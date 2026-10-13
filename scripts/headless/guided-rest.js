@@ -111,16 +111,16 @@ const t = H.checker();
         next: prim.classList.contains('is-next'), bg: cs.backgroundImage.slice(0, 15), bgc: cs.backgroundColor, ring: cs.boxShadow !== 'none', border: getComputedStyle(f).borderTopWidth + ' ' + getComputedStyle(f).borderTopColor };
     });
     const a = await foot();
-    t.check('footer, step 1: ‹ Prev is not drawn (not a disabled grey button), the primary says Done — Start Rest ✓ and takes the row',
-      a.labels.length === 1 && a.labels[0] === 'Done — Start Rest ✓' && a.pw >= a.fw - 33 && !a.next && a.bg === 'radial-gradient' && a.hs[0] >= 52 && /^1px /.test(a.border), JSON.stringify(a));
+    t.check('footer, step 1: ‹ Prev is not drawn (not a disabled grey button), the primary says Done · Start Rest ✓ and takes the row',
+      a.labels.length === 1 && a.labels[0] === 'Done · Start Rest ✓' && a.pw >= a.fw - 33 && !a.next && a.bg === 'radial-gradient' && a.hs[0] >= 52 && /^1px /.test(a.border), JSON.stringify(a));
     t.check('footer, step 1: no disabled button anywhere in it', await p.evaluate(() => !document.querySelector('#step-footer button[disabled]')));
     await doneRest(p);
     const r = await p.evaluate(() => ({ on: document.getElementById('timerOverlay').classList.contains('visible'), running: timerRunning, pos: STEP.pos, done: stepDone(STEP.seq[0]) }));
-    t.check('Done — Start Rest ✓ marks the set done and opens the timer running', r.on && r.running && r.pos === 0 && r.done, JSON.stringify(r));
+    t.check('Done · Start Rest ✓ marks the set done and opens the timer running', r.on && r.running && r.pos === 0 && r.done, JSON.stringify(r));
     await p.click('#timerXBtn'); await p.waitForTimeout(300);
     const b = await foot();
-    t.check('footer, step 2: ‹ Prev is there (44 px or more), outlined, and the primary is the green Done — Start Rest ✓',
-      b.pos === 1 && b.labels.join('|') === '‹ Prev|Done — Start Rest ✓' && b.hs.every(h => h >= 44) && !b.next && b.bg === 'radial-gradient', JSON.stringify(b));
+    t.check('footer, step 2: ‹ Prev is there (44 px or more), outlined, and the primary is the green Done · Start Rest ✓',
+      b.pos === 1 && b.labels.join('|') === '‹ Prev|Done · Start Rest ✓' && b.hs.every(h => h >= 44) && !b.next && b.bg === 'radial-gradient', JSON.stringify(b));
     t.check('footer, step 2: Prev is outlined (a ring, no fill)', await p.evaluate(() => { const c = getComputedStyle(document.querySelector('#step-footer .step-nav-btn')); return c.backgroundColor === 'rgba(0, 0, 0, 0)' && c.boxShadow !== 'none'; }));
     await p.click('#step-footer .step-nav-btn'); await p.waitForTimeout(250);
     const c = await foot();
@@ -131,7 +131,7 @@ const t = H.checker();
     // the last step: Finish Session ✓ is the primary again
     await p.evaluate(() => { STEP.pos = STEP.seq.length - 1; renderStep(); });
     const d = await foot();
-    t.check('the last set: ‹ Prev and the green primary; once ticked it is Finish Session ✓', d.labels.join('|') === '‹ Prev|Done — Start Rest ✓' && d.pos === 17, JSON.stringify(d));
+    t.check('the last set: ‹ Prev and the green primary; once ticked it is Finish Session ✓', d.labels.join('|') === '‹ Prev|Done · Start Rest ✓' && d.pos === 17, JSON.stringify(d));
     await p.evaluate(() => { currentStepRow().querySelector('.ex-set-check').click(); renderStep(); });
     const e = await foot();
     t.check('a done last set: Finish Session ✓ is the green primary', e.labels.join('|') === '‹ Prev|Finish Session ✓' && !e.next && e.bg === 'radial-gradient', JSON.stringify(e));

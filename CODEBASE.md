@@ -151,7 +151,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
     from the same progress blob. It flags a stale lift at the same 28 days but **ignores the
     closing-week window** — the athlete's strip waits so it does not nag, and Amir is the one
     deciding when to ask.
-  - Athlete-facing explanation is the **"Personal Records — the most you could lift once"** card
+  - Athlete-facing explanation is the **"Personal Records: the most you could lift once"** card
     in `APP_GUIDE` plus `CEILING_HELP` (the same prose, shown in place on the Records screen); the
     data handling is `privacy.html` §2.2. Keep all of them in step.
 - **The "Done" pill and the suggested-day highlight — the rules, in one place.** Both read

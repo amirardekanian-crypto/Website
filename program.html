@@ -255,7 +255,6 @@
     --rpe-under: var(--steel);
     --yellow-dim: rgba(14,74,54,0.08); --yellow-mid: rgba(14,74,54,0.22); --yellow-glow: rgba(14,74,54,0.2);
     --ice-dim: rgba(199,85,47,0.08); --ice-mid: rgba(199,85,47,0.22); --ice-glow: rgba(199,85,47,0.2);
-    --court: var(--fill);   /* the sign-in screen's green (it had a #0E4A36 fallback each time it was read) */
     --on-accent: #FFFFFF;   /* text/icons that sit on green/clay fills */
   }
   body[data-dark] {
@@ -536,7 +535,6 @@
   /* Section heading = §NN + condensed title + a scoreboard divider rule */
   #ar-body .ar-h { display: flex; align-items: center; gap: 10px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); text-transform: uppercase; color: var(--ink); letter-spacing: 0.3px; margin: 26px 0 11px; }
   #ar-body .ar-h::before { content: ''; width: 22px; height: 2px; background: var(--ice); flex-shrink: 0; }
-  #ar-body .ar-h .ar-sn { font-family: 'Space Mono', monospace; font-size: var(--fs-small); font-weight: 700; color: var(--clay-ink); flex-shrink: 0; }
   #ar-body .ar-h .ar-h-t { flex-shrink: 0; }
   /* List = tennis-ball bullets */
   #ar-body .ar-list { list-style: none; padding-left: 0; margin: 0 0 14px; }
@@ -1005,13 +1003,10 @@
   /* Collapsed state is now the DEFAULT — every exercise starts as a thin row
      and expands when tapped. Hides the expandable detail area + the inline
      chip/rest/log/etc. sections that exist on circuits. */
-  .checklist-item.collapsed .item-chips,
-  .checklist-item.collapsed .item-rest,
   .checklist-item.collapsed .weight-log,
   .checklist-item.collapsed .rpe-row,
   .checklist-item.collapsed .note-row,
-  .checklist-item.collapsed .round-list,
-  .checklist-item.collapsed .item-actions { display: none !important; }
+  .checklist-item.collapsed .round-list { display: none !important; }
 
   /* ── THE EXERCISE CARD ─────────────────────────────────────────────
      Tap-to-expand list view; its layout since 2026-09-27 is "The working card"
@@ -1542,8 +1537,6 @@
   .ex-how .ex-steps-slot:not(:empty) + .ex-cues-slot .ex-section-label { display: block; margin: 14px 0 4px; }
   body[data-dark] .ex-kit { color: #999; }
   body[data-dark] .ex-kit b, body[data-dark] .ex-steps li { color: #ddd; }
-  .sp-how .ex-vunit { margin: 2px 0 4px; }
-  .sp-how .ex-kit { margin-top: 4px; }
 
   /* The open card's Last time slot: the "First time" line only since 2026-10-12 (paintLastTime()). */
   .lt-slot:empty { display: none; }
@@ -1790,25 +1783,9 @@
      arrows, and the FIGURE carries the clay — the number is the hottest thing
      on the card. Legible in light and dark mode without a single override,
      which a near-black surface would not be (#202020 cards in dark mode). */
-  .nc-k { display: flex; align-items: center; gap: 7px;
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.74); }
-  .nc-r { margin-left: auto; color: #FAF7F2; }  /* was var(--grey-bg): near-black in dark mode, on a card that is always dark */
-  .nc-row { display: flex; align-items: flex-end; gap: 9px; margin-top: 10px; }
   .nc-n { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 50px;
     line-height: 0.82; letter-spacing: -1.8px; color: #E06B43; font-variant-numeric: tabular-nums; }
-  .nc-big { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 34px;
-    line-height: 0.9; letter-spacing: -0.6px; text-transform: uppercase; color: #E06B43; margin-top: 9px; }
-  .nc-u { font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
-    letter-spacing: 0.12em; color: rgba(255,255,255,0.58); padding-bottom: 5px; }
-  .nc-sp { margin-left: auto; padding-bottom: 2px; }
   .nc-spark { width: 70px; height: 28px; display: block; }
-  .nc-f { display: flex; align-items: center; gap: 7px; margin-top: 13px; padding-top: 11px;
-    border-top: 1px solid rgba(255,255,255,0.15);
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.04em;
-    text-transform: uppercase; color: rgba(255,255,255,0.74); }
-  .nc-f b { color: #fff; font-weight: 700; }
-  .nc-a { margin-left: auto; color: #FAF7F2; font-size: var(--fs-body); }
 
   /* ── The Daily Habits card is Proof's own Today hero, rebuilt on this app's
      palette (Amir, 2026-09-12: "the personal card that exists on today's tab").
@@ -1822,7 +1799,6 @@
      measures its page at 0px, and the strip would wait for ever for a height. */
   .proof-strip.off { height: 0; margin: 0; overflow: hidden; visibility: hidden; }
   .proof-frame { display: block; width: 100%; height: 0; border: 0; background: transparent; }
-  .nc-hero { padding-bottom: 14px; }
 
   /* ── Inline per-exercise weight field on round-format circuits / supersets ──
      A small box folded into each round row (one weight per exercise). Per-round
@@ -1872,15 +1848,10 @@
   body[data-dark] .play-btn { background: var(--yellow); color: var(--on-accent); }
 
   /* Wrapper so the play button stays right-aligned in the action area */
-  .item-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-shrink: 0; }
-  .item-actions .play-btn { margin-left: 0; }
-  .item-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .chip { font-size: var(--fs-label); font-weight: 500; padding: 3px 9px; border-radius: 20px; background: var(--grey-card); color: var(--grey-dark); letter-spacing: 0.3px; }
   .chip.yellow { background: var(--yellow); color: var(--on-accent); }
   .chip.dark   { background: var(--grey-card); color: var(--grey-text); }
 
-  .item-rest { border-top: 1px solid var(--grey-card); padding: 0; flex-direction: column; align-items: stretch; gap: 0; }
-  .rest-row { display: flex; align-items: center; justify-content: flex-end; padding: 10px 16px; }
   .rest-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-label); letter-spacing: 1px; text-transform: uppercase; background: var(--yellow); color: var(--on-accent); border: none; padding: 7px 12px; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 
   /* ── Coaching Cues (refreshed: rotating chevron + soft pill cues with circular badges) ── */
@@ -1909,7 +1880,6 @@
   }
   details[open].cues .chev { transform: rotate(90deg); }
   details.cues .chev path { stroke: currentColor; stroke-width: 2; fill: none; }
-  details.cues .cue-body { padding: 2px 18px 10px; display: flex; flex-direction: column; gap: 5px; }
 
   /* Cue lines — plain colored text, no backgrounds (per design preference). */
   .cue {
@@ -2161,10 +2131,6 @@
 
   /* ── Notes ── */
   #screen-notes { background: var(--grey-bg); }
-  .notes-header { background: var(--yellow); padding: 48px 24px 32px; position: relative; }
-  .notes-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
-  .notes-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display); color: #fff; text-transform: uppercase; line-height: 1; }
-  .notes-subtitle { font-size: var(--fs-small); color: rgba(255,255,255,0.72); margin-top: 6px; font-weight: 300; }
 
   .global-tabs .nav-item { position: relative; }
   /* The guide's cards (.note-card, the help sheet's fold rows): the SHEETS AND NOTICES block. */
@@ -2208,8 +2174,6 @@
   /* A card whose banner (not the whole card) is the way to Home: Game Plan's Active card. */
   .cm-banner[role="button"] { cursor: pointer; }
   .timer-presets { display: flex; gap: 10px; margin-top: 32px; }
-  .preset-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 1px; padding: 10px 20px; border-radius: 4px; border: 1px solid var(--grey-mid); background: transparent; color: var(--grey-text); cursor: pointer; }
-  .preset-btn.selected { border-color: var(--yellow); color: var(--green-ink); background: var(--yellow-dim); }
 
   /* ── Guided Mode entry point: Guided ▶ on the session bar, outlined (the CENTRE COURT block). */
 
@@ -2239,7 +2203,6 @@
   .step-scroll .rpe-row.dim { opacity: 0.55; }
   body[data-dark] .step-scroll .ex-set-row.step-current,
   body[data-dark] .step-scroll .rpe-row.step-current { background: #173328; }
-  .step-primary-full { flex: 1 1 100%; }
   .step-complete { text-align: center; padding: 48px 12px; }
   .step-complete-check { width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: var(--yellow); color: var(--on-accent); font-size: var(--fs-head); display: flex; align-items: center; justify-content: center; }
   .step-complete-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); color: var(--grey-dark); margin-bottom: 8px; }
@@ -2278,9 +2241,6 @@
 
   .weight-log { border-top: 1px solid var(--grey-card); padding: 9px 16px; display: flex; align-items: center; gap: 10px; }
   .weight-log label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-label); letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); white-space: nowrap; flex-shrink: 0; }
-  .weight-input { flex: 1; background: var(--grey-card); border: 1px solid transparent; border-radius: 4px; padding: 6px 10px; font-size: var(--fs-field); font-family: 'Barlow', sans-serif; color: var(--grey-dark); outline: none; transition: border-color 0.2s; }
-  .weight-input:focus { border-color: var(--yellow); }
-  .weight-input::placeholder { color: #bbb; }
   .checklist-item.checked .weight-log { opacity: 0.4; }
 
   /* ── RPE Selector ── */
@@ -2300,8 +2260,6 @@
   /* ── Dark Mode ── */
   /* Dark mode's colours are the dark half of THE APP'S ONE COLOUR SET, at the top of this sheet. The rules below are the non-token
      dark rules: a colour that has no token. */
-  body[data-dark] .weight-input { background: #2a2a2a; color: #ddd; }
-  body[data-dark] .weight-input::placeholder { color: #555; }
   body[data-dark] .rpe-btn { border-color: #444; color: #9a9a9a; }
   body[data-dark] .rpe-label { color: #9a9a9a; }
   body[data-dark] .chip { background: #2a2a2a; color: #aaa; }
@@ -4000,13 +3958,13 @@
   }
 
   /* 2. Guided's footer: one row on the paper under a hairline. ‹ Prev is outlined and not drawn on the first step; the primary is
-     the day's green (--btn) when it logs or finishes (Done — Start Rest ✓, Finish Session ✓) and outlined when it only moves
+     the day's green (--btn) when it logs or finishes (Done · Start Rest ✓, Finish Session ✓) and outlined when it only moves
      on (Next →). Every button 52 px tall; the words fit at 320 px. */
   #stepOverlay .step-footer { flex: none; display: flex; gap: 10px; padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 12px);
     border-top: 1px solid var(--hair); background: var(--paper); }
   #stepOverlay .step-nav-btn, #stepOverlay .step-primary-btn { min-height: 52px; padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; white-space: nowrap;
     font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; transition: transform 0.1s; }
-  @media (min-width: 400px) { #stepOverlay .step-nav-btn, #stepOverlay .step-primary-btn { font-size: var(--fs-lead); } }   /* --fs-body under 400 px: "Done — Start Rest ✓" beside ‹ Prev must hold in a fallback font too */
+  @media (min-width: 400px) { #stepOverlay .step-nav-btn, #stepOverlay .step-primary-btn { font-size: var(--fs-lead); } }   /* --fs-body under 400 px: "Done · Start Rest ✓" beside ‹ Prev must hold in a fallback font too */
   #stepOverlay .step-nav-btn { flex: none; background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--box); }
   #stepOverlay .step-primary-btn { flex: 1 1 0; min-width: 0; background: var(--btn); color: #fff; box-shadow: none; }
   #stepOverlay .step-primary-btn.is-next { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--box); }
@@ -4781,7 +4739,7 @@
 
 <!-- ═══ DEMO BANNER (shown only when ?client=demo) ═══ -->
 <div class="demo-banner" id="demo-banner" hidden>
-  <span class="demo-banner-text"><strong>Live demo</strong> · sample athlete — your real program is built from scratch.</span>
+  <span class="demo-banner-text"><strong>Live demo</strong> · sample athlete. Your real program is built from scratch.</span>
   <span class="demo-banner-actions">
     <a href="/form.html" class="demo-banner-cta">Apply</a>
     <a href="/" class="demo-banner-exit" aria-label="Exit demo and return to site">Exit ✕</a>
@@ -9271,36 +9229,36 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your program. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your program. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
-    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
+    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
     body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
-    body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
+    body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues; it opens by itself the first time you meet an exercise and is folded after that, and the ▶ on it means there is a video; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
-    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round; warm-ups stay in the list. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
-  { icon: 'compass', title: 'The ⓘ — what an exercise is for',
+    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. Warm-ups stay in the list. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
+  { icon: 'compass', title: 'The ⓘ: what an exercise is for',
     body: `<p>The small <strong>i</strong> at the right end of every exercise answers what you'd ask me about it. <strong>What does it do?</strong> and the qualities it builds (tap one to read what it means). <strong>How does it help on court?</strong> <strong>Where will I feel it?</strong> shows your body front and back with the working muscles in green, and a line under it names them, the main ones first.</p><p>Then three short lists. Under <strong>Too hard?</strong> are the <strong>Regressions</strong>, easier versions of the same movement. Under <strong>Too easy?</strong> are the <strong>Progressions</strong>, harder versions. Under <strong>Other kit?</strong> are the <strong>Alternatives</strong>, the same movement on other equipment. Tap a name to read about it. A name marked <em>Not in the app yet</em> has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why am I doing this?</strong>, signed by me. All of them are on one page too: tap <strong>Why your plan looks like this</strong> on <strong>Progress</strong>, under your current cycle in the Game Plan.</p><p><strong>Your history</strong> at the bottom says how many times you've done it and what you did last time. Tap it for every session.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with <strong>How do I do it?</strong> (the video when there is one, the steps and the cues), and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
     body: `<p>The <strong>Next up</strong> card on Home, and the top of each day, show up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Your history on every exercise',
     body: `<p>Every exercise remembers what you did. An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. A set that ran <strong>over</strong> its target last time also shows a faint "last" line under today's row.</p><p>For the whole story, tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>: every time you've done it, your reps, your RPEs and your notes, and how your best set has moved.</p><p>A superset or circuit still shows <strong>Last time</strong> when you open it, because its boxes don't show last time's weights.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
-  { icon: 'activity', title: 'Personal Records — the most you could lift once',
+  { icon: 'activity', title: 'Personal Records: the most you could lift once',
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal; the card says where it is. In <strong>Guided</strong> mode, <strong>Finish Session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done; rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> (in the bar at the top, under <strong>⋯</strong> once the clock is going; tap it twice) clears the clock, the check-in, your ticks and your RPEs. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish Session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Every Sunday</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
-    body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
+    body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong> — the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on; iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it.</li><li><strong>How to do it</strong> — inside an exercise: the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
-    body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
+    body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
 ];
 
 function buildAppGuideCards(openKey) {
@@ -10016,7 +9974,7 @@ function renderCeiling() {
           <li>Tick the set, then tap your RPE for it, which is how hard it felt out of 10.</li>
           <li>Finish the session. Your best set lands here by itself, and so does every new best after it.</li>
         </ol>
-        ${canAdd ? `<p class="ceil-after-steps">Or put one in from here — useful when you have
+        ${canAdd ? `<p class="ceil-after-steps">Or put one in from here. It's useful when you have
         just tested a lift, or lifted somewhere the app was not open.</p>`
         : `<p class="ceil-after-steps">Your number lands here. Go heavy and stop close to your limit
         and it will be a good one.</p>`}
@@ -10210,7 +10168,7 @@ function openCeilingForm(i, asTest) {
       </div>
       <button type="button" class="ex-1rm-save" id="cf-save" onclick="saveCeilingForm()">Save to Personal Records</button>
     </div>
-    <p class="ceil-note">A date in the past is fine — log the day you lifted it,<br>
+    <p class="ceil-note">A date in the past is fine. Log the day you lifted it,<br>
       not the day you got round to typing it in.</p>`;
 
   ['cf-kg', 'cf-rp'].forEach(id =>
@@ -13930,8 +13888,8 @@ function renderWeightScreen() {
       ideally first thing, and the line means something.</p>` + wtEntryHtml() + `
       <div class="ceil-empty">
         <p><strong>Nothing logged yet.</strong></p>
-        <p>One reading is just a number —
-        a few over a few weeks is the trend, and the trend is the part worth having.</p>
+        <p>One reading is just a number.
+        A few over a few weeks is the trend, and the trend is the part worth having.</p>
       </div>`;
     return;
   }
@@ -14782,11 +14740,11 @@ function currentStepRow() {
 }
 
 // ‹ Prev is not drawn on the first step (a disabled grey button said nothing; its room goes to the primary). The primary is
-// green when it logs or finishes (Done — Start Rest ✓, Finish Session ✓) and outlined when it only moves on (Next →).
+// green when it logs or finishes (Done · Start Rest ✓, Finish Session ✓) and outlined when it only moves on (Next →).
 function renderStepFooter() {
   const isLast = STEP.pos === STEP.seq.length - 1;
   const done = stepDone(STEP.seq[STEP.pos]);
-  const label = done ? (isLast ? 'Finish Session ✓' : 'Next →') : 'Done — Start Rest ✓';
+  const label = done ? (isLast ? 'Finish Session ✓' : 'Next →') : 'Done · Start Rest ✓';
   document.getElementById('step-footer').innerHTML =
     (STEP.pos > 0 ? `<button type="button" class="step-nav-btn" onclick="stepPrev()">‹ Prev</button>` : '') +
     `<button type="button" class="step-primary-btn${done && !isLast ? ' is-next' : ''}" onclick="stepPrimary()">${esc(label)}</button>`;

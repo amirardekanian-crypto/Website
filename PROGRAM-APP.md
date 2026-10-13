@@ -844,7 +844,7 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     **the card's own ⓘ** at the right end of the name row (`#step-about` clicks the card's `.ex-about`, so it opens the same About sheet
     over Guided; a Because is the clay disc), and ? and ✕ as the cover's 44 px glass buttons. The week's limits row (`#step-week`) sits
     under it on a darker green, its numbers clay-on-green. The body's own name is hidden inside Guided only.
-  - **The footer** is one row on the paper under a hairline: ‹ Prev (outlined, NOT drawn on step 1), the primary green Done — Start Rest ✓
+  - **The footer** is one row on the paper under a hairline: ‹ Prev (outlined, NOT drawn on step 1), the primary green Done · Start Rest ✓
     (Finish Session ✓ on the last set), Next → outlined. Labels unchanged; `--fs-body` under 400 px.
   - **The rest timer is a green band, then the paper**: the sound as an icon toggle top left (`aria-pressed`, the same
     `toggleRestSound()` and `rest_sound`), ✕ top right (`closeTimer()`: it closes in the list and skips in Guided, as the old bottom button
@@ -904,7 +904,7 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     mask of `--hero-end`, the eyebrow *● AA PERFORMANCE* in the mint-dot recipe, *COACH* clay on green (`--clay-on-green`, the brand line).
     The sheet is `--paper` with the app sheet's 16 px top corners; the labels Space Mono in `--grey`; the fields the set table's boxes (white
     `--row`, `--field` edge, 16 px text, 48 px, 10 px corners, green focus); a failed sign-in is the day's banner (4 px clay stripe, ink text).
-    Every colour is a token now (`--court` is no longer read).
+    Every colour is a token now (`--court`, which only this screen read, is gone).
   - **The Welcome** is a cover (the picture graded into `--hero` as the archive's is, *● YOU'RE IN*, *WELCOME, ALEX.*, ✕ as the 44 px glass
     button), its two lines on the paper **signed** (`WN_SIG` and his photo), **Open Day 1** the primary button and *Look around first* quiet
     green-ink text; both on screen at 320 × 568. On a wide window it sits in the app's 520 px column.
@@ -933,6 +933,13 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     (no caller passes one yet). Its place, one-at-a-time rule and timings are unchanged.
   - **The install offer** is a white bottom card styled in program.html only (shared.js serves the public site): the app icon, the words as
     before, **Install** primary green, *Not now* quiet text (`showInstallOffer()` relabels shared.js's Dismiss).
+
+- **The sweep** (2026-10-13, after every screen above): the athlete-facing copy in program.html is COM-3 clean (no em dash and no
+  semicolon in the guide, Records, Body weight or the demo banner; Guided's button reads **Done · Start Rest ✓**, and its tests and the
+  guide moved with it). An em dash is left only where the athlete never reads it as prose: the report email and `readinessPlanLine()`
+  (coach.html parses that line), the coach preview bar, the page title, and `—` as an empty value in a scoreboard. 42 lines of style
+  for classes nothing draws went (Night Court's card parts, the old Coach header, the old card's chips, rest and action rows, the timer
+  presets, the old weight input, `--court`).
 
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
 

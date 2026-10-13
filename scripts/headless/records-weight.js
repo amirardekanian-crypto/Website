@@ -184,7 +184,7 @@ const COVER = `(() => {
     t.check('Records empty: the four steps are a numbered list on the paper (01 to 04, Space Mono, green), with the same words',
       e.steps.length === 4 && e.steps.every(s => s[1] === 'counter(ceilstep, decimal-leading-zero)') && e.steps.every(s => s[2] === GREEN && /Space Mon/.test(s[3])) && /Open any exercise in today's session\./.test(e.steps[0][0]) && /Finish the session\. Your best set lands here by itself/.test(e.steps[3][0]) && e.head === 'Nothing here yet.', JSON.stringify(e));
     t.check('Records empty: then the one sentence about putting one in, then the + Log a max door, then How this works (closed)',
-      /^Or put one in from here — useful when you have just tested a lift, or lifted somewhere the app was not open\.$/.test(e.after) && e.door && e.order.join(' ') === 'ceil-intro ceil-empty hrow.ceil-door ceil-help' && e.help.n === 1 && e.help.open === false, JSON.stringify([e.after, e.door, e.order, e.help]));
+      /^Or put one in from here\. It's useful when you have just tested a lift, or lifted somewhere the app was not open\.$/.test(e.after) && e.door && e.order.join(' ') === 'ceil-intro ceil-empty hrow.ceil-door ceil-help' && e.help.n === 1 && e.help.open === false, JSON.stringify([e.after, e.door, e.order, e.help]));
     await shot(p, 'records-empty');
     t.check('no page errors (Records empty)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
@@ -468,7 +468,7 @@ const COVER = `(() => {
       note: document.querySelector('#wt-body .ceil-empty p + p').textContent.replace(/\s+/g, ' ').trim(), chips: document.querySelectorAll('#wt-body .wt-chip').length }));
     t.check('Body weight empty: no scoreboard, the sentence, the box and Weigh in, then "Nothing logged yet." and its line, all on the paper',
       e.cover[0] && e.cover[1] && e.order.join(' ') === 'ceil-intro wt-entry ceil-empty' && /^Your weight over time\. Weigh yourself at the same time of day, ideally first thing, and the line means something\.$/.test(e.intro) && e.nothing === 'Nothing logged yet.' && e.input && e.save === 'Weigh in'
-        && /^One reading is just a number — a few over a few weeks is the trend, and the trend is the part worth having\.$/.test(e.note) && e.chips === 0, JSON.stringify(e));
+        && /^One reading is just a number\. A few over a few weeks is the trend, and the trend is the part worth having\.$/.test(e.note) && e.chips === 0, JSON.stringify(e));
     await shot(p, 'weight-empty');
     // the first weigh-in from the empty screen
     await p.fill('#wt-input', '82.3'); await p.click('.wt-save'); await p.waitForTimeout(350);
