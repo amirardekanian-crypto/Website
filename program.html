@@ -3992,6 +3992,8 @@
      the day's green (--btn) when it logs or finishes (Done · Start Rest ✓, Finish Session ✓) and outlined when it only moves
      on (Next →). Every button 52 px tall; the words fit at 320 px. */
   /* A step of items with nothing to log (renderGroupStep(), 2026-10-13): paper rows, a ring that ticks each one. */
+  #stepOverlay .step-ex-nums .nl-help { position: relative; }
+  #stepOverlay .step-ex-nums .nl-help::after { content: ''; position: absolute; left: -12px; right: -12px; top: -12px; bottom: -12px; }   /* a 44 px target, as on the card */
   #stepOverlay .step-group { display: grid; margin-top: 8px; }
   #stepOverlay .sg-row { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: center; width: 100%; min-height: 56px;
     padding: 10px 0; border: 0; border-top: 1px solid var(--hair); background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
@@ -6555,6 +6557,7 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
       tabs.classList.remove('is-hidden');
       tabs.querySelectorAll('.nav-item').forEach(n => {
         n.classList.toggle('active', n.dataset.tab === 'home');
+        if (n.dataset.tab === 'home') n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');
       });
     }
     // Reveal the account button (NAV-02) with the athlete's initials.
@@ -8282,7 +8285,7 @@ function renderHome() {
           <div class="complete-rpe-hint">1 = very easy · 10 = maximum effort</div>
           <div class="complete-rpe-buttons" data-key="${sRpeKey}">
             ${[1,2,3,4,5,6,7,8,9,10].map(n =>
-              `<button type="button" class="complete-rpe-btn" data-rpe="${n}">${n}</button>`
+              `<button type="button" class="complete-rpe-btn" data-rpe="${n}" aria-label="Session rating ${n} of 10">${n}</button>`
             ).join('')}
           </div>
         </div>
@@ -9584,6 +9587,7 @@ function goTo(screen, historyId, keepContent) {
   const litTab = ({ ceiling: 'plan', weight: 'plan', workout: 'workouts', article: 'workouts', archive: 'plan' })[screen] || screen;
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
     n.classList.toggle('active', n.dataset.tab === litTab);
+    if (n.dataset.tab === litTab) n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');   // a screen reader says which tab is open
   });
 
   // Every nav screen shows the global tab bar + the account button (the Home tab
@@ -15336,7 +15340,7 @@ function paintTimerLog(row, item) {
       <div class="tl-line tl-rpe">
         <span class="tl-lab">RPE</span>
         ${[6,7,8,9,10].map(v => { const on = selRpe() === String(v), vs = on ? rpeVs(v, rpeTargetOf(item.card)) : '';
-          return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}">${v}</button>`; }).join('')}
+          return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}" aria-label="RPE ${v}">${v}</button>`; }).join('')}
       </div>${lim}`;
     const kgBox = tl.querySelector('.tl-kg');
     if (kgBox) kgBox.addEventListener('change', () => kgCheckTicked(item.name, wIn.value, item.card));   // the set is ticked by now
