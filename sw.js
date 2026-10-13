@@ -274,7 +274,8 @@
 // v143: program.html and habits.html changed (2026-10-13): supabase-js pinned to 2.117.3 (it was a floating @2).
 // v144: program.html and habits.html load supabase-js from this site (/assets/js/supabase-2.117.3.js, precached in SHELL), not jsDelivr.
 // v145: program.html changed (2026-10-13): it opens from the plan saved on the phone first and checks the server behind it; data/<id>.json is tried on local hosts only.
-const CACHE = 'aap-v145';
+// v146: program.html changed (2026-10-13): Next up is the day after the last one trained (it rotates), not the first day not done this week.
+const CACHE = 'aap-v146';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

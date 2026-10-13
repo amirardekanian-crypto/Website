@@ -7506,15 +7506,39 @@ function dayCardHTML(day, dayNum, total, opts) {
 }
 
 // The suggested day, by id (HOME-01): a session under way today first; otherwise, unless the cycle is over (PROG-02: nothing is
-// suggested between cycles), the first day not done THIS WEEK (it used to be the first day without today's stamp, so every
-// morning said Day 1). Every day done this week: null. markSuggestedDay() and homeDaysHTML() both ask it, so the card that is
-// marked and the card that is big can never be two different days.
+// suggested between cycles), the day AFTER the last one trained in this cycle, the first from there not done THIS WEEK (Line
+// Call, 2026-10-13; Amir: "yes to all recommended", decision 3, "rotate"). It used to be the first day not done this week, so a
+// week of two sessions repeated Days 1 and 2 for ever and the last day, the one done least (5-day plans: 30, 25, 19, 14 and 12%
+// of sessions by position), never came. Nothing trained yet in this cycle: the first day not done this week, as before. Every
+// day done this week: null. markSuggestedDay() and homeDaysHTML() both ask it, so the card that is marked and the card that is
+// big can never be two different days. This Week still counts the calendar week (weekDoneDays()).
 function suggestedDayId() {
   const ids = (DATA.workouts && DATA.workouts.days || []).map((d, i) => String(d.id != null ? d.id : i + 1));
   const done = weekDoneDays();
   let i = ids.findIndex(id => dayInProgress(id));
-  if (i < 0 && !cycleOver()) i = ids.findIndex(id => !done.has(id));
+  if (i < 0 && !cycleOver()) {
+    const last = ids.indexOf(lastTrainedDayId(ids));
+    for (let k = 0; k < ids.length && i < 0; k++) {
+      const j = (last + 1 + k) % ids.length;   // last = -1 (none yet): from the first day
+      if (!done.has(ids[j])) i = j;
+    }
+  }
   return i >= 0 ? ids[i] : null;
+}
+// The day of this cycle's latest session (suggestedDayId()): one finished on this phone today first (the latest by its clock),
+// else the newest in the session history (HIST is newest first) on or after the cycle's start. null when there is none.
+function lastTrainedDayId(ids) {
+  let best = null, bestEnd = -1;
+  ids.forEach(id => {
+    if (!completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) return;
+    const t = loadTimer(id), end = t && t.sessionEnd ? new Date(t.sessionEnd).getTime() : 0;
+    if (best === null || end >= bestEnd) { best = id; bestEnd = end; }   // ids in order, so a tie goes to the later day
+  });
+  if (best !== null) return best;
+  const cur = currentCycleData();
+  const from = cur && cur.startDate ? String(cur.startDate).slice(0, 10) : '';
+  const s = (HIST || []).find(x => ids.indexOf(String(x.day)) >= 0 && (!from || String(x.date) >= from));
+  return s ? String(s.day) : null;
 }
 
 // Home's days, one string for #day-cards-wrap (renderHome() and paintWeek() both write it): the suggested day as the Next up

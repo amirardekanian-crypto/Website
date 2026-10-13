@@ -250,7 +250,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   nothing reads it. Do not bring a chat back unasked. Details in `PROGRAM-APP.md`.
 - **Home leads with the week** (Amir 2026-10-12, Quiet Frame #6; HOME-02 before it; `PROGRAM-APP.md` → *Home and Progress
   in the Centre Court look*): the greeting, This Week (the week note in its week), **Next up** (the suggested day,
-  `suggestedDayId()`, as the day's cover with one green button: Open Day N, or Resume and its clock), the other days as
+  `suggestedDayId()`: since 2026-10-13 the day AFTER the last one trained, so short weeks rotate through every day; as the day's
+  cover with one green button: Open Day N, or Resume and its clock), the other days as
   paper rows (`.dc-row`, `data-dl`, the P24 numeral, solid green when done), then the habits row. Only Next up carries
   `data-dc`. **The This cycle card, Personal records and Body weight live on Progress**, not Home. **Home never names a rest
   day**: athletes move their days. **The day after the cycle's end date Home is between cycles** (PROG-02, Amir 2026-10-10,

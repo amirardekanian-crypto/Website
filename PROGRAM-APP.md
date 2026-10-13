@@ -828,7 +828,9 @@ tokens for one day; the copy is gone).
   at 28 px); the offline line and the filed-day card; This Week (the week note in its week, else the heading and the
   count); **Next up**; the rest of the week; the week-done extra; **Daily habits** and AA Proof's strip. Nothing else.
 - **Next up** (`dayCardHTML(…, { hero: true })`): the suggested day (`suggestedDayId()`: a session under way first, else
-  the first day not done this week, never between cycles; `markSuggestedDay()` asks the same function, so the marked day
+  the day after the last one trained this cycle, the first from there not done this week (`lastTrainedDayId()`; Line Call,
+  2026-10-13, Amir's decision 3 "rotate": the first day not done this week made two-session weeks repeat Days 1 and 2 for ever,
+  `scripts/headless/next-up.js`), never between cycles; `markSuggestedDay()` asks the same function, so the marked day
   and the big card are always one day) as the day's own cover: the photo graded into green, *● NEXT UP · DAY 2* (or
   *IN PROGRESS · DAY 2*), the name in capitals, *N blocks · M movements*, the quality tiles, and one green button,
   `.dc-go`: **Open Day 2 ▶**, or, for a day under way, *N of M sets* with the ticking clock (`.dc-clock`) and **Resume ▶**.
