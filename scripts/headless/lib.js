@@ -108,8 +108,8 @@ function library() {
 async function context(browser, opts) {
   const ctx = await browser.newContext({ viewport: { width: opts.w || 390, height: opts.h || 844 },
     isMobile: true, hasTouch: !!opts.touch, serviceWorkers: 'block', ...(opts.tz ? { timezoneId: opts.tz } : {}) });
-  // Only the local server: fonts, Plausible and the CDN fail fast, as they would with no signal. opts.fonts lets Google Fonts through
-  // (for screenshots that should look like the phone: Space Mono and Barlow Condensed instead of the system's fallbacks).
+  // Only the local server: Plausible and the CDN fail fast, as they would with no signal. program.html's fonts are local since
+  // 2026-10-13; opts.fonts still lets Google Fonts through, for AA Proof's strip (habits.html links them).
   await ctx.route('**/*', r => {
     const u = r.request().url();
     // The apps' own copy of supabase-js (2026-10-13): never loaded here, so the stub stays the library, as the CDN copy never was.

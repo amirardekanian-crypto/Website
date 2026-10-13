@@ -15,6 +15,9 @@ const tickAll = p => p.evaluate(() => {
   document.querySelectorAll('#day1 .checklist-item').forEach(c => { if (!c.classList.contains('checked')) toggleCheckOnly(c, '1'); });
   try { hideAaToast(); } catch (e) {}
 });
+// Waits for the status line (or the queue) to settle, up to `ms`, instead of a fixed time: under a loaded machine a call can take
+// longer than 1.5 s, and the check then read "Sending to your coach…" (2026-10-13). A timeout just lets the check report what it sees.
+const settle = (p, fn, ms) => p.waitForFunction(fn, null, { timeout: ms || 8000 }).catch(() => {});
 const line = p => p.evaluate(() => {
   const el = document.getElementById('send-status-1');
   return { text: el.textContent.trim(), cls: el.className, csq: JSON.parse(localStorage.getItem(ATHLETE_ID + '_csq') || '[]').length,
@@ -31,7 +34,8 @@ const line = p => p.evaluate(() => {
     await tickAll(p);
     await p.evaluate(() => { window.__STUB.mode = 'offline'; });
     await p.click('#confirm-1 .complete-rpe-btn[data-rpe="7"]'); await p.waitForTimeout(150);
-    await p.click('#confirm-1 .confirm-btn'); await p.waitForTimeout(1500);
+    await p.click('#confirm-1 .confirm-btn');
+    await settle(p, () => /^Saved on your phone/.test((document.getElementById('send-status-1') || { textContent: '' }).textContent.trim()));
     const a = await line(p);
     C.check('no signal at Done: "Saved on your phone" while the record and the email wait', /^Saved on your phone/.test(a.text) && a.csq === 1, JSON.stringify(a));
     // The email went (as if its own call got through) but the record is still in the queue: the line must not say "With your coach".
@@ -45,7 +49,7 @@ const line = p => p.evaluate(() => {
     });
     C.check('the email went but the record still waits: still "Saved on your phone", never "With your coach"', /^Saved on your phone/.test(b.text) && !/With your coach/.test(b.text) && b.csq === 1, JSON.stringify(b));
     await p.evaluate(() => { window.__STUB.mode = 'online'; window.dispatchEvent(new Event('online')); });
-    await p.waitForTimeout(2500);
+    await settle(p, () => /^✓ With your coach · /.test((document.getElementById('send-status-1') || { textContent: '' }).textContent.trim()));
     const c = await line(p);
     C.check('the signal comes back: the queue sends it and the line turns to "✓ With your coach" with the time, by itself', c.csq === 0 && /^✓ With your coach · /.test(c.text) && /success/.test(c.cls), JSON.stringify(c));
     C.check('no page errors (no signal, then signal)', !p.errs.length, JSON.stringify(p.errs));
@@ -57,7 +61,8 @@ const line = p => p.evaluate(() => {
     const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), stub: { library: H.library() } });
     await tickAll(p);
     await p.click('#confirm-1 .complete-rpe-btn[data-rpe="7"]'); await p.waitForTimeout(150);
-    await p.click('#confirm-1 .confirm-btn'); await p.waitForTimeout(1500);
+    await p.click('#confirm-1 .confirm-btn');
+    await settle(p, () => !JSON.parse(localStorage.getItem(ATHLETE_ID + '_csq') || '[]').length);
     const d = await p.evaluate(() => { localStorage.removeItem(ATHLETE_ID + '_outbox'); paintSendStatus('1'); return document.getElementById('send-status-1').textContent.trim(); });
     C.check('record on the server, no email waiting or sent: "✓ With your coach"', d === '✓ With your coach', d);
     await ctx.close();

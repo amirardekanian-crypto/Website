@@ -286,7 +286,8 @@
 // v155: program.html changed (2026-10-13): a rough day keeps the first lift of the Strength block that is not a jump.
 // v156: program.html changed (2026-10-13): names a screen reader says well (session rating, rest RPE keys, the open tab) and Guided's tempo link at 44 px.
 // v157: program.html changed (2026-10-13): 100dvh beside 100vh (iPhone's toolbar), and an installed app asks to keep its storage.
-const CACHE = 'aap-v157';
+// v158: program.html changed (2026-10-13): its fonts come from this site (/assets/css/app-fonts.css, Space Mono added), not Google Fonts.
+const CACHE = 'aap-v158';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -300,6 +301,8 @@ const SHELL = [
   '/assets/js/shared.js',
   // supabase-js, our own copy since 2026-10-13 (program.html and habits.html): a repeat open reads it from here, not jsDelivr.
   '/assets/js/supabase-2.117.3.js',
+  // The app's own font stylesheet since 2026-10-13 (its font files are kept as they are first used).
+  '/assets/css/app-fonts.css',
   '/assets/img/icon-192.png',
   '/assets/img/icon-512.png',
   // The training day's focus title (Centre Court, v124): our own copy, so it is condensed with no signal too.

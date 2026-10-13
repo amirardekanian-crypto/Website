@@ -162,19 +162,19 @@
          first meant a slow analytics download held up the Supabase SDK behind
          it — and the SDK is what boot() waits on before it can decide whether
          to show the login form at all.
-     So: preconnect to every third-party origin, load the font CSS without
-     blocking paint, put the SDK ahead of analytics, and make analytics `async`
-     so it leaves the ordered queue entirely. `crossorigin` is on exactly the
-     two origins fetched with CORS (font files, Supabase RPCs) — putting it on
-     the other two would open a second connection nothing reuses. -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     So: preconnect to Supabase, load the font CSS without blocking paint, put
+     the SDK ahead of analytics, and make analytics `async` so it leaves the
+     ordered queue entirely. The fonts and the SDK are this site's own files
+     since 2026-10-13, so the one preconnect left is Supabase's, with
+     `crossorigin` because its RPCs are fetched with CORS. -->
 <link rel="preconnect" href="https://bvipfipbdcyqnbczjmaq.supabase.co" crossorigin>
 <!-- media="print" → the browser fetches it at low priority and does NOT wait for
-     it to paint; onload promotes it to the real stylesheet. The families already
-     carry display=swap, so the only cost is a brief flash of the system font. -->
-<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"></noscript>
+     it to paint; onload promotes it to the real stylesheet. Every face carries
+     font-display:swap, so the only cost is a brief flash of the system font. -->
+<!-- The app's own fonts since 2026-10-13 (Line Call, Second Serve N1/N2): /assets/css/app-fonts.css and /assets/fonts/, the same
+     files the site serves, so nothing waits on Google Fonts (unverified from Iran), and the service worker keeps them. -->
+<link rel="stylesheet" media="print" onload="this.media='all'" href="/assets/css/app-fonts.css">
+<noscript><link rel="stylesheet" href="/assets/css/app-fonts.css"></noscript>
 <!-- Supabase: cloud backup of progress for the coach dashboard (Stage 1).
      Deliberately ABOVE analytics — see the ordering note above.
      onerror (REL-01, 2026-09-26): the service worker keeps only this site's own files, so
