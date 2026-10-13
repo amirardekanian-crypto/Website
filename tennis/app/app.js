@@ -51,6 +51,11 @@
   (() => { const ag = new URLSearchParams(location.search).get('age');
     if (AGE_LABEL[ag]) { prefs = { age: ag }; writePrefs(prefs); } })();
   let draft = prefs ? Object.assign({}, prefs) : { age: null };
+  // The last week opened, so Start's button says «ادامه: هفتهٔ ۵» (Amir, 2026-10-13). On this phone only, like the version;
+  // never sent. viewWeek() and viewSession() call rememberWeek() for a week that is open (never a locked one).
+  const LAST_KEY = 'tps.last';
+  const lastWeek = () => { try { const v = JSON.parse(localStorage.getItem(LAST_KEY)); return v && v.week > 0 ? v.week : 0; } catch (e) { return 0; } };
+  const rememberWeek = w => { try { localStorage.setItem(LAST_KEY, JSON.stringify({ week: +w })); } catch (e) { /* private mode: fine */ } };
   const cur = () => ({ age: (prefs && prefs.age) || 'adult' });
 
   // ?content=_fixtures loads a test set instead of the real content, and ?local=1 the real files
@@ -356,7 +361,7 @@
   const DEMO = !!window.DEMO;
   const COURSE = 'سیستم آمادگی جسمانی تنیس · سطح ۲';   // the name in the product page's buy message (tennis/level-test.js)
   const BUY_URL = 'https://wa.me/447435363461?text=' + encodeURIComponent('سلام امیر، نسخه‌ی نمایشی رو دیدم و می‌خوام «' + COURSE + '» رو بخرم.');
-  const LOCK = '<span class="lock" aria-label="قفل">🔒</span>';
+  const LOCK = '<span class="lock" role="img" aria-label="قفل"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>';
   const isLocked = o => !!(o && o.locked);
   const lockedCount = list => list.filter(isLocked).length;
   const openWeeksText = () => fa(((C.programme && C.programme.weeks) || []).map(w => w.week).join('، '));
@@ -474,6 +479,7 @@
     },
     testday: { '*': { f: 'test-day', pos: '50% 50%' } },                   // the test-day card and its page (weeks 4, 8, 12, 16)
     done: { '*': { f: 'last-ball', pos: '50% 50%' } },                     // the session-complete screen
+    start: { '*': { f: 'walk-on', pos: '22% 30%' } },                      // the Start screen's cover (the sign-in picture too, index.html)
     locked: { '*': { f: 'under-covers', pos: '50% 55%' } }                 // every locked item's page
   };
   const artFor = (kind, key) => (ART[kind] && ART[kind][key]) || null;
@@ -486,12 +492,31 @@
   // The Spine's video first (stage65: the course reads its exercises from the Spine), then the old name list, then the file.
   const videoFor = ex => (ex && ex.spineVideo) || (C.libIndex && C.libIndex[libKey(exName(ex))]) || (ex && ex.video) || '';
   const pill = (t, cls) => `<span class="pill ${cls || ''}">${t}</span>`;
-  const GEAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>';
+  const GEAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const BACK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12h15M13.5 6l6 6-6 6"/></svg>';   // → : back points right in RTL
 
+  /* Centre Court's small parts (app.css, section 3). Each is a string or a tiny function, so a screen never redraws one by hand. */
+  // The separator. NEVER a middle dot next to a Persian digit: in Vazirmatn "·" is the Persian zero "۰", so
+  // «۱۶ هفته · ۴ بلوک» reads «۴۰ بلوک». SEP is a short drawn bar; sepJoin() joins the non-empty parts with it;
+  // dots() turns the " · " inside a content string (session and week titles) into it, after esc().
+  const SEP = '<span class="sep" aria-hidden="true"></span>';
+  const sepJoin = parts => parts.filter(Boolean).join(SEP);
+  const dots = html => String(html == null ? '' : html).replace(/\s+·\s+/g, SEP);
+  // The numeral (P24): Persian digits, outlined; cls 'solid' when done or open, 'off' when locked, 'sm' smaller.
+  const pnum = (n, cls) => `<span class="pnum ${cls || ''}" aria-hidden="true">${fa(n)}</span>`;
+  const CHEV = '<span class="chev" aria-hidden="true"></span>';     // ⌄ a fold opens; turns over when open
+  const GO = '<span class="lr-go" aria-hidden="true"></span>';      // the go chevron, pointing left
+  const GO_TRI = '<span class="go-tri" aria-hidden="true"></span>'; // after a cover button's words
+
+  // The screen's head (app.css 3.3). A picture earns a COVER: o.art (or o.cover for the green with no picture). No picture:
+  // the PAPER HEADER. o.kicker is the eyebrow (plain Farsi, no "·"), o.title the title, o.sub a sentence, o.meta one line
+  // (sepJoin its parts), o.foot anything that belongs inside the cover under them (its one green button), o.tall a tall
+  // cover (Start). .banner, .back, .gear and .bhelp are the tour's and the tests' selectors: keep them.
   function banner(o) {
-    return `<header class="banner ${o.back ? 'has-back' : ''} ${o.art ? 'has-art' : ''}">
+    const cover = !!(o.art || o.cover);
+    return `<header class="banner ${cover ? 'is-cover' : 'is-paper'} ${o.back ? 'has-back' : ''} ${o.art ? 'has-art' : ''} ${o.tall ? 'is-tall' : ''}">
       ${artLayer(o.art)}
-      ${o.back ? `<button class="back" data-back="${esc(o.back)}" aria-label="بازگشت">→</button>` : ''}
+      ${o.back ? `<button class="back" data-back="${esc(o.back)}" aria-label="بازگشت">${BACK}</button>` : ''}
       ${o.gear || o.help ? `<div class="bnav">
         ${o.gear ? `<a class="gear" href="#/setup" aria-label="تنظیم نسخه">${GEAR}</a>` : ''}
         ${o.help ? `<a class="bhelp" href="#/guide" aria-label="راهنما">؟</a>` : ''}</div>` : ''}
@@ -499,6 +524,7 @@
       <h1>${o.title}</h1>
       ${o.sub ? `<div class="sub">${o.sub}</div>` : ''}
       ${o.meta ? `<div class="meta">${o.meta}</div>` : ''}
+      ${o.foot || ''}
     </header>`;
   }
 
@@ -512,6 +538,20 @@
 
   const roundName = it => (it && it.roundName) || 'دور';   // e.g. «گیم» for point games
   const totalSets = it => (it.sets || 1) * (it.rounds || 1);
+  // The dose as one line: "۳ × ۸ هر طرف | RPE ۶ | استراحت ۲:۳۰" (the bars are SEP). The first part is bold. The sets × reps keep
+  // the course's own right-to-left order (sets first, read from the right), as its lessons teach the card.
+  function doseLine(it) {
+    const p = [];
+    if (it.rounds && it.sets && it.reps) p.push(fa(it.rounds) + ' ' + roundName(it) + ' × ' + fa(it.sets) + ' × ' + faU(it.reps));
+    else if (it.sets && it.reps) p.push(fa(it.sets) + ' × ' + faU(it.reps) + (it.per ? ' ' + faPer(it.per) : ''));
+    else if (it.reps) p.push(faU(it.reps) + (it.per ? ' ' + faPer(it.per) : ''));
+    if (it.time) p.push(faU(it.time));
+    if (p.length) p[0] = `<b>${p[0]}</b>`;
+    if (it.rpe) p.push('RPE ' + fa(it.rpe));
+    if (it.rest) p.push('استراحت ' + fmtRest(it.rest));
+    if (it.rounds && it.roundRest) p.push('بین ' + roundName(it) + '\u200cها ' + fmtRest(it.roundRest));
+    return sepJoin(p);
+  }
   function dosePills(it) {
     const p = [];
     if (it.rounds && it.sets && it.reps) p.push(pill(fa(it.rounds) + ' ' + roundName(it) + ' × ' + fa(it.sets) + ' × ' + faU(it.reps)));
@@ -614,7 +654,7 @@
     ? `<div class="version-line">${pill(AGE_LABEL[prefs.age], 'green')}<a class="link-btn" href="#/setup">تغییر</a></div>`
     : `<div class="card clay"><h3>هنوز نسخه‌ات را انتخاب نکرده‌ای</h3><p>الان نسخهٔ «۱۶ سال و بالاتر» نشان داده می‌شود.</p><p><a class="link-btn" href="#/setup">انتخاب نسخه</a></p></div>`;
 
-  const PLACE = { gym: '🏋️ باشگاه', court: '🎾 زمین تنیس', home: '🏠 خانه' };
+  const PLACE = { gym: 'باشگاه', court: 'زمین تنیس', home: 'خانه' };
   const placePill = (s, cls) => (s && s.place ? pill(PLACE[s.place] || esc(s.place), cls) : '');
   const addonTitle = s => esc(String((s && s.title) || '').replace(/^\+\s*/, ''));   // the app adds its own "+"
   const sessionShort = s => (s.type === 'test' ? 'روز آزمون' : s.kind === 'addon' ? addonTitle(s) : `جلسهٔ ${esc(s.code)}`);
@@ -635,7 +675,7 @@
 
   function acc(id, cls, title, body, open) {
     return `<div class="acc ${cls || ''} ${open ? 'open' : ''}" id="${id}">
-      <button class="acc-head" aria-expanded="${open ? 'true' : 'false'}"><span>${title}</span><span class="chev">▼</span></button>
+      <button class="acc-head" aria-expanded="${open ? 'true' : 'false'}"><span>${title}</span>${CHEV}</button>
       <div class="acc-body">${body}</div></div>`;
   }
 
@@ -751,7 +791,7 @@
     return items.map((it, k) => {
       const ex = C.exercises[it.ex] || { name: it.ex };
       const name = stepMode ? `<span class="wname"><bdi>${esc(exName(ex))}</bdi></span>` : `<a class="wname" href="#/exercises/${encodeURIComponent(it.ex)}"><bdi>${esc(exName(ex))}</bdi></a>`;
-      return `<div class="wrow ${stepMode && ST.wDone.has(k) ? 'done' : ''}" data-wi="${k}"><button class="wchk" aria-label="انجام شد"></button>${name}<span class="ex-pills">${dosePills(it)}</span></div>`;
+      return `<div class="wrow ${stepMode && ST.wDone.has(k) ? 'done' : ''}" data-wi="${k}"><button class="wchk" aria-label="تیک: ${fa(k + 1)}">${fa(k + 1)}</button><span>${name}<span class="wdose">${doseLine(it)}</span></span></div>`;
     }).join('');
   }
   function warmCard(g) {
@@ -1450,7 +1490,7 @@
 
     if (sess) S.push({
       title: 'جلسه را قدم‌به‌قدم ببر',
-      body: `دکمهٔ سبز پایین هر جلسه. تمرین‌ها را یکی‌یکی جلویت می‌گذارد، ست‌ها را می‌شمارد و
+      body: `دکمهٔ سبز بالای هر جلسه. تمرین‌ها را یکی‌یکی جلویت می‌گذارد، ست‌ها را می‌شمارد و
              استراحت را خودش نگه می‌دارد. بیشترِ آدم‌ها همین را باز می‌کنند و گوشی را کنار می‌گذارند.`,
       hash: sess.hash, sel: () => tq('.cta-bar .btn.primary'),
       act: true, hint: 'بزنش — یا «بعدی» را بزن، خودم بازش می‌کنم.'
@@ -1492,7 +1532,7 @@
       body: `چرا قدرت، چطور گرم کنی، خواب، تغذیه، درد و علائم خطر، راهنمای پدر و مادر…
              ${DEMO ? `${fa(openL)} درس در نسخهٔ نمایشی باز است` : `${fa(L.length)} درس`}، هر کدام دو-سه دقیقه.
              اگر جایی از برنامه برایت سؤال شد، جوابش معمولاً اینجاست.`,
-      hash: '#/learn', sel: () => tq('.section .card.tap')
+      hash: '#/learn', sel: () => tq('.section .list-row')
     });
 
     S.push({
@@ -1500,7 +1540,7 @@
       body: `${DEMO ? `${fa(openT)} آزمون از ${fa(T.length)} آزمون` : `${fa(T.length)} آزمون`} ساده، با متر و کرنومتر و یک همراه.
              هر کدام روش دقیق اجرا و <b>برگهٔ نتایج</b> دارد. آزمون یو-یو زنگ‌هایش را خود اپ می‌زند،
              و آزمون قدرت <b>سقفت</b> (یک‌تکرار بیشینه) را برایت حساب می‌کند.`,
-      hash: '#/tests', sel: () => tq('.section .card.tap')
+      hash: '#/tests', sel: () => tq('.section .list-row')
     });
 
     // The last step rings the way back IN — the "؟" — so the tour ends pointing at
