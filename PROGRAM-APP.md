@@ -1549,6 +1549,15 @@ went wrong" and kept nothing, and every extra tap sent another email. Now:
   when the service refused it; *✓ With your coach · 10:12 AM*. **Send the update to your coach** shows only
   when the rating or note changed after the report went (`reportSig()` against `_sentsig_d`). The demo and
   the coach preview send nothing and say so.
+  **It follows the session's record too** (Line Call, 2026-10-13; Amir: *"yes to all recommended"*): it said
+  *With your coach* when the EMAIL went, even with the record (`save_session`) still in the queue, the way 10
+  sessions reached the inbox and not the dashboard before 2026-10-12. Now *Saved on your phone…* shows while
+  either waits (`recordWaiting(day)`: the queue's own session key), *✓ With your coach* only once both have gone,
+  or once the record has with no email waiting (as when the reports are switched off), and the line repaints the
+  moment the queue sends the session (`_paintSent()`). **Done on a full phone** used to throw and do nothing:
+  `finishDay()` now runs `finishDayNow()` in a try, and on a failure takes back its finish stamp, shows the card
+  again and says *Your phone is full. Free some space, then tap Done again.* (any other failure: *That didn't
+  save. Tap Done again.*). `scripts/headless/send-status.js` (7 checks, the full phone filled for real).
 - **Guided's Finish Session ✓** closes Guided on this card (`stepFinish()`); it never finishes for the athlete.
 - **Reset in the session bar** (Amir, 2026-09-27: *"when you start, its locked in and you cant cancle or
   reset"*): `.session-timer-reset`, two taps (`armedTap()`, armed label *Reset?*), shown once the day has started
