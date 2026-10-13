@@ -1,5 +1,7 @@
 # 🎞 App animation clips — build specs
 
+> ⚠ **Written before Centre Court (2026-10-12).** The screens these specs describe (My Plan, the cycle card, the boxed day cards) are the retired look. Clips already shipped stay as built; a new clip draws the app from [`APP-UI-KIT.md`](APP-UI-KIT.md).
+
 Companion to `SHOOT-explainer-reel-faq-stories.md`. Eight short silent clips (4–8s)
 that get cut into the Farsi reels as cutaways while Amir's voice-over plays over
 them. Each is a self-contained animated HTML file built the same way as the reels

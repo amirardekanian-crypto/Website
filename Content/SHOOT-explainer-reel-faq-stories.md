@@ -1,5 +1,7 @@
 # 🎬 Shoot pack — pinned explainer reel + «سؤالا» FAQ highlight
 
+> ⚠ **App facts changed after this pack (2026-08-14):** there is no in-app chat (the Coach tab opens WhatsApp, 2026-09-26) and the app has a new look (Centre Court, 2026-10-12: [`APP-UI-KIT.md`](APP-UI-KIT.md)). Check any beat that shows a chat or old screens before filming.
+
 Recording scripts for Amir, 2026-08-14. Farsi, Iran offer, tennis/padel targeting
 (Amir's calls: Farsi + Iran price · tennis/padel focus · 24–48h turnaround ·
 monthly price framed as a 6-month journey · card-to-card payment · CTA = DM

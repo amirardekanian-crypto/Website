@@ -119,7 +119,7 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 
 - **Compare columns:** *bad* = ghosted outline card with **strikethrough** (muted); *good* = **solid clay** card, white text.
 - **Rule-cards:** green card + **clay check-circle** (white tick) + **clay number** + white title + muted sub.
-- **App images — always image-on-top, with a green scrim + caption overlaid** (shows the real photo fully, like the app does):
+- **App images — always image-on-top, with a green scrim + caption overlaid** (shows the real photo fully, like the app does; in the app this is now the *cover*: the photo graded into green with a left mask, see [`APP-UI-KIT.md`](APP-UI-KIT.md) §5.1):
   - Cycle banner **16/9** · Day banner **5/2** (give it room — at 5/2.5 a 2-line title won't collide with the eyebrow) · Workout banner **2/1**
 - **Real assets to reuse:** `../assets/cycles/*.jpg` (foundation-forge, strength-engine, structural-build, durability-build, armour-build…) and `../assets/days/*.webp` (lower, upper, power, conditioning…). Use these, not stock — they *are* the product.
 
@@ -173,7 +173,7 @@ A persistent device, app UI animating inside:
 - **Screen transitions:** base `opacity:0; translateY(22px) scale(.985)` → `.on`.
 - **Render the *real* app** (authenticity sells the product): English copy, Barlow, paper background, **green as the primary** UI colour, **clay as the highlight** — same two brand colours, green just leads on product surfaces. Build the screens from [`APP-UI-KIT.md`](APP-UI-KIT.md) (cover, paper rows with hairlines, the outlined numeral, door rows) or capture the live app; the pre-2026-10-12 boxed look is retired.
 
-**Canonical app beats** (storyboard for the product reel): Lock screen → app opens (splash) → today's program (cycle + day banners) → exercise video (play→scrubber + coaching cue) → log weight + RPE → **readiness check** (use the app's real questions: sleep / energy / soreness / stress, 1–5) → the Coach tab's WhatsApp panel (no in-app chat since 2026-09-26; a message-typing beat would be false) → **coach sees it live** (dashboard updates the instant the athlete logs) → canonical outro.
+**Canonical app beats** (storyboard for the product reel): Lock screen → app opens (splash) → today's program (the day's green cover with the mint-dot eyebrow) → exercise video (play→scrubber + coaching cue) → log weight + RPE → **readiness check** (use the app's real questions: sleep / energy / soreness / stress, 1–5) → the Coach tab's WhatsApp panel (no in-app chat since 2026-09-26; a message-typing beat would be false) → **coach sees it live** (dashboard updates the instant the athlete logs) → canonical outro.
 
 ```css
 :root{ --ease:cubic-bezier(.16,1,.3,1); }
