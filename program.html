@@ -1767,13 +1767,6 @@
     50%      { box-shadow: 0 0 0 8px rgba(199,85,47,0); }
   }
 
-  /* ── Timer Exercise Name ── */
-  .timer-exercise-name {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: var(--fs-small); letter-spacing: 2px; text-transform: uppercase;
-    color: var(--green-ink); margin-bottom: 4px; text-align: center;
-  }
-
   /* ── Section Headers ── (a block's title, and its rest when written): the CENTRE COURT block. One colour for every
      block (DS-01): green, so a block's colour means nothing an athlete has to learn and clay stays for "look here". */
 
@@ -2160,8 +2153,8 @@
   /* RPE against target (rpeVs): clay over, steel blue under, green on target. */
   .ex-set-rpetag.under { color: var(--rpe-under); }
   body[data-dark] .ex-set-rpetag.under { color: var(--rpe-under); }
-  .ex-set-rpe .rpe-btn.selected.over,  .tl-rpe-btn.selected.over  { background: var(--ice); border-color: var(--ice); color: #fff; }
-  .ex-set-rpe .rpe-btn.selected.under, .tl-rpe-btn.selected.under { background: #3E6A92; border-color: #3E6A92; color: #fff; }
+  .ex-set-rpe .rpe-btn.selected.over { background: var(--ice); border-color: var(--ice); color: #fff; }
+  .ex-set-rpe .rpe-btn.selected.under { background: #3E6A92; border-color: #3E6A92; color: #fff; }
   b.rpe-under, .lt-rpe b.rpe-under, .lt-ghost b.rpe-under, .hs-d b.rpe-under,
   body[data-dark] .lt-rpe b.rpe-under, body[data-dark] .hs-d b.rpe-under { color: var(--rpe-under); }
 
@@ -3550,16 +3543,8 @@
   }
   .app-card-icon svg { width: 24px; height: 24px; }
 
-  /* ── Timer ── */
-  .timer-overlay { position: fixed; inset: 0; background: var(--grey-bg);   /* solid: at 97% the card showed through (POL-01) */ z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
-  .timer-overlay.visible { display: flex; }
-  .timer-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-label); letter-spacing: 3px; text-transform: uppercase; color: var(--grey-text); margin-bottom: 10px; }
-  /* Sound on/off for the tones at zero (WK-02); the buzz stays either way. */
-  .timer-sound { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-small); letter-spacing: 1px; text-transform: uppercase;
-    min-height: 32px; padding: 6px 14px; margin-bottom: 12px; border-radius: 999px; cursor: pointer;
-    background: transparent; border: 1px solid var(--grey-mid); color: var(--green-ink); }
-  .timer-sound.off { color: var(--grey-text); text-decoration: line-through; }
-  body[data-dark] .timer-sound { border-color: #444; }
+  /* ── Timer ── the rest timer (the overlay, its ring, controls, sound icon, Guided's log and Next line) is drawn by the
+     GUIDED AND THE REST TIMER IN THE CENTRE COURT LOOK block, after CENTRE COURT. */
   /* A note in a box in the middle of the screen (first-timer pass, 2026-10-11): one at a time, never dims or blocks the page,
      gone by itself or on its button. Used for a first-timer's note on the closed number, the empty-weight nudge and the clock offer. */
   .aa-toast { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 71; box-sizing: border-box;
@@ -3581,72 +3566,9 @@
     border-radius: 50%; border: 0; background: rgba(0,0,0,0.35); color: #fff; font-size: var(--fs-lead); line-height: 1; cursor: pointer; }
   /* A card whose banner (not the whole card) is the way to Home: Game Plan's Active card. */
   .cm-banner[role="button"] { cursor: pointer; }
-  .timer-ring { width: 220px; height: 220px; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
-  .timer-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
-  .timer-ring circle { fill: none; stroke-width: 4; }
-  .ring-bg { stroke: var(--grey-mid); }
-  .ring-progress { stroke: var(--yellow); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
-  .timer-inner { position: relative; text-align: center; }
-  .timer-display { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 96px; color: var(--grey-dark); line-height: 1; letter-spacing: -2px; }
-  .timer-display.warning { color: var(--green-ink); }
   .timer-presets { display: flex; gap: 10px; margin-top: 32px; }
   .preset-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 1px; padding: 10px 20px; border-radius: 4px; border: 1px solid var(--grey-mid); background: transparent; color: var(--grey-text); cursor: pointer; }
   .preset-btn.selected { border-color: var(--yellow); color: var(--green-ink); background: var(--yellow-dim); }
-  .timer-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 12px; margin-top: 20px; max-width: 320px; }
-  /* Guided Mode's rest: the ring gives up some height to the set-log panel. */
-  .timer-overlay.has-log .timer-ring { width: 176px; height: 176px; }
-  .timer-overlay.has-log .timer-display { font-size: 72px; }
-  .timer-overlay.has-log .timer-controls { margin-top: 12px; }
-  .timer-log { width: min(360px, calc(100vw - 32px)); margin-top: 18px; padding: 14px 14px 12px;
-    background: var(--white, #fff); border: 1px solid var(--grey-mid); border-radius: 14px; box-sizing: border-box; }
-  .timer-log[hidden] { display: none; }
-  .timer-log .session-timer-week { margin-top: 12px; }   /* the week's limits under the RPE buttons (weekLimitsHTML) */
-  .tl-head { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1.4px; text-transform: uppercase;
-    color: var(--grey-text); margin-bottom: 10px; }
-  .tl-line { display: flex; align-items: center; gap: 8px; }
-  .tl-line + .tl-line { margin-top: 10px; }
-  .tl-lab { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1.3px; text-transform: uppercase;
-    color: var(--grey-text); width: 38px; flex-shrink: 0; }
-  .tl-step { width: 48px; height: 44px; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent;
-    font-size: 24px; line-height: 1; color: var(--grey-dark); cursor: pointer; }   /* display: Guided's − and + */
-  .tl-val { flex: 1; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px; color: var(--grey-dark); }   /* display: Guided's reps and RPE */
-  .tl-val.off { color: var(--clay-big); }   /* 30 px, 900: big clay text keeps #C7552F */
-  .tl-rpe-btn { flex: 1 1 0; height: 44px; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); color: var(--grey-text); cursor: pointer; }
-  .tl-rpe-btn.selected { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
-  /* The weight on the rest screen (WK-01): 16 px or more, or iOS zooms the page on focus. */
-  .tl-kg { flex: 1; min-width: 0; height: 44px; border-radius: 10px; border: 1px solid var(--grey-mid); background: var(--grey-card);
-    text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; color: var(--grey-dark);   /* display: Guided's kg */
-    outline: none; box-sizing: border-box; padding: 0 8px; }
-  .tl-kg::placeholder { font-size: var(--fs-lead); font-weight: 600; color: var(--grey-text); opacity: 0.8; }
-  .tl-kg:focus { border-color: var(--yellow); }
-  .tl-same { flex: none; height: 44px; padding: 0 12px; border-radius: 10px; border: 0; background: transparent; cursor: pointer;
-    box-shadow: inset 0 0 0 1.5px var(--ice); color: var(--clay-ink); font-family: 'Barlow', sans-serif; font-weight: 600; font-size: var(--fs-small); }
-  .tl-same[hidden] { display: none; }
-  body[data-dark] .tl-kg { background: #2a2a2a; border-color: #444; color: #eee; }
-  /* A rest screen with the log panel can outgrow a short phone: it scrolls, and the ring
-     gives up more height, rather than cutting the panel off. */
-  .timer-overlay.has-log { justify-content: flex-start; overflow-y: auto; padding: 18px 0 calc(env(safe-area-inset-bottom, 0px) + 18px); }
-  /* It scrolls, never squashes: a shrunk ring box left its SVG full size, drawn over Pause and +15s (2026-10-12). */
-  .timer-overlay.has-log > * { flex-shrink: 0; }
-  @media (max-height: 720px) {
-    .timer-overlay.has-log .timer-ring { width: 140px; height: 140px; }
-    .timer-overlay.has-log .timer-display { font-size: 58px; }
-    .timer-overlay.has-log .timer-sound { margin-bottom: 6px; }
-  }
-  @media (max-height: 620px) {   /* a 568-600 px phone: the log and the week's limits still fit on the first screen */
-    .timer-overlay.has-log .timer-ring { width: 104px; height: 104px; }
-    .timer-overlay.has-log .timer-display { font-size: var(--fs-display); }
-  }
-  body[data-dark] .timer-log { background: #202020; border-color: #383838; }
-  body[data-dark] .tl-step, body[data-dark] .tl-rpe-btn { border-color: #444; color: #ccc; }
-  body[data-dark] .tl-val { color: #eee; }
-  .timer-ctrl-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 1px; text-transform: uppercase; padding: 14px 24px; border-radius: 4px; border: none; cursor: pointer; }
-  .btn-start { background: var(--yellow); color: var(--on-accent); }
-  .btn-add { background: var(--grey-card); color: var(--green-ink); border: 1px solid var(--grey-mid); }
-  .btn-close { background: var(--grey-card); color: var(--grey-dark); }
-  .btn-reset { background: var(--grey-card); color: var(--grey-text); border: 1px solid var(--grey-mid); }
-  body[data-dark] .btn-add { background: #2a2a2a; border-color: #444; }
 
   /* ── Guided Mode entry point: Guided ▶ on the session bar, outlined (the CENTRE COURT block). */
 
@@ -3656,26 +3578,6 @@
      about logging a set is reimplemented here — this is layout and navigation only. ── */
   .step-overlay { display: none; position: fixed; inset: 0; z-index: 90; background: var(--grey-bg); flex-direction: column; }
   .step-overlay.visible { display: flex; }
-  body[data-dark] .step-overlay { background: #141414; }
-  .step-topbar { display: flex; align-items: center; gap: 12px; padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px 12px; flex-shrink: 0; }
-  .step-exit { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--grey-mid); background: var(--white); color: var(--grey-dark); font-size: var(--fs-body); line-height: 1; cursor: pointer; flex-shrink: 0; }
-  /* ONE CLOSE GRAMMAR (NAV-01, 2026-09-27): a screen goes back with ← at the top left, an overlay
-     that fills the screen closes with ✕ at the top right (Guided, the video), and a sheet slides
-     down (its handle, a swipe, a tap above it). The phone's Back closes whatever is on top. */
-  /* ? — how Guided works (COACH-02), beside the ✕. */
-  .step-help { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--grey-mid); background: var(--white); color: var(--grey-text);
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-lead); line-height: 1; cursor: pointer; flex-shrink: 0; position: relative; }
-  .step-help::after, .step-exit::after { content: ''; position: absolute; inset: -5px; }   /* 44 px targets */
-  .step-exit { position: relative; }
-  body[data-dark] .step-help { background: #202020; border-color: #333; color: #bbb; }
-  body[data-dark] .step-exit { background: #202020; border-color: #333; color: #eee; }
-  .step-topbar-text { flex: 1; min-width: 0; }
-  /* This week's limits (weekLimitsHTML(), Amir 2026-10-12: "show the cap row in Guided too"): the session bar's row,
-     under Guided's top bar on every step, so a set coloured against the cap always has the cap on screen. */
-  .step-week { flex-shrink: 0; padding: 0 16px 10px; }
-  .step-week .session-timer-week { padding-top: 8px; }
-  .step-eyebrow { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); }
-  .step-pill { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); color: var(--green-ink); }
   .step-scroll { flex: 1; overflow-y: auto; padding: 0 16px 16px; }
   .step-ex-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-head); line-height: 1.15; color: var(--grey-dark); margin-bottom: 10px; }
   body[data-dark] .step-ex-name { color: #f0f0f0; }
@@ -3696,12 +3598,6 @@
   .step-scroll .rpe-row.dim { opacity: 0.55; }
   body[data-dark] .step-scroll .ex-set-row.step-current,
   body[data-dark] .step-scroll .rpe-row.step-current { background: #173328; }
-  .step-footer { display: flex; gap: 10px; padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 14px); border-top: 1px solid var(--grey-mid); background: var(--grey-bg); flex-shrink: 0; }
-  body[data-dark] .step-footer { background: #141414; border-top-color: #333; }
-  .step-nav-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 14px; border-radius: 8px; border: 1px solid var(--grey-mid); background: transparent; color: var(--grey-text); cursor: pointer; }
-  .step-nav-btn[disabled] { opacity: 0.35; cursor: default; }
-  .step-primary-btn { flex: 1; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-body); letter-spacing: 0.5px; text-transform: uppercase; padding: 15px; border-radius: 10px; border: none; background: var(--yellow); color: var(--on-accent); cursor: pointer; }
-  .step-primary-btn:active { transform: scale(0.98); }
   .step-primary-full { flex: 1 1 100%; }
   .step-complete { text-align: center; padding: 48px 12px; }
   .step-complete-check { width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: var(--yellow); color: var(--on-accent); font-size: var(--fs-head); display: flex; align-items: center; justify-content: center; }
@@ -3763,8 +3659,6 @@
   /* ── Dark Mode ── */
   /* Dark mode's colours are the dark half of THE APP'S ONE COLOUR SET, at the top of this sheet. The rules below are the non-token
      dark rules: a colour that has no token. */
-  /* The rest timer stayed a light sheet in dark mode while its digits turned light: "2:00" at 1.08:1. */
-  body[data-dark] .timer-overlay { background: #161616; }
   body[data-dark] .weight-input { background: #2a2a2a; color: #ddd; }
   body[data-dark] .weight-input::placeholder { color: #555; }
   body[data-dark] .rpe-btn { border-color: #444; color: #9a9a9a; }
@@ -4942,6 +4836,200 @@
   /* a Library session: its block titles' hairline runs to the edge like its rows' (the day view's do) */
   :where(#ws-body) .section-header-prog { margin-right: calc(-1 * var(--g)); }
   :where(#ws-body) .section-rest { margin-right: var(--g); }
+  /* ══ GUIDED AND THE REST TIMER IN THE CENTRE COURT LOOK (2026-10-13) ═════════════════════════════════════════════════════
+     Amir, 2026-10-13: "continue until everything has a consistent design". Guided's top bar and the rest timer still wore the
+     older look (grey ring buttons, a white card, a yellow-era footer) under a day that wore Centre Court. Behaviour is untouched
+     (openStepMode(), renderStep(), showTimer(), the keys, Back); this block is how they look, with the little markup they needed:
+     the exercise's name and its ⓘ in the bar, the sound as an icon, ✕ top right, a Next line. Colours are the app's one set
+     (THE APP'S ONE COLOUR SET); no colour token is declared here.
+     1 Guided's bar · 2 its footer · 3 the rest timer's green band · 4 its paper in Guided: the log of the set just done and
+     the Next line. A size is a --fs- token, or a display piece with its comment. */
+
+  /* 1. Guided's bar: the slim session bar's green (--bar), full width, safe-area aware. One eyebrow line (the exercise's place,
+     the set's), ? and ✕ as the cover's 44 px glass buttons, then the exercise's name in 22 px condensed capitals (two lines at
+     most) with its ⓘ at the right end, then the week's limits row on its darker green. Under 390 px the set's place goes on a
+     second line under the exercise's (one line would not fit beside two 44 px buttons). The body's own copy of the name is
+     hidden in here, never in the day. */
+  #stepOverlay { background: var(--paper); }
+  #stepOverlay .step-head { flex: none; background: var(--bar); color: #fff; }
+  #stepOverlay .step-topbar { display: grid; grid-template-columns: minmax(0, 1fr) 44px 44px; grid-template-areas: "eb help exit" "nm nm nm";
+    align-items: center; column-gap: 4px; padding: calc(env(safe-area-inset-top, 0px) + 2px) 8px 8px 16px; }
+  #stepOverlay .step-topbar-text { grid-area: eb; display: flex; align-items: center; column-gap: 8px; min-width: 0; min-height: 44px; }
+  #stepOverlay .step-eyebrow, #stepOverlay .step-pill { font: 700 var(--fs-label)/1.35 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase;
+    white-space: nowrap; }
+  #stepOverlay .step-eyebrow { display: flex; align-items: center; gap: 8px; color: var(--mint); }
+  #stepOverlay .step-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  #stepOverlay .step-pill { color: #fff; }
+  #stepOverlay .step-pill:not(:empty)::before { content: '\00B7'; margin-right: 8px; color: rgba(255,255,255,.5); }
+  #stepOverlay .step-help, #stepOverlay .step-exit { position: relative; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0;
+    border-radius: 50%; cursor: pointer; color: #fff; background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    font: 500 var(--fs-lead)/1 'Barlow', sans-serif; }
+  #stepOverlay .step-help { grid-area: help; font: 900 var(--fs-lead)/1 'Barlow Condensed', sans-serif; }
+  #stepOverlay .step-exit { grid-area: exit; }
+  #stepOverlay .step-help:active, #stepOverlay .step-exit:active { transform: scale(0.92); }
+  #stepOverlay .step-help:focus-visible, #stepOverlay .step-exit:focus-visible, #stepOverlay .step-about:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  #stepOverlay .step-namerow { grid-area: nm; display: flex; align-items: center; gap: 4px; min-width: 0; min-height: 44px; }
+  #stepOverlay .step-name { flex: 1; min-width: 0; margin: 0; padding: 0;
+    font: 900 var(--fs-title)/1.05 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;
+    letter-spacing: .4px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: normal; word-break: normal;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  /* the card's ⓘ, as the open card's head draws it on the green: a 22 px white ring with a 13 px i, a Because the 28 px clay disc;
+     both 44 px to hit. It is the last thing on the name's row, centred under the ✕ above it. */
+  #stepOverlay .step-about { position: relative; z-index: 0; flex: none; display: grid; place-items: center; width: 44px; height: 44px; margin: 0; padding: 0;
+    border: 0; border-radius: 50%; background: none; cursor: pointer; color: #fff; font: 700 var(--fs-small)/1 'Barlow', sans-serif; }
+  #stepOverlay .step-about[hidden] { display: none; }
+  #stepOverlay .step-about::before { content: ''; position: absolute; z-index: -1; inset: 11px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.7); }
+  #stepOverlay .step-about.has-why { font-size: var(--fs-body); }
+  #stepOverlay .step-about.has-why::before { inset: 8px; background: var(--clay-fill); border-color: var(--clay-fill); box-shadow: 0 0 0 1.5px rgba(255,255,255,.85); }
+  /* the week's limits (weekLimitsHTML()), the slim bar's row: label grey-white, the numbers clay on the green */
+  #stepOverlay .step-week { padding: 7px 16px 10px; background: rgba(0,0,0,.18); }
+  #stepOverlay .step-week .session-timer-week { display: block; margin: 0; padding: 0; border: 0;
+    font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
+  #stepOverlay .step-week .stw-k { margin-right: 10px; font: inherit; font-weight: 400; letter-spacing: inherit; color: rgba(255,255,255,.62); }
+  #stepOverlay .step-week .session-timer-week b { font-weight: 700; white-space: nowrap; }
+  #stepOverlay .step-week .session-timer-week em { color: var(--clay-on-green); }
+  #stepOverlay .step-week .session-timer-week i { margin: 0 8px 0 0; color: rgba(255,255,255,.4); }
+  #stepOverlay .step-scroll { padding: 14px 16px 16px; }
+  #stepOverlay .step-ex-name { display: none; }   /* the bar carries the name */
+  @media (max-width: 389px) {
+    #stepOverlay .step-topbar-text { flex-direction: column; align-items: flex-start; justify-content: center; column-gap: 0; }
+    #stepOverlay .step-pill { padding-left: 15px; }   /* under the eyebrow's text: its 7 px dot and 8 px gap */
+    #stepOverlay .step-pill:not(:empty)::before { content: none; }
+  }
+  @media (max-width: 359px) {
+    #stepOverlay .step-week .session-timer-week, #stepOverlay .step-week .stw-k { letter-spacing: .4px; }
+    #stepOverlay .step-week .stw-k { margin-right: 8px; }
+    #stepOverlay .step-week .session-timer-week i { margin: 0 6px 0 0; }
+  }
+
+  /* 2. Guided's footer: one row on the paper under a hairline. ‹ Prev is outlined and not drawn on the first step; the primary is
+     the day's green (--btn) when it logs or finishes (Done — Start Rest ✓, Finish Session ✓) and outlined when it only moves
+     on (Next →). Every button 52 px tall; the words fit at 320 px. */
+  #stepOverlay .step-footer { flex: none; display: flex; gap: 10px; padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 12px);
+    border-top: 1px solid var(--hair); background: var(--paper); }
+  #stepOverlay .step-nav-btn, #stepOverlay .step-primary-btn { min-height: 52px; padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; white-space: nowrap;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; transition: transform 0.1s; }
+  @media (min-width: 400px) { #stepOverlay .step-nav-btn, #stepOverlay .step-primary-btn { font-size: var(--fs-lead); } }   /* --fs-body under 400 px: "Done — Start Rest ✓" beside ‹ Prev must hold in a fallback font too */
+  #stepOverlay .step-nav-btn { flex: none; background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--box); }
+  #stepOverlay .step-primary-btn { flex: 1 1 0; min-width: 0; background: var(--btn); color: #fff; box-shadow: none; }
+  #stepOverlay .step-primary-btn.is-next { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--box); }
+  #stepOverlay .step-nav-btn:active, #stepOverlay .step-primary-btn:active { transform: scale(0.98); }
+  #stepOverlay .step-nav-btn:focus-visible, #stepOverlay .step-primary-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  @media (max-width: 359px) {
+    #stepOverlay .step-nav-btn, #stepOverlay .step-primary-btn { padding: 0 10px; letter-spacing: .8px; }
+  }
+
+  /* 3. The rest timer: a focus screen. The green band (the cover's --hero) holds the sound icon top left, ✕ top right (both the
+     cover's 44 px glass buttons), the eyebrow, the ring and the controls: Pause / Start (the cover's light-ring green button, the
+     biggest) with +15s and Reset outlined beside it, and in Guided a Skip → under them. In the list the band fills the screen. In
+     Guided it is only as tall as it needs and the paper (4) follows; the screen scrolls rather than squash (.has-log), and the
+     ring shrinks on a short phone. The phone's Back, the keys and the timing are the old ones. */
+  .timer-overlay { position: fixed; top: 0; bottom: 0; z-index: 100; display: none; flex-direction: column; overflow-y: auto; background: var(--paper);   /* solid: at 97% the card showed through (POL-01) */
+    animation: fadeIn 0.2s ease; }
+  .timer-overlay.visible { display: flex; }
+  .timer-overlay > * { flex-shrink: 0; }   /* it scrolls, never squashes: a shrunk ring box left its SVG full size, drawn over Pause and +15s (2026-10-12) */
+  /* under the demo banner (z 120): it covered the band's top. The banner wraps to two or three lines on a narrow phone, taller still
+     while the fonts are not there, so both layers ask for its real height (--demo-h, set where the banner is shown), 44 px until then. */
+  body.is-demo .timer-overlay, body.is-demo #stepOverlay { top: var(--demo-h, 44px); }
+  .timer-band { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; padding: calc(env(safe-area-inset-top, 0px) + 4px) var(--g) 24px;
+    background: var(--hero); color: #fff; }
+  .timer-overlay.has-log .timer-band, .timer-overlay.has-next .timer-band { flex-grow: 0; padding-bottom: 20px; }
+  .timer-top { align-self: stretch; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; column-gap: 8px;
+    min-height: 44px; margin: 0 calc(8px - var(--g)) 12px; }
+  .timer-sound, .timer-x { position: relative; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+    color: #fff; background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); font: 500 var(--fs-lead)/1 'Barlow', sans-serif; }
+  .timer-sound:active, .timer-x:active { transform: scale(0.92); }
+  .timer-sound:focus-visible, .timer-x:focus-visible, .timer-overlay .timer-ctrl-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .timer-sound svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .timer-sound .tsnd-off { display: none; }
+  .timer-sound.off .tsnd-on { display: none; }
+  .timer-sound.off .tsnd-off { display: inline; }
+  .timer-eyebrow { min-width: 0; text-align: center; font: 700 var(--fs-label)/1.4 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: #fff;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .timer-label { color: var(--mint); }
+  .timer-label::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: var(--mint); vertical-align: 1px; }
+  .timer-exercise-name:not(:empty)::before { content: '\00B7\00A0'; color: rgba(255,255,255,.5); }   /* the markup's space is before the dot, a no-break space after it: the dot rides with the name */
+  .timer-ring { position: relative; flex: none; width: 220px; height: 220px; margin: auto 0 0; display: flex; align-items: center; justify-content: center; }
+  .timer-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .timer-ring circle { fill: none; stroke-width: 5; }
+  .ring-bg { stroke: rgba(255,255,255,.2); }
+  .ring-progress { stroke: var(--mint); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .timer-inner { position: relative; text-align: center; }
+  .timer-display { font: 900 96px/1 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif; letter-spacing: -2px; color: #fff; }   /* display: the rest clock */
+  .timer-display.warning { color: var(--mint); }
+  .timer-controls { display: flex; align-items: center; gap: 10px; width: min(360px, 100%); margin: 24px 0 auto; }
+  .timer-overlay .timer-ctrl-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; padding: 0 12px; border: 0; border-radius: 8px; cursor: pointer;
+    white-space: nowrap; color: #fff; font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; transition: transform 0.1s; }
+  .timer-overlay .timer-ctrl-btn:active { transform: scale(0.97); }
+  .timer-overlay .timer-ctrl-btn.btn-start { flex: 1.6 1 0; min-height: 60px; background: var(--tile-on-green);
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.55), 0 10px 22px -10px rgba(0,0,0,.6); }
+  .timer-overlay .timer-ctrl-btn.btn-add, .timer-overlay .timer-ctrl-btn.btn-reset { flex: 1 1 0; min-height: 52px; background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.45); }
+  /* the mark in front of Pause / Start, drawn in mint as the slim bar's are (renderTimer(): data-sym; the glyphs render as colour emoji on some phones) */
+  .timer-overlay .btn-start::before { content: ''; flex: none; display: block; }
+  .timer-overlay .btn-start[data-sym="play"]::before { width: 0; height: 0; border-style: solid; border-width: 6px 0 6px 9px; border-color: transparent transparent transparent var(--mint); }
+  .timer-overlay .btn-start[data-sym="pause"]::before { width: 3px; height: 12px; margin-right: 5px; border-radius: 1px; background: var(--mint); box-shadow: 5px 0 0 var(--mint); }
+  .timer-overlay .timer-ctrl-btn.btn-close { width: min(360px, 100%); min-height: 48px; margin: 10px 0 auto; background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.45); }
+  .timer-overlay .timer-ctrl-btn.btn-close[hidden] { display: none; }
+  /* Guided's rest: the ring gives up some height to the paper under the band, more on a short phone */
+  .timer-overlay.has-log .timer-ring, .timer-overlay.has-next .timer-ring { width: 176px; height: 176px; margin-top: 0; }
+  .timer-overlay.has-log .timer-display, .timer-overlay.has-next .timer-display { font-size: 72px; }   /* display: the rest clock */
+  .timer-overlay.has-log .timer-controls, .timer-overlay.has-next .timer-controls { margin: 16px 0 0; }
+  @media (max-height: 720px) {
+    .timer-overlay.has-log .timer-ring, .timer-overlay.has-next .timer-ring { width: 140px; height: 140px; }
+    .timer-overlay.has-log .timer-display, .timer-overlay.has-next .timer-display { font-size: 58px; }   /* display: the rest clock */
+    .timer-overlay.has-log .timer-controls, .timer-overlay.has-next .timer-controls { margin-top: 12px; }
+  }
+  @media (max-height: 620px) {   /* a 568-600 px phone: the log and the week's limits still come early on the screen */
+    .timer-overlay.has-log .timer-ring, .timer-overlay.has-next .timer-ring { width: 104px; height: 104px; }
+    .timer-overlay.has-log .timer-display, .timer-overlay.has-next .timer-display { font-size: var(--fs-display); }
+    .timer-overlay.has-log .timer-top, .timer-overlay.has-next .timer-top { margin-bottom: 4px; }
+  }
+
+  /* 4. The paper under the band, in Guided: the log of the set just done in the day's set-table look (white boxes edged --field,
+     48 px keys, the selected key --mark; over target clay and under target steel, as before), the week's limits under the RPE
+     keys, then one Next line. The list's timer has none of it, and its band fills the screen. */
+  .timer-paper { flex: 1 0 auto; padding: 0 var(--g) calc(env(safe-area-inset-bottom, 0px) + 24px); background: var(--paper); }
+  .timer-overlay:not(.has-log):not(.has-next) .timer-paper { display: none; }
+  .timer-log { margin: 0; padding: 18px 0 0; }
+  .timer-log[hidden], .timer-next[hidden] { display: none; }
+  .timer-log .tl-head { margin: 0 0 12px; font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  .timer-log .tl-line { display: flex; align-items: center; gap: 6px; }
+  .timer-log .tl-line + .tl-line { margin-top: 10px; }
+  .timer-log .tl-lab { flex: none; width: 36px; font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  .timer-log .tl-kg { flex: 1; min-width: 0; height: 48px; padding: 0 8px; border: 1px solid var(--field); border-radius: 10px; background: var(--row); outline: none;
+    -webkit-appearance: none; appearance: none; box-sizing: border-box; font: 500 var(--fs-field)/1 'Barlow', sans-serif; color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
+  .timer-log .tl-kg::placeholder { color: var(--ph); opacity: 1; font-weight: 500; }
+  .timer-log .tl-kg:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
+  .timer-log .tl-same { flex: none; height: 48px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; cursor: pointer; white-space: nowrap;
+    box-shadow: inset 0 0 0 1.5px var(--clay); color: var(--clay-ink); font: 600 var(--fs-small)/1 'Barlow', sans-serif; }
+  .timer-log .tl-same[hidden] { display: none; }
+  .timer-log .tl-step { flex: none; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 10px; background: var(--row); box-shadow: inset 0 0 0 1px var(--field); cursor: pointer;
+    font: 500 24px/1 'Barlow', sans-serif; color: var(--ink); }   /* display: Guided's − and + */
+  .timer-log .tl-val { flex: 1; text-align: center; font: 900 30px/1 'Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }   /* display: Guided's reps */
+  .timer-log .tl-val.off { color: var(--clay-big); }   /* 30 px, 900: big clay text keeps its brand shade */
+  .timer-log .tl-rpe-btn { flex: 1 1 0; min-width: 44px; height: 48px; padding: 0; border: 0; border-radius: 10px; background: var(--row); box-shadow: inset 0 0 0 1px var(--box); cursor: pointer;
+    font: 700 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: var(--ink); }
+  .timer-log .tl-rpe-btn.selected { background: var(--mark); box-shadow: none; color: #fff; }
+  .timer-log .tl-rpe-btn.selected.over { background: var(--clay-fill); }
+  .timer-log .tl-rpe-btn.selected.under { background: var(--steel); }
+  body[data-dark] .timer-log .tl-rpe-btn.selected.under { background: #3E6A92; }   /* the day's under key in dark (--steel is a text tint there) */
+  .timer-log .tl-step:focus-visible, .timer-log .tl-rpe-btn:focus-visible, .timer-log .tl-same:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .timer-log .session-timer-week { display: block; margin: 16px 0 0; padding: 12px 0 0; border-top: 1px solid var(--hair);
+    font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--ink); }
+  .timer-log .stw-k { margin-right: 10px; font: inherit; font-weight: 400; letter-spacing: inherit; color: var(--grey); }
+  .timer-log .session-timer-week b { font-weight: 700; white-space: nowrap; }
+  .timer-log .session-timer-week em { color: var(--clay-ink); }
+  .timer-log .session-timer-week i { margin: 0 8px 0 0; color: var(--ring); }
+  .timer-next { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hair); }
+  .timer-next .tn-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  .timer-next .tn-v { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  @media (max-width: 359px) {
+    .timer-log .tl-line { gap: 4px; }
+    .timer-log .session-timer-week, .timer-log .stw-k { letter-spacing: .4px; }
+    .timer-log .stw-k { margin-right: 8px; }
+    .timer-log .session-timer-week i { margin: 0 6px 0 0; }
+  }
+
   /* ══ HOME AND PROGRESS IN THE CENTRE COURT LOOK (2026-10-12) ═════════════════════════════════════════════════════════════
      Amir, 2026-10-12: Home and Progress wear the training day's look (calm paper, one strong green thing a screen, hairlines
      between rows). This block covers: the tokens and the one gutter (--g) for #home-overview and #screen-plan · the Home
@@ -5488,25 +5576,39 @@
   onclick="openAccount(event)" aria-label="Your account: theme, install, help, privacy, sign out" title="Account"></button>
 
 <!-- ═══ TIMER ═══ -->
+<!-- The rest timer is a focus screen (Centre Court, 2026-10-13): a green band with the sound icon top left, ✕ top right, the
+     eyebrow, the ring and its controls; in Guided the paper under it holds the log of the set just done and a Next line.
+     ✕ calls closeTimer(), as the bottom Close/Skip → did; in Guided the Skip → button stays on the band. -->
 <div class="timer-overlay" id="timerOverlay">
-  <div class="timer-exercise-name" id="timer-exercise-name"></div>
-  <div class="timer-label">Rest Timer</div>
-  <button type="button" class="timer-sound" id="timerSoundBtn" onclick="toggleRestSound()" aria-pressed="true">Sound on</button>
-  <div class="timer-ring">
-    <svg viewBox="0 0 220 220">
-      <circle class="ring-bg" cx="110" cy="110" r="100"/>
-      <circle class="ring-progress" id="ringProgress" cx="110" cy="110" r="100" stroke-dasharray="628" stroke-dashoffset="0"/>
-    </svg>
-    <div class="timer-inner"><div class="timer-display" id="timerDisplay">2:00</div></div>
+  <div class="timer-band">
+    <div class="timer-top">
+      <button type="button" class="timer-sound" id="timerSoundBtn" onclick="toggleRestSound()" aria-pressed="true" aria-label="Sound on" title="Sound on">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19z"/><g class="tsnd-on"><path d="M15.5 9a4.2 4.2 0 0 1 0 6"/><path d="M18.4 6.2a8.2 8.2 0 0 1 0 11.6"/></g><g class="tsnd-off"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g></svg>
+      </button>
+      <div class="timer-eyebrow"><span class="timer-label">Rest</span> <span class="timer-exercise-name" id="timer-exercise-name"></span></div>
+      <button type="button" class="timer-x" id="timerXBtn" onclick="closeTimer()" aria-label="Close the rest timer">✕</button>
+    </div>
+    <div class="timer-ring">
+      <svg viewBox="0 0 220 220">
+        <circle class="ring-bg" cx="110" cy="110" r="100"/>
+        <circle class="ring-progress" id="ringProgress" cx="110" cy="110" r="100" stroke-dasharray="628" stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-inner"><div class="timer-display" id="timerDisplay">2:00</div></div>
+    </div>
+    <div class="timer-controls">
+      <button class="timer-ctrl-btn btn-start" id="startStopBtn" data-sym="play" onclick="toggleTimer()">Start</button>
+      <button class="timer-ctrl-btn btn-add" onclick="addTimerSeconds(15)">+15s</button>
+      <button class="timer-ctrl-btn btn-reset" onclick="resetTimer()">Reset</button>
+    </div>
+    <!-- Guided Mode only (showTimer() unhides it): moves on to the next set, as ✕ does. -->
+    <button class="timer-ctrl-btn btn-close" id="timerCloseBtn" onclick="closeTimer()" hidden>Skip →</button>
   </div>
-  <div class="timer-controls">
-    <button class="timer-ctrl-btn btn-start" id="startStopBtn" onclick="toggleTimer()">Start</button>
-    <button class="timer-ctrl-btn btn-add" onclick="addTimerSeconds(15)">+15s</button>
-    <button class="timer-ctrl-btn btn-reset" onclick="resetTimer()">Reset</button>
-    <button class="timer-ctrl-btn btn-close" id="timerCloseBtn" onclick="closeTimer()">Close</button>
+  <div class="timer-paper">
+    <!-- Guided Mode only: describe the set just done while resting (stepAfterDone). -->
+    <div class="timer-log" id="timerLog" hidden></div>
+    <!-- Guided Mode only: what comes after this rest (paintTimerNext()). -->
+    <div class="timer-next" id="timerNext" hidden></div>
   </div>
-  <!-- Guided Mode only: describe the set just done while resting (stepAfterDone). -->
-  <div class="timer-log" id="timerLog" hidden></div>
 </div>
 
 <!-- A note in a box in the middle of the screen: aaToast() fills it. One at a time, with a button. -->
@@ -5537,15 +5639,23 @@
      exact same set-log rows/listeners as the list view (see openStepMode in the script
      below): nothing here is a second copy of the logging or Ceiling logic. -->
 <div class="step-overlay" id="stepOverlay">
-  <div class="step-topbar">
-    <div class="step-topbar-text">
-      <div class="step-eyebrow" id="step-eyebrow"></div>
-      <div class="step-pill" id="step-pill"></div>
+  <!-- The bar is the slim session bar's green (Centre Court, 2026-10-13): one eyebrow line (the exercise's place and the set's), ? and ✕ as
+       the cover's glass buttons, then the exercise's name with its ⓘ (the card's own, paintStepAbout()), then the week's limits row. -->
+  <div class="step-head">
+    <div class="step-topbar">
+      <div class="step-topbar-text">
+        <div class="step-eyebrow" id="step-eyebrow"></div>
+        <div class="step-pill" id="step-pill"></div>
+      </div>
+      <button type="button" class="step-help" onclick="openHelp('guided')" aria-label="How Guided works">?</button>
+      <button type="button" class="step-exit" onclick="closeStepMode()" aria-label="Exit guided mode">✕</button>
+      <div class="step-namerow">
+        <div class="step-name" id="step-name" role="heading" aria-level="2"></div>
+        <button type="button" class="step-about" id="step-about" onclick="stepAbout()" hidden>i</button>
+      </div>
     </div>
-    <button type="button" class="step-help" onclick="openHelp('guided')" aria-label="How Guided works">?</button>
-    <button type="button" class="step-exit" onclick="closeStepMode()" aria-label="Exit guided mode">✕</button>
+    <div class="step-week" id="step-week" hidden></div>
   </div>
-  <div class="step-week" id="step-week" hidden></div>
   <div class="step-scroll" id="step-scroll"></div>
   <div class="step-footer" id="step-footer"></div>
 </div>
@@ -6555,7 +6665,14 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   if (window.IS_DEMO) {
     document.body.classList.add('is-demo');
     const db = document.getElementById('demo-banner');
-    if (db) db.hidden = false;
+    if (db) {
+      db.hidden = false;
+      // The banner's real height (--demo-h) for the layers that sit under it (Guided and the rest timer): it is two or three
+      // lines on a narrow phone, and taller while the page's fonts are not there, so a fixed 44 px left their tops covered.
+      const demoH = () => document.body.style.setProperty('--demo-h', db.offsetHeight + 'px');
+      demoH();
+      if (window.ResizeObserver) new ResizeObserver(demoH).observe(db); else window.addEventListener('resize', demoH);
+    }
   }
 
   if (window.IS_PREVIEW) {
@@ -9687,7 +9804,7 @@ const APP_GUIDE = [
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues; it opens by itself the first time you meet an exercise and is folded after that, and the ▶ on it means there is a video; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
-    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
+    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round; warm-ups stay in the list. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
     body: `<p>The small <strong>i</strong> at the right end of every exercise answers what you'd ask me about it. <strong>What does it do?</strong> and the qualities it builds (tap one to read what it means). <strong>How does it help on court?</strong> <strong>Where will I feel it?</strong> shows your body front and back with the working muscles in green, and a line under it names them, the main ones first.</p><p>Then three short lists. Under <strong>Too hard?</strong> are the <strong>Regressions</strong>, easier versions of the same movement. Under <strong>Too easy?</strong> are the <strong>Progressions</strong>, harder versions. Under <strong>Other kit?</strong> are the <strong>Alternatives</strong>, the same movement on other equipment. Tap a name to read about it. A name marked <em>Not in the app yet</em> has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why am I doing this?</strong>, signed by me. All of them are on one page too: tap <strong>Why your plan looks like this</strong> on <strong>Progress</strong>, under your current cycle in the Game Plan.</p><p><strong>Your history</strong> at the bottom says how many times you've done it and what you did last time. Tap it for every session.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with <strong>How do I do it?</strong> (the video when there is one, the steps and the cues), and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
@@ -9704,7 +9821,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong> — the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>How to do it</strong> — inside an exercise: the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong> — the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on; iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it.</li><li><strong>How to do it</strong> — inside an exercise: the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
@@ -14718,12 +14835,20 @@ function showTimer(secs, name, onComplete) {
   timerRemaining = secs;
   timerOnComplete = onComplete;
   document.getElementById('timer-exercise-name').textContent = name;
-  document.getElementById('timerCloseBtn').textContent = onComplete ? 'Skip →' : 'Close';
+  // ✕ (top right) is the list's Close and Guided's Skip → alike: both call closeTimer(), which in Guided moves on. Guided keeps
+  // its Skip → button on the band (it moves on, it is not only a close); the list has no bottom button any more.
+  const skip = document.getElementById('timerCloseBtn');
+  if (skip) skip.hidden = !onComplete;
+  const xBtn = document.getElementById('timerXBtn');
+  if (xBtn) xBtn.setAttribute('aria-label', onComplete ? 'Skip the rest' : 'Close the rest timer');
   // The set-log panel belongs to Guided Mode's rest only; the manual Rest button never shows it.
   const tl = document.getElementById('timerLog');
   if (tl) { tl.hidden = !(onComplete && tl.dataset.ready === '1'); tl.dataset.ready = ''; }
-  document.getElementById('timerOverlay').classList.toggle('has-log', !!(tl && !tl.hidden));
-  document.getElementById('timerOverlay').classList.add('visible');
+  const nextShown = paintTimerNext(!!onComplete);
+  const ov = document.getElementById('timerOverlay');
+  ov.classList.toggle('has-log', !!(tl && !tl.hidden));
+  ov.classList.toggle('has-next', nextShown);
+  ov.classList.add('visible');
   paintRestSound();
   // resetTimer() refreshes display + ring using the new timerDuration
   resetTimer();
@@ -14758,7 +14883,8 @@ function startTimer() {
   if (timerRemaining <= 0) timerRemaining = timerDuration;
   timerEndsAt = Date.now() + timerRemaining * 1000;
   timerRunning = true;
-  document.getElementById('startStopBtn').textContent = 'Pause';
+  const ssb = document.getElementById('startStopBtn');
+  ssb.textContent = 'Pause'; ssb.dataset.sym = 'pause';   // the mark in front of the word is drawn in CSS
   restAudioPrime();   // inside the tap that started it, so the sound at zero is allowed to play
   restWake(true);
   clearInterval(timerInterval);
@@ -14792,7 +14918,8 @@ function pauseTimer() {
   if (timerRunning) timerRemaining = timerLeft();
   timerRunning = false;
   clearInterval(timerInterval);
-  document.getElementById('startStopBtn').textContent = 'Start';
+  const ssb = document.getElementById('startStopBtn');
+  ssb.textContent = 'Start'; ssb.dataset.sym = 'play';
   restWake(false);
 }
 
@@ -14824,7 +14951,10 @@ function paintRestSound() {
   const b = document.getElementById('timerSoundBtn');
   if (!b) return;
   const on = restSoundOn();
-  b.textContent = on ? 'Sound on' : 'Sound off';
+  // An icon button since 2026-10-13 (a speaker, slashed when off, both drawn in the markup and picked by .off in CSS):
+  // the words live in its label.
+  b.setAttribute('aria-label', on ? 'Sound on' : 'Sound off');
+  b.title = on ? 'Sound on' : 'Sound off';
   b.setAttribute('aria-pressed', on ? 'true' : 'false');
   b.classList.toggle('off', !on);
 }
@@ -15078,6 +15208,8 @@ function renderStep() {
   }
   document.getElementById('step-eyebrow').textContent = `Exercise ${item.exI + 1} of ${item.exCount}`;
   document.getElementById('step-pill').textContent = `${item.circuit ? 'Round' : 'Set'} ${item.setI + 1} of ${item.total}`;
+  document.getElementById('step-name').textContent = item.name;   // the bar carries the name now; the body's copy is hidden by CSS
+  paintStepAbout();
   renderStepFooter();
   // The top of the exercise first (its name, note); the current row is sticky
   // (CSS), so it stays on screen above the footer however long the card above it is. It
@@ -15102,13 +15234,33 @@ function currentStepRow() {
   return STEP.homeDetail.querySelector(`.ex-set-row[data-set-idx="${item.setI}"]`);
 }
 
+// ‹ Prev is not drawn on the first step (a disabled grey button said nothing; its room goes to the primary). The primary is
+// green when it logs or finishes (Done — Start Rest ✓, Finish Session ✓) and outlined when it only moves on (Next →).
 function renderStepFooter() {
   const isLast = STEP.pos === STEP.seq.length - 1;
   const done = stepDone(STEP.seq[STEP.pos]);
   const label = done ? (isLast ? 'Finish Session ✓' : 'Next →') : 'Done — Start Rest ✓';
-  document.getElementById('step-footer').innerHTML = `
-    <button type="button" class="step-nav-btn" onclick="stepPrev()"${STEP.pos === 0 ? ' disabled' : ''}>‹ Prev</button>
-    <button type="button" class="step-primary-btn" onclick="stepPrimary()">${esc(label)}</button>`;
+  document.getElementById('step-footer').innerHTML =
+    (STEP.pos > 0 ? `<button type="button" class="step-nav-btn" onclick="stepPrev()">‹ Prev</button>` : '') +
+    `<button type="button" class="step-primary-btn${done && !isLast ? ' is-next' : ''}" onclick="stepPrimary()">${esc(label)}</button>`;
+}
+
+// The exercise's ⓘ in Guided's bar (Centre Court, 2026-10-13): the card's own, so it shows what the card shows (an approved entry,
+// a Because as the clay disc, or a history) and opens the same About sheet (openExerciseSheet(), which stacks over Guided and closes
+// back to it). The card stays where it was in the list (only its .ex-detail moves into Guided), so its button is read and clicked
+// there. A circuit has none. paintAbout() calls this too, since the Spine and the history can arrive after the step is drawn.
+function paintStepAbout() {
+  const b = document.getElementById('step-about');
+  if (!b) return;
+  const src = STEP && STEP.homeCard ? STEP.homeCard.querySelector('.ex-about') : null;
+  b.hidden = !src;
+  if (!src) return;
+  b.classList.toggle('has-why', src.classList.contains('has-why'));
+  b.setAttribute('aria-label', src.getAttribute('aria-label') || 'About this exercise');
+}
+function stepAbout() {
+  const src = STEP && STEP.homeCard ? STEP.homeCard.querySelector('.ex-about') : null;
+  if (src) src.click();
 }
 
 // The one big button. Marking a set done goes through the row's OWN check-circle click —
@@ -15255,6 +15407,22 @@ function paintRoundLog(row, item) {
   }
   draw();
   tl.dataset.ready = '1';
+}
+
+// The Next line under the log on the rest screen (Centre Court, 2026-10-13): what comes after this rest, read from Guided's own
+// step sequence (STEP.seq, the step after STEP.pos), "Next: Box Jump · set 2 of 3". The session's final step says "last set"
+// ("last round" for a circuit); nothing draws when nothing follows. The list's timer does not know the next set and has no line.
+// Returns whether the line shows (showTimer() sets .has-next from it).
+function paintTimerNext(guided) {
+  const el = document.getElementById('timerNext');
+  if (!el) return false;
+  const nx = guided && STEP ? STEP.seq[STEP.pos + 1] : null;
+  if (!nx) { el.hidden = true; el.textContent = ''; return false; }
+  const what = nx.circuit ? 'round' : 'set';
+  const where = STEP.pos + 1 === STEP.seq.length - 1 ? 'last ' + what : what + ' ' + (nx.setI + 1) + ' of ' + nx.total;
+  el.innerHTML = `<span class="tn-k">Next:</span> <span class="tn-v">${esc(nx.name)} · ${where}</span>`;
+  el.hidden = false;
+  return true;
 }
 
 function stepAdvance() {
@@ -16018,6 +16186,7 @@ function paintAbout(card) {
     if (!entry && !why && !hist) btn.remove();
     else btn.classList.toggle('has-why', !!why);
   }
+  if (STEP && STEP.homeCard === card) paintStepAbout();   // Guided's bar carries the same ⓘ
 }
 
 // Where this entry appears in the athlete's current programme.
