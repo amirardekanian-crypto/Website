@@ -960,30 +960,45 @@
     view().innerHTML = h + `</div>`;
   }
 
+  // The lessons in reading order (by `order`); a lesson's number is its place here, on Learn's rows and in its own kicker.
+  const lessonsOrdered = () => ((C.learn && C.learn.lessons) || []).slice().sort((x, y) => (x.order || 999) - (y.order || 999));
+  const lessonGroup = l => l.group || 'درس‌ها';
+  // Lesson and test TEXT is content: esc() it, and draw a " · " in it as the short bar (never a dot next to a Persian digit).
+  const tx = s => dots(esc(s));
+
+  // Learn (Centre Court): the paper header, then one shelf per group: a photo band over its lessons as numbered rows. Locked rows
+  // keep their numeral (grey) and a drawn lock. The tour rings the first `.section .list-row`.
   function viewLearn() {
-    const L = ((C.learn && C.learn.lessons) || []).slice().sort((x, y) => (x.order || 999) - (y.order || 999));
+    const L = lessonsOrdered();
     const groups = [];
-    L.forEach(l => { const name = l.group || 'درس‌ها'; let g = groups.find(x => x.name === name); if (!g) groups.push(g = { name, items: [] }); g.items.push(l); });
-    const card = l => { const art = artFor('lesson', l.id);
-      const body = `<h3>${esc(l.icon || '')} ${esc(l.title)}${isLocked(l) ? LOCK : ''}</h3><p>${esc(l.summary || '')}</p>${l.audience ? `<p class="lead" style="margin:4px 0 0">برای: ${esc(l.audience)}</p>` : ''}`;
-      return `<a class="card tap ${isLocked(l) ? 'locked' : 'green'} ${art ? 'has-cover' : ''}" href="#/learn/${encodeURIComponent(l.id)}">${art ? `<div class="cover has-art">${artLayer(art)}</div><div class="cbody">${body}</div>` : body}</a>`; };
-    view().innerHTML = banner({ kicker: 'درس‌ها', title: 'آموزش', help: true, sub: 'هر چیزی که برای تمرین درست باید بدانی، کوتاه و ساده.' }) +
-      `<div class="section">${groups.map(g => (groups.length > 1 ? `<div class="h2">${esc(g.name)}</div>` : '') + g.items.map(card).join('')).join('')}</div>`;
+    L.forEach(l => { const name = lessonGroup(l); let g = groups.find(x => x.name === name); if (!g) groups.push(g = { name, items: [] }); g.items.push(l); });
+    // 'For: …' only where a lesson is for someone other than the usual reader (the parents' guide): on every row it was noise.
+    const usual = (() => { const n = {}; L.forEach(l => { if (l.audience) n[l.audience] = (n[l.audience] || 0) + 1; }); return Object.keys(n).sort((a, b) => n[b] - n[a])[0] || ''; })();
+    const row = l => { const pos = L.indexOf(l) + 1, lk = isLocked(l);
+      const sub = [tx(l.summary || ''), l.audience && l.audience !== usual ? `برای: ${tx(l.audience)}` : ''].filter(Boolean).join(' ');
+      // two digits at the full numeral size are exactly the 44 px column, so a lesson numbered 10 or more takes the small numeral
+      return `<a class="list-row has-num ${lk ? 'locked' : ''}" href="#/learn/${encodeURIComponent(l.id)}">${pnum(pos, [lk ? 'off' : '', pos > 9 ? 'sm' : ''].filter(Boolean).join(' '))}<span class="lr-body"><span class="lr-title">${esc(l.title)}</span>${sub ? `<span class="lr-sub clamp">${sub}</span>` : ''}</span>${lk ? LOCK : GO}</a>`; };
+    const shelf = (g, i) => (groups.length > 1
+      ? `<div class="band">${artLayer(artFor('lesson', g.items[0].id))}<div class="b-cap"><div class="eb">بخش ${fa(i + 1)}</div><div class="b-t">${esc(g.name)}</div></div></div>` : '') + g.items.map(row).join('');
+    view().innerHTML = banner({ kicker: `${fa(L.length)} درس کوتاه`, title: 'آموزش', help: true, sub: 'هر چیزی که برای تمرین درست باید بدانی، کوتاه و ساده.' }) +
+      `<div class="section">${groups.map(shelf).join('')}</div>`;
   }
 
+  // A lesson: a cover with its picture, then the prose on the paper (app.css, "Lessons & tests").
   function viewLesson(id) {
-    const L = (C.learn && C.learn.lessons) || [], l = L.find(x => x.id === id);
+    const L = lessonsOrdered(), at = L.findIndex(x => x.id === id), l = L[at];
     if (!l) { view().innerHTML = banner({ back: '#/learn', title: 'این درس پیدا نشد' }); return; }
-    if (isLocked(l)) return viewLocked({ kind: 'lesson', item: id, back: '#/learn', kicker: 'درس', title: `${esc(l.icon || '')} ${esc(l.title)}`,
-      sub: esc(l.summary || ''), line: `این درس و ${fa(lockedCount(L) - 1)} درس دیگر در نسخهٔ کامل است.` });
-    let h = banner({ back: '#/learn', kicker: 'درس', title: `${esc(l.icon || '')} ${esc(l.title)}`, sub: esc(l.summary || ''), art: artFor('lesson', id) }) + `<div class="section prose">`;
+    const kicker = `درس ${fa(at + 1)}، ${esc(lessonGroup(l))}`;
+    if (isLocked(l)) return viewLocked({ kind: 'lesson', item: id, back: '#/learn', kicker, title: esc(l.title),
+      sub: tx(l.summary || ''), line: `این درس و ${fa(lockedCount(L) - 1)} درس دیگر در نسخهٔ کامل است.` });
+    let h = banner({ back: '#/learn', kicker, title: esc(l.title), sub: tx(l.summary || ''), art: artFor('lesson', id) }) + `<div class="section prose">`;
     (l.sections || []).forEach(sec => {
-      if (sec.h) h += `<h3>${esc(sec.h)}</h3>`;
-      (sec.p || []).forEach(p => { h += `<p>${esc(p)}</p>`; });
-      if (sec.list && sec.list.length) h += `<ul class="list">${sec.list.map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
-      if (sec.ol && sec.ol.length) h += `<ol class="steps">${sec.ol.map(i => `<li>${esc(i)}</li>`).join('')}</ol>`;
-      if (sec.callout) h += `<div class="callout">${esc(sec.callout)}</div>`;
-      if (sec.warn) h += `<div class="card warn"><p>${esc(sec.warn)}</p></div>`;
+      if (sec.h) h += `<h3>${tx(sec.h)}</h3>`;
+      (sec.p || []).forEach(p => { h += `<p>${tx(p)}</p>`; });
+      if (sec.list && sec.list.length) h += `<ul class="list">${sec.list.map(i => `<li>${tx(i)}</li>`).join('')}</ul>`;
+      if (sec.ol && sec.ol.length) h += `<ol class="steps">${sec.ol.map(i => `<li>${tx(i)}</li>`).join('')}</ol>`;
+      if (sec.callout) h += `<div class="callout">${tx(sec.callout)}</div>`;
+      if (sec.warn) h += `<div class="card warn"><p>${tx(sec.warn)}</p></div>`;
     });
     view().innerHTML = h + `</div>`;
   }
@@ -1030,7 +1045,7 @@
       ${field('bw', 'وزن بدن (اختیاری)', 'decimal', 'wide')}
       <div class="orm-ratio"></div>
       <p class="orm-note">اینجا چیزی ذخیره نمی‌شود. عدد را روی برگهٔ نتایج بنویس.</p>
-    </div>` + (help ? acc('ormhelp', '', '❓ ' + esc(t.calcHelpTitle || 'این چطور کار می‌کند؟'), help, false) : '');
+    </div>` + (help ? acc('ormhelp', '', esc(t.calcHelpTitle || 'این چطور کار می‌کند؟'), help, false) : '');
   }
   // Live recompute; tells "not filled in yet" apart from "too many reps to be honest about".
   const faN = v => fa(v).replace(/\./g, '٫');   // Persian decimal separator
@@ -1050,7 +1065,7 @@
     const rir = Math.max(0, 10 - rpe), eff = rp + rir, q = ormQuality(eff);
     const tank = rir === 0 ? 'هیچ تکراری در تو نمانده بود' : `${faN(rir)} تکرار دیگر در تو مانده بود`;
     out.innerHTML = `<b>≈ ${faN(est)}</b><i>کیلوگرم برای یک تکرار</i>`;
-    grade.innerHTML = `${q.label} <em>· چقدر به آن اعتماد کنی</em>`;
+    grade.innerHTML = `${q.label}${SEP}<em>چقدر به آن اعتماد کنی</em>`;
     grade.className = 'orm-grade ' + q.cls;
     from.innerHTML = `${tank}<br>${q.hint}`;
     ratio.textContent = bw > 0 ? `یعنی ${faN((est / bw).toFixed(2))} برابر وزن بدنت. در زمین تنیس، قدرت نسبت به جثه از خودِ کیلوها مهم‌تر است.` : '';
@@ -1123,7 +1138,7 @@
     const nx = R[i + 1];
     return { phase: 'rest', left: nx ? nx.go - now : 0, r: nx || r, next: !!nx, done };
   }
-  const yyLevelText = (r, next) => `${next ? 'بعدی: ' : ''}سطح ${fa(r.lv)} · رفت‌وبرگشت ${fa(r.b)} از ${fa(r.n)}`;
+  const yyLevelText = (r, next) => `${next ? 'بعدی: ' : ''}سطح ${fa(r.lv)}، رفت‌وبرگشت ${fa(r.b)} از ${fa(r.n)}`;
   function yyPaint(now) {
     const el = $('#yoyo'); if (!el || !YY.running) return;
     const st = yyState(now);
@@ -1174,14 +1189,14 @@
     yyShell(`<div class="yy-level">آزمون یو-یو (Yo-Yo IR1)</div>
       <div class="yy-phase">پشت خط شروع بایست</div>
       <p class="yy-hint">صدای گوشی را تا آخر زیاد کن و صدا را امتحان کن. صفحه تا آخر آزمون روشن می‌ماند؛ از این صفحه بیرون نرو. کمک‌کننده اخطارها را می‌شمارد و بعد از دومین دیر رسیدن، «پایان آزمون» را دو بار می‌زند.</p>
-      <button class="btn ghost" data-yy="testsound">🔊 امتحان صدا</button>
-      <button class="btn primary" data-yy="start">▶ شروع آزمون</button>`, true);
+      <button class="btn ghost" data-yy="testsound">امتحان صدا</button>
+      <button class="btn primary" data-yy="start">شروع آزمون${GO_TRI}</button>`, true);
   }
   function yyRenderRunning() {
     yyShell(`<div class="yy-level"></div><div class="yy-speed"></div>
       <div class="yy-left"></div><div class="yy-phase"></div>
       <div class="yy-dist-l">مسافتِ تمام‌شده</div><div class="yy-dist"></div>
-      <button class="btn stop" data-yy="stop">⏹ پایان آزمون</button>`, false);
+      <button class="btn stop" data-yy="stop">پایان آزمون</button>`, false);
   }
   function yyRenderResult() {
     const R = YY.runs, n = YY.result, r = n > 0 ? R[n - 1] : null, dist = n * 40;
@@ -1193,7 +1208,7 @@
       <p class="yy-note">این تخمین از فرمول Bangsbo است و برای یک نفر ممکن است چند واحد اشتباه باشد. برای مقایسه با خودت، مسافت را بنویس. اینجا چیزی ذخیره نمی‌شود.</p>
       <button class="btn primary" data-yy="close">بستن</button>`, true);
   }
-  const yoyoCard = () => `<div class="card yy-card"><h3>🔊 صدای آزمون</h3><p>بوق‌ها طبق جدول منتشرشدهٔ Yo-Yo IR1 پخش می‌شوند: هر رفت‌وبرگشت ۲ × ۲۰ متر، بعد ۱۰ ثانیه ریکاوری، و هر سطح سریع‌تر. در پایان، مسافت و VO2max تخمینی را نشان می‌دهد. چیزی ذخیره نمی‌شود.</p><button class="btn primary" data-yy="open">▶ باز کردن صفحهٔ آزمون</button></div>`;
+  const yoyoCard = () => `<div class="card yy-card"><h3>صدای آزمون</h3><p>بوق‌ها طبق جدول منتشرشدهٔ Yo-Yo IR1 پخش می‌شوند: هر رفت‌وبرگشت ۲ × ۲۰ متر، بعد ۱۰ ثانیه ریکاوری، و هر سطح سریع‌تر. در پایان، مسافت و VO2max تخمینی را نشان می‌دهد. چیزی ذخیره نمی‌شود.</p><button class="btn primary" data-yy="open">باز کردن صفحهٔ آزمون${GO_TRI}</button></div>`;
   document.addEventListener('click', e => {
     const b = e.target && e.target.closest && e.target.closest('[data-yy]'); if (!b) return;
     const a = b.dataset.yy;
@@ -1203,7 +1218,7 @@
     else if (a === 'stop') {
       // Two taps, so a brush against the screen can't end a test.
       if (YY.armed && Date.now() - YY.armed < 3000) { YY.armed = 0; yyStop(false); }
-      else { YY.armed = Date.now(); b.textContent = 'برای پایان، دوباره بزن'; setTimeout(() => { if (YY.running && b.isConnected) b.textContent = '⏹ پایان آزمون'; }, 3000); }
+      else { YY.armed = Date.now(); b.textContent = 'برای پایان، دوباره بزن'; setTimeout(() => { if (YY.running && b.isConnected) b.textContent = 'پایان آزمون'; }, 3000); }
     }
     else if (a === 'minus' || a === 'plus') { YY.result = Math.min(YY.runs.length, Math.max(0, YY.result + (a === 'plus' ? 1 : -1))); yyRenderResult(); }
     else if (a === 'close' && !YY.running) { const el = $('#yoyo'); if (el) { el.hidden = true; el.innerHTML = ''; } document.body.style.overflow = ''; }
@@ -1213,65 +1228,69 @@
     yyKeepAwake(true); if (YY.ctx && YY.ctx.state === 'suspended') YY.ctx.resume();
   });
 
-  const ulist = a => (a && a.length) ? `<ul class="list">${a.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : '';
-  const olist = a => (a && a.length) ? `<ol class="steps">${a.map(i => `<li>${esc(i)}</li>`).join('')}</ol>` : '';
+  const ulist = a => (a && a.length) ? `<ul class="list">${a.map(i => `<li>${tx(i)}</li>`).join('')}</ul>` : '';
+  const olist = a => (a && a.length) ? `<ol class="steps">${a.map(i => `<li>${tx(i)}</li>`).join('')}</ol>` : '';
 
   function testDayBody(D) {
     let b = '';
-    if (D.intro) b += `<p>${esc(D.intro)}</p>`;
+    if (D.intro) b += `<p>${tx(D.intro)}</p>`;
     if (D.ready) b += `<div class="label">فقط اگر همهٔ این‌ها درست است، امروز آزمون بده</div>${ulist(D.ready)}`;
-    if (D.readyNote) b += `<p class="lead">${esc(D.readyNote)}</p>`;
+    if (D.readyNote) b += `<p class="lead">${tx(D.readyNote)}</p>`;
     if (D.order) b += `<div class="label">ترتیب و استراحت</div>${olist(D.order)}`;
-    if (D.orderNote) b += `<p class="lead">${esc(D.orderNote)}</p>`;
-    if (D.warmup) b += `<div class="label">گرم کردن روز آزمون · هر بار همین، به همین ترتیب</div>${ulist(D.warmup)}`;
-    if (D.split) b += `<p>${esc(D.split)}</p>`;
+    if (D.orderNote) b += `<p class="lead">${tx(D.orderNote)}</p>`;
+    if (D.warmup) b += `<div class="label">گرم کردن روز آزمون، هر بار همین، به همین ترتیب</div>${ulist(D.warmup)}`;
+    if (D.split) b += `<p>${tx(D.split)}</p>`;
     return b;
   }
 
+  // Tests (Centre Court): a cover with the test-day picture; the why as a quiet sand note; the test-day fold; the tests as numbered
+  // rows (a numeral for the ones on test day, none for the optional ones). The tour rings the first `.section .list-row`, and the
+  // last tour step rings the cover's ؟ (.bhelp) here.
   function viewTests() {
     const T = (C.tests && C.tests.tests) || [], D = C.tests && C.tests.day;
-    const card = t => { const art = artFor('test', t.id);
-      const body = `<h3>${esc(t.icon || '')} ${esc(t.title)}${isLocked(t) ? LOCK : ''}</h3>${t.badge ? pill(esc(t.badge)) : ''}<p>${esc(t.why || '')}</p>`;
-      return `<a class="card tap ${isLocked(t) ? 'locked' : 'green'} ${art ? 'has-cover' : ''}" href="#/tests/${encodeURIComponent(t.id)}">${art ? `<div class="cover has-art">${artLayer(art)}</div><div class="cbody">${body}</div>` : body}</a>`; };
+    const row = (t, k) => { const lk = isLocked(t), sub = sepJoin([t.badge ? `<b>${tx(t.badge)}</b>` : '', tx(t.why || '')]);
+      return `<a class="list-row ${k ? 'has-num' : ''} ${lk ? 'locked' : ''}" href="#/tests/${encodeURIComponent(t.id)}">${k ? pnum(k, lk ? 'off' : '') : ''}<span class="lr-body"><span class="lr-title">${esc(t.title)}</span>${sub ? `<span class="lr-sub clamp">${sub}</span>` : ''}</span>${lk ? LOCK : GO}</a>`; };
     const onDay = T.filter(t => !t.optional), extra = T.filter(t => t.optional);
-    let h = banner({ kicker: 'آزمون‌های ساده', title: 'آزمون', help: true, sub: 'با متر، کرنومتر و یک همراه. ببین تمرین‌ها جواب می‌دهند یا نه.' }) +
-      `<div class="section"><div class="card"><h3>چرا آزمون می‌دهیم؟</h3><p>قبل از شروع، و در هفتهٔ کم‌حجم هر بلوک (هفته‌های ۴، ۸، ۱۲ و ۱۶)، چند آزمون ساده بده. اگر هر بار شرایط را یکسان نگه داری، می‌بینی بدنت واقعاً بهتر می‌شود یا نه. آزمون اختیاری است؛ برنامه بدون آن هم کار می‌کند.</p></div>`;
-    if (D) h += acc('testday', '', '📋 ' + esc(D.title || 'روز آزمون'), testDayBody(D), false);
-    if (onDay.length) h += `<div class="h2">روز آزمون · به همین ترتیب</div>${onDay.map(card).join('')}`;
-    if (extra.length) h += `<div class="h2">بیرون از روز آزمون</div>${extra.map(card).join('')}`;
+    let h = banner({ kicker: 'آزمون‌های ساده', title: 'آزمون', help: true, sub: 'با متر، کرنومتر و یک همراه. ببین تمرین‌ها جواب می‌دهند یا نه.', art: artFor('testday', '*') }) +
+      `<div class="section"><div class="card green"><h3>چرا آزمون می‌دهیم؟</h3><p>قبل از شروع، و در هفتهٔ کم‌حجم هر بلوک (هفته‌های ۴، ۸، ۱۲ و ۱۶)، چند آزمون ساده بده. اگر هر بار شرایط را یکسان نگه داری، می‌بینی بدنت واقعاً بهتر می‌شود یا نه. آزمون اختیاری است؛ برنامه بدون آن هم کار می‌کند.</p></div>`;
+    if (D) h += acc('testday', '', esc(D.title || 'روز آزمون'), testDayBody(D), false);
+    if (onDay.length) h += `<div class="sec">روز آزمون، به همین ترتیب</div>${onDay.map((t, k) => row(t, k + 1)).join('')}`;
+    if (extra.length) h += `<div class="sec">بیرون از روز آزمون</div>${extra.map(t => row(t, 0)).join('')}`;
     view().innerHTML = h + `</div>`;
   }
 
+  // One test: a cover with its picture, then the prose on the paper (the same as a lesson's), the calculator or the Yo-Yo card where
+  // the test has one, and the two tables (the RM guide, the results sheet) as clean tables that scroll sideways inside their own box.
   function viewTest(id) {
     const T = (C.tests && C.tests.tests) || [], t = T.find(x => x.id === id);
     if (!t) { view().innerHTML = banner({ back: '#/tests', title: 'این آزمون پیدا نشد' }); return; }
-    if (isLocked(t)) return viewLocked({ kind: 'test', item: id, back: '#/tests', kicker: 'آزمون', title: `${esc(t.icon || '')} ${esc(t.title)}`,
-      why: t.why, pills: (t.player ? pill('🔊 صدای آزمون داخل اپ', 'green') : '') + (t.calc ? pill('🧮 ماشین‌حساب سقف داخل اپ', 'green') : ''),
+    if (isLocked(t)) return viewLocked({ kind: 'test', item: id, back: '#/tests', kicker: 'آزمون', title: esc(t.title),
+      why: t.why, pills: (t.player ? pill('صدای آزمون داخل اپ', 'green') : '') + (t.calc ? pill('ماشین‌حساب سقف داخل اپ', 'green') : ''),
       line: `این آزمون و ${fa(lockedCount(T) - 1)} آزمون دیگر، با راهنمای کامل و برگهٔ نتایج، در نسخهٔ کامل است.` });
     const sh = t.sheet || {};
     const cols = sh.cols || ['تلاش ۱', 'تلاش ۲', 'تلاش ۳', 'عدد نهایی'];
-    const rows = sh.rows || ['هفتهٔ ۰ · روز اول', 'هفتهٔ ۰ · روز دوم', 'هفتهٔ ۴', 'هفتهٔ ۸', 'هفتهٔ ۱۲', 'هفتهٔ ۱۶'];
-    let h = banner({ back: '#/tests', kicker: t.badge ? `آزمون · ${esc(t.badge)}` : 'آزمون', title: `${esc(t.icon || '')} ${esc(t.title)}`, art: artFor('test', id) }) + `<div class="section prose">`;
-    if (t.why) h += `<h3>چرا این آزمون؟</h3><p>${esc(t.why)}</p>`;
-    if (t.caution) h += `<div class="card warn"><h3>${esc(t.cautionTitle || 'احتیاط')}</h3><p>${esc(t.caution)}</p></div>`;
-    if (t.rmGuide) h += `<h3>${esc(t.rmTitle || 'کدام RM؟')}</h3><div class="table-wrap"><table class="rmg"><thead><tr><th>شما</th><th>آزمون</th><th>برچسب</th></tr></thead><tbody>${t.rmGuide.map(r => `<tr><td>${esc(r.who)}</td><td><bdi>${esc(r.rm)}</bdi></td><td>${esc(r.note || '')}</td></tr>`).join('')}</tbody></table></div>`;
-    if (t.rmWhy) h += t.rmWhy.map(x => `<p>${x.b ? `<b>${esc(x.b)}</b> ` : ''}${esc(x.t || '')}</p>`).join('');
+    const rows = sh.rows || ['هفتهٔ ۰، روز اول', 'هفتهٔ ۰، روز دوم', 'هفتهٔ ۴', 'هفتهٔ ۸', 'هفتهٔ ۱۲', 'هفتهٔ ۱۶'];
+    let h = banner({ back: '#/tests', kicker: t.badge ? `آزمون، ${tx(t.badge)}` : 'آزمون', title: esc(t.title), art: artFor('test', id) }) + `<div class="section prose">`;
+    if (t.why) h += `<h3>چرا این آزمون؟</h3><p>${tx(t.why)}</p>`;
+    if (t.caution) h += `<div class="card warn"><h3>${tx(t.cautionTitle || 'احتیاط')}</h3><p>${tx(t.caution)}</p></div>`;
+    if (t.rmGuide) h += `<h3>${tx(t.rmTitle || 'کدام RM؟')}</h3><div class="table-wrap"><table class="rmg"><thead><tr><th>شما</th><th>آزمون</th><th>برچسب</th></tr></thead><tbody>${t.rmGuide.map(r => `<tr><td>${tx(r.who)}</td><td><bdi>${esc(r.rm)}</bdi></td><td>${tx(r.note || '')}</td></tr>`).join('')}</tbody></table></div>`;
+    if (t.rmWhy) h += t.rmWhy.map(x => `<p>${x.b ? `<b>${tx(x.b)}</b> ` : ''}${tx(x.t || '')}</p>`).join('');
     if (t.equipment) h += `<h3>وسایل</h3>${ulist(t.equipment)}`;
     if (t.setup) h += `<h3>آماده‌سازی</h3>${olist(t.setup)}`;
-    if (t.helper) h += `<div class="card green"><h3>${esc(t.helperTitle || 'کار همراه تو')}</h3><p>${esc(t.helper)}</p></div>`;
+    if (t.helper) h += `<div class="card green"><h3>${tx(t.helperTitle || 'کار همراه تو')}</h3><p>${tx(t.helper)}</p></div>`;
     if (t.steps) h += `<h3>انجام آزمون</h3>${olist(t.steps)}`;
-    if (t.tries) h += `<h3>چند بار؟</h3><p>${esc(t.tries)}</p>`;
-    if (t.record) h += `<div class="callout">چه عددی یادداشت کنی: ${esc(t.record)}</div>`;
+    if (t.tries) h += `<h3>چند بار؟</h3><p>${tx(t.tries)}</p>`;
+    if (t.record) h += `<div class="callout">چه عددی یادداشت کنی: ${tx(t.record)}</div>`;
     if (t.calc === 'one-rep-max') h += ormCalc(t);
     if (t.player === 'yo-yo-ir1') h += yoyoCard();
     if (t.mistakes) h += `<h3>اشتباه‌هایی که نتیجه را خراب می‌کند</h3>${ulist(t.mistakes)}`;
     if (t.standard) h += `<h3>هر بار یکسان</h3>${ulist(t.standard)}`;
-    if (t.clearChange) h += `<h3>${esc(t.clearTitle || 'تغییر واقعی چقدر است؟')}</h3><div class="callout">${esc(t.clearChange)}</div>`;
-    if (t.when) h += `<h3>کِی آزمون بدهی؟</h3><p>${esc(t.when)}</p>`;
+    if (t.clearChange) h += `<h3>${tx(t.clearTitle || 'تغییر واقعی چقدر است؟')}</h3><div class="callout">${tx(t.clearChange)}</div>`;
+    if (t.when) h += `<h3>کِی آزمون بدهی؟</h3><p>${tx(t.when)}</p>`;
     h += `<h3>برگهٔ نتایج</h3><p class="lead">این جدول را روی کاغذ بکش یا چاپ کن. اینجا چیزی ذخیره نمی‌شود.</p>
-      <div class="table-wrap"><table class="sheet"><thead><tr><th>${esc(sh.first || 'روز')}</th>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
-      <tbody>${rows.map(r => `<tr><td>${esc(r)}</td>${cols.map(() => '<td></td>').join('')}</tr>`).join('')}</tbody></table></div>
-      <button class="btn ghost" style="margin-top:12px" data-print>چاپ این صفحه</button>`;
+      <div class="table-wrap"><table class="sheet"><thead><tr><th>${tx(sh.first || 'روز')}</th>${cols.map(c => `<th>${tx(c)}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r => `<tr><td>${tx(r)}</td>${cols.map(() => '<td></td>').join('')}</tr>`).join('')}</tbody></table></div>
+      <button class="btn ghost print-btn" data-print>چاپ این صفحه</button>`;
     view().innerHTML = h + `</div>`;
   }
 
@@ -1373,30 +1392,37 @@
     if (c) c.style.strokeDashoffset = String(2 * Math.PI * 85 * (1 - left / total));
     if (left <= 0) { stopTick(); ST.wEnd = null; ST.wLeft = 0; beep(); renderStep(); }
   }
+  // The foot's two outlined buttons under the primary one: → back (right), next ← (left). Back is off on the first exercise.
+  const stepNav = () => `<div class="step-nav"><button class="btn ghost" data-step="prev" ${ST.i === 0 ? 'disabled' : ''}>→ قبلی</button><button class="btn ghost" data-step="next">بعدی ←</button></div>`;
+  // The countdown ring both timers share (app.css, "Step by step"): the drawing is 190 units, and tickRest()/tickWarm() redraw `.ring .time` and `.ring .prog`.
+  const ringHtml = (L, offset, text) => `<div class="ring"><svg viewBox="0 0 190 190" aria-hidden="true"><circle class="track" cx="95" cy="95" r="85"/><circle class="prog" cx="95" cy="95" r="85" stroke-dasharray="${L}" stroke-dashoffset="${offset}"/></svg><div class="time">${text}</div></div>`;
+
   function renderWarmStep(top) {
     const e = ST.items[ST.i], items = e.g.items || [], total = warmSeconds(e.g), left = warmLeft(total);
     const L = 2 * Math.PI * 85;
-    const label = ST.wEnd ? '❚❚ مکث' : left === 0 ? '↻ دوباره' : left < total ? '▶ ادامه' : `▶ شروع ${fa(Math.round(total / 60))} دقیقه`;
+    const label = ST.wEnd ? 'مکث' : left === 0 ? 'دوباره' : left < total ? 'ادامه' : `شروع ${fa(Math.round(total / 60))} دقیقه`;
     stepEl().innerHTML = top + `<div class="step-body">
-        <div class="step-slot">W</div><div class="step-name">${esc(e.g.title)}</div>
-        <div class="rest" style="padding-top:2px">
-          <div class="ring"><svg viewBox="0 0 190 190"><circle class="track" cx="95" cy="95" r="85"/><circle class="prog" cx="95" cy="95" r="85" stroke-dasharray="${L}" stroke-dashoffset="${L * (1 - left / total)}"/></svg><div class="time">${mmss(left)}</div></div>
-          <div class="rest-actions"><button data-step="wtimer">${label}</button></div></div>
+        <div class="eb">${fa(items.length)} حرکت، به ترتیب</div><div class="step-name">${esc(e.g.title)}</div>
+        <div class="rest">
+          ${ringHtml(L, L * (1 - left / total), mmss(left))}
+          <div class="rest-actions"><button class="chip" data-step="wtimer">${label}</button></div></div>
         <div class="label">حرکت‌ها</div><div class="wlist">${warmRows(items, true)}</div>
       </div>
-      <div class="step-foot"><button class="btn primary" data-step="done">✓ گرم کردن تمام شد · بعدی</button>
-        <div class="step-nav"><button class="btn ghost" data-step="prev" ${ST.i === 0 ? 'disabled style="opacity:.4"' : ''}>→ قبلی</button><button class="btn ghost" data-step="next">بعدی ←</button></div></div>`;
+      <div class="step-foot"><button class="btn primary" data-step="done">✓ گرم کردن تمام شد، بعدی</button>${stepNav()}</div>`;
   }
 
   function renderStep() {
     const n = ST.items.length;
-    const top = `<div class="step-top"><div class="row"><button class="x" data-step="close" aria-label="بستن">✕</button>
-      <div class="where">هفتهٔ ${fa(ST.week)} · ${sessionShort(ST.s)} · ${ST.phase === 'done' ? 'تمام شد' : `تمرین ${fa(ST.i + 1)} از ${fa(n)}`}</div></div>
+    const where = sepJoin([`هفتهٔ ${fa(ST.week)}`, sessionShort(ST.s), ST.phase === 'done' ? 'تمام شد' : `تمرین ${fa(ST.i + 1)} از ${fa(n)}`]);
+    // The slim green bar (the training app's Guided): where you are at the start (right), ✕ at the end (left), the progress line along its foot.
+    const top = `<div class="step-top"><div class="row"><div class="where">${where}</div><button class="x" data-step="close" aria-label="بستن">✕</button></div>
       <div class="bar"><i style="width:${ST.phase === 'done' ? 100 : Math.round((ST.i / n) * 100)}%"></i></div></div>`;
     if (ST.phase === 'done') {
+      // The last ball: a green band in the cover treatment (the classes of app.css 3.3's cover, written here because banner() has no
+      // class of its own to add), the sentence on the paper, one button. If the picture fails, the band is simply the green.
       const dart = artFor('done', '*');
-      stepEl().innerHTML = top + `<div class="step-body"><div class="done-screen">${dart ? `<div class="done-art has-art">${artLayer(dart)}</div>` : `<div class="big">🎾</div>`}<h2>جلسه تمام شد</h2>
-        <p>آفرین. چیزی ذخیره نمی‌شود؛ هر وقت خواستی جلسهٔ بعدی را از برنامه باز کن.</p></div></div>
+      stepEl().innerHTML = top + `<header class="banner is-cover done-cover ${dart ? 'has-art' : ''}">${artLayer(dart)}<div class="kicker">هفتهٔ ${fa(ST.week)}، ${sessionShort(ST.s)}</div><h1>جلسه تمام شد</h1></header>
+        <div class="step-body"><p class="done-line">آفرین. چیزی ذخیره نمی‌شود؛ هر وقت خواستی جلسهٔ بعدی را از برنامه باز کن.</p></div>
         <div class="step-foot"><button class="btn primary" data-step="close">بستن</button></div>`;
       return;
     }
@@ -1404,34 +1430,35 @@
     const { g, it, ex } = ST.items[ST.i];
     const per = it.sets || 1, R = it.rounds || 0, sets = R ? totalSets(it) : (it.sets || 0);
     const pos = k => ({ r: Math.ceil(k / per), k: ((k - 1) % per) + 1 });
-    const setText = k => R ? `${roundName(it)} ${fa(pos(k).r)} از ${fa(R)} · تکرار ${fa(pos(k).k)} از ${fa(per)}` : `ست ${fa(k)} از ${fa(sets)}`;
+    const setText = k => R ? `${roundName(it)} ${fa(pos(k).r)} از ${fa(R)}، تکرار ${fa(pos(k).k)} از ${fa(per)}` : `ست ${fa(k)} از ${fa(sets)}`;
     const curDot = R ? pos(ST.set).k : ST.set;
     if (ST.phase === 'rest') {
       const L = 2 * Math.PI * 85;
-      const nextLabel = `${setText(ST.set + 1)} · <bdi>${esc(exName(ex))}</bdi>`;
-      stepEl().innerHTML = top + `<div class="step-body"><div class="rest"><div class="rest-label">${R && ST.set % per === 0 ? `استراحت بین ${roundName(it)}\u200cها · آرام راه بروید` : 'استراحت'}</div>
-        <div class="ring"><svg viewBox="0 0 190 190"><circle class="track" cx="95" cy="95" r="85"/><circle class="prog" cx="95" cy="95" r="85" stroke-dasharray="${L}" stroke-dashoffset="0"/></svg><div class="time">${mmss(ST.total)}</div></div>
-        <div class="rest-actions"><button data-step="add15">+۱۵ ثانیه</button><button data-step="skip">رد کردن استراحت</button></div>
-        <p class="lead" style="margin-top:16px">بعدی: ${nextLabel}</p></div></div>`;
+      const nextLabel = sepJoin([setText(ST.set + 1), `<bdi>${esc(exName(ex))}</bdi>`]);
+      stepEl().innerHTML = top + `<div class="step-body"><div class="rest"><div class="rest-label">${R && ST.set % per === 0 ? `استراحت بین ${roundName(it)}\u200cها، آرام راه بروید` : 'استراحت'}</div>
+        ${ringHtml(L, 0, mmss(ST.total))}
+        <div class="rest-actions"><button class="chip" data-step="add15">+۱۵ ثانیه</button></div>
+        <p class="rest-next">بعدی: ${nextLabel}</p></div></div>
+        <div class="step-foot"><button class="btn ghost" data-step="skip">رد کردن استراحت</button></div>`;
       tickRest();
       return;
     }
-    const dots = sets > 1 ? `<div class="set-dots">${Array.from({ length: R ? per : sets }, (_, k) => `<i class="${k + 1 < curDot ? 'done' : k + 1 === curDot ? 'now' : ''}"></i>`).join('')}</div>
+    // The sets as numerals: done = solid green, now = a green disc with a white numeral, still to come = outlined.
+    const dots = sets > 1 ? `<div class="set-dots">${Array.from({ length: R ? per : sets }, (_, k) => `<i class="${k + 1 < curDot ? 'done' : k + 1 === curDot ? 'now' : ''}">${fa(k + 1)}</i>`).join('')}</div>
       <div class="set-label">${setText(ST.set)}</div>` : '';
     const cues = (ex.cues || []).slice(0, 3).map(c => `<div class="cue">${esc(c)}</div>`).join('') + (ex.avoid ? `<div class="cue bad">${esc(ex.avoid)}</div>` : '');
-    const doneLabel = sets > 1 ? (R ? '✓ تکرار انجام شد' : '✓ ست انجام شد') : '✓ انجام شد · بعدی';
+    const doneLabel = sets > 1 ? (R ? '✓ تکرار انجام شد' : '✓ ست انجام شد') : '✓ انجام شد، بعدی';
     stepEl().innerHTML = top + `<div class="step-body">
-        <div class="step-slot">${esc(g.title || '')}</div>
+        <div class="eb">${esc(g.title || '')}</div>
         <div class="step-name"><bdi>${esc(exName(ex))}</bdi></div>
         ${altEx(it) ? `<div class="step-alt">${altLine(it)}</div>` : ''}
-        <div class="step-dose">${dosePills(it)}</div>
+        ${statsGrid(it)}
         ${dots}
         ${it.note ? `<div class="note">${esc(it.note)}</div>` : ''}
         ${cues ? `<div class="label">نکته‌ها</div>${cues}` : ''}
         ${videoBlock(videoFor(ex))}
       </div>
-      <div class="step-foot"><button class="btn primary" data-step="done">${doneLabel}</button>
-        <div class="step-nav"><button class="btn ghost" data-step="prev" ${ST.i === 0 ? 'disabled style="opacity:.4"' : ''}>→ قبلی</button><button class="btn ghost" data-step="next">بعدی ←</button></div></div>`;
+      <div class="step-foot"><button class="btn primary" data-step="done">${doneLabel}</button>${stepNav()}</div>`;
   }
 
   /* ── The tour and the guide (راهنما) ───────────────────────────────── */
