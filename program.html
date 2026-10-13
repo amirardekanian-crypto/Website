@@ -6131,6 +6131,18 @@ function paintPlanOffline(state) {
   el.hidden = false;
 }
 
+// ── THE DEMO SHOWS THE COACHING (Line Call, 2026-10-13; Second Serve X1; Amir: "yes to all recommended", decision 7) ──
+// The demo's cycles carry no dates, so a stranger never saw the This cycle card (Progress) or a week note on Home: a programme,
+// with the coaching hidden. Its current cycle is dated when it opens, week 2 of 5 (it started 7 days ago), the others before and
+// after it, so the cycle card counts and a week-2 note in the demo's programme shows on Home. Demo only, in memory only.
+function dateDemoCycles(D) {
+  const cycles = (D && D.cycles) || [];
+  if (!cycles.length || cycles.some(c => c && c.startDate)) return;
+  const i = Number.isInteger(D.currentCycleIndex) ? D.currentCycleIndex : 0;
+  const at = n => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + n); return ymdLocal(d); };
+  cycles.forEach((c, j) => { const s0 = -7 + (j - i) * 35; c.startDate = at(s0); c.endDate = at(s0 + 34); });
+}
+
 // The server will not give this sign-in the plan: boot's answer, and since 2026-10-13 the background check of a plan opened from
 // the phone (_resumeSync()) when no session is under way.
 function showPlanRefused() {
@@ -6430,6 +6442,7 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   loadSpineCache();
   if (!SPINE) { try { await _withTimeout(refreshSpine(), 2500); } catch (_) { /* no videos this open */ } }
 
+  if (window.IS_DEMO) dateDemoCycles(DATA);
   ATHLETE_ID = DATA.athlete.id;
   STORAGE_KEY = ATHLETE_ID + '_prog_state';
 
@@ -6552,6 +6565,9 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
     if (wParam) openWorkoutDeepLink(wParam);
     const aParam = params.get('article');
     if (aParam) openArticleDeepLink(aParam);
+    // ?pane=sessions|playbook (2026-10-13): the site's Sessions and Playbook doors open that Library pane, not the demo's Home.
+    const pParam = params.get('pane');
+    if (!wParam && !aParam && (pParam === 'sessions' || pParam === 'playbook')) { goLibrary(); setLibPane(pParam); }
   }, 0);
 })();
 
@@ -6799,7 +6815,7 @@ function openAccount(e) {
   const name = [a.firstName, a.lastName].filter(Boolean).join(' ') || 'Your account';
   const dark = document.body.hasAttribute('data-dark');
   const waiting = (window.IS_DEMO || window.IS_PREVIEW) ? 0 : loadOutbox().length;
-  const sub = window.IS_DEMO ? 'The demo: nobody is signed in, and nothing is saved.'
+  const sub = window.IS_DEMO ? 'The demo keeps your taps on this phone only. Nothing reaches me.'
     : window.IS_PREVIEW ? 'Coach preview: you are looking at this athlete\'s app as your coach sign-in.'
     : 'Signed in on this phone.';
   const door = (id, ic, words) => `<button type="button" class="hrow" id="${id}">${acctIc(ic)}<span class="hrow-b"><span class="hrow-v">${words}</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;

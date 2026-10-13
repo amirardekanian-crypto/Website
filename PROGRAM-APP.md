@@ -106,8 +106,12 @@ card, card cues and videos dropped wherever the approved Spine entry has its own
 changed, and `program_versions` holds the old row. The two medicine-ball slams keep their own cues
 until their draft Spine entries are approved. Every athlete still changes over at their next cycle,
 and **until most have, no new exercise-card features** (same fork): the work goes to the Proof seam,
-readiness and the weight boxes instead. The demo has no cycle dates, so week-based features (the
-week notes, the retest nudge, "Week 3 of 5") cannot show in it.
+readiness and the weight boxes instead. The demo has no cycle dates in its row, so week-based features
+could not show in it. **Since 2026-10-13 the app dates it when it opens** (Line Call, Second Serve X1; Amir's decision 7;
+`dateDemoCycles()`, in memory only, never saved): the current cycle is in week 2 of 5, so Progress shows the This cycle card
+and a week-2 note in the demo's row would lead Home (the note's words are Amir's to write). `?pane=sessions` and
+`?pane=playbook` open that Library pane (the site's two "Step inside" doors use them), and the account sheet says *The demo
+keeps your taps on this phone only. Nothing reaches me.* `scripts/headless/demo-coaching.js`.
 
 **Writing a programme got shorter, which was the point.** `/program-design` already emitted plain
 dose fields; `/program-assemble` step 2b used to convert them into chips under a page of rules
