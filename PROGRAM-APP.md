@@ -1349,7 +1349,13 @@ dashboard do not change.
     mono label over the line, a grey ›; `sessionWaUrl()` reads the note from the finish card too now, so a note typed before
     Done comes along, which it did not). Finishing early
     uses the same band (*FINISHING DAY 1 EARLY*) and lists what is not done on the green, each tag in light clay; **Keep
-    going** sits under Done.
+    going** sits under Done. **It asks why** (Line Call, 2026-10-13; Amir's decision 4): under *Not done*, *What stopped you?
+    Optional* and four paper chips, **Out of time · Pain · Too tired · No kit** (`EARLY_WHY`, one tap, a second clears it,
+    the green when chosen), saved as `<id>_whyearly_d<N>` (a per-day key: the sweep, a reset and `staleCloudPlan()` treat it
+    like the note). The report's status line carries it, *Partial (8 of 19 sets/units done) · Pain* (`buildSessionData()`;
+    coach.html shows *Partial · pain*, `partialLabel()`). **Pain** brings a *Tell me about it* WhatsApp row up under the
+    question and hides the one at the foot; its message starts *I stopped early (pain).* (`sessionWaUrl()`).
+    `scripts/headless/early-why.js` (12 checks).
   - **Finished**: the card is signed the way the About sheet signs its reason. A grid whose `::before` paints the green
     band, *DAY 1 DONE* first (as E draws it: the finish picture, `.complete-art`, is filled but not shown in the day view), the message with the clay
     quote mark, and Amir's signature and photo (`.complete-by`: `WN_SIG` and `.wn-av`, added to the template after

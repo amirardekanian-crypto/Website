@@ -3782,6 +3782,18 @@
   /* the WhatsApp row is its OWN row under Done (Amir 2026-10-13: it competed with Done inside the note's box): quiet, the same
      door look it had, shown when the card is ready or early like the rating. The finished card has the same row (.complete-wa). */
   :where(#day-view) .finish-wa { display: none; padding: 0 var(--g) 32px; }
+  /* Finishing early asks why (EARLY_WHY, 2026-10-13): one optional tap, paper chips, the green when chosen. Pain brings the
+     WhatsApp row up under the question, so the one at the foot goes. */
+  :where(#day-view) .early-why { margin-top: 18px; }
+  :where(#day-view) .ew-q { font-size: var(--fs-body); font-weight: 600; line-height: 1.3; color: var(--ink); }
+  :where(#day-view) .ew-q span { margin-left: 6px; font-size: var(--fs-small); font-weight: 400; color: var(--grey); }
+  :where(#day-view) .ew-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  :where(#day-view) .ew-chip { min-height: 44px; padding: 0 16px; border: 1px solid var(--hair); border-radius: 999px; background: var(--row);
+    color: var(--ink); font: inherit; font-size: var(--fs-body); font-weight: 600; cursor: pointer; }
+  :where(#day-view) .ew-chip.on { background: var(--fill); border-color: var(--fill); color: #fff; }
+  :where(#day-view) .ew-wa { margin-top: 12px; }
+  :where(#day-view) .ew-wa .wa-inline { margin: 0; }
+  :where(#day-view) .session-confirm.ready.why-pain .finish-wa { display: none; }   /* beats .ready .finish-wa (below) */
   :where(#day-view) .session-confirm.ready .finish-wa { display: block; }
   :where(#day-view) .finish-wa .wa-inline, :where(#day-view) .complete-wa .wa-inline { margin: 0; }
   :where(#day-view) .session-confirm.ready .confirm-btn { width: 100%; min-height: 56px; border: 0; border-radius: 8px; background: var(--btn); color: #fff; box-shadow: none;
@@ -5674,7 +5686,7 @@ function staleCloudPlan(data, prefix) {
     if (k.indexOf(prefix) !== 0) return;
     const rel = k.slice(prefix.length);
     // Exactly the per-day keys autoResetStaleDays() owns.
-    const dm = rel.match(/^(?:completed_d|daynote_|srpe_|sent_d|sentsig_d|senton_d|timer_|readiness_|touched_d|donelog_d)(\d+)$/);
+    const dm = rel.match(/^(?:completed_d|daynote_|srpe_|sent_d|sentsig_d|senton_d|timer_|readiness_|touched_d|donelog_d|whyearly_d)(\d+)$/);
     if (dm && over[dm[1]]) { plan.skip.add(k); return; }
     // A timer/readiness for a day with no completed stamp at all still carries its
     // own date — a session abandoned last week must not come back running.
@@ -9417,7 +9429,10 @@ function sessionWaUrl(dayId) {
   // The note's box is in the finish card until Done, in the finished card after it (moveRatePanel()): the row under Done reads it too.
   const ta = document.querySelector('#confirm-' + dayId + ' .complete-note-input, #complete-' + dayId + ' .complete-note-input');
   const note = ta ? ta.value.trim() : '';
-  return coachWhatsAppUrl('About Day ' + dayId + title + ': ' + (note ? note + ' ' : ''));
+  // Finishing early with a reason (EARLY_WHY): the message starts with it.
+  const conf = document.getElementById('confirm-' + dayId);
+  const why = conf && conf.classList.contains('early') ? earlyWhyLabel(dayId) : '';
+  return coachWhatsAppUrl('About Day ' + dayId + title + ': ' + (why ? 'I stopped early (' + why.toLowerCase() + '). ' : '') + (note ? note + ' ' : ''));
 }
 window.sessionWaUrl = sessionWaUrl;
 // The Coach tab's WhatsApp panel, the screen's one green thing (2026-10-13): ONE <a> (the same href, target and pre-filled message
@@ -11408,10 +11423,13 @@ function refreshConfirmCard(day, status) {
   card.querySelector('.confirm-count').textContent = `${done} of ${total} sets`;
   card.querySelector('.confirm-bar i').style.width = (total ? Math.round(done / total * 100) : 0) + '%';
   const missEl = card.querySelector('.confirm-missing');
+  const why = early ? earlyWhyOf(day) : '';
   missEl.innerHTML = early
     ? `<div class="confirm-missing-label">Not done</div><ul>${missing.map(m =>
         `<li><span class="confirm-missing-name">${esc(m.name)}</span><span class="confirm-missing-tag">${esc(m.label)}</span></li>`).join('')}</ul>`
+      + earlyWhyHtml(day, why)
     : '';
+  card.classList.toggle('why-pain', why === 'pain');
   const btn = card.querySelector('.confirm-btn');
   if (btn.dataset.armed !== '1') btn.textContent = ready ? 'Done · send to coach ✓' : 'Finish early';
   const back = card.querySelector('.confirm-back');
@@ -11419,6 +11437,31 @@ function refreshConfirmCard(day, status) {
   if (!ready) { const h = card.querySelector('.finish-hint'); if (h) h.textContent = ''; }
   paintFinishBtn(day, status);   // the bar's Finish early (under ⋯) goes when the card is ready or early
 }
+
+// ── FINISHING EARLY ASKS WHY (Line Call, 2026-10-13; Amir: "yes to all recommended", decision 4) ──
+// 16% of sessions end early, mostly by dropping the end, and nothing said why: out of time, pain and too tired each call for a
+// different next cycle. The early card asks once, optional, one tap: the answer is <id>_whyearly_d<N> (a per-day key: the sweep,
+// a reset and the cloud's stale-day rule treat it like the note) and goes into the report's status line, "Partial (8 of 19
+// sets/units done) · Pain" (buildSessionData(); coach.html shows it after Partial). Pain brings a WhatsApp row up under the
+// question, its message saying so (sessionWaUrl()).
+const EARLY_WHY = [['time', 'Out of time'], ['pain', 'Pain'], ['tired', 'Too tired'], ['kit', 'No kit']];
+function earlyWhyKey(day) { return ATHLETE_ID + '_whyearly_d' + day; }
+function earlyWhyOf(day) { const v = localStorage.getItem(earlyWhyKey(day)) || ''; return EARLY_WHY.some(x => x[0] === v) ? v : ''; }
+function earlyWhyLabel(day) { const v = earlyWhyOf(day), x = EARLY_WHY.find(e => e[0] === v); return x ? x[1] : ''; }
+function earlyWhyHtml(day, why) {
+  const d = esc(String(day));
+  return `<div class="early-why"><div class="ew-q">What stopped you? <span>Optional</span></div><div class="ew-chips">` +
+    EARLY_WHY.map(([k, l]) => `<button type="button" class="ew-chip${why === k ? ' on' : ''}" aria-pressed="${why === k}" onclick="setEarlyWhy('${d}', '${k}')">${esc(l)}</button>`).join('') +
+    `</div>` + (why === 'pain'
+      ? `<div class="ew-wa">${waInlineHtml(coachWhatsAppUrl('About Day ' + day + ': '), 'Tell me about it', 'On WhatsApp, with your note and the day.', 'this.href=sessionWaUrl(\'' + d + '\')')}</div>` : '') +
+    `</div>`;
+}
+function setEarlyWhy(day, k) {
+  if (earlyWhyOf(day) === k) localStorage.removeItem(earlyWhyKey(day)); else localStorage.setItem(earlyWhyKey(day), k);
+  refreshConfirmCard(day);
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+window.setEarlyWhy = setEarlyWhy;
 
 // The card's one button. Ready: Done (finishDay()). In progress: "Finish early", which
 // takes two taps (armedTap(), LOG-02) and then asks the rating, showing what is left.
@@ -12538,6 +12581,7 @@ function resetDay(day) {
   if (dl) Object.keys(dl.sets || {}).forEach(nm => saveSetLogValue(nm, dl.sets[nm]));
   if (localStorage.getItem(doneLogKey(day)) != null) localStorage.removeItem(doneLogKey(day));
   localStorage.removeItem(ATHLETE_ID + '_touched_d' + day);   // nothing left to call unfinished (DATA-02)
+  localStorage.removeItem(ATHLETE_ID + '_whyearly_d' + day);  // why it ended early belongs to the session being reset
   localStorage.removeItem(ATHLETE_ID + '_clockasked_d' + day);  // the next start may be asked about again
   // A report still waiting in the outbox for the session being reset never goes (an
   // earlier week's, for the same day, still does).
@@ -12914,6 +12958,7 @@ function autoResetStaleDays() {
       localStorage.removeItem(ATHLETE_ID + '_readiness_' + day.id);
       localStorage.removeItem(ATHLETE_ID + '_touched_d' + day.id);
       localStorage.removeItem(doneLogKey(day.id));
+      localStorage.removeItem(ATHLETE_ID + '_whyearly_d' + day.id);
       // Per-exercise RPE + per-set RPE/done for this day's exercises. The weights
       // move out of the boxes into last time's hint (carryExerciseKeys()); personal notes stay.
       (day.blocks || []).forEach(block => {
@@ -13095,8 +13140,9 @@ function buildSessionData(day) {
   const dayData = (DATA.workouts.days || []).find(d => String(d.id) === String(day)) || {};
   const dayNote = localStorage.getItem(ATHLETE_ID + '_daynote_' + day) || '';
   const isPartial = dayStatus.done < dayStatus.total;
+  const whyEarly = isPartial ? earlyWhyLabel(day) : '';   // finishing early asks why (EARLY_WHY)
   const statusLabel = isPartial
-    ? `Partial (${dayStatus.done} of ${dayStatus.total} sets/units done)`
+    ? `Partial (${dayStatus.done} of ${dayStatus.total} sets/units done)` + (whyEarly ? ' · ' + whyEarly : '')
     : 'Complete';
   const sRpe = localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '';
 

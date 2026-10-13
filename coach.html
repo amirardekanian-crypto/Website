@@ -1573,6 +1573,8 @@ function copyText(t, btn, quiet) {
   }, () => notice('Copy failed — here it is:', t, { select: true }));
 }
 function isPartialStatus(s) { return String(s || '').toLowerCase().indexOf('partial') === 0; }
+// "Partial", with the reason the athlete gave since 2026-10-13 ("Partial (8 of 19 sets/units done) · Pain" → "Partial · pain").
+function partialLabel(s) { const m = String(s || '').match(/\)\s*·\s*([^·]+)$/); return 'Partial' + (m ? ' · ' + m[1].trim().toLowerCase() : ''); }
 // A "Note:" line with nothing after it is not a note (two old sessions carry one): it is not something to read.
 function sessionHasNote(s) { return !!((s.day_note && s.day_note.trim()) || (s.summary && /\n\s+Note:[ \t]*\S/.test(s.summary))); }
 function sessionNeedsReply(s) { return sessionHasNote(s) && (s.coach_status || 'new') === 'new'; }
@@ -4880,7 +4882,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   // Status line — only facts the session actually carries.
   let status, statusTone;
   if (!s) { status = sessions.length ? 'never finished' : 'not logged yet'; statusTone = 'idle'; }
-  else if (isPartialStatus(s.status)) { status = 'Partial'; statusTone = 'warn'; }
+  else if (isPartialStatus(s.status)) { status = partialLabel(s.status); statusTone = 'warn'; }
   else { status = 'Complete'; statusTone = 'ok'; }
   const thisCycle = !!(_D && _D.a && _D.a.cycle && _D.a.cycle.start);   // a dated cycle: the cards hold only its sessions (workTabHtml)
   const meta = [];
@@ -4999,7 +5001,7 @@ function earlierCyclesHtml(D, earlier) {
   if (!earlier.length) return '';
   const rows = earlier.slice(0, 80).map(s => {
     const uid = ('eh_' + D.athleteId + '_' + s.day + '_' + s.completed_on).replace(/[^a-z0-9]/gi, '_');
-    const bits = [prettyDate(s.completed_on), 'Day ' + s.day + (s.focus ? ' — ' + s.focus : ''), isPartialStatus(s.status) ? 'Partial' : 'Complete'];
+    const bits = [prettyDate(s.completed_on), 'Day ' + s.day + (s.focus ? ' — ' + s.focus : ''), isPartialStatus(s.status) ? partialLabel(s.status) : 'Complete'];
     if (s.session_rpe != null) bits.push('sRPE ' + s.session_rpe + '/10');
     if (s.duration_min != null) bits.push(s.duration_min + ' min');
     return `<details class="rawlog" id="${uid}"><summary>${esc(bits.join(' · '))}</summary>
