@@ -283,7 +283,8 @@
 // v152: program.html changed (2026-10-13): the ready finish card says "No RPE on N lifts. Add them ›" when lifts have none.
 // v153: program.html changed (2026-10-13): a pill holding a duration ("3s eccentric") keeps its own case; the guide's tempo line covers 3 and 4 numbers.
 // v154: program.html changed (2026-10-13): one vocabulary (Finish session, Reset session, programme, Once a week, the RPE hint).
-const CACHE = 'aap-v154';
+// v155: program.html changed (2026-10-13): a rough day keeps the first lift of the Strength block that is not a jump.
+const CACHE = 'aap-v155';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

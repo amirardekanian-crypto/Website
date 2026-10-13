@@ -12112,7 +12112,9 @@ function redDayCore(day) {
       else {
         if (!first) first = { start: i, n: (b.exercises || []).length, name: ex.name };
         if (!power && POWER_BLOCK_RE.test(t)) power = { i: i, name: ex.name };
-        if (!primary && PRIMARY_BLOCK_RE.test(t)) primary = { i: i, name: ex.name };
+        // The first lift of the Primary/Strength block that is not a jump or a landing (2026-10-13; Second Serve J-14): a contrast jump
+        // put first was picked, and the sore rule then took it away, leaving a rough day with the warm-up only.
+        if (!primary && PRIMARY_BLOCK_RE.test(t) && !isImpactWork(ex)) primary = { i: i, name: ex.name };
       }
       i++;
     });
@@ -12130,7 +12132,7 @@ function redDayCore(day) {
 // A jump or a landing: the Spine entry's impact, or the name when there is no entry yet.
 function isImpactWork(ex) {
   const e = spineFor(ex && ex.name, ex && ex.exId);
-  if (e) return e.impact === 'plyometric' || e.impact === 'landing';
+  if (e && e.impact) return e.impact === 'plyometric' || e.impact === 'landing';   // an entry with no impact set: the name decides (2026-10-13)
   return IMPACT_NAME_RE.test(String((ex && ex.name) || ''));
 }
 
