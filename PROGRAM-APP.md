@@ -759,12 +759,13 @@ tokens for one day; the copy is gone).
   `goTo('plan')`, the screen `#screen-plan`: none renamed) with a rising-line icon. Records, Body weight and the archive
   light it (`goTo()`'s `litTab`).
 - **Progress, top to bottom** (`renderPlan()`): the athlete's name as an eyebrow (`.prog-eyebrow`) over **Progress**
-  (`h1.prog-title`, 44 px), the sport badge and the cycle's dates (`.athlete-card-dates`, unchanged); the **This cycle**
-  card (`#cycle-card-wrap`, `paintCycleCard()`, a plain `div.cyc-card` now: no tap, no ›); the days-left banner; **Your
+  (`h1.prog-title`, 44 px), the sport badge; the **This cycle** card (`#cycle-card-wrap`, `paintCycleCard()`: since
+  2026-10-13 the screen's one green cover, with the cycle's dates and, in the last 14 days, the days left: the separate
+  banner and the header's dates went, see *Every other screen*, below); **Your
   numbers** (`h2.prog-sec`, then `#ceiling-row-wrap` and `#weight-row-wrap`, painted by `paintNumbers()` at boot and on
   every `goTo('plan')`, so a max saved mid-session or a new weigh-in shows; the Records count-up runs only while Progress
-  is on screen); then **Game Plan** (`h2.prog-sec`) over the meter and the cycle cards, unchanged (the Active card's
-  picture still goes Home, Amir 2026-10-11). Records' ← (`ceilingBack()`, after its own steps and `_ceilReturn`) and
+  is on screen); then **Game Plan** (`h2.prog-sec`) over the road of cycles (since 2026-10-13 one row per cycle: see
+  *Every other screen in the Centre Court look*, below). Records' ← (`ceilingBack()`, after its own steps and `_ceilReturn`) and
   Body weight's ← go to Progress.
 - **The This cycle card** has no "Your wins show here" line any more: with no wins it ends after its two bars. With no
   dates, or before the cycle, nothing is painted (the old `.home-cyc` line is gone).
@@ -799,6 +800,42 @@ tokens for one day; the copy is gone).
   and without data, the account button over no text on 11 screens and off screen once scrolled, one left edge, no
   sideways scroll in both themes, Records' and Body weight's ← and Back, Records from an exercise still returning to it),
   with `smoke.js` and `cycle-end.js` updated.
+
+## 🧩 Every other screen in the Centre Court look (2026-10-13, continuing)
+
+Amir: *"continue until everything has a consistent design"*. One screen at a time, each its own block in the sheet named
+`… IN THE CENTRE COURT LOOK (2026-10-13)`, each with its own headless suite, and the parts are always Centre Court's (a tab
+screen's header as Progress's; ONE green thing per screen; paper rows with hairlines; the door row; the P24 numeral; his
+signature for his voice). The plan and its order are in the audit artifact *Quiet Frame* (v2/v3).
+
+- **Coach** (`renderNotes()`, `coachContactHtml()`; `scripts/headless/coach-tab.js`, 102 checks): the header `● YOUR COACH` ·
+  **Coach Amir** · *Strength & conditioning coach*; the WhatsApp panel is the screen's one green thing (`a.coach-panel`, ONE link,
+  the same `coachWhatsAppUrl()` and pre-filled message, his photo graded into the green, the eyebrow *Questions, swaps, anything
+  that hurts*, **Message me on WhatsApp**, *Form videos welcome. I answer there, not in the app.*, the light-ring **Open WhatsApp**
+  as a span inside the link, his signature at the foot; his photo shows once, so no small avatar by the signature); the number
+  as selectable mono text (`COACH_WHATSAPP_SHOWN`); **Notes from Amir** as fold rows (`button.cn-row`, `toggleCoachNote()`, one
+  open at a time, `aria-expanded`); **How the app works** as one door row. The hero, the coloured icon tiles, *Tap to read* and
+  the section labels are gone.
+
+- **Progress's road and the archive** (`paintCycleCard()`, `paintRoad()`, `roadRowHTML()`, `toggleRoad()`, `roadDoorHTML()`,
+  `paintArchiveCover()`; `scripts/headless/progress-road.js`, 161 checks):
+  - **The This cycle card is the screen's one green cover**: the current cycle's art (`cycleArtUrl()`) graded into `--hero`, the
+    eyebrow *● THIS CYCLE · 2 OF 3* (a mint tick and *CYCLE COMPLETE* past the end date, *ROADMAP COMPLETE* on the last), the name in
+    capitals, one mono line with the dates (`cycDate()`) and, in the last 14 days, *· 9 DAYS LEFT* (`cycleDayNo()` / `todayDayNo()`),
+    then the bars and the wins as before. The days-left banner (`#sub-banner-wrap`) and the header's dates are gone (the cover says
+    both).
+  - **The road** (`#road-wrap` under the Game Plan title) replaces the C1–Cn meter and the photo cards: one `.road-row` per cycle,
+    `is-done` / `is-now` / `is-next` / `is-locked`, the P24 numeral (solid when done), the name, a mono line (*WEEKS 6–10 · NOW*). Now is
+    a fold, open by default (PLAN-01), holding the tagline, **The aims** (01, 02), **Why this cycle matters** behind the clay quote
+    mark and **signed** (`WN_SIG` and his photo, as the week note signs), **Expected outcomes** (green ✓) and the *Why your plan looks
+    like this* door (≥ 3 reasons). Past the end date that door sits under the current cycle's Done row. Up next and Locked are folds
+    holding the tagline, the aims and the teaser; a Locked cycle with none of them is a plain row with its lock. The cycle before the
+    current one opens its archive (›); earlier done cycles are plain rows. Folds keep their state across visits; Enter and Space work.
+    `cycleCardHTML()` and `toggleCycleCard()` are gone, and nothing on Progress jumps Home any more (the Active card's banner did).
+  - **Home between cycles** draws the next cycle as the same Up next row (`.bt-next`, its body ids `bt-road-body-N`).
+  - **The archive** (`#screen-archive`): a cover with the archived cycle's art (`archiveCycleOf()`), ← as the 44 px glass button
+    (Back to Progress), *● COMPLETED · CYCLE 1*, the name and its weeks; each day as a green section title and its exercises as
+    read-only paper rows (outlined numeral, name, the line of numbers); the empty state as one sentence.
 
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
 
@@ -875,8 +912,8 @@ told them to train. Amir picked direction B of three mockups (https://claude.ai/
 - **One ask, in all situations** (Amir, 2026-10-10: *"dont say amir is making the other one, just say 'Ready for
   NextCycle ? Message Amir to start it' in all situations"*). The first version said "Amir is building it now" for 14
   days, then this; it went the same day. Nothing on Home says the next cycle is being made.
-- **Game Plan marks it Done**: past the end date the cycle's card wears **Done** (it said Active) and its meter
-  segment is filled as done, not current.
+- **Game Plan marks it Done**: past the end date the cycle's row on Progress's road reads **Done** (`is-done`, its
+  numeral solid; it was the card's Active pill and the meter's segment until 2026-10-13), and the Why door stays under it.
 - **Between cycles**: *No new week until Cycle 3 starts. Want to keep moving? Any session from Load & Build still works.*
   and one **Repeat a session** row (`#bt-rep`) that unfolds the day cards (`paintBetweenFold()`, `.bt-folded`). They stay
   folded unless it is open or a session is under way: that card carries Resume, so it never hides. No week count, no
@@ -1725,5 +1762,6 @@ under it. Checked in `scripts/headless/first-timer.js`.
   It waits for a tick with no weight nudge. ⚠ A late start under-reports the session's duration and load; the offer comes at the first tick so it is late by seconds.
 - **The Welcome has a ✕** and the phone's Back closes it (`topLayer()` first, `navSync()` on open and close).
 - **Game Plan's Active card: only its banner goes Home** (`cycleCardHTML(…, { bannerOnly })`); reading its text no longer throws you out.
-  The Done card (Archive) and Up next (Game Plan) still take a tap anywhere.
+  The Done card (Archive) and Up next (Game Plan) still take a tap anywhere. **Superseded 2026-10-13**: the cards became Progress's
+  road (`cycleCardHTML()` is gone) and nothing on Progress jumps Home; the current cycle's row folds and unfolds in place.
 - **The rest pill is removed** (see *The rest offer is gone*, above).

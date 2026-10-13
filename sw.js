@@ -257,7 +257,9 @@
 // v126: program.html changed (2026-10-12): Game Plan became Progress (second tab; the This cycle card, Personal records and Body weight on it), Home in the Centre Court look (Next up, day rows, one door row), the account button scrolls with its screen.
 // v127: program.html changed (2026-10-13): one shared colour set for the whole app (Centre Court's tokens on body, the older names aliases of them).
 // v128: program.html changed (2026-10-13): the day's leftovers (WhatsApp under Done, the Your rating fold after Done, Finish early under the bar's dots).
-const CACHE = 'aap-v128';
+// v129: program.html changed (2026-10-13): the Coach tab in the Centre Court look (the signed WhatsApp panel, notes as fold rows).
+// v130: program.html changed (2026-10-13): Progress's road (one row per cycle) and the archive in the Centre Court look; the This cycle card is Progress's cover.
+const CACHE = 'aap-v130';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

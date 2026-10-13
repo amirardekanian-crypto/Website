@@ -326,7 +326,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **No yellow, gold, ochre or amber in either app**, AA Proof's metals included (its gold tier became
   emerald on 2026-09-26; Amir, asked whether Proof was an exception: *"fix"*).
 - **The exercise card is not frozen** (Amir, 2026-09-27: *"dont freeze anything"*, lifting Five Forks fork 4 B).
-  Athletes still change to the new card format at their next cycle; the demo is already on it. The tab that holds the whole plan is **Progress**, second in the bar (Amir, 2026-10-12: Home · Progress · Library · Coach; it was Game Plan, and My Plan before that; `data-tab="plan"` and `goTo('plan')` are unchanged). On it: the This cycle card, **Your numbers** (Personal records and Body weight, whose ← comes back here), then the road of cycles, still titled **Game Plan**. Only the current cycle opens expanded;
+  Athletes still change to the new card format at their next cycle; the demo is already on it. The tab that holds the whole plan is **Progress**, second in the bar (Amir, 2026-10-12: Home · Progress · Library · Coach; it was Game Plan, and My Plan before that; `data-tab="plan"` and `goTo('plan')` are unchanged). On it: the This cycle card, **Your numbers** (Personal records and Body weight, whose ← comes back here), then the road of cycles, still titled **Game Plan** (since 2026-10-13 one paper row per cycle, Done / Now / Up next / Locked, under the This cycle cover; nothing on Progress jumps Home). Only the current cycle opens expanded;
   past and future cycles are folded (Amir, 2026-09-26, PLAN-01), and the welcome's button opens Day 1.
 
 ## The habit app (`habits.html`, AA Proof) — read `HABITS.md` before changing it
@@ -471,7 +471,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v128` on 2026-10-13). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v130` on 2026-10-13). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

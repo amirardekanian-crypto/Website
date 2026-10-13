@@ -1,7 +1,8 @@
 // When the cycle is over (PROG-02): the day after the current cycle's endDate, Home says Cycle complete,
 // shows the next cycle under Up next, asks "Ready for Cycle N?" (always, the last cycle included) and folds
 // the day cards under Repeat a session; Progress marks the cycle Done. Since 2026-10-12 the Cycle complete / Roadmap complete CARD (and its
-// wins) is on Progress, and Home says the cycle ended with one door row, Cycle N complete (.bt-done). Serve the repo first
+// wins) is on Progress, and Home says the cycle ended with one door row, Cycle N complete (.bt-done). Since 2026-10-13 Progress's cycles are one road
+// of rows (.road-row.is-done / is-now / is-next / is-locked), not a meter and pills, and Home's Up next is the same row. Serve the repo first
 // (python3 -m http.server 8765 --bind 127.0.0.1, see lib.js), then: node scripts/headless/cycle-end.js [--out <dir>]
 'use strict';
 const path = require('path');
@@ -24,11 +25,15 @@ function hist(endedAgo) {
     { ex: 'Barbell Back Squat', block: 'Strength', reps: 6, note: '', sets: [1, 2, 3].map(() => ({ w: String(w), n: 6, r: '7', d: true })) }] });
   return [sq(70, 1), sq(75, 29)];
 }
-// The Game Plan's pill on the current cycle's card (on Progress), and which meter segment is current.
+// The Game Plan's road (on Progress): each cycle's state, in order (done · now · next · locked), and the mono line of the current cycle's row
+// (it says NOW while the cycle runs, DONE once it is over).
 const plan = p => p.evaluate(() => {
   goTo('plan');
-  const segs = [...document.querySelectorAll('.cycle-meter-seg')].map(x => x.classList.contains('current') ? 'current' : x.classList.contains('done') ? 'done' : '-');
-  const out = { pill: (document.querySelector('#current-message-wrap .cm-pill') || {}).textContent || null, segs: segs.join(' ') };
+  const rows = [...document.querySelectorAll('#road-wrap .road-row')];
+  const out = { states: rows.map(r => ['done', 'now', 'next', 'locked'].find(k => r.classList.contains('is-' + k)) || '-').join(' '),
+    now: (document.querySelector('#road-wrap .road-row.is-now .road-ln') || {}).textContent || null,
+    tag: (document.querySelector('#road-wrap .road-row.is-now .road-tag') || {}).textContent || null,
+    open: rows.map(r => r.classList.contains('is-open') ? 'open' : 'shut').join(' ') };
   goTo('home');
   return out;
 });
@@ -39,7 +44,7 @@ const state = p => p.evaluate(() => ({
   cardOnHome: !!document.querySelector('#screen-home .cyc-card, #screen-home .home-cyc'),
   bt: (document.querySelector('#home-week-wrap .bt-done .hrow-l') || {}).textContent || null,
   btSub: (document.querySelector('#home-week-wrap .bt-done .hrow-q') || {}).textContent || null,
-  upnext: !!document.querySelector('.bt-next .current-message'),
+  upnext: !!document.querySelector('.bt-next .road-row.is-next'),
   building: /building it/i.test(document.getElementById('screen-home').innerText),
   door: (document.querySelector('.bt-wa b') || {}).textContent || null,
   folded: document.getElementById('day-cards-wrap').classList.contains('bt-folded'),
@@ -62,7 +67,7 @@ const state = p => p.evaluate(() => ({
     t.check(`${tag}: This Week, nothing between cycles (no Cycle complete card on Progress, no row on Home)`, !s.fin && !s.bt && !s.upnext && !s.rep && s.weekSum && !s.folded, JSON.stringify(s));
     t.check(`${tag}: the This cycle card is on Progress and not on Home`, !s.cardOnHome && await p.evaluate(() => !!document.querySelector('#screen-plan .cyc-card .cyc-k')), JSON.stringify(s));
     const g = await plan(p);
-    t.check(`${tag}: Game Plan says Active, the meter on cycle 2`, g.pill === 'Active' && g.segs === 'done current -', JSON.stringify(g));
+    t.check(`${tag}: Game Plan's road says Now on cycle 2 (cycle 1 done, cycle 3 up next), open`, g.states === 'done now next' && /\bNOW$/i.test((g.now || '').trim()) && g.tag === 'Now' && g.open === 'shut open shut', JSON.stringify(g));
     await ctx.close();
   }
 
@@ -78,7 +83,7 @@ const state = p => p.evaluate(() => ({
     t.check('4 days past: the cycle\'s win is still on the card (on Progress)', s.wins === 1, s.wins);
     t.check('4 days past: Up next and Ready for Cycle 3?, nothing about Amir building it', s.upnext && !s.building && s.door === 'Ready for Cycle 3?', JSON.stringify(s));
     const g = await plan(p);
-    t.check('4 days past: Game Plan says Done, the meter has no current cycle', g.pill === 'Done' && g.segs === 'done done -', JSON.stringify(g));
+    t.check('4 days past: Game Plan says Done on cycle 2, the road has no Now row and cycle 3 is up next', g.states === 'done done next' && g.now === null && g.tag === null, JSON.stringify(g));
     t.check('4 days past: no week count, the day cards folded, nothing suggested', !s.weekSum && s.folded && s.suggested === 0, JSON.stringify(s));
     await shot(p, 'cycle-end-4days');
     await p.evaluate(() => document.getElementById('bt-rep').click());
@@ -86,9 +91,12 @@ const state = p => p.evaluate(() => ({
     t.check('Repeat a session unfolds the day cards', !s.folded && (await p.evaluate(() => document.getElementById('bt-rep').getAttribute('aria-expanded'))) === 'true', JSON.stringify(s));
     await p.evaluate(() => document.getElementById('bt-rep').click());
     t.check('a second tap folds them again', (await state(p)).folded);
-    await p.evaluate(() => document.querySelector('.bt-next .cm-toggle').click());
-    const read = await p.evaluate(() => ({ open: document.querySelector('.bt-next .current-message').classList.contains('is-open'), home: document.getElementById('screen-home').classList.contains('active') }));
-    t.check('Read more opens the next cycle in place, without leaving Home', read.open && read.home, JSON.stringify(read));
+    // Home's Up next is the road's own row, closed: its head folds it open in place.
+    const shut = await p.evaluate(() => { const r = document.querySelector('.bt-next .road-row.is-next'); return { open: r.classList.contains('is-open'), exp: r.querySelector('.road-head').getAttribute('aria-expanded') }; });
+    await p.evaluate(() => document.querySelector('.bt-next .road-row.is-next .road-head').click());
+    const read = await p.evaluate(() => { const r = document.querySelector('.bt-next .road-row.is-next'); return { open: r.classList.contains('is-open'), exp: r.querySelector('.road-head').getAttribute('aria-expanded'),
+      home: document.getElementById('screen-home').classList.contains('active') }; });
+    t.check('Up next starts closed, and its row opens the next cycle in place, without leaving Home', !shut.open && shut.exp === 'false' && read.open && read.exp === 'true' && read.home, JSON.stringify([shut, read]));
     await p.evaluate(() => { startTimerNow('1'); paintWeek(); });
     s = await state(p);
     t.check('a session under way is never folded away (its card carries Resume)', !s.folded, JSON.stringify(s));
@@ -110,6 +118,8 @@ const state = p => p.evaluate(() => ({
     const s = await state(p);
     t.check(`last cycle ${w}${dark ? ' dark' : ''}: Roadmap complete (Progress, and the row on Home), 3 cycles · 15 weeks, Ready for Cycle 4?`,
       s.fin === 'Roadmap complete' && s.bt === 'Roadmap complete' && /3 cycles · 15 weeks/.test(s.sub) && !s.upnext && !s.building && s.door === 'Ready for Cycle 4?' && s.folded, JSON.stringify(s));
+    const g = await plan(p);
+    t.check(`last cycle ${w}${dark ? ' dark' : ''}: the road is done all the way, no Now row and nothing up next`, g.states === 'done done done' && g.now === null, JSON.stringify(g));
     t.check(`last cycle ${w}${dark ? ' dark' : ''}: no sideways scroll, no page errors`, s.sideways <= 0 && p.errs.length === 0, p.errs.join(' | '));
     await shot(p, name);
     await ctx.close();

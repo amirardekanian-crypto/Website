@@ -450,19 +450,19 @@
     overflow: hidden;
   }
 
-  /* Shared fade-in animation reused by athlete-card, sub-banner, cycle-meter,
-     cycle-hero and the upcoming-section blocks. */
+  /* Shared fade-in animation (the athlete header, the greeting, the day cards). */
   @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
   /* ─── Progress header ────────────────────────────────────────────
      Plain page header at the top of Progress: the name as a small eyebrow, "Progress" as the title (.prog-eyebrow,
-     .prog-title: the HOME AND PROGRESS block at the end of this sheet) + goal + dates. No card chrome, no avatar. */
+     .prog-title: the HOME AND PROGRESS block at the end of this sheet) + the sport badge. No card chrome, no avatar. The cycle's dates
+     are on the This cycle cover under it (PROGRESS'S ROAD, the last block of this sheet). */
   .athlete-header {
     margin: 8px 24px 26px;
     opacity: 0; transform: translateY(16px);
     animation: fadeInUp 0.6s ease 0.1s forwards;
   }
-  /* Goal subtitle under the name — mono caps, like "CYCLE n OF N" on the cards */
+  /* Goal subtitle under the name — mono caps, for a goal that is not a tennis or padel one */
   .athlete-card-detail {
     font-family: 'Space Mono', monospace;
     font-size: var(--fs-label); font-weight: 700;
@@ -485,103 +485,19 @@
     color: var(--grey-text); overflow-wrap: anywhere; }
   body[data-dark] .sport-badge { background: rgba(109,190,149,.10); box-shadow: inset 0 0 0 1.5px rgba(109,190,149,.30); }
   body[data-dark] .sb-ico svg { background: #14684C; }
-  .athlete-card-dates {
-    font-family: 'Space Mono', monospace;
-    font-size: var(--fs-label); letter-spacing: 1.5px;
-    color: var(--grey-text); margin-top: 6px;
-    text-transform: uppercase;
-  }
-
-  /* ─── Subscription banner (new) ──────────────────────────────────
-     Appears only when current cycle has endDate AND ≤14 days remain */
-  .sub-banner {
-    margin: 0 24px 20px;
-    padding: 12px 16px;
-    border: 1px solid var(--yellow-mid);
-    background: var(--yellow-dim);
-    border-radius: 10px;
-    display: flex; align-items: center; gap: 10px;
-    opacity: 0; transform: translateY(8px);
-    animation: fadeInUp 0.5s ease 0.15s forwards;
-  }
-  .sub-banner-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--yellow);
-    flex-shrink: 0;
-    box-shadow: 0 0 6px var(--yellow);
-  }
-  .sub-banner-text {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: var(--fs-small); font-weight: 700;
-    letter-spacing: 1.2px; text-transform: uppercase;
-    color: var(--grey-dark);
-  }
-  .sub-banner-text strong { color: var(--green-ink); }
-
-  /* ─── Cycle meter (new — replaces the old gradient progress bar) ── */
-  .cycle-meter {
-    margin: 0 24px 28px;
-    opacity: 0; transform: translateY(12px);
-    animation: fadeInUp 0.6s ease 0.2s forwards;
-  }
-  .cycle-meter-bars {
-    display: flex; gap: 6px;
-  }
-  .cycle-meter-seg {
-    flex: 1; height: 5px; border-radius: 2px;
-    background: rgba(0,0,0,0.08);
-    transition: background 0.3s, box-shadow 0.3s;
-  }
-  .cycle-meter-seg.done    { background: var(--yellow); opacity: 0.55; }
-  .cycle-meter-seg.current { background: var(--ice); box-shadow: 0 0 10px var(--ice-glow); }
-  .cycle-meter-labels {
-    display: flex; gap: 6px; margin-top: 10px;
-  }
-  .cycle-meter-label {
-    flex: 1; text-align: center;
-    font-family: 'Space Mono', monospace;
-    font-size: var(--fs-label); letter-spacing: 1.2px;
-    color: var(--grey-text); font-weight: 400;
-  }
-  .cycle-meter-label.done    { color: rgba(14,74,54,0.55); }
-  body[data-dark] .cycle-meter-label.done { color: rgba(109,190,149,0.7); }   /* A11Y-01: 1.7:1 before */
-  body[data-dark] .planlike .focus-list-item { color: #cfcfcf; }             /* #444 on #202020 was 1.7:1 */
-  .cycle-meter-label.current { color: var(--clay-ink); font-weight: 700; }
-
-  /* ─── Cycle cards (Game Plan) — ONE shared design for past, current & future ───
-     All three render through cycleCardHTML() and reuse the .current-message /
-     .cm-* / .focus-list / .outcomes-* / .cm-body classes (defined further down).
-     Restyle those once and every card on Game Plan changes together.
-     The rules here are only the bits unique to the shared header + the
-     clickable "past" variant. */
-  .planlike .cm-headtext { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-  .planlike .cm-titlerow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  /* the day cards' name and weeks line (Home's Next up card and the day view's cover: their own looks are the HOME AND PROGRESS and
+     CENTRE COURT blocks at the end of this sheet) */
   .planlike .cm-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-head); line-height: 1; text-transform: uppercase; color: var(--ink); letter-spacing: 0.5px; }
   .planlike .cm-weeks { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1px; color: #C7552F; text-transform: uppercase; }
-  .planlike .cm-tagline { font-family: 'Barlow', sans-serif; font-style: italic; font-size: var(--fs-body); color: var(--grey-dark); }
-  /* Clickable variant (past program card → opens the archive) + its "Done" pill */
+  /* Clickable variant (Home's Next up card) */
   .current-message.is-clickable { cursor: pointer; transition: border-color .15s ease, transform .1s ease; }
   .current-message.is-clickable:hover { border-color: #C7552F; }
   .current-message.is-clickable:active { transform: scale(0.99); }
-  .cm-pill { position: absolute; top: 30px; right: 18px; background: #C7552F; color: #fff; font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 1.2px; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; z-index: 2; }
-  /* "Active" pill on the current cycle — brand green with a soft on/off glow. */
-  .cm-pill-active { background: #0E4A36; color: #fff; animation: cmPillPulse 2s ease-in-out infinite; }
-  @keyframes cmPillPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(14,74,54,0.55), 0 0 6px rgba(14,74,54,0.5); }
-    50%      { box-shadow: 0 0 0 4px rgba(14,74,54,0), 0 0 14px rgba(14,74,54,0.9); }
-  }
-  @media (prefers-reduced-motion: reduce) { .cm-pill-active { animation: none; } }
-  /* "Up next!" pill on the next cycle — green text on white, quieter than the
-     solid Done/Active pills so it reads as upcoming, not current. */
-  .cm-pill-next { background: rgba(255,255,255,0.92); color: var(--yellow); box-shadow: 0 1px 4px rgba(0,0,0,0.18); }   /* green on white in both themes (DS-01) */
-  /* "Locked" pill on cycles further out — quiet grey. */
-  .cm-pill-locked { background: var(--grey-mid); color: var(--grey-dark); }
-
-  /* ─── Cycle card image banner ──────────────────────────────────────
-     Full-bleed image at the top of every cycle card with the caption
-     (Cycle n of N · name · weeks · tagline) overlaid bottom-left. If no
-     image file exists for the cycle, .no-img keeps the green gradient. */
-  .planlike .current-message { padding: 0; }      /* banner is edge-to-edge; body re-adds padding */
+  /* ─── The day cards' image banner ──────────────────────────────────
+     Full-bleed image at the top of a day card with the caption (name · what it builds) over it. If no
+     image file exists for the day, .no-img keeps the green gradient. (The cycles are a road of rows now:
+     PROGRESS'S ROAD, the last block of this sheet.) */
+  .planlike .current-message { padding: 0; }      /* banner is edge-to-edge */
   .planlike .cm-banner {
     position: relative;
     /* width:100% first — otherwise aspect-ratio + the max-height cap makes the
@@ -613,57 +529,15 @@
     background: linear-gradient(to top,
       rgba(0,0,0,0.74) 0%, rgba(0,0,0,0.28) 44%, rgba(0,0,0,0) 74%);
   }
-  /* The repeat rule. When two cycle cards in a row resolve to the same family,
-     the second one is mirrored and takes a clay wash instead of green, so the
-     stack never shows the same picture twice running. Nothing in the art carries
-     text or a handed subject, which is what makes mirroring safe. */
-  .planlike .cm-banner.is-alt .cm-banner-img { transform: scaleX(-1); }
-  .planlike .cm-banner.is-alt .cm-banner-scrim {
-    background: linear-gradient(to top,
-      rgba(150,58,28,0.80) 0%, rgba(150,58,28,0.30) 44%, rgba(150,58,28,0) 74%);
-  }
-  /* A folded cycle (past or future, PLAN-01) is one slim row until opened: the caption sets the
-     height, and the tagline waits for Read more. */
-  .planlike .current-message.is-folded:not(.is-open) .cm-banner { aspect-ratio: auto; min-height: 0; }
-  .planlike .current-message.is-folded:not(.is-open) .cm-tagline { display: none; }
-  .planlike .current-message.is-folded:not(.is-open) .cm-banner-caption .cm-name { font-size: var(--fs-title); padding-right: 118px; }
-  .planlike .current-message.is-folded:not(.is-open) .cm-banner-caption { padding-top: 44px; }   /* under the pill */
   .planlike .cm-banner-caption {
     position: relative; z-index: 2;
     align-self: flex-end;
     width: 100%;
     padding: 16px 18px;
   }
-  .planlike .cm-cyclelabel {
-    font-family: 'Space Mono', monospace;
-    font-size: var(--fs-label); letter-spacing: 1.6px; text-transform: uppercase;
-    color: rgba(255,255,255,0.78);
-    margin-bottom: 6px;
-  }
-  /* Caption text sits on the dark banner, so override the dark-on-white colours.
-     The weeks + tagline share the bottom band with the toggle pill (bottom-right),
-     so reserve a right gutter on those lines to keep text from sliding underneath. */
+  /* Caption text sits on the dark banner, so override the dark-on-white colours. */
   .planlike .cm-banner-caption .cm-name    { color: #fff; margin-bottom: 5px; }
   .planlike .cm-banner-caption .cm-weeks   { color: rgba(255,255,255,0.92); padding-right: 112px; }
-  .planlike .cm-banner-caption .cm-tagline { color: rgba(255,255,255,0.85); margin-top: 3px; padding-right: 112px; }
-  /* Pill floats top-right over the banner */
-  .planlike .cm-pill { top: 14px; right: 14px; }
-  /* Toggle becomes a small white pill on the banner, bottom-right */
-  .planlike .cm-banner .cm-toggle {
-    position: absolute; z-index: 3;
-    right: 14px; bottom: 14px;
-    width: auto; margin: 0; padding: 9px 13px; min-height: 32px;
-    font-size: var(--fs-label); letter-spacing: 1px;
-    background: rgba(255,255,255,0.94);
-    border-radius: 999px;
-    color: #0E4A36;
-    gap: 5px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  }
-  .planlike .cm-banner .cm-toggle-chev { margin-left: 0; font-size: var(--fs-label); }
-  /* Padded body that holds the collapsible detail below the banner */
-  .planlike .cm-cardbody { padding: 16px 24px 22px; }
-
   /* ─── Global bottom tab bar (every nav screen; hidden while loading and during a session) ── */
   .global-tabs {
     position: fixed; left: 0; right: 0; bottom: 0;
@@ -704,9 +578,9 @@
   /* Hidden during loading (revealed once the first screen renders) */
   .global-tabs.is-hidden { display: none; }
 
-  /* ─── GAME PLAN ONLY: single accent ──────────────────────────────
+  /* ─── PROGRESS ONLY: single accent ──────────────────────────────
      Remap the clay tokens (--ice*, --clay-ink) to green ONLY inside #screen-plan,
-     so Game Plan reads as a single-accent design without affecting
+     so Progress reads as a single-accent design without affecting
      Home / Coach / Library / Archive, which keep clay. */
   #screen-plan {
     --clay-ink:  var(--green-ink);   /* same single-accent remap, for text (A11Y-01) */
@@ -716,16 +590,7 @@
     --ice-glow:  var(--yellow-glow);
   }
 
-  /* Soft steady glow on the current cycle segment — no size change, just light. */
-  @keyframes cycleSegGlow {
-    0%, 100% { box-shadow: 0 0 8px var(--yellow), 0 0 16px rgba(14,74,54,0.25); }
-    50%      { box-shadow: 0 0 14px var(--yellow), 0 0 22px rgba(14,74,54,0.45); }
-  }
-  #screen-plan .cycle-meter-seg.current {
-    animation: cycleSegGlow 2.6s ease-in-out infinite;
-  }
-
-  /* ─── .planlike card overrides (Game Plan, Home's overview, the day-view card) ───
+  /* ─── .planlike card overrides (Home's overview, the day-view card) ───
      The accent spotlights, it doesn't wash. These overrides strip the tinted
      backgrounds, pills, and gradients from the cards and replace them with
      quiet grey mono labels and thin separator lines. */
@@ -743,40 +608,7 @@
       0 8px 30px rgba(14,74,54,0.06),
       inset 0 0 24px rgba(14,74,54,0.02);
   }
-  /* This cycle (PROG-01): where the small cycle line was, the top of Home. */
-  .cyc-card { display: block; width: calc(100% - 48px); margin: 0 24px 22px; padding: 16px 16px 10px; border: 0; border-radius: 16px;
-    background: #122A22; color: #fff; text-align: left; cursor: pointer; font: inherit; box-shadow: 0 8px 24px rgba(14,74,54,0.16); }   /* the dark green of the Cycle complete card, on Progress */
-  .cyc-card > span { display: block; }
-  .cyc-top { display: flex !important; align-items: center; justify-content: space-between; gap: 10px;
-    font: 700 var(--fs-label)/1.35 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.78); }
-  .cyc-top b { color: #fff; font-weight: 700; }
-  .cyc-row { display: grid !important; grid-template-columns: minmax(96px, auto) 1fr; align-items: center; gap: 14px; margin-top: 12px; }
-  .cyc-k { font: 900 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: #E06B43; white-space: nowrap; }
-  .cyc-k small { font: 700 var(--fs-label) 'Space Mono', monospace; color: rgba(255,255,255,.82); margin-left: 6px; letter-spacing: .02em; }
-  .cyc-bar { display: flex; gap: 3px; } .cyc-bar i { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); }
-  .cyc-bar i.on { background: #E06B43; }
-  .cyc-bar-solid { height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; } .cyc-bar-solid i { display: block; height: 100%; background: #E06B43; }
-  .cyc-wins-h { margin: 16px 0 2px; font: 700 var(--fs-label) 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.66); }
-  .cyc-win { display: flex !important; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0;
-    border-top: 1px solid rgba(255,255,255,.12); font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; }
-  .cyc-win b { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: #A9E2C8; text-align: right; }
-  @media (max-width: 380px) {   /* a narrow phone: the lift, and its win under it */
-    .cyc-win { display: block !important; }
-    .cyc-win b { display: block; text-align: left; margin-top: 2px; }
-  }
-  body[data-dark] .cyc-card { box-shadow: 0 0 0 1px rgba(255,255,255,.08); }
-  /* The cycle is over (PROG-02): the same card says so, and Home is between cycles (paintCycleCard(),
-     betweenCyclesHTML()). The tick is the wins' mint, so "complete" reads as the good news it is. */
-  .cyc-fin-h { display: flex !important; align-items: center; gap: 10px; margin-top: 14px;
-    font: 900 var(--fs-head)/1 'Barlow Condensed', sans-serif; text-transform: uppercase; color: #fff; }
-  .cyc-fin-tick { width: 28px; height: 28px; border-radius: 50%; flex: none; display: grid; place-items: center; background: #A9E2C8; color: #122A22; }
-  .cyc-fin-tick svg { width: 17px; height: 17px; }
-  .cyc-fin-s { margin-top: 6px; font: 700 var(--fs-label)/1.35 'Space Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.78); }
-  .cyc-fin-meter { display: grid !important; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; margin-top: 14px; }
-  .cyc-fin-meter span { display: grid; gap: 6px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .06em; color: rgba(255,255,255,.82); }
-  .cyc-fin-meter span::before { content: ''; height: 6px; border-radius: 3px; background: #E06B43; }
   .bt-sum { margin: -6px 24px 12px; font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--grey-text); }
-  .bt-next .current-message { margin-bottom: 0; }
   .bt-wa { margin: 0 24px 26px; }
   .bt-next + .bt-wa .wa-inline { margin-top: 14px; }
   .bt-rep { display: flex; align-items: center; gap: 12px; width: calc(100% - 48px); margin: 0 24px 10px; padding: 12px 14px; min-height: 56px;
@@ -787,41 +619,7 @@
   .bt-rep-a { margin-left: auto; flex: none; color: var(--grey-text); font-size: var(--fs-title); line-height: 1; transition: transform .2s ease; }
   .bt-rep[aria-expanded="true"] .bt-rep-a { transform: rotate(90deg); }
   #day-cards-wrap.bt-folded { display: none; }
-  .planlike .cm-body-label { color: var(--green-ink); }
-
-  /* Focus list → numbered list with thin grey separators (no tint background) */
-  .planlike .focus-list {
-    counter-reset: focus-c;
-    display: block;
-    gap: 0;
-    margin-bottom: 4px;
-  }
-  .planlike .focus-list-item {
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    padding: 9px 0;
-    font-size: var(--fs-body);
-    color: #444;
-    counter-increment: focus-c;
-    line-height: 1.5;
-  }
-  .planlike .focus-list-item::before {
-    content: counter(focus-c, decimal-leading-zero);
-    width: auto; height: auto;
-    margin-top: 0;
-    background: transparent;
-    border-radius: 0;
-    font-family: 'Space Mono', monospace;
-    font-size: var(--fs-label); font-weight: 700;
-    letter-spacing: 1px;
-    color: var(--green-ink);   /* the aim numbers are labels: green (DS-01) */
-    flex-shrink: 0;
-    min-width: 24px;
-    line-height: 1.5;
-  }
-
-  /* Current cycle message card */
+  /* The base of a card (the day cards on Home and in the day view are .current-message too) */
   .current-message {
     margin: 0 24px 20px;
     background: var(--white);
@@ -849,94 +647,6 @@
   }
 
 
-  /* Flexible focus list — unlimited focuses, stacked vertically */
-  .focus-list {
-    display: flex; flex-direction: column; gap: 8px;
-    margin-bottom: 20px;
-  }
-  .focus-list-item {
-    background: var(--ice-dim);
-    border: 1px solid rgba(199,85,47,0.12);
-    border-radius: 10px;
-    padding: 12px 14px;
-    display: flex; align-items: flex-start; gap: 10px;
-    font-family: 'Barlow', sans-serif;
-    font-size: var(--fs-small); color: var(--grey-dark);
-    line-height: 1.5; font-weight: 400;
-  }
-  .focus-list-item::before {
-    content: '';
-    width: 6px; height: 6px; margin-top: 7px;
-    border-radius: 50%;
-    background: var(--ice);
-    flex-shrink: 0;
-  }
-
-  /* Collapsible detail: the aims (focus list), the why and the outcomes sit behind
-     this toggle on the banner. The current cycle opens expanded; past and future
-     start folded (PLAN-01). .is-open on the card reveals it. */
-  .cm-toggle {
-    display: flex; align-items: center; gap: 8px;
-    width: 100%; margin-top: 6px; padding: 4px 0 0;
-    border: none;
-    background: transparent; cursor: pointer;
-    font-family: 'Space Mono', monospace;
-    font-size: var(--fs-label); font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    color: #C7552F;
-  }
-  .cm-toggle-chev { margin-left: auto; font-size: var(--fs-small); transition: transform 0.25s ease; }
-  .current-message.is-open .cm-toggle-chev { transform: rotate(180deg); }
-  .cm-collapse {
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    transition: max-height 0.35s ease, opacity 0.25s ease;
-  }
-  .current-message.is-open .cm-collapse {
-    max-height: 2000px;
-    opacity: 1;
-  }
-
-  .cm-body-label {
-    font-family: 'Space Mono', monospace;
-    font-size: var(--fs-label); letter-spacing: 1.6px; text-transform: uppercase;
-    color: var(--green-ink); margin-bottom: 10px;   /* a label, so green (DS-01) */
-  }
-
-  .cm-body {
-    font-family: 'Barlow', sans-serif;
-    font-size: var(--fs-body); color: var(--grey-text);
-    line-height: 1.75; font-weight: 300;
-  }
-  .cm-body p + p { margin-top: 12px; }
-
-  .outcomes-block {
-    margin-top: 18px;
-  }
-  .outcomes-label {
-    font-family: 'Space Mono', monospace;
-    font-size: var(--fs-label); letter-spacing: 1.6px; text-transform: uppercase;
-    color: var(--green-ink); margin-bottom: 10px;
-  }
-  .outcome-item {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 7px 0;
-  }
-  .outcome-check {
-    width: 18px; height: 18px; border-radius: 5px;
-    border: 1.5px solid var(--yellow-mid);
-    background: var(--yellow-dim);
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: var(--fs-label); color: var(--green-ink);
-    margin-top: 2px; font-weight: 700;
-  }
-  .outcome-text {
-    font-family: 'Barlow', sans-serif;
-    font-size: var(--fs-small); color: var(--grey-dark);
-    line-height: 1.5;
-  }
-
   /* Reserve space so content isn't hidden behind the global tab bar */
   #screen-plan { padding-bottom: 90px; }
   #screen-workouts .archive-scroll { padding-bottom: 100px; }
@@ -961,28 +671,6 @@
 
   /* ── Archive ── */
   #screen-workouts { background: var(--grey-bg); }
-  .archive-banner { background: var(--yellow); padding: 48px 24px 32px; position: relative; overflow: hidden; }
-  .archive-banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); z-index: 1; }
-  .archive-banner::after {
-    content: attr(data-watermark); position: absolute; bottom: -10px; right: -8px;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 64px;
-    color: rgba(255,255,255,0.04); letter-spacing: -2px; pointer-events: none;
-  }
-  .archive-back { position: absolute; top: 14px; left: 18px; z-index: 2; background: transparent; border: none; color: #fff; font-size: var(--fs-title); line-height: 1; cursor: pointer; padding: 6px 8px; }
-  .archive-back:active { transform: scale(0.9); }
-  .archive-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-label); letter-spacing: 3px; text-transform: uppercase; color: var(--clay-big); margin-bottom: 8px; }   /* on the dark green banner, not the paper: it keeps the shade it had (--clay-ink is for small text on paper) */
-  .archive-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; color: #fff; text-transform: uppercase; line-height: 1; }
-  .archive-title span { color: rgba(255,255,255,0.65); }
-  .archive-scroll { padding: 20px 20px 100px; }
-  .archive-day-block { background: var(--white); border-radius: 8px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--grey-mid); opacity: 0.75; }
-  .archive-day-title { background: var(--ice); padding: 14px 18px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 1px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 10px; }
-  .archive-day-title span { font-size: var(--fs-label); font-weight: 400; color: rgba(255,255,255,0.7); letter-spacing: 2px; }
-  .archive-exercise-list { padding: 14px 18px; }
-  .archive-ex { padding: 8px 0; border-bottom: 1px solid var(--grey-card); display: flex; justify-content: space-between; align-items: center; }
-  .archive-ex:last-child { border-bottom: none; }
-  .archive-ex-name { font-size: var(--fs-body); font-weight: 500; color: #555; }
-  .archive-ex-detail { font-size: var(--fs-small); color: #aaa; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; }
-
   /* ── Workout session (a single opened library workout) ── */
   #screen-workout { background: var(--grey-bg); padding-bottom: 110px; }
   .ws-header { background: var(--yellow); padding: 48px 24px 24px; position: relative; }
@@ -2609,15 +2297,6 @@
   body[data-dark] .why-src.goal { background: #E06B43; color: #fff; }
   body[data-dark] .why-src.body { background: #1F5A44; color: #fff; }
   body[data-dark] .why-src.cycle { background: transparent; color: #E06B43; border-color: #E06B43; }
-  .why-plan-btn {
-    display: flex; justify-content: space-between; align-items: center; gap: 10px; width: calc(100% - 48px);
-    margin: -8px 24px 20px; padding: 13px 14px; cursor: pointer; text-align: left;
-    background: var(--white); border: 1.5px solid var(--ice); border-radius: 14px; color: var(--grey-dark);
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); letter-spacing: 0.3px; text-transform: uppercase;
-  }
-  .why-plan-btn small { font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.8px; color: var(--clay-ink); white-space: nowrap; }
-  body[data-dark] .why-plan-btn { background: #1e1e1e; color: #eee; border-color: #E06B43; }
-  body[data-dark] .why-plan-btn small { color: #E06B43; }
   .wp-grp { display: grid; gap: 6px; border-top: 1px solid var(--grey-card); padding-top: 11px; margin-top: 12px; }
   body[data-dark] .wp-grp { border-top-color: #2a2a2a; }
   .wp-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
@@ -3374,8 +3053,8 @@
   .note-body { display: none; padding: 14px 18px 18px; font-size: var(--fs-body); line-height: 1.65; color: #444; border-top: 1px solid var(--grey-card); }
   .note-card.open .note-body { display: block; }
   /* Note bodies render real HTML (paragraphs/lists/bold) — the global `* { margin:0; padding:0 }`
-     reset strips default browser spacing, so restore it explicitly here. Applies to both
-     personal notes (DATA.notes) and the "Using the app" guide cards. */
+     reset strips default browser spacing, so restore it explicitly here. Applies to the "Using the app"
+     guide cards in the help sheet (the Coach tab's own notes have .cn-body, in the COACH IN THE CENTRE COURT LOOK block). */
   .note-body p { margin: 0 0 10px; }
   .note-body p:last-child { margin-bottom: 0; }
   .note-body ul { margin: 4px 0 10px; padding-left: 20px; }
@@ -3386,70 +3065,10 @@
   body[data-dark] .note-body strong { color: #f0f0f0; }
 
   /* ════════════════════════════════════════════════════════════════════
-     COACH TAB — hero header · WhatsApp door · note cards
+     COACH TAB: the header, the WhatsApp panel, Notes from Amir and the How the app works row are drawn by the COACH IN THE CENTRE
+     COURT LOOK block before CENTRE COURT (2026-10-13). What stays here: the small WhatsApp door (.wa-inline) and the note cards the
+     help sheet's guide uses.
      ════════════════════════════════════════════════════════════════════ */
-
-  /* ── Coach hero (avatar + name + role line) ── */
-  .coach-hero { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 28px 64px 20px 24px; }   /* clear of the account button (NAV-02) */
-  .coach-avatar {
-    position: relative;
-    width: 64px; height: 64px; flex-shrink: 0; border-radius: 50%; overflow: hidden;
-    background: linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 14px rgba(14,74,54,0.25);
-  }
-  /* Photo overlays the initials when present; onerror removes it → initials show. */
-  .coach-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-  .coach-avatar-initials { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); letter-spacing: 0.5px; color: #fff; }
-  .coach-hero-main { flex: 1; min-width: 0; }
-  /* Same weight as the title on Progress (.prog-title), one step smaller */
-  .coach-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(38px, 11vw, 60px);
-    font-weight: 900; letter-spacing: -2px; line-height: 0.95;
-    text-transform: uppercase; color: var(--grey-dark); margin: 0;
-  }
-  .coach-status {
-    display: flex; align-items: center; gap: 8px; margin-top: 10px;
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label);
-    letter-spacing: 1px; text-transform: uppercase; color: var(--grey-text);
-  }
-  body[data-dark] .coach-name { color: #f0f0f0; }
-
-  /* ── Section labels ("Personal notes" / "Using the app") ── */
-  .notes-section-label {
-    font-family: 'Space Mono', monospace; font-weight: 700;
-    font-size: var(--fs-label); letter-spacing: 2px; text-transform: uppercase;
-    color: var(--grey-text); margin: 26px 24px 12px;
-  }
-
-  /* ── Message me on WhatsApp (replaced the in-app chat, 2026-09-26) ── */
-  .coach-wa {
-    display: flex; align-items: center; gap: 14px; margin: 14px 24px 0;
-    padding: 14px 16px; min-height: 64px; border-radius: 16px;
-    background: var(--yellow); color: #fff; text-decoration: none;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    transition: transform 0.12s ease;
-  }
-  .coach-wa:active { transform: scale(0.98); }
-  .coach-wa:focus-visible { outline: 2px solid var(--ice); outline-offset: 3px; }
-  .coach-wa-ico {
-    width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%;
-    background: rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center;
-  }
-  .coach-wa-ico svg { width: 22px; height: 22px; }
-  .coach-wa-txt { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
-  .coach-wa-txt b {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead);
-    text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.05;
-  }
-  .coach-wa-txt small { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.3; opacity: 0.88; }
-  .coach-wa-go { font-size: var(--fs-title); flex-shrink: 0; }
-  .coach-wa-num {
-    margin: 8px 24px 0; font-family: 'Space Mono', monospace; font-size: var(--fs-label);
-    letter-spacing: 1px; color: var(--grey-text); user-select: all;
-  }
-  body[data-dark] .coach-wa { background: #14684C; }
   /* The small WhatsApp door at the end of a session and in the About sheet. */
   .wa-inline { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 11px 14px; min-height: 52px; border: 1.5px solid var(--yellow); border-radius: 12px; color: var(--green-ink); background: transparent; text-decoration: none; text-align: left; transition: transform 0.12s ease; }
   .wa-inline:active { transform: scale(0.98); }
@@ -3461,74 +3080,15 @@
   .wa-inline-go { flex: none; font-size: var(--fs-lead); }
   body[data-dark] .wa-inline { border-color: #3E9C74; color: #7FD0AC; }
 
-  /* ── Note cards: rounder, taller radius for both note types ── */
+  /* ── Note cards (the help sheet's guide): a rounder, taller radius ── */
   .note-card { border-radius: 14px; }
 
-  /* Personal note card — category-banner thumbnail + dark title + green CTA */
-  .note-card-row { display: flex; align-items: center; gap: 14px; padding: 14px; cursor: pointer; user-select: none; }
-  /* Brand-colour tile with the note's icon centred: green over the court-sessions
-     photo, clay over court-playbook, or striped paper. The third
-     tone was ochre until 2026-09-26; the brand has no yellow or gold. */
-  .note-tile {
-    width: 64px; height: 64px; flex-shrink: 0; border-radius: 10px; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    font-size: var(--fs-head); line-height: 1; color: #fff;
-    background-color: #0E4A36;
-    background-image: linear-gradient(135deg, rgba(14,74,54,0.6) 0%, rgba(14,74,54,0.45) 100%), url('court-sessions.jpg');
-    background-size: cover;
-    background-position: center;
-  }
-  .note-tile.tone-clay {
-    background-color: #C7552F;
-    background-image: linear-gradient(135deg, rgba(199,85,47,0.6) 0%, rgba(199,85,47,0.45) 100%), url('court-playbook.jpg');
-    background-size: cover;
-    background-position: center;
-  }
-  .note-tile.tone-paper {
-    color: #0E4A36;
-    background-color: #F1ECE3;
-    background-image:
-      repeating-linear-gradient(135deg, rgba(14,74,54,0.07) 0 9px, rgba(14,74,54,0) 9px 18px),
-      linear-gradient(135deg, #F1ECE3 0%, #E7E2D9 100%);
-    box-shadow: inset 0 0 0 1px rgba(14,74,54,0.10);
-  }
-  /* In dark mode a paper tile would be the one bright square on the screen, so it
-     turns to a dark warm tile with a paper icon; still the third, distinct tone. */
-  body[data-dark] .note-tile.tone-paper {
-    color: #F1ECE3;
-    background-color: #2F2B25;
-    background-image:
-      repeating-linear-gradient(135deg, rgba(241,236,227,0.06) 0 9px, rgba(241,236,227,0) 9px 18px),
-      linear-gradient(135deg, #3A352E 0%, #2A2621 100%);
-    box-shadow: inset 0 0 0 1px rgba(241,236,227,0.12);
-  }
-  .note-tile svg { width: 30px; height: 30px; }
-  .note-card-main { flex: 1; min-width: 0; }
-  .note-date { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1px; color: var(--grey-text); margin-bottom: 4px; }
-  .note-personal .note-card-title {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: var(--fs-lead); line-height: 1.05; text-transform: uppercase;
-    color: var(--grey-dark); letter-spacing: 0.3px;
-  }
-  .note-cta {
-    font-family: 'Space Mono', monospace; font-weight: 700;
-    font-size: var(--fs-label); letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--green-ink); margin-top: 7px;
-  }
-  .note-card.open .note-cta { display: none; }
-  body[data-dark] .note-personal .note-card-title { color: #f0f0f0; }
-
-  /* "Using the app" cards — green icon tile + dark title (general, every client).
-     These are constant app-UI icons, so they always use the brand green tile
-     (the per-note clay/paper rotation only applies to personal notes above). */
+  /* "Using the app" cards (the guide in the help sheet) — green icon tile + dark title (general, every client).
+     These are constant app-UI icons, so they always use the brand green tile. */
   .app-card .note-card-title { color: var(--grey-dark); }
-  /* The guide in the sheet (COACH-02), and its one row on the Coach tab. */
+  /* The guide in the sheet (COACH-02). Its one row on the Coach tab is the .hrow in the COACH IN THE CENTRE COURT LOOK block. */
   .help-list { margin-top: 12px; }
   .help-list .note-card { margin: 0 0 10px; }
-  .app-help-row { display: flex; align-items: center; gap: 12px; width: calc(100% - 40px); padding: 12px 16px; text-align: left; cursor: pointer; font: inherit; }
-  .app-help-row .note-card-title { flex: 1; color: var(--grey-dark); }
-  .app-help-go { color: var(--grey-text); font-size: var(--fs-title); line-height: 1; }
-  body[data-dark] .app-help-row .note-card-title { color: #f0f0f0; }
   .nl-lab.nl-help { background: none; border: 0; padding: 0; margin: 0 1ch 0 0; font-family: inherit; font-size: inherit;
     letter-spacing: inherit; line-height: inherit; font-weight: 400; color: var(--grey-text); cursor: pointer;
     text-decoration: underline dotted; text-underline-offset: 3px; }
@@ -3848,6 +3408,95 @@
     cursor: pointer;
   }
   .ceil-add, .wt-save, .ex-1rm-save { font-size: var(--fs-body); }   /* they were Space Mono at the label size */
+  /* ══ COACH IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════════════════════════════════════
+     Amir, 2026-10-13: "continue until everything has a consistent design". The Coach tab (#screen-notes) wears Progress's and Home's
+     look: a header like Progress's (● YOUR COACH, COACH AMIR as the 44 px title, one mono line) · the WhatsApp panel, the screen's ONE
+     green thing (--hero, his photo graded in on the right the way Next up grades its photo, the cover's light-ring button, his
+     signature and photo at the foot as the week note signs; the whole panel is ONE <a>, and its button is a <span> inside it) · the
+     number as plain selectable mono text · Notes from Amir as fold rows on the paper with a hairline between (button.cn-row,
+     aria-expanded, one open at a time: renderNotes(), toggleCoachNote()) · How the app works as one door row (.hrow, Home's look).
+     Colours are the app's ONE shared set (declared on body, top of this sheet): no token is declared here. The gutter is --g.
+     It sits before CENTRE COURT and touches nothing of the day; the help sheet's guide cards keep .note-card. */
+
+  /* 1. The header: Progress's (.prog-eyebrow and .prog-title are global), and one mono line under the title. */
+  .coach-head { margin: 14px var(--g) 22px; }
+  .coach-role { margin: 12px 0 0; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.5px; text-transform: uppercase; color: var(--grey); }
+
+  /* 2. The panel: --hero, 16 px corners, inside the gutter. His photo (a square portrait on a dark grey wall) is graded into the green
+     on the right (luminosity at .7, masked from the left), under a scrim that ends on the cover's last colour; the words sit on the
+     left, clear of his face. One link: no part of it is a second control. */
+  .coach-panel { position: relative; isolation: isolate; display: block; overflow: hidden; margin: 0 var(--g); border-radius: 16px; background: var(--hero);
+    color: #fff; text-decoration: none; }
+  .coach-panel:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .coach-panel-img { position: absolute; z-index: 0; top: 0; right: 0; bottom: 0; width: 64%; height: 100%; object-fit: cover; object-position: 50% 14%;
+    background: transparent; mix-blend-mode: luminosity; opacity: .7; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
+  .coach-panel-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  .coach-panel-body { position: relative; z-index: 2; display: block; padding: 26px var(--g) 16px; }
+  .coach-panel-eye { display: flex; align-items: flex-start; gap: 8px; max-width: 250px; font: 700 var(--fs-label)/1.3 'Space Mono', monospace;
+    letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.84); text-wrap: balance; }
+  .coach-panel-eye::before { content: ''; flex: none; width: 7px; height: 7px; margin-top: 3px; border-radius: 50%; background: var(--mint); }
+  .coach-panel-title { display: block; max-width: 300px; margin: 12px 0 0;
+    font: 900 clamp(28px, 8.4vw, 36px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the panel's title, 28 to 36 px as Next up's */
+    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+  .coach-panel-line { display: block; max-width: 300px; margin: 12px 0 0; font: 500 var(--fs-body)/1.4 'Barlow', sans-serif; color: rgba(255,255,255,.9); text-wrap: pretty; }
+  /* the button: the cover's Start (the lighter green and a light ring), the full width of the panel's text. Green, never clay. */
+  .coach-panel-btn { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; margin-top: 20px; padding: 0 14px; border-radius: 8px;
+    color: #fff; background: var(--tile-on-green); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 10px 22px -10px rgba(0,0,0,.6);
+    font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; transition: transform 0.1s; }
+  .coach-panel-btn svg { flex: none; width: 20px; height: 20px; }
+  .coach-panel:active .coach-panel-btn { transform: scale(0.98); }
+  /* the sign-off, as the week note and the finished band sign: his signature in white on the left, his photo on the right, a faint line above */
+  .coach-panel-by { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 16px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.16); color: #fff; }
+  .coach-panel-by .wn-sig { width: 104px; height: 37px; margin: 0; color: #fff; }
+
+  /* 3. The number: plain mono text under the panel, one tap selects it whole so it can be copied. */
+  .coach-num { margin: 12px var(--g) 0; font: 400 var(--fs-body)/1.3 'Space Mono', monospace; letter-spacing: .5px; color: var(--grey); -webkit-user-select: all; user-select: all; }
+
+  /* 4. Notes from Amir: the section title is Progress's (.prog-sec: 15 px condensed capitals in green with a hairline to the edge), then a
+     fold row per note on the paper. A hairline between rows, none above the first. The icon is a 22 px green line icon, the title Barlow 600,
+     the date mono grey, the chevron the app's one ⌄ (it turns when open). Open, the note's body sits on the paper under the row. */
+  #screen-notes .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 12px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
+  #screen-notes .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }
+  .cn-list { margin: 0 var(--g); }
+  .cn-item + .cn-item { border-top: 1px solid var(--hair); }
+  .cn-row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 12px 0; border: 0; border-radius: 0; background: transparent; color: var(--ink);
+    text-align: left; cursor: pointer; }
+  .cn-row:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  .cn-row:active { background: var(--tint); }
+  .cn-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  .cn-ic svg { width: 22px; height: 22px; }
+  .cn-main { flex: 1; min-width: 0; display: block; }
+  .cn-title { display: block; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); text-wrap: balance; }
+  .cn-date { display: block; margin-top: 4px; font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; color: var(--grey); }
+  .cn-chev { flex: none; width: 18px; height: 18px; background: var(--grey); transition: transform .2s ease;
+    -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
+  .cn-row[aria-expanded="true"] .cn-chev { transform: rotate(180deg); }
+  .cn-body { padding: 0 0 20px 36px; font: 400 var(--fs-body)/1.65 'Barlow', sans-serif; color: var(--ink); }
+  .cn-body[hidden] { display: none; }
+  /* a note's body is the coach's own HTML (paragraphs, lists, bold); the global reset strips the spacing, so it is restored here */
+  .cn-body p { margin: 0 0 10px; }
+  .cn-body p:last-child { margin-bottom: 0; }
+  .cn-body ul { margin: 4px 0 10px; padding-left: 20px; }
+  .cn-body ul:last-child { margin-bottom: 0; }
+  .cn-body li { margin-bottom: 6px; }
+  .cn-body li:last-child { margin-bottom: 0; }
+  .cn-body strong { font-weight: 700; color: var(--ink); }
+
+  /* 5. How the app works: the door row (Home's and Progress's .hrow recipe): white, 1 px edge, 12 px corners, a 22 px green line icon, a green
+     Space Mono label over one Barlow line, a grey ›. No section label above it. */
+  :where(#screen-notes) .hrow { display: flex; align-items: center; gap: 14px; width: calc(100% - 2 * var(--g)); min-height: 64px; margin: 22px var(--g) 0;
+    padding: 12px 14px 12px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
+  :where(#screen-notes) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  :where(#screen-notes) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  :where(#screen-notes) .hrow-ic svg { width: 22px; height: 22px; }
+  :where(#screen-notes) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
+  :where(#screen-notes) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#screen-notes) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  :where(#screen-notes) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
   /* ══ CENTRE COURT: the training day, re-skinned (Amir, 2026-10-12: "lets go with E. exercise number inside the circle.
      but with P4, P5, P9, P50, P66") ═════════════════════════════════════════════════════════════════════════════════════
      ONE block for the training day, last in the sheet so it wins a tie: the day view (#day-view), Guided's moved card
@@ -5060,7 +4709,6 @@
   #home-overview .proof-strip:not(.off) { margin: -2px var(--g) 14px; }
   #home-overview .bt-sum { margin: -6px var(--g) 12px; }
   #home-overview .bt-wa { margin: 0 var(--g) 26px; }
-  #home-overview .bt-next .current-message { margin-left: var(--g); margin-right: var(--g); }
   #home-overview .bt-rep { width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 10px; }
   #home-overview #home-habits-wrap { margin-top: 20px; }
 
@@ -5152,22 +4800,175 @@
     :where(#home-overview, #screen-plan) .hrow-sp .nc-spark { width: 44px; }
   }
 
-  /* 7. Progress: the header (the name as the eyebrow, "Progress" as the title), a section title for each part, and the This cycle
-     card on the gutter. The cycle cards and the meter below move onto the same gutter, so the left edge is one line. */
+  /* 7. Progress: the header (the name as the eyebrow, "Progress" as the title), a section title for each part. The This cycle cover and
+     the road under the Game Plan title are the PROGRESS'S ROAD block below; they sit on the same gutter, so the left edge is one line. */
   #screen-plan .athlete-header { margin: 14px var(--g) 22px; }
   .prog-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 56px 8px 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px;
     text-transform: uppercase; color: var(--green-ink); }
   .prog-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--green-ink); }
   .prog-title { margin: 0; font: 900 var(--fs-display)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: .3px; text-transform: uppercase; color: var(--ink); }
   #screen-plan .athlete-header .sport-badge { margin-top: 14px; }
-  #screen-plan .cyc-card { width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 22px; padding-bottom: 16px; cursor: default; }
-  #screen-plan .sub-banner { margin: 0 var(--g) 20px; }
   #screen-plan .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 12px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
     letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
   #screen-plan .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }   /* to the right edge, as the training day's block titles */
-  #screen-plan .cycle-meter { margin-left: var(--g); margin-right: var(--g); }
-  #screen-plan .current-message { margin-left: var(--g); margin-right: var(--g); }
-  #screen-plan .why-plan-btn { width: calc(100% - 2 * var(--g)); margin-left: var(--g); margin-right: var(--g); }
+
+  /* ══ PROGRESS'S ROAD AND THE ARCHIVE IN THE CENTRE COURT LOOK (2026-10-13) ══════════════════════════════════════════════
+     Amir, 2026-10-13: "then do Progress's road cards in the Centre Court look". Progress keeps ONE green thing, the This cycle
+     cover (1); the cycles under the Game Plan title are one road of paper rows (2) in place of the C1 to Cn meter and the photo
+     cards; Home between cycles draws the next cycle as the same Up next row; the archive wears the training day's look (3).
+     Colours are the app's one set (THE APP'S ONE COLOUR SET, on body); none is declared here. paintCycleCard(), roadRowHTML(),
+     paintRoad(), renderArchive(). Font sizes are the --fs-* tokens, or a display size with its comment. */
+
+  /* 1. The cover (Progress's This cycle card). The cycle's picture graded into the green exactly as Home's Next up card does it
+     (luminosity at .7, masked from the left, a scrim to the cover's last colour), the eyebrow "● THIS CYCLE · 2 OF 3" in Space Mono,
+     the cycle's name in capitals (never clipped: the card has no fixed height), one mono line (the dates, and the days left in the
+     last 14), then the bars and the wins. Past the end date the tick takes the dot's place: "✓ CYCLE COMPLETE · 2 OF 3". */
+  .cyc-card { position: relative; isolation: isolate; display: block; width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 22px; padding: 0; overflow: hidden;
+    border: 0; border-radius: 16px; background: var(--hero); color: #fff; text-align: left; font: inherit; cursor: default; box-shadow: none; }
+  .cyc-img { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 84% 58%; background: transparent;
+    mix-blend-mode: luminosity; opacity: .66; pointer-events: none;   /* the text runs wider here than on Home's card, so the picture starts later and sits a little lower */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.16) 40%, #000 82%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.16) 40%, #000 82%); }
+  .cyc-scrim { position: absolute; inset: 0; z-index: 1; display: block; pointer-events: none;
+    background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  .cyc-body { position: relative; z-index: 2; display: block; padding: 44px var(--g) 16px; }
+  .cyc-top { display: flex; align-items: center; gap: 8px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,.88); }
+  .cyc-top, .cyc-name, .cyc-dates, .cyc-fin-s { text-shadow: 0 1px 10px rgba(6,36,26,.55); }   /* the picture can pass behind a line: a soft shadow keeps it readable */
+  .cyc-top::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .cyc-top.is-fin::before { display: none; }
+  .cyc-fin-h { display: inline-flex; align-items: center; gap: 8px; margin: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; }
+  .cyc-fin-tick { flex: none; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--mint); color: var(--hero-end); }
+  .cyc-fin-tick svg { width: 10px; height: 10px; }
+  .cyc-of { color: rgba(255,255,255,.7); }
+  .cyc-name { display: block; margin: 10px 0 0; max-width: 330px;
+    font: 900 clamp(28px, 8.4vw, 36px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the cycle's name, 28 to 36 px */
+    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+  .cyc-dates, .cyc-fin-s { display: block; margin: 10px 0 0; font: 400 var(--fs-label)/1.4 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.8); }
+  .cyc-dates b { font-weight: 700; color: var(--mint); }
+  .cyc-row { display: grid; grid-template-columns: minmax(96px, auto) 1fr; align-items: center; gap: 14px; margin-top: 14px; }
+  .cyc-dates + .cyc-row, .cyc-fin-s + .cyc-row, .cyc-fin-s + .cyc-fin-meter { margin-top: 22px; }
+  .cyc-k { font: 900 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: var(--clay-on-green); white-space: nowrap; }
+  .cyc-k small { margin-left: 6px; font: 700 var(--fs-label) 'Space Mono', monospace; letter-spacing: .02em; color: rgba(255,255,255,.82); }
+  .cyc-bar { display: flex; gap: 3px; }
+  .cyc-bar i { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); }
+  .cyc-bar i.on { background: var(--clay-on-green); }
+  .cyc-bar-solid { display: block; height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; }
+  .cyc-bar-solid i { display: block; height: 100%; background: var(--clay-on-green); }
+  .cyc-wins-h { display: block; margin: 20px 0 2px; font: 700 var(--fs-label) 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+  .cyc-win { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-top: 1px solid rgba(255,255,255,.14);
+    font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; }
+  .cyc-win b { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--mint); text-align: right; }
+  @media (max-width: 380px) {   /* a narrow phone: the lift, and its win under it */
+    .cyc-win { display: block; }
+    .cyc-win b { display: block; text-align: left; margin-top: 2px; }
+  }
+  .cyc-fin-meter { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; margin-top: 14px; }
+  .cyc-fin-meter span { display: grid; gap: 6px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .06em; color: rgba(255,255,255,.82); }
+  .cyc-fin-meter span::before { content: ''; height: 6px; border-radius: 3px; background: var(--clay-on-green); }
+
+  /* 2. The road: one row per cycle, on the paper. A hairline between rows (not above the first), no box. The cycle's number is the outlined
+     numeral (Barlow Condensed 900, 32 px, a green outline; P24, as Home's day rows), solid green once the cycle is done; its name in
+     Barlow 600 over a mono line ("WEEKS 6–10 · NOW"); at the right a chevron (a fold: grey ⌄, turned when open), a grey › (the cycle
+     before this one opens its archive), a lock (a cycle that is not open yet) or the Now tag. Done: the numeral solid. Now: outlined
+     green, a mint tag, OPEN. Up next: outlined grey-green, closed. Locked: outlined grey, a lock. The same row is Home's Up next. */
+  .road { --road-ind: 54px; margin: 0 var(--g); }
+  .road-row ~ .road-row { border-top: 1px solid var(--hair); }   /* ~, not +: the Why door can sit between two rows */
+  .road-head { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; column-gap: 10px; width: 100%; min-height: 64px; margin: 0; padding: 10px 0;
+    border: 0; border-radius: 0; background: transparent; color: var(--ink); text-align: left; font: inherit; cursor: default; }
+  button.road-head { cursor: pointer; }
+  button.road-head:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  button.road-head:active { background: var(--tint); }
+  .road-num { font: 900 32px/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif;   /* display: the cycle's number, P24 as the exercise numerals on the training day */
+    color: transparent; -webkit-text-stroke: 1.5px var(--green-ink); paint-order: stroke fill; font-variant-numeric: tabular-nums; }
+  .road-row.is-done .road-num { color: var(--green-ink); }
+  .road-row.is-next .road-num { -webkit-text-stroke-color: var(--ring); -webkit-text-stroke-color: color-mix(in srgb, var(--green-ink) 45%, var(--ring)); }
+  .road-row.is-locked .road-num { -webkit-text-stroke-color: var(--ring); }
+  .road-tx { display: block; min-width: 0; }
+  .road-nm { display: block; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); text-wrap: balance; }
+  .road-ln { display: block; margin-top: 4px; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  .road-ln b { font-weight: 700; }
+  .road-row.is-done .road-ln b, .road-row.is-now .road-ln b { color: var(--green-ink); }
+  .road-st { display: flex; align-items: center; gap: 6px; }
+  .road-tag { display: inline-block; padding: 4px 8px 3px; border-radius: 999px; background: var(--mint); color: var(--fill);
+    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; }
+  .road-lock { display: inline-flex; color: var(--ring); }
+  .road-lock svg { width: 16px; height: 16px; }
+  .road-chev { display: block; width: 28px; height: 28px; background-color: var(--grey); transition: transform .25s ease;
+    -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
+  .road-row.is-open > .road-head .road-chev { transform: rotate(180deg); }
+  .road-go { padding-right: 4px; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+  /* the fold: a grid row that grows from 0 to its content; closed, it is hidden to the eye, the keyboard and a screen reader */
+  .road-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+  .road-row.is-open > .road-body { grid-template-rows: 1fr; }
+  .road-in { min-height: 0; overflow: hidden; visibility: hidden; transition: visibility 0s linear .3s; }
+  .road-row.is-open > .road-body > .road-in { visibility: visible; transition-delay: 0s; }
+  .road-in::after { content: ''; display: block; height: 18px; }
+  @media (prefers-reduced-motion: reduce) { .road-body, .road-in, .road-chev { transition: none; } }
+  /* inside a row: the tagline, the aims (01, 02 in Space Mono green), why it matters (Amir's words, the clay quote of the Coach's note),
+     the outcomes (a green tick). Text starts under the cycle's name; each marker sits in the numeral's column. */
+  .road-tagline { margin: 0 0 2px var(--road-ind); font: italic 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--grey); }
+  .road-sec { margin: 20px 0 4px var(--road-ind); font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.6px; text-transform: uppercase; color: var(--green-ink); }
+  .road-aims, .road-outs { list-style: none; margin: 0; padding: 0; }
+  .road-aims li, .road-outs li { display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 10px; padding: 10px 0; }
+  .road-aims li { align-items: baseline; }
+  .road-aims li + li, .road-outs li + li { border-top: 1px solid var(--hair); }
+  .road-n { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; color: var(--green-ink); }
+  .road-aim, .road-out { font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .road-ck { display: inline-flex; width: 18px; height: 18px; margin-top: 2px; color: var(--green-ink); }
+  .road-ck svg { width: 18px; height: 18px; }
+  .road-why { position: relative; margin: 2px 0 0; padding: 8px 0 0 var(--road-ind); }
+  .road-why::before { content: '\201C'; position: absolute; left: 0; top: 6px; width: 44px; font: 900 var(--fs-display)/1 'Barlow Condensed', sans-serif; color: var(--clay); }
+  .road-why p { font: 500 var(--fs-field)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .road-why p + p { margin-top: 10px; }
+  .road-lead { margin: 2px 0 0 var(--road-ind); font: 500 var(--fs-lead)/1.35 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .road-paras { margin: 8px 0 0 var(--road-ind); }
+  .road-paras p { font: 400 var(--fs-body)/1.55 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
+  .road-paras p + p { margin-top: 10px; }
+  .road-tagline + .road-lead, .road-tagline + .road-paras { margin-top: 8px; }
+  .road-aims + .road-lead, .road-aims + .road-paras { margin-top: 16px; }   /* the teaser follows the aims */
+  .road-sign { justify-content: flex-end; margin: 12px 0 0; }   /* Amir's signature and photo (the week note's .wn-sign, its size), right-aligned under his words */
+  .road .hrow.road-why-door { width: 100%; margin: 20px 0 0; }   /* a door row: the full width of the road, not the gutter twice */
+  .road-door { padding: 2px 0 18px; }   /* past the end date the door sits directly under the current cycle's Done row */
+  .road-door .hrow.road-why-door { margin: 0; }
+  .road-why-door .hrow-l { text-wrap: balance; }   /* on the narrowest phone the label breaks in two even halves, never one word on a line of its own */
+  .bt-next { margin: 0 0 4px; }   /* Home between cycles: the road's one row, on the gutter (.road) */
+
+  /* 3. The archive (a finished cycle's days, read only): a compact cover as the training day's, then each day as a block title (the
+     .prog-sec look) and its exercises as paper rows with the outlined numeral. ← is the day cover's glass button. Nothing to tick. */
+  .archive-banner { position: relative; isolation: isolate; overflow: hidden; background: var(--hero); color: #fff; }
+  .arc-img { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 84% 58%; background: transparent;
+    mix-blend-mode: luminosity; opacity: .7; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
+  .arc-img[hidden] { display: none; }
+  .arc-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  .archive-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+    cursor: pointer; color: #fff; background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    font: 500 var(--fs-title)/1 'Barlow', sans-serif; -webkit-tap-highlight-color: transparent; }
+  .archive-back:active { transform: scale(0.92); }
+  .archive-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .arc-cap { position: relative; z-index: 2; padding: 74px var(--g) 22px; }
+  .archive-label { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
+  .archive-label::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .archive-title { margin: 10px 0 0; max-width: 330px;
+    font: 900 clamp(28px, 8.4vw, 36px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the archived cycle's name, 28 to 36 px */
+    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+  .archive-weeks { margin: 10px 0 0; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.8); }
+  .archive-weeks[hidden] { display: none; }
+  .archive-scroll { padding: 0 0 110px; }
+  .archive-day-title { display: flex; align-items: center; gap: 12px; margin: 26px 0 6px; padding-left: var(--g); font: 700 var(--fs-body)/1.2 'Barlow Condensed', sans-serif;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
+  .archive-day-title::after { content: ''; flex: 1; min-width: 12px; height: 1px; background: var(--hair); }   /* to the right edge, as Progress's section titles */
+  .archive-ex { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; column-gap: 10px; min-height: 64px; margin: 0 var(--g); padding: 10px 0; }
+  .archive-ex + .archive-ex { border-top: 1px solid var(--hair); }
+  .archive-ex-num { font: 900 32px/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif;   /* display: the exercise's number, P24 */
+    color: transparent; -webkit-text-stroke: 1.5px var(--green-ink); paint-order: stroke fill; font-variant-numeric: tabular-nums; }
+  .archive-ex-tx { display: block; min-width: 0; }
+  .archive-ex-name { display: block; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); text-wrap: balance; }
+  .archive-ex-detail { display: block; margin-top: 3px; font: 400 var(--fs-small)/1.3 'Space Mono', monospace; letter-spacing: .04em; color: var(--grey); }
+  .archive-empty { margin: 28px var(--g) 0; font: 400 var(--fs-lead)/1.5 'Barlow', sans-serif; color: var(--grey); }
 </style>
 </head>
 <body>
@@ -5279,14 +5080,12 @@
 <div id="screen-plan" class="screen planlike">
 
 
-  <!-- Header: the athlete's name as the eyebrow, "Progress" as the title, then the sport badge and the current cycle's dates -->
+  <!-- Header: the athlete's name as the eyebrow, "Progress" as the title, then the sport badge. The cycle's dates and days left are on the cover below. -->
   <div id="athlete-card-wrap"></div>
 
-  <!-- This cycle card (PROG-01, paintCycleCard()): where the cycle is, sessions done, the wins. It lived on Home until 2026-10-12. -->
+  <!-- This cycle card (PROG-01, paintCycleCard()): Progress's one green cover (the cycle's picture, its name, its dates and days left),
+       then where the cycle is, sessions done, the wins. It lived on Home until 2026-10-12. -->
   <div id="cycle-card-wrap"></div>
-
-  <!-- Subscription banner (only when ≤14 days remain) -->
-  <div id="sub-banner-wrap"></div>
 
   <!-- Your numbers (Amir, 2026-10-12: Personal records and Body weight moved here from Home): two door rows,
        painted by paintNumbers(). -->
@@ -5294,20 +5093,12 @@
   <div id="ceiling-row-wrap"></div>
   <div id="weight-row-wrap"></div>
 
-  <!-- The Game Plan: its section title, then the cycle meter (segments + C1/C2/C3 labels) -->
-  <div id="cycle-meter-wrap"></div>
+  <!-- The Game Plan (Amir, 2026-10-13): its section title, then ONE road of paper rows, a row per cycle (paintRoad()):
+       Done (the one before the current opens its archive), Now (open), Up next, Locked. -->
+  <div id="road-wrap"></div>
 
   <!-- Simple fallback for athletes without cycles -->
   <div id="home-simple-meta-wrap" style="padding: 0 24px;"></div>
-
-  <!-- Past program card (completed previous cycle) — opens the archive on tap -->
-  <div id="past-card-wrap"></div>
-
-  <!-- Current cycle message (optional) -->
-  <div id="current-message-wrap"></div>
-
-  <!-- All future cycles (next + upcoming), unified layout -->
-  <div id="upcoming-wrap"></div>
 
   <!-- Daily Habits are on Home, under the week's days (Amir, 2026-09-12). Personal Records and Body weight are
        the "Your numbers" rows above (2026-10-12). -->
@@ -5458,12 +5249,18 @@
 </div>
 
 <!-- ═══ ARCHIVE ═══ a single completed past program. Not a bottom-nav tab —
-     opened only by the "Done" card on the Progress screen. -->
+     opened only by the Done row on Progress's road. A compact cover in the Centre Court look (renderArchive()):
+     the cycle's picture graded into the green, ← as the day cover's glass button, the eyebrow, the name, its weeks. -->
 <div id="screen-archive" class="screen">
-  <div class="archive-banner" id="archive-banner" data-watermark="">
+  <div class="archive-banner" id="archive-banner">
+    <img class="arc-img" id="archive-img" alt="" aria-hidden="true" decoding="async" hidden onerror="cycleImgError(this)">
+    <div class="arc-scrim"></div>
     <button class="archive-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
-    <div class="archive-label">Completed</div>
-    <div class="archive-title" id="archive-title"></div>
+    <div class="arc-cap">
+      <div class="archive-label" id="archive-label">Completed</div>
+      <div class="archive-title" id="archive-title"></div>
+      <div class="archive-weeks" id="archive-weeks" hidden></div>
+    </div>
   </div>
   <div class="archive-scroll" id="archive-scroll"></div>
 </div>
@@ -5525,21 +5322,14 @@
 
 <!-- ═══ NOTES ═══ -->
 <div id="screen-notes" class="screen">
-  <!-- Coach hero — replaces the old green "Coach" header band. The avatar is
-       assets/img/coach.jpg over the brand initials, which show if the photo fails. -->
-  <div class="coach-hero">
-    <div class="coach-avatar" id="coach-avatar">
-      <img src="assets/img/coach.jpg" alt="Coach Amir" onerror="this.remove()">
-      <span class="coach-avatar-initials">AA</span>
-    </div>
-    <div class="coach-hero-main">
-      <h1 class="coach-name">Coach Amir</h1>
-      <div class="coach-status">
-        <span>Strength &amp; conditioning coach</span>
-      </div>
-    </div>
+  <!-- The Coach header, in Progress's look (the Centre Court block COACH IN THE CENTRE COURT LOOK): a green-dot eyebrow, the 44 px title, one
+       mono line. His photo is in the WhatsApp panel below, not here. renderNotes() fills #notes-container. -->
+  <div class="coach-head">
+    <div class="prog-eyebrow">Your coach</div>
+    <h1 class="prog-title">Coach Amir</h1>
+    <div class="coach-role">Strength &amp; conditioning coach</div>
   </div>
-  <div id="notes-container" style="padding: 4px 0 100px;"></div>
+  <div id="notes-container" style="padding: 0 0 100px;"></div>
 </div>
 
 <!-- ═══ GLOBAL BOTTOM TAB BAR ═══ Shown on every nav screen; hidden while loading
@@ -7225,22 +7015,12 @@ async function signOutSafely(btn) {
 window.signOutSafely = signOutSafely;
 
 // ═══════════════════════════════════════════════════════════════════════
-//  2. RENDER: GAME PLAN (V5 DESIGN, GRACEFUL FALLBACK)
+//  2. RENDER: PROGRESS (the cover, the road of cycles, the archive)
 // ═══════════════════════════════════════════════════════════════════════
+// Progress's cycles are ONE road of paper rows (roadRowHTML(), paintRoad()) and its This cycle card is the screen's one green
+// cover (paintCycleCard()), both in the Centre Court look (Amir, 2026-10-13: "do Progress's road cards in the Centre Court
+// look"). The photo cycle cards (cycleCardHTML(), its Read more / Active / Done / Up next! pills) and the C1 to Cn meter are gone.
 
-// Single source of truth for EVERY cycle card on Game Plan (past, current
-// and future). Edit this builder (and the .current-message / .cm-* / .focus-list
-// / .outcomes-* CSS it uses) once and all three card types change together.
-//   cycle = a cycles[] entry ({ num, name, weeks, tagline, focuses })
-//   opts  = {
-//     pill:       optional text for the top-right pill (e.g. 'Done'),
-//     onclick:    optional JS string → makes the whole card clickable,
-//     paragraphs: optional body paragraphs (current = message.paragraphs,
-//                 future = teaser.paragraphs),
-//     bodyLabel:  optional label above the paragraphs (e.g. 'Why This Cycle Matters'),
-//     italicLast: italicise the final paragraph when there are 2+ (teaser style),
-//     outcomes:   optional list rendered as the ticked "expected outcomes" block
-//   }
 // ═══════════════════════════════════════════════════════════════════════
 //  APP ART — every generated picture in the app, in one place
 // ═══════════════════════════════════════════════════════════════════════
@@ -7484,117 +7264,17 @@ function paintHints(day) {
 }
 window.paintHints = paintHints;
 
-function cycleCardHTML(cycle, opts) {
-  opts = opts || {};
-  // Cycle cards open EXPANDED (Amir, 2026-09-12). The whole point of Game Plan is
-  // the reasoning behind each block, and hiding it behind "Read more" meant most
-  // athletes never read a word of it. They can still collapse any card, and
-  // toggleCycleCard() below flips it back the other way.
-  // ⚠️ REVISED (Amir, 2026-09-26, PLAN-01: "Fold past and future"): only the CURRENT cycle
-  // opens expanded. Past and future cycles pass `folded`: collapsed, on a slim banner, so
-  // Game Plan reaches this cycle's reasoning without scrolling past last month's.
-  const folded = !!opts.folded;
-  // opts.bannerOnly: only the picture banner is the way on (Game Plan's Active card: tapping its text to read it used to throw you to Home).
-  const bannerOnly = !!(opts.bannerOnly && opts.onclick);
-  const cls = 'current-message' + (folded ? ' is-folded' : ' is-open') + (opts.onclick && !bannerOnly ? ' is-clickable' : '');
-  // ⚠️ The card's own tap must ignore taps on the Read less/more button inside
-  // it. stopPropagation() in toggleCycleCard() was not enough on its own — a
-  // tap on the toggle of a clickable card both collapsed it AND navigated away.
-  // Checking the target here cannot fail whatever the event does.
-  const attrs = opts.onclick && !bannerOnly
-    ? ` role="button" tabindex="0" onclick="if(event.target.closest('.cm-toggle'))return; ${opts.onclick}"`
-    : '';
-  let h = `<div class="${cls}"${attrs}>`;
-
-  // ── Image banner (full-bleed top of the card). The picture comes from the
-  // cycle's FAMILY (see cycleArt), not its name: ten pictures cover every cycle
-  // any athlete is on, including names the pipeline has not invented yet. If the
-  // file is missing, cycleImgError() flags the banner `.no-img` and the green
-  // court fallback shows. opts.alt mirrors the picture and swaps the scrim to
-  // clay, which is how two cards in a row from the same family stay apart.
-  const family = cycleArt(cycle);
-  const artFile = ART_CYCLES + (APP_ART.cycles[family] || APP_ART.cycles.bedrock) + '.webp';
-  const bannerCls = 'cm-banner' + (opts.alt ? ' is-alt' : '');
-  h += `<div class="${bannerCls}"${bannerOnly ? ` role="button" tabindex="0" onclick="if(event.target.closest('.cm-toggle'))return; ${opts.onclick}"` : ''}>`;
-  h += `<img class="cm-banner-img" alt="" aria-hidden="true" loading="lazy" ` +
-       `src="${artFile}" onerror="cycleImgError(this)">`;
-  h += `<div class="cm-banner-scrim"></div>`;
-  if (opts.pill) h += `<div class="cm-pill${opts.pillStyle ? ' cm-pill-' + opts.pillStyle : ''}">${esc(opts.pill)}</div>`;
-
-  // Caption overlay (bottom-left): "Cycle n of N" + name + weeks + tagline.
-  h += `<div class="cm-banner-caption">`;
-  if (cycle.num != null && opts.total) {
-    h += `<div class="cm-cyclelabel">Cycle ${cycle.num} of ${opts.total}</div>`;
-  }
-  h += `<div class="cm-name">${esc(cycle.name || '')}</div>`;
-  if (cycle.weeks) h += `<div class="cm-weeks">${esc(cycle.weeks)}</div>`;
-  if (cycle.tagline) h += `<div class="cm-tagline">${esc(cycle.tagline)}</div>`;
-  h += `</div>`;
-
-  // ── Collapsible detail. Everything below the caption — the aims (focus list),
-  // the "why this cycle matters" paragraphs and the outcomes — sits behind the
-  // toggle on the banner (open on the current cycle, folded on the rest). Built into its
-  // own string first so the toggle only renders when there's something to show.
-  let detail = '';
-
-  const focuses = Array.isArray(cycle.focuses) ? cycle.focuses : [];
-  if (focuses.length) {
-    detail += `<div class="cm-body-label">The Aims</div>`;
-    detail += `<div class="focus-list">`;
-    focuses.forEach(f => { detail += `<div class="focus-list-item">${esc(f)}</div>`; });
-    detail += `</div>`;
-  }
-
-  const paras = Array.isArray(opts.paragraphs) ? opts.paragraphs : [];
-  if (paras.length) {
-    if (opts.bodyLabel) detail += `<div class="cm-body-label">${esc(opts.bodyLabel)}</div>`;
-    detail += `<div class="cm-body">`;
-    paras.forEach((p, i) => {
-      if (opts.italicLast && i === paras.length - 1 && paras.length > 1) {
-        detail += `<p><em>${esc(p)}</em></p>`;
-      } else {
-        detail += `<p>${esc(p)}</p>`;
-      }
-    });
-    detail += `</div>`;
-  }
-
-  const outcomes = Array.isArray(opts.outcomes) ? opts.outcomes : [];
-  if (outcomes.length) {
-    detail += `<div class="outcomes-block"><div class="outcomes-label">Expected outcomes after this cycle:</div>`;
-    outcomes.forEach(o => {
-      detail += `<div class="outcome-item"><div class="outcome-check">✓</div><div class="outcome-text">${esc(o)}</div></div>`;
-    });
-    detail += `</div>`;
-  }
-
-  // noDetail (used by the home-overview current-cycle card) drops the whole
-  // collapsible section, so the card is just banner + caption + pill — no toggle.
-  if (opts.noDetail) detail = '';
-
-  if (detail) {
-    // Toggle button lives on the banner (bottom-right); the collapsible body
-    // sits below it. Close the banner div first, then add the body.
-    // An open card's button is the way OUT; a folded one's is the way in.
-    h += `<button class="cm-toggle" aria-expanded="${folded ? 'false' : 'true'}" onclick="toggleCycleCard(this, event)">`;
-    h += `<span class="cm-toggle-label">${folded ? 'Read more' : 'Read less'}</span><span class="cm-toggle-chev" aria-hidden="true">▾</span>`;
-    h += `</button>`;
-    h += `</div>`; // .cm-banner
-    h += `<div class="cm-collapse"><div class="cm-cardbody">${detail}</div></div>`;
-  } else {
-    h += `</div>`; // .cm-banner
-  }
-
-  h += `</div>`;
-  return h;
+// The picture of a cycle: its FAMILY's file (see cycleArt()), never its name. The cover on Progress and the archive's cover use it.
+function cycleArtUrl(cycle) {
+  return ART_CYCLES + (APP_ART.cycles[cycleArt(cycle)] || APP_ART.cycles.bedrock) + '.webp';
 }
 
-// Cycle banner image failed: hides the broken <img> and flags the banner
-// `.no-img` so the green court fallback shows.
+// A cycle's picture failed to load: hide the broken <img> and flag its cover `.no-img`, so the green under it shows (the This cycle
+// cover on Progress, the archive's cover, a day card's banner).
 function cycleImgError(img) {
   img.style.display = 'none';
-  const banner = img.closest('.cm-banner');
-  if (banner) banner.classList.add('no-img');
+  const cover = img.closest('.cm-banner, .cyc-card, .archive-banner');
+  if (cover) cover.classList.add('no-img');
 }
 
 // Day-card image failed (category file missing) → drop to the green gradient.
@@ -7604,17 +7284,105 @@ function dayImgError(img) {
   if (banner) banner.classList.add('no-img');
 }
 
-// Expand/collapse a cycle card's detail section (why-this-matters + outcomes).
-// Toggles the card's `is-open` class; CSS does the show/hide + chevron flip.
-function toggleCycleCard(btn, ev) {
-  if (ev) ev.stopPropagation();
-  const card = btn.closest('.current-message');
-  if (!card) return;
-  const open = card.classList.toggle('is-open');
-  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  const label = btn.querySelector('.cm-toggle-label');
-  if (label) label.textContent = open ? 'Read less' : 'Read more';
+// ── THE ROAD (Amir, 2026-10-13: "do Progress's road cards in the Centre Court look") ─────────────────────────────────
+// One row per cycle, on the paper: the cycle's number as the outlined numeral (solid green once it is done), its name over a mono
+// line ("WEEKS 6–10 · NOW"), a chevron when the row folds. Done (every cycle before the current one, and the current one past its
+// end date: PROG-02), Now (OPEN: the tagline, the aims, why it matters, the outcomes, then Why your plan looks like this), Up next
+// (closed: the teaser), Locked (a lock, and a fold only when it has a teaser). The cycle before the current one opens its archive
+// when it has one. Home between cycles draws the next cycle's row with the same function (betweenCyclesHTML()).
+// o = { state, idp (the body's id prefix), archive (a programHistory id), whyN (reasons: Now only), open (the fold's last state) }.
+// Functions, not consts: the road is drawn from boot(), which can run before a const further down has been evaluated.
+// Written only when it changed: goTo('plan') repaints the cover and the road on every visit, and a new <img> each time would flash the cover's
+// picture (it decodes after the green is already there). The last string written is kept on the element.
+function paintInto(el, html) {
+  if (el._painted === html) return;
+  el._painted = html;
+  el.innerHTML = html;
 }
+function roadStateOf(i, idx, over) {
+  if (i < idx) return 'done';
+  if (i === idx) return over ? 'done' : 'now';
+  return i === idx + 1 ? 'next' : 'locked';
+}
+function roadWord(state) { return { done: 'Done', now: 'Now', next: 'Up next', locked: 'Locked' }[state] || ''; }
+function roadIc(kind) {
+  const d = { lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>' }[kind] || '';
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+}
+// Why your plan looks like this · N reasons: a door row (.hrow) to the Why page. Inside the Now row while the cycle runs, under its Done row after it.
+function roadDoorHTML(n) {
+  return `<button type="button" class="hrow road-why-door" onclick="openWhyPlan()">${hrowIc('why')}`
+    + `<span class="hrow-b"><span class="hrow-l">Why your plan looks like this</span><span class="hrow-q">${n} reasons</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+}
+function roadRowHTML(c, i, o) {
+  o = o || {};
+  const state = o.state || 'locked', n = i + 1, idp = o.idp || 'road-body-';
+  const list = v => (Array.isArray(v) ? v : []).map(x => String(x == null ? '' : x).trim()).filter(Boolean);
+  const attr = s => esc(s).replace(/"/g, '&quot;');   // esc() leaves a quote alone, and these go inside attributes
+  const name = c.name || ('Cycle ' + n);
+  let body = '';
+  // Now, Up next and Locked all open on the cycle's tagline (one italic line) and The aims (01, 02 rows); nothing the old folded cards showed is lost.
+  if (state === 'now' || state === 'next' || state === 'locked') {
+    const aims = list(c.focuses);
+    if (c.tagline) body += `<p class="road-tagline">${esc(c.tagline)}</p>`;
+    if (aims.length) body += `<h3 class="road-sec">The aims</h3><ol class="road-aims">${aims.map((a, k) =>
+      `<li><span class="road-n" aria-hidden="true">${String(k + 1).padStart(2, '0')}</span><span class="road-aim">${esc(a)}</span></li>`).join('')}</ol>`;
+  }
+  if (state === 'now') {
+    const msg = c.message || {}, why = list(msg.paragraphs), outs = list(msg.outcomes);
+    // Amir's words, signed as the week note and the finished band sign them: the clay quote, then his signature (green ink) and photo, right-aligned.
+    if (why.length) body += `<h3 class="road-sec">Why this cycle matters</h3><div class="road-why">${why.map(p => `<p>${esc(p)}</p>`).join('')}`
+      + `<div class="wn-sign road-sign">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div></div>`;
+    if (outs.length) body += `<h3 class="road-sec">Expected outcomes</h3><ul class="road-outs">${outs.map(t =>
+      `<li><span class="road-ck">${roadIc('check')}</span><span class="road-out">${esc(t)}</span></li>`).join('')}</ul>`;
+    // Because: the cycle's reasons on one page, only when there are enough of them to read as a plan (three). Past the end date the same door
+    // sits under the current cycle's Done row instead (paintRoad()).
+    if (o.whyN >= 3) body += roadDoorHTML(o.whyN);
+  } else if (state === 'next' || state === 'locked') {
+    const t = c.teaser || {}, lead = String(t.subtitle || '').trim(), paras = list(t.paragraphs);
+    if (lead) body += `<p class="road-lead">${esc(lead)}</p>`;
+    if (paras.length) body += `<div class="road-paras">${paras.map((p, k) => k === paras.length - 1 && paras.length > 1 ? `<p><em>${esc(p)}</em></p>` : `<p>${esc(p)}</p>`).join('')}</div>`;
+  }
+  const fold = !!body, open = fold && (o.open != null ? !!o.open : state === 'now');
+  const archive = state === 'done' && !fold && o.archive ? String(o.archive) : '';
+  const inner = `<span class="road-num" aria-hidden="true">${n}</span>`
+    + `<span class="road-tx"><span class="road-nm">${esc(name)}</span><span class="road-ln">${c.weeks ? esc(c.weeks) + ' · ' : ''}<b>${roadWord(state)}</b></span></span>`
+    + `<span class="road-st">${state === 'now' ? '<span class="road-tag" aria-hidden="true">Now</span>' : ''}${state === 'locked' ? `<span class="road-lock" aria-hidden="true">${roadIc('lock')}</span>` : ''}`
+    + `${fold ? '<i class="road-chev" aria-hidden="true"></i>' : archive ? '<span class="road-go" aria-hidden="true">›</span>' : ''}</span>`;
+  const head = fold
+    ? `<button type="button" class="road-head" aria-expanded="${open ? 'true' : 'false'}" aria-controls="${idp}${n}" onclick="toggleRoad(this)">${inner}</button>`
+    : archive
+      ? `<button type="button" class="road-head" data-hist="${attr(archive)}" aria-label="Cycle ${n}, ${attr(name)}, done. Open its archive." onclick="goTo('archive', this.dataset.hist)">${inner}</button>`
+      : `<div class="road-head">${inner}</div>`;
+  return `<div class="road-row is-${state}${open ? ' is-open' : ''}" data-cycle="${n}">${head}`
+    + (fold ? `<div class="road-body" id="${idp}${n}"><div class="road-in">${body}</div></div>` : '') + `</div>`;
+}
+function toggleRoad(btn) {
+  const row = btn && btn.closest('.road-row');
+  if (!row) return;
+  const open = row.classList.toggle('is-open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+window.toggleRoad = toggleRoad;
+// Progress's road, under the Game Plan title (#road-wrap). renderPlan() paints it at boot and goTo('plan') on every visit (so a
+// cycle that ended while the app sat open reads Done), keeping each row's fold as the athlete left it.
+function paintRoad() {
+  const wrap = document.getElementById('road-wrap');
+  const cycles = (DATA && Array.isArray(DATA.cycles)) ? DATA.cycles : [];
+  if (!wrap || !cycles.length) return;
+  const idx = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+  const over = !!cycleOver();
+  const was = {};
+  wrap.querySelectorAll('.road-row').forEach(r => { was[r.dataset.cycle] = r.classList.contains('is-open'); });
+  const hist = Array.isArray(DATA.programHistory) ? DATA.programHistory : [];
+  const nWhy = whyList().length;
+  paintInto(wrap, `<h2 class="prog-sec">Game Plan</h2><div class="road">` + cycles.map((c, i) => {
+    const state = roadStateOf(i, idx, over);
+    return roadRowHTML(c, i, { state, whyN: state === 'now' ? nWhy : 0, archive: i === idx - 1 && hist.length ? hist[0].id : '', open: was[i + 1] })
+      + (i === idx && over && nWhy >= 3 ? `<div class="road-door">${roadDoorHTML(nWhy)}</div>` : '');   // past its end date: directly under the current cycle's Done row
+  }).join('') + `</div>`);
+}
+window.paintRoad = paintRoad;
 
 // ═══════════════════════════════════════════════════════════════════════
 //  HOME OVERVIEW HELPERS (landing page on #screen-home)
@@ -8189,6 +7957,11 @@ function cycDate(iso) {
   const s = String(iso || '').slice(0, 10), d = new Date(s + 'T00:00:00');
   return isNaN(d) ? '' : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate();
 }
+// The This cycle card (PROG-01) is Progress's one green thing, a cover in the Centre Court look (Amir, 2026-10-13): the cycle's picture graded
+// into the green, "● THIS CYCLE · 2 OF 3" in Space Mono over the cycle's NAME in capitals, one mono line under it with the cycle's dates and,
+// in its last 14 days, the days left (the days-left banner and the header's dates line it replaced are gone), then the bars and the wins.
+// Past the end date it says so in the same place: "● CYCLE COMPLETE · 2 OF 3" ("● ROADMAP COMPLETE" on the last), the dates line becomes
+// "Finished Nov 2 · 5 of 5 weeks". The dates are calendar days (cycleDayNo(), cycDate()), never new Date('YYYY-MM-DD').
 function paintCycleCard() {
   const wrap = document.getElementById('cycle-card-wrap');   // on Progress since 2026-10-12 (it was the top of Home)
   if (!wrap || !DATA) return;
@@ -8196,7 +7969,7 @@ function paintCycleCard() {
   const cIdx = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
   const cur = cycles[cIdx];
   const p = cur ? cycleProgress() : null;
-  if (!p) { wrap.innerHTML = ''; return; }   // no dates (5 of 35 live programmes), or before the cycle: nothing to count yet. The old small line is gone.
+  if (!p) { paintInto(wrap, ''); return; }   // no dates (5 of 35 live programmes), or before the cycle: nothing to count yet. The old small line is gone.
   const bar = (n, on) => n > 24
     ? `<span class="cyc-bar cyc-bar-solid"><i style="width:${Math.min(100, Math.round(on / n * 100))}%"></i></span>`
     : `<span class="cyc-bar">${Array.from({ length: n }, (_, i) => `<i${i < on ? ' class="on"' : ''}></i>`).join('')}</span>`;
@@ -8204,33 +7977,42 @@ function paintCycleCard() {
   const wins = p.wins.length
     ? `<span class="cyc-wins-h">Wins this cycle</span>` + p.wins.map(w => `<span class="cyc-win"><span>${esc(w.name)}</span><b>${esc(w.txt)}</b></span>`).join('')
     : '';
+  // The picture, graded into the green by CSS (luminosity, masked from the left, a scrim to the cover's last colour). A file that is
+  // missing leaves the green (cycleImgError()).
+  const photo = `<img class="cyc-img" alt="" aria-hidden="true" decoding="async" src="${cycleArtUrl(p.cur)}" onerror="cycleImgError(this)"><span class="cyc-scrim"></span>`;
+  const name = `<h2 class="cyc-name">${esc(p.cur.name || '')}</h2>`;
   if (p.over) {   // the day after the end date (PROG-02): the same card, saying the cycle is complete
     const last = !p.over.next;
     const lens = cycles.map(c => (cycleWeekInfo(c) || {}).total);
     const weeks = lens.every(n => n) ? lens.reduce((a, n) => a + n, 0) : 0;   // the roadmap's weeks, when every cycle is dated
     const what = last ? `${cycles.length} cycle${cycles.length === 1 ? '' : 's'}${weeks ? ' · ' + weeks + ' weeks' : ''}` : `${p.wk.total} of ${p.wk.total} weeks`;
-    wrap.innerHTML = `<div class="cyc-card">
-      <span class="cyc-top"><span>Cycle ${p.cIdx + 1} of ${p.count} · <b>${esc(p.cur.name || '')}</b></span></span>
-      <span class="cyc-fin-h"><span class="cyc-fin-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${last ? 'Roadmap complete' : 'Cycle complete'}</span>
+    paintInto(wrap, `<div class="cyc-card">${photo}<div class="cyc-body">
+      <span class="cyc-top is-fin"><span class="cyc-fin-h"><span class="cyc-fin-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${last ? 'Roadmap complete' : 'Cycle complete'}</span>${last ? '' : `<span class="cyc-of">· ${p.cIdx + 1} of ${p.count}</span>`}</span>
+      ${name}
       <span class="cyc-fin-s">Finished ${cycDate(p.cur.endDate)} · ${what}</span>
       ${last ? `<span class="cyc-fin-meter">${cycles.map((c, i) => `<span>C${i + 1}</span>`).join('')}</span>`
              : `<span class="cyc-row"><span class="cyc-k">Week ${p.wk.total}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.total)}</span>`}
       <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} sessions</small></span>${bar(p.planned, p.done)}</span>
       ${wins}
-    </div>`;
+    </div></div>`);
     return;
   }
-  // It is ON Progress now, so it is a plain card: no tap, no ›.
-  wrap.innerHTML = `<div class="cyc-card">
-      <span class="cyc-top"><span>Cycle ${p.cIdx + 1} of ${p.count} · <b>${esc(p.cur.name || '')}</b></span></span>
+  // It is ON Progress now, so it is a plain card: no tap, no ›. The days left show in the cycle's last 14 days (the rule the banner had).
+  const left = cycleDayNo(p.cur.endDate) - todayDayNo();
+  const sd = cycDate(p.cur.startDate), ed = cycDate(p.cur.endDate);
+  const dates = (sd && ed ? sd + ' – ' + ed : sd || ed) + (left >= 0 && left <= 14 ? ` · <b>${left} ${left === 1 ? 'day' : 'days'} left</b>` : '');
+  paintInto(wrap, `<div class="cyc-card">${photo}<div class="cyc-body">
+      <span class="cyc-top">This cycle · ${p.cIdx + 1} of ${p.count}</span>
+      ${name}
+      ${dates ? `<span class="cyc-dates">${dates}</span>` : ''}
       <span class="cyc-row"><span class="cyc-k">Week ${p.wk.wk}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.wk)}</span>
       <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} sessions</small></span>${bar(p.planned, p.done)}</span>
       ${wins}
-    </div>`;
+    </div></div>`);
 }
 window.paintCycleCard = paintCycleCard;
 
-// Home between cycles (PROG-02): where This Week was, the next cycle (Game Plan's own card, folded) when the
+// Home between cycles (PROG-02): where This Week was, the next cycle (Progress's own Up next row, folded: roadRowHTML()) when the
 // roadmap has one, the one ask, Ready for Cycle N?, and one row that unfolds the cycle's day cards.
 function betweenCyclesHTML(o) {
   const n = o.cIdx + 1, nDays = ((DATA.workouts && DATA.workouts.days) || []).length;
@@ -8241,8 +8023,7 @@ function betweenCyclesHTML(o) {
     <span class="hrow-b"><span class="hrow-l">${o.next ? 'Cycle ' + n : 'Roadmap'} complete</span><span class="hrow-q">Finished ${cycDate(o.cur.endDate)} · see it on Progress</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
   const h = fin + (o.next
     ? `<div class="home-section-head"><div class="home-section-title">Up next</div></div>
-      <div class="bt-next">${cycleCardHTML(o.next, { folded: true, pill: 'Up next!', pillStyle: 'next', total: o.count,
-        paragraphs: (o.next.teaser || {}).paragraphs, italicLast: true, onclick: "goTo('plan')" })}</div>${ask}`
+      <div class="bt-next"><div class="road">${roadRowHTML(o.next, o.cIdx + 1, { state: 'next', idp: 'bt-road-body-', open: false })}</div></div>${ask}`
     : `<div class="home-section-head"><div class="home-section-title">What's next</div></div>
       <div class="bt-sum">You've trained the whole plan.</div>${ask}`);
   return h +`<div class="home-section-head"><div class="home-section-title">${o.next ? 'Between cycles' : 'Keep moving'}</div></div>
@@ -8382,125 +8163,25 @@ function renderPlan() {
 
   // ── New schema: cycles[] + currentCycleIndex (single source of truth)
   const cycles = Array.isArray(DATA.cycles) ? DATA.cycles : [];
-  const idx = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
-  const current = cycles[idx];
-  const next = cycles[idx + 1];
-  const hasCycles = cycles.length > 0;
 
-  // Helper: derive a status label from the cycle's position relative to currentCycleIndex
-  const statusOf = i => {
-    if (i < idx) return 'completed';
-    if (i === idx) return cycleOver() ? 'completed' : 'active';   // past its end date it is done (PROG-02)
-    if (i === idx + 1) return 'next';
-    return 'locked';
-  };
-
-  // Format an ISO date ("2024-04-28") into "APR 28". Returns '' on failure so
-  // we just hide the dates row when the schema field is missing or malformed.
-  // A date-only string is a local calendar day (new Date('2026-10-16') is UTC midnight, which is the 15th west of UTC).
-  const isoDay = (iso) => { const s = String(iso).slice(0, 10); return /^\d{4}-\d\d-\d\d$/.test(s) ? new Date(s + 'T00:00:00') : new Date(iso); };
-  const fmtDate = (iso) => {
-    if (!iso) return '';
-    const d = isoDay(iso);
-    if (isNaN(d)) return '';
-    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    return `${months[d.getMonth()]} ${d.getDate()}`;
-  };
-
-  // Days remaining until a date string (returns null if the date is missing/invalid)
-  const daysUntil = (iso) => {
-    if (!iso) return null;
-    const end = isoDay(iso);
-    if (isNaN(end)) return null;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
-    return Math.round((end - today) / 86400000);
-  };
-
-  // ── PROGRESS HEADER (name as the eyebrow, "Progress" as the title, goal + dates) ──────
+  // ── PROGRESS HEADER (name as the eyebrow, "Progress" as the title, the sport badge) ──────
   // Plain page header — no card chrome, no avatar. The athlete's name is the small eyebrow and the screen's name is the
   // title (Amir, 2026-10-12: the Game Plan tab became Progress). The goal badge
   // may carry a leading emoji (e.g. "🎾 Tennis Performance"); strip it so the
-  // subtitle reads as clean mono caps like the rest of the page.
+  // subtitle reads as clean mono caps like the rest of the page. The cycle's dates and its days left are on the
+  // This cycle cover under it now (paintCycleCard(), 2026-10-13), so the header has no dates line.
   const rawGoal = (DATA.sport && DATA.sport.badge) ? DATA.sport.badge : '';
   const goalText = esc(rawGoal.replace(/^[^A-Za-z0-9]+/, '').trim());
-
-  // Dates string (e.g. "APR 28 — JUN 1") — only built if cycle has start/end
-  let datesText = '';
-  if (current) {
-    const s = fmtDate(current.startDate);
-    const e = fmtDate(current.endDate);
-    if (s && e) datesText = `${s} — ${e}`;
-    else if (s)  datesText = `Starts ${s}`;
-    else if (e)  datesText = `Ends ${e}`;
-  }
-  // Cycle X / Y is shown as the segmented meter below — no need to repeat it
-  // here. Just show the dates if available.
   document.getElementById('athlete-card-wrap').innerHTML = `
     <div class="athlete-header">
       <div class="prog-eyebrow">${esc([a.firstName, a.lastName].filter(Boolean).join(' '))}</div>
       <h1 class="prog-title">Progress</h1>
       ${sportBadgeHtml(rawGoal) || (goalText ? `<div class="athlete-card-detail">${goalText}</div>` : '')}
-      ${datesText ? `<div class="athlete-card-dates">${datesText}</div>` : ''}
     </div>`;
 
-  // ── SUBSCRIPTION BANNER (only when ≤14 days remain in current cycle) ──
-  if (current && current.endDate) {
-    const days = daysUntil(current.endDate);
-    if (days !== null && days >= 0 && days <= 14) {
-      const endStr = fmtDate(current.endDate);
-      const daysLabel = days === 1 ? 'day' : 'days';
-      document.getElementById('sub-banner-wrap').innerHTML = `
-        <div class="sub-banner">
-          <div class="sub-banner-dot"></div>
-          <div class="sub-banner-text"><strong>${days} ${daysLabel}</strong> left in cycle · ends ${endStr}</div>
-        </div>`;
-    }
-  }
-
-  // ── Past program card — the cycle immediately before the current one.
-  // Uses the same shared card as the current/future cycles, plus a "Done" pill
-  // and an onclick that opens the archive view. Only rendered when there is a
-  // previous cycle AND an archived program to view.
-  // Two cards in a row from the same family read as one picture repeated, so the
-  // second one is mirrored and re-tinted. Cards render in DOM order below: past,
-  // current, then the future stack, which is the order an athlete scrolls them.
-  let _artPrev = null;
-  const artAlt = c => { const f = cycleArt(c); const same = f === _artPrev; _artPrev = f; return same; };
-
-  const prevCycle = idx >= 1 ? cycles[idx - 1] : null;
-  const archiveList = Array.isArray(DATA.programHistory) ? DATA.programHistory : [];
-  if (prevCycle && archiveList.length) {
-    const histId = archiveList[0].id;
-    document.getElementById('past-card-wrap').innerHTML = cycleCardHTML(prevCycle, {
-      folded: true,
-      pill: 'Done',
-      alt: artAlt(prevCycle),
-      total: cycles.length,
-      onclick: `goTo('archive', '${esc(histId)}')`
-    });
-  }
-
-  // ── NEW CYCLE METER (segments + C1/C2/C3 labels) ───────────────────
-  if (hasCycles) {
-    const total = cycles.length;
-    const segs = cycles.map((_, i) => {
-      const status = statusOf(i);
-      const cls = status === 'completed' ? 'done' : status === 'active' ? 'current' : '';
-      return `<div class="cycle-meter-seg ${cls}"></div>`;
-    }).join('');
-    const labels = cycles.map((_, i) => {
-      const status = statusOf(i);
-      const cls = status === 'completed' ? 'done' : status === 'active' ? 'current' : '';
-      return `<div class="cycle-meter-label ${cls}">C${i+1}</div>`;
-    }).join('');
-    document.getElementById('cycle-meter-wrap').innerHTML = `
-      <h2 class="prog-sec">Game Plan</h2>
-      <div class="cycle-meter">
-        <div class="cycle-meter-bars">${segs}</div>
-        <div class="cycle-meter-labels">${labels}</div>
-      </div>`;
+  // ── THE ROAD: the Game Plan title, then one row per cycle (Done · Now · Up next · Locked), on the paper (paintRoad()).
+  if (cycles.length) {
+    paintRoad();
   } else {
     // Simple fallback for athletes without any cycles defined
     const label = DATA.workouts && DATA.workouts.label;
@@ -8510,55 +8191,6 @@ function renderPlan() {
           <div class="home-simple-meta-row"><strong>Program</strong><span>${esc(label)}</span></div>
         </div>`;
     }
-  }
-
-  // ── Current cycle message card (renders if the current cycle has any rich content)
-  // The banner caption shows "Cycle n of N", the name, weeks and tagline (these
-  // used to live in a separate hero above the meter), then the aims + paragraphs
-  // + outcomes.
-  if (current && (current.message || (current.focuses && current.focuses.length))) {
-    const msg = current.message || {};
-    const done = !!cycleOver();   // past its end date (PROG-02)
-    document.getElementById('current-message-wrap').innerHTML = cycleCardHTML(current, {
-      pill: done ? 'Done' : 'Active',
-      alt: artAlt(current),
-      pillStyle: done ? '' : 'active',
-      total: cycles.length,
-      onclick: "goTo('home')",
-      bannerOnly: true,
-      paragraphs: msg.paragraphs,
-      bodyLabel: 'Why This Cycle Matters',
-      outcomes: msg.outcomes
-    });
-  }
-  // Because: the cycle's reasons on one page — only when there are enough of
-  // them to read as a plan (three), never a thin page with one line on it.
-  const nWhy = whyList().length;
-  if (current && nWhy >= 3) {
-    document.getElementById('current-message-wrap').insertAdjacentHTML('beforeend',
-      `<button type="button" class="why-plan-btn" onclick="openWhyPlan()">Why your plan looks like this<small>${nWhy} reasons ›</small></button>`);
-  }
-
-  // ── All future cycles — rendered through the SAME shared card builder as the
-  // past and current cards, so every card on Game Plan matches.
-  const future = cycles.slice(idx + 1);
-  if (future.length) {
-    let html = '';
-    future.forEach((c, i) => {
-      const teaser = c.teaser || {};
-      // First future card is the immediate next cycle; everything after is locked.
-      const isNext = i === 0;
-      html += cycleCardHTML(c, {
-        folded: true,
-        pill: isNext ? 'Up next!' : 'Locked',
-        alt: artAlt(c),
-        pillStyle: isNext ? 'next' : 'locked',
-        total: cycles.length,
-        paragraphs: teaser.paragraphs,
-        italicLast: true
-      });
-    });
-    document.getElementById('upcoming-wrap').innerHTML = html;
   }
 
   // Your numbers: Personal records and Body weight (they were Home's last two rows until 2026-10-12). Daily habits stay on Home.
@@ -9688,26 +9320,60 @@ function renderRoundCues(cues) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-//  4. RENDER: ARCHIVE — a single completed past program (opened from the
-//     "Done" card on Game Plan; not a bottom-nav tab).
 // ═══════════════════════════════════════════════════════════════════════
+//  4. RENDER: ARCHIVE — a single completed past program (opened from the
+//     Done row on Progress's road; not a bottom-nav tab). The Centre Court look
+//     (Amir, 2026-10-13): a compact cover (the cycle's picture graded into the
+//     green, ← as the day cover's glass button, "● COMPLETED · CYCLE 1", the
+//     name in capitals, its weeks in mono), then each day as a block title and
+//     its exercises as paper rows. Read only: nothing to tick, nothing to open.
+// ═══════════════════════════════════════════════════════════════════════
+// Which cycle an archived program is: the one it is named for (the entry's subtitle is meant to be the cycle's name, SCHEMA.md), else
+// its id ("prog2" is cycle 2), else, for the newest entry, the cycle before the current one (the row that opens it).
+function archiveCycleOf(program) {
+  const cycles = Array.isArray(DATA.cycles) ? DATA.cycles : [];
+  const low = v => String(v || '').trim().toLowerCase();
+  const byName = [program.subtitle, program.label].map(low).filter(Boolean);
+  let i = cycles.findIndex(c => byName.indexOf(low(c.name)) >= 0);
+  if (i < 0) {
+    const m = /^prog(\d+)$/i.exec(String(program.id || ''));
+    if (m) i = cycles.findIndex(c => c.num != null && +c.num === +m[1]);
+    if (i < 0 && m && cycles[+m[1] - 1]) i = +m[1] - 1;
+  }
+  const idx = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+  if (i < 0 && (DATA.programHistory || [])[0] === program && idx >= 1 && cycles[idx - 1]) i = idx - 1;
+  return i >= 0 ? { c: cycles[i], n: i + 1 } : null;
+}
+// The cover's lines. `art` is a picture's address or '' (the plain green).
+function paintArchiveCover(label, title, weeks, art) {
+  const lab = document.getElementById('archive-label'), tit = document.getElementById('archive-title'), wk = document.getElementById('archive-weeks');
+  const img = document.getElementById('archive-img'), banner = document.getElementById('archive-banner');
+  if (lab) lab.textContent = label;
+  if (tit) tit.textContent = title;
+  if (wk) { wk.textContent = weeks; wk.hidden = !weeks; }
+  if (banner) banner.classList.remove('no-img');
+  if (img) {
+    img.style.display = '';
+    if (art) { img.hidden = false; img.src = art; } else { img.hidden = true; img.removeAttribute('src'); }
+  }
+}
 function renderArchive(programId) {
   const program = (DATA.programHistory || []).find(p => p.id === programId);
   if (!program) return;
-
-  document.getElementById('archive-banner').setAttribute('data-watermark', program.label.toUpperCase());
-  document.getElementById('archive-title').innerHTML =
-    `${esc(program.label)}<br><span>${esc(program.subtitle)}</span>`;
-
-  document.getElementById('archive-scroll').innerHTML = program.days.map(day => `
-    <div class="archive-day-block">
-      <div class="archive-day-title">${esc(day.label)} <span>· ${esc(day.focus)}</span></div>
-      <div class="archive-exercise-list">
-        ${day.exercises.map(ex =>
-          `<div class="archive-ex"><span class="archive-ex-name">${esc(ex.name)}</span><span class="archive-ex-detail">${esc(ex.detail)}</span></div>`
-        ).join('')}
-      </div>
-    </div>`).join('');
+  const cyc = archiveCycleOf(program);
+  const days = Array.isArray(program.days) ? program.days : [];
+  const m = /^prog(\d+)$/i.exec(String(program.id || ''));
+  const n = cyc ? cyc.n : m ? +m[1] : 0;
+  paintArchiveCover(n ? 'Completed · Cycle ' + n : 'Completed · ' + (program.label || 'Program'),
+    program.subtitle || (cyc && cyc.c.name) || program.label || 'Past program',
+    (cyc && cyc.c.weeks) || (days.length ? days.length + ' day' + (days.length === 1 ? '' : 's') : ''),
+    cyc ? cycleArtUrl(cyc.c) : '');
+  document.getElementById('archive-scroll').innerHTML = days.map(day => {
+    const exs = Array.isArray(day.exercises) ? day.exercises : [];
+    return `<section class="archive-day"><h2 class="archive-day-title">${esc([day.label, day.focus].filter(Boolean).join(' · '))}</h2>${
+      exs.map((ex, k) => `<div class="archive-ex"><span class="archive-ex-num" aria-hidden="true">${k + 1}</span>`
+        + `<span class="archive-ex-tx"><span class="archive-ex-name">${esc(ex.name)}</span>${ex.detail ? `<span class="archive-ex-detail">${esc(ex.detail)}</span>` : ''}</span></div>`).join('')}</section>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -9716,36 +9382,32 @@ function renderArchive(programId) {
 function renderNotes() {
   const notes = DATA.notes || {};
 
-  // ── Personal notes (per-client, from JSON). Closed by default; tap to open.
-  //    Each card gets an on-brand colour tile (green/clay/paper, cycled). The
-  //    note's emoji is resolved to a matching line icon via resolveIconKey() —
-  //    coaches keep authoring with emoji; the app translates them. No raw emoji.
-  const TONES = ['', 'tone-clay', 'tone-paper'];
-  const personalCards = (notes.cards || []).map((card, i) => `
-    <div class="note-card note-personal" onclick="toggleNote(this)">
-      <div class="note-card-row">
-        <div class="note-tile ${TONES[i % TONES.length]}">${window.ICON(window.resolveIconKey(card.icon))}</div>
-        <div class="note-card-main">
-          ${card.date ? `<div class="note-date">${esc(card.date)}</div>` : ''}
-          <div class="note-card-title">${esc(card.title)}</div>
-          <div class="note-cta">Tap to read ›</div>
-        </div>
-      </div>
-      <div class="note-body">${card.body}</div>
+  // ── Notes from Amir (per-client, from JSON): fold rows on the paper, all closed to start, one opens at a time
+  //    (toggleCoachNote()). The note's emoji is resolved to a matching line icon via resolveIconKey(): coaches keep
+  //    authoring with emoji and the app translates them. No raw emoji and no coloured tile. The body is the coach's own HTML
+  //    (paragraphs, lists, bold). No notes, no section.
+  const rows = (notes.cards || []).map((card, i) => `
+    <div class="cn-item">
+      <button type="button" class="cn-row" id="cn-h-${i}" aria-expanded="false" aria-controls="cn-b-${i}" onclick="toggleCoachNote(this)">
+        <span class="cn-ic" aria-hidden="true">${window.ICON(window.resolveIconKey(card.icon), 1.6)}</span>
+        <span class="cn-main"><span class="cn-title">${esc(card.title)}</span>${card.date ? `<span class="cn-date">${esc(card.date)}</span>` : ''}</span>
+        <span class="cn-chev" aria-hidden="true"></span>
+      </button>
+      <div class="cn-body" id="cn-b-${i}" role="region" aria-labelledby="cn-h-${i}" hidden>${card.body || ''}</div>
     </div>`).join('');
 
-  // ── "Using the app": the guide (APP_GUIDE) opens in the one sheet now (COACH-02); the
-  //    Coach tab keeps one row for it, and stays Amir's voice.
-  const appRow = `<button type="button" class="note-card app-help-row" onclick="openHelp()">
-      <span class="app-card-icon">${window.ICON('help')}</span>
-      <span class="note-card-title">How the app works</span>
-      <span class="app-help-go" aria-hidden="true">›</span>
+  // ── How the app works: the guide (APP_GUIDE) opens in the one sheet (COACH-02); the Coach tab keeps ONE door row for it
+  //    (Home's .hrow look), with no section label above it, and stays Amir's voice.
+  const door = `<button type="button" class="hrow" onclick="openHelp()">
+      <span class="hrow-ic" aria-hidden="true">${window.ICON('help', 1.6)}</span>
+      <span class="hrow-b"><span class="hrow-l">Using the app</span><span class="hrow-v">How the app works</span></span>
+      <span class="hrow-a" aria-hidden="true">›</span>
     </button>`;
 
   document.getElementById('notes-container').innerHTML =
     coachContactHtml() +
-    (personalCards ? `<div class="notes-section-label">Personal notes</div>${personalCards}` : '') +
-    `<div class="notes-section-label">Using the app</div>${appRow}`;
+    (rows ? `<div class="prog-sec">Notes from Amir</div><div class="cn-list">${rows}</div>` : '') +
+    door;
 }
 
 // "Using the app" — the general how-to content shown to every athlete in the
@@ -9796,7 +9458,7 @@ const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
     body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
-    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The "Why This Cycle Matters" note on <strong>Progress</strong>, in the Game Plan, explains what we're chasing right now.</p>` },
+    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
     body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
@@ -9893,13 +9555,23 @@ function sessionWaUrl(dayId) {
   return coachWhatsAppUrl('About Day ' + dayId + title + ': ' + (note ? note + ' ' : ''));
 }
 window.sessionWaUrl = sessionWaUrl;
+// The Coach tab's WhatsApp panel, the screen's one green thing (2026-10-13): ONE <a> (the same href, target and pre-filled message
+// as before), so every part of it opens WhatsApp. The "Open WhatsApp" button is a <span> inside it, not a second link. His photo is
+// graded into the green on the right, his signature and photo sign it at the foot (WN_SIG and .wn-av, as the week note signs).
+// The number sits under it as plain selectable text (COACH_WHATSAPP_SHOWN).
 function coachContactHtml() {
-  return `<a class="coach-wa" href="${esc(coachWhatsAppUrl())}" target="_blank" rel="noopener">
-      <span class="coach-wa-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg></span>
-      <span class="coach-wa-txt"><b>Message me on WhatsApp</b><small>Questions, swaps, anything that hurts, form videos.</small></span>
-      <span class="coach-wa-go" aria-hidden="true">→</span>
+  return `<a class="coach-panel" href="${esc(coachWhatsAppUrl())}" target="_blank" rel="noopener" aria-label="Open WhatsApp and message Amir">
+      <img class="coach-panel-img" src="assets/img/coach.jpg" alt="" onerror="this.remove()">
+      <span class="coach-panel-scrim" aria-hidden="true"></span>
+      <span class="coach-panel-body">
+        <span class="coach-panel-eye">Questions, swaps, anything that hurts</span>
+        <span class="coach-panel-title">Message me on WhatsApp</span>
+        <span class="coach-panel-line">Form videos welcome. I answer there, not in the app.</span>
+        <span class="coach-panel-btn">${WA_ICON}Open WhatsApp</span>
+        <span class="coach-panel-by">${WN_SIG}</span>
+      </span>
     </a>
-    <div class="coach-wa-num">${COACH_WHATSAPP_SHOWN}</div>`;
+    <div class="coach-num">${COACH_WHATSAPP_SHOWN}</div>`;
 }
 
 // Where the Library was scrolled when a session or an article opened from it (POL-01): coming back
@@ -9942,12 +9614,13 @@ function goTo(screen, historyId, keepContent) {
     paintWeekSugg();   // gone once its session has been opened (LIB-01)
   }
 
-  // Progress — rebuild the two number rows and the cycle card. They were Home's until 2026-10-12 and had the same
+  // Progress — rebuild the two number rows, the cycle card and the road. They were Home's until 2026-10-12 and had the same
   // reason: a max saved during today's session, or a weight logged, would show stale until a reload. The Records
   // row counts up to a new best here (paintNumbers() runs ceilingCountUp() while Progress is the screen on show).
   if (screen === 'plan') {
     paintNumbers();
     paintCycleCard();
+    paintRoad();   // a cycle that ended while the app sat open reads Done; every row keeps its fold
   }
 
   // Leaving Personal Records by any route other than its own back chevron drops the
@@ -10103,17 +9776,11 @@ function initSheetSwipe(overlayId, close) {
   m.addEventListener('touchcancel', end);
 }
 
-// Empty-state for the archive view when there are no past programs yet
+// Empty-state for the archive view when there are no past programs yet: the cover says so, and one plain sentence on the paper.
 function renderArchiveEmpty() {
-  const banner = document.getElementById('archive-banner');
-  const title  = document.getElementById('archive-title');
+  paintArchiveCover('Completed', 'No archives yet', '', '');
   const scroll = document.getElementById('archive-scroll');
-  if (banner) banner.setAttribute('data-watermark', '');
-  if (title)  title.innerHTML = 'No <span>archives</span> yet';
-  if (scroll) scroll.innerHTML = `
-    <div style="padding: 40px 20px; text-align: center; font-family: 'Barlow', sans-serif; color: #888; font-size: var(--fs-body); line-height: 1.6;">
-      Past programs will appear here once your first cycle wraps up.
-    </div>`;
+  if (scroll) scroll.innerHTML = `<p class="archive-empty">Past programs will appear here once your first cycle wraps up.</p>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -10257,13 +9924,14 @@ function habitCardHtml() {
     <span class="hrow-a" aria-hidden="true">›</span></button>`;
 
 }
-// The line icon at the left of a door row (Home's habits row, Progress's Records and Body weight rows). A function, not a const:
+// The line icon at the left of a door row (Home's habits row, Progress's Records and Body weight rows, the road's Why your plan row). A function, not a const:
 // the rows are drawn from boot(), which can run before this line of the script has been evaluated (the temporal dead zone).
 function hrowIc(kind) {
   const draw = {
     habits: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16 9.5"/>',
     records: '<path d="M5 20v-6M12 20V9M19 20V4"/>',
     weight: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 10.5a4.5 4.5 0 0 1 8 0"/><path d="M12 10.5l1.7-2"/>',
+    why: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.4a2.6 2.6 0 1 1 3.9 2.2c-.9.5-1.4 1.1-1.4 2"/><path d="M12 16.9h.01"/>',
   }[kind] || '';
   return `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${draw}</svg></span>`;
 }
@@ -12969,6 +12637,13 @@ function toggleNote(card) {
   const scope = card.closest('#notes-container, .help-list') || document;
   scope.querySelectorAll('.note-card.open').forEach(c => c.classList.remove('open'));
   if (!wasOpen) card.classList.add('open');
+}
+// The same rule for the Coach tab's Notes from Amir (2026-10-13): a fold row is a <button aria-expanded> over its body, one open at a time.
+function toggleCoachNote(btn) {
+  const wasOpen = btn.getAttribute('aria-expanded') === 'true';
+  const set = (b, open) => { b.setAttribute('aria-expanded', open ? 'true' : 'false'); const body = document.getElementById(b.getAttribute('aria-controls')); if (body) body.hidden = !open; };
+  document.querySelectorAll('#notes-container .cn-row[aria-expanded="true"]').forEach(b => set(b, false));
+  if (!wasOpen) set(btn, true);
 }
 
 // ── Carry an exercise's history across a rename ──────────────────────────────
