@@ -714,7 +714,7 @@
     const ul = a => `<ul class="list">${(a || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
     // «سیستم آمادگی جسمانی تنیس · سطح ۲»: the name is the title, the level goes in the eyebrow with the length of the plan.
     const tp = String(s.title || '').split(' · '), lvl = tp.slice(1).join('، ');
-    const kicker = lvl ? `${fa(esc(lvl))}، ${fa(16)} هفته` : 'کتاب راهنمای آمادگی جسمانی تنیس';
+    const kicker = lvl ? `${fa(16)} هفته، ${fa(esc(lvl))}` : 'کتاب راهنمای آمادگی جسمانی تنیس';   // number then word: «۱۶ هفته، سطح ۲», never «سطح ۲، ۱۶»
     // The one button: carry on where this phone left off (a week that exists), else week 1.
     const last = lastWeek(), N = last && C.programme && weekData(last) ? last : 0;
     const go = `<a class="btn primary big" href="#/programme/week/${N || 1}">${N ? 'ادامه: هفتهٔ ' + fa(N) : 'شروع هفتهٔ ۱'}${GO_TRI}</a>`;
