@@ -3,7 +3,7 @@
 Written 2026-10-01 at the end of a long session. Read this first when you pick the work up. This folder is on Amir's PC and is the one you edit. On his "go live"
 (2026-10-01, twice: morning and night) a mirror of it was committed to the website repo at `.claude/skills/cut/` (see the table; the night one is commit 69011f8: the Motion Menu connection and its
 tidy-up, stage 3 of the kit, showreels 5-6). After any later change run `python tools\sync_to_repo.py` and commit it only when he says "go live". The other thing published outside this PC is his own
-Motion Menu artifact (version 7 on 2026-10-01, after the tidy-up). **The page comes from `kit\menu\menu.json` alone (one source, his word 2026-10-01); menu numbers come from `Content/motion/numbers.json` in the website repo, the only file left there: the old lab was deleted on 2026-10-02 (not committed, `git restore Content/motion` brings it back). Read `kit\MENU.md` "One source".**
+Motion Menu artifact (version 7 on 2026-10-01, after the tidy-up). **The page comes from `kit\menu\menu.json` alone (one source, his word 2026-10-01); menu numbers come from `kit/menu/numbers.json` in the website repo, the only file left there: the old lab was deleted on 2026-10-02 (not committed, `git restore Content/motion` brings it back). Read `kit\MENU.md` "One source".**
 
 ## What this is
 Amir (online S&C coach, Farsi Instagram reels) is **not an editor**. He gave Claude the job of creative director and editor for his

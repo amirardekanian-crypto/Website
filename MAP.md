@@ -282,10 +282,9 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   from the picture's own cue sheet. Canvas engine + Playwright renderer + numpy audio, **no generation credits**.
   Every shot and scene change is built from named kit pieces, and a tool proves it renders the same 450 frames (see Motion Menu below).
   Live page [`reel.html`](Content/showreel/reel.html) (serve `Content/`, not this folder) · the file [`claude-motion-reel.mp4`](Content/showreel/claude-motion-reel.mp4) (+ `poster.jpg`) · rebuild steps in its README.
-- **Motion Menu** (2026-10-01): Claude's own list of moves, looks and sounds for reels. The lab folder `Content/motion/` was emptied (only the number ledger
-  [`numbers.json`](Content/motion/numbers.json) stays: menu numbers are never changed or reused). The menu now has **one source**, the `/cut` skill's
+- **Motion Menu** (2026-10-01): Claude's own list of moves, looks and sounds for reels. It has **one source**, the `/cut` skill's
   [`menu.json`](.claude/skills/cut/kit/menu/menu.json) (how: [`MENU.md`](.claude/skills/cut/kit/MENU.md)), published as a private page where Amir marks Keep / Maybe / Drop:
-  <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA>. The kit that builds the showreel from named pieces lives under `.claude/skills/cut/kit/`; start at [`HANDOFF.md`](.claude/skills/cut/kit/HANDOFF.md).
+  <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA>. Menu numbers have one ledger, [`numbers.json`](.claude/skills/cut/kit/menu/numbers.json) (never changed, never reused; it left `Content/motion/` on 2026-10-13, and that folder is gone). The kit that builds the showreel from named pieces lives under `.claude/skills/cut/kit/`; start at [`HANDOFF.md`](.claude/skills/cut/kit/HANDOFF.md).
 - **Result cards / app mockups:** [`card-preview.html`](Content/card-preview.html)
   (rebuilds every app card with real class names) → exports in
   [`instagram-cards/`](Content/instagram-cards/) (legacy style, off-palette).

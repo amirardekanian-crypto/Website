@@ -6,7 +6,7 @@ form to exist, so you understand and find them quickly and use them quickly to e
 talking videos or for his business; fix duplicates; know when and how to use each one. The menu went from 224 items to **78 cards** (version 7).
 
 **The numbers clash with the showreels** (menu 41 was Spring Lab, showreel 41 is the diagram chain): always say "menu N" or "showreel N". A removed number is never used again;
-the next new card is **226** (the ledger is `Content/motion/numbers.json`, see "One source").
+the next new card is **226** (the ledger is `kit/menu/numbers.json`, see "One source").
 
 ## How it is built
 | Where | What |
@@ -15,7 +15,7 @@ the next new card is **226** (the ledger is `Content/motion/numbers.json`, see "
 | the page (artifact) | Generated from the manifest by `tools/menu_patch.py`. Never edit its data by hand. |
 | the page's database | `marks` (his Keep / Maybe / Drop, his rename and note: one doc per card id) and `adds` (ideas he adds with + Add). Only he writes marks. |
 | `kit/sfx/` + `kit.py` | Every sound card is a file here. `kit.py` reads the sound cards of `menu.json` into the `SFX` table, so `sfx=[(E(t), "thump")]` plays the card called Thump. The 11 old names (pop, ding, thock, hit, stamp, step, rise, tick, roll, swipe, whoosh) still work. |
-| `Content/motion/numbers.json` (in the website repo) | The one ledger of menu numbers. It is the only file left in `Content/motion/`: the lab that used to sit there was deleted on 2026-10-02. |
+| `kit/menu/numbers.json` | The one ledger of menu numbers. It moved here from `Content/motion/` on 2026-10-13 (the lab folder there was deleted on 2026-10-02). |
 | `menu/archive/` | The /cut-only manifest this started from and the page as it was before the tidy (version 6). |
 | `menu/tidy_2026-10-01.py` | The record of the tidy: every one of the 224 old items, what was decided and why. Do not run it again. |
 
@@ -31,7 +31,7 @@ The website repo's `Content/motion/` was the page's FIRST builder (the "lab": `c
 `tools/build_menu.py`, the menu samples). It made items 1-183 and their samples on 2026-10-01. It was settled the same night, and on **2026-10-02 Amir had the lab deleted** (the Reels folder's
 `menu-samples`, `kit-showreel`..`kit-showreel6`, `hctv3230`, `raw` and `_tests` went too). It is not committed: `git restore Content/motion` in the repo brings the lab back.
 - **The live page is built ONLY from `kit/menu/menu.json` by `tools/menu_patch.py`.** Nothing else publishes it.
-- **One ledger of numbers: `Content/motion/numbers.json`**, the only file left in that folder (id to number, never reused; 1 to 225 are taken, `next` is 226). A card's `no` in `menu.json` must be the ledger's number for its id, and `menu_patch.py`
+- **One ledger of numbers: `kit/menu/numbers.json`**, moved here from `Content/motion/` on 2026-10-13 (id to number, never reused; 1 to 225 are taken, `next` is 226). A card's `no` in `menu.json` must be the ledger's number for its id, and `menu_patch.py`
   stops with a PROBLEM if it is not. A new card: take `next` from the ledger, add the id and number there, use the same number in `menu.json`, raise `next`. `catalog.py`, which used to number lab pieces, is gone: nothing else writes to the ledger.
 - **"Not built." on a card means not built as a /cut block** (Hyperframes). Several of those ideas (Range, Stat Chart, Cross Out, Pivot, Heartbeat, Dial) were canvas pieces in the old lab; they are
   gone from disk (they remain in the repo's git history). Port the idea to a /cut block when a reel needs it. A card's sample now comes only from a showreel (`tools\menu_samples.py`, step 3 below).
@@ -53,7 +53,7 @@ The digest prints Keep (use first), Maybe (ask him), Drop (see below), his names
 
 ## 2. Something is missing: build it, then add the card
 1. **Build the block** in the kit as always (`kit.js` / `kit.css`, a demo in a showreel build script, a `BLOCKS.md` row with "do NOT use it when", the cue table). `USAGE.md` rules stand.
-2. **Add a card to `menu.json`**: the group it belongs to (same job, same place: look at the group before you make a new one), the next free `no` from the ledger (`Content/motion/numbers.json`: add the id there too and raise its `next`), `label`, `when`, `how` (a real call),
+2. **Add a card to `menu.json`**: the group it belongs to (same job, same place: look at the group before you make a new one), the next free `no` from the ledger (`kit/menu/numbers.json`: add the id there too and raise its `next`), `label`, `when`, `how` (a real call),
    `takes`, `farsi`, `pairs` (sound ids that exist), `like`, `cut`. If it is only a new form of an existing card, add an `alts` entry instead of a new card.
 3. **Make its sample** from the showreel: `python tools\menu_samples.py prepare` (once per showreel), `render <N>`, then `cut <id>` (a form's key works too). 450x800, no sound, no burned-in label.
    `prepare` re-creates `C:\Users\Amir\Videos\Reels\menu-samples\` (deleted on 2026-10-02, about 1.8 GB when full) and needs the showreel folders it copies from, which were deleted too: rebuild the showreel first, and delete `menu-samples` again after publishing.
