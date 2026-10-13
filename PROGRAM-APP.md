@@ -902,7 +902,7 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
   `scripts/headless/entry-screens.js`, 121 checks; one block at the very end of the sheet):
   - **Sign in** keeps Amir's "Baseline" (2026-09-12): the court photo over a hero that paints as `--hero` before the photo, the scrim a
     mask of `--hero-end`, the eyebrow *● AA PERFORMANCE* in the mint-dot recipe, *COACH* clay on green (`--clay-on-green`, the brand line).
-    The sheet is `--paper` with the app sheet's 18 px top corners; the labels Space Mono in `--grey`; the fields the set table's boxes (white
+    The sheet is `--paper` with the app sheet's 16 px top corners; the labels Space Mono in `--grey`; the fields the set table's boxes (white
     `--row`, `--field` edge, 16 px text, 48 px, 10 px corners, green focus); a failed sign-in is the day's banner (4 px clay stripe, ink text).
     Every colour is a token now (`--court` is no longer read).
   - **The Welcome** is a cover (the picture graded into `--hero` as the archive's is, *● YOU'RE IN*, *WELCOME, ALEX.*, ✕ as the 44 px glass
@@ -912,6 +912,27 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     slowly and never stops.
   - **The error screen** keeps its clay icon (an error is "look here"), the title and message in ink, `.error-btn` in the one primary list and
     `.error-btn.ghost` outlined, both 48 px. No `--yellow` left in it.
+
+- **The sheets and the notices** (`sheetWrap()`, `paintSheetBack()`, `openAccount()`, `openHelp()`, `openHistorySheet()`, `openWhyPlan()`,
+  `openQualitySheet()`, `openReadiness()`, `paintPlanOffline()`, `aaToast()`, `showInstallOffer()`; `scripts/headless/sheets-notices.js`,
+  508 checks; one block before CENTRE COURT):
+  - **One sticky top row on every sheet** (`.sheet-bar`, 56 px): the handle, **‹ Back** on the left only when a page is behind, **Close** on
+    the right (44 px, green ink; white on the About sheet's green, where the row turns solid green once the page scrolls under it). It is
+    drawn once, by `paintSheetBack()` for the sheet and in the markup for the readiness check (whose Close cancels it). The six grey Close
+    buttons at the foot are gone; *Skip for today* stays (it is an answer). A fresh open starts at the top. The dim covers the whole
+    window at every width; from 560 px the sheet is a centred dialog with the same row and no handle.
+  - **The pages in Centre Court's parts**: Account (the name as the title, Theme as the Library's switch, Install, How the app works and
+    Privacy as door rows, Sign out quiet clay text, still two taps); Help (fold rows with a 22 px green line icon, the asked card open
+    under the row); History (the eyebrow, the chart green on the paper, the sessions as paper rows, *Open in Personal Records* as a door
+    row); Why and a Quality (green section titles, paper rows with ›); the readiness check (green section titles, the day's keys, *N of 5
+    answered* in grey until Begin turns primary).
+  - **The banner** is the day's lower-day recipe for every state that lasts on Home: the offline line (grey stripe, *OFFLINE*), *Your plan
+    was updated* (clay stripe, *UPDATE*, Refresh as the link), the filed-day card (clay stripe, *SAVED FOR YOU*, OK as the link).
+  - **The note box** (`aaToast()`) is a green cover box (`--hero`, white words, the light-ring button, 16 px corners) in the middle of the
+    screen, **above the sheets** (z 215; it was 71, under them: D9), still under the video pop-up. `opts.kicker` adds a mint-dot eyebrow
+    (no caller passes one yet). Its place, one-at-a-time rule and timings are unchanged.
+  - **The install offer** is a white bottom card styled in program.html only (shared.js serves the public site): the app icon, the words as
+    before, **Install** primary green, *Not now* quiet text (`showInstallOffer()` relabels shared.js's Dismiss).
 
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
 
@@ -1043,7 +1064,8 @@ sits beside it). A **sheet** (`.readiness-modal`: History, About, Why, Quality, 
 readiness check) has a **handle** and slides down: `initSheetSwipe()` closes it on a swipe down from the handle,
 or from anywhere while it is scrolled to its top (past 90 px, or a flick; a short drag springs back; a move up
 or one that starts mid-scroll is a scroll). A tap above it still closes it, and its **Close** (and the check-in's
-*Skip for today*) is a 44 px target now (it was 15 px). From 560 px wide the sheet is a centred dialog with no
+*Skip for today*) is a 44 px target now (it was 15 px); since 2026-10-13 Close sits top right in the sheet's one sticky
+row, beside ‹ Back (*The sheets and the notices*, above). From 560 px wide the sheet is a centred dialog with no
 handle and no drag. The rest timer keeps the button in its row: it is **Close** on its own and **Skip →** in
 Guided, where it ends the rest. The guide's first card says all this in one paragraph.
 **Back keeps your place (POL-01, 2026-09-27).** `history.scrollRestoration` is `manual`: the browser used to
@@ -1833,7 +1855,7 @@ structured" puts the "Why This Cycle Matters" note on Game Plan, where it is.
 Amir picked these after the map showed them (`Content/CLIENT-APP-MAP.md`, Part 2). They share one new piece, **`aaToast()`**: **a note in a box in the
 middle of the screen** (Amir: "all the notes should appear in a box in the middle of the screen"), one at a time, a **Got it** button (or **Start** /
 **Not now** for the clock offer), gone by itself after six seconds (twenty for the clock offer). It never dims or blocks the page, so logging can go on
-under it. Checked in `scripts/headless/first-timer.js`.
+under it. Since 2026-10-13 it is a green cover box above the sheets (z 215; *The sheets and the notices*, above). Checked in `scripts/headless/first-timer.js`.
 
 - **A first-timer's tap on a closed card's number opens it** (`toggleCheckOnly()`; the number has been the tick-all since Centre Court
   round 2): ticking every set at once logs no weight and no RPE, so nothing to
