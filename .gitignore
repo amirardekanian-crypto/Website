@@ -56,3 +56,6 @@ scripts/headless/coach/vendor-src/
 
 # Console logs the Playwright browser tool writes into the working folder: noise, never part of the site.
 .playwright-mcp/
+
+# Local-only working kits (audits and the like): never committed, never served.
+.claude/audit-kit/
