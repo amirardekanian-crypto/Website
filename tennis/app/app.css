@@ -493,69 +493,65 @@ ol.steps li::before { content: counter(s, persian); font-size: 19px; font-weight
 
 /* ══ TRAINING: Programme, Week, Session, Exercises ════════════════════════════════════════════════════════════════════════
    (viewProgramme, sessionCard, viewWeek, viewSession, exRow, exFacts, warmCard, viewTestDay, viewExercises, exListHtml,
-   viewExercise.) The older rules below are still the ones before the re-skin. */
+   viewExercise.) Centre Court's rows and numeral (section 3) do the work; this section holds only what is special to these
+   screens: the week tiles, the exercise row that opens in place, the reading lines. No shared part is overridden here. */
 
-/* ── Programme: blocks, weeks, sessions ── */
-.block-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
-.block-card .bc-top { padding: 12px 16px; color: #fff; background-color: var(--green);
-  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.05) 0 16px, rgba(255,255,255,0) 16px 32px); }
-.block-card .bc-top b { font-size: 18px; font-weight: 900; }
-.block-card .bc-top span { font-size: 13px; opacity: 0.85; margin: 0 8px; }
-.block-card .bc-body { padding: 12px 16px 14px; }
-.block-card .bc-goal { font-size: 14px; color: var(--muted); margin-bottom: 10px; }
-.block-card .bc-t { position: relative; }
-.block-card .bc-top.has-art { position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: 132px; overflow: hidden; }
-.weeks { display: flex; gap: 8px; flex-wrap: wrap; }
-.week {
-  width: 46px; height: 46px; border-radius: 12px; border: 1px solid var(--line);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 17px; background: var(--paper); text-decoration: none; color: var(--ink);
-}
-.week.open { background: var(--green); color: #fff; border-color: var(--green); }
-.week.soon { opacity: 0.4; }
-.week.locked { position: relative; color: #9a9a9a; border-style: dashed; }
+/* ── Programme: each block is a picture band (.band, 3.10), its goal as a grey line, and four week tiles. The numeral inside a
+   tile is the shared .pnum.sm: solid when the week is open, outlined grey when it is locked. The block's last week is its test
+   week and says «آزمون» in green. A tile is a link and at least 68 px tall. ── */
+.bc-goal { margin-top: 10px; font-size: var(--fs-small); line-height: 1.75; color: var(--grey); }
+.weeks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.week { display: grid; place-items: center; align-content: center; min-height: 68px; padding: 6px 0 4px; border: 1px solid var(--hair);
+  border-radius: 12px; background: var(--row); color: inherit; text-decoration: none; }
+a.week:active { background: var(--sand); }
+.week .wl { font-size: 12px; font-weight: 600; line-height: 1.4; color: var(--grey); }
+.week .wl.test { font-weight: 800; color: var(--green-ink); }
+.week.locked { background: transparent; }
+.week.soon { background: transparent; opacity: .45; }
+.block-card + .lead { margin-top: 24px; }
 
-.session-card { display: block; text-decoration: none; border-radius: var(--radius); overflow: hidden; margin-bottom: 12px;
-  background: var(--white); border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
-.session-card .sc-top { color: #fff; padding: 16px 18px 18px; background-color: var(--green);
-  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.05) 0 16px, rgba(255,255,255,0) 16px 32px),
-    linear-gradient(135deg, var(--green) 0%, var(--green-2) 100%); }
-.session-card .sc-code { font-size: 26px; font-weight: 900; line-height: 1.2; }
-.session-card .sc-title { font-size: 15px; font-weight: 700; opacity: 0.92; }
-.session-card .sc-meta { padding: 10px 18px; display: flex; gap: 6px; flex-wrap: wrap; }
-.session-card:active { transform: scale(0.99); }
-.session-card.test .sc-top { background-color: var(--clay);
-  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.07) 0 16px, rgba(255,255,255,0) 16px 32px); }
-.session-card.addon { border-style: dashed; }
-.session-card.addon .sc-top { background-color: #2F6B57;
-  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.05) 0 16px, rgba(255,255,255,0) 16px 32px); }
-.session-card.addon .sc-code { font-size: 20px; }
-.session-card.addon .sc-title { font-weight: 500; font-size: 14px; }
-.session-card .sc-top.has-art { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-height: 132px; }
-.session-card .sc-top.has-art .sc-code, .session-card .sc-top.has-art .sc-title { position: relative; }
+/* ── Week: the week's note, the session rows (.list-row, 3.7), the test day's stopwatch where a numeral would be ── */
+.section > .note:first-child { margin-top: 20px; }
+.lr-ic { display: grid; place-items: center; width: 44px; height: 44px; color: var(--green-ink); }
+.lr-ic svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.acc + .list-row { border-top: 1px solid var(--hair); }
+.acc-body .fact + .list { margin-top: 6px; }
+.list-row.soon { opacity: .55; }
+.list-row > .lock { margin: 0; }
+.lead.closing { margin-top: 18px; }
 
-/* ── Exercise rows (tap to expand) ── */
-.group-title { font-size: 14px; font-weight: 800; color: var(--muted); margin: 18px 2px 8px; display: flex; align-items: center; gap: 8px; }
-.group-title .slot { font-size: 12px; background: var(--card); border-radius: 6px; padding: 0 7px; color: var(--ink); }
-.ex { position: relative; background: var(--white); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 10px; overflow: hidden; overflow-wrap: anywhere; }
-.ex::before { content: ''; position: absolute; inset-block: 0; inset-inline-start: 0; width: 3px; background: var(--green); }
-.ex.f-warm::before, .ex.f-power::before { background: var(--clay); }
-.ex.f-speed::before { background: var(--green); }
-.ex-main { display: flex; align-items: center; gap: 12px; padding: 13px 16px; width: 100%; text-align: start; }
-.ex-num { font-weight: 900; font-size: 22px; color: #9a9a9a; line-height: 1; flex: none; min-width: 20px; }
-.ex-body { flex: 1; min-width: 0; }
-.ex-name { font-weight: 800; font-size: 16.5px; line-height: 1.5; }
-.ex-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-.ex-chev { flex: none; color: var(--muted); font-size: 12px; transition: transform 0.2s; }
-.ex.open .ex-chev { transform: rotate(180deg); }
-.ex-detail { display: none; padding: 2px 16px 16px; border-top: 1px solid var(--card); background: rgba(0,0,0,0.015); }
+/* ── Session: the one green button lives inside the cover now, so its wrapper is plain ── */
+.cta-bar { margin-top: 18px; }
+
+/* ── Exercise rows: a paper row, no box and no stripe, a hairline between neighbours. The button is a grid: the numeral in a 44 px
+   column at the start, the body, the ⌄ at the end (turned over when open, the numeral then solid). The warm-up row has no numeral.
+   The dose line steps aside once the row is open, because the scoreboard inside says the same numbers larger. ── */
+.ex { overflow-wrap: anywhere; }
+.ex + .ex { border-top: 1px solid var(--hair); }
+.ex-main { display: grid; grid-template-columns: 44px minmax(0, 1fr) 24px; align-items: center; column-gap: 12px; width: 100%; min-height: 64px;
+  padding: 12px 0; text-align: start; }
+.ex-main:active { background: rgba(14,74,54,.05); }
+.ex.warm .ex-main { grid-template-columns: minmax(0, 1fr) 24px; }
+.ex .pnum { white-space: nowrap; overflow-wrap: normal; }
+.ex-body { display: block; min-width: 0; }
+.ex-name { display: block; font-size: var(--fs-lead); font-weight: 700; line-height: 1.5; }
+.ex-dose { display: block; margin-top: 3px; font-size: 15px; font-weight: 500; line-height: 1.6; }
+.ex-dose b { font-weight: 800; }
+.ex-sub { display: block; margin-top: 2px; font-size: var(--fs-small); line-height: 1.65; color: var(--grey); }
+.ex.open .pnum { color: var(--green-ink); }
+.ex.open .chev { transform: rotate(180deg); }
+.ex.open .ex-dose { display: none; }
+.ex-detail { display: none; padding: 0 0 18px; }
 .ex.open .ex-detail { display: block; }
-.ex.warm .ex-num { font-size: 16px; color: var(--clay); }
-.list-row .ex-num { font-size: 20px; min-width: 22px; }
+.ex-links { display: flex; flex-wrap: wrap; column-gap: 22px; margin-top: 10px; }
 
-/* Sticky "start session" bar above the tabs */
-.cta-bar { position: sticky; bottom: calc(var(--tabs-h) + env(safe-area-inset-bottom)); padding: 14px 16px 10px;
-  background: linear-gradient(to bottom, rgba(250,247,242,0), var(--paper) 35%); z-index: 5; }
+/* ── What an exercise says (exFacts): reading lines under the .label titles ── */
+.fact { font-size: 15px; line-height: 1.85; }
+.fact.quiet { margin-top: 4px; font-size: var(--fs-small); color: var(--grey); }
+
+/* ── Exercises: the search, the chips, the list ── */
+.search + .chips { margin-top: 10px; }
+#exlist { margin-top: 4px; }
 
 
 /* ══ STEP, LEARN AND TESTS: step-by-step mode, Learn and a lesson, Tests and a test (the 1RM calculator, the Yo-Yo player) ══

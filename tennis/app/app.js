@@ -602,13 +602,15 @@
     </div>${it.rounds && it.roundRest ? `<div class="lead" style="margin:6px 2px 0">بین ${roundName(it)}\u200cها: ${fmtRest(it.roundRest)} آرام راه بروید</div>` : ''}${it.per ? `<div class="lead" style="margin:6px 2px 0">${faPer(it.per)}</div>` : ''}`;
   }
 
+  // What an exercise says, on its row in a session (with `it`: the numbers first, then the coach's line) and on its own page
+  // (opts.full: the video first, then the equipment and the body parts). Labels are .label; the reading is on the paper.
   function exFacts(ex, it, opts) {
     const o = opts || {};
-    let h = videoBlock(videoFor(ex));
-    if (it) h += statsGrid(it);
-    if (it && it.note) h += `<div class="note">${esc(it.note)}</div>`;
-    if (ex.purpose) h += `<div class="label">چرا این تمرین؟</div><p>${esc(ex.purpose)}</p>`;
-    if (ex.tennis) h += `<div class="label">در تنیس</div><p>${esc(ex.tennis)}</p>`;
+    const para = t => `<p class="fact">${esc(t)}</p>`;
+    const video = videoBlock(videoFor(ex));
+    let h = it ? statsGrid(it) + (it.note ? `<div class="note">${esc(it.note)}</div>` : '') + video : video;
+    if (ex.purpose) h += `<div class="label">چرا این تمرین؟</div>${para(ex.purpose)}`;
+    if (ex.tennis) h += `<div class="label">در تنیس</div>${para(ex.tennis)}`;
     // How to do it (stage65), from the exercise's Spine entry: numbered, before the cues, which finish it (CUE-7).
     if (ex.steps && ex.steps.length) h += `<div class="label">روش انجام</div><ol class="steps">${ex.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`;
     if ((ex.cues && ex.cues.length) || ex.avoid) {
@@ -619,28 +621,35 @@
     if (ex.mistakes && ex.mistakes.length) h += `<div class="label">اشتباه‌های رایج</div><ul class="list">${ex.mistakes.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`;
     if (ex.easier || ex.harder) h += `<div class="label">ساده‌تر یا سخت‌تر</div><div class="alt">
       <div><b>ساده‌تر</b>${esc(ex.easier || '—')}</div><div><b>سخت‌تر</b>${esc(ex.harder || '—')}</div></div>`;
-    if (o.full) {
-      if (ex.equipment) h += `<div class="label">وسایل</div><p>${esc(ex.equipment)}${ex.noEquipment ? `<br><span class="lead">بدون وسیله: ${esc(ex.noEquipment)}</span>` : ''}</p>`;
+    if (!it && o.full) {
+      if (ex.equipment) h += `<div class="label">وسایل</div>${para(ex.equipment)}${ex.noEquipment ? `<p class="fact quiet">بدون وسیله: ${esc(ex.noEquipment)}</p>` : ''}`;
       if (ex.tags && ex.tags.length) h += `<div class="label">بخش‌هایی از بدن که درگیر است</div><div class="tags">${ex.tags.map(t => pill(esc(REGION_FA[t] || t))).join('')}${ex.impact ? pill(esc(IMPACT_FA[ex.impact] || ex.impact), 'clay') : ''}</div>`;
     }
-    if (ex.u16) h += `<div class="label">زیر ۱۶ سال</div><p>${esc(ex.u16)}</p>`;
+    if (ex.u16) h += `<div class="label">زیر ۱۶ سال</div>${para(ex.u16)}`;
     return h;
   }
 
   const altEx = it => (it && it.alt && C.exercises[it.alt]) || null;   // the other main-lift choice
+  // «یا Barbell Back Squat»: the English name sits in a <bdi> INSIDE the block, so the block stays right-aligned.
   const altLine = it => { const a = altEx(it); return a ? `<span class="ex-alt">یا <bdi>${esc(exName(a))}</bdi></span>` : ''; };
+  // One exercise: a paper row (the numeral at the start, the name, the dose, the ⌄ at the end) that opens in place. .ex, .ex-main
+  // and .ex-detail are the tour's and the click handler's selectors (the handler toggles .open on .ex).
   function exRow(it, n) {
     const ex = C.exercises[it.ex] || { name: it.ex, slot: '' };
-    return `<div class="ex ${family(ex.slot || '')}">
+    const alt = altEx(it);
+    return `<div class="ex">
       <button class="ex-main" aria-expanded="false">
-        <span class="ex-num">${fa(n)}</span>
+        ${pnum(n, n > 9 ? 'sm' : '')}
         <span class="ex-body">
           <span class="ex-name"><bdi>${esc(exName(ex))}</bdi></span>${altLine(it)}
-          <span class="ex-pills">${dosePills(it)}</span>
+          <span class="ex-dose">${doseLine(it)}</span>
         </span>
-        <span class="ex-chev">▼</span>
+        ${CHEV}
       </button>
-      <div class="ex-detail">${exFacts(ex, it)}<p style="margin-top:12px"><a class="link-btn" href="#/exercises/${encodeURIComponent(it.ex)}">صفحهٔ کامل این تمرین</a>${altEx(it) ? ` · <a class="link-btn" href="#/exercises/${encodeURIComponent(it.alt)}"><bdi>${esc(exName(altEx(it)))}</bdi></a>` : ''}</p>${it.test ? `<p><a class="link-btn" href="#/tests/${encodeURIComponent(it.test)}">راهنمای آزمون ←</a></p>` : ''}</div>
+      <div class="ex-detail">${exFacts(ex, it)}<div class="ex-links">
+        <a class="link-btn" href="#/exercises/${encodeURIComponent(it.ex)}">صفحهٔ کامل این تمرین</a>${alt ? `
+        <a class="link-btn" href="#/exercises/${encodeURIComponent(it.alt)}"><bdi>${esc(exName(alt))}</bdi></a>` : ''}${it.test ? `
+        <a class="link-btn" href="#/tests/${encodeURIComponent(it.test)}">راهنمای آزمون</a>` : ''}</div></div>
     </div>`;
   }
 
@@ -720,66 +729,77 @@
        <a class="btn ghost" href="#/programme">رفتن به برنامه</a></div>`;
   }
 
+  // The 16 weeks: four blocks, each a picture band, its goal as a grey line and four week tiles (a link each). An open week is a
+  // white tile with the numeral solid; a locked one (the demo) is outlined grey on the paper; one not written yet is faded. The
+  // last week of every block is its test week, captioned «آزمون». .block-card .weeks is the tour's selector.
   function viewProgramme() {
     const P = C.programme;
-    let h = banner({ kicker: 'برنامهٔ ۱۶ هفته‌ای · ۴ بلوک', title: 'برنامه', gear: true, help: true,
-      meta: prefs ? pill(AGE_LABEL[cur().age], 'light') : '' });
+    let h = banner({ kicker: '۱۶ هفته، ۴ بلوک', title: 'برنامه', gear: true, help: true, meta: prefs ? versionLine() : '' });
     h += `<div class="section">${prefs ? '' : versionLine()}
-      <div class="card green"><h3>هر هفته</h3><p>۳ جلسهٔ اصلی: دو جلسه در باشگاه و یک جلسه روی زمین تنیس. اگر لازم داری، جلسه‌های انتخابی را هم اضافه کن.</p></div>`;
+      <p class="lead">هر هفته ۳ جلسهٔ اصلی: دو جلسه در باشگاه و یک جلسه روی زمین تنیس. اگر لازم داری، جلسه‌های انتخابی را هم اضافه کن.</p>`;
     (P.blocks || []).forEach((bl, i) => {
       const [a, b] = blockRange(bl);
       let weeks = '';
       for (let w = a; w <= b; w++) {
-        weeks += weekData(w) ? `<a class="week open" href="#/programme/week/${w}">${fa(w)}</a>`
-          : DEMO ? `<a class="week locked" href="#/programme/week/${w}" aria-label="هفتهٔ ${fa(w)}، قفل">${fa(w)}</a>`
-          : `<span class="week soon" title="به‌زودی">${fa(w)}</span>`;
+        const test = w === b, cap = `<span class="wl${test ? ' test' : ''}">${test ? 'آزمون' : 'هفته'}</span>`;
+        const name = `هفتهٔ ${fa(w)}${test ? '، آزمون' : ''}`;
+        weeks += weekData(w) ? `<a class="week open" href="#/programme/week/${w}" aria-label="${name}">${cap}${pnum(w, 'solid sm')}</a>`
+          : DEMO ? `<a class="week locked" href="#/programme/week/${w}" aria-label="${name}، قفل">${cap}${pnum(w, 'off sm')}</a>`
+          : `<span class="week soon" title="به‌زودی">${cap}${pnum(w, 'off sm')}</span>`;
       }
       const art = artFor('block', i + 1);
-      h += `<div class="block-card"><div class="bc-top ${art ? 'has-art' : ''}">${artLayer(art)}<div class="bc-t"><b>بلوک ${fa(i + 1)} · ${esc(bl.name)}</b><span dir="ltr">${esc(bl.nameEn)}</span></div></div>
-        <div class="bc-body"><div class="bc-goal">${esc(bl.goal || '')}</div><div class="weeks">${weeks}</div></div></div>`;
+      h += `<div class="block-card"><div class="band ${art ? 'has-art' : ''}">${artLayer(art)}<div class="b-cap">
+          <div class="eb">${a === b ? `بلوک ${fa(i + 1)}، هفتهٔ ${fa(a)}` : `بلوک ${fa(i + 1)}، هفته‌های ${fa(a)} تا ${fa(b)}`}</div><div class="b-t">${esc(bl.name)}</div></div></div>
+        ${bl.goal ? `<p class="bc-goal">${esc(bl.goal)}</p>` : ''}<div class="weeks">${weeks}</div></div>`;
     });
     const ready = (P.weeks || []).map(w => w.week);
-    h += DEMO ? `<p class="lead">🔒 در نسخهٔ نمایشی فقط هفتهٔ ${openWeeksText()} باز است. همهٔ ۱۶ هفته در نسخهٔ کامل است.</p></div>`
+    h += DEMO ? `<p class="lead">در نسخهٔ نمایشی فقط هفتهٔ ${openWeeksText()} باز است. همهٔ ۱۶ هفته در نسخهٔ کامل است.</p></div>`
       : ready.length < 16 ? `<p class="lead">در این نسخهٔ نمونه این هفته‌ها آماده است: ${fa(ready.join('، '))}</p></div>` : `</div>`;
     view().innerHTML = h;
   }
 
+  // A session on a week page: one paper row that opens the session. A core session's code is its numeral (an outlined letter);
+  // an add-on has none; the test day wears a small stopwatch where the numeral would be. .session-card is the tour's selector.
   function sessionCard(week, s) {
     const href = `#/programme/week/${week}/${encodeURIComponent(s.code)}`;
-    const mins = s.minutes ? pill(fa(s.minutes) + ' دقیقه') : '';
+    const mins = s.minutes ? fa(s.minutes) + ' دقیقه' : '';
+    const place = s.place ? (PLACE[s.place] || esc(s.place)) : '';
     if (s.type === 'test') {
-      const tart = artFor('testday', '*');
-      return `<a class="session-card test" href="${href}"><div class="sc-top ${tart ? 'has-art' : ''}">${artLayer(tart)}<div class="sc-code">روز آزمون</div><div class="sc-title">${esc(s.title || '')}</div></div>
-        <div class="sc-meta">${placePill(s)}${mins}${pill(fa((s.tests || []).length) + ' آزمون')}</div></a>`;
+      const glyph = '<span class="lr-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3h4M18.5 6.5l1.5-1.5"/></svg></span>';
+      return `<a class="list-row has-num session-card test" href="${href}">${glyph}<span class="lr-body"><span class="lr-title">روز آزمون</span>
+        <span class="lr-sub">${sepJoin([dots(esc(s.title || '')), fa((s.tests || []).length) + ' آزمون'])}</span></span>${GO}</a>`;
+    }
+    if (s.kind === 'addon') {
+      return `<a class="list-row session-card addon" href="${href}"><span class="lr-body"><span class="lr-title">${addonTitle(s)}</span>
+        <span class="lr-sub">${sepJoin([mins, esc(s.forWhom || '')])}</span></span>${GO}</a>`;
     }
     const count = (s.groups || []).filter(g => g.slot !== 'W').reduce((n, g) => n + (g.items || []).length, 0);
-    const addon = s.kind === 'addon';
-    const art = artFor('place', s.place);   // the test day keeps its clay banner: it has no picture yet
-    return `<a class="session-card ${addon ? 'addon' : ''}" href="${href}">
-      <div class="sc-top ${art ? 'has-art' : ''}">${artLayer(art)}<div class="sc-code">${addon ? '+ ' + addonTitle(s) : 'جلسهٔ ' + esc(s.code)}</div><div class="sc-title">${addon ? esc(s.forWhom || '') : esc(s.title)}</div></div>
-      <div class="sc-meta">${placePill(s)}${mins}${count ? pill('گرم کردن + ' + fa(count) + ' تمرین') : ''}</div></a>`;
+    return `<a class="list-row has-num session-card" href="${href}">${pnum(s.code)}<span class="lr-body"><span class="lr-title">${dots(esc(s.title))}</span>
+      <span class="lr-sub">${sepJoin([place, mins, count ? 'گرم کردن و ' + fa(count) + ' تمرین' : ''])}</span></span>${GO}</a>`;
   }
 
+  // One week: the block's picture as a cover, the week's note (Amir's line), the three core sessions, then the optional ones.
   function viewWeek(week) {
     const r = sessionsFor(week);
     if (!r && DEMO && blockOf(week)) {
       return viewLocked({ kind: 'week', item: String(week), back: '#/programme', kicker: 'برنامه', title: `هفتهٔ ${fa(week)}`,
-        sub: esc('بلوک · ' + (blockOf(week).name || '')),
+        sub: esc('بلوک ' + (blockOf(week).name || '')),
         line: `در نسخهٔ نمایشی فقط هفتهٔ ${openWeeksText()} باز است. همهٔ ۱۶ هفته، با جلسه‌های اصلی و انتخابی، در نسخهٔ کامل است.` });
     }
     if (!r) { view().innerHTML = banner({ back: '#/programme', title: 'این هفته هنوز آماده نیست' }); return; }
-    const bl = blockOf(week) || {};
-    let h = banner({ back: '#/programme', kicker: `بلوک · ${esc(bl.name || '')}`, title: `هفتهٔ ${fa(week)}`, sub: esc(r.w.title || ''),
-      meta: pill(AGE_LABEL[r.v.age], 'light'), art: artFor('block', (C.programme.blocks || []).indexOf(bl) + 1) });
+    rememberWeek(week);
+    const bl = blockOf(week) || {}, bi = (C.programme.blocks || []).indexOf(bl);
+    let h = banner({ back: '#/programme', kicker: bi >= 0 ? `بلوک ${fa(bi + 1)}، ${esc(bl.name || '')}` : '', title: `هفتهٔ ${fa(week)}`,
+      sub: dots(esc(String(r.w.title || '').replace(/^هفت(?:ه\u0654|\u06C0|ه)\s*[0-9۰-۹]+\s*[·،:\-–—]?\s*/, ''))), meta: AGE_LABEL[r.v.age], art: artFor('block', bi + 1), cover: true });
     h += `<div class="section">${prefs ? '' : versionLine()}`;
-    if (r.w.note) h += `<div class="card green"><p>${esc(r.w.note)}</p></div>`;
-    h += `<div class="h2">جلسه‌های اصلی</div>`;
+    if (r.w.note) h += `<div class="note">${esc(r.w.note)}</div>`;
+    h += `<div class="sec">جلسه‌های اصلی</div>`;
     r.core.forEach(s => { h += sessionCard(week, s); });
     if (r.addons.length) {
       const g = C.programme.addonGuide;
-      h += `<div class="h2">جلسه‌های انتخابی · بر اساس نیازت</div>`;
-      if (g) h += acc('addonguide', '', '🧭 ' + esc(g.title || 'کدام جلسهٔ انتخابی؟'),
-        `${g.intro ? `<p style="margin-top:10px">${esc(g.intro)}</p>` : ''}<ul class="list">${(g.rules || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>${g.note ? `<p class="lead">${esc(g.note)}</p>` : ''}`, false);
+      h += `<div class="sec">جلسه‌های انتخابی، بر اساس نیازت</div>`;
+      if (g) h += acc('addonguide', '', esc(g.title || 'کدام جلسهٔ انتخابی؟'),
+        `${g.intro ? `<p class="fact">${esc(g.intro)}</p>` : ''}<ul class="list">${(g.rules || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>${g.note ? `<p class="lead">${esc(g.note)}</p>` : ''}`, false);
       r.addons.forEach(s => { h += sessionCard(week, s); });
     }
     h += `</div>`;
@@ -794,14 +814,17 @@
       return `<div class="wrow ${stepMode && ST.wDone.has(k) ? 'done' : ''}" data-wi="${k}"><button class="wchk" aria-label="تیک: ${fa(k + 1)}">${fa(k + 1)}</button><span>${name}<span class="wdose">${doseLine(it)}</span></span></div>`;
     }).join('');
   }
+  // The warm-up is ONE row that opens into the tick list. It keeps the exercise row's parts (.ex, .ex-main, .ex-detail), so the
+  // same click toggles it; the thirteen movements and their ticks are warmRows().
   function warmCard(g) {
     const items = g.items || [];
-    return `<div class="ex f-warm warm">
-      <button class="ex-main" aria-expanded="false"><span class="ex-num">W</span>
-        <span class="ex-body"><span class="ex-name">${esc(g.title)}</span><span class="ex-pills">${pill(fa(items.length) + ' حرکت')}</span></span>
-        <span class="ex-chev">▼</span></button>
-      <div class="ex-detail"><p class="lead" style="margin-top:10px">حرکت‌ها را به ترتیب انجام بده. تیک زدن فقط برای راحتی خودت است و جایی ذخیره نمی‌شود.</p>
-        <div class="wlist">${warmRows(items, false)}</div></div></div>`;
+    return `<div class="ex warm">
+      <button class="ex-main" aria-expanded="false">
+        <span class="ex-body"><span class="ex-name">${fa(items.length)} حرکت، به ترتیب</span><span class="ex-sub">تیک زدن فقط برای راحتی خودت است</span></span>
+        ${CHEV}
+      </button>
+      <div class="ex-detail"><div class="wlist">${warmRows(items, false)}</div></div>
+    </div>`;
   }
 
   function findSession(week, code) {
@@ -813,35 +836,41 @@
   // Test day (replaces the last session of weeks 4, 8, 12 and 16). Links to the test pages.
   function viewTestDay(week, r, s) {
     const T = (C.tests && C.tests.tests) || [];
-    let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)} · ${AGE_LABEL[r.v.age]}`,
-      title: `روز آزمون · ${esc(s.title || '')}`, art: artFor('testday', '*'), meta: placePill(s, 'light') + (s.minutes ? pill(fa(s.minutes) + ' دقیقه', 'light') : '') });
-    h += `<div class="section">${s.note ? `<div class="card green"><p>${esc(s.note)}</p></div>` : ''}`;
+    let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)}، ${AGE_LABEL[r.v.age]}`, title: 'روز آزمون', sub: dots(esc(s.title || '')),
+      art: artFor('testday', '*'), cover: true, meta: sepJoin([s.place ? (PLACE[s.place] || esc(s.place)) : '', s.minutes ? fa(s.minutes) + ' دقیقه' : '']) });
+    h += `<div class="section">${s.note ? `<div class="note">${esc(s.note)}</div>` : ''}<div class="sec">آزمون‌های این روز</div>`;
     (s.tests || []).forEach((id, k) => {
       const t = T.find(x => x.id === id);
       const name = t ? t.title : ((s.testTitles || {})[id] || id);
-      h += t ? `<a class="list-row" href="#/tests/${encodeURIComponent(id)}"><span class="ex-num">${fa(k + 1)}</span><span class="lr-body"><span class="lr-title">${esc(t.icon || '')} ${esc(name)}</span><br><span class="lr-sub">${esc(t.record || '')}</span></span><span class="lr-go">←</span></a>`
-             : `<div class="list-row" style="opacity:.55"><span class="ex-num">${fa(k + 1)}</span><span class="lr-body"><span class="lr-title">${esc(name)}</span><br><span class="lr-sub">راهنمای این آزمون به‌زودی</span></span></div>`;
+      h += t ? `<a class="list-row has-num" href="#/tests/${encodeURIComponent(id)}">${pnum(k + 1)}<span class="lr-body"><span class="lr-title">${esc(name)}</span>${t.record ? `<span class="lr-sub">${esc(t.record)}</span>` : ''}</span>${GO}</a>`
+             : `<div class="list-row has-num soon">${pnum(k + 1, 'off')}<span class="lr-body"><span class="lr-title">${esc(name)}</span><span class="lr-sub">راهنمای این آزمون به‌زودی</span></span></div>`;
     });
-    h += `<p class="lead" style="margin-top:10px">نتیجه‌ها را روی برگهٔ نتایج بنویس. اینجا چیزی ذخیره نمی‌شود.</p></div>`;
+    h += `<p class="lead closing">نتیجه‌ها را روی برگهٔ نتایج بنویس. اینجا چیزی ذخیره نمی‌شود.</p></div>`;
     view().innerHTML = h;
   }
 
+  // A session: the room's picture as a cover with the one green button (step by step) inside it, then the warm-up and each
+  // group of exercises as a titled list of paper rows. The groups' slot codes (P1, L2…) sit quiet at the end of the title line.
   function viewSession(week, code) {
     const f = findSession(week, code);
     if (!f && DEMO && !weekData(week) && blockOf(week)) return viewWeek(week);   // a locked week
     if (!f) { view().innerHTML = banner({ back: `#/programme/week/${week}`, title: 'این جلسه پیدا نشد' }); return; }
     const { r, s } = f;
+    rememberWeek(week);
     if (s.type === 'test') return viewTestDay(week, r, s);
+    const addon = s.kind === 'addon';
     let n = 0;
-    let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)} · ${AGE_LABEL[r.v.age]}`,
-      title: s.kind === 'addon' ? `+ ${addonTitle(s)}` : `جلسهٔ ${esc(s.code)} · ${esc(s.title)}`, art: artFor('place', s.place), meta: placePill(s, 'light') + (s.minutes ? pill(fa(s.minutes) + ' دقیقه', 'light') : '') });
+    let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)}، ${addon ? 'جلسهٔ انتخابی' : 'جلسهٔ ' + esc(s.code)}`,
+      title: addon ? addonTitle(s) : dots(esc(s.title)), art: artFor('place', s.place), cover: true,
+      meta: sepJoin([s.minutes ? fa(s.minutes) + ' دقیقه' : '', s.place ? (PLACE[s.place] || esc(s.place)) : '', AGE_LABEL[r.v.age]]),
+      foot: `<div class="cta-bar"><button class="btn primary" data-step-open="${week}|${esc(s.code)}">شروع، قدم‌به‌قدم${GO_TRI}</button></div>` });
     h += `<div class="section">`;
     (s.groups || []).forEach(g => {
-      if (g.slot === 'W') { h += warmCard(g); return; }
-      h += `<div class="group-title">${g.slot ? `<span class="slot" dir="ltr">${esc(g.slot)}</span>` : ''}${esc(g.title)}</div>`;
+      if (g.slot === 'W') { h += `<div class="sec">${dots(esc(g.title))}</div>` + warmCard(g); return; }
+      h += `<div class="sec">${dots(esc(g.title))}${g.slot ? `<span class="sec-code" dir="ltr">${esc(g.slot)}</span>` : ''}</div>`;
       (g.items || []).forEach(it => { n++; h += exRow(it, n); });
     });
-    h += `</div><div class="cta-bar"><button class="btn primary" data-step-open="${week}|${esc(s.code)}">▶ شروع جلسه، قدم‌به‌قدم</button></div>`;
+    h += `</div>`;
     view().innerHTML = h;
   }
 
@@ -857,15 +886,15 @@
       .sort((a, b) => (isLocked(a[1]) - isLocked(b[1])) || String(a[1].slot).localeCompare(String(b[1].slot)));   // demo: open ones first
     if (!rows.length) return `<div class="empty">تمرینی پیدا نشد.</div>`;
     return rows.map(([id, ex]) => `<a class="list-row ${isLocked(ex) ? 'locked' : ''}" href="#/exercises/${encodeURIComponent(id)}">
-      <span class="lr-body"><span class="lr-title"><bdi>${esc(exName(ex))}</bdi></span><br><span class="lr-sub">${esc(ex.slotTitle || '')}</span></span>
-      <span class="lr-go">${isLocked(ex) ? LOCK : '←'}</span></a>`).join('');
+      <span class="lr-body"><span class="lr-title"><bdi>${esc(exName(ex))}</bdi></span><span class="lr-sub">${esc(ex.slotTitle || '')}</span></span>
+      ${isLocked(ex) ? LOCK : GO}</a>`).join('');
   }
   function viewExercises() {
     const all = Object.values(C.exercises), open = all.filter(ex => !isLocked(ex)).length;
-    view().innerHTML = banner({ kicker: 'کتابخانهٔ تمرین‌ها', title: 'تمرین‌ها', help: true,
-      sub: DEMO ? `${fa(all.length)} تمرین · ${fa(open)} تمرین هفتهٔ ${openWeeksText()} باز است` : `${fa(all.length)} تمرین · جست‌وجو کن یا یک دسته انتخاب کن` }) +
+    view().innerHTML = banner({ kicker: 'کتابخانهٔ حرکت‌ها', title: 'تمرین‌ها', help: true,
+      sub: sepJoin([fa(all.length) + ' تمرین', DEMO ? `${fa(open)} تمرین هفتهٔ ${openWeeksText()} باز است` : 'جست‌وجو کن یا یک دسته انتخاب کن']) }) +
       `<div class="section"><input class="search" id="exq" type="search" placeholder="جست‌وجو: زانو، پرش، اسکوات…" value="${esc(exQuery)}">
-       <div class="chips" style="margin-top:10px">${GROUPS.map(g => `<button class="chip ${exFilter === g.key ? 'on' : ''}" data-filter="${g.key}">${g.label}</button>`).join('')}</div>
+       <div class="chips">${GROUPS.map(g => `<button class="chip ${exFilter === g.key ? 'on' : ''}" data-filter="${g.key}">${g.label}</button>`).join('')}</div>
        <div id="exlist">${exListHtml()}</div></div>`;
   }
 
@@ -884,8 +913,8 @@
     let h = banner({ back: '#/exercises', kicker: esc(ex.slotTitle || ''), title: `<bdi>${esc(exName(ex))}</bdi>` });
     h += `<div class="section">${exFacts(ex, null, { full: true })}`;
     if (uses.length) {
-      h += `<div class="label">در برنامهٔ تو</div>` + uses.map(u =>
-        `<a class="list-row" href="#/programme/week/${u.w}/${encodeURIComponent(u.s.code)}"><span class="lr-body"><span class="lr-title">هفتهٔ ${fa(u.w)} · ${sessionShort(u.s)}</span><br><span class="lr-sub">${esc(u.s.title)}</span></span><span class="lr-go">←</span></a>`).join('');
+      h += `<div class="sec">در برنامهٔ تو</div>` + uses.map(u =>
+        `<a class="list-row" href="#/programme/week/${u.w}/${encodeURIComponent(u.s.code)}"><span class="lr-body"><span class="lr-title">هفتهٔ ${fa(u.w)}، ${sessionShort(u.s)}</span><span class="lr-sub">${u.s.kind === 'addon' ? 'جلسهٔ انتخابی' : dots(esc(u.s.title))}</span></span>${GO}</a>`).join('');
     }
     view().innerHTML = h + `</div>`;
   }
