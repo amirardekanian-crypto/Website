@@ -108,8 +108,12 @@ function library() {
 async function context(browser, opts) {
   const ctx = await browser.newContext({ viewport: { width: opts.w || 390, height: opts.h || 844 },
     isMobile: true, hasTouch: !!opts.touch, serviceWorkers: 'block', ...(opts.tz ? { timezoneId: opts.tz } : {}) });
-  // Only the local server: fonts, Plausible and the CDN fail fast, as they would with no signal.
-  await ctx.route('**/*', r => r.request().url().startsWith(BASE + '/') ? r.continue() : r.abort());
+  // Only the local server: fonts, Plausible and the CDN fail fast, as they would with no signal. opts.fonts lets Google Fonts through
+  // (for screenshots that should look like the phone: Space Mono and Barlow Condensed instead of the system's fallbacks).
+  await ctx.route('**/*', r => {
+    const u = r.request().url();
+    return u.startsWith(BASE + '/') || (opts.fonts && /^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(u)) ? r.continue() : r.abort();
+  });
   await ctx.addInitScript({ content: STUB });
   const p = await ctx.newPage();
   p.errs = [];
@@ -120,7 +124,7 @@ async function context(browser, opts) {
 
 // program.html, signed in as the fixture athlete, past the loading screen. opts:
 //   tz ('America/Los_Angeles': the browser's time zone) · w, h, dark, touch · prog / spine / hist (instead of the fixtures) · stub (extra stub config, e.g.
-//   { mode: 'offline' }) · seed: { '<key suffix>': value } stored under '<id><suffix>' (e.g.
+//   { mode: 'offline' }) · fonts: true lets Google Fonts load (screenshots) · query ('?client=demo') · seed: { '<key suffix>': value } stored under '<id><suffix>' (e.g.
 //   { _setlog_Barbell_Back_Squat: [...] }) · fresh: true skips the welcome and install stand-downs.
 async function openProgram(browser, opts = {}) {
   const { ctx, p } = await context(browser, opts);
