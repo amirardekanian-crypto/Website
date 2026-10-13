@@ -272,7 +272,8 @@
 // v141: program.html changed (2026-10-13): a weight far above the lift's own numbers asks once before the tick keeps it.
 // v142: program.html changed (2026-10-13): a Persian note reads right to left (dir=auto on the note boxes, <bdi> where a note is shown back).
 // v143: program.html and habits.html changed (2026-10-13): supabase-js pinned to 2.117.3 (it was a floating @2).
-const CACHE = 'aap-v143';
+// v144: program.html and habits.html load supabase-js from this site (/assets/js/supabase-2.117.3.js, precached in SHELL), not jsDelivr.
+const CACHE = 'aap-v144';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -284,6 +285,8 @@ const SHELL = [
   '/assets/css/base.css',
   '/assets/css/components.css',
   '/assets/js/shared.js',
+  // supabase-js, our own copy since 2026-10-13 (program.html and habits.html): a repeat open reads it from here, not jsDelivr.
+  '/assets/js/supabase-2.117.3.js',
   '/assets/img/icon-192.png',
   '/assets/img/icon-512.png',
   // The training day's focus title (Centre Court, v124): our own copy, so it is condensed with no signal too.

@@ -169,7 +169,6 @@
      the other two would open a second connection nothing reuses. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://bvipfipbdcyqnbczjmaq.supabase.co" crossorigin>
 <!-- media="print" → the browser fetches it at low priority and does NOT wait for
      it to paint; onload promotes it to the real stylesheet. The families already
@@ -181,9 +180,12 @@
      onerror (REL-01, 2026-09-26): the service worker keeps only this site's own files, so
      with no signal this download simply fails. The flag lets _sbReady() stop at once
      instead of polling ~3s for a library that is not coming, before every server call. -->
-<!-- Pinned (Line Call, 2026-10-13): "@2" let any new 2.x reach every phone untested. The same file and version coach.html loads;
-     bump all three together, with scripts/headless/coach/reallib.js and scripts/headless/signin.js run first. -->
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" onerror="window.SB_FAILED=true"></script>
+<!-- Our own copy of supabase-js 2.117.3 (Line Call, 2026-10-13): it was "@2" from cdn.jsdelivr.net, fetched on every open (the
+     service worker never caches another host) and unverified from Iran. Now it is a file of this site, precached by sw.js, so a
+     repeat open reads it from the phone. The same bytes as jsDelivr and unpkg serve for 2.117.3 (sha256 d6a5c441…). coach.html
+     loads the same version from jsDelivr: bump all three together (a NEW file name), with scripts/headless/coach/reallib.js and
+     scripts/headless/signin.js run first. -->
+<script defer src="/assets/js/supabase-2.117.3.js" onerror="window.SB_FAILED=true"></script>
 <!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
      on `defer` it shares one ordered execution queue with the SDK above. -->
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
@@ -5413,7 +5415,7 @@ async function _sbReady() {
 function _sbLoad() {
   if (window.supabase && window.supabase.createClient) return Promise.resolve(_sb());
   if (!window.SB_FAILED) return _sbReady();
-  const tag = document.querySelector('script[src*="supabase-js"]');
+  const tag = document.querySelector('script[src*="/supabase"]');   // the CDN's supabase-js@… or, since 2026-10-13, our own supabase-2.117.3.js
   if (!tag) return Promise.resolve(null);
   return new Promise(res => {
     const s = document.createElement('script');

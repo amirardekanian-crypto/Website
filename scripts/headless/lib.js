@@ -112,6 +112,8 @@ async function context(browser, opts) {
   // (for screenshots that should look like the phone: Space Mono and Barlow Condensed instead of the system's fallbacks).
   await ctx.route('**/*', r => {
     const u = r.request().url();
+    // The apps' own copy of supabase-js (2026-10-13): never loaded here, so the stub stays the library, as the CDN copy never was.
+    if (/\/assets\/js\/supabase-[\d.]+\.js/.test(u)) return r.abort();
     return u.startsWith(BASE + '/') || (opts.fonts && /^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(u)) ? r.continue() : r.abort();
   });
   await ctx.addInitScript({ content: STUB });

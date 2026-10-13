@@ -15,7 +15,7 @@ const H = require('./lib');
 
 const ROOT = path.join(__dirname, '..', '..');
 const SB = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
-const LIB_URL = '**/npm/@supabase/supabase-js@2**';   // the pinned file (2026-10-13: @2.117.3/dist/umd/supabase.js)
+const LIB_URL = '**/assets/js/supabase-*.js*';   // the apps' own copy (2026-10-13; it was @2 from jsDelivr)
 const LIB_JS = fs.readFileSync(path.join(ROOT, 'tennis/app/lib/supabase.js'), 'utf8');     // `var supabase = (...)`: window.supabase, as the CDN build does
 const FIX = 'createClient(SB_URL, SB_KEY, { global: { fetch: fetchRetryExpired(() => _sbClient) } })';
 const WITHOUT_FIX = 'createClient(SB_URL, SB_KEY)';
@@ -65,7 +65,7 @@ async function openPage(browser, withFix) {
   await ctx.route('**/*', r => {
     const u = r.request().url();
     if (u.startsWith(SB + '/')) return server.handler(r, r.request());
-    if (u.includes('/npm/@supabase/supabase-js@2')) return r.fulfill({ contentType: 'application/javascript', body: LIB_JS });
+    if (/\/assets\/js\/supabase-[\d.]+\.js/.test(u)) return r.fulfill({ contentType: 'application/javascript', body: LIB_JS });
     if (u === H.BASE + '/program.html' || u.startsWith(H.BASE + '/program.html?')) {
       let html = fs.readFileSync(path.join(ROOT, 'program.html'), 'utf8');
       if (!withFix) {

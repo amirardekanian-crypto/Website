@@ -76,9 +76,12 @@
   src: url('/assets/fonts/Outfit-Variable.woff2') format('woff2'); }</style>
 <!-- onerror (REL-01, 2026-09-26): with no signal this CDN download fails (the service
      worker keeps only this site's own files); the flag stops _sbReady() polling for it. -->
-<!-- Pinned (Line Call, 2026-10-13): "@2" let any new 2.x reach every phone untested. The same file and version coach.html loads;
-     bump all three together, with scripts/headless/coach/reallib.js and scripts/headless/signin.js run first. -->
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" onerror="window.SB_FAILED=true"></script>
+<!-- Our own copy of supabase-js 2.117.3 (Line Call, 2026-10-13): it was "@2" from cdn.jsdelivr.net, fetched on every open (the
+     service worker never caches another host) and unverified from Iran. Now it is a file of this site, precached by sw.js, so a
+     repeat open reads it from the phone. The same bytes as jsDelivr and unpkg serve for 2.117.3 (sha256 d6a5c441…). coach.html
+     loads the same version from jsDelivr: bump all three together (a NEW file name), with scripts/headless/coach/reallib.js and
+     scripts/headless/signin.js run first. -->
+<script defer src="/assets/js/supabase-2.117.3.js" onerror="window.SB_FAILED=true"></script>
 <style>
   /* ── Tokens ────────────────────────────────────────────────────────────
      PROOF's modernist structure on the AA Performance palette (the "green
@@ -4226,7 +4229,7 @@ async function _sbReady() {
 function _sbLoad() {
   if (window.supabase && window.supabase.createClient) return Promise.resolve(_sb());
   if (!window.SB_FAILED) return _sbReady();
-  const tag = document.querySelector('script[src*="supabase-js"]');
+  const tag = document.querySelector('script[src*="/supabase"]');   // the CDN's supabase-js@… or, since 2026-10-13, our own supabase-2.117.3.js
   if (!tag) return Promise.resolve(null);
   return new Promise(res => {
     const s = document.createElement('script');

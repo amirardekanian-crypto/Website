@@ -456,8 +456,9 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.
-- supabase-js is pinned (2.117.3) in coach.html, program.html and habits.html (the two apps loaded a floating `@2` until 2026-10-13):
-  bump all three together, only with the harness's `reallib.js` and `scripts/headless/signin.js` run.
+- supabase-js is pinned (2.117.3): program.html and habits.html load our own copy, `/assets/js/supabase-2.117.3.js` (precached by sw.js;
+  a floating `@2` from jsDelivr until 2026-10-13), coach.html the same version from jsDelivr. Bump all three together, a NEW file name,
+  only with the harness's `reallib.js` and `scripts/headless/signin.js` run.
 - **The coach's address is typed once per layer** (stage57, 2026-10-11): `public.is_coach()` in the database (every policy and
   function asks it; a new one never types the address; `coach_erase_person()` also names it, to protect the coach's own login),
   `COACH_EMAIL` in coach.html, once in each of the three login Edge Functions. **Public sign-up must stay off** (Supabase →

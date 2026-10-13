@@ -690,6 +690,7 @@ been a 404 since 2026-09-07. Rejected: opening from the phone on every launch (a
 swapped under a running session) and letting `sw.js` keep the plan (it cannot cache a POST, and it
 sits in front of the whole site).
 
+
 - **`plancache`** (localStorage, no athlete prefix, so it never syncs): ONE slot, `{ id, at, data }`
   = the athlete id it was asked for, when, and the plan exactly as the server sent it. A shared phone
   never holds two athletes' plans.
@@ -707,7 +708,15 @@ sits in front of the whole site).
   *Offline · your plan as saved on this phone, Tue 18:40* (`paintPlanOffline()`, `#home-offline`).
   With no copy: *No connection*, with *Try again*. The error screen's ⚠️ emoji (yellow) is now an
   icon in clay.
-- **The library** (`supabase-js` from jsDelivr, which the worker does not keep) marks a failed download
+- **The library is our own file since 2026-10-13** (Line Call, Second Serve N1/N2; Amir: *"yes to all recommended"*):
+  `/assets/js/supabase-2.117.3.js`, the same bytes jsDelivr and unpkg serve for 2.117.3 (sha256 `d6a5c441…`), precached
+  by `sw.js` (`SHELL`), so a repeat open reads it from the phone instead of fetching `@2` from jsDelivr every time (the
+  worker never keeps another host's files, and jsDelivr was unverified from Iran). program.html and habits.html load it;
+  coach.html the same version from jsDelivr. A version bump is a NEW file name and all three together. `_sbLoad()` finds
+  the tag by `script[src*="/supabase"]` (it was `supabase-js`, which the local name does not contain: the retry below
+  would never have started, caught by `signin.js`). The headless harness aborts the file (`lib.js`) so the stub stays the
+  library.
+- **The library** marks a failed download
   (`onerror` → `window.SB_FAILED`), so `_sbReady()` stops at once instead of polling ~3 s before
   every call; `_sbLoad()` fetches it again once the connection is back. **Sign-in uses `_sbForSignIn()`** (2026-10-11): it waits, fetches the library again when the first download failed or is only slow, takes whichever copy arrives first (12 s ceiling) and, if there is still nothing, says "The sign-in could not load…" instead of "check your connection". Before this a failed first download answered every tap with the connection message until the app was force-closed.
 - **Uploads wait for a pull (`_sbHold`).** A run opened from the copy, or whose boot pull ran out of

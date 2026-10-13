@@ -17,7 +17,7 @@
 'use strict';
 const H = require('./lib');
 
-const LIB = '**/npm/@supabase/supabase-js@2**';   // the pinned file (2026-10-13: @2.117.3/dist/umd/supabase.js)
+const LIB = '**/assets/js/supabase-*.js*';   // the apps' own copy (2026-10-13; it was @2 from jsDelivr)
 // What a successful (re)download of the library runs: the stub, with its "no library" switch cleared. The stub
 // defines window.supabase as non-writable, so a second copy arriving (the slow case: the original lands late
 // AND the retry lands) must do nothing; the real UMD bundle just reassigns the global, which is harmless.
@@ -41,7 +41,9 @@ const CASES = [
   for (const page of PAGES) {
     for (const c of CASES) {
       const tag = `${page.name} signed out (${c.label})`;
-      const ctx = await browser.newContext({ viewport: { width: 390, height: 800 } });
+      // No service worker, as in lib.js: since 2026-10-13 sw.js precaches the apps' own copy of supabase-js, and it would answer the
+      // library request from its cache before the route below could fail it (on a real phone that is the point).
+      const ctx = await browser.newContext({ viewport: { width: 390, height: 800 }, serviceWorkers: 'block' });
       // Signed out: a fresh context has no saved supabase token and the stub has no session, so boot() goes
       // straight to showSignIn(). The config is written before the page's own scripts (and before the stub
       // reads it), so ONE navigation is all there is: the library is requested once by the page's <script> tag.
