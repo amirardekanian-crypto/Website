@@ -3247,6 +3247,7 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-summary:empty { display: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier { padding: 6px 10px; border-radius: 999px; background: var(--tint); color: var(--green-ink); box-shadow: none;
     font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier.nocaps { text-transform: none; letter-spacing: 0; }
   :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.rd-pill, :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.rd-tag,
   :where(#day-view, .step-scroll, #ws-body) .rd-tag.rd-item { display: inline-block; margin-left: 0; padding: 6px 10px; border-radius: 999px; box-shadow: none;
     background: var(--clay-fill); color: #fff; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
@@ -8671,9 +8672,11 @@ function numLineText(nl) {
 // above now, the Coach's Note is a clay dot after the name, and last time is never on
 // a closed card (Amir: "no history on the exercise card when not opened").
 function renderExSummary(rx) {
-  const mods = (rx.intent ? [`<span class="ex-summary-pill modifier">${esc(rx.intent)}</span>`] : [])
+  // No capitals on a pill that holds a duration ("3s eccentric", "30s on / 30s off"): in capitals "3S" read like a code (2026-10-13).
+  const pillCls = t => /\d\s*[sm]\b/i.test(String(t || '')) ? ' nocaps' : '';
+  const mods = (rx.intent ? [`<span class="ex-summary-pill modifier${pillCls(rx.intent)}">${esc(rx.intent)}</span>`] : [])
     .concat((rx.extras || []).map(e =>
-      `<span class="ex-summary-pill modifier${e.style === 'yellow' ? ' priority' : ''}">${esc(e.label)}</span>`));
+      `<span class="ex-summary-pill modifier${e.style === 'yellow' ? ' priority' : ''}${pillCls(e.label)}">${esc(e.label)}</span>`));
   return mods.length ? `<div class="ex-summary">${mods.join('')}</div>` : '';
 }
 
@@ -9395,7 +9398,7 @@ const APP_GUIDE = [
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
-    body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
+    body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 3 or 4 numbers like <strong>3-1-1</strong> or <strong>3-1-1-0</strong>: down, pause, up, and sometimes a pause at the top. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',

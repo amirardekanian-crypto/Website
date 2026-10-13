@@ -281,7 +281,8 @@
 // v150: program.html changed (2026-10-13): the guide promises only what the plan has; the Why door shows from one Because.
 // v151: program.html changed (2026-10-13): the demo is dated to week 2 when it opens, ?pane= opens a Library pane, the demo's account line tells the truth.
 // v152: program.html changed (2026-10-13): the ready finish card says "No RPE on N lifts. Add them ›" when lifts have none.
-const CACHE = 'aap-v152';
+// v153: program.html changed (2026-10-13): a pill holding a duration ("3s eccentric") keeps its own case; the guide's tempo line covers 3 and 4 numbers.
+const CACHE = 'aap-v153';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
