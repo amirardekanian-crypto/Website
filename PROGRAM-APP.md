@@ -896,7 +896,7 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     prefix, never synced; with storage blocked it is open every time, the safe way round). The words are unchanged. **Why this session**
     is a fold row; **Mark as done** the one primary green button, behaviour unchanged.
   - **An article**: the same cover; a callout takes the Coach's-note pull-quote look; an embedded session is a door row. The reading
-    layout (the clay heading bar, the drop cap) is unchanged.
+    layout's heading bar, drop cap, ball bullets and caption mark are green since 2026-10-13 (they were clay; clay is "look here").
 
 - **Sign in, the Welcome, Loading and the error screen** (`showSignIn()`, `maybeWelcome()`, `#loading`, `showError()`;
   `scripts/headless/entry-screens.js`, 121 checks; one block at the very end of the sheet):
@@ -929,8 +929,8 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
   - **The banner** is the day's lower-day recipe for every state that lasts on Home: the offline line (grey stripe, *OFFLINE*), *Your plan
     was updated* (clay stripe, *UPDATE*, Refresh as the link), the filed-day card (clay stripe, *SAVED FOR YOU*, OK as the link).
   - **The note box** (`aaToast()`) is a green cover box (`--hero`, white words, the light-ring button, 16 px corners) in the middle of the
-    screen, **above the sheets** (z 215; it was 71, under them: D9), still under the video pop-up. `opts.kicker` adds a mint-dot eyebrow
-    (no caller passes one yet). Its place, one-at-a-time rule and timings are unchanged.
+    screen, **above the sheets** (z 215; it was 71, under them: D9), still under the video pop-up. `opts.kicker` adds a mint-dot eyebrow:
+    *How to log*, *No weight*, *Session clock* on its three notes (2026-10-13). Its place, one-at-a-time rule and timings are unchanged.
   - **The install offer** is a white bottom card styled in program.html only (shared.js serves the public site): the app icon, the words as
     before, **Install** primary green, *Not now* quiet text (`showInstallOffer()` relabels shared.js's Dismiss).
 
@@ -939,7 +939,8 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
   guide moved with it). An em dash is left only where the athlete never reads it as prose: the report email and `readinessPlanLine()`
   (coach.html parses that line), the coach preview bar, the page title, and `—` as an empty value in a scoreboard. 42 lines of style
   for classes nothing draws went (Night Court's card parts, the old Coach header, the old card's chips, rest and action rows, the timer
-  presets, the old weight input, `--court`).
+  presets, the old weight input, `--court`). After it (aap-v137): the one primary button wears `--btn` (lighter in dark mode), the
+  article reader is green, the note box's three notes carry labels, and the Your numbers rows' sparkline ends on a green dot (it was clay).
 
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
 
@@ -1116,7 +1117,7 @@ tints, the running bar, labels, and so it marked nothing. Now:
   the session bar's limits row (*Max RPE 7 · 1 set fewer*; only the numbers, light clay `#E06B43` on the green bar
   since Centre Court, the words white and the label a paler white),
   the one number on a dark Home card (*Week 2*, the habits row's *2 to go*), and the fault cue's bar in How to do it (the one fault, written
-  fault-then-fix, CUE-7: Amir, 2026-10-12, Centre Court round 2: *"3 clay"*; it was red `#E74C3C`). The Library's clay Playbook door went with the doors page (2026-10-13); the article reader keeps its clay heading bar and drop cap.
+  fault-then-fix, CUE-7: Amir, 2026-10-12, Centre Court round 2: *"3 clay"*; it was red `#E74C3C`). The Library's clay Playbook door went with the doors page, and the article reader's heading bar, drop cap and bullets turned green (2026-10-13).
 - **Green or grey for everything else**: every block's title, stripe and done tint are the same green (warm-up
   and power were clay and strength green, and a block the app did not recognise took its colour from its
   position, so *Core* was clay because it was third; `blockClass()` still names the type for the code); the
@@ -1166,7 +1167,8 @@ size is a token in `:root`, picked by its job:
 - **One primary button** (part 2, 2026-09-27, after DS-01 settled that buttons are green): every filled action
   (Sign in, the welcome's Open Day 1, the error screen's buttons, Begin session, Start/Pause, Rest, the rest timer's Pause, Guided's Done,
   the filed day's OK, Done · send to coach, + Log a max, Log a max's Save to Personal Records, Weigh in) wears one look, set once at the end of the stylesheet:
-  green, white Barlow Condensed 700 in capitals, 1 px tracking, an 8 px corner, 44 px at the least. There were
+  green (`--btn`, the same gradient as Centre Court's buttons since 2026-10-13; in dark mode it is lighter, so it stands off the
+  dark paper at 3:1), white Barlow Condensed 700 in capitals, 1 px tracking, an 8 px corner, 44 px at the least. There were
   eleven (corners from 4 to 13 px, two fonts, tracking from 0.02 em to 1.5 px, weights 700 and 900, and Sign in
   and Open Day 1 in clay). Each rule keeps only its place and size: full-width actions at `--fs-body` (the
   welcome and Done at `--fs-lead`), compact ones in a card or the session bar smaller, where WK-02 and WK-03
@@ -1193,8 +1195,8 @@ dashboard do not change.
   → `--grey`, `--grey-dark` → `--ink`, `--white` → `--row`, `--yellow` → `--fill`, `--ice` → `--clay`, `--rpe-under` →
   `--steel`), so a new rule uses the new names and no screen keeps a copy. The clay rule: `--clay` is the brand fill
   (`#C7552F`, the note's dot, the fault cue's bar); small clay TEXT is `--clay-ink`, `#B5461F` in light (5.1:1; `#C7552F`
-  is 4.1:1); clay text 18.66 px bold or more is `--clay-big`, `#C7552F` (the week note's headline numbers, the article's
-  drop cap, Guided's off-plan number); on the green it is `--clay-on-green`; in dark every clay TEXT is `#E06B43`. `--ink`
+  is 4.1:1); clay text 18.66 px bold or more is `--clay-big`, `#C7552F` (the week note's headline numbers, Guided's
+  off-plan number; the article's drop cap until 2026-10-13, green since); on the green it is `--clay-on-green`; in dark every clay TEXT is `#E06B43`. `--ink`
   and `--court` are defined at last (D7). The move was checked by a before/after diff of every element's computed colours on
   68 screens and states, light and dark: only small clay text outside the day, `--grey-card` fills (#EDE8E0 → #F1ECE3) and
   five dark greys moved. `--g` is the gutter: 20 px, 16 under 360. The panel is **full-bleed**: `.day-content` has no side padding (the rail's 32 px went with the rail).

@@ -265,7 +265,8 @@
 // v134: program.html changed (2026-10-13): sign-in, the Welcome, Loading and the error screen in the Centre Court look.
 // v135: program.html changed (2026-10-13): the sheets (one top row) and the notices in the Centre Court look.
 // v136: program.html changed (2026-10-13): the copy sweep (no em dashes or semicolons in athlete text) and dead style rules removed.
-const CACHE = 'aap-v136';
+// v137: program.html changed (2026-10-13): the primary button's green in dark mode, the article reader in green, the note box's labels.
+const CACHE = 'aap-v137';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

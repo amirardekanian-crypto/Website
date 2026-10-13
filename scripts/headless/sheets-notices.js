@@ -259,7 +259,7 @@ const CONTROLS = '.sheet-back, .sheet-close, .acct-seg button, .hrow, .acct-sign
     t.check(`readiness ${tag}: Skip for today closes it, starts the clock and stores a skipped check`, !sk.shown && await started() && sk.r && sk.r.skipped === true, JSON.stringify(sk));
     await p.evaluate(() => { resetDay('1'); }); await p.waitForTimeout(200);
     await p.evaluate(() => openReadiness('1')); await p.waitForTimeout(250);
-    const state = () => p.evaluate(() => { const b = document.getElementById('readiness-begin'); return { t: b.textContent.trim(), dis: b.disabled, bg: getComputedStyle(b).backgroundColor }; });
+    const state = () => p.evaluate(() => { const b = document.getElementById('readiness-begin'); return { t: b.textContent.trim(), dis: b.disabled, bg: (c => { if (c.backgroundImage === 'none') return c.backgroundColor; const e = document.createElement('i'); e.style.backgroundImage = 'var(--btn)'; document.body.appendChild(e); const v = getComputedStyle(e).backgroundImage; e.remove(); return c.backgroundImage === v ? 'BTN' : c.backgroundImage; })(getComputedStyle(b)) }; });
     let s = await state();
     t.check(`readiness ${tag}: starts "0 of 5 answered", disabled and grey`, s.t === '0 of 5 answered' && s.dis && s.bg === (dark ? 'rgb(32, 32, 32)' : SAND), JSON.stringify(s));
     const qs = await p.$$('.readiness-q');
@@ -271,7 +271,7 @@ const CONTROLS = '.sheet-back, .sheet-close, .acct-seg button, .hrow, .acct-sign
     t.check(`readiness ${tag}: the chosen key is the day's selected green (--mark), its number white, one per question`, sel.bg === (dark ? MARK_DARK : GREEN) && sel.num === WHITE && sel.one === 1, JSON.stringify(sel));
     await (await qs[4].$$('.readiness-opt'))[3].click();
     s = await state();
-    t.check(`readiness ${tag}: "Begin session ▶", enabled, the primary green`, /begin session/i.test(s.t) && !s.dis && s.bg === GREEN, JSON.stringify(s));
+    t.check(`readiness ${tag}: "Begin session ▶", enabled, the primary green`, /begin session/i.test(s.t) && !s.dis && s.bg === 'BTN', JSON.stringify(s));
     await p.click('#readiness-begin'); await p.waitForTimeout(300);
     const b = await p.evaluate(() => ({ shown: document.getElementById('readiness-overlay').classList.contains('visible'), r: JSON.parse(localStorage.getItem(readinessKey('1')) || 'null') }));
     t.check(`readiness ${tag}: Begin closes it, starts the clock and stores the five answers`, !b.shown && await started() && b.r && !b.r.skipped && b.r.sleep === 3 && b.r.overall === 4 && b.r.stress === 3, JSON.stringify(b));

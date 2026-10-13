@@ -19,6 +19,7 @@ const WIDTHS = [320, 375, 390];
 const HELP = `(() => {
   const T = window.__T = {
     tok(name) { const e = document.createElement('i'); e.style.color = 'var(' + name + ')'; document.body.appendChild(e); const c = getComputedStyle(e).color; e.remove(); return c; },
+    btn() { const e = document.createElement('i'); e.style.backgroundImage = 'var(--btn)'; document.body.appendChild(e); const c = getComputedStyle(e).backgroundImage; e.remove(); return c; },
     parse(c) { const m = String(c).match(/rgba?\\(([^)]+)\\)/); if (!m) return null; const p = m[1].split(/[ ,\\/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; },
     over(fg, bg) { return { r: fg.r * fg.a + bg.r * (1 - fg.a), g: fg.g * fg.a + bg.g * (1 - fg.a), b: fg.b * fg.a + bg.b * (1 - fg.a), a: 1 }; },
     lum(c) { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); },
@@ -90,7 +91,7 @@ const rect = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); 
 
 // A colour pulled from the page's own tokens, in both themes: { paper, row, hair, ink, grey, field, green, mint, clayOnGreen, clayFill, clayBig, ... }
 const TOKENS = ['--paper', '--row', '--hair', '--ink', '--grey', '--field', '--green-ink', '--fill', '--mint', '--clay-on-green', '--clay-fill', '--clay-big', '--clay', '--clay-ink', '--on-accent'];
-const tokens = p => p.evaluate(names => { const o = {}; names.forEach(n => { o[n] = window.__T.tok(n); }); return o; }, TOKENS);
+const tokens = p => p.evaluate(names => { const o = {}; names.forEach(n => { o[n] = window.__T.tok(n); }); o['--btn'] = window.__T.btn(); return o; }, TOKENS);
 const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); if (!m) return false; const [r, g, b] = [+m[1], +m[2], +m[3]]; return r > 150 && g < 130 && b < 90 && r - g > 80; };   // any clay shade
 
 (async () => {
@@ -136,7 +137,7 @@ const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); i
         input: { h: inp.getBoundingClientRect().height, size: cs(inp).fontSize, bg: cs(inp).backgroundColor, border: cs(inp).borderTopColor, bw: cs(inp).borderTopWidth, radius: cs(inp).borderTopLeftRadius, color: cs(inp).color, search: search ? cs(search).borderTopLeftRadius : null, pwH: pw.getBoundingClientRect().height,
           names: [inp.name, inp.autocomplete, pw.name, pw.autocomplete, pw.type, inp.required, pw.required].join('|') },
         eyeBtn: { w: ey.getBoundingClientRect().width, h: ey.getBoundingClientRect().height, color: cs(ey).color },
-        go: { text: go.innerText, bg: cs(go).backgroundColor, color: cs(go).color, h: go.getBoundingClientRect().height, radius: cs(go).borderTopLeftRadius, font: cs(go).fontFamily, caps: cs(go).textTransform },
+        go: { text: go.innerText, bg: cs(go).backgroundImage !== 'none' ? cs(go).backgroundImage : cs(go).backgroundColor, color: cs(go).color, h: go.getBoundingClientRect().height, radius: cs(go).borderTopLeftRadius, font: cs(go).fontFamily, caps: cs(go).textTransform },
         help: { color: cs(help).color, linkColor: cs(link).color, href: link.getAttribute('href'), text: help.innerText, linkH: link.getBoundingClientRect().height, size: cs(help).fontSize },
         foot: { text: foot.innerText, font: cs(foot).fontFamily, color: cs(foot).color },
         err: { hidden: q('#si-err').hidden },
@@ -159,7 +160,7 @@ const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); i
     t.check('Sign in: the fields have the Library search box\'s radius', L.input.radius === '10px' && L.input.radius === (L.input.search || '10px'), JSON.stringify([L.input.radius, L.input.search]));
     t.check('Sign in: the form keeps its names and autocomplete (a password manager finds them)', L.input.names === 'username|username|password|current-password|password|true|true', L.input.names);
     t.check('Sign in: the eye is a 48 px target, grey', L.eyeBtn.w >= 44 && L.eyeBtn.h >= 44 && L.eyeBtn.color === tk['--grey'], JSON.stringify(L.eyeBtn));
-    t.check('Sign in: Sign in is the one primary green button, at least 48 px', L.go.text === 'SIGN IN' && L.go.bg === tk['--fill'] && L.go.color === tk['--on-accent'] && L.go.h >= 48 && L.go.radius === '8px' && /Barlow Condensed/.test(L.go.font) && L.go.caps === 'uppercase', JSON.stringify(L.go));
+    t.check('Sign in: Sign in is the one primary green button, at least 48 px', L.go.text === 'SIGN IN' && L.go.bg === tk['--btn'] && L.go.color === tk['--on-accent'] && L.go.h >= 48 && L.go.radius === '8px' && /Barlow Condensed/.test(L.go.font) && L.go.caps === 'uppercase', JSON.stringify(L.go));
     t.check('Sign in: the help line is --grey, its link green ink and a 44 px target', L.help.color === tk['--grey'] && L.help.linkColor === tk['--green-ink'] && L.help.linkH >= 44 && /^https:\/\/wa\.me\/\d{8,}\?text=/.test(L.help.href) && /Lost your details\? Message Amir and he'll send new ones\./.test(L.help.text), JSON.stringify(L.help));
     t.check('Sign in: the footer is AMIRARDEKANI.COM in Space Mono, --grey', L.foot.text === 'AMIRARDEKANI.COM' && /Space Mono/.test(L.foot.font) && L.foot.color === tk['--grey'], JSON.stringify(L.foot));
     t.check('Sign in: the sheet\'s order is the same (Username, Password, Sign in, the error, the help, the footer)', L.order === 'signin-f > signin-f > si-go > si-err > signin-help > signin-foot', L.order);
@@ -255,7 +256,7 @@ const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); i
         ps, pColors: [...sheet.querySelectorAll('p')].map(e => cs(e).color), pSizes: [...sheet.querySelectorAll('p')].map(e => cs(e).fontSize),
         sign: sign ? { sig: !!sign.querySelector('svg.wn-sig'), sigLabel: sign.querySelector('svg.wn-sig') && sign.querySelector('svg.wn-sig').getAttribute('aria-label'), av: !!sign.querySelector('.wn-av'), avImg: sign.querySelector('.wn-av img') && sign.querySelector('.wn-av img').getAttribute('src'), rect: r(sign) } : null,
         order: [...sheet.children].map(e => e.className || e.tagName).join(' > '),
-        go: { text: go.innerText, bg: cs(go).backgroundColor, color: cs(go).color, h: r(go).h, radius: cs(go).borderTopLeftRadius, font: cs(go).fontFamily, bottom: r(go).b },
+        go: { text: go.innerText, bg: cs(go).backgroundImage !== 'none' ? cs(go).backgroundImage : cs(go).backgroundColor, color: cs(go).color, h: r(go).h, radius: cs(go).borderTopLeftRadius, font: cs(go).fontFamily, bottom: r(go).b },
         skip: { text: skip.innerText, color: cs(skip).color, h: r(skip).h, bg: cs(skip).backgroundColor, border: cs(skip).borderTopWidth, bottom: r(skip).b },
         vh: innerHeight, scrollable: q('.wel').scrollHeight - q('.wel').clientHeight,
         old: ['.wel-hero img.in'].length && !!q('.wel-hero img.in'),
@@ -270,7 +271,7 @@ const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); i
     t.check('Welcome: the sheet is the paper, its top corners the app\'s one sheet\'s radius', W.sheet.bg === tk['--paper'] && W.sheet.tl === W.sheet.modal && W.sheet.tr === W.sheet.modal, JSON.stringify(W.sheet));
     t.check('Welcome: the two lines are unchanged (ink and grey)', W.ps.length === 2 && /^Your plan is ready\. First up is .+\.$/.test(W.ps[0]) && W.ps[1] === 'Any questions, message me on WhatsApp. The button is in the Coach tab.' && W.pColors[0] === tk['--ink'] && W.pColors[1] === tk['--grey'] && W.pSizes[0] === '15px' && W.pSizes[1] === '13px', JSON.stringify([W.ps, W.pColors, W.pSizes]));
     t.check('Welcome: Amir\'s signature and photo sit under the two lines, as the week note signs, before the buttons', !!W.sign && W.sign.sig && W.sign.sigLabel === 'Amir' && W.sign.av && /assets\/img\/coach\.jpg$/.test(W.sign.avImg || '') && W.order === 'P > sub > wn-sign > wel-go > wel-skip', JSON.stringify([W.sign, W.order]));
-    t.check('Welcome: Open Day 1 is the one primary green button', W.go.text === 'OPEN DAY 1' && W.go.bg === tk['--fill'] && W.go.color === tk['--on-accent'] && W.go.h >= 48 && W.go.radius === '8px' && /Barlow Condensed/.test(W.go.font), JSON.stringify(W.go));
+    t.check('Welcome: Open Day 1 is the one primary green button', W.go.text === 'OPEN DAY 1' && W.go.bg === tk['--btn'] && W.go.color === tk['--on-accent'] && W.go.h >= 48 && W.go.radius === '8px' && /Barlow Condensed/.test(W.go.font), JSON.stringify(W.go));
     t.check('Welcome: Look around first is quiet green-ink text, at least 44 px tall, no box', W.skip.text === 'Look around first' && W.skip.color === tk['--green-ink'] && W.skip.h >= 44 && W.skip.border === '0px' && W.skip.bg === 'rgba(0, 0, 0, 0)', JSON.stringify(W.skip));
     t.check('Welcome (390 x 844): both buttons are on screen', W.go.bottom <= W.vh && W.skip.bottom <= W.vh, JSON.stringify([W.go.bottom, W.skip.bottom, W.vh]));
     const ov = await sideways(p);
@@ -398,7 +399,7 @@ const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); i
   const ERR = `(() => {
     const q = s => document.querySelector(s), cs = e => getComputedStyle(e), r = e => { const b = e.getBoundingClientRect(); return { w: Math.round(b.width * 10) / 10, h: Math.round(b.height * 10) / 10, b: b.bottom, x: b.x }; };
     const root = q('#error-screen'), icon = q('#error-icon'), svg = icon.querySelector('svg'), title = q('#error-title'), msg = q('#error-msg'), acts = q('#error-actions');
-    const btns = [...acts.querySelectorAll('.error-btn')].map(b => ({ tag: b.tagName, text: b.innerText, cls: b.className, bg: cs(b).backgroundColor, color: cs(b).color, h: r(b).h, w: r(b).w, radius: cs(b).borderTopLeftRadius, shadow: cs(b).boxShadow, border: cs(b).borderTopWidth + ' ' + cs(b).borderTopColor, font: cs(b).fontFamily, weight: cs(b).fontWeight, caps: cs(b).textTransform, size: cs(b).fontSize, href: b.getAttribute('href'), onclick: b.getAttribute('onclick'), outline: cs(b).outlineStyle }));
+    const btns = [...acts.querySelectorAll('.error-btn')].map(b => ({ tag: b.tagName, text: b.innerText, cls: b.className, bg: cs(b).backgroundImage !== 'none' ? cs(b).backgroundImage : cs(b).backgroundColor, color: cs(b).color, h: r(b).h, w: r(b).w, radius: cs(b).borderTopLeftRadius, shadow: cs(b).boxShadow, border: cs(b).borderTopWidth + ' ' + cs(b).borderTopColor, font: cs(b).fontFamily, weight: cs(b).fontWeight, caps: cs(b).textTransform, size: cs(b).fontSize, href: b.getAttribute('href'), onclick: b.getAttribute('onclick'), outline: cs(b).outlineStyle }));
     return { visible: root.classList.contains('visible'), bg: cs(root).backgroundColor, display: cs(root).display, pos: cs(root).position,
       icon: { color: cs(icon).color, w: r(svg).w, h: r(svg).h, kind: svg.innerHTML.indexOf('M1 1l22 22') >= 0 ? 'offline' : svg.innerHTML.indexOf('rect') >= 0 ? 'locked' : '?' },
       title: { text: title.textContent, font: cs(title).fontFamily, weight: cs(title).fontWeight, caps: cs(title).textTransform, color: cs(title).color, size: cs(title).fontSize, align: cs(title).textAlign },
@@ -417,7 +418,7 @@ const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); i
     t.check('Error (refused): the icon is the lock, in clay, 46 px', E.icon.kind === 'locked' && E.icon.color === tk['--clay-big'] && E.icon.w === 46 && E.icon.h === 46, JSON.stringify(E.icon));
     const [a, b] = E.btns;
     t.check('Error (refused): two buttons, Sign in again then Message Amir on WhatsApp', E.btns.length === 2 && a.text === 'SIGN IN AGAIN' && b.text === 'MESSAGE AMIR ON WHATSAPP' && a.tag === 'BUTTON' && b.tag === 'A', JSON.stringify(E.btns.map(x => [x.tag, x.text])));
-    t.check('Error (refused): Sign in again is the one primary green button, at least 48 px', a.bg === tk['--fill'] && a.color === tk['--on-accent'] && a.h >= 48 && a.radius === '8px' && /Barlow Condensed/.test(a.font) && a.weight === '700' && a.caps === 'uppercase' && a.size === '15px', JSON.stringify(a));
+    t.check('Error (refused): Sign in again is the one primary green button, at least 48 px', a.bg === tk['--btn'] && a.color === tk['--on-accent'] && a.h >= 48 && a.radius === '8px' && /Barlow Condensed/.test(a.font) && a.weight === '700' && a.caps === 'uppercase' && a.size === '15px', JSON.stringify(a));
     t.check('Error (refused): the WhatsApp button is the outlined twin: no fill, green-ink text, the --field edge, at least 48 px', b.bg === 'rgba(0, 0, 0, 0)' && b.color === tk['--green-ink'] && b.h >= 48 && b.shadow.indexOf(tk['--field']) >= 0 && /inset/.test(b.shadow) && b.radius === '8px' && b.border.startsWith('0px'), JSON.stringify(b));
     t.check('Error (refused): neither button computes the old --yellow-mid edge', !JSON.stringify(E.btns).includes('rgba(14, 74, 54, 0.22)'), JSON.stringify(E.btns.map(x => x.shadow)));
     t.check('Error (refused): the WhatsApp link is the same (the number and the message)', b.href === 'https://wa.me/447435363461?text=' + encodeURIComponent("Hi Amir, the app won't open my plan. "), b.href);
@@ -438,7 +439,7 @@ const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); i
     const E = await p.evaluate(ERR);
     t.check('Error (no signal): "No connection" on the paper with the offline icon in clay', E.visible && E.title.text === 'No connection' && E.bg === tk['--paper'] && E.icon.kind === 'offline' && E.icon.color === tk['--clay-big'], JSON.stringify([E.title.text, E.icon]));
     t.check('Error (no signal): the message is the same words, in --ink', E.msg.text === 'The app couldn\'t reach the server, and this phone hasn\'t saved your plan yet. Try again when you have signal. Once it has opened with a connection, it opens without one too.' && E.msg.color === tk['--ink'] && E.msg.size === '15px', JSON.stringify(E.msg));
-    t.check('Error (no signal): one button, Try again, the primary green, reloads', E.btns.length === 1 && E.btns[0].text === 'TRY AGAIN' && E.btns[0].onclick === 'location.reload()' && E.btns[0].bg === tk['--fill'] && E.btns[0].color === tk['--on-accent'] && E.btns[0].h >= 48, JSON.stringify(E.btns));
+    t.check('Error (no signal): one button, Try again, the primary green, reloads', E.btns.length === 1 && E.btns[0].text === 'TRY AGAIN' && E.btns[0].onclick === 'location.reload()' && E.btns[0].bg === tk['--btn'] && E.btns[0].color === tk['--on-accent'] && E.btns[0].h >= 48, JSON.stringify(E.btns));
     t.check('Error (no signal): the title is in --ink', E.title.color === tk['--ink'], E.title.color);
     t.check('Error (no signal): no page errors', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
