@@ -260,7 +260,8 @@
 // v129: program.html changed (2026-10-13): the Coach tab in the Centre Court look (the signed WhatsApp panel, notes as fold rows).
 // v130: program.html changed (2026-10-13): Progress's road (one row per cycle) and the archive in the Centre Court look; the This cycle card is Progress's cover.
 // v131: program.html changed (2026-10-13): Guided's top bar and the rest timer in the Centre Court look.
-const CACHE = 'aap-v131';
+// v132: program.html changed (2026-10-13): Personal Records and Body weight in the Centre Court look.
+const CACHE = 'aap-v132';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

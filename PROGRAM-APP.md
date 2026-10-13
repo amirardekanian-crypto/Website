@@ -858,6 +858,23 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
   - `scripts/headless/lib.js`'s `context()` takes `{ fonts: true }` to let Google Fonts through for screenshots (the checks keep aborting
     them, as a phone with no signal would).
 
+- **Personal Records and Body weight** (`paintCover()`, `ceilBoardHtml()`, `renderCeiling()`, `renderCeilingLift()`, `paintCeilingForm()`,
+  `renderWeightScreen()`; `scripts/headless/records-weight.js`, 122 checks):
+  - **A cover on every screen** (← as the 44 px glass button, a mint-dot eyebrow, the title in capitals) with a **scoreboard**: Records
+    shows the best lift (*104 · KG BACK SQUAT*), the ratio (*1.30× · YOUR OWN BODY WEIGHT*, only with a body weight) and the lift count,
+    with the old hero's sentence under it; a lift's page its latest estimate, the change since the first and the entries; Body weight
+    the last reading, the change over the range (*−0.8 kg · DOWN OVER THE RANGE*) and the readings, with the average-to-average sentence.
+    The green hero cards are gone. A **New best** is the cover's green foot (`--foot`), so the screen keeps one green thing.
+  - **Paper rows** for lifts, entries, readings and Log a max's picker; **+ Log a max** (*Tested a lift?*) and *Add your body weight* as
+    door rows; **Due for a retest** as the day's banner (a 4 px clay stripe, *Test 5RM* as the green text link); **How this works** one
+    fold, closed on every screen (it was open on the empty one); the empty state's four steps numbered 01–04.
+  - **Log a max**: the set table's boxes (white, `--field`), the day's 48 px RPE keys, the estimate and its grade as a two-track
+    scoreboard, Save as the primary green.
+  - **Charts green**: the line and every dot (the dots were clay; clay is "look here" only), grey axes; a sparkline is clay only for a
+    real fall. **The range chips** have their own class, `.wt-chip` with `aria-pressed` (defect D6: a second global `.chip` rule had
+    restyled them). Every ✕ is a 44 px target (it was 26). *Delete all my weight history* is quiet clay text, two taps as before.
+  - Every write is the same (`<id>_1rm`, the tombstones, `<id>_hab_wt`, one reading a day), checked field by field.
+
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
 
 **Since 2026-10-12 Home leads with the week and its pieces moved: read *Home and Progress in the Centre Court look*
