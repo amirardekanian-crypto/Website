@@ -2,6 +2,8 @@
 
 A portable brand + design spec for generating on-brand content (Instagram carousels, **reels**, web sections). Paste any section into Claude (design or code) to get consistent output.
 
+> **The athlete app has its own kit: [`APP-UI-KIT.md`](APP-UI-KIT.md)** (*Centre Court*, 2026-10-12/13): tokens with dark values, type, the parts, the rules and how they adapt to Farsi/RTL. This file is the brand bible and the social/reel/web spec; where the two differ about the app, the kit wins (the app's own button is green, not clay; its labels are Space Mono, not Barlow Condensed).
+
 **Essence:** premium, clinical-but-warm, lots of breathing room. A "Roland-Garros" palette — deep green + clay on warm paper, with white court-lines and a clay ball-arc as the sport motif. **No yellow/gold.** Persian-first, RTL for social; English for the website/wordmark.
 
 ---
@@ -50,9 +52,9 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 
 | Role | Hex | Use |
 |---|---|---|
-| **Green (primary / "ink")** | `#0E4A36` | dark-slide background; dark text/headings on light; **the app's primary UI colour** |
+| **Green (primary / "ink")** | `#0E4A36` | dark-slide background; dark text/headings on light; **the app's primary UI colour** (in the app, green *text* is `--green-ink`, which lightens to `#6DBE95` in dark mode) |
 | Green-2 | `#156A4D` | gradients paired with the green |
-| **Clay (the ONE accent)** | `#C7552F` | highlights, buttons, eyebrows, the header dot, accent words, the ball-arc |
+| **Clay (the ONE accent)** | `#C7552F` | highlights, buttons (social and web), eyebrows, the header dot, accent words, the ball-arc. **In the app clay means "look here" only**; small clay text there is `#B5461F` and its white-text fill `#C2512C` ([`APP-UI-KIT.md`](APP-UI-KIT.md) §2.3) |
 | Clay-2 (lift) | `#E06B43` | clay text on **dark** surfaces (a touch brighter so it pops) |
 | **Paper** | `#FAF7F2` | light-slide background; light text on dark; app background |
 | Paper-2 | `#F1ECE3` | secondary warm surface |
@@ -74,7 +76,7 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 
 - **Farsi: Vazirmatn** (400–900) — used for *everything* Persian. Headlines 800–900, body 400–600.
 - **Latin display / wordmark: Barlow Condensed** (700–900, **italic** for the AA PERFORMANCE lockup; big stat numbers use it upright at 900).
-- **Latin UI / app text / labels: Barlow** (500–900). This is what the real app renders in, so any "screen inside a phone" uses Barlow.
+- **Latin UI / app text / labels: Barlow** (300–700 load; 500 body, 600 row names). This is what the real app renders in, so any "screen inside a phone" uses Barlow for sentences, **Barlow Condensed for buttons, titles and numerals, and Space Mono for eyebrows, captions and clocks** (11 px capitals). Sizes: the `--fs-*` scale in [`APP-UI-KIT.md`](APP-UI-KIT.md) §3.
 - **Latin numerals & counters: Barlow Condensed.** (JetBrains Mono is an optional alt only if you want a deliberately technical look — not the default.)
 
 **⚠️ Two hard Farsi rules**
@@ -103,13 +105,13 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 ## 4. Core components
 
 - **Header:** handle + clay dot only. *(The page counter «۰۱ / ۰۵» is **retired** — position is shown by the pagination balls instead.)*
-- **Footer:** **tennis-ball pagination** — one small ball per slide (grey = other slides, **orange/clay = the current slide**, slightly scaled + glow), the row laid out **ltr** even on RTL slides — plus a **swipe** indicator on slide 1 only («بکش», arrow points left, the RTL direction). *(Replaces the old segmented progress bar.)*
+- **Footer:** ⚠ *retired 2026-07-06 (see §6 and `DESIGN-ATLAS.md`).* **Tennis-ball pagination** — one small ball per slide (grey = other slides, **orange/clay = the current slide**, slightly scaled + glow), the row laid out **ltr** even on RTL slides — plus a **swipe** indicator on slide 1 only («بکش», arrow points left, the RTL direction). *(Replaces the old segmented progress bar.)*
 - **chip-A** — solid clay block, white text (a hard label, e.g. «اشتباهِ رایج»).
 - **chip-B** — clay text + a 64px clay leading dash (an eyebrow, e.g. «حرفِ راست»).
 - **.hl** — clay highlight block behind a key word, white text.
 - **.acc** — clay-colored accent word (clay-2 on dark).
 - **.strike** — clay bar struck through a word (for myths).
-- **Buttons:** *primary* = clay pill + white text; *ghost* = 2px outline, paper text. Pill-shaped.
+- **Buttons (social and web):** *primary* = clay pill + white text; *ghost* = 2px outline, paper text. Pill-shaped. **In the app** the primary is a green gradient with an 8 px corner and the secondary is outlined ([`APP-UI-KIT.md`](APP-UI-KIT.md) §5.8): do not show a clay button on a phone screen.
 
 ---
 
@@ -169,9 +171,9 @@ A persistent device, app UI animating inside:
 - **Device:** ~556×1136, `border-radius:62`, `padding:14`, dark gradient body, shadow `0 60px 130px rgba(0,0,0,.62)` **+ a clay halo** `0 0 140px rgba(199,85,47,.16)`. A slow 6.5s float idles it.
 - **Screen:** ~532×1108, `border-radius:48`, paper bg, **`dir="ltr"`**, Barlow. A **dynamic-island** pill (128×34) + a **status bar** (58px: time / signal / 5G / battery). Status bar text = ink on light screens, **white on dark** screens (and dark screens must extend *under* the bar, or the white text lands on paper and vanishes).
 - **Screen transitions:** base `opacity:0; translateY(22px) scale(.985)` → `.on`.
-- **Render the *real* app** (authenticity sells the product): English copy, Barlow, paper background, **green as the primary** UI colour, **clay as the highlight** — same two brand colours, green just leads on product surfaces.
+- **Render the *real* app** (authenticity sells the product): English copy, Barlow, paper background, **green as the primary** UI colour, **clay as the highlight** — same two brand colours, green just leads on product surfaces. Build the screens from [`APP-UI-KIT.md`](APP-UI-KIT.md) (cover, paper rows with hairlines, the outlined numeral, door rows) or capture the live app; the pre-2026-10-12 boxed look is retired.
 
-**Canonical app beats** (storyboard for the product reel): Lock screen → app opens (splash) → today's program (cycle + day banners) → exercise video (play→scrubber + coaching cue) → log weight + RPE → **readiness check** (use the app's real questions: sleep / energy / soreness / stress, 1–5) → coach message (typing→reply) → **coach sees it live** (dashboard updates the instant the athlete logs) → canonical outro.
+**Canonical app beats** (storyboard for the product reel): Lock screen → app opens (splash) → today's program (cycle + day banners) → exercise video (play→scrubber + coaching cue) → log weight + RPE → **readiness check** (use the app's real questions: sleep / energy / soreness / stress, 1–5) → the Coach tab's WhatsApp panel (no in-app chat since 2026-09-26; a message-typing beat would be false) → **coach sees it live** (dashboard updates the instant the athlete logs) → canonical outro.
 
 ```css
 :root{ --ease:cubic-bezier(.16,1,.3,1); }
@@ -186,6 +188,8 @@ A persistent device, app UI animating inside:
 ---
 
 ## 8. Ready-to-paste tokens (CSS)
+
+*For social, reels and the websites. The app's own tokens (`--paper`, `--sand`, `--row`, `--fill`, `--green-ink`, `--clay-ink`, `--hero`, `--btn` and their dark values) are in [`APP-UI-KIT.md`](APP-UI-KIT.md) §2.*
 
 ```css
 :root{
@@ -240,3 +244,13 @@ A persistent device, app UI animating inside:
 - **Proof / credentials word:** «تجربه» (experience) — *not* «پشتوانه».
 - **Pricing (Iran residents):** «معادلِ ۲۵ دلار در ماه — به تومان، با نرخِ روز» (pegged to USD, charged in Toman); abroad → DM. Pricing headline: «یه مربیِ کامل، با قیمتی کم‌تر از اون‌چه فکرشو می‌کنی.»
 - **Handle:** Instagram **@amirardekanian** · site **amirardekani.com** — confirmed canonical. *(Already-shipped reels show @amirardekani; leave them as built — use @amirardekanian in all new work.)*
+
+---
+
+## 11. The app's UI — Centre Court (pointer)
+
+The athlete app was redesigned screen by screen on 2026-10-12/13 into one look. In a paragraph: **calm warm paper, rows with hairlines instead of cards,
+ONE strong green thing per screen** (the *cover*: a photo graded into green with a mint-dot eyebrow, a condensed capitals title and a scoreboard), a
+**green primary button**, the **outlined P24 numeral** that fills when an exercise is done, and **clay only where the athlete should look**. Dark mode is the
+athlete's choice. Everything, with values and selectors, is in [`APP-UI-KIT.md`](APP-UI-KIT.md); §9 of it says which parts carry over to Farsi/RTL screens
+(no capitals, no letter-spacing, Persian numerals, mirrored arrows) and which need a Vazirmatn variant.

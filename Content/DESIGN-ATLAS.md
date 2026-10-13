@@ -4,6 +4,8 @@ Open this before designing **anything** for Amir — carousel, reel, post, resul
 web or app redesign, animation. It answers three questions in a second: **where is every
 asset**, **what's the current rule** (vs retired), and **how each format is built**.
 The brand *why* lives in [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) — read the two together.
+**Designing anything that looks like the athlete app** (a screen, a mock-up, a reel's phone, the Farsi course app) starts at
+[`APP-UI-KIT.md`](APP-UI-KIT.md): *Centre Court*, the app's tokens, parts and rules, with a section on adapting it to Farsi/RTL.
 
 **Precedence when docs clash:** Amir-confirmed values in `.claude/skills/*/SKILL.md`
 → then [`Carousel-Kit.html`](Carousel-Kit.html) CSS → then `DESIGN_SYSTEM.md` prose.
@@ -26,7 +28,7 @@ new decks are Farsi) · [`reel-8-course.html`](reel-8-course.html) + [`reel-7-co
 | Language | **Farsi for all new social content** (Amir, 2026-09-21; `.claude/skills/ad/BRAND.md` §6): Vazirmatn, RTL, no uppercase or letter-spacing, Persian numerals. English only when he asks. Barlow stays for app screens and Latin numerals. |
 | Fonts | Farsi = **Vazirmatn** 400–900 · Latin display & numerals = **Barlow Condensed** 700–900 (*italic* only for the wordmark) · app/phone UI = **Barlow** · EN-site body = DM Sans · app mono = Space Mono · EN-site labels = JetBrains Mono. All Google Fonts (needs internet; base64-embed woff2 for true offline). |
 | Farsi hard rules | never `letter-spacing` (breaks cursive joining) · no UPPERCASE · Persian numerals «۰۱۲» · `direction:ltr` on counters, KPIs, handles, phone mock-ups |
-| Motion | house ease `cubic-bezier(.16,1,.3,1)` everywhere |
+| Motion | house ease `cubic-bezier(.16,1,.3,1)` in reels, carousels and the sites. The app itself uses plain `ease` and short durations ([`APP-UI-KIT.md`](APP-UI-KIT.md) §2.5) |
 | Canvases | carousel **1080×1350** (edge pad 64px) · reel **1080×1920** (pad 88px) · result card 1080×1080 |
 | Contrast | solid clay block → always `#fff` text · accent text on dark → clay-2 `#E06B43` |
 | Assets | real product art & real photos, never stock — the cycle/day banners *are* the product |
@@ -54,7 +56,12 @@ Never reuse anything in the right column, even though old files still contain it
 | Clay-2 `#E06B43` accents on dark | Gold `#E9B949` (reels 1–3 predate the rule) |
 | Farsi social content (2026-09-21) | English-only social (the 2026-07-02 directive); shipped English work stays as built |
 | Mantra without «کامل»/comma | «یه نقشه‌ی کامل…», «یه مربی، تو جیبت» (still in kit line ~1612 + reels 2–4) |
-| Library "Two Doors" (Sessions green / Playbook clay) | Read\|Train segmented control (dead CSS in program.html) |
+| **Library = one screen with a three-way switch** Sessions · Playbook · Exercises (2026-10-13, Amir: "Remove the doors"); the last pane used opens next | Library "Two Doors" / the doors page (Sessions green, Playbook clay) · Read\|Train segmented control |
+| **Centre Court** (2026-10-12/13): calm paper, rows with hairlines, one green cover per screen, `--hero` / `--btn` gradients, the P24 outlined numeral ([`APP-UI-KIT.md`](APP-UI-KIT.md)) | **Night Court** and the boxed look before it: white cards with shadows, 3 px block stripes (warm-up/power clay, strength green), a tick ring, a clay Playbook door |
+| The tab is **Progress** (Home · Progress · Library · Coach, 2026-10-12). The road of cycles on it is still titled "Game Plan" | "Game Plan" / "My Plan" as a tab name · tab order Home · Coach · Library · Game Plan |
+| One colour set on `body` / `body[data-dark]`; text tokens `--green-ink` / `--clay-ink`; clay only for "look here" | `--yellow` (it is green) and `--ice` (it is clay) as names in new work · clay as a block title, stripe, done tint or button · any yellow, gold, ochre or amber |
+| The Home **This cycle** card; Progress's cover (`--hero`) with the cycle's art and the road | The Active-cycle photo card with its banner and the C1–Cn meter |
+| Coach tab = a WhatsApp panel (Amir answers only there) | An in-app chat, typing-then-reply beats in a product reel |
 | Cycle-name system ("Cycle 2 of 5 · Strength Engine") | "Program 02 · Month Two" |
 | Kit's `.avatars` real photos or none | Gradient avatar placeholders (off-palette) |
 | **Huge translucent background page-number per slide** (`ghost-num`, ~460–640px, one per slide, low-opacity) — the number itself signals position | Tennis-ball pagination dots (row of grey/orange balls) — retired once the ghost number does that job. Header/footer chrome otherwise unchanged (clay dot + handle; swipe hint stays, slide 1 only). |
@@ -73,7 +80,7 @@ Never reuse anything in the right column, even though old files still contain it
 | **App icon / logo mark** | [`../assets/img/icon-192.png`](../assets/img/icon-192.png) (+ `icon-512`, `apple-touch-icon`, `favicon-32/.svg`) | On a paper surface: round corners ≈ **24% of size** + soft shadow so it reads as a tile. Masters: [`../assets/img/source/aa-mark.png`](../assets/img/source/aa-mark.png) (1254², monogram) · [`aa-logo.png`](../assets/img/source/aa-logo.png) (monogram + PERFORMANCE). Regenerate via [`generate_icons.py`](../assets/img/generate_icons.py). |
 | **Wordmark / share banner** | [`../assets/img/og-image.jpg`](../assets/img/og-image.jpg) (1200×630, JPEG q85 ~52KB) | Master: [`og-source.png`](../assets/img/source/og-source.png) (1731×909); regenerated by `generate_icons.py`. (The old 548KB PNG is retired.) |
 | **Court textures** (the signature backgrounds) | [`../court-sessions.jpg`](../court-sessions.jpg) (green, 1536×1024) · [`../court-playbook.jpg`](../court-playbook.jpg) (clay) | Used across the app + dark carousel slides. Standard photo scrim: `linear-gradient(to top, rgba(8,38,27,.94), rgba(8,38,27,.18) 56%, rgba(8,38,27,.58))`. |
-| **App screenshot** | [`../app-warmup-preview.jpg`](../app-warmup-preview.jpg) (729×1280, workout-session screen) · live app at `program.html?client=demo` | Screenshot gotchas in [App look](#the-apps-look--for-mockups--reels). |
+| **App screenshot** | [`../app-warmup-preview.jpg`](../app-warmup-preview.jpg) (729×1280, workout-session screen; ⚠ pre-Centre Court, re-capture before new work) · live app at `program.html?client=demo` | Screenshot gotchas in [App look](#the-apps-look--for-mockups--reels). |
 | **Cycle banners** (16:9) | [`../assets/cycles/`](../assets/cycles/) — 9 JPGs, 1200×675 | ⚠ 29 of 38 slugs in use have **no banner** (see [`README`](../assets/cycles/README.md)); missing → green-gradient fallback. Gen prompt in [`IMAGES.md`](../IMAGES.md). |
 | **Day banners** (5:2) | [`../assets/days/`](../assets/days/) — 8 WebPs, 1600×640: lower/upper/power/conditioning/core/recovery/fullbody/default | Picked by keyword (`DAY_IMAGE_RULES` in program.html). Keep bottom 40% + left 55% dark for white text. |
 | **Workout-category banners** (2:1) | [`../assets/img/workouts/`](../assets/img/workouts/) — 5 WebPs, 1600×800: strength/conditioning/on-court/mobility/recovery | Dark moody gym series — the grade to match. |
@@ -158,34 +165,28 @@ is just the quick-reference.
 - **Signature pattern = "App-as-Product"** ([`reel-4-app.html`](reel-4-app.html)): one persistent phone in a dark radial room, screens swap inside it, burned-in Farsi captions below, endcard takeover. Use this pattern when the whole reel is a tour of the app; use reel-6's scene-swap pattern for a numbered-steps narrative.
 - **Phone spec:** device 556×1136, radius 62, pad 14, dark gradient body, shadow + **clay halo** `0 0 140px rgba(199,85,47,.16)`, 6.5s idle float. Screen radius 48, paper bg, **`dir=ltr` + Barlow** (the real English app), dynamic island 128×34, status bar 58px. Screen transition: `opacity 0 / translateY(22px) scale(.985)` → on.
 - **Rhythm:** hook in first 2s · 2–6s per beat · ~30–40s total · text cascades `.rise` (translateY ~44px, delays in .12s steps) · count-ups ease-out.
-- **Canonical app beats:** lock screen → splash → today's program → exercise video → log weight+RPE → readiness check → coach chat → coach dashboard → canonical outro endcard.
+- **Canonical app beats:** lock screen → splash → today's program → exercise video → log weight+RPE → readiness check → the Coach tab's WhatsApp panel (there is no in-app chat since 2026-09-26) → coach dashboard → canonical outro endcard.
 - **Delivery — the deliverable is the HTML file itself**, sent directly so Amir can open/preview/screen-record it himself. **No MP4 unless explicitly asked**; no per-beat screenshot walls; no audit workflow for a routine draft. The `/reel` skill's Step 9 covers the export for when an MP4 *is* requested: a **frame-accurate renderer** (`.claude/skills/reel/tools/render_mp4.js`, 30 s of reel in about 35 s, 26 MB at crf 15), not a screen recording. A reel that will really be posted (an ad) gets the full check in Step 7 first, and is saved with its sources in `Content/<reel>/` (Step 10).
 - ⚠ Reels 1–3 (and reel-5, Farsi) predate the current rules or the language directive — copy mechanics only, not styling/language, from those files. Never retro-edit shipped reels; start a new numbered file.
 
 ## Recipe: result cards & app mockups
 
-- [`card-preview.html`](card-preview.html) = the **app-card library**: every program.html/coach.html card rebuilt with real class names (cycle card, day card, cycle meter, exercise checklist, readiness, session complete, chat, coach triage, charts). Use it when a design must mirror the product.
+- [`card-preview.html`](card-preview.html) = the **app-card library**: every program.html/coach.html card rebuilt with real class names (cycle card, day card, cycle meter, exercise checklist, readiness, session complete, chat, coach triage, charts). Use it when a design must mirror the product. ⚠ It was built before Centre Court (2026-10-12): its cards are the old boxed look. Mirror [`APP-UI-KIT.md`](APP-UI-KIT.md) instead and re-capture from the live app.
 - The 7 shipped cards in [`instagram-cards/`](instagram-cards/) are pre-brand (black/neon-yellow) — treat as content reference only.
 
 ---
 
 ## The app's look — for mockups & reels
 
-- **Default is light warm-paper**; dark mode is opt-in `body[data-dark]` (bg `#181818`, cards `#202020`). There is **no `theme-light` class** in program.html — that's stale terminology.
-- ⚠ Token names lie: in program.html `--yellow` = **green #0E4A36**, `--ice` = **clay #C7552F** (legacy names, re-pointed values). `--purple` (ochre) was deleted on 2026-09-26 with the last ochre and amber in both apps; the third tile tone is now **paper** (`tone-paper`: `#F1ECE3` with a green icon). The coach-side pages followed the same day: in coach.html `--ochre` (and the chart colour `C.amber`) and in call-log.html `--amber` are now a **muted plum #7A4E6E** (soft `rgba(122,78,110,0.12)`; call-log `#EDE3EA`), the "warn" step between green and clay. Legacy names, re-pointed values. AA Proof's METALS run bronze → silver → **emerald** → amethyst → prismatic.
-- Fonts: Barlow Condensed (all display, uppercase) · Barlow (body) · Space Mono (eyebrows/meta/timers).
-- Chrome: no top nav; bottom tab bar (Home / Coach / Library / Game Plan), green icons, active gets glow.
-- Signature elements: greeting eyebrow (Space Mono clay) over giant Barlow Condensed 900 first name · cycle cards = white card, 16:9 photo banner + green scrim + "CYCLE n OF N" + pills · day cards = 5:2 banner + "DAY n" · cycle meter = 5px segments (done green, current glowing) · exercise rows = white cards w/ 3px block-coloured left stripe (warm-up/power clay, strength green) · RPE squares fill green · rest timer = full-screen ring, 96px mono · Library = Two Doors (Sessions green photo / Playbook clay photo) · article reader "Center Court" = clay drop-cap, tennis-ball bullets, clay callouts.
-- **Login screen = "Baseline"** (Amir picked it 2026-09-12 from the three directions in
-  [`login-directions.html`](login-directions.html), taking the icon placement and the mantra
-  headline from the "Floodlight" direction). `court-sessions.jpg` under a green scrim, 52px logo
-  tile above a clay-2 Space Mono eyebrow, `A COACH IN YOUR POCKET.` in Barlow Condensed 900 with
-  **coach** in clay-2, then the form rising over the photo as a paper sheet (30px top radius,
-  -30px overlap). Clay button. ⚠ The hero is a green background **colour** with the photo as an
-  `<img>` fading over it — the form paints from markup in ~50ms and must never wait on a photo,
-  so the green stands in until the court arrives. The other two directions (Logbook, Floodlight)
-  stay in that file as the reference for anything else on this surface.
-- **Screenshots:** serve over HTTP (`python3 -m http.server`) — file:// fails; wait out `.loading-screen` (~1s) and entrance anims (or inject `*{animation-duration:0s!important}`); Chromium at `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`; demo data = `?client=demo` (athlete "Alex Rivera").
+**Full spec: [`APP-UI-KIT.md`](APP-UI-KIT.md)** (Centre Court, `program.html`, cache `aap-v124`–`v137`). What a mock-up or a reel's phone needs in a minute:
+
+- **Default is light warm-paper** (`#FAF7F2`); dark is opt-in, the athlete's choice, `body[data-dark]` (paper `#181818`, rows `#242424`). There is **no `theme-light` class**.
+- **Token names lie, and now they are only aliases:** `--yellow` = the **green** `#0E4A36` fill, `--ice` = **clay** `#C7552F`. Use the new names (`--fill`, `--green-ink`, `--clay`, `--clay-ink`, `--paper`, `--sand`, `--row`, `--hair`, `--ink`, `--grey`). The ochre/amber of the coach pages is a muted plum `#7A4E6E` (coach.html `--ochre`, call-log `--amber`: legacy names, re-pointed values). AA Proof's metals run bronze → silver → **emerald** → amethyst → prismatic.
+- **Fonts:** Barlow (body, row names) · Barlow Condensed (every button and link, titles, numerals) · Space Mono (every eyebrow, caption and clock). The old "all display uppercase" line is only true of titles and buttons.
+- **Chrome:** no top nav; the bottom tab bar is **Home · Progress · Library · Coach**; mid-session the bar hides and a slim green session bar replaces it.
+- **Signature elements:** the **cover** (a photo graded into green: luminosity blend, left mask, a scrim into `--hero-end`, the mint-dot eyebrow, the condensed title in capitals, a 44 px glass ←) is the screen's one green thing · **paper rows with hairlines** (no cards, no shadows) · the **outlined P24 numeral** that fills solid green when the exercise is done · the **scoreboard** (value over caption in four tracks: 4 × 6, RPE, tempo, rest) · **door rows** (white, rounded 12, a green line icon, a mono label) · **banners** (a white row with a 4 px stripe: clay asks, steel is sore, grey is offline) · the **Coach's note** as a pull quote with a clay “ · his **signature and photo** under his words · the primary button is a **green gradient**, never clay · RPE squares fill green, over target clay, under target steel blue · rest timer = a green band with a mint ring and 96 px white digits · the article reader ("Center Court") has a green heading bar and drop cap, ball bullets.
+- **Login screen = "Baseline"** (Amir picked it 2026-09-12 from [`login-directions.html`](login-directions.html)): `court-sessions.jpg` over a `--hero` green with the photo fading over it, the eyebrow *● AA PERFORMANCE*, `A COACH IN YOUR POCKET.` in Barlow Condensed 900 with **coach** in `--clay-on-green`, then the form rising over the photo as a paper sheet (16 px top corners, −30 px overlap), fields in the set table's box look, the primary green button. Re-skinned into Centre Court's tokens 2026-10-13.
+- **Screenshots:** serve over HTTP (`python3 -m http.server`) — file:// fails; wait out `#loading` (~1s) and entrance anims (or inject `*{animation-duration:0s!important}`); Chromium at `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`; demo data = `?client=demo` (athlete "Alex Rivera"). ⚠ Files made before 2026-10-12 (`app-warmup-preview.jpg`, `card-preview.html`, `reel-4-app.html`'s phone screens, the `client-app-map/` shots) show the **old boxed look**: re-capture from the live app before using them in new work.
 
 ## The websites' look
 
@@ -225,5 +226,7 @@ Site CSS: [`tokens.css`](../assets/css/tokens.css) → [`base.css`](../assets/cs
 1. **29 cycle slugs have no banner art** (green fallback shows); existing 9 banners are bright-studio style vs the documented moody grade.
 2. **Reels 1–3 + kit outro wording** still carry gold accents / old mantra («کامل», comma). Amir's ruling: **don't retro-edit shipped designs** — apply current rules to new work only.
 3. **instagram-cards** are pre-brand neon-yellow — next results card should be redesigned on the current system.
+4. **Pre-Centre Court app pictures** (`app-warmup-preview.jpg`, `card-preview.html`, `reel-4-app.html`'s screens, `Content/client-app-map/*.jpg`) show the retired boxed look. Re-capture when a piece next needs the app on screen.
+5. **Claude Design system "AA performance"** (Amir, 2026-10-13: he had one there). No Design System artifact is listed on claude.ai; the Claude Design project needs `/design-login` before it can be read or updated from the repo docs. Not yet synced to this kit.
 
 **Resolved rulings** (2026-07-02, by Amir): Instagram handle = **@amirardekanian** (shipped designs stay as built) · og-image recompressed to JPEG q85 ~52KB · DESIGN_SYSTEM frame fixed to `.30` at source.
