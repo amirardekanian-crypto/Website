@@ -898,6 +898,21 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
   - **An article**: the same cover; a callout takes the Coach's-note pull-quote look; an embedded session is a door row. The reading
     layout (the clay heading bar, the drop cap) is unchanged.
 
+- **Sign in, the Welcome, Loading and the error screen** (`showSignIn()`, `maybeWelcome()`, `#loading`, `showError()`;
+  `scripts/headless/entry-screens.js`, 121 checks; one block at the very end of the sheet):
+  - **Sign in** keeps Amir's "Baseline" (2026-09-12): the court photo over a hero that paints as `--hero` before the photo, the scrim a
+    mask of `--hero-end`, the eyebrow *● AA PERFORMANCE* in the mint-dot recipe, *COACH* clay on green (`--clay-on-green`, the brand line).
+    The sheet is `--paper` with the app sheet's 18 px top corners; the labels Space Mono in `--grey`; the fields the set table's boxes (white
+    `--row`, `--field` edge, 16 px text, 48 px, 10 px corners, green focus); a failed sign-in is the day's banner (4 px clay stripe, ink text).
+    Every colour is a token now (`--court` is no longer read).
+  - **The Welcome** is a cover (the picture graded into `--hero` as the archive's is, *● YOU'RE IN*, *WELCOME, ALEX.*, ✕ as the 44 px glass
+    button), its two lines on the paper **signed** (`WN_SIG` and his photo), **Open Day 1** the primary button and *Look around first* quiet
+    green-ink text; both on screen at 320 × 568. On a wide window it sits in the app's 520 px column.
+  - **Loading** is the mark (52 px), a 32 px ring and *LOADING YOUR PLAN* (it read "Loading Program"); with reduced motion the ring turns
+    slowly and never stops.
+  - **The error screen** keeps its clay icon (an error is "look here"), the title and message in ink, `.error-btn` in the one primary list and
+    `.error-btn.ghost` outlined, both 48 px. No `--yellow` left in it.
+
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
 
 **Since 2026-10-12 Home leads with the week and its pieces moved: read *Home and Progress in the Centre Court look*
@@ -1120,7 +1135,7 @@ size is a token in `:root`, picked by its job:
   part (`span:not(:last-child)::after`), so a new line starts clean. On a 390 px iPhone the open squat card's
   four parts take two lines; before, they fitted only by running into the card's padding.
 - **One primary button** (part 2, 2026-09-27, after DS-01 settled that buttons are green): every filled action
-  (Sign in, the welcome's Open Day 1, Begin session, Start/Pause, Rest, the rest timer's Pause, Guided's Done,
+  (Sign in, the welcome's Open Day 1, the error screen's buttons, Begin session, Start/Pause, Rest, the rest timer's Pause, Guided's Done,
   the filed day's OK, Done · send to coach, + Log a max, Log a max's Save to Personal Records, Weigh in) wears one look, set once at the end of the stylesheet:
   green, white Barlow Condensed 700 in capitals, 1 px tracking, an 8 px corner, 44 px at the least. There were
   eleven (corners from 4 to 13 px, two fonts, tracking from 0.02 em to 1.5 px, weights 700 and 900, and Sign in

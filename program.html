@@ -291,149 +291,7 @@
     overflow-x: hidden;
   }
 
-  /* ── Loading State ── */
-  .loading-screen {
-    position: fixed; inset: 0; z-index: 9999;
-    background: var(--grey-bg);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    transition: opacity 0.4s ease;
-  }
-  .loading-screen.hidden { opacity: 0; pointer-events: none; }
-  .loading-spinner {
-    width: 40px; height: 40px;
-    border: 3px solid var(--grey-mid); border-top-color: var(--yellow);
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-  }
-  .loading-text {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: var(--fs-label); letter-spacing: 3px; text-transform: uppercase;
-    color: var(--grey-text); margin-top: 20px;
-  }
-  .error-screen {
-    position: fixed; inset: 0; z-index: 9998;
-    background: var(--grey-bg);
-    display: none; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 40px;
-  }
-  .error-screen.visible { display: flex; }
-
-  /* ── Sign in — "Baseline" (Amir picked it 2026-09-12) ──────────────────
-     The real court under a green scrim, with the form rising over it as a paper
-     sheet. The mark sits above the headline rather than in a top bar, and the
-     headline is the EN mantra — both lifted from the "Floodlight" direction he
-     liked in Content/login-directions.html.
-     ⚠️ The hero is a background COLOUR with an <img> over it, not a background
-     image: the form paints from markup in ~47ms and must not wait on a photo, so
-     the green stands in until the court fades up. Never give this a white or
-     unset background — that is the one thing that would read as broken. */
-  .signin-screen { display: none; position: fixed; inset: 0; z-index: 900;
-    background: var(--court, #0E4A36); overflow-y: auto; }
-  .signin-screen.visible { display: block; }
-  .signin-card { width: 100%; max-width: 460px; min-height: 100%; margin: 0 auto;
-    background: #FAF7F2; display: flex; flex-direction: column; }
-
-  /* ⚠️ The copy is pushed down by margin-top:auto inside a padded flex column, NOT
-     anchored with `bottom`. Anchoring it put the logo 22px from the top of a 667px
-     phone — under the status bar — because a short screen makes a short hero and a
-     bottom-anchored block then starts wherever it lands. The padding is the floor:
-     it cannot be crossed however short the screen gets. env() is 0 today (the
-     viewport meta has no viewport-fit=cover) and is here so a notch is handled if
-     that ever changes. The 296px minimum is what the block actually needs —
-     raised from 264 when the mantra's second line joined it. */
-  .si-hero { position: relative; flex: 0 0 auto; overflow: hidden;
-    height: clamp(296px, 42vh, 380px); background: var(--court, #0E4A36);
-    display: flex; flex-direction: column;
-    padding: calc(env(safe-area-inset-top, 0px) + 44px) 26px 52px; }
-  .si-hero-img { position: absolute; inset: 0; width: 100%; height: 100%;
-    object-fit: cover; opacity: 0; transition: opacity .55s cubic-bezier(.16,1,.3,1); }
-  .si-hero-img.in { opacity: 1; }
-  .si-hero-scrim { position: absolute; inset: 0; background: linear-gradient(to top,
-    rgba(8,38,27,.96) 6%, rgba(8,38,27,.40) 56%, rgba(10,10,10,.52)); }
-  .si-hero-copy { position: relative; z-index: 2; margin-top: auto; }
-  /* Real logo tile, not an "AA" square. 24% radius is the house treatment, and
-     icon-192.png is already in the service worker's pre-cache, so it costs nothing. */
-  .signin-mark { display: block; width: 52px; height: 52px; border-radius: 13px;
-    margin: 0 0 16px; box-shadow: 0 8px 24px rgba(0,0,0,.34); }
-  .si-eyebrow { font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
-    letter-spacing: .17em; text-transform: uppercase; color: #E06B43; margin-bottom: 9px; }
-  /* clay-2 #E06B43, not clay — accent text on dark takes the lighter one. */
-  .signin-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    text-transform: uppercase; font-size: var(--fs-display); line-height: .92; letter-spacing: .005em;
-    color: #fff; margin: 0; }
-  .signin-title em { font-style: normal; color: #E06B43; }
-  /* The other half of the mantra, and it belongs WITH the first half rather than
-     opening the form (Amir, 2026-09-12). Barlow, not Condensed: a second line of
-     condensed caps under a 44px condensed caps headline competes with it instead
-     of answering it. Sized generously on purpose — supporting copy here is a line
-     of the brand, not a caption, and Amir has called this kind of line out for
-     being too quiet before. */
-  .si-mantra { margin: 13px 0 0; font-family: 'Barlow', sans-serif; font-size: var(--fs-lead);
-    font-weight: 400; line-height: 1.38; letter-spacing: .01em; color: rgba(255,255,255,.80); }
-
-  .si-sheet { flex: 1 1 auto; position: relative; z-index: 2; margin-top: -30px;
-    background: #FAF7F2; border-radius: 30px 30px 0 0;
-    padding: 30px 26px 26px; display: flex; flex-direction: column; }
-  .signin-f { display: block; margin-bottom: 15px; }
-  .signin-f > span { display: block; font-family: 'Space Mono', monospace; font-size: var(--fs-label);
-    font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: #5c6a66;
-    margin-bottom: 7px; }
-  /* 16px keeps iOS from zooming the page when the field takes focus. */
-  .signin-f input { width: 100%; box-sizing: border-box; font-size: var(--fs-field); padding: 14px 15px;
-    border: 1.5px solid #d9e0dd; border-radius: 13px; background: #fff; color: #1A1A1A;
-    transition: border-color .35s cubic-bezier(.16,1,.3,1); }
-  .signin-f input:focus { outline: none; border-color: var(--court, #0E4A36); }
-  /* Reveal toggle. The input gains room on the right so revealed text never
-     runs under the button, and the button sits over that gap, not over the text. */
-  .signin-f .si-wrap { position: relative; }
-  .signin-f .si-wrap input { padding-right: 52px; }
-  .si-eye { position: absolute; top: 0; right: 0; width: 48px; height: 100%;
-    display: flex; align-items: center; justify-content: center; padding: 0;
-    background: none; border: 0; cursor: pointer; color: #7d8a86;
-    -webkit-tap-highlight-color: transparent; }
-  .si-eye:focus-visible { outline: 2px solid var(--court, #0E4A36); outline-offset: -4px;
-    border-radius: 0 13px 13px 0; }
-  .si-eye svg { width: 20px; height: 20px; display: block; }
-  .si-eye .si-eye-slash { display: none; }
-  .si-eye.on { color: var(--court, #0E4A36); }
-  .si-eye.on .si-eye-slash { display: block; }
-  /* The one primary button (DS-03) sets its look at the end of this sheet; here only its place. It was
-     clay with a clay glow until 2026-09-27: buttons are green (DS-01). */
-  .signin-go { width: 100%; padding: 16px; font-size: var(--fs-body); margin-top: 6px;
-    transition: transform .35s cubic-bezier(.16,1,.3,1); }
-  .signin-go:active { transform: translateY(1px); }
-  .signin-go[disabled] { opacity: .6; cursor: default; box-shadow: none; }
-  .signin-err { margin-top: 13px; padding: 10px 12px; border-radius: 9px; font-size: var(--fs-small);
-    background: rgba(199,85,47,.10); color: #C7552F; line-height: 1.45; }
-  .signin-help { margin: 16px 0 0; font-size: var(--fs-small); color: #7d8a86; text-align: center;
-    line-height: 1.5; }
-  .signin-help a { color: var(--green-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-  /* Anchors the bottom of the sheet. Without it a tall phone leaves ~200px of bare
-     paper under the help line, which reads as unfinished rather than as space. */
-  .signin-foot { margin: auto 0 0; padding-top: 22px; text-align: center;
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
-    letter-spacing: .16em; text-transform: uppercase; color: #bdb5a8; }
-  .error-icon { margin-bottom: 16px; color: var(--clay-big); }   /* a 46 px drawn icon, not text: it keeps the brand clay it had */
-  .error-icon svg { width: 46px; height: 46px; display: block; }
-  .error-title {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: var(--fs-head); color: var(--green-ink); text-transform: uppercase;
-    margin-bottom: 8px; text-align: center;
-  }
-  .error-msg { font-size: var(--fs-body); color: var(--grey-text); text-align: center; line-height: 1.6; max-width: 340px; }
-  .error-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; width: 100%; max-width: 300px; }
-  .error-actions:empty { display: none; }
-  .error-btn {
-    display: block; min-height: 46px; padding: 13px 18px; border-radius: 10px;
-    border: 1.5px solid var(--yellow); background: var(--yellow); color: var(--on-accent);
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body);
-    letter-spacing: 1px; text-transform: uppercase; text-align: center; text-decoration: none;
-    cursor: pointer;
-  }
-  .error-btn.ghost { background: transparent; color: var(--green-ink); border-color: var(--yellow-mid); }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
+  /* Loading, Error and Sign in (.loading-*, .error-*, .signin-*, .si-*, @keyframes spin): their look is the SIGN-IN, WELCOME, LOADING AND ERROR IN THE CENTRE COURT LOOK block, the last in this sheet. */
 
   /* ── Screens ── */
   .screen { display: none; min-height: 100vh; flex-direction: column; }
@@ -1920,29 +1778,7 @@
   /* .ex-1rm-* (the fields of Records → Log a max), .ceil-* and .wt-* (Personal Records and Body weight): their look is the RECORDS AND BODY
      WEIGHT IN THE CENTRE COURT LOOK block, just before CENTRE COURT. The older rules (the yellow header, the card, the dark overrides) went with it. */
 
-  /* Welcome — shown once, straight after a new athlete signs in. Built on the
-     sign-in screen's own furniture so it reads as the next frame of it. */
-  .wel { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column;
-    background: var(--grey-bg); animation: fadeUp 0.35s ease both; }
-  .wel-hero { position: relative; flex: 0 0 auto; height: clamp(296px, 42vh, 380px);
-    background: #0E4A36; overflow: hidden; display: flex; }
-  .wel-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-    object-position: center 40%; opacity: 0; transition: opacity 0.5s ease; }
-  .wel-hero img.in { opacity: 1; }
-  .wel-scrim { position: absolute; inset: 0; background: linear-gradient(to top,
-    rgba(8,38,27,0.96) 6%, rgba(8,38,27,0.40) 56%, rgba(10,10,10,0.52)); }
-  .wel-copy { position: relative; z-index: 2; margin-top: auto; padding: 0 22px 52px; }
-  .wel-eyebrow { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 2px;
-    text-transform: uppercase; color: #E06B43; margin-bottom: 8px; }
-  .wel-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display);
-    line-height: 1; text-transform: uppercase; color: #fff; }
-  .wel-sheet { position: relative; margin-top: -30px; border-radius: 30px 30px 0 0;
-    background: var(--grey-bg); padding: 26px 22px 30px; flex: 1 1 auto; }
-  .wel-sheet p { margin: 0 0 10px; font-size: var(--fs-body); color: var(--grey-dark); }
-  .wel-sheet p.sub { color: var(--grey-text); font-size: var(--fs-small); }
-  .wel-go { display: block; width: 100%; margin-top: 18px; padding: 15px; font-size: var(--fs-lead); }   /* look: the one primary button */
-  .wel-skip { display: block; width: 100%; margin-top: 10px; padding: 12px; border: 0; background: none;
-    color: var(--grey-text); font-size: var(--fs-body); cursor: pointer; }
+  /* The Welcome (.wel*, shown once after a new athlete's first sign-in): its look is the SIGN-IN, WELCOME, LOADING AND ERROR IN THE CENTRE COURT LOOK block, the last in this sheet. */
   /* First-session hints (ONB-01, 2026-09-27): one at a time, in the flow right under the thing it explains (the
      session bar, the set to tick, the RPE strip that just opened). paintHints() places it; its look is the CENTRE
      COURT block. */
@@ -2368,9 +2204,7 @@
   /* A set ticked with no weight in its box: the box pulses once or twice, the toast says why. */
   .ex-set-wbox.kg-nudge .ex-set-weight { border-color: var(--ice); animation: kgNudge 0.9s ease 2; }
   @keyframes kgNudge { 0%, 100% { box-shadow: 0 0 0 3px rgba(199,85,47,0.28); } 50% { box-shadow: 0 0 0 6px rgba(199,85,47,0.45); } }
-  /* The Welcome's ✕, top right (one close grammar: a full-screen overlay closes with ✕ there). */
-  .wel-x { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); right: 12px; z-index: 3; width: 44px; height: 44px;
-    border-radius: 50%; border: 0; background: rgba(0,0,0,0.35); color: #fff; font-size: var(--fs-lead); line-height: 1; cursor: pointer; }
+  /* The Welcome's ✕ (.wel-x, top right: one close grammar, a full-screen overlay closes with ✕ there): in the SIGN-IN, WELCOME, LOADING AND ERROR block. */
   /* A card whose banner (not the whole card) is the way to Home: Game Plan's Active card. */
   .cm-banner[role="button"] { cursor: pointer; }
   .timer-presets { display: flex; gap: 10px; margin-top: 32px; }
@@ -2584,7 +2418,7 @@
      its size: the full-width actions at --fs-body (--fs-lead for the welcome and Done · send to coach), the
      compact ones in a card or the session bar smaller, where their widths were measured (WK-02, WK-03).
      A new primary action joins this list; a secondary one is outlined (Guided, Reset). */
-  .signin-go, .wel-go, .readiness-begin, .session-timer-btn:not(.guided), .step-primary-btn,
+  .signin-go, .wel-go, .error-btn, .readiness-begin, .session-timer-btn:not(.guided), .step-primary-btn,
   .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .wt-save, .rest-btn, .ex-1rm-save {
     background: var(--yellow); color: var(--on-accent); border: 0; border-radius: 8px; min-height: 44px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
@@ -4808,6 +4642,139 @@
   .archive-ex-name { display: block; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); text-wrap: balance; }
   .archive-ex-detail { display: block; margin-top: 3px; font: 400 var(--fs-small)/1.3 'Space Mono', monospace; letter-spacing: .04em; color: var(--grey); }
   .archive-empty { margin: 28px var(--g) 0; font: 400 var(--fs-lead)/1.5 'Barlow', sans-serif; color: var(--grey); }
+  /* ══ SIGN-IN, WELCOME, LOADING AND ERROR IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════
+     Amir, 2026-10-13: "continue until everything has a consistent design". The four screens a person sees before or around their
+     first plan wear Centre Court's look: Loading (the mark, a ring, one mono line, on the paper) · Sign in ("Baseline", Amir's pick of
+     2026-09-12, kept: the court photo under its scrim, the mark, the headline with its clay COACH, the mantra, the paper sheet
+     rising over it, the help line and the footer; now the mint-dot eyebrow, the sheet at the app's sheet radius, the set table's boxes
+     and the day's banner for an error) · Welcome (a cover: the picture graded into --hero as every other cover does it, the
+     glass ✕, a sheet on the paper, Amir's signature under his two lines, the one primary button) · Error (the paper, a clay icon, an ink
+     title, the primary button and its outlined twin). Behaviour is untouched: every id, handler, autocomplete name, the eye, the
+     retry, showError()'s titles, icons, words and buttons, the Welcome's three ways out and the phone's Back.
+     Colours are the app's ONE set (THE APP'S ONE COLOUR SET, on body); none is declared here and none is hard-coded except the
+     white of a text on the green and a mask's alpha. The gutter is --g. Font sizes are the --fs-* tokens, or a display size with its
+     comment. ⚠️ The sign-in hero is a background COLOUR (the cover's --hero) with the <img> over it, never a background-image: the
+     form paints from markup in ~47 ms and must not wait on a photo, so the green stands in until the court fades up. */
+
+  /* 1. Loading: the paper, the mark, a 32 px ring, one mono line. Reduced motion turns the ring slowly: it never stops. */
+  .loading-screen { position: fixed; top: 0; bottom: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--paper); transition: opacity 0.4s ease; }   /* left and right: the column's gutter, set with the other fixed chrome */
+  .loading-screen.hidden { opacity: 0; pointer-events: none; }
+  .loading-mark { display: block; width: 52px; height: 52px; margin: 0 0 26px; border-radius: 13px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+  .loading-spinner { width: 32px; height: 32px; border: 3px solid var(--hair); border-top-color: var(--green-ink); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .loading-text { margin-top: 18px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--grey); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .loading-spinner { animation-duration: 3s; } }
+
+  /* 2. Sign in. The screen behind the card (a wide window) is the cover's last colour; the card is the paper; the hero is --hero with the
+     court photo over it under a scrim (a mask of the cover's last colour: the plain photo, not graded). */
+  .signin-screen { display: none; position: fixed; inset: 0; z-index: 900; overflow-y: auto; background: var(--hero-end); }
+  .signin-screen.visible { display: block; }
+  .signin-card { display: flex; flex-direction: column; width: 100%; max-width: 460px; min-height: 100%; margin: 0 auto; background: var(--paper); }
+  /* ⚠️ The copy is pushed down by margin-top:auto inside a padded flex column, NOT anchored with `bottom`: a short screen makes a short
+     hero and a bottom-anchored block then starts wherever it lands (the logo once sat 22 px from the top of a 667 px phone, under the
+     status bar). The padding is the floor. 296 px is what the block needs, raised from 264 when the mantra's second line joined it. */
+  .si-hero { position: relative; flex: 0 0 auto; overflow: hidden; display: flex; flex-direction: column; height: clamp(296px, 42vh, 380px);
+    padding: calc(env(safe-area-inset-top, 0px) + 44px) 26px 52px; background: var(--hero); }
+  .si-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .55s cubic-bezier(.16,1,.3,1); }
+  .si-hero-img.in { opacity: 1; }
+  .si-hero-scrim { position: absolute; inset: 0; background: var(--hero-end);
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,.96) 6%, rgba(0,0,0,.4) 56%, rgba(0,0,0,.52));
+            mask-image: linear-gradient(to top, rgba(0,0,0,.96) 6%, rgba(0,0,0,.4) 56%, rgba(0,0,0,.52)); }
+  .si-hero-copy { position: relative; z-index: 2; margin-top: auto; }
+  .signin-mark { display: block; width: 52px; height: 52px; margin: 0 0 16px; border-radius: 13px; box-shadow: 0 8px 24px rgba(0,0,0,.34); }
+  /* the mint-dot eyebrow, as every cover's (Space Mono capitals, a 7 px mint dot, white-ish text) */
+  .si-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,.88); }
+  .si-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .signin-title { margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display); line-height: .92; letter-spacing: .005em; text-transform: uppercase;
+    color: var(--on-accent); }
+  .signin-title em { font-style: normal; color: var(--clay-on-green); }   /* the brand line: clay on the green */
+  /* The other half of the mantra belongs WITH the first half (Amir, 2026-09-12). Barlow, not Condensed: a second line of condensed
+     capitals under a 44 px condensed headline competes with it instead of answering it. */
+  .si-mantra { margin: 13px 0 0; font-family: 'Barlow', sans-serif; font-size: var(--fs-lead); font-weight: 400; line-height: 1.38; letter-spacing: .01em; color: rgba(255,255,255,.8); }
+  /* the sheet: the paper, its top corners the app's one sheet's (#hist-overlay .readiness-modal, 18 px) */
+  .si-sheet { position: relative; z-index: 2; flex: 1 1 auto; display: flex; flex-direction: column; margin-top: -30px; padding: 30px 26px 26px;
+    border-radius: 18px 18px 0 0; background: var(--paper); }
+  .signin-f { display: block; margin-bottom: 15px; }
+  .signin-f > span { display: block; margin-bottom: 7px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .13em; text-transform: uppercase; color: var(--grey); }
+  /* the set table's box (and the Library's search box): white, edged --field, 16 px (an iPhone zooms the page under that), 48 px tall, a 10 px radius; focus is green */
+  .signin-f input { display: block; width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--field); border-radius: 10px; background: var(--row); color: var(--ink);
+    font: 500 var(--fs-field)/1.2 'Barlow', sans-serif; outline: none; -webkit-appearance: none; appearance: none; transition: border-color .35s cubic-bezier(.16,1,.3,1); }
+  .signin-f input:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
+  /* a password manager's fill keeps the box's own colours (the browser paints a pale blue or yellow over them) */
+  .signin-f input:-webkit-autofill { -webkit-box-shadow: 0 0 0 100px var(--row) inset; -webkit-text-fill-color: var(--ink); caret-color: var(--ink); }
+  /* Reveal toggle. The input gains room on the right so revealed text never runs under the button; 48 px of target. */
+  .signin-f .si-wrap { position: relative; }
+  .signin-f .si-wrap input { padding-right: 52px; }
+  .si-eye { position: absolute; top: 0; right: 0; display: flex; align-items: center; justify-content: center; width: 48px; height: 100%; padding: 0; border: 0; background: none;
+    color: var(--grey); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .si-eye:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -4px; border-radius: 0 10px 10px 0; }
+  .si-eye svg { display: block; width: 20px; height: 20px; }
+  .si-eye .si-eye-slash { display: none; }
+  .si-eye.on { color: var(--green-ink); }
+  .si-eye.on .si-eye-slash { display: block; }
+  /* the one primary button: its look is the list in ONE PRIMARY BUTTON; here its size and place */
+  .signin-go { display: block; width: 100%; min-height: 52px; margin-top: 6px; padding: 16px; font-size: var(--fs-body); transition: transform .35s cubic-bezier(.16,1,.3,1); }
+  .signin-go:active { transform: translateY(1px); }
+  .signin-go:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .signin-go[disabled] { opacity: .6; cursor: default; box-shadow: none; }
+  /* the error line is the day's banner: a white row, a 4 px clay stripe at the left, the words in ink (no tinted box, no clay text) */
+  .signin-err { margin-top: 13px; padding: 12px 14px 12px 18px; border: 1px solid var(--hair); border-radius: 10px; background: var(--row); box-shadow: inset 4px 0 0 var(--clay-fill);
+    font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .signin-help { margin: 16px 0 0; font-size: var(--fs-small); line-height: 1.5; text-align: center; color: var(--grey); }
+  /* the link is a 44 px target that takes no room: padding out, margin back in */
+  .signin-help a { display: inline-block; margin: -13px 0; padding: 13px 2px; color: var(--green-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  .signin-help a:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; border-radius: 4px; }
+  /* Anchors the bottom of the sheet: without it a tall phone leaves ~200 px of bare paper under the help line, which reads as unfinished. */
+  .signin-foot { margin: auto 0 0; padding-top: 22px; text-align: center; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--grey); }
+
+  /* 3. Welcome, shown once after a new athlete's first sign-in. A cover (the picture graded into --hero exactly as the archive's is: luminosity,
+     masked from the left, a scrim to the cover's last colour), the glass ✕ (the archive's ←, mirrored), a paper sheet at the app's sheet radius
+     with his two lines, his signature (the week note's) and the primary button. It sits in the app's column on a wide window, as every layer does. */
+  .wel { position: fixed; top: 0; bottom: 0; left: var(--app-gutter); right: var(--app-gutter); z-index: 200; display: flex; flex-direction: column; overflow-y: auto; background: var(--paper);
+    animation: fadeUp 0.35s ease both; }
+  .wel-hero { position: relative; isolation: isolate; flex: none; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; min-height: clamp(220px, 38vh, 380px);
+    padding: calc(env(safe-area-inset-top, 0px) + 64px) var(--g) 48px; background: var(--hero); color: var(--on-accent); }
+  .wel-img { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 84% 14%; background: transparent; mix-blend-mode: luminosity;
+    opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
+  .wel-img.in { opacity: .7; }
+  .wel-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  .wel-copy { position: relative; z-index: 2; }
+  .wel-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
+  .wel-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .wel-title { margin: 10px 0 0; max-width: 340px;
+    font: 900 clamp(32px, 10vw, 44px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the welcome, 32 to 44 px */
+    letter-spacing: .3px; text-transform: uppercase; color: var(--on-accent); text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+  .wel-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 8px); right: 8px; z-index: 3; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0;
+    border-radius: 50%; cursor: pointer; color: var(--on-accent); background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    font: 500 var(--fs-lead)/1 'Barlow', sans-serif; -webkit-tap-highlight-color: transparent; }
+  .wel-x:active { transform: scale(0.92); }
+  .wel-x:focus-visible { outline: 2px solid var(--on-accent); outline-offset: 2px; }
+  .wel-sheet { position: relative; z-index: 2; flex: 1 0 auto; margin-top: -30px; padding: 26px var(--g) calc(env(safe-area-inset-bottom, 0px) + 22px); border-radius: 18px 18px 0 0; background: var(--paper); }
+  .wel-sheet p { margin: 0 0 10px; font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .wel-sheet p.sub { font-size: var(--fs-small); color: var(--grey); }
+  .wel-sheet .wn-sign { margin-top: 12px; }
+  .wel-go { display: block; width: 100%; min-height: 52px; margin-top: 18px; padding: 0 16px; font-size: var(--fs-lead); }   /* look: the one primary button */
+  .wel-skip { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 0 12px; border: 0; background: none; color: var(--green-ink); cursor: pointer;
+    font: 600 var(--fs-body)/1 'Barlow', sans-serif; }
+  .wel-go:focus-visible, .wel-skip:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+
+  /* 4. Error (showError()): the paper, the icon in clay (an error is "look here"), the title in ink, the words in ink, then the primary button and its
+     outlined twin (the Guided footer's Next → look: green-ink text, the box edge). The primary's look is the list in ONE PRIMARY BUTTON. */
+  .error-screen { position: fixed; top: 0; bottom: 0; z-index: 9998; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px var(--g); background: var(--paper); }
+  .error-screen.visible { display: flex; }
+  .error-icon { margin-bottom: 16px; color: var(--clay-big); }   /* a 46 px drawn icon, not text: it keeps the brand clay */
+  .error-icon svg { display: block; width: 46px; height: 46px; }
+  .error-title { margin: 0 0 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-head); line-height: 1; text-transform: uppercase; text-align: center; color: var(--ink); }
+  .error-msg { max-width: 340px; font: 400 var(--fs-body)/1.6 'Barlow', sans-serif; text-align: center; color: var(--ink); text-wrap: pretty; }
+  .error-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; margin-top: 24px; }
+  .error-actions:empty { display: none; }
+  .error-btn { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; font-size: var(--fs-body); text-align: center; text-decoration: none; }
+  .error-btn.ghost { background: transparent; color: var(--green-ink); box-shadow: inset 0 0 0 1.5px var(--field); }
+  .error-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -4823,8 +4790,9 @@
 
 <!-- ═══ LOADING ═══ -->
 <div class="loading-screen" id="loading">
+  <img class="loading-mark" src="assets/img/icon-192.png" alt="" aria-hidden="true" width="52" height="52" decoding="async">
   <div class="loading-spinner"></div>
-  <div class="loading-text">Loading Program</div>
+  <div class="loading-text">Loading your plan</div>
 </div>
 
 <!-- Filled by showError(): its title, icon and buttons name the real cause (REL-01). -->
@@ -7002,7 +6970,7 @@ function maybeWelcome() {
   el.className = 'wel';
   el.innerHTML =
     '<div class="wel-hero">' +
-      '<img src="' + ART_MOMENTS + APP_ART.welcome + '.webp" alt="" aria-hidden="true" onload="this.classList.add(\'in\')">' +
+      '<img class="wel-img" src="' + ART_MOMENTS + APP_ART.welcome + '.webp" alt="" aria-hidden="true" onload="this.classList.add(\'in\')">' +
       '<div class="wel-scrim"></div>' +
       '<button type="button" class="wel-x" aria-label="Close">✕</button>' +
       '<div class="wel-copy">' +
@@ -7013,6 +6981,7 @@ function maybeWelcome() {
     '<div class="wel-sheet">' +
       '<p>' + plan + '</p>' +
       '<p class="sub">Any questions, message me on WhatsApp. The button is in the Coach tab.</p>' +
+      '<div class="wn-sign">' + WN_SIG + '<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>' +   // his two lines, signed as the week note is
       '<button type="button" class="wel-go">Open Day 1</button>' +
       '<button type="button" class="wel-skip">Look around first</button>' +
     '</div>';
