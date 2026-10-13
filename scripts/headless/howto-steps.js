@@ -197,7 +197,7 @@ const HIST_MET = H.HISTORY.map(s => Object.assign({}, s, { log: s.log.concat([{ 
     await p.evaluate(() => { startTimerNow('1'); openGuided('1'); });
     await p.waitForTimeout(400);
     const g = await p.evaluate(() => {
-      const i = STEP.seq.findIndex(s => s.card.querySelector('.item-name').textContent.trim() === 'Barbell Back Squat');
+      const i = STEP.seq.findIndex(s => s.card && s.card.querySelector('.item-name').textContent.trim() === 'Barbell Back Squat');
       STEP.pos = i; renderStep();
       const hw = document.querySelector('#step-scroll .ex-how');
       return { steps: document.querySelectorAll('#step-scroll .ex-steps li').length, label: hw ? hw.querySelector('.ex-how-sum').textContent.replace(/[\s ]+/g, ' ') : '' };

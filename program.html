@@ -181,7 +181,9 @@
      onerror (REL-01, 2026-09-26): the service worker keeps only this site's own files, so
      with no signal this download simply fails. The flag lets _sbReady() stop at once
      instead of polling ~3s for a library that is not coming, before every server call. -->
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.SB_FAILED=true"></script>
+<!-- Pinned (Line Call, 2026-10-13): "@2" let any new 2.x reach every phone untested. The same file and version coach.html loads;
+     bump all three together, with scripts/headless/coach/reallib.js and scripts/headless/signin.js run first. -->
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" onerror="window.SB_FAILED=true"></script>
 <!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
      on `defer` it shares one ordered execution queue with the SDK above. -->
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
@@ -3528,6 +3530,7 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check::before { background: var(--mark); border-color: var(--mark); }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check::after { opacity: 1; transform: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-check:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row .ex-set-check.kg-armed::before { border: 2px solid var(--clay); }   /* the weight asks first (kgLooksWrong()) */
   /* How hard?: a sand band that hangs off its set, a caret up at that set's RPE slot, big keys */
   :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe { grid-column: 1 / -1; display: none; position: relative; align-items: center; gap: 6px;
     margin: 6px calc(-1 * var(--g)) -6px; padding: 10px var(--g) 12px; background: var(--sand); box-shadow: inset 0 -1px 0 var(--hair); }
@@ -3961,6 +3964,18 @@
   /* 2. Guided's footer: one row on the paper under a hairline. ‹ Prev is outlined and not drawn on the first step; the primary is
      the day's green (--btn) when it logs or finishes (Done · Start Rest ✓, Finish Session ✓) and outlined when it only moves
      on (Next →). Every button 52 px tall; the words fit at 320 px. */
+  /* A step of items with nothing to log (renderGroupStep(), 2026-10-13): paper rows, a ring that ticks each one. */
+  #stepOverlay .step-group { display: grid; margin-top: 8px; }
+  #stepOverlay .sg-row { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: center; width: 100%; min-height: 56px;
+    padding: 10px 0; border: 0; border-top: 1px solid var(--hair); background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+  #stepOverlay .sg-row:first-child { border-top: 0; }
+  #stepOverlay .sg-ring { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--hair);
+    color: transparent; font-size: var(--fs-small); font-weight: 700; }
+  #stepOverlay .sg-row.done .sg-ring { background: var(--fill); border-color: var(--fill); color: #fff; }
+  #stepOverlay .sg-txt { min-width: 0; }
+  #stepOverlay .sg-name { display: block; font-size: var(--fs-body); font-weight: 600; line-height: 1.25; }
+  #stepOverlay .sg-dose { display: block; margin-top: 2px; font-size: var(--fs-small); color: var(--grey); }
+  #stepOverlay .sg-hint { margin: 14px 0 0; font-size: var(--fs-small); line-height: 1.4; color: var(--grey); }
   #stepOverlay .step-footer { flex: none; display: flex; gap: 10px; padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 12px);
     border-top: 1px solid var(--hair); background: var(--paper); }
   #stepOverlay .step-nav-btn, #stepOverlay .step-primary-btn { min-height: 52px; padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; white-space: nowrap;
@@ -5956,9 +5971,13 @@ async function _replayQueue() {
     for (const entry of _csqLoad()) {
       // Replaced by a newer save while this loop waited on the network: that one is sent by its own save.
       if (!_csqLoad().some(e => _csqId(e) === _csqId(entry))) continue;
-      if (await _sendSession(sb, entry)) _dequeueSession(entry);
+      if (await _sendSession(sb, entry)) { _dequeueSession(entry); _paintSent(entry); }
     }
   } finally { _replaying = false; }
+}
+// A session the server now has: its finished card's line says so (paintSendStatus()).
+function _paintSent(entry) {
+  try { if (entry && entry.p_day != null && document.getElementById('send-status-' + entry.p_day)) paintSendStatus(String(entry.p_day)); } catch (e) {}
 }
 // The phone's own list of the sessions it finished, "day|YYYY-MM-DD", the last 60. It syncs with
 // the progress (a union, mergeStoredValue()), so coach.html's syncGapsOf() can name a session the
@@ -8129,7 +8148,7 @@ function renderHome() {
         </div>
         <div class="complete-note">
           <div class="complete-note-label">Notes for Coach (optional)</div>
-          <textarea class="complete-note-input" data-key="${noteKey}" placeholder="How it went, anything that felt off…">${esc(savedNote)}</textarea>
+          <textarea class="complete-note-input" dir="auto" data-key="${noteKey}" placeholder="How it went, anything that felt off…">${esc(savedNote)}</textarea>
         </div>
       </div>
       <div class="finish-hint" aria-live="polite"></div>
@@ -9241,9 +9260,9 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
-    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. Warm-ups stay in the list. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
+    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. It starts with your warm-up: tick each part as you do it, or tap <strong>Done ✓</strong> for all of it. <strong>Skip</strong> moves on, and I see it was skipped. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ: what an exercise is for',
     body: `<p>The small <strong>i</strong> at the right end of every exercise answers what you'd ask me about it. <strong>What does it do?</strong> and the qualities it builds (tap one to read what it means). <strong>How does it help on court?</strong> <strong>Where will I feel it?</strong> shows your body front and back with the working muscles in green, and a line under it names them, the main ones first.</p><p>Then three short lists. Under <strong>Too hard?</strong> are the <strong>Regressions</strong>, easier versions of the same movement. Under <strong>Too easy?</strong> are the <strong>Progressions</strong>, harder versions. Under <strong>Other kit?</strong> are the <strong>Alternatives</strong>, the same movement on other equipment. Tap a name to read about it. A name marked <em>Not in the app yet</em> has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why am I doing this?</strong>, signed by me. All of them are on one page too: tap <strong>Why your plan looks like this</strong> on <strong>Progress</strong>, under your current cycle in the Game Plan.</p><p><strong>Your history</strong> at the bottom says how many times you've done it and what you did last time. Tap it for every session.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with <strong>How do I do it?</strong> (the video when there is one, the steps and the cues), and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
@@ -12099,6 +12118,21 @@ function finishDay(day) {
     return;
   }
   if (hint) hint.textContent = '';
+  // A phone with no room left (2026-10-13): a write below throws, and Done used to do nothing at all. Now the half-done finish is
+  // undone (the stamp goes, the card comes back) and the card says why; tapping Done again once there is room finishes it.
+  const stampKey = ATHLETE_ID + '_completed_d' + day, hadStamp = localStorage.getItem(stampKey) != null;
+  try { finishDayNow(day, card); }
+  catch (e) {
+    if (!hadStamp) { try { localStorage.removeItem(stampKey); } catch (e2) {} }
+    const done = document.getElementById('complete-' + day);
+    if (done) done.classList.remove('visible');
+    card.classList.add('visible');
+    const full = e && (e.name === 'QuotaExceededError' || e.code === 22 || /quota/i.test(String(e.message || '')));
+    if (hint) hint.textContent = full ? 'Your phone is full. Free some space, then tap Done again.' : 'That didn’t save. Tap Done again.';
+    console.error(e);
+  }
+}
+function finishDayNow(day, card) {
   const st = getDayCompletion(day);
   const isPartial = st.done < st.total;
   delete card.dataset.early;
@@ -12195,7 +12229,11 @@ function paintRateFold(day) {
   const el = document.querySelector(`#complete-${day} .rate-fold .rf-line`);
   if (!el) return;
   const txt = rateFoldLine(day);
-  if (el.textContent !== txt) el.textContent = txt;
+  if (el.textContent === txt) return;
+  // The note keeps its own direction inside the English line (Line Call, 2026-10-13; 24% of day notes are Persian): in a <bdi>,
+  // a Persian note reads right to left and its full stop and the closing quote stay where they belong. The text is unchanged.
+  const m = txt.match(/^(.* · Note: ")([\s\S]*)(")$/);
+  el.innerHTML = m ? esc(m[1]) + '<bdi>' + esc(m[2]) + '</bdi>' + esc(m[3]) : esc(txt);
 }
 
 // ── The report's way to the coach: an outbox on this phone (WK-04) ──
@@ -12331,6 +12369,10 @@ function paintSendStatus(day) {
   }
   if (window.IS_PREVIEW) { el.className = 'send-session-status'; el.textContent = 'Coach preview: nothing is sent or saved.'; return; }
   const pend = loadOutbox().find(x => isSess(x, day, sessOf(day)));
+  // The session's record (save_session) still waiting in the queue on this phone (Line Call, 2026-10-13). The line used to
+  // follow the email alone, so it could say "With your coach" while the dashboard did not have the session (the 12 Oct loss).
+  const recWait = recordWaiting(day);
+  const finished = completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day));
   const sent = localStorage.getItem(ATHLETE_ID + '_sent_d' + day);
   // Recent enough to belong to this session (a session can end past midnight, DATA-02).
   const sentAt = sent ? new Date(sent) : null;
@@ -12338,9 +12380,9 @@ function paintSendStatus(day) {
   if (pend && _flushing) {
     el.className = 'send-session-status';
     el.textContent = 'Sending to your coach…';
-  } else if (pend) {
+  } else if (pend || recWait) {
     el.className = 'send-session-status pending';
-    el.innerHTML = pend.err === 'http'
+    el.innerHTML = pend && pend.err === 'http'
       ? 'Saved on your phone. It didn’t reach your coach yet. <button type="button" class="send-retry" onclick="flushOutbox()">Try again</button>'
       : 'Saved on your phone. It goes to your coach when you have signal.';
   } else if (sentNow) {
@@ -12348,10 +12390,19 @@ function paintSendStatus(day) {
     el.textContent = '✓ With your coach · ' + formatSentTime(sentAt);
     // A second email only when there is something new to say.
     if (upd) upd.hidden = (localStorage.getItem(ATHLETE_ID + '_sentsig_d' + day) || '') === reportSig(day);
+  } else if (finished) {
+    // The record is on the server and no email is waiting (or none is sent at all, as Amir plans): it is with the coach.
+    el.className = 'send-session-status success';
+    el.textContent = '✓ With your coach';
   } else {
     el.className = 'send-session-status';
     el.textContent = '';
   }
+}
+// Is this day's session record still waiting in the queue (_csq) on this phone? The same session key the queue uses.
+function recordWaiting(day) {
+  const k = Number(day) + '|' + sessionDateFor(day);
+  return _csqLoad().some(e => _csqSess(e) === k);
 }
 
 // The session bar's Reset (Amir, 2026-09-27: "when you start, its locked in and you cant
@@ -13166,7 +13217,7 @@ async function recordSessionToCloud(day) {
   const entry = _enqueueSession(base);       // on the phone first: nothing below can lose it
   const sb = _sb();
   if (!sb || !entry) return;                 // no library yet: the queue sends it at the next chance
-  if (await _sendSession(sb, entry)) _dequeueSession(entry);
+  if (await _sendSession(sb, entry)) { _dequeueSession(entry); _paintSent(entry); }
 }
 
 // Tiny helper: HH:MM in the user's locale (e.g. "2:14 PM")
@@ -13423,6 +13474,11 @@ function attachSetLog(card) {
       saveSetLogValue(name, cur, day);
       return cur;
     };
+    // A weight typed into a set already ticked: no tick is left to ask on, so a number far above the lift's says so once.
+    row.querySelector('.ex-set-weight').addEventListener('change', () => {
+      const s0 = loadSetLog(name, total, day)[idx] || {};
+      if (s0.d) kgCheckTicked(name, s0.w, card);
+    });
     // Weight — saves on every keystroke. Persian/Arabic digits and decimal marks are
     // normalised on the way in (live logs held "۲۵" and "٫20", which nothing can read).
     // A number typed in a set also fills the empty sets below it (Fork 3B), and keeps
@@ -13481,6 +13537,22 @@ function attachSetLog(card) {
     // an RPE is already there; unticking closes it. Nothing is erased either way.
     row.querySelector('.ex-set-check').addEventListener('click', ev => {
       ev.stopPropagation();
+      // A weight far above this lift's numbers asks once before the tick keeps it (kgLooksWrong()): the first tap arms the
+      // tick (a clay ring) and says so, a second within 4 s keeps it.
+      const pre = loadSetLog(name, total, day)[idx] || {}, btn = ev.currentTarget;
+      if (!pre.d && kgLooksWrong(name, pre.w, card)) {
+        if (btn.dataset.kgArmed !== String(pre.w)) {
+          clearTimeout(btn._kgT);
+          btn.dataset.kgArmed = String(pre.w); btn.classList.add('kg-armed');
+          btn._kgT = setTimeout(() => { btn.dataset.kgArmed = ''; btn.classList.remove('kg-armed'); }, 4000);
+          aaToast(`${pre.w} kg? That's far above your numbers for this lift. Tap ✓ again to keep it.`, { kicker: 'Check the weight' });
+          if (navigator.vibrate) navigator.vibrate([10, 40, 10]);
+          return;
+        }
+        clearTimeout(btn._kgT); btn.dataset.kgArmed = ''; btn.classList.remove('kg-armed');
+        kgKept(card, pre.w);
+        hideAaToast();
+      }
       carried.delete(idx);                          // countersigned: its weight is the athlete's now
       const cur = edit(s => { s.d = !s.d; });
       if (cur[idx].d && !cur[idx].r) open.add(idx); else open.delete(idx);
@@ -13493,6 +13565,37 @@ function attachSetLog(card) {
     });
   });
   paintSets();
+}
+
+// ── A WEIGHT FAR ABOVE THE LIFT'S OWN NUMBERS ASKS ONCE (Line Call, 2026-10-13; Second Serve D5; Amir: "yes to all recommended") ──
+// A fat finger ("600" for 60) filled the sets below, stayed on a ticked set after the fix, became an automatic Personal Record of
+// about 760 kg, led Records and blocked every real one (37 of 41 records are automatic). "Far above": over 1.5 × the heaviest
+// this lift has seen on this phone (last time's weights on the card, its history, its records), or over 300 kg when it has none
+// yet. The tick asks (two taps, the clay ring); a set already ticked says so in the note box. A weight kept once on a card never
+// asks again this session (card._kgOk). Nothing is ever changed for the athlete.
+function kgRefFor(name, card) {
+  let best = 0;
+  const add = v => { const k = parseLoggedKg(v); if (k != null && k > best) best = k; };
+  loadSetLog(name, parseInt(card.dataset.sets, 10) || 1, card.dataset.day).forEach(s => add(s.lw));
+  historyFor(name).forEach(h => ((h.entry && h.entry.sets) || []).forEach(s => add(s.w)));
+  loadCeiling().forEach(e => { if (histNorm(e.lift) === histNorm(name)) add(e.w); });
+  return best;
+}
+function kgLooksWrong(name, w, card) {
+  const k = parseLoggedKg(w);
+  if (k == null || !(k > 0) || !card) return false;
+  if (card._kgOk && card._kgOk.has(String(k))) return false;
+  const ref = kgRefFor(name, card);
+  return ref > 0 ? k > ref * 1.5 : k > 300;
+}
+function kgKept(card, w) {
+  const k = parseLoggedKg(w);
+  if (k != null) (card._kgOk = card._kgOk || new Set()).add(String(k));
+}
+function kgCheckTicked(name, w, card) {
+  if (!kgLooksWrong(name, w, card)) return;
+  kgKept(card, w);
+  aaToast(`${w} kg? That's far above your numbers for this lift. If it's a typo, fix it in the kg box.`, { kicker: 'Check the weight' });
 }
 
 // Persian (۰-۹) and Arabic-Indic (٠-٩) digits to ASCII, and their decimal marks
@@ -14322,9 +14425,9 @@ function initNotes() {
       `<summary>
          <svg class="chev" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9"/></svg>
          Note
-         <span class="note-preview">${esc(saved)}</span>
+         <span class="note-preview" dir="auto">${esc(saved)}</span>
        </summary>
-       <textarea placeholder="Anything about today's sets? Your coach sees it with this session.">${esc(saved)}</textarea>`;
+       <textarea dir="auto" placeholder="Anything about today's sets? Your coach sees it with this session.">${esc(saved)}</textarea>`;
     const ta = det.querySelector('textarea');
     const preview = det.querySelector('.note-preview');
     ta.addEventListener('input', e => {
@@ -14698,14 +14801,31 @@ function openGuided(day) {
 
 // One entry per (exercise, set) in on-screen order — the cards initSetOrRPE() attached a
 // set-log table to (a .rest-btn present) — and, since WK-01's second part (2026-09-27), one
-// per ROUND of a circuit that logs something (a superset, a complex, conditioning). A prep
-// circuit logs nothing and stays out, like the other warm-up items.
+// per ROUND of a circuit that logs something (a superset, a complex, conditioning).
+// The rest of the day (the warm-up, a prep circuit, anything with nothing to log) is ONE step per run of such items, in its
+// place: `{ group: true, cards, name }`, named by its block ("Warm-Up"). Before 2026-10-13 Guided left them out, so it ended on
+// "Every set logged" and the finish card then said "In progress · 18 of 19 · Finish early", and a full session was filed
+// Partial (Second Serve, G1; Amir: "yes to all recommended"). The step lists them; a row ticks one, Done ticks the rest, Skip
+// moves on and the report says they were skipped. Exercises are still counted without it ("Exercise 1 of 6").
 function buildStepSeq(day) {
-  const cards = Array.from(document.querySelectorAll(`.checklist-item[data-day="${day}"]`))
-    .filter(c => c.querySelector('.rest-btn') && (!c.classList.contains('round-group')
-      || c.dataset.logRpe === '1' || c.dataset.logWeight === '1'));
+  const all = Array.from(document.querySelectorAll(`.checklist-item[data-day="${day}"]`));
+  const logs = c => !!c.querySelector('.rest-btn') && (!c.classList.contains('round-group')
+    || c.dataset.logRpe === '1' || c.dataset.logWeight === '1');
+  const cards = all.filter(logs);
+  // The block each card sits in, from the day's data: the cards are drawn one per exercise, in order (as paintWeekTargets() reads them).
+  const dayData = ((DATA && DATA.workouts && DATA.workouts.days) || []).find(d => String(d.id) === String(day));
+  const blockOf = [];
+  ((dayData && dayData.blocks) || []).forEach(b => (b.exercises || []).forEach(() => blockOf.push(String(b.title || ''))));
   const seq = [];
-  cards.forEach((card, exI) => {
+  let group = null;
+  all.forEach((card, i) => {
+    if (!logs(card)) {
+      if (!group) { group = { group: true, cards: [], name: blockOf[i] || 'Warm-up' }; seq.push(group); }
+      group.cards.push(card);
+      return;
+    }
+    group = null;
+    const exI = cards.indexOf(card);
     const circuit = card.classList.contains('round-group');
     const total = parseInt(circuit ? card.dataset.rounds : card.dataset.sets, 10) || 1;
     const name = card.querySelector('.item-name').textContent.trim();
@@ -14718,6 +14838,7 @@ function buildStepSeq(day) {
 // is done when its RPE is in, when it was finished in this Guided session, or when the
 // whole circuit is ticked (its last round ticks it: finishRound()).
 function stepDone(it) {
+  if (it.group) return it.cards.every(c => c.classList.contains('checked'));
   if (!it.circuit) {
     const d = cardDetail(it.card);
     return !!(d && d.querySelector(`.ex-set-row[data-set-idx="${it.setI}"].done`));
@@ -14734,7 +14855,7 @@ function finishRound(it) {
 
 function openStepMode(day) {
   const seq = buildStepSeq(day);
-  if (!seq.length) return;   // nothing loggable today (e.g. a circuit-only day)
+  if (!seq.some(it => !it.group)) return;   // nothing loggable today (e.g. a circuit-only day): no Guided
   // Reopened mid-session: start at the first set not yet ticked, not at set 1 (WK-01).
   // All ticked → the last set, whose button is Finish Session.
   let pos = seq.findIndex(it => !stepDone(it));
@@ -14771,6 +14892,7 @@ function renderStep() {
   if (!STEP) return;
   const item = STEP.seq[STEP.pos];
   const scroll = document.getElementById('step-scroll');
+  if (item.group) { renderGroupStep(item, scroll); return; }
 
   if (STEP.homeCard !== item.card) {
     restoreStepHome();
@@ -14825,6 +14947,39 @@ function renderStep() {
   }
 }
 
+// A step of items with nothing to log (buildStepSeq()): one row each, its numbers under its name, a ring that ticks it. The ring is
+// the card's own tick (toggleCheckOnly()), so the list and Guided never disagree.
+function renderGroupStep(item, scroll) {
+  restoreStepHome();
+  const day = STEP.day;
+  scroll.innerHTML = `<div class="step-ex-name">${esc(item.name)}</div><div class="step-group">` + item.cards.map((c, k) => {
+    const done = c.classList.contains('checked');
+    const nm = c.querySelector('.item-name').textContent.trim();
+    const dose = numLineText(c.querySelector('.ex-numline'));
+    return `<button type="button" class="sg-row${done ? ' done' : ''}" data-k="${k}" aria-pressed="${done}">
+      <span class="sg-ring" aria-hidden="true">✓</span><span class="sg-txt"><span class="sg-name">${esc(nm)}</span>${dose ? `<span class="sg-dose">${esc(dose)}</span>` : ''}</span></button>`;
+  }).join('') + `</div><p class="sg-hint">Tick each one as you do it, or tap Done when you've done them all.</p>`;
+  scroll.querySelectorAll('.sg-row').forEach(b => b.addEventListener('click', () => {
+    toggleCheckOnly(item.cards[parseInt(b.dataset.k, 10)], day);
+    renderStep();
+  }));
+  // This week's limits from the first step: the warm-up is part of the session too.
+  const wk = document.getElementById('step-week');
+  if (wk) {
+    const lim = weekLimitsHTML(currentCycleData(), ((DATA && DATA.workouts && DATA.workouts.days) || []).find(d => String(d.id) === String(day)));
+    if (wk.innerHTML !== lim) wk.innerHTML = lim;
+    wk.hidden = !lim;
+  }
+  // The eyebrow says where it sits, as a set's says "Exercise 1 of 6"; the bar's title already names it.
+  const nxt = STEP.seq.slice(STEP.pos + 1).find(x => !x.group);
+  document.getElementById('step-eyebrow').textContent = nxt ? 'Before exercise ' + (nxt.exI + 1) : 'After the last exercise';
+  document.getElementById('step-pill').textContent = item.cards.length === 1 ? '1 item' : item.cards.length + ' items';
+  document.getElementById('step-name').textContent = item.name;
+  paintStepAbout();
+  renderStepFooter();
+  scroll.scrollTop = 0;
+}
+
 // The relocated .ex-detail for the current exercise is STEP.homeDetail, not something
 // still living under item.card — see renderStep(). A circuit round's row is its RPE row,
 // or null when the circuit logs weights only.
@@ -14838,10 +14993,13 @@ function currentStepRow() {
 // green when it logs or finishes (Done · Start Rest ✓, Finish Session ✓) and outlined when it only moves on (Next →).
 function renderStepFooter() {
   const isLast = STEP.pos === STEP.seq.length - 1;
-  const done = stepDone(STEP.seq[STEP.pos]);
-  const label = done ? (isLast ? 'Finish Session ✓' : 'Next →') : 'Done · Start Rest ✓';
+  const it = STEP.seq[STEP.pos];
+  const done = stepDone(it);
+  const label = done ? (isLast ? 'Finish Session ✓' : 'Next →') : it.group ? 'Done ✓' : 'Done · Start Rest ✓';
+  // A group not yet ticked has Skip where ‹ Prev would be on the first step: it moves on, and the items stay unticked.
+  const skip = it.group && !done && !isLast ? `<button type="button" class="step-nav-btn" onclick="stepAdvance()">Skip</button>` : '';
   document.getElementById('step-footer').innerHTML =
-    (STEP.pos > 0 ? `<button type="button" class="step-nav-btn" onclick="stepPrev()">‹ Prev</button>` : '') +
+    (STEP.pos > 0 ? `<button type="button" class="step-nav-btn" onclick="stepPrev()">‹ Prev</button>` : '') + skip +
     `<button type="button" class="step-primary-btn${done && !isLast ? ' is-next' : ''}" onclick="stepPrimary()">${esc(label)}</button>`;
 }
 
@@ -14868,9 +15026,17 @@ function stepAbout() {
 // progress) — this function never touches that data itself.
 function stepPrimary() {
   const item = STEP.seq[STEP.pos];
+  if (item.group && !stepDone(item)) {
+    item.cards.forEach(c => { if (!c.classList.contains('checked')) toggleCheckOnly(c, STEP.day); });
+    if (STEP.pos === STEP.seq.length - 1) showStepComplete(); else stepAdvance();
+    return;
+  }
   if (!stepDone(item)) {
     if (item.circuit) finishRound(item);
-    else currentStepRow().querySelector('.ex-set-check').click();
+    else {
+      currentStepRow().querySelector('.ex-set-check').click();
+      if (!stepDone(item)) return;   // the weight asked first (kgLooksWrong()): the next tap of Done keeps it
+    }
     stepAfterDone();
   } else if (STEP.pos === STEP.seq.length - 1) {
     stepFinish();
@@ -14948,6 +15114,7 @@ function paintTimerLog(row, item) {
           return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}">${v}</button>`; }).join('')}
       </div>${lim}`;
     const kgBox = tl.querySelector('.tl-kg');
+    if (kgBox) kgBox.addEventListener('change', () => kgCheckTicked(item.name, wIn.value, item.card));   // the set is ticked by now
     if (kgBox) kgBox.addEventListener('input', () => {
       const v = normDigits(kgBox.value);
       if (v !== kgBox.value) kgBox.value = v;
@@ -15019,8 +15186,8 @@ function paintTimerNext(guided) {
   const nx = guided && STEP ? STEP.seq[STEP.pos + 1] : null;
   if (!nx) { el.hidden = true; el.textContent = ''; return false; }
   const what = nx.circuit ? 'round' : 'set';
-  const where = STEP.pos + 1 === STEP.seq.length - 1 ? 'last ' + what : what + ' ' + (nx.setI + 1) + ' of ' + nx.total;
-  el.innerHTML = `<span class="tn-k">Next:</span> <span class="tn-v">${esc(nx.name)} · ${where}</span>`;
+  const where = nx.group ? '' : ' · ' + (STEP.pos + 1 === STEP.seq.length - 1 ? 'last ' + what : what + ' ' + (nx.setI + 1) + ' of ' + nx.total);
+  el.innerHTML = `<span class="tn-k">Next:</span> <span class="tn-v">${esc(nx.name)}${where}</span>`;
   el.hidden = false;
   return true;
 }
@@ -15036,13 +15203,15 @@ function stepPrev() {
 }
 
 function showStepComplete() {
-  document.getElementById('step-eyebrow').textContent = 'Guided workout';
+  document.getElementById('step-eyebrow').textContent = 'Guided session';
   document.getElementById('step-pill').textContent = 'Complete';
+  // "Everything" only when every item of the day is ticked; a skipped warm-up stays named (G1).
+  const left = STEP ? STEP.seq.filter(it => it.group && !stepDone(it)).map(it => it.name) : [];
   document.getElementById('step-scroll').insertAdjacentHTML('beforeend', `
     <div class="step-complete">
       <div class="step-complete-check">✓</div>
-      <div class="step-complete-title">Every set logged.</div>
-      <p class="step-complete-sub">Finish the session to rate it and send it to your coach.</p>
+      <div class="step-complete-title">${left.length ? 'Every set logged.' : 'Everything logged.'}</div>
+      <p class="step-complete-sub">${left.length ? esc(left.join(' and ')) + ' not ticked. ' : ''}Finish the session to rate it and send it to your coach.</p>
     </div>`);
   document.getElementById('step-footer').innerHTML =
     `<button type="button" class="step-nav-btn" onclick="closeStepMode()">Exit</button>
@@ -15267,7 +15436,7 @@ function paintLastTime(card) {
         <button type="button" class="lt-hist">History ›</button></div>
       <div class="lt-big">${parts.length ? parts.join(' · ') : esc(e.gear || '')}</div>
       ${low ? `<div class="lt-rpe"><span class="lt-low">low-readiness day</span></div>` : ''}
-      ${e.note ? `<div class="lt-note">“${esc(e.note)}”</div>` : ''}`;
+      ${e.note ? `<div class="lt-note">“<bdi>${esc(e.note)}</bdi>”</div>` : ''}`;
     strip.querySelector('.lt-hist').addEventListener('click', ev => { ev.stopPropagation(); openHistorySheet(card); });
     place(strip);
     return;
@@ -15419,7 +15588,7 @@ function openHistorySheet(card) {
     const low = h.readiness != null && h.readiness <= 2.5;
     return `<div class="hs-row"><span class="hs-d">${esc(dl.when)}${rs ? ' · RPE ' + rs : ''}${low ? ' · low day' : ''}</span>
       <span class="hs-v">${esc(txt)}</span>
-      ${e.note ? `<span class="hs-n">“${esc(e.note)}”</span>` : ''}</div>`;
+      ${e.note ? `<span class="hs-n">“<bdi>${esc(e.note)}</bdi>”</span>` : ''}</div>`;
   }).join('');
 
   const hasRecord = typeof ceilingLifts === 'function' && ceilingLifts().some(l => l.lift === name);

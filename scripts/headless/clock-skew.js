@@ -15,7 +15,7 @@ const H = require('./lib');
 
 const ROOT = path.join(__dirname, '..', '..');
 const SB = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
-const LIB_URL = '**/npm/@supabase/supabase-js@2';
+const LIB_URL = '**/npm/@supabase/supabase-js@2**';   // the pinned file (2026-10-13: @2.117.3/dist/umd/supabase.js)
 const LIB_JS = fs.readFileSync(path.join(ROOT, 'tennis/app/lib/supabase.js'), 'utf8');     // `var supabase = (...)`: window.supabase, as the CDN build does
 const FIX = 'createClient(SB_URL, SB_KEY, { global: { fetch: fetchRetryExpired(() => _sbClient) } })';
 const WITHOUT_FIX = 'createClient(SB_URL, SB_KEY)';

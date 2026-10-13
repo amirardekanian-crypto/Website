@@ -549,6 +549,12 @@ costs more than one tap.
   box shows `8–10` and reps are recorded only when typed. `repCount()` still takes the low end,
   for Personal Records only.
 - Weight and reps inputs normalise Persian/Arabic digits (`normDigits()`); live logs held `۲۵`.
+- **A Persian note reads right to left** (Line Call, 2026-10-13; Second Serve D6; 24% of day notes are in Persian). The
+  app had no `dir` anywhere, so a Persian note sat left-aligned with its full stop at the start and the "Your rating" line
+  wrapped its quote and full stop to the wrong side. Both text boxes (the day note, an exercise's note) and the note's
+  folded preview are `dir="auto"`, and every place a note is shown back puts it in a `<bdi>`: the rating line
+  (`paintRateFold()`, the same text), a circuit's last time (`.lt-note`) and the History sheet (`.hs-n`). A new place that
+  shows an athlete's own words does the same. `scripts/headless/persian-notes.js` (9 checks).
 - **Weight boxes open EMPTY, with last time's weight as a hint (Fork 3B, 2026-09-26).** Amir picked
   *"Hint plus Same as last"*. They used to open holding last session's weights as real numbers, so a
   bare tick logged last week's load as today's and every number built on the log (records included)
@@ -590,6 +596,16 @@ costs more than one tap.
     and skips ticked sets. Which rows were filled this way is kept in memory only.
   - **A tick on an empty box records no weight.** The summary grammar did not change, so History,
     coach.html and the email read the log exactly as before.
+  - **A weight far above the lift's own numbers asks once** (Line Call, 2026-10-13; Second Serve D5; Amir: *"yes to
+    all recommended"*). "600" typed for 60 filled down, stayed on a ticked set after the fix, and became an automatic
+    Personal Record of about 760 kg that blocked every real one (37 of 41 records are automatic). `kgLooksWrong()`:
+    over 1.5 × the heaviest this lift has seen on the phone (`kgRefFor()`: last time's weights, its history, its
+    records), or over 300 kg with no numbers yet. The tick's first tap arms it (`.kg-armed`, a clay ring) and the note
+    box says *600 kg? That's far above your numbers for this lift. Tap ✓ again to keep it.*; a second within 4 s keeps
+    it, and that weight never asks again on the card this session (`card._kgOk`, `kgKept()`). A big weight typed into a
+    set already ticked (the list, or Guided's rest screen) says so once (`kgCheckTicked()`), and Guided's Done goes
+    through the same tick, so an armed tick opens no rest. Nothing is ever changed for the athlete.
+    `scripts/headless/kg-check.js` (12 checks).
   - `migrateCarriedWeights()` converts, once per phone, the weights every sweep before this left in
     `w` (a set holding only a weight, on an exercise no live day holds). Its marker `aap_lw1_<id>`
     sits outside the athlete's key prefix so it never syncs.
@@ -1503,8 +1519,17 @@ the Centre Court look*, above). The pinned row and the round-by-round circuits b
   below the fold (a first-time lift, its video and cues open). Measured before: the row was under the
   footer on 4 of 14 steps at 375×667 and 8 of 14 at 320×568; after: on screen on every step at all three sizes.
 - **Kg on the rest screen**, beside reps and RPE (`paintTimerLog()`, above).
+- **The warm-up is a step** (Line Call, 2026-10-13, Second Serve G1; Amir: *"yes to all recommended"*). Guided
+  used to leave out everything with nothing to log, so it ended on "Every set logged" and the finish card then
+  said *In progress · 18 of 19 · Finish early*: a full session filed Partial. Now `buildStepSeq()` keeps every
+  run of such items (the warm-up, a prep circuit, a cool-down) as ONE step in its place, `{ group: true, cards,
+  name }` named by its block; `renderGroupStep()` lists them, a row ticks one (the card's own `toggleCheckOnly()`),
+  **Done ✓** ticks the rest and moves on with no rest, **Skip** moves on and leaves them unticked (the report says
+  so). Its eyebrow says where it sits (*Before exercise 1*, *After the last exercise*); exercises are still counted
+  without it (*Exercise 1 of 6*). The end says *Everything logged.* only when the whole day is ticked, else names
+  what was skipped. A day with no set or round to log still has no Guided.
 - **Circuits join Guided, one step per round** (`buildStepSeq()`): a circuit that logs something (a superset,
-  a complex, conditioning); a prep circuit logs nothing and stays out, like the warm-up items. A round has
+  a complex, conditioning); a prep circuit logs nothing and is part of a warm-up step (above). A round has
   no tick of its own, so `stepDone()` reads its RPE (the same `<id>_rpe_<Name>[_rN]` key the list writes),
   this Guided session's finished rounds, or the circuit's tick; the last round ticks the circuit
   (`finishRound()` → `toggleCheckOnly()`), the one unit the day counts it as. The round's rest screen asks
@@ -1540,6 +1565,15 @@ went wrong" and kept nothing, and every extra tap sent another email. Now:
   when the service refused it; *✓ With your coach · 10:12 AM*. **Send the update to your coach** shows only
   when the rating or note changed after the report went (`reportSig()` against `_sentsig_d`). The demo and
   the coach preview send nothing and say so.
+  **It follows the session's record too** (Line Call, 2026-10-13; Amir: *"yes to all recommended"*): it said
+  *With your coach* when the EMAIL went, even with the record (`save_session`) still in the queue, the way 10
+  sessions reached the inbox and not the dashboard before 2026-10-12. Now *Saved on your phone…* shows while
+  either waits (`recordWaiting(day)`: the queue's own session key), *✓ With your coach* only once both have gone,
+  or once the record has with no email waiting (as when the reports are switched off), and the line repaints the
+  moment the queue sends the session (`_paintSent()`). **Done on a full phone** used to throw and do nothing:
+  `finishDay()` now runs `finishDayNow()` in a try, and on a failure takes back its finish stamp, shows the card
+  again and says *Your phone is full. Free some space, then tap Done again.* (any other failure: *That didn't
+  save. Tap Done again.*). `scripts/headless/send-status.js` (7 checks, the full phone filled for real).
 - **Guided's Finish Session ✓** closes Guided on this card (`stepFinish()`); it never finishes for the athlete.
 - **Reset in the session bar** (Amir, 2026-09-27: *"when you start, its locked in and you cant cancle or
   reset"*): `.session-timer-reset`, two taps (`armedTap()`, armed label *Reset?*), shown once the day has started

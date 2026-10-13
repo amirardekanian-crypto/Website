@@ -267,7 +267,12 @@
 // v136: program.html changed (2026-10-13): the copy sweep (no em dashes or semicolons in athlete text) and dead style rules removed.
 // v137: program.html changed (2026-10-13): the primary button's green in dark mode, the article reader in green, the note box's labels.
 // v138: program.html changed (2026-10-13): a session closes at Done (the day keeps its own copy, the next day starts clean; Line Call).
-const CACHE = 'aap-v138';
+// v139: program.html changed (2026-10-13): Guided starts with the warm-up as one step (tick each, Done, or Skip), so a session done in Guided is not filed Partial.
+// v140: program.html changed (2026-10-13): the finished card's line follows the session's record too, and Done on a full phone says so.
+// v141: program.html changed (2026-10-13): a weight far above the lift's own numbers asks once before the tick keeps it.
+// v142: program.html changed (2026-10-13): a Persian note reads right to left (dir=auto on the note boxes, <bdi> where a note is shown back).
+// v143: program.html and habits.html changed (2026-10-13): supabase-js pinned to 2.117.3 (it was a floating @2).
+const CACHE = 'aap-v143';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

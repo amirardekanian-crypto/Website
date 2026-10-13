@@ -17,7 +17,7 @@
 'use strict';
 const H = require('./lib');
 
-const LIB = '**/npm/@supabase/supabase-js@2';
+const LIB = '**/npm/@supabase/supabase-js@2**';   // the pinned file (2026-10-13: @2.117.3/dist/umd/supabase.js)
 // What a successful (re)download of the library runs: the stub, with its "no library" switch cleared. The stub
 // defines window.supabase as non-writable, so a second copy arriving (the slow case: the original lands late
 // AND the retry lands) must do nothing; the real UMD bundle just reassigns the global, which is harmless.
