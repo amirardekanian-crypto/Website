@@ -1,5 +1,7 @@
 # The athlete app — a map for someone opening it for the first time
 
+> ⚠ **Written 2026-10-11, before Centre Court (2026-10-12/13).** The screens, screenshots and tab names below are out of date: the bar is now **Home · Progress · Library · Coach** (Game Plan became the road on Progress), the Library has no doors page (one switch: Sessions · Playbook · Exercises), the This cycle card moved from Home to Progress, and every screen has the new look ([`APP-UI-KIT.md`](APP-UI-KIT.md)). Re-check each section against `PROGRAM-APP.md` and re-capture the shots before this goes to a client.
+
 **Status: DRAFT 5 · 2026-10-11 · English only** (Farsi follows once Amir has approved this text).
 **Who it is for:** a new client who is comfortable with phones but new to this system, and, further down, the returning athlete starting cycle 2, 3 or 4.
 **What it covers (Amir, 2026-10-11):** core training (sign-in → Home → a session → finishing it), the Library (Sessions, Playbook, Exercises), and Personal Records + Body Weight. AA Proof (the habit tracker) appears only as the row and strip on Home, with a pointer. The full AA Proof app, the coach dashboard, the Farsi course app and the testing app are not here.

@@ -19,7 +19,9 @@ Durable context for working in this repo. Read the linked docs before diving in.
 
 ## Reference docs (read these, don't re-derive)
 - `MAP.md` — **start here.** The atlas: one linked index to every page, asset, skill, doc and design element.
-- `CODEBASE.md` — technical map of the repo.
+- `CODEBASE.md` — technical map of the repo (file by file; the headless suites and the guards are near its end).
+- `Content/CLIENT-APP-MAP.md` — the athlete app as a first-time client sees it, screen by screen, with findings for Amir.
+- `Content/COACH-AUDIT.md` — the coach dashboard audit (2026-10-10); its §12 is the list to continue from.
 - `Content/PRODUCT.md` — what the product/business actually is (internal brief; pricing, voice, backend).
 - `Content/HOW-IT-WORKS.md` — customer-facing explainer of the coaching process.
 - `HABITS.md` — **the habit app (`habits.html`, AA Proof) brief.** Start here for anything
