@@ -7903,13 +7903,38 @@ function betweenCyclesHTML(o) {
       <div class="bt-next"><div class="road">${roadRowHTML(o.next, o.cIdx + 1, { state: 'next', idp: 'bt-road-body-', open: false })}</div></div>${ask}`
     : `<div class="home-section-head"><div class="home-section-title">What's next</div></div>
       <div class="bt-sum">You've trained the whole plan.</div>${ask}`);
+  // One session to do until it starts (Line Call, 2026-10-13; Amir: "yes to all recommended"): the day trained least this cycle,
+  // usually the last of the week, the one partial weeks drop. Every day the same: none is named.
+  // In its own slot: the session history can arrive after Home is drawn, and paintWeek() then fills it again.
+  const pick = `<div id="bt-pick-slot">${btPickHTML(o.cur)}</div>`;
   return h +`<div class="home-section-head"><div class="home-section-title">${o.next ? 'Between cycles' : 'Keep moving'}</div></div>
-    <div class="bt-sum">No new week until Cycle ${n + 1} starts. Want to keep moving? Any session from ${esc(o.cur.name || 'this cycle')} still works.</div>
+    <div class="bt-sum">No new week until Cycle ${n + 1} starts. Want to keep moving? Any session from ${esc(o.cur.name || 'this cycle')} still works.</div>${pick}
     <button type="button" class="bt-rep" id="bt-rep" aria-expanded="false" aria-controls="day-cards-wrap" onclick="toggleBetweenDays()">
       <span class="bt-rep-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg></span>
       <span class="dc-nm">Repeat a session<small>Cycle ${n} · ${nDays} session${nDays === 1 ? '' : 's'}</small></span>
       <span class="bt-rep-a" aria-hidden="true">›</span>
     </button>`;
+}
+function btPickHTML(cur) {
+  const least = leastTrainedDay(cur);
+  return least ? `<button type="button" class="hrow bt-pick" onclick="openDayView('${esc(String(least.id))}')">
+    <span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/></svg></span>
+    <span class="hrow-b"><span class="hrow-l">Day ${esc(String(least.id))}${(least.title || least.focusTag) ? ' · ' + esc(least.title || least.focusTag) : ''}</span><span class="hrow-q">The one you did least this cycle. A good one to repeat.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>` : '';
+}
+// The day of this cycle trained least (betweenCyclesHTML()): sessions in the session history between its start and end dates, by
+// day; fewest wins, a tie goes to the later day. null when every day was trained as often (or nothing is known).
+function leastTrainedDay(cur) {
+  const days = (DATA.workouts && DATA.workouts.days) || [];
+  if (!days.length || !cur) return null;
+  const from = String(cur.startDate || '').slice(0, 10), to = String(cur.endDate || '').slice(0, 10);
+  const n = {};
+  days.forEach(d => { n[String(d.id)] = 0; });
+  (HIST || []).forEach(x => { const id = String(x.day); if (id in n && (!from || x.date >= from) && (!to || x.date <= to)) n[id]++; });
+  const counts = days.map(d => n[String(d.id)]);
+  if (Math.min(...counts) === Math.max(...counts)) return null;
+  let best = null;
+  days.forEach(d => { if (!best || n[String(d.id)] <= n[String(best.id)]) best = d; });
+  return best;
 }
 // The day cards stay folded under Repeat a session, unless the athlete opened it or a session is under way
 // (its card carries Resume, and that must never hide).
@@ -7933,6 +7958,9 @@ window.toggleBetweenDays = toggleBetweenDays;
 // Repaint everything the week drives: the pills, the suggested day, the count line.
 // Called when the day view closes and whenever the history arrives.
 function paintWeek() {
+  // Between cycles: the day trained least, once the session history is in (btPickHTML()).
+  const btSlot = document.getElementById('bt-pick-slot');
+  if (btSlot) { const o = cycleOver(); const h = o ? btPickHTML(o.cur) : ''; if (btSlot.innerHTML !== h) btSlot.innerHTML = h; }
   const cw = document.getElementById('day-cards-wrap');
   const days = (DATA.workouts && DATA.workouts.days) || [];
   if (cw && days.length) {
@@ -9406,7 +9434,10 @@ function coachWhatsAppUrl(about) {
     const first = (DATA && DATA.athlete && DATA.athlete.firstName) || '';
     const cyc = currentCycle();
     const wk = cycleWeekInfo(cyc);
-    const where = cyc && cyc.name ? ' (' + cyc.name + (wk ? ', week ' + wk.wk : '') + ')' : '';
+    // A cycle that is over says so (Line Call, 2026-10-13): it said "week 5" of a cycle that ended ten days before.
+    const where = !cyc || !cyc.name ? ''
+      : wk && wk.after ? ' (finished ' + cyc.name + (cycDate(cyc.endDate) ? ' on ' + cycDate(cyc.endDate) : '') + ')'
+      : ' (' + cyc.name + (wk ? ', week ' + wk.wk : '') + ')';
     text = 'Hi Amir, it\'s ' + first + where + '. ';
   }
   if (about) text += about;

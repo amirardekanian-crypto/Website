@@ -276,7 +276,8 @@
 // v145: program.html changed (2026-10-13): it opens from the plan saved on the phone first and checks the server behind it; data/<id>.json is tried on local hosts only.
 // v146: program.html changed (2026-10-13): Next up is the day after the last one trained (it rotates), not the first day not done this week.
 // v147: program.html changed (2026-10-13): finishing early asks why (Out of time, Pain, Too tired, No kit), into the report.
-const CACHE = 'aap-v147';
+// v148: program.html changed (2026-10-13): between cycles, the WhatsApp says the cycle is finished, and one row offers the day trained least.
+const CACHE = 'aap-v148';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

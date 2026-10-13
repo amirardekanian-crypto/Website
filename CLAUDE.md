@@ -257,7 +257,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   day**: athletes move their days. **The day after the cycle's end date Home is between cycles** (PROG-02, Amir 2026-10-10,
   option B): a **Cycle N complete** door row first (it opens Progress, where the card says Cycle complete), Up next shows
   the next cycle, the one ask is **"Ready for Cycle N? Message Amir to start it."** in all situations (never "Amir is
-  building it"), the day rows fold under Repeat a session, and the Game Plan marks the cycle Done (`cycleOver()`,
+  building it"; its WhatsApp says *(finished <cycle> on Oct 3)*, never the week, since 2026-10-13), one row offers the day trained
+  least this cycle (`btPickHTML()`, refilled by `paintWeek()` when the history arrives), the day rows fold under Repeat a session, and the Game Plan marks the cycle Done (`cycleOver()`,
   `PROGRAM-APP.md` → *When the cycle is over*).
   Under the habits row, **today's habits, ticked in place**: AA Proof itself, embedded (`habits.html?embed=1`, `mountProofStrip()`).
   program.html still holds no habit state and writes no `<id>_hab_*` key but body weight; Proof does every write.
