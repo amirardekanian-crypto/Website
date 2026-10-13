@@ -273,7 +273,8 @@
 // v142: program.html changed (2026-10-13): a Persian note reads right to left (dir=auto on the note boxes, <bdi> where a note is shown back).
 // v143: program.html and habits.html changed (2026-10-13): supabase-js pinned to 2.117.3 (it was a floating @2).
 // v144: program.html and habits.html load supabase-js from this site (/assets/js/supabase-2.117.3.js, precached in SHELL), not jsDelivr.
-const CACHE = 'aap-v144';
+// v145: program.html changed (2026-10-13): it opens from the plan saved on the phone first and checks the server behind it; data/<id>.json is tried on local hosts only.
+const CACHE = 'aap-v145';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

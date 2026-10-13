@@ -232,8 +232,12 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   is never scored.
 - **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`, and **`plancache`**, the one saved plan
   that opens both apps with no signal (REL-01, 2026-09-26): written only from a real server answer (never the
-  demo, the coach preview or Proof's strip), opened only when the server cannot be reached, deleted when it
-  answers no. `habits.html` keeps the same key, so change both. Details: `PROGRAM-APP.md` → *No signal*.
+  demo, the coach preview or Proof's strip), deleted when it answers no. **Since 2026-10-13 program.html opens
+  from it FIRST on every launch** (Line Call decision 2, `PLAN_OFFLINE.fast`) and checks the server behind the first
+  paint: a changed plan is *Your plan was updated · Refresh* (never swapped mid-session), a "no" closes the app unless
+  a session is under way. habits.html still opens it only when the server cannot be reached. `habits.html` keeps
+  the same key, so change both. Boot reaches deeper code with no network wait now: anything it reads must exist
+  before the main script finishes (`await null` on the fast path). Details: `PROGRAM-APP.md` → *No signal*.
 - **An RPE off its target is coloured** clay (over) or steel blue (under), the one exception to "clay is the
   only accent", through `rpeVs()`/`rpeMark()` on every screen. A live set's target is `rpeTargetOf(card)`: a lower
   day's, else the week note's (every day of its week), else the card's. Last time, History and the ghost line judge a

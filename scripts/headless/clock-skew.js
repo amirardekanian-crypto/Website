@@ -110,8 +110,10 @@ async function openPage(browser, withFix) {
   // The control: the page without the fix, on a phone with a wrong clock.
   let r = await openPage(browser, false);
   const rest = log => log.filter(l => l.includes('/rest/v1/'));
-  t.check('control, the page without the fix: "Plan not available" (the field report)', r.state.errorShown && /Plan not available/.test(r.state.errorTitle) && !r.state.hasPlan, JSON.stringify(r.state));
-  t.check('control: the first answer was 401 and nothing refreshed the token', rest(r.server.log).some(l => / 401 old$/.test(l)) && !r.server.log.some(l => l.includes('/auth/v1/token')), r.server.log.join(' | '));
+  // Since the phone-first open (2026-10-13) the saved plan shows first and the refusal closes it, so the plan was on screen before.
+  t.check('control, the page without the fix: "Plan not available" (the field report)', r.state.errorShown && /Plan not available/.test(r.state.errorTitle), JSON.stringify(r.state));
+  // Only the first answers: with the page open longer (it opens from the phone first) the library's own timer may refresh later.
+  t.check('control: the first answers were 401 and the plan was refused', rest(r.server.log).some(l => / 401 old$/.test(l)) && r.server.log.some(l => /rpc\/get_program 401 old$/.test(l)), r.server.log.join(' | '));
   t.check('control: the plan saved on the phone was thrown away', !r.state.ls.includes('plancache'), r.state.ls.join(','));
   await r.ctx.close();
 
@@ -121,7 +123,8 @@ async function openPage(browser, withFix) {
   t.check('it refreshed the token once, and every call that got through used the new one',
     r.server.log.filter(l => l.includes('/auth/v1/token')).length === 1 && rest(r.server.log).filter(l => / 200 /.test(l)).every(l => / new$/.test(l)), r.server.log.join(' | '));
   t.check('the athlete was found by the same rule (athlete_identities answered after the refresh)', r.server.log.some(l => /athlete_identities 200 new$/.test(l)), r.server.log.join(' | '));
-  t.check('get_program was refused once and then answered', r.server.log.filter(l => l.includes('rpc/get_program')).map(l => l.split(' ')[2]).slice(0, 2).join(',') === '401,200', r.server.log.join(' | '));
+  // The first paint's own calls now meet the old token first (the plan opens from the phone), so get_program is asked after the refresh.
+  t.check('get_program was answered with the refreshed token', r.server.log.some(l => /rpc\/get_program 200 new$/.test(l)) && !r.server.log.some(l => /rpc\/get_program 200 old$/.test(l)), r.server.log.join(' | '));
   t.check('the saved plan is still on the phone', r.state.ls.includes('plancache'), r.state.ls.join(','));
   t.check('no script error on the page', r.p.errs.length === 0, r.p.errs.join(' | '));
   await r.ctx.close();

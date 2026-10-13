@@ -686,10 +686,23 @@ Fresh Eyes REL-01; Amir picked *"A with Proof"*. Since 2026-09-07 the plan came 
 athlete who checked WhatsApp between sets in a no-signal gym reopened on *"Program Not Found … ask
 Amir for a fresh one"*, their logged sets safe on the phone and no way to see or finish them. The
 service worker keeps the app's own files; its old offline path for the plan, `data/<id>.json`, has
-been a 404 since 2026-09-07. Rejected: opening from the phone on every launch (a stale plan first,
+been a 404 since 2026-09-07. Rejected then: opening from the phone on every launch (a stale plan first,
 swapped under a running session) and letting `sw.js` keep the plan (it cannot cache a POST, and it
 sits in front of the whole site).
 
+**Opened FIRST on every launch since 2026-10-13** (Line Call, Second Serve N1; Amir: *"yes to all
+recommended"*, decision 2, with both guards). Every open waited for the library and then `get_program`
+(6 s cap) before Home, with the plan already on the phone: 9.8 s on a simulated slow evening line, and
+a stalled one held the loading screen 6 s, then up to 4 s more for the dead `data/<id>.json` (now tried on
+local hosts only). Now a phone holding this athlete's plan (`readPlanCopy(clientId)`; never the demo, the
+coach preview or a fresh sign-in, which drops the copy) opens from it at once as `PLAN_OFFLINE.fast`, and
+`_resumeSync()` runs straight after the first paint: the same plan → nothing shows and the held uploads go;
+a changed plan → *Your plan was updated · Refresh*, the old one on screen until the tap (**guard 2: never
+swapped under a running session**); no answer → the *Offline* line, only once the check has failed (a fast
+open says nothing before); a "no" → **guard 1: the app closes** on *Plan not available* and the copy goes
+(`showPlanRefused()`), unless a session is under way (`sessionUnderway()`), which keeps the screen with the
+*Heads up* line as before. The progress pull runs in the same check, so a two-phone athlete sees the other
+phone's sets from the next open. `scripts/headless/phone-first.js`.
 
 - **`plancache`** (localStorage, no athlete prefix, so it never syncs): ONE slot, `{ id, at, data }`
   = the athlete id it was asked for, when, and the plan exactly as the server sent it. A shared phone

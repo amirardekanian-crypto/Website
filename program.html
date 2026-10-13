@@ -6112,6 +6112,25 @@ function paintPlanOffline(state) {
   el.hidden = false;
 }
 
+// The server will not give this sign-in the plan: boot's answer, and since 2026-10-13 the background check of a plan opened from
+// the phone (_resumeSync()) when no session is under way.
+function showPlanRefused() {
+  const wa = 'https://wa.me/' + COACH_WHATSAPP + '?text=' +
+             encodeURIComponent("Hi Amir, the app won't open my plan. ");
+  showError('This sign-in or link isn\'t accepted any more. Sign in again, or message Amir on WhatsApp if it keeps happening.', {
+    title: 'Plan not available', icon: 'locked',
+    actions: '<button type="button" class="error-btn" onclick="signOutAthlete()">Sign in again</button>' +
+             `<a class="error-btn ghost" href="${wa}" target="_blank" rel="noopener">Message Amir on WhatsApp</a>`
+  });
+}
+// A session under way on this phone right now: the clock running or paused today on a day not finished, or the session bar on.
+function sessionUnderway() {
+  if (document.body.classList.contains('session-on')) return true;
+  const today = new Date().toDateString();
+  return ((DATA && DATA.workouts && DATA.workouts.days) || []).some(d =>
+    sessionStartedToday(String(d.id), today) && !completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id)));
+}
+
 // One capped pull. If the cap wins, the answer is thrown away when it lands.
 async function _pullOnce(key) {
   let live = true;
@@ -6133,15 +6152,25 @@ async function _resumeSync() {
   if (!_sbHold || _resuming || window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
   if (PLAN_OFFLINE && PLAN_OFFLINE.refused) return;
   _resuming = true;
+  // Opened from the phone FIRST (a fast open, not a lost signal): nothing is said until the server has answered or failed to.
+  const saidOffline = () => { if (PLAN_OFFLINE && PLAN_OFFLINE.fast && !PLAN_OFFLINE.said) { PLAN_OFFLINE.said = true; paintPlanOffline('offline'); } };
   try {
     const sb = await _sbLoad();
-    if (!sb) return;
+    if (!sb) { saidOffline(); return; }
     if (PLAN_OFFLINE && !PLAN_OFFLINE.checked) {
       const res = await _withTimeout(
         sb.rpc('get_program', { p_athlete_id: PLAN_OFFLINE.id, p_key: _sbKey || null }), 6000);
       const ans = planAnswerOf(res);
-      if (ans === 'unreachable') return;
+      if (ans === 'unreachable') { saidOffline(); return; }
       PLAN_OFFLINE.checked = true;
+      if (ans === 'no' && PLAN_OFFLINE.fast && !sessionUnderway()) {
+        // The guard Amir asked for: a "no" still closes the app. The copy goes with it.
+        PLAN_OFFLINE.refused = true;
+        dropPlanCopy();
+        _stopHoldTimer();
+        showPlanRefused();
+        return;
+      }
       if (ans === 'no') {
         // The server no longer lets this sign-in read the plan. Keep the screen (they
         // may be mid-set, and every set is on the phone) but stop: nothing sent from
@@ -6276,7 +6305,22 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   // How the server answered (REL-01): 'ok', 'no' (a refusal, or no plan) or
   // 'unreachable'. Only 'unreachable' may open the plan saved on this phone.
   let planAnswer = 'unreachable';
-  try {
+  // ── OPEN FROM THE PHONE FIRST (Line Call, 2026-10-13; Second Serve N1; Amir: "yes to all recommended", decision 2, with both
+  // guards) ── Every open used to wait for the library and then get_program (up to 6 s) before Home, with the plan already on the
+  // phone: 9.8 s on a simulated slow evening line. Now a phone that holds this athlete's plan (plancache, readPlanCopy()) opens
+  // from it at once, the way an open with no signal always has (PLAN_OFFLINE), and _resumeSync() asks the server straight after
+  // the first paint: the same plan → nothing shows; a changed one → "Your plan was updated · Refresh", never swapped under a
+  // running session; no answer → the Offline line; a "no" → the app closes on "Plan not available" unless a session is under
+  // way (then the Heads up line, as before). Never the demo or the coach preview, and never a fresh sign-in (it drops the copy).
+  const fastCopy = (!window.IS_DEMO && !window.IS_PREVIEW) ? readPlanCopy(clientId) : null;
+  if (fastCopy) {
+    // One pause first: boot() runs while this script is still being evaluated, and with no network wait before it, it would reach
+    // code that reads names declared further down (SPINE: "Cannot access before initialization"). A microtask lets the script finish.
+    await null;
+    DATA = fastCopy.data;
+    PLAN_OFFLINE = { id: fastCopy.id, at: fastCopy.at, raw: JSON.stringify(fastCopy.data), fast: true };
+  }
+  if (!fastCopy) try {
     const sb = await _sbReady();
     if (sb) {
       // Timed, for the same reason habits.html times its copy: a stalled fetch
@@ -6291,10 +6335,13 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
       }
     }
   } catch (e) { /* offline or rejected — the fallbacks below cover it */ }
+  // (The try above runs only when the phone had no plan to open from.)
   // The server said no. Its word is final, and a copy it would refuse goes too.
   if (planAnswer === 'no') dropPlanCopy();
 
-  if (!DATA && planAnswer !== 'no') {
+  // Local hosts only since 2026-10-13 (Line Call, Second Serve N1): on the live site it is a 404, and on a stalled line it held the
+  // loading screen up to 4 s more before the phone's own copy opened. The headless checks serve from 127.0.0.1 and still use it.
+  if (!DATA && planAnswer !== 'no' && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
     try {
       // no-cache: always revalidate so an updated program (e.g. a newly embedded
       // athlete key) reaches the athlete immediately instead of a stale cached copy.
@@ -6345,13 +6392,7 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   // Two real causes, each with its own words (REL-01). It used to blame a link for both.
   if (!DATA) {
     if (planAnswer === 'no') {
-      const wa = 'https://wa.me/' + COACH_WHATSAPP + '?text=' +
-                 encodeURIComponent("Hi Amir, the app won't open my plan. ");
-      showError('This sign-in or link isn\'t accepted any more. Sign in again, or message Amir on WhatsApp if it keeps happening.', {
-        title: 'Plan not available', icon: 'locked',
-        actions: '<button type="button" class="error-btn" onclick="signOutAthlete()">Sign in again</button>' +
-                 `<a class="error-btn ghost" href="${wa}" target="_blank" rel="noopener">Message Amir on WhatsApp</a>`
-      });
+      showPlanRefused();
     } else {
       showError('The app couldn\'t reach the server, and this phone hasn\'t saved your plan yet. ' +
                 'Try again when you have signal. Once it has opened with a connection, it opens without one too.', {
@@ -6433,7 +6474,9 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   renderPlan();
   renderHome();
   renderNotes();
-  if (PLAN_OFFLINE) paintPlanOffline('offline');
+  if (PLAN_OFFLINE && !PLAN_OFFLINE.fast) paintPlanOffline('offline');
+  // Opened from the phone first: ask the server now, behind the first paint (_resumeSync() is held by _sbHold, set above).
+  if (PLAN_OFFLINE && PLAN_OFFLINE.fast) setTimeout(_resumeSync, 0);
   _proofCardSig = proofCardSig();
   mountProofStrip();
 
