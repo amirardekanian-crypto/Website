@@ -3381,8 +3381,8 @@
   .note-body { display: none; padding: 14px 18px 18px; font-size: var(--fs-body); line-height: 1.65; color: #444; border-top: 1px solid var(--grey-card); }
   .note-card.open .note-body { display: block; }
   /* Note bodies render real HTML (paragraphs/lists/bold) — the global `* { margin:0; padding:0 }`
-     reset strips default browser spacing, so restore it explicitly here. Applies to both
-     personal notes (DATA.notes) and the "Using the app" guide cards. */
+     reset strips default browser spacing, so restore it explicitly here. Applies to the "Using the app"
+     guide cards in the help sheet (the Coach tab's own notes have .cn-body, in the COACH IN THE CENTRE COURT LOOK block). */
   .note-body p { margin: 0 0 10px; }
   .note-body p:last-child { margin-bottom: 0; }
   .note-body ul { margin: 4px 0 10px; padding-left: 20px; }
@@ -3393,70 +3393,10 @@
   body[data-dark] .note-body strong { color: #f0f0f0; }
 
   /* ════════════════════════════════════════════════════════════════════
-     COACH TAB — hero header · WhatsApp door · note cards
+     COACH TAB: the header, the WhatsApp panel, Notes from Amir and the How the app works row are drawn by the COACH IN THE CENTRE
+     COURT LOOK block before CENTRE COURT (2026-10-13). What stays here: the small WhatsApp door (.wa-inline) and the note cards the
+     help sheet's guide uses.
      ════════════════════════════════════════════════════════════════════ */
-
-  /* ── Coach hero (avatar + name + role line) ── */
-  .coach-hero { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 28px 64px 20px 24px; }   /* clear of the account button (NAV-02) */
-  .coach-avatar {
-    position: relative;
-    width: 64px; height: 64px; flex-shrink: 0; border-radius: 50%; overflow: hidden;
-    background: linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 14px rgba(14,74,54,0.25);
-  }
-  /* Photo overlays the initials when present; onerror removes it → initials show. */
-  .coach-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-  .coach-avatar-initials { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); letter-spacing: 0.5px; color: #fff; }
-  .coach-hero-main { flex: 1; min-width: 0; }
-  /* Same weight as the title on Progress (.prog-title), one step smaller */
-  .coach-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(38px, 11vw, 60px);
-    font-weight: 900; letter-spacing: -2px; line-height: 0.95;
-    text-transform: uppercase; color: var(--grey-dark); margin: 0;
-  }
-  .coach-status {
-    display: flex; align-items: center; gap: 8px; margin-top: 10px;
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label);
-    letter-spacing: 1px; text-transform: uppercase; color: var(--grey-text);
-  }
-  body[data-dark] .coach-name { color: #f0f0f0; }
-
-  /* ── Section labels ("Personal notes" / "Using the app") ── */
-  .notes-section-label {
-    font-family: 'Space Mono', monospace; font-weight: 700;
-    font-size: var(--fs-label); letter-spacing: 2px; text-transform: uppercase;
-    color: var(--grey-text); margin: 26px 24px 12px;
-  }
-
-  /* ── Message me on WhatsApp (replaced the in-app chat, 2026-09-26) ── */
-  .coach-wa {
-    display: flex; align-items: center; gap: 14px; margin: 14px 24px 0;
-    padding: 14px 16px; min-height: 64px; border-radius: 16px;
-    background: var(--yellow); color: #fff; text-decoration: none;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    transition: transform 0.12s ease;
-  }
-  .coach-wa:active { transform: scale(0.98); }
-  .coach-wa:focus-visible { outline: 2px solid var(--ice); outline-offset: 3px; }
-  .coach-wa-ico {
-    width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%;
-    background: rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center;
-  }
-  .coach-wa-ico svg { width: 22px; height: 22px; }
-  .coach-wa-txt { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
-  .coach-wa-txt b {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead);
-    text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.05;
-  }
-  .coach-wa-txt small { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.3; opacity: 0.88; }
-  .coach-wa-go { font-size: var(--fs-title); flex-shrink: 0; }
-  .coach-wa-num {
-    margin: 8px 24px 0; font-family: 'Space Mono', monospace; font-size: var(--fs-label);
-    letter-spacing: 1px; color: var(--grey-text); user-select: all;
-  }
-  body[data-dark] .coach-wa { background: #14684C; }
   /* The small WhatsApp door at the end of a session and in the About sheet. */
   .wa-inline { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 11px 14px; min-height: 52px; border: 1.5px solid var(--yellow); border-radius: 12px; color: var(--green-ink); background: transparent; text-decoration: none; text-align: left; transition: transform 0.12s ease; }
   .wa-inline:active { transform: scale(0.98); }
@@ -3468,74 +3408,15 @@
   .wa-inline-go { flex: none; font-size: var(--fs-lead); }
   body[data-dark] .wa-inline { border-color: #3E9C74; color: #7FD0AC; }
 
-  /* ── Note cards: rounder, taller radius for both note types ── */
+  /* ── Note cards (the help sheet's guide): a rounder, taller radius ── */
   .note-card { border-radius: 14px; }
 
-  /* Personal note card — category-banner thumbnail + dark title + green CTA */
-  .note-card-row { display: flex; align-items: center; gap: 14px; padding: 14px; cursor: pointer; user-select: none; }
-  /* Brand-colour tile with the note's icon centred: green over the court-sessions
-     photo, clay over court-playbook, or striped paper. The third
-     tone was ochre until 2026-09-26; the brand has no yellow or gold. */
-  .note-tile {
-    width: 64px; height: 64px; flex-shrink: 0; border-radius: 10px; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    font-size: var(--fs-head); line-height: 1; color: #fff;
-    background-color: #0E4A36;
-    background-image: linear-gradient(135deg, rgba(14,74,54,0.6) 0%, rgba(14,74,54,0.45) 100%), url('court-sessions.jpg');
-    background-size: cover;
-    background-position: center;
-  }
-  .note-tile.tone-clay {
-    background-color: #C7552F;
-    background-image: linear-gradient(135deg, rgba(199,85,47,0.6) 0%, rgba(199,85,47,0.45) 100%), url('court-playbook.jpg');
-    background-size: cover;
-    background-position: center;
-  }
-  .note-tile.tone-paper {
-    color: #0E4A36;
-    background-color: #F1ECE3;
-    background-image:
-      repeating-linear-gradient(135deg, rgba(14,74,54,0.07) 0 9px, rgba(14,74,54,0) 9px 18px),
-      linear-gradient(135deg, #F1ECE3 0%, #E7E2D9 100%);
-    box-shadow: inset 0 0 0 1px rgba(14,74,54,0.10);
-  }
-  /* In dark mode a paper tile would be the one bright square on the screen, so it
-     turns to a dark warm tile with a paper icon; still the third, distinct tone. */
-  body[data-dark] .note-tile.tone-paper {
-    color: #F1ECE3;
-    background-color: #2F2B25;
-    background-image:
-      repeating-linear-gradient(135deg, rgba(241,236,227,0.06) 0 9px, rgba(241,236,227,0) 9px 18px),
-      linear-gradient(135deg, #3A352E 0%, #2A2621 100%);
-    box-shadow: inset 0 0 0 1px rgba(241,236,227,0.12);
-  }
-  .note-tile svg { width: 30px; height: 30px; }
-  .note-card-main { flex: 1; min-width: 0; }
-  .note-date { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1px; color: var(--grey-text); margin-bottom: 4px; }
-  .note-personal .note-card-title {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: var(--fs-lead); line-height: 1.05; text-transform: uppercase;
-    color: var(--grey-dark); letter-spacing: 0.3px;
-  }
-  .note-cta {
-    font-family: 'Space Mono', monospace; font-weight: 700;
-    font-size: var(--fs-label); letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--green-ink); margin-top: 7px;
-  }
-  .note-card.open .note-cta { display: none; }
-  body[data-dark] .note-personal .note-card-title { color: #f0f0f0; }
-
-  /* "Using the app" cards — green icon tile + dark title (general, every client).
-     These are constant app-UI icons, so they always use the brand green tile
-     (the per-note clay/paper rotation only applies to personal notes above). */
+  /* "Using the app" cards (the guide in the help sheet) — green icon tile + dark title (general, every client).
+     These are constant app-UI icons, so they always use the brand green tile. */
   .app-card .note-card-title { color: var(--grey-dark); }
-  /* The guide in the sheet (COACH-02), and its one row on the Coach tab. */
+  /* The guide in the sheet (COACH-02). Its one row on the Coach tab is the .hrow in the COACH IN THE CENTRE COURT LOOK block. */
   .help-list { margin-top: 12px; }
   .help-list .note-card { margin: 0 0 10px; }
-  .app-help-row { display: flex; align-items: center; gap: 12px; width: calc(100% - 40px); padding: 12px 16px; text-align: left; cursor: pointer; font: inherit; }
-  .app-help-row .note-card-title { flex: 1; color: var(--grey-dark); }
-  .app-help-go { color: var(--grey-text); font-size: var(--fs-title); line-height: 1; }
-  body[data-dark] .app-help-row .note-card-title { color: #f0f0f0; }
   .nl-lab.nl-help { background: none; border: 0; padding: 0; margin: 0 1ch 0 0; font-family: inherit; font-size: inherit;
     letter-spacing: inherit; line-height: inherit; font-weight: 400; color: var(--grey-text); cursor: pointer;
     text-decoration: underline dotted; text-underline-offset: 3px; }
@@ -3954,6 +3835,96 @@
     cursor: pointer;
   }
   .ceil-add, .wt-save, .ex-1rm-save { font-size: var(--fs-body); }   /* they were Space Mono at the label size */
+  /* ══ COACH IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════════════════════════════════════
+     Amir, 2026-10-13: "continue until everything has a consistent design". The Coach tab (#screen-notes) wears Progress's and Home's
+     look: a header like Progress's (● YOUR COACH, COACH AMIR as the 44 px title, one mono line) · the WhatsApp panel, the screen's ONE
+     green thing (--hero, his photo graded in on the right the way Next up grades its photo, the cover's light-ring button, his
+     signature and photo at the foot as the week note signs; the whole panel is ONE <a>, and its button is a <span> inside it) · the
+     number as plain selectable mono text · Notes from Amir as fold rows on the paper with a hairline between (button.cn-row,
+     aria-expanded, one open at a time: renderNotes(), toggleCoachNote()) · How the app works as one door row (.hrow, Home's look).
+     Colours are the app's ONE shared set (declared on body, top of this sheet): no token is declared here. The gutter is --g.
+     It sits before CENTRE COURT and touches nothing of the day; the help sheet's guide cards keep .note-card. */
+
+  /* 1. The header: Progress's (.prog-eyebrow and .prog-title are global), and one mono line under the title. */
+  .coach-head { margin: 14px var(--g) 22px; }
+  .coach-role { margin: 12px 0 0; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.5px; text-transform: uppercase; color: var(--grey); }
+
+  /* 2. The panel: --hero, 16 px corners, inside the gutter. His photo (a square portrait on a dark grey wall) is graded into the green
+     on the right (luminosity at .7, masked from the left), under a scrim that ends on the cover's last colour; the words sit on the
+     left, clear of his face. One link: no part of it is a second control. */
+  .coach-panel { position: relative; isolation: isolate; display: block; overflow: hidden; margin: 0 var(--g); border-radius: 16px; background: var(--hero);
+    color: #fff; text-decoration: none; }
+  .coach-panel:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .coach-panel-img { position: absolute; z-index: 0; top: 0; right: 0; bottom: 0; width: 64%; height: 100%; object-fit: cover; object-position: 50% 14%;
+    background: transparent; mix-blend-mode: luminosity; opacity: .7; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
+  .coach-panel-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  .coach-panel-body { position: relative; z-index: 2; display: block; padding: 26px var(--g) 16px; }
+  .coach-panel-eye { display: flex; align-items: flex-start; gap: 8px; max-width: 250px; font: 700 var(--fs-label)/1.3 'Space Mono', monospace;
+    letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.84); text-wrap: balance; }
+  .coach-panel-eye::before { content: ''; flex: none; width: 7px; height: 7px; margin-top: 3px; border-radius: 50%; background: var(--mint); }
+  .coach-panel-title { display: block; max-width: 300px; margin: 12px 0 0;
+    font: 900 clamp(28px, 8.4vw, 36px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the panel's title, 28 to 36 px as Next up's */
+    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+  .coach-panel-line { display: block; max-width: 300px; margin: 12px 0 0; font: 500 var(--fs-body)/1.4 'Barlow', sans-serif; color: rgba(255,255,255,.9); text-wrap: pretty; }
+  /* the button: the cover's Start (the lighter green and a light ring), the full width of the panel's text. Green, never clay. */
+  .coach-panel-btn { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; margin-top: 20px; padding: 0 14px; border-radius: 8px;
+    color: #fff; background: var(--tile-on-green); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 10px 22px -10px rgba(0,0,0,.6);
+    font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; transition: transform 0.1s; }
+  .coach-panel-btn svg { flex: none; width: 20px; height: 20px; }
+  .coach-panel:active .coach-panel-btn { transform: scale(0.98); }
+  /* the sign-off, as the week note and the finished band sign: his signature in white on the left, his photo on the right, a faint line above */
+  .coach-panel-by { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 16px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.16); color: #fff; }
+  .coach-panel-by .wn-sig { width: 104px; height: 37px; margin: 0; color: #fff; }
+  .coach-panel-by .wn-av { width: 40px; height: 40px; margin: 0; box-shadow: 0 0 0 2px rgba(255,255,255,.92); }
+
+  /* 3. The number: plain mono text under the panel, one tap selects it whole so it can be copied. */
+  .coach-num { margin: 12px var(--g) 0; font: 400 var(--fs-body)/1.3 'Space Mono', monospace; letter-spacing: .5px; color: var(--grey); -webkit-user-select: all; user-select: all; }
+
+  /* 4. Notes from Amir: the section title is Progress's (.prog-sec: 15 px condensed capitals in green with a hairline to the edge), then a
+     fold row per note on the paper. A hairline between rows, none above the first. The icon is a 22 px green line icon, the title Barlow 600,
+     the date mono grey, the chevron the app's one ⌄ (it turns when open). Open, the note's body sits on the paper under the row. */
+  #screen-notes .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 12px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
+  #screen-notes .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }
+  .cn-list { margin: 0 var(--g); }
+  .cn-item + .cn-item { border-top: 1px solid var(--hair); }
+  .cn-row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 12px 0; border: 0; border-radius: 0; background: transparent; color: var(--ink);
+    text-align: left; cursor: pointer; }
+  .cn-row:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  .cn-row:active { background: var(--tint); }
+  .cn-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  .cn-ic svg { width: 22px; height: 22px; }
+  .cn-main { flex: 1; min-width: 0; display: block; }
+  .cn-title { display: block; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); text-wrap: balance; }
+  .cn-date { display: block; margin-top: 4px; font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; color: var(--grey); }
+  .cn-chev { flex: none; width: 18px; height: 18px; background: var(--grey); transition: transform .2s ease;
+    -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
+  .cn-row[aria-expanded="true"] .cn-chev { transform: rotate(180deg); }
+  .cn-body { padding: 0 0 20px 36px; font: 400 var(--fs-body)/1.65 'Barlow', sans-serif; color: var(--ink); }
+  .cn-body[hidden] { display: none; }
+  /* a note's body is the coach's own HTML (paragraphs, lists, bold); the global reset strips the spacing, so it is restored here */
+  .cn-body p { margin: 0 0 10px; }
+  .cn-body p:last-child { margin-bottom: 0; }
+  .cn-body ul { margin: 4px 0 10px; padding-left: 20px; }
+  .cn-body ul:last-child { margin-bottom: 0; }
+  .cn-body li { margin-bottom: 6px; }
+  .cn-body li:last-child { margin-bottom: 0; }
+  .cn-body strong { font-weight: 700; color: var(--ink); }
+
+  /* 5. How the app works: the door row (Home's and Progress's .hrow recipe): white, 1 px edge, 12 px corners, a 22 px green line icon, a green
+     Space Mono label over one Barlow line, a grey ›. No section label above it. */
+  :where(#screen-notes) .hrow { display: flex; align-items: center; gap: 14px; width: calc(100% - 2 * var(--g)); min-height: 64px; margin: 22px var(--g) 0;
+    padding: 12px 14px 12px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
+  :where(#screen-notes) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  :where(#screen-notes) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  :where(#screen-notes) .hrow-ic svg { width: 22px; height: 22px; }
+  :where(#screen-notes) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
+  :where(#screen-notes) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#screen-notes) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  :where(#screen-notes) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
   /* ══ CENTRE COURT: the training day, re-skinned (Amir, 2026-10-12: "lets go with E. exercise number inside the circle.
      but with P4, P5, P9, P50, P66") ═════════════════════════════════════════════════════════════════════════════════════
      ONE block for the training day, last in the sheet so it wins a tie: the day view (#day-view), Guided's moved card
@@ -5437,21 +5408,14 @@
 
 <!-- ═══ NOTES ═══ -->
 <div id="screen-notes" class="screen">
-  <!-- Coach hero — replaces the old green "Coach" header band. The avatar is
-       assets/img/coach.jpg over the brand initials, which show if the photo fails. -->
-  <div class="coach-hero">
-    <div class="coach-avatar" id="coach-avatar">
-      <img src="assets/img/coach.jpg" alt="Coach Amir" onerror="this.remove()">
-      <span class="coach-avatar-initials">AA</span>
-    </div>
-    <div class="coach-hero-main">
-      <h1 class="coach-name">Coach Amir</h1>
-      <div class="coach-status">
-        <span>Strength &amp; conditioning coach</span>
-      </div>
-    </div>
+  <!-- The Coach header, in Progress's look (the Centre Court block COACH IN THE CENTRE COURT LOOK): a green-dot eyebrow, the 44 px title, one
+       mono line. His photo is in the WhatsApp panel below, not here. renderNotes() fills #notes-container. -->
+  <div class="coach-head">
+    <div class="prog-eyebrow">Your coach</div>
+    <h1 class="prog-title">Coach Amir</h1>
+    <div class="coach-role">Strength &amp; conditioning coach</div>
   </div>
-  <div id="notes-container" style="padding: 4px 0 100px;"></div>
+  <div id="notes-container" style="padding: 0 0 100px;"></div>
 </div>
 
 <!-- ═══ GLOBAL BOTTOM TAB BAR ═══ Shown on every nav screen; hidden while loading
@@ -9599,36 +9563,32 @@ function renderArchive(programId) {
 function renderNotes() {
   const notes = DATA.notes || {};
 
-  // ── Personal notes (per-client, from JSON). Closed by default; tap to open.
-  //    Each card gets an on-brand colour tile (green/clay/paper, cycled). The
-  //    note's emoji is resolved to a matching line icon via resolveIconKey() —
-  //    coaches keep authoring with emoji; the app translates them. No raw emoji.
-  const TONES = ['', 'tone-clay', 'tone-paper'];
-  const personalCards = (notes.cards || []).map((card, i) => `
-    <div class="note-card note-personal" onclick="toggleNote(this)">
-      <div class="note-card-row">
-        <div class="note-tile ${TONES[i % TONES.length]}">${window.ICON(window.resolveIconKey(card.icon))}</div>
-        <div class="note-card-main">
-          ${card.date ? `<div class="note-date">${esc(card.date)}</div>` : ''}
-          <div class="note-card-title">${esc(card.title)}</div>
-          <div class="note-cta">Tap to read ›</div>
-        </div>
-      </div>
-      <div class="note-body">${card.body}</div>
+  // ── Notes from Amir (per-client, from JSON): fold rows on the paper, all closed to start, one opens at a time
+  //    (toggleCoachNote()). The note's emoji is resolved to a matching line icon via resolveIconKey(): coaches keep
+  //    authoring with emoji and the app translates them. No raw emoji and no coloured tile. The body is the coach's own HTML
+  //    (paragraphs, lists, bold). No notes, no section.
+  const rows = (notes.cards || []).map((card, i) => `
+    <div class="cn-item">
+      <button type="button" class="cn-row" id="cn-h-${i}" aria-expanded="false" aria-controls="cn-b-${i}" onclick="toggleCoachNote(this)">
+        <span class="cn-ic" aria-hidden="true">${window.ICON(window.resolveIconKey(card.icon), 1.6)}</span>
+        <span class="cn-main"><span class="cn-title">${esc(card.title)}</span>${card.date ? `<span class="cn-date">${esc(card.date)}</span>` : ''}</span>
+        <span class="cn-chev" aria-hidden="true"></span>
+      </button>
+      <div class="cn-body" id="cn-b-${i}" role="region" aria-labelledby="cn-h-${i}" hidden>${card.body || ''}</div>
     </div>`).join('');
 
-  // ── "Using the app": the guide (APP_GUIDE) opens in the one sheet now (COACH-02); the
-  //    Coach tab keeps one row for it, and stays Amir's voice.
-  const appRow = `<button type="button" class="note-card app-help-row" onclick="openHelp()">
-      <span class="app-card-icon">${window.ICON('help')}</span>
-      <span class="note-card-title">How the app works</span>
-      <span class="app-help-go" aria-hidden="true">›</span>
+  // ── How the app works: the guide (APP_GUIDE) opens in the one sheet (COACH-02); the Coach tab keeps ONE door row for it
+  //    (Home's .hrow look), with no section label above it, and stays Amir's voice.
+  const door = `<button type="button" class="hrow" onclick="openHelp()">
+      <span class="hrow-ic" aria-hidden="true">${window.ICON('help', 1.6)}</span>
+      <span class="hrow-b"><span class="hrow-l">Using the app</span><span class="hrow-v">How the app works</span></span>
+      <span class="hrow-a" aria-hidden="true">›</span>
     </button>`;
 
   document.getElementById('notes-container').innerHTML =
     coachContactHtml() +
-    (personalCards ? `<div class="notes-section-label">Personal notes</div>${personalCards}` : '') +
-    `<div class="notes-section-label">Using the app</div>${appRow}`;
+    (rows ? `<div class="prog-sec">Notes from Amir</div><div class="cn-list">${rows}</div>` : '') +
+    door;
 }
 
 // "Using the app" — the general how-to content shown to every athlete in the
@@ -9776,13 +9736,23 @@ function sessionWaUrl(dayId) {
   return coachWhatsAppUrl('About Day ' + dayId + title + ': ' + (note ? note + ' ' : ''));
 }
 window.sessionWaUrl = sessionWaUrl;
+// The Coach tab's WhatsApp panel, the screen's one green thing (2026-10-13): ONE <a> (the same href, target and pre-filled message
+// as before), so every part of it opens WhatsApp. The "Open WhatsApp" button is a <span> inside it, not a second link. His photo is
+// graded into the green on the right, his signature and photo sign it at the foot (WN_SIG and .wn-av, as the week note signs).
+// The number sits under it as plain selectable text (COACH_WHATSAPP_SHOWN).
 function coachContactHtml() {
-  return `<a class="coach-wa" href="${esc(coachWhatsAppUrl())}" target="_blank" rel="noopener">
-      <span class="coach-wa-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg></span>
-      <span class="coach-wa-txt"><b>Message me on WhatsApp</b><small>Questions, swaps, anything that hurts, form videos.</small></span>
-      <span class="coach-wa-go" aria-hidden="true">→</span>
+  return `<a class="coach-panel" href="${esc(coachWhatsAppUrl())}" target="_blank" rel="noopener" aria-label="Open WhatsApp and message Amir">
+      <img class="coach-panel-img" src="assets/img/coach.jpg" alt="" onerror="this.remove()">
+      <span class="coach-panel-scrim" aria-hidden="true"></span>
+      <span class="coach-panel-body">
+        <span class="coach-panel-eye">Questions, swaps, anything that hurts</span>
+        <span class="coach-panel-title">Message me on WhatsApp</span>
+        <span class="coach-panel-line">Form videos welcome. I answer there, not in the app.</span>
+        <span class="coach-panel-btn">${WA_ICON}Open WhatsApp</span>
+        <span class="coach-panel-by">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></span>
+      </span>
     </a>
-    <div class="coach-wa-num">${COACH_WHATSAPP_SHOWN}</div>`;
+    <div class="coach-num">${COACH_WHATSAPP_SHOWN}</div>`;
 }
 
 // Where the Library was scrolled when a session or an article opened from it (POL-01): coming back
@@ -12852,6 +12822,13 @@ function toggleNote(card) {
   const scope = card.closest('#notes-container, .help-list') || document;
   scope.querySelectorAll('.note-card.open').forEach(c => c.classList.remove('open'));
   if (!wasOpen) card.classList.add('open');
+}
+// The same rule for the Coach tab's Notes from Amir (2026-10-13): a fold row is a <button aria-expanded> over its body, one open at a time.
+function toggleCoachNote(btn) {
+  const wasOpen = btn.getAttribute('aria-expanded') === 'true';
+  const set = (b, open) => { b.setAttribute('aria-expanded', open ? 'true' : 'false'); const body = document.getElementById(b.getAttribute('aria-controls')); if (body) body.hidden = !open; };
+  document.querySelectorAll('#notes-container .cn-row[aria-expanded="true"]').forEach(b => set(b, false));
+  if (!wasOpen) set(btn, true);
 }
 
 // ── Carry an exercise's history across a rename ──────────────────────────────
