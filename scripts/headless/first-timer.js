@@ -18,22 +18,35 @@ const t = H.checker();
   });
   const cur = prog.cycles[prog.currentCycleIndex];
 
-  // ── 1. dates on Game Plan are the local day (needs TZ west of UTC) ──
+  // ── 1. dates on Progress are the local day (needs TZ west of UTC) ──
+  // Since 2026-10-13 the dates and the days left are on the This cycle cover (the header's dates line and the days-left banner are gone): the cover's
+  // mono line reads "SEP 29 – NOV 2" and, in the cycle's last 14 days, "· 9 DAYS LEFT". The fixture's cycle ends in 24 days, so a second one ends in 9, to run the days-left check.
   {
-    const { ctx, p } = await H.openProgram(browser, { prog });
-    await p.evaluate(() => goTo('plan'));
-    await p.waitForTimeout(300);
-    const got = await p.evaluate(() => (document.querySelector('.home-dates, .plan-dates, #athlete-card-wrap') || document.body).innerText);
     const mon = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     const f = iso => { const [y, m, d] = iso.split('-').map(Number); return mon[m - 1] + ' ' + d; };
-    const want = f(cur.startDate) + ' — ' + f(cur.endDate);
-    t.check('Game Plan header dates are the cycle\'s own days (TZ ' + (process.env.TZ || 'default') + ')', got.toUpperCase().replace(/\s+/g, ' ').includes(want), 'want "' + want + '" in "' + got.replace(/\s+/g, ' ').slice(0, 160) + '"');
-    const days = await p.evaluate(() => { const b = document.getElementById('sub-banner-wrap'); return b ? b.innerText.replace(/\s+/g, ' ') : ''; });
-    const todayLocal = new Date(); todayLocal.setHours(0, 0, 0, 0);
-    const [y, m, d] = cur.endDate.split('-').map(Number);
-    const left = Math.round((new Date(y, m - 1, d) - todayLocal) / 86400000);
-    if (left >= 0 && left <= 14) t.check('days-left banner counts from the local end day', new RegExp('\\b' + left + ' days? left', 'i').test(days), days + ' (want ' + left + ')');
-    await ctx.close();
+    const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const endingIn = n => {   // the current cycle ends n local days from today, five weeks long
+      const P = H.fixture(), c = P.cycles[P.currentCycleIndex], e = new Date(); e.setHours(12, 0, 0, 0); e.setDate(e.getDate() + n);
+      const s = new Date(e); s.setDate(s.getDate() - 34);
+      c.startDate = ymd(s); c.endDate = ymd(e);
+      return P;
+    };
+    for (const [pg, tag] of [[prog, 'ends in 24 days'], [endingIn(9), 'ends in 9 days'], [endingIn(0), 'ends today'], [endingIn(1), 'ends tomorrow']]) {
+      const c = pg.cycles[pg.currentCycleIndex];
+      const { ctx, p } = await H.openProgram(browser, { prog: pg });
+      await p.evaluate(() => goTo('plan'));
+      await p.waitForTimeout(300);
+      const got = await p.evaluate(() => { const e = document.querySelector('#cycle-card-wrap .cyc-dates'); return e ? e.innerText : ''; });
+      const want = f(c.startDate) + ' – ' + f(c.endDate);
+      t.check('Progress cover dates are the cycle\'s own days, ' + tag + ' (TZ ' + (process.env.TZ || 'default') + ')', got.toUpperCase().replace(/\s+/g, ' ').includes(want), 'want "' + want + '" in "' + got.replace(/\s+/g, ' ').slice(0, 160) + '"');
+      const todayLocal = new Date(); todayLocal.setHours(0, 0, 0, 0);
+      const [y, m, d] = c.endDate.split('-').map(Number);
+      const left = Math.round((new Date(y, m - 1, d) - todayLocal) / 86400000);
+      if (left >= 0 && left <= 14) t.check('days left on the cover count from the local end day, ' + tag, new RegExp('\\b' + left + ' days? left', 'i').test(got), got.replace(/\s+/g, ' ') + ' (want ' + left + ')');
+      else t.check('no days left on the cover before the last 14 days, ' + tag, !/left/i.test(got), got.replace(/\s+/g, ' '));
+      t.check('no days-left banner and no dates line in the header, ' + tag, await p.evaluate(() => !document.getElementById('sub-banner-wrap') && !document.querySelector('.sub-banner, .athlete-card-dates')));
+      await ctx.close();
+    }
   }
 
   // ── 2. readiness: the grey button says why ──
@@ -150,15 +163,19 @@ const t = H.checker();
     await ctx.close();
   }
 
-  // ── 9. Game Plan: reading the Active card's text stays; its banner goes Home ──
+  // ── 9. Progress: tapping the current cycle's row folds and unfolds it, and stays on Progress ──
+  // (Until 2026-10-13 the Active card's text stayed and its photo banner went Home. There is no banner now: nothing on Progress jumps Home.)
   {
     const { ctx, p } = await H.openProgram(browser, { prog });
     await p.evaluate(() => goTo('plan')); await p.waitForTimeout(300);
     const on = () => p.evaluate(() => document.querySelector('.screen.active').id);
-    await p.evaluate(() => { const b = document.querySelector('#current-message-wrap .cm-body, #current-message-wrap .focus-list'); if (b) b.click(); });
-    t.check('tapping the Active card\'s text stays on Game Plan', (await on()) === 'screen-plan', await on());
-    await p.evaluate(() => document.querySelector('#current-message-wrap .cm-banner').click()); await p.waitForTimeout(300);
-    t.check('tapping its banner goes Home', (await on()) === 'screen-home', await on());
+    const row = () => p.evaluate(() => { const r = document.querySelector('#road-wrap .road-row.is-now'); return { open: r.classList.contains('is-open'), exp: r.querySelector('.road-head').getAttribute('aria-expanded') }; });
+    await p.evaluate(() => { const b = document.querySelector('#road-wrap .road-row.is-now .road-aims, #road-wrap .road-row.is-now .road-why'); if (b) b.click(); });
+    t.check('tapping the current cycle\'s text stays on Progress, still open', (await on()) === 'screen-plan' && (await row()).open, await on());
+    await p.evaluate(() => document.querySelector('#road-wrap .road-row.is-now .road-head').click()); await p.waitForTimeout(300);
+    t.check('tapping the current cycle\'s row folds it, and stays on Progress', (await on()) === 'screen-plan' && !(await row()).open && (await row()).exp === 'false', JSON.stringify(await row()));
+    await p.evaluate(() => document.querySelector('#road-wrap .road-row.is-now .road-head').click()); await p.waitForTimeout(300);
+    t.check('tapping it again opens it, and stays on Progress', (await on()) === 'screen-plan' && (await row()).open && (await row()).exp === 'true', JSON.stringify(await row()));
     await ctx.close();
   }
 

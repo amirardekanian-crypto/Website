@@ -77,22 +77,24 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
       const top = sel => { const e = document.querySelector('#screen-plan ' + sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
       const eyebrow = document.querySelector('#athlete-card-wrap .prog-eyebrow'), title = document.querySelector('#athlete-card-wrap .prog-title');
       const sec = [...document.querySelectorAll('#screen-plan .prog-sec')].map(e => e.textContent.trim());
-      const gp = document.querySelector('#cycle-meter-wrap .prog-sec');
+      const gp = document.querySelector('#road-wrap .prog-sec');
       const card = document.querySelector('#cycle-card-wrap .cyc-card');
       return { eyebrow: eyebrow && eyebrow.textContent.trim(), title: title && title.textContent.trim(), titleTag: title && title.tagName, titleSize: title && getComputedStyle(title).fontSize,
         badge: !!document.querySelector('#athlete-card-wrap .sport-badge'), dates: (document.querySelector('#athlete-card-wrap .athlete-card-dates') || {}).textContent || null,
+        coverDates: (document.querySelector('#cycle-card-wrap .cyc-dates') || {}).textContent || null,
         old: !!document.querySelector('#screen-plan .home-name'),
-        y: { title: top('.prog-title'), badge: top('.sport-badge'), dates: top('.athlete-card-dates'), card: top('.cyc-card'), numbers: top('#numbers-title'), ceil: top('#ceiling-row-wrap .hrow'),
-             weight: top('#weight-row-wrap .hrow'), plan: gp ? Math.round(gp.getBoundingClientRect().top + scrollY) : null, meter: top('.cycle-meter') },
+        y: { title: top('.prog-title'), badge: top('.sport-badge'), card: top('.cyc-card'), numbers: top('#numbers-title'), ceil: top('#ceiling-row-wrap .hrow'),
+             weight: top('#weight-row-wrap .hrow'), plan: gp ? Math.round(gp.getBoundingClientRect().top + scrollY) : null, road: top('.road') },
         sec, card: card && { tag: card.tagName, onclick: card.getAttribute('onclick'), arrow: !!card.querySelector('.cyc-top i'), text: card.innerText },
         gp: gp && { size: getComputedStyle(gp).fontSize, caps: getComputedStyle(gp).textTransform, color: getComputedStyle(gp).color, spacing: getComputedStyle(gp).letterSpacing } };
     });
     t.check('Progress header: the name as the eyebrow, "Progress" as a 44 px title, no big two-line name',
       o.eyebrow === 'Alex Rivera' && o.title === 'Progress' && o.titleTag === 'H1' && o.titleSize === '44px' && !o.old, JSON.stringify([o.eyebrow, o.title, o.titleSize, o.old]));
-    t.check('Progress header: the sport badge and the dates line stay under the title', o.badge && /\d/.test(o.dates || '') && o.y.title < o.y.badge && o.y.badge < o.y.dates, JSON.stringify(o.y));
+    // The dates moved onto the This cycle cover (2026-10-13): the header keeps the eyebrow, the title and the sport badge, and the cover's mono line carries the dates.
+    t.check('Progress header: the sport badge stays under the title, and the header has no dates line (the cover has them)', o.badge && o.dates === null && o.y.title < o.y.badge && /\d/.test(o.coverDates || ''), JSON.stringify([o.y, o.dates, o.coverDates]));
     const y = o.y;
     t.check('Progress order: header, This cycle card, Your numbers (Records, Body weight), then the Game Plan and its road',
-      y.dates < y.card && y.card < y.numbers && y.numbers < y.ceil && y.ceil < y.weight && y.weight < y.plan && y.plan < y.meter, JSON.stringify(y));
+      y.badge < y.card && y.card < y.numbers && y.numbers < y.ceil && y.ceil < y.weight && y.weight < y.plan && y.plan < y.road, JSON.stringify(y));
     t.check('Progress: two section titles, Your numbers and Game Plan', o.sec.join('|') === 'Your numbers|Game Plan', o.sec.join('|'));
     t.check('Progress: the Game Plan title is 15 px capitals in green ink with a hairline to the edge',
       !!o.gp && o.gp.size === '15px' && o.gp.caps === 'uppercase' && o.gp.color === 'rgb(14, 74, 54)' && parseFloat(o.gp.spacing) > 0, JSON.stringify(o.gp));
@@ -320,15 +322,18 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
     const q = await p.evaluate(() => {
       const left = (sel, text) => { const el = document.querySelector(sel); if (!el) return null; if (!text) return Math.round(el.getBoundingClientRect().left * 10) / 10;
         const n = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: x => x.textContent.trim() ? 1 : 3 }).nextNode(); const r = document.createRange(); r.selectNodeContents(n); return Math.round(r.getClientRects()[0].left * 10) / 10; };
-      const sec = document.querySelector('#cycle-meter-wrap .prog-sec'), numbers = document.getElementById('numbers-title');
+      const sec = document.querySelector('#road-wrap .prog-sec'), numbers = document.getElementById('numbers-title');
       const pad = el => Math.round((el.getBoundingClientRect().left + parseFloat(getComputedStyle(el).paddingLeft)) * 10) / 10;
-      return { title: left('.prog-title', true), badge: left('.sport-badge'), dates: left('.athlete-card-dates', true), card: left('.cyc-card'), numbers: pad(numbers), ceiling: left('#ceiling-row-wrap .hrow'), weight: left('#weight-row-wrap .hrow'),
-        plan: pad(sec), meter: left('.cycle-meter'), cycleCard: left('#current-message-wrap .current-message'), why: left('.why-plan-btn') };
+      return { title: left('.prog-title', true), badge: left('.sport-badge'), card: left('.cyc-card'), numbers: pad(numbers), ceiling: left('#ceiling-row-wrap .hrow'), weight: left('#weight-row-wrap .hrow'),
+        plan: pad(sec), road: left('.road'), row: left('.road-row'), nowRow: left('.road-row.is-now .road-head'), why: left('.road-why-door'), aims: left('.road-row.is-now .road-n', true), whyText: left('.road-row.is-now .road-sec', true) };
     });
     const prEdges = Object.entries(q).filter(([k, v]) => v != null);
-    // the title's glyph has a side bearing: allow 3 px for the 44 px capitals
-    t.check(`Progress ${w}: the header, the card, both section titles, the number rows, the meter and the cycle cards start at ${want} px`,
-      prEdges.length >= 9 && prEdges.every(([k, v]) => Math.abs(v - want) <= (k === 'title' ? 3 : 0.6)), JSON.stringify(prEdges));
+    // the title's glyph has a side bearing: allow 3 px for the 44 px capitals. The road's rows, the Now row's head and its door row start on the gutter; the aim numbers (01) sit in
+    // the numeral's column, so they start there too; the section titles inside a row start under the cycle's name (the 54 px of the numeral column and its gap).
+    const inner = prEdges.filter(([k]) => k !== 'whyText');
+    t.check(`Progress ${w}: the header, the card, both section titles, the number rows, the road, its rows and the Why your plan row start at ${want} px`,
+      inner.length >= 11 && inner.every(([k, v]) => Math.abs(v - want) <= (k === 'title' ? 3 : k === 'aims' ? 2 : 0.6)), JSON.stringify(prEdges));
+    t.check(`Progress ${w}: a section title inside the Now row starts under the cycle's name (${want} + 54 px)`, q.whyText != null && Math.abs(q.whyText - (want + 54)) <= 1, JSON.stringify(q));
     t.check(`gutter ${w}: no page errors`, p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
