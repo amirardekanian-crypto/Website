@@ -62,6 +62,8 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   runs `stepFinish()`: close Guided, refresh the day's finish card (`refreshConfirmCard()`) and scroll to
   it. There the athlete rates and taps Done when every set is done, or gets **Finish early** when a
   circuit or warm-up is still open (WK-04). Guided never finishes a partial session on the athlete's behalf.
+  Since 2026-10-13 the warm-up (and any other run of items with nothing to log) is one Guided step of its own
+  (`renderGroupStep()`: tick each, Done ✓, or Skip), so a session done in Guided ends ready, not Partial.
 - **If deleted:** All athletes lose access to their programme.
 - **Depends on:** **Supabase**: `get_program()` (the plan; `plancache` with no signal), `get_library()` (the Library; `articles/index.json`, `workouts/index.json` and their files are the offline fallback), `get_exercises()` (the Spine: cues, videos), `get_qualities()` (the Quality Map), `get_my_history()`, and the progress and session saves. Also `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json` and icon files.
 - **Almost every picture in the app comes from `assets/art/`** (2026-09-19); the exceptions are the root `court-sessions.jpg` / `court-playbook.jpg` (the sign-in hero, the Sessions and Playbook doors and their headers) and `assets/img/coach.jpg` (the Coach tab). That includes the 13 Library shelf pictures (7 Sessions + 6 Playbook), whose paths live in `public.library_categories.banner`, with the index JSONs as the offline fallback. Only the Sessions ones are drawn: once per shelf, as its band (LIB-01, 2026-09-27; every session card used to wear it), and as the header of each workout's own screen (`libBannerFor()`). Ten cycle-card

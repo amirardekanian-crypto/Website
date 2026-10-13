@@ -237,6 +237,10 @@ function expectOk(s, want) {
     const id = String(DATA.workouts.days[0].id);
     openDayView(id); openStepMode(id);
     const wk = document.getElementById('step-week');
+    // Guided opens on the warm-up's step (2026-10-13), which carries the row too; its Done ✓ leads to the first set and its rest.
+    const wuRow = wk && !wk.hidden ? wk.textContent.replace(/\s+/g, ' ').trim() : null;
+    if (STEP && STEP.seq[STEP.pos].group) stepPrimary();
+    if ((wk && !wk.hidden ? wk.textContent.replace(/\s+/g, ' ').trim() : null) !== wuRow) return { step: 'the warm-up step and the first set disagree: ' + wuRow };
     const step = wk && !wk.hidden ? wk.textContent.replace(/\s+/g, ' ').trim() : null;
     const b = [...document.querySelectorAll('#step-footer button')].find(x => /Start Rest/.test(x.textContent));
     if (b) b.click();

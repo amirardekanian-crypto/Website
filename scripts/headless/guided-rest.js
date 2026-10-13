@@ -14,7 +14,7 @@ const loc = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0
 const LONG = 'Single-Arm Half-Kneeling Landmine Rotational Press With Reverse Lunge';
 
 // The fixture's day 1: Box Jump x3, Back Squat x4 (a Because, a Coach's Note), Split Squat x3, Pallof x3, Side Plank x3, and
-// the carry with no Spine entry x2: 18 steps. note: week 1 of the cycle with a cap (so the limits row is there and an RPE
+// the carry with no Spine entry x2: 18 set steps, after the warm-up's own step (Rowing; 2026-10-13), so 19 in all. note: week 1 of the cycle with a cap (so the limits row is there and an RPE
 // colours against it). circuit: a conditioning circuit of three rounds at the end. long: an exercise with a very long name.
 function prog({ note = false, circuit = false, long = false } = {}) {
   const P = H.fixture();
@@ -30,7 +30,9 @@ function prog({ note = false, circuit = false, long = false } = {}) {
   return P;
 }
 
-async function open(browser, { w = 390, h = 844, dark = false, demo = false, seed, ...pr } = {}) {
+// Guided opens on the warm-up's step (2026-10-13); `open()` taps its Done ✓ as an athlete would, so the checks below start on the
+// first set (step 2). atWarmup: true stays on the warm-up.
+async function open(browser, { w = 390, h = 844, dark = false, demo = false, seed, atWarmup = false, ...pr } = {}) {
   const P = prog(pr);
   const opts = { w, h, dark, prog: P, seed };
   if (demo) { opts.query = '?client=demo'; opts.stub = { demo: P }; }
@@ -38,6 +40,7 @@ async function open(browser, { w = 390, h = 844, dark = false, demo = false, see
   o.p.setDefaultTimeout(8000);   // a control that is not there fails in seconds, not half a minute
   await o.p.evaluate(() => { openDayView('1'); openStepMode('1'); });
   await o.p.waitForTimeout(350);
+  if (!atWarmup) { await o.p.evaluate(() => { if (STEP && STEP.seq[STEP.pos].group) stepPrimary(); }); await o.p.waitForTimeout(250); }
   return o;
 }
 const goStep = (p, name, setI = 0) => p.evaluate(([n, s]) => { const i = STEP.seq.findIndex(x => x.name === n && x.setI === s); STEP.pos = i; renderStep(); return i; }, [name, setI]);
@@ -102,36 +105,56 @@ const t = H.checker();
     await ctx.close();
   }
 
-  // ── 2. The footer: Prev is not drawn on step 1, the primary takes its room, Next → is outlined ─────────────────────────────
+  // ── 2. The footer: Prev is not drawn on step 1 (the warm-up), the primary takes its room, Next → is outlined ─────────────────────────────
   {
-    const { ctx, p } = await open(browser, { note: true });
+    const { ctx, p } = await open(browser, { note: true, atWarmup: true });
     const foot = () => p.evaluate(() => {
       const f = document.getElementById('step-footer'), bs = [...f.querySelectorAll('button')], fr = f.getBoundingClientRect(), prim = f.querySelector('.step-primary-btn'), cs = getComputedStyle(prim);
       return { labels: bs.map(b => b.textContent.trim()), pos: STEP.pos, fw: Math.round(fr.width), pw: Math.round(prim.getBoundingClientRect().width), hs: bs.map(b => Math.round(b.getBoundingClientRect().height)),
         next: prim.classList.contains('is-next'), bg: cs.backgroundImage.slice(0, 15), bgc: cs.backgroundColor, ring: cs.boxShadow !== 'none', border: getComputedStyle(f).borderTopWidth + ' ' + getComputedStyle(f).borderTopColor };
     });
     const a = await foot();
-    t.check('footer, step 1: ‹ Prev is not drawn (not a disabled grey button), the primary says Done · Start Rest ✓ and takes the row',
-      a.labels.length === 1 && a.labels[0] === 'Done · Start Rest ✓' && a.pw >= a.fw - 33 && !a.next && a.bg === 'radial-gradient' && a.hs[0] >= 52 && /^1px /.test(a.border), JSON.stringify(a));
+    t.check('footer, step 1 (the warm-up): ‹ Prev is not drawn, Skip sits there, the green primary says Done ✓ and takes the rest of the row',
+      a.pos === 0 && a.labels.join('|') === 'Skip|Done ✓' && a.pw >= a.fw - 140 && !a.next && a.bg === 'radial-gradient' && a.hs.every(h => h >= 44) && /^1px /.test(a.border), JSON.stringify(a));
+    const wu = await p.evaluate(() => ({ eb: document.getElementById('step-eyebrow').textContent, pill: document.getElementById('step-pill').textContent,
+      name: document.getElementById('step-name').textContent, rows: [...document.querySelectorAll('#step-scroll .sg-row')].map(r => ({ t: r.querySelector('.sg-name').textContent,
+      d: (r.querySelector('.sg-dose') || {}).textContent || '', h: Math.round(r.getBoundingClientRect().height), done: r.classList.contains('done') })),
+      week: !document.getElementById('step-week').hidden, about: !document.getElementById('step-about').hidden }));
+    t.check('the warm-up step: "Before exercise 1", 1 item, named by its block, Rowing with its 5 minutes, a row 56 px, nothing ticked, no ⓘ',
+      wu.eb === 'Before exercise 1' && wu.pill === '1 item' && /warm/i.test(wu.name) && wu.rows.length === 1 && wu.rows[0].t === 'Rowing' && /5 min/.test(wu.rows[0].d)
+      && wu.rows[0].h >= 56 && !wu.rows[0].done && !wu.about, JSON.stringify(wu));
+    await p.click('#step-scroll .sg-row'); await p.waitForTimeout(200);
+    const tap = await p.evaluate(() => ({ ring: document.querySelector('#step-scroll .sg-row').classList.contains('done'), card: document.querySelector('#day1 .checklist-item').classList.contains('checked'),
+      lbl: document.querySelector('#step-footer .step-primary-btn').textContent.trim(), pos: STEP.pos }));
+    t.check('a tap on its row ticks the card in the list (the same tick), and the primary turns to Next →', tap.ring && tap.card && tap.lbl === 'Next →' && tap.pos === 0, JSON.stringify(tap));
+    await p.click('#step-scroll .sg-row'); await p.waitForTimeout(200);
+    t.check('a second tap unticks it again', await p.evaluate(() => !document.querySelector('#day1 .checklist-item').classList.contains('checked')));
+    await p.click('#step-footer .step-primary-btn'); await p.waitForTimeout(300);
+    const after = await p.evaluate(() => ({ pos: STEP.pos, eb: document.getElementById('step-eyebrow').textContent, pill: document.getElementById('step-pill').textContent,
+      card: document.querySelector('#day1 .checklist-item').classList.contains('checked'), timer: document.getElementById('timerOverlay').classList.contains('visible') }));
+    t.check('Done ✓ ticks the warm-up and goes straight to the first set (no rest)', after.pos === 1 && after.card && !after.timer && after.eb === 'Exercise 1 of 6' && after.pill === 'Set 1 of 3', JSON.stringify(after));
+    const a2 = await foot();
+    t.check('footer, the first set: ‹ Prev (back to the warm-up) and the green Done · Start Rest ✓',
+      a2.labels.join('|') === '‹ Prev|Done · Start Rest ✓' && !a2.next && a2.bg === 'radial-gradient' && a2.hs.every(h => h >= 44), JSON.stringify(a2));
     t.check('footer, step 1: no disabled button anywhere in it', await p.evaluate(() => !document.querySelector('#step-footer button[disabled]')));
     await doneRest(p);
-    const r = await p.evaluate(() => ({ on: document.getElementById('timerOverlay').classList.contains('visible'), running: timerRunning, pos: STEP.pos, done: stepDone(STEP.seq[0]) }));
-    t.check('Done · Start Rest ✓ marks the set done and opens the timer running', r.on && r.running && r.pos === 0 && r.done, JSON.stringify(r));
+    const r = await p.evaluate(() => ({ on: document.getElementById('timerOverlay').classList.contains('visible'), running: timerRunning, pos: STEP.pos, done: stepDone(STEP.seq[1]) }));
+    t.check('Done · Start Rest ✓ marks the set done and opens the timer running', r.on && r.running && r.pos === 1 && r.done, JSON.stringify(r));
     await p.click('#timerXBtn'); await p.waitForTimeout(300);
     const b = await foot();
     t.check('footer, step 2: ‹ Prev is there (44 px or more), outlined, and the primary is the green Done · Start Rest ✓',
-      b.pos === 1 && b.labels.join('|') === '‹ Prev|Done · Start Rest ✓' && b.hs.every(h => h >= 44) && !b.next && b.bg === 'radial-gradient', JSON.stringify(b));
+      b.pos === 2 && b.labels.join('|') === '‹ Prev|Done · Start Rest ✓' && b.hs.every(h => h >= 44) && !b.next && b.bg === 'radial-gradient', JSON.stringify(b));
     t.check('footer, step 2: Prev is outlined (a ring, no fill)', await p.evaluate(() => { const c = getComputedStyle(document.querySelector('#step-footer .step-nav-btn')); return c.backgroundColor === 'rgba(0, 0, 0, 0)' && c.boxShadow !== 'none'; }));
     await p.click('#step-footer .step-nav-btn'); await p.waitForTimeout(250);
     const c = await foot();
-    t.check('Prev goes back to step 1 (where it is hidden again); the step is done, so the primary reads Next → and is outlined, not green',
-      c.pos === 0 && c.labels.join('|') === 'Next →' && c.next && c.bgc === 'rgba(0, 0, 0, 0)' && c.ring && c.bg === 'none', JSON.stringify(c));
+    t.check('Prev goes back to the first set; the set is done, so the primary reads Next → and is outlined, not green',
+      c.pos === 1 && c.labels.join('|') === '‹ Prev|Next →' && c.next && c.bgc === 'rgba(0, 0, 0, 0)' && c.ring && c.bg === 'none', JSON.stringify(c));
     await p.click('#step-footer .step-primary-btn'); await p.waitForTimeout(250);
-    t.check('Next → moves on to step 2', await p.evaluate(() => STEP.pos === 1 && document.getElementById('step-pill').textContent === 'Set 2 of 3'));
+    t.check('Next → moves on to the second set', await p.evaluate(() => STEP.pos === 2 && document.getElementById('step-pill').textContent === 'Set 2 of 3'));
     // the last step: Finish Session ✓ is the primary again
     await p.evaluate(() => { STEP.pos = STEP.seq.length - 1; renderStep(); });
     const d = await foot();
-    t.check('the last set: ‹ Prev and the green primary; once ticked it is Finish Session ✓', d.labels.join('|') === '‹ Prev|Done · Start Rest ✓' && d.pos === 17, JSON.stringify(d));
+    t.check('the last set: ‹ Prev and the green primary; once ticked it is Finish Session ✓', d.labels.join('|') === '‹ Prev|Done · Start Rest ✓' && d.pos === 18, JSON.stringify(d));
     await p.evaluate(() => { currentStepRow().querySelector('.ex-set-check').click(); renderStep(); });
     const e = await foot();
     t.check('a done last set: Finish Session ✓ is the green primary', e.labels.join('|') === '‹ Prev|Finish Session ✓' && !e.next && e.bg === 'radial-gradient', JSON.stringify(e));
@@ -240,7 +263,7 @@ const t = H.checker();
     await goStep(p, 'Engine', 2);
     await p.click('#step-footer .step-primary-btn'); await p.waitForTimeout(400);
     const last = await p.evaluate(() => ({ timer: document.getElementById('timerOverlay').classList.contains('visible'), eb: document.getElementById('step-eyebrow').textContent, pill: document.getElementById('step-pill').textContent }));
-    t.check('the last set: no rest at all (so no Next line); Guided says Complete', !last.timer && last.eb === 'Guided workout' && last.pill === 'Complete', JSON.stringify(last));
+    t.check('the last set: no rest at all (so no Next line); Guided says Complete', !last.timer && last.eb === 'Guided session' && last.pill === 'Complete', JSON.stringify(last));
     await ctx.close();
   }
   {   // a circuit round: the circuit's name and no ⓘ in the bar, and its rest asks for the round's RPE on the paper
@@ -276,22 +299,22 @@ const t = H.checker();
   {
     const { ctx, p } = await open(browser);
     await doneRest(p); await p.click('#timerXBtn'); await p.waitForTimeout(250);
-    const a = await p.evaluate(() => ({ pos: STEP.pos, pill: document.getElementById('step-pill').textContent, timer: document.getElementById('timerOverlay').classList.contains('visible'), running: timerRunning, done0: stepDone(STEP.seq[0]) }));
-    t.check('Guided: ✕ on the timer skips the rest and shows the next step (the set stays done)', a.pos === 1 && a.pill === 'Set 2 of 3' && !a.timer && !a.running && a.done0, JSON.stringify(a));
+    const a = await p.evaluate(() => ({ pos: STEP.pos, pill: document.getElementById('step-pill').textContent, timer: document.getElementById('timerOverlay').classList.contains('visible'), running: timerRunning, done0: stepDone(STEP.seq[1]) }));
+    t.check('Guided: ✕ on the timer skips the rest and shows the next step (the set stays done)', a.pos === 2 && a.pill === 'Set 2 of 3' && !a.timer && !a.running && a.done0, JSON.stringify(a));
     await doneRest(p); await p.click('#timerCloseBtn'); await p.waitForTimeout(250);
     const b = await p.evaluate(() => ({ pos: STEP.pos, pill: document.getElementById('step-pill').textContent, timer: document.getElementById('timerOverlay').classList.contains('visible') }));
-    t.check('Guided: Skip → does the same', b.pos === 2 && b.pill === 'Set 3 of 3' && !b.timer, JSON.stringify(b));
+    t.check('Guided: Skip → does the same', b.pos === 3 && b.pill === 'Set 3 of 3' && !b.timer, JSON.stringify(b));
     // the rest running out on its own moves on too (the old behaviour)
     await doneRest(p);
     await p.evaluate(() => { timerEndsAt = Date.now() + 300; });
     await p.waitForTimeout(2600);
     const c = await p.evaluate(() => ({ pos: STEP.pos, timer: document.getElementById('timerOverlay').classList.contains('visible'), pill: document.getElementById('step-pill').textContent }));
-    t.check('Guided: a rest that runs out closes itself and shows the next exercise\'s first set', c.pos === 3 && !c.timer && c.pill === 'Set 1 of 4', JSON.stringify(c));
+    t.check('Guided: a rest that runs out closes itself and shows the next exercise\'s first set', c.pos === 4 && !c.timer && c.pill === 'Set 1 of 4', JSON.stringify(c));
     // the phone's Back closes the timer (which moves on, as Skip does), then Guided
     await doneRest(p);
     await p.goBack(); await p.waitForTimeout(500);
     const d = await p.evaluate(() => ({ timer: document.getElementById('timerOverlay').classList.contains('visible'), guided: !!STEP && document.getElementById('stepOverlay').classList.contains('visible'), pos: STEP && STEP.pos }));
-    t.check('the phone\'s Back closes the timer first (Guided stays, on the next step)', !d.timer && d.guided && d.pos === 4, JSON.stringify(d));
+    t.check('the phone\'s Back closes the timer first (Guided stays, on the next step)', !d.timer && d.guided && d.pos === 5, JSON.stringify(d));
     await p.goBack(); await p.waitForTimeout(500);
     const e = await p.evaluate(() => ({ guided: document.getElementById('stepOverlay').classList.contains('visible'), step: STEP, day: !document.getElementById('day-view').hidden }));
     t.check('…and a second Back closes Guided (the day stays)', !e.guided && e.step === null && e.day, JSON.stringify(e));
@@ -408,6 +431,26 @@ const t = H.checker();
     await p.click('#timerXBtn'); await p.waitForTimeout(200);
     const g = await p.evaluate(() => ({ bar: getComputedStyle(document.querySelector('#stepOverlay .step-head')).backgroundImage.slice(0, 15), paper: getComputedStyle(document.getElementById('stepOverlay')).backgroundColor, foot: getComputedStyle(document.getElementById('step-footer')).backgroundColor }));
     t.check('dark: Guided\'s bar stays green on the dark paper', g.bar === 'radial-gradient' && g.paper === 'rgb(24, 24, 24)' && g.foot === 'rgb(24, 24, 24)', JSON.stringify(g));
+    await ctx.close();
+  }
+
+  // ── 9. A whole session done in Guided ends ready, not Partial (Line Call, 2026-10-13: the warm-up is a step of its own) ───
+  {
+    const { ctx, p } = await open(browser, { note: true });   // open() did the warm-up through its step
+    const end = await p.evaluate(() => {
+      STEP.seq.forEach(it => { if (!it.group && !it.circuit && !stepDone(it)) { STEP.pos = STEP.seq.indexOf(it); renderStep(); currentStepRow().querySelector('.ex-set-check').click(); } });
+      if (document.getElementById('timerOverlay').classList.contains('visible')) closeTimer();
+      STEP.pos = STEP.seq.length - 1; renderStep();
+      const st = getDayCompletion('1');
+      showStepComplete();
+      const msg = document.querySelector('.step-complete').innerText.replace(/\s+/g, ' ');
+      stepFinish();
+      const c = document.getElementById('confirm-1');
+      return { done: st.done, total: st.total, msg, ready: c.classList.contains('ready'), early: /finish early/i.test(c.innerText) };
+    });
+    t.check('every set and the warm-up done in Guided: the end says "Everything logged." and the finish card is ready (All done), not Finish early',
+      end.done === end.total && /Everything logged\./.test(end.msg) && end.ready && !end.early, JSON.stringify(end));
+    t.check('no page errors in the whole-session run', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
 

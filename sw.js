@@ -267,7 +267,8 @@
 // v136: program.html changed (2026-10-13): the copy sweep (no em dashes or semicolons in athlete text) and dead style rules removed.
 // v137: program.html changed (2026-10-13): the primary button's green in dark mode, the article reader in green, the note box's labels.
 // v138: program.html changed (2026-10-13): a session closes at Done (the day keeps its own copy, the next day starts clean; Line Call).
-const CACHE = 'aap-v138';
+// v139: program.html changed (2026-10-13): Guided starts with the warm-up as one step (tick each, Done, or Skip), so a session done in Guided is not filed Partial.
+const CACHE = 'aap-v139';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
