@@ -245,10 +245,10 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     t.check('Now body: the door opens the Why page', await p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible') && /Why Cycle 2 looks like this|looks like this/.test(document.querySelector('#hist-overlay .readiness-title').textContent)));
     t.check('no page errors (Now body)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
-    // fewer than three reasons: no door row (a thin page is never offered)
+    // fewer than three reasons: the door row is there too since 2026-10-13 (Line Call: the guide sends athletes to it from one Because)
     const few = await H.openProgram(browser, { prog: prog({ whys: 2 }), w: 390, h: 844 });
     await toPlan(few.p);
-    t.check('Why your plan: with only 2 reasons the door row is not there', await few.p.evaluate(() => !document.querySelector('.road-why-door')));
+    t.check('Why your plan: with 2 reasons the door row is there (from one, since 2026-10-13)', await few.p.evaluate(() => !!document.querySelector('.road-why-door')));
     await few.ctx.close();
   }
 
@@ -281,7 +281,7 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     }
     const two = await H.openProgram(browser, { prog: prog({ endsIn: -4, whys: 2 }), w: 390, h: 844 });
     await toPlan(two.p);
-    t.check('the Why door past the end with only 2 reasons: not there', await two.p.evaluate(() => !document.querySelector('.road-why-door, .road-door')));
+    t.check('the Why door past the end with 2 reasons: there (from one, since 2026-10-13)', await two.p.evaluate(() => !!document.querySelector('.road-why-door, .road-door')));
     await two.ctx.close();
   }
 

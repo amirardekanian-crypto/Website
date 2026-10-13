@@ -278,7 +278,8 @@
 // v147: program.html changed (2026-10-13): finishing early asks why (Out of time, Pain, Too tired, No kit), into the report.
 // v148: program.html changed (2026-10-13): between cycles, the WhatsApp says the cycle is finished, and one row offers the day trained least.
 // v149: program.html changed (2026-10-13): Ask Amir under ⋯ on the session bar, naming the exercise that is open.
-const CACHE = 'aap-v149';
+// v150: program.html changed (2026-10-13): the guide promises only what the plan has; the Why door shows from one Because.
+const CACHE = 'aap-v150';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

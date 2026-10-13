@@ -514,7 +514,8 @@ Idea #4 of `/ideas` round 1 (brief: claude.ai/artifact/WtZ4xfq38dV7zZwRu926jw; A
 recommended picks). `ex.why = { src, part?, text }`, spec in `SCHEMA.md` → *`why` — Because*.
 - **The card gains only a clay ⓘ** (`.ex-about.has-why`; a clay dot on its corner until 2026-09-27, when the clay dot after the name became the Coach's Note). The sentence opens the About
   sheet under **Why am I doing this?**, signed (`axHero()`; *Why you* until 2026-10-12), and **Why your plan looks like this**, a button under the
-  current cycle card (three or more reasons), groups them by source (`openWhyPlan()`). A card with a
+  current cycle card (from one reason since 2026-10-13, Line Call: it needed three, and the guide sent athletes to a door
+  that was not there; the guide now promises it only "when your plan has reasons like that"), groups them by source (`openWhyPlan()`). A card with a
   `why` gets the ⓘ even before its Spine entry is approved.
 - **Personal or nothing, 5–10 per cycle, written fresh each cycle**:
   `why_flag` (/program-design) → PART 3b (/program-engage) → /program-assemble, audited by
