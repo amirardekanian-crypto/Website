@@ -5,7 +5,8 @@
 // '5xx' | 'refuse' | 'empty'), program (what get_program answers), demo, progress, session
 // ({ user: { id } } = signed in), identity (the athlete id athlete_identities answers), stall
 // ({ rpcName: true } never answers), refuse ([rpcNames]), expired, signInOk, noLib (no library at all),
-// library (what get_library answers: lib.js library() builds it from workouts/; without it the app reads the files).
+// library (what get_library answers: lib.js library() builds it from workouts/; without it the app reads the files),
+// tables ({ name: rows } what sb.from(name) answers) and tableErr ({ name: status } a refused table read).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
   var cfg = {};
@@ -30,6 +31,10 @@
     if (name === 'get_progress') return res({ data: S.progress || null, error: null, status: 200 });
     if (name === 'get_library') return res({ data: S.library || null, error: null, status: 200 });
     if (name === 'athlete_identities') return res({ data: S.identity ? { athlete_id: S.identity } : null, error: null, status: 200 });
+    // A table read (sb.from(name)): tables ({ career_facts: [rows] }) answers rows as given (filters and order are not applied);
+    // tableErr ({ career_rules: 404 }) answers that status as a refusal. Neither set: no rows and no error, as before.
+    if (kind === 'from' && S.tableErr && S.tableErr[name]) return res({ data: null, error: { message: 'stub ' + name, code: 'PGRST205' }, status: S.tableErr[name] });
+    if (kind === 'from' && S.tables && S.tables[name]) return res({ data: JSON.parse(JSON.stringify(S.tables[name])), error: null, status: 200 });
     return res({ data: null, error: null, status: 200 });
   }
   function thenable(kind, name, params) {

@@ -7,7 +7,8 @@
 > **Status (2026-10-17): phase 1 is live, in shadow** (applied on Amir's *"yes, apply it"*). The fact ledger
 > (`supabase/stage66_career_mode.sql`) turns every save into facts on the server, the rulebook and the catalogue are rows
 > made from these files (`python scripts/career_seed.py`), and on the live project Career Mode's habit XP equals Proof's
-> for every athlete (34 of 34). Nothing an athlete sees reads it. The rest is the design the build follows, phase by phase (*Build order*, below). Change anything
+> for every athlete (34 of 34). The one thing an athlete sees is **Hold Serve on the training app's Home** (shipped the same day):
+> the weeks held in a row, read from the facts, display only (`PROGRAM-APP.md` → *Hold Serve on Home*). The rest is the design the build follows, phase by phase (*Build order*, below). Change anything
 > here first, then build; a changed file is re-seeded (`README.md`, *How to change something*).
 
 ---
@@ -321,7 +322,7 @@ Proof's to the point.
 
 | Phase | What | Visible | Status |
 |---|---|---|---|
-| 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app (not yet: its own follow-up) | **live 2026-10-17, in shadow** (stage66, applied on Amir's yes and seeded; PROCEDURES.md → *Phase 1, as built*). On the live project 34 of 34 athletes' habit XP equals Proof's, this season, the rolling week and all time (`career_compare()`) |
+| 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app: **shipped 2026-10-17**, a row on Home above Daily habits, the weeks held in a row and the next step (Amir: *"B, show it at zero, words ok"*; `PROGRAM-APP.md` → *Hold Serve on Home*) | **live 2026-10-17, in shadow** (stage66, applied on Amir's yes and seeded; PROCEDURES.md → *Phase 1, as built*). On the live project 34 of 34 athletes' habit XP equals Proof's, this season, the rolling week and all time (`career_compare()`) |
 | 2 | **One profile.** Proof's level, rank and board read `get_profile()`. The phone scorer becomes the preview, and instant feedback (P17) reads it | The career level, revealed once; every tick answers with its XP, the bar and the nearest goal | not started |
 | 3 | **Rewards with meanings, and the switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row; the finish card listing what a session earned; each reward's moment and share card (the cards are drawn already: Highlight Reel, GAME-14) | not started |
 | 4 | **Amir's column.** Courtside, reactions, commendations, Amir's Pick | coach.html → Today | not started |
@@ -378,3 +379,6 @@ None of these blocks phase 1.
   `estimateOneRM()` and `parseLoggedKg()`; `career_win_gain()` is `winText()`'s verdict; `career_weeks()` is
   `cycleWeekInfo()`'s weeks; `career_habit_days()` is `hab_bonus_xp()`'s day gate. A change to the original changes the copy
   the same day (`career_compare()` proves the day gate on every real log).
+- **And the other way round:** Home's Hold Serve row counts the weeks held in a row with `holdCount()`, program.html's copy of
+  `get_profile()`'s loop. `scripts/check_twins.js` holds it to `scripts/career/hold_cases.json` and `scripts/career/rehearse.mjs` holds
+  `get_profile()` to it on every athlete it builds: a change to one is a change to both.
