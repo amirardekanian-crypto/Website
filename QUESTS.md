@@ -74,6 +74,10 @@ select rules -> 'questRuns' from public.xp_rules where id = 1;
 > counts exactly the same, because it is the same log. The quest's medal takeover waits for the
 > next time Proof itself opens (`checkLevelUps()` stands down in the strip). `HABITS.md` →
 > *Embedded on the training app's Home*.
+>
+> **Its Share it opens a card of that quest** (2026-10-17): the Milestone card holding the quest's
+> name, note and XP, named *Quest* in the picker's rail. It opened the Rank card before. Nothing about
+> how a quest is scored changed. `HABITS.md` → *Every reward, its moment and its card*.
 
 ## Two ways to pull the lever
 
