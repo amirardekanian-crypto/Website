@@ -60,6 +60,7 @@ stale copy reached athletes.
 | INT-8 | A standing issue confirmed resolved gets one acknowledgment line, never silence. | design · engage | oblig `close-loop` |
 | INT-9 | Programming around pain carries named escalation triggers and a dated clinician checkpoint (about 6 weeks). | design · engage | |
 | INT-10 | An athlete who hides pain gets the modification menu in writing, up front: reporting buys a modification, never a ban. | engage | oblig `modification-menu` |
+| INT-11 | Before the roadmap, confirm the form's frame with Amir: days, minutes, kit, and anything the athlete asked him directly. | intake | |
 
 ### Exercise selection
 | ID | Rule | Stage | Check |
@@ -84,6 +85,7 @@ stale copy reached athletes.
 | SEL-18 | No Assault Bike warm-up for a flexion-sensitive back: an incline treadmill walk, or an upright bike with hips above knees. | design | |
 | SEL-19 | While the free hinge is deferred, a loaded carry is picked up from a bench or rack at hip height, never the floor. | design · engage | |
 | SEL-20 | Name one same-pattern fallback for each primary lift in the spec, for pain or a busy station. | design | |
+| SEL-21 | Every exercise's kit is on the athlete's equipment list or confirmed with Amir at the checkpoint; never assume a piece. | design | warn |
 
 ### Naming (exercises, cycles, days)
 | ID | Rule | Stage | Check |
@@ -116,7 +118,7 @@ stale copy reached athletes.
 | SES-1 | Days are listed in the best execution order; an optional day keeps its place in the week and is labelled optional. | design | |
 | SES-2 | A day trains what it says: never top up a muscle on the wrong half of the split; fix attendance with day order. | design | |
 | SES-3 | Warm-up plus prep is always 10–15 minutes of programmed time. | design | |
-| SES-4 | Gym clients warm up on a machine; strength prep has no joint-isolation drills; skips, shuffles and sprints belong to court or run days. | design · edit | |
+| SES-4 | Gym clients warm up on a machine; strength prep has no joint-isolation drills; skips, shuffles and sprints belong to court or run days. | design · edit | part (court drills in a roadmap focus) |
 | SES-5 | Warm-up and prep items log nothing and carry no RPE. | design · assemble | warn |
 | SES-6 | A lifting day's prep is a machine raise plus one two-round prep circuit; a cardio or running day's prep is one pass through distinct movements. | design · assemble | part (lifting days) |
 | SES-7 | Design to the real minutes the logs show; a new athlete gets the form's minutes plus 15. A cap binds only on a hard stop. | design | warn |
@@ -130,6 +132,7 @@ stale copy reached athletes.
 | SES-15 | Seven or more working exercises make a day a grind: check its load identity before it ships. | design · edit | warn |
 | SES-16 | A low-load brace primer (a dead bug or bird dog before a heavy hinge) may stay in prep; costly core work goes to Core. | design · edit | |
 | SES-17 | Never tie a training day to a weekday or build the week around the athlete's sport; give rules (REC-5, REC-6), the athlete places the days. | design · engage · report | |
+| SES-18 | A block named for jumps or landings holds a jumping or landing exercise. | design | warn |
 
 ### Progression
 | ID | Rule | Stage | Check |
@@ -178,7 +181,7 @@ stale copy reached athletes.
 |---|---|---|---|
 | COM-1 | In-app athlete text (message, outcomes, notes, completion text) is English. | engage | |
 | COM-2 | One WhatsApp handoff message ships with every programme, in the athlete's own language (Farsi: Persian numerals, Persian date first). | engage | |
-| COM-3 | Everything an athlete reads sounds like Amir typed it: plain words, short sentences; no em-dashes, semicolons, triads or brochure lines. | engage · report | warn (em-dash) |
+| COM-3 | Everything an athlete reads sounds like Amir typed it: plain words, short sentences; no em-dashes, semicolons, triads or brochure lines. | engage · report | warn (em-dash, a roadmap semicolon) |
 | COM-4 | 5–10 personal Becauses (`why`) a cycle, on exercises chosen for this athlete: the body part not the diagnosis, the next step not the failure. | engage | ✓ |
 | COM-5 | Notes name days as Day N and their on-screen names, never internal labels like "the Control day". | engage | |
 | COM-6 | Guidance about one exercise is its Coach's Note; notes cards carry programme-wide guidance only. | engage · assemble | warn (flagged vs placed) |
@@ -222,7 +225,7 @@ stale copy reached athletes.
 | PRC-1 | A programme run never touches the app: ideas and bugs go to Amir in the handoff. The one outside change is the library. | every stage | |
 | PRC-2 | A correction changes exactly what Amir named, and nothing else. | edit | |
 | PRC-3 | A roadmap: one pass, then one reviewer from files, every must-fix applied; it locks without Amir's sign-off and is saved to the row at once. | roadmap | |
-| PRC-4 | Check the build (Part A) before engage writes a word and fix every FAIL; then engage runs on. New athletes get one reviewer, returning none. | design · assemble | |
+| PRC-4 | Check the build before engage writes; fix every FAIL. New athletes get one reviewer, and a delta review of any later design change. | design · assemble | |
 | PRC-5 | Background agents work from scratchpad files, never the database or an MCP tool, and never launch with placeholder arguments. | every stage | |
 | PRC-6 | Ask the database as few times as possible: one context pull, one Spine query, never a lookup per exercise or schema discovery. | every stage | |
 | PRC-7 | Every progression gate resolves to a measurement, a film or a third party, never the athlete's word; ask forced-choice questions. | design | |
@@ -235,7 +238,7 @@ stale copy reached athletes.
 | PRC-14 | The roadmap is 5 cycles of 5 weeks, each 4 loading weeks and 1 back-off. Deviate only on Amir's word, and say so. | roadmap | |
 | PRC-15 | A week note belongs to one week, shows on Home, and its number covers every lift: design sets numbers, engage the words. | design · engage · assemble | ✓ (warn: a scoped number) |
 | PRC-16 | One current athlete profile heads the coaching log: intake drafts it, every run keeps it current, and the checker reads it. | intake · design · edit | warn (missing) |
-| PRC-17 | The roadmap is written once and locked. A change goes through design's `roadmap_amend:` line at the checkpoint, never a quiet rewrite. | roadmap · design | |
+| PRC-17 | The roadmap is written once and locked. A change goes through design's `roadmap_amend:` line at the checkpoint, never a quiet rewrite. | roadmap · design | warn (with PRC-28) |
 | PRC-18 | Every cycle's rationale is appended to the coach-only coaching log and never overwritten. | assemble | |
 | PRC-19 | An athlete whose cycle ends without a renewal keeps the app and gets no coaching until Amir says so. | every stage | |
 | PRC-20 | Cycles continue, they don't reset: read the log and the roadmap, progress the same logic; the latest rationale is the operative one. | design | |
@@ -246,6 +249,8 @@ stale copy reached athletes.
 | PRC-25 | Rule freeze from 2026-09-26 until eight cycles have run on this pipeline: a new rule only when something breaks, through the index. | every stage | |
 | PRC-26 | The Quality mix counts working sets (primary 1, secondary ½), skips prep, and shows nothing under 70% tagged; bedrock, peak and reset have no headline. | design · assemble | |
 | PRC-27 | A new athlete's first cycle gets a foundation picture word (bedrock, armour or build), never iron or voltage. | roadmap | |
+| PRC-28 | The current cycle's focus names only patterns its build trains; a gap is fixed in the build or by `roadmap_amend:`. | design · assemble | warn |
+| PRC-29 | The main conversation talks to Amir and writes the database; each heavy stage runs as a fresh helper, at its own effort, from files. | every stage | |
 
 ---
 
@@ -312,6 +317,7 @@ same ID. Read a rule's story and its history before changing it.
   always buys a **modification, never a ban** — then demonstrate it once, deliberately, early. It
   is the only countermeasure that fixes the cause rather than policing the symptom, and it makes
   every other monitoring measure cheaper.
+- `INT-11` **Confirm the form's frame before anything is planned.** The form is a snapshot, and athletes tell Amir things it never sees. Before the roadmap, put one question to him with the form's days a week, session length and kit, and ask what the athlete asked him directly (conditioning, a lift, an event). The roadmap waits for the answer. A first cycle was once built and locked for 2 gym days when the athlete wanted 3 with conditioning, and the change arrived after the build: a second spec, two rebuilds and a roadmap still arguing from 2 days.
 
 ## Exercise selection
 - `SEL-1` **SFR leads for general-fitness clients.** Pick the highest stimulus-to-fatigue option
@@ -439,6 +445,7 @@ same ID. Read a rule's story and its history before changing it.
   because it changes a step (CUE-7). Extends "audit the restriction against every exercise, including warm-up
   and fallbacks" (2026-08-17) to the parts of an exercise nobody thinks to write down.
 - `SEL-20` **One same-pattern fallback per primary, named in the spec.** For pain or a busy station, so the athlete never improvises a swap. A fallback is also where a banned movement hides, which is why the checker scans every `fallback:` line (SEL-12).
+- `SEL-21` **Kit is confirmed, not assumed.** Every piece an exercise needs is on the athlete's equipment list, or it is named in the checkpoint question so Amir can confirm it. A 'full gym' covers benches, racks, cables and its machines, never a trap bar, a landmine, a stability ball or an air bike. The checker lists what is not on the list. One first cycle shipped a stability ball leg curl to a gym with no ball, and the athlete found out mid-session.
 
 ## Exercise naming
 *(This is the single source of truth for exercise names — `/program-design`,
@@ -672,6 +679,8 @@ same ID. Read a rule's story and its history before changing it.
 - `SES-15` **Seven or more working exercises make a day a grind.** A long session spikes fatigue even at low RPE, which matters most for poor-recovery clients (VOL-2, 2026-06-19).
 - `SES-16` **A low-load brace primer may stay in prep.** A dead bug or bird dog before a heavy hinge primes the brace; costly core work (planks for time, Pallof presses, hollow holds) goes to the Core block (SES-9). The primer still counts toward core volume wherever it sits (VOL-10).
 - `SES-17` **The athlete places the days; the programme never does.** Day 1, 2 and 3 are an order, not dates. No card, week note, WhatsApp message or cycle report ties a training day to a weekday ("Day 3 on Thursday"), and no question asks for the athlete's sport schedule in order to fit the gym around it. That holds for every sport. What the athlete gets instead are rules he applies himself: the double-day rule (REC-5), the flexible order (REC-6) and the readiness levels (REC-2). A weekday pattern in the data, such as a short night before one session every week, is noted coach-only, and its fix is one of those rules, never a schedule.
+- `SES-18` **A block's name is a promise.** A block called Land & Launch or Jumps holds at least one exercise the Spine files as plyometric or landing; otherwise rename the block or change the exercise. The check reads the Spine's impact, so an entry filed wrongly fools it: the reviewer still reads the steps.
+- `SES-4` **The roadmap too.** A focus line that names shuffles, cone or ladder work, or change-of-direction and braking drills, puts court work into a gym cycle: the checker flags it when the roadmap is drafted.
 
 ## Progression (coach-driven)
 - `PRG-1` **Progression is coach-driven from the weekly logs** — the app shows one prescription
@@ -1431,3 +1440,7 @@ same ID. Read a rule's story and its history before changing it.
   cycles, read the `Checks:` lines and prune what never fired or never mattered.
 - `PRC-26` **How the Quality mix counts.** Working sets, the primary quality 1 and a secondary ½, prep blocks skipped, an exercise dosed by time counting one set per 10 minutes (never less than 1), nothing shown under 70% tagged coverage, and a 12% cut; bedrock, peak and reset are phases with no headline (2026-09-24). The method exists four times (program.html, coach.html, /program-design, the checker) and they must match.
 - `PRC-27` **A first cycle's picture word is a foundation one.** bedrock, armour or build, never iron or voltage: a new athlete's first cycle has no weighted lift under 8 reps and no supersets (VOL-11, SES-11), so it is never a heavy, low-rep block.
+- `PRC-28` **The focus is the cycle's promise to the athlete, on his screen.** If it names squat, hinge, single-leg, push, pull or carry patterns, the build trains each of them in its working blocks. A gap is closed by adding the pattern or by a `roadmap_amend:` line that drops the word (PRC-17), never left for the athlete to notice.
+- `PRC-29` **One conversation, many helpers.** The main conversation asks Amir, saves to the database and publishes; the roadmap draft, the design analysis and spec, the Part A build and check, engage's words, Part B's preparation and the Spine upkeep each run as a fresh helper that reads its inputs from files and writes its outputs to files. Effort follows the job: max for the roadmap and design, high for engage, medium for the build, Part B and upkeep. A run kept in one conversation once re-read 500 to 780 thousand tokens on every step by Part B. How to run it: `.claude/skills/PIPELINE-RUN.md`.
+- `PRC-4` **A late change gets a delta review.** When the design changes after the one review (Amir adds conditioning, an exercise is swapped, the reviewer's own suggestions go in), a helper reviews only the changed cards and their words before Part B: what changed, against the same rules. Once, the finishers added after the review reached the athlete unread, and his first question was how hard to go on them.
+

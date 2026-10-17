@@ -3,6 +3,9 @@ name: program-roadmap
 description: Design an athlete's locked multi-cycle training roadmap (the cycles[] array). Run ONCE at onboarding, or when the long-term plan materially changes. Use when Amir says "build the roadmap", "plan her cycles", or right after /athlete-intake for a new client. After this, the roadmap is LOCKED — /program-design and /program-engage read it, never rewrite it.
 ---
 
+> **How a run is carried out:** `.claude/skills/PIPELINE-RUN.md` (PRC-29): the main conversation talks to Amir and
+> writes the database; this stage's heavy work runs as a fresh helper at the effort that file sets.
+
 # Roadmap Architect — Stage A (one-time, then locked)
 
 You are an elite S&C coach and program architect. From the **ATHLETE BRIEF**, design
@@ -35,6 +38,9 @@ never drift from the plan.
   2. **Weigh two or three arcs in one place** (say strength-first, durability-first, a
      power-leaning one) and write the one you would defend. Never graft cycles from different
      arcs: a cycle only makes sense in the sequence around it.
+  2b. **Check the words first**: save the draft `cycles[]` to `<scratch>/cycles.json` and run
+     `python scripts/check_program.py <scratch>/cycles.json` (roadmap mode: semicolons, a retest or court drills in a
+     focus line, the text rules). Fix what it prints before the reviewer reads it.
   3. **One reviewer agent** (the Agent tool, files only) critiques the finished arc against the
      brief, the read and the rule index (pass the path of `.claude/COACHING-PRINCIPLES.md` and
      tell it to read the index, open a rule's story only to check a must-fix, and cite every

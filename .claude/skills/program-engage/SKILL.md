@@ -3,6 +3,9 @@ name: program-engage
 description: Wrap the engagement layer around a designed program — current-cycle message + outcomes, next-cycle teaser, coaching notes, and per-day completion messages. Runs straight after /program-assemble Part A when the build passes (the programme is built and checked before any words are written), or when Amir says "do prompt 2", "write her notes/message". Reads the locked roadmap, the program spec, and COACHING-PRINCIPLES.md; changes no programming. All in-app text is ENGLISH.
 ---
 
+> **How a run is carried out:** `.claude/skills/PIPELINE-RUN.md` (PRC-29): the main conversation talks to Amir and
+> writes the database; this stage's heavy work runs as a fresh helper at the effort that file sets.
+
 > Programmes and coaching logs live on the server (`public.programs`, `public.coaching_logs`;
 > CLAUDE.md → *THE BIG ONE*). Engage writes words only; /program-assemble Part B places and
 > publishes them.

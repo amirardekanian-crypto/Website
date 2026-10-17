@@ -44,6 +44,10 @@ gym experience (training age), goals, current pain/injury + description (stage &
 equipment, environment. Step 1's brief should already hold those, so **don't re-ask them** —
 confirm, then only resolve what's left to coach judgement or what the athlete left blank.
 Grouped into one round of questions, the genuine gaps to close:
+- **Confirm the frame (INT-11), always, even when the form is complete**: one question that quotes the form's days a
+  week, session length and kit list and asks *"Still right? Anything he asked you for directly (conditioning, a
+  lift, an event)?"* The roadmap waits for the answer. (2026-10-17: a roadmap locked on the form's 2 days met
+  "3 gym days please" at the checkpoint and the conditioning after the build.)
 - **Goal specificity + timeline** — turn the goal checkboxes into one concrete target
   (+ any competition / season date)
 - **Athlete type**: general-fitness OR sport-performance (+ sport) — decides whether SFR or

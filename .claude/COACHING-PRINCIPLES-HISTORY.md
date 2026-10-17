@@ -31,6 +31,8 @@ the principles (their *How to add*).
   - 2026-08-08
 - `INT-10` **For an athlete who hides pain, show the MODIFICATION MENU in writing before they have anything to hide.**
   - 2026-08-08
+- `INT-11` **Confirm the form's frame before the roadmap.**
+  - 2026-10-17. A new athlete's first cycle was locked for the form's 2 gym days; Amir then said "3 gym days please" and later "He wanted 3 training days with a bit of conditioning". Amir on the fix list: "fix everything else in a way you think best".
 
 ## Exercise selection
 
@@ -84,6 +86,8 @@ the principles (their *How to add*).
 - `SEL-20` **One same-pattern fallback per primary, named in the spec.**
   - It lived in /program-design (STEP 3, *FALLBACK*) with no number.
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `SEL-21` **Kit is confirmed, not assumed.**
+  - 2026-10-17. The trap bar, landmine and stability ball were not on the form; the gym had no ball and the athlete swapped to the machine curl himself.
 
 ## Exercise naming
 
@@ -186,6 +190,8 @@ the principles (their *How to add*).
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
 - `SES-17` **The athlete places the days; the programme never does.**
   - 2026-10-03. A first-cycle report asked a tennis player for his tennis days "to arrange the gym days around tennis", and the Debrief proposed moving one training day off a weekday after three short nights. Amir: "we dont write their fitness program around their tennis program. we just give instrcutions, we never say do 3nd day on thursday", then "the rule is not about tennis, its in any sport". Added during the rule freeze (PRC-25) because it fixed a real miss.
+- `SES-18` **A block's name is a promise.**
+  - 2026-10-17: a "Land & Spring" block whose exercise never left the floor (the reviewer caught it).
 
 ## Progression (coach-driven)
 
@@ -451,3 +457,8 @@ the principles (their *How to add*).
 - `PRC-27` **A first cycle's picture word is a foundation one.**
   - It lived in /program-roadmap.
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `PRC-4` **A late change gets a delta review** (added 2026-10-17, Amir: "fix everything else in a way you think best").
+- `PRC-28` **The focus names only what the build trains.**
+  - 2026-10-17: the reviewer caught a focus promising a squat the build did not have.
+- `PRC-29` **One conversation, many helpers.**
+  - 2026-10-17: a new athlete's run cost about $36, half of it re-reading one 780k-token conversation. Amir: "fix everything else in a way you think best".

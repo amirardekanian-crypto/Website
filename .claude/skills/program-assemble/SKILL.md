@@ -3,6 +3,9 @@ name: program-assemble
 description: Mechanically build a designed programme and publish it to public.programs (the server is the only copy that counts), in TWO parts. Part A, straight after /program-design and before /program-engage, builds the workouts, runs every programming check and goes straight on to /program-engage when the build passes. Part B, after /program-engage and Amir's "ship it", places the words, runs the full checks, writes the coaching log and publishes. Use when Amir says "build the json", "assemble", "write her file", "ship it", or when design hands over a spec. Handles cycle advancement (archive prior cycle, bump currentCycleIndex) for returning athletes and fresh-file creation for new ones. This is the mechanical step — it keeps formatting/JSON work out of the design pass.
 ---
 
+> **How a run is carried out:** `.claude/skills/PIPELINE-RUN.md` (PRC-29): the main conversation talks to Amir and
+> writes the database; this stage's heavy work runs as a fresh helper at the effort that file sets.
+
 # Assembler — build, check, publish (mechanical)
 
 Turn the **program spec** (/program-design) and the **engagement text** (/program-engage)
@@ -213,7 +216,9 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   it, and it is what puts them on the roster). Publishing then updates that row rather
   than inventing a second identity for the same person.
 
-**2f — Part B: place engage's words** (after /program-engage), **matched by `exId`**: engage tags
+**2f — Part B: place engage's words** with `python scripts/place_words.py <built.json> <words.json> <out.json>`
+(2026-10-17: tested, words on working cards only, stops if a prescription moves; engage writes `words.json` in the
+shape its docstring gives). The rules it applies, **matched by `exId`**: engage tags
 every Coach's Note and Because with the card's id (Part A stamped one on every card); the name is
 only the fallback for a card with none. The full check warns when the spec's `note_flag`/`why_flag`
 count and what landed on the cards differ, which is how a dropped or invented one shows.
@@ -244,9 +249,10 @@ count and what landed on the cards differ, which is how a dropped or invented on
   spec and the Spine file, whose lines carry each exercise's muscle credits and cost, so it
   **counts the volume itself** (2026-09-26: the hand-typed table and `--log` are retired):
   ```
-  python scripts/check_program.py data/<id>.json --spine-sql      # prints ONE query: run it
-  # save the query's result EXACTLY as returned (the JSON the tool returns loads directly). It
-  # carries checksums: a copy that differs from the server's answer stops the run. Then:
+  python scripts/check_program.py data/<id>.json --spine-sql --pad   # prints ONE query: run it
+  # --pad makes the connector save the whole answer to a file (the result names it); copy it out with
+  python scripts/save_spine_result.py <that file> <scratch>/spine_<id>.json   # checksums verified
+  # Never retype the answer: a copy that differs from the server's stops the run. Then:
   python scripts/check_program.py data/<id>.json --stage build --spec <scratch>/spec.md \
       --spine <scratch>/spine_<id>.json --tables <scratch>/volume_<id>.md
   # Part B: the same command without --stage build (the default is the full run). Re-run
@@ -296,6 +302,10 @@ transfer, whether a fallback is safe for THIS athlete, whether week 1, the back-
 outside days are dosed sensibly, and what the notes must cover (the period card, an arm or knee
 menu), as keys added to the spec's `obligations:` list, which engage then writes to. Apply every must-fix, re-run the build check, then hand
 to engage.
+**A late change gets a delta review (PRC-4).** When the design changes after that review (Amir adds or swaps
+something, or the reviewer's own suggestions go in), one more files-only helper reads ONLY the changed cards and
+their words against the rule index before Part B: same paths, plus a one-line list of what changed. Its must-fixes
+are applied like the first review's.
 **A RETURNING athlete gets no reviewer** unless Amir asks for one. The coaching log, the
 checks and his checkpoint already cover a cycle that continues a known logic.
 

@@ -241,7 +241,7 @@ expect("bans '-' bans nothing", not has(run(BASE, ctx=CTX, spec=PROFILE.replace(
 OB = copy.deepcopy(BASE)
 OB['notes'] = {"cards": [
   {"title": "Your knee", "body": "<p>Stop rules.</p>", "tags": ["pain-ladder"]},
-  {"title": "Film week one", "body": "<p>Film your last set.</p>", "tags": ["film"]},
+  {"title": "Film week one", "body": "<p>Film your last set. No video, and that lift stays at 8 reps next cycle.</p>", "tags": ["film"]},
   {"title": "Rough days", "body": "<p>Take 1 off every RPE, never below 6.</p>", "tags": ["low-readiness"]}]}
 OBSPEC = """obligations:
 - backoff → the week note on the final week
@@ -262,6 +262,56 @@ expect('no obligations block warns', has(run(OB, spec="bans: goblet\n"), 'WARN',
 out = run(OB, '--stage', 'build', spec=OBSPEC)
 expect('--stage build skips obligations', not has(out, 'FAIL', 'obligation') and not has(out, 'WARN', 'no obligations'), out)
 expect('an unmet obligation names its rule', has(run(d, spec=OBSPEC), 'FAIL', '[PRG-5 · COM-9]'))
+# PRC-8's last part (2026-10-17): the film card says what stops without the video.
+d = copy.deepcopy(OB); d['notes']['cards'][1]['body'] = '<p>Film your last set in week 2 and send it on WhatsApp.</p>'
+expect('a film card with no consequence fails', has(run(d, spec=OBSPEC), 'FAIL', "the film card never says what the video unlocks"))
+d['notes']['cards'][1]['body'] = '<p>Film your last set in week 2. It unlocks the heavy sets in Cycle 3.</p>'
+expect('a film card that names its unlock passes', not has(run(d, spec=OBSPEC), 'FAIL', 'film card never says'))
+
+# ── 3b. what the cycle promises against what it builds (2026-10-17) ──────────
+d = copy.deepcopy(BASE); d['cycles'][1]['focuses'] = ['Build the base: squat and pull patterns at 8 reps.']
+out = run(d, ctx=CTX)
+expect('a focus pattern the build has: no PRC-28', not has(out, 'WARN', 'PRC-28'), out)
+d['cycles'][1]['focuses'] = ['Build the base: squat, hinge, single-leg and push patterns at 8 reps.']
+out = run(d, ctx=CTX)
+expect('a focus naming single-leg with no single-leg exercise warns', has(out, 'WARN', 'focus names a single-leg pattern'), out)
+expect('...and push', has(out, 'WARN', 'focus names a push pattern'), out)
+expect('...but not the squat it has', not has(out, 'WARN', 'focus names a squat pattern'), out)
+d['cycles'][1]['focuses'] = ['A fast push-off and a strong single-leg finish.']
+expect('words outside a list of patterns are not read as patterns', not has(run(d, ctx=CTX), 'WARN', 'PRC-28'))
+d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][1]['title'] = 'Land & Launch'
+expect('a jump-named block with no jump or landing warns', has(run(d, ctx=CTX), 'WARN', 'promises a jump or a landing'))
+SBJ = SB + "\nsnap-down|approved|true|brakes|jump-land|landing|floor|Snap Down||none|none"
+d['workouts']['days'][1]['blocks'][1]['exercises'].append({"type": "standard", "name": "Snap Down", "exId": "snap-down", "rx": {"sets": 3, "reps": 5, "rpe": 6, "rest": 60}})
+expect('...and passes with a landing in it', not has(run(d, ctx=[{"spine": SBJ, "prev": None, "ledger": None}]), 'WARN', 'promises a jump'))
+KIT = PROFILE.replace('aim: strength-muscle', 'aim: sport') + "\n"
+KITP = lambda kit: KIT.replace('```profile', '```profile\nequipment: ' + kit, 1)
+out = run(BASE, ctx=CTX, spec=KITP('home gym: dumbbells, bench, bands'))
+expect('kit: a barbell and a leg curl machine missing from a home list warn', has(out, 'WARN', 'barbell (Day 1 Barbell Back Squat)') and has(out, 'WARN', 'leg curl machine'), out)
+expect('kit: dumbbells on the list do not warn', not has(out, 'WARN', 'kit not on the athlete\'s equipment list: dumbbell'), out)
+out = run(BASE, ctx=CTX, spec=KITP('full commercial gym: barbell and rack, dumbbells, cables, machines'))
+expect('kit: a full gym covers its machines, benches and cables', not has(out, 'WARN', 'kit not on the athlete'), out)
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0].update(name='Trap Bar Deadlift', exId='trap-bar-deadlift')
+SBT = SB + "\ntrap-bar-deadlift|approved|true|strength|hinge|none|trap bar|Trap Bar Deadlift||glutes:1,quads:1|heavy"
+out = run(d, ctx=[{"spine": SBT, "prev": None, "ledger": None}], spec=KITP('full commercial gym: barbell and rack, dumbbells, cables, machines'))
+expect('kit: a trap bar is never assumed, even in a full gym', has(out, 'WARN', 'kit not on the athlete\'s equipment list: trap bar'), out)
+
+# ── 3c. a roadmap on its own (2026-10-17) ─────────────────────────────────────
+RM = [{"num": 1, "name": "Cornerstone", "tagline": "Everything stands on this.", "art": "bedrock",
+       "focuses": ["Build the base: squat, hinge and pull patterns at 8 reps or more."]},
+      {"num": 2, "name": "Cast Iron", "tagline": "Strength the speed runs on.", "art": "iron",
+       "focuses": ["Heavy strength on the main lifts; the first 5RM retests on the main lifts.",
+                   "Braking drills and lateral shuffles for the split step."]}]
+p_rm = os.path.join(TMP, 'cycles.json'); json.dump(RM, open(p_rm, 'w', encoding='utf-8'))
+r = subprocess.run([sys.executable, CHECK, p_rm], capture_output=True, text=True, encoding='utf-8', cwd=REPO); out = r.stdout + r.stderr
+expect('roadmap mode: no traceback', 'Traceback' not in out and 'roadmap:' in out, out)
+expect('roadmap: a semicolon in a focus warns', has(out, 'WARN', '[COM-3] cycle 2 focus: a semicolon'), out)
+expect('roadmap: a retest in a focus warns', has(out, 'WARN', 'focus names a retest'), out)
+expect('roadmap: court drills in a focus warn', has(out, 'WARN', 'focus names court drills'), out)
+expect('roadmap: a clean cycle prints nothing about itself', not has(out, 'WARN', 'cycle 1 '), out)
+json.dump({"cycles": RM[:1]}, open(p_rm, 'w', encoding='utf-8'))
+r = subprocess.run([sys.executable, CHECK, p_rm], capture_output=True, text=True, encoding='utf-8', cwd=REPO)
+expect('roadmap mode reads {"cycles": [...]} too', 'roadmap: 0 FAIL · 0 WARN' in r.stdout, r.stdout + r.stderr)
 
 # ── 4. continuity against the cycle just trained ─────────────────────────────
 def ex(name, exid, **rx): return {"type": "standard", "name": name, "exId": exid, "rx": rx}

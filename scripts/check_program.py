@@ -843,6 +843,13 @@ def check_obligations(data, args):
         else:
             ok, where = k in tags, f"a notes card tagged '{k}'"
         if not ok: fail(f"obligation '{k}' is not met: {where} must carry it", OBLIG_RULES[k], 'COM-9')
+        elif k == 'film':
+            # PRC-8's last part, "what stops without it" (2026-10-17: a spec's film line once said what, when and
+            # where, and engage would have had to invent the gate).
+            body = ' '.join(re.sub(r'<[^>]+>', ' ', str(c.get('body') or '')) for c in (data.get('notes') or {}).get('cards') or []
+                            if 'film' in [str(t).lower() for t in (c.get('tags') or [])])
+            if not re.search(r'\bunlock|\bno (?:video|film|clip)|\bwithout (?:it|them|the (?:video|film|clip)s?|a (?:video|film|clip))|\bstays? at\b|\bcleared?\b', body, re.I):
+                fail("obligation 'film' is not met: the film card never says what the video unlocks or what stops without it", 'PRC-8', 'COM-9')
     extra = sorted(tags - set(keys))
     if extra: info(f"cards tagged {', '.join(extra)} though the spec didn't list them (fine if they're real)")
 
@@ -1103,6 +1110,91 @@ def check_week(data, args, per_day):
         if a and b and kind(a) and kind(b):
             warn(f"example week: Day {a} ({kind(a)}) on {WEEKDAYS[i].title()} is right before Day {b} ({kind(b)}): two hard lower-body days back to back", 'VOL-2')
     info('example week: ' + ', '.join(f"{WEEKDAYS[i].title()} Day {plan[i]}" for i in sorted(plan)))
+
+# ── what the cycle promises against what it builds (2026-10-17) ───────────────
+# Three things the first new-athlete review after the stage41 rules had to catch by eye: a focus that promised a
+# squat the build did not have (PRC-28), a block called "Land & Spring" whose one exercise never left the floor
+# (SES-18), and a programme on a trap bar, a landmine and a stability ball that were not on the athlete's form;
+# the gym turned out to have no ball (SEL-21). They are checks now, so the reviewer's time goes on judgement.
+FOCUS_PATTERNS = (('squat', r'(?<!split )\bsquats?\b', {'squat'}), ('hinge', r'\bhinges?\b', {'hinge'}),
+                  ('single-leg', r'\bsingle[- ]leg\b', {'single-leg'}),
+                  ('push', r'\bpush(?:es|ing)?\b(?![- ]off)', {'push-horizontal', 'push-vertical'}),
+                  ('pull', r'\bpull(?:s|ing)?\b', {'pull-horizontal', 'pull-vertical'}),
+                  ('carry', r'\bcarr(?:y|ies)\b', {'carry'}))
+
+def check_focus_promises(data, spine):
+    cycles = data.get('cycles') or []
+    i = data.get('currentCycleIndex') or 0
+    if not (0 <= i < len(cycles)) or not spine: return
+    built = {(spine.get((ex or {}).get('exId') or '') or {}).get('pattern') for ex, *_ in working(data)}
+    for f in cycles[i].get('focuses') or []:
+        for sen in sentences(f):
+            if not re.search(r'\bpatterns?\b', sen, re.I): continue   # a list of patterns, not "a fast push-off"
+            for word, rx, pats in FOCUS_PATTERNS:
+                if re.search(rx, sen, re.I) and not (built & pats):
+                    warn(f"cycle {cycles[i].get('num')} focus names a {word} pattern, and no working exercise is one: "
+                         f"add one, or drop the word with a roadmap_amend: line (\"{sen[:80]}\")", 'PRC-28', 'PRC-17')
+
+JUMPY_TITLE = re.compile(r'\b(?:land(?:ing)?s?|jumps?|spring|plyos?|bounds?|hops?|launch)\b', re.I)
+
+def check_block_promises(data, spine):
+    for d in (data.get('workouts') or {}).get('days') or []:
+        for b in d.get('blocks') or []:
+            t = b.get('title') or ''
+            if PREP.search(t) or not JUMPY_TITLE.search(t): continue
+            known = [(spine.get(o.get('exId') or '') or {}).get('impact') for ex in b.get('exercises') or []
+                     for o in ([ex] + list(ex.get('items') or [])) if (o.get('exId') or '') in spine]
+            if known and not any(x in ('plyometric', 'landing') for x in known):
+                warn(f"Day {d.get('id')} block \"{t}\" promises a jump or a landing, and none of its exercises has one "
+                     f"(Spine impact): rename the block or change the exercise", 'SES-18')
+
+KIT_FREE = {'floor', 'wall', 'mat', 'none', 'bodyweight', 'towel', 'timer', 'cone', 'cones', 'step', 'box'}
+KIT_SAME = {'medicine ball': 'med ball', 'dumbbells': 'dumbbell', 'kettlebells': 'kettlebell'}
+
+def kit_has(kit, item):
+    """Is this Spine equipment item on the athlete's list? Plurals match, a 'full gym' covers benches, racks,
+    plates and any '<something> machine' or cardio machine except an air bike, which many gyms lack."""
+    t = KIT_SAME.get(item, item)
+    words = [re.sub(r'(?:es|s)$', '', w) for w in re.findall(r'[a-z]+', t)]
+    if not words or t in KIT_FREE: return True
+    if re.search(r'\b' + r'\w*[\s-]+'.join(re.escape(w) for w in words) + r'\w*', kit): return True
+    full = re.search(r'\bfull\b.*\bgym\b|\bcommercial gym\b', kit)
+    generic = words[-1] in ('bench', 'rack', 'plate', 'bar', 'machine', 'cable', 'band', 'rope', 'handle', 'strap') or t in ('rower', 'bike', 'treadmill', 'pulley')
+    return bool(full and generic and 'trap' not in words and 'ez' not in words)
+
+def check_kit(data, prof, spine):
+    kit = ((prof or {}).get('equipment') or (prof or {}).get('kit') or '').lower()
+    if blank(kit) or not spine: return
+    missing = {}
+    for d, b, ex, it in exercises(data):
+        o = it or ex
+        for item in (spine.get(o.get('exId') or '') or {}).get('equipment') or []:
+            item = item.strip().lower()
+            if item.startswith('optional') or kit_has(kit, item): continue
+            missing.setdefault(item, []).append(f"Day {d.get('id')} {o.get('name')}")
+    for item, where in sorted(missing.items()):
+        warn(f"kit not on the athlete's equipment list: {item} ({', '.join(dict.fromkeys(where))}). "
+             f"Confirm it with Amir at the checkpoint, or the card meets a gym without it", 'SEL-21')
+
+# ── a roadmap on its own (2026-10-17): the cycles[] array, checked when it is drafted ──────
+# The roadmap reviewer's must-fixes were mostly words a script can read: semicolons in focus lines, a retest named
+# as a focus, court drills in a gym cycle. Run `check_program.py <cycles.json>` (the array, or {"cycles": [...]})
+# right after drafting, before the reviewer, and fix what it prints.
+COURT_DRILLS = re.compile(r'\b(?:shuffles?|cone drills?|ladder drills?|agility drills?|(?:change[- ]of[- ]direction|deceleration|braking) drills?)\b', re.I)
+
+def check_roadmap(cycles):
+    for c in cycles:
+        n = c.get('num')
+        for k in ('name', 'tagline'):
+            if ';' in str(c.get(k) or ''): warn(f"cycle {n} {k}: a semicolon (not how Amir writes)", 'COM-3')
+        for f in c.get('focuses') or []:
+            if ';' in f: warn(f"cycle {n} focus: a semicolon (not how Amir writes): \"{f[:70]}\"", 'COM-3')
+            if re.search(r'\bre-?tests?\b|\b\d\s*RM\b', f, re.I):
+                warn(f"cycle {n} focus names a retest: it runs on two or three flagged lifts in the closing week, "
+                     f"not as a focus (\"{f[:70]}\")", 'TST-5')
+            m = COURT_DRILLS.search(f)
+            if m: warn(f"cycle {n} focus names court drills ({m.group(0)}): those belong on court, not in a gym cycle", 'SES-4')
+    check_text({'cycles': cycles})
 
 # ── the saved --spine-sql result: the Spine, last cycle, the ledger ───────────
 def load_context(path):
@@ -1459,7 +1551,7 @@ LOOSE_SQL = ("(select coalesce(string_agg(t, ' ' order by t), '') from (select c
              "when 'bb' then 'barbell' when 'kb' then 'kettlebell' else w end t from unnest(string_to_array({n}, ' ')) w) z "
              "where t not in ('machine', ''))")
 
-def spine_sql(data):
+def spine_sql(data, pad=False):
     ids = sorted({(it or ex).get('exId') for d, b, ex, it in exercises(data) if (it or ex).get('exId')})
     names = sorted({(it or ex).get('name') for d, b, ex, it in exercises(data)
                     if (it or ex).get('name') and not (not it and ex.get('type') == 'circuit')})
@@ -1536,8 +1628,13 @@ select spine, md5(coalesce(spine, '')) spine_md5, names, md5(coalesce(names, '')
                 jsonb_array_elements(case when jsonb_typeof(d->'blocks') = 'array' then d->'blocks' else '[]'::jsonb end) b,
                 jsonb_array_elements(case when jsonb_typeof(b->'x') = 'array' then b->'x' else '[]'::jsonb end) x) prev_n,
        ledger, md5(coalesce(ledger, '')) ledger_md5, profile, minutes, purposes, md5(coalesce(purposes, '')) purposes_md5,
-       texts, md5(coalesce(texts, '')) texts_md5
+       texts, md5(coalesce(texts, '')) texts_md5{PAD if pad else ''}
 from s;""")
+
+# --pad (2026-10-17): the answer is ~30 KB, which comes back inline, and the --spine file must be a byte-exact copy of
+# it. 90,000 dots make the connector save the whole answer to a file instead, and scripts/save_spine_result.py turns
+# that file into the --spine file, checksums verified, without anyone retyping it.
+PAD = ", repeat('.', 90000) as _pad"
 
 KEYS = ['athlete', 'sport', 'currentCycleIndex', 'cycles', 'workouts', 'notes']
 def fingerprint(data, athlete_id):
@@ -1571,14 +1668,20 @@ def main():
     ap.add_argument('--female', action='store_true', help=argparse.SUPPRESS)  # retired 2026-09-26
     ap.add_argument('--cap', type=float, default=None); ap.add_argument('--ban'); ap.add_argument('--spec')
     ap.add_argument('--week'); ap.add_argument('--spine'); ap.add_argument('--art')
-    ap.add_argument('--spine-sql', action='store_true'); ap.add_argument('--fingerprint', action='store_true')
+    ap.add_argument('--spine-sql', action='store_true'); ap.add_argument('--pad', action='store_true'); ap.add_argument('--fingerprint', action='store_true')
     ap.add_argument('--stage', choices=['build', 'final'], default='final')
     args = ap.parse_args()
     data = json.load(open(args.program, encoding='utf-8'))
-    athlete_id = (data.get('athlete') or {}).get('id', '<id>')
-    if args.spine_sql: spine_sql(data); return 0
+    athlete_id = (data.get('athlete') or {}).get('id', '<id>') if isinstance(data, dict) else '<id>'
+    if args.spine_sql and isinstance(data, dict): spine_sql(data, args.pad); return 0
     if args.fingerprint:
         fingerprint(json.load(open(args.program, encoding='utf-8'), parse_float=decimal.Decimal), athlete_id); return 0
+    if isinstance(data, list) or ('cycles' in data and 'workouts' not in data):
+        check_roadmap(data if isinstance(data, list) else data['cycles'])
+        for level in ('FAIL', 'WARN', 'INFO'):
+            for m in out[level]: print(f"{level:4}  {m}")
+        print(f"\nroadmap: {len(out['FAIL'])} FAIL · {len(out['WARN'])} WARN")
+        return 1 if out['FAIL'] else 0
     if args.female:
         warn('--female is retired and did nothing: pass --floor only when the aim is strength and muscle (any athlete, any sex)')
     if args.log:
@@ -1611,6 +1714,8 @@ def main():
     check_week(data, args, per_day)
     if args.spine:
         check_spine(data, args, ctx['spine']); check_continuity(data, args, ctx)
+        check_focus_promises(data, ctx['spine']); check_block_promises(data, ctx['spine'])
+        check_kit(data, prof if prof else parse_profile(ctx.get('profile')), ctx['spine'])
     else: warn('no --spine: the Spine gate, the volume count (floors, tables, day loads, back-to-back days), '
                'the Quality Map and the continuity checks were not run (run --spine-sql)')
     for level in ('FAIL', 'WARN', 'INFO'):

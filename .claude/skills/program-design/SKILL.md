@@ -6,6 +6,9 @@ description: Design one athlete's training program for a cycle — the core S&C 
 > Programmes and coaching logs live on the server (`public.programs`, `public.coaching_logs`;
 > CLAUDE.md → *THE BIG ONE*). A local `data/<id>.json` is scratch, never the truth. A new cycle is
 > published by /program-assemble Step 7; a change inside the live cycle is /program-edit's.
+>
+> **How a run is carried out:** `.claude/skills/PIPELINE-RUN.md` (PRC-29): the main conversation talks to Amir and
+> writes the database; this stage's heavy work runs as a fresh helper at the effort that file sets.
 
 
 # Program Designer — Prompt 1 (Stage B)
@@ -273,6 +276,12 @@ PRIMARY LIFT SELECTIONS: [muscle/pattern → exercise, SFR/transfer rationale]
 ```
 **→ CHECKPOINT:** show this analysis + selections and the new athlete profile block, and ask Amir
 for changes before building, and ask the day the athlete starts (see STEP 1A's checkpoint).
+**Kit (SEL-21):** name, in the primary-lift question, every piece the plan needs that is not on the athlete's
+equipment list (a trap bar, a landmine, a stability ball, an air bike), so Amir confirms it or you swap it now.
+**A frame change at the checkpoint** (days, session length, kit, conditioning) means the locked roadmap's
+reasoning was built on other facts: read its focus lines and its `## Roadmap` read against the new frame and put
+every line that no longer holds on a `roadmap_amend:` line in the same checkpoint (PRC-17, PRC-28), before the
+spec, not after the build.
 
 ---
 
