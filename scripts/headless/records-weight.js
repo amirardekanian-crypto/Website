@@ -290,8 +290,10 @@ const COVER = `(() => {
       added.length === 1 && after.length === before.length + 1 && JSON.stringify(Object.keys(added[0]).sort()) === JSON.stringify(['d', 'kg', 'lift', 'r', 'rpe', 't', 'w']) && added[0].lift === 'Barbell Back Squat' && added[0].kg === est && added[0].w === 100 && added[0].r === 5 && added[0].rpe === 8 && added[0].d === today && Math.abs(added[0].t - Date.now()) < 20000, JSON.stringify(added));
     const nb = await read(p, '_ceil_best');
     t.check('Save beating the best writes the New best marker as before ({lift, kg, prev, d, t, i})', !!nb && JSON.stringify(Object.keys(nb).sort()) === JSON.stringify(['d', 'i', 'kg', 'lift', 'prev', 't']) && nb.lift === 'Barbell Back Squat' && nb.kg === est && nb.prev === 104 && nb.d === today && typeof nb.i === 'number', JSON.stringify(nb));
-    const lp = await p.evaluate(() => ({ title: document.getElementById('ceil-title').textContent, kick: document.querySelector('#screen-ceiling .ceil-kick').textContent, band: (document.querySelector('.ceil-pr') || {}).innerText }));
-    t.check('...and lands on that lift\'s page with the New best band', lp.title === 'Barbell Back Squat' && lp.kick === 'Personal records' && /^NEW BEST\s+\d+(\.\d)? KG OVER YOUR LAST BEST$/.test((lp.band || '').trim().replace(/\s+/g, ' ')) && (lp.band || '').replace(/\s+/g, ' ').includes(`${Math.round((est - 104) * 10) / 10} KG OVER`), JSON.stringify(lp));
+    const lp = await p.evaluate(() => ({ title: document.getElementById('ceil-title').textContent, kick: document.querySelector('#screen-ceiling .ceil-kick').textContent, band: (document.querySelector('.ceil-pr') || {}).innerText,
+      share: !!document.querySelector('.ceil-pr .ceil-pr-share') }));
+    // Since Highlight Reel (2026-10-17) the band ends on Share when its record makes a card (100 × 5 beat the best before it).
+    t.check('...and lands on that lift\'s page with the New best band, and its Share', lp.title === 'Barbell Back Squat' && lp.kick === 'Personal records' && /^NEW BEST\s+\d+(\.\d)? KG OVER YOUR LAST BEST SHARE$/.test((lp.band || '').trim().replace(/\s+/g, ' ')) && (lp.band || '').replace(/\s+/g, ' ').includes(`${Math.round((est - 104) * 10) / 10} KG OVER`) && lp.share, JSON.stringify(lp));
     t.check('no page errors (Log a max)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }

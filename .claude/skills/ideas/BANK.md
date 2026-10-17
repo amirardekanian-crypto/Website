@@ -72,7 +72,7 @@ and Ryan 1999 (expected rewards undermine, positive feedback helps), Mazeas 2022
 |---|---|---|---|---|
 | 29 | Hold Serve | A streak of held weeks (every session of the plan's week, any days; rest days never break it, pauses between cycles); later Proof's session ladder counts held weeks (settles the Proof audit's open decision 4), optionally STEP UP's metal standing that moves up and down | — | pitched · **recommended first** |
 | 30 | Courtside | coach.html → Today "Worth a word": the week's wins (new best, effort-matched win, held-weeks mark, session mark, comeback) with a pre-filled WhatsApp in the athlete's language; not a reason | (37) | pitched · top 3 |
-| 31 | Signed Off | The training's first share card: Cycle complete → Story card with cycle art, sessions, weeks held, top 3 wins, retest, Amir's signature and photo, AMIRARDEKANI.COM; Farsi card later | — | pitched · top 3 |
+| 31 | Signed Off | The training's first share card: Cycle complete → Story card with cycle art, sessions, weeks held, top 3 wins, retest, Amir's signature and photo, AMIRARDEKANI.COM; Farsi card later | — | **built** 2026-10-17 as **Highlight Reel** (design page https://claude.ai/artifact/SuyYRPeX9n2SdbiUvoHhkF, "go with your picks"): Signed Off with four more training cards (New Best, Same Effort, Retest, The Distance), Story or post, English or Farsi from the start, a one-time Cycle complete moment, and Career Mode's five reward cards drawn for phase 3 (`assets/js/sharecard.js`, PROGRAM-APP.md → Highlight Reel). Weeks held waits for Hold Serve (#29) |
 | 32 | Ring the Bell | Crew → Board \| Bell: automatic 7-day lines for a new best, a held-weeks mark or a session mark, 👏 once; consent asked at the first win | (37) | pitched |
 | 33 | Century Club | Career session count with marks (10, 25, 50, 100 …), a Home moment with Amir's line, a server-minted Proof title at 100, a voice note from Amir at 100 (first one ~end of 2026: top athlete at 74) | (37) | pitched |
 | 34 | Amir's Pick | Monthly: data shortlists 3 (weeks held, effort-matched gain, comeback), Amir picks one, a one-of-a-kind minted title, the Bell, an Instagram story with the athlete's yes | 29, 37 | pitched |
@@ -109,7 +109,8 @@ badges, achievements, titles, missions, quests, recognition, with Proof's existi
 
 Round 3's ideas are parts of it: #29 Hold Serve → Consistency's held weeks; #30 Courtside → the coach's column; #32
 Ring the Bell → the crew's column; #33 Century Club → Commitment; #34 Amir's Pick → a coach tool; #35 The Ghost →
-Progress; #36 Silverware → a later fact source; #37 The Win Ledger → the fact ledger; #31 Signed Off → phase 3.
+Progress; #36 Silverware → a later fact source; #37 The Win Ledger → the fact ledger; #31 Signed Off → phase 3 (built
+ahead of it on 2026-10-17 as Highlight Reel: the training's five cards, with the reward cards drawn for phase 3 to feed).
 
 ## Career Mode · 2026-10-17 · "Four Majors" (the catalogue, meaning by meaning)
 
