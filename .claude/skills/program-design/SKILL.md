@@ -382,9 +382,9 @@ still checked before Amir sees the finished programme, but the three-agent panel
 the BUILT programme, in /program-assemble **Part A**, straight after this spec and BEFORE engage
 writes anything (so a fix never leaves notes describing the old programme):
 1. **`scripts/check_program.py`** on the built file (Part A runs it). **Your spec's athlete profile
-   sets its flags**: `aim: strength-muscle` turns on the 10-set floor (never for a sport athlete, VOL-4;
-   a muscle or strength goal in the top two, or a `build` or `iron` cycle, is strength-muscle, and
-   `general` turns the floor off: `PROFILE.md` → *Choosing the aim*),
+   sets its flags**: `aim: strength-muscle` turns on the 10-set floor (VOL-4; a sport athlete gets it
+   as a warning in a `build` or `iron` cycle; a muscle or strength goal in the top two, or a `build` or
+   `iron` cycle, is strength-muscle, and `general` turns the floor off: `PROFILE.md` → *Choosing the aim*),
    `proven` lifts the 4-set cap (VOL-8), `bans` and `floor-except` are read as written, and `cap` is
    the soft session length; a first cycle turns the new-athlete rules on by itself. So get the
    profile right rather than typing flags (a typed flag only ever adds one). What it checks is the

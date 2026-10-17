@@ -236,6 +236,7 @@ the principles (their *How to add*).
 - `VOL-3` **Evidence-based volume ceiling for hypertrophy: ~10–20 hard sets/muscle/week, most of the benefit captured by ~10; per-session, ~5–10 sets/muscle is likely near the sweet spot in trained lifters**
   - 2026-07-08, sc-research brief — Schoenfeld 2017, Iversen 2022 umbrella review, Pelland 2025 meta-regression, Barbalho 2019, Krause Neto 2025 for glute-specific
 - `VOL-4` **When the programme's aim is to get strong and build muscle, every major muscle clears ≥10 working sets/week — a hard floor, not a target**
+  - 2026-10-17, Amir, "fix 1 and 2": a sport athlete's `build` or `iron` cycle now gets the floor as a warning (excused on `floor-except:` for a real reason), and a `build` or `iron` cycle on `aim: general` warns. It came from a muscle cycle written as `general` that shipped one major muscle at 4.5 sets a week with nothing flagged.
   - Amir, 2026-09-26, verbatim: "its a floor for when the program aim is to get strong and build muscles, that rule is based on science of hyper trophy, for athletes, do what is best for them and their condition."
   - 2026-07-27, Amir, verbatim: "specially for women every major muscle in lower body should get at least 10, this is a hard rule, unless you have a very good reason not to" — Athlete G C2 first shipped with quads at 5.5 and hamstrings at 7.5 sets/wk, both wrongly justified as secondary-by-design.
 - `VOL-5` **Check for unused session-time budget before calling a day "done."**

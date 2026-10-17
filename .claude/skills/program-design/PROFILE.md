@@ -48,13 +48,15 @@ updated: 2026-09-26 · /program-design, Cycle 3
 cycle, at design's STEP 0, from the goals and THIS cycle's `art`, and the checkpoint names the line
 below that decided it. In this order:
 - **`sport`**: a tennis or padel player training for their game. Their volume is a report (VOL-1),
-  and the floor stays off (VOL-4).
+  except in a `build` or `iron` cycle, where the checker warns on every major muscle under 10 sets
+  (VOL-4): add the sets, or put a real reason on `floor-except:`.
 - **`strength-muscle`**: building muscle or getting stronger is goal 1 or goal 2, **or** this cycle's
   `art` is `build` or `iron`. The checker turns the floor on; a muscle excused goes on `floor-except:`
   with its reason.
 - **`general`**: only when neither line above holds. It switches the floor off, so it is never the
   aim of a muscle or strength cycle (on 2026-10-17 a muscle cycle written as `general` shipped one
-  major muscle at 4.5 sets a week, and nothing flagged it).
+  major muscle at 4.5 sets a week, and nothing flagged it; the checker now warns on a `build` or
+  `iron` cycle with this aim).
 
 A change from last cycle goes on the log entry's *Profile changes* line with the reason.
 

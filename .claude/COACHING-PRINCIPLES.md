@@ -156,7 +156,7 @@ stale copy reached athletes.
 | VOL-1 | A sport athlete's volume is a report (sets, range, verdict); an under-dose on a time-limited client is maintenance, not failure. | design | |
 | VOL-2 | Manage load per day: weight sets by cost (heavy compound ×1.5, moderate ×1, isolation ×0.5), undulate the week, avoid back-to-back hard days. | design | warn (flat week, grind, back-to-back) |
 | VOL-3 | Hypertrophy runs on about 10–20 hard sets per muscle a week, most of the gain by 10; about 10 direct sets per session at most. | design | warn (over 20; over 10 in a session) |
-| VOL-4 | When the aim is strength and muscle, every major muscle clears 10 working sets a week; an exception goes on `floor-except:` with its reason. | design | ✓ |
+| VOL-4 | Strength-and-muscle aims: every major muscle clears 10 working sets a week. A sport athlete's build or iron cycle warns under 10. Exceptions: `floor-except:`. | design | ✓ (warn: a sport athlete's build or iron cycle; build or iron on aim general) |
 | VOL-5 | A session with real headroom (15 minutes or more) gets low-cost work before the day is called done. | design | |
 | VOL-6 | The pattern is deferred, the effort never: a restricted cycle still carries a real strength benchmark. | design | |
 | VOL-7 | The shoulder is one group on 10–20 sets: press, side and rear delt together. Scapular retraction counts as back. | design | warn (under 10) |
@@ -773,7 +773,8 @@ same ID. Read a rule's story and its history before changing it.
 - `VOL-1` **Volume is a report, not a rule, for a sport-performance athlete.** Show programmed
   sets/muscle vs the goal range vs a verdict; frame an under-dose as "maintenance" for
   time-limited clients (not failure), and say where to invest if/when time allows.
-  When the programme's aim is strength and muscle, the 10-set floor below is a rule instead.
+  When the programme's aim is strength and muscle, the 10-set floor below is a rule instead, and in
+  a `build` or `iron` cycle it is a warning for a sport athlete too (VOL-4).
 - `VOL-2` **Manage load per DAY, not just per week — weight by systemic cost, then undulate.**
   Raw set count lies: 21 isolation sets ≠ 13 heavy-compound sets. Weight each working set
   by neural/systemic cost (heavy compound ≈ ×1.5, moderate compound ≈ ×1.0, isolation ≈
@@ -793,7 +794,11 @@ same ID. Read a rule's story and its history before changing it.
   working sets/week — a hard floor, not a target** (quads, hamstrings, glutes, back, chest,
   shoulder; any athlete, any sex). It began as the women's lower-body
   rule below and now covers the aim, not the sex. A sport-performance athlete (tennis, padel)
-  gets what is best for them and their condition, and their volume is a report. The checker
+  gets what is best for them and their condition, and their volume is a report, **except in a
+  `build` or `iron` cycle** (2026-10-17): a muscle or strength cycle under 10 sets is not one, so
+  the checker warns on each major muscle under 10, and a real reason (a match month, a sore joint)
+  goes on `floor-except:`. A `build` or `iron` cycle on `aim: general` warns too, because that aim
+  switches the floor off. The checker
   applies it with `--floor`; a muscle excused for a stated reason (chest on a rounded-shoulder
   client, below) goes on the spec's `floor-except:` line. Where it began: **women's lower body,
   quads, hamstrings and glutes each ≥10.** The 10–20 range above is a rule to satisfy, not a band to approach from

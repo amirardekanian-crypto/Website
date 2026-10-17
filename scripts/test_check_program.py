@@ -247,6 +247,16 @@ expect('art voltage on aim general: no warning', not has(run(d, ctx=CTX, spec=GE
 expect('art build from --art on aim general warns', has(run(d, '--art', 'build', ctx=CTX, spec=GENERAL), 'WARN', 'art is build (muscle)'))
 expect('art iron on aim sport: no warning', not has(run(BASE, ctx=CTX, spec=PROFILE.replace('aim: strength-muscle', 'aim: sport')), 'WARN', 'aim is general'))
 expect('--floor typed: no warning', not has(run(BASE, '--floor', ctx=CTX, spec=GENERAL), 'WARN', 'aim is general'))
+# A sport athlete in a build or iron cycle gets the floor as a WARN, never a FAIL (Amir, 2026-10-17: "fix 1").
+SPORT = PROFILE.replace('aim: strength-muscle', 'aim: sport')
+out = run(BASE, ctx=CTX, spec=SPORT)
+expect('art iron on aim sport: quads under 10 warns', has(out, 'WARN', 'quads 4 sets/week: under 10 in this iron cycle'), out)
+expect('art iron on aim sport: never a floor FAIL', not has(out, 'FAIL', 'under the floor') and not has(out, 'FAIL', '0 sets/week'), out)
+expect('art iron on aim sport: floor-except still excuses', not has(out, 'WARN', 'chest: 0 sets/week'), out)
+expect('art iron on aim sport: a missing muscle warns', has(run(BASE, ctx=CTX, spec=SPORT.replace('floor-except: chest (posture), shoulder (posture)', 'floor-except: -')), 'WARN', 'chest: 0 sets/week in this iron cycle'))
+d = copy.deepcopy(BASE); d['cycles'][1]['art'] = 'voltage'
+expect('art voltage on aim sport: no floor warning', not has(run(d, ctx=CTX, spec=SPORT), 'WARN', 'sets/week: under 10 in this'))
+expect('art iron on aim general: no per-muscle floor warning', not has(run(BASE, ctx=CTX, spec=GENERAL), 'WARN', 'sets/week: under 10 in this'))
 
 # ── 3. the notes obligations list ─────────────────────────────────────────────
 OB = copy.deepcopy(BASE)

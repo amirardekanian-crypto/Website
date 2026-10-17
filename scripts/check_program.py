@@ -1051,18 +1051,25 @@ def check_volume(data, args, spine, timing=None):
     # The 10-set floor is hypertrophy science, so it binds a programme whose aim is strength and
     # muscle, man or woman; a sport-performance athlete gets what is best for them (Amir,
     # 2026-09-26). --floor switches it on; floor-except names a muscle excused for a stated reason.
+    # A sport athlete in a build or iron cycle gets the same floor as a WARN (check_aim_art sets soft_floor).
     total, excused = v['total'], floor_excused(args)
+    soft = getattr(args, 'soft_floor', None)
     for mm in sorted(total, key=lambda k: -total[k]):
         n = total[mm]
-        if args.floor and mm in MAJOR and n < 10:
+        if (args.floor or soft) and mm in MAJOR and n < 10:
             if mm in excused: info(f"{mm} {n:g} sets/week: under 10, excused (floor-except)")
-            else: fail(f"{mm} {n:g} sets/week: under the floor of 10 for a strength-and-muscle programme (or floor-except it, with the reason in the spec)", 'VOL-4')
+            elif args.floor: fail(f"{mm} {n:g} sets/week: under the floor of 10 for a strength-and-muscle programme (or floor-except it, with the reason in the spec)", 'VOL-4')
+            else: warn(f"{mm} {n:g} sets/week: under 10 in this {soft} cycle ({ART_HEADLINE[soft]}). A sport athlete's floor is a warning: "
+                       "add the sets, or floor-except it with the reason in the spec", 'VOL-4')
         elif n > 20: warn(f"{mm} {n:g} sets/week: over 20", 'VOL-3')
         elif mm == 'shoulder' and n < 10: warn(f"shoulder {n:g} sets/week: under the usual 10-20", 'VOL-7')
         else: info(f"{mm} {n:g} sets/week")
     for mm in MAJOR:
         if args.floor and mm not in total and mm not in excused:
             fail(f"{mm}: 0 sets/week (nothing on the programme counts toward it)", 'VOL-4')
+        elif soft and mm not in total and mm not in excused:
+            warn(f"{mm}: 0 sets/week in this {soft} cycle (nothing on the programme counts toward it): add the sets, "
+                 "or floor-except it with the reason in the spec", 'VOL-4')
     # About 10 direct sets on one muscle in a session is the most that pays; spread the rest (VOL-3).
     for day, dr in sorted(v['direct'].items(), key=lambda kv: day_order(kv[0])):
         for m, n in sorted(dr.items()):
@@ -1358,9 +1365,14 @@ def check_aim_art(data, args, prof):
     cycles = data.get('cycles') or []
     cci = data.get('currentCycleIndex') or 0
     art = (args.art or (cycles[cci].get('art') if cci < len(cycles) else '') or '').lower()
-    if art in ('build', 'iron') and 'general' in ((prof or {}).get('aim') or '').lower() and not args.floor:
+    aim = ((prof or {}).get('aim') or '').lower()
+    if art in ('build', 'iron') and 'general' in aim and not args.floor:
         warn(f"the cycle's art is {art} ({ART_HEADLINE[art]}) but the profile's aim is general, so the 10-set floor is off. "
              "If this cycle builds muscle and strength, set aim: strength-muscle in the profile; if not, check the art word", 'VOL-4')
+    # A tennis or padel player in a build or iron cycle gets the floor as a warning, not a fail (Amir, 2026-10-17:
+    # "fix 1"): a muscle cycle under 10 sets is not a muscle cycle, but a match month or a sore joint can be a
+    # real reason, written on the floor-except: line like any other.
+    args.soft_floor = art if art in ('build', 'iron') and 'sport' in aim and not args.floor else None
 
 # ── continuity: this cycle against the one just trained (2026-09-26) ──────────
 # A returning athlete gets no reviewer, and every rotation and re-ship failure on record was a
