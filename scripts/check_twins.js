@@ -37,6 +37,9 @@
                                  the WRITER of the check-in line and its READER (the email import). The writer is the
                                  app's real code, run as it stands, and its wording is pinned by golden strings below.
      assets/js/chips.js          coach.html's ?v= must change when the file does (TWIN-4)
+     holdCount                   / get_profile() in SQL          Career Mode's weeks held in a row, Home's Hold Serve row: held to the cases
+                                                                  in scripts/career/hold_cases.json here, and to the server's own loop by
+                                                                  scripts/career/rehearse.mjs (PGlite)
 
    Already guarded elsewhere (not repeated): rxOf/repCount/tempoDisplay (check_rx.js), the set-log grammar
    (check_setlog.js), the shared word lists (check_parity.py), the XP rules (check_xp_rules.py).
@@ -647,6 +650,19 @@ run('chips.js cache token', () => {
   else if (!prev) chipsFailures.push('scripts/twins_stamp.json is missing: run   node scripts/check_twins.js --stamp');
   else if (prev.sha !== now.sha && prev.v === now.v) chipsFailures.push(`assets/js/chips.js changed but coach.html still loads ?v=${now.v}.\n    The service worker answers /assets/ from cache first, so browsers keep the old file. Bump the ?v= token in coach.html, then run   node scripts/check_twins.js --stamp`);
   else if (prev.sha !== now.sha || prev.v !== now.v) chipsFailures.push(`the chips.js stamp is out of date (stamped ?v=${prev.v}, now ?v=${now.v}). Run   node scripts/check_twins.js --stamp   and stage scripts/twins_stamp.json`);
+});
+
+/* ── 8. Career Mode: the weeks held in a row (program.html / the server) ─────── */
+// Home's Hold Serve row (2026-10-17) counts the athlete's week_held and week_broken facts with holdCount(), the phone's copy of
+// get_profile()'s loop (supabase/stage66_career_mode.sql). Its twin is SQL, so the rule's cases live in scripts/career/hold_cases.json:
+// this holds the app to them, and scripts/career/rehearse.mjs holds get_profile() to holdCount() on every athlete it builds.
+const HOLD_CASES = JSON.parse(read('scripts/career/hold_cases.json')).cases;
+const A_HOLD = sandbox(null, fromA('holdCount'), ['holdCount']);
+run('Career Mode: weeks held in a row (holdCount / get_profile)', () => {
+  HOLD_CASES.forEach(c => {
+    const r = A_HOLD.holdCount(c.facts);
+    expect('holdCount: ' + c.name, c.facts.map(f => f.kind + ' ' + f.ref), { now: r.now, best: r.best }, c.want);
+  });
 });
 
 /* ── report ───────────────────────────────────────────────────────────────── */

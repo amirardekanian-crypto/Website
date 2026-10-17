@@ -4387,6 +4387,9 @@
   #home-overview .bt-wa { margin: 0 var(--g) 26px; }
   #home-overview .bt-rep { width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 10px; }
   #home-overview #home-habits-wrap { margin-top: 20px; }
+  /* Hold Serve's row (paintHold()) leads the pair of door rows under the week: it takes the 20 px, the habits row sits 10 px under it. */
+  #home-overview #home-hold-wrap:not(:empty) { margin-top: 20px; }
+  #home-overview #home-hold-wrap:not(:empty) + #home-habits-wrap { margin-top: 0; }
 
   /* 4. Next up (.dc-hero): the suggested day as ONE card, the training day's cover on Home. The photo graded into the green
      (luminosity at .7, masked from the left), a scrim to the cover's last colour, "● NEXT UP · DAY 1" in Space Mono with a mint
@@ -4645,140 +4648,6 @@
   .archive-ex-name { display: block; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); text-wrap: balance; }
   .archive-ex-detail { display: block; margin-top: 3px; font: 400 var(--fs-small)/1.3 'Space Mono', monospace; letter-spacing: .04em; color: var(--grey); }
   .archive-empty { margin: 28px var(--g) 0; font: 400 var(--fs-lead)/1.5 'Barlow', sans-serif; color: var(--grey); }
-  /* ══ SIGN-IN, WELCOME, LOADING AND ERROR IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════
-     Amir, 2026-10-13: "continue until everything has a consistent design". The four screens a person sees before or around their
-     first plan wear Centre Court's look: Loading (the mark, a ring, one mono line, on the paper) · Sign in ("Baseline", Amir's pick of
-     2026-09-12, kept: the court photo under its scrim, the mark, the headline with its clay COACH, the mantra, the paper sheet
-     rising over it, the help line and the footer; now the mint-dot eyebrow, the sheet at the app's sheet radius, the set table's boxes
-     and the day's banner for an error) · Welcome (a cover: the picture graded into --hero as every other cover does it, the
-     glass ✕, a sheet on the paper, Amir's signature under his two lines, the one primary button) · Error (the paper, a clay icon, an ink
-     title, the primary button and its outlined twin). Behaviour is untouched: every id, handler, autocomplete name, the eye, the
-     retry, showError()'s titles, icons, words and buttons, the Welcome's three ways out and the phone's Back.
-     Colours are the app's ONE set (THE APP'S ONE COLOUR SET, on body); none is declared here and none is hard-coded except the
-     white of a text on the green and a mask's alpha. The gutter is --g. Font sizes are the --fs-* tokens, or a display size with its
-     comment. ⚠️ The sign-in hero is a background COLOUR (the cover's --hero) with the <img> over it, never a background-image: the
-     form paints from markup in ~47 ms and must not wait on a photo, so the green stands in until the court fades up. */
-
-  /* 1. Loading: the paper, the mark, a 32 px ring, one mono line. Reduced motion turns the ring slowly: it never stops. */
-  .loading-screen { position: fixed; top: 0; bottom: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: var(--paper); transition: opacity 0.4s ease; }   /* left and right: the column's gutter, set with the other fixed chrome */
-  .loading-screen.hidden { opacity: 0; pointer-events: none; }
-  .loading-mark { display: block; width: 52px; height: 52px; margin: 0 0 26px; border-radius: 13px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
-  .loading-spinner { width: 32px; height: 32px; border: 3px solid var(--hair); border-top-color: var(--green-ink); border-radius: 50%; animation: spin 0.8s linear infinite; }
-  .loading-text { margin-top: 18px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--grey); }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { .loading-spinner { animation-duration: 3s; } }
-
-  /* 2. Sign in. The screen behind the card (a wide window) is the cover's last colour; the card is the paper; the hero is --hero with the
-     court photo over it under a scrim (a mask of the cover's last colour: the plain photo, not graded). */
-  .signin-screen { display: none; position: fixed; inset: 0; z-index: 900; overflow-y: auto; background: var(--hero-end); }
-  .signin-screen.visible { display: block; }
-  .signin-card { display: flex; flex-direction: column; width: 100%; max-width: 460px; min-height: 100%; margin: 0 auto; background: var(--paper); }
-  /* ⚠️ The copy is pushed down by margin-top:auto inside a padded flex column, NOT anchored with `bottom`: a short screen makes a short
-     hero and a bottom-anchored block then starts wherever it lands (the logo once sat 22 px from the top of a 667 px phone, under the
-     status bar). The padding is the floor. 296 px is what the block needs, raised from 264 when the mantra's second line joined it. */
-  .si-hero { position: relative; flex: 0 0 auto; overflow: hidden; display: flex; flex-direction: column; height: clamp(296px, 42vh, 380px);
-    padding: calc(env(safe-area-inset-top, 0px) + 44px) 26px 52px; background: var(--hero); }
-  .si-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .55s cubic-bezier(.16,1,.3,1); }
-  .si-hero-img.in { opacity: 1; }
-  .si-hero-scrim { position: absolute; inset: 0; background: var(--hero-end);
-    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,.96) 6%, rgba(0,0,0,.4) 56%, rgba(0,0,0,.52));
-            mask-image: linear-gradient(to top, rgba(0,0,0,.96) 6%, rgba(0,0,0,.4) 56%, rgba(0,0,0,.52)); }
-  .si-hero-copy { position: relative; z-index: 2; margin-top: auto; }
-  .signin-mark { display: block; width: 52px; height: 52px; margin: 0 0 16px; border-radius: 13px; box-shadow: 0 8px 24px rgba(0,0,0,.34); }
-  /* the mint-dot eyebrow, as every cover's (Space Mono capitals, a 7 px mint dot, white-ish text) */
-  .si-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase;
-    color: rgba(255,255,255,.88); }
-  .si-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
-  .signin-title { margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display); line-height: .92; letter-spacing: .005em; text-transform: uppercase;
-    color: var(--on-accent); }
-  .signin-title em { font-style: normal; color: var(--clay-on-green); }   /* the brand line: clay on the green */
-  /* The other half of the mantra belongs WITH the first half (Amir, 2026-09-12). Barlow, not Condensed: a second line of condensed
-     capitals under a 44 px condensed headline competes with it instead of answering it. */
-  .si-mantra { margin: 13px 0 0; font-family: 'Barlow', sans-serif; font-size: var(--fs-lead); font-weight: 400; line-height: 1.38; letter-spacing: .01em; color: rgba(255,255,255,.8); }
-  /* the sheet: the paper, its top corners the app's one sheet's (#hist-overlay .readiness-modal, 16 px) */
-  .si-sheet { position: relative; z-index: 2; flex: 1 1 auto; display: flex; flex-direction: column; margin-top: -30px; padding: 30px 26px 26px;
-    border-radius: 16px 16px 0 0; background: var(--paper); }
-  .signin-f { display: block; margin-bottom: 15px; }
-  .signin-f > span { display: block; margin-bottom: 7px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .13em; text-transform: uppercase; color: var(--grey); }
-  /* the set table's box (and the Library's search box): white, edged --field, 16 px (an iPhone zooms the page under that), 48 px tall, a 10 px radius; focus is green */
-  .signin-f input { display: block; width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--field); border-radius: 10px; background: var(--row); color: var(--ink);
-    font: 500 var(--fs-field)/1.2 'Barlow', sans-serif; outline: none; -webkit-appearance: none; appearance: none; transition: border-color .35s cubic-bezier(.16,1,.3,1); }
-  .signin-f input:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
-  /* a password manager's fill keeps the box's own colours (the browser paints a pale blue or yellow over them) */
-  .signin-f input:-webkit-autofill { -webkit-box-shadow: 0 0 0 100px var(--row) inset; -webkit-text-fill-color: var(--ink); caret-color: var(--ink); }
-  /* Reveal toggle. The input gains room on the right so revealed text never runs under the button; 48 px of target. */
-  .signin-f .si-wrap { position: relative; }
-  .signin-f .si-wrap input { padding-right: 52px; }
-  .si-eye { position: absolute; top: 0; right: 0; display: flex; align-items: center; justify-content: center; width: 48px; height: 100%; padding: 0; border: 0; background: none;
-    color: var(--grey); cursor: pointer; -webkit-tap-highlight-color: transparent; }
-  .si-eye:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -4px; border-radius: 0 10px 10px 0; }
-  .si-eye svg { display: block; width: 20px; height: 20px; }
-  .si-eye .si-eye-slash { display: none; }
-  .si-eye.on { color: var(--green-ink); }
-  .si-eye.on .si-eye-slash { display: block; }
-  /* the one primary button: its look is the list in ONE PRIMARY BUTTON; here its size and place */
-  .signin-go { display: block; width: 100%; min-height: 52px; margin-top: 6px; padding: 16px; font-size: var(--fs-body); transition: transform .35s cubic-bezier(.16,1,.3,1); }
-  .signin-go:active { transform: translateY(1px); }
-  .signin-go:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
-  .signin-go[disabled] { opacity: .6; cursor: default; box-shadow: none; }
-  /* the error line is the day's banner: a white row, a 4 px clay stripe at the left, the words in ink (no tinted box, no clay text) */
-  .signin-err { margin-top: 13px; padding: 12px 14px 12px 18px; border: 1px solid var(--hair); border-radius: 10px; background: var(--row); box-shadow: inset 4px 0 0 var(--clay-fill);
-    font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
-  .signin-help { margin: 16px 0 0; font-size: var(--fs-small); line-height: 1.5; text-align: center; color: var(--grey); }
-  /* the link is a 44 px target that takes no room: padding out, margin back in */
-  .signin-help a { display: inline-block; margin: -13px 0; padding: 13px 2px; color: var(--green-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-  .signin-help a:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; border-radius: 4px; }
-  /* Anchors the bottom of the sheet: without it a tall phone leaves ~200 px of bare paper under the help line, which reads as unfinished. */
-  .signin-foot { margin: auto 0 0; padding-top: 22px; text-align: center; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--grey); }
-
-  /* 3. Welcome, shown once after a new athlete's first sign-in. A cover (the picture graded into --hero exactly as the archive's is: luminosity,
-     masked from the left, a scrim to the cover's last colour), the glass ✕ (the archive's ←, mirrored), a paper sheet at the app's sheet radius
-     with his two lines, his signature (the week note's) and the primary button. It sits in the app's column on a wide window, as every layer does. */
-  .wel { position: fixed; top: 0; bottom: 0; left: var(--app-gutter); right: var(--app-gutter); z-index: 200; display: flex; flex-direction: column; overflow-y: auto; background: var(--paper);
-    animation: fadeUp 0.35s ease both; }
-  .wel-hero { position: relative; isolation: isolate; flex: none; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; min-height: clamp(220px, 38vh, 380px);
-    padding: calc(env(safe-area-inset-top, 0px) + 64px) var(--g) 48px; background: var(--hero); color: var(--on-accent); }
-  .wel-img { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 84% 14%; background: transparent; mix-blend-mode: luminosity;
-    opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
-            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
-  .wel-img.in { opacity: .7; }
-  .wel-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
-  .wel-copy { position: relative; z-index: 2; }
-  .wel-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
-  .wel-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
-  .wel-title { margin: 10px 0 0; max-width: 340px;
-    font: 900 clamp(32px, 10vw, 44px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the welcome, 32 to 44 px */
-    letter-spacing: .3px; text-transform: uppercase; color: var(--on-accent); text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
-  .wel-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 8px); right: 8px; z-index: 3; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0;
-    border-radius: 50%; cursor: pointer; color: var(--on-accent); background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-    font: 500 var(--fs-lead)/1 'Barlow', sans-serif; -webkit-tap-highlight-color: transparent; }
-  .wel-x:active { transform: scale(0.92); }
-  .wel-x:focus-visible { outline: 2px solid var(--on-accent); outline-offset: 2px; }
-  .wel-sheet { position: relative; z-index: 2; flex: 1 0 auto; margin-top: -30px; padding: 26px var(--g) calc(env(safe-area-inset-bottom, 0px) + 22px); border-radius: 16px 16px 0 0; background: var(--paper); }
-  .wel-sheet p { margin: 0 0 10px; font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
-  .wel-sheet p.sub { font-size: var(--fs-small); color: var(--grey); }
-  .wel-sheet .wn-sign { margin-top: 12px; }
-  .wel-go { display: block; width: 100%; min-height: 52px; margin-top: 18px; padding: 0 16px; font-size: var(--fs-lead); }   /* look: the one primary button */
-  .wel-skip { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 0 12px; border: 0; background: none; color: var(--green-ink); cursor: pointer;
-    font: 600 var(--fs-body)/1 'Barlow', sans-serif; }
-  .wel-go:focus-visible, .wel-skip:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
-
-  /* 4. Error (showError()): the paper, the icon in clay (an error is "look here"), the title in ink, the words in ink, then the primary button and its
-     outlined twin (the Guided footer's Next → look: green-ink text, the box edge). The primary's look is the list in ONE PRIMARY BUTTON. */
-  .error-screen { position: fixed; top: 0; bottom: 0; z-index: 9998; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px var(--g); background: var(--paper); }
-  .error-screen.visible { display: flex; }
-  .error-icon { margin-bottom: 16px; color: var(--clay-big); }   /* a 46 px drawn icon, not text: it keeps the brand clay */
-  .error-icon svg { display: block; width: 46px; height: 46px; }
-  .error-title { margin: 0 0 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-head); line-height: 1; text-transform: uppercase; text-align: center; color: var(--ink); }
-  .error-msg { max-width: 340px; font: 400 var(--fs-body)/1.6 'Barlow', sans-serif; text-align: center; color: var(--ink); text-wrap: pretty; }
-  .error-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; margin-top: 24px; }
-  .error-actions:empty { display: none; }
-  .error-btn { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; font-size: var(--fs-body); text-align: center; text-decoration: none; }
-  .error-btn.ghost { background: transparent; color: var(--green-ink); box-shadow: inset 0 0 0 1.5px var(--field); }
-  .error-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
-
   /* ══ HIGHLIGHT REEL (2026-10-17) ════════════════════════════════════════════════════════════════════════════════════════════
      Amir approved the design page (https://claude.ai/artifact/SuyYRPeX9n2SdbiUvoHhkF, "go with your picks"): a share card for each win,
      drawn on the phone by assets/js/sharecard.js, and a celebration where each win already shows. Five places: (1) the finished card's
@@ -4914,6 +4783,140 @@
     .hl-m-burst { display: none; }
     .hl-tg i, .hl-tg i::after, .hl-prev .hl-img { transition: none; }
   }
+
+  /* ══ SIGN-IN, WELCOME, LOADING AND ERROR IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════
+     Amir, 2026-10-13: "continue until everything has a consistent design". The four screens a person sees before or around their
+     first plan wear Centre Court's look: Loading (the mark, a ring, one mono line, on the paper) · Sign in ("Baseline", Amir's pick of
+     2026-09-12, kept: the court photo under its scrim, the mark, the headline with its clay COACH, the mantra, the paper sheet
+     rising over it, the help line and the footer; now the mint-dot eyebrow, the sheet at the app's sheet radius, the set table's boxes
+     and the day's banner for an error) · Welcome (a cover: the picture graded into --hero as every other cover does it, the
+     glass ✕, a sheet on the paper, Amir's signature under his two lines, the one primary button) · Error (the paper, a clay icon, an ink
+     title, the primary button and its outlined twin). Behaviour is untouched: every id, handler, autocomplete name, the eye, the
+     retry, showError()'s titles, icons, words and buttons, the Welcome's three ways out and the phone's Back.
+     Colours are the app's ONE set (THE APP'S ONE COLOUR SET, on body); none is declared here and none is hard-coded except the
+     white of a text on the green and a mask's alpha. The gutter is --g. Font sizes are the --fs-* tokens, or a display size with its
+     comment. ⚠️ The sign-in hero is a background COLOUR (the cover's --hero) with the <img> over it, never a background-image: the
+     form paints from markup in ~47 ms and must not wait on a photo, so the green stands in until the court fades up. */
+
+  /* 1. Loading: the paper, the mark, a 32 px ring, one mono line. Reduced motion turns the ring slowly: it never stops. */
+  .loading-screen { position: fixed; top: 0; bottom: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--paper); transition: opacity 0.4s ease; }   /* left and right: the column's gutter, set with the other fixed chrome */
+  .loading-screen.hidden { opacity: 0; pointer-events: none; }
+  .loading-mark { display: block; width: 52px; height: 52px; margin: 0 0 26px; border-radius: 13px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+  .loading-spinner { width: 32px; height: 32px; border: 3px solid var(--hair); border-top-color: var(--green-ink); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .loading-text { margin-top: 18px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--grey); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .loading-spinner { animation-duration: 3s; } }
+
+  /* 2. Sign in. The screen behind the card (a wide window) is the cover's last colour; the card is the paper; the hero is --hero with the
+     court photo over it under a scrim (a mask of the cover's last colour: the plain photo, not graded). */
+  .signin-screen { display: none; position: fixed; inset: 0; z-index: 900; overflow-y: auto; background: var(--hero-end); }
+  .signin-screen.visible { display: block; }
+  .signin-card { display: flex; flex-direction: column; width: 100%; max-width: 460px; min-height: 100%; margin: 0 auto; background: var(--paper); }
+  /* ⚠️ The copy is pushed down by margin-top:auto inside a padded flex column, NOT anchored with `bottom`: a short screen makes a short
+     hero and a bottom-anchored block then starts wherever it lands (the logo once sat 22 px from the top of a 667 px phone, under the
+     status bar). The padding is the floor. 296 px is what the block needs, raised from 264 when the mantra's second line joined it. */
+  .si-hero { position: relative; flex: 0 0 auto; overflow: hidden; display: flex; flex-direction: column; height: clamp(296px, 42vh, 380px);
+    padding: calc(env(safe-area-inset-top, 0px) + 44px) 26px 52px; background: var(--hero); }
+  .si-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .55s cubic-bezier(.16,1,.3,1); }
+  .si-hero-img.in { opacity: 1; }
+  .si-hero-scrim { position: absolute; inset: 0; background: var(--hero-end);
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,.96) 6%, rgba(0,0,0,.4) 56%, rgba(0,0,0,.52));
+            mask-image: linear-gradient(to top, rgba(0,0,0,.96) 6%, rgba(0,0,0,.4) 56%, rgba(0,0,0,.52)); }
+  .si-hero-copy { position: relative; z-index: 2; margin-top: auto; }
+  .signin-mark { display: block; width: 52px; height: 52px; margin: 0 0 16px; border-radius: 13px; box-shadow: 0 8px 24px rgba(0,0,0,.34); }
+  /* the mint-dot eyebrow, as every cover's (Space Mono capitals, a 7 px mint dot, white-ish text) */
+  .si-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,.88); }
+  .si-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .signin-title { margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display); line-height: .92; letter-spacing: .005em; text-transform: uppercase;
+    color: var(--on-accent); }
+  .signin-title em { font-style: normal; color: var(--clay-on-green); }   /* the brand line: clay on the green */
+  /* The other half of the mantra belongs WITH the first half (Amir, 2026-09-12). Barlow, not Condensed: a second line of condensed
+     capitals under a 44 px condensed headline competes with it instead of answering it. */
+  .si-mantra { margin: 13px 0 0; font-family: 'Barlow', sans-serif; font-size: var(--fs-lead); font-weight: 400; line-height: 1.38; letter-spacing: .01em; color: rgba(255,255,255,.8); }
+  /* the sheet: the paper, its top corners the app's one sheet's (#hist-overlay .readiness-modal, 16 px) */
+  .si-sheet { position: relative; z-index: 2; flex: 1 1 auto; display: flex; flex-direction: column; margin-top: -30px; padding: 30px 26px 26px;
+    border-radius: 16px 16px 0 0; background: var(--paper); }
+  .signin-f { display: block; margin-bottom: 15px; }
+  .signin-f > span { display: block; margin-bottom: 7px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .13em; text-transform: uppercase; color: var(--grey); }
+  /* the set table's box (and the Library's search box): white, edged --field, 16 px (an iPhone zooms the page under that), 48 px tall, a 10 px radius; focus is green */
+  .signin-f input { display: block; width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--field); border-radius: 10px; background: var(--row); color: var(--ink);
+    font: 500 var(--fs-field)/1.2 'Barlow', sans-serif; outline: none; -webkit-appearance: none; appearance: none; transition: border-color .35s cubic-bezier(.16,1,.3,1); }
+  .signin-f input:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
+  /* a password manager's fill keeps the box's own colours (the browser paints a pale blue or yellow over them) */
+  .signin-f input:-webkit-autofill { -webkit-box-shadow: 0 0 0 100px var(--row) inset; -webkit-text-fill-color: var(--ink); caret-color: var(--ink); }
+  /* Reveal toggle. The input gains room on the right so revealed text never runs under the button; 48 px of target. */
+  .signin-f .si-wrap { position: relative; }
+  .signin-f .si-wrap input { padding-right: 52px; }
+  .si-eye { position: absolute; top: 0; right: 0; display: flex; align-items: center; justify-content: center; width: 48px; height: 100%; padding: 0; border: 0; background: none;
+    color: var(--grey); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .si-eye:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -4px; border-radius: 0 10px 10px 0; }
+  .si-eye svg { display: block; width: 20px; height: 20px; }
+  .si-eye .si-eye-slash { display: none; }
+  .si-eye.on { color: var(--green-ink); }
+  .si-eye.on .si-eye-slash { display: block; }
+  /* the one primary button: its look is the list in ONE PRIMARY BUTTON; here its size and place */
+  .signin-go { display: block; width: 100%; min-height: 52px; margin-top: 6px; padding: 16px; font-size: var(--fs-body); transition: transform .35s cubic-bezier(.16,1,.3,1); }
+  .signin-go:active { transform: translateY(1px); }
+  .signin-go:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .signin-go[disabled] { opacity: .6; cursor: default; box-shadow: none; }
+  /* the error line is the day's banner: a white row, a 4 px clay stripe at the left, the words in ink (no tinted box, no clay text) */
+  .signin-err { margin-top: 13px; padding: 12px 14px 12px 18px; border: 1px solid var(--hair); border-radius: 10px; background: var(--row); box-shadow: inset 4px 0 0 var(--clay-fill);
+    font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .signin-help { margin: 16px 0 0; font-size: var(--fs-small); line-height: 1.5; text-align: center; color: var(--grey); }
+  /* the link is a 44 px target that takes no room: padding out, margin back in */
+  .signin-help a { display: inline-block; margin: -13px 0; padding: 13px 2px; color: var(--green-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  .signin-help a:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; border-radius: 4px; }
+  /* Anchors the bottom of the sheet: without it a tall phone leaves ~200 px of bare paper under the help line, which reads as unfinished. */
+  .signin-foot { margin: auto 0 0; padding-top: 22px; text-align: center; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--grey); }
+
+  /* 3. Welcome, shown once after a new athlete's first sign-in. A cover (the picture graded into --hero exactly as the archive's is: luminosity,
+     masked from the left, a scrim to the cover's last colour), the glass ✕ (the archive's ←, mirrored), a paper sheet at the app's sheet radius
+     with his two lines, his signature (the week note's) and the primary button. It sits in the app's column on a wide window, as every layer does. */
+  .wel { position: fixed; top: 0; bottom: 0; left: var(--app-gutter); right: var(--app-gutter); z-index: 200; display: flex; flex-direction: column; overflow-y: auto; background: var(--paper);
+    animation: fadeUp 0.35s ease both; }
+  .wel-hero { position: relative; isolation: isolate; flex: none; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; min-height: clamp(220px, 38vh, 380px);
+    padding: calc(env(safe-area-inset-top, 0px) + 64px) var(--g) 48px; background: var(--hero); color: var(--on-accent); }
+  .wel-img { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 84% 14%; background: transparent; mix-blend-mode: luminosity;
+    opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
+  .wel-img.in { opacity: .7; }
+  .wel-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  .wel-copy { position: relative; z-index: 2; }
+  .wel-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
+  .wel-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .wel-title { margin: 10px 0 0; max-width: 340px;
+    font: 900 clamp(32px, 10vw, 44px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the welcome, 32 to 44 px */
+    letter-spacing: .3px; text-transform: uppercase; color: var(--on-accent); text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+  .wel-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 8px); right: 8px; z-index: 3; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0;
+    border-radius: 50%; cursor: pointer; color: var(--on-accent); background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    font: 500 var(--fs-lead)/1 'Barlow', sans-serif; -webkit-tap-highlight-color: transparent; }
+  .wel-x:active { transform: scale(0.92); }
+  .wel-x:focus-visible { outline: 2px solid var(--on-accent); outline-offset: 2px; }
+  .wel-sheet { position: relative; z-index: 2; flex: 1 0 auto; margin-top: -30px; padding: 26px var(--g) calc(env(safe-area-inset-bottom, 0px) + 22px); border-radius: 16px 16px 0 0; background: var(--paper); }
+  .wel-sheet p { margin: 0 0 10px; font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .wel-sheet p.sub { font-size: var(--fs-small); color: var(--grey); }
+  .wel-sheet .wn-sign { margin-top: 12px; }
+  .wel-go { display: block; width: 100%; min-height: 52px; margin-top: 18px; padding: 0 16px; font-size: var(--fs-lead); }   /* look: the one primary button */
+  .wel-skip { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 0 12px; border: 0; background: none; color: var(--green-ink); cursor: pointer;
+    font: 600 var(--fs-body)/1 'Barlow', sans-serif; }
+  .wel-go:focus-visible, .wel-skip:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+
+  /* 4. Error (showError()): the paper, the icon in clay (an error is "look here"), the title in ink, the words in ink, then the primary button and its
+     outlined twin (the Guided footer's Next → look: green-ink text, the box edge). The primary's look is the list in ONE PRIMARY BUTTON. */
+  .error-screen { position: fixed; top: 0; bottom: 0; z-index: 9998; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px var(--g); background: var(--paper); }
+  .error-screen.visible { display: flex; }
+  .error-icon { margin-bottom: 16px; color: var(--clay-big); }   /* a 46 px drawn icon, not text: it keeps the brand clay */
+  .error-icon svg { display: block; width: 46px; height: 46px; }
+  .error-title { margin: 0 0 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-head); line-height: 1; text-transform: uppercase; text-align: center; color: var(--ink); }
+  .error-msg { max-width: 340px; font: 400 var(--fs-body)/1.6 'Barlow', sans-serif; text-align: center; color: var(--ink); text-wrap: pretty; }
+  .error-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; margin-top: 24px; }
+  .error-actions:empty { display: none; }
+  .error-btn { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; font-size: var(--fs-body); text-align: center; text-decoration: none; }
+  .error-btn.ghost { background: transparent; color: var(--green-ink); box-shadow: inset 0 0 0 1.5px var(--field); }
+  .error-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -5226,6 +5229,9 @@
     <!-- The week is done: one short extra from the Library, until it has been opened (LIB-01, paintWeekSugg()) -->
     <div id="home-sugg-wrap"></div>
 
+    <!-- Hold Serve (Career Mode, 2026-10-17): the training weeks held in a row, one door row (paintHold()). Empty when there is
+         nothing true to say: offline, the demo, the coach's preview, no rulebook on the server, or a week not judged yet. -->
+    <div id="home-hold-wrap"></div>
     <!-- Daily habits — one row, AA Proof's verdict for today and the streak (HOME-02). Training comes first (2026-09-26:
          Amir left the order to the audit's call). It sat ABOVE the week from
          2026-09-12, and in the fortnight after, 5 of 40 athletes logged a habit
@@ -5648,6 +5654,8 @@ function _snapshot() {
     if (k === prefix + 'csq' || k === prefix + 'autofiled') continue;
     // The finish card's New best and Retest bands (Highlight Reel): this phone's view of a session it finished, never progress.
     if (k && k.indexOf(prefix + 'hlwin_d') === 0) continue;
+    // Hold Serve's copy of the server's held weeks (Career Mode): a cache of the server's facts, never progress.
+    if (k === prefix + 'holdcache') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -6138,7 +6146,7 @@ async function _replayQueue() {
     for (const entry of _csqLoad()) {
       // Replaced by a newer save while this loop waited on the network: that one is sent by its own save.
       if (!_csqLoad().some(e => _csqId(e) === _csqId(entry))) continue;
-      if (await _sendSession(sb, entry)) { _dequeueSession(entry); _paintSent(entry); }
+      if (await _sendSession(sb, entry)) { _dequeueSession(entry); _paintSent(entry); refreshHoldSoon(); }
     }
   } finally { _replaying = false; }
 }
@@ -6666,6 +6674,9 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   // The Card Remembers: paint last time from the phone's copy now, then refresh
   // it from the server. Never blocks the first paint.
   loadHistory();
+  // Hold Serve (Career Mode): the phone's copy now (paintWeek() below draws it), then the server's held weeks behind the first paint.
+  loadHoldCache();
+  refreshHold();
   // The Spine: cues and the ⓘ from the phone's copy now, then from the server.
   paintSpine();
   paintDayQualities();
@@ -8164,6 +8175,7 @@ function paintWeek() {
   markSuggestedDay();
   paintCycleCard();   // the history may just have arrived (the card is on Progress)
   paintBetweenFold();
+  paintHold();        // Hold Serve's next step follows the week's count (and between cycles, its count waits)
   if (cycleOver()) {   // between cycles (PROG-02): no week to count, so no week-done extra either
     const sg = document.getElementById('home-sugg-wrap');
     if (sg) sg.innerHTML = '';
@@ -9560,7 +9572,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then <strong>Hold Serve</strong> (the weeks you've held in a row), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -9582,6 +9594,8 @@ const APP_GUIDE = [
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
     body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
+  { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks held in a row',
+    body: `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions don't.</p><p>Hold weeks in a row and the number on Home goes up. The dots are those weeks, and the dashed one is this week. The line under the number says what's left this week. Miss a week and the count starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
     body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
@@ -10060,9 +10074,163 @@ function hrowIc(kind) {
     plus: '<path d="M12 5v14M5 12h14"/>',
     weight: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 10.5a4.5 4.5 0 0 1 8 0"/><path d="M12 10.5l1.7-2"/>',
     why: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.4a2.6 2.6 0 1 1 3.9 2.2c-.9.5-1.4 1.1-1.4 2"/><path d="M12 16.9h.01"/>',
+    ball: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3.2 3.2 3.2 9.6 0 12.8"/><path d="M18.4 5.6c-3.2 3.2-3.2 9.6 0 12.8"/>',
   }[kind] || '';
   return `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${draw}</svg></span>`;
 }
+
+// ── HOLD SERVE: THE TRAINING WEEKS HELD IN A ROW (Career Mode phase 1, 2026-10-17) ──────────────────────────────────────────────
+// career/CAREER_MODE.md → Consistency, and the Build order's row 1: the one piece of Career Mode an athlete sees in phase 1. Display
+// only: nothing is written and nothing pays XP. The server judges every training week (supabase/stage66_career_mode.sql,
+// career_derive()) and writes a week_held or a week_broken fact; the athlete reads their own through row-level security. One small
+// read, never get_profile(), which works out the whole career (up to 1.5 s) and writes as it goes.
+// holdCount() counts them the way get_profile() does: a TWIN of its loop (scripts/check_twins.js runs scripts/career/hold_cases.json,
+// and scripts/career/rehearse.mjs holds the two equal on every athlete it builds). Change one, change the other.
+// The server judges a week only when something makes it look (a session saved, a programme change, a profile read). A week that ended
+// unheld with nothing saved since has no fact yet, so the newest held week would still look like the latest: when the training week
+// after it has ended (its last day is past), holdState() says nothing until a save brings the facts up to date. A week Amir paused
+// has no fact either, and the phone cannot tell the two apart, so it never guesses.
+// Nothing shows offline (no answer this visit), in the demo, in the coach's preview, with no rulebook on the server, or for a current
+// cycle with no dates (the server has no training week for it). <id>_holdcache keeps the last answer on this phone, never synced, so
+// Home has the row at once on the next open; the read that follows confirms it or takes it away.
+// `var`, not `let`: boot() can reach paintWeek() before the script has evaluated this far, and a `let` read then throws (SPINE's lesson).
+var HOLD = null;            // { facts: [{ kind, day, value: { cycle, week } }] }, in the server's order (day, ref); null = nothing to show
+var _holdAt = 0, _holdBusy = false, _holdSoonT = null;
+function holdKey() { return ATHLETE_ID + '_holdcache'; }
+// The weeks held in a row now, the best run, and the newest fact. TWIN of get_profile()'s loop: in order, a held week adds one and a
+// broken week starts again from zero.
+function holdCount(facts) {
+  let now = 0, best = 0, last = null;
+  (facts || []).forEach(f => {
+    if (!f || (f.kind !== 'week_held' && f.kind !== 'week_broken')) return;
+    if (f.kind === 'week_held') { now += 1; best = Math.max(best, now); } else now = 0;
+    last = f;
+  });
+  return { now, best, last };
+}
+// A cycle's number as the server reads it (career_weeks(): its `num` when that is a whole number, else its place from 1).
+function holdCycleNum(c, i) {
+  const v = c && c.num;
+  const n = typeof v === 'number' ? v : (typeof v === 'string' && /^\s*[+-]?(\d+(\.\d*)?|\.\d+)\s*$/.test(v) ? Number(v) : NaN);
+  return Number.isFinite(n) && Math.trunc(n) === n ? n : i + 1;
+}
+// Every training week the server judges, in its order: career_weeks(), the published cycles with dates, cycleWeekInfo()'s weeks
+// (7 days from startDate + (k − 1) × 7, the last one cut at endDate). Day numbers as cycleDayNo() counts them.
+function holdWeeks(cycles, cci) {
+  const out = [];
+  (cycles || []).forEach((c, i) => {
+    if (!c || i > cci || !c.startDate || !c.endDate) return;
+    const s = cycleDayNo(c.startDate), e = cycleDayNo(c.endDate);
+    if (isNaN(s) || isNaN(e) || e < s) return;
+    const num = holdCycleNum(c, i), total = Math.max(1, Math.round((e - s) / 7));
+    for (let k = 1; k <= total; k++) out.push({ num, wk: k, from: s + 7 * (k - 1), to: Math.min(s + 7 * k - 1, e), i });
+  });
+  return out.sort((a, b) => a.from - b.from || a.i - b.i);
+}
+// What the row says, or null for nothing: { now, best, held, done, total } in a week of the cycle, { now, best, carry } between cycles
+// or before this one starts (the count waits, it is not lost).
+function holdState() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !HOLD || !DATA) return null;
+  const cycles = Array.isArray(DATA.cycles) ? DATA.cycles : [];
+  const cci = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+  const cur = cycles[cci], w = cycleWeekInfo(cur);
+  if (!w) return null;
+  const { now, best, last } = holdCount(HOLD.facts);
+  const lv = (last && last.value) || {};
+  if (last && last.kind === 'week_held') {
+    const weeks = holdWeeks(cycles, cci);
+    const at = weeks.findIndex(x => x.num === Number(lv.cycle) && x.wk === Number(lv.week));
+    if (at < 0 || (weeks[at + 1] && weeks[at + 1].to < todayDayNo())) return null;   // not sure yet (above)
+  }
+  if (w.after || w.before) {
+    if (!now) return null;
+    const n = w.after ? cci + 2 : cci + 1;   // the app's own "Cycle N" (betweenCyclesHTML(): its place in the roadmap)
+    return { now, best, carry: (w.after && !cycles[cci + 1]) ? '' : 'Cycle ' + n };
+  }
+  const ids = ((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id));
+  if (!ids.length) return null;
+  const doneSet = weekDoneDays();
+  const done = ids.filter(id => doneSet.has(id)).length;
+  const held = !!(last && last.kind === 'week_held' && Number(lv.cycle) === holdCycleNum(cur, cci) && Number(lv.week) === w.wk);
+  return { now, best, held, done, total: ids.length };
+}
+// The weeks in a row as dots, this week as a dashed ring while it is open (up to five in all).
+function holdDots(n, open) {
+  const k = Math.min(n, open ? 4 : 5), all = k + (open ? 1 : 0);
+  let s = '', x = 6 + (5 - all) * 12;
+  for (let i = 0; i < k; i++) { s += `<circle cx="${x}" cy="12" r="4.5" fill="currentColor"/>`; x += 12; }
+  if (open) s += `<circle cx="${x}" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2.2 2"/>`;
+  return `<svg class="nc-spark" viewBox="0 0 60 24" aria-hidden="true">${s}</svg>`;
+}
+// The row (Amir's words, 2026-10-17). The big line is the count, the small line the next step. A tap opens the guide's Hold Serve card.
+function holdRowHTML(st) {
+  if (!st) return '';
+  const NB = '&nbsp;';
+  const big = !st.now ? 'Hold this week' : st.now === 1 ? '1 week held' : `${st.now} weeks in a row`;
+  let small, open = false;
+  if (st.carry != null) small = st.carry ? `It carries into ${st.carry.replace(' ', NB)}` : 'It carries into your next cycle';
+  else if (st.held) small = 'This week is held';
+  else {
+    open = true;
+    const left = st.total - st.done;
+    if (left <= 0) small = `All ${st.total} done this week`;   // finished here, not on the server yet: its answer comes after the save
+    else if (st.now) small = (st.done ? `${left} more this week` : `Do all ${st.total} this week`) + ` to make it${NB}${st.now + 1}`;
+    else small = st.done ? `${left} more session${left === 1 ? '' : 's'} this week to hold it` : `Do all ${st.total} sessions this week to hold it`;
+  }
+  const dots = st.now ? `<span class="hrow-sp" aria-hidden="true">${holdDots(st.now, open)}</span>` : '';
+  return `<button type="button" class="hrow hold-row" onclick="openHelp('hold')">
+    ${hrowIc('ball')}<span class="hrow-b"><span class="hrow-l">Hold Serve</span>
+      <span class="hrow-v${st.held ? ' is-ok' : ''}"><span class="hrow-vv">${big}</span><small>${small}</small></span></span>
+    ${dots}<span class="hrow-a" aria-hidden="true">›</span></button>`;
+}
+function paintHold() {
+  const el = document.getElementById('home-hold-wrap');
+  if (!el) return;
+  let h = '';
+  try { h = holdRowHTML(holdState()); } catch (e) { h = ''; }   // never let the row stop Home
+  if (el.innerHTML !== h) el.innerHTML = h;
+}
+// The last answer this phone had, painted at once on open, unless the app already knows it has no signal.
+function loadHoldCache() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
+  if (navigator.onLine === false || (PLAN_OFFLINE && !PLAN_OFFLINE.fast)) return;
+  try {
+    const o = JSON.parse(localStorage.getItem(holdKey()) || 'null');
+    if (o && Array.isArray(o.facts)) HOLD = { facts: o.facts };
+  } catch (e) { /* no copy yet */ }
+}
+// Ask the server. A real answer replaces the row (and the copy); no answer takes the row away and keeps the copy for next time;
+// a refusal, or no rulebook (Career Mode switched off), takes both away.
+async function refreshHold() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || _holdBusy) return;
+  _holdBusy = true;
+  try {
+    const sb = await _sbReady();
+    if (!sb) { HOLD = null; return; }
+    const [r, f] = await Promise.all([
+      _withTimeout(sb.from('career_rules').select('version').order('version', { ascending: false }).limit(1), 8000),
+      _withTimeout(sb.from('career_facts').select('kind,ref,day,value').eq('athlete_id', ATHLETE_ID)
+        .in('kind', ['week_held', 'week_broken']).is('void_at', null).order('day').order('ref'), 8000)
+    ]);
+    if (_noAnswer(r) || _noAnswer(f)) { HOLD = null; return; }
+    if (r.error || f.error || !Array.isArray(r.data) || !r.data.length || !Array.isArray(f.data)) {
+      HOLD = null;
+      try { _lsRawRemove(holdKey()); } catch (e) {}
+      return;
+    }
+    const facts = f.data.map(x => ({ kind: x.kind, day: x.day, value: { cycle: x.value && x.value.cycle, week: x.value && x.value.week } }));
+    HOLD = { facts };
+    _holdAt = Date.now();
+    try { _lsRawSet(holdKey(), JSON.stringify({ t: new Date().toISOString(), facts })); } catch (e) { /* storage full: shown this visit */ }
+  } catch (e) { HOLD = null; }
+  finally { _holdBusy = false; paintHold(); }
+}
+// After a session reaches the server (its trigger has judged the week by the time save_session answers), and back in the foreground
+// or online after ten minutes or more.
+function refreshHoldSoon() { clearTimeout(_holdSoonT); _holdSoonT = setTimeout(refreshHold, 400); }
+function refreshHoldIfOld() { if (Date.now() - _holdAt > 10 * 60000) refreshHoldSoon(); }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && typeof DATA !== 'undefined' && DATA) refreshHoldIfOld(); });
+window.addEventListener('online', () => { if (typeof DATA !== 'undefined' && DATA) refreshHoldIfOld(); });
 
 // ── PERSONAL RECORDS — the row on Progress + its own screen ───────────────────
 // Same grammar as the habit row above: one tappable row (the best lift, its
@@ -13625,7 +13793,7 @@ async function recordSessionToCloud(day) {
   const entry = _enqueueSession(base);       // on the phone first: nothing below can lose it
   const sb = _sb();
   if (!sb || !entry) return;                 // no library yet: the queue sends it at the next chance
-  if (await _sendSession(sb, entry)) { _dequeueSession(entry); _paintSent(entry); }
+  if (await _sendSession(sb, entry)) { _dequeueSession(entry); _paintSent(entry); refreshHoldSoon(); }
 }
 
 // Tiny helper: HH:MM in the user's locale (e.g. "2:14 PM")

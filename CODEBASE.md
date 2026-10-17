@@ -160,7 +160,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Highlight Reel, share cards for a win (2026-10-17).** `assets/js/sharecard.js` (`window.ShareCard`, precached by `sw.js`, loaded by
   `hlLib()` the first time a card is drawn) paints a 1080 × 1920 Story or 1080 × 1350 post on a canvas, in English or Farsi (every Farsi
   word in its one `FA` table, drafts for Amir). program.html decides which wins and which numbers (the HIGHLIGHT REEL block at the end of
-  the main script, and its CSS block at the end of the stylesheet): the finish card's New best and Retest beaten bands (`collectWins()`,
+  the main script, and its CSS block just above the sign-in block, which stays the last in the sheet): the finish card's New best and Retest beaten bands (`collectWins()`,
   `<id>_hlwin_d<N>`, raw and never synced), This cycle's *Share a win ›* and *Share your cycle*, the one-time Cycle complete / Roadmap
   complete moment (`maybeHighlightMoment()`, `<id>_hl_seen`, synced), Share in Personal Records, and the share sheet
   (`openShareSheet()`, a page of the one sheet; the choices in `aa_hl_prefs`, never synced). Nothing leaves the phone until the athlete taps
@@ -560,6 +560,10 @@ course app (`tennis/app/`) in demo mode, a right-to-left page, with `tps_demo()`
 its box, text in Instagram's bars, overlapping text, a Latin digit in Farsi and the EN and FA word tables drifting apart, and saves a PNG
 of each; the second runs the real app (the finish card's New best and Retest bands, This cycle's Share a win, the Cycle complete
 moment, the share sheet, Personal Records). `PROGRAM-APP.md` → *Highlight Reel*.
+`hold-serve.js` (2026-10-17) checks Career Mode's **Hold Serve** row on Home (40 checks): every state of its words, the "not sure yet"
+rule, nothing offline, with no rulebook, after a refusal, in the demo, the coach's preview or an undated cycle, the phone's copy kept or
+dropped and never synced, the tap into the guide, a re-read after a session reaches the server, 320 px and dark. The stub answers
+`sb.from()` table reads from its `tables` (and `tableErr`). `PROGRAM-APP.md` → *Hold Serve on Home*.
 `cycle-end.js` (2026-10-10) checks Home between cycles (PROG-02): the card and the week while the cycle runs and on its
 end date, Cycle complete, Up next and "Ready for Cycle N?" 4 and 40 days past, Roadmap complete on the last cycle (light,
 dark, 320 px), an undated cycle, the Repeat a session fold, Read more in place, a session under way unfolded, and Game
@@ -653,7 +657,9 @@ the book, cycles and the roadmap finished, effort wins, lift gains, months with 
 in `xp_rules`' shape (`career_habit_rules()`), and the rest from `[fact.*]` with its caps; `get_profile()` is the read;
 `career_compare()` is the shadow check; `career_backfill()` re-works everyone; `career_seed()` loads a seed from
 `scripts/career_seed.py`. Copies of the training app's maths live here (`career_entry_sets()`, `career_win_gain()`,
-`career_weeks()`) and of Proof's day gate (`career_habit_days()`): change them with their originals.
+`career_weeks()`) and of Proof's day gate (`career_habit_days()`): change them with their originals. The other way round,
+`program.html`'s `holdCount()` (Home's Hold Serve row, 2026-10-17) copies `get_profile()`'s weeks held in a row: `scripts/check_twins.js`
+runs it on `scripts/career/hold_cases.json`, and the rehearsal holds the two equal on every athlete it builds.
 `scripts/career/rehearse.mjs` builds the snapshot on PGlite and replays saves, hides, deletes, the row-level security, the
 profile, a broken rulebook and an erasure (47 checks made up; 49 with a dump of the real rows, which also proves every athlete
 matches Proof). The restore puts `career_rules` back last (`restore_backup.py`, `RESTORE_LAST`) so no trigger works anything out

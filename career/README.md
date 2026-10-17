@@ -3,7 +3,8 @@
 The whole gamification system, in files you can read, change and think about. **Phase 1 is live (2026-10-17), in
 shadow:** `scripts/career_seed.py` turns the `.toml` files
 into the server's rows (`career_rules`, `career_catalogue`), so
-changing a file and seeding it again is how a detail changes (GAME-10). Nothing an athlete sees reads them yet.
+changing a file and seeding it again is how a detail changes (GAME-10). No XP, badge or level reaches an athlete yet; the one thing
+they see is Hold Serve on the training app's Home (2026-10-17), the held weeks the server judges with `rulebook.toml` → `[week]`.
 
 ## What is here
 

@@ -8,15 +8,18 @@ add the questions people really ask you.
 How it is used:
 - Sections marked **[both]** go to the bot on both sites. **[en]** is only for the English
   site (`index.html`), **[fa]** only for the Farsi site (`index-fa.html` and the Farsi product pages).
-  The English site never mentions the Farsi course or the testing app (that is deliberate), so
-  they are in [fa] only.
+  The Iran products (the Iran coaching price, the course, the testing app) are [both], because
+  Iranians may ask in English (Amir, 2026-10-17). The English site still does not advertise them:
+  the English bot answers about them only when asked, or when the visitor says they live in Iran.
 - After any edit, run `python scripts/build_chat_facts.py` and redeploy `site-chat`
   (`supabase/functions/README.md`). The pre-commit check blocks a commit where this file and
   the function's copy disagree.
 - How the bot behaves (tone, what it refuses, when it hands over) is not here. It is in
   `supabase/functions/site-chat/index.ts`, the `RULES` text.
 
-Last checked against the live pages: 2026-10-17.
+Last checked against the live pages: 2026-10-17. Amir's own corrections added the same day (12 years, padel
+qualification, Liverpool, any sport and level, the WhatsApp talk, 5 cycles of 5 weeks, PayPal / card-to-card,
+nutrition advice but no plans).
 
 ---
 
@@ -26,12 +29,13 @@ Last checked against the live pages: 2026-10-17.
   Amir Ardekanian (امیر اردکانیان).
 - Two master's degrees: MSc Strength & Conditioning and MSc Applied Exercise Physiology.
   Working toward the CSCS certification.
-- More than 7 years as an S&C coach. 1000+ tennis and padel players coached, from club level to
-  international, including national-team, ITF and FIP players, and experience with Olympic-level
-  athletes.
-- Played competitive tennis for 15 years and is a qualified tennis coach, so he knows the sport
-  from both sides.
-- Tennis and padel are his specialty. Athletes from other sports are welcome on the English site.
+- A coach for 12 years. 1000+ tennis and padel players coached, from club level to international,
+  including national-team, ITF and FIP players, and experience with Olympic-level athletes.
+- Played competitive tennis for 15 years. Qualified as a tennis coach and as a padel coach, so he
+  knows both sports from both sides.
+- Lives in Liverpool, UK, and coaches online.
+- Tennis and padel are his specialty, but the coaching is not only for them: any athlete, from any
+  sport, can get a programme.
 
 ## [both] Contact
 
@@ -45,10 +49,12 @@ Last checked against the live pages: 2026-10-17.
 1. **Apply.** Fill in the application form (about 3 to 5 minutes). It asks about goals, sport and
    level, training history, injuries, sleep, stress, nutrition, days a week, session length and
    equipment. There is no commitment until you have talked.
-2. **Talk.** Amir reads every application himself and gets back to you to talk about whether you
-   are a good fit and which programme suits you.
-3. **Build.** The programme is written from scratch for you. It is a chain of cycles of about
-   5 weeks, each with its own focus, its reason and a target. The whole plan is mapped up front.
+2. **Talk.** Amir reads every application himself and you talk on WhatsApp before he writes
+   anything: whether you are a good fit, which programme suits you, and anything else you want him
+   to know that the form did not ask (your history, your season, what has and hasn't worked).
+3. **Build.** The programme is written from scratch for you: 5 cycles, each 5 weeks long, each
+   with its own focus, its reason and a target. The whole plan is mapped up front, and each cycle's
+   details are added to your app when it starts.
 4. **Train in the app.** Your programme lives in a private app on your phone (it installs from the
    browser like an app; nothing to download from an app store). You sign in with a username and
    password.
@@ -75,8 +81,8 @@ Last checked against the live pages: 2026-10-17.
 
 ## [both] Common questions
 
-- **Time:** usually 2 to 4 sessions a week, 45 to 60 minutes each. It depends on your court
-  hours, your season and how your body responds. It is planned around your tennis or padel.
+- **Time:** usually 2 to 4 sessions a week, 45 to 60 minutes each. It depends on your court or
+  training hours, your season and how your body responds. It is planned around your sport.
 - **Equipment:** a gym is ideal, but a home gym or limited equipment works. The programme is built
   around what you have.
 - **Travel and tournaments:** travel is part of the plan. There are sessions for minimal
@@ -87,7 +93,12 @@ Last checked against the live pages: 2026-10-17.
   around them. If you get injured during the programme it changes straight away, often keeping
   the unaffected areas training. If something hurts now (pain that makes you limp, wakes you at
   night, swells or is getting worse), see a doctor or physio first.
-- **Beginners and recreational players:** welcome. The programme starts from your level.
+- **Any level:** Amir works with athletes of any level and any experience, including people who
+  have never been in a gym. Everything is explained, and the programme starts from your level.
+- **Other sports:** the coaching is not only for tennis and padel. Any athlete can get a programme
+  built around their sport.
+- **Nutrition and supplements:** Amir gives advice on nutrition and supplements, but he does not
+  write nutrition plans or meal plans: that is outside his scope of practice.
 - **Padel:** the programme is written for padel's own movements and demands, not copied from tennis.
 - **Age:** you must be 18 or over to buy. For an athlete under 18, a parent or guardian applies
   and pays.
@@ -111,8 +122,10 @@ Last checked against the live pages: 2026-10-17.
 
 ## [en] Programmes and prices (English site)
 
-All prices in US dollars. Three levels, named after tennis scoring. You pay in advance, after you
-have talked with Amir.
+All prices in US dollars. Three levels, named after tennis scoring, priced by the number of
+5-week cycles (Amir, 2026-10-17: "the english prices are for 1 cycle, 3 cycles and 6 cycles").
+You pay in advance, after you have talked with Amir. The website's cards say "1-month", "3-month"
+and "6-month" programme: what you get is 1, 3 or 6 cycles of 5 weeks.
 
 **Every programme includes:** the training app and dashboard, an intake call (up to 30 min), a
 programme written for your goals and assessment, weekly check-ins (4 a month), a performance
@@ -120,12 +133,11 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 
 | Programme | Price | Length | Adds |
 |---|---|---|---|
-| **Game** | $70 | 1 month | everything above |
-| **Set** | $180 ($60 a month, saves 14%) | 3 months | the programme updated monthly |
-| **Match** (best value) | $300 ($50 a month, saves 29%) | 6 months | priority WhatsApp and email support; competition services (your plan follows your tournament schedule, with competition warm-up programmes); video technique reviews |
+| **Game** | $70 | 1 cycle (5 weeks) | everything above |
+| **Set** | $180 ($60 a cycle, saves 14%) | 3 cycles (15 weeks) | the programme updated every cycle |
+| **Match** (best value) | $300 ($50 a cycle, saves 29%) | 6 cycles (30 weeks) | priority WhatsApp and email support; competition services (your plan follows your tournament schedule, with competition warm-up programmes); video technique reviews |
 
-- **Payment:** apply, talk, then message Amir on WhatsApp or Instagram to pay. Then he writes your
-  programme.
+- **Payment:** apply, talk, then pay by PayPal. Then he writes your programme.
 - **Apply:** https://www.amirardekani.com/form.html
 - **Email:** amirardekanian@gmail.com
 - **Good fit:** you take your sport seriously (club to international), you train or play several
@@ -135,20 +147,21 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 
 ---
 
-## [fa] Online coaching on the Farsi site
+## [both] Online coaching for players living in Iran
 
-- برنامه‌ی اختصاصی، for tennis and padel players. Price for people living in Iran: **the
-  equivalent of $25 a month**, paid in toman at that day's rate. Amir says the exact toman amount
-  in his message. No hidden costs, no long contract. 10% loyalty discount on renewal.
-- Includes: a personal tennis or padel S&C programme, the app on your phone, cues (and video where
+- The personal programme (برنامه‌ی اختصاصی), for tennis and padel players and athletes from any sport, as sold on the Farsi site. Price for people living in Iran: **the
+  equivalent of $25 a cycle** (one cycle is 5 weeks; Amir, 2026-10-17), paid in toman at that day's
+  rate. People in Iran pay **one cycle at a time**: there are no multi-cycle plans or bundle prices
+  for Iran. Amir says the exact toman amount in his message; never work it out. No hidden costs, no long contract. 10% loyalty discount on renewal.
+- Includes: a personal S&C programme for your sport, the app on your phone, cues (and video where
   there is one) for each exercise, weekly updates, readiness and load monitoring, direct messages
   and support.
-- **Living outside Iran?** Send Amir a DM on Instagram or a WhatsApp message for the price.
-- **Payment:** fill in the form, Amir messages you with a few questions, then you arrange payment
-  on WhatsApp or Instagram.
-- **Start:** https://www.amirardekani.com/form-fa.html (the button says «شروع کن»).
+- **Living outside Iran?** The English-site plans apply (Game, Set, Match, in US dollars, paid by PayPal).
+- **Payment:** fill in the form, Amir messages you with a few questions, then you pay by
+  card-to-card (کارت‌به‌کارت). People outside Iran pay by PayPal.
+- **Start:** https://www.amirardekani.com/form-fa.html (the form is in Farsi; the button says «شروع کن»).
 
-## [fa] The Tennis Performance System course (سیستم آمادگی جسمانی تنیس)
+## [both] The Tennis Performance System course (سیستم آمادگی جسمانی تنیس)
 
 - A self-guided 16-week tennis S&C programme on your phone. One payment, the equivalent of
   **$17** in toman at that day's rate, and it never expires.
@@ -170,9 +183,9 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
   Level 2 suits you.
 - To buy: the buy button opens WhatsApp with the message ready; pay by card-to-card; the username
   and password come on WhatsApp.
-- Page: https://www.amirardekani.com/tennis/
+- Page (in Farsi): https://www.amirardekani.com/tennis/. The course itself is in Farsi.
 
-## [fa] The Tennis Fitness Testing app (آزمون آمادگی جسمانی تنیس)
+## [both] The Tennis Fitness Testing app (آزمون آمادگی جسمانی تنیس)
 
 - For tennis coaches and academies. One payment, the equivalent of **$17** in toman, for the whole
   academy: one account that every coach uses on their own phone.
@@ -187,10 +200,10 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 - Stores only each player's name, sex, birth year and month, results and notes, in the
   academy's own account.
 - To buy: WhatsApp, card-to-card, the academy's login comes on WhatsApp.
-- Page: https://www.amirardekani.com/tennis-testing/
+- Page (in Farsi): https://www.amirardekani.com/tennis-testing/
 
 ## [fa] Farsi words to use
 
 - Amir's title: «مربیِ بدنسازیِ تنیس و پدل». His degrees: «ارشد», never "MSc".
 - «یه برنامه» not «فایل» or «PDF». «شدت» not «سختی». «شروع کن» not «درخواست».
-- Prices are «معادلِ ۲۵ دلار در ماه» and «معادلِ ۱۷ دلار», always with «به تومان، با نرخِ روز».
+- Prices are «معادلِ ۲۵ دلار برای هر سیکل (۵ هفته)» and «معادلِ ۱۷ دلار», always with «به تومان، با نرخِ روز».

@@ -17,7 +17,7 @@ we'll always tell you what that purpose is.
 
 1. **We get to know you** — your goals, your life, your injuries, your schedule, your equipment, how you recover.
 2. **We analyse** — we line your goals up, resolve any that pull against each other, and (if you're an athlete) run a proper needs analysis for your sport.
-3. **We build your six months** — a science-based programme shaped around *your* constraints, mapped cycle by cycle, with a clear reason and a clear outcome for each one.
+3. **We build your programme** — 5 cycles of 5 weeks, science-based and shaped around *your* constraints, mapped cycle by cycle, with a clear reason and a clear outcome for each one.
 4. **You train through the app** — every exercise comes with coaching cues and, where there is one, a demo video; you log your sets and answer a quick wellbeing check each time.
 5. **We watch, we talk, we adjust** — your data flows to your coach, and a real weekly check-in plus ongoing review means your plan keeps changing as *you* change.
 

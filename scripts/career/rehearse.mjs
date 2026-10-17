@@ -22,6 +22,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import cp from 'node:child_process';
+import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { openDb, runSql, read } from '../restore/lib.mjs';
 
@@ -60,6 +61,26 @@ async function load(db, table, rows) {
   await db.query(`insert into public.${table} select * from jsonb_populate_recordset(null::public.${table}, $1::jsonb)`, [JSON.stringify(rows)]);
   return rows.length;
 }
+
+// A function of program.html, cut out by name as scripts/check_twins.js does (the first "\n}" after which it compiles), for the phone's
+// copies of a server rule: holdCount() is get_profile()'s weeks held in a row, for Home's Hold Serve row.
+function appFn(name) {
+  const src = fs.readFileSync(path.join(ROOT, 'program.html'), 'utf8').replace(/\r\n/g, '\n');
+  const m = new RegExp('^function ' + name + '\\(', 'm').exec(src);
+  if (!m) throw new Error('program.html has no function ' + name + '(): update scripts/career/rehearse.mjs');
+  for (let end = m.index; ;) {
+    end = src.indexOf('\n}', end + 1);
+    if (end < 0) throw new Error('program.html: ' + name + '() never closes');
+    const code = src.slice(m.index, end + 2);
+    try { new vm.Script(code); } catch (e) { continue; }
+    const ctx = vm.createContext({});
+    vm.runInContext(code, ctx);
+    return vm.runInContext(name, ctx);
+  }
+}
+// The athlete's own read in program.html (refreshHold()): the same rows, in the same order.
+const HOLD_SQL = `select kind, ref, day::text as day, value from public.career_facts
+                   where athlete_id = $1 and kind in ('week_held', 'week_broken') and void_at is null order by day, ref`;
 
 function ymd(d) { return d.toISOString().slice(0, 10); }
 function addDays(day, n) { const d = new Date(day + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return ymd(d); }
@@ -296,6 +317,7 @@ async function main() {
   let internal = '';
   try { await q(db, `select public.career_backfill()`); } catch (e) { internal = e.message; }
   const rulesSeen = await one(db, `select count(*)::int as n from public.career_rules`);
+  const ownWeeks = await q(db, HOLD_SQL, ['zz_one']);                       // what Home's Hold Serve row reads, as the athlete
   await q(db, `reset role`);
   ok(mine.n > 0 && mine.who === 1, `an athlete reads only their own facts (${mine.n} rows, 1 athlete)`);
   ok(/permission denied/i.test(denied), 'and cannot write one', denied);
@@ -319,6 +341,20 @@ async function main() {
   try { await q(db, `select count(*) from public.career_facts`); } catch (e) { anon = e.message; }
   await q(db, `reset role`);
   ok(/permission denied/i.test(anon), 'the anonymous key reads nothing', anon);
+  // Home's Hold Serve row (program.html, 2026-10-17): the athlete's own read, counted by holdCount(), is get_profile()'s weeks held.
+  const holdCount = appFn('holdCount');
+  const own = holdCount(ownWeeks);
+  ok(ownWeeks.length > 0 && own.now === prof.numbers.weeks_held.now && own.best === prof.numbers.weeks_held.best,
+     `Home's Hold Serve row counts the athlete's own read (${ownWeeks.length} weeks) as get_profile() does: ${own.now} in a row, best ${own.best}`,
+     JSON.stringify({ app: { now: own.now, best: own.best }, server: prof.numbers.weeks_held }));
+  const holdIds = (await q(db, `select distinct athlete_id as id from public.career_facts where kind in ('week_held', 'week_broken') order by 1`)).map(r => r.id);
+  const holdOff = [];
+  for (const id of holdIds) {
+    const p = (await one(db, `select public.get_profile($1) as p`, [id])).p, c = holdCount(await q(db, HOLD_SQL, [id]));
+    if (!p.ready || c.now !== p.numbers.weeks_held.now || c.best !== p.numbers.weeks_held.best)
+      holdOff.push(`${id}: holdCount() ${c.now} now, ${c.best} best; get_profile() ${JSON.stringify(p.numbers && p.numbers.weeks_held)}`);
+  }
+  ok(holdIds.length > 0 && holdOff.length === 0, `and for every athlete with training weeks (${holdIds.length})`, holdOff.join('\n'));
 
   section('8. a broken Career Mode never stops a save');
   await q(db, `insert into public.career_rules (version, rules) values (99, '{"version": 99, "habits": {"targets": "not an object"}, "level": {}}')`);
