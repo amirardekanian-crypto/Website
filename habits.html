@@ -3393,6 +3393,11 @@ function seasonTitleFor(id) {
            name: String(s.name || s.season_name || 'SEASON').toUpperCase(),
            note: 'You were there, and it is over. Nobody can earn this one now.' };
 }
+// "You finished ENFORCER 3 at level 23." A finished season's own record, for its moment and its card.
+function seasonFinishLine(r) {
+  const lv = Number(r && r.level) || 1;
+  return 'You finished ' + rankFor(lv).label + ' at level ' + lv + '.';
+}
 // The ones from the athlete's OWN record — what the Locker's title rail offers.
 // Prismatic like the event titles: a season title can never be earned again,
 // because the season is over.
@@ -3580,6 +3585,10 @@ const WT_AVG_WINDOW = 7;
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
              celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null,
              day:null, note:null, noteBusy:false, backTo:'today', install:false, share:null,
+             // The takeovers still waiting while the share picker is open from one of them
+             // (closeShare() puts them back): Share it used to empty the queue, so a title
+             // queued behind its level was never shown.
+             celebrateLater: [],
              confirmOnId: null, sub: null,
              // The weigh-in sheet: the day being weighed (null = closed), and the
              // number as a STRING, because it is bound to a real input and a
@@ -3606,7 +3615,7 @@ function defaultCfg() {
   return { v:3, on, custom:[], onboarded:false, toured:false, installAsked:false, dark:false, seen:null, rulesSig:null,
            pass:{ owned:[], title:null, card:null },
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null, seenStreak:null,
-           seenComeback:null,
+           seenComeback:null, seenSeasons:null,
            questPool:null, questRuns:null, seasons:null, seasonNames:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0,
            // Everyone is on the board (2026-09-12) — see autoJoinBoard().
@@ -4656,7 +4665,7 @@ async function syncFromCloud() {
       if (cloudCfg && !SYNC.dirty && (cloudCfg.updatedAt || 0) > (CFG.updatedAt || 0)) {
         const keepSeen = CFG.seen, keepSig = CFG.rulesSig;
         const keepTiers = CFG.seenTiers, keepAch = CFG.seenAch, keepPerfect = CFG.seenPerfect;
-        const keepQuests = CFG.seenQuests;
+        const keepQuests = CFG.seenQuests, keepSeasons = CFG.seenSeasons;
         const keepPass = CFG.pass || {};
         CFG = Object.assign(defaultCfg(), cloudCfg);
         CFG.on = Object.assign(defaultCfg().on, cloudCfg.on || {});
@@ -4669,6 +4678,10 @@ async function syncFromCloud() {
         if (!Array.isArray(CFG.seenAch)) CFG.seenAch = keepAch;
         if (!CFG.seenPerfect) CFG.seenPerfect = keepPerfect;
         if (!Array.isArray(CFG.seenQuests)) CFG.seenQuests = keepQuests;
+        // The seasons that have had their moment (checkSeasonMoments()): unioned, so one shown on
+        // either phone is never shown again on the other.
+        if (!Array.isArray(CFG.seenSeasons)) CFG.seenSeasons = keepSeasons;
+        else if (Array.isArray(keepSeasons)) CFG.seenSeasons = CFG.seenSeasons.concat(keepSeasons.filter(k => CFG.seenSeasons.indexOf(k) < 0));
         // ⚠️ REWARDS ARE UNIONED, NEVER REPLACED. Everything else in this block
         // is newest-device-wins, which is right for a setting and catastrophic
         // for a possession. The Locker makes exactly one promise — nothing ever
@@ -5426,10 +5439,38 @@ function rulesSignature() {
   return 'r' + hash.toString(36);
 }
 function seedSeenLevels() { CFG.seen = currentLevels(); CFG.rulesSig = rulesSignature(); seedUnlocks(); saveCfg(); }
+// A season that closed gets its moment (2026-10-17). The server archives it and mints its title for
+// everyone who reached level 5 (stage25), and the app used to file both away in silence: the one title
+// nobody can ever earn again arrived with no word. A season with a title takes the whole screen like an
+// event's; one without lands on the wins card. CFG.seenSeasons holds the start dates already shown and
+// only grows. It is seeded silently the first time, so a record that predates this build is history, not
+// a moment. It runs on the boot that re-baselines for the new season too: that pass is silent about
+// points, and this is the season's reward, not a point.
+function checkSeasonMoments() {
+  const recs = seasonRecords(), key = r => String((r && r.starts_on) || '').slice(0, 10);
+  if (!Array.isArray(CFG.seenSeasons)) { CFG.seenSeasons = recs.map(key).filter(Boolean); saveCfg(); return; }
+  const fresh = recs.filter(r => key(r) && CFG.seenSeasons.indexOf(key(r)) < 0);
+  if (!fresh.length) return;
+  fresh.forEach(r => {
+    CFG.seenSeasons.push(key(r));
+    const t = r.title ? seasonTitleFor(r.title) : null;
+    if (t) {
+      // The record names it only where the server minted it, so it is owned: add it now rather
+      // than wait for syncTitles(). Append-only, like every reward.
+      if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
+      const owned = CFG.pass.owned || (CFG.pass.owned = []);
+      if (owned.indexOf(t.id) < 0) owned.push(t.id);
+      UI.celebrate.push({ kind: 'reward', id: t.id, reward: Object.assign({}, t, { rec: r }) });
+      haptic('rank');
+    } else addWin({ k: 'season', id: key(r) });
+  });
+  saveCfg();
+}
 function checkLevelUps() {
   // Embedded (renderEmbed()): leave CFG.seen alone, so every level-up and reward earned
   // from the training app's Home is still waiting for its moment in the full app.
   if (window.IS_EMBED) return;
+  checkSeasonMoments();
   const sig = rulesSignature();
   if (!CFG.seen || CFG.rulesSig !== sig) {
     const rescored = !!CFG.seen && CFG.rulesSig !== sig;
@@ -5635,6 +5676,8 @@ function dismissWins() {
   haptic('tick');
   render();
 }
+// `share` is [card, subject]: the card that shows THIS win (2026-10-17). A medal or a tier opened the
+// newest milestone whatever had landed, a comeback the Rank card, and a habit's rank nothing at all.
 function winLine(w) {
   const emo = h => splitEmoji(h.name)[0] || '✨';
   if (w.k === 'milestone') {
@@ -5642,28 +5685,48 @@ function winLine(w) {
     if (!a) return null;
     const part = String(a.measure || '').split(':'), hh = part[1] ? habitById(part[1]) : null;
     return { emo: hh ? emo(hh) : (MEASURE_EMOJI[part[0]] || '🏅'), title: achName(a),
-             sub: (a.mark && a.mark !== 'I') ? 'Milestone, next rung' : 'Milestone', xp: milestonePaid(a.code), share: 'medal' };
+             sub: (a.mark && a.mark !== 'I') ? 'Milestone, next rung' : 'Milestone', xp: milestonePaid(a.code),
+             share: ['medal', { k: 'milestone', id: a.code }] };
   }
   if (w.k === 'tier') {
-    const t = CONSISTENCY_TIERS[w.ti], hs = (w.h || []).map(habitById);
+    const t = CONSISTENCY_TIERS[w.ti], hs = (w.h || []).map(habitById).filter(Boolean);
     if (!t || !hs.length) return null;
     return { emo: emo(hs[0]), title: t.name, sub: t.days + ' days of ' + nameList(hs.map(h => ({ name: shortName(h) }))) + ' in a row',
-             xp: hs.reduce((n, h) => n + tierPaid(h, w.ti), 0), share: 'medal' };
+             xp: hs.reduce((n, h) => n + tierPaid(h, w.ti), 0), share: ['medal', { k: 'tier', ti: w.ti, h: hs.map(h => h.id) }] };
   }
   if (w.k === 'hrank') {
     const h = habitById(w.id);
-    return { emo: emo(h), title: rankFor(w.to).label, sub: 'Your new ' + shortName(h).toLowerCase() + ' rank', xp: 0, share: null };
+    if (!h) return null;   // a custom habit removed since
+    return { emo: emo(h), title: rankFor(w.to).label, sub: 'Your new ' + shortName(h).toLowerCase() + ' rank', xp: 0,
+             share: ['rank', { habit: h.id }] };
   }
-  if (w.k === 'perfect') return { emo: '🏆', title: 'Perfect day', sub: 'Every habit you track, done', xp: dayXp(w.id), share: 'receipt' };
-  if (w.k === 'comeback') return { emo: '🔄', title: 'Second wind', sub: w.gone + ' days off, and back', xp: COMEBACK_XP, share: 'rank' };
-  if (w.k === 'streak') return { emo: '🔥', title: w.days + '-day streak', sub: w.days + ' days in a row that counted', xp: 0, share: 'streak' };
+  if (w.k === 'perfect') return { emo: '🏆', title: 'Perfect day', sub: 'Every habit you track, done', xp: dayXp(w.id),
+                                  share: ['receipt', { day: w.id }] };
+  if (w.k === 'comeback') return { emo: '🔄', title: 'Second wind', sub: w.gone + ' days off, and back', xp: COMEBACK_XP,
+                                   share: ['medal', { k: 'comeback', gone: w.gone }] };
+  if (w.k === 'streak') return { emo: '🔥', title: w.days + '-day streak', sub: w.days + ' days in a row that counted', xp: 0,
+                                 share: ['streak', { days: w.days }] };
+  // A finished season with no title (under level 5): its record on the Locker's shelf. No card: the
+  // Rank card is this season's, and it has just started again.
+  if (w.k === 'season') {
+    const r = seasonRecords().find(x => String((x && x.starts_on) || '').slice(0, 10) === w.id);
+    if (!r) return null;
+    const lv = Number(r.level) || 1;
+    return { emo: '🏁', title: String(r.season_name || 'Season').toUpperCase() + ' is over',
+             sub: 'Finished ' + rankFor(lv).label + ' at level ' + lv + '. Kept in your Locker.', xp: 0, share: null };
+  }
   return null;
 }
 function winsCard() {
   const lines = (CFG.wins || []).map(winLine).filter(Boolean).reverse();   // newest first
   if (!lines.length) return '';
   // Two lines at most (2026-10-12): a busy evening pushed the list down by 200 px.
-  const xp = lines.reduce((n, l) => n + l.xp, 0), shown = lines.slice(0, 2), share = (lines.find(l => l.share) || {}).share;
+  // Share it opens the newest win's card, and the picker holds the newest win of each other card too,
+  // so a milestone and a perfect day from one evening are each one tap apart (2026-10-17).
+  const xp = lines.reduce((n, l) => n + l.xp, 0), shown = lines.slice(0, 2), top = lines.find(l => l.share);
+  const subj = {};
+  lines.slice().reverse().forEach(l => { if (l.share) subj[l.share[0]] = l.share[1]; });   // oldest first, so the newest wins
+  const share = top ? top.share[0] : null;
   return `<div class="wins" data-k="wins" role="status">
     <div class="wins-hd"><span>New on your record</span>${xp > 0 ? `<b>+${xp.toLocaleString()} XP</b>` : ''}</div>
     ${shown.map(l => `<div class="win"><span class="we" aria-hidden="true">${l.emo}</span>
@@ -5671,7 +5734,7 @@ function winsCard() {
     ${lines.length > 2 ? `<div class="wins-more">and ${lines.length - 2} more</div>` : ''}
     <div class="wins-ft">
       <button class="btn btn-primary wins-ok" ${on(dismissWins)}>Got it</button>
-      ${share ? `<button class="wins-share" ${on(() => { dismissWins(); openShare(share); })}>Share it</button>` : ''}
+      ${share ? `<button class="wins-share" ${on(() => { dismissWins(); openShare(share, subj); })}>Share it</button>` : ''}
     </div>
   </div>`;
 }
@@ -6705,7 +6768,7 @@ const BACKNAV = { armed: false, ignore: false, popping: false };
 function topLayer() {
   if (UI.celebrate.length) return dismissCelebration;
   if (TOUR.on) return () => endTour(false);
-  if (UI.share) return () => { UI.share = null; render(); };
+  if (UI.share) return closeShare;
   if (UI.install) return closeInstall;
   if (UI.boardSheet) return () => { UI.boardSheet = false; render(); };
   if (UI.sheet) return () => { UI.sheet = null; render(); };
@@ -7880,11 +7943,15 @@ function coinHtml(n) {
   }
   return `<div class="lvcoins">${out}</div>`;
 }
-// Every takeover ends the same way: continue, or turn the moment into a post.
-function lvActions(shareKind) {
+// Every takeover ends the same way: continue, or turn the moment into a post. Share it opens the card
+// of THIS win (`subj`, one subject per card; 2026-10-17, Amir: "the achievements, badges and other
+// things need to have a celebration as well") and parks the rest of the queue, which comes back when
+// the picker closes (closeShare()). It used to empty the queue, so a title waiting behind its level
+// was never shown at all.
+function lvActions(shareKind, subj) {
   return `<div class="lvactions">
       <button class="lvgo">${UI.celebrate.length > 1 ? 'Next' : 'Continue'}</button>
-      ${shareKind ? `<button class="lvshare" ${on(e => { e.stopPropagation(); UI.celebrate = []; saveCfg(); openShare(shareKind); })}>Share it</button>` : ''}
+      ${shareKind ? `<button class="lvshare" ${on(e => { e.stopPropagation(); UI.celebrateLater = UI.celebrate.slice(1); UI.celebrate = []; saveCfg(); openShare(shareKind, subj); })}>Share it</button>` : ''}
     </div>`;
 }
 function renderCelebration(ev) {
@@ -7894,6 +7961,7 @@ function renderCelebration(ev) {
   const info = isHabit ? habitLevel(h) : overallLevel();
   const r = rankFor(ev.to), promoted = ev.rankChanged;
   const prestiged = promoted && r.star > 0 && r.name === RANKS[0] && r.sub === 1;
+  const sh = levelShare(ev, prestiged ? 'prestige' : promoted ? 'rank' : 'level');
   // Keyed per event, so advancing the queue swaps the whole takeover and the
   // next one bursts properly instead of inheriting a spent animation.
   return `
@@ -7925,9 +7993,20 @@ function renderCelebration(ev) {
           : `<span class="lvu-card"><i style="${CARD_LOOK[rw.id] || CARD_LOOK.c_paper}"></i>${esc(rw.name)}</span>`).join('')}
       </div>` : ''}
       <div class="lvbar"><span style="--w:${info.pct}%"></span></div>
-      ${lvActions(isHabit ? null : 'rank')}
+      ${lvActions(isHabit ? null : sh[0], sh[1])}
       ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
     </div>`;
+}
+// What a level's Share it opens (2026-10-17). A title the level unlocked is the newest thing on that
+// screen, so its plate leads, and the Rank card beside it in the picker still shows the level; a card
+// skin it unlocked is drawn as the Rank card's ground; otherwise the Rank card, naming the moment
+// (LEVEL UP, NEW RANK, PRESTIGE). [card, subjects]: one subject per card id, see openShare().
+function levelShare(ev, moment) {
+  const rw = ev.rewards || [];
+  const t = rw.filter(r => r.kind === 'title').pop(), c = rw.filter(r => r.kind === 'card').pop();
+  const subj = { rank: Object.assign({ moment }, c ? { skin: c.id } : {}) };
+  if (t) subj.title = { id: t.id };
+  return [t ? 'title' : 'rank', subj];
 }
 // "steps, sleep and water" — and past four, it stops listing and starts counting,
 // because a win's one line is not the place to read eight habit names.
@@ -7941,11 +8020,11 @@ function nameList(hs) {
 // on the green ground, so the KIND of win is readable before a word of it is. A tier, a milestone, a
 // perfect day and a comeback have no takeover: they land on the wins card on Today (PRF-02).
 function renderBadgeCelebration(ev) {
-  let badge, badgeLabel, kicker, title, sub, codeClass = '', art = null, ground = 'badge', share = 'medal', xpLine = 0;
+  let badge, badgeLabel, kicker, title, sub, codeClass = '', art = null, ground = 'badge', share = 'medal', subj = null, xpLine = 0;
   if (ev.kind === 'streak') {
     // The day streak crossing a mark — the single strongest signal that somebody
     // is going to keep going, and the app used to say nothing at all about it.
-    ground = 'streak'; share = 'streak';
+    ground = 'streak'; share = 'streak'; subj = { streak: { days: ev.days } };
     kicker = 'Day streak';
     title = ev.days + ' DAYS';
     // ev.best overrides the per-mark verdict — beating your own record is the
@@ -7962,14 +8041,22 @@ function renderBadgeCelebration(ev) {
     title = ev.quest.title;
     xpLine = ev.quest.xp;
     sub = ev.quest.note + '.';
-    share = 'rank';
+    share = 'medal'; subj = { medal: { k: 'quest', q: ev.quest } };   // it opened the Rank card until 2026-10-17
   } else if (ev.kind === 'reward') {
-    kicker = 'Unlocked';
-    title = ev.reward.name;
-    sub = ev.reward.note + ' ' + (ev.reward.kind === 'title'
-      ? 'A rank says where you stand this season; a title says what you are. It sits under your name for good. A new season cannot take it back.'
-      : 'Pick it for your card in your Locker. Yours for good.');
-    share = 'rank';
+    const rw = ev.reward, isT = rw.kind === 'title';
+    // A title is worn only when nothing else was (claimRewards()); an event or a season title never
+    // puts itself on, so the screen says which (it said "It sits under your name" for both).
+    const worn = isT && CFG.pass && CFG.pass.title === rw.id;
+    const keep = isT ? (worn ? ' It is on your name now, and a new season cannot take it back.' : ' It is yours for good. Wear it from your Locker.') : '';
+    kicker = rw.season ? 'Season over' : rw.evName ? rw.evName + ' finished' : 'Unlocked';
+    title = rw.name;
+    sub = rw.season
+      ? (rw.rec ? seasonFinishLine(rw.rec) + ' ' : '') + 'This title names the season, and nobody can earn it now.' + keep
+      : isT ? rw.note + ' A rank says where you stand this season. A title says what you are.' + keep
+      : rw.note + ' Pick it for your card in your Locker. Yours for good.';
+    // The Title card for a title, the Rank card drawn on a new skin (2026-10-17: both opened the Rank card as it was).
+    share = isT ? 'title' : 'rank';
+    subj = isT ? { title: { id: rw.id } } : { rank: { skin: rw.id } };
     art = ev.reward.kind === 'title'
       ? `<div style="position:relative">${titlePlate(ev.reward)}<span class="sheen"></span></div>`
       : `<div style="position:relative;width:132px;height:166px;border-radius:20px;${CARD_LOOK[ev.reward.id] || CARD_LOOK.c_paper};box-shadow:0 18px 40px -18px rgba(0,0,0,.8)"><span class="sheen"></span></div>`;
@@ -7989,7 +8076,7 @@ function renderBadgeCelebration(ev) {
       <div class="lvrank">${esc(title)}</div>
       <div class="lvsub">${esc(sub)}</div>
       ${xpLine > 0 ? `<div class="lvxp">+${xpLine.toLocaleString()} XP banked</div>` : ''}
-      ${lvActions(share)}
+      ${lvActions(share, subj)}
       ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
     </div>`;
 }
@@ -9193,7 +9280,8 @@ function renderManual() {
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game. They build your level, your rank in each habit, and your place on the leaderboard.`) +
         p(`The tile beside your week answers the one question that matters: <strong style="color:var(--ink)">does today count?</strong> It says how many habits are still to go, then <strong style="color:var(--ink)">On target</strong> once the day keeps your streak, then <strong style="color:var(--ink)">Perfect</strong> when the list is clear.`) +
-        p(`A <strong style="color:var(--ink)">new level</strong>, a <strong style="color:var(--ink)">new rank</strong> and a day streak of <strong style="color:var(--ink)">${STREAK_TAKEOVER} days or more</strong> stop the app to say so, with any reward the level unlocked on the same screen. A milestone, a consistency tier, a habit's new rank, a <strong style="color:var(--ink)">perfect day</strong> (the whole list cleared) and a comeback land in a card at the top of Today instead, with the XP they paid, and it stays there until you tap it. A habit's own level just flashes in its row and gets out of your way.`) +
+        p(`The big ones stop the app to say so: a <strong style="color:var(--ink)">new level</strong> or <strong style="color:var(--ink)">rank</strong>, a day streak of <strong style="color:var(--ink)">${STREAK_TAKEOVER} days or more</strong>, a finished quest or event, and a season's title. Any reward the level unlocked is on the same screen. A milestone, a consistency tier, a habit's new rank, a <strong style="color:var(--ink)">perfect day</strong> (the whole list cleared), a comeback and a finished season land in a card at the top of Today instead, with the XP they paid. It stays there until you tap it. A habit's own level just flashes in its row and gets out of your way.`) +
+        p(`Every one of them has <strong style="color:var(--ink)">Share it</strong>. It opens a card of that exact thing, like the milestone you just earned or a title on its plate, in the shape Instagram wants for a post or a story. Nothing leaves your phone until you tap it.`) +
         p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`) +
         (isFree() ? '' : p(`<strong style="color:var(--ink)">You can tick today's list from your training app too</strong>, on its Home under Daily Habits. It is this same list, saved the same way, for the same points. A new level or a reward waits for you here, so the moment is never spent on a small strip.`)) +
         p(`<strong style="color:var(--ink)">Put it on your home screen</strong> and it opens in one tap, looks like any other app and keeps working with no signal. ${isIOS() ? 'Tap Share in the browser bar, then Add to Home Screen.' : 'There is a row for it in Settings.'} There is nothing to download. It is this page, kept somewhere you can reach it.`))}
@@ -9252,7 +9340,7 @@ function renderManual() {
         const nx = nextReward(), got = passOwned().length, eq = passTitle();
         return block(h2('The Locker') +
           p(`Levels pay out. There are <strong style="color:var(--ink)">${PASS_TRACK.length} rewards</strong> spread up the ladder, and reaching the level is all it takes. There is nothing to buy and nothing to claim.`) +
-          p(`Two kinds. <strong style="color:var(--ink)">Titles</strong> are a name you wear: it sits under your rank, it goes on the card you share, and if you are on the board it sits next to your name there and on the roll call wall. <strong style="color:var(--ink)">Cards</strong> change how that shared card looks. Those are yours alone, nobody else sees them. You choose which of the ones you own to use, and you can change your mind whenever, including showing no title at all.`) +
+          p(`Two kinds. <strong style="color:var(--ink)">Titles</strong> are a name you wear: it sits under your rank, it goes on the card you share, and if you are on the board it sits next to your name there and on the roll call wall. Each one also has a card of its own to share, with its plate and what it took. <strong style="color:var(--ink)">Cards</strong> change how that shared card looks. Those are yours alone, nobody else sees them. You choose which of the ones you own to use, and you can change your mind whenever, including showing no title at all.`) +
           p(`<strong style="color:var(--ink)">They are kept.</strong> This is the one thing here a new season does not touch. Your points go back to zero and every reward you have unlocked stays exactly where it is. Switching a habit off does not take them either. That holds on the board too: what you have earned is recorded the day you earn it, and nothing later takes it back.`) +
           p(got
             ? `You have <strong style="color:var(--ink)">${got} of ${PASS_TRACK.length}</strong>${eq ? `, and you are showing <strong style="color:var(--ink)">${esc(eq.name)}</strong>` : ''}. ${nx ? `Next is <strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv}.` : 'There is nothing left to unlock.'}`
@@ -9334,7 +9422,8 @@ function renderManual() {
       ${block(h2('Seasons') +
         p(`Scoring runs in seasons, like ranked play in a game. You are in <strong style="color:var(--ink)">${esc(seasonName())}</strong>, which opened on ${esc(parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }))}.`) +
         p(`Only days from the start of the season earn points. Anything you logged before it still sits in your history and still counts toward your streaks and consistency tiers. It just does not score.`) +
-        p(`When a new season opens, <strong style="color:var(--ink)">every score goes back to zero</strong> and everyone starts together. Nothing is deleted, and your consistency tiers stay yours.`))}
+        p(`When a new season opens, <strong style="color:var(--ink)">every score goes back to zero</strong> and everyone starts together. Nothing is deleted, and your consistency tiers stay yours.`) +
+        p(`Reach <strong style="color:var(--ink)">level 5</strong> in a season and, when it closes, you keep a title that names it. It gets its own screen that day, and nobody can earn it after. Where you finished stays in your Locker either way.`))}
 
       ${block(h2('The leaderboard') +
         p(isFree()
@@ -9721,9 +9810,13 @@ function paintCardGround(x, S, id) {
   x.fillStyle = g; x.fillRect(0, 0, S, S);
   grid(0.045, 9);
 }
-async function buildShareCard(kind, sizeKey) {
+// `subj` is what the card is ABOUT (2026-10-17): the medal, title, day or streak a moment's Share it
+// came from (openShare()). Null draws the card as the picker always did: the rank, today, the newest
+// milestone, the title worn.
+async function buildShareCard(kind, sizeKey, subj) {
   const dim = SHARE_SIZES[sizeKey] || SHARE_SIZES.post;
   const W = dim[0], H = dim[1];
+  const safe = SHARE_SAFE[sizeKey] || SHARE_SAFE.post;
   const c = document.createElement('canvas');
   c.width = W; c.height = H;
   const x = c.getContext('2d');
@@ -9738,22 +9831,35 @@ async function buildShareCard(kind, sizeKey) {
   await loadBrandMark();
 
   const painter = SHARE_PAINT[kind] || SHARE_PAINT.rank;
-  const footTop = H - 176;
-  const area = { top: 120, bottom: footTop - 24, cx: W / 2 };
+  // The footer's lowest pixel. On a Story it sits above the bottom band Instagram covers (safe.bottom),
+  // where it used to sit under the reply bar at y 1750-1836; Post and Square keep their 84 px.
+  const footBottom = H - Math.max(84, safe.bottom);
+  const area = { top: Math.max(120, safe.top + 40), bottom: footBottom - 116, cx: W / 2,
+                 safeTop: safe.top, safeBottom: safe.bottom };
   area.cy = (area.top + area.bottom) / 2;
-  const ink = painter.ground(x, W, H, area);
-  painter.body(x, W, H, area);
-  scFooter(x, W, H, ink !== false);
+  const s = subj || null;
+  const ink = painter.ground(x, W, H, area, s);
+  painter.body(x, W, H, area, s);
+  scFooter(x, W, H, ink !== false, footBottom);
   return new Promise(res => c.toBlob(res, 'image/png'));
 }
 
 // ── The share picker ────────────────────────────────────────────────
-// Five cards × three formats. The athlete sees the real thing before they post
+// Six cards × three formats. The athlete sees the real thing before they post
 // it — the preview IS the export, painted by the same code.
-function openShare(kind) {
-  UI.share = { kind: kind || 'rank', size: 'post', busy: true };
+// `subj` is one subject per card id ({ medal: {k:'milestone', id:'HS2'}, title: {id:'t_unbowed'} }):
+// what each card shows when the picker was opened from a moment. Switching cards keeps them, so the
+// medal is still that medal after a look at the Rank card. Nothing in it is stored.
+function openShare(kind, subj) {
+  UI.share = { kind: kind || 'rank', size: 'post', busy: true, subj: subj || {} };
   render();
   paintSharePreview();
+}
+// Closing the picker puts back any takeover that was waiting behind the one shared (lvActions()).
+function closeShare() {
+  UI.share = null;
+  if (UI.celebrateLater.length) { UI.celebrate = UI.celebrate.concat(UI.celebrateLater); UI.celebrateLater = []; }
+  render();
 }
 function setShare(patch) {
   if (!UI.share) return;
@@ -9761,12 +9867,16 @@ function setShare(patch) {
   render();
   paintSharePreview();
 }
+function shareSubj(kind) { return (UI.share && UI.share.subj && UI.share.subj[kind]) || null; }
+// A card's name, emoji and note in the rail, as its subject makes it: the Milestone card holding a
+// quest says Quest.
+function shareCardView(sc, s) { return Object.assign({ name: sc.name, emoji: sc.emoji, note: sc.note }, (s && sc.as && sc.as(s)) || {}); }
 let SHARE_URL = null;
 async function paintSharePreview() {
   if (!UI.share) return;
   const want = UI.share.kind + ':' + UI.share.size;
   try {
-    const blob = await buildShareCard(UI.share.kind, UI.share.size);
+    const blob = await buildShareCard(UI.share.kind, UI.share.size, shareSubj(UI.share.kind));
     if (!UI.share || UI.share.kind + ':' + UI.share.size !== want) return;   // superseded
     if (SHARE_URL) URL.revokeObjectURL(SHARE_URL);
     SHARE_URL = URL.createObjectURL(blob);
@@ -9783,12 +9893,12 @@ async function paintSharePreview() {
 }
 async function doShare(saveOnly) {
   if (!UI.share) return;
-  const blob = UI.share.blob || await buildShareCard(UI.share.kind, UI.share.size);
+  const blob = UI.share.blob || await buildShareCard(UI.share.kind, UI.share.size, shareSubj(UI.share.kind));
   if (!blob) { toast('Could not build the card on this phone.'); return; }
   const card = SHARE_CARDS.find(s => s.id === UI.share.kind) || SHARE_CARDS[0];
   const name = 'aa-proof-' + UI.share.kind + '-' + UI.share.size + '.png';
   const LI = overallLevel();
-  const text = card.caption(LI) + '. Tracked on AA Proof · amirardekani.com';
+  const text = card.caption(LI, shareSubj(card.id)) + '. Tracked on AA Proof · @amirardekanian · amirardekani.com';
   try {
     const file = new File([blob], name, { type: 'image/png' });
     if (!saveOnly && navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
@@ -9810,12 +9920,13 @@ function renderShareSheet() {
   const S = UI.share, dim = SHARE_SIZES[S.size];
   const sizeChip = (k, label) => `<button class="chip ${S.size === k ? 'chip-on' : ''}" data-k="sz:${k}"
     ${on(() => setShare({ size: k }))}>${label}</button>`;
+  const view = sc => shareCardView(sc, shareSubj(sc.id));
   return `
-    <div class="scrim" data-k="scrim:share" ${on(() => { UI.share = null; render(); })}></div>
+    <div class="scrim" data-k="scrim:share" ${on(closeShare)}></div>
     <div class="sheet sharesheet" data-k="sharesheet">
         <div class="sharehd">
           <span class="hd" style="font-size:20px">Share your proof</span>
-          <button class="sharex" ${on(() => { UI.share = null; render(); })} aria-label="Close">&#10005;</button>
+          <button class="sharex" ${on(closeShare)} aria-label="Close">&#10005;</button>
         </div>
         <div id="sharepwrap" class="sharepwrap" style="aspect-ratio:${dim[0]} / ${dim[1]}">
           <img id="shareprev" alt="Your card" style="opacity:${S.busy ? '0' : '1'}">
@@ -9824,11 +9935,11 @@ function renderShareSheet() {
         <div class="sharerail">
           ${SHARE_CARDS.map(sc => `<button class="scard ${S.kind === sc.id ? 'on' : ''}" data-k="sc:${sc.id}"
             ${on(() => setShare({ kind: sc.id }))}>
-            <span class="scard-em">${sc.emoji}</span>
-            <span class="scard-nm">${esc(sc.name)}</span>
+            <span class="scard-em">${esc(view(sc).emoji)}</span>
+            <span class="scard-nm">${esc(view(sc).name)}</span>
           </button>`).join('')}
         </div>
-        <div class="sharenote">${esc((SHARE_CARDS.find(s => s.id === S.kind) || SHARE_CARDS[0]).note)}</div>
+        <div class="sharenote">${esc(view(SHARE_CARDS.find(s => s.id === S.kind) || SHARE_CARDS[0]).note)}</div>
         <div class="sharesizes">
           ${sizeChip('post', 'Post 4:5')}${sizeChip('story', 'Story 9:16')}${sizeChip('square', 'Square 1:1')}
         </div>
@@ -9967,8 +10078,11 @@ function scStats(x, W, y, stats, ink) {
 }
 // The fixed brand lockup. Every card carries it, so a stranger who has never
 // heard of this app learns three things: the mark, the name, and where to go.
-function scFooter(x, W, H, ink) {
-  const PAD = 96, mark = 68, my = H - PAD - 34, baseline = my + 30;
+// `bottom` is its lowest pixel (buildShareCard(): above Instagram's reply bar on a Story). The right
+// side is two lines like the left: the handle, which is what a viewer taps on Instagram, over the site
+// (2026-10-17; the cards carried no handle).
+function scFooter(x, W, H, ink, bottom) {
+  const PAD = 96, mark = 68, my = (bottom || H - 84) - 46, baseline = my + 30;
   x.strokeStyle = ink ? 'rgba(246,244,255,0.12)' : 'rgba(35,31,53,0.12)';
   x.lineWidth = 2;
   x.beginPath(); x.moveTo(PAD, my - 40); x.lineTo(W - PAD, my - 40); x.stroke();
@@ -9991,9 +10105,12 @@ function scFooter(x, W, H, ink) {
   x.fillText('The habit tracker that keeps score', PAD + mark + 24, baseline + 8);
   x.textAlign = 'right';
   x.fillStyle = ink ? CARD.mint : CARD.grape;
+  x.font = '700 26px "Outfit", sans-serif';
+  x.fillText('@amirardekanian', W - PAD, baseline - 24);
+  x.fillStyle = ink ? 'rgba(246,244,255,0.55)' : 'rgba(35,31,53,0.55)';
   x.font = '700 22px "Outfit", sans-serif';
   x.letterSpacing = '2px';
-  x.fillText('AMIRARDEKANI.COM', W - PAD, baseline - 8);
+  x.fillText('AMIRARDEKANI.COM', W - PAD, baseline + 8);
   x.letterSpacing = '0px';
   x.textAlign = 'left';
 }
@@ -10003,40 +10120,101 @@ function scFooter(x, W, H, ink) {
 function milestonesEarned() { return currentAch().length + EVENTS.filter(e => eventProgress(e).done).length; }
 function latestMedal() {
   const codes = currentAch();
-  if (codes.length) {
-    const a = ACHIEVEMENTS.filter(z => codes.indexOf(z.code) !== -1).slice(-1)[0];
-    const part = String(a.measure || '').split(':');
-    const h = part[1] ? habitById(part[1]) : null;
-    return { metal: a.tier === 'rare' ? 'emerald' : a.tier === 'long' ? 'silver' : 'bronze',
-             tint: h ? habitHue(h)[1] : '#EFECFB',
-             emoji: h ? (splitEmoji(h.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨'),
-             name: achName(a), note: a.note, xp: a.xp,
-             stars: a.tier === 'rare' ? 3 : a.tier === 'long' ? 2 : 1,
-             tierName: a.tier === 'rare' ? 'EMERALD · RARE' : a.tier === 'long' ? 'SILVER · THE LONG HAUL' : 'BRONZE · A GOOD WEEK' };
-  }
+  if (codes.length) return achMedalInfo(ACHIEVEMENTS.filter(z => codes.indexOf(z.code) !== -1).slice(-1)[0]);
   const best = live().slice().sort((a, b) => habitStreak(b) - habitStreak(a))[0];
   if (!best || habitStreak(best) < 2) return null;
   const c = consistencyFor(best), st = habitStreak(best);
-  return { metal: c.tier >= 4 ? 'emerald' : c.tier >= 2 ? 'silver' : 'bronze',
+  // shortName(): habit names are tasks now ("Drink 8 glasses"), so the note said "days of drink 8 glasses".
+  return { metal: c.tier ? tierMetal(c.tier - 1) : 'bronze',
            tint: habitHue(best)[1], emoji: splitEmoji(best.name)[0] || '✨',
-           name: (c.name || 'ON A STREAK'), note: st + ' days of ' + splitEmoji(best.name)[1].toLowerCase() + ' in a row',
-           xp: 0, stars: Math.max(1, Math.min(3, c.tier)), tierName: 'CONSISTENCY' };
+           name: 'ON A STREAK', note: st + ' days of ' + shortName(best).toLowerCase() + ' in a row',
+           xp: 0, stars: Math.max(1, Math.min(3, c.tier)), eyebrow: 'CONSISTENCY' };
+}
+// A milestone as the Milestone card draws it. The XP is what the ledger paid this season, never the
+// table's figure (XP_SYSTEM.md §5): one earned on pre-season days paid nothing, and the card says nothing.
+function achMedalInfo(a) {
+  const part = String(a.measure || '').split(':');
+  const h = part[1] ? habitById(part[1]) : null;
+  const tierName = a.tier === 'rare' ? 'EMERALD · RARE' : a.tier === 'long' ? 'SILVER · THE LONG HAUL' : 'BRONZE · A GOOD WEEK';
+  return { metal: a.tier === 'rare' ? 'emerald' : a.tier === 'long' ? 'silver' : 'bronze',
+           tint: h ? habitHue(h)[1] : '#EFECFB',
+           emoji: h ? (splitEmoji(h.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨'),
+           name: achName(a), note: a.note, xp: milestonePaid(a.code),
+           stars: a.tier === 'rare' ? 3 : a.tier === 'long' ? 2 : 1, eyebrow: 'MILESTONE · ' + tierName };
+}
+// A consistency tier's metal, the same steps the card always drew: bronze, silver for 10 and 20 days,
+// emerald for 30 and 60.
+function tierMetal(ti) { return ti >= 3 ? 'emerald' : ti >= 1 ? 'silver' : 'bronze'; }
+// What the Milestone card shows (2026-10-17): the milestone, consistency tier, quest or comeback that
+// Share it came from (openShare()'s subject), else the newest milestone, as it always did.
+function medalFor(s) {
+  if (!s) return latestMedal();
+  if (s.k === 'milestone') {
+    const a = ACHIEVEMENTS.find(z => z.code === s.id);
+    return a ? achMedalInfo(a) : latestMedal();
+  }
+  if (s.k === 'tier') {
+    const t = CONSISTENCY_TIERS[s.ti], hs = (s.h || []).map(habitById).filter(Boolean);
+    if (!t || !hs.length) return latestMedal();
+    return { metal: tierMetal(s.ti), tint: habitHue(hs[0])[1], emoji: splitEmoji(hs[0].name)[0] || '✨',
+             name: t.name, note: t.days + ' days of ' + nameList(hs.map(h => ({ name: shortName(h) }))) + ' in a row.',
+             xp: hs.reduce((n, h) => n + tierPaid(h, s.ti), 0), stars: s.ti + 1,
+             eyebrow: 'CONSISTENCY TIER · ' + (s.ti + 1) + ' OF ' + CONSISTENCY_TIERS.length };
+  }
+  if (s.k === 'comeback') {
+    return { metal: 'bronze', tint: '#EFECFB', emoji: '🔄', name: 'SECOND WIND',
+             note: (s.gone || LAPSE_DAYS) + ' days off. Back, and the day counted.', xp: COMEBACK_XP, stars: 0, eyebrow: 'COMEBACK' };
+  }
+  if (s.k === 'quest' && s.q) {
+    const part = String(s.q.kind || '').split(':'), h = part[1] ? habitById(part[1]) : null;
+    return { metal: 'amethyst', tint: h ? habitHue(h)[1] : '#EFECFB',
+             emoji: h ? (splitEmoji(h.name)[0] || '🎯') : ({ qualify: '✅', perfect: '🏆' })[part[0]] || '🎯',
+             name: String(s.q.title || 'QUEST'), note: String(s.q.note || '') + '.', xp: Number(s.q.xp) || 0, stars: 0,
+             eyebrow: 'QUEST COMPLETE' };
+  }
+  return latestMedal();
+}
+// The title the Title card shows (2026-10-17): the one Share it came from, else the one worn, else the
+// newest one owned. What it took is the event's three goals, the season's finish, or the level.
+// { p, metal, eyebrow, emoji, crest, took: { head, lines } }, or null when there is no title at all.
+function titleFor(s) {
+  const owned = passOwned().map(passItem).filter(p => p && p.kind === 'title');
+  const p = (s && s.id && passItem(s.id)) || passTitle() || owned[owned.length - 1] || null;
+  if (!p || p.kind !== 'title') return null;
+  const metal = titleMetalKey(p);
+  if (p.season) {
+    const rec = seasonRecords().find(r => r && r.title === p.id), lv = rec ? (Number(rec.level) || 1) : 0;
+    return { p, metal, eyebrow: 'SEASON TITLE', emoji: null, crest: rec ? rankFor(lv).name : RANKS[0],
+             took: { head: 'FINISHED ' + p.name, lines: rec
+               ? [rankFor(lv).label + ' at level ' + lv, (Number(rec.xp) || 0).toLocaleString() + ' XP that season']
+               : ['The season is over. Nobody can earn it now.'] } };
+  }
+  const ev = typeof p.event === 'string' ? EVENTS.find(e => e.id === p.event) : null;
+  if (ev) return { p, metal, eyebrow: 'EVENT TITLE', emoji: EV_EMOJI[ev.id] || '🏆', crest: null,
+                   took: { head: 'FINISHED ' + ev.name, lines: ev.goals.map(g => g.label) } };
+  return { p, metal, eyebrow: 'TITLE · LEVEL ' + p.lv, emoji: null, crest: rankFor(p.lv || 1).name,
+           took: { head: 'LEVEL ' + p.lv + ' ON THE ROAD', lines: ['Kept for good. A new season cannot take it back.'] } };
 }
 
 // ── The five cards ─────────────────────────────────────────────────
 const SHARE_PAINT = {
-  // THE RANK — the flex. Wears the skin the athlete picked in the Locker.
+  // THE RANK — the flex. Wears the skin the athlete picked in the Locker, or the one a level just
+  // unlocked (s.skin). s.moment names the takeover it came from; s.habit draws one habit's rank
+  // instead (a habit's new rank, on the wins card), with that habit's own streaks.
   rank: {
-    ground: (x, W, H) => { paintCardGround(x, Math.max(W, H), passCard().id); return true; },
-    body: (x, W, H, a) => {
-      const LI = overallLevel(), r = LI.rank, ttl = passTitle();
+    ground: (x, W, H, a, s) => { paintCardGround(x, Math.max(W, H), (s && s.skin && passHas(s.skin)) ? s.skin : passCard().id); return true; },
+    body: (x, W, H, a, s) => {
+      const h = s && s.habit ? habitById(s.habit) : null;
+      const LI = h ? habitLevel(h) : overallLevel(), r = LI.rank, ttl = h ? null : passTitle();
       const statsY = a.bottom - 150;
       const cw = Math.min(300, W * 0.28);
       // Centre the crest block in whatever room the format leaves above the
       // stats — a 9:16 story has 570px more of it than a 4:5 post.
       const blockH = 60 + cw * 1.12 + 96 + 52 + 34 + (ttl ? 102 : 0);
       let y = a.top + Math.max(20, (statsY - a.top - blockH) / 2);
-      scEyebrow(x, a.cx, y, 'PROOF · ' + seasonName().toUpperCase());
+      const lead = h ? shortName(h).toUpperCase() + ' RANK'
+                     : ({ level: 'LEVEL UP', rank: 'NEW RANK', prestige: 'PRESTIGE' })[s && s.moment] || 'PROOF';
+      scEyebrow(x, a.cx, y, lead + ' · ' + seasonName().toUpperCase());
       const cy = y + 60 + cw * 0.56;
       scCrest(x, a.cx, cy, cw, r.name);
       y = cy + cw * 0.56 + 96;
@@ -10047,23 +10225,30 @@ const SHARE_PAINT = {
       y += 52;
       x.fillStyle = 'rgba(246,244,255,0.66)';
       x.font = '600 33px "Outfit", sans-serif';
-      x.fillText('Level ' + LI.lv + ' · ' + LI.xp.toLocaleString() + ' XP', a.cx, y);
+      x.fillText((h ? shortName(h) + ' · level ' : 'Level ') + LI.lv + ' · ' + LI.xp.toLocaleString() + ' XP', a.cx, y);
       if (ttl) { y += 34; scPlate(x, a.cx, y, ttl.name.toUpperCase(), titleMetalKey(ttl)); }
-      scStats(x, W, statsY, [
+      // A habit's own streak is captioned STREAK, the day streak DAY STREAK (one word, two scopes).
+      scStats(x, W, statsY, h ? [
+        [String(habitStreak(h)), 'STREAK', CARD.orange],
+        [String(habitBest(h)), 'BEST STREAK'],
+        [String(seasonDays().filter(k => isDone(h, k)).length), 'DAYS DONE', CARD.teal]
+      ] : [
         [String(currentDayStreak()), 'DAY STREAK', CARD.orange],
         [String(milestonesEarned()), 'MILESTONES'],
         [String(seasonDays().filter(isPerfect).length), 'PERFECT DAYS', CARD.teal]
       ], true);
     }
   },
-  // THE RECEIPT — today's habits, ticked. The card a stranger decodes instantly.
+  // THE RECEIPT — today's habits, ticked. The card a stranger decodes instantly. s.day is the day a
+  // perfect-day win was for, which can be yesterday by the time the wins card is tapped. Everything
+  // in the header moves down by a.safeTop, so on a Story it clears Instagram's name and progress bar.
   receipt: {
-    ground: (x, W, H) => {
+    ground: (x, W, H, a) => {
       x.fillStyle = '#F6F4FF'; x.fillRect(0, 0, W, H);
-      x.fillStyle = CARD.card; x.fillRect(0, 0, W, 250);
+      x.fillStyle = CARD.card; x.fillRect(0, 0, W, 250 + ((a && a.safeTop) || 0));
       return false;
     },
-    body: (x, W, H, a) => {
+    body: (x, W, H, a, s) => {
       // rosterOn(k), not live(): the pct beside these numbers is scored against
       // the day's own roster, and removals do not land until TOMORROW — so for
       // the rest of the day an add-on switched off is still counted by dayPct()
@@ -10071,32 +10256,35 @@ const SHARE_PAINT = {
       // 95% chip, with the habit responsible for the gap missing from the list
       // that was supposed to explain it. Same live()-vs-roster fault the Today
       // screen's row list was fixed for; the card kept the old pattern.
-      const k = TKEY(), hs = rosterOn(k), pct = dayPct(k), done = hs.filter(h => isDone(h, k)).length;
-      const PAD = 96;
+      const k = (s && s.day && LOG[s.day]) ? s.day : TKEY(), isToday = k === TKEY();
+      const hs = rosterOn(k), pct = dayPct(k), done = hs.filter(h => isDone(h, k)).length;
+      const PAD = 96, t0 = a.safeTop || 0;
+      const first = loggedDays()[0], dayNo = first ? Math.max(1, Math.round((parseKey(k) - parseKey(first)) / 86400000) + 1) : 1;
       x.textAlign = 'left';
       x.fillStyle = 'rgba(246,244,255,0.6)';
       x.font = '700 22px "Outfit", sans-serif';
       x.letterSpacing = '6px';
-      x.fillText(today().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long' }).toUpperCase()
-                 + ' · DAY ' + dayNumber(), PAD, 120);
+      x.fillText(parseKey(k).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long' }).toUpperCase()
+                 + ' · DAY ' + dayNo, PAD, 120 + t0);
       x.letterSpacing = '0px';
       x.fillStyle = CARD.paper;
       x.font = '800 62px "Outfit", sans-serif';
-      x.fillText(pct === 100 ? 'A perfect day.' : (pct >= 75 ? 'Day on target.' : 'Today, logged.'), PAD, 196);
+      // "On target" is dayQualifies() and nothing else (it was dayPct >= 75, a third rule, under an 80% gate).
+      x.fillText(pct === 100 ? 'A perfect day.' : dayQualifies(k) ? 'Day on target.' : isToday ? 'Today, logged.' : 'A day, logged.', PAD, 196 + t0);
       // The percentage chip, right-aligned in the header.
       const chipW = 178, chipH = 96, chipX = W - PAD - chipW;
-      scRR(x, chipX, 92, chipW, chipH, 24);
+      scRR(x, chipX, 92 + t0, chipW, chipH, 24);
       x.fillStyle = pct === 100 ? CARD.teal : CARD.grape; x.fill();
       x.textAlign = 'center';
       x.fillStyle = pct === 100 ? '#0C4B43' : '#fff';
       x.font = '800 46px "Outfit", sans-serif';
-      x.fillText(pct + '%', chipX + chipW / 2, 152);
+      x.fillText(pct + '%', chipX + chipW / 2, 152 + t0);
       x.font = '700 17px "Outfit", sans-serif';
       x.letterSpacing = '3px';
-      x.fillText(done + ' OF ' + hs.length, chipX + chipW / 2, 176);
+      x.fillText(done + ' OF ' + hs.length, chipX + chipW / 2, 176 + t0);
       x.letterSpacing = '0px';
       // Rows, sized to whatever space the format leaves.
-      const listTop = 300, listBottom = a.bottom - 118;
+      const listTop = 300 + t0, listBottom = a.bottom - 118;
       const rowH = Math.min(104, Math.max(58, (listBottom - listTop) / Math.max(1, hs.length)));
       hs.forEach((h, i) => {
         const ry = listTop + i * rowH, mid = ry + rowH / 2;
@@ -10138,7 +10326,7 @@ const SHARE_PAINT = {
       x.fillStyle = 'rgba(246,244,255,0.6)';
       x.font = '700 22px "Outfit", sans-serif';
       x.letterSpacing = '4px';
-      x.fillText('BANKED TODAY', PAD + 30, by + 51);
+      x.fillText(isToday ? 'BANKED TODAY' : 'BANKED THAT DAY', PAD + 30, by + 51);
       x.letterSpacing = '0px';
       x.textAlign = 'right';
       x.fillStyle = CARD.teal;
@@ -10147,19 +10335,21 @@ const SHARE_PAINT = {
       x.textAlign = 'left';
     }
   },
-  // THE STREAK — one number, poster-loud.
+  // THE STREAK — one number, poster-loud. s.days is the mark a takeover or the wins card crossed: a
+  // win shared after the streak broke shows the mark it earned, never a 0 (2026-10-17).
   streak: {
     ground: (x, W, H) => { scInk(x, W, H, 'rgba(255,138,91,0.42)'); return true; },
-    body: (x, W, H, a) => {
+    body: (x, W, H, a, s) => {
       // Same wrong scope the Progress tile carried until 2026-08-02: this card
       // says DAYS IN A ROW, so its best-ever is the best DAY streak. With
       // bestHabitRun() here a personal-best day streak got the "ON A RUN"
       // eyebrow and a "Best: 8." footer borrowed from a single habit — on a
       // card built to be shared, which is the worst place to state a number
       // the athlete cannot find anywhere else in the app.
-      const now = currentDayStreak(), best = bestDayStreak();
+      const cur = currentDayStreak(), best = bestDayStreak();
+      const now = Math.max(cur, (s && s.days) || 0), alive = now === cur;
       x.textAlign = 'center';
-      scEyebrow(x, a.cx, a.cy - 260, now >= best ? 'PERSONAL BEST' : 'ON A STREAK', CARD.orange);   // one word, streak (it said ON A RUN)
+      scEyebrow(x, a.cx, a.cy - 260, !alive ? 'DAY STREAK' : now >= best ? 'PERSONAL BEST' : 'ON A STREAK', CARD.orange);   // one word, streak (it said ON A RUN)
       x.font = '150px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
       x.fillText('🔥', a.cx, a.cy - 120);
       const g = x.createLinearGradient(0, a.cy - 60, 0, a.cy + 110);
@@ -10175,7 +10365,9 @@ const SHARE_PAINT = {
       x.letterSpacing = '0px';
       x.fillStyle = 'rgba(246,244,255,0.6)';
       x.font = '600 28px "Outfit", sans-serif';
-      x.fillText(live().length + ' habits, logged every day.' + (best > now ? ' Best: ' + best + '.' : ' Not one missed.'), a.cx, a.cy + 224);
+      // A day streak is days on target, which allows one thing undone, so it does not say "Not one missed".
+      const said = now === 0 ? 'Today can start one.' : now === 1 ? 'Day one. Tomorrow makes it a streak.' : 'On target, every one of them.';
+      x.fillText(said + (best > now ? ' Best: ' + best + '.' : ''), a.cx, a.cy + 224);
       // A dot per day, wrapped.
       const dots = Math.min(now, 40), per = 20, dot = 18, gap = 10;
       const rows = Math.ceil(dots / per);
@@ -10188,11 +10380,12 @@ const SHARE_PAINT = {
       }
     }
   },
-  // THE UNLOCK — a single medal, big.
+  // THE UNLOCK — a single medal, big: the one Share it came from (medalFor(): a milestone, a
+  // consistency tier, a quest or a comeback), else the newest milestone.
   medal: {
     ground: (x, W, H) => { scInk(x, W, H, 'rgba(47,182,122,0.34)'); return true; },
-    body: (x, W, H, a) => {
-      const m = latestMedal();
+    body: (x, W, H, a, s) => {
+      const m = medalFor(s);
       x.textAlign = 'center';
       if (!m) {
         x.fillStyle = CARD.paper; x.font = '800 56px "Outfit", sans-serif';
@@ -10202,11 +10395,11 @@ const SHARE_PAINT = {
         return;
       }
       scConfetti(x, W, H, a.top, [CARD.mint, CARD.grape, CARD.teal, CARD.orange, '#F27DA8']);
-      scEyebrow(x, a.cx, a.cy - 250, m.tierName === 'CONSISTENCY' ? 'CONSISTENCY' : 'MILESTONE · ' + m.tierName, CARD.mint);
+      scEyebrow(x, a.cx, a.cy - 250, m.eyebrow, CARD.mint);
       scMedal(x, a.cx, a.cy - 60, 150, m.metal, m.tint, m.emoji);
       x.fillStyle = 'rgba(35,31,53,0.5)';
       x.font = '30px "Outfit", sans-serif';
-      x.fillText('★'.repeat(m.stars), a.cx, a.cy + 22);
+      if (m.stars) x.fillText('★'.repeat(m.stars), a.cx, a.cy + 22);
       x.textAlign = 'center';
       x.fillStyle = CARD.paper;
       const sz = scFit(x, m.name.toUpperCase(), W - 200, 84, 46);
@@ -10353,18 +10546,61 @@ const SHARE_PAINT = {
         x.textAlign = 'left';
       }
     }
+  },
+  // THE TITLE — a title you earned, on its metal plate (2026-10-17): an event's, a season's or one off
+  // the road. titleFor() decides which one and what it took.
+  title: {
+    ground: (x, W, H) => { scInk(x, W, H); return true; },
+    body: (x, W, H, a, s) => {
+      const t = titleFor(s);
+      x.textAlign = 'center';
+      if (!t) {
+        x.fillStyle = CARD.paper; x.font = '800 56px "Outfit", sans-serif';
+        x.fillText('No title yet.', a.cx, a.cy);
+        x.fillStyle = 'rgba(246,244,255,0.6)'; x.font = '600 30px "Outfit", sans-serif';
+        x.fillText('Your first lands at level ' + PASS_TRACK[0].lv + '.', a.cx, a.cy + 52);
+        return;
+      }
+      scEyebrow(x, a.cx, a.cy - 140, t.eyebrow, CARD.mint);
+      scPlate(x, a.cx, a.cy - 70, t.p.name.toUpperCase(), t.metal);
+      x.fillStyle = 'rgba(246,244,255,0.78)'; x.font = '600 34px "Outfit", sans-serif';
+      x.fillText(t.p.note, a.cx, a.cy + 60);
+      x.fillStyle = CARD.mint; x.font = '700 24px "Outfit", sans-serif';
+      x.fillText(t.took.head, a.cx, a.cy + 130);
+    }
   }
 };
 const SHARE_SIZES = { post: [1080, 1350], story: [1080, 1920], square: [1080, 1080] };
+// What Instagram draws over a Story (2026-10-17): its progress bar, name and close button across the
+// top 250 px, its reply bar and buttons across the bottom 340 px. Nothing that matters goes there, and
+// buildShareCard() hands every painter an area inside it. The footer sat at y 1750-1836 on a Story,
+// under the reply bar. A Post or a Square has no overlay.
+const SHARE_SAFE = { post: { top: 0, bottom: 0 }, square: { top: 0, bottom: 0 }, story: { top: 250, bottom: 340 } };
+// The six cards. `as(subject)` is how a card names itself in the rail when a moment handed it one (the
+// Milestone card holding a quest says Quest), and caption(level, subject) is the line that travels with
+// the image when it is shared.
 const SHARE_CARDS = [
   { id:'rank',    name:'Rank',    emoji:'🏵️', note:'Your crest, level, title and season stats.',
-    caption: LI => LI.rank.label + ' · level ' + LI.lv },
+    as: s => { const h = s.habit && habitById(s.habit);
+      return h ? { name: shortName(h), emoji: splitEmoji(h.name)[0] || '🏵️', note: 'Your new rank in ' + shortName(h).toLowerCase() + '.' }
+           : s.skin ? { note: 'Your card, on the skin you just unlocked.' } : null; },
+    caption: (LI, s) => { const h = s && s.habit && habitById(s.habit);
+      return h ? habitLevel(h).rank.label + ' in ' + shortName(h).toLowerCase() : LI.rank.label + ' · level ' + LI.lv; } },
   { id:'receipt', name:'The day', emoji:'✅', note:"Today's habits, ticked. The one that explains itself.",
-    caption: () => dayPct(TKEY()) + '% of my day, done' },
+    as: s => (s.day && s.day !== TKEY()) ? { note: 'That day, every habit ticked.' } : null,
+    caption: (LI, s) => { const k = (s && s.day && LOG[s.day]) ? s.day : TKEY();
+      return isPerfect(k) ? 'A perfect day' : dayPct(k) + '% of my day, done'; } },
   { id:'streak',  name:'Streak',  emoji:'🔥', note:'One number, as loud as it goes.',
-    caption: () => currentDayStreak() + ' days in a row' },
+    caption: (LI, s) => Math.max(currentDayStreak(), (s && s.days) || 0) + ' days in a row' },
   { id:'medal',   name:'Milestone', emoji:'🏅', note:'Your newest milestone and what it cost.',
-    caption: () => { const m = latestMedal(); return m ? m.name : 'A new milestone'; } },
+    as: s => s.k === 'tier' ? { name: 'Tier', emoji: (medalFor(s) || {}).emoji || '🏅', note: 'The consistency tier you just cleared.' }
+           : s.k === 'quest' ? { name: 'Quest', emoji: '🎯', note: 'The quest you just finished.' }
+           : s.k === 'comeback' ? { name: 'Comeback', emoji: '🔄', note: 'The day you came back.' }
+           : { note: 'The milestone you just earned.' },
+    caption: (LI, s) => { const m = medalFor(s); return m ? m.name : 'A new milestone'; } },
+  { id:'title',   name:'Title',   emoji:'📛', note:'A title you earned, on its plate.',
+    as: () => ({ note: 'The title you just earned, and what it took.' }),
+    caption: (LI, s) => { const t = titleFor(s); return t ? 'Earned the title ' + t.p.name : 'A title, earned'; } },
   { id:'wrap',    name:'Month',   emoji:'🗓️', note:'The whole month as a grid. Wrapped-style.',
     caption: () => 'My month, logged' }
 ];
