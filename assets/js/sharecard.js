@@ -154,8 +154,10 @@
   };
 
   // ⚠️ FARSI: DRAFTS, EVERY ONE. Amir writes or approves every Farsi word before it ships (the design page, decision 2). The voice is
-  // the Farsi site's: warm and colloquial ("همون"). Dates on a Farsi card are Shamsi (۲۵ مهر ۱۴۰۵); the design page showed Gregorian
-  // in Farsi, so that is one more thing for Amir to confirm. A lift's name and a cycle's name stay in English, as they are in the app.
+  // the Farsi site's: warm and colloquial ("همون"). A lift's name and a cycle's name stay in English, as they are in the app.
+  // DECIDED (Amir, 2026-10-17: "Keep all three Farsi choices"): Iranian (Shamsi) dates on a Farsi card (۲۵ مهر ۱۴۰۵, not the design
+  // page's Gregorian); the athlete's name in English letters (a programme holds no Farsi spelling of it); "Career Mode" in English on the
+  // level card (levelEye). The words below are still drafts waiting for his read.
   const FA = {
     coach: 'امیر اردکانی · مربی',
     kg: 'کیلو', reps: () => 'تکرار', sessions: 'جلسه', weeks: 'هفته', cycles: 'دوره', newBests: 'رکورد جدید',
