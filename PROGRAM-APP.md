@@ -1115,9 +1115,11 @@ Highlight Reel), and added *"the achievements, badges and other things need to h
   cycle's own cover, `cycleArtUrl()`) and **roadmap** (The Distance, each cycle's cover small), and Career Mode's **badge**, **achievement**,
   **title**, **level** and **quest**, drawn with sample data until phase 3 feeds them. Barlow and Barlow Condensed from
   `/assets/css/app-fonts.css`; Vazirmatn (`assets/fonts/Vazirmatn-Variable.woff2`) loaded only for a Farsi card: right to left, Persian
-  digits, Shamsi dates, no letter-spacing, a lift's and a cycle's name in English. Arrows, ticks and stars are drawn (the font files carry
-  Latin only). **Every Farsi word is in ONE table, `FA`, and every one is a draft for Amir.** program.html loads the painter the first time
-  a card is drawn (`hlLib()`); sw.js precaches it.
+  digits, no letter-spacing, a lift's and a cycle's name in English. **Decided** (Amir, 2026-10-17: *"Keep all three Farsi choices"*):
+  Iranian (Shamsi) dates on a Farsi card (the design page had shown Gregorian), the athlete's name in English letters, and "Career Mode"
+  in English on the level card. Arrows, ticks and stars are drawn (the font files carry Latin only). **Every Farsi word is in ONE table,
+  `FA`, and every one is still a draft for Amir to read.** program.html loads the painter the first time a card is drawn (`hlLib()`);
+  sw.js precaches it.
 - **The rules (the design page's):** a card says what the app says, from the same rules (PROG-01): the set as lifted (`w × r` from the
   record), never the 1RM estimate; a kilo gain only at the same reps (or a reps gain at the same weight). Never body weight, a check-in
   answer, pain or an RPE-only claim (`winText()` now says each win's `shape` and `share`: *felt easier* wins and *stronger* only because it

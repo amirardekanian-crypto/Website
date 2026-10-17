@@ -303,8 +303,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   cards, for Career Mode phase 3); program.html decides which win and which numbers from the app's own rules (`winText()`'s `shape` and `share`, the
   records, the retest comparison). A card never claims beyond the sets (PROG-01: the set as lifted, never the estimate, no RPE-only win), never
   shows body weight, a check-in answer or pain, and nothing leaves the phone until Share or Save image. **Every Farsi word on a card is in
-  sharecard.js's `FA` table, a draft for Amir.** sharecard.js is in sw.js's SHELL, served cache-first by its plain URL: a change to it ships with a
-  CACHE bump, and `node scripts/headless/sharecard.js` runs after it (every card, both sizes, both languages, text inside its box).
+  sharecard.js's `FA` table, a draft for Amir.** sharecard.js is in sw.js's SHELL, served cache-first by its plain URL: a change to what it draws
+  ships with a CACHE bump (a comment alone does not need one), and `node scripts/headless/sharecard.js` runs after it (every card, both sizes,
+  both languages, text inside its box). Farsi cards: Shamsi dates, the athlete's name in English letters, "Career Mode" in English (Amir, 2026-10-17).
 - **Mid-session the tab bar hides** (WK-03, Amir 2026-09-27, option C; `PROGRAM-APP.md` → *The session bar*): from
   Start until Done the session bar is one slim line (← Home · clock · Pause · ⋯; under ⋯ Pause, Guided, Reset and, once a
   set is logged and the day is not ready, **Finish early**, two taps, `finishEarlyStep()` shared with the finish card's
