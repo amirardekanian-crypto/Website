@@ -8,8 +8,9 @@ add the questions people really ask you.
 How it is used:
 - Sections marked **[both]** go to the bot on both sites. **[en]** is only for the English
   site (`index.html`), **[fa]** only for the Farsi site (`index-fa.html` and the Farsi product pages).
-  The English site never mentions the Farsi course or the testing app (that is deliberate), so
-  they are in [fa] only.
+  The Iran products (the Iran coaching price, the course, the testing app) are [both], because
+  Iranians may ask in English (Amir, 2026-10-17). The English site still does not advertise them:
+  the English bot answers about them only when asked, or when the visitor says they live in Iran.
 - After any edit, run `python scripts/build_chat_facts.py` and redeploy `site-chat`
   (`supabase/functions/README.md`). The pre-commit check blocks a commit where this file and
   the function's copy disagree.
@@ -135,9 +136,9 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 
 ---
 
-## [fa] Online coaching on the Farsi site
+## [both] Online coaching for players living in Iran
 
-- برنامه‌ی اختصاصی، for tennis and padel players. Price for people living in Iran: **the
+- The personal programme (برنامه‌ی اختصاصی), for tennis and padel players, as sold on the Farsi site. Price for people living in Iran: **the
   equivalent of $25 a month**, paid in toman at that day's rate. Amir says the exact toman amount
   in his message. No hidden costs, no long contract. 10% loyalty discount on renewal.
 - Includes: a personal tennis or padel S&C programme, the app on your phone, cues (and video where
@@ -146,9 +147,9 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 - **Living outside Iran?** Send Amir a DM on Instagram or a WhatsApp message for the price.
 - **Payment:** fill in the form, Amir messages you with a few questions, then you arrange payment
   on WhatsApp or Instagram.
-- **Start:** https://www.amirardekani.com/form-fa.html (the button says «شروع کن»).
+- **Start:** https://www.amirardekani.com/form-fa.html (the form is in Farsi; the button says «شروع کن»).
 
-## [fa] The Tennis Performance System course (سیستم آمادگی جسمانی تنیس)
+## [both] The Tennis Performance System course (سیستم آمادگی جسمانی تنیس)
 
 - A self-guided 16-week tennis S&C programme on your phone. One payment, the equivalent of
   **$17** in toman at that day's rate, and it never expires.
@@ -170,9 +171,9 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
   Level 2 suits you.
 - To buy: the buy button opens WhatsApp with the message ready; pay by card-to-card; the username
   and password come on WhatsApp.
-- Page: https://www.amirardekani.com/tennis/
+- Page (in Farsi): https://www.amirardekani.com/tennis/. The course itself is in Farsi.
 
-## [fa] The Tennis Fitness Testing app (آزمون آمادگی جسمانی تنیس)
+## [both] The Tennis Fitness Testing app (آزمون آمادگی جسمانی تنیس)
 
 - For tennis coaches and academies. One payment, the equivalent of **$17** in toman, for the whole
   academy: one account that every coach uses on their own phone.
@@ -187,7 +188,7 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 - Stores only each player's name, sex, birth year and month, results and notes, in the
   academy's own account.
 - To buy: WhatsApp, card-to-card, the academy's login comes on WhatsApp.
-- Page: https://www.amirardekani.com/tennis-testing/
+- Page (in Farsi): https://www.amirardekani.com/tennis-testing/
 
 ## [fa] Farsi words to use
 
