@@ -122,8 +122,10 @@ nutrition advice but no plans).
 
 ## [en] Programmes and prices (English site)
 
-All prices in US dollars. Three levels, named after tennis scoring. You pay in advance, after you
-have talked with Amir.
+All prices in US dollars. Three levels, named after tennis scoring, priced by the number of
+5-week cycles (Amir, 2026-10-17: "the english prices are for 1 cycle, 3 cycles and 6 cycles").
+You pay in advance, after you have talked with Amir. The website's cards say "1-month", "3-month"
+and "6-month" programme: what you get is 1, 3 or 6 cycles of 5 weeks.
 
 **Every programme includes:** the training app and dashboard, an intake call (up to 30 min), a
 programme written for your goals and assessment, weekly check-ins (4 a month), a performance
@@ -131,9 +133,9 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 
 | Programme | Price | Length | Adds |
 |---|---|---|---|
-| **Game** | $70 | 1 month | everything above |
-| **Set** | $180 ($60 a month, saves 14%) | 3 months | the programme updated monthly |
-| **Match** (best value) | $300 ($50 a month, saves 29%) | 6 months | priority WhatsApp and email support; competition services (your plan follows your tournament schedule, with competition warm-up programmes); video technique reviews |
+| **Game** | $70 | 1 cycle (5 weeks) | everything above |
+| **Set** | $180 ($60 a cycle, saves 14%) | 3 cycles (15 weeks) | the programme updated every cycle |
+| **Match** (best value) | $300 ($50 a cycle, saves 29%) | 6 cycles (30 weeks) | priority WhatsApp and email support; competition services (your plan follows your tournament schedule, with competition warm-up programmes); video technique reviews |
 
 - **Payment:** apply, talk, then pay by PayPal. Then he writes your programme.
 - **Apply:** https://www.amirardekani.com/form.html
@@ -148,12 +150,13 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 ## [both] Online coaching for players living in Iran
 
 - The personal programme (برنامه‌ی اختصاصی), for tennis and padel players and athletes from any sport, as sold on the Farsi site. Price for people living in Iran: **the
-  equivalent of $25 a month**, paid in toman at that day's rate. Amir says the exact toman amount
-  in his message. No hidden costs, no long contract. 10% loyalty discount on renewal.
+  equivalent of $25 a month**, as the Farsi site says, paid in toman at that day's rate. People in
+  Iran pay **one cycle (5 weeks) at a time**: there are no multi-cycle plans or bundle prices for
+  Iran. Amir says the exact toman amount for the cycle in his message; never work it out. No hidden costs, no long contract. 10% loyalty discount on renewal.
 - Includes: a personal S&C programme for your sport, the app on your phone, cues (and video where
   there is one) for each exercise, weekly updates, readiness and load monitoring, direct messages
   and support.
-- **Living outside Iran?** Send Amir a DM on Instagram or a WhatsApp message for the price.
+- **Living outside Iran?** The English-site plans apply (Game, Set, Match, in US dollars, paid by PayPal).
 - **Payment:** fill in the form, Amir messages you with a few questions, then you pay by
   card-to-card (کارت‌به‌کارت). People outside Iran pay by PayPal.
 - **Start:** https://www.amirardekani.com/form-fa.html (the form is in Farsi; the button says «شروع کن»).
