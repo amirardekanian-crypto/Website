@@ -16,6 +16,9 @@ function overProg() {
   P.cycles.forEach((c, j) => { const s = Date.now() - 44 * DAY + (j - i) * 35 * DAY; c.startDate = ymd(new Date(s)); c.endDate = ymd(new Date(s + 34 * DAY)); });
   return P;
 }
+// This suite is about Home between cycles, so the athlete has already seen the cycle's one-time Cycle complete moment (Highlight Reel,
+// 2026-10-17: it opens full screen at the first open in the 14 days after the end date, and would cover Home). <id>_hl_seen marks it.
+const seen = P => ({ _hl_seen: { ['cycle' + (P.currentCycleIndex + 1) + '|' + P.cycles[P.currentCycleIndex].endDate]: 1 } });
 
 (async () => {
   const C = H.checker();
@@ -25,7 +28,7 @@ function overProg() {
     const at = n => ymd(new Date(new Date(cur.startDate + 'T12:00:00').getTime() + n * DAY));
     // Day 1 four times, Day 2 once, inside the cycle; one Day 2 from before it (does not count)
     const hist = [[1, 30], [2, 22], [1, 15], [1, 8], [1, 1], [2, -3]].map(([d, n]) => ({ completed_on: at(n), day: String(d), readiness: 4, log: [] }));
-    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: P, hist, stub: { library: H.library() } });
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: P, hist, seed: seen(P), stub: { library: H.library() } });
     await p.waitForTimeout(600);
     const r = await p.evaluate(() => {
       const pick = document.querySelector('#screen-home .bt-pick');
@@ -44,7 +47,7 @@ function overProg() {
     const P = overProg(), cur = P.cycles[P.currentCycleIndex];
     const at = n => ymd(new Date(new Date(cur.startDate + 'T12:00:00').getTime() + n * DAY));
     const hist = [[1, 10], [2, 11]].map(([d, n]) => ({ completed_on: at(n), day: String(d), readiness: 4, log: [] }));
-    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: P, hist, stub: { library: H.library() } });
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: P, hist, seed: seen(P), stub: { library: H.library() } });
     await p.waitForTimeout(600);
     C.check('every day trained as often: no "did least" row', await p.evaluate(() => !document.querySelector('#screen-home .bt-pick')));
     await ctx.close();
