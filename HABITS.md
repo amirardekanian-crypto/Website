@@ -1530,7 +1530,8 @@ coach cannot owe forty people a phone call because forty people were consistent,
 nothing on this track costs Amir anything to hand over:
 
 - **Titles** — a name the athlete wears. It sits beside their rank on the board and the
-  wall, and is printed on the rank card they share.
+  wall, is printed on the rank card they share, and has a share card of its own, the **Title**
+  card (its plate and what it took, 2026-10-17).
 - **Cards** — the look of that shareable card. Five grounds (`HOUSE`, `EMBER`,
   `BLUEPRINT`, `NIGHTFALL`, `FLARE`), all painted on the canvas, all inside the palette:
   a treatment changes *structure*, never colour.
@@ -1622,39 +1623,120 @@ thing is ever listed — nothing appears twice.
 
 Ranks, titles and medals all wear the same metal language (`METALS` in `habits.html`:
 bronze → silver → emerald → amethyst → prismatic; the third tier was gold until 2026-09-26,
-when the brand's "no yellow or gold, ever" was applied to Proof too). `rankCrest()` draws a tier-shaped,
+when the brand's "no yellow or gold, ever" was applied to Proof too). The prismatic rim runs grape, sky,
+teal, pink, coral, in the same order in the CSS (`METALS.prisma.rim`) and on the canvas (`metalFill()`):
+until 2026-10-17 teal blended straight into coral through a khaki-olive band, the nearest thing to ochre in
+the app, 80 px wide on the Title card's plate. `rankCrest()` draws a tier-shaped,
 metal-rimmed badge for a rank — the road, the Today hero and the share card all call
 it, so a rank never looks different in two places. `titlePlate()` renders an owned title
 as a metal nameplate; rarity follows the level it unlocks at (bronze under 13, silver from
 13, emerald from 21), except **event titles and PROOF ITSELF, which are always prismatic**
 regardless of level. Medals are the third piece: `achMedal()` draws a milestone as the
-habit's own emoji (or one for its measure — 🏆 perfect days, 📋 three-habit days, 🔄 and
+habit's own emoji (or one for its measure — 💎 perfect days, 📋 three-habit days, 🔄 and
 🛡️ comebacks) on a disc tinted in that habit's colour, inside a metal rim set by its tier
 (bronze *A good week*, silver *The long haul*, emerald *Rare*); `evMedal()` draws an event as
-its own emoji on a dark disc inside the prismatic rim. **Not yet earned is dimmed, not
+its own emoji on a dark disc inside the prismatic rim (THE FOUNDRY's is ⚒️). Perfect days wore 🏆
+and THE FOUNDRY ☀️ until 2026-10-17: both are gold in every emoji font, and the share cards put them at
+the centre of a medal on Instagram. **Not yet earned is dimmed, not
 broken:** the same medal at 40% opacity, real rim and tint kept — the convention the
 Locker's road uses for locked rewards. A dashed, greyed disc reads as *something went
 wrong here*, not *you haven't got this yet*. None of this changes what is earned or when —
 it is presentation over the same `PASS_TRACK`/`ACHIEVEMENTS`/`EVENTS` data.
 
-### The share picker — five cards, one painter
+### The share picker — six cards, one painter
 
 "Share it" (the Locker's card preview, the wins card, and the button on every celebration takeover)
-opens a **sheet**, not a single fixed image. `SHARE_CARDS` in `habits.html` lists five:
+opens a **sheet**, not a single fixed image. `SHARE_CARDS` in `habits.html` lists six:
 **Rank** (crest, level, title, season stats), **The day** (today's habits ticked — "the
 one that explains itself"), **Streak** (the day streak, poster-loud), **Milestone** (it was
-*Medal* until POL-02; `latestMedal()` — the newest thing worth showing off: a milestone if one exists,
-otherwise the habit on the longest current streak), and **Month** (the calendar as a grid,
-Wrapped-style). Each renders in three formats — Post 4:5, Story 9:16, Square 1:1
+*Medal* until POL-02), **Title** (a title on its metal plate, 2026-10-17) and **Month** (the calendar
+as a grid, Wrapped-style). Each renders in three formats — Post 4:5, Story 9:16, Square 1:1
 (`SHARE_SIZES`) — and **the preview IS the export**: `paintSharePreview()` calls the
 exact same `buildShareCard()` the Save/Share buttons use, so there is no separate
 low-fidelity thumbnail to fall out of sync with the real thing.
 
+**A card is about the win it came from** (2026-10-17, Amir: *"the achievements, badges and other things
+need to have a celebration as well, those are important as well"*). Until then every Share it opened a
+card about the athlete in general: a milestone's opened `latestMedal()` (the last earned in the list's
+order, often not the one that had just landed), a quest's and a comeback's opened the Rank card, a title's
+too, and a habit's new rank had no card. Now `openShare(kind, subj)` takes **one subject per card id**
+(`{ medal: { k:'milestone', id:'HS2' }, title: { id:'t_early' } }`), `buildShareCard(kind, size, subject)`
+hands that card's subject to its painter, and switching cards in the rail keeps them, so the medal is
+still that medal after a look at the Rank card. A card with no subject draws what it always did (the
+Locker's *Share it →* sends none). Subjects live in `UI.share` only: nothing is stored, and nothing is
+shared until the athlete taps. The rail names a card by its subject (`shareCardView()`): the Milestone
+card holding a quest says *Quest*, one holding a tier says *Tier*. What each moment sends is the table
+in *Every reward, its moment and its card* below.
+
 Every painter is a `{ ground, body }` pair in `SHARE_PAINT`, sharing a small canvas kit
-(`scRR`, `scFit`, `scEyebrow`, `scStats`, `scConfetti`, …) so the five stay one family
-rather than five one-off drawings. `scFooter()` always signs the card the same way —
-the brand mark (or an "AA" fallback if the image hasn't loaded), "AA PROOF", and the
-site handle.
+(`scRR`, `scFit`, `scEyebrow`, `scStats`, `scConfetti`, …) so the six stay one family
+rather than six one-off drawings. Each is called `(x, W, H, area, subject)`. `scFooter()` always signs
+the card the same way — the brand mark (or an "AA" fallback if the image hasn't loaded), "AA PROOF"
+over *The habit tracker that keeps score* on the left, and **@amirardekanian** over AMIRARDEKANI.COM on
+the right (the handle since 2026-10-17: on Instagram it is the thing a viewer taps). The line that
+travels with the image (`caption()`) carries both too.
+
+**Instagram's bars (2026-10-17).** On a Story Instagram draws its progress bar, the name and the close
+button over the top ~250 px and its reply bar over the bottom ~340 px, and Proof's footer sat at
+y 1750-1836, under the reply bar. `SHARE_SAFE` holds those insets and `buildShareCard()` lays every card
+out inside them: on a Story the footer's lowest pixel is y 1580 and the painters get the area
+290-1464 (`area.safeTop` moves The day's header down); a Post (area 120-1150) and a Square (120-880) have
+no overlay and did not move. **A new painter draws inside `area` and nowhere else**, which
+`scripts/headless/proof-cards.js` checks for every card, subject and format.
+
+**The Title card** (`SHARE_PAINT.title`, `titleFor()`): the title as a big metal nameplate in its rarity
+(bronze, silver, emerald; event titles, season titles and PROOF ITSELF prismatic), its note in quotes,
+and a *what it took* panel: an event's three goals under *FINISHED BACKBONE*, a season's finish (rank,
+level and XP) under *FINISHED PRE-SEASON*, or *LEVEL 8 ON THE ROAD* for one off the road. An event title
+wears its event's medal above the plate, a road or season title the crest of its rank. With no subject it
+shows the title worn, else the newest one owned, else *No title yet*. UNBOWED's card reads *"Fell off.
+Came back. Did it again."*
+
+**Share it never loses a takeover.** It used to empty `UI.celebrate`, so a title or a quest queued behind
+the level being shared was never shown. The rest of the queue now waits in `UI.celebrateLater` and
+`closeShare()` (the ✕, the scrim, the phone's Back) puts it back.
+
+### Every reward, its moment and its card (2026-10-17)
+
+| Reward | Its moment | Share it opens |
+|---|---|---|
+| A new overall level | the whole screen, grape | **Rank**, eyebrow *LEVEL UP* |
+| A new overall rank, or prestige past level 50 | the whole screen, the rank ground | **Rank**, eyebrow *NEW RANK* or *PRESTIGE* |
+| A road title (10 of the 14 rewards, SIGNED ON to PROOF ITSELF) | on its level's screen (*Unlocked · yours for good*); a screen of its own when no level came with it (a rules change, a sync) | **Title**: its plate, its note, *LEVEL N ON THE ROAD*. The Rank card beside it shows the level |
+| A card skin (4 of the 14: EMBER, BLUEPRINT, NIGHTFALL, FLARE) | on its level's screen; its own when no level came with it | **Rank**, painted on the new skin |
+| A milestone (32 in families of marks I to III) | the wins card | **Milestone**: that medal in its metal, its note, the XP the ledger paid this season |
+| A consistency tier (5 per habit, same-day tiers coalesced) | the wins card | **Milestone** (chip *Tier*): the habit's medal in the tier's metal, *20 days of water and steps in a row* |
+| A habit's new rank | the wins card | **Rank** (chip = the habit): that habit's crest and level, with STREAK, BEST STREAK and DAYS DONE |
+| A habit's own level | a flash in its row (`UI.flash`): eight habits level often, so it stays small | none: its rank, every fifth level, has the card above |
+| A finished *A few weeks* event (5) and its title | the whole screen, kicker *BACKBONE finished* | **Title**: the prismatic plate, *FINISHED BACKBONE* and its three goals |
+| A quest completed during a run | the whole screen, badge ground | **Milestone** (chip *Quest*): the quest's name, note and XP (it opened the Rank card) |
+| The 3-day day streak mark | the wins card | **Streak**, that mark |
+| A day streak mark from 7 (`STREAK_TAKEOVER`) to 365 | the whole screen, ember | **Streak**, that mark: shared after the streak broke, the mark it earned, never a 0 |
+| A perfect day | the wins card | **The day**, for THAT day: by the time the card is tapped it can be yesterday |
+| A comeback | the wins card | **Milestone** (chip *Comeback*): SECOND WIND, *4 days off. Back, and the day counted.*, +50 XP (it opened the Rank card) |
+| A season title (level 5 in a season that has closed) | **the whole screen, kicker *Season over*** (new: it arrived in silence) | **Title**: the prismatic plate, *FINISHED PRE-SEASON*, the rank, level and XP it finished on |
+| A finished season with no title | **the wins card** (new) | none: the Rank card is already the new season's |
+
+The wins card has one Share it: it opens the newest win that has a card, and the picker holds the newest
+win of every other card too (a milestone and a perfect day from one evening are each one tap apart).
+
+**The season's moment is `checkSeasonMoments()`**, the first thing `checkLevelUps()` does, so it runs
+on the boot that re-baselines for the new season (that pass stays silent about points; this is the
+season's reward, not a point). `CFG.seenSeasons` holds the start dates already shown, only grows, is
+unioned across phones by `syncFromCloud()`, and is seeded silently the first time it is missing, so a
+record older than this build is history, not a moment. `season_record()` names a title only where the
+server minted it, so the title is added to `CFG.pass.owned` there and then rather than waiting for
+`syncTitles()`. Embedded on the training app's Home it waits, like every takeover.
+
+**Small truths fixed on the way:** The day's headline says *Day on target.* only when `dayQualifies()`
+says so (it was `dayPct >= 75`, a third rule under an 80% gate); the Streak card's line is *On target,
+every one of them.* (it said *N habits, logged every day. Not one missed.*, which the one-miss door makes
+untrue); the Milestone card quotes the ledger (`milestonePaid()`), never the table, as XP_SYSTEM.md §5
+requires; and a habit name in a card's note is its short name (*12 days of water*, not *12 days of drink 8
+glasses*). On a Square the Rank card's crest gives way so a worn title's plate clears the stats (it was
+drawn over the middle number; `proof-cards.js` found it), the Streak card says *DAY STREAK*, not *ON A
+STREAK*, over a 0, and a title or skin takeover's sheen stays on the plate or card (it slid past their
+edge as a pale box).
 
 ⚠️ The **Month** card's calendar grid must fit inside a fixed body area that also holds
 its stat boxes and the footer. A 5-row month (most months, depending on which weekday
@@ -1926,8 +2008,8 @@ it only when this app says it is ready. The card stays either way.
   or synced twice, and `program.html` still writes no `<id>_hab_*` key (body weight, which
   it owns, aside). It redraws its card from the snapshot `publishCardSnapshot()` republishes.
 - **What waits for the full app:** `checkLevelUps()` stands down in the strip, so `CFG.seen`
-  does not move and every level-up, reward and quest is still waiting for its takeover, and a
-  medal or a perfect day for the wins card, the next time Proof opens. So are the tour, the install offer, the XP flights,
+  does not move and every level-up, reward, quest and season title is still waiting for its
+  takeover, and a medal or a perfect day for the wins card, the next time Proof opens. So are the tour, the install offer, the XP flights,
   the board sweep (`autoJoinBoard()`), the silent reward baseline, title minting, and
   Progress, Crew and the Locker. The toast shows inline under the rows.
 - The strip follows the training app's dark mode (`dark_mode`, then a message on each
@@ -2070,17 +2152,19 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   earned on the best run ever so breaking a streak never revokes a badge.
 - **Celebrations** (PRF-02, Amir's 1A, 2026-09-27): the whole screen only for a **new overall
   level** (its reward on the same screen), a **new rank**, a **day streak from 7 days**
-  (`STREAK_TAKEOVER`), a quest completed during a run and a finished *A few weeks* event (its
-  title); a reward that arrives with no level in the same pass (a rules change, a sync) gets
-  its own too. A medal, a consistency tier, a habit's
-  new rank, a perfect day, a comeback and the 3-day streak mark land on **the wins card** under
+  (`STREAK_TAKEOVER`), a quest completed during a run, a finished *A few weeks* event (its
+  title) and, since 2026-10-17, **a season's title** the day the season closes; a reward that
+  arrives with no level in the same pass (a rules change, a sync) gets its own too. A medal, a
+  consistency tier, a habit's new rank, a perfect day, a comeback, the 3-day streak mark and a
+  finished season with no title land on **the wins card** under
   Today's hero (`winsCard()`), with the XP the ledger paid, until it is tapped (*Got it*, or
   *Share it*). A made-up athlete's first 22 days: **30 takeovers → 9** (a free athlete 24 → 7),
   on 15 of the days before, up to 4 in one evening. `CFG.wins` holds only *which* win
   (`{k, id, …}`), never its XP (points are recomputed, never stored), and it syncs, so a card
   tapped on one phone is gone on the other. A habit's own level still flashes inline, and
-  same-day tier clears across several habits coalesce into one. Full rules in
-  [`XP_SYSTEM.md`](XP_SYSTEM.md) §5.
+  same-day tier clears across several habits coalesce into one. **Every moment's Share it opens a
+  card of that exact win** (2026-10-17): the table is *Every reward, its moment and its card*, under
+  *The share picker*. Full rules in [`XP_SYSTEM.md`](XP_SYSTEM.md) §5.
 
 - **The badges pay** (since stage 12). Clearing a consistency tier or unlocking a
   milestone is worth real XP, on the **overall** ladder only — never on a habit's own,
@@ -2098,7 +2182,9 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   never be earned again because the season is over. That was the honest answer to a
   veteran opening day 1 of season 2 with nothing new to want: the reset used to delete the
   evidence that the season ever happened. The shelf renders **nothing at all** until a
-  season has actually closed, like the streak flame on day one.
+  season has actually closed, like the streak flame on day one. **The day it closes, the season
+  title takes the whole screen** (*Season over*, `checkSeasonMoments()`, 2026-10-17; it used to land
+  in the Locker with no word), and a season finished without one lands on the wins card.
   ⚠️ `start_season()` is **coach-only now and was not before** — it had no auth guard at
   all while being executable by `anon`, so anyone with the public key in `habits.html`
   could have reset the board. Future-dated starts are refused, and `undo_season()` puts

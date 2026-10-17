@@ -480,9 +480,11 @@ has to climb in a new season — which is part of what §12.2 was about.
 
 ## 5. Celebrations
 
-**Since PRF-02 (2026-09-27, Amir's 1A) only five things take the whole screen**; the rest land on
+**Since PRF-02 (2026-09-27, Amir's 1A) only a few things take the whole screen** (six since a
+season's title joined them, 2026-10-17); the rest land on
 **the wins card** at the top of Today (`winsCard()`), with the XP they paid, until it is tapped. A
 made-up athlete's first 22 days went from 30 takeovers to 9 (a free athlete 24 → 7), nothing lost.
+Nothing in this section scores: a celebration only reads what the ledger already paid.
 
 | Trigger | Detected in | Where |
 |---|---|---|
@@ -491,6 +493,8 @@ made-up athlete's first 22 days went from 30 takeovers to 9 (a free athlete 24 �
 | **A day streak crossing a mark** of `STREAK_TAKEOVER` (7) days or more | `checkUnlocks()` | the whole screen, ember ground, a drawn flame |
 | **A weekly quest** completed (this week only) | `checkUnlocks()` | the whole screen, badge ground |
 | **A finished *A few weeks* event** (its title, `claimEventTitles()`) | `checkLevelUps()` | the whole screen, as a reward: the biggest single thing that is not a level |
+| **A season's title**, the day its season closes (level 5 that season, minted by the server) | `checkSeasonMoments()` | the whole screen, *Season over* (2026-10-17; it arrived in silence) |
+| **A finished season with no title** | `checkSeasonMoments()` | the wins card |
 | **A rank promotion on one habit** (water crossing GRINDER 5 → OPERATOR 1) | `checkLevelUps()` | the wins card |
 | **A consistency tier** cleared on any habit | `checkUnlocks()` | the wins card |
 | **A milestone** unlocked | `checkUnlocks()` | the wins card |
@@ -517,8 +521,18 @@ reading a word of it. Grape is never a badge, and ember is only ever the day str
 Confetti and a scatter of coins play once per takeover (`confettiHtml()`/`coinHtml()`
 in `habits.html`), deterministic per event so a re-render never re-scrambles it
 mid-fall. Every takeover but a habit-level chip, and the wins card, carries a **Share it** button
-(`lvActions()`) straight into the share picker below, pre-selecting the card that
-matches what was just earned.
+(`lvActions()`) straight into the share picker, **on a card of that exact win** (2026-10-17): the
+milestone, tier, quest or comeback on the Milestone card, a title on the Title card, the streak's
+mark, the perfect day's own date. The table of every reward, its moment and its card is in
+`HABITS.md` → *The share picker*. A Share it from a takeover parks the rest of the queue
+(`UI.celebrateLater`) and `closeShare()` puts it back: it used to drop it. A card that names an XP
+figure quotes the ledger, the rule below.
+
+**A season's moment** (`checkSeasonMoments()`, the first thing `checkLevelUps()` does) is the one
+celebration on the boot that re-baselines for a new season: that pass is silent about points, and
+this is the season's reward, not a point. `CFG.seenSeasons` holds the season starts already shown
+and only grows (unioned across phones); missing, it is seeded silently, so a record that predates
+the build is history.
 
 **The day streak celebration is new** (Amir: *"the app used to say nothing about the
 one number the whole qualify rule exists to protect"*). `DAY_STREAK_MARKS` in
@@ -955,8 +969,11 @@ That split is deliberate and matches how games work: ranked resets each season,
 account-level unlocks persist. It also means a season change never punishes someone for
 a 30-day streak they legitimately built.
 
-**No celebrations fire on a season change.** Levels drop, which would otherwise be
-noise; `rulesSignature()` includes the season start, so the app re-baselines silently.
+**No celebrations fire on a season change**, but one. Levels drop, which would otherwise be
+noise; `rulesSignature()` includes the season start, so the app re-baselines silently. The
+exception is the season that just closed (2026-10-17): its title, for anyone who reached level 5,
+takes the whole screen (*Season over*), and a finish without one lands on the wins card
+(`checkSeasonMoments()`, §5). It is a reward, not a point, so nothing is rescored for it.
 
 ### It also gates the workout backfill
 

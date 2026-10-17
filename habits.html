@@ -2990,7 +2990,9 @@ const METALS = {
   silver:   { label:'Silver',    rim:'linear-gradient(145deg,#E8ECF5,#AEB6C9 55%,#7C8499)',  ink:'#C9CEDC', flat:['#E8ECF5','#7C8499'] },
   emerald:  { label:'Emerald',   rim:'linear-gradient(145deg,#B5F2D2,#2FB67A 50%,#137A4F)',  ink:'#8BE8BC', flat:['#B5F2D2','#137A4F'] },
   amethyst: { label:'Amethyst',  rim:'linear-gradient(145deg,#C9B8FF,#8F7BF0 50%,#5A48C9)',  ink:'#C9B8FF', flat:['#C9B8FF','#5A48C9'] },
-  prisma:   { label:'Prismatic', rim:'conic-gradient(from 210deg,#6C5CE7,#3EC6E0,#35D0BA,#FF8A5B,#F27DA8,#6C5CE7)', ink:'#F6F4FF', flat:['#8F7BF0','#3EC6E0'] }
+  // Teal, then pink, then coral (2026-10-17): teal blended straight into coral through a khaki-olive band,
+  // the nearest thing to ochre in the app, and on the Title card's plate it ran 80 px wide. metalFill() matches.
+  prisma:   { label:'Prismatic', rim:'conic-gradient(from 210deg,#6C5CE7,#3EC6E0,#35D0BA,#F27DA8,#FF8A5B,#6C5CE7)', ink:'#F6F4FF', flat:['#8F7BF0','#3EC6E0'] }
 };
 const TIER_KEYS = ['bronze','bronze','silver','silver','emerald','emerald','amethyst','amethyst','prisma','prisma'];
 const CREST_CLIPS = {
@@ -3034,7 +3036,7 @@ function crestPath(x, cx, cy, w, h, key) {
 function metalFill(x, px, py, w, h, key) {
   const g = x.createLinearGradient(px, py, px + w, py + h);
   if (key === 'prisma') {
-    ['#6C5CE7', '#3EC6E0', '#35D0BA', '#FF8A5B', '#F27DA8'].forEach((c, i) => g.addColorStop(i / 4, c));
+    ['#6C5CE7', '#3EC6E0', '#35D0BA', '#F27DA8', '#FF8A5B'].forEach((c, i) => g.addColorStop(i / 4, c));   // METALS.prisma's order
   } else {
     const m = METALS[key] || METALS.bronze;
     g.addColorStop(0, m.flat[0]); g.addColorStop(1, m.flat[1]);
@@ -3056,9 +3058,11 @@ function titlePlate(p, small) {
 }
 // ── Medals ── milestones as emblems: metal rim by tier, habit-tint disc, the
 // habit's own emoji in the middle. Events wear the prismatic rim.
-const MEASURE_EMOJI = { perfectDays:'🏆', daysWith3:'📋', qualify:'✅',
+// 💎 and ⚒️, not 🏆 and ☀️ (2026-10-17): both are gold in every emoji font, and the share cards put them at
+// the centre of a medal on Instagram. No gold, yellow, amber or ochre in Proof, its emoji included.
+const MEASURE_EMOJI = { perfectDays:'💎', daysWith3:'📋', qualify:'✅',
                         comebackRun:'🔄', comebacksStuck:'🛡️' };
-const EV_EMOJI = { ev_foundry:'☀️', ev_bedrock:'🪨', ev_coldblood:'❄️', ev_standing:'🏁', ev_backbone:'🔄' };
+const EV_EMOJI = { ev_foundry:'⚒️', ev_bedrock:'🪨', ev_coldblood:'❄️', ev_standing:'🏁', ev_backbone:'🔄' };
 // A rung's full name, numeral included — "HUMAN SPRINKLER II". One helper so
 // the row, the takeover and the nearest-badge line can never disagree about
 // what a thing is called. See the `mark` note on ACHIEVEMENTS.
@@ -3078,7 +3082,7 @@ function achMedal(a, got) {
   return '<span class="medal" style="background:' + METALS[key].rim + '"><span class="medal-in" style="background:' + tint + '">' + emo + '</span></span>';
 }
 function evMedal(ev, got) {
-  const emo = EV_EMOJI[ev.id] || '🏆';
+  const emo = EV_EMOJI[ev.id] || '🏁';
   if (!got) return '<span class="medal" style="background:' + METALS.prisma.rim + ';opacity:.4"><span class="medal-in" style="background:#231F35">' + emo + '</span></span>';
   return '<span class="medal" style="background:' + METALS.prisma.rim + '"><span class="medal-in" style="background:#231F35">' + emo + '</span></span>';
 }
@@ -5700,7 +5704,7 @@ function winLine(w) {
     return { emo: emo(h), title: rankFor(w.to).label, sub: 'Your new ' + shortName(h).toLowerCase() + ' rank', xp: 0,
              share: ['rank', { habit: h.id }] };
   }
-  if (w.k === 'perfect') return { emo: '🏆', title: 'Perfect day', sub: 'Every habit you track, done', xp: dayXp(w.id),
+  if (w.k === 'perfect') return { emo: MEASURE_EMOJI.perfectDays, title: 'Perfect day', sub: 'Every habit you track, done', xp: dayXp(w.id),
                                   share: ['receipt', { day: w.id }] };
   if (w.k === 'comeback') return { emo: '🔄', title: 'Second wind', sub: w.gone + ' days off, and back', xp: COMEBACK_XP,
                                    share: ['medal', { k: 'comeback', gone: w.gone }] };
@@ -8050,16 +8054,19 @@ function renderBadgeCelebration(ev) {
     const keep = isT ? (worn ? ' It is on your name now, and a new season cannot take it back.' : ' It is yours for good. Wear it from your Locker.') : '';
     kicker = rw.season ? 'Season over' : rw.evName ? rw.evName + ' finished' : 'Unlocked';
     title = rw.name;
+    // The season's toast ("SEASON 1 has begun") never shows under a takeover, so this one says it.
+    const begun = rw.season && seasonName().toUpperCase() !== rw.name ? ' ' + seasonName() + ' has begun.' : '';
     sub = rw.season
-      ? (rw.rec ? seasonFinishLine(rw.rec) + ' ' : '') + 'This title names the season, and nobody can earn it now.' + keep
+      ? (rw.rec ? seasonFinishLine(rw.rec) + ' ' : '') + 'This title names the season, and nobody can earn it now.' + keep + begun
       : isT ? rw.note + ' A rank says where you stand this season. A title says what you are.' + keep
       : rw.note + ' Pick it for your card in your Locker. Yours for good.';
     // The Title card for a title, the Rank card drawn on a new skin (2026-10-17: both opened the Rank card as it was).
     share = isT ? 'title' : 'rank';
     subj = isT ? { title: { id: rw.id } } : { rank: { skin: rw.id } };
+    // The sheen is clipped to the plate or the card (2026-10-17): it slid on past their edge as a pale box.
     art = ev.reward.kind === 'title'
-      ? `<div style="position:relative">${titlePlate(ev.reward)}<span class="sheen"></span></div>`
-      : `<div style="position:relative;width:132px;height:166px;border-radius:20px;${CARD_LOOK[ev.reward.id] || CARD_LOOK.c_paper};box-shadow:0 18px 40px -18px rgba(0,0,0,.8)"><span class="sheen"></span></div>`;
+      ? `<div style="display:flex;position:relative;overflow:hidden;border-radius:999px">${titlePlate(ev.reward)}<span class="sheen"></span></div>`
+      : `<div style="position:relative;overflow:hidden;width:132px;height:166px;border-radius:20px;${CARD_LOOK[ev.reward.id] || CARD_LOOK.c_paper};box-shadow:0 18px 40px -18px rgba(0,0,0,.8)"><span class="sheen"></span></div>`;
   }
   return `
     <div class="lvwrap ${ground}" data-k="cel:${esc(ev.kind)}:${esc(String(ev.id))}" ${on(dismissCelebration)}>
@@ -10168,7 +10175,7 @@ function medalFor(s) {
   if (s.k === 'quest' && s.q) {
     const part = String(s.q.kind || '').split(':'), h = part[1] ? habitById(part[1]) : null;
     return { metal: 'amethyst', tint: h ? habitHue(h)[1] : '#EFECFB',
-             emoji: h ? (splitEmoji(h.name)[0] || '🎯') : ({ qualify: '✅', perfect: '🏆' })[part[0]] || '🎯',
+             emoji: h ? (splitEmoji(h.name)[0] || '🎯') : ({ qualify: MEASURE_EMOJI.qualify, perfect: MEASURE_EMOJI.perfectDays })[part[0]] || '🎯',
              name: String(s.q.title || 'QUEST'), note: String(s.q.note || '') + '.', xp: Number(s.q.xp) || 0, stars: 0,
              eyebrow: 'QUEST COMPLETE' };
   }
@@ -10190,13 +10197,189 @@ function titleFor(s) {
                : ['The season is over. Nobody can earn it now.'] } };
   }
   const ev = typeof p.event === 'string' ? EVENTS.find(e => e.id === p.event) : null;
-  if (ev) return { p, metal, eyebrow: 'EVENT TITLE', emoji: EV_EMOJI[ev.id] || '🏆', crest: null,
+  if (ev) return { p, metal, eyebrow: 'EVENT TITLE', emoji: EV_EMOJI[ev.id] || '🏁', crest: null,
                    took: { head: 'FINISHED ' + ev.name, lines: ev.goals.map(g => g.label) } };
   return { p, metal, eyebrow: 'TITLE · LEVEL ' + p.lv, emoji: null, crest: rankFor(p.lv || 1).name,
            took: { head: 'LEVEL ' + p.lv + ' ON THE ROAD', lines: ['Kept for good. A new season cannot take it back.'] } };
 }
 
-// ── The five cards ─────────────────────────────────────────────────
+// ── The Title card's own pieces (2026-10-17) ───────────────────────────────────────────────────
+// A title is worn on a plate, so the card is built round one big metal plate with a block of words and
+// proof under it, the whole block centred in the room the format leaves. A Square has 760 px to a Story's
+// 1174, so every height is measured first (scTitleLayout()) and the card shrinks its ornament, then gives
+// it up, then the note's third line, then the panel's rows, before anything could cross the bottom of the area.
+// The glow behind the card is its metal's own; a card with no title at all keeps the Proof violet.
+function scTitleGlow(metal) {
+  return ({ prisma: 'rgba(108,92,231,0.55)', amethyst: 'rgba(143,123,240,0.45)', emerald: 'rgba(47,182,122,0.34)',
+            silver: 'rgba(201,206,220,0.24)', bronze: 'rgba(226,163,119,0.30)' })[metal] || 'rgba(108,92,231,0.55)';
+}
+// Sixteen thin rays from the plate's centre, drawn first so everything else sits in front of them. The
+// prismatic titles (an event's, a season's, PROOF ITSELF) are the only ones that throw them. They run out
+// to a quarter of their strength a thousand pixels from the plate, so the words stay the loudest thing.
+function scTitleRays(x, cx, cy, W, H) {
+  const R = Math.hypot(W, H), half = 0.085;
+  const tone = (r, g, b, al) => {
+    const gr = x.createRadialGradient(0, 0, 0, 0, 0, 1000);
+    gr.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',' + al + ')');
+    gr.addColorStop(1, 'rgba(' + r + ',' + g + ',' + b + ',' + al / 4 + ')');
+    return gr;
+  };
+  x.save(); x.translate(cx, cy);
+  const violet = tone(108, 92, 231, 0.10), cyan = tone(62, 198, 224, 0.08);
+  for (let i = 0; i < 16; i++) {
+    const ang = i * Math.PI / 8 - Math.PI / 2;
+    x.fillStyle = i % 2 ? cyan : violet;
+    x.beginPath(); x.moveTo(0, 0); x.arc(0, 0, R, ang - half, ang + half); x.closePath(); x.fill();
+  }
+  x.restore();
+}
+// `text` in lines no wider than `max` at the font already set, balanced so a last line is never one
+// orphaned word, and cut with an ellipsis past `maxLines`.
+function scTitleWrap(x, text, max, maxLines) {
+  const words = String(text || '').split(/\s+/).filter(Boolean);
+  const fill = limit => {
+    const out = []; let line = '';
+    words.forEach(w => {
+      const next = line ? line + ' ' + w : w;
+      if (line && x.measureText(next).width > limit) { out.push(line); line = w; } else line = next;
+    });
+    if (line) out.push(line);
+    return out;
+  };
+  let lines = fill(max);
+  for (let lim = max - 8; lines.length > 1 && lim > max * 0.45; lim -= 8) {
+    const t = fill(lim);
+    if (t.length > lines.length) break;
+    lines = t;
+  }
+  if (lines.length > maxLines) {
+    let last = lines.slice(maxLines - 1).join(' ');
+    while (last.length > 1 && x.measureText(last + '…').width > max) last = last.slice(0, -1).replace(/[\s,;:]+$/, '');
+    lines = lines.slice(0, maxLines - 1).concat(last.replace(/[\s,;:]+$/, '') + '…');
+  }
+  return lines;
+}
+// The name's size on the plate: 72 px down to 40 until it fits, measured WITH the letter-spacing set
+// (Chrome counts it in measureText). A season name long enough to pass 40 goes a little lower, and one
+// that is still too long at 28 is cut with an ellipsis: nothing leaves the plate.
+function scTitleName(x, name, max) {
+  let size = 72, sp = 10, tw, text = name;
+  const set = () => {
+    x.font = '800 ' + size + 'px "Outfit", sans-serif';
+    x.letterSpacing = sp + 'px';
+    tw = x.measureText(text).width;
+  };
+  set();
+  while (tw > max && size > 28) { size -= 2; sp = size >= 40 ? 10 : Math.max(4, Math.round(size / 4)); set(); }
+  let base = name;
+  while (tw > max && base.length > 1) { base = base.slice(0, -1).replace(/\s+$/, ''); text = base + '…'; set(); }
+  x.letterSpacing = '0px';
+  return { size, sp, tw, text };
+}
+// What it took, one row per line: 30 px, a touch smaller for a long one, then two lines.
+function scTitleRows(x, lines, max) {
+  return (lines || []).map(text => {
+    let size = 30;
+    x.font = '600 ' + size + 'px "Outfit", sans-serif';
+    while (size > 26 && x.measureText(text).width > max) { size -= 1; x.font = '600 ' + size + 'px "Outfit", sans-serif'; }
+    return x.measureText(text).width <= max ? { size, lines: [text] } : { size, lines: scTitleWrap(x, text, max, 2) };
+  });
+}
+// Where everything goes, measured before anything is drawn. The block is eyebrow, ornament, plate, note
+// and panel with the spacing the design gives them (40, 50, 64, 52), centred in the area. If it is too tall
+// the ornament goes down to three quarters of its size, then goes (`orn` comes back null), then the note
+// keeps two lines, then the panel keeps only its head. The smallest of those is 508 px, the smallest area
+// 760. The plate is capped at the panel's width, 96 px in from each side, like everything else.
+function scTitleLayout(x, W, a, t) {
+  const cap = W - 192;
+  const nm = scTitleName(x, t.p.name.toUpperCase(), cap - 128);
+  const plateW = Math.min(cap, Math.ceil(nm.tw) + 128);
+  const orn = k => t.emoji ? { r: Math.round(110 * k), h: 2 * Math.round(110 * k) }
+                 : t.crest ? { w: Math.round(190 * k), h: Math.round(Math.round(190 * k) * 1.12) } : null;
+  const quote = t.p.note ? '“' + t.p.note + '”' : '';
+  x.font = '600 38px "Outfit", sans-serif';
+  const note3 = quote ? scTitleWrap(x, quote, W - 240, 3) : [];
+  const note2 = note3.length > 2 ? scTitleWrap(x, quote, W - 240, 2) : note3;
+  const panelW = W - 192, rows = scTitleRows(x, t.took.lines, panelW - 72 - 50);
+  const rowsH = rows.reduce((n, r) => n + 54 + (r.lines.length - 1) * 32, 0);
+  const steps = [[orn(1), note3, true], [orn(0.76), note3, true], [null, note3, true], [null, note2, true], [null, note2, false]];
+  const panelH = rowsOn => rowsOn && rows.length ? 98 + rowsH : 88;
+  const total = st => 18 + (st[0] ? 40 + st[0].h + 50 : 50) + 136 + 64
+                    + (st[1].length ? st[1].length * 50 + 52 : 0) + panelH(st[2]);
+  const room = a.bottom - a.top;
+  const st = steps.find(s => total(s) <= room) || steps[steps.length - 1];
+  let y = a.top + Math.max(0, (room - total(st)) / 2);
+  const L = { nm, plateW, rows, panelW, note: st[1], showRows: st[2] && rows.length > 0, panelH: panelH(st[2]),
+              orn: null, noteTop: 0 };
+  L.eyebrowY = y + 18; y += 18;
+  if (st[0]) { y += 40; L.orn = Object.assign({ cy: y + st[0].h / 2 }, st[0]); y += st[0].h + 50; } else y += 50;
+  L.plateTop = y; L.plateCy = y + 68; y += 136 + 64;
+  if (st[1].length) { L.noteTop = y; y += st[1].length * 50 + 52; }
+  L.panelTop = y;
+  return L;
+}
+// The plate, the hero: a fully rounded pill 136 high, the metal for its rim and Proof's ink inside, the
+// name in the metal's own ink (the prismatic wears white). The metal throws a soft glow round it.
+function scTitlePlate(x, cx, L, t) {
+  x.save();
+  const h = 136, w = L.plateW, px = cx - w / 2, py = L.plateTop, key = t.metal;
+  x.save();
+  x.shadowColor = scTitleGlow(key); x.shadowBlur = 48;
+  scRR(x, px, py, w, h, h / 2);
+  x.fillStyle = metalFill(x, px, py, w, h, key); x.fill();
+  x.restore();
+  // The sheen: a band of light slanting across the pill, laid on the outer shape before the ink goes in,
+  // so only the rim carries it.
+  const P = 0.906 * w + 0.423 * h;
+  const sh = x.createLinearGradient(px, py, px + 0.906 * P, py + 0.423 * P);
+  sh.addColorStop(0.26, 'rgba(255,255,255,0)'); sh.addColorStop(0.46, 'rgba(255,255,255,0.24)'); sh.addColorStop(0.66, 'rgba(255,255,255,0)');
+  scRR(x, px, py, w, h, h / 2);
+  x.fillStyle = sh; x.fill();
+  scRR(x, px + 9, py + 9, w - 18, h - 18, (h - 18) / 2);
+  x.fillStyle = CARD.ink; x.fill();
+  x.font = '800 ' + L.nm.size + 'px "Outfit", sans-serif';
+  x.letterSpacing = L.nm.sp + 'px';
+  x.textAlign = 'center';
+  x.fillStyle = key === 'prisma' ? '#F6F4FF' : METALS[key].ink;
+  const cap = x.measureText('H').actualBoundingBoxAscent || L.nm.size * 0.7;
+  x.fillText(L.nm.text, cx + L.nm.sp / 2, py + h / 2 + cap / 2);   // + half the spacing: it trails the last letter
+  x.letterSpacing = '0px';
+  x.restore();
+}
+// What it took: the panel under the note. The head says what was finished, then one ticked row per line.
+function scTitlePanel(x, L, t) {
+  x.save();
+  const px = 96, py = L.panelTop, pw = L.panelW, ph = L.panelH;
+  scRR(x, px + 1, py + 1, pw - 2, ph - 2, 27);   // the 2 px line is centred on the path, so it stays inside 96..W-96
+  x.fillStyle = 'rgba(246,244,255,0.07)'; x.fill();
+  x.strokeStyle = 'rgba(246,244,255,0.12)'; x.lineWidth = 2; x.stroke();
+  x.textAlign = 'left';
+  x.fillStyle = CARD.mint;
+  let hs = 22, hsp = 5, head = t.took.head;
+  const setHead = () => { x.font = '700 ' + hs + 'px "Outfit", sans-serif'; x.letterSpacing = hsp + 'px'; };
+  setHead();
+  while (hs > 18 && x.measureText(head).width > pw - 72) { hs -= 1; hsp = 4; setHead(); }
+  let cut = head;
+  while (x.measureText(head).width > pw - 72 && cut.length > 1) { cut = cut.slice(0, -1).replace(/\s+$/, ''); head = cut + '…'; }
+  x.fillText(head, px + 36, py + 36 + Math.round(hs * 0.72));
+  x.letterSpacing = '0px';
+  if (!L.showRows) { x.restore(); return; }
+  let ry = py + 74;
+  L.rows.forEach(r => {
+    const cx = px + 36 + 15, cy = ry + 27;
+    x.beginPath(); x.arc(cx, cy, 15, 0, Math.PI * 2);
+    x.fillStyle = CARD.teal; x.fill();
+    x.strokeStyle = '#0C4B43'; x.lineWidth = 4; x.lineCap = 'round'; x.lineJoin = 'round';
+    x.beginPath(); x.moveTo(cx - 7, cy + 0.5); x.lineTo(cx - 2, cy + 5.5); x.lineTo(cx + 7.5, cy - 5); x.stroke();
+    x.fillStyle = CARD.paper;
+    x.font = '600 ' + r.size + 'px "Outfit", sans-serif';
+    r.lines.forEach((ln, i) => x.fillText(ln, px + 36 + 30 + 20, Math.round(cy + r.size * 0.35) + i * 32));
+    ry += 54 + (r.lines.length - 1) * 32;
+  });
+  x.restore();
+}
+
+// ── The six cards ──────────────────────────────────────────────────
 const SHARE_PAINT = {
   // THE RANK — the flex. Wears the skin the athlete picked in the Locker, or the one a level just
   // unlocked (s.skin). s.moment names the takeover it came from; s.habit draws one habit's rank
@@ -10207,10 +10390,14 @@ const SHARE_PAINT = {
       const h = s && s.habit ? habitById(s.habit) : null;
       const LI = h ? habitLevel(h) : overallLevel(), r = LI.rank, ttl = h ? null : passTitle();
       const statsY = a.bottom - 150;
-      const cw = Math.min(300, W * 0.28);
+      // The crest gives way first when the block would not fit above the stats: a Square with a title
+      // worn has 610 px there for a 680 px block, and the plate was drawn over the middle number until
+      // 2026-10-17 (scripts/headless/proof-cards.js found it). Post and Story keep the full 300.
+      const fixedH = 60 + 96 + 52 + 34 + (ttl ? 102 : 0);
+      const cw = Math.max(140, Math.min(300, W * 0.28, (statsY - a.top - 20 - fixedH) / 1.12));
       // Centre the crest block in whatever room the format leaves above the
       // stats — a 9:16 story has 570px more of it than a 4:5 post.
-      const blockH = 60 + cw * 1.12 + 96 + 52 + 34 + (ttl ? 102 : 0);
+      const blockH = fixedH + cw * 1.12;
       let y = a.top + Math.max(20, (statsY - a.top - blockH) / 2);
       const lead = h ? shortName(h).toUpperCase() + ' RANK'
                      : ({ level: 'LEVEL UP', rank: 'NEW RANK', prestige: 'PRESTIGE' })[s && s.moment] || 'PROOF';
@@ -10347,7 +10534,7 @@ const SHARE_PAINT = {
       // card built to be shared, which is the worst place to state a number
       // the athlete cannot find anywhere else in the app.
       const cur = currentDayStreak(), best = bestDayStreak();
-      const now = Math.max(cur, (s && s.days) || 0), alive = now === cur;
+      const now = Math.max(cur, (s && s.days) || 0), alive = now === cur && now > 0;   // a 0 is not ON A STREAK
       x.textAlign = 'center';
       scEyebrow(x, a.cx, a.cy - 260, !alive ? 'DAY STREAK' : now >= best ? 'PERSONAL BEST' : 'ON A STREAK', CARD.orange);   // one word, streak (it said ON A RUN)
       x.font = '150px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
@@ -10548,9 +10735,10 @@ const SHARE_PAINT = {
     }
   },
   // THE TITLE — a title you earned, on its metal plate (2026-10-17): an event's, a season's or one off
-  // the road. titleFor() decides which one and what it took.
+  // the road. titleFor() decides which one and what it took; the plate, the note and the panel are the
+  // scTitle...() pieces above, laid out as one block centred in the area.
   title: {
-    ground: (x, W, H) => { scInk(x, W, H); return true; },
+    ground: (x, W, H, a, s) => { const t = titleFor(s); scInk(x, W, H, scTitleGlow(t ? t.metal : 'prisma')); return true; },
     body: (x, W, H, a, s) => {
       const t = titleFor(s);
       x.textAlign = 'center';
@@ -10561,12 +10749,18 @@ const SHARE_PAINT = {
         x.fillText('Your first lands at level ' + PASS_TRACK[0].lv + '.', a.cx, a.cy + 52);
         return;
       }
-      scEyebrow(x, a.cx, a.cy - 140, t.eyebrow, CARD.mint);
-      scPlate(x, a.cx, a.cy - 70, t.p.name.toUpperCase(), t.metal);
-      x.fillStyle = 'rgba(246,244,255,0.78)'; x.font = '600 34px "Outfit", sans-serif';
-      x.fillText(t.p.note, a.cx, a.cy + 60);
-      x.fillStyle = CARD.mint; x.font = '700 24px "Outfit", sans-serif';
-      x.fillText(t.took.head, a.cx, a.cy + 130);
+      const L = scTitleLayout(x, W, a, t);
+      if (t.metal === 'prisma') scTitleRays(x, a.cx, L.plateCy, W, H);
+      scEyebrow(x, a.cx, L.eyebrowY, t.eyebrow, CARD.mint);
+      if (L.orn) {
+        if (t.emoji) scMedal(x, a.cx, L.orn.cy, L.orn.r, t.metal, '#231F35', t.emoji);
+        else scCrest(x, a.cx, L.orn.cy, L.orn.w, t.crest);
+      }
+      scTitlePlate(x, a.cx, L, t);
+      x.textAlign = 'center';
+      x.fillStyle = 'rgba(246,244,255,0.82)'; x.font = '600 38px "Outfit", sans-serif';
+      L.note.forEach((ln, i) => x.fillText(ln, a.cx, L.noteTop + 37 + i * 50));
+      scTitlePanel(x, L, t);
     }
   }
 };
