@@ -3,8 +3,8 @@
 Every function the system needs, step by step, in plain words. Each one says **when** it runs, what it **reads**, its
 **steps**, what it **writes**, and the rules it obeys (GAME-n, in [`CAREER_MODE.md`](CAREER_MODE.md) → *The rules*).
 
-**Status (2026-10-17): phase 1 is built and rehearsed, in shadow** (P1, P2, P3, P4, P10, P12, P14, P15: *Phase 1, as
-built*, at the end; on the live project once Amir says yes); the rest is a specification. When a phase is built, its SQL follows these steps; when a step here changes, the code
+**Status (2026-10-17): phase 1 is live, in shadow** (P1, P2, P3, P4, P10, P12, P14, P15: *Phase 1, as built*, at the
+end; applied to the live project on Amir's yes, seeded, 34 of 34 athletes matching Proof); the rest is a specification. When a phase is built, its SQL follows these steps; when a step here changes, the code
 changes with it. The numbers they use live in `rulebook.toml`, and the rewards, missions and quests in the other `.toml`
 files: a procedure never hard-codes a number (GAME-10).
 
@@ -495,10 +495,21 @@ became, and the choices the build had to make:
 - **P14.** `career_compare()`: for every athlete with a Proof log, Career Mode's habit XP against `hab_xp()` +
   `hab_bonus_xp()` this season, the rolling week and all time, the rules key by key, and three probes through Proof's own
   CTEs (the days on target, the perfect days and the comebacks of the season) against the facts. Rehearsed on the real
-  rows on 2026-10-17: **34 of 34 athletes equal, on every window**, Proof's numbers in the rehearsal equal to the live
-  project's.
+  rows on 2026-10-17, then run on the live project the same evening: **34 of 34 athletes equal, on every window**.
 - **P15.** `career_facts`, `career_rules`, `career_catalogue`, with row-level security (an athlete reads their own facts, the
   coach every fact, anyone signed in the rules and the catalogue; nobody but the server writes), in the erasure, and in
-  `BACKUP_TABLES` and the schema snapshot the day stage66 is applied. The other six tables come with their phases.
+  `BACKUP_TABLES` and the schema snapshot (in the commit that recorded the apply). The other six tables come with their
+  phases.
+- **On the live project (2026-10-17).** Applied on Amir's *"yes, apply it"*, after a backup of every row and a tested way back
+  (`scripts/career/rollback_stage66.sql`), then seeded from the committed files (rulebook version 1, 144 catalogue rows; 4,512
+  facts for 40 athletes) and checked there: every career function's body equals this file's, `career_compare()` is `ok` (this
+  season 102,752 habit XP on both sides, the rolling week 6,311, all time 110,095), and a made-up athlete's save, hide and
+  un-hide wrote and voided the right facts in a transaction that was rolled back. Measured there: Career Mode adds at most 0.3 s
+  to a save (the Proof log 25 to 55 ms, the training derive 35 to 220 ms, one session 2 to 4 ms) and `get_profile()` takes 0.2
+  to 1.5 s, most of it Proof's own `hab_bonus_xp()` over a whole career. `career_cfg()` writes a roster entry only on a day
+  whose list changed: one entry for every day gave the same numbers but made `hab_bonus_xp()` eight times slower (the
+  profile of the longest log took 15 s), so it was fixed and re-applied the same evening.
+  ⚠️ **A trigger's exception block cannot catch a cancelled statement** (PL/pgSQL's `when others` skips `query_canceled`).
+  A signed-in request is cut off at 8 s, and the save with it, so what a trigger does per save must stay small.
 - **What it does not read yet.** Sessions saved before the structured log (only the text summary) give no best, win, gain
   or full log; a renamed lift starts a new line (the app's rename aliases are not copied).

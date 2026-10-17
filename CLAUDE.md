@@ -29,12 +29,21 @@ Durable context for working in this repo. Read the linked docs before diving in.
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
 - `career/CAREER_MODE.md` — **Career Mode, the gamification system for both apps** (Amir, 2026-10-17: designed, decisions
-  taken with *"go with your picks"*, NOT built). One fact ledger and one server scorer; XP and a career level that never
+  taken with *"go with your picks"*). One fact ledger and one server scorer; XP and a career level that never
   resets; badges, achievements and titles that each mean consistency, commitment, progress or resilience; weekly missions,
   personal quests; recognition for the athlete, Amir and the crew. Rules GAME-1 to GAME-12 live there (cite the ID).
   Every function step by step: `career/PROCEDURES.md`. The numbers and the catalogue are `career/*.toml`, which Amir reads
   and edits; `python scripts/check_career.py` checks them (pre-commit guard 20). When it is built, it supersedes the parts of
-  `XP_SYSTEM.md` and `QUESTS.md` it names.
+  `XP_SYSTEM.md` and `QUESTS.md` it names. **Phase 1 is live, in shadow** (`supabase/stage66_career_mode.sql`, applied 2026-10-17 on Amir's yes;
+  `PROCEDURES.md` → *Phase 1, as built*): triggers on `athlete_progress`, `session_history`, `library_sessions` and
+  `programs` write `career_facts` (a trigger never stops a save), `scripts/career_seed.py` turns the `.toml` files into
+  `career_rules` / `career_catalogue` (re-seed after any edit), `get_profile()` is the read, and `career_compare()` must stay
+  `ok` while `[shadow] on = true`: Career Mode's habit XP equals `hab_xp()` + `hab_bonus_xp()` for every athlete. ⚠️ **While
+  the shadow is on, Proof's habit numbers live twice**, the `xp_rules` row and `career/*.toml`; the checker holds them equal to
+  `supabase/xp_rules_snapshot.json`, so a change to Proof's rules is a change to both. Rehearse a change to stage66 with
+  `node scripts/career/rehearse.mjs` (PGlite, nothing live; `--data <dump>` for the real rows, kept outside the repo).
+  ⚠️ A trigger's exception block cannot catch a statement timeout (8 s for a signed-in request), so the work a trigger does
+  per save stays small (at most 0.3 s on 2026-10-17). `scripts/career/rollback_stage66.sql` takes phase 1 off, on Amir's word only.
 - `FARSI-PRODUCTS.md` — the paid course app (`/tennis/app/`), the testing app's page and the Farsi
   product pages: how they are built, deployed and introduced.
 - `PROGRAM-APP.md` — the athlete app's programme features in full (rx, week notes, the Spine, the Quality

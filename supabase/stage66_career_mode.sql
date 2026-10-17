@@ -1059,14 +1059,20 @@ language sql stable set search_path to 'public' as $function$
                    where f.athlete_id = p_athlete and f.kind in ('habit_day', 'habit_done') and f.void_at is null) d) x
 $function$;
 
--- The athlete's Proof config as hab_bonus_xp() reads it, rebuilt from the facts: one roster entry per day (that day's list) and their
--- own habits (the list on their latest day).
+-- The athlete's Proof config as hab_bonus_xp() reads it, rebuilt from the facts: a roster entry on each day whose list differs from the
+-- day before (rosterOn() reads the newest entry from that day or earlier, so every day still gets its own list) and their own habits (the
+-- list on their latest day). One entry for every day gave the same numbers but made hab_bonus_xp() about eight times slower: 7.3 s
+-- against 0.95 s for the longest log on the live project, 2026-10-17.
 create or replace function public.career_cfg(p_athlete text) returns jsonb
 language sql stable set search_path to 'public' as $function$
+  with d as (
+    select f.day, f.value -> 'live' as ids, lag(f.value -> 'live') over (order by f.day) as prev
+      from public.career_facts f
+     where f.athlete_id = p_athlete and f.kind = 'habit_day' and f.void_at is null
+  )
   select jsonb_build_object(
-    'roster', coalesce((select jsonb_agg(jsonb_build_object('from', f.day::text, 'ids', f.value -> 'live') order by f.day)
-                          from public.career_facts f
-                         where f.athlete_id = p_athlete and f.kind = 'habit_day' and f.void_at is null), '[]'::jsonb),
+    'roster', coalesce((select jsonb_agg(jsonb_build_object('from', d.day::text, 'ids', d.ids) order by d.day)
+                          from d where d.prev is distinct from d.ids), '[]'::jsonb),
     'custom', coalesce((select jsonb_agg(jsonb_build_object('id', c.value))
                           from (select f.value -> 'custom' as cl from public.career_facts f
                                  where f.athlete_id = p_athlete and f.kind = 'habit_day' and f.void_at is null

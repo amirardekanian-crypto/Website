@@ -28,6 +28,9 @@ SECRET_TABLES = {'assess_publish_keys', 'tps_publish_keys'}      # hashes of rev
 ACCOUNT_TABLES = {'athlete_identities': 'athlete_id', 'tps_accounts': 'username', 'assess_accounts': 'username'}
 # Tables whose rows belong to a LOGIN, and the column that says which one: the old login's id is swapped for the new login's id.
 REMAP = {'assess_players': 'account_id', 'assess_notes': 'account_id', 'assess_results': 'account_id', 'buyer_notes': 'user_id'}
+# Restored after every other table (stage66): until Career Mode's rulebook is back, every Career Mode trigger does nothing, so the facts
+# come back exactly as they were backed up instead of being worked out again, half-restored, on the way (a programme before its sessions).
+RESTORE_LAST = ['career_rules']
 # A table whose athlete_id is a LINK to a person, not the owner of the row: for an erased person the link is cleared and the row stays.
 LINK_COLUMNS = {'affiliates': ['athlete_id'], 'hab_intake': ['athlete_id', 'linked_at']}
 RECEIPT_KINDS = ('athlete', 'course', 'testing')
@@ -376,7 +379,9 @@ def build(backup_path, schema_path, out_dir, receipt_paths=(), keep=(), allow_in
     # 3. phase 1: every table but the logins and what waits for them
     skip = set(ACCOUNT_TABLES) | set(REMAP)
     expected, n_files, cleared_links = {}, 0, {}
-    for t in table_order(set(schema_cols), fks):
+    order = table_order(set(schema_cols), fks)
+    order = [t for t in order if t not in RESTORE_LAST] + [t for t in RESTORE_LAST if t in order]
+    for t in order:
         if t not in tables or t in skip:
             continue
         rows = tables[t]

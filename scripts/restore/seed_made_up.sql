@@ -48,6 +48,19 @@ insert into public.buyer_notes (user_id, app, note, updated_at) values
   ('00000000-0000-4000-8000-00000000c002', 'course', null, '2026-09-25 09:10:00+00'),
   ('00000000-0000-4000-8000-00000000c003', 'course', 'gone learner''s note', '2026-09-25 09:20:00+00');
 
+-- ── Career Mode's rulebook and catalogue (stage66), BEFORE the rows below: the triggers then make each athlete's facts as the live
+--    project does, so career_facts is backed up and restored like any other table. A made-up rulebook, not career/rulebook.toml ──
+insert into public.career_rules (version, rules, source, loaded_at) values
+  (1, '{"version": 1, "shadow": {"on": true}, "level": {"base": 400, "growth": 0.55, "ranks": ["ROOKIE", "CONTENDER"], "levels_per_rank": 5, "prestige_after": 50},
+        "week": {"close_after_days": 1}, "habits": {"completion_bonus": 1.2, "max_custom": 3, "lapse_days": 3, "comeback_stick": 7, "qualify_pct": 80,
+        "one_miss_door": true, "locked": ["strength"], "backfill_days": 3, "weights": {"strength": 100, "steps": 60, "water": 30, "custom": 25},
+        "targets": {"strength": 1, "steps": 10000, "water": 8}},
+        "fact": {"session_finished": {"xp": 400, "limit": 1, "limit_per": "plan_day_week"}, "comeback": {"xp": 50}, "cycle_finished": {"min_share": 0.8}}}',
+   'made up', '2026-10-17 09:00:00+00');
+insert into public.career_catalogue (kind, id, body, version, loaded_at) values
+  ('badge', 'held_weeks', '{"name": "Held Weeks", "meaning": "consistency", "kind": "best_run", "counts": "week_held", "tiers": [{"at": 4, "metal": "bronze", "xp": 200, "size": "highlight"}]}', 1, '2026-10-17 09:00:00+00'),
+  ('setting', 'bell', '{"keep_days": 7, "question": "Ring the bell for the crew when you set a best? ''Yes'' \\ or keep it to me"}', 1, '2026-10-17 09:00:00+00');
+
 -- ── the programmes and what hangs off an athlete ──────────────────────────────────────────────────────────────────────────
 insert into public.programs (athlete_id, data, updated_at, updated_by) values
   ('ava_test', '{"athlete":{"firstName":"Ava","lastName":"Test","goal":"first serve \"speed\" $bk$ and $$ tags \\ backslash"},"cycles":[{"n":1,"startDate":"2026-09-07","endDate":"2026-10-04","weeks":4}],"notes":["پیام فارسی","line\nbreak","emoji 🎾"]}', '2026-10-01 08:00:00+00', 'coach'),

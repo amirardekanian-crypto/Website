@@ -155,7 +155,7 @@ try {
   section('1. the schema snapshot and the dashboard agree on the tables');
   const A = await makeDb();
   const tablesInDb = (await q(A, `select tablename from pg_tables where schemaname = 'public' order by 1`)).map(r => r.tablename);
-  ok(tablesInDb.length >= 42, `the snapshot built ${tablesInDb.length} tables`);
+  ok(tablesInDb.length >= 45, `the snapshot built ${tablesInDb.length} tables`);
   ok(JSON.stringify([...lists.backupTables].sort()) === JSON.stringify(tablesInDb.filter(t => !SECRET_TABLES.includes(t))),
      'coach.html BACKUP_TABLES is every public table except the two key-hash tables',
      'in the database but not in BACKUP_TABLES: ' + tablesInDb.filter(t => !SECRET_TABLES.includes(t) && !lists.backupTables.includes(t)).join(', ') +

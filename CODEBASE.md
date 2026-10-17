@@ -629,13 +629,35 @@ mock Supabase, with and without the fix. Nine deliberate breakages of the functi
 
 ### The Career Mode guard (`scripts/check_career.py`, 2026-10-17)
 
-Pre-commit guard 20, run when a `career/*.toml` file or the checker is staged. `career/` is the design of the gamification
-system (`career/CAREER_MODE.md`; not built yet), kept as seven `.toml` files Amir edits by hand: the rulebook, badges,
+Pre-commit guard 20, run when a `career/*.toml` file, the checker or `supabase/xp_rules_snapshot.json` is staged. `career/` is
+the design of the gamification system (`career/CAREER_MODE.md`; phase 1 live in shadow, below), kept as seven `.toml` files
+Amir edits by hand: the rulebook, badges,
 achievements, titles, missions, quests and recognition. The checker (standard library only, `tomllib`) blocks a reward with
 no meaning, a fact nobody defined, a mission with a fixed XP of its own (GAME-7), a title or tier that points at nothing,
 tiers out of order, metals out of order and the banned colour words; coverage gaps (a meaning with no badge, a habit with no
-recovery mission) are warnings. `scripts/test_check_career.py` (43 tests on temp copies) runs when the checker or its test is
-staged; each of 24 rules was disabled once on a throwaway copy, and its test failed every time.
+recovery mission) are warnings. `scripts/test_check_career.py` (50 tests on temp copies) runs when the checker or its test is
+staged; each of 24 rules was disabled once on a throwaway copy, and its test failed every time. Since phase 1 it also checks
+the fields that carry Proof's counting (`proof_measure`, `proof_kind`, `proof_need`) and, while `[shadow] on = true`, that
+every habit number, tier, milestone and quest equals Proof's own in `supabase/xp_rules_snapshot.json`.
+
+### Career Mode, phase 1 (`supabase/stage66_career_mode.sql`, 2026-10-17)
+
+The fact ledger, in shadow, live since 2026-10-17 (applied on Amir's yes, seeded, `career_compare()` 34 of 34; the numbers measured
+there are in `career/PROCEDURES.md` → *Phase 1, as built*; `scripts/career/rollback_stage66.sql` takes it off, tested). Three tables: `career_facts` (athlete, kind, ref, day, value, source, void_at; unique on athlete +
+kind + ref; voided, never deleted), `career_rules` (the rulebook, one row per version) and `career_catalogue` (every badge,
+achievement, title, skin, mission, quest, size, message, tool and setting). `observe()` is four triggers (`career_on_progress`,
+`career_on_session`, `career_on_library`, `career_on_programme`), each in its own exception block, so Career Mode can never stop a
+save. `career_derive()` / `career_derive_days()` write the derived facts (held and broken weeks, bounce backs, returns, weeks by
+the book, cycles and the roadmap finished, effort wins, lift gains, months with Amir, personal bests, retests, comebacks).
+`career_score()` scores the habit half with Proof's own `hab_xp()` / `hab_bonus_xp()`, fed from the facts and from the rulebook
+in `xp_rules`' shape (`career_habit_rules()`), and the rest from `[fact.*]` with its caps; `get_profile()` is the read;
+`career_compare()` is the shadow check; `career_backfill()` re-works everyone; `career_seed()` loads a seed from
+`scripts/career_seed.py`. Copies of the training app's maths live here (`career_entry_sets()`, `career_win_gain()`,
+`career_weeks()`) and of Proof's day gate (`career_habit_days()`): change them with their originals.
+`scripts/career/rehearse.mjs` builds the snapshot on PGlite and replays saves, hides, deletes, the row-level security, the
+profile, a broken rulebook and an erasure (47 checks made up; 49 with a dump of the real rows, which also proves every athlete
+matches Proof). The restore puts `career_rules` back last (`restore_backup.py`, `RESTORE_LAST`) so no trigger works anything out
+half-restored.
 
 ---
 

@@ -1,7 +1,7 @@
 # Career Mode: the folder
 
-The whole gamification system, in files you can read, change and think about. **Phase 1 is built and rehearsed
-(2026-10-17), in shadow, and on the live project once Amir says yes:** `scripts/career_seed.py` turns the `.toml` files
+The whole gamification system, in files you can read, change and think about. **Phase 1 is live (2026-10-17), in
+shadow:** `scripts/career_seed.py` turns the `.toml` files
 into the server's rows (`career_rules`, `career_catalogue`), so
 changing a file and seeding it again is how a detail changes (GAME-10). Nothing an athlete sees reads them yet.
 
@@ -48,7 +48,8 @@ python scripts/career_seed.py --out "$TEMP/career-seed.sql"
 ```
 
 The file holds one `select public.career_seed(…)` statement. Run it on the project, then `select public.career_compare()`
-must still say `"ok": true` while the shadow is on. `node scripts/career/rehearse.mjs` (PGlite, nothing live) proves a
+must still say `"ok": true` while the shadow is on. `select version, source, loaded_at from career_rules` says which files
+the server was last seeded from (`source` is the sha256 the seed prints). `node scripts/career/rehearse.mjs` (PGlite, nothing live) proves a
 change to `supabase/stage66_career_mode.sql` before it is applied.
 
 **An id never changes.** `[badge.held_weeks]`: `held_weeks` is the id that history is filed under. Change the `name`,

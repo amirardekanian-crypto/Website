@@ -27,7 +27,7 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 | File-by-file plain-English guide | [`CODEBASE.md`](CODEBASE.md) |
 | What fields a program / article / workout JSON can have | [`SCHEMA.md`](SCHEMA.md) |
 | **How XP, levels and ranks work** (and how to retune them) | [`XP_SYSTEM.md`](XP_SYSTEM.md) |
-| **Career Mode, the gamification system for both apps** (designed 2026-10-17, not built): XP, level, badges, achievements, titles, weekly missions, personal quests, recognition | [`career/CAREER_MODE.md`](career/CAREER_MODE.md) · how each part works: [`career/PROCEDURES.md`](career/PROCEDURES.md) · the editable numbers and catalogue: [`career/README.md`](career/README.md) |
+| **Career Mode, the gamification system for both apps** (designed 2026-10-17; phase 1 live in shadow the same day): XP, level, badges, achievements, titles, weekly missions, personal quests, recognition | [`career/CAREER_MODE.md`](career/CAREER_MODE.md) · how each part works: [`career/PROCEDURES.md`](career/PROCEDURES.md) · the editable numbers and catalogue: [`career/README.md`](career/README.md) · the server half: [`supabase/stage66_career_mode.sql`](supabase/stage66_career_mode.sql), seeded by [`scripts/career_seed.py`](scripts/career_seed.py), rehearsed by [`scripts/career/rehearse.mjs`](scripts/career/rehearse.mjs), taken off by [`scripts/career/rollback_stage66.sql`](scripts/career/rollback_stage66.sql) |
 | How to run the coaching skills (intake → ship) | [`.claude/COACHING-HOWTO.md`](.claude/COACHING-HOWTO.md) |
 | The home page / hero | [`index.html`](index.html) (EN) · [`index-fa.html`](index-fa.html) (FA) |
 | The athlete training app | [`program.html`](program.html) · how its features work: [`PROGRAM-APP.md`](PROGRAM-APP.md) |
@@ -336,7 +336,7 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`IMAGES.md`](IMAGES.md) | What every marketing image is + how to make more |
 | [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md) | Import how-to |
 | [`QUESTS.md`](QUESTS.md) | **The quest catalogue** — what's running, the built quests, ready-made weeks, idea bank |
-| [`career/`](career/README.md) | **Career Mode** (2026-10-17, designed, not built): the gamification system for both apps. `CAREER_MODE.md` (the system, rules GAME-1 to GAME-12, decisions, build order), `PROCEDURES.md` (every function step by step), and the `.toml` files Amir edits (rulebook, badges, achievements, titles, missions, quests, recognition); `python scripts/check_career.py` checks them |
+| [`career/`](career/README.md) | **Career Mode** (2026-10-17, designed; phase 1 live in shadow, stage66): the gamification system for both apps. `CAREER_MODE.md` (the system, rules GAME-1 to GAME-12, decisions, build order), `PROCEDURES.md` (every function step by step), and the `.toml` files Amir edits (rulebook, badges, achievements, titles, missions, quests, recognition); `python scripts/check_career.py` checks them |
 | [`CLAUDE.md`](CLAUDE.md) | Working notes / preferences for AI assistants |
 
 ---

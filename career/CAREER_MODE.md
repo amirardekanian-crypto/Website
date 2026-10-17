@@ -4,10 +4,10 @@
 > out, step by step, is in **[`PROCEDURES.md`](PROCEDURES.md)**. Every number and every badge, title, mission and quest
 > lives in the `.toml` files beside this one, and **[`README.md`](README.md)** says which file to open to change what.
 >
-> **Status (2026-10-17): phase 1 built and rehearsed, in shadow; on the live project once Amir says yes.** The fact
-> ledger (`supabase/stage66_career_mode.sql`) turns every save into facts on the server, the rulebook and the catalogue
-> are rows made from these files (`python scripts/career_seed.py`), and in the rehearsal on the real rows Career Mode's
-> habit XP equals Proof's for every athlete. Nothing an athlete sees reads it. The rest is the design the build follows, phase by phase (*Build order*, below). Change anything
+> **Status (2026-10-17): phase 1 is live, in shadow** (applied on Amir's *"yes, apply it"*). The fact ledger
+> (`supabase/stage66_career_mode.sql`) turns every save into facts on the server, the rulebook and the catalogue are rows
+> made from these files (`python scripts/career_seed.py`), and on the live project Career Mode's habit XP equals Proof's
+> for every athlete (34 of 34). Nothing an athlete sees reads it. The rest is the design the build follows, phase by phase (*Build order*, below). Change anything
 > here first, then build; a changed file is re-seeded (`README.md`, *How to change something*).
 
 ---
@@ -320,7 +320,7 @@ Proof's to the point.
 
 | Phase | What | Visible | Status |
 |---|---|---|---|
-| 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app (not yet: its own follow-up) | **built and rehearsed 2026-10-17, in shadow** (stage66; PROCEDURES.md → *Phase 1, as built*). On the real rows 34 of 34 athletes' habit XP equals Proof's, this season, the rolling week and all time. On the live project: waiting for Amir's yes |
+| 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app (not yet: its own follow-up) | **live 2026-10-17, in shadow** (stage66, applied on Amir's yes and seeded; PROCEDURES.md → *Phase 1, as built*). On the live project 34 of 34 athletes' habit XP equals Proof's, this season, the rolling week and all time (`career_compare()`) |
 | 2 | **One profile.** Proof's level, rank and board read `get_profile()`. The phone scorer becomes the preview, and instant feedback (P17) reads it | The career level, revealed once; every tick answers with its XP, the bar and the nearest goal | not started |
 | 3 | **Rewards with meanings, and the switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row; the finish card listing what a session earned; Signed Off | not started |
 | 4 | **Amir's column.** Courtside, reactions, commendations, Amir's Pick | coach.html → Today | not started |

@@ -92,6 +92,8 @@ with the Supabase tool:
 3. `PGLITE=... node scripts/restore/rehearse.mjs` (below). It also checks that the snapshot reproduces itself.
 
 A **new table** goes into coach.html's `BACKUP_TABLES` the same day; `scripts/test_restore_backup.py` (pre-commit) fails when the list and the snapshot disagree.
+**Career Mode** (stage66): `restore_backup.py` puts `career_rules` back after every other table, so its triggers do nothing until every row is back and the
+facts come back exactly as they were backed up. After restoring a backup older than stage66, seed it (`python scripts/career_seed.py`, `career/README.md`).
 If a backup holds a table or column the snapshot does not have, `restore_backup.py` stops and says the snapshot is older than the backup: apply the later
 `supabase/stage*.sql` files to the new database, or regenerate the snapshot from a project that still has the change.
 
@@ -105,10 +107,10 @@ PGLITE="$TEMP/pglite/node_modules/@electric-sql/pglite" node scripts/restore/reh
 PGlite is PostgreSQL compiled to WebAssembly (about 25 MB). It is **not** a dependency of the repo: install it in a scratch folder, delete the folder after. Nothing
 is written outside the system's temp folder, no real project is touched, and every row is made up (`seed_made_up.sql`). What it checks, in order:
 
-1. the snapshot builds 42 tables, reproduces itself when read back, and `BACKUP_TABLES` is exactly its tables;
+1. the snapshot builds 45 tables, reproduces itself when read back, and `BACKUP_TABLES` is exactly its tables;
 2. a backup taken the dashboard's way (same table list, first passwords blanked);
 3. three erasures with the real `coach_erase_person()` (an athlete, a testing buyer, a course buyer), then a newer backup holding their receipts;
-4. the old backup restored with those receipts into a fresh database: nobody erased comes back, in any of the 20 tables with an `athlete_id`; a link to them is
+4. the old backup restored with those receipts into a fresh database: nobody erased comes back, in any of the 21 tables with an `athlete_id`; a link to them is
    cleared and the row stays; their application form is left out; a note older than the table keeps is pruned by the table itself;
 5. every file run twice changes nothing; every id counter ends past the biggest id;
 6. the logins come back in two steps and the rows that wait for them follow;
