@@ -16849,7 +16849,7 @@ window.renderExerciseLibrary = renderExerciseLibrary;
 //   · Signed off and The distance: the cycle's and the roadmap's own numbers, past the end date (cycleOver()).
 // Never: body weight, a check-in answer, pain, an RPE-only claim. Nothing leaves the phone until the athlete taps Share or Save image.
 // Never in the coach's preview. PROGRAM-APP.md → Highlight Reel. Career Mode's reward cards (badge, achievement, title, level, quest)
-// open the same sheet and the same moment (openShareSheet(), openMoment()) once phase 3 feeds them (career/CAREER_MODE.md → Recognition).
+// open the same sheet and the same moment (openShareSheet(), openMoment()) once phase 3 feeds them (career/CAREER_MODE.md, GAME-14).
 let _hlLibP = null;
 function hlLib() {
   if (window.ShareCard) return Promise.resolve(window.ShareCard);
@@ -17264,7 +17264,7 @@ function maybeHighlightMoment() {
     specs,
   });
 }
-// o: { eyebrow, title, sub, art, words, go, specs }. Career Mode phase 3 opens a reward's moment with the same call.
+// o: { eyebrow, title, sub, art, words, go, specs }. Career Mode phase 3 opens a reward's moment with the same call (GAME-14).
 function openMoment(o) {
   if (window.IS_PREVIEW || !o || !o.specs || !o.specs.length) return;
   closeMoment();

@@ -1106,7 +1106,7 @@ told them to train. Amir picked direction B of three mockups (https://claude.ai/
 Amir asked to celebrate athletes' wins and let them share them on Instagram, approved the design page
 (https://claude.ai/artifact/SuyYRPeX9n2SdbiUvoHhkF) with *"go with your picks"* on all five decisions (all five cards at once; the
 athlete picks English or Farsi; the weights shown, with a switch to hide them; his photo and signature on every card; the name
-Highlight Reel), and added *"the achievements, badges and other things need to have a celebration as well"* (Career Mode, career/CAREER_MODE.md).
+Highlight Reel), and added *"the achievements, badges and other things need to have a celebration as well"* (Career Mode's GAME-14).
 
 - **One painter, `assets/js/sharecard.js`** (`window.ShareCard`): a canvas, 1080 × 1920 (Story, the default) or 1080 × 1350 (post), the
   court's lines on every card, Centre Court's green and clay, Amir's photo (`assets/img/coach.jpg`), his signature (`WN_SIG`'s two paths,
@@ -1147,7 +1147,7 @@ Highlight Reel), and added *"the achievements, badges and other things need to h
      the tip *Mention @amirardekanian in your Story so Amir can share it too.* The choices are `aa_hl_prefs` (no athlete prefix, never
      synced). Share waits for the picture so the phone's sheet opens inside the tap (Safari refuses it after a wait).
 - **Career Mode** (phase 3) opens a reward's card with the same `openShareSheet([spec])` and its moment with `openMoment({ eyebrow, title,
-  sub, art, words, go, specs })` (career/CAREER_MODE.md → Recognition). The data shapes are written above each template in sharecard.js.
+  sub, art, words, go, specs })` (career/CAREER_MODE.md, GAME-14). The data shapes are written above each template in sharecard.js.
 - **The guide** has a *Share a win* card (`key: 'share'`); the privacy notice says how a card is made and where it goes (§2.2, `#share-cards`).
 - Checked by `scripts/headless/sharecard.js` (every template at both sizes, in both languages, with weights and names on and off and with
   long names: no text past its box, nothing in Instagram's bars, nothing overlapping, Persian digits in Farsi, the EN and FA tables

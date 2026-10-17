@@ -3,6 +3,8 @@
 # Who hears about what (CAREER_MODE.md → Recognition, PROCEDURES.md → P8, P9, P11).
 # Every badge tier, achievement, mission sweep and quest carries a size; the size decides the audience.
 # The athlete always sees their own. The crew only sees what the athlete said yes to (GAME-9).
+# Every reward is celebrated (GAME-14): a moment at its size, and from highlight up a share card in its app's card family
+# (the training's: Highlight Reel, assets/js/sharecard.js; Proof's: its own). A share pays nothing (GAME-6).
 
 sizes = ["tick", "win", "highlight", "milestone", "legend"]
 
@@ -19,10 +21,10 @@ crew = "nothing"
 beyond = "nothing"
 
 [size.highlight]
-athlete = "the wins card, until tapped"
+athlete = "the wins card, until tapped, and a share card offered"
 coach = "a Courtside row, with the WhatsApp message written"
 crew = "a line on the Bell, if the athlete said yes"
-beyond = "nothing"
+beyond = "the share card, the athlete's to post"
 
 [size.milestone]
 athlete = "a full-screen moment right away (they just acted), or at the next open if the app was closed; a share card offered"

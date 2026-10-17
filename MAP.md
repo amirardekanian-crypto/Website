@@ -336,7 +336,7 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`IMAGES.md`](IMAGES.md) | What every marketing image is + how to make more |
 | [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md) | Import how-to |
 | [`QUESTS.md`](QUESTS.md) | **The quest catalogue** — what's running, the built quests, ready-made weeks, idea bank |
-| [`career/`](career/README.md) | **Career Mode** (2026-10-17, designed; phase 1 live in shadow, stage66): the gamification system for both apps. `CAREER_MODE.md` (the system, rules GAME-1 to GAME-12, decisions, build order), `PROCEDURES.md` (every function step by step), and the `.toml` files Amir edits (rulebook, badges, achievements, titles, missions, quests, recognition); `python scripts/check_career.py` checks them |
+| [`career/`](career/README.md) | **Career Mode** (2026-10-17, designed; phase 1 live in shadow, stage66): the gamification system for both apps. `CAREER_MODE.md` (the system, rules GAME-1 to GAME-14, decisions, build order), `PROCEDURES.md` (every function step by step), and the `.toml` files Amir edits (rulebook, badges, achievements, titles, missions, quests, recognition); `python scripts/check_career.py` checks them |
 | [`CLAUDE.md`](CLAUDE.md) | Working notes / preferences for AI assistants |
 
 ---

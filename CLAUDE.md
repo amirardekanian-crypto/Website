@@ -31,7 +31,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
 - `career/CAREER_MODE.md` — **Career Mode, the gamification system for both apps** (Amir, 2026-10-17: designed, decisions
   taken with *"go with your picks"*). One fact ledger and one server scorer; XP and a career level that never
   resets; badges, achievements and titles that each mean consistency, commitment, progress or resilience; weekly missions,
-  personal quests; recognition for the athlete, Amir and the crew. Rules GAME-1 to GAME-12 live there (cite the ID).
+  personal quests; recognition for the athlete, Amir and the crew. Rules GAME-1 to GAME-14 live there (cite the ID).
   Every function step by step: `career/PROCEDURES.md`. The numbers and the catalogue are `career/*.toml`, which Amir reads
   and edits; `python scripts/check_career.py` checks them (pre-commit guard 20). When it is built, it supersedes the parts of
   `XP_SYSTEM.md` and `QUESTS.md` it names. **Phase 1 is live, in shadow** (`supabase/stage66_career_mode.sql`, applied 2026-10-17 on Amir's yes;
@@ -309,7 +309,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   stronger", from the effort-adjusted index, as a percentage only. Holds log no seconds, so a hold's win is an easier RPE.
 - **Highlight Reel: a share card for each win** (Amir, 2026-10-17: *"go with your picks"* on https://claude.ai/artifact/SuyYRPeX9n2SdbiUvoHhkF;
   `PROGRAM-APP.md` → *Highlight Reel*). `assets/js/sharecard.js` draws the cards on the phone (the training's five, and Career Mode's five reward
-  cards, for Career Mode phase 3); program.html decides which win and which numbers from the app's own rules (`winText()`'s `shape` and `share`, the
+  cards for Career Mode phase 3, GAME-14); program.html decides which win and which numbers from the app's own rules (`winText()`'s `shape` and `share`, the
   records, the retest comparison). A card never claims beyond the sets (PROG-01: the set as lifted, never the estimate, no RPE-only win), never
   shows body weight, a check-in answer or pain, and nothing leaves the phone until Share or Save image. **Every Farsi word on a card is in
   sharecard.js's `FA` table, a draft for Amir.** sharecard.js is in sw.js's SHELL, served cache-first by its plain URL: a change to what it draws
