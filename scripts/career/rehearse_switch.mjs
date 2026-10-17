@@ -1,4 +1,4 @@
-// Career Mode, phase 2 (the XP switch), rehearsed away from the live project (supabase/stage68_career_xp_switch.sql; career/PROCEDURES.md → P14 and
+// Career Mode, phase 2 (the XP switch), rehearsed away from the live project (supabase/stage69_career_xp_switch.sql; career/PROCEDURES.md → P14 and
 // "Phase 2, as built").
 //
 //     PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse_switch.mjs --backup <aa-backup-YYYY-MM-DD.json> [--report <file>]
@@ -7,15 +7,15 @@
 // project. The backup is coach.html's ⤓ Backup (or the same shape): the real rows, read here and never written anywhere but this process's memory;
 // --report writes the switch's list (each athlete's level in AA Proof against the career level after the switch) to a file: keep it outside the repo.
 //
-// What it does, in order: the live project as it stands before stage68 (the schema snapshot, the backup's rows, stage66 and the phase 1 seed made
+// What it does, in order: the live project as it stands before stage69 (the schema snapshot, the backup's rows, stage66 and the phase 1 seed made
 // from the committed files at HEAD), then
-//   1. stage68 twice, then the seed of the working files ([switch] xp = "off"): nothing an athlete sees moves (the board, Proof's level, the profile);
+//   1. stage69 twice, then the seed of the working files ([switch] xp = "off"): nothing an athlete sees moves (the board, Proof's level, the profile);
 //   2. Season 1 starts with the switch off: Proof's own season record, as before;
 //   3. the switch, dry run first (the list, then nothing changed), then for real: nobody's level goes down, the WORKOUT habit pays 0 a day, training
 //      pays, the board ranks season points with career levels, the road's titles follow the career level, the compare still holds;
 //   4. the switch seed again (nothing new), a switch turned back off and a day still to come (both refused);
 //   5. settling: a closed day's change keeps its fact, an open day's moves it; the compare calls that row settled, not failed;
-//   6. a season closing under the switch, an erasure, the score cache's timing, the way back (scripts/career/rollback_stage68.sql).
+//   6. a season closing under the switch, an erasure, the score cache's timing, the way back (scripts/career/rollback_stage69.sql).
 // Exit code 1 if anything failed.
 import fs from 'node:fs';
 import os from 'node:os';
@@ -30,6 +30,8 @@ const COACH_JWT = JSON.stringify({ email: 'amirardekanian@gmail.com', role: 'aut
 const args = process.argv.slice(2);
 const opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
 const BACKUP = opt('--backup'), REPORT = opt('--report');
+// The commit the live project's phase 1 rulebook was seeded from (2026-10-17, rulebook version 1: the phase 1 note). --phase1 <rev> for another.
+const PHASE1 = opt('--phase1') || '94cdc89';
 
 let passed = 0, failed = 0;
 function ok(cond, what, detail) {
@@ -63,7 +65,7 @@ function ymd(d) { return d.toISOString().slice(0, 10); }
 function addDays(day, n) { const d = new Date(day + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return ymd(d); }
 const ms = async (fn) => { const t = Date.now(); const r = await fn(); return [r, Date.now() - t]; };
 
-// The career files of a commit (HEAD: what the live project was seeded from) or of the working tree, with their own checker and seed script,
+// The career files of a commit (PHASE1: what the live project was seeded from) or of the working tree, with their own checker and seed script,
 // in a scratch folder; and a working copy of the career folder with one rulebook change (the switch).
 function filesAt(rev) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'career-' + (rev || 'work') + '-'));
@@ -87,13 +89,90 @@ function withRulebook(dir, edit) {
   fs.writeFileSync(f, edit(fs.readFileSync(f, 'utf8')));
 }
 
+// The server's answers to what the two phones copy (P13, P17), on fixed inputs: scripts/career/xp_cases.json. Run with the XP switch on.
+//   levels    career_level() over XP values that cross levels, ranks and a prestige (habits.html levelInfo() on the career's curve,
+//             program.html careerLevelOf())
+//   paid      one value of one habit on one day, through hab_xp() with career_paid_rules(): the WORKOUT habit pays 0 (habits.html paidXp())
+//   sessions  career_session_want()'s facts for a session as the app saves it (program.html careerFullLog(), careerCheckin(), the early rule)
+const CASE_XP = [0, 1, 399, 400, 401, 989, 990, 991, 1720, 5000, 9999, 10000, 25000, 47260, 60000, 99999, 123456, 250000, 400000, 750000, 1000000];
+const CASE_PAID = [['strength', 1], ['strength', 0.5], ['steps', 10000], ['steps', 5000], ['steps', 12000], ['sleep', 7.5], ['sleep', 6], ['fuel', 3],
+  ['fuel', 1], ['water', 8], ['water', 4], ['water', 0], ['mobility', 1], ['breathe', 1], ['supps', 1], ['c_zz_read', 1]];
+const ANSWERED = { composite: 4, sleep: 4, energy: 4, soreness: 4, stress: 3, overall: 4, skipped: false };
+const setOf = (d, r) => ({ w: '40', n: 8, r, d });
+const CASE_SESSIONS = [
+  { name: 'complete, every set ticked and rated, checked in', status: 'Complete', readiness: ANSWERED,
+    log: [{ ex: 'Goblet Squat', sets: [setOf(true, '8'), setOf(true, '8')] }, { ex: 'Row', sets: [setOf(true, '7'), setOf(true, '7')] }] },
+  { name: 'complete, one set not ticked', status: 'Complete', readiness: ANSWERED,
+    log: [{ ex: 'Goblet Squat', sets: [setOf(true, '8'), setOf(false, '')] }] },
+  { name: 'complete, an exercise rated on one set only', status: 'Complete', readiness: null,
+    log: [{ ex: 'Goblet Squat', sets: [setOf(true, '8'), setOf(true, '')] }, { ex: 'Row', sets: [setOf(true, ''), setOf(true, '')] }] },
+  { name: 'complete, nothing rated anywhere, every set ticked', status: 'Complete', readiness: { skipped: true, composite: null },
+    log: [{ ex: 'Goblet Squat', sets: [setOf(true, ''), setOf(true, '')] }] },
+  { name: 'finished early, every set ticked and rated', status: 'Partial (4 of 8 sets/units done) · Out of time', readiness: ANSWERED,
+    log: [{ ex: 'Goblet Squat', sets: [setOf(true, '8'), setOf(true, '8')] }] },
+  { name: 'finished early, lower case and a space', status: ' partial (1 of 9 sets/units done)', readiness: ANSWERED,
+    log: [{ ex: 'Goblet Squat', sets: [setOf(true, '8')] }] },
+  { name: 'a circuit only: rounds, no sets', status: 'Complete', readiness: ANSWERED,
+    log: [{ ex: 'Finisher', circuit: true, items: [{ name: 'Burpee', w: '' }], rounds: [{ round: 1, r: '8' }] }] },
+  { name: 'a circuit and a lift', status: 'Complete', readiness: ANSWERED,
+    log: [{ ex: 'Finisher', circuit: true, items: [], rounds: [] }, { ex: 'Row', sets: [setOf(true, '7')] }] },
+  { name: 'no structured log (an old session)', status: 'Complete', readiness: ANSWERED, log: null },
+  { name: 'an empty log', status: 'Complete', readiness: ANSWERED, log: [] },
+  { name: 'a lift with no sets', status: 'Complete', readiness: ANSWERED, log: [{ ex: 'Row', sets: [] }] },
+  { name: 'a set that is not an object', status: 'Complete', readiness: ANSWERED, log: [{ ex: 'Row', sets: [5, setOf(true, '8')] }] },
+  { name: 'ticks written as text and numbers', status: 'Complete', readiness: ANSWERED,
+    log: [{ ex: 'Row', sets: [{ w: '40', n: 8, r: 8, d: 1 }, { w: '40', n: 8, r: '8', d: 'yes' }] }] },
+  { name: 'a check-in with no number in it', status: 'Complete', readiness: { skipped: false, composite: null, sleep: null },
+    log: [{ ex: 'Row', sets: [setOf(true, '')] }] },
+  { name: 'a check-in with only a score', status: 'Complete', readiness: { score: 3 },
+    log: [{ ex: 'Row', sets: [setOf(true, '')] }] },
+];
+async function serverCases(db, today) {
+  const rules = (await one(db, `select public.career_rules_now() as r`)).r;
+  const levels = [];
+  for (const xp of CASE_XP) levels.push({ xp, ...(await one(db, `select public.career_level($1::bigint, public.career_rules_now()) as l`, [xp])).l });
+  const paid = [];
+  for (const [habit, v] of CASE_PAID) {
+    const xp = Number((await one(db, `select public.hab_xp(jsonb_build_object('2026-01-05', jsonb_build_object($1::text, $2::numeric)), null, null,
+                                       public.career_paid_rules(public.career_habit_rules(), public.career_rules_now())) as x`, [habit, v])).x);
+    paid.push({ habit, v, xp });
+  }
+  const U = '10000000-0000-4000-8000-0000000000c5';
+  await q(db, `insert into auth.users (id, email) values ($1, 'athlete.zz_cases@amirardekani.com') on conflict do nothing`, [U]);
+  await q(db, `insert into public.athlete_identities (user_id, athlete_id, email) values ($1, 'zz_cases', null) on conflict do nothing`, [U]);
+  await asAthlete(db, U, 'zz_cases');
+  for (let i = 0; i < CASE_SESSIONS.length; i++) {
+    const c = CASE_SESSIONS[i];
+    await q(db, `select public.save_session('zz_cases', 'Zed Cases', 1, $1::date, $2::jsonb, null)`,
+            [addDays(today, -40 - i), JSON.stringify({ status: c.status, readiness: c.readiness, log: c.log, duration_min: 30 })]);
+  }
+  await asNobody(db);
+  const want = (await one(db, `select public.career_session_want('zz_cases') as w`)).w || [];
+  const sessions = CASE_SESSIONS.map((c, i) => {
+    const ref = 'd1|' + addDays(today, -40 - i);
+    return { ...c, facts: want.filter(f => f.ref === ref).map(f => f.kind).sort() };
+  });
+  await asCoach(db);
+  await one(db, `select public.coach_erase_person('athlete', 'zz_cases', 'zz_cases', '{}'::uuid[], false) as r`);
+  await asNobody(db);
+  return {
+    about: 'What the two phones copy from the server in Career Mode phase 2 (P13, P17), and the server\'s own answers on fixed inputs. Written by '
+      + 'node scripts/career/rehearse_switch.mjs --write-cases (the rehearsal checks them every run); held by scripts/check_twins.js against '
+      + 'habits.html (levelInfo() on the career\'s curve, paidXp()) and program.html (careerLevelOf(), careerFullLog(), careerCheckin(), the early rule). '
+      + 'levels: career_level(). paid: hab_xp() of one value on one day with career_paid_rules() and the XP switch on (the WORKOUT habit pays 0). '
+      + 'sessions: the facts career_session_want() makes of a session as the app saves it. Change a rule on both sides, then here.',
+    rules: { level: rules.level },
+    levels, paid, sessions,
+  };
+}
+
 async function main() {
   if (!BACKUP) throw new Error('--backup <aa-backup-YYYY-MM-DD.json> is required: the real rows the switch is rehearsed on');
   const db = await openDb();
   const backup = JSON.parse(fs.readFileSync(BACKUP, 'utf8'));
   const today = (await one(db, `select current_date::text as d`)).d;
 
-  section('0. the live project before stage68');
+  section('0. the live project before stage69');
   await runSql(db, read(path.join(ROOT, 'scripts', 'restore', 'stand_in_supabase.sql')), 'stand-in');
   await runSql(db, read(path.join(ROOT, 'supabase', 'schema_snapshot.sql')), 'snapshot');
   const T = backup.tables || {};
@@ -106,9 +185,9 @@ async function main() {
   // the backup predates stage66; the live project has had it since 2026-10-17, seeded from the files at HEAD
   const s66 = read(path.join(ROOT, 'supabase', 'stage66_career_mode.sql'));
   await runSql(db, s66, 'stage66');
-  const head = filesAt('HEAD');
+  const head = filesAt(PHASE1);
   const v1 = (await one(db, seedSql(seedFrom(head)))).r;
-  ok(v1 && v1.version === 1, `stage66 and the phase 1 seed from HEAD's files: rulebook ${v1 && v1.version}, ${v1 && v1.catalogue} catalogue rows, `
+  ok(v1 && v1.version === 1, `stage66 and the phase 1 seed from ${PHASE1}'s files (what the live project was seeded from): rulebook ${v1 && v1.version}, ${v1 && v1.catalogue} catalogue rows, `
      + `${Object.values((v1 && v1.backfill && v1.backfill.facts) || {}).reduce((a, b) => a + b, 0)} facts`);
   let cmp = (await one(db, `select public.career_compare() as r`)).r;
   ok(cmp.ok, `phase 1's shadow check holds on the real rows: ${cmp.matched} of ${cmp.athletes}`, cmp.rows.filter(r => !r.ok).map(r => JSON.stringify(r)).join('\n'));
@@ -129,11 +208,11 @@ async function main() {
   const before = await defs(['hab_season_level', 'coach_season_levels', 'leaderboard_top', 'hab_close_season', 'career_score', 'career_facts_xp',
                              'career_settled_before', 'get_profile', 'career_compare', 'career_seed']);
 
-  section('1. stage68, twice, then the seed of the working files (both switches off)');
-  const s68 = read(path.join(ROOT, 'supabase', 'stage68_career_xp_switch.sql'));
-  await runSql(db, s68, 'stage68');
-  await runSql(db, s68, 'stage68 again');
-  ok(true, 'stage68 applied, and applied again without an error');
+  section('1. stage69, twice, then the seed of the working files (both switches off)');
+  const s68 = read(path.join(ROOT, 'supabase', 'stage69_career_xp_switch.sql'));
+  await runSql(db, s68, 'stage69');
+  await runSql(db, s68, 'stage69 again');
+  ok(true, 'stage69 applied, and applied again without an error');
   const erase1 = (await one(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure) as d`)).d;
   ok((erase1.match(/'career_scores'/g) || []).length === 1 && erase1.replace(`'career_facts', 'career_scores']`, `'career_facts']`) === erase0,
      'coach_erase_person() learns career_scores exactly once, and nothing else in it moves');
@@ -281,6 +360,21 @@ async function main() {
   const owed = road.filter(t => t.kind === 'title' && t.lv > 0 && t.lv <= top.level).map(t => t.id);
   ok(owed.every(t => titles.includes(t)), `the road's titles follow the career level: ${top.athlete_id} at ${top.level} holds ${owed.length} of them`, JSON.stringify({ owed, titles }));
 
+  section('3b. the twins\' cases: what the phones copy, answered by the server (scripts/career/xp_cases.json)');
+  // The curve (career_level()), a value's daily XP with the switch on (hab_xp() with career_paid_rules()), and a session's own facts
+  // (career_session_want()). scripts/check_twins.js holds habits.html and program.html to these answers; this holds the answers to the server.
+  const casesNow = await serverCases(db, today);
+  const casesFile = path.join(ROOT, 'scripts', 'career', 'xp_cases.json');
+  if (args.includes('--write-cases')) {
+    fs.writeFileSync(casesFile, JSON.stringify(casesNow, null, 1) + '\n');
+    ok(true, `wrote ${path.relative(ROOT, casesFile)}: ${casesNow.levels.length} levels, ${casesNow.paid.length} values, ${casesNow.sessions.length} sessions`);
+  } else {
+    const onDisk = fs.existsSync(casesFile) ? JSON.parse(fs.readFileSync(casesFile, 'utf8')) : null;
+    const strip = c => c && JSON.stringify({ rules: c.rules, levels: c.levels, paid: c.paid, sessions: c.sessions });
+    ok(onDisk && strip(onDisk) === strip(casesNow), 'scripts/career/xp_cases.json is the server\'s answer today (rewrite it with --write-cases after a deliberate change)',
+       onDisk ? 'they differ' : 'the file is missing');
+  }
+
   section('4. again, and what the seed refuses');
   const again = (await one(db, seedSql(seedFrom(sw)))).r;
   ok(again && !again.turned_on && again.backfill.skipped && Number((await one(db, `select count(*) as n from public.career_facts where kind = 'level_kept'`)).n) === real.levels.filter(r => r.kept_xp).length,
@@ -346,8 +440,8 @@ async function main() {
   console.log(`         here (PGlite, slower than the live project): ${big}'s profile ${cold} ms cold, ${warm} ms warm; the board ${bcold} ms cold, ${bwarm} ms warm`);
   ok(warm < cold && bwarm < bcold, 'the cache pays: a warm read is quicker than a cold one, for the profile and the board');
 
-  await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage68.sql')), 'rollback68');
-  await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage68.sql')), 'rollback68 again');
+  await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage69.sql')), 'rollback69');
+  await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage69.sql')), 'rollback69 again');
   const after = await defs(Object.keys(before));
   const differ = Object.keys(before).filter(k => before[k] !== after[k]);
   const left = (await q(db, `select p.proname as n from pg_proc p join pg_namespace s on s.oid = p.pronamespace where s.nspname = 'public'
@@ -355,7 +449,7 @@ async function main() {
                                                'career_compute', 'career_scored', 'career_scores_for', 'career_keep_levels', 'hab_proof_level')`)).map(r => r.n);
   const erase2 = (await one(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure) as d`)).d;
   ok(differ.length === 0 && left.length === 0 && erase2 === erase0 && !(await one(db, `select to_regclass('public.career_scores') as t`)).t,
-     'the way back (run twice) leaves every function as it was before stage68, nothing it added, and coach_erase_person() byte-identical',
+     'the way back (run twice) leaves every function as it was before stage69, nothing it added, and coach_erase_person() byte-identical',
      JSON.stringify({ differ, left, erase: erase2 === erase0 }));
   await asCoach(db);
   const board3 = await q(db, `select * from public.leaderboard_top('amir_ardekani', null, 'season', 50)`);

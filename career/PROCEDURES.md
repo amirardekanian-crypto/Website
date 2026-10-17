@@ -4,7 +4,9 @@ Every function the system needs, step by step, in plain words. Each one says **w
 **steps**, what it **writes**, and the rules it obeys (GAME-n, in [`CAREER_MODE.md`](CAREER_MODE.md) → *The rules*).
 
 **Status (2026-10-17): phase 1 is live, in shadow** (P1, P2, P3, P4, P10, P12, P14, P15: *Phase 1, as built*, at the
-end; applied to the live project on Amir's yes, seeded, 34 of 34 athletes matching Proof); the rest is a specification. When a phase is built, its SQL follows these steps; when a step here changes, the code
+end; applied to the live project on Amir's yes, seeded, 34 of 34 athletes matching Proof). **Phase 2, the XP switch, is built
+and rehearsed, not yet switched on** (P1 step 4, P3, P4, P10, P13, P14 steps 4 to 6, P17: *Phase 2, as built*, at the end); the
+rest is a specification. When a phase is built, its SQL follows these steps; when a step here changes, the code
 changes with it. The numbers they use live in `rulebook.toml`, and the rewards, missions and quests in the other `.toml`
 files: a procedure never hard-codes a number (GAME-10).
 
@@ -169,11 +171,12 @@ rulebook changes.
    - A badge with `habit = "…"` reads only that habit's facts.
    For each tier whose `at` the measure has reached and that is not yet an award, mint it: athlete, badge, tier, the day
    the measure crossed `at`, the facts that crossed it (the evidence).
-   **Entries gated on the switch.** An entry with `retire_at = "switch"` is earned exactly as Proof earns it until phase 3,
-   minted at the baseline, and never earned after. An entry with `starts_at = "switch"` is not earned before phase 3; at
-   the switch it is worked out over the whole history and minted in silence. `superseded_by` names the entry that takes
-   an old one's place: the shelf shows the new one, and the old awards fold under it, never deleted. This is how a design
-   change reaches a Proof entry without breaking the shadow (P14), which needs Proof's exact rules until the switch.
+   **Entries gated on the catalogue switch** (`[switch] catalogue`, phase 3). An entry with `retire_at = "catalogue"` is earned
+   exactly as Proof earns it until phase 3, minted at the baseline, and never earned after. An entry with `starts_at = "catalogue"`
+   is not earned before phase 3; at the catalogue switch it is worked out over the whole history and minted in silence.
+   `superseded_by` names the entry that takes an old one's place: the shelf shows the new one, and the old awards fold under it,
+   never deleted. This is how a design change reaches a Proof entry without changing Proof's numbers, which AA Proof's phone keeps
+   previewing ticks with until the catalogue switch (P13, P14).
 2. **Achievements.** For each achievement not yet earned, check its rule once. When it holds, mint it.
 3. **Titles.** Mint a title when what earns it is minted: a badge tier or achievement with `title = "…"`, a level on
    the road (Proof's 14 rewards), a season's close (P4), a finished quest with a title (P7), Amir's Pick (P9).
@@ -365,6 +368,11 @@ mission if one is set.
 3. When the server answers, its number replaces the preview.
 4. The preview is a copy of a server rule, so it goes into `scripts/check_twins.js` the same day.
 
+As built in phase 2: AA Proof shows the profile's XP plus what its own scorer has moved since that answer (its scorer, in Career
+Mode, is the server's habit half on the same log: the whole career, the WORKOUT habit at 0 a day), so a tick's XP is exact rather
+than marked pending; the training app previews a session from the profile's prices and shows the held week as counting until the
+server says so (P17). *Phase 2, as built*.
+
 ## P14. Shadow, then the switch
 
 1. Seed the rulebook from `rulebook.toml` (Proof's habit numbers as they are today, plus the training facts).
@@ -375,6 +383,19 @@ mission if one is set.
 5. Switch Proof's level, rank and board to `get_profile()`. The first open shows one moment: *Your career: level N,
    from everything you've logged since <date>*.
 6. Proof's phone scorer stays only as the preview (P13).
+
+The switch, as it is done (phase 2; Amir 2026-10-17, *The decisions, round 3*): the switch is `rulebook.toml` → `[switch] xp`,
+turned on by a seed.
+1. Before it: Season 1 has started (2026-10-18), so Pre-Season's records hold each athlete's highest Proof level. Take a backup
+   (coach.html → ⚙ Tools → ⤓ Backup).
+2. In `rulebook.toml`, bump `version` and set `[switch] xp` to today's date (never a day still to come: the seed refuses it).
+3. `python scripts/career_seed.py --dry-run --out <file>` and run it on the project: the server works everything out (the levels
+   kept included), undoes it, and returns every athlete's line: Proof's level now and its best season record, the career level,
+   the XP kept and the level after. That is the list Amir reads before he says yes.
+4. On Amir's yes: the same without `--dry-run`. It runs no backfill (only a switch changed), writes each `level_kept` fact
+   (`career_keep_levels()`), and returns the same list. `select public.career_compare()` must still say `ok` (both sides pay
+   the WORKOUT habit 0 now; a row that differs only because a closed day settled says `settled`).
+5. Commit the `.toml` with the date the same day, so the next seed keeps the switch on (a seed that turns it back off is refused).
 
 ## P15. The tables
 
@@ -460,7 +481,7 @@ became, and the choices the build had to make:
     `full_log`: finished as written, every set ticked, every set rated where the card asks an RPE. The log does not carry
     the card's target, so an exercise rated on any set asks one on every set it ticked, and one rated on none asks none
     (the app asks only where the card sets a target: `noRpeCards()`). `checkin_done`: the check-in answered, not skipped.
-  - **Step 4, settling,** is built (`career_sync()`'s `p_settled_before`) and waits for the switch: while the shadow is on a
+  - **Step 4, settling,** is built (`career_sync()`'s `p_settled_before`) and waits for the XP switch (phase 2): while the shadow is on a
     closed day still follows the log, as Proof does, or the two could not match.
 - **P2, derive.** On every training save, a programme change and a profile read (no cron, as P2 asks).
   - Training weeks are `cycleWeekInfo()`'s, for the published cycles (index ≤ `currentCycleIndex`) **that have dates**; a
@@ -488,10 +509,10 @@ became, and the choices the build had to make:
   (runs and comebacks measured from the season's first day). The quest *runs* are read where Proof keeps them
   (`xp_rules.questRuns`) until the crew mission replaces the lever. Every other fact pays `[fact.<kind>] xp`, capped by
   `limit` and `limit_per` (one session per plan day per training week, the better one paying; two Library sessions a week;
-  three effort wins a cycle). Nothing is stored. ⚠️ Until the switch the shadow's career XP counts a session twice, as the
+  three effort wins a cycle). Nothing is stored. ⚠️ Until the XP switch the shadow's career XP counts a session twice, as the
   WORKOUT habit (Proof's 120) and as the session fact (400).
 - **P4.** `career_level()`: the rulebook's curve and ranks, no ceiling, no reset. `base` was re-anchored to 400 on the
-  shadow data with the switch's numbers (the measurement is beside it in `rulebook.toml`).
+  shadow data with the XP switch's numbers (the measurement is beside it in `rulebook.toml`).
 - **P10.** `get_profile(athlete)`: the athlete's own, the coach's anyone's (and the SQL editor's or the service role's, for a
   report). Career XP, level, rank, XP to the next level, this season's points, the numbers (weeks held now and best,
   sessions with Amir, personal bests, comebacks, days on target, perfect days) and the titles owned. The board place, the
@@ -520,3 +541,63 @@ became, and the choices the build had to make:
   A signed-in request is cut off at 8 s, and the save with it, so what a trigger does per save must stay small.
 - **What it does not read yet.** Sessions saved before the structured log (only the text summary) give no best, win, gain
   or full log; a renamed lift starts a new line (the app's rename aliases are not copied).
+
+## Phase 2, as built (2026-10-17): the XP switch
+
+`supabase/stage69_career_xp_switch.sql` (with the seed of `rulebook.toml` version 2: both switches `"off"`), rehearsed by
+`scripts/career/rehearse_switch.mjs` (PGlite, the schema snapshot, a full backup of the real rows, phase 1 as it stands on the live
+project, then stage69, Season 1, the dry run, the switch, the refusals, settling, a season closing under the switch, an erasure, the
+cache's cost and the way back: 42 of 42 on 2026-10-17); the way back is `scripts/career/rollback_stage69.sql`, tested there. What the
+procedures above became, and the choices the build made:
+
+- **The two switches.** `rulebook.toml` → `[switch]`: `xp` (phase 2) and `catalogue` (phase 3), each `"off"` or the day it was turned on.
+  `career_switch_day()` reads them (a rulebook from before them, version 1, has both off). The seed refuses a switch turned back off, a
+  day still to come, and the catalogue switch without the XP switch (rule 16 of `check_career.py` checks the file; the server checks
+  the order).
+- **P1 step 4, settling,** is on with the XP switch (`career_settled_before()`): a day older than `[habits] backfill_days` (plus one, so
+  no time zone closes a day early) keeps its facts as they stood; a day that first arrives late is still added.
+- **P3, the daily XP.** `career_paid_rules()`: with the XP switch on, every habit in `[habits] locked` (WORKOUT) pays 0 a day in
+  `hab_xp()`: the session fact pays instead. `hab_bonus_xp()` is still given Proof's weights, so the habit's weight still counts in the
+  day gate (the day streak, days on target, comebacks) and in its own tiers, HEAVY METAL and THE MACHINIST until the catalogue switch.
+  The facts outside the habit half are priced by `career_facts_paid()`, one row each within the caps: a fact whose `[fact.<kind>]` says
+  `xp_from = "value"` pays its own `value.xp` (`level_kept`), and a `career_only` one counts toward the career only, never a season or
+  a week.
+- **P3, cached.** `career_scores` holds each athlete's score (`career_compute()`: the career with its level, this season's points, the
+  rolling week; the log rebuilt from the facts once for all three). `career_stamp()` says what it rests on: the newest rulebook (its
+  version and load time), Amir's quest runs, the season, today, the athlete's facts (their count and last change) and programme. A
+  different stamp is stale, worked out again on the next read (`career_scored()`). The board reads many at once with a time budget
+  (`career_scores_for()`: 2.5 s, then a stale row is served as it was), because the career's habit half walks a whole career (up to a
+  second for the longest log on 2026-10-17). Coach-only read, in `BACKUP_TABLES`, the schema snapshot and `coach_erase_person()`.
+  Measured on PGlite (slower than the live project): the longest athlete's profile 0.39 s cold and 0.11 s warm, the board 0.84 s cold
+  and 0.003 s warm.
+- **P4.** With the XP switch on: the level is `career_level()` of the career XP (never resets); `hab_season_level()` answers it, so the
+  road's titles (`hab_mint_titles()`, `set_title()`) and `coach_season_levels()` follow it; `leaderboard_top()` ranks this season's
+  points (or the rolling week's) from the cache, with the career level and rank beside each name; `hab_close_season()` archives a
+  season's points and the career level at its last day, and gives the season's title to `[season] title_points` (2,000) or more.
+  Before it, all four are Proof's own, unchanged (`hab_proof_level()` keeps Proof's season level for the switch's list).
+- **Nobody's level goes down** (`career_keep_levels()`, run by the seed that turns the XP switch on): for each athlete with a Proof log,
+  a season record or a fact, the highest Proof level (the best `hab_season_results.level`, or `hab_proof_level()` now) against the career
+  level; where the career is lower, one `level_kept` fact (ref `xp-switch`, dated the switch day) worth `career_level_floor(level)` minus
+  the career XP. Written once; a later re-seed never works it out again (GAME-1).
+- **P10.** `get_profile()` reads the cache and adds `switch`, `week`, `since` (the first day the athlete logged anything: the reveal's
+  date), `kept` and `rules` (the curve, `[season] title_points` and the prices an app previews with).
+- **AA Proof** (`habits.html`, `HABITS.md` → *Career Mode*): `fetchCareer()` reads the profile behind the first paint, after every push
+  and on the foreground pull, and keeps it in `<id>_hab_career` (never synced; the coach's preview keeps it in memory). `careerOn()` is
+  the profile's switch. In Career Mode the scorer's window is the whole career (`scoreDays()`), `paidXp()` pays the locked habit 0,
+  `overallXp()` is the profile's XP plus what the phone counted since (`careerXp()`), and the curve is the profile's (`overallBase()`).
+  `rulesSignature()` carries the switch instead of the season, so the first open after it re-baselines in silence and shows the one
+  reveal (`renderCareerReveal()`), once per athlete (`CFG.careerSeen`, kept through the cloud merge). The embedded strip reads the copy
+  and never asks the server.
+- **The training app** (`program.html`, `PROGRAM-APP.md` → *Career on Home*): Hold Serve's read of `career_rules` also reads the switch
+  (`careerSwitchSeen()`); with it on, `refreshCareer()` reads the profile into `<id>_careercache`. The Career row on Home above Hold Serve
+  (`careerRowHTML()`), and P17's finish card (`careerEarn()`, `paintConfirmEarn()`) and finished card (`paintCareerEarn()`, kept in
+  `<id>_earn_d<N>`). Neither key syncs.
+- **The twins** (P13): `habits.html` `levelInfo()` on the career's curve and `paidXp()`; `program.html` `careerLevelOf()`,
+  `careerFullLog()`, `careerCheckin()`, `careerEarly()`. `scripts/check_twins.js` §9 holds them to `scripts/career/xp_cases.json`, the
+  server's own answers (`career_level()`, `hab_xp()` with `career_paid_rules()`, `career_session_want()`), which
+  `scripts/career/rehearse_switch.mjs` writes (`--write-cases`) and checks on every run. `scripts/headless/career.js` drives both apps.
+- **`career_compare()` after the switch:** both sides pay the locked habits 0, and a row whose numbers differ only because a closed day
+  settled is `settled` (with how many closed days differ), not a failure.
+- **What it does not do yet:** no badge, achievement or title of the catalogue is minted (phase 3); the training app has no moment of its
+  own for a level reached (AA Proof celebrates it at its next open); the board's level beside a name can lag an athlete who has not
+  opened an app since a change, by at most the time it takes a board read to work out a stale row.

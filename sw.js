@@ -290,7 +290,8 @@
 // v159: habits.html and app-fonts.css changed (2026-10-17): AA Proof's strip on Home takes its fonts from /assets/css/app-fonts.css (Barlow Condensed 800 added), not Google Fonts.
 // v160: program.html changed and /assets/js/sharecard.js joins the shell (2026-10-17, Highlight Reel): share cards for a win, drawn on the phone, with no signal too.
 // v161: program.html changed (2026-10-17, Career Mode): Hold Serve on Home, the training weeks held in a row, read from the server.
-const CACHE = 'aap-v161';
+// v162: program.html changed (2026-10-17, Career Mode phase 2): the Career row on Home and what a session earns, once the XP switch is on.
+const CACHE = 'aap-v162';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

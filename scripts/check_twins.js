@@ -40,6 +40,10 @@
      holdCount                   / get_profile() in SQL          Career Mode's weeks held in a row, Home's Hold Serve row: held to the cases
                                                                   in scripts/career/hold_cases.json here, and to the server's own loop by
                                                                   scripts/career/rehearse.mjs (PGlite)
+     habits.html levelInfo, paidXp; program.html careerLevelOf, careerFullLog, careerCheckin, careerEarly
+                                 / career_level(), hab_xp() with career_paid_rules(), career_session_want() in SQL
+                                 Career Mode phase 2 (the XP switch): the career's curve, the WORKOUT habit at 0 a day, a session's
+                                 facts. Held to scripts/career/xp_cases.json, the server's answers (scripts/career/rehearse_switch.mjs)
 
    Already guarded elsewhere (not repeated): rxOf/repCount/tempoDisplay (check_rx.js), the set-log grammar
    (check_setlog.js), the shared word lists (check_parity.py), the XP rules (check_xp_rules.py).
@@ -662,6 +666,46 @@ run('Career Mode: weeks held in a row (holdCount / get_profile)', () => {
   HOLD_CASES.forEach(c => {
     const r = A_HOLD.holdCount(c.facts);
     expect('holdCount: ' + c.name, c.facts.map(f => f.kind + ' ' + f.ref), { now: r.now, best: r.best }, c.want);
+  });
+});
+
+/* ── 9. Career Mode phase 2: what the two phones copy from the server (habits.html, program.html / the SQL) ─────── */
+// Once the XP switch is on, AA Proof shows the career's level and a tick's XP at once, and the training app shows the level on Home and what a
+// session earns (P13, P17; supabase/stage69_career_xp_switch.sql). Each copies a server rule, so the cases live in scripts/career/xp_cases.json,
+// the server's own answers (written, and checked every run, by scripts/career/rehearse_switch.mjs on PGlite). This holds both apps to them.
+const XP_CASES = JSON.parse(read('scripts/career/xp_cases.json'));
+const H_CURVE = sandbox(null, [lineSrc(H_SRC, 'const RANKS =', 'habits.html'), lineSrc(H_SRC, 'const SUBS_PER_RANK =', 'habits.html'),
+  lineSrc(H_SRC, 'const LEVELS_PER_CYCLE =', 'habits.html'), lineSrc(H_SRC, 'const MAX_LEVEL_SCAN =', 'habits.html'), constSrc(H_SRC, 'XP_RULES', 'habits.html')]
+  .concat(['levelCost', 'rankFor', 'levelInfo'].map(n => fnSrc(H_SRC, n, 'habits.html'))), ['levelInfo', 'RANKS']);
+const A_CAREER = sandbox(null, fromA('careerLevelOf', 'careerTruthy', 'careerFullLog', 'careerCheckin', 'careerEarly'),
+  ['careerLevelOf', 'careerFullLog', 'careerCheckin', 'careerEarly']);
+// paidXp() with Career Mode on: its own careerOn() is the profile's switch, so the sandbox says yes.
+const H_PAID = sandbox('function careerOn() { return true; }', [constSrc(H_SRC, 'XP_RULES', 'habits.html'), constSrc(H_SRC, 'HABITS', 'habits.html')]
+  .concat(['baseXp', 'xpFor', 'paidXp'].map(n => fnSrc(H_SRC, n, 'habits.html'))), ['paidXp', 'HABITS']);
+run('Career Mode: the career\'s curve (habits.html levelInfo, program.html careerLevelOf / career_level)', () => {
+  const L = XP_CASES.rules.level;
+  expect('habits.html RANKS are the rulebook\'s ranks', null, H_CURVE.RANKS, L.ranks);
+  XP_CASES.levels.forEach(c => {
+    const want = { level: c.level, rank: c.rank, xp_in_level: c.xp_in_level, level_cost: c.level_cost };
+    const h = H_CURVE.levelInfo(c.xp, L.base, L.growth);
+    expect('habits.html levelInfo on the career\'s curve', c.xp, { level: h.lv, rank: h.label, xp_in_level: h.into, level_cost: h.need }, want);
+    const a = A_CAREER.careerLevelOf(c.xp, XP_CASES.rules);
+    expect('program.html careerLevelOf', c.xp, { level: a.level, rank: a.rank, xp_in_level: a.xp_in_level, level_cost: a.level_cost }, want);
+  });
+});
+run('Career Mode: a value\'s daily XP once the switch is on (habits.html paidXp / career_paid_rules + hab_xp)', () => {
+  XP_CASES.paid.forEach(c => {
+    const h = H_PAID.HABITS.find(x => x.id === c.habit) || { id: c.habit, kind: 'check', target: 1 };   // a custom habit's target is 1
+    expect('paidXp', { habit: c.habit, v: c.v }, H_PAID.paidXp(h, c.v), c.xp);
+  });
+});
+run('Career Mode: what a session makes (program.html careerFullLog, careerCheckin, careerEarly / career_session_want)', () => {
+  XP_CASES.sessions.forEach(c => {
+    const early = A_CAREER.careerEarly(c.status);
+    const kinds = [early ? 'session_finished_early' : 'session_finished']
+      .concat(A_CAREER.careerFullLog(c.log, early) ? ['full_log'] : [])
+      .concat(A_CAREER.careerCheckin(c.readiness) ? ['checkin_done'] : []).sort();
+    expect('the facts of a session: ' + c.name, { status: c.status }, kinds, c.facts);
   });
 });
 

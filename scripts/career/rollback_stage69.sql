@@ -1,11 +1,11 @@
--- The way back from stage68 (Career Mode phase 2, the XP switch): every function stage68 redefined goes back to what it was before (stage66's own
+-- The way back from stage69 (Career Mode phase 2, the XP switch): every function stage69 redefined goes back to what it was before (stage66's own
 -- text for the career_ functions, the schema snapshot's for AA Proof's), every function and the table it added go, and coach_erase_person()
--- forgets career_scores. Made from those files by the session that wrote stage68 (2026-10-17), and run by scripts/career/rehearse_switch.mjs
+-- forgets career_scores. Made from those files by the session that wrote stage69 (2026-10-17), and run by scripts/career/rehearse_switch.mjs
 -- against the result, so it is tested. On Amir's word only (CLAUDE.md: a change to the live project waits for his yes).
 --
 -- After it: the rulebook rows stay as they are. Phase 1's functions read a rulebook with no [shadow] table as in shadow, which is what this
 -- wants: AA Proof's own scorer and board come back for every athlete. A level kept at the switch (kind level_kept) is voided, not deleted: it
--- pays nothing in phase 1, and stage68 writes it again if the switch is ever turned on again. Seed the phase 1 files after it only with a
+-- pays nothing in phase 1, and stage69 writes it again if the switch is ever turned on again. Seed the phase 1 files after it only with a
 -- version number above the newest loaded (career_seed() refuses an older one).
 --
 -- Run it as one statement batch (the Supabase tool's execute_sql, or the SQL editor). It is safe to run twice.
@@ -209,7 +209,7 @@ begin
                             'rules_differ_on', v_diff, 'rows', v_rows);
 end $function$;
 
--- ── 2. AA Proof's functions, as the schema snapshot had them before stage68 ─────────────────────────────────────────
+-- ── 2. AA Proof's functions, as the schema snapshot had them before stage69 ─────────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.hab_season_level(p_athlete_id text)
  RETURNS integer
  LANGUAGE plpgsql
@@ -355,7 +355,7 @@ begin
   return v_n;
 end; $function$;
 
--- ── 3. what stage68 added ──────────────────────────────────────────────────────────────────────────────────────────
+-- ── 3. what stage69 added ──────────────────────────────────────────────────────────────────────────────────────────
 drop function if exists public.career_switch_day(jsonb, text);
 drop function if exists public.career_xp_on();
 drop function if exists public.career_paid_rules(jsonb, jsonb);
@@ -369,7 +369,7 @@ drop function if exists public.hab_proof_level(text);
 drop function if exists public.career_keep_levels(date);
 update public.career_facts set void_at = now(), updated_at = now() where kind = 'level_kept' and void_at is null;
 
--- coach_erase_person() forgets career_scores (the reverse of stage68's patch: found exactly once, or nothing is changed)
+-- coach_erase_person() forgets career_scores (the reverse of stage69's patch: found exactly once, or nothing is changed)
 do $rollback68_patch$
 declare
   d text := pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure);
@@ -382,7 +382,7 @@ begin
   end if;
   n := (length(d) - length(replace(d, s_old, ''))) / length(s_old);
   if n <> 1 then
-    raise exception 'rollback68: coach_erase_person() holds the patched list % times, not once. Nothing was changed.', n;
+    raise exception 'rollback69: coach_erase_person() holds the patched list % times, not once. Nothing was changed.', n;
   end if;
   execute replace(d, s_old, s_new);
 end $rollback68_patch$;

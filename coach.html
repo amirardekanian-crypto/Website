@@ -1641,7 +1641,8 @@ const S = {
   assess: null,    // public.assess_accounts rows — testing-app logins, loaded when Buyers opens.
   course: null,    // public.tps_accounts rows — course app (/tennis/app/) logins, loaded when Buyers opens.
   ath: {},         // assembled per-athlete records
-  levels: {},      // athlete_id -> server season level
+  levels: {},      // athlete_id -> the server's level: Proof's season level, or the career level once Career Mode's XP switch is on
+  careerXp: null,  // the day Career Mode's XP switch was turned on (career_rules → [switch] xp), or null while it is off (loadLevels())
   board: { season: null, week: null },
   boardAt: {},     // scope -> when the board was read (it is kept until ↻ Refresh, or a quest week starts or ends)
   boardErr: '',    // why the last board read failed
@@ -2684,7 +2685,8 @@ function lvHtml(kind, id) {
   if (kind === 'chip') return lv ? `<span class="lvchip">LV ${lv}</span>` : '';
   if (kind === 'text') return lv ? `<span class="lvtext">LV ${lv}</span>` : '';   // the roster's plain-text level (a chip on every row was loud)
   if (kind === 'hchip') return lv ? ` <span class="lvchip">LV ${lv}</span>` : '';
-  if (kind === 'big') return lv ? `<div class="big">LV ${lv}<br><small>season level (server)</small></div>` : '';
+  // Career Mode (phase 2): once the XP switch is on, the server's level is the career's (it never resets), and the label says so.
+  if (kind === 'big') return lv ? `<div class="big">LV ${lv}<br><small>${S.careerXp ? 'career level (server)' : 'season level (server)'}</small></div>` : '';
   return '';
 }
 function lvSlot(kind, id) { return `<span class="lvslot" data-lv="${esc(kind)}:${esc(id)}">${lvHtml(kind, id)}</span>`; }
@@ -2696,6 +2698,13 @@ async function loadLevels() {
   loadLevels._done = true;
   const ids = Object.values(S.ath).filter(a => a.isHab).map(a => a.id);
   if (!ids.length) return;
+  // Career Mode's XP switch (the newest rulebook's [switch] xp, a day or "off"): with it on, coach_season_levels() answers the career level.
+  // Read quietly: a page that cannot read it simply keeps the old label.
+  sb.from('career_rules').select('version,switch:rules->switch').order('version', { ascending: false }).limit(1).then(r => {
+    const sw = r && !r.error && Array.isArray(r.data) && r.data[0] && r.data[0].switch;
+    S.careerXp = sw && /^\d{4}-\d{2}-\d{2}$/.test(String(sw.xp || '')) ? sw.xp : null;
+    if (S.careerXp) paintLevels();
+  }, () => {});
   const all = await sb.rpc('coach_season_levels', { p_ids: ids });
   if (!all.error && Array.isArray(all.data)) {
     all.data.forEach(r => { if (r && r.level != null) S.levels[r.athlete_id] = r.level; });

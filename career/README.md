@@ -5,6 +5,8 @@ shadow:** `scripts/career_seed.py` turns the `.toml` files
 into the server's rows (`career_rules`, `career_catalogue`), so
 changing a file and seeding it again is how a detail changes (GAME-10). No XP, badge or level reaches an athlete yet; the one thing
 they see is Hold Serve on the training app's Home (2026-10-17), the held weeks the server judges with `rulebook.toml` → `[week]`.
+**Phase 2, the XP switch, is built (2026-10-17) and waits for Amir's yes**: `rulebook.toml` → `[switch] xp` is the switch
+(*Turning a switch on*, below).
 
 ## What is here
 
@@ -39,8 +41,9 @@ python scripts/check_career.py
 ```
 
 It reads every file and refuses anything that breaks the rules: a reward with no meaning, a fact nobody defined, gold,
-a mission with its own fixed XP (GAME-7), a title that doesn't exist, tiers out of order, and, while `[shadow] on = true`,
-a habit number that is not Proof's own (`supabase/xp_rules_snapshot.json`). Or just ask Claude to make the change.
+a mission with its own fixed XP (GAME-7), a title that doesn't exist, tiers out of order, a switch that is neither `"off"` nor a
+day, and, until the catalogue switch, a habit number that is not Proof's own (`supabase/xp_rules_snapshot.json`). Or just ask
+Claude to make the change.
 
 Then seed it, so the server scores with it (Claude does this with the Supabase tool; it re-works every athlete's facts):
 
@@ -49,9 +52,24 @@ python scripts/career_seed.py --out "$TEMP/career-seed.sql"
 ```
 
 The file holds one `select public.career_seed(…)` statement. Run it on the project, then `select public.career_compare()`
-must still say `"ok": true` while the shadow is on. `select version, source, loaded_at from career_rules` says which files
+must still say `"ok": true`. `select version, source, loaded_at from career_rules` says which files
 the server was last seeded from (`source` is the sha256 the seed prints). `node scripts/career/rehearse.mjs` (PGlite, nothing live) proves a
-change to `supabase/stage66_career_mode.sql` before it is applied.
+change to `supabase/stage66_career_mode.sql` before it is applied, and `node scripts/career/rehearse_switch.mjs --backup <file>` one to
+`supabase/stage69_career_xp_switch.sql` (on a backup of the real rows, kept outside the repo).
+
+### Turning a switch on
+
+`rulebook.toml` → `[switch]` holds the two switches: `xp` (phase 2: training earns XP, the WORKOUT habit pays 0 a day, closed days
+settle, the level is the career level and never resets) and `catalogue` (phase 3: the entries with `retire_at` / `starts_at =
+"catalogue"`). Each is `"off"` until it is turned on, on Amir's yes only:
+
+1. Bump `version`, set the switch to today's date (`xp = "2026-10-19"`), and run `python scripts/check_career.py`.
+2. `python scripts/career_seed.py --dry-run --out "$TEMP/career-switch-dry.sql"`, run it on the project: everything is worked out,
+   then undone. For the XP switch it answers every athlete's line (Proof's level, the career level, the level kept), the list Amir
+   reads first. Nobody's level goes down: an athlete below their best Proof level is kept at it (`[fact.level_kept]`).
+3. On his yes, the same without `--dry-run`, then `select public.career_compare()`, and commit the file the same day.
+
+A switch once on never goes back off: the seed refuses it (the way back is `scripts/career/rollback_stage69.sql`, on Amir's word only).
 
 **An id never changes.** `[badge.held_weeks]`: `held_weeks` is the id that history is filed under. Change the `name`,
 never the id.
@@ -81,25 +99,27 @@ The allowed words: **meanings** `consistency` · `commitment` · `progress` · `
 - `[season]` `title_points`, … · `[week]` · `[share]` `mission`, `quest`, `mission_sweep`.
 - `[habits]` `completion_bonus`, `daily_cap`, `max_custom`, `lapse_days`, `comeback_stick`, and `[habits.weights]`.
 - `[fact.<id>]` `meaning` (one of the four, or `chosen` for a commendation, `quest` for a quest step, `none` for a
-  social action), `xp` (a number) **or** `xp_from` (`habits` · `mission` · `quest` · `share.mission_sweep`), `source`
-  (`training` · `proof` · `coach` · `server`), `pays_for` (`act` · `progress` · `nothing`), `when`, and `cap` if it has
-  one.
+  social action, `carried` for the level kept at the XP switch), `xp` (a number) **or** `xp_from` (`habits` · `mission` ·
+  `quest` · `share.mission_sweep` · `value`: the fact's own number, with `career_only = true` so it never counts toward a
+  season), `source` (`training` · `proof` · `coach` · `server`), `pays_for` (`act` · `progress` · `nothing`), `when`, and
+  `cap` if it has one.
+- `[switch]` `xp` and `catalogue`: `"off"`, or the day the switch was turned on (*Turning a switch on*, above).
 
 **`badges.toml`** `[badge.<id>]`: `name`, `meaning`, `kind` (`best_run` · `total` · `per_habit_best_run` · `best_value` ·
 `proof`; `best_value` is the largest value its fact has reached, such as a percent), `counts` (the fact or facts it
 reads; for `origin = "proof"`, `proof_codes` instead), optional `habit` (reads only that habit's facts: one of
 `[habits.weights]`), `caption` (`{n}` is the number), `free`, `origin`, `tiers`: a list of `{ at, metal, xp, size }` in
 rising order, each with an optional `title` (a habit's ladder also has `tier_name`). A `per_habit_best_run` tier has
-`mult` instead of `xp`. For a change that takes effect at the switch (phase 3), optional:
-- `retire_at = "switch"`: earned as Proof earns it until phase 3, never after. Anyone who has it keeps it.
-- `starts_at = "switch"`: not earned before phase 3.
+`mult` instead of `xp`. For a change that takes effect at the catalogue switch (phase 3), optional:
+- `retire_at = "catalogue"`: earned as Proof earns it until phase 3, never after. Anyone who has it keeps it.
+- `starts_at = "catalogue"`: not earned before phase 3.
 - `superseded_by`: the id, or list of ids, of the entry that takes its place.
 
-That is how a design change reaches an `origin = "proof"` entry while the shadow is on: the old entry only gains
+That is how a design change reaches an `origin = "proof"` entry before the catalogue switch: the old entry only gains
 `retire_at` and `superseded_by`, and its numbers stay Proof's (`check_career.py` still compares them).
 
 **`achievements.toml`** `[achievement.<id>]`: `name`, `meaning`, `reads` (a fact, or `proof`), `rule`, `xp`, `size`,
-`caption`, `free`, `origin`, optional `title`, `proof_code` when carried over, and the switch keys `retire_at`,
+`caption`, `free`, `origin`, optional `title`, `proof_code` when carried over, and the catalogue switch's keys `retire_at`,
 `starts_at` and `superseded_by` as on badges (an achievement may be superseded by a badge: THE MACHINIST by CENTURY).
 
 **`titles.toml`** `[title.<id>]`: `name`, `meaning` (one of the four, `chosen`, `season`, `level` for the road's titles,

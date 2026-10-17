@@ -16,7 +16,7 @@ call it). career_seed() replaces the row for that version and the whole catalogu
 again with the new numbers (PROCEDURES.md → P16). An id is never renamed in the files, only its name, so history stays
 filed under it. Bump `version` in rulebook.toml when the old rulebook should stay on the server beside the new one.
 
-The switches (rulebook.toml → [switch], stage68): the seed that turns the XP switch on also writes the levels kept and
+The switches (rulebook.toml → [switch], stage69): the seed that turns the XP switch on also writes the levels kept and
 returns every athlete's line (Proof's level, the career level, the level kept). --dry-run makes the same statement with
 p_dry_run => true: the server does all of it, undoes it, and answers the same, so the list can be read first. A seed
 that changes nothing but a switch runs no backfill. The server refuses a switch turned back off and a day still to come.

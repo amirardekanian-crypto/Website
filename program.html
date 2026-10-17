@@ -3798,6 +3798,14 @@
   :where(#day-view) .confirm-norpe:empty, :where(#day-view) .session-confirm:not(.ready) .confirm-norpe { display: none; }
   :where(#day-view) .cf-norpe { display: block; min-height: 44px; margin-top: 0; padding: 0; border: 0; background: none; color: var(--clay-ink);
     font: inherit; font-size: var(--fs-body); font-weight: 600; text-align: left; cursor: pointer; }
+  /* What the session earns (Career Mode phase 2, paintConfirmEarn()): the XP in Barlow Condensed, what makes it up in grey, what only the
+     server decides (the held week) on its own line. Green and ink, never clay: it asks for nothing. */
+  :where(#day-view) .confirm-earn { padding: 14px var(--g) 0; }
+  :where(#day-view) .confirm-earn:empty, :where(#day-view) .session-confirm:not(.ready) .confirm-earn { display: none; }
+  :where(#day-view) .cf-earn { display: grid; gap: 4px; }
+  :where(#day-view) .cf-earn-k { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .cf-earn b { font: 700 var(--fs-title)/1.1 'Barlow Condensed', sans-serif; letter-spacing: .4px; color: var(--ink); }
+  :where(#day-view) .cf-earn small { font: 500 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
   :where(#day-view) .ew-q { font-size: var(--fs-body); font-weight: 600; line-height: 1.3; color: var(--ink); }
   :where(#day-view) .ew-q span { margin-left: 6px; font-size: var(--fs-small); font-weight: 400; color: var(--grey); }
   :where(#day-view) .ew-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -3838,6 +3846,12 @@
   :where(#day-view) .session-complete .complete-by { grid-row: 4; display: flex; align-items: flex-end; justify-content: flex-end; gap: 10px; padding: 8px var(--g) 24px; color: #fff; }
   :where(#day-view) .session-complete .complete-by .wn-sig { width: 104px; height: 37px; margin: 0; color: #fff; }
   :where(#day-view) .session-complete .complete-by .wn-av { width: 40px; height: 40px; margin: 0; box-shadow: 0 0 0 2px rgba(255,255,255,.92); }
+  /* What the session earned (Career Mode phase 2, paintCareerEarn()): at the left of the signature row, on the green, the XP in white
+     and the level in mint. */
+  :where(#day-view) .session-complete .complete-by .complete-earn { margin-right: auto; align-self: center; display: grid; gap: 4px; }
+  :where(#day-view) .session-complete .complete-by .complete-earn[hidden] { display: none; }
+  :where(#day-view) .complete-earn .earn-xp { font: 900 var(--fs-title)/1 'Barlow Condensed', sans-serif; letter-spacing: .4px; color: #fff; }
+  :where(#day-view) .complete-earn .earn-lv { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--mint); }
   :where(#day-view) .session-complete > .complete-habit + .complete-actions { grid-row: 6; display: block; margin: 0; padding: 20px var(--g) 0; }
   :where(#day-view) .session-complete > .complete-habit { grid-row: 7; width: auto; max-width: none; margin: 12px var(--g) 0; cursor: pointer; }
   :where(#day-view) .session-complete > .complete-habit[hidden] { display: none; }
@@ -4390,6 +4404,14 @@
   /* Hold Serve's row (paintHold()) leads the pair of door rows under the week: it takes the 20 px, the habits row sits 10 px under it. */
   #home-overview #home-hold-wrap:not(:empty) { margin-top: 20px; }
   #home-overview #home-hold-wrap:not(:empty) + #home-habits-wrap { margin-top: 0; }
+  /* The Career row (paintCareer(), Career Mode phase 2) leads them once the XP switch is on: it takes the 20 px, the rows under it 10. */
+  #home-overview #home-career-wrap:not(:empty) { margin-top: 20px; }
+  #home-overview #home-career-wrap:not(:empty) + #home-hold-wrap:not(:empty) { margin-top: 0; }
+  #home-overview #home-career-wrap:not(:empty) + #home-hold-wrap:empty + #home-habits-wrap { margin-top: 0; }
+  /* its level bar: a 3 px line along the row's foot, green filling toward the next level (never clay: it asks for nothing) */
+  #home-overview .career-row { position: relative; overflow: hidden; }
+  #home-overview .career-row .career-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--hair); }
+  #home-overview .career-row .career-bar i { display: block; height: 100%; background: var(--fill); }
 
   /* 4. Next up (.dc-hero): the suggested day as ONE card, the training day's cover on Home. The photo graded into the green
      (luminosity at .7, masked from the left), a scrim to the cover's last colour, "● NEXT UP · DAY 1" in Space Mono with a mint
@@ -5229,6 +5251,9 @@
     <!-- The week is done: one short extra from the Library, until it has been opened (LIB-01, paintWeekSugg()) -->
     <div id="home-sugg-wrap"></div>
 
+    <!-- Career (Career Mode phase 2, 2026-10-17): the athlete's level, never reset, with the level bar; one door row (paintCareer()),
+         a tap opens AA Proof's Locker. Empty until the server's XP switch is on, and in the demo and the coach's preview. -->
+    <div id="home-career-wrap"></div>
     <!-- Hold Serve (Career Mode, 2026-10-17): the training weeks held in a row, one door row (paintHold()). Empty when there is
          nothing true to say: offline, the demo, the coach's preview, no rulebook on the server, or a week not judged yet. -->
     <div id="home-hold-wrap"></div>
@@ -5656,6 +5681,8 @@ function _snapshot() {
     if (k && k.indexOf(prefix + 'hlwin_d') === 0) continue;
     // Hold Serve's copy of the server's held weeks (Career Mode): a cache of the server's facts, never progress.
     if (k === prefix + 'holdcache') continue;
+    // The career's profile (Career Mode phase 2): a cache of get_profile(); and what a finished day earned, this phone's view of it.
+    if (k === prefix + 'careercache' || (k && k.indexOf(prefix + 'earn_d') === 0)) continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -6153,6 +6180,7 @@ async function _replayQueue() {
 // A session the server now has: its finished card's line says so (paintSendStatus()).
 function _paintSent(entry) {
   try { if (entry && entry.p_day != null && document.getElementById('send-status-' + entry.p_day)) paintSendStatus(String(entry.p_day)); } catch (e) {}
+  careerSessionSaved(entry);   // Career Mode: the session is on the server now, so what it earned is the server's to confirm
 }
 // The phone's own list of the sessions it finished, "day|YYYY-MM-DD", the last 60. It syncs with
 // the progress (a union, mergeStoredValue()), so coach.html's syncGapsOf() can name a session the
@@ -6675,7 +6703,9 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   // it from the server. Never blocks the first paint.
   loadHistory();
   // Hold Serve (Career Mode): the phone's copy now (paintWeek() below draws it), then the server's held weeks behind the first paint.
+  // The same read says whether the XP switch is on, and then the career's profile follows (careerSwitchSeen()).
   loadHoldCache();
+  loadCareerCache();
   refreshHold();
   // The Spine: cues and the ⓘ from the phone's copy now, then from the server.
   paintSpine();
@@ -8176,6 +8206,7 @@ function paintWeek() {
   paintCycleCard();   // the history may just have arrived (the card is on Progress)
   paintBetweenFold();
   paintHold();        // Hold Serve's next step follows the week's count (and between cycles, its count waits)
+  paintCareer();      // the career's level row (Career Mode, once the XP switch is on)
   if (cycleOver()) {   // between cycles (PROG-02): no week to count, so no week-done extra either
     const sg = document.getElementById('home-sugg-wrap');
     if (sg) sg.innerHTML = '';
@@ -8452,6 +8483,8 @@ function renderHome() {
         <div class="confirm-missing"></div>
       </div>
       <div class="confirm-norpe"></div>
+      <!-- Career Mode (phase 2): what this session earns, before Done (paintConfirmEarn(); empty until the XP switch is on) -->
+      <div class="confirm-earn" aria-live="polite"></div>
       <div class="finish-rate">
         <div class="complete-rpe">
           <div class="complete-rpe-label">How hard was this session?</div>
@@ -8479,7 +8512,7 @@ function renderHome() {
       <div class="complete-emoji">✓</div>
       <div class="complete-title">${esc(day.completionTitle)}</div>
       <div class="complete-sub">${esc(day.completionMessage)}</div>
-      <div class="complete-by">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>
+      <div class="complete-by"><span class="complete-earn" id="earn-${day.id}" hidden aria-live="polite"></span>${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>
       <!-- Highlight Reel (2026-10-17): a New best or a Retest beaten in this session, each with Share (paintWinBand()) -->
       <div class="hl-band-slot" id="hlwin-${day.id}"></div>
       <!-- After a sore check-in: the day-after session, until it has been opened (LIB-01, paintSoreSugg()) -->
@@ -9572,7 +9605,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then <strong>Hold Serve</strong> (the weeks you've held in a row), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then <strong>Career</strong> (your level, once Career Mode is on), then <strong>Hold Serve</strong> (the weeks you've held in a row), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -9593,7 +9626,9 @@ const APP_GUIDE = [
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
+  { icon: 'activity', key: 'career', title: 'Career: your level',
+    body: `<p>Once Career Mode is on, Home has a <strong>Career</strong> row above Hold Serve. It shows your level and how far you are from the next one. Your level counts everything you do with me: every session you finish, your daily habits in AA Proof, and the weeks you hold. It never goes back to zero. A new season only restarts the board's points in AA Proof.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>counting</strong> until my side has it.</p><p>Tap the <strong>Career</strong> row to open your Locker in AA Proof: your rank, your titles and what is next on the road.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks held in a row',
     body: `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions don't.</p><p>Hold weeks in a row and the number on Home goes up. The dots are those weeks, and the dashed one is this week. The line under the number says what's left this week. Miss a week and the count starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
@@ -10007,9 +10042,12 @@ window.addEventListener('message', e => {
   ps.host.classList.remove('off');
   const sig = proofCardSig();
   if (sig !== _proofCardSig) {
+    const first = !_proofCardSig;
     _proofCardSig = sig;
     const hw = document.getElementById('home-habits-wrap');
     if (hw) hw.innerHTML = habitCardHtml();
+    // A habit ticked in the strip pays XP to the career (Career Mode): once Proof has sent it (about 1.2 s), ask for the level again.
+    if (!first && careerOnT()) refreshCareerSoon(3000);
   }
 });
 function proofStripTheme() {
@@ -10052,11 +10090,14 @@ function habitCardHtml() {
   // a snapshot from an earlier day says the level until the strip below boots Proof and writes today's.
   // `done of total` is only for a Proof that has not been updated alongside.
   const fresh = s.t && new Date(s.t).toDateString() === new Date().toDateString();
-  const said = !fresh ? `Level ${s.lv}`
+  // In Career Mode the level is the Career row's (one number on Home): a snapshot Proof wrote before the switch, or on a phone that has
+  // not seen it yet, could say another. So this row says the habits' word, never a level.
+  const lvWord = careerOnT() ? 'Ready for today' : `Level ${s.lv}`;
+  const said = !fresh ? lvWord
     : s.verdict === 'togo' ? `${s.togo} to go`
     : s.verdict === 'on' ? 'On target'
     : s.verdict === 'perfect' ? 'Perfect'
-    : (s.done != null && s.total ? `${s.done} of ${s.total}` : `Level ${s.lv}`);
+    : (s.done != null && s.total ? `${s.done} of ${s.total}` : lvWord);
   // "N to go" asks for something, so it stays clay; On target and Perfect are the good news, green.
   const tone = fresh && s.verdict === 'togo' ? ' is-togo' : fresh && (s.verdict === 'on' || s.verdict === 'perfect') ? ' is-ok' : '';
   return `<button type="button" class="hrow" onclick="goHabits()">
@@ -10075,6 +10116,7 @@ function hrowIc(kind) {
     weight: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 10.5a4.5 4.5 0 0 1 8 0"/><path d="M12 10.5l1.7-2"/>',
     why: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.4a2.6 2.6 0 1 1 3.9 2.2c-.9.5-1.4 1.1-1.4 2"/><path d="M12 16.9h.01"/>',
     ball: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3.2 3.2 3.2 9.6 0 12.8"/><path d="M18.4 5.6c-3.2 3.2-3.2 9.6 0 12.8"/>',
+    career: '<path d="M6 14l6-5 6 5"/><path d="M6 19l6-5 6 5"/><path d="M12 3.5v3"/>',   // a rank's chevrons: the career level
   }[kind] || '';
   return `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${draw}</svg></span>`;
 }
@@ -10208,7 +10250,9 @@ async function refreshHold() {
     const sb = await _sbReady();
     if (!sb) { HOLD = null; return; }
     const [r, f] = await Promise.all([
-      _withTimeout(sb.from('career_rules').select('version').order('version', { ascending: false }).limit(1), 8000),
+      // The newest rulebook's version, and its switches (Career Mode phase 2): the XP switch decides whether Home shows the career
+      // (careerSwitchSeen(), below). One read for both.
+      _withTimeout(sb.from('career_rules').select('version,switch:rules->switch').order('version', { ascending: false }).limit(1), 8000),
       _withTimeout(sb.from('career_facts').select('kind,ref,day,value').eq('athlete_id', ATHLETE_ID)
         .in('kind', ['week_held', 'week_broken']).is('void_at', null).order('day').order('ref'), 8000)
     ]);
@@ -10220,6 +10264,7 @@ async function refreshHold() {
     }
     const facts = f.data.map(x => ({ kind: x.kind, day: x.day, value: { cycle: x.value && x.value.cycle, week: x.value && x.value.week } }));
     HOLD = { facts };
+    careerSwitchSeen(r.data[0].switch);
     _holdAt = Date.now();
     try { _lsRawSet(holdKey(), JSON.stringify({ t: new Date().toISOString(), facts })); } catch (e) { /* storage full: shown this visit */ }
   } catch (e) { HOLD = null; }
@@ -10231,6 +10276,213 @@ function refreshHoldSoon() { clearTimeout(_holdSoonT); _holdSoonT = setTimeout(r
 function refreshHoldIfOld() { if (Date.now() - _holdAt > 10 * 60000) refreshHoldSoon(); }
 document.addEventListener('visibilitychange', () => { if (!document.hidden && typeof DATA !== 'undefined' && DATA) refreshHoldIfOld(); });
 window.addEventListener('online', () => { if (typeof DATA !== 'undefined' && DATA) refreshHoldIfOld(); });
+
+// ── CAREER: THE LEVEL ON HOME, AND WHAT A SESSION EARNS (Career Mode phase 2, the XP switch, 2026-10-17) ──────────────────────────────
+// career/CAREER_MODE.md → decisions 1 to 3 and GAME-13. Once the server's XP switch is on, the athlete's level is the career's: every fact
+// counted (sessions, habits, the level kept at the switch), never reset by a season. get_profile() works it out on the server (from a cache
+// there: supabase/stage69_career_xp_switch.sql); this app shows it on ONE Home row above Hold Serve, with the level bar, and the finish card
+// says what the session earns before Done and what it earned after (P17). AA Proof shows the same level: one scorer (GAME-2).
+// Before the switch nothing here asks the server for anything and nothing shows: the switch is read by Hold Serve's own small read of
+// career_rules (refreshHold()). <id>_careercache keeps the last profile on this phone, never synced (_snapshot()), so the row is there at
+// once on the next open; <id>_earn_d<N> keeps what a finished day earned, for its finished card. Not in the demo or the coach's preview.
+// TWINS (scripts/check_twins.js, scripts/career/xp_cases.json): careerLevelOf() is the server's career_level() and habits.html's levelInfo()
+// on the career's curve; careerFullLog() and careerCheckin() are career_session_want()'s full_log and checkin_done; careerEarn() prices them
+// with the profile's prices and the cap of career_facts_paid() (one paid session per plan day per training week). A held week is the
+// server's to decide (career_derive()), so the phone shows it marked as counting until the server's answer.
+// `var`, not `let`: boot() reaches paintWeek() before the script has evaluated this far (Hold Serve's note above).
+var CAREER_T = null;        // { p: get_profile()'s answer, at: when } or null
+var CAREER_SWITCH = null;   // the newest rulebook's [switch], from Hold Serve's read; null = not read yet
+var _careerBusy = false, _careerSoonT = null, _careerAt = 0;
+function careerKey() { return ATHLETE_ID + '_careercache'; }
+function careerOnT() {
+  return !window.IS_DEMO && !window.IS_PREVIEW && !!(CAREER_T && CAREER_T.p && CAREER_T.p.ready && CAREER_T.p.switch && CAREER_T.p.switch.xp);
+}
+// The level of an XP on the career's curve, from the rules the profile carries (rulebook.toml [level]): the cost of level n to n+1 is
+// base × n^growth, rounded to 10, never under 10; the rank and its sub-level; a star every prestige_after levels. TWIN of career_level().
+function careerLevelOf(xp, rules) {
+  const L = (rules && rules.level) || {};
+  const base = Number(L.base) > 0 ? Number(L.base) : 300, growth = Number(L.growth) > 0 ? Number(L.growth) : 0.55;
+  const per = Math.max(1, Math.trunc(Number(L.levels_per_rank)) || 5), prestige = Math.max(1, Math.trunc(Number(L.prestige_after)) || 50);
+  const ranks = Array.isArray(L.ranks) ? L.ranks : [];
+  const cost = n => Math.max(10, Math.round(base * Math.pow(n, growth) / 10) * 10);
+  const v = Math.max(0, Math.floor(Number(xp) || 0));
+  let lv = 1, spent = 0, c = cost(1);
+  while (lv < 100000 && v - spent >= c) { spent += c; lv++; c = cost(lv); }
+  const i = lv - 1, star = Math.floor(i / prestige), within = i % prestige;
+  const nm = ranks[Math.min(Math.floor(within / per), Math.max(ranks.length - 1, 0))] || '';
+  return { level: lv, rank: (star > 0 ? '★' + star + ' ' : '') + nm + ' ' + (within % per + 1),
+           xp_in_level: v - spent, level_cost: c, to_next: c - (v - spent) };
+}
+// JavaScript's truthiness of a value in the session record (the server reads the log the same way: career_truthy()).
+function careerTruthy(v) { return !!v && !(typeof v === 'number' && isNaN(v)); }
+// full_log, as career_session_want() decides it: a structured log, finished as written (not early), at least one set, every set ticked,
+// and every set rated on an exercise where any set was rated (the log does not carry the card's target). A circuit logs rounds, not sets.
+function careerFullLog(log, early) {
+  if (!Array.isArray(log) || early) return false;
+  const sets = [];
+  log.forEach((e, o) => {
+    if (e && typeof e === 'object' && !Array.isArray(e) && Array.isArray(e.sets)) e.sets.forEach(st => sets.push({ o, st }));
+  });
+  if (!sets.length) return false;
+  const val = (st, k) => (st && typeof st === 'object' && !Array.isArray(st)) ? st[k] : undefined;
+  if (sets.some(x => !careerTruthy(val(x.st, 'd')))) return false;
+  const asks = new Set(sets.filter(x => careerTruthy(val(x.st, 'r'))).map(x => x.o));
+  return !sets.some(x => asks.has(x.o) && !careerTruthy(val(x.st, 'r')));
+}
+// A session finished early, as career_session_want() reads its status ('Partial (n of m …)'): session_finished_early, not session_finished.
+function careerEarly(status) { return /^\s*partial/i.test(String(status || '')); }
+// checkin_done, as career_session_want() decides it: the check-in answered and not skipped (the answers are never paid, GAME-5).
+function careerCheckin(r) {
+  if (!r || typeof r !== 'object' || Array.isArray(r) || careerTruthy(r.skipped)) return false;
+  return ['composite', 'score', 'sleep', 'energy', 'soreness', 'stress', 'overall'].some(k => typeof r[k] === 'number' && isFinite(r[k]));
+}
+// What a session earns, worked out before the server answers: [{ k, xp, pending }] and the sum. D is buildSessionData(day). `done` is the set
+// of this training week's plan days already done BEFORE this session (weekDoneDays() before the finish stamp): a day done twice in a week
+// pays its session once (the full log and the check-in still pay). Every plan day done once this one is: the held week (and the bounce
+// back when the week before it broke), marked pending, the server's to confirm. Null outside Career Mode.
+function careerEarn(day, D, done) {
+  if (!careerOnT() || !D) return null;
+  const pr = (CAREER_T.p.rules && CAREER_T.p.rules.prices) || {};
+  const early = careerEarly(D.statusLabel);
+  const parts = [], n = v => Number(v) || 0;
+  const repeat = done.has(String(day));
+  if (!repeat) parts.push(early ? { k: 'early', xp: n(pr.session_finished_early) } : { k: 'session', xp: n(pr.session_finished) });
+  if (careerFullLog(D.log, early)) parts.push({ k: 'log', xp: n(pr.full_log) });
+  if (careerCheckin(D.readiness)) parts.push({ k: 'checkin', xp: n(pr.checkin_done) });
+  const ids = ((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id));
+  const cur = (DATA.cycles || [])[Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0], w = cycleWeekInfo(cur);
+  if (!repeat && w && !w.before && !w.after && ids.length && ids.every(id => id === String(day) || done.has(id))) {
+    parts.push({ k: 'week', xp: n(pr.week_held), pending: true });
+    const last = HOLD && holdCount(HOLD.facts).last;
+    if (last && last.kind === 'week_broken') parts.push({ k: 'back', xp: n(pr.bounce_back), pending: true });
+  }
+  return { parts, xp: parts.reduce((s, p) => s + p.xp, 0), repeat };
+}
+const CAREER_PART_WORDS = { session: 'Session', early: 'Session, finished early', log: 'Every set logged', checkin: 'Check-in',
+                            week: 'Your week held', back: 'Back after a broken week' };
+// The finish card's line, before Done: "This session earns +470 XP", then what makes it up.
+function careerEarnHTML(e) {
+  if (!e) return '';
+  const fmt = v => v.toLocaleString('en-US');
+  const sure = e.parts.filter(p => !p.pending), later = e.parts.filter(p => p.pending);
+  const sum = sure.reduce((s, p) => s + p.xp, 0);
+  return `<div class="cf-earn"><span class="cf-earn-k">This session earns</span><b>+${fmt(sum)} XP</b>`
+    + (sure.length ? `<small>${sure.map(p => esc(CAREER_PART_WORDS[p.k]) + ' ' + fmt(p.xp)).join(' · ')}</small>` : '')
+    + (e.repeat ? `<small>Day ${esc(String(e.day || ''))} is done this week already, so the session itself pays once.</small>` : '')
+    + (later.length ? `<small class="cf-earn-more">${later.map(p => esc(CAREER_PART_WORDS[p.k]) + ' +' + fmt(p.xp)).join(' · ')} when it counts</small>` : '')
+    + `</div>`;
+}
+function paintConfirmEarn(day, ready) {
+  const card = document.getElementById('confirm-' + day);
+  const el = card && card.querySelector('.confirm-earn');
+  if (!el) return;
+  let h = '';
+  if (ready && careerOnT()) {
+    try { const e = careerEarn(day, buildSessionData(day), weekDoneDays()); if (e) { e.day = day; h = careerEarnHTML(e); } } catch (err) { h = ''; }
+  }
+  if (el.innerHTML !== h) el.innerHTML = h;
+}
+// At Done (finishDayNow(), before the finish stamp): what the session earns and the career XP shown at that moment, kept on this phone
+// (<id>_earn_d<N>) for the finished card. Once the session is on the server (careerSessionSaved()), the next answer turns it into what
+// the server counted.
+function careerEarnAtDone(day) {
+  if (!careerOnT()) return;
+  try {
+    const e = careerEarn(day, buildSessionData(day), weekDoneDays());
+    if (!e) return;
+    _lsRawSet(ATHLETE_ID + '_earn_d' + day, JSON.stringify({ t: new Date().toISOString(), xp: e.xp, parts: e.parts,
+      before: Number(CAREER_T.p.career && CAREER_T.p.career.xp) || 0, saved: 0 }));
+  } catch (err) { /* storage full: the finished card simply has no line */ }
+}
+function careerSessionSaved(entry) {
+  if (!careerOnT() || !entry || entry.p_day == null) return;
+  const k = ATHLETE_ID + '_earn_d' + entry.p_day;
+  try {
+    const raw = JSON.parse(localStorage.getItem(k) || 'null');
+    if (raw && !raw.saved) { raw.saved = Date.now(); _lsRawSet(k, JSON.stringify(raw)); }
+  } catch (e) { /* nothing kept: nothing to confirm */ }
+  refreshCareerSoon();
+}
+// The finished card's line: "+470 XP" and where it took the career. Counting until an answer asked AFTER the session reached the server
+// (careerSessionSaved()); then the server's numbers: its career XP since Done (the held week, a best or anything else that landed with the
+// session is in it).
+function paintCareerEarn(day) {
+  const el = document.getElementById('earn-' + day);
+  if (!el) return;
+  let h = '';
+  try {
+    const raw = careerOnT() ? JSON.parse(localStorage.getItem(ATHLETE_ID + '_earn_d' + day) || 'null') : null;
+    if (raw) {
+      const p = CAREER_T.p, fresh = !!raw.saved && (CAREER_T.at || 0) > raw.saved;
+      const gained = fresh ? Math.max(0, (Number(p.career && p.career.xp) || 0) - raw.before) : raw.xp;
+      const L = careerLevelOf((fresh ? 0 : raw.xp) + (Number(p.career && p.career.xp) || 0), p.rules);
+      h = `<span class="earn-xp">+${gained.toLocaleString('en-US')} XP</span>`
+        + `<span class="earn-lv">Level ${L.level} · ${fresh ? `${L.to_next.toLocaleString('en-US')} to ${L.level + 1}` : 'counting'}</span>`;
+    }
+  } catch (err) { h = ''; }
+  if (el.innerHTML !== h) el.innerHTML = h;
+  el.hidden = !h;
+}
+// Home's row (Amir 2026-10-17, decision 2: "the training app shows one strip on Home: the level"). The big line is the level, the small
+// one the rank and what the next level needs, the bar under it the way to the next. A tap opens AA Proof's Locker, the career's home.
+function careerRowHTML() {
+  if (!careerOnT() || !DATA) return '';
+  const p = CAREER_T.p, c = p.career || {};
+  if (typeof c.level !== 'number') return '';
+  const L = careerLevelOf(c.xp, p.rules);
+  const pct = L.level_cost > 0 ? Math.max(0, Math.min(100, Math.round(L.xp_in_level / L.level_cost * 100))) : 0;
+  return `<button type="button" class="hrow career-row" onclick="goCareer()" aria-label="Your career: level ${L.level}, ${esc(L.rank)}. Open your Locker in AA Proof">
+    ${hrowIc('career')}<span class="hrow-b"><span class="hrow-l">Career</span>
+      <span class="hrow-v"><span class="hrow-vv">Level ${L.level}</span><small>${esc(L.rank)} · ${L.to_next.toLocaleString('en-US')} XP to level ${L.level + 1}</small></span></span>
+    <span class="hrow-a" aria-hidden="true">›</span>
+    <span class="career-bar" aria-hidden="true"><i style="width:${pct}%"></i></span></button>`;
+}
+function paintCareer() {
+  const el = document.getElementById('home-career-wrap');
+  if (el) {
+    let h = '';
+    try { h = careerRowHTML(); } catch (e) { h = ''; }   // never let the row stop Home
+    if (el.innerHTML !== h) el.innerHTML = h;
+  }
+  document.querySelectorAll('.session-complete.visible[id^="complete-"]').forEach(c => paintCareerEarn(c.id.slice(9)));
+}
+function goCareer() { window.location.href = habitsUrl() + '&go=pass'; }
+window.goCareer = goCareer;
+// The last profile this phone had, painted at once on open.
+function loadCareerCache() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
+  try {
+    const o = JSON.parse(localStorage.getItem(careerKey()) || 'null');
+    if (o && o.p && o.p.athlete_id === ATHLETE_ID) CAREER_T = o;
+  } catch (e) { /* no copy yet */ }
+}
+// Hold Serve's read of career_rules says whether the XP switch is on (refreshHold()). Off: nothing to ask, and a copy from before is
+// dropped. On: the profile.
+function careerSwitchSeen(sw) {
+  CAREER_SWITCH = sw || {};
+  const on = typeof CAREER_SWITCH.xp === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(CAREER_SWITCH.xp);
+  if (!on) {
+    if (CAREER_T) { CAREER_T = null; try { _lsRawRemove(careerKey()); } catch (e) {} paintCareer(); }
+    return;
+  }
+  refreshCareerSoon();
+}
+async function refreshCareer() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || _careerBusy) return;
+  _careerBusy = true;
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    const asked = Date.now();   // when the question left: an answer asked after a session landed counts it (paintCareerEarn())
+    const r = await _withTimeout(sb.rpc('get_profile', { p_athlete_id: ATHLETE_ID }), 10000);
+    if (_noAnswer(r) || !r || r.error || !r.data || r.data.athlete_id !== ATHLETE_ID) return;   // offline or refused: keep the copy
+    CAREER_T = { p: r.data, at: asked };
+    _careerAt = Date.now();
+    try { _lsRawSet(careerKey(), JSON.stringify(CAREER_T)); } catch (e) { /* storage full: shown this visit */ }
+  } catch (e) { /* keep the copy */ }
+  finally { _careerBusy = false; paintCareer(); }
+}
+function refreshCareerSoon(ms) { clearTimeout(_careerSoonT); _careerSoonT = setTimeout(refreshCareer, ms == null ? 400 : ms); }
 
 // ── PERSONAL RECORDS — the row on Progress + its own screen ───────────────────
 // Same grammar as the habit row above: one tappable row (the best lift, its
@@ -11853,6 +12105,7 @@ function refreshConfirmCard(day, status) {
   const back = card.querySelector('.confirm-back');
   if (back) back.hidden = !early;
   if (!ready) { const h = card.querySelector('.finish-hint'); if (h) h.textContent = ''; }
+  paintConfirmEarn(day, ready);   // Career Mode: what the session earns, once it can be finished
   paintFinishBtn(day, status);   // the bar's Finish early (under ⋯) goes when the card is ready or early
 }
 
@@ -12707,6 +12960,8 @@ function finishDayNow(day, card) {
   card.classList.remove('visible');
   // Lock in the session duration the moment they finish.
   finishTimer(day);
+  // Career Mode: what the session earns, worked out before the finish stamp counts this day as done this week.
+  careerEarnAtDone(day);
   localStorage.setItem(ATHLETE_ID + '_completed_d' + day, stampCompleted());
   moveRatePanel(day, true);
   const completeEl = document.getElementById('complete-' + day);
@@ -12714,6 +12969,7 @@ function finishDayNow(day, card) {
   // keeps the plain card (Amir, 2026-09-19).
   if (!isPartial) paintFinishArt(day);
   completeEl.classList.add('visible');
+  paintCareerEarn(day);   // "+470 XP · Level 24", counting until the server has the session
   completeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   // The record for the coach dashboard, and the report, once (the outbox keeps it
   // until it goes: sendReport()). Its first step (before any await) files this session's Personal Records; every new best it
@@ -13500,6 +13756,7 @@ function restoreState() {
       if (el) el.classList.add('visible');
       paintSoreSugg(day);
       paintWinBand(day, true);   // the session's New best or Retest band, as it was at Done (quietly: no burst again)
+      paintCareerEarn(day);      // and what it earned (Career Mode), as this phone kept it
     }
     updateProgress(day);
   });

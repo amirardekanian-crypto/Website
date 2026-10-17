@@ -1,4 +1,4 @@
--- stage68 — Career Mode, phase 2: the XP switch (2026-10-17; Amir: "go with your picks, but the season starts tomorrow"; career/CAREER_MODE.md
+-- stage69 — Career Mode, phase 2: the XP switch (2026-10-17; Amir: "go with your picks, but the season starts tomorrow"; career/CAREER_MODE.md
 -- → The decisions, phase 2, and career/PROCEDURES.md P3, P4, P10, P13, P14 and "Phase 2, as built"). Safe to re-run.
 --
 -- Amir's three decisions of 2026-10-17, in the database:
@@ -38,7 +38,7 @@
 --   · coach_erase_person() learns career_scores (patched in place, as stage63 and stage66).
 --
 -- Rehearsed 2026-10-17 away from the live project: scripts/career/rehearse.mjs (PGlite, the schema snapshot, a full backup of the real rows,
--- stage66 and its seed, then this file, the switch and made-up athletes through the real doors). The way back: scripts/career/rollback_stage68.sql.
+-- stage66 and its seed, then this file, the switch and made-up athletes through the real doors). The way back: scripts/career/rollback_stage69.sql.
 
 -- ── 1. the two switches ──────────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -194,13 +194,13 @@ create table if not exists public.career_scores (
 );
 alter table public.career_scores enable row level security;
 
-do $stage68_policies$
+do $stage69_policies$
 begin
   if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'career_scores' and policyname = 'coach reads career scores') then
     create policy "coach reads career scores" on public.career_scores as permissive for select to authenticated
       using ((select public.is_coach()));
   end if;
-end $stage68_policies$;
+end $stage69_policies$;
 
 revoke all on table public.career_scores from public, anon, authenticated;
 grant select on table public.career_scores to authenticated;
@@ -624,7 +624,7 @@ begin
       raise exception 'rulebook.toml → [switch] % is %, a day still to come: turn a switch on on the day it happens. Nothing was changed', v_which, v_will;
     end if;
     if v_was is not null and coalesce(v_will, 'off') = 'off' then
-      raise exception 'the % switch is on (since %) and is never turned back off: it would take every athlete''s level back. Nothing was changed (the way back is scripts/career/rollback_stage68.sql, on Amir''s word)', v_which, v_was;
+      raise exception 'the % switch is on (since %) and is never turned back off: it would take every athlete''s level back. Nothing was changed (the way back is scripts/career/rollback_stage69.sql, on Amir''s word)', v_which, v_was;
     end if;
   end loop;
   if public.career_switch_day(p_rules, 'catalogue') is not null and public.career_switch_day(p_rules, 'xp') is null then
@@ -827,7 +827,7 @@ end $function$;
 
 -- As stage66: every career_ function runs inside the server or from the service role; get_profile() is open to a signed-in athlete (their own)
 -- and the coach (anyone's). hab_proof_level() is the server's. The functions this file redefines keep the grants they had.
-do $stage68_grants$
+do $stage69_grants$
 declare f text;
 begin
   for f in
@@ -837,7 +837,7 @@ begin
     execute format('revoke all on function %s from public, anon, authenticated', f);
     execute format('grant execute on function %s to service_role', f);
   end loop;
-end $stage68_grants$;
+end $stage69_grants$;
 revoke all on function public.get_profile(text) from public, anon, authenticated;
 grant execute on function public.get_profile(text) to authenticated, service_role;
 revoke all on function public.hab_proof_level(text) from public, anon, authenticated;
@@ -854,7 +854,7 @@ grant execute on function public.hab_close_season(date) to service_role;
 -- ── 10. coach_erase_person() learns career_scores ────────────────────────────────────────────────────────────────────────
 -- Patched from its live definition, as stage66: the end of the table list must be found exactly once, or nothing is changed. career_scores is
 -- a cache (nothing in it is a source), and it holds the athlete's numbers, so an erasure empties it too.
-do $stage68_patch$
+do $stage69_patch$
 declare
   d text := pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure);
   s_old constant text := '''career_facts'']';
@@ -866,7 +866,7 @@ begin
   end if;
   n := (length(d) - length(replace(d, s_old, ''))) / length(s_old);
   if n <> 1 then
-    raise exception 'stage68: coach_erase_person() is not what this patch expects (the end of its table list was found % times, not once). Nothing was changed.', n;
+    raise exception 'stage69: coach_erase_person() is not what this patch expects (the end of its table list was found % times, not once). Nothing was changed.', n;
   end if;
   execute replace(d, s_old, s_new);
-end $stage68_patch$;
+end $stage69_patch$;

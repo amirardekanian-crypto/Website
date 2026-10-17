@@ -1,0 +1,759 @@
+{
+ "about": "What the two phones copy from the server in Career Mode phase 2 (P13, P17), and the server's own answers on fixed inputs. Written by node scripts/career/rehearse_switch.mjs --write-cases (the rehearsal checks them every run); held by scripts/check_twins.js against habits.html (levelInfo() on the career's curve, paidXp()) and program.html (careerLevelOf(), careerFullLog(), careerCheckin(), the early rule). levels: career_level(). paid: hab_xp() of one value on one day with career_paid_rules() and the XP switch on (the WORKOUT habit pays 0). sessions: the facts career_session_want() makes of a session as the app saves it. Change a rule on both sides, then here.",
+ "rules": {
+  "level": {
+   "base": 400,
+   "ranks": [
+    "ROOKIE",
+    "CONTENDER",
+    "GRINDER",
+    "OPERATOR",
+    "ENFORCER",
+    "PREDATOR",
+    "MACHINE",
+    "RELENTLESS",
+    "UNTOUCHABLE",
+    "IMMORTAL"
+   ],
+   "growth": 0.55,
+   "resets": false,
+   "prestige_after": 50,
+   "levels_per_rank": 5
+  }
+ },
+ "levels": [
+  {
+   "xp": 0,
+   "rank": "ROOKIE 1",
+   "level": 1,
+   "to_next": 400,
+   "level_cost": 400,
+   "xp_in_level": 0
+  },
+  {
+   "xp": 1,
+   "rank": "ROOKIE 1",
+   "level": 1,
+   "to_next": 399,
+   "level_cost": 400,
+   "xp_in_level": 1
+  },
+  {
+   "xp": 399,
+   "rank": "ROOKIE 1",
+   "level": 1,
+   "to_next": 1,
+   "level_cost": 400,
+   "xp_in_level": 399
+  },
+  {
+   "xp": 400,
+   "rank": "ROOKIE 2",
+   "level": 2,
+   "to_next": 590,
+   "level_cost": 590,
+   "xp_in_level": 0
+  },
+  {
+   "xp": 401,
+   "rank": "ROOKIE 2",
+   "level": 2,
+   "to_next": 589,
+   "level_cost": 590,
+   "xp_in_level": 1
+  },
+  {
+   "xp": 989,
+   "rank": "ROOKIE 2",
+   "level": 2,
+   "to_next": 1,
+   "level_cost": 590,
+   "xp_in_level": 589
+  },
+  {
+   "xp": 990,
+   "rank": "ROOKIE 3",
+   "level": 3,
+   "to_next": 730,
+   "level_cost": 730,
+   "xp_in_level": 0
+  },
+  {
+   "xp": 991,
+   "rank": "ROOKIE 3",
+   "level": 3,
+   "to_next": 729,
+   "level_cost": 730,
+   "xp_in_level": 1
+  },
+  {
+   "xp": 1720,
+   "rank": "ROOKIE 4",
+   "level": 4,
+   "to_next": 860,
+   "level_cost": 860,
+   "xp_in_level": 0
+  },
+  {
+   "xp": 5000,
+   "rank": "CONTENDER 2",
+   "level": 7,
+   "to_next": 790,
+   "level_cost": 1170,
+   "xp_in_level": 380
+  },
+  {
+   "xp": 9999,
+   "rank": "GRINDER 1",
+   "level": 11,
+   "to_next": 1311,
+   "level_cost": 1500,
+   "xp_in_level": 189
+  },
+  {
+   "xp": 10000,
+   "rank": "GRINDER 1",
+   "level": 11,
+   "to_next": 1310,
+   "level_cost": 1500,
+   "xp_in_level": 190
+  },
+  {
+   "xp": 25000,
+   "rank": "OPERATOR 4",
+   "level": 19,
+   "to_next": 720,
+   "level_cost": 2020,
+   "xp_in_level": 1300
+  },
+  {
+   "xp": 47260,
+   "rank": "PREDATOR 4",
+   "level": 29,
+   "to_next": 1650,
+   "level_cost": 2550,
+   "xp_in_level": 900
+  },
+  {
+   "xp": 60000,
+   "rank": "MACHINE 4",
+   "level": 34,
+   "to_next": 2360,
+   "level_cost": 2780,
+   "xp_in_level": 420
+  },
+  {
+   "xp": 99999,
+   "rank": "IMMORTAL 2",
+   "level": 47,
+   "to_next": 2411,
+   "level_cost": 3320,
+   "xp_in_level": 909
+  },
+  {
+   "xp": 123456,
+   "rank": "★1 ROOKIE 4",
+   "level": 54,
+   "to_next": 3284,
+   "level_cost": 3590,
+   "xp_in_level": 306
+  },
+  {
+   "xp": 250000,
+   "rank": "★1 MACHINE 4",
+   "level": 84,
+   "to_next": 170,
+   "level_cost": 4580,
+   "xp_in_level": 4410
+  },
+  {
+   "xp": 400000,
+   "rank": "★2 GRINDER 4",
+   "level": 114,
+   "to_next": 680,
+   "level_cost": 5410,
+   "xp_in_level": 4730
+  },
+  {
+   "xp": 750000,
+   "rank": "★3 ENFORCER 2",
+   "level": 172,
+   "to_next": 6330,
+   "level_cost": 6790,
+   "xp_in_level": 460
+  },
+  {
+   "xp": 1000000,
+   "rank": "★4 CONTENDER 2",
+   "level": 207,
+   "to_next": 7080,
+   "level_cost": 7510,
+   "xp_in_level": 430
+  }
+ ],
+ "paid": [
+  {
+   "habit": "strength",
+   "v": 1,
+   "xp": 0
+  },
+  {
+   "habit": "strength",
+   "v": 0.5,
+   "xp": 0
+  },
+  {
+   "habit": "steps",
+   "v": 10000,
+   "xp": 72
+  },
+  {
+   "habit": "steps",
+   "v": 5000,
+   "xp": 30
+  },
+  {
+   "habit": "steps",
+   "v": 12000,
+   "xp": 72
+  },
+  {
+   "habit": "sleep",
+   "v": 7.5,
+   "xp": 60
+  },
+  {
+   "habit": "sleep",
+   "v": 6,
+   "xp": 40
+  },
+  {
+   "habit": "fuel",
+   "v": 3,
+   "xp": 48
+  },
+  {
+   "habit": "fuel",
+   "v": 1,
+   "xp": 13
+  },
+  {
+   "habit": "water",
+   "v": 8,
+   "xp": 36
+  },
+  {
+   "habit": "water",
+   "v": 4,
+   "xp": 15
+  },
+  {
+   "habit": "water",
+   "v": 0,
+   "xp": 0
+  },
+  {
+   "habit": "mobility",
+   "v": 1,
+   "xp": 36
+  },
+  {
+   "habit": "breathe",
+   "v": 1,
+   "xp": 24
+  },
+  {
+   "habit": "supps",
+   "v": 1,
+   "xp": 24
+  },
+  {
+   "habit": "c_zz_read",
+   "v": 1,
+   "xp": 30
+  }
+ ],
+ "sessions": [
+  {
+   "name": "complete, every set ticked and rated, checked in",
+   "status": "Complete",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": [
+    {
+     "ex": "Goblet Squat",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "8",
+       "d": true
+      },
+      {
+       "w": "40",
+       "n": 8,
+       "r": "8",
+       "d": true
+      }
+     ]
+    },
+    {
+     "ex": "Row",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "7",
+       "d": true
+      },
+      {
+       "w": "40",
+       "n": 8,
+       "r": "7",
+       "d": true
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "checkin_done",
+    "full_log",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "complete, one set not ticked",
+   "status": "Complete",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": [
+    {
+     "ex": "Goblet Squat",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "8",
+       "d": true
+      },
+      {
+       "w": "40",
+       "n": 8,
+       "r": "",
+       "d": false
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "checkin_done",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "complete, an exercise rated on one set only",
+   "status": "Complete",
+   "readiness": null,
+   "log": [
+    {
+     "ex": "Goblet Squat",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "8",
+       "d": true
+      },
+      {
+       "w": "40",
+       "n": 8,
+       "r": "",
+       "d": true
+      }
+     ]
+    },
+    {
+     "ex": "Row",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "",
+       "d": true
+      },
+      {
+       "w": "40",
+       "n": 8,
+       "r": "",
+       "d": true
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "session_finished"
+   ]
+  },
+  {
+   "name": "complete, nothing rated anywhere, every set ticked",
+   "status": "Complete",
+   "readiness": {
+    "skipped": true,
+    "composite": null
+   },
+   "log": [
+    {
+     "ex": "Goblet Squat",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "",
+       "d": true
+      },
+      {
+       "w": "40",
+       "n": 8,
+       "r": "",
+       "d": true
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "full_log",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "finished early, every set ticked and rated",
+   "status": "Partial (4 of 8 sets/units done) · Out of time",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": [
+    {
+     "ex": "Goblet Squat",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "8",
+       "d": true
+      },
+      {
+       "w": "40",
+       "n": 8,
+       "r": "8",
+       "d": true
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "checkin_done",
+    "session_finished_early"
+   ]
+  },
+  {
+   "name": "finished early, lower case and a space",
+   "status": " partial (1 of 9 sets/units done)",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": [
+    {
+     "ex": "Goblet Squat",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "8",
+       "d": true
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "checkin_done",
+    "session_finished_early"
+   ]
+  },
+  {
+   "name": "a circuit only: rounds, no sets",
+   "status": "Complete",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": [
+    {
+     "ex": "Finisher",
+     "circuit": true,
+     "items": [
+      {
+       "name": "Burpee",
+       "w": ""
+      }
+     ],
+     "rounds": [
+      {
+       "round": 1,
+       "r": "8"
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "checkin_done",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "a circuit and a lift",
+   "status": "Complete",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": [
+    {
+     "ex": "Finisher",
+     "circuit": true,
+     "items": [],
+     "rounds": []
+    },
+    {
+     "ex": "Row",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "7",
+       "d": true
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "checkin_done",
+    "full_log",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "no structured log (an old session)",
+   "status": "Complete",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": null,
+   "facts": [
+    "checkin_done",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "an empty log",
+   "status": "Complete",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": [],
+   "facts": [
+    "checkin_done",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "a lift with no sets",
+   "status": "Complete",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": [
+    {
+     "ex": "Row",
+     "sets": []
+    }
+   ],
+   "facts": [
+    "checkin_done",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "a set that is not an object",
+   "status": "Complete",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": [
+    {
+     "ex": "Row",
+     "sets": [
+      5,
+      {
+       "w": "40",
+       "n": 8,
+       "r": "8",
+       "d": true
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "checkin_done",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "ticks written as text and numbers",
+   "status": "Complete",
+   "readiness": {
+    "composite": 4,
+    "sleep": 4,
+    "energy": 4,
+    "soreness": 4,
+    "stress": 3,
+    "overall": 4,
+    "skipped": false
+   },
+   "log": [
+    {
+     "ex": "Row",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": 8,
+       "d": 1
+      },
+      {
+       "w": "40",
+       "n": 8,
+       "r": "8",
+       "d": "yes"
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "checkin_done",
+    "full_log",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "a check-in with no number in it",
+   "status": "Complete",
+   "readiness": {
+    "skipped": false,
+    "composite": null,
+    "sleep": null
+   },
+   "log": [
+    {
+     "ex": "Row",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "",
+       "d": true
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "full_log",
+    "session_finished"
+   ]
+  },
+  {
+   "name": "a check-in with only a score",
+   "status": "Complete",
+   "readiness": {
+    "score": 3
+   },
+   "log": [
+    {
+     "ex": "Row",
+     "sets": [
+      {
+       "w": "40",
+       "n": 8,
+       "r": "",
+       "d": true
+      }
+     ]
+    }
+   ],
+   "facts": [
+    "checkin_done",
+    "full_log",
+    "session_finished"
+   ]
+  }
+ ]
+}

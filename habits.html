@@ -11594,6 +11594,8 @@ function showError(msg, opts) {
     // A door from the training app's strip straight to one habit: ?open=<id>.
     const openId = params.get('open');
     if (openId && rosterOn(TKEY()).some(h => h.id === openId)) openHabit(openId, 'today');
+    // And one to the Locker: ?go=pass, from the training app's Career row (Career Mode phase 2).
+    else if (params.get('go') === 'pass') go('pass');
   }
 
   // The board sweep, now gated on having actually trained. See autoJoinBoard().

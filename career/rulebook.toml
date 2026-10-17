@@ -17,7 +17,7 @@ meanings = ["consistency", "commitment", "progress", "resilience"]
 [switch]
 # Career Mode's two switches (Amir, 2026-10-17: "go with your picks"; CAREER_MODE.md → The decisions, round 3). Each is
 # "off" until a seed turns it on with the day it happens ("YYYY-MM-DD", never a day still to come), and once on it is never
-# turned back off: the seed refuses that, because the level would go back with it (scripts/career/rollback_stage68.sql is
+# turned back off: the seed refuses that, because the level would go back with it (scripts/career/rollback_stage69.sql is
 # the way back, on Amir's word only).
 #
 # xp, phase 2 (PROCEDURES.md → P14): while it is off, Career Mode runs in shadow beside AA Proof and scores habits exactly as

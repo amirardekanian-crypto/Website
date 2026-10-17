@@ -5,7 +5,8 @@
 'use strict';
 const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
 const ROOT = path.join(__dirname, '..');
-const FILES = ['program.html', 'coach.html', 'habits.html', 'assets/js/chips.js', 'scripts/twins_stamp.json', 'scripts/name_cases.json', 'scripts/career/hold_cases.json'];
+const FILES = ['program.html', 'coach.html', 'habits.html', 'assets/js/chips.js', 'scripts/twins_stamp.json', 'scripts/name_cases.json', 'scripts/career/hold_cases.json',
+  'scripts/career/xp_cases.json'];
 // No GIT_* variable reaches a git command in the temp folder, or the guard run on it. The pre-commit hook runs this test inside
 // `git commit`, which exports GIT_INDEX_FILE: a `git add -A` in the temp folder then wrote the temp folder's files into the REAL
 // index (2026-10-17: a worktree's index was left holding seven files), and `git show :file` read the real index instead of the copy.
@@ -109,6 +110,17 @@ want('a bumped ?v= that is not staged does not pass (the hook reads the index)',
     put('coach.html', get('coach.html').replace('chips.js?v=', 'chips.js?v=b-'));
     git('add', 'assets/js/chips.js');                                   // chips.js staged; coach.html (with the bump) is not
   }, 1, /chips\.js changed but coach\.html still loads/, { index: true });
+
+// Career Mode phase 2 (§9): a phone's copy of a server rule drifting from the server's answers in scripts/career/xp_cases.json.
+want('AA Proof pays the WORKOUT habit again once the XP switch is on',
+  swap('habits.html', 'function paidXp(h, v) { return careerOn() && h.locked ? 0 : xpFor(h, v); }', 'function paidXp(h, v) { return xpFor(h, v); }'), 1, /paidXp/);
+want('the training app rounds the career curve its own way',
+  swap('program.html', 'const cost = n => Math.max(10, Math.round(base * Math.pow(n, growth) / 10) * 10);',
+       'const cost = n => Math.max(10, Math.floor(base * Math.pow(n, growth) / 10) * 10);'), 1, /program\.html careerLevelOf/);
+want('the training app pays a full log when a set is left unrated',
+  swap('program.html', "return !sets.some(x => asks.has(x.o) && !careerTruthy(val(x.st, 'r')));", 'return true;'), 1, /the facts of a session/);
+want('a server answer in the cases changes on its own',
+  (get, put) => put('scripts/career/xp_cases.json', get('scripts/career/xp_cases.json').replace('"level_cost": 400', '"level_cost": 410')), 1, /career's curve/);
 
 console.log(bad ? '\n' + bad + ' mutation(s) NOT caught' : '\nthe guard catches every drift it is meant to');
 process.exit(bad ? 1 : 0);

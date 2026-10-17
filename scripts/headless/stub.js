@@ -6,7 +6,8 @@
 // ({ user: { id } } = signed in), identity (the athlete id athlete_identities answers), stall
 // ({ rpcName: true } never answers), refuse ([rpcNames]), expired, signInOk, noLib (no library at all),
 // library (what get_library answers: lib.js library() builds it from workouts/; without it the app reads the files),
-// tables ({ name: rows } what sb.from(name) answers) and tableErr ({ name: status } a refused table read).
+// tables ({ name: rows } what sb.from(name) answers) and tableErr ({ name: status } a refused table read),
+// profile (what get_profile answers: Career Mode, scripts/headless/career.js).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
   var cfg = {};
@@ -30,6 +31,8 @@
     }
     if (name === 'get_progress') return res({ data: S.progress || null, error: null, status: 200 });
     if (name === 'get_library') return res({ data: S.library || null, error: null, status: 200 });
+    // Career Mode (phase 2): get_profile answers the stub's `profile` as given (none set: no answer, as an RPC the stub does not know).
+    if (name === 'get_profile') return res({ data: S.profile ? JSON.parse(JSON.stringify(S.profile)) : null, error: null, status: 200 });
     if (name === 'athlete_identities') return res({ data: S.identity ? { athlete_id: S.identity } : null, error: null, status: 200 });
     // A table read (sb.from(name)): tables ({ career_facts: [rows] }) answers rows as given (filters and order are not applied);
     // tableErr ({ career_rules: 404 }) answers that status as a refusal. Neither set: no rows and no error, as before.

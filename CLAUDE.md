@@ -38,12 +38,24 @@ Durable context for working in this repo. Read the linked docs before diving in.
   `PROCEDURES.md` → *Phase 1, as built*): triggers on `athlete_progress`, `session_history`, `library_sessions` and
   `programs` write `career_facts` (a trigger never stops a save), `scripts/career_seed.py` turns the `.toml` files into
   `career_rules` / `career_catalogue` (re-seed after any edit), `get_profile()` is the read, and `career_compare()` must stay
-  `ok` while `[shadow] on = true`: Career Mode's habit XP equals `hab_xp()` + `hab_bonus_xp()` for every athlete. ⚠️ **While
-  the shadow is on, Proof's habit numbers live twice**, the `xp_rules` row and `career/*.toml`; the checker holds them equal to
+  `ok`: Career Mode's habit XP equals `hab_xp()` + `hab_bonus_xp()` for every athlete. ⚠️ **Until the catalogue switch,
+  Proof's habit numbers live twice**, the `xp_rules` row and `career/*.toml`; the checker holds them equal to
   `supabase/xp_rules_snapshot.json`, so a change to Proof's rules is a change to both. Rehearse a change to stage66 with
   `node scripts/career/rehearse.mjs` (PGlite, nothing live; `--data <dump>` for the real rows, kept outside the repo).
   ⚠️ A trigger's exception block cannot catch a statement timeout (8 s for a signed-in request), so the work a trigger does
   per save stays small (at most 0.3 s on 2026-10-17). `scripts/career/rollback_stage66.sql` takes phase 1 off, on Amir's word only.
+  **Phase 2, the XP switch, is built, not yet on** (`supabase/stage69_career_xp_switch.sql`; Amir 2026-10-17, three decisions in
+  `CAREER_MODE.md` → *round 3*; `PROCEDURES.md` → *Phase 2, as built*). The one gate is two, `rulebook.toml` → `[switch]`: `xp`
+  (phase 2) and `catalogue` (phase 3; the badge entries say `retire_at` / `starts_at = "catalogue"`), each `"off"` or the day a seed
+  turned it on, never back off. With the XP switch on: training earns XP, the WORKOUT habit pays 0 a day, closed days settle, the
+  level is the career level (never resets; the road's titles, the board's level and coach.html's follow it), the board ranks season
+  points from the facts through a cache (`career_scores`: in `BACKUP_TABLES`, the snapshot and the erasure, a cache holding no source),
+  and nobody's level goes down (`[fact.level_kept]`, written once by the seed that turns it on; `career_seed.py --dry-run` shows the
+  list first). Both apps read `get_profile()` only once it is on and behave exactly as before until then. The phones copy three of its
+  rules (the career's curve, WORKOUT at 0, a session's full log and check-in): `scripts/check_twins.js` §9 holds them to
+  `scripts/career/xp_cases.json`, the server's answers, which `node scripts/career/rehearse_switch.mjs --backup <file>` writes
+  (`--write-cases`) and checks (42 checks on the real rows); `scripts/headless/career.js` drives both apps. The way back is
+  `scripts/career/rollback_stage69.sql`, on Amir's word only.
 - `FARSI-PRODUCTS.md` — the paid course app (`/tennis/app/`), the testing app's page and the Farsi
   product pages: how they are built, deployed and introduced.
 - `PROGRAM-APP.md` — the athlete app's programme features in full (rx, week notes, the Spine, the Quality
@@ -249,7 +261,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   `dayTargetC()` in coach.html, both with the week note and the drop optional: change both (`check_twins.js` §4).
 - **Body weight lives in `program.html`** under the key `<id>_hab_wt`; AA Proof must never write it, and it
   is never scored.
-- **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`, `<id>_holdcache` (Hold Serve), and **`plancache`**, the one saved plan
+- **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`, `<id>_holdcache` (Hold Serve), `<id>_careercache` and `<id>_earn_d<N>`
+  (Career Mode's profile and what a finished day earned), and **`plancache`**, the one saved plan
   that opens both apps with no signal (REL-01, 2026-09-26): written only from a real server answer (never the
   demo, the coach preview or Proof's strip), deleted when it answers no. **Since 2026-10-13 program.html opens
   from it FIRST on every launch** (Line Call decision 2, `PLAN_OFFLINE.fast`) and checks the server behind the first
@@ -274,7 +287,10 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   cover with one green button: Open Day N, or Resume and its clock), the other days as
   paper rows (`.dc-row`, `data-dl`, the P24 numeral, solid green when done), then **Hold Serve** (Career Mode's training weeks held
   in a row, 2026-10-17: display only, read from the athlete's own `career_facts`, never `get_profile()`; `holdCount()` is a twin of
-  `get_profile()`'s loop; it says nothing when it cannot be sure; `PROGRAM-APP.md` → *Hold Serve on Home*), then the habits row. Only Next up carries
+  `get_profile()`'s loop; it says nothing when it cannot be sure; `PROGRAM-APP.md` → *Hold Serve on Home*), then the habits row. Once
+  Career Mode's XP switch is on, a **Career** row sits above Hold Serve: the career level, its rank and the bar to the next level,
+  from `get_profile()` (kept in `<id>_careercache`), a tap to AA Proof's Locker; the finish card says what a session earns and the
+  finished card what it earned (`PROGRAM-APP.md` → *Career on Home*); the habits row then never shows a level. Only Next up carries
   `data-dc`. **The This cycle card, Personal records and Body weight live on Progress**, not Home. **Home never names a rest
   day**: athletes move their days. **The day after the cycle's end date Home is between cycles** (PROG-02, Amir 2026-10-10,
   option B): a **Cycle N complete** door row first (it opens Progress, where the card says Cycle complete), Up next shows
@@ -385,6 +401,11 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   a constant (18 keys on 2026-09-26; the table is in `XP_SYSTEM.md` §8), and `bonusEvents()` mirrors `hab_bonus_xp()`: change both
   sides. Update the row with `rules || jsonb_build_object(…)` or `jsonb_set`, never by rewriting the
   whole object.
+- **Career Mode (once the server's XP switch is on; `HABITS.md` → *Career Mode*):** the overall level, rank and XP are
+  `get_profile()`'s (`careerOn()`, kept in `<id>_hab_career`, never in CFG), the phone's scorer counts the whole career with the
+  WORKOUT habit at 0 a day (`scoreDays()`, `paidXp()`) and is only the preview of a tick (P13), the first open shows ONE reveal
+  (`CFG.careerSeen`, kept through the cloud merge) and never a flood of level-ups, and a new season resets only the board's points.
+  Until the switch none of this changes a number. `?go=pass` opens the Locker (the training app's Career row).
 - **`live()` is present tense only**: anything that takes a `dayKey` uses `rosterOn(dayKey)`, UI row
   lists included. Only `stampRoster()` writes `CFG.roster`, append-only: a habit added lands today, a
   habit removed lands tomorrow, and a closed day never moves.
