@@ -7,7 +7,7 @@
 sizes = ["tick", "win", "highlight", "milestone", "legend"]
 
 [size.tick]
-athlete = "the XP counter moves"
+athlete = "at once, on the thing they tapped: +XP rising, the level bar filling, and the nearest goal it touched with its new count (GAME-13, [feedback] below)"
 coach = "nothing"
 crew = "nothing"
 beyond = "nothing"
@@ -25,7 +25,7 @@ crew = "a line on the Bell, if the athlete said yes"
 beyond = "nothing"
 
 [size.milestone]
-athlete = "a full-screen moment at the next open, and a share card offered"
+athlete = "a full-screen moment right away (they just acted), or at the next open if the app was closed; a share card offered"
 coach = "a Courtside row, and a heads-up when it can be seen coming"
 crew = "a line on the Bell, if the athlete said yes"
 beyond = "the share card, the athlete's to post"
@@ -35,6 +35,49 @@ athlete = "a full-screen moment, and a share card offered"
 coach = "a Courtside row; often Amir's own to give"
 crew = "a line on the Bell, if the athlete said yes"
 beyond = "Amir's story, only after the athlete says yes"
+
+# ── Instant feedback (GAME-13) ────────────────────────────────────────────────────────────────────────────────────
+# Amir, 2026-10-17: "we need to show the client a visible progress and immediate feedback every time a meaningful task
+# is completed." Every fact an athlete makes answers at once, on the thing they tapped, before the server does
+# (PROCEDURES.md → P17). The lines are drafts in Amir's voice; {…} are filled in.
+
+[feedback]
+when = "in the same moment as the tap; never waits for the network (the phone previews from the rulebook, GAME-2)"
+shows = ["what it earned: +XP, rising from the thing tapped", "where it moved them: the level bar fills and the meaning's number ticks up", "the nearest goal it touched: a badge's next tier, this week's mission or the quest step, with its new count"]
+crossing = "a tier, mission or quest step it completes gets its moment right then, at its size; one only the server can decide (a personal best, a held week, a cycle finished) shows at once marked pending and is confirmed when the server answers"
+never = "a tap that changes nothing on screen, or a number that changes without the athlete seeing it move"
+
+[feedback.habit_done]
+where = "AA Proof's habit row, and the strip on the training app's Home"
+line = "+{xp} XP · {habit} {n} of {target} · {streak}-day streak"
+
+[feedback.checkin_done]
+where = "the check-in sheet as it closes"
+line = "+{xp} XP · Pulse Check {n} of {next}"
+
+[feedback.session_finished]
+where = "the training app's finish card, before Done closes it"
+line = "Everything the session earned: +{xp} XP, the week ({done} of {plan} · Hold Serve), every badge, mission and quest step it moved"
+
+[feedback.week_held]
+where = "the finish card of the session that held it, then This Week on Home"
+line = "Week held · {run} in a row · +{xp} XP"
+
+[feedback.personal_best]
+where = "the finish card (where the New best band is today)"
+line = "New best · {exercise} · +{xp} XP · Record Breaker {n} of {next}"
+
+[feedback.mission_done]
+where = "wherever the fact that finished it was made"
+line = "{mission}: done · +{xp} XP · {done} of 3 this week"
+
+[feedback.quest_step]
+where = "wherever the fact that closed it was made"
+line = "{quest}: step {k} of {steps} done"
+
+[feedback.comeback]
+where = "AA Proof's Today, on the day it happens"
+line = "Comeback · +{xp} XP. Good to have you back."
 
 [courtside]
 # coach.html → Today. Good news is never a reason in reasonsOf(): it never counts as "needs you".

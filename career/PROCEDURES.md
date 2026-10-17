@@ -25,6 +25,7 @@ missions and quests in the other `.toml` files: a procedure never hard-codes a n
 | P14 | Shadow, then the switch | once | 1–2 |
 | P15 | The tables | built with each phase | 1–7 |
 | P16 | Changing a detail | whenever Amir wants | any |
+| P17 | Instant feedback: every meaningful action answers at once (GAME-13) | on every tap that makes a fact | 2–3 |
 
 ---
 
@@ -89,7 +90,11 @@ their session history (for the History sheet's maths), `rulebook.toml`.
 | `bounce_back` | A `week_held` straight after a `week_broken` | cycle and week number |
 | `training_return` | The first `week_held` after two or more weeks with no session, between-cycle and paused weeks not counted | that week |
 | `personal_best` | A finished session's best set for a lift beats every earlier number for that lift, by the History sheet's maths (the same rule that fills Personal Records today). The first time a lift is ever done is not a best: there is nothing to beat | lift and session |
-| `effort_win` | The day after a cycle's end date: each of its top three effort-matched wins (`cycleWins()`: a lift's first session of the cycle against its best since, 2% or more) | cycle and lift |
+| `effort_win` | The day after a cycle's end date: each of its top three effort-matched wins (`cycleWins()`: a lift's first session of the cycle against its best since, 2% or more) **in which the weight or the reps went up**. A lower RPE alone still shows on the This cycle card and earns nothing (GAME-5) | cycle and lift |
+| `lift_gain` | A lift's best effort-adjusted index (the History sheet's maths) reaches a new high above its first session; the value is the percent above it. One fact per lift, its value rising | lift |
+| `week_by_the_book` | A `week_held` in which every session has `full_log` and `checkin_done` | cycle and week number |
+| `month_with_amir` | Each whole month since the athlete's first session; none while they are a former athlete | the month's number |
+| `comeback_stuck` | A `comeback` followed by `comeback_stick` days on target in a row | the comeback's day |
 | `retest_beaten` | A `retest_done` whose result beats the lift's previous test, or its record when there was no test | lift and cycle |
 | `cycle_finished` | The day after a cycle's end date, if at least `min_share` of its planned sessions were finished | cycle |
 | `roadmap_finished` | The roadmap's last cycle gets `cycle_finished` | roadmap |
@@ -159,11 +164,21 @@ rulebook changes.
    - `kind = "best_run"`: the longest run of its fact, best ever (a broken run never lowers it).
    - `kind = "total"`: how many of its fact, over the whole career.
    - `kind = "per_habit_best_run"`: Proof's consistency tiers, one ladder per habit.
+   - `kind = "best_value"`: the largest value its fact has reached (The Upgrade reads `lift_gain`'s percent).
+   - A badge with `habit = "…"` reads only that habit's facts.
    For each tier whose `at` the measure has reached and that is not yet an award, mint it: athlete, badge, tier, the day
    the measure crossed `at`, the facts that crossed it (the evidence).
+   **Entries gated on the switch.** An entry with `retire_at = "switch"` is earned exactly as Proof earns it until phase 3,
+   minted at the baseline, and never earned after. An entry with `starts_at = "switch"` is not earned before phase 3; at
+   the switch it is worked out over the whole history and minted in silence. `superseded_by` names the entry that takes
+   an old one's place: the shelf shows the new one, and the old awards fold under it, never deleted. This is how a design
+   change reaches a Proof entry without breaking the shadow (P14), which needs Proof's exact rules until the switch.
 2. **Achievements.** For each achievement not yet earned, check its rule once. When it holds, mint it.
 3. **Titles.** Mint a title when what earns it is minted: a badge tier or achievement with `title = "…"`, a level on
    the road (Proof's 14 rewards), a season's close (P4), a finished quest with a title (P7), Amir's Pick (P9).
+   **The Grand Slam:** after any title is minted, if the athlete now holds at least one title in each of the four
+   meanings (a title whose `meaning` is one of the four; level, season and chosen titles don't count), mint GRAND SLAM,
+   size `legend`.
 4. **Recognition.** Each new award gets a recognition row with its catalogue `size` (P8).
 5. **Never delete an award.** A void fact (P12) only stops future awards.
 6. **The baseline.** The first run for an athlete (phase 3) mints everything they already earned in silence: one moment
@@ -275,8 +290,9 @@ mission if one is set.
 1. **The athlete**, always:
    - `tick`: the XP counter moves.
    - `win`, `highlight`: the wins card, until tapped.
-   - `milestone`, `legend`: a full-screen moment at the next open, one per open, the rest queued; a share card
-     offered.
+   - `milestone`, `legend`: a full-screen moment right away, because the athlete has just acted (GAME-13), or at the
+     next open when it was earned with the app closed (a server-worked fact such as a cycle finished overnight); one at a
+     time, the rest queued; a share card offered.
 2. **Amir**, from `highlight` up: a Courtside row with the WhatsApp message from `recognition.toml` → `[message.*]`
    filled in.
 3. **The crew**, from `highlight` up, only if the athlete said yes: a line on the Bell, kept `keep_days` (7).
@@ -380,3 +396,39 @@ through `get_bell()`), and goes into `BACKUP_TABLES`, the schema snapshot and `c
    (GAME-1).
 4. Nothing already minted is taken back. A new badge or tier is minted for everyone who already qualifies, in silence
    (P5, step 6).
+
+## P17. Instant feedback: every meaningful action answers at once (GAME-13)
+
+Amir, 2026-10-17: *"we need to show the client a visible progress and immediate feedback every time a meaningful task is
+completed."*
+
+**When:** every tap that makes a fact (P1): a habit ticked, a session finished, the check-in answered, a mission or a
+quest step closed. A set logged mid-session is part of its session: its row ticks as it does today, and the session's
+feedback comes at the finish.
+
+**Reads:** the phone's copy of the rulebook (`career_rules`, kept on the phone the way the plan is), the last profile
+(`get_profile()`, P10), `recognition.toml` → `[feedback]` and its lines.
+
+**Steps:**
+1. In the same moment as the tap, before any network call, the app works out what the action is worth from the
+   rulebook (the preview, P13).
+2. It shows three things, on the thing tapped:
+   - **what it earned:** +XP, rising from the row or the button;
+   - **where it moved them:** the level bar fills, and the meaning's number ticks up (a held week, a session, a best);
+   - **the nearest goal it touched**, with its new count: a badge's next tier (*Paper Trail 9 of 10*), this week's
+     mission (*Lights Out 3 of 5*), the quest step.
+3. If the action completes something the phone can decide (a habit tier, a mission, a quest step), its moment shows
+   right then, at its size (P8). If only the server can decide it (a personal best, a held week, a cycle finished), the
+   phone shows it at once, marked pending.
+4. When the server answers, its numbers replace the preview (GAME-2). A pending moment is confirmed. If the server ever
+   disagrees, the moment is quietly withdrawn and the copy that disagreed is a bug in a twin (P13).
+5. **The finish card** of a session lists everything that session earned before Done closes it: the XP, the week
+   (*2 of 3 · Hold Serve*), and every badge, mission and quest step it moved.
+6. **Progress is always visible**, not only at the moment: the level bar and the four numbers sit where the athlete
+   looks (AA Proof's Today card, the strip on the training app's Home), each with its *next* line.
+7. Nothing changes silently. A number never moves on screen without the athlete seeing it move.
+
+**Writes:** nothing (the server writes the facts, P1).
+
+**Rules:** GAME-2, GAME-13. The preview copies server rules, so every rule it copies goes into `scripts/check_twins.js`
+the same day.

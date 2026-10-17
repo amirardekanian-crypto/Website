@@ -30,6 +30,9 @@ the crew.
 - **The decisions, 2026-10-17:** Amir, *"go with your picks"*, on all eight (below). And: *"write down the functions and
   procedures into files i can then change, adjust or anything. i need to have this gamification system somewhere i can
   read and think about"*. This folder is that place.
+- **The catalogue, 2026-10-17:** the four meanings worked out one by one on the page *Four Majors*,
+  https://claude.ai/artifact/1wa7BQgeMAMipm24Fwzo1z. Amir: *"go with your picks, just remember that we need to show the
+  client a visible progress and immediate feedback every time a meaningfull task is completed"* (GAME-13).
 
 ## The decisions (settled 2026-10-17)
 
@@ -43,6 +46,20 @@ the crew.
 | 6 | What does the crew see? | **Only what the athlete agreed to show**, asked once at their first highlight, with a switch in Settings. Amir always sees everything. |
 | 7 | Who sets the quests? | **The athlete picks one of three Amir approved, and Amir can assign one directly.** A cycle's outcomes can also become a quest. |
 | 8 | The name | **Career Mode.** |
+
+**The catalogue decisions (round 2, 2026-10-17, *Four Majors*):**
+
+| # | The question | What was chosen |
+|---|---|---|
+| 1 | Tennis words in the names? | **Yes, each with a plain line under it**, so a runner gets it too: Hold Serve, Second Serve, Love Hold, All-Court, Grand Slam. |
+| 2 | One behaviour, one badge? | **Yes.** Each habit keeps one badge, its Proof name, on five steps (at the switch). A streak no longer pays twice. |
+| 3 | Retire HEAVY METAL, The Machinist and Day One? | **Yes.** HEAVY METAL paid for sessions on days in a row; the other two counted what Century and First Blood count. Anyone who has one keeps it. |
+| 4 | A lower RPE alone earns nothing? | **Yes.** It still shows on the This cycle card; a Progress reward needs the weight or the reps to go up. |
+| 5 | The Grand Slam as the capstone? | **Yes.** A title in each meaning makes a fifth title. A Calendar Slam (all four in one season) can come later. |
+| 6 | Free athletes see the Progress shelf locked? | **Yes**, as the pitch for coaching, the way the locked WORKOUT habit works today. |
+| 7 | The twelve new pieces? | **All twelve:** The Long Count, Pulse Check, Love Hold, Veteran, The Upgrade, Flawless, Full Stack, By the Book, All-Court, Double Up, All the Way Back, The Proving Ground. |
+
+And with it, a rule: **every meaningful action answers at once, visibly** (GAME-13).
 
 ---
 
@@ -86,6 +103,72 @@ levels, comebacks.
 Proof already holds some of this: its consistency tiers (KINDLED to UNBREAKABLE) are Consistency, and its comeback,
 BACK IN THE FIGHT, HARD TO KILL and the UNBOWED title are Resilience. They carry over unchanged.
 
+### Each meaning in full (decided 2026-10-17)
+
+Every meaning is built the same way: its number, an arc (something to earn in the first week, month, season and year),
+badges, moments, titles, what points at it, and what it never pays for. The exact tiers, XP and sizes are in the `.toml`
+files; this is the shape.
+
+**Consistency: you keep showing up.** Number: weeks held in a row (a free athlete: days on target in a row).
+- Arc: *Held* (first week held) → *Hold Serve I* (4 in a row) → *Hold Serve III* (12) → **CLOCKWORK** (52).
+- Badges: **Hold Serve** (weeks held in a row, 4 · 8 · 12 · 24 · 52) · **The Long Count** (weeks held in all, which a
+  broken run never takes back) · **Day Streak** · one badge per habit under its Proof name (HUMAN SPRINKLER, BLACKOUT
+  ARTIST, GROUND COVERED, FULLY FUELLED, ZEN MACHINE, RUBBER BAND, IRON MONK; custom habits: HOUSE RULES) on five steps
+  named KINDLED to UNBREAKABLE · **Treble** (weeks in a row with all three missions).
+- Moments: Held · First Treble · **Flawless** (every week of a cycle held) · **Full Stack** (steps, sleep, fuel and
+  water each on a 7-day streak at once).
+- Titles: CLOCKWORK · THE CONSTANT (100 weeks held in all) · BEDROCK · STILL HERE.
+- Never pays for: a session on a rest day.
+
+**Commitment: you do the whole thing, properly, for the long run.** Number: sessions with Amir (free: perfect days).
+- Arc: *First Blood* (first session) → *Paper Trail I* (10 sessions fully logged) → *Closer I* (first cycle finished) →
+  **CENTURY** (100 sessions).
+- Badges: **Century** · **Closer** (cycles finished) · **Paper Trail** (every set logged) · **Pulse Check** (the check-in
+  done first) · **Love Hold** (weeks held by the book: every session, every set, every check-in) · **Veteran** (months
+  with Amir) · CLEAN SWEEP · DAWN PATROL.
+- Moments: First Blood · First Cycle · **By the Book** (a whole cycle by the book) · The Distance · The Centurion.
+- Titles: CENTURY · THE DISTANCE · LIFER (two years with Amir) · MATCH FIT · SUN-FORGED · COLD-FORGED.
+- Never pays for: a session past the plan, more volume, or the RPE number itself.
+
+**Progress: you are getting better.** Number: personal bests. A free athlete sees this shelf locked: *Coached athletes
+earn these from their programme.*
+- Arc: *First Best* → *Record Breaker I* (5 bests) → *Beat the Test I* (first retest beaten) → **CLIMBER** (25 bests).
+- Badges: **Record Breaker** (personal bests) · **Free Kilos** (heavier at the same effort) · **Beat the Test** (retests
+  beaten) · **The Upgrade** (your most improved lift against its first session, +10 · +20 · +30 · +50 · +75%).
+- Moments: First Best · **All-Court** (a best in every main movement pattern in one cycle) · **Double Up** (a lift twice
+  its first number) · **The Proving Ground** (an event: three bests, a retest beaten, every week of the cycle held).
+- Titles: CLIMBER · PROVEN (The Proving Ground) · NEW ENGINE (Double Up).
+- No mission asks for progress, on purpose. Never pays for: a lower RPE alone, or body weight.
+
+**Resilience: you come back, and you keep going when it's hard.** Number: comebacks (the same for a free athlete).
+- Arc (it starts at a setback): *Second Serve I* (the week after a miss, held) → *Back on Court* (a full week after two
+  or more away) → *Played Through* (a cycle finished despite a broken week) → *All the Way Back* (the old best run,
+  rebuilt).
+- Badges: **Second Serve** (a week held straight after a broken one) · **Hard to Kill** (comebacks that stuck, from
+  habits and, after the switch, from training) · Back in the Fight.
+- Moments: Back on Court · Played Through · **All the Way Back** · Backbone.
+- Titles: UNBOWED · RETURNED · SECOND WIND (five bounce backs).
+- Never pays for: a setback itself. *The one shelf you can't fill by never slipping.*
+
+### The Grand Slam
+
+One title from each of the four meanings, any one, makes a fifth title: **GRAND SLAM** (prismatic, the biggest moment in
+the system). The road's level titles don't count: they celebrate the career level, the sum of all four. The profile shows
+the four slots, filled with the title won in each.
+
+### Left out on purpose
+
+A streak of training days (rest days are part of the plan) · a medal for training on a low check-in (it pays for
+reporting a low day) · a badge for a lower RPE at the same weight (it pays for typing a smaller number) · body weight or
+lifts as a share of it (body weight is never scored) · a weekly "set a best" mission (it pushes past the plan's RPE) · a
+level for each meaning (one level and four numbers say it) · badges for kudos or posts (GAME-6).
+
+### For Amir: the shape of an athlete
+
+coach.html shows each athlete's four numbers side by side (phase 4). Consistency high and Progress flat: the plan may be
+too easy, or the effort low. Progress high and Consistency low: talent and an irregular week. Resilience climbing: life is
+getting in the way, and a WhatsApp may matter more than the plan. Commitment low: thin data for the next cycle.
+
 ## The pieces: nine mechanics, one job each
 
 | Mechanic | What it is | Its job | It never |
@@ -125,6 +208,14 @@ size decides the audience. The athlete always sees their own.
   A **commendation** (a badge only Amir gives, in any meaning, with one line of why). **Amir's Pick** (once a month,
   one athlete, a title nobody else will ever hold; the data shortlists three, Amir decides).
 - **No chat comes back.** Every word from Amir still goes by WhatsApp.
+- **Instant feedback, every time (GAME-13).** Amir, 2026-10-17: *"we need to show the client a visible progress and
+  immediate feedback every time a meaningfull task is completed."* Every fact answers at once, on the thing tapped, before
+  the server does: **what it earned** (+XP rising), **where it moved them** (the level bar fills, the meaning's number
+  ticks up) and **the nearest goal it touched** with its new count (*Paper Trail 9 of 10*, *Lights Out 3 of 5*). A tier
+  or mission it completes gets its moment right then; one only the server can decide shows at once, marked pending. A
+  session's finish card lists everything the session earned before Done. The level bar and the four numbers are always
+  on screen, each with its *next* line. The lines are `recognition.toml` → `[feedback]`; the steps are
+  `PROCEDURES.md` → P17.
 
 ## Weekly missions
 
@@ -171,6 +262,10 @@ The full account is in [`PROCEDURES.md`](PROCEDURES.md). The shape:
   reads.
 - **Offline:** the phone keeps the last profile, the way it keeps the plan, and shows a tick's XP at once, marked
   pending, until the server agrees.
+- **Proof's entries keep Proof's exact rules until the switch** (phase 3). Phase 1 runs in shadow and must match Proof's
+  own scorer, so a design change to an `origin = "proof"` entry is written as `retire_at = "switch"` on the old entry
+  and a new entry with `starts_at = "switch"` (`superseded_by` links them). Nothing an athlete sees changes before the
+  switch.
 
 ## The rules
 
@@ -182,7 +277,7 @@ The index line is the rule. A later doc cites the ID instead of restating it, th
 | **GAME-2** | **One scorer, on the server.** The apps write facts and show the profile. A phone may preview a tick's XP from the rulebook, marked pending; the server's number is the number. |
 | **GAME-3** | **Every reward means something.** Each belongs to one of the four meanings and says in one sentence what it proves. |
 | **GAME-4** | **The plan is the biggest earner.** A held training week is worth about half of a perfect week. Past the plan, XP shrinks (caps), so more never beats as written. |
-| **GAME-5** | **Pay for the act, never for the value.** Logging an RPE pays; the RPE number never does. Answering the check-in pays; the answers never do. Progress is judged against the athlete's own history at the same effort. |
+| **GAME-5** | **Pay for the act, never for the value.** Logging an RPE pays; the RPE number never does. Answering the check-in pays; the answers never do. Progress is judged against the athlete's own history at the same effort, and a Progress reward needs the weight or the reps to go up: a lower RPE alone shows on the This cycle card and earns nothing. |
 | **GAME-6** | **Social actions pay nothing.** Kudos, roll call lines and shares are the recognition, not the work. |
 | **GAME-7** | **Missions and quests pay the same share of the work inside them.** A mission on a cheap habit is a cheap mission. Amir's lesson from the 27 July 2026 quest run: NO NEGOTIATION paid 7 times a supplement's value and THREE HARD DAYS 2.5 times a session's, and supplements took the board. |
 | **GAME-8** | **Nothing is lost.** A hidden or deleted session stops paying from then on, and what it minted stays. A quest pauses; it never fails. |
@@ -190,6 +285,7 @@ The index line is the rule. A later doc cites the ID instead of restating it, th
 | **GAME-10** | **Every number is a row.** XP values, badges, achievements, missions, quests and thresholds live in the `.toml` files and, once built, in their tables. Changing a detail never needs new code. |
 | **GAME-11** | **Amir's time is budgeted.** The system finds the moment and writes the message. He spends seconds each, about 10 minutes a week in all. |
 | **GAME-12** | **One system for everyone.** Free and coached athletes share the rules and the board. A free athlete simply has no training facts. |
+| **GAME-13** | **Every meaningful action answers at once, visibly.** In the same moment as the tap, never waiting for the network: what it earned, where it moved the athlete, and the nearest goal it touched. Nothing changes on screen without the athlete seeing it move. (Amir, 2026-10-17; `PROCEDURES.md` → P17.) |
 
 ## What exists today, and where it goes
 
@@ -200,8 +296,8 @@ owned.
 |---|---|
 | Proof's XP weights and level curve (`XP_RULES`, the `xp_rules` row) | The rulebook. Habits keep their values, training joins, the curve is re-anchored |
 | WORKOUT's 100 XP a day | Moves into the session fact (400). The habit stays on the day's list for the day streak, paying 0 |
-| Consistency tiers, KINDLED to UNBREAKABLE | Consistency badges, unchanged |
-| 32 milestones in marks, 5 events | Badges and achievements, each given its meaning (`badges.toml`, `achievements.toml`, `origin = "proof"`) |
+| Consistency tiers, KINDLED to UNBREAKABLE | Unchanged until the switch. Then each habit keeps one badge, its Proof name, on these five steps (one behaviour, one badge) |
+| 32 milestones in marks, 5 events | Badges and achievements, each given its meaning (`badges.toml`, `achievements.toml`, `origin = "proof"`). At the switch HEAVY METAL (sessions on days in a row) and THE MACHINIST (Century's double) stop being earned; anyone who has one keeps it |
 | The comeback, BACK IN THE FIGHT, HARD TO KILL, UNBOWED | Resilience, unchanged |
 | The 14-reward road of titles and card skins | Stays: level titles and skins |
 | Seasons and season titles | Seasons rank the board by season points; levels stop resetting. A season's title is earned by season points (`rulebook.toml` → `[season]`) |
@@ -222,8 +318,8 @@ Proof's to the point.
 | Phase | What | Visible | Status |
 |---|---|---|---|
 | 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app | not started |
-| 2 | **One profile.** Proof's level, rank and board read `get_profile()`. The phone scorer becomes the preview | The career level, revealed once | not started |
-| 3 | **Rewards with meanings.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join | The four numbers; Signed Off, the training's first share card | not started |
+| 2 | **One profile.** Proof's level, rank and board read `get_profile()`. The phone scorer becomes the preview, and instant feedback (P17) reads it | The career level, revealed once; every tick answers with its XP, the bar and the nearest goal | not started |
+| 3 | **Rewards with meanings, and the switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row; the finish card listing what a session earned; Signed Off | not started |
 | 4 | **Amir's column.** Courtside, reactions, commendations, Amir's Pick | coach.html → Today | not started |
 | 5 | **Weekly missions.** The planner, the three slots, the crew mission in place of Quest week | Missions in both apps | not started |
 | 6 | **The crew.** The Bell, kudos, the consent question at the first highlight, titles on every line | AA Proof → Crew | not started |
