@@ -150,9 +150,9 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 ## [both] Online coaching for players living in Iran
 
 - The personal programme (برنامه‌ی اختصاصی), for tennis and padel players and athletes from any sport, as sold on the Farsi site. Price for people living in Iran: **the
-  equivalent of $25 a month**, as the Farsi site says, paid in toman at that day's rate. People in
-  Iran pay **one cycle (5 weeks) at a time**: there are no multi-cycle plans or bundle prices for
-  Iran. Amir says the exact toman amount for the cycle in his message; never work it out. No hidden costs, no long contract. 10% loyalty discount on renewal.
+  equivalent of $25 a cycle** (one cycle is 5 weeks; Amir, 2026-10-17), paid in toman at that day's
+  rate. People in Iran pay **one cycle at a time**: there are no multi-cycle plans or bundle prices
+  for Iran. Amir says the exact toman amount in his message; never work it out. No hidden costs, no long contract. 10% loyalty discount on renewal.
 - Includes: a personal S&C programme for your sport, the app on your phone, cues (and video where
   there is one) for each exercise, weekly updates, readiness and load monitoring, direct messages
   and support.
@@ -206,4 +206,4 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 
 - Amir's title: «مربیِ بدنسازیِ تنیس و پدل». His degrees: «ارشد», never "MSc".
 - «یه برنامه» not «فایل» or «PDF». «شدت» not «سختی». «شروع کن» not «درخواست».
-- Prices are «معادلِ ۲۵ دلار در ماه» and «معادلِ ۱۷ دلار», always with «به تومان، با نرخِ روز».
+- Prices are «معادلِ ۲۵ دلار برای هر سیکل (۵ هفته)» and «معادلِ ۱۷ دلار», always with «به تومان، با نرخِ روز».
