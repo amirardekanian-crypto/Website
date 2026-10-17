@@ -12,11 +12,13 @@ ERRORS (exit 1)
    2  the rulebook: the four meanings, the level curve, the shares, the habit weights, cycle_finished.min_share
    3  every [fact.<id>]: a meaning, exactly one of xp / xp_from, a source, pays_for, when. A social fact (meaning
       "none") pays nothing (GAME-6); pays_for "progress" needs meaning "progress"
-   4  every [badge.<id>]: the required fields, a meaning (or "chosen" for the commendation badge only), a kind, what it
-      counts (a fact) or reads (proof_codes), and tiers that rise (at), never go down a metal, and carry xp (mult for
-      per_habit_best_run); a tier title must exist
+   4  every [badge.<id>]: the required fields, a meaning (or "chosen" for the commendation badge only), a kind
+      (best_value reads the largest value its fact has reached, e.g. a percent), what it counts (a fact) or reads
+      (proof_codes), and tiers that rise (at), never go down a metal, and carry xp (mult for per_habit_best_run); a
+      tier title must exist; a habit, when given, is one of the rulebook's habits
    5  every [achievement.<id>]: the required fields, reads a fact or "proof" (then proof_code), a title that exists
-   6  every [title.<id>] and [skin.<id>]
+   6  every [title.<id>] and [skin.<id>] (a title's meaning is one of the four, "chosen", "season", "level", or "all"
+      for the Grand Slam)
    7  every [mission.<id>]: the required fields, counts a fact, a target, and NO xp of its own (GAME-7)
    8  every [quest.<id>]: the required fields, 2 to 12 weeks, 2 to 5 steps, each step closing on a fact or Amir's tick
    9  recognition.toml: the five sizes and what each means, Courtside, the Bell, Amir's three tools, the WhatsApp lines
@@ -24,11 +26,15 @@ ERRORS (exit 1)
   13  the fields that carry Proof's counting (proof_measure, proof_need, proof_kind, proof_xp): a known measure or kind,
       a habit that exists, a need above 0, one Proof code per tier
   14  while [shadow] on = true (phase 1): every habit number and every Proof milestone, tier and quest equals Proof's
-      own, read from supabase/xp_rules_snapshot.json (the shadow must match Proof to the point, PROCEDURES.md → P14)
+      own, read from supabase/xp_rules_snapshot.json (the shadow must match Proof to the point, PROCEDURES.md → P14).
+      retire_at, starts_at and superseded_by say when an entry stops or starts, not what Proof pays: never compared
+  15  the switch gates (phase 3): retire_at and starts_at are "switch"; superseded_by (an id or a list) names entries
+      that exist (a badge for a badge; an achievement or a badge for an achievement; a title; a mission), never itself
 WARNINGS (exit 0)
-   6  a title with origin "new" that nothing awards (unless it is a template)
+   6  a title with origin "new" that nothing awards (unless it is a template, or its meaning is "all": the engine
+      mints the Grand Slam)
   11  coverage: each meaning has a badge, an achievement, a title and a mission (missions skip progress, on purpose); each slot has a mission; each habit
-      except strength and custom has a recovery mission
+      except strength and custom has a recovery mission. An entry with retire_at does not count: it stops at the switch
   12  an unknown key inside an entry (a typo would otherwise be silently ignored); also an id that is not snake_case
       and an unknown top-level key (a mistyped [table] would silently drop its entries from every check above)
   14  the Proof snapshot is missing or unreadable, so the parity check could not run
@@ -68,8 +74,8 @@ SOURCES = ["training", "proof", "coach", "server"]
 PAYS_FOR = ["act", "progress", "nothing"]
 XP_FROM = ["habits", "mission", "quest", "share.mission_sweep"]
 FACT_MEANINGS = MEANINGS + ["chosen", "quest", "none"]
-TITLE_MEANINGS = MEANINGS + ["chosen", "season", "level"]
-BADGE_KINDS = ["best_run", "total", "per_habit_best_run", "proof"]
+TITLE_MEANINGS = MEANINGS + ["chosen", "season", "level", "all"]       # "all": the Grand Slam, a title in each of the four
+BADGE_KINDS = ["best_run", "total", "per_habit_best_run", "best_value", "proof"]
 MEASURES = ["count", "units", "days"]
 CLOSERS = ["fact", "coach_tick"]
 TOOLS = ["reaction", "commendation", "amirs_pick"]
@@ -79,6 +85,7 @@ LIMIT_PER = ["plan_day_week", "week", "cycle"]
 PROOF_MEASURES = ["streak:<habit>", "daysHit:<habit>", "daysWith3", "perfectDays", "comebackRun", "comebacksStuck"]
 PROOF_KINDS = ["daysHit:<habit>", "total:<habit>", "qualify", "perfect"]
 PROOF_SNAPSHOT = ROOT / "supabase" / "xp_rules_snapshot.json"
+SWITCH = "switch"      # the one value retire_at and starts_at may take: phase 3, when Career Mode replaces Proof's scorer
 
 BANNED_WORDS = re.compile(r"\b(gold|golden|yellow|amber|ochre)\b", re.IGNORECASE)
 SNAKE_CASE = re.compile(r"^[a-z][a-z0-9_]*$")
@@ -86,16 +93,19 @@ SNAKE_CASE = re.compile(r"^[a-z][a-z0-9_]*$")
 # Keys an entry may carry besides its own fields without a warning (rule 12).
 EXTRA_KEYS = {"tier_name", "mult", "title", "template", "proof_id", "proof_code", "proof_codes", "proof_xp",
               "proof_measure", "proof_need", "proof_kind", "min_share", "cap", "habit", "within", "run", "line"}
+# retire_at, starts_at and superseded_by are the switch gates (rule 15). A badge may also name the one habit it reads.
 KNOWN_KEYS = {
     "fact": {"meaning", "xp", "xp_from", "source", "pays_for", "when", "cap", "min_share", "limit", "limit_per",
              "weeks_away", "window_days", "min_gain"},
-    "badge": {"name", "meaning", "kind", "counts", "proof_codes", "caption", "free", "origin", "tiers"},
+    "badge": {"name", "meaning", "kind", "counts", "habit", "proof_codes", "caption", "free", "origin", "tiers",
+              "retire_at", "starts_at", "superseded_by"},
     "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},
-    "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code"},
-    "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id"},
+    "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code",
+                    "retire_at", "starts_at", "superseded_by"},
+    "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id", "retire_at", "superseded_by"},
     "skin": {"name", "from", "origin", "proof_id"},
     "mission": {"name", "slot", "meaning", "asks", "counts", "habit", "measure", "target", "picked_when", "free",
-                "origin", "proof_id", "proof_xp"},
+                "origin", "proof_id", "proof_xp", "retire_at", "superseded_by"},
     "quest": {"name", "meaning", "weeks", "doors", "free", "size", "caption", "reward_badge", "title", "origin", "steps"},
     "step": {"name", "closes_on", "counts", "target", "habit", "measure", "within", "run"},
     "message": {"en", "fa", "used_for"},
@@ -155,6 +165,7 @@ class World:
         weights = habits.get("weights") if isinstance(habits, dict) else None
         self.weights = list(weights) if isinstance(weights, dict) else None
         self.titles = ids_of(tl, "title") if tl is not None else None
+        self.badge_ids = ids_of(data["badges"], "badge") if data["badges"] is not None else None
         self.title_entries = {}
         self.title_refs = set()
 
@@ -281,6 +292,37 @@ def check_habit_ref(c, e, w):
         c.error(f"habit must be a habit from rulebook.toml [habits.weights], found {h!r}")
     elif w.weights is not None and h not in w.weights:
         c.error(f"habit {h!r} is not in rulebook.toml [habits.weights] ({', '.join(w.weights)})")
+
+
+def retires(e):
+    """An entry gated to stop at the switch (it has retire_at). It is earned as Proof earns it until phase 3, but
+    coverage (rule 11) does not count it: the catalogue is built on what stays."""
+    return isinstance(e, dict) and "retire_at" in e
+
+
+def check_gates(c, e, ident, targets):
+    """Rule 15. retire_at and starts_at, when present, are "switch": the one moment the rules change (phase 3).
+    superseded_by is the id of the entry that takes this one's place, or a list of ids, and each must exist.
+    `targets` is a list of (ids, label): where a name may be found (ids is None for a file that did not parse: then
+    there is nothing to check against, and that file's own error says why). An entry never supersedes itself."""
+    for key in ("retire_at", "starts_at"):
+        if key in e and e[key] != SWITCH:
+            c.error(f'{key} must be "{SWITCH}" (the entry is gated on the switch, phase 3), found {e[key]!r}')
+    if "superseded_by" not in e:
+        return
+    raw = e["superseded_by"]
+    if is_text(raw):
+        names = [raw]
+    elif isinstance(raw, list) and raw and all(is_text(x) for x in raw):
+        names = raw
+    else:
+        c.error(f"superseded_by must be the id of the entry that takes its place, or a list of ids, found {raw!r}")
+        return
+    for name in names:
+        if name == ident:
+            c.error("superseded_by names the entry itself")
+        elif all(ids is not None for ids, _ in targets) and not any(name in ids for ids, _ in targets):
+            c.error(f"superseded_by {name!r} is not " + " or ".join(label for _, label in targets))
 
 
 # ── Loading ───────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -490,7 +532,8 @@ def check_tiers(c, b, kind, w):
 
 def check_badges(data, w, rep):
     f = "badges.toml"
-    for bid, b in entries(data, "badge", f, rep).items():
+    badges = entries(data, "badge", f, rep)
+    for bid, b in badges.items():
         c = Ctx(rep, f, f"badge.{bid}")
         get_text(c, b, "name")
         kind = get_choice(c, b, "kind", BADGE_KINDS)
@@ -517,6 +560,8 @@ def check_badges(data, w, rep):
                     if fid not in w.facts:
                         c.error(f"counts {fid!r} is not a fact in rulebook.toml")
         check_tiers(c, b, kind, w)
+        check_habit_ref(c, b, w)
+        check_gates(c, b, bid, [(set(badges), "a badge in badges.toml")])
         warn_unknown(c, b, "badge")
 
 
@@ -524,7 +569,8 @@ def check_badges(data, w, rep):
 
 def check_achievements(data, w, rep):
     f = "achievements.toml"
-    for aid, a in entries(data, "achievement", f, rep).items():
+    achievements = entries(data, "achievement", f, rep)
+    for aid, a in achievements.items():
         c = Ctx(rep, f, f"achievement.{aid}")
         get_text(c, a, "name")
         get_choice(c, a, "meaning", MEANINGS)
@@ -544,6 +590,8 @@ def check_achievements(data, w, rep):
         get_bool(c, a, "free")
         get_choice(c, a, "origin", ORIGINS)
         check_title_ref(c, a, w)
+        check_gates(c, a, aid, [(set(achievements), "an achievement in achievements.toml"),
+                                (w.badge_ids, "a badge in badges.toml")])
         warn_unknown(c, a, "achievement")
 
 
@@ -559,6 +607,7 @@ def check_titles(data, w, rep):
         get_text(c, t, "from")
         get_choice(c, t, "metal", METALS, note="; no gold, ever")
         get_choice(c, t, "origin", ORIGINS)
+        check_gates(c, t, tid, [(set(w.title_entries), "a title in titles.toml")])
         warn_unknown(c, t, "title")
     for sid, s in entries(data, "skin", f, rep).items():
         c = Ctx(rep, f, f"skin.{sid}")
@@ -569,9 +618,11 @@ def check_titles(data, w, rep):
 
 
 def check_title_use(w, rep):
-    """A title Career Mode creates (origin "new") that nothing awards is dead weight. A template is filled in later."""
+    """A title Career Mode creates (origin "new") that nothing awards is dead weight. A template is filled in later, and
+    the Grand Slam (meaning "all") is minted by the engine when an athlete holds a title in each meaning, not by an entry."""
     for tid, t in w.title_entries.items():
-        if t.get("origin") == "new" and t.get("template") is not True and tid not in w.title_refs:
+        if (t.get("origin") == "new" and t.get("template") is not True and t.get("meaning") != "all"
+                and tid not in w.title_refs):
             rep.warn("titles.toml", f"title.{tid}", "nothing awards this title: no badge tier, achievement or quest "
                                                     "names it, and it is not a template")
 
@@ -580,7 +631,8 @@ def check_title_use(w, rep):
 
 def check_missions(data, w, rep):
     f = "missions.toml"
-    for mid, m in entries(data, "mission", f, rep).items():
+    missions = entries(data, "mission", f, rep)
+    for mid, m in missions.items():
         c = Ctx(rep, f, f"mission.{mid}")
         get_text(c, m, "name")
         get_choice(c, m, "slot", SLOTS)
@@ -599,6 +651,7 @@ def check_missions(data, w, rep):
             c.error("a mission never has its own xp: it pays share.mission of the work inside it (GAME-7). "
                     "Proof's old figure goes in proof_xp")
         check_habit_ref(c, m, w)
+        check_gates(c, m, mid, [(set(missions), "a mission in missions.toml")])
         warn_unknown(c, m, "mission", skip=("xp",))
 
 
@@ -727,14 +780,15 @@ def check_coverage(data, w, rep):
             continue
         section = data[stem].get(key)
         have = {e["meaning"] for e in (section.values() if isinstance(section, dict) else [])
-                if isinstance(e, dict) and isinstance(e.get("meaning"), str)}
+                if isinstance(e, dict) and not retires(e) and isinstance(e.get("meaning"), str)}
         for meaning in wanted:
             if meaning not in have:
                 rep.warn(f"{stem}.toml", "coverage", f"no {key} has the meaning {meaning!r}")
     if data["missions"] is None:
         return
     section = data["missions"].get("mission")
-    missions = [m for m in section.values() if isinstance(m, dict)] if isinstance(section, dict) else []
+    missions = ([m for m in section.values() if isinstance(m, dict) and not retires(m)]
+                if isinstance(section, dict) else [])
     for slot in SLOTS:
         if not any(m.get("slot") == slot for m in missions):
             rep.warn("missions.toml", "coverage", f"no mission in the {slot!r} slot")
@@ -797,7 +851,9 @@ def check_proof_fields(data, w, rep):
 # ── Rule 14: while in shadow, every habit number equals Proof's ───────────────────────────────────────────────────
 
 def proof_numbers(data):
-    """What the catalogue says Proof pays, in the shape of Proof's xp_rules row."""
+    """What the catalogue says Proof pays, in the shape of Proof's xp_rules row. Only numbers and codes are read: an
+    origin = "proof" entry may also carry retire_at, starts_at and superseded_by (they say when it stops, not what it
+    pays), and a retiring entry is still compared, because it is earned exactly as Proof earns it until the switch."""
     rb = data["rulebook"] or {}
     habits = rb.get("habits") if isinstance(rb.get("habits"), dict) else {}
     weights = habits.get("weights") if isinstance(habits.get("weights"), dict) else {}
@@ -971,7 +1027,7 @@ def print_summary(folder, data):
     print(f"  {'':<13}" + "".join(f"{stem:>14}" for stem, _ in columns))
     for m in MEANINGS:
         print(f"  {m:<13}" + "".join(f"{n:>14}" for n in table[m]))
-    print(f"  {'other':<13}" + "".join(f"{n:>14}" for n in other) + "   (chosen, season, level)")
+    print(f"  {'other':<13}" + "".join(f"{n:>14}" for n in other) + "   (chosen, season, level, all)")
 
 
 def print_problems(rep):

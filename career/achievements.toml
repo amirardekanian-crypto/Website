@@ -2,6 +2,7 @@
 #
 # An achievement is a moment reached once. It never repeats (a moment that comes back in steps is a badge).
 # Names, XP and sizes are drafts (2026-10-17): change them freely; never change an id.
+# The switch keys (retire_at, starts_at, superseded_by) work as in badges.toml; an achievement may be superseded by a badge.
 
 
 # ── Consistency ───────────────────────────────────────────────────────────────────────────────────────────────────
@@ -18,29 +19,40 @@ free = false
 origin = "new"
 
 [achievement.clean_sheet]
-name = "Clean Sheet"
+name = "First Treble"
 meaning = "consistency"
 reads = "mission_sweep"
 rule = "The first week with all three missions done."
 xp = 50
 size = "win"
-caption = "Three missions, three done."
+caption = "Three missions in one week, all done."
+free = true
+origin = "new"
+
+[achievement.flawless]
+name = "Flawless"
+meaning = "consistency"
+reads = "week_held"
+rule = "Every week of a cycle held."
+xp = 300
+size = "milestone"
+caption = "Every week of the cycle, held."
+free = false
+origin = "new"
+
+[achievement.full_stack]
+name = "Full Stack"
+meaning = "consistency"
+reads = "habit_done"
+rule = "Steps, sleep, fuel and water each on a 7-day streak at the same time."
+xp = 200
+size = "highlight"
+caption = "Four habits, seven days each, all at once."
 free = true
 origin = "new"
 
 
 # ── Commitment ────────────────────────────────────────────────────────────────────────────────────────────────────
-
-[achievement.day_one]
-name = "Day One"
-meaning = "commitment"
-reads = "session_finished"
-rule = "The first session from the plan finished."
-xp = 100
-size = "win"
-caption = "Day one, done."
-free = false
-origin = "new"
 
 [achievement.first_cycle]
 name = "First Cycle"
@@ -50,6 +62,17 @@ rule = "The first cycle finished."
 xp = 300
 size = "milestone"
 caption = "A whole cycle, finished."
+free = false
+origin = "new"
+
+[achievement.by_the_book]
+name = "By the Book"
+meaning = "commitment"
+reads = "cycle_finished"
+rule = "A whole cycle by the book: every week held, every set logged, every check-in done."
+xp = 500
+size = "milestone"
+caption = "A whole cycle, done exactly as written."
 free = false
 origin = "new"
 
@@ -79,11 +102,47 @@ caption = "Your first personal best. Not the last."
 free = false
 origin = "new"
 
+[achievement.all_court]
+name = "All-Court"
+meaning = "progress"
+reads = "personal_best"
+rule = "A personal best in each main movement pattern in one cycle: squat, hinge, push, pull and single leg (the Spine's pattern field)."
+xp = 400
+size = "milestone"
+caption = "Stronger everywhere, in one cycle."
+free = false
+origin = "new"
+
+[achievement.double_up]
+name = "Double Up"
+meaning = "progress"
+reads = "lift_gain"
+rule = "A lift twice its first number (lift_gain 100% or more), at the same effort."
+xp = 500
+size = "legend"
+caption = "Twice as strong as day one."
+title = "new_engine"
+free = false
+origin = "new"
+
+# An event, like Proof's five: it pays a title.
+[achievement.the_proving_ground]
+name = "The Proving Ground"
+meaning = "progress"
+reads = "personal_best"
+rule = "In one cycle: three personal bests, a retest beaten and every week held."
+xp = 0
+size = "milestone"
+caption = "Proved it on the test and in the log."
+title = "proven"
+free = false
+origin = "new"
+
 
 # ── Resilience ────────────────────────────────────────────────────────────────────────────────────────────────────
 
 [achievement.kept_going]
-name = "Kept Going"
+name = "Played Through"
 meaning = "resilience"
 reads = "cycle_finished"
 rule = "A cycle finished with at least one broken week in it."
@@ -94,13 +153,24 @@ free = false
 origin = "new"
 
 [achievement.back]
-name = "Back"
+name = "Back on Court"
 meaning = "resilience"
 reads = "training_return"
 rule = "The first held week after two or more weeks away."
 xp = 100
 size = "highlight"
-caption = "Two weeks away, then a full week. Back."
+caption = "Two weeks away, then a full week. Back on court."
+free = false
+origin = "new"
+
+[achievement.all_the_way_back]
+name = "All the Way Back"
+meaning = "resilience"
+reads = "week_held"
+rule = "After four or more weeks away, the held-weeks run reaches its old best again."
+xp = 400
+size = "milestone"
+caption = "All the way back to your best run."
 free = false
 origin = "new"
 
@@ -127,6 +197,7 @@ caption = "Your first session on the board"
 free = false
 origin = "proof"
 
+# Four Majors (2026-10-17): retires at the switch (phase 3); CENTURY counts the same sessions. Anyone who has it keeps it.
 [achievement.the_machinist]
 name = "THE MACHINIST"
 meaning = "commitment"
@@ -140,6 +211,8 @@ size = "milestone"
 caption = "150 sessions. A year of turning up."
 free = false
 origin = "proof"
+retire_at = "switch"
+superseded_by = "century"
 
 [achievement.the_centurion]
 name = "THE CENTURION"

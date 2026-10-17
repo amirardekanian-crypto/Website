@@ -126,7 +126,7 @@ en = "Saw your {exercise}. {gain}. That's the work."
 fa = ""
 
 [message.week_held]
-used_for = "Held Weeks tiers"
+used_for = "Hold Serve tiers"
 en = "{n} weeks in a row, every session. Keep it boring."
 fa = ""
 

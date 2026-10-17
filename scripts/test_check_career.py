@@ -109,6 +109,13 @@ def swap(block, old, new):
 
 AWARDS_TITLE = swap(GOOD_ACHIEVEMENT, "free = true\n", 'free = true\ntitle = "zz_good"\n')   # names the title in GOOD_TITLE
 
+# The switch (Four Majors, 2026-10-17): a best_value badge, a badge that retires, and the one that takes its place.
+BEST_VALUE_BADGE = swap(swap(GOOD_BADGE.replace("zz_good", "zz_value"), 'kind = "total"', 'kind = "best_value"'),
+                        'counts = "session_finished"', 'counts = "lift_gain"')
+RETIRING_BADGE = swap(GOOD_BADGE.replace("zz_good", "zz_old"), 'origin = "new"\n',
+                      'origin = "new"\nretire_at = "switch"\nsuperseded_by = "zz_new"\n')
+REPLACEMENT_BADGE = swap(GOOD_BADGE.replace("zz_good", "zz_new"), 'origin = "new"\n', 'origin = "new"\nstarts_at = "switch"\n')
+
 
 class CareerCheckerTests(unittest.TestCase):
     def setUp(self):
@@ -144,6 +151,29 @@ class CareerCheckerTests(unittest.TestCase):
                 path.write_text("\n".join(lines), encoding="utf-8", newline="\n")
                 return
         self.fail(f"{filename} has no `{key}` in [{table}]: update this test")
+
+    def put_key(self, filename, table, key, literal):
+        """Set `key = literal` inside [table]: replaced when the key is already there, else added right under the
+        table's header. A test about a gate never breaks because the real file already carries it."""
+        path = self.dir / filename
+        lines = path.read_text(encoding="utf-8").split("\n")
+        where, header_at = None, None
+        for i, line in enumerate(lines):
+            header = re.match(r"^\[([^\]]+)\]\s*(#.*)?$", line)
+            if header:
+                where = header.group(1)
+                if where == table:
+                    header_at = i
+                continue
+            m = re.match(rf"^({re.escape(key)}\s*=\s*)(.*?)(\s+#.*)?$", line)
+            if where == table and m:
+                lines[i] = m.group(1) + literal + (m.group(3) or "")
+                path.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+                return
+        if header_at is None:
+            self.fail(f"{filename} has no [{table}]: update this test")
+        lines.insert(header_at + 1, f"{key} = {literal}")
+        path.write_text("\n".join(lines), encoding="utf-8", newline="\n")
 
     def assertFails(self, *needles):
         rc, out = self.run_checker()
@@ -447,6 +477,156 @@ class CareerCheckerTests(unittest.TestCase):
         self.append("titles.toml", "\n[title.zz_broken\n")
         self.append("missions.toml", swap(GOOD_MISSION, 'counts = "library_session"', 'counts = "no_such_fact"'))
         self.assertFails("titles.toml", "does not parse", "counts 'no_such_fact' is not a fact")
+
+    # ── the switch (Four Majors, 2026-10-17): best_value, retire_at, starts_at, superseded_by, the Grand Slam ──────
+    def test_a_best_value_badge_passes(self):
+        self.append("badges.toml", BEST_VALUE_BADGE)
+        self.assertPasses("OK: 0 errors")
+
+    def test_a_best_value_badge_is_checked_like_any_other_kind(self):
+        # it still needs the fact it counts, an xp on every tier and tiers that rise
+        self.append("badges.toml", swap(swap(BEST_VALUE_BADGE, 'counts = "lift_gain"\n', ""), "xp = 10, ", ""))
+        self.assertFails("[badge.zz_value]", 'kind "best_value" needs counts', "tier 1", "xp is missing")
+        self.setUp()
+        self.append("badges.toml", swap(BEST_VALUE_BADGE, "at = 1,", "at = 9,"))
+        self.assertFails("[badge.zz_value]", "tier 2", "strictly rising")
+
+    def test_retire_at_with_a_valid_superseded_by_passes(self):
+        self.append("badges.toml", RETIRING_BADGE)
+        self.append("badges.toml", REPLACEMENT_BADGE)
+        self.assertPasses("OK: 0 errors")
+        # a list of ids is fine too
+        self.setUp()
+        self.append("badges.toml", swap(RETIRING_BADGE, 'superseded_by = "zz_new"', 'superseded_by = ["zz_new", "zz_old_two"]'))
+        self.append("badges.toml", REPLACEMENT_BADGE)
+        self.append("badges.toml", GOOD_BADGE.replace("zz_good", "zz_old_two"))
+        self.assertPasses("OK: 0 errors")
+
+    def test_superseded_by_must_name_an_entry_that_exists(self):
+        self.append("badges.toml", RETIRING_BADGE)          # names zz_new, which is not there
+        self.assertFails("[badge.zz_old]", "superseded_by 'zz_new' is not a badge in badges.toml")
+        self.setUp()
+        self.append("badges.toml", swap(RETIRING_BADGE, 'superseded_by = "zz_new"', 'superseded_by = ["zz_new", "zz_nobody"]'))
+        self.append("badges.toml", REPLACEMENT_BADGE)       # one good id and one missing: the missing one is named
+        out = self.assertFails("superseded_by 'zz_nobody' is not a badge in badges.toml")
+        self.assertNotIn("superseded_by 'zz_new'", out)
+        self.setUp()
+        self.append("badges.toml", swap(RETIRING_BADGE, 'superseded_by = "zz_new"', 'superseded_by = "zz_old"'))
+        self.assertFails("[badge.zz_old]", "superseded_by names the entry itself")
+        self.setUp()
+        self.append("badges.toml", swap(RETIRING_BADGE, 'superseded_by = "zz_new"', "superseded_by = []"))
+        self.assertFails("[badge.zz_old]", "superseded_by must be the id of the entry that takes its place")
+
+    def test_retire_at_and_starts_at_must_be_switch(self):
+        self.append("badges.toml", swap(RETIRING_BADGE, 'retire_at = "switch"', 'retire_at = "soon"'))
+        self.append("badges.toml", swap(REPLACEMENT_BADGE, 'starts_at = "switch"', 'starts_at = "later"'))
+        self.assertFails("[badge.zz_old]", 'retire_at must be "switch"', "'soon'",
+                         "[badge.zz_new]", 'starts_at must be "switch"', "'later'")
+
+    def test_the_switch_keys_are_known_on_every_kind_of_entry_that_takes_them(self):
+        # an achievement can be superseded by a badge (THE MACHINIST by CENTURY) or by another achievement
+        old = swap(GOOD_ACHIEVEMENT.replace("zz_good", "zz_old"), "free = true\n",
+                   'free = true\nretire_at = "switch"\nstarts_at = "switch"\nsuperseded_by = "zz_new"\n')
+        self.append("achievements.toml", old)
+        self.append("badges.toml", REPLACEMENT_BADGE)
+        out = self.assertPasses("OK: 0 errors")
+        self.assertNotIn("unknown key", out)
+        self.setUp()
+        self.append("achievements.toml", swap(old, '"zz_new"', '"zz_good"'))
+        self.append("achievements.toml", GOOD_ACHIEVEMENT)
+        self.assertPasses("OK: 0 errors")
+        self.setUp()
+        self.append("achievements.toml", swap(old, '"zz_new"', '"zz_nobody"'))
+        self.assertFails("[achievement.zz_old]",
+                         "superseded_by 'zz_nobody' is not an achievement in achievements.toml or a badge in badges.toml")
+        # a title and a mission retire in favour of their own kind
+        self.setUp()
+        self.append("titles.toml", GOOD_TITLE)
+        self.append("titles.toml", swap(GOOD_TITLE.replace("zz_good", "zz_old"), 'origin = "new"\n',
+                                        'origin = "new"\nretire_at = "switch"\nsuperseded_by = "zz_good"\n'))
+        self.append("missions.toml", GOOD_MISSION)
+        self.append("missions.toml", swap(GOOD_MISSION.replace("zz_good", "zz_old"), "free = true\n",
+                                          'free = true\nretire_at = "switch"\nsuperseded_by = "zz_good"\n'))
+        out = self.assertPasses("OK: 0 errors")
+        self.assertNotIn("unknown key", out)
+        self.setUp()
+        self.append("titles.toml", swap(GOOD_TITLE, 'origin = "new"\n', 'origin = "new"\nsuperseded_by = "zz_nobody"\n'))
+        self.append("missions.toml", swap(GOOD_MISSION, "free = true\n", 'free = true\nsuperseded_by = "zz_nobody"\n'))
+        self.assertFails("[title.zz_good]", "superseded_by 'zz_nobody' is not a title in titles.toml",
+                         "[mission.zz_good]", "superseded_by 'zz_nobody' is not a mission in missions.toml")
+
+    def test_a_title_with_meaning_all_passes(self):
+        self.append("titles.toml", swap(GOOD_TITLE, 'meaning = "progress"', 'meaning = "all"'))
+        out = self.assertPasses("OK: 0 errors")
+        self.assertNotIn("nothing awards", out)          # the engine mints the Grand Slam: no badge, achievement or quest names it
+
+    def test_a_badge_habit_must_be_a_habit_in_the_rulebook(self):
+        self.append("badges.toml", swap(GOOD_BADGE, "free = true\n", 'free = true\nhabit = "juggling"\n'))
+        self.assertFails("[badge.zz_good]", "habit 'juggling' is not in rulebook.toml [habits.weights]")
+        self.setUp()
+        self.append("badges.toml", swap(GOOD_BADGE, "free = true\n", 'free = true\nhabit = "custom"\n'))
+        out = self.assertPasses("OK: 0 errors")          # custom is a habit with a weight (one badge for HOUSE RULES)
+        self.assertNotIn("unknown key", out)
+
+    def test_a_proof_entry_may_carry_retire_at_without_tripping_the_parity_check(self):
+        # the shadow is on: Proof's own entries still equal Proof's numbers, and a retiring one may say when it stops
+        self.put_key("badges.toml", "badge.dawn_patrol", "retire_at", '"switch"')
+        self.put_key("badges.toml", "badge.dawn_patrol", "superseded_by", '"century"')
+        self.put_key("achievements.toml", "achievement.first_blood", "retire_at", '"switch"')
+        self.put_key("achievements.toml", "achievement.first_blood", "superseded_by", '"century"')
+        self.put_key("missions.toml", "mission.three_hard_days", "retire_at", '"switch"')
+        self.put_key("missions.toml", "mission.three_hard_days", "superseded_by", '"hold_your_week"')
+        out = self.assertPasses("OK: 0 errors")
+        self.assertNotIn("unknown key", out)
+
+    def test_a_retiring_proof_entry_must_still_match_proofs_numbers(self):
+        # retire_at is not a way round the parity check: until the switch the entry is earned exactly as Proof earns it
+        self.put_key("badges.toml", "badge.dawn_patrol", "retire_at", '"switch"')
+        self.put_key("badges.toml", "badge.dawn_patrol", "superseded_by", '"century"')
+        path = self.dir / "badges.toml"
+        text = path.read_text(encoding="utf-8")
+        tier = '{ at = 10, metal = "silver", xp = 75, size = "highlight" }'
+        self.assertIn(tier, text)
+        path.write_text(text.replace(tier, tier.replace("xp = 75", "xp = 80"), 1), encoding="utf-8", newline="\n")
+        self.assertFails("Proof pays the milestone DP (need 10, 75 XP, daysWith3)", "DP (need 10.0, 80.0 XP")
+
+    def test_a_retiring_entry_does_not_count_for_coverage(self):
+        def small_files(retiring):
+            # One badge and one mission in place of the real ones (and one achievement, so nothing names a badge that
+            # is gone). Proof's entries are swapped out too, so the shadow is turned off: there is no parity to check.
+            self.setUp()
+            self.set_key("rulebook.toml", "shadow", "on", "false")
+            gate = 'free = true\nretire_at = "switch"\n' if retiring else "free = true\n"
+            for filename, block in (("badges.toml", GOOD_BADGE), ("missions.toml", GOOD_MISSION)):
+                (self.dir / filename).write_text(swap(block, "free = true\n", gate), encoding="utf-8", newline="\n")
+            (self.dir / "achievements.toml").write_text(GOOD_ACHIEVEMENT, encoding="utf-8", newline="\n")
+            return self.assertPasses("OK: 0 errors")
+
+        out = small_files(retiring=True)
+        self.assertIn("no badge has the meaning 'consistency'", out)    # the one badge retires: nothing live covers it
+        self.assertIn("no mission has the meaning 'commitment'", out)
+        self.assertIn("no mission in the 'stretch' slot", out)
+        out = small_files(retiring=False)                               # the same two entries, not retiring, do cover them
+        self.assertNotIn("no badge has the meaning 'consistency'", out)
+        self.assertNotIn("no mission has the meaning 'commitment'", out)
+        self.assertNotIn("no mission in the 'stretch' slot", out)
+
+    def test_odd_switch_keys_are_reported_and_never_crash_the_checker(self):
+        # Each body replaces one whole file: valid TOML, the wrong shape for retire_at / starts_at / superseded_by.
+        odd = {
+            "badges.toml": '[badge.a]\nretire_at = 5\nstarts_at = ["x"]\nsuperseded_by = {a = 1}\nhabit = 3\n',
+            "achievements.toml": '[achievement.a]\nretire_at = true\nsuperseded_by = [5, ["a"]]\n',
+            "titles.toml": '[title.a]\nretire_at = {}\nsuperseded_by = ""\n',
+            "missions.toml": '[mission.a]\nretire_at = 1.5\nsuperseded_by = []\n',
+        }
+        for filename, body in odd.items():
+            with self.subTest(file=filename):
+                self.setUp()
+                (self.dir / filename).write_text(body, encoding="utf-8", newline="\n")
+                rc, out = self.run_checker()
+                self.assertNotIn("Traceback", out)
+                self.assertNotIn("does not parse", out)          # it is valid TOML, just the wrong shape
+                self.assertEqual(rc, 1, out)
 
 
 if __name__ == "__main__":

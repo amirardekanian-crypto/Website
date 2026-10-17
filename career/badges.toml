@@ -2,14 +2,18 @@
 #
 # A badge is a quality built over time, in tiers. It is judged on the best ever and never taken back (GAME-1).
 # Metals, low to high: bronze, silver, emerald, amethyst, prismatic. No gold, ever.
-# kind: best_run (the longest run, best ever) · total (a career count) · per_habit_best_run (Proof's tiers) · proof
+# kind: best_run (the longest run, best ever) · total (a career count) · per_habit_best_run (Proof's tiers) ·
+#       best_value (the largest value its fact has reached, e.g. a percent) · proof
+# Gated on the switch (phase 3; CAREER_MODE.md → The engine): retire_at = "switch" is earned as Proof earns it until
+# then and never after (anyone who has it keeps it); starts_at = "switch" is not earned before it; superseded_by names
+# the entry (or entries) that take its place. A badge with habit = "…" reads only that habit's facts.
 # Names, tiers and XP are drafts (2026-10-17): change them freely; never change an id.
 
 
 # ── Consistency ───────────────────────────────────────────────────────────────────────────────────────────────────
 
 [badge.held_weeks]
-name = "Held Weeks"
+name = "Hold Serve"
 meaning = "consistency"
 kind = "best_run"
 counts = "week_held"
@@ -24,8 +28,24 @@ tiers = [
   { at = 52, metal = "prismatic", xp = 2500, size = "legend", title = "clockwork" },
 ]
 
+[badge.long_count]
+name = "The Long Count"
+meaning = "consistency"
+kind = "total"
+counts = "week_held"
+caption = "{n} weeks held in all. A broken run never takes them back."
+free = false
+origin = "new"
+tiers = [
+  { at = 10, metal = "bronze", xp = 200, size = "highlight" },
+  { at = 25, metal = "silver", xp = 400, size = "highlight" },
+  { at = 50, metal = "emerald", xp = 800, size = "milestone" },
+  { at = 100, metal = "amethyst", xp = 1600, size = "milestone", title = "the_constant" },
+  { at = 200, metal = "prismatic", xp = 3200, size = "legend" },
+]
+
 [badge.clean_sweeps]
-name = "Clean Sweeps"
+name = "Treble"
 meaning = "consistency"
 kind = "best_run"
 counts = "mission_sweep"
@@ -38,6 +58,159 @@ tiers = [
   { at = 8, metal = "emerald", xp = 400, size = "highlight" },
   { at = 12, metal = "amethyst", xp = 800, size = "milestone" },
   { at = 26, metal = "prismatic", xp = 1600, size = "milestone" },
+]
+
+
+# ── One badge per habit, from the switch ──────────────────────────────────────────────────────────────────────────
+# Four Majors (2026-10-17), "one behaviour, one badge": from the switch (phase 3) each habit has ONE badge, wearing its
+# Proof name, on five steps named KINDLED to UNBREAKABLE (Proof's own consistency tiers), so a streak no longer pays
+# twice. They take the place of Proof's two ladders further down (habit_tiers and the seven families), which retire at
+# the switch and name these in superseded_by. Until then nothing here is earned (starts_at = "switch"), so the shadow
+# still matches Proof. The xp is Proof's step multipliers (×0.5, 1, 2, 3, 6) on the habit's daily value (its weight × 1.2),
+# rounded to the nearest 10.
+
+[badge.habit_water]
+name = "HUMAN SPRINKLER"
+meaning = "consistency"
+kind = "best_run"
+counts = "habit_done"
+habit = "water"
+caption = "{n} days in a row on full water."
+free = true
+origin = "new"
+starts_at = "switch"
+tiers = [
+  { at = 5, metal = "bronze", xp = 20, size = "win", tier_name = "KINDLED" },
+  { at = 10, metal = "silver", xp = 40, size = "win", tier_name = "STEADY" },
+  { at = 20, metal = "emerald", xp = 70, size = "win", tier_name = "LOCKED IN" },
+  { at = 30, metal = "amethyst", xp = 110, size = "win", tier_name = "IRONCLAD" },
+  { at = 60, metal = "prismatic", xp = 220, size = "highlight", tier_name = "UNBREAKABLE" },
+]
+
+[badge.habit_sleep]
+name = "BLACKOUT ARTIST"
+meaning = "consistency"
+kind = "best_run"
+counts = "habit_done"
+habit = "sleep"
+caption = "{n} days in a row on your sleep target."
+free = true
+origin = "new"
+starts_at = "switch"
+tiers = [
+  { at = 5, metal = "bronze", xp = 30, size = "win", tier_name = "KINDLED" },
+  { at = 10, metal = "silver", xp = 60, size = "win", tier_name = "STEADY" },
+  { at = 20, metal = "emerald", xp = 120, size = "win", tier_name = "LOCKED IN" },
+  { at = 30, metal = "amethyst", xp = 180, size = "win", tier_name = "IRONCLAD" },
+  { at = 60, metal = "prismatic", xp = 360, size = "highlight", tier_name = "UNBREAKABLE" },
+]
+
+[badge.habit_steps]
+name = "GROUND COVERED"
+meaning = "consistency"
+kind = "best_run"
+counts = "habit_done"
+habit = "steps"
+caption = "{n} days in a row on your step target."
+free = true
+origin = "new"
+starts_at = "switch"
+tiers = [
+  { at = 5, metal = "bronze", xp = 40, size = "win", tier_name = "KINDLED" },
+  { at = 10, metal = "silver", xp = 70, size = "win", tier_name = "STEADY" },
+  { at = 20, metal = "emerald", xp = 140, size = "win", tier_name = "LOCKED IN" },
+  { at = 30, metal = "amethyst", xp = 220, size = "win", tier_name = "IRONCLAD" },
+  { at = 60, metal = "prismatic", xp = 430, size = "highlight", tier_name = "UNBREAKABLE" },
+]
+
+[badge.habit_fuel]
+name = "FULLY FUELLED"
+meaning = "consistency"
+kind = "best_run"
+counts = "habit_done"
+habit = "fuel"
+caption = "{n} days in a row on three proper meals."
+free = true
+origin = "new"
+starts_at = "switch"
+tiers = [
+  { at = 5, metal = "bronze", xp = 20, size = "win", tier_name = "KINDLED" },
+  { at = 10, metal = "silver", xp = 50, size = "win", tier_name = "STEADY" },
+  { at = 20, metal = "emerald", xp = 100, size = "win", tier_name = "LOCKED IN" },
+  { at = 30, metal = "amethyst", xp = 140, size = "win", tier_name = "IRONCLAD" },
+  { at = 60, metal = "prismatic", xp = 290, size = "highlight", tier_name = "UNBREAKABLE" },
+]
+
+[badge.habit_breathe]
+name = "ZEN MACHINE"
+meaning = "consistency"
+kind = "best_run"
+counts = "habit_done"
+habit = "breathe"
+caption = "{n} days in a row on your breathing."
+free = true
+origin = "new"
+starts_at = "switch"
+tiers = [
+  { at = 5, metal = "bronze", xp = 10, size = "win", tier_name = "KINDLED" },
+  { at = 10, metal = "silver", xp = 20, size = "win", tier_name = "STEADY" },
+  { at = 20, metal = "emerald", xp = 50, size = "win", tier_name = "LOCKED IN" },
+  { at = 30, metal = "amethyst", xp = 70, size = "win", tier_name = "IRONCLAD" },
+  { at = 60, metal = "prismatic", xp = 140, size = "highlight", tier_name = "UNBREAKABLE" },
+]
+
+[badge.habit_mobility]
+name = "RUBBER BAND"
+meaning = "consistency"
+kind = "best_run"
+counts = "habit_done"
+habit = "mobility"
+caption = "{n} days in a row on mobility."
+free = true
+origin = "new"
+starts_at = "switch"
+tiers = [
+  { at = 5, metal = "bronze", xp = 20, size = "win", tier_name = "KINDLED" },
+  { at = 10, metal = "silver", xp = 40, size = "win", tier_name = "STEADY" },
+  { at = 20, metal = "emerald", xp = 70, size = "win", tier_name = "LOCKED IN" },
+  { at = 30, metal = "amethyst", xp = 110, size = "win", tier_name = "IRONCLAD" },
+  { at = 60, metal = "prismatic", xp = 220, size = "highlight", tier_name = "UNBREAKABLE" },
+]
+
+[badge.habit_supps]
+name = "IRON MONK"
+meaning = "consistency"
+kind = "best_run"
+counts = "habit_done"
+habit = "supps"
+caption = "{n} days in a row on your supplements."
+free = true
+origin = "new"
+starts_at = "switch"
+tiers = [
+  { at = 5, metal = "bronze", xp = 10, size = "win", tier_name = "KINDLED" },
+  { at = 10, metal = "silver", xp = 20, size = "win", tier_name = "STEADY" },
+  { at = 20, metal = "emerald", xp = 50, size = "win", tier_name = "LOCKED IN" },
+  { at = 30, metal = "amethyst", xp = 70, size = "win", tier_name = "IRONCLAD" },
+  { at = 60, metal = "prismatic", xp = 140, size = "highlight", tier_name = "UNBREAKABLE" },
+]
+
+[badge.habit_custom]
+name = "HOUSE RULES"
+meaning = "consistency"
+kind = "best_run"
+counts = "habit_done"
+habit = "custom"
+caption = "{n} days in a row on a habit of your own."
+free = true
+origin = "new"
+starts_at = "switch"
+tiers = [
+  { at = 5, metal = "bronze", xp = 20, size = "win", tier_name = "KINDLED" },
+  { at = 10, metal = "silver", xp = 30, size = "win", tier_name = "STEADY" },
+  { at = 20, metal = "emerald", xp = 60, size = "win", tier_name = "LOCKED IN" },
+  { at = 30, metal = "amethyst", xp = 90, size = "win", tier_name = "IRONCLAD" },
+  { at = 60, metal = "prismatic", xp = 180, size = "highlight", tier_name = "UNBREAKABLE" },
 ]
 
 
@@ -60,7 +233,7 @@ tiers = [
 ]
 
 [badge.finisher]
-name = "Finisher"
+name = "Closer"
 meaning = "commitment"
 kind = "total"
 counts = "cycle_finished"
@@ -76,7 +249,7 @@ tiers = [
 ]
 
 [badge.full_log]
-name = "Full Log"
+name = "Paper Trail"
 meaning = "commitment"
 kind = "total"
 counts = "full_log"
@@ -91,11 +264,59 @@ tiers = [
   { at = 250, metal = "prismatic", xp = 1500, size = "milestone" },
 ]
 
+[badge.pulse_check]
+name = "Pulse Check"
+meaning = "commitment"
+kind = "total"
+counts = "checkin_done"
+caption = "{n} sessions with the check-in done first."
+free = false
+origin = "new"
+tiers = [
+  { at = 10, metal = "bronze", xp = 100, size = "win" },
+  { at = 25, metal = "silver", xp = 200, size = "win" },
+  { at = 50, metal = "emerald", xp = 400, size = "highlight" },
+  { at = 100, metal = "amethyst", xp = 800, size = "highlight" },
+  { at = 250, metal = "prismatic", xp = 1500, size = "milestone" },
+]
+
+[badge.love_hold]
+name = "Love Hold"
+meaning = "commitment"
+kind = "total"
+counts = "week_by_the_book"
+caption = "{n} weeks held by the book: every session, every set, every check-in."
+free = false
+origin = "new"
+tiers = [
+  { at = 1, metal = "bronze", xp = 150, size = "highlight" },
+  { at = 4, metal = "silver", xp = 300, size = "highlight" },
+  { at = 12, metal = "emerald", xp = 600, size = "milestone" },
+  { at = 24, metal = "amethyst", xp = 1200, size = "milestone" },
+  { at = 52, metal = "prismatic", xp = 2500, size = "legend" },
+]
+
+[badge.veteran]
+name = "Veteran"
+meaning = "commitment"
+kind = "total"
+counts = "month_with_amir"
+caption = "{n} months with Amir."
+free = false
+origin = "new"
+tiers = [
+  { at = 3, metal = "bronze", xp = 300, size = "highlight" },
+  { at = 6, metal = "silver", xp = 600, size = "milestone" },
+  { at = 12, metal = "emerald", xp = 1200, size = "milestone" },
+  { at = 24, metal = "amethyst", xp = 2400, size = "legend", title = "lifer" },
+  { at = 36, metal = "prismatic", xp = 3600, size = "legend" },
+]
+
 
 # ── Progress ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
 [badge.bests]
-name = "Bests"
+name = "Record Breaker"
 meaning = "progress"
 kind = "total"
 counts = "personal_best"
@@ -111,7 +332,7 @@ tiers = [
 ]
 
 [badge.same_effort]
-name = "Same Effort, More Weight"
+name = "Free Kilos"
 meaning = "progress"
 kind = "total"
 counts = "effort_win"
@@ -127,7 +348,7 @@ tiers = [
 ]
 
 [badge.retests]
-name = "Retest Beaten"
+name = "Beat the Test"
 meaning = "progress"
 kind = "total"
 counts = "retest_beaten"
@@ -142,11 +363,27 @@ tiers = [
   { at = 20, metal = "prismatic", xp = 2500, size = "legend" },
 ]
 
+[badge.the_upgrade]
+name = "The Upgrade"
+meaning = "progress"
+kind = "best_value"
+counts = "lift_gain"
+caption = "Your most improved lift is {n}% stronger than its first session, at the same effort."
+free = false
+origin = "new"
+tiers = [
+  { at = 10, metal = "bronze", xp = 200, size = "highlight" },
+  { at = 20, metal = "silver", xp = 400, size = "highlight" },
+  { at = 30, metal = "emerald", xp = 800, size = "milestone" },
+  { at = 50, metal = "amethyst", xp = 1500, size = "milestone" },
+  { at = 75, metal = "prismatic", xp = 2500, size = "legend" },
+]
+
 
 # ── Resilience ────────────────────────────────────────────────────────────────────────────────────────────────────
 
 [badge.bounce_back]
-name = "Bounce Back"
+name = "Second Serve"
 meaning = "resilience"
 kind = "total"
 counts = "bounce_back"
@@ -156,9 +393,26 @@ origin = "new"
 tiers = [
   { at = 1, metal = "bronze", xp = 150, size = "highlight" },
   { at = 3, metal = "silver", xp = 300, size = "highlight" },
-  { at = 5, metal = "emerald", xp = 600, size = "milestone" },
+  { at = 5, metal = "emerald", xp = 600, size = "milestone", title = "second_wind" },
   { at = 10, metal = "amethyst", xp = 1200, size = "milestone" },
   { at = 20, metal = "prismatic", xp = 2500, size = "legend" },
+]
+
+# Widens Proof's HARD TO KILL (hard_to_kill, further down) from the switch: comebacks that stuck from habits
+# (comeback_stuck) AND from training (training_return). Proof's two tiers, then a third at 10.
+[badge.comebacks]
+name = "HARD TO KILL"
+meaning = "resilience"
+kind = "total"
+counts = ["comeback_stuck", "training_return"]
+caption = "{n} comebacks that stuck, from habits or from training."
+free = true
+origin = "new"
+starts_at = "switch"
+tiers = [
+  { at = 3, metal = "bronze", xp = 300, size = "highlight" },
+  { at = 5, metal = "silver", xp = 600, size = "milestone" },
+  { at = 10, metal = "emerald", xp = 1200, size = "milestone" },
 ]
 
 
@@ -188,6 +442,7 @@ tiers = [
 
 # CONSISTENCY_TIERS: one ladder per habit, judged on the best run ever. mult multiplies THAT habit's own daily value
 # (XP_SYSTEM.md §4), so the same tier pays more on a heavy habit and less on a light one.
+# Four Majors (2026-10-17): retires at the switch (phase 3); one behaviour, one badge: each habit's ladder lives on its own badge (habit_water to habit_custom). Anyone who has it keeps it.
 [badge.habit_tiers]
 name = "Consistency Tiers"
 meaning = "consistency"
@@ -197,6 +452,9 @@ caption = "{n} days in a row on one habit."
 free = true
 origin = "proof"
 proof_id = "CONSISTENCY_TIERS"
+retire_at = "switch"
+superseded_by = ["habit_water", "habit_sleep", "habit_steps", "habit_fuel", "habit_breathe", "habit_mobility",
+                 "habit_supps", "habit_custom"]
 tiers = [
   { at = 5, metal = "bronze", mult = 0.5, size = "win", tier_name = "KINDLED" },
   { at = 10, metal = "silver", mult = 1, size = "win", tier_name = "STEADY" },
@@ -254,7 +512,7 @@ tiers = [
   { at = 50, metal = "emerald", xp = 250, size = "highlight" },
 ]
 
-# proof_ in the id: Career Mode's own Clean Sweeps (weeks with every mission done) is one letter away.
+# proof_ in the id: Career Mode's own clean_sweeps (Treble: weeks with every mission done) is one letter away.
 [badge.proof_clean_sweep]
 name = "CLEAN SWEEP"
 meaning = "commitment"
@@ -270,6 +528,7 @@ tiers = [
   { at = 30, metal = "emerald", xp = 600, size = "highlight" },
 ]
 
+# Four Majors (2026-10-17): retires at the switch (phase 3); one behaviour, one badge: its habit's ladder lives on habit_water. Anyone who has it keeps it.
 [badge.human_sprinkler]
 name = "HUMAN SPRINKLER"
 meaning = "consistency"
@@ -279,12 +538,15 @@ proof_measure = "streak:water"
 caption = "{n} days in a row on full water."
 free = true
 origin = "proof"
+retire_at = "switch"
+superseded_by = "habit_water"
 tiers = [
   { at = 5, metal = "bronze", xp = 100, size = "win" },
   { at = 20, metal = "silver", xp = 250, size = "highlight" },
   { at = 60, metal = "emerald", xp = 600, size = "milestone" },
 ]
 
+# Four Majors (2026-10-17): retires at the switch (phase 3); it paid for sessions on days in a row, which means skipping a rest day; Hold Serve replaces it. Anyone who has it keeps it.
 [badge.heavy_metal]
 name = "HEAVY METAL"
 meaning = "commitment"
@@ -294,12 +556,15 @@ proof_measure = "streak:strength"
 caption = "{n} days in a row with a session."
 free = false
 origin = "proof"
+retire_at = "switch"
+superseded_by = "held_weeks"
 tiers = [
   { at = 3, metal = "bronze", xp = 120, size = "win" },
   { at = 12, metal = "silver", xp = 150, size = "highlight" },
   { at = 30, metal = "emerald", xp = 350, size = "highlight" },
 ]
 
+# Four Majors (2026-10-17): retires at the switch (phase 3); one behaviour, one badge: its habit's ladder lives on habit_steps. Anyone who has it keeps it.
 [badge.ground_covered]
 name = "GROUND COVERED"
 meaning = "consistency"
@@ -309,12 +574,15 @@ proof_measure = "daysHit:steps"
 caption = "{n} days over your step target."
 free = true
 origin = "proof"
+retire_at = "switch"
+superseded_by = "habit_steps"
 tiers = [
   { at = 7, metal = "bronze", xp = 130, size = "win" },
   { at = 30, metal = "silver", xp = 200, size = "highlight" },
   { at = 100, metal = "emerald", xp = 500, size = "milestone" },
 ]
 
+# Four Majors (2026-10-17): retires at the switch (phase 3); one behaviour, one badge: its habit's ladder lives on habit_fuel. Anyone who has it keeps it.
 [badge.fully_fuelled]
 name = "FULLY FUELLED"
 meaning = "consistency"
@@ -324,11 +592,14 @@ proof_measure = "daysHit:fuel"
 caption = "{n} days of three proper meals."
 free = true
 origin = "proof"
+retire_at = "switch"
+superseded_by = "habit_fuel"
 tiers = [
   { at = 5, metal = "bronze", xp = 110, size = "win" },
   { at = 25, metal = "silver", xp = 300, size = "highlight" },
 ]
 
+# Four Majors (2026-10-17): retires at the switch (phase 3); one behaviour, one badge: its habit's ladder lives on habit_breathe. Anyone who has it keeps it.
 [badge.zen_machine]
 name = "ZEN MACHINE"
 meaning = "consistency"
@@ -338,11 +609,14 @@ proof_measure = "streak:breathe"
 caption = "{n} breathing sessions in a row."
 free = true
 origin = "proof"
+retire_at = "switch"
+superseded_by = "habit_breathe"
 tiers = [
   { at = 10, metal = "bronze", xp = 100, size = "highlight" },
   { at = 30, metal = "silver", xp = 280, size = "highlight" },
 ]
 
+# Four Majors (2026-10-17): retires at the switch (phase 3); one behaviour, one badge: its habit's ladder lives on habit_sleep. Anyone who has it keeps it.
 [badge.blackout_artist]
 name = "BLACKOUT ARTIST"
 meaning = "consistency"
@@ -352,11 +626,14 @@ proof_measure = "streak:sleep"
 caption = "{n} nights in a row at 7.5 hours or more."
 free = true
 origin = "proof"
+retire_at = "switch"
+superseded_by = "habit_sleep"
 tiers = [
   { at = 10, metal = "bronze", xp = 150, size = "highlight" },
   { at = 30, metal = "silver", xp = 350, size = "highlight" },
 ]
 
+# Four Majors (2026-10-17): retires at the switch (phase 3); one behaviour, one badge: its habit's ladder lives on habit_mobility. Anyone who has it keeps it.
 [badge.rubber_band]
 name = "RUBBER BAND"
 meaning = "consistency"
@@ -366,11 +643,14 @@ proof_measure = "streak:mobility"
 caption = "{n}-day mobility streak."
 free = true
 origin = "proof"
+retire_at = "switch"
+superseded_by = "habit_mobility"
 tiers = [
   { at = 14, metal = "bronze", xp = 150, size = "highlight" },
   { at = 40, metal = "silver", xp = 350, size = "highlight" },
 ]
 
+# Four Majors (2026-10-17): retires at the switch (phase 3); one behaviour, one badge: its habit's ladder lives on habit_supps. Anyone who has it keeps it.
 [badge.iron_monk]
 name = "IRON MONK"
 meaning = "consistency"
@@ -380,6 +660,8 @@ proof_measure = "streak:supps"
 caption = "{n}-day supplement streak."
 free = true
 origin = "proof"
+retire_at = "switch"
+superseded_by = "habit_supps"
 tiers = [
   { at = 16, metal = "bronze", xp = 150, size = "highlight" },
   { at = 45, metal = "silver", xp = 380, size = "highlight" },
@@ -400,6 +682,7 @@ tiers = [
   { at = 21, metal = "silver", xp = 400, size = "highlight" },
 ]
 
+# Four Majors (2026-10-17): retires at the switch (phase 3); it widens to count training returns too, as comebacks. Anyone who has it keeps it.
 [badge.hard_to_kill]
 name = "HARD TO KILL"
 meaning = "resilience"
@@ -409,6 +692,8 @@ proof_measure = "comebacksStuck"
 caption = "{n} comebacks that each stuck."
 free = true
 origin = "proof"
+retire_at = "switch"
+superseded_by = "comebacks"
 tiers = [
   { at = 3, metal = "bronze", xp = 300, size = "highlight" },
   { at = 5, metal = "silver", xp = 600, size = "milestone" },

@@ -59,7 +59,7 @@ never the id.
 ```toml
 # a line starting with # is a note: the scorer ignores it
 [badge.held_weeks]          # starts the entry with the id held_weeks
-name = "Held Weeks"         # text goes in quotes
+name = "Hold Serve"         # text goes in quotes
 free = false                # true or false
 tiers = [                   # a list goes in square brackets
   { at = 4, metal = "bronze", xp = 200, size = "highlight" },
@@ -83,21 +83,32 @@ The allowed words: **meanings** `consistency` · `commitment` · `progress` · `
   (`training` · `proof` · `coach` · `server`), `pays_for` (`act` · `progress` · `nothing`), `when`, and `cap` if it has
   one.
 
-**`badges.toml`** `[badge.<id>]`: `name`, `meaning`, `kind` (`best_run` · `total` · `per_habit_best_run` · `proof`),
-`counts` (the fact or facts it reads; for `origin = "proof"`, `proof_codes` instead), `caption` (`{n}` is the number),
-`free`, `origin`, `tiers`: a list of `{ at, metal, xp, size }` in rising order, each with an optional `title`. A
-`per_habit_best_run` tier has `mult` instead of `xp`.
+**`badges.toml`** `[badge.<id>]`: `name`, `meaning`, `kind` (`best_run` · `total` · `per_habit_best_run` · `best_value` ·
+`proof`; `best_value` is the largest value its fact has reached, such as a percent), `counts` (the fact or facts it
+reads; for `origin = "proof"`, `proof_codes` instead), optional `habit` (reads only that habit's facts: one of
+`[habits.weights]`), `caption` (`{n}` is the number), `free`, `origin`, `tiers`: a list of `{ at, metal, xp, size }` in
+rising order, each with an optional `title` (a habit's ladder also has `tier_name`). A `per_habit_best_run` tier has
+`mult` instead of `xp`. For a change that takes effect at the switch (phase 3), optional:
+- `retire_at = "switch"`: earned as Proof earns it until phase 3, never after. Anyone who has it keeps it.
+- `starts_at = "switch"`: not earned before phase 3.
+- `superseded_by`: the id, or list of ids, of the entry that takes its place.
+
+That is how a design change reaches an `origin = "proof"` entry while the shadow is on: the old entry only gains
+`retire_at` and `superseded_by`, and its numbers stay Proof's (`check_career.py` still compares them).
 
 **`achievements.toml`** `[achievement.<id>]`: `name`, `meaning`, `reads` (a fact, or `proof`), `rule`, `xp`, `size`,
-`caption`, `free`, `origin`, optional `title`, `proof_code` when carried over.
+`caption`, `free`, `origin`, optional `title`, `proof_code` when carried over, and the switch keys `retire_at`,
+`starts_at` and `superseded_by` as on badges (an achievement may be superseded by a badge: THE MACHINIST by CENTURY).
 
-**`titles.toml`** `[title.<id>]`: `name`, `meaning` (one of the four, `chosen` or `season`), `from` (what earns it),
-`metal`, `origin`, optional `template = true` when the name has a blank like `<MON YYYY>`. `[skin.<id>]`: `name`,
-`from`, `origin`.
+**`titles.toml`** `[title.<id>]`: `name`, `meaning` (one of the four, `chosen`, `season`, `level` for the road's titles,
+or `all` for the Grand Slam, which the engine mints when an athlete holds a title in each of the four), `from` (what
+earns it), `metal`, `origin`, optional `template = true` when the name has a blank like `<MON YYYY>`, and `retire_at` /
+`superseded_by` as on badges. `[skin.<id>]`: `name`, `from`, `origin`.
 
 **`missions.toml`** `[mission.<id>]`: `name`, `slot`, `meaning`, `asks`, `counts` (a fact), optional `habit`, `measure`
 (`count` · `units` · `days`), `target` (a number, or `plan_days`), `picked_when`, `free`, `origin`, `proof_xp` (what
-Proof paid, kept for history). **Never an `xp` field:** a mission pays `share.mission` of the work inside it (GAME-7).
+Proof paid, kept for history), and `retire_at` / `superseded_by` as on badges. **Never an `xp` field:** a mission
+pays `share.mission` of the work inside it (GAME-7).
 
 **`quests.toml`** `[quest.<id>]`: `name`, `meaning`, `weeks` (2 to 12), `doors`, `free`, `size`, `caption`,
 `reward_badge`, optional `title`, `origin`, and `steps`, 2 to 5 of `{ name, closes_on, … }`: `closes_on = "fact"` with

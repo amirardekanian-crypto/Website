@@ -9,8 +9,15 @@
 [title.clockwork]
 name = "CLOCKWORK"
 meaning = "consistency"
-from = "Held Weeks, prismatic: 52 weeks held in a row"
+from = "Hold Serve, prismatic: 52 weeks held in a row"
 metal = "prismatic"
+origin = "new"
+
+[title.the_constant]
+name = "THE CONSTANT"
+meaning = "consistency"
+from = "The Long Count, amethyst: 100 weeks held in all"
+metal = "amethyst"
 origin = "new"
 
 [title.century]
@@ -27,6 +34,13 @@ from = "The Distance: the whole roadmap finished"
 metal = "prismatic"
 origin = "new"
 
+[title.lifer]
+name = "LIFER"
+meaning = "commitment"
+from = "Veteran, amethyst: 24 months with Amir"
+metal = "amethyst"
+origin = "new"
+
 [title.match_fit]
 name = "MATCH FIT"
 meaning = "commitment"
@@ -37,8 +51,22 @@ origin = "new"
 [title.climber]
 name = "CLIMBER"
 meaning = "progress"
-from = "Bests, emerald: 25 personal bests"
+from = "Record Breaker, emerald: 25 personal bests"
 metal = "emerald"
+origin = "new"
+
+[title.proven]
+name = "PROVEN"
+meaning = "progress"
+from = "the event The Proving Ground"
+metal = "prismatic"
+origin = "new"
+
+[title.new_engine]
+name = "NEW ENGINE"
+meaning = "progress"
+from = "Double Up: a lift twice as strong as its first session"
+metal = "prismatic"
 origin = "new"
 
 [title.returned]
@@ -46,6 +74,22 @@ name = "RETURNED"
 meaning = "resilience"
 from = "the quest Return to Court"
 metal = "amethyst"
+origin = "new"
+
+[title.second_wind]
+name = "SECOND WIND"
+meaning = "resilience"
+from = "Second Serve, emerald: five times a broken week was followed by a held one"
+metal = "emerald"
+origin = "new"
+
+# The Grand Slam is the capstone (CAREER_MODE.md → The Grand Slam). The engine mints it when an athlete holds a title in
+# each of the four meanings, so no badge, achievement or quest names it; its meaning "all" is how the checker knows.
+[title.grand_slam]
+name = "GRAND SLAM"
+meaning = "all"
+from = "one title from each of the four meanings; level titles don't count (PROCEDURES.md → P5)"
+metal = "prismatic"
 origin = "new"
 
 [title.amirs_pick]

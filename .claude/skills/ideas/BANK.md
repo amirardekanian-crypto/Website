@@ -126,8 +126,12 @@ Love Hold, All-Court, Paper Trail, Free Kilos, Beat the Test, Closer, Record Bre
 Pulse Check, Love Hold, Veteran, The Upgrade, Flawless, Full Stack, By the Book, All-Court, Double Up, All the Way Back,
 The Proving Ground); free athletes see the Progress shelf locked, as the pitch; coach.html shows each athlete's four
 numbers ("the shape").
-Status: **pitched**, 7 picks waiting. Nothing in `career/` changed; on his word the picks go into the `.toml` files and
-`CAREER_MODE.md`, then `python scripts/check_career.py`.
+Status: **picked** 2026-10-17. Amir: *"go with your picks, just remember that we need to show the client a visible
+progress and immediate feedback every time a meaningfull task is completed"*, which became rule GAME-13 (instant
+feedback, `PROCEDURES.md` → P17). In the repo: d2757b1 (the decisions, each meaning in full, GAME-13, P17, the
+`[feedback]` lines) and the catalogue commit after it (38 badges, 22 achievements, 29 titles; The Upgrade tops at +75%
+and Double Up earns NEW ENGINE; custom habits get HOUSE RULES; every change to a Proof entry waits for the switch,
+`retire_at` / `starts_at = "switch"`, so phase 1's shadow still matches `hab_xp()`).
 
 ## Grown out of deep-dives
 

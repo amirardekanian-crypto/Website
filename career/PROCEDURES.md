@@ -203,7 +203,7 @@ mission if one is set.
 1. If Amir paused missions for this athlete, stop.
 2. **The plan slot** (coached athletes only), first match wins:
    1. a retest is due this week → *Test Day*;
-   2. last week was broken (`week_broken`) → *Bounce Back*, the same job paid as resilience;
+   2. last week was broken (`week_broken`) → *Second Serve*, the same job paid as resilience;
    3. last week had sessions with sets left unlogged → *Every Set Counts*;
    4. last week had a check-in skipped → *Check In First*;
    5. otherwise → *Hold Your Week*.
@@ -229,7 +229,7 @@ mission if one is set.
 2. Reaching the target writes `mission_done` (dated today, paying the frozen XP).
 3. The third `mission_done` of a week writes `mission_sweep` (paying `share.mission_sweep`).
 4. Missions are never claimed. On Sunday night an unfinished mission simply ends.
-5. A week with a sweep extends the athlete's Clean Sweeps run (a badge, P5).
+5. A week with a sweep extends the athlete's Treble run (a badge, P5).
 
 ### P6c. The crew mission
 

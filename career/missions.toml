@@ -17,7 +17,7 @@ asks = "Every session of your plan this week, on any days. Its progress shows th
 counts = "week_held"
 measure = "count"
 target = 1
-picked_when = "The default, when nothing else applies. After a broken week, Bounce Back is picked instead."
+picked_when = "The default, when nothing else applies. After a broken week, Second Serve is picked instead."
 free = false
 origin = "new"
 
@@ -58,7 +58,7 @@ free = false
 origin = "new"
 
 [mission.bounce_back]
-name = "Bounce Back"
+name = "Second Serve"
 slot = "plan"
 meaning = "resilience"
 asks = "Last week got away from you. Hold this one: every session of your plan, on any days."
