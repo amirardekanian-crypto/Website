@@ -214,6 +214,12 @@ h1,h2,h3{text-transform:uppercase;letter-spacing:.01em}
 .card h2,.card h3{font-size:25px;line-height:1.1}
 .art p.lead::first-letter{float:left;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:3.6em;line-height:.82;color:var(--clay);margin:.06em .12em 0 0}"""
 
+# In Vazirmatn a middle dot "·" is the Persian zero «۰»: «اردکانیان · ۶ دقیقه» reads «۶۰ دقیقه». So a Farsi page joins a line's
+# items with a short drawn bar, the course app's SEP (FARSI-PRODUCTS.md → The course app's look); English keeps " · ".
+CSS_FA = """
+.sep{display:inline-block;width:1px;height:.85em;margin:0 .6em;vertical-align:-.1em;background:currentColor;opacity:.35}"""
+SEP_FA = '<span class="sep" aria-hidden="true"></span>'
+
 
 # ── helpers ───────────────────────────────────────────────────────────────
 
@@ -253,6 +259,10 @@ def date_label(ym, lang):
         return ''
     y, mo = ym
     return f'{MONTHS_FA[mo - 1]} {y}'.translate(FA_DIGITS) if lang == 'fa' else f'{MONTHS[mo - 1]} {y}'
+
+
+def meta_sep(lang):
+    return SEP_FA if lang == 'fa' else ' · '
 
 
 def read_label(minutes, lang):
@@ -414,7 +424,7 @@ def page(lang, *, title, description, path, alternates, jsonld, body, og_type):
     toggle = alt.get(other) or L[other]['home']
     hreflang = ''.join(f'<link rel="alternate" hreflang="{k}" href="{SITE}{v}">\n' for k, v in alternates) \
         if other in alt else ''
-    css = CSS.replace('__BODY__', c['body_font']).replace('__HEAD__', c['head_font']) + (CSS_EN if lang == 'en' else '')
+    css = CSS.replace('__BODY__', c['body_font']).replace('__HEAD__', c['head_font']) + (CSS_EN if lang == 'en' else CSS_FA)
     return f"""<!DOCTYPE html>
 <html lang="{lang}" dir="{c['dir']}">
 <head>
@@ -460,7 +470,7 @@ def page(lang, *, title, description, path, alternates, jsonld, body, og_type):
 def card_html(lang, art, heading):
     doc = art[lang]
     desc = str(doc.get('description') or '').strip() or summary(doc)
-    meta = ' · '.join(filter(None, [read_label(art['en'].get('readMins'), lang), date_label(art['date'], lang)]))
+    meta = meta_sep(lang).join(filter(None, [read_label(art['en'].get('readMins'), lang), date_label(art['date'], lang)]))
     return (f'<a class="card" href="/{lang}/articles/{art["slug"]}.html">'
             f'<span class="chip">{esc(CATEGORIES[art["cat"]][lang])}</span>'
             f'<{heading}>{esc(doc["title"])}</{heading}><p>{esc(desc)}</p><div class="m">{meta}</div></a>')
@@ -485,7 +495,7 @@ def article_page(lang, art, arts):
     description = explicit or summary(doc)
     title = str(doc.get('seoTitle') or '').strip() or f'{doc["title"]} | {c["author"]}'
     ym = art['date']
-    meta = ' · '.join(filter(None, [read_label(art['en'].get('readMins'), lang), date_label(ym, lang)]))
+    meta = meta_sep(lang).join(filter(None, [read_label(art['en'].get('readMins'), lang), date_label(ym, lang)]))
 
     post = {
         '@type': 'BlogPosting', '@id': SITE + path + '#article',
@@ -512,7 +522,7 @@ def article_page(lang, art, arts):
     body = f"""<header class="hero"><div class="wrap narrow">
 <nav class="crumbs" aria-label="{esc(c['crumbs_label'])}"><a href="{c['home']}">{esc(c['nav_home'])}</a><span aria-hidden="true">/</span><a href="{c['articles']}">{esc(c['nav_articles'])}</a><span aria-hidden="true">/</span><span>{esc(cat)}</span></nav>
 <h1>{esc(doc['title'])}</h1>
-{dek}<p class="meta"><b>{esc(c['author'])}</b> · {meta}</p>
+{dek}<p class="meta"><b>{esc(c['author'])}</b>{meta_sep(lang)}{meta}</p>
 </div></header>
 <main class="wrap narrow">
 <a class="card-link" href="/program.html?article={quote(slug)}"><span class="ic" aria-hidden="true">📲</span><span><b>{esc(c['app_title'])}</b><small>{esc(c['app_sub'])}</small></span><span class="go">{esc(c['open'])}</span></a>
