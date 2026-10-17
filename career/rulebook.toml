@@ -3,26 +3,39 @@
 # Every number the scorer uses. Change a number, run `python scripts/check_career.py`, and (once built) re-seed:
 # every athlete's XP and level are worked out again from their facts, and nothing already minted is taken back (GAME-1).
 #
-# First draft, 2026-10-17. The numbers are here so the shape is visible: after the switch (WORKOUT's habit at 0, the
-# session fact paying instead) a perfect week on a 3-day plan is about 3,900 XP and training is 46% of it (today 15-19%,
-# decision 4). Tune freely.
+# First draft, 2026-10-17. The numbers are here so the shape is visible: once the XP switch is on (WORKOUT's habit at 0
+# a day, the session fact paying instead) a perfect week on a 3-day plan is about 3,900 XP and training is 46% of it
+# (before it, 15-19%; decision 4). Tune freely.
 #
 # How the server uses this file (phase 1, 2026-10-17): scripts/career_seed.py turns it into the career_rules row and
 # the other files into career_catalogue rows. Run `python scripts/check_career.py` first; the seed refuses a file with
-# an error.
+# an error. Version 2 (phase 2, 2026-10-17): phase 1's one shadow gate became the two switches below.
 
-version = 1
+version = 2
 meanings = ["consistency", "commitment", "progress", "resilience"]
 
-[shadow]
-# Phase 1 (PROCEDURES.md → P14): Career Mode runs beside AA Proof and must score habits exactly as Proof does, so the
-# two can be compared to the point. While `on` is true:
-#   · scripts/check_career.py checks every habit number below against Proof's own (supabase/xp_rules_snapshot.json),
-#   · the WORKOUT habit keeps Proof's weight (strength = 100, in [habits.weights]),
-#   · a closed habit day does not settle (P1 step 4): Career Mode follows the log the way Proof does.
-# At the switch (phase 2) it becomes false, strength drops to 0 (the session fact pays instead, decision 4) and closed
-# days settle. Nothing an athlete sees reads Career Mode while it is on.
-on = true
+[switch]
+# Career Mode's two switches (Amir, 2026-10-17: "go with your picks"; CAREER_MODE.md → The decisions, round 3). Each is
+# "off" until a seed turns it on with the day it happens ("YYYY-MM-DD", never a day still to come), and once on it is never
+# turned back off: the seed refuses that, because the level would go back with it (scripts/career/rollback_stage68.sql is
+# the way back, on Amir's word only).
+#
+# xp, phase 2 (PROCEDURES.md → P14): while it is off, Career Mode runs in shadow beside AA Proof and scores habits exactly as
+# Proof does, so the two can be compared to the point (career_compare()); nothing an athlete sees reads it. When it is on:
+#   · AA Proof's level, rank, XP and board, and the training app's strip, read get_profile(): one scorer (GAME-2);
+#   · training earns XP (the [fact.*] blocks below), and the locked habits ([habits] locked: WORKOUT) pay 0 a day, because
+#     the session fact pays instead (decision 4): a session is never paid twice. The habit stays on the day's list for the
+#     day streak, and its weight still counts in the day gate and its tiers until the catalogue switch;
+#   · a closed habit day settles (P1 step 4: [habits] backfill_days);
+#   · the level is the career level: it never resets (decision 1), the board ranks season points ([season]), and nobody's
+#     level goes down ([fact.level_kept]).
+# The seed that turns it on writes the levels kept and returns every athlete's line; `--dry-run` shows that list first.
+xp = "off"
+#
+# catalogue, phase 3: the entries gated on it in badges.toml and achievements.toml (retire_at / starts_at = "catalogue")
+# take effect: one badge per habit, HEAVY METAL and THE MACHINIST retire, the training badges and the awards join. It
+# needs the XP switch on first.
+catalogue = "off"
 
 [level]
 # The cost of level n to n+1 is base × n^growth, rounded to 10 (Proof's curve today, XP_SYSTEM.md §2).
@@ -39,7 +52,8 @@ resets = false            # decision 1: the level is the career and never resets
 
 [season]
 board = "season points"   # the board ranks the XP earned inside the current season
-title_points = 2000       # season points that earn the season's title (Proof used "level 5 inside the season", 1,930 XP)
+title_points = 2000       # season points that earn the season's title once the XP switch is on (hab_close_season(); until
+                          # then Proof's own rule, "level 5 inside the season", 1,930 XP)
 starts_only_on = "Amir's word, with start_season()"
 
 [week]
@@ -63,13 +77,15 @@ comeback_stick = 7        # days held after a comeback for it to count as one th
 qualify_pct = 80          # a day is on target at this % of the weight it could have earned (dayQualifies())...
 one_miss_door = true      # ...or with at most one thing left undone: the second door (Proof's gateV2)
 locked = ["strength"]     # habits nobody ticks by hand (WORKOUT: only a finished session ticks it); one not earned that
-                          # day leaves the day gate instead of counting against it (Proof's unearnable)
+                          # day leaves the day gate instead of counting against it (Proof's unearnable). Once the XP
+                          # switch is on a locked habit pays 0 a day: its session pays
 backfill_days = 3         # today and this many days back are open on Proof's log (BACKFILL_DAYS); an older day is
-                          # closed, and settles once the shadow ends (P1 step 4)
+                          # closed, and settles once the XP switch is on (P1 step 4)
 
 [habits.weights]
-strength = 100            # the WORKOUT habit, as Proof pays it today. It drops to 0 at the switch, when the session
-                          # fact pays instead (decision 4); it stays 100 until then so the shadow matches Proof ([shadow])
+strength = 100            # the WORKOUT habit, as Proof pays it. Once the XP switch is on it pays 0 a day, because the
+                          # session fact pays instead (decision 4): every habit in [habits] locked does (career_paid_rules()).
+                          # The 100 stays here, Proof's own number: the day gate and the habit's tiers still read it
 steps = 60
 sleep = 50
 fuel = 40
@@ -180,6 +196,15 @@ xp = 0
 source = "proof"
 pays_for = "act"
 when = "Proof's WORKOUT habit is ticked by a finished session. It keeps the day streak whole; the session fact pays."
+
+[fact.level_kept]
+meaning = "carried"
+xp_from = "value"
+career_only = true
+source = "server"
+pays_for = "act"
+when = "Once, at the XP switch: an athlete whose career level would be below the highest level they reached in AA Proof keeps it (decision 2, 2026-10-17: nobody's level goes down). The fact holds the XP that brings them to the start of that level, worked out that day and never again, and it counts toward the career only, never a season's points or a week's."
+cap = "One per athlete, ever (ref xp-switch)."
 
 [fact.habit_day]
 meaning = "consistency"

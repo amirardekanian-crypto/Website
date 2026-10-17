@@ -2,7 +2,7 @@
 #
 # An achievement is a moment reached once. It never repeats (a moment that comes back in steps is a badge).
 # Names, XP and sizes are drafts (2026-10-17): change them freely; never change an id.
-# The switch keys (retire_at, starts_at, superseded_by) work as in badges.toml; an achievement may be superseded by a badge.
+# The catalogue switch keys (retire_at, starts_at, superseded_by) work as in badges.toml; an achievement may be superseded by a badge.
 
 
 # ── Consistency ───────────────────────────────────────────────────────────────────────────────────────────────────
@@ -197,7 +197,7 @@ caption = "Your first session on the board"
 free = false
 origin = "proof"
 
-# Four Majors (2026-10-17): retires at the switch (phase 3); CENTURY counts the same sessions. Anyone who has it keeps it.
+# Four Majors (2026-10-17): retires at the catalogue switch (phase 3); CENTURY counts the same sessions. Anyone who has it keeps it.
 [achievement.the_machinist]
 name = "THE MACHINIST"
 meaning = "commitment"
@@ -211,7 +211,7 @@ size = "milestone"
 caption = "150 sessions. A year of turning up."
 free = false
 origin = "proof"
-retire_at = "switch"
+retire_at = "catalogue"
 superseded_by = "century"
 
 [achievement.the_centurion]

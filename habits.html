@@ -2535,6 +2535,7 @@ const HABITS = [
   // habits it now carries the coaching detail the name has no room for.
   { id:'strength', core:true, name:'🏋 Finish your session', short:'Session', code:'WO', kind:'check', target:1,     unit:'session', goal:'45 min · from your programme',   source:'From your programme', locked:true,
     lockedHint:'Finish any session in your programme and this ticks itself.',
+    careerHint:'Finish a session in your programme and this ticks itself. The session pays the XP. This keeps your day streak.',
     freeHint:'Coached athletes earn this from their programme. It is the biggest habit on the list.' },
   { id:'steps', core:true,    name:'🚶 Walk 10,000 steps', short:'Steps',   code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
   { id:'sleep', core:true,    name:'🛏 Sleep 7.5+ hours', short:'Sleep',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
@@ -2731,10 +2732,11 @@ function questProgress(q, run) {
     const k = fmtKey(addDays(start, i));
     if (k > endK) break;                         // a later run has taken over — see runEndKey()
     if (k > TKEY()) break;                       // the future has not happened
-    // Season-bounded like everything else that pays: a run straddling the season
+    // Bounded like everything else that pays: a run straddling the season
     // opening must not count the days before it, or the server (which never sees
-    // them) would score the same quest differently.
-    if (!inSeason(k)) continue;
+    // them) would score the same quest differently. In Career Mode there is no
+    // season in the career's count (scoreStart()), on the server either.
+    if (!inScore(k)) continue;
     if (kind === 'daysHit') { if (h && isDone(h, k)) have++; }
     else if (kind === 'total') { have += valOf(k, hid); }
     else if (kind === 'qualify') { if (dayQualifies(k)) have++; }
@@ -3092,10 +3094,11 @@ function rankNameOf(label) {
   const s = String(label || '').toUpperCase();
   return RANKS.find(n => s.indexOf(n) !== -1) || RANKS[0];
 }
-// Total XP needed to arrive at a given overall level.
+// Total XP needed to arrive at a given overall level (on the career's curve in Career Mode: overallBase()).
 function cumXpTo(level) {
   let s = 0;
-  for (let n = 1; n < level; n++) s += levelCost(XP_RULES.base, n);
+  const base = overallBase(), growth = overallGrowth();
+  for (let n = 1; n < level; n++) s += levelCost(base, n, growth);
   return s;
 }
 const SUBS_PER_RANK = 5;
@@ -3532,6 +3535,18 @@ const K_CFG  = () => ATHLETE_ID + '_hab_cfg';
 const K_LOG  = () => ATHLETE_ID + '_hab_log';
 const K_META = () => ATHLETE_ID + '_hab_meta';
 
+// ── CAREER MODE (phase 2, the XP switch; career/CAREER_MODE.md, Amir 2026-10-17) ──
+// Once the server's XP switch is on, the OVERALL level, rank and XP are the career's: get_profile() works
+// them out from every fact (the habits, the training, the level kept at the switch) and they never reset;
+// a season resets only the board's points. CAREER holds the last answer: { p: the profile, at: when it came,
+// base: what this phone's own scorer counted for the log that answer rests on }. A tick shows its XP at once,
+// the profile's XP plus whatever this phone's scorer moved since (P13), and the server's next answer takes
+// over. Until the switch CAREER is either null or says the switch is off, and nothing here changes a number.
+// The copy on this phone lives under <id>_hab_career, NEVER in CFG: CFG syncs newest-wins, and a newer
+// phone would adopt a stale profile. The training app reads and writes the same key (one copy per phone).
+let CAREER = null, _pushedXp = null, _careerBusy = false, _careerAgain = false, _careerTimer = null;
+const K_CAREER = () => ATHLETE_ID + '_hab_career';
+
 // ── BODY WEIGHT ───────────────────────────────────────────────────────────
 // Its OWN payload key, deliberately — not a habit, not a field on CFG, and
 // never inside LOG. Three reasons, each of which is a real bug avoided:
@@ -3620,6 +3635,9 @@ function defaultCfg() {
            pass:{ owned:[], title:null, card:null },
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null, seenStreak:null,
            seenComeback:null, seenSeasons:null,
+           // careerSeen: the day of the XP switch whose reveal ("Your career: level N") this athlete has
+           // had, on any phone (kept through the cloud merge like `seen`). See checkLevelUps().
+           careerSeen:null,
            questPool:null, questRuns:null, seasons:null, seasonNames:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0,
            // Everyone is on the board (2026-09-12) — see autoJoinBoard().
@@ -4574,6 +4592,9 @@ async function pushNow() {
     const payload = {};
     payload[K_CFG()] = JSON.stringify(CFG || {});
     payload[K_LOG()] = JSON.stringify(LOG || {});
+    // What this phone's scorer counts for exactly this log: once the push lands, the server's facts rest on it,
+    // so the next profile's XP lines up against it (careerXp()). Career Mode only.
+    const sentXp = careerOn() ? phoneXp() : null;
     // A third key alongside the other two. save_progress merges the payload into
     // the stored blob at the TOP LEVEL (data || excluded.data, stage1) and
     // whitelists nothing, so this needed no migration — and the coach dashboard
@@ -4595,6 +4616,8 @@ async function pushNow() {
     if (_writeGen === sentGen) { SYNC.dirty = false; _dirtyDays.clear(); clearTimeout(_retryTimer); }
     else { clearTimeout(_pushTimer); _pushTimer = setTimeout(pushNow, 1200); }
     okay = true;
+    // The server has just turned this log into facts: ask for the career it now adds up to.
+    if (sentXp != null && careerOn()) { _pushedXp = sentXp; fetchCareerSoon(); }
   } catch (e) {
     SYNC.lastErr = String((e && e.message) || e);
     SYNC.attempts++;
@@ -4669,12 +4692,14 @@ async function syncFromCloud() {
       if (cloudCfg && !SYNC.dirty && (cloudCfg.updatedAt || 0) > (CFG.updatedAt || 0)) {
         const keepSeen = CFG.seen, keepSig = CFG.rulesSig;
         const keepTiers = CFG.seenTiers, keepAch = CFG.seenAch, keepPerfect = CFG.seenPerfect;
-        const keepQuests = CFG.seenQuests, keepSeasons = CFG.seenSeasons;
+        const keepQuests = CFG.seenQuests, keepSeasons = CFG.seenSeasons, keepCareer = CFG.careerSeen;
         const keepPass = CFG.pass || {};
         CFG = Object.assign(defaultCfg(), cloudCfg);
         CFG.on = Object.assign(defaultCfg().on, cloudCfg.on || {});
         if (!CFG.seen) CFG.seen = keepSeen;
         if (!CFG.rulesSig) CFG.rulesSig = keepSig;
+        // The career reveal, once per athlete: a phone that has shown it keeps that, whichever config is newer.
+        if (!CFG.careerSeen) CFG.careerSeen = keepCareer || null;
         // Same reasoning as `seen`: a cloud row written before this build has no
         // unlock baseline, and inheriting nothing would replay every badge the
         // athlete already owns as a fresh takeover.
@@ -4744,6 +4769,8 @@ async function pullFresh() {
   checkLevelUps();
   render();
   refreshSyncBadge();
+  // And the career it now adds up to (a session finished in the training app since, the XP switch itself).
+  fetchCareer();
 }
 
 // ── Derived stats, all from real history ──────────────────────────────────
@@ -4909,7 +4936,8 @@ let _cbCache = { all: null, season: null };
 function comebackRuns(all) {
   const key = all ? 'all' : 'season';
   if (_cbCache[key]) return _cbCache[key];
-  const days = all ? loggedDays() : seasonDays();
+  // The ledger's walk is the scorer's window: the season, or in Career Mode the whole career (scoreDays()).
+  const days = all ? loggedDays() : scoreDays();
   const out = [];
   if (!days.length) { _cbCache[key] = out; return out; }
   // From the first day they logged, never earlier: days before an athlete
@@ -4964,6 +4992,11 @@ function xpFor(h, v) {
   const base = baseXp(h);
   return Math.round(v >= h.target ? base * XP_RULES.completionBonus : base * (v / h.target));
 }
+// What a value pays toward the OVERALL score. Once the XP switch is on, a locked habit (WORKOUT, which only a
+// finished session ticks) pays 0 a day: the session pays instead, in Career Mode, so it is never paid twice
+// (career_paid_rules() on the server, a twin: scripts/check_twins.js). Its own ladder still counts it
+// (habitXp()), and its weight still counts in the day gate and its tiers until the catalogue switch.
+function paidXp(h, v) { return careerOn() && h.locked ? 0 : xpFor(h, v); }
 // ── Seasons ───────────────────────────────────────────────────────────────
 // Scores run in seasons, like ranked play. Days before the season started stay
 // in the athlete's history — visible in the grid, still counting toward streaks
@@ -4973,6 +5006,63 @@ function seasonStart() { return (CFG.season && CFG.season.startsOn) || XP_RULES.
 function seasonName()  { return (CFG.season && CFG.season.name)     || XP_RULES.seasonName; }
 function inSeason(dayKey) { return dayKey >= seasonStart(); }   // ISO dates compare as strings
 function seasonDays() { return loggedDays().filter(inSeason); }
+// Where this phone's scorer starts counting. Until the XP switch: the season's first day, as it always has.
+// Once the switch is on (Career Mode), the whole career: the level never resets, a badge pays once ever,
+// and this phone then counts the habit half exactly as the server does (career_compute(): hab_xp() and
+// hab_bonus_xp() with no season), which is what lets a tick show its XP before the server answers (P13).
+// The season itself still decides the board, the season record and the season's stats.
+function scoreStart() { return careerOn() ? '' : seasonStart(); }
+function inScore(dayKey) { return dayKey >= scoreStart(); }
+function scoreDays() { return careerOn() ? loggedDays() : seasonDays(); }
+
+// ── Career Mode: the profile, on this phone ───────────────────────────────
+// careerOn(): the server says the XP switch is on (a real answer, kept on this phone). Never in the demo.
+function careerOn() {
+  return !window.IS_DEMO && !!(CAREER && CAREER.p && CAREER.p.ready && CAREER.p.switch && CAREER.p.switch.xp);
+}
+function loadCareer() {
+  CAREER = null;
+  if (window.IS_DEMO || !ATHLETE_ID) return;
+  try {
+    const c = JSON.parse(localStorage.getItem(K_CAREER()) || 'null');
+    if (c && c.p && c.p.athlete_id === ATHLETE_ID && typeof c.base === 'number') CAREER = c;
+  } catch (e) { /* a broken copy is no copy */ }
+}
+function saveCareer() {
+  // The coach's preview reads the athlete's career and keeps it in memory only: it must not write.
+  if (window.IS_PREVIEW || window.IS_DEMO || !CAREER) return;
+  try { localStorage.setItem(K_CAREER(), JSON.stringify(CAREER)); } catch (e) { /* full: memory still has it */ }
+}
+// Asks the server for the athlete's profile and keeps it. The XP it carries rests on the log the server last
+// received: with nothing waiting to go up that is the log as it stands (another phone's newer push only makes
+// the server's number bigger, and right); with an edit still waiting it is the last push from this session
+// (_pushedXp, this phone's count for that log), and that push's own answer follows (pushNow()).
+// Returns true when the answer changed what this phone shows.
+async function fetchCareer() {
+  if (window.IS_DEMO || window.IS_EMBED || !ATHLETE_ID) return false;
+  if (_careerBusy) { _careerAgain = true; return false; }
+  _careerBusy = true;
+  let changed = false;
+  try {
+    const sb = _sb();
+    if (!sb) return false;
+    const { data, error } = await sb.rpc('get_profile', { p_athlete_id: ATHLETE_ID });
+    if (error || !data || typeof data !== 'object' || data.athlete_id !== ATHLETE_ID) return false;
+    const wasOn = careerOn(), before = careerOn() ? careerXp() + '|' + CAREER.p.switch.xp : null;
+    CAREER = { p: data, at: Date.now(), base: 0 };
+    if (careerOn() !== wasOn) { invalidateBonus(); _pushedXp = null; }   // the scorer's window just changed
+    CAREER.base = careerOn() ? ((SYNC.dirty && _pushedXp != null) ? _pushedXp : phoneXp()) : 0;
+    saveCareer();
+    changed = careerOn() !== wasOn || (careerOn() && careerXp() + '|' + CAREER.p.switch.xp !== before);
+  } catch (e) { /* offline: keep the copy */ }
+  finally {
+    _careerBusy = false;
+    if (_careerAgain) { _careerAgain = false; fetchCareerSoon(); }
+  }
+  if (changed) { checkLevelUps(); render(); }
+  return changed;
+}
+function fetchCareerSoon() { clearTimeout(_careerTimer); _careerTimer = setTimeout(fetchCareer, 400); }
 // "Days logged" for celebration copy — the same definition the Progress stat
 // grid already uses (a day with real content, not a bare empty LOG entry left
 // by a reset), so the number a takeover cites never disagrees with the number
@@ -5016,7 +5106,8 @@ async function fetchQuests() {
 
 // A habit's own XP pool for the CURRENT SEASON. Counted even when the habit is
 // currently switched off — XP you earned is never taken back mid-season.
-function habitXp(h) { return seasonDays().reduce((s, k) => s + xpFor(h, valOf(k, h.id)), 0); }
+// In Career Mode the whole career (scoreDays()): a habit's ladder never resets either.
+function habitXp(h) { return scoreDays().reduce((s, k) => s + xpFor(h, valOf(k, h.id)), 0); }
 // ── What the badges pay ───────────────────────────────────────────────────
 // Consistency tiers and milestones are worth real points, and each is paid ON
 // THE DAY IT WAS CROSSED. Dating them is the whole trick: a bonus is then just
@@ -5042,9 +5133,11 @@ function invalidateBonus() { _bonusCache = null; _rosterCache = null; _evCache =
 // before the season could never earn tier points again, while someone who joined
 // yesterday could earn every one of them. The season resets the run for PAYMENT;
 // the badge itself is judged on the best run ever and is never given back.
+// In Career Mode the ledger is the career's (scoreDays()): a tier pays once, ever,
+// as on the server (career_compute(): hab_bonus_xp() with no season).
 function bonusEvents() {
   if (_bonusCache) return _bonusCache;
-  const days = seasonDays(), out = [];
+  const days = scoreDays(), out = [];
   if (!days.length) { _bonusCache = out; return out; }
   const hs = allHabits();
 
@@ -5148,19 +5241,43 @@ function bonusXpBetween(fromDate, toDate) {
     return (d < fromDate || d > toDate) ? s : s + e.xp;
   }, 0);
 }
-function overallXp() { return allHabits().reduce((s, h) => s + habitXp(h), 0) + bonusXp(); }
+// This phone's own count of the overall score: what every habit paid (paidXp()) plus the badges, over the
+// scorer's window. Until the XP switch it IS the overall XP. In Career Mode it is the habit half of the career,
+// the server's own count of the same log, and only its movement is shown (careerXp()).
+function phoneXp() {
+  const days = scoreDays();
+  return allHabits().reduce((s, h) => s + days.reduce((t, k) => t + paidXp(h, valOf(k, h.id)), 0), 0) + bonusXp();
+}
+// The career's XP as the athlete sees it: the server's (get_profile(): habits, training, the level kept) plus
+// what this phone has counted since that answer (a tick shows at once, P13). Never below zero.
+function careerXp() {
+  return Math.max(0, (Number(CAREER.p.career && CAREER.p.career.xp) || 0) + phoneXp() - (CAREER.base || 0));
+}
+function overallXp() { return careerOn() ? careerXp() : phoneXp(); }
 // What a single day actually paid, badges included — the perfect-day takeover
 // quotes it, so it has to match what the athlete's total just moved by.
 function dayXp(dayKey) {
-  if (!inSeason(dayKey)) return 0;
+  if (!inScore(dayKey)) return 0;
   const d = parseKey(dayKey);
-  return allHabits().reduce((s, h) => s + xpFor(h, valOf(dayKey, h.id)), 0) + bonusXpBetween(d, d);
+  return allHabits().reduce((s, h) => s + paidXp(h, valOf(dayKey, h.id)), 0) + bonusXpBetween(d, d);
 }
 // Habit ladders reuse the curve, scaled to that habit's daily value, so every
 // habit levels at the same RATE — which is what makes your level in a habit
 // track how often you actually do it.
 function baseFor(h) { return h ? Math.max(10, Math.round(baseXp(h) * XP_RULES.completionBonus)) : XP_RULES.base; }
-function levelCost(base, n) { return Math.max(10, Math.round(base * Math.pow(n, XP_RULES.growth) / 10) * 10); }
+function levelCost(base, n, growth) {
+  return Math.max(10, Math.round(base * Math.pow(n, growth == null ? XP_RULES.growth : growth) / 10) * 10);
+}
+// The overall curve: Proof's (XP_RULES) until the XP switch, then the career's, as the profile carries it
+// (rulebook.toml [level]; the server's career_level(), a twin: scripts/check_twins.js).
+function overallBase() {
+  const b = careerOn() && CAREER.p.rules && CAREER.p.rules.level ? Number(CAREER.p.rules.level.base) : 0;
+  return b > 0 ? b : XP_RULES.base;
+}
+function overallGrowth() {
+  const g = careerOn() && CAREER.p.rules && CAREER.p.rules.level ? Number(CAREER.p.rules.level.growth) : NaN;
+  return g > 0 ? g : XP_RULES.growth;
+}
 
 function rankFor(level) {
   const i = Math.max(0, level - 1);
@@ -5170,10 +5287,10 @@ function rankFor(level) {
   const sub = (within % SUBS_PER_RANK) + 1;
   return { star, name, sub, label: (star ? '★' + star + ' ' : '') + name + ' ' + sub };
 }
-function levelInfo(xp, base) {
+function levelInfo(xp, base, growth) {
   base = base || XP_RULES.base;
-  let lv = 1, spent = 0, cost = levelCost(base, 1);
-  while (lv < MAX_LEVEL_SCAN && xp - spent >= cost) { spent += cost; lv++; cost = levelCost(base, lv); }
+  let lv = 1, spent = 0, cost = levelCost(base, 1, growth);
+  while (lv < MAX_LEVEL_SCAN && xp - spent >= cost) { spent += cost; lv++; cost = levelCost(base, lv, growth); }
   const into = xp - spent, r = rankFor(lv);
   return {
     lv, xp, into, need: cost, toNext: cost - into,
@@ -5182,19 +5299,25 @@ function levelInfo(xp, base) {
     nextLabel: (cost - into) + ' XP to level ' + (lv + 1)
   };
 }
-function overallLevel() { return levelInfo(overallXp(), XP_RULES.base); }
+function overallLevel() { return levelInfo(overallXp(), overallBase(), overallGrowth()); }
 function habitLevel(h) { return levelInfo(habitXp(h), baseFor(h)); }
 
 // XP earned inside a date window — powers the weekly recap. Season-gated too,
 // so the first week of a season never shows points carried in from before it.
 function xpBetween(fromDate, toDate) {
   let sum = 0;
-  seasonDays().forEach(k => {
+  scoreDays().forEach(k => {
     const d = parseKey(k);
     if (d < fromDate || d > toDate) return;
-    allHabits().forEach(h => { sum += xpFor(h, valOf(k, h.id)); });
+    allHabits().forEach(h => { sum += paidXp(h, valOf(k, h.id)); });
   });
   return sum + bonusXpBetween(fromDate, toDate);
+}
+// The rolling week's XP as Progress shows it. In Career Mode it is the server's week (habits and training, the
+// weekly board's number: get_profile() → week) plus what this phone has counted since; before it, this phone's.
+function weekXpShown() {
+  if (!careerOn() || !CAREER.p.week) return xpBetween(addDays(today(), -6), today());
+  return Math.max(0, (Number(CAREER.p.week.points) || 0) + phoneXp() - (CAREER.base || 0));
 }
 
 // ── Consistency ladders ───────────────────────────────────────────────────
@@ -5436,7 +5559,12 @@ function rulesSignature() {
     // every `qualify` quest and every comeback — bump this token whenever that
     // logic changes, or athletes get a wall of celebrations for a rule change.
     'gate2', LAPSE_DAYS, COMEBACK_XP, COMEBACK_STICK,
-    seasonStart()   // a new season resets every score, so re-baseline instead of celebrating
+    // Until the XP switch a new season resets every score, so it re-baselines instead of celebrating.
+    // In Career Mode the level never resets: a season is no reason to re-baseline, but the switch itself
+    // is (the career's XP and curve replace Proof's: one reveal, never a flood of level-ups), and so is a
+    // re-seeded rulebook (its numbers move every athlete's XP).
+    careerOn() ? ['career', CAREER.p.switch.xp, overallBase(), overallGrowth(), CAREER.p.rules_version || 0]
+               : seasonStart()
   ]);
   let hash = 0;
   for (let i = 0; i < src.length; i++) hash = (hash * 31 + src.charCodeAt(i)) % 2147483647;
@@ -5475,12 +5603,33 @@ function checkLevelUps() {
   // from the training app's Home is still waiting for its moment in the full app.
   if (window.IS_EMBED) return;
   checkSeasonMoments();
+  // In Career Mode a new season moves no level (rulesSignature() leaves it out), but the athlete still hears it began.
+  if (careerOn() && CFG.seenSeason && CFG.seenSeason !== seasonStart()) {
+    CFG.seenSeason = seasonStart();
+    saveCfg();
+    toast(seasonName().toUpperCase() + ' has begun. The board starts from zero. Your level stays.');
+  }
   const sig = rulesSignature();
   if (!CFG.seen || CFG.rulesSig !== sig) {
     const rescored = !!CFG.seen && CFG.rulesSig !== sig;
-    const wasSeason = CFG.seenSeason && CFG.seenSeason !== seasonStart();
+    const wasSeason = !careerOn() && CFG.seenSeason && CFG.seenSeason !== seasonStart();
     CFG.seenSeason = seasonStart();
     seedSeenLevels();
+    // THE REVEAL (Career Mode, phase 2). The career's level replaces Proof's season level in silence, and the
+    // athlete gets ONE moment for it, never a flood of level-ups: "Your career: level N, from everything you've
+    // logged since <date>". The road's rewards it reaches go into the Locker with it, and the moment says how
+    // many. Once per athlete: CFG.careerSeen survives the cloud merge, so a second phone stays quiet. Someone
+    // who started after the switch has nothing to reveal and gets no moment.
+    if (careerOn() && CFG.careerSeen !== CAREER.p.switch.xp) {
+      const fresh = claimRewards(false);
+      CFG.careerSeen = CAREER.p.switch.xp;
+      saveCfg();
+      if (CAREER.p.since && String(CAREER.p.since) < String(CAREER.p.switch.xp)) {
+        UI.celebrate.push({ kind: 'career', id: CAREER.p.switch.xp, since: String(CAREER.p.since), rewards: fresh });
+        haptic('rank');
+      }
+      return;
+    }
     if (rescored) toast(wasSeason ? seasonName().toUpperCase() + ' has begun. Scores start from zero.'
                                   : 'XP system updated. Your levels were rescored.');
     return;
@@ -5899,7 +6048,7 @@ function toggleHabit(h) {
   // A locked habit is owned by another system — the athlete cannot claim it by
   // hand, so explain what does earn it instead of silently doing nothing. No
   // haptic and no XP flight either: nothing was earned to celebrate.
-  if (h.locked) { toast((isFree() && h.freeHint) || h.lockedHint || 'This one is earned elsewhere.'); return; }
+  if (h.locked) { toast((isFree() && h.freeHint) || (careerOn() && h.careerHint) || h.lockedHint || 'This one is earned elsewhere.'); return; }
   // A COUNTED HABIT'S CIRCLE OPENS THE LOG SHEET (Amir, 2026-10-12, the UX audit's 1A). It used to write
   // the full target in one tap (4,500 steps became 10,000, with the XP) and 0 on the next (the real
   // 4,500 gone, no undo). Now it opens the sheet with the target filled in, so a full day is still two
@@ -7453,7 +7602,11 @@ function tourSteps() {
 
   S.push({
     title: 'Your level, and the Locker',
-    body: `Everything you log pays XP. XP builds levels, levels carry ranks, ${esc(RANKS[0])} up to
+    body: careerOn()
+      ? `Everything you log pays XP${isFree() ? '' : ', and so does every session you train'}. XP builds your level, which is your career:
+           it never resets. Levels carry ranks, ${esc(RANKS[0])} up to ${esc(RANKS[RANKS.length - 1])}.
+           <strong>Tap this line</strong> for the Locker: your titles, card looks and the next rewards.`
+      : `Everything you log pays XP. XP builds levels, levels carry ranks, ${esc(RANKS[0])} up to
            ${esc(RANKS[RANKS.length - 1])}. <strong>Tap this line</strong> for the Locker: your titles, card looks and the next rewards.`,
     screen: 'today', sel: () => $t('.hero-top')
   });
@@ -7989,6 +8142,9 @@ function renderCelebration(ev) {
            are unchanged: no clean evidence stat for a per-habit rank exists
            yet, so this doesn't overreach into a claim it can't back. -->
       ${isHabit ? `<div class="lvsub">${esc(r.label)} · your ${esc(h.name.toLowerCase())} rank</div>`
+                : careerOn() ? (promoted
+                    ? `<div class="lvsub">A rank you earn is yours now. Nothing resets it, not even a new season.</div>`
+                    : `<div class="lvsub">Career level ${ev.to}. Levels are just days wearing a number, and now they never reset.</div>`)
                 : promoted ? `<div class="lvsub">A season can take the rank back. It cannot take back the ${seasonDaysLogged()} days that earned it.</div>`
                 : `<div class="lvsub">Overall level ${ev.to} · ${seasonDaysLogged()} days logged this season. Levels are just days wearing a number.</div>`}
       ${ev.rewards && ev.rewards.length ? `<div class="lvunlock">
@@ -8023,7 +8179,35 @@ function nameList(hs) {
 // A quest, a day streak from STREAK_TAKEOVER days and a reward borrow the same machinery but land
 // on the green ground, so the KIND of win is readable before a word of it is. A tier, a milestone, a
 // perfect day and a comeback have no takeover: they land on the wins card on Today (PRF-02).
+// THE REVEAL (Career Mode, phase 2; checkLevelUps()): one moment, once per athlete, the first time the app
+// opens on the career's level. The rank's own ground and crest, the level, where it comes from, and the one
+// rule that changed for them: it never resets now. The road's rewards it reached are counted, not paraded.
+function renderCareerReveal(ev) {
+  const LI = overallLevel(), r = LI.rank;
+  const since = parseKey(ev.since).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+  const trained = !!(CAREER && CAREER.p.numbers && CAREER.p.numbers.sessions_with_amir > 0);
+  const got = (ev.rewards || []).length;
+  return `
+    <div class="lvwrap rank" data-k="cel:career:${esc(String(ev.id))}" ${on(dismissCelebration)}>
+      ${confettiHtml(34)}
+      <div class="lvstage">
+        <div class="lvrays"></div>
+        <div class="lvshock"></div>
+        <div class="lvshards">${shardHtml()}</div>
+        ${coinHtml(12)}
+        <div class="lvbadge"><span class="n">${LI.lv}</span><span class="l">LEVEL</span></div>
+      </div>
+      <div class="lvkicker">Your career</div>
+      <div class="lvrank">${esc(r.label)}</div>
+      <div class="lvsub">From everything you've logged since ${esc(since)}${trained ? ', your training included' : ''}. Your level never resets now. A new season only starts the board's points again.</div>
+      ${got ? `<div class="lvunlock"><span class="lvu-k">${got === 1 ? 'A reward on the road is yours' : got + ' rewards on the road are yours'} · in your Locker</span></div>` : ''}
+      <div class="lvbar"><span style="--w:${LI.pct}%"></span></div>
+      ${lvActions('rank', { rank: { moment: 'career' } })}
+      ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
+    </div>`;
+}
 function renderBadgeCelebration(ev) {
+  if (ev.kind === 'career') return renderCareerReveal(ev);
   let badge, badgeLabel, kicker, title, sub, codeClass = '', art = null, ground = 'badge', share = 'medal', subj = null, xpLine = 0;
   if (ev.kind === 'streak') {
     // The day streak crossing a mark — the single strongest signal that somebody
@@ -8058,7 +8242,8 @@ function renderBadgeCelebration(ev) {
     const begun = rw.season && seasonName().toUpperCase() !== rw.name ? ' ' + seasonName() + ' has begun.' : '';
     sub = rw.season
       ? (rw.rec ? seasonFinishLine(rw.rec) + ' ' : '') + 'This title names the season, and nobody can earn it now.' + keep + begun
-      : isT ? rw.note + ' A rank says where you stand this season. A title says what you are.' + keep
+      : isT ? rw.note + (careerOn() ? ' A rank says how far you have come. A title says what you are.'
+                                    : ' A rank says where you stand this season. A title says what you are.') + keep
       : rw.note + ' Pick it for your card in your Locker. Yours for good.';
     // The Title card for a title, the Rank card drawn on a new skin (2026-10-17: both opened the Rank card as it was).
     share = isT ? 'title' : 'rank';
@@ -8533,7 +8718,7 @@ function weekTable(hs, off) {
   for (let i = 6; i >= 0; i--) days.push(fmtKey(addDays(today(), -i)));
   let goodDays = 0;
   days.forEach(k => { if (dayQualifies(k)) goodDays++; });
-  const weekXp = xpBetween(addDays(today(), -6), today());
+  const weekXp = weekXpShown();     // in Career Mode the server's week, training included
   const order = hs.filter(h => !h.locked).concat(hs.filter(h => h.locked));
   const cell = (h, k) => {
     if ((firstDay && k < firstDay) || !firstDay) return 'pre';
@@ -8777,7 +8962,8 @@ function renderDetail(h) {
       note: h.kind === 'count' ? fmtVal(h, v) + ' ' + h.unit + ' logged' : (hit ? 'Logged in the app' : 'Nothing logged'),
       // A day before the season earns nothing, the same as dayXp() and habitXp().
       // This row printed raw xpFor(), so a pre-season day read "+36 XP" here.
-      val: hit ? 'HIT' : 'MISS', hit, pre: !inSeason(k), xp: inSeason(k) ? xpFor(h, v) : 0
+      // In Career Mode every day counts (scoreStart() is the career's first day).
+      val: hit ? 'HIT' : 'MISS', hit, pre: !inScore(k), xp: inScore(k) ? paidXp(h, v) : 0
     });
   }
   // Units sit inside the figure at a smaller size rather than being welded to
@@ -9028,7 +9214,8 @@ function renderCrew() {
         </div>
         <div class="boardnote">${LB.scope === 'week'
           ? 'Today and the six days before it. It resets with the season.'
-          : 'Everything since ' + esc(started) + '. It resets with the season.'}
+          : 'Everything since ' + esc(started) + '. It resets with the season.'}${careerOn()
+          ? ' Your level never does, and your points count your training too.' : ''}
           <button class="manjump" ${on(() => openManual('The leaderboard', 'crew'))}>How the board works ›</button></div>
         ${renderBoardJoin()}`}
     </div>`;
@@ -9233,7 +9420,10 @@ function openManual(section, from) {
 function renderManual() {
   const hs = allHabits();
   const perfectDay = live().reduce((s, h) => s + Math.round(baseXp(h) * XP_RULES.completionBonus), 0);
-  const cum = (L) => { let s = 0; for (let n = 1; n < L; n++) s += levelCost(XP_RULES.base, n); return s; };
+  const cum = cumXpTo;     // the overall curve: Proof's, or the career's once the XP switch is on
+  const ob = overallBase(), og = overallGrowth(), career = careerOn();
+  const prices = career && CAREER.p.rules && CAREER.p.rules.prices || {};
+  const xpn = v => (Number(v) || 0).toLocaleString();
   const water = habitById('water'), steps = habitById('steps');
   // Each heading carries an id so the contents list at the top can jump to it.
   // The manual is a dozen sections of prose; without a way in it is a wall you
@@ -9333,7 +9523,9 @@ function renderManual() {
         </div>`)}
 
       ${block(h2('Levels and ranks') +
-        p(`Every level costs more than the one before it: ${levelCost(XP_RULES.base, 1).toLocaleString()} XP for level 2, ${levelCost(XP_RULES.base, 10).toLocaleString()} for level 11. One full day gets you to level 2. Level 20 is about two months of solid work (${cum(20).toLocaleString()} XP).`) +
+        (career ? p(`<strong style="color:var(--ink)">Your level is your career.</strong> It counts everything you have logged since you started${isFree() ? '' : ', your training too'}. It never resets. A new season only starts the board's points again.`) +
+          (isFree() ? '' : p(`Training pays here as well. A finished session is worth ${xpn(prices.session_finished)} XP, or ${xpn(prices.session_finished_early)} if you finish it early. Log every set and it pays ${xpn(prices.full_log)} more. Answer the check-in first and it pays ${xpn(prices.checkin_done)}. Train every day of your plan in a week and the week pays ${xpn(prices.week_held)}. The WORKOUT habit stays on your list for your day streak, but it pays nothing itself. That way a session is never paid twice.`)) : '') +
+        p(`Every level costs more than the one before it: ${levelCost(ob, 1, og).toLocaleString()} XP for level 2, ${levelCost(ob, 10, og).toLocaleString()} for level 11. ${career ? '' : 'One full day gets you to level 2. '}Level 20 is about two months of solid work (${cum(20).toLocaleString()} XP).`) +
         p(`There are <strong style="color:var(--ink)">${RANKS.length} ranks with ${SUBS_PER_RANK} levels each</strong>. Level ${SUBS_PER_RANK + 1} makes you ${esc(rankFor(SUBS_PER_RANK + 1).label)}, level 20 is ${esc(rankFor(20).label)}. Every rank has its own insignia. <strong style="color:var(--ink)">tap your rank anywhere in the app</strong> to see the whole ladder and what each one costs.`) +
         `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
           ${RANKS.map(r => `<span style="display:flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--rule);color:var(--muted)">
@@ -9348,7 +9540,9 @@ function renderManual() {
         return block(h2('The Locker') +
           p(`Levels pay out. There are <strong style="color:var(--ink)">${PASS_TRACK.length} rewards</strong> spread up the ladder, and reaching the level is all it takes. There is nothing to buy and nothing to claim.`) +
           p(`Two kinds. <strong style="color:var(--ink)">Titles</strong> are a name you wear: it sits under your rank, it goes on the card you share, and if you are on the board it sits next to your name there and on the roll call wall. Each one also has a card of its own to share, with its plate and what it took. <strong style="color:var(--ink)">Cards</strong> change how that shared card looks. Those are yours alone, nobody else sees them. You choose which of the ones you own to use, and you can change your mind whenever, including showing no title at all.`) +
-          p(`<strong style="color:var(--ink)">They are kept.</strong> This is the one thing here a new season does not touch. Your points go back to zero and every reward you have unlocked stays exactly where it is. Switching a habit off does not take them either. That holds on the board too: what you have earned is recorded the day you earn it, and nothing later takes it back.`) +
+          p(career
+            ? `<strong style="color:var(--ink)">They are kept.</strong> A new season does not touch them, and it does not touch your level either. Only the board's points go back to zero. Switching a habit off does not take them either. That holds on the board too: what you have earned is recorded the day you earn it, and nothing later takes it back.`
+            : `<strong style="color:var(--ink)">They are kept.</strong> This is the one thing here a new season does not touch. Your points go back to zero and every reward you have unlocked stays exactly where it is. Switching a habit off does not take them either. That holds on the board too: what you have earned is recorded the day you earn it, and nothing later takes it back.`) +
           p(got
             ? `You have <strong style="color:var(--ink)">${got} of ${PASS_TRACK.length}</strong>${eq ? `, and you are showing <strong style="color:var(--ink)">${esc(eq.name)}</strong>` : ''}. ${nx ? `Next is <strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv}.` : 'There is nothing left to unlock.'}`
             : `Your first is <strong style="color:var(--ink)">${esc(PASS_TRACK[0].name)}</strong> at level ${PASS_TRACK[0].lv}, which is one full day of habits away.`) +
@@ -9424,20 +9618,26 @@ function renderManual() {
           </div>`).join('')}
         </div>` +
         `<div style="height:12px"></div>` +
-        p(`Tier points are paid on the day you cross the tier, so they belong to the season you earned them in. A new season starts your points again, but the tiers themselves stay yours.`))}
+        p(career
+          ? `Tier points are paid on the day you cross the tier, once. They count toward your level for good, and the tiers themselves stay yours.`
+          : `Tier points are paid on the day you cross the tier, so they belong to the season you earned them in. A new season starts your points again, but the tiers themselves stay yours.`))}
 
-      ${block(h2('Seasons') +
-        p(`Scoring runs in seasons, like ranked play in a game. You are in <strong style="color:var(--ink)">${esc(seasonName())}</strong>, which opened on ${esc(parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }))}.`) +
-        p(`Only days from the start of the season earn points. Anything you logged before it still sits in your history and still counts toward your streaks and consistency tiers. It just does not score.`) +
-        p(`When a new season opens, <strong style="color:var(--ink)">every score goes back to zero</strong> and everyone starts together. Nothing is deleted, and your consistency tiers stay yours.`) +
-        p(`Reach <strong style="color:var(--ink)">level 5</strong> in a season and, when it closes, you keep a title that names it. It gets its own screen that day, and nobody can earn it after. Where you finished stays in your Locker either way.`))}
+      ${block(h2('Seasons') + (career
+        ? p(`The board runs in seasons, like ranked play in a game. You are in <strong style="color:var(--ink)">${esc(seasonName())}</strong>, which opened on ${esc(parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }))}.`) +
+          p(`Your level counts everything you have ever logged. The board counts only the points you earn this season${isFree() ? '' : ', your training included'}.`) +
+          p(`When a new season opens, <strong style="color:var(--ink)">the board's points go back to zero</strong> and everyone starts together. Your level, your rank and your habit levels stay where they are. Nothing is deleted.`) +
+          p(`Earn <strong style="color:var(--ink)">${xpn(CAREER.p.rules && CAREER.p.rules.season && CAREER.p.rules.season.title_points || 2000)} points</strong> in a season and, when it closes, you keep a title that names it. It gets its own screen that day, and nobody can earn it after. Where you finished stays in your Locker either way.`)
+        : p(`Scoring runs in seasons, like ranked play in a game. You are in <strong style="color:var(--ink)">${esc(seasonName())}</strong>, which opened on ${esc(parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }))}.`) +
+          p(`Only days from the start of the season earn points. Anything you logged before it still sits in your history and still counts toward your streaks and consistency tiers. It just does not score.`) +
+          p(`When a new season opens, <strong style="color:var(--ink)">every score goes back to zero</strong> and everyone starts together. Nothing is deleted, and your consistency tiers stay yours.`) +
+          p(`Reach <strong style="color:var(--ink)">level 5</strong> in a season and, when it closes, you keep a title that names it. It gets its own screen that day, and nobody can earn it after. Where you finished stays in your Locker either way.`)))}
 
       ${block(h2('The leaderboard') +
         p(isFree()
           ? `You join it from Crew when you want to. Nobody sees you before that.`
           : `Once you finish your first workout in the programme app, you are put on it under your first name and last initial.`) +
         p(`You can rename yourself whenever you like (it does not have to be your real name), or leave: tap <strong style="color:var(--ink)">You appear as</strong> under the board on Crew, or <strong style="color:var(--ink)">Board name</strong> in Settings. <strong style="color:var(--ink)">If you leave, you stay off.</strong> Other athletes see <strong style="color:var(--ink)">your name, your points, your rank and the title you wear</strong>. They never see your habits, your logs, your programme or anything else.`) +
-        p(`There are two boards. <strong style="color:var(--ink)">This season</strong> is every point since ${esc(seasonName().toLowerCase())} opened. <strong style="color:var(--ink)">Past week</strong> is a rolling seven days, so a strong week always shows and anyone can win it.`) +
+        p(`There are two boards. <strong style="color:var(--ink)">This season</strong> is every point since ${esc(seasonName().toLowerCase())} opened. <strong style="color:var(--ink)">Past week</strong> is a rolling seven days, so a strong week always shows and anyone can win it.${career ? ' Your points count your training sessions as well as your habits, and the level beside your name is your career level.' : ''}`) +
         p(`Your points are worked out on the server from what you have actually logged, so the board is honest, and there is nothing to gain from fiddling with your phone.`))}
 
       ${block(h2('Body weight') +
@@ -10400,8 +10600,10 @@ const SHARE_PAINT = {
       const blockH = fixedH + cw * 1.12;
       let y = a.top + Math.max(20, (statsY - a.top - blockH) / 2);
       const lead = h ? shortName(h).toUpperCase() + ' RANK'
-                     : ({ level: 'LEVEL UP', rank: 'NEW RANK', prestige: 'PRESTIGE' })[s && s.moment] || 'PROOF';
-      scEyebrow(x, a.cx, y, lead + ' · ' + seasonName().toUpperCase());
+                     : ({ level: 'LEVEL UP', rank: 'NEW RANK', prestige: 'PRESTIGE', career: 'MY CAREER' })[s && s.moment] || 'PROOF';
+      // In Career Mode the level is the career's, not the season's: the card says so.
+      scEyebrow(x, a.cx, y, s && s.moment === 'career' ? lead
+                          : lead + ' · ' + (careerOn() && !h ? 'CAREER' : seasonName().toUpperCase()));
       const cy = y + 60 + cw * 0.56;
       scCrest(x, a.cx, cy, cw, r.name);
       y = cy + cw * 0.56 + 96;
@@ -10418,11 +10620,11 @@ const SHARE_PAINT = {
       scStats(x, W, statsY, h ? [
         [String(habitStreak(h)), 'STREAK', CARD.orange],
         [String(habitBest(h)), 'BEST STREAK'],
-        [String(seasonDays().filter(k => isDone(h, k)).length), 'DAYS DONE', CARD.teal]
+        [String(scoreDays().filter(k => isDone(h, k)).length), 'DAYS DONE', CARD.teal]
       ] : [
         [String(currentDayStreak()), 'DAY STREAK', CARD.orange],
         [String(milestonesEarned()), 'MILESTONES'],
-        [String(seasonDays().filter(isPerfect).length), 'PERFECT DAYS', CARD.teal]
+        [String(scoreDays().filter(isPerfect).length), 'PERFECT DAYS', CARD.teal]
       ], true);
     }
   },
@@ -11293,6 +11495,10 @@ function showError(msg, opts) {
   }
 
   loadLocal();
+  // The career profile this phone last had (Career Mode): the app opens on it and asks again behind the screen.
+  // The embedded strip reads it too (the training app keeps it fresh), so the level it hands the training app's
+  // Home (publishCardSnapshot()) is the career's.
+  loadCareer();
   // NOTHING BELOW MAY HOLD THE SPINNER OPEN INDEFINITELY. Four server round
   // trips run before the first paint, and on a bad connection — the hotel wifi
   // that answers the handshake and then stalls — a fetch neither resolves nor
@@ -11395,8 +11601,12 @@ function showError(msg, opts) {
   // after the sweep so the two never race. It only reads.
   if (!window.IS_EMBED) autoJoinBoard().then(checkBoardStatus, () => {});
 
-  // Anything still unsent from a previous session goes up now.
+  // Anything still unsent from a previous session goes up now (and its answer asks for the career again).
   if (SYNC.dirty) pushNow();
+  // The career profile, behind the first paint: it can take a second on the server, and the phone already
+  // shows the last one. The answer re-renders only when it changed what is shown; the first one after the
+  // XP switch is the reveal (checkLevelUps()). Nothing is shown from it until the switch.
+  if (!window.IS_EMBED && !window.IS_DEMO) fetchCareer();
 
   // Read before writing: our push replaces the stored snapshot wholesale, so
   // coming back online with a pull first is what stops this device erasing days

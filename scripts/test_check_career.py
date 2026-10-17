@@ -109,12 +109,12 @@ def swap(block, old, new):
 
 AWARDS_TITLE = swap(GOOD_ACHIEVEMENT, "free = true\n", 'free = true\ntitle = "zz_good"\n')   # names the title in GOOD_TITLE
 
-# The switch (Four Majors, 2026-10-17): a best_value badge, a badge that retires, and the one that takes its place.
+# The catalogue switch (Four Majors, 2026-10-17): a best_value badge, a badge that retires, and the one that takes its place.
 BEST_VALUE_BADGE = swap(swap(GOOD_BADGE.replace("zz_good", "zz_value"), 'kind = "total"', 'kind = "best_value"'),
                         'counts = "session_finished"', 'counts = "lift_gain"')
 RETIRING_BADGE = swap(GOOD_BADGE.replace("zz_good", "zz_old"), 'origin = "new"\n',
-                      'origin = "new"\nretire_at = "switch"\nsuperseded_by = "zz_new"\n')
-REPLACEMENT_BADGE = swap(GOOD_BADGE.replace("zz_good", "zz_new"), 'origin = "new"\n', 'origin = "new"\nstarts_at = "switch"\n')
+                      'origin = "new"\nretire_at = "catalogue"\nsuperseded_by = "zz_new"\n')
+REPLACEMENT_BADGE = swap(GOOD_BADGE.replace("zz_good", "zz_new"), 'origin = "new"\n', 'origin = "new"\nstarts_at = "catalogue"\n')
 
 
 class CareerCheckerTests(unittest.TestCase):
@@ -133,6 +133,11 @@ class CareerCheckerTests(unittest.TestCase):
     def append(self, filename, block):
         path = self.dir / filename
         path.write_text(path.read_text(encoding="utf-8") + block, encoding="utf-8", newline="\n")
+
+    def catalogue_on(self):
+        """Both switches on (the catalogue switch needs the XP switch): rule 14 no longer holds Proof's numbers."""
+        self.set_key("rulebook.toml", "switch", "xp", '"2026-10-18"')
+        self.set_key("rulebook.toml", "switch", "catalogue", '"2026-10-18"')
 
     def set_key(self, filename, table, key, literal):
         """Set `key = literal` inside [table] (None: the keys before the first table), keeping any trailing comment.
@@ -424,7 +429,7 @@ class CareerCheckerTests(unittest.TestCase):
     def test_coverage_gaps_are_warnings(self):
         # a missions file with one stretch mission: no plan, recovery or crew slot, no recovery mission for any habit
         (self.dir / "missions.toml").write_text(GOOD_MISSION, encoding="utf-8", newline="\n")
-        self.set_key("rulebook.toml", "shadow", "on", "false")   # Proof's quests are gone too: parity is not this test
+        self.catalogue_on()   # Proof's quests are gone too: parity is not this test
         out = self.assertPasses("OK: 0 errors")
         for gap in ("no mission in the 'plan' slot", "no mission in the 'recovery' slot", "no mission in the 'crew' slot",
                     "no recovery mission for the habit 'steps'", "no recovery mission for the habit 'supps'",
@@ -435,7 +440,7 @@ class CareerCheckerTests(unittest.TestCase):
         self.assertNotIn("no recovery mission for the habit 'strength'", out)
         self.assertNotIn("no recovery mission for the habit 'custom'", out)
 
-    # ── rules 13 and 14: Proof's counting, and the shadow's parity with Proof (phase 1) ──────────────────────────
+    # ── rules 13 and 14: Proof's counting, and the parity with Proof until the catalogue switch ─────────────────────
     def test_in_shadow_a_habit_number_must_equal_proofs(self):
         self.set_key("rulebook.toml", "habits.weights", "water", "31")
         self.assertFails("[habits.weights] water is 31 but Proof's is 30")
@@ -456,10 +461,16 @@ class CareerCheckerTests(unittest.TestCase):
         self.set_key("missions.toml", "mission.no_negotiation", "proof_need", "6")
         self.assertFails("Proof's quest w_supps7 (daysHit:supps, need 7, 140 XP) has no mission")
 
-    def test_out_of_shadow_the_habit_numbers_may_move(self):
-        self.set_key("rulebook.toml", "shadow", "on", "false")
-        self.set_key("rulebook.toml", "habits.weights", "strength", "0")   # the switch: the session fact pays instead
+    def test_after_the_catalogue_switch_the_habit_numbers_may_move(self):
+        self.catalogue_on()
+        self.set_key("rulebook.toml", "habits.weights", "water", "45")
         self.assertPasses("OK: 0 errors")
+
+    def test_the_xp_switch_alone_keeps_proofs_numbers(self):
+        # phase 2: Proof's phone previews a tick with these numbers, so they stay Proof's until the catalogue switch
+        self.set_key("rulebook.toml", "switch", "xp", '"2026-10-18"')
+        self.set_key("rulebook.toml", "habits.weights", "water", "31")
+        self.assertFails("[habits.weights] water is 31 but Proof's is 30", "until the catalogue switch")
 
     def test_a_proof_measure_or_kind_must_be_known(self):
         self.set_key("badges.toml", "badge.zen_machine", "proof_measure", '"streak:nothing"')
@@ -517,16 +528,67 @@ class CareerCheckerTests(unittest.TestCase):
         self.append("badges.toml", swap(RETIRING_BADGE, 'superseded_by = "zz_new"', "superseded_by = []"))
         self.assertFails("[badge.zz_old]", "superseded_by must be the id of the entry that takes its place")
 
-    def test_retire_at_and_starts_at_must_be_switch(self):
-        self.append("badges.toml", swap(RETIRING_BADGE, 'retire_at = "switch"', 'retire_at = "soon"'))
-        self.append("badges.toml", swap(REPLACEMENT_BADGE, 'starts_at = "switch"', 'starts_at = "later"'))
-        self.assertFails("[badge.zz_old]", 'retire_at must be "switch"', "'soon'",
-                         "[badge.zz_new]", 'starts_at must be "switch"', "'later'")
+    def test_retire_at_and_starts_at_must_be_catalogue(self):
+        self.append("badges.toml", swap(RETIRING_BADGE, 'retire_at = "catalogue"', 'retire_at = "soon"'))
+        self.append("badges.toml", swap(REPLACEMENT_BADGE, 'starts_at = "catalogue"', 'starts_at = "switch"'))
+        self.assertFails("[badge.zz_old]", 'retire_at must be "catalogue"', "'soon'",
+                         "[badge.zz_new]", 'starts_at must be "catalogue"', "'switch'")
+
+    # ── rule 16: the two switches, and the level kept (Amir, 2026-10-17) ───────────────────────────────────────────
+    def test_a_switch_is_off_or_a_day(self):
+        for bad in ('"on"', '"yes"', '"2026-13-01"', '"18 Oct 2026"', "true"):
+            with self.subTest(value=bad):
+                self.setUp()
+                self.set_key("rulebook.toml", "switch", "xp", bad)
+                self.assertFails("[switch]", 'xp must be "off" or a day written YYYY-MM-DD')
+        self.setUp()
+        self.set_key("rulebook.toml", "switch", "xp", '"2026-10-18"')
+        self.assertPasses("OK: 0 errors")
+
+    def test_the_catalogue_switch_needs_the_xp_switch_first(self):
+        self.set_key("rulebook.toml", "switch", "catalogue", '"2026-11-01"')
+        self.assertFails("[switch]", "the catalogue switch (phase 3) needs the XP switch (phase 2) on first")
+        self.setUp()
+        self.set_key("rulebook.toml", "switch", "xp", '"2026-11-02"')
+        self.set_key("rulebook.toml", "switch", "catalogue", '"2026-11-01"')
+        self.assertFails("[switch]", "cannot come before the XP switch")
+        self.setUp()
+        self.catalogue_on()                       # both on the same day is fine
+        self.assertPasses("OK: 0 errors")
+
+    def test_the_switch_table_must_be_there(self):
+        path = self.dir / "rulebook.toml"
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("\n[switch]\n", text)
+        path.write_text(text.replace("\n[switch]\n", "\n[switches]\n", 1), encoding="utf-8", newline="\n")
+        self.assertFails("[switch]", "the [switch] table is missing")
+
+    def test_a_shadow_table_is_no_longer_known(self):
+        self.append("rulebook.toml", "\n[shadow]\non = true\n")
+        out = self.assertPasses("OK: 0 errors")
+        self.assertIn("unknown top-level key 'shadow'", out)
+
+    def test_a_fact_paid_from_its_value_is_carried_and_career_only(self):
+        path = self.dir / "rulebook.toml"
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("career_only = true\n", text)
+        path.write_text(text.replace("career_only = true\n", "", 1), encoding="utf-8", newline="\n")
+        self.assertFails("[fact.level_kept]", "needs career_only = true")
+        self.setUp()
+        self.set_key("rulebook.toml", "fact.level_kept", "meaning", '"consistency"')
+        self.assertFails("[fact.level_kept]", 'has meaning "carried"')
+        self.setUp()
+        self.append("rulebook.toml", swap(swap(GOOD_FACT, 'meaning = "none"', 'meaning = "carried"'),
+                                          'pays_for = "nothing"', 'pays_for = "act"'))
+        self.assertFails("[fact.zz_social]", 'meaning "carried" is for a fact paid from its own value')
+        self.setUp()
+        self.set_key("rulebook.toml", "fact.level_kept", "career_only", '"yes"')
+        self.assertFails("[fact.level_kept]", "career_only")
 
     def test_the_switch_keys_are_known_on_every_kind_of_entry_that_takes_them(self):
         # an achievement can be superseded by a badge (THE MACHINIST by CENTURY) or by another achievement
         old = swap(GOOD_ACHIEVEMENT.replace("zz_good", "zz_old"), "free = true\n",
-                   'free = true\nretire_at = "switch"\nstarts_at = "switch"\nsuperseded_by = "zz_new"\n')
+                   'free = true\nretire_at = "catalogue"\nstarts_at = "catalogue"\nsuperseded_by = "zz_new"\n')
         self.append("achievements.toml", old)
         self.append("badges.toml", REPLACEMENT_BADGE)
         out = self.assertPasses("OK: 0 errors")
@@ -543,10 +605,10 @@ class CareerCheckerTests(unittest.TestCase):
         self.setUp()
         self.append("titles.toml", GOOD_TITLE)
         self.append("titles.toml", swap(GOOD_TITLE.replace("zz_good", "zz_old"), 'origin = "new"\n',
-                                        'origin = "new"\nretire_at = "switch"\nsuperseded_by = "zz_good"\n'))
+                                        'origin = "new"\nretire_at = "catalogue"\nsuperseded_by = "zz_good"\n'))
         self.append("missions.toml", GOOD_MISSION)
         self.append("missions.toml", swap(GOOD_MISSION.replace("zz_good", "zz_old"), "free = true\n",
-                                          'free = true\nretire_at = "switch"\nsuperseded_by = "zz_good"\n'))
+                                          'free = true\nretire_at = "catalogue"\nsuperseded_by = "zz_good"\n'))
         out = self.assertPasses("OK: 0 errors")
         self.assertNotIn("unknown key", out)
         self.setUp()
@@ -570,18 +632,18 @@ class CareerCheckerTests(unittest.TestCase):
 
     def test_a_proof_entry_may_carry_retire_at_without_tripping_the_parity_check(self):
         # the shadow is on: Proof's own entries still equal Proof's numbers, and a retiring one may say when it stops
-        self.put_key("badges.toml", "badge.dawn_patrol", "retire_at", '"switch"')
+        self.put_key("badges.toml", "badge.dawn_patrol", "retire_at", '"catalogue"')
         self.put_key("badges.toml", "badge.dawn_patrol", "superseded_by", '"century"')
-        self.put_key("achievements.toml", "achievement.first_blood", "retire_at", '"switch"')
+        self.put_key("achievements.toml", "achievement.first_blood", "retire_at", '"catalogue"')
         self.put_key("achievements.toml", "achievement.first_blood", "superseded_by", '"century"')
-        self.put_key("missions.toml", "mission.three_hard_days", "retire_at", '"switch"')
+        self.put_key("missions.toml", "mission.three_hard_days", "retire_at", '"catalogue"')
         self.put_key("missions.toml", "mission.three_hard_days", "superseded_by", '"hold_your_week"')
         out = self.assertPasses("OK: 0 errors")
         self.assertNotIn("unknown key", out)
 
     def test_a_retiring_proof_entry_must_still_match_proofs_numbers(self):
         # retire_at is not a way round the parity check: until the switch the entry is earned exactly as Proof earns it
-        self.put_key("badges.toml", "badge.dawn_patrol", "retire_at", '"switch"')
+        self.put_key("badges.toml", "badge.dawn_patrol", "retire_at", '"catalogue"')
         self.put_key("badges.toml", "badge.dawn_patrol", "superseded_by", '"century"')
         path = self.dir / "badges.toml"
         text = path.read_text(encoding="utf-8")
@@ -595,8 +657,8 @@ class CareerCheckerTests(unittest.TestCase):
             # One badge and one mission in place of the real ones (and one achievement, so nothing names a badge that
             # is gone). Proof's entries are swapped out too, so the shadow is turned off: there is no parity to check.
             self.setUp()
-            self.set_key("rulebook.toml", "shadow", "on", "false")
-            gate = 'free = true\nretire_at = "switch"\n' if retiring else "free = true\n"
+            self.catalogue_on()
+            gate = 'free = true\nretire_at = "catalogue"\n' if retiring else "free = true\n"
             for filename, block in (("badges.toml", GOOD_BADGE), ("missions.toml", GOOD_MISSION)):
                 (self.dir / filename).write_text(swap(block, "free = true\n", gate), encoding="utf-8", newline="\n")
             (self.dir / "achievements.toml").write_text(GOOD_ACHIEVEMENT, encoding="utf-8", newline="\n")

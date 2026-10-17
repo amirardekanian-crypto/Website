@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Career Mode's rulebook and catalogue as database rows: python scripts/career_seed.py [--out FILE | --json]
+"""Career Mode's rulebook and catalogue as database rows: python scripts/career_seed.py [--out FILE | --json] [--dry-run]
 
 The numbers, badges, achievements, titles, missions, quests and WhatsApp lines live in career/*.toml so Amir can read
 and change them (GAME-10). The server scores from two tables made from them (supabase/stage66_career_mode.sql):
@@ -16,9 +16,15 @@ call it). career_seed() replaces the row for that version and the whole catalogu
 again with the new numbers (PROCEDURES.md → P16). An id is never renamed in the files, only its name, so history stays
 filed under it. Bump `version` in rulebook.toml when the old rulebook should stay on the server beside the new one.
 
+The switches (rulebook.toml → [switch], stage68): the seed that turns the XP switch on also writes the levels kept and
+returns every athlete's line (Proof's level, the career level, the level kept). --dry-run makes the same statement with
+p_dry_run => true: the server does all of it, undoes it, and answers the same, so the list can be read first. A seed
+that changes nothing but a switch runs no backfill. The server refuses a switch turned back off and a day still to come.
+
   python scripts/career_seed.py                 # the SQL, to stdout
   python scripts/career_seed.py --out seed.sql  # the SQL, to a file
   python scripts/career_seed.py --json          # the payload as JSON (the rehearsal reads this)
+  python scripts/career_seed.py --dry-run       # the same SQL with p_dry_run => true: worked out, then undone
 
 Standard library only. Python 3.11+ (tomllib).
 """
@@ -88,7 +94,7 @@ def payload(folder):
     return version, rules, rows, digest.hexdigest()
 
 
-def sql_for(version, rules, rows, sha):
+def sql_for(version, rules, rows, sha, dry_run=False):
     rules_json = json.dumps(rules, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     rows_json = json.dumps(rows, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     for text in (rules_json, rows_json):
@@ -96,7 +102,7 @@ def sql_for(version, rules, rows, sha):
             raise SystemExit(f"career_seed: the files contain {DOLLAR}, which would end the SQL string early")
     return (f"-- Career Mode seed, made by scripts/career_seed.py from career/*.toml (sha256 {sha}).\n"
             f"select public.career_seed({version},\n  {DOLLAR}{rules_json}{DOLLAR}::jsonb,\n"
-            f"  {DOLLAR}{rows_json}{DOLLAR}::jsonb,\n  '{sha}');\n")
+            f"  {DOLLAR}{rows_json}{DOLLAR}::jsonb,\n  '{sha}'" + (",\n  p_dry_run => true" if dry_run else "") + ");\n")
 
 
 def main(argv=None):
@@ -105,6 +111,8 @@ def main(argv=None):
     ap.add_argument("folder", nargs="?", default=str(check_career.DEFAULT_FOLDER), help="default: career/")
     ap.add_argument("--out", help="write the SQL to this file instead of stdout")
     ap.add_argument("--json", action="store_true", help="print the payload as JSON instead of SQL")
+    ap.add_argument("--dry-run", action="store_true", help="the SQL with p_dry_run => true: the server works it all "
+                                                           "out (the levels kept at the XP switch included), then undoes it")
     args = ap.parse_args(argv)
     folder = pathlib.Path(args.folder)
     version, rules, rows, sha = payload(folder)
@@ -112,11 +120,11 @@ def main(argv=None):
         text = json.dumps({"version": version, "rules": rules, "catalogue": rows, "sha": sha}, ensure_ascii=False,
                           sort_keys=True, indent=1)
     else:
-        text = sql_for(version, rules, rows, sha)
+        text = sql_for(version, rules, rows, sha, dry_run=args.dry_run)
     if args.out:
         pathlib.Path(args.out).write_text(text, encoding="utf-8", newline="\n")
-        print(f"career_seed: rulebook version {version}, {len(rows)} catalogue rows, sha256 {sha[:12]} -> {args.out}",
-              file=sys.stderr)
+        print(f"career_seed: rulebook version {version}, {len(rows)} catalogue rows, sha256 {sha[:12]}"
+              + (" (a dry run)" if args.dry_run else "") + f" -> {args.out}", file=sys.stderr)
     else:
         sys.stdout.write(text)
     return 0

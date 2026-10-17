@@ -25,11 +25,17 @@ ERRORS (exit 1)
   10  the brand rule: no gold, golden, yellow, amber or ochre in any string, in any file
   13  the fields that carry Proof's counting (proof_measure, proof_need, proof_kind, proof_xp): a known measure or kind,
       a habit that exists, a need above 0, one Proof code per tier
-  14  while [shadow] on = true (phase 1): every habit number and every Proof milestone, tier and quest equals Proof's
-      own, read from supabase/xp_rules_snapshot.json (the shadow must match Proof to the point, PROCEDURES.md → P14).
-      retire_at, starts_at and superseded_by say when an entry stops or starts, not what Proof pays: never compared
-  15  the switch gates (phase 3): retire_at and starts_at are "switch"; superseded_by (an id or a list) names entries
-      that exist (a badge for a badge; an achievement or a badge for an achievement; a title; a mission), never itself
+  14  until the catalogue switch ([switch] catalogue = "off"): every habit number and every Proof milestone, tier and
+      quest equals Proof's own, read from supabase/xp_rules_snapshot.json (in shadow Career Mode must match Proof to the
+      point, PROCEDURES.md → P14; after the XP switch AA Proof's phone previews a tick with these numbers, P13).
+      retire_at, starts_at and superseded_by say when an entry stops or starts, not what it pays: never compared
+  15  the catalogue switch's gates (phase 3): retire_at and starts_at are "catalogue"; superseded_by (an id or a list)
+      names entries that exist (a badge for a badge; an achievement or a badge for an achievement; a title; a mission),
+      never itself
+  16  the two switches (rulebook.toml → [switch]; Amir, 2026-10-17): xp (phase 2) and catalogue (phase 3) are each "off" or
+      the day it was turned on (YYYY-MM-DD); the catalogue switch needs the XP switch, on the same day or after it. A fact
+      paid from its own value (xp_from = "value": the level kept at the XP switch) has meaning "carried" and
+      career_only = true, so a stored number never reaches a season's points; "carried" is for such a fact only
 WARNINGS (exit 0)
    6  a title with origin "new" that nothing awards (unless it is a template, or its meaning is "all": the engine
       mints the Grand Slam)
@@ -45,6 +51,7 @@ Standard library only. Python 3.11+ (tomllib).
   python scripts/check_career.py some/dir   # another folder (scripts/test_check_career.py checks copies of it)
 """
 import argparse
+import datetime
 import json
 import math
 import pathlib
@@ -72,8 +79,8 @@ DOORS = ["coach", "cycle", "athlete"]
 ORIGINS = ["new", "proof"]
 SOURCES = ["training", "proof", "coach", "server"]
 PAYS_FOR = ["act", "progress", "nothing"]
-XP_FROM = ["habits", "mission", "quest", "share.mission_sweep"]
-FACT_MEANINGS = MEANINGS + ["chosen", "quest", "none"]
+XP_FROM = ["habits", "mission", "quest", "share.mission_sweep", "value"]   # "value": the fact's own value.xp
+FACT_MEANINGS = MEANINGS + ["chosen", "quest", "none", "carried"]   # "carried": the level kept at the XP switch
 TITLE_MEANINGS = MEANINGS + ["chosen", "season", "level", "all"]       # "all": the Grand Slam, a title in each of the four
 BADGE_KINDS = ["best_run", "total", "per_habit_best_run", "best_value", "proof"]
 MEASURES = ["count", "units", "days"]
@@ -85,7 +92,8 @@ LIMIT_PER = ["plan_day_week", "week", "cycle"]
 PROOF_MEASURES = ["streak:<habit>", "daysHit:<habit>", "daysWith3", "perfectDays", "comebackRun", "comebacksStuck"]
 PROOF_KINDS = ["daysHit:<habit>", "total:<habit>", "qualify", "perfect"]
 PROOF_SNAPSHOT = ROOT / "supabase" / "xp_rules_snapshot.json"
-SWITCH = "switch"      # the one value retire_at and starts_at may take: phase 3, when Career Mode replaces Proof's scorer
+SWITCH = "catalogue"   # the one value retire_at and starts_at may take: the catalogue switch, phase 3 ([switch] catalogue)
+SWITCHES = ["xp", "catalogue"]   # rulebook.toml → [switch]: phase 2 (XP) and phase 3 (the catalogue); each "off" or a day
 
 BANNED_WORDS = re.compile(r"\b(gold|golden|yellow|amber|ochre)\b", re.IGNORECASE)
 SNAKE_CASE = re.compile(r"^[a-z][a-z0-9_]*$")
@@ -96,7 +104,7 @@ EXTRA_KEYS = {"tier_name", "mult", "title", "template", "proof_id", "proof_code"
 # retire_at, starts_at and superseded_by are the switch gates (rule 15). A badge may also name the one habit it reads.
 KNOWN_KEYS = {
     "fact": {"meaning", "xp", "xp_from", "source", "pays_for", "when", "cap", "min_share", "limit", "limit_per",
-             "weeks_away", "window_days", "min_gain"},
+             "weeks_away", "window_days", "min_gain", "career_only"},
     "badge": {"name", "meaning", "kind", "counts", "habit", "proof_codes", "caption", "free", "origin", "tiers",
               "retire_at", "starts_at", "superseded_by"},
     "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},
@@ -111,7 +119,7 @@ KNOWN_KEYS = {
     "message": {"en", "fa", "used_for"},
 }
 TOP_LEVEL_KEYS = {
-    "rulebook": {"version", "meanings", "shadow", "level", "season", "week", "share", "habits", "fact"},
+    "rulebook": {"version", "meanings", "switch", "level", "season", "week", "share", "habits", "fact"},
     "badges": {"badge"},
     "achievements": {"achievement"},
     "titles": {"title", "skin"},
@@ -295,19 +303,19 @@ def check_habit_ref(c, e, w):
 
 
 def retires(e):
-    """An entry gated to stop at the switch (it has retire_at). It is earned as Proof earns it until phase 3, but
+    """An entry gated to stop at the catalogue switch (it has retire_at). It is earned as Proof earns it until phase 3, but
     coverage (rule 11) does not count it: the catalogue is built on what stays."""
     return isinstance(e, dict) and "retire_at" in e
 
 
 def check_gates(c, e, ident, targets):
-    """Rule 15. retire_at and starts_at, when present, are "switch": the one moment the rules change (phase 3).
+    """Rule 15. retire_at and starts_at, when present, are "catalogue": the catalogue switch (phase 3).
     superseded_by is the id of the entry that takes this one's place, or a list of ids, and each must exist.
     `targets` is a list of (ids, label): where a name may be found (ids is None for a file that did not parse: then
     there is nothing to check against, and that file's own error says why). An entry never supersedes itself."""
     for key in ("retire_at", "starts_at"):
         if key in e and e[key] != SWITCH:
-            c.error(f'{key} must be "{SWITCH}" (the entry is gated on the switch, phase 3), found {e[key]!r}')
+            c.error(f'{key} must be "{SWITCH}" (the entry is gated on the catalogue switch, phase 3), found {e[key]!r}')
     if "superseded_by" not in e:
         return
     raw = e["superseded_by"]
@@ -353,6 +361,53 @@ def load_all(folder, rep):
 
 
 # ── Rule 2 and 3: the rulebook ────────────────────────────────────────────────────────────────────────────────────
+
+def switch_day(v):
+    """A switch's value as a date, None for "off", or False when it is neither."""
+    if v == "off":
+        return None
+    if isinstance(v, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", v):
+        try:
+            return datetime.date.fromisoformat(v)
+        except ValueError:
+            return False
+    return False
+
+
+def check_switches(rb, rep, f):
+    """Rule 16. [switch] holds xp (phase 2) and catalogue (phase 3), each "off" or the day it was turned on. The catalogue
+    switch needs the XP switch, on the same day or after it. (The seed refuses a day still to come and a switch turned
+    back off: the checker cannot know today's date or what is on the server.)"""
+    c = Ctx(rep, f, "switch")
+    sw = rb.get("switch")
+    if not isinstance(sw, dict):
+        c.error('the [switch] table is missing (xp = "off" and catalogue = "off" until each is turned on)')
+        return
+    days = {}
+    for key in SWITCHES:
+        if key not in sw:
+            c.error(f'{key} is missing: "off", or the day the switch was turned on (YYYY-MM-DD)')
+            continue
+        d = switch_day(sw[key])
+        if d is False:
+            c.error(f'{key} must be "off" or a day written YYYY-MM-DD, found {sw[key]!r}')
+        else:
+            days[key] = d
+    for key in sw:
+        if key not in SWITCHES:
+            c.warn(f"unknown key {key!r} (the switches are {', '.join(SWITCHES)}): a typo would be ignored")
+    if "xp" in days and "catalogue" in days and days["catalogue"] is not None:
+        if days["xp"] is None:
+            c.error("the catalogue switch (phase 3) needs the XP switch (phase 2) on first")
+        elif days["catalogue"] < days["xp"]:
+            c.error(f"the catalogue switch ({days['catalogue']}) cannot come before the XP switch ({days['xp']})")
+
+
+def catalogue_off(rb):
+    """True until the catalogue switch: rule 14 holds Proof's numbers until then."""
+    sw = rb.get("switch") if isinstance(rb, dict) else None
+    return isinstance(sw, dict) and sw.get("catalogue") == "off"
+
 
 def check_rulebook(rb, rep):
     f = "rulebook.toml"
@@ -430,12 +485,7 @@ def check_rulebook(rb, rep):
         get_number(c, week, "close_after_days", ge=0, integer=True)
     else:
         c.error("the [week] table is missing")
-    c = Ctx(rep, f, "shadow")
-    shadow = rb.get("shadow")
-    if isinstance(shadow, dict):
-        get_bool(c, shadow, "on")
-    else:
-        c.error("the [shadow] table is missing (on = true while Career Mode runs beside Proof)")
+    check_switches(rb, rep, f)
 
     facts = entries(rb, "fact", f, rep)
     for fid, fact in facts.items():
@@ -462,6 +512,17 @@ def check_rulebook(rb, rep):
             get_number(c, fact, "window_days", ge=0, integer=True)
         if "min_gain" in fact:
             get_number(c, fact, "min_gain", ge=0)
+        if "career_only" in fact:
+            get_bool(c, fact, "career_only")
+        if fact.get("xp_from") == "value":
+            if fact.get("career_only") is not True:
+                c.error('a fact paid from its own value (xp_from = "value") needs career_only = true: a number '
+                        "worked out once must never reach a season's points (rule 16)")
+            if fact.get("meaning") != "carried":
+                c.error(f'a fact paid from its own value (xp_from = "value") has meaning "carried", found '
+                        f'{fact.get("meaning")!r} (rule 16)')
+        elif fact.get("meaning") == "carried":
+            c.error('meaning "carried" is for a fact paid from its own value (xp_from = "value") only (rule 16)')
         if fact.get("meaning") == "none":
             xp = fact.get("xp")
             if not (is_num(xp) and xp == 0):
@@ -848,12 +909,13 @@ def check_proof_fields(data, w, rep):
                     c.error("proof_kind needs proof_id: the id of Proof's quest")
 
 
-# ── Rule 14: while in shadow, every habit number equals Proof's ───────────────────────────────────────────────────
+# ── Rule 14: until the catalogue switch, every habit number equals Proof's ────────────────────────────────────────
 
 def proof_numbers(data):
     """What the catalogue says Proof pays, in the shape of Proof's xp_rules row. Only numbers and codes are read: an
     origin = "proof" entry may also carry retire_at, starts_at and superseded_by (they say when it stops, not what it
-    pays), and a retiring entry is still compared, because it is earned exactly as Proof earns it until the switch."""
+    pays), and a retiring entry is still compared, because it is earned exactly as Proof earns it until the catalogue
+    switch."""
     rb = data["rulebook"] or {}
     habits = rb.get("habits") if isinstance(rb.get("habits"), dict) else {}
     weights = habits.get("weights") if isinstance(habits.get("weights"), dict) else {}
@@ -902,8 +964,7 @@ def _row(code, need, xp, how):
 
 def check_proof_parity(data, rep, snapshot=None):
     rb = data["rulebook"]
-    shadow = rb.get("shadow") if isinstance(rb, dict) else None
-    if not (isinstance(shadow, dict) and shadow.get("on") is True):
+    if not catalogue_off(rb):
         return
     f = "rulebook.toml"
     snapshot = pathlib.Path(snapshot or PROOF_SNAPSHOT)
@@ -923,18 +984,18 @@ def check_proof_parity(data, rep, snapshot=None):
         a, b = mine[key], proof.get(key)
         ok = (a is b) if isinstance(a, bool) or isinstance(b, bool) else same_number(a, b)
         if not ok:
-            rep.error(f, "shadow", f"{label} is {a!r} but Proof's {key} is {b!r}: in shadow they must be equal")
+            rep.error(f, "shadow", f"{label} is {a!r} but Proof's {key} is {b!r}: until the catalogue switch they must be equal")
     for key, label in (("weights", "[habits.weights]"), ("targets", "[habits.targets]")):
         a = mine[key]
         b = proof.get(key) if isinstance(proof.get(key), dict) else {}
         for h in sorted(set(a) | set(b)):
             if not same_number(a.get(h), b.get(h)):
-                rep.error(f, "shadow", f"{label} {h} is {a.get(h)!r} but Proof's is {b.get(h)!r}: in shadow they must "
-                                       f"be equal")
+                rep.error(f, "shadow", f"{label} {h} is {a.get(h)!r} but Proof's is {b.get(h)!r}: until the catalogue "
+                                       f"switch they must be equal")
     theirs = sorted(x for x in (proof.get("unearnable") or []) if isinstance(x, str))
     if mine["unearnable"] != theirs:
-        rep.error(f, "shadow", f"[habits] locked is {mine['unearnable']!r} but Proof's unearnable is {theirs!r}: in "
-                               f"shadow they must be equal")
+        rep.error(f, "shadow", f"[habits] locked is {mine['unearnable']!r} but Proof's unearnable is {theirs!r}: until "
+                               f"the catalogue switch they must be equal")
     ptiers = [{"days": t.get("days"), "mult": t.get("mult")} for t in (proof.get("tiers") or []) if isinstance(t, dict)]
     if len(mine["tiers"]) != len(ptiers) or not all(
             same_number(x["days"], y["days"]) and same_number(x["mult"], y["mult"])
