@@ -3,15 +3,34 @@
 # Every number the scorer uses. Change a number, run `python scripts/check_career.py`, and (once built) re-seed:
 # every athlete's XP and level are worked out again from their facts, and nothing already minted is taken back (GAME-1).
 #
-# First draft, 2026-10-17. The numbers are here so the shape is visible: with them a perfect week on a 3-day plan is
-# about 3,900 XP and training is 46% of it (today 15-19%, decision 4). Tune freely.
+# First draft, 2026-10-17. The numbers are here so the shape is visible: after the switch (WORKOUT's habit at 0, the
+# session fact paying instead) a perfect week on a 3-day plan is about 3,900 XP and training is 46% of it (today 15-19%,
+# decision 4). Tune freely.
+#
+# How the server uses this file (phase 1, 2026-10-17): scripts/career_seed.py turns it into the career_rules row and
+# the other files into career_catalogue rows. Run `python scripts/check_career.py` first; the seed refuses a file with
+# an error.
 
 version = 1
 meanings = ["consistency", "commitment", "progress", "resilience"]
 
+[shadow]
+# Phase 1 (PROCEDURES.md → P14): Career Mode runs beside AA Proof and must score habits exactly as Proof does, so the
+# two can be compared to the point. While `on` is true:
+#   · scripts/check_career.py checks every habit number below against Proof's own (supabase/xp_rules_snapshot.json),
+#   · the WORKOUT habit keeps Proof's weight (strength = 100, in [habits.weights]),
+#   · a closed habit day does not settle (P1 step 4): Career Mode follows the log the way Proof does.
+# At the switch (phase 2) it becomes false, strength drops to 0 (the session fact pays instead, decision 4) and closed
+# days settle. Nothing an athlete sees reads Career Mode while it is on.
+on = true
+
 [level]
 # The cost of level n to n+1 is base × n^growth, rounded to 10 (Proof's curve today, XP_SYSTEM.md §2).
-base = 300                # re-anchored in phase 1 so two months of solid work, training included, still reaches level 20
+base = 400                # re-anchored in phase 1 (P4 step 3), so two months of solid work, training included, still
+                          # reaches level 20: measured 2026-10-17 on the shadow data with the switch's numbers (WORKOUT's
+                          # habit at 0), the one athlete solid in both apps (28 sessions, habits on 59 of 60 days) made
+                          # 27,367 XP in their best 60 days, which is level 24 at 300 and level 20 at 400. A training-only
+                          # athlete's best two months reach level 13 to 15. (Proof's own season curve stays at 300.)
 growth = 0.55             # raise it to make the top end slower, lower it to make it faster
 ranks = ["ROOKIE", "CONTENDER", "GRINDER", "OPERATOR", "ENFORCER", "PREDATOR", "MACHINE", "RELENTLESS", "UNTOUCHABLE", "IMMORTAL"]
 levels_per_rank = 5
@@ -26,6 +45,8 @@ starts_only_on = "Amir's word, with start_season()"
 [week]
 missions = "monday-sunday"   # decision 5: one week for everyone, in each athlete's local time
 held_week = "plan week"      # a held week follows the cycle's own training week (cycleWeekInfo())
+close_after_days = 1         # a training week is judged (held or broken) this many days after its last day, so no time
+                             # zone closes it while it is still running for the athlete
 
 [share]
 mission = 0.5             # GAME-7: a mission pays this share of the XP of the work inside it, the same for every mission
@@ -33,15 +54,22 @@ quest = 0.5               # the same rule for a personal quest
 mission_sweep = 200       # all three of a week's missions done
 
 [habits]
-# AA Proof's habit values as they are today (XP_RULES in habits.html). They carry over unchanged.
+# AA Proof's habit values as they are today (XP_RULES in habits.html, the xp_rules row). They carry over unchanged.
 completion_bonus = 1.2    # a habit that reaches its target pays weight × 1.2; part way, it pays its share of the weight
-daily_cap = 3             # a counter takes at most 3 × its target in a day
+daily_cap = 3             # a counter takes at most 3 × its target in a day (the phone clamps it; nothing to score)
 max_custom = 3            # at most three custom habits pay in a day
 lapse_days = 3            # this many days off target in a row make a lapse (the comeback rule)
 comeback_stick = 7        # days held after a comeback for it to count as one that stuck (BACK IN THE FIGHT)
+qualify_pct = 80          # a day is on target at this % of the weight it could have earned (dayQualifies())...
+one_miss_door = true      # ...or with at most one thing left undone: the second door (Proof's gateV2)
+locked = ["strength"]     # habits nobody ticks by hand (WORKOUT: only a finished session ticks it); one not earned that
+                          # day leaves the day gate instead of counting against it (Proof's unearnable)
+backfill_days = 3         # today and this many days back are open on Proof's log (BACKFILL_DAYS); an older day is
+                          # closed, and settles once the shadow ends (P1 step 4)
 
 [habits.weights]
-strength = 0              # the WORKOUT habit: 0 here because the session fact pays instead (it was 100)
+strength = 100            # the WORKOUT habit, as Proof pays it today. It drops to 0 at the switch, when the session
+                          # fact pays instead (decision 4); it stays 100 until then so the shadow matches Proof ([shadow])
 steps = 60
 sleep = 50
 fuel = 40
@@ -50,6 +78,18 @@ mobility = 30
 breathe = 20
 supps = 20
 custom = 25
+
+[habits.targets]
+# What "done" means for each habit, per day (HABITS[].target in habits.html, Proof's targets). A custom habit's target
+# is 1: done or not.
+strength = 1              # sessions
+steps = 10000
+sleep = 7.5               # hours
+fuel = 3                  # proper meals
+water = 8                 # glasses
+mobility = 1
+breathe = 1
+supps = 1
 
 
 # ── Facts from the training app ───────────────────────────────────────────────────────────────────────────────────
@@ -61,6 +101,8 @@ source = "training"
 pays_for = "act"
 when = "A session from the plan is finished with Done."
 cap = "One per plan day per training week. A day repeated in the same week pays once."
+limit = 1                 # the cap as a number: at most this many paid sessions per plan day per training week
+limit_per = "plan_day_week"
 
 [fact.session_finished_early]
 meaning = "commitment"
@@ -69,6 +111,8 @@ source = "training"
 pays_for = "act"
 when = "A session from the plan is finished with Finish early."
 cap = "As session_finished. It still counts toward a held week."
+limit = 1                 # shared with session_finished: one paid session per plan day per training week
+limit_per = "plan_day_week"
 
 [fact.full_log]
 meaning = "commitment"
@@ -93,6 +137,7 @@ source = "training"
 pays_for = "act"
 when = "A test-flagged lift is logged in its test week."
 cap = "One per lift per cycle."
+window_days = 7           # the test week: the cycle's last 7 days (RETEST_WINDOW_DAYS), and after its end while it is current
 
 [fact.library_session]
 meaning = "commitment"
@@ -101,6 +146,8 @@ source = "training"
 pays_for = "act"
 when = "A Library session is marked done."
 cap = "Two a week. It never counts toward a held week."
+limit = 2                 # paid Library sessions per week (Monday to Sunday)
+limit_per = "week"
 
 
 # ── Facts from AA Proof ───────────────────────────────────────────────────────────────────────────────────────────
@@ -134,6 +181,13 @@ source = "proof"
 pays_for = "act"
 when = "Proof's WORKOUT habit is ticked by a finished session. It keeps the day streak whole; the session fact pays."
 
+[fact.habit_day]
+meaning = "consistency"
+xp = 0
+source = "proof"
+pays_for = "nothing"
+when = "A day on Proof's log, with the habits on its list that day (rosterOn()) and the athlete's own habits. It pays nothing: the day's habits do, and the day gate and the perfect day read its list."
+
 
 # ── Facts the server works out (P2) ───────────────────────────────────────────────────────────────────────────────
 
@@ -165,6 +219,35 @@ xp = 50
 source = "server"
 pays_for = "act"
 when = "The first held week after two or more weeks with no session (between-cycle and paused weeks don't count)."
+weeks_away = 2            # training weeks in a row with no session that make an absence
+
+[fact.comeback_stuck]
+meaning = "resilience"
+xp = 0
+source = "server"
+pays_for = "act"
+when = "A comeback followed by comeback_stick days on target in a row (Hard to Kill reads it). It pays through badges, not by itself."
+
+[fact.week_by_the_book]
+meaning = "commitment"
+xp = 0
+source = "server"
+pays_for = "act"
+when = "A held week in which every session has full_log and checkin_done (Love Hold reads it). It pays through badges, not by itself."
+
+[fact.month_with_amir]
+meaning = "commitment"
+xp = 0
+source = "server"
+pays_for = "act"
+when = "Each whole month since the athlete's first session; none while they are a former athlete (Veteran reads it). It pays through badges, not by itself."
+
+[fact.lift_gain]
+meaning = "progress"
+xp = 0
+source = "server"
+pays_for = "progress"
+when = "A lift's best effort-adjusted index, with the weight or the reps up, reaches a new high above its first session; the value is the percent above it. One fact per lift, its value rising (The Upgrade reads it). It pays through badges, not by itself."
 
 [fact.comeback]
 meaning = "resilience"
@@ -186,8 +269,11 @@ meaning = "progress"
 xp = 200
 source = "server"
 pays_for = "progress"
-when = "At a cycle's end, each of its top three effort-matched wins (cycleWins(): heavier at the same effort, 2% or more)."
+when = "At a cycle's end, each of its top three effort-matched wins (cycleWins(): heavier at the same effort, 2% or more) in which the weight or the reps went up. A lower RPE alone shows on the This cycle card and earns nothing (GAME-5)."
 cap = "Three per cycle."
+limit = 3                 # wins paid per cycle
+limit_per = "cycle"
+min_gain = 0.02           # the effort-adjusted gain a win needs (cycleWins(): 2%)
 
 [fact.retest_beaten]
 meaning = "progress"

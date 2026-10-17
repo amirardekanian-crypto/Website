@@ -21,12 +21,17 @@ ERRORS (exit 1)
    8  every [quest.<id>]: the required fields, 2 to 12 weeks, 2 to 5 steps, each step closing on a fact or Amir's tick
    9  recognition.toml: the five sizes and what each means, Courtside, the Bell, Amir's three tools, the WhatsApp lines
   10  the brand rule: no gold, golden, yellow, amber or ochre in any string, in any file
+  13  the fields that carry Proof's counting (proof_measure, proof_need, proof_kind, proof_xp): a known measure or kind,
+      a habit that exists, a need above 0, one Proof code per tier
+  14  while [shadow] on = true (phase 1): every habit number and every Proof milestone, tier and quest equals Proof's
+      own, read from supabase/xp_rules_snapshot.json (the shadow must match Proof to the point, PROCEDURES.md → P14)
 WARNINGS (exit 0)
    6  a title with origin "new" that nothing awards (unless it is a template)
   11  coverage: each meaning has a badge, an achievement, a title and a mission (missions skip progress, on purpose); each slot has a mission; each habit
       except strength and custom has a recovery mission
   12  an unknown key inside an entry (a typo would otherwise be silently ignored); also an id that is not snake_case
       and an unknown top-level key (a mistyped [table] would silently drop its entries from every check above)
+  14  the Proof snapshot is missing or unreadable, so the parity check could not run
 
 Standard library only. Python 3.11+ (tomllib).
 
@@ -34,6 +39,7 @@ Standard library only. Python 3.11+ (tomllib).
   python scripts/check_career.py some/dir   # another folder (scripts/test_check_career.py checks copies of it)
 """
 import argparse
+import json
 import math
 import pathlib
 import re
@@ -68,15 +74,21 @@ MEASURES = ["count", "units", "days"]
 CLOSERS = ["fact", "coach_tick"]
 TOOLS = ["reaction", "commendation", "amirs_pick"]
 SIZE_AUDIENCES = ["athlete", "coach", "crew", "beyond"]
+LIMIT_PER = ["plan_day_week", "week", "cycle"]
+# How Proof counts a milestone (hab_bonus_xp()'s measures) and a quest inside a run (its kinds). <habit> is a habit id.
+PROOF_MEASURES = ["streak:<habit>", "daysHit:<habit>", "daysWith3", "perfectDays", "comebackRun", "comebacksStuck"]
+PROOF_KINDS = ["daysHit:<habit>", "total:<habit>", "qualify", "perfect"]
+PROOF_SNAPSHOT = ROOT / "supabase" / "xp_rules_snapshot.json"
 
 BANNED_WORDS = re.compile(r"\b(gold|golden|yellow|amber|ochre)\b", re.IGNORECASE)
 SNAKE_CASE = re.compile(r"^[a-z][a-z0-9_]*$")
 
 # Keys an entry may carry besides its own fields without a warning (rule 12).
 EXTRA_KEYS = {"tier_name", "mult", "title", "template", "proof_id", "proof_code", "proof_codes", "proof_xp",
-              "min_share", "cap", "habit", "within", "run", "line"}
+              "proof_measure", "proof_need", "proof_kind", "min_share", "cap", "habit", "within", "run", "line"}
 KNOWN_KEYS = {
-    "fact": {"meaning", "xp", "xp_from", "source", "pays_for", "when", "cap", "min_share"},
+    "fact": {"meaning", "xp", "xp_from", "source", "pays_for", "when", "cap", "min_share", "limit", "limit_per",
+             "weeks_away", "window_days", "min_gain"},
     "badge": {"name", "meaning", "kind", "counts", "proof_codes", "caption", "free", "origin", "tiers"},
     "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},
     "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code"},
@@ -89,13 +101,13 @@ KNOWN_KEYS = {
     "message": {"en", "fa", "used_for"},
 }
 TOP_LEVEL_KEYS = {
-    "rulebook": {"version", "meanings", "level", "season", "week", "share", "habits", "fact"},
+    "rulebook": {"version", "meanings", "shadow", "level", "season", "week", "share", "habits", "fact"},
     "badges": {"badge"},
     "achievements": {"achievement"},
     "titles": {"title", "skin"},
     "missions": {"mission"},
     "quests": {"quest"},
-    "recognition": {"sizes", "size", "courtside", "bell", "tool", "message"},
+    "recognition": {"sizes", "size", "courtside", "bell", "tool", "message", "feedback"},
 }
 
 
@@ -338,6 +350,51 @@ def check_rulebook(rb, rep):
             if not is_num(value) or value < 0:
                 c.error(f"the weight of {habit!r} must be a number >= 0, found {value!r}")
 
+    # What the server scores habits by (phase 1): Proof's own numbers, so nothing is typed into the SQL (GAME-10).
+    c = Ctx(rep, f, "habits")
+    if isinstance(habits, dict):
+        get_number(c, habits, "completion_bonus", gt=0)
+        get_number(c, habits, "max_custom", ge=0, integer=True)
+        get_number(c, habits, "lapse_days", gt=0, integer=True)
+        get_number(c, habits, "comeback_stick", gt=0, integer=True)
+        get_number(c, habits, "qualify_pct", gt=0, le=100)
+        get_bool(c, habits, "one_miss_door")
+        get_number(c, habits, "backfill_days", ge=0, integer=True)
+        locked = habits.get("locked")
+        if not (isinstance(locked, list) and all(is_text(x) for x in locked)):
+            c.error(f"locked must be a list of habit ids (it may be empty), found {locked!r}")
+        elif isinstance(weights, dict):
+            for h in locked:
+                if h not in weights or h == "custom":
+                    c.error(f"locked names {h!r}, which is not a habit in [habits.weights]")
+    else:
+        c.error("the [habits] table is missing")
+    c = Ctx(rep, f, "habits.targets")
+    targets = habits.get("targets") if isinstance(habits, dict) else None
+    if not isinstance(targets, dict) or not targets:
+        c.error("the [habits.targets] table is missing or empty (what \"done\" means for each habit)")
+    elif isinstance(weights, dict):
+        for habit, value in targets.items():
+            if habit not in weights or habit == "custom":
+                c.error(f"{habit!r} has a target but no weight in [habits.weights]")
+            if not is_num(value) or value <= 0:
+                c.error(f"the target of {habit!r} must be a number above 0, found {value!r}")
+        for habit in weights:
+            if habit != "custom" and habit not in targets:
+                c.error(f"{habit!r} has a weight but no target (a custom habit's target is 1: it needs none)")
+    c = Ctx(rep, f, "week")
+    week = rb.get("week")
+    if isinstance(week, dict):
+        get_number(c, week, "close_after_days", ge=0, integer=True)
+    else:
+        c.error("the [week] table is missing")
+    c = Ctx(rep, f, "shadow")
+    shadow = rb.get("shadow")
+    if isinstance(shadow, dict):
+        get_bool(c, shadow, "on")
+    else:
+        c.error("the [shadow] table is missing (on = true while Career Mode runs beside Proof)")
+
     facts = entries(rb, "fact", f, rep)
     for fid, fact in facts.items():
         c = Ctx(rep, f, f"fact.{fid}")
@@ -354,6 +411,15 @@ def check_rulebook(rb, rep):
         get_text(c, fact, "when")
         if "min_share" in fact:
             get_number(c, fact, "min_share", gt=0, le=1)
+        if "limit" in fact or "limit_per" in fact:
+            get_number(c, fact, "limit", ge=1, integer=True)
+            get_choice(c, fact, "limit_per", LIMIT_PER)
+        if "weeks_away" in fact:
+            get_number(c, fact, "weeks_away", ge=1, integer=True)
+        if "window_days" in fact:
+            get_number(c, fact, "window_days", ge=0, integer=True)
+        if "min_gain" in fact:
+            get_number(c, fact, "min_gain", ge=0)
         if fact.get("meaning") == "none":
             xp = fact.get("xp")
             if not (is_num(xp) and xp == 0):
@@ -679,6 +745,167 @@ def check_coverage(data, w, rep):
             rep.warn("missions.toml", "coverage", f"no recovery mission for the habit {habit!r}")
 
 
+# ── Rule 13: the fields that carry Proof's counting ───────────────────────────────────────────────────────────────
+
+def proof_rule_ok(value, allowed, habits):
+    """`value` is one of `allowed`, where "x:<habit>" stands for x: followed by a habit id (never custom)."""
+    if not isinstance(value, str):
+        return False
+    for a in allowed:
+        if a.endswith(":<habit>"):
+            head = a[: -len("<habit>")]
+            if value.startswith(head) and value[len(head):] in habits:
+                return True
+        elif value == a:
+            return True
+    return False
+
+
+def check_proof_fields(data, w, rep):
+    habits = [h for h in (w.weights or []) if h != "custom"]
+    for stem, key in (("badges", "badge"), ("achievements", "achievement"), ("missions", "mission")):
+        if data[stem] is None:
+            continue
+        section = data[stem].get(key)
+        for ident, e in (section.items() if isinstance(section, dict) else []):
+            if not isinstance(e, dict):
+                continue
+            c = Ctx(rep, f"{stem}.toml", f"{key}.{ident}")
+            if "proof_measure" in e:
+                if not proof_rule_ok(e["proof_measure"], PROOF_MEASURES, habits):
+                    c.error(f"proof_measure {e['proof_measure']!r} is not one of {', '.join(PROOF_MEASURES)} "
+                            f"(<habit> is a habit in [habits.weights])")
+                if key == "badge":
+                    codes, tiers = e.get("proof_codes"), e.get("tiers")
+                    if isinstance(codes, list) and isinstance(tiers, list) and len(codes) != len(tiers):
+                        c.error(f"proof_codes has {len(codes)} code(s) for {len(tiers)} tier(s): one Proof code per "
+                                f"tier, in order")
+                if key == "achievement":
+                    get_number(c, e, "proof_need", gt=0, integer=True)
+                    if not is_text(e.get("proof_code")):
+                        c.error("proof_measure needs proof_code: the code Proof pays it under")
+            if "proof_kind" in e:
+                if not proof_rule_ok(e["proof_kind"], PROOF_KINDS, habits):
+                    c.error(f"proof_kind {e['proof_kind']!r} is not one of {', '.join(PROOF_KINDS)} "
+                            f"(<habit> is a habit in [habits.weights])")
+                get_number(c, e, "proof_need", gt=0)
+                get_number(c, e, "proof_xp", gt=0, integer=True)
+                if not is_text(e.get("proof_id")):
+                    c.error("proof_kind needs proof_id: the id of Proof's quest")
+
+
+# ── Rule 14: while in shadow, every habit number equals Proof's ───────────────────────────────────────────────────
+
+def proof_numbers(data):
+    """What the catalogue says Proof pays, in the shape of Proof's xp_rules row."""
+    rb = data["rulebook"] or {}
+    habits = rb.get("habits") if isinstance(rb.get("habits"), dict) else {}
+    weights = habits.get("weights") if isinstance(habits.get("weights"), dict) else {}
+    fact = rb.get("fact") if isinstance(rb.get("fact"), dict) else {}
+    comeback = fact.get("comeback") if isinstance(fact.get("comeback"), dict) else {}
+    out = {
+        "completionBonus": habits.get("completion_bonus"), "customXp": weights.get("custom"),
+        "maxCustom": habits.get("max_custom"), "streakQualifyPct": habits.get("qualify_pct"),
+        "gateV2": habits.get("one_miss_door"), "lapseDays": habits.get("lapse_days"),
+        "comebackStick": habits.get("comeback_stick"), "comebackXp": comeback.get("xp"),
+        "weights": {k: v for k, v in weights.items() if k != "custom"},
+        "targets": habits.get("targets") if isinstance(habits.get("targets"), dict) else {},
+        "unearnable": sorted(x for x in (habits.get("locked") or []) if isinstance(x, str)),
+        "tiers": [], "milestones": [], "quests": [],
+    }
+    section = (data["badges"] or {}).get("badge")
+    for b in (section.values() if isinstance(section, dict) else []):
+        if not isinstance(b, dict) or b.get("origin") != "proof":
+            continue
+        tiers = [t for t in (b.get("tiers") or []) if isinstance(t, dict)] if isinstance(b.get("tiers"), list) else []
+        if b.get("kind") == "per_habit_best_run":
+            out["tiers"] = [{"days": t.get("at"), "mult": t.get("mult")} for t in tiers]
+        elif "proof_measure" in b and isinstance(b.get("proof_codes"), list):
+            for code, t in zip(b["proof_codes"], tiers):
+                out["milestones"].append((code, t.get("at"), t.get("xp"), b.get("proof_measure")))
+    section = (data["achievements"] or {}).get("achievement")
+    for a in (section.values() if isinstance(section, dict) else []):
+        if isinstance(a, dict) and a.get("origin") == "proof" and "proof_measure" in a:
+            out["milestones"].append((a.get("proof_code"), a.get("proof_need"), a.get("xp"), a.get("proof_measure")))
+    section = (data["missions"] or {}).get("mission")
+    for m in (section.values() if isinstance(section, dict) else []):
+        if isinstance(m, dict) and m.get("origin") == "proof" and "proof_kind" in m:
+            out["quests"].append((m.get("proof_id"), m.get("proof_kind"), m.get("proof_need"), m.get("proof_xp")))
+    return out
+
+
+def same_number(a, b):
+    return is_num(a) and is_num(b) and math.isclose(a, b, rel_tol=0, abs_tol=1e-9)
+
+
+def _row(code, need, xp, how):
+    """A milestone or quest as a comparable tuple: numbers as floats, so 1 and 1.0 are the same."""
+    num = lambda v: float(v) if is_num(v) else repr(v)  # noqa: E731
+    return (str(code), num(need), num(xp), str(how))
+
+
+def check_proof_parity(data, rep, snapshot=None):
+    rb = data["rulebook"]
+    shadow = rb.get("shadow") if isinstance(rb, dict) else None
+    if not (isinstance(shadow, dict) and shadow.get("on") is True):
+        return
+    f = "rulebook.toml"
+    snapshot = pathlib.Path(snapshot or PROOF_SNAPSHOT)
+    try:
+        proof = json.loads(snapshot.read_text(encoding="utf-8"))["rules"]
+        if not isinstance(proof, dict):
+            raise ValueError("its rules are not an object")
+    except Exception as exc:  # noqa: BLE001 - any failure to read means the check could not run
+        rep.warn(f, "shadow", f"could not read Proof's rules from {snapshot} ({exc}): the parity check did not run")
+        return
+    mine = proof_numbers(data)
+    where = {"completionBonus": "[habits] completion_bonus", "customXp": "[habits.weights] custom",
+             "maxCustom": "[habits] max_custom", "streakQualifyPct": "[habits] qualify_pct",
+             "gateV2": "[habits] one_miss_door", "lapseDays": "[habits] lapse_days",
+             "comebackStick": "[habits] comeback_stick", "comebackXp": "[fact.comeback] xp"}
+    for key, label in where.items():
+        a, b = mine[key], proof.get(key)
+        ok = (a is b) if isinstance(a, bool) or isinstance(b, bool) else same_number(a, b)
+        if not ok:
+            rep.error(f, "shadow", f"{label} is {a!r} but Proof's {key} is {b!r}: in shadow they must be equal")
+    for key, label in (("weights", "[habits.weights]"), ("targets", "[habits.targets]")):
+        a = mine[key]
+        b = proof.get(key) if isinstance(proof.get(key), dict) else {}
+        for h in sorted(set(a) | set(b)):
+            if not same_number(a.get(h), b.get(h)):
+                rep.error(f, "shadow", f"{label} {h} is {a.get(h)!r} but Proof's is {b.get(h)!r}: in shadow they must "
+                                       f"be equal")
+    theirs = sorted(x for x in (proof.get("unearnable") or []) if isinstance(x, str))
+    if mine["unearnable"] != theirs:
+        rep.error(f, "shadow", f"[habits] locked is {mine['unearnable']!r} but Proof's unearnable is {theirs!r}: in "
+                               f"shadow they must be equal")
+    ptiers = [{"days": t.get("days"), "mult": t.get("mult")} for t in (proof.get("tiers") or []) if isinstance(t, dict)]
+    if len(mine["tiers"]) != len(ptiers) or not all(
+            same_number(x["days"], y["days"]) and same_number(x["mult"], y["mult"])
+            for x, y in zip(mine["tiers"], ptiers)):
+        rep.error("badges.toml", "badge.habit_tiers", f"the tiers {mine['tiers']!r} are not Proof's {ptiers!r}")
+    pm = {_row(m.get("code"), m.get("need"), m.get("xp"), m.get("measure"))
+          for m in (proof.get("milestones") or []) if isinstance(m, dict)}
+    mm = {_row(*m) for m in mine["milestones"]}
+    for row in sorted(pm - mm):
+        rep.error("badges.toml", "proof milestones", f"Proof pays the milestone {row[0]} (need {row[1]:g}, {row[2]:g} "
+                                                     f"XP, {row[3]}) and no proof badge tier or achievement matches it")
+    for row in sorted(mm - pm):
+        rep.error("badges.toml", "proof milestones", f"{row[0]} (need {row[1]}, {row[2]} XP, {row[3]}) is not a "
+                                                     f"milestone Proof pays: code, need, xp and measure must all match")
+    pq = {_row(q.get("id"), q.get("need"), q.get("xp"), q.get("kind"))
+          for q in (proof.get("quests") or []) if isinstance(q, dict)}
+    mq = {_row(q[0], q[2], q[3], q[1]) for q in mine["quests"]}
+    for row in sorted(pq - mq):
+        rep.error("missions.toml", "proof quests", f"Proof's quest {row[0]} ({row[3]}, need {row[1]:g}, {row[2]:g} XP) "
+                                                   f"has no mission with that proof_id, proof_kind, proof_need and "
+                                                   f"proof_xp")
+    for row in sorted(mq - pq):
+        rep.error("missions.toml", "proof quests", f"{row[0]} ({row[3]}, need {row[1]}, {row[2]} XP) is not a quest "
+                                                   f"Proof has: proof_id, proof_kind, proof_need and proof_xp must "
+                                                   f"all match")
+
+
 # ── The run, and the summary ──────────────────────────────────────────────────────────────────────────────────────
 
 def check_folder(folder):
@@ -703,6 +930,9 @@ def check_folder(folder):
         check_title_use(w, rep)
     check_brand(data, rep)
     check_coverage(data, w, rep)
+    check_proof_fields(data, w, rep)
+    if all(data[stem] is not None for stem in ("rulebook", "badges", "achievements", "missions")):
+        check_proof_parity(data, rep)
     return rep, data
 
 

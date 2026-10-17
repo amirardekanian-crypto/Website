@@ -394,6 +394,7 @@ class CareerCheckerTests(unittest.TestCase):
     def test_coverage_gaps_are_warnings(self):
         # a missions file with one stretch mission: no plan, recovery or crew slot, no recovery mission for any habit
         (self.dir / "missions.toml").write_text(GOOD_MISSION, encoding="utf-8", newline="\n")
+        self.set_key("rulebook.toml", "shadow", "on", "false")   # Proof's quests are gone too: parity is not this test
         out = self.assertPasses("OK: 0 errors")
         for gap in ("no mission in the 'plan' slot", "no mission in the 'recovery' slot", "no mission in the 'crew' slot",
                     "no recovery mission for the habit 'steps'", "no recovery mission for the habit 'supps'",
@@ -403,6 +404,44 @@ class CareerCheckerTests(unittest.TestCase):
         self.assertNotIn("no mission has the meaning 'progress'", out)   # no mission asks for progress, on purpose
         self.assertNotIn("no recovery mission for the habit 'strength'", out)
         self.assertNotIn("no recovery mission for the habit 'custom'", out)
+
+    # ── rules 13 and 14: Proof's counting, and the shadow's parity with Proof (phase 1) ──────────────────────────
+    def test_in_shadow_a_habit_number_must_equal_proofs(self):
+        self.set_key("rulebook.toml", "habits.weights", "water", "31")
+        self.assertFails("[habits.weights] water is 31 but Proof's is 30")
+
+    def test_in_shadow_the_day_gate_must_equal_proofs(self):
+        self.set_key("rulebook.toml", "habits", "qualify_pct", "75")
+        self.assertFails("[habits] qualify_pct is 75 but Proof's streakQualifyPct is 80")
+
+    def test_in_shadow_a_proof_milestone_must_match(self):
+        path = self.dir / "badges.toml"
+        text = path.read_text(encoding="utf-8")
+        tier = '{ at = 10, metal = "silver", xp = 75, size = "highlight" }'
+        self.assertIn(tier, text)
+        path.write_text(text.replace(tier, tier.replace("xp = 75", "xp = 80"), 1), encoding="utf-8", newline="\n")
+        self.assertFails("Proof pays the milestone DP (need 10, 75 XP, daysWith3)", "DP (need 10.0, 80.0 XP")
+
+    def test_in_shadow_a_proof_quest_must_match(self):
+        self.set_key("missions.toml", "mission.no_negotiation", "proof_need", "6")
+        self.assertFails("Proof's quest w_supps7 (daysHit:supps, need 7, 140 XP) has no mission")
+
+    def test_out_of_shadow_the_habit_numbers_may_move(self):
+        self.set_key("rulebook.toml", "shadow", "on", "false")
+        self.set_key("rulebook.toml", "habits.weights", "strength", "0")   # the switch: the session fact pays instead
+        self.assertPasses("OK: 0 errors")
+
+    def test_a_proof_measure_or_kind_must_be_known(self):
+        self.set_key("badges.toml", "badge.zen_machine", "proof_measure", '"streak:nothing"')
+        self.set_key("missions.toml", "mission.dead_calm", "proof_kind", '"dayshit:breathe"')
+        self.assertFails("proof_measure 'streak:nothing' is not one of", "proof_kind 'dayshit:breathe' is not one of")
+
+    def test_the_new_rulebook_fields_are_checked(self):
+        self.set_key("rulebook.toml", "habits", "one_miss_door", '"yes"')
+        self.set_key("rulebook.toml", "fact.library_session", "limit_per", '"month"')
+        self.set_key("rulebook.toml", "habits.targets", "sleep", "0")
+        self.assertFails("one_miss_door must be true or false", "limit_per 'month' is not one of",
+                         "the target of 'sleep' must be a number above 0")
 
     def test_a_file_that_does_not_parse_does_not_hide_the_others(self):
         self.append("titles.toml", "\n[title.zz_broken\n")

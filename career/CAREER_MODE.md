@@ -4,8 +4,11 @@
 > out, step by step, is in **[`PROCEDURES.md`](PROCEDURES.md)**. Every number and every badge, title, mission and quest
 > lives in the `.toml` files beside this one, and **[`README.md`](README.md)** says which file to open to change what.
 >
-> **Status (2026-10-17): designed, not built.** Nothing in the apps reads this folder yet. It is the design the build
-> will follow, phase by phase (*Build order*, below). Change anything here first, then build.
+> **Status (2026-10-17): phase 1 built and rehearsed, in shadow; on the live project once Amir says yes.** The fact
+> ledger (`supabase/stage66_career_mode.sql`) turns every save into facts on the server, the rulebook and the catalogue
+> are rows made from these files (`python scripts/career_seed.py`), and in the rehearsal on the real rows Career Mode's
+> habit XP equals Proof's for every athlete. Nothing an athlete sees reads it. The rest is the design the build follows, phase by phase (*Build order*, below). Change anything
+> here first, then build; a changed file is re-seeded (`README.md`, *How to change something*).
 
 ---
 
@@ -317,7 +320,7 @@ Proof's to the point.
 
 | Phase | What | Visible | Status |
 |---|---|---|---|
-| 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app | not started |
+| 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app (not yet: its own follow-up) | **built and rehearsed 2026-10-17, in shadow** (stage66; PROCEDURES.md → *Phase 1, as built*). On the real rows 34 of 34 athletes' habit XP equals Proof's, this season, the rolling week and all time. On the live project: waiting for Amir's yes |
 | 2 | **One profile.** Proof's level, rank and board read `get_profile()`. The phone scorer becomes the preview, and instant feedback (P17) reads it | The career level, revealed once; every tick answers with its XP, the bar and the nearest goal | not started |
 | 3 | **Rewards with meanings, and the switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row; the finish card listing what a session earned; Signed Off | not started |
 | 4 | **Amir's column.** Courtside, reactions, commendations, Amir's Pick | coach.html → Today | not started |
@@ -343,8 +346,9 @@ None of these blocks phase 1.
 
 - **Names.** Every badge, title, mission and quest name is a draft. Amir renames freely (names should be cool, not
   literal).
-- **The numbers.** Every XP value in `rulebook.toml` is a first draft. The level curve's `base` is re-anchored in phase 1
-  from the shadow data, so two months of solid work still reaches level 20.
+- **The numbers.** Every XP value in `rulebook.toml` is a first draft. The level curve's `base` was re-anchored in phase 1
+  from the shadow data (2026-10-17: 300 → 400, the measurement is beside it), so two months of solid work still reaches
+  level 20.
 - **The season title.** Proof gives a season's title at level 5 inside the season. With career levels it needs a season
   points threshold instead (`rulebook.toml` → `[season] title_points`, drafted at 2,000).
 - **Proof's milestones.** Which families become badges and which one-offs become achievements, and the meaning of each
@@ -364,4 +368,12 @@ None of these blocks phase 1.
 - A rule a phone previews goes into `scripts/check_twins.js` the same day.
 - `privacy.html` changes with the Bell, the share card and Amir's Pick (what is shown, to whom, on what basis).
 - The in-app guides name real controls: `tourSteps()` in Proof, `APP_GUIDE` and `ONB_TEXT` in the training app.
-- `python scripts/check_career.py` passes after any edit to this folder.
+- `python scripts/check_career.py` passes after any edit to this folder, and a changed file is re-seeded on the server
+  (`python scripts/career_seed.py`, then its one statement through the Supabase tool).
+- **While `[shadow] on = true`, Proof's habit numbers live twice:** the `xp_rules` row and `career/*.toml` (`[habits]`,
+  the tiers, the `origin = "proof"` milestones and quests). `check_career.py` holds them equal to
+  `supabase/xp_rules_snapshot.json`, in pre-commit. A change to one is a change to both, until the switch.
+- **The training app's maths copied into SQL** (stage66): `career_entry_sets()` is `cycleBestSet()`, `histBestSet()`,
+  `estimateOneRM()` and `parseLoggedKg()`; `career_win_gain()` is `winText()`'s verdict; `career_weeks()` is
+  `cycleWeekInfo()`'s weeks; `career_habit_days()` is `hab_bonus_xp()`'s day gate. A change to the original changes the copy
+  the same day (`career_compare()` proves the day gate on every real log).
