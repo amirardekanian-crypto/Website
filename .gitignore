@@ -16,7 +16,9 @@ data/patch_jsons_1.py.txt
 # coaching pipeline still WRITES data/<id>.json as a local working file — it goes up through
 # publish_cycle() (/program-assemble). Committing one would put
 # every programme, and the athlete keys 30 of them carry, back on the public web.
-data/*.json
+# Every file in data/, not only *.json (2026-10-17): data/payam_sadr.json.bak-2026-10-13 slipped past
+# the old *.json rule, was committed on 2026-10-14 and served live until it was removed.
+data/*
 !data/.gitkeep
 
 # Coaching logs are coach-only rationale written ABOUT an athlete, and this repo is
