@@ -34,11 +34,16 @@
     // Embedded on the training app's Home (program.html, Fork 1B, 2026-09-26): today's
     // habits only, in that app's clothes. See renderEmbed().
     window.IS_EMBED = params.get('embed') === '1';
+    // Its fonts are the training app's own sheet since 2026-10-17 (it was Google Fonts, unverified
+    // from Iran): Barlow, Barlow Condensed 800 and Space Mono from /assets/fonts/. media=print and
+    // onload, as program.html loads it, so the strip never waits on it to paint.
     if (window.IS_EMBED) {
       document.documentElement.classList.add('embed');
       var ef = document.createElement('link');
       ef.rel = 'stylesheet';
-      ef.href = 'https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&family=Space+Mono:wght@400;700&display=swap';
+      ef.media = 'print';
+      ef.onload = function () { this.media = 'all'; };
+      ef.href = '/assets/css/app-fonts.css';
       document.head.appendChild(ef);
     }
 

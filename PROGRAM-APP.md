@@ -741,8 +741,8 @@ phone's sets from the next open. `scripts/headless/phone-first.js`.
 - **The fonts are our own files too** (2026-10-13, aap-v158): `/assets/css/app-fonts.css` (the Barlow and Barlow Condensed
   weights the app uses, the same files as the site's `fonts.css`, and Space Mono, added to `/assets/fonts/` with its licence
   line), loaded without blocking paint as the Google stylesheet was. The worker precaches the stylesheet and keeps each font
-  file the first time it is used. Nothing in the app asks Google Fonts now except AA Proof's strip on Home (habits.html,
-  which still links them).
+  file the first time it is used. AA Proof's strip on Home (`habits.html?embed=1`) loads the same sheet since 2026-10-17
+  (aap-v159; it added the Barlow Condensed 800 face, which only the strip uses), so nothing on Home asks Google Fonts.
 - **The library** marks a failed download
   (`onerror` → `window.SB_FAILED`), so `_sbReady()` stops at once instead of polling ~3 s before
   every call; `_sbLoad()` fetches it again once the connection is back. **Sign-in uses `_sbForSignIn()`** (2026-10-11): it waits, fetches the library again when the first download failed or is only slow, takes whichever copy arrives first (12 s ceiling) and, if there is still nothing, says "The sign-in could not load…" instead of "check your connection". Before this a failed first download answered every tap with the connection message until the app was force-closed.
@@ -926,8 +926,8 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     same 720 / 620 px heights and the screen scrolls rather than squash. Timing, sound, the wake lock, the keys and Back are unchanged.
   - **The demo banner never covers a full-screen layer** (D9): `--demo-h` is the banner's measured height (a ResizeObserver), and the timer
     and Guided offset by it (the banner is 54 px at 320 px with fallback fonts, so a fixed 44 px covered the band).
-  - program.html's fonts are this site's files since 2026-10-13, so every check draws the real faces; `scripts/headless/lib.js`'s
-    `context()` still takes `{ fonts: true }` to let Google Fonts through, which now matters only for AA Proof's strip.
+  - program.html's fonts are this site's files since 2026-10-13 and AA Proof's strip's since 2026-10-17, so every check draws the
+    real faces; `scripts/headless/lib.js`'s `context()` still takes `{ fonts: true }` (Google Fonts let through), which no app needs now.
 
 - **Personal Records and Body weight** (`paintCover()`, `ceilBoardHtml()`, `renderCeiling()`, `renderCeilingLift()`, `paintCeilingForm()`,
   `renderWeightScreen()`; `scripts/headless/records-weight.js`, 122 checks):

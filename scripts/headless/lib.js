@@ -109,7 +109,8 @@ async function context(browser, opts) {
   const ctx = await browser.newContext({ viewport: { width: opts.w || 390, height: opts.h || 844 },
     isMobile: true, hasTouch: !!opts.touch, serviceWorkers: 'block', ...(opts.tz ? { timezoneId: opts.tz } : {}) });
   // Only the local server: Plausible and the CDN fail fast, as they would with no signal. program.html's fonts are local since
-  // 2026-10-13; opts.fonts still lets Google Fonts through, for AA Proof's strip (habits.html links them).
+  // 2026-10-13 and AA Proof's strip's since 2026-10-17, so opts.fonts (Google Fonts let through) changes nothing in either app;
+  // it stays so the callers that pass it still run.
   await ctx.route('**/*', r => {
     const u = r.request().url();
     // The apps' own copy of supabase-js (2026-10-13): never loaded here, so the stub stays the library, as the CDN copy never was.
@@ -126,7 +127,7 @@ async function context(browser, opts) {
 
 // program.html, signed in as the fixture athlete, past the loading screen. opts:
 //   tz ('America/Los_Angeles': the browser's time zone) · w, h, dark, touch · prog / spine / hist (instead of the fixtures) · stub (extra stub config, e.g.
-//   { mode: 'offline' }) · fonts: true lets Google Fonts load (screenshots) · query ('?client=demo') · seed: { '<key suffix>': value } stored under '<id><suffix>' (e.g.
+//   { mode: 'offline' }) · fonts: true lets Google Fonts load (no app asks for them since 2026-10-17) · query ('?client=demo') · seed: { '<key suffix>': value } stored under '<id><suffix>' (e.g.
 //   { _setlog_Barbell_Back_Squat: [...] }) · fresh: true skips the welcome and install stand-downs.
 async function openProgram(browser, opts = {}) {
   const { ctx, p } = await context(browser, opts);

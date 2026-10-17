@@ -287,7 +287,8 @@
 // v156: program.html changed (2026-10-13): names a screen reader says well (session rating, rest RPE keys, the open tab) and Guided's tempo link at 44 px.
 // v157: program.html changed (2026-10-13): 100dvh beside 100vh (iPhone's toolbar), and an installed app asks to keep its storage.
 // v158: program.html changed (2026-10-13): its fonts come from this site (/assets/css/app-fonts.css, Space Mono added), not Google Fonts.
-const CACHE = 'aap-v158';
+// v159: habits.html and app-fonts.css changed (2026-10-17): AA Proof's strip on Home takes its fonts from /assets/css/app-fonts.css (Barlow Condensed 800 added), not Google Fonts.
+const CACHE = 'aap-v159';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
