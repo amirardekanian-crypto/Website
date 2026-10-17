@@ -16,6 +16,9 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const $ = (sel, root) => (root || document).querySelector(sel);
   const pill = (t, cls) => `<span class="pill ${cls || ''}">${t}</span>`;
+  // In Vazirmatn a middle dot "·" is the Persian zero «۰»: «۱۴۰۵/۰۱/۱۵ · ۴۸» reads «۴۸۰». So no "·" sits next
+  // to a number here: a sentence takes «،», and items on one line take SEP, the course app's short drawn bar.
+  const SEP = '<span class="sep" aria-hidden="true"></span>';
   const ul = a => (a && a.length) ? `<ul class="list">${a.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : '';
   const ol = a => (a && a.length) ? `<ol class="steps">${a.map(i => `<li>${esc(i)}</li>`).join('')}</ol>` : '';
   const mmss = s => fa(Math.floor(s / 60)) + ':' + fa(String(s % 60).padStart(2, '0'));
@@ -338,7 +341,7 @@
       const rpeSel = sfx => `<div class="field"><label for="le${sfx}">RPE</label><select class="input num-in" id="le${sfx}"><option value="">—</option>${RPES.map(v => `<option value="${v}">${fmt(v, v % 1 ? 1 : 0)}</option>`).join('')}</select></div>`;
       const set = sfx => `<div class="calc-grid">${field('lk' + sfx, esc(c.loadLabel))}${field('lr' + sfx, 'تکرار')}${rpeSel(sfx)}</div>`;
       inputs = (c.sides ? ['R', 'L'].map(sfx => `<div class="lift-set"><div class="sub-h">${esc(c.sideLabels[sfx])}</div>${set(sfx)}</div>`).join('') : set(''))
-        + `<p class="lead" style="margin:8px 0 0">۱۶ سال و بالاتر: ۵ تکرار با RPE ۹ یا ۱۰ · زیر ۱۶ سال: ۶ تکرار با RPE ۷ یا ۸</p>`;
+        + `<p class="lead" style="margin:8px 0 0">۱۶ سال و بالاتر: ۵ تکرار با RPE ۹ یا ۱۰، زیر ۱۶ سال: ۶ تکرار با RPE ۷ یا ۸</p>`;
     } else if (c.type === 'reps') {
       inputs = field('rp', 'تعداد تکرار درست');
     } else if (c.type === 'grip') {
@@ -365,7 +368,7 @@
     const h = history(p, id);
     if (!h.length) return '';
     const d = measureInfo(id).decimals;
-    return `<div class="hist">${label}: ${h.slice(-3).map(r => `${fa(r.date)} · <b>${fmt(r.value, d)}</b>`).join(' ، ')}</div>`;
+    return `<div class="hist">${label}: ${h.slice(-3).map(r => `${fa(r.date)}${SEP}<b>${fmt(r.value, d)}</b>`).join(' ، ')}</div>`;
   }
   function paintHistory() {
     const box = $('.calc'), el = $('#rec-hist');
@@ -530,7 +533,7 @@
     }
     const q = ceilingQuality(s.eff), j = p ? judgeSet(p, s.reps, s.rpe) : null;
     h += `<div class="big-result"><span>حداکثر قدرت تخمینی</span><b>${showKg(s.est, c)}</b><em>کیلوگرم</em></div>
-      <div class="grade ${q.key}">${q.label} <em>· میزان اعتماد به این عدد</em></div>`;
+      <div class="grade ${q.key}">${q.label}${SEP}<em>میزان اعتماد به این عدد</em></div>`;
     h += j ? `<div class="${j.ok ? 'ok' : 'warn'}">${esc(j.msg)}</div>` : `<p class="lead" style="margin:6px 0 0">${esc(q.hint)}</p>`;
     const result = j && j.ok ? { test: id, value: Number(s.est.toFixed(1)), kg: s.kg, reps: s.reps, rpe: s.rpe, mode: j.mode } : null;
     return { html: h, result };
@@ -593,15 +596,15 @@
   // Own progress (with strength per kg of body weight), no reference table, then the group.
   function analysisLift(t, p, results) {
     if (!results.length) return '';
-    let h = `<div class="an"><div class="an-h">۱ · پیشرفت خود بازیکن</div>`;
+    let h = `<div class="an"><div class="an-h">۱${SEP}پیشرفت خود بازیکن</div>`;
     results.forEach(r => { h += (t.calc.sides ? `<div class="sub-h">${esc(measureInfo(r.test).title)}</div>` : '') + liftProgress(p, r); });
     const w = latest(p, 'weight');
     if (w) {
       h += `<p style="margin:8px 0 0">نسبت به وزن بدن: ${results.map(r => `<b>${fmt(r.value / w.value, 2)}</b>`).join(' و ')} برابر وزن (وزن ${fmt(w.value, 1)} کیلوگرم، ${fa(w.date)})</p>`;
       if (dayIndex(todayStr()) - dayIndex(w.date) > 7) h += `<p class="lead" style="margin:0">این وزن بیش از یک هفته پیش ثبت شده؛ برای عدد دقیق‌تر دوباره وزن کنید.</p>`;
     } else h += `<p class="lead" style="margin:8px 0 0">برای قدرت نسبت به وزن بدن، وزن بازیکن را در صفحهٔ «قد، وزن و طول دست‌ها» ثبت کنید.</p>`;
-    h += `</div><div class="an"><div class="an-h">۲ · مقایسه با جدول مرجع</div>${NO_NORM_TENNIS}</div>`;
-    return h + `<div class="an"><div class="an-h">۳ · مقایسه با گروه خودتان</div>${liftGroup(t, p, results)}</div>`;
+    h += `</div><div class="an"><div class="an-h">۲${SEP}مقایسه با جدول مرجع</div>${NO_NORM_TENNIS}</div>`;
+    return h + `<div class="an"><div class="an-h">۳${SEP}مقایسه با گروه خودتان</div>${liftGroup(t, p, results)}</div>`;
   }
 
   // Group: same sex and 2-year band, each player's latest result of the same kind (test or light
@@ -620,7 +623,7 @@
     if (n < 8) return fewText({ groupLabel: label, n });
     const all = peers.map(o => o.v).concat([mine]).sort((a, b) => a - b);
     const med = all.length % 2 ? all[(all.length - 1) / 2] : (all[all.length / 2 - 1] + all[all.length / 2]) / 2;
-    let h = `<p>گروه «${esc(label)}»: رتبهٔ <b>${fa(1 + peers.filter(o => o.v > mine).length)}</b> از ${fa(n)} · میانهٔ گروه ${showKg(med, t.calc)} کیلوگرم</p>`;
+    let h = `<p>گروه «${esc(label)}»: رتبهٔ <b>${fa(1 + peers.filter(o => o.v > mine).length)}</b> از ${fa(n)}، میانهٔ گروه ${showKg(med, t.calc)} کیلوگرم</p>`;
     const w = latest(p, 'weight'), pw = peers.filter(o => o.w);
     if (w && pw.length + 1 >= 8) h += `<p style="margin:0">نسبت به وزن بدن: رتبهٔ <b>${fa(1 + pw.filter(o => o.v / o.w.value > mine / w.value).length)}</b> از ${fa(pw.length + 1)}</p>`;
     return h;
@@ -635,7 +638,7 @@
     let h = `<div class="big-result"><span>تکرار درست</span><b>${fa(value)}</b><em>${esc(t.calc.unit)}</em></div>`;
     if (!p) return { results: [{ test: t.id, value }], html: h + NO_PLAYER };
     const past = history(p, t.id).filter(x => x.date < todayStr());
-    h += `<div class="an"><div class="an-h">۱ · پیشرفت خود بازیکن</div>`;
+    h += `<div class="an"><div class="an-h">۱${SEP}پیشرفت خود بازیکن</div>`;
     if (!past.length) h += `<p>اولین نتیجهٔ این بازیکن در این آزمون؛ این عدد، عدد شروع او می‌شود.</p>`;
     else {
       const base = past[0], prev = past[past.length - 1];
@@ -644,9 +647,9 @@
         `<div class="lead" style="margin:2px 0 0">برای تکرار شنا دادهٔ نوسان روزبه‌روز پیدا نشد؛ اپ دربارهٔ واقعی بودن تغییر حکم نمی‌دهد. روند چند آزمون را ببینید.</div></div>`;
     }
     const g = groupView(t, p, value);
-    h += `</div><div class="an"><div class="an-h">۲ · مقایسه با جدول مرجع</div>${NO_NORM_TENNIS}</div>`;
-    h += `<div class="an"><div class="an-h">۳ · مقایسه با گروه خودتان</div>${g.noAge ? NO_AGE : g.few ? fewText(g)
-      : `<p>گروه «${esc(g.groupLabel)}»: رتبهٔ <b>${fa(g.rank)}</b> از ${fa(g.n)} · میانهٔ گروه ${fmt(g.median, 0)} تکرار</p>`}</div>`;
+    h += `</div><div class="an"><div class="an-h">۲${SEP}مقایسه با جدول مرجع</div>${NO_NORM_TENNIS}</div>`;
+    h += `<div class="an"><div class="an-h">۳${SEP}مقایسه با گروه خودتان</div>${g.noAge ? NO_AGE : g.few ? fewText(g)
+      : `<p>گروه «${esc(g.groupLabel)}»: رتبهٔ <b>${fa(g.rank)}</b> از ${fa(g.n)}، میانهٔ گروه ${fmt(g.median, 0)} تکرار</p>`}</div>`;
     return { results: [{ test: t.id, value }], html: h };
   }
 
@@ -670,18 +673,18 @@
   }
   function analysisGrip(p, results) {
     const HANDS = { gripD: 'دست راکت', gripN: 'دست دیگر' };
-    let h = `<div class="an"><div class="an-h">۱ · پیشرفت خود بازیکن</div><div class="an-rows">`;
+    let h = `<div class="an"><div class="an-h">۱${SEP}پیشرفت خود بازیکن</div><div class="an-rows">`;
     results.forEach(r => {
       const past = history(p, r.test).filter(x => x.date < todayStr());
       if (!past.length) { h += `<div>${HANDS[r.test]}: اولین نتیجه؛ این عدد، عدد شروع می‌شود.</div>`; return; }
       const base = past[0], prev = past[past.length - 1], w = changeWord(r.value - base.value, 1.5, 3.5);
-      h += `<div>${HANDS[r.test]} نسبت به عدد شروع (${fa(base.date)}): <b>${signed(r.value - base.value, 0)}</b> کیلوگرم · ${esc(w.text)}</div>` +
+      h += `<div>${HANDS[r.test]} نسبت به عدد شروع (${fa(base.date)}): <b>${signed(r.value - base.value, 0)}</b> کیلوگرم، ${esc(w.text)}</div>` +
         (past.length > 1 ? `<div>${HANDS[r.test]} نسبت به آزمون قبلی (${fa(prev.date)}): <b>${signed(r.value - prev.value, 0)}</b> کیلوگرم</div>` : '');
     });
     h += `<div class="lead" style="margin:2px 0 0">تغییر واقعی: دست‌کم ۳٫۵ کیلوگرم. در نوجوانی قدرت چنگش با رشد هم بالا می‌رود، پس رده را هم کنارش ببینید.</div></div></div>`;
     const N = C.norms && C.norms.grip, age = ageYears(p);
     const cls = N && age != null ? N.classes.find(c => c.sex === p.sex && age >= c.from && age < c.to) : null;
-    h += `<div class="an"><div class="an-h">۲ · مقایسه با جدول مرجع</div>`;
+    h += `<div class="an"><div class="an-h">۲${SEP}مقایسه با جدول مرجع</div>`;
     if (age == null) h += NO_AGE;
     else if (!cls) h += `<p class="lead" style="margin:0">برای جنس و سن این بازیکن در جدول مرجع داده‌ای نیست.</p>`;
     else {
@@ -689,14 +692,14 @@
         const q = quarter(r.value, cls[r.test === 'gripD' ? 'd' : 'nd']);
         h += `<div class="sub-h">${HANDS[r.test]}</div><div class="bands">${BANDS.map((b, i) => `<span class="${i === q ? 'on' : ''}">${b}</span>`).join('')}</div>`;
       });
-      h += `<p class="lead" style="margin:6px 0 0">رده: ${esc(cls.label)} · در مقایسه با ${esc(N.reference)}</p>`;
+      h += `<p class="lead" style="margin:6px 0 0">رده: ${esc(cls.label)}، در مقایسه با ${esc(N.reference)}</p>`;
     }
-    h += `</div><div class="an"><div class="an-h">۳ · مقایسه با گروه خودتان</div>`;
+    h += `</div><div class="an"><div class="an-h">۳${SEP}مقایسه با گروه خودتان</div>`;
     const dr = results.find(r => r.test === 'gripD');
     if (!dr) h += `<p class="lead" style="margin:0">برای مقایسه با گروه، دست راکت لازم است.</p>`;
     else {
       const g = groupView({ id: 'gripD', calc: {} }, p, dr.value);
-      h += g.noAge ? NO_AGE : g.few ? fewText(g) : `<p>دست راکت در گروه «${esc(g.groupLabel)}»: رتبهٔ <b>${fa(g.rank)}</b> از ${fa(g.n)} · میانهٔ گروه ${fmt(g.median, 0)} کیلوگرم</p>`;
+      h += g.noAge ? NO_AGE : g.few ? fewText(g) : `<p>دست راکت در گروه «${esc(g.groupLabel)}»: رتبهٔ <b>${fa(g.rank)}</b> از ${fa(g.n)}، میانهٔ گروه ${fmt(g.median, 0)} کیلوگرم</p>`;
     }
     return h + `</div>`;
   }
@@ -723,7 +726,7 @@
     const c = t.calc, d = c.decimals || 0, u = esc(c.unit);
     const past = history(p, t.id).filter(r => r.date < todayStr());
 
-    let h = `<div class="an"><div class="an-h">۱ · پیشرفت خود بازیکن</div>`;
+    let h = `<div class="an"><div class="an-h">۱${SEP}پیشرفت خود بازیکن</div>`;
     if (!past.length) h += `<p>اولین نتیجهٔ این بازیکن در این آزمون؛ این عدد، عدد شروع او می‌شود.</p>`;
     else {
       const base = past[0], prev = past[past.length - 1];
@@ -737,19 +740,19 @@
     h += `</div>`;
 
     const nb = normBand(t, p, value);
-    h += `<div class="an"><div class="an-h">۲ · مقایسه با جدول مرجع</div>`;
+    h += `<div class="an"><div class="an-h">۲${SEP}مقایسه با جدول مرجع</div>`;
     if (nb.noNorms) h += `<p class="lead" style="margin:0">${esc(c.noNormsText || 'برای این آزمون جدول مرجع منتشرشده‌ای وجود ندارد.')}</p>`;
     else if (nb.noAge) h += NO_AGE;
     else if (nb.noClass) h += `<p class="lead" style="margin:0">برای جنس و سن این بازیکن در جدول مرجع دادهٔ کافی نیست.</p>`;
     else h += `<div class="bands">${BANDS.map((b, i) => `<span class="${i === nb.q ? 'on' : ''}">${b}</span>`).join('')}</div>
-      <p class="lead" style="margin:0">رده: ${esc(nb.cls.label)} · در مقایسه با ${esc(nb.N.reference)}</p>`;
+      <p class="lead" style="margin:0">رده: ${esc(nb.cls.label)}، در مقایسه با ${esc(nb.N.reference)}</p>`;
     h += `</div>`;
 
     const g = groupView(t, p, value);
-    h += `<div class="an"><div class="an-h">۳ · مقایسه با گروه خودتان</div>`;
+    h += `<div class="an"><div class="an-h">۳${SEP}مقایسه با گروه خودتان</div>`;
     if (g.noAge) h += NO_AGE;
     else if (g.few) h += `<p class="lead" style="margin:0">گروه «${esc(g.groupLabel)}»: برای رتبه‌بندی دست‌کم ۸ بازیکن با نتیجه لازم است؛ الان ${fa(g.n)} نفر.</p>`;
-    else h += `<p>گروه «${esc(g.groupLabel)}»: رتبهٔ <b>${fa(g.rank)}</b> از ${fa(g.n)} · میانهٔ گروه ${fmt(g.median, d)} ${u}</p>
+    else h += `<p>گروه «${esc(g.groupLabel)}»: رتبهٔ <b>${fa(g.rank)}</b> از ${fa(g.n)}، میانهٔ گروه ${fmt(g.median, d)} ${u}</p>
       ${g.similar ? `<p class="lead" style="margin:0">${fa(g.similar)} بازیکن دیگر عملاً هم‌سطح او هستند (فاصله کمتر از تغییر واقعی).</p>` : ''}`;
     h += `</div>`;
     return h;
@@ -773,7 +776,7 @@
         // Real change for height: 1.0 cm (typical error about 0.3 cm). A drop that big, or a change
         // that big from age 18, means measure again.
         const txt = Math.abs(dH) < 1 ? 'تغییر روشنی نیست' : (dH > 0 && !adult) ? 'قد بیشتر شده' : 'احتمالاً خطای اندازه‌گیری؛ دوباره اندازه بگیرید';
-        h += `<div>قد نسبت به ${fa(prev.date)}: <b>${signed(dH, 1)}</b> سانتی‌متر · ${txt}</div>`;
+        h += `<div>قد نسبت به ${fa(prev.date)}: <b>${signed(dH, 1)}</b> سانتی‌متر، ${txt}</div>`;
         // Growth speed, under 18 only, from the most recent earlier height at least 90 days back.
         const nowIdx = dayIndex(today);
         const ref = past.slice().reverse().find(r => nowIdx - dayIndex(r.date) >= 90);
@@ -783,7 +786,7 @@
           const days = nowIdx - dayIndex(ref.date);
           const speed = (height - ref.value) / (days / 365.2422);
           const band = speed > 7.2 ? 'سریع' : speed >= 3.5 ? 'متوسط' : 'آهسته';
-          h += `<div>سرعت رشد: <b>${fmt(Math.max(speed, 0), 1)}</b> سانتی‌متر در سال · ${band}${days < 180 ? ' (موقت؛ داده کمتر از ۶ ماه)' : ''}</div>`;
+          h += `<div>سرعت رشد: <b>${fmt(Math.max(speed, 0), 1)}</b> سانتی‌متر در سال، ${band}${days < 180 ? ' (موقت؛ داده کمتر از ۶ ماه)' : ''}</div>`;
           if (speed > 7.2) h += `<div class="note">رشد سریع: آزمون‌های مهارتی مثل عنکبوتی، ۵۰۵ و پرش جانبی ممکن است مدتی درجا بزنند. این تنبلی یا شکست تمرین نیست.</div>`;
         }
       }
@@ -794,7 +797,7 @@
       else {
         const prev = past[past.length - 1], pct = (weight - prev.value) / prev.value * 100;
         // Real change for body mass: 2% (day-to-day CV about 0.7%). A trend only, never good or bad.
-        h +=`<div>وزن نسبت به ${fa(prev.date)}: <b>${signed(weight - prev.value, 1)}</b> کیلوگرم (${signed(pct, 1).replace('</bdi>', '٪</bdi>')}) · ${Math.abs(pct) < 2 ? 'در حد نوسان روزانه' : 'تغییر روشن'}</div>`;
+        h +=`<div>وزن نسبت به ${fa(prev.date)}: <b>${signed(weight - prev.value, 1)}</b> کیلوگرم (${signed(pct, 1).replace('</bdi>', '٪</bdi>')})، ${Math.abs(pct) < 2 ? 'در حد نوسان روزانه' : 'تغییر روشن'}</div>`;
         if (!adult) h +=`<div class="lead" style="margin:2px 0 0">در نوجوانِ در حال رشد، تغییر وزن را کنار تغییر قد ببینید، نه به‌تنها.</div>`;
       }
     }
@@ -825,21 +828,21 @@
     const pastL = history(p, 'hopL').filter(x => x.date < today);
     const pastR = history(p, 'hopR').filter(x => x.date < today);
 
-    h += `<div class="an"><div class="an-h">۱ · پیشرفت خود بازیکن</div>`;
+    h += `<div class="an"><div class="an-h">۱${SEP}پیشرفت خود بازیکن</div>`;
     if (!pastL.length && !pastR.length) h += `<p>اولین نتیجهٔ این بازیکن در این آزمون؛ این عددها، عدد شروع او می‌شوند.</p>`;
     else {
       const legRow = (label, now, past) => {
         if (now == null || !past.length) return '';
         const base = past[0].value, d = now - base, real = base * c.distReal / 100;
         const txt = Math.abs(d) < real ? 'در حد نوسان معمول' : d > 0 ? 'پیشرفت واقعی' : 'افت واقعی';
-        return `<div>${label} نسبت به عدد شروع (${fa(past[0].date)}): <b>${signed(d, 0)}</b> سانتی‌متر · ${txt}</div>`;
+        return `<div>${label} نسبت به عدد شروع (${fa(past[0].date)}): <b>${signed(d, 0)}</b> سانتی‌متر، ${txt}</div>`;
       };
       h += `<div class="an-rows">${legRow('پای راست', r, pastR)}${legRow('پای چپ', l, pastL)}`;
       const bothDates = pastL.map(x => x.date).filter(dt => pastR.some(y => y.date === dt));
       if (gap != null && bothDates.length) {
         const at = dt => gapOf(pastL.find(x => x.date === dt).value, pastR.find(y => y.date === dt).value);
         const dg = gap - at(bothDates[0]);
-        h += `<div>تفاوت دو پا نسبت به عدد شروع: <b>${signed(dg, 1)}</b> واحد درصد · ${Math.abs(dg) < c.gapReal ? 'در حد نوسان معمول' : dg < 0 ? 'تفاوت واقعاً کمتر شده' : 'تفاوت واقعاً بیشتر شده'}</div>`;
+        h += `<div>تفاوت دو پا نسبت به عدد شروع: <b>${signed(dg, 1)}</b> واحد درصد، ${Math.abs(dg) < c.gapReal ? 'در حد نوسان معمول' : dg < 0 ? 'تفاوت واقعاً کمتر شده' : 'تفاوت واقعاً بیشتر شده'}</div>`;
         const last = bothDates[bothDates.length - 1];
         const pl = pastL.find(x => x.date === last).value, pr = pastR.find(y => y.date === last).value;
         // A big difference that is smaller the next time is partly normal wobble (regression to the mean).
@@ -848,13 +851,13 @@
           h += `<div class="lead" style="margin:2px 0 0">هنوز پای بهتر مشخصی دیده نمی‌شود.</div>`;
         }
       }
-      h += `<div class="lead" style="margin:2px 0 0">تغییر واقعی فاصله: دست‌کم ${fa(c.distReal)}٪ · تغییر واقعی تفاوت دو پا: دست‌کم ${fa(c.gapReal)} واحد درصد</div></div>`;
+      h += `<div class="lead" style="margin:2px 0 0">تغییر واقعی فاصله: دست‌کم ${fa(c.distReal)}٪، تغییر واقعی تفاوت دو پا: دست‌کم ${fa(c.gapReal)} واحد درصد</div></div>`;
     }
     h += `</div>`;
 
-    h += `<div class="an"><div class="an-h">۲ · مقایسه با جدول مرجع</div><p class="lead" style="margin:0">برای این آزمون جدول مرجع منتشرشده‌ای برای بازیکنان تنیس وجود ندارد.</p></div>`;
+    h += `<div class="an"><div class="an-h">۲${SEP}مقایسه با جدول مرجع</div><p class="lead" style="margin:0">برای این آزمون جدول مرجع منتشرشده‌ای برای بازیکنان تنیس وجود ندارد.</p></div>`;
 
-    h += `<div class="an"><div class="an-h">۳ · مقایسه با گروه خودتان</div>`;
+    h += `<div class="an"><div class="an-h">۳${SEP}مقایسه با گروه خودتان</div>`;
     const bandA = ageBand(ageYears(p));
     if (!bandA) h += NO_AGE;
     else if (l == null || r == null) h += `<p class="lead" style="margin:0">برای مقایسه با گروه، هر دو پا لازم است.</p>`;
@@ -874,7 +877,7 @@
         else {
           const q = f => { const pos = (gaps.length - 1) * f, lo = Math.floor(pos), hi = Math.ceil(pos); return gaps[lo] + (gaps[hi] - gaps[lo]) * (pos - lo); };
           const p75 = q(0.75);
-          h += `<p>تفاوت دو پا در گروه: میانه ${fmt(q(0.5), 1)}٪ · ربع بالایی از ${fmt(p75, 1)}٪</p>`;
+          h += `<p>تفاوت دو پا در گروه: میانه ${fmt(q(0.5), 1)}٪، ربع بالایی از ${fmt(p75, 1)}٪</p>`;
           if (gap >= band && gap > p75) h += `<p class="lead" style="margin:0">این تفاوت از ۳ نفر از هر ۴ بازیکن گروه شما بزرگ‌تر است.</p>`;
         }
       }
@@ -1039,7 +1042,7 @@
       const band = ageBand(ageYears(p));
       const bits = [bornText(p), band ? band.label : '', SEX[p.sex] || '', HAND[p.hand] || ''];
       h += `<a class="list-row" href="#/players/${encodeURIComponent(p.id)}"><span class="avatar">${esc(p.name.trim().charAt(0))}</span>
-        <span class="lr-body"><span class="lr-title">${esc(p.name)}</span><br><span class="lr-sub">${bits.filter(Boolean).join(' · ')}</span></span><span class="lr-go">←</span></a>`;
+        <span class="lr-body"><span class="lr-title">${esc(p.name)}</span><br><span class="lr-sub">${bits.filter(Boolean).join(SEP)}</span></span><span class="lr-go">←</span></a>`;
     });
     view().innerHTML = h + `</div>`;
   }

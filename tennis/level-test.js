@@ -163,7 +163,7 @@
   function showResult(p) {
     var lv = p.level;
     var h = '<div class="lt-res-top"><div class="lt-badge' + (lv === 2 ? '' : ' soon') + '">' + FA_NUM[lv] + '</div>' +
-      '<div><div class="lt-kick">نتیجه‌ی تو</div><div class="lt-title" tabindex="-1">سطح ' + FA_NUM[lv] + ' · ' + NAMES[lv] + '</div></div></div>';
+      '<div><div class="lt-kick">نتیجه‌ی تو</div><div class="lt-title" tabindex="-1">سطح ' + FA_NUM[lv] + '، ' + NAMES[lv] + '</div></div></div>';
 
     if (A.doctor === 'yes') {
       h += note('<b>قبل از تمرینِ سخت، اول پزشک.</b> گفتی یکی از موردهای پزشکی درباره‌ت درسته (برای آسیب: پزشک یا فیزیوتراپ). ' +
@@ -178,12 +178,12 @@
       }[p.reason];
       h += '<ul class="lt-why"><li>' + why + '</li></ul>';
       if (p.reason === 'base') h += note('همین حرکت‌ها رو هفته‌ای ۲ تا ۳ بار تمرین کن و ۴ تا ۶ هفته بعد دوباره تست بده.');
-      h += '<p class="lt-p">سطح ۱ · پایه به‌زودی میاد. تا اون موقع، اگه می‌خوای همین حالا شروع کنی، برنامه‌ی اختصاصی از همون جایی که هستی شروع می‌کنه.</p>' +
+      h += '<p class="lt-p">سطح ۱، پایه به‌زودی میاد. تا اون موقع، اگه می‌خوای همین حالا شروع کنی، برنامه‌ی اختصاصی از همون جایی که هستی شروع می‌کنه.</p>' +
         '<div class="lt-cta"><a class="btn btn-primary" href="/form-fa.html">برنامه‌ی اختصاصی ←</a>' +
         '<a class="btn btn-ghost dark" href="/index-fa.html#pricing">قیمت و جزئیات</a></div>';
     } else if (lv === 3) {
       h += '<p class="lt-p">تو بازیکنِ ورزیده‌ای: سابقه‌ی تمرین، پلایومتریک، قدرت و استقامت، همه‌ش هست.</p>' +
-        '<p class="lt-p">سطح ۳ · حرفه‌ای به‌زودی میاد. تا اون موقع، برنامه‌ی اختصاصی بهترین قدمه: از همین سطحی که هستی جلو میره.</p>' +
+        '<p class="lt-p">سطح ۳، حرفه‌ای به‌زودی میاد. تا اون موقع، برنامه‌ی اختصاصی بهترین قدمه: از همین سطحی که هستی جلو میره.</p>' +
         '<div class="lt-cta"><a class="btn btn-primary" href="/form-fa.html">برنامه‌ی اختصاصی ←</a>' +
         '<a class="btn btn-ghost dark" href="/index-fa.html#pricing">قیمت و جزئیات</a></div>';
     } else {
@@ -195,7 +195,7 @@
         h += note('مسابقه‌ی جدی داری؟ درسِ «تمرین کنار تنیس و مسابقه» می‌گه هفته‌ی تورنمنت چی‌کار کنی.');
       }
       h += '<div class="lt-cta"><a class="btn btn-primary" target="_blank" rel="noopener" href="' +
-        esc(waLink('سلام امیر، تستِ «تو کدوم سطحی؟» رو دادم و سطح ۲ · پیشرفته شدم. می‌خوام «' + COURSE + '» رو بخرم.')) +
+        esc(waLink('سلام امیر، تستِ «تو کدوم سطحی؟» رو دادم و سطح ۲، پیشرفته شدم. می‌خوام «' + COURSE + '» رو بخرم.')) +
         '">خرید از واتساپ 💬</a><a class="btn btn-ghost dark" href="#inside">داخلش چیه؟</a></div>' +
         '<div class="lt-price">یه‌بار پرداخت · معادلِ ۱۷ دلار، به تومان</div>';
     }

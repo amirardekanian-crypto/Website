@@ -72,6 +72,10 @@ Exercises · STEP, LEARN AND TESTS). A part two screens use lives in the shared 
 - **⚠️ No middle dot "·" next to a Persian digit.** In Vazirmatn it is the Persian zero «۰»: «۱۶ هفته · ۴ بلوک» read
   «۱۶ هفته ۴۰ بلوک». The shell uses «،» in eyebrows and sentences and `SEP` (a short drawn bar, `sepJoin()`) between items on
   one line; `dots()` (and `tx()` in lessons and tests) turns the " · " inside content strings into that bar.
+  **The rest of the Farsi side follows it too** (2026-10-17): the testing app (`SEP` in `tennis-testing/app/app.js`, `.sep` in its
+  `app.css`), the product pages' buy buttons (`.sep` in `fa-product.css`), the level test, `index-fa.html`, `etminan.html` and the
+  Farsi article pages (`meta_sep()` in `scripts/build_article_pages.py`). A dot written before a number lands on its right in a
+  right-to-left line, so «خرید · ۱۷ دلار» read «۱۷۰ دلار».
 - **No emoji drawn by the shell** (they paint yellow): the lessons' and tests' `icon` fields are no longer shown, the lock is a
   drawn icon (`LOCK`), the places are words (`PLACE`), the guide's icons are line drawings (`IC`).
 - **Right to left:** back (→) at the right, the go chevron (‹, drawn) at the left, ⌄ opens a fold; a video's ▶ still points

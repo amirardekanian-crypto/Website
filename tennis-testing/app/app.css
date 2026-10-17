@@ -131,6 +131,8 @@ ol.steps li::before {
 .pill.green { background: var(--green); color: #fff; }
 .pill.clay { background: var(--clay); color: #fff; }
 .pill.light { background: rgba(255,255,255,0.18); color: #fff; }
+/* Between items on one line: a short drawn bar, never "·", which is the Persian zero «۰» in Vazirmatn (the course app's .sep). */
+.sep { display: inline-block; width: 1px; height: .85em; margin: 0 .6em; vertical-align: -.1em; background: currentColor; opacity: .35; }
 .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: none; }
 .chips::-webkit-scrollbar { display: none; }
 .chip {
