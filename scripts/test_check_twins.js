@@ -8,8 +8,10 @@ const ROOT = path.join(__dirname, '..');
 const FILES = ['program.html', 'coach.html', 'habits.html', 'assets/js/chips.js', 'scripts/twins_stamp.json', 'scripts/name_cases.json', 'scripts/career/hold_cases.json',
   'scripts/career/xp_cases.json'];
 // No GIT_* variable reaches a git command in the temp folder, or the guard run on it. The pre-commit hook runs this test inside
-// `git commit`, which exports GIT_INDEX_FILE: a `git add -A` in the temp folder then wrote the temp folder's files into the REAL
-// index (2026-10-17: a worktree's index was left holding seven files), and `git show :file` read the real index instead of the copy.
+// `git commit`, which exports GIT_DIR and GIT_INDEX_FILE. On 2026-10-17 the temp folder's `git init` then re-initialised the REAL
+// repository (a worktree's GIT_DIR) as bare: core.bare = true in the shared config, and every checkout's git said "must be run in
+// a work tree" for a minute. With GIT_INDEX_FILE alone, `git add -A` writes the temp folder's files into the real index (seen the
+// same evening), and `git show :file` reads the real index instead of the copy.
 const CLEAN_ENV = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^GIT_/i.test(k)));
 
 function runOn(mutate, opts) {

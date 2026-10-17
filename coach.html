@@ -135,7 +135,7 @@
                                                 font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 0; text-transform: none; white-space: nowrap; }
   .chip.court, .ipill.en, .ipill.pct, .fl.good, .tag.done { background: var(--court-100); border-color: transparent; color: var(--court); }
   .chip.clay, .ipill.fa, .ipill.warn, .fl.warn, .zpill.reply, .tag.warn, .hidetag { background: var(--clay-100); border-color: transparent; color: var(--clay-ink); }
-  .tag.partial { background: var(--ochre-100); border-color: transparent; color: var(--ochre); }
+  .tag.partial, .ipill.gap { background: var(--ochre-100); border-color: transparent; color: var(--ochre); }
   .fl.under { background: var(--rpe-under-100); border-color: transparent; color: var(--rpe-under); }
   .ipill.prog { background: var(--court); border-color: transparent; color: #fff; }
   .fl.miss { background: var(--clay-fill); border-color: transparent; color: #fff; }
@@ -487,6 +487,13 @@
   .ch-msg.user { background: var(--court-100); }
   .ch-msg.bot { border: 1px solid var(--line); }
   .ch-who { display: block; margin-bottom: 2px; font-size: 12px; color: var(--muted); }
+  .ch-gaps { grid-column: 1 / -1; padding: 8px 0 12px; }
+  .in-view[data-pane="detail"] > .ch-gaps { display: none; }
+  .ch-gap { padding: 10px 20px; border-top: 1px solid var(--rule); }
+  .ch-gap-q { font-weight: 600; font-size: 14px; overflow-wrap: anywhere; white-space: pre-wrap; }
+  .ch-gap-a { margin: 4px 0 8px; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; white-space: pre-wrap; }
+  .ch-gap-f { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 12px; color: var(--muted); }
+  .ch-filter { padding: 0 20px 8px; }
   .ch-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 4px 0 16px; font-size: 14px; color: var(--muted); }
   .in-empty { padding: 48px 0; text-align: center; color: var(--muted); font-size: 14px; }
   /* Two question-and-answer pairs to a row only while the application itself is 700 px wide or more (the pane, not the screen: at 1000 px it is 620). */
@@ -505,7 +512,7 @@
     .in-view { grid-template-columns: 320px minmax(0, 1fr); align-items: start; }
     .in-view.solo { grid-template-columns: minmax(0, 1fr); }
     .in-row.on { background: var(--court-100); box-shadow: inset 3px 0 0 var(--court); }
-    .in-view[data-pane] > .in-list, .in-view[data-pane] > .in-detail { display: block; }
+    .in-view[data-pane] > .in-list, .in-view[data-pane] > .in-detail, .in-view[data-pane] > .ch-gaps { display: block; }
     .in-list { position: sticky; top: calc(var(--stick) + 12px); max-height: calc(100vh - var(--stick) - 28px); overflow-y: auto; }
     .in-back { display: none; }
   }
@@ -8418,7 +8425,7 @@ function renderLeads() {
 // site-chat Edge Function; the coach may read and delete them. Kept 90 days: opening the tab first deletes older conversations (their messages go with
 // them, ON DELETE CASCADE), then reads the rest with selectAll(). Loaded when the tab first opens, not at boot.
 const CHAT_KEEP_DAYS = 90;
-let _chatSel = '', _chatOpen = false, _chatLoading = null;
+let _chatSel = '', _chatOpen = false, _chatLoading = null, _chatGapsOnly = false;
 function chatsByMessage() {
   const m = {};
   (S.chatMsgs || []).forEach(x => { (m[x.conversation_id] = m[x.conversation_id] || []).push(x); });
@@ -8463,16 +8470,22 @@ function chatsViewHtml() {
   const cost = thisMonth.reduce((n, c) => n + (Number(c.cost_usd) || 0), 0);
   const tot = `<p class="ch-tot">This month: <b>${thisMonth.length}</b> chat${thisMonth.length === 1 ? '' : 's'}, <b>$${cost.toFixed(4)}</b></p>`;
   if (!all.length) return `<div id="chView" class="in-view solo"><section class="panel">${hint}${tot}<p class="empty">No chats yet. When a visitor talks to the chatbot on the site, the conversation is saved here.</p></section></div>`;
-  if (_chatSel && !all.some(c => c.id === _chatSel)) _chatSel = '';
-  if (!_chatSel) _chatSel = all[0].id;
-  const cur = all.find(c => c.id === _chatSel);
-  const rows = all.map(c => {
+  const gaps = chatGapsOpen();
+  const gapChats = new Set(gaps.map(g => g.msg.conversation_id));
+  const gapBlock = chatGapBlockHtml(gaps);
+  const gapChip = `<div class="ch-filter"><button type="button" class="rf${_chatGapsOnly ? ' on' : ''} ch-gapsonly" aria-pressed="${_chatGapsOnly}">Only with gaps<span class="c">${gapChats.size}</span></button></div>`;
+  const view = _chatGapsOnly ? all.filter(c => gapChats.has(c.id)) : all;
+  if (!view.length) return `<div id="chView" class="in-view solo">${gapBlock}<section class="panel">${hint}${tot}${gapChip}<p class="empty">No chat has an open gap.</p></section></div>`;
+  if (_chatSel && !view.some(c => c.id === _chatSel)) _chatSel = '';
+  if (!_chatSel) _chatSel = view[0].id;
+  const cur = view.find(c => c.id === _chatSel);
+  const rows = view.map(c => {
     const first = (msgs[c.id] || []).find(x => x.role === 'user');
     const txt = first ? String(first.content).replace(/\s+/g, ' ').trim() : '(no message)';
     const h = chatHandoffLabel(c.handoff);
     return `<button type="button" class="in-row${c.id === _chatSel ? ' on' : ''}" data-id="${esc(c.id)}"${c.id === _chatSel ? ' aria-current="true"' : ''}>
       <span class="ava" aria-hidden="true">${c.site === 'fa' ? 'FA' : 'EN'}</span>
-      <span class="in-main"><span class="in-n" dir="auto">${esc(txt.length > 80 ? txt.slice(0, 80) + '…' : txt)}</span><span class="in-s"><span class="ipill ${c.site === 'fa' ? 'fa' : 'en'}">${c.site === 'fa' ? 'FA' : 'EN'}</span><span>${c.turns} turn${c.turns === 1 ? '' : 's'}</span>${h ? `<span class="ipill pct">${esc(h)}</span>` : ''}</span></span>
+      <span class="in-main"><span class="in-n" dir="auto">${esc(txt.length > 80 ? txt.slice(0, 80) + '…' : txt)}</span><span class="in-s"><span class="ipill ${c.site === 'fa' ? 'fa' : 'en'}">${c.site === 'fa' ? 'FA' : 'EN'}</span><span>${c.turns} turn${c.turns === 1 ? '' : 's'}</span>${h ? `<span class="ipill pct">${esc(h)}</span>` : ''}${gapChats.has(c.id) ? '<span class="ipill gap">Not in your facts</span>' : ''}</span></span>
       <span class="in-when">${esc(chatWhen(c.started_at))}</span>
     </button>`;
   }).join('');
@@ -8484,16 +8497,68 @@ function chatsViewHtml() {
       <div class="ch-meta"><span class="ipill ${cur.site === 'fa' ? 'fa' : 'en'}">${cur.site === 'fa' ? 'FA' : 'EN'}</span>
         <span>Page <bdi>${esc(cur.page || '/')}</bdi></span><span>${cur.turns} turn${cur.turns === 1 ? '' : 's'}</span><span>Cost $${(Number(cur.cost_usd) || 0).toFixed(4)}</span>${h ? `<span class="ipill pct">${esc(h)}</span>` : ''}</div>
     </div>
-    ${m.length ? m.map(x => `<div class="ch-msg ${x.role === 'user' ? 'user' : 'bot'}"><span class="ch-who">${x.role === 'user' ? 'Visitor' : 'Chatbot'}</span><span dir="auto">${esc(x.content)}</span></div>`).join('') : '<p class="empty">No messages saved for this chat.</p>'}
+    ${m.length ? m.map(x => `<div class="ch-msg ${x.role === 'user' ? 'user' : 'bot'}"><span class="ch-who">${x.role === 'user' ? 'Visitor' : 'Chatbot'}${x.gap ? ` <span class="ipill gap">${x.gap_handled_at ? 'Was not in your facts · added' : 'Not in your facts'}</span>` : ''}</span><span dir="auto">${esc(x.content)}</span></div>`).join('') : '<p class="empty">No messages saved for this chat.</p>'}
     <div class="typed"><button type="button" class="btn sm danger ch-del" data-id="${esc(cur.id)}">Delete this chat</button></div>
     ${dangerSlot('chat:' + cur.id)}`;
   return `<div id="chView" class="in-view${_chatOpen ? ' touched' : ''}" data-pane="${_chatOpen ? 'detail' : 'list'}">
-    <section class="panel in-list" aria-label="Chats">${hint}${tot}${rows}</section>
+    ${gapBlock}
+    <section class="panel in-list" aria-label="Chats">${hint}${tot}${gapChip}${rows}</section>
     <section class="panel in-detail">${detail}</section>
   </div>`;
 }
+// "Not answered yet": the assistant replies the bot marked gap = true (its facts file could not answer) that Amir has not marked as added.
+// Newest first; each carries the visitor's question (the user message just before it in the same conversation, in id order).
+function chatGapsOpen() {
+  const out = [], by = chatsByMessage();
+  Object.keys(by).forEach(cid => {
+    const list = by[cid];
+    list.forEach((x, i) => {
+      if (x.role !== 'assistant' || !x.gap || x.gap_handled_at) return;
+      let q = null;
+      for (let k = i - 1; k >= 0; k--) if (list[k].role === 'user') { q = list[k]; break; }
+      out.push({ msg: x, q });
+    });
+  });
+  return out.sort((a, b) => new Date(b.msg.at) - new Date(a.msg.at) || String(b.msg.id).localeCompare(String(a.msg.id), undefined, { numeric: true }));
+}
+function chatGapBlockHtml(gaps) {
+  const conv = {}; (S.chats || []).forEach(c => { conv[c.id] = c; });
+  const head = `<div class="phead"><span class="t hd">Not answered yet</span><span class="r">${gaps.length ? gaps.length : ''}</span></div>`;
+  const hint = '<p class="ch-hint">Questions the bot could not answer from your facts. Add the answer to Content/CHATBOT-FACTS.md (or tell Claude), then mark it.</p>';
+  if (!gaps.length) return `<section class="panel ch-gaps" id="chGaps">${head}${hint}<p class="empty">Nothing waiting. Every question so far was in your facts.</p></section>`;
+  const items = gaps.map(g => {
+    const c = conv[g.msg.conversation_id] || {};
+    const rep = String(g.msg.content || '').replace(/\s+/g, ' ').trim();
+    return `<div class="ch-gap" data-mid="${esc(g.msg.id)}">
+      <div class="ch-gap-q" dir="auto">${esc(g.q ? g.q.content : '(question not saved)')}</div>
+      <div class="ch-gap-a" dir="auto">${esc(rep.length > 240 ? rep.slice(0, 240) + '…' : rep)}</div>
+      <div class="ch-gap-f"><span class="ipill ${c.site === 'fa' ? 'fa' : 'en'}">${c.site === 'fa' ? 'FA' : 'EN'}</span><span>${esc(chatWhen(g.msg.at))}</span>
+        <button type="button" class="btn sm ch-gap-open" data-id="${esc(g.msg.conversation_id)}">Open chat</button>
+        <button type="button" class="btn sm ch-gap-done" data-mid="${esc(g.msg.id)}">Added to facts ✓</button></div>
+    </div>`;
+  }).join('');
+  return `<section class="panel ch-gaps" id="chGaps">${head}${hint}${items}</section>`;
+}
+async function chatGapMark(mid, handled) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const msg = (S.chatMsgs || []).find(x => String(x.id) === String(mid));
+  if (!msg) return;
+  const stamp = handled ? new Date().toISOString() : null;
+  const res = await sb.from('chat_messages').update({ gap_handled_at: stamp }).eq('id', msg.id).select('id');
+  const bad = writeFailed(res, handled ? 'marked' : 'put back');
+  if (bad) { fail('Could not save that: ' + bad); return; }
+  msg.gap_handled_at = stamp;
+  chatsRedraw();
+  if (handled) offerUndoFn('Marked as added to the facts.', () => chatGapMark(mid, false));
+  else toast('Put back under Not answered yet');
+}
 function wireChats(root) {
   if (!root) return;
+  root.querySelectorAll('.ch-gap-open').forEach(b => b.addEventListener('click', () => {
+    _chatSel = b.dataset.id; _chatOpen = true; chatsRedraw(); window.scrollTo({ top: 0, behavior: 'instant' });
+  }));
+  root.querySelectorAll('.ch-gap-done').forEach(b => b.addEventListener('click', () => chatGapMark(b.dataset.mid, true)));
+  root.querySelectorAll('.ch-gapsonly').forEach(b => b.addEventListener('click', () => { _chatGapsOnly = !_chatGapsOnly; chatsRedraw(); }));
   root.querySelectorAll('.in-row').forEach(b => b.addEventListener('click', () => {
     _chatSel = b.dataset.id; _chatOpen = true; chatsRedraw(); window.scrollTo({ top: 0, behavior: 'instant' });
   }));

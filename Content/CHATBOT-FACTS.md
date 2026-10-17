@@ -5,6 +5,10 @@ else. If a question is not covered here, it says it does not know and offers you
 wrong line here becomes a wrong answer to a client. Read it, fix anything that is not true, and
 add the questions people really ask you.
 
+**To add or change something, ask Claude: "/chat-facts"** (or just "add this to the bot: ..."). The steps are in
+`.claude/skills/chat-facts/SKILL.md`. The questions the bot could not answer wait in coach.html → Leads → Chats →
+*Not answered yet*.
+
 How it is used:
 - Sections marked **[both]** go to the bot on both sites. **[en]** is only for the English
   site (`index.html`), **[fa]** only for the Farsi site (`index-fa.html` and the Farsi product pages).

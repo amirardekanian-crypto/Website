@@ -42,10 +42,13 @@ either the Supabase SQL editor or `psql`.
    (Project Settings → API).
 2. **The structure.** Open `supabase/schema_snapshot.sql`, paste it into the SQL editor and run it. It creates everything and **fails on a project that
    already has these tables, on purpose**. It ends without an error. (Its header says which Postgres it was read from and when.)
+   Then run `grant update (gap_handled_at) on public.chat_messages to authenticated;` (stage68): the snapshot reads only table grants,
+   so this one column grant is not in it, and without it the website chatbot's "Added to facts" button in coach.html is refused.
 3. **Supabase settings.** Authentication → Sign In / Providers → **User Signups: off** (the coach check trusts the email of the sign-in alone; CLAUDE.md,
    *The coach's address is typed once per layer*). Authentication → Users → **Add user**: your own coach address, a password, *Auto Confirm User* ticked.
 4. **Edge Functions.** Deploy `athlete-login`, `assess-login` and `tps-login` from `supabase/functions/`, each with `verify_jwt` **false**
-   (`supabase/functions/README.md`). They need no secrets of their own.
+   (`supabase/functions/README.md`). They need no secrets of their own. Also `site-chat` (the website chatbot, both of its files), which needs the
+   secret `ANTHROPIC_API_KEY`.
 5. **The rows.** Make the files from the backup:
 
    ```bash
