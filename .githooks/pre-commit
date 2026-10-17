@@ -1,5 +1,5 @@
 #!/bin/sh
-# Eighteen guards. Each runs only when its own files are staged, so a commit that
+# Nineteen guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -370,6 +370,34 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|h
     failed=1
   else
     echo "pre-commit: expired-token retry OK."
+  fi
+fi
+
+# ── 19. skill and agent headers parse as YAML (added 2026-10-17) ────────────────────────────────────────────────────────────
+# Why: an unquoted ": " inside a `description:` is not valid YAML, so the Claude desktop app drops the skill's description and shows its first heading instead,
+# which is what Claude reads to pick a skill. Seven SKILL.md files had it and nothing errored (the agent athlete-brief.md too). scripts/check_skill_headers.py
+# needs only the standard library: each header must have name and description, a quoted description must close, an unquoted one holds no ": " and does not start
+# with a YAML indicator. The fix is always the same: wrap the description value in double quotes. test_check_skill_headers.py proves the guard still fails
+# on each fault, and runs only when the guard itself changes.
+hdr_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(\.claude/skills/[^/]+/SKILL\.md|\.claude/agents/[^/]+\.md)$')
+if [ -n "$hdr_files" ]; then
+  echo "pre-commit: a skill or agent header changed — checking it parses as YAML..."
+  if ! hdr_out=$("$PY" scripts/check_skill_headers.py $hdr_files 2>&1); then
+    echo "$hdr_out"
+    echo ""
+    echo "pre-commit: BLOCKED — a skill or agent header will not parse (details above). Wrap its description value in double quotes (escape any \" inside) and change nothing else."
+    failed=1
+  else
+    echo "pre-commit: skill and agent headers OK."
+  fi
+fi
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^scripts/(check|test_check)_skill_headers\.py$'; then
+  echo "pre-commit: the header guard changed — running its tests..."
+  if ! hdr_test=$("$PY" scripts/test_check_skill_headers.py 2>&1); then
+    echo "$hdr_test" | grep -v '^ok '
+    echo ""
+    echo "pre-commit: BLOCKED — the skill-header guard's tests failed (details above)."
+    failed=1
   fi
 fi
 

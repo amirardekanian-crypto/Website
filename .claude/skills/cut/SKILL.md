@@ -1,6 +1,6 @@
 ---
 name: cut
-description: Edit one of Amir's talking-head reels for Instagram. Cuts silences, changes pace (faster, punchier, slower), adds cut-ins, transitions and (mostly) motion graphics over his clean footage, built in Hyperframes and rendered to one finished MP4. No captions, Amir adds those himself. Use when Amir drops or points at a raw talking-head clip, or says "edit this reel", "cut this", "tighten this", "add motion graphics", "make this ready for Instagram". Also use it to continue the reel kit (new motion-graphics ideas shown as showreels on his footage): read kit/HANDOFF.md first. Not for ads built from scratch (/ad), HTML-only reels (/reel) or generated clips (/video).
+description: "Edit one of Amir's talking-head reels for Instagram. Cuts silences, changes pace (faster, punchier, slower), adds cut-ins, transitions and (mostly) motion graphics over his clean footage, built in Hyperframes and rendered to one finished MP4. No captions, Amir adds those himself. Use when Amir drops or points at a raw talking-head clip, or says \"edit this reel\", \"cut this\", \"tighten this\", \"add motion graphics\", \"make this ready for Instagram\". Also use it to continue the reel kit (new motion-graphics ideas shown as showreels on his footage): read kit/HANDOFF.md first. Not for ads built from scratch (/ad), HTML-only reels (/reel) or generated clips (/video)."
 ---
 
 # /cut: talking-head reels, finished for Instagram

@@ -1,6 +1,6 @@
 ---
 name: workout
-description: Turn Amir's workout content into a finished workout JSON file and add it to the app's Train library. Use when Amir pastes a workout or exercise list and asks to publish it, or says "add this workout to the app" / "make a library workout". Handles everything: exercise mapping, file creation, manifest registration, commit + push.
+description: "Turn Amir's workout content into a finished workout JSON file and add it to the app's Train library. Use when Amir pastes a workout or exercise list and asks to publish it, or says \"add this workout to the app\" / \"make a library workout\". Handles everything: exercise mapping, file creation, manifest registration, commit + push."
 ---
 
 # Workout publisher — AA Performance Train library

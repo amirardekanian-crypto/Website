@@ -1,6 +1,6 @@
 ---
 name: spine
-description: Draft the next batch of exercises for The Spine (public.exercises), the one-record-per-exercise catalogue behind the ⓘ, the About sheet (Regressions · Progressions · Alternatives) and Library → Exercises. Use when Amir says "add the next 80 exercises", "draft more exercises", "fill the Spine", "add <exercise> to the Spine", or when /program-assemble finds a name the Spine does not have. Drafts only: Amir approves in coach.html → Exercises. Also the Upkeep pass that ends every /program-assemble, /program-edit and /workout run: draft missing exercises, fill empty fields, propose updates.
+description: "Draft the next batch of exercises for The Spine (public.exercises), the one-record-per-exercise catalogue behind the ⓘ, the About sheet (Regressions · Progressions · Alternatives) and Library → Exercises. Use when Amir says \"add the next 80 exercises\", \"draft more exercises\", \"fill the Spine\", \"add <exercise> to the Spine\", or when /program-assemble finds a name the Spine does not have. Drafts only: Amir approves in coach.html → Exercises. Also the Upkeep pass that ends every /program-assemble, /program-edit and /workout run: draft missing exercises, fill empty fields, propose updates."
 ---
 
 # The Spine: drafting the next batch

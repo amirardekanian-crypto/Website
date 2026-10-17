@@ -1,6 +1,6 @@
 ---
 name: article
-description: Turn Amir's raw article text into a finished article in the app's Read library AND a public web page in Farsi and English. Use when Amir pastes article copy and asks to publish it, says "write a blog about…" / "add this to the app", or revises an existing article. Handles everything: block mapping, the English JSON, the Farsi translation (with his approval), the website pages + sitemap, commit + push.
+description: "Turn Amir's raw article text into a finished article in the app's Read library AND a public web page in Farsi and English. Use when Amir pastes article copy and asks to publish it, says \"write a blog about…\" / \"add this to the app\", or revises an existing article. Handles everything: block mapping, the English JSON, the Farsi translation (with his approval), the website pages + sitemap, commit + push."
 ---
 
 # Article publisher — AA Performance Read library + the website
