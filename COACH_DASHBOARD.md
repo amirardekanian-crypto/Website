@@ -614,7 +614,7 @@ Paused or Former chip), **Cycle** (`C2 · wk 3/5 · ends 22 Oct`, from `rosterCy
 index + 1, the week is `cycleWeekOnC()`; in the last 7 days it says `ends in 3 d` / `ends today` and after the end `ended 5 d ago`, in clay
 for an active coached athlete; an undated cycle shows its name and length, then `no cycle`, or `no programme` for someone with no
 programme row), **Last session** (how long ago and how many; `no sessions yet` for a coached athlete with none, a dash for anyone
-else), **Proof** (seven presence dots, `n/7`, and the level as plain text, filled in place by `paintLevels()` when the levels arrive;
+else), **Proof** (seven presence dots, `n/7`, and the level as plain text, filled in place by `paintLevels()` when the levels arrive (the career level once Career Mode's XP switch is on, see *Proof · File* below);
 empty for a person with no habits) and **Why** (the reasons from §3's one rule, clay when it is a warning and grey when it is only worth knowing,
 a pause or former status in words, and a load spike in plum: `load 1.6 · high load`, `· climbing`). A note waiting keeps a clay mark on
 the left edge. On a phone (under 900 px) there are no column heads and a row is two lines: the name, tier and Why, then the cycle, the last
@@ -852,6 +852,12 @@ weight comes from the training app, not from Proof, and a coached athlete who ne
 
 - **Proof** (only for people who log habits) — server-scored level, 14 presence dots, their week,
   board name and worn title, WhatsApp and email, and their wall lines with hide/show on each. (Body weight is not here any more: it is on The work, above.)
+  **The level is the server's, never worked out here.** `coach_season_levels()` (stage46, one call for the whole roster, with
+  `hab_season_level()` per athlete as the fallback) answers it. It is Proof's season level until Career Mode's XP switch is on, and
+  then the **career level**, which never resets. The big figure's caption reads **career level (server)** where it read **season
+  level (server)**, and the roster's `LV n` text and the header chip show the same number. The page learns which from
+  `S.careerXp`, read quietly in `loadLevels()` from the newest `career_rules` row (`rules->switch`: the day the XP switch was turned
+  on, or null while it is off). A page that cannot read it keeps the old caption, and the number is the server's either way.
 - ~~**Chat**~~ — **removed 2026-09-26** (Amir: *"whatsapp first, remove in app chat from app and
   coach.html"*). The `messages` table and its three functions stay on the server untouched, so no
   past thread is lost; nothing reads or writes them now.
@@ -1139,7 +1145,8 @@ So every Proof number on this page is one of exactly two things:
 1. **A presence fact** — "this day has a non-empty log entry", the same test
    `contact_list()` uses server-side. That's what the dots, `n/7`, "on court
    today" and the silence counters are.
-2. **A number the server returned** — `hab_season_level()`, `leaderboard_top()`,
+2. **A number the server returned** — `hab_season_level()` (through `coach_season_levels()`: the career level once Career Mode's XP
+   switch is on), `leaderboard_top()`,
    `contact_list()`.
 
 If you want a new Proof number here, get the server to return it. Don't compute
@@ -1164,6 +1171,7 @@ it in this file.
 | `hab_titles` | Titles-minted feed |
 | `xp_rules` | The quest pool and the live runs |
 | `seasons` | Which season, and what day of it |
+| `career_rules` (the newest row's `rules->switch`, read quietly by `loadLevels()`) | Whether Career Mode's XP switch is on (`S.careerXp`): the Proof level's caption reads *career level (server)* instead of *season level (server)* |
 | `call_logs` | Weekly check-ins (loaded per athlete, on open) |
 | `program_versions` | Version history: the programme as it was before each save (the `programs` trigger keeps the last 20 and every save since the previous cycle began, at most 150) |
 | `coaching_logs` | The coach-only log on the File tab (loaded on open) |

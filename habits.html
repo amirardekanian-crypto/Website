@@ -3543,7 +3543,8 @@ const K_META = () => ATHLETE_ID + '_hab_meta';
 // the profile's XP plus whatever this phone's scorer moved since (P13), and the server's next answer takes
 // over. Until the switch CAREER is either null or says the switch is off, and nothing here changes a number.
 // The copy on this phone lives under <id>_hab_career, NEVER in CFG: CFG syncs newest-wins, and a newer
-// phone would adopt a stale profile. The training app reads and writes the same key (one copy per phone).
+// phone would adopt a stale profile. Only the full app writes it: the embedded strip reads it and never asks,
+// and the training app keeps its own copy (<id>_careercache), never this key.
 let CAREER = null, _pushedXp = null, _careerBusy = false, _careerAgain = false, _careerTimer = null;
 const K_CAREER = () => ATHLETE_ID + '_hab_career';
 
@@ -9419,11 +9420,14 @@ function openManual(section, from) {
 }
 function renderManual() {
   const hs = allHabits();
-  const perfectDay = live().reduce((s, h) => s + Math.round(baseXp(h) * XP_RULES.completionBonus), 0);
   const cum = cumXpTo;     // the overall curve: Proof's, or the career's once the XP switch is on
   const ob = overallBase(), og = overallGrowth(), career = careerOn();
   const prices = career && CAREER.p.rules && CAREER.p.rules.prices || {};
   const xpn = v => (Number(v) || 0).toLocaleString();
+  // In Career Mode the locked habit (WORKOUT) pays 0 a day and the session pays instead (paidXp()), so the list and
+  // the perfect day say what the ledger pays, never Proof's own 100.
+  const sessionPays = h => career && !!h.locked;
+  const perfectDay = live().reduce((s, h) => s + (sessionPays(h) ? 0 : Math.round(baseXp(h) * XP_RULES.completionBonus)), 0);
   const water = habitById('water'), steps = habitById('steps');
   // Each heading carries an id so the contents list at the top can jump to it.
   // The manual is a dozen sections of prose; without a way in it is a wall you
@@ -9500,14 +9504,15 @@ function renderManual() {
           ${hs.map(h => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0">
             <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
               <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
-              <span style="font-size:12px;color:var(--muted)">${esc(h.goal || h.source)}</span>
+              <span style="font-size:12px;color:var(--muted)">${esc(sessionPays(h) ? 'Paid by your finished session' : (h.goal || h.source))}</span>
             </span>
-            <span class="mono" style="font-size:14px;font-weight:700;white-space:nowrap">${baseXp(h)} <span style="font-size:12px;color:var(--muted-soft)">XP</span></span>
+            <span class="mono" style="font-size:14px;font-weight:700;white-space:nowrap">${sessionPays(h) ? xpn(prices.session_finished) : baseXp(h)} <span style="font-size:12px;color:var(--muted-soft)">XP</span></span>
           </div>`).join('')}
         </div>` +
         `<div style="height:12px"></div>` +
         p(`<strong style="color:var(--ink)">Finishing pays more than nearly finishing.</strong> Habits you count (water, steps, sleep, meals) pay as you go, then add a bonus once you hit the target. ${water ? `${water.target / 2} of ${water.target} glasses earns ${xpFor(water, water.target / 2)} XP; all ${water.target} earns ${xpFor(water, water.target)} XP.` : ''}`) +
-        p(`A perfect day is currently <strong style="color:var(--ink)">${perfectDay.toLocaleString()} XP</strong>.`) +
+        p(`A perfect day is currently <strong style="color:var(--ink)">${perfectDay.toLocaleString()} XP</strong>.${career && !isFree() && prices.session_finished
+          ? ` A finished session pays <strong style="color:var(--ink)">${xpn(prices.session_finished)} XP</strong> on top.` : ''}`) +
         p(`There is a ceiling on what a counter will take in one day: <strong style="color:var(--ink)">${XP_RULES.dailyCap}× the target</strong>${steps ? `, so ${fmtVal(steps, steps.target * XP_RULES.dailyCap)} steps` : ''}. Going past your target never paid extra anyway; the ceiling is there so a stuck thumb on the + button cannot hand you a quest you did not walk.`))}
 
       ${block(h2('How to earn more') +
@@ -11496,8 +11501,8 @@ function showError(msg, opts) {
 
   loadLocal();
   // The career profile this phone last had (Career Mode): the app opens on it and asks again behind the screen.
-  // The embedded strip reads it too (the training app keeps it fresh), so the level it hands the training app's
-  // Home (publishCardSnapshot()) is the career's.
+  // The embedded strip reads it too and never asks (only the full app writes it), so the level it hands the
+  // training app's Home (publishCardSnapshot()) is the career's.
   loadCareer();
   // NOTHING BELOW MAY HOLD THE SPINNER OPEN INDEFINITELY. Four server round
   // trips run before the first paint, and on a bad connection — the hotel wifi

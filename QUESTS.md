@@ -78,6 +78,13 @@ select rules -> 'questRuns' from public.xp_rules where id = 1;
 > **Its Share it opens a card of that quest** (2026-10-17): the Milestone card holding the quest's
 > name, note and XP, named *Quest* in the picker's rail. It opened the Rank card before. Nothing about
 > how a quest is scored changed. `HABITS.md` → *Every reward, its moment and its card*.
+>
+> **Career Mode** (once the XP switch is on, see `HABITS.md` → *Career Mode (phase 2, the XP switch)*). A quest's XP counts toward the
+> athlete's career with no season filter, because the server's career score calls `hab_bonus_xp()` with no season, so a run that
+> straddles a season opening counts all its days. It counts toward the season's board points as before, from the season's first day.
+> The lever has not moved: runs are still `questRuns` on the `xp_rules` row, started and ended from coach.html → Today or with
+> `set_quests()` and `end_quests()`. Changing `questRuns` makes every cached score stale, because it is part of the stamp of the
+> server's score copy (`career_stamp()`), so each athlete's score is worked out again at its next read.
 
 ## Two ways to pull the lever
 

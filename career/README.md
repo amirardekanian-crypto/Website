@@ -67,7 +67,8 @@ settle, the level is the career level and never resets) and `catalogue` (phase 3
 2. `python scripts/career_seed.py --dry-run --out "$TEMP/career-switch-dry.sql"`, run it on the project: everything is worked out,
    then undone. For the XP switch it answers every athlete's line (Proof's level, the career level, the level kept), the list Amir
    reads first. Nobody's level goes down: an athlete below their best Proof level is kept at it (`[fact.level_kept]`).
-3. On his yes, the same without `--dry-run`, then `select public.career_compare()`, and commit the file the same day.
+3. On his yes, the same without `--dry-run`, then `select public.career_compare()`, and commit the file the same day, with
+   `privacy.html` §2.3 brought up to date in that commit for the XP switch (`PROCEDURES.md` → P14, step 5).
 
 A switch once on never goes back off: the seed refuses it (the way back is `scripts/career/rollback_stage69.sql`, on Amir's word only).
 

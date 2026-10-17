@@ -399,5 +399,6 @@ None of these blocks phase 1.
 - **The phones' copies of phase 2's rules** (the career's curve, the WORKOUT habit at 0 a day, a session's full log and check-in)
   are held to the server's own answers in `scripts/career/xp_cases.json` by `scripts/check_twins.js` §9, and the answers to the
   server by `scripts/career/rehearse_switch.mjs` (rewrite them with `--write-cases` after a deliberate change, on both sides).
-- **The score cache, `career_scores`,** is in `BACKUP_TABLES`, the schema snapshot and `coach_erase_person()` (stage69). It holds no
+- **The score cache, `career_scores`,** is in `coach_erase_person()` (stage69's patch) and joins `BACKUP_TABLES` and the schema snapshot
+  in the commit that applies stage69 to the live project (`test_restore_backup.py` needs both at once). It holds no
   source: a stale or missing row is worked out again from the facts (`career_stamp()` says when).

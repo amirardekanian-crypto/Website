@@ -840,8 +840,9 @@ tokens for one day; the copy is gone).
   dates, or before the cycle, nothing is painted (the old `.home-cyc` line is gone).
 - **Home, top to bottom** (`renderHome()`): the greeting as one compact block (the time of day as the eyebrow, the name
   at 28 px); the offline line and the filed-day card; This Week (the week note in its week, else the heading and the
-  count); **Next up**; the rest of the week; the week-done extra; **Hold Serve** (Career Mode's weeks held in a row, since
-  2026-10-17: *Hold Serve on Home*, below); **Daily habits** and AA Proof's strip. Nothing else.
+  count); **Next up**; the rest of the week; the week-done extra; **Career** (the level, once Career Mode's XP switch is on:
+  *Career on Home, and what a session earns*, below); **Hold Serve** (Career Mode's weeks held in a row, since 2026-10-17:
+  *Hold Serve on Home*, below); **Daily habits** and AA Proof's strip. Nothing else.
 - **Next up** (`dayCardHTML(…, { hero: true })`): the suggested day (`suggestedDayId()`: a session under way first, else
   the day after the last one trained this cycle, the first from there not done this week (`lastTrainedDayId()`; Line Call,
   2026-10-13, Amir's decision 3 "rotate": the first day not done this week made two-session weeks repeat Days 1 and 2 for ever,
@@ -1038,7 +1039,8 @@ their rest days, athlete can move the days". So:
   then *On target*, then *Perfect*, the words Proof's Today tile and the strip's head use. It read "Daily
   habits · day complete" beside the strip's "1 of 5 done", two answers to one question. `habitCardHtml()` reads
   `verdict` and `togo` from Proof's snapshot and never works them out (`HABITS.md` → *card snapshot*). A
-  snapshot from an earlier day shows the level until the strip writes today's.
+  snapshot from an earlier day shows the level until the strip writes today's (once Career Mode's XP switch is on it says *Ready for
+  today* instead: the level is the Career row's).
 - A week where every day is done says "All 3 sessions done this week" (in a week with a note, "All 3 done" on the
   note's top line), with every day a row. Nothing more.
 
@@ -1171,7 +1173,8 @@ three: *"B, show it at zero, words ok"*. **Display only: nothing is written and 
   the server's count and *All 3 done this week*; between cycles or before the next starts: *5 weeks in a row* · *It carries into Cycle 3*
   (at zero then, nothing). "This week" is the plan's own training week, the same one This Week counts (`weekDoneDays()`).
 - **The data:** the athlete's own `week_held` and `week_broken` facts (`career_facts`, row-level security: their own only), read with
-  `sb.from()` in `refreshHold()`, and one row of `career_rules` (a rulebook exists). Never `get_profile()`: it works out the whole career
+  `sb.from()` in `refreshHold()`, and one row of `career_rules` (a rulebook exists, and its `switch`: the Career row below asks for the
+  profile only when it says the XP switch is on). Hold Serve itself never calls `get_profile()`: it works out the whole career
   (0.2 to 1.5 s) and writes as it goes. `holdCount()` counts them as `get_profile()` does, a **twin** of its loop:
   `scripts/check_twins.js` runs `scripts/career/hold_cases.json`, and `scripts/career/rehearse.mjs` holds the two equal on every athlete
   it builds (and they were equal for all 28 live athletes on 2026-10-17). Change one, change the other.
@@ -1189,6 +1192,66 @@ three: *"B, show it at zero, words ok"*. **Display only: nothing is written and 
 - Checked by `scripts/headless/hold-serve.js` (40 checks: every state of the words, the not-sure rule, offline, no rulebook, a refusal,
   the demo, the preview, an undated cycle, the copy kept or dropped and never synced, the tap, a re-read after a session reaches the
   server, 320 px and dark). The stub answers table reads from its `tables` (and `tableErr`).
+
+## 🪜 Career on Home, and what a session earns (Career Mode phase 2, 2026-10-17)
+
+The training app's half of Career Mode's XP switch (`career/CAREER_MODE.md` → *The switch decisions*, and GAME-13: every meaningful
+action answers at once, visibly). The server's half and AA Proof's are in `HABITS.md` → *Career Mode (phase 2, the XP switch)*.
+**Built and rehearsed, not applied: nothing here shows, and the app asks the server for nothing new, until the server's XP switch is
+on.** Applying `supabase/stage69_career_xp_switch.sql` and turning the switch on wait for Amir's yes. Once it is on, the athlete's
+level is the career's (every session, every habit, never reset by a season) and this app shows it in three places.
+
+- **The row** (`#home-career-wrap`, `paintCareer()`, `careerRowHTML()`): one door row on Home, **above Hold Serve**. Home now reads: the
+  week's days and the week-done extra, then **Career**, **Hold Serve**, **Daily habits**. The `.hrow` recipe with a rank's chevrons
+  (`hrowIc('career')`), the label **CAREER**, the level as the big line (*Level 11*) and the rank with what the next level needs as
+  the small one (*GRINDER 1 · 1,310 XP to level 12*). A thin green bar runs along the row's foot (`.career-bar`): the way to the next
+  level. The level is worked out here from the profile's XP with `careerLevelOf()`, so the row and the finish card agree to the XP.
+- **The tap** (`goCareer()`): AA Proof's Locker, `habits.html?client=<id>&go=pass` (AA Proof reads `go=pass` at the end of its boot).
+  The row leaves the app. It does not open the guide the way Hold Serve's row does.
+- **When it shows:** the switch is on (`careerOnT()`: a real profile with `ready` and `switch.xp`), `DATA` has loaded and the profile
+  carries a level. **When it does not:** before the switch, in the demo, in the coach's preview, and on a first launch with no signal
+  (no profile yet and no copy). With no signal and a copy, the copy shows.
+- **The data:** `get_profile()` (`refreshCareer()`, 10 s), kept as `<id>_careercache` (`{ p, at }`) and painted at once on the next
+  open (`loadCareerCache()`). Before the switch the app never asks. **Hold Serve's own read of `career_rules`** (`refreshHold()`
+  selects `version` and `rules->switch`) tells it (`careerSwitchSeen()`): a day in `xp` means ask, anything else drops the copy and
+  the row. It asks again after a session reaches the server (`careerSessionSaved()`), 3 s after a habit ticked in the Proof strip
+  changes the card snapshot (that tick pays XP), and whenever Hold Serve reads again (at boot, and in the foreground or back online
+  after ten minutes).
+- **The habits row** (Daily habits) never says a level in Career Mode. Where an earlier day's snapshot would have said *Level N* it
+  says *Ready for today*, because the level is the Career row's.
+- **The finish card's line, before Done** (`.confirm-earn` in `#confirm-<day>`, `paintConfirmEarn()`): once the session can be
+  finished, *This session earns* **+450 XP**, with what makes it up in grey underneath: *Session 400 · Every set logged 50*, and
+  *Check-in 20* when it was answered. A day already done this week says *Day 1 is done this week already, so the session itself pays
+  once* (the full log and the check-in still pay). A session that completes the week adds *Your week held +400 · Back after a broken
+  week +100 when it counts*. The server judges a week (`career_derive()`), so the phone marks those two as pending and keeps them out
+  of the sum. `careerEarn()` prices from the profile's `rules.prices`, so a re-seeded rulebook changes it with no release, and it uses
+  the cap of `career_facts_paid()` (one paid session per plan day per training week). A session finished early reads *Session,
+  finished early* at the early price. The box is empty, and hidden, outside Career Mode and until the card is ready.
+- **The finished card's line, after Done** (`#earn-<day>`, `.complete-earn`, at the left of Amir's signature on the green): **+470 XP**
+  over **Level 11 · 840 to 12**. At Done, `careerEarnAtDone()` keeps what the session earned and the career XP of that moment in
+  `<id>_earn_d<N>` (`{ t, xp, parts, before, saved }`). Until the server has the session, the line shows this phone's number and says
+  **counting** where *840 to 12* would be. `careerSessionSaved()` stamps `saved` the moment `save_session` answers and asks for the
+  profile again. An answer asked after that stamp turns the line into the server's: its career XP since Done (a held week, a best or
+  anything else that landed with the session is in it) and the level that gives. A reload paints the same line again from the key.
+- **Twins** (`scripts/check_twins.js` §9, held to `scripts/career/xp_cases.json`, the server's own answers): `careerLevelOf()` is the
+  server's `career_level()` and AA Proof's `levelInfo()` on the career's curve. `careerFullLog()`, `careerCheckin()` and `careerEarly()`
+  are `career_session_want()`'s full-log, check-in and early rules. `careerEarn()` is not a twin of one function: it prices those facts
+  with the profile's prices and the cap of `career_facts_paid()`. A held week stays the server's to decide. Change a rule on both
+  sides, then in the cases.
+- **The guide:** `APP_GUIDE` has a card `key: 'career'`, *Career: your level* (your initials → How the app works). The row leaves the
+  app, so nothing opens the card by key. *Getting around* says where the row sits (next session, the other days, Career, Hold Serve,
+  daily habits) and *Finishing a session* says what the finish card shows (CNT-01: a control that moves changes its card in the same
+  pass).
+- **Keys.** `program.html` still writes **no `<id>_hab_*` key**. Those are AA Proof's, and its profile copy, `<id>_hab_career`, is a key
+  this app neither reads nor writes. This app's two Career keys are `<id>_careercache` and `<id>_earn_d<N>`. `_snapshot()` skips both
+  (a cache of the server's answer, and this phone's view of a finished day), so neither ever syncs. Neither is written in the demo or
+  the coach's preview.
+- Checked by `scripts/headless/career.js` (55 checks across both apps, and this is the training half): the row, its place above Hold Serve and the
+  10 px between the two, no row and no `get_profile` before the switch (the switch off, and the phase 1 rulebook that has none), the
+  phone's copy shown at once and dropped when the switch goes off, nothing in the demo or the preview, the habits row's wording, the
+  finish card's line (plain, a repeat, a held week after a broken one), the finished card (*counting*, then the server's number), the
+  keys never synced, the tap into the Locker and 320 px. The stub answers `get_profile` from `__STUB.profile` and `career_rules` from
+  its `tables`.
 
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 
@@ -1465,7 +1528,8 @@ dashboard do not change.
   - **Finished**: the card is signed the way the About sheet signs its reason. A grid whose `::before` paints the green
     band, *DAY 1 DONE* first (as E draws it: the finish picture, `.complete-art`, is filled but not shown in the day view), the message with the clay
     quote mark, and Amir's signature and photo (`.complete-by`: `WN_SIG` and `.wn-av`, added to the template after
-    `.complete-sub`). The tick medallion is gone (the words say it). On the paper under the band: the send status (the
+    `.complete-sub`, and, once Career Mode's XP switch is on, what the session earned at the left of the signature,
+    `.complete-earn`: *Career on Home, and what a session earns*). The tick medallion is gone (the words say it). On the paper under the band: the send status (the
     card's one ✓), AA Proof as a row with an open-out glyph and its label *OPEN AA PROOF* over *Counts as your Session
     habit* (the template's `<b>` lost its "· "), its own WhatsApp row (`.complete-wa`, never folded), the day-after
     suggestion, then **Your rating** (since 2026-10-13): one door row, `.rate-fold`, *7 of 10 · No note* or *7 of 10 · Note:

@@ -248,6 +248,9 @@ async function toReady(p) {
     const own = await p.evaluate(() => ({ lv: overallLevel().lv, base: overallBase(), on: careerOn(), wo: paidXp(habitById('strength'), 1) }));
     C.check('Proof, off: no reveal', (await reveal(p)) === null);
     C.check('Proof, off: the level is Proof\'s own (its curve, base 300), WORKOUT still pays 120', !own.on && own.base === 300 && own.wo === 120 && String(own.lv) === await hero(p), JSON.stringify(own));
+    const manOff = await p.evaluate(() => { const d = document.createElement('div'); d.innerHTML = renderManual(); return d.textContent.replace(/\s+/g, ' '); });
+    C.check('Proof, off: the manual lists WORKOUT at its own 100 and no session on top', /Finish your session 45 min · from your programme 100 XP/.test(manOff) && !/on top\./.test(manOff),
+      manOff.match(/Finish your session.{0,60}/));
     C.check('Proof, off: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -271,6 +274,13 @@ async function toReady(p) {
     C.check('Proof, on: the overall curve is the career\'s (base 400)', await p.evaluate(() => overallBase()) === 400);
     const man = await p.evaluate(() => { const d = document.createElement('div'); d.innerHTML = renderManual(); return d.textContent.replace(/\s+/g, ' '); });
     C.check('Proof, on: the manual says the level is the career and never resets', /Your level is your career\./.test(man) && /the board's points go back to zero/.test(man), man.slice(0, 200));
+    // "What each habit is worth" says what the ledger pays: WORKOUT is the session's price, the perfect day leaves it out
+    const worth = await p.evaluate(() => ({ pd: live().reduce((s, h) => s + paidXp(h, h.target), 0), price: CAREER.p.rules.prices.session_finished }));
+    C.check('Proof, on: the manual\'s WORKOUT row is the session\'s price, "Paid by your finished session"',
+      new RegExp('Finish your session Paid by your finished session ' + worth.price.toLocaleString() + ' XP').test(man), man.match(/Finish your session.{0,60}/));
+    C.check('Proof, on: the manual\'s perfect day is what the ledger pays (WORKOUT 0), and the session on top',
+      man.includes('A perfect day is currently ' + worth.pd.toLocaleString() + ' XP. A finished session pays ' + worth.price.toLocaleString() + ' XP on top.'),
+      JSON.stringify({ worth, said: (man.match(/A perfect day is currently.{0,80}/) || [''])[0] }));
     C.check('Proof, on: before the reveal was shown nothing re-baselined twice (careerSeen is the switch day)', await p.evaluate(() => CFG.careerSeen) === SWITCH_DAY);
     C.check('Proof, on: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     // the same phone, opened again: no reveal; the profile copy opens it at once

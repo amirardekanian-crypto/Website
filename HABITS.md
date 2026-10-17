@@ -59,6 +59,7 @@ The two apps are **linked both ways**:
 | From | To | Where |
 |---|---|---|
 | `program.html` | Proof | **Daily Habits card** on Home *and* at the end of Game Plan (a plain shortcut — it shows no level or XP, because that is Proof's job). On Home it sits **below** This Week and the day cards since 2026-09-26: training leads, habits follow. Under it on Home, **today's habits, ticked in place** (Proof embedded, `?embed=1`; see *Embedded on the training app's Home*) |
+| `program.html` | Proof's Locker | **Once Career Mode's XP switch is on:** the **Career** row on Home, above Hold Serve, shows the athlete's level and what the next one needs, and a tap opens `habits.html?client=<id>&go=pass`, the Locker (*Career Mode (phase 2, the XP switch)*). The Daily Habits row still shows no level of its own: where it would have said one, it says *Ready for today* |
 | Proof | `program.html` | The session row at the end of Today's list (its → opens the programme), and a row in Settings (behind the initials button). The **Your training programme** card at the bottom of Today went on 2026-10-12; a free athlete keeps **Want the training too?** there |
 
 Both are the same origin with the same PWA scope, so tapping through from an installed
@@ -193,6 +194,8 @@ point. It also makes the upgrade free of migration: drop `"tier"` (or set it to
 `public.programs` row**, and their whole history, level and board place carry straight
 over. **Same id, same login, same history** — the username and password that opened
 Proof now open `program.html` too.
+Once Career Mode's XP switch is on, a free athlete's career is their habits alone (GAME-12: one system for everyone, and a free
+athlete simply has no training facts). The upgrade adds the training to the same career. Nothing resets.
 
 **Contact details never go in the programme record** — every app the athlete signs in to
 reads that row. Email and WhatsApp live in `public.hab_contacts` behind coach-only RLS
@@ -1045,7 +1048,9 @@ per-athlete streak is the whole change needed for everyone's cards to carry one.
 The reward track, as a tab of its own (screen id `pass`, drawn by `renderPass()`). Four ways
 in: the tab bar; the **level ring** or the **rank** on Today's hero, both `go('pass')` — the
 rank lives here and nowhere else now that Progress dropped its strip; the profile card at
-the top of Settings; and Settings → *Locker*. Top to bottom it draws:
+the top of Settings; and Settings → *Locker*. A fifth comes from outside, once Career Mode's XP switch is on: the training
+app's Career row opens `habits.html?client=<id>&go=pass` (read at the end of boot, after `?open=<id>`, which wins if both are
+given, and never in the embed). Top to bottom it draws:
 
 1. **The pass hero** — level ring, rank crest and name, its metal tier with the XP into this
    level, *N of 14 rewards kept*, and a **NEXT ON THE ROAD** button that scrolls the track
@@ -1547,6 +1552,8 @@ season, not by a retune, not by switching a habit off. A reward you can lose is 
 That also settles the season question without a second XP ladder: levels reset exactly as
 they do now, and what you already unlocked does not. *"A new season resets your points,
 not your rewards."*
+**Once Career Mode's XP switch is on the level does not reset either** (it is the career's), and the sentence on the screens
+becomes *"A new season only starts the board's points again."* Rewards are still recorded and only ever added.
 
 `claimRewards()` records anything the current level has reached and returns only what is
 **new**, so the caller can celebrate it — **on the level-up's own screen** since PRF-02
@@ -1609,6 +1616,7 @@ A season reset drops levels to 1 and keeps the shelf, so an athlete rebuilding f
 who already owns everything through level 14 must not have the pass hero announce "NEXT ON
 THE ROAD: SIGNED ON" for a title they have worn for months. Both call sites get this for
 free from the one function.
+Once Career Mode's XP switch is on no season drops a level, so that case stops arising from seasons. The guard stays.
 
 **Reward art is the real thing, not a placeholder.** `art()` draws the actual card ground
 (`CARD_LOOK`) for a skin or a metal nameplate swatch for a title, greyed (`filter:
@@ -1714,8 +1722,9 @@ the level being shared was never shown. The rest of the queue now waits in `UI.c
 | A day streak mark from 7 (`STREAK_TAKEOVER`) to 365 | the whole screen, ember | **Streak**, that mark: shared after the streak broke, the mark it earned, never a 0 |
 | A perfect day | the wins card | **The day**, for THAT day: by the time the card is tapped it can be yesterday |
 | A comeback | the wins card | **Milestone** (chip *Comeback*): SECOND WIND, *4 days off. Back, and the day counted.*, +50 XP (it opened the Rank card) |
-| A season title (level 5 in a season that has closed) | **the whole screen, kicker *Season over*** (new: it arrived in silence) | **Title**: the prismatic plate, *FINISHED PRE-SEASON*, the rank, level and XP it finished on |
+| A season title (level 5 in a season that has closed, or 2,000 season points once the XP switch is on) | **the whole screen, kicker *Season over*** (new: it arrived in silence) | **Title**: the prismatic plate, *FINISHED PRE-SEASON*, the rank, level and XP it finished on |
 | A finished season with no title | **the wins card** (new) | none: the Rank card is already the new season's |
+| The career reveal (once the XP switch is on, once per athlete) | **the whole screen, kicker *Your career***, the rank's own ground | **Rank**, eyebrow *MY CAREER* |
 
 The wins card has one Share it: it opens the newest win that has a card, and the picker holds the newest
 win of every other card too (a milestone and a perfect day from one evening are each one tap apart).
@@ -1777,6 +1786,12 @@ happens; `set_title()` then only checks the record. **The threshold mirrors the 
 exactly — season-scoped, because that is what `overallLevel()` measures.** Scoring career
 XP server-side instead would mint titles the athlete's own app never awarded.
 
+**Once Career Mode's XP switch is on, the mirror holds with the career's level instead.** `hab_season_level()` answers the career
+level (`hab_proof_level()` keeps Proof's own season level, for the switch's report) and so does `overallLevel()` on the phone, so
+`hab_mint_titles()`, `claim_titles()` and `set_title()` still mint exactly what the athlete's own app awards. Levels no longer
+reset, so reason 1 stops applying. The record is still minted and never recomputed: a re-seeded rulebook can still move a level,
+and nothing already minted is taken back (GAME-1).
+
 Three rules follow on the client, all in `pushTitle()`:
 
 - equipping is **local and instant** — it is their screen, and it must not wait on a round
@@ -1822,6 +1837,7 @@ re-run) reads the array, and draws the distinction the naive fix would have miss
 
 - **`lv > 0` — the level track.** `hab_mint_titles()` mints a `kind: 'title'` entry only
   when `hab_season_level() >= lv`. Cards are never minted server-side.
+  (`hab_season_level()` is the career level once the XP switch is on.)
 - **`lv: 0` — event titles.** "Mint where level ≥ lv" would have handed all five to every
   athlete on their next boot. `hab_mint_titles()` ignores them instead, and `set_title()`
   records one directly when it is equipped: event completion is computed client-side only,
@@ -1842,7 +1858,7 @@ check, which no file in `supabase/` holds.
 
 | Habit | Target | XP | Notes |
 |---|---|---|---|
-| **WORKOUT** | 1 session | 100 | **Locked** — only a finished session earns it. See below |
+| **WORKOUT** | 1 session | 100 | **Locked** — only a finished session earns it. See below. **Once Career Mode's XP switch is on it pays 0 a day toward the overall XP** (the session pays instead), and still counts 120 on its own ladder |
 | STEPS | 10,000 | 60 | Entered as a number |
 | SLEEP | 7.5 h | 50 | Entered as a number |
 | FUEL | 3 meals | 40 | Counter |
@@ -1964,7 +1980,8 @@ whole Today hero until then): **Daily habits · 2 to go · 4 days in a row**. `v
 and the strip under it say the same thing; they replaced *"Daily habits · day complete"*
 beside the strip's *"1 of 5 done"*. A snapshot whose `t` is not today shows the level
 instead, until the strip boots Proof and writes today's, and `done of total` is only for a
-Proof that has not been updated alongside. The redraw signature includes the day, the
+Proof that has not been updated alongside. Once Career Mode's XP switch is on the row says *Ready for today* there and never a
+level: the level is the Career row's, one number on Home. The redraw signature includes the day, the
 verdict and the count. `days[]`, `week[]`, `pct`, `toNext` and `crest` are still written
 for a programme app that has not been updated alongside this one.
 
@@ -1980,6 +1997,9 @@ rank ladder and the weighted day gate already live in two places (this file and 
 `xp_rules` row); computing them in a third would be exactly the class of bug this repo
 warns about hardest — two screens quietly disagreeing, with nothing erroring. Proof owns
 the formulas and exports only the numbers it has already worked out for that render.
+**Career Mode is the one deliberate exception, and it is guarded.** Once the XP switch is on, `program.html` works out the career
+level from the server's XP (`careerLevelOf()`) for its Career row, because its finish card shows where a session's XP takes the
+level before the server has answered. That copy is held to the server's `career_level()` by `scripts/check_twins.js` §9.
 `qualified` is `dayQualifies(today)`, the same gate a day streak uses, so the card and the
 streak can never disagree about whether today counts.
 
@@ -2012,6 +2032,9 @@ it only when this app says it is ready. The card stays either way.
   takeover, and a medal or a perfect day for the wins card, the next time Proof opens. So are the tour, the install offer, the XP flights,
   the board sweep (`autoJoinBoard()`), the silent reward baseline, title minting, and
   Progress, Crew and the Locker. The toast shows inline under the rows.
+  **Career Mode** (once the XP switch is on): the strip never asks the server for the profile (`fetchCareer()` stands down when
+  `IS_EMBED`). It reads the copy in `<id>_hab_career`, which only the full app writes. The career reveal waits for the full app,
+  like every takeover.
 - The strip follows the training app's dark mode (`dark_mode`, then a message on each
   toggle), and reports `ready` with its height, `setup` (never onboarded: no strip) or
   `error` (sign-in or load failure: no strip) through `postMessage`, same origin only.
@@ -2042,6 +2065,10 @@ Why it's built this way:
 - **`program.html` writes nothing into Proof.** It has no habit log, no XP maths, no
   level formula. Its entire habit footprint is two shortcut cards, a link, and the strip on
   its Home, which is Proof itself in a frame (see *Embedded on the training app's Home*).
+  **Career Mode adds one row and one preview, and says so.** Once the XP switch is on, Home has a Career row and the finish card
+  previews what a session earns. Both use copies of the server's rules (`careerLevelOf()`, `careerEarn()`) that
+  `scripts/check_twins.js` §9 holds equal. It still writes no `<id>_hab_*` key: its two keys are `<id>_careercache` and
+  `<id>_earn_d<N>` (`PROGRAM-APP.md` → *Career on Home, and what a session earns*).
 - **Proof reads nothing from `program.html`'s storage.** It asks the server.
 - **`program.html` never syncs `<id>_hab_*`.** Those keys share an origin but belong to
   Proof, which merges them conflict-safely; a stale programme app would otherwise
@@ -2060,6 +2087,8 @@ The habit's id is still `strength` internally so that renaming it to WORKOUT did
 orphan anyone's history or XP.
 
 Only sessions from the current season's start are ever imported — see Seasons below.
+Once Career Mode's XP switch is on the tick itself pays 0 a day (it keeps the day streak whole, and its weight still feeds its
+tiers). The session's XP is the session's, paid by the server.
 
 SQL: `supabase/stage10_workout_days.sql` — **applied and live**.
 
@@ -2139,15 +2168,22 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
 
 - **Nothing about XP is stored.** Levels are recomputed from the logged history every
   load, so retuning the numbers rescores everyone automatically.
+  Once Career Mode's XP switch is on this still holds for the rules. The server keeps a working copy of each athlete's numbers
+  (`career_scores`) so the board loads fast, and works it out again from the facts whenever what it rests on changes. Nothing in
+  it is a source.
 - **Points are weighted by health impact** — training most, then steps. Counter habits
   pay pro-rata as you go plus a bonus for finishing.
 - **Each level costs more than the last** (`base × n^growth`). One full day reaches
   level 2; roughly two months of solid work reaches level 20.
+  Once the XP switch is on the curve is the career's (base 400, growth 0.55). Level 2 costs 400 and a day of habits alone no
+  longer reaches it, because WORKOUT pays 0 a day. A finished session pays 400. Level 20 is still about two months of solid work,
+  habits and training together (the rulebook's note, measured 2026-10-17: training alone reaches level 13 to 15 in that time).
 - **Ranks**: 10 names × 5 sub-levels — ROOKIE · CONTENDER · GRINDER · OPERATOR ·
   ENFORCER · PREDATOR · MACHINE · RELENTLESS · UNTOUCHABLE · IMMORTAL. Past 50 they
   prestige and start again carrying a star. No ceiling.
 - **Every habit has its own level** on the same curve scaled to its own value — so a
   habit's level measures *how often they do it*, not how hard it is.
+  Once the XP switch is on each ladder counts the whole career and does not reset with a season.
 - **Consistency ladders**: five tiers per habit (5/10/20/30/60 consecutive days),
   earned on the best run ever so breaking a streak never revokes a badge.
 - **Celebrations** (PRF-02, Amir's 1A, 2026-09-27): the whole screen only for a **new overall
@@ -2165,6 +2201,7 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   same-day tier clears across several habits coalesce into one. **Every moment's Share it opens a
   card of that exact win** (2026-10-17): the table is *Every reward, its moment and its card*, under
   *The share picker*. Full rules in [`XP_SYSTEM.md`](XP_SYSTEM.md) §5.
+  Once the XP switch is on there is one more, **the career reveal**, once per athlete (*Career Mode (phase 2, the XP switch)*).
 
 - **The badges pay** (since stage 12). Clearing a consistency tier or unlocking a
   milestone is worth real XP, on the **overall** ladder only — never on a habit's own,
@@ -2174,6 +2211,9 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   so every season everyone can earn them again. Tier values are a multiplier on *that
   habit's* daily value, so a workout streak outpays a supplements streak. Detail in
   [`XP_SYSTEM.md`](XP_SYSTEM.md) §4.5.
+  Once the XP switch is on the career counts each badge once, ever, on the day it was crossed (`bonusEvents()` walks the whole
+  log, as the server's career score calls `hab_bonus_xp()` with no season). The board's season points still measure runs from
+  the season start, so a badge pays again toward each season's points.
 
 - **A season is archived now, not erased** (2026-08-02). When a season closes, every
   athlete's final level and XP are snapshotted into `hab_season_results` and the **Locker
@@ -2190,6 +2230,9 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   could have reset the board. Future-dated starts are refused, and `undo_season()` puts
   back the one-command undo the archive would otherwise have removed.
   [`XP_SYSTEM.md`](XP_SYSTEM.md) §7.5.
+  Once the XP switch is on the archive keeps the season's **points** (training included) and the **career level** at the
+  season's last day, and the title goes to everyone with 2,000 points or more (`rulebook.toml` → `[season] title_points`) in
+  place of level 5 inside the season.
 
 - **Milestones come in MARKS** (2026-08-02, Amir: *"as ive seen in call of duty you can
   unlock achievements again but next levels of them"*). A family is one achievement earned
@@ -2201,6 +2244,7 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   badge used to be `FIRST BLOOD`, which is WORKOUT-gated and therefore unreachable for the
   whole funnel. Five badges were renamed so families read as one thing — codes untouched,
   so no history moved. [`XP_SYSTEM.md`](XP_SYSTEM.md) §4.6.
+  Once the XP switch is on a milestone pays the career once, and still pays again toward each season's board points.
 
 - **Custom habits have a server ceiling now** (`maxCustom`, 3). The client cap is a UI rule
   and the log is just JSON, so a tampered copy with fifty junk keys was paid fifty times.
@@ -2421,7 +2465,14 @@ season's start earn XP — for the athlete's own level *and* for the boards. Ear
 stay in their history and still count toward streaks and consistency badges; they just
 don't score.
 
-**Currently `Pre-Season`, opened 26 July 2026.** Amir launches the real thing with one
+**Once Career Mode's XP switch is on, that is true of the boards only.** The athlete's level, rank and each habit's ladder count
+the whole career and never reset. A season still starts the boards from zero, and it archives the season's points and the career
+level. The paragraphs below describe the reset as it works until then. `XP_SYSTEM.md` §7 has the table of what resets, with both
+columns, and *Career Mode (phase 2, the XP switch)*, next, has the rest.
+
+**Currently `Pre-Season`, opened 26 July 2026.** Season 1 is scheduled to open on 2026-10-18 (Amir's scheduled task
+`start-season-1`, 06:00 UK, `start_season('Season 1','2026-10-18')`). `select * from public.current_season();` says which is live.
+Amir launches the real thing with one
 SQL command:
 
 ```sql
@@ -2431,11 +2482,128 @@ select public.start_season('Season 1', '2026-08-01');  -- or a chosen date
 
 Nothing is deleted — it inserts a row in `public.seasons` and every score is recomputed
 from that date. Athletes' apps pick it up on next open with a toast. XP, levels and both
-boards reset; logged history, streaks and consistency badges do not.
+boards reset (once the XP switch is on, only the boards' points); logged history, streaks and consistency badges do not.
 
 This also gates the workout backfill: without it, one athlete's 41 days of past sessions
 would have landed as an instant head start. Full detail in
 [`XP_SYSTEM.md`](XP_SYSTEM.md) §7. SQL: `supabase/stage11_seasons.sql`.
+
+---
+
+## Career Mode (phase 2, the XP switch)
+
+> **Where it stands (2026-10-17).** Built and rehearsed. **Not applied to the live project, and the switch is not on.** Both
+> apps ship ready for it and behave exactly as the rest of this file says until it is. Applying
+> `supabase/stage69_career_xp_switch.sql` and turning the switch on each wait for Amir's yes. Every "once the XP switch is on"
+> in this file points here.
+
+Career Mode (`career/CAREER_MODE.md`, with the steps in `career/PROCEDURES.md` → *Phase 2, as built*) gives AA Proof and the
+training app one score and one level. Amir's three decisions, 2026-10-17 (*"go with your picks, but the season starts tomorrow"*):
+
+1. **Two switches, not one** (`career/rulebook.toml` → `[switch]`). `xp` is this one. `catalogue` (phase 3: the new badges and
+   awards) needs it on first. Each is `"off"` until a seed turns it on with the day. Once on, it never goes back: the seed
+   refuses. The way back is `scripts/career/rollback_stage69.sql`, on Amir's word only.
+2. **Nobody's level goes down.** The seed that turns the XP switch on gives anyone whose career level would sit below the highest
+   level they reached in AA Proof one `level_kept` fact, worth the XP to the start of that level. Their best level is the better
+   of their season records (`hab_season_results`) and the level Proof shows them this season. The fact counts toward the career
+   and never toward a season's points. Measured on the real rows (the backup of 2026-10-17, Season 1 simulated): of 39 athletes,
+   32 go up, 7 stay and 1 is kept at their Proof level by a top-up (level 12, +630 XP). `python scripts/career_seed.py --dry-run`
+   prints every athlete's line first. The server does the whole seed and undoes it.
+3. **Season 1 starts on 2026-10-18.** A scheduled task (`start-season-1`, 06:00 UK) runs `start_season('Season 1','2026-10-18')`,
+   Proof's own way: Pre-Season is archived with Proof's levels and its title at level 5. The switch lands during Season 1. Season
+   points are worked out from the facts and never kept as a record of their own (the server's cache is only a copy), so at the
+   switch the board is worked out again from the season's first day under the new rules, training included. A session finished in Season 1 before the switch counts its 400, and its WORKOUT
+   tick 0, from the moment the switch is on.
+
+**What changes, and only once the switch is on:**
+
+- **Training earns XP**, paid by the server from the training facts (`career/rulebook.toml` → `[fact.*]`): a finished session 400
+  (finished early 200), a full log (every set logged) 50, the check-in answered 20, a week held 400, a bounce-back after a broken week 100, a
+  return after two or more weeks away 50, a Library session 100 (two a week), a personal best 150, an effort win 200 (three a
+  cycle), a retest done 50, a retest beaten 300, a cycle finished 1,000 and the roadmap finished 3,000. One paid session per plan
+  day per training week: a day done twice in a week pays its session once. Proof's own comeback stays 50, paid by the habit half.
+- **The WORKOUT habit pays 0 a day toward the overall XP** (id `strength`, the locked one). The session pays instead, so a session
+  is never paid twice. The habit stays on the day's list. Its weight (100) still counts in the day gate (the day streak, days on
+  target), in its own consistency tiers and in HEAVY METAL and THE MACHINIST until the catalogue switch. Its own ladder (its level
+  ring) still counts 120 a session day. Server: `career_paid_rules()`. Phone: `paidXp()`.
+- **The overall level is the career level.** It counts every fact of the athlete's whole career (habits, training and the level
+  kept) on the rulebook's curve (`[level]`: base 400, growth 0.55, where Proof's own curve is base 300), with the same ten ranks and
+  the star past level 50. It **never resets.** A season resets only the board's points. Each habit's own ladder counts the whole
+  career too.
+- **No season window on the career.** The phone's scorer walks the whole log (`scoreDays()`, and `scoreStart()` is empty). The
+  server's career score calls `hab_xp()` and `hab_bonus_xp()` with no season. So a tier, a milestone or a quest pays the career
+  once, ever, on the day it was crossed. The board's season points still measure from the season's first day, so the same badge
+  pays again toward each season's points.
+- **Closed habit days settle.** A day older than the backfill window (today and 3 days back, plus one so no time zone closes a day
+  early) keeps its facts as they stood. A day that first arrives late is still added.
+- **The profile.** `get_profile()` is the one read for both apps. AA Proof asks for it with `fetchCareer()`: behind the first
+  paint, after every push that lands (the server has just turned the log into facts) and on the foreground pull. Never in the
+  demo, and **never in the embedded strip**, which reads the copy and does not ask. The answer is kept in `<id>_hab_career`
+  (`{ p, at, base }`), on this phone only. It is never in `CFG` (which syncs newest-wins, so a newer phone would adopt a stale
+  profile), never pushed, and written only by the full app. The coach's preview keeps it in memory. `careerOn()` is the profile's
+  switch (`p.ready` and `p.switch.xp`). A tick shows its XP at once: the overall XP is the profile's plus whatever this phone's
+  own scorer has moved since (`careerXp()`, P13), and the server's next answer takes over. The curve comes from the profile
+  (`overallBase()`, `overallGrowth()`), with Proof's own as the fallback.
+- **One reveal, once per athlete.** At the first open of AA Proof on the career, `rulesSignature()` carries the switch, the curve
+  and the rulebook's version instead of the season. The app re-baselines in silence and no level-up fires. `checkLevelUps()` then
+  shows one takeover (`renderCareerReveal()`): the kicker *Your career*, the level, the rank's own ground, and *From everything
+  you've logged since 6 June, your training included. Your level never resets now. A new season only starts the board's points
+  again.* The date is the profile's `since`, the first day the athlete logged anything, and *your training included* appears only
+  when they have finished a session. When the road's rewards up to the career level were added to the Locker, a line counts them:
+  *N rewards on the road are yours · in your Locker*. `CFG.careerSeen` holds the switch's day it was shown for and survives the
+  cloud merge, so a second phone stays quiet. Someone who started after the switch has nothing to reveal and gets none. Its
+  Share it opens the Rank card with the eyebrow *MY CAREER*. In the strip it waits for the full app, like every takeover.
+- **The words change** (all in `habits.html`, behind `careerOn()`). A new season toast: *SEASON 2 has begun. The board starts from
+  zero. Your level stays.* A level-up reads *Career level N. Levels are just days wearing a number, and now they never reset.* A
+  rank-up reads *A rank you earn is yours now. Nothing resets it, not even a new season.* A title reads *A rank says how far you
+  have come. A title says what you are.* The board's note adds *Your level never does, and your points count your training too.*
+  The WORKOUT row's hint reads *Finish a session in your programme and this ticks itself. The session pays the XP. This keeps your
+  day streak.* The Rank card says CAREER where it named the season. The tour's level step and the manual's *Levels and ranks*,
+  *The Locker*, *Consistency*, *Seasons* and *The leaderboard* have Career Mode versions: the manual shows the session prices from
+  the profile and drops "One full day gets you to level 2". Its *What each habit is worth* lists WORKOUT at the session's price
+  over *Paid by your finished session*, and its perfect day leaves WORKOUT out (*A perfect day is currently 216 XP. A finished
+  session pays 400 XP on top.*, on the five core habits). Progress's *This week · +N XP* is the server's week (habits and
+  training) plus what the phone has moved since.
+- **The board and the road.** `leaderboard_top()` ranks this season's points (or the rolling week's), worked out from the facts
+  with the training included, with each athlete's **career** level and rank beside the name. Same columns, same identity check.
+  The road's titles (SIGNED ON at level 2 up to PROOF ITSELF at 50) mint by the career level: `hab_season_level()` answers it, and
+  `hab_mint_titles()`, `claim_titles()` and `set_title()` follow.
+- **A season closing.** `hab_close_season()` (called by `start_season()`) archives each athlete's season **points** (training
+  included) and the **career level** at the season's last day. The season's title goes to everyone with `[season] title_points`
+  (2,000) or more, in place of Proof's "level 5 inside the season".
+- **The server's working copy.** The table `career_scores` (athlete, stamp, score, updated_at) holds each athlete's career XP and
+  level, season points and rolling week. It is worked out again whenever what it rests on changes. The stamp (`career_stamp()`) is
+  the rulebook's version and load time, Amir's quest runs, the season, today, the athlete's facts (their count and last change) and
+  their programme with its versions. A board read works out the stale rows it has time for (2.5 s) and serves the rest as they
+  were. `coach_season_levels()` has 3 s. Only the coach can read it (RLS), `coach_erase_person()` empties it, and **nothing in it
+  is a source**: delete a row and it comes back. It joins `BACKUP_TABLES` in coach.html and `supabase/schema_snapshot.sql` the day
+  stage69 is applied (pre-commit guard 17 fails when the two disagree).
+- **`get_profile()`** answers from that copy and adds `switch` (`xp`, `catalogue`), `week` (`from`, `points`), `since`, `kept` (the
+  level kept) and `rules` (the curve under `level`: base, growth, ranks, levels per rank and prestige, then `season` with
+  `title_points`, and `prices`: the facts a phone previews a tap with). `hab_proof_level()` keeps Proof's own season level, for the switch's report.
+  After the switch `career_compare()` has both sides pay the locked habit 0, and a row that differs only because a closed day
+  settled is `settled`, not a failure.
+- **coach.html.** `coach_season_levels()` answers the career level, and the athlete's Proof sub-tab label reads *career level
+  (server)* where it read *season level (server)* (`COACH_DASHBOARD.md`).
+- **The training app** (`PROGRAM-APP.md` → *Career on Home, and what a session earns*). A Career row on Home above Hold Serve
+  shows the level. The finish card says what a session earns and the finished card what it earned.
+- **`?go=pass`.** `habits.html?client=<id>&go=pass` opens the Locker. It is the Career row's tap. It is read at the end of boot
+  after `?open=<id>` (which wins if both are given) and never in the embed.
+
+**What does not change.** The day gate, the day streak, perfect days, the roster rules, partial credit on a counter, the backfill
+window, how a quest is scored, roll call (no XP), body weight (no score), the ten rank names and the Locker's rewards (kept for
+good) all work as this file says. Progress's stat tiles (days logged, perfect days) keep the season's window.
+
+**The twins, and how they are checked.** `habits.html` `levelInfo()` on the career's curve and `paidXp()` copy the server's
+`career_level()` and `hab_xp()` with `career_paid_rules()`. `program.html` `careerLevelOf()`, `careerFullLog()`, `careerCheckin()`
+and `careerEarly()` copy `career_level()` and `career_session_want()`. `scripts/check_twins.js` §9 holds them to
+`scripts/career/xp_cases.json`, the server's own answers, which `node scripts/career/rehearse_switch.mjs --write-cases` writes and
+the rehearsal checks on every run. Change a rule on both sides, then in the cases (`check_twins.js` said 65,151 checks agree on
+2026-10-17). `career/rulebook.toml` is also a third copy of Proof's habit numbers: `scripts/check_career.py` rule 14 holds them
+equal to the `xp_rules` row until the catalogue switch (`XP_SYSTEM.md` §8). The rehearsal itself (PGlite, the schema snapshot and
+a full backup of the real rows kept outside the repo) was 42 of 42 on 2026-10-17. `node scripts/headless/career.js` (55 checks)
+drives both apps: the row, the finish and finished lines, the reveal once, the manual, a tick moving the XP at once, `?go=pass`,
+the strip never asking, and nothing changing before the switch.
 
 ---
 
@@ -2449,12 +2617,16 @@ would have landed as an instant head start. Full detail in
   athlete can rename or leave at any time from Crew → Leaderboard.
 - Others see **that name, their points, level and rank, and the title they chose to
   show** — nothing else.
+  Once Career Mode's XP switch is on the level and rank are the career's, and the points count the training too.
 - **Two boards**: *this season* (the default — every point since the season opened) and
   *past week* (a **rolling** seven days: today and the six before it, so a strong week
   always shows instead of emptying every Monday). Neither ever counts a day from before
   the season started.
 - **Scored in Postgres** from the log already stored server-side. The app submits no
   number, so editing local storage cannot buy a place.
+  Once the XP switch is on it is worked out from the facts (the log turned into facts by the server, plus the training) and kept
+  in the `career_scores` copy. `leaderboard_top()` reads that copy, works out the stale rows it has time for and serves the rest
+  as they were.
 - **No athlete ids are ever returned.** An id is the athlete's sign-in username (and it
   used to be enough to fetch `/data/<id>.json`, which is 404 since 2026-09-07).
 - **Reading the board needs a signed-in athlete.** Since 2026-09-07 the RPCs check
@@ -2556,6 +2728,9 @@ schema: see the box below):
 Stages 18 and 20 have no entry in the database's migration history, but both are live: 18's
 per-day roster is inside every later `hab_bonus_xp()`, and 20's event titles are on the row.
 
+Career Mode's stages are not in this table. Stage 66 (the fact ledger, live in shadow since 2026-10-17) and stage 69 (the XP
+switch, built and rehearsed, **not applied**) are described under *Career Mode (phase 2, the XP switch)*.
+
 > Because scoring happens on the server, the XP rules exist in **two places**:
 > `XP_RULES` (and its sibling constants) in `habits.html` and the `xp_rules` row in
 > Supabase. Change both together — the full key-by-key table is `XP_SYSTEM.md` §8.
@@ -2569,7 +2744,8 @@ per-day roster is inside every later `hab_bonus_xp()`, and 20's event titles are
 > error. Where the latest definitions sit today: `hab_bonus_xp()` and `hab_xp()` —
 > the latest definition, currently `stage24_marks_quests_customcap.sql` plus the `qruns` patch in `stage55_end_quests.sql`;
 > `leaderboard_top()` and `roll_call()` — `stage17_titles.sql`; `set_title()` —
-> `stage25_season_record.sql`. ⚠️ **And no file holds the live board RPCs exactly:**
+> `stage25_season_record.sql`. Once stage69 is applied, `leaderboard_top()`, `hab_season_level()`, `coach_season_levels()` and
+> `hab_close_season()` are stage69's (each is Proof's own scorer until the XP switch is on). ⚠️ **And no file holds the live board RPCs exactly:**
 > since 2026-09-07 `leaderboard_top`, `roll_call`, `set_day_note`, `set_leaderboard_optin`,
 > `set_title`, `claim_titles`, `get_workout_days` and `season_record` carry a sign-in
 > identity check (`current_athlete_id()`) that was added outside these files. Before
@@ -2635,11 +2811,14 @@ sides only ever append, so the union is the truth. What they were *wearing* is a
 preference, so the newer config still wins — but never into an empty slot.
 
 Storage keys, all owned solely by Proof: `<id>_hab_cfg` (settings), `<id>_hab_log`
-(the daily log), `<id>_hab_meta` (sync state, which stays on the phone). The first two ride the existing `save_progress` /
+(the daily log), `<id>_hab_meta` (sync state, which stays on the phone) and, once Career Mode's XP switch is on,
+`<id>_hab_career` (the last profile the server sent: a cache, kept on the phone and never synced). The first two ride the
+existing `save_progress` /
 `get_progress` functions into the same `athlete_progress` row the programme app uses —
 **no table of its own for the log** (the board, roll call, titles, contacts and seasons have
 theirs: the stages under *The leaderboard*). `program.html` explicitly skips
 these keys when it syncs.
+`CFG.careerSeen` (the career reveal has been shown) is in `CFG`, so it does sync, and the cloud merge keeps it.
 
 ---
 

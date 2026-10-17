@@ -396,6 +396,10 @@ turned on by a seed.
    (`career_keep_levels()`), and returns the same list. `select public.career_compare()` must still say `ok` (both sides pay
    the WORKOUT habit 0 now; a row that differs only because a closed day settled says `settled`).
 5. Commit the `.toml` with the date the same day, so the next seed keeps the switch on (a seed that turns it back off is refused).
+   The same commit changes `privacy.html` §2.3 and its *Last updated* date (Proof's six-file rule): the level is a career level that
+   counts finished sessions too and no longer resets, the board's points count finished sessions (a number only), and the server
+   keeps a working copy of the numbers, worked out again from the history and erased with the rest. Not before: until the switch it
+   would not be true. `privacy-fa.html`'s short version ("name, points and rank") stays true as it is.
 
 ## P15. The tables
 
@@ -466,7 +470,8 @@ the same day.
 the schema snapshot, a dump of the real rows, then made-up athletes through the real doors). What the procedures above
 became, and the choices the build had to make:
 
-- **Shadow.** `rulebook.toml` → `[shadow] on = true`. The one thing an athlete sees is Hold Serve's row on the training app's Home
+- **Shadow.** `rulebook.toml` → `[shadow] on = true` (rulebook version 1; version 2 replaced it with `[switch]`, both `"off"`:
+  *Phase 2, as built*, below). The one thing an athlete sees is Hold Serve's row on the training app's Home
   (2026-10-17): it reads the athlete's own `week_held` and `week_broken` facts, not `get_profile()`, and counts them as P10 does
   (`holdCount()`, a twin; `PROGRAM-APP.md` → *Hold Serve on Home*). No XP, level or score reaches a screen; AA Proof's scorers and board
   are untouched. While it is on, the habit numbers are Proof's own (strength 100, the gate, the targets) and the checker
@@ -567,7 +572,8 @@ procedures above became, and the choices the build made:
   version and load time), Amir's quest runs, the season, today, the athlete's facts (their count and last change) and programme. A
   different stamp is stale, worked out again on the next read (`career_scored()`). The board reads many at once with a time budget
   (`career_scores_for()`: 2.5 s, then a stale row is served as it was), because the career's habit half walks a whole career (up to a
-  second for the longest log on 2026-10-17). Coach-only read, in `BACKUP_TABLES`, the schema snapshot and `coach_erase_person()`.
+  second for the longest log on 2026-10-17). Coach-only read; `coach_erase_person()` empties it; it joins `BACKUP_TABLES` and the schema snapshot in the commit that applies
+  stage69.
   Measured on PGlite (slower than the live project): the longest athlete's profile 0.39 s cold and 0.11 s warm, the board 0.84 s cold
   and 0.003 s warm.
 - **P4.** With the XP switch on: the level is `career_level()` of the career XP (never resets); `hab_season_level()` answers it, so the

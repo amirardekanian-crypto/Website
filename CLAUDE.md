@@ -49,7 +49,8 @@ Durable context for working in this repo. Read the linked docs before diving in.
   (phase 2) and `catalogue` (phase 3; the badge entries say `retire_at` / `starts_at = "catalogue"`), each `"off"` or the day a seed
   turned it on, never back off. With the XP switch on: training earns XP, the WORKOUT habit pays 0 a day, closed days settle, the
   level is the career level (never resets; the road's titles, the board's level and coach.html's follow it), the board ranks season
-  points from the facts through a cache (`career_scores`: in `BACKUP_TABLES`, the snapshot and the erasure, a cache holding no source),
+  points from the facts through a cache (`career_scores`, a cache holding no source: `coach_erase_person()` empties it, and it joins `BACKUP_TABLES` and the snapshot in
+  the commit that applies stage69),
   and nobody's level goes down (`[fact.level_kept]`, written once by the seed that turns it on; `career_seed.py --dry-run` shows the
   list first). Both apps read `get_profile()` only once it is on and behave exactly as before until then. The phones copy three of its
   rules (the career's curve, WORKOUT at 0, a session's full log and check-in): `scripts/check_twins.js` §9 holds them to
