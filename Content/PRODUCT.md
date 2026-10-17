@@ -6,7 +6,7 @@ The "what the product actually is" context doc. Pair it with **`DESIGN_SYSTEM.md
 
 ## The business in one breath
 
-**Amir Ardekani** — online **Strength & Conditioning coach** (Farsi-facing title: **«مربیِ بدنسازیِ حرفه‌ای»**). MSc Strength & Conditioning · MSc Applied Exercise Physiology (Farsi: **«ارشد»**, never "MSc") · **1000+ tennis & padel players coached**. He sells **premium, individualised programmes** delivered through a private web app. The promise: ***not just a program* — a full coaching experience**: a bespoke programme **plus a coach who watches your data**. **EN-site pricing (USD, 2026-07):** Game **$70 / 1 month** · Set **$180 / 3 months** · Match **$300 / 6 months** (tennis-scoring commitment ladder). All tiers include weekly check-ins (4/month) and a performance report; Match (6-month) adds the extra-attention layer — competition-specific services (tournament-periodised plan, competition warm-ups) and video technique reviews. **10% loyalty renewal discount** (both sites). Iran price (Farsi site, unchanged): **معادلِ ۲۵ دلار / ماه** (به تومان، با نرخِ روز); abroad → DM.
+**Amir Ardekani** — online **Strength & Conditioning coach** (Farsi-facing title: **«مربیِ بدنسازیِ حرفه‌ای»**). MSc Strength & Conditioning · MSc Applied Exercise Physiology (Farsi: **«ارشد»**, never "MSc") · **1000+ tennis & padel players coached**. He sells **premium, individualised programmes** delivered through a private web app. The promise: ***not just a program* — a full coaching experience**: a bespoke programme **plus a coach who watches your data**. **EN-site pricing (USD, by 5-week cycles since Amir's 2026-10-17 correction):** Game **$70 / 1 cycle** · Set **$180 / 3 cycles** ($60 a cycle) · Match **$300 / 6 cycles** ($50 a cycle) (tennis-scoring commitment ladder); paid by PayPal. All tiers include weekly check-ins (4/month) and a performance report; Match (6 cycles) adds the extra-attention layer — competition-specific services (tournament-periodised plan, competition warm-ups) and video technique reviews. **10% loyalty renewal discount** (both sites). Iran price (Farsi site, Amir 2026-10-17): **معادلِ ۲۵ دلار برای هر سیکل (۵ هفته)** (به تومان، با نرخِ روز), paid **one cycle at a time** by card-to-card; living abroad → the EN plans. Any sport and any level are welcome (tennis and padel stay the specialty); nutrition and supplement advice, never a nutrition plan. Source of truth for these facts: `Content/CHATBOT-FACTS.md`.
 
 > **Farsi word choices** (the canonical list lives in `DESIGN_SYSTEM.md` §10): title = «مربیِ بدنسازیِ حرفه‌ای» · «ارشد» not "MSc" · «یه برنامه» not «فایل/PDF» · «شدت» not «سختی» · «شروع کن» not «درخواست» · «تجربه» not «پشتوانه».
 
@@ -40,7 +40,7 @@ Each athlete signs in with their own username and password at `program.html` and
 **The system — "هیچی بی‌دلیل نیست / nothing without a reason":**
 
 ```
-Programme (~6 months)
+Programme (5 cycles of 5 weeks)
 └── Cycle  (~5 weeks, a "mission" with a focus, the WHY, and expected outcomes)
     └── Day  (one session, with a focus — e.g. Lower Body & Glutes)
         └── Block  (warm-up · strength · power — colour-coded)
