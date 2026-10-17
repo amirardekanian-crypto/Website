@@ -1,8 +1,9 @@
 # Career Mode: the folder
 
-The whole gamification system, in files you can read, change and think about. **Nothing in the apps reads these files
-yet (2026-10-17):** they are the design the build will follow. When a phase is built, a script turns the `.toml` files
-into database rows, so changing a file and re-running it is how a detail changes later (GAME-10).
+The whole gamification system, in files you can read, change and think about. **Phase 1 is built and rehearsed
+(2026-10-17), in shadow, and on the live project once Amir says yes:** `scripts/career_seed.py` turns the `.toml` files
+into the server's rows (`career_rules`, `career_catalogue`), so
+changing a file and seeding it again is how a detail changes (GAME-10). Nothing an athlete sees reads them yet.
 
 ## What is here
 
@@ -37,8 +38,18 @@ python scripts/check_career.py
 ```
 
 It reads every file and refuses anything that breaks the rules: a reward with no meaning, a fact nobody defined, gold,
-a mission with its own fixed XP (GAME-7), a title that doesn't exist, tiers out of order. Or just ask Claude to make the
-change.
+a mission with its own fixed XP (GAME-7), a title that doesn't exist, tiers out of order, and, while `[shadow] on = true`,
+a habit number that is not Proof's own (`supabase/xp_rules_snapshot.json`). Or just ask Claude to make the change.
+
+Then seed it, so the server scores with it (Claude does this with the Supabase tool; it re-works every athlete's facts):
+
+```bash
+python scripts/career_seed.py --out "$TEMP/career-seed.sql"
+```
+
+The file holds one `select public.career_seed(…)` statement. Run it on the project, then `select public.career_compare()`
+must still say `"ok": true` while the shadow is on. `node scripts/career/rehearse.mjs` (PGlite, nothing live) proves a
+change to `supabase/stage66_career_mode.sql` before it is applied.
 
 **An id never changes.** `[badge.held_weeks]`: `held_weeks` is the id that history is filed under. Change the `name`,
 never the id.

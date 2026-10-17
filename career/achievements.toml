@@ -111,12 +111,15 @@ origin = "new"
 # ── Proof's one-off milestones ──────────────────────────────────────────────────────────────────────────────────────
 # The way in and two trophies: the three Proof milestones that are not a family (no Roman numeral, on purpose).
 # The other 29 are the tiers of the badge families in badges.toml. xp and caption are Proof's own, size follows its tier.
+# proof_measure and proof_need are how Proof counts it (as in badges.toml); they must stay equal to Proof's.
 
 [achievement.first_blood]
 name = "FIRST BLOOD"
 meaning = "commitment"
 reads = "proof"
 proof_code = "FB"
+proof_measure = "daysHit:strength"
+proof_need = 1
 rule = "The first day with a session done (the WORKOUT habit)."
 xp = 50
 size = "win"
@@ -129,6 +132,8 @@ name = "THE MACHINIST"
 meaning = "commitment"
 reads = "proof"
 proof_code = "MC"
+proof_measure = "daysHit:strength"
+proof_need = 150
 rule = "150 days with a session done (the WORKOUT habit)."
 xp = 750
 size = "milestone"
@@ -141,6 +146,8 @@ name = "THE CENTURION"
 meaning = "commitment"
 reads = "proof"
 proof_code = "CN"
+proof_measure = "perfectDays"
+proof_need = 100
 rule = "100 perfect days: every habit on the day's list done."
 xp = 1200
 size = "milestone"

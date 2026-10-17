@@ -123,6 +123,9 @@ origin = "new"
 # Habit quests are recovery missions for that habit; the rest are stretch or plan. name is Proof's title in Title Case,
 # asks is Proof's own line, proof_id is Proof's id and proof_xp what Proof paid. That XP is history only: a mission
 # pays share.mission of the work inside it, so a mission on a cheap habit is a cheap mission (GAME-7).
+# proof_kind and proof_need are how Proof counted it inside a quest run (daysHit:<habit>, total:<habit>, qualify, perfect):
+# until the crew mission replaces Proof's quest week (phase 5), Career Mode pays the runs Proof ran from these, with
+# proof_xp, so they must stay equal to Proof's (check_career.py).
 
 [mission.the_well_runs_deep]
 name = "The Well Runs Deep"
@@ -137,6 +140,8 @@ picked_when = "Their weakest habit last week was water."
 free = true
 origin = "proof"
 proof_id = "w_water5"
+proof_kind = "daysHit:water"
+proof_need = 5
 proof_xp = 150
 
 [mission.seven_for_seven]
@@ -152,6 +157,8 @@ picked_when = "Their weakest habit last week was water."
 free = true
 origin = "proof"
 proof_id = "w_water7"
+proof_kind = "daysHit:water"
+proof_need = 7
 proof_xp = 220
 
 [mission.fifty_thousand]
@@ -167,6 +174,8 @@ picked_when = "Their weakest habit last week was steps."
 free = true
 origin = "proof"
 proof_id = "w_steps50k"
+proof_kind = "total:steps"
+proof_need = 50000
 proof_xp = 200
 
 [mission.the_long_way_round]
@@ -182,6 +191,8 @@ picked_when = "Their weakest habit last week was steps."
 free = true
 origin = "proof"
 proof_id = "w_steps70k"
+proof_kind = "total:steps"
+proof_need = 70000
 proof_xp = 280
 
 [mission.lights_out]
@@ -197,6 +208,8 @@ picked_when = "Their weakest habit last week was sleep."
 free = true
 origin = "proof"
 proof_id = "w_sleep5"
+proof_kind = "daysHit:sleep"
+proof_need = 5
 proof_xp = 180
 
 [mission.oiled_hinges]
@@ -212,6 +225,8 @@ picked_when = "Their weakest habit last week was mobility."
 free = true
 origin = "proof"
 proof_id = "w_mob4"
+proof_kind = "daysHit:mobility"
+proof_need = 4
 proof_xp = 120
 
 [mission.dead_calm]
@@ -227,6 +242,8 @@ picked_when = "Their weakest habit last week was breathe."
 free = true
 origin = "proof"
 proof_id = "w_breathe4"
+proof_kind = "daysHit:breathe"
+proof_need = 4
 proof_xp = 100
 
 [mission.no_negotiation]
@@ -242,6 +259,8 @@ picked_when = "Their weakest habit last week was supps."
 free = true
 origin = "proof"
 proof_id = "w_supps7"
+proof_kind = "daysHit:supps"
+proof_need = 7
 proof_xp = 140
 
 [mission.on_the_record]
@@ -257,6 +276,8 @@ picked_when = "Their weakest habit last week was fuel."
 free = true
 origin = "proof"
 proof_id = "w_fuel5"
+proof_kind = "daysHit:fuel"
+proof_need = 5
 proof_xp = 140
 
 [mission.three_hard_days]
@@ -271,6 +292,8 @@ picked_when = "Only when Amir pins it: the planner uses Hold Your Week."
 free = false
 origin = "proof"
 proof_id = "w_train3"
+proof_kind = "daysHit:strength"
+proof_need = 3
 proof_xp = 250
 
 [mission.five_on_target]
@@ -285,6 +308,8 @@ picked_when = "Not done in the last four weeks."
 free = true
 origin = "proof"
 proof_id = "w_qualify5"
+proof_kind = "qualify"
+proof_need = 5
 proof_xp = 220
 
 [mission.twice_perfect]
@@ -299,4 +324,6 @@ picked_when = "Not done in the last four weeks."
 free = true
 origin = "proof"
 proof_id = "w_perfect2"
+proof_kind = "perfect"
+proof_need = 2
 proof_xp = 300

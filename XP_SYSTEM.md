@@ -1012,6 +1012,14 @@ object. **It has 18 keys** (read from the live row, 2026-09-26), and every one b
 | `passTrack` | `PASS_TRACK`, plus the event titles in `EVENTS` | **The server refuses a title the app already gave** |
 | `questRuns` | — (cached on the phone as `CFG.questRuns`) | Server-only; written by `set_quests()` / `end_quests()` / `clear_quests()` |
 
+⚠️ **And a third copy, while Career Mode runs in shadow** (phase 1, `supabase/stage66_career_mode.sql`, 2026-10-17):
+`career/rulebook.toml` → `[habits]` (the weights, targets, gate, lapse and custom numbers), `badges.toml` (the tiers and the
+milestone families, with `proof_measure`), `achievements.toml` (FIRST BLOOD, THE MACHINIST, THE CENTURION) and `missions.toml`
+(the quest pool, `proof_kind`, `proof_need`, `proof_xp`). Career Mode scores habits with them through these same SQL functions,
+and `scripts/check_career.py` (pre-commit, also when `supabase/xp_rules_snapshot.json` is staged) refuses any of them that is
+not equal to the row. Change the row, `habits.html` and `career/*.toml` together, re-seed Career Mode, and
+`select public.career_compare()` must still say `"ok": true`. The quest runs are read from this row by both.
+
 Three more mirrors live in **SQL function bodies**, not on the row:
 
 | SQL | `habits.html` | What breaks if they drift |

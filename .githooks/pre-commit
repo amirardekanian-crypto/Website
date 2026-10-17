@@ -406,7 +406,9 @@ fi
 # then change, adjust"). scripts/check_career.py reads all seven and blocks a reward with no meaning, a fact nobody defined, a
 # mission with its own fixed XP (GAME-7), a title that does not exist, tiers out of order, or gold. Its coverage warnings never
 # block. test_check_career.py proves the checker still fails on each fault, and runs only when the checker or its test changes.
-if git diff --cached --name-only --diff-filter=ACMD | grep -qE '^career/.+\.toml$|^scripts/check_career\.py$'; then
+# Since phase 1 (stage66, 2026-10-17) Career Mode scores habits with Proof's own numbers while [shadow] on = true, and the checker
+# holds them equal to supabase/xp_rules_snapshot.json: a change to Proof's rules runs it too, so the two can never drift apart quietly.
+if git diff --cached --name-only --diff-filter=ACMD | grep -qE '^career/.+\.toml$|^scripts/check_career\.py$|^supabase/xp_rules_snapshot\.json$'; then
   echo "pre-commit: Career Mode's files changed — checking them..."
   if ! career_out=$("$PY" -X utf8 scripts/check_career.py 2>&1); then
     echo "$career_out" | sed -n '/^Errors/,$p'
