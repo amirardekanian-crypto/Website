@@ -5,17 +5,21 @@
 'use strict';
 const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
 const ROOT = path.join(__dirname, '..');
-const FILES = ['program.html', 'coach.html', 'habits.html', 'assets/js/chips.js', 'scripts/twins_stamp.json', 'scripts/name_cases.json'];
+const FILES = ['program.html', 'coach.html', 'habits.html', 'assets/js/chips.js', 'scripts/twins_stamp.json', 'scripts/name_cases.json', 'scripts/career/hold_cases.json'];
+// No GIT_* variable reaches a git command in the temp folder, or the guard run on it. The pre-commit hook runs this test inside
+// `git commit`, which exports GIT_INDEX_FILE: a `git add -A` in the temp folder then wrote the temp folder's files into the REAL
+// index (2026-10-17: a worktree's index was left holding seven files), and `git show :file` read the real index instead of the copy.
+const CLEAN_ENV = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^GIT_/i.test(k)));
 
 function runOn(mutate, opts) {
   opts = opts || {};
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'twins-'));
   try {
     FILES.forEach(f => { fs.mkdirSync(path.dirname(path.join(dir, f)), { recursive: true }); fs.copyFileSync(path.join(ROOT, f), path.join(dir, f)); });
-    const git = (...a) => cp.execFileSync('git', a, { cwd: dir, stdio: 'ignore' });
+    const git = (...a) => cp.execFileSync('git', a, { cwd: dir, stdio: 'ignore', env: CLEAN_ENV });
     if (opts.index) { git('init', '-q'); git('add', '-A'); }        // the staged state is the starting point
     if (mutate) mutate(f => fs.readFileSync(path.join(dir, f), 'utf8'), (f, t) => fs.writeFileSync(path.join(dir, f), t), git);
-    const env = Object.assign({}, process.env, { CHECK_TWINS_ROOT: dir }, opts.index ? { CHECK_TWINS_INDEX: '1' } : {});
+    const env = Object.assign({}, CLEAN_ENV, { CHECK_TWINS_ROOT: dir }, opts.index ? { CHECK_TWINS_INDEX: '1' } : {});
     delete env.CHECK_TWINS_INDEX_UNSET;
     const r = cp.spawnSync(process.execPath, [path.join(__dirname, 'check_twins.js')].concat(opts.args || []), { env, encoding: 'utf8' });
     return { code: r.status, out: (r.stdout || '') + (r.stderr || '') };
@@ -79,6 +83,9 @@ want('the app rewords its check-in line', swap('program.html', "bits.push('lower
 want('the app stops writing the sore wording', swap('program.html', "bits.push('sore: jumps and landings halved')", "bits.push('sore: jumps halved')"), 1, /readinessPlanLine's wording/);
 want('the time-dose rule drifts (a set per 10 minutes becomes 5)', swap('coach.html', 'Math.max(1, sec / 600)', 'Math.max(1, sec / 300)'), 1, /qmSets vs qmSetsC/);
 want('a function is renamed away', swap('coach.html', 'function spineForC(', 'function spineForD('), 2, /could not find function spineForC/);
+// Career Mode's weeks held in a row (Home's Hold Serve row): the app's copy of get_profile()'s loop, held to scripts/career/hold_cases.json.
+want('Hold Serve stops starting again after a broken week (the app only)', swap('program.html', 'best = Math.max(best, now); } else now = 0;', 'best = Math.max(best, now); }'), 1, /holdCount: /);
+want('Hold Serve\'s best is the latest run, not the longest', swap('program.html', 'best = Math.max(best, now);', 'best = now;'), 1, /holdCount: /);
 want('chips.js changes under an unchanged ?v=', (get, put) => put('assets/js/chips.js', get('assets/js/chips.js') + '\n// edited\n'), 1, /chips\.js changed but coach\.html still loads \?v=/);
 want('?v= bumped but the stamp not refreshed', swap('coach.html', 'chips.js?v=', 'chips.js?v=zz-'), 1, /stamp is out of date/);
 

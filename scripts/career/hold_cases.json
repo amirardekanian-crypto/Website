@@ -1,0 +1,58 @@
+{
+  "about": "Hold Serve, the weeks held in a row (Career Mode, 2026-10-17). get_profile() (supabase/stage66_career_mode.sql) counts numbers.weeks_held {now, best} over an athlete's week_held and week_broken facts in (day, ref) order: a held week adds one, a broken week starts again from zero. program.html's holdCount() is the phone's copy, for Home's Hold Serve row. scripts/check_twins.js runs holdCount() on these cases (facts as the athlete's read returns them, already in order); scripts/career/rehearse.mjs holds get_profile() to holdCount() on every athlete it builds. Change the rule in both, then here.",
+  "cases": [
+    { "name": "no facts", "facts": [], "want": { "now": 0, "best": 0 } },
+    { "name": "one held week", "facts": [
+        { "kind": "week_held", "day": "2026-10-09", "ref": "c1|w1", "value": { "cycle": 1, "week": 1 } }
+      ], "want": { "now": 1, "best": 1 } },
+    { "name": "one broken week", "facts": [
+        { "kind": "week_broken", "day": "2026-10-11", "ref": "c1|w1", "value": { "cycle": 1, "week": 1 } }
+      ], "want": { "now": 0, "best": 0 } },
+    { "name": "four held in a row", "facts": [
+        { "kind": "week_held", "day": "2026-09-17", "ref": "c1|w1", "value": { "cycle": 1, "week": 1 } },
+        { "kind": "week_held", "day": "2026-09-24", "ref": "c1|w2", "value": { "cycle": 1, "week": 2 } },
+        { "kind": "week_held", "day": "2026-10-01", "ref": "c1|w3", "value": { "cycle": 1, "week": 3 } },
+        { "kind": "week_held", "day": "2026-10-08", "ref": "c1|w4", "value": { "cycle": 1, "week": 4 } }
+      ], "want": { "now": 4, "best": 4 } },
+    { "name": "held, held, broken, held: the run starts again", "facts": [
+        { "kind": "week_held", "day": "2026-09-17", "ref": "c1|w1", "value": { "cycle": 1, "week": 1 } },
+        { "kind": "week_held", "day": "2026-09-24", "ref": "c1|w2", "value": { "cycle": 1, "week": 2 } },
+        { "kind": "week_broken", "day": "2026-10-04", "ref": "c1|w3", "value": { "cycle": 1, "week": 3 } },
+        { "kind": "week_held", "day": "2026-10-08", "ref": "c1|w4", "value": { "cycle": 1, "week": 4 } }
+      ], "want": { "now": 1, "best": 2 } },
+    { "name": "a run, then a broken week last", "facts": [
+        { "kind": "week_held", "day": "2026-09-17", "ref": "c1|w1", "value": { "cycle": 1, "week": 1 } },
+        { "kind": "week_held", "day": "2026-09-24", "ref": "c1|w2", "value": { "cycle": 1, "week": 2 } },
+        { "kind": "week_held", "day": "2026-10-01", "ref": "c1|w3", "value": { "cycle": 1, "week": 3 } },
+        { "kind": "week_broken", "day": "2026-10-11", "ref": "c1|w4", "value": { "cycle": 1, "week": 4 } }
+      ], "want": { "now": 0, "best": 3 } },
+    { "name": "two broken weeks in a row, then held", "facts": [
+        { "kind": "week_broken", "day": "2026-09-20", "ref": "c1|w1", "value": { "cycle": 1, "week": 1 } },
+        { "kind": "week_broken", "day": "2026-09-27", "ref": "c1|w2", "value": { "cycle": 1, "week": 2 } },
+        { "kind": "week_held", "day": "2026-10-01", "ref": "c1|w3", "value": { "cycle": 1, "week": 3 } }
+      ], "want": { "now": 1, "best": 1 } },
+    { "name": "a run across two cycles (the time between them is no week)", "facts": [
+        { "kind": "week_held", "day": "2026-08-27", "ref": "c1|w4", "value": { "cycle": 1, "week": 4 } },
+        { "kind": "week_held", "day": "2026-09-03", "ref": "c1|w5", "value": { "cycle": 1, "week": 5 } },
+        { "kind": "week_held", "day": "2026-09-17", "ref": "c2|w1", "value": { "cycle": 2, "week": 1 } },
+        { "kind": "week_held", "day": "2026-09-24", "ref": "c2|w2", "value": { "cycle": 2, "week": 2 } },
+        { "kind": "week_held", "day": "2026-10-01", "ref": "c2|w3", "value": { "cycle": 2, "week": 3 } }
+      ], "want": { "now": 5, "best": 5 } },
+    { "name": "the best is an earlier, longer run", "facts": [
+        { "kind": "week_held", "day": "2026-07-02", "ref": "c1|w1", "value": { "cycle": 1, "week": 1 } },
+        { "kind": "week_held", "day": "2026-07-09", "ref": "c1|w2", "value": { "cycle": 1, "week": 2 } },
+        { "kind": "week_held", "day": "2026-07-16", "ref": "c1|w3", "value": { "cycle": 1, "week": 3 } },
+        { "kind": "week_held", "day": "2026-07-23", "ref": "c1|w4", "value": { "cycle": 1, "week": 4 } },
+        { "kind": "week_held", "day": "2026-07-30", "ref": "c1|w5", "value": { "cycle": 1, "week": 5 } },
+        { "kind": "week_held", "day": "2026-08-13", "ref": "c2|w1", "value": { "cycle": 2, "week": 1 } },
+        { "kind": "week_broken", "day": "2026-08-23", "ref": "c2|w2", "value": { "cycle": 2, "week": 2 } },
+        { "kind": "week_held", "day": "2026-08-27", "ref": "c2|w3", "value": { "cycle": 2, "week": 3 } },
+        { "kind": "week_held", "day": "2026-09-03", "ref": "c2|w4", "value": { "cycle": 2, "week": 4 } }
+      ], "want": { "now": 2, "best": 6 } },
+    { "name": "another kind of fact counts for nothing", "facts": [
+        { "kind": "week_held", "day": "2026-09-24", "ref": "c1|w2", "value": { "cycle": 1, "week": 2 } },
+        { "kind": "bounce_back", "day": "2026-09-24", "ref": "c1|w2", "value": { "cycle": 1, "week": 2 } },
+        { "kind": "week_held", "day": "2026-10-01", "ref": "c1|w3", "value": { "cycle": 1, "week": 3 } }
+      ], "want": { "now": 2, "best": 2 } }
+  ]
+}

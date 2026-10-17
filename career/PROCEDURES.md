@@ -445,7 +445,9 @@ the same day.
 the schema snapshot, a dump of the real rows, then made-up athletes through the real doors). What the procedures above
 became, and the choices the build had to make:
 
-- **Shadow.** `rulebook.toml` → `[shadow] on = true`. Nothing an athlete sees reads Career Mode; AA Proof's scorers and board
+- **Shadow.** `rulebook.toml` → `[shadow] on = true`. The one thing an athlete sees is Hold Serve's row on the training app's Home
+  (2026-10-17): it reads the athlete's own `week_held` and `week_broken` facts, not `get_profile()`, and counts them as P10 does
+  (`holdCount()`, a twin; `PROGRAM-APP.md` → *Hold Serve on Home*). No XP, level or score reaches a screen; AA Proof's scorers and board
   are untouched. While it is on, the habit numbers are Proof's own (strength 100, the gate, the targets) and the checker
   holds them equal to `supabase/xp_rules_snapshot.json`.
 - **P1, observe.** Four triggers: `athlete_progress` (the Proof log, its config, the Personal Records), `session_history`,

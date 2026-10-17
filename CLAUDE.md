@@ -249,7 +249,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   `dayTargetC()` in coach.html, both with the week note and the drop optional: change both (`check_twins.js` §4).
 - **Body weight lives in `program.html`** under the key `<id>_hab_wt`; AA Proof must never write it, and it
   is never scored.
-- **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`, and **`plancache`**, the one saved plan
+- **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`, `<id>_holdcache` (Hold Serve), and **`plancache`**, the one saved plan
   that opens both apps with no signal (REL-01, 2026-09-26): written only from a real server answer (never the
   demo, the coach preview or Proof's strip), deleted when it answers no. **Since 2026-10-13 program.html opens
   from it FIRST on every launch** (Line Call decision 2, `PLAN_OFFLINE.fast`) and checks the server behind the first
@@ -272,7 +272,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   in the Centre Court look*): the greeting, This Week (the week note in its week), **Next up** (the suggested day,
   `suggestedDayId()`: since 2026-10-13 the day AFTER the last one trained, so short weeks rotate through every day; as the day's
   cover with one green button: Open Day N, or Resume and its clock), the other days as
-  paper rows (`.dc-row`, `data-dl`, the P24 numeral, solid green when done), then the habits row. Only Next up carries
+  paper rows (`.dc-row`, `data-dl`, the P24 numeral, solid green when done), then **Hold Serve** (Career Mode's training weeks held
+  in a row, 2026-10-17: display only, read from the athlete's own `career_facts`, never `get_profile()`; `holdCount()` is a twin of
+  `get_profile()`'s loop; it says nothing when it cannot be sure; `PROGRAM-APP.md` → *Hold Serve on Home*), then the habits row. Only Next up carries
   `data-dc`. **The This cycle card, Personal records and Body weight live on Progress**, not Home. **Home never names a rest
   day**: athletes move their days. **The day after the cycle's end date Home is between cycles** (PROG-02, Amir 2026-10-10,
   option B): a **Cycle N complete** door row first (it opens Progress, where the card says Cycle complete), Up next shows

@@ -560,6 +560,10 @@ course app (`tennis/app/`) in demo mode, a right-to-left page, with `tps_demo()`
 its box, text in Instagram's bars, overlapping text, a Latin digit in Farsi and the EN and FA word tables drifting apart, and saves a PNG
 of each; the second runs the real app (the finish card's New best and Retest bands, This cycle's Share a win, the Cycle complete
 moment, the share sheet, Personal Records). `PROGRAM-APP.md` → *Highlight Reel*.
+`hold-serve.js` (2026-10-17) checks Career Mode's **Hold Serve** row on Home (40 checks): every state of its words, the "not sure yet"
+rule, nothing offline, with no rulebook, after a refusal, in the demo, the coach's preview or an undated cycle, the phone's copy kept or
+dropped and never synced, the tap into the guide, a re-read after a session reaches the server, 320 px and dark. The stub answers
+`sb.from()` table reads from its `tables` (and `tableErr`). `PROGRAM-APP.md` → *Hold Serve on Home*.
 `cycle-end.js` (2026-10-10) checks Home between cycles (PROG-02): the card and the week while the cycle runs and on its
 end date, Cycle complete, Up next and "Ready for Cycle N?" 4 and 40 days past, Roadmap complete on the last cycle (light,
 dark, 320 px), an undated cycle, the Repeat a session fold, Read more in place, a session under way unfolded, and Game
@@ -653,7 +657,9 @@ the book, cycles and the roadmap finished, effort wins, lift gains, months with 
 in `xp_rules`' shape (`career_habit_rules()`), and the rest from `[fact.*]` with its caps; `get_profile()` is the read;
 `career_compare()` is the shadow check; `career_backfill()` re-works everyone; `career_seed()` loads a seed from
 `scripts/career_seed.py`. Copies of the training app's maths live here (`career_entry_sets()`, `career_win_gain()`,
-`career_weeks()`) and of Proof's day gate (`career_habit_days()`): change them with their originals.
+`career_weeks()`) and of Proof's day gate (`career_habit_days()`): change them with their originals. The other way round,
+`program.html`'s `holdCount()` (Home's Hold Serve row, 2026-10-17) copies `get_profile()`'s weeks held in a row: `scripts/check_twins.js`
+runs it on `scripts/career/hold_cases.json`, and the rehearsal holds the two equal on every athlete it builds.
 `scripts/career/rehearse.mjs` builds the snapshot on PGlite and replays saves, hides, deletes, the row-level security, the
 profile, a broken rulebook and an erasure (47 checks made up; 49 with a dump of the real rows, which also proves every athlete
 matches Proof). The restore puts `career_rules` back last (`restore_backup.py`, `RESTORE_LAST`) so no trigger works anything out
