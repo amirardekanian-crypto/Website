@@ -54,6 +54,37 @@ ten below are the prototype list, ranked by what a prototype would teach per hou
 | 27 | The One Button | A whole session driven by one full-width button; drag up to change a set | — | pitched |
 | 28 | Body Weather | The body lit by the week's load (Spine credits × sets × effort), cooling over 2–3 days; tap a region to see why or to report pain | 1 | pitched |
 
+## Round 3 · 2026-10-17 · "Bragging Rights" (gamification: train more, be recognised, earn achievements)
+
+Full write-up (8 fields per idea, mockups for five, the five rules, build order, dependency map, the cuts):
+https://claude.ai/artifact/SV2d9r6SL7kq7RLBiAdewS
+
+Brief: Amir asked "if you had a fitness app, and you wanted to gamify it so people will do more, to be recognised
+more or get achievements, what would you do?". AA Proof's game (XP, ranks, milestones, events, road, seasons, titles,
+board, quests, comebacks, share cards) was not pitched again. The round gives the TRAINING its own game, paying for
+doing the plan, never for more. Live numbers that day: 19 of 38 programmes trained in the last 28 days at 1.4 sessions a
+week (22 plans ask for 3); 31 of 38 plans are 2-4 days a week, so Proof's session streak (`habitStreak()`, days in a
+row) can't pass a rest day; roll call 0 lines in 7 days with 22 on the board; program.html has no share card; coach.html
+has no copy of `cycleWins()`. Research cited: STEP UP (Patel 2019, only competition outlasted the game), Deci, Koestner
+and Ryan 1999 (expected rewards undermine, positive feedback helps), Mazeas 2022 (JMIR meta-analysis).
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 29 | Hold Serve | A streak of held weeks (every session of the plan's week, any days; rest days never break it, pauses between cycles); later Proof's session ladder counts held weeks (settles the Proof audit's open decision 4), optionally STEP UP's metal standing that moves up and down | — | pitched · **recommended first** |
+| 30 | Courtside | coach.html → Today "Worth a word": the week's wins (new best, effort-matched win, held-weeks mark, session mark, comeback) with a pre-filled WhatsApp in the athlete's language; not a reason | (37) | pitched · top 3 |
+| 31 | Signed Off | The training's first share card: Cycle complete → Story card with cycle art, sessions, weeks held, top 3 wins, retest, Amir's signature and photo, AMIRARDEKANI.COM; Farsi card later | — | pitched · top 3 |
+| 32 | Ring the Bell | Crew → Board \| Bell: automatic 7-day lines for a new best, a held-weeks mark or a session mark, 👏 once; consent asked at the first win | (37) | pitched |
+| 33 | Century Club | Career session count with marks (10, 25, 50, 100 …), a Home moment with Amir's line, a server-minted Proof title at 100, a voice note from Amir at 100 (first one ~end of 2026: top athlete at 74) | (37) | pitched |
+| 34 | Amir's Pick | Monthly: data shortlists 3 (weeks held, effort-matched gain, comeback), Amir picks one, a one-of-a-kind minted title, the Bell, an Instagram story with the athlete's yes | 29, 37 | pitched |
+| 35 | The Ghost | One line on the This cycle card: this cycle against the last at the same day, as a share of the plan ("2 ahead of your last cycle") | — | pitched · ships with 29 |
+| 36 | Silverware | Tournament and match results (a race or a test day for non-players) logged in two taps → Progress shelf, the Bell, Courtside | 21 | pitched |
+| 37 | The Win Ledger | Foundation: a server table of wins written beside `save_session` (through the session queue), read by 30, 32, 33, 34, 31; in the backup and the erase list the same day | — | pitched · foundation |
+
+Cut in the same round (listed on the page so they are not re-pitched): an RPE-on-target badge and a low-readiness medal
+(both pay for a typed number; RPE is the prescription), progression "moved up" moments (too close to Rungs), a public
+most-improved board, Duolingo leagues (22 on the board), a Library Local Legend crown, booking days ahead (no
+scheduling around tennis), tonnage/minutes/sets counters, more training XP in Proof's day score, collecting exercises.
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |

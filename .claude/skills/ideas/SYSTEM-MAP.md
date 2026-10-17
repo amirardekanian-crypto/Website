@@ -33,10 +33,11 @@ already shipped. Line numbers drift, so search by function name.
 
 ## program.html (coached athletes)
 
-Home (the This cycle card, This Week built from the session history, day cards with up to three
-quality chips, Resume when in progress and a small row when done, then one row each for habits (AA
-Proof's Today embedded under it), Personal Records and body weight; never a rest day) · Game Plan
-(current cycle open, past and future folded, Why your plan) · the session (slim bar, tabs hidden; the
+Home (since 2026-10-12: the greeting, This Week = the week note in its own week with the "2 of 3 sessions
+done this week" line under it, Next up as the day's cover, the other days as paper rows, then the habits
+row with AA Proof's Today embedded under it; never a rest day) · Progress, the second tab (the This cycle
+card with up to three effort-matched wins from `cycleWins()`, Your numbers = Personal Records and body
+weight, then the road of cycles still titled Game Plan, Why your plan) · the session (slim bar, tabs hidden; the
 working card: one line of numbers, the intent pill, a clay dot for a Coach's Note, the ⓘ; open: the
 note, Last time, How to do it, the set rows; the check-in sets today's targets; Guided; a rest timer
 that keeps time from a timestamp; one finish that sends itself) · Personal Records (fill themselves;
@@ -81,7 +82,14 @@ player, results sheet (not saved), guide, tour. No "quality" field.
 ## AA Proof (`habits.html`)
 
 Daily habits (train, steps, sleep, protein, water core; add-ons), XP, levels, ranks, seasons, Roll
-Call, leaderboard, Locker rewards. WORKOUT is ticked from `session_history`. Sleep hours are logged
+Call, leaderboard, Locker rewards. WORKOUT is ticked from `session_history`.
+
+**Recognition and the game, checked 2026-10-17 (round 3):** the training app has **no share card** (Proof
+has five, all habits); wins (`cycleWins()`) and automatic Personal Records exist **only in program.html**,
+coach.html has no copy; Proof's session streak is **calendar days in a row** (`habitStreak()`), so on a
+2-4-day plan (31 of 38 that day) it breaks on every rest day and its ladder (5/10/20/30/60 days) is out of
+reach; roll call had **0 lines in 7 days** with 22 on the board; 19 of 38 programmes trained in the last
+28 days, at 1.4 sessions a week. Sleep hours are logged
 here **and** asked again in program.html's readiness modal; the two are never compared. Since
 2026-09-26 Proof's Today is embedded on the training app's Home (`?embed=1`), and a coached athlete is
 no longer asked to install Proof as a second app.
