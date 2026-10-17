@@ -85,6 +85,29 @@ Cut in the same round (listed on the page so they are not re-pitched): an RPE-on
 most-improved board, Duolingo leagues (22 on the board), a Library Local Legend crown, booking days ahead (no
 scheduling around tennis), tonnage/minutes/sets counters, more training XP in Proof's day score, collecting exercises.
 
+## System · 2026-10-17 · "Career Mode" (the progression and recognition system)
+
+Amir's brief, straight after round 3 (his words are in TASTE.md): one system where any meaningful action earns progress
+and is recognised by the client, the coach and a community; total XP and level, titles, badges and achievements, each
+meaning consistency, commitment, progress or resilience; weekly missions and personal quests; details later.
+
+Blueprint: https://claude.ai/artifact/42WHTUzoxmnr6axP64QNGN. The loop (action → fact → points and rewards →
+recognition); the four meanings, one number each (weeks held · sessions with Amir · personal bests · comebacks); nine
+mechanics with one job each; five sizes of moment routed to the athlete, the coach, the crew and beyond; missions (three
+slots, plan · recovery · stretch, plus a crew mission that replaces Quest week) and quests (three doors, never failed);
+the engine (fact ledger, rulebook, catalogue, awards, missions, quests, recognition; `observe()`, `evaluate()`,
+`get_profile()`; ONE scorer on the server); first numbers (training 46% of a perfect week, 15–19% today); where each
+piece of Proof's game goes; rules GAME-1 to GAME-12; 8 decisions; 7 build phases (phase 1 runs in shadow until it
+matches `hab_xp()` for every athlete).
+
+Status: **pitched**, 8 decisions waiting (level never resets · Proof is the game's home · one server scorer · training
+about half of a perfect week · missions Monday to Sunday · crew consent at the first highlight · quests from three
+doors · the name, Career Mode or another).
+
+Round 3's ideas are parts of it: #29 Hold Serve → Consistency's held weeks; #30 Courtside → the coach's column; #32
+Ring the Bell → the crew's column; #33 Century Club → Commitment; #34 Amir's Pick → a coach tool; #35 The Ghost →
+Progress; #36 Silverware → a later fact source; #37 The Win Ledger → the fact ledger; #31 Signed Off → phase 3.
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |

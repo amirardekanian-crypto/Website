@@ -5,6 +5,18 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-17 · The SYSTEM first, then features.** After round 3 (Bragging Rights) he picked no single idea and
+  asked for the whole system: *"first i want to create a system that celebrates achievements and progress and
+  consistency / any meaningful action earns progress and get recognised by the client, the coach, and a community /
+  it should have game mechanics like total xp and level, titles, badges, achievement. all of these mean something,
+  consistency, commitment, progress, and resilience / i want to have weekly missions and personal quests / the
+  details can be added or changed later / lets think system now"*. What it teaches: (1) he wants one connected model
+  before any screen, so a gamification idea is pitched as a part of that model (the Career Mode blueprint,
+  https://claude.ai/artifact/42WHTUzoxmnr6axP64QNGN), never as a standalone feature; (2) every mechanic must MEAN one of
+  his four words; (3) recognition always has three audiences: the athlete, the coach, the community; (4) "details
+  later" means design the catalogue and the rules, and leave badge names, numbers and missions as rows he can change;
+  (5) his words, kept apart: missions are weekly, quests are personal.
+
 - **2026-09-24 · The Debrief is a MESSAGE plus a LOG ENTRY, not a page.** *"i dont need a debrief
   file like this, i just want the message which is like a cycle report … tell him what he did well,
   what we are gonna do next, what we want more work from him, and celebrate his wins … then we want
