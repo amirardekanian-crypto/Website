@@ -236,6 +236,17 @@ expect('the coaching log profile when the spec has none', has(run(BASE, spec="ba
 expect('no profile anywhere warns', has(run(BASE, ctx=CTX, spec="bans: goblet\n"), 'WARN', 'no athlete profile'))
 expect('a command-line --cap wins', not has(run(BASE, '--cap', '50', ctx=CTX, spec=PROFILE), 'INFO', '--cap 75'))
 expect("bans '-' bans nothing", not has(run(BASE, ctx=CTX, spec=PROFILE.replace('bans: lat pulldown', 'bans: -')), 'FAIL', 'banned for this athlete'))
+out = run(BASE, ctx=CTX, spec=PROFILE.replace('chest (posture)', 'chest (posture, a desk job)'))
+expect('floor-except: a comma inside the reason is not a split', not has(out, 'FAIL', 'chest: 0') and not has(out, 'FAIL', 'shoulder: 0'), out)
+# A build or iron cycle on aim: general runs with the 10-set floor off, and the run must say so (2026-10-17).
+GENERAL = PROFILE.replace('aim: strength-muscle', 'aim: general')
+out = run(BASE, ctx=CTX, spec=GENERAL)
+expect('art iron on aim general warns', has(out, 'WARN', "art is iron (strength) but the profile's aim is general"), out)
+d = copy.deepcopy(BASE); d['cycles'][1]['art'] = 'voltage'
+expect('art voltage on aim general: no warning', not has(run(d, ctx=CTX, spec=GENERAL), 'WARN', 'aim is general'))
+expect('art build from --art on aim general warns', has(run(d, '--art', 'build', ctx=CTX, spec=GENERAL), 'WARN', 'art is build (muscle)'))
+expect('art iron on aim sport: no warning', not has(run(BASE, ctx=CTX, spec=PROFILE.replace('aim: strength-muscle', 'aim: sport')), 'WARN', 'aim is general'))
+expect('--floor typed: no warning', not has(run(BASE, '--floor', ctx=CTX, spec=GENERAL), 'WARN', 'aim is general'))
 
 # ── 3. the notes obligations list ─────────────────────────────────────────────
 OB = copy.deepcopy(BASE)
@@ -373,6 +384,13 @@ expect('a "do not reintroduce" note warns', has(out, 'WARN', 'Cable Face Pull: i
 out = cont(NEW, spec="keep: Chest-Supported Dumbbell Row (only row the gym has), Dead Bug (rehab)\nreintroduce: Lat Pulldown (pain gone for 6 weeks), Cable Face Pull (rope checked)\n")
 expect('keep: silences the warning', not has(out, 'WARN', 'Dead Bug: kept from last cycle'), out)
 expect('reintroduce: excuses the ledger', not has(out, 'FAIL', 'Exercise Ledger says pain-flagged') and not has(out, 'WARN', 'ledger note says'), out)
+# A reason in brackets may hold commas: the split is on the commas outside brackets only (2026-10-17).
+out = cont(NEW, spec="keep: Chest-Supported Dumbbell Row (the only row the gym has, 12 to 10 reps), Dead Bug (rehab, 2 to 3 sets), "
+                     "Cable Face Pull (rope (new), checked)\n")
+expect('keep: a comma inside a reason is not a split', not any(has(out, 'WARN', f'{n}: kept from last cycle')
+       for n in ('Chest-Supported Dumbbell Row', 'Dead Bug', 'Cable Face Pull')), out)
+out = cont(NEW, spec="reintroduce: Lat Pulldown (pain gone, six weeks clear), Cable Face Pull (rope checked)\n")
+expect('reintroduce: a comma inside a reason is not a split', not has(out, 'FAIL', 'Exercise Ledger says pain-flagged'), out)
 d = copy.deepcopy(NEW); d['currentCycleIndex'] = 0
 expect('same cci: not compared', has(cont(d), 'INFO', 'the live cycle, not a new one'))
 expect('no prev: skipped', has(cont(NEW, prev={"cci": 0, "days": []}), 'INFO', 'continuity checks skipped'))
@@ -413,6 +431,16 @@ d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['
 expect('an empty rx fails', has(run(d), 'FAIL', 'an empty rx'))
 expect("the spec's week: line runs the back-to-back check", has(run(BASE, ctx=CTX, spec="week: Mon:1, Tue:1\n"), 'WARN', 'two hard lower-body days back to back'))
 expect('no week: line, no back-to-back check', not has(run(BASE, ctx=CTX, spec="bans: -\n"), 'WARN', 'back to back'))
+# A week: line the check cannot read is a WARN, never a silent skip (2026-10-17).
+out = run(BASE, ctx=CTX, spec="week: Day 1, a rest day, Day 2 (never two days in a row)\n")
+expect('an unreadable week: line warns', has(out, 'WARN', 'has no weekday:day pairs'), out)
+out = run(BASE, ctx=CTX, spec="week: Mon: Day 1, Tuesday - 1, someday\n")
+expect('week: "Mon: Day 1" and "Tuesday - 1" are read', has(out, 'WARN', 'two hard lower-body days back to back'), out)
+expect('week: a part it cannot read warns', has(out, 'WARN', "could not read 'someday'"), out)
+expect('week: a day the programme does not have warns', has(run(BASE, ctx=CTX, spec="week: Mon:1, Wed:4\n"), 'WARN', 'names Day 4'))
+out = run(BASE, ctx=CTX, spec="week: -\n")
+expect("week: '-' says there is none", has(out, 'INFO', 'no example week') and not has(out, 'WARN', 'example week'), out)
+expect('week: a rest day is not a day', not has(run(BASE, ctx=CTX, spec="week: Mon:1, Tue: rest, Wed:2\n"), 'WARN', 'example week'))
 out = run(BASE, spec="bans: box jump\nroadmap_amend: cycle 3: art → voltage (box jump returns once the knee settles)\n")
 expect('a roadmap_amend: line is not a fallback', not has(out, 'FAIL', 'a fallback or swap gives a banned'), out)
 expect('a real fallback to a banned word still fails', has(run(BASE, spec="bans: box jump\nFallback: step-up → box jump\n"), 'FAIL', 'a fallback or swap gives a banned'))

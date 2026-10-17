@@ -54,6 +54,25 @@ titles/icons, the vivid `focusTag`, names. The spec gives you decisions; you ren
 prescription as DATA (`rx`), and design's dose fields already ARE that data — so this stage
 copies them, it does not render them. There is no chip formatting left to get wrong.
 
+**Run the build script; never write one** (2026-10-17: a hand-written build held every dose a second
+time, a 12-to-10 rep change had to be made twice, and one card's tempo in it differed from the spec):
+```
+python scripts/spec_to_workouts.py <scratch>/spec.md <scratch>/built_<id>.json --into <scratch>/base_<id>.json \
+    --choices <scratch>/choices_<id>.json --spine <scratch>/match_<id>.json
+```
+It reads the spec's DAY blocks and does 2a–2e's copying: the blocks with their titles and icons, each
+card's `type` and `rx` (a rest on every working card and circuit, CHP-7), the prep circuit's rounds and
+rest, one RPE per working circuit, `intent`, `test`, the week notes' numbers and the badge, and `exId` on
+every name design's match (or Step 3's saved `--spine` file) has exactly. `--into` is the live row's data
+saved as a file, `currentCycleIndex` already +1 for a returning athlete (it stops if the spec's PROGRAM is
+another cycle). A gap in the spec (no rest, a rep range, a field it does not know) stops it with the line:
+**a dose changes in the spec only, then build again.** Your choices live in the choices file and survive
+every rebuild: each day's `focusTag` and `art` (2d), the prep circuit's name, a circuit's pairing name, the
+label when the cycle has none, Step 4's renames and the ids the match did not give
+(`{"label", "days": {"1": {"focusTag", "art", "prep"}}, "rename": {}, "exId": {}}`; the run prints
+what is still missing). Never hand-edit the built workouts: the next build overwrites them. What
+follows is what it applies, and what is still yours to judge.
+
 **2a — Structure.** `workouts.label` = `Program 0N · <Cycle Name>`; `workouts.days[]` from
 the spec. Each exercise → `type` + `rx` (+ `intent`/`note` where the spec has them; never `setup`, CHP-1);
 circuits → `rx.rounds` + `items[]`. **Write NO `cues`, on any exercise or circuit item** (Amir,

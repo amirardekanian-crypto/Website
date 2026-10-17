@@ -42,12 +42,14 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   without it, the spec's "bans: ..." line is used
   --spec FILE     the design spec: its fallback lines are scanned for banned words too
   --week DAYS     the example week, e.g. "Sat:1,Sun:2,Mon:3,Wed:4" (back-to-back check); without it,
-                  the spec's "week: ..." line is used
+                  the spec's "week: ..." line is used. A week it cannot read is a WARN; "week: -" says
+                  there is none
   --spine FILE    the saved result of --spine-sql: the Spine gate, the volume count, the Quality
                   Map, "weighted" for the 8-rep rule, and (from last cycle and the Exercise Ledger in the same
                   result) the continuity checks: kept accessories, a kept dose that didn't move,
                   a Disliked / Pain-flagged / Banned exercise back. The spec's "keep:" and
-                  "reintroduce:" lines name the ones kept or brought back on purpose, with reasons.
+                  "reintroduce:" lines name the ones kept or brought back on purpose, with reasons
+                  in brackets (a comma inside the brackets is fine)
                   It also says how every card's NAME resolves in the Spine (the name scan that was
                   a separate node step in /program-assemble until 2026-09-27), and it carries
                   checksums: a saved copy that differs from what the server sent stops the run.
@@ -862,6 +864,27 @@ def spec_lines(args, key):
     found = re.findall(rf'^\s*{key}\s*:\s*(.+)$', open(args.spec, encoding='utf-8').read(), re.I | re.M)
     return [re.sub(r'\s+#.*$', '', f).strip() for f in found]
 
+def split_top(s, sep=','):
+    """Split a spec list on the commas OUTSIDE brackets, so a reason in brackets may hold a comma (2026-10-17: a
+    keep: line whose reasons had commas cut four exercise names in half, and SEL-4 warned on all four).
+    scripts/spec_to_workouts.py splits a spec line's '|' fields with it too."""
+    parts, cur, depth = [], '', 0
+    for ch in s:
+        if ch in '([': depth += 1
+        elif ch in ')]': depth = max(0, depth - 1)
+        if ch == sep and depth == 0: parts.append(cur); cur = ''
+        else: cur += ch
+    return parts + [cur]
+
+def outside_brackets(s):
+    """The text outside every bracket, nested ones too: 'Face Pull (rope, cable)' → 'Face Pull '."""
+    out, depth = '', 0
+    for ch in s:
+        if ch in '([': depth += 1
+        elif ch in ')]': depth = max(0, depth - 1)
+        elif depth == 0: out += ch
+    return out
+
 def check_bans(data, args):
     # --ban, the profile's standing bans and the spec's "bans:" line(s) for this cycle, together.
     ban = ', '.join([x for x in [args.ban] if x] + spec_lines(args, r'bans?'))
@@ -1085,17 +1108,32 @@ def volume_tables(v, excused, timing=None):
 def floor_excused(args):
     """Major muscles excused from --floor: --floor-except plus every 'floor-except:' line."""
     s = ', '.join([x for x in [args.floor_except] if x] + spec_lines(args, r'floor[- ]except'))
-    return {norm_muscle(re.sub(r'\(.*?\)', '', w)) for w in s.split(',') if w.strip() and not blank(w)}
+    return {norm_muscle(outside_brackets(w)) for w in split_top(s) if w.strip() and not blank(w)}
+
+# One part of the example week: 'Sat:1', 'Sat: Day 1', 'Saturday - 1', 'mon=2'.
+WEEK_PART = re.compile(r'(sat|sun|mon|tue|wed|thu|fri)[a-z]*\.?\s*[:=–—-]?\s*(?:day\s*)?(\w+)', re.I)
 
 def check_week(data, args, per_day):
     if not args.week: return
-    plan = {}
-    for part in args.week.split(','):
-        if ':' not in part: continue
-        wd, day = part.split(':', 1)
-        wd = wd.strip().lower()[:3]
-        if wd in WEEKDAYS: plan[WEEKDAYS.index(wd)] = day.strip()
+    if blank(args.week):
+        info('the week: line says there is no example week, so back-to-back days were not checked'); return
+    # A line the check cannot read used to skip it without a word (2026-10-17: 'week: Day 1, a rest day, Day 2, ...').
+    how = ("write it as weekday:day, e.g. 'week: Sat:1, Mon:2, Wed:3' (an example only: the athlete still places "
+           "their days), or 'week: -' when there is none")
+    plan, unread = {}, []
+    for part in re.split(r'[,;·]', outside_brackets(args.week)):
+        m = WEEK_PART.fullmatch(part.strip())
+        if m and m.group(2).lower() in ('rest', 'off'): continue
+        if m: plan[WEEKDAYS.index(m.group(1).lower()[:3])] = m.group(2)
+        elif part.strip(): unread.append(part.strip())
+    if not plan:
+        warn(f"the example week '{args.week[:70]}' has no weekday:day pairs, so back-to-back hard days were not checked: {how}", 'VOL-2')
+        return
+    if unread:
+        warn(f"the example week: could not read {', '.join(repr(u) for u in unread)}, so the back-to-back check left it out: {how}", 'VOL-2')
     days = {str(d.get('id')): d for d in (data.get('workouts') or {}).get('days') or []}
+    gone = [plan[i] for i in sorted(plan) if plan[i] not in days]
+    if gone: warn(f"the example week names Day {', Day '.join(gone)}, which the programme does not have", 'VOL-2')
     def kind(did):
         d = days.get(did)
         if not d: return None
@@ -1314,6 +1352,16 @@ def apply_profile(args, prof, source):
         args.cap = float(m.group()); did.append(f'--cap {m.group()}')
     info(f"athlete profile from the {source}: " + (', '.join(did) or 'no flags to set'))
 
+def check_aim_art(data, args, prof):
+    """A muscle or strength cycle on a general profile runs with the 10-set floor off, and nothing said so
+    (2026-10-17: a `build` cycle on `aim: general`). The aim may be right; the run has to say which."""
+    cycles = data.get('cycles') or []
+    cci = data.get('currentCycleIndex') or 0
+    art = (args.art or (cycles[cci].get('art') if cci < len(cycles) else '') or '').lower()
+    if art in ('build', 'iron') and 'general' in ((prof or {}).get('aim') or '').lower() and not args.floor:
+        warn(f"the cycle's art is {art} ({ART_HEADLINE[art]}) but the profile's aim is general, so the 10-set floor is off. "
+             "If this cycle builds muscle and strength, set aim: strength-muscle in the profile; if not, check the art word", 'VOL-4')
+
 # ── continuity: this cycle against the one just trained (2026-09-26) ──────────
 # A returning athlete gets no reviewer, and every rotation and re-ship failure on record was a
 # returning cycle (the 2026-09-26 audit). The previous cycle is `prev` from --spine-sql, so these
@@ -1359,10 +1407,10 @@ def dose_sig(v):
                                       v.get('tempo'), rounds))
 
 def spec_list(args, key):
-    """Names on a spec line like 'keep: Face Pull (only cable row the gym has), Dead Bug (...)'."""
-    if not args.spec: return set()
-    m = re.search(rf'^\s*{key}\s*:\s*(.+)$', open(args.spec, encoding='utf-8').read(), re.I | re.M)
-    return {norm_name(re.sub(r'\(.*?\)', '', w)) for w in (m.group(1) if m else '').split(',') if w.strip()}
+    """Names on a spec line like 'keep: Face Pull (the only cable row, rope checked), Dead Bug (...)': split on
+    the commas outside brackets only (2026-10-17), every such line in the spec."""
+    names = {norm_name(outside_brackets(w)) for line in spec_lines(args, key) for w in split_top(line)}
+    return {n for n in names if n and not blank(n)}
 
 def names_of(o, spine):
     e = (spine or {}).get(o.get('exId') or '') or {}
@@ -1697,6 +1745,7 @@ def main():
     prof = parse_profile(open(args.spec, encoding='utf-8').read()) if args.spec else None
     if prof: apply_profile(args, prof, 'spec')
     else: apply_profile(args, parse_profile(ctx.get('profile')), 'coaching log')
+    check_aim_art(data, args, prof if prof else parse_profile(ctx.get('profile')))
     if not args.week and spec_lines(args, 'week'):
         args.week = spec_lines(args, 'week')[0]  # the spec's example week (2026-09-26)
     check_structure(data, args, ctx['spine'], ctx.get('names')); check_pill_layers(data, ctx)

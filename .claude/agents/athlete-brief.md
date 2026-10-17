@@ -1,6 +1,6 @@
 ---
 name: athlete-brief
-description: Data prep for ONE athlete, run in the foreground. MODE=new pulls a new athlete's Web3Forms intake form from Gmail and returns a one-page intake brief (for /athlete-intake). MODE=import reconciles the Web3Forms session-report emails in Gmail with public.session_history for a date window and imports the missing sessions (for /cycle-report, before it reads a cycle). The returning-athlete brief is retired (2026-09-26): /cycle-report's Debrief is the evidence for a returning athlete's next cycle. Runs on a cheaper model to keep the design budget clean.
+description: "Data prep for ONE athlete, run in the foreground. MODE=new pulls a new athlete's Web3Forms intake form from Gmail and returns a one-page intake brief (for /athlete-intake). MODE=import reconciles the Web3Forms session-report emails in Gmail with public.session_history for a date window and imports the missing sessions (for /cycle-report, before it reads a cycle). The returning-athlete brief is retired (2026-09-26): /cycle-report's Debrief is the evidence for a returning athlete's next cycle. Runs on a cheaper model to keep the design budget clean."
 model: sonnet
 ---
 

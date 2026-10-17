@@ -211,6 +211,7 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
 | What | Where |
 |---|---|
 | Programme checker (the house rules; `/program-assemble` runs it) | [`scripts/check_program.py`](scripts/check_program.py) · tests `test_check_program.py` |
+| Programme build (the spec's DAY blocks to the workouts JSON, Part A Step 2) and words (Part B 2f) | [`scripts/spec_to_workouts.py`](scripts/spec_to_workouts.py) · tests `test_spec_to_workouts.py` · [`scripts/place_words.py`](scripts/place_words.py) |
 | Rule index guard (principles, checker and skills agree) | [`scripts/check_rule_index.py`](scripts/check_rule_index.py) |
 | Twin guard (dashboard/app pairs of one rule) | [`scripts/check_twins.js`](scripts/check_twins.js) · `check_rx.js` · `check_setlog.js` · `check_parity.py` |
 | App guards: type scale, JS syntax, habits boots, XP rules, Library/Spine, circuit logging, fetch retry | `check_type_scale.py` · `check_js_syntax.py` · `check_habits_boots.py` · `check_xp_rules.py` · `check_library_spine.py` · `check_circuit_logging.py` · `test_fetch_retry.js` |
