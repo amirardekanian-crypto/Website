@@ -2506,8 +2506,8 @@ training app one score and one level. Amir's three decisions, 2026-10-17 (*"go w
 2. **Nobody's level goes down.** The seed that turns the XP switch on gives anyone whose career level would sit below the highest
    level they reached in AA Proof one `level_kept` fact, worth the XP to the start of that level. Their best level is the better
    of their season records (`hab_season_results`) and the level Proof shows them this season. The fact counts toward the career
-   and never toward a season's points. Measured on the real rows (the backup of 2026-10-17, Season 1 simulated): of 39 athletes,
-   32 go up, 7 stay and 1 is kept at their Proof level by a top-up (level 12, +630 XP). `python scripts/career_seed.py --dry-run`
+   and never toward a season's points. Measured on the real rows (the backup of 2026-10-17, Season 1 simulated): of 38 athletes
+   (the demo included), 31 go up, 6 stay and 1 is kept at their Proof level by a top-up (level 12, +630 XP: Amir's own test identity). `python scripts/career_seed.py --dry-run`
    prints every athlete's line first. The server does the whole seed and undoes it.
 3. **Season 1 starts on 2026-10-18.** A scheduled task (`start-season-1`, 06:00 UK) runs `start_season('Season 1','2026-10-18')`,
    Proof's own way: Pre-Season is archived with Proof's levels and its title at level 5. The switch lands during Season 1. Season
