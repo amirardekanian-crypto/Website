@@ -111,6 +111,23 @@ Round 3's ideas are parts of it: #29 Hold Serve → Consistency's held weeks; #3
 Ring the Bell → the crew's column; #33 Century Club → Commitment; #34 Amir's Pick → a coach tool; #35 The Ghost →
 Progress; #36 Silverware → a later fact source; #37 The Win Ledger → the fact ledger; #31 Signed Off → phase 3.
 
+## Career Mode · 2026-10-17 · "Four Majors" (the catalogue, meaning by meaning)
+
+Amir: *"if we want to think in these 4 words, about the achievements and titles and everything. lets think what
+achievements and progress things we want in each field, consistency, commitment, progress, resilience"*.
+Page: https://claude.ai/artifact/1wa7BQgeMAMipm24Fwzo1z. Each meaning built the same way: its number, an arc (first week →
+first month → first season → first year), badges, moments, titles, quests and missions, what it never pays for, what Amir
+sees. The capstone: **GRAND SLAM**, a title in each of the four meanings (level titles don't count).
+Proposed changes to `career/`: one behaviour, one badge (each habit keeps its Proof name on five steps); HEAVY METAL, The
+Machinist and Day One retired for new earning; Clean Sweeps → Treble; a lower RPE alone earns nothing (GAME-5 sharper);
+an event per meaning (new: The Proving Ground for Progress); tennis names with a plain line (Hold Serve, Second Serve,
+Love Hold, All-Court, Paper Trail, Free Kilos, Beat the Test, Closer, Record Breaker); twelve new pieces (The Long Count,
+Pulse Check, Love Hold, Veteran, The Upgrade, Flawless, Full Stack, By the Book, All-Court, Double Up, All the Way Back,
+The Proving Ground); free athletes see the Progress shelf locked, as the pitch; coach.html shows each athlete's four
+numbers ("the shape").
+Status: **pitched**, 7 picks waiting. Nothing in `career/` changed; on his word the picks go into the `.toml` files and
+`CAREER_MODE.md`, then `python scripts/check_career.py`.
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
