@@ -116,7 +116,8 @@
     b.x = S.W / 2 + (Math.random() - 0.5) * S.W * 0.2;
     b.y = toYou ? mid() + (B() - mid()) * 0.45 : mid() - (mid() - T()) * 0.45;
     b.vx = 0; b.vy = 0;
-    S.trail = []; S.rally = 0; S.freeze = 0.7; S.lastHit = ''; S.stuck = 0;
+    S.trail = []; S.rally = 0; S.freeze = 0.7; S.lastHit = ''; S.lastHitT = -1;
+    S.anchor = { x: b.x, y: b.y, t: S.gt };
   }
 
   function newMatch() {
@@ -174,11 +175,19 @@
       b.vx -= 1.9 * dot * nx; b.vy -= 1.9 * dot * ny;
       capBall();
       const s = speed(b);
-      if (S.lastHit !== who) { S.rally += 1; S.best = Math.max(S.best, S.rally); S.lastHit = who; }
-      S.flash.push({ x: b.x, y: b.y, t: 0, c: who === 'you' ? C.mint : C.clay });
-      tone(320 + Math.min(1, s / S.vmax) * 520, 0.06, 0.18);
-      if (who === 'you') buzz(s > S.vmax * 0.7 ? 18 : 8);
-      if (s > S.vmax * 0.8) S.shake = Math.max(S.shake, 4);
+      // A ball squeezed between two rackets (or a racket and the glass) touches them every substep and goes nowhere. Such
+      // a ball (still inside its 2-ball circle after 0.3 s) counts no hit and makes no sound or buzz, and otherwise a hit
+      // counts in the rally only 0.12 s after the last one and rings 0.09 s apart per racket, or a trapped ball would buzz
+      // the phone nonstop and run the rally into the thousands (found 2026-10-18).
+      const jam = S.gt - S.anchor.t > 0.3;
+      if (!jam && S.lastHit !== who && S.gt - S.lastHitT > 0.12) { S.rally += 1; S.best = Math.max(S.best, S.rally); S.lastHit = who; S.lastHitT = S.gt; }
+      if (!jam && S.gt - (S.fxT[who] || -1) > 0.09) {
+        S.fxT[who] = S.gt;
+        S.flash.push({ x: b.x, y: b.y, t: 0, c: who === 'you' ? C.mint : C.clay });
+        tone(320 + Math.min(1, s / S.vmax) * 520, 0.06, 0.18);
+        if (who === 'you') buzz(s > S.vmax * 0.7 ? 18 : 8);
+        if (s > S.vmax * 0.8) S.shake = Math.max(S.shake, 4);
+      }
     }
   }
 
@@ -275,11 +284,13 @@
     }
     const drag = Math.pow(0.8, dt);   // the court is a little slow: a ball left alone settles in a few seconds
     S.ball.vx *= drag; S.ball.vy *= drag;
-    // A ball that dies for 4 s (tucked behind Amir, wedged in a corner, or left alone by a player who is only resting) is
-    // served to the other half, so the court never sits still.
-    if (!S.over && !S.freeze && speed(S.ball) < S.vmax * 0.04) {
-      if ((S.stuck += dt) > 4) serve(S.ball.y < mid());
-    } else S.stuck = 0;
+    // A ball that goes nowhere for 3 s is served to the other half, so the court never sits still: one that died (tucked
+    // behind Amir, left alone by a player who is only resting) and one trapped and shaking between the two rackets at the
+    // net or against the glass, which moves fast and goes nowhere (so this watches where the ball is, not its speed).
+    S.gt += dt;
+    if (S.over || S.freeze || Math.hypot(S.ball.x - S.anchor.x, S.ball.y - S.anchor.y) > S.br * 2) {
+      S.anchor.x = S.ball.x; S.anchor.y = S.ball.y; S.anchor.t = S.gt;
+    } else if (S.gt - S.anchor.t > 3) serve(S.ball.y < mid());
     if (!S.over) { S.trail.push({ x: S.ball.x, y: S.ball.y }); if (S.trail.length > 10) S.trail.shift(); }
   }
 
@@ -470,6 +481,7 @@
     S = {
       opts, root, cv: root.querySelector('canvas'), clock: root.querySelector('.rally-clock'), msg: root.querySelector('.rally-msg'),
       parts: [], flash: [], shake: 0, banner: null, hint: true, timeUp: false, pid: null, raf: 0, last: 0,
+      gt: 0, fxT: {}, lastHitT: -1, anchor: { x: 0, y: 0, t: 0 },
       reduce: !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches),
       score: { you: 0, amir: 0 },
     };

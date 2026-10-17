@@ -117,6 +117,34 @@ async function openGame(browser, opts = {}) {
     t.check('twenty seconds of Amir alone: no NaN, nothing off the court, speed capped', solo.bad === 0 && solo.capped, JSON.stringify(solo));
     t.check('Amir scores on an empty racket', solo.score.amir >= 1, JSON.stringify(solo.score));
 
+    // ── 3b. a ball trapped between the two rackets against the glass (found 2026-10-18 by a bot: it shook in place for
+    // ever, the rally ran into the thousands and every substep buzzed). It must be served again within 3-4 s, count as
+    // no rally, and ring at most ~11 times a second per racket. ──
+    const pinch = await p.evaluate(async () => {
+      const s = Rally._state(), f = () => new Promise(r => requestAnimationFrame(r));
+      for (let k = 0; k < 60 && s.freeze > 0; k++) await f();
+      const mid = (s.top + s.H - 8) / 2, x = 8 + s.br + 1;
+      const base = s.rally;                                              // what the earlier solo play left on the counter
+      s.rally = 0; s.lastHit = ''; s.lastHitT = -1;                      // the trap starts a fresh rally, as a serve leaves it
+      s.ball.x = x; s.ball.y = mid + 2; s.ball.vx = 0; s.ball.vy = 0;
+      s.over = false; s.score.you = 0; s.score.amir = 0;
+      let maxRally = 0, rings = 0, lastFx = -1, moved = false, t0 = performance.now(), at = null;
+      while (performance.now() - t0 < 5000) {
+        s.target.x = x; s.target.y = s.ball.y + s.rr * 0.6;              // the player pushes the ball up into the net
+        s.amir.x = x + 6; s.amir.y = Math.min(s.ball.y - s.br - s.rr + 4, mid - s.rr);   // and Amir leans on it from above
+        await f();
+        if (s.fxT.you !== undefined && s.fxT.you !== lastFx) { rings++; lastFx = s.fxT.you; }
+        if (!moved) maxRally = Math.max(maxRally, s.rally);
+        if (!moved && Math.hypot(s.ball.x - x, s.ball.y - (mid + 2)) > s.br * 4) { moved = true; at = (performance.now() - t0) / 1000; }
+        if (moved) break;
+      }
+      return { moved, at, rally: maxRally, rings, base };
+    });
+    t.check('a ball trapped between the rackets is served again in about 3 s', pinch.moved && pinch.at > 1 && pinch.at < 4.2, JSON.stringify(pinch));
+    // Before the ball counts as jammed (0.3 s in its circle) hits count 0.12 s apart, so at most three get through: 0, 0.12 and 0.24 s.
+    t.check('a trapped ball adds a few hits at most (the three before it counts as jammed), not thousands', pinch.rally <= 3, JSON.stringify(pinch));
+    t.check('a trapped ball goes quiet: a few rings at most, not one per frame', pinch.rings <= 6, JSON.stringify(pinch));
+
     // ── 4. Back and ✕ return to the running rest ──
     await p.evaluate(() => history.back());
     await wait(p, 400);

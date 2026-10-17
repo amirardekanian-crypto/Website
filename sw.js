@@ -291,7 +291,8 @@
 // v160: program.html changed and /assets/js/sharecard.js joins the shell (2026-10-17, Highlight Reel): share cards for a win, drawn on the phone, with no signal too.
 // v161: program.html changed (2026-10-17, Career Mode): Hold Serve on Home, the training weeks held in a row, read from the server.
 // v162: program.html changed and /assets/js/rally.js joins the shell (2026-10-17): Off the Glass, a game for the rest, with no signal too.
-const CACHE = 'aap-v162';
+// v163: assets/js/rally.js changed (2026-10-18): a ball trapped between the rackets is served again after 3 s, and a trapped ball no longer buzzes or counts in the rally.
+const CACHE = 'aap-v163';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -1583,12 +1583,15 @@ and runs it; program.html owns the door and the layer.
   closes the game with the timer. ✕ and Back (`#rallyOverlay` is in `topLayer()` above the timer and in `initBackNav()`'s observer)
   return to the timer, still running. It never runs past a rest.
 - **Short and fair:** first to 5. Amir's racket chases a ball in his half and guards his gap otherwise; its top speed rises while the
-  athlete leads and drops while they trail (`amirMove()`). A ball that dies for 4 s is served to the other half.
+  athlete leads and drops while they trail (`amirMove()`).
+- **A ball that goes nowhere for 3 s is served to the other half**, whether it died or is trapped and shaking between the rackets at
+  the net or against the glass (2026-10-18: a bot found a trapped ball that buzzed every frame and ran the rally into the thousands).
+  A jammed ball counts no hit and makes no sound; otherwise a hit counts 0.12 s after the last and rings 0.09 s apart per racket.
 - **One thumb:** drag anywhere in your half; a touch puts the racket 1.4 rackets above the finger so the thumb never hides it. A hit
   buzzes; the sounds follow the timer's speaker (`rest_sound`); reduced motion drops the shake.
 - **Its numbers stay on the phone:** `rally_stats` (`best` rally, `wins`, `played`), no athlete prefix, never synced, never scored,
   never seen by the coach. No yellow: the ball is white, the court the brand green, Amir's racket clay.
-- The guide's *Built-in tools* card names the door (CNT-01). Test: `node scripts/headless/rally.js` (23 checks).
+- The guide's *Built-in tools* card names the door (CNT-01). Test: `node scripts/headless/rally.js` (26 checks).
 
 ## 🧾 The working card (CARD-01/02/03, 2026-09-27)
 
