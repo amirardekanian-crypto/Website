@@ -242,7 +242,7 @@ A persistent device, app UI animating inside:
 - **Training intensity / RPE:** «شدت» — *not* «سختی».
 - **Call-to-action verb:** «شروع کن» (begin) — *not* «درخواست» (apply).
 - **Proof / credentials word:** «تجربه» (experience) — *not* «پشتوانه».
-- **Pricing (Iran residents):** «معادلِ ۲۵ دلار در ماه — به تومان، با نرخِ روز» (pegged to USD, charged in Toman); abroad → DM. Pricing headline: «یه مربیِ کامل، با قیمتی کم‌تر از اون‌چه فکرشو می‌کنی.»
+- **Pricing (Iran residents):** «معادلِ ۲۵ دلار برای هر سیکل (۵ هفته) — به تومان، با نرخِ روز» (pegged to USD, charged in Toman, paid one cycle at a time by card-to-card; Amir 2026-10-17, it was «در ماه»); abroad → the English plans, PayPal. Pricing headline: «یه مربیِ کامل، با قیمتی کم‌تر از اون‌چه فکرشو می‌کنی.»
 - **Handle:** Instagram **@amirardekanian** · site **amirardekani.com** — confirmed canonical. *(Already-shipped reels show @amirardekani; leave them as built — use @amirardekanian in all new work.)*
 
 ---
