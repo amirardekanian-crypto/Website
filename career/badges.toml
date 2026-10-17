@@ -1,0 +1,400 @@
+# Career Mode · badges
+#
+# A badge is a quality built over time, in tiers. It is judged on the best ever and never taken back (GAME-1).
+# Metals, low to high: bronze, silver, emerald, amethyst, prismatic. No gold, ever.
+# kind: best_run (the longest run, best ever) · total (a career count) · per_habit_best_run (Proof's tiers) · proof
+# Names, tiers and XP are drafts (2026-10-17): change them freely; never change an id.
+
+
+# ── Consistency ───────────────────────────────────────────────────────────────────────────────────────────────────
+
+[badge.held_weeks]
+name = "Held Weeks"
+meaning = "consistency"
+kind = "best_run"
+counts = "week_held"
+caption = "{n} weeks held in a row. You keep showing up."
+free = false
+origin = "new"
+tiers = [
+  { at = 4, metal = "bronze", xp = 200, size = "highlight" },
+  { at = 8, metal = "silver", xp = 400, size = "highlight" },
+  { at = 12, metal = "emerald", xp = 600, size = "milestone" },
+  { at = 24, metal = "amethyst", xp = 1200, size = "milestone" },
+  { at = 52, metal = "prismatic", xp = 2500, size = "legend", title = "clockwork" },
+]
+
+[badge.clean_sweeps]
+name = "Clean Sweeps"
+meaning = "consistency"
+kind = "best_run"
+counts = "mission_sweep"
+caption = "{n} weeks in a row with every mission done."
+free = true
+origin = "new"
+tiers = [
+  { at = 2, metal = "bronze", xp = 100, size = "win" },
+  { at = 4, metal = "silver", xp = 200, size = "highlight" },
+  { at = 8, metal = "emerald", xp = 400, size = "highlight" },
+  { at = 12, metal = "amethyst", xp = 800, size = "milestone" },
+  { at = 26, metal = "prismatic", xp = 1600, size = "milestone" },
+]
+
+
+# ── Commitment ────────────────────────────────────────────────────────────────────────────────────────────────────
+
+[badge.century]
+name = "Century"
+meaning = "commitment"
+kind = "total"
+counts = ["session_finished", "session_finished_early"]
+caption = "{n} sessions with Amir."
+free = false
+origin = "new"
+tiers = [
+  { at = 25, metal = "bronze", xp = 300, size = "highlight" },
+  { at = 50, metal = "silver", xp = 600, size = "milestone" },
+  { at = 100, metal = "emerald", xp = 1500, size = "milestone", title = "century" },
+  { at = 200, metal = "amethyst", xp = 3000, size = "milestone" },
+  { at = 500, metal = "prismatic", xp = 6000, size = "legend" },
+]
+
+[badge.finisher]
+name = "Finisher"
+meaning = "commitment"
+kind = "total"
+counts = "cycle_finished"
+caption = "{n} cycles finished."
+free = false
+origin = "new"
+tiers = [
+  { at = 1, metal = "bronze", xp = 100, size = "milestone" },
+  { at = 3, metal = "silver", xp = 300, size = "milestone" },
+  { at = 5, metal = "emerald", xp = 600, size = "milestone" },
+  { at = 10, metal = "amethyst", xp = 1200, size = "legend" },
+  { at = 20, metal = "prismatic", xp = 2500, size = "legend" },
+]
+
+[badge.full_log]
+name = "Full Log"
+meaning = "commitment"
+kind = "total"
+counts = "full_log"
+caption = "{n} sessions with every set logged."
+free = false
+origin = "new"
+tiers = [
+  { at = 10, metal = "bronze", xp = 100, size = "win" },
+  { at = 25, metal = "silver", xp = 200, size = "win" },
+  { at = 50, metal = "emerald", xp = 400, size = "highlight" },
+  { at = 100, metal = "amethyst", xp = 800, size = "highlight" },
+  { at = 250, metal = "prismatic", xp = 1500, size = "milestone" },
+]
+
+
+# ── Progress ──────────────────────────────────────────────────────────────────────────────────────────────────────
+
+[badge.bests]
+name = "Bests"
+meaning = "progress"
+kind = "total"
+counts = "personal_best"
+caption = "{n} personal bests. You are getting better."
+free = false
+origin = "new"
+tiers = [
+  { at = 5, metal = "bronze", xp = 200, size = "highlight" },
+  { at = 10, metal = "silver", xp = 400, size = "highlight" },
+  { at = 25, metal = "emerald", xp = 800, size = "milestone", title = "climber" },
+  { at = 50, metal = "amethyst", xp = 1500, size = "milestone" },
+  { at = 100, metal = "prismatic", xp = 3000, size = "legend" },
+]
+
+[badge.same_effort]
+name = "Same Effort, More Weight"
+meaning = "progress"
+kind = "total"
+counts = "effort_win"
+caption = "{n} lifts heavier at the same effort, cycle on cycle."
+free = false
+origin = "new"
+tiers = [
+  { at = 3, metal = "bronze", xp = 200, size = "highlight" },
+  { at = 10, metal = "silver", xp = 400, size = "highlight" },
+  { at = 25, metal = "emerald", xp = 800, size = "milestone" },
+  { at = 50, metal = "amethyst", xp = 1500, size = "milestone" },
+  { at = 100, metal = "prismatic", xp = 3000, size = "legend" },
+]
+
+[badge.retests]
+name = "Retest Beaten"
+meaning = "progress"
+kind = "total"
+counts = "retest_beaten"
+caption = "{n} retests beaten. The cycles are working."
+free = false
+origin = "new"
+tiers = [
+  { at = 1, metal = "bronze", xp = 200, size = "highlight" },
+  { at = 3, metal = "silver", xp = 400, size = "highlight" },
+  { at = 5, metal = "emerald", xp = 600, size = "milestone" },
+  { at = 10, metal = "amethyst", xp = 1200, size = "milestone" },
+  { at = 20, metal = "prismatic", xp = 2500, size = "legend" },
+]
+
+
+# ── Resilience ────────────────────────────────────────────────────────────────────────────────────────────────────
+
+[badge.bounce_back]
+name = "Bounce Back"
+meaning = "resilience"
+kind = "total"
+counts = "bounce_back"
+caption = "{n} times a broken week was followed by a held one."
+free = false
+origin = "new"
+tiers = [
+  { at = 1, metal = "bronze", xp = 150, size = "highlight" },
+  { at = 3, metal = "silver", xp = 300, size = "highlight" },
+  { at = 5, metal = "emerald", xp = 600, size = "milestone" },
+  { at = 10, metal = "amethyst", xp = 1200, size = "milestone" },
+  { at = 20, metal = "prismatic", xp = 2500, size = "legend" },
+]
+
+
+# ── From Amir ─────────────────────────────────────────────────────────────────────────────────────────────────────
+
+[badge.commended]
+name = "Commended"
+meaning = "chosen"          # each commendation carries the meaning Amir chose; the badge shows it
+kind = "total"
+counts = "commendation"
+caption = "Commended by Amir: {line}"
+free = true
+origin = "new"
+tiers = [
+  { at = 1, metal = "bronze", xp = 0, size = "milestone" },
+  { at = 3, metal = "silver", xp = 0, size = "milestone" },
+  { at = 5, metal = "emerald", xp = 0, size = "milestone" },
+  { at = 10, metal = "amethyst", xp = 0, size = "legend" },
+  { at = 20, metal = "prismatic", xp = 0, size = "legend" },
+]
+
+
+# ── Carried over from AA Proof (origin = "proof") ────────────────────────────────────────────────────────────────
+# Proof's consistency tiers, milestone families and comeback badges, as they are in habits.html today.
+
+# ── Proof's two streak ladders ──────────────────────────────────────────────────────────────────────────────────────
+
+# CONSISTENCY_TIERS: one ladder per habit, judged on the best run ever. mult multiplies THAT habit's own daily value
+# (XP_SYSTEM.md §4), so the same tier pays more on a heavy habit and less on a light one.
+[badge.habit_tiers]
+name = "Consistency Tiers"
+meaning = "consistency"
+kind = "per_habit_best_run"
+counts = "habit_done"
+caption = "{n} days in a row on one habit."
+free = true
+origin = "proof"
+proof_id = "CONSISTENCY_TIERS"
+tiers = [
+  { at = 5, metal = "bronze", mult = 0.5, size = "win", tier_name = "KINDLED" },
+  { at = 10, metal = "silver", mult = 1, size = "win", tier_name = "STEADY" },
+  { at = 20, metal = "emerald", mult = 2, size = "win", tier_name = "LOCKED IN" },
+  { at = 30, metal = "amethyst", mult = 3, size = "win", tier_name = "IRONCLAD" },
+  { at = 60, metal = "prismatic", mult = 6, size = "win", tier_name = "UNBREAKABLE" },
+]
+
+# DAY_STREAK_MARKS: days on target in a row (dayQualifies()). The 3-day mark is a card on Today; from STREAK_TAKEOVER
+# (7) a mark takes the whole screen, so: win below it, milestone from it. It pays no XP of its own
+# (XP_SYSTEM.md §5: "recognition, not a second payout"), so every xp here is 0.
+[badge.day_streak]
+name = "Day Streak"
+meaning = "consistency"
+kind = "proof"
+proof_codes = ["DAY_STREAK_MARKS"]
+caption = "{n} days on target in a row."
+free = true
+origin = "proof"
+tiers = [
+  { at = 3, metal = "bronze", xp = 0, size = "win" },
+  { at = 7, metal = "bronze", xp = 0, size = "milestone" },
+  { at = 14, metal = "silver", xp = 0, size = "milestone" },
+  { at = 21, metal = "silver", xp = 0, size = "milestone" },
+  { at = 30, metal = "emerald", xp = 0, size = "milestone" },
+  { at = 50, metal = "emerald", xp = 0, size = "milestone" },
+  { at = 75, metal = "amethyst", xp = 0, size = "milestone" },
+  { at = 100, metal = "amethyst", xp = 0, size = "milestone" },
+  { at = 150, metal = "prismatic", xp = 0, size = "milestone" },
+  { at = 200, metal = "prismatic", xp = 0, size = "milestone" },
+  { at = 300, metal = "prismatic", xp = 0, size = "milestone" },
+  { at = 365, metal = "prismatic", xp = 0, size = "milestone" },
+]
+
+# ── Proof's milestone families ──────────────────────────────────────────────────────────────────────────────────────
+# One badge per family: its marks (I, II, III …) are the tiers, on the metals in order. at = the mark's need,
+# xp = what Proof pays today (XP_SYSTEM.md §4.6), size follows Proof's tier (week win, long highlight, rare milestone).
+# proof_codes are Proof's own codes, in mark order.
+
+[badge.dawn_patrol]
+name = "DAWN PATROL"
+meaning = "commitment"
+kind = "proof"
+proof_codes = ["GO", "DP", "DP3"]     # I, II, III
+caption = "Days with three or more habits logged: {n}."
+free = true
+origin = "proof"
+tiers = [
+  { at = 1, metal = "bronze", xp = 40, size = "win" },
+  { at = 10, metal = "silver", xp = 75, size = "highlight" },
+  { at = 50, metal = "emerald", xp = 250, size = "highlight" },
+]
+
+# proof_ in the id: Career Mode's own Clean Sweeps (weeks with every mission done) is one letter away.
+[badge.proof_clean_sweep]
+name = "CLEAN SWEEP"
+meaning = "commitment"
+kind = "proof"
+proof_codes = ["CS", "CS2", "CS3"]     # I, II, III
+caption = "Perfect days: {n}."
+free = true
+origin = "proof"
+tiers = [
+  { at = 1, metal = "bronze", xp = 100, size = "win" },
+  { at = 10, metal = "silver", xp = 300, size = "highlight" },
+  { at = 30, metal = "emerald", xp = 600, size = "highlight" },
+]
+
+[badge.human_sprinkler]
+name = "HUMAN SPRINKLER"
+meaning = "consistency"
+kind = "proof"
+proof_codes = ["HS", "HS2", "UB"]     # I, II, III
+caption = "{n} days in a row on full water."
+free = true
+origin = "proof"
+tiers = [
+  { at = 5, metal = "bronze", xp = 100, size = "win" },
+  { at = 20, metal = "silver", xp = 250, size = "highlight" },
+  { at = 60, metal = "emerald", xp = 600, size = "milestone" },
+]
+
+[badge.heavy_metal]
+name = "HEAVY METAL"
+meaning = "commitment"
+kind = "proof"
+proof_codes = ["TS", "HM", "HM3"]     # I, II, III
+caption = "{n} days in a row with a session."
+free = false
+origin = "proof"
+tiers = [
+  { at = 3, metal = "bronze", xp = 120, size = "win" },
+  { at = 12, metal = "silver", xp = 150, size = "highlight" },
+  { at = 30, metal = "emerald", xp = 350, size = "highlight" },
+]
+
+[badge.ground_covered]
+name = "GROUND COVERED"
+meaning = "consistency"
+kind = "proof"
+proof_codes = ["SW", "RR", "SW3"]     # I, II, III
+caption = "{n} days over your step target."
+free = true
+origin = "proof"
+tiers = [
+  { at = 7, metal = "bronze", xp = 130, size = "win" },
+  { at = 30, metal = "silver", xp = 200, size = "highlight" },
+  { at = 100, metal = "emerald", xp = 500, size = "milestone" },
+]
+
+[badge.fully_fuelled]
+name = "FULLY FUELLED"
+meaning = "consistency"
+kind = "proof"
+proof_codes = ["FF", "FF2"]     # I, II
+caption = "{n} days of three proper meals."
+free = true
+origin = "proof"
+tiers = [
+  { at = 5, metal = "bronze", xp = 110, size = "win" },
+  { at = 25, metal = "silver", xp = 300, size = "highlight" },
+]
+
+[badge.zen_machine]
+name = "ZEN MACHINE"
+meaning = "consistency"
+kind = "proof"
+proof_codes = ["ZM", "ZM2"]     # I, II
+caption = "{n} breathing sessions in a row."
+free = true
+origin = "proof"
+tiers = [
+  { at = 10, metal = "bronze", xp = 100, size = "highlight" },
+  { at = 30, metal = "silver", xp = 280, size = "highlight" },
+]
+
+[badge.blackout_artist]
+name = "BLACKOUT ARTIST"
+meaning = "consistency"
+kind = "proof"
+proof_codes = ["BA", "BA2"]     # I, II
+caption = "{n} nights in a row at 7.5 hours or more."
+free = true
+origin = "proof"
+tiers = [
+  { at = 10, metal = "bronze", xp = 150, size = "highlight" },
+  { at = 30, metal = "silver", xp = 350, size = "highlight" },
+]
+
+[badge.rubber_band]
+name = "RUBBER BAND"
+meaning = "consistency"
+kind = "proof"
+proof_codes = ["RB", "RB2"]     # I, II
+caption = "{n}-day mobility streak."
+free = true
+origin = "proof"
+tiers = [
+  { at = 14, metal = "bronze", xp = 150, size = "highlight" },
+  { at = 40, metal = "silver", xp = 350, size = "highlight" },
+]
+
+[badge.iron_monk]
+name = "IRON MONK"
+meaning = "consistency"
+kind = "proof"
+proof_codes = ["IM", "IM2"]     # I, II
+caption = "{n}-day supplement streak."
+free = true
+origin = "proof"
+tiers = [
+  { at = 16, metal = "bronze", xp = 150, size = "highlight" },
+  { at = 45, metal = "silver", xp = 380, size = "highlight" },
+]
+
+# Tier I's need is Proof's COMEBACK_STICK, which is comeback_stick = 7 in rulebook.toml [habits]: change them together.
+[badge.back_in_the_fight]
+name = "BACK IN THE FIGHT"
+meaning = "resilience"
+kind = "proof"
+proof_codes = ["BF", "LR"]     # I, II
+caption = "{n} days on target in a row after a comeback."
+free = true
+origin = "proof"
+tiers = [
+  { at = 7, metal = "bronze", xp = 200, size = "highlight" },
+  { at = 21, metal = "silver", xp = 400, size = "highlight" },
+]
+
+[badge.hard_to_kill]
+name = "HARD TO KILL"
+meaning = "resilience"
+kind = "proof"
+proof_codes = ["HK", "US"]     # I, II
+caption = "{n} comebacks that each stuck."
+free = true
+origin = "proof"
+tiers = [
+  { at = 3, metal = "bronze", xp = 300, size = "highlight" },
+  { at = 5, metal = "silver", xp = 600, size = "milestone" },
+]

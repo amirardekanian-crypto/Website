@@ -28,6 +28,13 @@ Durable context for working in this repo. Read the linked docs before diving in.
   habit-tracker related: the four tabs, the eight habits, how progression works, the
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
+- `career/CAREER_MODE.md` — **Career Mode, the gamification system for both apps** (Amir, 2026-10-17: designed, decisions
+  taken with *"go with your picks"*, NOT built). One fact ledger and one server scorer; XP and a career level that never
+  resets; badges, achievements and titles that each mean consistency, commitment, progress or resilience; weekly missions,
+  personal quests; recognition for the athlete, Amir and the crew. Rules GAME-1 to GAME-12 live there (cite the ID).
+  Every function step by step: `career/PROCEDURES.md`. The numbers and the catalogue are `career/*.toml`, which Amir reads
+  and edits; `python scripts/check_career.py` checks them (pre-commit guard 20). When it is built, it supersedes the parts of
+  `XP_SYSTEM.md` and `QUESTS.md` it names.
 - `FARSI-PRODUCTS.md` — the paid course app (`/tennis/app/`), the testing app's page and the Farsi
   product pages: how they are built, deployed and introduced.
 - `PROGRAM-APP.md` — the athlete app's programme features in full (rx, week notes, the Spine, the Quality

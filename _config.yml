@@ -4,6 +4,7 @@
 exclude:
   - Content/          # design-reference workspace (reels, carousels, business docs) — not site content
   - supabase/          # DB schema/migration SQL — internal infra, not public
+  - career/            # Career Mode, the gamification system's design (docs and .toml data) — internal, not public
   # Root docs. This is an explicit list, not a glob: a new .md at the root is served
   # (as .md AND as a rendered .html) until it is added here.
   - CLAUDE.md

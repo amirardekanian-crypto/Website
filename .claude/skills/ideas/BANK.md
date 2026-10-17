@@ -100,9 +100,12 @@ the engine (fact ledger, rulebook, catalogue, awards, missions, quests, recognit
 piece of Proof's game goes; rules GAME-1 to GAME-12; 8 decisions; 7 build phases (phase 1 runs in shadow until it
 matches `hab_xp()` for every athlete).
 
-Status: **pitched**, 8 decisions waiting (level never resets · Proof is the game's home · one server scorer · training
-about half of a perfect week · missions Monday to Sunday · crew consent at the first highlight · quests from three
-doors · the name, Career Mode or another).
+Status: **picked** 2026-10-17. Amir, *"go with your picks"*, on all eight decisions (level never resets · Proof is the
+game's home · one server scorer · training about half of a perfect week · missions Monday to Sunday · crew consent at the
+first highlight · quests from three doors · the name, Career Mode). Written into the repo the same day as **`career/`**:
+`CAREER_MODE.md` (the system), `PROCEDURES.md` (every function, step by step), seven `.toml` files Amir edits (rulebook,
+badges, achievements, titles, missions, quests, recognition, with Proof's existing catalogue carried over) and
+`scripts/check_career.py`. Nothing built; phase 1 (facts in shadow) is next.
 
 Round 3's ideas are parts of it: #29 Hold Serve → Consistency's held weeks; #30 Courtside → the coach's column; #32
 Ring the Bell → the crew's column; #33 Century Club → Commitment; #34 Amir's Pick → a coach tool; #35 The Ghost →

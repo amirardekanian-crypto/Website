@@ -1,0 +1,302 @@
+# Career Mode · the weekly mission pool
+#
+# Three missions a week per athlete, picked every Monday (PROCEDURES.md → P6): one from the plan, one for their
+# weakest habit (recovery), one stretch. Plus a crew mission when Amir sets one.
+# A mission NEVER has its own XP: it pays share.mission (rulebook.toml) of the work inside it, so a mission on a
+# cheap habit is a cheap mission (GAME-7). proof_xp only records what Proof's quest paid, for history.
+# Names are drafts (2026-10-17): change them freely; never change an id.
+
+
+# ── The plan slot (coached athletes) ──────────────────────────────────────────────────────────────────────────────
+
+[mission.hold_your_week]
+name = "Hold Your Week"
+slot = "plan"
+meaning = "consistency"
+asks = "Every session of your plan this week, on any days. Its progress shows the plan week's sessions, as This Week does."
+counts = "week_held"
+measure = "count"
+target = 1
+picked_when = "The default, when nothing else applies. After a broken week, Bounce Back is picked instead."
+free = false
+origin = "new"
+
+[mission.every_set_counts]
+name = "Every Set Counts"
+slot = "plan"
+meaning = "commitment"
+asks = "Every set logged, in every session this week."
+counts = "full_log"
+measure = "count"
+target = "plan_days"
+picked_when = "A session last week had sets left unlogged."
+free = false
+origin = "new"
+
+[mission.check_in_first]
+name = "Check In First"
+slot = "plan"
+meaning = "commitment"
+asks = "The check-in before every session this week."
+counts = "checkin_done"
+measure = "count"
+target = "plan_days"
+picked_when = "A check-in was skipped last week."
+free = false
+origin = "new"
+
+[mission.test_day]
+name = "Test Day"
+slot = "plan"
+meaning = "commitment"
+asks = "Do your retest this week."
+counts = "retest_done"
+measure = "count"
+target = 1
+picked_when = "A retest is due this week. This wins the plan slot over everything else."
+free = false
+origin = "new"
+
+[mission.bounce_back]
+name = "Bounce Back"
+slot = "plan"
+meaning = "resilience"
+asks = "Last week got away from you. Hold this one: every session of your plan, on any days."
+counts = "bounce_back"
+measure = "count"
+target = 1
+picked_when = "Last week was broken (it ended short of the plan). It replaces Hold Your Week and pays as resilience."
+free = false
+origin = "new"
+
+# No mission asks for progress, on purpose: a personal best can't be ordered for a given week without pushing past the
+# RPE the plan sets. Progress is paid by badges, achievements and quests (CAREER_MODE.md → Weekly missions).
+
+
+# ── The stretch slot ──────────────────────────────────────────────────────────────────────────────────────────────
+
+[mission.recovery_day]
+name = "Recovery Day"
+slot = "stretch"
+meaning = "commitment"
+asks = "One recovery session from the Library."
+counts = "library_session"
+measure = "count"
+target = 1
+picked_when = "Not done in the last four weeks."
+free = false
+origin = "new"
+
+
+# ── Crew missions: set by Amir, one shared total ─────────────────────────────────────────────────────────────────
+
+[mission.hold_the_line]
+name = "Hold the Line"
+slot = "crew"
+meaning = "consistency"
+asks = "The crew holds this many weeks between us this week."
+counts = "week_held"
+measure = "count"
+target = 15
+picked_when = "Amir sets it from coach.html (it replaces the Quest week lever)."
+free = false
+origin = "new"
+
+[mission.a_million_steps]
+name = "A Million Steps"
+slot = "crew"
+meaning = "consistency"
+asks = "A million steps between us this week."
+counts = "habit_done"
+habit = "steps"
+measure = "units"
+target = 1000000
+picked_when = "Amir sets it from coach.html."
+free = true
+origin = "new"
+
+
+# ── Carried over from AA Proof's quest pool (origin = "proof") ───────────────────────────────────────────────────
+# Proof's 12 quests become recovery, stretch and plan missions. Their fixed XP is dropped (GAME-7) and kept as proof_xp.
+
+# ── Proof's twelve quests, as missions ──────────────────────────────────────────────────────────────────────────────
+# Habit quests are recovery missions for that habit; the rest are stretch or plan. name is Proof's title in Title Case,
+# asks is Proof's own line, proof_id is Proof's id and proof_xp what Proof paid. That XP is history only: a mission
+# pays share.mission of the work inside it, so a mission on a cheap habit is a cheap mission (GAME-7).
+
+[mission.the_well_runs_deep]
+name = "The Well Runs Deep"
+slot = "recovery"
+meaning = "consistency"
+asks = "Full water on 5 days"
+counts = "habit_done"
+habit = "water"
+measure = "days"
+target = 5
+picked_when = "Their weakest habit last week was water."
+free = true
+origin = "proof"
+proof_id = "w_water5"
+proof_xp = 150
+
+[mission.seven_for_seven]
+name = "Seven for Seven"
+slot = "recovery"
+meaning = "consistency"
+asks = "Full water every single day"
+counts = "habit_done"
+habit = "water"
+measure = "days"
+target = 7
+picked_when = "Their weakest habit last week was water."
+free = true
+origin = "proof"
+proof_id = "w_water7"
+proof_xp = 220
+
+[mission.fifty_thousand]
+name = "Fifty Thousand"
+slot = "recovery"
+meaning = "consistency"
+asks = "50,000 steps this week"
+counts = "habit_done"
+habit = "steps"
+measure = "units"
+target = 50000
+picked_when = "Their weakest habit last week was steps."
+free = true
+origin = "proof"
+proof_id = "w_steps50k"
+proof_xp = 200
+
+[mission.the_long_way_round]
+name = "The Long Way Round"
+slot = "recovery"
+meaning = "consistency"
+asks = "70,000 steps this week"
+counts = "habit_done"
+habit = "steps"
+measure = "units"
+target = 70000
+picked_when = "Their weakest habit last week was steps."
+free = true
+origin = "proof"
+proof_id = "w_steps70k"
+proof_xp = 280
+
+[mission.lights_out]
+name = "Lights Out"
+slot = "recovery"
+meaning = "consistency"
+asks = "Hit your sleep target 5 nights"
+counts = "habit_done"
+habit = "sleep"
+measure = "days"
+target = 5
+picked_when = "Their weakest habit last week was sleep."
+free = true
+origin = "proof"
+proof_id = "w_sleep5"
+proof_xp = 180
+
+[mission.oiled_hinges]
+name = "Oiled Hinges"
+slot = "recovery"
+meaning = "consistency"
+asks = "Mobility on 4 days"
+counts = "habit_done"
+habit = "mobility"
+measure = "days"
+target = 4
+picked_when = "Their weakest habit last week was mobility."
+free = true
+origin = "proof"
+proof_id = "w_mob4"
+proof_xp = 120
+
+[mission.dead_calm]
+name = "Dead Calm"
+slot = "recovery"
+meaning = "consistency"
+asks = "Breathe on 4 days"
+counts = "habit_done"
+habit = "breathe"
+measure = "days"
+target = 4
+picked_when = "Their weakest habit last week was breathe."
+free = true
+origin = "proof"
+proof_id = "w_breathe4"
+proof_xp = 100
+
+[mission.no_negotiation]
+name = "No Negotiation"
+slot = "recovery"
+meaning = "consistency"
+asks = "Supplements every day"
+counts = "habit_done"
+habit = "supps"
+measure = "days"
+target = 7
+picked_when = "Their weakest habit last week was supps."
+free = true
+origin = "proof"
+proof_id = "w_supps7"
+proof_xp = 140
+
+[mission.on_the_record]
+name = "On the Record"
+slot = "recovery"
+meaning = "consistency"
+asks = "Log your meals on 5 days"
+counts = "habit_done"
+habit = "fuel"
+measure = "days"
+target = 5
+picked_when = "Their weakest habit last week was fuel."
+free = true
+origin = "proof"
+proof_id = "w_fuel5"
+proof_xp = 140
+
+[mission.three_hard_days]
+name = "Three Hard Days"
+slot = "plan"
+meaning = "commitment"
+asks = "Three sessions this week"
+counts = "session_finished"
+measure = "count"
+target = 3
+picked_when = "Only when Amir pins it: the planner uses Hold Your Week."
+free = false
+origin = "proof"
+proof_id = "w_train3"
+proof_xp = 250
+
+[mission.five_on_target]
+name = "Five on Target"
+slot = "stretch"
+meaning = "consistency"
+asks = "5 days on target"
+counts = "day_on_target"
+measure = "count"
+target = 5
+picked_when = "Not done in the last four weeks."
+free = true
+origin = "proof"
+proof_id = "w_qualify5"
+proof_xp = 220
+
+[mission.twice_perfect]
+name = "Twice Perfect"
+slot = "stretch"
+meaning = "commitment"
+asks = "Two clean sweeps"
+counts = "perfect_day"
+measure = "count"
+target = 2
+picked_when = "Not done in the last four weeks."
+free = true
+origin = "proof"
+proof_id = "w_perfect2"
+proof_xp = 300

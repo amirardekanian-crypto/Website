@@ -1,0 +1,223 @@
+# Career Mode · achievements
+#
+# An achievement is a moment reached once. It never repeats (a moment that comes back in steps is a badge).
+# Names, XP and sizes are drafts (2026-10-17): change them freely; never change an id.
+
+
+# ── Consistency ───────────────────────────────────────────────────────────────────────────────────────────────────
+
+[achievement.held]
+name = "Held"
+meaning = "consistency"
+reads = "week_held"
+rule = "The first week held."
+xp = 100
+size = "highlight"
+caption = "Your first held week. Every session, on your days."
+free = false
+origin = "new"
+
+[achievement.clean_sheet]
+name = "Clean Sheet"
+meaning = "consistency"
+reads = "mission_sweep"
+rule = "The first week with all three missions done."
+xp = 50
+size = "win"
+caption = "Three missions, three done."
+free = true
+origin = "new"
+
+
+# ── Commitment ────────────────────────────────────────────────────────────────────────────────────────────────────
+
+[achievement.day_one]
+name = "Day One"
+meaning = "commitment"
+reads = "session_finished"
+rule = "The first session from the plan finished."
+xp = 100
+size = "win"
+caption = "Day one, done."
+free = false
+origin = "new"
+
+[achievement.first_cycle]
+name = "First Cycle"
+meaning = "commitment"
+reads = "cycle_finished"
+rule = "The first cycle finished."
+xp = 300
+size = "milestone"
+caption = "A whole cycle, finished."
+free = false
+origin = "new"
+
+[achievement.the_distance]
+name = "The Distance"
+meaning = "commitment"
+reads = "roadmap_finished"
+rule = "The whole roadmap finished. The fact itself pays 3,000."
+xp = 0
+size = "legend"
+caption = "Every cycle of the roadmap, finished."
+title = "the_distance"
+free = false
+origin = "new"
+
+
+# ── Progress ──────────────────────────────────────────────────────────────────────────────────────────────────────
+
+[achievement.first_best]
+name = "First Best"
+meaning = "progress"
+reads = "personal_best"
+rule = "The first personal best."
+xp = 100
+size = "highlight"
+caption = "Your first personal best. Not the last."
+free = false
+origin = "new"
+
+
+# ── Resilience ────────────────────────────────────────────────────────────────────────────────────────────────────
+
+[achievement.kept_going]
+name = "Kept Going"
+meaning = "resilience"
+reads = "cycle_finished"
+rule = "A cycle finished with at least one broken week in it."
+xp = 300
+size = "milestone"
+caption = "A week went wrong. You finished the cycle anyway."
+free = false
+origin = "new"
+
+[achievement.back]
+name = "Back"
+meaning = "resilience"
+reads = "training_return"
+rule = "The first held week after two or more weeks away."
+xp = 100
+size = "highlight"
+caption = "Two weeks away, then a full week. Back."
+free = false
+origin = "new"
+
+
+# ── Carried over from AA Proof (origin = "proof") ────────────────────────────────────────────────────────────────
+# Proof's one-off milestones and its five events, as they are in habits.html today.
+
+# ── Proof's one-off milestones ──────────────────────────────────────────────────────────────────────────────────────
+# The way in and two trophies: the three Proof milestones that are not a family (no Roman numeral, on purpose).
+# The other 29 are the tiers of the badge families in badges.toml. xp and caption are Proof's own, size follows its tier.
+
+[achievement.first_blood]
+name = "FIRST BLOOD"
+meaning = "commitment"
+reads = "proof"
+proof_code = "FB"
+rule = "The first day with a session done (the WORKOUT habit)."
+xp = 50
+size = "win"
+caption = "Your first session on the board"
+free = false
+origin = "proof"
+
+[achievement.the_machinist]
+name = "THE MACHINIST"
+meaning = "commitment"
+reads = "proof"
+proof_code = "MC"
+rule = "150 days with a session done (the WORKOUT habit)."
+xp = 750
+size = "milestone"
+caption = "150 sessions. A year of turning up."
+free = false
+origin = "proof"
+
+[achievement.the_centurion]
+name = "THE CENTURION"
+meaning = "commitment"
+reads = "proof"
+proof_code = "CN"
+rule = "100 perfect days: every habit on the day's list done."
+xp = 1200
+size = "milestone"
+caption = "100 perfect days. Nobody has done this."
+free = true
+origin = "proof"
+
+# ── Proof's five events ─────────────────────────────────────────────────────────────────────────────────────────────
+# An event is all of its goals met, counted over the athlete's whole history (no window): about four weeks of work,
+# BACKBONE however long it takes. It pays a TITLE and no XP (XP_SYSTEM.md §4.5), so xp is 0. The rule is the goals;
+# the caption is the note on the event's title (titles.toml).
+
+# meaning: first pass, Amir checks
+[achievement.the_foundry]
+name = "THE FOUNDRY"
+meaning = "commitment"
+reads = "proof"
+proof_code = "ev_foundry"
+rule = "16 sessions · 200,000 steps · Protein on 20 days"
+xp = 0
+size = "milestone"
+caption = "Four weeks in the fire."
+title = "sun_forged"
+free = false
+origin = "proof"
+
+# meaning: first pass, Amir checks
+[achievement.bedrock]
+name = "BEDROCK"
+meaning = "consistency"
+reads = "proof"
+proof_code = "ev_bedrock"
+rule = "20 nights on target · 16 mobility sessions · 20 days on target"
+xp = 0
+size = "milestone"
+caption = "Built the base nobody claps for."
+title = "bedrock"
+free = true
+origin = "proof"
+
+# meaning: first pass, Amir checks
+[achievement.cold_blood]
+name = "COLD BLOOD"
+meaning = "commitment"
+reads = "proof"
+proof_code = "ev_coldblood"
+rule = "18 sessions · Full water on 22 days · 6 perfect days"
+xp = 0
+size = "milestone"
+caption = "Kept going after it stopped being fun."
+title = "cold_forged"
+free = false
+origin = "proof"
+
+# meaning: first pass, Amir checks
+[achievement.still_standing]
+name = "STILL STANDING"
+meaning = "consistency"
+reads = "proof"
+proof_code = "ev_standing"
+rule = "24 days on target · 250,000 steps · Protein on 24 days"
+xp = 0
+size = "milestone"
+caption = "Starting is easy. This was not."
+title = "still_here"
+free = true
+origin = "proof"
+
+[achievement.backbone]
+name = "BACKBONE"
+meaning = "resilience"
+reads = "proof"
+proof_code = "ev_backbone"
+rule = "2 comebacks that held a week · 14 straight days after a comeback · 30 days on target"
+xp = 0
+size = "milestone"
+caption = "Fell off. Came back. Did it again."
+title = "unbowed"
+free = true
+origin = "proof"

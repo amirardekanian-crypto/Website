@@ -1,0 +1,775 @@
+#!/usr/bin/env python3
+"""Check Career Mode's catalogue: python scripts/check_career.py [folder]
+
+Career Mode (career/CAREER_MODE.md) keeps every number, badge, achievement, title, mission and quest in plain .toml
+files so a detail can change without code (GAME-10). Nothing reads those files yet, which makes them easy to break by
+accident: a meaning that is not one of the four, a title that was renamed, a mission given an XP of its own. This reads
+the seven files (rulebook, badges, achievements, titles, missions, quests, recognition) and refuses what breaks a rule.
+The folder defaults to career/ at the repo root.
+
+ERRORS (exit 1)
+   1  a file that does not parse (or is missing)
+   2  the rulebook: the four meanings, the level curve, the shares, the habit weights, cycle_finished.min_share
+   3  every [fact.<id>]: a meaning, exactly one of xp / xp_from, a source, pays_for, when. A social fact (meaning
+      "none") pays nothing (GAME-6); pays_for "progress" needs meaning "progress"
+   4  every [badge.<id>]: the required fields, a meaning (or "chosen" for the commendation badge only), a kind, what it
+      counts (a fact) or reads (proof_codes), and tiers that rise (at), never go down a metal, and carry xp (mult for
+      per_habit_best_run); a tier title must exist
+   5  every [achievement.<id>]: the required fields, reads a fact or "proof" (then proof_code), a title that exists
+   6  every [title.<id>] and [skin.<id>]
+   7  every [mission.<id>]: the required fields, counts a fact, a target, and NO xp of its own (GAME-7)
+   8  every [quest.<id>]: the required fields, 2 to 12 weeks, 2 to 5 steps, each step closing on a fact or Amir's tick
+   9  recognition.toml: the five sizes and what each means, Courtside, the Bell, Amir's three tools, the WhatsApp lines
+  10  the brand rule: no gold, golden, yellow, amber or ochre in any string, in any file
+WARNINGS (exit 0)
+   6  a title with origin "new" that nothing awards (unless it is a template)
+  11  coverage: each meaning has a badge, an achievement, a title and a mission (missions skip progress, on purpose); each slot has a mission; each habit
+      except strength and custom has a recovery mission
+  12  an unknown key inside an entry (a typo would otherwise be silently ignored); also an id that is not snake_case
+      and an unknown top-level key (a mistyped [table] would silently drop its entries from every check above)
+
+Standard library only. Python 3.11+ (tomllib).
+
+  python scripts/check_career.py            # the career/ folder in this repo
+  python scripts/check_career.py some/dir   # another folder (scripts/test_check_career.py checks copies of it)
+"""
+import argparse
+import math
+import pathlib
+import re
+import sys
+import tomllib
+
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+DEFAULT_FOLDER = ROOT / "career"
+
+FILES = ["rulebook", "badges", "achievements", "titles", "missions", "quests", "recognition"]
+
+# The words the files may use.
+MEANINGS = ["consistency", "commitment", "progress", "resilience"]
+SIZES = ["tick", "win", "highlight", "milestone", "legend"]
+METALS = ["bronze", "silver", "emerald", "amethyst", "prismatic"]      # low to high; no gold, ever
+SLOTS = ["plan", "recovery", "stretch", "crew"]
+DOORS = ["coach", "cycle", "athlete"]
+ORIGINS = ["new", "proof"]
+SOURCES = ["training", "proof", "coach", "server"]
+PAYS_FOR = ["act", "progress", "nothing"]
+XP_FROM = ["habits", "mission", "quest", "share.mission_sweep"]
+FACT_MEANINGS = MEANINGS + ["chosen", "quest", "none"]
+TITLE_MEANINGS = MEANINGS + ["chosen", "season", "level"]
+BADGE_KINDS = ["best_run", "total", "per_habit_best_run", "proof"]
+MEASURES = ["count", "units", "days"]
+CLOSERS = ["fact", "coach_tick"]
+TOOLS = ["reaction", "commendation", "amirs_pick"]
+SIZE_AUDIENCES = ["athlete", "coach", "crew", "beyond"]
+
+BANNED_WORDS = re.compile(r"\b(gold|golden|yellow|amber|ochre)\b", re.IGNORECASE)
+SNAKE_CASE = re.compile(r"^[a-z][a-z0-9_]*$")
+
+# Keys an entry may carry besides its own fields without a warning (rule 12).
+EXTRA_KEYS = {"tier_name", "mult", "title", "template", "proof_id", "proof_code", "proof_codes", "proof_xp",
+              "min_share", "cap", "habit", "within", "run", "line"}
+KNOWN_KEYS = {
+    "fact": {"meaning", "xp", "xp_from", "source", "pays_for", "when", "cap", "min_share"},
+    "badge": {"name", "meaning", "kind", "counts", "proof_codes", "caption", "free", "origin", "tiers"},
+    "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},
+    "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code"},
+    "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id"},
+    "skin": {"name", "from", "origin", "proof_id"},
+    "mission": {"name", "slot", "meaning", "asks", "counts", "habit", "measure", "target", "picked_when", "free",
+                "origin", "proof_id", "proof_xp"},
+    "quest": {"name", "meaning", "weeks", "doors", "free", "size", "caption", "reward_badge", "title", "origin", "steps"},
+    "step": {"name", "closes_on", "counts", "target", "habit", "measure", "within", "run"},
+    "message": {"en", "fa", "used_for"},
+}
+TOP_LEVEL_KEYS = {
+    "rulebook": {"version", "meanings", "level", "season", "week", "share", "habits", "fact"},
+    "badges": {"badge"},
+    "achievements": {"achievement"},
+    "titles": {"title", "skin"},
+    "missions": {"mission"},
+    "quests": {"quest"},
+    "recognition": {"sizes", "size", "courtside", "bell", "tool", "message"},
+}
+
+
+# ── Plumbing ──────────────────────────────────────────────────────────────────────────────────────────────────────
+
+class Report:
+    """Every problem found, in the order found: (level, file, id, message)."""
+
+    def __init__(self):
+        self.items = []
+
+    def error(self, file, ident, msg):
+        self.items.append(("ERROR", file, ident, msg))
+
+    def warn(self, file, ident, msg):
+        self.items.append(("WARN", file, ident, msg))
+
+    def of(self, level):
+        return [i for i in self.items if i[0] == level]
+
+
+class Ctx:
+    """Where a message belongs: the file, the entry and (for a tier or a step) a prefix."""
+
+    def __init__(self, rep, file, ident, prefix=""):
+        self.rep, self.file, self.ident, self.prefix = rep, file, ident, prefix
+
+    def sub(self, prefix):
+        return Ctx(self.rep, self.file, self.ident, self.prefix + prefix)
+
+    def error(self, msg):
+        self.rep.error(self.file, self.ident, self.prefix + msg)
+
+    def warn(self, msg):
+        self.rep.warn(self.file, self.ident, self.prefix + msg)
+
+
+class World:
+    """What the files refer to each other by: facts, habit weights, titles, and which titles something awards."""
+
+    def __init__(self, data):
+        rb, tl = data["rulebook"], data["titles"]
+        self.facts = ids_of(rb, "fact") if rb is not None else None
+        habits = rb.get("habits") if rb is not None else None
+        weights = habits.get("weights") if isinstance(habits, dict) else None
+        self.weights = list(weights) if isinstance(weights, dict) else None
+        self.titles = ids_of(tl, "title") if tl is not None else None
+        self.title_entries = {}
+        self.title_refs = set()
+
+
+def is_num(v):
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
+
+def is_int(v):
+    return isinstance(v, int) and not isinstance(v, bool)
+
+
+def is_text(v):
+    return isinstance(v, str) and v.strip() != ""
+
+
+def ids_of(data, key):
+    section = data.get(key) if data is not None else None
+    return set(section) if isinstance(section, dict) else set()
+
+
+def entries(data, key, file, rep):
+    """The {id: table} under a top-level key. Anything that is not a table is reported and left out."""
+    section = data.get(key, {})
+    if not isinstance(section, dict):
+        rep.error(file, key, f"[{key}] must hold tables such as [{key}.some_id]")
+        return {}
+    out = {}
+    for ident, body in section.items():
+        if not isinstance(body, dict):
+            rep.error(file, f"{key}.{ident}", "must be a table of settings, not a single value")
+            continue
+        if not SNAKE_CASE.match(ident):
+            rep.warn(file, f"{key}.{ident}", "the id should be snake_case (lower case letters, digits and _): "
+                                             "an id never changes once history is filed under it")
+        out[ident] = body
+    return out
+
+
+def get_text(c, e, key):
+    if key not in e:
+        c.error(f"{key} is missing")
+        return None
+    if not is_text(e[key]):
+        c.error(f"{key} must be non-empty text, found {e[key]!r}")
+        return None
+    return e[key]
+
+
+def get_bool(c, e, key):
+    if key not in e:
+        c.error(f"{key} is missing")
+        return None
+    if not isinstance(e[key], bool):
+        c.error(f"{key} must be true or false, found {e[key]!r}")
+        return None
+    return e[key]
+
+
+def get_choice(c, e, key, allowed, note=""):
+    if key not in e:
+        c.error(f"{key} is missing")
+        return None
+    v = e[key]
+    if not (isinstance(v, str) and v in allowed):
+        c.error(f"{key} {v!r} is not one of {', '.join(allowed)}{note}")
+        return None
+    return v
+
+
+def get_number(c, e, key, gt=None, ge=None, le=None, integer=False):
+    if key not in e:
+        c.error(f"{key} is missing")
+        return None
+    v = e[key]
+    if not (is_int(v) if integer else is_num(v)):
+        c.error(f"{key} must be {'a whole number' if integer else 'a number'}, found {v!r}")
+        return None
+    for ok, want in ((gt is None or v > gt, f"above {gt}"), (ge is None or v >= ge, f"{ge} or more"),
+                     (le is None or v <= le, f"{le} or less")):
+        if not ok:
+            c.error(f"{key} = {v} must be {want}")
+            return None
+    return v
+
+
+def warn_unknown(c, entry, kind, skip=()):
+    for key in entry:
+        if key not in KNOWN_KEYS[kind] and key not in EXTRA_KEYS and key not in skip:
+            c.warn(f"unknown key {key!r} (a typo? it is ignored)")
+
+
+def check_title_ref(c, e, w, key="title"):
+    """An optional `title = "<id>"`: it must be a title in titles.toml. Remember it, so an unused title can be flagged."""
+    if key not in e:
+        return
+    t = e[key]
+    if not is_text(t):
+        c.error(f"{key} must be the id of a title in titles.toml, found {t!r}")
+        return
+    w.title_refs.add(t)
+    if w.titles is not None and t not in w.titles:
+        c.error(f"{key} {t!r} is not in titles.toml")
+
+
+def check_fact_ref(c, e, key, w):
+    """`<key> = "<fact id>"`: required, and the fact must be in the rulebook."""
+    if key not in e:
+        c.error(f"{key} is missing")
+        return
+    fid = e[key]
+    if not is_text(fid):
+        c.error(f"{key} must be a fact id from rulebook.toml, found {fid!r}")
+    elif w.facts is not None and fid not in w.facts:
+        c.error(f"{key} {fid!r} is not a fact in rulebook.toml")
+
+
+def check_habit_ref(c, e, w):
+    """An optional `habit = "<key>"`: it must be a key of [habits.weights]."""
+    if "habit" not in e:
+        return
+    h = e["habit"]
+    if not is_text(h):
+        c.error(f"habit must be a habit from rulebook.toml [habits.weights], found {h!r}")
+    elif w.weights is not None and h not in w.weights:
+        c.error(f"habit {h!r} is not in rulebook.toml [habits.weights] ({', '.join(w.weights)})")
+
+
+# ── Loading ───────────────────────────────────────────────────────────────────────────────────────────────────────
+
+def load_all(folder, rep):
+    """Rule 1. A file that fails is reported and left as None, and every check that needs it steps aside."""
+    data = {}
+    for stem in FILES:
+        fname = f"{stem}.toml"
+        try:
+            with open(folder / fname, "rb") as fh:
+                data[stem] = tomllib.load(fh)
+        except FileNotFoundError:
+            rep.error(fname, None, "file not found")
+            data[stem] = None
+        except tomllib.TOMLDecodeError as exc:
+            rep.error(fname, None, f"does not parse: {exc}")
+            data[stem] = None
+        except (OSError, UnicodeDecodeError) as exc:
+            rep.error(fname, None, f"cannot be read: {exc}")
+            data[stem] = None
+        else:
+            for key in data[stem]:
+                if key not in TOP_LEVEL_KEYS[stem]:
+                    rep.warn(fname, key, f"unknown top-level key {key!r} (a mistyped [table]? its entries are not "
+                                         f"checked). Expected: {', '.join(sorted(TOP_LEVEL_KEYS[stem]))}")
+    return data
+
+
+# ── Rule 2 and 3: the rulebook ────────────────────────────────────────────────────────────────────────────────────
+
+def check_rulebook(rb, rep):
+    f = "rulebook.toml"
+    c = Ctx(rep, f, "meanings")
+    if rb.get("meanings") != MEANINGS:
+        c.error(f"must be exactly {MEANINGS}, found {rb.get('meanings')!r}")
+
+    c = Ctx(rep, f, "level")
+    level = rb.get("level")
+    if not isinstance(level, dict):
+        c.error("the [level] table is missing")
+    else:
+        get_number(c, level, "base", gt=0)
+        get_number(c, level, "growth", gt=0)
+        ranks = level.get("ranks")
+        if not (isinstance(ranks, list) and ranks and all(is_text(x) for x in ranks)):
+            c.error("ranks must be a non-empty list of rank names")
+        get_number(c, level, "levels_per_rank", gt=0, integer=True)
+        get_number(c, level, "prestige_after", gt=0, integer=True)
+
+    c = Ctx(rep, f, "share")
+    share = rb.get("share")
+    if not isinstance(share, dict):
+        c.error("the [share] table is missing")
+    else:
+        get_number(c, share, "mission", gt=0, le=1)
+        get_number(c, share, "quest", gt=0, le=1)
+        get_number(c, share, "mission_sweep", ge=0, integer=True)
+
+    c = Ctx(rep, f, "habits.weights")
+    habits = rb.get("habits")
+    weights = habits.get("weights") if isinstance(habits, dict) else None
+    if not isinstance(weights, dict) or not weights:
+        c.error("the [habits.weights] table is missing or empty")
+    else:
+        for habit, value in weights.items():
+            if not is_num(value) or value < 0:
+                c.error(f"the weight of {habit!r} must be a number >= 0, found {value!r}")
+
+    facts = entries(rb, "fact", f, rep)
+    for fid, fact in facts.items():
+        c = Ctx(rep, f, f"fact.{fid}")
+        get_choice(c, fact, "meaning", FACT_MEANINGS)
+        has_xp, has_from = "xp" in fact, "xp_from" in fact
+        if has_xp == has_from:
+            c.error("needs exactly one of xp or xp_from" + (" (it has both)" if has_xp else " (it has neither)"))
+        if has_xp:
+            get_number(c, fact, "xp", ge=0)
+        if has_from:
+            get_choice(c, fact, "xp_from", XP_FROM)
+        get_choice(c, fact, "source", SOURCES)
+        pays_for = get_choice(c, fact, "pays_for", PAYS_FOR)
+        get_text(c, fact, "when")
+        if "min_share" in fact:
+            get_number(c, fact, "min_share", gt=0, le=1)
+        if fact.get("meaning") == "none":
+            xp = fact.get("xp")
+            if not (is_num(xp) and xp == 0):
+                found = f"xp = {xp!r}" if "xp" in fact else "no xp"
+                c.error(f'a social fact (meaning "none") must have xp = 0, found {found} '
+                        f'(GAME-6: social actions pay nothing)')
+            if pays_for is not None and pays_for != "nothing":
+                c.error(f'a social fact (meaning "none") must have pays_for = "nothing", found {pays_for!r} (GAME-6)')
+        if pays_for == "progress" and fact.get("meaning") != "progress":
+            c.error(f'pays_for "progress" needs meaning "progress", found {fact.get("meaning")!r}')
+        warn_unknown(c, fact, "fact")
+
+    cf = facts.get("cycle_finished")
+    if cf is None:
+        rep.error(f, "fact.cycle_finished", "the fact cycle_finished is missing")
+    elif "min_share" not in cf:
+        rep.error(f, "fact.cycle_finished", "min_share is missing (the share of a cycle's planned sessions that "
+                                            "must be finished, above 0 and at most 1)")
+
+
+# ── Rule 4: badges ────────────────────────────────────────────────────────────────────────────────────────────────
+
+def counts_of(c, b):
+    """A badge's counts as a list of fact ids; None when absent or malformed."""
+    if "counts" not in b:
+        return None
+    raw = b["counts"]
+    if is_text(raw):
+        return [raw]
+    if isinstance(raw, list) and raw and all(is_text(x) for x in raw):
+        return list(raw)
+    c.error("counts must be a fact id or a list of fact ids")
+    return None
+
+
+def check_tiers(c, b, kind, w):
+    tiers = b.get("tiers")
+    if not isinstance(tiers, list) or not tiers:
+        c.error("tiers must be a non-empty list of { at, metal, xp, size } tables")
+        return
+    prev_at, prev_metal = None, None
+    for i, t in enumerate(tiers, 1):
+        if not isinstance(t, dict):
+            c.error(f"tier {i} must be a table like {{ at = 5, metal = \"bronze\", xp = 100, size = \"win\" }}")
+            continue
+        tc = c.sub(f"tier {i}: ")
+        at = get_number(tc, t, "at")
+        if at is not None:
+            if prev_at is not None and not at > prev_at:
+                tc.error(f"at = {at} does not rise above the tier before it ({prev_at}): tiers must be strictly rising")
+            prev_at = at
+        metal = get_choice(tc, t, "metal", METALS, note="; no gold, ever")
+        if metal is not None:
+            idx = METALS.index(metal)
+            if prev_metal is not None and idx < prev_metal[0]:
+                tc.error(f"metal {metal!r} goes down from {prev_metal[1]!r}; metals only go up ({' < '.join(METALS)})")
+            prev_metal = (idx, metal)
+        get_choice(tc, t, "size", SIZES)
+        if kind == "per_habit_best_run":
+            get_number(tc, t, "mult", gt=0)
+            if "xp" in t:
+                tc.error("a per_habit_best_run tier carries mult, not xp")
+        else:
+            get_number(tc, t, "xp", ge=0)
+        check_title_ref(tc, t, w)
+        warn_unknown(tc, t, "tier")
+
+
+def check_badges(data, w, rep):
+    f = "badges.toml"
+    for bid, b in entries(data, "badge", f, rep).items():
+        c = Ctx(rep, f, f"badge.{bid}")
+        get_text(c, b, "name")
+        kind = get_choice(c, b, "kind", BADGE_KINDS)
+        counts = counts_of(c, b)
+        if b.get("meaning") == "chosen":
+            if counts != ["commendation"]:
+                c.error('meaning "chosen" is only for the commendation badge (counts = "commendation")')
+        else:
+            get_choice(c, b, "meaning", MEANINGS, note=' (or "chosen", for the commendation badge only)')
+        get_text(c, b, "caption")
+        get_bool(c, b, "free")
+        get_choice(c, b, "origin", ORIGINS)
+        if kind == "proof":
+            codes = b.get("proof_codes")
+            if not (isinstance(codes, list) and codes and all(is_text(x) for x in codes)):
+                c.error('kind "proof" needs proof_codes: a non-empty list of Proof\'s own codes')
+            if "counts" in b:
+                c.error('kind "proof" must not have counts (it reads proof_codes)')
+        elif kind is not None:
+            if "counts" not in b:
+                c.error(f'kind "{kind}" needs counts: the fact (or list of facts) it reads')
+            elif counts is not None and w.facts is not None:
+                for fid in counts:
+                    if fid not in w.facts:
+                        c.error(f"counts {fid!r} is not a fact in rulebook.toml")
+        check_tiers(c, b, kind, w)
+        warn_unknown(c, b, "badge")
+
+
+# ── Rule 5: achievements ──────────────────────────────────────────────────────────────────────────────────────────
+
+def check_achievements(data, w, rep):
+    f = "achievements.toml"
+    for aid, a in entries(data, "achievement", f, rep).items():
+        c = Ctx(rep, f, f"achievement.{aid}")
+        get_text(c, a, "name")
+        get_choice(c, a, "meaning", MEANINGS)
+        if "reads" not in a:
+            c.error("reads is missing (a fact id, or \"proof\")")
+        elif not is_text(a["reads"]):
+            c.error(f"reads must be a fact id or \"proof\", found {a['reads']!r}")
+        elif a["reads"] == "proof":
+            if not is_text(a.get("proof_code")):
+                c.error('reads "proof" needs proof_code: Proof\'s own code for it')
+        elif w.facts is not None and a["reads"] not in w.facts:
+            c.error(f"reads {a['reads']!r} is not a fact in rulebook.toml (or \"proof\")")
+        get_text(c, a, "rule")
+        get_number(c, a, "xp", ge=0)
+        get_choice(c, a, "size", SIZES)
+        get_text(c, a, "caption")
+        get_bool(c, a, "free")
+        get_choice(c, a, "origin", ORIGINS)
+        check_title_ref(c, a, w)
+        warn_unknown(c, a, "achievement")
+
+
+# ── Rule 6: titles and skins ──────────────────────────────────────────────────────────────────────────────────────
+
+def check_titles(data, w, rep):
+    f = "titles.toml"
+    w.title_entries = entries(data, "title", f, rep)
+    for tid, t in w.title_entries.items():
+        c = Ctx(rep, f, f"title.{tid}")
+        get_text(c, t, "name")
+        get_choice(c, t, "meaning", TITLE_MEANINGS)
+        get_text(c, t, "from")
+        get_choice(c, t, "metal", METALS, note="; no gold, ever")
+        get_choice(c, t, "origin", ORIGINS)
+        warn_unknown(c, t, "title")
+    for sid, s in entries(data, "skin", f, rep).items():
+        c = Ctx(rep, f, f"skin.{sid}")
+        get_text(c, s, "name")
+        get_text(c, s, "from")
+        get_choice(c, s, "origin", ORIGINS)
+        warn_unknown(c, s, "skin")
+
+
+def check_title_use(w, rep):
+    """A title Career Mode creates (origin "new") that nothing awards is dead weight. A template is filled in later."""
+    for tid, t in w.title_entries.items():
+        if t.get("origin") == "new" and t.get("template") is not True and tid not in w.title_refs:
+            rep.warn("titles.toml", f"title.{tid}", "nothing awards this title: no badge tier, achievement or quest "
+                                                    "names it, and it is not a template")
+
+
+# ── Rule 7: missions ──────────────────────────────────────────────────────────────────────────────────────────────
+
+def check_missions(data, w, rep):
+    f = "missions.toml"
+    for mid, m in entries(data, "mission", f, rep).items():
+        c = Ctx(rep, f, f"mission.{mid}")
+        get_text(c, m, "name")
+        get_choice(c, m, "slot", SLOTS)
+        get_choice(c, m, "meaning", MEANINGS)
+        get_text(c, m, "asks")
+        check_fact_ref(c, m, "counts", w)
+        get_choice(c, m, "measure", MEASURES)
+        if "target" not in m:
+            c.error("target is missing")
+        elif m["target"] != "plan_days" and not (is_int(m["target"]) and m["target"] > 0):
+            c.error(f'target must be a whole number above 0, or "plan_days", found {m["target"]!r}')
+        get_text(c, m, "picked_when")
+        get_bool(c, m, "free")
+        get_choice(c, m, "origin", ORIGINS)
+        if "xp" in m:
+            c.error("a mission never has its own xp: it pays share.mission of the work inside it (GAME-7). "
+                    "Proof's old figure goes in proof_xp")
+        check_habit_ref(c, m, w)
+        warn_unknown(c, m, "mission", skip=("xp",))
+
+
+# ── Rule 8: quests ────────────────────────────────────────────────────────────────────────────────────────────────
+
+def check_quests(data, w, rep):
+    f = "quests.toml"
+    for qid, q in entries(data, "quest", f, rep).items():
+        c = Ctx(rep, f, f"quest.{qid}")
+        get_text(c, q, "name")
+        get_choice(c, q, "meaning", MEANINGS)
+        get_number(c, q, "weeks", ge=2, le=12, integer=True)
+        doors = q.get("doors")
+        if not (isinstance(doors, list) and doors and all(isinstance(d, str) and d in DOORS for d in doors)):
+            c.error(f"doors must be a non-empty list drawn from {', '.join(DOORS)}, found {doors!r}")
+        get_bool(c, q, "free")
+        get_choice(c, q, "size", SIZES)
+        get_text(c, q, "caption")
+        get_text(c, q, "reward_badge")
+        get_choice(c, q, "origin", ORIGINS)
+        check_title_ref(c, q, w)
+        steps = q.get("steps")
+        if not isinstance(steps, list) or not 2 <= len(steps) <= 5:
+            if isinstance(steps, list):
+                given = f"{len(steps)} step{'s' if len(steps) != 1 else ''} given"
+            else:
+                given = f"steps is {steps!r}"
+            c.error(f"a quest needs 2 to 5 steps: {given}")
+        for i, s in enumerate(steps if isinstance(steps, list) else [], 1):
+            sc = c.sub(f"step {i}: ")
+            if not isinstance(s, dict):
+                sc.error("must be a table like { name = \"...\", closes_on = \"coach_tick\" }")
+                continue
+            get_text(sc, s, "name")
+            if get_choice(sc, s, "closes_on", CLOSERS) == "fact":
+                check_fact_ref(sc, s, "counts", w)
+                get_number(sc, s, "target", gt=0, integer=True)
+            check_habit_ref(sc, s, w)
+            warn_unknown(sc, s, "step")
+        warn_unknown(c, q, "quest")
+
+
+# ── Rule 9: recognition ───────────────────────────────────────────────────────────────────────────────────────────
+
+def check_recognition(rec, w, rep):
+    f = "recognition.toml"
+    if rec.get("sizes") != SIZES:
+        rep.error(f, "sizes", f"must be exactly {SIZES}, found {rec.get('sizes')!r}")
+    size_tables = rec.get("size") if isinstance(rec.get("size"), dict) else {}
+    for s in SIZES:
+        c = Ctx(rep, f, f"size.{s}")
+        body = size_tables.get(s)
+        if not isinstance(body, dict):
+            c.error(f"the [size.{s}] table is missing")
+            continue
+        for who in SIZE_AUDIENCES:
+            get_text(c, body, who)
+
+    c = Ctx(rep, f, "courtside")
+    courtside = rec.get("courtside")
+    if isinstance(courtside, dict):
+        get_number(c, courtside, "max_rows_per_week", ge=1, integer=True)
+    else:
+        c.error("the [courtside] table is missing")
+    c = Ctx(rep, f, "bell")
+    bell = rec.get("bell")
+    if isinstance(bell, dict):
+        get_number(c, bell, "keep_days", ge=1, integer=True)
+    else:
+        c.error("the [bell] table is missing")
+
+    tools = rec.get("tool") if isinstance(rec.get("tool"), dict) else {}
+    for name in TOOLS:
+        c = Ctx(rep, f, f"tool.{name}")
+        body = tools.get(name)
+        if not isinstance(body, dict):
+            c.error(f"the [tool.{name}] table is missing")
+        elif name == "amirs_pick":
+            if "title" not in body:
+                c.error("title is missing (the title Amir's Pick awards)")
+            check_title_ref(c, body, w)
+
+    for mid, m in entries(rec, "message", f, rep).items():
+        c = Ctx(rep, f, f"message.{mid}")
+        get_text(c, m, "en")
+        if "fa" not in m:
+            c.error("fa is missing (it may be empty: the Farsi is Amir's to write)")
+        elif not isinstance(m["fa"], str):
+            c.error(f"fa must be text, found {m['fa']!r}")
+        warn_unknown(c, m, "message")
+
+
+# ── Rule 10: the brand rule ───────────────────────────────────────────────────────────────────────────────────────
+
+def strings_in(node, path):
+    if isinstance(node, str):
+        yield path, node
+    elif isinstance(node, dict):
+        for k, v in node.items():
+            yield from strings_in(v, f"{path}.{k}" if path else str(k))
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            yield from strings_in(v, f"{path}[{i}]")
+
+
+def check_brand(data, rep):
+    for stem in FILES:
+        if data[stem] is None:
+            continue
+        for path, text in strings_in(data[stem], ""):
+            for m in BANNED_WORDS.finditer(text):
+                rep.error(f"{stem}.toml", path, f"the word {m.group(0)!r} is not allowed in any string "
+                                                 f"(brand rule: no gold, yellow, amber or ochre, ever)")
+
+
+# ── Rule 11: coverage ─────────────────────────────────────────────────────────────────────────────────────────────
+
+def check_coverage(data, w, rep):
+    # Missions are actions for one week, and none asks for progress on purpose: a personal best can't be ordered for a
+    # week without pushing past the RPE the plan sets (CAREER_MODE.md → Weekly missions). Progress lives in badges,
+    # achievements and quests, so the missions shelf is only asked to cover the other three meanings.
+    shelves = [("badges", "badge", MEANINGS), ("achievements", "achievement", MEANINGS), ("titles", "title", MEANINGS),
+               ("missions", "mission", [m for m in MEANINGS if m != "progress"])]
+    for stem, key, wanted in shelves:
+        if data[stem] is None:
+            continue
+        section = data[stem].get(key)
+        have = {e["meaning"] for e in (section.values() if isinstance(section, dict) else [])
+                if isinstance(e, dict) and isinstance(e.get("meaning"), str)}
+        for meaning in wanted:
+            if meaning not in have:
+                rep.warn(f"{stem}.toml", "coverage", f"no {key} has the meaning {meaning!r}")
+    if data["missions"] is None:
+        return
+    section = data["missions"].get("mission")
+    missions = [m for m in section.values() if isinstance(m, dict)] if isinstance(section, dict) else []
+    for slot in SLOTS:
+        if not any(m.get("slot") == slot for m in missions):
+            rep.warn("missions.toml", "coverage", f"no mission in the {slot!r} slot")
+    for habit in (w.weights or []):
+        if habit in ("strength", "custom"):
+            continue
+        if not any(m.get("slot") == "recovery" and m.get("habit") == habit for m in missions):
+            rep.warn("missions.toml", "coverage", f"no recovery mission for the habit {habit!r}")
+
+
+# ── The run, and the summary ──────────────────────────────────────────────────────────────────────────────────────
+
+def check_folder(folder):
+    rep = Report()
+    data = load_all(folder, rep)
+    w = World(data)
+    if data["rulebook"] is not None:
+        check_rulebook(data["rulebook"], rep)
+    if data["titles"] is not None:
+        check_titles(data["titles"], w, rep)
+    if data["badges"] is not None:
+        check_badges(data["badges"], w, rep)
+    if data["achievements"] is not None:
+        check_achievements(data["achievements"], w, rep)
+    if data["missions"] is not None:
+        check_missions(data["missions"], w, rep)
+    if data["quests"] is not None:
+        check_quests(data["quests"], w, rep)
+    if data["recognition"] is not None:
+        check_recognition(data["recognition"], w, rep)
+    if data["titles"] is not None:
+        check_title_use(w, rep)
+    check_brand(data, rep)
+    check_coverage(data, w, rep)
+    return rep, data
+
+
+def count_of(data, stem, key):
+    section = data[stem].get(key) if data[stem] is not None else None
+    return len(section) if isinstance(section, dict) else 0
+
+
+def print_summary(folder, data):
+    print(f"Career Mode catalogue: {folder}\n")
+    print("Entries per file")
+    rows = [("rulebook.toml", [("facts", "rulebook", "fact")]),
+            ("badges.toml", [("badges", "badges", "badge")]),
+            ("achievements.toml", [("achievements", "achievements", "achievement")]),
+            ("titles.toml", [("titles", "titles", "title"), ("skins", "titles", "skin")]),
+            ("missions.toml", [("missions", "missions", "mission")]),
+            ("quests.toml", [("quests", "quests", "quest")]),
+            ("recognition.toml", [("messages", "recognition", "message")])]
+    for fname, parts in rows:
+        stem = fname[:-5]
+        if data[stem] is None:
+            print(f"  {fname:<18} not read")
+        else:
+            print(f"  {fname:<18} " + ", ".join(f"{count_of(data, s, k)} {label}" for label, s, k in parts))
+
+    columns = [("badges", "badge"), ("achievements", "achievement"), ("titles", "title"), ("missions", "mission"),
+               ("quests", "quest")]
+    table = {m: [0] * len(columns) for m in MEANINGS}
+    other = [0] * len(columns)
+    for col, (stem, key) in enumerate(columns):
+        section = data[stem].get(key) if data[stem] is not None else None
+        for e in (section.values() if isinstance(section, dict) else []):
+            meaning = e.get("meaning") if isinstance(e, dict) else None
+            (table[meaning] if isinstance(meaning, str) and meaning in table else other)[col] += 1
+    print("\nBy meaning")
+    print(f"  {'':<13}" + "".join(f"{stem:>14}" for stem, _ in columns))
+    for m in MEANINGS:
+        print(f"  {m:<13}" + "".join(f"{n:>14}" for n in table[m]))
+    print(f"  {'other':<13}" + "".join(f"{n:>14}" for n in other) + "   (chosen, season, level)")
+
+
+def print_problems(rep):
+    for level, label in (("ERROR", "Errors"), ("WARN", "Warnings")):
+        items = rep.of(level)
+        print(f"\n{label} ({len(items)})")
+        for _, file, ident, msg in items:
+            print(f"  {level:<5} {file}" + (f" [{ident}]" if ident else "") + f"  {msg}")
+        if not items:
+            print("  none")
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description="Check Career Mode's catalogue (career/*.toml).")
+    ap.add_argument("folder", nargs="?", default=str(DEFAULT_FOLDER), help="the folder to check (default: career/)")
+    args = ap.parse_args(argv)
+    folder = pathlib.Path(args.folder)
+    if not folder.is_dir():
+        print(f"{folder} is not a folder", file=sys.stderr)
+        return 2
+    rep, data = check_folder(folder)
+    print_summary(folder, data)
+    print_problems(rep)
+    errors, warnings = len(rep.of("ERROR")), len(rep.of("WARN"))
+    print(f"\n{'FAIL' if errors else 'OK'}: {errors} error{'s' if errors != 1 else ''}, "
+          f"{warnings} warning{'s' if warnings != 1 else ''}")
+    return 1 if errors else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

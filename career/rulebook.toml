@@ -1,0 +1,276 @@
+# Career Mode · the rulebook
+#
+# Every number the scorer uses. Change a number, run `python scripts/check_career.py`, and (once built) re-seed:
+# every athlete's XP and level are worked out again from their facts, and nothing already minted is taken back (GAME-1).
+#
+# First draft, 2026-10-17. The numbers are here so the shape is visible: with them a perfect week on a 3-day plan is
+# about 3,900 XP and training is 46% of it (today 15-19%, decision 4). Tune freely.
+
+version = 1
+meanings = ["consistency", "commitment", "progress", "resilience"]
+
+[level]
+# The cost of level n to n+1 is base × n^growth, rounded to 10 (Proof's curve today, XP_SYSTEM.md §2).
+base = 300                # re-anchored in phase 1 so two months of solid work, training included, still reaches level 20
+growth = 0.55             # raise it to make the top end slower, lower it to make it faster
+ranks = ["ROOKIE", "CONTENDER", "GRINDER", "OPERATOR", "ENFORCER", "PREDATOR", "MACHINE", "RELENTLESS", "UNTOUCHABLE", "IMMORTAL"]
+levels_per_rank = 5
+prestige_after = 50       # level 51 is ★1 ROOKIE 1, and so on, with no ceiling
+resets = false            # decision 1: the level is the career and never resets
+
+[season]
+board = "season points"   # the board ranks the XP earned inside the current season
+title_points = 2000       # season points that earn the season's title (Proof used "level 5 inside the season", 1,930 XP)
+starts_only_on = "Amir's word, with start_season()"
+
+[week]
+missions = "monday-sunday"   # decision 5: one week for everyone, in each athlete's local time
+held_week = "plan week"      # a held week follows the cycle's own training week (cycleWeekInfo())
+
+[share]
+mission = 0.5             # GAME-7: a mission pays this share of the XP of the work inside it, the same for every mission
+quest = 0.5               # the same rule for a personal quest
+mission_sweep = 200       # all three of a week's missions done
+
+[habits]
+# AA Proof's habit values as they are today (XP_RULES in habits.html). They carry over unchanged.
+completion_bonus = 1.2    # a habit that reaches its target pays weight × 1.2; part way, it pays its share of the weight
+daily_cap = 3             # a counter takes at most 3 × its target in a day
+max_custom = 3            # at most three custom habits pay in a day
+lapse_days = 3            # this many days off target in a row make a lapse (the comeback rule)
+comeback_stick = 7        # days held after a comeback for it to count as one that stuck (BACK IN THE FIGHT)
+
+[habits.weights]
+strength = 0              # the WORKOUT habit: 0 here because the session fact pays instead (it was 100)
+steps = 60
+sleep = 50
+fuel = 40
+water = 30
+mobility = 30
+breathe = 20
+supps = 20
+custom = 25
+
+
+# ── Facts from the training app ───────────────────────────────────────────────────────────────────────────────────
+
+[fact.session_finished]
+meaning = "commitment"
+xp = 400
+source = "training"
+pays_for = "act"
+when = "A session from the plan is finished with Done."
+cap = "One per plan day per training week. A day repeated in the same week pays once."
+
+[fact.session_finished_early]
+meaning = "commitment"
+xp = 200
+source = "training"
+pays_for = "act"
+when = "A session from the plan is finished with Finish early."
+cap = "As session_finished. It still counts toward a held week."
+
+[fact.full_log]
+meaning = "commitment"
+xp = 50
+source = "training"
+pays_for = "act"
+when = "Every working set of a finished session is logged as the card asks."
+cap = "One per session."
+
+[fact.checkin_done]
+meaning = "commitment"
+xp = 20
+source = "training"
+pays_for = "act"
+when = "The check-in is answered before the session. The answers themselves are never paid (GAME-5)."
+cap = "One per session."
+
+[fact.retest_done]
+meaning = "commitment"
+xp = 50
+source = "training"
+pays_for = "act"
+when = "A test-flagged lift is logged in its test week."
+cap = "One per lift per cycle."
+
+[fact.library_session]
+meaning = "commitment"
+xp = 100
+source = "training"
+pays_for = "act"
+when = "A Library session is marked done."
+cap = "Two a week. It never counts toward a held week."
+
+
+# ── Facts from AA Proof ───────────────────────────────────────────────────────────────────────────────────────────
+
+[fact.habit_done]
+meaning = "consistency"
+xp_from = "habits"
+source = "proof"
+pays_for = "act"
+when = "A habit is done, or part done on a counter, on a day."
+cap = "daily_cap and max_custom, in [habits]."
+
+[fact.day_on_target]
+meaning = "consistency"
+xp = 0
+source = "proof"
+pays_for = "act"
+when = "A day passes Proof's two-door gate (dayQualifies()). It pays through badges, not by itself."
+
+[fact.perfect_day]
+meaning = "commitment"
+xp = 0
+source = "proof"
+pays_for = "act"
+when = "Every habit on the day's list is done (isPerfect()). It pays through badges, not by itself."
+
+[fact.workout_tick]
+meaning = "commitment"
+xp = 0
+source = "proof"
+pays_for = "act"
+when = "Proof's WORKOUT habit is ticked by a finished session. It keeps the day streak whole; the session fact pays."
+
+
+# ── Facts the server works out (P2) ───────────────────────────────────────────────────────────────────────────────
+
+[fact.week_held]
+meaning = "consistency"
+xp = 400
+source = "server"
+pays_for = "act"
+when = "Every plan day of a training week has a finished session, in any order."
+cap = "One per training week."
+
+[fact.week_broken]
+meaning = "consistency"
+xp = 0
+source = "server"
+pays_for = "nothing"
+when = "A training week ends short of the plan. Never between cycles, never while Amir has paused the athlete."
+
+[fact.bounce_back]
+meaning = "resilience"
+xp = 100
+source = "server"
+pays_for = "act"
+when = "A week held straight after a broken one."
+
+[fact.training_return]
+meaning = "resilience"
+xp = 50
+source = "server"
+pays_for = "act"
+when = "The first held week after two or more weeks with no session (between-cycle and paused weeks don't count)."
+
+[fact.comeback]
+meaning = "resilience"
+xp = 50
+source = "server"
+pays_for = "act"
+when = "Proof's rule: a day on target after lapse_days or more days that weren't, with an earlier day on target before them."
+
+[fact.personal_best]
+meaning = "progress"
+xp = 150
+source = "server"
+pays_for = "progress"
+when = "A finished session's best set for a lift beats every earlier number for that lift. A lift's first time is not a best."
+cap = "One per lift per session."
+
+[fact.effort_win]
+meaning = "progress"
+xp = 200
+source = "server"
+pays_for = "progress"
+when = "At a cycle's end, each of its top three effort-matched wins (cycleWins(): heavier at the same effort, 2% or more)."
+cap = "Three per cycle."
+
+[fact.retest_beaten]
+meaning = "progress"
+xp = 300
+source = "server"
+pays_for = "progress"
+when = "A retest beats the lift's previous test, or its record when there was no test."
+cap = "One per lift per cycle."
+
+[fact.cycle_finished]
+meaning = "commitment"
+xp = 1000
+source = "server"
+pays_for = "act"
+when = "The day after a cycle's end date, with at least min_share of its planned sessions finished."
+min_share = 0.8
+
+[fact.roadmap_finished]
+meaning = "commitment"
+xp = 3000
+source = "server"
+pays_for = "act"
+when = "The roadmap's last cycle is finished."
+
+[fact.mission_done]
+meaning = "consistency"
+xp_from = "mission"
+source = "server"
+pays_for = "act"
+when = "A weekly mission reaches its target (P6). It pays the XP frozen when the mission was planned."
+
+[fact.mission_sweep]
+meaning = "consistency"
+xp_from = "share.mission_sweep"
+source = "server"
+pays_for = "act"
+when = "All three of a week's missions are done."
+cap = "One per mission week."
+
+[fact.quest_done]
+meaning = "quest"
+xp_from = "quest"
+source = "server"
+pays_for = "act"
+when = "A personal quest's last step closes (P7). It pays its share of the work its steps counted."
+
+
+# ── Facts from Amir ───────────────────────────────────────────────────────────────────────────────────────────────
+
+[fact.commendation]
+meaning = "chosen"
+xp = 300
+source = "coach"
+pays_for = "act"
+when = "Amir gives a commendation, in the meaning he chooses, with one line of why (P9)."
+
+[fact.quest_step_ticked]
+meaning = "quest"
+xp = 0
+source = "coach"
+pays_for = "act"
+when = "Amir ticks a quest step only he can judge. It pays through the quest."
+
+
+# ── Social actions: shown, never paid (GAME-6) ────────────────────────────────────────────────────────────────────
+
+[fact.kudos]
+meaning = "none"
+xp = 0
+source = "proof"
+pays_for = "nothing"
+when = "A kudos given on the Bell."
+
+[fact.roll_call]
+meaning = "none"
+xp = 0
+source = "proof"
+pays_for = "nothing"
+when = "A roll call line. It never paid and never will."
+
+[fact.share]
+meaning = "none"
+xp = 0
+source = "proof"
+pays_for = "nothing"
+when = "A share card saved or shared."

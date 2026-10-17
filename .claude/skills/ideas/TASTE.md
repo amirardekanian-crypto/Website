@@ -5,6 +5,13 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-17 · "go with your picks", then: the system goes into files he can read and change.** *"remeber to write
+  down the functions and procedures into files i can then change, adjust or anything. i need to have this gamification
+  system somewhere i can read and think about"*. So a picked system lands in the repo as plain docs (what it is and why;
+  every procedure step by step) plus data files he edits (the numbers, the catalogue), with a checker. `career/` is the
+  pattern. The Artifact is the pitch; the repo is the record he thinks with. Mid-turn, the same day: *"use cheaper agents
+  for tasks that are easier. you can even create things in other chats"*.
+
 - **2026-10-17 · The SYSTEM first, then features.** After round 3 (Bragging Rights) he picked no single idea and
   asked for the whole system: *"first i want to create a system that celebrates achievements and progress and
   consistency / any meaningful action earns progress and get recognised by the client, the coach, and a community /

@@ -613,6 +613,18 @@ mock Supabase, with and without the fix. Nine deliberate breakages of the functi
 
 ---
 
+### The Career Mode guard (`scripts/check_career.py`, 2026-10-17)
+
+Pre-commit guard 20, run when a `career/*.toml` file or the checker is staged. `career/` is the design of the gamification
+system (`career/CAREER_MODE.md`; not built yet), kept as seven `.toml` files Amir edits by hand: the rulebook, badges,
+achievements, titles, missions, quests and recognition. The checker (standard library only, `tomllib`) blocks a reward with
+no meaning, a fact nobody defined, a mission with a fixed XP of its own (GAME-7), a title or tier that points at nothing,
+tiers out of order, metals out of order and the banned colour words; coverage gaps (a meaning with no badge, a habit with no
+recovery mission) are warnings. `scripts/test_check_career.py` (43 tests on temp copies) runs when the checker or its test is
+staged; each of 24 rules was disabled once on a throwaway copy, and its test failed every time.
+
+---
+
 ### Support Files (Hosting & Search Engines)
 
 #### `CNAME`

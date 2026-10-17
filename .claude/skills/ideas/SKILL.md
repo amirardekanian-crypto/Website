@@ -30,6 +30,11 @@ know where it came from. This skill is where it came from, written down so it ca
 5. **Free to run.** An idea that costs Amir an hour per athlete per week does not scale past ten
    athletes. Say the coach-time cost of every idea out loud.
 6. **Pitch, don't build.** Ideas end at a recommendation. Nothing gets built until Amir picks it.
+7. **A picked system lands in the repo, not only in an Artifact** (Amir, 2026-10-17: *"write down the functions and
+   procedures into files i can then change, adjust or anything … somewhere i can read and think about"*): a plain doc of
+   what it is and why, a procedures doc (every function step by step), and the numbers and catalogue as data files he
+   edits, with a checker. `career/` (Career Mode) is the reference. Hand the mechanical parts (extracting, transcribing,
+   the checker) to cheaper agents, and keep the design for the main model.
 
 ## The lenses — run all of them, not just the first that works
 

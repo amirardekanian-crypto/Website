@@ -1,0 +1,105 @@
+# Career Mode · personal quest templates
+#
+# A quest is one long goal, 2 to 12 weeks, in 2 to 5 steps (PROCEDURES.md → P7). One at a time, two at most.
+# Doors: coach (Amir assigns it), cycle (a cycle's outcome becomes it), athlete (they pick one of three Amir approved).
+# A step closes on facts, or on Amir's tick when only he can judge it. A quest is paused or extended, never failed.
+# It pays share.quest (rulebook.toml) of the work its steps counted, plus its badge, and its title if it has one.
+# Names and steps are drafts (2026-10-17): change them freely; never change an id.
+
+[quest.sleep_reset]
+name = "Sleep Reset"
+meaning = "consistency"
+weeks = 4
+doors = ["coach", "athlete"]
+free = true
+size = "milestone"
+caption = "Four weeks of real sleep."
+reward_badge = "Sleep Reset"
+origin = "new"
+steps = [
+  { name = "Your sleep target on 5 nights in a week", closes_on = "fact", counts = "habit_done", habit = "sleep", measure = "days", target = 5, within = "7 days" },
+  { name = "10 of 14 nights", closes_on = "fact", counts = "habit_done", habit = "sleep", measure = "days", target = 10, within = "14 days" },
+  { name = "20 of 28 nights", closes_on = "fact", counts = "habit_done", habit = "sleep", measure = "days", target = 20, within = "28 days" },
+]
+
+[quest.ten_thousand]
+name = "Ten Thousand"
+meaning = "consistency"
+weeks = 4
+doors = ["coach", "athlete"]
+free = true
+size = "milestone"
+caption = "Four weeks on your feet."
+reward_badge = "Ten Thousand"
+origin = "new"
+steps = [
+  { name = "Your steps target on 5 days in a week", closes_on = "fact", counts = "habit_done", habit = "steps", measure = "days", target = 5, within = "7 days" },
+  { name = "10 of 14 days", closes_on = "fact", counts = "habit_done", habit = "steps", measure = "days", target = 10, within = "14 days" },
+  { name = "21 of 28 days", closes_on = "fact", counts = "habit_done", habit = "steps", measure = "days", target = 21, within = "28 days" },
+]
+
+[quest.tournament_ready]
+name = "Tournament Ready"
+meaning = "commitment"
+weeks = 5
+doors = ["cycle", "coach"]
+free = false
+size = "milestone"
+caption = "Every week of the pre-competition cycle, held."
+reward_badge = "Tournament Ready"
+title = "match_fit"
+origin = "new"
+steps = [
+  { name = "Hold the first week", closes_on = "fact", counts = "week_held", target = 1 },
+  { name = "Hold three weeks in a row", closes_on = "fact", counts = "week_held", target = 3, run = true },
+  { name = "Finish the cycle", closes_on = "fact", counts = "cycle_finished", target = 1 },
+]
+
+[quest.first_strict_pullup]
+name = "First Strict Pull-up"
+meaning = "progress"
+weeks = 8
+doors = ["coach", "athlete"]
+free = false
+size = "milestone"
+caption = "From a band to your own bodyweight."
+reward_badge = "First Strict Pull-up"
+origin = "new"
+steps = [
+  { name = "A 5-second lowering, on video", closes_on = "coach_tick" },
+  { name = "Three 5-second lowerings in one set, on video", closes_on = "coach_tick" },
+  { name = "One strict pull-up, on video", closes_on = "coach_tick" },
+]
+
+[quest.beat_your_retest]
+name = "Beat Your Retest"
+meaning = "progress"
+weeks = 5
+doors = ["cycle", "athlete"]
+free = false
+size = "milestone"
+caption = "Train the cycle, then prove it on the test."
+reward_badge = "Beat Your Retest"
+origin = "new"
+steps = [
+  { name = "Hold three weeks", closes_on = "fact", counts = "week_held", target = 3 },
+  { name = "Do the retest", closes_on = "fact", counts = "retest_done", target = 1 },
+  { name = "Beat it", closes_on = "fact", counts = "retest_beaten", target = 1 },
+]
+
+[quest.return_to_court]
+name = "Return to Court"
+meaning = "resilience"
+weeks = 8
+doors = ["coach"]
+free = false
+size = "milestone"
+caption = "Back from an injury, one held week at a time."
+reward_badge = "Return to Court"
+title = "returned"
+origin = "new"
+steps = [
+  { name = "Your first week back, held", closes_on = "fact", counts = "week_held", target = 1 },
+  { name = "Four weeks held in a row", closes_on = "fact", counts = "week_held", target = 4, run = true },
+  { name = "Pain-free, in your own words to Amir", closes_on = "coach_tick" },
+]

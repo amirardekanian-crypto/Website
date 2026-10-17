@@ -1,5 +1,5 @@
 #!/bin/sh
-# Nineteen guards. Each runs only when its own files are staged, so a commit that
+# Twenty guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -397,6 +397,32 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^scripts/(check|t
     echo "$hdr_test" | grep -v '^ok '
     echo ""
     echo "pre-commit: BLOCKED — the skill-header guard's tests failed (details above)."
+    failed=1
+  fi
+fi
+
+# ── 20. Career Mode's files agree with each other (added 2026-10-17) ────────────────────────────────────────────────────────
+# Why: career/ is the design of the gamification system, kept as .toml files Amir edits by hand (Amir, 2026-10-17: "files i can
+# then change, adjust"). scripts/check_career.py reads all seven and blocks a reward with no meaning, a fact nobody defined, a
+# mission with its own fixed XP (GAME-7), a title that does not exist, tiers out of order, or gold. Its coverage warnings never
+# block. test_check_career.py proves the checker still fails on each fault, and runs only when the checker or its test changes.
+if git diff --cached --name-only --diff-filter=ACMD | grep -qE '^career/.+\.toml$|^scripts/check_career\.py$'; then
+  echo "pre-commit: Career Mode's files changed — checking them..."
+  if ! career_out=$("$PY" -X utf8 scripts/check_career.py 2>&1); then
+    echo "$career_out" | sed -n '/^Errors/,$p'
+    echo ""
+    echo "pre-commit: BLOCKED — a career/*.toml file has an error (details above; python scripts/check_career.py prints the whole report)."
+    failed=1
+  else
+    echo "pre-commit: Career Mode files OK."
+  fi
+fi
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^scripts/(check|test_check)_career\.py$'; then
+  echo "pre-commit: the Career Mode checker changed — running its tests..."
+  if ! career_test=$("$PY" -X utf8 scripts/test_check_career.py 2>&1); then
+    echo "$career_test" | tail -20
+    echo ""
+    echo "pre-commit: BLOCKED — the Career Mode checker's tests failed (details above)."
     failed=1
   fi
 fi
