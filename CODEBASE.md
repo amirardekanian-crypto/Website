@@ -157,6 +157,14 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   - Athlete-facing explanation is the **"Personal Records: the most you could lift once"** card
     in `APP_GUIDE` plus `CEILING_HELP` (the same prose, shown in place on the Records screen); the
     data handling is `privacy.html` §2.2. Keep all of them in step.
+- **Highlight Reel, share cards for a win (2026-10-17).** `assets/js/sharecard.js` (`window.ShareCard`, precached by `sw.js`, loaded by
+  `hlLib()` the first time a card is drawn) paints a 1080 × 1920 Story or 1080 × 1350 post on a canvas, in English or Farsi (every Farsi
+  word in its one `FA` table, drafts for Amir). program.html decides which wins and which numbers (the HIGHLIGHT REEL block at the end of
+  the main script, and its CSS block at the end of the stylesheet): the finish card's New best and Retest beaten bands (`collectWins()`,
+  `<id>_hlwin_d<N>`, raw and never synced), This cycle's *Share a win ›* and *Share your cycle*, the one-time Cycle complete / Roadmap
+  complete moment (`maybeHighlightMoment()`, `<id>_hl_seen`, synced), Share in Personal Records, and the share sheet
+  (`openShareSheet()`, a page of the one sheet; the choices in `aa_hl_prefs`, never synced). Nothing leaves the phone until the athlete taps
+  Share or Save image. `PROGRAM-APP.md` → *Highlight Reel*.
 - **The "Done" pill and the suggested-day highlight — the rules, in one place.** Both read
   `weekDoneDays()` (HOME-01, 2026-09-26): a day is done when `session_history` (HIST, via
   `get_my_history()` or its phone copy) has it inside the cycle's training week (`weekWindow()`), or
@@ -546,6 +554,11 @@ app ships. Excluded from the site with the rest of `scripts/`. How to use it: `C
 `program.html` and its pop-up (`shared.js`): the link built from the stored video link, the bar reachable once the embed has
 loaded, a Short, a non-YouTube link, the circuit pop-up on a 320 × 568 screen. `youtube-course.js` does the same for the
 course app (`tennis/app/`) in demo mode, a right-to-left page, with `tps_demo()` answered by a made-up course.
+`sharecard.js` and `highlight-reel.js` (2026-10-17) check Highlight Reel: the first paints every share card of `assets/js/sharecard.js`
+(ten templates, Story and post, English and Farsi, weights and names on and off, long names) in a page of its own and fails on text past
+its box, text in Instagram's bars, overlapping text, a Latin digit in Farsi and the EN and FA word tables drifting apart, and saves a PNG
+of each; the second runs the real app (the finish card's New best and Retest bands, This cycle's Share a win, the Cycle complete
+moment, the share sheet, Personal Records). `PROGRAM-APP.md` → *Highlight Reel*.
 `cycle-end.js` (2026-10-10) checks Home between cycles (PROG-02): the card and the week while the cycle runs and on its
 end date, Cycle complete, Up next and "Ready for Cycle N?" 4 and 40 days past, Roadmap complete on the last cycle (light,
 dark, 320 px), an undated cycle, the Repeat a session fold, Read more in place, a session under way unfolded, and Game

@@ -288,7 +288,8 @@
 // v157: program.html changed (2026-10-13): 100dvh beside 100vh (iPhone's toolbar), and an installed app asks to keep its storage.
 // v158: program.html changed (2026-10-13): its fonts come from this site (/assets/css/app-fonts.css, Space Mono added), not Google Fonts.
 // v159: habits.html and app-fonts.css changed (2026-10-17): AA Proof's strip on Home takes its fonts from /assets/css/app-fonts.css (Barlow Condensed 800 added), not Google Fonts.
-const CACHE = 'aap-v159';
+// v160: program.html changed and /assets/js/sharecard.js joins the shell (2026-10-17, Highlight Reel): share cards for a win, drawn on the phone, with no signal too.
+const CACHE = 'aap-v160';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -308,6 +309,9 @@ const SHELL = [
   '/assets/img/icon-512.png',
   // The training day's focus title (Centre Court, v124): our own copy, so it is condensed with no signal too.
   '/assets/fonts/BarlowCondensed-900.woff2',
+  // Highlight Reel's painter (v160): a win's share card is drawn on the phone, signal or not. Served cache-first by this plain URL,
+  // so a change to it needs a CACHE bump. (Its fonts, photo, mark and covers are kept as they are first used.)
+  '/assets/js/sharecard.js',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

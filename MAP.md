@@ -99,6 +99,8 @@ Three layers, in the order a designer should read them:
   [`assets/js/shared.js`](assets/js/shared.js) (nav, footer, video pop-ups, install prompt, scroll reveal).
   The Farsi homepage and product pages keep their own nav; [`assets/js/fa-nav.js`](assets/js/fa-nav.js) opens and closes their phone menu (☰).
   [`assets/js/track.js`](assets/js/track.js) counts Apply, WhatsApp and demo clicks and the apply form's steps in Plausible (funnel pages only).
+  [`assets/js/sharecard.js`](assets/js/sharecard.js) is **Highlight Reel**, the training app's share cards (a win drawn as an Instagram Story or post,
+  English or Farsi; every Farsi word in its `FA` table is a draft for Amir): [`PROGRAM-APP.md`](PROGRAM-APP.md) → *Highlight Reel*.
 - **Master marks:** [`icon-192.png`](assets/img/icon-192.png) (app tile; masters in
   [`assets/img/source/`](assets/img/source/)) ·
   [`og-image.jpg`](assets/img/og-image.jpg) (wordmark lockup / share image) ·
@@ -219,7 +221,7 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
 | Public-page style guard (ratchet on `site_style_baseline.json`) | [`scripts/check_site_style.py`](scripts/check_site_style.py) |
 | Article pages + sitemap builder | [`scripts/build_article_pages.py`](scripts/build_article_pages.py) |
 | Course app stamp (after any edit in `tennis/app/`) | [`scripts/stamp_tps_app.py`](scripts/stamp_tps_app.py) |
-| Headless suites for `program.html` (22: one per Centre Court screen, plus sign-in, session queue, clock skew, cycle dates, YouTube) | [`scripts/headless/`](scripts/headless/) (`smoke.js`, `home-progress.js`, `library.js`, `about-sheet.js`, `sheets-notices.js` …; `lib.js`, `stub.js`, `fixture.json` are the harness) |
+| Headless suites for `program.html` (24: one per Centre Court screen, plus sign-in, session queue, clock skew, cycle dates, YouTube, and Highlight Reel's two: `sharecard.js` paints every share card, `highlight-reel.js` runs its doors in the app) | [`scripts/headless/`](scripts/headless/) (`smoke.js`, `home-progress.js`, `library.js`, `about-sheet.js`, `sheets-notices.js` …; `lib.js`, `stub.js`, `fixture.json` are the harness) |
 | Headless harness for `coach.html` (117 scenarios) | [`scripts/headless/coach/`](scripts/headless/coach/README.md) |
 | Restore from a lost database (rehearsed) | [`scripts/restore/README.md`](scripts/restore/README.md) |
 | Website audit tools (screenshots, scoreboard, link check) | [`scripts/site_audit/README.md`](scripts/site_audit/README.md) |

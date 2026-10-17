@@ -2382,7 +2382,7 @@
      compact ones in a card or the session bar smaller, where their widths were measured (WK-02, WK-03).
      A new primary action joins this list; a secondary one is outlined (Guided, Reset). */
   .signin-go, .wel-go, .error-btn, .readiness-begin, .session-timer-btn:not(.guided), .step-primary-btn,
-  .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .wt-save, .rest-btn, .ex-1rm-save {
+  .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .wt-save, .rest-btn, .ex-1rm-save, .hl-share, .hl-m-go {
     background: var(--btn); color: var(--on-accent); border: 0; border-radius: 8px; min-height: 44px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
     cursor: pointer;
@@ -4778,6 +4778,142 @@
   .error-btn { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; font-size: var(--fs-body); text-align: center; text-decoration: none; }
   .error-btn.ghost { background: transparent; color: var(--green-ink); box-shadow: inset 0 0 0 1.5px var(--field); }
   .error-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+
+  /* ══ HIGHLIGHT REEL (2026-10-17) ════════════════════════════════════════════════════════════════════════════════════════════
+     Amir approved the design page (https://claude.ai/artifact/SuyYRPeX9n2SdbiUvoHhkF, "go with your picks"): a share card for each win,
+     drawn on the phone by assets/js/sharecard.js, and a celebration where each win already shows. Five places: (1) the finished card's
+     New best and Retest bands, inside its green (grid-row 5, under the signature); (2) "Share a win ›" under the This cycle card's wins,
+     and "Share your cycle" on the card once the cycle is complete; (3) the Cycle complete and Roadmap complete moment, once, full screen,
+     the Welcome's recipe (.wel); (4) Share on a lift's New best band and on each record in Personal Records; (5) the share sheet, one
+     page of the one sheet (#hist-overlay): the preview IS the exported picture, then Story|Post, English|فارسی, Show the weights, Show
+     my name, Share (the one primary button), Save image (outlined), Copy caption (quiet text) and the tip. Colours are the app's one set;
+     the bursts stop for prefers-reduced-motion. PROGRAM-APP.md → Highlight Reel. */
+
+  /* 1. The finished card's bands: a row on the card's green, a mint eyebrow, the lift and the set, a light-ring Share. */
+  :where(#day-view) .session-complete > .hl-band-slot { grid-row: 5; display: grid; gap: 10px; padding: 0 var(--g) 24px; }
+  :where(#day-view) .session-complete > .hl-band-slot:empty { display: none; }
+  .hl-band { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 64px; margin: 0; padding: 12px 12px 12px 16px;
+    border: 1px solid rgba(255,255,255,.18); border-radius: 12px; background: rgba(255,255,255,.07); color: #fff; text-align: left; cursor: pointer; overflow: hidden; }
+  .hl-band:active { background: rgba(255,255,255,.12); }
+  .hl-band:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .hl-band-t { flex: 1; min-width: 0; display: grid; gap: 4px; }
+  .hl-band-t small { display: flex; align-items: center; gap: 8px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
+  .hl-band-t small::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .hl-band-t b { font: 700 var(--fs-lead)/1.2 'Barlow Condensed', sans-serif; letter-spacing: .4px; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
+  .hl-band-t b em { font-style: normal; color: var(--clay-on-green); }
+  .hl-band-go { flex: none; display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.62);
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
+  /* the burst: two clay and mint sparks run across the band once when it first appears (never again on a reload) */
+  .hl-band.is-new { animation: hlPop .5s cubic-bezier(.2,.9,.3,1.3) both; }
+  .hl-band.is-new::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(100deg, transparent 30%, rgba(109,190,149,.35) 45%, rgba(224,107,67,.35) 55%, transparent 70%) no-repeat;
+    background-size: 220% 100%; animation: hlSweep 1.1s .25s ease-out both; }
+  @keyframes hlPop { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+  @keyframes hlSweep { from { background-position: 120% 0; } to { background-position: -120% 0; opacity: 0; } }
+
+  /* 2. On the This cycle card: a row under the wins, and the button once the cycle is complete (white on the green: a green button
+     would vanish there). */
+  .cyc-share { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 48px; margin: 4px 0 0; padding: 0;
+    border: 0; border-top: 1px solid rgba(255,255,255,.14); background: none; color: #fff; cursor: pointer; text-align: left;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .cyc-share-a { font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: rgba(255,255,255,.75); }
+  .cyc-share:focus-visible, .cyc-share-go:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .cyc-share-go { display: block; width: 100%; min-height: 48px; margin: 18px 0 2px; padding: 0 16px; border: 0; border-radius: 8px; background: #fff; color: var(--fill); cursor: pointer;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .cyc-share-go:active { transform: scale(.98); }
+
+  /* 3. The moment: the Welcome's cover and sheet, a burst of court lines from the cover's middle, the card itself small on the paper. */
+  .hl-moment { position: fixed; top: 0; bottom: 0; left: var(--app-gutter); right: var(--app-gutter); z-index: 200; display: flex; flex-direction: column; overflow-y: auto;
+    background: var(--paper); animation: fadeUp 0.35s ease both; }
+  .hl-m-hero { position: relative; isolation: isolate; flex: none; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; min-height: clamp(220px, 34vh, 340px);
+    padding: calc(env(safe-area-inset-top, 0px) + 64px) var(--g) 48px; background: var(--hero); color: var(--on-accent); }
+  .hl-m-img { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 84% 50%; mix-blend-mode: luminosity;
+    opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
+  .hl-m-img.in { opacity: .7; }
+  .hl-m-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  .hl-m-burst { position: absolute; left: 50%; top: 46%; z-index: 1; width: 0; height: 0; pointer-events: none; }
+  .hl-m-burst i { position: absolute; left: -1px; top: 0; width: 2px; height: 120px; border-radius: 1px; transform-origin: 50% 0; opacity: 0;
+    background: linear-gradient(180deg, transparent, var(--clay-on-green)); animation: hlRay 1.1s cubic-bezier(.2,.8,.2,1) both; }
+  .hl-m-burst i:nth-child(even) { background: linear-gradient(180deg, transparent, var(--mint)); height: 86px; }
+  /* each ray carries its angle as `rotate` (inline), so this translateY runs outward along it */
+  @keyframes hlRay { 0% { opacity: 0; transform: translateY(14px); } 35% { opacity: 1; } 100% { opacity: 0; transform: translateY(160px); } }
+  .hl-m-copy { position: relative; z-index: 2; }
+  .hl-m-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
+  .hl-m-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .hl-m-title { margin: 10px 0 0; max-width: 340px;
+    font: 900 clamp(32px, 10vw, 44px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the moment, 32 to 44 px */
+    letter-spacing: .3px; text-transform: uppercase; color: var(--on-accent); text-wrap: balance; }
+  .hl-m-sub { margin: 10px 0 0; font: 400 var(--fs-label)/1.4 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.82); }
+  .hl-m-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 8px); right: 8px; z-index: 3; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0;
+    border-radius: 50%; cursor: pointer; color: var(--on-accent); background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    font: 500 var(--fs-lead)/1 'Barlow', sans-serif; }
+  .hl-m-x:focus-visible { outline: 2px solid var(--on-accent); outline-offset: 2px; }
+  .hl-m-sheet { position: relative; z-index: 2; flex: 1 0 auto; margin-top: -30px; padding: 22px var(--g) calc(env(safe-area-inset-bottom, 0px) + 22px); border-radius: 16px 16px 0 0; background: var(--paper); }
+  .hl-m-card { display: flex; justify-content: center; margin: 0 0 16px; }
+  .hl-m-card img { display: block; width: auto; height: min(42vh, 360px); aspect-ratio: 9 / 16; border-radius: 12px; background: var(--hero); box-shadow: 0 10px 28px rgba(8,45,32,.28); }
+  .hl-m-sheet p { margin: 0 0 10px; font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .hl-m-sheet .wn-sign { margin-top: 8px; }
+  .hl-m-go { display: block; width: 100%; min-height: 52px; margin-top: 16px; padding: 0 16px; font-size: var(--fs-lead); }   /* look: the one primary button */
+  .hl-m-skip { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 0 12px; border: 0; background: none; color: var(--green-ink); cursor: pointer;
+    font: 600 var(--fs-body)/1 'Barlow', sans-serif; }
+  .hl-m-go:focus-visible, .hl-m-skip:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+
+  /* 4. Personal Records: Share on the New best band (on its green) and on each record's row (green text, 44 px to hit). */
+  .ceil-pr-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+  .ceil-pr-share { flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: none; cursor: pointer;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.62); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
+  .ceil-pr-share:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .ceil-pr.is-retest { border-top-color: rgba(255,255,255,.18); }
+  .ceil-row-share { flex: none; display: grid; place-items: center; min-width: 44px; height: 44px; margin: 0 2px 0 0; padding: 0 6px; border: 0; border-radius: 10px; background: transparent; cursor: pointer;
+    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
+  .ceil-row-share:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+
+  /* 5. The share sheet, a page of the one sheet. */
+  .hl-pick { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
+  .hl-pick button { min-height: 40px; max-width: 100%; padding: 0 14px; border: 1px solid var(--hair); border-radius: 999px; background: var(--row); color: var(--ink); cursor: pointer;
+    font: 600 var(--fs-small)/1.2 'Barlow', sans-serif; text-align: left; overflow-wrap: anywhere; }
+  .hl-pick button[aria-checked="true"] { border-color: var(--fill); background: var(--btn); color: #fff; }
+  .hl-pick button:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .hl-prev { position: relative; display: flex; justify-content: center; margin: 18px 0 0; }
+  .hl-prev .hl-img { display: block; width: auto; height: min(50vh, 440px); max-width: 100%; aspect-ratio: 9 / 16; border-radius: 12px; background: var(--hero); object-fit: contain;
+    box-shadow: 0 10px 28px rgba(8,45,32,.24); transition: opacity .2s ease; }
+  .hl-prev.is-post .hl-img { height: min(42vh, 380px); aspect-ratio: 4 / 5; }
+  .hl-prev.is-busy .hl-img { opacity: .55; }
+  .hl-wait { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 8px 12px; border-radius: 999px; background: rgba(6,36,26,.7);
+    font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: #fff; white-space: nowrap; }
+  .hl-prev:not(.is-busy) .hl-wait { display: none; }
+  .hl-ctl { display: grid; gap: 10px; margin: 18px 0 0; }
+  .hl-seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border: 1px solid var(--hair); border-radius: 14px; background: var(--sand); }
+  .hl-seg button { min-height: 44px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--grey); cursor: pointer;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .hl-seg button[lang="fa"] { font: 700 var(--fs-body)/1 'Vazirmatn', 'Tahoma', sans-serif; letter-spacing: 0; text-transform: none; }
+  .hl-seg button[aria-pressed="true"] { background: var(--btn); color: #fff; }
+  .hl-seg button:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .hl-tg { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 52px; padding: 0 2px; border: 0; border-top: 1px solid var(--hair);
+    background: none; color: var(--ink); cursor: pointer; text-align: left; font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; }
+  .hl-tg[hidden] { display: none; }
+  .hl-tg i { position: relative; flex: none; width: 46px; height: 28px; border-radius: 999px; background: var(--box); transition: background .2s ease; }
+  .hl-tg i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .2s ease; }
+  .hl-tg[aria-checked="true"] i { background: var(--fill); }
+  body[data-dark] .hl-tg[aria-checked="true"] i { background: var(--mark); }
+  .hl-tg[aria-checked="true"] i::after { transform: translateX(18px); }
+  .hl-tg:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .hl-share { display: block; width: 100%; min-height: 52px; margin: 16px 0 0; padding: 0 16px; font-size: var(--fs-lead); }   /* look: the one primary button */
+  .hl-share:disabled, .hl-save:disabled { opacity: .55; cursor: default; }
+  .hl-save { display: block; width: 100%; min-height: 48px; margin: 8px 0 0; padding: 0 16px; border: 0; border-radius: 8px; background: transparent; color: var(--green-ink); cursor: pointer;
+    box-shadow: inset 0 0 0 1.5px var(--field); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .hl-copy { display: block; width: 100%; min-height: 44px; margin: 4px 0 0; padding: 0 12px; border: 0; background: none; color: var(--green-ink); cursor: pointer;
+    font: 600 var(--fs-body)/1 'Barlow', sans-serif; }
+  .hl-save:focus-visible, .hl-copy:focus-visible, .hl-share:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .hl-tip { margin: 10px 0 0; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; text-align: center; color: var(--grey); text-wrap: pretty; }
+  .hl-tip b { font-weight: 600; color: var(--ink); }
+  .hl-msg { min-height: 1.4em; margin: 6px 0 0; font: 600 var(--fs-small)/1.4 'Barlow', sans-serif; text-align: center; color: var(--green-ink); }
+  @media (prefers-reduced-motion: reduce) {
+    .hl-band.is-new, .hl-band.is-new::after, .hl-moment { animation: none; }
+    .hl-m-burst { display: none; }
+    .hl-tg i, .hl-tg i::after, .hl-prev .hl-img { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -5510,6 +5646,8 @@ function _snapshot() {
     // same reason; and a cloud copy pulled back over it would wipe a session still waiting.
     // So is the note of what fileUnfinished() filed: it is said on this phone only.
     if (k === prefix + 'csq' || k === prefix + 'autofiled') continue;
+    // The finish card's New best and Retest bands (Highlight Reel): this phone's view of a session it finished, never progress.
+    if (k && k.indexOf(prefix + 'hlwin_d') === 0) continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -6553,6 +6691,7 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('screen-home').classList.add('active');
     maybeWelcome();
+    maybeHighlightMoment();   // a cycle or the roadmap just complete: its moment, once (Highlight Reel; never over the Welcome)
     // Reveal the global tab bar and mark Home (the training screen) as the
     // active tab on first load.
     const tabs = document.getElementById('global-tabs');
@@ -7005,9 +7144,15 @@ function ceilingPrevBest(lift, day) {
   const others = l.entries.filter(e => e.d !== day).map(e => e.kg);
   return others.length ? Math.max.apply(null, others) : null;
 }
+// Highlight Reel: while Done files the session's records, every new best is collected here (finishDayNow()). A var, not a let:
+// fillRecordsFrom() can run from boot, and a let declared lower down would still be in its dead zone then.
+var _hlCollect = null;
 function noteNewBest(lift, est, day) {
   const prev = ceilingPrevBest(lift, day);
   if (prev == null || !(est > prev)) return false;
+  // Done is collecting this session's new bests for the finish card's band (finishDayNow(), Highlight Reel): a session can set more
+  // than one, and _ceil_best below keeps only the last.
+  if (_hlCollect) _hlCollect.push({ lift: lift, d: day });
   try {
     localStorage.setItem(ATHLETE_ID + '_ceil_best', JSON.stringify({
       lift: lift, kg: est, prev: prev, d: day, t: Date.now(),
@@ -7773,13 +7918,17 @@ function cycleBestSet(e) {
   });
   return best;
 }
+// Each win also says its SHAPE (Highlight Reel, 2026-10-17): which of these sentences it is, so a share card words it the same way in
+// English and in Farsi (assets/js/sharecard.js) and never claims more. `share` is false for a win that only the RPE tells (felt easier):
+// true, but it means nothing to someone who does not rate effort, so it stays a private win (the design page). `same`: the RPE is
+// known and did not change. The words above stay exactly as they were.
 function winText(a, b) {
   const kg = v => String(Math.round(v * 2) / 2).replace(/\.0$/, '');
   const reps = k => '+' + k + ' rep' + (k === 1 ? '' : 's');
   const rpeKnown = a.r != null && b.r != null;
   const dr = rpeKnown ? b.r - a.r : 0;
   if (a.n == null || b.n == null) {                       // a hold: the dose is fixed, the effort tells
-    return (rpeKnown && dr < 0) ? { txt: `felt easier: RPE ${a.r} → ${b.r}`, gain: -dr * 0.03 } : null;
+    return (rpeKnown && dr < 0) ? { txt: `felt easier: RPE ${a.r} → ${b.r}`, gain: -dr * 0.03, shape: 'holdEasier', share: false } : null;
   }
   const gain = (a.idx && b.idx) ? b.idx / a.idx - 1 : 0;
   if (gain < 0.02) return null;
@@ -7787,21 +7936,23 @@ function winText(a, b) {
   const loaded = a.w != null && b.w != null;
   if (!loaded && (a.w != null || b.w != null)) return null;   // one set loaded, one not: nothing honest to say
   const dw = loaded ? Math.round((b.w - a.w) * 2) / 2 : 0, dn = b.n - a.n;
-  let txt;
+  const same = rpeKnown && dr === 0;
+  let txt, shape, share = true;
   if (!loaded) {
-    txt = dn > 0 && dr <= 0 ? `${reps(dn)}${rpeKnown && dr === 0 ? ', same RPE' : ''}`
-        : dn === 0 && dr < 0 ? `${b.n} reps felt easier: RPE ${a.r} → ${b.r}`
-        : `about ${pct}% stronger`;
-  } else if (dw > 0 && dn === 0 && dr === 0) txt = `+${kg(dw)} kg, same reps${rpeKnown ? ', same RPE' : ''}`;
-  else if (dw > 0 && dn === 0 && dr < 0)     txt = `+${kg(dw)} kg, and it felt easier`;
-  else if (dw > 0 && dn > 0 && dr <= 0)      txt = `+${kg(dw)} kg and ${reps(dn)}`;
-  else if (dw === 0 && dn > 0 && dr <= 0)    txt = `${reps(dn)} at ${kg(b.w)} kg${rpeKnown && dr === 0 ? ', same RPE' : ''}`;
-  else if (dw === 0 && dn === 0 && dr < 0)   txt = `${kg(b.w)} kg × ${b.n} felt easier: RPE ${a.r} → ${b.r}`;
-  else if (dw > 0 && dr > 0)                 txt = `heavier and harder: about ${pct}% stronger`;
-  else if (dw > 0 && dn < 0)                 txt = `heavier for fewer reps: about ${pct}% stronger`;
-  else if (dw < 0 && dn > 0)                 txt = `more reps with less: about ${pct}% stronger`;
-  else                                       txt = `about ${pct}% stronger at the same effort`;
-  return { txt, gain };
+    if (dn > 0 && dr <= 0)               { txt = `${reps(dn)}${same ? ', same RPE' : ''}`; shape = 'bwReps'; }
+    else if (dn === 0 && dr < 0)         { txt = `${b.n} reps felt easier: RPE ${a.r} → ${b.r}`; shape = 'bwEasier'; share = false; }
+    else                                 { txt = `about ${pct}% stronger`; shape = 'pctBw'; share = dn > 0; }
+  } else if (dw > 0 && dn === 0 && dr === 0) { txt = `+${kg(dw)} kg, same reps${rpeKnown ? ', same RPE' : ''}`; shape = 'kg'; }
+  else if (dw > 0 && dn === 0 && dr < 0)     { txt = `+${kg(dw)} kg, and it felt easier`; shape = 'kgEasier'; }
+  else if (dw > 0 && dn > 0 && dr <= 0)      { txt = `+${kg(dw)} kg and ${reps(dn)}`; shape = 'kgReps'; }
+  else if (dw === 0 && dn > 0 && dr <= 0)    { txt = `${reps(dn)} at ${kg(b.w)} kg${same ? ', same RPE' : ''}`; shape = 'reps'; }
+  else if (dw === 0 && dn === 0 && dr < 0)   { txt = `${kg(b.w)} kg × ${b.n} felt easier: RPE ${a.r} → ${b.r}`; shape = 'easier'; share = false; }
+  else if (dw > 0 && dr > 0)                 { txt = `heavier and harder: about ${pct}% stronger`; shape = 'pctHarder'; }
+  else if (dw > 0 && dn < 0)                 { txt = `heavier for fewer reps: about ${pct}% stronger`; shape = 'pctFewer'; }
+  else if (dw < 0 && dn > 0)                 { txt = `more reps with less: about ${pct}% stronger`; shape = 'pctLess'; }
+  // Less weight for no more reps, "stronger" only because it felt easier: the app says so, a public card does not.
+  else                                       { txt = `about ${pct}% stronger at the same effort`; shape = 'pctSame'; share = false; }
+  return { txt, gain, shape, same, pct, share };
 }
 function cycleWins(rows) {
   const lifts = {};
@@ -7811,6 +7962,7 @@ function cycleWins(rows) {
     const best = cycleBestSet(e);
     if (!name || !best) return;
     const k = histNorm(name);
+    best.date = sess.date;   // a share card names the week each set was lifted in
     (lifts[k] = lifts[k] || { name, sets: [] }).sets.push(best);
   }));
   const wins = [];
@@ -7825,7 +7977,8 @@ function cycleWins(rows) {
       else if (x.idx == null && b.idx == null && x.r != null && (b.r == null || x.r < b.r)) b = x;
     });
     const w = b && winText(a, b);
-    if (w) wins.push({ name: L.name, txt: w.txt, gain: w.gain });
+    // a and b: the first session's best set and the best since, as lifted ({ w, n, r, idx, date }), for the share card.
+    if (w) wins.push({ name: L.name, txt: w.txt, gain: w.gain, shape: w.shape, same: w.same, pct: w.pct, share: w.share, a, b });
   });
   return wins.sort((x, y) => y.gain - x.gain).slice(0, 3);
 }
@@ -7886,8 +8039,12 @@ function paintCycleCard() {
     ? `<span class="cyc-bar cyc-bar-solid"><i style="width:${Math.min(100, Math.round(on / n * 100))}%"></i></span>`
     : `<span class="cyc-bar">${Array.from({ length: n }, (_, i) => `<i${i < on ? ' class="on"' : ''}></i>`).join('')}</span>`;
   // No wins yet: nothing in that place (Amir, 2026-10-12: the "Your wins show here" line is gone).
+  // Highlight Reel (2026-10-17): one row under the wins opens the share sheet with each win to pick from. A win only the RPE tells
+  // (felt easier) is not offered, so the row shows only when one can be shared. Never in the coach's preview.
+  const canShare = !window.IS_PREVIEW && p.wins.some(w => w.share);
   const wins = p.wins.length
     ? `<span class="cyc-wins-h">Wins this cycle</span>` + p.wins.map(w => `<span class="cyc-win"><span>${esc(w.name)}</span><b>${esc(w.txt)}</b></span>`).join('')
+      + (canShare && !p.over ? `<button type="button" class="cyc-share" onclick="openShareWins()"><span>Share a win</span><span class="cyc-share-a" aria-hidden="true">›</span></button>` : '')
     : '';
   // The picture, graded into the green by CSS (luminosity, masked from the left, a scrim to the cover's last colour). A file that is
   // missing leaves the green (cycleImgError()).
@@ -7906,6 +8063,7 @@ function paintCycleCard() {
              : `<span class="cyc-row"><span class="cyc-k">Week ${p.wk.total}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.total)}</span>`}
       <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} sessions</small></span>${bar(p.planned, p.done)}</span>
       ${wins}
+      ${window.IS_PREVIEW || !p.done ? '' : `<button type="button" class="cyc-share-go" onclick="openShareCycle()">${last ? 'Share the whole road' : 'Share your cycle'}</button>`}
     </div></div>`);
     return;
   }
@@ -8310,6 +8468,8 @@ function renderHome() {
       <div class="complete-title">${esc(day.completionTitle)}</div>
       <div class="complete-sub">${esc(day.completionMessage)}</div>
       <div class="complete-by">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>
+      <!-- Highlight Reel (2026-10-17): a New best or a Retest beaten in this session, each with Share (paintWinBand()) -->
+      <div class="hl-band-slot" id="hlwin-${day.id}"></div>
       <!-- After a sore check-in: the day-after session, until it has been opened (LIB-01, paintSoreSugg()) -->
       <div class="complete-sugg-slot" id="sugg-${day.id}"></div>
       <!-- Confirms the WORKOUT habit was ticked in Proof, so the athlete can
@@ -9422,6 +9582,8 @@ const APP_GUIDE = [
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
     body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
+  { icon: 'activity', key: 'share', title: 'Share a win',
+    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Once a week</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
@@ -9623,6 +9785,7 @@ function _visibleBtn(root, sel) {
 function topLayer() {
   const on = id => { const e = document.getElementById(id); return !!(e && e.classList.contains('visible')); };
   if (document.querySelector('.wel')) return () => { const w = document.querySelector('.wel'); if (w) w.remove(); };   // the Welcome sits over everything
+  if (document.querySelector('.hl-moment')) return closeMoment;   // a cycle's moment (Highlight Reel), the Welcome's recipe
   const vm = document.querySelector('.video-modal.is-open');
   if (vm) return () => window.VideoModal && window.VideoModal.close();
   if (on('timerOverlay')) return closeTimer;
@@ -10482,8 +10645,14 @@ function renderCeilingLift(lift) {
   let best = null;
   try { best = JSON.parse(localStorage.getItem(ATHLETE_ID + '_ceil_best') || 'null'); } catch (e) {}
   const fresh = best && best.lift === lift && best.t && (Date.now() - best.t) < 7 * 864e5;
-  const band = fresh
-    ? `<div class="ceil-pr"><div class="ceil-pr-k">New best</div><div class="ceil-pr-t">${Math.round((best.kg - best.prev) * 10) / 10} kg over your last best</div></div>` : '';
+  // Highlight Reel (2026-10-17): the band gets Share when its record makes a card (the set as lifted beat a best before it), and a
+  // retest logged here in the last 7 days that beat the one before gets its own band.
+  const canBest = fresh && !window.IS_PREVIEW && !!hlBestSpec(lift, best.d);
+  const share = (fn, what) => `<button type="button" class="ceil-pr-share" onclick="${fn}()" aria-label="Share your ${what}">Share</button>`;
+  const rt = !window.IS_PREVIEW && hlLiftRetest(lift);
+  const band = (rt ? `<div class="ceil-pr is-retest"><div class="ceil-pr-k">Retest beaten</div><div class="ceil-pr-row"><div class="ceil-pr-t">${esc(hlSetText(rt))}</div>${share('openShareRetest', 'retest')}</div></div>` : '')
+    + (fresh && !(rt && rt.now.date === best.d)   // the same day's test is said once, as the retest
+    ? `<div class="ceil-pr"><div class="ceil-pr-k">New best</div><div class="ceil-pr-row"><div class="ceil-pr-t">${Math.round((best.kg - best.prev) * 10) / 10} kg over your last best</div>${canBest ? share('openShareBest', 'new best') : ''}</div></div>` : '');
 
   const v = l.entries.map(e => e.kg);
   const lo = Math.min(...v), hi = Math.max(...v), span = (hi - lo) || 1;
@@ -10499,11 +10668,13 @@ function renderCeilingLift(lift) {
   // the pair the record is actually keyed on. l.lift may be the current
   // programme's name for a lift filed under an older one (see ceilAliasMap), so
   // deleting by the heading would miss the row sitting right there on screen.
+  // A row that set a record (it beat every entry before it) can be shared as a New best card, any time (Highlight Reel).
   const rows = l.entries.slice().reverse().map((e, i) => `
     <div class="ceil-row">
       <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} kg × ${e.r} @ RPE ${e.rpe}${
         e.test ? ' · tested' : e.auto ? ' · from your sets' : ''}</span>
       <b>${e.kg} kg</b>
+      ${!window.IS_PREVIEW && hlBestSpec(lift, e.d) ? `<button type="button" class="ceil-row-share" onclick="openShareRecord(${i})" aria-label="Share this record">Share</button>` : ''}
       <button type="button" class="wt-del" onclick="armedTap(this, 'Delete?', () => removeCeilingEntry(${i}))"
         aria-label="Delete this entry">✕</button>
     </div>`).join('');
@@ -12377,8 +12548,12 @@ function finishDayNow(day, card) {
   completeEl.classList.add('visible');
   completeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   // The record for the coach dashboard, and the report, once (the outbox keeps it
-  // until it goes: sendReport()).
+  // until it goes: sendReport()). Its first step (before any await) files this session's Personal Records; every new best it
+  // finds is collected for the finish card's New best band (Highlight Reel, collectWins()).
+  _hlCollect = [];
   recordSessionToCloud(day);
+  const _hlBests = _hlCollect; _hlCollect = null;
+  collectWins(day, _hlBests);
   sendReport(day);
   // Both above built the record from the live keys before their first await. Now the session closes: the day keeps its
   // own copy and the per-name keys start the next day clean (closeSessionAtDone()).
@@ -13156,6 +13331,7 @@ function restoreState() {
       const el = document.getElementById('complete-' + day);
       if (el) el.classList.add('visible');
       paintSoreSugg(day);
+      paintWinBand(day, true);   // the session's New best or Retest band, as it was at Done (quietly: no burst again)
     }
     updateProgress(day);
   });
@@ -15922,6 +16098,7 @@ function wrapSheetOpeners() {
   openQualitySheet = sheetWrap(openQualitySheet);
   openAccount = sheetWrap(openAccount); openHelp = sheetWrap(openHelp);   // Help from the account: ‹ Back
   window.openAccount = openAccount; window.openHelp = openHelp;
+  openShareSheet = sheetWrap(openShareSheet); window.openShareSheet = openShareSheet;   // Highlight Reel's share sheet
   window.openHistorySheet = openHistorySheet; window.openExerciseSheet = openExerciseSheet;
   window.openWhyPlan = openWhyPlan; window.openQualitySheet = openQualitySheet;
   const close0 = closeHistorySheet;
@@ -16657,6 +16834,483 @@ function renderExerciseLibrary() {
   list.querySelectorAll('.xl-row').forEach(b => b.addEventListener('click', () => openExerciseSheet(b.dataset.id, xlCardFor(b.dataset.id), true)));
 }
 window.renderExerciseLibrary = renderExerciseLibrary;
+
+// ══ HIGHLIGHT REEL: share cards for a win, and a moment for each (2026-10-17) ══════════════════════════════════════════════
+// Amir: celebrate athletes' wins and let them share them on Instagram. He approved the design page
+// (https://claude.ai/artifact/SuyYRPeX9n2SdbiUvoHhkF) with "go with your picks": all five cards at once, the athlete picks English or
+// Farsi, the weights shown with a switch to hide them, his photo and signature on every card, the name Highlight Reel. The cards are
+// drawn on the phone by assets/js/sharecard.js (loaded the first time one is drawn; sw.js keeps it for no signal). This block decides
+// WHICH wins and WHICH numbers, from the app's own rules, so a card can never say more than the app does (PROG-01):
+//   · New best: a session's best set that beat every earlier one for the lift (fillRecordsFrom() → noteNewBest()), the set as lifted
+//     (w × r from the record), never the estimate; the gain only against the best before it at the same reps (or the same weight).
+//   · Same effort: one of the This cycle card's wins (cycleWins() keeps its two sets), never one only the RPE tells.
+//   · Retest beaten (new): a test-flagged lift in the retest window, against the previous test of the same lift, else the best before
+//     the cycle. Beaten means more weight for at least the reps, or more reps for at least the weight: what the sets show.
+//   · Signed off and The distance: the cycle's and the roadmap's own numbers, past the end date (cycleOver()).
+// Never: body weight, a check-in answer, pain, an RPE-only claim. Nothing leaves the phone until the athlete taps Share or Save image.
+// Never in the coach's preview. PROGRAM-APP.md → Highlight Reel. Career Mode's reward cards (badge, achievement, title, level, quest)
+// open the same sheet and the same moment (openShareSheet(), openMoment()) once phase 3 feeds them (career/CAREER_MODE.md → Recognition).
+let _hlLibP = null;
+function hlLib() {
+  if (window.ShareCard) return Promise.resolve(window.ShareCard);
+  if (_hlLibP) return _hlLibP;
+  _hlLibP = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = '/assets/js/sharecard.js';
+    s.onload = () => (window.ShareCard ? res(window.ShareCard) : rej(new Error('sharecard')));
+    s.onerror = () => { s.remove(); _hlLibP = null; rej(new Error('sharecard')); };
+    document.head.appendChild(s);
+  });
+  return _hlLibP;
+}
+function hlFirst() { return (DATA && DATA.athlete && DATA.athlete.firstName) || ''; }
+// The dated cycle a calendar day falls in (its index), else -1.
+function hlCycleIdxOf(iso) {
+  const cs = (DATA && DATA.cycles) || [], d = cycleDayNo(iso);
+  if (isNaN(d)) return -1;
+  for (let i = 0; i < cs.length; i++) {
+    const c = cs[i];
+    if (c && c.startDate && c.endDate && d >= cycleDayNo(c.startDate) && d <= cycleDayNo(c.endDate)) return i;
+  }
+  return -1;
+}
+// { n, of, name } for the card's eyebrow: the cycle a day falls in, else the current one.
+function hlCycleOf(iso) {
+  const cs = (DATA && DATA.cycles) || [];
+  let i = iso ? hlCycleIdxOf(iso) : -1;
+  if (i < 0) i = Number.isInteger(DATA && DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+  const c = cs[i];
+  return c ? { n: i + 1, of: cs.length, name: c.name || '' } : null;
+}
+// A lift's records as Personal Records shows them (renames joined, one entry a day, oldest first).
+function hlLiftEntries(lift) { const l = ceilingLifts().find(x => x.lift === lift); return l ? l.entries : []; }
+// A New best card for the record set on `day`: the set as lifted, and the best before it (the bar it beat) as lifted. A first record
+// beats nothing, so it has no card (the same rule as noteNewBest()).
+function hlBestSpec(lift, day) {
+  const es = hlLiftEntries(lift), e = es.find(x => x.d === day);
+  if (!e || !(Number(e.w) > 0) || !(Number(e.r) > 0)) return null;
+  const before = es.filter(x => x.d < day);
+  if (!before.length) return null;
+  const top = before.reduce((a, b) => (b.kg > a.kg ? b : a));
+  if (!(e.kg > top.kg)) return null;
+  const prev = Number(top.w) > 0 && Number(top.r) > 0 ? { w: Number(top.w), r: Number(top.r), date: top.d } : null;
+  return { kind: 'best', first: hlFirst(), lift, w: Number(e.w), r: Number(e.r), date: day, prev, cycle: hlCycleOf(day) };
+}
+// A retest beaten (the comparison the design page added): `set` = { w, r, d } lifted on a test-flagged lift.
+function hlRetestSpec(lift, set, label) {
+  if (!set || !(Number(set.w) > 0) || !(Number(set.r) > 0)) return null;
+  const es = hlLiftEntries(lift).filter(x => x.d < set.d);
+  let before = es.filter(x => x.test).pop() || null;   // the last test of this lift
+  const wasTest = !!before;
+  if (!before) {                                       // else the best before this cycle
+    const c = currentCycle(), s = c && c.startDate ? String(c.startDate).slice(0, 10) : '';
+    const pre = s ? es.filter(x => x.d < s) : [];
+    if (pre.length) before = pre.reduce((a, b) => (b.kg > a.kg ? b : a));
+  }
+  if (!before || !(Number(before.w) > 0) || !(Number(before.r) > 0)) return null;
+  const a = { w: Number(before.w), r: Number(before.r) }, b = { w: Number(set.w), r: Number(set.r) };
+  if (!((b.w > a.w && b.r >= a.r) || (b.w >= a.w && b.r > a.r))) return null;
+  const ia = hlCycleIdxOf(before.d), ib = hlCycleIdxOf(set.d);
+  return { kind: 'retest', first: hlFirst(), lift, spec: label || '', now: { w: b.w, r: b.r, date: set.d },
+    before: { w: a.w, r: a.r, date: before.d, test: wasTest }, oneCycle: ia >= 0 && ib >= 0 && ib - ia <= 1, cycle: hlCycleOf(set.d) };
+}
+// The cycle week a day falls in (1 = the cycle's first), for the Same effort card's "Week 1 · Week 5".
+function hlWeekOf(cur, iso) {
+  const s = cur && cur.startDate ? cycleDayNo(cur.startDate) : NaN, d = cycleDayNo(iso);
+  return isNaN(s) || isNaN(d) || d < s ? 0 : Math.floor((d - s) / 7) + 1;
+}
+function hlEffortSpec(w) {
+  const cur = currentCycle();
+  const set = x => ({ w: x.w, n: x.n, r: x.r, date: x.date, wk: hlWeekOf(cur, x.date) });
+  return { kind: 'effort', first: hlFirst(), lift: w.name, shape: w.shape, same: !!w.same, pct: w.pct, a: set(w.a), b: set(w.b),
+    cycle: hlCycleOf(), date: w.b.date };
+}
+// New bests set between two days (each beat every earlier record of its lift; a lift's first record beats nothing).
+function hlBestsIn(from, to) {
+  let n = 0;
+  ceilingLifts().forEach(l => {
+    let bar = null;
+    l.entries.forEach(e => {
+      if (bar != null && e.kg > bar && e.d >= from && e.d <= to) n++;
+      bar = bar == null ? e.kg : Math.max(bar, e.kg);
+    });
+  });
+  return n;
+}
+// Signed off: the This cycle card's own numbers, past the end date.
+function hlCycleSpec() {
+  const p = cycleProgress();
+  if (!p || !p.over || !p.done) return null;   // a cycle with no session trained has nothing to sign off
+  const c = p.cur, from = String(c.startDate).slice(0, 10), to = String(c.endDate).slice(0, 10);
+  return { kind: 'cycle', first: hlFirst(), cycle: { n: p.cIdx + 1, of: p.count, name: c.name || ('Cycle ' + (p.cIdx + 1)), art: cycleArtUrl(c) },
+    done: p.done, planned: p.planned, bests: hlBestsIn(from, to), weeks: p.wk.total, end: to,
+    wins: p.wins.filter(w => w.share).map(w => ({ lift: w.name, shape: w.shape, same: !!w.same, pct: w.pct, a: w.a, b: w.b })) };
+}
+// The distance: every cycle by name, the weeks when every cycle is dated, the sessions from the session history (left out when the
+// history the phone holds starts after the roadmap did: it keeps the last 120).
+function hlRoadSpec() {
+  const o = cycleOver(), p = o && cycleProgress();
+  if (!o || o.next || !p || !p.done) return null;   // the last cycle trained at least once
+  const cs = DATA.cycles || [];
+  const lens = cs.map(c => (cycleWeekInfo(c) || {}).total);
+  const weeks = lens.every(n => n) ? lens.reduce((a, n) => a + n, 0) : 0;
+  const start = cs[0] && cs[0].startDate ? String(cs[0].startDate).slice(0, 10) : '', end = String(o.cur.endDate).slice(0, 10);
+  let sessions = 0;
+  if (start && Array.isArray(HIST)) {
+    const seen = new Set(HIST.filter(x => x.date >= start && x.date <= end).map(x => x.date + '|' + x.day));
+    const oldest = HIST.length ? HIST[HIST.length - 1].date : '';
+    sessions = HIST.length >= 120 && oldest > start ? 0 : seen.size;
+  }
+  return { kind: 'roadmap', first: hlFirst(), cycles: cs.map(c => ({ name: c.name || '', art: cycleArtUrl(c) })), weeks, sessions, start, end };
+}
+// What the Cycle complete card and moment offer: the whole road first on the roadmap's last cycle, the cycle, then each win.
+function hlCycleSpecs() {
+  const out = [], r = hlRoadSpec(), c = hlCycleSpec();
+  if (r) out.push(r);
+  if (c) out.push(c);
+  const p = cycleProgress();
+  if (p) p.wins.filter(w => w.share).forEach(w => out.push(hlEffortSpec(w)));
+  return out;
+}
+
+// ── The finish card's bands: this session's New best and Retest beaten, found at Done ──
+// Kept on this phone only (<id>_hlwin_d<N>, a raw write that _snapshot() skips), tied to the session's finish stamp like the day's
+// own set copy (loadDoneLog()): a reload of the finished day shows the same bands, a new session or a reset shows none.
+function winKey(day) { return ATHLETE_ID + '_hlwin_d' + day; }
+function loadWins(day) {
+  try {
+    const o = JSON.parse(localStorage.getItem(winKey(day)) || 'null');
+    const stamp = localStorage.getItem(ATHLETE_ID + '_completed_d' + day) || '';
+    return o && stamp && o.sess === stamp && Array.isArray(o.specs) ? o : null;
+  } catch (e) { return null; }
+}
+// Done (finishDayNow()) hands over the new bests the records just filed. A retest is looked for here: a lift the plan flags for a test,
+// in the retest window, done in this session. A lift that was both shows once, as the retest (the bigger moment). Three bands at most.
+function collectWins(day, bests) {
+  if (window.IS_PREVIEW || !ATHLETE_ID || !DATA) return;
+  try {
+    const on = sessionDateFor(day), out = [], seen = {};
+    const d = ((DATA.workouts && DATA.workouts.days) || []).find(x => String(x.id) === String(day));
+    if (d && inRetestWindow()) {
+      const flagged = {};
+      (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
+        const t = ex && ex.type === 'standard' && exTestSpec(ex);
+        if (t) flagged[histNorm(ex.name)] = { name: String(ex.name).trim(), label: t.label };
+      }));
+      if (Object.keys(flagged).length) {
+        const D = buildSessionData(day);
+        ((D && D.log) || []).forEach(e => {
+          const f = flagged[histNorm(HIST_ALIAS[e.ex] || e.ex)], s = f && histBestSet(e);
+          const spec = s && hlRetestSpec(f.name, { w: s.kg, r: s.reps, d: on }, f.label);
+          if (spec && !seen[f.name]) { out.push(spec); seen[f.name] = 1; }
+        });
+      }
+    }
+    (bests || []).forEach(b => {
+      if (seen[b.lift]) return;
+      const spec = hlBestSpec(b.lift, b.d);
+      if (spec) { out.push(spec); seen[b.lift] = 1; }
+    });
+    const sess = localStorage.getItem(ATHLETE_ID + '_completed_d' + day) || '';
+    if (out.length) _lsRawSet(winKey(day), JSON.stringify({ sess, specs: out.slice(0, 3) }));
+    else _lsRawRemove(winKey(day));
+  } catch (e) { console.warn('[highlight] wins not collected:', e); }
+  paintWinBand(day);
+}
+// "100 kg × 5", or a retest's "90 → 100 kg": in the app the weights always show (they are the athlete's own screen).
+function hlSetText(s) {
+  const kg = v => String(Math.round(Number(v) * 2) / 2).replace(/\.0$/, '');
+  if (s.kind === 'retest') return s.now.r === s.before.r ? `${kg(s.before.w)} → ${kg(s.now.w)} kg` : `${kg(s.now.w)} kg × ${s.now.r}`;
+  return `${kg(s.w)} kg × ${s.r}`;
+}
+function paintWinBand(day, quiet) {
+  const slot = document.getElementById('hlwin-' + day);
+  if (!slot) return;
+  const o = !window.IS_PREVIEW && loadWins(day);
+  if (!o || !o.specs.length) { slot.innerHTML = ''; return; }
+  const d = esc(String(day)), attr = t => esc(t).replace(/"/g, '&quot;');
+  slot.innerHTML = o.specs.map((s, i) => {
+    const what = s.kind === 'retest' ? 'Retest beaten' : 'New best';
+    return `<button type="button" class="hl-band${quiet ? '' : ' is-new'}" onclick="openShareFromBand('${d}', ${i})" aria-label="${attr(what + ': ' + s.lift + ', ' + hlSetText(s) + '. Share it')}">
+      <span class="hl-band-t"><small>${what}</small><b>${esc(s.lift)} <em>${esc(hlSetText(s))}</em></b></span>
+      <span class="hl-band-go" aria-hidden="true">Share</span></button>`;
+  }).join('');
+  if (!quiet && navigator.vibrate) navigator.vibrate([12, 60, 12]);
+}
+function openShareFromBand(day, i) { const o = loadWins(day); if (o) openShareSheet(o.specs, i); }
+window.openShareFromBand = openShareFromBand;
+// This cycle's wins (Progress → This cycle → Share a win ›): each shareable win to pick from.
+function openShareWins() {
+  const p = cycleProgress();
+  const specs = p ? p.wins.filter(w => w.share).map(hlEffortSpec) : [];
+  if (specs.length) openShareSheet(specs, 0);
+}
+window.openShareWins = openShareWins;
+function openShareCycle() { const s = hlCycleSpecs(); if (s.length) openShareSheet(s, 0); }
+window.openShareCycle = openShareCycle;
+// Personal Records: the New best band on a lift's page, a retest just logged there, and any record row.
+function openShareBest() {
+  let best = null;
+  try { best = JSON.parse(localStorage.getItem(ATHLETE_ID + '_ceil_best') || 'null'); } catch (e) {}
+  const s = best && _ceilLift ? hlBestSpec(_ceilLift, best.d) : null;
+  if (s) openShareSheet([s], 0);
+}
+window.openShareBest = openShareBest;
+function openShareRecord(i) { const e = _ceilRows[i], s = e && _ceilLift ? hlBestSpec(_ceilLift, e.d) : null; if (s) openShareSheet([s], 0); }
+window.openShareRecord = openShareRecord;
+// The lift page's latest entry when it is a test logged in the last 7 days that beat the one before (+ Log a max, as a test).
+function hlLiftRetest(lift) {
+  const es = hlLiftEntries(lift), e = es[es.length - 1];
+  if (!e || !e.test || daysSince(e.d) > 7) return null;
+  const c = ceilingCandidates().find(x => x.name === lift);
+  return hlRetestSpec(lift, { w: e.w, r: e.r, d: e.d }, c && c.test ? c.test.label : (Number(e.r) > 0 ? e.r + 'RM' : ''));
+}
+function openShareRetest() { const s = _ceilLift && hlLiftRetest(_ceilLift); if (s) openShareSheet([s], 0); }
+window.openShareRetest = openShareRetest;
+
+// ── The share sheet: one page of the one sheet (#hist-overlay), its top row drawn by paintSheetBack() ──
+// The preview IS the picture that is shared (painted by the same code). The choices are remembered on this phone (aa_hl_prefs: no
+// athlete prefix, never synced): Story or Post, English or Farsi, the weights, the name.
+const _HL = { specs: [], i: 0, blob: null, url: '', seq: 0 };
+function hlPrefs() {
+  const d = { size: 'story', lang: 'en', weights: true, name: true };
+  try { const o = JSON.parse(localStorage.getItem('aa_hl_prefs') || '{}'); return Object.assign(d, o && typeof o === 'object' ? o : {}); } catch (e) { return d; }
+}
+function hlSetPref(k, v) {
+  const p = hlPrefs(); p[k] = v;
+  try { _lsRawSet('aa_hl_prefs', JSON.stringify(p)); } catch (e) { /* private window: it just forgets */ }
+}
+const HL_TITLE = { best: 'Share your best', effort: 'Share a win', retest: 'Share your retest', cycle: 'Share your cycle', roadmap: 'Share the whole road',
+  badge: 'Share your badge', achievement: 'Share it', title: 'Share your title', level: 'Share your level', quest: 'Share your quest' };
+function hlLabel(s) {
+  return s.kind === 'roadmap' ? 'The whole road' : s.kind === 'cycle' ? (s.cycle && s.cycle.name) || 'This cycle'
+    : s.kind === 'retest' ? s.lift + ' retest' : s.lift || s.name || HL_TITLE[s.kind] || '';
+}
+// Does the card carry kilos the switch can hide? (A cycle's wins can.)
+function hlHasWeights(s) {
+  if (s.kind === 'best' || s.kind === 'retest') return true;
+  if (s.kind === 'effort') return !!(s.a && s.a.w) || !!(s.b && s.b.w);
+  if (s.kind === 'cycle') return (s.wins || []).some(w => (w.a && w.a.w) || (w.b && w.b.w));
+  return false;
+}
+function openShareSheet(specs, i) {
+  if (window.IS_PREVIEW) return;
+  specs = (Array.isArray(specs) ? specs : [specs]).filter(s => s && s.kind);
+  if (!specs.length) return;
+  const ov = document.getElementById('hist-overlay'), m = ov && ov.querySelector('.readiness-modal');
+  if (!m) return;
+  _HL.specs = specs; _HL.i = Math.max(0, Math.min(Number(i) || 0, specs.length - 1));
+  const pr = hlPrefs(), s = specs[_HL.i];
+  const seg = (k, v, label, extra) => `<button type="button" data-k="${k}" data-v="${v}" aria-pressed="${pr[k] === v}"${extra || ''}>${label}</button>`;
+  const tg = (k, label) => `<button type="button" class="hl-tg" role="switch" data-k="${k}" aria-checked="${pr[k] !== false}"><span>${label}</span><i aria-hidden="true"></i></button>`;
+  m.innerHTML = `
+    <div class="readiness-eyebrow">Highlight Reel</div>
+    <h2 class="readiness-title" id="hl-title">${esc(HL_TITLE[s.kind] || 'Share it')}</h2>
+    ${specs.length > 1 ? `<div class="hl-pick" role="radiogroup" aria-label="Which card">${specs.map((x, j) =>
+      `<button type="button" role="radio" data-j="${j}" aria-checked="${j === _HL.i}">${esc(hlLabel(x))}</button>`).join('')}</div>` : ''}
+    <div class="hl-prev is-busy${pr.size === 'post' ? ' is-post' : ''}" id="hl-prev"><img class="hl-img" id="hl-img" alt="" width="1080" height="${pr.size === 'post' ? 1350 : 1920}"><span class="hl-wait">Drawing your card…</span></div>
+    <div class="hl-ctl">
+      <div class="hl-seg" role="group" aria-label="Size">${seg('size', 'story', 'Story')}${seg('size', 'post', 'Post')}</div>
+      <div class="hl-seg" role="group" aria-label="Language">${seg('lang', 'en', 'English')}${seg('lang', 'fa', 'فارسی', ' lang="fa" dir="rtl"')}</div>
+      ${tg('weights', 'Show the weights')}
+      ${tg('name', 'Show my name')}
+    </div>
+    <button type="button" class="hl-share" id="hl-share" disabled>Share</button>
+    <button type="button" class="hl-save" id="hl-save" disabled>Save image</button>
+    <button type="button" class="hl-copy" id="hl-copy">Copy caption</button>
+    <p class="hl-tip">Mention <b>@amirardekanian</b> in your Story so Amir can share it too.</p>
+    <p class="hl-msg" id="hl-msg" role="status" aria-live="polite"></p>`;
+  hlWire(m);
+  ov.classList.add('visible');
+  hlPaint();
+}
+function hlWire(m) {
+  m.querySelectorAll('.hl-pick [data-j]').forEach(b => b.addEventListener('click', () => {
+    _HL.i = Number(b.dataset.j) || 0;
+    m.querySelectorAll('.hl-pick [data-j]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
+    const t = document.getElementById('hl-title'); if (t) t.textContent = HL_TITLE[_HL.specs[_HL.i].kind] || 'Share it';
+    hlPaint();
+  }));
+  m.querySelectorAll('.hl-seg [data-k]').forEach(b => b.addEventListener('click', () => {
+    hlSetPref(b.dataset.k, b.dataset.v);
+    b.parentElement.querySelectorAll('[data-k]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    if (b.dataset.k === 'size') { const pv = document.getElementById('hl-prev'); if (pv) pv.classList.toggle('is-post', b.dataset.v === 'post'); }
+    hlPaint();
+  }));
+  m.querySelectorAll('.hl-tg').forEach(b => b.addEventListener('click', () => {
+    const on = b.getAttribute('aria-checked') !== 'true';
+    b.setAttribute('aria-checked', String(on));
+    hlSetPref(b.dataset.k, on);
+    hlPaint();
+  }));
+  document.getElementById('hl-share').addEventListener('click', hlShareNow);
+  document.getElementById('hl-save').addEventListener('click', () => hlSaveNow(false));
+  document.getElementById('hl-copy').addEventListener('click', hlCopy);
+}
+function hlMsg(t) { const el = document.getElementById('hl-msg'); if (el) el.textContent = t || ''; }
+function hlOpts() { const p = hlPrefs(); return { size: p.size === 'post' ? 'post' : 'story', lang: p.lang === 'fa' ? 'fa' : 'en', weights: p.weights !== false, name: p.name !== false }; }
+// Draws the chosen card into the preview. The Share and Save buttons wait for the picture, so a tap shares at once (the phone's share
+// sheet must open inside the tap: Safari refuses it after a wait).
+async function hlPaint() {
+  const seq = ++_HL.seq, spec = _HL.specs[_HL.i], o = hlOpts();
+  const pv = document.getElementById('hl-prev'), img = document.getElementById('hl-img');
+  const sh = document.getElementById('hl-share'), sv = document.getElementById('hl-save');
+  const tw = document.querySelector('#hist-overlay .hl-tg[data-k="weights"]');
+  if (tw) tw.hidden = !hlHasWeights(spec);
+  if (pv) pv.classList.add('is-busy');
+  if (sh) sh.disabled = true;
+  if (sv) sv.disabled = true;
+  _HL.blob = null;
+  hlMsg('');
+  try {
+    const SC = await hlLib();
+    const blob = await SC.toBlob(spec, o);
+    if (seq !== _HL.seq) return;   // a newer choice is already drawing
+    if (_HL.url) URL.revokeObjectURL(_HL.url);
+    _HL.blob = blob; _HL.url = URL.createObjectURL(blob);
+    if (img) {
+      img.src = _HL.url;
+      img.height = o.size === 'post' ? 1350 : 1920;
+      img.alt = SC.caption(spec, { lang: 'en', weights: o.weights });
+    }
+    if (pv) pv.classList.remove('is-busy');
+    if (sh) sh.disabled = false;
+    if (sv) sv.disabled = false;
+  } catch (e) {
+    if (seq !== _HL.seq) return;
+    if (pv) pv.classList.remove('is-busy');
+    hlMsg('The card could not be drawn on this phone. Try again with signal.');
+    console.warn('[highlight] card not drawn:', e);
+  }
+}
+function hlFileName() {
+  const s = _HL.specs[_HL.i] || {}, o = hlOpts();
+  return 'aa-highlight-' + (s.kind || 'card') + '-' + o.size + (o.lang === 'fa' ? '-fa' : '') + '.png';
+}
+function hlCaption() {
+  const s = _HL.specs[_HL.i], o = hlOpts();
+  return window.ShareCard && s ? window.ShareCard.caption(s, { lang: o.lang, weights: o.weights }) : '';
+}
+// Share: the phone's own share sheet with the picture (Instagram is in it on iPhone and Android). A phone or browser that cannot share
+// a picture saves it instead, and says so.
+function hlShareNow() {
+  if (!_HL.blob) return;
+  let file = null;
+  try { file = new File([_HL.blob], hlFileName(), { type: 'image/png' }); } catch (e) { file = null; }
+  if (file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({ files: [file], text: hlCaption() }).catch(e => {
+      if (e && e.name === 'AbortError') return;   // they closed the phone's sheet
+      hlSaveNow(true);
+    });
+    return;
+  }
+  hlSaveNow(true);
+}
+function hlSaveNow(insteadOfShare) {
+  if (!_HL.url) return;
+  const a = document.createElement('a');
+  a.href = _HL.url; a.download = hlFileName();
+  document.body.appendChild(a); a.click(); a.remove();
+  hlMsg(insteadOfShare ? 'This phone can’t share a picture from here, so it’s saved instead.' : 'Saved.');
+}
+function hlCopy() {
+  const t = hlCaption();
+  if (!t) return;
+  const done = ok => hlMsg(ok ? 'Caption copied.' : t);
+  const old = () => {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = t; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy'); ta.remove(); done(ok);
+    } catch (e) { done(false); }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => done(true), old);
+  else old();
+}
+
+// ── The moment: a cycle (or the whole roadmap) complete, once, full screen, at the first open after the end date ──
+// The Welcome's recipe (.wel): the cycle's own cover with a burst of court lines, then the card itself on the paper, signed. Shown once
+// per cycle (<id>_hl_seen, synced, so another phone does not show it again), only in the 14 days after the end date, never over the
+// Welcome, never in the demo or the coach's preview. Back closes it (topLayer()).
+function maybeHighlightMoment() {
+  if (window.IS_PREVIEW || window.IS_DEMO || !ATHLETE_ID || !DATA) return;
+  if (document.querySelector('.wel, .hl-moment')) return;
+  const o = cycleOver();
+  if (!o) return;
+  const end = String(o.cur.endDate).slice(0, 10), past = todayDayNo() - cycleDayNo(end);
+  if (!(past >= 1 && past <= 14)) return;
+  const key = ATHLETE_ID + '_hl_seen', id = (o.next ? 'cycle' : 'road') + (o.cIdx + 1) + '|' + end;
+  let seen = {};
+  try { seen = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) { seen = {}; }
+  if (seen[id]) return;
+  const specs = hlCycleSpecs();
+  if (!specs.length) return;
+  seen[id] = Date.now();
+  try { localStorage.setItem(key, JSON.stringify(seen)); } catch (e) { return; }   // storage blocked: never show it every open
+  const p = cycleProgress(), n = o.cIdx + 1;
+  const last = !o.next;
+  const sub = last
+    ? `${(DATA.cycles || []).length} cycles${specs[0].weeks ? ' · ' + specs[0].weeks + ' weeks' : ''}`
+    : `${p ? p.done + ' of ' + p.planned + ' sessions · ' : ''}${p ? p.wk.total + ' weeks' : ''}`;
+  openMoment({
+    eyebrow: last ? 'Roadmap complete' : 'Cycle complete',
+    title: last ? 'The distance' : (o.cur.name || 'Cycle ' + n),
+    sub,
+    art: cycleArtUrl(o.cur),
+    words: last ? 'You’ve trained the whole plan, every cycle of it. Here’s your card if you want to share it.'
+                : `Cycle ${n} is done, and I’ve signed it off. Here’s your card if you want to share it.`,
+    go: last ? 'Share the whole road' : 'Share your cycle',
+    specs,
+  });
+}
+// o: { eyebrow, title, sub, art, words, go, specs }. Career Mode phase 3 opens a reward's moment with the same call.
+function openMoment(o) {
+  if (window.IS_PREVIEW || !o || !o.specs || !o.specs.length) return;
+  closeMoment();
+  const el = document.createElement('div');
+  el.className = 'hl-moment';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'hl-m-title');
+  const rays = Array.from({ length: 14 }, (_, i) => `<i style="rotate:${Math.round(i * 360 / 14)}deg;animation-delay:${(i % 3) * 60}ms"></i>`).join('');
+  el.innerHTML = `
+    <div class="hl-m-hero">
+      ${o.art ? `<img class="hl-m-img" src="${esc(o.art)}" alt="" aria-hidden="true" onload="this.classList.add('in')" onerror="this.remove()">` : ''}
+      <div class="hl-m-scrim"></div>
+      <div class="hl-m-burst" aria-hidden="true">${rays}</div>
+      <button type="button" class="hl-m-x" aria-label="Close">✕</button>
+      <div class="hl-m-copy">
+        <div class="hl-m-eyebrow">${esc(o.eyebrow || '')}</div>
+        <h2 class="hl-m-title" id="hl-m-title">${esc(o.title || '')}</h2>
+        ${o.sub ? `<div class="hl-m-sub">${esc(o.sub)}</div>` : ''}
+      </div>
+    </div>
+    <div class="hl-m-sheet">
+      <div class="hl-m-card"><img alt="" width="1080" height="1920"></div>
+      <p>${esc(o.words || '')}</p>
+      <div class="wn-sign">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>
+      <button type="button" class="hl-m-go">${esc(o.go || 'Share it')}</button>
+      <button type="button" class="hl-m-skip">Not now</button>
+    </div>`;
+  document.body.appendChild(el);
+  el.querySelector('.hl-m-x').addEventListener('click', closeMoment);
+  el.querySelector('.hl-m-skip').addEventListener('click', closeMoment);
+  el.querySelector('.hl-m-go').addEventListener('click', () => { closeMoment(); openShareSheet(o.specs, 0); });
+  navSync();
+  if (navigator.vibrate && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) navigator.vibrate([16, 80, 16]);
+  // The card itself, small, as it will be shared (a Story, in the athlete's last choices).
+  const im = el.querySelector('.hl-m-card img'), op = Object.assign(hlOpts(), { size: 'story' });
+  hlLib().then(SC => SC.toBlob(o.specs[0], op).then(b => {
+    if (!document.body.contains(el)) return;
+    im.src = URL.createObjectURL(b);
+    im.alt = SC.caption(o.specs[0], { lang: 'en', weights: op.weights });
+  })).catch(() => { const c = el.querySelector('.hl-m-card'); if (c) c.remove(); });
+}
+function closeMoment() {
+  const el = document.querySelector('.hl-moment');
+  if (el) { el.remove(); navSync(); }
+}
+window.openMoment = openMoment;
+window.closeMoment = closeMoment;
 
 function esc(str) {
   if (!str) return '';
