@@ -22,6 +22,7 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 | How to build a carousel / reel / result card | [Recipes](Content/DESIGN-ATLAS.md#recipe-carousel-ig-45-10801350) in the atlas |
 | What the business *is* (pricing, voice, backend) | [`Content/PRODUCT.md`](Content/PRODUCT.md) |
 | How the coaching process works (customer-facing) | [`Content/HOW-IT-WORKS.md`](Content/HOW-IT-WORKS.md) |
+| What the website chatbot knows (prices, products, FAQ; Amir edits it) | [`Content/CHATBOT-FACTS.md`](Content/CHATBOT-FACTS.md) |
 | Amir's coaching philosophy (the *why* behind sets/reps) | [`.claude/COACHING-PRINCIPLES.md`](.claude/COACHING-PRINCIPLES.md) |
 | File-by-file plain-English guide | [`CODEBASE.md`](CODEBASE.md) |
 | What fields a program / article / workout JSON can have | [`SCHEMA.md`](SCHEMA.md) |
@@ -98,6 +99,7 @@ Three layers, in the order a designer should read them:
   [`partials/footer.html`](partials/footer.html) — injected by
   [`assets/js/shared.js`](assets/js/shared.js) (nav, footer, video pop-ups, install prompt, scroll reveal).
   The Farsi homepage and product pages keep their own nav; [`assets/js/fa-nav.js`](assets/js/fa-nav.js) opens and closes their phone menu (☰).
+  The chat bubble on both homepages and the two Farsi product pages is [`assets/js/site-chat.js`](assets/js/site-chat.js); its answers come from the Edge Function `site-chat` and [`Content/CHATBOT-FACTS.md`](Content/CHATBOT-FACTS.md) (CLAUDE.md → *The website chatbot*).
   [`assets/js/track.js`](assets/js/track.js) counts Apply, WhatsApp and demo clicks and the apply form's steps in Plausible (funnel pages only).
   [`assets/js/sharecard.js`](assets/js/sharecard.js) is **Highlight Reel**, the training app's share cards (a win drawn as an Instagram Story or post,
   English or Farsi; every Farsi word in its `FA` table is a draft for Amir): [`PROGRAM-APP.md`](PROGRAM-APP.md) → *Highlight Reel*.

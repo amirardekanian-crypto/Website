@@ -89,7 +89,7 @@ at 599, 600, 750, 899, 900 and 1440.
 | **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done (a habit-only athlete opens on Proof) |
 | **Exercises** | The Spine (2026-09-24): one entry per exercise you programme. Coverage of the names in live programmes, Claude's drafts waiting for you, a search, and an editor (purpose, How to do it, cues, links, body parts and the muscle map, video, and the coach-only SFR rank, flags, counts and cost) showing who is doing each exercise now. Claude's draft steps, cues or purpose for an approved entry wait in the editor's boxes, and your Save approves them. A save sends only what you changed. **Approve** is what puts an entry on athletes' phones |
 | **Proof** | The crew's home: the wall and your line, the quest lever, the pulse, the board, titles minted, the season. (The signup funnel is no longer here: it is Leads → Free signups) |
-| **Leads** | Everyone who might become a client, in three sub-tabs: **Applications** (the coaching apply forms, English and Farsi, the whole questionnaire per lead; a clay count of the new ones), **Free signups** (the Proof funnel: everyone who signed up on `proof.html`, days logged, who is ready to upgrade) and **Referral codes** (who holds which discount code; the apply forms accept exactly the live codes listed here) |
+| **Leads** | Everyone who might become a client, in four sub-tabs: **Applications** (the coaching apply forms, English and Farsi, the whole questionnaire per lead; a clay count of the new ones), **Free signups** (the Proof funnel: everyone who signed up on `proof.html`, days logged, who is ready to upgrade) **Referral codes** (who holds which discount code; the apply forms accept exactly the live codes listed here) and **Chats** (what people asked the website chatbot, kept 90 days) |
 | **Library** | Publishes workouts and articles into the app's Library, and copies a link to each (the address is still `#links`; the tab was called Links until 2026-10-10) |
 | **Buyers** | Logins for the two apps people pay for, in two sub-tabs: the **Course** (the paid course app, `/tennis/app/`) and the **Testing app** (`/tennis-testing/app/`); each sub-tab shows its count of active logins |
 
@@ -355,6 +355,10 @@ Everyone who signed up through `proof.html`, newest first (`funnelPanelHtml()`; 
 *The funnel* in §7). Days logged is the qualifying signal; a free athlete past 14 logged days is flagged *ready to upgrade?*. A row keeps **WhatsApp**,
 **copy email** and **open**. `leads/signups` is the only place the funnel is drawn; `proof-home` checks it is not on Proof, `whatsapp-number` and `file-groups`
 read it here.
+
+### Leads → Chats — the website chatbot's saved conversations (2026-10-17)
+
+`#leads/chats`. What people asked the site's chatbot, from `chat_conversations` and `chat_messages` (`supabase/stage67_site_chat.sql`; only the `site-chat` Edge Function writes them, the coach can read and delete, RLS through `is_coach()`). Both tables are in `BACKUP_TABLES`. It is loaded when the tab first opens, not at boot: `chatsLoad()` first deletes conversations whose `last_at` is older than 90 days (quietly; their messages go by `ON DELETE CASCADE`), then reads the rest with `selectAll()`; a failed read lands in `LOAD_ERR.chats` and the tab offers Try again. The layout is Applications': the list on the left (date and time, an EN/FA pill, the visitor's first message, the turns, a WhatsApp or Apply tag when the chat ended in a handoff), the chosen chat on the right as a transcript (visitor text escaped, `dir="auto"` for Farsi), its page and its cost (`cost_usd`, 4 decimals); below 1000 px the list is the screen. The top line totals this month's chats and cost. **Delete this chat** goes through `dangerAsk()` and writes with `.select()` + `writeFailed()`. Harness scenario: `leads-chats`.
 
 ### Leads → Referral codes — the referral-code roster
 

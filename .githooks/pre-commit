@@ -429,4 +429,17 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^scripts/(check|t
   fi
 fi
 
+# ── 21. the website chatbot knows what the facts file says (added 2026-10-17) ───────────────────────────────────────────────
+# Why: the chat bubble's answers come only from Content/CHATBOT-FACTS.md, which Amir reads and edits. The Edge Function cannot read
+# that file: scripts/build_chat_facts.py copies it into supabase/functions/site-chat/facts.ts. A facts change committed without the
+# rebuild (or a hand edit of facts.ts) means the bot keeps quoting the old price, and nothing errors. After the rebuild, redeploy
+# site-chat (supabase/functions/README.md): this guard proves the two files agree, not that the deployment does.
+if git diff --cached --name-only --diff-filter=ACMD | grep -qE '^(Content/CHATBOT-FACTS\.md|supabase/functions/site-chat/facts\.ts|scripts/build_chat_facts\.py)$'; then
+  if ! chat_out=$("$PY" -X utf8 scripts/build_chat_facts.py --check 2>&1); then
+    echo "$chat_out"
+    echo "pre-commit: BLOCKED — the chatbot's facts.ts does not match Content/CHATBOT-FACTS.md (run the line above, then redeploy site-chat)."
+    failed=1
+  fi
+fi
+
 exit $failed

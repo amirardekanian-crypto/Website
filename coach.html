@@ -481,6 +481,13 @@
   .in-q dt { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
   .in-q dd { min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
   .in-q dd.rtl { text-align: right; }
+  .ch-hint { margin: 0 0 4px; padding: 8px 20px 0; color: var(--muted); font-size: 14px; }
+  .ch-tot { margin: 0 0 8px; padding: 0 20px; font-size: 14px; }
+  .ch-msg { max-width: 640px; margin: 0 0 8px; padding: 8px 12px; border-radius: 12px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .ch-msg.user { background: var(--court-100); }
+  .ch-msg.bot { border: 1px solid var(--line); }
+  .ch-who { display: block; margin-bottom: 2px; font-size: 12px; color: var(--muted); }
+  .ch-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 4px 0 16px; font-size: 14px; color: var(--muted); }
   .in-empty { padding: 48px 0; text-align: center; color: var(--muted); font-size: 14px; }
   /* Two question-and-answer pairs to a row only while the application itself is 700 px wide or more (the pane, not the screen: at 1000 px it is 620). */
   .in-detail { container: intake / inline-size; }
@@ -1744,7 +1751,7 @@ async function loadAll() {
 const LOAD_ERR_LABEL = {
   programs: 'programmes', logins: 'athlete logins', contacts: 'Proof contacts', intake: 'intake forms',
   assess: 'testing-app logins', course: 'course logins', buyerNotes: 'your notes about buyers', spine: 'the exercise library (Spine)',
-  affiliates: 'affiliate codes', status: 'paused and former marks', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
+  affiliates: 'affiliate codes', chats: 'website chats', status: 'paused and former marks', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
 };
 function paintLoadWarn() {
   const lw = $('loadwarn'), warn = loadWarnHtml();
@@ -2090,6 +2097,7 @@ const BACKUP_TABLES = [
   'assess_players', 'assess_notes', 'assess_results',
   'exercises', 'exercise_coach', 'qualities', 'coaching_log_versions', 'spine_versions',
   'buyer_notes', 'erasure_log', 'athlete_status',
+  'chat_conversations', 'chat_messages',
 ];
 
 const PASSWORD_TABLES = ['athlete_identities', 'tps_accounts', 'assess_accounts'];
@@ -2767,7 +2775,7 @@ const TABS = [
   { id: 'buyers', label: 'Buyers' },
 ];
 // The sub-tabs of Leads and Buyers: the address part (the first has none), the label, and what it shows (renderLeads(), renderBuyers()).
-const LEAD_TABS = [{ sub: '', label: 'Applications' }, { sub: 'signups', label: 'Free signups' }, { sub: 'codes', label: 'Referral codes' }];
+const LEAD_TABS = [{ sub: '', label: 'Applications' }, { sub: 'signups', label: 'Free signups' }, { sub: 'codes', label: 'Referral codes' }, { sub: 'chats', label: 'Chats' }];
 const BUYER_TABS = [{ sub: '', key: 'course', label: 'Course' }, { sub: 'testing', key: 'assess', label: 'Testing app' }];
 // #a/<id> opens an athlete's file; #a/<id>/<sub> opens it on one of its three
 // screens, so any of them can be bookmarked or reloaded in place. A retired
@@ -2780,9 +2788,9 @@ const EX_SUBS = ['qualities', 'coverage'];
 function route() { return routeOf((location.hash || '#today').slice(1)); }
 // The same reading for any address (the hashchange guard asks what the OLD address was).
 function routeOfUrl(url) { const i = String(url || '').indexOf('#'); return routeOf(i < 0 ? 'today' : String(url).slice(i + 1) || 'today'); }
-// #leads opens the applications; #leads/signups the free signups; #leads/codes the referral codes. #buyers opens the course logins; #buyers/testing the
+// #leads opens the applications; #leads/signups the free signups; #leads/codes the referral codes; #leads/chats the website chatbot's saved chats. #buyers opens the course logins; #buyers/testing the
 // testing app's. As with Exercises, anything else after the slash reads as the first one.
-const LEAD_SUBS = ['signups', 'codes'];
+const LEAD_SUBS = ['signups', 'codes', 'chats'];
 const BUYER_SUBS = ['testing'];
 // The addresses of the nine-tab dashboard (until 2026-10-12): bookmarks, old links and the harness still use them. They land in the new place and the
 // address bar is rewritten in place (fixLegacyHash), so there is no extra history entry.
@@ -8389,9 +8397,128 @@ function renderLeads() {
   const c = $('content');
   const prev = c.querySelector('.lead-subrail');
   c.classList.toggle('no-anim', !!prev && prev.dataset.sub === sub);   // a redraw of the sub-tab already showing does not replay the entrance
-  c.innerHTML = leadsBarHtml(sub) + (sub === 'signups' ? funnelPanelHtml() : sub === 'codes' ? affiliatesViewHtml() : intakeViewHtml());
+  c.innerHTML = leadsBarHtml(sub) + (sub === 'signups' ? funnelPanelHtml() : sub === 'codes' ? affiliatesViewHtml() : sub === 'chats' ? chatsViewHtml() : intakeViewHtml());
   if (sub === 'codes') wireAffiliates($('affView'));
+  else if (sub === 'chats') { wireChats($('chView')); chatsEnsure(); }
   else if (!sub) wireIntake($('inView'));
+}
+
+// --- LEADS → Chats (2026-10-17): what people asked the website chatbot. chat_conversations / chat_messages (stage67) are written only by the
+// site-chat Edge Function; the coach may read and delete them. Kept 90 days: opening the tab first deletes older conversations (their messages go with
+// them, ON DELETE CASCADE), then reads the rest with selectAll(). Loaded when the tab first opens, not at boot.
+const CHAT_KEEP_DAYS = 90;
+let _chatSel = '', _chatOpen = false, _chatLoading = null;
+function chatsByMessage() {
+  const m = {};
+  (S.chatMsgs || []).forEach(x => { (m[x.conversation_id] = m[x.conversation_id] || []).push(x); });
+  return m;
+}
+function chatsLoad() {
+  if (_chatLoading) return _chatLoading;
+  _chatLoading = (async () => {
+    if (DEMO) { S.chats = S.chats || []; S.chatMsgs = S.chatMsgs || []; return; }
+    const cut = new Date(Date.now() - CHAT_KEEP_DAYS * 86400000).toISOString();
+    // Quiet: a failed cleanup only means the old rows are still there; they go the next time. No rows changed is the normal answer.
+    try { await sb.from('chat_conversations').delete().lt('last_at', cut).select('id'); } catch (e) { /* tried again next time */ }
+    const [c, m] = await Promise.all([selectAll('chat_conversations', '*', ['id']), selectAll('chat_messages', '*', ['id'])]);
+    LOAD_ERR.chats = c.error ? c.error.message : m.error ? m.error.message : c.short ? `only ${c.data.length} of ${c.total} chats came back` : '';
+    S.chats = c.error ? null : c.data;
+    S.chatMsgs = m.error ? [] : m.data;
+  })().finally(() => { _chatLoading = null; });
+  return _chatLoading;
+}
+// Called after the tab is drawn: starts the first read, and draws again when it lands (only if the coach is still on the tab).
+function chatsEnsure() {
+  if (S.chats || LOAD_ERR.chats) return;
+  chatsLoad().then(() => { if (route().view === 'leads' && route().sub === 'chats') chatsRedraw(); });
+}
+function chatsReload() { S.chats = null; LOAD_ERR.chats = ''; chatsRedraw(); chatsEnsure(); }
+window.chatsReload = chatsReload;
+function chatWhen(iso) {
+  const d = new Date(iso);
+  return isNaN(d) ? '' : `${d.getDate()} ${MONTHS[d.getMonth()]}, ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+const chatHandoffLabel = h => h === 'whatsapp' ? 'WhatsApp' : h === 'apply' ? 'Apply' : '';
+function chatsViewHtml() {
+  const hint = '<p class="ch-hint">What people asked the website chatbot. Kept 90 days, then deleted.</p>';
+  if (!S.chats) {
+    if (LOAD_ERR.chats) return `<div id="chView" class="in-view solo"><section class="panel">${hint}<p class="empty t-clay">The chats did not load: ${esc(LOAD_ERR.chats)}</p><button class="btn sm" onclick="chatsReload()">↻ Try again</button></section></div>`;
+    return `<div id="chView" class="in-view solo"><section class="panel">${hint}<p class="empty">Loading the chats…</p></section></div>`;
+  }
+  const all = S.chats.slice().sort((a, b) => new Date(b.started_at) - new Date(a.started_at));
+  const msgs = chatsByMessage();
+  const month = new Date().toISOString().slice(0, 7);
+  const thisMonth = all.filter(c => new Date(c.started_at).toISOString().slice(0, 7) === month);
+  const cost = thisMonth.reduce((n, c) => n + (Number(c.cost_usd) || 0), 0);
+  const tot = `<p class="ch-tot">This month: <b>${thisMonth.length}</b> chat${thisMonth.length === 1 ? '' : 's'}, <b>$${cost.toFixed(4)}</b></p>`;
+  if (!all.length) return `<div id="chView" class="in-view solo"><section class="panel">${hint}${tot}<p class="empty">No chats yet. When a visitor talks to the chatbot on the site, the conversation is saved here.</p></section></div>`;
+  if (_chatSel && !all.some(c => c.id === _chatSel)) _chatSel = '';
+  if (!_chatSel) _chatSel = all[0].id;
+  const cur = all.find(c => c.id === _chatSel);
+  const rows = all.map(c => {
+    const first = (msgs[c.id] || []).find(x => x.role === 'user');
+    const txt = first ? String(first.content).replace(/\s+/g, ' ').trim() : '(no message)';
+    const h = chatHandoffLabel(c.handoff);
+    return `<button type="button" class="in-row${c.id === _chatSel ? ' on' : ''}" data-id="${esc(c.id)}"${c.id === _chatSel ? ' aria-current="true"' : ''}>
+      <span class="ava" aria-hidden="true">${c.site === 'fa' ? 'FA' : 'EN'}</span>
+      <span class="in-main"><span class="in-n" dir="auto">${esc(txt.length > 80 ? txt.slice(0, 80) + '…' : txt)}</span><span class="in-s"><span class="ipill ${c.site === 'fa' ? 'fa' : 'en'}">${c.site === 'fa' ? 'FA' : 'EN'}</span><span>${c.turns} turn${c.turns === 1 ? '' : 's'}</span>${h ? `<span class="ipill pct">${esc(h)}</span>` : ''}</span></span>
+      <span class="in-when">${esc(chatWhen(c.started_at))}</span>
+    </button>`;
+  }).join('');
+  const m = msgs[cur.id] || [];
+  const h = chatHandoffLabel(cur.handoff);
+  const detail = `<div class="in-head">
+      <button type="button" class="btn sm in-back">← All chats</button>
+      <h2 class="hd in-title" tabindex="-1">${esc(chatWhen(cur.started_at))}</h2>
+      <div class="ch-meta"><span class="ipill ${cur.site === 'fa' ? 'fa' : 'en'}">${cur.site === 'fa' ? 'FA' : 'EN'}</span>
+        <span>Page <bdi>${esc(cur.page || '/')}</bdi></span><span>${cur.turns} turn${cur.turns === 1 ? '' : 's'}</span><span>Cost $${(Number(cur.cost_usd) || 0).toFixed(4)}</span>${h ? `<span class="ipill pct">${esc(h)}</span>` : ''}</div>
+    </div>
+    ${m.length ? m.map(x => `<div class="ch-msg ${x.role === 'user' ? 'user' : 'bot'}"><span class="ch-who">${x.role === 'user' ? 'Visitor' : 'Chatbot'}</span><span dir="auto">${esc(x.content)}</span></div>`).join('') : '<p class="empty">No messages saved for this chat.</p>'}
+    <div class="typed"><button type="button" class="btn sm danger ch-del" data-id="${esc(cur.id)}">Delete this chat</button></div>
+    ${dangerSlot('chat:' + cur.id)}`;
+  return `<div id="chView" class="in-view${_chatOpen ? ' touched' : ''}" data-pane="${_chatOpen ? 'detail' : 'list'}">
+    <section class="panel in-list" aria-label="Chats">${hint}${tot}${rows}</section>
+    <section class="panel in-detail">${detail}</section>
+  </div>`;
+}
+function wireChats(root) {
+  if (!root) return;
+  root.querySelectorAll('.in-row').forEach(b => b.addEventListener('click', () => {
+    _chatSel = b.dataset.id; _chatOpen = true; chatsRedraw(); window.scrollTo({ top: 0, behavior: 'instant' });
+  }));
+  root.querySelectorAll('.in-back').forEach(b => b.addEventListener('click', () => { _chatOpen = false; chatsRedraw(); }));
+  root.querySelectorAll('.ch-del').forEach(b => b.addEventListener('click', () => chatDelete(b.dataset.id)));
+}
+function chatsRedraw() {
+  const old = $('chView');
+  if (!old) return;
+  const list = old.querySelector('.in-list'), y = list ? list.scrollTop : 0;
+  $('content').classList.add('no-anim');
+  const tmp = document.createElement('div');
+  tmp.innerHTML = chatsViewHtml();
+  const nv = tmp.firstElementChild;
+  old.replaceWith(nv);
+  const nl = nv.querySelector('.in-list');
+  if (nl) nl.scrollTop = y;
+  wireChats(nv);
+}
+function chatDelete(id) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  dangerAsk('chat:' + id, {
+    title: 'Delete this chat?',
+    goes: 'The conversation and every message in it, for good.',
+    stays: 'Every other chat. Nothing else on the site changes.',
+    button: 'Delete this chat', busyText: 'Deleting…', run: () => chatDeleteNow(id) });
+}
+async function chatDeleteNow(id) {
+  const res = await sb.from('chat_conversations').delete().eq('id', id).select('id');
+  const bad = writeFailed(res, 'deleted');
+  if (bad) { fail('Could not delete the chat: ' + bad); return; }
+  S.chats = (S.chats || []).filter(c => c.id !== id);
+  S.chatMsgs = (S.chatMsgs || []).filter(x => x.conversation_id !== id);
+  _chatOpen = false;
+  toast('Chat deleted');
+  chatsRedraw();
 }
 
 // --- demo fixtures (?demo=1) — layout preview only, nothing is real ----------
@@ -8580,6 +8707,16 @@ function demoStore() {
     { athlete_id: 'demo_tara', email: 'tara@example.com', whatsapp: '+44 7000 000000', source: 'proof.html', tier: 'free', shown_as: 'Tara', on_board: true, days_logged: 17, signed_up: new Date(Date.now() - 18 * 86400000).toISOString() },
     { athlete_id: 'demo_kian', email: 'kian@example.com', whatsapp: '+98 912 000 0000', source: 'proof.html', tier: 'free', shown_as: 'Kian', on_board: false, days_logged: 3, signed_up: new Date(Date.now() - 2 * 86400000).toISOString() },
     { athlete_id: 'demo_nora', email: 'nora@example.com', whatsapp: '+98 912 111 1111', source: 'proof.html', tier: 'free', shown_as: 'Nora', on_board: false, days_logged: 0, signed_up: new Date(Date.now() - 5 * 86400000).toISOString() },
+  ];
+  S.chats = [
+    { id: 'demo-c1', site: 'en', page: '/', visitor: 'demo', started_at: new Date(Date.now() - 2 * 3600000).toISOString(), last_at: new Date(Date.now() - 2 * 3600000).toISOString(), turns: 2, handoff: 'whatsapp', tokens_in: 900, tokens_out: 200, cost_usd: 0.0031 },
+    { id: 'demo-c2', site: 'fa', page: '/index-fa.html', visitor: 'demo', started_at: new Date(Date.now() - 30 * 3600000).toISOString(), last_at: new Date(Date.now() - 30 * 3600000).toISOString(), turns: 1, handoff: null, tokens_in: 500, tokens_out: 120, cost_usd: 0.0018 },
+  ];
+  S.chatMsgs = [
+    { id: 1, conversation_id: 'demo-c1', role: 'user', content: 'Do you coach padel players too?', at: new Date(Date.now() - 2 * 3600000).toISOString() },
+    { id: 2, conversation_id: 'demo-c1', role: 'assistant', content: 'Yes. Tennis and padel are what Amir works with most.', at: new Date(Date.now() - 2 * 3600000).toISOString() },
+    { id: 3, conversation_id: 'demo-c2', role: 'user', content: 'قیمت برنامه سه ماهه چقدره؟', at: new Date(Date.now() - 30 * 3600000).toISOString() },
+    { id: 4, conversation_id: 'demo-c2', role: 'assistant', content: 'نمونه پاسخ برای دمو.', at: new Date(Date.now() - 30 * 3600000).toISOString() },
   ];
   S.intake = [
     { id: 'demo-i1', created_at: new Date(Date.now() - 3 * 3600000).toISOString(), lang: 'en', name: 'Marcus Vale', email: 'marcus@example.com', contact: '@marcus.plays', programme: 'Match — $300 / 6 months', status: 'new',

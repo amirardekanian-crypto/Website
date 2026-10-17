@@ -17,7 +17,7 @@ not restore: use the dashboard's History / Undo, `program_versions`, `coaching_l
 
 | In `aa-backup-<date>.json` | Not in it (and what you do about it) |
 |---|---|
-| The rows of the 38 tables in `BACKUP_TABLES` (coach.html): programmes, versions, logs, sessions, habits, Library, the Spine, the course and testing content, the testing app's players and results, the receipts of erasures | **Logins and passwords** (the `auth` schema): re-created from the dashboard, step 5 |
+| The rows of the 40 tables in `BACKUP_TABLES` (coach.html): programmes, versions, logs, sessions, habits, Library, the Spine, the course and testing content, the testing app's players and results, the receipts of erasures | **Logins and passwords** (the `auth` schema): re-created from the dashboard, step 5 |
 | | **The structure** (tables, rules, functions, who may do what): `supabase/schema_snapshot.sql` |
 | | **Edge Functions**: `supabase/functions/`, deployed again, step 4 |
 | | **Supabase settings** (sign-up off, and so on): step 3 |
@@ -105,7 +105,7 @@ PGLITE="$TEMP/pglite/node_modules/@electric-sql/pglite" node scripts/restore/reh
 PGlite is PostgreSQL compiled to WebAssembly (about 25 MB). It is **not** a dependency of the repo: install it in a scratch folder, delete the folder after. Nothing
 is written outside the system's temp folder, no real project is touched, and every row is made up (`seed_made_up.sql`). What it checks, in order:
 
-1. the snapshot builds 40 tables, reproduces itself when read back, and `BACKUP_TABLES` is exactly its tables;
+1. the snapshot builds 42 tables, reproduces itself when read back, and `BACKUP_TABLES` is exactly its tables;
 2. a backup taken the dashboard's way (same table list, first passwords blanked);
 3. three erasures with the real `coach_erase_person()` (an athlete, a testing buyer, a course buyer), then a newer backup holding their receipts;
 4. the old backup restored with those receipts into a fresh database: nobody erased comes back, in any of the 20 tables with an `athlete_id`; a link to them is

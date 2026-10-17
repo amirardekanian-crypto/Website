@@ -155,7 +155,7 @@ try {
   section('1. the schema snapshot and the dashboard agree on the tables');
   const A = await makeDb();
   const tablesInDb = (await q(A, `select tablename from pg_tables where schemaname = 'public' order by 1`)).map(r => r.tablename);
-  ok(tablesInDb.length >= 38, `the snapshot built ${tablesInDb.length} tables`);
+  ok(tablesInDb.length >= 42, `the snapshot built ${tablesInDb.length} tables`);
   ok(JSON.stringify([...lists.backupTables].sort()) === JSON.stringify(tablesInDb.filter(t => !SECRET_TABLES.includes(t))),
      'coach.html BACKUP_TABLES is every public table except the two key-hash tables',
      'in the database but not in BACKUP_TABLES: ' + tablesInDb.filter(t => !SECRET_TABLES.includes(t) && !lists.backupTables.includes(t)).join(', ') +
@@ -245,7 +245,7 @@ try {
   const chk2 = await check(B, dirB);
   ok(JSON.stringify(chk2) === JSON.stringify(chk), 'the second run leaves every count as it was');
   const nx = await nextIdsAfterMax(B);
-  ok(nx.n === 6 && nx.bad.length === 0, `all ${nx.n} id counters hand out an id past every restored one`, nx.bad.join('\n'));
+  ok(nx.n === 7 && nx.bad.length === 0, `all ${nx.n} id counters hand out an id past every restored one`, nx.bad.join('\n'));
 
   section('7. the logins come back in two steps; the rows that belong to a login follow');
   const made1 = await recreateLogins(B, reportB, new Set(['buyer_one', 'learner_one', 'ava_test']));

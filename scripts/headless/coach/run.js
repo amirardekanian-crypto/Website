@@ -3364,10 +3364,10 @@ S['nav-seven'] = async (b) => {
   check(r, 'opening the page ON an old address (a bookmark) lands in the new place and rewrites it: #assess → #buyers/testing, the Testing app sub-tab on show', (await o2.page.evaluate(() => location.hash)) === '#buyers/testing' && (await o2.page.locator('.buy-subrail .stab.active').textContent()).startsWith('Testing app') && (await o2.page.locator('#asUser').count()) === 1, await o2.page.evaluate(() => location.hash));
   await o2.page.context().close();
 
-  // 5. Leads: Applications · Free signups · Referral codes
+  // 5. Leads: Applications · Free signups · Referral codes · Chats
   await L.go(page, 'leads'); await L.settle(page, 400);
   let subs = await subsOf('.lead-subrail');
-  check(r, 'Leads has three sub-tabs, Applications first and marked, with a count of the new ones; its address is #leads', JSON.stringify(subs.map(s => s.label)) === JSON.stringify(['Applications', 'Free signups', 'Referral codes']) && JSON.stringify(subs.map(s => s.href)) === JSON.stringify(['#leads', '#leads/signups', '#leads/codes']) && subs[0].on && subs[0].n === '2' && !subs[1].n && !subs[2].n && (await page.locator('#inView').count()) === 1, subs);
+  check(r, 'Leads has four sub-tabs, Applications first and marked, with a count of the new ones; its address is #leads', JSON.stringify(subs.map(s => s.label)) === JSON.stringify(['Applications', 'Free signups', 'Referral codes', 'Chats']) && JSON.stringify(subs.map(s => s.href)) === JSON.stringify(['#leads', '#leads/signups', '#leads/codes', '#leads/chats']) && subs[0].on && subs[0].n === '2' && !subs[1].n && !subs[2].n && (await page.locator('#inView').count()) === 1, subs);
   check(r, 'the page title names the screen: Applications · Leads', (await page.title()) === "Applications · Leads · The Coach's Box", await page.title());
   await page.locator('.lead-subrail .stab', { hasText: 'Free signups' }).click(); await L.settle(page, 400);
   check(r, 'Free signups (#leads/signups) is the funnel: its section, two rows, and no applications view', (await hash()) === '#leads/signups' && (await page.locator('#funnelPanel').count()) === 1 && (await page.locator('#funnelPanel .fun').count()) === 2 && (await page.locator('#inView').count()) === 0 && (await page.title()) === "Free signups · Leads · The Coach's Box", await hash());
@@ -5339,6 +5339,34 @@ S['sync-finished-list'] = async (b) => {
   await hideFixture(page, FX.daysAgo(today, 2), false);
   await page.evaluate(([k]) => hideSession('ava_test', 3, k), [FX.daysAgo(today, 2)]); await L.settle(page, 900);
   check(r, 'a hidden session counts as on file', !(await keys()).includes('sync'), await gaps());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Leads → Chats (2026-10-17) ───────────────────────────────────────────────
+S['leads-chats'] = async (b) => {
+  const r = { id: 'leads-chats', title: 'Leads → Chats: old chats are deleted on open, the rest listed, escaped, and a delete asks first', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'leads/chats' });
+  await page.locator('#chView .in-row').first().waitFor();
+  await L.settle(page, 400);
+  const rows = await page.locator('#chView .in-row').count();
+  const db0 = await L.db(page);
+  check(r, 'the conversation older than 90 days was deleted when the tab opened, the other two are listed', rows === 2 && db0.chat_conversations.length === 2 && !db0.chat_conversations.some(c => c.visitor === 'fixture-old'), { rows, left: db0.chat_conversations.length });
+  const txt = (await page.locator('#content').innerText()).replace(/\s+/g, ' ');
+  check(r, 'one hint line and the month line (2 chats, $0.0049)', /Kept 90 days, then deleted/.test(txt) && /This month: 2 chats, \$0\.0049/.test(txt), txt.slice(0, 300));
+  check(r, 'a row shows the first message, the turns and the handoff tag', /Fixture question/.test(txt) && /2 turns/.test(txt) && /WhatsApp/.test(txt), txt.slice(0, 300));
+  check(r, 'visitor text is escaped (no element made from it)', (await page.locator('#chView .ch-msg b').count()) === 0 && /<b>one<\/b>/.test(await page.locator('#chView .in-detail').innerText()), await page.locator('#chView .in-detail').innerText());
+  await page.locator('#chView .in-row').nth(1).click();
+  check(r, 'the Farsi chat reads with dir=auto and shows its page', (await page.locator('#chView .ch-msg span[dir=auto]').first().getAttribute('dir')) === 'auto' && /index-fa\.html/.test(await page.locator('#chView .in-detail').innerText()), '');
+  const n0 = await L.nCalls(page);
+  await page.locator('#chView .ch-del').click();
+  await page.locator('#dangerGo').waitFor();
+  check(r, 'Delete only opens the panel: no write yet', !(await L.callsSince(page, n0)).some(x => x.kind === 'from' && x.name === 'chat_conversations' && x.op === 'delete'), '');
+  await page.locator('#dangerGo').click();
+  await L.settle(page, 600);
+  const db1 = await L.db(page);
+  check(r, 'the chat is deleted on the server and leaves the list', db1.chat_conversations.length === 1 && (await page.locator('#chView .in-row').count()) === 1, db1.chat_conversations.length);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

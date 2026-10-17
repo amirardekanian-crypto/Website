@@ -153,6 +153,13 @@ insert into public.affiliates (code, percent, coach_name, coach_name_fa, instagr
   ('GONE20', 20, 'Gone Partner', null, null, null, null, 'gone_test', '2026-08-02', false, '2026-09-30', null),
   ('SOLO5', 5, 'Solo', null, null, null, null, null, null, true, null, null);
 
+-- ── the website chatbot's saved chats (stage67) ──
+insert into public.chat_conversations (id, site, page, visitor, started_at, last_at, turns, handoff, tokens_in, tokens_out, cost_usd) values
+  ('20000000-0000-4000-8000-000000000001', 'en', '/', 'visitor-made-up-1', '2026-09-01 10:00:00+00', '2026-09-01 10:03:00+00', 2, 'whatsapp', 1200, 300, 0.004500);
+insert into public.chat_messages (conversation_id, role, content, at) values
+  ('20000000-0000-4000-8000-000000000001', 'user', 'How much is the 3 month plan?', '2026-09-01 10:00:00+00'),
+  ('20000000-0000-4000-8000-000000000001', 'assistant', 'It is made-up text for the rehearsal.', '2026-09-01 10:00:05+00');
+
 -- ── the Library, the exercise Spine, qualities ─────────────────────────────────────────────────────────────────────────────
 insert into public.library_categories (id, kind, title, banner, icon, sort_order) values
   ('speed', 'workout', 'Speed', 'banner-speed-v2.jpg', '⚡', 1),

@@ -113,6 +113,18 @@ function buildSeed(opt) {
     affiliates: [
       { code: 'FIXTURE10', percent: 10, coach_name: 'Fixture Coach', coach_name_fa: null, instagram: '@fixture.coach', whatsapp: '09120000009', email: 'fc@example.invalid', athlete_id: null, applied_on: daysAgo(today, 40), active: true, retired_on: null, notes: 'Made up.', created_at: iso(today, 40), updated_at: iso(today, 40) },
     ],
+    chat_conversations: [
+      { id: '00000000-0000-4000-8000-0000000000c1', site: 'en', page: '/', visitor: 'fixture-v1', started_at: new Date(Date.now() - 2 * 3600e3).toISOString(), last_at: new Date(Date.now() - 2 * 3600e3).toISOString(), turns: 2, handoff: 'whatsapp', tokens_in: 900, tokens_out: 200, cost_usd: 0.0031 },
+      { id: '00000000-0000-4000-8000-0000000000c2', site: 'fa', page: '/index-fa.html', visitor: 'fixture-v2', started_at: new Date(Date.now() - 30 * 3600e3).toISOString(), last_at: new Date(Date.now() - 30 * 3600e3).toISOString(), turns: 1, handoff: null, tokens_in: 500, tokens_out: 120, cost_usd: 0.0018 },
+      { id: '00000000-0000-4000-8000-0000000000c3', site: 'en', page: '/', visitor: 'fixture-old', started_at: new Date(Date.now() - 100 * 86400e3).toISOString(), last_at: new Date(Date.now() - 100 * 86400e3).toISOString(), turns: 1, handoff: null, tokens_in: 100, tokens_out: 50, cost_usd: 0.0005 },
+    ],
+    chat_messages: [
+      { id: 1, conversation_id: '00000000-0000-4000-8000-0000000000c1', role: 'user', content: 'Fixture question <b>one</b>?', at: new Date(Date.now() - 2 * 3600e3).toISOString() },
+      { id: 2, conversation_id: '00000000-0000-4000-8000-0000000000c1', role: 'assistant', content: 'Fixture answer one.', at: new Date(Date.now() - 2 * 3600e3).toISOString() },
+      { id: 3, conversation_id: '00000000-0000-4000-8000-0000000000c2', role: 'user', content: 'سوال نمونه', at: new Date(Date.now() - 30 * 3600e3).toISOString() },
+      { id: 4, conversation_id: '00000000-0000-4000-8000-0000000000c2', role: 'assistant', content: 'پاسخ نمونه', at: new Date(Date.now() - 30 * 3600e3).toISOString() },
+      { id: 5, conversation_id: '00000000-0000-4000-8000-0000000000c3', role: 'user', content: 'Fixture old question', at: new Date(Date.now() - 100 * 86400e3).toISOString() },
+    ],
     library_categories: [{ id: 'strength', kind: 'workout', title: 'Strength (fixture)', banner: null, icon: null, sort_order: 1 }],
     library: [{ slug: 'workouts/strength/fixture-burner', kind: 'workout', category_id: 'strength', published: true, sort_order: 1, updated_at: iso(today, 10),
       data: { id: 'fixture-burner', title: 'Fixture Burner', duration: '20 min', equipment: 'Bands', category: 'strength' } }],
