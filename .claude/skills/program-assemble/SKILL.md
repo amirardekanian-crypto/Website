@@ -22,7 +22,7 @@ notes, Becauses and WhatsApp text describing the old programme, and the Spine ga
 not pass until the drafting (Step 8) had run. Now:
 
 **Part A — build and check. Straight after /program-design, BEFORE /program-engage.**
-Step 1 · Step 2a–2e (the workouts, with `exId` stamped from the design pull; `weekNotes` carries
+Step 1 · Step 2a–2e (the workouts, with `exId` stamped from design's match; `weekNotes` carries
 design's numbers, no words yet) · Step 3 with `--stage build` (it also resolves every card name) ·
 Step 4 (act on the names: stamp, snap, rename to the entry's name, or draft a new exercise into the Spine, then re-run
 Step 3) · Step 3b (a new athlete's one review). A FAIL here is a design decision to revise: change
@@ -62,7 +62,8 @@ The app draws every card's cues from its Spine entry, circuit items included (SC
 the Spine"). Something only this athlete needs arrives as engage's Coach's Note (`note`), never
 as a cue. **Stamp `exId`**
 on every exercise whose name resolves to a `public.exercises` entry (approved or draft), so the
-card follows the id even if the name is edited later. `sport.badge` ← design's `SPORT_BADGE` line.
+card follows the id even if the name is edited later: design's match (`match_<id>.json` and its Q4
+rows, /program-design STEP 3 → *THE SPINE*) gives every id. `sport.badge` ← design's `SPORT_BADGE` line.
 Leave `videoUrl` out: the app plays the card's Spine entry's video (found by `exId`, then by name). Set it only for a video that belongs to this card alone. The words come in Part B (2f).
 - **Set `type` from the design category** (the spec never emits it): standard grinding lift
   / ballistic / loaded carry → `"standard"`; working or prep circuit → `"circuit"`; warm-up
@@ -260,7 +261,7 @@ count and what landed on the cards differ, which is how a dropped or invented on
   ```
   The one query also resolves every card NAME on the server (exact name, else a loose
   match) for Step 4, and brings last cycle's modelled and logged minutes for the time check. Save
-  only this result: never the design pull's 39,000-character catalogue (2026-09-27).
+  only this result: never a copy of the whole catalogue (2026-09-27).
   `--tables` writes the log's Volume & Dose tables (per exercise, per muscle, per-day load); Step 5
   pastes the file from the LAST run. A count that looks wrong is its Spine entry's (fix it via /spine
   Upkeep, a proposal on an approved entry), never a hand edit of the table.
@@ -310,20 +311,26 @@ are applied like the first review's.
 checks and his checkpoint already cover a cycle that continues a known logic.
 
 ## Step 4 — Names and new Spine entries (Part A, from the check's output)
-Names from /program-design are rough by design — **this is the correction pass** (NAM-1 to NAM-9;
-the Spine is the name and video source since 2026-09-26). Stamp each card's `exId` while building
-(the design pull's spine lines carry every id). Step 3's check then reads every card name against
-the Spine on the server, so the catalogue is never copied into a file (until 2026-09-27 this was a
-node scan over a 39,000-character copy). Act on what it prints:
+**This is the correction pass** (NAM-1 to NAM-9; the Spine is the name and video source since
+2026-09-26). Since 2026-10-17 design chooses every movement first and matches the names once,
+with the same resolver Step 3 runs (/program-design STEP 3 → *THE SPINE*): its match gives each
+card its entry's exact name and `exId`, and every miss arrives as a `new_exercise:` line with its
+pattern and qualities already set. Stamp the ids while building. Step 3's check then reads every
+card name against the Spine on the server again, so the catalogue is never copied into a file.
+Act on what it prints:
+- **Every `new_exercise:` line first:** draft it NOW with `/spine`, in full, so its card gets an
+  `exId` before the check. Its qualities are the line's, set from the movement before any Quality
+  count was seen: never re-tag one after the check prints the QUALITY line (/spine → *qualities*).
 - **Mechanical, fix in the file now:** a `NAM-2` or `NAM-4` FAIL (a "Bodyweight" prefix; brackets,
   colons or commas: a grip goes to the pill, a variant that changes the exercise is its own entry,
   anything else is the Coach's Note) · `no exId: the Spine has it as <id>` → stamp it ·
   `no exId: … the nearest is <Name> [<id>]` → use that name and id when it is the same movement.
-- **Judgment, surface to Amir, never silently invent:** `no exId: not in the Spine by that name` is
+- **Judgment, surface to Amir, never silently invent:** `no exId: not in the Spine by that name` should
+  be rare now (design matched every name; a name changed after the match is the usual cause). It is
   either a movement the Spine has under another name (stamp that id AND rename the card to the entry's name:
   one name, no alias, NAM-8) or a
-  new movement: draft it into the Spine NOW with `/spine`, in full, so its card gets an `exId` before
-  the check · a `NAM-8` WARN (the card's name is another entry's) · an exercise that looks like the
+  new movement design did not mark: draft it with `/spine` like a `new_exercise:` line, its qualities
+  from the movement alone · a `NAM-8` WARN (the card's name is another entry's) · an exercise that looks like the
   *wrong* movement · a corrective or postural drill with no noted indication (SEL-14).
 - A `NAM-8` WARN "the card is not named as its Spine entry" is a rename, done here before publishing (Amir,
   2026-10-09: one name, the Spine's; a different version is its own entry, via `/spine`).
@@ -342,8 +349,8 @@ SFR and flags), qualities from the ten and a pattern from the library's list, ne
 either kind. Only an approved entry reaches the phone, so the new entries are one question for Amir
 before publishing (Step 6a): *"approve these N so their cards show cues and steps?"* Approve only on his word.
 
-An exercise whose Spine line in the design pull says `novideo` is fine to ship: it goes on the
-handoff's film list.
+An exercise whose entry has no video (design's Q4 row says `has_video` false) is fine to ship: it
+goes on the handoff's film list.
 
 ## Step 5 — Archive the cycle rationale (coach-only, append-only) + update the profile and the Exercise Ledger
 Persist the **COACHING LOG ENTRY** from /program-design — the coach-only record of WHY this

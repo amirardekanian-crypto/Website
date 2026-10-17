@@ -28,7 +28,8 @@ You output: the **program spec** (for the athlete app) + **coach-facing reports*
 printed in chat and archived as the cycle's COACHING LOG ENTRY to the coach-only coaching log).
 You do not fetch email, write JSON, or write messages — /cycle-report (the evidence),
 /program-assemble and /program-engage do those, so your whole context stays on coaching. Your
-one database read is the context pull in STEP 0.
+database reads are the context pull in STEP 0 and, once the movements are chosen, the one Spine
+match in STEP 3.
 
 Do not write a single exercise until STEP 1 is complete. Every Step 2–3 decision must
 trace to a Step 1 point or a stated principle.
@@ -48,9 +49,9 @@ checkpoint:** after STEP 1, show your analysis + the locked lists and ask *"anyt
 change before I build?"* before writing exercises.
 
 ## LEARNING LOOP — get smarter each cycle
-- **Read `.claude/COACHING-PRINCIPLES.md` at STEP 0** and apply it: the **rule index** at the
-  top first (one numbered line per rule, and the line is the rule), then the stories below it.
-  Never re-ask a question it already answers. Where a rule decides something in the spec or the
+- **Read `.claude/COACHING-PRINCIPLES.md` at STEP 0** and apply it: the **rule index** in full
+  (one numbered line per rule, and the line is the rule), then the stories this pass decides from
+  (STEP 0.1 lists them). Never re-ask a question it already answers. Where a rule decides something in the spec or the
   log, cite its ID (`VOL-8`) rather than restating it (PRC-23).
 - When Amir makes a call during design that is **generalizable** (would apply to other
   athletes — e.g. an exercise preference, a dosing rule, a communication choice), ask:
@@ -75,7 +76,12 @@ change before I build?"* before writing exercises.
    `scripts/check_program.py` or `assets/js/chips.js` is on the list, write both from `origin/main`
    into `<scratch>/pipeline/` at the same paths and run `python <scratch>/pipeline/scripts/check_program.py`
    for the whole run: run it, never read it.
-1. Read **`.claude/COACHING-PRINCIPLES.md`**: the rule index, then the stories (apply throughout).
+1. Read **`.claude/COACHING-PRINCIPLES.md`** the way /program-engage does (2026-10-17): the **rule
+   index** in full, then only the story sections this pass decides from: **Intake & assessment** (the
+   injury logic), **Exercise selection**, **Recovery & autoregulation**, **Session structure & time**,
+   **Progression**, **Volume & dosing** and **Testing**. Apply them throughout. The other sections
+   (naming, communication, cues, chips, process) belong to assemble, engage and /spine: open one of
+   their stories, by searching its ID, only when its line is not enough for a decision in hand.
    Not `COACHING-PRINCIPLES-HISTORY.md`: its dates and quotes change no decision.
 2. Establish `athlete_id`. If Amir pasted athlete info, proceed without commentary.
 3. **ONE context pull: everything design reads from the server, in a single call**: **Q1 in
@@ -101,15 +107,11 @@ change before I build?"* before writing exercises.
      exactly what assemble's local copy and fingerprint need, so nothing is looked up twice.
      `ctx.row.notes` lists last cycle's card titles. `ctx.sessions.minutes_by_day` is the real
      average session length per day over the last six weeks (STEP 2's time check).
-   - `spine` is the whole exercise catalogue, one line per entry, pattern by pattern, best SFR
-     first: `id|name|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases|video|credits|cost`.
-     `credits` is what one working set counts toward (`glutes:0.5,quads:1`; `none` = nothing) and
-     `cost` its day-load tier: size the week's volume with them, since the checker counts from them.
-     **Read it here and never copy it into a file** (it is 39,000 characters): Part A's checker
-     resolves every card name on the server (2026-09-27). The entry's `name` is not always the card's
-     (`Inverted Row (BW)`, whose card says Inverted Row); the card follows its `exId`, so it gets the
-     entry's cues and video either way. Every `novideo` exercise you prescribe goes on the handoff's
-     film list (videos live on the entries, added in coach.html → Exercises).
+   - **No exercise catalogue comes with it** (2026-10-17; Amir: *"i want the program writer to write
+     the best program possible, use new exercises if needed, and then check spine"*). Until then Q1
+     carried the whole Spine, 39,000 characters ordered by SFR, and reading it before choosing anchored
+     each pick to what the library happened to hold. Design chooses every movement from the athlete
+     first, then checks the Spine once (STEP 3 → *THE SPINE*).
 4. **Get the brief:**
    - RETURNING → **the Debrief IS the brief** (the one evidence path since 2026-09-26). If
      `ctx.log` has no **`## Debrief`** for the cycle just trained, run **/cycle-report** first: it
@@ -126,9 +128,20 @@ change before I build?"* before writing exercises.
      roadmap's read and rationale in `ctx.log` (saved when the roadmap locked, PRC-3) plus intake's one
      lookup (/athlete-intake Step 1) stand in for it. If neither exists, stop and ask Amir to run
      /athlete-intake first.
+4b. **RETURNING — are the athlete's answers in?** (2026-10-17: a cycle was designed before the
+   athlete had answered the cycle report's questions.) The latest Debrief's **Open** list names the
+   questions sent to the athlete. An answer is recorded when Amir pasted it into this chat or a later
+   section of `ctx.log` holds it. If any question has no recorded answer, ask Amir before STEP 1, in
+   one message: *wait for the answers, or design now?* List each open question with the default you
+   would design on (for a back: which direction you would assume is the worse one, and what that does
+   to the hinge, squat and core picks). On "wait", stop: nothing is written. On "design now", each
+   default goes under MY CALLS at the checkpoint and into the log entry's read, so the next cycle knows
+   which answers were assumed. Answers that arrive go into this cycle's log entry (*The read*), in the
+   athlete's words.
 5a. **The athlete profile — read it first** (2026-09-26). The `## Athlete profile` block at the
-   top of `ctx.log` says who the athlete is today: aim (sport / strength-muscle / general), goals in
-   order, the bottleneck, days and real minutes, kit, standing bans, injuries with status,
+   top of `ctx.log` says who the athlete is today: aim (sport / strength-muscle / general, decided
+   again every cycle by `PROFILE.md` → *Choosing the aim*, since it moves with the goals and this
+   cycle's `art`), goals in order, the bottleneck, days and real minutes, kit, standing bans, injuries with status,
    recovery. Apply the Debrief's **Profile changes** to it. **No profile yet** (every athlete before
    2026-09-26), **or one marked `status: partial`**: `ctx.log` is then the whole log (Q1 returns it
    whole, since the old injuries and bans may sit in an early cycle's section). Build or complete
@@ -184,7 +197,9 @@ cycle's log entry).
   consequence (session length, frequency, autoregulation, deload) or an explicit "no
   adjustment needed" + why. Never ignore the chat.
 - **INJURY / MOVEMENT STATUS** — emerged / persisted / resolved; per item, the exercise-
-  level implication. For anything **resolving**, plan a staged return (isometric →
+  level implication. For a back, the direction decides the picks: which is worse, bending forward,
+  arching back or sitting long (the cycle report asks it; without an answer it is a STEP 0.4b
+  question, never a guess). For anything **resolving**, plan a staged return (isometric →
   eccentric → full ROM → loaded → reactive) across the weeks. **Logs are filled in by
   humans and go stale.** A pain/cramp/complaint that repeats verbatim across sessions with
   no other corroboration, or that reads inconsistent with the readiness/adherence trend,
@@ -202,8 +217,9 @@ cycle's log entry).
   `cycles[]` moves (PRC-17).
 
 **Rotate accessories BY VARIANT** (Amir, 2026-09-26: *"rotate by variant"*). The REPLACE pick is
-the same movement pattern on a different implement, stance, angle or grip (the Spine entry's
-`alts`), or its progression (`harder`) when the athlete has earned it. It reads as new, keeps the
+the same movement pattern on a different implement, stance, angle or grip, or its progression when
+the athlete has earned it. Pick it as a coach would; the library's `alts` and `harder` for that lift
+(Q5, read after the pick) show what it already holds, and a variant it lacks is a `new_exercise:`. It reads as new, keeps the
 movement skill and what the logs know, and it is not "new to the client", so from Cycle 2 it may be
 supersetted. A genuinely new pattern is still fine when the athlete needs one; it runs as straight
 sets its first cycle.
@@ -262,7 +278,8 @@ say what changed. Don't redo it from scratch.
   count (REC-1), anchored to the evidence-based range (VOL-3), not just intuition. If desired
   frequency exceeds capacity, say so and justify the cut.
 - **PRIORITY TARGETS** — for each priority muscle/pattern pick the highest-**SFR** option
-  from available equipment and say why (SEL-1; extend as equipment dictates). For a
+  from available equipment and say why (SEL-1; extend as equipment dictates). The SFR judgment is
+  yours, made from the athlete; the Spine is checked after (STEP 3 → *THE SPINE*). For a
   sport-performance athlete, write the trade-off whenever transfer wins (SEL-2, SEL-3). Give the
   minimum effective frequency per priority muscle.
 - **CONTRAINDICATIONS & RISKS** — every injury/restriction/lifestyle factor → the specific
@@ -293,9 +310,9 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   cycle get programmed like hypertrophy.
 - **PER-DAY LOAD DISTRIBUTION (required — not just weekly volume, VOL-2):** give each day a
   deliberate **load identity** and **undulate the week**: one peak / one–two moderate / one low
-  day, not four flat days. Raw set count lies, so read each day by cost (the spine lines' `cost`:
-  heavy ×1.5, moderate ×1, isolation ×0.5). The build check prints every day's load from the same
-  numbers and warns on a flat week. Also: no two high-load days for the same pattern back-to-back,
+  day, not four flat days. Raw set count lies, so read each day by cost (heavy ×1.5, moderate ×1,
+  isolation ×0.5: your estimate while choosing, each entry's `cost` from Q4 once the names are
+  matched). The build check prints every day's load from the entries and warns on a flat week. Also: no two high-load days for the same pattern back-to-back,
   and no grind (7 or more working exercises, SES-15). For poor-recovery clients this distribution is the
   primary lever.
 - **Warm-up + prep** on every day: 10–15 minutes (SES-3), its contents by SES-4, and its shape
@@ -365,7 +382,9 @@ still checked before Amir sees the finished programme, but the three-agent panel
 the BUILT programme, in /program-assemble **Part A**, straight after this spec and BEFORE engage
 writes anything (so a fix never leaves notes describing the old programme):
 1. **`scripts/check_program.py`** on the built file (Part A runs it). **Your spec's athlete profile
-   sets its flags**: `aim: strength-muscle` turns on the 10-set floor (never for a sport athlete, VOL-4),
+   sets its flags**: `aim: strength-muscle` turns on the 10-set floor (never for a sport athlete, VOL-4;
+   a muscle or strength goal in the top two, or a `build` or `iron` cycle, is strength-muscle, and
+   `general` turns the floor off: `PROFILE.md` → *Choosing the aim*),
    `proven` lifts the 4-set cap (VOL-8), `bans` and `floor-except` are read as written, and `cap` is
    the soft session length; a first cycle turns the new-athlete rules on by itself. So get the
    profile right rather than typing flags (a typed flag only ever adds one). What it checks is the
@@ -484,22 +503,49 @@ lives only as "engage should write a card about X" can no longer slip. List ever
 - `win: <what, with its number>` — a real win in the data (never manufactured).
 The same list drives the WhatsApp message's action lines (COM-17) and your handoff (MEASURE, GATE, FILM, DATES, WATCH).
 
-**THE SPINE — read it before choosing (2026-09-24).** Every exercise Amir programmes has (or
-will have) one entry in `public.exercises`, with its coach-only half in `public.exercise_coach`.
-You already have all of it: the `spine` column of STEP 0's context pull, one line per entry
-(`id|name|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases|video|credits|cost`).
-Don't query it again exercise by exercise. Use it for the decisions this pass already makes: **SFR** order within a pattern (`sfr` 1 = best),
-**restrictions** (`flags`: `loaded-knee-flexion`, `axial-load`, `free-hinge`, `high-impact`,
-`overhead` — check every flag against the athlete's injury picture), and **PROGRESS/REPLACE**
-with the entry's links: `harder` = progressions (the same movement made harder), `easier` =
-regressions (the same movement made easier), `alts` = alternatives (the same movement on other
-equipment or a machine: the swap when a gym lacks the kit).
-**Prescribe the movement that is right, in the library or not.** A movement with no entry is a
-`new_exercise:` line, and it goes INTO the library, in full, like the entries already there (Amir,
-2026-09-25: *"if there is any exercise that is outside of the exercise library, after its
-prescribed for any athlete, it should be added to our library, with all the cues and other details
-like the ones already there"*). A card shows cues only from an APPROVED entry, so the new entries
-are the one approval question in the handoff. Never swap a movement out because it has no entry.
+**THE SPINE — choose first, then check it (2026-10-17).** Amir: *"i want the program writer to write
+the best program possible, use new exercises if needed, and then check spine."* Every exercise he
+programmes has (or will have) one entry in `public.exercises`, its coach-only half in
+`public.exercise_coach`. The library records a choice; it never makes one (NAM-8: not a whitelist).
+1. **Write every slot's movement from the athlete read**, any real name: the injury picture (what
+   hurts, in which direction, what is deferred), the kit they have, the load each limb can take (a
+   side that lags, a joint in a staged return, one leg or two), and the goal and this cycle's
+   adaptation. Pick what you would pick with no library in front of you: the best SFR you know for
+   this athlete (SEL-1), transfer when it wins (SEL-2), a variant for REPLACE (STEP 1A). Write the
+   whole week this way, prep and core included, before any lookup.
+2. **One match, every name at once.** Put the chosen names (each exercise and circuit item) in a stub
+   and let the checker resolve them, with the resolver Part A runs on the built file (exact after
+   normalising, else a loose match), so design and assemble cannot disagree:
+   ```
+   # <scratch>/names_<id>.json:
+   # {"athlete": {"id": "<id>"}, "workouts": {"days": [{"id": 1, "blocks": [{"exercises": [{"name": "<a chosen name>"}, …]}]}]}}
+   python scripts/check_program.py <scratch>/names_<id>.json --spine-sql --pad   # ONE query: run it
+   python scripts/save_spine_result.py <the file the connector names> <scratch>/match_<id>.json
+   ```
+   Its `names` field is one line per name, `name|hit|near|entry name`. Then run **Q4** in
+   `queries.sql` once, for every id it found (PRC-6: these two and Q5 below are the run's Spine reads).
+3. **Read each name.** A **hit**: the card takes the entry's exact name and id (NAM-8). A **near**
+   match only: the same movement under another spelling takes the entry's name and id; a different
+   version (other kit or setup) is a miss (NAM-6). **Nothing**: a miss.
+4. **Check each matched entry against the athlete, and change the pick, never the label.** A
+   restriction flag (`loaded-knee-flexion`, `axial-load`, `free-hinge`, `high-impact`, `overhead`)
+   that meets the injury picture means the pick was wrong: choose again from step 1, or say on the
+   line why it is still right. `credits` (what one working set counts toward) and `cost` (its
+   day-load tier) size the week, since the checker counts from them. An entry with no video goes on
+   the handoff's film list (SEL-16; videos are added in coach.html → Exercises).
+5. **Every miss is a `new_exercise:` line**, and it goes INTO the library, in full, like the entries
+   already there (Amir, 2026-09-25: *"if there is any exercise that is outside of the exercise
+   library, after its prescribed for any athlete, it should be added to our library, with all the
+   cues and other details like the ones already there"*). Write its pattern (from the library's list)
+   and its qualities NOW, from the movement alone, before THE QUALITY CHECK below has run (/spine →
+   *qualities*). Part A drafts it with `/spine`. A card shows cues only from an APPROVED entry, so the
+   new entries are the one approval question in the handoff. Never swap a movement out because it
+   has no entry (NAM-9).
+**Regressions, progressions and kit swaps, when you want them:** **Q5** lists the entries in one or
+more patterns (all of them in one call), each with its kit and `easier>harder>alts` (`easier` the
+same movement made easier, `harder` made harder, `alts` the same movement on other kit). Read it only
+after the slot's own pick is written, to find a version of THAT pick, never to choose it. A name that
+changes after the match is matched again (the stub once more, with the changed names only).
 
 **THE QUALITY CHECK — before the spec goes to Amir (Quality Map, 2026-09-24).** Each Spine entry
 carries `qualities` (first = primary) from the ten: `strength · muscle · power · spring · speed ·
@@ -514,7 +560,8 @@ should be in the top two.** When it isn't, report it with your recommendation (A
 *"report it, but recommend what you think should happen"*); it is a warning, never a fail. Counting
 sets under-weights a quality trained in few, fast sets, so a real power block can put Power third,
 and that is fine when the power work comes first each day. Never add volume only to move this
-line. Report the per-day top three too: it is exactly what each day card on Home will say
+line, and never re-tag an exercise to move it: a new exercise counts with the qualities its
+`new_exercise:` line already carries, set before this count (THE SPINE, step 5). Report the per-day top three too: it is exactly what each day card on Home will say
 it builds, so a day card that reads "Movement · Armour" on a day you meant as the power day is a
 design bug.
 
@@ -525,10 +572,8 @@ exercise has one set of steps (CUE-6) and three cues (CUE-1) on its Spine entry,
 shows those; each layer says one thing (CUE-7).
 - **Read the four layers before you write a pill or a flag** (CUE-7; Amir, 2026-10-11: *"everytime we write a
   program, we dont have conflict of coaching with the cues, coaches notes, and how to do the exercise and
-  pills"*). The context pull's `spine` lines carry no steps or cues, so once the exercises are chosen, read
-  them for all of them in ONE query (PRC-6):
-  `select id, name, steps, cues, purpose, tennis from public.exercises where id in (<every chosen exercise and circuit item's id>)`.
-  Then, exercise by exercise:
+  pills"*). Q4 (THE SPINE, step 2) already returned every matched entry's steps, cues, purpose and On
+  court line; a `new_exercise:` brings its own. Then, exercise by exercise:
   - **The pill** changes or adds to what the entry says, every rep. Never a value the steps or cues already
     say (the Broad Jump's steps hold the landing, so no `stick the landing`), never the grip the steps name
     unless this athlete holds it differently.
@@ -629,7 +674,7 @@ SECTION: Core
  about an entry while designing, such as a missing regression/progression/alternative, a wrong flag, a
  missing or unclear step or a better general cue, goes in as spine_cue: / new_exercise: lines.
  /program-assemble applies them in its Spine upkeep step.
- new_exercise: [name] | steps: 1. … 2. … 3. … (CUE-6) | key point / feel or check / avoid (CUE-1), written for anyone → drafted into the Spine
+ new_exercise: [name] | pattern: … | qualities: … (from the movement alone, set before the Quality check) | steps: 1. … 2. … 3. … (CUE-6) | key point / feel or check / avoid (CUE-1), written for anyone → drafted into the Spine
  spine_cue: [entry id] | [a general change to a step, a cue or the purpose, for Amir to approve on the entry])
 
 (fallback per primary: one same-pattern swap if pain / station busy)
@@ -718,6 +763,8 @@ app's Home → Body Weight card, never in AA Proof (COM-13).
 
 ## Don'ts
 - Don't ask trivial questions or drip them — consult only on genuine forks; batch.
+- Don't read the Spine before choosing: the pick comes from the athlete, the match comes after
+  (STEP 3 → *THE SPINE*).
 - Don't prescribe %1RM off The Ceiling, and don't prescribe a true 1RM test — see
   *The Ceiling* above. Loads stay RPE-prescribed; a max estimate informs a starting-load
   note, nothing more.

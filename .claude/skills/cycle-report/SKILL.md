@@ -175,6 +175,12 @@ what's next, and what I need from you.>
 امیر
 ```
 
+**A question that is always asked** (2026-10-17): for any athlete with back pain, now or in their
+profile, one of the three questions is **which is worse: bending forward, arching back, or sitting
+for a long time**. The answer decides the next cycle's hinge, squat and core picks (on 2026-10-17 a
+cycle was designed without it). Write it in the athlete's language, with the three choices, so a
+one-word answer works.
+
 **Worked example:** the first report (2026-09-24, its athlete's coaching log holds it) is the model: 5 wins, 3 things he
 said on a call (heart rate and fatigue → cardio base; left arm on backhands → medicine-ball
 throws; speed → cycle 3), the Force Bank plan with a broad-jump baseline, 4 asks (tick + RPE,
@@ -248,7 +254,9 @@ In this order, in chat:
 2. What was **left out on purpose** and why (a medical question for Amir to ask himself, a typo).
 3. **What was saved**: the log section's headings in one line each, its length before and after,
    and that the prefix checksum matched.
-4. The next step: `/program-design <name>` once the athlete answers.
+4. The next step: `/program-design <name>` once the athlete answers. Paste the answers into that run:
+   design records them in the new cycle's log entry, and when the Debrief's Open list still has a
+   question with no recorded answer it asks Amir first, *wait or design now with stated defaults*.
 
 ---
 

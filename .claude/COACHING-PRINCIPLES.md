@@ -4,9 +4,10 @@ This is Amir's codified coaching philosophy, in two parts: **the rule index** (o
 line per rule, just below) and **the stories behind the rules** (the bullets after it: what each
 rule means in practice, with its examples). The history, meaning each rule's date, Amir's own words
 and the athlete it came from, is in **`COACHING-PRINCIPLES-HISTORY.md`** (moved there 2026-09-27).
-No stage reads that file; open it for a rule's origin. `/program-design` reads this whole file
-every run; `/program-engage`, `/program-edit` and the reviewers read the index and the sections
-their job needs. Either way, settled questions are never re-asked. It
+No stage reads that file; open it for a rule's origin. Every stage reads the whole index and only
+the story sections its job needs: `/program-design` the seven its decisions come from (its STEP 0
+lists them, since 2026-10-17), `/program-engage`, `/program-edit` and the reviewers theirs. Either
+way, settled questions are never re-asked. It
 grows as we design together: when Amir makes a **generalizable** call during design, the skill
 offers to add it here (he approves; one-off athlete-specific calls are NOT saved). Amir can open
 and edit this file anytime.

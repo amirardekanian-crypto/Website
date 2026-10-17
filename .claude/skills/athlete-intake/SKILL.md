@@ -68,7 +68,7 @@ Grouped into one round of questions, the genuine gaps to close:
   tier, sport, sex and age, training age, goals in order, days, minutes, cap = form + 15, kit,
   injuries with status, bans, recovery, language) and leave `bottleneck` for the roadmap, which saves
   the draft to the coaching log when it locks. It is what every later check reads, so an `aim` of
-  strength-muscle vs sport is a question for Amir, not a guess.
+  strength-muscle vs sport is a question for Amir, not a guess (PROFILE.md → *Choosing the aim*).
   **`tier: academy (Etminan)`** when the intake row's `programme` is the Etminan Tennis Academy's:
   that deal fixes 2 sessions of up to 60 minutes (a hard stop), home or court with minimum kit, and
   no mid-cycle changes, so write `days: 2`, `cap: 60` and `aim: sport`, and ask Amir for the 3

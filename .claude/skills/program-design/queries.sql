@@ -8,6 +8,9 @@
 -- ctx.log is the log's head (profile, ledger, roadmap) + everything from the latest cycle's first
 -- section on. It comes back WHOLE when the log has one cycle, or no finished profile yet (no ```profile
 -- block, or one marked "status: partial"), because design then builds the profile from all of it.
+-- No exercise catalogue (2026-10-17): until then a `spine` column carried the whole Spine, ordered by SFR,
+-- and reading it before choosing anchored every pick to what the library held. Design chooses first, then
+-- matches the names once (SKILL.md → STEP 3 → THE SPINE) and reads Q4.
 select jsonb_build_object(
   'row', (select jsonb_build_object(
             'has_workouts', jsonb_typeof(data->'workouts'->'days') = 'array',
@@ -43,18 +46,7 @@ select jsonb_build_object(
   'cycle_names_in_use', (select jsonb_agg(distinct c->>'name') from public.programs p,
                          jsonb_array_elements(coalesce(p.data->'cycles', '[]'::jsonb)) c),
   'qualities', (select jsonb_agg(id order by sort) from public.qualities where status = 'approved')
-) as ctx,
-(select string_agg(concat_ws('|', e.id, e.name, coalesce(e.pattern, ''), e.status, coalesce(c.sfr::text, '-'),
-          coalesce(array_to_string(c.flags, ','), ''), coalesce(array_to_string(e.qualities, ','), ''),
-          coalesce(array_to_string(e.loads, ','), ''), coalesce(e.impact, '-'),
-          coalesce(array_to_string(e.easier, ','), '') || '>' || coalesce(array_to_string(e.harder, ','), '') || '>' ||
-          coalesce(array_to_string(e.alts, ','), ''),
-          coalesce(array_to_string(e.aliases, ';'), ''), case when e.video is null then 'novideo' else 'video' end,
-          case when c.credits is null then '-' when c.credits = '{}'::jsonb then 'none' else
-            (select string_agg(k || ':' || w, ',' order by k) from jsonb_each_text(c.credits) t(k, w)) end,
-          coalesce(c.cost, '-')),
-          E'\n' order by e.pattern, c.sfr nulls last, e.id)
- from public.exercises e left join public.exercise_coach c using (id)) as spine;
+) as ctx;
 
 -- ─── Q2 · the coaching log slice alone (what /program-edit Step 0 reads) ─────────────────────
 -- The same slice as Q1's ctx.log: the head + the latest cycle's sections, or the whole log while it
@@ -73,3 +65,29 @@ from (select body,
 -- Read it up to the next "## " heading.
 select substring(body from position('<the ## heading>' in body) for 15000)
 from public.coaching_logs where athlete_id = '<id>';
+
+-- ─── Q4 · THE MATCH: what the Spine holds for the movements design CHOSE (after choosing, never before) ──
+-- The ids come from the names check (SKILL.md → STEP 3 → THE SPINE: the checker's own resolver, run on a
+-- stub of the chosen names). One row per matched entry: what design checks the pick against (flags
+-- against the injury picture, credits and cost for the volume, qualities for the Quality check, video for
+-- the film list) and the four layers a pill or a note_flag must not repeat (CUE-7). Once per run.
+select e.id, e.name, e.status, e.pattern, c.sfr, c.flags, e.qualities, e.equipment, e.loads, e.impact,
+       e.easier, e.harder, e.alts, e.video is not null as has_video,
+       case when c.credits = '{}'::jsonb then 'none' else
+         (select string_agg(k || ':' || w, ',' order by k) from jsonb_each_text(c.credits) t(k, w)) end as credits,
+       c.cost, e.steps, e.cues, e.purpose, e.tennis
+from public.exercises e left join public.exercise_coach c using (id)
+where e.id in (<every id the names check found>)
+order by e.id;
+
+-- ─── Q5 · optional: the entries in some patterns, for a regression, a progression or a kit swap ──
+-- Only AFTER a slot's own pick is written: to find an easier, harder or other-kit version of THAT pick,
+-- or the variant for a REPLACE. Never to choose the pick. Every pattern you need in ONE call (PRC-6).
+-- One line per entry: id|name|status|sfr|flags|equipment|easier>harder>alts
+select string_agg(concat_ws('|', e.id, e.name, e.status, coalesce(c.sfr::text, '-'),
+         coalesce(array_to_string(c.flags, ','), ''), coalesce(array_to_string(e.equipment, ','), ''),
+         coalesce(array_to_string(e.easier, ','), '') || '>' || coalesce(array_to_string(e.harder, ','), '') || '>' ||
+         coalesce(array_to_string(e.alts, ','), '')),
+         E'\n' order by e.pattern, c.sfr nulls last, e.id) as entries
+from public.exercises e left join public.exercise_coach c using (id)
+where e.pattern in (<'pattern', …>);

@@ -148,6 +148,12 @@ the existing ids for the links, and they show you which names are only variants.
   mostly FOR. A day card on Home counts working sets × (primary 1, secondary ½), so tag what it
   really trains and stop at three. A curl is `muscle`, not `muscle strength armour`. Warm-up drills
   still get tagged (`movement`), because prep blocks are skipped when a day is counted.
+  **Set them from the movement alone** (2026-10-17): what the exercise trains for anyone, decided
+  before you look at any programme's Quality line. Never read the cycle's headline (its `art`) or the
+  week's Quality mix to choose them, and never change a new entry's qualities after that line prints:
+  a tag picked to move a headline mislabels the entry for every athlete. When design's
+  `new_exercise:` line carries qualities, they were set this way: use them, and put a disagreement to
+  Amir rather than rewriting them.
   For an entry Amir has already **approved**, never write `qualities` on it: put the suggestion in
   `exercise_coach.suggested_qualities`, and coach.html pre-fills his editor with it.
 - **sfr:** 1 = best stimulus-to-fatigue in its pattern. Use `null` for prep, drills and plyos.
@@ -352,7 +358,8 @@ no SFR. Answer them once and they stop mattering.
   aliased. In a live programme, check the athlete's logged history first (rule 4).
 - **exId on the card:** a programme exercise that resolves to an entry but has no `exId` gets one
   (on the programme row, beside the name). It is what keeps the card on its entry.
-- **Qualities:** tag what the exercise is mostly FOR, first = primary, stop at three. A new
+- **Qualities:** tag what the exercise is mostly FOR, first = primary, stop at three, from the
+  movement alone and never to move the programme's QUALITY line (the Run above). A new
   exercise without qualities makes its day card go blank (under 70% tagged shows nothing), so this
   is never optional.
 - **Links:** an id when the entry exists, a plain name when it doesn't, by the strict meanings in

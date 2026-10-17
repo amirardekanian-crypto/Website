@@ -20,7 +20,7 @@ header: it lives in the coach-only row.
 ````
 ## Athlete profile
 ```profile
-aim: sport                 # sport | strength-muscle | general (strength-muscle = the 10-set floor)
+aim: sport                 # sport | strength-muscle | general: see "Choosing the aim" below
 tier: -                    # - for a coached athlete; academy (Etminan): see below
 sport: padel
 sex: male · age: 34
@@ -41,6 +41,22 @@ language: English
 updated: 2026-09-26 · /program-design, Cycle 3
 ```
 ````
+
+## Choosing the aim (2026-10-17)
+
+`aim` is the one line that switches the 10-set floor (VOL-4) on or off, so it is decided again every
+cycle, at design's STEP 0, from the goals and THIS cycle's `art`, and the checkpoint names the line
+below that decided it. In this order:
+- **`sport`**: a tennis or padel player training for their game. Their volume is a report (VOL-1),
+  and the floor stays off (VOL-4).
+- **`strength-muscle`**: building muscle or getting stronger is goal 1 or goal 2, **or** this cycle's
+  `art` is `build` or `iron`. The checker turns the floor on; a muscle excused goes on `floor-except:`
+  with its reason.
+- **`general`**: only when neither line above holds. It switches the floor off, so it is never the
+  aim of a muscle or strength cycle (on 2026-10-17 a muscle cycle written as `general` shipped one
+  major muscle at 4.5 sets a week, and nothing flagged it).
+
+A change from last cycle goes on the log entry's *Profile changes* line with the reason.
 
 ## tier: academy (Etminan)
 
