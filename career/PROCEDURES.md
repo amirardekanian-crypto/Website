@@ -552,7 +552,7 @@ became, and the choices the build had to make:
 `supabase/stage69_career_xp_switch.sql` (with the seed of `rulebook.toml` version 2: both switches `"off"`), rehearsed by
 `scripts/career/rehearse_switch.mjs` (PGlite, the schema snapshot, a full backup of the real rows, phase 1 as it stands on the live
 project, then stage69, Season 1, the dry run, the switch, the refusals, settling, a season closing under the switch, an erasure, the
-cache's cost and the way back: 42 of 42 on 2026-10-17); the way back is `scripts/career/rollback_stage69.sql`, tested there. What the
+cache's cost and the way back: 42 of 42 on 2026-10-17), then applied to the live project late that day with the switches still off (every level, both boards and `career_compare()` identical before and after, 34 of 34); the way back is `scripts/career/rollback_stage69.sql`, tested there. What the
 procedures above became, and the choices the build made:
 
 - **The two switches.** `rulebook.toml` → `[switch]`: `xp` (phase 2) and `catalogue` (phase 3), each `"off"` or the day it was turned on.
@@ -572,8 +572,7 @@ procedures above became, and the choices the build made:
   version and load time), Amir's quest runs, the season, today, the athlete's facts (their count and last change) and programme. A
   different stamp is stale, worked out again on the next read (`career_scored()`). The board reads many at once with a time budget
   (`career_scores_for()`: 2.5 s, then a stale row is served as it was), because the career's habit half walks a whole career (up to a
-  second for the longest log on 2026-10-17). Coach-only read; `coach_erase_person()` empties it; it joins `BACKUP_TABLES` and the schema snapshot in the commit that applies
-  stage69.
+  second for the longest log on 2026-10-17). Coach-only read; `coach_erase_person()` empties it; it is in `BACKUP_TABLES` and the schema snapshot.
   Measured on PGlite (slower than the live project): the longest athlete's profile 0.39 s cold and 0.11 s warm, the board 0.84 s cold
   and 0.003 s warm.
 - **P4.** With the XP switch on: the level is `career_level()` of the career XP (never resets); `hab_season_level()` answers it, so the

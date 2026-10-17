@@ -60,6 +60,10 @@ insert into public.career_rules (version, rules, source, loaded_at) values
 insert into public.career_catalogue (kind, id, body, version, loaded_at) values
   ('badge', 'held_weeks', '{"name": "Held Weeks", "meaning": "consistency", "kind": "best_run", "counts": "week_held", "tiers": [{"at": 4, "metal": "bronze", "xp": 200, "size": "highlight"}]}', 1, '2026-10-17 09:00:00+00'),
   ('setting', 'bell', '{"keep_days": 7, "question": "Ring the bell for the crew when you set a best? ''Yes'' \\ or keep it to me"}', 1, '2026-10-17 09:00:00+00');
+-- Career Mode's score cache (stage69): nothing in it is a source, but it holds a person's numbers, so it is backed up and erased like the rest
+insert into public.career_scores (athlete_id, stamp, score, updated_at) values
+  ('ava_test', 'made-up stamp', '{"career": {"xp": 1200, "level": 3, "rank": "ROOKIE 3"}, "season": {"points": 400}, "week": {"points": 0}}', '2026-10-17 09:00:00+00'),
+  ('gone_test', 'made-up stamp', '{"career": {"xp": 50, "level": 1, "rank": "ROOKIE 1"}}', '2026-10-17 09:00:00+00');
 
 -- ── the programmes and what hangs off an athlete ──────────────────────────────────────────────────────────────────────────
 insert into public.programs (athlete_id, data, updated_at, updated_by) values

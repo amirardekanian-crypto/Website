@@ -107,7 +107,7 @@ PGLITE="$TEMP/pglite/node_modules/@electric-sql/pglite" node scripts/restore/reh
 PGlite is PostgreSQL compiled to WebAssembly (about 25 MB). It is **not** a dependency of the repo: install it in a scratch folder, delete the folder after. Nothing
 is written outside the system's temp folder, no real project is touched, and every row is made up (`seed_made_up.sql`). What it checks, in order:
 
-1. the snapshot builds 45 tables, reproduces itself when read back, and `BACKUP_TABLES` is exactly its tables;
+1. the snapshot builds 46 tables, reproduces itself when read back, and `BACKUP_TABLES` is exactly its tables;
 2. a backup taken the dashboard's way (same table list, first passwords blanked);
 3. three erasures with the real `coach_erase_person()` (an athlete, a testing buyer, a course buyer), then a newer backup holding their receipts;
 4. the old backup restored with those receipts into a fresh database: nobody erased comes back, in any of the 21 tables with an `athlete_id`; a link to them is

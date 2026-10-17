@@ -44,13 +44,12 @@ Durable context for working in this repo. Read the linked docs before diving in.
   `node scripts/career/rehearse.mjs` (PGlite, nothing live; `--data <dump>` for the real rows, kept outside the repo).
   ⚠️ A trigger's exception block cannot catch a statement timeout (8 s for a signed-in request), so the work a trigger does
   per save stays small (at most 0.3 s on 2026-10-17). `scripts/career/rollback_stage66.sql` takes phase 1 off, on Amir's word only.
-  **Phase 2, the XP switch, is built, not yet on** (`supabase/stage69_career_xp_switch.sql`; Amir 2026-10-17, three decisions in
+  **Phase 2, the XP switch, is applied to the live project (2026-10-17), not yet on** (`supabase/stage69_career_xp_switch.sql`; Amir 2026-10-17, three decisions in
   `CAREER_MODE.md` → *round 3*; `PROCEDURES.md` → *Phase 2, as built*). The one gate is two, `rulebook.toml` → `[switch]`: `xp`
   (phase 2) and `catalogue` (phase 3; the badge entries say `retire_at` / `starts_at = "catalogue"`), each `"off"` or the day a seed
   turned it on, never back off. With the XP switch on: training earns XP, the WORKOUT habit pays 0 a day, closed days settle, the
   level is the career level (never resets; the road's titles, the board's level and coach.html's follow it), the board ranks season
-  points from the facts through a cache (`career_scores`, a cache holding no source: `coach_erase_person()` empties it, and it joins `BACKUP_TABLES` and the snapshot in
-  the commit that applies stage69),
+  points from the facts through a cache (`career_scores`, a cache holding no source: `coach_erase_person()` empties it, and it is in `BACKUP_TABLES` and the snapshot),
   and nobody's level goes down (`[fact.level_kept]`, written once by the seed that turns it on; `career_seed.py --dry-run` shows the
   list first). Both apps read `get_profile()` only once it is on and behave exactly as before until then. The phones copy three of its
   rules (the career's curve, WORKOUT at 0, a session's full log and check-in): `scripts/check_twins.js` §9 holds them to

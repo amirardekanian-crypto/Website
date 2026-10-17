@@ -1197,8 +1197,8 @@ three: *"B, show it at zero, words ok"*. **Display only: nothing is written and 
 
 The training app's half of Career Mode's XP switch (`career/CAREER_MODE.md` → *The switch decisions*, and GAME-13: every meaningful
 action answers at once, visibly). The server's half and AA Proof's are in `HABITS.md` → *Career Mode (phase 2, the XP switch)*.
-**Built and rehearsed, not applied: nothing here shows, and the app asks the server for nothing new, until the server's XP switch is
-on.** Applying `supabase/stage69_career_xp_switch.sql` and turning the switch on wait for Amir's yes. Once it is on, the athlete's
+**Built, rehearsed and applied on the server (2026-10-17), switch off: nothing here shows, and the app asks the server for nothing new, until the server's XP switch is
+on.** Turning the switch on waits for Amir's yes. Once it is on, the athlete's
 level is the career's (every session, every habit, never reset by a season) and this app shows it in three places.
 
 - **The row** (`#home-career-wrap`, `paintCareer()`, `careerRowHTML()`): one door row on Home, **above Hold Serve**. Home now reads: the

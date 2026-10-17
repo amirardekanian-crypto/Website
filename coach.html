@@ -1382,7 +1382,7 @@ const TABLE_KEYS = {
   career_facts: ['athlete_id', 'kind', 'ref'], career_rules: ['version'], career_catalogue: ['kind', 'id'],
 };
 function keysOf(table) {
-  return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys', 'athlete_status']
+  return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys', 'athlete_status', 'career_scores']
     .includes(table) ? ['athlete_id'] : ['id']);
 }
 // `apply` narrows the read ((q) => q.eq('athlete_id', id)); the paging and the key order stay the same.
@@ -2091,7 +2091,7 @@ window.bulkCreateLogins = bulkCreateLogins;
 const BACKUP_TABLES = [
   'programs', 'program_versions', 'coaching_logs', 'athlete_identities',
   'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
-  'career_facts', 'career_rules', 'career_catalogue',
+  'career_facts', 'career_rules', 'career_catalogue', 'career_scores',
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
   'library', 'library_categories', 'library_sessions',

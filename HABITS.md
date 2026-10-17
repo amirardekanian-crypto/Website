@@ -2492,9 +2492,8 @@ would have landed as an instant head start. Full detail in
 
 ## Career Mode (phase 2, the XP switch)
 
-> **Where it stands (2026-10-17).** Built and rehearsed. **Not applied to the live project, and the switch is not on.** Both
-> apps ship ready for it and behave exactly as the rest of this file says until it is. Applying
-> `supabase/stage69_career_xp_switch.sql` and turning the switch on each wait for Amir's yes. Every "once the XP switch is on"
+> **Where it stands (2026-10-17).** Built and rehearsed. **The server half (`supabase/stage69_career_xp_switch.sql`) was applied to the live project on 2026-10-17, and the switch is not on.** Both
+> apps ship ready for it and behave exactly as the rest of this file says until it is. Turning the switch on waits for Season 1, the switch's dry run and Amir's yes. Every "once the XP switch is on"
 > in this file points here.
 
 Career Mode (`career/CAREER_MODE.md`, with the steps in `career/PROCEDURES.md` → *Phase 2, as built*) gives AA Proof and the
@@ -2576,8 +2575,8 @@ training app one score and one level. Amir's three decisions, 2026-10-17 (*"go w
   the rulebook's version and load time, Amir's quest runs, the season, today, the athlete's facts (their count and last change) and
   their programme with its versions. A board read works out the stale rows it has time for (2.5 s) and serves the rest as they
   were. `coach_season_levels()` has 3 s. Only the coach can read it (RLS), `coach_erase_person()` empties it, and **nothing in it
-  is a source**: delete a row and it comes back. It joins `BACKUP_TABLES` in coach.html and `supabase/schema_snapshot.sql` the day
-  stage69 is applied (pre-commit guard 17 fails when the two disagree).
+  is a source**: delete a row and it comes back. It is in `BACKUP_TABLES` in coach.html and in `supabase/schema_snapshot.sql`
+  (pre-commit guard 17 fails when the two disagree).
 - **`get_profile()`** answers from that copy and adds `switch` (`xp`, `catalogue`), `week` (`from`, `points`), `since`, `kept` (the
   level kept) and `rules` (the curve under `level`: base, growth, ranks, levels per rank and prestige, then `season` with
   `title_points`, and `prices`: the facts a phone previews a tap with). `hab_proof_level()` keeps Proof's own season level, for the switch's report.
@@ -2729,7 +2728,7 @@ Stages 18 and 20 have no entry in the database's migration history, but both are
 per-day roster is inside every later `hab_bonus_xp()`, and 20's event titles are on the row.
 
 Career Mode's stages are not in this table. Stage 66 (the fact ledger, live in shadow since 2026-10-17) and stage 69 (the XP
-switch, built and rehearsed, **not applied**) are described under *Career Mode (phase 2, the XP switch)*.
+switch, applied 2026-10-17 with the switch off) are described under *Career Mode (phase 2, the XP switch)*.
 
 > Because scoring happens on the server, the XP rules exist in **two places**:
 > `XP_RULES` (and its sibling constants) in `habits.html` and the `xp_rules` row in
@@ -2744,7 +2743,7 @@ switch, built and rehearsed, **not applied**) are described under *Career Mode (
 > error. Where the latest definitions sit today: `hab_bonus_xp()` and `hab_xp()` —
 > the latest definition, currently `stage24_marks_quests_customcap.sql` plus the `qruns` patch in `stage55_end_quests.sql`;
 > `leaderboard_top()` and `roll_call()` — `stage17_titles.sql`; `set_title()` —
-> `stage25_season_record.sql`. Once stage69 is applied, `leaderboard_top()`, `hab_season_level()`, `coach_season_levels()` and
+> `stage25_season_record.sql`. Since stage69 was applied (2026-10-17), `leaderboard_top()`, `hab_season_level()`, `coach_season_levels()` and
 > `hab_close_season()` are stage69's (each is Proof's own scorer until the XP switch is on). ⚠️ **And no file holds the live board RPCs exactly:**
 > since 2026-09-07 `leaderboard_top`, `roll_call`, `set_day_note`, `set_leaderboard_optin`,
 > `set_title`, `claim_titles`, `get_workout_days` and `season_record` carry a sign-in

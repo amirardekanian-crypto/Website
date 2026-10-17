@@ -10,9 +10,9 @@
 > for every athlete (34 of 34). The one thing an athlete sees is **Hold Serve on the training app's Home** (shipped the same day):
 > the weeks held in a row, read from the facts, display only (`PROGRAM-APP.md` → *Hold Serve on Home*).
 >
-> **Phase 2, the XP switch, is built and rehearsed (2026-10-17), not yet switched on** (`supabase/stage69_career_xp_switch.sql`,
+> **Phase 2, the XP switch, is built, rehearsed and applied to the live project (2026-10-17), not yet switched on** (`supabase/stage69_career_xp_switch.sql`,
 > *The decisions, round 3*, and `PROCEDURES.md` → *Phase 2, as built*). Both apps ship ready for it and behave exactly as before
-> until the server's XP switch is on: applying stage69 and turning the switch on each wait for Amir's yes. The rest is the design
+> until the server's XP switch is on: turning the switch on waits for Season 1, the dry run and Amir's yes. The rest is the design
 > the build follows, phase by phase (*Build order*, below). Change anything here first, then build; a changed file is re-seeded
 > (`README.md`, *How to change something*).
 
@@ -336,7 +336,7 @@ Proof's to the point.
 | Phase | What | Visible | Status |
 |---|---|---|---|
 | 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app: **shipped 2026-10-17**, a row on Home above Daily habits, the weeks held in a row and the next step (Amir: *"B, show it at zero, words ok"*; `PROGRAM-APP.md` → *Hold Serve on Home*) | **live 2026-10-17, in shadow** (stage66, applied on Amir's yes and seeded; PROCEDURES.md → *Phase 1, as built*). On the live project 34 of 34 athletes' habit XP equals Proof's, this season, the rolling week and all time (`career_compare()`) |
-| 2 | **The XP switch: one profile.** Training earns XP, the WORKOUT habit pays 0 a day, closed days settle, the level is the career level (never resets) and nobody's level goes down (*The decisions, round 3*). Proof's level, rank and board read `get_profile()`; the phone scorer becomes the preview (P13); the board ranks season points from the facts, from a cache (`career_scores`) | The career level, revealed once in AA Proof; every tick answers with its XP and the bar; the training app's Career row on Home above Hold Serve, and the finish card saying what a session earns and the finished card what it earned (P17) | **built and rehearsed 2026-10-17** (stage69, both apps, 42 of 42 on the real rows, twins and a headless suite; `PROCEDURES.md` → *Phase 2, as built*). Applying it and turning the switch on wait for Amir's yes |
+| 2 | **The XP switch: one profile.** Training earns XP, the WORKOUT habit pays 0 a day, closed days settle, the level is the career level (never resets) and nobody's level goes down (*The decisions, round 3*). Proof's level, rank and board read `get_profile()`; the phone scorer becomes the preview (P13); the board ranks season points from the facts, from a cache (`career_scores`) | The career level, revealed once in AA Proof; every tick answers with its XP and the bar; the training app's Career row on Home above Hold Serve, and the finish card saying what a session earns and the finished card what it earned (P17) | **built, rehearsed and applied to the live project 2026-10-17, switch off** (stage69, both apps, 42 of 42 on the real rows, twins and a headless suite; `PROCEDURES.md` → *Phase 2, as built*; 34 of 34 identical before and after the apply). Turning the switch on waits for Season 1, the dry run and Amir's yes |
 | 3 | **Rewards with meanings, and the catalogue switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the catalogue switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row; the finish card listing every badge a session moved; each reward's moment and share card (the cards are drawn already: Highlight Reel, GAME-14) | not started |
 | 4 | **Amir's column.** Courtside, reactions, commendations, Amir's Pick | coach.html → Today | not started |
 | 5 | **Weekly missions.** The planner, the three slots, the crew mission in place of Quest week | Missions in both apps | not started |
@@ -399,6 +399,6 @@ None of these blocks phase 1.
 - **The phones' copies of phase 2's rules** (the career's curve, the WORKOUT habit at 0 a day, a session's full log and check-in)
   are held to the server's own answers in `scripts/career/xp_cases.json` by `scripts/check_twins.js` §9, and the answers to the
   server by `scripts/career/rehearse_switch.mjs` (rewrite them with `--write-cases` after a deliberate change, on both sides).
-- **The score cache, `career_scores`,** is in `coach_erase_person()` (stage69's patch) and joins `BACKUP_TABLES` and the schema snapshot
-  in the commit that applies stage69 to the live project (`test_restore_backup.py` needs both at once). It holds no
+- **The score cache, `career_scores`,** is in `coach_erase_person()` (stage69's patch) and is in `BACKUP_TABLES` and the schema snapshot
+  (`test_restore_backup.py` needs both at once). It holds no
   source: a stale or missing row is worked out again from the facts (`career_stamp()` says when).
