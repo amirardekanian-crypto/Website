@@ -201,7 +201,9 @@ create table public.chat_messages (
   conversation_id uuid not null,
   role text not null,
   content text not null,
-  at timestamp with time zone default now() not null
+  at timestamp with time zone default now() not null,
+  gap boolean default false not null,
+  gap_handled_at timestamp with time zone
 );
 
 create table public.coaching_log_versions (
@@ -4923,6 +4925,7 @@ CREATE INDEX career_facts_day_idx ON public.career_facts USING btree (athlete_id
 CREATE INDEX chat_conversations_started ON public.chat_conversations USING btree (started_at DESC);
 CREATE INDEX chat_conversations_visitor ON public.chat_conversations USING btree (visitor, started_at);
 CREATE INDEX chat_messages_conv ON public.chat_messages USING btree (conversation_id, id);
+CREATE INDEX chat_messages_open_gaps ON public.chat_messages USING btree (at DESC) WHERE (gap AND (gap_handled_at IS NULL));
 CREATE INDEX coaching_log_versions_athlete_idx ON public.coaching_log_versions USING btree (athlete_id, id DESC);
 CREATE INDEX cycle_reports_athlete_idx ON public.cycle_reports USING btree (athlete_id, cycle);
 CREATE INDEX hab_contacts_created_idx ON public.hab_contacts USING btree (created_at DESC);
@@ -5033,6 +5036,7 @@ create policy "chat_conversations_coach_delete" on public.chat_conversations as 
 create policy "chat_conversations_coach_read" on public.chat_conversations as permissive for SELECT to authenticated using (is_coach());
 create policy "chat_messages_coach_delete" on public.chat_messages as permissive for DELETE to authenticated using (is_coach());
 create policy "chat_messages_coach_read" on public.chat_messages as permissive for SELECT to authenticated using (is_coach());
+create policy "chat_messages_coach_update" on public.chat_messages as permissive for UPDATE to authenticated using (is_coach()) with check (is_coach());
 create policy "coach manage coaching log versions" on public.coaching_log_versions as permissive for ALL to authenticated using (is_coach()) with check (is_coach());
 create policy "coach manage coaching logs" on public.coaching_logs as permissive for ALL to authenticated using (is_coach()) with check (is_coach());
 create policy "coach manages course_en" on public.course_en as permissive for ALL to authenticated using (( SELECT is_coach() AS is_coach)) with check (( SELECT is_coach() AS is_coach));

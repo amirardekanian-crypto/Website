@@ -120,9 +120,11 @@ function buildSeed(opt) {
     ],
     chat_messages: [
       { id: 1, conversation_id: '00000000-0000-4000-8000-0000000000c1', role: 'user', content: 'Fixture question <b>one</b>?', at: new Date(Date.now() - 2 * 3600e3).toISOString() },
-      { id: 2, conversation_id: '00000000-0000-4000-8000-0000000000c1', role: 'assistant', content: 'Fixture answer one.', at: new Date(Date.now() - 2 * 3600e3).toISOString() },
+      { id: 2, conversation_id: '00000000-0000-4000-8000-0000000000c1', role: 'assistant', content: 'Fixture answer one.', at: new Date(Date.now() - 2 * 3600e3).toISOString(), gap: true, gap_handled_at: null },
       { id: 3, conversation_id: '00000000-0000-4000-8000-0000000000c2', role: 'user', content: 'سوال نمونه', at: new Date(Date.now() - 30 * 3600e3).toISOString() },
-      { id: 4, conversation_id: '00000000-0000-4000-8000-0000000000c2', role: 'assistant', content: 'پاسخ نمونه', at: new Date(Date.now() - 30 * 3600e3).toISOString() },
+      { id: 4, conversation_id: '00000000-0000-4000-8000-0000000000c2', role: 'assistant', content: 'پاسخ نمونه', at: new Date(Date.now() - 30 * 3600e3).toISOString(), gap: true, gap_handled_at: new Date(Date.now() - 29 * 3600e3).toISOString() },
+      { id: 6, conversation_id: '00000000-0000-4000-8000-0000000000c1', role: 'user', content: 'Fixture second question: do you take under-16s?', at: new Date(Date.now() - 1 * 3600e3).toISOString() },
+      { id: 7, conversation_id: '00000000-0000-4000-8000-0000000000c1', role: 'assistant', content: 'Fixture second answer, I could not find that.', at: new Date(Date.now() - 1 * 3600e3).toISOString(), gap: true, gap_handled_at: null },
       { id: 5, conversation_id: '00000000-0000-4000-8000-0000000000c3', role: 'user', content: 'Fixture old question', at: new Date(Date.now() - 100 * 86400e3).toISOString() },
     ],
     library_categories: [{ id: 'strength', kind: 'workout', title: 'Strength (fixture)', banner: null, icon: null, sort_order: 1 }],

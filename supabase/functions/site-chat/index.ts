@@ -45,7 +45,9 @@ Style: plain, warm, confident. 1 to 4 short sentences, or a short list when comp
 
 The Iran products (the Iran coaching price, the Tennis Performance System course and the Tennis Fitness Testing app) are for people living in Iran, and their pages and the course are in Farsi. Never bring them up yourself. Answer about them only when the visitor asks about them, or says they live in Iran: then give the Iran coaching price instead of the US-dollar tiers, and say the pages are in Farsi and buying is on WhatsApp.
 
-Handoff: when the visitor is ready to start or asks how to sign up, end your reply with the tag [[apply]] on its own line. When the question is personal, needs Amir's judgement (their injury, their schedule, a custom price, outside the facts), or they ask to talk to him, end with [[whatsapp]] on its own line. At most one tag, always after your last sentence and never inside one. The website turns the tag into a button, so when you use a tag do not also write the form or WhatsApp link in your text.`,
+Handoff: when the visitor is ready to start or asks how to sign up, end your reply with the tag [[apply]] on its own line. When the question is personal, needs Amir's judgement (their injury, their schedule, a custom price, outside the facts), or they ask to talk to him, end with [[whatsapp]] on its own line. At most one tag, always after your last sentence and never inside one. The website turns the tag into a button, so when you use a tag do not also write the form or WhatsApp link in your text.
+
+Gaps: when the FACTS do not answer what the visitor asked (you had to say you are not sure, or send them to Amir because the answer is not in the facts), also write [[gap]] on its own line at the very end. Not for off-topic questions, medical questions or requests for a workout: only for real questions about Amir's coaching, products or prices that the facts should have answered. Amir reads these to learn what to add.`,
 
   fa: `تو دستیارِ سایتِ امیر اردکانی (amirardekani.com) هستی. بیشترِ کسایی که می‌پرسن بازیکنِ تنیس و پدل توی ایرانن. تو خودِ امیر نیستی: دستیارِ سایتشی و درباره‌ش سوم‌شخص حرف می‌زنی («امیر»). هیچ‌وقت از زبونِ امیر حرف نزن: «امیر برنامه‌ی غذایی نمی‌نویسه»، نه «نمی‌نویسم».
 
@@ -61,7 +63,9 @@ Handoff: when the visitor is ready to start or asks how to sign up, end your rep
 
 لحن: فارسیِ محاوره‌ایِ تهرانی، گرم و رک، مثلِ پیامِ واتساپ. ۱ تا ۴ جمله‌ی کوتاه. عددها با رقمِ فارسی. از واژه‌های بخشِ «Farsi words to use» استفاده کن. اگه کسی انگلیسی نوشت، انگلیسی جواب بده.
 
-ارجاع: وقتی طرف آماده‌ی شروعه یا می‌پرسه چطور ثبت‌نام کنه، آخرِ جوابت تگِ [[apply]] رو توی یه خطِ جدا بذار (برای دوره و اپِ آزمون، که خریدشون از واتساپه، [[whatsapp]] بذار). وقتی سؤال شخصیه، نظرِ خودِ امیر رو می‌خواد (آسیبش، شرایطش، قیمت برای خارج از ایران، هر چیزی بیرون از FACTS) یا می‌خواد با امیر حرف بزنه، [[whatsapp]] بذار. حداکثر یه تگ، همیشه بعد از جمله‌ی آخر و توی یه خطِ جدا، هیچ‌وقت وسطِ جمله. سایت تگ رو دکمه می‌کنه، پس جمله‌ت رو کامل بنویس (مثلاً «از دکمه‌ی زیر شروع کن») و لینکِ فرم یا واتساپ رو خودت ننویس.`,
+ارجاع: وقتی طرف آماده‌ی شروعه یا می‌پرسه چطور ثبت‌نام کنه، آخرِ جوابت تگِ [[apply]] رو توی یه خطِ جدا بذار (برای دوره و اپِ آزمون، که خریدشون از واتساپه، [[whatsapp]] بذار). وقتی سؤال شخصیه، نظرِ خودِ امیر رو می‌خواد (آسیبش، شرایطش، قیمت برای خارج از ایران، هر چیزی بیرون از FACTS) یا می‌خواد با امیر حرف بزنه، [[whatsapp]] بذار. حداکثر یه تگ، همیشه بعد از جمله‌ی آخر و توی یه خطِ جدا، هیچ‌وقت وسطِ جمله. سایت تگ رو دکمه می‌کنه، پس جمله‌ت رو کامل بنویس (مثلاً «از دکمه‌ی زیر شروع کن») و لینکِ فرم یا واتساپ رو خودت ننویس.
+
+کمبود: وقتی FACTS جوابِ سؤالِ طرف رو نداره (مجبور شدی بگی مطمئن نیستی، یا چون جواب توی FACTS نیست فرستادیش پیشِ امیر)، [[gap]] رو هم توی یه خطِ جدا، آخرِ آخر بذار. برای سؤالِ بی‌ربط، سؤالِ پزشکی یا درخواستِ تمرین نذار: فقط برای سؤالِ واقعی درباره‌ی مربیگری، محصول‌ها یا قیمت‌های امیر که FACTS باید جوابشو می‌داشت. امیر این‌ها رو می‌خونه تا بفهمه چی اضافه کنه.`,
 };
 
 const FALLBACK: Record<'en' | 'fa', string> = {
@@ -92,11 +96,13 @@ async function visitorHash(req: Request) {
   return Array.from(new Uint8Array(sig).slice(0, 12)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-// The tag at the end of the model's reply becomes a button on the page.
-function splitHandoff(text: string): { reply: string; handoff: 'whatsapp' | 'apply' | null } {
+// The tags at the end of the model's reply: a handoff becomes a button on the page, [[gap]] marks a question the facts
+// did not answer (coach.html → Leads → Chats lists those under "Not answered yet", stage68).
+function splitHandoff(text: string): { reply: string; handoff: 'whatsapp' | 'apply' | null; gap: boolean } {
   const m = /\[\[(whatsapp|apply)\]\]/i.exec(text);
-  const reply = text.replace(/\s*\[\[(whatsapp|apply)\]\]\s*/gi, '\n').trim();
-  return { reply, handoff: m ? (m[1].toLowerCase() as 'whatsapp' | 'apply') : null };
+  const gap = /\[\[gap\]\]/i.test(text);
+  const reply = text.replace(/\s*\[\[(whatsapp|apply|gap)\]\]\s*/gi, '\n').trim();
+  return { reply, handoff: m ? (m[1].toLowerCase() as 'whatsapp' | 'apply') : null, gap };
 }
 
 Deno.serve(async (req) => {
@@ -165,6 +171,7 @@ Deno.serve(async (req) => {
 
   let reply = FALLBACK[site];
   let handoff: 'whatsapp' | 'apply' | null = 'whatsapp';
+  let gap = false;
   try {
     const client = new Anthropic({ apiKey, maxRetries: 1, timeout: 25_000 });
     // deno-lint-ignore no-explicit-any
@@ -179,7 +186,7 @@ Deno.serve(async (req) => {
     // deno-lint-ignore no-explicit-any
     } as any);
     const text = (res.content || []).filter((b: { type: string }) => b.type === 'text').map((b: { text: string }) => b.text).join('').trim();
-    if (res.stop_reason !== 'refusal' && text) ({ reply, handoff } = splitHandoff(text));
+    if (res.stop_reason !== 'refusal' && text) ({ reply, handoff, gap } = splitHandoff(text));
     const u = res.usage || {};
     const tin = (u.input_tokens || 0) + (u.cache_creation_input_tokens || 0) + (u.cache_read_input_tokens || 0);
     tokensIn += tin; tokensOut += u.output_tokens || 0;
@@ -189,7 +196,7 @@ Deno.serve(async (req) => {
     console.error('site-chat: model call failed', e instanceof Error ? e.message : String(e));
   }
 
-  await db.from('chat_messages').insert({ conversation_id: convId, role: 'assistant', content: reply });
+  await db.from('chat_messages').insert({ conversation_id: convId, role: 'assistant', content: reply, gap });
   const upd: Record<string, unknown> = { turns: turns + 1, last_at: new Date().toISOString(), tokens_in: tokensIn, tokens_out: tokensOut, cost_usd: cost };
   if (handoff) upd.handoff = handoff;
   await db.from('chat_conversations').update(upd).eq('id', convId);

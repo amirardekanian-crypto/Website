@@ -5372,6 +5372,45 @@ S['leads-chats'] = async (b) => {
   return r;
 };
 
+// ── Leads → Chats: Not answered yet (stage68, 2026-10-17) ────────────────────
+S['leads-chats-gaps'] = async (b) => {
+  const r = { id: 'leads-chats-gaps', title: 'Leads → Chats: Not answered yet lists open gaps, marks them with one column, filters, and undoes', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'leads/chats' });
+  await page.locator('#chView .in-row').first().waitFor();
+  await L.settle(page, 500);
+  // Not answered yet (stage68): only open gaps, the visitor's question, a one-column write, and the item leaves.
+  const gtxt = await page.locator('#chGaps').innerText();
+  check(r, 'Not answered yet lists the two open gaps (not the handled one) with the right question, newest first',
+    /Not answered yet/.test(gtxt) && (await page.locator('#chGaps .ch-gap').count()) === 2 && /Fixture second question/.test((await page.locator('#chGaps .ch-gap-q').first().innerText())) && !/پاسخ نمونه|سوال نمونه/.test(gtxt) && /Questions the bot could not answer from your facts/.test(gtxt), gtxt);
+  check(r, 'the chat with open gaps carries the marker in the list and its gap replies in the transcript',
+    (await page.locator('#chView .in-row .ipill.gap').count()) === 1 && (await page.locator('#chView .in-detail .ipill.gap').count()) >= 1, '');
+  await page.locator('#chView .ch-gapsonly').click();
+  check(r, 'Only with gaps shows just the conversation with an open gap', (await page.locator('#chView .in-row').count()) === 1 && /Fixture question/.test(await page.locator('#chView .in-row').first().innerText()), '');
+  await page.locator('#chView .ch-gapsonly').click();
+  check(r, 'turning the filter off lists both again', (await page.locator('#chView .in-row').count()) === 2, '');
+  await page.locator('#chGaps .ch-gap-open').first().click();
+  check(r, 'Open chat selects that conversation', /Fixture question/.test(await page.locator('#chView .in-detail').innerText()), '');
+  if (await page.locator('#chView .in-back').isVisible()) await page.locator('#chView .in-back').click();
+  const n1 = await L.nCalls(page);
+  await page.locator('#chGaps .ch-gap-done').first().click();
+  await L.settle(page, 600);
+  const wr = (await L.callsSince(page, n1)).filter(x => x.kind === 'from' && x.name === 'chat_messages' && x.op === 'update');
+  const db2 = await L.db(page);
+  const m7 = db2.chat_messages.find(x => x.id === 7), m2 = db2.chat_messages.find(x => x.id === 2);
+  check(r, 'Added to facts writes only gap_handled_at, for that message', wr.length === 1 && JSON.stringify(Object.keys(wr[0].payload)) === '["gap_handled_at"]' && !!m7.gap_handled_at && m2.gap_handled_at === null, wr);
+  check(r, 'the item leaves the list and one remains; Undo bar is offered', (await page.locator('#chGaps .ch-gap').count()) === 1 && (await page.locator('#undobar button', { hasText: 'Undo' }).count()) === 1, '');
+  await page.locator('#undobar button', { hasText: 'Undo' }).click();
+  await L.settle(page, 600);
+  const db3 = await L.db(page);
+  check(r, 'Undo clears the stamp and the item is back', db3.chat_messages.find(x => x.id === 7).gap_handled_at === null && (await page.locator('#chGaps .ch-gap').count()) === 2, '');
+  await page.locator('#chGaps .ch-gap-done').nth(0).click(); await L.settle(page, 500);
+  await page.locator('#chGaps .ch-gap-done').nth(0).click(); await L.settle(page, 500);
+  check(r, 'with none left the block says nothing is waiting', /Nothing waiting\. Every question so far was in your facts\./.test(await page.locator('#chGaps').innerText()), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));
