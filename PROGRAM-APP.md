@@ -1568,6 +1568,28 @@ Centre Court look*, above). The timing below is unchanged.
 - The overlay's dark palette came with A11Y-01 (#245). It is solid since 2026-09-27 (POL-01): at 97% the day's
   cards showed through behind the clock.
 
+## 🏓 Off the Glass: a game for the rest (2026-10-17)
+
+Amir: *"can you create a game like this for my app? the aim is to use it during rest time for my athletes"* (after Matt Cannon's air
+hockey pen, *"improve it in any way you think is good"*). Air hockey on a padel court seen from above: your racket at the bottom,
+Amir's (clay) at the top, a point is the ball through the gap in the other end's glass. `assets/js/rally.js` (`window.Rally`) draws
+and runs it; program.html owns the door and the layer.
+
+- **The door** is the rest band's last line, **Off the Glass · play while you rest** (`#timerPlayBtn`, `openRally()`), in the list's
+  rest and Guided's. It loads `rally.js` on the first tap (`rallyLib()`; sw.js keeps it in SHELL, so it plays with no signal and a
+  change to it ships with a CACHE bump), opens the audio context in that tap (`restAudioPrime()`; iPhone needs it) and starts a paused rest.
+- **The rest is the boss.** The court shows the rest clock the whole time (`left()` = `timerLeft()`), clay and pulsing in the last
+  10 s, a tick and a buzz at 3, 2, 1. `timerDone()` calls `Rally.timeUp()` (the court freezes, *Time. Next set.*) and `closeTimer()`
+  closes the game with the timer. ✕ and Back (`#rallyOverlay` is in `topLayer()` above the timer and in `initBackNav()`'s observer)
+  return to the timer, still running. It never runs past a rest.
+- **Short and fair:** first to 5. Amir's racket chases a ball in his half and guards his gap otherwise; its top speed rises while the
+  athlete leads and drops while they trail (`amirMove()`). A ball that dies for 4 s is served to the other half.
+- **One thumb:** drag anywhere in your half; a touch puts the racket 1.4 rackets above the finger so the thumb never hides it. A hit
+  buzzes; the sounds follow the timer's speaker (`rest_sound`); reduced motion drops the shake.
+- **Its numbers stay on the phone:** `rally_stats` (`best` rally, `wins`, `played`), no athlete prefix, never synced, never scored,
+  never seen by the coach. No yellow: the ball is white, the court the brand green, Amir's racket clay.
+- The guide's *Built-in tools* card names the door (CNT-01). Test: `node scripts/headless/rally.js` (23 checks).
+
 ## 🧾 The working card (CARD-01/02/03, 2026-09-27)
 
 Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8rz). Opened, the card was

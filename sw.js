@@ -290,7 +290,8 @@
 // v159: habits.html and app-fonts.css changed (2026-10-17): AA Proof's strip on Home takes its fonts from /assets/css/app-fonts.css (Barlow Condensed 800 added), not Google Fonts.
 // v160: program.html changed and /assets/js/sharecard.js joins the shell (2026-10-17, Highlight Reel): share cards for a win, drawn on the phone, with no signal too.
 // v161: program.html changed (2026-10-17, Career Mode): Hold Serve on Home, the training weeks held in a row, read from the server.
-const CACHE = 'aap-v161';
+// v162: program.html changed and /assets/js/rally.js joins the shell (2026-10-17): Off the Glass, a game for the rest, with no signal too.
+const CACHE = 'aap-v162';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -313,6 +314,8 @@ const SHELL = [
   // Highlight Reel's painter (v160): a win's share card is drawn on the phone, signal or not. Served cache-first by this plain URL,
   // so a change to it needs a CACHE bump. (Its fonts, photo, mark and covers are kept as they are first used.)
   '/assets/js/sharecard.js',
+  // Off the Glass, the rest game (v162): loaded on the first tap on Play. Cache-first by this plain URL: a change needs a CACHE bump.
+  '/assets/js/rally.js',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
