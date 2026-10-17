@@ -160,7 +160,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Highlight Reel, share cards for a win (2026-10-17).** `assets/js/sharecard.js` (`window.ShareCard`, precached by `sw.js`, loaded by
   `hlLib()` the first time a card is drawn) paints a 1080 × 1920 Story or 1080 × 1350 post on a canvas, in English or Farsi (every Farsi
   word in its one `FA` table, drafts for Amir). program.html decides which wins and which numbers (the HIGHLIGHT REEL block at the end of
-  the main script, and its CSS block at the end of the stylesheet): the finish card's New best and Retest beaten bands (`collectWins()`,
+  the main script, and its CSS block just above the sign-in block, which stays the last in the sheet): the finish card's New best and Retest beaten bands (`collectWins()`,
   `<id>_hlwin_d<N>`, raw and never synced), This cycle's *Share a win ›* and *Share your cycle*, the one-time Cycle complete / Roadmap
   complete moment (`maybeHighlightMoment()`, `<id>_hl_seen`, synced), Share in Personal Records, and the share sheet
   (`openShareSheet()`, a page of the one sheet; the choices in `aa_hl_prefs`, never synced). Nothing leaves the phone until the athlete taps
