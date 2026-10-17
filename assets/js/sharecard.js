@@ -6,8 +6,8 @@
    draws ten cards in one family:
      · the training's five, fed by program.html: best (New Best), effort (Same Effort), retest (Retest), cycle (Signed Off) and
        roadmap (The Distance);
-     · Career Mode's five reward cards, drawn and tested with sample data now and fed by Career Mode phase 3 (career/CAREER_MODE.md →
-       Recognition: from a highlight up, a reward gets a share card): badge, achievement, title, level and quest.
+     · Career Mode's five reward cards, drawn and tested with sample data now and fed by Career Mode phase 3 (career/CAREER_MODE.md,
+       GAME-14: from a highlight up, a reward gets a share card): badge, achievement, title, level and quest.
    Two sizes: a Story (1080 × 1920, the default) and a 4:5 post (1080 × 1350). Every card carries the court's lines, Amir's photo,
    his signature (program.html's WN_SIG, the same paths), the mark, @amirardekanian and AMIRARDEKANI.COM. In a Story the top 250 px
    and the bottom 340 px are Instagram's own bars, so nothing that matters is drawn there.

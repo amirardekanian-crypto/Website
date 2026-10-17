@@ -9,7 +9,7 @@ changing a file and seeding it again is how a detail changes (GAME-10). Nothing 
 
 | File | What it holds | Open it when you want to |
 |---|---|---|
-| [`CAREER_MODE.md`](CAREER_MODE.md) | The system: the loop, the four meanings, the pieces, recognition, missions, quests, the rules (GAME-1 to GAME-12), the decisions, the build order | Read and think about it |
+| [`CAREER_MODE.md`](CAREER_MODE.md) | The system: the loop, the four meanings, the pieces, recognition, missions, quests, the rules (GAME-1 to GAME-14), the decisions, the build order | Read and think about it |
 | [`PROCEDURES.md`](PROCEDURES.md) | Every function, step by step: how a fact is made, how XP and levels are worked out, how rewards are minted, how missions are picked, how recognition is routed | See exactly how something is worked out, or change how it works |
 | [`rulebook.toml`](rulebook.toml) | Every number: XP for each fact, the caps, the level curve, the shares, the season, Proof's habit values | Change what something is worth |
 | [`badges.toml`](badges.toml) | Badges: qualities built over time, in tiers | Add a badge, change its tiers |

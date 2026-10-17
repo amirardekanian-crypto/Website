@@ -198,7 +198,7 @@ size decides the audience. The athlete always sees their own.
 |---|---|---|---|---|---|
 | **Tick** | Any action | XP moves | nothing | nothing | nothing |
 | **Win** | A habit tier, a mission done | The wins card | nothing | nothing | nothing |
-| **Highlight** | A best, a badge tier, 3 of 3 missions, 4 weeks held | The wins card | Courtside, the message written | The Bell, with their yes | nothing |
+| **Highlight** | A best, a badge tier, 3 of 3 missions, 4 weeks held | The wins card | Courtside, the message written | The Bell, with their yes | A share card, theirs to post (GAME-14) |
 | **Milestone** | A new rank, a quest done, a cycle finished, session 100, a title | A full-screen moment | Courtside, with a heads-up when it can be seen coming | The Bell | A share card, theirs to post |
 | **Legend** | The roadmap finished, Amir's Pick, a season title | A full-screen moment | Often his to give | The Bell | Amir's story, with their yes |
 
@@ -289,6 +289,7 @@ The index line is the rule. A later doc cites the ID instead of restating it, th
 | **GAME-11** | **Amir's time is budgeted.** The system finds the moment and writes the message. He spends seconds each, about 10 minutes a week in all. |
 | **GAME-12** | **One system for everyone.** Free and coached athletes share the rules and the board. A free athlete simply has no training facts. |
 | **GAME-13** | **Every meaningful action answers at once, visibly.** In the same moment as the tap, never waiting for the network: what it earned, where it moved the athlete, and the nearest goal it touched. Nothing changes on screen without the athlete seeing it move. (Amir, 2026-10-17; `PROCEDURES.md` → P17.) |
+| **GAME-14** | **Every reward is celebrated: a moment at its size for the athlete, and from highlight up a share card in its app's card family.** The instant answer is GAME-13; this is the celebration and the card. The training's family is Highlight Reel (`assets/js/sharecard.js`, built 2026-10-17: the five training cards, and a badge tier, an achievement, a title, a level and a quest drawn already for phase 3, opened by program.html's `openShareSheet()` and `openMoment()`); Proof's cards keep Proof's look. A card is drawn on the phone and leaves only when the athlete taps Share or Save; a share pays nothing (GAME-6). (Amir, 2026-10-17: *"the achievements, badges and other things need to have a celebration as well, those are important as well"*; `PROCEDURES.md` → P8.) |
 
 ## What exists today, and where it goes
 
@@ -307,7 +308,7 @@ owned.
 | `hab_titles` | Awards. Every title owned stays owned |
 | Quest week and its 12 quests | Missions (`missions.toml`, `origin = "proof"`); the crew's run becomes the crew mission |
 | The wins card and the full-screen moments | The athlete's column of recognition |
-| Five share cards | Stay, joined by the training's first, Signed Off (round 3, #31) |
+| Five share cards | Stay, in Proof's look. The training's five are built (Highlight Reel, 2026-10-17: New Best, Same Effort, Retest, Signed Off, The Distance), and every reward's card is drawn in the same family for phase 3 (GAME-14) |
 | The board | Ranks season points, with titles beside names |
 | Roll call | Stays, and still pays nothing |
 | The training app's wins (`cycleWins()`) and automatic Personal Records | Progress facts |
@@ -322,7 +323,7 @@ Proof's to the point.
 |---|---|---|---|
 | 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app (not yet: its own follow-up) | **built and rehearsed 2026-10-17, in shadow** (stage66; PROCEDURES.md → *Phase 1, as built*). On the real rows 34 of 34 athletes' habit XP equals Proof's, this season, the rolling week and all time. On the live project: waiting for Amir's yes |
 | 2 | **One profile.** Proof's level, rank and board read `get_profile()`. The phone scorer becomes the preview, and instant feedback (P17) reads it | The career level, revealed once; every tick answers with its XP, the bar and the nearest goal | not started |
-| 3 | **Rewards with meanings, and the switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row; the finish card listing what a session earned; Signed Off | not started |
+| 3 | **Rewards with meanings, and the switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row; the finish card listing what a session earned; each reward's moment and share card (the cards are drawn already: Highlight Reel, GAME-14) | not started |
 | 4 | **Amir's column.** Courtside, reactions, commendations, Amir's Pick | coach.html → Today | not started |
 | 5 | **Weekly missions.** The planner, the three slots, the crew mission in place of Quest week | Missions in both apps | not started |
 | 6 | **The crew.** The Bell, kudos, the consent question at the first highlight, titles on every line | AA Proof → Crew | not started |
