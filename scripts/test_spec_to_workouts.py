@@ -261,6 +261,11 @@ r = subprocess.run([sys.executable, CHECK, os.path.join(TMP, 'out.json'), '--sta
 fails = [l for l in r.stdout.splitlines() if l.startswith('FAIL')]
 expect('the build passes check_program.py --stage build with 0 FAIL', code == 0 and not fails and 'Traceback' not in r.stdout + r.stderr,
        r.stdout[-3000:] + r.stderr[-2000:])
+# The spec's Box Jump is a circuit item with a why_flag: the app draws no Because on an item (2026-10-17).
+expect("why_flag on a circuit item: the build warns, with the spec's line", 'WARN  [COM-4] line 32: Day 1 · Box Jump (in Jump & Throw Pair)' in out
+       and out.count('why_flag on a circuit item') == 1, out)
+expect('why_flag on a circuit item: the build check warns too', any(l.startswith('WARN') and 'spec line 32: Day 1 · Box Jump' in l
+       for l in r.stdout.splitlines()), r.stdout[-3000:])
 
 print(f"{sum(1 for _, ok in results if ok)}/{len(results)} passed")
 for n, ok in results:

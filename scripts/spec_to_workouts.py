@@ -90,7 +90,9 @@ def add_fields(card, segs, n):
         k, v = kv(seg)
         if k is None: k = bare(v)
         k = {'duration': 'time', 'hold': 'time'}.get(k, k)
-        if ignored(k) or k in ('new_exercise', 'spine_cue'): continue
+        if ignored(k) or k in ('new_exercise', 'spine_cue'):
+            if k == 'why_flag' and not none(v) and not v.startswith('['): card.setdefault('flags', {})[k] = n
+            continue
         if k not in FIELDS: raise Gap(f"'{k}:' is not a field this build knows ({', '.join(sorted(FIELDS - {'duration', 'hold'}))})")
         old = card['f'].get(k)
         if old is not None and cp.outside_brackets(old).strip() != cp.outside_brackets(v).strip():
@@ -305,6 +307,16 @@ def build(head, wn_lines, days, gaps, choices, spine_names):
     weeknotes = parse_weeknotes(wn_lines, gaps, notes)
     return out_days, weeknotes, notes, left, counts, yours
 
+def item_whys(days):
+    """(line, where) for every why_flag the spec puts on a circuit item. program.html reads a Because only on a card of
+    its own, never on an item, so a flag there is lost: six of one cycle's twelve on 2026-10-17. check_program.py's
+    --stage build reads the spec through this too."""
+    return [(it['flags']['why_flag'], f"Day {d['id']} · {it['name']} (in {c['name'] or 'the prep circuit'})")
+            for d in days for b in d['blocks'] for c in b['cards'] for it in c['items'] if 'why_flag' in (it.get('flags') or {})]
+
+ITEM_WHY = ("a why_flag on a circuit item never shows (the app draws no Because on an item): design moves it to a "
+            "standalone exercise or drops it")
+
 def icon(title):
     """SCHEMA.md → Standard section names: prep 🔥, Primary 🎯, Accessory 💪, Core 🧱, power ⚡, conditioning 🫀."""
     t = title.lower()
@@ -325,6 +337,7 @@ def main():
     spine_names = cp.load_context(a.spine)['names'] if a.spine else None
     if not days: gaps.append("no DAY blocks: the spec's days start with 'DAY 1 — <working title>'")
     out_days, weeknotes, notes, left, counts, yours = build(head, wn_lines, days, gaps, choices, spine_names)
+    for n, where in item_whys(days): print(f"WARN  [COM-4] line {n}: {where}: {ITEM_WHY}")
     for k in (choices.get('days') or {}):
         if k not in {str(d['id']) for d in days}: notes.append(f"the choices file has Day {k}, which the spec does not")
     prog = json.load(open(a.into, encoding='utf-8')) if a.into else None

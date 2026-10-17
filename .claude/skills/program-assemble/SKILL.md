@@ -292,7 +292,11 @@ count and what landed on the cards differ, which is how a dropped or invented on
   column is the list of what the script covers, so it isn't repeated here. Two WARNs are soft by
   design: a Quality headline outside the week's top two (PRC-24: report it with your
   recommendation) and a day past the cap (SES-7). It prints what the handoff needs: minutes per
-  day, sets per muscle and the **QUALITY** line. The JSON parse, the rx shape checks and the
+  day (the expected real length once last cycle's logs give a ratio, a chips-format last cycle
+  included), sets per muscle, the week's plyometric contacts and throws, and the **QUALITY** line.
+  **Every number told to Amir is one of these lines, quoted, never a sum or an estimate of your own**
+  (2026-10-17: a run told him 100 contacts for a programme with 94, and hand-made real lengths).
+  The JSON parse, the rx shape checks and the
   Because audit (`Chips.auditWhy`) run inside it, so there is no separate node step any more.
 - **Coaching lint** (still yours: the script can't judge these): every `standard` has sets, a dose
   and an RPE unless the movement says otherwise; every `standard` exercise and every circuit carries its own

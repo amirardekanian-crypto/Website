@@ -334,8 +334,10 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   from the last Debrief's time line (logged minutes against the modelled minutes that `--tables`
   writes into each log entry since 2026-09-27); without one, set your estimate against
   `ctx.sessions.minutes_by_day`. Part A's check prints the exact ratio (last cycle's model against
-  its logged minutes) and each new day's expected real length, and holds the soft cap against that.
-  Tell Amir the expected real length at the checkpoint, not only the model's number.
+  its logged minutes) and each new day's expected real length, and holds the soft cap against that
+  (since 2026-10-17 a last cycle still in the old chips format is read too, so there is a ratio).
+  Tell Amir the expected real length at the checkpoint, not only the model's number, and say it is
+  your estimate: the handoff quotes Part A's line, and its contacts line, never a hand sum.
   **NEW athlete: no logs yet, so design to the form's minutes plus 15** (Amir, 2026-09-26:
   *"form + 15"*), unless they said plainly that the time is a hard stop.
 - **Sequencing within a day:** power/CNS → Primary → Accessory → corrective/Core →
@@ -469,7 +471,10 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   no more**: the primaries whose choice came from the brief, every swap, every injury choice. An
   exercise that would be in anyone's programme gets none; its general job is the Spine's
   `purpose`. The ledger row you already write is where this comes from. /program-engage writes
-  the athlete's sentence from it; you don't.
+  the athlete's sentence from it; you don't. **Only on a card of its own, never on a circuit item**
+  (a superset's, a working circuit's or the prep circuit's): the app draws no Because on an item, so
+  a flag there is lost (2026-10-17: six of one cycle's twelve). Move the reason to a standalone
+  exercise, or drop it. The build and `check_program.py --stage build` warn when one sits on an item.
 - `note_flag` (optional, NOT athlete-facing wording): when THIS athlete needs something on the card
   that the entry's steps, cues and the pill can't say, flag it in one short coaching-domain line naming
   what COM-14 lets a note carry (a starting weight from their logs, their limit, their kit, their checked

@@ -805,6 +805,83 @@ expect('a name added with no SQL row is caught', any('Brand New Name' in p for p
 bad_rows = dict(cases['sql']['rows']); bad_rows['Goblet Squat'] = ['goblet squats', 'goblet squat']
 expect('a recorded answer that differs from the app is caught', any('Goblet Squat' in p for p in sql_problems({'variants': cases['variants'], 'sql': dict(cases['sql'], rows=bad_rows)}, sha_now)), '')
 
+# ── 12. added 2026-10-17 (a cycle's review): last cycle in chips, the week's contacts, a Because on an item ──
+# Last cycle in the old chips[] format had no rx, so every card timed as one 30-s set (one athlete's days modelled
+# 18-23 min against 53-90 logged) and the ratio was thrown away. chips.js's converter reads those cards now.
+PREV_CHIPS = {"cci": 0, "days": [
+  {"id": 1, "blocks": [
+    {"t": "Activation & Prep", "x": [
+      {"n": "Rowing", "type": "simple", "chips": [{"label": "×5 min"}]},
+      {"n": "Hip Prep", "type": "circuit", "rounds": "×2 Rounds",
+       "items": [{"n": "Glute Bridge", "detail": "×12"}, {"n": "Bird Dog", "detail": "×8 Each Side"}]}]},
+    {"t": "Primary", "x": [{"n": "Barbell Back Squat", "type": "standard", "rs": 150,
+                            "chips": [{"label": "4 Sets"}, {"label": "×6"}, {"label": "RPE 7"}, {"label": "Tempo 3-0-1-0"}]}]},
+    {"t": "Accessory", "x": [
+      {"n": "Dead Bug", "type": "standard", "rs": 45,
+       "chips": [{"label": "3 Sets"}, {"label": "×8 Each Side"}, {"label": "RPE 7"}, {"label": "Tempo 2-0-2-0"}]},
+      {"n": "Side Plank", "type": "standard", "chips": [{"label": "3 Sets"}, {"label": "×30s Each Side"}, {"label": "Rest 45s"}]}]}]},
+  {"id": 2, "blocks": [
+    {"t": "Primary", "x": [{"n": "Lat Pulldown", "type": "standard", "rs": 90,
+                            "chips": [{"label": "4 Sets"}, {"label": "×8"}, {"label": "RPE 8"}, {"label": "Tempo 3-0-1-0"}]}]},
+    {"t": "Finisher", "x": [{"n": "Engine", "type": "circuit", "rounds": "×3 Rounds", "chips": [{"label": "Rest 60s"}],
+                             "items": [{"n": "Kettlebell Swing", "detail": "×15"}, {"n": "Farmer's Carry", "detail": "20 m"}]}]}]}]}
+out = run(BASE, ctx=[{"spine": SB, "prev": PREV_CHIPS, "ledger": None, "minutes": {"1": 38, "2": 24}}])
+if HAVE_NODE:
+    expect('chips: last cycle in chips is read, and its ratio is used', has(out, 'INFO', '7 old chips cards read through chips.js')
+           and 'real ≈ ×' in out and 'too far off' not in out, out)
+    expect('chips: the rests, sets, reps and rounds count (D1 is not one 30-s set a card)', 'D1 37→38' in out and 'D2 18→24' in out, out)
+else:
+    expect('chips: with no node, it says why there is no ratio', has(out, 'WARN', 'node could not run assets/js/chips.js to read it'), out)
+out = run(BASE, ctx=[{"spine": SB, "prev": PREV_T, "ledger": None, "minutes": {"1": 15, "2": 12}}])
+expect('chips: an rx cycle says nothing about chips', 'old chips card' not in out and 'real ≈ ×' in out, out)
+expect("--spine-sql: last cycle's restSec is asked for (a legacy card's rest lives there)", "'rs', e->'restSec'" in sql, sql[-1500:])
+
+# The week's contacts and throws, counted (a run told Amir 100 contacts for a programme with 94).
+SBC = SB + "\n" + "\n".join([
+  "box-jump|approved|true|power|jump|plyometric|box|Box Jump||quads:0.5,glutes:0.5|moderate",
+  "pogo-hop|approved|true|power|jump|plyometric|floor|Pogo Hop||calves:0.5|isolation",
+  "snap-down|approved|true|power|jump|landing|floor|Snap Down||quads:0.5|isolation",
+  "jump-rope|approved|true|engine|conditioning|plyometric|rope|Jump Rope||calves:0.5|moderate",
+  "medicine-ball-rotational-throw|approved|true|rotation|throw|none|medicine ball;wall|Medicine Ball Rotational Throw||core:0.5|moderate"])
+d = copy.deepcopy(BASE)
+d['workouts']['days'][0]['blocks'][0]['exercises'][1] = {"type": "circuit", "name": "Lower Primer", "rx": {"rounds": 2, "rest": 30},
+    "items": [{"name": "Glute Bridge", "exId": "glute-bridge", "rx": {"reps": 12}}, {"name": "Pogo Hop", "exId": "pogo-hop", "rx": {"reps": 10}}]}
+d['workouts']['days'][0]['blocks'].insert(1, {"title": "Power", "exercises": [
+    {"type": "standard", "name": "Box Jump", "exId": "box-jump", "rx": {"sets": 3, "reps": 5, "rest": 90}},
+    {"type": "standard", "name": "Snap Down", "exId": "snap-down", "rx": {"sets": 2, "reps": 4, "side": True, "rest": 60}}]})
+d['workouts']['days'][1]['blocks'].insert(1, {"title": "Power", "exercises": [
+    {"type": "standard", "name": "Medicine Ball Rotational Throw", "exId": "medicine-ball-rotational-throw", "rx": {"sets": 3, "reps": 5, "side": True, "rest": 60}},
+    {"type": "circuit", "name": "Jump Pair", "rx": {"rounds": 3, "rest": 75, "rpe": 7},
+     "items": [{"name": "Box Jump", "exId": "box-jump", "rx": {"reps": 4}}, {"name": "Jump Rope", "exId": "jump-rope", "rx": {"time": "60s"}}]}]})
+out = run(d, ctx=[{"spine": SBC, "prev": None, "ledger": None}])
+line = next((l for l in out.splitlines() if 'plyometric contacts' in l), '')
+expect('contacts: sets × reps, ×2 a side, an item times its rounds, per day', 'plyometric contacts 63 (D1 51 · D2 12)' in line, out)
+expect('contacts: throws come from the pattern', 'throws 30 (D2 30)' in line, line)
+expect('contacts: a timed dose is named, not guessed', 'not counted, dosed in time or distance: Jump Rope (D2)' in line, line)
+expect('contacts: a programme with none prints no line', 'plyometric contacts' not in run(BASE, ctx=CTX))
+
+# A Because on a circuit item never shows: the app reads `why` only on a card of its own.
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][0]['exercises'][1]['items'][0]['why'] = {"src": "cycle", "text": "Your hips got stronger."}
+expect('why: one on a circuit item warns', has(run(d, ctx=CTX), 'WARN', 'Glute Bridge why: it sits on an item of Lower Primer'))
+SPEC_ITEM = """bans: -
+---
+DAY 1 — Lower
+SECTION: Power
+Jump Pair | role: circuit | rounds: 3 | rest: 75s | RPE: 7
+  Box Jump — reps: 5 | why_flag: cycle — the next rung
+  Pogo Hop — reps: 10
+    why_flag: body/ankle — stiffer ankles first
+  Snap Down — reps: 4 | why_flag: [none]
+SECTION: Primary
+Barbell Back Squat | role: primary
+sets: 4 | reps: 6 | RPE: 8 | rest: 150s
+why_flag: cycle — up from 6 reps
+"""
+out = run(BASE, '--stage', 'build', spec=SPEC_ITEM, ctx=CTX)
+expect('why_flag: on an item, the build check warns with its spec line', has(out, 'WARN', 'spec line 6: Day 1 · Box Jump (in Jump Pair)')
+       and has(out, 'WARN', 'spec line 8: Day 1 · Pogo Hop (in Jump Pair)'), out)
+expect('why_flag: a placeholder on an item and one on a card do not warn', 'Snap Down (in' not in out and 'Barbell Back Squat (in' not in out, out)
+
 print(f"{sum(1 for _, ok in results if ok)}/{len(results)} passed" + ('' if HAVE_NODE else ' (node not found: the node-backed checks were skipped)'))
 for n, ok in results:
     if not ok: print('  failed:', n)

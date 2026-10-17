@@ -39,6 +39,23 @@ WARN). Effort is set per helper, by this file's word (the Agent tool's `effort`)
   **delta review**: a files-only helper reads only the changed cards and their words, against the rule index
   (PRC-4).
 
+## Keep every call cheap
+
+Every tool call re-reads the whole conversation before it, so what a call costs is the size of the context it runs
+in, not the size of its own output. Measured on 2026-10-17 (a returning athlete's cycle: the main conversation
+reached ~580k tokens and re-read about 26M in all):
+
+- **A second round with a helper is a NEW helper with a short brief file, never a resume.** SendMessage to a helper
+  that has finished re-reads its whole transcript before it does anything: one resume cost 214k tokens for three
+  tool calls. Write what the second round needs into `<scratch>/brief_<stage>_2.md` (what changed, the files to
+  read, what to return) and start a fresh helper on it, at the stage's effort from the table above.
+- **Batch shell steps into one script.** A dozen single Bash calls in a long conversation re-read it a dozen times.
+  Write the steps (build, check, pull the lines that matter, write a summary file) into one script in the
+  scratchpad, run it once and read only the summary. A step whose answer decides the next one is the only reason
+  to split.
+- **No whole skill in the main conversation.** That run kept three skill bodies (~1,550 lines) in context from start
+  to finish. The helper for a stage reads its skill; the main conversation greps the one step it acts on.
+
 ## Before anything is planned (INT-11)
 
 The intake question round confirms the form's frame with Amir: days a week, session length, the kit list, and

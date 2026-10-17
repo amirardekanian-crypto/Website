@@ -186,7 +186,9 @@ name can differ between the spec and the built card, an id cannot. Skip an exerc
 
 **PART 3b — Because (from design's `why_flag`s, 2026-09-24).** For every exercise design
 flagged with a `why_flag`, write `{ src, part?, text }`: why THIS athlete has THIS exercise. It
-opens the About sheet under **Why you**, and the cycle's Why page groups them by `src`.
+opens the About sheet under **Why you**, and the cycle's Why page groups them by `src`. A Because
+goes on a card of its own only: the app draws none on a circuit item, so a `why_flag` that design left
+on an item goes back to design (move it or drop it), never into a `why` nobody sees.
 - **One sentence, 140 characters at most, plain text** (COM-15), in Amir's voice (short words, no
   em-dashes or semicolons). *"Stepping back is kinder to your knee than a forward lunge."*
 - **Name the body part, never the diagnosis**, and say what we do next, never the failure. The

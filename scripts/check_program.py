@@ -20,7 +20,8 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   whenever --spine is given. (--log, the hand-typed table this replaced, is retired.)
                   The day table also carries each day's modelled minutes, and the expected real
                   minutes once last cycle's logs give a real-to-model ratio, so the log keeps them
-                  for the next cycle's time check (2026-09-27).
+                  for the next cycle's time check (2026-09-27). A last cycle still in the old chips[]
+                  format is read through chips.js's own converter first (2026-10-17).
   --floor         the programme's aim is to get strong and build muscle (Amir, 2026-09-26:
                   "that rule is based on science of hypertrophy, for athletes, do what is best
                   for them"): every major muscle (quads, hamstrings, glutes, back, chest,
@@ -54,7 +55,9 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   a separate node step in /program-assemble until 2026-09-27), and it carries
                   checksums: a saved copy that differs from what the server sent stops the run.
                   Since 2026-10-11 each line also says whether the entry has steps (How to do it,
-                  CUE-6), and the result carries each entry's purpose for the Because audit
+                  CUE-6), and the result carries each entry's purpose for the Because audit.
+                  With it, one INFO line counts the week's plyometric contacts and throws (2026-10-17):
+                  quote that number, never a sum made by hand
   --spine-sql     print the one query whose result is the --spine file, then stop
   --art WORD      the cycle's art word for the headline check, when the built file has none
   --stage S       build = straight after design, before engage writes any text: every
@@ -625,6 +628,12 @@ def check_notes(data, ctx=None):
                      'CUE-7', 'COM-14')
 
 def check_whys(data, ctx=None):
+    # program.html reads a Because only on a card of its own, never on a circuit item (2026-10-17: six of one cycle's
+    # twelve were lost there), so one on an item is counted nowhere and shown nowhere.
+    for d, b, ex, it in exercises(data):
+        if it and it.get('why') is not None:
+            warn(f"Day {d.get('id')} {it.get('name')} why: it sits on an item of {ex.get('name')}, and the app draws no "
+                 "Because on a circuit item: put it on a standalone exercise or drop it", 'COM-4')
     whys = [(d, ex) for d, b, ex, it in exercises(data) if not it and ex.get('why') is not None]
     n = len(whys)
     if n > 10: fail(f"{n} Becauses: keep the 5-10 real personal decisions", 'COM-4')
@@ -673,6 +682,18 @@ def why_basics(d, ex):
     text = (w.get('text') or '').strip()
     if len(text) > 140: fail(f"{where}: {len(text)} characters (140 max)", 'COM-15')
     if re.search(r'[—;]', text): fail(f"{where}: an em-dash or semicolon", 'COM-4')
+
+def check_spec_whys(args):
+    """Part A: a why_flag the spec puts on a circuit item, read with the build's own spec reader, so the build check
+    says it before engage writes a Because nobody will see (2026-10-17)."""
+    if not args.spec: return
+    try:
+        import spec_to_workouts as stw   # it imports this file for its shared helpers; the spec grammar lives there
+        days = stw.parse(open(args.spec, encoding='utf-8').read())[2]
+    except Exception as e:
+        info(f"the spec's days could not be read with spec_to_workouts.py ({e}), so no why_flag on a circuit item was looked for")
+        return
+    for n, where in stw.item_whys(days): warn(f"spec line {n}: {where}: {stw.ITEM_WHY}", 'COM-4')
 
 def check_placed(data, args):
     """Every note_flag and why_flag in the spec should land on the programme (2026-09-26): engage
@@ -960,19 +981,42 @@ def day_minutes(day):
                 if primary and rx.get('tempo'): total += 120  # ramp-up sets before a main lift
     return total / 60, assumed
 
+def legacy_rx(days):
+    """Turn last cycle's legacy cards into rx in place, so day_minutes() can time them. A cycle written before rx
+    (chips[], restSec, "×3 Rounds", an item's `detail`) has no rx, so every card read as one 30-s set: one athlete's
+    days modelled 18-23 min against 53-90 logged, the ratio (×3.47) was thrown away and the real lengths told to Amir
+    were guessed (2026-10-17). chips.js's toRx() and circuitToRx(), the converter the coach editor runs on an old card,
+    do the reading, so the chips grammar keeps one copy. How many cards it converted; None when node could not run."""
+    todo = [ex for d in days for b in d.get('blocks') or [] for ex in b.get('exercises') or []
+            if (ex.get('type') == 'circuit' and (not ex.get('rx') or any(not it.get('rx') and it.get('detail') for it in ex.get('items') or [])))
+            or (ex.get('type') != 'circuit' and not ex.get('rx') and (ex.get('chips') or ex.get('restSec')))]
+    if not todo: return 0
+    done = run_chips("a.map(e=>{try{return e.type==='circuit'?C.circuitToRx(e):C.toRx(e)}catch(x){return null}})", todo)
+    if done is None: return None
+    for ex, new in zip(todo, done):
+        if new: ex.clear(); ex.update(new)
+    return sum(1 for new in done if new)
+
 def time_ratio(ctx):
     """Real minutes ÷ modelled minutes for the cycle just trained (2026-09-27): `prev` from --spine-sql
     (the live programme before this build) through day_minutes(), against the logged average per day
     over the last six weeks. The model runs short (one athlete's 48 modelled minutes took 69), so the
     ratio turns this cycle's model into an expected real length. None when either side is missing or
-    the ratio is implausible (a timer left running)."""
+    the ratio is implausible (a timer left running). A legacy chips cycle is read through legacy_rx() first."""
     prev, logged = (ctx or {}).get('prev'), (ctx or {}).get('minutes') or {}
     if not prev or not logged: return None, ''
-    model = {str(d.get('id')): day_minutes(d)[0] for d in prev_programme(prev)['workouts']['days']}
+    days = prev_programme(prev)['workouts']['days']
+    old = legacy_rx(days)
+    if old is None:
+        warn("last cycle is written in the old chips format and node could not run assets/js/chips.js to read it, so there "
+             "is no real-to-model ratio: give Amir the modelled minutes and say they run short", 'SES-7')
+        return None, ''
+    model = {str(d.get('id')): day_minutes(d)[0] for d in days}
     both = sorted((k for k in logged if k in model and model[k] > 0 and num(logged[k])), key=day_order)
     if not both: return None, ''
     ratio = sum(num(logged[k]) for k in both) / sum(model[k] for k in both)
     detail = ' · '.join(f"D{k} {model[k]:.0f}→{num(logged[k]):.0f}" for k in both)
+    detail += f" ({old} old chips card{'s' if old != 1 else ''} read through chips.js)" if old else ''
     if not 0.6 <= ratio <= 2.5:
         return None, f"last cycle, modelled → logged minutes: {detail}: ×{ratio:.2f} is too far off to use"
     return ratio, f"last cycle, modelled → logged minutes: {detail} (real ≈ ×{ratio:.2f} the model)"
@@ -995,6 +1039,33 @@ def check_time(data, args, ctx=None):
         if (real or mins) > cap: warn(f"{line}: past the {cap:g}-min cap (soft: tell Amir the expected real length)", 'SES-7')
         else: info(line)
     return timing
+
+# ── the week's ground contacts and throws (2026-10-17) ────────────────────────
+def contact_counts(data, spine):
+    """One INFO line with the week's plyometric contacts and throws, so the number told to Amir is counted, never
+    summed by hand (2026-10-17: a run told him 100 contacts for a programme with 94). A contact is a rep of any card
+    or circuit item, prep included, whose Spine impact is plyometric or landing; a throw, one whose pattern is throw.
+    Sets (an item: its circuit's rounds) × reps, ×2 when side, each day once. The week as written: week 1's and the
+    back-off's limits are not taken off. A dose in time or distance has no count, so it is named instead."""
+    tot, unc = {'contacts': {}, 'throws': {}}, []
+    for d, b, ex, it in exercises(data):
+        if not it and ex.get('type') == 'circuit': continue
+        o, day = it or ex, str(d.get('id'))
+        e = spine.get(o.get('exId') or '') or {}
+        kind = 'throws' if e.get('pattern') == 'throw' else 'contacts' if e.get('impact') in ('plyometric', 'landing') else None
+        if not kind: continue
+        rx = o.get('rx') or {}
+        reps = num(rx.get('reps'))
+        if reps is None: unc.append(f"{o.get('name')} (D{day})"); continue
+        times = round_count(ex) if it else int(num(rx.get('sets')) or 1)
+        tot[kind][day] = tot[kind].get(day, 0) + times * reps * (2 if rx.get('side') else 1)
+    if not (tot['contacts'] or tot['throws'] or unc): return
+    def part(label, per):
+        days = ' · '.join(f"D{k} {per[k]:.0f}" for k in sorted(per, key=day_order))
+        return f"{label} {sum(per.values()):.0f}" + (f" ({days})" if per else '')
+    info("the week as written: " + part('plyometric contacts', tot['contacts']) + ' · ' + part('throws', tot['throws'])
+         + " (Spine impact plyometric/landing and pattern throw: sets × reps, ×2 a side; say these, never a hand sum)"
+         + (f" · not counted, dosed in time or distance: {', '.join(unc)}" if unc else ''))
 
 # ── volume, counted from each exercise's Spine credits (2026-09-26) ───────────
 # VOL-10's count (1 prime mover, 0.5 synergist) and VOL-2's cost live ONCE, on the exercise's Spine
@@ -1390,7 +1461,7 @@ def prev_programme(prev):
             exs = []
             for x in b.get('x') or []:
                 e = {'name': x.get('n'), 'exId': x.get('id'), 'type': x.get('type'), 'rx': x.get('rx'),
-                     'chips': x.get('chips'), 'rounds': x.get('rounds'),
+                     'chips': x.get('chips'), 'rounds': x.get('rounds'), 'restSec': x.get('rs'),
                      'items': [{k: v for k, v in {'name': i.get('n'), 'exId': i.get('id'), 'rx': i.get('rx'),
                                                   'detail': i.get('detail')}.items() if v is not None}
                                for i in (x.get('items') or [])]}
@@ -1655,7 +1726,7 @@ s as (select
     (select jsonb_agg(jsonb_build_object('id', d->'id', 'blocks',
        (select jsonb_agg(jsonb_build_object('t', b->>'title', 'r', b->'rest', 'x',
           (select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('n', e->>'name', 'id', e->>'exId', 'type', e->>'type',
-               'rx', e->'rx', 'chips', e->'chips', 'rounds', e->'rounds',
+               'rx', e->'rx', 'chips', e->'chips', 'rounds', e->'rounds', 'rs', e->'restSec',
                'items', (select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('n', i->>'name', 'id', i->>'exId',
                                                                                'rx', i->'rx', 'detail', i->'detail')))
                          from jsonb_array_elements(case when jsonb_typeof(e->'items') = 'array' then e->'items' else '[]'::jsonb end) i))))
@@ -1769,12 +1840,13 @@ def main():
         check_obligations(data, args); check_placed(data, args)
     else:
         info('--stage build: the text checks (notes, Becauses, week-note words, RPE in text) run in the final pass')
+        check_spec_whys(args)
     check_week_notes(data, args)
     check_bans(data, args); timing = check_time(data, args, ctx)
     per_day = check_volume(data, args, ctx['spine'], timing) if args.spine else {}
     check_week(data, args, per_day)
     if args.spine:
-        check_spine(data, args, ctx['spine']); check_continuity(data, args, ctx)
+        check_spine(data, args, ctx['spine']); check_continuity(data, args, ctx); contact_counts(data, ctx['spine'])
         check_focus_promises(data, ctx['spine']); check_block_promises(data, ctx['spine'])
         check_kit(data, prof if prof else parse_profile(ctx.get('profile')), ctx['spine'])
     else: warn('no --spine: the Spine gate, the volume count (floors, tables, day loads, back-to-back days), '
