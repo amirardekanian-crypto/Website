@@ -38,6 +38,17 @@ coach = "a Courtside row; often Amir's own to give"
 crew = "a line on the Bell, if the athlete said yes"
 beyond = "Amir's story, only after the athlete says yes"
 
+# ── Moments (phase 3, D7) ─────────────────────────────────────────────────────────────────────────────────────────
+# How a reward is told in the apps (PROCEDURES.md → the queue). per_open: at most this many full-screen moments of ANY kind per
+# app open (a level-up or the reveal counts). keep_days: a full-screen award not shown in this many days becomes a wins-card line
+# (never lost). max: the most moments one answer carries. full_screen: the sizes that open full-screen.
+[moments]
+per_open = 1
+keep_days = 14
+max = 8
+full_screen = ["milestone", "legend"]
+
+
 # ── Instant feedback (GAME-13) ────────────────────────────────────────────────────────────────────────────────────
 # Amir, 2026-10-17: "we need to show the client a visible progress and immediate feedback every time a meaningful task
 # is completed." Every fact an athlete makes answers at once, on the thing they tapped, before the server does

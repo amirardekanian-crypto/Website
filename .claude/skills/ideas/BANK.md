@@ -149,8 +149,8 @@ rest is the boss; the last 25 s are for the set; only inside a rest and optional
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 38 | The Read | Amir defends like a person: aims where the ball will cross, reacts a beat late, small aim error, form set between points; the score-based speed dial goes; a sim test with three human-like bots. Advanced: a visible head start ("Amir gives you a point") | — | **picked** 2026-10-18 ('go with your picks') · **built** 2026-10-18 (sw.js v169) |
-| 39 | Serve Clock | At 25 s left (30 on rests of 100 s+) "Last point", then the next set and one Spine cue; no game door on rests under 45 s, circuit rounds or retest lifts; one `cueForRest()` shared with #20 | — | **picked** 2026-10-18 ('go with your picks') · **built** 2026-10-18 (sw.js v169) |
+| 38 | The Read | Amir defends like a person: aims where the ball will cross, reacts a beat late, small aim error, form set between points; the score-based speed dial goes; a sim test with three human-like bots. Advanced: a visible head start ("Amir gives you a point") | — | **picked** 2026-10-18 ('go with your picks') · **built** 2026-10-18 (sw.js v170) |
+| 39 | Serve Clock | At 25 s left (30 on rests of 100 s+) "Last point", then the next set and one Spine cue; no game door on rests under 45 s, circuit rounds or retest lifts; one `cueForRest()` shared with #20 | — | **picked** 2026-10-18 ('go with your picks') · **built** 2026-10-18 (sw.js v170) |
 | 40 | Full Time | One match a session: the score waits between rests, first to 15, an 8-minute play cap, Done ends it | 39 | picked (first to 15, 8-min cap) |
 | 41 | Chair Umpire | A receipt per rest (written, run, how it ended, +15s) in the session log, read by coach.html, `/cycle-report` and `/program-design`; a line in privacy.html | — | picked (with a privacy line) |
 | 42 | Clean Strike | Hit-stop up to 60 ms, a pitch ladder per rally hit, a white rim on Amir's racket, the thumb lift fading near the back glass | — | pitched |

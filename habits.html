@@ -1603,6 +1603,14 @@
   #app .lo-rl { padding: 0 20px; font-size: 12px; font-weight: 800; letter-spacing: .16em; color: var(--muted-soft); }
   #app .rail { display: flex; gap: 8px; overflow-x: auto; padding: 2px 20px 4px; scrollbar-width: none; }
   #app .rail::-webkit-scrollbar { display: none; }
+  /* The Grand Slam row (phase 3): a title per kind of win, then the GRAND SLAM plate. An empty slot says so in grey. */
+  #app .slamrow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0 16px 12px; }
+  #app .slam-slot { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; overflow: hidden;
+    padding: 10px 12px; border-radius: 14px; background: var(--surface); }
+  #app .slam-slot > span:last-child { max-width: 100%; }
+  #app .slam-k { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-soft); }
+  #app .slam-no { font-size: 12px; font-weight: 700; color: var(--muted-soft); }
+  #app .slam-grand { grid-column: 1 / -1; display: flex; justify-content: center; }
   #app .lo-empty {
     flex: none; border-radius: 999px; border: 1.5px dashed var(--box); padding: 8px 13px;
     font-size: 12px; font-weight: 700; color: var(--muted-soft); white-space: nowrap;
@@ -1896,6 +1904,19 @@
     display: block; height: 100%; border-radius: 999px;
     background: linear-gradient(90deg, var(--accent-700), var(--accent));
     transition: width .35s cubic-bezier(.2,.8,.2,1);
+  }
+  /* The four numbers (Career Mode phase 3, only once the catalogue switch is on): one per kind of win, under the bar.
+     Four across, two by two below 360 px; each opens Progress at its kind of win. */
+  #app .hero4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  #app .hero4 .h4 { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; padding: 8px 6px 8px 0;
+    background: none; border: 0; text-align: left; cursor: pointer; font-family: inherit; color: var(--ink); }
+  #app .hero4 .h4 + .h4 { border-left: 1px solid var(--rule); padding-left: 8px; }
+  #app .hero4 .figure { font-size: 22px; line-height: 1; }
+  #app .hero4 .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0; text-transform: none; line-height: 1.25; color: var(--muted); }
+  @media (max-width: 359px) {
+    #app .hero4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #app .hero4 .h4:nth-child(3) { border-left: 0; padding-left: 0; }
+    #app .hero4 .h4:nth-child(n+3) { border-top: 1px solid var(--rule); }
   }
   /* The streak tile keeps its own colour and sits on the right of the row, so
      the level and the streak are two objects rather than one crowded lockup. It
@@ -3049,6 +3070,7 @@ function metalFill(x, px, py, w, h, key) {
 // emerald (lv 21+); event titles and PROOF ITSELF are prismatic.
 function titleMetalKey(p) {
   if (!p) return 'bronze';
+  if (p.metal && METALS[p.metal]) return p.metal;    // a catalogue title carries its own (phase 3)
   if (p.event || p.id === 't_proof') return 'prisma';
   const lv = p.lv || 0;
   return lv >= 21 ? 'emerald' : lv >= 13 ? 'silver' : 'bronze';
@@ -3434,6 +3456,7 @@ function passItem(id) {
   return PASS_TRACK.find(p => p.id === id)
       || eventTitles().find(t => t.id === id)
       || seasonTitleFor(id)          // resolves ANY season's title, not just our own
+      || catTitleByHabId(id)         // a catalogue title (phase 3): CLOCKWORK, CENTURY, GRAND SLAM ... (null until then)
       || null;
 }
 function passOwned()  { return (CFG.pass && CFG.pass.owned) || []; }
@@ -3547,6 +3570,23 @@ const K_META = () => ATHLETE_ID + '_hab_meta';
 // and the training app keeps its own copy (<id>_careercache), never this key.
 let CAREER = null, _pushedXp = null, _careerBusy = false, _careerAgain = false, _careerTimer = null;
 const K_CAREER = () => ATHLETE_ID + '_hab_career';
+// ── CAREER MODE, phase 3 (the catalogue switch): the server's catalogue of badges, milestones and titles ──
+// CATALOGUE is the copy this phone keeps of it (names, tiers, captions, sizes): { version, rows: { badge: { id: body },
+// achievement, title, setting } }. Never in CFG and never synced: it is the server's, and every phone fetches its own.
+// Never written in the coach's preview or the demo, never read in the embedded strip. See catalogueOn() for the switch.
+const K_CATALOGUE = () => ATHLETE_ID + '_hab_catalogue';
+const GRAND_SLAM_LINE = "A title in all four. That's the whole game.";   // §10.2: the Grand Slam's own line
+let CATALOGUE = null, _awCache = null, _phoneCat = null, _awwd = null, _catBusy = false;
+// THE SHELF (stage70's split, 2026-10-18): get_profile() is the core every screen reads (Today, the Locker, the dedupe);
+// the shelf's rows (every badge with the day of each tier, the milestones, the titles, `recent`) are get_awards()'s,
+// asked for only when Progress opens (fetchShelf()). SHELF is the last answer, { v: the catalogue version it was read
+// under, n: how many awards the core owned then, at, a: the answer }, kept under <id>_hab_shelf: a cache like the two
+// above, never in CFG, never synced, never written in the coach's preview or the demo, never read in the embedded strip.
+const K_SHELF = () => ATHLETE_ID + '_hab_shelf';
+let SHELF = null, _shelfBusy = false, _shelfTried = '', _shelfTimer = null;
+// When this phone's last push landed with nothing left to send (pushNow()), and whether the check that is running
+// came from a tap (a full-screen moment it earned opens at once, D7). Both phase 3 only.
+let _pushOkAt = 0, _actionPass = false, _fullThisRun = false;
 
 // ── BODY WEIGHT ───────────────────────────────────────────────────────────
 // Its OWN payload key, deliberately — not a habit, not a field on CFG, and
@@ -3639,6 +3679,11 @@ function defaultCfg() {
            // careerSeen: the day of the XP switch whose reveal ("Your career: level N") this athlete has
            // had, on any phone (kept through the cloud merge like `seen`). See checkLevelUps().
            careerSeen:null,
+           // Phase 3 (the catalogue switch): seenAwards, every award id that has had its moment or was recorded without
+           // one (union only, like seenAch); catalogueSeen, the switch day whose reveal this athlete has had; heldBefore,
+           // Proof's own tiers and milestones as they stood at the switch (the "Earned before" lines). All three survive
+           // the cloud merge. See checkCatalogueReveal().
+           seenAwards:null, catalogueSeen:null, heldBefore:null,
            questPool:null, questRuns:null, seasons:null, seasonNames:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0,
            // Everyone is on the board (2026-09-12) — see autoJoinBoard().
@@ -4614,7 +4659,7 @@ async function pushNow() {
     // payload. The re-armed timer then found nothing dirty and did nothing, the
     // boot catch-up did nothing, and the badge said SYNCED while the board
     // scored a day with a habit missing from it.
-    if (_writeGen === sentGen) { SYNC.dirty = false; _dirtyDays.clear(); clearTimeout(_retryTimer); }
+    if (_writeGen === sentGen) { SYNC.dirty = false; _dirtyDays.clear(); clearTimeout(_retryTimer); _pushOkAt = Date.now(); }
     else { clearTimeout(_pushTimer); _pushTimer = setTimeout(pushNow, 1200); }
     okay = true;
     // The server has just turned this log into facts: ask for the career it now adds up to.
@@ -4694,6 +4739,7 @@ async function syncFromCloud() {
         const keepSeen = CFG.seen, keepSig = CFG.rulesSig;
         const keepTiers = CFG.seenTiers, keepAch = CFG.seenAch, keepPerfect = CFG.seenPerfect;
         const keepQuests = CFG.seenQuests, keepSeasons = CFG.seenSeasons, keepCareer = CFG.careerSeen;
+        const keepAwards = CFG.seenAwards, keepCatalogue = CFG.catalogueSeen, keepHeld = CFG.heldBefore;
         const keepPass = CFG.pass || {};
         CFG = Object.assign(defaultCfg(), cloudCfg);
         CFG.on = Object.assign(defaultCfg().on, cloudCfg.on || {});
@@ -4701,6 +4747,12 @@ async function syncFromCloud() {
         if (!CFG.rulesSig) CFG.rulesSig = keepSig;
         // The career reveal, once per athlete: a phone that has shown it keeps that, whichever config is newer.
         if (!CFG.careerSeen) CFG.careerSeen = keepCareer || null;
+        // Phase 3, the same three rules: the catalogue reveal once per athlete, Proof's shelf at the switch as first
+        // read, and every award moment shown on either phone never shown again on the other (unioned).
+        if (!CFG.catalogueSeen) CFG.catalogueSeen = keepCatalogue || null;
+        if (!CFG.heldBefore) CFG.heldBefore = keepHeld || null;
+        if (!Array.isArray(CFG.seenAwards)) CFG.seenAwards = Array.isArray(keepAwards) ? keepAwards : null;
+        else if (Array.isArray(keepAwards)) CFG.seenAwards = CFG.seenAwards.concat(keepAwards.filter(k => CFG.seenAwards.indexOf(k) < 0));
         // Same reasoning as `seen`: a cloud row written before this build has no
         // unlock baseline, and inheriting nothing would replay every badge the
         // athlete already owns as a fresh takeover.
@@ -5043,27 +5095,685 @@ async function fetchCareer() {
   if (window.IS_DEMO || window.IS_EMBED || !ATHLETE_ID) return false;
   if (_careerBusy) { _careerAgain = true; return false; }
   _careerBusy = true;
-  let changed = false;
+  let changed = false, fresh = false;
+  const started = Date.now();
   try {
     const sb = _sb();
     if (!sb) return false;
     const { data, error } = await sb.rpc('get_profile', { p_athlete_id: ATHLETE_ID });
     if (error || !data || typeof data !== 'object' || data.athlete_id !== ATHLETE_ID) return false;
-    const wasOn = careerOn(), before = careerOn() ? careerXp() + '|' + CAREER.p.switch.xp : null;
+    const wasOn = careerOn(), wasCat = catalogueOn(), before = careerOn() ? careerXp() + '|' + CAREER.p.switch.xp : null;
     CAREER = { p: data, at: Date.now(), base: 0 };
-    if (careerOn() !== wasOn) { invalidateBonus(); _pushedXp = null; }   // the scorer's window just changed
+    // The catalogue switch has just gone on (phase 3): what Proof's own shelf held, read once and kept (CFG.heldBefore),
+    // so an old tier or milestone the server never carried is still named under its new badge, never taken away.
+    if (catalogueOn() && !wasCat && CFG && !CFG.heldBefore && !window.IS_PREVIEW) {
+      CFG.heldBefore = { tiers: currentTiers(), ach: currentAch() };
+      saveCfg();
+    }
+    // The scorer's window just changed (the XP switch), or what it pays (the catalogue switch: tiers and milestones
+    // leave this phone's ledger). A push made before the flip carried them in _pushedXp: it is dropped, so the base
+    // is this phone's count under the NEW rules and the XP shown does not move.
+    if (careerOn() !== wasOn || catalogueOn() !== wasCat) { invalidateBonus(); _pushedXp = null; }
     CAREER.base = careerOn() ? ((SYNC.dirty && _pushedXp != null) ? _pushedXp : phoneXp()) : 0;
     saveCareer();
-    changed = careerOn() !== wasOn || (careerOn() && careerXp() + '|' + CAREER.p.switch.xp !== before);
+    fresh = true;
+    changed = careerOn() !== wasOn || catalogueOn() !== wasCat || (careerOn() && careerXp() + '|' + CAREER.p.switch.xp !== before);
   } catch (e) { /* offline: keep the copy */ }
   finally {
     _careerBusy = false;
     if (_careerAgain) { _careerAgain = false; fetchCareerSoon(); }
   }
   if (changed) { checkLevelUps(); render(); }
+  // Phase 3, only once the catalogue switch is on: the catalogue copy when its version moved, the titles the server
+  // minted, a pending award the server disagrees with, and the moments waiting on the server (one answer, this run).
+  if (fresh && catalogueOn()) {
+    if (CAREER.p.catalogue_version && (!CATALOGUE || CATALOGUE.version !== CAREER.p.catalogue_version)) fetchCatalogue();
+    // The shelf on screen while the core moved under it (a new award, a new catalogue): read it again.
+    if (UI.screen === 'progress' && shelfStale()) fetchShelf(false);
+    let again = syncCatalogueTitles();
+    if (checkWithdrawals(started)) again = true;
+    if (serverMoments()) again = true;
+    if (again) render();
+  }
   return changed;
 }
 function fetchCareerSoon() { clearTimeout(_careerTimer); _careerTimer = setTimeout(fetchCareer, 400); }
+
+// ── Career Mode, phase 3: the catalogue switch (career/CAREER_MODE.md; supabase/stage70_career_rewards.sql) ──
+// From the server's catalogue switch every badge tier, milestone and catalogue title is an AWARD the server mints
+// once in a career (career_awards). Two reads carry them (stage70's split): get_profile(), the CORE, carries `owned`
+// (every award id, a LIST in byte order with no days), `ladder`, `near`, `slam`, `title_worn`, `titles_owned`,
+// `numbers.four` and the `moments` waiting to be told; its `badges` and `achievements` are always [] (placeholders,
+// never "none earned"). get_awards(), the SHELF, carries the rows: every badge with the day of each tier, the
+// milestones, the titles and `recent`. careerView() is the core with the shelf's rows laid over it once they are here.
+// catalogueOn(): the switch is on and the profile carries the awards; the four numbers and the server's moments draw
+// from the core alone. catalogueReady(): this phone also holds the catalogue copy, which the phone's
+// own scoring (awardMeasures(), phoneAwards(), pendingAwardXp()) and its instant celebrations need. Anything that
+// reads CATALOGUE asks catalogueReady(), never catalogueOn(): a first open offline has the profile and no copy, and
+// a throw at boot here is the "loading for ever, nothing in the console" kind (2026-08-01).
+// With the switch off (null in the profile, or no profile ever) every branch below stands down and the app is
+// exactly what it was.
+function catalogueOn() {
+  return careerOn() && !!(CAREER.p.switch && CAREER.p.switch.catalogue) && !!CAREER.p.owned && typeof CAREER.p.owned === 'object';
+}
+function catalogueReady() { return catalogueOn() && !!(CATALOGUE && CATALOGUE.version && CATALOGUE.rows); }
+// The award ids the core owns. The server answers a list; a map { id: day } (a copy from before the split) reads the same.
+function ownedIds() {
+  const o = CAREER && CAREER.p && CAREER.p.owned;
+  return Array.isArray(o) ? o.filter(x => typeof x === 'string') : (o && typeof o === 'object' ? Object.keys(o) : []);
+}
+function ownedSet() { return new Set(ownedIds()); }
+// The shelf's answer, when this phone holds one for this athlete (get_awards() with the catalogue on).
+function shelfAnswer() {
+  if (!catalogueOn() || !SHELF || !SHELF.a || SHELF.a.athlete_id !== CAREER.p.athlete_id || !SHELF.a.catalogue) return null;
+  return SHELF.a;
+}
+function shelfLoaded() { return !!shelfAnswer(); }
+// The profile as the shelf's screens read it: the core, with the shelf's four lists laid over it when it is here
+// (get_awards()'s own merge; owned stays the core's list). Without the shelf it is the core as it came.
+function careerView() {
+  const P = (CAREER && CAREER.p) || {}, a = shelfAnswer();
+  if (!a) return P;
+  const L = x => (Array.isArray(x) ? x : []);
+  return Object.assign({}, P, { badges: L(a.badges), achievements: L(a.achievements), titles: L(a.titles), recent: L(a.recent) });
+}
+// The shelf wants reading again: none yet, a catalogue it was not read under, or an award count that moved.
+function shelfStale() {
+  if (!catalogueOn()) return false;
+  return !shelfLoaded() || SHELF.v !== (CAREER.p.catalogue_version || '') || SHELF.n !== ownedIds().length;
+}
+function loadShelf() {
+  SHELF = null;
+  if (window.IS_DEMO || window.IS_EMBED || !ATHLETE_ID) return;
+  try {
+    const c = JSON.parse(localStorage.getItem(K_SHELF()) || 'null');
+    if (c && c.a && c.a.athlete_id === ATHLETE_ID && typeof c.n === 'number') SHELF = c;
+  } catch (e) { /* a broken copy is no copy */ }
+}
+// Reads the shelf (get_awards()). force: Progress was just opened, so ask even when nothing looks stale (once in 15 s);
+// otherwise only when shelfStale(), and once per state in a run, so no signal never loops. A failed read keeps the copy,
+// and Progress shows it; a success redraws. The answer with the catalogue off ({ catalogue: null }) is never kept.
+async function fetchShelf(force) {
+  if (window.IS_DEMO || window.IS_EMBED || !ATHLETE_ID || _shelfBusy || !catalogueOn()) return false;
+  const want = CAREER.p.catalogue_version || '', n = ownedIds().length, key = want + '|' + n;
+  if (!force && (!shelfStale() || _shelfTried === key)) return false;
+  if (force && !shelfStale() && Date.now() - (SHELF.at || 0) < 15000) return false;
+  _shelfBusy = true; _shelfTried = key;
+  try {
+    const sb = _sb();
+    if (!sb) return false;
+    // Capped like every other read: a call that stalls (hotel wifi) must not hold _shelfBusy for the rest of the run.
+    const res = await _withTimeout(sb.rpc('get_awards', { p_athlete_id: ATHLETE_ID }), 8000);
+    if (!res) return false;   // no answer: the copy stays, and the next open of Progress asks again (force)
+    const { data, error } = res;
+    if (error || !data || typeof data !== 'object' || data.athlete_id !== ATHLETE_ID || !data.catalogue) return false;
+    if (!CAREER || !CAREER.p || CAREER.p.athlete_id !== ATHLETE_ID) return false;
+    SHELF = { v: data.catalogue_version || want, n, at: Date.now(), a: data };
+    if (!window.IS_PREVIEW) { try { localStorage.setItem(K_SHELF(), JSON.stringify(SHELF)); } catch (e) { /* full: memory still has it */ } }
+    syncCatalogueTitles();
+    // The catalogue reveal waited for something that names each award's kind: this is one (checkCatalogueReveal()).
+    if (catalogueRevealDue()) checkLevelUps();
+    render();
+    return true;
+  } catch (e) { return false; }
+  finally { _shelfBusy = false; }
+}
+// From inside a render (the shelf drawn while stale): asked after the paint, never during it.
+function fetchShelfSoon() { clearTimeout(_shelfTimer); _shelfTimer = setTimeout(() => fetchShelf(false), 0); }
+function loadCatalogue() {
+  CATALOGUE = null; _phoneCat = null;
+  if (window.IS_DEMO || window.IS_EMBED || !ATHLETE_ID) return;
+  try {
+    const c = JSON.parse(localStorage.getItem(K_CATALOGUE()) || 'null');
+    if (c && c.version && c.rows && c.rows.badge) CATALOGUE = c;
+  } catch (e) { /* a broken copy is no copy */ }
+}
+// The catalogue's rows (signed-in SELECT, stage66), asked for only when the profile names a version this phone
+// does not hold. On an error the copy stays; on success the bonus cache and the screen are redrawn.
+async function fetchCatalogue() {
+  if (window.IS_DEMO || window.IS_EMBED || !ATHLETE_ID || _catBusy) return false;
+  const want = CAREER && CAREER.p && CAREER.p.catalogue_version;
+  if (!want || (CATALOGUE && CATALOGUE.version === want)) return false;
+  _catBusy = true;
+  try {
+    const sb = _sb();
+    if (!sb) return false;
+    const { data, error } = await sb.from('career_catalogue').select('kind,id,body').in('kind', ['badge', 'achievement', 'title', 'setting']);
+    if (error || !Array.isArray(data)) return false;
+    const rows = { badge: {}, achievement: {}, title: {}, setting: {} };
+    data.forEach(r => { if (r && rows[r.kind] && r.id && r.body && typeof r.body === 'object') rows[r.kind][r.id] = r.body; });
+    if (!Object.keys(rows.badge).length) return false;
+    CATALOGUE = { version: want, rows };
+    _phoneCat = null;
+    if (!window.IS_PREVIEW) { try { localStorage.setItem(K_CATALOGUE(), JSON.stringify(CATALOGUE)); } catch (e) {} }
+    invalidateBonus();
+    // A new copy names catalogue titles the Locker could not name before; a shelf read under the old one is read again.
+    syncCatalogueTitles();
+    if (SHELF && shelfStale()) fetchShelf(false);
+    // The catalogue reveal waited for this copy to name each award's kind (checkCatalogueReveal()): it opens now.
+    if (catalogueRevealDue()) checkLevelUps();
+    render();
+    return true;
+  } catch (e) { return false; }
+  finally { _catBusy = false; }
+}
+function catEntry(kind, id) {
+  const r = CATALOGUE && CATALOGUE.rows && CATALOGUE.rows[kind];
+  return (r && id && r[id]) || null;
+}
+// A catalogue title by the id it wears in hab_titles and CFG.pass.owned (its Proof id, or its catalogue id), from the
+// copy or, without one, from the shelf's titles (careerView()). Templates and season titles never resolve here (seasonTitleFor() does).
+function catTitleByHabId(hid) {
+  if (!hid) return null;
+  let body = null, cid = null;
+  const T = CATALOGUE && CATALOGUE.rows && CATALOGUE.rows.title;
+  if (T) {
+    if (T[hid]) { body = T[hid]; cid = hid; }
+    else { const k = Object.keys(T).find(x => T[x] && T[x].proof_id === hid); if (k) { body = T[k]; cid = k; } }
+  }
+  const VT = !body ? careerView().titles : null;
+  if (Array.isArray(VT)) {
+    const t = VT.find(x => x && (x.hab_id === hid || x.id === hid));
+    if (t) { body = t; cid = t.id; }
+  }
+  if (!body || body.template || body.meaning === 'season') return null;
+  const metal = body.metal === 'prismatic' ? 'prisma' : (METALS[body.metal] ? body.metal : 'bronze');
+  return { kind: 'title', id: body.proof_id || body.hab_id || cid, cat: cid, name: String(body.name || cid).toUpperCase(),
+           // The Grand Slam's `from` is the catalogue's own note for Amir, never an athlete's line (§10.2 has its words).
+           metal, note: body.meaning === 'all' ? GRAND_SLAM_LINE : (body.from || ''), meaning: body.meaning || '' };
+}
+// ── The award id: one key for a reward everywhere (the server's career_award_id(), program.html's awardId(); a twin,
+// scripts/check_twins.js §10). badge:<item>:<tier>[:<subject>] · achievement:<item> · title:<item>. PURE.
+function awardId(kind, item, tier, subject) {
+  let s = String(kind) + ':' + String(item);
+  if (tier != null && tier !== '') s += ':' + tier;
+  if (subject) s += ':' + subject;
+  return s;
+}
+function awardParts(id) {
+  const p = String(id || '').split(':');
+  const t = p[2] != null && /^\d+$/.test(p[2]) ? Number(p[2]) : null;
+  return { kind: p[0] || '', item: p[1] || '', tier: t, subject: (t != null ? p[3] : p[2]) || '' };
+}
+// A catalogue as { badge: { id: body }, achievement: { id: body } }, from either that shape or a flat { id: body }
+// (scripts/career/reward_cases.json): a body with tiers is a badge. PURE.
+function awardCat(cat) {
+  cat = cat || {};
+  if (cat.badge || cat.achievement) return { badge: cat.badge || {}, achievement: cat.achievement || {} };
+  const out = { badge: {}, achievement: {} };
+  Object.keys(cat).forEach(id => { const b = cat[id]; if (b && typeof b === 'object') out[Array.isArray(b.tiers) ? 'badge' : 'achievement'][id] = b; });
+  return out;
+}
+// ── THE PHONE'S TWIN OF career_measures() / career_badge_eval() / career_achievement_eval() (§3.3, §3.4) ──
+// For the entries this phone can decide from its own log, so a tick that crosses a tier shows its moment and its XP
+// at once (GAME-13, P17): the eight habit_* badges, day_streak, dawn_patrol, proof_clean_sweep, back_in_the_fight,
+// first_blood, the_centurion, full_stack and the five events. Retired entries are left out (never earned after the
+// switch). PURE, so scripts/check_twins.js runs it on the server's own answers (scripts/career/reward_cases.json):
+//   inp = { log: { day: { hid: v } }, targets: { hid: target }, custom: [ids] (target 1, as the server's done set),
+//           onTarget: [days] (dayQualifies), perfect: [days] (isPerfect), with3: [days] (3+ habits of that day's roster
+//           done), comebacks: [{ day, run }] (comebackRuns(): the return day and the qualifying days held from it),
+//           stuck: [days] (the day each comeback reached COMEBACK_STICK) }
+//   → { <badge id>: { have, crossed: { "<tier>": day } }, <achievement id>: day | null }
+// A measure's crossing day for a threshold is the first day its best-so-far reached it (the server's `steps`).
+function awardMeasures(inp, cat) {
+  inp = inp || {};
+  const C = awardCat(cat);
+  const DAY = 86400000;
+  const shift = (k, n) => new Date(Date.parse(k + 'T00:00:00Z') + n * DAY).toISOString().slice(0, 10);
+  const byDay = (a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
+  const log = inp.log || {}, targets = inp.targets || {}, custom = Array.isArray(inp.custom) ? inp.custom : [];
+  const days = Object.keys(log).sort();
+  const targetOf = h => (typeof targets[h] === 'number' && custom.indexOf(h) < 0) ? targets[h] : (custom.indexOf(h) >= 0 ? 1 : null);
+  const done = (k, h) => { const row = log[k], v = row ? row[h] : undefined, t = targetOf(h); return typeof v === 'number' && t != null && v >= t; };
+  const rise = pts => { const st = []; let best = -Infinity; pts.forEach(p => { if (p[1] > best) { best = p[1]; st.push([p[0], p[1]]); } }); return st; };
+  const runPts = h => { const pts = []; let run = 0, prev = null;
+    days.forEach(k => { if (!done(k, h)) return; run = (prev && shift(prev, 1) === k) ? run + 1 : 1; prev = k; pts.push([k, run]); });
+    return pts; };
+  const countPts = list => Array.from(new Set(list || [])).sort().map((k, i) => [k, i + 1]);
+  const islandPts = list => { const pts = []; let run = 0, prev = null;
+    Array.from(new Set(list || [])).sort().forEach(k => { run = (prev && shift(prev, 1) === k) ? run + 1 : 1; prev = k; pts.push([k, run]); });
+    return pts; };
+  const memo = {};
+  const series = key => {
+    if (memo[key]) return memo[key];
+    const i = key.indexOf(':'), kind = i < 0 ? key : key.slice(0, i), h = i < 0 ? '' : key.slice(i + 1);
+    let pts = [];
+    if (kind === 'run') pts = h === 'custom' ? custom.map(runPts).reduce((a, b) => a.concat(b), []).sort(byDay) : runPts(h);
+    else if (kind === 'hits') pts = countPts(days.filter(k => done(k, h)));
+    else if (kind === 'sum') { let s = 0; days.forEach(k => { const v = log[k] ? log[k][h] : undefined; if (typeof v === 'number' && v > 0) { s += v; pts.push([k, s]); } }); }
+    else if (kind === 'with3') pts = countPts(inp.with3);
+    else if (kind === 'perfect') pts = countPts(inp.perfect);
+    else if (kind === 'qualify') pts = countPts(inp.onTarget);
+    else if (kind === 'daystreak') pts = islandPts(inp.onTarget);
+    else if (kind === 'stuck') pts = (inp.stuck || []).slice().sort().map((k, j) => [k, j + 1]);
+    else if (kind === 'cbrun') {
+      (inp.comebacks || []).forEach(c => { for (let j = 0; j < (Number(c && c.run) || 0); j++) pts.push([shift(c.day, j), j + 1]); });
+      pts.sort(byDay);
+    }
+    const steps = rise(pts);
+    return (memo[key] = { have: steps.length ? steps[steps.length - 1][1] : 0, steps });
+  };
+  const crossDay = (key, at) => { const st = series(key).steps; for (let j = 0; j < st.length; j++) if (st[j][1] >= at) return st[j][0]; return null; };
+  // Proof's measure grammar (badges.toml proof_measure, the events' goals) → the measure key.
+  const keyOf = m => {
+    const p = String(m || '').split(':');
+    if (p[0] === 'streak') return 'run:' + p[1];
+    if (p[0] === 'daysHit') return 'hits:' + p[1];
+    if (p[0] === 'total') return 'sum:' + p[1];
+    return ({ daysWith3: 'with3', perfectDays: 'perfect', perfect: 'perfect', qualify: 'qualify',
+              comebackRun: 'cbrun', comebacksStuck: 'stuck' })[p[0]] || null;
+  };
+  const out = {};
+  Object.keys(C.badge).sort().forEach(id => {
+    const b = C.badge[id];
+    if (!b || b.retire_at || !Array.isArray(b.tiers)) return;
+    let key = null;
+    if (b.kind === 'best_run' && b.counts === 'habit_done' && b.habit) key = 'run:' + b.habit;
+    else if (id === 'day_streak' || (b.kind === 'proof' && (b.proof_codes || []).indexOf('DAY_STREAK_MARKS') >= 0)) key = 'daystreak';
+    else if (b.kind === 'proof' && b.proof_measure) key = keyOf(b.proof_measure);
+    if (!key) return;
+    const crossed = {};
+    b.tiers.forEach((t, j) => { const d = crossDay(key, Number(t && t.at)); if (d) crossed[String(j + 1)] = d; });
+    out[id] = { have: series(key).have, crossed };
+  });
+  Object.keys(C.achievement).sort().forEach(id => {
+    const b = C.achievement[id];
+    if (!b || b.retire_at) return;
+    const test = b.test || (b.proof_measure && b.proof_need != null ? 'proof' : null);
+    if (test === 'proof') {
+      const k = keyOf(b.proof_measure);
+      if (k) out[id] = crossDay(k, Number(b.proof_need));
+    } else if (test === 'goals' && Array.isArray(b.goals) && b.goals.length) {
+      let day = null, all = true;
+      b.goals.forEach(g => { const k = keyOf(g && g.kind), d = k ? crossDay(k, Number(g.need)) : null;
+        if (!d) all = false; else if (!day || d > day) day = d; });
+      out[id] = all ? day : null;
+    } else if (test === 'runs_together' && Array.isArray(b.habits) && b.habits.length) {
+      const R = Number(b.run) || 0;
+      const maps = b.habits.map(h => { const m = {}; runPts(h).forEach(p => { m[p[0]] = p[1]; }); return m; });
+      out[id] = days.find(k => maps.every(m => (m[k] || 0) >= R)) || null;
+    }
+  });
+  return out;
+}
+// What the phone counts as earned and the server has not confirmed: the crossings of awardMeasures() on a day AFTER
+// the switch (the switch day is history on both sides), inside the open window (today and BACKFILL_DAYS before it, plus
+// one: a settled day never changes on the server), not owned, not withdrawn. Priced as the server prices it (§3.6: the
+// tier's xp, the achievement's xp; size from the tier, the entry, else 'win'). PURE: o = { S, today, backfill_days,
+// owned: [ids] (the core's list; the older { id: day } reads the same), withdrawn: [ids] } → [{ award_id, xp, size, day }]
+// by day, then id.
+function phoneAwardsFrom(meas, cat, o) {
+  o = o || {}; meas = meas || {};
+  const C = awardCat(cat), S = String(o.S || '');
+  if (!S || !o.today) return [];
+  const floor = new Date(Date.parse(o.today + 'T00:00:00Z') - ((Number(o.backfill_days) || 0) + 1) * 86400000).toISOString().slice(0, 10);
+  const ow = o.owned, wd = Array.isArray(o.withdrawn) ? o.withdrawn : [];
+  const own = Array.isArray(ow) ? new Set(ow) : null, owns = id => (own ? own.has(id) : !!(ow && typeof ow === 'object' && ow[id]));
+  const out = [];
+  const add = (kind, item, tier, d, xp, size) => {
+    const id = awardId(kind, item, tier, '');
+    if (!d || !(d > S) || d < floor || d > o.today || owns(id) || wd.indexOf(id) >= 0) return;
+    out.push({ award_id: id, xp: Math.max(0, Math.round(Number(xp) || 0)), size: size || 'win', day: d });
+  };
+  Object.keys(meas).forEach(item => {
+    const m = meas[item];
+    if (C.badge[item] && m && typeof m === 'object') {
+      const b = C.badge[item];
+      Object.keys(m.crossed || {}).forEach(t => { const tb = (b.tiers || [])[Number(t) - 1] || {}; add('badge', item, Number(t), m.crossed[t], tb.xp, tb.size || b.size); });
+    } else if (C.achievement[item] && typeof m === 'string') {
+      const b = C.achievement[item];
+      add('achievement', item, null, m, b.xp, b.size);
+    }
+  });
+  out.sort((a, b) => (a.day < b.day ? -1 : a.day > b.day ? 1 : a.award_id < b.award_id ? -1 : a.award_id > b.award_id ? 1 : 0));
+  return out;
+}
+// The catalogue as the phone's twin reads it. An event that has no `goals` in the copy yet takes them from EVENTS
+// (career/achievements.toml copies them from there; scripts/check_twins.js holds the two equal).
+function phoneCat() {
+  if (!catalogueReady()) return { badge: {}, achievement: {} };
+  if (_phoneCat && _phoneCat.v === CATALOGUE.version) return _phoneCat.c;
+  const R = CATALOGUE.rows, a = {};
+  Object.keys(R.achievement || {}).forEach(id => {
+    let x = R.achievement[id];
+    if (x && !x.test && !x.goals && x.proof_code) {
+      const ev = EVENTS.find(e => e.id === x.proof_code);
+      if (ev) x = Object.assign({}, x, { test: 'goals', goals: ev.goals.map(g => ({ kind: g.kind, need: g.need })) });
+    }
+    a[id] = x;
+  });
+  _phoneCat = { v: CATALOGUE.version, c: { badge: R.badge || {}, achievement: a } };
+  return _phoneCat.c;
+}
+// The twin's input, built from this phone's own functions (the same ones every badge here has always read).
+function awardInput() {
+  const days = loggedDays(), targets = {}, custom = (CFG.custom || []).map(c => c.id);
+  HABITS.forEach(h => { targets[h.id] = h.target; });
+  const runs = comebackRuns(true);
+  return {
+    log: LOG, targets, custom,
+    onTarget: days.filter(dayQualifies),
+    perfect: days.filter(isPerfect),
+    with3: days.filter(k => rosterOn(k).filter(h => isDone(h, k)).length >= 3),
+    comebacks: runs.map(c => ({ day: c.day, run: c.run })),
+    stuck: runs.filter(c => c.run >= COMEBACK_STICK).map(c => fmtKey(addDays(parseKey(c.day), COMEBACK_STICK - 1)))
+  };
+}
+// Memoized with the bonus ledger's scope: invalidateBonus() runs on every log or config change.
+function phoneMeasures() {
+  if (!catalogueReady()) return {};
+  return _awCache || (_awCache = awardMeasures(awardInput(), phoneCat()));
+}
+function loadWithdrawn() {
+  if (_awwd) return _awwd;
+  try { const a = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_awwd') || '[]'); _awwd = Array.isArray(a) ? a : []; }
+  catch (e) { _awwd = []; }
+  return _awwd;
+}
+function saveWithdrawn(list) {
+  _awwd = list;
+  if (window.IS_PREVIEW || window.IS_DEMO) return;
+  try { localStorage.setItem(ATHLETE_ID + '_hab_awwd', JSON.stringify(list.slice(-200))); } catch (e) {}
+}
+function phoneAwards() {
+  if (!catalogueReady()) return [];
+  return phoneAwardsFrom(phoneMeasures(), phoneCat(), { S: CAREER.p.switch.catalogue, today: TKEY(), backfill_days: BACKFILL_DAYS,
+                                                        owned: ownedIds(), withdrawn: loadWithdrawn() });
+}
+function pendingAwardXp() { return catalogueReady() ? phoneAwards().reduce((s, a) => s + a.xp, 0) : 0; }
+// ── The four kinds of win ──
+const WIN_KINDS = ['consistency', 'commitment', 'progress', 'resilience'];
+const WIN_WORDS = { consistency: 'Consistency', commitment: 'Commitment', progress: 'Progress', resilience: 'Resilience' };
+// One emoji each, none gold or yellow and none already meaning something else here (🛡️ is the comeback's own glyph).
+const WIN_EMOJI = { consistency: '🔁', commitment: '📅', progress: '📈', resilience: '🛡️' };
+const WIN_TINT = { consistency: '#E6E1FB', commitment: '#DDF3EC', progress: '#DCEFF7', resilience: '#F7E1EA' };
+const SIZE_RANK = { tick: 0, win: 1, highlight: 2, milestone: 3, legend: 4 };
+function fullScreenSize(size) {
+  const m = catalogueReady() && CATALOGUE.rows.setting && CATALOGUE.rows.setting.moments;
+  const fs = (m && Array.isArray(m.full_screen)) ? m.full_screen : ['milestone', 'legend'];
+  return fs.indexOf(size) >= 0;
+}
+// Everything a screen needs to name an award: from the catalogue copy, else the core's waiting moment, else the shelf's
+// recent, badge, milestone or title row (careerView(): only once the shelf has been read), else null.
+function awardView(id, spec) {
+  const a = awardParts(id);
+  if (!a.item || !CAREER || !CAREER.p) return null;
+  const P = careerView();
+  const row = (P.moments || []).concat(P.recent || []).find(m => m && m.award_id === id) || null;
+  const sp = spec || (row && row.spec) || null;
+  const disp = a.kind === 'badge' ? (P.badges || []).find(b => b && b.id === a.item && (b.subject || '') === a.subject)
+             : a.kind === 'achievement' ? (P.achievements || []).find(x => x && x.id === a.item)
+             : (P.titles || []).find(t => t && (t.id === a.item || t.hab_id === a.item));
+  const ent = catalogueReady() ? catEntry(a.kind, a.item) : null;
+  let name, meaning, metal = null, caption = '', size = 'win', xp = 0, tierName = null, n = null, hab = null;
+  if (ent) {
+    name = ent.name; meaning = ent.meaning;
+    if (a.kind === 'badge') {
+      const tb = (ent.tiers || [])[a.tier - 1] || {};
+      metal = tb.metal || null; size = tb.size || ent.size || 'win'; xp = tb.xp; tierName = tb.tier_name || null; n = tb.at;
+    } else { size = ent.size || 'win'; xp = ent.xp; metal = ent.metal || null; }
+    caption = ent.caption || ent.from || '';
+    hab = ent.proof_id || a.item;
+  } else if (sp) { name = sp.name; meaning = sp.meaning; metal = sp.metal || null; caption = sp.caption || sp.from || ''; size = sp.size || size; }
+  else if (disp) { name = disp.name; meaning = disp.meaning; metal = disp.metal || null; caption = disp.caption || disp.from || ''; size = disp.size || size; hab = disp.hab_id || null; }
+  else return null;
+  if (row) { if (row.size) size = row.size; if (typeof row.xp === 'number') xp = row.xp; }
+  if (sp && sp.n != null) n = sp.n;
+  if (sp && sp.caption) caption = sp.caption;               // the server fills {n} from the evidence
+  caption = String(caption || '').replace(/\{n\}/g, n != null ? String(n) : '').replace(/\s+/g, ' ').trim();
+  if (a.kind === 'title' && disp && disp.hab_id) hab = disp.hab_id;
+  if (a.kind === 'title' && meaning === 'all') caption = '';          // the Grand Slam: its size line says it
+  return { id, kind: a.kind, item: a.item, tier: a.tier, subject: a.subject, name: String(name || a.item), meaning: meaning || '',
+           metal, metalKey: metal === 'prismatic' ? 'prisma' : (METALS[metal] ? metal : 'bronze'), caption, size,
+           xp: Math.max(0, Number(xp) || 0), tierName, n, hab: a.kind === 'title' ? (hab || a.item) : null };
+}
+// "Hold Serve · Silver": a badge wears its tier's metal; a milestone or a title is its name.
+function awardTitle(v) { return v.name + (v.kind === 'badge' && v.metal ? ' · ' + (METALS[v.metalKey] || METALS.bronze).label : ''); }
+// The line a full-screen award adds, by its size (§10.2).
+function awardSizeLine(v) {
+  if (v.item === 'grand_slam') return GRAND_SLAM_LINE;
+  return v.size === 'legend' ? 'This is rare. Well done.' : v.size === 'milestone' ? "That one took weeks. It's yours for good." : '';
+}
+function awardMedal(v, got, w) {
+  const m = METALS[v.metalKey] || METALS.bronze, emo = WIN_EMOJI[v.meaning] || '✨', tint = WIN_TINT[v.meaning] || '#EFECFB';
+  const box = w ? 'width:' + w + 'px;height:' + w + 'px;' : '';
+  const inner = w ? 'width:' + Math.round(w * 0.79) + 'px;height:' + Math.round(w * 0.79) + 'px;font-size:' + Math.round(w * 0.38) + 'px;' : '';
+  return '<span class="medal" style="' + box + 'background:' + m.rim + (got ? '' : ';opacity:.4') + '"><span class="medal-in" style="' + inner + 'background:' + tint + '">' + emo + '</span></span>';
+}
+// The day-streak award's tier for a mark (D17): its place in the catalogue's tiers, else in DAY_STREAK_MARKS.
+function streakTier(mark) {
+  const b = catalogueReady() && catEntry('badge', 'day_streak');
+  const i = b && Array.isArray(b.tiers) ? b.tiers.findIndex(t => Number(t.at) === mark) : -1;
+  return i >= 0 ? i + 1 : DAY_STREAK_MARKS.indexOf(mark) + 1;
+}
+function seenAward(id) {
+  if (!Array.isArray(CFG.seenAwards)) CFG.seenAwards = [];
+  if (CFG.seenAwards.indexOf(id) < 0) CFG.seenAwards.push(id);
+}
+// Everything already owned, and everything this phone already counts, recorded as seen without a moment (the reveal
+// and every re-baseline). Union only: a moment once shown is never put back on the table. What the server is still
+// waiting to tell (moments) is left for serverMoments(): a re-baseline for a quest pool or a rules change must not
+// swallow the Hold Serve moment a session earned in the training app.
+function seedAwardsSeen() {
+  const was = Array.isArray(CFG.seenAwards) ? CFG.seenAwards.slice() : [];
+  const P = (CAREER && CAREER.p) || {}, waiting = (P.moments || []).map(m => m && m.award_id);
+  const ids = ownedIds().filter(id => waiting.indexOf(id) < 0).concat(phoneAwards().map(a => a.award_id));
+  ids.forEach(id => { if (was.indexOf(id) < 0) was.push(id); });
+  return was;
+}
+// The moments waiting on the server (get_profile().moments), from an answer of THIS run only (never the cached copy at
+// first paint). One RPC tells the server what this app has shown: the ones it opens now AND every waiting one already
+// in CFG.seenAwards (a phone-decided award celebrated before the server minted it, or an RPC lost offline), so the
+// training app never replays them (§7.3). A full-screen row opens only when nothing full-screen opened this run (D7);
+// a row that does not open stays unseen and waits for the next open. A wins-card row lands on Today's wins card.
+// The day streak keeps its own takeover (D17): its award is recorded and told, never shown again.
+function serverMoments() {
+  if (!catalogueOn() || window.IS_DEMO || window.IS_PREVIEW || window.IS_EMBED || !ATHLETE_ID || !CFG) return false;
+  if (!Array.isArray(CFG.seenAwards)) return false;       // not baselined on this phone yet: the reveal seeds it
+  if (catalogueRevealDue()) return false;                 // the reveal, still waiting, is the open's one moment (D7)
+  const ms = Array.isArray(CAREER.p.moments) ? CAREER.p.moments : [];
+  const seen = CFG.seenAwards, tell = [], shown = [];
+  const busy = UI.celebrate.length > 0 || _fullThisRun;
+  let opened = false;
+  ms.forEach(m => {
+    const id = m && m.award_id;
+    if (!id) return;
+    if (seen.indexOf(id) >= 0) { tell.push(id); return; }
+    if (awardParts(id).item === 'day_streak') { shown.push(id); return; }
+    if (m.full) {
+      if (busy || opened || !awardView(id, m.spec)) return;
+      UI.celebrate.push({ kind: 'award', id, spec: m.spec || null, also: m.also || null, pending: false });
+      opened = true; shown.push(id); haptic('rank');
+    } else if (awardView(id, m.spec)) { addWin({ k: 'award', id }); shown.push(id); }
+  });
+  if (shown.length) { shown.forEach(seenAward); saveCfg(); }
+  const ids = tell.concat(shown);
+  if (ids.length) {
+    try {
+      const sb = _sb();
+      if (sb) Promise.resolve(sb.rpc('mark_moments_told', { p_athlete_id: ATHLETE_ID, p_award_ids: ids, p_app: 'proof' })).catch(() => {});
+    } catch (e) { /* told at the next answer */ }
+  }
+  return shown.length > 0;
+}
+// A pending award the server does not hold (P17 step 4). Judged only on an answer that STARTED after a push carrying
+// every pending day landed with nothing left to send: then the server has seen the same log and decided. A withdrawn id
+// never counts or celebrates again on this phone (_hab_awwd, phone-local); its wins line goes; the disagreement is a twin
+// bug, said in the console. If the server owns it later, it arrives as an ordinary server moment.
+function checkWithdrawals(started) {
+  if (!catalogueReady() || window.IS_PREVIEW || window.IS_DEMO || !_pushOkAt || started <= _pushOkAt || SYNC.dirty
+      || CAREER.p.rewards_stale) return false;
+  const pend = phoneAwards();
+  if (!pend.length) return false;
+  const wd = loadWithdrawn().slice(), ids = pend.map(a => a.award_id);
+  ids.forEach(id => { if (wd.indexOf(id) < 0) wd.push(id); console.warn('[career] twin disagrees', id); });
+  saveWithdrawn(wd);
+  if ((CFG.wins || []).some(w => w.k === 'award' && ids.indexOf(w.id) >= 0)) {
+    CFG.wins = CFG.wins.filter(w => !(w.k === 'award' && ids.indexOf(w.id) >= 0));
+    saveCfg();
+  }
+  return true;
+}
+// The titles the server minted from awards and events land in the Locker (append-only, like every reward). Only the
+// server puts one there: a pending award never does, because CFG.pass.owned can never give one back.
+function syncCatalogueTitles() {
+  if (!catalogueOn() || window.IS_PREVIEW || window.IS_DEMO || !CFG) return false;
+  if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
+  const owned = CFG.pass.owned || (CFG.pass.owned = []);
+  let n = 0;
+  serverCatalogueTitleIds().forEach(id => { if (owned.indexOf(id) < 0 && passItem(id)) { owned.push(id); n++; } });
+  if (n) saveCfg();
+  return n > 0;
+}
+// The catalogue and event titles the server holds for this athlete, by the id each wears in hab_titles. From the core:
+// `titles_owned` is hab_titles itself, which every award title and event title the server mints is written to; only the
+// ones that are an event's title or a catalogue title count here (the road's and the seasons' have their own doors,
+// syncTitles() and seasonTitles()). The shelf's titles, once read, add the same ids by another road.
+function serverCatalogueTitleIds() {
+  if (!catalogueOn()) return [];
+  const out = [], add = id => { if (id && typeof id === 'string' && out.indexOf(id) < 0) out.push(id); };
+  const evIds = eventTitles().map(t => t.id);
+  (Array.isArray(CAREER.p.titles_owned) ? CAREER.p.titles_owned : []).forEach(id => {
+    if (evIds.indexOf(id) >= 0 || catTitleByHabId(id)) add(id);
+  });
+  (careerView().titles || []).forEach(t => { if (t && (t.source === 'award' || t.source === 'event')) add(t.hab_id || t.id); });
+  return out;
+}
+// Owned awards counted by kind of win, for the reveal. The kind of each award comes from the catalogue copy, else the
+// shelf's rows (careerView(), only once the shelf has been read), else the core's ladder (live badges only). The
+// core's own `badges` and `achievements` are placeholders ([]), never "none earned": with neither the copy nor the
+// shelf on this phone the kinds cannot be counted, and ownedByMeaning() answers null (the reveal waits for one).
+function awardMeaningOf(id) {
+  const a = awardParts(id), e = catalogueReady() ? catEntry(a.kind, a.item) : null;
+  if (e) return e.meaning || '';
+  const P = careerView(), r = a.kind === 'badge' ? (P.badges || []).find(b => b && b.id === a.item)
+                         : a.kind === 'achievement' ? (P.achievements || []).find(x => x && x.id === a.item) : null;
+  if (r && r.meaning) return r.meaning;
+  const L = a.kind === 'badge' && CAREER && CAREER.p && CAREER.p.ladder && CAREER.p.ladder[a.item];
+  return (L && L.meaning) || '';
+}
+function ownedAwardIds() { return ownedIds().filter(id => /^(badge|achievement):/.test(id)); }
+function ownedByMeaning() {
+  const out = { consistency: 0, commitment: 0, progress: 0, resilience: 0 }, ids = ownedAwardIds();
+  if (ids.length && !catalogueReady() && !shelfLoaded()) return null;
+  ids.forEach(id => {
+    const m = awardMeaningOf(id);
+    if (out[m] != null) out[m]++;
+  });
+  return out;
+}
+// The catalogue reveal is due on this phone and has not opened yet (checkCatalogueReveal()).
+function catalogueRevealDue() {
+  const S = catalogueOn() && CAREER.p.switch.catalogue;
+  return !!S && !!CFG && CFG.catalogueSeen !== S && !window.IS_PREVIEW && !window.IS_DEMO && !window.IS_EMBED;
+}
+// THE CATALOGUE REVEAL: one moment, once per athlete, the first open after the switch. Everything the server minted in
+// silence from the athlete's history (and the back-pay it raised the level by) is absorbed without a single takeover
+// of its own: levels re-baselined, every award recorded as seen, the road's rewards it reaches ride on this screen.
+// CFG.catalogueSeen survives the cloud merge, so a second phone stays quiet. It waits a run when the XP reveal opened.
+// It also waits, and opens nothing else meanwhile, until this phone can say what each award is (the catalogue copy, or
+// the shelf): the core alone names no kinds, and a reveal of four zeros over earned awards would be false. Levels are
+// absorbed in silence while it waits (returns true); fetchCatalogue() and fetchShelf() call checkLevelUps() again when
+// the copy or the shelf lands, and the reveal opens then. The road's rewards stay unclaimed, so they ride on it.
+function checkCatalogueReveal() {
+  const S = catalogueOn() && CAREER.p.switch.catalogue;
+  if (!S || !CFG || CFG.catalogueSeen === S || window.IS_PREVIEW || window.IS_DEMO) return false;
+  if (UI.celebrate.some(e => e.kind === 'career')) return false;
+  if (!CFG.heldBefore) CFG.heldBefore = { tiers: currentTiers(), ach: currentAch() };
+  seedSeenLevels();
+  const counts = ownedByMeaning();
+  if (!counts) return true;
+  const fresh = claimRewards(false);
+  CFG.catalogueSeen = S;
+  saveCfg();
+  if (ownedIds().length || fresh.length) {
+    UI.celebrate.push({ kind: 'catalogue', id: S, counts, slam: CAREER.p.slam || null, rewards: fresh });
+    haptic('rank');
+  }
+  return true;
+}
+// The milestones count on Progress and the Rank card, from the catalogue: owned badge tiers and milestones, over
+// every live tier and milestone (from the profile's ladder when there is no copy yet).
+function catalogueEarned() {
+  return ownedIds().filter(id => /^(badge|achievement):/.test(id)).length;
+}
+function catalogueTotal() {
+  if (catalogueReady()) {
+    const R = CATALOGUE.rows;
+    let n = 0;
+    Object.keys(R.badge).forEach(id => { const b = R.badge[id]; if (b && !b.retire_at && b.meaning !== 'chosen') n += (b.tiers || []).length; });
+    Object.keys(R.achievement).forEach(id => { const b = R.achievement[id]; if (b && !b.retire_at && b.meaning !== 'chosen') n++; });
+    return Math.max(n, catalogueEarned());
+  }
+  const L = CAREER.p.ladder || {};
+  let n = Object.keys(L).reduce((s, id) => s + (L[id].next == null ? Number(L[id].tier) || 0 : Math.max(5, Number(L[id].next_tier) || 0)), 0);
+  n += (careerView().achievements || []).length;
+  return Math.max(n, catalogueEarned());
+}
+// The four numbers on Today's card (numbers.four, the same keys the training app reads). A free athlete's day streak,
+// perfect days and habit steps are this phone's own and move at the tap; the rest are the server's.
+function habitSteps() {
+  const f = (((CAREER.p.numbers || {}).four || {}).progress) || {};
+  if (!catalogueReady()) return Math.max(0, Number(f.value) || 0);
+  const R = CATALOGUE.rows.badge, m = phoneMeasures(), owned = ownedIds();
+  let n = 0;
+  Object.keys(R).forEach(id => {
+    const b = R[id];
+    if (!b || b.retire_at || b.kind !== 'best_run' || b.counts !== 'habit_done' || !b.habit) return;
+    let t = 0;
+    owned.forEach(k => { const a = awardParts(k); if (a.kind === 'badge' && a.item === id && a.tier > t) t = a.tier; });
+    Object.keys((m[id] || {}).crossed || {}).forEach(k => { if (Number(k) > t) t = Number(k); });
+    n += t;
+  });
+  return Math.max(n, Number(f.value) || 0);
+}
+function fourNumbers() {
+  const nb = CAREER.p.numbers || {}, f = nb.four || {}, g = k => f[k] || {};
+  const cell = (meaning, label, value, best) => ({ meaning, label, value: Math.max(0, Math.round(Number(value) || 0)), best: Math.max(0, Number(best) || 0) });
+  if (!(nb.free === true || isFree())) return [
+    cell('consistency', 'Weeks held', g('consistency').value, g('consistency').best),
+    cell('commitment', 'Sessions with Amir', g('commitment').value),
+    cell('progress', 'Personal bests', g('progress').value),
+    cell('resilience', 'Comebacks', g('resilience').value)
+  ];
+  return [
+    cell('consistency', 'Day streak', currentDayStreak(), Math.max(bestDayStreak(), Number(g('consistency').best) || 0)),
+    cell('commitment', 'Perfect days', loggedDays().filter(isPerfect).length),
+    cell('progress', 'Habit steps', habitSteps()),
+    cell('resilience', 'Comebacks', g('resilience').value)
+  ];
+}
+// A number's tap: Progress, opened at that kind of win.
+function openWins(meaning) {
+  const o = CFG.msOpen || (CFG.msOpen = {});
+  o.all = true; o[meaning] = true;
+  saveCfg();
+  go('progress');
+  setTimeout(() => {
+    const el = document.querySelector('[data-k="mstoggle:' + meaning + '"]'), sc = document.getElementById('scroll');
+    if (!el || !sc) return;
+    const r = el.getBoundingClientRect(), s = sc.getBoundingClientRect();
+    sc.scrollTo({ top: Math.max(0, sc.scrollTop + (r.top - s.top) - 14), behavior: reduced() ? 'auto' : 'smooth' });
+  }, 60);
+}
+function hero4() {
+  if (!catalogueOn()) return '';
+  return `<div class="hero4" data-k="hero4">${fourNumbers().map(c => `<button class="h4" data-k="h4:${c.meaning}" ${on(() => openWins(c.meaning))}
+      aria-label="${esc(c.label)}: ${c.value}${c.best > c.value ? ', best ' + c.best : ''}. Open ${esc(WIN_WORDS[c.meaning])} on Progress">
+      <span class="figure" data-static data-num="h4${c.meaning}" data-to="${c.value}">${c.value}</span>
+      <span class="eyebrow">${esc(c.label)}${c.best > c.value ? ' · best ' + c.best : ''}</span>
+    </button>`).join('')}</div>`;
+}
+// The Grand Slam row, first in the Locker's loadout: one title per kind of win, then the GRAND SLAM plate itself.
+function slamRow() {
+  if (!catalogueOn()) return '';
+  const s = CAREER.p.slam || {};
+  const plate = (t, fb) => titlePlate((t && (passItem(t.id) || catTitleByHabId(t.id))) || { name: (t && t.name) || fb, metal: 'prisma' }, true);
+  return `<div class="slamrow" data-k="slamrow">${WIN_KINDS.map(m => {
+      const t = s[m];
+      return `<span class="slam-slot${t ? ' got' : ''}"><span class="slam-k">${WIN_WORDS[m]}</span>${t ? plate(t, '') : '<span class="slam-no">Not yet</span>'}</span>`;
+    }).join('')}${s.grand ? `<span class="slam-grand">${plate({ id: 'grand_slam' }, 'GRAND SLAM')}</span>` : ''}</div>`;
+}
 // "Days logged" for celebration copy — the same definition the Progress stat
 // grid already uses (a day with real content, not a bare empty LOG entry left
 // by a reset), so the number a takeover cites never disagrees with the number
@@ -5127,7 +5837,7 @@ function tierXp(h, i) {
 // Recomputing this on every level read would be thousands of operations per
 // render, so it is cached and dropped whenever the log or the tracked set moves.
 let _bonusCache = null;
-function invalidateBonus() { _bonusCache = null; _rosterCache = null; _evCache = null; _cbCache = { all:null, season:null }; }
+function invalidateBonus() { _bonusCache = null; _rosterCache = null; _evCache = null; _cbCache = { all:null, season:null }; _awCache = null; }
 // Runs and counts are measured FROM THE SEASON START, not from all of history.
 // That is a fairness rule, not an implementation detail: a tier crosses once, so
 // scoring it against all-time runs would mean an athlete whose streak began
@@ -5142,8 +5852,13 @@ function bonusEvents() {
   if (!days.length) { _bonusCache = out; return out; }
   const hs = allHabits();
 
+  // From the catalogue switch (phase 3) the server pays tiers and milestones as awards, once in a career
+  // (career_awards; career_bonus_rules() strips them from hab_bonus_xp()), so this ledger pays neither: the
+  // awards it has not confirmed yet are pendingAwardXp(). Quests and comebacks are unchanged.
+  const catOn = catalogueOn();
+
   // Tiers — one ordered pass per habit, watching the run length.
-  hs.forEach(h => {
+  if (!catOn) hs.forEach(h => {
     let run = 0, prev = null, next = 0;
     days.forEach(k => {
       if (!isDone(h, k)) { run = 0; return; }
@@ -5177,7 +5892,7 @@ function bonusEvents() {
     });
   })();
   let cbRunNow = 0, cbStuckNow = 0;
-  days.forEach(k => {
+  if (!catOn) days.forEach(k => {
     if (cbRunAt[k] !== undefined) cbRunNow = cbRunAt[k];
     if (cbStuckAt[k] !== undefined) cbStuckNow = cbStuckAt[k];
     hs.forEach(h => {
@@ -5252,7 +5967,9 @@ function phoneXp() {
 // The career's XP as the athlete sees it: the server's (get_profile(): habits, training, the level kept) plus
 // what this phone has counted since that answer (a tick shows at once, P13). Never below zero.
 function careerXp() {
-  return Math.max(0, (Number(CAREER.p.career && CAREER.p.career.xp) || 0) + phoneXp() - (CAREER.base || 0));
+  // + the awards this phone has seen crossed and the server has not confirmed yet (phase 3, P13; 0 until the catalogue switch).
+  return Math.max(0, (Number(CAREER.p.career && CAREER.p.career.xp) || 0) + phoneXp() - (CAREER.base || 0)
+                     + (catalogueReady() ? pendingAwardXp() : 0));
 }
 function overallXp() { return careerOn() ? careerXp() : phoneXp(); }
 // What a single day actually paid, badges included — the perfect-day takeover
@@ -5318,7 +6035,8 @@ function xpBetween(fromDate, toDate) {
 // weekly board's number: get_profile() → week) plus what this phone has counted since; before it, this phone's.
 function weekXpShown() {
   if (!careerOn() || !CAREER.p.week) return xpBetween(addDays(today(), -6), today());
-  return Math.max(0, (Number(CAREER.p.week.points) || 0) + phoneXp() - (CAREER.base || 0));
+  return Math.max(0, (Number(CAREER.p.week.points) || 0) + phoneXp() - (CAREER.base || 0)
+                     + (catalogueReady() ? pendingAwardXp() : 0));
 }
 
 // ── Consistency ladders ───────────────────────────────────────────────────
@@ -5528,7 +6246,7 @@ function currentLevels() {
 // Signature of everything that affects scoring. When XP_RULES or a target
 // changes, levels legitimately move — we re-baseline silently instead of
 // firing a hundred celebrations the athlete did not earn today.
-function rulesSignature() {
+function rulesSignature(noCatalogue) {
   const src = JSON.stringify([
     XP_RULES.base, XP_RULES.growth, XP_RULES.completionBonus, XP_RULES.customXp,
     XP_RULES.weights, HABITS.map(h => [h.id, h.target]),
@@ -5564,7 +6282,9 @@ function rulesSignature() {
     // In Career Mode the level never resets: a season is no reason to re-baseline, but the switch itself
     // is (the career's XP and curve replace Proof's: one reveal, never a flood of level-ups), and so is a
     // re-seeded rulebook (its numbers move every athlete's XP).
+    // The catalogue switch (phase 3) re-baselines too, once, and only when it is on: off, nothing here moves.
     careerOn() ? ['career', CAREER.p.switch.xp, overallBase(), overallGrowth(), CAREER.p.rules_version || 0]
+                 .concat(catalogueOn() && !noCatalogue ? [['catalogue', CAREER.p.switch.catalogue]] : [])
                : seasonStart()
   ]);
   let hash = 0;
@@ -5612,7 +6332,8 @@ function checkLevelUps() {
   }
   const sig = rulesSignature();
   if (!CFG.seen || CFG.rulesSig !== sig) {
-    const rescored = !!CFG.seen && CFG.rulesSig !== sig;
+    // The catalogue switch alone (phase 3) is never "XP system updated": the reveal says it, once, on one phone.
+    const rescored = !!CFG.seen && CFG.rulesSig !== sig && !(catalogueOn() && CFG.rulesSig === rulesSignature(true));
     const wasSeason = !careerOn() && CFG.seenSeason && CFG.seenSeason !== seasonStart();
     CFG.seenSeason = seasonStart();
     seedSeenLevels();
@@ -5631,10 +6352,14 @@ function checkLevelUps() {
       }
       return;
     }
+    // THE CATALOGUE REVEAL (phase 3): the switch is a re-baseline with its own one moment, never the toast below.
+    if (checkCatalogueReveal()) return;
     if (rescored) toast(wasSeason ? seasonName().toUpperCase() + ' has begun. Scores start from zero.'
                                   : 'XP system updated. Your levels were rescored.');
     return;
   }
+  // An athlete whose XP reveal took the earlier open meets the catalogue's on this one.
+  if (checkCatalogueReveal()) return;
   const now = currentLevels(), seen = CFG.seen, events = [];
   Object.keys(now).forEach(id => {
     const from = typeof seen[id] === 'number' ? seen[id] : now[id];
@@ -5667,7 +6392,9 @@ function checkLevelUps() {
   if (rewards.length) haptic('rank');
   // Finishing an event is the biggest single thing in the app that is not a
   // level, so it takes over the screen like one.
-  claimEventTitles(false).forEach(r => {
+  // From the catalogue switch an event is an award (checkUnlocks() opens it), and its title reaches the Locker only
+  // from the server (syncCatalogueTitles()): CFG.pass.owned can never give a pending one back.
+  if (!catalogueOn()) claimEventTitles(false).forEach(r => {
     UI.celebrate.push({ kind: 'reward', id: r.id, reward: r });
     haptic('rank');
   });
@@ -5701,6 +6428,8 @@ function seedUnlocks() {
   CFG.seenStreak = DAY_STREAK_MARKS.filter(d => d <= currentDayStreak()).pop() || 0;
   const cb = comebackRuns(false).find(c => c.day === TKEY());
   CFG.seenComeback = cb ? TKEY() : null;
+  // Phase 3: every award owned or counted so far is recorded, never replayed (the catalogue reveal is the one moment).
+  if (catalogueOn()) CFG.seenAwards = seedAwardsSeen();
 }
 function checkUnlocks() {
   // seenStreak is in this guard too. It shipped later than the other three, so
@@ -5713,13 +6442,16 @@ function checkUnlocks() {
       || typeof CFG.seenStreak !== 'number'
       || CFG.seenComeback === undefined) { seedUnlocks(); saveCfg(); return; }
   const tiers = currentTiers(), ach = currentAch(), events = [];
+  // From the catalogue switch (phase 3) a tier or a milestone is an award: the award branch below opens it, so
+  // these two blocks stand down (their seen-lists still follow, so a rollback replays nothing).
+  const cat = catalogueOn();
 
   // Tiers are COALESCED BY TIER, not reported per habit. An athlete who has been
   // solid since day one crosses the 20-day tier on all eight habits on the same
   // day, and eight identical takeovers in a row is a punishment, not a reward —
   // the same reasoning that keeps routine habit levels down to an inline chip.
   const byTier = {};
-  allHabits().forEach(h => {
+  if (!cat) allHabits().forEach(h => {
     const was = typeof CFG.seenTiers[h.id] === 'number' ? CFG.seenTiers[h.id] : tiers[h.id];
     if (tiers[h.id] <= was) return;
     // Crossing several tiers at once (a long run imported at once) reports only
@@ -5732,7 +6464,7 @@ function checkUnlocks() {
     const g = byTier[days];
     events.push({ kind:'tier', id:'t' + days, tier:g.tier, tierIndex:g.tierIndex, habits:g.habits });
   });
-  ach.forEach(code => {
+  if (!cat) ach.forEach(code => {
     if (CFG.seenAch.indexOf(code) !== -1) return;
     const a = ACHIEVEMENTS.find(x => x.code === code);
     if (a) events.push({ kind:'milestone', id:code, ach:a });
@@ -5761,6 +6493,8 @@ function checkUnlocks() {
     // jumps several marks at once.
     events.push({ kind:'streak', id:'s' + mark, days:mark, best: dstreak >= bestDayStreak() });
     CFG.seenStreak = mark;
+    // D17: this takeover still fires on every new streak, and the mark's award (once a career) never opens one of its own.
+    if (cat) seenAward(awardId('badge', 'day_streak', streakTier(mark)));
   } else if (dstreak === 0 && markSeen) {
     CFG.seenStreak = 0;   // streak broken — the marks are all back on the table
   }
@@ -5799,11 +6533,12 @@ function checkUnlocks() {
   CFG.seenAch = keep(CFG.seenAch, ach);
   CFG.seenQuests = keep(CFG.seenQuests, quests);
   if (isPerfect(TKEY())) CFG.seenPerfect = TKEY();
-  saveCfg();
-  if (!events.length) return;
   // The whole screen for a day streak from STREAK_TAKEOVER days and a quest; the rest land on the
   // wins card on Today, which stays until it is tapped (PRF-02).
   const full = e => e.kind === 'quest' || (e.kind === 'streak' && e.days >= STREAK_TAKEOVER);
+  if (cat) unlockAwards(UI.celebrate.length > 0 || events.some(full));
+  saveCfg();
+  if (!events.length) return;
   events.filter(full).forEach(e => UI.celebrate.push(e));
   events.filter(e => !full(e)).forEach(e => addWin(
       e.kind === 'tier'      ? { k: 'tier', id: e.id, ti: e.tierIndex, h: e.habits.map(h => h.id) }
@@ -5813,6 +6548,33 @@ function checkUnlocks() {
     :                          { k: 'perfect', id: e.id }));
   haptic(events.some(full) ? 'rank' : 'level');
 }
+
+// Phase 3: the awards this phone counts and the server has not confirmed yet (phoneAwards()), each with its moment at
+// once (GAME-13, P17): a milestone or a legend takes the screen, ONE per check and the biggest, and not when anything
+// else full-screen is queued in this pass, nor (outside a tap) when one already opened this run (D7); a win or a
+// highlight is a line on the wins card. Only what is shown goes into CFG.seenAwards: a full-screen one that waits
+// stays unseen for the next chance. The day streak's award never opens (D17: its own takeover above is the moment).
+function unlockAwards(busy) {
+  if (window.IS_PREVIEW || window.IS_DEMO) return;
+  if (!Array.isArray(CFG.seenAwards)) { CFG.seenAwards = seedAwardsSeen(); return; }
+  if (!catalogueReady()) return;
+  const owned = ownedSet(), fulls = [];
+  phoneAwards().forEach(a => {
+    if (CFG.seenAwards.indexOf(a.award_id) >= 0) return;
+    if (awardParts(a.award_id).item === 'day_streak') { seenAward(a.award_id); return; }
+    if (!awardView(a.award_id)) return;
+    if (fullScreenSize(a.size)) fulls.push(a);
+    else { addWin({ k: 'award', id: a.award_id }); seenAward(a.award_id); }
+  });
+  if (!fulls.length || busy || (_fullThisRun && !_actionPass)) return;
+  fulls.sort((x, y) => ((SIZE_RANK[y.size] || 0) - (SIZE_RANK[x.size] || 0)) || (x.day < y.day ? 1 : x.day > y.day ? -1 : 0));
+  const top = fulls[0];
+  UI.celebrate.push({ kind: 'award', id: top.award_id, pending: !owned.has(top.award_id) });
+  seenAward(top.award_id);
+  haptic('rank');
+}
+// A tap's check (toggleHabit, bump, saveSheetLog): a full-screen award that tap earned opens right then (D7).
+function actionLevelUps() { _actionPass = true; try { checkLevelUps(); } finally { _actionPass = false; } }
 
 // ── The wins card (PRF-02, 2026-09-27) ────────────────────────────────────
 // A medal, a consistency tier, a habit's new rank, a perfect day, a comeback and the 3-day streak
@@ -5860,6 +6622,14 @@ function winLine(w) {
                                    share: ['medal', { k: 'comeback', gone: w.gone }] };
   if (w.k === 'streak') return { emo: '🔥', title: w.days + '-day streak', sub: w.days + ' days in a row that counted', xp: 0,
                                  share: ['streak', { days: w.days }] };
+  // A badge tier or a milestone from the catalogue (phase 3): its kind of win, its name, its caption, what it pays now.
+  if (w.k === 'award') {
+    if (loadWithdrawn().indexOf(w.id) >= 0) return null;
+    const v = awardView(w.id);
+    if (!v) return null;
+    return { emo: WIN_EMOJI[v.meaning] || '✨', title: awardTitle(v), sub: v.caption || WIN_WORDS[v.meaning] || '', xp: v.xp,
+             share: v.kind === 'title' ? ['title', { id: v.hab }] : ['medal', { k: 'award', id: w.id }] };
+  }
   // A finished season with no title (under level 5): its record on the Locker's shelf. No card: the
   // Rank card is this season's, and it has just started again.
   if (w.k === 'season') {
@@ -6058,7 +6828,7 @@ function toggleHabit(h) {
   if (h.kind === 'count') { if (window.IS_EMBED) openEmbedEdit(h); else openSheet(h, true); return; }
   const done = isDone(h, AKEY()), before = habitXp(h), rect = UI._tapRect;
   setVal(h.id, done ? 0 : h.target);
-  checkLevelUps();
+  actionLevelUps();
   render();
   if (done) { haptic('tick'); return; }        // unticking earns nothing to fly
   const gained = habitXp(h) - before;
@@ -6081,7 +6851,7 @@ function bump(h) {
   // the ceiling and + lowered the number all over again.
   const v = Math.max(cur, Math.min(capFor(h), cur + (h.step || 1)));
   setVal(h.id, v);
-  checkLevelUps();
+  actionLevelUps();
   render();
   const gained = habitXp(h) - before, complete = v >= h.target, wasDone = cur >= h.target;
   haptic(complete ? 'done' : 'tick');
@@ -6201,7 +6971,7 @@ function saveSheetLog() {
   const h = habitById(id), before = habitXp(h), rect = UI._tapRect, logged = UI.sheetVal;
   setVal(h.id, logged);
   UI.sheet = null; UI.embedEdit = null;
-  checkLevelUps();
+  actionLevelUps();
   render();
   const gained = Math.max(0, habitXp(h) - before);
   haptic(logged >= h.target ? 'done' : 'tick');
@@ -6267,6 +7037,8 @@ function go(screen) {
   render();
   resetScroll();
   if (screen === 'crew') { fetchBoard(); if (!RC.loaded) fetchRollCall(); }
+  // Progress opened: its shelf is read now (get_awards()); the copy this phone kept is on screen meanwhile.
+  if (screen === 'progress' && catalogueOn()) fetchShelf(true);
 }
 // Settings sub-screens travel like screens — in from the right, out to the
 // left — without being screens, so the tab bar and the header stay put.
@@ -7612,6 +8384,13 @@ function tourSteps() {
     screen: 'today', sel: () => $t('.hero-top')
   });
 
+  // Career Mode phase 3: the four numbers under the bar, one per kind of win (only once the catalogue switch is on).
+  if (catalogueOn()) S.push({
+    title: 'Your record',
+    body: `Four numbers that only go up. <strong>Tap one</strong> to see what's next.`,
+    screen: 'today', sel: () => $t('.hero4')
+  });
+
   // ⚠️ Three states, from boardState(). The 'coming' one is the first thing a new coached
   // athlete reads about the board, days before the sweep lists them: it must say so.
   const bs = boardState();
@@ -7942,7 +8721,7 @@ function renderApp() {
   const openH = habitById(UI.open || (hs[0] || HABITS[0]).id);
   // MILESTONES, one word and one count (POL-02): the tile said "Badges 8/72" (tiers and milestones) over
   // a section that said "6 of 37". The tiers are a habit's five squares, counted on its row.
-  const earned = milestonesEarned(), totalAch = ACHIEVEMENTS.length + EVENTS.length;
+  const earned = milestonesEarned(), totalAch = catalogueOn() ? catalogueTotal() : ACHIEVEMENTS.length + EVENTS.length;
 
   const heads = {
     today:    editingPast()
@@ -8113,6 +8892,7 @@ function lvActions(shareKind, subj) {
     </div>`;
 }
 function renderCelebration(ev) {
+  _fullThisRun = true;     // something took the whole screen this run: an award moment waits for the next open (D7)
   if (ev.kind) return renderBadgeCelebration(ev);
   const isHabit = !ev.overall;
   const h = isHabit ? habitById(ev.id) : null;
@@ -8207,8 +8987,36 @@ function renderCareerReveal(ev) {
       ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
     </div>`;
 }
+// THE CATALOGUE REVEAL (phase 3; checkCatalogueReveal()): one moment, once per athlete, the first open after the
+// catalogue switch. Everything earned before it, counted by kind of win, the Grand Slam row, and the road's rewards it
+// reached, counted like the XP reveal counts them.
+function renderCatalogueReveal(ev) {
+  const c = ev.counts || {}, slam = ev.slam || {}, got = (ev.rewards || []).length;
+  const total = WIN_KINDS.reduce((n, m) => n + (Number(c[m]) || 0), 0);
+  const plate = t => titlePlate((t && (passItem(t.id) || catTitleByHabId(t.id))) || { name: (t && t.name) || '', metal: 'prisma' }, true);
+  return `
+    <div class="lvwrap rank" data-k="cel:catalogue:${esc(String(ev.id))}" ${on(dismissCelebration)}>
+      ${confettiHtml(34)}
+      <div class="lvstage">
+        <div class="lvrays"></div>
+        <div class="lvshock"></div>
+        <div class="lvshards">${shardHtml()}</div>
+        ${coinHtml(12)}
+        <div class="lvbadge art">${awardMedal({ metalKey: 'prisma', meaning: '' }, true, 120).replace('✨', '<b class="hd" style="font-size:44px;line-height:1;color:#231F35">' + total + '</b>')}</div>
+      </div>
+      <div class="lvkicker">My record</div>
+      <div class="lvrank">Your record</div>
+      <div class="lvsub">Everything you've earned, counted once and kept for good.</div>
+      <div class="lvunlock">${WIN_KINDS.map(m => `<span class="lvu-card"><span aria-hidden="true">${WIN_EMOJI[m]}</span>${esc(WIN_WORDS[m])} · ${Number(c[m]) || 0}</span>`).join('')}</div>
+      <div class="lvunlock"><span class="lvu-k">Grand Slam</span>${WIN_KINDS.map(m => slam[m] ? plate(slam[m]) : `<span class="lvu-card">${esc(WIN_WORDS[m])} · Not yet</span>`).join('')}</div>
+      ${got ? `<div class="lvunlock"><span class="lvu-k">${got === 1 ? 'A reward on the road is yours' : got + ' rewards on the road are yours'} · in your Locker</span></div>` : ''}
+      ${lvActions('rank', { rank: { moment: 'catalogue' } })}
+      ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
+    </div>`;
+}
 function renderBadgeCelebration(ev) {
   if (ev.kind === 'career') return renderCareerReveal(ev);
+  if (ev.kind === 'catalogue') return renderCatalogueReveal(ev);
   let badge, badgeLabel, kicker, title, sub, codeClass = '', art = null, ground = 'badge', share = 'medal', subj = null, xpLine = 0;
   if (ev.kind === 'streak') {
     // The day streak crossing a mark — the single strongest signal that somebody
@@ -8231,6 +9039,22 @@ function renderBadgeCelebration(ev) {
     xpLine = ev.quest.xp;
     sub = ev.quest.note + '.';
     share = 'medal'; subj = { medal: { k: 'quest', q: ev.quest } };   // it opened the Rank card until 2026-10-17
+  } else if (ev.kind === 'award') {
+    // A badge tier, a milestone or a title from the catalogue (phase 3), full screen because its size says so
+    // (a milestone or a legend). Named from the catalogue copy, or the server's own spec when there is no copy yet.
+    const v = awardView(ev.id, ev.spec) || { kind: 'badge', item: '', name: 'New on your record', meaning: '', caption: '', size: 'milestone', xp: 0, metal: null, metalKey: 'bronze' };
+    kicker = WIN_WORDS[v.meaning] || (v.item === 'grand_slam' ? 'Grand Slam' : 'New on your record');
+    title = awardTitle(v);
+    sub = [v.caption, awardSizeLine(v)].filter(Boolean).join(' ');
+    xpLine = v.xp;
+    if (v.kind === 'title') {
+      const p = passItem(v.hab) || { name: v.name, metal: v.metalKey };
+      art = `<div style="display:flex;position:relative;overflow:hidden;border-radius:999px">${titlePlate(p)}<span class="sheen"></span></div>`;
+      share = 'title'; subj = { title: { id: v.hab } };
+    } else {
+      art = awardMedal(v, true, 132);
+      share = 'medal'; subj = { medal: { k: 'award', id: ev.id } };
+    }
   } else if (ev.kind === 'reward') {
     const rw = ev.reward, isT = rw.kind === 'title';
     // A title is worn only when nothing else was (claimRewards()); an event or a season title never
@@ -8566,7 +9390,7 @@ function renderToday(LI, doneCount) {
           </div>
           ${streakFlame(currentDayStreak(), bestDayStreak())}
         </div>
-        <div class="herobar"><span data-fill style="width:${LI.pct}%"></span></div>
+        <div class="herobar"><span data-fill style="width:${LI.pct}%"></span></div>${hero4()}
         <div class="wkrow" data-k="wkrow">${verdictTile(AKEY())}${weekStrip()}</div>
         ${past ? `<div class="backfill" data-k="backfill">
           <div>
@@ -8606,8 +9430,8 @@ function renderToday(LI, doneCount) {
           <span>
             <span class="eyebrow">The tour</span>
             <span class="rcq">${loggedDays().length
-              ? 'New: five steps on what the buttons in here do.'
-              : 'Want the five-step tour of what everything does?'}</span>
+              ? 'New: ' + (catalogueOn() ? 'six' : 'five') + ' steps on what the buttons in here do.'
+              : 'Want the ' + (catalogueOn() ? 'six' : 'five') + '-step tour of what everything does?'}</span>
           </span>
           <span class="hd" style="font-size:20px;color:var(--accent);flex:none">→</span>
         </button>`}
@@ -8751,6 +9575,147 @@ function weekTable(hs, off) {
     </div>`;
 }
 
+// ── The catalogue shelf (phase 3, D5, D15) ─────────────────────────────────
+// From the catalogue switch the milestone block below the week table is the catalogue's, grouped by the four kinds of
+// win, with the same folds (CFG.msOpen[meaning], the next three, the Earned strip). A badge row is one badge: its held
+// tier's metal and its count toward the next step, moved by this phone at the tap where it can decide it (GAME-13). A
+// retired badge is never a row of its own and never taken away: it is a line under the badge that replaced it,
+// "Earned before: HUMAN SPRINKLER II", from the server's own record or what Proof's shelf held at the switch.
+function earnedBeforeLines() {
+  const P = careerView(), best = {};
+  const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+  const put = (succ, fam, tier) => [].concat(succ || []).forEach(sx => {
+    if (!sx || !fam) return;
+    const o = best[sx] || (best[sx] = {});
+    o[fam] = Math.max(o[fam] || 0, Number(tier) || 0);
+  });
+  const habitSucc = hid => ((catalogueReady() && catEntry('badge', 'habit_' + hid)) || (P.ladder || {})['habit_' + hid]) ? 'habit_' + hid : 'habit_custom';
+  (P.badges || []).forEach(b => {
+    if (!b || !b.retired) return;
+    if (b.id === 'habit_tiers') put(habitSucc(b.subject), '\u0000tiers', b.tier);
+    else put(b.superseded_by, b.name, (Number(b.of) || 1) > 1 ? b.tier : 0);
+  });
+  (P.achievements || []).forEach(a => { if (a && a.retired) put(a.superseded_by, a.name, 0); });
+  const hb = CFG.heldBefore;
+  if (hb) {
+    Object.keys(hb.tiers || {}).forEach(hid => { const t = Number(hb.tiers[hid]) || 0; if (t > 0) put(habitSucc(hid), '\u0000tiers', t); });
+    if (catalogueReady()) (hb.ach || []).forEach(code => {
+      const a = ACHIEVEMENTS.find(x => x.code === code), R = CATALOGUE.rows;
+      if (!a) return;
+      const fam = Object.keys(R.badge).find(id => (R.badge[id].proof_codes || []).indexOf(code) >= 0);
+      const ach = fam ? null : Object.keys(R.achievement).find(id => R.achievement[id].proof_code === code);
+      const body = fam ? R.badge[fam] : (ach ? R.achievement[ach] : null);
+      if (body && body.retire_at) put(body.superseded_by, a.name, Math.max(0, ROMAN.indexOf(a.mark || '')));
+    });
+  }
+  const out = {};
+  Object.keys(best).forEach(sx => {
+    out[sx] = Object.keys(best[sx]).map(fam => fam === '\u0000tiers'
+      ? ((CONSISTENCY_TIERS[best[sx][fam] - 1] || {}).name || '')
+      : fam + (best[sx][fam] > 0 ? ' ' + (ROMAN[best[sx][fam]] || best[sx][fam]) : '')).filter(Boolean);
+  });
+  return out;
+}
+function catalogueShelf() {
+  // The shelf's rows are get_awards()'s: read when Progress opens (go()), and again here, after the paint, when the copy
+  // on this phone is stale. Until it comes (or with no signal and no copy) the rows are the core's ladder and owned
+  // list, and the shelf's own lists are empty, never read as "none earned".
+  if (shelfStale()) fetchShelfSoon();
+  const P = careerView(), L = P.ladder || {}, ownedL = ownedIds(), owned = new Set(ownedL), ready = catalogueReady();
+  const meas = ready ? phoneMeasures() : {}, pend = {};
+  phoneAwards().forEach(a => { pend[a.award_id] = true; });
+  const free = (P.numbers && P.numbers.free === true) || isFree();
+  const before = earnedBeforeLines();
+  const sizeMetal = sz => ({ legend: 'prisma', milestone: 'emerald', highlight: 'silver' })[sz] || 'bronze';
+  const mk = m => m === 'prismatic' ? 'prisma' : (METALS[m] ? m : 'bronze');
+  const tracked = id => !/^habit_/.test(id) || (id === 'habit_custom' ? (CFG.custom || []).length > 0 : allHabits().some(h => 'habit_' + h.id === id));
+  const rows = [];
+  Object.keys(L).forEach(id => {
+    const l = L[id] || {}, ent = ready ? catEntry('badge', id) : null;
+    if (free && ent && ent.free === false) return;
+    let have = Number(l.have) || 0, tier = Number(l.tier) || 0;
+    const m = meas[id];
+    if (m) { have = Math.max(have, Number(m.have) || 0); Object.keys(m.crossed || {}).forEach(t => { tier = Math.max(tier, Number(t)); }); }
+    ownedL.forEach(k => { const a = awardParts(k); if (a.kind === 'badge' && a.item === id && !a.subject && a.tier > tier) tier = a.tier; });
+    let next = l.next != null ? Number(l.next) : null, metalNext = l.metal_next || null, xpNext = null, held = null;
+    if (ent && Array.isArray(ent.tiers)) {
+      const nt = ent.tiers[tier];
+      next = nt ? Number(nt.at) : null; metalNext = nt ? nt.metal : null; xpNext = nt ? Number(nt.xp) || 0 : null;
+      held = tier > 0 && ent.tiers[tier - 1] ? ent.tiers[tier - 1].metal : null;
+    }
+    if (!held && tier > 0) held = ((P.badges || []).find(b => b && b.id === id && !b.subject) || {}).metal || null;
+    if (!tracked(id) && !tier && !have) return;
+    const capt = ent ? ent.caption : (((P.badges || []).find(b => b && b.id === id) || {}).caption || '');
+    rows.push({ kind: 'badge', id, name: l.name || (ent && ent.name) || id, meaning: l.meaning || (ent && ent.meaning) || '',
+                have, tier, next, metal: held, metalNext, xpNext, got: tier > 0, done: tier > 0 && next == null,
+                note: have > 0 && capt ? String(capt).replace(/\{n\}/g, have) : '',
+                pct: next ? Math.max(0, Math.min(100, Math.round(have / next * 100))) : 100, before: before[id] || [] });
+  });
+  const achOwned = {};
+  (P.achievements || []).forEach(a => { if (a && a.id) achOwned[a.id] = a; });
+  const achIds = ready
+    ? Object.keys(CATALOGUE.rows.achievement).filter(id => { const b = CATALOGUE.rows.achievement[id]; return b && !b.retire_at && b.meaning !== 'chosen' && !(free && b.free === false); })
+    : Object.keys(achOwned).filter(id => !achOwned[id].retired);
+  achIds.forEach(id => {
+    const b = ready ? CATALOGUE.rows.achievement[id] : null, a = achOwned[id], aid = awardId('achievement', id);
+    const got = !!(a || owned.has(aid) || pend[aid]);
+    const ev = b && b.proof_code ? EVENTS.find(e => e.id === b.proof_code) : null, evp = ev ? eventProgress(ev) : null;
+    const tt = b && b.title ? catEntry('title', b.title) : null;
+    rows.push({ kind: 'achievement', id, name: (b && b.name) || (a && a.name) || id, meaning: (b && b.meaning) || (a && a.meaning) || '',
+                got, done: got, size: (b && b.size) || (a && a.size) || 'win', note: (b && b.caption) || (a && a.caption) || '',
+                xp: Number((b && b.xp) || 0), titleName: tt ? tt.name : '', goals: evp ? evp.goals : null,
+                pct: got ? 100 : (evp ? evp.pct : 0), before: before[id] || [] });
+  });
+  const row = r => {
+    const medal = awardMedal({ meaning: r.meaning, metalKey: r.kind === 'badge' ? mk(r.got ? r.metal : r.metalNext) : sizeMetal(r.size) }, r.got);
+    const mark = r.kind === 'badge' && r.got && r.metal ? `<i class="ms-mk">${esc((METALS[mk(r.metal)] || METALS.bronze).label)}</i>` : '';
+    const note = r.goals && !r.got ? r.goals.map(g => `<i class="g${g.done ? ' got' : ''}">${esc(g.label)}</i>`).join(' · ') : esc(r.note);
+    const right = r.kind === 'badge'
+      ? `<span class="ms-xp">${r.xpNext ? '+' + r.xpNext.toLocaleString() + ' XP' : ''}</span><span class="ms-cnt">${r.done ? esc((METALS[mk(r.metal)] || METALS.bronze).label.toUpperCase()) : r.have + '/' + r.next}</span>`
+      : `<span class="ms-xp">${esc(r.titleName || (r.xp ? '+' + r.xp.toLocaleString() + ' XP' : ''))}</span><span class="ms-cnt">${r.got ? 'UNLOCKED' : r.goals ? r.goals.filter(g => g.done).length + '/' + r.goals.length : ''}</span>`;
+    return `<div class="msrow ${r.done ? 'got' : ''}" data-k="aw:${r.kind}:${esc(r.id)}">
+        ${medal}
+        <span class="ms-mid">
+          <span class="ms-name">${esc(r.name)}${mark}</span>
+          ${note ? `<span class="ms-note">${note}</span>` : ''}
+          ${r.before.length ? `<span class="ms-note">Earned before: ${esc(r.before.join(', '))}</span>` : ''}
+          ${!r.done && (r.kind === 'badge' || r.goals) ? `<span class="ms-bar"><span data-fill style="width:${r.pct}%"></span></span>` : ''}
+        </span>
+        <span class="ms-right">${right}</span>
+      </div>`;
+  };
+  const total = catalogueTotal(), gotN = catalogueEarned();
+  const allOpen = (CFG.msOpen || {}).all === true;
+  const flip = () => { (CFG.msOpen || (CFG.msOpen = {})).all = !allOpen; saveCfg(); render(); };
+  const head = sectionLabel('Milestones', gotN + ' of ' + total)
+    + `<div style="padding:0 20px 14px;font-size:12px;line-height:1.5;color:var(--muted)">Each one pays XP, and some a title, yours for good once you cross the line.</div>`;
+  const nearIds = (P.near || []).map(n => n && n.id).filter(Boolean);
+  const open = rows.filter(r => !r.done && !(free && r.meaning === 'progress'));
+  const near = nearIds.map(id => open.find(r => r.kind === 'badge' && r.id === id)).filter(Boolean)
+    .concat(open.filter(r => nearIds.indexOf(r.id) < 0).sort((x, y) => y.pct - x.pct)).slice(0, 3);
+  if (allOpen) {
+    const n0 = near[0];
+    const group = m => {
+      const inG = rows.filter(r => r.meaning === m);
+      if (free && m === 'progress') return `<div class="eyebrow sectlbl" data-k="mstoggle:progress"><span>${WIN_WORDS[m]}</span></div>`
+        + `<div class="msnext" data-k="msfree">Coached athletes earn these from their programme.</div>`;
+      if (!inG.length) return '';
+      const isOpen = (CFG.msOpen || {})[m] !== false;
+      return msTierHeader(m, WIN_WORDS[m], inG.filter(r => r.got).length + '/' + inG.length) + (isOpen ? inG.map(row).join('') : '');
+    };
+    return head
+      + (n0 && n0.kind === 'badge' && n0.have > 0 ? `<div class="msnext" data-k="msnext"><strong>${esc(n0.name)}</strong> is the closest. ${Math.max(0, n0.next - n0.have)} to go${n0.xpNext ? ', worth +' + n0.xpNext.toLocaleString() + ' XP' : ''}.</div>` : '')
+      + WIN_KINDS.map(group).join('')
+      + `<button class="msall" data-k="msall" ${on(flip)}><span>Show the next three only</span><span class="go">‹</span></button>`;
+  }
+  const earned = rows.filter(r => r.got);
+  return head
+    + (earned.length ? `<button class="msearned" data-k="msearned" ${on(flip)} aria-label="${earned.length} earned: open every milestone">
+        <span class="mse-l">Earned · ${earned.length}</span>
+        <span class="mse-m">${earned.map(r => awardMedal({ meaning: r.meaning, metalKey: r.kind === 'badge' ? mk(r.metal) : sizeMetal(r.size) }, true)).join('')}</span></button>` : '')
+    + near.map(row).join('')
+    + `<button class="msall" data-k="msall" ${on(flip)}><span>All ${total} milestones</span><span class="go">›</span></button>`;
+}
 function renderProgress(LI, earned, totalAch) {
   const hs = live(), off = offHabits();
   // ⚠️ bestDayStreak(), NOT bestHabitRun(). This tile is captioned DAY STREAK,
@@ -8799,7 +9764,7 @@ function renderProgress(LI, earned, totalAch) {
            (No backticks in here: this comment lives inside a template literal
            and one would close it.) -->
       ${daysLogged === 0 ? `<div class="statnote" data-k="statnote">
-        A <strong>milestone</strong> is one of the ${ACHIEVEMENTS.length + EVENTS.length} at the foot of this screen;
+        A <strong>milestone</strong> is one of the ${totalAch} at the foot of this screen;
         a habit's page shows its five consistency tiers.
         Every habit has <strong>its own streak</strong>: consecutive days you did that one thing.
         Your <strong>day streak</strong>, at the top, is consecutive days where you cleared
@@ -8836,7 +9801,7 @@ function renderProgress(LI, earned, totalAch) {
            reachable row above nine walls, and gave a two-year athlete nothing
            left to want. The tier is the promise: a good week, the long haul, or
            something most people never get. -->
-      ${(() => {
+      ${catalogueOn() ? catalogueShelf() : (() => {
         const rows = ACHIEVEMENTS.map(a => {
           // Clamped: THE CENTURION reads 143/100 without it, and a bar past
           // 100% would run outside its own track.
@@ -9422,6 +10387,12 @@ function renderManual() {
   const hs = allHabits();
   const cum = cumXpTo;     // the overall curve: Proof's, or the career's once the XP switch is on
   const ob = overallBase(), og = overallGrowth(), career = careerOn();
+  // Career Mode phase 3 (the catalogue switch): the shelf is the catalogue's, one badge per habit, four kinds of win.
+  const cat = catalogueOn();
+  const habitBadge = h => (catalogueReady() && h ? catEntry('badge', (CFG.custom || []).some(c => c.id === h.id) ? 'habit_custom' : 'habit_' + h.id) : null);
+  const stepRows = h => { const b = habitBadge(h);
+    return b && Array.isArray(b.tiers) ? b.tiers.map(t => ({ name: t.tier_name || '', days: Number(t.at) || 0, xp: Number(t.xp) || 0 }))
+                                       : CONSISTENCY_TIERS.map((t, i) => ({ name: t.name, days: t.days, xp: tierXp(h, i) })); };
   const prices = career && CAREER.p.rules && CAREER.p.rules.prices || {};
   const xpn = v => (Number(v) || 0).toLocaleString();
   // In Career Mode the locked habit (WORKOUT) pays 0 a day and the session pays instead (paidXp()), so the list and
@@ -9450,8 +10421,8 @@ function renderManual() {
     if (el) el.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
   })}>${esc(t)}</button>`;
   const CONTENTS = ['Start here', 'The daily loop', 'Forgot to log a day?', 'Roll call', 'What each habit is worth',
-                    'How to earn more', 'Levels and ranks', 'The Locker', 'Consistency', 'Quests',
-                    'Seasons', 'The leaderboard', 'Body weight', 'Your data'];
+                    'How to earn more', 'Levels and ranks', 'The Locker'].concat(cat ? ['Four kinds of win'] : []).concat(['Consistency', 'Quests',
+                    'Seasons', 'The leaderboard', 'Body weight', 'Your data']);
 
   return `
     <div data-k="screen:manual" style="${screenAnim()}">
@@ -9476,12 +10447,16 @@ function renderManual() {
         </div>` +
         `<button class="btn btn-primary btn-block" ${on(() => { UI.backTo = 'settings'; startTour('settings'); })}>Show me around instead</button>` +
         `<div style="height:12px"></div>` +
-        p(`Five steps on the real screen: the row, the week, your level, the board and your initials. It is also in Settings under <strong style="color:var(--ink)">The tour</strong>, any time.`))}
+        p(cat
+          ? `Six steps on the real screen: the row, the week, your level, your four numbers, the board and your initials. It is also in Settings under <strong style="color:var(--ink)">The tour</strong>, any time.`
+          : `Five steps on the real screen: the row, the week, your level, the board and your initials. It is also in Settings under <strong style="color:var(--ink)">The tour</strong>, any time.`))}
 
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game. They build your level, your rank in each habit, and your place on the leaderboard.`) +
         p(`The tile beside your week answers the one question that matters: <strong style="color:var(--ink)">does today count?</strong> It says how many habits are still to go, then <strong style="color:var(--ink)">On target</strong> once the day keeps your streak, then <strong style="color:var(--ink)">Perfect</strong> when the list is clear.`) +
-        p(`The big ones stop the app to say so: a <strong style="color:var(--ink)">new level</strong> or <strong style="color:var(--ink)">rank</strong>, a day streak of <strong style="color:var(--ink)">${STREAK_TAKEOVER} days or more</strong>, a finished quest or event, and a season's title. Any reward the level unlocked is on the same screen. A milestone, a consistency tier, a habit's new rank, a <strong style="color:var(--ink)">perfect day</strong> (the whole list cleared), a comeback and a finished season land in a card at the top of Today instead, with the XP they paid. It stays there until you tap it. A habit's own level just flashes in its row and gets out of your way.`) +
+        (cat
+          ? p(`The big ones stop the app to say so: a <strong style="color:var(--ink)">new level</strong> or <strong style="color:var(--ink)">rank</strong>, a day streak of <strong style="color:var(--ink)">${STREAK_TAKEOVER} days or more</strong>, a finished quest, the biggest badges and milestones, and a season's title. One at a time: if something big already had the screen when you opened the app, the next one waits for your next visit. Any reward the level unlocked is on the same screen. A smaller badge step, a milestone, a habit's new rank, a <strong style="color:var(--ink)">perfect day</strong> (the whole list cleared), a comeback and a finished season land in a card at the top of Today instead, with the XP they paid. It stays there until you tap it. A habit's own level just flashes in its row and gets out of your way.`)
+          : p(`The big ones stop the app to say so: a <strong style="color:var(--ink)">new level</strong> or <strong style="color:var(--ink)">rank</strong>, a day streak of <strong style="color:var(--ink)">${STREAK_TAKEOVER} days or more</strong>, a finished quest or event, and a season's title. Any reward the level unlocked is on the same screen. A milestone, a consistency tier, a habit's new rank, a <strong style="color:var(--ink)">perfect day</strong> (the whole list cleared), a comeback and a finished season land in a card at the top of Today instead, with the XP they paid. It stays there until you tap it. A habit's own level just flashes in its row and gets out of your way.`)) +
         p(`Every one of them has <strong style="color:var(--ink)">Share it</strong>. It opens a card of that exact thing, like the milestone you just earned or a title on its plate, in the shape Instagram wants for a post or a story. Nothing leaves your phone until you tap it.`) +
         p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`) +
         (isFree() ? '' : p(`<strong style="color:var(--ink)">You can tick today's list from your training app too</strong>, on its Home under Daily Habits. It is this same list, saved the same way, for the same points. A new level or a reward waits for you here, so the moment is never spent on a small strip.`)) +
@@ -9523,8 +10498,10 @@ function renderManual() {
           ${isFree() ? '' : `<div>▸ <strong style="color:var(--ink)">Use the Library.</strong> Open a workout in your programme app and mark it done. A strength, conditioning or on-court session ticks your session. A mobility flow or a recovery session ticks Mobility. Anything in Breath ticks Breathe. A warm-up ticks nothing, because a warm-up is part of a session rather than a session of its own. If the habit it counts towards is one you are not tracking, this screen will offer to switch it on.</div>`}
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
           <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings, under <strong style="color:var(--ink)">Your habits</strong>.</div>
-          <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points, up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit. And they only come from unbroken streaks.</div>
-          <div>▸ <strong style="color:var(--ink)">Go after the milestones.</strong> The ${ACHIEVEMENTS.length} on your Progress tab pay ${ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0).toLocaleString()} XP between them, once each.</div>
+          ${cat ? `<div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Every habit has one badge with ${stepRows(live()[0] || HABITS[0]).length} steps, worth up to ${stepRows(live()[0] || HABITS[0]).reduce((s, t) => s + t.xp, 0).toLocaleString()} XP on a single habit. They only come from unbroken streaks, and each step pays once.</div>
+          <div>▸ <strong style="color:var(--ink)">Go after the badges.</strong> There are ${catalogueTotal().toLocaleString()} badge steps and milestones on your Progress tab, in four kinds of win. Each one pays once in your career.</div>`
+          : `<div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points, up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit. And they only come from unbroken streaks.</div>
+          <div>▸ <strong style="color:var(--ink)">Go after the milestones.</strong> The ${ACHIEVEMENTS.length} on your Progress tab pay ${ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0).toLocaleString()} XP between them, once each.</div>`}
         </div>`)}
 
       ${block(h2('Levels and ranks') +
@@ -9551,8 +10528,19 @@ function renderManual() {
           p(got
             ? `You have <strong style="color:var(--ink)">${got} of ${PASS_TRACK.length}</strong>${eq ? `, and you are showing <strong style="color:var(--ink)">${esc(eq.name)}</strong>` : ''}. ${nx ? `Next is <strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv}.` : 'There is nothing left to unlock.'}`
             : `Your first is <strong style="color:var(--ink)">${esc(PASS_TRACK[0].name)}</strong> at level ${PASS_TRACK[0].lv}, which is one full day of habits away.`) +
+          (cat ? p(`<strong style="color:var(--ink)">Some badges and milestones pay a title too.</strong> It lands in the same rail as the road's titles and you wear it the same way. At the top of the Locker is your <strong style="color:var(--ink)">Grand Slam</strong> row: one title for each kind of win. Fill all four and the Grand Slam title is yours as well.`) : '') +
           p(`It has its own tab now, <strong style="color:var(--ink)">Locker</strong>, last on the bar. What you are wearing is up top, everything you own under it, and below that <strong style="color:var(--ink)">the road</strong>. One track with every rank and reward threaded on it, and a marker showing exactly where you stand. It opens on the rank you are in and the next three rewards; <strong style="color:var(--ink)">The whole road</strong> under them shows the rest.`));
       })()}
+
+      ${cat ? (() => {
+        const four = fourNumbers();
+        return block(h2('Four kinds of win') +
+          p(`Every badge and milestone counts toward one of four kinds of win. <strong style="color:var(--ink)">Consistency</strong> is turning up, day after day and week after week. <strong style="color:var(--ink)">Commitment</strong> is doing the work as it was written. <strong style="color:var(--ink)">Progress</strong> is getting stronger. <strong style="color:var(--ink)">Resilience</strong> is coming back after a bad patch.`) +
+          p(`The four numbers under your level on Today are one for each: ${four.map(c => '<strong style="color:var(--ink)">' + esc(c.label.toLowerCase()) + '</strong>').join(', ')}. Tap one and Progress opens on that kind of win, with what is next in it.`) +
+          (isFree() ? p(`The Progress badges come from training with a coach, so they stay locked on your shelf until you have a programme.`) : '') +
+          p(`Every badge step and milestone is earned once in your career. A new season never takes one back, and neither does a broken streak. If a badge you had before was folded into a newer one, it is still there, under the new one, as <strong style="color:var(--ink)">Earned before</strong>.`) +
+          p(`Win a title in all four and you hold the <strong style="color:var(--ink)">Grand Slam</strong>. Level titles and season titles do not count toward it.`));
+      })() : ''}
 
       ${(() => {
         const run = activeQuestRun(), qs = run ? runQuests(run) : [];
@@ -9612,18 +10600,22 @@ function renderManual() {
         // tracking works rather than just showing it.
         p(`<strong style="color:var(--ink)">Five habits are fixed.</strong> Your session, steps, sleep, protein and water are the same for everyone on the board. That is what makes a day score mean the same thing for all of you, and they have no off switch. Everything else is an add-on: optional, worth real points on top, and once one is on it counts like anything else.`) +
         p(`<strong style="color:var(--ink)">Changing what you track is safe.</strong> A day is judged on the habits you had switched on <em>that day</em>. Add an add-on today and the days behind you keep the scores they earned; switch one off and it does not go back and make old days look better than they were. Today counts from now, because today is still yours to finish.`) +
-        p(`<strong style="color:var(--ink)">Clearing a tier pays.</strong> What it pays depends on the habit: a tier on your workout is worth more than the same tier on your supplements, because a day of it is worth more. The figures below are for ${esc((live()[0] || HABITS[0]).name.toLowerCase())}; open any habit to see its own.`) +
+        (cat
+          ? p(`<strong style="color:var(--ink)">One badge per habit.</strong> Each habit has its own badge with the same ${stepRows(live()[0] || HABITS[0]).length} steps, and a step pays the day you reach it. What it pays depends on the habit: a step on your workout is worth more than the same step on your supplements, because a day of it is worth more. The figures below are for ${esc((live()[0] || HABITS[0]).name.toLowerCase())}; Progress shows every badge.`)
+          : p(`<strong style="color:var(--ink)">Clearing a tier pays.</strong> What it pays depends on the habit: a tier on your workout is worth more than the same tier on your supplements, because a day of it is worth more. The figures below are for ${esc((live()[0] || HABITS[0]).name.toLowerCase())}; open any habit to see its own.`)) +
         `<div style="display:flex;flex-direction:column;gap:0">
-          ${CONSISTENCY_TIERS.map((t, i) => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0">
+          ${(cat ? stepRows(live()[0] || HABITS[0]) : CONSISTENCY_TIERS.map((t, i) => ({ name: t.name, days: t.days, xp: tierXp(live()[0] || HABITS[0], i) }))).map(t => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0">
             <span class="hd" style="font-size:14px">${esc(t.name)}</span>
             <span style="display:flex;gap:10px;align-items:baseline;white-space:nowrap">
               <span class="mono" style="font-size:12px;color:var(--muted)">${t.days} DAYS IN A ROW</span>
-              <span class="mono" style="font-size:12px;font-weight:700;color:var(--clay-deep)">+${tierXp(live()[0] || HABITS[0], i)}</span>
+              <span class="mono" style="font-size:12px;font-weight:700;color:var(--clay-deep)">+${t.xp}</span>
             </span>
           </div>`).join('')}
         </div>` +
         `<div style="height:12px"></div>` +
-        p(career
+        p(cat
+          ? `A step is paid once in your career, on the day you reach it. It counts toward your level for good, and the badge keeps it.`
+          : career
           ? `Tier points are paid on the day you cross the tier, once. They count toward your level for good, and the tiers themselves stay yours.`
           : `Tier points are paid on the day you cross the tier, so they belong to the season you earned them in. A new season starts your points again, but the tiers themselves stay yours.`))}
 
@@ -9697,6 +10689,17 @@ const CARD_LOOK = {
 // too). `.trow.mark` drops in wherever the athlete actually stands — after
 // every reward their current rank has already paid, before the ones it has
 // not — so the marker can never land on the wrong rung again.
+// The catalogue's titles on the Locker's rail (phase 3): the ones the server says this athlete holds from a badge, a
+// milestone or an event, that the road, the events and the seasons above do not already list. [] until the switch.
+function catalogueTitles() {
+  if (!catalogueOn()) return [];
+  const have = PASS_TRACK.map(p => p.id).concat(eventTitles().map(t => t.id)), out = [];
+  serverCatalogueTitleIds().forEach(id => {
+    const p = passItem(id);
+    if (p && have.indexOf(p.id) < 0 && !out.some(x => x.id === p.id)) out.push(p);
+  });
+  return out;
+}
 function renderPass() {
   const LI = overallLevel(), lv = LI.lv;
   const next = nextReward();
@@ -9709,7 +10712,7 @@ function renderPass() {
   const fromXp = cumXpTo(prevRw ? prevRw.lv : 1);
   const nextPct = next ? Math.max(4, Math.min(100, Math.round((LI.xp - fromXp) / Math.max(1, cumXpTo(next.lv) - fromXp) * 100))) : 100;
   const nextDays = Math.max(1, Math.round(toNext / Math.max(1, perfectDayXp())));
-  const titles = PASS_TRACK.filter(p => p.kind === 'title').concat(eventTitles()).concat(seasonTitles());
+  const titles = PASS_TRACK.filter(p => p.kind === 'title').concat(eventTitles()).concat(seasonTitles()).concat(catalogueTitles());
   const cards = [CARD_BASE].concat(PASS_TRACK.filter(p => p.kind === 'card'));
   const myTitles = titles.filter(p => passHas(p.id))
     .sort((a, b) => (b.id === (CFG.pass && CFG.pass.title)) - (a.id === (CFG.pass && CFG.pass.title)));   // the one you wear first
@@ -9888,7 +10891,7 @@ function renderPass() {
         </div>`}
       </div>
 
-      ${sectionLabel('What you have')}
+      ${sectionLabel('What you have')}${slamRow()}
       <div class="loadout">
         <!-- A thumbnail of the share card in the equipped skin: the skin and the crest. Its 7.5 px rank name
              never read and could not be raised to 11 px inside 66 px (A11Y-01); the hero above names the rank. -->
@@ -10329,8 +11332,18 @@ function scFooter(x, W, H, ink, bottom) {
 // The newest thing worth showing off: a milestone if there is one, otherwise the
 // habit carrying the longest run.
 // Milestones earned: the one-off ones and the "A few weeks" events, the count Progress and the rank card print.
-function milestonesEarned() { return currentAch().length + EVENTS.filter(e => eventProgress(e).done).length; }
+// From the catalogue switch: every badge tier and milestone the server holds (phase 3).
+function milestonesEarned() { return catalogueOn() ? catalogueEarned() : currentAch().length + EVENTS.filter(e => eventProgress(e).done).length; }
 function latestMedal() {
+  // From the catalogue switch: the newest award on the shelf (get_awards() lists them newest first), from the copy this
+  // phone last read (careerView()); until Progress has read one, the older ledger below.
+  if (catalogueOn()) {
+    const P = careerView(), b = (P.badges || []).find(x => x && !x.retired), a = (P.achievements || []).find(x => x && !x.retired);
+    const pick = [b && { id: awardId('badge', b.id, b.tier, b.subject || ''), day: b.day }, a && { id: awardId('achievement', a.id), day: a.day }]
+      .filter(Boolean).sort((x, y) => String(y.day || '').localeCompare(String(x.day || '')))[0];
+    const info = pick && awardMedalInfo(pick.id);
+    if (info) return info;
+  }
   const codes = currentAch();
   if (codes.length) return achMedalInfo(ACHIEVEMENTS.filter(z => codes.indexOf(z.code) !== -1).slice(-1)[0]);
   const best = live().slice().sort((a, b) => habitStreak(b) - habitStreak(a))[0];
@@ -10359,8 +11372,18 @@ function achMedalInfo(a) {
 function tierMetal(ti) { return ti >= 3 ? 'emerald' : ti >= 1 ? 'silver' : 'bronze'; }
 // What the Milestone card shows (2026-10-17): the milestone, consistency tier, quest or comeback that
 // Share it came from (openShare()'s subject), else the newest milestone, as it always did.
+// A catalogue award as the Milestone card draws it (phase 3): its tier's metal, its kind of win's emoji and tint, its
+// caption, what it pays now, its tier as stars (five at most), the kind of win as the eyebrow.
+function awardMedalInfo(id) {
+  const v = awardView(id);
+  if (!v || v.kind === 'title') return null;
+  return { metal: v.metalKey, tint: WIN_TINT[v.meaning] || '#EFECFB', emoji: WIN_EMOJI[v.meaning] || '✨',
+           name: awardTitle(v), note: v.caption || '', xp: v.xp, stars: Math.min(5, v.tier || 0),
+           eyebrow: (WIN_WORDS[v.meaning] || 'Milestone').toUpperCase() };
+}
 function medalFor(s) {
   if (!s) return latestMedal();
+  if (s.k === 'award') return awardMedalInfo(s.id) || latestMedal();
   if (s.k === 'milestone') {
     const a = ACHIEVEMENTS.find(z => z.code === s.id);
     return a ? achMedalInfo(a) : latestMedal();
@@ -10404,6 +11427,18 @@ function titleFor(s) {
   const ev = typeof p.event === 'string' ? EVENTS.find(e => e.id === p.event) : null;
   if (ev) return { p, metal, eyebrow: 'EVENT TITLE', emoji: EV_EMOJI[ev.id] || '🏁', crest: null,
                    took: { head: 'FINISHED ' + ev.name, lines: ev.goals.map(g => g.label) } };
+  // A catalogue title (phase 3): the badge or milestone that earned it; the Grand Slam, its four titles.
+  if (p.cat) {
+    if (p.cat === 'grand_slam') {
+      const sl = (CAREER && CAREER.p && CAREER.p.slam) || {};
+      return { p, metal: 'prisma', eyebrow: 'GRAND SLAM', emoji: null, crest: null,
+               took: { head: 'A TITLE IN ALL FOUR', lines: WIN_KINDS.map(m => sl[m] && sl[m].name).filter(Boolean) } };
+    }
+    const fr = String(p.note || ''), i = fr.indexOf(': ');
+    return { p, metal, eyebrow: 'TITLE · ' + (WIN_WORDS[p.meaning] || 'Career').toUpperCase(), emoji: WIN_EMOJI[p.meaning] || null, crest: null,
+             took: { head: (i > 0 ? fr.slice(0, i) : fr || p.name).toUpperCase(),
+                     lines: [i > 0 ? fr.slice(i + 2) : 'Kept for good. A new season cannot take it back.'] } };
+  }
   return { p, metal, eyebrow: 'TITLE · LEVEL ' + p.lv, emoji: null, crest: rankFor(p.lv || 1).name,
            took: { head: 'LEVEL ' + p.lv + ' ON THE ROAD', lines: ['Kept for good. A new season cannot take it back.'] } };
 }
@@ -10605,9 +11640,9 @@ const SHARE_PAINT = {
       const blockH = fixedH + cw * 1.12;
       let y = a.top + Math.max(20, (statsY - a.top - blockH) / 2);
       const lead = h ? shortName(h).toUpperCase() + ' RANK'
-                     : ({ level: 'LEVEL UP', rank: 'NEW RANK', prestige: 'PRESTIGE', career: 'MY CAREER' })[s && s.moment] || 'PROOF';
+                     : ({ level: 'LEVEL UP', rank: 'NEW RANK', prestige: 'PRESTIGE', career: 'MY CAREER', catalogue: 'MY RECORD' })[s && s.moment] || 'PROOF';
       // In Career Mode the level is the career's, not the season's: the card says so.
-      scEyebrow(x, a.cx, y, s && s.moment === 'career' ? lead
+      scEyebrow(x, a.cx, y, s && (s.moment === 'career' || s.moment === 'catalogue') ? lead
                           : lead + ' · ' + (careerOn() && !h ? 'CAREER' : seasonName().toUpperCase()));
       const cy = y + 60 + cw * 0.56;
       scCrest(x, a.cx, cy, cw, r.name);
@@ -10997,6 +12032,7 @@ const SHARE_CARDS = [
     as: s => s.k === 'tier' ? { name: 'Tier', emoji: (medalFor(s) || {}).emoji || '🏅', note: 'The consistency tier you just cleared.' }
            : s.k === 'quest' ? { name: 'Quest', emoji: '🎯', note: 'The quest you just finished.' }
            : s.k === 'comeback' ? { name: 'Comeback', emoji: '🔄', note: 'The day you came back.' }
+           : s.k === 'award' ? { name: awardParts(s.id).kind === 'badge' ? 'Badge' : 'Milestone', emoji: (medalFor(s) || {}).emoji || '✨', note: 'Any badge or milestone' }
            : { note: 'The milestone you just earned.' },
     caption: (LI, s) => { const m = medalFor(s); return m ? m.name : 'A new milestone'; } },
   { id:'title',   name:'Title',   emoji:'📛', note:'A title you earned, on its plate.',
@@ -11504,6 +12540,10 @@ function showError(msg, opts) {
   // The embedded strip reads it too and never asks (only the full app writes it), so the level it hands the
   // training app's Home (publishCardSnapshot()) is the career's.
   loadCareer();
+  // And the catalogue copy (phase 3), never in the embedded strip: the shelf names its awards from it offline.
+  loadCatalogue();
+  // And the shelf this phone last read (get_awards()): Progress shows it with no signal.
+  loadShelf();
   // NOTHING BELOW MAY HOLD THE SPINNER OPEN INDEFINITELY. Four server round
   // trips run before the first paint, and on a bad connection — the hotel wifi
   // that answers the handshake and then stalls — a fetch neither resolves nor
@@ -11576,7 +12616,8 @@ function showError(msg, opts) {
   // without its moment, and the board sweep is Proof's to make (renderEmbed()).
   if (!window.IS_EMBED) {
     claimRewards(true);
-    claimEventTitles(true);
+    // From the catalogue switch an event's title comes from the server only (syncCatalogueTitles()).
+    if (!catalogueOn()) claimEventTitles(true);
     // And the other half of the same record. Minting on boot is what makes the
     // server's copy keep up with a level that is about to reset: the peak is
     // captured on the day it happens, while the level is still there to prove it.
@@ -11601,6 +12642,8 @@ function showError(msg, opts) {
     if (openId && rosterOn(TKEY()).some(h => h.id === openId)) openHabit(openId, 'today');
     // And one to the Locker: ?go=pass, from the training app's Career row (Career Mode phase 2).
     else if (params.get('go') === 'pass') go('pass');
+    // And one to Progress: ?go=progress, the training app's Career row once the catalogue switch is on (phase 3).
+    else if (params.get('go') === 'progress') go('progress');
   }
 
   // The board sweep, now gated on having actually trained. See autoJoinBoard().

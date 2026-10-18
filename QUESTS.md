@@ -12,6 +12,10 @@ The mechanics — how they're scored, why they're safe, how the app and the serv
 > line in between; the manual explains quests meanwhile). That's the point — seeing quests means
 > *something is on this week*.
 
+> **Career Mode's catalogue switch (phase 3) changes nothing here.** Quests keep paying through `hab_bonus_xp()` and
+> `bonusEvents()` as this file and `XP_SYSTEM.md` §8.5 say, on the phone and on the server, after the switch as before it. Only
+> tiers and milestones become awards. Missions and personal quests are phases 5 and 7 (`career/CAREER_MODE.md`).
+
 ---
 
 ## Right now

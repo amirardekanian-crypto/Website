@@ -44,6 +44,11 @@
                                  / career_level(), hab_xp() with career_paid_rules(), career_session_want() in SQL
                                  Career Mode phase 2 (the XP switch): the career's curve, the WORKOUT habit at 0 a day, a session's
                                  facts. Held to scripts/career/xp_cases.json, the server's answers (scripts/career/rehearse_switch.mjs)
+     habits.html awardMeasures, phoneAwardsFrom, awardId, EVENTS; program.html careerMoves, awardId
+                                 / career_measures(), career_evaluate(), career_award_xp(), career_award_id() in SQL, and career/achievements.toml
+                                 Career Mode phase 3 (the catalogue switch), section 10: held to scripts/career/reward_cases.json (the server's answers,
+                                 scripts/career/rehearse_catalogue.mjs) AND, for what those cases never cross, to a measure grown by hand, one a day, for every
+                                 entry the phone decides and every tier. In index mode the toml, its seed script and the snapshot come from the index too.
 
    Already guarded elsewhere (not repeated): rxOf/repCount/tempoDisplay (check_rx.js), the set-log grammar
    (check_setlog.js), the shared word lists (check_parity.py), the XP rules (check_xp_rules.py).
@@ -61,7 +66,7 @@
 // cycle's date as a UTC midnight and the clock in local time, a day off west of Greenwich and an hour off on a clock-change day (fixed in pile C,
 // 2026-10-11: both copies now count calendar days). Section 4b sets process.env.TZ for each zone and puts it back.
 process.env.TZ = 'UTC';
-const fs = require('fs'), path = require('path'), vm = require('vm'), crypto = require('crypto'), cp = require('child_process');
+const fs = require('fs'), os = require('os'), path = require('path'), vm = require('vm'), crypto = require('crypto'), cp = require('child_process');
 
 // CHECK_TWINS_ROOT points the guard at another copy of the files (scripts/test_check_twins.js breaks one on purpose).
 const ROOT = process.env.CHECK_TWINS_ROOT || path.join(__dirname, '..');
@@ -74,6 +79,34 @@ function read(f) {
     catch (e) { /* not in the index: the working-tree copy */ }
   }
   return fs.readFileSync(path.join(ROOT, f), 'utf8').replace(/\r\n/g, '\n');
+}
+// Section 10 holds habits.html to the catalogue that scripts/career_seed.py builds from career/*.toml. In index mode (the pre-commit hook) BOTH sides must be what is staged:
+// habits.html is read from the index above, so the seed script, the checker it imports, the snapshot the checker compares and every career/ file are cut out of the
+// index too and the script is run on that copy. (Until 2026-10-18 it ran on the working tree, so a toml edited and not staged was held against a staged habits.html,
+// or a staged toml against a stale working one, and the hook said the wrong thing either way.) A file that is not in the index is read from the working tree, as read().
+function catalogueSeed() {
+  let root = ROOT, tmp = null;
+  if (FROM_INDEX) {
+    tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'twins-seed-'));
+    const gitOut = (...a) => cp.execFileSync('git', a, { cwd: ROOT, maxBuffer: 128 << 20, stdio: ['ignore', 'pipe', 'ignore'] });
+    let names = [];
+    try { names = gitOut('ls-files', 'career').toString('utf8').split('\n').map(s => s.trim()).filter(Boolean); } catch (e) { /* none: the seed script fails below, loudly */ }
+    names.concat(['scripts/career_seed.py', 'scripts/check_career.py', 'supabase/xp_rules_snapshot.json']).forEach(f => {
+      let buf = null;
+      try { buf = gitOut('show', ':' + f); } catch (e) { try { buf = fs.readFileSync(path.join(ROOT, f)); } catch (e2) { /* not there either */ } }
+      if (!buf) return;
+      fs.mkdirSync(path.dirname(path.join(tmp, f)), { recursive: true });
+      fs.writeFileSync(path.join(tmp, f), buf);
+    });
+    root = tmp;
+  }
+  try {
+    for (const py of ['python', 'python3']) {
+      try { return JSON.parse(cp.execFileSync(py, ['-X', 'utf8', path.join(root, 'scripts', 'career_seed.py'), '--json'], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'ignore'] })); }
+      catch (e) { /* the next name */ }
+    }
+    return null;
+  } finally { if (tmp) fs.rmSync(tmp, { recursive: true, force: true }); }
 }
 const A_SRC = read('program.html'), D_SRC = read('coach.html'), H_SRC = read('habits.html');
 const STAMP_FILE = path.join(ROOT, 'scripts', 'twins_stamp.json');
@@ -709,11 +742,211 @@ run('Career Mode: what a session makes (program.html careerFullLog, careerChecki
   });
 });
 
+/* ── 10. Career Mode phase 3: what the two phones copy of the rewards (habits.html, program.html / the SQL) ─────── */
+// Once the catalogue switch is on, a tick in AA Proof that crosses a badge tier is told at once (GAME-13), and the training app's finish card says
+// which ladders the session moves. Each copies a server rule (supabase/stage70_career_rewards.sql: career_measures(), career_badge_eval(),
+// career_achievement_eval(), career_award_xp(), career_award_id()), so the cases are the server's own answers on made-up athletes: written, and checked
+// every run, by scripts/career/rehearse_catalogue.mjs on PGlite (scripts/career/reward_cases.json). This holds both apps to them:
+//   habits.html awardMeasures() + phoneAwardsFrom()   the pure core of the phone's scoring of the phone-decidable entries and its pending awards
+//   habits.html awardId(), program.html awardId()     the one key for a reward (career_award_id())
+//   program.html careerMoves()                        the finish card's lines (the ladder the server answered, what the session moved)
+//   habits.html EVENTS goals                          the five events' goals, equal to career/achievements.toml (through scripts/career_seed.py --json; in index mode
+//                                                     the toml, the seed script, the checker and the snapshot are cut from the INDEX, like habits.html)
+// `owned` is what get_profile()'s CORE answers since stage70's split: a LIST of award ids, sorted byte by byte, with no days. The cases keep the server's own record of each
+// athlete's owned awards as a map {id: day}; the phone is handed the ids in the core's shape (ownedAs()).
+const RW = JSON.parse(read('scripts/career/reward_cases.json'));
+const ownedAs = o => (Array.isArray(o) ? o.slice() : Object.keys(o || {})).sort();
+const H_AW = sandbox(null, ['awardId', 'awardCat', 'awardMeasures', 'phoneAwardsFrom'].map(n => fnSrc(H_SRC, n, 'habits.html')),
+  ['awardId', 'awardMeasures', 'phoneAwardsFrom']);
+const A_AW = sandbox(null, fromA('awardId', 'careerMoves'), ['awardId', 'careerMoves']);
+// Key order is not part of an answer: compare as sorted JSON.
+const canon = v => JSON.stringify(v, (k, x) => (x && typeof x === 'object' && !Array.isArray(x)) ? Object.keys(x).sort().reduce((o, y) => { o[y] = x[y]; return o; }, {}) : x);
+function expectCanon(label, input, got, want) {
+  checks++;
+  if (canon(got) !== canon(want)) failures.push(`${label}\n    input    ${J(input)}\n    got      ${canon(got)}\n    want     ${canon(want)}`);
+}
+run('Career Mode phase 3: the award id (habits.html awardId, program.html awardId / career_award_id)', () => {
+  checks++;
+  if (!Array.isArray(RW.ids) || RW.ids.length < 5) failures.push('scripts/career/reward_cases.json has no award id cases (rehearse_catalogue.mjs --write-cases)');
+  (RW.ids || []).forEach(c => {
+    expect('habits.html awardId', c.args, H_AW.awardId.apply(null, c.args), c.id);
+    expect('program.html awardId', c.args, A_AW.awardId.apply(null, c.args), c.id);
+  });
+});
+run('Career Mode phase 3: what the phone decides from its own log (habits.html awardMeasures, phoneAwardsFrom / career_evaluate, career_award_xp)', () => {
+  checks++;
+  if (!Array.isArray(RW.athletes) || RW.athletes.length < 3) failures.push('scripts/career/reward_cases.json has no athletes (rehearse_catalogue.mjs --write-cases)');
+  (RW.athletes || []).forEach(a => {
+    const inp = Object.assign({ targets: RW.rules.targets }, a.input);
+    const meas = H_AW.awardMeasures(inp, RW.catalogue);
+    expectCanon('awardMeasures: ' + a.id + ' (have, and the day each tier crossed)', { S: a.S, today: a.today }, meas, a.expect);
+    const got = H_AW.phoneAwardsFrom(meas, RW.catalogue, { S: a.S, today: a.today, backfill_days: RW.rules.backfill_days, owned: ownedAs(a.owned), withdrawn: [] });
+    expect('phoneAwardsFrom: ' + a.id + ' (pending awards: after S, in the window, not owned, priced by the server)', { S: a.S, today: a.today },
+      got.map(x => [x.award_id, x.xp, x.size, x.day]), (a.phone_awards || []).map(x => [x.award_id, x.xp, x.size, x.day]));
+    // A withdrawn id is never pending, and a day on or before the switch day is history: nothing for the phone to say.
+    const wd = got.length ? [got[0].award_id] : [];
+    expect('phoneAwardsFrom: ' + a.id + ' (a withdrawn id is left out)', wd, H_AW.phoneAwardsFrom(meas, RW.catalogue, { S: a.S, today: a.today, backfill_days: RW.rules.backfill_days, owned: ownedAs(a.owned), withdrawn: wd }).map(x => x.award_id),
+      got.slice(1).map(x => x.award_id));
+    expect('phoneAwardsFrom: ' + a.id + ' (nothing after a switch day in the future)', a.S, H_AW.phoneAwardsFrom(meas, RW.catalogue, { S: '2999-01-01', today: a.today, backfill_days: RW.rules.backfill_days, owned: [], withdrawn: [] }), []);
+  });
+});
+// What the cases cannot say, pinned by hand on made-up measures: the window and the switch day. (A crossing ON the switch day is history and the server owns it, so the
+// cases never leave one unowned: only this holds the phone's own `d > S`.)
+run('Career Mode phase 3: when an award is pending on the phone, pinned (habits.html phoneAwardsFrom / career_evaluate history rule)', () => {
+  const water = RW.catalogue.habit_water, t1 = water.tiers[0], size = t1.size || water.size || 'win';
+  const S = '2026-11-01', today = '2026-11-03';
+  const o = (extra) => Object.assign({ S, today, backfill_days: RW.rules.backfill_days, owned: [], withdrawn: [] }, extra || {});
+  const meas = d => ({ habit_water: { have: 5, crossed: { '1': d } } });
+  const ids = r => r.map(x => [x.award_id, x.xp, x.size, x.day]);
+  expect('phoneAwardsFrom: the switch day is history (d <= S): a crossing on it is not pending', S, H_AW.phoneAwardsFrom(meas(S), RW.catalogue, o()), []);
+  expect('phoneAwardsFrom: the day after the switch day is pending, at the price of its tier', '2026-11-02', ids(H_AW.phoneAwardsFrom(meas('2026-11-02'), RW.catalogue, o())), [['badge:habit_water:1', t1.xp, size, '2026-11-02']]);
+  expect('phoneAwardsFrom: a crossing older than the open window is settled, never pending', '2026-10-25', H_AW.phoneAwardsFrom(meas('2026-10-25'), RW.catalogue, o({ S: '2026-10-01' })), []);
+  expect('phoneAwardsFrom: a crossing in the future is not pending', '2026-11-04', H_AW.phoneAwardsFrom(meas('2026-11-04'), RW.catalogue, o()), []);
+  expect('phoneAwardsFrom: no switch day, no pending award', null, H_AW.phoneAwardsFrom(meas('2026-11-02'), RW.catalogue, o({ S: '' })), []);
+  expect('phoneAwardsFrom: an owned award is not pending', null, H_AW.phoneAwardsFrom(meas('2026-11-02'), RW.catalogue, o({ owned: ['badge:habit_water:1'] })), []);
+});
+// What the cases above cannot say: habit_breathe, habit_mobility, habit_supps, habit_custom, the_centurion, cold_blood and backbone never cross in the server's answers, and
+// no case reaches the top tiers. So every entry of that catalogue the phone decides is also run on a measure that grows BY HAND, one a day (one every other day for a count,
+// which a run is not), and held to the plain arithmetic of it: a measure that grows by one reaches `at` on day `at`. Nothing here copies the phone's code; the oracle is the
+// count of days. Every tier of every badge (on the day it is reached, and absent one short of the top), an achievement on a single measure, each goal of an event in turn the last
+// to finish and in turn one short, and the runs-together test with a late start and a broken run.
+run('Career Mode phase 3: every entry the phone decides, every tier, on a measure that grows by hand (habits.html awardMeasures; the cases never cross them all)', () => {
+  const D0 = Date.UTC(2026, 0, 1), DAYMS = 86400000, V = 5000;           // V: a day's steps in a `total` measure: under the 10,000 target (a total counts every number logged), and 200,000 and 250,000 are exact multiples, so a `>` for a `>=` shows
+  const dayAt = i => new Date(D0 + i * DAYMS).toISOString().slice(0, 10);
+  const T = RW.rules.targets;
+  const KINDS = { streak: 'run', daysHit: 'hits', total: 'sum', daysWith3: 'with3', perfectDays: 'perfect', perfect: 'perfect', qualify: 'qualify', comebackRun: 'comebackRun', comebacksStuck: 'comebacksStuck' };
+  const parse = s => { const p = String(s || '').split(':'); return KINDS[p[0]] ? { m: KINDS[p[0]], h: p[1] } : null; };
+  const LIST = { with3: 'with3', perfect: 'perfect', qualify: 'onTarget', comebacksStuck: 'stuck' };
+  const blank = () => ({ log: {}, onTarget: [], perfect: [], with3: [], comebacks: [], stuck: [], custom: [] });
+  // grow(spec, n, start): the phone's input for a measure that has grown n steps from day `start`, and the day it reached `need` (null if it never did)
+  function grow(sp, n, start) {
+    const inp = blank(), put = (i, hid, v) => { const k = dayAt(i); (inp.log[k] = inp.log[k] || {})[hid] = v; };
+    let at;
+    if (sp.m === 'run') { for (let i = 0; i < n; i++) put(start + i, sp.h, T[sp.h]); at = need => (need <= n ? start + need - 1 : null); }
+    else if (sp.m === 'hits') { for (let i = 0; i < n; i++) put(start + 2 * i, sp.h, T[sp.h]); at = need => (need <= n ? start + 2 * (need - 1) : null); }
+    else if (sp.m === 'sum') { for (let i = 0; i < n; i++) put(start + i, sp.h, V); at = need => { const c = Math.ceil(need / V); return c <= n ? start + c - 1 : null; }; }
+    else if (sp.m === 'daystreak') { for (let i = 0; i < n; i++) inp.onTarget.push(dayAt(start + i)); at = need => (need <= n ? start + need - 1 : null); }
+    else if (sp.m === 'comebackRun') { inp.comebacks.push({ day: dayAt(start), run: n }); at = need => (need <= n ? start + need - 1 : null); }
+    else { for (let i = 0; i < n; i++) inp[LIST[sp.m]].push(dayAt(start + 2 * i)); at = need => (need <= n ? start + 2 * (need - 1) : null); }
+    return { inp, at };
+  }
+  function merge(parts) {
+    const o = blank();
+    parts.forEach(p => {
+      Object.keys(p.log).forEach(k => Object.keys(p.log[k]).forEach(h => { o.log[k] = o.log[k] || {}; if (o.log[k][h] !== undefined) throw new Error('check_twins: two synthetic feeds write ' + h + ' on ' + k); o.log[k][h] = p.log[k][h]; }));
+      ['onTarget', 'perfect', 'with3', 'comebacks', 'stuck', 'custom'].forEach(f => { o[f] = o[f].concat(p[f] || []); });
+    });
+    return o;
+  }
+  const measure = (inp, cat) => H_AW.awardMeasures(Object.assign({ targets: T }, inp), cat);
+  const shortOf = (sp, need) => (sp.m === 'sum' ? Math.ceil(need / V) - 1 : need - 1);   // the last size that does not reach `need`
+  const fullOf = (sp, need) => (sp.m === 'sum' ? Math.ceil(need / V) + 3 : need + 3);    // a size that reaches it with a few steps to spare
+  const feedFor = (id, b) => {
+    if (b.kind === 'best_run' && b.habit) return { m: 'run', h: b.habit };
+    if (id === 'day_streak' || (b.proof_codes || []).indexOf('DAY_STREAK_MARKS') >= 0) return { m: 'daystreak' };
+    return parse(b.proof_measure);
+  };
+  Object.keys(RW.catalogue).sort().forEach(id => {
+    const b = RW.catalogue[id];
+    if (b.retire_at) return;
+    if (Array.isArray(b.tiers)) {
+      // a badge: every tier on the day it is reached; one short of the top tier, the top tier is absent
+      const sp = feedFor(id, b), last = Number(b.tiers[b.tiers.length - 1].at);
+      checks++;
+      if (!sp) { failures.push(`synthetic ${id}: no way to grow its measure here (kind ${b.kind}, ${b.proof_measure || b.habit}). Teach scripts/check_twins.js, and habits.html awardMeasures() if it cannot decide it.`); return; }
+      [last + 3, last - 1].forEach(n => {
+        let inp, at;
+        if (id === 'habit_custom') {
+          // two habits of the player's own: the first holds a 7-day run early, the second runs n days from day 20. The badge is the BEST custom habit (D6): a tier is reached
+          // on the first day any one of them reaches it, never on the sum of the two.
+          const mk = (hid, len, st) => { const x = blank(); for (let i = 0; i < len; i++) { const k = dayAt(st + i); (x.log[k] = x.log[k] || {})[hid] = 1; } x.custom = [hid]; return x; };
+          inp = merge([mk('c_a', 7, 0), mk('c_b', n, 20)]);
+          at = need => { const d = [need <= 7 ? need - 1 : null, need <= n ? 20 + need - 1 : null].filter(x => x !== null); return d.length ? Math.min.apply(null, d) : null; };
+        } else { const g = grow(sp, n, 0); inp = g.inp; at = g.at; }
+        const want = { have: id === 'habit_custom' ? Math.max(7, n) : n, crossed: {} };
+        b.tiers.forEach((t, j) => { const d = at(Number(t.at)); if (d !== null) want.crossed[String(j + 1)] = dayAt(d); });
+        expectCanon(`synthetic ${id} (a measure that grows to ${n}; tiers at ${b.tiers.map(t => t.at).join(', ')})`, { n }, measure(inp, { badge: { [id]: b } })[id], want);
+      });
+      return;
+    }
+    // an achievement
+    if (b.test === 'runs_together') {
+      const R = Number(b.run), hs = b.habits;
+      const feed = (h, len, start, gapAfter) => { const x = blank(); for (let i = 0; i < len; i++) { const k = dayAt(start + i + (gapAfter !== undefined && i > gapAfter ? 1 : 0)); x.log[k] = { [h]: T[h] }; } return x; };
+      const all = (over) => merge(hs.map(h => feed(h, (over[h] || {}).len == null ? R + 15 : over[h].len, (over[h] || {}).start || 0, (over[h] || {}).gap)));
+      checks++;
+      expectCanon(`synthetic ${id} (every habit on a ${R}-day run together: the day the last one reaches ${R})`, null, measure(all({}), { achievement: { [id]: b } })[id], dayAt(R - 1));
+      hs.forEach(h => {
+        expectCanon(`synthetic ${id} (${h} starts ten days late: the day IT reaches ${R})`, h, measure(all({ [h]: { start: 10 } }), { achievement: { [id]: b } })[id], dayAt(10 + R - 1));
+        expectCanon(`synthetic ${id} (${h} one day short of ${R}: not earned)`, h, measure(all({ [h]: { len: R - 1 } }), { achievement: { [id]: b } })[id], null);
+        expectCanon(`synthetic ${id} (${h} broken by a missed day, never ${R} in a row: not earned)`, h, measure(all({ [h]: { len: 2 * (R - 1), gap: R - 2 } }), { achievement: { [id]: b } })[id], null);
+      });
+      return;
+    }
+    const goals = b.test === 'goals' ? (b.goals || []).map(g => ({ sp: parse(g.kind), need: Number(g.need), kind: g.kind })) : (b.proof_measure && b.proof_need != null ? [{ sp: parse(b.proof_measure), need: Number(b.proof_need), kind: b.proof_measure }] : []);
+    checks++;
+    if (!goals.length || goals.some(g => !g.sp)) { failures.push(`synthetic ${id}: no way to grow its measure here (test ${b.test}). Teach scripts/check_twins.js, and habits.html awardMeasures() if it cannot decide it.`); return; }
+    const cat = { achievement: { [id]: b } };
+    // each goal in turn is the last to finish (forty days late): the achievement's day is the day that goal reaches its need
+    goals.forEach((g, last) => {
+      const parts = goals.map((x, i) => grow(x.sp, fullOf(x.sp, x.need), i === last ? 40 : 0));
+      const days = parts.map((p, i) => p.at(goals[i].need));
+      expectCanon(`synthetic ${id} (${g.kind} finishes last: the day it reaches ${g.need})`, g.kind, measure(merge(parts.map(p => p.inp)), cat)[id], dayAt(Math.max.apply(null, days)));
+    });
+    // each goal in turn one short of its need: not earned
+    goals.forEach((g, short) => {
+      const parts = goals.map((x, i) => grow(x.sp, i === short ? shortOf(x.sp, x.need) : fullOf(x.sp, x.need), 0));
+      expectCanon(`synthetic ${id} (${g.kind} one short of ${g.need}: not earned)`, g.kind, measure(merge(parts.map(p => p.inp)), cat)[id], null);
+    });
+  });
+});
+run('Career Mode phase 3: the finish card\'s lines (program.html careerMoves / the ladder get_profile() answers)', () => {
+  checks++;
+  if (!Array.isArray(RW.moves) || RW.moves.length < 6) failures.push('scripts/career/reward_cases.json has no moves cases (rehearse_catalogue.mjs --write-cases)');
+  (RW.moves || []).forEach((c, i) => expect('careerMoves #' + i, c.e, A_AW.careerMoves(c.e, c.ladder), c.expect));
+  // Pinned by hand, what the cases cannot tell apart: a run badge (Hold Serve) counts from the run so far (`now`), not from its best (`have`); a week ladder moves only
+  // when the session closes its week or cycle; Century counts a session finished early under its own fact.
+  const LAD = {
+    held_weeks: { name: 'Hold Serve', have: 7, now: 2, next: 8, phone: 'week', counts: ['week_held'] },
+    love_hold: { name: 'Love Hold', have: 3, next: 5, phone: 'week', counts: ['week_by_the_book'] },
+    finisher: { name: 'Closer', have: 0, next: 1, phone: 'week', counts: ['cycle_finished'] },
+    century: { name: 'Century', have: 24, next: 25, phone: 'session', counts: ['session_finished', 'session_finished_early'] },
+    early_only: { name: 'Early Bird', have: 4, next: 5, phone: 'session', counts: ['session_finished_early'] },
+  };
+  const none = { early: false, fullLog: false, checkin: false, weekCloses: false, cycleCloses: false };
+  const brief = r => r.lines.map(l => [l.id, l.have, l.next, l.crossed, l.pending].join(' ')).concat(r.more ? ['more ' + r.more] : []);
+  expect('careerMoves, pinned: a run badge counts from the run so far, not from its best (now 2, so 3 of 8, pending)', 'weekCloses', brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true }), { held_weeks: LAD.held_weeks })), ['held_weeks 3 8 false true']);
+  expect('careerMoves, pinned: a week ladder does not move while the week stays open', 'no weekCloses', brief(A_AW.careerMoves(none, { held_weeks: LAD.held_weeks, love_hold: LAD.love_hold, finisher: LAD.finisher })), []);
+  expect('careerMoves, pinned: the last session of a cycle moves Closer (and a week closing alongside it)', 'cycleCloses', brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, cycleCloses: true }), { finisher: LAD.finisher })), ['finisher 1 1 true true']);
+  expect('careerMoves, pinned: a session finished early moves its own ladder and not the finished one', 'early', brief(A_AW.careerMoves(Object.assign({}, none, { early: true }), { century: LAD.century, early_only: LAD.early_only })).sort(), ['century 25 25 true false', 'early_only 5 5 true false']);
+  expect('careerMoves, pinned: a session finished in full moves the finished ladders only', 'not early', brief(A_AW.careerMoves(none, { century: LAD.century, early_only: LAD.early_only })), ['century 25 25 true false']);
+  expect('careerMoves, pinned: Love Hold needs a session logged in full and checked in, or the byBook the caller knows', 'byBook', [
+    brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, fullLog: true, checkin: true }), { love_hold: LAD.love_hold })),
+    brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, fullLog: true, checkin: true, byBook: false }), { love_hold: LAD.love_hold })),
+    brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, byBook: true }), { love_hold: LAD.love_hold }))],
+    [['love_hold 4 5 false true'], [], ['love_hold 4 5 false true']]);
+  // Something the cases cannot say: no ladder, no session, an entry on its top tier (next missing) all move nothing.
+  expect('careerMoves: no ladder', null, A_AW.careerMoves({ early: false, fullLog: true, checkin: true }, null), { lines: [], more: 0 });
+  expect('careerMoves: no session facts', null, A_AW.careerMoves(null, (RW.moves[0] || {}).ladder || {}), { lines: [], more: 0 });
+});
+run('Career Mode phase 3: the five events\' goals (habits.html EVENTS / career/achievements.toml)', () => {
+  const H_EV = sandbox(null, [constSrc(H_SRC, 'EVENTS', 'habits.html')], ['EVENTS']);
+  const seed = catalogueSeed();
+  if (!seed) bail('could not run   python scripts/career_seed.py --json   (needed to hold habits.html EVENTS to career/achievements.toml)');
+  const evs = seed.catalogue.filter(r => r.kind === 'achievement' && r.body && r.body.test === 'goals');
+  expect('every event achievement has an EVENTS twin and the other way round', null, evs.map(r => r.body.proof_code).sort(), H_EV.EVENTS.map(e => e.id).sort());
+  H_EV.EVENTS.forEach(ev => {
+    const row = evs.find(r => r.body.proof_code === ev.id);
+    if (!row) return;
+    expect('EVENTS goals vs achievements.toml: ' + ev.id, ev.id, ev.goals.map(g => ({ kind: g.kind, need: g.need })), row.body.goals.map(g => ({ kind: g.kind, need: g.need })));
+  });
+});
+
 /* ── report ───────────────────────────────────────────────────────────────── */
 if (failures.length || chipsFailures.length) {
   console.error('\ncheck_twins: ' + (failures.length + chipsFailures.length) + ' problem' + (failures.length + chipsFailures.length === 1 ? '' : 's') + ' (of ' + checks + ' checks):\n');
-  failures.slice(0, 12).forEach(f => console.error('  ✗ ' + f + '\n'));
-  if (failures.length > 12) console.error('  … and ' + (failures.length - 12) + ' more\n');
+  failures.slice(0, 40).forEach(f => console.error('  ✗ ' + f + '\n'));
+  if (failures.length > 40) console.error('  … and ' + (failures.length - 40) + ' more\n');
   chipsFailures.forEach(f => console.error('  ✗ ' + f + '\n'));
   if (failures.length) console.error('coach.html and program.html hold one rule in two copies. Change BOTH (or, if the difference is intended, say so in this script\'s header).');
   process.exit(1);

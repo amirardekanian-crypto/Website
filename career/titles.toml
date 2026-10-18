@@ -90,6 +90,7 @@ name = "GRAND SLAM"
 meaning = "all"
 from = "one title from each of the four meanings; level titles don't count (PROCEDURES.md → P5)"
 metal = "prismatic"
+size = "legend"
 origin = "new"
 
 [title.amirs_pick]

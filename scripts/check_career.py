@@ -36,6 +36,12 @@ ERRORS (exit 1)
       the day it was turned on (YYYY-MM-DD); the catalogue switch needs the XP switch, on the same day or after it. A fact
       paid from its own value (xp_from = "value": the level kept at the XP switch) has meaning "carried" and
       career_only = true, so a stored number never reaches a season's points; "carried" is for such a fact only
+  17  best_run badges (phase 3): run is plan_weeks (counts week_held), days (counts habit_done, with a habit) or iso_weeks
+  18  achievements (phase 3): test is one of eleven, with exactly that test's own keys (goals, habits, run, at, groups, bests,
+      retests, away_weeks, proof_measure + proof_need)
+  19  a title's size only on the Grand Slam (meaning "all"), one of the sizes; recognition.toml [moments] has its keys
+  21  tiers are APPEND-ONLY once career/tiers.lock.json exists: an entry in the lock keeps its first tiers' metals and is never
+      removed (a tier's place in the list is its award's id)
 WARNINGS (exit 0)
    6  a title with origin "new" that nothing awards (unless it is a template, or its meaning is "all": the engine
       mints the Grand Slam)
@@ -44,6 +50,9 @@ WARNINGS (exit 0)
   12  an unknown key inside an entry (a typo would otherwise be silently ignored); also an id that is not snake_case
       and an unknown top-level key (a mistyped [table] would silently drop its entries from every check above)
   14  the Proof snapshot is missing or unreadable, so the parity check could not run
+  20  the gates agree: every starts_at entry is named by a retired entry's superseded_by (or is a listed new one), a pair
+      shares a meaning (heavy_metal -> held_weeks excepted), history_twin_counts sits on a starts_at entry that counts that kind
+  21  a badge that is not in tiers.lock.json yet (run python scripts/career_seed.py --write-lock)
 
 Standard library only. Python 3.11+ (tomllib).
 
@@ -69,6 +78,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 DEFAULT_FOLDER = ROOT / "career"
 
 FILES = ["rulebook", "badges", "achievements", "titles", "missions", "quests", "recognition"]
+LOCK_FILE = "tiers.lock.json"   # rule 21: {badge id: [the metal of tier 1, tier 2, ...]}, written by career_seed.py --write-lock
 
 # The words the files may use.
 MEANINGS = ["consistency", "commitment", "progress", "resilience"]
@@ -77,6 +87,19 @@ METALS = ["bronze", "silver", "emerald", "amethyst", "prismatic"]      # low to 
 SLOTS = ["plan", "recovery", "stretch", "crew"]
 DOORS = ["coach", "cycle", "athlete"]
 ORIGINS = ["new", "proof"]
+RUNS = ["plan_weeks", "days", "iso_weeks"]    # rule 17: what a best_run badge's "run" is
+ACHIEVEMENT_TESTS = ["first", "proof", "goals", "cycle_all_held", "cycle_by_the_book", "cycle_with_broken", "runs_together",
+                      "best_value", "patterns_in_cycle", "cycle_proving", "run_regained"]
+# Rule 18: the keys each test carries, and no others (a stray one is an error).
+TEST_PARAMS = {"first": set(), "proof": {"proof_measure", "proof_need"}, "goals": {"goals"}, "cycle_all_held": set(),
+               "cycle_by_the_book": set(), "cycle_with_broken": set(), "runs_together": {"habits", "run"},
+               "best_value": {"at"}, "patterns_in_cycle": {"groups"}, "cycle_proving": {"bests", "retests"},
+               "run_regained": {"away_weeks"}}
+PARAM_KEYS = set().union(*TEST_PARAMS.values())
+GOAL_KINDS = ["daysHit:<habit>", "total:<habit>", "qualify", "perfect", "comebacksStuck", "comebackRun"]
+MOMENT_KEYS = ["per_open", "keep_days", "max", "full_screen"]
+NO_TWIN_OK = {"habit_custom"}   # rule 20: a starts_at entry that is new and has no Proof twin to retire
+SAME_MEANING_EXCEPTIONS = {("heavy_metal", "held_weeks")}   # rule 20: a pair whose meanings differ on purpose
 SOURCES = ["training", "proof", "coach", "server"]
 PAYS_FOR = ["act", "progress", "nothing"]
 XP_FROM = ["habits", "mission", "quest", "share.mission_sweep", "value"]   # "value": the fact's own value.xp
@@ -106,11 +129,12 @@ KNOWN_KEYS = {
     "fact": {"meaning", "xp", "xp_from", "source", "pays_for", "when", "cap", "min_share", "limit", "limit_per",
              "weeks_away", "window_days", "min_gain", "career_only"},
     "badge": {"name", "meaning", "kind", "counts", "habit", "proof_codes", "caption", "free", "origin", "tiers",
-              "retire_at", "starts_at", "superseded_by"},
+              "retire_at", "starts_at", "superseded_by", "run", "history_twin_counts"},
     "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},
     "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code",
-                    "retire_at", "starts_at", "superseded_by"},
-    "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id", "retire_at", "superseded_by"},
+                    "retire_at", "starts_at", "superseded_by", "test", "goals", "habits", "run", "at", "groups", "bests",
+                    "retests", "away_weeks", "proof_measure", "proof_need"},
+    "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id", "retire_at", "superseded_by", "size"},
     "skin": {"name", "from", "origin", "proof_id"},
     "mission": {"name", "slot", "meaning", "asks", "counts", "habit", "measure", "target", "picked_when", "free",
                 "origin", "proof_id", "proof_xp", "retire_at", "superseded_by"},
@@ -125,7 +149,7 @@ TOP_LEVEL_KEYS = {
     "titles": {"title", "skin"},
     "missions": {"mission"},
     "quests": {"quest"},
-    "recognition": {"sizes", "size", "courtside", "bell", "tool", "message", "feedback"},
+    "recognition": {"sizes", "size", "courtside", "bell", "tool", "message", "feedback", "moments"},
 }
 
 
@@ -591,6 +615,26 @@ def check_tiers(c, b, kind, w):
         warn_unknown(tc, t, "tier")
 
 
+def check_run(c, b, kind, counts):
+    """Rule 17. A best_run badge says what a run is: plan_weeks (the plan's own weeks held in a row: counts week_held), days
+    (days in a row a habit is done: counts habit_done, with a habit) or iso_weeks (calendar weeks in a row holding the fact).
+    Other kinds carry no run."""
+    if kind != "best_run":
+        if "run" in b:
+            c.error(f'run is for kind "best_run" only (rule 17), found it on kind {kind!r}')
+        return
+    run = b.get("run")
+    if run not in RUNS:
+        c.error(f"a best_run badge needs run = one of {', '.join(RUNS)}, found {run!r} (rule 17)")
+    elif run == "days":
+        if counts != ["habit_done"]:
+            c.error('run "days" needs counts = "habit_done" (rule 17)')
+        if not is_text(b.get("habit")):
+            c.error('run "days" needs habit: the habit whose days in a row it counts (rule 17)')
+    elif run == "plan_weeks" and counts != ["week_held"]:
+        c.error('run "plan_weeks" needs counts = "week_held" (rule 17)')
+
+
 def check_badges(data, w, rep):
     f = "badges.toml"
     badges = entries(data, "badge", f, rep)
@@ -622,11 +666,82 @@ def check_badges(data, w, rep):
                         c.error(f"counts {fid!r} is not a fact in rulebook.toml")
         check_tiers(c, b, kind, w)
         check_habit_ref(c, b, w)
+        check_run(c, b, kind, counts)
         check_gates(c, b, bid, [(set(badges), "a badge in badges.toml")])
         warn_unknown(c, b, "badge")
 
 
 # ── Rule 5: achievements ──────────────────────────────────────────────────────────────────────────────────────────
+
+def check_goals(c, goals, w):
+    if not (isinstance(goals, list) and goals and all(isinstance(g, dict) for g in goals)):
+        c.error('test "goals" needs goals = a non-empty list of { kind, need } tables (rule 18)')
+        return
+    habits = [h for h in (w.weights or []) if h != "custom"]
+    for i, g in enumerate(goals, 1):
+        gc = c.sub(f"goal {i}: ")
+        if not proof_rule_ok(g.get("kind"), GOAL_KINDS, habits):
+            gc.error(f"kind {g.get('kind')!r} is not one of {', '.join(GOAL_KINDS)} (<habit> is a habit in [habits.weights])")
+        get_number(gc, g, "need", gt=0)
+        for key in g:
+            if key not in ("kind", "need"):
+                gc.warn(f"unknown key {key!r} (a typo? it is ignored)")
+
+
+def check_test(c, a, w):
+    """Rule 18. Every achievement says how the server decides it: test is one of eleven, and it carries exactly that test's
+    keys (the params of another test, or a missing one, is an error)."""
+    test = a.get("test")
+    if test not in ACHIEVEMENT_TESTS:
+        c.error(f"test {test!r} is not one of {', '.join(ACHIEVEMENT_TESTS)} (rule 18)" if "test" in a
+                else f"test is missing: one of {', '.join(ACHIEVEMENT_TESTS)} (rule 18)")
+        return
+    want = TEST_PARAMS[test]
+    for key in sorted(want - set(a)):
+        c.error(f'test "{test}" needs {key} (rule 18)')
+    for key in sorted((PARAM_KEYS & set(a)) - want):
+        c.error(f'{key} belongs to another test, not to test "{test}" (rule 18)')
+    reads = a.get("reads")
+    if test == "first" and (reads == "proof" or (w.facts is not None and reads not in w.facts)):
+        c.error('test "first" reads a fact from rulebook.toml (reads is the fact whose first one counts) (rule 18)')
+    if test == "proof" and reads != "proof":
+        c.error('test "proof" needs reads = "proof" (rule 18)')
+    if test == "best_value" and reads != "lift_gain":
+        c.error('test "best_value" reads the fact lift_gain (rule 18)')
+    if test == "goals":
+        if "goals" in a:
+            check_goals(c, a["goals"], w)
+    elif test == "proof":
+        pass   # proof_measure and proof_need are held to Proof's list by rule 13
+    elif test == "runs_together":
+        hs = a.get("habits")
+        known = [h for h in (w.weights or []) if h != "custom"]
+        if "habits" in a and not (isinstance(hs, list) and hs and all(is_text(h) for h in hs)):
+            c.error(f"habits must be a non-empty list of habits, found {hs!r} (rule 18)")
+        elif isinstance(hs, list):
+            for h in hs:
+                if w.weights is not None and h not in known:
+                    c.error(f"habits names {h!r}, which is not a habit in [habits.weights] (rule 18)")
+        if "run" in a:
+            get_number(c, a, "run", gt=0, integer=True)
+    elif test == "best_value":
+        if "at" in a:
+            get_number(c, a, "at", gt=0)
+    elif test == "patterns_in_cycle":
+        g = a.get("groups")
+        if "groups" in a and not (isinstance(g, dict) and g and all(
+                isinstance(v, list) and v and all(is_text(x) for x in v) for v in g.values())):
+            c.error("groups must be a table of non-empty lists of Spine patterns, such as "
+                    '{ squat = ["squat"], push = ["push-horizontal", "push-vertical"] } (rule 18)')
+    elif test == "cycle_proving":
+        if "bests" in a:
+            get_number(c, a, "bests", ge=1, integer=True)
+        if "retests" in a:
+            get_number(c, a, "retests", ge=0, integer=True)
+    elif test == "run_regained":
+        if "away_weeks" in a:
+            get_number(c, a, "away_weeks", ge=1, integer=True)
+
 
 def check_achievements(data, w, rep):
     f = "achievements.toml"
@@ -651,6 +766,7 @@ def check_achievements(data, w, rep):
         get_bool(c, a, "free")
         get_choice(c, a, "origin", ORIGINS)
         check_title_ref(c, a, w)
+        check_test(c, a, w)
         check_gates(c, a, aid, [(set(achievements), "an achievement in achievements.toml"),
                                 (w.badge_ids, "a badge in badges.toml")])
         warn_unknown(c, a, "achievement")
@@ -669,6 +785,12 @@ def check_titles(data, w, rep):
         get_choice(c, t, "metal", METALS, note="; no gold, ever")
         get_choice(c, t, "origin", ORIGINS)
         check_gates(c, t, tid, [(set(w.title_entries), "a title in titles.toml")])
+        if "size" in t:
+            if t.get("meaning") != "all":
+                c.error('size is for the Grand Slam (meaning "all") only: every other title is as big as the award that '
+                        "mints it (rule 19)")
+            elif t["size"] not in SIZES:
+                c.error(f"size {t['size']!r} is not one of {', '.join(SIZES)} (rule 19)")
         warn_unknown(c, t, "title")
     for sid, s in entries(data, "skin", f, rep).items():
         c = Ctx(rep, f, f"skin.{sid}")
@@ -771,6 +893,20 @@ def check_recognition(rec, w, rep):
         for who in SIZE_AUDIENCES:
             get_text(c, body, who)
 
+    c = Ctx(rep, f, "moments")
+    moments = rec.get("moments")
+    if isinstance(moments, dict):
+        get_number(c, moments, "per_open", ge=1, integer=True)
+        get_number(c, moments, "keep_days", ge=1, integer=True)
+        get_number(c, moments, "max", ge=1, integer=True)
+        fs = moments.get("full_screen")
+        if not (isinstance(fs, list) and fs and all(isinstance(x, str) and x in SIZES for x in fs)):
+            c.error(f"full_screen must be a non-empty list drawn from {', '.join(SIZES)}, found {fs!r} (rule 19)")
+        for key in moments:
+            if key not in MOMENT_KEYS:
+                c.warn(f"unknown key {key!r} (a typo? it is ignored)")
+    else:
+        c.error("the [moments] table is missing (per_open, keep_days, max, full_screen) (rule 19)")
     c = Ctx(rep, f, "courtside")
     courtside = rec.get("courtside")
     if isinstance(courtside, dict):
@@ -1023,6 +1159,102 @@ def check_proof_parity(data, rep, snapshot=None):
                                                    f"all match")
 
 
+# ── Rule 20: the gates agree ──────────────────────────────────────────────────────────────────────────────────────────
+
+def check_gate_agreement(data, rep):
+    """Rule 20 (warnings). Every starts_at entry is named in some retired entry's superseded_by (it takes its place), or is a
+    new entry with no Proof twin (NO_TWIN_OK). A superseding pair shares a meaning (SAME_MEANING_EXCEPTIONS lists the one
+    that does not). history_twin_counts sits only on a starts_at entry whose counts include the kind it names."""
+    shelves = [("badges.toml", "badge", (data["badges"] or {}).get("badge")),
+               ("achievements.toml", "achievement", (data["achievements"] or {}).get("achievement")),
+               ("titles.toml", "title", (data["titles"] or {}).get("title")),
+               ("missions.toml", "mission", (data["missions"] or {}).get("mission"))]
+    shelves = [(f, k, s) for f, k, s in shelves if isinstance(s, dict)]
+    meaning_of = {}
+    named = set()
+    for f, k, s in shelves:
+        for ident, e in s.items():
+            if isinstance(e, dict):
+                meaning_of.setdefault(ident, e.get("meaning"))
+    for f, k, s in shelves:
+        for ident, e in s.items():
+            if not isinstance(e, dict) or "retire_at" not in e:
+                continue
+            raw = e.get("superseded_by")
+            for name in ([raw] if is_text(raw) else raw if isinstance(raw, list) else []):
+                if not is_text(name):
+                    continue
+                named.add(name)
+                if ((ident, name) not in SAME_MEANING_EXCEPTIONS and name in meaning_of
+                        and meaning_of[name] != e.get("meaning") and is_text(e.get("meaning"))):
+                    rep.warn(f, f"{k}.{ident}", f"{ident} ({e.get('meaning')}) is superseded by {name} "
+                                                f"({meaning_of[name]}): a pair shares a meaning (rule 20)")
+    for f, k, s in shelves:
+        for ident, e in s.items():
+            if not isinstance(e, dict):
+                continue
+            if "starts_at" in e and ident not in named and ident not in NO_TWIN_OK:
+                rep.warn(f, f"{k}.{ident}", "starts_at at the catalogue switch, but no retired entry names it in "
+                                           "superseded_by: name it there, or it is new with no Proof twin (rule 20)")
+            if "history_twin_counts" in e:
+                twin = e["history_twin_counts"]
+                counts = e.get("counts")
+                counts = [counts] if is_text(counts) else counts if isinstance(counts, list) else []
+                if "starts_at" not in e:
+                    rep.warn(f, f"{k}.{ident}", "history_twin_counts is for a starts_at entry only (rule 20)")
+                elif not is_text(twin) or twin not in counts:
+                    rep.warn(f, f"{k}.{ident}", f"history_twin_counts {twin!r} must be a fact its counts include "
+                                               f"({', '.join(counts) or 'no counts'}) (rule 20)")
+
+
+# ── Rule 21: tiers are append-only ────────────────────────────────────────────────────────────────────────────────────
+
+def tier_metals(badge):
+    tiers = badge.get("tiers") if isinstance(badge, dict) else None
+    return [t.get("metal") for t in tiers if isinstance(t, dict)] if isinstance(tiers, list) else []
+
+
+def check_tier_lock(folder, data, rep):
+    """Rule 21. career/tiers.lock.json is {badge id: [metal of tier 1, tier 2, ...]}. An award's id holds its tier's place in
+    the list (badge:<item>:<tier>), so once the lock exists a tier is never inserted, reordered or removed, and an id is never
+    removed. at and xp may change. No lock: nothing to hold (the lock is written by career_seed.py --write-lock)."""
+    path = pathlib.Path(folder) / LOCK_FILE
+    if not path.exists():
+        return
+    f = LOCK_FILE
+    try:
+        lock = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        rep.error(f, None, f"cannot be read: {exc}")
+        return
+    if not (isinstance(lock, dict) and all(isinstance(v, list) and all(isinstance(m, str) for m in v)
+                                          for v in lock.values())):
+        rep.error(f, None, 'must be an object of lists of metals, such as {"held_weeks": ["bronze", "silver"]}')
+        return
+    if data["badges"] is None:
+        return
+    badges = data["badges"].get("badge")
+    badges = badges if isinstance(badges, dict) else {}
+    why = "a tier's place is its award's id: insert a tier at the end, never in the middle"
+    for ident, metals in lock.items():
+        c = Ctx(rep, f, f"badge.{ident}")
+        if ident not in badges:
+            c.error(f"is in the lock but not in badges.toml: an id is never removed ({why})")
+            continue
+        now = tier_metals(badges[ident])
+        if len(now) < len(metals):
+            c.error(f"has {len(now)} tier(s), the lock holds {len(metals)}: a tier is never removed ({why})")
+            continue
+        for i, (a, b) in enumerate(zip(metals, now), 1):
+            if a != b:
+                c.error(f"tier {i} is {b!r} but the lock holds {a!r}: {why}")
+                break
+    for ident in badges:
+        if ident not in lock:
+            rep.warn(f, f"badge.{ident}", "is not in the tiers lock yet: run python scripts/career_seed.py --write-lock "
+                                         "(rule 21)")
+
+
 # ── The run, and the summary ──────────────────────────────────────────────────────────────────────────────────────
 
 def check_folder(folder):
@@ -1048,6 +1280,8 @@ def check_folder(folder):
     check_brand(data, rep)
     check_coverage(data, w, rep)
     check_proof_fields(data, w, rep)
+    check_gate_agreement(data, rep)
+    check_tier_lock(folder, data, rep)
     if all(data[stem] is not None for stem in ("rulebook", "badges", "achievements", "missions")):
         check_proof_parity(data, rep)
     return rep, data

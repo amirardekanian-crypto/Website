@@ -1,0 +1,344 @@
+<title>Split Step</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Barlow+Condensed:wght@700;900&family=Space+Mono:wght@700&display=swap">
+<style>
+  /* Layout: the app's rest screen, in a phone, beside the game developer's notes; one column on a phone.
+     The phone keeps the app's own greens in both themes (it is a picture of the app); the page around it follows the viewer. */
+  /* --app-mint is lighter than the app's own #6DBE95 so 12 px mint text passes 4.5:1 across this page's whole hero gradient */
+  :root {
+    --paper: #FAF7F2; --sand: #F1ECE3; --row: #FFFFFF; --hair: #E4DDD1; --ink: #1A1A1A; --grey: #5C5C5C;
+    --green: #0E4A36; --green-ink: #0E4A36; --clay: #C7552F; --clay-ink: #B5461F; --mint: #6DBE95; --chip-on: #0E4A36; --chip-on-ink: #FFFFFF;
+    --app-deep: #082D20; --app-mint: #7FD6AE; --app-white: #FFFFFF; --app-glass: rgba(0,0,0,.22); --app-edge: rgba(255,255,255,.45);
+    --app-hero: radial-gradient(125% 90% at 100% 0%, #1B7254 0%, #0E4A36 46%, #082D20 100%);
+    --app-tile: radial-gradient(120% 150% at 0% 0%, #24855F 0%, #16603F 52%, #0E4A36 100%);
+    --bezel: #121714; --bezel-edge: #2B322E;
+    --display: 'Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif;
+    --body: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'Space Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #161816; --sand: #1F2220; --row: #232624; --hair: #2E3330; --ink: #EDEDED; --grey: #A3A3A3;
+      --green-ink: #6DBE95; --clay-ink: #E06B43; --chip-on: #6DBE95; --chip-on-ink: #0B2219; --bezel: #050706; --bezel-edge: #3A433E; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #161816; --sand: #1F2220; --row: #232624; --hair: #2E3330; --ink: #EDEDED; --grey: #A3A3A3;
+    --green-ink: #6DBE95; --clay-ink: #E06B43; --chip-on: #6DBE95; --chip-on-ink: #0B2219; --bezel: #050706; --bezel-edge: #3A433E; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 500 16px/1.55 var(--body); -webkit-text-size-adjust: 100%; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; }
+
+  .intro { display: grid; gap: 6px; margin-bottom: 26px; }
+  .eye { font: 700 12px/1.4 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  .eye::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: var(--mint); vertical-align: 1px; }
+  h1 { margin: 0; font: 900 clamp(44px, 9vw, 76px)/0.92 var(--display); text-transform: uppercase; letter-spacing: -0.5px; text-wrap: balance; }
+  .lead { margin: 4px 0 0; max-width: 60ch; font-size: 18px; color: var(--grey); }
+  .lead b { color: var(--ink); }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  @media (min-width: 980px) { .grid { grid-template-columns: 410px minmax(0, 1fr); gap: 56px; align-items: start; } .stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); } }
+
+  /* ── The phone: the app's rest timer (program.html's timer overlay, list mode) and, over it, the game's layer ── */
+  .phone { position: relative; width: min(390px, 100%); height: clamp(560px, calc(100svh - 150px), 780px); margin: 0 auto; overflow: hidden; isolation: isolate;
+    border-radius: 30px; background: var(--app-deep); box-shadow: 0 0 0 8px var(--bezel), 0 0 0 9px var(--bezel-edge), 0 40px 70px -40px rgba(0,0,0,.55); }
+  @media (max-width: 520px) { .phone { border-radius: 18px; box-shadow: none; height: clamp(540px, calc(100svh - 96px), 760px); } }
+  .rest { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 10px 20px 20px; background: var(--app-hero); color: var(--app-white); }
+  .rest-top { align-self: stretch; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; column-gap: 8px; min-height: 44px; margin: 0 -12px; }
+  .glass { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; color: var(--app-white); background: var(--app-glass); font: 500 20px/1 var(--body); }
+  .glass svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .glass .off { display: none; } .glass[aria-pressed="false"] .on { display: none; } .glass[aria-pressed="false"] .off { display: inline; }
+  .rest-eye { min-width: 0; text-align: center; font: 700 12px/1.4 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+  .rest-eye .lbl { color: var(--app-mint); }
+  .rest-eye .lbl::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: var(--app-mint); vertical-align: 1px; }
+  .ring { position: relative; width: min(220px, 56vw); aspect-ratio: 1; max-width: 100%; margin: auto 0 0; display: grid; place-items: center; }
+  .ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 5; }
+  .ring .bg { stroke: rgba(255,255,255,.2); }
+  .ring .pr { stroke: var(--app-mint); stroke-linecap: round; transition: stroke-dashoffset .25s linear; }
+  .digits { position: relative; font: 900 clamp(64px, 22vw, 92px)/1 var(--display); letter-spacing: -2px; font-variant-numeric: tabular-nums; }
+  .digits.go { color: var(--app-mint); letter-spacing: 0; }
+  .ctrls { display: flex; gap: 10px; width: min(350px, 100%); margin: 22px 0 0; }
+  .cbtn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; min-height: 52px; flex: 1 1 0; padding: 0 10px; border: 0; border-radius: 8px; cursor: pointer;
+    color: var(--app-white); background: transparent; box-shadow: inset 0 0 0 1.5px var(--app-edge); font: 700 17px/1 var(--display); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+  .cbtn.main { flex: 1.6 1 0; min-height: 60px; background: var(--app-tile); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.55), 0 10px 22px -10px rgba(0,0,0,.6); }
+  .cbtn.main::before { content: ''; flex: none; }
+  .cbtn.main[data-sym="play"]::before { width: 0; height: 0; border-style: solid; border-width: 6px 0 6px 9px; border-color: transparent transparent transparent var(--app-mint); }
+  .cbtn.main[data-sym="pause"]::before { width: 3px; height: 12px; margin-right: 5px; border-radius: 1px; background: var(--app-mint); box-shadow: 5px 0 0 var(--app-mint); }
+  .cbtn:active, .door:active { transform: scale(0.97); }
+  .door { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; margin: 16px 0 auto; padding: 0 18px; border: 0; border-radius: 999px; cursor: pointer;
+    color: var(--app-white); background: var(--app-glass); box-shadow: inset 0 0 0 1px rgba(255,255,255,.3); font: 700 16px/1 var(--body); white-space: nowrap; max-width: 100%; }
+  .door .sub { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  @media (max-width: 359px) { .door .sub { display: none; } }
+  .door .ball { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--app-white); box-shadow: 0 0 0 3px rgba(127,214,174,.45); }
+  .door .sub { font-weight: 500; color: rgba(255,255,255,.75); }
+  .rest-foot { margin: 14px 0 0; max-width: 30ch; text-align: center; font: 500 13px/1.4 var(--body); color: rgba(255,255,255,.7); }
+  .glass:focus-visible, .cbtn:focus-visible, .door:focus-visible { outline: 2px solid var(--app-white); outline-offset: 2px; }
+  .game { position: absolute; inset: 0; z-index: 5; display: none; overflow: hidden; background: var(--app-deep); user-select: none; -webkit-user-select: none; overscroll-behavior: contain; }
+  .game.visible { display: block; }
+  /* the phone on this page is not the screen's edge: the game's own safe-area padding is not needed here */
+  .phone .ss-top { padding-top: 10px; } .phone .ss-hud { padding-bottom: 14px; }
+
+  .demo { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; margin: 22px auto 0; max-width: 390px; }
+  .demo span { font: 700 12px/1 var(--mono); letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  .pill { min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; cursor: pointer; color: var(--ink); background: transparent; box-shadow: inset 0 0 0 1.5px var(--hair); font: 700 15px/1 var(--body); }
+  .pill[aria-pressed="true"] { color: var(--chip-on-ink); background: var(--chip-on); box-shadow: none; }
+  .pill:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .demo-note { margin: 10px auto 0; max-width: 390px; text-align: center; font-size: 14px; color: var(--grey); }
+
+  /* ── The notes ── */
+  .notes { min-width: 0; display: grid; gap: 44px; }
+  .notes section { display: grid; gap: 14px; }
+  h2 { margin: 0; font: 900 30px/1 var(--display); text-transform: uppercase; letter-spacing: .2px; text-wrap: balance; }
+  h2 small { display: block; margin-bottom: 8px; font: 700 12px/1.4 var(--mono); letter-spacing: 1.2px; color: var(--green-ink); }
+  .notes p { margin: 0; max-width: 66ch; }
+  .changes { margin: 0; padding: 0; list-style: none; display: grid; gap: 0; border-top: 1px solid var(--hair); }
+  .changes li { display: grid; grid-template-columns: minmax(0, 15ch) minmax(0, 1fr); gap: 4px 18px; padding: 13px 0; border-bottom: 1px solid var(--hair); }
+  .changes b { font: 700 19px/1.15 var(--display); text-transform: uppercase; letter-spacing: .3px; }
+  .changes span { color: var(--grey); }
+  @media (max-width: 620px) { .changes li { grid-template-columns: minmax(0, 1fr); } }
+  .drills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 620px) { .drills { grid-template-columns: minmax(0, 1fr); } }
+  .drill { display: grid; gap: 6px; align-content: start; padding: 16px; border-radius: 12px; background: var(--sand); }
+  .drill .n { font: 700 12px/1 var(--mono); letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  .drill h3 { margin: 0; font: 900 26px/1 var(--display); text-transform: uppercase; }
+  .drill .do { font-weight: 600; }
+  .drill .what { font-size: 15px; color: var(--grey); }
+  .drill .what em { font-style: normal; color: var(--green-ink); font-weight: 700; }
+  .refs { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+  .refs li { padding-left: 16px; border-left: 3px solid var(--hair); }
+  .refs li.key { border-left-color: var(--clay); }
+  .refs .so { display: block; margin-top: 2px; font-weight: 700; color: var(--green-ink); }
+  .refs a { color: var(--green-ink); text-underline-offset: 2px; white-space: nowrap; }
+  .changes a { color: var(--green-ink); text-underline-offset: 2px; white-space: nowrap; }
+  .src { font-size: 14px; color: var(--grey); }
+  .calls { display: grid; gap: 12px; }
+  .call { display: grid; gap: 8px; padding: 16px; border-radius: 12px; background: var(--row); box-shadow: inset 0 0 0 1px var(--hair); }
+  .call h3 { margin: 0; font: 700 21px/1.1 var(--display); text-transform: uppercase; letter-spacing: .3px; }
+  .call .pick { font: 700 12px/1.4 var(--mono); letter-spacing: 1px; text-transform: uppercase; color: var(--clay-ink); }
+  .names { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 0; padding: 0; list-style: none; }
+  .names li { padding: 8px 14px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px var(--hair); font: 700 17px/1 var(--display); letter-spacing: .5px; text-transform: uppercase; }
+  .names li.mine { color: var(--chip-on-ink); background: var(--chip-on); box-shadow: none; }
+  .shelf { max-width: 360px; padding: 14px; border-radius: 12px; background: var(--app-hero); color: var(--app-white); }
+  .shelf .se { font: 700 12px/1.4 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; color: var(--app-mint); }
+  .shelf .row { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: 2px 12px; margin-top: 10px; padding: 12px; border-radius: 8px; background: var(--app-glass); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22); }
+  .shelf .row b { font: 700 18px/1.1 var(--display); text-transform: uppercase; letter-spacing: .5px; }
+  .shelf .row small { grid-column: 2; font-size: 13px; color: rgba(255,255,255,.75); }
+  .shelf .row i { grid-row: 1 / span 2; grid-column: 3; font-style: normal; font-size: 20px; color: rgba(255,255,255,.7); }
+  .shelf .dot { grid-row: 1 / span 2; width: 12px; height: 12px; border-radius: 50%; background: var(--app-white); box-shadow: 0 0 0 3px rgba(127,214,174,.45); }
+  .shelf .dot.puck { border-radius: 3px; background: var(--clay); box-shadow: none; }
+  .next { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 66ch; }
+  footer { margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--hair); font-size: 14px; color: var(--grey); }
+  @media (prefers-reduced-motion: reduce) { .ring .pr { transition: none; } .cbtn:active, .door:active { transform: none; } }
+</style>
+
+<main class="wrap">
+  <header class="intro">
+    <div class="eye">A game for the rest between sets</div>
+    <h1>Split Step</h1>
+    <p class="lead">Four short drills to play while the rest clock runs. <b>Tap the Split Step button under the timer.</b> The game stops the moment the rest does.</p>
+  </header>
+
+  <div class="grid">
+    <section class="stage" aria-label="Try it in the app's rest screen">
+      <div class="phone">
+        <div class="rest" id="rest">
+          <div class="rest-top">
+            <button type="button" class="glass" id="restSound" aria-pressed="true" aria-label="Rest sound">
+              <svg class="on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+              <svg class="off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+            </button>
+            <div class="rest-eye"><span class="lbl">Rest</span> <span>· Barbell Back Squat</span></div>
+            <button type="button" class="glass" id="restX" aria-label="Reset this rest">✕</button>
+          </div>
+          <div class="ring">
+            <svg viewBox="0 0 220 220" aria-hidden="true"><circle class="bg" cx="110" cy="110" r="104"/><circle class="pr" id="restProg" cx="110" cy="110" r="104"/></svg>
+            <div class="digits" id="restDigits" role="timer">1:30</div>
+          </div>
+          <div class="ctrls">
+            <button type="button" class="cbtn main" id="restStart" data-sym="play">Start</button>
+            <button type="button" class="cbtn" id="restAdd">+15s</button>
+            <button type="button" class="cbtn" id="restReset">Reset</button>
+          </div>
+          <button type="button" class="door" id="door"><span class="ball" aria-hidden="true"></span>Split Step <span class="sub">· play while you rest</span></button>
+          <p class="rest-foot">The app's rest timer, rebuilt for this page.</p>
+        </div>
+        <div class="game" id="game" role="dialog" aria-modal="true" aria-label="Split Step"></div>
+      </div>
+      <div class="demo" role="group" aria-label="Rest length for this page">
+        <span>Rest</span>
+        <button type="button" class="pill" data-rest="60" aria-pressed="false">1:00</button>
+        <button type="button" class="pill" data-rest="90" aria-pressed="true">1:30</button>
+        <button type="button" class="pill" data-rest="120" aria-pressed="false">2:00</button>
+      </div>
+      <p class="demo-note">Best on a phone. On a computer, Space or Enter taps. In Fore or Back the left and right arrows pick the side.</p>
+    </section>
+
+    <div class="notes">
+      <section>
+        <h2><small>What I changed from the original</small>Built for the rest between sets</h2>
+        <p>The original is a good reaction test for a desk. A gym in the middle of a session is a different place, so these are the changes.</p>
+        <ul class="changes">
+          <li><b>The rest is the boss</b><span>The rest clock never leaves the screen. A round starts only if there is enough rest left for a normal one, and the game stops the second the rest does. Nobody plays one more round into their next set.</span></li>
+          <li><b>Tennis questions</b><span>The original asks one thing, how fast. These drills ask what a player asks on court. When was it hit? Which side? Is it in? When does it reach me?</span></li>
+          <li><b>No guessing the start</b><span>The wait before each hit is random, so you can't time it. Tap before the hit, or so soon after it that it can only be a guess, and it's a foot fault. That ball is played again.</span></li>
+          <li><b>No red and green</b><span>The cue is movement and a burst, never a colour change alone. In most drills it is the ball leaving the clay racket at the top, which stands for you. About 1 in 12 men of European descent see red and green poorly, and somewhat fewer in most other groups. The original's main mode is a red screen turning green. <a href="https://doi.org/10.1364/JOSAA.29.000313">Birch 2012</a></span></li>
+          <li><b>The middle number</b><span>A round shows the median, not the average. One tap missed while someone talks to them doesn't wreck it.</span></li>
+          <li><b>Your phone, your numbers</b><span>Every phone adds its own delay to the touch and the screen, and it differs from phone to phone. So bests are kept per phone and nobody is ranked. There is no "average human is 250 ms" grade that a slow phone fails for no reason.</span></li>
+          <li><b>Seen, never heard</b><span>Sound comes after the tap, never with the hit. A beep at the hit would be a second, faster cue, and a phone on silent would lose. The cue is visual only, so the game is not playable without sight. The rest timer and every other part of the app are unaffected.</span></li>
+          <li><b>A ball that sits up</b><span>In Sweet Spot the ball bounces and then slows by a different amount each time. In one small study, expert table tennis players timed a slowing target better than novices did, and a steady one did not tell them apart.</span></li>
+          <li><b>One thumb, wet hands</b><span>The targets are the whole court or half of it. Nothing small to hit with chalk or sweat on the screen.</span></li>
+          <li><b>Nothing leaves the phone</b><span>No server and no XP. Nothing new for the privacy notice.</span></li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><small>Easy to hard</small>The four drills</h2>
+        <div class="drills">
+          <div class="drill"><span class="n">Drill 1</span><h3>First Step</h3><span class="do">Tap the moment Amir hits the ball.</span><span class="what"><em>Simple reaction.</em> Five balls. The score is the median ms of your taps.</span></div>
+          <div class="drill"><span class="n">Drill 2</span><h3>Fore or Back</h3><span class="do">Tap the side the ball goes to.</span><span class="what"><em>A choice.</em> Six balls, each left or right at random. The score is the median ms of the right taps, and how many were right.</span></div>
+          <div class="drill"><span class="n">Drill 3</span><h3>In or Out</h3><span class="do">Tap if it lands in. Leave it if it's out. On the line is in.</span><span class="what"><em>Tap or leave.</em> Six balls, two of them out. The score is the median ms of your taps. A good leave counts toward a best.</span></div>
+          <div class="drill"><span class="n">Drill 4</span><h3>Sweet Spot</h3><span class="do">Tap as the ball reaches your racket.</span><span class="what"><em>Timing.</em> Five balls. The score is how many ms off, and whether you lean early or late.</span></div>
+        </div>
+        <p>A best counts only when every ball was right and there were no foot faults. That keeps a fast guesser from setting one.</p>
+      </section>
+
+      <section>
+        <h2><small>Checked before building</small>What the research says</h2>
+        <p class="src">According to PubMed. The coloured line is the one that shaped the game most.</p>
+        <ul class="refs">
+          <li>Phone time before lifting didn't cost strength in one study. After 30 minutes of social media or a Stroop task, 25 trained adults lifted the same bench press max and jumped as high, even though they felt more mentally tired. <a href="https://doi.org/10.1123/mc.2022-0133">Alix-Fages 2023</a></li>
+          <li class="key">Long scrolling can cost decisions. In amateur boxers, 30 minutes of social media or video games just before a fight simulation made decisions worse. In young volleyball players, 30 minutes before each session for four weeks stopped their decision-making from improving. A review of 12 papers found that demanding tasks of about 20 to 30 minutes tired the mind, and short or passive ones often did not. <a href="https://doi.org/10.1080/23279095.2021.1927036">Fortes 2021 (boxers)</a> · <a href="https://doi.org/10.1177/00315125211040596">Fortes 2021 (volleyball)</a> · <a href="https://doi.org/10.1186/s40798-025-00891-0">Bian 2025 review</a><span class="so">So the rounds are about 15 to 20 seconds, capped by the rest. That is far shorter than anything tested.</span></li>
+          <li>Expert players picked up sport cues faster and more accurately than non-experts, across 42 studies. <a href="https://doi.org/10.1123/jsep.29.4.457">Mann 2007 meta-analysis</a><span class="so">So every drill asks a question from court.</span></li>
+          <li>Tennis players aged 10 to 14 timed a moving target with less error than table tennis players of the same age, who had the quicker simple reactions. <a href="https://doi.org/10.2466/PMS.110.3.879-887">Ak &amp; Koçak 2010</a><span class="so">So Sweet Spot is the drill closest to what a tennis player is good at.</span></li>
+          <li>Expert table tennis players timed a slowing target better than novices, but not a steady one (16 people, on a screen). <a href="https://doi.org/10.1080/026404197367001">Ripoll &amp; Latiri 1997</a><span class="so">So the ball slows by a different amount after the bounce each time.</span></li>
+        </ul>
+        <p><b>What we don't claim.</b> A phone game won't teach anyone to read a serve. It's a game for the rest, and the app should never call it reaction training.</p>
+      </section>
+
+      <section>
+        <h2><small>Waiting on you</small>Your calls</h2>
+        <div class="calls">
+          <div class="call">
+            <span class="pick">My pick: Split Step</span>
+            <h3>The name</h3>
+            <ul class="names"><li class="mine">Split Step</li><li>Return Ready</li><li>Quick Hands</li><li>Ready Position</li></ul>
+            <p>Split Step is the little hop every tennis and padel player makes just before they react. Both crowds know the word, and it sits well next to Off the Glass.</p>
+          </div>
+          <div class="call">
+            <span class="pick">My pick: one door, a shelf behind it</span>
+            <h3>Two games, one door</h3>
+            <p>Off the Glass, the air hockey game, is being built in another chat for the same spot under the rest clock. Two doors there would crowd the screen. One door that opens both, last played first:</p>
+            <div class="shelf" role="img" aria-label="A drawing of one door with both games behind it">
+              <div class="se">● Play while you rest</div>
+              <div class="row"><span class="dot"></span><b>Split Step</b><small>React to the hit · 4 drills</small><i>›</i></div>
+              <div class="row"><span class="dot puck"></span><b>Off the Glass</b><small>Air hockey · first to 5</small><i>›</i></div>
+            </div>
+          </div>
+          <div class="call">
+            <span class="pick">My pick: keep it on the phone</span>
+            <h3>Scores, XP and the crew</h3>
+            <p>No XP and no crew leaderboard for now. Points for phone time would reward the wrong thing, and a board in milliseconds would be won by whoever has the fastest phone.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2><small>If you say go</small>Before it goes in the app</h2>
+        <ol class="next">
+          <li>Wait for the Off the Glass chat to commit its door, since both games touch the rest screen.</li>
+          <li>Put Split Step behind the same door, with the small shelf if you want both games.</li>
+          <li>Keep it in the offline copy (sw.js), add a line to the app's guide, and add a headless test that plays every drill.</li>
+          <li>Try it on a real iPhone and a real Android, mid-session.</li>
+        </ol>
+      </section>
+
+      <footer>Built 2026-10-18. One file, splitstep.js, with the same plug-in shape as Off the Glass: open, time up, close. Your bests on this page stay in this browser.</footer>
+    </div>
+  </div>
+</main>
+
+<script src="splitstep.js"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const game = $('game'), digits = $('restDigits'), prog = $('restProg'), startBtn = $('restStart'), soundBtn = $('restSound');
+  const CIRC = 2 * Math.PI * 104;
+  prog.style.strokeDasharray = String(CIRC);
+  let dur = 90, remainMs = 90000, endsAt = 0, running = false, done = false, soundOn = true, ac = null, goT = 0, tickT = 0;
+
+  // The same answers program.html gives the game: whole seconds left, or null while the rest is paused.
+  const left = () => (running ? Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)) : null);
+  const remaining = () => (running ? Math.max(0, endsAt - Date.now()) : remainMs);
+  function paint() {
+    const ms = remaining(), sec = Math.ceil(ms / 1000);
+    if (!done) { digits.textContent = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); digits.classList.remove('go'); }
+    prog.style.strokeDashoffset = String(Math.max(0, CIRC * (1 - ms / (dur * 1000))));
+    startBtn.textContent = running ? 'Pause' : 'Start';
+    startBtn.dataset.sym = running ? 'pause' : 'play';
+  }
+  function primeAudio() {
+    try { if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (A) ac = new A(); } if (ac && ac.state === 'suspended') ac.resume(); } catch (e) {}
+  }
+  function beep() {
+    if (!soundOn || !ac) return;
+    [0, 0.22].forEach(d => { try {
+      const t = ac.currentTime + d, o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'sine'; o.frequency.value = 880; g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.25, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + 0.2);
+    } catch (e) {} });
+  }
+  function start() {
+    clearTimeout(goT); goT = 0;   // a new rest must not be closed by the old GO! timer
+    if (running) return;
+    if (done || remainMs <= 0) { done = false; remainMs = dur * 1000; }
+    endsAt = Date.now() + remainMs; running = true;
+    clearInterval(tickT); tickT = setInterval(tick, 250); paint();
+  }
+  function pause() { if (!running) return; remainMs = Math.max(0, endsAt - Date.now()); running = false; paint(); }
+  function tick() { if (running && Date.now() >= endsAt) finish(); else paint(); }
+  // At zero, as the app does: the alert, "GO!", the game told the rest is over, then both close a moment later.
+  function finish() {
+    running = false; remainMs = 0; done = true; clearInterval(tickT); paint();
+    digits.textContent = 'GO!'; digits.classList.add('go');
+    beep();
+    if (window.SplitStep && SplitStep.isOpen()) SplitStep.timeUp();
+    clearTimeout(goT);
+    goT = setTimeout(() => { if (window.SplitStep && SplitStep.isOpen()) SplitStep.close(); reset(); }, 2200);
+  }
+  function reset() { clearTimeout(goT); clearInterval(tickT); running = false; done = false; remainMs = dur * 1000; paint(); }
+
+  startBtn.addEventListener('click', () => { primeAudio(); running ? pause() : start(); });
+  $('restAdd').addEventListener('click', () => {
+    clearTimeout(goT); goT = 0;
+    if (running) endsAt += 15000;
+    else {
+      if (done) { done = false; remainMs = 0; if (window.SplitStep && SplitStep.isOpen()) SplitStep.close(); }   // a game left open on GO! closes with it
+      remainMs += 15000;
+    }
+    paint();
+  });
+  $('restReset').addEventListener('click', reset);
+  $('restX').addEventListener('click', reset);
+  soundBtn.addEventListener('click', () => { soundOn = !soundOn; soundBtn.setAttribute('aria-pressed', String(soundOn)); });
+  $('door').addEventListener('click', () => {
+    primeAudio();
+    if (!running) start();   // the game is for a rest that is running
+    $('rest').inert = true;   // keyboard and screen reader users stay in the game; every close path runs onClose
+    SplitStep.open({ root: game, left, sound: () => soundOn, audio: () => ac, onClose: () => { $('rest').inert = false; $('door').focus(); } });
+  });
+  document.querySelectorAll('[data-rest]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-rest]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    dur = +b.dataset.rest;
+    if (window.SplitStep && SplitStep.isOpen()) SplitStep.close();
+    reset();
+  }));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && window.SplitStep && SplitStep.isOpen()) SplitStep.close(); });
+  paint();
+})();
+</script>

@@ -292,8 +292,11 @@ fi
 # fails a change to assets/js/chips.js that keeps coach.html's hand-typed ?v= (TWIN-4): the service worker serves /assets/
 # cache-first, so the old file would stay in every browser that has it. test_check_twins.js proves the guard still fails
 # when a twin drifts, and runs only when the guard itself changes.
-if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|coach\.html|assets/js/chips\.js|scripts/(check_twins|test_check_twins)\.js|scripts/twins_stamp\.json|scripts/name_cases\.json)$'; then
-  echo "pre-commit: program.html, coach.html or chips.js changed — checking the rules they share still agree..."
+# Career Mode (added 2026-10-18): check_twins.js section 10 also holds habits.html (the five events' goals, the reward rules) to career/*.toml,
+# which it reads through scripts/career_seed.py --json, and to scripts/career/reward_cases.json; sections 8 and 9 hold both apps to hold_cases.json
+# and xp_cases.json. A change to any of them alone used to pass this guard unrun, so they trigger it too.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|coach\.html|assets/js/chips\.js|scripts/(check_twins|test_check_twins)\.js|scripts/twins_stamp\.json|scripts/name_cases\.json|habits\.html|career/[^/]+\.toml|scripts/career_seed\.py|scripts/career/(hold|xp|reward)_cases\.json)$'; then
+  echo "pre-commit: program.html, coach.html, habits.html, chips.js or the Career Mode files they are held to changed — checking the rules they share still agree..."
   # CHECK_TWINS_INDEX=1: read the STAGED files, the ones that will be committed. A ?v= bumped in the working tree but
   # left unstaged must not pass. The output is kept so a failure is printed once.
   twins_out=$(CHECK_TWINS_INDEX=1 node scripts/check_twins.js 2>&1)
