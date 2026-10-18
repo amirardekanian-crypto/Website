@@ -178,6 +178,12 @@ class CareerCheckerTests(unittest.TestCase):
         self.set_key("rulebook.toml", "switch", "xp", '"2026-10-18"')
         self.set_key("rulebook.toml", "switch", "catalogue", '"2026-10-18"')
 
+    def catalogue_off(self):
+        """The state before the catalogue switch (the XP switch on, the catalogue switch off): rule 14 holds Proof's
+        numbers. The real rulebook says the switch day now (2026-10-18), so a test of rule 14 puts it back to "off"
+        in its own copy first."""
+        self.set_key("rulebook.toml", "switch", "catalogue", '"off"')
+
     def set_key(self, filename, table, key, literal):
         """Set `key = literal` inside [table] (None: the keys before the first table), keeping any trailing comment.
         Whatever the key is worth today does not matter, so tuning a number in the real files never breaks a test."""
@@ -481,14 +487,17 @@ class CareerCheckerTests(unittest.TestCase):
 
     # ── rules 13 and 14: Proof's counting, and the parity with Proof until the catalogue switch ─────────────────────
     def test_in_shadow_a_habit_number_must_equal_proofs(self):
+        self.catalogue_off()
         self.set_key("rulebook.toml", "habits.weights", "water", "31")
         self.assertFails("[habits.weights] water is 31 but Proof's is 30")
 
     def test_in_shadow_the_day_gate_must_equal_proofs(self):
+        self.catalogue_off()
         self.set_key("rulebook.toml", "habits", "qualify_pct", "75")
         self.assertFails("[habits] qualify_pct is 75 but Proof's streakQualifyPct is 80")
 
     def test_in_shadow_a_proof_milestone_must_match(self):
+        self.catalogue_off()
         path = self.dir / "badges.toml"
         text = path.read_text(encoding="utf-8")
         tier = '{ at = 10, metal = "silver", xp = 75, size = "highlight" }'
@@ -497,6 +506,7 @@ class CareerCheckerTests(unittest.TestCase):
         self.assertFails("Proof pays the milestone DP (need 10, 75 XP, daysWith3)", "DP (need 10.0, 80.0 XP")
 
     def test_in_shadow_a_proof_quest_must_match(self):
+        self.catalogue_off()
         self.set_key("missions.toml", "mission.no_negotiation", "proof_need", "6")
         self.assertFails("Proof's quest w_supps7 (daysHit:supps, need 7, 140 XP) has no mission")
 
@@ -507,6 +517,7 @@ class CareerCheckerTests(unittest.TestCase):
 
     def test_the_xp_switch_alone_keeps_proofs_numbers(self):
         # phase 2: Proof's phone previews a tick with these numbers, so they stay Proof's until the catalogue switch
+        self.catalogue_off()
         self.set_key("rulebook.toml", "switch", "xp", '"2026-10-18"')
         self.set_key("rulebook.toml", "habits.weights", "water", "31")
         self.assertFails("[habits.weights] water is 31 but Proof's is 30", "until the catalogue switch")
@@ -832,6 +843,7 @@ class CareerCheckerTests(unittest.TestCase):
 
     def test_a_retiring_proof_entry_must_still_match_proofs_numbers(self):
         # retire_at is not a way round the parity check: until the switch the entry is earned exactly as Proof earns it
+        self.catalogue_off()
         self.put_key("badges.toml", "badge.dawn_patrol", "retire_at", '"catalogue"')
         self.put_key("badges.toml", "badge.dawn_patrol", "superseded_by", '"century"')
         path = self.dir / "badges.toml"

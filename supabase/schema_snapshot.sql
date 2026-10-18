@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 48 tables, 178 functions, 7 sequences.
+-- 48 tables, 179 functions, 7 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -616,7 +616,7 @@ begin
     v_ev := jsonb_build_object('via', 'first', 'n', 1, 'facts', jsonb_build_array(jsonb_build_object('kind', v_kind, 'ref', v_ref)));
 
   elsif v_test in ('proof', 'best_value') then
-    v_k := case when v_test = 'proof' then public.career_proof_key(p_body ->> 'proof_measure') else 'maxpct' end;
+    v_k := case when v_test = 'proof' then public.career_proof_key(p_body ->> 'proof_measure') else public.career_maxpct_key(p_body) end;
     v_need := public.career_num(case when v_test = 'proof' then p_body -> 'proof_need' else p_body -> 'at' end);
     select x.s into s from jsonb_array_elements(coalesce(p_m -> v_k -> 'steps', '[]'::jsonb)) with ordinality x(s, o)
      where public.career_num(x.s -> 1) >= v_need order by x.o limit 1;
@@ -1564,7 +1564,7 @@ begin
                  when 'days' then array['run:' || coalesce(p_body ->> 'habit', '')]
                  else array['iso:' || coalesce(v_counts[1], '')] end;
       when 'total' then return array['count:' || array_to_string(v_counts, ',')];
-      when 'best_value' then return array['maxpct'];
+      when 'best_value' then return array[public.career_maxpct_key(p_body)];
       when 'per_habit_best_run' then
         return array(select 'run:' || t.key from jsonb_each(coalesce(p_ctx -> 'targets', '{}'::jsonb)) t
                      union
@@ -1582,7 +1582,7 @@ begin
      where public.career_proof_key(g ->> 'kind') is not null and g ->> 'kind' is not null;
     return v_out;
   elsif v_t = 'best_value' then
-    return array['maxpct'];
+    return array[public.career_maxpct_key(p_body)];
   elsif v_t = 'run_regained' then
     return array['weeks'];
   end if;
@@ -2273,6 +2273,29 @@ AS $function$
                    where f.athlete_id = p_athlete and f.kind in ('habit_day', 'habit_done') and f.void_at is null) d) x
 $function$;
 
+CREATE OR REPLACE FUNCTION public.career_maxpct_key(p_body jsonb)
+ RETURNS text
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select case jsonb_typeof(p_body -> 'patterns')
+           when 'array' then 'maxpct:' || coalesce((select string_agg(distinct x, ',' order by x)
+                                                     from jsonb_array_elements_text(p_body -> 'patterns') x where x <> ''), '')
+           when 'string' then 'maxpct:' || (p_body ->> 'patterns')
+           else 'maxpct' end
+      || case jsonb_typeof(p_body -> 'qualities')
+           when 'array' then '|q:' || coalesce((select string_agg(distinct x, ',' order by x)
+                                                  from jsonb_array_elements_text(p_body -> 'qualities') x where x <> ''), '')
+           when 'string' then '|q:' || (p_body ->> 'qualities')
+           else '' end
+      || case jsonb_typeof(p_body -> 'exclude')
+           when 'array' then '|x:' || coalesce((select string_agg(distinct x, ',' order by x)
+                                                  from jsonb_array_elements_text(p_body -> 'exclude') x where x <> ''), '')
+           when 'string' then '|x:' || (p_body ->> 'exclude')
+           else '' end
+$function$;
+
 CREATE OR REPLACE FUNCTION public.career_measures(p_athlete text, p_ctx jsonb, p_keys text[])
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -2281,7 +2304,7 @@ CREATE OR REPLACE FUNCTION public.career_measures(p_athlete text, p_ctx jsonb, p
 AS $function$
 declare
   v_out jsonb := '{}'::jsonb; v_k text; v_h text; v_t numeric; v_v jsonb; v_kinds text[]; r record;
-  v_best integer; v_run integer; v_steps jsonb; v_walk jsonb; v_custom text[];
+  v_best integer; v_run integer; v_steps jsonb; v_walk jsonb; v_custom text[]; v_capped text[]; v_pats text[];
   c_empty constant jsonb := '{"have": 0, "now": null, "steps": []}'::jsonb;
 begin
   v_custom := array(select jsonb_array_elements_text(coalesce(p_ctx -> 'custom', '[]'::jsonb)));
@@ -2356,6 +2379,16 @@ begin
     elsif v_k in ('perfect', 'qualify', 'stuck') or v_k like 'count:%' then
       v_kinds := case v_k when 'perfect' then array['perfect_day'] when 'qualify' then array['day_on_target']
                           when 'stuck' then array['comeback_stuck'] else string_to_array(substr(v_k, 7), ',') end;
+      -- D19 (career/CAREER_MODE.md, round 4): a count over a kind the rulebook caps (limit_per: a session, one per plan day per training
+      -- week; a Library session, two a week; an effort win, three a cycle) counts only the facts career_facts_paid() pays, the cap GAME-4
+      -- puts on XP, so a plan day repeated in its week never moves Century. Every other kind is counted as it was. A finished and an early
+      -- session share one cap, which pays the higher XP: count them together, as Century does. The early kind counted alone would lose
+      -- one when a full finish of the same plan day in the same week replaces it; the finished kind alone holds while it out-earns an early one.
+      v_capped := case when v_k like 'count:%'
+                       then array(select k from unnest(v_kinds) k
+                                   where public.career_rules_now() -> 'fact' -> k ->> 'limit_per' is not null)
+                       else '{}'::text[] end;
+      if cardinality(v_capped) = 0 then
       with x as (
         select f.day as d, f.kind, f.ref, (row_number() over (order by f.day, f.ref, f.kind))::int as n from public.career_facts f
          where f.athlete_id = p_athlete and f.kind = any (v_kinds) and f.void_at is null
@@ -2363,6 +2396,18 @@ begin
       select jsonb_build_object('have', (select count(*) from x), 'now', null,
                'steps', coalesce((select jsonb_agg(jsonb_build_array(x.d, x.n, x.kind, x.ref) order by x.n) from x), '[]'::jsonb))
         into v_v;
+      else
+      with y as (
+        select f.day as d, f.kind, f.ref from public.career_facts f
+         where f.athlete_id = p_athlete and f.kind = any (v_kinds) and not (f.kind = any (v_capped)) and f.void_at is null
+        union all
+        select p.day, p.kind, p.ref from public.career_facts_paid(p_athlete) p where p.kind = any (v_capped)
+      ),
+      x as (select y.d, y.kind, y.ref, (row_number() over (order by y.d, y.ref, y.kind))::int as n from y)
+      select jsonb_build_object('have', (select count(*) from x), 'now', null,
+               'steps', coalesce((select jsonb_agg(jsonb_build_array(x.d, x.n, x.kind, x.ref) order by x.n) from x), '[]'::jsonb))
+        into v_v;
+      end if;
     elsif v_k in ('daystreak', 'cbrun') then
       with q as (
         select f.day as d from public.career_facts f
@@ -2434,6 +2479,56 @@ begin
                'steps', coalesce((select jsonb_agg(jsonb_build_array(mx.d, mx.pct, 'lift_gain', mx.ref) order by mx.d, mx.ref)
                                     from mx where mx.prev is null or mx.pct > mx.prev), '[]'::jsonb))
         into v_v;
+    elsif v_k like 'maxpct:%' or v_k like 'maxpct|%' then
+      -- maxpct over the lifts the entry names (GAME-10; D18 as amended 2026-10-18; the key is career_maxpct_key()'s). A lift_gain counts when
+      -- an approved Spine entry whose name or alias it is (compared as career_norm() compares lifts; the All-Court test's placing) is on one of
+      -- the patterns (maxpct:<patterns>; a key without them takes any pattern), carries one of the qualities (|q:, when the key has it) and is
+      -- not one of the ids left out (|x:, when the key has it). An empty list of patterns or qualities matches no lift. A lift the Spine cannot
+      -- place counts for nothing. For The Upgrade and Double Up: the seven main patterns, the strength quality, and the four accessories Amir
+      -- left out (45° Back Extension, Cable Face Pull, Machine Reverse Fly, Cable Straight-Arm Pulldown).
+      -- A lift is placed by value.lift, the exercise name as logged. Under stage72 that name carries no measure (|lb or |plates is on the ref,
+      -- the series key), so a main lift logged in pounds or plates is placed as one in kilograms is. Each measure is its own series with its
+      -- own lift_gain; the best is the number. Nothing here calls a function the weight units add or change, so their ways back leave this
+      -- working.
+      -- Fail closed: while any |x: id names no row of public.exercises (a typo in the list, the entry given a new id, or deleted), the key
+      -- counts no lift at all (ks is empty), and says so in the database log (the warning below), until the list or the Spine is put right.
+      -- Otherwise the list would silently exclude nothing, the entry it names could count again under its new id, and a mint is never taken
+      -- back (GAME-1); a crossing held back is minted, on its own day, at the first full evaluate after the fix. A draft is no reason to stop:
+      -- a draft places no lift (sp reads approved entries only), and its id is still on the list when it is approved again.
+      v_pats := case when v_k like 'maxpct:%' then string_to_array(substr(split_part(v_k, '|', 1), 8), ',') end;
+      with kp as (select (select string_to_array(substr(p.x, 3), ',') from unnest((string_to_array(v_k, '|'))[2:]) p(x) where p.x like 'q:%' limit 1) as qs,
+                         (select string_to_array(substr(p.x, 3), ',') from unnest((string_to_array(v_k, '|'))[2:]) p(x) where p.x like 'x:%' limit 1) as xs),
+      ks as (select kp.qs, kp.xs from kp
+              where kp.xs is null or not exists (select 1 from unnest(kp.xs) i(id)
+                                                  where not exists (select 1 from public.exercises e where e.id = i.id))),
+      sp as (select public.career_norm(n.x) as nm
+               from public.exercises e cross join ks cross join unnest(array[e.name] || e.aliases) n(x)
+              where e.status = 'approved' and (v_pats is null or e.pattern = any (v_pats))
+                and (ks.qs is null or e.qualities && ks.qs) and (ks.xs is null or e.id <> all (ks.xs))),
+      x as (
+        select f.day as d, f.ref, public.career_num(f.value -> 'pct') as pct from public.career_facts f
+         where f.athlete_id = p_athlete and f.kind = 'lift_gain' and f.void_at is null and public.career_num(f.value -> 'pct') is not null
+           and public.career_norm(f.value ->> 'lift') in (select sp.nm from sp)
+      ),
+      mx as (select x.*, max(x.pct) over (order by x.d, x.ref rows between unbounded preceding and 1 preceding) as prev from x)
+      select jsonb_build_object('have', coalesce((select max(x.pct) from x), 0), 'now', null,
+               'steps', coalesce((select jsonb_agg(jsonb_build_array(mx.d, mx.pct, 'lift_gain', mx.ref) order by mx.d, mx.ref)
+                                    from mx where mx.prev is null or mx.pct > mx.prev), '[]'::jsonb))
+        into v_v;
+      -- Failing closed is silent otherwise (the rewards just stop moving): a warning in the database log names the key and every |x: id that
+      -- has no row in public.exercises. A warning never stops a save. Keys without |x: skip the look-up.
+      if v_k like '%|x:%' then
+        declare
+          v_gone text;
+        begin
+          select string_agg(i.id, ', ' order by i.id) into v_gone
+            from unnest((select string_to_array(substr(p.x, 3), ',') from unnest((string_to_array(v_k, '|'))[2:]) p(x) where p.x like 'x:%' limit 1)) i(id)
+           where not exists (select 1 from public.exercises e where e.id = i.id);
+          if v_gone is not null then
+            raise warning 'Career Mode: % counts no lift while % in its exclude list is not in the Spine (no row in public.exercises; fail closed). Put the list (career/*.toml, then a re-seed) or the Spine right.', v_k, v_gone;
+          end if;
+        end;
+      end if;
     end if;
     v_out := v_out || jsonb_build_object(v_k, coalesce(v_v, c_empty));
   end loop;
@@ -2894,7 +2989,7 @@ AS $function$
 declare
   v_rules jsonb := public.career_rules_now(); v_S date; v_rw jsonb := p_rw; v_stale boolean := false; v_hr jsonb;
   v_ms jsonb; v_keep integer; v_max integer; v_full jsonb; v_free boolean; f record; v_now integer := 0; v_best integer := 0;
-  v_dnow integer; v_dbest integer; v_four jsonb; v_ladder jsonb; v_near jsonb; v_out jsonb; v_moments jsonb;
+  v_dnow integer; v_dbest integer; v_four jsonb; v_ladder jsonb; v_near jsonb; v_out jsonb; v_moments jsonb; v_sess integer;
   c_rank constant jsonb := '{"tick": 0, "win": 1, "highlight": 2, "milestone": 3, "legend": 4}'::jsonb;
   c_session constant jsonb := '["session_finished", "session_finished_early", "full_log", "checkin_done"]'::jsonb;
   c_week constant jsonb := '["week_held", "week_by_the_book", "bounce_back", "training_return", "cycle_finished", "roadmap_finished", "effort_win"]'::jsonb;
@@ -2926,12 +3021,34 @@ begin
   rl as (select isl.d, (row_number() over (partition by isl.grp order by isl.d))::int as run from isl)
   select coalesce((select rl.run from rl where rl.d >= current_date - 1 order by rl.d desc limit 1), 0), coalesce((select max(rl.run) from rl), 0)
     into v_dnow, v_dbest;
+  -- commitment, coached (D19, CAREER_MODE.md): the sessions Century counts, the ones career_facts_paid() pays (a plan day done again in
+  -- its training week counts once), so the Home row's "N sessions" and Century's ladder never disagree. Read from evaluate's cache, the
+  -- `have` of a live badge whose one measure is that count: no second pass over the paid facts. Worked out here only when no such badge
+  -- holds one; when that fails as well, every session fact is counted (the number before stage73). A stale cache gives the ladder's own
+  -- number. get_profile()'s older numbers.sessions_with_amir stays every session fact.
+  if not v_free then
+    select public.career_num(v_rw -> 'have' -> c.id)::int into v_sess
+      from public.career_catalogue c
+     where c.kind = 'badge' and c.body ->> 'kind' = 'total' and not (c.body ? 'retire_at') and coalesce(c.body ->> 'meaning', '') <> 'chosen'
+       and jsonb_typeof(v_rw -> 'have' -> c.id) = 'number'
+       and public.career_entry_keys('badge', c.body, '{}'::jsonb) = array['count:session_finished,session_finished_early']
+     order by c.id limit 1;
+    if v_sess is null then
+      begin
+        v_sess := public.career_num(public.career_measures(p_athlete, '{}'::jsonb, array['count:session_finished,session_finished_early'])
+                                      -> 'count:session_finished,session_finished_early' -> 'have')::int;
+      exception when others then
+        raise warning 'Career Mode could not count the paid sessions of %: % (%). Every session fact is counted.', p_athlete, sqlerrm, sqlstate;
+        v_sess := null;
+      end;
+    end if;
+  end if;
   select jsonb_build_object(
            'consistency', case when v_free then jsonb_build_object('key', 'day_streak', 'value', v_dnow, 'best', v_dbest)
                                else jsonb_build_object('key', 'weeks_held', 'value', v_now, 'best', v_best) end,
            'commitment', case when v_free then jsonb_build_object('key', 'perfect_days', 'value', count(*) filter (where cf.kind = 'perfect_day'))
                               else jsonb_build_object('key', 'sessions_with_amir',
-                                                      'value', count(*) filter (where cf.kind in ('session_finished', 'session_finished_early'))) end,
+                                                      'value', coalesce(v_sess, count(*) filter (where cf.kind in ('session_finished', 'session_finished_early')))) end,
            'progress', case when v_free then jsonb_build_object('key', 'habit_steps', 'locked', true,
                               'value', coalesce((select sum(z.t) from (select max(a.tier) as t from public.career_awards a
                                                                          join public.career_catalogue c on c.kind = 'badge' and c.id = a.item
@@ -7263,6 +7380,8 @@ revoke all on function public.career_lift_unit(p_key text) from public, anon, au
 grant execute on function public.career_lift_unit(p_key text) to service_role;
 revoke all on function public.career_log(p_athlete text) from public, anon, authenticated, service_role;
 grant execute on function public.career_log(p_athlete text) to service_role;
+revoke all on function public.career_maxpct_key(p_body jsonb) from public, anon, authenticated, service_role;
+grant execute on function public.career_maxpct_key(p_body jsonb) to service_role;
 revoke all on function public.career_measures(p_athlete text, p_ctx jsonb, p_keys text[]) from public, anon, authenticated, service_role;
 grant execute on function public.career_measures(p_athlete text, p_ctx jsonb, p_keys text[]) to service_role;
 revoke all on function public.career_mint(p_athlete text, p_kind text, p_item text, p_tier integer, p_subject text, p_day date, p_body jsonb, p_tier_body jsonb, p_evidence jsonb, p_how text, p_ctx jsonb) from public, anon, authenticated, service_role;

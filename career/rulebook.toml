@@ -40,7 +40,7 @@ xp = "2026-10-18"
 # paying through hab_bonus_xp() and pay once in a career as awards (the same crossing day, the same XP, so no level drops);
 # the retired entries stop, the starts_at entries start, and what was earned under the new entries before that day is
 # minted in silence at the switch. It is seeded alone, on today's day (or yesterday's), at the same rulebook version.
-catalogue = "off"
+catalogue = "2026-10-18"
 
 [level]
 # The cost of level n to n+1 is base × n^growth, rounded to 10 (Proof's curve today, XP_SYSTEM.md §2).

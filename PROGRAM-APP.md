@@ -1318,7 +1318,7 @@ level is the career's (every session, every habit, never reset by a season) and 
 ## 🏅 Rewards on the finish card, the bands and the row (Career Mode phase 3, 2026-10-18)
 
 The training app's half of Career Mode's catalogue switch (`career/CAREER_MODE.md`, GAME-13 and GAME-14; the server's half and AA Proof's
-are in `HABITS.md`). **Built behind `catalogueOnT()` and dormant:** with the catalogue switch off the app is exactly phase 2's (the finish
+are in `HABITS.md`). **Built behind `catalogueOnT()`, ON since 2026-10-18:** with the catalogue switch off the app is exactly phase 2's (the finish
 card, the row and the finished card are byte for byte what they were; `scripts/headless/career.js` still passes). **No new screen**
 (decision D13): Proof is the career's home (the shelf, the Grand Slam, the titles), this app adds four small things to places that exist.
 
@@ -1339,7 +1339,7 @@ card, the row and the finished card are byte for byte what they were; `scripts/h
   before the pending. `careerMoves(e, ladder)` is PURE and a **twin** (`scripts/check_twins.js` §10, `scripts/career/reward_cases.json`):
   `e = { early, repeat?, fullLog, checkin, weekCloses, cycleCloses, byBook? }`; `byBook` is optional (without it the session alone is read);
   each line is exactly `{ id, name, have, next, crossed, pending }`, and the metal word is read from the ladder when it is drawn.
-  **`repeat` is GAME-4, and D19 is Claude's pick, waiting for Amir's word** (stage73, not applied yet): `careerEarn()` passes the flag it already works out (the plan day was done earlier in this
+  **`repeat` is GAME-4, and D19 is Claude's pick, in since Amir went live with it** (stage73, applied 2026-10-18): `careerEarn()` passes the flag it already works out (the plan day was done earlier in this
   training week), and a repeated day moves **no count over `session_finished` / `session_finished_early`** (Century stays at 24 of 25),
   because `career_facts_paid()` pays one session per plan day per week and the badges count only what it pays. The full log and the
   check-in still move their ladders (they are paid per session, uncapped). **The lift badges are not previewed here:** The Upgrade and

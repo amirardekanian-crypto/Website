@@ -2639,7 +2639,7 @@ the strip never asking, and nothing changing before the switch.
 > With it off, or with no profile ever (a new install offline, the demo, a preview with nothing to read), the app is
 > exactly what the rest of this file says, screen for screen (the lane's headless check compares the rendered Today, Progress and
 > Locker with the previous build's). The server half is `supabase/stage70_career_rewards.sql`; the rules are
-> `career/CAREER_MODE.md` and `career/PROCEDURES.md` → *Phase 3, as built*. Turning it on waits for Amir's sign-off of the catalogue
+> `career/CAREER_MODE.md` and `career/PROCEDURES.md` → *Phase 3, as built*. It went on on 2026-10-18 (Amir: "go live"); before that it waited for Amir's sign-off of the catalogue
 > (D11) and of every new line an athlete reads (D10), and the go-day he picks (D1: recommended, the day Season 2 starts).
 
 **What the switch is.** From its day every badge tier, milestone and catalogue title is an **award**: the server mints it once in a

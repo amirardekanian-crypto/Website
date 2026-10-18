@@ -304,7 +304,8 @@
 // v173: program.html changed (2026-10-18): the unit button over the weight boxes (kg, lb or plates), and a build-up of weights no longer asks "far above your numbers" at every heavier set.
 // v174: program.html and assets/js/sharecard.js changed (2026-10-18): a Personal Record, a win and a share card are kept in their own measure (kg, lb or plates), isolation lifts file no record, circuits get the unit button, Log a max has one.
 // v175: program.html changed (2026-10-18, Career Mode phase 3, the main-lifts fix): a plan day done again in its week moves no session count (Century) and adds nothing to Home's Sessions with Amir, shipped dormant behind the catalogue switch (off): nothing an athlete sees moves until it is on.
-const CACHE = 'aap-v175';
+// v176: program.html changed (2026-10-18): Career Mode's rewards are on (the catalogue switch went on that day), so the in-app guide says it in the plain present.
+const CACHE = 'aap-v176';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
