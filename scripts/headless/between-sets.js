@@ -108,7 +108,8 @@ const state = p => p.evaluate(() => ({ game: !!(window.BetweenSets && BetweenSet
     await openSets(p);
     await p.click(OV + ' [data-act="match"]');
     await wait(p, 1000);
-    await p.evaluate(() => { timerEndsAt = Date.now() + 1500; });
+    // Serve Clock would close the game with 30 s left (serve-clock.js tests that); this check is the rest running out on an open game, so the hand-back is off.
+    await p.evaluate(() => { SERVE_CLOCK.at = 0; SERVE_CLOCK.atLong = 0; timerEndsAt = Date.now() + 1500; });
     await wait(p, 2000);
     const up = await p.evaluate(() => { const lay = document.getElementById('setsOverlay'); const g = BetweenSets.isOpen() ? BetweenSets._game() : null;
       return { open: !!g, txt: /Time to lift/.test(lay.textContent), timedOut: g ? g.timedOut : null }; });
