@@ -18,7 +18,7 @@ const H = require('./lib');
 
 const t = H.checker();
 const wait = (p, ms) => p.waitForTimeout(ms);
-const DEFAULT_LINE = 'Air hockey against me · one match a session';
+const DEFAULT_LINE = 'Air hockey against me · one match';
 
 function prog() {
   const P = H.fixture();
@@ -101,6 +101,12 @@ async function helpers(p) {
     t.check('before any game has loaded (rally.js is not here yet) the row reads the default', (await p.evaluate(() => !window.Rally)) && (await line(p)) === DEFAULT_LINE, await line(p));
     await playRally(p);
     t.check('opening the game starts a fresh match at 0-0, parked in the file', await p.evaluate(() => { const m = Rally.matchState(); return m && m.you === 0 && m.amir === 0 && !m.over; }));
+    // review fix (2026-10-18): a match closed with no point played is nothing to resume, in the row and in the game
+    await p.click('.rally-x'); await wait(p, 250);
+    t.check('closing at 0-0 leaves the row at its default, not "You 0, me 0 · play resumes"', (await line(p)) === DEFAULT_LINE, await line(p));
+    await playRally(p);
+    const zero = await p.evaluate(() => { const s = Rally._state(); return { hint: s.hint, banner: s.banner && s.banner.text, freeze: s.freeze }; });
+    t.check('and the next open is a first open: the hint, no "Play resumes" banner, the ordinary serve pause', zero.hint === true && zero.banner === null && zero.freeze <= 0.7, JSON.stringify(zero));
     await helpers(p);
     await p.evaluate(() => { const s = Rally._state(); s.score.you = 6; s.score.amir = 4; s.best = 7; });
     await p.click('.rally-x');
@@ -169,6 +175,20 @@ async function helpers(p) {
       mk(); const s2 = Rally._state(); const r = { score: s2.score.you + '-' + s2.score.amir, hint: s2.hint }; Rally.close(); return r;
     });
     t.check('with no session key every open is a fresh match', noKey.score === '0-0' && noKey.hint === true, JSON.stringify(noKey));
+    // review fix (2026-10-18): Done for one day drops that day's parked match (and one opened with no card, 'x'), not another day's
+    const ends = await p.evaluate(() => {
+      const root = document.getElementById('rallyOverlay'), r = {};
+      const park = k => { Rally.open({ root, left: () => 90, sound: () => false, session: k }); Rally._state().score.you = 1; Rally.close(); };
+      park('1|2026-10-18'); Rally.endSession('2'); r.otherDay = !!Rally.matchState('1|2026-10-18');
+      Rally.endSession('1'); r.ownDay = Rally.matchState() === null;
+      park('x|2026-10-18'); Rally.endSession('2'); r.noCard = Rally.matchState() === null;
+      park('1|2026-10-18'); Rally.endSession(); r.noDay = Rally.matchState() === null;
+      park('12|2026-10-18'); Rally.endSession('1'); r.prefix = !!Rally.matchState();   // day 1 is not day 12
+      Rally.endSession();
+      return r;
+    });
+    t.check('Done for day 2 leaves the match of day 1; Done for day 1 drops it; no card (x) goes with any Done; no day drops all; day 1 is not day 12',
+      ends.otherDay && ends.ownDay && ends.noCard && ends.noDay && ends.prefix, JSON.stringify(ends));
     // the key itself: the card's day, Guided's day, 'x'
     const keys = await p.evaluate(() => {
       const d = ymdLocal(new Date()), r = {};
@@ -258,6 +278,19 @@ async function helpers(p) {
     t.check('Full time: "You win 16–9." then the longest rally and "Off the glass: 3." (2 before and this one)', box.title === 'Full time' && box.text === 'You win 16–9.\nLongest rally: 5 hits.\nOff the glass: 3.' && !box.hidden, JSON.stringify(box));
     t.check('its one button is "Back to the timer" (no Play again)', box.btn === 'Back to the timer' && !box.btnHidden, JSON.stringify(box));
     t.check('rally_stats counts it once, played and won, with the best rally', JSON.stringify(await stats(p)) === JSON.stringify({ best: 5, wins: 1, played: 1 }), JSON.stringify(await stats(p)));
+    // review fix (2026-10-18): the last point's banner is not drawn behind the Full time box (it showed round the box's edges at 320 px)
+    const ghost = await p.evaluate(() => {
+      const texts = [], f = CanvasRenderingContext2D.prototype.fillText;
+      CanvasRenderingContext2D.prototype.fillText = function (tx) { texts.push(String(tx)); return f.apply(this, arguments); };
+      try {
+        const s = Rally._state(), r = { banner: s.banner && s.banner.text };
+        Rally._draw(); r.atFullTime = texts.filter(x => /GLASS/i.test(x)).length;
+        s.m.over = false; s.over = false; Rally._draw(); r.control = texts.filter(x => /GLASS/i.test(x)).length;   // the same frame with the match still on: it is drawn
+        s.m.over = true; s.over = true;
+        return r;
+      } finally { CanvasRenderingContext2D.prototype.fillText = f; }
+    });
+    t.check('the last point banner "Off the glass +2" is not drawn behind the Full time box (and is drawn while the match is on)', ghost.banner === 'Off the glass +2' && ghost.atFullTime === 0 && ghost.control === 1, JSON.stringify(ghost));
     await p.screenshot({ path: path.join(out, 'full-time-won-390.png') });
     await p.click('.rally-go'); await wait(p, 200);
     t.check('the button closes the game, the rest keeps running', await p.evaluate(() => !Rally.isOpen() && timerRunning && document.getElementById('timerOverlay').classList.contains('visible')));

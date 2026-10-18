@@ -158,7 +158,7 @@ rest is the boss; the last 25 s are for the set; only inside a rest and optional
 | 44 | The Lob | A calm breathing door on the shelf (in 4, out 6), handing back at 25 s; a mode of rally.js | 39 | picked · **built** 2026-10-18 (sw.js v171) |
 | 45 | Call the Score | Guided: the door reads "Rate the set, then play" while the set just done has no RPE; nothing locks | — | picked, conditional: check whose sets are blank first |
 | 46 | Walk-On | Amir's own recorded lines at the bell, English and Farsi | — | pitched · waits for Amir's recordings |
-| 47 | Passing Shot | A Story card for beating Amir, in the Highlight Reel family | 38, 40 | parked until The Read ships |
+| 47 | Passing Shot | A Story card for beating Amir, in the Highlight Reel family | 38, 40 | parked; The Read (#38) and Full Time (#40) are built, so it can be picked |
 
 Grown for #20 The Corner (slices, not new numbers; they share Serve Clock's cue function): Ball Change (the next exercise's Because
 at a changeover), Towel Break (why this rest is long or short, three sightings), Order of Play (why the block order, in the guide

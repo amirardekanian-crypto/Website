@@ -8,7 +8,7 @@
 //   · Full time (2026-10-18): ONE match a session, first to 15, that waits between rests. The match belongs to the session, not the
 //     rest: it lives in a variable of this file (memory only, a reload starts fresh), and opening the game again for the same session
 //     key (program.html passes the day and the local date) picks it up where it was ("Play resumes · You 6, Amir 4"). A rest that ends
-//     or hands back PARKS it and never ends it; only Full time counts a match played or won; Done drops it (Rally.endSession()).
+//     or hands back PARKS it and never ends it; only Full time counts a match played or won; Done drops it (Rally.endSession(day)).
 //   · Bajada (2026-10-18): a goal that came off the glass counts 2. After a racket's last touch the ball hits the glass (a side wall
 //     or an end wall beside the gap, never a post) faster than BANK_MIN of its top speed and then goes through the far gap with no
 //     other racket in between: the player whose racket it was scores 2. An own goal off the glass is 1 for the other side, as ever.
@@ -22,13 +22,13 @@
 // program.html owns the layer (#rallyOverlay, in topLayer() so Back closes it) and loads this file the first time Play is
 // tapped (sw.js keeps it in the shell, so it plays with no signal; a change to it ships with a CACHE bump).
 // API: Rally.open({ root, left, sound, audio, session, onClose, mode }) · Rally.timeUp() · Rally.close() · Rally.isOpen() · Rally.handBack(done)
-//      · Rally.endSession() · Rally.matchState(session).
+//      · Rally.endSession(day) · Rally.matchState(session).
 //   mode: 'lob' opens The Lob instead of the game (a slow ball to breathe with, no match, no score: see "The Lob" below). It never reads or
 //   changes the parked match, so opening The Lob and then Off the Glass in one session picks the match up where it was left.
 //   left()  → whole seconds of rest left, or null while the rest is paused.
 //   session → a string that names the session (program.html: the day and the local date). The same string as the parked match's, and
-//   the match not over, resumes it; anything else starts a fresh match. Without one every open is a fresh match.
-//   endSession() → drops the parked match (Done, program.html's finishDayNow()).  matchState(session) → { you, amir, over } of the
+//   the match not over and with a point played, resumes it; anything else starts a fresh match (a 0-0 match is picked up as new). Without one every open is a fresh match.
+//   endSession(day) → drops the parked match (Done, program.html's finishDayNow(day)): that day's only, or any with no day.  matchState(session) → { you, amir, over } of the
 //   parked match, or null (with a session given, null unless it is that session's), for the shelf row's small line.
 //   sound() → true when the rest timer's sound is on.  audio() → the page's AudioContext, opened in the tap on Play.
 //   handBack(done) → Serve Clock (idea #39): with 25 s left program.html asks the game to wind down. It says "Last point.", lets a point in
@@ -599,7 +599,7 @@
     });
     g.globalAlpha = 1;
     // the point banner
-    if (S.banner) {
+    if (S.banner && !(S.m && S.m.over)) {   // not behind the Full time box: the last point's banner would show round its edges
       const t = S.banner.t, d = S.banner.dur || 1.1, a = t < 0.15 ? t / 0.15 : t > d - 0.3 ? Math.max(0, 1 - (t - (d - 0.3)) / 0.3) : 1;
       g.globalAlpha = a; g.fillStyle = S.banner.c; g.textAlign = 'center';
       const word = S.banner.text.toUpperCase(), fam = `'Barlow Condensed', 'AA Barlow Condensed', 'Arial Narrow', sans-serif`;
@@ -719,7 +719,7 @@
     S.onResize = () => { if (S) sizeCourt(); };
     window.addEventListener('resize', S.onResize);
     sizeCourt();
-    loadMatch(M, same && !M.over);
+    loadMatch(M, same && !M.over && M.score.you + M.score.amir > 0);   // a match with no point played yet is not "resumed": it opens like a new one, hint and all
     S.raf = requestAnimationFrame(frame);
   }
 
@@ -1016,8 +1016,13 @@
   function tick(dt) { if (!S) return; advance(dt, dt); }
   function apiTick(dt) { return S && S.mode === 'lob' ? lobTick(dt) : tick(dt); }
 
-  // Done drops the parked match (program.html's finishDayNow()): the next session starts a fresh one.
-  function endSession() { M = null; }
+  // Done drops the parked match (program.html's finishDayNow()): the next session starts a fresh one. With the finished day given, only that
+  // day's match goes (and one opened with no day, 'x'): finishing day 2 leaves a match parked for day 1 alone. No day, every match.
+  function endSession(day) {
+    if (!M) return;
+    if (day == null || typeof M.key !== 'string') { M = null; return; }
+    if (M.key.indexOf(String(day) + '|') === 0 || M.key.indexOf('x|') === 0) M = null;
+  }
   // The parked match as { you, amir, over }, or null. With a session given, only that session's (a match left from another day is not
   // "play resumes": open() would start a fresh one). The Lob never touches it.
   function matchState(session) {
@@ -1027,5 +1032,5 @@
   }
 
   window.Rally = { open, timeUp: apiTimeUp, handBack: apiHandBack, endSession, matchState, close: () => close(), isOpen: () => !!S, stats: loadStats,
-    _state: () => S, _tick: apiTick, _next: () => { if (S && S.mode !== 'lob') newMatch(); } };
+    _state: () => S, _tick: apiTick, _draw: () => { if (S && S.mode !== 'lob') draw(); }, _next: () => { if (S && S.mode !== 'lob') newMatch(); } };
 })();

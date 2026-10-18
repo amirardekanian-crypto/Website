@@ -5417,7 +5417,7 @@
     <button type="button" class="timer-play" id="timerPlayBtn" aria-expanded="false" aria-controls="timerGames" onclick="toggleRestGames()"><span class="tp-ball" aria-hidden="true"></span>Play while you rest</button>
     <div class="timer-games" id="timerGames" hidden>
       <button type="button" class="tg-row" data-game="splitstep" onclick="openRestGame('splitstep')"><span class="tg-dot" aria-hidden="true"></span><b>Split Step</b><small>React to the hit · 4 drills</small><span class="tg-chev" aria-hidden="true">›</span></button>
-      <button type="button" class="tg-row" data-game="rally" onclick="openRestGame('rally')"><span class="tg-dot" aria-hidden="true"></span><b>Off the Glass</b><small>Air hockey against me · one match a session</small><span class="tg-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="tg-row" data-game="rally" onclick="openRestGame('rally')"><span class="tg-dot" aria-hidden="true"></span><b>Off the Glass</b><small>Air hockey against me · one match</small><span class="tg-chev" aria-hidden="true">›</span></button>
       <button type="button" class="tg-row" data-game="sets" onclick="openRestGame('sets')"><span class="tg-dot" aria-hidden="true"></span><b>Between Sets</b><small>Tennis against me · a set lasts your workout</small><span class="tg-chev" aria-hidden="true">›</span></button>
       <button type="button" class="tg-row" data-game="lob" onclick="openRestGame('lob')"><span class="tg-dot" aria-hidden="true"></span><b>The Lob</b><small>Breathe with the ball · in 4, out 6</small><span class="tg-chev" aria-hidden="true">›</span></button>
     </div>
@@ -9726,7 +9726,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. One match lasts your whole session: first to 15. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. <strong>The Lob</strong> is a slow ball to breathe with: in as it rises, out as it falls. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. You get one match a session: first to 15. A goal off the glass counts 2. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. <strong>The Lob</strong> is a slow ball to breathe with: in as it rises, out as it falls. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. During a session it's under <strong>⋯</strong> on the bar too, as <strong>Ask Amir</strong>, and it names the exercise you have open. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
 ];
@@ -13447,7 +13447,7 @@ function finishDayNow(day, card) {
   paintSoreSugg(day);   // a sore check-in: the day-after session (LIB-01)
   paintResetBtn(day);
   markSuggestedDay();
-  try { if (window.Rally && Rally.endSession) Rally.endSession(); } catch (e) {}   // Full time: Done ends the session, and its Off the Glass match with it
+  try { if (window.Rally && Rally.endSession) Rally.endSession(day); } catch (e) {}   // Full time: Done ends the session, and its Off the Glass match with it (that day's only)
 }
 window.finishDay = finishDay;
 
@@ -16117,7 +16117,7 @@ function openRestGame(key) {
       session: restGameSession(),   // Off the Glass (Full time): the same session resumes its one match; the other games ignore it
       onClose: () => { paintRestGameLines(); if (document.getElementById('timerOverlay').classList.contains('visible')) { const b = document.getElementById('timerPlayBtn'), f = b && !b.hidden ? b : document.getElementById('startStopBtn'); if (f) f.focus(); } },   // the door is gone after the hand-back: focus the clock's button, not a hidden one
     });
-  }, () => { if (_restGameWant === key && typeof aaToast === 'function') { _restGameWant = null; aaToast('The game did not load. Check your signal and try again.'); } });
+  }, () => { if (_restGameWant === key && typeof aaToast === 'function') { _restGameWant = null; aaToast('That did not load. Check your signal and try again.'); } });
 }
 // Full time (Off the Glass, 2026-10-18): ONE match a session. A session is a workout day on its date: Guided knows its day (STEP.day), the
 // list takes it from the card the Rest button belongs to (timerCtx.card), a rest opened with neither is 'x'; the local date comes from
@@ -16134,11 +16134,11 @@ function restGameSession() {
 // Off the Glass's row reads its small line from the game when the shelf opens (and again when the game closes): the default, the match
 // that waits for the next rest, or Full time. rally.js not loaded yet means no match to speak of, so the default.
 function rallyRowLine() {
-  const dflt = 'Air hockey against me · one match a session';
+  const dflt = 'Air hockey against me · one match';
   try {
     const m = window.Rally && Rally.matchState ? Rally.matchState(restGameSession()) : null;
     if (!m) return dflt;
-    if (!m.over) return 'You ' + m.you + ', me ' + m.amir + ' · play resumes';
+    if (!m.over) return m.you + m.amir > 0 ? 'You ' + m.you + ', me ' + m.amir + ' · play resumes' : dflt;   // 0-0: nothing to resume
     return m.you > m.amir ? 'Full time · you won ' + m.you + '–' + m.amir : 'Full time · I won ' + m.amir + '–' + m.you;
   } catch (e) { return dflt; }
 }
@@ -16169,6 +16169,7 @@ function toggleRestGames() {
   paintRestGameLines();   // Off the Glass's line: the match waiting, or Full time
   sh.hidden = false;
   b.setAttribute('aria-expanded', 'true');
+  try { sh.lastElementChild.scrollIntoView({ block: 'nearest' }); } catch (e) {}   // a small phone: the fourth row is not left under the fold
 }
 
 // A hidden page gets no ticks and loses its wake lock; coming back catches the clock up

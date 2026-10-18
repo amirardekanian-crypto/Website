@@ -20,7 +20,7 @@
 // from a player this good, and the row shows that ceiling whenever a number moves. Amir should play it himself: this is a ruler, not a player.
 //
 // What it holds true (every number measured on 2026-10-18, over eight seeds, none of it a hope):
-//   sharp ~71% of the goals, average ~57%, tired ~51%, the follower ~86%. At first to 15 with banks counting 2 (Full time, Bajada) the average bot
+//   sharp ~69% of the goals, average ~57%, tired ~52%, the follower ~86%. At first to 15 with banks counting 2 (Full time, Bajada) the average bot
 //   wins about 57% of the goals but about 53% of the BOARD (about half of Amir's goals are banks, about 27% of the average bot's), which is about two
 //   matches in three (64%; the tired bot wins 38% of the matches, the sharp one 98%); a match takes the average bot about 1.3 minutes of play (the
 //   longest of 248 took 2.7), so the 8-minute budget is for a person who dawdles and no bot ever reaches it;
