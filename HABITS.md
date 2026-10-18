@@ -2680,7 +2680,12 @@ every badge here already read: `loggedDays()`, `isDone()`, `dayQualifies()`, `is
 bonus cache. `phoneAwards()` keeps the crossings on a day AFTER the switch (the switch day is history on both sides), inside the open
 window (today and the 3 days before it, plus one), not owned, not withdrawn, priced as the server prices them. Their XP shows at the
 tap (`pendingAwardXp()`, added to `careerXp()` and the week) until the server's answer owns them. `scripts/check_twins.js` §10 holds
-the twin to the server's own answers (`scripts/career/reward_cases.json`).
+the twin to the server's own answers (`scripts/career/reward_cases.json`). **No lift badge and no server session count is scored here**
+(D18, Amir 2026-10-18; D19, Claude's pick, waiting for his word): The Upgrade and Double Up (main lifts only: a lift on one of the seven main Spine patterns with the strength tag, minus four accessories Amir named, the entry's `patterns`, `qualities` and `exclude`; the list fails closed on a missing id, `career/PROCEDURES.md` → *Stage 73*) and Century (the sessions
+`career_facts_paid()` pays) have no measure in `awardMeasures()` and are server-decided, so they reach this app as ordinary server
+moments and the phone never previews them. Do not add a measure for one without each lift's Spine pattern, its Spine strength tag and the `exclude` list (or the phone would count Amir's four accessories again), and for Century without the paid-session cap.
+**What Proof does score is its own log:** THE FOUNDRY's *16 sessions* is days the WORKOUT habit (id `strength`) was hit (`daysHit:strength`, `achievements.toml`), so a plan day done again
+on another date still moves it, though with D19 it no longer moves Century. That is what the event reads today; Amir may want to know when he answers D19.
 
 **A pending award the server does not hold is withdrawn, quietly.** Judged only on an answer that started after a push landed with
 nothing left to send: the id goes into `<id>_hab_awwd` (phone-local), its wins line goes, its XP goes, and the console says
@@ -2711,7 +2716,8 @@ Share it opens the Rank card, eyebrow *MY RECORD*.
 
 - **Today:** under the level bar, **four numbers**, one per kind of win (`hero4()`): coached *Weeks held* (with its best) ·
   *Sessions with Amir* · *Personal bests* · *Comebacks*; free *Day streak* · *Perfect days* · *Habit steps* · *Comebacks* (D4),
-  the free athlete's first three this phone's own, so they move at the tap. A tap opens Progress at that kind of win. Two by two
+  the free athlete's first three this phone's own, so they move at the tap. *Sessions with Amir* is the server's `numbers.four.commitment.value` and nothing is added to it here: from stage73
+  (built, not yet applied; D19, Claude's pick, waiting for Amir's word) it is the paid sessions Century counts, a plan day done again in its training week counting once (GAME-4). A tap opens Progress at that kind of win. Two by two
   under 360 px.
 - **Progress:** the statgrid is unchanged (D15; *Milestones* now counts the awards held over every live tier and milestone). The
   milestone block is the catalogue's, in four groups (*Consistency*, *Commitment*, *Progress*, *Resilience*), with the same folds,

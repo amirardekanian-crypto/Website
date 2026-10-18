@@ -133,9 +133,22 @@ fi
 # the leak itself (one id per line; /athlete-intake appends each new one). Only lines
 # being ADDED are checked, so an old mention elsewhere never blocks a commit. A clone
 # without the list skips this guard.
+# Since 2026-10-18 it also covers career/, scripts/career/, the root *.md docs and the stage
+# SQL files: the Career Mode rehearsals report real athletes' numbers, and a docs pass wrote
+# ten client ids with their session counts and lift gains into career/*.md (caught before the
+# commit; one had already reached main). And a worktree has no list of its own (the file is
+# gitignored), so it reads the main checkout's; until then the guard skipped every worktree.
 ids_file=".claude/athlete-ids.local"
+if [ ! -f "$ids_file" ]; then
+  ids_common=$(git rev-parse --git-common-dir 2>/dev/null)
+  if [ -n "$ids_common" ] && [ -f "$ids_common/../.claude/athlete-ids.local" ]; then
+    ids_file="$ids_common/../.claude/athlete-ids.local"
+  fi
+fi
 if [ -f "$ids_file" ]; then
-  staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(\.claude/|\.githooks/)' | grep -vx "$ids_file")
+  staged=$(git diff --cached --name-only --diff-filter=ACM \
+    | grep -E '^(\.claude/|\.githooks/|career/|scripts/career/|supabase/stage[^/]*\.sql$|[^/]+\.md$)' \
+    | grep -vx ".claude/athlete-ids.local")
   if [ -n "$staged" ]; then
     # Lower-case both sides instead of `grep -i`: Git for Windows' grep aborts on -i with
     # -F -f (found testing this guard, 2026-09-26), and an aborted grep reads as "no hits".
@@ -145,7 +158,7 @@ if [ -f "$ids_file" ]; then
     rm -f "$pats"
     if [ -n "$hits" ]; then
       echo ""
-      echo "pre-commit: BLOCKED — athlete ids in lines being added to public coaching files:"
+      echo "pre-commit: BLOCKED — athlete ids in lines being added to public files (this repo is public):"
       echo "$hits" | sed 's/^/  /'
       echo "Write 'one athlete' or the next 'Athlete <letter>' instead; their record lives in public.coaching_logs."
       failed=1
@@ -411,8 +424,9 @@ fi
 # block. test_check_career.py proves the checker still fails on each fault, and runs only when the checker or its test changes.
 # Since phase 1 (stage66, 2026-10-17) Career Mode scores habits with Proof's own numbers until rulebook.toml's [switch] catalogue
 # is turned on (phase 3; [shadow] until phase 2), and the checker holds them equal to supabase/xp_rules_snapshot.json: a change to
-# Proof's rules runs it too, so the two can never drift apart quietly.
-if git diff --cached --name-only --diff-filter=ACMD | grep -qE '^career/.+\.toml$|^scripts/check_career\.py$|^supabase/xp_rules_snapshot\.json$'; then
+# Proof's rules runs it too, so the two can never drift apart quietly. Since stage73 (GAME-10) it also reads coach.html's SPINE_PATTERNS (for the `patterns` key) and QM_IDS (for the `qualities` key),
+# so a coach.html change runs it as well (a dropped pattern or quality would otherwise surface only as guard 15 failing to seed).
+if git diff --cached --name-only --diff-filter=ACMD | grep -qE '^career/.+\.toml$|^scripts/check_career\.py$|^supabase/xp_rules_snapshot\.json$|^coach\.html$'; then
   echo "pre-commit: Career Mode's files changed — checking them..."
   if ! career_out=$("$PY" -X utf8 scripts/check_career.py 2>&1); then
     echo "$career_out" | sed -n '/^Errors/,$p'

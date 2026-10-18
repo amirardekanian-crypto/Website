@@ -10483,7 +10483,7 @@ function careerEarn(day, D, done) {
   if (catalogueOnT()) {
     try {
       const fullLog = careerFullLog(D.log, early), checkin = careerCheckin(D.readiness);
-      moves = careerMoves({ early, fullLog, checkin, weekCloses, cycleCloses: weekCloses && !!w && w.wk === w.total,
+      moves = careerMoves({ early, repeat, fullLog, checkin, weekCloses, cycleCloses: weekCloses && !!w && w.wk === w.total,
         byBook: weekCloses && careerWeekByBook(fullLog, checkin) }, careerLadderNow());
     } catch (err) { moves = null; }
   }
@@ -10538,7 +10538,10 @@ function awardId(kind, item, tier, subject) {
 // session closes its week (week_held, week_by_the_book) or its cycle (cycle_finished), and is always pending: the server decides a week.
 // A run badge (Hold Serve) counts from `now`, the run so far, not from its best. Crossed lines first, then the nearest, then the sure
 // before the pending. byBook, when the caller knows it, says every session of the week was logged in full and checked in; without it this
-// session alone is read.
+// session alone is read. repeat (GAME-4; D19, Claude's pick, waiting for Amir's word): the plan day was done already this training week, so the session itself is not a paid
+// session (career_facts_paid() pays one per plan day per week) and moves no count over session_finished / session_finished_early (Century);
+// the full log and the check-in count as ever. The lift badges (The Upgrade, Double Up: main lifts only, GAME-10) have no `phone`, so they
+// never come here: the server decides a lift's gain.
 function careerMoves(e, ladder) {
   const lines = [];
   if (!e || !ladder || typeof ladder !== 'object') return { lines, more: 0 };
@@ -10548,8 +10551,8 @@ function careerMoves(e, ladder) {
     if (!en || typeof en !== 'object' || !(Number(en.next) > 0)) return;   // no entry, or already on its top tier
     let inc = 0, pending = false;
     if (en.phone === 'session') {
-      if (has(en, 'session_finished') && !e.early) inc += 1;
-      if (has(en, 'session_finished_early') && e.early) inc += 1;
+      if (has(en, 'session_finished') && !e.early && !e.repeat) inc += 1;
+      if (has(en, 'session_finished_early') && e.early && !e.repeat) inc += 1;
       if (has(en, 'full_log') && e.fullLog) inc += 1;
       if (has(en, 'checkin_done') && e.checkin) inc += 1;
     } else if (en.phone === 'week') {
@@ -10596,7 +10599,8 @@ function careerMovesHTML(m) {
   return `<div class="cf-moves">${m.lines.map(row).join('')}${m.more > 0 ? `<small class="cf-earn-more">+${m.more} more in AA Proof</small>` : ''}</div>`;
 }
 // Home's Career row: the four numbers from numbers.four only (both apps read the same keys), a zero cell left out. Sessions with Amir shows +1
-// from this phone for a session finished here that no answer has counted yet (never lower than the profile's).
+// from this phone for a PAID session finished here that no answer has counted yet (never lower than the profile's): the server's number counts
+// what career_facts_paid() pays, one session per plan day per training week (GAME-4), so a plan day done again in its week adds nothing.
 // (functions, not top-level tables: Home's first paint can reach these before the script has evaluated this far.)
 function careerFourWord(key, n) {
   const w = { weeks_held: ['week held', 'weeks held'], sessions_with_amir: ['session', 'sessions'], personal_bests: ['best', 'bests'],
@@ -10604,7 +10608,32 @@ function careerFourWord(key, n) {
     habit_steps: ['habit step', 'habit steps'] }[key];
   return w ? w[n === 1 ? 0 : 1] : '';
 }
+// What one waiting record (<id>_earn_d<N>) adds to Sessions with Amir until an answer counts it: 1 for a paid session, 0 for a plan day done again in its
+// training week (GAME-4; D19, Claude's pick, waiting for Amir's word: career_facts_paid() pays one session per plan day per week, and the server's number
+// counts only what it pays). Once the catalogue switch is on, careerEarnAtDone() writes two things on the record: `repeat` (this finish was a repeat) and
+// `paid`, the sessions the record stands for: this finish's own (none for a repeat) plus whatever the record it replaces still had waiting. The record is
+// keyed by plan day, so without that a repeat finished before an answer has counted the first session would take the first one's +1 away and Home would
+// read one low. `paid` decides when it is there, else `repeat`. A record with neither (one written before, or while the catalogue was off) is read from its
+// parts: careerEarn() leaves the 'session' / 'early' part out of a repeat (and has since phase 2), so a record with neither part is a repeat; a record
+// with no parts at all counts, as before. PURE (a twin: scripts/check_twins.js §10 holds it to careerEarn()'s own parts).
+function careerRecPaid(raw) {
+  if (!raw || typeof raw !== 'object') return 0;
+  if (typeof raw.paid === 'number' && isFinite(raw.paid)) return Math.max(0, Math.floor(raw.paid));
+  if (typeof raw.repeat === 'boolean') return raw.repeat ? 0 : 1;
+  if (!Array.isArray(raw.parts)) return 1;
+  return raw.parts.some(x => x && (x.k === 'session' || x.k === 'early')) ? 1 : 0;
+}
+// What one waiting record adds to the cell right now: careerRecPaid(), unless it is older than 3 days or an answer asked after the session reached the
+// server has counted it. now is Date.now(). PURE apart from CAREER_T.at (pinned in scripts/check_twins.js §10).
+function careerRecPending(raw, now) {
+  if (!raw || typeof raw !== 'object' || !(now - Date.parse(raw.t) < 3 * 86400000)) return 0;
+  if (raw.saved && CAREER_T.at > raw.saved) return 0;   // an answer asked after the session reached the server has counted it
+  return careerRecPaid(raw);
+}
+// The `paid` a record gets at Done: this finish's own session (none for a repeat) plus what the record for the same plan day, still waiting, stood for.
+function careerPaidAtDone(repeat, prev, now) { return (repeat ? 0 : 1) + careerRecPending(prev, now); }
 function careerPendingSessions() {
+  if (!catalogueOnT()) return 0;   // the four cells exist only with the catalogue switch on
   let n = 0;
   try {
     const pre = ATHLETE_ID + '_earn_d', now = Date.now();
@@ -10612,9 +10641,7 @@ function careerPendingSessions() {
       const k = localStorage.key(i);
       if (!k || k.indexOf(pre) !== 0) continue;
       const raw = JSON.parse(localStorage.getItem(k) || 'null');
-      if (!raw || !(now - Date.parse(raw.t) < 3 * 86400000)) continue;
-      if (raw.saved && CAREER_T.at > raw.saved) continue;   // an answer asked after the session reached the server has counted it
-      n += 1;
+      n += careerRecPending(raw, now);
     }
   } catch (e) { return 0; }
   return n;
@@ -10819,7 +10846,13 @@ function careerEarnAtDone(day) {
       before: Number(CAREER_T.p.career && CAREER_T.p.career.xp) || 0, saved: 0 };
     // Career Mode phase 3: every award this phone knows at Done (the finished card's new rewards are what the next answer adds to it) and
     // the lines the finish card showed (the phone-decided crossings become "Counting" bands).
-    if (catalogueOnT()) { rec.snap = ownedIds(CAREER_T.p); rec.moves = e.moves; }
+    // `repeat` is the plan day done again in its week (GAME-4; D19) and `paid` what this record adds to Sessions with Amir until an answer counts it
+    // (careerPaidAtDone()): a repeat adds nothing of its own, and it keeps the +1 of a session of the same plan day that the record it replaces still had waiting.
+    if (catalogueOnT()) {
+      let prev = null;
+      try { prev = JSON.parse(localStorage.getItem(ATHLETE_ID + '_earn_d' + day) || 'null'); } catch (x) { /* an unreadable old record has nothing waiting */ }
+      rec.snap = ownedIds(CAREER_T.p); rec.moves = e.moves; rec.repeat = !!e.repeat; rec.paid = careerPaidAtDone(!!e.repeat, prev, Date.now());
+    }
     _lsRawSet(ATHLETE_ID + '_earn_d' + day, JSON.stringify(rec));
   } catch (err) { /* storage full: the finished card simply has no line */ }
 }

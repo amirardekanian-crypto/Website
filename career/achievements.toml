@@ -135,6 +135,11 @@ meaning = "progress"
 reads = "lift_gain"
 test = "best_value"
 at = 100
+# GAME-10: a lift counts toward Double Up only when its Spine entry is on one of these patterns, is tagged strength and is not in `exclude` (Amir, 2026-10-18: "Yes i want those to be exluded / You set up the rule for that").
+# Each `exclude` id must be a Spine id spelled exactly (a draft is fine): an id with no Spine row at all pauses both rewards (this one and The Upgrade) for everyone until it is fixed.
+patterns = ["squat", "hinge", "single-leg", "push-horizontal", "push-vertical", "pull-horizontal", "pull-vertical"]
+qualities = ["strength"]
+exclude = ["back-extension-45", "cable-face-pull", "machine-reverse-fly", "cable-straight-arm-pulldown"]
 rule = "A lift twice its first number (lift_gain 100% or more), at the same effort."
 xp = 500
 size = "legend"

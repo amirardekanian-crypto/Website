@@ -9,8 +9,12 @@
 // --report writes the switch's list (each athlete's level in AA Proof against the career level after the switch) to a file: keep it outside the repo.
 //
 // What it does, in order: the live project as it stood before stage69. The schema snapshot is the live structure and already holds stage69 (and stage70
-// once that is live), so the rehearsal first takes them off with their own way back (scripts/career/rollback_stage70.sql, then rollback_stage69.sql:
-// the way back is tested by what comes after); then the backup's rows and the phase 1 seed made from the career files of --phase1 (what the live
+// once that is live, and stage73 once that is), so the rehearsal first takes them off with their own way back, the newest first (scripts/career/
+// rollback_stage73.sql if the snapshot holds stage73, then rollback_stage70.sql, then rollback_stage69.sql: stage70's way back does not know
+// career_maxpct_key(), which only stage73's drops; the way back is tested by what comes after). The weight units (stage71_weight_units.sql and
+// stage72_weight_measures.sql, live since 2026-10-18) stay when the snapshot holds them: none of the three ways back touches their functions, and
+// for a log in kilograms (every real log) they move no fact (scripts/career/rehearse.mjs, section 11, and rehearse_measures.mjs are their own
+// rehearsals); rollback_stage71.sql is theirs and is never run here. Then the backup's rows and the phase 1 seed made from the career files of --phase1 (what the live
 // project was seeded from). The phase 2 rulebook is the career files of --phase2 (version 2, both switches off), so this stays the rehearsal of phase 2
 // whatever the working files say now. Then
 //   1. stage69 twice, then the seed of the phase 2 files ([switch] xp = "off"): nothing an athlete sees moves (the board, Proof's level, the profile);
@@ -148,15 +152,21 @@ async function main() {
   section('0. the live project before stage69');
   await runSql(db, read(path.join(ROOT, 'scripts', 'restore', 'stand_in_supabase.sql')), 'stand-in');
   await runSql(db, read(path.join(ROOT, 'supabase', 'schema_snapshot.sql')), 'snapshot');
-  // The snapshot is the live structure NOW: stage66 and stage69 are in it (stage70 too once it is live). The project before stage69 is what the
-  // way back puts back, so take them off with it (stage70 first). Their own files do it, so they are tested by everything that follows.
+  // The snapshot is the live structure NOW: stage66 and stage69 are in it (stage70, stage71 and stage72 too once they are live, stage73 too once that
+  // is). The project before stage69 is what the way back puts back, so take them off with it, the newest first: stage73 (it replaces four of stage70's
+  // functions and adds career_maxpct_key(), which rollback_stage70.sql does not drop), then stage70, then stage69. Their own files do it, so they are
+  // tested by everything that follows. stage71 and stage72 (the weight units) stay: no way back here touches their functions, and for a log in
+  // kilograms they derive what stage66 did (their own rehearsals prove it); rollback_stage71.sql is the weight units' and is never run here.
   const held0 = await heldStages(db);
   const rb70 = read(path.join(ROOT, 'scripts', 'career', 'rollback_stage70.sql')).replace(`'career.rollback70', 'dry'`, `'career.rollback70', 'real'`);
+  if (held0[73]) await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage73.sql')), 'rollback73 on the snapshot');
   if (held0[70]) await runSql(db, rb70, 'rollback70 on the snapshot');
   if (held0[69]) await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage69.sql')), 'rollback69 on the snapshot');
   const held1 = await heldStages(db);
-  ok(!held1[69] && !held1[70], `the snapshot holds ${[66, 69, 70].filter(k => held0[k]).map(k => 'stage' + k).join(', ') || 'no career stage'}; its way back takes off stage69 `
-     + `(${held0[70] ? 'and stage70 ' : ''}so the project is as it stood on 2026-10-17, phase 1 in shadow)`);
+  ok(!held1[69] && !held1[70] && !held1[73] && held1[71] === held0[71] && held1[72] === held0[72],
+     `the snapshot holds ${[66, 69, 70, 71, 72, 73].filter(k => held0[k]).map(k => 'stage' + k).join(', ') || 'no career stage'}; its way back takes off stage69 `
+     + `(${held0[70] ? 'and stage70 ' : ''}${held0[73] ? 'and stage73, career_maxpct_key() with it, ' : ''}so the project is as it stood on 2026-10-17, phase 1 in shadow`
+     + `${held0[71] || held0[72] ? '; the weight units, ' + [71, 72].filter(k => held0[k]).map(k => 'stage' + k).join(' and ') + ', stay' : ''})`);
   const T = backup.tables || {};
   const n = {};
   for (const t of ['seasons', 'xp_rules', 'programs', 'program_versions', 'library_sessions', 'athlete_status', 'hab_titles', 'leaderboard_optin',

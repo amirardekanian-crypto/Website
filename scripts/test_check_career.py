@@ -533,6 +533,155 @@ class CareerCheckerTests(unittest.TestCase):
         self.append("badges.toml", BEST_VALUE_BADGE)
         self.assertPasses("OK: 0 errors")
 
+    def test_game_10_patterns_on_lift_gain_entries(self):
+        good = swap(BEST_VALUE_BADGE, 'counts = "lift_gain"\n', 'counts = "lift_gain"\npatterns = ["squat", "pull-vertical"]\n')
+        self.append("badges.toml", good)
+        self.assertPasses("OK: 0 errors")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "best_value"\nat = 100\npatterns = ["hinge"]',
+                                                     reads="lift_gain", name="zz_value"))
+        self.assertPasses("OK: 0 errors")
+
+    def test_game_10_patterns_are_checked(self):
+        bad = lambda v: swap(BEST_VALUE_BADGE, 'counts = "lift_gain"\n', f'counts = "lift_gain"\npatterns = {v}\n')
+        self.append("badges.toml", bad('["squat", "no-such-pattern"]'))
+        self.assertFails("[badge.zz_value]", "'no-such-pattern' is not a Spine pattern")
+        self.setUp()
+        self.append("badges.toml", bad("[]"))
+        self.assertFails("[badge.zz_value]", "patterns must be a non-empty list")
+        self.setUp()
+        self.append("badges.toml", bad('"squat"'))
+        self.assertFails("[badge.zz_value]", "patterns must be a non-empty list")
+        self.setUp()   # not a lift-gain entry
+        self.append("badges.toml", swap(GOOD_BADGE.replace("zz_good", "zz_plain"), 'origin = "new"\n',
+                                        'origin = "new"\npatterns = ["squat"]\n'))
+        self.assertFails("[badge.zz_plain]", "patterns is only for an entry that reads the fact lift_gain")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "first"\npatterns = ["squat"]', name="zz_plainach"))
+        self.assertFails("[achievement.zz_plainach]", "patterns is only for an entry that reads the fact lift_gain")
+        self.setUp()   # reads lift_gain but not as a best value: the server would ignore the key there
+        self.append("badges.toml", swap(swap(BEST_VALUE_BADGE, 'kind = "best_value"', 'kind = "total"'),
+                                        'counts = "lift_gain"\n', 'counts = "lift_gain"\npatterns = ["squat"]\n'))
+        self.assertFails("[badge.zz_value]", "patterns is only for an entry that reads the fact lift_gain as its best value")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "first"\npatterns = ["squat"]', reads="lift_gain", name="zz_firstgain"))
+        self.assertFails("[achievement.zz_firstgain]", "patterns is only for an entry that reads the fact lift_gain as its best value")
+
+    # ── GAME-10 (Amir, 2026-10-18: accessories are out of The Upgrade and Double Up): qualities and exclude narrow `patterns` ──
+    @staticmethod
+    def lift_badge(extra):
+        """A valid best_value lift_gain badge (zz_value) with `extra` lines right under its counts."""
+        return swap(BEST_VALUE_BADGE, 'counts = "lift_gain"\n', 'counts = "lift_gain"\n' + extra)
+
+    @staticmethod
+    def lift_achievement(extra):
+        """A valid best_value lift_gain achievement (zz_value) with `extra` lines under its test."""
+        return achievement('test = "best_value"\nat = 100\n' + extra, reads="lift_gain", name="zz_value")
+
+    def test_game_10_qualities_and_exclude_pass_beside_patterns(self):
+        both = 'patterns = ["squat", "pull-vertical"]\nqualities = ["strength"]\nexclude = ["cable-face-pull", "back-extension-45"]\n'
+        self.append("badges.toml", self.lift_badge(both))
+        self.assertPasses("OK: 0 errors")
+        self.setUp()
+        self.append("achievements.toml", self.lift_achievement(both))
+        self.assertPasses("OK: 0 errors")
+        for alone in ('qualities = ["strength", "power", "muscle"]\n', 'exclude = ["machine-reverse-fly"]\n'):
+            self.setUp()   # each key stands without the other
+            self.append("badges.toml", self.lift_badge('patterns = ["hinge"]\n' + alone))
+            self.assertPasses("OK: 0 errors")
+            self.setUp()
+            self.append("achievements.toml", self.lift_achievement('patterns = ["hinge"]\n' + alone))
+            self.assertPasses("OK: 0 errors")
+
+    def test_game_10_qualities_are_checked(self):
+        bad = lambda v: self.lift_badge(f'patterns = ["squat"]\nqualities = {v}\n')
+        self.append("badges.toml", bad('["strength", "stamina"]'))
+        out = self.assertFails("[badge.zz_value]", "qualities 'stamina' is not one of the Spine's qualities", "(GAME-10)")
+        self.assertNotIn("qualities 'strength'", out)
+        for v in ("[]", '"strength"', "[1]", '["strength", ""]'):
+            self.setUp()
+            self.append("badges.toml", bad(v))
+            self.assertFails("[badge.zz_value]", "qualities must be a non-empty list")
+        self.setUp()
+        self.append("achievements.toml", self.lift_achievement('patterns = ["hinge"]\nqualities = ["strong"]\n'))
+        self.assertFails("[achievement.zz_value]", "qualities 'strong' is not one of the Spine's qualities")
+        self.setUp()
+        self.append("achievements.toml", self.lift_achievement('patterns = ["hinge"]\nqualities = "strength"\n'))
+        self.assertFails("[achievement.zz_value]", "qualities must be a non-empty list")
+
+    def test_game_10_exclude_is_checked(self):
+        bad = lambda v: self.lift_badge(f'patterns = ["squat"]\nexclude = {v}\n')
+        for v in ("[]", '"cable-face-pull"', "[1]", '["cable-face-pull", ""]'):
+            self.setUp()
+            self.append("badges.toml", bad(v))
+            self.assertFails("[badge.zz_value]", "exclude must be a non-empty list of Spine ids")
+        for v in ('Cable Face Pull', 'cable_face_pull', '-cable', 'cable--pull', 'cable-face-pull-', 'Cable-Face-Pull', 'cable face-pull'):
+            self.setUp()
+            self.append("badges.toml", bad(f'["back-extension-45", "{v}"]'))
+            self.assertFails("[badge.zz_value]", f"exclude '{v}' is not a Spine id", "(GAME-10)")
+        self.setUp()
+        self.append("badges.toml", bad('["cable-face-pull", "back-extension-45", "cable-face-pull"]'))
+        out = self.assertFails("[badge.zz_value]", "exclude lists 'cable-face-pull' twice", "(GAME-10)")
+        self.assertNotIn("back-extension-45", out)
+        self.setUp()
+        self.append("achievements.toml", self.lift_achievement('patterns = ["hinge"]\nexclude = ["cable-face-pull", "cable-face-pull"]\n'))
+        self.assertFails("[achievement.zz_value]", "exclude lists 'cable-face-pull' twice")
+        self.setUp()
+        self.append("achievements.toml", self.lift_achievement('patterns = ["hinge"]\nexclude = ["Cable Face Pull"]\n'))
+        self.assertFails("[achievement.zz_value]", "exclude 'Cable Face Pull' is not a Spine id")
+
+    def test_game_10_qualities_and_exclude_need_patterns(self):
+        for key, value in (("qualities", '["strength"]'), ("exclude", '["cable-face-pull"]')):
+            says = f"{key} narrows the lifts that patterns lists, so it needs patterns on the same entry"
+            self.setUp()   # a best_value lift_gain entry that names no patterns
+            self.append("badges.toml", self.lift_badge(f"{key} = {value}\n"))
+            self.assertFails("[badge.zz_value]", says, "(GAME-10)")
+            self.setUp()
+            self.append("achievements.toml", self.lift_achievement(f"{key} = {value}\n"))
+            self.assertFails("[achievement.zz_value]", says)
+            self.setUp()   # an entry that reads no lift at all
+            self.append("badges.toml", swap(GOOD_BADGE.replace("zz_good", "zz_plain"), 'origin = "new"\n',
+                                            f'origin = "new"\n{key} = {value}\n'))
+            self.assertFails("[badge.zz_plain]", says)
+            self.setUp()
+            self.append("achievements.toml", achievement(f'test = "first"\n{key} = {value}', name="zz_plainach"))
+            self.assertFails("[achievement.zz_plainach]", says)
+        # patterns is there but the entry is not a best value: the patterns refusal stands, so the filters never sit where the server ignores them
+        self.setUp()
+        self.append("badges.toml", swap(swap(BEST_VALUE_BADGE, 'kind = "best_value"', 'kind = "total"'), 'counts = "lift_gain"\n',
+                                        'counts = "lift_gain"\npatterns = ["squat"]\nqualities = ["strength"]\nexclude = ["cable-face-pull"]\n'))
+        self.assertFails("[badge.zz_value]", "patterns is only for an entry that reads the fact lift_gain as its best value")
+
+    def test_game_10_the_ten_qualities_are_read_from_coach_html(self):
+        """Never hand-copied: the checker is run in a scratch repo whose coach.html says what QM_IDS is."""
+        repo = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, repo, True)
+        (repo / "scripts").mkdir()
+        (repo / "supabase").mkdir()
+        shutil.copy(CHECKER, repo / "scripts" / "check_career.py")
+        shutil.copy(HERE.parent / "supabase" / "xp_rules_snapshot.json", repo / "supabase" / "xp_rules_snapshot.json")
+        shutil.copytree(CAREER, repo / "career")
+        badges = repo / "career" / "badges.toml"
+        badges.write_text(badges.read_text(encoding="utf-8") + self.lift_badge('patterns = ["squat"]\nqualities = ["movement"]\n'),
+                          encoding="utf-8", newline="\n")
+        real = (HERE.parent / "coach.html").read_text(encoding="utf-8")
+
+        def run(coach_text):
+            (repo / "coach.html").write_text(coach_text, encoding="utf-8", newline="\n")
+            p = subprocess.run([sys.executable, "-X", "utf8", str(repo / "scripts" / "check_career.py"), str(repo / "career")],
+                               capture_output=True, text=True, encoding="utf-8", timeout=120)
+            return p.returncode, p.stdout + p.stderr
+
+        rc, out = run(real)
+        self.assertEqual(rc, 0, out)
+        rc, out = run(re.sub(r"const QM_IDS\s*=\s*\[.*?\]", "const QM_IDS = ['strength','muscle']", real, count=1, flags=re.S))
+        self.assertEqual(rc, 1, out)
+        self.assertIn("qualities 'movement' is not one of the Spine's qualities in coach.html's QM_IDS", out)
+        self.assertNotIn("qualities 'strength'", out)
+        rc, out = run(real.replace("const QM_IDS", "const QM_IDX", 1))
+        self.assertEqual(rc, 1, out)
+        self.assertIn("qualities cannot be checked: QM_IDS was not found in coach.html (GAME-10)", out)
+
     def test_a_best_value_badge_is_checked_like_any_other_kind(self):
         # it still needs the fact it counts, an xp on every tier and tiers that rise
         self.append("badges.toml", swap(swap(BEST_VALUE_BADGE, 'counts = "lift_gain"\n', ""), "xp = 10, ", ""))

@@ -1,5 +1,9 @@
 -- The way back from stage70 (Career Mode phase 3, rewards and the catalogue switch; spec §5.6). On Amir's word only (CLAUDE.md: a change to
 -- the live project waits for his yes), after a backup (coach.html → ⚙ Tools → ⤓ Backup).
+-- When stage73 (supabase/stage73_career_main_lifts.sql) is applied, run scripts/career/rollback_stage73.sql FIRST: this file does not know
+-- stage73's helper career_maxpct_key(), so run alone it would leave that function behind (and the next schema snapshot would carry it).
+-- NEVER run scripts/career/rollback_stage71.sql for that: it is the way back from stage71_weight_units.sql (the weight units), which
+-- this file does not touch and does not need taken off (nor stage72_weight_measures.sql).
 --
 -- Two modes, one file. The first statement after `begin` names the mode: 'dry' (as written) does everything below inside the one transaction
 -- and then raises an error that carries the report (what a real run would do, athlete by athlete), so the transaction is undone and nothing is

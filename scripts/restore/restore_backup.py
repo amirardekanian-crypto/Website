@@ -30,6 +30,8 @@ ACCOUNT_TABLES = {'athlete_identities': 'athlete_id', 'tps_accounts': 'username'
 REMAP = {'assess_players': 'account_id', 'assess_notes': 'account_id', 'assess_results': 'account_id', 'buyer_notes': 'user_id'}
 # Restored after every other table (stage66): until Career Mode's rulebook is back, every Career Mode trigger does nothing, so the facts
 # come back exactly as they were backed up instead of being worked out again, half-restored, on the way (a programme before its sessions).
+# career_awards and career_recognition (stage70) are restored with the other tables, BEFORE the rulebook: their rows are facts
+# already minted, so the rulebook's triggers must stay quiet while they come back (a restore never re-mints an award).
 RESTORE_LAST = ['career_rules']
 # A table whose athlete_id is a LINK to a person, not the owner of the row: for an erased person the link is cleared and the row stays.
 LINK_COLUMNS = {'affiliates': ['athlete_id'], 'hab_intake': ['athlete_id', 'linked_at']}

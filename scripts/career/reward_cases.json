@@ -3616,6 +3616,816 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
+     "metal_next": "bronze"
+    },
+    "century": {
+     "have": 10,
+     "name": "Century",
+     "next": 25,
+     "phone": "session",
+     "counts": [
+      "session_finished",
+      "session_finished_early"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "retests": {
+     "name": "Beat the Test",
+     "next": 1,
+     "meaning": "progress",
+     "metal_next": "bronze"
+    },
+    "veteran": {
+     "have": 2,
+     "name": "Veteran",
+     "next": 3,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    },
+    "finisher": {
+     "name": "Closer",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "cycle_finished"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "milestone",
+     "metal_next": "bronze"
+    },
+    "full_log": {
+     "have": 10,
+     "name": "Paper Trail",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "full_log"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "comebacks": {
+     "name": "HARD TO KILL",
+     "next": 3,
+     "meaning": "resilience",
+     "metal_next": "bronze"
+    },
+    "love_hold": {
+     "have": 10,
+     "name": "Love Hold",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_by_the_book"
+     ],
+     "meaning": "commitment",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "day_streak": {
+     "have": 7,
+     "name": "Day Streak",
+     "next": 14,
+     "tier": 2,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_fuel": {
+     "name": "FULLY FUELLED",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "held_weeks": {
+     "now": 10,
+     "have": 10,
+     "name": "Hold Serve",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "long_count": {
+     "have": 10,
+     "name": "The Long Count",
+     "next": 25,
+     "tier": 1,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 2,
+     "size_next": "highlight",
+     "metal_next": "silver"
+    },
+    "bounce_back": {
+     "name": "Second Serve",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "bounce_back"
+     ],
+     "meaning": "resilience",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "dawn_patrol": {
+     "name": "DAWN PATROL",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    },
+    "habit_sleep": {
+     "have": 7,
+     "name": "BLACKOUT ARTIST",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_steps": {
+     "have": 7,
+     "name": "GROUND COVERED",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_supps": {
+     "name": "IRON MONK",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_water": {
+     "have": 7,
+     "name": "HUMAN SPRINKLER",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "pulse_check": {
+     "have": 10,
+     "name": "Pulse Check",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "checkin_done"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "same_effort": {
+     "name": "Free Kilos",
+     "next": 3,
+     "phone": "week",
+     "counts": [
+      "effort_win"
+     ],
+     "meaning": "progress",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "the_upgrade": {
+     "have": 22,
+     "name": "The Upgrade",
+     "next": 30,
+     "tier": 2,
+     "meaning": "progress",
+     "metal_next": "emerald"
+    },
+    "clean_sweeps": {
+     "name": "Treble",
+     "next": 2,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_custom": {
+     "name": "HOUSE RULES",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_breathe": {
+     "name": "ZEN MACHINE",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_mobility": {
+     "name": "RUBBER BAND",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "back_in_the_fight": {
+     "name": "BACK IN THE FIGHT",
+     "next": 7,
+     "meaning": "resilience",
+     "metal_next": "bronze"
+    },
+    "proof_clean_sweep": {
+     "name": "CLEAN SWEEP",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    }
+   },
+   "e": {
+    "early": false,
+    "fullLog": true,
+    "checkin": true,
+    "weekCloses": false,
+    "cycleCloses": false,
+    "repeat": true
+   },
+   "expect": {
+    "lines": [
+     {
+      "id": "full_log",
+      "name": "Paper Trail",
+      "have": 11,
+      "next": 25,
+      "crossed": false,
+      "pending": false
+     },
+     {
+      "id": "pulse_check",
+      "name": "Pulse Check",
+      "have": 11,
+      "next": 25,
+      "crossed": false,
+      "pending": false
+     }
+    ],
+    "more": 0
+   }
+  },
+  {
+   "ladder": {
+    "bests": {
+     "name": "Record Breaker",
+     "next": 5,
+     "meaning": "progress",
+     "metal_next": "bronze"
+    },
+    "century": {
+     "have": 10,
+     "name": "Century",
+     "next": 25,
+     "phone": "session",
+     "counts": [
+      "session_finished",
+      "session_finished_early"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "retests": {
+     "name": "Beat the Test",
+     "next": 1,
+     "meaning": "progress",
+     "metal_next": "bronze"
+    },
+    "veteran": {
+     "have": 2,
+     "name": "Veteran",
+     "next": 3,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    },
+    "finisher": {
+     "name": "Closer",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "cycle_finished"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "milestone",
+     "metal_next": "bronze"
+    },
+    "full_log": {
+     "have": 10,
+     "name": "Paper Trail",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "full_log"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "comebacks": {
+     "name": "HARD TO KILL",
+     "next": 3,
+     "meaning": "resilience",
+     "metal_next": "bronze"
+    },
+    "love_hold": {
+     "have": 10,
+     "name": "Love Hold",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_by_the_book"
+     ],
+     "meaning": "commitment",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "day_streak": {
+     "have": 7,
+     "name": "Day Streak",
+     "next": 14,
+     "tier": 2,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_fuel": {
+     "name": "FULLY FUELLED",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "held_weeks": {
+     "now": 10,
+     "have": 10,
+     "name": "Hold Serve",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "long_count": {
+     "have": 10,
+     "name": "The Long Count",
+     "next": 25,
+     "tier": 1,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 2,
+     "size_next": "highlight",
+     "metal_next": "silver"
+    },
+    "bounce_back": {
+     "name": "Second Serve",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "bounce_back"
+     ],
+     "meaning": "resilience",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "dawn_patrol": {
+     "name": "DAWN PATROL",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    },
+    "habit_sleep": {
+     "have": 7,
+     "name": "BLACKOUT ARTIST",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_steps": {
+     "have": 7,
+     "name": "GROUND COVERED",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_supps": {
+     "name": "IRON MONK",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_water": {
+     "have": 7,
+     "name": "HUMAN SPRINKLER",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "pulse_check": {
+     "have": 10,
+     "name": "Pulse Check",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "checkin_done"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "same_effort": {
+     "name": "Free Kilos",
+     "next": 3,
+     "phone": "week",
+     "counts": [
+      "effort_win"
+     ],
+     "meaning": "progress",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "the_upgrade": {
+     "have": 22,
+     "name": "The Upgrade",
+     "next": 30,
+     "tier": 2,
+     "meaning": "progress",
+     "metal_next": "emerald"
+    },
+    "clean_sweeps": {
+     "name": "Treble",
+     "next": 2,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_custom": {
+     "name": "HOUSE RULES",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_breathe": {
+     "name": "ZEN MACHINE",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_mobility": {
+     "name": "RUBBER BAND",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "back_in_the_fight": {
+     "name": "BACK IN THE FIGHT",
+     "next": 7,
+     "meaning": "resilience",
+     "metal_next": "bronze"
+    },
+    "proof_clean_sweep": {
+     "name": "CLEAN SWEEP",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    }
+   },
+   "e": {
+    "early": true,
+    "fullLog": false,
+    "checkin": false,
+    "weekCloses": false,
+    "cycleCloses": false,
+    "repeat": true
+   },
+   "expect": {
+    "lines": [],
+    "more": 0
+   }
+  },
+  {
+   "ladder": {
+    "bests": {
+     "name": "Record Breaker",
+     "next": 5,
+     "meaning": "progress",
+     "metal_next": "bronze"
+    },
+    "century": {
+     "have": 10,
+     "name": "Century",
+     "next": 25,
+     "phone": "session",
+     "counts": [
+      "session_finished",
+      "session_finished_early"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "retests": {
+     "name": "Beat the Test",
+     "next": 1,
+     "meaning": "progress",
+     "metal_next": "bronze"
+    },
+    "veteran": {
+     "have": 2,
+     "name": "Veteran",
+     "next": 3,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    },
+    "finisher": {
+     "name": "Closer",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "cycle_finished"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "milestone",
+     "metal_next": "bronze"
+    },
+    "full_log": {
+     "have": 10,
+     "name": "Paper Trail",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "full_log"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "comebacks": {
+     "name": "HARD TO KILL",
+     "next": 3,
+     "meaning": "resilience",
+     "metal_next": "bronze"
+    },
+    "love_hold": {
+     "have": 10,
+     "name": "Love Hold",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_by_the_book"
+     ],
+     "meaning": "commitment",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "day_streak": {
+     "have": 7,
+     "name": "Day Streak",
+     "next": 14,
+     "tier": 2,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_fuel": {
+     "name": "FULLY FUELLED",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "held_weeks": {
+     "now": 10,
+     "have": 10,
+     "name": "Hold Serve",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "long_count": {
+     "have": 10,
+     "name": "The Long Count",
+     "next": 25,
+     "tier": 1,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 2,
+     "size_next": "highlight",
+     "metal_next": "silver"
+    },
+    "bounce_back": {
+     "name": "Second Serve",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "bounce_back"
+     ],
+     "meaning": "resilience",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "dawn_patrol": {
+     "name": "DAWN PATROL",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    },
+    "habit_sleep": {
+     "have": 7,
+     "name": "BLACKOUT ARTIST",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_steps": {
+     "have": 7,
+     "name": "GROUND COVERED",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_supps": {
+     "name": "IRON MONK",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_water": {
+     "have": 7,
+     "name": "HUMAN SPRINKLER",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "pulse_check": {
+     "have": 10,
+     "name": "Pulse Check",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "checkin_done"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "same_effort": {
+     "name": "Free Kilos",
+     "next": 3,
+     "phone": "week",
+     "counts": [
+      "effort_win"
+     ],
+     "meaning": "progress",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "the_upgrade": {
+     "have": 22,
+     "name": "The Upgrade",
+     "next": 30,
+     "tier": 2,
+     "meaning": "progress",
+     "metal_next": "emerald"
+    },
+    "clean_sweeps": {
+     "name": "Treble",
+     "next": 2,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_custom": {
+     "name": "HOUSE RULES",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_breathe": {
+     "name": "ZEN MACHINE",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "habit_mobility": {
+     "name": "RUBBER BAND",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze"
+    },
+    "back_in_the_fight": {
+     "name": "BACK IN THE FIGHT",
+     "next": 7,
+     "meaning": "resilience",
+     "metal_next": "bronze"
+    },
+    "proof_clean_sweep": {
+     "name": "CLEAN SWEEP",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    }
+   },
+   "e": {
+    "early": false,
+    "fullLog": true,
+    "checkin": true,
+    "weekCloses": true,
+    "cycleCloses": false,
+    "repeat": true
+   },
+   "expect": {
+    "lines": [
+     {
+      "id": "love_hold",
+      "name": "Love Hold",
+      "have": 11,
+      "next": 12,
+      "crossed": false,
+      "pending": true
+     },
+     {
+      "id": "held_weeks",
+      "name": "Hold Serve",
+      "have": 11,
+      "next": 12,
+      "crossed": false,
+      "pending": true
+     },
+     {
+      "id": "full_log",
+      "name": "Paper Trail",
+      "have": 11,
+      "next": 25,
+      "crossed": false,
+      "pending": false
+     }
+    ],
+    "more": 2
+   }
+  },
+  {
+   "ladder": {
+    "bests": {
+     "name": "Record Breaker",
+     "next": 5,
+     "meaning": "progress",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5355,6 +6165,861 @@
      }
     ],
     "more": 1
+   }
+  },
+  {
+   "ladder": {
+    "bests": {
+     "name": "Record Breaker",
+     "next": 5,
+     "meaning": "progress",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "century": {
+     "have": 24,
+     "name": "Century",
+     "next": 25,
+     "phone": "session",
+     "counts": [
+      "session_finished",
+      "session_finished_early"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "retests": {
+     "name": "Beat the Test",
+     "next": 1,
+     "meaning": "progress",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "veteran": {
+     "have": 2,
+     "name": "Veteran",
+     "next": 3,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    },
+    "finisher": {
+     "name": "Closer",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "cycle_finished"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "milestone",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "full_log": {
+     "have": 24,
+     "name": "Paper Trail",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "full_log"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "comebacks": {
+     "name": "HARD TO KILL",
+     "next": 3,
+     "meaning": "resilience",
+     "metal_next": "bronze",
+     "have": 2
+    },
+    "love_hold": {
+     "have": 11,
+     "name": "Love Hold",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_by_the_book"
+     ],
+     "meaning": "commitment",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "day_streak": {
+     "have": 13,
+     "name": "Day Streak",
+     "next": 14,
+     "tier": 2,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_fuel": {
+     "name": "FULLY FUELLED",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "held_weeks": {
+     "now": 11,
+     "have": 11,
+     "name": "Hold Serve",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "long_count": {
+     "have": 24,
+     "name": "The Long Count",
+     "next": 25,
+     "tier": 1,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 2,
+     "size_next": "highlight",
+     "metal_next": "silver"
+    },
+    "bounce_back": {
+     "name": "Second Serve",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "bounce_back"
+     ],
+     "meaning": "resilience",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "dawn_patrol": {
+     "name": "DAWN PATROL",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "habit_sleep": {
+     "have": 9,
+     "name": "BLACKOUT ARTIST",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_steps": {
+     "have": 9,
+     "name": "GROUND COVERED",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_supps": {
+     "name": "IRON MONK",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "habit_water": {
+     "have": 9,
+     "name": "HUMAN SPRINKLER",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "pulse_check": {
+     "have": 24,
+     "name": "Pulse Check",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "checkin_done"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "same_effort": {
+     "name": "Free Kilos",
+     "next": 3,
+     "phone": "week",
+     "counts": [
+      "effort_win"
+     ],
+     "meaning": "progress",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze",
+     "have": 2
+    },
+    "the_upgrade": {
+     "have": 29,
+     "name": "The Upgrade",
+     "next": 30,
+     "tier": 2,
+     "meaning": "progress",
+     "metal_next": "emerald"
+    },
+    "clean_sweeps": {
+     "name": "Treble",
+     "next": 2,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 1
+    },
+    "habit_custom": {
+     "name": "HOUSE RULES",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "habit_breathe": {
+     "name": "ZEN MACHINE",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "habit_mobility": {
+     "name": "RUBBER BAND",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "back_in_the_fight": {
+     "name": "BACK IN THE FIGHT",
+     "next": 7,
+     "meaning": "resilience",
+     "metal_next": "bronze",
+     "have": 6
+    },
+    "proof_clean_sweep": {
+     "name": "CLEAN SWEEP",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze",
+     "have": 0
+    }
+   },
+   "e": {
+    "early": false,
+    "fullLog": true,
+    "checkin": true,
+    "weekCloses": false,
+    "cycleCloses": false,
+    "repeat": true
+   },
+   "expect": {
+    "lines": [
+     {
+      "id": "full_log",
+      "name": "Paper Trail",
+      "have": 25,
+      "next": 25,
+      "crossed": true,
+      "pending": false
+     },
+     {
+      "id": "pulse_check",
+      "name": "Pulse Check",
+      "have": 25,
+      "next": 25,
+      "crossed": true,
+      "pending": false
+     }
+    ],
+    "more": 0
+   }
+  },
+  {
+   "ladder": {
+    "bests": {
+     "name": "Record Breaker",
+     "next": 5,
+     "meaning": "progress",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "century": {
+     "have": 24,
+     "name": "Century",
+     "next": 25,
+     "phone": "session",
+     "counts": [
+      "session_finished",
+      "session_finished_early"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "retests": {
+     "name": "Beat the Test",
+     "next": 1,
+     "meaning": "progress",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "veteran": {
+     "have": 2,
+     "name": "Veteran",
+     "next": 3,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    },
+    "finisher": {
+     "name": "Closer",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "cycle_finished"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "milestone",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "full_log": {
+     "have": 24,
+     "name": "Paper Trail",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "full_log"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "comebacks": {
+     "name": "HARD TO KILL",
+     "next": 3,
+     "meaning": "resilience",
+     "metal_next": "bronze",
+     "have": 2
+    },
+    "love_hold": {
+     "have": 11,
+     "name": "Love Hold",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_by_the_book"
+     ],
+     "meaning": "commitment",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "day_streak": {
+     "have": 13,
+     "name": "Day Streak",
+     "next": 14,
+     "tier": 2,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_fuel": {
+     "name": "FULLY FUELLED",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "held_weeks": {
+     "now": 11,
+     "have": 11,
+     "name": "Hold Serve",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "long_count": {
+     "have": 24,
+     "name": "The Long Count",
+     "next": 25,
+     "tier": 1,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 2,
+     "size_next": "highlight",
+     "metal_next": "silver"
+    },
+    "bounce_back": {
+     "name": "Second Serve",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "bounce_back"
+     ],
+     "meaning": "resilience",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "dawn_patrol": {
+     "name": "DAWN PATROL",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "habit_sleep": {
+     "have": 9,
+     "name": "BLACKOUT ARTIST",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_steps": {
+     "have": 9,
+     "name": "GROUND COVERED",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_supps": {
+     "name": "IRON MONK",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "habit_water": {
+     "have": 9,
+     "name": "HUMAN SPRINKLER",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "pulse_check": {
+     "have": 24,
+     "name": "Pulse Check",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "checkin_done"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "same_effort": {
+     "name": "Free Kilos",
+     "next": 3,
+     "phone": "week",
+     "counts": [
+      "effort_win"
+     ],
+     "meaning": "progress",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze",
+     "have": 2
+    },
+    "the_upgrade": {
+     "have": 29,
+     "name": "The Upgrade",
+     "next": 30,
+     "tier": 2,
+     "meaning": "progress",
+     "metal_next": "emerald"
+    },
+    "clean_sweeps": {
+     "name": "Treble",
+     "next": 2,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 1
+    },
+    "habit_custom": {
+     "name": "HOUSE RULES",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "habit_breathe": {
+     "name": "ZEN MACHINE",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "habit_mobility": {
+     "name": "RUBBER BAND",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "back_in_the_fight": {
+     "name": "BACK IN THE FIGHT",
+     "next": 7,
+     "meaning": "resilience",
+     "metal_next": "bronze",
+     "have": 6
+    },
+    "proof_clean_sweep": {
+     "name": "CLEAN SWEEP",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze",
+     "have": 0
+    }
+   },
+   "e": {
+    "early": true,
+    "fullLog": false,
+    "checkin": false,
+    "weekCloses": false,
+    "cycleCloses": false,
+    "repeat": true
+   },
+   "expect": {
+    "lines": [],
+    "more": 0
+   }
+  },
+  {
+   "ladder": {
+    "bests": {
+     "name": "Record Breaker",
+     "next": 5,
+     "meaning": "progress",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "century": {
+     "have": 24,
+     "name": "Century",
+     "next": 25,
+     "phone": "session",
+     "counts": [
+      "session_finished",
+      "session_finished_early"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze"
+    },
+    "retests": {
+     "name": "Beat the Test",
+     "next": 1,
+     "meaning": "progress",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "veteran": {
+     "have": 2,
+     "name": "Veteran",
+     "next": 3,
+     "meaning": "commitment",
+     "metal_next": "bronze"
+    },
+    "finisher": {
+     "name": "Closer",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "cycle_finished"
+     ],
+     "meaning": "commitment",
+     "next_tier": 1,
+     "size_next": "milestone",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "full_log": {
+     "have": 24,
+     "name": "Paper Trail",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "full_log"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "comebacks": {
+     "name": "HARD TO KILL",
+     "next": 3,
+     "meaning": "resilience",
+     "metal_next": "bronze",
+     "have": 2
+    },
+    "love_hold": {
+     "have": 11,
+     "name": "Love Hold",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_by_the_book"
+     ],
+     "meaning": "commitment",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "day_streak": {
+     "have": 13,
+     "name": "Day Streak",
+     "next": 14,
+     "tier": 2,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_fuel": {
+     "name": "FULLY FUELLED",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "held_weeks": {
+     "now": 11,
+     "have": 11,
+     "name": "Hold Serve",
+     "next": 12,
+     "tier": 2,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 3,
+     "size_next": "milestone",
+     "metal_next": "emerald"
+    },
+    "long_count": {
+     "have": 24,
+     "name": "The Long Count",
+     "next": 25,
+     "tier": 1,
+     "phone": "week",
+     "counts": [
+      "week_held"
+     ],
+     "meaning": "consistency",
+     "next_tier": 2,
+     "size_next": "highlight",
+     "metal_next": "silver"
+    },
+    "bounce_back": {
+     "name": "Second Serve",
+     "next": 1,
+     "phone": "week",
+     "counts": [
+      "bounce_back"
+     ],
+     "meaning": "resilience",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "dawn_patrol": {
+     "name": "DAWN PATROL",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze",
+     "have": 0
+    },
+    "habit_sleep": {
+     "have": 9,
+     "name": "BLACKOUT ARTIST",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_steps": {
+     "have": 9,
+     "name": "GROUND COVERED",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "habit_supps": {
+     "name": "IRON MONK",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "habit_water": {
+     "have": 9,
+     "name": "HUMAN SPRINKLER",
+     "next": 10,
+     "tier": 1,
+     "meaning": "consistency",
+     "metal_next": "silver"
+    },
+    "pulse_check": {
+     "have": 24,
+     "name": "Pulse Check",
+     "next": 25,
+     "tier": 1,
+     "phone": "session",
+     "counts": [
+      "checkin_done"
+     ],
+     "meaning": "commitment",
+     "next_tier": 2,
+     "size_next": "win",
+     "metal_next": "silver"
+    },
+    "same_effort": {
+     "name": "Free Kilos",
+     "next": 3,
+     "phone": "week",
+     "counts": [
+      "effort_win"
+     ],
+     "meaning": "progress",
+     "next_tier": 1,
+     "size_next": "highlight",
+     "metal_next": "bronze",
+     "have": 2
+    },
+    "the_upgrade": {
+     "have": 29,
+     "name": "The Upgrade",
+     "next": 30,
+     "tier": 2,
+     "meaning": "progress",
+     "metal_next": "emerald"
+    },
+    "clean_sweeps": {
+     "name": "Treble",
+     "next": 2,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 1
+    },
+    "habit_custom": {
+     "name": "HOUSE RULES",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "habit_breathe": {
+     "name": "ZEN MACHINE",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "habit_mobility": {
+     "name": "RUBBER BAND",
+     "next": 5,
+     "meaning": "consistency",
+     "metal_next": "bronze",
+     "have": 4
+    },
+    "back_in_the_fight": {
+     "name": "BACK IN THE FIGHT",
+     "next": 7,
+     "meaning": "resilience",
+     "metal_next": "bronze",
+     "have": 6
+    },
+    "proof_clean_sweep": {
+     "name": "CLEAN SWEEP",
+     "next": 1,
+     "meaning": "commitment",
+     "metal_next": "bronze",
+     "have": 0
+    }
+   },
+   "e": {
+    "early": false,
+    "fullLog": true,
+    "checkin": true,
+    "weekCloses": true,
+    "cycleCloses": false,
+    "repeat": true
+   },
+   "expect": {
+    "lines": [
+     {
+      "id": "full_log",
+      "name": "Paper Trail",
+      "have": 25,
+      "next": 25,
+      "crossed": true,
+      "pending": false
+     },
+     {
+      "id": "pulse_check",
+      "name": "Pulse Check",
+      "have": 25,
+      "next": 25,
+      "crossed": true,
+      "pending": false
+     },
+     {
+      "id": "love_hold",
+      "name": "Love Hold",
+      "have": 12,
+      "next": 12,
+      "crossed": true,
+      "pending": true
+     }
+    ],
+    "more": 2
    }
   }
  ],

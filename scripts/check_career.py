@@ -15,7 +15,9 @@ ERRORS (exit 1)
    4  every [badge.<id>]: the required fields, a meaning (or "chosen" for the commendation badge only), a kind
       (best_value reads the largest value its fact has reached, e.g. a percent), what it counts (a fact) or reads
       (proof_codes), and tiers that rise (at), never go down a metal, and carry xp (mult for per_habit_best_run); a
-      tier title must exist; a habit, when given, is one of the rulebook's habits
+      tier title must exist; a habit, when given, is one of the rulebook's habits. A best_value lift_gain entry (a badge, or an
+      achievement with test "best_value") may narrow the lifts it counts (GAME-10): patterns (Spine patterns), and only with
+      patterns, qualities (the Spine's ten, read from coach.html's QM_IDS) and exclude (Spine ids that never count)
    5  every [achievement.<id>]: the required fields, reads a fact or "proof" (then proof_code), a title that exists
    6  every [title.<id>] and [skin.<id>] (a title's meaning is one of the four, "chosen", "season", "level", or "all"
       for the Grand Slam)
@@ -120,6 +122,7 @@ SWITCHES = ["xp", "catalogue"]   # rulebook.toml → [switch]: phase 2 (XP) and 
 
 BANNED_WORDS = re.compile(r"\b(gold|golden|yellow|amber|ochre)\b", re.IGNORECASE)
 SNAKE_CASE = re.compile(r"^[a-z][a-z0-9_]*$")
+SPINE_ID = re.compile(r"[a-z0-9]+(-[a-z0-9]+)*")   # a Spine exercise id: lower-case words joined by hyphens (used with fullmatch)
 
 # Keys an entry may carry besides its own fields without a warning (rule 12).
 EXTRA_KEYS = {"tier_name", "mult", "title", "template", "proof_id", "proof_code", "proof_codes", "proof_xp",
@@ -129,11 +132,11 @@ KNOWN_KEYS = {
     "fact": {"meaning", "xp", "xp_from", "source", "pays_for", "when", "cap", "min_share", "limit", "limit_per",
              "weeks_away", "window_days", "min_gain", "career_only"},
     "badge": {"name", "meaning", "kind", "counts", "habit", "proof_codes", "caption", "free", "origin", "tiers",
-              "retire_at", "starts_at", "superseded_by", "run", "history_twin_counts"},
+              "retire_at", "starts_at", "superseded_by", "run", "history_twin_counts", "patterns", "qualities", "exclude"},
     "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},
     "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code",
                     "retire_at", "starts_at", "superseded_by", "test", "goals", "habits", "run", "at", "groups", "bests",
-                    "retests", "away_weeks", "proof_measure", "proof_need"},
+                    "retests", "away_weeks", "proof_measure", "proof_need", "patterns", "qualities", "exclude"},
     "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id", "retire_at", "superseded_by", "size"},
     "skin": {"name", "from", "origin", "proof_id"},
     "mission": {"name", "slot", "meaning", "asks", "counts", "habit", "measure", "target", "picked_when", "free",
@@ -569,6 +572,84 @@ def check_rulebook(rb, rep):
 
 # ── Rule 4: badges ────────────────────────────────────────────────────────────────────────────────────────────────
 
+def spine_patterns():
+    """coach.html's SPINE_PATTERNS, read from the file (never hand-copied here); None if it cannot be found."""
+    try:
+        text = (ROOT / "coach.html").read_text(encoding="utf-8")
+    except OSError:
+        return None
+    m = re.search(r"const SPINE_PATTERNS\s*=\s*\[(.*?)\]", text, re.S)
+    return re.findall(r"'([a-z-]+)'", m.group(1)) if m else None
+
+
+def spine_qualities():
+    """coach.html's QM_IDS, the Spine's ten qualities, read from the file (never hand-copied here); None if it cannot be found."""
+    try:
+        text = (ROOT / "coach.html").read_text(encoding="utf-8")
+    except OSError:
+        return None
+    m = re.search(r"const QM_IDS\s*=\s*\[(.*?)\]", text, re.S)
+    return re.findall(r"'([a-z-]+)'", m.group(1)) if m else None
+
+
+def check_lift_filters(c, e):
+    """GAME-10 (Amir, 2026-10-18: accessories are out of The Upgrade and Double Up): `qualities = [...]` and `exclude = [...]`
+    narrow the lifts `patterns` lists, so each needs `patterns` on the same entry (and so a best_value lift_gain one, which
+    check_patterns() holds `patterns` to). qualities: some of the Spine's ten (coach.html's QM_IDS), a lift counts when its
+    Spine entry carries one. exclude: Spine ids that never count, whatever their tags (kebab-case, each once)."""
+    for key in ("qualities", "exclude"):
+        if key in e and "patterns" not in e:
+            c.error(f"{key} narrows the lifts that patterns lists, so it needs patterns on the same entry (GAME-10)")
+    if "qualities" in e:
+        v = e["qualities"]
+        if not (isinstance(v, list) and v and all(is_text(x) for x in v)):
+            c.error(f"qualities must be a non-empty list of the Spine's qualities, found {v!r} (GAME-10)")
+        else:
+            known = spine_qualities()
+            if not known:
+                c.error("qualities cannot be checked: QM_IDS was not found in coach.html (GAME-10)")
+            else:
+                for x in v:
+                    if x not in known:
+                        c.error(f"qualities {x!r} is not one of the Spine's qualities in coach.html's QM_IDS (GAME-10)")
+    if "exclude" in e:
+        v = e["exclude"]
+        if not (isinstance(v, list) and v and all(is_text(x) for x in v)):
+            c.error(f"exclude must be a non-empty list of Spine ids, found {v!r} (GAME-10)")
+        else:
+            seen = set()
+            for x in v:
+                if not SPINE_ID.fullmatch(x):
+                    c.error(f"exclude {x!r} is not a Spine id (lower-case words joined by hyphens, such as 'cable-face-pull') (GAME-10)")
+                elif x in seen:
+                    c.error(f"exclude lists {x!r} twice (GAME-10)")
+                seen.add(x)
+
+
+def check_patterns(c, e, reads_lift_gain):
+    """GAME-10: an optional `patterns = [...]` narrows a best_value lift-gain entry to lifts whose Spine pattern is listed.
+    The server reads it only there (career_maxpct_key() is reached from the best_value branches alone), so anywhere else it
+    would be silently ignored: refused instead. Its two companions, `qualities` and `exclude`, are held to it first."""
+    check_lift_filters(c, e)
+    if "patterns" not in e:
+        return
+    if not reads_lift_gain:
+        c.error("patterns is only for an entry that reads the fact lift_gain as its best value (kind or test best_value; "
+                "the server reads it nowhere else, GAME-10)")
+        return
+    v = e["patterns"]
+    if not (isinstance(v, list) and v and all(is_text(x) for x in v)):
+        c.error(f"patterns must be a non-empty list of Spine patterns, found {v!r} (GAME-10)")
+        return
+    known = spine_patterns()
+    if known is None:
+        c.error("patterns cannot be checked: SPINE_PATTERNS was not found in coach.html (GAME-10)")
+        return
+    for x in v:
+        if x not in known:
+            c.error(f"patterns {x!r} is not a Spine pattern in coach.html's SPINE_PATTERNS (GAME-10)")
+
+
 def counts_of(c, b):
     """A badge's counts as a list of fact ids; None when absent or malformed."""
     if "counts" not in b:
@@ -664,6 +745,7 @@ def check_badges(data, w, rep):
                 for fid in counts:
                     if fid not in w.facts:
                         c.error(f"counts {fid!r} is not a fact in rulebook.toml")
+        check_patterns(c, b, kind == "best_value" and isinstance(counts, list) and "lift_gain" in counts)
         check_tiers(c, b, kind, w)
         check_habit_ref(c, b, w)
         check_run(c, b, kind, counts)
@@ -766,6 +848,7 @@ def check_achievements(data, w, rep):
         get_bool(c, a, "free")
         get_choice(c, a, "origin", ORIGINS)
         check_title_ref(c, a, w)
+        check_patterns(c, a, a.get("test") == "best_value" and a.get("reads") == "lift_gain")
         check_test(c, a, w)
         check_gates(c, a, aid, [(set(achievements), "an achievement in achievements.toml"),
                                 (w.badge_ids, "a badge in badges.toml")])

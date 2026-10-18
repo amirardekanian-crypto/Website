@@ -1337,8 +1337,14 @@ card, the row and the finished card are byte for byte what they were; `scripts/h
   Hold Serve and The Long Count when the session closes the week, Love Hold when the week is by the book so far, Closer when it closes
   the cycle; always pending, because the server decides a week). Order: crossed first, then the nearest (`next − have`), then the sure
   before the pending. `careerMoves(e, ladder)` is PURE and a **twin** (`scripts/check_twins.js` §10, `scripts/career/reward_cases.json`):
-  `e = { early, fullLog, checkin, weekCloses, cycleCloses, byBook? }`; `byBook` is optional (without it the session alone is read);
+  `e = { early, repeat?, fullLog, checkin, weekCloses, cycleCloses, byBook? }`; `byBook` is optional (without it the session alone is read);
   each line is exactly `{ id, name, have, next, crossed, pending }`, and the metal word is read from the ladder when it is drawn.
+  **`repeat` is GAME-4, and D19 is Claude's pick, waiting for Amir's word** (stage73, not applied yet): `careerEarn()` passes the flag it already works out (the plan day was done earlier in this
+  training week), and a repeated day moves **no count over `session_finished` / `session_finished_early`** (Century stays at 24 of 25),
+  because `career_facts_paid()` pays one session per plan day per week and the badges count only what it pays. The full log and the
+  check-in still move their ladders (they are paid per session, uncapped). **The lift badges are not previewed here:** The Upgrade and
+  Double Up count `lift_gain` on main lifts only (D18: a Spine entry on a main pattern, tagged strength, minus four accessories; the entry's `patterns`, `qualities` and `exclude`, which fails closed on a missing id), so the server leaves `phone` off their ladder entry
+  and this card never shows them; the server decides a lift's gain and the phone cannot know a lift's Spine pattern, tags or exclusion.
   A run badge (Hold Serve) counts from the ladder's `now`; if the ladder leaves it out, `careerLadderNow()` fills it from
   `numbers.four` (one source). **Clay never shows here** (DS-01); no new card, `--fs-` tokens only.
 - **The finished card, after Done** (`rwCountingBands()`, `collectRewardBands()`, `paintWinBand()`; the Highlight Reel's slot
@@ -1371,15 +1377,19 @@ card, the row and the finished card are byte for byte what they were; `scripts/h
   or the coach's preview.
 - **Home's Career row** (`careerRowHTML()`): the level line is untouched. Two more small lines under it, each on its own line:
   `.career-four` from `numbers.four` only (*7 weeks held · 41 sessions · 12 bests · 2 comebacks*, a zero cell left out, nothing when
-  all four are zero, singular at 1; **Sessions with Amir shows +1 from this phone** for a session finished here that no answer has
-  counted yet, never lower than the profile's) and `.career-next` (`near[0]` as *Paper Trail 9 of 10* when it is within two or at 80%).
+  all four are zero, singular at 1; **Sessions with Amir shows +1 from this phone** for a *paid* session finished here that no answer has
+  counted yet, never lower than the profile's: **a plan day done again in its training week adds nothing** (GAME-4; D19, Claude's pick, waiting for Amir's
+  word: the server counts one session per plan day per week, as Century does; if he says no, `careerMoves()`'s `repeat` rule and `careerRecPaid()` go back with stage73's),
+  which `careerRecPaid()` reads from the `paid` count `careerEarnAtDone()` writes on the record (this finish's own session, none for a repeat, plus what the record it
+  replaces still had waiting, `careerPaidAtDone()`, so a repeat never takes away a session of the same plan day that no answer has counted yet), else from its `repeat`
+  flag, else, for a record written before them, from its parts, a record with no `session` / `early` part being a repeat) and `.career-next` (`near[0]` as *Paper Trail 9 of 10* when it is within two or at 80%).
   The tap opens AA Proof's **Progress** (`&go=progress`) instead of the Locker; the `aria-label` names the numbers. Checked at 320 and
   390 px, light and dark: the four wrap to two rows at most, the goal is one row, the rank line is never cut.
 - **The guide:** `APP_GUIDE` *Getting around*, *Finishing a session*, `key: 'career'` and `key: 'share'` each gained a sentence phrased
   *Once Career Mode's rewards are on, …* until the go-day commit rewrites it to the plain present (Amir reads every new string first, D10). The guide says what the app does, no more: the goal line shows only *when you're close to a badge* (as `.career-next` does), the row opens **Progress** in AA Proof, a Counting band has no Share until my side has it, and a band can be a badge, a moment or a title.
   `scripts/headless/guide-truth.js` passes.
 - **Keys:** `<id>_rw_seen` is new and **synced** (`_snapshot()` does not skip it; `mergeStoredValue()` unions it); `<id>_earn_d<N>` gains
-  `snap`, `moves` and `rm` (a moment was decided for this finish); `<id>_hlwin_d<N>` gains `rewards`. `program.html` still writes no
+  `snap`, `moves`, `repeat` (the plan day was done already this week: it adds no session to Home's count), `paid` (the sessions this record adds to Home's count until an answer counts them: this finish's own, none for a repeat, plus the +1 of the record it replaces if that was still waiting; `careerRecPaid()` reads it first) and `rm` (a moment was decided for this finish); `<id>_hlwin_d<N>` gains `rewards`. `program.html` still writes no
   `<id>_hab_*` key.
 - **Boot-order lesson:** Home's first paint reaches `careerRowHTML()` before the script has evaluated its later `const` tables, so every
   lookup the first paint can reach is a function (`careerFourWord()`, `rwMetalWord()`, `hlBandWord()`), and the new top-level state is
@@ -1398,7 +1408,7 @@ session of it is in `HIST` (`get_my_history()` or its phone copy) inside `weekWi
 phone today. The window is the **cycle's own training week** (`cycleWeekInfo()`: seven days from `startDate +
 (wk − 1) × 7`; a cycle's dates are calendar days read in whole days by `cycleDayNo()` / `todayDayNo()`, the same in every time zone and across a clock change; until 2026-10-11 an athlete west of Greenwich was told "Cycle complete" a day early, `scripts/headless/cycle-tz.js`), or Monday–Sunday for a cycle with no dates or one that is over. **Before the cycle starts**
 (published a day or two early) the window is the cycle's first week, not Monday–Sunday: the old cycle's last
-sessions share the day numbers 1–4, and a Day 4 trained on 6 Oct ticked the new cycle's Day 4 as done (Pooya,
+sessions share the day numbers 1–4, and a Day 4 trained on 6 Oct ticked the new cycle's Day 4 as done (one athlete,
 2026-10-11; `scripts/headless/cycle-end.js` covers it). `paintWeek()` redraws the day cards (a day
 done this week is a `.dc-row` since HOME-02), the suggested day (a session in progress first, then the
 first day not done this week, none when all are done) and the line under **This Week**, "2 of 3 sessions

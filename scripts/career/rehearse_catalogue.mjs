@@ -3,6 +3,37 @@
 //
 //     PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse_catalogue.mjs --backup <aa-backup-YYYY-MM-DD.json>
 //         [--report <file outside the repo>] [--write-cases [--cases-file <path>]] [--stop-after N] [--phase1 <rev>] [--head <rev>]
+//         [--no-stage73] [--dump-awards <file>] [--vs-awards <file>] [--snapshot-rev <rev>]
+//
+// THE STACK, in the order the live project has it (section 2): stage70, then main's stage71 and stage72 (stage71_weight_units.sql and
+// stage72_weight_measures.sql, the weight units: a weight is kg, lb or plates, and a lift's series is kept in its own measure), each twice, then
+// stage73 (supabase/stage73_career_main_lifts.sql, scripts/career/rollback_stage73.sql; 2026-10-18), twice; stage73 comes off before stage70
+// (section 13), the weight units stay. When the snapshot already holds stage71 and stage72 (it went live before the snapshot was made), they go on
+// again on top of stage70 and must put back exactly what it holds. stage73 opens with a guard that refuses, with nothing changed, without stage70
+// (section 2 tries it). It needs nothing of stage71 and stage72 and calls none of their functions: section 2 puts it on with stage72's way back run
+// first, and runs stage72's way back over it (each in a transaction that is undone). It was built as stage71 and renumbered on 2026-10-18: main's
+// stage71 and stage72 replace none of stage73's four functions; --no-stage71 is refused with a pointer to --no-stage73, so an old command never
+// runs WITH the stage by mistake.
+// The weight units on made-up athletes (section 2, after the stack): Barbell Back Squat logged in POUNDS, +150% (its series key is
+// 'barbell back squat|lb'), earns all five The Upgrade tiers, Double Up and NEW ENGINE; the excluded lifts logged in PLATES earn nothing.
+// stage73 places a lift by its lift_gain's value.lift, the name as logged, which stage72 leaves plain (|lb or |plates is on the ref alone): a case
+// checks that no lift_gain's value.lift carries a measure.
+// D18 (Amir): The Upgrade and Double Up count the lifts the Spine places on the seven main patterns (GAME-10). D18 as amended
+// (2026-10-18, Amir: "Yes i want those to be exluded / You set up the rule for that"): and only when the lift's Spine entry carries one of the entry's
+// `qualities` (strength) and is not one of its `exclude` ids (45° Back Extension, Cable Face Pull, Machine Reverse Fly, Cable Straight-Arm Pulldown);
+// section 3b lists what the rule leaves out. While an `exclude` id names no row of the Spine (a typo, a re-keyed or deleted entry) the rule counts no
+// lift at all (stage73 fails closed, and puts a warning in the database log naming the key and the missing id); an entry made a draft is no stop (a
+// draft places no lift, and its id is still on the list once approved). Section 2 reads the measure with an id unknown, drafted, copied under a new id,
+// re-keyed and deleted, in transactions that are undone, with the warnings; 4f3 re-keys one through the real door and puts it right (what was held
+// back is minted, dated the day it was earned); 4f4 drafts one through the door (no stop); 3b checks the four on the backup's Spine.
+// D19 (Claude's pick, waiting for his word): a count over sessions counts the PAID sessions (the cap GAME-4
+// puts on XP), and so does the Home row's commitment number, numbers.four.
+// --no-stage73 leaves it out: the run is then phase 3 as it was applied to the project, the "before" numbers; --dump-awards writes every athlete's
+// awards to a file (with the lift behind each The Upgrade tier and Double Up, from the award's evidence) and --vs-awards, in a run WITH stage73, checks
+// that the only awards that differ from that file are the ones the fix names. The file may come from a run without stage73 or from a run of an
+// earlier build of it (the patterns alone, under the old number 71): an athlete the file does not hold (one made up since) is listed, not compared.
+// The snapshot (supabase/schema_snapshot.sql) holds stage70 once it is live: then the rehearsal starts from the last committed snapshot that did not
+// (--snapshot-rev <rev> picks one), because the point is to rehearse stage70 and stage73 going on. PYTHON must point at a real python on this PC.
 //
 // PGlite is a real PostgreSQL compiled to WebAssembly (install it in a scratch folder: scripts/restore/lib.mjs, the top). Nothing here touches a real
 // project. The backup is coach.html's ⤓ Backup (or the same shape): the real rows, read here and never written anywhere but this process's memory;
@@ -18,7 +49,8 @@
 //   4. live mints through the real doors on made-up athletes (a tier, a held week, the Personal Records and the Spine, the cycle's end, a mid-cycle start,
 //      the events, the Grand Slam, the lift gains, D14's comebacks), 5. partial calls, 6. the stamp, 7. voids, 8. mark_moments_told, 9. timing on the longest
 //      real logs (get_profile's skip path is a growth budget, +100 ms over phase 2's get_profile on the same log) and the core profile's size (the largest real
-//      career and a simulated 200-award one, each under 14 KB compact; get_awards() returns every owned award), 10. a re-seed (a tier appended, an xp changed, a title added), 11. erasure, 12. reward_cases.json,
+//      career and a simulated 200-award one, each under 14 KB compact; get_awards() returns every owned award; with stage73 the commitment number's own
+//      cost on the longest real log: stage70, stage73 without it, stage73 with it), 10. a re-seed (a tier appended, an xp changed, a title added), 11. erasure, 12. reward_cases.json,
 //   13. the way back (rollback_stage70.sql, dry then real, twice).
 // Exit code 1 if anything failed. A failure line ends with the lane that owns the fix: [L1] the stage file or the rollback, [L2] the catalogue or the
 // seed, [L5] the training app's twin.
@@ -34,16 +66,23 @@ import cp from 'node:child_process';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { openDb, runSql, read } from '../restore/lib.mjs';
+import { STAGES, holdsStage } from './rehearse_lib.mjs';     // what tells a database that it holds a stage (the weight units' markers among them)
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
 const COACH_JWT = JSON.stringify({ email: 'amirardekanian@gmail.com', role: 'authenticated', sub: '00000000-0000-4000-8000-00000000c0c0' });
 const args = process.argv.slice(2);
+if (args.includes('--no-stage' + '71')) {             // the old name of --no-stage73: refused, never ignored (an ignored flag would run WITH the stage)
+  console.error('--no-stage71 is --no-stage73 now: the stage was renumbered (main\'s stage71 and stage72 are the weight units). Nothing was run.');
+  process.exit(2);
+}
 const opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
 const BACKUP = opt('--backup'), REPORT = opt('--report');
 const PHASE1 = opt('--phase1') || '94cdc89';       // the commit the live project's phase 1 rulebook was seeded from
 const HEAD = opt('--head') || 'a219d5a';           // the commit the live project's phase 2 rulebook (version 2) was seeded from
 const STOP = Number(opt('--stop-after') || 99);
+const S73 = !args.includes('--no-stage73');          // stage73 after stage70 (the default); --no-stage73 is phase 3 as it went on the project
+const DUMP_AWARDS = opt('--dump-awards'), VS_AWARDS = opt('--vs-awards'), SNAP_REV = opt('--snapshot-rev');
 const CASES_FILE = opt('--cases-file') || path.join(ROOT, 'scripts', 'career', 'reward_cases.json');   // --cases-file: write somewhere else to look at a change first
 
 let passed = 0, failed = 0;
@@ -74,7 +113,8 @@ function py(argv, opts = {}) {
   for (const exe of [process.env.PYTHON, 'python', 'python3'].filter(Boolean)) {
     const r = cp.spawnSync(exe, ['-X', 'utf8', ...argv], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, ...opts });
     if (r.error && r.error.code === 'ENOENT') continue;
-    if (r.status === 9009 || /Microsoft Store|was not found/i.test(r.stderr || '')) continue;
+    // only the Windows Store stub of python3 (rehearse_lib.mjs STORE_STUB): a checker that says "was not found" in its own words is a real answer
+    if (r.status === 9009 || /^\s*Python was not found; run without arguments to install from the Microsoft Store/m.test((r.stderr || '') + '\n' + (r.stdout || ''))) continue;
     return r;
   }
   throw new Error('No python found. Set PYTHON to its path.');
@@ -93,6 +133,7 @@ function filesAt(rev) {
   const want = ['rulebook', 'badges', 'achievements', 'titles', 'missions', 'quests', 'recognition'].map(f => `career/${f}.toml`)
     .concat(['scripts/check_career.py', 'scripts/career_seed.py', 'supabase/xp_rules_snapshot.json']);
   if (!rev) want.push('career/tiers.lock.json');
+  want.push('coach.html');       // the checker reads SPINE_PATTERNS from coach.html (GAME-10: a `patterns` key is checked against it): the rev's own, else the working tree's
   for (const f of want) {
     const body = rev ? cp.execFileSync('git', ['show', `${rev}:${f}`], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 })
                      : fs.readFileSync(path.join(ROOT, f), 'utf8');
@@ -210,7 +251,19 @@ async function main() {
   // ── 0. the live project as it stands before stage70 ─────────────────────────────────────────────────────────────────────
   section('0. the live project before stage70 (the snapshot has stage66 and stage69 in it)');
   await runSql(db, read(path.join(ROOT, 'scripts', 'restore', 'stand_in_supabase.sql')), 'stand-in');
-  await runSql(db, read(path.join(ROOT, 'supabase', 'schema_snapshot.sql')), 'snapshot');
+  // The snapshot is the live structure. Once stage70 is live it holds stage70, and this rehearsal is about stage70 and stage73 going on: start from the
+  // last committed snapshot that does not hold it (or the one --snapshot-rev names). A snapshot without stage70 is used as it is.
+  const snapNow = read(path.join(ROOT, 'supabase', 'schema_snapshot.sql'));
+  let snapSql = snapNow, snapSays = 'the working copy of supabase/schema_snapshot.sql';
+  if (SNAP_REV || /career_awards/.test(snapNow)) {
+    const gitShow = rev => cp.execFileSync('git', ['show', `${rev}:supabase/schema_snapshot.sql`], { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 << 20 });
+    const revs = SNAP_REV ? [SNAP_REV] : cp.execFileSync('git', ['log', '--format=%h', '-n', '40', '--', 'supabase/schema_snapshot.sql'], { cwd: ROOT, encoding: 'utf8' }).split(/\s+/).filter(Boolean);
+    const pick = revs.find(r => { try { return !/career_awards/.test(gitShow(r)); } catch (e) { return false; } });
+    if (!pick) throw new Error('No committed schema snapshot without stage70 was found (git log of supabase/schema_snapshot.sql); pass --snapshot-rev <rev>');
+    snapSql = gitShow(pick).split('\r\n').join('\n'); snapSays = `supabase/schema_snapshot.sql as committed at ${pick} (the working copy already holds stage70, which is live)`;
+  }
+  info(`the structure starts from ${snapSays}`);
+  await runSql(db, snapSql, 'snapshot');
   const T = backup.tables || {};
   const xpRow = JSON.parse(read(path.join(ROOT, 'supabase', 'xp_rules_snapshot.json')));
   await db.exec(`set session_replication_role = replica`);          // load the rows without the shadow triggers; the backfill below derives every fact
@@ -222,11 +275,29 @@ async function main() {
   await q(db, `select setval(pg_get_serial_sequence('public.seasons', 'id'), greatest((select max(id) from public.seasons), 1))`);
   ok(Object.values(n).reduce((a, b) => a + b, 0) > 500 && n.athlete_progress > 20 && n.session_history > 100,
      `the backup's rows are in (${backup.exported_at}${backup.complete === true ? ', complete' : ', no "complete" flag: an older export'}): ` + Object.entries(n).map(([t, k]) => `${t} ${k}`).join(', '));
-  // the Spine entries All-Court reads (status approved, a pattern): the backup carries none, so the five groups are made up here
-  const SPINE = [['squat', 'Back Squat', 'squat', []], ['rdl', 'Romanian Deadlift', 'hinge', ['RDL']], ['bench', 'Bench Press', 'push-horizontal', []],
-                 ['pullup', 'Pull-Up', 'pull-vertical', []], ['splitsq', 'Split Squat', 'single-leg', []], ['goblet', 'Goblet Squat', 'squat', []]];
-  for (const [id, name, pattern, aliases] of SPINE)
-    await q(db, `insert into public.exercises (id, name, pattern, aliases, status) values ($1, $2, $3, $4::text[], 'approved')`, [id, name, pattern, aliases]);
+  // the Spine: the backup's own entries (the real names, patterns and aliases, as approved or draft), then the made-up ones the live-mint scenarios use
+  // that the real Spine does not already name. The Upgrade and Double Up place a lift through it (stage73), All-Court through it as well.
+  await db.exec(`set session_replication_role = replica`);
+  const nSpine = await load(db, 'exercises', T.exercises || []);
+  await db.exec(`set session_replication_role = origin`);
+  const spineNames = new Set((T.exercises || []).flatMap(e => [e.name, ...(e.aliases || [])]).map(x => String(x).toLowerCase().replace(/[^a-z0-9]+/g, '')));
+  // A made-up main lift carries the strength quality, as the real ones do (D18 as amended: The Upgrade and Double Up read only entries tagged strength).
+  const SPINE = [['squat', 'Back Squat', 'squat', [], ['strength']], ['rdl', 'Romanian Deadlift', 'hinge', ['RDL'], ['strength']], ['bench', 'Bench Press', 'push-horizontal', [], ['strength']],
+                 ['pullup', 'Pull-Up', 'pull-vertical', [], ['strength']], ['splitsq', 'Split Squat', 'single-leg', [], ['strength']], ['goblet', 'Goblet Squat', 'squat', [], ['strength']],
+                 // stage73's own cases: a main lift with an alias, and a squat that is only a draft (a draft is placed nowhere)
+                 ['zed-alias-press', 'Zed Alias Press', 'push-vertical', ['ZAP'], ['strength']],
+                 // D18 as amended: an excluded accessory tagged strength, a main-pattern entry with no strength tag, a strength-tagged main lift (the real
+                 // Spine has all three; they are made up only for a backup that does not)
+                 ['back-extension-45', '45° Back Extension', 'hinge', [], ['strength', 'armour']], ['cable-chest-press', 'Cable Chest Press', 'push-horizontal', [], ['muscle']],
+                 ['barbell-back-squat', 'Barbell Back Squat', 'squat', [], ['strength']],
+                 // the weight units' cases (section 2b): another of Amir's four, and a main lift on a machine's stack (logged in plates)
+                 ['machine-reverse-fly', 'Machine Reverse Fly', 'pull-horizontal', [], ['armour', 'muscle']], ['machine-leg-press', 'Machine Leg Press', 'squat', [], ['strength', 'muscle']]];
+  for (const [id, name, pattern, aliases, qualities] of SPINE) {
+    if ([name, ...aliases].some(x => spineNames.has(x.toLowerCase().replace(/[^a-z0-9]+/g, '')))) continue;
+    await q(db, `insert into public.exercises (id, name, pattern, aliases, status, qualities) values ($1, $2, $3, $4::text[], 'approved', $5::text[])`, [id, name, pattern, aliases, qualities]);
+  }
+  await q(db, `insert into public.exercises (id, name, pattern, aliases, status, qualities) values ('zed-draft-squat', 'Zed Draft Squat', 'squat', '{}', 'draft', '{strength}')`);
+  info(`the Spine: ${nSpine} entries from the backup, ${(await val(db, `select count(*)::int from public.exercises`)) - nSpine} made up to complete it`);
 
   const s66ok = (await one(db, `select to_regclass('public.career_facts') as t, to_regclass('public.career_scores') as s`));
   ok(s66ok.t && s66ok.s, 'the snapshot already holds stage66 and stage69 (career_facts, career_scores)');
@@ -271,6 +342,48 @@ async function main() {
   const cHist = await val(db, `select count(*)::int from public.career_facts where athlete_id = 'zz_hist' and kind = 'training_return' and void_at is null`);
   const cStuck = await val(db, `select count(*)::int from public.career_facts where athlete_id = 'zz_hist2' and kind = 'comeback_stuck' and void_at is null`);
   ok(cHist === 3 && cStuck >= 3, `zz_hist has ${cHist} training returns, zz_hist2 ${cStuck} comebacks that stuck`, 'the made-up histories do not make the facts the scenario needs: ' + cHist + '/' + cStuck);
+  // stage73 (D18, D19): lifts that gain on a main pattern, on an isolation pattern, on a lift the Spine cannot place, on an alias and on a draft; a plan day
+  // done twice in its week; and one plan day finished early and in full in the same week
+  const liftAthlete = async (id, pairs) => {      // pairs: [exercise, kg in the first session, kg in the second]; the second session is ten days later
+    await mkLogin(db, id);
+    await insProgram(db, id, prog({ start: addDays(today, -40), end: addDays(today, 30), days: [1, 2] }));
+    const both = (k) => pairs.map(p => sess({ ex: p[0], w: p[k] })).reduce((a, b) => ({ ...a, log: [...a.log, ...b.log] }));
+    await insSession(db, id, 1, addDays(today, -30), both(1));
+    await insSession(db, id, 2, addDays(today, -20), both(2));
+  };
+  await liftAthlete('zz_ml_main', [['Goblet Squat', 40, 100]]);                                            // a squat, 150% up
+  await liftAthlete('zz_ml_acc', [['Machine Seated Leg Curl', 40, 100], ['Dumbbell Forearm Rotation', 10, 25]]);   // isolation lifts only (off the seven patterns)
+  await liftAthlete('zz_ml_none', [['Zed Mystery Lift', 40, 100]]);                                          // a lift the Spine cannot place
+  await liftAthlete('zz_ml_alias', [['ZAP', 40, 100]]);                                                      // a main lift, logged by its alias
+  await liftAthlete('zz_ml_draft', [['Zed Draft Squat', 40, 100]]);                                          // an entry that is only a draft
+  await liftAthlete('zz_ml_mix', [['Goblet Squat', 40, 58], ['Machine Seated Leg Curl', 40, 100]]);         // a squat 45% up, an isolation lift 150% up
+  // D18 as amended: an excluded accessory on a main pattern (tagged strength), a main-pattern entry with no strength tag, a strength-tagged main lift,
+  // and the excluded accessory 150% up beside the main lift 25% up
+  await liftAthlete('zz_ml_bext', [['45° Back Extension', 10, 25]]);                                         // hinge, strength, but excluded by id
+  await liftAthlete('zz_ml_cchest', [['Cable Chest Press', 20, 50]]);                                        // push-horizontal, muscle only
+  await liftAthlete('zz_ml_bbs', [['Barbell Back Squat', 40, 100]]);                                         // squat, strength
+  await liftAthlete('zz_ml_mix2', [['45° Back Extension', 10, 25], ['Barbell Back Squat', 40, 50]]);        // the excluded lift 150% up, the main lift 25% up
+  // zz_rep: eight weeks, three plan days, each done twice in its week: 48 sessions, 24 of them paid (one per plan day per week). Century starts at 25.
+  await mkLogin(db, 'zz_rep');
+  const repStart = addDays(today, -60);
+  await insProgram(db, 'zz_rep', prog({ start: repStart, end: addDays(repStart, 55), days: [1, 2, 3] }));
+  for (let wk = 0; wk < 8; wk++) for (let dd = 0; dd < 3; dd++) for (let rep = 0; rep < 2; rep++)
+    await insSession(db, 'zz_rep', dd + 1, addDays(repStart, 7 * wk + 2 * dd + rep), sess({ w: 40 + wk }));
+  const repFacts = await q(db, `select kind, count(*)::int as n from public.career_facts where athlete_id = 'zz_rep' and kind in ('session_finished', 'session_finished_early') and void_at is null group by 1`);
+  const repPaid = await val(db, `select count(*)::int from public.career_facts_paid('zz_rep') where kind in ('session_finished', 'session_finished_early')`);
+  const repRaw = repFacts.reduce((a, r) => a + r.n, 0);
+  ok(repRaw === 48 && repPaid === 24, `zz_rep did each of three plan days twice in each of eight weeks: ${repRaw} session facts, ${repPaid} of them paid`, JSON.stringify({ repFacts, repPaid }), 'L3');
+  // zz_cap_*: plan day 1 in the first training week, finished early only (e), early then in full two days later (ef), in full then early (fe). A finished
+  // and an early session share one cap that pays the higher XP (career_facts_paid(); D19 counts what it pays): section 2 reads the three counts
+  const capStart = addDays(today, -30), CAP_IDS = { zz_cap_e: 'e', zz_cap_ef: 'ef', zz_cap_fe: 'fe' };
+  for (const [id, seq] of Object.entries(CAP_IDS)) {
+    await mkLogin(db, id);
+    await insProgram(db, id, prog({ start: capStart, end: addDays(capStart, 40), days: [1] }));
+    for (let i = 0; i < seq.length; i++) await insSession(db, id, 1, addDays(capStart, 1 + 2 * i), seq[i] === 'e' ? { ...sess(), status: 'Partial (3 of 5)' } : sess());
+  }
+  const capFacts = await q(db, `select athlete_id as id, string_agg(case kind when 'session_finished' then 'f' else 'e' end, '' order by day) as k from public.career_facts
+                                 where athlete_id like 'zz\\_cap\\_%' and kind in ('session_finished', 'session_finished_early') and void_at is null group by 1 order by 1`);
+  ok(JSON.stringify(Object.fromEntries(capFacts.map(r => [r.id, r.k]))) === JSON.stringify(CAP_IDS), `zz_cap_e, zz_cap_ef and zz_cap_fe carry the session facts e, ef and fe (one plan day, one week)`, JSON.stringify(capFacts), 'L3');
 
   // the longest real log, twice: one is saved WITHOUT stage70 (the control), the other with it (section 9)
   const facts = await q(db, `select athlete_id as id, count(*)::int as n from public.career_facts where void_at is null and athlete_id not like 'zz\\_%' group by 1 order by 2 desc`);
@@ -313,6 +426,10 @@ async function main() {
   await profile(db, 'zz_ctl');
   const ctlProf = []; for (let k = 0; k < 5; k++) ctlProf.push((await ms(() => profile(db, 'zz_ctl')))[1]);
   info(`control (stage69 only): get_profile() of ${big}'s log ${ctlProf.join(' / ')} ms (median ${median(ctlProf)})`);
+  // and of the real athlete itself (its log holds more than the copy: the Proof log, the board), for stage73's commitment number in section 9
+  await profile(db, big);
+  const ctlProfBig = []; for (let k = 0; k < 5; k++) ctlProfBig.push((await ms(() => profile(db, big)))[1]);
+  info(`control (stage69 only): get_profile() of ${big} itself ${ctlProfBig.join(' / ')} ms (median ${median(ctlProfBig)})`);
 
   // everything stage70 must leave as it was while the switch is off
   const allIds0 = (await q(db, `select z.id from (select ap.athlete_id as id from public.athlete_progress ap where ap.data ? (ap.athlete_id || '_hab_log')
@@ -333,11 +450,105 @@ async function main() {
   if (STOP < 2) return finish();
 
   // ── 2. stage70, twice; the phase 3 catalogue data with the switch off ───────────────────────────────────────────────────
-  section('2. stage70 twice, then the phase 3 catalogue data at the same version with the switch off');
+  section('2. stage70 twice, the weight units (stage71, stage72) twice each on top of it, stage73 twice; then the phase 3 catalogue data at the same version with the switch off');
   const s70 = read(path.join(ROOT, 'supabase', 'stage70_career_rewards.sql'));
   const [, tS70] = await ms(() => runSql(db, s70, 'stage70'));
   await runSql(db, s70, 'stage70 again');
   ok(true, `stage70 applied (${Math.round(tS70 / 1000)} s), and applied again without an error`);
+  const allCareerDefs = async () => Object.fromEntries((await q(db, `select p.oid::regprocedure::text as n, pg_get_functiondef(p.oid) as d from pg_proc p join pg_namespace s on s.oid = p.pronamespace
+      where s.nspname = 'public' order by 1`)).map(r => [r.n, r.d.replace(/\r/g, '')]));
+  // main's stage71 and stage72 (the weight units) went live after stage70: they go on here, twice each, in that order. When the snapshot already
+  // holds one (it went live before the snapshot was made) the file must put back exactly what the snapshot holds: nothing may move.
+  const WU = STAGES.filter(s => s.n === 71 || s.n === 72);
+  for (const s of WU) {
+    const heldBefore = await holdsStage(db, s), defsWu0 = await allCareerDefs();
+    const sql = read(path.join(ROOT, 'supabase', s.file));
+    await runSql(db, sql, `stage${s.n}`); await runSql(db, sql, `stage${s.n} again`);
+    const defsWu1 = await allCareerDefs();
+    const moved = Object.keys({ ...defsWu0, ...defsWu1 }).filter(k => defsWu0[k] !== defsWu1[k]);
+    ok(await holdsStage(db, s) && (!heldBefore || moved.length === 0),
+       `stage${s.n} (${s.file}, the weight units) on top of stage70, twice: ${heldBefore ? `the snapshot already held it, and the file put back exactly what it holds (${Object.keys(defsWu1).length} functions compared, none moved)` : `applied here (${moved.length} functions new or replaced: ${moved.map(k => k.split('(')[0]).join(', ')})`}`,
+       moved.slice(0, 5).map(k => k + '\n' + firstDiff(defsWu0[k], defsWu1[k])).join('\n'), 'S');
+    // stage70's way back (section 13) does not touch the weight units' functions: when they were applied here, what it must give back for
+    // career_derive() (in REPLACED) is the text they left, not the snapshot's, and their new helpers are not stage70's to drop
+    if (!heldBefore) {
+      for (const k of Object.keys(defs0)) { const d = (await defsOf([k]))[k]; if (d !== defs0[k]) { info(`${k}() is stage${s.n}'s now: section 13 compares it with that`); defs0[k] = d; } }
+      for (const k of moved) fnNames0.add(k.split('(')[0]);
+    }
+  }
+  // stage73 (The Upgrade and Double Up on the seven main patterns, counts over the paid sessions) goes on after stage70, stage71 and stage72, twice. What it
+  // replaces must be only four functions, and its one new function must be closed to everybody but the service role. (--no-stage73 leaves it out: phase 3
+  // as it was applied.)
+  const s73 = read(path.join(ROOT, 'supabase', 'stage73_career_main_lifts.sql'));
+  const S73_FNS = ['career_entry_keys', 'career_measures', 'career_achievement_eval', 'career_rewards_profile'];
+  const defsBefore73 = await allCareerDefs();
+  // THE ORDER (the port of 2026-10-18): stage73 opens with a guard. Without stage70 (career_awards, taken away for one try and put back) it refuses at its
+  // first statement and nothing is changed. It needs nothing of stage71 and stage72 (the port's repair round 2 took career_lift_base() out of the main-lift
+  // test, where it changed nothing and tied stage73 to stage72's way back): with main's rollback_stage72.sql run first, all seven of stage72's helpers gone,
+  // stage73 goes on without an error, in a transaction that is undone.
+  const STAGE72_FNS = ['career_w', 'career_wn', 'career_wu', 'career_lift_key', 'career_lift_base', 'career_lift_unit', 'career_rec_unit'];
+  const rb72 = read(path.join(ROOT, 'scripts', 'career', 'rollback_stage72.sql'));
+  const n72 = async () => val(db, `select count(*)::int from pg_proc where pronamespace = 'public'::regnamespace and proname = any($1::text[])`, [STAGE72_FNS]);
+  if (S73) {
+    const tryS73 = async () => { let e = null; try { await runSql(db, s73, 'stage73 out of order'); } catch (x) { e = String(x.message); } return [e, await allCareerDefs()]; };
+    await q(db, `alter table public.career_awards rename to career_awards_away`);
+    const [g70, d70] = await tryS73();
+    await q(db, `alter table public.career_awards_away rename to career_awards`);
+    ok(g70 && /stage73 needs stage70 first: public\.career_awards is missing\. Apply stage70, then this file\. Nothing was changed\./.test(g70) && !d70['career_maxpct_key(jsonb)']
+       && Object.keys(defsBefore73).every(k => defsBefore73[k] === d70[k]),
+       'stage73 without stage70 (career_awards renamed away for one try) refuses at its guard, and nothing was changed (every function as it was, no career_maxpct_key())', g70, 'S');
+    const no72 = { before: await n72() };
+    await db.exec('begin');
+    try {
+      await runSql(db, rb72, 'rollback_stage72 (undone)');
+      no72.left = await n72();
+      try { await runSql(db, s73, 'stage73 without stage72'); } catch (x) { no72.err = String(x.message); }
+      if (!no72.err) no72.key = await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify({ patterns: ['squat'], qualities: ['strength'], exclude: ['cable-face-pull'] })]);
+    } catch (x) { no72.err = 'rollback_stage72.sql: ' + String(x.message); }
+    finally { await db.exec('rollback'); }
+    ok(no72.before === STAGE72_FNS.length && no72.left === 0 && !no72.err && no72.key === 'maxpct:squat|q:strength|x:cable-face-pull',
+       `stage73 needs nothing of stage72: with rollback_stage72.sql run first (its ${no72.before} helpers gone, ${no72.left} left), stage73 goes on without an error and its key helper answers (in a transaction that is undone)`,
+       JSON.stringify(no72), 'S');
+    ok(JSON.stringify(await allCareerDefs()) === JSON.stringify(defsBefore73) && !!(await val(db, `select to_regclass('public.career_awards')::text`)) && (await n72()) === STAGE72_FNS.length,
+       'both put back as they were (stage72 whole again, career_awards back, no career_maxpct_key())', undefined, 'S');
+  }
+  const fnNamesBefore73 = new Set((await q(db, `select p.proname as n from pg_proc p join pg_namespace s on s.oid = p.pronamespace where s.nspname = 'public'`)).map(r => r.n));
+  if (S73) {
+    const [, tS73] = await ms(() => runSql(db, s73, 'stage73'));
+    await runSql(db, s73, 'stage73 again');
+    ok(true, `stage73 applied (${Math.round(tS73 / 1000)} s), and applied again without an error`);
+    const defsAfter73 = await allCareerDefs();
+    const changed73 = Object.keys(defsAfter73).filter(k => defsBefore73[k] !== undefined && defsBefore73[k] !== defsAfter73[k]).map(k => k.split('(')[0]).sort();
+    const added73 = Object.keys(defsAfter73).filter(k => defsBefore73[k] === undefined).map(k => k.split('(')[0]).sort();
+    ok(JSON.stringify(changed73) === JSON.stringify([...S73_FNS].sort()) && JSON.stringify(added73) === JSON.stringify(['career_maxpct_key']),
+       `stage73 replaces exactly career_entry_keys, career_measures, career_achievement_eval and career_rewards_profile and adds exactly career_maxpct_key (replaced ${changed73.join(', ')}; added ${added73.join(', ')})`, undefined, 'L1');
+    const prv = await one(db, `select has_function_privilege('anon', 'public.career_maxpct_key(jsonb)', 'execute') as anon, has_function_privilege('authenticated', 'public.career_maxpct_key(jsonb)', 'execute') as auth,
+                                      has_function_privilege('service_role', 'public.career_maxpct_key(jsonb)', 'execute') as svc, has_function_privilege('public', 'public.career_maxpct_key(jsonb)', 'execute') as pub`).catch(e => ({ err: e.message }));
+    ok(prv && !prv.err && !prv.anon && !prv.auth && !prv.pub && prv.svc, 'career_maxpct_key() is closed to public, anon and authenticated and open to service_role', JSON.stringify(prv), 'L1');
+    const keyCases = [[{}, 'maxpct'], [{ patterns: ['squat', 'hinge', 'squat'] }, 'maxpct:hinge,squat'], [{ patterns: 'squat' }, 'maxpct:squat'], [{ patterns: [] }, 'maxpct:'], [{ patterns: ['hinge', 'squat'] }, 'maxpct:hinge,squat']];
+    const keyBad = [];
+    for (const [b, want] of keyCases) { const got = await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify(b)]); if (got !== want) keyBad.push(`${JSON.stringify(b)}: ${got}, wanted ${want}`); }
+    ok(keyBad.length === 0, `career_maxpct_key() reads the entry: no patterns key = maxpct; an array = maxpct: the patterns sorted, de-duplicated, comma-joined; a string as it is (${keyCases.length} cases)`, keyBad.join('\n'), 'L1');
+    // D18 as amended: `qualities` adds |q:, `exclude` adds |x: (each sorted, de-duplicated, comma-joined; a string is one item); an entry with neither
+    // reads the key it read before (the cases above), whatever order the lists and the keys come in
+    const M7k = ['squat', 'hinge', 'single-leg', 'push-horizontal', 'push-vertical', 'pull-horizontal', 'pull-vertical'];
+    const X4k = ['back-extension-45', 'cable-face-pull', 'machine-reverse-fly', 'cable-straight-arm-pulldown'];
+    const RULE_KEY = 'maxpct:hinge,pull-horizontal,pull-vertical,push-horizontal,push-vertical,single-leg,squat|q:strength|x:back-extension-45,cable-face-pull,cable-straight-arm-pulldown,machine-reverse-fly';
+    const filterCases = [
+      [{ patterns: ['squat', 'hinge'], qualities: ['strength'] }, 'maxpct:hinge,squat|q:strength', 'patterns + qualities'],
+      [{ patterns: ['hinge'], exclude: ['cable-face-pull', 'back-extension-45'] }, 'maxpct:hinge|x:back-extension-45,cable-face-pull', 'patterns + exclude'],
+      [{ patterns: M7k, qualities: ['strength'], exclude: X4k }, RULE_KEY, 'the rule as the catalogue writes it'],
+      [{ exclude: X4k.slice().reverse(), qualities: ['strength'], patterns: M7k.slice().reverse() }, RULE_KEY, 'the same lists in another order, the keys in another order'],
+      [{ patterns: 'squat', qualities: 'strength', exclude: 'back-extension-45' }, 'maxpct:squat|q:strength|x:back-extension-45', 'string values, one item each'],
+      [{ patterns: ['squat', 'squat'], qualities: ['strength', 'armour', 'strength', ''], exclude: ['machine-reverse-fly', 'cable-face-pull', 'machine-reverse-fly'] }, 'maxpct:squat|q:armour,strength|x:cable-face-pull,machine-reverse-fly', 'duplicates and an empty item'],
+      [{ patterns: ['squat'], qualities: [], exclude: [] }, 'maxpct:squat|q:|x:', 'empty lists are kept (an empty qualities list matches no lift, an empty exclude list leaves nothing out)'],
+      [{ qualities: ['strength'] }, 'maxpct|q:strength', 'qualities without patterns (the checker refuses it in the catalogue; the key is still defined)'],
+      [{ patterns: ['squat'], qualities: null }, 'maxpct:squat', 'a JSON null is no key']];
+    const fBad = [];
+    for (const [b, want, what] of filterCases) { const got = await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify(b)]); if (got !== want) fBad.push(`${what}: ${JSON.stringify(b)} gave ${got}, wanted ${want}`); }
+    ok(fBad.length === 0, `career_maxpct_key() with qualities and exclude (D18 as amended): ${filterCases.map(c => c[2]).join('; ')} (${filterCases.length} cases)`, fBad.join('\n'), 'S');
+    ok((await val(db, `select count(*)::int from public.career_scores where rewards ? 'stamp'`)) === 0, 'stage73 leaves no cached rewards stamp (with the switch off there are none), so the next full evaluate looks again', undefined, 'L1');
+  } else info('--no-stage73: phase 3 as it was applied to the project (stage70 only)');
   const erase1 = (await one(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure) as d`)).d;
   ok((erase1.match(/'career_awards'/g) || []).length === 1 && (erase1.match(/'career_recognition'/g) || []).length === 1
      && erase1.replace(`'career_scores', 'career_awards', 'career_recognition']`, `'career_scores']`) === erase0,
@@ -345,7 +556,7 @@ async function main() {
   const open = (await q(db, `select p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public'
                               and (p.proname like 'career\\_%' or p.proname in ('get_profile', 'mark_moments_told')) and has_function_privilege('authenticated', p.oid, 'execute')`)).map(r => r.proname).sort();
   ok(JSON.stringify(open) === JSON.stringify(['get_profile', 'mark_moments_told']), 'only get_profile and mark_moments_told are open to a signed-in athlete', open.join(','), 'L1');
-  const newFns = (await q(db, `select p.proname as n from pg_proc p join pg_namespace s on s.oid = p.pronamespace where s.nspname = 'public'`)).map(r => r.n).filter(x => !fnNames0.has(x));
+  const newFns = (await q(db, `select p.proname as n from pg_proc p join pg_namespace s on s.oid = p.pronamespace where s.nspname = 'public'`)).map(r => r.n).filter(x => !fnNames0.has(x) && x !== 'career_maxpct_key');       // stage73's helper is told apart from stage70's
   info(`stage70 adds ${new Set(newFns).size} functions: ${[...new Set(newFns)].sort().join(', ')}`);
   const tables = async () => (await q(db, `select (select count(*)::int from public.career_awards) as a, (select count(*)::int from public.career_recognition) as r`))[0];
   const work = filesAt(null);
@@ -366,13 +577,181 @@ async function main() {
     if (JSON.stringify(stripVolatile(a)) !== JSON.stringify(stripVolatile(b))) diffs.push(`${id}: profile keys differ: ${Object.keys(b).filter(k => JSON.stringify(a[k]) !== JSON.stringify(b[k])).join(',')}`);
     if (!(Array.isArray(p.badges) && !p.badges.length && Array.isArray(p.achievements) && !p.achievements.length && Array.isArray(p.moments) && !p.moments.length) || 'owned' in p || 'ladder' in p) diffs.push(`${id}: a phase 3 slot is filled`);
   }
-  ok(diffs.length === 0, `every athlete's score and profile are exactly what they were before stage70 (${allIds0.length}); badges, achievements and moments are []`, diffs.slice(0, 8).join('\n'), 'L1');
+  ok(diffs.length === 0, `every athlete's score and profile are exactly what they were before stage70${S73 ? ' and stage73' : ''} (${allIds0.length}); badges, achievements and moments are []`, diffs.slice(0, 8).join('\n'), 'L1');
   await asCoach(db);
   const board1 = { season: await q(db, `select * from public.leaderboard_top('amir_ardekani', null, 'season', 50)`), week: await q(db, `select * from public.leaderboard_top('amir_ardekani', null, 'week', 50)`) };
   await asNobody(db);
   ok(JSON.stringify(board1) === JSON.stringify(board0), `the board is exactly as before (${board1.season.length} on it, both scopes)`, undefined, 'L1');
   cmp = (await one(db, `select public.career_compare() as r`)).r;
   ok(cmp.ok && !('catalogue_switch' in cmp && cmp.catalogue_switch), `the compare still holds with the switch off: ${cmp.matched} of ${cmp.athletes}`, cmp.rows.filter(r => !r.ok).map(r => JSON.stringify(r)).join('\n'), 'L1');
+  // 2b. the weight units on made-up athletes, saved once the stack is on (so stage72 derives them whatever the snapshot held): a main lift in POUNDS
+  // 150% up, the two excluded lifts that sit on a main pattern in PLATES 150% up, and a main lift on a machine's stack in plates 62.5% up. Each lift's
+  // series is kept in its own measure (stage72): its lift_gain's ref is the series key, its value.lift the name as logged. They are history at the go-day.
+  await liftAthlete('zz_ml_lb', [['Barbell Back Squat', '100 lb', '250 lb']]);                                         // squat, strength, in pounds: +150%
+  await liftAthlete('zz_ml_plates', [['45° Back Extension', '4 plates', '10 plates'], ['Machine Reverse Fly', '6 plates', '15 plates']]);   // excluded, in plates
+  await liftAthlete('zz_ml_plmain', [['Machine Leg Press', '8 plates', '13 plates']]);                                  // squat, strength, in plates: +62.5%
+  const lgU = id => q(db, `select ref, value ->> 'lift' as lift, (value ->> 'pct')::numeric as pct from public.career_facts where athlete_id = $1 and kind = 'lift_gain' and void_at is null order by ref`, [id]);
+  const uLb = await lgU('zz_ml_lb'), uPl = await lgU('zz_ml_plates'), uPm = await lgU('zz_ml_plmain');
+  info(`the weight-unit athletes' lift gains: ` + [['zz_ml_lb', uLb], ['zz_ml_plates', uPl], ['zz_ml_plmain', uPm]].map(([id, r]) => `${id} ${r.map(x => `${x.ref} (${x.lift}) ${x.pct}%`).join(', ')}`).join('; '));
+  ok(uLb.length === 1 && uLb[0].ref === 'barbell back squat|lb' && uLb[0].lift === 'Barbell Back Squat' && Number(uLb[0].pct) === 150
+     && JSON.stringify(uPl.map(x => x.ref)) === JSON.stringify(['45° back extension|plates', 'machine reverse fly|plates']) && uPl.every(x => Number(x.pct) === 150)
+     && uPm.length === 1 && uPm[0].ref === 'machine leg press|plates' && Number(uPm[0].pct) === 62.5,
+     'stage72 keeps each lift in its own measure: Barbell Back Squat 100 to 250 lb is the series barbell back squat|lb (+150%), the two excluded lifts in plates are |plates series (+150% each), Machine Leg Press 8 to 13 plates is machine leg press|plates (+62.5%); value.lift is the name as logged',
+     JSON.stringify({ uLb, uPl, uPm }), 'S');
+  if (S73) {
+    // the measures stage73 adds, read directly (service role / superuser here): maxpct over every lift as before, maxpct:<patterns> over the lifts the Spine places there
+    const MAIN7 = ['squat', 'hinge', 'single-leg', 'push-horizontal', 'push-vertical', 'pull-horizontal', 'pull-vertical'];
+    const mp = async (id, key) => Number((await val(db, `select public.career_measures($1, '{}'::jsonb, array[$2]::text[]) -> $2 ->> 'have'`, [id, key])));
+    const k7 = await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify({ patterns: MAIN7 })]);
+    const lg = id => q(db, `select value ->> 'lift' as lift, (value ->> 'pct')::numeric as pct from public.career_facts where athlete_id = $1 and kind = 'lift_gain' and void_at is null order by 1`, [id]);
+    info(`the lift gains the made-up athletes carry: ` + (await Promise.all(['zz_ml_main', 'zz_ml_acc', 'zz_ml_none', 'zz_ml_alias', 'zz_ml_draft', 'zz_ml_mix'].map(async id => `${id} ${(await lg(id)).map(r => `${r.lift} ${r.pct}%`).join(', ')}`))).join('; '));
+    const m = {};
+    for (const id of ['zz_ml_main', 'zz_ml_acc', 'zz_ml_none', 'zz_ml_alias', 'zz_ml_draft', 'zz_ml_mix']) m[id] = { all: await mp(id, 'maxpct'), main: await mp(id, k7) };
+    ok(m.zz_ml_main.all === m.zz_ml_main.main && m.zz_ml_main.main >= 100, `maxpct:<the seven main patterns> reads a squat's gain as maxpct does (${m.zz_ml_main.main}% both ways)`, JSON.stringify(m.zz_ml_main), 'L1');
+    ok(m.zz_ml_acc.all >= 100 && m.zz_ml_acc.main === 0, `and an isolation lift's gain (Machine Seated Leg Curl, Dumbbell Forearm Rotation: ${m.zz_ml_acc.all}% by maxpct) is 0 on the seven main patterns`, JSON.stringify(m.zz_ml_acc), 'L1');
+    ok(m.zz_ml_none.all >= 100 && m.zz_ml_none.main === 0, `a lift the Spine cannot place counts for nothing (${m.zz_ml_none.all}% → ${m.zz_ml_none.main}%)`, JSON.stringify(m.zz_ml_none), 'L1');
+    ok(m.zz_ml_draft.all >= 100 && m.zz_ml_draft.main === 0, `a lift that is only a Spine DRAFT is placed nowhere (${m.zz_ml_draft.all}% → ${m.zz_ml_draft.main}%)`, JSON.stringify(m.zz_ml_draft), 'L1');
+    ok(m.zz_ml_alias.main === m.zz_ml_alias.all && m.zz_ml_alias.main >= 100, `a main lift logged by its alias is placed (${m.zz_ml_alias.main}%)`, JSON.stringify(m.zz_ml_alias), 'L1');
+    ok(m.zz_ml_mix.all >= 100 && m.zz_ml_mix.main > 0 && m.zz_ml_mix.main < 100, `a squat at ${m.zz_ml_mix.main}% and an isolation lift at ${m.zz_ml_mix.all}%: the measure over the seven patterns is the squat's alone`, JSON.stringify(m.zz_ml_mix), 'L1');
+    ok(await mp('zz_ml_main', 'maxpct:') === 0 && await mp('zz_ml_main', 'maxpct:squat') === m.zz_ml_main.main && await mp('zz_ml_main', 'maxpct:hinge') === 0,
+       'an empty pattern list places no lift; a single pattern reads only that pattern', undefined, 'L1');
+    // D18 as amended, read directly: the rule's key from an explicit body (so it holds whatever the catalogue says; section 3b reads the catalogue's)
+    const X4 = ['back-extension-45', 'cable-face-pull', 'machine-reverse-fly', 'cable-straight-arm-pulldown'];
+    const kRule = await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify({ patterns: MAIN7, qualities: ['strength'], exclude: X4 })]);
+    const kQ = await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify({ patterns: MAIN7, qualities: ['strength'] })]);
+    const kX = await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify({ patterns: MAIN7, exclude: X4 })]);
+    const AM = ['zz_ml_bext', 'zz_ml_cchest', 'zz_ml_bbs', 'zz_ml_mix2', 'zz_ml_main', 'zz_ml_alias', 'zz_ml_mix'];
+    info(`the lift gains of the D18-as-amended athletes: ` + (await Promise.all(AM.slice(0, 4).map(async id => `${id} ${(await lg(id)).map(r => `${r.lift} ${r.pct}%`).join(', ')}`))).join('; '));
+    const a = {};
+    for (const id of AM) a[id] = { all: await mp(id, 'maxpct'), pats: await mp(id, k7), q: await mp(id, kQ), x: await mp(id, kX), rule: await mp(id, kRule) };
+    info(`maxpct / patterns / + strength / + exclude / the rule: ` + AM.map(id => `${id} ${a[id].all}/${a[id].pats}/${a[id].q}/${a[id].x}/${a[id].rule}`).join('; '));
+    ok(a.zz_ml_bext.all >= 100 && a.zz_ml_bext.pats === a.zz_ml_bext.all && a.zz_ml_bext.q === a.zz_ml_bext.all && a.zz_ml_bext.x === 0 && a.zz_ml_bext.rule === 0,
+       `45° Back Extension ${a.zz_ml_bext.all}% up (hinge, tagged strength): counted by the patterns and by the strength rule, 0 once its id is excluded, 0 under the rule`, JSON.stringify(a.zz_ml_bext), 'S');
+    ok(a.zz_ml_cchest.all >= 100 && a.zz_ml_cchest.pats === a.zz_ml_cchest.all && a.zz_ml_cchest.q === 0 && a.zz_ml_cchest.x === a.zz_ml_cchest.all && a.zz_ml_cchest.rule === 0,
+       `Cable Chest Press ${a.zz_ml_cchest.all}% up (push-horizontal, muscle only): counted by the patterns and by the exclude list alone, 0 once strength is asked, 0 under the rule`, JSON.stringify(a.zz_ml_cchest), 'S');
+    ok(a.zz_ml_bbs.all >= 100 && ['pats', 'q', 'x', 'rule'].every(k => a.zz_ml_bbs[k] === a.zz_ml_bbs.all), `Barbell Back Squat ${a.zz_ml_bbs.all}% up (squat, strength): counted every way`, JSON.stringify(a.zz_ml_bbs), 'S');
+    ok(a.zz_ml_mix2.all >= 100 && a.zz_ml_mix2.pats === a.zz_ml_mix2.all && a.zz_ml_mix2.rule > 0 && a.zz_ml_mix2.rule < 30,
+       `the excluded lift ${a.zz_ml_mix2.all}% up beside the main lift ${a.zz_ml_mix2.rule}% up: the patterns alone read the back extension, the rule reads the squat alone`, JSON.stringify(a.zz_ml_mix2), 'S');
+    ok(['zz_ml_main', 'zz_ml_alias'].every(id => a[id].rule === a[id].all && a[id].all >= 100) && a.zz_ml_mix.rule === m.zz_ml_mix.main,
+       `the strength-tagged main lifts of stage73's own cases count under the rule as before (Goblet Squat ${a.zz_ml_main.rule}%, a lift by its alias ${a.zz_ml_alias.rule}%, the squat beside an isolation lift ${a.zz_ml_mix.rule}%)`, JSON.stringify({ main: a.zz_ml_main, alias: a.zz_ml_alias, mix: a.zz_ml_mix }), 'S');
+    const bbs = a.zz_ml_bbs.all;
+    const edge = { emptyQ: await mp('zz_ml_bbs', 'maxpct:squat|q:'), emptyX: await mp('zz_ml_bbs', 'maxpct:squat|x:'), aliasOut: await mp('zz_ml_alias', 'maxpct:push-vertical|x:zed-alias-press'),
+                   noPatsQ: await mp('zz_ml_bbs', 'maxpct|q:strength'), noPatsQc: await mp('zz_ml_cchest', 'maxpct|q:strength'), noPatsMuscle: await mp('zz_ml_cchest', 'maxpct|q:muscle'),
+                   noPatsUnplaced: await mp('zz_ml_none', 'maxpct|x:back-extension-45'), draftQ: await mp('zz_ml_draft', 'maxpct:squat|q:strength') };
+    ok(edge.emptyQ === 0 && edge.emptyX === bbs && edge.aliasOut === 0 && edge.noPatsQ === bbs && edge.noPatsQc === 0 && edge.noPatsMuscle === a.zz_ml_cchest.all && edge.noPatsUnplaced === 0 && edge.draftQ === 0,
+       'an empty qualities list matches no lift, an empty exclude list leaves nothing out, an excluded entry is out by its alias too, a key without patterns takes any pattern but only a placed lift, and a draft is placed nowhere',
+       JSON.stringify(edge), 'S');
+    // the exclude list fails closed, narrowly (the port of 2026-10-18): only an |x: id with NO row in public.exercises (a typo, the entry given a new id,
+    // or deleted) stops the key, which then counts no lift at all, so nothing is minted by mistake (a mint is never taken back, GAME-1). An entry made a
+    // draft is no stop: a draft places no lift anyway, and its id is still on the list when it is approved again. Each case in a transaction that is undone.
+    const bextAll = a.zz_ml_bext.all;
+    // and a stop says so: career_measures() puts a WARNING in the database log naming the key and every |x: id with no row (a warning never stops a save);
+    // a healthy key, a key without |x:, plain maxpct and a key naming a draft are quiet. Read with PGlite's onNotice.
+    const mpW = async (id, key) => {
+      const w = [];
+      const r = await db.query(`select public.career_measures($1, '{}'::jsonb, array[$2]::text[]) -> $2 ->> 'have' as h`, [id, key], { onNotice: n => w.push(`${n.severity}: ${n.message}`) });
+      return [Number(r.rows[0].h), w];
+    };
+    const undone = async fn => { await db.exec('begin'); try { return await fn(); } finally { await db.exec('rollback'); } };
+    const warn = { healthy: (await mpW('zz_ml_bbs', kRule))[1], plain: (await mpW('zz_ml_bbs', 'maxpct'))[1], noX: (await mpW('zz_ml_bbs', kQ))[1],
+                   unknown: (await mpW('zz_ml_bbs', 'maxpct:squat|x:no-such-entry'))[1], two: (await mpW('zz_ml_bbs', 'maxpct:squat|x:zz-gone,cable-face-pull,no-such-entry'))[1] };
+    const fc = { unknown: await mp('zz_ml_bbs', 'maxpct:squat|x:no-such-entry'), unknownBeside: await mp('zz_ml_bbs', 'maxpct:squat|q:strength|x:cable-face-pull,no-such-entry') };
+    // drafted: no stop. The squat counts under the rule as before; the back extension counts nowhere (a draft places nothing, with the list or without it).
+    fc.draft = await undone(async () => {
+      await q(db, `update public.exercises set status = 'draft' where id = 'back-extension-45'`);
+      return { bbs: await mp('zz_ml_bbs', kRule), bext: await mp('zz_ml_bext', kRule), bextNoX: await mp('zz_ml_bext', kQ), mix2: await mp('zz_ml_mix2', kRule),
+               warn: (await mpW('zz_ml_bbs', kRule))[1] };
+    });
+    // re-keyed: the row moves to a new id, so the old id has no row: the key stops (both athletes read 0), where the strength rule without the list
+    // would count the back extension again under its new id
+    fc.rekey = await undone(async () => {
+      await q(db, `update public.exercises set id = 'back-extension-45-v2' where id = 'back-extension-45'`);
+      return { bbs: await mp('zz_ml_bbs', kRule), bext: await mp('zz_ml_bext', kRule), bextNoX: await mp('zz_ml_bext', kQ), bbsNoX: await mp('zz_ml_bbs', kQ),
+               warn: (await mpW('zz_ml_bbs', kRule))[1] };
+    });
+    // deleted: no row either, the key stops
+    fc.deleted = await undone(async () => {
+      await q(db, `delete from public.exercises where id = 'back-extension-45'`);
+      return { bbs: await mp('zz_ml_bbs', kRule), bext: await mp('zz_ml_bext', kRule), warn: (await mpW('zz_ml_bbs', kRule))[1] };
+    });
+    // a copy under a new id BESIDE the old row (made a draft) is a new exercise to the rule: the old id still has its row, so nothing stops, and the copy
+    // counts when it qualifies (approved, hinge, tagged strength) until its id is on the list too. The stop is for an id with no row and cannot tell a copy
+    // from a new entry: pinned here, so a change to it is seen.
+    fc.copy = await undone(async () => {
+      await q(db, `insert into public.exercises select (jsonb_populate_record(null::public.exercises, to_jsonb(e) || jsonb_build_object('id', 'back-extension-45-v2', 'status', 'approved'))).*
+                    from public.exercises e where e.id = 'back-extension-45'`);
+      await q(db, `update public.exercises set status = 'draft' where id = 'back-extension-45'`);
+      return { bext: await mp('zz_ml_bext', kRule), bextV2Out: await mp('zz_ml_bext', kRule.replace('|x:', '|x:back-extension-45-v2,')), warn: (await mpW('zz_ml_bbs', kRule))[1] };
+    });
+    fc.after = { bbs: await mp('zz_ml_bbs', kRule), bext: await mp('zz_ml_bext', kRule), v2: await val(db, `select count(*)::int from public.exercises where id = 'back-extension-45-v2'`),
+                 be45: await val(db, `select count(*)::int from public.exercises where id = 'back-extension-45' and status = 'approved'`) };
+    ok(fc.unknown === 0 && fc.unknownBeside === 0
+       && fc.draft.bbs === bbs && fc.draft.bext === 0 && fc.draft.bextNoX === 0 && fc.draft.mix2 === a.zz_ml_mix2.rule
+       && fc.rekey.bbs === 0 && fc.rekey.bext === 0 && fc.rekey.bextNoX === bextAll && fc.rekey.bbsNoX === bbs
+       && fc.deleted.bbs === 0 && fc.deleted.bext === 0
+       && fc.after.bbs === bbs && fc.after.bext === 0 && fc.after.v2 === 0 && fc.after.be45 === 1,
+       `the exclude list fails closed, only on an id with no row: a key naming an id the Spine does not have counts no lift (alone or beside a real id); back-extension-45 made a draft is no stop (Barbell Back Squat still ${fc.draft.bbs}%, the back extension 0 with the list and without it: a draft places nothing); re-keyed to a new id, the key counts nothing (the squat ${fc.rekey.bbs}%), where the strength rule alone would count the back extension again (${fc.rekey.bextNoX}%); deleted, nothing either; put back, the rule reads the squat (${fc.after.bbs}%) and not the back extension (${fc.after.bext}%)`,
+       JSON.stringify(fc), 'S');
+    ok(fc.copy.bext === bextAll && fc.copy.bextV2Out === 0 && fc.copy.warn.length === 0,
+       `a copy of the back extension under a new id, beside the old row made a draft, is a new exercise to the rule: nothing stops, and it counts (${fc.copy.bext}%) until its id is on the list as well (then ${fc.copy.bextV2Out}%)`,
+       JSON.stringify(fc.copy), 'S');
+    const W0 = 'WARNING: Career Mode: ', WMSG = ' in its exclude list is not in the Spine (no row in public.exercises; fail closed)';
+    ok(warn.healthy.length === 0 && warn.plain.length === 0 && warn.noX.length === 0 && fc.draft.warn.length === 0
+       && warn.unknown.length === 1 && warn.unknown[0].startsWith(W0 + 'maxpct:squat|x:no-such-entry counts no lift while no-such-entry' + WMSG)
+       && warn.two.length === 1 && warn.two[0].includes(' counts no lift while no-such-entry, zz-gone' + WMSG)
+       && fc.rekey.warn.length === 1 && fc.rekey.warn[0].startsWith(W0 + kRule + ' counts no lift while back-extension-45' + WMSG)
+       && fc.deleted.warn.length === 1 && fc.deleted.warn[0].startsWith(W0 + kRule + ' counts no lift while back-extension-45' + WMSG),
+       'and a stop says so: one WARNING in the database log naming the key and every id with no row, sorted (an unknown id, two beside a real one, back-extension-45 re-keyed, then deleted); the rule\'s key with its four ids in the Spine (one of them a draft), a key without |x: and plain maxpct raise none',
+       JSON.stringify({ warn, draft: fc.draft.warn, rekey: fc.rekey.warn, deleted: fc.deleted.warn }), 'S');
+    // the weight units (section 2b) under the rule: a main lift in pounds counts as one in kilograms does; the excluded lifts in plates count for nothing
+    // (the strength rule without the list would count the back extension's plates); a main lift in plates counts
+    const u = {};
+    for (const id of ['zz_ml_lb', 'zz_ml_plates', 'zz_ml_plmain']) u[id] = { all: await mp(id, 'maxpct'), rule: await mp(id, kRule), q: await mp(id, kQ) };
+    ok(u.zz_ml_lb.all === 150 && u.zz_ml_lb.rule === 150 && u.zz_ml_plates.all === 150 && u.zz_ml_plates.rule === 0 && u.zz_ml_plates.q === 150
+       && u.zz_ml_plmain.all === 62.5 && u.zz_ml_plmain.rule === 62.5,
+       `pounds and plates under the rule: Barbell Back Squat in lb counts (${u.zz_ml_lb.rule}%, the series barbell back squat|lb); the excluded 45° Back Extension and Machine Reverse Fly in plates count for nothing (${u.zz_ml_plates.rule}%, where the strength rule without the list reads ${u.zz_ml_plates.q}%); Machine Leg Press in plates counts (${u.zz_ml_plmain.rule}%)`,
+       JSON.stringify(u), 'S');
+    // what the main-lift test rests on: a lift_gain's value.lift is the name as logged and never carries a measure (stage72 puts |lb or |plates on the ref,
+    // the series key, alone), so career_norm(value.lift) places a lift in pounds or plates as one in kilograms. Every lift gain in this database, the real
+    // rows and the made-up ones, in every measure.
+    const lgAll = await one(db, `select count(*)::int as n, (count(*) filter (where ref ~ '\\|(lb|plates)$'))::int as keyed_refs,
+                                        (count(*) filter (where value ->> 'lift' ~ '\\|(lb|plates)$'))::int as keyed_lifts
+                                   from public.career_facts where kind = 'lift_gain' and void_at is null`);
+    ok(lgAll.keyed_refs >= 4 && lgAll.keyed_lifts === 0,
+       `no lift_gain's value.lift carries a measure (${lgAll.n} lift gains, ${lgAll.keyed_refs} of them kept in pounds or plates by their ref, ${lgAll.keyed_lifts} with |lb or |plates on value.lift): the name as logged is what the Spine places`,
+       JSON.stringify(lgAll), 'S');
+    // stage72's way back over stage73 (the order the review of 2026-10-18 found unguarded: with the port's career_lift_base() call, every key with patterns
+    // then raised "function public.career_lift_base(text) does not exist", and a full evaluate with it). stage73 calls none of stage72's functions now:
+    // with rollback_stage72.sql run over it, the rule reads the same numbers. In a transaction that is undone.
+    const F73 = ['career_maxpct_key', 'career_entry_keys', 'career_measures', 'career_achievement_eval', 'career_rewards_profile'];
+    const calls72 = (await q(db, `select p.proname as n from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname = any($1::text[])
+                                     and p.prosrc ~ ('\\m(' || array_to_string($2::text[], '|') || ')\\s*\\(')`, [F73, STAGE72_FNS])).map(r => r.n);
+    const U72 = ['zz_ml_lb', 'zz_ml_plates', 'zz_ml_plmain', 'zz_ml_bbs', 'zz_ml_mix2'];
+    const over72 = {};
+    for (const id of U72) over72[id] = await mp(id, kRule);
+    let after72;
+    try {
+      after72 = await undone(async () => {
+        await runSql(db, rb72, 'rollback_stage72 over stage73 (undone)');
+        const r = { left: await n72() };
+        for (const id of U72) r[id] = await mp(id, kRule);
+        return r;
+      });
+    } catch (x) { after72 = { err: String(x.message) }; }
+    ok(calls72.length === 0 && !after72.err && after72.left === 0 && U72.every(id => after72[id] === over72[id])
+       && over72.zz_ml_lb === 150 && over72.zz_ml_plates === 0 && over72.zz_ml_plmain === 62.5 && over72.zz_ml_bbs === bbs,
+       `stage72's way back can run over stage73: none of stage73's five functions calls one of stage72's seven (${calls72.length} do), and with rollback_stage72.sql run (${after72.left} of its helpers left; undone after) the rule reads the same for every weight-unit athlete (Barbell Back Squat in lb ${after72.zz_ml_lb}%, the excluded lifts in plates ${after72.zz_ml_plates}%, Machine Leg Press in plates ${after72.zz_ml_plmain}%, the kilogram squat ${after72.zz_ml_bbs}%, the excluded lift beside a main one ${after72.zz_ml_mix2}%)`,
+       JSON.stringify({ calls72, before: over72, after: after72 }), 'S');
+    ok((await n72()) === STAGE72_FNS.length, 'and stage72 is whole again after the undo', undefined, 'S');
+    // the shared session cap: one plan day in one week is one paid session, the higher XP (a finished one, 400, over an early one, 200). Counted together
+    // (Century, the commitment number) the count never goes down as sessions are added; the finished kind alone does not either while it out-earns an
+    // early finish; the early kind alone loses the one a full finish replaces (zz_cap_e has it, zz_cap_ef does not): why a count names both kinds
+    const capN = {};
+    for (const id of Object.keys(CAP_IDS)) capN[id] = [await mp(id, 'count:session_finished,session_finished_early'), await mp(id, 'count:session_finished'), await mp(id, 'count:session_finished_early')];
+    ok(capN.zz_cap_e.join() === '1,0,1' && capN.zz_cap_ef.join() === '1,1,0' && capN.zz_cap_fe.join() === '1,1,0',
+       `one plan day in one week (both kinds, finished, early): early only ${capN.zz_cap_e.join('/')}; early then in full ${capN.zz_cap_ef.join('/')}; in full then early ${capN.zz_cap_fe.join('/')}. Both kinds together and the finished kind alone never go down as sessions are added; the early kind alone does, so a count names both`,
+       JSON.stringify(capN), 'L1');
+  }
   if (STOP < 3) return finish();
 
   // ── 3. the go-day ───────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -517,6 +896,303 @@ async function main() {
   cmp = (await one(db, `select public.career_compare() as r`)).r;
   ok(cmp.ok && cmp.catalogue_switch === S && cmp.rows.every(r => r.awards && Number(r.awards.proof) === Number(r.awards.career) || (r.settled)),
      `career_compare() is ok after the switch, its awards equal or settled (${cmp.matched} of ${cmp.athletes})`, cmp.rows.filter(r => !r.ok || (r.awards && r.awards.proof !== r.awards.career)).map(r => JSON.stringify(r)).slice(0, 6).join('\n'), 'L1');
+  // ── 3b. The Upgrade and Double Up on the seven main patterns (GAME-10, D18); counts over sessions count the paid ones (D19) ──────────────────
+  section(`3b. ${S73 ? 'stage73' : 'phase 3 as applied, WITHOUT stage73'}: The Upgrade and Double Up, and the counts over sessions, athlete by athlete`);
+  {
+    const MAIN7 = ['squat', 'hinge', 'single-leg', 'push-horizontal', 'push-vertical', 'pull-horizontal', 'pull-vertical'];
+    const cbody = (kind, id) => cat3.find(c => c.kind === kind && c.id === id).body;
+    const upAt = cbody('badge', 'the_upgrade').tiers.map(x => x.at), dblAt = Number(cbody('achievement', 'double_up').at);
+    ok(JSON.stringify(cbody('badge', 'the_upgrade').patterns) === JSON.stringify(MAIN7) && JSON.stringify(cbody('achievement', 'double_up').patterns) === JSON.stringify(MAIN7),
+       'the catalogue rows of The Upgrade and Double Up carry patterns = the seven main patterns (and no other entry names patterns)', undefined, 'L2');
+    ok(cat3.filter(c => c.body && c.body.patterns !== undefined).map(c => c.kind + '.' + c.id).sort().join() === 'achievement.double_up,badge.the_upgrade', 'only those two entries carry `patterns`', cat3.filter(c => c.body && c.body.patterns !== undefined).map(c => c.kind + '.' + c.id).join(), 'L2');
+    // D18 as amended: both entries carry qualities = strength and exclude = Amir's four, the same on both, and no other entry carries either key
+    const X4 = ['back-extension-45', 'cable-face-pull', 'machine-reverse-fly', 'cable-straight-arm-pulldown'];
+    const filt = b => ({ q: b.qualities === undefined ? null : [].concat(b.qualities), x: b.exclude === undefined ? null : [].concat(b.exclude) });
+    const fU = filt(cbody('badge', 'the_upgrade')), fD = filt(cbody('achievement', 'double_up'));
+    ok(JSON.stringify(fU.q) === JSON.stringify(['strength']) && JSON.stringify((fU.x || []).slice().sort()) === JSON.stringify(X4.slice().sort()) && JSON.stringify(fU) === JSON.stringify(fD),
+       `the catalogue rows of The Upgrade and Double Up carry qualities = ${JSON.stringify(fU.q)} and exclude = ${JSON.stringify(fU.x)}, the same on both (D18 as amended)`, JSON.stringify({ the_upgrade: fU, double_up: fD }), 'K');
+    const withFilt = cat3.filter(c => c.body && (c.body.qualities !== undefined || c.body.exclude !== undefined)).map(c => c.kind + '.' + c.id).sort().join();
+    ok(withFilt === 'achievement.double_up,badge.the_upgrade', 'only those two entries carry `qualities` or `exclude`', withFilt, 'K');
+    // every id an exclude list names is an APPROVED entry of the real Spine (the backup's). One with no row stops stage73's rule (it counts no lift at all,
+    // sections 2, 4f3), so on go-day The Upgrade and Double Up would mint nothing; a draft would not stop it (section 4f4), but the four are meant to be
+    // live entries, so this asks for approved. The report lists each id and whether it resolves (exclude_ids).
+    const realSpine = Object.fromEntries((T.exercises || []).map(e => [e.id, e]));
+    const exBad = [];
+    for (const c of cat3) for (const xid of (c.body && c.body.exclude !== undefined ? [].concat(c.body.exclude) : [])) {
+      const e = realSpine[xid];
+      if (!e) exBad.push(`${c.kind} ${c.id}: ${xid} is not in the backup's Spine (the rule would count no lift: put the id right in career/*.toml or the Spine)`);
+      else if (e.status !== 'approved') exBad.push(`${c.kind} ${c.id}: ${xid} (${e.name}) is a ${e.status}, not approved (the rule would count no lift)`);
+    }
+    const exIds = [...new Set(cat3.flatMap(c => c.body && c.body.exclude !== undefined ? [].concat(c.body.exclude) : []))].sort()
+      .map(x => ({ id: x, name: realSpine[x] ? realSpine[x].name : null, status: realSpine[x] ? realSpine[x].status : null, pattern: realSpine[x] ? realSpine[x].pattern : null,
+                   qualities: realSpine[x] ? realSpine[x].qualities || [] : [], resolves: !!(realSpine[x] && realSpine[x].status === 'approved') }));
+    ok(exBad.length === 0, `every Spine id in the catalogue's exclude lists is an approved entry of the backup's Spine (${[...new Set(cat3.flatMap(c => c.body && c.body.exclude !== undefined ? [].concat(c.body.exclude) : []))].map(x => `${x} = ${realSpine[x] ? realSpine[x].name + ' (' + realSpine[x].pattern + '; ' + (realSpine[x].qualities || []).join(', ') + ')' : '?'}`).join(', ')})`, exBad.join('\n'), 'K');
+    // every lift gain, with whether the Spine places its lift on a main pattern (the placing patterns_in_cycle uses: an approved entry's name or alias, career_norm'd),
+    // and whether it counts under the entry's whole rule (D18 as amended: an approved entry on the patterns, carrying one of the qualities, not excluded),
+    // worked out here from the catalogue row and the Spine, independently of the function
+    const gains = await q(db, `with main as (select public.career_norm(e.name) as nm from public.exercises e where e.status = 'approved' and e.pattern = any($1::text[])
+                                              union select public.career_norm(a.x) from public.exercises e cross join unnest(e.aliases) a(x) where e.status = 'approved' and e.pattern = any($1::text[])),
+                                    rule as (select public.career_norm(e.name) as nm from public.exercises e
+                                              where e.status = 'approved' and e.pattern = any($1::text[]) and ($2::text[] is null or e.qualities && $2::text[]) and ($3::text[] is null or not (e.id = any($3::text[])))
+                                             union select public.career_norm(a.x) from public.exercises e cross join unnest(e.aliases) a(x)
+                                              where e.status = 'approved' and e.pattern = any($1::text[]) and ($2::text[] is null or e.qualities && $2::text[]) and ($3::text[] is null or not (e.id = any($3::text[]))))
+                                select f.athlete_id as id, f.value ->> 'lift' as lift, (f.value ->> 'pct')::numeric as pct, f.day::text as d, f.ref,
+                                       (public.career_norm(f.value ->> 'lift') in (select nm from main)) as is_main,
+                                       (public.career_norm(f.value ->> 'lift') in (select nm from rule)) as counts
+                                  from public.career_facts f where f.kind = 'lift_gain' and f.void_at is null and public.career_num(f.value -> 'pct') is not null
+                                 order by f.athlete_id, f.day, f.ref`, [[].concat(cbody('badge', 'the_upgrade').patterns || MAIN7), fU.q, fU.x]);
+    const gby = {}; for (const g of gains) (gby[g.id] = gby[g.id] || []).push(g);
+    const awRows = await q(db, `select athlete_id as id, award_id, day::text as d, pays, xp from public.career_awards order by 1, 2`);
+    const aby = {}; for (const a of awRows) (aby[a.id] = aby[a.id] || {})[a.award_id] = a;
+    // the lift behind each The Upgrade tier and Double Up, as the server recorded it: the award's evidence names the lift_gain fact it crossed on
+    const evRows = await q(db, `select a.athlete_id as id, a.award_id, a.evidence ->> 'via' as via, public.career_num(a.evidence -> 'n') as n,
+                                       (select f.value ->> 'lift' from public.career_facts f where f.athlete_id = a.athlete_id and f.kind = 'lift_gain'
+                                           and f.ref = a.evidence -> 'facts' -> 0 ->> 'ref' order by f.void_at nulls first limit 1) as lift
+                                  from public.career_awards a where a.item in ('the_upgrade', 'double_up') order by 1, 2`);
+    const evOf = {}; for (const r of evRows) (evOf[r.id] = evOf[r.id] || {})[r.award_id] = r;
+    const firstDay = (rows, at) => rows.filter(g => g.pct >= at).map(g => g.d).sort()[0] || null;
+    const upBad = [], accessoryOnly = [], duHolders = [], neHolders = [], upHolders = [];
+    const useRows = id => (gby[id] || []).filter(g => !S73 || g.counts);
+    for (const id of Object.keys({ ...gby, ...aby })) {
+      const mine = aby[id] || {}, rows = useRows(id);
+      upAt.forEach((at, i) => {
+        const want = firstDay(rows, at), got = mine[`badge:the_upgrade:${i + 1}`];
+        if (!!want !== !!got) upBad.push(`${id}: The Upgrade tier ${i + 1} (${at}%): ${got ? 'awarded ' + got.d : 'not awarded'}, the ${S73 ? 'main-lift' : 'lift'} gains say ${want || 'no'}`);
+        else if (want && got.d !== want) upBad.push(`${id}: The Upgrade tier ${i + 1} dated ${got.d}, the ${S73 ? 'main-lift' : 'lift'} gains cross it on ${want}`);
+      });
+      const wantDU = firstDay(rows, dblAt), gotDU = mine['achievement:double_up'], gotNE = mine['title:new_engine'];
+      if (!!wantDU !== !!gotDU) upBad.push(`${id}: Double Up ${gotDU ? 'awarded ' + gotDU.d : 'not awarded'}, the gains say ${wantDU || 'no'}`);
+      else if (wantDU && gotDU.d !== wantDU) upBad.push(`${id}: Double Up dated ${gotDU.d}, the gains cross ${dblAt}% on ${wantDU}`);
+      if (!!gotDU !== !!gotNE) upBad.push(`${id}: Double Up ${gotDU ? 'is' : 'is not'} awarded but the title NEW ENGINE ${gotNE ? 'is' : 'is not'}`);
+      if (mine['badge:the_upgrade:1']) upHolders.push(id);
+      if (gotDU) duHolders.push(id);
+      if (gotNE) neHolders.push(id);
+      const all = gby[id] || [], mainRows = all.filter(g => g.counts);
+      if (all.some(g => g.pct >= upAt[0]) && (upAt.some(at => !!firstDay(all, at) !== !!firstDay(mainRows, at)) || !!firstDay(all, dblAt) !== !!firstDay(mainRows, dblAt)))
+        accessoryOnly.push({ id, lifts: all.filter(g => !g.counts && g.pct >= upAt[0]).map(g => `${g.lift} ${g.pct}%`) });
+    }
+    ok(upBad.length === 0, S73
+       ? `every The Upgrade tier, Double Up and NEW ENGINE follows the lifts the rule counts (an approved Spine entry on the seven main patterns${fU.q ? ', tagged ' + fU.q.join(' or ') : ''}${fU.x ? ', not one of the ' + fU.x.length + ' excluded' : ''}), tier by tier and day by day, independently of the function (${Object.keys(gby).length} athletes with a lift gain, ${upHolders.length} with a tier)`
+       : `without stage73, every The Upgrade tier, Double Up and NEW ENGINE follows ALL lifts (the "before" the fix; ${upHolders.length} athletes with a tier)`, upBad.slice(0, 10).join('\n'), 'L1');
+    const real = id => !/^zz_/.test(id);
+    const payOf = async (where, params) => Number(await val(db, `select coalesce(sum(case when not a.pays then 0 else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, $1::jsonb), a.xp) end), 0)
+                                                           from public.career_awards a left join public.career_catalogue c on c.kind = a.kind and c.id = a.item
+                                                          where a.day <= $2::date and ${where}`, [JSON.stringify(hr), S, ...(params || [])]));
+    const upXp = await payOf(`a.item = 'the_upgrade' and a.athlete_id not like 'zz\\_%'`), upXpAll = await payOf(`a.item = 'the_upgrade'`);
+    const duXp = await payOf(`a.item = 'double_up' and a.athlete_id not like 'zz\\_%'`), neXp = await payOf(`a.item = 'new_engine' and a.athlete_id not like 'zz\\_%'`);
+    const upN = awRows.filter(a => real(a.id) && /^badge:the_upgrade:/.test(a.award_id)).length;
+    info(`THE UPGRADE at the switch (${S73 ? 'WITH' : 'WITHOUT'} stage73), real athletes: ${upN} tier awards to ${upHolders.filter(real).length} athletes, ${upXp} XP of back-pay (all ${upXpAll} with the made-up athletes)`);
+    info(`DOUBLE UP (${S73 ? 'with' : 'without'} stage73), real athletes: ${duHolders.filter(real).join(', ') || 'nobody'} (${duXp} XP); NEW ENGINE: ${neHolders.filter(real).join(', ') || 'nobody'} (${neXp} XP)`);
+    const ceXp = await payOf(`a.item = 'century' and a.athlete_id not like 'zz\\_%'`);
+    const realBack = lines.filter(l => real(l.athlete_id)).reduce((s, l) => s + Number(l.back_pay), 0);
+    info(`BACK-PAY of the real athletes at the switch (${S73 ? 'WITH' : 'WITHOUT'} stage73): The Upgrade ${upXp}, Double Up ${duXp}, NEW ENGINE ${neXp}, Century ${ceXp}, every entry together ${realBack} XP; The Upgrade's holders ${upHolders.filter(real).join(', ') || 'nobody'}`);
+    info(`real athletes whose lift gains on a lift the rule leaves out (off the patterns, unplaced, not tagged strength, or excluded) would have moved The Upgrade or Double Up before the fix: ${accessoryOnly.filter(x => real(x.id)).map(x => `${x.id} [${x.lifts.join(', ')}]`).join('; ') || 'nobody'}`);
+    // D18 as amended: the seven patterns hold accessory exercises too (a face pull, a back extension, a glute bridge); the strength tag and the exclude list
+    // leave them out. Every approved entry on the seven, the ones the rule leaves out, the ones a real athlete has a gain on, and the lift behind each real
+    // The Upgrade tier and Double Up, with its pattern and qualities.
+    const spineAll = await q(db, `select e.id, e.name, e.pattern, e.qualities, e.aliases from public.exercises e where e.status = 'approved' order by e.pattern, e.name`);
+    const backupIds = new Set((T.exercises || []).map(e => e.id));        // the real Spine only: the made-up entries of section 0 are left out of the lists
+    const spineMain = spineAll.filter(e => MAIN7.includes(e.pattern) && backupIds.has(e.id));
+    const nmOf = Object.fromEntries((await q(db, `select x as n, public.career_norm(x) as k from unnest($1::text[]) x`,
+                                             [[...new Set(spineAll.flatMap(e => [e.name, ...(e.aliases || [])]).concat(gains.map(g => g.lift)).filter(Boolean))]])).map(r => [r.n, r.k]));
+    const entryOf = {}; for (const e of spineAll) for (const n of [e.name, ...(e.aliases || [])]) if (!entryOf[nmOf[n]]) entryOf[nmOf[n]] = e;
+    const strong = e => (e.qualities || []).includes('strength');
+    const ruleOk = e => !!e && MAIN7.includes(e.pattern) && (!fU.q || (e.qualities || []).some(x => fU.q.includes(x))) && (!fU.x || !fU.x.includes(e.id));
+    const tierLift = [];
+    for (const id of [...new Set(upHolders.concat(duHolders))].filter(real)) {
+      const rows = useRows(id), mineAw = aby[id] || {};
+      const push = (award, at) => { const g = rows.find(x => x.pct >= at), e = g && entryOf[nmOf[g.lift]], ev = (evOf[id] || {})[award.replace(/^the_upgrade:/, 'badge:the_upgrade:').replace(/^double_up$/, 'achievement:double_up')];
+        tierLift.push({ id, award, at, lift: g ? g.lift : null, pct: g ? Number(g.pct) : null, day: g ? g.d : null, entry: e ? e.name : null, entryId: e ? e.id : null, pattern: e ? e.pattern : null, qualities: e ? e.qualities : [],
+                        evLift: ev ? ev.lift : null, evN: ev ? Number(ev.n) : null, via: ev ? ev.via : null }); };
+      upAt.forEach((at, i) => { if (mineAw[`badge:the_upgrade:${i + 1}`]) push(`the_upgrade:${i + 1}`, at); });
+      if (mineAw['achievement:double_up']) push('double_up', dblAt);
+    }
+    if (S73) ok(tierLift.length > 0 && tierLift.every(t => ruleOk(entryOf[nmOf[t.lift]])), `the lift behind every real The Upgrade tier and Double Up is an approved Spine entry on one of the seven patterns${fU.q ? ', tagged ' + fU.q.join(' or ') : ''}${fU.x ? ', not excluded' : ''} (${tierLift.length} awards)`,
+                JSON.stringify(tierLift.filter(t => !ruleOk(entryOf[nmOf[t.lift]]))), 'L1');
+    // the award's own evidence names the same lift the gains name, and its `via` is the catalogue's key (career_maxpct_key() of the entry)
+    if (S73) {
+      const viaWant = { the_upgrade: await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify(cbody('badge', 'the_upgrade'))]),
+                        double_up: await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify(cbody('achievement', 'double_up'))]) };
+      const evBad = tierLift.filter(t => t.evLift !== t.lift || t.via !== viaWant[t.award.split(':')[0]]);
+      ok(evBad.length === 0, `and each one's evidence names that lift, with the catalogue's key as its via (${viaWant.the_upgrade})`, JSON.stringify(evBad.slice(0, 5)), 'S');
+    }
+    const byLift = {}; for (const t of tierLift) { const k = `${t.id}|${t.lift}`; (byLift[k] = byLift[k] || { ...t, awards: [] }).awards.push(t.award.replace('the_upgrade:', 'tier ').replace('double_up', 'Double Up')); }
+    info(`the lifts behind the real The Upgrade tiers and Double Up ${S73 ? 'WITH' : 'WITHOUT'} stage73: ` + (Object.values(byLift).map(t => `${t.id}: ${t.lift} (${t.pattern || 'not placed'}${t.qualities.length ? '; ' + t.qualities.join(', ') : ''}) ${t.awards.join(', ')}`).join('; ') || 'nobody'));
+    const gainEntries = {};
+    for (const g of gains) {
+      const e = real(g.id) && g.is_main && entryOf[nmOf[g.lift]];
+      if (!e) continue;
+      const r = gainEntries[e.name] = gainEntries[e.name] || { entry: e.name, id: e.id, pattern: e.pattern, qualities: e.qualities || [], strength: strong(e), excluded: !!(fU.x && fU.x.includes(e.id)), counts: ruleOk(e), athletes: [], best: 0 };
+      if (!r.athletes.includes(g.id)) r.athletes.push(g.id);
+      r.best = Math.max(r.best, Number(g.pct));
+    }
+    const ge = Object.values(gainEntries).sort((a, b) => MAIN7.indexOf(a.pattern) - MAIN7.indexOf(b.pattern) || (a.entry < b.entry ? -1 : 1));
+    const why = e => (fU.x && fU.x.includes(e.id) ? 'excluded' : '') + (fU.q && !(e.qualities || []).some(x => fU.q.includes(x)) ? ((fU.x && fU.x.includes(e.id)) ? ', ' : '') + 'no ' + fU.q.join('/') + ' tag' : '');
+    const leftOut = spineMain.filter(e => !ruleOk(e));
+    info(`approved entries of the real Spine on the seven patterns: ${spineMain.length} (${MAIN7.map(p => `${p} ${spineMain.filter(e => e.pattern === p).length}`).join(', ')}), ${spineMain.filter(e => !strong(e)).length} of them without the strength quality`);
+    info(`the rule (D18 as amended) leaves out ${leftOut.length} of them: ` + leftOut.map(e => `${e.name} (${e.pattern}; ${(e.qualities || []).join(', ') || 'no qualities'}; ${why(e)})`).join('; '));
+    info(`of those on the seven, the ${ge.length} a real athlete has a lift gain on (one the rule leaves out marked *): ` + ge.map(r => `${r.counts ? '' : '*'}${r.entry} (${r.pattern}; ${r.qualities.join(', ')}${r.counts ? '' : '; ' + why(r)}) ${r.athletes.length} athlete${r.athletes.length > 1 ? 's' : ''}, best ${r.best}%`).join('; '));
+    // the made-up athletes, by name
+    const mine = id => Object.keys(aby[id] || {}).filter(k => /the_upgrade|double_up|new_engine/.test(k)).sort();
+    const upCount = id => mine(id).filter(k => k.startsWith('badge:the_upgrade')).length;
+    if (S73) {
+      ok(upCount('zz_ml_main') === 5 && mine('zz_ml_main').includes('achievement:double_up') && mine('zz_ml_main').includes('title:new_engine'), 'zz_ml_main (a squat 150% up): all five tiers of The Upgrade, Double Up and NEW ENGINE', mine('zz_ml_main').join(), 'L1');
+      for (const id of ['zz_ml_acc', 'zz_ml_none', 'zz_ml_draft']) ok(mine(id).length === 0, `${id} (${{ zz_ml_acc: 'accessories only, 150% and 150%', zz_ml_none: 'a lift the Spine cannot place, 150%', zz_ml_draft: 'a squat that is only a Spine draft, 150%' }[id]}): no tier of The Upgrade, no Double Up, no NEW ENGINE`, mine(id).join(), 'L1');
+      ok(upCount('zz_ml_alias') === 5 && mine('zz_ml_alias').includes('achievement:double_up'), 'zz_ml_alias (a main lift logged by its alias): placed, all five tiers and Double Up', mine('zz_ml_alias').join(), 'L1');
+      ok(upCount('zz_ml_mix') === 3 && !mine('zz_ml_mix').includes('achievement:double_up') && !mine('zz_ml_mix').includes('title:new_engine'),
+         `zz_ml_mix (a squat 45% up, an accessory 150% up): The Upgrade tiers 1 to 3 from the squat, no Double Up, no NEW ENGINE (${mine('zz_ml_mix').join()})`, undefined, 'L1');
+      // D18 as amended, on the go-day with the switch on
+      ok(mine('zz_ml_bext').length === 0, `zz_ml_bext (45° Back Extension 150% up: hinge and tagged strength, but one of Amir's four): no tier of The Upgrade, no Double Up, no NEW ENGINE`, mine('zz_ml_bext').join(), 'S');
+      ok(mine('zz_ml_cchest').length === 0, `zz_ml_cchest (Cable Chest Press 150% up: push-horizontal, tagged muscle only): no tier of The Upgrade, no Double Up, no NEW ENGINE`, mine('zz_ml_cchest').join(), 'S');
+      ok(upCount('zz_ml_bbs') === 5 && mine('zz_ml_bbs').includes('achievement:double_up') && mine('zz_ml_bbs').includes('title:new_engine'),
+         `zz_ml_bbs (Barbell Back Squat 150% up: squat, strength): all five tiers of The Upgrade, Double Up and NEW ENGINE (${mine('zz_ml_bbs').join()})`, undefined, 'S');
+      const mix2 = mine('zz_ml_mix2'), ev2 = evOf.zz_ml_mix2 || {};
+      ok(JSON.stringify(mix2) === JSON.stringify(['badge:the_upgrade:1', 'badge:the_upgrade:2']) && ['badge:the_upgrade:1', 'badge:the_upgrade:2'].every(k => ev2[k] && ev2[k].lift === 'Barbell Back Squat'),
+         `zz_ml_mix2 (the excluded 45° Back Extension 150% up, Barbell Back Squat 25% up): The Upgrade tiers 1 and 2 only, no Double Up, no NEW ENGINE, and both tiers' evidence is the squat (${mix2.join()}; evidence ${['badge:the_upgrade:1', 'badge:the_upgrade:2'].map(k => ev2[k] ? `${ev2[k].lift} ${ev2[k].n}%` : 'none').join(', ')})`,
+         JSON.stringify(ev2), 'S');
+      // the weight units (section 2b) on the go-day: a main lift in pounds earns what one in kilograms would, and its evidence is the pound series;
+      // the excluded lifts in plates earn nothing; a main lift in plates earns its tiers
+      const refsOf = async (id, re) => (await q(db, `select a.award_id, a.evidence -> 'facts' -> 0 ->> 'ref' as ref from public.career_awards a where a.athlete_id = $1 order by 1`, [id]))
+        .filter(r => re.test(r.award_id));
+      const lbRefs = await refsOf('zz_ml_lb', /^(badge:the_upgrade:|achievement:double_up$)/);
+      ok(upCount('zz_ml_lb') === 5 && mine('zz_ml_lb').includes('achievement:double_up') && mine('zz_ml_lb').includes('title:new_engine') && lbRefs.length === 6 && lbRefs.every(r => r.ref === 'barbell back squat|lb'),
+         `zz_ml_lb (Barbell Back Squat 100 to 250 lb, +150%): all five tiers of The Upgrade, Double Up and NEW ENGINE, every one's evidence the series barbell back squat|lb (${mine('zz_ml_lb').join()})`,
+         JSON.stringify(lbRefs), 'S');
+      ok(mine('zz_ml_plates').length === 0, `zz_ml_plates (45° Back Extension and Machine Reverse Fly in plates, +150% each, two of Amir's four): no tier of The Upgrade, no Double Up, no NEW ENGINE`, mine('zz_ml_plates').join(), 'S');
+      const pmRefs = await refsOf('zz_ml_plmain', /^badge:the_upgrade:/);
+      ok(JSON.stringify(mine('zz_ml_plmain')) === JSON.stringify(['badge:the_upgrade:1', 'badge:the_upgrade:2', 'badge:the_upgrade:3', 'badge:the_upgrade:4']) && pmRefs.every(r => r.ref === 'machine leg press|plates'),
+         `zz_ml_plmain (Machine Leg Press 8 to 13 plates, +62.5%): The Upgrade tiers 1 to 4 on the plates series, no Double Up (${mine('zz_ml_plmain').join()})`, JSON.stringify(pmRefs), 'S');
+    } else {
+      info(`before the fix: zz_ml_acc has ${mine('zz_ml_acc').length} of the 7 awards, zz_ml_none ${mine('zz_ml_none').length}, zz_ml_draft ${mine('zz_ml_draft').length}, zz_ml_mix ${mine('zz_ml_mix').length}`);
+      info(`before the fix, the weight units: zz_ml_lb has ${mine('zz_ml_lb').join() || 'nothing'}; zz_ml_plates (excluded lifts in plates) ${mine('zz_ml_plates').join() || 'nothing'}; zz_ml_plmain ${mine('zz_ml_plmain').join() || 'nothing'}`);
+      ok(['zz_ml_acc', 'zz_ml_none', 'zz_ml_draft', 'zz_ml_mix'].every(id => mine(id).includes('achievement:double_up')), 'before the fix an accessory, an unplaced lift and a draft each earned Double Up (what the fix removes)', undefined, 'L1');
+    }
+    // the counts over session facts count the PAID sessions: Century, and every total badge whose counts include a capped kind
+    const capped = Object.keys(rules3.fact).filter(k => rules3.fact[k].limit_per);
+    info(`the rulebook caps (limit_per): ${capped.map(k => `${k} ${rules3.fact[k].limit_per}`).join(', ')}`);
+    const totals = cat3.filter(c => c.kind === 'badge' && c.body.kind === 'total' && [].concat(c.body.counts).some(k => capped.includes(k)));
+    ok(totals.some(c => c.id === 'century'), `the total badges that count a capped kind: ${totals.map(c => c.id).join(', ')} (Century among them)`, undefined, 'L2');
+    // career_facts_paid() ranks a finished and an early session of one plan day in one week together (their cap is shared, plan_day_week) and pays the
+    // higher XP. A count that names only part of that shared cap holds as sessions are added only while every kind it counts out-earns, at a fixed XP,
+    // every kind of the cap it leaves out; otherwise a later session of a left-out kind can take one away. Every catalogue entry with `counts` (badges, missions)
+    const shared = capped.filter(k => rules3.fact[k].limit_per === 'plan_day_week');
+    const fixedXp = k => (rules3.fact[k].xp_from === undefined && Number.isFinite(Number(rules3.fact[k].xp)) ? Number(rules3.fact[k].xp) : null);
+    const partial = [], unsafe = [];
+    for (const c of cat3) {
+      const ks = c.body && c.body.counts !== undefined ? [].concat(c.body.counts) : [];
+      const inCap = ks.filter(k => shared.includes(k)), left = shared.filter(k => !ks.includes(k));
+      if (!inCap.length || !left.length) continue;
+      partial.push(`${c.kind} ${c.id} (${ks.join(', ')})`);
+      const lo = Math.min(...inCap.map(k => fixedXp(k) === null ? -Infinity : fixedXp(k))), hi = Math.max(...left.map(k => fixedXp(k) === null ? Infinity : fixedXp(k)));
+      if (!(lo > hi)) unsafe.push(`${c.kind} ${c.id} counts ${inCap.join(', ')} (XP ${inCap.map(fixedXp).join('/')}) and leaves out ${left.join(', ')} (XP ${left.map(fixedXp).join('/')})`);
+    }
+    ok(shared.length > 1 && unsafe.length === 0, `every count over part of the shared session cap (${shared.map(k => `${k} ${fixedXp(k)} XP`).join(', ')}) holds as sessions are added: ${partial.join('; ') || 'no entry counts part of it'}`,
+       unsafe.join('\n'), 'L2');
+    const cntBad = [], moved = [];
+    for (const id of allIds) {
+      for (const c of totals) {
+        const kinds = [].concat(c.body.counts);
+        const rows = [];
+        for (const k of kinds) {
+          const useP = S73 && capped.includes(k);
+          const rs = useP ? await q(db, `select day::text as d, ref, kind from public.career_facts_paid($1) where kind = $2`, [id, k])
+                          : await q(db, `select day::text as d, ref, kind from public.career_facts where athlete_id = $1 and kind = $2 and void_at is null`, [id, k]);
+          rows.push(...rs);
+        }
+        rows.sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : a.ref < b.ref ? -1 : a.ref > b.ref ? 1 : a.kind < b.kind ? -1 : a.kind > b.kind ? 1 : 0));
+        const raw = Number(await val(db, `select count(*)::int from public.career_facts where athlete_id = $1 and kind = any($2::text[]) and void_at is null`, [id, kinds]));
+        if (rows.length !== raw) moved.push(`${id} ${c.id}: ${raw} → ${rows.length}`);
+        c.body.tiers.forEach((tr, i) => {
+          const want = rows.length >= tr.at ? rows[tr.at - 1].d : null, got = (aby[id] || {})[`badge:${c.id}:${i + 1}`];
+          if (!!want !== !!got) cntBad.push(`${id}: ${c.id} tier ${i + 1} (${tr.at}): ${got ? 'awarded ' + got.d : 'not awarded'}, ${rows.length} ${S73 ? 'paid' : 'counted'} (${raw} raw)`);
+          else if (want && got.d !== want) cntBad.push(`${id}: ${c.id} tier ${i + 1} dated ${got.d}, the ${tr.at}th is on ${want}`);
+        });
+      }
+    }
+    ok(cntBad.length === 0, S73 ? `Century (and every total over a capped kind) counts the paid sessions: every tier is awarded exactly when the PAID count reaches it, dated the day of its nth paid session (${allIds.length} athletes, ${totals.length} badges)`
+                                : `without stage73 Century and the capped totals count every session fact (${allIds.length} athletes)`, cntBad.slice(0, 10).join('\n'), 'L1');
+    info(`${moved.length} athlete-badge counts differ between the raw facts and the paid ones: ${moved.slice(0, 12).join('; ')}${moved.length > 12 ? '; …' : ''}`);
+    const repCentury = (aby.zz_rep || {})['badge:century:1'];
+    ok(S73 ? !repCentury : !!repCentury, S73 ? `zz_rep (48 sessions done, 24 paid; Century starts at 25) has no Century tier: repeating a plan day moves nothing` : `before the fix zz_rep (48 sessions done, 24 paid) held Century tier 1`, repCentury && repCentury.d, 'L1');
+    const repLad = (await profile(db, 'zz_rep')).ladder;
+    info(`zz_rep's Century on its ladder: ${JSON.stringify(repLad && repLad.century)}`);
+    if (S73 && repLad && repLad.century) ok(Number(repLad.century.have) === 24, `and its ladder says 24 sessions with Amir, the paid ones (${repLad.century.have})`, JSON.stringify(repLad.century), 'L1');
+    // the awards of the run, to a file, and against another run's
+    const dump = {}; for (const a of awRows) (dump[a.id] = dump[a.id] || {})[a.award_id] = [a.d, a.pays, a.xp];
+    // the lift behind each The Upgrade tier and Double Up (and so NEW ENGINE), from the award's evidence, under a key no athlete id can take
+    const liftsNow = {};
+    for (const r of evRows) { const s = r.lift ? `${r.lift} ${Number(r.n)}%` : '?'; (liftsNow[r.id] = liftsNow[r.id] || {})[r.award_id] = s; if (r.award_id === 'achievement:double_up') liftsNow[r.id]['title:new_engine'] = s; }
+    if (DUMP_AWARDS) { fs.writeFileSync(DUMP_AWARDS, JSON.stringify({ ...dump, '~lifts': liftsNow })); info(`awards written to ${DUMP_AWARDS} (${awRows.length}, with the lift behind each The Upgrade tier and Double Up)`); }
+    if (VS_AWARDS && S73) {
+      const wasAll = JSON.parse(fs.readFileSync(VS_AWARDS, 'utf8')), wasLifts = wasAll['~lifts'] || {}, diffAw = [];
+      const was = Object.fromEntries(Object.entries(wasAll).filter(([k]) => !k.startsWith('~')));
+      // an athlete the file does not hold was made up after it was written: listed, not compared (a real athlete missing from it is a failure)
+      const fresh = Object.keys(dump).filter(id => !(id in was)).sort();
+      ok(fresh.every(id => !real(id)), `the --vs-awards file holds every athlete with an award in this run but ${fresh.length} made-up ones (${fresh.join(', ') || 'none'}), which are listed and not compared`, fresh.filter(real).join(', '), 'S');
+      for (const id of new Set([...Object.keys(was), ...Object.keys(dump).filter(id => id in was)])) for (const k of new Set([...Object.keys(was[id] || {}), ...Object.keys(dump[id] || {})])) {
+        const x = (was[id] || {})[k], y = (dump[id] || {})[k];
+        if (JSON.stringify(x) !== JSON.stringify(y)) diffAw.push({ id, k, x, y });
+      }
+      const allowed = /^(badge:the_upgrade:|achievement:double_up$|title:new_engine$|badge:century:|title:century$)/;
+      const stray = diffAw.filter(d => !allowed.test(d.k));
+      const kinds = {}; for (const d of diffAw) { const key = d.k.replace(/:\d+$/, ''); kinds[key] = (kinds[key] || 0) + 1; }
+      info(`against the --vs-awards run (${path.basename(VS_AWARDS)}), ${diffAw.length} awards differ: ${Object.entries(kinds).map(([k, n]) => `${k} ${n}`).join(', ') || 'none'}`);
+      ok(stray.length === 0 && diffAw.every(d => d.x !== undefined), 'EVERYTHING ELSE AS BEFORE: against the --vs-awards run the only awards that differ are The Upgrade, Double Up, NEW ENGINE and Century (and its title), and none is added: one is withheld, or a Century tier is dated later (its nth PAID session), or a The Upgrade tier is dated later (its nth gain on a lift the rule counts)',
+         stray.slice(0, 8).map(d => `${d.id} ${d.k}: ${JSON.stringify(d.x)} → ${JSON.stringify(d.y)}`).join('\n') || diffAw.filter(d => d.x === undefined).slice(0, 6).map(d => `${d.id} ${d.k}: ${JSON.stringify(d.x)} → ${JSON.stringify(d.y)}`).join('\n'), 'L1');
+      const lost = {}; for (const d of diffAw) if (real(d.id) && d.y === undefined) (lost[d.k.replace(/:\d+$/, '')] = lost[d.k.replace(/:\d+$/, '')] || []).push(d.id);
+      info(`withheld from real athletes against that run (an award that is not there any more): ` + (Object.entries(lost).map(([k, ids]) => `${k} × ${ids.length} (${[...new Set(ids)].join(', ')})`).join('; ') || 'nothing'));
+      // every The Upgrade tier, Double Up and NEW ENGINE of a real athlete that changed, with the lift behind it then and now
+      const liftDiff = diffAw.filter(d => real(d.id) && /^(badge:the_upgrade:|achievement:double_up$|title:new_engine$)/.test(d.k)).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.k < b.k ? -1 : 1));
+      const side = (v, lift) => (v ? `${v[0]}${v[1] ? ' ' + v[2] + ' XP' : ' (pays 0)'}, ${lift || 'lift not in the file'}` : 'none');
+      info(`real athletes' The Upgrade / Double Up / NEW ENGINE awards that changed against that run (${liftDiff.length}): ` + (liftDiff.map(d => `${d.id} ${d.k.replace('badge:the_upgrade:', 'The Upgrade tier ').replace('achievement:double_up', 'Double Up').replace('title:new_engine', 'NEW ENGINE')}: ${side(d.x, (wasLifts[d.id] || {})[d.k])} -> ${d.y ? side(d.y, (liftsNow[d.id] || {})[d.k]) : 'withheld'}`).join('; ') || 'none'));
+      // and the ones that kept their day and XP but rest on another lift now (the file's evidence against this run's)
+      const reCredited = [];
+      for (const id of Object.keys(liftsNow).filter(id => real(id) && id in was)) for (const k of Object.keys(liftsNow[id]).sort()) {
+        const w = (wasLifts[id] || {})[k];
+        if (w && w !== liftsNow[id][k] && JSON.stringify((was[id] || {})[k]) === JSON.stringify((dump[id] || {})[k])) reCredited.push({ id, k, was: w, now: liftsNow[id][k] });
+      }
+      info(`real athletes' awards that kept their day and XP but rest on another lift now (${reCredited.length}): ` + (reCredited.map(r => `${r.id} ${r.k.replace('badge:the_upgrade:', 'The Upgrade tier ').replace('achievement:double_up', 'Double Up').replace('title:new_engine', 'NEW ENGINE')}: ${r.was} -> ${r.now}`).join('; ') || 'none'));
+      if (REPORT) fs.writeFileSync(REPORT.replace(/(\.[a-z]+)?$/, '-vs.json'), JSON.stringify({ vs: VS_AWARDS, fresh, kinds, changed: diffAw.map(d => ({ ...d, liftWas: (wasLifts[d.id] || {})[d.k] || null, liftNow: (liftsNow[d.id] || {})[d.k] || null })), reCredited }, null, 1));
+    }
+    if (REPORT) fs.writeFileSync(REPORT.replace(/(\.[a-z]+)?$/, '-mainlifts.json'), JSON.stringify({ stage73: S73, upgrade: { realAwards: upN, realHolders: upHolders.filter(real), xpRealBackPay: upXp, xpAllBackPay: upXpAll },
+      double_up: duHolders.filter(real), double_up_xp: duXp, new_engine: neHolders.filter(real), new_engine_xp: neXp, century_xp: ceXp, real_back_pay: realBack, accessory_only: accessoryOnly.filter(x => real(x.id)),
+      rule: { patterns: cbody('badge', 'the_upgrade').patterns, qualities: fU.q, exclude: fU.x }, exclude_ids: exIds, left_out: leftOut.map(e => ({ id: e.id, name: e.name, pattern: e.pattern, qualities: e.qualities || [], why: why(e) })),
+      // D18 for the apply ask: the lift behind each real tier, the entries on the seven patterns with a real gain, and every entry on the seven
+      tier_lifts: tierLift, main_entries_with_real_gains: ge,
+      main_entries: spineMain.map(e => ({ name: e.name, pattern: e.pattern, qualities: e.qualities || [], strength: strong(e) })) }, null, 1));
+    // numbers.four's commitment, the Home row's "N sessions" (D19, 2026-10-18): a coached athlete's counts the sessions Century counts, so the row never
+    // says 50 beside "Century 46 of 100"; a free athlete's perfect days do not move; get_profile()'s older numbers.sessions_with_amir stays every session
+    // fact. Through the real door, get_profile(), for every athlete, real and made up.
+    const CK = 'count:session_finished,session_finished_early';
+    const comBad = [], comMoved = [];
+    let nCoached = 0, nFree = 0;
+    for (const id of allIds) {
+      const p = await profile(db, id), nums = p.numbers || {}, com = nums.four && nums.four.commitment;
+      const rawN = Number(await val(db, `select count(*)::int from public.career_facts where athlete_id = $1 and kind in ('session_finished', 'session_finished_early') and void_at is null`, [id]));
+      if (Number(nums.sessions_with_amir) !== rawN) comBad.push(`${id}: get_profile's numbers.sessions_with_amir is ${nums.sessions_with_amir}, every session fact ${rawN}`);
+      if (nums.free) {
+        nFree++;
+        const pd = Number(await val(db, `select count(*)::int from public.career_facts where athlete_id = $1 and kind = 'perfect_day' and void_at is null`, [id]));
+        if (!com || com.key !== 'perfect_days' || Number(com.value) !== pd) comBad.push(`${id} (free): commitment ${JSON.stringify(com)}, perfect days ${pd}`);
+        continue;
+      }
+      nCoached++;
+      const paid = Number(await val(db, `select count(*)::int from public.career_facts_paid($1) where kind in ('session_finished', 'session_finished_early')`, [id]));
+      const meas = Number(await val(db, `select public.career_measures($1, '{}'::jsonb, array[$2]::text[]) -> $2 ->> 'have'`, [id, CK]));
+      const lad = Number((p.ladder && p.ladder.century && p.ladder.century.have) || 0), want = S73 ? paid : rawN;
+      if (!com || com.key !== 'sessions_with_amir' || Number(com.value) !== want || meas !== want || lad !== want)
+        comBad.push(`${id}: commitment ${com && com.value}, ${S73 ? 'the paid sessions' : 'every session fact'} ${want}; career_measures ${meas}; Century's ladder ${lad} (facts ${rawN}, paid ${paid})`);
+      if (paid !== rawN) comMoved.push({ id, raw: rawN, paid, value: Number(com && com.value) });
+    }
+    ok(comBad.length === 0, S73
+       ? `numbers.four's commitment of every coached athlete is the sessions Century counts: the PAID count = career_measures('${CK}') = Century's ladder have (${nCoached} coached); ${nFree} free athletes keep their perfect days; get_profile()'s numbers.sessions_with_amir stays every session fact`
+       : `without stage73 numbers.four's commitment counts every session fact, as Century does (${nCoached} coached, ${nFree} free); numbers.sessions_with_amir the same`, comBad.slice(0, 10).join('\n'), 'L1');
+    const comReal = comMoved.filter(x => real(x.id));
+    info(`the commitment number ${S73 ? 'moves' : 'would move with stage73'} for ${comReal.length} real athletes (${comMoved.length} with the made-up ones), every session fact → the paid ones: ` + (comReal.map(x => `${x.id} ${x.raw} → ${x.paid}`).join(', ') || 'nobody'));
+    if (S73) ok(comMoved.length > 0 && comMoved.every(x => x.value === x.paid && x.paid < x.raw), `every athlete whose number moves goes down to the paid count, never up (${comMoved.length}, ${comReal.length} of them real)`, JSON.stringify(comMoved.filter(x => x.value !== x.paid).slice(0, 5)), 'L1');
+    if (REPORT) fs.writeFileSync(REPORT.replace(/(\.[a-z]+)?$/, '-commitment.json'), JSON.stringify({ stage73: S73, moved: comMoved }, null, 1));
+  }
+
   // the board and the profiles read the same numbers
   await asCoach(db);
   const board2 = await q(db, `select * from public.leaderboard_top('amir_ardekani', null, 'season', 50)`);
@@ -664,6 +1340,104 @@ async function main() {
      `a lift 125% up on its first session: The Upgrade tiers ${up.join(',')}, Double Up (a legend, dated ${addDays(today, -1)}) and its title NEW ENGINE`, JSON.stringify(aw.map(a => a.award_id)), 'L1');
   const pG = await profile(db, 'zz_gain');
   ok(pG.moments.length <= 8 && pG.moments.length === Math.min(8, rc.length) && pG.moments[0].size === 'legend', `moments are capped at 8 and the legend comes first (${rc.length} waiting rows, ${pG.moments.length} shown)`, undefined, 'L1');
+
+  if (S73) {
+    // 4f2. an isolation lift through the real door moves nothing; the Spine placing it on a main pattern later (updated_at moves) mints at the next read; and the way back
+    await mkLogin(db, 'zz_acc');
+    await insProgram(db, 'zz_acc', prog({ start: addDays(today, -30), end: addDays(today, 40), days: [1, 2] }));
+    await doorSession(db, 'zz_acc', 1, addDays(today, -10), sess({ ex: 'Machine Seated Leg Curl', w: 40 }));
+    await doorSession(db, 'zz_acc', 2, addDays(today, -1), sess({ ex: 'Machine Seated Leg Curl', w: 90 }));
+    const lg4 = await q(db, `select value ->> 'lift' as lift, value ->> 'pct' as pct from public.career_facts where athlete_id = 'zz_acc' and kind = 'lift_gain' and void_at is null`);
+    aw = await awardsOf(db, 'zz_acc');
+    ok(lg4.length === 1 && Number(lg4[0].pct) >= 100 && !aw.some(a => /the_upgrade|double_up|new_engine/.test(a.award_id)),
+       `a Machine Seated Leg Curl ${lg4[0] && lg4[0].pct}% up on its first session, saved through the door: no The Upgrade, no Double Up, no NEW ENGINE`, JSON.stringify({ lg4, aw: aw.map(a => a.award_id) }), 'L1');
+    const pZ = await profile(db, 'zz_acc');
+    ok(!(pZ.ladder && pZ.ladder.the_upgrade && Number(pZ.ladder.the_upgrade.have) > 0), `and its profile's ladder for The Upgrade says ${JSON.stringify(pZ.ladder && pZ.ladder.the_upgrade && { have: pZ.ladder.the_upgrade.have, next: pZ.ladder.the_upgrade.next })}: nothing yet`, undefined, 'L1');
+    // D18 as amended: a main pattern is not enough, the entry must also carry the strength tag (the leg curl is muscle and armour)
+    const legQ = (await one(db, `select qualities from public.exercises where id = 'machine-seated-leg-curl'`)).qualities;
+    await q(db, `update public.exercises set pattern = 'hinge', updated_at = clock_timestamp() where id = 'machine-seated-leg-curl'`);
+    await profile(db, 'zz_acc');
+    aw = await awardsOf(db, 'zz_acc');
+    ok(!aw.some(a => /the_upgrade|double_up|new_engine/.test(a.award_id)), `the Spine places that lift on a main pattern but it carries no strength tag (${legQ.join(', ')}): the next get_profile still mints nothing (D18 as amended)`, JSON.stringify(aw.map(a => a.award_id)), 'S');
+    await q(db, `update public.exercises set qualities = array_append(qualities, 'strength'), updated_at = clock_timestamp() where id = 'machine-seated-leg-curl'`);
+    await profile(db, 'zz_acc');
+    aw = await awardsOf(db, 'zz_acc');
+    const upZ = aw.filter(a => a.item === 'the_upgrade').length;
+    ok(upZ === 5 && aw.some(a => a.award_id === 'achievement:double_up') && aw.some(a => a.award_id === 'title:new_engine'),
+       `and once the Spine tags it strength as well (its updated_at moves): the next get_profile mints The Upgrade (${upZ} tiers), Double Up and NEW ENGINE (the rewards stamp includes the Spine)`, JSON.stringify(aw.map(a => a.award_id)), 'L1');
+    await q(db, `update public.exercises set pattern = 'isolation', qualities = $1::text[], updated_at = clock_timestamp() where id = 'machine-seated-leg-curl'`, [legQ]);
+    await profile(db, 'zz_acc');
+    ok((await awardsOf(db, 'zz_acc')).filter(a => /the_upgrade|double_up|new_engine/.test(a.award_id)).length === upZ + 2, 'and placing it back on isolation, untagged, takes no award back (GAME-1)', undefined, 'L1');
+
+    // 4f3. the exclude list fails closed through the real door, in a transaction that is undone: 45° Back Extension's entry is RE-KEYED (its row moved to
+    // back-extension-45-v2, approved, the old id gone), so the catalogue's exclude list names an id with no row. A session with the back extension 150% up
+    // and Barbell Back Squat 25% up mints nothing at all, where the list excluding nothing would have minted five tiers, Double Up and NEW ENGINE on the back
+    // extension (the copy under its new id is approved, hinge and tagged strength). Put right (the id moved back, which moves the Spine's updated_at and so
+    // the rewards stamp), the next get_profile mints what was held back: The Upgrade tiers 1 and 2, on the squat, dated the day they were earned.
+    const M7f = ['squat', 'hinge', 'single-leg', 'push-horizontal', 'push-vertical', 'pull-horizontal', 'pull-vertical'];
+    const X4f = ['back-extension-45', 'cable-face-pull', 'machine-reverse-fly', 'cable-straight-arm-pulldown'];
+    const kRuleF = await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify({ patterns: M7f, qualities: ['strength'], exclude: X4f })]);
+    const kNoXF = await val(db, `select public.career_maxpct_key($1::jsonb)`, [JSON.stringify({ patterns: M7f, qualities: ['strength'] })]);
+    const catKeyF = await val(db, `select public.career_maxpct_key(c.body) from public.career_catalogue c where c.kind = 'badge' and c.id = 'the_upgrade' order by c.version desc limit 1`);
+    const haveF = async (id, key) => Number(await val(db, `select public.career_measures($2, '{}'::jsonb, array[$1]::text[]) -> $1 ->> 'have'`, [key, id]));
+    const twoLifts = (sq, be) => ({ ...sess({ ex: 'Barbell Back Squat', w: sq }), log: [...sess({ ex: 'Barbell Back Squat', w: sq }).log, ...sess({ ex: '45° Back Extension', w: be }).log] });
+    const ML = /the_upgrade|double_up|new_engine/;
+    const mlAwards = async id => (await awardsOf(db, id)).filter(a => ML.test(a.award_id)).map(a => `${a.award_id}@${a.day}`);
+    const mlLifts = async id => q(db, `select a.award_id, a.evidence ->> 'via' as via, (select f.value ->> 'lift' from public.career_facts f where f.athlete_id = a.athlete_id and f.kind = 'lift_gain'
+                                          and f.ref = a.evidence -> 'facts' -> 0 ->> 'ref' order by f.void_at nulls first limit 1) as lift
+                                         from public.career_awards a where a.athlete_id = $1 and a.item = 'the_upgrade' order by 1`, [id]);
+    const twoTiers = [`badge:the_upgrade:1@${addDays(today, -1)}`, `badge:the_upgrade:2@${addDays(today, -1)}`];
+    let xf = null;
+    await db.exec('begin');
+    try {
+      // the copy keeps the row's updated_at, so the re-key itself does not move the stamp; moving the id back does (touch_updated_at)
+      await q(db, `insert into public.exercises select (jsonb_populate_record(null::public.exercises, to_jsonb(e) || jsonb_build_object('id', 'back-extension-45-v2'))).*
+                    from public.exercises e where e.id = 'back-extension-45'`);
+      await q(db, `delete from public.exercises where id = 'back-extension-45'`);
+      await mkLogin(db, 'zz_xfail');
+      await insProgram(db, 'zz_xfail', prog({ start: addDays(today, -30), end: addDays(today, 40), days: [1, 2] }));
+      await doorSession(db, 'zz_xfail', 1, addDays(today, -10), twoLifts(40, 10));
+      await doorSession(db, 'zz_xfail', 2, addDays(today, -1), twoLifts(50, 25));
+      await profile(db, 'zz_xfail');
+      xf = { broken: { awards: await mlAwards('zz_xfail'), rule: await haveF('zz_xfail', kRuleF), noX: await haveF('zz_xfail', kNoXF) } };
+      await q(db, `update public.exercises set id = 'back-extension-45' where id = 'back-extension-45-v2'`);
+      await profile(db, 'zz_xfail');
+      const evF = await mlLifts('zz_xfail');
+      xf.fixed = { awards: await mlAwards('zz_xfail'), lifts: evF.map(r => r.lift), vias: [...new Set(evF.map(r => r.via))], rule: await haveF('zz_xfail', kRuleF) };
+    } finally { await db.exec('rollback'); }
+    ok(xf && xf.broken.awards.length === 0 && xf.broken.rule === 0 && xf.broken.noX >= 100,
+       `45° Back Extension's entry re-keyed (its row under a new id, the listed id gone): a session with it 150% up and Barbell Back Squat 25% up, saved through the door, mints no tier of The Upgrade, no Double Up and no NEW ENGINE (the rule reads ${xf && xf.broken.rule}%; without the exclude list it would read ${xf && xf.broken.noX}%)`,
+       JSON.stringify(xf), 'S');
+    ok(xf && xf.fixed && JSON.stringify(xf.fixed.awards) === JSON.stringify(twoTiers)
+       && xf.fixed.lifts.every(l => l === 'Barbell Back Squat') && JSON.stringify(xf.fixed.vias) === JSON.stringify([catKeyF]) && catKeyF === kRuleF && xf.fixed.rule > 0 && xf.fixed.rule < 30,
+       `and put right (the id moved back), the next get_profile mints what was held back: The Upgrade tiers 1 and 2 on the squat (${xf && xf.fixed && xf.fixed.rule}%), dated the day they were earned (the session's, ${addDays(today, -1)}), with the catalogue's key as their via`,
+       JSON.stringify(xf && xf.fixed), 'S');
+    // 4f4. an entry made a DRAFT is no stop, through the real door (a transaction that is undone): with back-extension-45 a draft, the same two sessions
+    // mint The Upgrade tiers 1 and 2 on the squat at once (a draft places no lift, so the back extension counts for nothing); approved again (the stamp
+    // moves), the next get_profile mints nothing more: its id is still on the list.
+    let xd = null;
+    await db.exec('begin');
+    try {
+      await q(db, `update public.exercises set status = 'draft' where id = 'back-extension-45'`);
+      await mkLogin(db, 'zz_xdraft');
+      await insProgram(db, 'zz_xdraft', prog({ start: addDays(today, -30), end: addDays(today, 40), days: [1, 2] }));
+      await doorSession(db, 'zz_xdraft', 1, addDays(today, -10), twoLifts(40, 10));
+      await doorSession(db, 'zz_xdraft', 2, addDays(today, -1), twoLifts(50, 25));
+      await profile(db, 'zz_xdraft');
+      xd = { drafted: { awards: await mlAwards('zz_xdraft'), lifts: (await mlLifts('zz_xdraft')).map(r => r.lift), rule: await haveF('zz_xdraft', kRuleF) } };
+      await q(db, `update public.exercises set status = 'approved' where id = 'back-extension-45'`);
+      await profile(db, 'zz_xdraft');
+      xd.approved = { awards: await mlAwards('zz_xdraft'), rule: await haveF('zz_xdraft', kRuleF), noX: await haveF('zz_xdraft', kNoXF) };
+    } finally { await db.exec('rollback'); }
+    ok(xd && JSON.stringify(xd.drafted.awards) === JSON.stringify(twoTiers) && xd.drafted.lifts.every(l => l === 'Barbell Back Squat') && xd.drafted.rule > 0 && xd.drafted.rule < 30
+       && JSON.stringify(xd.approved.awards) === JSON.stringify(twoTiers) && xd.approved.rule === xd.drafted.rule && xd.approved.noX >= 100,
+       `45° Back Extension made a draft: no stop, the same sessions mint The Upgrade tiers 1 and 2 on the squat at once (${xd && xd.drafted.rule}%), the back extension counting for nothing; approved again, nothing more is minted, its id still on the list (without the list the strength rule would read ${xd && xd.approved.noX}%)`,
+       JSON.stringify(xd), 'S');
+    ok((await val(db, `select count(*)::int from public.career_awards where athlete_id in ('zz_xfail', 'zz_xdraft')`)) === 0
+       && (await val(db, `select count(*)::int from public.exercises where id = 'back-extension-45-v2' or (id = 'back-extension-45' and status <> 'approved')`)) === 0
+       && (await val(db, `select count(*)::int from public.exercises where id = 'back-extension-45'`)) === 1,
+       'and both transactions were undone (no zz_xfail or zz_xdraft award, the Spine as it was)', undefined, 'S');
+  }
 
   // 4g. a free athlete saving with no score row yet, then repeatedly (also 9)
   if (STOP < 5) return finish();
@@ -864,6 +1638,67 @@ async function main() {
   const dProf = median(profSkip) - median(ctlProf);
   info(`${big}'s log: get_profile() first read after the saves ${profFirst[1]} ms; skip path ${profSkip.join(' / ')} ms (median ${median(profSkip)}); phase 2's get_profile() on the same log ${ctlProf.join(' / ')} ms (median ${median(ctlProf)})`);
   ok(dProf <= 100, `get_profile() of the longest log on the skip path costs ${Math.round(dProf)} ms more than phase 2's get_profile() on the same log (median ${median(profSkip)} against ${median(ctlProf)}; the budget is +100 ms)`, JSON.stringify({ profSkip, ctlProf }), 'L1');
+  if (S73) {
+    // the commitment number's own cost (D19): get_profile() of the longest REAL log with stage70's four functions, with stage73 but stage70's
+    // career_rewards_profile() (stage73 without the hunk), and with stage73 as built; the skip path, and a full call (the stamp taken off). Each variant
+    // runs in a transaction that is undone, so nothing it mints or writes is kept; two rounds, the variants in turn.
+    const cutFn = (txt, name) => { const a = txt.indexOf(`create or replace function public.${name}(`); return txt.slice(a, txt.indexOf('end $function$;', a) + 'end $function$;'.length); };
+    const V = [['stage70', S73_FNS.map(n => cutFn(s70, n)).join('\n')], ['stage73 without the commitment hunk', cutFn(s70, 'career_rewards_profile')], ['stage73 as built', '']];
+    const T = Object.fromEntries(V.map(([k]) => [k, { skip: [], full: [], bytes: 0, com: null }]));
+    for (let round = 0; round < 2; round++) for (const [name, sql] of V) {
+      await db.exec('begin');
+      try {
+        if (sql) await runSql(db, sql, name);
+        await profile(db, big);
+        for (let k = 0; k < 5; k++) T[name].skip.push((await ms(() => profile(db, big)))[1]);
+        for (let k = 0; k < 2; k++) { await q(db, `update public.career_scores set rewards = rewards - 'stamp' where athlete_id = $1`, [big]); T[name].full.push((await ms(() => profile(db, big)))[1]); }
+        const pv = await profile(db, big); T[name].bytes = sizeOf(pv); T[name].com = pv.numbers.four.commitment.value;
+      } finally { await db.exec('rollback'); }
+    }
+    const r1 = x => Math.round(x * 10) / 10;
+    for (const [name] of V) info(`${big}'s get_profile() with ${name}: skip path ${T[name].skip.join(' / ')} ms (median ${r1(median(T[name].skip))}), full call ${T[name].full.join(' / ')} ms (median ${r1(median(T[name].full))}); the core ${T[name].bytes} bytes; commitment ${T[name].com}`);
+    const W = T['stage73 as built'], WO = T['stage73 without the commitment hunk'];
+    const hunkSkip = Math.round((median(W.skip) - median(WO.skip)) * 10) / 10, hunkFull = Math.round((median(W.full) - median(WO.full)) * 10) / 10;
+    ok(median(W.skip) - median(ctlProfBig) <= 100, `with the commitment number, get_profile() of the longest real log (${big}) on the skip path costs ${Math.round(median(W.skip) - median(ctlProfBig))} ms more than phase 2's get_profile() of ${big} (median ${r1(median(W.skip))} against ${r1(median(ctlProfBig))}; budget +100); the hunk itself ${hunkSkip} ms on the skip path, ${hunkFull} ms on a full call`, JSON.stringify({ T, ctlProfBig }), 'L1');
+    ok(W.bytes <= BUDGET, `and the core of ${big} is ${W.bytes} bytes compact with it (${WO.bytes} without; the budget ${BUDGET})`, undefined, 'L1');
+    // which path: evaluate's cache answers (no second pass over the paid facts); with no badge holding the count it is worked out; when that fails, every fact
+    const paidBig = Number(await val(db, `select count(*)::int from public.career_facts_paid($1) where kind in ('session_finished', 'session_finished_early')`, [big]));
+    const rawBig = Number(await val(db, `select count(*)::int from public.career_facts where athlete_id = $1 and kind in ('session_finished', 'session_finished_early') and void_at is null`, [big]));
+    const rwBig = (await one(db, `select rewards from public.career_scores where athlete_id = $1`, [big])).rewards;
+    const comOf = async rw => { const [r, t] = await ms(() => one(db, `select public.career_rewards_profile($1, $2::jsonb) #> '{numbers,four,commitment,value}' as v`, [big, JSON.stringify(rw)])); return [Number(r.v), t]; };
+    const tC = [], tF = [];
+    let cC, cF;
+    for (let k = 0; k < 3; k++) { const [a, ta] = await comOf(rwBig); const [b, tb] = await comOf({}); cC = a; cF = b; tC.push(ta); tF.push(tb); }
+    info(`career_rewards_profile() of ${big}: from evaluate's cache ${tC.join(' / ')} ms, with no badge in the cache holding the count (worked out) ${tF.join(' / ')} ms; facts ${rawBig}, paid ${paidBig}`);
+    ok(cC === paidBig && cF === paidBig && rawBig > paidBig, `${big}'s commitment is ${paidBig}, the paid sessions (${rawBig} session facts), both from the cache and when it is worked out`, JSON.stringify({ cC, cF, paidBig, rawBig }), 'L1');
+    await db.exec('begin');
+    let viaCache, viaNothing, errF = null;
+    try {
+      await q(db, `create or replace function public.career_measures(p_athlete text, p_ctx jsonb, p_keys text[]) returns jsonb language plpgsql as $$ begin raise exception 'boom'; end $$`);
+      viaCache = (await comOf(rwBig))[0];
+      viaNothing = await comOf({}).then(r => r[0], e => { errF = e.message; return null; });
+    } finally { await db.exec('rollback'); }
+    ok(viaCache === paidBig, `with career_measures() made to raise, the commitment still comes from the cache (${viaCache}): the usual read calls no measure`, undefined, 'L1');
+    ok(!errF && viaNothing === rawBig, `and with nothing to read it from either, the profile still answers, counting every session fact (${viaNothing}; the number before stage73)`, errF, 'L1');
+    ok((await val(db, `select pg_get_functiondef('public.career_measures(text,jsonb,text[])'::regprocedure) like '%career_facts_paid%'`)) === true, 'and career_measures() is stage73\'s again (the transaction was undone)', undefined, 'L1');
+    // a free athlete's commitment is its perfect days, as before. No athlete of this run is free, so the coached athlete with the most perfect days
+    // (one with sessions too, so the two numbers differ) is made free for one read, in a transaction that is undone.
+    const freeId = await val(db, `select f.athlete_id from public.career_facts f join public.programs p on p.athlete_id = f.athlete_id
+                                   where f.kind in ('perfect_day', 'session_finished') and f.void_at is null group by 1
+                                  having count(*) filter (where f.kind = 'perfect_day') > 0 and count(*) filter (where f.kind = 'session_finished') > 0
+                                   order by count(*) filter (where f.kind = 'perfect_day') desc, 1 limit 1`);
+    await db.exec('begin');
+    let pFree = null, pdFree = null, sessFree = null;
+    try {
+      await q(db, `update public.programs set data = jsonb_set(data, '{athlete,tier}', '"free"') where athlete_id = $1`, [freeId]);
+      const rwFree = (await one(db, `select rewards from public.career_scores where athlete_id = $1`, [freeId])).rewards;
+      pFree = (await one(db, `select public.career_rewards_profile($1, $2::jsonb) as p`, [freeId, JSON.stringify(rwFree || {})])).p;
+      pdFree = Number(await val(db, `select count(*)::int from public.career_facts where athlete_id = $1 and kind = 'perfect_day' and void_at is null`, [freeId]));
+      sessFree = Number(await val(db, `select count(*)::int from public.career_facts where athlete_id = $1 and kind in ('session_finished', 'session_finished_early') and void_at is null`, [freeId]));
+    } finally { await db.exec('rollback'); }
+    const cf = pFree && pFree.numbers && pFree.numbers.four && pFree.numbers.four.commitment;
+    ok(freeId && pdFree > 0 && pFree.numbers.free === true && cf && cf.key === 'perfect_days' && Number(cf.value) === pdFree && pdFree !== sessFree, `a free athlete's commitment is still its perfect days (${freeId} made free for one read: ${JSON.stringify(cf)}; ${pdFree} perfect days, ${sessFree} session facts)`, JSON.stringify(pFree && pFree.numbers), 'L1');
+  }
   // a failing evaluate keeps the ladder and marks the profile stale
   const staleId = 'zz_week';
   const ladBefore = (await profile(db, staleId)).ladder;
@@ -879,9 +1714,11 @@ async function main() {
   }
   ok(pS.rewards_stale === true && pS.ladder && Object.keys(pS.ladder).length === Object.keys(ladBefore).length && pS.ladder.held_weeks && pS.career && pS.career.xp > 0,
      `a forced evaluate error (${forced}) keeps the ladder (${Object.keys(pS.ladder || {}).length} entries), serves the score and sets rewards_stale`, JSON.stringify({ stale: pS.rewards_stale, ladder: pS.ladder && Object.keys(pS.ladder).length }), 'L1');
+  ok(pS.numbers && pS.numbers.four && typeof pS.numbers.four.commitment.value === 'number', `and the four numbers still answer (commitment ${pS.numbers && pS.numbers.four && JSON.stringify(pS.numbers.four.commitment)})`, undefined, 'L1');
   const okSave = await doorProgress(db, staleId, habitLog(today, -6, 0, { water: 8, steps: 11000, sleep: 8 }), CFG_THREE).then(() => true, () => false);
   ok(okSave, 'and a save still goes through while evaluate fails (the trigger only warns)', undefined, 'L1');
   await runSql(db, s70, 'stage70 (restore the functions)');
+  if (S73) await runSql(db, s73, 'stage73 (restore the functions)');
   await q(db, `update public.career_catalogue c set body = x.body from jsonb_to_recordset($1::jsonb) as x(kind text, id text, body jsonb) where c.kind = x.kind and c.id = x.id`, [JSON.stringify(cat3)]);
   pS = await profile(db, staleId);
   ok(!pS.rewards_stale, 'the failure heals when the catalogue and the functions are back: no more rewards_stale', undefined, 'L1');
@@ -930,7 +1767,10 @@ async function main() {
     ok(true, `wrote ${path.relative(ROOT, CASES_FILE)}: ${cases.athletes.length} athletes, ${Object.keys(cases.catalogue).length} entries, ${cases.moves.length} session vectors, ${cases.ids.length} ids`);
   } else {
     const onDisk = fs.existsSync(CASES_FILE) ? JSON.parse(fs.readFileSync(CASES_FILE, 'utf8')) : null;
-    const strip = c => c && JSON.stringify({ rules: c.rules, catalogue: c.catalogue, athletes: c.athletes, moves: c.moves, ids: c.ids });
+    // an object's keys compared in sorted order: the catalogue map follows career_catalogue's physical row order (cat3 is read without an ORDER BY),
+    // which a re-seed of other rows can shuffle (2026-10-18: the qualities and exclude keys on two entries moved first_blood); the order means nothing
+    const canon = x => (Array.isArray(x) ? x.map(canon) : x && typeof x === 'object' ? Object.fromEntries(Object.keys(x).sort().map(k => [k, canon(x[k])])) : x);
+    const strip = c => c && JSON.stringify(canon({ rules: c.rules, catalogue: c.catalogue, athletes: c.athletes, moves: c.moves, ids: c.ids }));
     const moved = onDisk && onDisk.today ? daysBetween(onDisk.today, today) : 0;
     ok(onDisk && strip(shiftDates(onDisk, moved)) === strip(shiftDates(cases, 0)), `scripts/career/reward_cases.json is the server's answer today (its dates moved ${moved} days; rewrite it with --write-cases after a deliberate change)`,
        onDisk ? 'they differ' : 'the file is missing', 'L1');
@@ -974,6 +1814,27 @@ async function main() {
   const idsRb = (await q(db, `select * from public.career_rewards_athletes(0, 1000)`)).map(r => r.career_rewards_athletes);
   const xpRb = {}; for (const id of idsRb) xpRb[id] = (await one(db, `select public.career_compute($1) as s`, [id])).s.career;
   const awCount = (await tables()).a;
+  if (S73) {
+    // stage73 comes off first (the order they went on in, reversed): stage70's four functions back byte for byte, the helper dropped, no award touched, the stamp cleared
+    const rb73 = read(path.join(ROOT, 'scripts', 'career', 'rollback_stage73.sql'));
+    const stamps = () => val(db, `select count(*)::int from public.career_scores where rewards ? 'stamp'`);
+    ok(await stamps() > 0, `before the rollback of stage73 the cached rewards carry their stamp (${await stamps()} athletes)`, undefined, 'L3');
+    const awBefore73 = JSON.stringify(await q(db, `select athlete_id, award_id, day::text as d, pays, xp from public.career_awards order by 1, 2`));
+    let e73 = null; try { await runSql(db, rb73, 'rollback stage73'); } catch (e) { e73 = e.message; }
+    ok(!e73, 'rollback_stage73.sql goes through', e73, 'L1');
+    const dNow = await allCareerDefs();
+    const dDiff = Object.keys(defsBefore73).filter(k => dNow[k] !== defsBefore73[k]);
+    ok(dDiff.length === 0 && !dNow['career_maxpct_key(jsonb)'], `career_entry_keys, career_measures, career_achievement_eval and career_rewards_profile are stage70's text again, byte for byte as the database prints them, and career_maxpct_key is dropped (${Object.keys(defsBefore73).length} functions compared, every one the same)`,
+       dDiff.map(k => k + '\n' + firstDiff(defsBefore73[k], dNow[k])).join('\n'), 'L1');
+    ok(await stamps() === 0, 'and the cached rewards lost their stamp, so the next full evaluate looks again', undefined, 'L1');
+    ok(JSON.stringify(await q(db, `select athlete_id, award_id, day::text as d, pays, xp from public.career_awards order by 1, 2`)) === awBefore73, 'and no award was touched (GAME-1: an award minted while stage73 stood is kept)', undefined, 'L1');
+    let e73b = null; try { await runSql(db, rb73, 'rollback stage73 again'); } catch (e) { e73b = e.message; }
+    const dNow2 = await allCareerDefs();
+    ok(!e73b && Object.keys(defsBefore73).every(k => dNow2[k] === defsBefore73[k]) && !dNow2['career_maxpct_key(jsonb)'], 'the rollback of stage73 runs a second time and finds nothing to do', e73b, 'L1');
+    const again73 = await runSql(db, s73, 'stage73 after its rollback').then(() => true, e => e.message);
+    ok(again73 === true, 'stage73 can be applied again after a rollback', again73 === true ? undefined : again73, 'L1');
+    await runSql(db, rb73, 'rollback stage73 (third time, to go on to stage70)');
+  }
   const rb = read(path.join(ROOT, 'scripts', 'career', 'rollback_stage70.sql'));
   let dryErr = null; try { await runSql(db, rb, 'rollback dry'); } catch (e) { dryErr = e.message; }
   try { await db.exec('rollback'); } catch (e) { /* no transaction left */ }
@@ -1026,6 +1887,10 @@ async function main() {
   ok(REPLACED.every(k => defs2[k] === defs0[k]) && (await val(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure)`)) === erase0, 'and after the second run everything is still as it was', undefined, 'L1');
   const s70again = await runSql(db, s70, 'stage70 after the rollback').then(() => true, e => e.message);
   ok(s70again === true, 'stage70 can be applied again after a rollback', s70again === true ? undefined : s70again, 'L1');
+  if (S73) {
+    const s73again = await runSql(db, s73, 'stage73 after stage70 again').then(() => true, e => e.message);
+    ok(s73again === true && !!(await val(db, `select to_regprocedure('public.career_maxpct_key(jsonb)')::text`)), 'and stage73 goes back on top of it', s73again === true ? undefined : s73again, 'L1');
+  }
 
   finish();
 }
@@ -1043,7 +1908,9 @@ const PHONE_ACH = ['first_blood', 'the_centurion', 'full_stack', 'bedrock', 'the
 
 async function buildCases(db, c) {
   const { today, SL, hr, bf, cat3 } = c;
-  const body = Object.fromEntries(cat3.filter(r => (r.kind === 'badge' && PHONE_BADGES.includes(r.id)) || (r.kind === 'achievement' && PHONE_ACH.includes(r.id))).map(r => [r.id, r.body]));
+  // in a fixed order (the badges, then the achievements, as listed above), not the table's physical row order, so --write-cases is stable
+  const body = Object.fromEntries([...PHONE_BADGES.map(id => ['badge', id]), ...PHONE_ACH.map(id => ['achievement', id])]
+    .map(([k, id]) => cat3.find(r => r.kind === k && r.id === id)).filter(Boolean).map(r => [r.id, r.body]));
   const rules = { targets: hr.targets, weights: hr.weights, completionBonus: hr.completionBonus, customXp: hr.customXp, backfill_days: bf };
   // three athletes with logs that cross different things: a long one, one with a custom habit and a comeback, a short one
   const specs = [
@@ -1096,7 +1963,11 @@ async function buildCases(db, c) {
   ladders.push(nearing);
   const E = [{ early: false, fullLog: true, checkin: true, weekCloses: false, cycleCloses: false }, { early: false, fullLog: false, checkin: true, weekCloses: false, cycleCloses: false },
              { early: true, fullLog: false, checkin: false, weekCloses: false, cycleCloses: false }, { early: false, fullLog: true, checkin: true, weekCloses: true, cycleCloses: false },
-             { early: false, fullLog: true, checkin: true, weekCloses: true, cycleCloses: true }, { early: false, fullLog: false, checkin: false, weekCloses: true, cycleCloses: false, byBook: true }];
+             { early: false, fullLog: true, checkin: true, weekCloses: true, cycleCloses: true }, { early: false, fullLog: false, checkin: false, weekCloses: true, cycleCloses: false, byBook: true },
+             // D19 (2026-10-18; the cap GAME-4 puts on XP): a plan day done again in its training week is not a paid session; it moves no count over the session kinds
+             { early: false, fullLog: true, checkin: true, weekCloses: false, cycleCloses: false, repeat: true },
+             { early: true, fullLog: false, checkin: false, weekCloses: false, cycleCloses: false, repeat: true },
+             { early: false, fullLog: true, checkin: true, weekCloses: true, cycleCloses: false, repeat: true }];
   const moves = [];
   for (const ladder of ladders) for (const e of E) moves.push({ ladder, e, expect: movesRef(e, ladder) });
   const ids = [['badge', 'held_weeks', 3], ['badge', 'habit_tiers', 2, 'water'], ['badge', 'habit_water', 1], ['achievement', 'first_best'], ['title', 'grand_slam'], ['badge', 'day_streak', 12], ['title', 'bedrock', null, '']];
@@ -1122,8 +1993,8 @@ function movesRef(e, ladder) {
     if (!en || !(Number(en.next) > 0)) return;
     let inc = 0, pending = false;
     if (en.phone === 'session') {
-      if (has(en, 'session_finished') && !e.early) inc++;
-      if (has(en, 'session_finished_early') && e.early) inc++;
+      if (has(en, 'session_finished') && !e.early && !e.repeat) inc++;           // a repeated plan day is not a paid session (D19); the full log and the check-in still count
+      if (has(en, 'session_finished_early') && e.early && !e.repeat) inc++;
       if (has(en, 'full_log') && e.fullLog) inc++;
       if (has(en, 'checkin_done') && e.checkin) inc++;
     } else if (en.phone === 'week') {

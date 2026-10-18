@@ -385,6 +385,11 @@ name = "The Upgrade"
 meaning = "progress"
 kind = "best_value"
 counts = "lift_gain"
+# GAME-10: a lift counts toward The Upgrade only when its Spine entry is on one of these patterns, is tagged strength and is not in `exclude` (Amir, 2026-10-18: "Yes i want those to be exluded / You set up the rule for that").
+# Each `exclude` id must be a Spine id spelled exactly (a draft is fine): an id with no Spine row at all pauses both rewards (this one and Double Up) for everyone until it is fixed.
+patterns = ["squat", "hinge", "single-leg", "push-horizontal", "push-vertical", "pull-horizontal", "pull-vertical"]
+qualities = ["strength"]
+exclude = ["back-extension-45", "cable-face-pull", "machine-reverse-fly", "cable-straight-arm-pulldown"]
 caption = "Your most improved lift is {n}% stronger than its first session, at the same effort."
 free = false
 origin = "new"

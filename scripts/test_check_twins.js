@@ -158,6 +158,22 @@ want('a habit counts as done on any logged amount, not the target', swap('habits
 want('the finish card shows four lines, not three', swap('program.html', 'lines.slice(0, 3).map', 'lines.slice(0, 4).map'), 1, /careerMoves #/);
 want('the finish card sorts a tier not crossed before one crossed', swap('program.html', '(b.crossed - a.crossed) ||', '(a.crossed - b.crossed) ||'), 1, /careerMoves #/);
 want('the finish card calls a week ladder sure (not pending)', swap('program.html', 'pending = true;', 'pending = false;'), 1, /careerMoves #/);
+want('a plan day repeated in its week moves Century on the finish card (GAME-4)', swap('program.html', "has(en, 'session_finished') && !e.early && !e.repeat", "has(en, 'session_finished') && !e.early"), 1, /careerMoves, pinned: a plan day repeated in its week/);
+want('a plan day repeated in its week moves a session finished early on the finish card (GAME-4)', swap('program.html', "has(en, 'session_finished_early') && e.early && !e.repeat", "has(en, 'session_finished_early') && e.early"), 1, /careerMoves, pinned: a plan day repeated in its week/);
+want('a repeated plan day stops moving the full log on the finish card', swap('program.html', "has(en, 'full_log') && e.fullLog", "has(en, 'full_log') && e.fullLog && !e.repeat"), 1, /careerMoves, pinned: a repeated plan day still moves the full log/);
+// Sessions with Amir on Home: a plan day done again in its week is not a paid session (GAME-4), so the phone's +1 for a session the server has not counted yet skips it.
+want('Home adds a session for a plan day done again in its week (the flag on the record is ignored)', swap('program.html', "if (typeof raw.repeat === 'boolean') return raw.repeat ? 0 : 1;", "if (typeof raw.repeat === 'boolean') return 1;"), 1, /careerRecPaid, pinned: the repeat flag decides/);
+want('Home reads an older record (no flag) as paid whenever it has any part', swap('program.html', "return raw.parts.some(x => x && (x.k === 'session' || x.k === 'early')) ? 1 : 0;", 'return raw.parts.length ? 1 : 0;'), 1, /careerRecPaid, pinned: an older record with no session part/);
+want('Home forgets that a session finished early is a paid session (an older record)', swap('program.html', "(x.k === 'session' || x.k === 'early')", "x.k === 'session'"), 1, /careerRecPaid, pinned: an older record with a session part, or an early one/);
+want('careerEarn gives a repeated plan day a session part again (an older record then counts it)', swap('program.html', 'if (!repeat) parts.push(early ?', 'if (true) parts.push(early ?'), 1, /the older record \(no flag\) of day 1, day 1 done this week/);
+want('careerEarn stops calling a plan day done earlier this week a repeat', swap('program.html', 'const repeat = done.has(String(day));', 'const repeat = false;'), 1, /careerEarn calls it a repeat only when the day was done/);
+want('Home counts every waiting record as one session again (careerPendingSessions)', swap('program.html', 'n += careerRecPending(raw, now);', 'n += 1;'), 1, /careerPendingSessions, pinned: a plan day done again in its week adds nothing/);
+want('Home ignores the paid count on the record (a repeat that carries a waiting session adds nothing again)', swap('program.html', "if (typeof raw.paid === 'number' && isFinite(raw.paid)) return Math.max(0, Math.floor(raw.paid));", ''), 1, /careerRecPaid, pinned: the paid count decides/);
+want('Home reads a paid count that is not a number as a number', swap('program.html', "typeof raw.paid === 'number' && isFinite(raw.paid)", "raw.paid != null"), 1, /careerRecPaid, pinned: a paid count that is not a usable number/);
+want('a repeat takes away the session still waiting in the record it replaces (careerPaidAtDone)', swap('program.html', 'return (repeat ? 0 : 1) + careerRecPending(prev, now);', 'return (repeat ? 0 : 1);'), 1, /careerPaidAtDone, pinned: a repeat keeps the session still waiting/);
+want('a session an answer has counted is carried into the next record again (careerPaidAtDone)', swap('program.html', 'if (raw.saved && CAREER_T.at > raw.saved) return 0;   // an answer asked after the session reached the server has counted it', ''), 1, /careerPaidAtDone, pinned: a session an answer has counted|careerPendingSessions, pinned: a session an answer asked after it was saved has counted/);
+want('a session older than 3 days is carried into the next record (careerPaidAtDone)', swap('program.html', '!(now - Date.parse(raw.t) < 3 * 86400000)', 'false'), 1, /careerPaidAtDone, pinned: a session an answer has counted, or one older than 3 days|careerPendingSessions, pinned: a record older than 3 days/);
+want('Home shows the pending session with the catalogue switch off (careerPendingSessions)', swap('program.html', 'if (!catalogueOnT()) return 0;   // the four cells exist only with the catalogue switch on', ''), 1, /careerPendingSessions, pinned: nothing while the catalogue switch is off/);
 want('Hold Serve counts from its best on the finish card, not the run so far', swap('program.html', "const base = typeof en.now === 'number' ? en.now : (Number(en.have) || 0)", "const base = Number(en.have) || 0"), 1, /careerMoves, pinned: a run badge counts from the run so far/);
 want('an event\'s goal changes in AA Proof only (16 sessions become 17)', swap('habits.html', "need:16,     label:'16 sessions'", "need:17,     label:'16 sessions'"), 1, /EVENTS goals vs achievements\.toml: ev_foundry/);
 want('an event\'s goal changes in the catalogue only (career/achievements.toml)', swap('career/achievements.toml', '{ kind = "daysHit:strength", need = 16 }', '{ kind = "daysHit:strength", need = 15 }'), 1, /EVENTS goals vs achievements\.toml: ev_foundry/);
@@ -234,6 +250,28 @@ want('index mode: habits.html STAGED with a new goal while the toml in the worki
 
   }, 1, /EVENTS goals vs achievements\.toml: ev_foundry/, { index: true });
 
+
+// GAME-10: The Upgrade and Double Up carry `patterns`, and scripts/check_career.py (which career_seed.py runs) holds each one to coach.html's SPINE_PATTERNS. Guard 15 runs on a coach.html change and
+// guard 20 does not, so a pattern dropped from that list is stopped HERE: the guard must say what the seed refused (its own words), not only that it could not run, and in index mode it reads the STAGED coach.html.
+const PAT_FROM = "const SPINE_PATTERNS = ['squat','hinge',", PAT_TO = "const SPINE_PATTERNS = ['hinge',", PAT_SAYS = /patterns 'squat' is not a Spine pattern in coach\.html's SPINE_PATTERNS/;
+want('a pattern is dropped from coach.html\'s SPINE_PATTERNS while The Upgrade lists it: the guard says what the seed refused', swap('coach.html', PAT_FROM, PAT_TO), 2, PAT_SAYS);
+want('index mode: a pattern dropped from coach.html in the working tree and NOT staged does not fail the hook (the staged coach.html still lists it)', swap('coach.html', PAT_FROM, PAT_TO), 0, /all \d+ checks agree/, { index: true });
+want('index mode: coach.html STAGED without a pattern The Upgrade lists fails the hook, in the seed script\'s own words',
+  (get, put, git) => { const old = get('coach.html'); put('coach.html', old.replace(PAT_FROM, PAT_TO)); git('add', 'coach.html'); put('coach.html', old); }, 2, PAT_SAYS, { index: true });
+// `patterns`, `qualities` and `exclude` (Amir, 2026-10-18: accessories are out of The Upgrade and Double Up). scripts/check_career.py refuses each of these first, and the seed script refuses with it
+// (exit 2, in the checker's own words). The guard's own lines are the second defence, so those cases loosen the checker's refusal in the copy and mutate the toml, to see the guard say it (exit 1).
+const TOTAL_UPGRADE = swap('career/badges.toml', 'kind = "best_value"', 'kind = "total"');
+const NO_PATTERNS = swap('career/badges.toml', 'patterns = ["squat"', 'zpatterns = ["squat"');
+const together = (...muts) => (get, put, git) => muts.forEach(m => m(get, put, git));
+want('`patterns` on a badge that is not best_value: the seed script refuses first, in the checker\'s own words', TOTAL_UPGRADE, 2, /patterns is only for an entry that reads the fact lift_gain as its best value/);
+want('`patterns` on a badge that is not best_value, the checker loosened: the guard says the server ignores it there', together(TOTAL_UPGRADE, swap('scripts/check_career.py', 'if not reads_lift_gain:', 'if False:')), 1, /patterns \(GAME-10\) sit only on a best_value entry/);
+want('`qualities` and `exclude` on an entry with no `patterns`: the seed script refuses first, in the checker\'s own words', NO_PATTERNS, 2, /qualities narrows the lifts that patterns lists, so it needs patterns/);
+want('`qualities` and `exclude` on an entry with no `patterns`, the checker loosened: the guard says it', together(NO_PATTERNS, swap('scripts/check_career.py', 'if key in e and "patterns" not in e:', 'if False:')), 1, /qualities and exclude \(GAME-10\) sit only on an entry that carries patterns/);
+want('`qualities` on a badge that is not best_value, the checker loosened: the guard says it', together(TOTAL_UPGRADE, swap('scripts/check_career.py', 'if not reads_lift_gain:', 'if False:')), 1, /qualities and exclude \(GAME-10\) sit only on an entry that carries patterns, so only on a best_value one/);
+want('The Upgrade stops naming its qualities: it counts lifts Double Up does not', swap('career/badges.toml', 'qualities = ["strength"]', 'zqualities = ["strength"]'), 1, /The Upgrade and Double Up each name the lifts they count/);
+want('Double Up also counts muscle-tagged lifts and The Upgrade does not', swap('career/achievements.toml', 'qualities = ["strength"]', 'qualities = ["strength", "muscle"]'), 1, /The Upgrade and Double Up count the same lifts/);
+want('Double Up stops excluding the back extension and The Upgrade still does', swap('career/achievements.toml', 'exclude = ["back-extension-45", ', 'exclude = ['), 1, /The Upgrade and Double Up count the same lifts/);
+want('a quality dropped from coach.html\'s QM_IDS while The Upgrade lists it: the guard says what the seed refused', swap('coach.html', "const QM_IDS = ['strength','muscle',", "const QM_IDS = ['muscle',"), 2, /qualities 'strength' is not one of the Spine's qualities in coach\.html's QM_IDS/);
 
 console.log(bad ? '\n' + bad + ' mutation(s) NOT caught' : '\nthe guard catches every drift it is meant to');
 process.exit(bad ? 1 : 0);

@@ -26,7 +26,8 @@
 //                 its award never opens a second · 320 and 390 px, light and dark.
 //   training app  the Career row's two new lines · the finish card's moves (three lines and "+N more", never clay) · Counting bands at Done, confirmed (or taken away) by
 //                 the answer, only a DRAWN reward is marked seen and told, none from an old answer · moments (one per open, never from the cached answer, never over the
-//                 Welcome or the rating, the catch-up, the Grand Slam's line, demo and preview silent) · the session queue never waits on any of it.
+//                 Welcome or the rating, the catch-up, the Grand Slam's line, demo and preview silent) · the session queue never waits on any of it · Sessions with Amir on Home:
+//                 a plan day finished again in its week and not yet saved adds nothing, a new plan day adds 1 (GAME-4), older waiting records read from their parts.
 //   both apps     one reward, celebrated once: Proof's phone-decided milestone is told at its next answer and the training app opens silent (and the control without
 //                 the catch-up), and the other way round.
 // Serve the repo first (python -m http.server 8775 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
@@ -926,6 +927,106 @@ async function trainingCatalogue(browser, C) {
     const only = await s.p.evaluate(() => [...document.querySelectorAll('#hlwin-1 .hl-band')].map(b => b.tagName));
     C.check('training, no fresh answer yet: only the phone\'s own Counting bands (no Share), nothing confirmed', only.length === 2 && only.every(t => t === 'DIV'), JSON.stringify(only));
     await s.ctx.close();
+  }
+  // Sessions with Amir on Home counts the sessions career_facts_paid() pays: one per plan day per training week (GAME-4; D19, Claude's pick, waiting for Amir's word), like Century. Home adds +1 for a session
+  // finished on this phone that no answer has counted yet, and a plan day done again in its week adds nothing, or Home would say 25 while Century says 24. The save never answers
+  // here (stall), so every record stays waiting on the phone. The fixture's plan has two days; the cycle's week 2 is under way, so a session at(-1) is this training week's.
+  {
+    const sessionsOf = async p => {
+      const t = await p.evaluate(() => { const f = document.querySelector('#home-career-wrap .career-four'); return f ? f.textContent.replace(/\s+/g, ' ').trim() : null; });
+      const m = /(\d[\d,]*) sessions?/.exec(t || '');
+      return { text: t, n: m ? Number(m[1].replace(/,/g, '')) : null };
+    };
+    const earnOf = (p, d) => p.evaluate(([id, d]) => JSON.parse(localStorage.getItem(id + '_earn_d' + d) || 'null'), [H.ID, d]);
+    // a day ticked through, rated and finished (day-finish.js's way), then back on Home
+    const finishDay = async (p, d) => {
+      await p.evaluate(d => {
+        openDayView(d);
+        const t0 = Date.now() - 754000;
+        localStorage.setItem(timerKey(d), JSON.stringify({ running: true, resumeAt: t0, acc: 0, sessionStart: t0 }));
+        renderTimer(d);
+      }, d);
+      await p.waitForTimeout(250);
+      const n = await p.evaluate(d => document.querySelectorAll('#day' + d + ' .checklist-item').length, d);
+      for (let i = 0; i < n; i++) {
+        await p.evaluate(([i, d]) => {
+          const c = document.querySelectorAll('#day' + d + ' .checklist-item')[i];
+          if (c.classList.contains('collapsed')) toggleExpand(c);
+          if (!c.classList.contains('checked')) toggleCheckOnly(c, d);
+        }, [i, d]);
+        await p.waitForTimeout(100);
+      }
+      await p.evaluate(() => hideAaToast());
+      await p.waitForTimeout(700);
+      await p.evaluate(d => document.querySelector('#confirm-' + d + ' .complete-rpe-btn[data-rpe="7"]').click(), d);
+      await p.waitForTimeout(200);
+      await p.evaluate(d => finishTap(d, document.querySelector('#confirm-' + d + ' .confirm-btn')), d);
+      await p.waitForTimeout(500);
+      await p.evaluate(() => closeDayView());
+      await p.waitForTimeout(400);
+    };
+    const STALL = { stall: { save_session: true } };
+    // 1. Day 1 was trained yesterday: finishing it again this week adds nothing; Day 2 is a new plan day and adds 1
+    {
+      const { ctx, p } = await openRW(browser, { hist: [{ completed_on: at(-1), day: '1', readiness: 4, log: [] }], stub: STALL });
+      await waitRow(p);
+      const s0 = await sessionsOf(p);
+      C.check('training, Sessions with Amir: the profile\'s number before anything is finished (24)', s0.n === 24, JSON.stringify(s0));
+      await finishDay(p, '1');
+      const s1 = await sessionsOf(p), r1 = await earnOf(p, '1');
+      C.check('training, Sessions with Amir: Day 1 finished again in its week, not yet saved, leaves the cell as it was (24)', s1.n === 24 && s1.text === s0.text && r1 && !r1.saved, JSON.stringify({ s1, r1: r1 && { saved: r1.saved, repeat: r1.repeat } }));
+      C.check('training, Sessions with Amir: the repeat is on the record (repeat true, paid 0) and its parts have no session', r1 && r1.repeat === true && r1.paid === 0 && !(r1.parts || []).some(x => x.k === 'session' || x.k === 'early'), JSON.stringify(r1 && { repeat: r1.repeat, paid: r1.paid, parts: r1.parts }));
+      await finishDay(p, '2');
+      const s2 = await sessionsOf(p), r2 = await earnOf(p, '2');
+      C.check('training, Sessions with Amir: Day 2, a new plan day, not yet saved, adds 1 (25)', s2.n === 25 && !r2.saved, JSON.stringify({ s2, r2: r2 && { saved: r2.saved, repeat: r2.repeat } }));
+      C.check('training, Sessions with Amir: the new day\'s record says repeat false, paid 1, and carries its session part', r2 && r2.repeat === false && r2.paid === 1 && r2.parts.some(x => x.k === 'session'), JSON.stringify(r2 && { repeat: r2.repeat, paid: r2.paid, parts: r2.parts }));
+      await shot(p, 'p3-train-sessions-cell.png');
+      C.check('training, Sessions with Amir: the session was never saved here (the stall), no page errors', (await p.evaluate(() => (window.__STUB.params || []).filter(x => x[0] === 'save_session').length)) >= 1 && !p.errs.length, JSON.stringify(p.errs));
+      await ctx.close();
+    }
+    // 1b. a Day 1 session is waiting for an answer (finished on this phone, the history already lists Day 1 this week): finishing Day 1 AGAIN before an answer has counted that
+    // session must not take its +1 away. The key of the record is the plan day, so the repeat's record replaces the waiting one and carries it in `paid`.
+    {
+      const waiting = { t: new Date().toISOString(), xp: 450, parts: [{ k: 'session', xp: 400 }, { k: 'log', xp: 50 }], before: 10000, saved: 0, repeat: false, paid: 1 };
+      const { ctx, p } = await openRW(browser, { hist: [{ completed_on: at(-1), day: '1', readiness: 4, log: [] }], stub: STALL, seed: { _earn_d1: waiting } });
+      await waitRow(p);
+      const s0 = await sessionsOf(p);
+      C.check('training, Sessions with Amir: a Day 1 session waiting for an answer shows as +1 (25)', s0.n === 25, JSON.stringify(s0));
+      await finishDay(p, '1');
+      const s1 = await sessionsOf(p), r1 = await earnOf(p, '1');
+      C.check('training, Sessions with Amir: Day 1 finished again before an answer counted the first leaves the cell at 25, and the repeat\'s record carries the waiting session (repeat true, paid 1)',
+        s1.n === 25 && s1.text === s0.text && r1 && r1.repeat === true && r1.paid === 1 && !r1.saved, JSON.stringify({ s1, r1: r1 && { saved: r1.saved, repeat: r1.repeat, paid: r1.paid } }));
+      await finishDay(p, '2');
+      const s2 = await sessionsOf(p), r2 = await earnOf(p, '2');
+      C.check('training, Sessions with Amir: Day 2, a new plan day, then adds 1 more (26)', s2.n === 26 && r2 && r2.paid === 1, JSON.stringify({ s2, paid: r2 && r2.paid }));
+      C.check('training, Sessions with Amir: no page errors in the repeat-over-a-waiting-session run', !p.errs.length, JSON.stringify(p.errs));
+      await ctx.close();
+    }
+    // 2. nothing done this week: Day 1 is a new plan day and adds 1
+    {
+      const { ctx, p } = await openRW(browser, { stub: STALL });
+      await waitRow(p);
+      await finishDay(p, '1');
+      const s = await sessionsOf(p), r = await earnOf(p, '1');
+      C.check('training, Sessions with Amir: Day 1 finished with nothing done this week adds 1 (25), the record says repeat false', s.n === 25 && r && r.repeat === false, JSON.stringify({ s, repeat: r && r.repeat }));
+      await ctx.close();
+    }
+    // 3. records written before the flag existed (the app as of the last release), waiting on the phone: read from their parts
+    {
+      const rec = parts => ({ t: new Date().toISOString(), xp: parts.reduce((a, x) => a + x.xp, 0), parts, before: 10000, saved: 0 });
+      const { ctx, p } = await openRW(browser, { seed: {
+        _earn_d1: rec([{ k: 'log', xp: 50 }, { k: 'checkin', xp: 20 }]),                       // a repeat: no session part
+        _earn_d2: rec([{ k: 'session', xp: 400 }, { k: 'log', xp: 50 }]) } });                  // a paid session
+      await waitRow(p);
+      const s = await sessionsOf(p);
+      C.check('training, Sessions with Amir: an older waiting record with no session part adds nothing, one with a session part adds 1 (25)', s.n === 25, JSON.stringify(s));
+      await ctx.close();
+      const q = await openRW(browser, { seed: { _earn_d1: rec([{ k: 'log', xp: 50 }]), _earn_d2: rec([{ k: 'checkin', xp: 20 }]) } });
+      await waitRow(q.p);
+      const s2 = await sessionsOf(q.p);
+      C.check('training, Sessions with Amir: two older repeats waiting leave the cell as the profile has it (24)', s2.n === 24, JSON.stringify(s2));
+      await q.ctx.close();
+    }
   }
   // an award the other app has already told is owned but no longer waiting, and the core carries no `recent` (that is the shelf's, which this app does not read): there is no
   // spec to confirm the phone's Counting band with. The band goes (it is never left "Counting"), and nothing throws or is marked seen or told for it.

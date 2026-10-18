@@ -51,16 +51,18 @@ Durable context for working in this repo. Read the linked docs before diving in.
   level is the career level (never resets; the road's titles, the board's level and coach.html's follow it), the board ranks season
   points from the facts through a cache (`career_scores`, a cache holding no source: `coach_erase_person()` empties it, and it is in `BACKUP_TABLES` and the snapshot),
   and nobody's level goes down (`[fact.level_kept]`, written once by the seed that turns it on; `career_seed.py --dry-run` shows the
-  list first). Both apps read `get_profile()` only once it is on; it went on at the real switch (2026-10-18, rulebook version 3: 31 athletes up, 7 the same, nobody down, no level kept). Phase 3, the catalogue switch, is next, not started. The phones copy three of its
+  list first). Both apps read `get_profile()` only once it is on; it went on at the real switch (2026-10-18, rulebook version 3: 31 athletes up, 7 the same, nobody down, no level kept). Phase 3, the catalogue switch, follows below. The phones copy three of its
   rules (the career's curve, WORKOUT at 0, a session's full log and check-in): `scripts/check_twins.js` §9 holds them to
   `scripts/career/xp_cases.json`, the server's answers, which `node scripts/career/rehearse_switch.mjs --backup <file>` writes
-  (`--write-cases`) and checks (42 checks on the real rows); `scripts/headless/career.js` drives both apps. The way back is
+  (`--write-cases`) and checks (49 checks on the real rows); `scripts/headless/career.js` drives both apps. The way back is
   `scripts/career/rollback_stage69.sql`, on Amir's word only.
-  **Phase 3, rewards with meanings and the catalogue switch, is built and rehearsed (2026-10-18), not applied, switch off**
+  **Phase 3, rewards with meanings and the catalogue switch, is built, rehearsed and applied to the live project (2026-10-18), switch off**
   (`supabase/stage70_career_rewards.sql`; `PROCEDURES.md` → *Phase 3, as built*; Amir's go-day answers D1, D10, D11 are open). Pointers only:
-  `career_awards` and `career_recognition` go into `BACKUP_TABLES`, the snapshot and `coach_erase_person()` with the stage's apply (rollout step 2);
+  `career_awards` and `career_recognition` are in `BACKUP_TABLES`, the snapshot and `coach_erase_person()` (rollout step 2, in the phase 3 commit);
   **no trigger runs `career_evaluate()` on a DELETE**; the evaluate budget is asserted by `rehearse_catalogue.mjs`; a badge's tiers are append-only
   (`career/tiers.lock.json`); the phones' reward copies are held to `scripts/career/reward_cases.json` by `check_twins.js` §10.
+  **A fix, stage73, is built and rehearsed (249 of 249), not applied** (`supabase/stage73_career_main_lifts.sql`; it applies after the weight units' stages 71 and 72, which are live, and its first statement refuses otherwise; its way back is `scripts/career/rollback_stage73.sql`, never `rollback_stage71.sql`, and before `rollback_stage72.sql` if that is ever run; The Upgrade and Double Up count main lifts only, D18, Amir's word: a main lift is a Spine entry on one of the seven main patterns with the strength tag, minus the four accessories he named (`patterns`, `qualities` and `exclude` in the toml; a face pull, a reverse fly, a back extension and a straight-arm pulldown are out; a lift in pounds or plates counts in its own measure), and the list fails closed on a missing id, so the four ids must keep a row in the Spine for as long as the rule stands: one deleted or given a new id, or a typo in the toml's list, switches both rewards off for everyone, with a warning in the database log, until it is put right, and one taken back to draft does not (check them at the apply, `PROCEDURES.md` → *Stage 73* → *To apply*);
+  Century and Home's Sessions with Amir count paid sessions, D19, Claude's pick waiting for his word; a no to D19 comes out alone, `PROCEDURES.md` → *Stage 73* → *If D19 is a no*): it goes on before the catalogue switch, on Amir's yes, and the switch's go-day opens by checking that it is on (`PROCEDURES.md` → *The go-day*).
 - `FARSI-PRODUCTS.md` — the paid course app (`/tennis/app/`), the testing app's page and the Farsi
   product pages: how they are built, deployed and introduced.
 - `PROGRAM-APP.md` — the athlete app's programme features in full (rx, week notes, the Spine, the Quality
@@ -359,7 +361,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   session queue and the progress go up first, then nothing more is pushed, then `signOutAthlete()`. The athlete's
   keys stay on the phone. Never offered in the demo or the coach preview. AA Proof's Settings has the same.
 - **The signed-out login screen is the one screen Amir never sees, so test it** (2026-10-11: for hours every button on it did
-  nothing and Pooya could not sign in). With no session `boot()` reaches `showSignIn()` synchronously, while the script is still
+  nothing and an athlete could not sign in). With no session `boot()` reaches `showSignIn()` synchronously, while the script is still
   being evaluated, so anything `showSignIn()` reads must be a function, a `window.*` value set in the head, or a `const` declared
   ABOVE `boot()` (`COACH_WHATSAPP` was below it and sat in its temporal dead zone). The form is painted by an inline script, so a
   throw looks like a working screen. Run `node scripts/headless/signin.js` after any change near sign-in; it taps every button on program.html and habits.html, with the Supabase library loading, never loading, failing once and arriving late (`_sbForSignIn()` is the sign-in's door to it; the copy in each app moves together).
@@ -507,7 +509,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (117 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (121 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **The UX pass (2026-10-12; Amir's answers in memory `coach-redesign-2026-10-12`)**, round 1 shipped: Today puts Needs you first and wide,
   each row's button names what it does, and **"Also waiting"** (applications, logins to send, backup, older notes) is NOT a reason, so it never
   touches `reasonsOf()` or the people count. The roster is one aligned table (Athlete · Cycle · Last session · Proof · Why); the athlete header

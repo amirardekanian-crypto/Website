@@ -303,7 +303,8 @@
 // v172: program.html changed (2026-10-18): the guide says a bank shot off the glass counts 2 (a clip near the goal counts 1).
 // v173: program.html changed (2026-10-18): the unit button over the weight boxes (kg, lb or plates), and a build-up of weights no longer asks "far above your numbers" at every heavier set.
 // v174: program.html and assets/js/sharecard.js changed (2026-10-18): a Personal Record, a win and a share card are kept in their own measure (kg, lb or plates), isolation lifts file no record, circuits get the unit button, Log a max has one.
-const CACHE = 'aap-v174';
+// v175: program.html changed (2026-10-18, Career Mode phase 3, the main-lifts fix): a plan day done again in its week moves no session count (Century) and adds nothing to Home's Sessions with Amir, shipped dormant behind the catalogue switch (off): nothing an athlete sees moves until it is on.
+const CACHE = 'aap-v175';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -576,7 +576,7 @@ S['no-program-file-button'] = async (b) => {
 // Tables that were each missing from the backup once with nothing erroring (CLAUDE.md, "A table added to the public schema goes
 // into BACKUP_TABLES the same day"): they must stay on it.
 const MUST_BE_BACKED_UP = ['exercises', 'exercise_coach', 'qualities', 'coaching_log_versions', 'spine_versions', 'hab_season_results',
-  'assess_players', 'assess_notes', 'assess_results', 'buyer_notes', 'erasure_log', 'athlete_status'];
+  'assess_players', 'assess_notes', 'assess_results', 'buyer_notes', 'erasure_log', 'athlete_status', 'career_awards', 'career_recognition'];
 async function takeBackup(page, tag) {
   await L.go(page, 'athletes');
   const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 30000 }), (async () => { await openTools(page); await page.locator('details.tools button', { hasText: 'Backup' }).click(); })()]);

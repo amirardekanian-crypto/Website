@@ -64,6 +64,13 @@ insert into public.career_catalogue (kind, id, body, version, loaded_at) values
 insert into public.career_scores (athlete_id, stamp, score, updated_at) values
   ('ava_test', 'made-up stamp', '{"career": {"xp": 1200, "level": 3, "rank": "ROOKIE 3"}, "season": {"points": 400}, "week": {"points": 0}}', '2026-10-17 09:00:00+00'),
   ('gone_test', 'made-up stamp', '{"career": {"xp": 50, "level": 1, "rank": "ROOKIE 1"}}', '2026-10-17 09:00:00+00');
+-- Career Mode's rewards and the moments told (stage70): a person's own, so backed up and erased like the rest
+insert into public.career_awards (athlete_id, award_id, kind, item, tier, subject, day, pays, xp, size, meaning, evidence, how, rules_version, created_at) values
+  ('ava_test', 'badge:held_weeks:1', 'badge', 'held_weeks', 1, '', '2026-10-12', true, 200, 'highlight', 'consistency', '{"facts": ["week_held|c1|w4"]}', 'live', 1, '2026-10-17 09:00:00+00'),
+  ('gone_test', 'achievement:first_best', 'achievement', 'first_best', null, '', '2026-10-10', true, 100, 'highlight', 'progress', '{}', 'baseline', 1, '2026-10-17 09:00:00+00');
+insert into public.career_recognition (athlete_id, award_id, audience, size, due_at, told_at, told_by, created_at) values
+  ('ava_test', 'badge:held_weeks:1', 'athlete', 'highlight', '2026-10-17 09:00:00+00', '2026-10-17 10:00:00+00', 'proof', '2026-10-17 09:00:00+00'),
+  ('gone_test', 'achievement:first_best', 'athlete', 'highlight', '2026-10-17 09:00:00+00', null, null, '2026-10-17 09:00:00+00');
 
 -- ── the programmes and what hangs off an athlete ──────────────────────────────────────────────────────────────────────────
 insert into public.programs (athlete_id, data, updated_at, updated_by) values

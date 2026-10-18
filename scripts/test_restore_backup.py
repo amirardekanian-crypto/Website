@@ -146,7 +146,7 @@ check('1c: digits9 folds Persian and Arabic-Indic digits and keeps the last nine
       rb.digits9('۰۹۱۲ ۰۰۰ ۰۰۰۱') == '120000001' and rb.digits9('+98 912 000 0001') == '120000001' and rb.digits9('٠٩١٢٠٠٠٠٠٠١') == '120000001' and rb.digits9('12345') is None and rb.digits9(None) is None)
 schema_sql = open(SCHEMA, encoding='utf-8').read()
 cols = rb.snapshot_tables(schema_sql)
-check('1d: the snapshot parser finds the 46 tables and their columns', len(cols) == 46 and 'athlete_id' in cols['programs'] and 'steps' in cols['exercises'], len(cols))
+check('1d: the snapshot parser finds the 48 tables and their columns (46 + career_awards, career_recognition, stage70)', len(cols) == 48 and 'athlete_id' in cols['programs'] and 'steps' in cols['exercises'], len(cols))
 html = open(os.path.join(ROOT, 'coach.html'), encoding='utf-8').read()
 listed = re.findall(r"'([a-z_]+)'", re.search(r"const BACKUP_TABLES = \[([\s\S]*?)\];", html).group(1))
 check('1h: coach.html BACKUP_TABLES lists every table of the schema snapshot except the two key-hash tables, and nothing else (a new table goes in both)',
@@ -173,6 +173,10 @@ _, f_ = run({**base, 'career_rules': [{'version': 1, 'rules': {'version': 1}, 's
 tens = sorted(f for f in f_ if f.startswith('10-'))
 check('2e: the Career Mode rulebook is restored after every other table, so its triggers stay quiet until every row is back (stage66)',
       len(tens) == 3 and tens[-1].endswith('-career_rules.sql'), tens)
+erase_list = re.search(r"c_athlete_tables constant text\[\] := array\[([\s\S]*?)\];", schema_sql)
+erased = re.findall(r"'([a-z_]+)'", erase_list.group(1)) if erase_list else []
+check('2f: the Career Mode awards and recognition are in BACKUP_TABLES, the snapshot and the coach_erase_person() list (stage70)',
+      all(t in listed and t in cols and t in erased for t in ('career_awards', 'career_recognition')), (sorted(set(('career_awards', 'career_recognition')) - set(listed)), erased[-4:]))
 def one_do(text):
     try:
         s = sql_statements(text)

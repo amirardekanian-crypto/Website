@@ -1387,6 +1387,7 @@ const TABLE_KEYS = {
   assess_content: ['key'], tps_content: ['key'], tps_accounts: ['user_id'], athlete_identities: ['user_id'],
   library: ['slug'], buyer_notes: ['user_id'],
   career_facts: ['athlete_id', 'kind', 'ref'], career_rules: ['version'], career_catalogue: ['kind', 'id'],
+  career_awards: ['athlete_id', 'award_id'], career_recognition: ['athlete_id', 'award_id', 'audience'],
 };
 function keysOf(table) {
   return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys', 'athlete_status', 'career_scores']
@@ -2098,7 +2099,7 @@ window.bulkCreateLogins = bulkCreateLogins;
 const BACKUP_TABLES = [
   'programs', 'program_versions', 'coaching_logs', 'athlete_identities',
   'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
-  'career_facts', 'career_rules', 'career_catalogue', 'career_scores',
+  'career_facts', 'career_rules', 'career_catalogue', 'career_scores', 'career_awards', 'career_recognition',
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
   'library', 'library_categories', 'library_sessions',
