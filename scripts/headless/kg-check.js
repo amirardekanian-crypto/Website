@@ -43,14 +43,14 @@ const state = p => p.evaluate(() => {
     const c = await state(p);
     C.check('the same weight (filled down) never asks again on that card', c.sets.split(' ')[1] === '600✓' && !/far above/.test(c.toast), JSON.stringify(c));
     // a typo fixed before the second tap: the fix is what gets ticked, nothing asks
-    await p.fill(`${row(2)} .ex-set-weight`, '850');
+    await p.fill(`${row(2)} .ex-set-weight`, '1000');   // the kept 600 is "your numbers" now: 1.5 × 600 = 900
     await p.click(`${row(2)} .ex-set-check`); await p.waitForTimeout(200);
     const d1 = await state(p);
     await p.waitForTimeout(4300);   // the arm runs out
     await p.fill(`${row(2)} .ex-set-weight`, '85');
     await p.click(`${row(2)} .ex-set-check`); await p.waitForTimeout(250);
     const d = await state(p);
-    C.check('a typo fixed instead of the second tap: 85 ticks at once and the arm has run out', d1.armed && /850 kg\?/.test(d1.toast) && d.sets.split(' ')[2] === '85✓' && !d.armed, JSON.stringify([d1, d]));
+    C.check('a typo fixed instead of the second tap: 85 ticks at once and the arm has run out', d1.armed && /1000 kg\?/.test(d1.toast) && d.sets.split(' ')[2] === '85✓' && !d.armed, JSON.stringify([d1, d]));
     C.check('no page errors (the list)', !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -71,10 +71,10 @@ const state = p => p.evaluate(() => {
     await p.fill(`${row(0)} .ex-set-weight`, '250');
     await p.click(`${row(0)} .ex-set-check`); await p.waitForTimeout(250);
     const a = await state(p);
-    await p.fill(`${row(1)} .ex-set-weight`, '350');
+    await p.fill(`${row(1)} .ex-set-weight`, '400');   // over 1.5 × the 250 just ticked
     await p.click(`${row(1)} .ex-set-check`); await p.waitForTimeout(250);
     const b = await state(p);
-    C.check('no numbers yet: 250 ticks at once, 350 (over 300) asks', a.sets.split(' ')[0] === '250✓' && !/far above/.test(a.toast) && !/✓/.test(b.sets.split(' ')[1]) && b.armed, JSON.stringify([a, b]));
+    C.check('no numbers yet: 250 ticks at once, then 400 (over 1.5 × the 250 just ticked) asks', a.sets.split(' ')[0] === '250✓' && !/far above/.test(a.toast) && !/✓/.test(b.sets.split(' ')[1]) && b.armed, JSON.stringify([a, b]));
     await ctx.close();
   }
 
@@ -88,7 +88,56 @@ const state = p => p.evaluate(() => {
     await p.locator(`${row(0)} .ex-set-weight`).blur(); await p.waitForTimeout(250);
     const a = await state(p);
     C.check('600 typed into a ticked set: the note box says to fix it if it is a typo, and the set stays as typed', a.sets.split(' ')[0] === '600✓'
-      && /600 kg\? That's far above your numbers for this lift\. If it's a typo, fix it in the kg box\./.test(a.toast), JSON.stringify(a));
+      && /600 kg\? That's far above your numbers for this lift\. If it's a typo, fix it in the weight box\./.test(a.toast), JSON.stringify(a));
+    await ctx.close();
+  }
+
+  // ── 3b. A build-up asks once (Amir, 2026-10-18: "it asks this question but warns you twice, I thought it's a bug") ──
+  // 120 · 140 · 160 · 180 on a lift last done at 50: 120 is over 1.5 × 50 and asks; once it is kept (and ticked), 140 is measured against
+  // the 120 just ticked, 160 against the 140, and none of them asks. It used to ask again at every heavier set.
+  {
+    const LW50 = LW.map(s => Object.assign({}, s, { lw: '50' }));
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), seed: { _setlog_Barbell_Back_Squat: LW50 }, stub: { library: H.library() } });
+    await openSquat(p);
+    const seen = [];
+    for (const [i, w] of [[0, '120'], [1, '140'], [2, '160'], [3, '180']]) {
+      await p.fill(`${row(i)} .ex-set-weight`, w);
+      await p.click(`${row(i)} .ex-set-check`); await p.waitForTimeout(250);
+      let a = await state(p);
+      const asked = a.armed;
+      if (asked) { await p.click(`${row(i)} .ex-set-check`); await p.waitForTimeout(250); a = await state(p); }
+      seen.push(w + (asked ? ' asked' : ' ticked') + (a.sets.split(' ')[i].endsWith('✓') ? '' : ' NOT TICKED'));
+    }
+    C.check('a ramp 120 · 140 · 160 · 180 on a lift last done at 50 asks once, at 120; 140, 160 and 180 tick at once',
+      seen.join(' | ') === '120 asked | 140 ticked | 160 ticked | 180 ticked', seen.join(' | '));
+    C.check('no page errors (the ramp)', !p.errs.length, JSON.stringify(p.errs));
+    await ctx.close();
+  }
+
+  // ── 3c. Pounds are compared as kilograms, plates are never "far above" anything ──
+  const sets = p => p.evaluate(() => loadSetLog('Barbell Back Squat', 4, '1').map(s => ({ w: s.w, d: !!s.d })));
+  {
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), seed: { _setlog_Barbell_Back_Squat: LW }, stub: { library: H.library() } });
+    await openSquat(p);
+    await p.click(`#sq .ex-set-unit`); await p.waitForTimeout(150);          // kg -> lb
+    await p.fill(`${row(0)} .ex-set-weight`, '300');                         // 300 lb = 136 kg, over 1.5 × 80
+    await p.click(`${row(0)} .ex-set-check`); await p.waitForTimeout(250);
+    const a = await state(p);
+    C.check('300 lb on a lift last done at 80 kg (136 kg) asks, and says pounds', a.armed && /^CHECK THE WEIGHT 300 lb\? /.test(a.toast), JSON.stringify(a));
+    await p.fill(`${row(0)} .ex-set-weight`, '100');                         // 100 lb = 45 kg: nothing to ask
+    await p.click(`${row(0)} .ex-set-check`); await p.waitForTimeout(250);
+    const b = await sets(p);
+    C.check('100 lb (45 kg) ticks at once and is saved as "100 lb"', b[0].w === '100 lb' && b[0].d, JSON.stringify(b));
+    await ctx.close();
+  }
+  {
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), seed: { _setlog_Barbell_Back_Squat: LW }, stub: { library: H.library() } });
+    await openSquat(p);
+    await p.click(`#sq .ex-set-unit`); await p.click(`#sq .ex-set-unit`); await p.waitForTimeout(150);   // kg -> lb -> plates
+    await p.fill(`${row(0)} .ex-set-weight`, '600');
+    await p.click(`${row(0)} .ex-set-check`); await p.waitForTimeout(250);
+    const c = await sets(p), t = await state(p);
+    C.check('600 plates is no load: it ticks at once, nothing asks, and it is saved as "600 plates"', c[0].w === '600 plates' && c[0].d && !t.armed && !/far above/.test(t.toast), JSON.stringify([c, t]));
     await ctx.close();
   }
 

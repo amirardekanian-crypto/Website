@@ -31,12 +31,16 @@ order by h.completed_on, h.day;
 -- Reads session_history.log (stage30, 2026-09-24 on) and falls back to parsing the summary
 -- text for older rows ("Set 2: 80 ×5 @8 ✓"; ✓ ticked, · logged not ticked). Persian digits
 -- are normalised. Only exercises with at least one weight typed are returned.
+-- ⚠ A weight carries its unit (2026-10-18): a bare number is kg, "45 lb" is pounds and "6 plates" is the count on a
+-- machine's stack. `units` says which. Never compare or add numbers across units, and a plates number is a position on a
+-- stack, never a load (5 → 6 plates is a step up on that machine, not 1 kg).
 with params as (select 'ATHLETE_ID'::text id, date 'START' - 3 s, date 'END' e),
 s as (select h.completed_on, h.day, h.summary, h.log from public.session_history h, params
       where h.athlete_id = params.id and h.completed_on between params.s and params.e and h.hidden_at is null),
 from_log as (
   select s.completed_on, s.day, e->>'block' block, e->>'ex' ex, st.ord::int set_no,
          substring(translate(st.v->>'w', '۰۱۲۳۴۵۶۷۸۹٫', '0123456789.') from '[0-9]+(?:[.,][0-9]+)?') w,
+         case when st.v->>'w' ~* '[0-9]\s*(lbs?|pounds?)([^a-z]|$)' then 'lb' when st.v->>'w' ~* '[0-9]\s*plates?([^a-z]|$)' then 'plates' else 'kg' end unit,
          nullif(st.v->>'n', '') reps, nullif(st.v->>'r', '') rpe, coalesce((st.v->>'d')::boolean, false) ticked
   from s, jsonb_array_elements(s.log) e,
        jsonb_array_elements(coalesce(e->'sets', '[]'::jsonb)) with ordinality st(v, ord)
@@ -55,6 +59,8 @@ from_text as (
          regexp_replace(x.line, '^•\s*(.*?)\s*(\([^()]*\))?\s*$', '\1') ex,
          substring(t.line from 'Set (\d+):')::int set_no,
          substring(t.line from 'Set \d+:\s*([0-9]+(?:[.,][0-9]+)?)') w,
+         case when t.line ~* 'Set \d+:\s*[0-9]+(?:[.,][0-9]+)?\s*(lbs?|pounds?)([^a-z]|$)' then 'lb'
+              when t.line ~* 'Set \d+:\s*[0-9]+(?:[.,][0-9]+)?\s*plates?([^a-z]|$)' then 'plates' else 'kg' end unit,
          substring(t.line from '×\s*([0-9]+)') reps,
          substring(t.line from '@\s*([0-9]+(?:\.[0-9])?)') rpe,
          t.line ~ '✓\s*$' ticked
@@ -67,6 +73,7 @@ sets as (select *, replace(w, ',', '.')::numeric wn
 ranked as (select *, max(wn) over (partition by completed_on, day, ex) top from sets)
 select completed_on, day, block, ex,
        string_agg(coalesce(w, '–'), ' / ' order by set_no) weights,
+       string_agg(distinct unit, '/') filter (where w is not null) units,   -- kg, lb or plates (2026-10-18): the numbers above are in THIS unit
        max(top) top,
        count(*) filter (where wn = top) sets_at_top,
        count(*) n_sets,

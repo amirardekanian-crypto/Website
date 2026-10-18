@@ -55,7 +55,7 @@ vm.runInContext([
   // A finished day's own copy (closeSessionAtDone(), 2026-10-13): buildSessionData() reads it first. None is stored here.
   slice(prog, 'program.html', 'function doneLogKey(day) {', 'function loadSetLog('),
   slice(prog, 'program.html', 'function normDigits(v) {', 'const ONE_RM_MAX_EFFECTIVE'),   // ends on code, not a comment a docs pass may reword
-  slice(prog, 'program.html', 'function parseLoggedKg(v) {', '// The set that produces the HIGHEST'),
+  slice(prog, 'program.html', '// ── THE UNIT A WEIGHT IS IN', '// The set that produces the HIGHEST'),   // weightOf(), splitW(), composeW(), weightText(), parseLoggedKg()
   slice(prog, 'program.html', 'function buildSessionData(day) {', '// Saves a permanent session record'),
   slice(prog, 'program.html', 'function parseSetText(t) {', 'function histFromRows('),
 ].join('\n'), P);
@@ -65,7 +65,7 @@ const C = {};
 vm.createContext(C);
 vm.runInContext([
   slice(coach, 'coach.html', 'function parseSetLine(rest) {', 'function normEx('),
-  slice(coach, 'coach.html', 'function loadSummary(sets) {', '// One prescribed exercise against its log line.'),
+  slice(coach, 'coach.html', 'function wUnitOf(w) {', '// One prescribed exercise against its log line.'),   // wUnitOf(), loadSummary()
 ].join('\n'), C);
 
 /* ── fixtures: one exercise per case, its sets as the phone stores them ───── */
@@ -100,6 +100,10 @@ const CASES = [
   { name: 'distance dose: no reps', rx: { sets: 2, distance: '20m' },
     sets: [S('2×24', null, 7, 1), S('', null, null, 0)],
     want: [W('2×24', null, '7', true), null] },
+  // The unit is written in the weight (2026-10-18): "45 lb", "6 plates", a pair "2×20 lb". Both readers hand it back untouched.
+  { name: 'pounds, a pair in pounds and plates', rx: { sets: 4, reps: 8, rpe: 7 },
+    sets: [S('45 lb', null, 7, 1), S('2×20 lb', 6, 8, 1), S('6 plates', null, null, 1), S('1 plate', 10, 9, 1)],
+    want: [W('45 lb', 8, '7', true), W('2×20 lb', 6, '8', true), W('6 plates', 8, '', true), W('1 plate', 10, '9', true)] },
 ];
 
 let fails = 0, passes = 0;
@@ -170,12 +174,48 @@ console.log('2 · readers agree on hand-written lines (older sessions)');
 console.log('3 · a weight as a number');
 const kg = vm.runInContext('parseLoggedKg', P);
 [['80', 80], ['62,5', 62.5], ['۲۵', 25], ['2×20', 20], ['2x22.5', 22.5], ['2 x 20kg', 20],
- ['20x2', 20], ['BW', null], ['', null], ['24kg', 24]].forEach(([v, want]) =>
+ ['20x2', 20], ['BW', null], ['', null], ['24kg', 24],
+ // pounds are read as kilograms to two places, plates are no weight at all
+ ['45 lb', 20.41], ['45lb', 20.41], ['135 lbs', 61.23], ['2×20 lb', 9.07], ['۴۵ lb', 20.41], ['0 lb', null],
+ ['6 plates', null], ['1 plate', null], ['6plates', null]].forEach(([v, want]) =>
   say(kg(v) === want, 'parseLoggedKg("' + v + '") = ' + want, 'got ' + kg(v)));
 const ls = ws => C.loadSummary(ws.map(w => ({ w })));
 [[['2×20', '2×20'], '2×20 · 2×20'], [['80', '85'], '80 → 85'], [['24kg', '24kg'], '24'],
- [['0', '0'], ''], [['BW+10'], 'BW+10']].forEach(([ws, want]) =>
+ [['0', '0'], ''], [['BW+10'], 'BW+10'],
+ [['45 lb', '50 lb'], '45 → 50 lb'], [['50 lb', '45 lb'], '50 → 45 lb'], [['45 lb', '45 lb'], '45 lb'],
+ [['6 plates', '7 plates'], '6 → 7 plates'], [['1 plate', '1 plate'], '1 plate'],
+ [['45 lb', '20'], '45 lb · 20'], [['6 plates', '45 lb'], '6 plates · 45 lb'], [['2×20 lb', '2×20 lb'], '2×20 lb · 2×20 lb']].forEach(([ws, want]) =>
   say(ls(ws) === want, 'loadSummary(' + JSON.stringify(ws) + ') = "' + want + '"', 'got "' + ls(ws) + '"'));
+
+console.log('4 · the unit is written in the weight, and read back out');
+const wOf = vm.runInContext('weightOf', P), sp = vm.runInContext('splitW', P), cw = vm.runInContext('composeW', P), wt = vm.runInContext('weightText', P);
+[['45 lb', 45, 'lb'], ['45lb', 45, 'lb'], ['2×20 lb', 20, 'lb'], ['6 plates', 6, 'plates'], ['1 plate', 1, 'plates'], ['60kg', 60, 'kg'], ['80', 80, 'kg'],
+ ['BW', null, 'kg'], ['', null, 'kg'], ['45 lbx', 45, 'kg']].forEach(([v, n, u]) => {
+  const g = wOf(v);
+  say(g.n === n && g.unit === u, 'weightOf("' + v + '") = ' + n + ' ' + u, 'got ' + JSON.stringify(g));
+});
+[['45 lb', '45', 'lb'], ['6 plates', '6', 'plates'], ['1 plate', '1', 'plates'], ['2×20 lb', '2×20', 'lb'], ['80', '80', null], ['60kg', '60kg', null],
+ ['', '', null]].forEach(([v, num, u]) => {
+  const g = sp(v);
+  say(g.num === num && g.unit === u, 'splitW("' + v + '") = ' + num + ' ' + u, 'got ' + JSON.stringify(g));
+});
+[['45', 'lb', '45 lb'], ['6', 'plates', '6 plates'], ['1', 'plates', '1 plate'], ['2×20', 'lb', '2×20 lb'], ['80', 'kg', '80'], ['80', null, '80'],
+ ['', 'lb', ''], ['BW+10', 'lb', 'BW+10']].forEach(([n, u, want]) =>
+  say(cw(n, u) === want, 'composeW("' + n + '", ' + u + ') = "' + want + '"', 'got "' + cw(n, u) + '"'));
+[['160', '160 kg'], ['60kg', '60kg'], ['45 lb', '45 lb'], ['6 plates', '6 plates']].forEach(([v, want]) =>
+  say(wt(v) === want, 'weightText("' + v + '") = "' + want + '"', 'got "' + wt(v) + '"'));
+// Where the dashboard reads a weight's unit at all (wUnitOf(): a whole number and an optional unit), it reads the app's number and unit.
+['45 lb', '45lb', '45 LBS', '6 plates', '1 plate', '5 Plates', '60kg', '24 KG', '80', '62,5', '45 pounds'].forEach(v => {
+  const c = C.wUnitOf(v), a = wOf(v);
+  say(c && c.n === a.n && c.unit === a.unit, 'coach.html wUnitOf("' + v + '") agrees with weightOf()', JSON.stringify([c, a]));
+});
+['2×20', 'BW+10', 'red band', '45 lbx'].forEach(v =>
+  say(C.wUnitOf(v) === null, 'coach.html wUnitOf("' + v + '") is no number (printed as typed)', JSON.stringify(C.wUnitOf(v))));
+// What a phone stores and what it reads back must be one thing: compose, split, compose again changes nothing.
+['45 lb', '6 plates', '1 plate', '2×20 lb', '80'].forEach(v => {
+  const s = sp(v), u = s.unit || 'kg';
+  say(cw(s.num, u) === v, 'composeW(splitW("' + v + '")) is "' + v + '"', 'got "' + cw(s.num, u) + '"');
+});
 
 console.log('  ' + passes + ' checks');
 if (fails) { console.log('\ncheck_setlog: ' + fails + ' FAILED'); process.exit(1); }

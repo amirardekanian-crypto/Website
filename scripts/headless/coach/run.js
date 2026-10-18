@@ -5411,6 +5411,29 @@ S['leads-chats-gaps'] = async (b) => {
   return r;
 };
 
+// A weight carries its unit (2026-10-18; program.html, "THE UNIT A WEIGHT IS IN"): a set typed in pounds or plates is shown as typed, and
+// the load column says the unit, so a pounds athlete is never read as lifting kilograms and a stack of plates is never a load.
+S['lb-sets'] = async (b) => {
+  const r = { id: 'lb-sets', title: 'A session logged in pounds or plates reads in pounds or plates', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await page.evaluate(() => {
+    const h = window.__DB.session_history.find(x => x.athlete_id === 'ava_test' && /Set 2: 20 @8/.test(x.summary || ''));
+    h.summary = h.summary.replace('Set 1: 20 @7 ✓ ×10', 'Set 1: 45 lb @7 ✓ ×10').replace('Set 2: 20 @8 ✓ ×10', 'Set 2: 45 lb @8 ✓ ×10')
+      .replace('Set 3: 22 @8 ✓ ×9', 'Set 3: 50 lb @8 ✓ ×9').replace('Set 4: 22 @9 ✓ ×8', 'Set 4: 50 lb @9 ✓ ×8')
+      .replace('Set 1: 60 @7 ✓', 'Set 1: 6 plates @7 ✓').replace('Set 2: 60 @7 ✓', 'Set 2: 7 plates @7 ✓');
+  });
+  await L.go(page, 'a/ava_test/work');
+  const sq = await rowLoc(page, 'Goblet Squat').locator('.cmp-did').innerText();
+  const lp = await rowLoc(page, 'Machine Leg Press').locator('.cmp-did').innerText();
+  check(r, 'pounds: the load reads 45 → 50 lb, with no kg after it and the reps and RPE still read', /45 → 50 lb/.test(sq) && !/\bkg\b/.test(sq) && /4\/4 sets/.test(sq), sq.replace(/\s+/g, ' '));
+  check(r, 'plates: the load reads 6 → 7 plates, never kg', /6 → 7 plates/.test(lp) && !/\bkg\b/.test(lp), lp.replace(/\s+/g, ' '));
+  const raw = await page.locator('.wday.open .rawlog .elog-body').first().textContent();
+  check(r, 'the raw log shows what was sent, unit and all', /Set 1: 45 lb @7/.test(raw || '') && /Set 1: 6 plates @7/.test(raw || ''), (raw || '').slice(0, 120));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));

@@ -725,6 +725,12 @@ invents a number you might train off. ⚠️ `parseSetText()` in `program.html` 
 for the athlete's own history, so a change to the log line moves three places together
 (`buildSessionData()`, `parseSetLine()`, `parseSetText()`).
 
+**A weight carries its unit from 2026-10-18.** The athlete picks kg, lb or plates over the weight boxes, and the unit is written in
+the weight: `Set 1: 45 lb ×8 @7 ✓`, `Set 2: 6 plates @7 ✓` (a bare number is kg). The dashboard shows it as typed (Amir: *"lb sessions
+should be shown lb in coach.html"*): the load column reads `45 → 50 lb` or `6 → 7 plates` (`wUnitOf()`, `loadSummary()`), sets in
+two units are listed as typed and never folded into one range, and a Personal Record set in pounds says `≈ N lb` beside its kg
+estimate. Plates are a position on a machine's stack, never a load: nothing here adds them up or turns them into kilograms.
+
 Other things on this tab: the **day's session picker** when a day has been trained more than once
 (tap a date to compare against that run instead), the athlete's note with **Mark read** (a note is read here, never answered: you answer only on
 WhatsApp, 2026-09-26, and the athlete app sends anything that needs an answer there),

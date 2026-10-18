@@ -1416,20 +1416,24 @@ CREATE OR REPLACE FUNCTION public.career_kg(p jsonb)
  IMMUTABLE
  SET search_path TO 'public'
 AS $function$
-declare t text; m text[]; k numeric;
+declare t text; m text[]; n numeric;
 begin
   if p is null or jsonb_typeof(p) not in ('string', 'number') then return null; end if;
   if not public.career_truthy(p) then return null; end if;        -- String(v || ''): 0 and '' read as nothing
   t := regexp_replace(public.career_digits(p #>> '{}'), ',', '.');  -- the first comma only, as String.replace does
   m := regexp_match(t, '^\s*([1-4])\s*[×xX*]\s*([0-9]+(?:\.[0-9]+)?)');
   if m is not null then
-    k := m[2]::numeric;
-    return case when k > 0 then k end;
+    n := m[2]::numeric;
+  else
+    m := regexp_match(t, '[0-9]+(?:\.[0-9]+)?');
+    if m is null then return null; end if;
+    n := m[1]::numeric;
   end if;
-  m := regexp_match(t, '[0-9]+(?:\.[0-9]+)?');
-  if m is null then return null; end if;
-  k := m[1]::numeric;
-  return case when k > 0 then k end;
+  if not (n > 0) then return null; end if;
+  -- the unit, as weightOf() reads it: pounds first, then plates, else kilograms
+  if t ~* '[0-9]\s*(lbs?|pounds?)([^a-z]|$)' then return round(n * 0.45359237, 2); end if;
+  if t ~* '[0-9]\s*plates?([^a-z]|$)' then return null; end if;
+  return n;
 end $function$;
 
 CREATE OR REPLACE FUNCTION public.career_level(p_xp bigint, p_rules jsonb)

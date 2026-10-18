@@ -610,7 +610,39 @@ costs more than one tap.
     it, and that weight never asks again on the card this session (`card._kgOk`, `kgKept()`). A big weight typed into a
     set already ticked (the list, or Guided's rest screen) says so once (`kgCheckTicked()`), and Guided's Done goes
     through the same tick, so an armed tick opens no rest. Nothing is ever changed for the athlete.
-    `scripts/headless/kg-check.js` (12 checks).
+    **A build-up asks once** (2026-10-18; Amir: *"it asks this question but warns you twice, I thought it's a bug"*):
+    the sets already ticked today are "your numbers" too (`kgRefFor()`, the set being checked never counts as its own
+    reference), so 120 · 140 · 160 on a lift last done at 50 asks at 120 and at nothing after it. It used to ask again at
+    every heavier set, because only last time's weights and the history counted. The two taps are not a second warning:
+    the first tap asks, the second keeps it. `scripts/headless/kg-check.js` (17 checks).
+  - **The unit button: kg, lb or plates** (Amir, 2026-10-18: *"give the client the choice, some equipment is on lb and some
+    has no weight so I told them to count the stacks"*, then *"plates is better"*, *"lb sessions should be shown lb in
+    coach.html"*). The unit is **written in the weight's text**: a bare number is kg (every weight logged before this
+    day), `45 lb` is pounds, `6 plates` is the count on a machine's stack (`1 plate`). So it rides every pipe a weight
+    already rode (the cloud merge, the carried LAST, the saved session and its email, coach.html) and no field is added
+    that `mergeStoredValue()` could drop. `weightOf()`, `splitW()`, `composeW()`, `weightText()`, `unitWord()` sit above
+    `parseLoggedKg()`. The weight box holds the **number only**; the unit is the small pill over the boxes (`.ex-set-unit`,
+    list) or the label of the weight line (`.tl-unit`, Guided's rest screen): one tap goes kg → lb → plates → kg
+    (`cycleUnit()`), and a pick **relabels what is already typed on that card** ("100" becomes "100 lb"; the numbers
+    stay, this is *I chose the wrong unit*, never a conversion; `setCardUnit()`). **Which unit a card is in** is never
+    stored: `cardUnit()` reads the pick made this visit (`card._unit`), else the unit already in today's sets, else last
+    time's (`lw`, which carries its own unit), else the lift's last logged session, else kg. Pick pounds once and the
+    next session of that lift opens in pounds on any phone. LAST shows the bare number when it is in today's unit and
+    names its own unit when it is not (`lastText()`: "45 lb" under a kg box), so it is never read as the other unit.
+    **The maths** (`parseLoggedKg()`): pounds are kilograms to two places (45 lb = 20.41 kg), plates are no weight at all
+    (null: no estimate, no Personal Record, never "far above", a win only by reps), everything else reads as before.
+    **What is shown**: sets in the unit they were typed in (History, the done line, Last time, the ghost line:
+    `histSetsText()`, `histWt()`; a list that mixes units names every unit; the History chart is drawn in the lift's
+    last unit, a plates lift as *Top stack, plates*); a win in pounds is worded in pounds (`winText()`); **Personal
+    Records stay in kilograms** (the estimate is kg) and a record set in pounds carries `u: 'lb'`, so its row also says the
+    pounds, and **no share card is drawn from pounds** (a card says kilograms and would round converted numbers up:
+    `hlBestSpec()`, `hlRetestSpec()`, a win's `share: false`). In coach.html a set reads as typed in the athlete's own
+    unit and the load column says `45 → 50 lb` or `6 → 7 plates` (`wUnitOf()`, `loadSummary()`); sets in two units are
+    listed as typed, never folded into one range. **Twins**: `career_kg()` in the database
+    (`supabase/stage71_weight_units.sql`; `node scripts/career/rehearse_units.mjs` runs it against `parseLoggedKg()` on
+    thousands of weights) and `scripts/check_setlog.js` (the grammar both readers share). Not done, on purpose:
+    circuits' per-item weights stay free text (typing "16 lb" there reads, but there is no button), the Log a max form
+    is kg, and share cards say kg. `scripts/headless/weight-units.js` (28 checks).
   - `migrateCarriedWeights()` converts, once per phone, the weights every sweep before this left in
     `w` (a set holding only a weight, on an exercise no live day holds). Its marker `aap_lw1_<id>`
     sits outside the athlete's key prefix so it never syncs.

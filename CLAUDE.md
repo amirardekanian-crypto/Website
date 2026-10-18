@@ -192,7 +192,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   `check_twins.js` and `test_check_program.py` read it) · the body-part
   region and impact lists (four copies) · the muscle list of the Spine's volume credits (SIX copies since the
   muscle map: `spine_credits_ok()`, coach.html, `check_program.py`, `draft_sql.py`, program.html `MAP_MUSCLE` and
-  the body drawing's groups; see PROGRAM-APP.md *The muscle map*) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
+  the body drawing's groups; see PROGRAM-APP.md *The muscle map*) · a weight's unit, kg / lb / plates written in the weight's own text
+  (`weightOf()` / `parseLoggedKg()`, `wUnitOf()` / `loadSummary()` in coach.html, `career_kg()` in the database, stage71; PROGRAM-APP.md
+  *The unit button*; `scripts/check_setlog.js`, `node scripts/career/rehearse_units.mjs`) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
   `parseSetText()`) · the records rename matcher (`matchRenamed()` / `ceilAliasMapC()`) · how a session's set ends (`carrySet()`, called at
   Done, by the midnight sweep, the cloud copy and a rename; Done keeps the day's own copy, `<id>_donelog_d<N>`, and a reader of a
   set log or a round rating passes its day, `loadSetLog(name, total, day)` / `rpeOn(day, key)`: PROGRAM-APP.md → *A session closes at Done*) · whether a session is over (`sessionIsStale()`, 6 h grace past

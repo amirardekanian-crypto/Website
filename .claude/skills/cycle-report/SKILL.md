@@ -82,8 +82,10 @@ because athletes often start a day or two before the date) and run them:
 
 - **Q2** sessions: date, weekday, day, session RPE, minutes, readiness (composite, sleep,
   soreness), day note.
-- **Q3** loaded exercises, one row per session: weights set by set, `top`, `sets_at_top`,
-  `n_sets`, reps, RPEs, ticks. It reads `session_history.log` (stage30, from 2026-09-24) and
+- **Q3** loaded exercises, one row per session: weights set by set, their `units` (`kg`, `lb` or
+  `plates`: an athlete picks it per exercise, 2026-10-18; a bare number is kg), `top`, `sets_at_top`,
+  `n_sets`, reps, RPEs, ticks. Never compare or add weights across units, and plates are a position
+  on a machine's stack, never a load: say "up a plate", never "+N kg". It reads `session_history.log` (stage30, from 2026-09-24) and
   parses the text summary for older rows, so both kinds come back the same.
   ⚠ In summaries written before the countersigned set log, every set line ends in ✓, so
   `ticked` is not evidence of ticking on those rows. Use the progress blob's `_setlog_` `d`

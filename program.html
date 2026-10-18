@@ -3475,6 +3475,10 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-set-log:not(.has-reps) .ex-set-header > div:nth-child(3) { text-align: center; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg .ex-set-header > div:nth-child(3) { text-align: left; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg:not(.has-reps) .ex-set-header { display: none; }
+  /* The unit button over the weight boxes (2026-10-18): kg, lb or plates, one tap to the next. A quiet pill, so it reads as a label that can be pressed. */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-unit { display: inline-block; min-height: 34px; margin: 0 -8px; padding: 0 8px; border: 1px solid var(--field); border-radius: 999px;
+    background: none; cursor: pointer; font: inherit; letter-spacing: .3px; text-transform: uppercase; color: var(--green-ink); white-space: nowrap; -webkit-appearance: none; appearance: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-log .ex-set-row { position: relative; align-items: center; min-height: 60px; padding-top: 6px; padding-bottom: 6px; border-top: 0;
     border-radius: 0; background: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row::before { content: ''; position: absolute; top: 0; left: calc(var(--c-set) + var(--c-gap)); right: calc(-1 * var(--g)); height: 1px; background: var(--hair); }
@@ -4136,6 +4140,10 @@
   .timer-log .tl-line { display: flex; align-items: center; gap: 6px; }
   .timer-log .tl-line + .tl-line { margin-top: 10px; }
   .timer-log .tl-lab { flex: none; width: 36px; font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  /* The unit is the label of the weight line and a button: kg, lb or plates, one tap to the next. Same look as its sisters, underlined so it reads as pressable. */
+  .timer-log .tl-unit { width: auto; min-width: 36px; min-height: 44px; margin: 0; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; color: var(--green-ink);
+    text-decoration: underline dotted; text-underline-offset: 4px; -webkit-appearance: none; appearance: none; }
+  .timer-log .tl-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   .timer-log .tl-kg { flex: 1; min-width: 0; height: 48px; padding: 0 8px; border: 1px solid var(--field); border-radius: 10px; background: var(--row); outline: none;
     -webkit-appearance: none; appearance: none; box-sizing: border-box; font: 500 var(--fs-field)/1 'Barlow', sans-serif; color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
   .timer-log .tl-kg::placeholder { color: var(--ph); opacity: 1; font-weight: 500; }
@@ -7984,11 +7992,12 @@ window.dismissFiled = dismissFiled;
 // bodyweight moves (reps to failure), and for holds (a lower RPE: holds log a tick, not seconds).
 function cycleSetOf(e, s) {
   const w = parseLoggedKg(s.w);
+  const wt = weightOf(s.w);                       // wn, u: the number as typed and its unit, so a pounds win is worded in pounds
   const n = (s.n != null && s.n !== '') ? Number(s.n) : (e.reps ? Number(e.reps) : null);
   const r = s.r ? Number(s.r) : null;
   const rir = (r >= 6 && r <= 10) ? 10 - r : 0;
   const idx = n ? (w ? w * (1 + (n + rir) / 30) : n + rir) : null;
-  return { w, n, r, idx };
+  return { w, n, r, idx, wn: wt.n, u: wt.unit };
 }
 function cycleBestSet(e) {
   let best = null;
@@ -8016,18 +8025,20 @@ function winText(a, b) {
   const pct = Math.max(2, Math.round(gain * 100));
   const loaded = a.w != null && b.w != null;
   if (!loaded && (a.w != null || b.w != null)) return null;   // one set loaded, one not: nothing honest to say
-  const dw = loaded ? Math.round((b.w - a.w) * 2) / 2 : 0, dn = b.n - a.n;
+  // Both sets in pounds: said in pounds, the numbers as typed. Anything else is worded in kilograms (a pound set was converted).
+  const lb = loaded && a.u === 'lb' && b.u === 'lb', U = lb ? 'lb' : 'kg', val = x => lb ? x.wn : x.w;
+  const dw = loaded ? Math.round((val(b) - val(a)) * 2) / 2 : 0, dn = b.n - a.n;
   const same = rpeKnown && dr === 0;
-  let txt, shape, share = true;
+  let txt, shape, share = !(loaded && (a.u === 'lb' || b.u === 'lb'));   // a share card says kilograms: none for a pounds win
   if (!loaded) {
     if (dn > 0 && dr <= 0)               { txt = `${reps(dn)}${same ? ', same RPE' : ''}`; shape = 'bwReps'; }
     else if (dn === 0 && dr < 0)         { txt = `${b.n} reps felt easier: RPE ${a.r} → ${b.r}`; shape = 'bwEasier'; share = false; }
     else                                 { txt = `about ${pct}% stronger`; shape = 'pctBw'; share = dn > 0; }
-  } else if (dw > 0 && dn === 0 && dr === 0) { txt = `+${kg(dw)} kg, same reps${rpeKnown ? ', same RPE' : ''}`; shape = 'kg'; }
-  else if (dw > 0 && dn === 0 && dr < 0)     { txt = `+${kg(dw)} kg, and it felt easier`; shape = 'kgEasier'; }
-  else if (dw > 0 && dn > 0 && dr <= 0)      { txt = `+${kg(dw)} kg and ${reps(dn)}`; shape = 'kgReps'; }
-  else if (dw === 0 && dn > 0 && dr <= 0)    { txt = `${reps(dn)} at ${kg(b.w)} kg${same ? ', same RPE' : ''}`; shape = 'reps'; }
-  else if (dw === 0 && dn === 0 && dr < 0)   { txt = `${kg(b.w)} kg × ${b.n} felt easier: RPE ${a.r} → ${b.r}`; shape = 'easier'; share = false; }
+  } else if (dw > 0 && dn === 0 && dr === 0) { txt = `+${kg(dw)} ${U}, same reps${rpeKnown ? ', same RPE' : ''}`; shape = 'kg'; }
+  else if (dw > 0 && dn === 0 && dr < 0)     { txt = `+${kg(dw)} ${U}, and it felt easier`; shape = 'kgEasier'; }
+  else if (dw > 0 && dn > 0 && dr <= 0)      { txt = `+${kg(dw)} ${U} and ${reps(dn)}`; shape = 'kgReps'; }
+  else if (dw === 0 && dn > 0 && dr <= 0)    { txt = `${reps(dn)} at ${kg(val(b))} ${U}${same ? ', same RPE' : ''}`; shape = 'reps'; }
+  else if (dw === 0 && dn === 0 && dr < 0)   { txt = `${kg(val(b))} ${U} × ${b.n} felt easier: RPE ${a.r} → ${b.r}`; shape = 'easier'; share = false; }
   else if (dw > 0 && dr > 0)                 { txt = `heavier and harder: about ${pct}% stronger`; shape = 'pctHarder'; }
   else if (dw > 0 && dn < 0)                 { txt = `heavier for fewer reps: about ${pct}% stronger`; shape = 'pctFewer'; }
   else if (dw < 0 && dn > 0)                 { txt = `more reps with less: about ${pct}% stronger`; shape = 'pctLess'; }
@@ -9653,7 +9664,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small button over the weight boxes says <strong>kg</strong>. Some machines show pounds, and some show no weight at all. Tap the button to change it to <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. It starts with your warm-up: tick each part as you do it, or tap <strong>Done ✓</strong> for all of it. <strong>Skip</strong> moves on, and I see it was skipped. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ: what an exercise is for',
@@ -11134,7 +11145,7 @@ function renderCeilingLift(lift) {
   // A row that set a record (it beat every entry before it) can be shared as a New best card, any time (Highlight Reel).
   const rows = l.entries.slice().reverse().map((e, i) => `
     <div class="ceil-row">
-      <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} kg × ${e.r} @ RPE ${e.rpe}${
+      <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.u === 'lb' ? Math.round(e.w / 0.45359237 * 2) / 2 + ' lb (' + e.w + ' kg)' : e.w + ' kg'} × ${e.r} @ RPE ${e.rpe}${
         e.test ? ' · tested' : e.auto ? ' · from your sets' : ''}</span>
       <b>${e.kg} kg</b>
       ${!window.IS_PREVIEW && hlBestSpec(lift, e.d) ? `<button type="button" class="ceil-row-share" onclick="openShareRecord(${i})" aria-label="Share this record">Share</button>` : ''}
@@ -14264,7 +14275,8 @@ function attachSetLog(card) {
   // No "Same as last" button above the table (removed 2026-09-27, Amir: "its a duplicate
   // of what can be seen in history"): each empty kg box shows last time's weight, and a
   // weight typed in set 1 fills the empty sets below it.
-  let html = `<div class="ex-set-header"><div>SET</div><div>${repsCol ? 'KG' : 'WEIGHT'}</div>${repsCol ? '<div>REPS</div>' : ''}<div></div><div></div></div>`;
+  // The unit button over the weight boxes (2026-10-18): kg, lb or plates, one tap to the next (setCardUnit()). Painted by paintSets().
+  let html = `<div class="ex-set-header"><div>SET</div><div><button type="button" class="ex-set-unit" aria-label="Weight unit. Tap to change it">kg</button></div>${repsCol ? '<div>REPS</div>' : ''}<div></div><div></div></div>`;
   log.forEach((s, i) => {
     const rpeBtns = [6,7,8,9,10].map(n =>
       `<button class="rpe-btn${String(s.r) === String(n) ? ' selected' : ''}" data-rpe="${n}" type="button" aria-label="RPE ${n}">${n}</button>`
@@ -14276,7 +14288,7 @@ function attachSetLog(card) {
       : `<div class="ex-set-dose">${esc(card.dataset.dose || '')}</div>`;
     html += `<div class="ex-set-row${s.d ? ' done' : ''}" data-set-idx="${i}">
       <div class="ex-set-num">${i+1}</div>
-      <div class="ex-set-wbox"><input class="ex-set-weight" type="text" inputmode="decimal" placeholder="kg" value="${esc(s.w)}" aria-label="Weight on set ${i+1}"><span class="ex-set-wlast" aria-hidden="true">last</span></div>
+      <div class="ex-set-wbox"><input class="ex-set-weight" type="text" inputmode="decimal" placeholder="kg" value="${esc(splitW(s.w).num)}" aria-label="Weight on set ${i+1}"><span class="ex-set-wlast" aria-hidden="true">last</span></div>
       ${repsBox}
       <button class="ex-set-rpetag" type="button" aria-label="Rate set ${i+1}"></button>
       <button class="ex-set-check" type="button" aria-label="Mark set ${i+1} done as written"></button>
@@ -14285,6 +14297,7 @@ function attachSetLog(card) {
   });
   wrap.innerHTML = html;
   slot.appendChild(wrap);
+  wrap.querySelector('.ex-set-unit').addEventListener('click', ev => { ev.stopPropagation(); cycleUnit(card); });
   paintKgCol(card);
 
   const rows = Array.from(wrap.querySelectorAll('.ex-set-row'));
@@ -14301,6 +14314,11 @@ function attachSetLog(card) {
   function paintSets() {
     const cur = loadSetLog(name, total, day);
     const liveIdx = cur.findIndex(s => !s.d);
+    const unit = cardUnit(card);
+    const ub = wrap.querySelector('.ex-set-unit');
+    if (ub && ub.textContent !== unit) ub.textContent = unit;
+    if (ub) ub.setAttribute('aria-label', `Weight in ${unit}. Tap to change it`);
+    wrap.dataset.unit = unit;
     rows.forEach((row, i) => {
       const s = cur[i] || {};
       row.classList.toggle('done', !!s.d);
@@ -14315,10 +14333,14 @@ function attachSetLog(card) {
       // typed. ("last 80" as the placeholder itself was
       // tried: at 375px the box holds about 38px of text, so "last 22.5" was cut off.)
       // A ticked set shows no hint: its empty box is the receipt of a set with no weight.
+      // The box holds the number; the unit is the button over it (splitW(), composeW()). Last time's weight shows in the same unit
+      // as today's, and names its own unit when it differs ("last 20 kg" under a pounds box).
       const wIn = row.querySelector('.ex-set-weight');
-      if (wIn !== document.activeElement && wIn.value !== (s.w || '')) wIn.value = s.w || '';
-      const lastW = (!s.d && s.lw) ? s.lw : '';
-      if (wIn.placeholder !== (lastW || 'kg')) wIn.placeholder = lastW || 'kg';
+      const shown = splitW(s.w).num;
+      if (wIn !== document.activeElement && wIn.value !== shown) wIn.value = shown;
+      const lastW = (!s.d && s.lw) ? lastText(s.lw, unit) : '';
+      const ph = lastW || unitWord(unit);
+      if (wIn.placeholder !== ph) wIn.placeholder = ph;
       wIn.setAttribute('aria-label', `Weight on set ${i + 1}${lastW ? ', last time ' + lastW : ''}`);
       row.querySelector('.ex-set-wbox').classList.toggle('show-last', !!lastW && !s.w);
       const tag = row.querySelector('.ex-set-rpetag');
@@ -14353,7 +14375,7 @@ function attachSetLog(card) {
     // A weight typed into a set already ticked: no tick is left to ask on, so a number far above the lift's says so once.
     row.querySelector('.ex-set-weight').addEventListener('change', () => {
       const s0 = loadSetLog(name, total, day)[idx] || {};
-      if (s0.d) kgCheckTicked(name, s0.w, card);
+      if (s0.d) kgCheckTicked(name, s0.w, card, idx);
     });
     // Weight — saves on every keystroke. Persian/Arabic digits and decimal marks are
     // normalised on the way in (live logs held "۲۵" and "٫20", which nothing can read).
@@ -14364,14 +14386,15 @@ function attachSetLog(card) {
       const v = normDigits(e.target.value);
       if (v !== e.target.value) e.target.value = v;
       const cur = loadSetLog(name, total, day);
+      const w = composeW(v, cardUnit(card));        // the number and the unit the button shows: "45 lb", "6 plates", a bare kg
       cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
-      cur[idx].w = v;
+      cur[idx].w = w;
       carried.delete(idx);
       for (let j = idx + 1; j < cur.length; j++) {
         if (cur[j].d) continue;
         if (cur[j].w && !carried.has(j)) break;
-        cur[j].w = v;
-        if (v) carried.add(j); else carried.delete(j);
+        cur[j].w = w;
+        if (w) carried.add(j); else carried.delete(j);
       }
       saveSetLogValue(name, cur, day);
       paintSets();
@@ -14416,12 +14439,12 @@ function attachSetLog(card) {
       // A weight far above this lift's numbers asks once before the tick keeps it (kgLooksWrong()): the first tap arms the
       // tick (a clay ring) and says so, a second within 4 s keeps it.
       const pre = loadSetLog(name, total, day)[idx] || {}, btn = ev.currentTarget;
-      if (!pre.d && kgLooksWrong(name, pre.w, card)) {
+      if (!pre.d && kgLooksWrong(name, pre.w, card, idx)) {
         if (btn.dataset.kgArmed !== String(pre.w)) {
           clearTimeout(btn._kgT);
           btn.dataset.kgArmed = String(pre.w); btn.classList.add('kg-armed');
           btn._kgT = setTimeout(() => { btn.dataset.kgArmed = ''; btn.classList.remove('kg-armed'); }, 4000);
-          aaToast(`${pre.w} kg? That's far above your numbers for this lift. Tap ✓ again to keep it.`, { kicker: 'Check the weight' });
+          aaToast(`${weightText(pre.w)}? That's far above your numbers for this lift. Tap ✓ again to keep it.`, { kicker: 'Check the weight' });
           if (navigator.vibrate) navigator.vibrate([10, 40, 10]);
           return;
         }
@@ -14449,29 +14472,33 @@ function attachSetLog(card) {
 // this lift has seen on this phone (last time's weights on the card, its history, its records), or over 300 kg when it has none
 // yet. The tick asks (two taps, the clay ring); a set already ticked says so in the note box. A weight kept once on a card never
 // asks again this session (card._kgOk). Nothing is ever changed for the athlete.
-function kgRefFor(name, card) {
+// Today's ticked sets count as "your numbers" too (2026-10-18: a ramp 120 · 140 · 160 on a lift last done at 80 asked at 140, and again
+// at 160 although 140 had just been kept): once a set is ticked, the next one is measured against it, so a build-up asks once.
+// Pounds are compared as kilograms; plates are never "far above" anything (parseLoggedKg() is null for them).
+// `skip`: the index of the set being checked, which never counts as its own reference.
+function kgRefFor(name, card, skip) {
   let best = 0;
   const add = v => { const k = parseLoggedKg(v); if (k != null && k > best) best = k; };
-  loadSetLog(name, parseInt(card.dataset.sets, 10) || 1, card.dataset.day).forEach(s => add(s.lw));
+  loadSetLog(name, parseInt(card.dataset.sets, 10) || 1, card.dataset.day).forEach((s, i) => { add(s.lw); if (s.d && i !== skip) add(s.w); });
   historyFor(name).forEach(h => ((h.entry && h.entry.sets) || []).forEach(s => add(s.w)));
   loadCeiling().forEach(e => { if (histNorm(e.lift) === histNorm(name)) add(e.w); });
   return best;
 }
-function kgLooksWrong(name, w, card) {
+function kgLooksWrong(name, w, card, skip) {
   const k = parseLoggedKg(w);
   if (k == null || !(k > 0) || !card) return false;
   if (card._kgOk && card._kgOk.has(String(k))) return false;
-  const ref = kgRefFor(name, card);
+  const ref = kgRefFor(name, card, skip);
   return ref > 0 ? k > ref * 1.5 : k > 300;
 }
 function kgKept(card, w) {
   const k = parseLoggedKg(w);
   if (k != null) (card._kgOk = card._kgOk || new Set()).add(String(k));
 }
-function kgCheckTicked(name, w, card) {
-  if (!kgLooksWrong(name, w, card)) return;
+function kgCheckTicked(name, w, card, skip) {
+  if (!kgLooksWrong(name, w, card, skip)) return;
   kgKept(card, w);
-  aaToast(`${w} kg? That's far above your numbers for this lift. If it's a typo, fix it in the kg box.`, { kicker: 'Check the weight' });
+  aaToast(`${weightText(w)}? That's far above your numbers for this lift. If it's a typo, fix it in the weight box.`, { kicker: 'Check the weight' });
 }
 
 // Persian (۰-۹) and Arabic-Indic (٠-٩) digits to ASCII, and their decimal marks
@@ -14541,6 +14568,42 @@ function prescribedReps(repsChip) {
   return n > 0 ? n : null;
 }
 
+// ── THE UNIT A WEIGHT IS IN (Amir, 2026-10-18: "let the client pick what to input": kg, lb or plates) ──
+// A weight is free text and the unit is WRITTEN IN IT: a bare number is kilograms (every weight logged before this day), "45 lb" is
+// pounds and "6 plates" is the count on a machine's stack. So one string travels everywhere a weight already did (the cloud merge,
+// the carried LAST, the saved session, the email, coach.html) and no field is added that a merge could drop. The weight box holds
+// the number only; the unit is the small button over it (setCardUnit()), kept per exercise by the sets themselves.
+// Plates are a position on a stack, never a load: no kilograms, no estimate, no record, no comparison with kg (parseLoggedKg() is
+// null for them). Pounds are converted to kilograms for every calculation and shown as typed everywhere a set is shown.
+// ⚠ Twins: career_kg() in the database (supabase/stage71_weight_units.sql) and wUnitOf() / loadSummary() in coach.html.
+function weightOf(v) {
+  const t = normDigits(v == null ? '' : v).replace(',', '.');
+  const pair = t.match(/^\s*([1-4])\s*[×xX*]\s*(\d+(?:\.\d+)?)/);
+  const m = pair ? null : t.match(/\d+(?:\.\d+)?/);
+  const n = parseFloat(pair ? pair[2] : (m ? m[0] : ''));
+  if (!(n > 0)) return { n: null, unit: 'kg' };
+  const unit = /\d\s*(?:lbs?|pounds?)(?![a-z])/i.test(t) ? 'lb' : (/\d\s*plates?(?![a-z])/i.test(t) ? 'plates' : 'kg');
+  return { n, unit };
+}
+function unitWord(unit, n) { return unit === 'plates' ? (n === 1 ? 'plate' : 'plates') : (unit || 'kg'); }
+// "45 lb" -> { num: '45', unit: 'lb' }. Anything else is all number: { num: v, unit: null } (a bare number, "60kg", "BW+10").
+function splitW(v) {
+  const s = String(v == null ? '' : v).trim();
+  const m = s.match(/^(.*\d)\s*(lbs?|pounds?|plates?)$/i);
+  return m ? { num: m[1].trim(), unit: /^pl/i.test(m[2]) ? 'plates' : 'lb' } : { num: s, unit: null };
+}
+// The number the athlete typed and the unit they chose, as the text a set stores. kg stays a bare number, as it always was.
+function composeW(num, unit) {
+  const s = String(num == null ? '' : num).trim();
+  if (!s || !unit || unit === 'kg') return s;
+  return /^\d+(?:\.\d+)?(?:\s*[×xX*]\s*\d+(?:\.\d+)?)?$/.test(s) ? s + ' ' + unitWord(unit, parseFloat(s)) : s;
+}
+// A weight as a short phrase, for the notes that name it: "160 kg", "45 lb", "6 plates".
+function weightText(w) {
+  const s = String(w == null ? '' : w).trim();
+  return weightOf(s).unit !== 'kg' || /kg$/i.test(s) ? s : s + ' kg';
+}
+
 // Weight fields are free text ("60", "60kg", "62.5", "62,5"). Take the first
 // number; anything without one (e.g. "BW") simply has no estimate.
 // Persian/Arabic digits ("۲۵") are read too — real logs carry them.
@@ -14548,14 +14611,11 @@ function prescribedReps(repsChip) {
 // is read as ONE implement's weight, 20: how a dumbbell lift is logged when it is
 // written "20", so the two ways of writing it compare as the same lift (2026-09-26,
 // PROGRAM-APP.md → Set log). Only a count of 1–4 counts as a pair; "20x2" stays 20.
+// Pounds are read as kilograms to two places ("45 lb" = 20.41), plates as nothing at all.
 function parseLoggedKg(v) {
-  const t = normDigits(v == null ? '' : v).replace(',', '.');
-  const pair = t.match(/^\s*([1-4])\s*[×xX*]\s*(\d+(?:\.\d+)?)/);
-  if (pair) { const k = parseFloat(pair[2]); return k > 0 ? k : null; }
-  const m = t.match(/\d+(?:\.\d+)?/);
-  if (!m) return null;
-  const n = parseFloat(m[0]);
-  return n > 0 ? n : null;
+  const w = weightOf(v);
+  if (w.n == null || w.unit === 'plates') return null;
+  return w.unit === 'lb' ? Math.round(w.n * 0.45359237 * 100) / 100 : w.n;
 }
 
 // The set that produces the HIGHEST estimate — the athlete's real best effort
@@ -14695,7 +14755,7 @@ function fillRecords(sessions, celebrate) {
   const orphans = all.map(e => e.lift).filter((n, i, a) => a.indexOf(n) === i && current.indexOf(n) < 0);
   const alias = orphans.length ? matchRenamed(orphans, current) : {};
   const read = e => alias[e.lift] || e.lift;
-  const same = (a, b) => a.lift === b.lift && a.kg === b.kg && a.w === b.w && a.r === b.r && a.rpe === b.rpe;
+  const same = (a, b) => a.lift === b.lift && a.kg === b.kg && a.w === b.w && a.r === b.r && a.rpe === b.rpe && (a.u || '') === (b.u || '');
   let changed = false;
 
   lifts.forEach(lift => {
@@ -14721,7 +14781,7 @@ function fillRecords(sessions, celebrate) {
           // Not a new best: no automatic entry here.
         } else {
           bar = v;
-          next = h ? { lift: lift, kg: h.est, w: h.kg, r: h.reps, rpe: h.rpe, d: d, t: 0, auto: true } : eff;
+          next = h ? Object.assign({ lift: lift, kg: h.est, w: h.kg, r: h.reps, rpe: h.rpe, d: d, t: 0, auto: true }, h.u ? { u: h.u } : {}) : eff;
         }
       }
       const autos = all.filter(e => e.auto && !e.del && e.d === d && read(e) === lift);
@@ -15130,7 +15190,7 @@ const KG_NOT    = /treadmill|bike|rower|row machine|ski ?erg|assault/i;
 function kgWanted(card) {
   const name = card.querySelector('.item-name').textContent.trim();
   if (loadSetLog(name, parseInt(card.dataset.sets, 10) || 1, card.dataset.day).some(s => s.w || s.lw)) return true;
-  if (HIST && historyFor(name).some(h => !h.entry.circuit && (h.entry.sets || []).some(s => histKg(s.w) != null))) return true;
+  if (HIST && historyFor(name).some(h => !h.entry.circuit && (h.entry.sets || []).some(s => weightOf(s.w).n != null))) return true;   // plates count: a stack is a weight to log
   const entry = SPINE ? spineFor(name, card.dataset.exid) : null;
   const eq = (entry && Array.isArray(entry.equipment)) ? entry.equipment : [];
   if (!eq.length) return true;
@@ -15142,6 +15202,7 @@ function paintKgCol(card) {
   if (!wrap) return;
   const noKg = !kgWanted(card);
   wrap.classList.toggle('no-kg', noKg);
+  if (card._paintSets) card._paintSets();         // the unit may have just become known: last time's, from the history that arrived
   // A per-side move with no kg box says so in its reps box, "4 / side" (Centre Court r2, E's p). The placeholder
   // only: a tick records the card's reps (cardReps(), never this text), and Guided's rest screen reads the number with
   // parseInt() (paintTimerLog()). With a kg box the column is too narrow for the words, so it stays "4".
@@ -15149,6 +15210,51 @@ function paintKgCol(card) {
   if (!base) return;
   const ph = base + (noKg && / \/ side$/.test(card.dataset.dose || '') ? ' / side' : '');
   wrap.querySelectorAll('.ex-set-reps').forEach(i => { if (i.getAttribute('placeholder') !== ph) i.setAttribute('placeholder', ph); });
+}
+
+// ── THE UNIT BUTTON (Amir, 2026-10-18: "let the client pick what to input: kg, lb, or plates, for a machine with no weight") ──
+// Which unit a card's weight boxes are in: the pick made on this card this visit (card._unit, in memory), else the unit already in
+// today's sets, else last time's (the carried LAST), else the lift's last logged session, else kilograms. So the choice follows the
+// data: pick pounds once and every later session of that lift opens in pounds, on any phone, with nothing else stored.
+function cardUnit(card) {
+  if (card._unit) return card._unit;
+  const name = card.querySelector('.item-name').textContent.trim();
+  const log = loadSetLog(name, parseInt(card.dataset.sets, 10) || 1, card.dataset.day);
+  const mine = log.find(s => s.w && weightOf(s.w).n != null) || log.find(s => s.lw && weightOf(s.lw).n != null);
+  if (mine) return weightOf(mine.w && weightOf(mine.w).n != null ? mine.w : mine.lw).unit;
+  if (HIST) {
+    for (const h of historyFor(name)) {
+      const s = ((h.entry && h.entry.sets) || []).find(x => x && x.w && weightOf(x.w).n != null);
+      if (s) return weightOf(s.w).unit;
+    }
+  }
+  return 'kg';
+}
+// Last time's weight as a box hint: the bare number in today's unit, the number and its own unit when they differ.
+function lastText(lw, unit) {
+  const L = splitW(lw), u = L.unit || 'kg';
+  return u === unit ? L.num : L.num + ' ' + unitWord(u, parseFloat(L.num));
+}
+// A pick of unit relabels what is already typed on this card (the numbers stay as typed: this is "I chose the wrong unit", never a
+// conversion), then every later keystroke and tick saves in it.
+function setCardUnit(card, unit) {
+  card._unit = unit;
+  const name = card.querySelector('.item-name').textContent.trim();
+  const total = parseInt(card.dataset.sets, 10) || 1, day = card.dataset.day;
+  const cur = loadSetLog(name, total, day);
+  let changed = false;
+  cur.forEach(s => {
+    if (!s.w || weightOf(s.w).n == null) return;
+    const w = composeW(splitW(s.w).num, unit);
+    if (w !== s.w) { s.w = w; changed = true; }
+  });
+  if (changed) saveSetLogValue(name, cur, day);
+  if (card._paintSets) card._paintSets();
+}
+function cycleUnit(card) {
+  const order = ['kg', 'lb', 'plates'], u = cardUnit(card);
+  setCardUnit(card, order[(order.indexOf(u) + 1) % order.length]);
+  if (navigator.vibrate) navigator.vibrate(8);
 }
 
 // Reflect "all sets done?" on the exercise-level check and the day progress.
@@ -15693,7 +15799,7 @@ function kgNudge(row, card, set) {
   if (onbVeteran() && _kgNudged[day]) return false;
   _kgNudged[day] = true;
   box.classList.remove('kg-nudge'); void box.offsetWidth; box.classList.add('kg-nudge');
-  aaToast('No weight saved on that set. Type it in the kg box.', { kicker: 'No weight' });
+  aaToast('No weight saved on that set. Type it in the weight box.', { kicker: 'No weight' });
   return true;
 }
 // The clock is only started by Start, and the report's duration, load and readiness come from it. A set or a warm-up ticked
@@ -16051,12 +16157,13 @@ function paintTimerLog(row, item) {
   function draw() {
     const n = repsIn ? repsNow() : null;
     const off = repsIn && repsIn.value !== '';
+    const unit = item.card ? cardUnit(item.card) : 'kg';
     const lw = kgOn && !wIn.value ? lastKg() : '';
     tl.innerHTML = `
       <div class="tl-head">Set ${item.setI + 1} of ${item.total} · how did it go?</div>
       ${kgOn ? `<div class="tl-line tl-kgline">
-        <span class="tl-lab">Kg</span>
-        <input class="tl-kg" type="text" inputmode="decimal" autocomplete="off" value="${esc(wIn.value)}" placeholder="${lw ? 'last ' + esc(lw) : 'kg'}" aria-label="Weight on set ${item.setI + 1}">
+        <button type="button" class="tl-lab tl-unit" aria-label="Weight in ${unit}. Tap to change it">${unit === 'plates' ? 'Plates' : unit === 'lb' ? 'Lb' : 'Kg'}</button>
+        <input class="tl-kg" type="text" inputmode="decimal" autocomplete="off" value="${esc(wIn.value)}" placeholder="${lw ? 'last ' + esc(lastText(lw, unit)) : unitWord(unit)}" aria-label="Weight on set ${item.setI + 1}">
         ${lw ? `<button type="button" class="tl-same">Same as last</button>` : ''}
       </div>` : ''}
       ${repsIn ? `<div class="tl-line">
@@ -16071,7 +16178,9 @@ function paintTimerLog(row, item) {
           return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}" aria-label="RPE ${v}">${v}</button>`; }).join('')}
       </div>${lim}`;
     const kgBox = tl.querySelector('.tl-kg');
-    if (kgBox) kgBox.addEventListener('change', () => kgCheckTicked(item.name, wIn.value, item.card));   // the set is ticked by now
+    const unitBtn = tl.querySelector('.tl-unit');
+    if (unitBtn) unitBtn.addEventListener('click', () => { cycleUnit(item.card); draw(); });
+    if (kgBox) kgBox.addEventListener('change', () => kgCheckTicked(item.name, composeW(wIn.value, cardUnit(item.card)), item.card, item.setI));   // the set is ticked by now
     if (kgBox) kgBox.addEventListener('input', () => {
       const v = normDigits(kgBox.value);
       if (v !== kgBox.value) kgBox.value = v;
@@ -16082,7 +16191,10 @@ function paintTimerLog(row, item) {
     });
     const sameBtn = tl.querySelector('.tl-same');
     if (sameBtn) sameBtn.addEventListener('click', () => {
-      wIn.value = lastKg();
+      // Last time's weight in last time's unit: the card switches to it, and the box gets the number.
+      const L = splitW(lastKg());
+      if (item.card && (L.unit || 'kg') !== cardUnit(item.card)) setCardUnit(item.card, L.unit || 'kg');
+      wIn.value = L.num;
       wIn.dispatchEvent(new Event('input'));
       if (navigator.vibrate) navigator.vibrate(8);
       draw();
@@ -16301,23 +16413,38 @@ function histDateLabel(iso) {
             : Math.round(days / 30) + ' months ago';
   return { when, ago };
 }
+// A logged weight in KILOGRAMS (pounds converted, plates and no number → null). Every calculation reads this one.
 function histKg(v) {
   const k = parseLoggedKg(v);
   return k == null ? null : String(Math.round(k * 100) / 100);
 }
+// The same weight as the athlete typed it, to SHOW: "80", "45 lb", "6 plates" (kg stays a bare number); null with no number.
+function histWt(v) {
+  const w = weightOf(v);
+  if (w.n == null) return null;
+  const s = String(Math.round(w.n * 100) / 100);
+  return w.unit === 'kg' ? s : s + ' ' + unitWord(w.unit, w.n);
+}
 
-// "80 kg × 5 · 5 · 4", "80 · 82.5 · 85 kg", "× 12 · 12 · 10", or "3 sets".
+// "80 kg × 5 · 5 · 4", "80 · 82.5 · 85 kg", "45 lb × 8 · 8", "6 plates × 12", "× 12 · 12 · 10", or "3 sets".
+// Shown in the unit each set was typed in; a list that mixes units names the unit on every weight.
 function histSetsText(sets, planned) {
   const done = (sets || []).filter(histSetLogged);
   if (!done.length) return '';
-  const ws = done.map(s => histKg(s.w));
+  const wd = done.map(s => weightOf(s.w));
+  const ws = wd.map(w => w.n == null ? null : String(Math.round(w.n * 100) / 100));
+  const us = wd.filter(w => w.n != null).map(w => w.unit);
+  const mixed = us.some(u => u !== us[0]), U = us[0] || 'kg';
+  const wt = i => ws[i] == null ? null : (mixed ? (wd[i].unit === 'kg' ? ws[i] + ' kg' : histWt(done[i].w)) : ws[i]);
   const ns = done.map(s => (s.n != null && s.n !== '') ? Number(s.n) : (planned || null));
   const anyN = ns.some(n => n), allW = ws.every(w => w != null), noW = ws.every(w => w == null);
-  const same = allW && ws.every(w => w === ws[0]);
-  if (same) return anyN ? `${ws[0]} kg × ${ns.map(n => n || '–').join(' · ')}` : `${ws[0]} kg · ${done.length} sets`;
+  const same = allW && ws.every(w => w === ws[0]) && !mixed;
+  // The unit goes once, after the weights, when they all share it; on each weight when they do not.
+  const tail = mixed ? '' : ' ' + unitWord(U, new Set(ws.filter(w => w != null)).size > 1 ? 2 : Number(ws.find(w => w != null)));
+  if (same) return anyN ? `${ws[0]}${tail} × ${ns.map(n => n || '–').join(' · ')}` : `${ws[0]}${tail} · ${done.length} sets`;
   if (noW)  return anyN ? `× ${ns.map(n => n || '–').join(' · ')}` : `${done.length} set${done.length === 1 ? '' : 's'}`;
-  if (anyN) return done.map((s, i) => `${ws[i] || 'BW'}×${ns[i] || '–'}`).join(' · ');
-  return ws.map(w => w || 'BW').join(' · ') + ' kg';
+  if (anyN) return done.map((s, i) => `${wt(i) || 'BW'}×${ns[i] || '–'}`).join(' · ') + (U === 'kg' ? '' : tail);   // kg is implied, as it always was
+  return ws.map((w, i) => wt(i) || 'BW').join(' · ') + tail;
 }
 // The set in one past session that gives the highest estimated max, at the reps it
 // was done for (its own `n`, else the plan's). { est, kg, reps, rpe } or null. ONE copy
@@ -16330,7 +16457,8 @@ function histBestSet(e) {
     const kg = parseLoggedKg(s.w);
     const n = (s.n != null && s.n !== '') ? Number(s.n) : (e.reps || null);
     const est = (kg && n) ? estimateOneRM(kg, n, s.r) : null;
-    if (est != null && (!best || est > best.est)) best = { est: est, kg: kg, reps: n, rpe: Number(s.r) };
+    // `u`: a set lifted in pounds says so, so Records can show it in pounds and a share card is not drawn from converted kilograms.
+    if (est != null && (!best || est > best.est)) best = { est: est, kg: kg, reps: n, rpe: Number(s.r), u: weightOf(s.w).unit === 'lb' ? 'lb' : '' };
   });
   return best;
 }
@@ -16385,7 +16513,7 @@ function paintLastTime(card) {
   if (e.circuit) {
     const strip = document.createElement('div');
     strip.addEventListener('click', ev => ev.stopPropagation());
-    const parts = (e.items || []).filter(it => it.w).map(it => `${esc(it.name)} <b>${esc(histKg(it.w) || it.w)}</b>`);
+    const parts = (e.items || []).filter(it => it.w).map(it => `${esc(it.name)} <b>${esc(histWt(it.w) || it.w)}</b>`);
     const low = last.readiness != null && last.readiness <= 2.5;
     strip.className = 'lt-strip';
     strip.innerHTML = `
@@ -16408,7 +16536,7 @@ function paintLastTime(card) {
       if (!histSetLogged(s) || rpeVs(s.r, target) !== 'over') return;
       const g = document.createElement('div');
       g.className = 'lt-ghost';
-      const w = histKg(s.w), n = (s.n != null && s.n !== '') ? s.n : (e.reps || null);
+      const w = histWt(s.w), n = (s.n != null && s.n !== '') ? s.n : (e.reps || null);
       // "last 5 @ 9": the weight is in the kg box already (Centre Court, 2026-10-12). w stays for a bodyweight set.
       g.innerHTML = `last${n ? ' ' + esc(String(n)) : (w ? ' ' + esc(w) : '')} @ <b>${esc(String(s.r))}</b>`;
       row.appendChild(g);
@@ -16499,21 +16627,29 @@ function openHistorySheet(card) {
   const ov = document.getElementById('hist-overlay');
   if (!ov) return;
 
+  // The chart is drawn in the unit the lift was last logged in (kg, lb or plates); a session in another unit leaves the line, never
+  // joins it as if the numbers were alike.
+  let lu = 'kg';
+  for (const h of hist) {
+    const s = h.entry && !h.entry.circuit && (h.entry.sets || []).find(x => weightOf(x && x.w).n != null);
+    if (s) { lu = weightOf(s.w).unit; break; }
+  }
   const pts = hist.slice().reverse().map(h => {
     const e = h.entry;
     if (e.circuit) return null;
     const best = histBestSet(e);
     let top = null;
     (e.sets || []).filter(histSetLogged).forEach(s => {
-      const kg = parseLoggedKg(s.w);
-      if (kg != null && (top == null || kg > top)) top = kg;
+      const w = weightOf(s.w);
+      if (w.n != null && w.unit === lu && (top == null || w.n > top)) top = w.n;
     });
-    return { date: h.date, est: best ? best.est : null, top };
+    const estOk = best && ((best.u === 'lb') === (lu === 'lb'));
+    return { date: h.date, est: estOk ? (lu === 'lb' ? Math.round(best.est / 0.45359237) : best.est) : null, top };
   }).filter(Boolean);
   const estPts = pts.filter(p => p.est != null);
-  const series = estPts.length >= 2 ? { label: 'Best set · estimated 1RM, kg', vals: estPts.map(p => p.est) }
+  const series = estPts.length >= 2 ? { label: `Best set · estimated 1RM, ${lu}`, vals: estPts.map(p => p.est) }
                : (pts.filter(p => p.top != null).length >= 2
-                 ? { label: 'Top weight, kg', vals: pts.filter(p => p.top != null).map(p => p.top) } : null);
+                 ? { label: lu === 'plates' ? 'Top stack, plates' : `Top weight, ${lu}`, vals: pts.filter(p => p.top != null).map(p => p.top) } : null);
 
   let chart = '';
   if (series) {
@@ -16538,7 +16674,7 @@ function openHistorySheet(card) {
 
   const rows = hist.map(h => {
     const e = h.entry, dl = histDateLabel(h.date);
-    const txt = e.circuit ? ((e.items || []).filter(it => it.w).map(it => `${it.name} ${histKg(it.w) || it.w}`).join(' · ') || e.gear || '')
+    const txt = e.circuit ? ((e.items || []).filter(it => it.w).map(it => `${it.name} ${histWt(it.w) || it.w}`).join(' · ') || e.gear || '')
                           : histSetsText(e.sets, e.reps || null);
     const rs = e.circuit ? '' : (e.sets || []).filter(histSetLogged).map(s => Number(s.r) || null).filter(Boolean)
       .map(r => rpeMark(r, target)).join(' ');
@@ -17438,10 +17574,11 @@ function hlLiftEntries(lift) { const l = ceilingLifts().find(x => x.lift === lif
 function hlBestSpec(lift, day) {
   const es = hlLiftEntries(lift), e = es.find(x => x.d === day);
   if (!e || !(Number(e.w) > 0) || !(Number(e.r) > 0)) return null;
+  if (e.u === 'lb') return null;                      // lifted in pounds: a card says kilograms, so no card is drawn from converted ones
   const before = es.filter(x => x.d < day);
   if (!before.length) return null;
   const top = before.reduce((a, b) => (b.kg > a.kg ? b : a));
-  if (!(e.kg > top.kg)) return null;
+  if (!(e.kg > top.kg) || top.u === 'lb') return null;
   const prev = Number(top.w) > 0 && Number(top.r) > 0 ? { w: Number(top.w), r: Number(top.r), date: top.d } : null;
   return { kind: 'best', first: hlFirst(), lift, w: Number(e.w), r: Number(e.r), date: day, prev, cycle: hlCycleOf(day) };
 }
@@ -17457,6 +17594,7 @@ function hlRetestSpec(lift, set, label) {
     if (pre.length) before = pre.reduce((a, b) => (b.kg > a.kg ? b : a));
   }
   if (!before || !(Number(before.w) > 0) || !(Number(before.r) > 0)) return null;
+  if (before.u === 'lb' || set.u === 'lb') return null;   // pounds: no card (see hlBestSpec())
   const a = { w: Number(before.w), r: Number(before.r) }, b = { w: Number(set.w), r: Number(set.r) };
   if (!((b.w > a.w && b.r >= a.r) || (b.w >= a.w && b.r > a.r))) return null;
   const ia = hlCycleIdxOf(before.d), ib = hlCycleIdxOf(set.d);
@@ -17550,7 +17688,7 @@ function collectWins(day, bests) {
         const D = buildSessionData(day);
         ((D && D.log) || []).forEach(e => {
           const f = flagged[histNorm(HIST_ALIAS[e.ex] || e.ex)], s = f && histBestSet(e);
-          const spec = s && hlRetestSpec(f.name, { w: s.kg, r: s.reps, d: on }, f.label);
+          const spec = s && hlRetestSpec(f.name, { w: s.kg, r: s.reps, d: on, u: s.u }, f.label);
           if (spec && !seen[f.name]) { out.push(spec); seen[f.name] = 1; }
         });
       }
@@ -17612,7 +17750,7 @@ function hlLiftRetest(lift) {
   const es = hlLiftEntries(lift), e = es[es.length - 1];
   if (!e || !e.test || daysSince(e.d) > 7) return null;
   const c = ceilingCandidates().find(x => x.name === lift);
-  return hlRetestSpec(lift, { w: e.w, r: e.r, d: e.d }, c && c.test ? c.test.label : (Number(e.r) > 0 ? e.r + 'RM' : ''));
+  return hlRetestSpec(lift, { w: e.w, r: e.r, d: e.d, u: e.u }, c && c.test ? c.test.label : (Number(e.r) > 0 ? e.r + 'RM' : ''));
 }
 function openShareRetest() { const s = _ceilLift && hlLiftRetest(_ceilLift); if (s) openShareSheet([s], 0); }
 window.openShareRetest = openShareRetest;
