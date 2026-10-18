@@ -23,6 +23,7 @@ import path from 'node:path';
 import cp from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { openDb, runSql, read } from '../restore/lib.mjs';
+import { snapshotBefore } from './snapshot_before.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
@@ -32,6 +33,10 @@ const opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null
 const BACKUP = opt('--backup'), REPORT = opt('--report');
 // The commit the live project's phase 1 rulebook was seeded from (2026-10-17, rulebook version 1: the phase 1 note). --phase1 <rev> for another.
 const PHASE1 = opt('--phase1') || '94cdc89';
+// The career files phase 2 was built with (rulebook version 2, both switches off): what "the working files" were when this was written. Since
+// the XP switch went on (version 3, b8837cf) the working files are later than that; --files <rev> for another, `--files work` for the tree.
+const FILES = opt('--files') || '08e4f41';
+const filesFor = () => filesAt(FILES === 'work' ? null : FILES);
 
 let passed = 0, failed = 0;
 function ok(cond, what, detail) {
@@ -175,6 +180,9 @@ async function main() {
   section('0. the live project before stage69');
   await runSql(db, read(path.join(ROOT, 'scripts', 'restore', 'stand_in_supabase.sql')), 'stand-in');
   await runSql(db, read(path.join(ROOT, 'supabase', 'schema_snapshot.sql')), 'snapshot');
+  // the snapshot is the live structure: take it back to just before stage69 (scripts/career/snapshot_before.mjs)
+  const undone = await snapshotBefore(db, 69, ROOT);
+  if (undone.length) console.log('  (the snapshot taken back from stage ' + undone.join(', ') + ')');
   const T = backup.tables || {};
   const n = {};
   for (const t of ['seasons', 'xp_rules', 'programs', 'program_versions', 'library_sessions', 'athlete_status', 'hab_titles', 'leaderboard_optin',
@@ -216,7 +224,7 @@ async function main() {
   const erase1 = (await one(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure) as d`)).d;
   ok((erase1.match(/'career_scores'/g) || []).length === 1 && erase1.replace(`'career_facts', 'career_scores']`, `'career_facts']`) === erase0,
      'coach_erase_person() learns career_scores exactly once, and nothing else in it moves');
-  const work = filesAt(null);
+  const work = filesFor();
   const v2 = (await one(db, seedSql(seedFrom(work)))).r;
   ok(v2 && v2.version === 2 && v2.switch && v2.switch.xp === 'off' && v2.switch.catalogue === 'off' && !v2.turned_on && !v2.levels,
      `the working files seed as rulebook 2, both switches off (backfill: ${JSON.stringify(v2 && v2.backfill && v2.backfill.athletes)} athletes)`, JSON.stringify(v2));
@@ -276,7 +284,7 @@ async function main() {
      `in shadow the session already counts in Career Mode's season (${zBefore.season.points} points), beside WORKOUT's 120`);
 
   section('3. the switch: the dry run (the list), then for real');
-  const sw = filesAt(null);
+  const sw = filesFor();
   withRulebook(sw, t => t.replace(/^version = 2$/m, 'version = 3').replace(/^xp = "off"$/m, `xp = "${today}"`));
   const dryOut = (await one(db, seedSql(seedFrom(sw, ['--dry-run'])))).r;
   const list = (dryOut && dryOut.levels) || [];
@@ -380,10 +388,10 @@ async function main() {
   ok(again && !again.turned_on && again.backfill.skipped && Number((await one(db, `select count(*) as n from public.career_facts where kind = 'level_kept'`)).n) === real.levels.filter(r => r.kept_xp).length,
      'the switch seed again: nothing turned on, no backfill, no new level kept');
   let refusedOff = '', refusedFuture = '', refusedCat = '';
-  const offAgain = filesAt(null);
+  const offAgain = filesFor();
   withRulebook(offAgain, t => t.replace(/^version = 2$/m, 'version = 4'));
   try { await one(db, seedSql(seedFrom(offAgain))); } catch (e) { refusedOff = e.message; }
-  const future = filesAt(null);
+  const future = filesFor();
   withRulebook(future, t => t.replace(/^version = 2$/m, 'version = 4').replace(/^xp = "off"$/m, `xp = "${addDays(today, 3)}"`));
   try { await one(db, seedSql(seedFrom(future))); } catch (e) { refusedFuture = e.message; }
   try {

@@ -10,9 +10,11 @@
 # How the server uses this file (phase 1, 2026-10-17): scripts/career_seed.py turns it into the career_rules row and
 # the other files into career_catalogue rows. Run `python scripts/check_career.py` first; the seed refuses a file with
 # an error. Version 2 (phase 2, 2026-10-17): phase 1's one shadow gate became the two switches below. Version 3
-# (2026-10-18): the XP switch turned on, the day Season 1 opened (Amir: "switch after Season 1 starts").
+# (2026-10-18): the XP switch turned on, the day Season 1 opened (Amir: "switch after Season 1 starts"). Version 4
+# (2026-10-18, phase 3 built, the catalogue switch still off): The Upgrade and Double Up count main lifts only (`patterns`,
+# Amir's round 4 call 4); seeded with stage70.
 
-version = 3
+version = 4
 meanings = ["consistency", "commitment", "progress", "resilience"]
 
 [switch]

@@ -1151,6 +1151,8 @@ Highlight Reel), and added *"the achievements, badges and other things need to h
      synced). Share waits for the picture so the phone's sheet opens inside the tap (Safari refuses it after a wait).
 - **Career Mode** (phase 3) opens a reward's card with the same `openShareSheet([spec])` and its moment with `openMoment({ eyebrow, title,
   sub, art, words, go, specs })` (career/CAREER_MODE.md, GAME-14). The data shapes are written above each template in sharecard.js.
+  Built 2026-10-18, inert until the catalogue switch: see *Rewards (Career Mode phase 3)* below (`hlBadgeSpec()`, `hlAchievementSpec()`,
+  `hlTitleSpec()` feed these two).
 - **The guide** has a *Share a win* card (`key: 'share'`); the privacy notice says how a card is made and where it goes (§2.2, `#share-cards`).
 - Checked by `scripts/headless/sharecard.js` (every template at both sizes, in both languages, with weights and names on and off and with
   long names: no text past its box, nothing in Instagram's bars, nothing overlapping, Persian digits in Farsi, the EN and FA tables
@@ -1207,6 +1209,8 @@ level is the career's (every session, every habit, never reset by a season) and 
   the small one (*GRINDER 1 · 1,310 XP to level 12*). A thin green bar runs along the row's foot (`.career-bar`): the way to the next
   level. The level is worked out here from the profile's XP with `careerLevelOf()`, so the row and the finish card agree to the XP.
 - **The tap** (`goCareer()`): AA Proof's Locker, `habits.html?client=<id>&go=pass` (AA Proof reads `go=pass` at the end of its boot).
+  **Once the catalogue switch is on** (`catalogueOnT()`, below) it opens the **Trophy Room**, `&go=trophy`, and the row's `aria-label` and the
+  guide's *Career* card say so (the card is a getter, `get body()`, so the Locker is still the Locker before the switch).
   The row leaves the app. It does not open the guide the way Hold Serve's row does.
 - **When it shows:** the switch is on (`careerOnT()`: a real profile with `ready` and `switch.xp`), `DATA` has loaded and the profile
   carries a level. **When it does not:** before the switch, in the demo, in the coach's preview, and on a first launch with no signal
@@ -1246,12 +1250,80 @@ level is the career's (every session, every habit, never reset by a season) and 
   this app neither reads nor writes. This app's two Career keys are `<id>_careercache` and `<id>_earn_d<N>`. `_snapshot()` skips both
   (a cache of the server's answer, and this phone's view of a finished day), so neither ever syncs. Neither is written in the demo or
   the coach's preview.
+  Phase 3 adds `<id>_trophy_d<N>` and `<id>_trophy_seen`, skipped by `_snapshot()` the same way (*Rewards*, below).
 - Checked by `scripts/headless/career.js` (55 checks across both apps, and this is the training half): the row, its place above Hold Serve and the
   10 px between the two, no row and no `get_profile` before the switch (the switch off, and the phase 1 rulebook that has none), the
   phone's copy shown at once and dropped when the switch goes off, nothing in the demo or the preview, the habits row's wording, the
   finish card's line (plain, a repeat, a held week after a broken one), the finished card (*counting*, then the server's number), the
   keys never synced, the tap into the Locker and 320 px. The stub answers `get_profile` from `__STUB.profile` and `career_rules` from
   its `tables`.
+
+## 🏆 Rewards (Career Mode phase 3, the catalogue switch, 2026-10-18)
+
+The training app's half of the catalogue switch (`career/CAREER_MODE.md` → *round 4*, GAME-13 and GAME-14; `career/PROCEDURES.md` → P8 and
+P17). The server's half is `supabase/stage70_career_catalogue.sql`: `get_profile()` carries a **shelf** and the athlete's **moments**, and
+`career_told()` marks one as shown. **Built against stubs while the server was written; inert until `get_profile().switch.catalogue` is a
+day.** Until then none of it runs, draws or asks the server for anything, in the app, the demo or the coach's preview: `catalogueOnT()` is
+`careerOnT()` and a `YYYY-MM-DD` in `switch.catalogue`, and every door below starts with it.
+
+- **What the profile carries** (the contract: the spec's `shelf`, `moments`, `reveal`). `shelf.badges[]` each have `id`, `name`, `meaning`,
+  `n` (the measure judged: a count, or Hold Serve's best run), `now` (Hold Serve's current run only), `tier`, `metal`, `steps[]` (with the
+  `day` each was reached) and `next { tier, at, metal, xp }`. `moments[]` are the athlete's untold awards, biggest first: `{ key, kind
+  ('badge'|'achievement'|'title'), id, tier, name, meaning, metal, size ('win'|'highlight'|'milestone'|'legend'), xp, day, caption, app }`.
+  **This app shows only `app === 'training'`**; AA Proof shows the reveal and its own. The server marks as told, when it mints, everything
+  AA Proof celebrates itself, so `moments` is nearly always training's (Full Stack is the one habit moment left, and not ours).
+- **The finish card, before Done** (`trophyMoves()`, drawn by `careerEarnHTML()` under *This session earns*): up to **three lines** for the
+  badges this session moves, a step reached first, then in this order: **Hold Serve**, **Century**, **Paper Trail**, **Pulse Check**,
+  **Second Serve**. *Century 24 of 25*, or *Century I reached* with the numeral in clay when the session takes the step (`next.tier`, in
+  Roman). A line follows the rules the server counts by, from `careerEarn()`'s own parts: Century when the session pays (`session` or
+  `early`, so a repeat of a day done this week does not move it), Paper Trail when `careerFullLog()` says every set was logged, Pulse
+  Check when `careerCheckin()` says it was checked in, Hold Serve when the session completes the week (the `week` part, and only if the run
+  would pass the best run: the badge is judged on the best, so a held week inside an older, longer run moves nothing), Second Serve when the
+  week follows a broken one. **Nothing when it cannot be sure** (no shelf, `n` unknown, no `next`, the badge retired or maxed) and nothing
+  at all on a session that pays nothing. Under them: *These count once your session is saved.*, because the server mints (GAME-2) and the
+  phone only previews. Love Hold needs the whole week's log, so it is left to the server's moment. The lines follow a new profile
+  (`paintCareer()` repaints an open card).
+- **After Done**: `careerSessionSaved()` (the session is on the server) notes the day as pending, and the profile that comes back **asked
+  after that** (`trophyAfterRefresh()`; an older answer asks again) is the one that carries what the session earned. `trophyIngest(day)`
+  takes its training moments by size:
+  - **win**: one quiet line on the finished card (a mint dot, white words: *Achievement: Held*), nothing to tap.
+  - **highlight**: a **band with Share** in the finished card's `.hl-band-slot`, after the New best bands (*New badge · Century · Bronze I*;
+    `openShareFromTrophy()` opens the share sheet on the card, with the other bands' cards in its picker).
+  - **milestone, legend**: a **full-screen moment** (`openMoment()`, `trophyMoment()`): *Badge · Commitment* over the name, the metal and
+    step as the small line, his words (*You earned this one.* / *You did it.* / *This title is yours now.* then *Here's your card if you want
+    to share it.*), **Share your badge / Share it / Share your title** and **Not now**. One at a time: the rest wait in a queue and follow when
+    one closes (`closeMoment()` asks again); a moment never opens over the Welcome, another moment, a sheet, the rest timer, Guided or a
+    video, or while the app is in the background (it waits, 24 tries at 2.5 s). **Back closes it**: it is the `.hl-moment` that `topLayer()`
+    already knows, so this build adds no layer.
+  - A reward whose card the painter cannot draw (`ShareCard.can()`: no metal, say) is a quiet line, never a band or a moment with nothing to
+    share. A win or a highlight shows only here, after a session: **at boot a highlight waits for the next finished card** (and AA Proof shows it
+    meanwhile), so nothing opens over Home for a small thing.
+  - The card is kept for a reload: `<id>_trophy_d<N>` (`{ sess, items }`) is tied to the day's finish stamp like `<id>_hlwin_d<N>` (a new
+    session or a reset shows none) and painted quietly (no pop). `paintWinBand()` writes both sets of rows; `paintCareer()` paints them once
+    the phone's copy of the profile is loaded (`restoreState()` runs before it).
+- **At boot** (the first answer of each open, `trophyAfterRefresh()`): a **milestone or legend earned while the app was closed** (a cycle
+  finished overnight) shows once, by the same rules. The profile is asked once per open as before: nothing new is asked for it.
+- **`career_told`** (`trophyTold()`): the athlete saw it, so AA Proof never repeats it. A win or a highlight is told as it is put on the
+  finished card, a milestone or legend as its moment opens, in one call per group (`p_keys`). Errors are ignored, and it is never called in
+  the demo or the coach's preview. `<id>_trophy_seen` (the last 80 keys this phone has shown) stops a moment repeating when a tell never got
+  through, and the next boot tells those keys again.
+- **The cards** (`hlBadgeSpec()`, `hlAchievementSpec()`, `hlTitleSpec()`, in the Highlight Reel block): a moment or a shelf entry becomes the
+  sharecard.js spec, `{ kind:'badge', first, name, meaning, metal, tier, n, caption, date }`, `{ kind:'achievement', … }`,
+  `{ kind:'title', first, name, meaning, metal, from, date }` (a title's `from` is the shelf's, `c_` stripped). **Names stay English on a
+  Farsi card** (Amir 2026-10-18, round 4 call 5): no `nameFa`, no `captionFa`. `ShareCard.can(spec)` is asked before anything is offered.
+  sharecard.js was not changed: its badge, achievement and title templates draw all of it.
+- **Keys.** `<id>_trophy_d<N>` and `<id>_trophy_seen`, never synced (`_snapshot()` skips both), never written in the demo or the preview
+  (`catalogueOnT()` is false there). Written with `_lsRawSet`.
+- **The guide** follows the controls (CNT-01): `APP_GUIDE`'s *Career* card says the row opens the **Trophy Room** and what a session's
+  badges look like, and *Finishing a session* names the lines, only once the switch is on (both are getters, `get body()`).
+- **Twins:** none new. The lines count with `careerEarn()`'s parts (which are held to the server's `career_session_want()` in
+  `scripts/check_twins.js` §9); the server's `career_awards` stays the one judge of what is minted. If the server's counting of Century, Paper
+  Trail or Pulse Check ever changes, `trophyMoves()` changes with it.
+- Checked by `scripts/headless/trophy-training.js` (the inert state: phase 2's card word for word and nothing told; each line, the step
+  reached and its clay, a repeat, the week after a broken one, the cap of three, the rules on the function itself; after Done the
+  quiet line, the band, the legend then the milestone one at a time, Back, Share, each key told once, a habit moment never, the kept card
+  and a reload; the boot moment once, not over the Welcome; the spec builders and `ShareCard.can()`; the demo and the preview; the Trophy
+  Room link; the guide; 320 px).
 
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 

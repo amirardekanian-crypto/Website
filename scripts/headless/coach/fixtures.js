@@ -52,6 +52,40 @@ function session(id, name, day, completed_on, extra) {
     updated_at: completed_on + 'T18:00:00.000Z', coach_status: 'read', log: null }, extra || {});
 }
 
+// The rows of the three Career Mode tables the Trophies group reads (made-up days around 2026-10-18; the scenario fixes the clock there).
+// ava_test has 4 badges (Century at its 2nd step, Hold Serve, HUMAN SPRINKLER with tier names, and one step of the retired per-habit ladder),
+// 3 achievements (one retired) and 1 title; cara_free has one achievement; ben_test has none.
+function careerRows(mode) {
+  const aw = (athlete, kind, item, tier, day, sub) => ({ athlete_id: athlete, kind, item, sub: sub || '', tier, day, xp: 0, size: 'win', how: 'earned', evidence: {}, minted_at: day + 'T08:00:00.000Z', told_at: null });
+  return {
+    career_rules: [
+      { version: 2, rules: { switch: { xp: '2026-10-18', catalogue: 'off' } } },
+      { version: 3, rules: { switch: { xp: '2026-10-18', catalogue: mode === 'on' ? '2026-10-18' : 'off' } } },
+    ],
+    career_catalogue: [
+      { kind: 'badge', id: 'century', body: { name: 'Century', meaning: 'commitment', tiers: [{ at: 25, metal: 'bronze' }, { at: 50, metal: 'silver' }, { at: 100, metal: 'emerald' }] } },
+      { kind: 'badge', id: 'held_weeks', body: { name: 'Hold Serve', meaning: 'consistency', tiers: [{ at: 4, metal: 'bronze' }, { at: 8, metal: 'silver' }] } },
+      { kind: 'badge', id: 'habit_water', body: { name: 'HUMAN SPRINKLER', meaning: 'consistency', tiers: [{ at: 5, metal: 'bronze', tier_name: 'KINDLED' }, { at: 10, metal: 'silver', tier_name: 'STEADY' }] } },
+      { kind: 'badge', id: 'habit_tiers', body: { name: 'Consistency Tiers', meaning: 'consistency', retire_at: 'catalogue', tiers: [{ at: 5, metal: 'bronze', tier_name: 'KINDLED' }, { at: 10, metal: 'silver', tier_name: 'STEADY' }, { at: 20, metal: 'emerald', tier_name: 'LOCKED IN' }] } },
+      { kind: 'achievement', id: 'held', body: { name: 'Held', meaning: 'consistency' } },
+      { kind: 'achievement', id: 'first_cycle', body: { name: 'First Cycle', meaning: 'commitment' } },
+      { kind: 'achievement', id: 'old_mark', body: { name: 'Old Mark', meaning: 'progress', retire_at: 'catalogue' } },
+      { kind: 'achievement', id: 'first_look', body: { name: 'First Look', meaning: 'commitment' } },
+      { kind: 'title', id: 'clockwork', body: { name: 'CLOCKWORK', meaning: 'consistency', metal: 'prismatic', from: 'Hold Serve, prismatic' } },
+      { kind: 'setting', id: 'sizes', body: { list: ['win', 'highlight'] } },
+    ],
+    career_awards: [
+      aw('ava_test', 'badge', 'century', 1, '2026-08-02'), aw('ava_test', 'badge', 'century', 2, '2026-10-14'),
+      aw('ava_test', 'badge', 'held_weeks', 1, '2026-09-20'),
+      aw('ava_test', 'badge', 'habit_water', 1, '2026-09-01'), aw('ava_test', 'badge', 'habit_water', 2, '2026-10-03'),
+      aw('ava_test', 'badge', 'habit_tiers', 3, '2026-07-11', 'water'), aw('ava_test', 'badge', 'habit_tiers', 1, '2026-06-01', 'water'),
+      aw('ava_test', 'achievement', 'held', 0, '2026-09-27'), aw('ava_test', 'achievement', 'first_cycle', 0, '2025-12-03'), aw('ava_test', 'achievement', 'old_mark', 0, '2026-05-09'),
+      aw('ava_test', 'title', 'clockwork', 0, '2026-10-15'),
+      aw('cara_free', 'achievement', 'first_look', 0, '2026-10-10'),
+    ],
+  };
+}
+
 function buildSeed(opt) {
   opt = opt || {};
   const today = opt.today;                     // the page's local YYYY-MM-DD
@@ -185,6 +219,9 @@ function buildSeed(opt) {
       { player_id: 'p-0001', test: 'sprint-10m', day: daysAgo(today, 1), account_id: 'u-assess-1', value: 1.85, extra: { wind: 'none' }, updated_at: iso(today, 1), deleted_at: null },
     ],
   };
+  // Career Mode phase 3 (the Trophies group on the File): opt.career = 'on' | 'off' adds the newest rulebook with the catalogue switch a day or
+  // "off", the catalogue entries the awards name, and ava_test's awards. Left out by default, so the other scenarios see a project that has none.
+  if (opt.career) Object.assign(db, careerRows(opt.career));
   if (opt.bigHistory) {
     for (let i = 0; i < opt.bigHistory; i++) {
       db.session_history.push(session('bulk_' + (i % 40), 'Bulk ' + (i % 40), (i % 3) + 1, daysAgo(today, 30 + Math.floor(i / 40))));

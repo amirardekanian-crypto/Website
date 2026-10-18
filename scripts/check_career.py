@@ -106,10 +106,10 @@ KNOWN_KEYS = {
     "fact": {"meaning", "xp", "xp_from", "source", "pays_for", "when", "cap", "min_share", "limit", "limit_per",
              "weeks_away", "window_days", "min_gain", "career_only"},
     "badge": {"name", "meaning", "kind", "counts", "habit", "proof_codes", "caption", "free", "origin", "tiers",
-              "retire_at", "starts_at", "superseded_by"},
+              "retire_at", "starts_at", "superseded_by", "patterns"},
     "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},
     "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code",
-                    "retire_at", "starts_at", "superseded_by"},
+                    "retire_at", "starts_at", "superseded_by", "patterns"},
     "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id", "retire_at", "superseded_by"},
     "skin": {"name", "from", "origin", "proof_id"},
     "mission": {"name", "slot", "meaning", "asks", "counts", "habit", "measure", "target", "picked_when", "free",
@@ -545,6 +545,38 @@ def check_rulebook(rb, rep):
 
 # ── Rule 4: badges ────────────────────────────────────────────────────────────────────────────────────────────────
 
+_SPINE_PATTERNS = None
+
+
+def spine_patterns():
+    """The Spine's movement patterns, read from coach.html's SPINE_PATTERNS (the list the editor offers), so this is no new copy."""
+    global _SPINE_PATTERNS
+    if _SPINE_PATTERNS is None:
+        try:
+            src = (pathlib.Path(__file__).resolve().parent.parent / "coach.html").read_text(encoding="utf-8")
+            m = re.search(r"const SPINE_PATTERNS = \[([^\]]*)\]", src)
+            _SPINE_PATTERNS = set(re.findall(r"'([a-z-]+)'", m.group(1))) if m else set()
+        except OSError:
+            _SPINE_PATTERNS = set()
+    return _SPINE_PATTERNS
+
+
+def check_patterns(c, e, reads):
+    """patterns (round 4, 2026-10-18): the Spine patterns a lift must have to count. Only for an entry that reads lift_gain."""
+    if "patterns" not in e:
+        return
+    p = e["patterns"]
+    if reads != ["lift_gain"]:
+        c.error("patterns is only for an entry that reads lift_gain (it narrows which lifts count)")
+    if not (isinstance(p, list) and p and all(is_text(x) for x in p)):
+        c.error("patterns must be a non-empty list of the Spine's movement patterns")
+        return
+    known = spine_patterns()
+    for x in p:
+        if known and x not in known:
+            c.error(f"patterns {x!r} is not one of the Spine's patterns (coach.html SPINE_PATTERNS: {', '.join(sorted(known))})")
+
+
 def counts_of(c, b):
     """A badge's counts as a list of fact ids; None when absent or malformed."""
     if "counts" not in b:
@@ -621,6 +653,7 @@ def check_badges(data, w, rep):
                     if fid not in w.facts:
                         c.error(f"counts {fid!r} is not a fact in rulebook.toml")
         check_tiers(c, b, kind, w)
+        check_patterns(c, b, counts)
         check_habit_ref(c, b, w)
         check_gates(c, b, bid, [(set(badges), "a badge in badges.toml")])
         warn_unknown(c, b, "badge")
@@ -651,6 +684,7 @@ def check_achievements(data, w, rep):
         get_bool(c, a, "free")
         get_choice(c, a, "origin", ORIGINS)
         check_title_ref(c, a, w)
+        check_patterns(c, a, [a.get("reads")])
         check_gates(c, a, aid, [(set(achievements), "an achievement in achievements.toml"),
                                 (w.badge_ids, "a badge in badges.toml")])
         warn_unknown(c, a, "achievement")
@@ -1023,6 +1057,29 @@ def check_proof_parity(data, rep, snapshot=None):
                                                    f"all match")
 
 
+# ── Rule 17: every new achievement has a rule on the server ───────────────────────────────────────────────────────
+
+def check_server_achievements(data, folder, rep):
+    """Rule 17 (phase 3, 2026-10-18). An achievement's `rule` is prose; the server judges each origin = "new" achievement by its own SQL
+    (supabase/stage70_career_catalogue.sql, career_evaluate()), which lists the ids it knows in its `-- achievement:` comment lines. A new
+    achievement in the file with no rule there would never be minted, silently. Checked only on the repo's own career folder."""
+    root = pathlib.Path(__file__).resolve().parent.parent
+    if pathlib.Path(folder).resolve() != (root / "career").resolve():
+        return
+    sql = root / "supabase" / "stage70_career_catalogue.sql"
+    if not sql.exists():
+        return
+    known = set()
+    for line in sql.read_text(encoding="utf-8").splitlines():
+        m = re.match(r"\s*-- achievement: (.*)$", line)
+        if m:
+            known |= {mm.group(1) for x in m.group(1).split(",") if (mm := re.match(r"\s*([a-z][a-z0-9_]*)", x))}
+    for aid, a in (data.get("achievement") or {}).items():
+        if isinstance(a, dict) and a.get("origin") == "new" and aid not in known:
+            rep.error("achievements.toml", f"achievement.{aid}",
+                      f"the server has no rule for it: add it to career_evaluate() in {sql.name} (its '-- achievement:' list), or it is never minted (rule 17)")
+
+
 # ── The run, and the summary ──────────────────────────────────────────────────────────────────────────────────────
 
 def check_folder(folder):
@@ -1037,6 +1094,7 @@ def check_folder(folder):
         check_badges(data["badges"], w, rep)
     if data["achievements"] is not None:
         check_achievements(data["achievements"], w, rep)
+        check_server_achievements(data["achievements"], folder, rep)
     if data["missions"] is not None:
         check_missions(data["missions"], w, rep)
     if data["quests"] is not None:

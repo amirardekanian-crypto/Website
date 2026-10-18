@@ -757,6 +757,8 @@
   .frec:first-child { border-top: 0; }
   .frec-h { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
   .frec-t { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+  .trow { font-size: 14px; padding: 2px 0; overflow-wrap: anywhere; }
+  .rawlog > summary + .trow { margin-top: 8px; }
   .fpanel .day-c { border: 0; border-top: 1px solid var(--rule); border-radius: 0; margin: 0; background: none; }
   .fpanel .day-c > summary { padding: 12px 0; }
   .fpanel .day-c > summary:hover { background: none; }
@@ -1650,6 +1652,9 @@ const S = {
   ath: {},         // assembled per-athlete records
   levels: {},      // athlete_id -> the server's level: Proof's season level, or the career level once Career Mode's XP switch is on
   careerXp: null,  // the day Career Mode's XP switch was turned on (career_rules → [switch] xp), or null while it is off (loadLevels())
+  careerCat: null, // the day the catalogue switch was turned on ([switch] catalogue), or null while it is off. Only a day lets the File read career_awards (trophiesBodyHtml())
+  careerCatalogue: null, // 'kind:id' -> the catalogue entry's body (name, meaning, tiers, metal, retire_at), read once when the first File needs it
+  careerAwards: {},      // athlete_id -> that athlete's career_awards rows, read when their File shows them; emptied by ↻ Refresh
   board: { season: null, week: null },
   boardAt: {},     // scope -> when the board was read (it is kept until ↻ Refresh, or a quest week starts or ends)
   boardErr: '',    // why the last board read failed
@@ -2703,15 +2708,19 @@ function paintLevels() {
 async function loadLevels() {
   if (DEMO || loadLevels._done) return;
   loadLevels._done = true;
-  const ids = Object.values(S.ath).filter(a => a.isHab).map(a => a.id);
-  if (!ids.length) return;
-  // Career Mode's XP switch (the newest rulebook's [switch] xp, a day or "off"): with it on, coach_season_levels() answers the career level.
-  // Read quietly: a page that cannot read it simply keeps the old label.
+  // Career Mode's two switches (the newest rulebook's [switch]: xp and catalogue, each a day or "off"). With xp on, coach_season_levels()
+  // answers the career level; with catalogue on, the athlete's File lists their trophies. Read quietly, and not waited for: a page that
+  // cannot read it simply keeps the old label and shows no trophies. It is read before the habit-athlete check below: it has nothing to do with it.
   sb.from('career_rules').select('version,switch:rules->switch').order('version', { ascending: false }).limit(1).then(r => {
     const sw = r && !r.error && Array.isArray(r.data) && r.data[0] && r.data[0].switch;
-    S.careerXp = sw && /^\d{4}-\d{2}-\d{2}$/.test(String(sw.xp || '')) ? sw.xp : null;
+    const day = v => sw && /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? v : null;
+    S.careerXp = day(sw && sw.xp);
+    S.careerCat = day(sw && sw.catalogue);
     if (S.careerXp) paintLevels();
+    if (S.careerCat) trophiesSwitchedOn();
   }, () => {});
+  const ids = Object.values(S.ath).filter(a => a.isHab).map(a => a.id);
+  if (!ids.length) return;
   const all = await sb.rpc('coach_season_levels', { p_ids: ids });
   if (!all.error && Array.isArray(all.data)) {
     all.data.forEach(r => { if (r && r.level != null) S.levels[r.athlete_id] = r.level; });
@@ -2873,6 +2882,7 @@ async function hardRefresh() {
   loadLevels._done = false; resetBoard(); S.assess = null; S.course = null; S.spine = null;
   LOAD_ERR.assess = LOAD_ERR.course = LOAD_ERR.spine = '';
   S.callLogs = {};   // cached per athlete for the page's life: a failed read stuck as "No call logs yet"
+  S.careerAwards = {}; S.careerCatalogue = null; Object.keys(_trophyState).forEach(k => delete _trophyState[k]);   // the trophies are read again
   try { await loadAll(); } catch (e) { $('content').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; return; }
   render();
   loadLevels().then(() => { if (S.ready) paintLevels(); });   // ↻ used to drop the levels and never fetch them again; they are filled in place (ROSTER-15)
@@ -5365,6 +5375,7 @@ function renderDetailBody(keep) {
   else box.innerHTML = fileTabHtml(D);
   box.dataset.athlete = D.athleteId; box.dataset.sub = D.sub;
   restoreTabBody(st, D.athleteId, D.sub);
+  if (D.sub === 'file') ensureTrophies(D.athleteId);   // once the catalogue switch is on: reads their awards, then fills the Trophies group in place
 }
 window.renderDetailBody = renderDetailBody;
 
@@ -5562,8 +5573,96 @@ function hiddenSessionsHtml(D) {
 // Which tier the Proof funnel treats a contact as: the programme's (S.ath), not the contact row's second copy. A coached client who signed up
 // through Proof first is "converted", and is never offered Forget. funnelPanelHtml() (Leads → Free signups) and the File's Danger zone ask the same question.
 function contactTierOf(c) { return (S.ath[c.athlete_id] && S.ath[c.athlete_id].tier) || c.tier || 'free'; }
+// ── Trophies (Career Mode, phase 3; read only) ─────────────────────────────────────────────────────────────────────────────────────
+// The File lists what the athlete has earned (public.career_awards: one row per badge step, achievement or title) once the newest
+// rulebook's catalogue switch is a day (S.careerCat, read by loadLevels()). Nothing is read before that: the table only exists on the
+// project after the catalogue stage is applied. Names, meanings and metals come from public.career_catalogue, read once. The awards are
+// read for the athlete whose File is on screen (a few dozen rows at most). A read that fails is a quiet line inside the group, never
+// LOAD_ERR or fail(): this is a look, not a duty. Nothing on it writes.
+const TROPHY_HOW = 'Everything the athlete has earned, as the database holds it. A badge shows its highest step and the day it was reached. A retired badge is no longer earned, and whoever has one keeps it. This page only reads: nothing here can be changed.';
+const _trophyState = {};   // athlete id -> 'loading' | 'error' (an athlete whose awards were read is in S.careerAwards instead)
+const ROMAN_STEPS = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+const roman = n => ROMAN_STEPS[n] || String(n);
+const cap1 = s => { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); };
+// "14 Oct", with the year when it is not this one.
+const trophyDay = iso => { const y = String(iso || '').slice(0, 4); return !/^\d{4}-\d{2}-\d{2}/.test(String(iso || '')) ? '' : dayMonth(String(iso).slice(0, 10)) + (y === todayKey().slice(0, 4) ? '' : ' ' + y); };
+// The awards as lines: titles first, then achievements, then badges (a badge once, at its highest step; a retired per-habit ladder once per habit),
+// each newest first. An entry the catalogue retired at the switch (body.retire_at = 'catalogue') is kept apart: the athlete still has it.
+function trophyLines(rows, cat) {
+  const best = new Map(), picked = [];
+  (rows || []).forEach(w => {
+    if (w.kind !== 'badge') { picked.push(w); return; }
+    const k = w.item + '|' + (w.sub || ''), cur = best.get(k);
+    if (!cur || Number(w.tier) > Number(cur.tier)) best.set(k, w);
+  });
+  best.forEach(w => picked.push(w));
+  const ORDER = { title: 0, achievement: 1, badge: 2 };
+  const lines = picked.map(w => {
+    const body = (cat && cat[w.kind + ':' + w.item]) || {};
+    const name = body.name || unslug(w.item);
+    let how = '';
+    if (w.kind === 'badge') {
+      const t = (Array.isArray(body.tiers) && body.tiers[Number(w.tier) - 1]) || {};
+      how = [cap1(t.metal), t.tier_name || roman(Number(w.tier))].filter(Boolean).join(' ');
+    } else if (w.kind === 'title') how = cap1(body.metal);
+    const bits = [`<b>${esc(name)}</b>`];
+    if (w.sub) bits.push(esc(w.sub));
+    if (how) bits.push(esc(how));
+    if (trophyDay(w.day)) bits.push(esc(trophyDay(w.day)));
+    return { kind: w.kind, day: String(w.day || ''), name, retired: body.retire_at === 'catalogue', html: `<div class="trow">${bits.join(' · ')}</div>` };
+  }).sort((x, y) => ORDER[x.kind] - ORDER[y.kind] || y.day.localeCompare(x.day) || x.name.localeCompare(y.name));
+  const of = (kind, retired) => lines.filter(l => l.kind === kind && l.retired === retired);
+  const n = k => lines.filter(l => l.kind === k).length;
+  const plural = (c, one, many) => c ? `${c} ${c === 1 ? one : many}` : '';
+  return {
+    count: lines.length,
+    countText: [plural(n('badge'), 'badge', 'badges'), plural(n('achievement'), 'achievement', 'achievements'), plural(n('title'), 'title', 'titles')].filter(Boolean).join(', '),
+    title: of('title', false), achievement: of('achievement', false), badge: of('badge', false),
+    retired: lines.filter(l => l.retired),
+  };
+}
+function trophiesBodyHtml(athleteId) {
+  const rows = S.careerAwards[athleteId];
+  if (!rows) return _trophyState[athleteId] === 'error'
+    ? '<p class="empty">The trophies did not load just now. Tap ↻ Refresh to try again.</p>' : '<p class="empty">Loading…</p>';
+  const t = trophyLines(rows, S.careerCatalogue);
+  const list = (label, lines) => lines.length ? fRow(label, { val: lines.map(l => l.html).join('') }) : '';
+  return (t.count ? fRow('Earned', { val: esc(t.countText) }) + list('Titles', t.title) + list('Achievements', t.achievement) + list('Badges', t.badge)
+      + (t.retired.length ? `<details class="rawlog" id="trophies-retired"><summary>Retired, still theirs · ${t.retired.length}</summary>${t.retired.map(l => l.html).join('')}</details>` : '')
+    : '<p class="empty">No trophies yet.</p>') + howFold('how-trophies', [`<b>Trophies.</b> ${TROPHY_HOW}`]);
+}
+// The group is absent until the catalogue switch is a day (and in the public demo, which never reads it).
+function trophiesGroupHtml(D) {
+  if (DEMO || !S.careerCat) return '';
+  return `<section class="fgroup" id="trophies"><h3 class="fh">Trophies</h3><div class="panel fpanel" id="trophies-body" data-athlete="${esc(D.athleteId)}">${trophiesBodyHtml(D.athleteId)}</div></section>`;
+}
+function paintTrophies(athleteId) {
+  const el = $('trophies-body');
+  if (el && el.dataset.athlete === athleteId) el.innerHTML = trophiesBodyHtml(athleteId);
+}
+// Read an athlete's awards (and, once, the catalogue) when their File shows the group; the group is filled in place when they arrive.
+async function ensureTrophies(athleteId) {
+  if (DEMO || !S.careerCat || S.careerAwards[athleteId] || _trophyState[athleteId]) return;
+  _trophyState[athleteId] = 'loading';
+  let rows = null;
+  try {
+    const [aw, cat] = await Promise.all([
+      selectAll('career_awards', 'athlete_id,kind,item,sub,tier,day,xp,size,how', ['athlete_id', 'kind', 'item', 'sub', 'tier'], q => q.eq('athlete_id', athleteId)),
+      S.careerCatalogue ? { data: null, error: null } : selectAll('career_catalogue', 'kind,id,body', null, q => q.in('kind', ['badge', 'achievement', 'title'])),
+    ]);
+    if (!cat.error && !S.careerCatalogue) { S.careerCatalogue = {}; (cat.data || []).forEach(c => { S.careerCatalogue[c.kind + ':' + c.id] = jparse(c.body) || {}; }); }
+    if (!aw.error && !cat.error) rows = aw.data || [];
+  } catch (e) { rows = null; }
+  if (rows) { S.careerAwards[athleteId] = rows; delete _trophyState[athleteId]; } else _trophyState[athleteId] = 'error';
+  paintTrophies(athleteId);
+}
+// The switch read can arrive after a File was already drawn (a deep link, a slow answer): draw that tab again, which adds the group.
+function trophiesSwitchedOn() {
+  if (S.ready && _D && _D.sub === 'file' && $('tabbody') && !$('trophies') && route().view === 'detail') renderDetailBody();
+}
 // The File tab: four groups, in this order, each one white panel with label / value / action rows between hairlines, and the longer
 // explanations folded at the end of their group (How this works). The Danger zone is shut until it is needed (or while Erase is open).
+// Once the catalogue switch is on, Trophies sits between Programme and Records (read only).
 const THEIR_APP_HOW = id => `Open ${esc(id)}'s programme in the same screens and words as their phone. It shows the programme only: what they have logged (sets, weights, records, habits) is not in it, and that is under The work and Proof here. It is read-only: nothing you tap is saved.`;
 const NO_LOGIN_HOW = 'The old secret links were retired on 7 Sep 2026. Create a username and password here, then send it on WhatsApp (it waits under “Logins to send” on the Athletes tab until you mark it sent, or they sign in with it).';
 const DELETE_HISTORY_HOW = 'Deletes every finished session (the hidden ones too) and everything the app keeps for them on the server (habit log, body weight, personal records). Their programme, login, coaching log and calls stay, and so do they on the roster.';
@@ -5675,7 +5774,7 @@ function fileTabHtml(D) {
         slot: dangerSlot('hist:' + athleteId, 'frow-w') })}${eraseRow}${forgetRow}${
       howFold('how-danger', [`<b>Delete training history.</b> ${DELETE_HISTORY_HOW}`, `<b>Erase completely.</b> ${ERASE_HOW}`].concat(forgetRow ? [`<b>Forget.</b> ${FORGET_HOW}`] : []))}</div></details>`;
 
-  return contactGroup + programmeGroup + recordsGroup + dangerGroup;
+  return contactGroup + programmeGroup + trophiesGroupHtml(D) + recordsGroup + dangerGroup;
 }
 
 // --- session notes -----------------------------------------------------------

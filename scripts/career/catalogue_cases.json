@@ -1,0 +1,763 @@
+{
+ "retired_codes": [
+  "BA",
+  "BA2",
+  "FF",
+  "FF2",
+  "HK",
+  "HM",
+  "HM3",
+  "HS",
+  "HS2",
+  "IM",
+  "IM2",
+  "MC",
+  "RB",
+  "RB2",
+  "RR",
+  "SW",
+  "SW3",
+  "TS",
+  "UB",
+  "US",
+  "ZM",
+  "ZM2"
+ ],
+ "about": "What AA Proof's phone pays once the catalogue switch is on (P13): the habit badges' steps (one ladder per habit, none for WORKOUT, one for all the athlete's own habits) and Proof's kept marks, with the day each was reached and its XP, as the server mints them for fixed logs. Written by node scripts/career/rehearse_catalogue.mjs --write-cases (the rehearsal checks them every run); held by scripts/check_twins.js §10 against habits.html. Change a rule on both sides, then here.",
+ "cases": [
+  {
+   "name": "water, 12 days in a row",
+   "log": {
+    "2026-09-01": {
+     "water": 8
+    },
+    "2026-09-02": {
+     "water": 8
+    },
+    "2026-09-03": {
+     "water": 8
+    },
+    "2026-09-04": {
+     "water": 8
+    },
+    "2026-09-05": {
+     "water": 8
+    },
+    "2026-09-06": {
+     "water": 8
+    },
+    "2026-09-07": {
+     "water": 8
+    },
+    "2026-09-08": {
+     "water": 8
+    },
+    "2026-09-09": {
+     "water": 8
+    },
+    "2026-09-10": {
+     "water": 8
+    },
+    "2026-09-11": {
+     "water": 8
+    },
+    "2026-09-12": {
+     "water": 8
+    }
+   },
+   "cfg": {
+    "on": {
+     "strength": false,
+     "steps": false,
+     "sleep": false,
+     "fuel": false,
+     "water": true,
+     "mobility": false,
+     "breathe": false,
+     "supps": false
+    }
+   },
+   "awards": [
+    {
+     "kind": "badge",
+     "item": "proof_clean_sweep",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-01",
+     "xp": 100
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-03",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "habit_water",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-05",
+     "xp": 20
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-07",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "habit_water",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-10",
+     "xp": 40
+    },
+    {
+     "kind": "badge",
+     "item": "proof_clean_sweep",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-10",
+     "xp": 300
+    }
+   ]
+  },
+  {
+   "name": "water, 4 days, a miss, then 6",
+   "log": {
+    "2026-09-01": {
+     "water": 8
+    },
+    "2026-09-02": {
+     "water": 8
+    },
+    "2026-09-03": {
+     "water": 8
+    },
+    "2026-09-04": {
+     "water": 8
+    },
+    "2026-09-05": {
+     "water": 3
+    },
+    "2026-09-06": {
+     "water": 8
+    },
+    "2026-09-07": {
+     "water": 8
+    },
+    "2026-09-08": {
+     "water": 8
+    },
+    "2026-09-09": {
+     "water": 8
+    },
+    "2026-09-10": {
+     "water": 8
+    },
+    "2026-09-11": {
+     "water": 8
+    }
+   },
+   "cfg": {
+    "on": {
+     "strength": false,
+     "steps": false,
+     "sleep": false,
+     "fuel": false,
+     "water": true,
+     "mobility": false,
+     "breathe": false,
+     "supps": false
+    }
+   },
+   "awards": [
+    {
+     "kind": "badge",
+     "item": "proof_clean_sweep",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-01",
+     "xp": 100
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-03",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-07",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "habit_water",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-10",
+     "xp": 20
+    },
+    {
+     "kind": "badge",
+     "item": "proof_clean_sweep",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-11",
+     "xp": 300
+    }
+   ]
+  },
+  {
+   "name": "WORKOUT 6 days in a row (no badge of its own)",
+   "log": {
+    "2026-09-01": {
+     "strength": 1
+    },
+    "2026-09-02": {
+     "strength": 1
+    },
+    "2026-09-03": {
+     "strength": 1
+    },
+    "2026-09-04": {
+     "strength": 1
+    },
+    "2026-09-05": {
+     "strength": 1
+    },
+    "2026-09-06": {
+     "strength": 1
+    }
+   },
+   "cfg": {
+    "on": {
+     "strength": true,
+     "steps": false,
+     "sleep": false,
+     "fuel": false,
+     "water": true,
+     "mobility": false,
+     "breathe": false,
+     "supps": false
+    }
+   },
+   "awards": [
+    {
+     "kind": "achievement",
+     "item": "first_blood",
+     "sub": "",
+     "tier": 0,
+     "day": "2026-09-01",
+     "xp": 50
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-03",
+     "xp": 0
+    }
+   ]
+  },
+  {
+   "name": "two habits of their own, runs of 6 (from day 4) and 11 (one ladder)",
+   "log": {
+    "2026-09-04": {
+     "c_aa": 1,
+     "c_bb": 1
+    },
+    "2026-09-05": {
+     "c_aa": 1,
+     "c_bb": 1
+    },
+    "2026-09-06": {
+     "c_aa": 1,
+     "c_bb": 1
+    },
+    "2026-09-07": {
+     "c_aa": 1,
+     "c_bb": 1
+    },
+    "2026-09-08": {
+     "c_aa": 1,
+     "c_bb": 1
+    },
+    "2026-09-09": {
+     "c_aa": 1,
+     "c_bb": 1
+    },
+    "2026-09-01": {
+     "c_bb": 1
+    },
+    "2026-09-02": {
+     "c_bb": 1
+    },
+    "2026-09-03": {
+     "c_bb": 1
+    },
+    "2026-09-10": {
+     "c_bb": 1
+    },
+    "2026-09-11": {
+     "c_bb": 1
+    }
+   },
+   "cfg": {
+    "on": {
+     "strength": false,
+     "steps": false,
+     "sleep": false,
+     "fuel": false,
+     "water": true,
+     "mobility": false,
+     "breathe": false,
+     "supps": false
+    },
+    "custom": [
+     {
+      "id": "c_aa",
+      "name": "Read"
+     },
+     {
+      "id": "c_bb",
+      "name": "Stretch"
+     }
+    ]
+   },
+   "awards": [
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-03",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "habit_custom",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-05",
+     "xp": 20
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-07",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "habit_custom",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-10",
+     "xp": 30
+    }
+   ]
+  },
+  {
+   "name": "three habits on two days",
+   "log": {
+    "2026-09-01": {
+     "water": 8,
+     "sleep": 8,
+     "steps": 11000
+    },
+    "2026-09-02": {
+     "water": 8,
+     "sleep": 8,
+     "steps": 11000
+    }
+   },
+   "cfg": {
+    "on": {
+     "strength": false,
+     "steps": true,
+     "sleep": true,
+     "fuel": false,
+     "water": true,
+     "mobility": false,
+     "breathe": false,
+     "supps": false
+    }
+   },
+   "awards": [
+    {
+     "kind": "badge",
+     "item": "dawn_patrol",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-01",
+     "xp": 40
+    },
+    {
+     "kind": "badge",
+     "item": "proof_clean_sweep",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-01",
+     "xp": 100
+    }
+   ]
+  },
+  {
+   "name": "sleep 31 days in a row",
+   "log": {
+    "2026-09-01": {
+     "sleep": 7.5
+    },
+    "2026-09-02": {
+     "sleep": 7.5
+    },
+    "2026-09-03": {
+     "sleep": 7.5
+    },
+    "2026-09-04": {
+     "sleep": 7.5
+    },
+    "2026-09-05": {
+     "sleep": 7.5
+    },
+    "2026-09-06": {
+     "sleep": 7.5
+    },
+    "2026-09-07": {
+     "sleep": 7.5
+    },
+    "2026-09-08": {
+     "sleep": 7.5
+    },
+    "2026-09-09": {
+     "sleep": 7.5
+    },
+    "2026-09-10": {
+     "sleep": 7.5
+    },
+    "2026-09-11": {
+     "sleep": 7.5
+    },
+    "2026-09-12": {
+     "sleep": 7.5
+    },
+    "2026-09-13": {
+     "sleep": 7.5
+    },
+    "2026-09-14": {
+     "sleep": 7.5
+    },
+    "2026-09-15": {
+     "sleep": 7.5
+    },
+    "2026-09-16": {
+     "sleep": 7.5
+    },
+    "2026-09-17": {
+     "sleep": 7.5
+    },
+    "2026-09-18": {
+     "sleep": 7.5
+    },
+    "2026-09-19": {
+     "sleep": 7.5
+    },
+    "2026-09-20": {
+     "sleep": 7.5
+    },
+    "2026-09-21": {
+     "sleep": 7.5
+    },
+    "2026-09-22": {
+     "sleep": 7.5
+    },
+    "2026-09-23": {
+     "sleep": 7.5
+    },
+    "2026-09-24": {
+     "sleep": 7.5
+    },
+    "2026-09-25": {
+     "sleep": 7.5
+    },
+    "2026-09-26": {
+     "sleep": 7.5
+    },
+    "2026-09-27": {
+     "sleep": 7.5
+    },
+    "2026-09-28": {
+     "sleep": 7.5
+    },
+    "2026-09-29": {
+     "sleep": 7.5
+    },
+    "2026-09-30": {
+     "sleep": 7.5
+    },
+    "2026-10-01": {
+     "sleep": 7.5
+    }
+   },
+   "cfg": {
+    "on": {
+     "strength": false,
+     "steps": false,
+     "sleep": true,
+     "fuel": false,
+     "water": false,
+     "mobility": false,
+     "breathe": false,
+     "supps": false
+    }
+   },
+   "awards": [
+    {
+     "kind": "badge",
+     "item": "proof_clean_sweep",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-01",
+     "xp": 100
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-03",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "habit_sleep",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-05",
+     "xp": 30
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-07",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "habit_sleep",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-10",
+     "xp": 60
+    },
+    {
+     "kind": "badge",
+     "item": "proof_clean_sweep",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-10",
+     "xp": 300
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 3,
+     "day": "2026-09-14",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "habit_sleep",
+     "sub": "",
+     "tier": 3,
+     "day": "2026-09-20",
+     "xp": 120
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 4,
+     "day": "2026-09-21",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 5,
+     "day": "2026-09-30",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "habit_sleep",
+     "sub": "",
+     "tier": 4,
+     "day": "2026-09-30",
+     "xp": 180
+    },
+    {
+     "kind": "badge",
+     "item": "proof_clean_sweep",
+     "sub": "",
+     "tier": 3,
+     "day": "2026-09-30",
+     "xp": 600
+    }
+   ]
+  },
+  {
+   "name": "steps, sleep, fuel and water 7 days at once (Full Stack)",
+   "log": {
+    "2026-09-01": {
+     "steps": 10000,
+     "sleep": 8,
+     "fuel": 3,
+     "water": 8
+    },
+    "2026-09-02": {
+     "steps": 10000,
+     "sleep": 8,
+     "fuel": 3,
+     "water": 8
+    },
+    "2026-09-03": {
+     "steps": 10000,
+     "sleep": 8,
+     "fuel": 3,
+     "water": 8
+    },
+    "2026-09-04": {
+     "steps": 10000,
+     "sleep": 8,
+     "fuel": 3,
+     "water": 8
+    },
+    "2026-09-05": {
+     "steps": 10000,
+     "sleep": 8,
+     "fuel": 3,
+     "water": 8
+    },
+    "2026-09-06": {
+     "steps": 10000,
+     "sleep": 8,
+     "fuel": 3,
+     "water": 8
+    },
+    "2026-09-07": {
+     "steps": 10000,
+     "sleep": 8,
+     "fuel": 3,
+     "water": 8
+    }
+   },
+   "cfg": {
+    "on": {
+     "strength": false,
+     "steps": true,
+     "sleep": true,
+     "fuel": true,
+     "water": true,
+     "mobility": false,
+     "breathe": false,
+     "supps": false
+    }
+   },
+   "awards": [
+    {
+     "kind": "badge",
+     "item": "dawn_patrol",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-01",
+     "xp": 40
+    },
+    {
+     "kind": "badge",
+     "item": "proof_clean_sweep",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-01",
+     "xp": 100
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-03",
+     "xp": 0
+    },
+    {
+     "kind": "badge",
+     "item": "habit_fuel",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-05",
+     "xp": 20
+    },
+    {
+     "kind": "badge",
+     "item": "habit_sleep",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-05",
+     "xp": 30
+    },
+    {
+     "kind": "badge",
+     "item": "habit_steps",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-05",
+     "xp": 40
+    },
+    {
+     "kind": "badge",
+     "item": "habit_water",
+     "sub": "",
+     "tier": 1,
+     "day": "2026-09-05",
+     "xp": 20
+    },
+    {
+     "kind": "achievement",
+     "item": "full_stack",
+     "sub": "",
+     "tier": 0,
+     "day": "2026-09-07",
+     "xp": 200
+    },
+    {
+     "kind": "badge",
+     "item": "day_streak",
+     "sub": "",
+     "tier": 2,
+     "day": "2026-09-07",
+     "xp": 0
+    }
+   ]
+  }
+ ]
+}

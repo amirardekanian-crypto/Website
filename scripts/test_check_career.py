@@ -546,6 +546,7 @@ class CareerCheckerTests(unittest.TestCase):
         self.assertPasses("OK: 0 errors")
 
     def test_the_catalogue_switch_needs_the_xp_switch_first(self):
+        self.set_key("rulebook.toml", "switch", "xp", '"off"')      # the working file has had it on since 2026-10-18
         self.set_key("rulebook.toml", "switch", "catalogue", '"2026-11-01"')
         self.assertFails("[switch]", "the catalogue switch (phase 3) needs the XP switch (phase 2) on first")
         self.setUp()

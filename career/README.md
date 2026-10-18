@@ -7,6 +7,8 @@ changing a file and seeding it again is how a detail changes (GAME-10). In phase
 they saw was Hold Serve on the training app's Home (2026-10-17), the held weeks the server judges with `rulebook.toml` → `[week]`.
 **Phase 2, the XP switch, is done: applied to the live project on 2026-10-17 and switched on 2026-10-18**: `rulebook.toml` → `[switch] xp` is the switch
 (*Turning a switch on*, below). Since then the career level and its XP reach both apps; Career Mode's badges wait for phase 3.
+**Phase 3, the catalogue switch, is built and rehearsed (2026-10-18), not applied yet** (`supabase/stage70_career_catalogue.sql`): the badges,
+achievements and titles in these files get minted on the server, and the switch is `rulebook.toml` → `[switch] catalogue`, turned on the same way.
 
 ## What is here
 
@@ -67,10 +69,13 @@ settle, the level is the career level and never resets) and `catalogue` (phase 3
 2. `python scripts/career_seed.py --dry-run --out "$TEMP/career-switch-dry.sql"`, run it on the project: everything is worked out,
    then undone. For the XP switch it answers every athlete's line (Proof's level, the career level, the level kept), the list Amir
    reads first. Nobody's level goes down: an athlete below their best Proof level is kept at it (`[fact.level_kept]`).
+   For the catalogue switch it answers every athlete's career level and XP before and after, and what was minted (badge steps,
+   achievements, titles, steps carried over from Proof's ladders); it refuses if anyone's level would go down.
 3. On his yes, the same without `--dry-run`, then `select public.career_compare()`, and commit the file the same day, with
    `privacy.html` §2.3 brought up to date in that commit for the XP switch (`PROCEDURES.md` → P14, step 5).
 
-A switch once on never goes back off: the seed refuses it (the way back is `scripts/career/rollback_stage69.sql`, on Amir's word only).
+A switch once on never goes back off, and its day never moves: the seed refuses both (the way back is `scripts/career/rollback_stage69.sql` for the XP switch
+and `scripts/career/rollback_stage70.sql` for the catalogue switch, on Amir's word only).
 
 **An id never changes.** `[badge.held_weeks]`: `held_weeks` is the id that history is filed under. Change the `name`,
 never the id.

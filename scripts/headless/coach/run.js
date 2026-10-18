@@ -5411,6 +5411,122 @@ S['leads-chats-gaps'] = async (b) => {
   return r;
 };
 
+// ── Career Mode phase 3: the Trophies group on the athlete's File (2026-10-18; read only) ───────────────────────────────────────────────
+// It exists only once the newest rulebook's [switch] catalogue is a day. While it is "off" (or the rulebook cannot be read) the group is absent and
+// career_awards / career_catalogue are never read; with it on, the File lists titles, achievements and badges (a badge once, at its highest step),
+// the retired ones folded under "Retired, still theirs", and a read that fails is a quiet line in the group: no banner, no fail-bar line.
+S['career-trophies'] = async (b) => {
+  const r = { id: 'career-trophies', title: "The File's Trophies group: absent and never read while the catalogue switch is off; with it on, titles, achievements and badges at their highest step with the retired ones folded; a failed read is a quiet line", checks: [] };
+  const NOW = '2026-10-18T10:00:00Z';   // fixes "this year" for the days without a year
+  const awardsOf = cs => cs.filter(c => c.kind === 'from' && c.name === 'career_awards' && c.op === 'select');
+  const catalogueOf = cs => cs.filter(c => c.kind === 'from' && c.name === 'career_catalogue' && c.op === 'select');
+  const heads = async page => (await page.locator('#tabbody .fh').allInnerTexts()).map(x => x.replace(/\s+/g, ' ').trim());
+  const rowLines = async (page, label) => (await page.locator('#trophies-body .frow').filter({ has: page.locator('.frow-l', { hasText: new RegExp('^' + label + '$') }) }).locator('.trow').allInnerTexts()).map(x => x.replace(/\s+/g, ' ').trim());
+  const quiet = async (page, log) => ({ fail: await L.failText(page), warn: (await page.locator('#loadwarn').innerText()).trim(), alerts: log.dialogs.filter(d => d.type === 'alert' || d.via).map(d => d.message), errors: log.errors });
+  const isQuiet = q => !q.fail && !q.warn && !q.alerts.length && !q.errors.length;
+  const ALL4 = ['Contact and access', 'Programme', 'Records', 'Danger zone'];
+
+  // 1. The switch is "off": Ava has awards in the database, and the page does not look.
+  {
+    const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/file', fixedTime: NOW, seed: { career: 'off' } });
+    await L.settle(page, 600);
+    check(r, 'switch "off": the File is the usual groups, no Trophies group', JSON.stringify(await heads(page)) === JSON.stringify(ALL4) && (await page.locator('#trophies').count()) === 0, await heads(page));
+    await L.go(page, 'a/ben_test/file'); await L.go(page, 'a/ava_test/file');
+    await page.evaluate(() => hardRefresh()); await L.settle(page, 1000);
+    const cs = await L.calls(page);
+    check(r, 'the rulebook is read (twice: boot and Refresh), and career_awards and career_catalogue are never read', cs.filter(c => c.name === 'career_rules').length === 2 && !awardsOf(cs).length && !catalogueOf(cs).length, cs.filter(c => /^career_/.test(c.name)).map(c => c.name));
+    check(r, 'and still no Trophies group after Refresh, and nothing was said', (await page.locator('#trophies').count()) === 0 && isQuiet(await quiet(page, log)), await quiet(page, log));
+    await page.context().close();
+  }
+
+  // 2. The switch is a day.
+  {
+    const { page, log } = await L.openCoach(b, { hash: 'athletes', fixedTime: NOW, seed: { career: 'on' } });
+    await L.settle(page, 500);
+    const c0 = await L.calls(page);
+    check(r, 'before any File is open nothing of the awards is read (one athlete at a time)', !awardsOf(c0).length && !catalogueOf(c0).length, '');
+    await L.go(page, 'a/ava_test/file'); await L.settle(page, 800);
+    check(r, 'Ava\'s File: Trophies sits between Programme and Records', JSON.stringify(await heads(page)) === JSON.stringify(['Contact and access', 'Programme', 'Trophies', 'Records', 'Danger zone']), await heads(page));
+    let cs = await L.calls(page);
+    check(r, 'one read of her awards (filtered on her id) and one of the catalogue (badges, achievements and titles only)', awardsOf(cs).length === 1 && awardsOf(cs)[0].filters.some(f => /^athlete_id\.eq\."ava_test"$/.test(f)) && catalogueOf(cs).length === 1 && catalogueOf(cs)[0].filters.some(f => /^kind\.in\./.test(f)), { aw: awardsOf(cs).map(c => c.filters), cat: catalogueOf(cs).map(c => c.filters) });
+    check(r, 'the count line: 4 badges, 3 achievements, 1 title', (await rowLines(page, 'Earned')).length === 0 && /^4 badges, 3 achievements, 1 title$/.test((await page.locator('#trophies-body .frow').filter({ has: page.locator('.frow-l', { hasText: /^Earned$/ }) }).locator('.frow-v').innerText()).trim()), await page.locator('#trophies-body').innerText());
+    check(r, 'Titles: the title with its metal and day', JSON.stringify(await rowLines(page, 'Titles')) === JSON.stringify(['CLOCKWORK · Prismatic · 15 Oct']), await rowLines(page, 'Titles'));
+    check(r, 'Achievements, newest first, the year only when it is not this one, the retired one not here', JSON.stringify(await rowLines(page, 'Achievements')) === JSON.stringify(['Held · 27 Sep', 'First Cycle · 3 Dec 2025']), await rowLines(page, 'Achievements'));
+    check(r, 'Badges: one line each at the highest step (Century at step 2 = Silver II, tier names where the catalogue has them, a step number where it has not), newest first, the retired ladder not here',
+      JSON.stringify(await rowLines(page, 'Badges')) === JSON.stringify(['Century · Silver II · 14 Oct', 'HUMAN SPRINKLER · Silver STEADY · 3 Oct', 'Hold Serve · Bronze I · 20 Sep']), await rowLines(page, 'Badges'));
+    const ret = await page.evaluate(() => { const d = document.getElementById('trophies-retired'); return d && { open: d.open, summary: d.querySelector('summary').textContent.replace(/\s+/g, ' ').trim(), lines: [...d.querySelectorAll('.trow')].map(x => x.textContent.replace(/\s+/g, ' ').trim()) }; });
+    check(r, 'Retired, still theirs: folded, counts its two, the achievement then the badge (a retired ladder keeps its habit and its highest step)', !!ret && !ret.open && ret.summary === 'Retired, still theirs · 2' && JSON.stringify(ret.lines) === JSON.stringify(['Old Mark · 9 May', 'Consistency Tiers · water · Emerald LOCKED IN · 11 Jul']), ret);
+    check(r, 'read only: no button, box or action inside the group, and no career call but selects', (await page.locator('#trophies button, #trophies input, #trophies textarea, #trophies select, #trophies [onclick]').count()) === 0 && cs.filter(c => /^career_/.test(c.name)).every(c => c.op === 'select'), '');
+    const sizes = await page.evaluate(() => { const ok = [12, 14, 17, 22, 30], bad = []; document.querySelectorAll('#trophies *').forEach(el => { if ([...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) { const s = parseFloat(getComputedStyle(el).fontSize); if (!ok.includes(s)) bad.push(el.tagName + ' ' + s); } }); return bad; });
+    check(r, 'its text keeps to the five sizes', !sizes.length, sizes);
+    // opened by hand, kept through a redraw; nothing is read again
+    await page.locator('#trophies-retired > summary').click(); await L.settle(page, 200);
+    check(r, 'the fold opens and shows the two lines', await page.locator('#trophies-retired .trow').first().isVisible(), '');
+    await page.evaluate(() => { assemble(); render(); }); await L.settle(page, 700);
+    check(r, 'a full redraw keeps it open and the group full (no "Loading…")', await page.evaluate(() => { const d = document.getElementById('trophies-retired'); return !!d && d.open; }) && !/Loading/.test(await page.locator('#trophies-body').innerText()), await page.locator('#trophies-body').innerText());
+    await L.go(page, 'a/ava_test/work'); await L.go(page, 'a/ava_test/file'); await L.settle(page, 500);
+    cs = await L.calls(page);
+    check(r, 'another sub-tab and back, and the redraw, read nothing again', awardsOf(cs).length === 1 && catalogueOf(cs).length === 1, { aw: awardsOf(cs).length, cat: catalogueOf(cs).length });
+    // another athlete: only their awards, the catalogue is not read again
+    await L.go(page, 'a/cara_free/file'); await L.settle(page, 700);
+    check(r, 'Cara (one achievement): "1 achievement", her own award only', /^1 achievement$/.test((await page.locator('#trophies-body .frow').first().locator('.frow-v').innerText()).trim()) && JSON.stringify(await rowLines(page, 'Achievements')) === JSON.stringify(['First Look · 10 Oct']) && (await rowLines(page, 'Badges')).length === 0 && (await rowLines(page, 'Titles')).length === 0 && (await page.locator('#trophies-retired').count()) === 0, await page.locator('#trophies-body').innerText());
+    await L.go(page, 'a/ben_test/file'); await L.settle(page, 700);
+    check(r, 'Ben (nothing earned): "No trophies yet."', /No trophies yet\./.test(await page.locator('#trophies-body').innerText()) && (await page.locator('#trophies-body .frow').count()) === 0, await page.locator('#trophies-body').innerText());
+    cs = await L.calls(page);
+    check(r, 'each athlete was read once, by their own id, and the catalogue still once', awardsOf(cs).length === 3 && catalogueOf(cs).length === 1 && JSON.stringify(awardsOf(cs).map(c => (c.filters.find(f => /^athlete_id\.eq\./.test(f)) || '').replace(/^athlete_id\.eq\./, ''))) === JSON.stringify(['"ava_test"', '"cara_free"', '"ben_test"']), awardsOf(cs).map(c => c.filters));
+    check(r, 'nothing was said: no banner, no bar line, no pop-up, no error', isQuiet(await quiet(page, log)), await quiet(page, log));
+    // ↻ Refresh reads them again
+    await page.evaluate(() => hardRefresh()); await L.settle(page, 1200);
+    cs = await L.calls(page);
+    check(r, '↻ Refresh reads Ben\'s awards and the catalogue again', awardsOf(cs).length === 4 && catalogueOf(cs).length === 2, { aw: awardsOf(cs).length, cat: catalogueOf(cs).length });
+    // narrow screens, with the fold and the explanation open
+    await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
+    await page.evaluate(() => { const d = document.getElementById('trophies-retired'); if (d) d.open = true; document.querySelectorAll('details.how').forEach(x => x.open = true); });
+    for (const w of [390, 320]) {
+      await page.setViewportSize({ width: w, height: 800 }); await L.settle(page, 300);
+      const sw = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth }));
+      check(r, `at ${w} px the File with the Trophies group fits the screen`, sw.sw <= sw.iw, sw);
+    }
+    check(r, 'no page errors', !log.errors.length, log.errors);
+    await page.context().close();
+  }
+
+  // 3. A read that fails is a quiet line in the group, and Refresh tries again.
+  for (const [what, name] of [['the awards', 'career_awards'], ['the catalogue', 'career_catalogue']]) {
+    const { page, log } = await L.openCoach(b, { hash: 'athletes', fixedTime: NOW, seed: { career: 'on', stub: { fail: [{ kind: 'from', name, message: `relation "public.${name}" does not exist`, code: '42P01', times: 1 }] } } });
+    await L.go(page, 'a/ava_test/file'); await L.settle(page, 900);
+    const txt = (await page.locator('#trophies-body').innerText()).replace(/\s+/g, ' ');
+    check(r, `reading ${what} fails: the group says so in one line and lists nothing`, /did not load just now/.test(txt) && (await page.locator('#trophies-body .frow').count()) === 0, txt);
+    check(r, `and says nothing else: no banner, no bar line, no pop-up, no error; the rest of the File is there`, isQuiet(await quiet(page, log)) && JSON.stringify(await heads(page)) === JSON.stringify(['Contact and access', 'Programme', 'Trophies', 'Records', 'Danger zone']), { q: await quiet(page, log), h: await heads(page) });
+    await L.go(page, 'a/ava_test/work'); await L.go(page, 'a/ava_test/file'); await L.settle(page, 500);
+    check(r, 'it is not read again on a redraw (no loop on a table that is not there)', (await L.calls(page)).filter(c => c.name === name && c.op === 'select').length === 1, '');
+    await page.evaluate(() => hardRefresh()); await L.settle(page, 1200);
+    check(r, 'Refresh tries again and the trophies appear', /^4 badges, 3 achievements, 1 title$/.test((await page.locator('#trophies-body .frow').first().locator('.frow-v').innerText()).trim()), await page.locator('#trophies-body').innerText());
+    await page.context().close();
+  }
+
+  // 4. The rulebook cannot be read: the same as "off".
+  {
+    const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/file', fixedTime: NOW, seed: { career: 'on', stub: { fail: [{ kind: 'from', name: 'career_rules', message: 'permission denied for table career_rules', code: '42501', times: 5 }] } } });
+    await L.settle(page, 700);
+    const cs = await L.calls(page);
+    check(r, 'a rulebook that cannot be read: no Trophies group, nothing read, nothing said', (await page.locator('#trophies').count()) === 0 && !awardsOf(cs).length && isQuiet(await quiet(page, log)), await quiet(page, log));
+    await page.context().close();
+  }
+
+  // 5. The switch answers after a File was already drawn (a link straight to it).
+  {
+    const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/file', fixedTime: NOW, seed: { career: 'on', stub: { delay: { career_rules: 2500 } } } });
+    check(r, 'a File drawn before the rulebook answers has no Trophies group yet', (await page.locator('#trophies').count()) === 0 && (await page.locator('#tabbody .fh').count()) >= 3, await heads(page));
+    await page.locator('#trophies-body').waitFor({ timeout: 6000 });
+    await L.settle(page, 800);
+    check(r, 'when it answers the group is added and filled in', /^4 badges, 3 achievements, 1 title$/.test((await page.locator('#trophies-body .frow').first().locator('.frow-v').innerText()).trim()), await page.locator('#trophies-body').innerText());
+    check(r, 'and nothing was said', isQuiet(await quiet(page, log)), await quiet(page, log));
+    await page.context().close();
+  }
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));

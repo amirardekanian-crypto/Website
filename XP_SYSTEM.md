@@ -17,6 +17,10 @@ career's numbers live in `career/rulebook.toml` as well as here (§8). The serve
 (`career_scores`) so the board loads fast. It is worked out again from the facts whenever they change, and nothing in it is a
 source.
 
+**Once Career Mode's catalogue switch is on** (phase 3, **built in the app, inert until the server turns it on**: `HABITS.md` → *Career Mode
+(phase 3, the Trophy Room)*) a habit's streak pays as the habit's **badge** (§4.7), the retired marks pay nothing new, and the Trophy
+Room replaces the milestone shelf. Until a seed turns it on with a day, nothing in this file changes.
+
 ---
 
 ## Where the settings live
@@ -519,6 +523,36 @@ has to climb in a new season — which is part of what §12.2 was about.
 
 ---
 
+## 4.7 After the catalogue switch (Career Mode phase 3): one badge a habit, and what pays
+
+**Inert until `get_profile().switch.catalogue` is a day** (`catalogueOn()` in `habits.html`; `rulebook.toml` → `[switch]` `catalogue`). The server pays
+the awards (`career_awards`), and the phone only previews a tick the way it already does (P13). What changes in the preview, and so what
+twins the server:
+
+| | Before the switch | After the switch |
+|---|---|---|
+| A habit's streak (§4) | `CONSISTENCY_TIERS`, one ladder **per habit**, WORKOUT included | The same five steps (5, 10, 20, 30 and 60 days in a row, KINDLED to UNBREAKABLE, the same `mult`), now **one badge per habit** under its Proof name (HUMAN SPRINKLER, BLACKOUT ARTIST, GROUND COVERED, FULLY FUELLED, ZEN MACHINE, RUBBER BAND, IRON MONK) |
+| WORKOUT's steps | Paid (120 a step at STEADY, and so on) | **None.** WORKOUT has no badge: its steps are Century and Hold Serve, from the training |
+| The athlete's own habits | Each its own ladder, up to three | **One ladder for all of them**, HOUSE RULES, keyed `'custom'`: a step is crossed on the earliest day any one of them reached it, and pays `tierXp` of a custom habit (20, 30, 60, 90, 180) once |
+| A step's pay | `tierXp()` | `tierXp()` again: the badge's own xp in `career/badges.toml` is the same number for every built-in habit |
+| HUMAN SPRINKLER I to III, HEAVY METAL, GROUND COVERED, FULLY FUELLED, ZEN MACHINE, BLACKOUT ARTIST, RUBBER BAND, IRON MONK, HARD TO KILL, THE MACHINIST | Milestones that pay | **Retired: pay nothing new.** Anyone who has one keeps it, and it paid what it paid (the server mints it as owned, paid once) |
+| DAWN PATROL, CLEAN SWEEP, BACK IN THE FIGHT, FIRST BLOOD, THE CENTURION, the five events, a comeback, a quest | Pay | Pay **as before** |
+| The day gate, the day streak, a perfect day, partial credit, the backfill window | Unchanged | **Unchanged.** WORKOUT stays in the gate (Amir, round 4 call 3) |
+
+The retired codes are `CATALOGUE_RETIRED` in `habits.html`: `HS HS2 UB TS HM HM3 SW RR SW3 FF FF2 ZM ZM2 BA BA2 RB RB2 IM IM2 HK US MC`, the proof codes
+of every entry with `retire_at = "catalogue"` in `badges.toml` and `achievements.toml`. A badge step pays **once in a career**, as the old tiers did
+under the XP switch. The phone's twin is the pure function `catalogueSteps(log, cfgLike)` (`[{ key, habit, tier, day, xp }]`), which `bonusEvents()` calls
+instead of the per-habit tier pass when the switch is on; it reads only its two arguments, `HABITS`, `XP_RULES`, `CONSISTENCY_TIERS` and the date helpers, so
+`scripts/check_twins.js` can run it on the server's own cases. The new HARD TO KILL badge also counts comebacks from training, which the phone cannot see,
+so the phone does not preview its steps: the next profile carries them (a push asks for it at once).
+
+**The switch moves no number the athlete sees jump.** `fetchCareer()` recomputes the scorer's cache (`invalidateBonus()`) and takes the base with the new
+definition when it first sees the switch, so `careerXp()` is the server's number at that moment and only a later tick moves it.
+`rulesSignature()` carries the switch (and ends in `c`), so that first open **re-baselines in silence** (no *XP system updated* toast, no tier or milestone
+takeover) and shows one reveal instead (§5).
+
+---
+
 ## 5. Celebrations
 
 **Since PRF-02 (2026-09-27, Amir's 1A) only a few things take the whole screen** (six since a
@@ -537,8 +571,10 @@ Nothing in this section scores: a celebration only reads what the ledger already
 | **A season's title**, the day its season closes (level 5 that season, minted by the server, or 2,000 season points once the XP switch is on) | `checkSeasonMoments()` | the whole screen, *Season over* (2026-10-17; it arrived in silence) |
 | **A finished season with no title** | `checkSeasonMoments()` | the wins card |
 | **The career reveal** (once the XP switch is on: the first open of AA Proof on the career, once per athlete) | `checkLevelUps()` | the whole screen, the rank's own ground, kicker *Your career*. Its Share it opens the Rank card, eyebrow *MY CAREER* |
+| **The Trophy Room's reveal** (once the catalogue switch is on: the first open on it, once per athlete) | `checkLevelUps()` → `catalogueReveal()` | the whole screen, badge ground, kicker *Your Trophy Room is open* (the badges and achievements already theirs, from `get_profile().reveal`). Told with `career_told(['reveal'])` when it is dismissed |
+| **A moment the server sent** (`get_profile().moments`: a training reward, a title, an achievement with no local celebration) | `processMoments()` | milestone and legend: the whole screen (a badge's medal, or a title's plate), then Share it; highlight: the wins card with Share it; win: the wins card. Each is told with `career_told([key])` once shown |
 | **A rank promotion on one habit** (water crossing GRINDER 5 → OPERATOR 1) | `checkLevelUps()` | the wins card |
-| **A consistency tier** cleared on any habit | `checkUnlocks()` | the wins card |
+| **A consistency tier** cleared on any habit (after the catalogue switch: a **badge step**, *HUMAN SPRINKLER · STEADY*; WORKOUT is silent; the athlete's own habits are one badge) | `checkUnlocks()` | the wins card |
 | **A milestone** unlocked | `checkUnlocks()` | the wins card |
 | **A perfect day** — every tracked habit done | `checkUnlocks()` | the wins card |
 | **A comeback** | `checkUnlocks()` | the wins card |
@@ -1118,6 +1154,12 @@ in shadow. Once the XP switch is on, AA Proof's phone previews a tick with these
 Proof's functions on them, so a drift between the `.toml` files and the row is a drift between the phone and the board. The one
 deliberate difference is `[level]`, base 400 against Proof's 300 (§2), which rule 14 does not compare. After the XP switch
 `career_compare()` also lets a row differ where a closed day settled, and calls it `settled`, not a failure.
+
+⚠️ **And a fourth, from the catalogue switch** (phase 3): `catalogueSteps()` and `CATALOGUE_RETIRED` in `habits.html` copy what the server pays for a habit's
+steps (`career_awards`: one badge a habit, WORKOUT none, one `'custom'` ladder) and which marks stopped paying. `catalogueSteps()` is pure so that
+`scripts/check_twins.js` can hold it to the server's cases, the way §9 holds `paidXp()`; `CATALOGUE_RETIRED` must equal the `retire_at = "catalogue"` entries'
+proof codes in `career/badges.toml` and `career/achievements.toml`. `node scripts/headless/trophy-proof.js` drives the app after the switch (the scorer cases,
+the reveal, the moments, the Trophy Room, the titles, and everything inert before it).
 
 Three more mirrors live in **SQL function bodies**, not on the row:
 

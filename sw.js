@@ -295,7 +295,8 @@
 // v164: program.html and habits.html changed (2026-10-18, Career Mode phase 2): the Career row on Home, what a session earns, AA Proof's career level; inert until the XP switch is on.
 // v165: program.html changed and /assets/js/splitstep.js joins the shell (2026-10-18): Split Step, a reaction game for the rest, and one door with a shelf for both rest games.
 // v166: program.html changed and /assets/js/between-sets.js joins the shell (2026-10-18): Between Sets, a tennis game for the rest, the third game on the shelf.
-const CACHE = 'aap-v166';
+// v167: program.html and habits.html changed (2026-10-18, Career Mode phase 3): AA Proof's Trophy Room, the training app's reward moments and cards; inert until the catalogue switch is on.
+const CACHE = 'aap-v167';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

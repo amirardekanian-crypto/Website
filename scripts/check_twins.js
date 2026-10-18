@@ -44,6 +44,10 @@
                                  / career_level(), hab_xp() with career_paid_rules(), career_session_want() in SQL
                                  Career Mode phase 2 (the XP switch): the career's curve, the WORKOUT habit at 0 a day, a session's
                                  facts. Held to scripts/career/xp_cases.json, the server's answers (scripts/career/rehearse_switch.mjs)
+     habits.html catalogueSteps, CATALOGUE_RETIRED
+                                 / career_evaluate() in SQL       Career Mode phase 3 (the catalogue switch): the habit badges' steps (one
+                                 ladder per habit, none for WORKOUT, one for the athlete's own habits) and the marks that retire. Held to
+                                 scripts/career/catalogue_cases.json, the server's answers (scripts/career/rehearse_catalogue.mjs)
 
    Already guarded elsewhere (not repeated): rxOf/repCount/tempoDisplay (check_rx.js), the set-log grammar
    (check_setlog.js), the shared word lists (check_parity.py), the XP rules (check_xp_rules.py).
@@ -706,6 +710,28 @@ run('Career Mode: what a session makes (program.html careerFullLog, careerChecki
       .concat(A_CAREER.careerFullLog(c.log, early) ? ['full_log'] : [])
       .concat(A_CAREER.careerCheckin(c.readiness) ? ['checkin_done'] : []).sort();
     expect('the facts of a session: ' + c.name, { status: c.status }, kinds, c.facts);
+  });
+});
+
+/* ── 10. Career Mode phase 3: what AA Proof's phone pays after the catalogue switch (habits.html / the SQL) ───────── */
+// Once the catalogue switch is on, AA Proof previews a tick with the habit badges' steps (one ladder per habit, none for WORKOUT, one for all the
+// athlete's own habits: catalogueSteps()) and never pays a retired mark (CATALOGUE_RETIRED). The server mints them (career_evaluate(),
+// supabase/stage70_career_catalogue.sql); its answers on fixed logs live in scripts/career/catalogue_cases.json, written and checked every run by
+// scripts/career/rehearse_catalogue.mjs on PGlite. This holds the phone to them.
+const CAT_CASES = JSON.parse(read('scripts/career/catalogue_cases.json'));
+const H_CAT = sandbox(null, [constSrc(H_SRC, 'XP_RULES', 'habits.html'), constSrc(H_SRC, 'HABITS', 'habits.html'),
+  constSrc(H_SRC, 'CONSISTENCY_TIERS', 'habits.html'), constSrc(H_SRC, 'CATALOGUE_RETIRED', 'habits.html')]
+  .concat(['addDays', 'fmtKey', 'parseKey', 'baseXp', 'tierXp', 'catalogueSteps'].map(n => fnSrc(H_SRC, n, 'habits.html'))),
+  ['catalogueSteps', 'CATALOGUE_RETIRED']);
+run('Career Mode: the habit badges\' steps after the catalogue switch (habits.html catalogueSteps / career_evaluate)', () => {
+  expect('habits.html CATALOGUE_RETIRED is the proof codes of the entries that retire at the switch', null,
+         Array.from(H_CAT.CATALOGUE_RETIRED).slice().sort(), (CAT_CASES.retired_codes || []).slice().sort());
+  CAT_CASES.cases.forEach(c => {
+    const order = (x, y) => (x.key + x.tier).localeCompare(y.key + y.tier);
+    const want = c.awards.filter(a => a.kind === 'badge' && /^habit_/.test(a.item))
+      .map(a => ({ key: a.item, tier: a.tier - 1, day: a.day, xp: a.xp })).sort(order);
+    const got = Array.from(H_CAT.catalogueSteps(c.log, c.cfg)).map(s => ({ key: s.key, tier: s.tier, day: s.day, xp: s.xp })).sort(order);
+    expect('the habit badges\' steps of: ' + c.name, null, got, want);
   });
 });
 

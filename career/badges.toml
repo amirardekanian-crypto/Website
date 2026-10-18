@@ -364,11 +364,15 @@ tiers = [
   { at = 20, metal = "prismatic", xp = 2500, size = "legend" },
 ]
 
+# Main lifts only (Amir, 2026-10-18, round 4 call 4): a lift counts when its Spine entry's pattern is one of `patterns`, so a
+# wrist or forearm drill that doubles from a light first session never wins it. Measured that day: any lift would have paid
+# 23,900 XP and NEW ENGINE twice at the switch (a forearm rotation +174%, a seated leg curl +100%); main lifts only, 18,500.
 [badge.the_upgrade]
 name = "The Upgrade"
 meaning = "progress"
 kind = "best_value"
 counts = "lift_gain"
+patterns = ["squat", "hinge", "single-leg", "push-horizontal", "push-vertical", "pull-horizontal", "pull-vertical"]
 caption = "Your most improved lift is {n}% stronger than its first session, at the same effort."
 free = false
 origin = "new"

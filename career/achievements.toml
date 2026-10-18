@@ -113,11 +113,13 @@ caption = "Stronger everywhere, in one cycle."
 free = false
 origin = "new"
 
+# Main lifts only, as The Upgrade (badges.toml; Amir, 2026-10-18, round 4 call 4).
 [achievement.double_up]
 name = "Double Up"
 meaning = "progress"
 reads = "lift_gain"
-rule = "A lift twice its first number (lift_gain 100% or more), at the same effort."
+patterns = ["squat", "hinge", "single-leg", "push-horizontal", "push-vertical", "pull-horizontal", "pull-vertical"]
+rule = "A main lift twice its first number (lift_gain 100% or more), at the same effort."
 xp = 500
 size = "legend"
 caption = "Twice as strong as day one."

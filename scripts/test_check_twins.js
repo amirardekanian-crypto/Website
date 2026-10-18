@@ -6,7 +6,7 @@
 const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
 const ROOT = path.join(__dirname, '..');
 const FILES = ['program.html', 'coach.html', 'habits.html', 'assets/js/chips.js', 'scripts/twins_stamp.json', 'scripts/name_cases.json', 'scripts/career/hold_cases.json',
-  'scripts/career/xp_cases.json'];
+  'scripts/career/xp_cases.json', 'scripts/career/catalogue_cases.json'];
 // No GIT_* variable reaches a git command in the temp folder, or the guard run on it. The pre-commit hook runs this test inside
 // `git commit`, which exports GIT_DIR and GIT_INDEX_FILE. On 2026-10-17 the temp folder's `git init` then re-initialised the REAL
 // repository (a worktree's GIT_DIR) as bare: core.bare = true in the shared config, and every checkout's git said "must be run in
@@ -123,6 +123,14 @@ want('the training app pays a full log when a set is left unrated',
   swap('program.html', "return !sets.some(x => asks.has(x.o) && !careerTruthy(val(x.st, 'r')));", 'return true;'), 1, /the facts of a session/);
 want('a server answer in the cases changes on its own',
   (get, put) => put('scripts/career/xp_cases.json', get('scripts/career/xp_cases.json').replace('"level_cost": 400', '"level_cost": 410')), 1, /career's curve/);
+
+// Career Mode phase 3 (§10): AA Proof's preview after the catalogue switch drifting from the server's answers in scripts/career/catalogue_cases.json.
+want('AA Proof gives the WORKOUT habit a ladder again after the catalogue switch',
+  swap('habits.html', 'HABITS.filter(h => !h.locked).forEach(h => {', 'HABITS.forEach(h => {'), 1, /habit badges' steps/);
+want('AA Proof crosses a step of the athlete\'s own habits on the latest of them, not the earliest',
+  swap('habits.html', 'if (!first[i] || day < first[i]) first[i] = day;', 'if (!first[i] || day > first[i]) first[i] = day;'), 1, /habit badges' steps/);
+want('a mark that retires at the switch is paid again',
+  (get, put) => put('habits.html', get('habits.html').replace("'IM', 'IM2', 'HK', 'US', 'MC'];", "'IM', 'IM2', 'HK', 'US'];")), 1, /CATALOGUE_RETIRED/);
 
 console.log(bad ? '\n' + bad + ' mutation(s) NOT caught' : '\nthe guard catches every drift it is meant to');
 process.exit(bad ? 1 : 0);

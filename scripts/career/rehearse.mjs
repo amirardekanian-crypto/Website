@@ -20,11 +20,13 @@
 //      row-level security, get_profile(), a save that still goes through when Career Mode breaks, idempotence, and an erasure.
 // Exit code 1 if anything failed.
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import cp from 'node:child_process';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { openDb, runSql, read } from '../restore/lib.mjs';
+import { snapshotBefore } from './snapshot_before.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
@@ -32,6 +34,16 @@ const COACH_JWT = JSON.stringify({ email: 'amirardekanian@gmail.com', role: 'aut
 const args = process.argv.slice(2);
 const opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
 const DATA = opt('--data'), EXPECT = opt('--expect'), REPORT = opt('--report');
+const FILES = opt('--files') || '94cdc89';   // the commit the live project's phase 1 rulebook was seeded from (2026-10-17)
+function filesOf(rev) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'career66-' + rev + '-'));
+  for (const d of ['career', 'scripts', 'supabase']) fs.mkdirSync(path.join(dir, d));
+  for (const f of ['rulebook', 'badges', 'achievements', 'titles', 'missions', 'quests', 'recognition'].map(f => `career/${f}.toml`)
+         .concat(['scripts/check_career.py', 'scripts/career_seed.py', 'supabase/xp_rules_snapshot.json'])) {
+    fs.writeFileSync(path.join(dir, f), cp.execFileSync('git', ['show', `${rev}:${f}`], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 }).replace(/\r\n/g, '\n'));
+  }
+  return dir;
+}
 
 let passed = 0, failed = 0;
 function ok(cond, what, detail) {
@@ -90,6 +102,9 @@ async function main() {
   section('1. the database from the snapshot');
   await runSql(db, read(path.join(ROOT, 'scripts', 'restore', 'stand_in_supabase.sql')), 'stand-in');
   await runSql(db, read(path.join(ROOT, 'supabase', 'schema_snapshot.sql')), 'snapshot');
+  // the snapshot is the live structure: take it back to just before stage66 (scripts/career/snapshot_before.mjs)
+  const undone = await snapshotBefore(db, 66, ROOT);
+  if (undone.length) console.log('  (the snapshot taken back from stage ' + undone.join(', ') + ')');
   ok(true, 'stand-in + schema_snapshot.sql built');
   const today = (await one(db, `select current_date::text as d`)).d;
 
@@ -119,7 +134,9 @@ async function main() {
   const erase = (await one(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure) as d`)).d;
   ok((erase.match(/'career_facts'/g) || []).length === 1, 'coach_erase_person() lists career_facts exactly once (the patch is idempotent)');
   ok((await q(db, `select 1 from public.career_facts`)).length === 0, 'no facts before the seed: with no rulebook, every trigger does nothing');
-  const seed = py([path.join(ROOT, 'scripts', 'career_seed.py')]);
+  // the career files phase 1 was seeded with (rulebook version 1, in shadow; --files <rev>, or `--files work` for the working tree)
+  const fdir = FILES === 'work' ? null : filesOf(FILES);
+  const seed = fdir ? py([path.join(fdir, 'scripts', 'career_seed.py'), path.join(fdir, 'career')]) : py([path.join(ROOT, 'scripts', 'career_seed.py')]);
   ok(seed.status === 0, 'scripts/career_seed.py wrote the seed', seed.stderr);
   const t0 = Date.now();
   const seeded = (await one(db, seed.stdout.replace(/;\s*$/, '').replace(/^--[^\n]*\n/, '') + ' as r')).r;

@@ -5,8 +5,9 @@ Every function the system needs, step by step, in plain words. Each one says **w
 
 **Status (2026-10-17): phase 1 is live, in shadow** (P1, P2, P3, P4, P10, P12, P14, P15: *Phase 1, as built*, at the
 end; applied to the live project on Amir's yes, seeded, 34 of 34 athletes matching Proof). **Phase 2, the XP switch, is built,
-rehearsed and switched on (2026-10-18)** (P1 step 4, P3, P4, P10, P13, P14 steps 4 to 6, P17: *Phase 2, as built*, at the end); the
-rest is a specification. When a phase is built, its SQL follows these steps; when a step here changes, the code
+rehearsed and switched on (2026-10-18)** (P1 step 4, P3, P4, P10, P13, P14 steps 4 to 6, P17: *Phase 2, as built*, at the end).
+**Phase 3, the catalogue switch, is built and rehearsed (2026-10-18), not yet applied to the live project** (P5, P8 for the athlete, P10, P12, P13, P17
+step 5: *Phase 3, as built*, at the end); the rest is a specification. When a phase is built, its SQL follows these steps; when a step here changes, the code
 changes with it. The numbers they use live in `rulebook.toml`, and the rewards, missions and quests in the other `.toml`
 files: a procedure never hard-codes a number (GAME-10).
 
@@ -606,3 +607,57 @@ procedures above became, and the choices the build made:
 - **What it does not do yet:** no badge, achievement or title of the catalogue is minted (phase 3); the training app has no moment of its
   own for a level reached (AA Proof celebrates it at its next open); the board's level beside a name can lag an athlete who has not
   opened an app since a change, by at most the time it takes a board read to work out a stale row.
+
+## Phase 3, as built (2026-10-18): the catalogue switch
+
+`supabase/stage70_career_catalogue.sql` (with the seed of `rulebook.toml` version 4: the switch still `"off"`), rehearsed by
+`scripts/career/rehearse_catalogue.mjs` (PGlite, the schema snapshot, a full backup of the real rows, the live rulebook, then stage70, the switch's dry run
+and the real one, the refusals, made-up athletes through the real doors, the twin cases, an erasure, the cost and the way back: 42 of 42 on the backup of
+2026-10-17). The way back is `scripts/career/rollback_stage70.sql`, tested there. Amir's five calls are *The decisions, round 4* in
+[`CAREER_MODE.md`](CAREER_MODE.md). What the procedures above became, and the choices the build made:
+
+- **P5, minted.** `career_awards` holds one row per badge step, achievement or title earned (athlete, kind, item, `sub` for a habit's step of the retired
+  ladder, tier, the day it was reached, the XP it pays, size, `how`, evidence, `told_at`). Never deleted, except by an erasure (P12). **An award's XP is frozen
+  when it is minted** (P16: a later change to a tier's XP pays new mints only, and never takes a level back). `career_evaluate()` works out every reward the
+  athlete has reached and mints the ones not yet minted. It runs when a score is worked out again (`career_scored()`, `career_scores_for()`), never in a
+  trigger: it walks the whole log, as `hab_bonus_xp()` does, and a signed-in request has 8 s. It returns each badge's measure, kept in the score cache
+  (`measures`), which the shelf shows ("Paper Trail 9 of 10").
+- **How each kind is judged.** `total`: the at-th fact of its `counts`, by day, counting only the facts that pay within their caps (`career_facts_paid()`: a plan day repeated in its week moves Century no more than it pays, GAME-4). `best_run` of weeks: weeks held in a row, only a broken week ends a run (as
+  `get_profile()` counts). A habit badge (`habit = …`): `career_marks()`, Proof's own CTEs returning rows, gives the day each run length was first reached
+  (`custom` = any one of the athlete's own habits: one ladder). `best_value`: the largest `lift_gain` percent, only for lifts whose Spine entry's pattern is
+  in `patterns` (`career_lift_counts()`, round 4 call 4). Proof's kept marks (DAWN PATROL, CLEAN SWEEP, BACK IN THE FIGHT, FIRST BLOOD, THE CENTURION) and
+  Day Streak: the day `career_marks()` says Proof's rule reached them. The achievements of origin `"new"` are each a rule in `career_evaluate()`, listed in its
+  `-- achievement:` lines; `scripts/check_career.py` rule 17 refuses a new one in the file that the server has no rule for. Proof's five events are owned when
+  the athlete owns the event's title (`hab_titles`, or claimed on the phone: `CFG.pass.owned`).
+- **Titles.** A badge step or an achievement that names a title mints it (Career Mode's own titles only; Proof's stay Proof's), and mints `'c_' + id` into
+  `hab_titles`, so `set_title()` lets the athlete wear it. The Grand Slam: a title in each of the four meanings, from Career Mode's titles and the Proof titles the
+  athlete owns.
+- **The switch's baseline.** The seed that turns `[switch] catalogue` on runs `career_catalogue_baseline()`: `career_evaluate(…, true)` for every athlete.
+  Everything reached before the switch day is minted `baseline` and pays (round 4 call 1). The retired entries (Proof's per-habit ladder, its seven streak
+  families, HEAVY METAL, HARD TO KILL's first form, THE MACHINIST) are minted only here, from what was reached before the switch, with the XP Proof paid;
+  after it they are never earned again. A new habit badge's step that the old ladder paid is minted `carried`, xp 0 (round 4 call 2): at the baseline, from the
+  old ladder's steps before the switch; after it, only when the baseline actually minted that old step (a past day logged late after the switch was never paid
+  by the old ladder, so the new badge pays it). HARD TO KILL's widened badge is carried the same way from its first form.
+- **The score from the switch.** `career_bonus_rules()` takes the ladders and marks out of the rules `hab_bonus_xp()` is given, so it pays the quests and the
+  comebacks only; every reward is paid by `career_awards`, in the window of its day (`career_awards_xp()`): the career, this season, the rolling week. A step is
+  earned once in a career. The day gate is untouched (round 4 call 3: WORKOUT stays in it). Measured on the real rows: Proof's carried-over past pays exactly
+  what it paid before for 35 of 35 athletes, so the career moves by exactly what the new rewards pay, and Season 1's points do not move.
+- **P8, who is told.** `told_at` is when an app showed an award. What AA Proof celebrates itself, the moment it happens (a habit badge's step, its kept marks,
+  Day Streak, an event's title), is told as it is minted, so no app shows it twice. `get_profile()`'s `moments` are the rest (training rewards, titles, a new
+  achievement Proof has no celebration for, such as Full Stack), biggest first, each with the app that shows it (`app`). `career_told(keys)` is the athlete's
+  app marking them shown (never the coach's preview). The switch's past is not a moment each: it is one `reveal` (badges, steps, achievements, titles, XP,
+  since), until an app tells `'reveal'`.
+- **P10.** With the switch on, `get_profile()` adds `shelf` (every badge with its steps, the athlete's measure, the step owned and the next one; every
+  achievement; Career Mode's titles; the Grand Slam's four slots), `moments` and `reveal`; `career.awards_xp` is what the awards pay inside the total. The
+  contract both apps build against is the shape `career_shelf()` and `career_moments()` return.
+- **The seed.** A seed whose rulebook numbers did not change runs no backfill (no fact depends on the catalogue or a switch). A switch's day never moves once it
+  is on. The seed that turns the catalogue switch on returns every athlete's line (the career level and XP before and after, the steps, achievements and titles
+  minted, how many carried) and **refuses if anyone's level would go down**; `--dry-run` shows the list and undoes it.
+- **`career_compare()`** leaves the ladders and marks out on both sides once the switch is on (Proof's own `xp_rules` row still carries them, for its phone's
+  fallback): it compares the daily XP, the quests, the comebacks and the day gate.
+- **P12.** `coach_erase_person()` empties `career_awards` too (patched in place, as stage63, stage66 and stage69).
+- **Measured on the real rows** (the backup of 2026-10-17, phases 1 and 2 as live, the switch set to that day): 317 rewards minted, 13 of 35 athletes up 1 to 4
+  levels (36,600 XP: 37,500 before Century counted paid sessions only), nobody down, nobody earning a title or the Grand Slam yet; the dry run took 12 s on PGlite. The biggest athlete's profile 1.4 s cold and
+  0.2 s warm there; the board 3.2 s cold (its 2.5 s budget then serves a stale row) and 6 ms warm.
+- **The older rehearsals** start from the snapshot taken back to just before their stage (`scripts/career/snapshot_before.mjs`) and seed the career files of
+  their own phase (`--files <rev>`), because the snapshot is the live structure and the working files move on.

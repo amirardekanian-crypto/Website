@@ -850,6 +850,10 @@ Habits and achievements merged, because they were two views of one question.
 > none, before you started; `rosterOn(k)` per day, compared by id), the habit's level ring at the end,
 > the row opening the habit's page, and paused add-ons as dim rows. Its heading carries *N of 7 on
 > target · +XP*. The five consistency pips are on the habit's page. Milestones below are unchanged.
+>
+> **After Career Mode's catalogue switch** (phase 3, inert until the server turns it on) the milestone shelf at the foot is replaced by the
+> **Trophy Room** (`renderTrophyRoom()`, *Career Mode (phase 3, the Trophy Room)* below): the *Milestones* tile reads *Trophies*, and a
+> habit's page shows its badge. Before it, nothing here changes.
 
 Opens straight on **four season stats**: days logged, **milestones** (the same count as the
 section at the foot, since POL-02; the tile said *Badges 8/72*, tiers included), **day streak** (as the
@@ -1070,6 +1074,9 @@ given, and never in the embed). Top to bottom it draws:
 
 *How rewards work* at the foot opens the manual. The design, and the three shapes it went
 through, are in *The long game* below.
+
+After the catalogue switch the titles won in the Trophy Room (`get_profile().shelf.titles`, worn as `'c_' + id`) are plates in the *Titles*
+rail too, and `?go=trophy` is the Career row's other door (below).
 
 ### The type scale (2026-10-12, the UX audit's last pass)
 
@@ -1725,6 +1732,12 @@ the level being shared was never shown. The rest of the queue now waits in `UI.c
 | A season title (level 5 in a season that has closed, or 2,000 season points once the XP switch is on) | **the whole screen, kicker *Season over*** (new: it arrived in silence) | **Title**: the prismatic plate, *FINISHED PRE-SEASON*, the rank, level and XP it finished on |
 | A finished season with no title | **the wins card** (new) | none: the Rank card is already the new season's |
 | The career reveal (once the XP switch is on, once per athlete) | **the whole screen, kicker *Your career***, the rank's own ground | **Rank**, eyebrow *MY CAREER* |
+| *After the catalogue switch:* the Trophy Room's reveal (once per athlete) | **the whole screen, kicker *Your Trophy Room is open***, the badge ground | none (it opens the Trophy Room) |
+| *After the catalogue switch:* a badge step of a habit (the same five steps, now one badge a habit) | the wins card, *HUMAN SPRINKLER · STEADY* | **Milestone** (chip *Badge*): the habit's medal in the step's metal |
+| *After the catalogue switch:* a moment from the server at milestone or legend size (a training badge, an achievement) | **the whole screen**: the medal in its metal, the badge's name and step, its XP | **Milestone** (chip *Badge* or *Achievement*) |
+| *After the catalogue switch:* a moment at highlight size | the wins card, with Share it | the same |
+| *After the catalogue switch:* a moment at win size | the wins card | none |
+| *After the catalogue switch:* a title won (`c_` + id) | **the whole screen**, as a reward: the plate in its metal | **Title**: the plate, *HOW YOU EARNED IT* and the line that says (`from`) |
 
 The wins card has one Share it: it opens the newest win that has a card, and the picker holds the newest
 win of every other card too (a milestone and a perfect day from one evening are each one tap apart).
@@ -2603,6 +2616,64 @@ equal to the `xp_rules` row until the catalogue switch (`XP_SYSTEM.md` §8). The
 a full backup of the real rows kept outside the repo) was 42 of 42 on 2026-10-17. `node scripts/headless/career.js` (55 checks)
 drives both apps: the row, the finish and finished lines, the reveal once, the manual, a tick moving the XP at once, `?go=pass`,
 the strip never asking, and nothing changing before the switch.
+
+---
+
+## Career Mode (phase 3, the Trophy Room)
+
+> **Where it stands (2026-10-18).** **Built in AA Proof and inert: nothing below shows, scores or asks the server anything until the server's
+> catalogue switch is on** (`get_profile().switch.catalogue` is a `YYYY-MM-DD` day; `catalogueOn()`). With it off, the scorer, every screen, the manual and the
+> network calls are exactly what *Career Mode (phase 2)* above describes. The server half (`career_awards`, the `shelf`, `moments` and `reveal` in `get_profile()`,
+> `career_told()`) is being written in parallel: the contract the app is built against is the phase 3 profile spec (`career-phase3-profile-spec.md`), and
+> `scripts/headless/trophy-proof.js` drives the app against a stub of it (100 checks).
+
+Amir's round 4 calls (`career/CAREER_MODE.md`, 2026-10-18, *"Go with your picks"*): rewards from the past pay and arrive in one reveal; Proof's badges carry
+over, paid once; **WORKOUT stays in the day gate** (so `dayQualifies()` and `dayParts()` do not change); The Upgrade and Double Up read main lifts only;
+reward names stay English on Farsi cards. What AA Proof does with them:
+
+- **The scorer's preview** (P13; the twin of the server's `career_awards`, XP_SYSTEM.md §4.7). `bonusEvents()` pays a habit's steps through the pure
+  `catalogueSteps(log, cfgLike)`: the five steps (5, 10, 20, 30, 60 days in a row) **per habit as its badge**, the locked WORKOUT habit **none**, and **one ladder
+  for the athlete's own habits** (id `'custom'`, HOUSE RULES: a step on the earliest day any one of them reached it). The retired marks (`CATALOGUE_RETIRED`, the proof codes of
+  the `retire_at = "catalogue"` entries) pay nothing new; kept marks, a comeback and quests pay as before. `fetchCareer()` calls `invalidateBonus()` when
+  `catalogueOn()` flips and takes the base after, so `careerXp()` never jumps. `tierPaid()` and `tierPaidFor()` answer for `'custom'`.
+- **The first open after the switch is silent and has ONE reveal.** `rulesSignature()` carries the switch (the string ends in `c`), so `checkLevelUps()`
+  re-baselines the levels and the unlocks without a toast or a flood of tier and milestone takeovers, even on a phone another phone had already shown the
+  reveal to, then `catalogueReveal()` queues one takeover: *Your Trophy Room is open*, with `get_profile().reveal` (`badges`, `achievements`, `titles`,
+  `steps`, `xp`, `since`): *15 badges and 7 achievements. Already yours, from everything you have logged since 11 June. Your badges hold 50 steps between them.
+  1 title is yours too. Together they paid 7,155 XP, and it is already in your level.* It has **Continue** and **Open it** (the Trophy Room). `CFG.catalogueSeen`
+  (the switch's day) survives the cloud merge like `careerSeen`, so a second phone stays quiet. It is told with `career_told(['reveal'])` when dismissed.
+  An athlete whose first open comes after both switches gets the career's reveal first.
+- **Moments** (`get_profile().moments`, `processMoments()`): each shown **once at its size**, then `career_told([key])`. Milestone and legend: a whole-screen
+  takeover (`kind: 'moment'`, the medal in its metal, the badge's name and step, its caption and XP; a title is the existing *reward* takeover and is owned
+  at once), then Share it. Highlight: a line on the wins card with Share it. Win: a line on the wins card. The wins card lines are stored as `{ k: 'moment', id: key, m: { kind, item, tier, size, name, meaning, metal } }`
+  (which win, never its XP, as the privacy notice says), and the XP is read from the shelf when the line is drawn. At most five takeovers a pass, the rest wait for
+  the next open. **The server has already told everything AA Proof celebrates itself** (a habit badge's step, DAWN PATROL, CLEAN SWEEP, BACK IN THE FIGHT, FIRST BLOOD,
+  THE CENTURION, Day Streak, the five events), so `moments` only holds training rewards, titles and new achievements (Full Stack): no matching against the phone's own
+  celebration is needed. What the phone celebrates itself is renamed to the badge: *HUMAN SPRINKLER · STEADY* (`habitBadgeName()`, HOUSE RULES for the athlete's own
+  habits, one line however many of them crossed the step, WORKOUT silent), and a retired mark is never celebrated after the switch (`currentAch()` leaves it out).
+  A key that could not be told (no signal) waits in `<id>_hab_toldq` on this phone, never in `CFG`, and goes with the next profile. Never in the demo, the coach's preview or the embed.
+- **The Trophy Room** (`renderTrophyRoom()`, the foot of Progress, replacing the milestone shelf only when `catalogueOn()`): the **four numbers** (coached: weeks held now and best, sessions with Amir,
+  personal bests, comebacks, from `get_profile().numbers`; a free athlete: days on target, perfect days, comebacks and badges owned), a **Grand Slam** of four
+  slots (one per meaning, the title won in it from `shelf.grand_slam`), then **four shelves by meaning** (Consistency, Commitment, Progress, Resilience) of
+  `shelf.badges` (the metal and the step's name or Roman numeral, the `n`, the next step: *Paper Trail 9 of 10*, a bar, the five steps as diamonds) and
+  `shelf.achievements` (owned ones with their caption, XP and day; locked ones greyed with their rule), each folded to what is owned and the next three
+  (*Show all N*, remembered in `CFG.msOpen.tr_<meaning>`), the titles of that meaning as plates, a *From Amir* shelf once a commendation is owned, and **Retired, still yours**
+  (folded; the old marks the athlete owns). The per-habit *Consistency Tiers* ladder is left out of it: its steps are carried onto each habit's badge. A **free athlete** sees only what is
+  marked `free`, and the Progress shelf **locked**: *Coached athletes earn these from their programme.* The *Milestones* stat tile reads *Trophies* (`trophyCounts()`),
+  and the rank card says TROPHIES where it said MILESTONES. Everything is 12 px or more and in Proof's own look (metals bronze, silver, emerald, amethyst, prismatic: no gold).
+- **A habit's page** shows its **badge** instead of *Consistency*: the badge's name, its five steps from KINDLED to UNBREAKABLE and the next, the old marks of that habit
+  folded under it. The shared HOUSE RULES badge on a habit of the athlete's own. **WORKOUT shows no badge block** (its badges are Century and Hold Serve, in the training app).
+- **Titles** are worn as `'c_' + id` (the server mints them into `hab_titles`, so `set_title()` accepts them). `passItem()` resolves such an id through `careerTitleFor()`:
+  the athlete's own from `shelf.titles`, anyone's from **one read of `career_catalogue`** (kind `title`, read lazily the first time a `c_` id is on screen, kept in memory, retried at most once
+  a minute), so the board and the wall name them. `syncCareerTitles()` adds the shelf's titles to `CFG.pass.owned` (append-only), and `titleFor()` draws them on the Title card
+  (*HOW YOU EARNED IT* and the `from` line). The Milestone card draws a badge step or an achievement through `medalFor()` (`{ k: 'badge', id, tier }`, `{ k: 'achievement', id }`).
+- **`?go=trophy`** opens Progress at the Trophy Room (`goTrophy()`). With the switch off it is `?go=pass`; on a phone with no copy of the profile it opens the Locker and moves on when the profile says the switch is on.
+- **The manual** (`renderManual()`) branches on `catalogueOn()`: *How to earn more*, *The Locker* and *Consistency* speak of badge steps, and a *The Trophy Room* section (and its contents link) is added. The tour
+  names no control that moved. `privacy.html` §2.3 says what the server keeps (the badges, achievements and titles earned, worked out from the log and the sessions, erased with the rest).
+
+⚠️ **Do not**: write a `<id>_hab_*` key that syncs (only `CFG` and `LOG` are pushed: the profile copy, the told queue and the like stay out of `CFG`), invent another athlete's number, put a stray backtick inside an
+HTML comment inside a JS template literal (none of the new templates has an HTML comment), or rejoin the board. The server's catalogue seed turning `retire_at`/`starts_at` on is what makes `CATALOGUE_RETIRED` true:
+a change to those entries is a change to this list (`career/badges.toml`, `career/achievements.toml`).
 
 ---
 

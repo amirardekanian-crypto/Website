@@ -12,7 +12,11 @@
 >
 > **Phase 2, the XP switch, is DONE: built, rehearsed, applied to the live project (2026-10-17) and switched on 2026-10-18** (`supabase/stage69_career_xp_switch.sql`,
 > *The decisions, round 3*, and `PROCEDURES.md` → *Phase 2, as built*). Season 1 opened at 06:00 UK on 2026-10-18 and the switch went on
-> shortly after, on Amir's yes to the dry run's list (`rulebook.toml` version 3). Nobody needed a level kept. Phase 3, the catalogue switch, is next and not started. The rest is the design
+> shortly after, on Amir's yes to the dry run's list (`rulebook.toml` version 3). Nobody needed a level kept.
+>
+> **Phase 3, the catalogue switch, is built and rehearsed (2026-10-18), not yet applied to the live project** (`supabase/stage70_career_catalogue.sql`,
+> *The decisions, round 4*, and `PROCEDURES.md` → *Phase 3, as built*): the server mints badges, achievements and titles, AA Proof gets the Trophy Room
+> and the training app celebrates its rewards, all inert until `[switch] catalogue` is turned on, on Amir's word. The rest is the design
 > the build follows, phase by phase (*Build order*, below). Change anything here first, then build; a changed file is re-seeded
 > (`README.md`, *How to change something*).
 
@@ -77,6 +81,17 @@ And with it, a rule: **every meaningful action answers at once, visibly** (GAME-
 | 1 | One switch, or two? | **Two** (`rulebook.toml` → `[switch]`). The **XP switch** (phase 2, now): training earns XP, the WORKOUT habit pays 0 a day so a session is never paid twice, a closed habit day settles, and the level becomes the career level (never resets; the rank from it). The **catalogue switch** (phase 3, later): the entries gated on it (`retire_at` / `starts_at = "catalogue"`: one badge per habit, HEAVY METAL and THE MACHINIST retire, the training badges and the awards). Each is `"off"` until a seed turns it on with its day, and a switch never goes back off. |
 | 2 | Does anybody's level go down at the XP switch? | **No.** An athlete whose career level would be below the highest level they reached in AA Proof (their best season record, `hab_season_results`, or Proof's level this season, whichever is higher) gets ONE `level_kept` fact at the XP switch that brings them to it. It counts toward the career, never a season's points. Measured on the real rows (2026-10-17): of 38 athletes (the demo included), 31 go up, 6 stay, and 1 is kept at 12 by a top-up of 630 XP (Amir's own test identity); athletes who train a lot jump most (9 → 24, 5 → 19, 8 → 15; the top athlete 22 → 27). **At the real switch (2026-10-18) nobody needed it:** the dry run's list matched the approved one for all 38 athletes, 31 went up, 7 stayed, nobody went down and no `level_kept` fact was written, because Amir's test identity had reached level 12 on its own XP by then. |
 | 3 | When does Season 1 start? | **2026-10-18**, Proof's own way (a scheduled task ran `start_season('Season 1', '2026-10-18')` at 06:00 UK): Pre-Season was archived with Proof's levels and its title at level 5 (30 athlete records, 18 titles). Phase 2 landed during Season 1 (the switch went on 2026-10-18, shortly after the season opened). Season points are derived from the facts, never stored, so at the XP switch Season 1's board is worked out again from 2026-10-18 under the new rules, training included: a session finished in Season 1 before the XP switch counts its 400, and its WORKOUT tick 0, from the moment the switch is on (checked in `scripts/career/rehearse_switch.mjs`). A season that closes under the XP switch archives its points and the career level, and gives its title at `[season] title_points` (2,000). |
+
+**The catalogue switch decisions (round 4, 2026-10-18, phase 3).** Amir: *"Go with your picks"*, on the plan page *Trophy Room*,
+https://claude.ai/artifact/MxuRVfeZ7HXspgnBvieU7o, measured on the real rows (the backup of 2026-10-17, phases 1 and 2 as live).
+
+| # | The question | What was chosen |
+|---|---|---|
+| 1 | Do rewards from the past pay their XP at the switch? | **Yes.** Every badge step and achievement already reached is minted at the switch, in silence (one reveal, never thirty), and pays its XP, the way the training history paid at the XP switch. Measured: 13 of 35 athletes go up 1 to 4 levels, nobody goes down, 125 rewards worth 37,500 XP (36,600 once the build counted Century's sessions within the plan only, GAME-4: two athletes' Century step waits, no level moves); Season 1's board does not move (the past is dated before it). |
+| 2 | Do the badges already earned in Proof carry over? | **Yes, all of them, paid once.** Every tier and mark stays owned with the XP it paid. Each habit's new badge starts at the step its old ladder reached, shown and not paid again (`carried`); the old marks fold under it. Checked: the steps carried over equal Proof's own numbers for 35 of 35 athletes. |
+| 3 | Does WORKOUT stay in the day gate? | **It stays**, against the earlier plan that its weight would leave the gate at this switch. Taking it out would have turned the last four weeks' 99 days on target into 31 and 25 comebacks into 4 (all history: 375 → 146, 78 → 21): most coached athletes reach "on target" because a session ticked WORKOUT. It already pays 0 XP a day, so nothing is paid twice. |
+| 4 | Do The Upgrade and Double Up count main lifts only? | **Yes:** squat, hinge, single leg, push and pull, from the Spine's pattern field (`patterns` on both entries). Any lift would have given NEW ENGINE to a forearm rotation (+174%) and a seated leg curl (+100%). The Upgrade is still about half of what the switch pays (18,500 of 37,500); its tiers are drafts. |
+| 5 | Reward names on Farsi share cards? | **English for now**, the way "Career Mode" is; Amir's Farsi names replace them when he writes them. |
 
 ---
 
@@ -313,7 +328,7 @@ owned.
 | Today | In Career Mode |
 |---|---|
 | Proof's XP weights and level curve (`XP_RULES`, the `xp_rules` row) | The rulebook. Habits keep their values, training joins, the curve is re-anchored |
-| WORKOUT's 100 XP a day | Moves into the session fact (400) at the XP switch (phase 2). The habit stays on the day's list for the day streak, paying 0 a day; its weight still counts in the day gate and its tiers until the catalogue switch |
+| WORKOUT's 100 XP a day | Moves into the session fact (400) at the XP switch (phase 2). The habit stays on the day's list for the day streak, paying 0 a day. Its weight stays in the day gate for good (round 4 call 3); its ladder and HEAVY METAL stop at the catalogue switch |
 | Consistency tiers, KINDLED to UNBREAKABLE | Unchanged until the catalogue switch. Then each habit keeps one badge, its Proof name, on these five steps (one behaviour, one badge) |
 | 32 milestones in marks, 5 events | Badges and achievements, each given its meaning (`badges.toml`, `achievements.toml`, `origin = "proof"`). At the catalogue switch HEAVY METAL (sessions on days in a row) and THE MACHINIST (Century's double) stop being earned; anyone who has one keeps it |
 | The comeback, BACK IN THE FIGHT, HARD TO KILL, UNBOWED | Resilience, unchanged |
@@ -337,7 +352,7 @@ Proof's to the point.
 |---|---|---|---|
 | 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app: **shipped 2026-10-17**, a row on Home above Daily habits, the weeks held in a row and the next step (Amir: *"B, show it at zero, words ok"*; `PROGRAM-APP.md` → *Hold Serve on Home*) | **live 2026-10-17, in shadow** (stage66, applied on Amir's yes and seeded; PROCEDURES.md → *Phase 1, as built*). On the live project 34 of 34 athletes' habit XP equals Proof's, this season, the rolling week and all time (`career_compare()`) |
 | 2 | **The XP switch: one profile.** Training earns XP, the WORKOUT habit pays 0 a day, closed days settle, the level is the career level (never resets) and nobody's level goes down (*The decisions, round 3*). Proof's level, rank and board read `get_profile()`; the phone scorer becomes the preview (P13); the board ranks season points from the facts, from a cache (`career_scores`) | The career level, revealed once in AA Proof; every tick answers with its XP and the bar; the training app's Career row on Home above Hold Serve, and the finish card saying what a session earns and the finished card what it earned (P17) | **DONE: built and rehearsed, applied to the live project 2026-10-17 with the switch off, switched on 2026-10-18** (stage69, both apps, 42 of 42 on the real rows, twins and a headless suite; `PROCEDURES.md` → *Phase 2, as built*; 34 of 34 identical before and after the apply; at the switch the dry run matched the approved list, 31 up, 7 the same, 0 levels kept) |
-| 3 | **Rewards with meanings, and the catalogue switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the catalogue switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row; the finish card listing every badge a session moved; each reward's moment and share card (the cards are drawn already: Highlight Reel, GAME-14) | not started |
+| 3 | **Rewards with meanings, and the catalogue switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the catalogue switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row (AA Proof's Trophy Room); the finish card listing every badge a session moved; each reward's moment and share card (the cards are drawn already: Highlight Reel, GAME-14) | **built and rehearsed 2026-10-18, not applied yet** (stage70; *The decisions, round 4*; `PROCEDURES.md` → *Phase 3, as built*; 42 of 42 on the real rows: 13 of 35 up, nobody down) |
 | 4 | **Amir's column.** Courtside, reactions, commendations, Amir's Pick | coach.html → Today | not started |
 | 5 | **Weekly missions.** The planner, the three slots, the crew mission in place of Quest week | Missions in both apps | not started |
 | 6 | **The crew.** The Bell, kudos, the consent question at the first highlight, titles on every line | AA Proof → Crew | not started |
@@ -399,6 +414,14 @@ None of these blocks phase 1.
 - **The phones' copies of phase 2's rules** (the career's curve, the WORKOUT habit at 0 a day, a session's full log and check-in)
   are held to the server's own answers in `scripts/career/xp_cases.json` by `scripts/check_twins.js` §9, and the answers to the
   server by `scripts/career/rehearse_switch.mjs` (rewrite them with `--write-cases` after a deliberate change, on both sides).
+- **The awards, `career_awards`** (phase 3): in `coach_erase_person()` (stage70's patch), and in `BACKUP_TABLES` and the schema snapshot the day stage70 is
+  applied to the live project. Unlike the score cache it IS a source: an award is the athlete's record (GAME-1), and its XP was frozen when it was minted.
+- **AA Proof's phone after the catalogue switch** previews a tick with the habit badges' steps (one ladder per habit, none for WORKOUT, one for all the
+  athlete's own habits) and Proof's kept marks, never the retired ones (`CATALOGUE_RETIRED` in `habits.html`, the proof codes of the entries with
+  `retire_at = "catalogue"`): `scripts/check_twins.js` §10 holds it to `scripts/career/catalogue_cases.json`, the server's own answers, which
+  `node scripts/career/rehearse_catalogue.mjs --write-cases` writes.
+- An achievement of origin `"new"` is judged by its own SQL in `career_evaluate()` (stage70): a new one in `achievements.toml` needs its rule there the same
+  day (`scripts/check_career.py` rule 17).
 - **The score cache, `career_scores`,** is in `coach_erase_person()` (stage69's patch) and is in `BACKUP_TABLES` and the schema snapshot
   (`test_restore_backup.py` needs both at once). It holds no
   source: a stale or missing row is worked out again from the facts (`career_stamp()` says when).

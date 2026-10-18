@@ -857,7 +857,8 @@ weight comes from the training app, not from Proof, and a coached athlete who ne
   then the **career level**, which never resets. The big figure's caption reads **career level (server)** where it read **season
   level (server)**, and the roster's `LV n` text and the header chip show the same number. The page learns which from
   `S.careerXp`, read quietly in `loadLevels()` from the newest `career_rules` row (`rules->switch`: the day the XP switch was turned
-  on, or null while it is off). A page that cannot read it keeps the old caption, and the number is the server's either way.
+  on, or null while it is off). A page that cannot read it keeps the old caption, and the number is the server's either way. The same row's
+  `catalogue` key is `S.careerCat`, which decides whether the File shows **Trophies** (see the File, 2a).
 - ~~**Chat**~~ — **removed 2026-09-26** (Amir: *"whatsapp first, remove in app chat from app and
   coach.html"*). The `messages` table and its three functions stay on the server untouched, so no
   past thread is lost; nothing reads or writes them now.
@@ -866,7 +867,7 @@ weight comes from the training app, not from Proof, and a coached athlete who ne
   prompt** are gone. The old logs stay readable, and deletable one by one, in the File tab under **Old call
   logs** (the section is absent when there are none). An old `#a/<id>/calls` link opens the athlete on The
   work. `call-log.html` and `CALL_LOG.md` still exist but nothing in the dashboard links to them.
-- **File** — four groups in this order (2026-10-12), each one white panel of label / value / action rows between hairlines, with the longer
+- **File** — four groups in this order (2026-10-12; a fifth, **Trophies**, between Programme and Records once Career Mode's catalogue switch is on: 2a below), each one white panel of label / value / action rows between hairlines, with the longer
   explanations folded at the end of their group under **How this works** (nothing was removed: each short hint on a row has its full text there):
   1. **Contact and access:** **WhatsApp** (the number box, *Save number*, *Remove*), **Login** (create, change password, remove; an unsent
      password shows here with Copy message, WhatsApp when the number is known, and Mark sent; *No login yet* stays in clay), **Status**,
@@ -874,6 +875,16 @@ weight comes from the training app, not from Proof, and a coached athlete who ne
      under The work and Proof here; audit TOOLS-11) and **Came from** (the applications linked to them under Leads; each has an *open the application* link).
   2. **Programme:** the facts (athlete id, tier, days a week, cycle, roadmap n of m, when it was last saved and by whom; *Stored in: no
      programme row* only when there is none), then the **Coaching log** and **Version history** folds.
+  2a. **Trophies** (Career Mode phase 3, 2026-10-18; **read only**, no button writes): a fifth group between Programme and Records that exists **only
+     while the newest rulebook's catalogue switch is a day** (`S.careerCat`, read quietly by `loadLevels()` beside `S.careerXp`: `career_rules` →
+     `rules->switch->catalogue`; "off", a missing key or a failed read means no group, and `career_awards` is never read). It lists that athlete's
+     `career_awards` (read for the athlete whose File is on screen, by `ensureTrophies()`; the catalogue, `career_catalogue`, once, for names and
+     metals; both cached until ↻ Refresh): a **count line** (*4 badges, 3 achievements, 1 title*), **Titles**, **Achievements**, then **Badges**
+     (one line each at the highest step, *Century · Silver II · 14 Oct*; a tier name replaces the Roman numeral where the catalogue has one;
+     newest first; the year shows only when it is not this one), and entries the catalogue retired at the switch (`retire_at = 'catalogue'`)
+     folded under **Retired, still theirs** (`#trophies-retired`, kept open through a redraw). **A read that fails is a quiet line in the group**
+     (*did not load just now, tap ↻ Refresh*): never `LOAD_ERR`, never `fail()`, and not read again until Refresh. Harness: `career-trophies`.
+     `career_awards` is not yet in `BACKUP_TABLES` or `keysOf()` (its read passes its own key order); that ships with the live database change.
   3. **Records** (absent when there is nothing to show): **Hidden sessions** and **Old call logs**. Each log's **Delete** and each hidden
      session's **Delete for good** opens a panel right under it (see *One way to say what happened*): what goes, what stays, a final button
      named for the act, Cancel. An old call log's fold has an id, so a redraw keeps an open log (and its panel) open.

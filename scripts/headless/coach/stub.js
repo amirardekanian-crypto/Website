@@ -138,7 +138,9 @@
     if (!cols || cols.trim() === '*') return clone(row);
     var out = {};
     cols.split(',').map(function (c) { return c.trim(); }).filter(Boolean).forEach(function (c) {
-      if (c === '*') Object.assign(out, clone(row)); else out[c] = clone(row[c]);
+      var js = /^(\w+):(\w+)((?:->>?\w+)+)$/.exec(c);   // a JSON path with an alias, as PostgREST has it: `switch:rules->switch`
+      if (js) { var v = row[js[2]]; js[3].split(/->>?/).filter(Boolean).forEach(function (k) { v = v == null ? null : v[k]; }); out[js[1]] = clone(v === undefined ? null : v); }
+      else if (c === '*') Object.assign(out, clone(row)); else out[c] = clone(row[c]);
     });
     return out;
   }
