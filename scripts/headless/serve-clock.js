@@ -20,7 +20,8 @@ const LONG = 'Single-Arm Half-Kneeling Landmine Rotational Press With Reverse Lu
 // The fixture's day 1 with the rests this suite needs: Pallof 60, Split Squat 40, Side Plank 20, the squat as asked (default 150), Box Jump 90
 // (the fixture's). circuit: a Conditioning circuit with a 60 s rest. retest: the squat flagged for a 5RM and the cycle ending in 3 days (inside
 // the retest window); flagged: false leaves the cycle's end 24 days away (outside it). long: an exercise with a long name, two sets and cues.
-function prog({ squatRest = 150, circuit = false, retest = false, flagged = false, long = false } = {}) {
+// solo: the Side Plank has one set.
+function prog({ squatRest = 150, circuit = false, retest = false, flagged = false, long = false, solo = false } = {}) {
   const P = H.fixture();
   const day = P.workouts.days[0];
   const ex = n => day.blocks.reduce((a, b) => a.concat(b.exercises), []).find(e => e.name === n);
@@ -31,6 +32,7 @@ function prog({ squatRest = 150, circuit = false, retest = false, flagged = fals
   if (circuit) day.blocks.push({ title: 'Conditioning', exercises: [{ type: 'circuit', name: 'Engine', rx: { rounds: 3, rest: 60 }, items: [{ name: 'Kettlebell Swing', rx: { reps: 12 } }] }] });
   if (flagged || retest) ex('Barbell Back Squat').test = '5RM';
   if (retest) P.cycles[P.currentCycleIndex].endDate = ymd(new Date(Date.now() + 3 * DAY));
+  if (solo) ex('Side Plank').rx.sets = 1;
   if (long) day.blocks[1].exercises.push({ name: LONG, exId: 'long-ex', type: 'standard', rx: { sets: 2, reps: 8, rest: 60 } });
   return P;
 }
@@ -91,6 +93,7 @@ const view = p => p.evaluate(() => {
     await p.waitForFunction(() => !Rally.isOpen(), null, { timeout: 7000 });
     const took = Date.now() - t0;
     t.check('the game closes within 7 s of the hand-back (a dead ball: about 0.6 s)', took < 7000 && took < 2500, took + ' ms');
+    t.check('when the game closes itself at the hand-back, focus goes to the clock\'s button, not to the hidden door', await p.evaluate(() => document.activeElement && document.activeElement.id === 'startStopBtn'), await p.evaluate(() => document.activeElement && (document.activeElement.id || document.activeElement.tagName)));
     v = await view(p);
     t.check('the timer is still there, running, with the door gone and the shelf folded', await p.evaluate(() => document.getElementById('timerOverlay').classList.contains('visible') && timerRunning) && !v.door && !v.shelf, JSON.stringify(v));
     t.check('the get-set block shows "Get set" and Next: the card\'s next unticked set', v.box && v.k === 'Get set' && v.next === 'Next: Half Kneeling Pallof Press · set 2 of 3', JSON.stringify(v));
@@ -145,7 +148,7 @@ const view = p => p.evaluate(() => {
     t.check('a rest written at 40 s (under 45) has no door from the start', !v.door && !v.box && !(await p.evaluate(() => serveHandedBack)), JSON.stringify(v));
     await setLeft(p, 24);
     v = await view(p);
-    t.check('…and it still hands back at 25 s: the line shows (Split Squat, set 1 of 3, its two cues)', v.latched && v.box && v.next === 'Next: Dumbbell Bulgarian Split Squat · set 1 of 3' && v.cue === 'Back foot on the bench', JSON.stringify(v));
+    t.check('…and it still hands back at 25 s: with no set ticked the line names the Split Squat alone (Rest means a set is over, so "set 1" cannot be next) and shows its cue', v.latched && v.box && v.next === 'Next: Dumbbell Bulgarian Split Squat' && v.cue === 'Back foot on the bench', JSON.stringify(v));
     await p.evaluate(() => closeTimer());
     // a 20 s rest: handed back from the start
     await tickSet(p, 'Side Plank', 0);
@@ -252,6 +255,70 @@ const view = p => p.evaluate(() => {
     v = await view(p);
     t.check('…and hands back with no Next line (nothing is known)', v.latched && !v.box && !v.door, JSON.stringify(v));
     await ctx.close();
+
+    // ── 4b. The Next line keeps the day's own rules: a struck-out card, a halved exercise, a one-set card, a Library session ──────────────
+    ({ ctx, p } = await open(browser));
+    p.on('pageerror', e => errors.push(String(e)));
+    await p.evaluate(`${H.card('Barbell Back Squat')}.classList.add('rd-skip')`);   // the check-in struck the squat out
+    for (let i = 0; i < 3; i++) await tickSet(p, 'Box Jump', i);
+    await restOn(p, 'Box Jump');
+    await wait(p, 300);
+    await setLeft(p, 24);
+    v = await view(p);
+    t.check('a card the check-in struck out (rd-skip) is passed over: after Box Jump, Next is the split squat, not the squat', v.box && v.next === 'Next: Dumbbell Bulgarian Split Squat · set 1 of 3', JSON.stringify(v));
+    await ctx.close();
+
+    ({ ctx, p } = await open(browser));
+    p.on('pageerror', e => errors.push(String(e)));
+    await p.evaluate(`${H.card('Box Jump')}.dataset.rdSets = '2'`);   // the check-in halved Box Jump to two sets today
+    await tickSet(p, 'Box Jump', 0);
+    await restOn(p, 'Box Jump');
+    await wait(p, 300);
+    await setLeft(p, 24);
+    v = await view(p);
+    t.check('a halved exercise counts the sets asked today: Next is Box Jump, set 2 of 2 (not of 3)', v.box && v.next === 'Next: Box Jump · set 2 of 2', JSON.stringify(v));
+    await p.evaluate(() => closeTimer());
+    await tickSet(p, 'Box Jump', 1);
+    await restOn(p, 'Box Jump');
+    await wait(p, 300);
+    await setLeft(p, 24);
+    v = await view(p);
+    t.check('…and with those two done, Box Jump is finished: Next is the squat, set 1 of 4 (not a dimmed third Box Jump set)', v.box && v.next === 'Next: Barbell Back Squat · set 1 of 4', JSON.stringify(v));
+    await ctx.close();
+
+    ({ ctx, p } = await open(browser, { solo: true }));
+    p.on('pageerror', e => errors.push(String(e)));
+    await restOn(p, 'Side Plank');   // one set, not ticked yet: the only set is the one just done
+    await wait(p, 300);
+    v = await view(p);
+    t.check('a one-set card rested from before its tick is taken as done: Next is the card after it', v.latched && v.box && v.next === 'Next: Mystery Carry · set 1 of 2', JSON.stringify(v));
+    await ctx.close();
+
+    // a Library session has no set log to read: the hand-back still happens, and the band names nothing (it used to read the programme's log)
+    {
+      const done3 = [1, 1, 1, 0].map(d => ({ w: '', n: '', r: '', d: !!d }));
+      const lib = await H.openProgram(browser, { w: 390, h: 844, prog: prog(), spine: SPINE, stub: { library: H.library() }, seed: { _setlog_Barbell_Back_Squat: done3 } });
+      ctx = lib.ctx; p = lib.p;
+      p.setDefaultTimeout(8000);
+      p.on('pageerror', e => errors.push(String(e)));
+      await p.evaluate(() => goLibrary());   // the Library fills the cache openWorkout() reads
+      await wait(p, 900);
+      await p.evaluate(() => openWorkout('strength/full-body-power'));
+      await wait(p, 800);
+      const wsRest = name => p.evaluate(`(() => { const c = [...document.querySelectorAll('#ws-body .checklist-item')].find(c => c.querySelector('.item-name').textContent.trim() === ${JSON.stringify(name)}); c.querySelector('.rest-btn').click(); })()`);
+      await wsRest('Countermovement Jump');
+      await wait(p, 300);
+      await setLeft(p, 24);
+      v = await view(p);
+      t.check('a Library session: the hand-back happens and the band names nothing (no set log to read)', v.latched && !v.box && !v.door, JSON.stringify(v));
+      await p.evaluate(() => closeTimer());
+      await wsRest('Barbell Back Squat');   // the programme's own squat log stands at 3 of 4: the Library squat must not read it
+      await wait(p, 300);
+      await setLeft(p, 24);
+      v = await view(p);
+      t.check('…and a Library squat does not read the programme\'s squat log (3 of 4 done there)', v.latched && !v.box, JSON.stringify(v));
+      await ctx.close();
+    }
 
     // ── 5. No games on a circuit round, nor on a flagged retest lift in its window ──────────────────────────────────────────────────
     ({ ctx, p } = await open(browser, { circuit: true }));

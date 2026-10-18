@@ -9702,7 +9702,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a test set.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. During a session it's under <strong>⋯</strong> on the bar too, as <strong>Ask Amir</strong>, and it names the exercise you have open. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
 ];
@@ -15457,24 +15457,33 @@ function cueForRest(name, exId, setNo) {
 // What comes after a list rest. Guided reads STEP.seq (paintTimerNext()); the list keeps the card its Rest button belongs to (timerCtx.card,
 // since openRest() drops the event): the next set is that card's first unticked set, and with all of them ticked the next exercise in the
 // day and its first unticked set. A circuit is named without a count (the list does not track its rounds). null when nothing follows.
+// It keeps the day's own rules, as getDayCompletion() and foldWhenDone() do: a card the check-in struck out (rd-skip) is passed over, a halved
+// exercise (data-rd-sets) counts only the sets asked today, and a Library session (not in #day-view) has no set log to read, so it names nothing.
+// Rest means a set of this card is over, so with none ticked yet "set 1" cannot be next (the athlete ticks late, or all at the end): a card of
+// several sets is named alone, with no count, and a one-set card is taken as done.
 function restNextOfCard(card) {
   try {
+    if (!card.closest('#day-view')) return null;
     const day = card.dataset.day, nm = c => ((c.querySelector('.item-name') || {}).textContent || '').trim();
     const loggable = c => !!((cardDetail(c) || c).querySelector('.rest-btn'));
     const circuit = c => c.classList.contains('round-group');
     const openSet = c => {
       if (circuit(c) || !loggable(c)) return null;
-      const total = parseInt(c.dataset.sets, 10) || 1, i = loadSetLog(nm(c), total, day).findIndex(s => !s.d);
-      return i < 0 ? null : { no: i + 1, total };
+      const total = parseInt(c.dataset.sets, 10) || 1;
+      const need = c.dataset.rdSets ? Math.min(parseInt(c.dataset.rdSets, 10) || total, total) : total;
+      const i = loadSetLog(nm(c), total, day).findIndex((s, k) => k < need && !s.d);
+      return i < 0 ? null : { no: i + 1, total: need };
     };
     const mk = (c, s) => ({ name: nm(c), exId: c.dataset.exid || '', circuit: circuit(c), no: s ? s.no : 0, total: s ? s.total : 0 });
-    const mine = openSet(card);
-    if (mine) return mk(card, mine);
-    if (circuit(card) && !card.classList.contains('checked')) return mk(card, null);
+    const struck = card.classList.contains('rd-skip');
+    const mine = struck ? null : openSet(card);
+    if (mine && mine.no > 1) return mk(card, mine);
+    if (mine && mine.total > 1) return mk(card, null);
+    if (!struck && circuit(card) && !card.classList.contains('checked')) return mk(card, null);
     const all = Array.from(document.querySelectorAll('.checklist-item')).filter(c => c.dataset.day === day);
     for (let i = all.indexOf(card) + 1; i < all.length; i++) {
       const c = all[i];
-      if (c.classList.contains('checked')) continue;
+      if (c.classList.contains('checked') || c.classList.contains('rd-skip')) continue;
       if (circuit(c)) { if (loggable(c)) return mk(c, null); continue; }
       const s = openSet(c);
       if (s) return mk(c, s);
@@ -15503,7 +15512,7 @@ function paintGetSet() {
     box.hidden = !next;
     const nl = document.getElementById('timerGetNext'), cl = document.getElementById('timerGetCue');
     if (next) {
-      const where = next.circuit ? '' : ' · set ' + next.no + ' of ' + next.total;
+      const where = next.circuit || !next.no ? '' : ' · set ' + next.no + ' of ' + next.total;
       if (nl) nl.innerHTML = `<span class="tn-k">Next:</span> ${esc(next.name + where)}`;
       if (cl) { cl.textContent = cue; cl.hidden = !cue; }
     } else {
@@ -15729,7 +15738,7 @@ function openRestGame(key) {
       sound: restSoundOn,
       audio: () => _restAC,
       name: (typeof DATA !== 'undefined' && DATA && DATA.athlete && DATA.athlete.firstName) || '',   // Between Sets' scoreboard; the other games ignore it
-      onClose: () => { if (document.getElementById('timerOverlay').classList.contains('visible')) { const b = document.getElementById('timerPlayBtn'); if (b) b.focus(); } },
+      onClose: () => { if (document.getElementById('timerOverlay').classList.contains('visible')) { const b = document.getElementById('timerPlayBtn'), f = b && !b.hidden ? b : document.getElementById('startStopBtn'); if (f) f.focus(); } },   // the door is gone after the hand-back: focus the clock's button, not a hidden one
     });
   }, () => { if (_restGameWant === key && typeof aaToast === 'function') { _restGameWant = null; aaToast('The game did not load. Check your signal and try again.'); } });
 }

@@ -12,15 +12,19 @@
 //   · like Amir, every bot now and then reads a point late (SLIP). A bot that never erred could not lose, so "the follower wins
 //     under 90%" would say nothing; with it the follower is as perfect as a person can be.
 // Four of them: sharp (r 0.10, v 4.0), average (0.20, 2.5), tired (0.30, 1.5) and the old perfect follower (r 0, no speed limit),
-// the bot that used to win 58 points out of 58 against the first Amir.
+// the bot that used to win 58 points out of 58 against the first Amir. A fifth, the ace (sharp's reaction and speed, never late, shoots
+// at the edges of the gap, reads ahead), is printed and never asserted on: Amir's form is capped at 1, so the rubber band cannot save him
+// from a player this good, and the row shows that ceiling whenever a number moves. Amir should play it himself: this is a ruler, not a player.
 //
 // What it holds true (every number measured on 2026-10-18, over eight seeds, none of it a hope):
-//   sharp ~70% of the points, average ~57% (about two matches in three at first to 5), tired ~47%, the follower ~86%;
-//   every bot loses some points; sharper always wins more; no NaN; the ball never leaves the court except through a gap; Amir's
+//   sharp ~71% of the points, average ~57% (about two matches in three at first to 5), tired ~51%, the follower ~86%;
+//   every bot loses some points; sharper always wins more; he looks calm (his misjudgement is drawn once per shot, his aim once per strike); no NaN; the ball never leaves the court except through a gap; Amir's
 //   form changes only between points and really does change how he plays; his top speed is the same whoever leads (the first
 //   Amir sped up while you led and slowed while you trailed); and the same seed plays the same game.
 // Pre-commit guard 22 runs it whenever rally.js or this file is staged: when Amir's numbers move, this says whether he still
-// plays like a person. Change a number in the AMIR block of rally.js, run this, read the table.
+// plays like a person. Change a number in the AMIR block of rally.js, run this, read the table. The bands are wide on purpose (the shares
+// wobble by 2 to 5 points with the seeds and the court size): `react` is the number they guard, while `speed` and `aim` barely move the
+// shares (speed 0.6 or 1.6 and aim 0 all still pass), so judge those two by playing.
 'use strict';
 const fs = require('fs'), path = require('path');
 
@@ -41,6 +45,7 @@ let SRC = fs.readFileSync(path.join(__dirname, '..', 'assets', 'js', 'rally.js')
 for (let i = 0; i < argv.length; i++) if (argv[i] === '--set') { const [k, v] = argv[i + 1].split('='); SRC = patchSrc(SRC, k, v); }
 const AMIR_SPEED = +(SRC.match(/\n    speed: ([0-9.]+),/) || [])[1];   // court widths a second
 const AMIR_STEP = +(SRC.match(/\n    step: ([0-9.]+),/) || [])[1];     // how far his form moves after a point
+const YOU_SPEED = +(SRC.match(/const YOU_SPEED = ([0-9.]+);/) || [])[1];   // your racket's top speed, court widths a second
 
 // ── what the bots share: their habits as people (experiments: --blead 0.1 --slip 0.2 --slipby 0.4 --aimside 0.9) ──
 const HABIT = {
@@ -101,29 +106,30 @@ function loadRally(src, seed) {
 
 // ── a bot with a person's limits ──
 function makeBot(S, spec, rnd) {
+  const HB = Object.assign({}, HABIT, spec.habit || {});   // a bot may have its own habits (the ace)
   const seen = [];
   let striking = false, aim = 0, coin = 1, extra = 0, wasFrozen = false;
   return function think() {
     const b = S.ball;
-    if (S.freeze > 0 && !wasFrozen) extra = rnd() < HABIT.slip ? HABIT.slipBy : 0;   // a new point: now and then a person reads it late
+    if (S.freeze > 0 && !wasFrozen) extra = rnd() < HB.slip ? HB.slipBy : 0;   // a new point: now and then a person reads it late
     wasFrozen = S.freeze > 0;
     const delay = spec.r + extra, lag = Math.round(delay / DT);
     seen.push({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, ax: S.amir.x }); if (seen.length > 40) seen.shift();
     const m = S.you, rr = S.rr, W = S.W, T = S.top, B = S.H - S.pad, mid = (T + B) / 2;
     let pb = seen[Math.max(0, seen.length - 1 - lag)];
     if (delay > 0) {                                            // it follows a ball in smooth flight a little, and is late to a hit or a bounce
-      const lo = S.pad + S.br, w = W - S.pad - S.br - lo, a = delay * HABIT.lookAhead;
+      const lo = S.pad + S.br, w = W - S.pad - S.br - lo, a = delay * HB.lookAhead;
       const x = ((pb.x + pb.vx * a - lo) % (2 * w) + 2 * w) % (2 * w);
       pb = { x: lo + (x <= w ? x : 2 * w - x), y: Math.max(T, Math.min(B, pb.y + pb.vy * a)), vx: pb.vx, vy: pb.vy, ax: pb.ax };
     }
     let tx, ty;
     if (pb.y > mid && !(pb.vy < -S.vmax * 0.3)) {               // in my half and not already leaving it: just below it, push it up toward his gap
-      if (!striking) { striking = true; aim = (rnd() * 2 - 1) * HABIT.aimNoise * W; coin = rnd() < 0.5 ? -1 : 1; }
+      if (!striking) { striking = true; aim = (rnd() * 2 - 1) * HB.aimNoise * W; coin = rnd() < 0.5 ? -1 : 1; }
       const side = Math.abs(pb.ax - W / 2) < rr * 0.25 ? coin : (pb.ax < W / 2 ? 1 : -1);   // the open side of his gap, as it saw him
       if (pb.y > m.y + rr * 0.5) {                              // it got behind me: go round it, never push it into my own gap
         tx = pb.x + (pb.x < W / 2 ? 1 : -1) * rr * 2.2; ty = pb.y + rr * 1.2;
       } else {
-        const ax = W / 2 + side * HABIT.aimSide * (S.gw / 2 - S.br) + aim - pb.x, ay = T - pb.y, al = Math.hypot(ax, ay) || 1;
+        const ax = W / 2 + side * HB.aimSide * (S.gw / 2 - S.br) + aim - pb.x, ay = T - pb.y, al = Math.hypot(ax, ay) || 1;
         tx = pb.x - (ax / al) * rr * 0.6; ty = pb.y - (ay / al) * rr * 0.6;
         if (Math.hypot(pb.vx, pb.vy) < S.vmax * 0.1) { tx += (ax / al) * rr * 1.6; ty += (ay / al) * rr * 1.6; }
       }
@@ -143,6 +149,7 @@ const BOTS = [
   { name: 'average', r: 0.20, v: 2.5 },
   { name: 'tired', r: 0.30, v: 1.5 },
   { name: 'follower', r: 0, v: Infinity },
+  { name: 'ace', r: 0.10, v: 4.0, extra: true, habit: { slip: 0, aimSide: 0.95, lookAhead: 0.6 } },   // printed, never asserted on
 ];
 
 // ── one bot, `secs` seconds of game time ──
@@ -150,7 +157,7 @@ function play(spec, secs, seed, src) {
   const { Rally, S, playAgain } = loadRally(src || SRC, seed);
   const think = makeBot(S, spec, prng(seed ^ 0x9E3779B9));
   const r = { pts: { you: 0, amir: 0 }, matches: { you: 0, amir: 0 }, quick: 0, nan: 0, escaped: 0, formMoved: 0, formRange: [1, 0], youFast: 0, ballFast: 0,
-    amirTop: { lead: 0, trail: 0, all: 0 }, formSteps: 0, formStepsOk: 0, bad: [] };
+    amirTop: { lead: 0, trail: 0, all: 0 }, formSteps: 0, formStepsOk: 0, missRolls: 0, aimRolls: 0, bad: [] };
   const L = S.pad, R = S.W - S.pad, T = S.top, B = S.H - S.pad, g1 = S.W / 2 - S.gw / 2 - S.br, g2 = S.W / 2 + S.gw / 2 + S.br;
   let last = { you: 0, amir: 0 }, form = S.form, sincePoint = 0, formSum = 0, mid = (T + B) / 2;
   const ticks = Math.round(secs / DT), note = s => { if (r.bad.length < 5) r.bad.push(s); };
@@ -162,8 +169,10 @@ function play(spec, secs, seed, src) {
     }
     think();
     const yx = S.you.x, yy = S.you.y, ax = S.amir.x, ay = S.amir.y, lead = S.score.you - S.score.amir, form0 = S.form;
-    const last0 = { you: S.score.you, amir: S.score.amir };
+    const last0 = { you: S.score.you, amir: S.score.amir }, miss0 = S.miss, aim0 = S.aim;
     Rally._tick(DT);
+    if (S.miss !== miss0) r.missRolls++;       // a new read of a shot (drawn once per shot) and a new aim point (once per strike)
+    if (S.aim !== aim0) r.aimRolls++;
     if (TRACE && i * DT < TRACE && i % 6 === 0) {
       const f = v => String(Math.round(v)).padStart(5);
       console.log((i * DT).toFixed(2).padStart(6) + ' ball' + f(S.ball.x) + f(S.ball.y) + ' v' + f(S.ball.vx) + f(S.ball.vy) + ' | amir' + f(S.amir.x) + f(S.amir.y) + ' | you' + f(S.you.x) + f(S.you.y) +
@@ -185,7 +194,7 @@ function play(spec, secs, seed, src) {
     }
     r.formRange = [Math.min(r.formRange[0], S.form), Math.max(r.formRange[1], S.form)];
     formSum += S.form;
-    if (Math.hypot(S.you.x - yx, S.you.y - yy) > 6 * S.W * DT + 1e-6) r.youFast++;
+    if (Math.hypot(S.you.x - yx, S.you.y - yy) > YOU_SPEED * S.W * DT + 1e-6) r.youFast++;
     const am = Math.hypot(S.amir.x - ax, S.amir.y - ay) / DT / S.W;   // Amir's speed this frame, in court widths a second
     if (!scored) {                                              // a point's own frame can be a re-serve; the racket does not teleport but skip it anyway
       r.amirTop.all = Math.max(r.amirTop.all, am);
@@ -215,10 +224,10 @@ const pad = (s, n) => String(s).padEnd(n), pc = x => (x * 100).toFixed(1) + '%';
 // Several independent games of one bot, pooled: a share measured on ~550 points wobbles by ~2 points, and the gap between the
 // average and the tired bot is only a handful, so each bot plays SEEDS games of SECS seconds and the points are added up.
 function pool(games) {
-  const r = { pts: { you: 0, amir: 0 }, matches: { you: 0, amir: 0 }, quick: 0, nan: 0, escaped: 0, formMoved: 0, formRange: [1, 0], youFast: 0, ballFast: 0, amirTop: { lead: 0, trail: 0, all: 0 }, bad: [], formMean: 0, formSteps: 0, formStepsOk: 0 };
+  const r = { pts: { you: 0, amir: 0 }, matches: { you: 0, amir: 0 }, quick: 0, nan: 0, escaped: 0, formMoved: 0, formRange: [1, 0], youFast: 0, ballFast: 0, amirTop: { lead: 0, trail: 0, all: 0 }, bad: [], formMean: 0, formSteps: 0, formStepsOk: 0, missRolls: 0, aimRolls: 0 };
   games.forEach(g => {
     ['you', 'amir'].forEach(w => { r.pts[w] += g.pts[w]; r.matches[w] += g.matches[w]; });
-    ['quick', 'nan', 'escaped', 'formMoved', 'youFast', 'ballFast', 'formSteps', 'formStepsOk'].forEach(k => { r[k] += g[k]; });
+    ['quick', 'nan', 'escaped', 'formMoved', 'youFast', 'ballFast', 'formSteps', 'formStepsOk', 'missRolls', 'aimRolls'].forEach(k => { r[k] += g[k]; });
     r.formRange = [Math.min(r.formRange[0], g.formRange[0]), Math.max(r.formRange[1], g.formRange[1])];
     ['lead', 'trail', 'all'].forEach(k => { r.amirTop[k] = Math.max(r.amirTop[k], g.amirTop[k]); });
     r.bad.push(...g.bad); r.formMean += g.formMean / games.length;
@@ -233,7 +242,7 @@ function table(results) {
   const lines = [pad('bot', 10) + pad('react', 7) + pad('speed', 7) + pad('points', 8) + pad('you win', 9) + pad('matches', 9) + pad('you win', 9) + pad('s/point', 9) + pad('<2 s', 7) + pad('form', 6) + 'by game'];
   Object.keys(results).forEach(k => {
     const s = BOTS.find(b => b.name === k), r = results[k];
-    lines.push(pad(k, 10) + pad(s.r.toFixed(2), 7) + pad(s.v === Infinity ? 'any' : s.v.toFixed(1), 7) + pad(r.n, 8) + pad(pc(r.share), 9) + pad(r.mt, 9) + pad(pc(r.matchShare), 9) +
+    lines.push(pad(k + (s.extra ? ' *' : ''), 10) + pad(s.r.toFixed(2), 7) + pad(s.v === Infinity ? 'any' : s.v.toFixed(1), 7) + pad(r.n, 8) + pad(pc(r.share), 9) + pad(r.mt, 9) + pad(pc(r.matchShare), 9) +
       pad(r.sPerPt.toFixed(1), 9) + pad(pc(r.quickShare), 7) + pad(r.formMean.toFixed(2), 6) + r.shares.map(x => (x * 100).toFixed(0)).join(' '));
   });
   return lines.join('\n');
@@ -253,17 +262,17 @@ BOTS.filter(b => !ONLY || b.name === ONLY).forEach(spec => {
   results[spec.name] = pool(games);
 });
 if (!ONLY) {
-  const sh = results.sharp, av = results.average, ti = results.tired, fo = results.follower, all = Object.keys(results).map(n => results[n]);
+  const sh = results.sharp, av = results.average, ti = results.tired, fo = results.follower, all = BOTS.filter(b => !b.extra).map(b => results[b.name]);
   const bad = all.map(r => r.bad[0]).filter(Boolean).join('; ');
   check('every bot loses some points: Amir scores against all of them', all.every(r => r.pts.amir > 0), Object.keys(results).map(n => n + ' ' + results[n].pts.amir).join(', '));
   check('the old perfect follower wins under 90% of the points', fo.share < 0.90, pc(fo.share));
   check('a sharper player wins a bigger share: sharp > average > tired', sh.share > av.share && av.share > ti.share, [sh, av, ti].map(r => pc(r.share)).join(' > '));
-  check('an average player wins between 50% and 72% of the points (aim: about 58%)', av.share >= 0.50 && av.share <= 0.72, pc(av.share));
-  check('a tired player still wins at least 25% of the points', ti.share >= 0.25, pc(ti.share));
+  check('an average player wins between 52% and 64% of the points (aim: about 57%)', av.share >= 0.52 && av.share <= 0.64, pc(av.share));
+  check('a tired player wins between 44% and 60% of the points (aim: about 51%)', ti.share >= 0.44 && ti.share <= 0.60, pc(ti.share));
   check('no number goes NaN', all.every(r => r.nan === 0), bad);
   check('the ball never leaves the court except through a gap, and no racket crosses the net', all.every(r => r.escaped === 0), bad);
   check('the ball never goes faster than its top speed', all.every(r => r.ballFast === 0), all.map(r => r.ballFast).join(','));
-  check('your racket never moves faster than 6 court widths a second', all.every(r => r.youFast === 0), all.map(r => r.youFast).join(','));
+  check('your racket never moves faster than YOU_SPEED (' + YOU_SPEED + ') court widths a second', all.every(r => r.youFast === 0), all.map(r => r.youFast).join(','));
   check('Amir\'s form changes only between points', all.every(r => r.formMoved === 0), all.map(r => r.formMoved).join(','));
   check('Amir\'s form moves one step after every point: up when you score, down when he does', all.every(r => r.formSteps > 100 && r.formStepsOk === r.formSteps), all.map(r => r.formStepsOk + '/' + r.formSteps).join(' '));
   check('Amir\'s form stays between 0 and 1', all.every(r => r.formRange[0] >= 0 && r.formRange[1] <= 1), all.map(r => r.formRange.join('-')).join(' '));
@@ -272,6 +281,11 @@ if (!ONLY) {
   const top = all.map(r => r.amirTop);
   check('Amir\'s top speed is fixed: never over the AMIR block\'s, reached both when you lead and when you trail',
     top.every(t => t.all <= AMIR_SPEED * 1.001 && t.lead >= AMIR_SPEED * 0.95 && t.trail >= AMIR_SPEED * 0.95), top.map(t => t.lead.toFixed(2) + '/' + t.trail.toFixed(2) + '/' + t.all.toFixed(2)).join(' ') + ' of ' + AMIR_SPEED);
+  // He looks calm: his misjudgement of a shot is drawn once per shot and his aim once per strike. Redrawn every frame he would twitch
+  // (a mutant that re-rolls either each frame measures 69 and 40 a point; as written about 4 and 1.4).
+  const calm = all.map(r => ({ miss: r.missRolls / r.n, aim: r.aimRolls / r.n }));
+  check('Amir looks calm, not twitchy: under 10 new reads and 5 new aim points a point (they are drawn once per shot and per strike)',
+    calm.every(c => c.miss < 10 && c.aim < 5), calm.map(c => c.miss.toFixed(1) + '/' + c.aim.toFixed(1)).join(' '));
   check('every bot played matches to the end (first to 5)', all.every(r => r.mt >= 40), all.map(r => r.mt).join(','));
   // the same seed plays the same game
   const a = play(BOTS[1], 240, SEED + 1000), b = play(BOTS[1], 240, SEED + 1000);
@@ -282,5 +296,5 @@ if (!ONLY) {
   const soft = held(0), sharp = held(1);
   check('his form matters: held soft (0) he loses clearly more points than held sharp (1)', soft.share - sharp.share >= 0.06, pc(soft.share) + ' vs ' + pc(sharp.share));
 }
-if (!QUIET || failed) console.log('\n' + table(results) + '\n\n' + SECS + ' s of game time per bot per game, ' + SEEDS + ' games per bot pooled, ' + CW + 'x' + CH + ' court, seeds ' + SEED + (SEEDS > 1 ? '-' + (SEED + SEEDS - 1) : '') + ', ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s to run');
+if (!QUIET || failed) console.log('\n' + table(results) + (BOTS.some(b => b.extra && results[b.name]) ? '\n* printed, not asserted on: the ceiling (a player this good beats his rubber band)' : '') + '\n\n' + SECS + ' s of game time per bot per game, ' + SEEDS + ' games per bot pooled, ' + CW + 'x' + CH + ' court, seeds ' + SEED + (SEEDS > 1 ? '-' + (SEED + SEEDS - 1) : '') + ', ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s to run');
 process.exitCode = failed ? 1 : 0;

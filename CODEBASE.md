@@ -573,7 +573,7 @@ match and its `rally_stats`, Back and ✕ back to the running rest, the rest run
 `splitstep.js` (2026-10-18) plays Split Step in the real app: the shelf and its order, each of the four drills, foot faults, a round that
 needs more rest than is left, the rest running out mid-round, Back and ✕ back to the running rest, `splitstep_stats`, the host's loading rules (the last tap wins, a late load opens nothing over the next rest or the GO!, no focus pulled to the door as a rest ends), 320 px and no yellow.
 `between-sets.js` (2026-10-18) plays Between Sets in the real app: the third shelf row, the saved match and Continue, the rest clock and `timeUp()`, Back and ✕ back to the running rest, `courtduel.*` stays on the phone, 320 px and no yellow.
-`serve-clock.js` (2026-10-18) checks Serve Clock, the rest handing back to the set: the hand-back at 25 s (30 s from a 100 s rest) with Off the Glass saying *Last point.* and finishing its point (`Rally.handBack`), Split Step closed at once and Between Sets parking and closing itself (each has its own `handBack`), the door rules (under 45 s, a circuit round, a retest lift in its window, 10 s before the hand-back), the get-set block and `cueForRest()` in the list and in Guided, the latch (+15s keeps it, Reset clears it), the catch-up tick, `timerDone()` still stopping a game, 320 x 568 light and dark.
+`serve-clock.js` (2026-10-18) checks Serve Clock, the rest handing back to the set: the hand-back at 25 s (30 s from a 100 s rest) with Off the Glass saying *Last point.* and finishing its point (`Rally.handBack`), Split Step closed at once and Between Sets parking and closing itself (each has its own `handBack`), the door rules (under 45 s, a circuit round, a retest lift in its window, 10 s before the hand-back), the get-set block and `cueForRest()` in the list and in Guided (a struck-out card, a halved exercise, a one-set card, a rest before the tick and a Library session each keep the Next line honest; focus after a game closes itself), the latch (+15s keeps it, Reset clears it), the catch-up tick, `timerDone()` still stopping a game, 320 x 568 light and dark.
 `sharecard.js` and `highlight-reel.js` (2026-10-17) check Highlight Reel: the first paints every share card of `assets/js/sharecard.js`
 (ten templates, Story and post, English and Farsi, weights and names on and off, long names) in a page of its own and fails on text past
 its box, text in Instagram's bars, overlapping text, a Latin digit in Farsi and the EN and FA word tables drifting apart, and saves a PNG
@@ -745,17 +745,22 @@ point starts with a mistimed read, how far his form moves a step), so moving one
   it was going) and moves its target at most `v` court widths a second. While the ball is in its half it gets just below it and pushes it up toward the
   open side of Amir's gap (with a little aim noise); otherwise it guards in front of its own gap. **Sharp** (r 0.10, v 4.0), **average** (0.20, 2.5),
   **tired** (0.30, 1.5) and **the old perfect follower** (no delay, no speed limit). Every bot, the perfect one too, reads a point late now and then
-  (30% of points, 0.3 s), as Amir does: a bot that never errs cannot lose, so "the follower wins under 90%" would say nothing.
+  (30% of points, 0.3 s), as Amir does: a bot that never errs cannot lose, so "the follower wins under 90%" would say nothing (`--slip 0` gives it
+  100%). A fifth, **the ace** (sharp's delay and speed, never late, shoots at the edges, reads ahead), is printed with a `*` and never asserted on: his
+  form is capped at 1, so it wins about 98% and shows the ceiling.
 - **What it holds** (each bot plays three 3,000 s games, 9,000 s of game time, pooled; about 4 s in all): every bot loses some points; the follower wins under
-  90% (measured about 86%); sharp > average > tired in point share (about 70, 57 and 51%); an average bot wins 50 to 72% (aim: 58%, which is about two
-  matches in three); a tired one at least 25%; no NaN; the ball never leaves the court except through a gap; it never exceeds its top speed; your racket never
-  moves faster than 6 court widths a second; his form changes only between points and stays in 0 to 1 and **matters** (held at 0 an average bot wins 6
+  90% (measured about 86%); sharp > average > tired in point share (about 71, 57 and 51%); an average bot wins 52 to 64% (aim: 57%, which is about two
+  matches in three); a tired one 44 to 60%; he looks calm (his misjudgement is drawn once per shot and his aim once per strike: about 4 and 1.4 new
+  draws a point, the test allows 10 and 5; a mutant that redraws either every frame measures 69 and 40); no NaN; the ball never leaves the court except through a gap; it never exceeds its top speed; your racket never
+  moves faster than `YOU_SPEED` (read from `rally.js`) court widths a second; his form changes only between points and stays in 0 to 1 and **matters** (held at 0 an average bot wins 6
   points more than held at 1; measured about 12); his top speed is one number, reached whether you lead or trail; the same seed plays the same game.
 - **To retune** change a number in the `AMIR` block and run `node scripts/test_rally_sim.js`. `--set speed=1.2 --set react=0.2,0.1` tries a number without
   editing the file, `--seed N` starts from another seed (check three or four: a change should hold on all), `--seeds N` pools more games, `--only average
   --trace 40` prints 40 s of one bot's play every 0.1 s. Measured 2026-10-18 over ten seed blocks: sharp 68 to 72%, average 54 to 58%, tired 51 to 54%,
   follower 85 to 87%. The gap between average and tired is only about 5 points (r 0.2 against 0.3 s and 2.5 against 1.5 widths a second matter little
   on a court this small), which is why each bot plays 9,000 s.
+- **The bands are wide on purpose** (the shares wobble 2 to 5 points with the seeds and the court size). `react` is the number they guard; `speed` 0.6
+  or 1.6 and `aim` 0 all still pass, so judge those two by playing.
 - **Not measured:** how it feels to a person. The bots are a ruler, not a player; Amir plays it before this ships.
 - **`scripts/headless/rally.js`** still plays the real game in a browser. Its *Amir alone* check parks your racket in the corner (it used to leave it dead
   centre in front of his gap, and he now aims for the middle of the biggest hole beside your racket, two 14 px slivers for a racket parked in the middle) and

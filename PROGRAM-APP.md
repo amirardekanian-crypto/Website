@@ -1671,8 +1671,10 @@ and runs it; program.html owns the door and the layer.
   side is a sprint, not a jump across the court in one frame.
 - **The numbers are set against bots with a person's limits** (`scripts/test_rally_sim.js`, pre-commit guard 22; `CODEBASE.md` → *Off the
   Glass's opponent*): a sharp bot (sees the ball 0.10 s late, thumb 4 court widths a second) wins about 70% of the points, an average one
-  (0.20 s, 2.5) about 57%, which is about two matches in three at first to 5, a tired one (0.30 s, 1.5) about 51%, and a bot that never errs
-  (no delay, no speed limit) about 86%. A change to the `AMIR` block runs it; it prints the table.
+  (0.20 s, 2.5) about 57%, which is about two matches in three at first to 5, a tired one (0.30 s, 1.5) about 51%, and a bot with no delay and
+  no speed limit (that still misreads three points in ten, as he does) about 86%. A change to the `AMIR` block runs it; it prints the table, with
+  the *ace* (a sharp bot that never misreads and shoots at the edges) as an extra row it does not assert on: it wins about 98%, the ceiling of his
+  rubber band. Known: his look-ahead keeps the old `vx` when it folds off the side glass (comment in `rally.js`; fixing it needs a retune).
 - **A ball that goes nowhere for 3 s is served to the other half**, whether it died or is trapped and shaking between the rackets at
   the net or against the glass (2026-10-18: a bot found a trapped ball that buzzed every frame and ran the rally into the thousands).
   A jammed ball counts no hit and makes no sound; otherwise a hit counts 0.12 s after the last and rings 0.09 s apart per racket.
@@ -1710,7 +1712,10 @@ takes the screen back from the games and says what is next.
 - **The get-set line** (`paintGetSet()`). The list has no paper, so the band shows a small block where the door was (`#timerGetSet`): the eyebrow
   *Get set*, *Next: <exercise> · set N of M* (`restNextOfCard()`: the Rest button's own card and its first unticked set from `loadSetLog()`, else the
   next unticked exercise in the day and its first unticked set; a circuit is named with no count because the list does not track its rounds; when
-  nothing follows there is no block) and the cue. Guided keeps its Next line (`paintTimerNext()`, `STEP.seq[STEP.pos + 1]`) and gets the cue under it
+  nothing follows there is no block) and the cue. **It keeps the day's own rules** (review fixes, 2026-10-18): a card the check-in struck out
+  (`rd-skip`) is passed over, a halved exercise (`data-rd-sets`) counts only the sets asked today (*set 2 of 2*), a Library session (a card outside
+  `#day-view`) names nothing because it keeps no set log, and since Rest means a set is over, a card with none ticked yet is named alone, with no
+  count (an athlete who ticks late or all at the end would otherwise read "set 1"), and a one-set card in that state is taken as done. Guided keeps its Next line (`paintTimerNext()`, `STEP.seq[STEP.pos + 1]`) and gets the cue under it
   (`#timerCue`, on the paper). The cue sits behind the 3 px clay bar that means look here (the Coach's words), 15 px (`--fs-body`), white on the band,
   ink on the paper. On a 568 px phone the list's ring shrinks to 140 px so the block fits (`.has-getset`); Guided's cue can sit below the first
   screen there and the overlay scrolls (it never squashes, and nothing scrolls by itself: the clock must stay in view).
@@ -1726,8 +1731,8 @@ takes the screen back from the games and says what is next.
   would cut and stops at once; Off the Glass finishes its point (above); Between Sets finishes a point in play for up to 6 s, parks on *Time to lift* and
   calls `done()` about a second later (a76016d). Off the Glass and Between Sets ignore the option.
 - The guide's *Built-in tools* card says it in one sentence (CNT-01). No new data is stored.
-- Test: `node scripts/headless/serve-clock.js` (85 checks: the hand-back by the clock at 60, 100 and 150 s, the door rules, the line and the cue in
-  the list and in Guided, the latch, +15s, Reset, the catch-up, `Rally.handBack` on a live, dead, endless and winning ball, 320 x 568 and 375 x 667
+- Test: `node scripts/headless/serve-clock.js` (92 checks: the hand-back by the clock at 60, 100 and 150 s, the door rules, the line and the cue in
+  the list and in Guided, a struck-out card, a halved exercise, a one-set card and a Library session, focus after a game closes itself, the latch, +15s, Reset, the catch-up, `Rally.handBack` on a live, dead, endless and winning ball, 320 x 568 and 375 x 667
   light and dark). The other games' suites switch the hand-back off (`SERVE_CLOCK.at = 0; SERVE_CLOCK.atLong = 0`) in the one check that is the rest
   running out on an open game (`rally.js`, `splitstep.js`, `between-sets.js`).
 

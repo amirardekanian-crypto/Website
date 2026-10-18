@@ -30,7 +30,9 @@
 
   // Amir's numbers (The Read, 2026-10-18). They were set against bots with a person's limits in scripts/test_rally_sim.js, which
   // pre-commit guard 22 runs whenever this file changes: move one, run it. The aim is an average player at about 57% of the points
-  // (about two matches in three at first to 5), a sharp one near 70%, a tired one near 51%, and a bot that never errs still under 90%.
+  // (about two matches in three at first to 5), a sharp one near 70%, a tired one near 51%, and a bot as quick as a person can be, that
+  // misreads three points in ten as Amir does, still under 90%. Of these numbers `react` is the one that moves the shares most; `speed`
+  // and `aim` barely do (the test's bands are too wide to catch them), so judge those two by playing.
   // A pair is [form 0, form 1]. `node scripts/test_rally_sim.js --set speed=1.2 --set react=0.2,0.1` tries a number without editing this.
   const AMIR = {
     speed: 0.95,           // top speed, in court widths a second. Fixed: nothing about him reads the score any more.
@@ -297,6 +299,10 @@
     let x = ((b.x + b.vx * ahead - lo) % (2 * w) + 2 * w) % (2 * w);
     return { t: b.t, x: lo + (x <= w ? x : 2 * w - x), y: Math.max(T(), Math.min(B(), b.y + b.vy * ahead)), vx: b.vx, vy: b.vy, px: b.px };
   }
+  // Known, left as it is: seenBall() folds the sighting's x off the side glass but keeps its old vx, so on the (8% of) frames where the
+  // look-ahead crosses a glass his crossX() leans the wrong way, by 57 px at the 90th percentile of those. Flipping vx there is right, and
+  // it moves the shares (average 57.3 to 54.7%, tired 50.8 to 55.0%, so "sharp > average > tired" fails): AMIR was tuned with it as it is,
+  // so fix the two together, with scripts/test_rally_sim.js and a playthrough by Amir.
   // Where a ball heading up the court will cross the line y, bouncing off the side glass on the way.
   function crossX(b, y) {
     const lo = L() + S.br, w = R() - S.br - lo;
@@ -392,9 +398,10 @@
     } else if (S.gt - S.anchor.t > 3) serve(S.ball.y < mid());
     if (!S.over) {
       S.trail.push({ x: S.ball.x, y: S.ball.y }); if (S.trail.length > 10) S.trail.shift();
-      const h = S.hist;   // what Amir can look back on: the ball's last 0.6 s, and where your racket was
+      const h = S.hist;   // what Amir can look back on: the ball's last 0.6 s (more if his reaction plus a mistimed read is longer), and where your racket was
       h.push(snap());
-      while (h.length > 2 && h[1].t < S.gt - 0.6) h.shift();
+      const keep = Math.max(0.6, Math.max(AMIR.react[0], AMIR.react[1]) + AMIR.lateBy + 0.15);
+      while (h.length > 2 && h[1].t < S.gt - keep) h.shift();
     }
   }
 
