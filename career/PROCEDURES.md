@@ -192,6 +192,9 @@ rulebook changes.
 
 **Rules:** GAME-1, GAME-3, GAME-8.
 
+**As built (phase 3, 2026-10-18, catalogue switch off):** `career_evaluate()` does steps 1 to 6 in one pass of measures, and step 4 only for an
+award earned live. Every function, the seams, the switch and the queue are in *Phase 3, as built*, at the end of this file.
+
 ## P6. Weekly missions
 
 ### P6a. Plan the week: `plan_missions(athlete, week)`
@@ -411,12 +414,17 @@ through `get_bell()`), and goes into `BACKUP_TABLES`, the schema snapshot and `c
 | `career_facts` | fact | athlete, day, kind, ref, value, source, void_at; unique on athlete + kind + ref |
 | `career_rules` | rulebook version | `rulebook.toml`, as stored data |
 | `career_catalogue` | badge, achievement, title, mission or quest | its block from the `.toml` files |
-| `career_awards` | badge tier, achievement or title earned | athlete, item, tier, day earned, evidence, season |
+| `career_awards` | badge tier, achievement or title earned (**built, stage70, 2026-10-18**) | athlete, award id, kind, item, tier, subject, day earned, `pays`, xp at mint, size, meaning, evidence, how (`live`, `silent`, `baseline`), rulebook version. Never updated, never deleted (an erasure is the one exception) |
 | `career_missions` | mission, per athlete per week | slot, mission, target, frozen XP, progress, day done, pinned by |
 | `career_quests` | quest, per athlete | steps, status, door, set by, started, paused, finished |
-| `career_recognition` | moment told | size, when the athlete, Amir, the crew and beyond were told; consent at the time |
+| `career_recognition` | moment told (**built, stage70**) | athlete, award id, audience (`athlete` now; `coach`, `crew`, `beyond` are later phases), size, `due_at`, `told_at`, `told_by` (`proof` or `training`). Written only for an award earned live |
 | `career_kudos` | kudos | who gave it, which line |
 | `career_consent` | athlete | the Bell yes or no, when it was asked |
+
+Also built in stage70: the column `career_scores.rewards` (the cache of `career_evaluate()`: what each ladder stands at, and the day the athlete was
+baselined; no source), the index `career_facts_kind_idx`, and the one-off table `backup.career_catalogue_before` (each athlete's score under the old
+rules, kept for the go-day report; **dropped 14 days after the go-day**). `career_awards` and `career_recognition` are in `coach_erase_person()` and the
+rollback; their lines in `BACKUP_TABLES` and the schema snapshot land with the snapshot commit (rollout step 2).
 
 ## P16. Changing a detail
 
@@ -606,3 +614,109 @@ procedures above became, and the choices the build made:
 - **What it does not do yet:** no badge, achievement or title of the catalogue is minted (phase 3); the training app has no moment of its
   own for a level reached (AA Proof celebrates it at its next open); the board's level beside a name can lag an athlete who has not
   opened an app since a change, by at most the time it takes a board read to work out a stale row.
+
+## Phase 3, as built (2026-10-18): rewards with meanings, and the catalogue switch
+
+`supabase/stage70_career_rewards.sql` (safe to re-run; the build is **not applied** to the live project, and the catalogue switch is off), rehearsed by
+`scripts/career/rehearse_catalogue.mjs` (PGlite, the schema snapshot, a full backup of the real rows, phases 1 and 2 as they stand on the live project,
+then stage70, the go-day, live mints on made-up athletes, partial calls, the stamp, voids, the queue, timing, a re-seed, an erasure and the way back:
+**156 of 156 on 2026-10-18**), with the way back in `scripts/career/rollback_stage70.sql` (tested there: dry run first). The apps ship ready and behave
+exactly as phase 2 until the switch is on: `catalogueOn()` in `habits.html` and `catalogueOnT()` in `program.html` are the profile's `switch.catalogue`
+and a `ladder` and `owned` that the server only fills once it is on. Decisions D1 to D17 are not answered; the recommendation of each is what is built
+(*The decisions, round 4*, in `CAREER_MODE.md`).
+
+**Words.** The **switch day** `S` is the day `[switch] catalogue` was turned on. **History** is a crossing day `d <= S` (the switch day counts as history on
+both sides: the server's `hist := d <= S`, the phone's `live := d > S`). The **award id** is the one key for a reward everywhere:
+`badge:<item>:<tier>`, `badge:<item>:<tier>:<habit>` (only `habit_tiers`), `achievement:<item>`, `title:<item>`; built only by `career_award_id()` and
+`awardId()` (both phones; a twin). A tier is its 1-based place in the entry's `tiers`, so **tiers are append-only** (*P16*, `tiers.lock.json`).
+
+**The functions** (every one is service-only; `get_profile()` and `mark_moments_told()` are the only doors for a signed-in athlete):
+- `career_catalogue_on()`: the switch is a day. With it off, every function below does nothing and `get_profile()` answers exactly as in phase 2.
+- `career_measures(athlete, ctx, keys)`: **one pass**. Each key (`run:<habit>`, `hits`, `sum`, `with3`, `perfect`, `qualify`, `daystreak`, `cbrun`,
+  `stuck`, `count:<kind>`, `weeks`, `iso:<kind>`, `maxpct`) is one set-based statement over `career_facts` and answers `{have, now, steps}`: `steps` are the
+  days on which the running best rose, so the crossing day of any `at` is the first step at or past it. Copies of `hab_bonus_xp()`'s CTEs, proved by
+  conservation (below).
+- `career_badge_eval()` and `career_achievement_eval()`: from the measures, the tiers crossed (with day and evidence) and, for a ladder, `have`, `now` and
+  `next`. A badge reads `run` (`plan_weeks`, `days`, `iso_weeks`) and an achievement reads `test` (eleven: `first`, `proof`, `goals`, `cycle_all_held`,
+  `cycle_by_the_book`, `cycle_with_broken`, `runs_together`, `best_value`, `patterns_in_cycle`, `cycle_proving`, `run_regained`), each with only its own
+  keys (rules 17 and 18 of the checker). The readings of the five prose rules are decision D9.
+- `career_entry_kinds()` / `career_entry_keys()`: which fact kinds wake an entry and which measures it needs, so a save of one kind runs only the
+  entries that read it.
+- `career_award_pays()`, `career_award_xp()`: a crossing after `S` always pays. History of an **ungated new entry** (Hold Serve, Century, Record Breaker,
+  Closer, The Upgrade and the rest) pays its tier xp, dated the day it was earned (D2). History of an entry with `starts_at` pays **0**, because the
+  Proof entry it takes the place of already paid it, except `comebacks` (D14: it pays unless the habit comebacks alone, `history_twin_counts`, had reached
+  that tier). `pays` is decided once and stored. The price of an award is **always the current catalogue's** (D12), like a fact; the price at mint is kept
+  for display and as the fallback when a tier is gone; a crossing that pays 0 stays 0.
+- `career_mint()`: inserts the award (`on conflict do nothing`), a `career_recognition` row for an award of size `win` or more that was earned `live`
+  (never for `baseline` or `silent`; a title rides on its award's moment, except the Grand Slam, which has its own), and the `hab_titles` row for a
+  title. A retired entry is never minted for a day after `S`.
+- `career_slam()`: the Grand Slam row, one earliest title per meaning (level, season and chosen titles never count).
+- `career_rewards_stamp()`: `career_stamp()` plus the awards, the titles and the Spine's approved entries (All-Court reads `pattern`). Equal to the stored
+  stamp means nothing can have changed: `career_evaluate()` answers from `career_scores.rewards` in about half a millisecond.
+- **`career_evaluate(athlete, kinds, how)`**: takes the athlete's lock; **the first call after the switch is always a full one**; a call with `kinds`
+  wakes only the entries that read them; runs the badges, the achievements, the titles of every owned award whose entry names a `title`, then the Grand
+  Slam; stores `{have, now, at, base, stamp}` in `career_scores.rewards` (a partial call merges and never moves the stamp). Returns what it minted.
+  **Order inside a save:** facts first (`observe`, `derive`), then evaluate. It is called by the three save triggers with the kinds that changed, by
+  `get_profile()` with all, and before an athlete is scored for the first time after the switch. **It is never called on a DELETE** (an erasure must not
+  mint). A failure is a warning, never a failed save.
+
+**The seams (how an award's XP reaches the score).** `career_bonus_rules()` hands `hab_bonus_xp()` empty `tiers` and `milestones` once the switch is on, in
+`career_compute()`, `career_score()` and both sides of `career_compare()`; quests and comebacks stay with `hab_bonus_xp()`. `career_facts_paid()` gains a
+branch: every award is a fact of kind `award` priced as above (no cap: the id is unique), counted in the career, the season by its day and the rolling
+week like any fact. `career_stamp()` includes the awards. `career_scored()` and `career_scores_for()` evaluate an athlete who is not baselined before
+scoring them, so the instant the switch seed commits, a board read can never score tiers stripped and awards missing: no one sees a drop.
+
+**The switch.** `career_seed()` turns the catalogue switch on **only alone**: no other change in the same seed (the catalogue data first, then the
+switch), never with the XP switch, and the day is today or yesterday. It mints nothing. The rest is batches of five athletes a call, so no save waits
+more than about 1.5 s on a lock (`python scripts/career_seed.py --catalogue-steps` prints them):
+1. `career_catalogue_before(o, 5)`: each athlete's score under the old rules, into `backup.career_catalogue_before` (refuses once the switch is on).
+2. `career_catalogue_preview(rules, o, 5)`: **the dry run**. The rulebook differing only by the switch, everything evaluated, a line per athlete, all undone.
+   The line: awards, by meaning, titles, Grand Slam, XP and level before and after, season points before and after, `proof_carried`, `proof_sum`,
+   `back_pay` and `ok` (`level_after >= level_before`). Amir reads these.
+3. The seed for real, on his yes (only `[switch] catalogue` changes).
+4. `career_rewards_batch(o, 5, 'baseline')`: mints every athlete's history in silence and prints the lines again. (`'silent'` does the same after a
+   re-seed.)
+5. `select public.career_compare()`: every row ok. After the switch it also compares, per athlete, what Proof's own tiers and milestones came to
+   (`proof_sum`) with what the awards carried (`proof_carried`).
+
+**Conservation.** At the switch, for every athlete, the XP of the Proof-origin awards dated up to `S` equals what `hab_bonus_xp()` paid for tiers and
+milestones up to `S`, because each award copies one crossing (same day, same price). So **career XP after = career XP before + the back-pay** (D2, D14), and
+no level goes down. Season points do move (D1); the dry run lists them. Rehearsed through the real scorer on every athlete, including the longest.
+
+**The profile.** `get_profile()` adds, without changing a phase 2 key: `catalogue_version`, `numbers.four` (and `numbers.free`), `owned` (every award id with its
+day: the dedupe key), `badges` (the best tier held per badge, newest first), `achievements`, `titles`, `title_worn`, `slam`, `ladder` (every live badge:
+`have`, `now`, `next`, `next_tier`, `metal_next`, `size_next`, `phone`), `near` (the nearest goals), `moments` and `recent`. Absent keys read as null in
+both apps (the **size budget**: 14 KB on the longest career, 13.7 KB on 2026-10-18). On a failed evaluate it answers from the stored cache with
+`rewards_stale`. Switch off: `{badges: [], achievements: [], moments: []}` and nothing else new.
+
+**The queue (D7).** `mark_moments_told(athlete, award_ids, app)` (the athlete's own, `proof` or `training`) stamps `told_at`. In both apps: a moment opens
+only from a server answer received in this run, never the cached profile at first paint; the award id is marked seen locally **before** the moment shows
+(`CFG.seenAwards` in Proof; `<id>_rw_seen` in the training app, synced as a union), then told on the server; on every fresh answer each app first tells
+the server about what it has already seen, so the other app never replays it; at most one full-screen moment per open **of any kind**; an award earned by
+acting in this visit (a tick, Done) opens right then; a full-screen award not shown in `keep_days` (14) arrives with `full: false` and becomes a wins line.
+
+**The apps.** AA Proof: `catalogueOn()`, `catalogueReady()`, `awardMeasures()` + `phoneAwardsFrom()` (the phone's scoring of the phone-decidable entries,
+for the instant answer to a tick), `awardId()`, `phoneAwards()`, `checkCatalogueReveal()` (the one reveal), the shelf on Progress in four kinds of win,
+the four numbers on Today's card, the Grand Slam row in the Locker, award moments and wins-card lines, Proof-look share cards (`HABITS.md` → *Career
+Mode, phase 3 (the catalogue switch)*). Training app: `catalogueOnT()`, `careerMoves()` (the finish card's lines, at most three and "+N more"), the finished card's reward
+bands (`rwCountingBands()`, `collectRewardBands()`, `paintWinBand()`), `maybeRewardMoment()` / `rewardAfterAnswer()` through `openMoment()`, the four
+numbers and the nearest goal on Home's Career row, and `APP_GUIDE` (`PROGRAM-APP.md` → *Rewards on the finish card, the bands and the row*). **No new screen** (D13).
+
+**The twins** (P13): `awardId()` (both phones), `awardMeasures()` + `phoneAwardsFrom()` (`habits.html`), `careerMoves()` (`program.html`) and the five events'
+goals (`habits.html` `EVENTS`, equal to `achievements.toml`). `scripts/check_twins.js` §10 holds them to `scripts/career/reward_cases.json`, the server's
+own answers, which `rehearse_catalogue.mjs` writes (`--write-cases`) and checks on every run. `scripts/headless/career.js`, `sharecard.js`,
+`highlight-reel.js` and `proof-cards.js` drive both apps.
+
+**Measured on PGlite** (slower than the live project), on the longest real log: a Proof save costs 44 ms more, a session save 2 ms more (budget 300); the first
+full evaluate 67 ms (budget 500); the skip path 0.5 ms (budget 10); the baseline for all 51 athletes took 3 s.
+
+**The go-day** (rollout step 4, after D1, D10 and D11 are answered): backup, `--catalogue-steps` batches 1 and 2, Amir reads the lines, the seed that only
+flips the switch, the baseline batches, `career_compare()`, then one commit with the toml dated, `privacy.html` §2.3 and its *Last updated* (the text is
+drafted outside the repo and held), the `APP_GUIDE` phrasing "Once Career Mode's rewards are on, ..." rewritten to the plain present, and the docs. 14 days
+later: `drop table backup.career_catalogue_before`. **The way back** (Amir's word only): `scripts/career/rollback_stage70.sql`, dry first, then real, then
+commit the toml with `catalogue = "off"`. It restores every function stage70 replaced, drops the two tables and the cache column, un-patches the erase
+function, and writes one `level_kept` fact (`catalogue-rollback`) for any athlete whose XP would fall, so nobody's level goes down. The apps fall back by
+themselves.
+
+**What it does not do yet:** no coach rows, reactions or commendations (phase 4); no weekly missions (phase 5); no Bell lines or kudos (phase 6); no quest
+titles (phase 7); no Farsi name or caption for a reward (Amir writes them; the share card falls back to English); no training-app moment for a plain level-up.

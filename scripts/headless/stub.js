@@ -7,7 +7,10 @@
 // ({ rpcName: true } never answers), refuse ([rpcNames]), expired, signInOk, noLib (no library at all),
 // library (what get_library answers: lib.js library() builds it from workouts/; without it the app reads the files),
 // tables ({ name: rows } what sb.from(name) answers) and tableErr ({ name: status } a refused table read),
-// profile (what get_profile answers: Career Mode, scripts/headless/career.js).
+// profile (what get_profile answers: Career Mode, scripts/headless/career.js), tellRemoves (Career Mode phase 3: mark_moments_told
+// answers how many waiting moments it told and takes them out of the profile's `moments`, as the server's told_at does, and keeps the
+// profile in '__stubcfg' so the OTHER app opened next in the same browser sees it; off by default: the stub never tells), told (every
+// id mark_moments_told was given, as [app, award_id], in window.__STUB.told).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
   var cfg = {};
@@ -33,6 +36,17 @@
     if (name === 'get_library') return res({ data: S.library || null, error: null, status: 200 });
     // Career Mode (phase 2): get_profile answers the stub's `profile` as given (none set: no answer, as an RPC the stub does not know).
     if (name === 'get_profile') return res({ data: S.profile ? JSON.parse(JSON.stringify(S.profile)) : null, error: null, status: 200 });
+    // Career Mode phase 3 (the athlete's door to the moment queue, spec section 7): it answers the count told; with tellRemoves it behaves like
+    // the server (the rows leave `moments`, the profile is kept for the next page of this browser).
+    if (name === 'mark_moments_told') {
+      var ids = (params && params.p_award_ids) || [], n = 0;
+      (S.told = S.told || []).push.apply(S.told, ids.map(function (id) { return [params && params.p_app, id]; }));
+      if (S.tellRemoves && S.profile && Array.isArray(S.profile.moments)) {
+        S.profile.moments = S.profile.moments.filter(function (m) { var hit = m && ids.indexOf(m.award_id) >= 0; if (hit) n++; return !hit; });
+        try { var c = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); c.profile = S.profile; localStorage.setItem('__stubcfg', JSON.stringify(c)); } catch (e) {}
+      }
+      return res({ data: n, error: null, status: 200 });
+    }
     if (name === 'athlete_identities') return res({ data: S.identity ? { athlete_id: S.identity } : null, error: null, status: 200 });
     // A table read (sb.from(name)): tables ({ career_facts: [rows] }) answers rows as given (filters and order are not applied);
     // tableErr ({ career_rules: 404 }) answers that status as a refusal. Neither set: no rows and no error, as before.

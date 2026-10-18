@@ -18143,7 +18143,10 @@ function openMoment(o) {
   document.body.appendChild(el);
   el.querySelector('.hl-m-x').addEventListener('click', closeMoment);
   el.querySelector('.hl-m-skip').addEventListener('click', closeMoment);
-  el.querySelector('.hl-m-go').addEventListener('click', () => { closeMoment(); openShareSheet(o.specs, 0); });
+  // The moment hands its guard history entry to the share sheet: popping it with history.back() (closeMoment) and pushing the sheet's own
+  // in the same tick let the late pop remove the SHEET's entry, and closing the sheet then left the app. navSync() settles it afterwards:
+  // if the sheet opened, the one guard stays; if it did not (preview, no card), the guard is taken off.
+  el.querySelector('.hl-m-go').addEventListener('click', () => { dropMoment(true); openShareSheet(o.specs, 0); navSync(); });
   navSync();
   if (navigator.vibrate && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) navigator.vibrate([16, 80, 16]);
   // The card itself, small, as it will be shared (a Story, in the athlete's last choices).
@@ -18154,11 +18157,13 @@ function openMoment(o) {
     im.alt = SC.caption(o.specs[0], { lang: 'en', weights: op.weights });
   })).catch(() => { const c = el.querySelector('.hl-m-card'); if (c) c.remove(); });
 }
-function closeMoment() {
+function closeMoment() { dropMoment(false); }
+// keepGuard: the moment is handing over to another layer (Share), so its guard history entry stays for that layer (see the go button).
+function dropMoment(keepGuard) {
   const el = document.querySelector('.hl-moment');
   if (el) {
     const f = el._onClose;
-    el.remove(); navSync();
+    el.remove(); if (!keepGuard) navSync();
     if (f) { try { f(); } catch (e) { /* a callback never keeps a moment open */ } }
   }
 }

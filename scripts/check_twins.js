@@ -709,6 +709,111 @@ run('Career Mode: what a session makes (program.html careerFullLog, careerChecki
   });
 });
 
+/* ── 10. Career Mode phase 3: what the two phones copy of the rewards (habits.html, program.html / the SQL) ─────── */
+// Once the catalogue switch is on, a tick in AA Proof that crosses a badge tier is told at once (GAME-13), and the training app's finish card says
+// which ladders the session moves. Each copies a server rule (supabase/stage70_career_rewards.sql: career_measures(), career_badge_eval(),
+// career_achievement_eval(), career_award_xp(), career_award_id()), so the cases are the server's own answers on made-up athletes: written, and checked
+// every run, by scripts/career/rehearse_catalogue.mjs on PGlite (scripts/career/reward_cases.json). This holds both apps to them:
+//   habits.html awardMeasures() + phoneAwardsFrom()   the pure core of the phone's scoring of the phone-decidable entries and its pending awards
+//   habits.html awardId(), program.html awardId()     the one key for a reward (career_award_id())
+//   program.html careerMoves()                        the finish card's lines (the ladder the server answered, what the session moved)
+//   habits.html EVENTS goals                          the five events' goals, equal to career/achievements.toml (through scripts/career_seed.py --json)
+const RW = JSON.parse(read('scripts/career/reward_cases.json'));
+const H_AW = sandbox(null, ['awardId', 'awardCat', 'awardMeasures', 'phoneAwardsFrom'].map(n => fnSrc(H_SRC, n, 'habits.html')),
+  ['awardId', 'awardMeasures', 'phoneAwardsFrom']);
+const A_AW = sandbox(null, fromA('awardId', 'careerMoves'), ['awardId', 'careerMoves']);
+// Key order is not part of an answer: compare as sorted JSON.
+const canon = v => JSON.stringify(v, (k, x) => (x && typeof x === 'object' && !Array.isArray(x)) ? Object.keys(x).sort().reduce((o, y) => { o[y] = x[y]; return o; }, {}) : x);
+function expectCanon(label, input, got, want) {
+  checks++;
+  if (canon(got) !== canon(want)) failures.push(`${label}\n    input    ${J(input)}\n    got      ${canon(got)}\n    want     ${canon(want)}`);
+}
+run('Career Mode phase 3: the award id (habits.html awardId, program.html awardId / career_award_id)', () => {
+  checks++;
+  if (!Array.isArray(RW.ids) || RW.ids.length < 5) failures.push('scripts/career/reward_cases.json has no award id cases (rehearse_catalogue.mjs --write-cases)');
+  (RW.ids || []).forEach(c => {
+    expect('habits.html awardId', c.args, H_AW.awardId.apply(null, c.args), c.id);
+    expect('program.html awardId', c.args, A_AW.awardId.apply(null, c.args), c.id);
+  });
+});
+run('Career Mode phase 3: what the phone decides from its own log (habits.html awardMeasures, phoneAwardsFrom / career_evaluate, career_award_xp)', () => {
+  checks++;
+  if (!Array.isArray(RW.athletes) || RW.athletes.length < 3) failures.push('scripts/career/reward_cases.json has no athletes (rehearse_catalogue.mjs --write-cases)');
+  (RW.athletes || []).forEach(a => {
+    const inp = Object.assign({ targets: RW.rules.targets }, a.input);
+    const meas = H_AW.awardMeasures(inp, RW.catalogue);
+    expectCanon('awardMeasures: ' + a.id + ' (have, and the day each tier crossed)', { S: a.S, today: a.today }, meas, a.expect);
+    const got = H_AW.phoneAwardsFrom(meas, RW.catalogue, { S: a.S, today: a.today, backfill_days: RW.rules.backfill_days, owned: a.owned, withdrawn: [] });
+    expect('phoneAwardsFrom: ' + a.id + ' (pending awards: after S, in the window, not owned, priced by the server)', { S: a.S, today: a.today },
+      got.map(x => [x.award_id, x.xp, x.size, x.day]), (a.phone_awards || []).map(x => [x.award_id, x.xp, x.size, x.day]));
+    // A withdrawn id is never pending, and a day on or before the switch day is history: nothing for the phone to say.
+    const wd = got.length ? [got[0].award_id] : [];
+    expect('phoneAwardsFrom: ' + a.id + ' (a withdrawn id is left out)', wd, H_AW.phoneAwardsFrom(meas, RW.catalogue, { S: a.S, today: a.today, backfill_days: RW.rules.backfill_days, owned: a.owned, withdrawn: wd }).map(x => x.award_id),
+      got.slice(1).map(x => x.award_id));
+    expect('phoneAwardsFrom: ' + a.id + ' (nothing after a switch day in the future)', a.S, H_AW.phoneAwardsFrom(meas, RW.catalogue, { S: '2999-01-01', today: a.today, backfill_days: RW.rules.backfill_days, owned: {}, withdrawn: [] }), []);
+  });
+});
+// What the cases cannot say, pinned by hand on made-up measures: the window and the switch day. (A crossing ON the switch day is history and the server owns it, so the
+// cases never leave one unowned: only this holds the phone's own `d > S`.)
+run('Career Mode phase 3: when an award is pending on the phone, pinned (habits.html phoneAwardsFrom / career_evaluate history rule)', () => {
+  const water = RW.catalogue.habit_water, t1 = water.tiers[0], size = t1.size || water.size || 'win';
+  const S = '2026-11-01', today = '2026-11-03';
+  const o = (extra) => Object.assign({ S, today, backfill_days: RW.rules.backfill_days, owned: {}, withdrawn: [] }, extra || {});
+  const meas = d => ({ habit_water: { have: 5, crossed: { '1': d } } });
+  const ids = r => r.map(x => [x.award_id, x.xp, x.size, x.day]);
+  expect('phoneAwardsFrom: the switch day is history (d <= S): a crossing on it is not pending', S, H_AW.phoneAwardsFrom(meas(S), RW.catalogue, o()), []);
+  expect('phoneAwardsFrom: the day after the switch day is pending, at the price of its tier', '2026-11-02', ids(H_AW.phoneAwardsFrom(meas('2026-11-02'), RW.catalogue, o())), [['badge:habit_water:1', t1.xp, size, '2026-11-02']]);
+  expect('phoneAwardsFrom: a crossing older than the open window is settled, never pending', '2026-10-25', H_AW.phoneAwardsFrom(meas('2026-10-25'), RW.catalogue, o({ S: '2026-10-01' })), []);
+  expect('phoneAwardsFrom: a crossing in the future is not pending', '2026-11-04', H_AW.phoneAwardsFrom(meas('2026-11-04'), RW.catalogue, o()), []);
+  expect('phoneAwardsFrom: no switch day, no pending award', null, H_AW.phoneAwardsFrom(meas('2026-11-02'), RW.catalogue, o({ S: '' })), []);
+  expect('phoneAwardsFrom: an owned award is not pending', null, H_AW.phoneAwardsFrom(meas('2026-11-02'), RW.catalogue, o({ owned: { 'badge:habit_water:1': '2026-11-02' } })), []);
+});
+run('Career Mode phase 3: the finish card\'s lines (program.html careerMoves / the ladder get_profile() answers)', () => {
+  checks++;
+  if (!Array.isArray(RW.moves) || RW.moves.length < 6) failures.push('scripts/career/reward_cases.json has no moves cases (rehearse_catalogue.mjs --write-cases)');
+  (RW.moves || []).forEach((c, i) => expect('careerMoves #' + i, c.e, A_AW.careerMoves(c.e, c.ladder), c.expect));
+  // Pinned by hand, what the cases cannot tell apart: a run badge (Hold Serve) counts from the run so far (`now`), not from its best (`have`); a week ladder moves only
+  // when the session closes its week or cycle; Century counts a session finished early under its own fact.
+  const LAD = {
+    held_weeks: { name: 'Hold Serve', have: 7, now: 2, next: 8, phone: 'week', counts: ['week_held'] },
+    love_hold: { name: 'Love Hold', have: 3, next: 5, phone: 'week', counts: ['week_by_the_book'] },
+    finisher: { name: 'Closer', have: 0, next: 1, phone: 'week', counts: ['cycle_finished'] },
+    century: { name: 'Century', have: 24, next: 25, phone: 'session', counts: ['session_finished', 'session_finished_early'] },
+    early_only: { name: 'Early Bird', have: 4, next: 5, phone: 'session', counts: ['session_finished_early'] },
+  };
+  const none = { early: false, fullLog: false, checkin: false, weekCloses: false, cycleCloses: false };
+  const brief = r => r.lines.map(l => [l.id, l.have, l.next, l.crossed, l.pending].join(' ')).concat(r.more ? ['more ' + r.more] : []);
+  expect('careerMoves, pinned: a run badge counts from the run so far, not from its best (now 2, so 3 of 8, pending)', 'weekCloses', brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true }), { held_weeks: LAD.held_weeks })), ['held_weeks 3 8 false true']);
+  expect('careerMoves, pinned: a week ladder does not move while the week stays open', 'no weekCloses', brief(A_AW.careerMoves(none, { held_weeks: LAD.held_weeks, love_hold: LAD.love_hold, finisher: LAD.finisher })), []);
+  expect('careerMoves, pinned: the last session of a cycle moves Closer (and a week closing alongside it)', 'cycleCloses', brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, cycleCloses: true }), { finisher: LAD.finisher })), ['finisher 1 1 true true']);
+  expect('careerMoves, pinned: a session finished early moves its own ladder and not the finished one', 'early', brief(A_AW.careerMoves(Object.assign({}, none, { early: true }), { century: LAD.century, early_only: LAD.early_only })).sort(), ['century 25 25 true false', 'early_only 5 5 true false']);
+  expect('careerMoves, pinned: a session finished in full moves the finished ladders only', 'not early', brief(A_AW.careerMoves(none, { century: LAD.century, early_only: LAD.early_only })), ['century 25 25 true false']);
+  expect('careerMoves, pinned: Love Hold needs a session logged in full and checked in, or the byBook the caller knows', 'byBook', [
+    brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, fullLog: true, checkin: true }), { love_hold: LAD.love_hold })),
+    brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, fullLog: true, checkin: true, byBook: false }), { love_hold: LAD.love_hold })),
+    brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, byBook: true }), { love_hold: LAD.love_hold }))],
+    [['love_hold 4 5 false true'], [], ['love_hold 4 5 false true']]);
+  // Something the cases cannot say: no ladder, no session, an entry on its top tier (next missing) all move nothing.
+  expect('careerMoves: no ladder', null, A_AW.careerMoves({ early: false, fullLog: true, checkin: true }, null), { lines: [], more: 0 });
+  expect('careerMoves: no session facts', null, A_AW.careerMoves(null, (RW.moves[0] || {}).ladder || {}), { lines: [], more: 0 });
+});
+run('Career Mode phase 3: the five events\' goals (habits.html EVENTS / career/achievements.toml)', () => {
+  const H_EV = sandbox(null, [constSrc(H_SRC, 'EVENTS', 'habits.html')], ['EVENTS']);
+  let seed = null;
+  for (const py of ['python', 'python3']) {
+    try { seed = JSON.parse(cp.execFileSync(py, ['-X', 'utf8', 'scripts/career_seed.py', '--json'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'ignore'] })); break; }
+    catch (e) { /* the next name */ }
+  }
+  if (!seed) bail('could not run   python scripts/career_seed.py --json   (needed to hold habits.html EVENTS to career/achievements.toml)');
+  const evs = seed.catalogue.filter(r => r.kind === 'achievement' && r.body && r.body.test === 'goals');
+  expect('every event achievement has an EVENTS twin and the other way round', null, evs.map(r => r.body.proof_code).sort(), H_EV.EVENTS.map(e => e.id).sort());
+  H_EV.EVENTS.forEach(ev => {
+    const row = evs.find(r => r.body.proof_code === ev.id);
+    if (!row) return;
+    expect('EVENTS goals vs achievements.toml: ' + ev.id, ev.id, ev.goals.map(g => ({ kind: g.kind, need: g.need })), row.body.goals.map(g => ({ kind: g.kind, need: g.need })));
+  });
+});
+
 /* ── report ───────────────────────────────────────────────────────────────── */
 if (failures.length || chipsFailures.length) {
   console.error('\ncheck_twins: ' + (failures.length + chipsFailures.length) + ' problem' + (failures.length + chipsFailures.length === 1 ? '' : 's') + ' (of ' + checks + ' checks):\n');

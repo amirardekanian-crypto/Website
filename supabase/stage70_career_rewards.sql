@@ -1240,7 +1240,7 @@ language plpgsql stable set search_path to 'public' as $function$
 declare
   v_rules jsonb := public.career_rules_now(); v_S date; v_rw jsonb := p_rw; v_stale boolean := false; v_hr jsonb;
   v_ms jsonb; v_keep integer; v_max integer; v_full jsonb; v_free boolean; f record; v_now integer := 0; v_best integer := 0;
-  v_dnow integer; v_dbest integer; v_four jsonb; v_ladder jsonb; v_near jsonb; v_out jsonb;
+  v_dnow integer; v_dbest integer; v_four jsonb; v_ladder jsonb; v_near jsonb; v_out jsonb; v_moments jsonb;
   c_rank constant jsonb := '{"tick": 0, "win": 1, "highlight": 2, "milestone": 3, "legend": 4}'::jsonb;
   c_session constant jsonb := '["session_finished", "session_finished_early", "full_log", "checkin_done"]'::jsonb;
   c_week constant jsonb := '["week_held", "week_by_the_book", "bounce_back", "training_return", "cycle_finished", "roadmap_finished", "effort_win"]'::jsonb;
@@ -1289,36 +1289,70 @@ begin
     into v_four
     from public.career_facts cf where cf.athlete_id = p_athlete and cf.void_at is null;
 
-  -- the ladder: every live badge (not retired, not chosen), where it stands and its next tier
-  select coalesce(jsonb_object_agg(c.id, jsonb_build_object(
-           'name', c.body ->> 'name', 'meaning', c.body ->> 'meaning', 'counts', z.counts,
-           'have', coalesce(public.career_num(v_rw -> 'have' -> c.id), 0), 'now', v_rw -> 'now' -> c.id,
-           'tier', t.tier, 'next', public.career_num(t.nt -> 'at'),
-           'next_tier', case when t.nt is not null then t.tier + 1 end,
+  -- the ladder: every live badge (not retired, not chosen), where it stands and its next tier. The size budget (spec §6): a key whose
+  -- value is null is left out (phone on a server-only badge, the next-tier keys on a top tier: both apps read absent as null), a `have`
+  -- or `tier` of 0 is left out (both apps and the rehearsal read Number(x) || 0), and `counts` and `now` go only with a `phone` (the
+  -- finish card, careerMoves(), reads them for those alone); so does `size_next`, once the near list below has been ordered by it.
+  -- `next_tier` is always tier + 1 beside a `next`: it goes with a `phone` (the training app's award id for a tier its finish card
+  -- crossed, rwCountingBands()) and past tier 5 only, because AA Proof's one other read of it, catalogueTotal() without its catalogue
+  -- copy, counts max(5, next_tier) steps for a ladder not yet at its top: absent and 1 to 5 are the same 5 there.
+  select coalesce(jsonb_object_agg(c.id, jsonb_strip_nulls(jsonb_build_object(
+           'name', c.body ->> 'name', 'meaning', c.body ->> 'meaning', 'counts', case when z.phone is not null then z.counts end,
+           'have', nullif(coalesce(public.career_num(v_rw -> 'have' -> c.id), 0), 0),
+           'now', case when z.phone is not null then v_rw -> 'now' -> c.id end,
+           'tier', nullif(t.tier, 0), 'next', public.career_num(t.nt -> 'at'),
+           'next_tier', case when t.nt is not null and (z.phone is not null or t.tier + 1 > 5) then t.tier + 1 end,
            'metal_next', t.nt ->> 'metal', 'size_next', t.nt ->> 'size',
-           'phone', case when jsonb_array_length(z.counts) = 0 then null
-                         when z.counts <@ c_session then 'session' when z.counts <@ c_week then 'week' end)), '{}'::jsonb)
+           'phone', z.phone))), '{}'::jsonb)
     into v_ladder
     from public.career_catalogue c
-    cross join lateral (select case jsonb_typeof(c.body -> 'counts') when 'array' then c.body -> 'counts'
-                                    when 'string' then jsonb_build_array(c.body -> 'counts') else '[]'::jsonb end as counts) z
+    cross join lateral (select y.counts, case when jsonb_array_length(y.counts) = 0 then null
+                                              when y.counts <@ c_session then 'session' when y.counts <@ c_week then 'week' end as phone
+                          from (select case jsonb_typeof(c.body -> 'counts') when 'array' then c.body -> 'counts'
+                                            when 'string' then jsonb_build_array(c.body -> 'counts') else '[]'::jsonb end as counts) y) z
     cross join lateral (select y.tier, c.body -> 'tiers' -> y.tier as nt
                           from (select coalesce(max(a.tier), 0) as tier from public.career_awards a
                                  where a.athlete_id = p_athlete and a.kind = 'badge' and a.item = c.id and a.subject = '') y) t
    where c.kind = 'badge' and not (c.body ? 'retire_at') and coalesce(c.body ->> 'meaning', '') <> 'chosen'
      and coalesce(c.body ->> 'kind', '') <> 'per_habit_best_run';
 
-  select coalesce(jsonb_agg(n.j order by n.gap, n.rk desc, n.id), '[]'::jsonb) into v_near
+  -- near: the nearest goals, an index into the ladder (its name, have, next, meaning, next_tier and metal_next are the ladder entry's,
+  -- under the same id). The size budget: the first row carries id, name, have, next and pct (the training app's Home row prints near[0]
+  -- alone, careerNearText()); every other row is its id only (AA Proof reads the ids and draws the rest from the ladder, catalogueShelf()).
+  select coalesce(jsonb_agg(case when n.rn = 1 then n.j else jsonb_build_object('id', n.id) end order by n.rn), '[]'::jsonb) into v_near
     from (select e.key as id,
-                 jsonb_build_object('id', e.key, 'name', e.value ->> 'name', 'meaning', e.value ->> 'meaning',
-                                    'have', e.value -> 'have', 'next', e.value -> 'next', 'next_tier', e.value -> 'next_tier',
-                                    'metal_next', e.value -> 'metal_next',
+                 jsonb_build_object('id', e.key, 'name', e.value ->> 'name', 'have', e.value -> 'have', 'next', e.value -> 'next',
                                     'pct', floor(public.career_num(e.value -> 'have') * 100 / public.career_num(e.value -> 'next'))::int) as j,
-                 (public.career_num(e.value -> 'next') - public.career_num(e.value -> 'have')) / public.career_num(e.value -> 'next') as gap,
-                 coalesce(public.career_num(c_rank -> (e.value ->> 'size_next')), 0) as rk
+                 row_number() over (order by (public.career_num(e.value -> 'next') - public.career_num(e.value -> 'have'))
+                                               / public.career_num(e.value -> 'next'),
+                                             coalesce(public.career_num(c_rank -> (e.value ->> 'size_next')), 0) desc, e.key) as rn
             from jsonb_each(v_ladder) e
-           where public.career_num(e.value -> 'have') > 0 and public.career_num(e.value -> 'next') > 0
-           order by 3, 4 desc, 1 limit 6) n;
+           where public.career_num(e.value -> 'have') > 0 and public.career_num(e.value -> 'next') > 0) n
+   where n.rn <= 6;
+
+  -- size_next stays only beside a `phone`: the training app reads it for a ladder its finish card moved (rwCountingBands()), AA Proof
+  -- never (the near order above has used it already). The size budget.
+  select coalesce(jsonb_object_agg(e.key, case when e.value ? 'phone' then e.value else e.value - 'size_next' end), '{}'::jsonb)
+    into v_ladder from jsonb_each(v_ladder) e;
+
+  -- the moments waiting to be told: `also` (the title the award minted) only when there is one (the size budget)
+  select coalesce(jsonb_agg(m.j order by m.rk desc, m.day desc, m.award_id), '[]'::jsonb) into v_moments
+    from (select r.award_id, a.day, coalesce(public.career_num(c_rank -> r.size), 0) as rk,
+                 jsonb_build_object(
+                   'award_id', r.award_id, 'kind', a.kind, 'item', a.item, 'tier', a.tier, 'size', r.size, 'day', a.day,
+                   'full', (v_full ? r.size) and r.due_at >= now() - make_interval(days => v_keep),
+                   'xp', case when not a.pays then 0 else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, v_hr), a.xp) end,
+                   'spec', public.career_award_spec(a.kind, a.item, a.tier, a.day, a.evidence, c.body))
+                 || coalesce((select jsonb_build_object('also', jsonb_agg(public.career_award_spec('title', ta.item, null, ta.day, ta.evidence, tc.body)
+                                                                          order by ta.item))
+                                from public.career_awards ta left join public.career_catalogue tc on tc.kind = 'title' and tc.id = ta.item
+                               where ta.athlete_id = p_athlete and ta.kind = 'title' and ta.evidence ->> 'from' = r.award_id
+                              having count(*) > 0), '{}'::jsonb) as j
+            from public.career_recognition r
+            join public.career_awards a on a.athlete_id = r.athlete_id and a.award_id = r.award_id
+            left join public.career_catalogue c on c.kind = a.kind and c.id = a.item
+           where r.athlete_id = p_athlete and r.audience = 'athlete' and r.told_at is null
+           order by 3 desc, a.day desc, r.award_id limit greatest(v_max, 0)) m;
 
   v_out := jsonb_build_object(
     'catalogue_version', (select r.version::text || '@' || extract(epoch from r.loaded_at)::bigint::text
@@ -1326,26 +1360,38 @@ begin
     'numbers', jsonb_build_object('free', v_free, 'four', v_four),
     'owned', coalesce((select jsonb_object_agg(a.award_id, a.day) from public.career_awards a where a.athlete_id = p_athlete), '{}'::jsonb),
     'badges', coalesce((
+      -- The size budget (14 KB on the longest career, spec §6). A live badge: id, subject (only when there is one), name, meaning, tier,
+      -- metal, day, caption; a tier's tier_name is the catalogue's, `n` is already inside the caption and `of` is read only on a retired
+      -- row (earnedBeforeLines() in habits.html: "HUMAN SPRINKLER II" or plain "HEAVY METAL"), so a live row has none of the three
+      -- (neither app reads them there). A retired badge is only ever the
+      -- line "Earned before: HUMAN SPRINKLER II" under the badge that replaced it, so its row is id, subject, name, meaning, tier, of,
+      -- retired and superseded_by, and a per-habit one (habit_tiers, with a subject) is id, subject, meaning, tier and retired: its
+      -- successor is the subject's own badge and its line is that badge's tier steps (habitSucc() and earnedBeforeLines() in habits.html).
+      -- There is no `days` list: every tier's day is in `owned` (badge:<id>:<tier>[:<subject>]).
       select jsonb_agg(b.j order by b.day desc, b.id, b.subject)
         from (select bt.item as id, bt.subject, bt.day,
-                     jsonb_build_object(
-                       'id', bt.item, 'subject', bt.subject, 'name', coalesce(c.body ->> 'name', bt.item), 'meaning', bt.meaning,
-                       'tier', bt.tier, 'of', case when jsonb_typeof(c.body -> 'tiers') = 'array' then jsonb_array_length(c.body -> 'tiers') end,
-                       'metal', c.body -> 'tiers' -> (bt.tier - 1) ->> 'metal', 'tier_name', c.body -> 'tiers' -> (bt.tier - 1) ->> 'tier_name',
-                       'day', bt.day, 'n', round(public.career_num(bt.evidence -> 'n')),
-                       'caption', (public.career_award_spec('badge', bt.item, bt.tier, bt.day, bt.evidence, c.body)) ->> 'caption',
-                       'retired', coalesce(c.body ? 'retire_at', false), 'superseded_by', c.body -> 'superseded_by',
-                       'days', (select jsonb_agg(a2.day order by a2.tier) from public.career_awards a2
-                                 where a2.athlete_id = p_athlete and a2.kind = 'badge' and a2.item = bt.item and a2.subject = bt.subject)) as j
+                     jsonb_strip_nulls(jsonb_build_object(
+                       'id', bt.item, 'subject', nullif(bt.subject, ''), 'meaning', bt.meaning, 'tier', bt.tier))
+                     || case when rt.retired and bt.subject <> '' then '{}'::jsonb
+                             else jsonb_build_object('name', coalesce(c.body ->> 'name', bt.item)) end
+                     || case when rt.retired
+                             then jsonb_build_object('retired', true)
+                                  || case when bt.subject = '' then jsonb_strip_nulls(jsonb_build_object(
+                                            'of', case when jsonb_typeof(c.body -> 'tiers') = 'array' then jsonb_array_length(c.body -> 'tiers') end,
+                                            'superseded_by', c.body -> 'superseded_by')) else '{}'::jsonb end
+                             else jsonb_strip_nulls(jsonb_build_object(
+                                    'metal', c.body -> 'tiers' -> (bt.tier - 1) ->> 'metal', 'day', bt.day,
+                                    'caption', (public.career_award_spec('badge', bt.item, bt.tier, bt.day, bt.evidence, c.body)) ->> 'caption')) end as j
                 from (select distinct on (a.item, a.subject) a.* from public.career_awards a
                        where a.athlete_id = p_athlete and a.kind = 'badge' order by a.item, a.subject, a.tier desc) bt
                 left join public.career_catalogue c on c.kind = 'badge' and c.id = bt.item
+                cross join lateral (select coalesce(c.body ? 'retire_at', false) as retired) rt
                order by bt.day desc, bt.item, bt.subject limit 60) b), '[]'::jsonb),
     'achievements', coalesce((
-      select jsonb_agg(jsonb_build_object(
+      select jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
                'id', a.item, 'name', coalesce(c.body ->> 'name', a.item), 'meaning', a.meaning, 'day', a.day, 'size', a.size,
                'caption', (public.career_award_spec('achievement', a.item, null, a.day, a.evidence, c.body)) ->> 'caption',
-               'retired', coalesce(c.body ? 'retire_at', false), 'superseded_by', c.body -> 'superseded_by') order by a.day desc, a.item)
+               'retired', case when c.body ? 'retire_at' then true end, 'superseded_by', c.body -> 'superseded_by')) order by a.day desc, a.item)
         from public.career_awards a left join public.career_catalogue c on c.kind = 'achievement' and c.id = a.item
        where a.athlete_id = p_athlete and a.kind = 'achievement'), '[]'::jsonb),
     'titles', coalesce((
@@ -1365,8 +1411,10 @@ begin
                coalesce(c.body, case when ht.hab_id like 't\_sn\_%' then (select s.body from public.career_catalogue s where s.kind = 'title' and s.id = 'season') end) as body
           from ht left join public.career_catalogue c on c.kind = 'title' and c.id = ht.cid
       )
-      select jsonb_agg(jsonb_build_object(
-               'id', coalesce(tt.cid, case when tt.season is not null then 'season' end, tt.hab_id), 'hab_id', tt.hab_id,
+      -- hab_id only when it differs from id (both apps read `hab_id || id`); empty keys left out (the size budget)
+      select jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
+               'id', coalesce(tt.cid, case when tt.season is not null then 'season' end, tt.hab_id),
+               'hab_id', nullif(tt.hab_id, coalesce(tt.cid, case when tt.season is not null then 'season' end, tt.hab_id)),
                'name', case when tt.season is not null
                             then coalesce((select r.season_name from public.hab_season_results r
                                             where r.athlete_id = p_athlete and to_char(r.starts_on, 'YYYYMMDD') = substr(tt.hab_id, 6) limit 1),
@@ -1374,37 +1422,27 @@ begin
                             else coalesce(tt.body ->> 'name', tt.hab_id) end,
                'meaning', case when tt.season is not null then 'season' else tt.body ->> 'meaning' end,
                'metal', tt.body ->> 'metal', 'from', tt.body ->> 'from', 'day', tt.day,
-               'source', case when tt.season is not null then 'season'
-                              when tt.body ->> 'meaning' = 'level' or tt.body is null then 'road'
+               -- source: 'award' or 'event' only, the two both apps read (syncCatalogueTitles(), catalogueTitles()); a road title
+               -- (meaning 'level', or no catalogue row) and a season title (meaning 'season') say it by their meaning (the size budget)
+               'source', case when tt.season is not null then null
+                              when tt.body ->> 'meaning' = 'level' or tt.body is null then null
                               when tt.body ->> 'origin' = 'proof' then 'event'
-                              else 'award' end) order by tt.day, tt.hab_id)
+                              else 'award' end)) order by tt.day, tt.hab_id)
         from tt), '[]'::jsonb),
     'title_worn', (select o.title from public.leaderboard_optin o where o.athlete_id = p_athlete),
     'slam', public.career_slam(p_athlete),
     'ladder', v_ladder,
     'near', v_near,
-    'moments', coalesce((
-      select jsonb_agg(m.j order by m.rk desc, m.day desc, m.award_id)
-        from (select r.award_id, a.day, coalesce(public.career_num(c_rank -> r.size), 0) as rk,
-                     jsonb_build_object(
-                       'award_id', r.award_id, 'kind', a.kind, 'item', a.item, 'tier', a.tier, 'size', r.size, 'day', a.day,
-                       'full', (v_full ? r.size) and r.due_at >= now() - make_interval(days => v_keep),
-                       'xp', case when not a.pays then 0 else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, v_hr), a.xp) end,
-                       'spec', public.career_award_spec(a.kind, a.item, a.tier, a.day, a.evidence, c.body),
-                       'also', coalesce((select jsonb_agg(public.career_award_spec('title', ta.item, null, ta.day, ta.evidence, tc.body) order by ta.item)
-                                           from public.career_awards ta left join public.career_catalogue tc on tc.kind = 'title' and tc.id = ta.item
-                                          where ta.athlete_id = p_athlete and ta.kind = 'title' and ta.evidence ->> 'from' = r.award_id), '[]'::jsonb)) as j
-                from public.career_recognition r
-                join public.career_awards a on a.athlete_id = r.athlete_id and a.award_id = r.award_id
-                left join public.career_catalogue c on c.kind = a.kind and c.id = a.item
-               where r.athlete_id = p_athlete and r.audience = 'athlete' and r.told_at is null
-               order by 3 desc, a.day desc, r.award_id limit greatest(v_max, 0)) m), '[]'::jsonb),
+    'moments', v_moments,
+    -- recent: no created_at (the order is the server's), and no spec on a row whose award is in `moments` above (the moment row carries
+    -- it; both apps read the moment row first): the size budget
     'recent', coalesce((
       select jsonb_agg(z.j order by z.created_at desc, z.award_id)
         from (select a.award_id, a.created_at,
                      jsonb_build_object('award_id', a.award_id, 'kind', a.kind, 'item', a.item, 'tier', a.tier, 'size', a.size, 'day', a.day,
-                       'xp', case when not a.pays then 0 else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, v_hr), a.xp) end,
-                       'created_at', a.created_at, 'spec', public.career_award_spec(a.kind, a.item, a.tier, a.day, a.evidence, c.body)) as j
+                       'xp', case when not a.pays then 0 else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, v_hr), a.xp) end)
+                     || case when v_moments @> jsonb_build_array(jsonb_build_object('award_id', a.award_id)) then '{}'::jsonb
+                             else jsonb_build_object('spec', public.career_award_spec(a.kind, a.item, a.tier, a.day, a.evidence, c.body)) end as j
                 from public.career_awards a left join public.career_catalogue c on c.kind = a.kind and c.id = a.item
                where a.athlete_id = p_athlete and a.how <> 'baseline' and a.created_at >= now() - interval '7 days'
                order by a.created_at desc, a.award_id limit 10) z), '[]'::jsonb));

@@ -493,7 +493,7 @@ The site started with no backend. It now uses **Supabase** (a hosted Postgres da
   - `stage62_coach_whatsapp.sql` — `coach_set_whatsapp(athlete, number)`: the coach's WhatsApp number for an athlete, kept on their `hab_contacts` record (2026-10-11, audit FLOW-8; Amir: "a WhatsApp number field on each coached athlete's File, shown in the header with a WhatsApp button"). Coach only; a new record (`source 'coach'`) only when there is a number to keep; the dashboard does not count a `source 'coach'` record as a signup. Applied; rehearsed in a rolled-back transaction (13 checks).
   - `stage63_athlete_status.sql` — a status for each athlete: active, paused or former (2026-10-11, audit ROSTER-7; Amir: "a status: active, paused, former"). `athlete_status(athlete_id, status, since, note)` holds only the paused and former ones (no row = active), coach-only through RLS; `coach_set_status(athlete, status, since, note)` (coach only; 'active' removes the row; the demo and the dashboard's own identity have none); `coach_erase_person()` patched in place (the table joins its list). Applied; rehearsed in a rolled-back transaction (18 checks incl. RLS and a real erasure).
   - `stage67_site_chat.sql` — the website chatbot's conversations (2026-10-17). `chat_conversations` (site, page, a daily-rotating `visitor` hash, turns, handoff, tokens, cost) and `chat_messages`; written only by the Edge Function `site-chat` with the service role, read and deleted by the coach (Leads → Chats); kept 90 days. In `BACKUP_TABLES`; no `athlete_id`, so not in `coach_erase_person()`. Applied 2026-10-17.
-  - `stage66_career_mode.sql` and `stage69_career_xp_switch.sql` — Career Mode's server half (2026-10-17). Stage 66 is phase 1, the fact ledger, live in shadow. Stage 69 is phase 2, the XP switch (the level is the career level, training earns XP, the board ranks season points from the facts), applied to the live project 2026-10-17, **switch off**. Both are described under *Career Mode, phase 1* and *Career Mode, phase 2* below.
+  - `stage66_career_mode.sql`, `stage69_career_xp_switch.sql` and `stage70_career_rewards.sql` — Career Mode's server half (2026-10-17/18). Stage 66 is phase 1, the fact ledger, live in shadow. Stage 69 is phase 2, the XP switch (the level is the career level, training earns XP, the board ranks season points from the facts), applied to the live project 2026-10-17, **switch off**. Stage 70 is phase 3, rewards with meanings and the catalogue switch (awards, the moment queue, the go-day batches), **built and rehearsed 2026-10-18, not applied, switch off**. Described under *Career Mode, phase 1*, *phase 2* and *phase 3* below.
   - `stage65_spine_farsi.sql` — the Farsi course reads its exercises from the Spine (2026-10-12; Amir: "fed from spine"). `exercises.steps_fa`, `cues_fa`, `purpose_fa`, `tennis_fa`; `get_exercises_fa()` (anyone may call it, like `get_exercises()`); `coach_save_spine()` takes the four (patched in place from stage64's). Applied 2026-10-12.
   - `stage64_spine_steps.sql` — How to do it (2026-10-11, the exercise card blueprint; Amir: "all recommended, go ahead"; CUE-6, CUE-7). `exercises.steps text[] not null default '{}'`, held by `spine_steps_ok()` (0 to 6 steps, none blank, none over 140 characters); `get_exercises()` sends `steps` (`[]` when none) for approved entries; `coach_save_spine()` may also write `steps` and `exercise_coach.suggested_changes`, so Amir's Save approves Claude's pending steps, cues or purpose drafts and takes them off the list in the same guarded transaction (stage48's locks and clash rule unchanged). Apply it (migration `stage64_spine_steps`) before the coach.html that writes steps goes live: without it a save that carries steps or a draft is refused, and the page names the file.
   - `schema_snapshot.sql` — **generated, never hand-edited** (2026-10-11, audit TOOLS-4; Amir: "yes, build and rehearse it"): the whole `public` schema of the live project as SQL for a FRESH database — 6 sequences, 40 tables, 92 functions, constraints (foreign keys last), indexes, triggers, RLS and policies, every grant, and the trigger on `auth.users`. The structure half of a restore (`scripts/restore/README.md`); the rows come from a backup. Made again, in the same commit, after any stage file is applied to the live project (`scripts/restore/catalog.sql` → `make_schema_snapshot.py`; pre-commit guard 17 warns when a stage file is staged without it).
@@ -577,6 +577,10 @@ habits row never saying a level, the finish card's *This session earns* line, th
 keys never synced, and 320 px. In AA Proof: the one reveal (once per athlete, no flood of level-ups), the career's level and curve, a tick moving
 the XP at once, WORKOUT at 0, the manual's wording, `?go=pass` opening the Locker, and the embedded strip never asking for the profile. Serve the
 repo first (see `lib.js`). `PROGRAM-APP.md` → *Career on Home, and what a session earns*, `HABITS.md` → *Career Mode (phase 2, the XP switch)*.
+Phase 3 (2026-10-18) extends it to 234 checks, with the catalogue switch OFF and ON: with it off both apps are byte for byte phase 2's; with it on, the
+four numbers and the nearest goal on Home's Career row, the finish card's `moves` lines, the reward bands on the finished card and the reward moment in
+the training app, and in AA Proof the catalogue reveal, the shelf, the four numbers on Today's card, the Grand Slam row, award moments and wins lines.
+`sharecard.js`, `highlight-reel.js` and `proof-cards.js` also draw the badge, achievement and title cards (the Proof look for Proof's).
 `cycle-end.js` (2026-10-10) checks Home between cycles (PROG-02): the card and the week while the cycle runs and on its
 end date, Cycle complete, Up next and "Ready for Cycle N?" 4 and 40 days past, Roadmap complete on the last cycle (light,
 dark, 320 px), an undated cycle, the Repeat a session fold, Read more in place, a session under way unfolded, and Game
@@ -652,12 +656,16 @@ Amir edits by hand: the rulebook, badges,
 achievements, titles, missions, quests and recognition. The checker (standard library only, `tomllib`) blocks a reward with
 no meaning, a fact nobody defined, a mission with a fixed XP of its own (GAME-7), a title or tier that points at nothing,
 tiers out of order, metals out of order and the banned colour words; coverage gaps (a meaning with no badge, a habit with no
-recovery mission) are warnings. `scripts/test_check_career.py` (68 tests on temp copies) runs when the checker or its test is
+recovery mission) are warnings. `scripts/test_check_career.py` (107 tests on temp copies, 2026-10-18) runs when the checker or its test is
 staged; each of 24 rules was disabled once on a throwaway copy (phase 1), and its test failed every time. Since phase 1 it also checks
 the fields that carry Proof's counting (`proof_measure`, `proof_kind`, `proof_need`) and, until `[switch] catalogue` is turned on (rule 14), that
 every habit number, tier, milestone and quest equals Proof's own in `supabase/xp_rules_snapshot.json`. Since phase 2 it checks the two switches
 (`[switch]` `xp` and `catalogue`, each `"off"` or a day, the catalogue one never before the XP one: rule 16), the catalogue's gates
 (`retire_at` and `starts_at` say `"catalogue"`: rule 15) and a fact paid from its own value (the level kept: `career_only`, meaning `"carried"`).
+Since phase 3 it also checks a `best_run` badge's `run` (rule 17), an achievement's `test` and exactly that test's keys (18), a title's `size` and the
+`[moments]` table (19), the gates agreeing (20, a warning) and **tiers append-only** against `career/tiers.lock.json` (21: an inserted, reordered or
+removed tier is an error, a badge missing from the lock a warning). `python scripts/career_seed.py --write-lock` rewrites the lock after the checker
+passes, and `--catalogue-steps` prints the go-day statements.
 
 ### Career Mode, phase 1 (`supabase/stage66_career_mode.sql`, 2026-10-17)
 
@@ -715,6 +723,44 @@ around it:
   `program.html` (the Career row, the finish card's line and the finished card's, and the keys `<id>_careercache` and `<id>_earn_d<N>`) and
   `coach.html` (`loadLevels()` reads `career_rules`, which sets the Proof level's caption). `HABITS.md` → *Career Mode (phase 2, the XP switch)*,
   `PROGRAM-APP.md` → *Career on Home, and what a session earns*, `XP_SYSTEM.md` §2, §5, §7 and §8, `COACH_DASHBOARD.md`.
+
+### Career Mode, phase 3: rewards with meanings (`supabase/stage70_career_rewards.sql`, 2026-10-18)
+
+Built and rehearsed on the real rows, **not applied to the live project, and the catalogue switch is off**: both apps behave exactly as in phase 2 until
+it is on. The go-day waits for Amir's answers on D1, D10 and D11 (`career/CAREER_MODE.md` → *round 4*). Every step is in `career/PROCEDURES.md` →
+*Phase 3, as built*; the files:
+- **`supabase/stage70_career_rewards.sql`** (safe to re-run). Two tables, `career_awards` (one row per badge tier, achievement or title earned, never
+  updated or deleted) and `career_recognition` (one row per moment to tell the athlete, told once by either app); the column `career_scores.rewards` (the
+  cache of `career_evaluate()`) and the index `career_facts_kind_idx`; `backup.career_catalogue_before`. Functions: `career_evaluate()` with
+  `career_measures()` (one pass), `career_badge_eval()`, `career_achievement_eval()`, `career_mint()`, `career_slam()`, `career_award_id()`,
+  `career_award_pays()`, `career_award_xp()`, `career_rewards_stamp()`; the seams (`career_bonus_rules()`, `career_facts_paid()` with the `award` branch,
+  `career_stamp()`, `career_score()`, `career_compute()`, `career_scored()`, `career_scores_for()`); `get_profile()` (additive: `owned`, `badges`,
+  `achievements`, `titles`, `title_worn`, `slam`, `ladder`, `near`, `moments`, `recent`, `numbers.four`, `catalogue_version`) and `mark_moments_told()`;
+  `career_seed()` (turns the catalogue switch on only alone); the go-day batches `career_catalogue_before()`, `career_catalogue_preview()` and
+  `career_rewards_batch()`; `career_compare()` after the switch. `career_sync()` and `career_keep_levels()` stamp with `clock_timestamp()` (a save that
+  waited on a lock never writes a stamp older than one already stored). The three save triggers evaluate with the kinds that changed, **never on a
+  DELETE**. `coach_erase_person()` is patched for the two tables (exactly one match or nothing changes).
+- **`scripts/career/rollback_stage70.sql`**: the way back, dry first; nobody's level goes down (a `level_kept` fact, `catalogue-rollback`). Tested by the rehearsal.
+- **`scripts/career/rehearse_catalogue.mjs`**: `PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse_catalogue.mjs --backup <file>
+  [--report <file outside the repo>] [--write-cases]`. The snapshot, a full backup of the real rows, phases 1 and 2 as live, stage70 twice, the go-day
+  (refusals, scores before, the dry run, the seed that only flips the switch, the baseline batches, conservation athlete by athlete), live mints, partial
+  calls, the stamp race, voids, the queue, timing and the profile's size, a re-seed, an erasure, reward_cases.json, the way back. 156 of 156 on 2026-10-18.
+- **`scripts/career/reward_cases.json`**: the server's own answers on fixed inputs that the phones' copies are held to: `awardId()`, `awardMeasures()` +
+  `phoneAwardsFrom()` (habits.html) and `careerMoves()` (program.html). `scripts/check_twins.js` §10 reads it (and the five events' goals against
+  `career/achievements.toml`); the rehearsal writes it (`--write-cases`) and checks it on every run.
+- **`career/tiers.lock.json`**: the metal of every tier of every badge, so tiers stay append-only (the award id is the tier's place in the list).
+- **`career/*.toml`**: the new keys (`run`, `history_twin_counts`, a test and its params on every achievement, a title's `size`, `[moments]`), described in
+  `career/README.md`. `scripts/check_career.py` rules 17 to 21 and `scripts/test_check_career.py` (107 tests).
+- **In the apps:** `habits.html` (`catalogueOn()`, `catalogueReady()`, `awardMeasures()`, `phoneAwardsFrom()`, `awardId()`, `phoneAwards()`,
+  `checkCatalogueReveal()`, `catalogueShelf()`, `renderProgress()`, the keys `CFG.seenAwards`, `CFG.catalogueSeen`, `CFG.heldBefore`) and `program.html`
+  (`catalogueOnT()`, `careerMoves()`, `awardId()`, `maybeRewardMoment()`, `rewardAfterAnswer()`, `rwCountingBands()`, `collectRewardBands()`,
+  `careerEarnAtDone()`, `paintWinBand()`, the new synced key `<id>_rw_seen`). `HABITS.md` → *Career Mode, phase 3 (the catalogue switch)*, `XP_SYSTEM.md`, `QUESTS.md`,
+  `PROGRAM-APP.md` → *Rewards on the finish card, the bands and the row*.
+- **Held until the snapshot commit (rollout step 2):** the lines for `career_awards` and `career_recognition` in coach.html's `BACKUP_TABLES` and `TABLE_KEYS`,
+  the comment in `scripts/restore/restore_backup.py`, the count in `scripts/test_restore_backup.py` (46 tables become 48) and
+  `supabase/schema_snapshot.sql` regenerated. Applying stage70 without them leaves two tables out of the backup.
+- **The rest of the checks that guard it:** `scripts/headless/career.js` (234 checks, switch off and on), `sharecard.js`, `highlight-reel.js`,
+  `proof-cards.js` and `stub.js` (the profile's rewards keys), `scripts/test_check_twins.js`.
 
 ---
 

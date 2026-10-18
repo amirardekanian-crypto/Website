@@ -7,6 +7,8 @@ changing a file and seeding it again is how a detail changes (GAME-10). No XP, b
 they see is Hold Serve on the training app's Home (2026-10-17), the held weeks the server judges with `rulebook.toml` → `[week]`.
 **Phase 2, the XP switch, is built and applied to the live project (2026-10-17) and its switch waits for Amir's yes**: `rulebook.toml` → `[switch] xp` is the switch
 (*Turning a switch on*, below).
+**Phase 3, the catalogue switch, is built and rehearsed (2026-10-18) but not applied; its switch is off.** `badges.toml`, `achievements.toml`,
+`titles.toml` and `recognition.toml` carry the keys it reads (below). Their names, tiers, XP and sizes are drafts until Amir signs them off before the go-day.
 
 ## What is here
 
@@ -33,6 +35,8 @@ they see is Hold Serve on the training app's Home (2026-10-17), the held weeks t
 | Change who hears about a moment | its `size` in its file, or what a size means in `recognition.toml` → `[size.…]` |
 | Change a WhatsApp line | `recognition.toml` → `[message.…]` → `en` or `fa` |
 | Add a mission or a quest | copy a block in `missions.toml` or `quests.toml` and change it |
+| Add a tier to a badge | `badges.toml` → that badge → `tiers`: **add it at the END**, then `python scripts/career_seed.py --write-lock` and commit `career/tiers.lock.json` |
+| Change how many full-screen moments an app opens, or for how long one waits | `recognition.toml` → `[moments]` |
 
 Then run:
 
@@ -55,7 +59,9 @@ The file holds one `select public.career_seed(…)` statement. Run it on the pro
 must still say `"ok": true`. `select version, source, loaded_at from career_rules` says which files
 the server was last seeded from (`source` is the sha256 the seed prints). `node scripts/career/rehearse.mjs` (PGlite, nothing live) proves a
 change to `supabase/stage66_career_mode.sql` before it is applied, and `node scripts/career/rehearse_switch.mjs --backup <file>` one to
-`supabase/stage69_career_xp_switch.sql` (on a backup of the real rows, kept outside the repo).
+`supabase/stage69_career_xp_switch.sql` (on a backup of the real rows, kept outside the repo), and `node scripts/career/rehearse_catalogue.mjs --backup <file>`
+one to `supabase/stage70_career_rewards.sql` and `scripts/career/rollback_stage70.sql` (PGlite in a scratch folder, `PGLITE=<scratch>/node_modules/@electric-sql/pglite`;
+`--write-cases` rewrites `scripts/career/reward_cases.json`, the answers the phones' copies are held to; `--report <file outside the repo>` writes the go-day list).
 
 ### Turning a switch on
 
@@ -71,6 +77,24 @@ settle, the level is the career level and never resets) and `catalogue` (phase 3
    `privacy.html` §2.3 brought up to date in that commit for the XP switch (`PROCEDURES.md` → P14, step 5).
 
 A switch once on never goes back off: the seed refuses it (the way back is `scripts/career/rollback_stage69.sql`, on Amir's word only).
+
+**The catalogue switch is different** (phase 3, stage70). It changes no number: Proof's habit tiers and milestones stop being paid by the daily score and
+are paid once in a career as awards, the same crossing day at the same XP, so no level drops. It is turned on in its own seed, with **nothing else
+changed**, at the **same rulebook version** (a bump would tell every athlete the XP system was updated), on today's day (or yesterday's), and after the XP
+switch. The server refuses anything else. The order, with a statement per line from `python scripts/career_seed.py --catalogue-steps [--day YYYY-MM-DD]`:
+
+1. Amir has answered D1, D10 and D11 (`CAREER_MODE.md` → *round 4*), and `python scripts/check_career.py` passes.
+2. Backup (coach.html → ⚙ Tools → ⤓ Backup).
+3. `career_catalogue_before(offset, 5)`, offsets 0 to 95: each athlete's score under the old rules. An answer with no lines means the list ended.
+4. `career_catalogue_preview(rules, offset, 5)`: the dry run. One line per athlete (XP and level before and after, season points before and after, the
+   back-pay, what Proof's tiers came to against what the awards carry, `ok`). Everything is undone. Amir reads every line.
+5. On his yes: set `catalogue = "<today>"` in `rulebook.toml` (the same `version`), run `python scripts/career_seed.py`, execute its one statement.
+6. Straight after: `career_rewards_batch(offset, 5, 'baseline')`, offsets 0 to 95, until a batch answers with no lines. Every line `ok`.
+7. `select public.career_compare()` must say `"ok": true`.
+8. Commit the toml with its date, `privacy.html` §2.3 with its *Last updated*, the rewritten `APP_GUIDE` phrasing and the docs. 14 days later,
+   `drop table backup.career_catalogue_before`.
+
+Do one statement per call. The way back is `scripts/career/rollback_stage70.sql`, on Amir's word only (dry first), then commit the toml with `catalogue = "off"`.
 
 **An id never changes.** `[badge.held_weeks]`: `held_weeks` is the id that history is filed under. Change the `name`,
 never the id.
@@ -113,8 +137,18 @@ reads; for `origin = "proof"`, `proof_codes` instead), optional `habit` (reads o
 rising order, each with an optional `title` (a habit's ladder also has `tier_name`). A `per_habit_best_run` tier has
 `mult` instead of `xp`. For a change that takes effect at the catalogue switch (phase 3), optional:
 - `retire_at = "catalogue"`: earned as Proof earns it until phase 3, never after. Anyone who has it keeps it.
-- `starts_at = "catalogue"`: not earned before phase 3.
+- `starts_at = "catalogue"`: not earned before phase 3. Its history is minted at the switch and **pays 0** (the entry it replaces already paid it).
 - `superseded_by`: the id, or list of ids, of the entry that takes its place.
+
+Phase 3's keys on a badge:
+- `run` (a `best_run` badge, required): what a run is. `plan_weeks` = held weeks in a row on the plan's own weeks (counts `week_held`); `days` = days in a
+  row a habit is done (counts `habit_done`, and needs `habit`); `iso_weeks` = calendar weeks (Monday to Sunday) in a row holding the fact.
+- `history_twin_counts` (on a `starts_at` badge): the fact kind of the Proof badge it widens (`comebacks` uses `comeback_stuck`). A history crossing pays
+  only when that kind alone had not reached the tier (decision D14).
+- **`tiers` are APPEND-ONLY once the catalogue switch is on** (rule 21): a tier's place in the list is its award's id (`badge:held_weeks:2`), so add a new
+  tier at the END. Never insert, reorder or remove one. A tier's `at`, `xp` and `size` may still change (a retune re-prices every athlete like any fact,
+  D12; `metal` is part of the lock). `career/tiers.lock.json` holds the first metals of every badge; after adding a badge or a tier run
+  `python scripts/career_seed.py --write-lock` (it runs the checker first) and commit the file.
 
 That is how a design change reaches an `origin = "proof"` entry before the catalogue switch: the old entry only gains
 `retire_at` and `superseded_by`, and its numbers stay Proof's (`check_career.py` still compares them).
@@ -122,11 +156,17 @@ That is how a design change reaches an `origin = "proof"` entry before the catal
 **`achievements.toml`** `[achievement.<id>]`: `name`, `meaning`, `reads` (a fact, or `proof`), `rule`, `xp`, `size`,
 `caption`, `free`, `origin`, optional `title`, `proof_code` when carried over, and the catalogue switch's keys `retire_at`,
 `starts_at` and `superseded_by` as on badges (an achievement may be superseded by a badge: THE MACHINIST by CENTURY).
+Phase 3 adds **`test`** (required; one of `first`, `proof`, `goals`, `cycle_all_held`, `cycle_by_the_book`, `cycle_with_broken`, `runs_together`,
+`best_value`, `patterns_in_cycle`, `cycle_proving`, `run_regained`) with exactly that test's own keys and no others (rule 18): `proof` needs
+`proof_measure` and `proof_need`; `goals` needs `goals` = a list of `{ kind, need }` (`kind` is `daysHit:<habit>`, `total:<habit>`, `qualify`, `perfect`,
+`comebacksStuck` or `comebackRun`; this is how the five events are written); `runs_together` needs `habits` and `run`; `best_value` needs `at`;
+`patterns_in_cycle` needs `groups`; `cycle_proving` needs `bests` and `retests`; `run_regained` needs `away_weeks`. `rule` stays as the words for a human.
 
 **`titles.toml`** `[title.<id>]`: `name`, `meaning` (one of the four, `chosen`, `season`, `level` for the road's titles,
 or `all` for the Grand Slam, which the engine mints when an athlete holds a title in each of the four), `from` (what
 earns it), `metal`, `origin`, optional `template = true` when the name has a blank like `<MON YYYY>`, and `retire_at` /
-`superseded_by` as on badges. `[skin.<id>]`: `name`, `from`, `origin`.
+`superseded_by` as on badges. Phase 3 adds `size` (only on the Grand Slam, `legend`: how big its own moment is; the other titles ride on the
+moment of the award that minted them, rule 19). `[skin.<id>]`: `name`, `from`, `origin`.
 
 **`missions.toml`** `[mission.<id>]`: `name`, `slot`, `meaning`, `asks`, `counts` (a fact), optional `habit`, `measure`
 (`count` · `units` · `days`), `target` (a number, or `plan_days`), `picked_when`, `free`, `origin`, `proof_xp` (what
@@ -138,4 +178,6 @@ pays `share.mission` of the work inside it (GAME-7).
 `counts`, `target` and optional `habit`, `measure`, `within`, `run`; or `closes_on = "coach_tick"`.
 
 **`recognition.toml`** `sizes` (the five), `[size.<size>]` with `athlete`, `coach`, `crew`, `beyond`; `[courtside]`;
-`[bell]`; `[tool.reaction]`, `[tool.commendation]`, `[tool.amirs_pick]`; `[message.<id>]` with `en`, `fa`, `used_for`.
+`[bell]`; `[tool.reaction]`, `[tool.commendation]`, `[tool.amirs_pick]`; `[message.<id>]` with `en`, `fa`, `used_for`. Phase 3 adds `[moments]`:
+`per_open` (the most full-screen moments of ANY kind an app opens in one visit, 1), `keep_days` (a full-screen award not shown in this many days
+becomes a wins-card line, 14), `max` (the most moments one answer carries, 8) and `full_screen` (the sizes that open full-screen, `milestone` and `legend`).

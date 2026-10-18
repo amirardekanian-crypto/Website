@@ -1140,7 +1140,10 @@ Highlight Reel), and added *"the achievements, badges and other things need to h
   3. **Cycle complete / Roadmap complete**: a one-time full-screen moment (`maybeHighlightMoment()`, `openMoment()`, the Welcome's recipe)
      at the first open in the 14 days after the end date: the cycle's cover with a burst of court lines, the card itself, his words and
      signature, **Share your cycle** and **Not now**. `<id>_hl_seen` (synced) marks it, so it shows once across phones. Never over the
-     Welcome, never in the demo or the preview. Back closes it (`topLayer()`).
+     Welcome, never in the demo or the preview. Back closes it (`topLayer()`). **Its Share button hands the moment's one guard history
+     entry to the share sheet** (`dropMoment(true)` then `openShareSheet()` then `navSync()`): popping the entry with `history.back()` and pushing the
+     sheet's own in the same tick let the late pop remove the sheet's entry, and closing the sheet (✕ or Back) then left the app (found 2026-10-18;
+     a reward's moment goes through the same `openMoment()`). Any new "close this layer, open that one" hand-off does the same, never `closeX(); openY()`.
   4. **Personal Records**: **Share** on a lift's New best band, on a **Retest beaten** band (a test logged there in the last 7 days that beat
      the one before), and on every row that set a record (it beat every entry before it). A lift's first record beats nothing: no card.
   5. **The share sheet** (`openShareSheet(specs, i)`, a page of the one sheet, wrapped by `sheetWrap()`): a picker when there is more than

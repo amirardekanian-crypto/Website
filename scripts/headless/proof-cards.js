@@ -19,6 +19,9 @@
 // rest of the queue until the picker closes; the wins card's Share it holds the newest win of each card, and
 // the rail then shows them; the picker's rail names follow the subject; every other door to a card (a quest, a
 // streak mark, a skin, a rank-up, a tier, a comeback, a habit's rank, a season with no title).
+// Career Mode phase 3 (the catalogue switch): the same cards for the subjects it adds, on a page whose profile has the catalogue on (scripts/headless/career.js
+// builds the answer in the shape get_profile() really gives): a badge of each kind of win and an achievement as {k: 'award', id} on the Milestone card (its tier's
+// metal, its kind of win's emoji, none of them gold), a catalogue title and the Grand Slam on the Title card, an event title that is also a catalogue title.
 // A made-up athlete (lib.js stub), 40 days of log ending today. Serve the repo first
 // (python -m http.server 8765 --bind 127.0.0.1, see lib.js), then:
 //   node scripts/headless/proof-cards.js [--out <dir for the PNGs>]
@@ -95,6 +98,21 @@ const CASES = [
   // tight fit. November 2026 starts on a Sunday and has 30 days.
   { card: 'wrap', slug: 'six-row-month', subj: null, on: [2026, 11, 15], show: () => [has('NOVEMBER 2026 · 30 DAYS')] },
 ];
+// Career Mode phase 3: the subjects the catalogue switch adds. They are painted on a page whose profile has the catalogue on (cat: true).
+const A = (id, name, kindOfWin, emoji) => ({ card: 'medal', slug: 'award-' + id.replace(/[:_]/g, '-'), subj: { k: 'award', id }, cat: true, emoji,
+  show: () => [has(name), has(kindOfWin.toUpperCase()), has(emoji)] });
+CASES.push(
+  A('badge:held_weeks:3', 'HOLD SERVE · EMERALD', 'Consistency', '🔁'),
+  A('badge:century:2', 'CENTURY · SILVER', 'Commitment', '📅'),
+  A('badge:bests:3', 'RECORD BREAKER · EMERALD', 'Progress', '📈'),
+  A('badge:comebacks:2', 'HARD TO KILL · SILVER', 'Resilience', '🛡️'),
+  A('badge:habit_water:1', 'HUMAN SPRINKLER · BRONZE', 'Consistency', '🔁'),
+  A('achievement:the_foundry', 'THE FOUNDRY', 'Commitment', '📅'),
+  { card: 'title', slug: 'cat-clockwork', subj: { id: 'clockwork' }, cat: true, show: () => [has('CLOCKWORK'), has('TITLE · CONSISTENCY')] },
+  { card: 'title', slug: 'cat-the-constant', subj: { id: 'the_constant' }, cat: true, show: () => [has('THE CONSTANT')] },
+  { card: 'title', slug: 'cat-grand-slam', subj: { id: 'grand_slam' }, cat: true, show: () => [has('GRAND SLAM'), has('A TITLE IN ALL FOUR')] },
+  { card: 'title', slug: 'cat-event-sun-forged', subj: { id: 't_sunforged' }, cat: true, show: () => [has('SUN-FORGED'), has('FINISHED THE FOUNDRY')] },
+);
 CASES.forEach(c => { c.id = c.card + '-' + c.slug; });
 
 // ── In the page ──
@@ -249,7 +267,7 @@ const GOLD_EMOJI = /[🏆🥇🏅🎖⭐🌟✨💫⚡☀🌞💡💰🪙👑�
   const f = await facts(A.p);
   t.check('setup: the page and this script agree on today', f.today === todayKey, f.today + ' vs ' + todayKey);
   t.check('setup: yesterday is a perfect day and a day streak is running', f.perfectYesterday && f.streak >= 8, JSON.stringify({ perfectYesterday: f.perfectYesterday, streak: f.streak, best: f.best }));
-  await paintAll(A.p, CASES.filter(c => !c.broken));
+  await paintAll(A.p, CASES.filter(c => !c.broken && !c.cat));
   errs.push(...A.p.errs);
   await A.ctx.close();
 
@@ -258,9 +276,27 @@ const GOLD_EMOJI = /[🏆🥇🏅🎖⭐🌟✨💫⚡☀🌞💡💰🪙👑�
   await B.p.evaluate(installCapture);
   const fb = await facts(B.p);
   t.check('setup: the second page has no day streak (a lost streak, with a best behind it)', fb.streak === 0 && fb.best >= 7, JSON.stringify({ streak: fb.streak, best: fb.best }));
-  await paintAll(B.p, CASES.filter(c => c.broken));
+  await paintAll(B.p, CASES.filter(c => c.broken && !c.cat));
   errs.push(...B.p.errs);
   await B.ctx.close();
+
+  // 2b. The catalogue switch on: the same athlete, with a profile that has the awards, the titles and a full Grand Slam, and the catalogue copy the cards name them from.
+  const R = require('./career');
+  const slamTitles = { consistency: { id: 'clockwork', name: 'CLOCKWORK' }, commitment: { id: 'sun_forged', name: 'SUN-FORGED' }, progress: { id: 'proven', name: 'PROVEN' }, resilience: { id: 'second_wind', name: 'SECOND WIND' } };
+  const slam = Object.fromEntries(Object.entries(slamTitles).map(([k, v]) => [k, Object.assign({ day: R.at(-2) }, v)]).concat([['grand', { id: 'grand_slam', name: 'GRAND SLAM', day: R.at(-1) }]]));
+  const prof = R.rwProfile(10000, { slam, worn: null,
+    owned: { 'title:grand_slam': R.at(-1), 'title:sun_forged': R.at(-2), 'badge:held_weeks:3': R.at(-2), 'badge:century:2': R.at(-9), 'badge:bests:3': R.at(-8), 'badge:comebacks:2': R.at(-7), 'badge:habit_water:1': R.at(-5), 'achievement:the_foundry': R.at(-2) },
+    titles: [{ id: 'clockwork', hab_id: 'clockwork', name: 'CLOCKWORK', meaning: 'consistency', metal: 'prismatic', from: 'Hold Serve, prismatic: 52 weeks held in a row', day: R.at(-20), source: 'award' },
+      { id: 'the_constant', hab_id: 'the_constant', name: 'THE CONSTANT', meaning: 'consistency', metal: 'prismatic', from: 'Long Count, prismatic: 100 weeks held', day: R.at(-20), source: 'award' },
+      { id: 'grand_slam', hab_id: 'grand_slam', name: 'GRAND SLAM', meaning: 'all', metal: 'prismatic', from: 'A title in all four', day: R.at(-1), source: 'award' }] });
+  const D = await H.openProof(browser, { w: 390, h: 844, tz: TZ, cfg: Object.assign({}, CFG_SEED, { careerSeen: R.SWX, catalogueSeen: R.at(-3) }), seed: { _hab_log: habitLog(false) },
+    stub: { profile: prof, tables: { career_rules: R.RW_RULES, career_facts: [], career_catalogue: R.catRows() } } });
+  await D.p.waitForFunction(() => typeof catalogueReady === 'function' && catalogueReady(), null, { timeout: 15000 }).catch(() => {});
+  t.check('setup: the third page has the catalogue on and holds the catalogue copy', await D.p.evaluate(() => catalogueReady()));
+  await D.p.evaluate(installCapture);
+  await paintAll(D.p, CASES.filter(c => c.cat));
+  errs.push(...D.p.errs);
+  await D.ctx.close();
 
   fs.writeFileSync(path.join(out, 'draws.json'), JSON.stringify(shots.map(s => ({ id: s.id, size: s.size, error: s.error,
     texts: s.texts.map(x => ({ text: x.text, x: x.x, y: x.y, font: x.font, align: x.align, baseline: x.baseline, ls: x.ls, width: Math.round(x.width) })),
@@ -346,6 +382,14 @@ const GOLD_EMOJI = /[🏆🥇🏅🎖⭐🌟✨💫⚡☀🌞💡💰🪙👑�
   });
   const emoji = new Map();
   painted.forEach(s => s.texts.forEach(x => (x.text.match(GOLD_EMOJI) || []).forEach(e => emoji.set(e, (emoji.get(e) || new Set()).add(s.id)))));
+
+  // The four kinds of win's emoji are drawn on their cards and none of them is on the gold list (Amir: no yellow, gold, ochre or amber, emoji included).
+  const WIN_EMOJI_SET = ['🔁', '📅', '📈', '🛡️'];
+  t.check('the four kinds of win\'s emoji (consistency, commitment, progress, resilience) are not on the gold-or-yellow list', WIN_EMOJI_SET.every(e => !new RegExp(GOLD_EMOJI.source, 'u').test(e)), WIN_EMOJI_SET.join(' '));
+  const drawnEmoji = new Set();
+  painted.filter(s => /^medal-award-/.test(s.id)).forEach(s => s.texts.forEach(x => WIN_EMOJI_SET.forEach(e => { if (x.text.includes(e)) drawnEmoji.add(e); })));
+  t.check('the award cards draw all four emoji between them', WIN_EMOJI_SET.every(e => drawnEmoji.has(e)), [...drawnEmoji].join(' '));
+  t.check('no award or catalogue title card draws a gold-looking emoji', painted.filter(s => /^(medal-award-|title-cat-)/.test(s.id)).every(s => !s.texts.some(x => (x.text.match(GOLD_EMOJI) || []).length)), '');
 
   // 5. The routing, in the real UI. A fresh page, and every step is a real click.
   const C = await open(habitLog(false)), p = C.p;
