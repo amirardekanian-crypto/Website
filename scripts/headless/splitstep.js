@@ -84,7 +84,7 @@ const PLAY = `(async () => {
         rowH: Math.min(...[...g.querySelectorAll('.tg-row')].map(x => x.getBoundingClientRect().height)), l: r.left, r: r.right, w: innerWidth }; });
     t.check('the door opens the shelf, aria-expanded true', !shelf.hidden && shelf.exp === 'true', JSON.stringify(shelf));
     t.check('the shelf has three rows, Split Step first with no history', shelf.games.join() === 'splitstep,rally,sets', shelf.games.join());
-    t.check('the rows carry the names and lines', shelf.names.join('|') === 'Split Step|Off the Glass|Between Sets' && shelf.lines.join('|') === 'React to the hit · 4 drills|Air hockey against me · first to 5|Tennis against me · a set lasts your workout', shelf.names.join('|') + ' / ' + shelf.lines.join('|'));
+    t.check('the rows carry the names and lines', shelf.names.join('|') === 'Split Step|Off the Glass|Between Sets' && shelf.lines.join('|') === 'React to the hit · 4 drills|Air hockey against me · one match a session|Tennis against me · a set lasts your workout', shelf.names.join('|') + ' / ' + shelf.lines.join('|'));
     t.check('each row is a 44 px target inside the screen', shelf.rowH >= 44 && shelf.l >= 0 && shelf.r <= shelf.w, JSON.stringify([shelf.rowH, shelf.l, shelf.r]));
     await p.screenshot({ path: path.join(out, 'shelf-390.png') });
     await p.click('#timerPlayBtn');

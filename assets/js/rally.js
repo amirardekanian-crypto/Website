@@ -5,7 +5,14 @@
 // What makes it a rest game, not just a game (PROGRAM-APP.md → *Off the Glass*):
 //   · The rest clock is always on screen, turns clay in the last 10 s, and the game stops the moment the rest ends
 //     (program.html calls Rally.timeUp() from timerDone(), then closeTimer() closes both). It never runs past a rest.
-//   · First to 5, so a match fits a 2-minute rest. Amir defends like a person (The Read, 2026-10-18): he sees the ball a moment late,
+//   · Full time (2026-10-18): ONE match a session, first to 15, that waits between rests. The match belongs to the session, not the
+//     rest: it lives in a variable of this file (memory only, a reload starts fresh), and opening the game again for the same session
+//     key (program.html passes the day and the local date) picks it up where it was ("Play resumes · You 6, Amir 4"). A rest that ends
+//     or hands back PARKS it and never ends it; only Full time counts a match played or won; Done drops it (Rally.endSession()).
+//   · Bajada (2026-10-18): a goal that came off the glass counts 2. After a racket's last touch the ball hits the glass (a side wall
+//     or an end wall beside the gap, never a post) faster than BANK_MIN of its top speed and then goes through the far gap with no
+//     other racket in between: the player whose racket it was scores 2. An own goal off the glass is 1 for the other side, as ever.
+//   · Amir defends like a person (The Read, 2026-10-18): he sees the ball a moment late,
 //     walks to where it will cross his end, aims with a small error and now and then mistimes one. His form moves a step after each
 //     point (sharper when you score, softer when he does); nothing changes mid-rally and nothing about it shows on screen.
 //   · One thumb: drag anywhere in your half; on a touch screen the racket sits above the finger so the thumb never hides it.
@@ -14,14 +21,22 @@
 //
 // program.html owns the layer (#rallyOverlay, in topLayer() so Back closes it) and loads this file the first time Play is
 // tapped (sw.js keeps it in the shell, so it plays with no signal; a change to it ships with a CACHE bump).
-// API: Rally.open({ root, left, sound, audio, onClose }) · Rally.timeUp() · Rally.close() · Rally.isOpen() · Rally.handBack(done).
+// API: Rally.open({ root, left, sound, audio, session, onClose }) · Rally.timeUp() · Rally.close() · Rally.isOpen() · Rally.handBack(done)
+//      · Rally.endSession() · Rally.matchState(session).
 //   left()  → whole seconds of rest left, or null while the rest is paused.
+//   session → a string that names the session (program.html: the day and the local date). The same string as the parked match's, and
+//   the match not over, resumes it; anything else starts a fresh match. Without one every open is a fresh match.
+//   endSession() → drops the parked match (Done, program.html's finishDayNow()).  matchState(session) → { you, amir, over } of the
+//   parked match, or null (with a session given, null unless it is that session's), for the shelf row's small line.
 //   sound() → true when the rest timer's sound is on.  audio() → the page's AudioContext, opened in the tap on Play.
 //   handBack(done) → Serve Clock (idea #39): with 25 s left program.html asks the game to wind down. It says "Last point.", lets a point in
 //   play finish (no new serve), then calls done() and program.html closes it, so the last seconds of the rest belong to the next set.
 (function () {
   'use strict';
-  const WIN_AT = 5;
+  const WIN_AT = 15;      // Full time: first to 15, Amir's pick 2026-10-18 (a goal that is a bank counts 2, so 16 can win)
+  const PLAY_CAP_S = 480; // Full time: 8 minutes of real play a session at most. Only seconds with a point live count (not the serve pause, the end box, a paused rest or the hand-back); then the next point that leaves someone ahead ends it
+  const LIT_S = 0.33;     // Bajada: how long the pane lights up
+  const BANK_MIN = 0.25;  // Bajada: the ball must hit the glass faster than this share of its top speed for a goal to count 2
   const C = {
     court: '#0E4A36', courtDeep: '#082D20', line: 'rgba(255,255,255,.28)', glass: 'rgba(170,235,205,.55)',
     you: '#FFFFFF', youHole: '#16603F', amir: '#C7552F', amirHole: '#8E3A1E', ball: '#FFFFFF', clay: '#E06B43', mint: '#7FD6AE',
@@ -29,9 +44,9 @@
   const STORE = 'rally_stats';
 
   // Amir's numbers (The Read, 2026-10-18). They were set against bots with a person's limits in scripts/test_rally_sim.js, which
-  // pre-commit guard 22 runs whenever this file changes: move one, run it. The aim is an average player at about 57% of the points
-  // (about two matches in three at first to 5), a sharp one near 70%, a tired one near 51%, and a bot as quick as a person can be, that
-  // misreads three points in ten as Amir does, still under 90%. Of these numbers `react` is the one that moves the shares most; `speed`
+  // pre-commit guard 22 runs whenever this file changes: move one, run it. The aim is an average player at about 57% of the goals
+  // (a goal is a ball through a gap; about two matches in three, at first to 5 and still at first to 15 with banks counting 2), a sharp one
+  // near 70%, a tired one near 51%, and a bot as quick as a person can be, that misreads three points in ten as Amir does, still under 90%. Of these numbers `react` is the one that moves the shares most; `speed`
   // and `aim` barely do (the test's bands are too wide to catch them), so judge those two by playing.
   // A pair is [form 0, form 1]. `node scripts/test_rally_sim.js --set speed=1.2 --set react=0.2,0.1` tries a number without editing this.
   const AMIR = {
@@ -52,6 +67,12 @@
   function byForm(pair) { return pair[0] + (pair[1] - pair[0]) * S.form; }
 
   let S = null;   // the open game, or null
+  // The match of this session (Full time), or null. It outlives the open game: closing the game, a rest ending and the hand-back all
+  // leave it here, parked. Memory only: a reload starts fresh. { key, score, best, banked, played, over, form }.
+  let M = null;
+  function freshMatch(key) {
+    return { key, score: { you: 0, amir: 0 }, best: 0, banked: { you: 0, amir: 0 }, played: 0, over: false, form: AMIR.start };
+  }
 
   function loadStats() {
     try { const o = JSON.parse(localStorage.getItem(STORE) || '{}'); return { best: o.best | 0, wins: o.wins | 0, played: o.played | 0 }; }
@@ -82,7 +103,7 @@
         box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 18px 40px -16px rgba(0,0,0,.7); }
       .rally-msg[hidden] { display: none; }
       .rally-msg h3 { margin: 0 0 6px; font: 900 34px/1 'Barlow Condensed', 'AA Barlow Condensed', 'Arial Narrow', sans-serif; text-transform: uppercase; }
-      .rally-msg p { margin: 0; font: 500 15px/1.4 'Barlow', sans-serif; color: rgba(255,255,255,.85); }
+      .rally-msg p { margin: 0; font: 500 15px/1.4 'Barlow', sans-serif; color: rgba(255,255,255,.85); white-space: pre-line; }
       .rally-msg .rally-go { margin-top: 16px; min-height: 48px; width: 100%; border: 0; border-radius: 8px; cursor: pointer; color: #fff;
         background: #16603F; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.55); font: 700 17px/1 'Barlow Condensed', sans-serif;
         letter-spacing: 1px; text-transform: uppercase; }
@@ -145,47 +166,74 @@
     b.y = toYou ? mid() + (B() - mid()) * 0.45 : mid() - (mid() - T()) * 0.45;
     b.vx = 0; b.vy = 0;
     S.trail = []; S.rally = 0; S.freeze = 0.7; S.lastHit = ''; S.lastHitT = -1;
+    S.touch = ''; S.glass = null;   // Bajada: nobody has touched this ball yet, and it has not been off the glass since
     S.anchor = { x: b.x, y: b.y, t: S.gt };
     S.hist = []; S.striking = false; S.reading = false;   // Amir's short memory of the ball starts again with the ball
     S.late = Math.random() < byForm(AMIR.late) ? AMIR.lateBy : 0;   // this point's one mistimed read, if it has one
   }
 
-  function newMatch() {
-    S.score = { you: 0, amir: 0 };
-    S.over = false; S.rally = 0; S.best = 0;
-    S.form = AMIR.start;
+  // Put the open game on a match: a fresh one, a parked one picked up again (resumed), or one that already reached Full time (its end
+  // box again, nothing to play). S.score is the match's own object, so a point is written to the parked match as it is scored.
+  function loadMatch(m, resumed) {
+    S.m = m; S.score = m.score; S.best = m.best; S.form = m.form;
+    S.over = !!m.over; S.rally = 0;
     newBodies();
     serve(true);
     msg(null);
+    if (m.over) { S.ball.vx = S.ball.vy = 0; S.ball.y = -9999; S.hint = false; showFullTime(); return; }
+    if (resumed) {                       // the serve waits 1.5 s so the banner can be read, and the first-open hint stays away
+      S.hint = false; S.freeze = 1.5;
+      S.banner = { text: `Play resumes · You ${m.score.you}, Amir ${m.score.amir}`, t: 0, c: C.mint, dur: 1.5 };
+    }
+  }
+  // A fresh match for this game's session. Also the way scripts/test_rally_sim.js starts the next match (_next): Full time has no Play again.
+  function newMatch() {
+    M = freshMatch(S.opts && typeof S.opts.session === 'string' && S.opts.session ? S.opts.session : null);
+    loadMatch(M, false);
   }
 
-  // ── The message box (a won match, a lost one, time up) ──
+  // ── The message box (Full time, time up) ──
   function msg(m) {
     const box = S.msg;
     if (!m) { box.hidden = true; return; }
     box.querySelector('h3').textContent = m.title;
     box.querySelector('p').textContent = m.text;
     const go = box.querySelector('.rally-go');
-    go.hidden = !m.button || !!S.hb; go.textContent = m.button || '';   // no Play again once the rest has asked for the screen back
+    go.hidden = !m.button || !!S.hb; go.textContent = m.button || '';   // no button once the rest has asked for the screen back
     box.hidden = false;
   }
 
-  function endMatch() {
-    S.over = true;
+  // Full time: who won and by how much, the longest rally, and (when there were any) how many came off the glass. One sentence each,
+  // each on its own line (the box's text is pre-line, so a sentence never breaks in the middle of "Off the glass: 3.").
+  function fullTimeText(m) {
+    const y = m.score.you, a = m.score.amir;
+    const parts = [y > a ? `You win ${y}–${a}.` : `Amir wins ${a}–${y}.`, `Longest rally: ${m.best} ${m.best === 1 ? 'hit' : 'hits'}.`];
+    if (m.banked.you > 0) parts.push(`Off the glass: ${m.banked.you}.`);
+    return parts.join('\n');
+  }
+  // One match a session: no Play again. The button takes the athlete back to the timer (closes the game).
+  function showFullTime() { msg({ title: 'Full time', text: fullTimeText(S.m), button: 'Back to the timer' }); }
+
+  // The best rally goes to this phone's stats whenever the game stops being the screen (Full time, time up, the hand-back, closing it),
+  // because the match it came from can be parked for a whole workout.
+  function saveBest() {
+    if (!S || S.best <= 0) return;
+    S.m.best = Math.max(S.m.best, S.best);
     const st = loadStats();
-    st.played += 1;
-    const won = S.score.you > S.score.amir;
+    if (S.best > st.best) { st.best = S.best; saveStats(st); }
+  }
+
+  function endMatch() {
+    const m = S.m;
+    S.over = true; m.over = true; m.best = S.best; m.form = S.form;
+    const st = loadStats();
+    st.played += 1;                     // a match is played and won at Full time only: a hand-back or time up parks it
+    const won = m.score.you > m.score.amir;
     if (won) st.wins += 1;
-    const newBest = S.best > st.best;
-    if (newBest) st.best = S.best;
+    if (S.best > st.best) st.best = S.best;
     saveStats(st);
     if (won) { burst(S.W / 2, mid(), 60, true); tone(660, 0.15, 0.25); setTimeout(() => tone(990, 0.3, 0.25), 140); buzz([20, 40, 20]); }
-    const rally = newBest ? `New best rally: ${S.best} hits.` : `Longest rally: ${S.best} hits. Your best is ${st.best}.`;
-    msg({
-      title: won ? `You win ${S.score.you}–${S.score.amir}` : `Amir wins ${S.score.amir}–${S.score.you}`,
-      text: `${rally} Wins on this phone: ${st.wins}.`,
-      button: 'Play again',
-    });
+    showFullTime();
   }
 
   // ── Physics ──
@@ -206,6 +254,7 @@
       b.vx -= 1.9 * dot * nx; b.vy -= 1.9 * dot * ny;
       capBall();
       const s = speed(b);
+      S.touch = who; S.glass = null;   // Bajada: this racket touched it last, and whatever glass it hit before no longer counts
       // A ball squeezed between two rackets (or a racket and the glass) touches them every substep and goes nowhere. Such
       // a ball (still inside its 2-ball circle after 0.3 s) counts no hit and makes no sound or buzz, and otherwise a hit
       // counts in the rally only 0.12 s after the last one and rings 0.09 s apart per racket, or a trapped ball would buzz
@@ -231,34 +280,58 @@
     if (dot < 0) { b.vx -= 1.85 * dot * nx; b.vy -= 1.85 * dot * ny; tone(1200, 0.04, 0.1, 'sine'); }
   }
 
+  // The pane of glass a hit touched, as the line to light up if the goal that follows counts double: a side wall is three panes, and
+  // each end wall has one pane either side of the gap.
+  function paneAt(kind, b) {
+    const l = L(), r = R(), t = T(), bt = B(), g1 = S.W / 2 - S.gw / 2, g2 = S.W / 2 + S.gw / 2;
+    if (kind === 'L' || kind === 'R') {
+      const x = kind === 'L' ? l : r, third = (bt - t) / 3, i = Math.max(0, Math.min(2, Math.floor((b.y - t) / third)));
+      return { x1: x, y1: t + i * third, x2: x, y2: t + (i + 1) * third };
+    }
+    const y = kind[0] === 'T' ? t : bt;
+    return kind[1] === 'L' ? { x1: l, y1: y, x2: g1, y2: y } : { x1: g2, y1: y, x2: r, y2: y };
+  }
+
   function walls() {
     const b = S.ball, r = S.br, g1 = S.W / 2 - S.gw / 2, g2 = S.W / 2 + S.gw / 2, e = 0.9;
-    let glass = false;
-    if (b.x < L() + r) { b.x = L() + r; b.vx = Math.abs(b.vx) * e; glass = true; }
-    if (b.x > R() - r) { b.x = R() - r; b.vx = -Math.abs(b.vx) * e; glass = true; }
+    const arrive = speed(b);   // how fast it comes at the glass (Bajada: a bank needs more than BANK_MIN of the top speed)
+    let glass = false, pane = null;
+    if (b.x < L() + r) { b.x = L() + r; b.vx = Math.abs(b.vx) * e; glass = true; pane = paneAt('L', b); }
+    if (b.x > R() - r) { b.x = R() - r; b.vx = -Math.abs(b.vx) * e; glass = true; pane = paneAt('R', b); }
     const inGap = b.x > g1 && b.x < g2;
     if (!inGap) {
-      if (b.y < T() + r) { b.y = T() + r; b.vy = Math.abs(b.vy) * e; glass = true; }
-      if (b.y > B() - r) { b.y = B() - r; b.vy = -Math.abs(b.vy) * e; glass = true; }
+      if (b.y < T() + r) { b.y = T() + r; b.vy = Math.abs(b.vy) * e; glass = true; pane = paneAt(b.x < S.W / 2 ? 'TL' : 'TR', b); }
+      if (b.y > B() - r) { b.y = B() - r; b.vy = -Math.abs(b.vy) * e; glass = true; pane = paneAt(b.x < S.W / 2 ? 'BL' : 'BR', b); }
     }
-    [[g1, T()], [g2, T()], [g1, B()], [g2, B()]].forEach(p => hitPost(p[0], p[1]));
+    [[g1, T()], [g2, T()], [g1, B()], [g2, B()]].forEach(p => hitPost(p[0], p[1]));   // a post is not glass: it never makes a bank
     if (glass && speed(b) > S.vmax * 0.15) tone(180, 0.05, 0.12, 'sine');
+    // Bajada: the glass, after a racket's last touch and at speed. A slower touch changes nothing, and neither takes back an earlier one.
+    if (glass && S.touch && arrive > S.vmax * BANK_MIN) S.glass = pane;
     // through the gap: a point
     if (b.y < T() - r * 1.5) point('you');
     else if (b.y > B() + r * 1.5) point('amir');
   }
 
   function point(who) {
-    S.score[who] += 1;
-    const top = who === 'you';
-    burst(S.W / 2, top ? T() : B(), 34, false);
+    const m = S.m, top = who === 'you';
+    // Bajada: the scorer's own racket touched it last, the glass came after that and the ball went through the OTHER side's gap.
+    // (A ball off the glass into your own gap is the other side's goal for 1, as it always was.)
+    const bank = !!S.glass && S.touch === who;
+    S.score[who] += bank ? 2 : 1;
+    if (bank) { m.banked[who] += 1; S.lit = Object.assign({ t: 0 }, S.glass); }
+    burst(S.W / 2, top ? T() : B(), bank ? 48 : 34, false);
     S.shake = 10;
     if (top) { tone(523, 0.12, 0.22); setTimeout(() => tone(784, 0.2, 0.22), 110); buzz([15, 30, 15]); }
     else { tone(220, 0.25, 0.2, 'sawtooth'); buzz(40); }
-    S.banner = { text: top ? 'Point!' : 'Amir scores', t: 0, c: top ? C.mint : C.clay };
-    if (S.score[who] >= WIN_AT) { S.ball.vx = S.ball.vy = 0; S.ball.y = -9999; endMatch(); lastPointIn(); return; }
+    if (bank) {
+      setTimeout(() => tone(top ? 1047 : 330, 0.2, 0.2, top ? 'triangle' : 'sawtooth'), 230);
+      S.banner = { text: top ? 'Off the glass +2' : 'Amir off the glass +2', t: 0, c: top ? C.mint : C.clay };
+    } else S.banner = { text: top ? 'Point!' : 'Amir scores', t: 0, c: top ? C.mint : C.clay };
+    // Full time: first to WIN_AT, or, once the play budget is used up, the next point that leaves someone ahead
+    if (S.score[who] >= WIN_AT || (m.played >= PLAY_CAP_S && S.score.you !== S.score.amir)) { S.ball.vx = S.ball.vy = 0; S.ball.y = -9999; endMatch(); lastPointIn(); return; }
     // Amir's form changes here and nowhere else: a step sharper after your point, a step softer after his
     S.form = Math.max(0, Math.min(1, S.form + (top ? AMIR.step : -AMIR.step)));
+    m.form = S.form;   // the parked match keeps how sharp he was
     if (lastPointIn()) return;   // Serve Clock: that was the last point of this rest, nobody serves again
     serve(!top);   // the one who lost the point serves
   }
@@ -418,7 +491,8 @@
     S.parts = S.parts.filter(p => (p.t += dt) < p.life);
     S.parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 260 * dt; p.vx *= 0.98; });
     S.flash = S.flash.filter(f => (f.t += dt) < 0.3);
-    if (S.banner) { S.banner.t += dt; if (S.banner.hold) S.banner.t = Math.min(S.banner.t, 0.5); else if (S.banner.t > 1.1) S.banner = null; }   // a held banner ("Last point.") stays until the next one replaces it
+    if (S.lit && (S.lit.t += dt) > LIT_S) S.lit = null;   // Bajada: the pane that made the goal count double glows mint for a third of a second
+    if (S.banner) { S.banner.t += dt; if (S.banner.hold) S.banner.t = Math.min(S.banner.t, 0.5); else if (S.banner.t > (S.banner.dur || 1.1)) S.banner = null; }   // a held banner ("Last point.") stays until the next one replaces it
     S.shake = S.reduce ? 0 : Math.max(0, S.shake - dt * 40);
   }
 
@@ -484,6 +558,13 @@
     g.stroke(); g.shadowBlur = 0;
     g.fillStyle = 'rgba(0,0,0,.35)';
     g.fillRect(g1, T() - 6, S.gw, 6); g.fillRect(g1, B(), S.gw, 6);
+    // Bajada: the pane the ball banked off lights up mint, fading out over LIT_S
+    if (S.lit) {
+      g.globalAlpha = Math.max(0, 1 - S.lit.t / LIT_S); g.strokeStyle = C.mint; g.lineWidth = 8; g.lineCap = 'round';
+      g.shadowColor = C.mint; g.shadowBlur = 18;
+      g.beginPath(); g.moveTo(S.lit.x1, S.lit.y1); g.lineTo(S.lit.x2, S.lit.y2); g.stroke();
+      g.shadowBlur = 0; g.globalAlpha = 1;
+    }
     // hit rings
     S.flash.forEach(f => {
       g.strokeStyle = f.c; g.globalAlpha = 1 - f.t / 0.3; g.lineWidth = 3;
@@ -517,18 +598,25 @@
     g.globalAlpha = 1;
     // the point banner
     if (S.banner) {
-      const t = S.banner.t, a = t < 0.15 ? t / 0.15 : t > 0.8 ? Math.max(0, 1 - (t - 0.8) / 0.3) : 1;
+      const t = S.banner.t, d = S.banner.dur || 1.1, a = t < 0.15 ? t / 0.15 : t > d - 0.3 ? Math.max(0, 1 - (t - (d - 0.3)) / 0.3) : 1;
       g.globalAlpha = a; g.fillStyle = S.banner.c; g.textAlign = 'center';
-      g.font = `900 ${Math.round(W * 0.13)}px 'Barlow Condensed', 'AA Barlow Condensed', 'Arial Narrow', sans-serif`;
-      g.fillText(S.banner.text.toUpperCase(), W / 2, mid() - 40);
+      const word = S.banner.text.toUpperCase(), fam = `'Barlow Condensed', 'AA Barlow Condensed', 'Arial Narrow', sans-serif`;
+      g.font = `900 ${Math.round(W * 0.13)}px ${fam}`;
+      // a long banner ("Amir off the glass +2", "Play resumes · You 6, Amir 4") shrinks to fit the court's width, never under 22 px
+      const wide = g.measureText(word).width, room = W - 28;
+      if (wide > room) g.font = `900 ${Math.max(22, Math.floor(W * 0.13 * room / wide))}px ${fam}`;
+      g.fillText(word, W / 2, mid() - 40);
       g.globalAlpha = 1;
     }
     // the first serve's hint
     if (S.hint) {
       g.fillStyle = 'rgba(255,255,255,.8)'; g.textAlign = 'center';
+      const lines = ['Drag in your half. Hit it through Amir\'s gap.', `First to ${WIN_AT}. The match waits for your next rest.`];
       g.font = `600 15px 'Barlow', sans-serif`;
-      g.fillText('Drag in your half. Hit it through Amir\'s gap.', W / 2, B() - S.rr * 4.2);
-      g.fillText(`First to ${WIN_AT}. The game stops when your rest does.`, W / 2, B() - S.rr * 4.2 + 22);
+      const wide = Math.max(g.measureText(lines[0]).width, g.measureText(lines[1]).width), room = W - 24;
+      if (wide > room) g.font = `600 ${Math.max(12, Math.floor(15 * room / wide))}px 'Barlow', sans-serif`;   // a narrow phone: smaller, never under 12 px
+      g.fillText(lines[0], W / 2, B() - S.rr * 4.2);
+      g.fillText(lines[1], W / 2, B() - S.rr * 4.2 + 22);
     }
   }
 
@@ -544,13 +632,23 @@
     if (left <= 3 && left > 0 && S._lastCount !== left) { S._lastCount = left; buzz(12); tone(880, 0.07, 0.15, 'sine'); }
   }
 
+  // One frame of the game. `dt` moves the court (never more than 1/30 s, so a hiccup cannot throw the ball through a wall); `wall` is the
+  // wall-clock time that passed (never more than 0.25 s, so a page that was asleep adds a quarter of a second, not the minutes it was
+  // away) and is what the play budget (PLAY_CAP_S) counts: only while a point is live, not in the serve pause, the end box, a paused
+  // rest, the hand-back or after time up.
+  function advance(dt, wall) {
+    const live = !S.over && !S.timeUp && !S.hb && !(S.freeze > 0) && S.opts.left() != null;
+    if (!S.timeUp && dt > 0) step(dt);
+    if (live && wall > 0) S.m.played += Math.min(0.25, wall);
+    tickFx(dt);
+  }
+
   function frame(now) {
     if (!S) return;
     S.raf = requestAnimationFrame(frame);
-    const dt = Math.min(1 / 30, Math.max(0, (now - (S.last || now)) / 1000));
+    const raw = Math.max(0, (now - (S.last || now)) / 1000), dt = Math.min(1 / 30, raw);
     S.last = now;
-    if (!S.timeUp && dt > 0) step(dt);
-    tickFx(dt);
+    advance(dt, raw);
     draw();
     paintClock();
   }
@@ -592,10 +690,15 @@
     S = {
       opts, root, cv: root.querySelector('canvas'), clock: root.querySelector('.rally-clock'), msg: root.querySelector('.rally-msg'),
       parts: [], flash: [], shake: 0, banner: null, hint: true, timeUp: false, pid: null, raf: 0, last: 0,
-      gt: 0, fxT: {}, lastHitT: -1, anchor: { x: 0, y: 0, t: 0 },
+      gt: 0, fxT: {}, lastHitT: -1, anchor: { x: 0, y: 0, t: 0 }, lit: null, touch: '', glass: null,
       reduce: !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches),
       score: { you: 0, amir: 0 },
     };
+    // Full time: the same session key as the parked match picks it up again; a different one (or none) starts a fresh match. A match
+    // that is already over is shown again (its end box), not replayed: one match a session.
+    const key = typeof opts.session === 'string' && opts.session ? opts.session : null;
+    const same = !!(M && key !== null && M.key === key);
+    if (!same) M = freshMatch(key);
     S.g = S.cv.getContext('2d');
     // The page's own audio context (opened in the tap on Play, which iPhone needs); a page with none gets ours.
     try {
@@ -604,7 +707,7 @@
       if (S.ac && S.ac.state === 'suspended') S.ac.resume();
     } catch (e) {}
     root.querySelector('.rally-x').addEventListener('click', () => close());
-    S.msg.querySelector('.rally-go').addEventListener('click', e => { e.stopPropagation(); if (S && !S.timeUp && !S.hb) newMatch(); });
+    S.msg.querySelector('.rally-go').addEventListener('click', e => { e.stopPropagation(); if (S && !S.timeUp && !S.hb) close(); });   // Full time's button: back to the timer
     S.cv.addEventListener('pointerdown', onDown);
     S.cv.addEventListener('pointermove', onMove);
     S.cv.addEventListener('pointerup', onUp);
@@ -613,7 +716,7 @@
     S.onResize = () => { if (S) sizeCourt(); };
     window.addEventListener('resize', S.onResize);
     sizeCourt();
-    newMatch();
+    loadMatch(M, same && !M.over);
     S.raf = requestAnimationFrame(frame);
   }
 
@@ -624,8 +727,7 @@
     S.clock.classList.remove('low');
     S.clock.querySelector('b').textContent = '0:00';
     S.clock.querySelector('span').textContent = 'Rest';
-    const st = loadStats();
-    if (S.best > st.best) { st.best = S.best; saveStats(st); }
+    saveBest();   // the match is parked, not ended: it waits for the next rest
     msg({ title: 'Time. Next set.', text: S.over ? 'Back to work.' : `You ${S.score.you}, Amir ${S.score.amir}. Back to work.`, button: '' });
   }
 
@@ -643,9 +745,8 @@
       hb.fired = true;
       hb.timers.forEach(clearTimeout);
       if (S === s) {
-        s.over = true;                             // after done() the court never serves again, whatever the caller does next
-        const st = loadStats();
-        if (s.best > st.best) { st.best = s.best; saveStats(st); }   // the best rally of a match cut short counts, as it does when time runs out
+        s.over = true;                             // after done() the court never serves again, whatever the caller does next (the MATCH is only parked)
+        saveBest();                                // the best rally of a match cut short counts, as it does when time runs out
       }
       if (done) { try { done(); } catch (e) {} }
     };
@@ -657,6 +758,7 @@
 
   function close(quiet) {
     if (!S) return;
+    saveBest();   // closing parks the match; its best rally is not lost with the screen
     const s = S; S = null;
     if (s.hb) s.hb.timers.forEach(clearTimeout);
     cancelAnimationFrame(s.raf);
@@ -668,7 +770,18 @@
   }
 
   // For scripts/test_rally_sim.js, which plays whole matches with no browser: one frame, with nothing drawn.
-  function tick(dt) { if (!S) return; if (!S.timeUp && dt > 0) step(dt); tickFx(dt); }
+  function tick(dt) { if (!S) return; advance(dt, dt); }
 
-  window.Rally = { open, timeUp, handBack, close: () => close(), isOpen: () => !!S, stats: loadStats, _state: () => S, _tick: tick };
+  // Done drops the parked match (program.html's finishDayNow()): the next session starts a fresh one.
+  function endSession() { M = null; }
+  // The parked match as { you, amir, over }, or null. With a session given, only that session's (a match left from another day is not
+  // "play resumes": open() would start a fresh one).
+  function matchState(session) {
+    if (!M) return null;
+    if (typeof session === 'string' && session && M.key !== session) return null;
+    return { you: M.score.you, amir: M.score.amir, over: !!M.over };
+  }
+
+  window.Rally = { open, timeUp, handBack, endSession, matchState, close: () => close(), isOpen: () => !!S, stats: loadStats,
+    _state: () => S, _tick: tick, _next: () => { if (S) newMatch(); } };
 })();
