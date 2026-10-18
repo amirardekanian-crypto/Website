@@ -107,7 +107,7 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Rejected
 
-*(nothing yet)*
+- **2026-10-18 · #41 Chair Umpire (a coach-only receipt of how every rest ended), rejected while it was being built.** *"i dont want chair umpire"*, then *"reverse it"*. He gave no reason. Do not pitch rest-timing receipts or rest-adherence tracking again; if a question about real rest lengths comes up, ask him first.
 
 ## Standing preferences from elsewhere in the repo (read `CLAUDE.md` for the full rulings)
 

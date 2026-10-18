@@ -1,5 +1,5 @@
 // Between Sets, the third rest game (assets/js/between-sets.js): node scripts/headless/between-sets.js [--out <dir>]
-// The shelf shows three rows and fits at 320/360/390; the Between Sets row loads the script and opens #setsOverlay on the game's menu; a match
+// The shelf shows four rows (three games and The Lob) and fits at 320/360/390; the Between Sets row loads the script and opens #setsOverlay on the game's menu; a match
 // starts and its rest pill shows the timer's seconds; rest_game_last = 'sets' leads the shelf next rest; the rest running out freezes the game on
 // "Time to lift" and closeTimer closes both layers; ✕ returns to the running timer; Back closes the game first, then the timer; opening Off the
 // Glass after it closes it (one game at a time); Serve Clock's BetweenSets.handBack(done): closed = done at once, a point in play finishes then the game
@@ -59,7 +59,7 @@ async function freshSets(p) {
           fit: rs.every(x => { const r = x.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.height >= 44; }),
           inner: rs.every(x => { const r = x.getBoundingClientRect(); return [...x.children].every(c => { const q = c.getBoundingClientRect(); return q.right <= r.right + 0.5 && q.left >= r.left - 0.5; }); }),
           sw: document.documentElement.scrollWidth, w: innerWidth, bottom: g.getBoundingClientRect().bottom, h: innerHeight }; });
-      t.check(w + ' px: the shelf has three rows including Between Sets', s.games.length === 3 && s.games.includes('sets') && s.names.includes('Between Sets'), s.games.join() + ' / ' + s.names.join('|'));
+      t.check(w + ' px: the shelf has four rows including Between Sets', s.games.length === 4 && s.games.includes('sets') && s.names.includes('Between Sets'), s.games.join() + ' / ' + s.names.join('|'));
       t.check(w + ' px: rows are 44 px targets inside the screen and their text inside the row', s.fit && s.inner, JSON.stringify(s));
       t.check(w + ' px: no horizontal overflow', s.sw <= s.w, s.sw + ' vs ' + s.w);
       if (w === 320) await p.screenshot({ path: path.join(out, 'sets-shelf-320.png') });
@@ -98,7 +98,7 @@ async function freshSets(p) {
     t.check('✕ closes the game, the timer is still running', !s.game && !s.vis && s.timer && s.running && s.html === 0, JSON.stringify(s));
     await reopenShelf(p);
     const r1 = await rows(p);
-    t.check('the last game played leads the shelf next time', r1[0] === 'sets' && r1.length === 3, r1.join());
+    t.check('the last game played leads the shelf next time', r1[0] === 'sets' && r1.length === 4, r1.join());
 
     // ── 5. Back closes the game first, then the timer ──
     await p.click('#timerGames [data-game="sets"]');

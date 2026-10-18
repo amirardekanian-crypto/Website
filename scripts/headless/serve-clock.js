@@ -493,11 +493,11 @@ const view = p => p.evaluate(() => {
       const s = Rally._state(), sleep = ms => new Promise(r => setTimeout(r, ms));
       s.freeze = 0; s.you.x = s.W / 2; s.target.x = s.W / 2; s.target.y = s.H - 40; s.amir.x = s.W / 2;
       s.ball.x = s.W / 2; s.ball.y = s.H * 0.62; s.ball.vx = s.vmax * 0.9; s.ball.vy = 0; s.anchor = { x: s.ball.x, y: s.ball.y, t: s.gt };
-      const t0 = performance.now(); let doneAt = 0;
+      const t0 = performance.now(); let doneAt = 0, before = s.score.you + s.score.amir;   // one match a session: the earlier points of this page are still on it
       Rally.handBack(() => { doneAt = performance.now() - t0; });
       const live = !s.over;
       await sleep(7500);
-      return { live, doneAt, scored: s.score.you + s.score.amir };
+      return { live, doneAt, scored: s.score.you + s.score.amir - before };
     });
     t.check('a ball that never scores is cut at the 6 s deadline', hard.live && hard.doneAt >= 5800 && hard.doneAt <= 6600 && hard.scored === 0, JSON.stringify(hard));
     await p.evaluate(() => closeRestGames());
@@ -505,14 +505,14 @@ const view = p => p.evaluate(() => {
     await playGame(p, 'rally');
     const win = await p.evaluate(async () => {
       const s = Rally._state(), sleep = ms => new Promise(r => setTimeout(r, ms));
-      s.score.amir = 4; s.freeze = 0; s.you.x = 30; s.target.x = 30; s.amir.x = s.W - 30;
+      s.score.amir = 14; s.freeze = 0; s.you.x = 30; s.target.x = 30; s.amir.x = s.W - 30;   // 14 is one from Full time (first to 15)
       s.ball.x = s.W / 2; s.ball.y = s.H - 8 - s.br * 6; s.ball.vx = 0; s.ball.vy = s.vmax * 0.6; s.anchor = { x: s.ball.x, y: s.ball.y, t: s.gt };
       let doneAt = 0; const t0 = performance.now();
       Rally.handBack(() => { doneAt = performance.now() - t0; });
       await sleep(1300);
-      return { doneAt, over: s.over, title: s.msg.querySelector('h3').textContent, go: s.msg.querySelector('.rally-go').hidden, boxHidden: s.msg.hidden };
+      return { doneAt, over: s.over, title: s.msg.querySelector('h3').textContent, text: s.msg.querySelector('p').textContent, go: s.msg.querySelector('.rally-go').hidden, boxHidden: s.msg.hidden, matchOver: Rally.matchState().over };
     });
-    t.check('a winning last point ends the match, hides Play again and hands back about 0.8 s later', win.over && /^Amir wins 5/.test(win.title) && win.go && !win.boxHidden && win.doneAt >= 700 && win.doneAt <= 1300, JSON.stringify(win));
+    t.check('a winning last point is Full time: the match ends (and counts), the button is hidden and the hand-back comes about 0.8 s later', win.over && win.matchOver && win.title === 'Full time' && /^Amir wins 15–/.test(win.text) && win.go && !win.boxHidden && win.doneAt >= 700 && win.doneAt <= 1300, JSON.stringify(win));
     await p.evaluate(() => closeRestGames());
     await ctx.close();
 
