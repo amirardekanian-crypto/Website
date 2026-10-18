@@ -16,8 +16,12 @@
 --     instead: every one an athlete had is minted in silence, dated the day it was crossed, at the price Proof paid, so career XP and levels
 --     do not drop (conservation, spec §5.3). The retired entries stop there; the starts_at entries start (their history is minted, and pays
 --     nothing unless D14 says so).
---   · get_profile() adds the shelf: owned, badges, achievements, titles, title_worn, slam, ladder, near, moments, recent, numbers.free and
---     numbers.four, catalogue_version (additive only: every phase 2 key keeps its name and meaning). Catalogue off: phase 2's answer exactly.
+--   · get_profile() adds the CORE of the career (what Today, the Home row, the finish card, the moments and the phones' dedupe need): owned
+--     (the award ids, a sorted list), title_worn, slam, ladder, near, moments, numbers.free and numbers.four, catalogue_version (additive
+--     only: every phase 2 key keeps its name and meaning, so its badges and achievements stay phase 2's empty lists). Its size does not grow
+--     with a career but for one id an award. Catalogue off: phase 2's answer exactly.
+--   · get_awards() is the SHELF, read only when the shelf opens: every badge row with its tiers and the day of each, the achievements, the
+--     full titles list and the recent awards. Same access as get_profile(). Catalogue off: the same keys, empty.
 --   · career_seed() turns the catalogue switch on only alone (no other change in the same seed, never with the XP switch, the day today or
 --     yesterday). Three batch functions do the rest, five athletes a call: career_catalogue_before() (each score under the old rules, kept in
 --     backup.career_catalogue_before for the report), career_catalogue_preview() (the dry run: every line, then everything undone) and
@@ -1235,6 +1239,8 @@ end $function$;
 
 -- What get_profile() adds once the catalogue switch is on (spec §6); with it off exactly {"badges": [], "achievements": [], "moments": []}.
 -- p_rw is evaluate's answer; null when it failed this call (then the stored cache, and "rewards_stale": true; the ladder is never empty).
+-- Only the CORE: nothing here grows with a career but `owned` (one id an award; the size budget, 14 KB on the longest career). The shelf's
+-- detail (every badge row with its tiers and days, the achievements, the full titles list, recent) is get_awards()'s, read when it opens.
 create or replace function public.career_rewards_profile(p_athlete text, p_rw jsonb) returns jsonb
 language plpgsql stable set search_path to 'public' as $function$
 declare
@@ -1358,94 +1364,15 @@ begin
     'catalogue_version', (select r.version::text || '@' || extract(epoch from r.loaded_at)::bigint::text
                             from public.career_rules r order by r.version desc limit 1),
     'numbers', jsonb_build_object('free', v_free, 'four', v_four),
-    'owned', coalesce((select jsonb_object_agg(a.award_id, a.day) from public.career_awards a where a.athlete_id = p_athlete), '{}'::jsonb),
-    'badges', coalesce((
-      -- The size budget (14 KB on the longest career, spec §6). A live badge: id, subject (only when there is one), name, meaning, tier,
-      -- metal, day, caption; a tier's tier_name is the catalogue's, `n` is already inside the caption and `of` is read only on a retired
-      -- row (earnedBeforeLines() in habits.html: "HUMAN SPRINKLER II" or plain "HEAVY METAL"), so a live row has none of the three
-      -- (neither app reads them there). A retired badge is only ever the
-      -- line "Earned before: HUMAN SPRINKLER II" under the badge that replaced it, so its row is id, subject, name, meaning, tier, of,
-      -- retired and superseded_by, and a per-habit one (habit_tiers, with a subject) is id, subject, meaning, tier and retired: its
-      -- successor is the subject's own badge and its line is that badge's tier steps (habitSucc() and earnedBeforeLines() in habits.html).
-      -- There is no `days` list: every tier's day is in `owned` (badge:<id>:<tier>[:<subject>]).
-      select jsonb_agg(b.j order by b.day desc, b.id, b.subject)
-        from (select bt.item as id, bt.subject, bt.day,
-                     jsonb_strip_nulls(jsonb_build_object(
-                       'id', bt.item, 'subject', nullif(bt.subject, ''), 'meaning', bt.meaning, 'tier', bt.tier))
-                     || case when rt.retired and bt.subject <> '' then '{}'::jsonb
-                             else jsonb_build_object('name', coalesce(c.body ->> 'name', bt.item)) end
-                     || case when rt.retired
-                             then jsonb_build_object('retired', true)
-                                  || case when bt.subject = '' then jsonb_strip_nulls(jsonb_build_object(
-                                            'of', case when jsonb_typeof(c.body -> 'tiers') = 'array' then jsonb_array_length(c.body -> 'tiers') end,
-                                            'superseded_by', c.body -> 'superseded_by')) else '{}'::jsonb end
-                             else jsonb_strip_nulls(jsonb_build_object(
-                                    'metal', c.body -> 'tiers' -> (bt.tier - 1) ->> 'metal', 'day', bt.day,
-                                    'caption', (public.career_award_spec('badge', bt.item, bt.tier, bt.day, bt.evidence, c.body)) ->> 'caption')) end as j
-                from (select distinct on (a.item, a.subject) a.* from public.career_awards a
-                       where a.athlete_id = p_athlete and a.kind = 'badge' order by a.item, a.subject, a.tier desc) bt
-                left join public.career_catalogue c on c.kind = 'badge' and c.id = bt.item
-                cross join lateral (select coalesce(c.body ? 'retire_at', false) as retired) rt
-               order by bt.day desc, bt.item, bt.subject limit 60) b), '[]'::jsonb),
-    'achievements', coalesce((
-      select jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
-               'id', a.item, 'name', coalesce(c.body ->> 'name', a.item), 'meaning', a.meaning, 'day', a.day, 'size', a.size,
-               'caption', (public.career_award_spec('achievement', a.item, null, a.day, a.evidence, c.body)) ->> 'caption',
-               'retired', case when c.body ? 'retire_at' then true end, 'superseded_by', c.body -> 'superseded_by')) order by a.day desc, a.item)
-        from public.career_awards a left join public.career_catalogue c on c.kind = 'achievement' and c.id = a.item
-       where a.athlete_id = p_athlete and a.kind = 'achievement'), '[]'::jsonb),
-    'titles', coalesce((
-      with ht as (
-        select t.title as hab_id, t.earned_on as day,
-               (select c0.id from public.career_catalogue c0 where c0.kind = 'title' and (c0.body ->> 'proof_id' = t.title or c0.id = t.title)
-                 order by (c0.body ->> 'proof_id' = t.title) desc nulls last, c0.id limit 1) as cid
-          from public.hab_titles t where t.athlete_id = p_athlete
-        union all
-        select coalesce(c1.body ->> 'proof_id', a.item), a.day, a.item
-          from public.career_awards a left join public.career_catalogue c1 on c1.kind = 'title' and c1.id = a.item
-         where a.athlete_id = p_athlete and a.kind = 'title'
-           and not exists (select 1 from public.hab_titles t2 where t2.athlete_id = p_athlete and t2.title = coalesce(c1.body ->> 'proof_id', a.item))
-      ),
-      tt as (
-        select ht.*, case when ht.hab_id like 't\_sn\_%' then 'season' end as season,
-               coalesce(c.body, case when ht.hab_id like 't\_sn\_%' then (select s.body from public.career_catalogue s where s.kind = 'title' and s.id = 'season') end) as body
-          from ht left join public.career_catalogue c on c.kind = 'title' and c.id = ht.cid
-      )
-      -- hab_id only when it differs from id (both apps read `hab_id || id`); empty keys left out (the size budget)
-      select jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
-               'id', coalesce(tt.cid, case when tt.season is not null then 'season' end, tt.hab_id),
-               'hab_id', nullif(tt.hab_id, coalesce(tt.cid, case when tt.season is not null then 'season' end, tt.hab_id)),
-               'name', case when tt.season is not null
-                            then coalesce((select r.season_name from public.hab_season_results r
-                                            where r.athlete_id = p_athlete and to_char(r.starts_on, 'YYYYMMDD') = substr(tt.hab_id, 6) limit 1),
-                                          tt.body ->> 'name', tt.hab_id)
-                            else coalesce(tt.body ->> 'name', tt.hab_id) end,
-               'meaning', case when tt.season is not null then 'season' else tt.body ->> 'meaning' end,
-               'metal', tt.body ->> 'metal', 'from', tt.body ->> 'from', 'day', tt.day,
-               -- source: 'award' or 'event' only, the two both apps read (syncCatalogueTitles(), catalogueTitles()); a road title
-               -- (meaning 'level', or no catalogue row) and a season title (meaning 'season') say it by their meaning (the size budget)
-               'source', case when tt.season is not null then null
-                              when tt.body ->> 'meaning' = 'level' or tt.body is null then null
-                              when tt.body ->> 'origin' = 'proof' then 'event'
-                              else 'award' end)) order by tt.day, tt.hab_id)
-        from tt), '[]'::jsonb),
+    -- owned: every award id the athlete holds, sorted byte by byte (the phones' dedupe and the shelf's held mark; a set: no day here,
+    -- get_awards() has each day). About 25 bytes an award: the one part of the core that grows with a career.
+    'owned', coalesce((select jsonb_agg(a.award_id order by a.award_id collate "C") from public.career_awards a where a.athlete_id = p_athlete),
+                      '[]'::jsonb),
     'title_worn', (select o.title from public.leaderboard_optin o where o.athlete_id = p_athlete),
     'slam', public.career_slam(p_athlete),
     'ladder', v_ladder,
     'near', v_near,
-    'moments', v_moments,
-    -- recent: no created_at (the order is the server's), and no spec on a row whose award is in `moments` above (the moment row carries
-    -- it; both apps read the moment row first): the size budget
-    'recent', coalesce((
-      select jsonb_agg(z.j order by z.created_at desc, z.award_id)
-        from (select a.award_id, a.created_at,
-                     jsonb_build_object('award_id', a.award_id, 'kind', a.kind, 'item', a.item, 'tier', a.tier, 'size', a.size, 'day', a.day,
-                       'xp', case when not a.pays then 0 else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, v_hr), a.xp) end)
-                     || case when v_moments @> jsonb_build_array(jsonb_build_object('award_id', a.award_id)) then '{}'::jsonb
-                             else jsonb_build_object('spec', public.career_award_spec(a.kind, a.item, a.tier, a.day, a.evidence, c.body)) end as j
-                from public.career_awards a left join public.career_catalogue c on c.kind = a.kind and c.id = a.item
-               where a.athlete_id = p_athlete and a.how <> 'baseline' and a.created_at >= now() - interval '7 days'
-               order by a.created_at desc, a.award_id limit 10) z), '[]'::jsonb));
+    'moments', v_moments);
   if v_stale then v_out := v_out || '{"rewards_stale": true}'::jsonb; end if;
   return v_out;
 end $function$;
@@ -1523,6 +1450,119 @@ begin
   v_rp := public.career_rewards_profile(v_id, v_rw);
   return v_out || (v_rp - 'numbers')
          || case when v_rp ? 'numbers' then jsonb_build_object('numbers', (v_out -> 'numbers') || (v_rp -> 'numbers')) else '{}'::jsonb end;
+end $function$;
+
+-- The shelf (spec §6, split from get_profile() for the size budget): every badge row with its tiers and the day of each, the achievements,
+-- the full titles list and the recent awards. The phones call it only when the shelf opens; it works nothing out (get_profile() evaluates)
+-- and writes nothing. Who may read it is get_profile()'s rule: the athlete their own, the coach anyone's, the SQL editor and the service
+-- role anyone's. Catalogue off (or no rulebook yet): the same keys, empty, and catalogue null.
+create or replace function public.get_awards(p_athlete_id text default null) returns jsonb
+language plpgsql stable security definer set search_path to 'public' as $function$
+declare
+  v_me text := public.current_athlete_id();
+  v_id text := coalesce(nullif(btrim(coalesce(p_athlete_id, '')), ''), v_me);
+  v_rules jsonb; v_S date; v_hr jsonb;
+begin
+  if v_id is null then
+    raise exception 'not signed in';
+  end if;
+  if not (public.is_coach() or v_id is not distinct from v_me or coalesce(auth.jwt() ->> 'role', '') in ('', 'service_role')) then
+    raise exception 'not your profile';
+  end if;
+  v_rules := public.career_rules_now();
+  v_S := case when v_rules is not null then public.career_switch_day(v_rules, 'catalogue') end;
+  if v_S is null then
+    return jsonb_build_object('athlete_id', v_id, 'catalogue', null, 'badges', '[]'::jsonb, 'achievements', '[]'::jsonb,
+                              'titles', '[]'::jsonb, 'recent', '[]'::jsonb);
+  end if;
+  v_hr := public.career_habit_rules();
+  return jsonb_build_object(
+    'athlete_id', v_id,
+    'catalogue', v_S,
+    'catalogue_version', (select r.version::text || '@' || extract(epoch from r.loaded_at)::bigint::text
+                            from public.career_rules r order by r.version desc limit 1),
+    'badges', coalesce((
+      -- Every badge the athlete holds, one row per badge (per habit for habit_tiers' ladders), newest first. A live badge: id, subject (only
+      -- when there is one), name, meaning, tier, metal, day, caption, and `days`: the day each tier was earned, tier 1 first (null for a tier
+      -- skipped). A retired badge is only ever the line "Earned before: HUMAN SPRINKLER II" under the badge that replaced it, so its row is
+      -- id, subject, name, meaning, tier, of, retired, superseded_by and days, and a per-habit one (habit_tiers, with a subject) is id, subject,
+      -- meaning, tier, retired and days: its successor is the subject's own badge (habitSucc() and earnedBeforeLines() in habits.html).
+      select jsonb_agg(b.j order by b.day desc, b.id, b.subject)
+        from (select bt.item as id, bt.subject, bt.day,
+                     jsonb_strip_nulls(jsonb_build_object(
+                       'id', bt.item, 'subject', nullif(bt.subject, ''), 'meaning', bt.meaning, 'tier', bt.tier))
+                     || case when rt.retired and bt.subject <> '' then '{}'::jsonb
+                             else jsonb_build_object('name', coalesce(c.body ->> 'name', bt.item)) end
+                     || case when rt.retired
+                             then jsonb_build_object('retired', true)
+                                  || case when bt.subject = '' then jsonb_strip_nulls(jsonb_build_object(
+                                            'of', case when jsonb_typeof(c.body -> 'tiers') = 'array' then jsonb_array_length(c.body -> 'tiers') end,
+                                            'superseded_by', c.body -> 'superseded_by')) else '{}'::jsonb end
+                             else jsonb_strip_nulls(jsonb_build_object(
+                                    'metal', c.body -> 'tiers' -> (bt.tier - 1) ->> 'metal', 'day', bt.day,
+                                    'caption', (public.career_award_spec('badge', bt.item, bt.tier, bt.day, bt.evidence, c.body)) ->> 'caption')) end
+                     || jsonb_build_object('days', (select jsonb_agg(to_jsonb(d.day) order by g.t)
+                                                      from generate_series(1, bt.tier) g(t)
+                                                      left join public.career_awards d on d.athlete_id = bt.athlete_id and d.kind = 'badge'
+                                                       and d.item = bt.item and d.subject = bt.subject and d.tier = g.t)) as j
+                from (select distinct on (a.item, a.subject) a.* from public.career_awards a
+                       where a.athlete_id = v_id and a.kind = 'badge' order by a.item, a.subject, a.tier desc) bt
+                left join public.career_catalogue c on c.kind = 'badge' and c.id = bt.item
+                cross join lateral (select coalesce(c.body ? 'retire_at', false) as retired) rt
+               order by bt.day desc, bt.item, bt.subject) b), '[]'::jsonb),
+    'achievements', coalesce((
+      select jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
+               'id', a.item, 'name', coalesce(c.body ->> 'name', a.item), 'meaning', a.meaning, 'day', a.day, 'size', a.size,
+               'caption', (public.career_award_spec('achievement', a.item, null, a.day, a.evidence, c.body)) ->> 'caption',
+               'retired', case when c.body ? 'retire_at' then true end, 'superseded_by', c.body -> 'superseded_by')) order by a.day desc, a.item)
+        from public.career_awards a left join public.career_catalogue c on c.kind = 'achievement' and c.id = a.item
+       where a.athlete_id = v_id and a.kind = 'achievement'), '[]'::jsonb),
+    'titles', coalesce((
+      with ht as (
+        select t.title as hab_id, t.earned_on as day,
+               (select c0.id from public.career_catalogue c0 where c0.kind = 'title' and (c0.body ->> 'proof_id' = t.title or c0.id = t.title)
+                 order by (c0.body ->> 'proof_id' = t.title) desc nulls last, c0.id limit 1) as cid
+          from public.hab_titles t where t.athlete_id = v_id
+        union all
+        select coalesce(c1.body ->> 'proof_id', a.item), a.day, a.item
+          from public.career_awards a left join public.career_catalogue c1 on c1.kind = 'title' and c1.id = a.item
+         where a.athlete_id = v_id and a.kind = 'title'
+           and not exists (select 1 from public.hab_titles t2 where t2.athlete_id = v_id and t2.title = coalesce(c1.body ->> 'proof_id', a.item))
+      ),
+      tt as (
+        select ht.*, case when ht.hab_id like 't\_sn\_%' then 'season' end as season,
+               coalesce(c.body, case when ht.hab_id like 't\_sn\_%' then (select s.body from public.career_catalogue s where s.kind = 'title' and s.id = 'season') end) as body
+          from ht left join public.career_catalogue c on c.kind = 'title' and c.id = ht.cid
+      )
+      -- hab_id only when it differs from id (both apps read `hab_id || id`); empty keys left out (the size budget)
+      select jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
+               'id', coalesce(tt.cid, case when tt.season is not null then 'season' end, tt.hab_id),
+               'hab_id', nullif(tt.hab_id, coalesce(tt.cid, case when tt.season is not null then 'season' end, tt.hab_id)),
+               'name', case when tt.season is not null
+                            then coalesce((select r.season_name from public.hab_season_results r
+                                            where r.athlete_id = v_id and to_char(r.starts_on, 'YYYYMMDD') = substr(tt.hab_id, 6) limit 1),
+                                          tt.body ->> 'name', tt.hab_id)
+                            else coalesce(tt.body ->> 'name', tt.hab_id) end,
+               'meaning', case when tt.season is not null then 'season' else tt.body ->> 'meaning' end,
+               'metal', tt.body ->> 'metal', 'from', tt.body ->> 'from', 'day', tt.day,
+               -- source: 'award' or 'event' only, the two both apps read (syncCatalogueTitles(), catalogueTitles()); a road title
+               -- (meaning 'level', or no catalogue row) and a season title (meaning 'season') say it by their meaning (the size budget)
+               'source', case when tt.season is not null then null
+                              when tt.body ->> 'meaning' = 'level' or tt.body is null then null
+                              when tt.body ->> 'origin' = 'proof' then 'event'
+                              else 'award' end)) order by tt.day, tt.hab_id)
+        from tt), '[]'::jsonb),
+    -- recent: the awards of the last 7 days (not the go-day's baseline), newest first, at most 10, each with its share spec; no created_at
+    -- (the order is the server's)
+    'recent', coalesce((
+      select jsonb_agg(z.j order by z.created_at desc, z.award_id)
+        from (select a.award_id, a.created_at,
+                     jsonb_build_object('award_id', a.award_id, 'kind', a.kind, 'item', a.item, 'tier', a.tier, 'size', a.size, 'day', a.day,
+                       'xp', case when not a.pays then 0 else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, v_hr), a.xp) end)
+                     || jsonb_build_object('spec', public.career_award_spec(a.kind, a.item, a.tier, a.day, a.evidence, c.body)) as j
+                from public.career_awards a left join public.career_catalogue c on c.kind = a.kind and c.id = a.item
+               where a.athlete_id = v_id and a.how <> 'baseline' and a.created_at >= now() - interval '7 days'
+               order by a.created_at desc, a.award_id limit 10) z), '[]'::jsonb));
 end $function$;
 
 -- ── 9. the moments: told once ─────────────────────────────────────────────────────────────────────────────────────────
@@ -1980,8 +2020,9 @@ end $function$;
 
 -- ── 13. who may run what ──────────────────────────────────────────────────────────────────────────────────────────────
 
--- As stage66 and stage69: every career_ function runs inside the server or from the service role. get_profile() is open to a signed-in
--- athlete (their own) and the coach (anyone's); mark_moments_told() to the signed-in athlete (their own; anyone else marks nothing).
+-- As stage66 and stage69: every career_ function runs inside the server or from the service role. get_profile() and get_awards() are open
+-- to a signed-in athlete (their own) and the coach (anyone's); mark_moments_told() to the signed-in athlete (their own; anyone else marks
+-- nothing).
 do $stage70_grants$
 declare f text;
 begin
@@ -1997,6 +2038,8 @@ revoke all on function public.get_profile(text) from public, anon, authenticated
 grant execute on function public.get_profile(text) to authenticated, service_role;
 revoke all on function public.mark_moments_told(text, text[], text) from public, anon, authenticated;
 grant execute on function public.mark_moments_told(text, text[], text) to authenticated, service_role;
+revoke all on function public.get_awards(text) from public, anon, authenticated;
+grant execute on function public.get_awards(text) to authenticated, service_role;
 
 -- ── 14. coach_erase_person() learns career_awards and career_recognition ──────────────────────────────────────────────
 -- Patched from its live definition, as stage66 and stage69: the end of the table list must be found exactly once, or nothing is changed.

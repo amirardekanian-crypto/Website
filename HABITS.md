@@ -2635,8 +2635,8 @@ the strip never asking, and nothing changing before the switch.
 ## Career Mode, phase 3 (the catalogue switch)
 
 > **Where it stands (2026-10-18).** Built in `habits.html`, dormant. Every branch below sits behind **`catalogueOn()`**: the
-> server's catalogue switch is on (`get_profile().switch.catalogue` is a day) AND the profile carries the awards (`badges`,
-> `owned`). With it off, or with no profile ever (a new install offline, the demo, a preview with nothing to read), the app is
+> server's catalogue switch is on (`get_profile().switch.catalogue` is a day) AND the profile carries the awards (`owned`).
+> With it off, or with no profile ever (a new install offline, the demo, a preview with nothing to read), the app is
 > exactly what the rest of this file says, screen for screen (the lane's headless check compares the rendered Today, Progress and
 > Locker with the previous build's). The server half is `supabase/stage70_career_rewards.sql`; the rules are
 > `career/CAREER_MODE.md` and `career/PROCEDURES.md` → *Phase 3, as built*. Turning it on waits for Amir's sign-off of the catalogue
@@ -2650,8 +2650,25 @@ unchanged), exactly as the server strips them from `hab_bonus_xp()`. History is 
 habit** (`habit_water` … `habit_custom`, five steps KINDLED to UNBREAKABLE), Hold Serve, Century, the widened HARD TO KILL. Nothing
 already earned is ever taken away (below, *Earned before*).
 
-**The two gates.** `catalogueOn()` draws the shelf, the four numbers and the server's moments from the profile alone (it carries every
-name and caption). `catalogueReady()` is that AND this phone holding the **catalogue copy** (`<id>_hab_catalogue`, fetched by
+**Two reads: the core and the shelf (stage70's split, 2026-10-18).** `get_profile()` is the **core**, read by `fetchCareer()` as
+before: `owned` (every award id, a **list** in byte order with no days: read it with `ownedIds()` / `ownedSet()`, never
+`Object.keys()` or `owned[id]`), `ladder`, `near`, `slam`, `title_worn`, `titles_owned`, `numbers.four`, `catalogue_version` and the
+`moments` waiting to be told. Its `badges` and `achievements` are always `[]`: placeholders, never "none earned". Today, the Locker,
+the reveal and the moment dedupe read the core only. **`get_awards()`** is the **shelf**: every badge row with `days` (the day of each
+tier, `null` for a tier skipped), the milestones, the `titles` and `recent` (last 7 days, at most 10, each with its `spec`). Proof
+asks for it only when **Progress opens** (`go('progress')` → `fetchShelf(true)`, at most once in 15 s), and again when the shelf is
+drawn stale (`shelfStale()`: no copy, a catalogue version it was not read under, or a different number of awards owned; asked after
+the paint, once per state in a run, so no signal never loops). The answer is kept in **`<id>_hab_shelf`** (`{ v, n, at, a }`: a
+cache, never in `CFG`, never synced, never written in the preview or the demo, never read in the embed), so Progress shows the last
+shelf with no signal. `careerView()` is the core with the shelf's four lists laid over it (`badges`, `achievements`, `titles`,
+`recent`), exactly the server's own merge; every reader of those lists goes through it (`awardView()`, `awardMeaningOf()`,
+`earnedBeforeLines()`, `catalogueShelf()`, `catalogueTotal()`, `latestMedal()`, `catTitleByHabId()`). Until the shelf comes the
+rows are the core's ladder and owned list. The catalogue's titles reach the Locker from the core's `titles_owned` (hab_titles, which
+every award and event title is written to; only an event's or a catalogue title counts: `serverCatalogueTitleIds()`), with the
+shelf's titles adding the same ids once read. With the catalogue off `get_awards()` answers `catalogue: null` and nothing is kept.
+
+**The two gates.** `catalogueOn()` draws the four numbers and the server's moments from the core, and the shelf from the core plus
+the shelf read. `catalogueReady()` is that AND this phone holding the **catalogue copy** (`<id>_hab_catalogue`, fetched by
 `fetchCatalogue()` from `career_catalogue` whenever `get_profile().catalogue_version` moves; never in `CFG`, never synced, never
 written in the preview or the demo, never read in the embed). Everything that reads the copy asks `catalogueReady()`: a first open
 offline has a profile and no copy, and then the phone simply does not score awards itself until the copy arrives.
@@ -2684,6 +2701,10 @@ down).
 seen, the road's rewards it reaches) and shows ONE screen: *MY RECORD · Your record · Everything you've earned, counted once and kept
 for good.*, the four counts, the Grand Slam row and the road's rewards. `CFG.catalogueSeen` survives the cloud merge, so a second
 phone stays quiet, and the flip alone never toasts *XP system updated*. When the XP reveal had this open, it waits for the next.
+The four counts come from the catalogue copy (or the shelf, once read), never from the core, whose `badges` and `achievements`
+are placeholders: on an open that holds neither (the copy still on its way, or a first open offline) the reveal waits, the levels
+are absorbed in silence and nothing else takes the screen, and it opens the moment the copy or the shelf lands (`fetchCatalogue()`
+and `fetchShelf()` run `checkLevelUps()` again while `catalogueRevealDue()`). It never shows four zeros over earned awards.
 Share it opens the Rank card, eyebrow *MY RECORD*.
 
 **What the athlete sees.**
@@ -2695,8 +2716,8 @@ Share it opens the Rank card, eyebrow *MY RECORD*.
 - **Progress:** the statgrid is unchanged (D15; *Milestones* now counts the awards held over every live tier and milestone). The
   milestone block is the catalogue's, in four groups (*Consistency*, *Commitment*, *Progress*, *Resilience*), with the same folds,
   next three and Earned strip. A badge row shows its held tier's metal and its count to the next step. A retired badge is never a
-  row of its own: it is a line under its successor, **Earned before: HUMAN SPRINKLER II**, from the server's record or from
-  `CFG.heldBefore` (what Proof's own shelf held at the switch, read once, synced). A free athlete's Progress group is locked:
+  row of its own: it is a line under its successor, **Earned before: HUMAN SPRINKLER II**, from the server's record (the shelf
+  read, `get_awards()`) or from `CFG.heldBefore` (what Proof's own shelf held at the switch, read once, synced). A free athlete's Progress group is locked:
   *Coached athletes earn these from their programme.*
 - **Locker:** the **Grand Slam row** first under *What you have* (a title per kind of win, *Not yet* in grey, the GRAND SLAM plate
   once all four are held), and the catalogue's titles on the title rail (`passItem()` resolves them through `catTitleByHabId()`).
@@ -2917,8 +2938,8 @@ preference, so the newer config still wins — but never into an empty slot.
 Storage keys, all owned solely by Proof: `<id>_hab_cfg` (settings), `<id>_hab_log`
 (the daily log), `<id>_hab_meta` (sync state, which stays on the phone) and, once Career Mode's XP switch is on,
 `<id>_hab_career` (the last profile the server sent: a cache, kept on the phone and never synced) and, once the catalogue switch
-is on, `<id>_hab_catalogue` (the catalogue copy, never synced) and `<id>_hab_awwd` (pending awards the server disagreed with,
-phone-local). The first two ride the
+is on, `<id>_hab_catalogue` (the catalogue copy, never synced), `<id>_hab_shelf` (the last `get_awards()` answer, Progress's
+shelf: a cache, never synced) and `<id>_hab_awwd` (pending awards the server disagreed with, phone-local). The first two ride the
 existing `save_progress` /
 `get_progress` functions into the same `athlete_progress` row the programme app uses —
 **no table of its own for the log** (the board, roll call, titles, contacts and seasons have

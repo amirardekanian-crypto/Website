@@ -588,9 +588,10 @@ habits row never saying a level, the finish card's *This session earns* line, th
 keys never synced, and 320 px. In AA Proof: the one reveal (once per athlete, no flood of level-ups), the career's level and curve, a tick moving
 the XP at once, WORKOUT at 0, the manual's wording, `?go=pass` opening the Locker, and the embedded strip never asking for the profile. Serve the
 repo first (see `lib.js`). `PROGRAM-APP.md` → *Career on Home, and what a session earns*, `HABITS.md` → *Career Mode (phase 2, the XP switch)*.
-Phase 3 (2026-10-18) extends it to 234 checks, with the catalogue switch OFF and ON: with it off both apps are byte for byte phase 2's; with it on, the
+Phase 3 (2026-10-18) extends it to 276 checks, with the catalogue switch OFF and ON: with it off both apps are byte for byte phase 2's; with it on, the
 four numbers and the nearest goal on Home's Career row, the finish card's `moves` lines, the reward bands on the finished card and the reward moment in
-the training app, and in AA Proof the catalogue reveal, the shelf, the four numbers on Today's card, the Grand Slam row, award moments and wins lines.
+the training app, and in AA Proof the catalogue reveal (which waits for the catalogue copy or the shelf, never counting four zeros), the shelf and its phone cache
+(`<id>_hab_shelf`, the stub's `get_awards`), the four numbers on Today's card, the Grand Slam row, award moments and wins lines.
 `sharecard.js`, `highlight-reel.js` and `proof-cards.js` also draw the badge, achievement and title cards (the Proof look for Proof's).
 `cycle-end.js` (2026-10-10) checks Home between cycles (PROG-02): the card and the week while the cycle runs and on its
 end date, Cycle complete, Up next and "Ready for Cycle N?" 4 and 40 days past, Roadmap complete on the last cycle (light,
@@ -619,7 +620,8 @@ the drafts still waiting for Amir; `--list` prints every unlinked card.
 
 ### The twin guard (`scripts/check_twins.js`, 2026-10-10)
 
-Pre-commit guard 15, run whenever `program.html`, `coach.html` or `assets/js/chips.js` is staged. coach.html
+Pre-commit guard 15, run whenever `program.html`, `coach.html`, `assets/js/chips.js` or (since 2026-10-18) `habits.html`, a `career/*.toml`, `scripts/career_seed.py` or
+`scripts/career/{hold,xp,reward}_cases.json` is staged. coach.html
 re-implements some of the athlete app's rules, so a change to one copy alone makes the coach and the athlete
 see different numbers with nothing erroring (coach.html audit, TWIN-10). The script cuts each pair out of
 both files by function name, compiles each side in its own sandbox and runs the same vectors through both:
@@ -629,9 +631,12 @@ import's reader `parseCheckinPlan()`, 300 random answer sets included). A functi
 rename has to come here. It also checks coach.html's hand-typed `chips.js?v=` token: an edit to chips.js under
 an unchanged token fails (the service worker serves `/assets/` cache-first); bump it, then run
 `node scripts/check_twins.js --stamp` to refresh `scripts/twins_stamp.json`. `scripts/test_check_twins.js`
-breaks a copy of the files on purpose, twenty ways, and requires the guard to fail each time. The known, deliberate
+breaks a copy of the files on purpose, 94 ways, and requires the guard to fail each time. The known, deliberate
 differences (the week-note input, drafts, the leftover-session window, the retest flag) are in the script's header.
-Already guarded elsewhere: `rxOf()` (`check_rx.js`), the set-log grammar (`check_setlog.js`), the word lists
+Career Mode's phone copies are sections 8 to 10 (2026-10-17/18; 65,307 checks in all): the weeks held in a row, phase 2's curve and the day's XP, and phase 3's award id, the
+phone's scoring (`habits.html awardMeasures()` / `phoneAwardsFrom()`, held to the server's `reward_cases.json` and to a measure grown by hand for every entry and every tier),
+the finish card's lines and the five events' goals against `career/*.toml` (read through `career_seed.py --json`; in index mode the toml, the seed script, the checker and the
+snapshot come from the index, like `habits.html`). Already guarded elsewhere: `rxOf()` (`check_rx.js`), the set-log grammar (`check_setlog.js`), the word lists
 (`check_parity.py`), the XP rules (`check_xp_rules.py`).
 
 ---
@@ -695,8 +700,9 @@ in `xp_rules`' shape (`career_habit_rules()`), and the rest from `[fact.*]` with
 `program.html`'s `holdCount()` (Home's Hold Serve row, 2026-10-17) copies `get_profile()`'s weeks held in a row: `scripts/check_twins.js`
 runs it on `scripts/career/hold_cases.json`, and the rehearsal holds the two equal on every athlete it builds.
 `scripts/career/rehearse.mjs` builds the snapshot on PGlite and replays saves, hides, deletes, the row-level security, the
-profile, a broken rulebook and an erasure (47 checks made up; 49 with a dump of the real rows, which also proves every athlete
-matches Proof). The restore puts `career_rules` back last (`restore_backup.py`, `RESTORE_LAST`) so no trigger works anything out
+profile, a broken rulebook and an erasure (50 checks, 2026-10-18; with a dump of the real rows it also proves every athlete
+matches Proof). Since 2026-10-18 the three Career Mode rehearsals start from `schema_snapshot.sql` as it is and apply only the stages it does not hold, through
+`scripts/career/rehearse_lib.mjs` (`ensureStages()`, `filesAt()` for the career files of an older commit); see *Phase 3* below. The restore puts `career_rules` back last (`restore_backup.py`, `RESTORE_LAST`) so no trigger works anything out
 half-restored.
 
 ### Career Mode, phase 2: the XP switch (`supabase/stage69_career_xp_switch.sql`, 2026-10-17)
@@ -721,7 +727,9 @@ around it:
 - **`scripts/career/rehearse_switch.mjs`**: `PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse_switch.mjs --backup
   <aa-backup-…json> [--report <file>] [--write-cases]`. PGlite in a scratch folder (`scripts/restore/lib.mjs`), nothing live: the schema snapshot, a
   full backup of the real rows, phase 1 as it stands on the live project (`--phase1 <rev>` names the commit it was seeded from), then the file,
-  Season 1, the dry run, the switch, the refusals, settling, a season closing, an erasure, the cache's cost and the way back. 42 of 42 on 2026-10-17.
+  Season 1, the dry run, the switch, the refusals, settling, a season closing, an erasure, the cache's cost and the way back. 42 of 42 on 2026-10-17; **49 of 49
+  on 2026-10-18** after the repair (the snapshot now holds stage69 and stage70, so it first takes both off with their own way-back files, then seeds phase 1 and
+  phase 2 from the commits the live project was seeded from: `--phase1`, `--phase2`, `--no-stage70`).
 - **`scripts/career/rollback_stage69.sql`**: the way back. Every function the file redefined goes back to what it was, the new functions and the
   table go, and `coach_erase_person()` forgets `career_scores`. Tested by the rehearsal. On Amir's word only. A level kept at the switch is
   voided, not deleted.
@@ -745,8 +753,10 @@ it is on. The go-day waits for Amir's answers on D1, D10 and D11 (`career/CAREER
   cache of `career_evaluate()`) and the index `career_facts_kind_idx`; `backup.career_catalogue_before`. Functions: `career_evaluate()` with
   `career_measures()` (one pass), `career_badge_eval()`, `career_achievement_eval()`, `career_mint()`, `career_slam()`, `career_award_id()`,
   `career_award_pays()`, `career_award_xp()`, `career_rewards_stamp()`; the seams (`career_bonus_rules()`, `career_facts_paid()` with the `award` branch,
-  `career_stamp()`, `career_score()`, `career_compute()`, `career_scored()`, `career_scores_for()`); `get_profile()` (additive: `owned`, `badges`,
-  `achievements`, `titles`, `title_worn`, `slam`, `ladder`, `near`, `moments`, `recent`, `numbers.four`, `catalogue_version`) and `mark_moments_told()`;
+  `career_stamp()`, `career_score()`, `career_compute()`, `career_scored()`, `career_scores_for()`); `get_profile()` (the **core**, additive: `owned` as a sorted list of award ids with no days, `title_worn`, `slam`, `ladder`, `near`, `moments`,
+  `numbers.four` and `numbers.free`, `catalogue_version`; `badges` and `achievements` stay empty placeholders; 7.6 KB on the largest real career against the 14 KB budget),
+  **`get_awards(p_athlete_id)`** (the **shelf**, read when Progress opens: `badges` with `days`, `achievements`, `titles`, `recent`; `get_profile()`'s access rule; catalogue off:
+  the same keys, empty) and `mark_moments_told()`;
   `career_seed()` (turns the catalogue switch on only alone); the go-day batches `career_catalogue_before()`, `career_catalogue_preview()` and
   `career_rewards_batch()`; `career_compare()` after the switch. `career_sync()` and `career_keep_levels()` stamp with `clock_timestamp()` (a save that
   waited on a lock never writes a stamp older than one already stored). The three save triggers evaluate with the kinds that changed, **never on a
@@ -755,7 +765,13 @@ it is on. The go-day waits for Amir's answers on D1, D10 and D11 (`career/CAREER
 - **`scripts/career/rehearse_catalogue.mjs`**: `PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse_catalogue.mjs --backup <file>
   [--report <file outside the repo>] [--write-cases]`. The snapshot, a full backup of the real rows, phases 1 and 2 as live, stage70 twice, the go-day
   (refusals, scores before, the dry run, the seed that only flips the switch, the baseline batches, conservation athlete by athlete), live mints, partial
-  calls, the stamp race, voids, the queue, timing and the profile's size, a re-seed, an erasure, reward_cases.json, the way back. 156 of 156 on 2026-10-18.
+  calls, the stamp race, voids, the queue, timing and the profile's size, a re-seed, an erasure, reward_cases.json, the way back. **163 of 163 on 2026-10-18** on the real
+  rows of 2026-10-17 (196 s): the core profile 7.6 KB on the largest real career and 8.7 KB on a simulated 208-award one, `get_awards()` returning every owned award dated
+  as `career_awards` has it, `get_profile()` on the skip path no more than 0.1 ms over phase 2's on the same log (a growth budget of +100 ms), a Proof save +75 ms and a session save +12 ms
+  on the longest log (budget 300), the first full evaluate 123 ms (budget 500), the baseline of 43 athletes 5 s. `--cases-file <path>` writes the cases elsewhere to look first.
+- **`scripts/career/rehearse_lib.mjs`** (2026-10-18): what the three rehearsals share, not a rehearsal. `STAGES`, `heldStages()` and `ensureStages(db, through)` (apply,
+  each twice, only the stages the snapshot lacks), `eraseDef()`, and `filesAt(rev)` / `seedFrom()` / `withRulebook()` (the career files of a commit, cut out of git with that
+  commit's own checker and seed script, in a scratch folder; `PHASE1_REV`, `PHASE2_REV`).
 - **`scripts/career/reward_cases.json`**: the server's own answers on fixed inputs that the phones' copies are held to: `awardId()`, `awardMeasures()` +
   `phoneAwardsFrom()` (habits.html) and `careerMoves()` (program.html). `scripts/check_twins.js` §10 reads it (and the five events' goals against
   `career/achievements.toml`); the rehearsal writes it (`--write-cases`) and checks it on every run.
@@ -763,14 +779,15 @@ it is on. The go-day waits for Amir's answers on D1, D10 and D11 (`career/CAREER
 - **`career/*.toml`**: the new keys (`run`, `history_twin_counts`, a test and its params on every achievement, a title's `size`, `[moments]`), described in
   `career/README.md`. `scripts/check_career.py` rules 17 to 21 and `scripts/test_check_career.py` (107 tests).
 - **In the apps:** `habits.html` (`catalogueOn()`, `catalogueReady()`, `awardMeasures()`, `phoneAwardsFrom()`, `awardId()`, `phoneAwards()`,
-  `checkCatalogueReveal()`, `catalogueShelf()`, `renderProgress()`, the keys `CFG.seenAwards`, `CFG.catalogueSeen`, `CFG.heldBefore`) and `program.html`
+  `checkCatalogueReveal()`, `catalogueShelf()`, `renderProgress()`; the shelf: `ownedIds()`, `careerView()`, `fetchShelf()`, `shelfStale()`, `loadShelf()`, the phone key
+  `<id>_hab_shelf`; the keys `CFG.seenAwards`, `CFG.catalogueSeen`, `CFG.heldBefore`) and `program.html`
   (`catalogueOnT()`, `careerMoves()`, `awardId()`, `maybeRewardMoment()`, `rewardAfterAnswer()`, `rwCountingBands()`, `collectRewardBands()`,
   `careerEarnAtDone()`, `paintWinBand()`, the new synced key `<id>_rw_seen`). `HABITS.md` → *Career Mode, phase 3 (the catalogue switch)*, `XP_SYSTEM.md`, `QUESTS.md`,
   `PROGRAM-APP.md` → *Rewards on the finish card, the bands and the row*.
 - **Held until the snapshot commit (rollout step 2):** the lines for `career_awards` and `career_recognition` in coach.html's `BACKUP_TABLES` and `TABLE_KEYS`,
   the comment in `scripts/restore/restore_backup.py`, the count in `scripts/test_restore_backup.py` (46 tables become 48) and
   `supabase/schema_snapshot.sql` regenerated. Applying stage70 without them leaves two tables out of the backup.
-- **The rest of the checks that guard it:** `scripts/headless/career.js` (234 checks, switch off and on), `sharecard.js`, `highlight-reel.js`,
+- **The rest of the checks that guard it:** `scripts/headless/career.js` (276 checks, switch off and on), `sharecard.js`, `highlight-reel.js`,
   `proof-cards.js` and `stub.js` (the profile's rewards keys), `scripts/test_check_twins.js`.
 
 ---

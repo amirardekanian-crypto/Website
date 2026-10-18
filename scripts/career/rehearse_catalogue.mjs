@@ -2,7 +2,7 @@
 // (supabase/stage70_career_rewards.sql, scripts/career/rollback_stage70.sql; career/PROCEDURES.md → P5, P12, P15, P16 and "Phase 3, as built").
 //
 //     PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse_catalogue.mjs --backup <aa-backup-YYYY-MM-DD.json>
-//         [--report <file outside the repo>] [--write-cases] [--stop-after N] [--phase1 <rev>] [--head <rev>]
+//         [--report <file outside the repo>] [--write-cases [--cases-file <path>]] [--stop-after N] [--phase1 <rev>] [--head <rev>]
 //
 // PGlite is a real PostgreSQL compiled to WebAssembly (install it in a scratch folder: scripts/restore/lib.mjs, the top). Nothing here touches a real
 // project. The backup is coach.html's ⤓ Backup (or the same shape): the real rows, read here and never written anywhere but this process's memory;
@@ -17,7 +17,8 @@
 //      before + back-pay exactly, no level down, Proof's tiers and milestones carried over to the point, the compare ok, the retired and the starts_at rules;
 //   4. live mints through the real doors on made-up athletes (a tier, a held week, the Personal Records and the Spine, the cycle's end, a mid-cycle start,
 //      the events, the Grand Slam, the lift gains, D14's comebacks), 5. partial calls, 6. the stamp, 7. voids, 8. mark_moments_told, 9. timing on the longest
-//      real logs and the profile's size, 10. a re-seed (a tier appended, an xp changed, a title added), 11. erasure, 12. reward_cases.json,
+//      real logs (get_profile's skip path is a growth budget, +100 ms over phase 2's get_profile on the same log) and the core profile's size (the largest real
+//      career and a simulated 200-award one, each under 14 KB compact; get_awards() returns every owned award), 10. a re-seed (a tier appended, an xp changed, a title added), 11. erasure, 12. reward_cases.json,
 //   13. the way back (rollback_stage70.sql, dry then real, twice).
 // Exit code 1 if anything failed. A failure line ends with the lane that owns the fix: [L1] the stage file or the rollback, [L2] the catalogue or the
 // seed, [L5] the training app's twin.
@@ -43,7 +44,7 @@ const BACKUP = opt('--backup'), REPORT = opt('--report');
 const PHASE1 = opt('--phase1') || '94cdc89';       // the commit the live project's phase 1 rulebook was seeded from
 const HEAD = opt('--head') || 'a219d5a';           // the commit the live project's phase 2 rulebook (version 2) was seeded from
 const STOP = Number(opt('--stop-after') || 99);
-const CASES_FILE = path.join(ROOT, 'scripts', 'career', 'reward_cases.json');
+const CASES_FILE = opt('--cases-file') || path.join(ROOT, 'scripts', 'career', 'reward_cases.json');   // --cases-file: write somewhere else to look at a change first
 
 let passed = 0, failed = 0;
 const failures = [];
@@ -171,6 +172,16 @@ async function doorSession(db, id, day, on, s) {
 const awardsOf = async (db, id) => q(db, `select award_id, day::text as day, how, pays, xp, size, meaning, tier, item, subject, kind from public.career_awards where athlete_id = $1 order by day, award_id`, [id]);
 const recOf = async (db, id) => q(db, `select award_id, size, told_at from public.career_recognition where athlete_id = $1 order by award_id`, [id]);
 const profile = async (db, id) => (await one(db, `select public.get_profile($1) as p`, [id])).p;
+const shelfOf = async (db, id) => (await one(db, `select public.get_awards($1) as p`, [id])).p;
+// the award ids and days a get_awards() answer carries, the way career_award_id() writes them: a badge row's `days` (tier 1 first, null for a tier
+// skipped; the subject is the habit of a per-habit ladder), an achievement's day, a title's day
+function shelfAwards(sh) {
+  const m = {};
+  for (const b of sh.badges || []) (b.days || []).forEach((d, i) => { if (d) m[`badge:${b.id}:${i + 1}` + (b.subject ? ':' + b.subject : '')] = d; });
+  for (const a of sh.achievements || []) m['achievement:' + a.id] = a.day;
+  for (const t of sh.titles || []) m['title:' + t.id] = t.day;
+  return m;
+}
 const scoreOf = async (db, id) => (await one(db, `select public.career_scored($1) as s`, [id])).s;
 const sizeOf = p => JSON.stringify(p).length;
 const stripVolatile = o => JSON.parse(JSON.stringify(o, (k, v) => (k === 'at' || k === 'stamp' ? undefined : v)));
@@ -298,6 +309,10 @@ async function main() {
   };
   const ctlProof = await proofSaves('zz_ctl'), ctlSess = await sessionSaves('zz_ctl');
   info(`control (stage69 only) on ${big}'s log: Proof saves ${ctlProof.join(' / ')} ms, session saves ${ctlSess.join(' / ')} ms`);
+  // phase 2's get_profile() on the same log, five reads after a first one (the growth budget of section 9 is measured against these)
+  await profile(db, 'zz_ctl');
+  const ctlProf = []; for (let k = 0; k < 5; k++) ctlProf.push((await ms(() => profile(db, 'zz_ctl')))[1]);
+  info(`control (stage69 only): get_profile() of ${big}'s log ${ctlProf.join(' / ')} ms (median ${median(ctlProf)})`);
 
   // everything stage70 must leave as it was while the switch is off
   const allIds0 = (await q(db, `select z.id from (select ap.athlete_id as id from public.athlete_progress ap where ap.data ? (ap.athlete_id || '_hab_log')
@@ -538,7 +553,9 @@ async function main() {
      `a Proof log crossing a habit badge tier: one award (Water, tier 1, live, 20 XP, ${w1[0] && w1[0].day}), one recognition row (win), saved in ${tTier} ms`, JSON.stringify({ aw: aw.map(a => a.award_id), rc }), 'L1');
   ok(!aw.some(a => /habit_tiers/.test(a.award_id)), 'and the retired habit_tiers ladder mints nothing after the switch', undefined, 'L1');
   const owned = (await profile(db, 'zz_tier')).owned;
-  ok(owned && owned['badge:habit_water:1'] === today, 'the profile lists it in owned', undefined, 'L1');
+  ok(Array.isArray(owned) && owned.includes('badge:habit_water:1'), 'the profile lists it in owned (a sorted list of award ids, no days)', JSON.stringify(owned), 'L1');
+  const shT = shelfAwards(await shelfOf(db, 'zz_tier'));
+  ok(shT['badge:habit_water:1'] === today, `and the shelf read has its day (${shT['badge:habit_water:1']})`, JSON.stringify(shT), 'L1');
 
   // 4b. ten weeks held, one session each, saved through the door: Hold Serve, Long Count, Held
   await mkLogin(db, 'zz_week');
@@ -631,7 +648,8 @@ async function main() {
   await q(db, `select public.set_title('zz_wear', 't_sunforged', null)`);
   await asNobody(db);
   pW = await profile(db, 'zz_wear');
-  ok(pW.slam.commitment && pW.slam.grand && pW.titles.some(t => t.id === 'grand_slam') && (await recOf(db, 'zz_wear')).some(r => r.award_id === 'title:grand_slam'),
+  const shW = await shelfOf(db, 'zz_wear');
+  ok(pW.slam.commitment && pW.slam.grand && shW.titles.some(t => t.id === 'grand_slam') && pW.owned.includes('title:grand_slam') && (await recOf(db, 'zz_wear')).some(r => r.award_id === 'title:grand_slam'),
      'an event title worn through set_title() completes the slam on the next get_profile (the rewards stamp includes hab_titles), with its legend row', JSON.stringify({ slam: pW.slam, rc: await recOf(db, 'zz_wear') }), 'L1');
   ok(pW.title_worn === 't_sunforged' || pW.title_worn === 'sun_forged', `and the profile shows the title worn (${pW.title_worn})`, undefined, 'L1');
 
@@ -710,7 +728,7 @@ async function main() {
   const aw7b = await awardsOf(db, 'zz_week'), rc7b = await recOf(db, 'zz_week');
   ok(JSON.stringify(aw7b) === JSON.stringify(aw7) && rc7b.length === rc7.length, 'hide the session that crossed Long Count: the award and its recognition row stay', undefined, 'L1');
   const pHid = await profile(db, 'zz_week');
-  ok(pHid.owned['badge:long_count:1'] === today, 'and the profile still owns it', undefined, 'L1');
+  ok(pHid.owned.includes('badge:long_count:1') && shelfAwards(await shelfOf(db, 'zz_week'))['badge:long_count:1'] === today, 'and the profile still owns it, and the shelf still has its day', undefined, 'L1');
   await q(db, `update public.session_history set hidden_at = null where athlete_id = 'zz_week' and completed_on = $1::date`, [today]);
   const aw7c = await awardsOf(db, 'zz_week'), rc7c = await recOf(db, 'zz_week');
   ok(JSON.stringify(aw7c) === JSON.stringify(aw7) && rc7c.length === rc7.length, 'un-hide it: nothing new is minted, nothing repeated', undefined, 'L1');
@@ -777,19 +795,75 @@ async function main() {
   info(`zz_noscore's saves: ${nsTimes.join(' / ')} ms; awards after each: ${nsAw.join(' / ')}`);
   ok(nsRow === 0 && nsAw.every(x => x === nsAw[0]), 'six saves, no career_scores row stored by them, and the same awards each time (a repeat mints nothing)', undefined, 'L1');
   ok(Math.max(...nsTimes) - Math.max(...ctlProof) <= 500 && nsTimes[5] <= nsTimes[0] * 1.6 + 60, `every save of the athlete with no score row stays inside budget (each is a full evaluate: worst ${Math.max(...nsTimes)} ms, the first ${nsTimes[0]}, the sixth ${nsTimes[5]}): the cost does not grow`, undefined, 'L1');
-  // the profile's size on the largest careers
+  // the profile's size on the largest careers: the CORE (get_profile) stays inside 14 KB however long the career, and the shelf (get_awards) has every award
+  const BUDGET = 14 * 1024;
   const owners = await q(db, `select athlete_id, count(*)::int as n from public.career_awards where athlete_id not like 'zz\_%' group by 1 order by 2 desc limit 3`);
   const sizes = [];
   for (const o of owners.concat([{ athlete_id: 'zz_ev', n: 0 }, { athlete_id: 'zz_week', n: 0 }])) {
-    const p = await profile(db, o.athlete_id);
-    sizes.push({ id: o.athlete_id, awards: await val(db, `select count(*)::int from public.career_awards where athlete_id = $1`, [o.athlete_id]), compact: sizeOf(p), wire: await val(db, `select octet_length(public.get_profile($1)::text)`, [o.athlete_id]),
+    const p = await profile(db, o.athlete_id), sh = await shelfOf(db, o.athlete_id);
+    sizes.push({ id: o.athlete_id, awards: await val(db, `select count(*)::int from public.career_awards where athlete_id = $1`, [o.athlete_id]), compact: sizeOf(p), shelf: sizeOf(sh), p, sh,
+                 wire: await val(db, `select octet_length(public.get_profile($1)::text)`, [o.athlete_id]),
                  parts: Object.entries(p).map(([k, v]) => [k, JSON.stringify(v).length]).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k, n]) => `${k} ${n}`).join(', ') });
   }
-  for (const z of sizes) info(`get_profile of ${z.id}: ${z.awards} awards, ${z.compact} bytes compact (${z.wire} as Postgres prints it); largest parts: ${z.parts}`);
+  for (const z of sizes) info(`get_profile of ${z.id}: ${z.awards} awards, ${z.compact} bytes compact (${z.wire} as Postgres prints it); largest parts: ${z.parts}; the shelf read: ${z.shelf} bytes`);
   const bigCareer = sizes[0];
-  ok(bigCareer.compact <= 14 * 1024, `the profile of the largest real career (${bigCareer.id}, ${bigCareer.awards} awards) is ${bigCareer.compact} bytes against the 14 KB budget (${14 * 1024})`, `${bigCareer.wire} bytes as Postgres prints it; its largest parts: ${bigCareer.parts}`, 'L1');
-  const prof9 = await profile(db, big), [, tProf] = await ms(() => profile(db, big));
-  ok(tProf <= 100, `get_profile() of the longest log answers from the cache in ${tProf} ms (budget: +100 ms on the skip path)`, undefined, 'L1');
+  ok(bigCareer.compact <= BUDGET, `the core profile of the largest real career (${bigCareer.id}, ${bigCareer.awards} awards) is ${bigCareer.compact} bytes compact against the 14 KB budget (${BUDGET})`, `${bigCareer.wire} bytes as Postgres prints it; its largest parts: ${bigCareer.parts}`, 'L1');
+  ok(sizes.every(z => z.compact <= BUDGET), `and so is every other profile measured (${sizes.map(z => z.compact).join(', ')} bytes)`, undefined, 'L1');
+  // the shelf read returns every owned award: each id in `owned` is on the shelf with the day its award row has (a badge tier's day, an achievement's day, a title's presence)
+  const shelfBad = [];
+  for (const z of sizes) {
+    const m = shelfAwards(z.sh), rows = await awardsOf(db, z.id);
+    const day = Object.fromEntries(rows.map(r => [r.award_id, r.day]));
+    for (const id of z.p.owned) {
+      if (!(id in m)) shelfBad.push(`${z.id}: ${id} is owned but not on the shelf`);
+      else if (!id.startsWith('title:') && m[id] !== day[id]) shelfBad.push(`${z.id}: ${id} is dated ${m[id]} on the shelf, ${day[id]} in career_awards`);
+    }
+    const extra = Object.keys(m).filter(id => !z.p.owned.includes(id) && !id.startsWith('title:'));
+    if (extra.length) shelfBad.push(`${z.id}: on the shelf but not owned: ${extra.slice(0, 5).join(', ')}`);
+    if (JSON.stringify(z.p.owned) !== JSON.stringify(z.p.owned.slice().sort((x, y) => (x < y ? -1 : x > y ? 1 : 0)))) shelfBad.push(`${z.id}: owned is not sorted byte by byte`);
+    if (z.p.owned.length !== rows.length) shelfBad.push(`${z.id}: owned has ${z.p.owned.length} ids, career_awards ${rows.length} rows`);
+  }
+  ok(shelfBad.length === 0, `get_awards() returns every owned award, dated as career_awards has it, and nothing owned is missing (${sizes.map(z => `${z.id} ${z.p.owned.length}`).join(', ')}); owned lists every award row once, sorted`, shelfBad.slice(0, 8).join('\n'), 'L1');
+  // a simulated 200-award career: every tier of every badge, then the achievements, then the titles, from the real catalogue, written straight into the table
+  await mkLogin(db, 'zz_sim');
+  await insProgram(db, 'zz_sim', prog({ start: addDays(today, -10), end: addDays(today, 20) }));
+  const simIds = [];
+  for (const c of cat3) {
+    if (c.kind === 'badge') (c.body.tiers || []).forEach((t, i) => simIds.push({ kind: 'badge', item: c.id, tier: i + 1, size: t.size || 'win', meaning: c.body.meaning || 'consistency' }));
+    else if (c.kind === 'achievement') simIds.push({ kind: 'achievement', item: c.id, tier: null, size: c.body.size || 'milestone', meaning: c.body.meaning || 'consistency' });
+  }
+  for (const c of cat3) if (c.kind === 'title') simIds.push({ kind: 'title', item: c.id, tier: null, size: 'win', meaning: c.body.meaning || 'consistency' });
+  const sim = simIds.slice(0, 200);
+  await db.exec(`set session_replication_role = replica`);
+  for (let i = 0; i < sim.length; i++) {
+    const a = sim[i];
+    await q(db, `insert into public.career_awards (athlete_id, award_id, kind, item, tier, subject, day, pays, xp, size, meaning, evidence, how, rules_version)
+                 values ('zz_sim', public.career_award_id($1::text, $2::text, $3::integer, ''), $1::text, $2::text, $3::integer, '', $4::date, false, 0, $5::text, $6::text, '{}'::jsonb, 'silent', 3)`,
+            [a.kind, a.item, a.tier, addDays(today, -(i % 90)), ['tick', 'win', 'highlight', 'milestone', 'legend'].includes(a.size) ? a.size : 'win', a.meaning]);
+  }
+  await db.exec(`set session_replication_role = origin`);
+  // the first read settles it: a title that follows from a tier the career holds is minted by get_profile's own evaluate (a real career does the same)
+  await profile(db, 'zz_sim');
+  const simN = await val(db, `select count(*)::int from public.career_awards where athlete_id = 'zz_sim'`);
+  const pSim = await profile(db, 'zz_sim'), shSim = await shelfOf(db, 'zz_sim');
+  { const hav = new Set(sim.map(a => `${a.kind}:${a.item}` + (a.tier ? ':' + a.tier : ''))); info(`the 200 written, ${simN - 200} more minted by get_profile's evaluate (their titles): ` + pSim.owned.filter(id => !hav.has(id)).join(', ')); }
+  const simBytes = sizeOf(pSim);
+  info(`get_profile of zz_sim (a simulated career of ${simN} awards): ${simBytes} bytes compact; owned ${sizeOf(pSim.owned)} of them; the shelf read ${sizeOf(shSim)} bytes`);
+  ok(simN >= 200 && pSim.owned.length === simN, `the simulated career holds ${simN} awards (200 written) and the profile's owned lists every one (${pSim.owned.length} ids)`, undefined, 'L1');
+  ok(simBytes <= BUDGET, `the core profile of a simulated ${simN}-award career is ${simBytes} bytes compact against the 14 KB budget (${BUDGET}): it grows by one id an award and nothing else`, `its largest parts: ${Object.entries(pSim).map(([k, v]) => [k, JSON.stringify(v).length]).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k, n]) => `${k} ${n}`).join(', ')}`, 'L1');
+  const mSim = shelfAwards(shSim), simMiss = pSim.owned.filter(id => !(id in mSim));
+  ok(simMiss.length === 0 && Object.keys(mSim).length === simN, `and the shelf read returns all ${simN} (${Object.keys(mSim).length} ids; missing ${simMiss.length}${simMiss.length ? ': ' + simMiss.slice(0, 5).join(', ') : ''})`, undefined, 'L1');
+  // the simulated career leaves nothing behind for the sections that follow
+  for (const t of ['career_awards', 'career_recognition', 'career_scores', 'career_facts']) await q(db, `delete from public.${t} where athlete_id = 'zz_sim'`);
+  await q(db, `delete from public.programs where athlete_id = 'zz_sim'`);
+  const simLeft = await val(db, `select (select count(*) from public.career_awards where athlete_id = 'zz_sim') + (select count(*) from public.career_recognition where athlete_id = 'zz_sim') + (select count(*) from public.career_scores where athlete_id = 'zz_sim') + (select count(*) from public.career_facts where athlete_id = 'zz_sim')`);
+  ok(Number(simLeft) === 0, 'and zz_sim is taken out again (no award, recognition, score or fact left)', undefined, 'L3');
+  // get_profile() on the skip path is a growth budget over phase 2's get_profile() on the same log (the first read after the saves, a full call, is also told)
+  const profFirst = await ms(() => profile(db, 'zz_long'));
+  const profSkip = []; for (let k = 0; k < 5; k++) profSkip.push((await ms(() => profile(db, 'zz_long')))[1]);
+  const dProf = median(profSkip) - median(ctlProf);
+  info(`${big}'s log: get_profile() first read after the saves ${profFirst[1]} ms; skip path ${profSkip.join(' / ')} ms (median ${median(profSkip)}); phase 2's get_profile() on the same log ${ctlProf.join(' / ')} ms (median ${median(ctlProf)})`);
+  ok(dProf <= 100, `get_profile() of the longest log on the skip path costs ${Math.round(dProf)} ms more than phase 2's get_profile() on the same log (median ${median(profSkip)} against ${median(ctlProf)}; the budget is +100 ms)`, JSON.stringify({ profSkip, ctlProf }), 'L1');
   // a failing evaluate keeps the ladder and marks the profile stale
   const staleId = 'zz_week';
   const ladBefore = (await profile(db, staleId)).ladder;
@@ -841,8 +915,8 @@ async function main() {
      `a tier appended by a re-seed is minted by career_rewards_batch(…, 'silent') for the athlete who already crossed it (${t6 && t6.day}), at its current price, with no moment`, JSON.stringify(t6), 'L1');
   const x2 = await xpOf('zz_top');
   ok(x2 === x1 + 300, `and it is paid (${x1} → ${x2})`, undefined, 'L1');
-  const pTitle = await profile(db, 'zz_week');
-  ok((await awardsOf(db, 'zz_week')).some(a => a.award_id === 'title:climber') && pTitle.titles.some(t => t.id === 'climber'), 'a title added by a re-seed to a tier already owned is minted on the next full evaluate (zz_week: CLIMBER from Hold Serve)', JSON.stringify(pTitle.titles.map(t => t.id)), 'L1');
+  const pTitle = await profile(db, 'zz_week'), shTitle = await shelfOf(db, 'zz_week');
+  ok((await awardsOf(db, 'zz_week')).some(a => a.award_id === 'title:climber') && pTitle.owned.includes('title:climber') && shTitle.titles.some(t => t.id === 'climber'), 'a title added by a re-seed to a tier already owned is minted on the next full evaluate (zz_week: CLIMBER from Hold Serve)', JSON.stringify(shTitle.titles.map(t => t.id)), 'L1');
   ok((await xpOf(big)) === xBig0, 'and the re-seed moved nobody else (the longest real log is unchanged)', undefined, 'L1');
   await seedJson(rulesNow, cat3);       // back to the catalogue the file has
   for (let o = 0; o < 400; o += 5) { const r = (await one(db, `select public.career_rewards_batch($1, 5, 'silent') as r`, [o])).r; if (!r.n) break; }

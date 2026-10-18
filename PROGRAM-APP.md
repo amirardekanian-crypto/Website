@@ -1265,9 +1265,13 @@ card, the row and the finished card are byte for byte what they were; `scripts/h
 
 - **The gate:** `catalogueOnT()` = `careerOnT()` and `p.switch.catalogue` and `p.ladder` and `p.owned`. It reads the profile of the
   server's `get_profile()` (spec §6): `ladder` (every live badge with `have`, `now` for a run, `next`, `next_tier`, `metal_next`,
-  `size_next`, `phone`: `'session'` = this app moves it at Done, `'week'` = it moves when a week or cycle closes), `near`, `owned` (every
-  award id → day, the dedupe key), `numbers.four`, `moments` and `recent`. Nothing is asked of the server that phase 2 did not ask: one
-  `get_profile()` plus `mark_moments_told()`.
+  `size_next`, `phone`: `'session'` = this app moves it at Done, `'week'` = it moves when a week or cycle closes), `near`, `owned` (a
+  **list** of award ids, sorted, no days: the dedupe key; read through `ownedIds(p)`, never `Object.keys(p.owned)` or `owned[id]`),
+  `numbers.four` and `moments`. **The profile is split (stage70):** `get_profile()` is the core and carries no `recent`, `titles` or filled
+  `badges` / `achievements` (those are `get_awards()`'s, the shelf, which only AA Proof reads when its shelf opens). Nothing is asked of the
+  server that phase 2 did not ask: one `get_profile()` plus `mark_moments_told()`; this app never calls `get_awards()`. The one cost: a
+  reward AA Proof has already told is no longer in `moments` and, with no `recent`, draws no band here (`collectRewardBands()` still reads
+  `p.recent` if a profile ever carries it). A session's own reward is untold when the answer after Done arrives, so it is in `moments`.
 - **The finish card, before Done** (`careerMoves()`, `careerMovesHTML()`; `.cf-moves` under the XP lines in the same `.confirm-earn` box):
   every ladder the session moves, **three lines at most**, then one grey *+N more in AA Proof*. A line is `Paper Trail 10 of 10 · bronze`
   (a tier crossed: bold ink, the metal in lower case), `Century 24 of 25`, or `Hold Serve 5 of 8 · when the week counts` (a week ladder:
@@ -1282,7 +1286,7 @@ card, the row and the finished card are byte for byte what they were; `scripts/h
   `#hlwin-<day>`, `<id>_hlwin_d<N>.rewards`): at Done `careerEarnAtDone()` also keeps `snap` (every award id the phone knew) and `moves`
   in `<id>_earn_d<N>`. A tier the finish card showed as crossed (and is not full-screen) is a band at once with **Counting** in its mint
   label and no Share. When an answer asked after the session reached the server arrives, `owned` minus `snap` is mapped to specs through
-  the answer's `moments` and `recent`: a Counting band whose award is owned becomes the real band (the label goes, Share is there), and
+  the answer's `moments` (and `recent`, if present): a Counting band whose award is owned becomes the real band (the label goes, Share is there), and
   one the server did not give is taken away. A full-screen reward is never a band (it gets its moment); a `tick` is XP only; an older
   reward this phone only just learned of is Proof's to tell. **Three bands at most across the Best/Retest specs and the rewards, the rest
   one grey line.** The reward's name and, for a badge, its metal go in `<b>` as plain text, never `<em>` (that is clay on the green). Share
@@ -1290,6 +1294,8 @@ card, the row and the finished card are byte for byte what they were; `scripts/h
   `'training'`): the room for rewards is `3 − the day's Best/Retest specs`, in the stored order, and one behind the *+N more in AA Proof* line
   (or cut by the 8-reward cap) stays unseen and untold, so AA Proof's queue still announces it (GAME-14).
   A reload paints the same bands from the key, quietly (the reward bands wait for the profile, so `paintCareer()` draws them).
+  **`paintWinBand()` with the catalogue off is phase 2's, exactly:** every paint that is not quiet re-draws the bands, runs their `is-new`
+  burst and buzzes (`navigator.vibrate`). With the catalogue on a band bursts, and the phone buzzes, only for a band key not on screen yet.
 - **Moments** (`maybeRewardMoment(reason)`, `rewardAfterAnswer()`, `openMoment()` with a new `onClose`): the queue of spec §7. **Only an
   answer received in this run opens one** (`CAREER_T.at` newer than the page's `performance.timeOrigin`), never the phone's copy at
   first paint. On every fresh answer the **cross-app catch-up** runs first: a waiting row this app has seen (`<id>_rw_seen`, which is
@@ -2258,6 +2264,9 @@ Seven small changes, all found while mapping the app as a first-time client and 
 - **The grey Begin button counts the answers** ("0 of 5 answered", then "Begin session ▶") so a first-timer sees why it is grey.
 - **After the last card closes the page scrolls to the finish card** (`nudgeFinishCard()`: a standard card's fold, a circuit's last round, a
   warm-up/simple tick), as a fold already scrolled to the next card. Never in Guided, which has its own way there.
+  Both it and Guided's last button go through `scrollFinishCard()`: plain centring, except when the card carries Career Mode's "what the session moves" lines
+  (`.cf-moves`, catalogue switch on). Those make it taller than a short phone, so it slides to put its top on screen if Done stays on screen, and Done wins when both cannot
+  (first-timer.js §7; at 320 × 640 the card is ~810 px, so only Done fits). Catalogue off, it is the plain centring it always was.
 
 The in-app guide's "Getting around" now lists the tabs in the bar's order (Home · Coach · Library · Game Plan) and "How your program is
 structured" puts the "Why This Cycle Matters" note on Game Plan, where it is.

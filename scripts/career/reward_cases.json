@@ -1959,8 +1959,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "century": {
@@ -1981,8 +1979,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "veteran": {
@@ -1990,8 +1986,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -2024,8 +2018,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "love_hold": {
@@ -2048,16 +2040,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "held_weeks": {
@@ -2105,8 +2093,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_sleep": {
@@ -2115,8 +2101,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -2125,16 +2109,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_water": {
@@ -2143,8 +2123,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -2179,56 +2157,42 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_custom": {
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_breathe": {
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_mobility": {
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "back_in_the_fight": {
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "proof_clean_sweep": {
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     }
    },
@@ -2275,8 +2239,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "century": {
@@ -2297,8 +2259,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "veteran": {
@@ -2306,8 +2266,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -2340,8 +2298,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "love_hold": {
@@ -2364,16 +2320,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "held_weeks": {
@@ -2421,8 +2373,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_sleep": {
@@ -2431,8 +2381,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -2441,16 +2389,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_water": {
@@ -2459,8 +2403,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -2495,56 +2437,42 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_custom": {
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_breathe": {
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_mobility": {
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "back_in_the_fight": {
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "proof_clean_sweep": {
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     }
    },
@@ -2583,8 +2511,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "century": {
@@ -2605,8 +2531,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "veteran": {
@@ -2614,8 +2538,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -2648,8 +2570,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "love_hold": {
@@ -2672,16 +2592,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "held_weeks": {
@@ -2729,8 +2645,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_sleep": {
@@ -2739,8 +2653,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -2749,16 +2661,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_water": {
@@ -2767,8 +2675,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -2803,56 +2709,42 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_custom": {
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_breathe": {
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_mobility": {
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "back_in_the_fight": {
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "proof_clean_sweep": {
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     }
    },
@@ -2883,8 +2775,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "century": {
@@ -2905,8 +2795,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "veteran": {
@@ -2914,8 +2802,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -2948,8 +2834,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "love_hold": {
@@ -2972,16 +2856,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "held_weeks": {
@@ -3029,8 +2909,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_sleep": {
@@ -3039,8 +2917,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -3049,16 +2925,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_water": {
@@ -3067,8 +2939,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -3103,56 +2973,42 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_custom": {
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_breathe": {
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_mobility": {
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "back_in_the_fight": {
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "proof_clean_sweep": {
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     }
    },
@@ -3199,8 +3055,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "century": {
@@ -3221,8 +3075,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "veteran": {
@@ -3230,8 +3082,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -3264,8 +3114,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "love_hold": {
@@ -3288,16 +3136,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "held_weeks": {
@@ -3345,8 +3189,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_sleep": {
@@ -3355,8 +3197,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -3365,16 +3205,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_water": {
@@ -3383,8 +3219,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -3419,56 +3253,42 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_custom": {
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_breathe": {
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_mobility": {
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "back_in_the_fight": {
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "proof_clean_sweep": {
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     }
    },
@@ -3515,8 +3335,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "century": {
@@ -3537,8 +3355,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "veteran": {
@@ -3546,8 +3362,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -3580,8 +3394,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "love_hold": {
@@ -3604,16 +3416,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "held_weeks": {
@@ -3661,8 +3469,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_sleep": {
@@ -3671,8 +3477,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -3681,16 +3485,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_water": {
@@ -3699,8 +3499,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -3735,56 +3533,42 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_custom": {
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_breathe": {
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "habit_mobility": {
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     },
     "back_in_the_fight": {
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "proof_clean_sweep": {
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze"
     }
    },
@@ -3832,8 +3616,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 4
     },
@@ -3855,8 +3637,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 0
     },
@@ -3865,8 +3645,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -3900,8 +3678,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 2
     },
@@ -3925,16 +3701,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -3984,8 +3756,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     },
@@ -3995,8 +3765,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -4005,16 +3773,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4024,8 +3788,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -4061,16 +3823,12 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 1
     },
@@ -4078,8 +3836,6 @@
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4087,8 +3843,6 @@
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4096,8 +3850,6 @@
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4105,8 +3857,6 @@
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 6
     },
@@ -4114,8 +3864,6 @@
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     }
@@ -4163,8 +3911,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4186,8 +3932,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 0
     },
@@ -4196,8 +3940,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -4231,8 +3973,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 2
     },
@@ -4256,16 +3996,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4315,8 +4051,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     },
@@ -4326,8 +4060,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -4336,16 +4068,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4355,8 +4083,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -4392,16 +4118,12 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 1
     },
@@ -4409,8 +4131,6 @@
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4418,8 +4138,6 @@
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4427,8 +4145,6 @@
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4436,8 +4152,6 @@
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 6
     },
@@ -4445,8 +4159,6 @@
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     }
@@ -4486,8 +4198,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4509,8 +4219,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 0
     },
@@ -4519,8 +4227,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -4554,8 +4260,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 2
     },
@@ -4579,16 +4283,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4638,8 +4338,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     },
@@ -4649,8 +4347,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -4659,16 +4355,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4678,8 +4370,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -4715,16 +4405,12 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 1
     },
@@ -4732,8 +4418,6 @@
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4741,8 +4425,6 @@
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4750,8 +4432,6 @@
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4759,8 +4439,6 @@
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 6
     },
@@ -4768,8 +4446,6 @@
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     }
@@ -4801,8 +4477,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4824,8 +4498,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 0
     },
@@ -4834,8 +4506,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -4869,8 +4539,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 2
     },
@@ -4894,16 +4562,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4953,8 +4617,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     },
@@ -4964,8 +4626,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -4974,16 +4634,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -4993,8 +4649,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -5030,16 +4684,12 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 1
     },
@@ -5047,8 +4697,6 @@
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5056,8 +4704,6 @@
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5065,8 +4711,6 @@
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5074,8 +4718,6 @@
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 6
     },
@@ -5083,8 +4725,6 @@
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     }
@@ -5132,8 +4772,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5155,8 +4793,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 0
     },
@@ -5165,8 +4801,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -5200,8 +4834,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 2
     },
@@ -5225,16 +4857,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5284,8 +4912,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     },
@@ -5295,8 +4921,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -5305,16 +4929,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5324,8 +4944,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -5361,16 +4979,12 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 1
     },
@@ -5378,8 +4992,6 @@
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5387,8 +4999,6 @@
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5396,8 +5006,6 @@
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5405,8 +5013,6 @@
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 6
     },
@@ -5414,8 +5020,6 @@
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     }
@@ -5463,8 +5067,6 @@
      "name": "Record Breaker",
      "next": 5,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5486,8 +5088,6 @@
      "name": "Beat the Test",
      "next": 1,
      "meaning": "progress",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 0
     },
@@ -5496,8 +5096,6 @@
      "name": "Veteran",
      "next": 3,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze"
     },
     "finisher": {
@@ -5531,8 +5129,6 @@
      "name": "HARD TO KILL",
      "next": 3,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 2
     },
@@ -5556,16 +5152,12 @@
      "next": 14,
      "tier": 2,
      "meaning": "consistency",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "silver"
     },
     "habit_fuel": {
      "name": "FULLY FUELLED",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5615,8 +5207,6 @@
      "name": "DAWN PATROL",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     },
@@ -5626,8 +5216,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_steps": {
@@ -5636,16 +5224,12 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "habit_supps": {
      "name": "IRON MONK",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5655,8 +5239,6 @@
      "next": 10,
      "tier": 1,
      "meaning": "consistency",
-     "next_tier": 2,
-     "size_next": "win",
      "metal_next": "silver"
     },
     "pulse_check": {
@@ -5692,16 +5274,12 @@
      "next": 30,
      "tier": 2,
      "meaning": "progress",
-     "next_tier": 3,
-     "size_next": "milestone",
      "metal_next": "emerald"
     },
     "clean_sweeps": {
      "name": "Treble",
      "next": 2,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 1
     },
@@ -5709,8 +5287,6 @@
      "name": "HOUSE RULES",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5718,8 +5294,6 @@
      "name": "ZEN MACHINE",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5727,8 +5301,6 @@
      "name": "RUBBER BAND",
      "next": 5,
      "meaning": "consistency",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 4
     },
@@ -5736,8 +5308,6 @@
      "name": "BACK IN THE FIGHT",
      "next": 7,
      "meaning": "resilience",
-     "next_tier": 1,
-     "size_next": "highlight",
      "metal_next": "bronze",
      "have": 6
     },
@@ -5745,8 +5315,6 @@
      "name": "CLEAN SWEEP",
      "next": 1,
      "meaning": "commitment",
-     "next_tier": 1,
-     "size_next": "win",
      "metal_next": "bronze",
      "have": 0
     }

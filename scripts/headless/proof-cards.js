@@ -290,7 +290,7 @@ const GOLD_EMOJI = /[🏆🥇🏅🎖⭐🌟✨💫⚡☀🌞💡💰🪙👑�
       { id: 'the_constant', hab_id: 'the_constant', name: 'THE CONSTANT', meaning: 'consistency', metal: 'prismatic', from: 'Long Count, prismatic: 100 weeks held', day: R.at(-20), source: 'award' },
       { id: 'grand_slam', hab_id: 'grand_slam', name: 'GRAND SLAM', meaning: 'all', metal: 'prismatic', from: 'A title in all four', day: R.at(-1), source: 'award' }] });
   const D = await H.openProof(browser, { w: 390, h: 844, tz: TZ, cfg: Object.assign({}, CFG_SEED, { careerSeen: R.SWX, catalogueSeen: R.at(-3) }), seed: { _hab_log: habitLog(false) },
-    stub: { profile: prof, tables: { career_rules: R.RW_RULES, career_facts: [], career_catalogue: R.catRows() } } });
+    stub: { profile: prof, awards: R.rwShelf(prof), tables: { career_rules: R.RW_RULES, career_facts: [], career_catalogue: R.catRows() } } });
   await D.p.waitForFunction(() => typeof catalogueReady === 'function' && catalogueReady(), null, { timeout: 15000 }).catch(() => {});
   t.check('setup: the third page has the catalogue on and holds the catalogue copy', await D.p.evaluate(() => catalogueReady()));
   await D.p.evaluate(installCapture);

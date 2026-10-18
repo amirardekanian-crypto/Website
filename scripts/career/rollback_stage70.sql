@@ -19,7 +19,8 @@
 --   9. leaves hab_titles as it is (a title minted from an award is owned; set_title() still accepts it);
 --  10. repeats the grants; then the report. Check `select public.career_compare()` is ok afterwards.
 --  11. In the same sitting, commit career/rulebook.toml with [switch] catalogue = "off" (the file must say what the server says).
--- The apps fall back by themselves: get_profile() answers switch.catalogue null and badges [], so catalogueOn() is false.
+-- The apps fall back by themselves: get_profile() answers switch.catalogue null and badges [], so catalogueOn() is false (and neither
+-- calls get_awards(), which this file drops, while it is).
 -- Safe to run twice (a second run finds nothing of stage70 and changes nothing but the switch it already turned off).
 
 begin;
@@ -665,6 +666,7 @@ drop function if exists public.career_rewards_stamp(text);
 drop function if exists public.career_evaluate(text, text[], text);
 drop function if exists public.career_rewards_profile(text, jsonb);
 drop function if exists public.mark_moments_told(text, text[], text);
+drop function if exists public.get_awards(text);
 drop function if exists public.career_rewards_athletes(integer, integer);
 drop function if exists public.career_proof_sum(text, date);
 drop function if exists public.career_rewards_line(text, jsonb, jsonb);

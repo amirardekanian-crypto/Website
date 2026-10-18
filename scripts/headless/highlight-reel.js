@@ -257,7 +257,7 @@ const ready = p => p.waitForFunction(() => { const i = document.getElementById('
   }
 
   // ── 7. Career Mode phase 3: a reward band and a reward moment hand their spec to the SAME sheet (badge, milestone, title) ──
-  // The rewards come from get_profile() (scripts/headless/career.js builds the answer in its real shape); the sheet and the cards are the Highlight Reel's.
+  // The rewards come from get_profile()'s moments (scripts/headless/career.js builds the core and the shelf in their real shapes: stage70's split); the sheet and the cards are the Highlight Reel's.
   {
     const R = require('./career');
     const T0 = ymd(new Date());
@@ -267,10 +267,11 @@ const ready = p => p.waitForFunction(() => { const i = document.getElementById('
       R.mom('achievement:the_foundry', 'highlight', false, 0, { kind: 'achievement', name: 'THE FOUNDRY', meaning: 'commitment', caption: 'Four weeks of putting the work in.', date: T0 }),
       R.mom('title:bedrock', 'highlight', false, 0, { kind: 'title', name: 'BEDROCK', meaning: 'consistency', metal: 'prismatic', from: 'BEDROCK: four weeks of the boring half', date: T0 })];
     const owned = {}; rows.forEach(m => { owned[m.award_id] = T0; });
-    const { ctx, p } = await open(browser, { prog: prog(-4), hist: [], stub: { tables, profile: R.rwProfile(10000) } });
+    const first = R.rwProfile(10000);
+    const { ctx, p } = await open(browser, { prog: prog(-4), hist: [], stub: { tables, profile: first, awards: R.rwShelf(first) } });
     await R.toReady(p);
     await p.evaluate(() => document.querySelector('#confirm-1 .complete-rpe-btn[data-rpe="7"]').click());
-    await p.evaluate(a => { window.__STUB.profile = a; }, R.rwProfile(10470, { owned, moments: rows }));
+    await p.evaluate(s => { eval(s); }, R.stubSet(R.rwProfile(10470, { owned, moments: rows })));
     await p.evaluate(() => finishTap('1', document.querySelector('#confirm-1 .confirm-btn')));
     await p.waitForFunction(() => [...document.querySelectorAll('#hlwin-1 .hl-band')].filter(b => b.tagName === 'BUTTON').length >= 3, null, { timeout: 8000 }).catch(() => {});
     const bands = await p.evaluate(() => [...document.querySelectorAll('#hlwin-1 .hl-band')].map(el => ({ txt: el.innerText.replace(/\s+/g, ' ').trim(), tag: el.tagName, label: el.getAttribute('aria-label') })));
@@ -305,7 +306,8 @@ const ready = p => p.waitForFunction(() => { const i = document.getElementById('
     const R = require('./career');
     const T0 = ymd(new Date());
     const m = R.mom('badge:held_weeks:3', 'milestone', true, 600, R.badgeSpec('Hold Serve', 'consistency', 'emerald', 3, 12, '12 weeks held in a row. You keep showing up.', T0));
-    const stub = { tables: { career_rules: R.RW_RULES, career_facts: [], career_catalogue: R.catRows() }, profile: R.rwProfile(10000, { moments: [m], owned: { 'badge:held_weeks:3': T0 } }) };
+    const mp = R.rwProfile(10000, { moments: [m], owned: { 'badge:held_weeks:3': T0 } });
+    const stub = { tables: { career_rules: R.RW_RULES, career_facts: [], career_catalogue: R.catRows() }, profile: mp, awards: R.rwShelf(mp) };
     const { ctx, p } = await open(browser, { prog: prog(-4), hist: hist(-4), stub });
     await p.waitForSelector('.hl-moment', { timeout: 8000 }).catch(() => {});
     const mo = await p.evaluate(() => { const el = document.querySelector('.hl-moment'); return el ? { eyebrow: el.querySelector('.hl-m-eyebrow').textContent, title: el.querySelector('.hl-m-title').textContent, go: el.querySelector('.hl-m-go').textContent } : null; });

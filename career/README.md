@@ -8,7 +8,8 @@ they saw was Hold Serve on the training app's Home (2026-10-17), the held weeks 
 **Phase 2, the XP switch, is done: applied to the live project on 2026-10-17 and switched on 2026-10-18**: `rulebook.toml` → `[switch] xp` is the switch
 (*Turning a switch on*, below). Since then the career level and its XP reach both apps; Career Mode's badges wait for phase 3.
 **Phase 3, the catalogue switch, is built and rehearsed (2026-10-18) but not applied; its switch is off.** `badges.toml`, `achievements.toml`,
-`titles.toml` and `recognition.toml` carry the keys it reads (below). Their names, tiers, XP and sizes are drafts until Amir signs them off before the go-day.
+`titles.toml` and `recognition.toml` carry the keys it reads (below). Changing a toml file that a phone copies (an event's goals, a tier's `at`, a title) also runs
+the twin guard (`scripts/check_twins.js` §10) in the hook, and its tests of the phone's scoring read the catalogue through this folder's seed script. Their names, tiers, XP and sizes are drafts until Amir signs them off before the go-day.
 
 ## What is here
 
@@ -61,7 +62,11 @@ the server was last seeded from (`source` is the sha256 the seed prints). `node 
 change to `supabase/stage66_career_mode.sql` before it is applied, and `node scripts/career/rehearse_switch.mjs --backup <file>` one to
 `supabase/stage69_career_xp_switch.sql` (on a backup of the real rows, kept outside the repo), and `node scripts/career/rehearse_catalogue.mjs --backup <file>`
 one to `supabase/stage70_career_rewards.sql` and `scripts/career/rollback_stage70.sql` (PGlite in a scratch folder, `PGLITE=<scratch>/node_modules/@electric-sql/pglite`;
-`--write-cases` rewrites `scripts/career/reward_cases.json`, the answers the phones' copies are held to; `--report <file outside the repo>` writes the go-day list).
+`--write-cases` rewrites `scripts/career/reward_cases.json`, the answers the phones' copies are held to, and `--cases-file <path>` writes them somewhere else to look
+first; `--report <file outside the repo>` writes the go-day list). **All three start from `supabase/schema_snapshot.sql` as it is** and apply only the stages it does
+not hold yet (`scripts/career/rehearse_lib.mjs`); phase 1 and 2 are seeded from the career files of the commits the live project was seeded from (`--phase1 <rev>`,
+`--phase2 <rev>`; the defaults are in the lib), so a change to the working `.toml` files never changes what they prove. `--no-stage70` leaves phase 3 off. After a
+stage goes on the live project and the snapshot is made again, nothing in these commands changes. On 2026-10-18: 50 of 50, 49 of 49 and 163 of 163.
 
 ### Turning a switch on
 

@@ -3577,6 +3577,13 @@ const K_CAREER = () => ATHLETE_ID + '_hab_career';
 const K_CATALOGUE = () => ATHLETE_ID + '_hab_catalogue';
 const GRAND_SLAM_LINE = "A title in all four. That's the whole game.";   // §10.2: the Grand Slam's own line
 let CATALOGUE = null, _awCache = null, _phoneCat = null, _awwd = null, _catBusy = false;
+// THE SHELF (stage70's split, 2026-10-18): get_profile() is the core every screen reads (Today, the Locker, the dedupe);
+// the shelf's rows (every badge with the day of each tier, the milestones, the titles, `recent`) are get_awards()'s,
+// asked for only when Progress opens (fetchShelf()). SHELF is the last answer, { v: the catalogue version it was read
+// under, n: how many awards the core owned then, at, a: the answer }, kept under <id>_hab_shelf: a cache like the two
+// above, never in CFG, never synced, never written in the coach's preview or the demo, never read in the embedded strip.
+const K_SHELF = () => ATHLETE_ID + '_hab_shelf';
+let SHELF = null, _shelfBusy = false, _shelfTried = '', _shelfTimer = null;
 // When this phone's last push landed with nothing left to send (pushNow()), and whether the check that is running
 // came from a tap (a full-screen moment it earned opens at once, D7). Both phase 3 only.
 let _pushOkAt = 0, _actionPass = false, _fullThisRun = false;
@@ -5121,6 +5128,8 @@ async function fetchCareer() {
   // minted, a pending award the server disagrees with, and the moments waiting on the server (one answer, this run).
   if (fresh && catalogueOn()) {
     if (CAREER.p.catalogue_version && (!CATALOGUE || CATALOGUE.version !== CAREER.p.catalogue_version)) fetchCatalogue();
+    // The shelf on screen while the core moved under it (a new award, a new catalogue): read it again.
+    if (UI.screen === 'progress' && shelfStale()) fetchShelf(false);
     let again = syncCatalogueTitles();
     if (checkWithdrawals(started)) again = true;
     if (serverMoments()) again = true;
@@ -5132,20 +5141,85 @@ function fetchCareerSoon() { clearTimeout(_careerTimer); _careerTimer = setTimeo
 
 // ── Career Mode, phase 3: the catalogue switch (career/CAREER_MODE.md; supabase/stage70_career_rewards.sql) ──
 // From the server's catalogue switch every badge tier, milestone and catalogue title is an AWARD the server mints
-// once in a career (career_awards) and the profile carries: `owned` (every award id), the shelf (`badges`,
-// `achievements`, `ladder`, `near`), `titles`, `slam`, `numbers.four` and the `moments` waiting to be told.
-// catalogueOn(): the switch is on and the profile carries the awards; the shelf, the four numbers and the server's
-// moments draw from the profile alone. catalogueReady(): this phone also holds the catalogue copy, which the phone's
+// once in a career (career_awards). Two reads carry them (stage70's split): get_profile(), the CORE, carries `owned`
+// (every award id, a LIST in byte order with no days), `ladder`, `near`, `slam`, `title_worn`, `titles_owned`,
+// `numbers.four` and the `moments` waiting to be told; its `badges` and `achievements` are always [] (placeholders,
+// never "none earned"). get_awards(), the SHELF, carries the rows: every badge with the day of each tier, the
+// milestones, the titles and `recent`. careerView() is the core with the shelf's rows laid over it once they are here.
+// catalogueOn(): the switch is on and the profile carries the awards; the four numbers and the server's moments draw
+// from the core alone. catalogueReady(): this phone also holds the catalogue copy, which the phone's
 // own scoring (awardMeasures(), phoneAwards(), pendingAwardXp()) and its instant celebrations need. Anything that
 // reads CATALOGUE asks catalogueReady(), never catalogueOn(): a first open offline has the profile and no copy, and
 // a throw at boot here is the "loading for ever, nothing in the console" kind (2026-08-01).
 // With the switch off (null in the profile, or no profile ever) every branch below stands down and the app is
 // exactly what it was.
 function catalogueOn() {
-  return careerOn() && !!(CAREER.p.switch && CAREER.p.switch.catalogue) && Array.isArray(CAREER.p.badges)
-      && !!CAREER.p.owned && typeof CAREER.p.owned === 'object';
+  return careerOn() && !!(CAREER.p.switch && CAREER.p.switch.catalogue) && !!CAREER.p.owned && typeof CAREER.p.owned === 'object';
 }
 function catalogueReady() { return catalogueOn() && !!(CATALOGUE && CATALOGUE.version && CATALOGUE.rows); }
+// The award ids the core owns. The server answers a list; a map { id: day } (a copy from before the split) reads the same.
+function ownedIds() {
+  const o = CAREER && CAREER.p && CAREER.p.owned;
+  return Array.isArray(o) ? o.filter(x => typeof x === 'string') : (o && typeof o === 'object' ? Object.keys(o) : []);
+}
+function ownedSet() { return new Set(ownedIds()); }
+// The shelf's answer, when this phone holds one for this athlete (get_awards() with the catalogue on).
+function shelfAnswer() {
+  if (!catalogueOn() || !SHELF || !SHELF.a || SHELF.a.athlete_id !== CAREER.p.athlete_id || !SHELF.a.catalogue) return null;
+  return SHELF.a;
+}
+function shelfLoaded() { return !!shelfAnswer(); }
+// The profile as the shelf's screens read it: the core, with the shelf's four lists laid over it when it is here
+// (get_awards()'s own merge; owned stays the core's list). Without the shelf it is the core as it came.
+function careerView() {
+  const P = (CAREER && CAREER.p) || {}, a = shelfAnswer();
+  if (!a) return P;
+  const L = x => (Array.isArray(x) ? x : []);
+  return Object.assign({}, P, { badges: L(a.badges), achievements: L(a.achievements), titles: L(a.titles), recent: L(a.recent) });
+}
+// The shelf wants reading again: none yet, a catalogue it was not read under, or an award count that moved.
+function shelfStale() {
+  if (!catalogueOn()) return false;
+  return !shelfLoaded() || SHELF.v !== (CAREER.p.catalogue_version || '') || SHELF.n !== ownedIds().length;
+}
+function loadShelf() {
+  SHELF = null;
+  if (window.IS_DEMO || window.IS_EMBED || !ATHLETE_ID) return;
+  try {
+    const c = JSON.parse(localStorage.getItem(K_SHELF()) || 'null');
+    if (c && c.a && c.a.athlete_id === ATHLETE_ID && typeof c.n === 'number') SHELF = c;
+  } catch (e) { /* a broken copy is no copy */ }
+}
+// Reads the shelf (get_awards()). force: Progress was just opened, so ask even when nothing looks stale (once in 15 s);
+// otherwise only when shelfStale(), and once per state in a run, so no signal never loops. A failed read keeps the copy,
+// and Progress shows it; a success redraws. The answer with the catalogue off ({ catalogue: null }) is never kept.
+async function fetchShelf(force) {
+  if (window.IS_DEMO || window.IS_EMBED || !ATHLETE_ID || _shelfBusy || !catalogueOn()) return false;
+  const want = CAREER.p.catalogue_version || '', n = ownedIds().length, key = want + '|' + n;
+  if (!force && (!shelfStale() || _shelfTried === key)) return false;
+  if (force && !shelfStale() && Date.now() - (SHELF.at || 0) < 15000) return false;
+  _shelfBusy = true; _shelfTried = key;
+  try {
+    const sb = _sb();
+    if (!sb) return false;
+    // Capped like every other read: a call that stalls (hotel wifi) must not hold _shelfBusy for the rest of the run.
+    const res = await _withTimeout(sb.rpc('get_awards', { p_athlete_id: ATHLETE_ID }), 8000);
+    if (!res) return false;   // no answer: the copy stays, and the next open of Progress asks again (force)
+    const { data, error } = res;
+    if (error || !data || typeof data !== 'object' || data.athlete_id !== ATHLETE_ID || !data.catalogue) return false;
+    if (!CAREER || !CAREER.p || CAREER.p.athlete_id !== ATHLETE_ID) return false;
+    SHELF = { v: data.catalogue_version || want, n, at: Date.now(), a: data };
+    if (!window.IS_PREVIEW) { try { localStorage.setItem(K_SHELF(), JSON.stringify(SHELF)); } catch (e) { /* full: memory still has it */ } }
+    syncCatalogueTitles();
+    // The catalogue reveal waited for something that names each award's kind: this is one (checkCatalogueReveal()).
+    if (catalogueRevealDue()) checkLevelUps();
+    render();
+    return true;
+  } catch (e) { return false; }
+  finally { _shelfBusy = false; }
+}
+// From inside a render (the shelf drawn while stale): asked after the paint, never during it.
+function fetchShelfSoon() { clearTimeout(_shelfTimer); _shelfTimer = setTimeout(() => fetchShelf(false), 0); }
 function loadCatalogue() {
   CATALOGUE = null; _phoneCat = null;
   if (window.IS_DEMO || window.IS_EMBED || !ATHLETE_ID) return;
@@ -5173,6 +5247,11 @@ async function fetchCatalogue() {
     _phoneCat = null;
     if (!window.IS_PREVIEW) { try { localStorage.setItem(K_CATALOGUE(), JSON.stringify(CATALOGUE)); } catch (e) {} }
     invalidateBonus();
+    // A new copy names catalogue titles the Locker could not name before; a shelf read under the old one is read again.
+    syncCatalogueTitles();
+    if (SHELF && shelfStale()) fetchShelf(false);
+    // The catalogue reveal waited for this copy to name each award's kind (checkCatalogueReveal()): it opens now.
+    if (catalogueRevealDue()) checkLevelUps();
     render();
     return true;
   } catch (e) { return false; }
@@ -5183,7 +5262,7 @@ function catEntry(kind, id) {
   return (r && id && r[id]) || null;
 }
 // A catalogue title by the id it wears in hab_titles and CFG.pass.owned (its Proof id, or its catalogue id), from the
-// copy or, without one, from the profile's titles. Templates and season titles never resolve here (seasonTitleFor() does).
+// copy or, without one, from the shelf's titles (careerView()). Templates and season titles never resolve here (seasonTitleFor() does).
 function catTitleByHabId(hid) {
   if (!hid) return null;
   let body = null, cid = null;
@@ -5192,8 +5271,9 @@ function catTitleByHabId(hid) {
     if (T[hid]) { body = T[hid]; cid = hid; }
     else { const k = Object.keys(T).find(x => T[x] && T[x].proof_id === hid); if (k) { body = T[k]; cid = k; } }
   }
-  if (!body && CAREER && CAREER.p && Array.isArray(CAREER.p.titles)) {
-    const t = CAREER.p.titles.find(x => x && (x.hab_id === hid || x.id === hid));
+  const VT = !body ? careerView().titles : null;
+  if (Array.isArray(VT)) {
+    const t = VT.find(x => x && (x.hab_id === hid || x.id === hid));
     if (t) { body = t; cid = t.id; }
   }
   if (!body || body.template || body.meaning === 'season') return null;
@@ -5320,17 +5400,19 @@ function awardMeasures(inp, cat) {
 // the switch (the switch day is history on both sides), inside the open window (today and BACKFILL_DAYS before it, plus
 // one: a settled day never changes on the server), not owned, not withdrawn. Priced as the server prices it (§3.6: the
 // tier's xp, the achievement's xp; size from the tier, the entry, else 'win'). PURE: o = { S, today, backfill_days,
-// owned: { id: day }, withdrawn: [ids] } → [{ award_id, xp, size, day }] by day, then id.
+// owned: [ids] (the core's list; the older { id: day } reads the same), withdrawn: [ids] } → [{ award_id, xp, size, day }]
+// by day, then id.
 function phoneAwardsFrom(meas, cat, o) {
   o = o || {}; meas = meas || {};
   const C = awardCat(cat), S = String(o.S || '');
   if (!S || !o.today) return [];
   const floor = new Date(Date.parse(o.today + 'T00:00:00Z') - ((Number(o.backfill_days) || 0) + 1) * 86400000).toISOString().slice(0, 10);
-  const owned = o.owned || {}, wd = Array.isArray(o.withdrawn) ? o.withdrawn : [];
+  const ow = o.owned, wd = Array.isArray(o.withdrawn) ? o.withdrawn : [];
+  const own = Array.isArray(ow) ? new Set(ow) : null, owns = id => (own ? own.has(id) : !!(ow && typeof ow === 'object' && ow[id]));
   const out = [];
   const add = (kind, item, tier, d, xp, size) => {
     const id = awardId(kind, item, tier, '');
-    if (!d || !(d > S) || d < floor || d > o.today || owned[id] || wd.indexOf(id) >= 0) return;
+    if (!d || !(d > S) || d < floor || d > o.today || owns(id) || wd.indexOf(id) >= 0) return;
     out.push({ award_id: id, xp: Math.max(0, Math.round(Number(xp) || 0)), size: size || 'win', day: d });
   };
   Object.keys(meas).forEach(item => {
@@ -5396,7 +5478,7 @@ function saveWithdrawn(list) {
 function phoneAwards() {
   if (!catalogueReady()) return [];
   return phoneAwardsFrom(phoneMeasures(), phoneCat(), { S: CAREER.p.switch.catalogue, today: TKEY(), backfill_days: BACKFILL_DAYS,
-                                                        owned: CAREER.p.owned || {}, withdrawn: loadWithdrawn() });
+                                                        owned: ownedIds(), withdrawn: loadWithdrawn() });
 }
 function pendingAwardXp() { return catalogueReady() ? phoneAwards().reduce((s, a) => s + a.xp, 0) : 0; }
 // ── The four kinds of win ──
@@ -5411,12 +5493,12 @@ function fullScreenSize(size) {
   const fs = (m && Array.isArray(m.full_screen)) ? m.full_screen : ['milestone', 'legend'];
   return fs.indexOf(size) >= 0;
 }
-// Everything a screen needs to name an award: from the catalogue copy, else the profile's own moment, shelf or title
-// row (the profile carries every name and caption), else null.
+// Everything a screen needs to name an award: from the catalogue copy, else the core's waiting moment, else the shelf's
+// recent, badge, milestone or title row (careerView(): only once the shelf has been read), else null.
 function awardView(id, spec) {
   const a = awardParts(id);
   if (!a.item || !CAREER || !CAREER.p) return null;
-  const P = CAREER.p;
+  const P = careerView();
   const row = (P.moments || []).concat(P.recent || []).find(m => m && m.award_id === id) || null;
   const sp = spec || (row && row.spec) || null;
   const disp = a.kind === 'badge' ? (P.badges || []).find(b => b && b.id === a.item && (b.subject || '') === a.subject)
@@ -5475,7 +5557,7 @@ function seenAward(id) {
 function seedAwardsSeen() {
   const was = Array.isArray(CFG.seenAwards) ? CFG.seenAwards.slice() : [];
   const P = (CAREER && CAREER.p) || {}, waiting = (P.moments || []).map(m => m && m.award_id);
-  const ids = Object.keys(P.owned || {}).filter(id => waiting.indexOf(id) < 0).concat(phoneAwards().map(a => a.award_id));
+  const ids = ownedIds().filter(id => waiting.indexOf(id) < 0).concat(phoneAwards().map(a => a.award_id));
   ids.forEach(id => { if (was.indexOf(id) < 0) was.push(id); });
   return was;
 }
@@ -5488,6 +5570,7 @@ function seedAwardsSeen() {
 function serverMoments() {
   if (!catalogueOn() || window.IS_DEMO || window.IS_PREVIEW || window.IS_EMBED || !ATHLETE_ID || !CFG) return false;
   if (!Array.isArray(CFG.seenAwards)) return false;       // not baselined on this phone yet: the reveal seeds it
+  if (catalogueRevealDue()) return false;                 // the reveal, still waiting, is the open's one moment (D7)
   const ms = Array.isArray(CAREER.p.moments) ? CAREER.p.moments : [];
   const seen = CFG.seenAwards, tell = [], shown = [];
   const busy = UI.celebrate.length > 0 || _fullThisRun;
@@ -5535,50 +5618,76 @@ function checkWithdrawals(started) {
 // server puts one there: a pending award never does, because CFG.pass.owned can never give one back.
 function syncCatalogueTitles() {
   if (!catalogueOn() || window.IS_PREVIEW || window.IS_DEMO || !CFG) return false;
-  const ts = Array.isArray(CAREER.p.titles) ? CAREER.p.titles : [];
   if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
   const owned = CFG.pass.owned || (CFG.pass.owned = []);
   let n = 0;
-  ts.forEach(t => {
-    if (!t || (t.source !== 'award' && t.source !== 'event')) return;
-    const id = t.hab_id || t.id;
-    if (id && owned.indexOf(id) < 0 && passItem(id)) { owned.push(id); n++; }
-  });
+  serverCatalogueTitleIds().forEach(id => { if (owned.indexOf(id) < 0 && passItem(id)) { owned.push(id); n++; } });
   if (n) saveCfg();
   return n > 0;
 }
-// Owned awards counted by kind of win, for the reveal.
+// The catalogue and event titles the server holds for this athlete, by the id each wears in hab_titles. From the core:
+// `titles_owned` is hab_titles itself, which every award title and event title the server mints is written to; only the
+// ones that are an event's title or a catalogue title count here (the road's and the seasons' have their own doors,
+// syncTitles() and seasonTitles()). The shelf's titles, once read, add the same ids by another road.
+function serverCatalogueTitleIds() {
+  if (!catalogueOn()) return [];
+  const out = [], add = id => { if (id && typeof id === 'string' && out.indexOf(id) < 0) out.push(id); };
+  const evIds = eventTitles().map(t => t.id);
+  (Array.isArray(CAREER.p.titles_owned) ? CAREER.p.titles_owned : []).forEach(id => {
+    if (evIds.indexOf(id) >= 0 || catTitleByHabId(id)) add(id);
+  });
+  (careerView().titles || []).forEach(t => { if (t && (t.source === 'award' || t.source === 'event')) add(t.hab_id || t.id); });
+  return out;
+}
+// Owned awards counted by kind of win, for the reveal. The kind of each award comes from the catalogue copy, else the
+// shelf's rows (careerView(), only once the shelf has been read), else the core's ladder (live badges only). The
+// core's own `badges` and `achievements` are placeholders ([]), never "none earned": with neither the copy nor the
+// shelf on this phone the kinds cannot be counted, and ownedByMeaning() answers null (the reveal waits for one).
 function awardMeaningOf(id) {
   const a = awardParts(id), e = catalogueReady() ? catEntry(a.kind, a.item) : null;
   if (e) return e.meaning || '';
-  const P = CAREER.p, r = a.kind === 'badge' ? (P.badges || []).find(b => b && b.id === a.item)
+  const P = careerView(), r = a.kind === 'badge' ? (P.badges || []).find(b => b && b.id === a.item)
                          : a.kind === 'achievement' ? (P.achievements || []).find(x => x && x.id === a.item) : null;
-  return (r && r.meaning) || '';
+  if (r && r.meaning) return r.meaning;
+  const L = a.kind === 'badge' && CAREER && CAREER.p && CAREER.p.ladder && CAREER.p.ladder[a.item];
+  return (L && L.meaning) || '';
 }
+function ownedAwardIds() { return ownedIds().filter(id => /^(badge|achievement):/.test(id)); }
 function ownedByMeaning() {
-  const out = { consistency: 0, commitment: 0, progress: 0, resilience: 0 };
-  Object.keys((CAREER && CAREER.p && CAREER.p.owned) || {}).forEach(id => {
-    if (!/^(badge|achievement):/.test(id)) return;
+  const out = { consistency: 0, commitment: 0, progress: 0, resilience: 0 }, ids = ownedAwardIds();
+  if (ids.length && !catalogueReady() && !shelfLoaded()) return null;
+  ids.forEach(id => {
     const m = awardMeaningOf(id);
     if (out[m] != null) out[m]++;
   });
   return out;
 }
+// The catalogue reveal is due on this phone and has not opened yet (checkCatalogueReveal()).
+function catalogueRevealDue() {
+  const S = catalogueOn() && CAREER.p.switch.catalogue;
+  return !!S && !!CFG && CFG.catalogueSeen !== S && !window.IS_PREVIEW && !window.IS_DEMO && !window.IS_EMBED;
+}
 // THE CATALOGUE REVEAL: one moment, once per athlete, the first open after the switch. Everything the server minted in
 // silence from the athlete's history (and the back-pay it raised the level by) is absorbed without a single takeover
 // of its own: levels re-baselined, every award recorded as seen, the road's rewards it reaches ride on this screen.
 // CFG.catalogueSeen survives the cloud merge, so a second phone stays quiet. It waits a run when the XP reveal opened.
+// It also waits, and opens nothing else meanwhile, until this phone can say what each award is (the catalogue copy, or
+// the shelf): the core alone names no kinds, and a reveal of four zeros over earned awards would be false. Levels are
+// absorbed in silence while it waits (returns true); fetchCatalogue() and fetchShelf() call checkLevelUps() again when
+// the copy or the shelf lands, and the reveal opens then. The road's rewards stay unclaimed, so they ride on it.
 function checkCatalogueReveal() {
   const S = catalogueOn() && CAREER.p.switch.catalogue;
   if (!S || !CFG || CFG.catalogueSeen === S || window.IS_PREVIEW || window.IS_DEMO) return false;
   if (UI.celebrate.some(e => e.kind === 'career')) return false;
   if (!CFG.heldBefore) CFG.heldBefore = { tiers: currentTiers(), ach: currentAch() };
   seedSeenLevels();
+  const counts = ownedByMeaning();
+  if (!counts) return true;
   const fresh = claimRewards(false);
   CFG.catalogueSeen = S;
   saveCfg();
-  if (Object.keys(CAREER.p.owned || {}).length || fresh.length) {
-    UI.celebrate.push({ kind: 'catalogue', id: S, counts: ownedByMeaning(), slam: CAREER.p.slam || null, rewards: fresh });
+  if (ownedIds().length || fresh.length) {
+    UI.celebrate.push({ kind: 'catalogue', id: S, counts, slam: CAREER.p.slam || null, rewards: fresh });
     haptic('rank');
   }
   return true;
@@ -5586,7 +5695,7 @@ function checkCatalogueReveal() {
 // The milestones count on Progress and the Rank card, from the catalogue: owned badge tiers and milestones, over
 // every live tier and milestone (from the profile's ladder when there is no copy yet).
 function catalogueEarned() {
-  return Object.keys(CAREER.p.owned || {}).filter(id => /^(badge|achievement):/.test(id)).length;
+  return ownedIds().filter(id => /^(badge|achievement):/.test(id)).length;
 }
 function catalogueTotal() {
   if (catalogueReady()) {
@@ -5598,7 +5707,7 @@ function catalogueTotal() {
   }
   const L = CAREER.p.ladder || {};
   let n = Object.keys(L).reduce((s, id) => s + (L[id].next == null ? Number(L[id].tier) || 0 : Math.max(5, Number(L[id].next_tier) || 0)), 0);
-  n += (CAREER.p.achievements || []).length;
+  n += (careerView().achievements || []).length;
   return Math.max(n, catalogueEarned());
 }
 // The four numbers on Today's card (numbers.four, the same keys the training app reads). A free athlete's day streak,
@@ -5606,13 +5715,13 @@ function catalogueTotal() {
 function habitSteps() {
   const f = (((CAREER.p.numbers || {}).four || {}).progress) || {};
   if (!catalogueReady()) return Math.max(0, Number(f.value) || 0);
-  const R = CATALOGUE.rows.badge, m = phoneMeasures(), owned = CAREER.p.owned || {};
+  const R = CATALOGUE.rows.badge, m = phoneMeasures(), owned = ownedIds();
   let n = 0;
   Object.keys(R).forEach(id => {
     const b = R[id];
     if (!b || b.retire_at || b.kind !== 'best_run' || b.counts !== 'habit_done' || !b.habit) return;
     let t = 0;
-    Object.keys(owned).forEach(k => { const a = awardParts(k); if (a.kind === 'badge' && a.item === id && a.tier > t) t = a.tier; });
+    owned.forEach(k => { const a = awardParts(k); if (a.kind === 'badge' && a.item === id && a.tier > t) t = a.tier; });
     Object.keys((m[id] || {}).crossed || {}).forEach(k => { if (Number(k) > t) t = Number(k); });
     n += t;
   });
@@ -6449,7 +6558,7 @@ function unlockAwards(busy) {
   if (window.IS_PREVIEW || window.IS_DEMO) return;
   if (!Array.isArray(CFG.seenAwards)) { CFG.seenAwards = seedAwardsSeen(); return; }
   if (!catalogueReady()) return;
-  const owned = CAREER.p.owned || {}, fulls = [];
+  const owned = ownedSet(), fulls = [];
   phoneAwards().forEach(a => {
     if (CFG.seenAwards.indexOf(a.award_id) >= 0) return;
     if (awardParts(a.award_id).item === 'day_streak') { seenAward(a.award_id); return; }
@@ -6460,7 +6569,7 @@ function unlockAwards(busy) {
   if (!fulls.length || busy || (_fullThisRun && !_actionPass)) return;
   fulls.sort((x, y) => ((SIZE_RANK[y.size] || 0) - (SIZE_RANK[x.size] || 0)) || (x.day < y.day ? 1 : x.day > y.day ? -1 : 0));
   const top = fulls[0];
-  UI.celebrate.push({ kind: 'award', id: top.award_id, pending: !owned[top.award_id] });
+  UI.celebrate.push({ kind: 'award', id: top.award_id, pending: !owned.has(top.award_id) });
   seenAward(top.award_id);
   haptic('rank');
 }
@@ -6928,6 +7037,8 @@ function go(screen) {
   render();
   resetScroll();
   if (screen === 'crew') { fetchBoard(); if (!RC.loaded) fetchRollCall(); }
+  // Progress opened: its shelf is read now (get_awards()); the copy this phone kept is on screen meanwhile.
+  if (screen === 'progress' && catalogueOn()) fetchShelf(true);
 }
 // Settings sub-screens travel like screens — in from the right, out to the
 // left — without being screens, so the tab bar and the header stay put.
@@ -9471,7 +9582,7 @@ function weekTable(hs, off) {
 // retired badge is never a row of its own and never taken away: it is a line under the badge that replaced it,
 // "Earned before: HUMAN SPRINKLER II", from the server's own record or what Proof's shelf held at the switch.
 function earnedBeforeLines() {
-  const P = CAREER.p, best = {};
+  const P = careerView(), best = {};
   const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
   const put = (succ, fam, tier) => [].concat(succ || []).forEach(sx => {
     if (!sx || !fam) return;
@@ -9506,7 +9617,11 @@ function earnedBeforeLines() {
   return out;
 }
 function catalogueShelf() {
-  const P = CAREER.p, L = P.ladder || {}, owned = P.owned || {}, ready = catalogueReady();
+  // The shelf's rows are get_awards()'s: read when Progress opens (go()), and again here, after the paint, when the copy
+  // on this phone is stale. Until it comes (or with no signal and no copy) the rows are the core's ladder and owned
+  // list, and the shelf's own lists are empty, never read as "none earned".
+  if (shelfStale()) fetchShelfSoon();
+  const P = careerView(), L = P.ladder || {}, ownedL = ownedIds(), owned = new Set(ownedL), ready = catalogueReady();
   const meas = ready ? phoneMeasures() : {}, pend = {};
   phoneAwards().forEach(a => { pend[a.award_id] = true; });
   const free = (P.numbers && P.numbers.free === true) || isFree();
@@ -9521,7 +9636,7 @@ function catalogueShelf() {
     let have = Number(l.have) || 0, tier = Number(l.tier) || 0;
     const m = meas[id];
     if (m) { have = Math.max(have, Number(m.have) || 0); Object.keys(m.crossed || {}).forEach(t => { tier = Math.max(tier, Number(t)); }); }
-    Object.keys(owned).forEach(k => { const a = awardParts(k); if (a.kind === 'badge' && a.item === id && !a.subject && a.tier > tier) tier = a.tier; });
+    ownedL.forEach(k => { const a = awardParts(k); if (a.kind === 'badge' && a.item === id && !a.subject && a.tier > tier) tier = a.tier; });
     let next = l.next != null ? Number(l.next) : null, metalNext = l.metal_next || null, xpNext = null, held = null;
     if (ent && Array.isArray(ent.tiers)) {
       const nt = ent.tiers[tier];
@@ -9543,7 +9658,7 @@ function catalogueShelf() {
     : Object.keys(achOwned).filter(id => !achOwned[id].retired);
   achIds.forEach(id => {
     const b = ready ? CATALOGUE.rows.achievement[id] : null, a = achOwned[id], aid = awardId('achievement', id);
-    const got = !!(a || owned[aid] || pend[aid]);
+    const got = !!(a || owned.has(aid) || pend[aid]);
     const ev = b && b.proof_code ? EVENTS.find(e => e.id === b.proof_code) : null, evp = ev ? eventProgress(ev) : null;
     const tt = b && b.title ? catEntry('title', b.title) : null;
     rows.push({ kind: 'achievement', id, name: (b && b.name) || (a && a.name) || id, meaning: (b && b.meaning) || (a && a.meaning) || '',
@@ -10579,9 +10694,8 @@ const CARD_LOOK = {
 function catalogueTitles() {
   if (!catalogueOn()) return [];
   const have = PASS_TRACK.map(p => p.id).concat(eventTitles().map(t => t.id)), out = [];
-  (CAREER.p.titles || []).forEach(t => {
-    if (!t || (t.source !== 'award' && t.source !== 'event')) return;
-    const p = passItem(t.hab_id || t.id);
+  serverCatalogueTitleIds().forEach(id => {
+    const p = passItem(id);
     if (p && have.indexOf(p.id) < 0 && !out.some(x => x.id === p.id)) out.push(p);
   });
   return out;
@@ -11221,9 +11335,10 @@ function scFooter(x, W, H, ink, bottom) {
 // From the catalogue switch: every badge tier and milestone the server holds (phase 3).
 function milestonesEarned() { return catalogueOn() ? catalogueEarned() : currentAch().length + EVENTS.filter(e => eventProgress(e).done).length; }
 function latestMedal() {
-  // From the catalogue switch: the newest award on the shelf (the profile lists them newest first).
+  // From the catalogue switch: the newest award on the shelf (get_awards() lists them newest first), from the copy this
+  // phone last read (careerView()); until Progress has read one, the older ledger below.
   if (catalogueOn()) {
-    const P = CAREER.p, b = (P.badges || []).find(x => x && !x.retired), a = (P.achievements || []).find(x => x && !x.retired);
+    const P = careerView(), b = (P.badges || []).find(x => x && !x.retired), a = (P.achievements || []).find(x => x && !x.retired);
     const pick = [b && { id: awardId('badge', b.id, b.tier, b.subject || ''), day: b.day }, a && { id: awardId('achievement', a.id), day: a.day }]
       .filter(Boolean).sort((x, y) => String(y.day || '').localeCompare(String(x.day || '')))[0];
     const info = pick && awardMedalInfo(pick.id);
@@ -12427,6 +12542,8 @@ function showError(msg, opts) {
   loadCareer();
   // And the catalogue copy (phase 3), never in the embedded strip: the shelf names its awards from it offline.
   loadCatalogue();
+  // And the shelf this phone last read (get_awards()): Progress shows it with no signal.
+  loadShelf();
   // NOTHING BELOW MAY HOLD THE SPINNER OPEN INDEFINITELY. Four server round
   // trips run before the first paint, and on a bad connection — the hotel wifi
   // that answers the handshake and then stalls — a fetch neither resolves nor

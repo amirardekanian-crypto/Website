@@ -341,7 +341,9 @@ mission if one is set.
 - the four numbers: weeks held (current and best), sessions with Amir, personal bests, comebacks (a free athlete's four
   come from habits);
 - the title worn and the titles owned;
-- badges by meaning, with tier, metal and date; recent achievements;
+- once the catalogue switch is on, the **core** of the career: every award id owned, the ladder, the nearest goals, the moments to tell. The
+  shelf (badges by meaning with tier, metal and the day of each tier, achievements, the full titles list, recent awards) is a second read,
+  **`get_awards()`**, asked for only when a shelf opens (*Phase 3, as built*);
 - this week's missions with progress; the active quest with its steps;
 - moments waiting to be shown.
 
@@ -560,7 +562,7 @@ became, and the choices the build had to make:
 `supabase/stage69_career_xp_switch.sql` (with the seed of `rulebook.toml` version 2: both switches `"off"`), rehearsed by
 `scripts/career/rehearse_switch.mjs` (PGlite, the schema snapshot, a full backup of the real rows, phase 1 as it stands on the live
 project, then stage69, Season 1, the dry run, the switch, the refusals, settling, a season closing under the switch, an erasure, the
-cache's cost and the way back: 42 of 42 on 2026-10-17), then applied to the live project late that day with the switches still off (every level, both boards and `career_compare()` identical before and after, 34 of 34); the way back is `scripts/career/rollback_stage69.sql`, tested there. **Switched on 2026-10-18** (`rulebook.toml` version 3, `[switch] xp = "2026-10-18"`, the dry run first, on Amir's yes to its list: 31 up, 7 the same, nobody down, 0 levels kept). What the
+cache's cost and the way back: 42 of 42 on 2026-10-17, 49 of 49 on 2026-10-18 after the repair below), then applied to the live project late that day with the switches still off (every level, both boards and `career_compare()` identical before and after, 34 of 34); the way back is `scripts/career/rollback_stage69.sql`, tested there. **Switched on 2026-10-18** (`rulebook.toml` version 3, `[switch] xp = "2026-10-18"`, the dry run first, on Amir's yes to its list: 31 up, 7 the same, nobody down, 0 levels kept). What the
 procedures above became, and the choices the build made:
 
 - **The two switches.** `rulebook.toml` → `[switch]`: `xp` (phase 2) and `catalogue` (phase 3), each `"off"` or the day it was turned on.
@@ -620,9 +622,9 @@ procedures above became, and the choices the build made:
 `supabase/stage70_career_rewards.sql` (safe to re-run; the build is **not applied** to the live project, and the catalogue switch is off), rehearsed by
 `scripts/career/rehearse_catalogue.mjs` (PGlite, the schema snapshot, a full backup of the real rows, phases 1 and 2 as they stand on the live project,
 then stage70, the go-day, live mints on made-up athletes, partial calls, the stamp, voids, the queue, timing, a re-seed, an erasure and the way back:
-**156 of 156 on 2026-10-18**), with the way back in `scripts/career/rollback_stage70.sql` (tested there: dry run first). The apps ship ready and behave
+**163 of 163 on 2026-10-18**, 196 s here), with the way back in `scripts/career/rollback_stage70.sql` (tested there: dry run first). The apps ship ready and behave
 exactly as phase 2 until the switch is on: `catalogueOn()` in `habits.html` and `catalogueOnT()` in `program.html` are the profile's `switch.catalogue`
-and a `ladder` and `owned` that the server only fills once it is on. Decisions D1 to D17 are not answered; the recommendation of each is what is built
+and an `owned` (a list of award ids) and a `ladder` that the server only fills once it is on. Decisions D1 to D17 are not answered; the recommendation of each is what is built
 (*The decisions, round 4*, in `CAREER_MODE.md`).
 
 **Words.** The **switch day** `S` is the day `[switch] catalogue` was turned on. **History** is a crossing day `d <= S` (the switch day counts as history on
@@ -630,7 +632,7 @@ both sides: the server's `hist := d <= S`, the phone's `live := d > S`). The **a
 `badge:<item>:<tier>`, `badge:<item>:<tier>:<habit>` (only `habit_tiers`), `achievement:<item>`, `title:<item>`; built only by `career_award_id()` and
 `awardId()` (both phones; a twin). A tier is its 1-based place in the entry's `tiers`, so **tiers are append-only** (*P16*, `tiers.lock.json`).
 
-**The functions** (every one is service-only; `get_profile()` and `mark_moments_told()` are the only doors for a signed-in athlete):
+**The functions** (every one is service-only; `get_profile()`, `get_awards()` and `mark_moments_told()` are the only doors for a signed-in athlete):
 - `career_catalogue_on()`: the switch is a day. With it off, every function below does nothing and `get_profile()` answers exactly as in phase 2.
 - `career_measures(athlete, ctx, keys)`: **one pass**. Each key (`run:<habit>`, `hits`, `sum`, `with3`, `perfect`, `qualify`, `daystreak`, `cbrun`,
   `stuck`, `count:<kind>`, `weeks`, `iso:<kind>`, `maxpct`) is one set-based statement over `career_facts` and answers `{have, now, steps}`: `steps` are the
@@ -683,11 +685,28 @@ more than about 1.5 s on a lock (`python scripts/career_seed.py --catalogue-step
 milestones up to `S`, because each award copies one crossing (same day, same price). So **career XP after = career XP before + the back-pay** (D2, D14), and
 no level goes down. Season points do move (D1); the dry run lists them. Rehearsed through the real scorer on every athlete, including the longest.
 
-**The profile.** `get_profile()` adds, without changing a phase 2 key: `catalogue_version`, `numbers.four` (and `numbers.free`), `owned` (every award id with its
-day: the dedupe key), `badges` (the best tier held per badge, newest first), `achievements`, `titles`, `title_worn`, `slam`, `ladder` (every live badge:
-`have`, `now`, `next`, `next_tier`, `metal_next`, `size_next`, `phone`), `near` (the nearest goals), `moments` and `recent`. Absent keys read as null in
-both apps (the **size budget**: 14 KB on the longest career, 13.7 KB on 2026-10-18). On a failed evaluate it answers from the stored cache with
-`rewards_stale`. Switch off: `{badges: [], achievements: [], moments: []}` and nothing else new.
+**The profile, in two reads** (the fix round of 2026-10-18; before it `get_profile()` carried everything and the longest real career came to 19.5 KB against a
+14 KB budget).
+- **The core, `get_profile()`**, adds without changing a phase 2 key: `catalogue_version`, `numbers.four` (and `numbers.free`), **`owned`** (every award id, a
+  list sorted byte by byte, **no days**: the phones' dedupe key and the shelf's held mark), `title_worn`, `slam`, `ladder` (every live badge: `have`, `now`,
+  `next`, `next_tier`, `metal_next`, `size_next`, `phone`), `near` (the nearest goals) and `moments`. Its `badges` and `achievements` are still the empty
+  lists phase 2 had, placeholders and never "none earned"; it carries no `titles` list and no `recent`. Its size grows with a career by one id an award and
+  nothing else. Absent keys read as null in both apps. On a failed evaluate it answers from the stored cache with `rewards_stale`.
+  Switch off: `{badges: [], achievements: [], moments: []}` and nothing else new.
+- **The shelf, `get_awards(p_athlete_id default null)`**, security definer, stable, writes nothing and works nothing out (`get_profile()` evaluates): `athlete_id`,
+  `catalogue` (the switch day), `catalogue_version`, `badges` (one row per badge, per habit for a `habit_tiers` ladder, newest first, each with `days`: the day of
+  each tier, tier 1 first, null for a tier skipped; a retired row is the line "Earned before: HUMAN SPRINKLER II"), `achievements`, `titles` (the full list, with
+  Proof's `hab_titles` rows) and `recent` (the last 7 days, at most 10, each with its share `spec`). The access rule is `get_profile()`'s: the athlete their own,
+  the coach anyone's, the SQL editor and the service role anyone's; a signed-in other athlete is refused. Switch off: the same keys, empty, `catalogue` null.
+  Execute is granted to `authenticated` and the service role, not to `anon`; the way back drops it.
+- **Sizes**, compact JSON, on the real rows of 2026-10-17: the core of the largest real career (elmira_askari, 58 awards) 7.6 KB (the ladder 3.5 KB, `owned` 1.4 KB);
+  a simulated 208-award career 8.7 KB; the shelf of the same two 6.7 KB and 18.5 KB. The 14 KB budget is the core's.
+- **The phone's shelf cache (AA Proof).** `fetchShelf()` asks for `get_awards()` when Progress opens (once in 15 s) and when the shelf is drawn stale
+  (`shelfStale()`: none yet, another `catalogue_version`, or a different number of awards owned; once per state in a run, so no signal never loops). The last
+  answer is kept under `<id>_hab_shelf` as `{ v, n, at, a }`. `careerView()` is the core with the shelf's four lists laid over it, and every reader of those lists
+  goes through it. Until the shelf comes, the rows are the core's ladder and owned list. The catalogue reveal waits for the catalogue copy or the shelf to
+  say what each award is, so it never counts four zeros over earned awards. The training app does not read the shelf: it uses `moments` and `owned` only,
+  and a reward AA Proof has already told is no band there (`PROGRAM-APP.md`).
 
 **The queue (D7).** `mark_moments_told(athlete, award_ids, app)` (the athlete's own, `proof` or `training`) stamps `told_at`. In both apps: a moment opens
 only from a server answer received in this run, never the cached profile at first paint; the award id is marked seen locally **before** the moment shows
@@ -704,11 +723,31 @@ numbers and the nearest goal on Home's Career row, and `APP_GUIDE` (`PROGRAM-APP
 
 **The twins** (P13): `awardId()` (both phones), `awardMeasures()` + `phoneAwardsFrom()` (`habits.html`), `careerMoves()` (`program.html`) and the five events'
 goals (`habits.html` `EVENTS`, equal to `achievements.toml`). `scripts/check_twins.js` §10 holds them to `scripts/career/reward_cases.json`, the server's
-own answers, which `rehearse_catalogue.mjs` writes (`--write-cases`) and checks on every run. `scripts/headless/career.js`, `sharecard.js`,
+own answers, which `rehearse_catalogue.mjs` writes (`--write-cases`) and checks on every run, **and** to a measure grown by hand, one a day, for every entry the
+phone decides and every tier (91 checks: the cases never cross `habit_custom`, `the_centurion`, `cold_blood`, `backbone` or any top tier, and a drift in one phone
+function now names the entry). `phoneAwardsFrom()` takes `owned` as the core's list of ids (the older map `{id: day}` reads the same). Section 10 reads the toml
+through `career_seed.py --json`; in the hook (index mode) the toml, the seed script, the checker and the snapshot are cut out of the **index**, like `habits.html`, so a
+file edited and not staged is never held against a staged one. **The guard now runs when `habits.html`, a `career/*.toml`, `scripts/career_seed.py` or one of the
+three `*_cases.json` files is staged**, not only for `program.html`, `coach.html` and `chips.js` (pre-commit guard 15); each of these used to pass it unrun.
+`scripts/test_check_twins.js` breaks the files on purpose (94 mutations) and requires the guard to name the entry that drifted. All 65,307 checks agree. `scripts/headless/career.js`, `sharecard.js`,
 `highlight-reel.js` and `proof-cards.js` drive both apps.
 
-**Measured on PGlite** (slower than the live project), on the longest real log: a Proof save costs 44 ms more, a session save 2 ms more (budget 300); the first
-full evaluate 67 ms (budget 500); the skip path 0.5 ms (budget 10); the baseline for all 51 athletes took 3 s.
+**Measured on PGlite** (slower than the live project), on the longest real log (elmira_askari, 673 facts in the backup of 2026-10-05, 796 in the backup of
+2026-10-17). Backup of 2026-10-05: a Proof save costs 45 ms more, a session save 3 ms more (budget 300); the first full evaluate 68 ms (budget 500); the skip
+path 0.5 ms (budget 10); the baseline for all 51 athletes 3 s. Backup of 2026-10-17, the last run (the three rehearsals ran at once, so it is the slow side): a Proof save 75 ms more, a session save 12 ms more; the first
+full evaluate 123 ms; the skip path 0.6 ms; the baseline for 43 athletes 5 s; the slowest first full evaluate of any athlete 143 ms. **`get_profile()` on the skip path is
+a growth budget**, not an absolute: it may cost at most 100 ms more than phase 2's `get_profile()` on the same log, measured in the same run (it cost between 7 ms
+less and 0.1 ms more in two runs; the call itself takes 56 to 115 ms here because it reads the whole season). `get_awards()` takes about 2 ms.
+
+**The rehearsals start from the snapshot now** (2026-10-18). `supabase/schema_snapshot.sql` is the live structure and already holds stage66 and stage69 (and holds
+stage70 once it is live), and a rehearsal that applied stage66 on top of it broke on `coach_erase_person()`. `scripts/career/rehearse_lib.mjs` (shared, not a
+rehearsal) holds what the three need: `ensureStages()` applies, each twice, only the stages the database does not hold, in order, and says what the snapshot
+already holds; `filesAt()` cuts the career files of a commit out of git, with that commit's own checker and seed script (`PHASE1_REV` 94cdc89, the rulebook the
+live project was seeded from; `PHASE2_REV` a219d5a), so phase 1 and 2 stay the rehearsals of phase 1 and 2 whatever the working files say now. `rehearse.mjs`
+(50 of 50) takes `--phase1 <rev>` and `--no-stage70`; `rehearse_switch.mjs` (49 of 49) first takes the snapshot's stage70 and stage69 off with their own
+way-back files (so the way back is tested by what follows), then seeds phase 1 and phase 2 from their commits, and takes `--phase1`, `--phase2` and `--no-stage70`
+too; `rehearse_catalogue.mjs` (163 of 163) takes `--cases-file <path>` with `--write-cases`, to look at a change to the cases before replacing them. Stage70 goes on
+the project as it will stand when phase 3 ships (XP switch on), and the way back is run twice.
 
 **The go-day** (rollout step 4, after D1, D10 and D11 are answered): backup, `--catalogue-steps` batches 1 and 2, Amir reads the lines, the seed that only
 flips the switch, the baseline batches, `career_compare()`, then one commit with the toml dated, `privacy.html` §2.3 and its *Last updated* (the text is

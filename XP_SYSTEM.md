@@ -422,6 +422,10 @@ the career, the season and the week like any fact (§8). Three things keep this 
 3. **A disagreement is withdrawn, never kept.** A pending award the server still does not hold after a push of the same log is
    withdrawn on that phone (`<id>_hab_awwd`), its XP and its line go, and the console names it (`[career] twin disagrees`).
 
+"Owned" is the core's: `get_profile().owned` is a **list** of award ids (byte order, no days, stage70's split), read through
+`ownedIds()`. The shelf's rows with their days are `get_awards()`'s, read only when Progress opens (`HABITS.md` → *Two reads: the
+core and the shelf*); no XP number reads them.
+
 **Retired, never removed.** HEAVY METAL (it paid sessions on days in a row, which means skipping a rest day: Hold Serve replaces
 it), THE MACHINIST (Century counts the same sessions), HARD TO KILL (widened to training returns as *comebacks*), the seven habit
 families and the per-habit tiers are earned as Proof earned them up to the switch and never after. Anyone who has one keeps it:
@@ -635,6 +639,8 @@ only from an answer of this run, and each answer tells the server what Proof has
 app never replays one. `CFG.seenAwards` holds every award id that has had its moment (synced, unioned). **The catalogue reveal**
 is the switch's one moment, once per athlete (`checkCatalogueReveal()`, `CFG.catalogueSeen`): *MY RECORD · Your record*, the
 four counts, the Grand Slam row and the road's rewards. The flip re-baselines in silence and never toasts *XP system updated*.
+The counts are read from the catalogue copy (or the shelf), never the core's placeholder lists, so the reveal waits, absorbing
+levels in silence and opening nothing else, until one of them is on the phone.
 The day streak keeps its takeover on every new streak (D17); its award, once a career, never opens a second one.
 
 **The day streak celebration is new** (Amir: *"the app used to say nothing about the
@@ -1207,7 +1213,7 @@ matters, held by `scripts/check_twins.js` §10 to `scripts/career/reward_cases.j
 | SQL | App | What breaks if they drift |
 |---|---|---|
 | `career_measures()` / `career_badge_eval()` / `career_achievement_eval()` for the phone-decidable entries | `awardMeasures()` (pure) in `habits.html` | A tap celebrates a step the server does not mint (withdrawn, quietly) or misses one it does |
-| the open window, the switch day as history, the price (§3.6 of the build spec) | `phoneAwardsFrom()` (pure), wrapped by `phoneAwards()` | The XP shown at the tap is not what the server pays |
+| the open window, the switch day as history, the price (§3.6 of the build spec) | `phoneAwardsFrom()` (pure), wrapped by `phoneAwards()`; `owned` is the core's list of ids (the older `{ id: day }` map reads the same) | The XP shown at the tap is not what the server pays |
 | `career_award_id()` | `awardId()` in both apps | One award gets two ids: shown twice, or never told |
 | the events' `goals` in `achievements.toml` | `EVENTS` in `habits.html` | An event finishes on the phone and not on the server |
 

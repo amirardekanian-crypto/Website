@@ -76,8 +76,8 @@ const NORMAL = [
     caption: 'Three missions, three done.', captionFa: 'سه مأموریت، هر سه انجام شد.', date: D } },
   { id: 'title', card: { kind: 'title', first: FIRST, name: 'CLOCKWORK', meaning: 'consistency', metal: 'prismatic',
     from: 'Hold Serve, prismatic: 52 weeks held in a row', fromFa: 'هفته‌های کامل، منشوری: ۵۲ هفتهٔ پشت‌سرهم', date: D } },
-  // Career Mode phase 3 (the catalogue switch): the spec get_profile() hands over for a reward (scripts/career/rehearse_catalogue.mjs; moments[].spec and
-  // recent[].spec), with no nameFa, captionFa or fromFa yet (Amir writes them): a Farsi card must fall back to the English words and still fit, in Persian digits.
+  // Career Mode phase 3 (the catalogue switch): the spec the server hands over for a reward (scripts/career/rehearse_catalogue.mjs; get_profile()'s moments[].spec and
+  // get_awards()'s recent[].spec), with no nameFa, captionFa or fromFa yet (Amir writes them): a Farsi card must fall back to the English words and still fit, in Persian digits.
   { id: 'badge-server', card: { kind: 'badge', first: FIRST, name: 'Hold Serve', meaning: 'consistency', metal: 'emerald', tier: 3, n: 12, caption: '12 weeks held in a row. You keep showing up.', date: D } },
   { id: 'badge-server-habit', card: { kind: 'badge', first: FIRST, name: 'HUMAN SPRINKLER', meaning: 'consistency', metal: 'bronze', tier: 1, n: 5, caption: '5 days in a row on full water.', date: D } },
   { id: 'badge-server-upgrade', card: { kind: 'badge', first: FIRST, name: 'The Upgrade', meaning: 'progress', metal: 'silver', tier: 2, n: 22, caption: 'Your most improved lift is 22% stronger than its first session, at the same effort.', date: D } },

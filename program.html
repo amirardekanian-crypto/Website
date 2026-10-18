@@ -10449,7 +10449,7 @@ function careerEarnHTML(e) {
 }
 // ── CAREER MODE PHASE 3: REWARDS WITH MEANINGS (the catalogue switch; career/CAREER_MODE.md, GAME-13, GAME-14) ─────────────────────────────
 // Once the catalogue switch is on the server fills get_profile() with the ladder (every badge the phone may name, with the count and the next
-// tier), `owned` (every award id, the dedupe key), `near`, `numbers.four`, `moments` and `recent` (the rewards to tell). This app shows them in
+// tier), `owned` (a list of every award id, the dedupe key), `near`, `numbers.four` and `moments` (the rewards to tell; `recent` is the shelf's). This app shows them in
 // FOUR places and no new screen (D13): the finish card's lines (careerMoves(), under the XP), the finished card's bands (collectRewardBands(),
 // in the Highlight Reel's slot), reward moments (maybeRewardMoment(), through openMoment()) and two more small lines on Home's Career row. Every
 // branch is behind catalogueOnT(): with the switch off the app is exactly what phase 2 shipped. The full shelf, the Grand Slam and the
@@ -10461,6 +10461,13 @@ var _momentQ;        // the full-screen rewards waiting at the last answer (a li
 var _rwOpened;       // a full-screen moment of ANY kind opened in this run: no award opens full screen on top of it (D7: one per open)
 function catalogueOnT() {
   return careerOnT() && !!(CAREER_T.p.switch && CAREER_T.p.switch.catalogue) && !!CAREER_T.p.ladder && !!CAREER_T.p.owned;
+}
+// Every award id the profile says is owned. Since the profile split (stage70) get_profile()'s `owned` is a LIST of award ids, sorted, with no
+// days (it was a map {id: day}: Object.keys() of the list gives array indices and owned[id] is undefined). The day an award was earned is the
+// shelf's (get_awards(): badges[].days, achievements[].day), which this app never reads. The old map shape is still read (a saved answer).
+function ownedIds(p) {
+  const o = p && p.owned;
+  return Array.isArray(o) ? o.filter(id => typeof id === 'string') : (o && typeof o === 'object' ? Object.keys(o) : []);
 }
 // The one key for a reward everywhere (the server's career_award_id()): badge:<item>:<tier>[:<subject>] · achievement:<item> · title:<item>.
 function awardId(kind, item, tier, subject) {
@@ -10638,16 +10645,18 @@ function collectRewardBands(day) {
   if (!raw || !raw.saved || !(CAREER_T.at > raw.saved) || !Array.isArray(raw.snap)) return;
   const sess = localStorage.getItem(ATHLETE_ID + '_completed_d' + day) || '';
   if (!sess) return;
-  const p = CAREER_T.p, owned = p.owned || {}, was = new Set(raw.snap), on = sessionDateFor(day);
+  const p = CAREER_T.p, owned = ownedIds(p), was = new Set(raw.snap), on = sessionDateFor(day);
   let cur = null;
   try { cur = JSON.parse(localStorage.getItem(winKey(day)) || 'null'); } catch (e) { cur = null; }
   if (!cur || cur.sess !== sess || !Array.isArray(cur.specs)) cur = { sess, specs: [] };
   const had = (cur.rewards || []).filter(r => r && !r.counting);
   const haveIds = new Set(had.map(r => r.award_id)), seen = rwSeenGet();
   const rows = {};
+  // The core profile carries `moments` (the rewards still to tell, each with its spec) and no `recent`: that is the shelf's, read only when AA
+  // Proof opens it (get_awards()). So a reward AA Proof has already told is no band here; this app makes no call of its own for it.
   (p.recent || []).concat(p.moments || []).forEach(m => { if (m && m.award_id && m.spec && m.spec.kind) rows[m.award_id] = m; });   // moments win
   const add = [];
-  Object.keys(owned).forEach(id => {
+  owned.forEach(id => {
     if (was.has(id) || haveIds.has(id) || seen[id]) return;
     const m = rows[id];
     if (!m || !m.spec || m.size === 'tick' || rwIsFull(m)) return;
@@ -10700,7 +10709,8 @@ function maybeRewardMoment(reason, day) {
   let list = (p.moments || []).filter(m => m && m.spec && m.spec.kind && rwIsFull(m) && !seen[m.award_id]);
   if (reason === 'done') {
     const raw = rwEarnRaw(day), was = new Set(raw && Array.isArray(raw.snap) ? raw.snap : []);
-    list = list.filter(m => !was.has(m.award_id) && p.owned[m.award_id]);
+    const own = new Set(ownedIds(p));
+    list = list.filter(m => !was.has(m.award_id) && own.has(m.award_id));
   } else if (_rwOpened || document.body.classList.contains('session-on')) list = [];
   list.sort((a, b) => (rwSizeRank(b.size)) - (rwSizeRank(a.size)) || String(b.day || '').localeCompare(String(a.day || '')));
   _momentQ = list;
@@ -10753,7 +10763,7 @@ function careerEarnAtDone(day) {
       before: Number(CAREER_T.p.career && CAREER_T.p.career.xp) || 0, saved: 0 };
     // Career Mode phase 3: every award this phone knows at Done (the finished card's new rewards are what the next answer adds to it) and
     // the lines the finish card showed (the phone-decided crossings become "Counting" bands).
-    if (catalogueOnT()) { rec.snap = Object.keys(CAREER_T.p.owned || {}); rec.moves = e.moves; }
+    if (catalogueOnT()) { rec.snap = ownedIds(CAREER_T.p); rec.moves = e.moves; }
     _lsRawSet(ATHLETE_ID + '_earn_d' + day, JSON.stringify(rec));
   } catch (err) { /* storage full: the finished card simply has no line */ }
 }
@@ -12637,13 +12647,34 @@ function foldWhenDone(card, openStrips) {
 // Nothing left to do in the day: the way on is the finish card (rate, then Done), and it sits at the very end of a
 // long page. Take the athlete to it, as folding a card takes them to the next one. Only once the last card has closed,
 // never mid-card, and never in Guided (which has its own way to the finish card).
+// Brings the finish card into view, centred (the ready card, and Guided's last button). With Career Mode's catalogue on the card can carry the
+// lines of what the session moves (.cf-moves, phase 3), which makes it taller than a short phone: centring then cuts its top off or sends Done
+// under the fold. So when that line is there and the centred card is off, it slides: its top onto the screen if Done stays on the screen, and
+// Done wins when both cannot be. Moved instantly to measure, then smoothly to where it ended (no jump). Without the line it is the plain centring.
+function scrollFinishCard(card) {
+  if (!card) return;
+  const y0 = window.scrollY;
+  if (!card.querySelector('.cf-moves')) { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  let y1 = y0;
+  try {
+    card.scrollIntoView({ behavior: 'instant', block: 'center' });
+    const r = card.getBoundingClientRect(), btn = card.querySelector('.confirm-btn'), b = btn && btn.getBoundingClientRect();
+    if (b && b.height) {
+      const room = (window.innerHeight - 8) - b.bottom, slide = Math.min(Math.max(0, -r.top), room);   // down = card moves down = scroll up
+      if (slide) window.scrollBy(0, -slide);
+    }
+    y1 = window.scrollY;
+  } catch (e) { y1 = y0; }
+  window.scrollTo({ top: y0, behavior: 'instant' });
+  window.scrollTo({ top: y1, behavior: 'smooth' });
+}
 function nudgeFinishCard(day) {
   if (typeof STEP !== 'undefined' && STEP) return;
   const left = [...document.querySelectorAll(`.checklist-item[data-day="${day}"]`)]
     .some(c => !c.classList.contains('checked') && !c.classList.contains('rd-skip'));
   if (left) return;
   const conf = document.getElementById('confirm-' + day);
-  if (conf && conf.classList.contains('visible')) conf.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (conf && conf.classList.contains('visible')) scrollFinishCard(conf);
 }
 
 function updateProgress(day) {
@@ -16355,7 +16386,7 @@ function stepFinish() {
   // Rate, then Done (WK-04): the card asks the rating when every set is done, or offers
   // "Finish early" when a circuit or a warm-up is still open.
   refreshConfirmCard(day);
-  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  scrollFinishCard(card);
 }
 
 function stepAfterDone() {
@@ -17927,12 +17958,15 @@ function paintWinBand(day, quiet) {
   const d = esc(String(day)), attr = t => esc(t).replace(/"/g, '&quot;');
   const items = o.specs.map(s => ({ s, reward: false })).concat(rewards.map(s => ({ s, reward: true })));
   const share = hlShareList(o);
+  // Catalogue off: phase 2's behaviour exactly. Every paint that is not quiet re-draws the bands and runs their is-new burst, and the phone
+  // buzzes. Catalogue on: a band burst and a buzz only for a key not on screen yet, so a repaint with the same answer stays still.
+  const on = catalogueOnT();
   const had = new Set(Array.prototype.map.call(slot.querySelectorAll('[data-bk]'), b => b.getAttribute('data-bk')));
   let fresh = false;
   const html = items.slice(0, 3).map((it, i) => {
     const s = it.s;
     const key = it.reward ? s.award_id : s.kind + ':' + s.lift;
-    const isNew = !quiet && !had.has(key);
+    const isNew = !quiet && (!on || !had.has(key));
     if (isNew) fresh = true;
     const cls = 'hl-band' + (isNew ? ' is-new' : '');
     if (!it.reward) {
@@ -17951,8 +17985,8 @@ function paintWinBand(day, quiet) {
       <span class="hl-band-t"><small>${esc(what)}</small><b>${esc(nm)}</b></span>
       <span class="hl-band-go" aria-hidden="true">Share</span></button>`;
   }).join('') + (items.length > 3 ? `<small class="hl-band-more">+${items.length - 3} more in AA Proof</small>` : '');
-  if (slot.innerHTML !== html) slot.innerHTML = html;
-  if (fresh && navigator.vibrate) navigator.vibrate([12, 60, 12]);
+  if (!on || slot.innerHTML !== html) slot.innerHTML = html;
+  if ((on ? fresh : !quiet) && navigator.vibrate) navigator.vibrate([12, 60, 12]);
 }
 function openShareFromBand(day, i) { const o = loadWins(day); if (o) openShareSheet(hlShareList(o), i); }
 window.openShareFromBand = openShareFromBand;

@@ -121,10 +121,15 @@ async function toReady(p) {
 // ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 // Career Mode PHASE 3: rewards with meanings (the catalogue switch; career/CAREER_MODE.md, supabase/stage70_career_rewards.sql, spec §6, §8, §9, §12.5)
 // ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-// The stub profile follows the shape get_profile() really answers (scripts/career/rehearse_catalogue.mjs on PGlite): a null inside a ladder entry,
-// a badge row or an achievement row is not there at all (jsonb_strip_nulls), a retired badge row carries only its id, subject, tier, of, name,
-// meaning and superseded_by (never a day or a metal), `near` rows carry only id, name, have, next, pct, and `recent` rows have no created_at.
-// `rwProfile()` builds one; the catalogue's rows (what AA Proof fetches from career_catalogue) are career/*.toml through scripts/career_seed.py --json.
+// The stub follows the shapes the server really answers (scripts/career/rehearse_catalogue.mjs on PGlite), in the TWO reads of stage70's split:
+//   get_profile(), the CORE   `owned` is a LIST of award ids sorted byte by byte, with no days (it was a map {id: day}); `badges` and `achievements` are the
+//                             placeholders [] and there is no `titles` or `recent` at all; the ladder, `near`, `slam`, `numbers.four` and `moments` as before.
+//   get_awards(), the SHELF   the rows: every badge (a live row has `day` and `days`, a retired one only id, subject, name, meaning, tier, of, superseded_by and
+//                             `days`, a retired per-habit row only id, subject, meaning, tier and `days`), the milestones, the titles, and `recent` (always
+//                             with a spec). With the catalogue off it is { athlete_id, catalogue: null, badges: [], achievements: [], titles: [], recent: [] }.
+// a null inside a ladder entry is not there at all (jsonb_strip_nulls); `near` rows carry only id, name, have, next, pct.
+// `rwProfile()` builds the core and keeps its shelf beside it (`rwShelf(core)`); `stubSet(core)` is the JS that makes the stub answer both, for a page that
+// changes its answer live. The catalogue's rows (what AA Proof fetches from career_catalogue) are career/*.toml through scripts/career_seed.py --json.
 const cp = require('child_process');
 const REPO = path.join(__dirname, '..', '..');
 let _catRows = null;
@@ -165,7 +170,11 @@ const badgeSpec = (name, meaning, metal, tier, n, caption, date) => ({ kind: 'ba
 // A waiting moment, as get_profile() lists it (full: the server's own call, from the size and the age).
 const mom = (id, size, full, xp, spec, extra) => Object.assign({ award_id: id, kind: id.split(':')[0], item: id.split(':')[1], tier: Number(id.split(':')[2]) || null,
   size, day: (spec && spec.date) || at(-1), full, xp, spec }, extra || {});
-// One athlete's get_profile() with the catalogue on (o.S = the switch day, null = phase 2's answer with the catalogue off).
+// One athlete's get_profile() with the catalogue on: the CORE (o.S = the switch day, null = phase 2's answer with the catalogue off). Its shelf, what
+// get_awards() answers, is kept beside it (rwShelf(core)); o.owned / o.badges / o.achievements / o.titles / o.recent / o.version describe both.
+// `owned` may be given as the old map { id: day } or a list of ids: the core's answer is the list, sorted byte by byte.
+const SHELVES = new WeakMap();
+const ownedList = x => Array.from(new Set(Array.isArray(x) ? x : Object.keys(x || {}))).sort();
 function rwProfile(xp, o = {}) {
   const S = o.S === undefined ? at(-3) : o.S;
   const free = !!o.free;
@@ -182,29 +191,45 @@ function rwProfile(xp, o = {}) {
   };
   if (S === null) return p;
   p.numbers.four = o.four || four;
-  return Object.assign(p, {
-    catalogue_version: o.version || '4@1760774400',
-    owned: Object.assign({ 'badge:held_weeks:1': at(-60), 'badge:held_weeks:2': at(-20), 'achievement:first_best': at(-50), 'badge:human_sprinkler:2': at(-45),
-      'badge:habit_tiers:2:water': at(-45), 'title:clockwork': at(-20) }, o.owned || {}),
-    badges: o.badges || [
-      strip({ id: 'held_weeks', name: 'Hold Serve', meaning: 'consistency', tier: 2, of: 5, metal: 'silver', day: at(-20), n: 8, caption: '8 weeks held in a row. You keep showing up.' }),
-      strip({ id: 'human_sprinkler', name: 'HUMAN SPRINKLER', meaning: 'consistency', tier: 2, of: 3, retired: true, superseded_by: 'habit_water' }),
-      strip({ id: 'habit_tiers', subject: 'water', name: 'Consistency Tiers', meaning: 'consistency', tier: 2, of: 5, retired: true })],
-    achievements: o.achievements || [{ id: 'first_best', name: 'First Best', meaning: 'progress', day: at(-50), size: 'highlight', caption: 'Your first personal best. Not the last.' }],
-    titles: o.titles || [{ id: 'clockwork', hab_id: 'clockwork', name: 'CLOCKWORK', meaning: 'consistency', metal: 'prismatic', from: 'Hold Serve, prismatic: 52 weeks held in a row', day: at(-20), source: 'award' }],
+  const version = o.version || '4@1760774400';
+  Object.assign(p, {
+    catalogue_version: version,
+    // the core: the ids and nothing else (the days are the shelf's); `badges` and `achievements` stay the placeholders [] above
+    owned: ownedList(Object.assign({ 'badge:held_weeks:1': 1, 'badge:held_weeks:2': 1, 'achievement:first_best': 1, 'badge:human_sprinkler:2': 1,
+      'badge:habit_tiers:2:water': 1, 'title:clockwork': 1 }, Array.isArray(o.owned) ? Object.fromEntries(o.owned.map(id => [id, 1])) : (o.owned || {}))),
     title_worn: o.worn === undefined ? null : o.worn,
     slam: o.slam || { consistency: { id: 'clockwork', name: 'CLOCKWORK', day: at(-20) }, commitment: null, progress: null, resilience: null, grand: null },
     ladder: o.ladder || RW_LADDER,
     near: o.near || [{ id: 'full_log', name: 'Paper Trail', have: 9, next: 10, pct: 90 }, { id: 'century', name: 'Century', have: 24, next: 25, pct: 96 }],
-    moments: o.moments || [], recent: o.recent || [],
+    moments: o.moments || [],
   });
+  // the shelf: get_awards()'s rows (a live badge row has `day` and `days`; days[i] is the day tier i+1 was earned, null for a tier skipped)
+  SHELVES.set(p, {
+    catalogue_version: version,
+    badges: o.badges || [
+      strip({ id: 'held_weeks', name: 'Hold Serve', meaning: 'consistency', tier: 2, metal: 'silver', day: at(-20), caption: '8 weeks held in a row. You keep showing up.', days: [at(-60), at(-20)] }),
+      strip({ id: 'human_sprinkler', name: 'HUMAN SPRINKLER', meaning: 'consistency', tier: 2, of: 3, retired: true, superseded_by: 'habit_water', days: [null, at(-45)] }),
+      strip({ id: 'habit_tiers', subject: 'water', meaning: 'consistency', tier: 2, retired: true, days: [null, at(-45)] })],
+    achievements: o.achievements || [{ id: 'first_best', name: 'First Best', meaning: 'progress', day: at(-50), size: 'highlight', caption: 'Your first personal best. Not the last.' }],
+    titles: o.titles || [{ id: 'clockwork', hab_id: 'clockwork', name: 'CLOCKWORK', meaning: 'consistency', metal: 'prismatic', from: 'Hold Serve, prismatic: 52 weeks held in a row', day: at(-20), source: 'award' }],
+    recent: o.recent || [],
+  });
+  return p;
 }
+// get_awards()'s answer for a core made by rwProfile(): the shelf with the catalogue on, null with it off (the stub then answers the empty shelf).
+function rwShelf(core) {
+  const sh = core && SHELVES.get(core);
+  if (!sh || !core.switch || !core.switch.catalogue) return null;
+  return Object.assign({ athlete_id: core.athlete_id, catalogue: core.switch.catalogue }, sh);
+}
+// The JS that makes the stub answer a core AND its shelf, for a page whose answer changes live (the stub keeps both under window.__STUB).
+const stubSet = core => `window.__STUB.profile = ${JSON.stringify(core)}, window.__STUB.awards = ${JSON.stringify(rwShelf(core))}`;
 const RW_RULES = [{ version: 4, switch: { xp: SWX, catalogue: 'off' } }];     // the training app's Hold Serve read; the catalogue switch is the profile's
 const rwLog = (n = 6, more) => { const L = {}; for (let i = 1; i <= n; i++) L[at(-i)] = { water: 8, sleep: 8, steps: 11000, fuel: 3 }; return Object.assign(L, more || {}); };
 // AA Proof on a catalogue profile: UTC (so "today" is this script's), the career reveal already shown (careerSeen), the catalogue as the server holds it.
 const rwProof = (prof, extra = {}) => Object.assign({ tz: 'UTC' }, extra, {
   seed: Object.assign({ _hab_log: extra.log || rwLog() }, extra.seed || {}),
-  stub: Object.assign({ profile: prof, tables: { career_rules: RW_RULES, career_facts: [], career_catalogue: catRows() } }, extra.stub || {}),
+  stub: Object.assign({ profile: prof, awards: rwShelf(prof), tables: { career_rules: RW_RULES, career_facts: [], career_catalogue: catRows() } }, extra.stub || {}),
   cfg: Object.assign({ careerSeen: SWX }, extra.cfg || {}) });
 const ev = (p, src) => p.evaluate(src);
 const toldCalls = p => p.evaluate(() => (window.__STUB.params || []).filter(x => x[0] === 'mark_moments_told').map(x => x[1]));
@@ -236,9 +261,9 @@ async function proofCatalogue(browser, C) {
   // 1. switch off: AA Proof draws exactly what it drew before phase 3 (Today, Progress, the Locker), and never asks for the catalogue
   {
     const baseHtml = gitShow(OFF_REF, 'habits.html');
-    const one = async (base, prof) => {
+    const one = async (base, prof, w, dark) => {
       const o = rwProof(prof, { cfg: { careerSeen: prof ? SWX : null } });
-      const { ctx, p } = await H.openProof(base ? atBaseline(browser, { '/habits.html': baseHtml }) : browser, Object.assign({ w: 390, h: 844 }, o));
+      const { ctx, p } = await H.openProof(base ? atBaseline(browser, { '/habits.html': baseHtml }) : browser, Object.assign({ w, h: 844, dark }, o));
       await p.waitForTimeout(1500);
       await p.evaluate(() => { UI.celebrate = []; render(); });
       const out = {};
@@ -248,14 +273,17 @@ async function proofCatalogue(browser, C) {
         out[tab] = normHTML(await p.evaluate(() => document.querySelector('#scroll').innerHTML));
       }
       out.catCalls = await calls(p, 'from:career_catalogue');
+      out.awardsAsked = await calls(p, 'rpc:get_awards');
       out.errs = p.errs.slice();
       await ctx.close();
       return out;
     };
-    for (const [label, prof] of [['no profile', null], ['phase 2 profile, catalogue switch null', rwProfile(10000, { S: null })]]) {
-      const a = await one(true, prof), b = await one(false, prof);
+    for (const [w, dark] of [[390, false], [320, true]]) for (const [label0, prof] of [['no profile', null], ['phase 2 profile, catalogue switch null', rwProfile(10000, { S: null })]]) {
+      const label = label0 + (w === 390 ? '' : `, ${w} px${dark ? ' dark' : ''}`);
+      const a = await one(true, prof, w, dark), b = await one(false, prof, w, dark);
       ['today', 'progress', 'pass'].forEach(t => C.check(`Proof, catalogue off (${label}): ${t} is drawn as before phase 3`, a[t] === b[t], a[t] === b[t] ? a[t].length + ' chars' : firstDiff(a[t], b[t])));
       C.check(`Proof, catalogue off (${label}): the catalogue is never asked for`, b.catCalls === 0, b.catCalls);
+      C.check(`Proof, catalogue off (${label}): the shelf (get_awards) is never asked for, Progress opened`, b.awardsAsked === 0, b.awardsAsked);
       C.check(`Proof, catalogue off (${label}): no page errors`, b.errs.length === 0, JSON.stringify(b.errs));
     }
   }
@@ -320,7 +348,7 @@ async function proofCatalogue(browser, C) {
     await p.waitForTimeout(1500);
     C.check('Proof, the flip: before it nothing is queued', (await ev(p, `UI.celebrate.length`)) === 0);
     const lv0 = await ev(p, `overallLevel().lv`);
-    await ev(p, `(window.__STUB.profile = ${JSON.stringify(rwProfile(18000))}, 0)`);
+    await ev(p, `(${stubSet(rwProfile(18000))}, 0)`);
     await ev(p, `fetchCareer()`);
     await p.waitForTimeout(800);
     const q = await celebrating(p), lv1 = await ev(p, `overallLevel().lv`);
@@ -373,8 +401,8 @@ async function proofCatalogue(browser, C) {
     C.check('Proof, withdrawal: the XP shown falls by exactly what the pending award had added', wd.shown <= xp.shown - 20, JSON.stringify([xp.shown, wd.shown]));
     // and when the server owns it: nothing withdrawn, nothing pending, no second line
     await ev(p, `(localStorage.removeItem(ATHLETE_ID + '_hab_awwd'), _awwd = null, 0)`);
-    const own = JSON.parse(JSON.stringify(prof)); own.owned['badge:habit_water:1'] = at(0); own.career.xp = 10020;
-    await ev(p, `(window.__STUB.profile = ${JSON.stringify(own)}, 0)`);
+    const own = rwProfile(10020, { owned: { 'badge:habit_water:1': at(0) } });
+    await ev(p, `(${stubSet(own)}, 0)`);
     await ev(p, `fetchCareer()`);
     await p.waitForTimeout(300);
     const ok = await ev(p, `({ wd: loadWithdrawn().length, pend: pendingAwardXp() })`);
@@ -392,7 +420,7 @@ async function proofCatalogue(browser, C) {
     const { ctx, p } = await H.openProof(browser, rwProof(rwProfile(10000), { cfg: { catalogueSeen: S3 } }));
     await p.waitForTimeout(2500);
     C.check('Proof, moments: the boot before them is quiet', (await ev(p, `UI.celebrate.length`)) === 0);
-    await ev(p, `(window.__STUB.profile = ${JSON.stringify(prof)}, 0)`);
+    await ev(p, `(${stubSet(prof)}, 0)`);
     await ev(p, `fetchCareer()`);
     await p.waitForTimeout(400);
     const q = await celebrating(p);
@@ -423,7 +451,7 @@ async function proofCatalogue(browser, C) {
     const { ctx, p } = await H.openProof(browser, rwProof(rwProfile(10000), { cfg: { catalogueSeen: S3 } }));
     await p.waitForTimeout(2500);
     await ev(p, `(CFG.seen._overall = overallLevel().lv - 1, saveCfg(), 0)`);
-    await ev(p, `(window.__STUB.profile = ${JSON.stringify(rwProfile(10200, { moments: [m], owned: { 'badge:held_weeks:3': at(-1) } }))}, 0)`);
+    await ev(p, `(${stubSet(rwProfile(10200, { moments: [m], owned: { 'badge:held_weeks:3': at(-1) } }))}, 0)`);
     await ev(p, `fetchCareer()`);
     await p.waitForTimeout(500);
     const q = await celebrating(p);
@@ -441,7 +469,7 @@ async function proofCatalogue(browser, C) {
     const old = mom('badge:held_weeks:3', 'milestone', false, 600, badgeSpec('Hold Serve', 'consistency', 'emerald', 3, 12, '12 weeks held in a row.', at(-20)));
     const { ctx, p } = await H.openProof(browser, rwProof(rwProfile(10000), { cfg: { catalogueSeen: S3 } }));
     await p.waitForTimeout(2000);
-    await ev(p, `(window.__STUB.profile = ${JSON.stringify(rwProfile(10000, { moments: [old], owned: { 'badge:held_weeks:3': at(-20) } }))}, 0)`);
+    await ev(p, `(${stubSet(rwProfile(10000, { moments: [old], owned: { 'badge:held_weeks:3': at(-20) } }))}, 0)`);
     await ev(p, `fetchCareer()`);
     await p.waitForTimeout(400);
     C.check('Proof, a milestone not shown within the keep days is a wins line, not a takeover', (await ev(p, `UI.celebrate.length`)) === 0
@@ -455,7 +483,7 @@ async function proofCatalogue(browser, C) {
     await p.waitForTimeout(2000);
     const before = await ev(p, `({ xp: overallXp(), tiers: bonusEvents().filter(e => e.kind === 'tier' || e.kind === 'milestone').length })`);
     await ev(p, `(SYNC.dirty = true, _pushedXp = phoneXp(), 0)`);
-    await ev(p, `(window.__STUB.profile = ${JSON.stringify(rwProfile(20000, { S: at(-1) }))}, 0)`);
+    await ev(p, `(${stubSet(rwProfile(20000, { S: at(-1) }))}, 0)`);
     await ev(p, `fetchCareer()`);
     await p.waitForTimeout(500);
     const after = await ev(p, `({ xp: overallXp(), tiers: bonusEvents().filter(e => e.kind === 'tier' || e.kind === 'milestone').length, cat: catalogueOn(), pend: pendingAwardXp() })`);
@@ -584,13 +612,114 @@ async function proofCatalogue(browser, C) {
   }
 }
 
+// ── The core and the shelf (stage70's split, 2026-10-18): get_profile() carries the ids, get_awards() the rows, read only when Progress opens ──
+// get_profile()'s `owned` is a LIST of award ids, its `badges` and `achievements` are the placeholders [] (never "none earned") and it has no `titles` or `recent`. The rows
+// are get_awards()'s: AA Proof reads them when Progress opens (fetchShelf()), keeps the last answer on this phone under <id>_hab_shelf (never synced), asks again when the
+// catalogue version or the count of owned awards moved, and never reads them in the embedded strip, the coach's preview or the demo, or with the catalogue off.
+async function proofShelf(browser, C) {
+  const S3 = at(-3);
+  const asked = p => calls(p, 'rpc:get_awards');
+  const goProgress = async p => { await ev(p, `(go('progress'), 0)`); await p.waitForFunction(() => typeof shelfLoaded === 'function', null, { timeout: 3000 }).catch(() => {}); await p.waitForTimeout(700); };
+  const statfrac = p => ev(p, `(document.querySelector('.statgrid .statfrac') || { textContent: null }).textContent`);
+  const awardParams = p => p.evaluate(() => (window.__STUB.params || []).filter(x => x[0] === 'get_awards').map(x => x[1]));
+  // 1. Today reads the core alone
+  {
+    const { ctx, p } = await H.openProof(browser, rwProof(rwProfile(10000), { cfg: { catalogueSeen: S3 } }));
+    await p.waitForTimeout(2200);
+    await swallowTakeovers(p);
+    const core = await ev(p, `({ list: Array.isArray(CAREER.p.owned), sorted: CAREER.p.owned.join() === CAREER.p.owned.slice().sort().join(), n: CAREER.p.owned.length, badges: CAREER.p.badges.length,
+      ach: CAREER.p.achievements.length, titles: 'titles' in CAREER.p, recent: 'recent' in CAREER.p, shelf: shelfLoaded(), ready: catalogueReady(), on: catalogueOn() })`);
+    C.check('Proof, the core: owned is a list of award ids in byte order, badges and achievements are the placeholders [], no titles and no recent', core.on && core.ready && core.list && core.sorted && core.n === 6 && core.badges === 0 && core.ach === 0 && !core.titles && !core.recent, JSON.stringify(core));
+    C.check('Proof, the core: a placeholder [] is not "none earned": the shelf is not loaded and nothing was asked for yet', core.shelf === false && (await asked(p)) === 0, JSON.stringify([core.shelf, await asked(p)]));
+    await ev(p, `(go('today'), go('pass'), go('today'), 0)`);
+    await p.waitForTimeout(600);
+    C.check('Proof, the core: Today and the Locker alone never ask for the shelf', (await asked(p)) === 0, await asked(p));
+    // 2. Progress opens the shelf: one read, with the athlete's id, then the rows are laid over the core
+    await goProgress(p);
+    const a1 = await asked(p), prm = await awardParams(p);
+    const view = await ev(p, `({ loaded: shelfLoaded(), badges: careerView().badges.length, ach: careerView().achievements.length, titles: careerView().titles.length, owned: Array.isArray(careerView().owned), n: careerView().owned.length,
+      kept: !!localStorage.getItem(ATHLETE_ID + '_hab_shelf'), synced: JSON.stringify(CFG).includes('hab_shelf') || Object.keys(typeof _snapshot === 'function' ? _snapshot() : {}).some(k => /hab_shelf/.test(k)) })`);
+    C.check('Proof, Progress opens the shelf: ONE get_awards, for this athlete', a1 === 1 && prm.length === 1 && prm[0] && prm[0].p_athlete_id === H.ID, JSON.stringify([a1, prm]));
+    C.check('Proof, the shelf is laid over the core (3 badge rows, 1 milestone, 1 title), owned stays the core\'s list', view.loaded && view.badges === 3 && view.ach === 1 && view.titles === 1 && view.owned && view.n === 6, JSON.stringify(view));
+    C.check('Proof, the shelf is kept on this phone and is never synced', view.kept && !view.synced, JSON.stringify(view));
+    await goProgress(p);
+    C.check('Proof, Progress opened again at once: the shelf is not asked for again', (await asked(p)) === a1, [a1, await asked(p)]);
+    const frac = await statfrac(p);
+    // 3. the award count moves (a session earned one): the shelf is stale, and is read again behind the screen
+    const base = rwProfile(10000), rows = rwShelf(base).badges;
+    const grown = rwProfile(10100, { owned: { 'badge:dawn_patrol:1': at(-1) }, badges: rows.concat([strip({ id: 'dawn_patrol', name: 'DAWN PATROL', meaning: 'commitment', tier: 1, metal: 'bronze', day: at(-1), caption: 'Days with three or more habits logged: 1.', days: [at(-1)] })]) });
+    await ev(p, `(${stubSet(grown)}, 0)`);
+    await ev(p, `fetchCareer()`);
+    await p.waitForTimeout(1200);
+    const again = await ev(p, `({ n: CAREER.p.owned.length, rows: careerView().badges.map(b => b.id), loaded: shelfLoaded() })`);
+    C.check('Proof, a new award in the core: the shelf is read again and shows it', (await asked(p)) === 2 && again.n === 7 && again.rows.indexOf('dawn_patrol') >= 0 && again.loaded, JSON.stringify([await asked(p), again]));
+    C.check('Proof, the shelf screen: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
+    // 4. the next open with no signal: the kept shelf answers
+    await p.evaluate(() => { const c = JSON.parse(localStorage.getItem('__stubcfg')); c.mode = 'offline'; localStorage.setItem('__stubcfg', JSON.stringify(c)); });
+    await p.reload({ waitUntil: 'domcontentloaded' });
+    await p.waitForFunction(() => document.getElementById('app') && document.getElementById('app').textContent.length > 200, null, { timeout: 20000 }).catch(() => {});
+    await p.waitForTimeout(1500);
+    await goProgress(p);
+    const off = await ev(p, `({ loaded: shelfLoaded(), rows: careerView().badges.map(b => b.id) })`);
+    C.check('Proof, no signal: the shelf this phone kept answers (the new row included), the screen draws', off.loaded && off.rows.indexOf('dawn_patrol') >= 0 && (await statfrac(p)) !== null, JSON.stringify(off));
+    C.check('Proof, no signal: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
+    await ctx.close();
+    // 5. the shelf cannot be read (stalled, refused): the screen still draws, the count is the core\'s, the read is not looped
+    for (const [name, stub] of [['stalled', { stall: { get_awards: true } }], ['refused', { refuse: ['get_awards'] }]]) {
+      const x = await H.openProof(browser, rwProof(rwProfile(10000), { cfg: { catalogueSeen: S3 }, stub }));
+      await x.p.waitForTimeout(2200);
+      await swallowTakeovers(x.p);
+      await goProgress(x.p);
+      await x.p.waitForTimeout(1500);
+      const st = await ev(x.p, `({ loaded: shelfLoaded(), badges: careerView().badges.length, n: ownedIds().length, scroll: document.getElementById('scroll').textContent.length })`);
+      C.check(`Proof, the shelf ${name}: Progress draws from the core, no rows, the same Milestones count as with the shelf`, !st.loaded && st.badges === 0 && st.n === 6 && st.scroll > 300 && (await statfrac(x.p)) === frac, JSON.stringify([st, frac, await statfrac(x.p)]));
+      C.check(`Proof, the shelf ${name}: asked once, not looped, no page errors`, (await asked(x.p)) === 1 && x.p.errs.length === 0, JSON.stringify([await asked(x.p), x.p.errs]));
+      await x.ctx.close();
+    }
+    // 6. what is never kept: the empty answer a server gives with the catalogue off, and another athlete's copy
+    const off2 = { athlete_id: H.ID, catalogue: null, badges: [], achievements: [], titles: [], recent: [] };
+    const z = await H.openProof(browser, rwProof(rwProfile(10000), { cfg: { catalogueSeen: S3 }, stub: { awards: off2 } }));
+    await z.p.waitForTimeout(2200);
+    await swallowTakeovers(z.p);
+    await goProgress(z.p);
+    C.check('Proof, an empty shelf answer ({ catalogue: null }) is never kept and never read as "none earned"', !(await ev(z.p, `shelfLoaded()`)) && !(await ev(z.p, `localStorage.getItem(ATHLETE_ID + '_hab_shelf')`)), await asked(z.p));
+    await z.ctx.close();
+    const other = Object.assign({}, rwShelf(rwProfile(10000)), { athlete_id: 'someone_else' });
+    const w = await H.openProof(browser, rwProof(rwProfile(10000), { cfg: { catalogueSeen: S3 }, seed: { _hab_shelf: { v: '4@1760774400', n: 6, at: Date.now(), a: other } }, stub: { stall: { get_awards: true } } }));
+    await w.p.waitForTimeout(2200);
+    C.check('Proof, another athlete\'s kept shelf on this phone is not used', !(await ev(w.p, `shelfLoaded()`)), await ev(w.p, `shelfLoaded()`));
+    await w.ctx.close();
+  }
+  // 7. never asked: the catalogue off (a phase 2 profile, no profile), the embedded strip, the coach's preview, the demo
+  for (const [name, prof, url, extra] of [['the catalogue off', rwProfile(10000, { S: null }), null, {}], ['no profile', null, null, {}],
+    ['embedded', rwProfile(10000), '/habits.html?embed=1', { seed: { _hab_career: { p: rwProfile(10000), at: Date.now(), base: 0 } } }]]) {
+    const o = rwProof(prof, Object.assign({ cfg: { catalogueSeen: prof ? S3 : null } }, url ? { url } : {}, extra));
+    const x = await H.openProof(browser, o);
+    await x.p.waitForTimeout(1800);
+    await ev(x.p, `(typeof go === 'function' ? go('progress') : 0, 0)`);
+    await x.p.waitForTimeout(700);
+    C.check(`Proof, ${name}: get_awards is never asked, no shelf is kept, no page errors`, (await asked(x.p)) === 0 && !(await ev(x.p, `localStorage.getItem(ATHLETE_ID + '_hab_shelf')`)) && x.p.errs.length === 0, JSON.stringify([await asked(x.p), x.p.errs]));
+    await x.ctx.close();
+  }
+  // the coach's preview looks at the athlete's Progress, so the shelf may be read for the screen, but nothing is kept on the coach's phone
+  {
+    const x = await H.openProof(browser, rwProof(rwProfile(10000), { cfg: { catalogueSeen: S3 }, url: '/habits.html?preview=1' }));
+    await x.p.waitForTimeout(1800);
+    await goProgress(x.p);
+    const kept = await ev(x.p, `localStorage.getItem(ATHLETE_ID + '_hab_shelf')`), loaded = await ev(x.p, `shelfLoaded()`);
+    C.check("Proof, the coach's preview: Progress draws the shelf, nothing is kept on this phone, nothing told, no page errors", loaded && !kept && (await calls(x.p, 'rpc:mark_moments_told')) === 0 && x.p.errs.length === 0, JSON.stringify([loaded, !!kept, x.p.errs]));
+    await x.ctx.close();
+  }
+}
+
 // ── The training app, catalogue switch on and off (spec §9) ───────────────────────────────────────────────────────────────────────────────
 const params = (p, name) => p.evaluate(n => (window.__STUB.params || []).filter(c => c[0] === n).map(c => c[1]), name);
 const rwSeenOf = p => p.evaluate(id => JSON.parse(localStorage.getItem(id + '_rw_seen') || 'null'), H.ID);
 // The training app on a catalogue profile: UTC, the fixture's two-day plan dated so that the current cycle's week 2 is under way (prog()).
 async function openRW(browser, o = {}) {
+  const prof = o.profile === null ? null : (o.profile || rwProfile(10000));
   const stub = Object.assign({ tables: { career_rules: RW_RULES, career_facts: o.facts || [], career_catalogue: catRows() } },
-    o.profile === null ? {} : { profile: o.profile || rwProfile(10000) }, o.stub || {});
+    prof === null ? {} : { profile: prof, awards: rwShelf(prof) }, o.stub || {});
   return H.openProgram(browser, Object.assign({ w: o.w || 390, h: 844, tz: 'UTC', prog: o.prog || prog(), hist: o.hist || [], stub, seed: o.seed || {}, query: o.query || '' }, o.opts || {}));
 }
 async function trainingCatalogue(browser, C) {
@@ -601,8 +730,8 @@ async function trainingCatalogue(browser, C) {
   // 1. the catalogue switch off: the app is exactly what it was before phase 3 (Home, the finish card)
   {
     const baseHtml = gitShow(OFF_REF, 'program.html');
-    const one = async base => {
-      const o = { w: 390, h: 844, tz: 'UTC', prog: prog(), hist: [], seed: {}, stub: { tables: { career_rules: RULES_ON, career_facts: [] }, profile: profile(10000) } };
+    const one = async (base, w, dark) => {
+      const o = { w, h: 844, dark, tz: 'UTC', prog: prog(), hist: [], seed: {}, stub: { tables: { career_rules: RULES_ON, career_facts: [] }, profile: profile(10000) } };
       const { ctx, p } = await H.openProgram(base ? atBaseline(browser, { '/program.html': baseHtml }) : browser, o);
       await waitRow(p);
       const out = { home: normHTML(await p.evaluate(() => document.getElementById('home-overview').innerHTML)) };
@@ -610,15 +739,20 @@ async function trainingCatalogue(browser, C) {
       out.confirm = normHTML(await p.evaluate(() => document.getElementById('confirm-1').innerHTML));
       out.snap = await p.evaluate(() => Object.keys(_snapshot()).filter(k => /_rw_seen|_careercache|_earn_d/.test(k)).sort());
       out.on = await p.evaluate(() => typeof catalogueOnT === 'function' ? catalogueOnT() : false);
+      out.awardsAsked = await calls(p, 'rpc:get_awards');
       out.errs = p.errs.slice();
       await ctx.close();
       return out;
     };
-    const a = await one(true), b = await one(false);
-    C.check('training, catalogue off: Home is drawn as before phase 3', a.home === b.home, a.home === b.home ? a.home.length + ' chars' : firstDiff(a.home, b.home));
-    C.check('training, catalogue off: the finish card is drawn as before phase 3', a.confirm === b.confirm, a.confirm === b.confirm ? a.confirm.length + ' chars' : firstDiff(a.confirm, b.confirm));
-    C.check('training, catalogue off: catalogueOnT() is false, nothing of phase 3 is synced', b.on === false && b.snap.join() === a.snap.join(), JSON.stringify([b.on, a.snap, b.snap]));
-    C.check('training, catalogue off: no page errors', b.errs.length === 0, JSON.stringify(b.errs));
+    for (const [w, dark] of [[390, false], [320, true]]) {
+      const at_ = w === 390 ? '' : `, ${w} px${dark ? ' dark' : ''}`;
+      const a = await one(true, w, dark), b = await one(false, w, dark);
+      C.check(`training, catalogue off${at_}: Home is drawn as before phase 3`, a.home === b.home, a.home === b.home ? a.home.length + ' chars' : firstDiff(a.home, b.home));
+      C.check(`training, catalogue off${at_}: the finish card is drawn as before phase 3`, a.confirm === b.confirm, a.confirm === b.confirm ? a.confirm.length + ' chars' : firstDiff(a.confirm, b.confirm));
+      C.check(`training, catalogue off${at_}: catalogueOnT() is false, nothing of phase 3 is synced`, b.on === false && b.snap.join() === a.snap.join(), JSON.stringify([b.on, a.snap, b.snap]));
+      C.check(`training, catalogue off${at_}: the shelf (get_awards) is never asked for`, b.awardsAsked === 0, b.awardsAsked);
+      C.check(`training, catalogue off${at_}: no page errors`, b.errs.length === 0, JSON.stringify(b.errs));
+    }
     // the switch off with the profile still carrying the phase 3 keys (a rollback): no phase 3 line anywhere
     const { ctx, p } = await openRW(browser, { profile: Object.assign(rwProfile(10000), { switch: { xp: SWX, catalogue: null } }) });
     await waitRow(p);
@@ -629,7 +763,7 @@ async function trainingCatalogue(browser, C) {
     await p.evaluate(() => document.querySelector('#home-career-wrap .hrow').click());
     await p.waitForTimeout(600);
     C.check('training, catalogue switch back off: a tap opens the Locker (go=pass)', /&go=pass/.test(p.url()), p.url());
-    C.check('training, catalogue switch back off: no page errors', !p.errs.length, JSON.stringify(p.errs));
+    C.check('training, catalogue switch back off: no page errors, the shelf (get_awards) never asked for', !p.errs.length && (await calls(p, 'rpc:get_awards')) === 0, JSON.stringify([p.errs, await calls(p, 'rpc:get_awards')]));
     await ctx.close();
   }
   // 2. the Career row with the catalogue on
@@ -723,7 +857,7 @@ async function trainingCatalogue(browser, C) {
     const after = rwProfile(10470, { sessions: 25, owned: { 'badge:century:2': TODAY, 'badge:full_log:1': TODAY }, moments: [
       mom('badge:century:2', 'highlight', false, 100, badgeSpec('Century', 'commitment', 'silver', 2, 25, '25 sessions with Amir. That is a habit.')),
       mom('badge:full_log:1', 'win', false, 50, badgeSpec('Paper Trail', 'commitment', 'bronze', 1, 10, '10 sessions logged in full.'))] });
-    await p.evaluate(a => { window.__STUB.profile = a; }, after);
+    await p.evaluate(s => { eval(s); }, stubSet(after));
     const counting = await p.evaluate(() => {
       finishTap('1', document.querySelector('#confirm-1 .confirm-btn'));
       return [...document.querySelectorAll('#hlwin-1 .hl-band')].map(b => ({ t: b.innerText.replace(/\s+/g, ' ').trim(), tag: b.tagName, share: !!b.querySelector('.hl-band-go') }));
@@ -732,7 +866,7 @@ async function trainingCatalogue(browser, C) {
     C.check('training, Done: nothing is told or marked seen from the phone\'s guess', (await params(p, 'mark_moments_told')).every(a => !a.p_award_ids.includes('badge:century:2')));
     await p.waitForTimeout(1800);
     const rec = await p.evaluate(id => JSON.parse(localStorage.getItem(id + '_earn_d1')), H.ID);
-    C.check('training, Done: the day\'s record keeps the awards owned at Done, the finish card\'s lines and the save stamp', Array.isArray(rec.snap) && rec.snap.slice().sort().join() === Object.keys(rwProfile(0).owned).sort().join() && rec.moves && rec.moves.lines.length === 2 && rec.saved > 0, JSON.stringify({ snap: rec.snap, saved: rec.saved }));
+    C.check('training, Done: the day\'s record keeps the awards owned at Done, the finish card\'s lines and the save stamp', Array.isArray(rec.snap) && rec.snap.slice().sort().join() === rwProfile(0).owned.join() && rec.moves && rec.moves.lines.length === 2 && rec.saved > 0, JSON.stringify({ snap: rec.snap, saved: rec.saved }));
     const conf = await p.evaluate(() => [...document.querySelectorAll('#hlwin-1 .hl-band')].map(b => ({ t: b.innerText.replace(/\s+/g, ' ').trim(), tag: b.tagName, share: !!b.querySelector('.hl-band-go'), em: !!b.querySelector('em'), color: getComputedStyle(b.querySelector('.hl-band-t b') || b).color })));
     C.check('training, after the answer: both bands confirmed (Counting gone, Share there), the metal word is plain text and never clay', conf.length === 2 && conf.every(b => b.tag === 'BUTTON' && b.share && !b.em && !/COUNTING/i.test(b.t) && !CLAY.test(b.color)) && /^BADGE CENTURY · SILVER/i.test(conf[0].t), JSON.stringify(conf));
     const told = await params(p, 'mark_moments_told');
@@ -772,7 +906,7 @@ async function trainingCatalogue(browser, C) {
     const mk = (i, size) => mom('badge:b' + i + ':1', size, false, 50, badgeSpec('Badge ' + i, 'progress', 'bronze', 1, i, 'c'));
     const ms = [1, 2, 3, 4, 5].map(i => mk(i, i === 3 ? 'highlight' : 'win'));
     const owned = {}; ms.forEach(m => { owned[m.award_id] = TODAY; });
-    await q.p.evaluate(a => { window.__STUB.profile = a; finishTap('1', document.querySelector('#confirm-1 .confirm-btn')); }, rwProfile(10470, { owned, moments: ms }));
+    await q.p.evaluate(s => { eval(s); finishTap('1', document.querySelector('#confirm-1 .confirm-btn')); }, stubSet(rwProfile(10470, { owned, moments: ms })));
     await q.p.waitForTimeout(2200);
     const bands = await q.p.evaluate(() => ({ b: [...document.querySelectorAll('#hlwin-1 .hl-band')].map(b => b.innerText.replace(/\s+/g, ' ').trim()), more: (document.querySelector('#hlwin-1 .hl-band-more') || {}).textContent }));
     C.check('training, five rewards: three bands (the highlight first) and one grey "+N more in AA Proof"', bands.b.length === 3 && /Badge 3/i.test(bands.b[0]) && bands.more === '+2 more in AA Proof', JSON.stringify(bands));
@@ -792,6 +926,22 @@ async function trainingCatalogue(browser, C) {
     const only = await s.p.evaluate(() => [...document.querySelectorAll('#hlwin-1 .hl-band')].map(b => b.tagName));
     C.check('training, no fresh answer yet: only the phone\'s own Counting bands (no Share), nothing confirmed', only.length === 2 && only.every(t => t === 'DIV'), JSON.stringify(only));
     await s.ctx.close();
+  }
+  // an award the other app has already told is owned but no longer waiting, and the core carries no `recent` (that is the shelf's, which this app does not read): there is no
+  // spec to confirm the phone's Counting band with. The band goes (it is never left "Counting"), and nothing throws or is marked seen or told for it.
+  {
+    const { ctx, p } = await openRW(browser, {});
+    await waitRow(p);
+    await toReady(p);
+    await p.evaluate(() => document.querySelector('#confirm-1 .complete-rpe-btn[data-rpe="7"]').click());
+    const told = rwProfile(10470, { sessions: 25, owned: { 'badge:century:2': TODAY, 'badge:full_log:1': TODAY }, moments: [] });
+    await p.evaluate(s => { eval(s); }, stubSet(told));
+    const c0 = await p.evaluate(() => { finishTap('1', document.querySelector('#confirm-1 .confirm-btn')); return document.querySelectorAll('#hlwin-1 .hl-band').length; });
+    await p.waitForTimeout(2200);
+    const left = await p.evaluate(() => [...document.querySelectorAll('#hlwin-1 .hl-band')].map(b => b.innerText.replace(/\s+/g, ' ').trim()));
+    C.check('training, an award the other app already told (owned, not waiting): no band is left "Counting", nothing marked seen or told for it, no page errors',
+      c0 === 2 && left.every(t => !/COUNTING/i.test(t)) && !(await rwSeenOf(p)) && (await params(p, 'mark_moments_told')).every(a => !a.p_award_ids.includes('badge:century:2')) && !p.errs.length, JSON.stringify({ c0, left, errs: p.errs }));
+    await ctx.close();
   }
   // 7. moments: one per open, never from the phone's copy, no replay, the other app's catch-up
   {
@@ -853,7 +1003,7 @@ async function trainingCatalogue(browser, C) {
     await waitRow(p);
     await p.evaluate(m => {
       const w = document.createElement('div'); w.className = 'wel'; w.id = 'fakewel'; document.body.appendChild(w);
-      CAREER_T.p.moments = [m]; CAREER_T.p.owned['badge:held_weeks:3'] = at0(); maybeRewardMoment('open');
+      CAREER_T.p.moments = [m]; CAREER_T.p.owned = (CAREER_T.p.owned || []).concat('badge:held_weeks:3'); maybeRewardMoment('open');
       function at0() { return new Date().toISOString().slice(0, 10); }
     }, m1);
     await p.waitForTimeout(400);
@@ -881,7 +1031,7 @@ async function trainingCatalogue(browser, C) {
     const m = mom('badge:full_log:2', 'milestone', true, 200, badgeSpec('Paper Trail', 'commitment', 'silver', 2, 10, '10 full logs.'));
     // the rating box is being typed in: a moment waits (the row stays unseen)
     const ta = await p.evaluate(() => { const t = document.querySelector('#confirm-1 .finish-rate textarea, #confirm-1 .finish-rate input'); if (t) t.focus(); return !!t; });
-    await p.evaluate(a => { window.__STUB.profile = a; }, rwProfile(10470, { owned: { 'badge:full_log:2': TODAY }, moments: [m] }));
+    await p.evaluate(s => { eval(s); }, stubSet(rwProfile(10470, { owned: { 'badge:full_log:2': TODAY }, moments: [m] })));
     if (ta) {
       await p.evaluate(() => { CAREER_T.p.moments = window.__STUB.profile.moments; CAREER_T.p.owned = window.__STUB.profile.owned; CAREER_T.at = Date.now(); maybeRewardMoment('open'); });
       await p.waitForTimeout(300);
@@ -963,7 +1113,7 @@ async function crossApp(browser, C) {
     // the server mints it (its row waits, untold); AA Proof's next answer tells it
     const spec = { kind: 'achievement', name: 'THE FOUNDRY', meaning: 'commitment', caption: 'Four weeks of putting the work in.', date: at(0) };
     const minted = rwProfile(30200, { S: S30, owned: { 'achievement:the_foundry': at(0) }, moments: [mom('achievement:the_foundry', 'milestone', true, 0, spec)] });
-    await ev(p, `(window.__STUB.profile = ${JSON.stringify(minted)}, 0)`);
+    await ev(p, `(${stubSet(minted)}, 0)`);
     await ev(p, `fetchCareer()`);
     await p.waitForTimeout(500);
     const told = await toldCalls(p);
@@ -971,7 +1121,7 @@ async function crossApp(browser, C) {
     C.check('cross-app: the server no longer lists it as waiting', (await ev(p, `JSON.parse(localStorage.getItem('__stubcfg')).profile.moments.length`)) === 0);
     await toApp(p, 'training');
     C.check('cross-app: the training app opens SILENT: no moment, nothing marked seen here, no replay', !(await p.$('.hl-moment')) && !(await rwSeenOf(p)), JSON.stringify(await rwSeenOf(p)));
-    C.check('cross-app: …and it knew the award (owned) without a word of it on the screen', await p.evaluate(() => catalogueOnT() && !!CAREER_T.p.owned['achievement:the_foundry']));
+    C.check('cross-app: …and it knew the award (owned) without a word of it on the screen', await p.evaluate(() => catalogueOnT() && CAREER_T.p.owned.indexOf('achievement:the_foundry') >= 0));
     C.check('cross-app: no page errors in either app', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -988,7 +1138,7 @@ async function crossApp(browser, C) {
     await ev(p, `(CFG.pass = CFG.pass || { owned: [], title: null, card: null }, CFG.pass.owned = PASS_TRACK.map(t => t.id), saveCfg(), UI.celebrate = [], render(), 0)`);
     await ev(p, `(setVal('fuel', 3), actionLevelUps(), render(), 0)`);
     await p.waitForTimeout(200);
-    await p.evaluate(m => { const c = JSON.parse(localStorage.getItem('__stubcfg')); c.profile = m; localStorage.setItem('__stubcfg', JSON.stringify(c)); }, minted);   // minted, never told
+    await p.evaluate(([m, aw]) => { const c = JSON.parse(localStorage.getItem('__stubcfg')); c.profile = m; c.awards = aw; localStorage.setItem('__stubcfg', JSON.stringify(c)); }, [minted, rwShelf(minted)]);   // minted, never told
     await toApp(p, 'training');
     C.check('cross-app, control: with no catch-up the training app opens the same award (so the silence above comes from the catch-up)', await p.evaluate(() => !!document.querySelector('.hl-moment')));
     await ctx.close();
@@ -1231,6 +1381,7 @@ async function main() {
 
   // ── Career Mode phase 3 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   await proofCatalogue(browser, C);
+  await proofShelf(browser, C);
   if (typeof trainingCatalogue === 'function') await trainingCatalogue(browser, C);
   if (typeof crossApp === 'function') await crossApp(browser, C);
 
@@ -1238,4 +1389,4 @@ async function main() {
   process.exitCode = C.report() ? 1 : 0;
 }
 if (require.main === module) main().catch(e => { console.error(e); process.exitCode = 1; });
-module.exports = { rwProfile, rwLog, catRows, rwProof, mom, badgeSpec, RW_LADDER, RW_RULES, at, lvl, SWX, strip, toReady, tickAll, waitRow, T, proofCatalogue, trainingCatalogue: typeof trainingCatalogue === 'function' ? trainingCatalogue : null, crossApp: typeof crossApp === 'function' ? crossApp : null };
+module.exports = { rwProfile, rwShelf, stubSet, proofShelf, rwLog, catRows, rwProof, mom, badgeSpec, RW_LADDER, RW_RULES, at, lvl, SWX, strip, toReady, tickAll, waitRow, T, proofCatalogue, trainingCatalogue: typeof trainingCatalogue === 'function' ? trainingCatalogue : null, crossApp: typeof crossApp === 'function' ? crossApp : null };
