@@ -9,9 +9,11 @@
 //     rest: it lives in a variable of this file (memory only, a reload starts fresh), and opening the game again for the same session
 //     key (program.html passes the day and the local date) picks it up where it was ("Play resumes · You 6, Amir 4"). A rest that ends
 //     or hands back PARKS it and never ends it; only Full time counts a match played or won; Done drops it (Rally.endSession(day)).
-//   · Bajada (2026-10-18): a goal that came off the glass counts 2. After a racket's last touch the ball hits the glass (a side wall
-//     or an end wall beside the gap, never a post) faster than BANK_MIN of its top speed and then goes through the far gap with no
-//     other racket in between: the player whose racket it was scores 2. An own goal off the glass is 1 for the other side, as ever.
+//   · Bajada (2026-10-18): a goal that came off the glass IN PLAY counts 2. After a racket's last touch the ball hits the glass (a side wall
+//     or an end wall beside the gap, never a post) faster than BANK_MIN of its top speed, while it is still in the shooter's own half or the
+//     first half of the far half (BANK_REACH), and then goes through the far gap with no other racket in between: the player whose racket it
+//     was scores 2. A glass touch nearer the goal than that is a clip, worth 1 (the last fast touch decides). An own goal off the glass is 1
+//     for the other side, as ever.
 //   · Amir defends like a person (The Read, 2026-10-18): he sees the ball a moment late,
 //     walks to where it will cross his end, aims with a small error and now and then mistimes one. His form moves a step after each
 //     point (sharper when you score, softer when he does); nothing changes mid-rally and nothing about it shows on screen.
@@ -39,6 +41,13 @@
   const PLAY_CAP_S = 480; // Full time: 8 minutes of real play a session at most. Only seconds with a point live count (not the serve pause, the end box, a paused rest or the hand-back); then the next point that leaves someone ahead ends it
   const LIT_S = 0.33;     // Bajada: how long the pane lights up
   const BANK_MIN = 0.25;  // Bajada: the ball must hit the glass faster than this share of its top speed for a goal to count 2
+  // Bajada counts a PLAYED bank, not a clip. Measure up the court from the end of whoever hit the ball last (you the bottom end, Amir the top):
+  // a glass touch counts only in the first BANK_REACH of the court, which is their own half plus the first half of the far half (0.75). A touch
+  // nearer the goal than that is a wide shot that clips the side glass on its way in, and the goal is worth 1, as it always was. The LAST fast
+  // glass touch decides, so a ball that banked in play and then clipped near the goal is worth 1. (Until 2026-10-18 every glass touch after the
+  // racket counted: banks were 36% of all goals, nearly all of them clips, and a tired player won only 39% of the first-to-15 matches. Now they are
+  // 19 to 27% of the goals, whoever plays, and Amir's `react` was brought down with it.)
+  const BANK_REACH = 0.75;
   const C = {
     court: '#0E4A36', courtDeep: '#082D20', line: 'rgba(255,255,255,.28)', glass: 'rgba(170,235,205,.55)',
     you: '#FFFFFF', youHole: '#16603F', amir: '#C7552F', amirHole: '#8E3A1E', ball: '#FFFFFF', clay: '#E06B43', mint: '#7FD6AE',
@@ -46,16 +55,18 @@
   const STORE = 'rally_stats';
 
   // Amir's numbers (The Read, 2026-10-18). They were set against bots with a person's limits in scripts/test_rally_sim.js, which
-  // pre-commit guard 22 runs whenever this file changes: move one, run it. The aim is an average player at about 57% of the goals
-  // (a goal is a ball through a gap; about two matches in three, at first to 5 and still at first to 15 with banks counting 2), a sharp one
-  // near 70%, a tired one near 51%, and a bot as quick as a person can be, that misreads three points in ten as Amir does, still under 90%. Of these numbers `react` is the one that moves the shares most; `speed`
-  // and `aim` barely do (the test's bands are too wide to catch them), so judge those two by playing.
+  // pre-commit guard 22 runs whenever this file changes: move one, run it. The aim is an average player at about 54% of the goals
+  // (a goal is a ball through a gap), which is about 70% of the first-to-15 matches (60 to 75 asserted), a sharp one near 68% of the goals and
+  // 98% of the matches (at least 85), a tired one near 50% of the goals and 50% of the matches (45 to 65), and a bot as quick as a person can be,
+  // that misreads three points in ten as Amir does, still under 90%. (With every glass touch counting 2 an average player won 80% of the matches and
+  // a tired one 63%, which is why `react` came down from 0.24, 0.12 when Bajada began counting played banks only.) Of these numbers `react` is the one
+  // that moves the shares most; `speed` and `aim` barely do (the test's bands are too wide to catch them), so judge those two by playing.
   // A pair is [form 0, form 1]. `node scripts/test_rally_sim.js --set speed=1.2 --set react=0.2,0.1` tries a number without editing this.
   const AMIR = {
     speed: 0.95,           // top speed, in court widths a second. Fixed: nothing about him reads the score any more.
     start: 0.5,            // his form at the start of a match (0 to 1: how sharp he is)
     step: 0.2,             // how far his form moves after a point: up when you score, down when he does
-    react: [0.24, 0.12],   // seconds late that he sees the ball
+    react: [0.16, 0.07],   // seconds late that he sees the ball (was 0.24, 0.12 until Bajada counted only played banks: see above)
     aim: [0.28, 0.05],     // furthest his aim point can land from where he meant it in your gap, in court widths
     read: [0.30, 0.015],   // how far off he can misjudge where a shot will cross his end, in court widths (drawn once per shot)
     late: [0.30, 0.02],    // the chance that a point starts with a mistimed read
@@ -294,6 +305,13 @@
     return kind[1] === 'L' ? { x1: l, y1: y, x2: g1, y2: y } : { x1: g2, y1: y, x2: r, y2: y };
   }
 
+  // Bajada: is a glass touch at height y close enough to `who`'s own end to be a played bank? (BANK_REACH; you shoot up from the bottom
+  // end, Amir down from the top.)
+  function playedBank(who, y) {
+    const run = who === 'you' ? B() - y : y - T();   // how far up the court from the shooter's end wall
+    return run <= (B() - T()) * BANK_REACH;
+  }
+
   function walls() {
     const b = S.ball, r = S.br, g1 = S.W / 2 - S.gw / 2, g2 = S.W / 2 + S.gw / 2, e = 0.9;
     const arrive = speed(b);   // how fast it comes at the glass (Bajada: a bank needs more than BANK_MIN of the top speed)
@@ -307,8 +325,10 @@
     }
     [[g1, T()], [g2, T()], [g1, B()], [g2, B()]].forEach(p => hitPost(p[0], p[1]));   // a post is not glass: it never makes a bank
     if (glass && speed(b) > S.vmax * 0.15) tone(180, 0.05, 0.12, 'sine');
-    // Bajada: the glass, after a racket's last touch and at speed. A slower touch changes nothing, and neither takes back an earlier one.
-    if (glass && S.touch && arrive > S.vmax * BANK_MIN) S.glass = pane;
+    // Bajada: the glass, after a racket's last touch and at speed. The last such touch decides: within BANK_REACH of the court from that
+    // racket's own end it is a played bank (its pane lights if the goal counts 2), nearer the goal it is a clip and takes any earlier bank back.
+    // A slower touch changes nothing, and takes nothing back.
+    if (glass && S.touch && arrive > S.vmax * BANK_MIN) S.glass = playedBank(S.touch, b.y) ? pane : null;
     // through the gap: a point
     if (b.y < T() - r * 1.5) point('you');
     else if (b.y > B() + r * 1.5) point('amir');
@@ -375,9 +395,10 @@
     return { t: b.t, x: lo + (x <= w ? x : 2 * w - x), y: Math.max(T(), Math.min(B(), b.y + b.vy * ahead)), vx: b.vx, vy: b.vy, px: b.px };
   }
   // Known, left as it is: seenBall() folds the sighting's x off the side glass but keeps its old vx, so on the (8% of) frames where the
-  // look-ahead crosses a glass his crossX() leans the wrong way, by 57 px at the 90th percentile of those. Flipping vx there is right, and
-  // it moves the shares (average 57.3 to 54.7%, tired 50.8 to 55.0%, so "sharp > average > tired" fails): AMIR was tuned with it as it is,
-  // so fix the two together, with scripts/test_rally_sim.js and a playthrough by Amir.
+  // look-ahead crosses a glass his crossX() leans the wrong way, by 57 px at the 90th percentile of those. Flipping vx there is right. With the
+  // numbers of the first tuning it moved the shares enough to break "sharp > average > tired" (average 57.3 to 54.7%, tired 50.8 to 55.0%); with
+  // the 2026-10-18 retune it does not (24 seeds: average 54.3 to 54.0%, tired 50.1 to 50.4%, sharp 67.4 to 67.8%), so it can be fixed on its own
+  // with scripts/test_rally_sim.js and a playthrough by Amir.
   // Where a ball heading up the court will cross the line y, bouncing off the side glass on the way.
   function crossX(b, y) {
     const lo = L() + S.br, w = R() - S.br - lo;

@@ -7,9 +7,11 @@
 // when there were any, "Off the glass: N.", and its one button is "Back to the timer". 8 minutes of real play (PLAY_CAP_S) end it at the
 // next point that leaves someone ahead; only seconds with a point live count. Done (finishDay) drops the match. The shelf row's small line
 // reads the match: the default, "You 6, me 4 · play resumes", "Full time · you won 15–11".
-// BAJADA. A goal off the glass counts 2: after a racket's last touch the ball hits the glass (side wall or an end wall beside the gap, never a
-// post) faster than 25% of its top speed and then goes through the far gap with no other racket between. "Off the glass +2" for you,
-// "Amir off the glass +2" for Amir, the pane lights mint for 0.33 s; an own goal off the glass is 1 for the other side; a slow touch is no bank.
+// BAJADA. A goal off the glass IN PLAY counts 2: after a racket's last touch the ball hits the glass (side wall or an end wall beside the gap, never a
+// post) faster than 25% of its top speed, while it is still in the shooter's own half or the first half of the far half (BANK_REACH 0.75 of the
+// court from the shooter's own end), and then goes through the far gap with no other racket between. A glass touch nearer the goal is a clip, worth
+// 1, and the LAST fast touch decides. "Off the glass +2" for you, "Amir off the glass +2" for Amir, the pane lights mint for 0.33 s; an own goal off
+// the glass is 1 for the other side; a slow touch is no bank.
 // The court is driven by Rally._tick with the game's animation frame cancelled, so every scenario is exact.
 // Serve the repo first (python -m http.server 8871 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE).
 'use strict';
@@ -65,11 +67,12 @@ async function helpers(p) {
         Rally._tick(1 / 60);
       }
     };
-    // launch off a side wall ('L' or 'R') toward the 'top' (Amir's) or 'bottom' (your) gap at f of the top speed; touch is who touched it last
-    window.__shot = ({ side, toward, f, touch }) => {
+    // launch off a side wall ('L' or 'R') toward the 'top' (Amir's) or 'bottom' (your) gap at f of the top speed; touch is who touched it last;
+    // q is how far up the court from the SHOOTER's end the ball meets the glass (0.55 by default: a played bank; past 0.75 it is a clip)
+    window.__shot = ({ side, toward, f, touch, q = 0.55 }) => {
       const s = Rally._state(), W = s.W, T = s.top, B = bt(s);
       const wall = side === 'L' ? s.pad + s.br + 0.5 : W - s.pad - s.br - 0.5, dir = side === 'L' ? 1 : -1;
-      const y0 = toward === 'top' ? T + 0.45 * (B - T) : B - 0.45 * (B - T), dy = toward === 'top' ? y0 - T : B - y0;
+      const y0 = toward === 'top' ? B - q * (B - T) : T + q * (B - T), dy = toward === 'top' ? y0 - T : B - y0;
       const k = Math.abs(W / 2 - wall) / (dy * 0.9);
       const vy = (toward === 'top' ? -1 : 1) * f * s.vmax / Math.sqrt(1 + k * k);
       Object.assign(s.ball, { x: wall, y: y0, vx: -dir * Math.abs(vy) * k, vy });
@@ -421,15 +424,50 @@ async function helpers(p) {
       return { seen, bounced };
     });
     t.check('h. a ball that hits a post (not the glass) makes no bank', post.bounced && !post.seen, JSON.stringify(post));
-    // i. the end wall beside the gap is glass
+    // i. the end wall beside the gap is glass: the shooter's OWN end wall (Amir's, at the top) is inside the reach, so it is a played bank
+    // (the far end wall is a clip: see j)
     const endWall = await p.evaluate(() => {
       const s = Rally._state(); __stop();
       Object.assign(s.ball, { x: 60, y: s.top + s.br + 4, vx: 0, vy: -s.vmax * 0.7 });
-      s.touch = 'you'; s.glass = null; s.freeze = 0; s.anchor = { x: s.ball.x, y: s.ball.y, t: s.gt };
+      s.touch = 'amir'; s.glass = null; s.freeze = 0; s.anchor = { x: s.ball.x, y: s.ball.y, t: s.gt };
       __drive(3, true);
       return { glass: s.glass && { y1: s.glass.y1, y2: s.glass.y2, x1: s.glass.x1, x2: s.glass.x2 } , top: s.top, g1: s.W / 2 - s.gw / 2 };
     });
-    t.check('i. the end wall beside the gap is glass: the ball off it at speed is a bank, lit from the corner to the post', endWall.glass && endWall.glass.y1 === endWall.top && endWall.glass.y2 === endWall.top && endWall.glass.x1 === 8 && Math.abs(endWall.glass.x2 - endWall.g1) < 1, JSON.stringify(endWall));
+    t.check('i. the end wall beside the gap is glass: off the shooter\'s own end wall at speed is a played bank, lit from the corner to the post', endWall.glass && endWall.glass.y1 === endWall.top && endWall.glass.y2 === endWall.top && endWall.glass.x1 === 8 && Math.abs(endWall.glass.x2 - endWall.g1) < 1, JSON.stringify(endWall));
+    // j. the reach: a glass touch within 0.75 of the court from the shooter's own end is a played bank, one nearer the goal is a clip
+    const reach = await p.evaluate(() => {
+      const s = Rally._state(); __stop();
+      const T = s.top, B = s.H - s.pad - (parseFloat(getComputedStyle(s.root).paddingBottom) || 0), span = B - T, r = {};
+      // a ball at the shooter's side glass, `q` of the way up the court from their end, driven into it at 70% of the top speed; what the glass touch left on the ball
+      const touchAt = (who, q, f = 0.7, earlier = null) => {
+        const left = who === 'you', y = left ? B - q * span : T + q * span;
+        Object.assign(s.ball, { x: left ? s.pad + s.br + 1 : s.W - s.pad - s.br - 1, y, vx: (left ? -1 : 1) * s.vmax * f, vy: 0 });
+        s.touch = who; s.glass = earlier; s.freeze = 0; s.anchor = { x: s.ball.x, y: s.ball.y, t: s.gt };
+        __drive(2, true);
+        return s.glass ? 'bank' : 'none';
+      };
+      r.you = [0.2, 0.5, 0.7, 0.8, 0.9].map(q => touchAt('you', q));
+      r.amir = [0.2, 0.5, 0.7, 0.8, 0.9].map(q => touchAt('amir', q));
+      r.lastDecides = touchAt('you', 0.9, 0.7, { x1: 8, y1: 1, x2: 8, y2: 2 });          // a clip after an earlier bank takes it back
+      r.slowKeeps = touchAt('you', 0.9, 0.2, { x1: 8, y1: 1, x2: 8, y2: 2 });           // a slow touch takes nothing back
+      r.laterBank = touchAt('you', 0.5, 0.7, null);                                      // and a played bank after nothing is a bank
+      return r;
+    });
+    t.check('j. your touches at 20, 50 and 70% of the court from your end are played banks, at 80 and 90% they are clips', JSON.stringify(reach.you) === JSON.stringify(['bank', 'bank', 'bank', 'none', 'none']), JSON.stringify(reach.you));
+    t.check('j. Amir\'s are the same from HIS end (the top)', JSON.stringify(reach.amir) === JSON.stringify(['bank', 'bank', 'bank', 'none', 'none']), JSON.stringify(reach.amir));
+    t.check('j. the LAST fast glass touch decides: a clip takes an earlier bank back, a slow clip does not, a played bank is a bank', reach.lastDecides === 'none' && reach.slowKeeps === 'bank' && reach.laterBank === 'bank', JSON.stringify(reach));
+    // k. a clip scores 1 and shows the plain banner; a played bank 2
+    await p.evaluate(() => __stop());
+    const bk = (await p.evaluate(() => Object.assign({}, Rally._state().m.banked)));
+    await p.evaluate(() => __shot({ side: 'L', toward: 'top', f: 0.8, touch: 'you', q: 0.85 }));
+    g = await p.evaluate(() => __goal());
+    t.check('k. your shot that meets the glass only near Amir\'s end (0.85 of the court) is a clip: 1 point, "Point!", nothing lit, no bank counted', g.you === 1 && g.amir === 0 && g.banner === 'Point!' && g.lit === null && g.glassSeen === false && g.banked.you === bk.you, JSON.stringify(g));
+    await p.evaluate(() => __shot({ side: 'R', toward: 'bottom', f: 0.8, touch: 'amir', q: 0.85 }));
+    g = await p.evaluate(() => __goal());
+    t.check('k. Amir\'s clip near your end is 1 for him: "Amir scores", nothing lit, no bank counted', g.amir === 1 && g.you === 0 && g.banner === 'Amir scores' && g.lit === null && g.glassSeen === false && g.banked.amir === bk.amir, JSON.stringify(g));
+    await p.evaluate(() => __shot({ side: 'L', toward: 'top', f: 0.8, touch: 'you', q: 0.7 }));
+    g = await p.evaluate(() => __goal());
+    t.check('k. the same shot a little earlier (0.70 of the court) is a played bank: 2 points, "Off the glass +2", the pane lit', g.you === 2 && g.banner === 'Off the glass +2' && !!g.lit && g.banked.you === bk.you + 1, JSON.stringify(g));
     await p.screenshot({ path: path.join(out, 'bajada-390.png') });
     await ctx.close();
 
