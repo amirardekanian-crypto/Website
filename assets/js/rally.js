@@ -21,8 +21,10 @@
 //
 // program.html owns the layer (#rallyOverlay, in topLayer() so Back closes it) and loads this file the first time Play is
 // tapped (sw.js keeps it in the shell, so it plays with no signal; a change to it ships with a CACHE bump).
-// API: Rally.open({ root, left, sound, audio, session, onClose }) · Rally.timeUp() · Rally.close() · Rally.isOpen() · Rally.handBack(done)
+// API: Rally.open({ root, left, sound, audio, session, onClose, mode }) · Rally.timeUp() · Rally.close() · Rally.isOpen() · Rally.handBack(done)
 //      · Rally.endSession() · Rally.matchState(session).
+//   mode: 'lob' opens The Lob instead of the game (a slow ball to breathe with, no match, no score: see "The Lob" below). It never reads or
+//   changes the parked match, so opening The Lob and then Off the Glass in one session picks the match up where it was left.
 //   left()  → whole seconds of rest left, or null while the rest is paused.
 //   session → a string that names the session (program.html: the day and the local date). The same string as the parked match's, and
 //   the match not over, resumes it; anything else starts a fresh match. Without one every open is a fresh match.
@@ -217,7 +219,7 @@
   // The best rally goes to this phone's stats whenever the game stops being the screen (Full time, time up, the hand-back, closing it),
   // because the match it came from can be parked for a whole workout.
   function saveBest() {
-    if (!S || S.best <= 0) return;
+    if (!S || S.mode === 'lob' || !(S.best > 0)) return;   // The Lob has no match, no best: close() reaches here too
     S.m.best = Math.max(S.m.best, S.best);
     const st = loadStats();
     if (S.best > st.best) { st.best = S.best; saveStats(st); }
@@ -677,6 +679,7 @@
   function onUp(e) { if (S && S.pid === e.pointerId) S.pid = null; }
 
   function open(opts) {
+    if (opts && opts.mode === 'lob') return openLob(opts);   // The Lob: a calm mode of this file, below (no match, no rackets)
     if (S) close(true);
     css();
     const root = opts.root;
@@ -766,22 +769,263 @@
     try { if (s.ac && s.ownAc) s.ac.close(); } catch (e) {}
     s.root.classList.remove('visible');
     s.root.innerHTML = '';
+    if (s.mode === 'lob') s.root.setAttribute('aria-label', s.label0);   // The Lob named the layer for a screen reader; it goes back to the game's name
     if (!quiet && s.opts.onClose) s.opts.onClose();
   }
 
+  // ── The Lob (idea #44 of the Rest in Play round, Amir 2026-10-18 "go with your picks"): a calm mode of this file ──
+  // Not a game: the shelf's fourth row, for a rest when you would rather breathe than play. On the dimmed court a soft white ball grows for 4 s
+  // (breathe in) and shrinks for 6 s (breathe out), eased, until the rest says stop. Seen from above, a ball that rises looks bigger and its shadow
+  // slides away from it, so "in as it rises, out as it falls" is what the screen does. No score, no rackets, no counts, no hold, no number but the
+  // rest clock, and no health claim anywhere on it.
+  // It is a MODE of Rally, so every hook program.html already has works with no change (the clock, ✕, Back, timeUp, handBack, closeRestGames):
+  // Rally.open({ ..., mode: 'lob' }) leaves S.mode === 'lob' and none of the match's fields (no score, ball or rackets), so nothing here can touch a
+  // match. While it is open Rally.timeUp(), .handBack() and ._tick() route to the functions below; close() is shared (S has the raf, onResize, ac,
+  // ownAc, root, opts and hb.timers it reads, and it puts the layer's name back). `lob_seen` (no athlete prefix, never synced) holds that the
+  // one-time line has been shown on this phone.
+  // PROGRAM-APP.md → Off the Glass → The Lob. Test: node scripts/headless/lob.js.
+  const LOB = {
+    inS: 4, outS: 6,        // seconds breathing in (the ball grows) and out (it shrinks)
+    rest: 0.36,             // the ball's resting size, as a share of its full size
+    hintCycles: 2,          // the one-time line shows for this many breaths, then fades
+    settleS: 0.6,           // handBack: seconds the ball takes to settle to its resting size
+    seen: 'lob_seen',       // localStorage: the one-time line has been shown
+    inHz: 262, outHz: 196,  // the very soft tone at each turn (only with the timer's sound on): a little higher going in, lower going out
+  };
+
+  function lobEase(x) { return (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, x)))) / 2; }
+  // Where the breath is `t` seconds in: which word it is, and how full the ball is (0 = its resting size, 1 = full).
+  function lobAt(t) {
+    const cyc = LOB.inS + LOB.outS, c = ((t % cyc) + cyc) % cyc;
+    return c < LOB.inS ? { phase: 'in', k: lobEase(c / LOB.inS) } : { phase: 'out', k: 1 - lobEase((c - LOB.inS) / LOB.outS) };
+  }
+
+  function lobCss() {
+    if (document.getElementById('lob-css')) return;
+    const st = document.createElement('style');
+    st.id = 'lob-css';
+    st.textContent = `
+      .lob-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+      .lob-stage { position: absolute; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + 64px); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+        z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 24px; text-align: center; color: #fff; pointer-events: none; }
+      .lob-orb { position: relative; flex: none; width: var(--lob-d, 220px); height: var(--lob-d, 220px); }
+      .lob-orb > * { position: absolute; inset: 0; border-radius: 50%; will-change: transform, opacity; }
+      .lob-shadow { background: radial-gradient(circle, rgba(0,0,0,.5) 0%, rgba(0,0,0,0) 70%); }
+      .lob-halo { inset: -16%; background: radial-gradient(circle, rgba(127,214,174,.4) 0%, rgba(127,214,174,0) 68%); }
+      .lob-ball { overflow: hidden; background: radial-gradient(circle at 36% 32%, #fff 0%, #F4FBF7 55%, #D5EDE0 100%); box-shadow: 0 0 36px 4px rgba(127,214,174,.3); }
+      .lob-ball::before, .lob-ball::after { content: ''; position: absolute; top: 0; width: 100%; height: 100%; border-radius: 50%; border: 3px solid rgba(14,74,54,.16); box-sizing: border-box; }
+      .lob-ball::before { left: -64%; }
+      .lob-ball::after { left: 64%; }
+      .lob-word { margin: 28px 0 0; min-height: 1.2em; font: 900 34px/1.1 'Barlow Condensed', 'AA Barlow Condensed', 'Arial Narrow', sans-serif; text-transform: uppercase; letter-spacing: .5px; transition: opacity .6s ease; }
+      .lob-word.lob-pop { animation: lobPop .5s ease-out; }
+      .lob-word.lob-gone { opacity: 0; }
+      @keyframes lobPop { from { opacity: .15; } to { opacity: 1; } }
+      .lob-hint { margin: 12px 0 0; max-width: 300px; text-wrap: balance; font: 500 15px/1.4 'Barlow', sans-serif; color: rgba(255,255,255,.8); transition: opacity 1s ease; }
+      .lob-hint.lob-fade { opacity: 0; }
+      .lob-hint[hidden] { display: none; }
+      @media (prefers-reduced-motion: reduce) { .lob-word, .lob-hint { transition: none; } .lob-word.lob-pop { animation: none; } }`;
+    document.head.appendChild(st);
+  }
+
+  // The court, drawn once per size: the game's turf and lines with the lines dimmed (nothing here is in play).
+  function lobCourt() {
+    const g = S.g, W = S.W, H = S.H, dpr = S.dpr;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.fillStyle = C.courtDeep; g.fillRect(0, 0, W, H);
+    const bg = g.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, C.court); bg.addColorStop(0.5, '#105239'); bg.addColorStop(1, C.court);
+    g.fillStyle = bg; g.fillRect(L(), T(), R() - L(), B() - T());
+    g.strokeStyle = 'rgba(255,255,255,.1)'; g.lineWidth = 2;
+    const q = (B() - T()) * 0.2;
+    g.beginPath();
+    g.moveTo(L(), mid() - q * 1.4); g.lineTo(R(), mid() - q * 1.4);
+    g.moveTo(L(), mid() + q * 1.4); g.lineTo(R(), mid() + q * 1.4);
+    g.moveTo(W / 2, mid() - q * 1.4); g.lineTo(W / 2, mid() + q * 1.4);
+    g.stroke();
+    g.setLineDash([4, 6]); g.strokeStyle = 'rgba(255,255,255,.16)'; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(L(), mid()); g.lineTo(R(), mid()); g.stroke(); g.setLineDash([]);
+    const g1 = W / 2 - S.gw / 2, g2 = W / 2 + S.gw / 2;
+    g.strokeStyle = 'rgba(170,235,205,.2)'; g.lineWidth = 4; g.lineCap = 'round';
+    g.beginPath();
+    g.moveTo(g1, T()); g.lineTo(L(), T()); g.lineTo(L(), B()); g.lineTo(g1, B());
+    g.moveTo(g2, T()); g.lineTo(R(), T()); g.lineTo(R(), B()); g.lineTo(g2, B());
+    g.stroke();
+  }
+  function lobSize() {
+    const r = S.cv.getBoundingClientRect();
+    S.dpr = Math.min(window.devicePixelRatio || 1, 3);
+    S.W = Math.max(200, r.width); S.H = Math.max(320, r.height);
+    S.cv.width = Math.round(S.W * S.dpr); S.cv.height = Math.round(S.H * S.dpr);
+    S.pad = 8; S.top = 64 + (parseFloat(getComputedStyle(S.root).paddingTop) || 0); S.gw = S.W * 0.4;
+    // the ball at its full size is the square its box holds, so the words under it never move while it breathes
+    const d = Math.round(Math.max(120, Math.min(S.W * 0.68, (S.H - S.top) * 0.46, 320)));
+    S.stage.style.setProperty('--lob-d', d + 'px');
+    S.lob.d = d;
+    lobCourt();
+    lobPaint();
+  }
+
+  // The ball, its halo and its shadow follow k (0 resting, 1 full) as compositor-only changes (a transform and an opacity each).
+  function lobPaint() {
+    const L = S.lob, k = L.settle ? L.settle.k : L.k, sc = LOB.rest + (1 - LOB.rest) * k;
+    L.ballEl.style.transform = 'scale(' + sc.toFixed(4) + ')';
+    L.haloEl.style.transform = 'scale(' + sc.toFixed(4) + ')';
+    L.haloEl.style.opacity = (S.reduce ? 0.6 : 0.3 + 0.55 * k).toFixed(3);   // reduced motion keeps the size change (it is the pacer) and drops the glow's pulse
+    const d = L.d || 220;
+    L.shadowEl.style.transform = 'translate(' + (k * d * 0.1).toFixed(1) + 'px,' + (k * d * 0.14).toFixed(1) + 'px) scale(' + (LOB.rest * (1 + 0.5 * k)).toFixed(4) + ')';
+    L.shadowEl.style.opacity = (0.6 - 0.35 * k).toFixed(3);
+  }
+  function lobWord() {
+    const L = S.lob, w = S.wordEl;
+    w.textContent = L.phase === 'in' ? 'Breathe in' : 'Breathe out';
+    w.classList.remove('lob-pop'); void w.offsetWidth; w.classList.add('lob-pop');
+  }
+  function lobClock() {
+    if (S.timeUp) return;
+    const left = S.opts.left(), el = S.clock;
+    if (left == null) { el.querySelector('b').textContent = '—'; el.querySelector('span').textContent = 'Rest paused'; el.classList.remove('low'); return; }
+    const txt = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+    if (el._t !== txt) { el._t = txt; el.querySelector('b').textContent = txt; el.querySelector('span').textContent = 'Rest'; }
+    el.classList.toggle('low', left <= 10);   // no tick and no buzz at 3, 2, 1 here: nothing on this screen startles
+  }
+  // One very soft low tone at a turn, only with the rest timer's sound on (S.opts.sound()). Never a buzz.
+  function lobTone(f) {
+    if (!S || !S.ac || !S.opts.sound()) return;
+    try {
+      const t = S.ac.currentTime, o = S.ac.createOscillator(), g = S.ac.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.05, t + 0.15);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
+      o.connect(g); g.connect(S.ac.destination); o.start(t); o.stop(t + 1.15);
+    } catch (e) {}
+  }
+
+  // dt seconds of breathing (a hidden page sends none, and a janky frame is capped by lobFrame so the ball never jumps).
+  function lobAdvance(dt) {
+    const L = S.lob;
+    if (L.frozen || !(dt > 0)) return;
+    if (L.settle) {                                // handed back: the ball eases down to its resting size, the breath stands still
+      L.settle.t = Math.min(LOB.settleS, L.settle.t + dt);
+      L.settle.k = L.settle.from * (1 - lobEase(L.settle.t / LOB.settleS));
+      lobPaint();
+      return;
+    }
+    L.t += dt;
+    const b = lobAt(L.t);
+    L.k = b.k;
+    if (b.phase !== L.phase) { L.phase = b.phase; lobWord(); lobTone(b.phase === 'in' ? LOB.inHz : LOB.outHz); }
+    const end = LOB.hintCycles * (LOB.inS + LOB.outS);
+    if (S.hintEl && L.t >= end) {                  // the one-time line stays for two breaths, fades, then goes
+      S.hintEl.classList.add('lob-fade');
+      if (L.t >= end + 1.2) { S.hintEl.hidden = true; S.hintEl = null; }
+    }
+    lobPaint();
+  }
+  function lobFrame(now) {
+    if (!S || S.mode !== 'lob') return;
+    S.raf = requestAnimationFrame(lobFrame);
+    const dt = Math.min(0.25, Math.max(0, (now - (S.last || now)) / 1000));
+    S.last = now;
+    lobAdvance(dt);
+    lobClock();
+  }
+  // For scripts/headless/lob.js: dt seconds of breathing in quarter-second steps, with no frame needed.
+  function lobTick(dt) { for (let left = dt; left > 0; left -= 0.25) lobAdvance(Math.min(0.25, left)); lobClock(); }
+
+  function openLob(opts) {
+    if (S) close(true);
+    css(); lobCss();
+    const root = opts.root, label0 = root.getAttribute('aria-label') || 'Off the Glass';
+    let first = true;                              // the one-time line: only on the first open on this phone (storage that throws shows it each time)
+    try { first = !localStorage.getItem(LOB.seen); localStorage.setItem(LOB.seen, '1'); } catch (e) {}
+    root.setAttribute('aria-label', 'The Lob');
+    root.innerHTML =
+      `<canvas class="lob-cv" aria-hidden="true"></canvas>
+       <div class="rally-top">
+         <div class="rally-clock" role="timer" aria-live="off"><span>Rest</span><b>0:00</b></div>
+         <button type="button" class="rally-x" aria-label="Back to the rest timer">✕</button>
+       </div>
+       <div class="lob-stage">
+         <div class="lob-orb" aria-hidden="true"><div class="lob-shadow"></div><div class="lob-halo"></div><div class="lob-ball"></div></div>
+         <p class="lob-word" role="status" aria-live="polite">Breathe in</p>
+         ${first ? '<p class="lob-hint">Breathe in as the ball rises. Breathe out as it falls.</p>' : ''}
+       </div>`;
+    S = {
+      mode: 'lob', opts, root, label0, cv: root.querySelector('canvas'), g: null, clock: root.querySelector('.rally-clock'),
+      stage: root.querySelector('.lob-stage'), wordEl: root.querySelector('.lob-word'), hintEl: root.querySelector('.lob-hint'),
+      timeUp: false, raf: 0, last: 0,
+      reduce: !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches),
+      lob: { t: 0, k: 0, phase: 'in', frozen: false, settle: null, d: 0,
+        ballEl: root.querySelector('.lob-ball'), haloEl: root.querySelector('.lob-halo'), shadowEl: root.querySelector('.lob-shadow') },
+    };
+    S.g = S.cv.getContext('2d');
+    try {                                          // the page's own audio context, as the game takes it; a silent rest needs none
+      if (opts.sound && opts.sound()) {
+        S.ac = opts.audio && opts.audio();
+        if (!S.ac) { const A = window.AudioContext || window.webkitAudioContext; if (A) { S.ac = new A(); S.ownAc = true; } }
+        if (S.ac && S.ac.state === 'suspended') S.ac.resume();
+      }
+    } catch (e) {}
+    root.querySelector('.rally-x').addEventListener('click', () => close());
+    root.classList.add('visible');
+    S.onResize = () => { if (S && S.mode === 'lob') lobSize(); };
+    window.addEventListener('resize', S.onResize);
+    lobSize();
+    lobClock();
+    S.raf = requestAnimationFrame(lobFrame);
+  }
+
+  // The rest is over: stop at once, wherever the ball is, and say so. program.html closes the layer a moment later (closeTimer()).
+  function lobTimeUp() {
+    if (S.timeUp) return;
+    S.timeUp = true; S.lob.frozen = true;
+    cancelAnimationFrame(S.raf);
+    S.clock.classList.remove('low');
+    S.clock.querySelector('b').textContent = '0:00';
+    S.clock.querySelector('span').textContent = 'Rest';
+    S.wordEl.classList.remove('lob-pop', 'lob-gone');
+    S.wordEl.textContent = 'Time. Next set.';
+    if (S.hintEl) { S.hintEl.hidden = true; S.hintEl = null; }
+  }
+
+  // Serve Clock: the ball settles to its resting size over about 0.6 s, then done(); nothing is left to finish, so it never waits longer. A second
+  // call is ignored (the first done() stands); one made after timeUp() only calls done() on the next tick.
+  function lobHandBack(done) {
+    const s = S, L = s.lob;
+    if (s.hb) return;
+    const hb = s.hb = { fired: false, timers: [] };
+    hb.finish = () => {
+      if (hb.fired) return;
+      hb.fired = true;
+      hb.timers.forEach(clearTimeout);
+      if (done) { try { done(); } catch (e) {} }
+    };
+    if (!L.frozen) {
+      L.settle = { t: 0, from: L.k, k: L.k };
+      s.wordEl.classList.remove('lob-pop'); s.wordEl.classList.add('lob-gone');
+      if (s.hintEl) s.hintEl.classList.add('lob-fade');
+    }
+    hb.timers.push(setTimeout(hb.finish, L.frozen ? 0 : Math.round(LOB.settleS * 1000)));
+  }
+
+  function apiTimeUp() { return S && S.mode === 'lob' ? lobTimeUp() : timeUp(); }
+  function apiHandBack(done) { return S && S.mode === 'lob' ? lobHandBack(done) : handBack(done); }
+
   // For scripts/test_rally_sim.js, which plays whole matches with no browser: one frame, with nothing drawn.
   function tick(dt) { if (!S) return; advance(dt, dt); }
+  function apiTick(dt) { return S && S.mode === 'lob' ? lobTick(dt) : tick(dt); }
 
   // Done drops the parked match (program.html's finishDayNow()): the next session starts a fresh one.
   function endSession() { M = null; }
   // The parked match as { you, amir, over }, or null. With a session given, only that session's (a match left from another day is not
-  // "play resumes": open() would start a fresh one).
+  // "play resumes": open() would start a fresh one). The Lob never touches it.
   function matchState(session) {
     if (!M) return null;
     if (typeof session === 'string' && session && M.key !== session) return null;
     return { you: M.score.you, amir: M.score.amir, over: !!M.over };
   }
 
-  window.Rally = { open, timeUp, handBack, endSession, matchState, close: () => close(), isOpen: () => !!S, stats: loadStats,
-    _state: () => S, _tick: tick, _next: () => { if (S) newMatch(); } };
+  window.Rally = { open, timeUp: apiTimeUp, handBack: apiHandBack, endSession, matchState, close: () => close(), isOpen: () => !!S, stats: loadStats,
+    _state: () => S, _tick: apiTick, _next: () => { if (S && S.mode !== 'lob') newMatch(); } };
 })();

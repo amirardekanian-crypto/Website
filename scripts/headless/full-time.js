@@ -440,6 +440,66 @@ async function helpers(p) {
     t.check('"PLAY RESUMES · YOU 11, AMIR 14" is drawn whole inside a 320 px court, and the hint is not drawn', rs.a.length === 1 && rs.a[0].text === 'PLAY RESUMES · YOU 11, AMIR 14' && rs.a[0].w <= rs.W - 8 && rs.a[0].px >= 22 && !rs.hint, JSON.stringify(rs));
     await ctx.close();
 
+    // ── 10. The Lob (the shelf's fourth row) never touches the parked match, and Off the Glass picks it up after it ──
+    ({ ctx, p } = await open(browser));
+    p.on('pageerror', e => errors.push(String(e)));
+    await restPlain(p);
+    await playRally(p);
+    await helpers(p);
+    await p.evaluate(() => { const s = Rally._state(); s.score.you = 6; s.score.amir = 4; s.best = 7; s.m.played = 90; s.form = 0.9; s.m.form = 0.9; });
+    await p.click('.rally-x'); await wait(p, 200);
+    const parked = JSON.stringify({ you: 6, amir: 4, over: false });
+    const lobErrs = errors.length;
+    const mState = () => p.evaluate(() => JSON.stringify(Rally.matchState()));
+    const statsBefore = JSON.stringify(await stats(p));
+    t.check('a match is parked at 6-4 and the row says so', (await mState()) === parked && (await line(p)) === 'You 6, me 4 · play resumes', await mState());
+    // by its row, closed with the ✕ (close() runs the game's saveBest(), which a lob has nothing for)
+    await shelf(p, 'lob');
+    await p.waitForFunction(() => Rally.isOpen() && Rally._state().mode === 'lob', null, { timeout: 8000 });
+    t.check('The Lob opens with the match parked: still 6-4, not over', (await mState()) === parked, await mState());
+    await wait(p, 300);
+    await p.click('.rally-x'); await wait(p, 250);
+    t.check('closing The Lob with ✕ leaves the match at 6-4, not over, and rally_stats as it was',
+      !(await p.evaluate(() => Rally.isOpen())) && (await mState()) === parked && JSON.stringify(await stats(p)) === statsBefore, await mState() + ' / ' + JSON.stringify(await stats(p)));
+    t.check('and the shelf row still reads "You 6, me 4 · play resumes"', (await line(p)) === 'You 6, me 4 · play resumes', await line(p));
+    // the hand-back (Serve Clock) and the rest running out, each on a lob
+    await shelf(p, 'lob');
+    await p.waitForFunction(() => Rally.isOpen() && Rally._state().mode === 'lob', null, { timeout: 8000 });
+    await p.evaluate(() => { window.__hbDone = false; Rally.handBack(() => { window.__hbDone = true; }); });
+    await wait(p, 900);
+    t.check('the lob\'s hand-back calls done() and parks nothing: the match is still 6-4', (await p.evaluate(() => window.__hbDone)) && (await mState()) === parked, await mState());
+    await p.evaluate(() => Rally.close()); await wait(p, 200);
+    await shelf(p, 'lob');
+    await p.waitForFunction(() => Rally.isOpen() && Rally._state().mode === 'lob', null, { timeout: 8000 });
+    await p.evaluate(() => Rally.timeUp()); await wait(p, 200);
+    await p.evaluate(() => Rally.close()); await wait(p, 200);
+    t.check('the rest running out on a lob leaves the match at 6-4, not over, not counted played',
+      (await mState()) === parked && JSON.stringify(await stats(p)) === statsBefore, await mState() + ' / ' + JSON.stringify(await stats(p)));
+    // The Lob then Off the Glass, straight across: the match is picked up where it was left
+    await shelf(p, 'lob');
+    await p.waitForFunction(() => Rally.isOpen() && Rally._state().mode === 'lob', null, { timeout: 8000 });
+    await p.evaluate(() => openRestGame('rally'));
+    await p.waitForFunction(() => Rally.isOpen() && Rally._state().mode === undefined, null, { timeout: 8000 });
+    const back = await p.evaluate(() => { const s = Rally._state(); return { banner: s.banner && s.banner.text, score: s.score.you + '-' + s.score.amir, best: s.best, form: s.form, hint: s.hint, over: s.over }; });
+    t.check('The Lob then Off the Glass in one session resumes the match: 6-4, "Play resumes · You 6, Amir 4", best 7, form 0.9, no first-open hint',
+      back.score === '6-4' && back.banner === 'Play resumes · You 6, Amir 4' && back.best === 7 && Math.abs(back.form - 0.9) < 1e-9 && back.hint === false && !back.over, JSON.stringify(back));
+    // …and the other order: the game mid-match, swapped for a lob, then back
+    await p.evaluate(() => { const s = Rally._state(); s.score.you = 9; s.score.amir = 7; s.best = 11; });
+    await p.evaluate(() => openRestGame('lob'));
+    await p.waitForFunction(() => Rally.isOpen() && Rally._state().mode === 'lob', null, { timeout: 8000 });
+    t.check('Off the Glass swapped for The Lob parks the match at 9-7 (the best rally 11 goes to the stats)',
+      (await mState()) === JSON.stringify({ you: 9, amir: 7, over: false }) && (await stats(p)).best === 11, await mState() + ' / ' + JSON.stringify(await stats(p)));
+    await p.evaluate(() => openRestGame('rally'));
+    await p.waitForFunction(() => Rally.isOpen() && Rally._state().mode === undefined, null, { timeout: 8000 });
+    const back2 = await p.evaluate(() => { const s = Rally._state(); return { banner: s.banner && s.banner.text, score: s.score.you + '-' + s.score.amir, best: s.best }; });
+    t.check('and back to Off the Glass resumes it at 9-7', back2.score === '9-7' && back2.banner === 'Play resumes · You 9, Amir 7' && back2.best === 11, JSON.stringify(back2));
+    // Done drops the match, whichever game was last
+    await p.evaluate(() => Rally.close());
+    await p.evaluate(() => Rally.endSession());
+    t.check('a lob opened after Done is no match: the parked match is gone', await p.evaluate(() => Rally.matchState() === null));
+    t.check('none of it logged an error', errors.length === lobErrs, errors.slice(lobErrs).join(' | '));
+    await ctx.close();
+
     t.check('the page logged no error', errors.length === 0, errors.join(' | '));
   } catch (e) {
     t.check('the run finished', false, e.stack || String(e));
