@@ -165,6 +165,9 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   is now one button, "Play while you rest" (`toggleRestGames()`), that opens the shelf `#timerGames`; program.html owns `#splitOverlay`
   (in `topLayer()` and `initBackNav()`), `REST_GAMES`, `openRestGame()`, `closeRestGames()` and the same two hooks, which now act on every
   open game. `PROGRAM-APP.md` → *Split Step*.
+- **Between Sets, the third rest game (2026-10-18).** `assets/js/between-sets.js` (`window.BetweenSets`, precached by `sw.js`, loaded by
+  `restGameLib('sets')` from the shelf): tennis against Amir on a perspective court, a Fast4 set saved after every point (`courtduel.*`, this phone only).
+  program.html owns `#setsOverlay` (in `topLayer()` and `initBackNav()`), `openBetweenSets()` and passes the athlete's first name. `PROGRAM-APP.md` → *Between Sets*.
 - **Highlight Reel, share cards for a win (2026-10-17).** `assets/js/sharecard.js` (`window.ShareCard`, precached by `sw.js`, loaded by
   `hlLib()` the first time a card is drawn) paints a 1080 × 1920 Story or 1080 × 1350 post on a canvas, in English or Farsi (every Farsi
   word in its one `FA` table, drafts for Amir). program.html decides which wins and which numbers (the HIGHLIGHT REEL block at the end of
@@ -568,6 +571,7 @@ course app (`tennis/app/`) in demo mode, a right-to-left page, with `tps_demo()`
 match and its `rally_stats`, Back and ✕ back to the running rest, the rest running out mid-game, 320 px, the demo banner and no yellow.
 `splitstep.js` (2026-10-18) plays Split Step in the real app: the shelf and its order, each of the four drills, foot faults, a round that
 needs more rest than is left, the rest running out mid-round, Back and ✕ back to the running rest, `splitstep_stats`, the host's loading rules (the last tap wins, a late load opens nothing over the next rest or the GO!, no focus pulled to the door as a rest ends), 320 px and no yellow.
+`between-sets.js` (2026-10-18) plays Between Sets in the real app: the third shelf row, the saved match and Continue, the rest clock and `timeUp()`, Back and ✕ back to the running rest, `courtduel.*` stays on the phone, 320 px and no yellow.
 `sharecard.js` and `highlight-reel.js` (2026-10-17) check Highlight Reel: the first paints every share card of `assets/js/sharecard.js`
 (ten templates, Story and post, English and Farsi, weights and names on and off, long names) in a page of its own and fails on text past
 its box, text in Instagram's bars, overlapping text, a Latin digit in Farsi and the EN and FA word tables drifting apart, and saves a PNG

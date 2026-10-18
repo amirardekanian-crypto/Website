@@ -4102,6 +4102,7 @@
   .tg-row:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .tg-dot { grid-row: 1 / span 2; grid-column: 1; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(127,214,174,.45); }
   .tg-row[data-game="rally"] .tg-dot { border-radius: 3px; background: #C7552F; }   /* Off the Glass: the puck */
+  .tg-row[data-game="sets"] .tg-dot { background: radial-gradient(circle at 30% 30%, #fff 55%, #E4F4EC 100%); box-shadow: 0 0 0 3px rgba(127,214,174,.45), inset 0 0 0 1px rgba(127,214,174,.9); }   /* Between Sets: the ball, white with a mint ring */
   .tg-row b { grid-row: 1; grid-column: 2; white-space: nowrap; font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: .6px; text-transform: uppercase; }
   .tg-row small { grid-row: 2; grid-column: 2; margin-top: 3px; min-width: 0; font-size: var(--fs-small); line-height: 1.25; font-weight: 500; color: rgba(255,255,255,.75); }
   .tg-chev { grid-row: 1 / span 2; grid-column: 3; font-size: var(--fs-lead); line-height: 1; color: rgba(255,255,255,.75); }
@@ -5388,6 +5389,7 @@
     <div class="timer-games" id="timerGames" hidden>
       <button type="button" class="tg-row" data-game="splitstep" onclick="openRestGame('splitstep')"><span class="tg-dot" aria-hidden="true"></span><b>Split Step</b><small>React to the hit · 4 drills</small><span class="tg-chev" aria-hidden="true">›</span></button>
       <button type="button" class="tg-row" data-game="rally" onclick="openRestGame('rally')"><span class="tg-dot" aria-hidden="true"></span><b>Off the Glass</b><small>Air hockey against me · first to 5</small><span class="tg-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="tg-row" data-game="sets" onclick="openRestGame('sets')"><span class="tg-dot" aria-hidden="true"></span><b>Between Sets</b><small>Tennis against me · a set lasts your workout</small><span class="tg-chev" aria-hidden="true">›</span></button>
     </div>
   </div>
   <div class="timer-paper">
@@ -5402,6 +5404,8 @@
 <div class="rally-overlay" id="rallyOverlay" role="dialog" aria-modal="true" aria-label="Off the Glass"></div>
 <!-- Split Step, the other rest game (assets/js/splitstep.js fills it; openSplitStep() / closeSplitStep()). Same layer look as Off the Glass. -->
 <div class="rally-overlay" id="splitOverlay" role="dialog" aria-modal="true" aria-label="Split Step"></div>
+<!-- Between Sets, the third rest game (assets/js/between-sets.js fills it; openBetweenSets() / closeBetweenSets()). Same layer look. -->
+<div class="rally-overlay" id="setsOverlay" role="dialog" aria-modal="true" aria-label="Between Sets"></div>
 
 <!-- A note in a box in the middle of the screen: aaToast() fills it. One at a time, with a button. -->
 <div class="aa-toast" id="aaToast" role="status" aria-live="polite" hidden></div>
@@ -9674,7 +9678,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. Both stop the moment your rest is over.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. All of them stop the moment your rest is over.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. During a session it's under <strong>⋯</strong> on the bar too, as <strong>Ask Amir</strong>, and it names the exercise you have open. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
 ];
@@ -9875,6 +9879,7 @@ function topLayer() {
   if (vm) return () => window.VideoModal && window.VideoModal.close();
   if (on('rallyOverlay')) return closeRally;   // the rest games sit over the rest timer
   if (on('splitOverlay')) return closeSplitStep;
+  if (on('setsOverlay')) return closeBetweenSets;
   if (on('timerOverlay')) return closeTimer;
   if (on('readiness-overlay')) return cancelReadiness;
   if (on('hist-overlay')) return _SHEET.stack.length ? sheetBack : closeHistorySheet;   // a page back first (SHEET-01)
@@ -9924,7 +9929,7 @@ function initBackNav() {
   // Every way a layer opens or closes goes through one of these nodes' class or hidden
   // attribute, so watching them catches all of them without touching each function.
   const mo = new MutationObserver(() => navSync());
-  ['rallyOverlay', 'splitOverlay', 'timerOverlay', 'readiness-overlay', 'hist-overlay', 'stepOverlay', 'day-view'].forEach(id => {
+  ['rallyOverlay', 'splitOverlay', 'setsOverlay', 'timerOverlay', 'readiness-overlay', 'hist-overlay', 'stepOverlay', 'day-view'].forEach(id => {
     const e = document.getElementById(id);
     if (e) mo.observe(e, { attributes: true, attributeFilter: ['class', 'hidden'] });
   });
@@ -15506,16 +15511,17 @@ function resetTimer() {
   document.getElementById('timerDisplay').classList.remove('warning');
 }
 
-// ── The rest games: Split Step and Off the Glass, behind one door ──
+// ── The rest games: Split Step, Off the Glass and Between Sets, behind one door ──
 // "Play while you rest" opens a small shelf in the band, a row per game, the one played last on this phone first (Split Step when
-// there is no history). Each game is a script loaded on its first tap (assets/js/splitstep.js, assets/js/rally.js; kept by sw.js for no
+// there is no history). Each game is a script loaded on its first tap (assets/js/splitstep.js, assets/js/rally.js, assets/js/between-sets.js; kept by sw.js for no
 // signal) and opens full screen over the running rest, showing the rest clock the whole time. It stops when the rest does:
 // timerDone() calls timeUp() on every open game, then closeTimer() closes them with the timer. A game's ✕ or Back returns to the
-// timer, still running. Nothing a game keeps syncs (`splitstep_stats`, `rally_stats` and `rest_game_last`, this phone only).
-// PROGRAM-APP.md → Off the Glass, Split Step.
+// timer, still running. Nothing a game keeps syncs (`splitstep_stats`, `rally_stats`, `courtduel.*` (Between Sets: stats and the saved match) and `rest_game_last`, this phone only).
+// PROGRAM-APP.md → Off the Glass, Split Step, Between Sets.
 const REST_GAMES = {
   splitstep: { src: '/assets/js/splitstep.js', global: 'SplitStep', root: 'splitOverlay' },
   rally: { src: '/assets/js/rally.js', global: 'Rally', root: 'rallyOverlay' },
+  sets: { src: '/assets/js/between-sets.js', global: 'BetweenSets', root: 'setsOverlay' },
 };
 const _restGameP = {};
 let _restGameWant = null;   // the game the last tap asked for: a load that finishes late opens nothing if this moved on (the last tap wins, a rest that ended drops it)
@@ -15552,6 +15558,7 @@ function openRestGame(key) {
       left: () => (timerRunning ? timerLeft() : null),
       sound: restSoundOn,
       audio: () => _restAC,
+      name: (typeof DATA !== 'undefined' && DATA && DATA.athlete && DATA.athlete.firstName) || '',   // Between Sets' scoreboard; the other games ignore it
       onClose: () => { if (document.getElementById('timerOverlay').classList.contains('visible')) { const b = document.getElementById('timerPlayBtn'); if (b) b.focus(); } },
     });
   }, () => { if (_restGameWant === key && typeof aaToast === 'function') { _restGameWant = null; aaToast('The game did not load. Check your signal and try again.'); } });
@@ -15560,6 +15567,8 @@ function openRally() { openRestGame('rally'); }
 function closeRally() { if (window.Rally) Rally.close(); }
 function openSplitStep() { openRestGame('splitstep'); }
 function closeSplitStep() { if (window.SplitStep) SplitStep.close(); }
+function openBetweenSets() { openRestGame('sets'); }
+function closeBetweenSets() { if (window.BetweenSets) BetweenSets.close(); }
 function foldRestGames() {
   const sh = document.getElementById('timerGames'), b = document.getElementById('timerPlayBtn');
   if (sh) sh.hidden = true;

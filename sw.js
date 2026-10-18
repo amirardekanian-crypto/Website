@@ -294,7 +294,8 @@
 // v163: assets/js/rally.js changed (2026-10-18): a ball trapped between the rackets is served again after 3 s, and a trapped ball no longer buzzes or counts in the rally.
 // v164: program.html and habits.html changed (2026-10-18, Career Mode phase 2): the Career row on Home, what a session earns, AA Proof's career level; inert until the XP switch is on.
 // v165: program.html changed and /assets/js/splitstep.js joins the shell (2026-10-18): Split Step, a reaction game for the rest, and one door with a shelf for both rest games.
-const CACHE = 'aap-v165';
+// v166: program.html changed and /assets/js/between-sets.js joins the shell (2026-10-18): Between Sets, a tennis game for the rest, the third game on the shelf.
+const CACHE = 'aap-v166';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -321,6 +322,8 @@ const SHELL = [
   '/assets/js/rally.js',
   // Split Step, the second rest game (v165): loaded on the first tap on its row in the shelf. Cache-first by this plain URL: a change needs a CACHE bump.
   '/assets/js/splitstep.js',
+  // Between Sets, the third rest game (v166): same loading and the same rule.
+  '/assets/js/between-sets.js',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

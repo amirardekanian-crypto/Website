@@ -1639,7 +1639,7 @@ hockey pen, *"improve it in any way you think is good"*). Air hockey on a padel 
 Amir's (clay) at the top, a point is the ball through the gap in the other end's glass. `assets/js/rally.js` (`window.Rally`) draws
 and runs it; program.html owns the door and the layer.
 
-- **The door is shared with Split Step** (2026-10-18). The rest band's last line reads **Play while you rest** (`#timerPlayBtn`,
+- **The door is shared with Split Step and Between Sets** (2026-10-18). The rest band's last line reads **Play while you rest** (`#timerPlayBtn`,
   `toggleRestGames()`, in the list's rest and Guided's) and opens a small shelf inline in the green band (`#timerGames`), one row
   per game, the game played last on this phone first (`rest_game_last`, this phone only, never synced; Split Step first when there is
   no history). **Off the Glass's row** (`openRestGame('rally')`, `openRally()` kept) loads `rally.js` on the first tap (`restGameLib()`;
@@ -1687,8 +1687,30 @@ scores stay on the phone."* The prototype: https://claude.ai/artifact/DFZd4XE2Mg
 - **Its numbers stay on the phone:** `splitstep_stats` (bests and the last rounds per drill), no athlete prefix, never synced, no XP,
   no leaderboard, never seen by the coach. Phones differ in touch delay, so nobody is ranked against anyone.
 - No yellow: the ball is white, the court the brand green, Amir's racket clay. **Never call it reaction training** in copy; it is a
-  game for the rest. The guide's *Built-in tools* card names the door and both games (CNT-01).
+  game for the rest. The guide's *Built-in tools* card names the door and the games on the shelf (CNT-01).
 - Test: `node scripts/headless/splitstep.js`.
+
+## 🎾 Between Sets: a tennis game for the rest (2026-10-18)
+
+Amir asked for a better version of a tennis game he saw on a player's website: *"the aim is to add this game to my app, to use on their
+phone while resting and sitting in the gym"*. He chose all the games behind the shelf, the name **Between Sets**, and the coach lines as
+drafted. `assets/js/between-sets.js` (`window.BetweenSets`, the same API shape as Rally and SplitStep) draws and runs it; program.html owns
+the layer (`#setsOverlay`, beside `#splitOverlay`), the shelf row (`data-game="sets"`, `openRestGame('sets')`; `openBetweenSets()` /
+`closeBetweenSets()`) and passes the athlete's first name (`name`) for the scoreboard. It is the third game behind the same door.
+
+- **What it is:** a court in real ITF dimensions drawn in perspective, clay, grass or hard, YOU vs AMIR. A Fast4 set, first to 4 games,
+  a no-ad deciding point, and a tiebreak to 5 at 3-3. **Saved after every point**, so one set lasts a whole workout and Continue picks it
+  up on the next rest. Also a rally drill. At the end a match report with coach-style movement numbers.
+- **One thumb:** drag anywhere to run; the swing is automatic and getting there early makes a better shot; tap as the ring closes for a
+  power shot; tap to toss, then tap again at the top to serve. Clay keeps ball marks, and a close call shows a mark check.
+- **The rest is the boss.** `left()` is shown in the game's rest pill, `timeUp()` freezes play and shows *Time to lift*, and
+  `closeTimer()` closes the game with the timer. ✕ and Back return to the running timer (`#setsOverlay` is in `topLayer()` and
+  `initBackNav()`'s observer).
+- **Sound** follows `rest_sound` on the timer's AudioContext (`audio()`), with no sound button of its own.
+- **Its numbers stay on the phone:** stats and the saved match are `courtduel.*` keys in localStorage, never synced, never scored, never
+  seen by the coach.
+- **The coach lines** are `CD.LINES` in the file; a change ships with a CACHE bump (sw.js keeps it in SHELL).
+- Test: `node scripts/headless/between-sets.js`.
 
 ## 🧾 The working card (CARD-01/02/03, 2026-09-27)
 
