@@ -1712,6 +1712,8 @@ the layer (`#setsOverlay`, beside `#splitOverlay`), the shelf row (`data-game="s
 - **The rest is the boss.** `left()` is shown in the game's rest pill, `timeUp()` freezes play and shows *Time to lift*, and
   `closeTimer()` closes the game with the timer. ✕ and Back return to the running timer (`#setsOverlay` is in `topLayer()` and
   `initBackNav()`'s observer).
+- **Serve Clock hands back gracefully:** when the app hands the rest back to the set (`handBack(done)`), a point in play may finish (up to 6 s;
+  the score saves at the end of every point), a rally drill keeps its best, then the game freezes on *Time to lift* and calls `done()` once.
 - **Sound** follows `rest_sound` on the timer's AudioContext (`audio()`), with no sound button of its own.
 - **Its numbers stay on the phone:** stats and the saved match are `courtduel.*` keys in localStorage, never synced, never scored, never
   seen by the coach.

@@ -12,6 +12,7 @@
 //
 // API, the same shape as Off the Glass (assets/js/rally.js) and Split Step (assets/js/splitstep.js), so one rest door opens any of them:
 //   BetweenSets.open({ root, left, sound, audio, onClose, name }) · BetweenSets.timeUp() · BetweenSets.close() · BetweenSets.isOpen()
+//   · BetweenSets.handBack(done) (Serve Clock: finish the point, park, then done())
 //   root    -> an empty element the host shows over the rest timer; the game fills it and toggles its `visible` class.
 //   left()  -> whole seconds of rest left, or null while the rest is paused.
 //   sound() -> true when the rest timer's sound is on.   audio() -> the page's AudioContext, opened in the tap.
@@ -3101,14 +3102,43 @@ border:1px solid rgba(244,239,230,.42);background:transparent;font:700 19px/1 va
     try { S.game.hostTimeUp(); } catch (e) {}
   }
 
+  // Serve Clock: the app hands the rest back to the set about 25 s before it ends and calls handBack(done). A point in play may
+  // finish (up to 6 s; the score saves when a point ends), a rally drill keeps its best, then the game freezes on its Time to
+  // lift card and calls done() once, about a second later. Asked when closed, done() comes at once.
+  function handBack(done) {
+    let called = false;
+    const finish = () => { if (called) return; called = true; try { if (typeof done === 'function') done(); } catch (e) {} };
+    if (!S) { finish(); return; }
+    const s = S, g = s.game;
+    if (s.handedBack) { finish(); return; }              // already parked: nothing left to finish
+    if (s.handing) { s.handing.push(finish); return; }   // asked twice: one hand-back, every done() called
+    s.handing = [finish];
+    const t0 = Date.now();
+    const inPoint = () => g.mode === 'match' && g.state === 'rally' && !g.paused;
+    const park = () => {
+      clearInterval(s.wait); s.wait = 0;
+      if (S === s) {
+        try {
+          if (g.mode === 'drill' && (g.drillCount | 0) > (CD.U.load('best', 0) | 0)) CD.U.save('best', g.drillCount | 0);
+          g.hostTimeUp();
+        } catch (e) {}
+      }
+      s.handOff = setTimeout(() => { s.handedBack = true; s.handing.splice(0).forEach((f) => f()); }, 900);
+    };
+    if (!inPoint()) { park(); return; }
+    s.wait = setInterval(() => { if (S !== s || !inPoint() || Date.now() - t0 > 6000) park(); }, 100);
+  }
+
   function close(quiet) {
     if (!S) return;
     const s = S; S = null;
+    if (s.wait) { clearInterval(s.wait); s.wait = 0; }
     try { s.game.destroy(); } catch (e) {}    // listeners, the frame loop, the crowd and every sound
     s.root.classList.remove('visible');
     s.root.innerHTML = '';
     if (!quiet && s.opts.onClose) s.opts.onClose();
+    if (s.handing) s.handing.splice(0).forEach((f) => f());   // closed during a hand-back: every waiting done() runs now, once
   }
 
-  window.BetweenSets = { open, timeUp, close: () => close(), isOpen: () => !!S, _game: () => (S ? S.game : null) };
+  window.BetweenSets = { open, timeUp, handBack, close: () => close(), isOpen: () => !!S, _game: () => (S ? S.game : null) };
 })();
