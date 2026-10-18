@@ -1732,7 +1732,7 @@ and runs it; program.html owns the door and the layer.
   closes the game with the timer. ✕ and Back (`#rallyOverlay` is in `topLayer()` above the timer and in `initBackNav()`'s observer)
   return to the timer, still running. It never runs past a rest, and Serve Clock hands the screen back 25 s early (below).
 - **Short and fair, and Amir plays like a person (The Read, 2026-10-18; idea #38 of the Rest in Play round, *"go with your picks"*).**
-  First to 5. The first Amir chased the ball's current spot at a speed that rose to 1.45x while the athlete led and fell to 0.65x while
+  First to 5 (first to 15 since Full Time, below). The first Amir chased the ball's current spot at a speed that rose to 1.45x while the athlete led and fell to 0.65x while
   they trailed, which players saw and resented, and a bot that only followed the ball beat him 58 points to 0. Now (`amirMove()`):
   his top speed is **one fixed number** (`AMIR.speed`, nothing reads the score); he **sees the ball `react` seconds late** (a short
   ring buffer of the ball's last 0.6 s, `S.hist`, with a part of that delay made up by knowing which way it was going, `AMIR.lead`), so a
@@ -1749,7 +1749,7 @@ and runs it; program.html owns the door and the layer.
   side is a sprint, not a jump across the court in one frame.
 - **The numbers are set against bots with a person's limits** (`scripts/test_rally_sim.js`, pre-commit guard 22; `CODEBASE.md` → *Off the
   Glass's opponent*): a sharp bot (sees the ball 0.10 s late, thumb 4 court widths a second) wins about 70% of the points, an average one
-  (0.20 s, 2.5) about 57%, which is about two matches in three at first to 5, a tired one (0.30 s, 1.5) about 51%, and a bot with no delay and
+  (0.20 s, 2.5) about 57% of the goals, which is about two matches in three (at first to 5; at first to 15 with banks counting 2 it is still 64%), a tired one (0.30 s, 1.5) about 51%, and a bot with no delay and
   no speed limit (that still misreads three points in ten, as he does) about 86%. A change to the `AMIR` block runs it; it prints the table, with
   the *ace* (a sharp bot that never misreads and shoots at the edges) as an extra row it does not assert on: it wins about 98%, the ceiling of his
   rubber band. Known: his look-ahead keeps the old `vx` when it folds off the side glass (comment in `rally.js`; fixing it needs a retune).
@@ -1760,8 +1760,48 @@ and runs it; program.html owns the door and the layer.
   buzzes; the sounds follow the timer's speaker (`rest_sound`); reduced motion drops the shake.
 - **Its numbers stay on the phone:** `rally_stats` (`best` rally, `wins`, `played`), no athlete prefix, never synced, never scored,
   never seen by the coach. No yellow: the ball is white, the court the brand green, Amir's racket clay.
-- The guide's *Built-in tools* card names the door (CNT-01). Tests: `node scripts/headless/rally.js` (26 checks; in *Amir alone* your racket is
-  parked in the corner, since 2026-10-18: nobody defends, and he finishes the point) and `node scripts/test_rally_sim.js` (no browser, about 4 s).
+- The guide's *Built-in tools* card names the door (CNT-01). Tests: `node scripts/headless/rally.js` (29 checks; in *Amir alone* your racket is
+  parked in the corner, since 2026-10-18: nobody defends, and he finishes the point) and `node scripts/test_rally_sim.js` (no browser, about 5 s).
+
+### Full Time and Bajada: one match a session, and a goal off the glass counts 2 (2026-10-18)
+
+Ideas #40 (Full Time) and #43 (Bajada) of the round-4 page (https://claude.ai/artifact/1qn7D8shTUmKrYDHo9UT9W), picked on Amir's *"Go with your
+picks on all nine decisions"*. Tests: `node scripts/headless/full-time.js` (62 checks), `rally.js` (29), `serve-clock.js` (92) and `node scripts/test_rally_sim.js`.
+
+- **Full Time: the match belongs to the session, not the rest.** It is first to 15 (`WIN_AT`, was 5), one match for the whole workout, and it waits between
+  rests. It lives in a variable of `rally.js` (`M`: `key`, `score`, `best`, `banked`, `played`, `over`, `form`; memory only, **a reload starts fresh**, nothing
+  is stored or synced). `open()` takes `session`, a string; program.html passes `restGameSession()`: the day plus the local date from `ymdLocal(new Date())`
+  (Guided's `STEP.day`, the list's rest card through `timerCtx.card.dataset.day`, else `x`), so the same workout's rests share one match and tomorrow's starts
+  fresh. The same key with the match not over **resumes** it: the banner *Play resumes · You 6, Amir 4* (real numbers, mint, 1.5 s, `banner.dur`), the
+  serve to the player after the 1.5 s, the first-open hint stays away, and his form, the best rally and the played seconds come back with it. A different key
+  (or none) starts a fresh match and drops the old one. The same key with the match OVER shows the Full time box again: one match a session, no Play again.
+  **Hand-back, time up and ✕ PARK the match, they never end it and never count it as played** (`rally_stats.played` and `wins` move at Full time only; the best
+  rally is still saved at every stop, as before, and now also on close). `Rally.handBack` still calls `done()` within 6 s. **Done ends it:** `finishDayNow()`
+  calls `Rally.endSession()` (guarded; nothing happens when `rally.js` never loaded).
+- **Play budget.** `PLAY_CAP_S` = 480: eight minutes of real play a session. It counts wall-clock seconds (`advance(dt, wall)`: `wall` is clamped to 0.25 s a
+  frame, so a page that slept adds a quarter of a second, not the minutes) **only while a point is live**: not in the serve pause (a resume's pause is 1.5 s),
+  not in the end box, not while the rest is paused (`left()` is null), not after the hand-back or time up. Once the budget is used up the match ends at the next
+  point that leaves someone ahead (level at the cap, it plays on). A bot reaches Full time in about 1.3 minutes of play (median, longest 2.7 of 248 matches),
+  so the budget is for a person who dawdles.
+- **The end box:** the title *Full time*, then one sentence a line: *You win 15–11.* or *Amir wins 15–12.*, *Longest rally: N hits.* and, when there were any,
+  *Off the glass: N.* (your banks only). The one button reads **Back to the timer** and closes the game. The old *Wins on this phone* and *Your best is* lines are gone.
+- **The shelf row's small line** is read from the game when the shelf opens (`toggleRestGames()` → `paintRestGameLines()`, again when the game closes, so a shelf left
+  open is not stale): default *Air hockey against me · one match a session*; parked *You 6, me 4 · play resumes*; over *Full time · you won 15–11* or *Full time · I won
+  15–12*. `Rally.matchState(session)` → `{you, amir, over}` or null; given a session it answers only for that one, so a match left from another day never says
+  "play resumes". Before `rally.js` has loaded (nothing was played this page) the line is the default.
+- **The first-open hint is two lines:** *Drag in your half. Hit it through Amir's gap.* and *First to 15. The match waits for your next rest.*, shrunk to a narrow court (never under 12 px).
+  The guide's Off the Glass sentence gains *One match lasts your whole session: first to 15.* (CNT-01).
+- **Bajada: a goal off the glass counts 2.** After a racket's last touch (`S.touch`, set by `hitRacket()` on a real contact) the ball hits the glass (a side wall or an
+  end wall beside the gap, never a post) at more than `BANK_MIN` = 25% of its top speed (`S.glass`, set in `walls()`; a slower touch changes nothing and takes nothing back) and goes through the far gap
+  with no other racket in between (the next racket's touch clears `S.glass`). The scorer is the player whose racket touched it last AND whose opponent's gap it went through: +2, **and
+  Amir banks too**. An own goal off the glass is 1 for the other side, as ever; a ball nobody has touched since the serve is never a bank. The pane lights mint for 0.33 s
+  (`LIT_S`; a side wall is three panes, each end wall one either side of the gap); the banner says *Off the glass +2* (mint) or *Amir off the glass +2* (clay), shrunk to fit a 320 px
+  court. A bank from 14 makes 16 and wins, and the end box shows the real score. Banked goals are counted per match (`M.banked`).
+- **What the bots say** (`test_rally_sim.js`; 8 seeds, 3,000 s each): the shares are still counted in GOALS, which banking does not touch (Amir does not aim at the glass): sharp 69%,
+  average 57%, tired 52%, follower 86%. **On the board a bank is worth 2 and Amir banks more of his goals than the bots do**: banks are 25 to 35% of a bot's goals and 35 to 50% of
+  Amir's, so the average bot gets about 53% of the board (tired 47.5%) and wins about 64% of the matches at first to 15 (tired 38%, sharp 98%, follower 100%). That is about two
+  matches in three for an average player, as it was at first to 5, but a tired one now loses most. The size of the threshold hardly moves it (BANK_MIN 0.5 or 0.7 measure about the same),
+  so if Amir wants Amir to bank less, that is a change to how he aims, not to this number.
 
 ### Serve Clock: the rest hands back to the set (2026-10-18)
 
@@ -1801,10 +1841,10 @@ takes the screen back from the games and says what is next.
   `spineFor()` (approved entries only: the phone is served nothing else, and a card that names an entry that is not there gets none), rotated by the
   next set's number through `[cues.good[0], cues.good[1], cues.bad[0]]`, missing ones skipped, so eighteen rests do not repeat one line. `''` when
   the entry has none (the Next line shows alone). A circuit gets no cue.
-- **`Rally.handBack(done)`** (assets/js/rally.js): no game, `done()` at once; otherwise the held mint banner *Last point.*, Play again hidden, and
+- **`Rally.handBack(done)`** (assets/js/rally.js): no game, `done()` at once; otherwise the held mint banner *Last point.*, the end box's button hidden, and
   a point in play is let finish (`lastPointIn()`: nothing is served after it, the point's own banner shows 0.8 s, then `done()`); with no point in
   play (the serve pause, a ball that died, a finished match) `done()` after 0.6 s; never later than 6 s. After it the court is `over` (no serve, no
-  auto-serve, no Play again) and the best rally is kept as `timeUp()` keeps it. It does not touch `amirMove()`, `youMove()` or `step()`.
+  auto-serve, no button) and the best rally is kept as `timeUp()` keeps it. **The match is parked, not ended** (Full Time, above). It does not touch `amirMove()`, `youMove()` or `step()`.
 - **Every game gets `handBackAt: serveHb`** in `open()`, and every game has its own `handBack(done)`. Split Step uses `handBackAt` to start no round it
   would cut and stops at once; Off the Glass finishes its point (above); Between Sets finishes a point in play for up to 6 s, parks on *Time to lift* and
   calls `done()` about a second later (a76016d). Off the Glass and Between Sets ignore the option.

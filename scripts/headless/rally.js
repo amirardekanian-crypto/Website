@@ -1,9 +1,9 @@
 // Off the Glass, the rest game (assets/js/rally.js, 2026-10-17): node scripts/headless/rally.js [--out <dir>]
 //
 // The door on the rest timer opens a shelf, and Off the Glass's row opens the game over the running rest; the rest clock shows on the court and matches the timer; a swipe
-// hits the ball (a touch lifts the racket above the thumb); a ball through Amir's gap is your point and through yours is his; five wins
-// the match, which says so and keeps the best rally and the wins in `rally_stats` (this phone only); Play again starts at 0-0; Back and
-// ✕ return to the timer, still running; the rest running out freezes the game ("Time. Next set.") and closes it with the timer; twenty
+// hits the ball (a touch lifts the racket above the thumb); a ball through Amir's gap is your point and through yours is his; fifteen wins
+// the match (Full time, 2026-10-18), which says so and keeps the best rally and the wins in `rally_stats` (this phone only); there is no
+// Play again (one match a session: scripts/headless/full-time.js tests that, with Bajada); Back and ✕ return to the timer, still running; the rest running out freezes the game ("Time. Next set.") and closes it with the timer; twenty
 // seconds of Amir playing alone keeps every body on the court with no NaN; the clock is whole at 320 and 390 px and under the demo banner;
 // no yellow in the file. Serve the repo first (python -m http.server 8779 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE).
 'use strict';
@@ -97,14 +97,27 @@ async function openGame(browser, opts = {}) {
       return { over: s.over, score: s.score, hidden: m.hidden, title: m.querySelector('h3').textContent, text: m.querySelector('p').textContent,
         stats: JSON.parse(localStorage.getItem('rally_stats') || 'null'), synced: Object.keys(localStorage).filter(k => /rally/.test(k)) };
     });
-    t.check('five points win the match and it says so', won.over && won.score.you === 5 && !won.hidden && /You win 5–1/.test(won.title), JSON.stringify(won));
+    t.check('fifteen points win the match: the box says Full time and who won', won.over && won.score.you === 15 && !won.hidden && won.title === 'Full time' && /^You win 15–1\.\nLongest rally: 9 hits\.$/.test(won.text), JSON.stringify(won));
     t.check('the best rally and the wins are kept on this phone', won.stats && won.stats.best === 9 && won.stats.wins === 1 && won.stats.played === 1, JSON.stringify(won.stats));
     t.check('its key is not an athlete key (never synced)', won.synced.length === 1 && won.synced[0] === 'rally_stats', won.synced.join(','));
     await p.screenshot({ path: path.join(out, 'rally-won-390.png') });
+    const btn = await p.evaluate(() => { const b = document.querySelector('.rally-go'); return { text: b.textContent, hidden: b.hidden }; });
+    t.check('there is no Play again: the one button reads Back to the timer', btn.text === 'Back to the timer' && !btn.hidden, JSON.stringify(btn));
     await p.click('.rally-go');
     await wait(p, 200);
-    const again = await p.evaluate(() => { const s = Rally._state(); return { sc: s.score, over: s.over, hidden: s.msg.hidden }; });
-    t.check('Play again starts at 0-0', again.sc.you === 0 && again.sc.amir === 0 && !again.over && again.hidden, JSON.stringify(again));
+    const shut = await p.evaluate(() => ({ game: Rally.isOpen(), timer: document.getElementById('timerOverlay').classList.contains('visible'), running: timerRunning }));
+    t.check('the button closes the game and the rest keeps running', !shut.game && shut.timer && shut.running, JSON.stringify(shut));
+    // One match a session: opening it again shows the same Full time box; a new session (Done) starts a fresh match
+    await rallyRow(p);
+    await p.waitForFunction(() => Rally.isOpen());
+    const same = await p.evaluate(() => { const s = Rally._state(); return { over: s.over, title: s.msg.querySelector('h3').textContent, hidden: s.msg.hidden, sc: s.score.you + '-' + s.score.amir }; });
+    t.check('opening it again in the same session shows Full time, not a new match', same.over && same.title === 'Full time' && !same.hidden && same.sc === '15-1', JSON.stringify(same));
+    await p.evaluate(() => { Rally.endSession(); Rally.close(); });
+    await rallyRow(p);
+    await p.waitForFunction(() => Rally.isOpen());
+    await wait(p, 300);
+    const fresh = await p.evaluate(() => { const s = Rally._state(); return { sc: s.score, over: s.over, hidden: s.msg.hidden }; });
+    t.check('a new session starts at 0-0', fresh.sc.you === 0 && fresh.sc.amir === 0 && !fresh.over && fresh.hidden, JSON.stringify(fresh));
 
     // ── 3. Amir alone for 20 s: the bodies stay on the court ──
     // Your racket is parked in the far corner: nobody defends. (It used to sit dead centre in front of his gap, and he now aims for

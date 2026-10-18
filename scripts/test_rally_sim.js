@@ -1,4 +1,7 @@
 // Off the Glass, The Read (2026-10-18): does Amir play like a person?   node scripts/test_rally_sim.js
+// Full time and Bajada (2026-10-18) changed the match: first to 15 (a goal that came off the glass is worth 2), one match a session. The shares below
+// are still counted in GOALS (a ball through a gap, one each: what The Read was tuned on and what banking does not touch, because Amir does not aim
+// at the glass); the board's score share, the banks and the minutes a match takes are printed beside them.
 //   options: --secs N (game time per bot per game, 3000) · --seed N (first seed) · --seeds N (games per bot, pooled, 3) · --only name
 //            --quiet (print only failures) · --set speed=1.2 --set react=0.2,0.1 (try one of Amir's numbers without editing rally.js)
 //            --only average --trace 40 (print the first 40 s of one bot's play, every 0.1 s)
@@ -17,7 +20,10 @@
 // from a player this good, and the row shows that ceiling whenever a number moves. Amir should play it himself: this is a ruler, not a player.
 //
 // What it holds true (every number measured on 2026-10-18, over eight seeds, none of it a hope):
-//   sharp ~71% of the points, average ~57% (about two matches in three at first to 5), tired ~51%, the follower ~86%;
+//   sharp ~71% of the goals, average ~57%, tired ~51%, the follower ~86%. At first to 15 with banks counting 2 (Full time, Bajada) the average bot
+//   wins about 57% of the goals but about 53% of the BOARD (about half of Amir's goals are banks, about 27% of the average bot's), which is about two
+//   matches in three (64%; the tired bot wins 38% of the matches, the sharp one 98%); a match takes the average bot about 1.3 minutes of play (the
+//   longest of 248 took 2.7), so the 8-minute budget is for a person who dawdles and no bot ever reaches it;
 //   every bot loses some points; sharper always wins more; he looks calm (his misjudgement is drawn once per shot, his aim once per strike); no NaN; the ball never leaves the court except through a gap; Amir's
 //   form changes only between points and really does change how he plays; his top speed is the same whoever leads (the first
 //   Amir sped up while you led and slowed while you trailed); and the same seed plays the same game.
@@ -46,6 +52,9 @@ for (let i = 0; i < argv.length; i++) if (argv[i] === '--set') { const [k, v] = 
 const AMIR_SPEED = +(SRC.match(/\n    speed: ([0-9.]+),/) || [])[1];   // court widths a second
 const AMIR_STEP = +(SRC.match(/\n    step: ([0-9.]+),/) || [])[1];     // how far his form moves after a point
 const YOU_SPEED = +(SRC.match(/const YOU_SPEED = ([0-9.]+);/) || [])[1];   // your racket's top speed, court widths a second
+const WIN_AT_SRC = +(SRC.match(/const WIN_AT = ([0-9]+);/) || [])[1];       // first to this many (Full time)
+const CAP_SRC = +(SRC.match(/const PLAY_CAP_S = ([0-9]+);/) || [])[1];      // seconds of real play a match may take before the next point that leaves someone ahead ends it
+const patchConst = (src, k, v) => { const re = new RegExp('(const ' + k + ' = )[0-9.]+(;)'); if (!re.test(src)) { console.log('no const ' + k + ' in rally.js'); process.exit(2); } return src.replace(re, '$1' + v + '$2'); };
 
 // ── what the bots share: their habits as people (experiments: --blead 0.1 --slip 0.2 --slipby 0.4 --aimside 0.9) ──
 const HABIT = {
@@ -100,8 +109,8 @@ function loadRally(src, seed) {
   const sb = { Rally: win.Rally };
   sb.Rally.open({ root: El(), left: () => 120, sound: () => false });
   const S = sb.Rally._state();
-  const go = S.msg.querySelector('.rally-go');   // "Play again": the only way rally.js starts a new match
-  return { Rally: sb.Rally, S, playAgain: () => go.ev.click.forEach(fn => fn({ stopPropagation() {} })) };
+  // Full time has no Play again (one match a session), so the next match is rally.js's own test hook: a fresh match on the same court.
+  return { Rally: sb.Rally, S, playAgain: () => sb.Rally._next() };
 }
 
 // ── a bot with a person's limits ──
@@ -156,14 +165,23 @@ const BOTS = [
 function play(spec, secs, seed, src) {
   const { Rally, S, playAgain } = loadRally(src || SRC, seed);
   const think = makeBot(S, spec, prng(seed ^ 0x9E3779B9));
-  const r = { pts: { you: 0, amir: 0 }, matches: { you: 0, amir: 0 }, quick: 0, nan: 0, escaped: 0, formMoved: 0, formRange: [1, 0], youFast: 0, ballFast: 0,
-    amirTop: { lead: 0, trail: 0, all: 0 }, formSteps: 0, formStepsOk: 0, missRolls: 0, aimRolls: 0, bad: [] };
+  const winAt = +((src || SRC).match(/const WIN_AT = ([0-9]+);/) || [])[1], cap = +((src || SRC).match(/const PLAY_CAP_S = ([0-9]+);/) || [])[1];
+  // pts: GOALS (a ball through a gap, one each, what The Read was tuned on); score: what the board says (a bank is worth 2); banks: goals that were banks;
+  // mins: the minutes of real play each finished match took (S.m.played, which only counts while a point is live)
+  const r = { pts: { you: 0, amir: 0 }, score: { you: 0, amir: 0 }, banks: { you: 0, amir: 0 }, mins: [], matches: { you: 0, amir: 0 }, quick: 0, nan: 0, escaped: 0, formMoved: 0, formRange: [1, 0], youFast: 0, ballFast: 0,
+    amirTop: { lead: 0, trail: 0, all: 0 }, formSteps: 0, formStepsOk: 0, missRolls: 0, aimRolls: 0, bad: [], level: 0, odd: 0, over16: 0, capped: 0 };
   const L = S.pad, R = S.W - S.pad, T = S.top, B = S.H - S.pad, g1 = S.W / 2 - S.gw / 2 - S.br, g2 = S.W / 2 + S.gw / 2 + S.br;
   let last = { you: 0, amir: 0 }, form = S.form, sincePoint = 0, formSum = 0, mid = (T + B) / 2;
   const ticks = Math.round(secs / DT), note = s => { if (r.bad.length < 5) r.bad.push(s); };
   for (let i = 0; i < ticks; i++) {
-    if (S.over) {                                               // a finished match: count it, then "Play again"
+    if (S.over) {                                               // Full time: count it, then the next match
       r.matches[S.score.you > S.score.amir ? 'you' : 'amir']++;
+      r.mins.push(S.m.played / 60);
+      const hi = Math.max(S.score.you, S.score.amir);
+      if (S.score.you === S.score.amir) r.level++;                         // a match never ends level, on the budget or not
+      if (hi > winAt + 1 || (hi < winAt && S.m.played < cap)) r.odd++;   // it ends at 15 or 16 (a bank from 14), or on the budget
+      if (hi > winAt + 1) r.over16++;
+      if (hi < winAt) r.capped++;                                          // ended on the budget, before anyone reached the target
       playAgain(); last = { you: 0, amir: 0 }; form = S.form;
       continue;
     }
@@ -181,7 +199,7 @@ function play(spec, secs, seed, src) {
     // ── what it counts ──
     for (const who of ['you', 'amir']) {
       const n = S.score[who] - last[who];
-      if (n > 0) { r.pts[who] += n; if (sincePoint <= 2) r.quick += n; sincePoint = 0; }
+      if (n > 0) { r.pts[who] += 1; r.score[who] += n; if (n === 2) r.banks[who] += 1; if (sincePoint <= 2) r.quick += 1; sincePoint = 0; }
     }
     sincePoint += DT;
     const scored = S.score.you !== last.you || S.score.amir !== last.amir;
@@ -224,10 +242,11 @@ const pad = (s, n) => String(s).padEnd(n), pc = x => (x * 100).toFixed(1) + '%';
 // Several independent games of one bot, pooled: a share measured on ~550 points wobbles by ~2 points, and the gap between the
 // average and the tired bot is only a handful, so each bot plays SEEDS games of SECS seconds and the points are added up.
 function pool(games) {
-  const r = { pts: { you: 0, amir: 0 }, matches: { you: 0, amir: 0 }, quick: 0, nan: 0, escaped: 0, formMoved: 0, formRange: [1, 0], youFast: 0, ballFast: 0, amirTop: { lead: 0, trail: 0, all: 0 }, bad: [], formMean: 0, formSteps: 0, formStepsOk: 0, missRolls: 0, aimRolls: 0 };
+  const r = { pts: { you: 0, amir: 0 }, score: { you: 0, amir: 0 }, banks: { you: 0, amir: 0 }, mins: [], matches: { you: 0, amir: 0 }, quick: 0, nan: 0, escaped: 0, formMoved: 0, formRange: [1, 0], youFast: 0, ballFast: 0, amirTop: { lead: 0, trail: 0, all: 0 }, bad: [], formMean: 0, formSteps: 0, formStepsOk: 0, missRolls: 0, aimRolls: 0 };
   games.forEach(g => {
-    ['you', 'amir'].forEach(w => { r.pts[w] += g.pts[w]; r.matches[w] += g.matches[w]; });
-    ['quick', 'nan', 'escaped', 'formMoved', 'youFast', 'ballFast', 'formSteps', 'formStepsOk', 'missRolls', 'aimRolls'].forEach(k => { r[k] += g[k]; });
+    ['you', 'amir'].forEach(w => { r.pts[w] += g.pts[w]; r.score[w] += g.score[w]; r.banks[w] += g.banks[w]; r.matches[w] += g.matches[w]; });
+    r.mins.push(...g.mins);
+    ['quick', 'nan', 'escaped', 'formMoved', 'youFast', 'ballFast', 'formSteps', 'formStepsOk', 'missRolls', 'aimRolls', 'level', 'odd', 'over16', 'capped'].forEach(k => { r[k] = (r[k] || 0) + g[k]; });
     r.formRange = [Math.min(r.formRange[0], g.formRange[0]), Math.max(r.formRange[1], g.formRange[1])];
     ['lead', 'trail', 'all'].forEach(k => { r.amirTop[k] = Math.max(r.amirTop[k], g.amirTop[k]); });
     r.bad.push(...g.bad); r.formMean += g.formMean / games.length;
@@ -236,14 +255,20 @@ function pool(games) {
   r.share = n ? r.pts.you / n : 0; r.matchShare = mt ? r.matches.you / mt : 0;
   r.sPerPt = n ? games.length * games[0].secs / n : 0; r.quickShare = n ? r.quick / n : 0; r.n = n; r.mt = mt;
   r.shares = games.map(g => g.share);
+  // Bajada and Full time: banks as a share of each side's goals, the board's score share (a bank is worth 2) and how long a match takes
+  r.bankYou = r.pts.you ? r.banks.you / r.pts.you : 0; r.bankAmir = r.pts.amir ? r.banks.amir / r.pts.amir : 0;
+  r.bankAll = n ? (r.banks.you + r.banks.amir) / n : 0;
+  r.scoreShare = (r.score.you + r.score.amir) ? r.score.you / (r.score.you + r.score.amir) : 0;
+  const ms = r.mins.slice().sort((x, y) => x - y);
+  r.medMin = ms.length ? ms[Math.floor(ms.length / 2)] : 0; r.maxMin = ms.length ? ms[ms.length - 1] : 0;
   return r;
 }
 function table(results) {
-  const lines = [pad('bot', 10) + pad('react', 7) + pad('speed', 7) + pad('points', 8) + pad('you win', 9) + pad('matches', 9) + pad('you win', 9) + pad('s/point', 9) + pad('<2 s', 7) + pad('form', 6) + 'by game'];
+  const lines = [pad('bot', 10) + pad('react', 7) + pad('speed', 7) + pad('goals', 8) + pad('you win', 9) + pad('on board', 10) + pad('matches', 9) + pad('you win', 9) + pad('min med/max', 15) + pad('s/goal', 8) + pad('banks you', 11) + pad('banks Amir', 12) + pad('<2 s', 7) + pad('form', 6) + 'by game'];
   Object.keys(results).forEach(k => {
     const s = BOTS.find(b => b.name === k), r = results[k];
-    lines.push(pad(k + (s.extra ? ' *' : ''), 10) + pad(s.r.toFixed(2), 7) + pad(s.v === Infinity ? 'any' : s.v.toFixed(1), 7) + pad(r.n, 8) + pad(pc(r.share), 9) + pad(r.mt, 9) + pad(pc(r.matchShare), 9) +
-      pad(r.sPerPt.toFixed(1), 9) + pad(pc(r.quickShare), 7) + pad(r.formMean.toFixed(2), 6) + r.shares.map(x => (x * 100).toFixed(0)).join(' '));
+    lines.push(pad(k + (s.extra ? ' *' : ''), 10) + pad(s.r.toFixed(2), 7) + pad(s.v === Infinity ? 'any' : s.v.toFixed(1), 7) + pad(r.n, 8) + pad(pc(r.share), 9) + pad(pc(r.scoreShare), 10) + pad(r.mt, 9) + pad(pc(r.matchShare), 9) +
+      pad(r.medMin.toFixed(2) + '/' + r.maxMin.toFixed(1), 15) + pad(r.sPerPt.toFixed(1), 8) + pad(pc(r.bankYou), 11) + pad(pc(r.bankAmir), 12) + pad(pc(r.quickShare), 7) + pad(r.formMean.toFixed(2), 6) + r.shares.map(x => (x * 100).toFixed(0)).join(' '));
   });
   return lines.join('\n');
 }
@@ -267,8 +292,15 @@ if (!ONLY) {
   check('every bot loses some points: Amir scores against all of them', all.every(r => r.pts.amir > 0), Object.keys(results).map(n => n + ' ' + results[n].pts.amir).join(', '));
   check('the old perfect follower wins under 90% of the points', fo.share < 0.90, pc(fo.share));
   check('a sharper player wins a bigger share: sharp > average > tired', sh.share > av.share && av.share > ti.share, [sh, av, ti].map(r => pc(r.share)).join(' > '));
-  check('an average player wins between 52% and 64% of the points (aim: about 57%)', av.share >= 0.52 && av.share <= 0.64, pc(av.share));
-  check('a tired player wins between 44% and 60% of the points (aim: about 51%)', ti.share >= 0.44 && ti.share <= 0.60, pc(ti.share));
+  check('an average player wins between 52% and 64% of the goals (aim: about 57%)', av.share >= 0.52 && av.share <= 0.64, pc(av.share));
+  check('a tired player wins between 44% and 60% of the goals (aim: about 51%)', ti.share >= 0.44 && ti.share <= 0.60, pc(ti.share));
+  // Bajada: a bank is worth 2, so the board is not the goals. Amir banks more of his goals than the bots do, which costs the player a few points
+  // of share on the board (measured: the average bot 56% of the goals, 52% of the board; the tired one 52% and 47%).
+  check('on the board (a bank counts 2) a sharper player still leads: sharp > average > tired', sh.scoreShare > av.scoreShare && av.scoreShare > ti.scoreShare, [sh, av, ti].map(r => pc(r.scoreShare)).join(' > '));
+  check('on the board an average player gets between 46% and 64% and a tired one between 40% and 58%', av.scoreShare >= 0.46 && av.scoreShare <= 0.64 && ti.scoreShare >= 0.40 && ti.scoreShare <= 0.58, pc(av.scoreShare) + ' / ' + pc(ti.scoreShare));
+  check('the board is the goals plus the banks, for both sides, for every bot', all.every(r => r.score.you === r.pts.you + r.banks.you && r.score.amir === r.pts.amir + r.banks.amir), all.map(r => r.score.you + '=' + r.pts.you + '+' + r.banks.you).join(' '));
+  check('a bank is a real share of the goals but never most of them (between 5% and 60%, for each side and each bot)',
+    all.every(r => r.bankYou >= 0.05 && r.bankYou <= 0.60 && r.bankAmir >= 0.05 && r.bankAmir <= 0.70), all.map(r => pc(r.bankYou) + '/' + pc(r.bankAmir)).join(' '));
   check('no number goes NaN', all.every(r => r.nan === 0), bad);
   check('the ball never leaves the court except through a gap, and no racket crosses the net', all.every(r => r.escaped === 0), bad);
   check('the ball never goes faster than its top speed', all.every(r => r.ballFast === 0), all.map(r => r.ballFast).join(','));
@@ -286,7 +318,26 @@ if (!ONLY) {
   const calm = all.map(r => ({ miss: r.missRolls / r.n, aim: r.aimRolls / r.n }));
   check('Amir looks calm, not twitchy: under 10 new reads and 5 new aim points a point (they are drawn once per shot and per strike)',
     calm.every(c => c.miss < 10 && c.aim < 5), calm.map(c => c.miss.toFixed(1) + '/' + c.aim.toFixed(1)).join(' '));
-  check('every bot played matches to the end (first to 5)', all.every(r => r.mt >= 40), all.map(r => r.mt).join(','));
+  check('every bot played matches to the end (first to ' + WIN_AT_SRC + ')', all.every(r => r.mt >= 40), all.map(r => r.mt).join(','));
+  check('a match ends at ' + WIN_AT_SRC + ' or ' + (WIN_AT_SRC + 1) + ' (a bank from ' + (WIN_AT_SRC - 1) + '), never level, and none runs past the play budget (' + CAP_SRC + ' s) by more than a point or two',
+    all.every(r => r.odd === 0 && r.level === 0 && r.over16 === 0 && r.maxMin * 60 <= CAP_SRC + 40), all.map(r => r.odd + '/' + r.level + '/' + r.over16 + '/' + (r.maxMin * 60).toFixed(0) + ' s').join(' '));
+  check('an average bot reaches Full time in 1 to 4 minutes of real play (the median; measured about 1.3)', av.medMin >= 1 && av.medMin <= 4, av.medMin.toFixed(2) + ' min, longest ' + av.maxMin.toFixed(1));
+  // The play budget: with it cut to 20 s (the real one is 8 minutes, which a bot never reaches) a match ends at the next point that leaves someone
+  // ahead, before anyone has 15, and never level. Without it a bot would need about 80 s.
+  const cut = pool([...Array(SEEDS)].map((_, k) => Object.assign(play(BOTS[1], 900, SEED + k, patchConst(SRC, 'PLAY_CAP_S', 20)), { secs: 900 })));
+  check('with the play budget cut to 20 s, matches end on it: early, never level, within a point or two of it',
+    cut.mt >= 20 && cut.capped >= cut.mt * 0.8 && cut.level === 0 && cut.maxMin * 60 <= 20 + 40, cut.mt + ' matches, ' + cut.capped + ' ended early, ' + cut.level + ' level, longest ' + (cut.maxMin * 60).toFixed(0) + ' s');
+  // Only live seconds are play: none in the serve pause, then the clock runs; one hiccup of a frame adds a quarter of a second at most
+  {
+    const { Rally: R2, S: S2 } = loadRally(SRC, 7);
+    for (let i = 0; i < 30; i++) R2._tick(DT);
+    const pause = S2.m.played;
+    for (let i = 0; i < 60; i++) R2._tick(DT);
+    const live = S2.m.played, before = S2.m.played;
+    R2._tick(4);
+    check('the play budget counts only live seconds: none in the serve pause, the clock runs after it, a long frame adds at most 0.25 s',
+      pause === 0 && live > 0.7 && live < 0.9 && S2.m.played - before <= 0.25 + 1e-9, 'pause ' + pause + ', live ' + live.toFixed(2) + ', long frame +' + (S2.m.played - before).toFixed(3));
+  }
   // the same seed plays the same game
   const a = play(BOTS[1], 240, SEED + 1000), b = play(BOTS[1], 240, SEED + 1000);
   check('the same seed plays the same game (deterministic)', a.pts.you === b.pts.you && a.pts.amir === b.pts.amir && a.matches.you === b.matches.you, a.pts.you + '-' + a.pts.amir + ' vs ' + b.pts.you + '-' + b.pts.amir);

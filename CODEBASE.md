@@ -160,7 +160,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Off the Glass, the rest game (2026-10-17).** `assets/js/rally.js` (`window.Rally`, precached by `sw.js`, loaded by `restGameLib('rally')` on the
   first tap of its row on the shelf behind the rest band's door): a one-thumb air hockey on a padel court that stops when the rest does. program.html owns `#rallyOverlay`
   (in `topLayer()`), `openRally()` (= `openRestGame('rally')`) and the two hooks in `timerDone()` / `closeTimer()`. `PROGRAM-APP.md` → *Off the Glass*. **Serve Clock (2026-10-18)** adds `SERVE_CLOCK`, the latch, `restDoorOn()`, `paintGetSet()` and `cueForRest()` beside the timer and `Rally.handBack(done)`: with 25 s left (30 s from a 100 s rest) the games stop and the band shows the next set and one cue (`PROGRAM-APP.md` → *Serve Clock*).
-  Amir's racket plays like a person since 2026-10-18 (The Read: the `AMIR` block, `amirMove()`, a form that moves between points), held by `scripts/test_rally_sim.js` (guard 22).
+  Amir's racket plays like a person since 2026-10-18 (The Read: the `AMIR` block, `amirMove()`, a form that moves between points), held by `scripts/test_rally_sim.js` (guard 22). **Full Time and Bajada (2026-10-18)**: one match a session, first to 15, kept in `rally.js`'s `M` (memory only) and picked up again by the `session` option program.html passes (`restGameSession()`: the day plus `ymdLocal(new Date())`); hand-back, time up and close park it, `finishDayNow()` calls `Rally.endSession()`, the shelf row's small line is `rallyRowLine()` / `paintRestGameLines()` reading `Rally.matchState(session)`; a goal off the glass counts 2 (`S.touch`, `S.glass`, `BANK_MIN`). `PROGRAM-APP.md` → *Full Time and Bajada*; `scripts/headless/full-time.js`.
 - **Split Step, the second rest game (2026-10-18).** `assets/js/splitstep.js` (`window.SplitStep`, precached by `sw.js`, loaded by
   `restGameLib('splitstep')` from the shelf): four drills with the rest clock on the court, bests in `splitstep_stats`. The door
   is now one button, "Play while you rest" (`toggleRestGames()`), that opens the shelf `#timerGames`; program.html owns `#splitOverlay`
@@ -568,8 +568,12 @@ app ships. Excluded from the site with the rest of `scripts/`. How to use it: `C
 `program.html` and its pop-up (`shared.js`): the link built from the stored video link, the bar reachable once the embed has
 loaded, a Short, a non-YouTube link, the circuit pop-up on a 320 × 568 screen. `youtube-course.js` does the same for the
 course app (`tennis/app/`) in demo mode, a right-to-left page, with `tps_demo()` answered by a made-up course.
-`rally.js` (2026-10-17) plays Off the Glass in the real app: the door, the rest clock on the court, a swipe, points both ways, a won
-match and its `rally_stats`, Back and ✕ back to the running rest, the rest running out mid-game, 320 px, the demo banner and no yellow.
+`rally.js` (2026-10-17) plays Off the Glass in the real app: the door, the rest clock on the court, a swipe, points both ways, Full time (fifteen points, its end box,
+no Play again, one match a session) and its `rally_stats`, Back and ✕ back to the running rest, the rest running out mid-game, 320 px, the demo banner and no yellow.
+`full-time.js` (2026-10-18) checks Full Time and Bajada with the game's own loop stopped and `Rally._tick` driving it: the shelf row's small line in its states, a match resumed across two
+rests of one session key with its banner (and a new key starting fresh), the session key, a match parked by the hand-back and by time up (never counted played), the 6 s deadline of a
+resumed game, Done dropping it, the end box and `rally_stats` at Full time, the play budget (only live seconds, the cap in a level rally), and every Bajada case (your bank, Amir's, an own goal,
+a slow touch, an untouched ball, a racket in between, a post, the end wall, the lit pane's 0.33 s), the banners and the hint fitting a 320 px court.
 `splitstep.js` (2026-10-18) plays Split Step in the real app: the shelf and its order, each of the four drills, foot faults, a round that
 needs more rest than is left, the rest running out mid-round, Back and ✕ back to the running rest, `splitstep_stats`, the host's loading rules (the last tap wins, a late load opens nothing over the next rest or the GO!, no focus pulled to the door as a rest ends), 320 px and no yellow.
 `between-sets.js` (2026-10-18) plays Between Sets in the real app: the third shelf row, the saved match and Continue, the rest clock and `timeUp()`, Back and ✕ back to the running rest, `courtduel.*` stays on the phone, 320 px and no yellow.
@@ -803,7 +807,8 @@ lean on each other (his speed, where he waits and where he meets a shot, how lat
 point starts with a mistimed read, how far his form moves a step), so moving one quietly makes him unbeatable or a doormat and nothing errors.
 - **How it runs.** The test reads the real `rally.js` as text, runs it as a function whose free names are stubs (window, document, a canvas context that
   does nothing, localStorage, matchMedia; `Math.random` replaced by a seeded generator; a bare vm context was 3.6x slower), opens a 390 x 804 court and
-  drives it with `Rally._tick(1/60)` (one `step()` and `tickFx()`, nothing drawn). "Play again" is the click handler the real button has.
+  drives it with `Rally._tick(1/60)` (one `advance()`: a `step()`, the play budget and `tickFx()`, nothing drawn). Full Time has no Play again, so the next match is
+  `Rally._next()`, a test hook that starts a fresh match on the same court.
 - **The bots** steer `S.target` the way a thumb would: each sees the ball as it was `r` seconds ago (and makes up a fifth of that by knowing which way
   it was going) and moves its target at most `v` court widths a second. While the ball is in its half it gets just below it and pushes it up toward the
   open side of Amir's gap (with a little aim noise); otherwise it guards in front of its own gap. **Sharp** (r 0.10, v 4.0), **average** (0.20, 2.5),
@@ -811,7 +816,12 @@ point starts with a mistimed read, how far his form moves a step), so moving one
   (30% of points, 0.3 s), as Amir does: a bot that never errs cannot lose, so "the follower wins under 90%" would say nothing (`--slip 0` gives it
   100%). A fifth, **the ace** (sharp's delay and speed, never late, shoots at the edges, reads ahead), is printed with a `*` and never asserted on: his
   form is capped at 1, so it wins about 98% and shows the ceiling.
-- **What it holds** (each bot plays three 3,000 s games, 9,000 s of game time, pooled; about 4 s in all): every bot loses some points; the follower wins under
+- **Full Time and Bajada (2026-10-18)** changed the match to first to 15 with a goal off the glass worth 2. The shares are still counted in **goals** (a ball through a
+  gap: what The Read was tuned on, untouched by banking); the table also prints the board share, the banks each side scores (a share of its goals), the median and longest minutes of
+  real play a match took, and the test asserts: the board is goals plus banks, a bank is 5 to 60% of a side's goals, a match ends at 15 or 16 and never level, an average bot
+  reaches Full time in 1 to 4 minutes (measured 1.3), a play budget cut to 20 s ends matches on it, and only live seconds count. Measured over 8 seeds: goals sharp 69%, average 57%,
+  tired 52%, follower 86%; board 69, 53.5, 47.5 and 84.5%; matches won 98, 64.5, 38 and 100%; banks are 25 to 35% of a bot's goals and 35 to 50% of Amir's. `PROGRAM-APP.md` → *Full Time and Bajada*.
+- **What it holds** (each bot plays three 3,000 s games, 9,000 s of game time, pooled; about 5 s in all): every bot loses some points; the follower wins under
   90% (measured about 86%); sharp > average > tired in point share (about 71, 57 and 51%); an average bot wins 52 to 64% (aim: 57%, which is about two
   matches in three); a tired one 44 to 60%; he looks calm (his misjudgement is drawn once per shot and his aim once per strike: about 4 and 1.4 new
   draws a point, the test allows 10 and 5; a mutant that redraws either every frame measures 69 and 40); no NaN; the ball never leaves the court except through a gap; it never exceeds its top speed; your racket never
