@@ -3,10 +3,10 @@
 The whole gamification system, in files you can read, change and think about. **Phase 1 is live (2026-10-17), in
 shadow:** `scripts/career_seed.py` turns the `.toml` files
 into the server's rows (`career_rules`, `career_catalogue`), so
-changing a file and seeding it again is how a detail changes (GAME-10). No XP, badge or level reaches an athlete yet; the one thing
-they see is Hold Serve on the training app's Home (2026-10-17), the held weeks the server judges with `rulebook.toml` → `[week]`.
-**Phase 2, the XP switch, is built and applied to the live project (2026-10-17) and its switch waits for Amir's yes**: `rulebook.toml` → `[switch] xp` is the switch
-(*Turning a switch on*, below).
+changing a file and seeding it again is how a detail changes (GAME-10). In phase 1 no Career Mode XP, badge or level reached an athlete; the one thing
+they saw was Hold Serve on the training app's Home (2026-10-17), the held weeks the server judges with `rulebook.toml` → `[week]`.
+**Phase 2, the XP switch, is done: applied to the live project on 2026-10-17 and switched on 2026-10-18**: `rulebook.toml` → `[switch] xp` is the switch
+(*Turning a switch on*, below). Since then the career level and its XP reach both apps; Career Mode's badges wait for phase 3.
 
 ## What is here
 
@@ -63,7 +63,7 @@ change to `supabase/stage66_career_mode.sql` before it is applied, and `node scr
 settle, the level is the career level and never resets) and `catalogue` (phase 3: the entries with `retire_at` / `starts_at =
 "catalogue"`). Each is `"off"` until it is turned on, on Amir's yes only:
 
-1. Bump `version`, set the switch to today's date (`xp = "2026-10-19"`), and run `python scripts/check_career.py`.
+1. Bump `version`, set the switch to today's date (the XP switch went on this way with `xp = "2026-10-18"`), and run `python scripts/check_career.py`.
 2. `python scripts/career_seed.py --dry-run --out "$TEMP/career-switch-dry.sql"`, run it on the project: everything is worked out,
    then undone. For the XP switch it answers every athlete's line (Proof's level, the career level, the level kept), the list Amir
    reads first. Nobody's level goes down: an athlete below their best Proof level is kept at it (`[fact.level_kept]`).

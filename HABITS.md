@@ -2470,8 +2470,8 @@ the whole career and never reset. A season still starts the boards from zero, an
 level. The paragraphs below describe the reset as it works until then. `XP_SYSTEM.md` §7 has the table of what resets, with both
 columns, and *Career Mode (phase 2, the XP switch)*, next, has the rest.
 
-**Currently `Pre-Season`, opened 26 July 2026.** Season 1 is scheduled to open on 2026-10-18 (Amir's scheduled task
-`start-season-1`, 06:00 UK, `start_season('Season 1','2026-10-18')`). `select * from public.current_season();` says which is live.
+**Currently `Season 1`, opened 2026-10-18.** It opened at 06:00 UK (Amir's scheduled task
+`start-season-1`, `start_season('Season 1','2026-10-18')`); `Pre-Season` (opened 26 July 2026) was archived Proof's way, 30 athlete records and 18 Pre-Season titles at level 5. `select * from public.current_season();` says which is live.
 Amir launches the real thing with one
 SQL command:
 
@@ -2492,8 +2492,8 @@ would have landed as an instant head start. Full detail in
 
 ## Career Mode (phase 2, the XP switch)
 
-> **Where it stands (2026-10-17).** Built and rehearsed. **The server half (`supabase/stage69_career_xp_switch.sql`) was applied to the live project on 2026-10-17, and the switch is not on.** Both
-> apps ship ready for it and behave exactly as the rest of this file says until it is. Turning the switch on waits for Season 1, the switch's dry run and Amir's yes. Every "once the XP switch is on"
+> **Where it stands (2026-10-18).** Done. **The server half (`supabase/stage69_career_xp_switch.sql`) was applied to the live project on 2026-10-17, and the XP switch was turned on 2026-10-18**, shortly after Season 1 opened, on Amir's yes to the dry run's list (`rulebook.toml` version 3; `career_compare()` ok, 34 of 34). Both
+> apps read the career profile now. The catalogue switch (phase 3) is next and not started. Every "once the XP switch is on"
 > in this file points here.
 
 Career Mode (`career/CAREER_MODE.md`, with the steps in `career/PROCEDURES.md` → *Phase 2, as built*) gives AA Proof and the
@@ -2506,10 +2506,10 @@ training app one score and one level. Amir's three decisions, 2026-10-17 (*"go w
    level they reached in AA Proof one `level_kept` fact, worth the XP to the start of that level. Their best level is the better
    of their season records (`hab_season_results`) and the level Proof shows them this season. The fact counts toward the career
    and never toward a season's points. Measured on the real rows (the backup of 2026-10-17, Season 1 simulated): of 38 athletes
-   (the demo included), 31 go up, 6 stay and 1 is kept at their Proof level by a top-up (level 12, +630 XP: Amir's own test identity). `python scripts/career_seed.py --dry-run`
+   (the demo included), 31 go up, 6 stay and 1 is kept at their Proof level by a top-up (level 12, +630 XP: Amir's own test identity). That was the rehearsal. **At the real switch (2026-10-18) nobody needed a level kept:** 31 went up, 7 stayed, nobody went down, because that identity had reached level 12 on its own XP by then. `python scripts/career_seed.py --dry-run`
    prints every athlete's line first. The server does the whole seed and undoes it.
-3. **Season 1 starts on 2026-10-18.** A scheduled task (`start-season-1`, 06:00 UK) runs `start_season('Season 1','2026-10-18')`,
-   Proof's own way: Pre-Season is archived with Proof's levels and its title at level 5. The switch lands during Season 1. Season
+3. **Season 1 started on 2026-10-18.** A scheduled task (`start-season-1`, 06:00 UK) ran `start_season('Season 1','2026-10-18')`,
+   Proof's own way: Pre-Season was archived with Proof's levels and its title at level 5. The switch landed during Season 1. Season
    points are worked out from the facts and never kept as a record of their own (the server's cache is only a copy), so at the
    switch the board is worked out again from the season's first day under the new rules, training included. A session finished in Season 1 before the switch counts its 400, and its WORKOUT
    tick 0, from the moment the switch is on.
@@ -2728,7 +2728,7 @@ Stages 18 and 20 have no entry in the database's migration history, but both are
 per-day roster is inside every later `hab_bonus_xp()`, and 20's event titles are on the row.
 
 Career Mode's stages are not in this table. Stage 66 (the fact ledger, live in shadow since 2026-10-17) and stage 69 (the XP
-switch, applied 2026-10-17 with the switch off) are described under *Career Mode (phase 2, the XP switch)*.
+switch, applied 2026-10-17 and switched on 2026-10-18) are described under *Career Mode (phase 2, the XP switch)*.
 
 > Because scoring happens on the server, the XP rules exist in **two places**:
 > `XP_RULES` (and its sibling constants) in `habits.html` and the `xp_rules` row in

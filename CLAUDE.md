@@ -44,14 +44,14 @@ Durable context for working in this repo. Read the linked docs before diving in.
   `node scripts/career/rehearse.mjs` (PGlite, nothing live; `--data <dump>` for the real rows, kept outside the repo).
   ⚠️ A trigger's exception block cannot catch a statement timeout (8 s for a signed-in request), so the work a trigger does
   per save stays small (at most 0.3 s on 2026-10-17). `scripts/career/rollback_stage66.sql` takes phase 1 off, on Amir's word only.
-  **Phase 2, the XP switch, is applied to the live project (2026-10-17), not yet on** (`supabase/stage69_career_xp_switch.sql`; Amir 2026-10-17, three decisions in
+  **Phase 2, the XP switch, is DONE: applied to the live project 2026-10-17 and switched on 2026-10-18** (`supabase/stage69_career_xp_switch.sql`; Amir 2026-10-17, three decisions in
   `CAREER_MODE.md` → *round 3*; `PROCEDURES.md` → *Phase 2, as built*). The one gate is two, `rulebook.toml` → `[switch]`: `xp`
   (phase 2) and `catalogue` (phase 3; the badge entries say `retire_at` / `starts_at = "catalogue"`), each `"off"` or the day a seed
   turned it on, never back off. With the XP switch on: training earns XP, the WORKOUT habit pays 0 a day, closed days settle, the
   level is the career level (never resets; the road's titles, the board's level and coach.html's follow it), the board ranks season
   points from the facts through a cache (`career_scores`, a cache holding no source: `coach_erase_person()` empties it, and it is in `BACKUP_TABLES` and the snapshot),
   and nobody's level goes down (`[fact.level_kept]`, written once by the seed that turns it on; `career_seed.py --dry-run` shows the
-  list first). Both apps read `get_profile()` only once it is on and behave exactly as before until then. The phones copy three of its
+  list first). Both apps read `get_profile()` only once it is on; it went on at the real switch (2026-10-18, rulebook version 3: 31 athletes up, 7 the same, nobody down, no level kept). Phase 3, the catalogue switch, is next, not started. The phones copy three of its
   rules (the career's curve, WORKOUT at 0, a session's full log and check-in): `scripts/check_twins.js` §9 holds them to
   `scripts/career/xp_cases.json`, the server's answers, which `node scripts/career/rehearse_switch.mjs --backup <file>` writes
   (`--write-cases`) and checks (42 checks on the real rows); `scripts/headless/career.js` drives both apps. The way back is
@@ -405,7 +405,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   `get_profile()`'s (`careerOn()`, kept in `<id>_hab_career`, never in CFG), the phone's scorer counts the whole career with the
   WORKOUT habit at 0 a day (`scoreDays()`, `paidXp()`) and is only the preview of a tick (P13), the first open shows ONE reveal
   (`CFG.careerSeen`, kept through the cloud merge) and never a flood of level-ups, and a new season resets only the board's points.
-  Until the switch none of this changes a number. `?go=pass` opens the Locker (the training app's Career row).
+  Before the XP switch (on since 2026-10-18) none of this changed a number. `?go=pass` opens the Locker (the training app's Career row).
 - **`live()` is present tense only**: anything that takes a `dayKey` uses `rosterOn(dayKey)`, UI row
   lists included. Only `stampRoster()` writes `CFG.roster`, append-only: a habit added lands today, a
   habit removed lands tomorrow, and a closed day never moves.
