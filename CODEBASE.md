@@ -159,7 +159,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
     data handling is `privacy.html` §2.2. Keep all of them in step.
 - **Off the Glass, the rest game (2026-10-17).** `assets/js/rally.js` (`window.Rally`, precached by `sw.js`, loaded by `restGameLib('rally')` on the
   first tap of its row on the shelf behind the rest band's door): a one-thumb air hockey on a padel court that stops when the rest does. program.html owns `#rallyOverlay`
-  (in `topLayer()`), `openRally()` (= `openRestGame('rally')`) and the two hooks in `timerDone()` / `closeTimer()`. `PROGRAM-APP.md` → *Off the Glass*.
+  (in `topLayer()`), `openRally()` (= `openRestGame('rally')`) and the two hooks in `timerDone()` / `closeTimer()`. `PROGRAM-APP.md` → *Off the Glass*. **Serve Clock (2026-10-18)** adds `SERVE_CLOCK`, the latch, `restDoorOn()`, `paintGetSet()` and `cueForRest()` beside the timer and `Rally.handBack(done)`: with 25 s left (30 s from a 100 s rest) the games stop and the band shows the next set and one cue (`PROGRAM-APP.md` → *Serve Clock*).
   Amir's racket plays like a person since 2026-10-18 (The Read: the `AMIR` block, `amirMove()`, a form that moves between points), held by `scripts/test_rally_sim.js` (guard 22).
 - **Split Step, the second rest game (2026-10-18).** `assets/js/splitstep.js` (`window.SplitStep`, precached by `sw.js`, loaded by
   `restGameLib('splitstep')` from the shelf): four drills with the rest clock on the court, bests in `splitstep_stats`. The door
@@ -573,6 +573,7 @@ match and its `rally_stats`, Back and ✕ back to the running rest, the rest run
 `splitstep.js` (2026-10-18) plays Split Step in the real app: the shelf and its order, each of the four drills, foot faults, a round that
 needs more rest than is left, the rest running out mid-round, Back and ✕ back to the running rest, `splitstep_stats`, the host's loading rules (the last tap wins, a late load opens nothing over the next rest or the GO!, no focus pulled to the door as a rest ends), 320 px and no yellow.
 `between-sets.js` (2026-10-18) plays Between Sets in the real app: the third shelf row, the saved match and Continue, the rest clock and `timeUp()`, Back and ✕ back to the running rest, `courtduel.*` stays on the phone, 320 px and no yellow.
+`serve-clock.js` (2026-10-18) checks Serve Clock, the rest handing back to the set: the hand-back at 25 s (30 s from a 100 s rest) with Off the Glass saying *Last point.* and finishing its point (`Rally.handBack`), Split Step closed at once and Between Sets parking and closing itself (each has its own `handBack`), the door rules (under 45 s, a circuit round, a retest lift in its window, 10 s before the hand-back), the get-set block and `cueForRest()` in the list and in Guided, the latch (+15s keeps it, Reset clears it), the catch-up tick, `timerDone()` still stopping a game, 320 x 568 light and dark.
 `sharecard.js` and `highlight-reel.js` (2026-10-17) check Highlight Reel: the first paints every share card of `assets/js/sharecard.js`
 (ten templates, Story and post, English and Farsi, weights and names on and off, long names) in a page of its own and fails on text past
 its box, text in Instagram's bars, overlapping text, a Latin digit in Farsi and the EN and FA word tables drifting apart, and saves a PNG

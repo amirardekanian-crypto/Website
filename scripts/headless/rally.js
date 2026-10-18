@@ -176,7 +176,9 @@ async function openGame(browser, opts = {}) {
     // ── 5. the rest runs out mid-game ──
     await rallyRow(p);
     await p.waitForFunction(() => Rally.isOpen());
-    await p.evaluate(() => { timerEndsAt = Date.now() + 2000; });
+    // Serve Clock would hand the game back ("Last point.", then close) with 30 s left; scripts/headless/serve-clock.js tests that. This check is the rest
+    // running out on a game that is still open, so the hand-back is off here.
+    await p.evaluate(() => { SERVE_CLOCK.at = 0; SERVE_CLOCK.atLong = 0; timerEndsAt = Date.now() + 2000; });
     await wait(p, 1100);
     const low = await p.evaluate(() => document.querySelector('.rally-clock').classList.contains('low'));
     t.check('the clock turns clay in the last 10 seconds', low);

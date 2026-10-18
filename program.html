@@ -4106,6 +4106,22 @@
   .tg-row b { grid-row: 1; grid-column: 2; white-space: nowrap; font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: .6px; text-transform: uppercase; }
   .tg-row small { grid-row: 2; grid-column: 2; margin-top: 3px; min-width: 0; font-size: var(--fs-small); line-height: 1.25; font-weight: 500; color: rgba(255,255,255,.75); }
   .tg-chev { grid-row: 1 / span 2; grid-column: 3; font-size: var(--fs-lead); line-height: 1; color: rgba(255,255,255,.75); }
+  /* SERVE CLOCK (idea #39, Amir 2026-10-18 "go with your picks"): with 25 s left (30 on a rest of 100 s or more) the games stop, the door
+     goes and the band holds the next set and one thing to think about, where the door was. In Guided the same cue is one line on the paper
+     under Next. The cue is the Coach's words, so it keeps the clay bar that means look here (PROGRAM-APP.md → Off the Glass → Serve Clock). */
+  .timer-play[hidden], .timer-getset[hidden], .timer-cue[hidden] { display: none; }
+  .timer-getset { width: min(360px, 100%); margin: 14px 0 0; text-align: left; }
+  .timer-getset .tgs-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--mint); }
+  .timer-getset .tgs-next { margin-top: 4px; font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: #fff; overflow-wrap: anywhere; }
+  .timer-getset .tn-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,.75); }
+  .timer-cue { margin: 10px 0 0; padding: 2px 0 2px 12px; border-left: 3px solid var(--clay-on-green); font: 500 var(--fs-body)/1.4 'Barlow', sans-serif; color: #fff; overflow-wrap: anywhere; }
+  .timer-paper .timer-cue { margin-top: 12px; border-left-color: var(--clay); color: var(--ink); }
+  @media (max-height: 620px) {   /* a 568-600 px phone only: the ring gives up some height so the block fits (the rest of the phones have room, and the ring never jumps) */
+    .timer-overlay.has-getset .timer-ring { width: 140px; height: 140px; margin-top: 0; }
+    .timer-overlay.has-getset .timer-display { font-size: 58px; }   /* display: the rest clock */
+    .timer-overlay.has-getset .timer-controls { margin: 12px 0 0; }
+    .timer-overlay.has-getset .timer-top { margin-bottom: 4px; }
+  }
   .rally-overlay { position: fixed; inset: 0; z-index: 105; display: none; overflow: hidden; background: #082D20;
     padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); overscroll-behavior: contain; user-select: none; -webkit-user-select: none; }
   .rally-overlay.visible { display: block; }
@@ -5391,12 +5407,20 @@
       <button type="button" class="tg-row" data-game="rally" onclick="openRestGame('rally')"><span class="tg-dot" aria-hidden="true"></span><b>Off the Glass</b><small>Air hockey against me · first to 5</small><span class="tg-chev" aria-hidden="true">›</span></button>
       <button type="button" class="tg-row" data-game="sets" onclick="openRestGame('sets')"><span class="tg-dot" aria-hidden="true"></span><b>Between Sets</b><small>Tennis against me · a set lasts your workout</small><span class="tg-chev" aria-hidden="true">›</span></button>
     </div>
+    <!-- Serve Clock (paintGetSet()): from the hand-back on, the list's rest shows the next set and one cue where the door was. Guided has #timerCue instead. -->
+    <div class="timer-getset" id="timerGetSet" aria-live="polite" hidden>
+      <div class="tgs-k">Get set</div>
+      <div class="tgs-next" id="timerGetNext"></div>
+      <p class="timer-cue" id="timerGetCue" hidden></p>
+    </div>
   </div>
   <div class="timer-paper">
     <!-- Guided Mode only: describe the set just done while resting (stepAfterDone). -->
     <div class="timer-log" id="timerLog" hidden></div>
     <!-- Guided Mode only: what comes after this rest (paintTimerNext()). -->
     <div class="timer-next" id="timerNext" hidden></div>
+    <!-- Guided Mode only: one thing to think about for that next set, from the hand-back on (paintGetSet(), Serve Clock). -->
+    <p class="timer-cue" id="timerCue" aria-live="polite" hidden></p>
   </div>
 </div>
 
@@ -9131,7 +9155,7 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // default and says so ("Rest timer").
   const timerSec = restSec || 120;
   const restBottom = isStandard
-    ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${timerSec}" onclick="openTimer(event)">${
+    ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${timerSec}"${restTestAttr(ex)} onclick="openTimer(event)">${
         restSec ? `Rest ${REST_IC} <span class="rest-t">${formatRestLabel(restSec)}</span>` : `Rest timer ${REST_IC}`}</button></div>`
     : '';
 
@@ -9307,9 +9331,9 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // with none opens the timer at a neutral minute and says so ("Rest timer"), like a single
   // exercise; a warm-up with none has no rest button at all (it flows).
   const restBottom = circuitRestSec
-    ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ${REST_IC} <span class="rest-t">${formatRestLabel(circuitRestSec)}</span></button></div>`
+    ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" data-circuit="1" onclick="openTimer(event)">Rest ${REST_IC} <span class="rest-t">${formatRestLabel(circuitRestSec)}</span></button></div>`
     : isPrep ? ''
-    : `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="60" onclick="openTimer(event)">Rest timer ${REST_IC}</button></div>`;
+    : `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="60" data-circuit="1" onclick="openTimer(event)">Rest timer ${REST_IC}</button></div>`;
 
   return `<div class="checklist-item round-group collapsed ${blockClass}" data-day="${dayId}" data-rounds="${roundCount}" data-log-weight="${logWeight ? '1' : '0'}" data-log-rpe="${logRPE ? '1' : '0'}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
@@ -9678,7 +9702,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. All of them stop the moment your rest is over.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a test set.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. During a session it's under <strong>⋯</strong> on the bar too, as <strong>Ask Amir</strong>, and it names the exercise you have open. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
 ];
@@ -15379,6 +15403,142 @@ let timerEndsAt = 0, timerGoTimeout = null;
 let timerOnComplete = null;   // set only by openTimerAuto (Guided Mode) — see closeTimer()
 const circumference = 2 * Math.PI * 100;
 
+// ── SERVE CLOCK (idea #39 of the rest-games round, Amir 2026-10-18 "go with your picks"): the rest hands back to the set ──
+// The last 20 to 30 s of a rest are when getting ready for the next set helps (Hammoudi-Nassib 2014; Tod 2005; Cusimano 2026), and every
+// rest game used to play to 0:00. So with SERVE_CLOCK.at s left (atLong on a rest written at longFrom s or more) the games wind down
+// (a game with handBack(done) says "Last point." and finishes its point, any other closes at once), the door goes, and the band shows
+// the next set and one cue from its Spine entry. The numbers are coaching judgment, not measurements: median written rest 60 s, 83% of
+// rests 90 s or less. +15s never moves the hand-back (it is set by the WRITTEN rest) and never takes it back; Reset restarts the rest, so
+// it does. The door is also not offered at all on a rest written under noDoorUnder s, on a circuit round, or on a flagged retest lift
+// in its window (a test set is the one hard set of the week), and it goes once doorGone s remain before the hand-back.
+// PROGRAM-APP.md → Off the Glass → Serve Clock. Test: node scripts/headless/serve-clock.js.
+const SERVE_CLOCK = { at: 25, atLong: 30, longFrom: 100, noDoorUnder: 45, doorGone: 10 };
+let timerWritten = 0;          // the rest as written when it opened (+15s raises timerDuration, never this)
+let serveHandedBack = false;   // the latch: this rest has been handed back (showTimer() and resetTimer() clear it)
+let timerCtx = null;           // what the open rest belongs to: { card, circuit, test }, or null when unknown (the door then shows, as it always did)
+
+function serveHb() { return timerWritten >= SERVE_CLOCK.longFrom ? SERVE_CLOCK.atLong : SERVE_CLOCK.at; }
+function serveLeft() { return timerRunning ? timerLeft() : timerRemaining; }
+
+// The Rest button says when its lift is a flagged retest (exTestSpec()); read at openTimer(). A throw here must never cost a card.
+function restTestAttr(ex) { try { return exTestSpec(ex) ? ' data-test="1"' : ''; } catch (e) { return ''; } }
+
+// Is "Play while you rest" offered right now?
+function restDoorOn() {
+  if (serveHandedBack) return false;
+  if (timerWritten < SERVE_CLOCK.noDoorUnder) return false;
+  if (timerCtx && (timerCtx.circuit || timerCtx.test)) return false;
+  return serveLeft() > serveHb() + SERVE_CLOCK.doorGone;
+}
+function syncRestDoor() {
+  const b = document.getElementById('timerPlayBtn');
+  if (!b) return;
+  const on = restDoorOn();
+  if (b.hidden === !on) return;
+  if (!on) {
+    foldRestGames();
+    if (document.activeElement === b) { const s = document.getElementById('startStopBtn'); if (s) s.focus(); }
+  }
+  b.hidden = !on;
+}
+
+// One thing to think about for the next set (Serve Clock; The Corner, idea #20, will share it): the Spine entry's own cues, rotated by the
+// set's number through its first two good cues and its fault, so eighteen rests do not repeat one line. Approved entries only (the phone is
+// served nothing else, and a card that names its entry shows that entry or nothing: spineFor()). '' when the entry has no cue.
+function cueForRest(name, exId, setNo) {
+  const e = spineFor(name, exId), c = e && e.cues;
+  if (!c) return '';
+  const pool = [c.good && c.good[0], c.good && c.good[1], c.bad && c.bad[0]].filter(x => typeof x === 'string' && x.trim());
+  if (!pool.length) return '';
+  const n = Math.max(1, parseInt(setNo, 10) || 1);
+  return pool[(n - 1) % pool.length].trim();
+}
+
+// What comes after a list rest. Guided reads STEP.seq (paintTimerNext()); the list keeps the card its Rest button belongs to (timerCtx.card,
+// since openRest() drops the event): the next set is that card's first unticked set, and with all of them ticked the next exercise in the
+// day and its first unticked set. A circuit is named without a count (the list does not track its rounds). null when nothing follows.
+function restNextOfCard(card) {
+  try {
+    const day = card.dataset.day, nm = c => ((c.querySelector('.item-name') || {}).textContent || '').trim();
+    const loggable = c => !!((cardDetail(c) || c).querySelector('.rest-btn'));
+    const circuit = c => c.classList.contains('round-group');
+    const openSet = c => {
+      if (circuit(c) || !loggable(c)) return null;
+      const total = parseInt(c.dataset.sets, 10) || 1, i = loadSetLog(nm(c), total, day).findIndex(s => !s.d);
+      return i < 0 ? null : { no: i + 1, total };
+    };
+    const mk = (c, s) => ({ name: nm(c), exId: c.dataset.exid || '', circuit: circuit(c), no: s ? s.no : 0, total: s ? s.total : 0 });
+    const mine = openSet(card);
+    if (mine) return mk(card, mine);
+    if (circuit(card) && !card.classList.contains('checked')) return mk(card, null);
+    const all = Array.from(document.querySelectorAll('.checklist-item')).filter(c => c.dataset.day === day);
+    for (let i = all.indexOf(card) + 1; i < all.length; i++) {
+      const c = all[i];
+      if (c.classList.contains('checked')) continue;
+      if (circuit(c)) { if (loggable(c)) return mk(c, null); continue; }
+      const s = openSet(c);
+      if (s) return mk(c, s);
+    }
+  } catch (e) { /* unknown: no line */ }
+  return null;
+}
+
+// The get-set line. Before the hand-back (or with the rest not known) there is nothing; after it, the list's band shows "Get set", the
+// next set and the cue where the door was, and Guided's paper (which already has Next) gets the cue under it.
+function paintGetSet() {
+  const guided = !!timerOnComplete;
+  const box = document.getElementById('timerGetSet'), cueP = document.getElementById('timerCue'), ov = document.getElementById('timerOverlay');
+  let next = null, cue = '';
+  if (serveHandedBack) {
+    if (guided) {
+      const nx = STEP ? STEP.seq[STEP.pos + 1] : null;
+      if (nx && !nx.group && !nx.circuit) cue = cueForRest(nx.name, nx.card && nx.card.dataset.exid, nx.setI + 1);
+    } else {
+      next = timerCtx && timerCtx.card ? restNextOfCard(timerCtx.card) : null;
+      if (next && !next.circuit) cue = cueForRest(next.name, next.exId, next.no);
+    }
+  }
+  if (cueP) { cueP.textContent = guided ? cue : ''; cueP.hidden = !(guided && cue); }
+  if (box) {
+    box.hidden = !next;
+    const nl = document.getElementById('timerGetNext'), cl = document.getElementById('timerGetCue');
+    if (next) {
+      const where = next.circuit ? '' : ' · set ' + next.no + ' of ' + next.total;
+      if (nl) nl.innerHTML = `<span class="tn-k">Next:</span> ${esc(next.name + where)}`;
+      if (cl) { cl.textContent = cue; cl.hidden = !cue; }
+    } else {
+      if (nl) nl.textContent = '';
+      if (cl) { cl.textContent = ''; cl.hidden = true; }
+    }
+  }
+  if (ov) ov.classList.toggle('has-getset', !!next);
+}
+
+// The hand-back, once per rest: fold the shelf, take the door away, ask every open game to finish (a game with handBack(done) is closed when
+// it calls done(); any other is closed now) and paint the get-set line. A game still loading for a tap just before this opens nothing.
+function serveHandBack() {
+  if (serveHandedBack) return;
+  serveHandedBack = true;
+  _restGameWant = null;
+  foldRestGames();
+  syncRestDoor();
+  restGamesOpen().forEach(G => {
+    if (typeof G.handBack === 'function') G.handBack(() => { if (G.isOpen()) G.close(); });
+    else G.close();
+  });
+  paintGetSet();
+}
+// A rest (re)starts: the latch is clear, and a rest written at or under the hand-back point is handed back from the start.
+function serveClockReset() {
+  serveHandedBack = false;
+  if (timerWritten > 0 && timerWritten <= serveHb()) serveHandBack();
+  else { syncRestDoor(); paintGetSet(); }
+}
+// Every tick of a running rest (and the catch-up when the page comes back): the hand-back at its point, the door by the clock.
+function serveClockTick(left) {
+  if (!serveHandedBack && left <= serveHb()) serveHandBack(); else syncRestDoor();
+}
+
 function openTimer(e) {
   if (e) e.stopPropagation();
   const btn  = e ? e.target.closest('.rest-btn') : null;
@@ -15388,29 +15548,35 @@ function openTimer(e) {
   // Read rest duration from the button's data-rest, default to 120s
   const parsed = btn ? parseInt(btn.getAttribute('data-rest'), 10) : NaN;
   const secs = (Number.isFinite(parsed) && parsed > 0) ? parsed : 120;
-  openRest(secs, name);
+  // What the rest belongs to, for Serve Clock: its card (the next set), a circuit round or a flagged retest lift (no games on those).
+  // Unknown, as for a rest opened with no card, shows the door as it always did.
+  const ctx = card ? { card, circuit: !!(btn && btn.dataset.circuit === '1') || card.classList.contains('round-group'),
+    test: !!(btn && btn.dataset.test === '1') && inRetestWindow() } : null;
+  openRest(secs, name, ctx);
 }
 
 // Every list-mode door (the card's Rest button, the offer after a tick) opens the rest
 // already running: tapping Rest means the set is over (WK-02; it used to wait for Start).
-function openRest(secs, name) {
-  showTimer(secs, name, null);
+function openRest(secs, name, ctx) {
+  showTimer(secs, name, null, ctx);
   startTimer();
 }
 
 // Guided Mode's rest: same overlay, same running start, but it calls onComplete when
 // the rest ends — naturally, or via Skip.
-function openTimerAuto(secs, name, onComplete) {
-  showTimer(secs, name, onComplete);
+function openTimerAuto(secs, name, onComplete, ctx) {
+  showTimer(secs, name, onComplete, ctx);
   startTimer();
 }
 
 // Shared setup for both entry points above.
-function showTimer(secs, name, onComplete) {
+function showTimer(secs, name, onComplete, ctx) {
   clearTimeout(timerGoTimeout); timerGoTimeout = null;   // a "GO!" still closing the last rest
   _restGameWant = null;   // a game still loading for the last rest does not open over this one
   timerDuration = secs;
   timerRemaining = secs;
+  timerWritten = secs;     // Serve Clock reads the written rest; +15s raises timerDuration, not this
+  timerCtx = ctx || null;
   timerOnComplete = onComplete;
   document.getElementById('timer-exercise-name').textContent = name;
   // ✕ (top right) is the list's Close and Guided's Skip → alike: both call closeTimer(), which in Guided moves on. Guided keeps
@@ -15482,6 +15648,7 @@ function timerTick() {
     updateRing(timerDuration ? timerRemaining / timerDuration : 0);
   }
   if (left <= 0) timerDone();
+  else serveClockTick(left);   // Serve Clock: the hand-back at its point, the door by the clock
 }
 
 function timerDone() {
@@ -15509,6 +15676,7 @@ function resetTimer() {
   pauseTimer(); timerRemaining = timerDuration;
   updateTimerDisplay(); updateRing(1);
   document.getElementById('timerDisplay').classList.remove('warning');
+  serveClockReset();   // Serve Clock: Reset restarts the rest, so the door comes back (a rest written at the hand-back point or under is handed back at once)
 }
 
 // ── The rest games: Split Step, Off the Glass and Between Sets, behind one door ──
@@ -15544,6 +15712,7 @@ function restGamesOpen() { return Object.keys(REST_GAMES).map(k => window[REST_G
 function closeRestGames() { restGamesOpen().forEach(G => G.close()); }
 function openRestGame(key) {
   if (timerGoTimeout) return;   // the rest is over and its GO! is closing: nothing to play for
+  if (serveHandedBack) return;  // Serve Clock: the last seconds of the rest belong to the next set
   _restGameWant = key;
   restAudioPrime();   // in the tap: iPhone plays a game's sounds only from a context opened by one
   if (!timerRunning && timerRemaining > 0) startTimer();   // a game is for a rest that is running
@@ -15556,6 +15725,7 @@ function openRestGame(key) {
     G.open({
       root: document.getElementById(REST_GAMES[key].root),
       left: () => (timerRunning ? timerLeft() : null),
+      handBackAt: serveHb,   // Serve Clock: where the host takes the screen back (25 or 30 s), so Split Step starts no round it would cut
       sound: restSoundOn,
       audio: () => _restAC,
       name: (typeof DATA !== 'undefined' && DATA && DATA.athlete && DATA.athlete.firstName) || '',   // Between Sets' scoreboard; the other games ignore it
@@ -16025,7 +16195,7 @@ function stepAfterDone() {
   else paintTimerLog(currentStepRow(), item);
   const restBtn = STEP.homeDetail.querySelector('.rest-btn');   // hidden by CSS, but still real
   const secs = parseInt(restBtn && restBtn.getAttribute('data-rest'), 10) || 120;
-  openTimerAuto(secs, item.name, stepAdvance);
+  openTimerAuto(secs, item.name, stepAdvance, { card: item.card, circuit: !!item.circuit, test: !!(restBtn && restBtn.dataset.test === '1') && inRetestWindow() });
 }
 
 // The rest screen asks what the set was, while the athlete is sitting down anyway:

@@ -170,7 +170,8 @@ const PLAY = `(async () => {
     await openFromShelf(p, 'splitstep');
     await p.click('#splitOverlay [data-go]');
     await p.waitForFunction(() => /^(wait|live)$/.test(SplitStep._state().phase), null, { timeout: 5000 });
-    await p.evaluate(() => { timerEndsAt = Date.now() + 1500; });
+    // Serve Clock would close the game with 30 s left (serve-clock.js tests that); this check is the rest running out on an open round, so the hand-back is off.
+    await p.evaluate(() => { SERVE_CLOCK.at = 0; SERVE_CLOCK.atLong = 0; timerEndsAt = Date.now() + 1500; });
     await wait(p, 2100);
     const up = await p.evaluate(() => { const s = SplitStep._state(); return s ? { up: s.up, phase: s.phase, title: s.card.querySelector('h3') && s.card.querySelector('h3').textContent, hidden: s.card.hidden } : null; });
     t.check('the rest running out stops the round and says so', up && up.up && !up.hidden && up.title === 'Time. Next set.', JSON.stringify(up));

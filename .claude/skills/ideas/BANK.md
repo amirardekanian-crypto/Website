@@ -149,16 +149,16 @@ rest is the boss; the last 25 s are for the set; only inside a rest and optional
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 38 | The Read | Amir defends like a person: aims where the ball will cross, reacts a beat late, small aim error, form set between points; the score-based speed dial goes; a sim test with three human-like bots. Advanced: a visible head start ("Amir gives you a point") | — | pitched · **build first** (with 39) |
-| 39 | Serve Clock | At 25 s left (30 on rests of 100 s+) "Last point", then the next set and one Spine cue; no game door on rests under 45 s, circuit rounds or retest lifts; one `cueForRest()` shared with #20 | — | pitched · **build first** (with 38) |
-| 40 | Full Time | One match a session: the score waits between rests, first to 15, an 8-minute play cap, Done ends it | 39 | pitched |
-| 41 | Chair Umpire | A receipt per rest (written, run, how it ended, +15s) in the session log, read by coach.html, `/cycle-report` and `/program-design`; a line in privacy.html | — | pitched |
+| 38 | The Read | Amir defends like a person: aims where the ball will cross, reacts a beat late, small aim error, form set between points; the score-based speed dial goes; a sim test with three human-like bots. Advanced: a visible head start ("Amir gives you a point") | — | **picked** 2026-10-18 ('go with your picks') · **built** 2026-10-18 (sw.js v169) |
+| 39 | Serve Clock | At 25 s left (30 on rests of 100 s+) "Last point", then the next set and one Spine cue; no game door on rests under 45 s, circuit rounds or retest lifts; one `cueForRest()` shared with #20 | — | **picked** 2026-10-18 ('go with your picks') · **built** 2026-10-18 (sw.js v169) |
+| 40 | Full Time | One match a session: the score waits between rests, first to 15, an 8-minute play cap, Done ends it | 39 | picked (first to 15, 8-min cap) |
+| 41 | Chair Umpire | A receipt per rest (written, run, how it ended, +15s) in the session log, read by coach.html, `/cycle-report` and `/program-design`; a line in privacy.html | — | picked (with a privacy line) |
 | 42 | Clean Strike | Hit-stop up to 60 ms, a pitch ladder per rally hit, a white rim on Amir's racket, the thumb lift fading near the back glass | — | pitched |
-| 43 | Bajada | A real bank off the glass through the gap counts 2 | 38 | pitched |
-| 44 | The Lob | A calm breathing door on the shelf (in 4, out 6), handing back at 25 s; a mode of rally.js | 39 | pitched |
-| 45 | Call the Score | Guided: the door reads "Rate the set, then play" while the set just done has no RPE; nothing locks | — | pitched · check whose sets are blank first |
-| 46 | Walk-On | Amir's own recorded lines at the bell, English and Farsi | — | pitched · needs his recordings |
-| 47 | Passing Shot | A Story card for beating Amir, in the Highlight Reel family | 38, 40 | pitched · his call on being the opponent on athletes' Stories |
+| 43 | Bajada | A real bank off the glass through the gap counts 2 | 38 | picked (after The Read) |
+| 44 | The Lob | A calm breathing door on the shelf (in 4, out 6), handing back at 25 s; a mode of rally.js | 39 | picked |
+| 45 | Call the Score | Guided: the door reads "Rate the set, then play" while the set just done has no RPE; nothing locks | — | picked (check whose sets are blank first) |
+| 46 | Walk-On | Amir's own recorded lines at the bell, English and Farsi | — | pitched · waits for Amir's recordings |
+| 47 | Passing Shot | A Story card for beating Amir, in the Highlight Reel family | 38, 40 | parked until The Read ships |
 
 Grown for #20 The Corner (slices, not new numbers; they share Serve Clock's cue function): Ball Change (the next exercise's Because
 at a changeover), Towel Break (why this rest is long or short, three sightings), Order of Play (why the block order, in the guide

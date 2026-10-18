@@ -14,9 +14,11 @@
 //
 // program.html owns the layer (#rallyOverlay, in topLayer() so Back closes it) and loads this file the first time Play is
 // tapped (sw.js keeps it in the shell, so it plays with no signal; a change to it ships with a CACHE bump).
-// API: Rally.open({ root, left, sound, audio, onClose }) · Rally.timeUp() · Rally.close() · Rally.isOpen().
+// API: Rally.open({ root, left, sound, audio, onClose }) · Rally.timeUp() · Rally.close() · Rally.isOpen() · Rally.handBack(done).
 //   left()  → whole seconds of rest left, or null while the rest is paused.
 //   sound() → true when the rest timer's sound is on.  audio() → the page's AudioContext, opened in the tap on Play.
+//   handBack(done) → Serve Clock (idea #39): with 25 s left program.html asks the game to wind down. It says "Last point.", lets a point in
+//   play finish (no new serve), then calls done() and program.html closes it, so the last seconds of the rest belong to the next set.
 (function () {
   'use strict';
   const WIN_AT = 5;
@@ -162,7 +164,7 @@
     box.querySelector('h3').textContent = m.title;
     box.querySelector('p').textContent = m.text;
     const go = box.querySelector('.rally-go');
-    go.hidden = !m.button; go.textContent = m.button || '';
+    go.hidden = !m.button || !!S.hb; go.textContent = m.button || '';   // no Play again once the rest has asked for the screen back
     box.hidden = false;
   }
 
@@ -252,10 +254,21 @@
     if (top) { tone(523, 0.12, 0.22); setTimeout(() => tone(784, 0.2, 0.22), 110); buzz([15, 30, 15]); }
     else { tone(220, 0.25, 0.2, 'sawtooth'); buzz(40); }
     S.banner = { text: top ? 'Point!' : 'Amir scores', t: 0, c: top ? C.mint : C.clay };
-    if (S.score[who] >= WIN_AT) { S.ball.vx = S.ball.vy = 0; S.ball.y = -9999; endMatch(); return; }
+    if (S.score[who] >= WIN_AT) { S.ball.vx = S.ball.vy = 0; S.ball.y = -9999; endMatch(); lastPointIn(); return; }
     // Amir's form changes here and nowhere else: a step sharper after your point, a step softer after his
     S.form = Math.max(0, Math.min(1, S.form + (top ? AMIR.step : -AMIR.step)));
+    if (lastPointIn()) return;   // Serve Clock: that was the last point of this rest, nobody serves again
     serve(!top);   // the one who lost the point serves
+  }
+
+  // ── Serve Clock (idea #39): the rest hands the screen back ──
+  // The last point is in (or no point was in play): serve nothing more and let it show for 0.8 s, then hand the screen back.
+  function lastPointIn() {
+    const hb = S.hb;
+    if (!hb || hb.fired) return false;
+    S.over = true; S.ball.vx = S.ball.vy = 0; S.ball.y = -9999;   // the court stops: no serve, no auto-serve, no more points
+    hb.timers.push(setTimeout(hb.finish, 800));
+    return true;
   }
 
   // ── Amir's racket: The Read (2026-10-18) ──
@@ -398,7 +411,7 @@
     S.parts = S.parts.filter(p => (p.t += dt) < p.life);
     S.parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 260 * dt; p.vx *= 0.98; });
     S.flash = S.flash.filter(f => (f.t += dt) < 0.3);
-    if (S.banner && (S.banner.t += dt) > 1.1) S.banner = null;
+    if (S.banner) { S.banner.t += dt; if (S.banner.hold) S.banner.t = Math.min(S.banner.t, 0.5); else if (S.banner.t > 1.1) S.banner = null; }   // a held banner ("Last point.") stays until the next one replaces it
     S.shake = S.reduce ? 0 : Math.max(0, S.shake - dt * 40);
   }
 
@@ -584,7 +597,7 @@
       if (S.ac && S.ac.state === 'suspended') S.ac.resume();
     } catch (e) {}
     root.querySelector('.rally-x').addEventListener('click', () => close());
-    S.msg.querySelector('.rally-go').addEventListener('click', e => { e.stopPropagation(); if (S && !S.timeUp) newMatch(); });
+    S.msg.querySelector('.rally-go').addEventListener('click', e => { e.stopPropagation(); if (S && !S.timeUp && !S.hb) newMatch(); });
     S.cv.addEventListener('pointerdown', onDown);
     S.cv.addEventListener('pointermove', onMove);
     S.cv.addEventListener('pointerup', onUp);
@@ -609,9 +622,36 @@
     msg({ title: 'Time. Next set.', text: S.over ? 'Back to work.' : `You ${S.score.you}, Amir ${S.score.amir}. Back to work.`, button: '' });
   }
 
+  // Serve Clock (idea #39, Amir 2026-10-18 "go with your picks"): with 25 s left the last seconds of the rest belong to the next set, so
+  // program.html asks the game to wind down and closes it when done() is called. A point in play is let finish (nothing is served after
+  // it); with no point in play (the serve freeze, a ball that died, a match that is over) done() comes after 0.6 s; never later than 6 s.
+  function handBack(done) {
+    if (!S) { if (done) done(); return; }
+    if (S.hb) return;                              // asked already: the first done() stands
+    const s = S;
+    const live = !s.over && !s.timeUp && !s.freeze && speed(s.ball) >= s.vmax * 0.1;
+    const hb = s.hb = { fired: false, timers: [] };
+    hb.finish = () => {
+      if (hb.fired) return;
+      hb.fired = true;
+      hb.timers.forEach(clearTimeout);
+      if (S === s) {
+        s.over = true;                             // after done() the court never serves again, whatever the caller does next
+        const st = loadStats();
+        if (s.best > st.best) { st.best = s.best; saveStats(st); }   // the best rally of a match cut short counts, as it does when time runs out
+      }
+      if (done) { try { done(); } catch (e) {} }
+    };
+    s.banner = { text: 'Last point.', t: 0, c: C.mint, hold: true };
+    s.msg.querySelector('.rally-go').hidden = true;
+    hb.timers.push(setTimeout(hb.finish, 6000));   // the hard deadline
+    if (!live) hb.timers.push(setTimeout(hb.finish, 600));
+  }
+
   function close(quiet) {
     if (!S) return;
     const s = S; S = null;
+    if (s.hb) s.hb.timers.forEach(clearTimeout);
     cancelAnimationFrame(s.raf);
     window.removeEventListener('resize', s.onResize);
     try { if (s.ac && s.ownAc) s.ac.close(); } catch (e) {}
@@ -623,5 +663,5 @@
   // For scripts/test_rally_sim.js, which plays whole matches with no browser: one frame, with nothing drawn.
   function tick(dt) { if (!S) return; if (!S.timeUp && dt > 0) step(dt); tickFx(dt); }
 
-  window.Rally = { open, timeUp, close: () => close(), isOpen: () => !!S, stats: loadStats, _state: () => S, _tick: tick };
+  window.Rally = { open, timeUp, handBack, close: () => close(), isOpen: () => !!S, stats: loadStats, _state: () => S, _tick: tick };
 })();
