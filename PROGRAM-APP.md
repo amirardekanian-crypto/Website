@@ -629,20 +629,47 @@ costs more than one tap.
     time's (`lw`, which carries its own unit), else the lift's last logged session, else kg. Pick pounds once and the
     next session of that lift opens in pounds on any phone. LAST shows the bare number when it is in today's unit and
     names its own unit when it is not (`lastText()`: "45 lb" under a kg box), so it is never read as the other unit.
-    **The maths** (`parseLoggedKg()`): pounds are kilograms to two places (45 lb = 20.41 kg), plates are no weight at all
-    (null: no estimate, no Personal Record, never "far above", a win only by reps), everything else reads as before.
+    **The maths** (`parseLoggedKg()`): a weight in kilograms is the number, pounds are kilograms to two places (45 lb = 20.41 kg),
+    plates are none (null). That reading is used for exactly two things now: "far above your numbers" and the ratio to body
+    weight. **Everything else is kept in the weight's own measure** (below).
     **What is shown**: sets in the unit they were typed in (History, the done line, Last time, the ghost line:
     `histSetsText()`, `histWt()`; a list that mixes units names every unit; the History chart is drawn in the lift's
-    last unit, a plates lift as *Top stack, plates*); a win in pounds is worded in pounds (`winText()`); **Personal
-    Records stay in kilograms** (the estimate is kg) and a record set in pounds carries `u: 'lb'`, so its row also says the
-    pounds, and **no share card is drawn from pounds** (a card says kilograms and would round converted numbers up:
-    `hlBestSpec()`, `hlRetestSpec()`, a win's `share: false`). In coach.html a set reads as typed in the athlete's own
+    last measure, a plates lift as *Top stack, plates*). In coach.html a set reads as typed in the athlete's own
     unit and the load column says `45 → 50 lb` or `6 → 7 plates` (`wUnitOf()`, `loadSummary()`); sets in two units are
-    listed as typed, never folded into one range. **Twins**: `career_kg()` in the database
-    (`supabase/stage71_weight_units.sql`; `node scripts/career/rehearse_units.mjs` runs it against `parseLoggedKg()` on
-    thousands of weights) and `scripts/check_setlog.js` (the grammar both readers share). Not done, on purpose:
-    circuits' per-item weights stay free text (typing "16 lb" there reads, but there is no button), the Log a max form
-    is kg, and share cards say kg. `scripts/headless/weight-units.js` (28 checks).
+    listed as typed, never folded into one range. Circuits have the same pill over their weight boxes (`.circ-unit`,
+    `circuitUnit()`, `setCircuitUnit()`: one unit for the whole circuit, the unit written in each item's weight).
+    **Twins**: `career_kg()` / `career_wn()` / `career_wu()` in the database (`supabase/stage71_weight_units.sql`,
+    `stage72_weight_measures.sql`; `node scripts/career/rehearse_units.mjs` and `rehearse_measures.mjs` run them against
+    `weightOf()` on thousands of weights) and `scripts/check_setlog.js` (the grammar both readers share).
+    `scripts/headless/weight-units.js`.
+  - **A record is kept per MEASURE** (Amir, 2026-10-18: *"personal records can be in all measures, and it's only an
+    achievement if you go higher than your previous record in the same measure"*). Kilograms, pounds and plates are three
+    scales that never meet: 225 lb is not "above" 100 kg and 9 plates is not a weight. So a Personal Records entry says its
+    measure in `u` (`'lb'` or `'plates'`; absent = kg) and its `kg` (the estimate) and `w` (the set) are numbers **in that
+    measure, never converted** (the field names are the old ones). `estimateOneRM(w, reps, rpe, unit)` rounds to the measure's
+    own step (`ONE_RM_ROUND`: kg 2.5, lb 5, plates 0.5); `setsMeasure()` is the measure of a session's exercise (the first
+    weighted set's unit; a set typed in another measure is left out of every best); `histBestSet()` returns `{ est, w, reps,
+    rpe, u }`. `ceilingSeries()` is every (lift, measure) series; `ceilingLifts()` is one row per lift, the series of its newest
+    entry (the other measure stays on the record, untouched, as its own series). `ceilingPrevBest(lift, day, u)`,
+    `noteNewBest(lift, est, day, u)` and `fillRecords()` (a bar per lift AND measure) judge a best against the same measure
+    only, so **the first record in a new measure beats nothing** and a higher estimate in pounds is a new best against the
+    pounds records alone. One entry a day per lift AND measure (`saveCeilingEntry()`, the merge key lift|day|measure,
+    `deleteCeilingEntry(lift, day, u)`: a tombstone carries `u`). Every Records screen says its unit (`uWord()`); Home's best
+    lift and the body-weight ratio use `recKgEq()` (pounds converted, plates none, so a plates lift never leads that line);
+    + Log a max opens in the lift's own measure with a unit button (`cycleCeilingUnit()`, `cf-unit`). **Wins are per measure
+    too** (`cycleBestSet()`, `cycleWins()` keys name + measure, `winText()` words a win in its own unit: *+10 lb, same reps*,
+    *+1 plate, same reps*), and a kg win against a lb one is no win. **Share cards say the measure** (`spec.u`;
+    `assets/js/sharecard.js` `unitW()`; the Farsi words for lb and plates are drafts for Amir).
+  - **Which movements earn a record by themselves** (Amir, 2026-10-18: *"those movements are mainly isolate or don't count as a
+    strength exercise, but one handed cable machines are used to build strength and are not isolate exercises"*): a strength
+    pattern only (`RECORD_PATTERNS`: squat, hinge, single-leg, the two pushes and the two pulls), no impact. **Isolation no
+    longer files a record** (a curl, a lateral raise, an external rotation, a wrist extension, a leg curl), except a
+    **one-handed cable exercise** (`oneHandedCable()`: a cable in the Spine entry's equipment and *single-arm* / *one-arm* /
+    *one-hand* in its name), which counts wherever the Spine files it. The automatic records the isolation lifts had already
+    filed are put away by `dropIneligibleRecords()` (tombstones, so every phone and coach.html drop them together; only
+    automatic entries, only for a lift whose Spine entry is known and has a pattern; a tested or hand-entered record stays).
+    On the server nothing mirrors the rule: `personal_best` facts come from the `auto` entries in the athlete's `_1rm`, so
+    the tombstones void them on the next derive.
   - `migrateCarriedWeights()` converts, once per phone, the weights every sweep before this left in
     `w` (a set holding only a weight, on an exercise no live day holds). Its marker `aap_lw1_<id>`
     sits outside the athlete's key prefix so it never syncs.

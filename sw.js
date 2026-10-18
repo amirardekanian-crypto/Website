@@ -302,7 +302,8 @@
 // v171: program.html and assets/js/rally.js changed (2026-10-18): Full Time (one match a session), Bajada (off the glass counts 2) and The Lob (a calm breathing door on the shelf).
 // v172: program.html changed (2026-10-18): the guide says a bank shot off the glass counts 2 (a clip near the goal counts 1).
 // v173: program.html changed (2026-10-18): the unit button over the weight boxes (kg, lb or plates), and a build-up of weights no longer asks "far above your numbers" at every heavier set.
-const CACHE = 'aap-v173';
+// v174: program.html and assets/js/sharecard.js changed (2026-10-18): a Personal Record, a win and a share card are kept in their own measure (kg, lb or plates), isolation lifts file no record, circuits get the unit button, Log a max has one.
+const CACHE = 'aap-v174';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

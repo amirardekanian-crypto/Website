@@ -110,30 +110,137 @@ const tapUnit = async p => { await p.click('#sq .ex-set-unit'); await p.waitForT
     await ctx.close();
   }
 
-  // ── 7. the maths: pounds are kilograms in every calculation, plates are none ──
+  // ── 7. the maths: each measure is its own scale, never converted, never compared with another ──
   {
     const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), hist: [], stub: { library: H.library() } });
     const m = await p.evaluate(() => {
       const set = (w, n, r) => cycleSetOf({ reps: n }, { w, n: String(n), r: String(r) });
-      const lbWin = winText(set('100 lb', 8, 7), set('110 lb', 8, 7));
-      const kgWin = winText(set('100', 8, 7), set('105', 8, 7));
-      const mixWin = winText(set('100', 8, 7), set('250 lb', 8, 7));
-      const plWin = winText(set('5 plates', 8, 7), set('6 plates', 8, 7));
-      const plReps = winText(set('5 plates', 8, 7), set('5 plates', 10, 7));
-      const best = histBestSet({ reps: 5, sets: [{ w: '225 lb', n: 5, r: '8', d: true }] });
-      const bestKg = histBestSet({ reps: 5, sets: [{ w: '100', n: 5, r: '8', d: true }] });
-      const bestPl = histBestSet({ reps: 5, sets: [{ w: '6 plates', n: 5, r: '8', d: true }] });
-      return { lbWin, kgWin, mixWin, plWin, plReps, best, bestKg, bestPl, kgs: [parseLoggedKg('225 lb'), parseLoggedKg('6 plates'), parseLoggedKg('100')] };
+      const best = (w, n, r) => histBestSet({ reps: n, sets: [{ w, n, r, d: true }] });
+      return {
+        lbWin: winText(set('100 lb', 8, 7), set('110 lb', 8, 7)),
+        kgWin: winText(set('100', 8, 7), set('105', 8, 7)),
+        mixWin: winText(set('100', 8, 7), set('250 lb', 8, 7)),
+        plWin: winText(set('5 plates', 8, 7), set('6 plates', 8, 7)),
+        plReps: winText(set('5 plates', 8, 7), set('5 plates', 10, 7)),
+        plSame: winText(set('5 plates', 8, 7), set('5 plates', 8, 7)),
+        lb: best('225 lb', 5, 8), kg: best('100', 5, 8), pl: best('6 plates', 5, 8), none: best('', 5, 8),
+        mixedEntry: histBestSet({ reps: 5, sets: [{ w: '60', n: 5, r: '8', d: true }, { w: '225 lb', n: 5, r: '8', d: true }] }),
+        est: [estimateOneRM(100, 5, 8), estimateOneRM(225, 5, 8, 'lb'), estimateOneRM(6, 5, 8, 'plates'), estimateOneRM(100, 5, 8, 'kg')],
+        kgs: [parseLoggedKg('225 lb'), parseLoggedKg('6 plates'), parseLoggedKg('100')],
+        recKg: [recKgEq({ kg: 280, u: 'lb' }), recKgEq({ kg: 7.5, u: 'plates' }), recKgEq({ kg: 100 })],
+        meas: [setsMeasure([{ w: '', d: true }, { w: '45 lb', d: true }]), setsMeasure([{ w: '60', d: true }, { w: '45 lb', d: true }]), setsMeasure([])],
+      };
     });
-    C.check('a win in pounds is worded in pounds, and draws no share card (a card says kilograms)', m.lbWin && m.lbWin.txt === '+10 lb, same reps, same RPE' && m.lbWin.share === false, JSON.stringify(m.lbWin));
-    C.check('a win in kg is worded as ever and can still be shared', m.kgWin && /^\+5 kg, same reps, same RPE$/.test(m.kgWin.txt) && m.kgWin.share === true, JSON.stringify(m.kgWin));
-    C.check('kg then pounds is compared in kilograms and says kg', m.mixWin && /kg/.test(m.mixWin.txt) && !/ lb/.test(m.mixWin.txt) && m.mixWin.share === false, JSON.stringify(m.mixWin));
-    C.check('plates are no load: 5 → 6 plates at the same reps is no win, and more reps at the same plates is a reps win with no kilogram in it',
-      m.plWin === null && m.plReps && /^\+2 reps/.test(m.plReps.txt) && !/kg|lb/.test(m.plReps.txt), JSON.stringify([m.plWin, m.plReps]));
-    C.check('a best set in pounds is estimated in kilograms and marked lb; kg is not marked; plates have no estimate',
-      m.best && m.best.u === 'lb' && m.best.kg === 102.06 && m.bestKg && m.bestKg.u === '' && m.bestPl === null, JSON.stringify([m.best, m.bestKg, m.bestPl]));
-    C.check('225 lb = 102.06 kg, plates = no weight', m.kgs[0] === 102.06 && m.kgs[1] === null && m.kgs[2] === 100, JSON.stringify(m.kgs));
+    C.check('a win in pounds is worded in pounds (numbers as typed) and can be shared (the card says pounds)', m.lbWin && m.lbWin.txt === '+10 lb, same reps, same RPE' && m.lbWin.share === true, JSON.stringify(m.lbWin));
+    C.check('a win in kg is worded as ever and can be shared', m.kgWin && /^\+5 kg, same reps, same RPE$/.test(m.kgWin.txt) && m.kgWin.share === true, JSON.stringify(m.kgWin));
+    C.check('kg against pounds is no win: two measures are never compared', m.mixWin === null, JSON.stringify(m.mixWin));
+    C.check('plates are a measure of their own: 5 → 6 plates at the same reps is "+1 plate", more reps at the same plates is a reps win, no change is none',
+      m.plWin && m.plWin.txt === '+1 plate, same reps, same RPE' && m.plReps && /^\+2 reps at 5 plates/.test(m.plReps.txt) && m.plSame === null, JSON.stringify([m.plWin, m.plReps, m.plSame]));
+    C.check('a best set is estimated in its own measure, rounded to its own step (kg 2.5, lb 5, plates 0.5), and says which',
+      m.lb && m.lb.est === 280 && m.lb.w === 225 && m.lb.u === 'lb' && m.kg && m.kg.est === 122.5 && m.kg.u === '' && m.pl && m.pl.est === 7.5 && m.pl.w === 6 && m.pl.u === 'plates' && m.none === null, JSON.stringify([m.lb, m.kg, m.pl, m.none]));
+    C.check('a session\'s exercise is one measure: the first weighted set decides, a set typed in another is left out',
+      m.mixedEntry && m.mixedEntry.u === '' && m.mixedEntry.w === 60 && m.meas.join('|') === 'lb|kg|kg', JSON.stringify([m.mixedEntry, m.meas]));
+    C.check('estimateOneRM rounds to the measure\'s step; kilograms only for the body-weight ratio, plates have none', JSON.stringify(m.est) === '[122.5,280,7.5,122.5]'
+      && m.kgs[0] === 102.06 && m.kgs[1] === null && m.kgs[2] === 100 && Math.abs(m.recKg[0] - 127) < 0.01 && m.recKg[1] === null && m.recKg[2] === 100, JSON.stringify([m.est, m.kgs, m.recKg]));
     C.check('no page errors (the maths)', !p.errs.length, JSON.stringify(p.errs));
+    await ctx.close();
+  }
+
+  // ── 9. a record is only an achievement against the SAME measure ──
+  {
+    const day = n => H.past(n);
+    const sess = (n, ex, w, reps, rpe) => ({ date: day(n), day: '1', entries: [{ ex, reps, sets: [{ w, n: reps, r: String(rpe), d: true }] }] });
+    const spine = H.SPINE.map(e => e.id === 'barbell-back-squat' ? Object.assign({}, e, { pattern: 'squat', impact: 'none' }) : e);   // a record lift
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), spine, hist: [], stub: { library: H.library() } });
+    const r = await p.evaluate(([s1, s2, s3, s4]) => {
+      const lift = 'Barbell Back Squat';
+      const ent = () => loadCeilingRaw().filter(e => e.lift === lift).map(e => ({ d: e.d, kg: e.kg, u: e.u || '', auto: !!e.auto, del: !!e.del }));
+      fillRecords([s1], true);                                    // 100 kg: the first record
+      const afterKg = ent(), bestA = localStorage.getItem(ATHLETE_ID + '_ceil_best');
+      fillRecords([s1, s2], true);                                // then 225 lb: the first record in pounds beats nothing
+      const afterLb = ent(), bestB = localStorage.getItem(ATHLETE_ID + '_ceil_best');
+      fillRecords([s1, s2, s3], true);                            // then 235 lb: higher than 225 lb, so a best
+      const afterLb2 = ent(), bestC = JSON.parse(localStorage.getItem(ATHLETE_ID + '_ceil_best') || 'null');
+      fillRecords([s1, s2, s3, s4], true);                        // then 6 plates on a stack: the first in plates
+      const series = ceilingSeries().filter(x => x.lift === lift).map(x => x.u + ':' + x.entries.length + ':' + x.latest.kg);
+      const row = ceilingLifts().filter(x => x.lift === lift).map(x => x.u + ':' + x.latest.kg);
+      return { afterKg, bestA, afterLb, bestB, afterLb2, bestC, series, row, prevKg: ceilingPrevBest(lift, '2000-01-01', ''), prevLb: ceilingPrevBest(lift, '2000-01-01', 'lb'), prevPl: ceilingPrevBest(lift, '2000-01-01', 'plates') };
+    }, [sess(9, 'Barbell Back Squat', '100', 5, 8), sess(6, 'Barbell Back Squat', '225 lb', 5, 8), sess(3, 'Barbell Back Squat', '235 lb', 5, 8), sess(1, 'Barbell Back Squat', '6 plates', 5, 8)]);
+    C.check('a kg session files the first record (no best to celebrate)', r.afterKg.length === 1 && r.afterKg[0].kg === 122.5 && r.afterKg[0].u === '' && r.bestA === null, JSON.stringify([r.afterKg, r.bestA]));
+    C.check('the first record in pounds is filed beside it and is NOT a new best (225 lb is not "above" 100 kg)', r.afterLb.length === 2 && r.afterLb.some(e => e.u === 'lb' && e.kg === 280) && r.bestB === null, JSON.stringify([r.afterLb, r.bestB]));
+    C.check('a higher estimate in pounds IS a new best, against the pounds record only', r.afterLb2.some(e => e.u === 'lb' && e.kg === 290) && r.bestC && r.bestC.u === 'lb' && r.bestC.prev === 280 && r.bestC.kg === 290, JSON.stringify([r.afterLb2, r.bestC]));
+    C.check('plates have a series of their own, and the lift\'s row is the measure it was last lifted in', r.series.sort().join('|') === ':1:122.5|lb:2:290|plates:1:7.5' && r.row.join('|') === 'plates:7.5', JSON.stringify([r.series, r.row]));
+    C.check('the bar to beat is per measure', r.prevKg === 122.5 && r.prevLb === 290 && r.prevPl === 7.5, JSON.stringify([r.prevKg, r.prevLb, r.prevPl]));
+    C.check('no page errors (records)', !p.errs.length, JSON.stringify(p.errs));
+    await ctx.close();
+  }
+
+  // ── 10. which movements earn a record by themselves ──
+  {
+    const spine = H.SPINE.concat([
+      { id: 'half-kneeling-single-arm-cable-row', name: 'Half-Kneeling Single-Arm Cable Row', aliases: [], equipment: ['cable'], pattern: 'pull-horizontal', impact: 'none', cues: { good: [], bad: [] } },
+      { id: 'single-arm-cable-lateral-raise', name: 'Single-Arm Cable Lateral Raise', aliases: [], equipment: ['cable'], pattern: 'isolation', impact: 'none', cues: { good: [], bad: [] } },
+      { id: 'cable-lateral-raise', name: 'Cable Lateral Raise', aliases: [], equipment: ['cable'], pattern: 'isolation', impact: 'none', cues: { good: [], bad: [] } },
+      { id: 'machine-lying-leg-curl', name: 'Machine Lying Leg Curl', aliases: [], equipment: ['machine'], pattern: 'isolation', impact: 'none', cues: { good: [], bad: [] } },
+      { id: 'cable-external-rotation', name: 'Cable External Rotation', aliases: [], equipment: ['cable'], pattern: 'isolation', impact: 'none', cues: { good: [], bad: [] } },
+      { id: 'barbell-back-squat-p', name: 'Barbell Back Squat P', aliases: [], equipment: ['barbell'], pattern: 'squat', impact: 'none', cues: { good: [], bad: [] } },
+      { id: 'box-jump-p', name: 'Box Jump P', aliases: [], equipment: ['box'], pattern: 'jump-land', impact: 'high', cues: { good: [], bad: [] } },
+    ]);
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), spine, hist: [], stub: { library: H.library() } });
+    const v = await p.evaluate(() => ({
+      row: recordsItself('Half-Kneeling Single-Arm Cable Row'), oneArm: recordsItself('Single-Arm Cable Lateral Raise'), lat: recordsItself('Cable Lateral Raise'),
+      curl: recordsItself('Machine Lying Leg Curl'), rot: recordsItself('Cable External Rotation'), squat: recordsItself('Barbell Back Squat P'), jump: recordsItself('Box Jump P'),
+      unknown: recordsItself('Something The Spine Never Heard Of'),
+    }));
+    C.check('a strength pattern earns a record; a ONE-HANDED CABLE exercise does even where the Spine files it as isolation; other isolation does not; a jump does not',
+      v.row && v.squat && v.oneArm && !v.lat && !v.curl && !v.rot && !v.jump && !v.unknown, JSON.stringify(v));
+    // the isolation records that were filed before the rule are put away (tombstones), by hand and tested ones stay
+    const t = await p.evaluate(() => {
+      const d = '2026-09-01', now = Date.now();
+      writeCeiling([
+        { lift: 'Cable External Rotation', kg: 10, w: 8, r: 8, rpe: 8, d, t: 0, auto: true },
+        { lift: 'Cable External Rotation', kg: 12, w: 9, r: 8, rpe: 8, d: '2026-09-08', t: now, test: true },
+        { lift: 'Machine Lying Leg Curl', kg: 40, w: 35, r: 8, rpe: 8, d, t: 0, auto: true },
+        { lift: 'Half-Kneeling Single-Arm Cable Row', kg: 30, w: 25, r: 8, rpe: 8, d, t: 0, auto: true },
+        { lift: 'Lift The Spine Does Not Know', kg: 50, w: 40, r: 8, rpe: 8, d, t: 0, auto: true },
+      ]);
+      const changed = dropIneligibleRecords();
+      return { changed, live: loadCeiling().map(e => e.lift + (e.test ? ' (test)' : '')).sort(), raw: loadCeilingRaw().filter(e => e.del).map(e => e.lift).sort() };
+    });
+    C.check('isolation records filed by themselves become tombstones; a tested one, a strength one and an unknown lift stay',
+      t.changed && JSON.stringify(t.raw) === JSON.stringify(['Cable External Rotation', 'Machine Lying Leg Curl']) && JSON.stringify(t.live) === JSON.stringify(['Cable External Rotation (test)', 'Half-Kneeling Single-Arm Cable Row', 'Lift The Spine Does Not Know']), JSON.stringify(t));
+    C.check('no page errors (eligibility)', !p.errs.length, JSON.stringify(p.errs));
+    await ctx.close();
+  }
+
+  // ── 11. the records screens say the measure, and Log a max has a unit button ──
+  {
+    const d = H.past;
+    const recs = [
+      { lift: 'Barbell Back Squat', kg: 122.5, w: 100, r: 5, rpe: 8, d: d(30), t: 1, auto: true },
+      { lift: 'Barbell Back Squat', kg: 280, w: 225, r: 5, rpe: 8, d: d(10), t: 1, auto: true, u: 'lb' },
+      { lift: 'Barbell Back Squat', kg: 290, w: 235, r: 5, rpe: 8, d: d(3), t: 1, auto: true, u: 'lb' },
+    ];
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), hist: [], seed: { _1rm: recs }, stub: { library: H.library() } });
+    await p.evaluate("goTo('ceiling')"); await p.waitForTimeout(350);
+    const list = await p.evaluate(() => ({ row: document.querySelector('#ceil-body .ceil-lift').innerText.replace(/\s+/g, ' '), cover: document.getElementById('ceil-board').innerText.replace(/\s+/g, ' ') }));
+    C.check('the list shows the lift in the measure it was last lifted in, with its unit', /290/.test(list.row) && /LB/i.test(list.row) && !/KG/.test(list.row.replace(/\d+ lb/i, '')), JSON.stringify(list));
+    await p.click('#ceil-body .ceil-lift'); await p.waitForTimeout(400);
+    const page = await p.evaluate(() => ({ cover: document.getElementById('ceil-board').innerText.replace(/\s+/g, ' '), rows: [...document.querySelectorAll('#ceil-body .ceil-row')].map(r => r.innerText.replace(/\s+/g, ' ')) }));
+    C.check('a lift\'s page is the pounds series only: 290 lb, +10 lb since first, two entries, each row in lb', /290/.test(page.cover) && /lb/i.test(page.cover) && /\+10/.test(page.cover) && page.rows.length === 2 && page.rows.every(r => /lb/.test(r) && !/ kg/.test(r)), JSON.stringify(page));
+    await p.evaluate(() => { const i = ceilingCandidates().findIndex(c => c.name === 'Barbell Back Squat'); openCeilingForm(i); });
+    await p.waitForTimeout(300);
+    const f = await p.evaluate(() => ({ unit: document.getElementById('cf-unit').textContent }));
+    C.check('Log a max opens in the lift\'s own measure (lb) with a unit button', f.unit === 'lb', JSON.stringify(f));
+    await p.fill('#cf-kg', '240'); await p.fill('#cf-rp', '5'); await p.click('.cf-rpe .rpe-btn[data-rpe="8"]'); await p.waitForTimeout(150);
+    const o1 = await p.evaluate(() => ({ out: document.getElementById('cf-out').innerText.replace(/\s+/g, ' ') }));
+    await p.click('#cf-unit'); await p.waitForTimeout(150);
+    const o2 = await p.evaluate(() => ({ unit: document.getElementById('cf-unit').textContent, out: document.getElementById('cf-out').innerText.replace(/\s+/g, ' ') }));
+    C.check('the estimate follows the unit: 240 lb × 5 @ RPE 8 is 295 LB, and plates give a number of plates', /295/.test(o1.out) && /LB/i.test(o1.out) && o2.unit === 'plates' && /PLATES/i.test(o2.out), JSON.stringify([o1, o2]));
+    await p.click('#cf-save'); await p.waitForTimeout(300);
+    const saved = await p.evaluate(() => loadCeilingRaw().filter(e => e.d === ceilingToday()).map(e => ({ kg: e.kg, w: e.w, u: e.u || '' })));
+    C.check('saved in plates it is a plates entry (the first one: beats nothing), not a kilogram one', saved.length === 1 && saved[0].u === 'plates' && saved[0].w === 240, JSON.stringify(saved));
+    C.check('no page errors (records screens)', !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();
   }
 

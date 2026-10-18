@@ -143,7 +143,49 @@ const LONG = [
     captionFa: 'از کش تا وزن بدن خودت، با هر پایین‌آوردن آهسته، و امیر هر تکرار رو توی ویدیو می‌بینه.',
     title: 'UNTOUCHABLE PULL-UP ARTIST', date: D } },
 ];
-const SAMPLES = NORMAL.map(s => Object.assign({ long: false, kind: s.card.kind }, s)).concat(LONG.map(s => Object.assign({ long: true, kind: s.card.kind }, s)));
+// ── The three measures (2026-10-18): a weight is in kg, lb or plates (the count on a machine's stack) ─────────────────────────────────
+// Every card that can show a weight (best, effort, retest, cycle) is drawn again in pounds and in plates, from its kg sample: the same
+// sets, every weight turned into the other measure (lb is the kg number doubled, plates the kg number over 8 to the half), with `u` on the
+// spec (on each win for the cycle card). The numbers are made up and never "converted": the card prints what the spec holds.
+// A bodyweight sample is drawn in them too, to prove a unit word does not appear where no weight does.
+const MEASURE_MAP = { lb: w => w * 2, plates: w => Math.round(w / 8 * 2) / 2 };
+function inMeasure(s, u) {
+  const f = MEASURE_MAP[u], c = JSON.parse(JSON.stringify(s.card));
+  const set = o => { if (o && o.w != null) o.w = f(o.w); };
+  if (c.kind === 'best') { set(c); set(c.prev); c.u = u; }
+  else if (c.kind === 'effort') { set(c.a); set(c.b); c.u = u; }
+  else if (c.kind === 'retest') { set(c.now); set(c.before); c.u = u; }
+  else if (c.kind === 'cycle') (c.wins || []).forEach(w => { set(w.a); set(w.b); w.u = u; });
+  return Object.assign({}, s, { id: s.id + '-' + u, card: c });
+}
+// The edge cases of the words: exactly one plate is "1 plate" (a gain of one is "+1 plate"), every other count "plates" ("+0.5 plates",
+// "+2.5 plates", "10 plates"); a cycle card whose three wins are in three measures prints each win's own; an unknown measure is kg.
+const plateBest = (id, lift, w, r, pw, pr) => ({ id: 'best-plates-' + id, card: { kind: 'best', first: FIRST, lift, u: 'plates', w, r, date: D, prev: { w: pw, r: pr, date: '2026-09-12' }, cycle: CYC } });
+const EXTRA = [
+  // (the earlier bar of "one" has other reps: a gain of 0.5 would be the same number as the bar's weight, and with the weights hidden the
+  // test could not tell a change from a weight)
+  plateBest('one', 'Leg Press', 1, 8, 0.5, 6),
+  plateBest('gainOne', 'Seated Cable Row', 6, 10, 5, 10),
+  plateBest('gainHalf', 'Leg Press', 3, 8, 2.5, 8),
+  plateBest('gainTwoHalf', 'Leg Press', 10, 8, 7.5, 8),
+  { id: 'effort-plates-gainOne', card: { kind: 'effort', first: FIRST, lift: 'Lat Pulldown', u: 'plates', shape: 'kg', same: true, date: D, cycle: CYC,
+    a: { w: 11, n: 8, r: 8, date: '2026-09-15', wk: 1 }, b: { w: 12, n: 8, r: 8, date: '2026-10-13', wk: 5 } } },
+  { id: 'effort-plates-reps', card: { kind: 'effort', first: FIRST, lift: 'Seated Cable Row', u: 'plates', shape: 'reps', same: true, date: D, cycle: CYC,
+    a: { w: 1, n: 8, r: 8, date: '2026-09-15' }, b: { w: 1, n: 12, r: 8, date: '2026-10-13' } } },
+  { id: 'retest-plates-gainOne', card: { kind: 'retest', first: FIRST, lift: 'Leg Press', u: 'plates', spec: '8RM', oneCycle: true, now: { w: 6, r: 8, date: '2026-09-14' },
+    before: { w: 5, r: 8, date: '2026-08-03', test: true }, cycle: { n: 2 } } },
+  { id: 'cycle-mixed', card: { kind: 'cycle', first: FIRST, cycle: { n: 2, of: 3, name: 'Load & Build', art: ART('build') }, done: 19, planned: 20, bests: 3, weeks: 5, end: '2026-10-06',
+    wins: [
+      { lift: 'Trap Bar Deadlift', u: 'kg', shape: 'kg', same: true, a: { w: 92.5, n: 5, r: 8 }, b: { w: 100, n: 5, r: 8 } },
+      { lift: 'Dumbbell Row', u: 'lb', shape: 'reps', same: true, a: { w: 70, n: 6, r: 8 }, b: { w: 70, n: 10, r: 8 } },
+      { lift: 'Leg Press', u: 'plates', shape: 'kg', same: false, a: { w: 11, n: 8, r: 8 }, b: { w: 12, n: 8, r: 8 } },
+    ] } },
+];
+const BASE_SAMPLES = NORMAL.map(s => Object.assign({ long: false, kind: s.card.kind }, s)).concat(LONG.map(s => Object.assign({ long: true, kind: s.card.kind }, s)));
+const WEIGHTED_KINDS = ['best', 'effort', 'retest', 'cycle'];
+const MEASURED = [];
+BASE_SAMPLES.filter(s => WEIGHTED_KINDS.includes(s.kind)).forEach(s => ['lb', 'plates'].forEach(u => MEASURED.push(inMeasure(s, u))));
+const SAMPLES = BASE_SAMPLES.concat(MEASURED, EXTRA.map(s => Object.assign({ long: false, kind: s.card.kind }, s)));
 
 // ── Reading a run ────────────────────────────────────────────────────────────────────────────────────────────────────────
 const ARABIC = /[؀-ۿ]/, ASCII_DIGIT = /[0-9]/, LATIN_LETTER = /[A-Za-z]/, BAD_TEXT = /undefined|NaN|\[object|Infinity/;
@@ -167,6 +209,55 @@ function weightsOf(card) {
   return [...out];
 }
 
+// ── The measures: which unit words a card should and should not carry ────────────────────────────────────────────────────────────────
+const UNITS = ['kg', 'lb', 'plates'];
+const uk = u => (u === 'lb' || u === 'plates' ? u : 'kg');                      // the painter's own default: absent or unknown is kg
+const UNIT_WORD = { en: { kg: 'kg', lb: 'lb', plates: 'plates?' }, fa: { kg: 'کیلو', lb: 'پوند', plates: 'پلیت' } };
+// A unit word anywhere / straight after a number ("100 kg", "۶ پلیت" read as "6 پلیت"). Latin words are whole words, case aside.
+const wordRx = (lang, x) => lang === 'fa' ? new RegExp(UNIT_WORD.fa[x]) : new RegExp('\\b(?:' + UNIT_WORD.en[x] + ')\\b', 'i');
+const afterNumRx = (lang, x) => lang === 'fa' ? new RegExp('\\d ?' + UNIT_WORD.fa[x]) : new RegExp('\\d ?(?:' + UNIT_WORD.en[x] + ')\\b', 'i');
+const WEIGHT_SHAPES = ['kg', 'kgEasier', 'kgReps'];   // the shapes whose words say a weight change (+7.5 kg), shown or hidden
+// The measures a spec uses (a cycle card: one per win).
+function usedUnits(card) {
+  if (card.kind === 'cycle') return new Set((card.wins || []).map(w => uk(w.u)));
+  return new Set([uk(card.u)]);
+}
+// The measures whose unit word the CARD must show (its painted text): where a weight is on it, or, with the weights hidden, a weight change.
+function unitsShown(card, show) {
+  const out = new Set();
+  if (card.kind === 'best') { if (show || (card.prev && +card.prev.r === +card.r && card.w > card.prev.w)) out.add(uk(card.u)); }
+  else if (card.kind === 'retest') { if (show || (+card.before.r === +card.now.r && card.now.w > card.before.w)) out.add(uk(card.u)); }
+  else if (card.kind === 'effort') { if ((show && (card.a.w || card.b.w)) || WEIGHT_SHAPES.includes(card.shape)) out.add(uk(card.u)); }
+  else if (card.kind === 'cycle') (card.wins || []).slice(0, 3).forEach(w => {
+    if (WEIGHT_SHAPES.includes(w.shape) || (show && w.shape === 'reps' && w.b.w)) out.add(uk(w.u));
+  });
+  return out;
+}
+// The same for caption() (its words are the short form: the change, or the set when the weights are shown; a cycle's has no weight).
+function unitsInCaption(card, show) {
+  const out = new Set();
+  if (card.kind === 'best') { if (show || (card.prev && +card.prev.r === +card.r)) out.add(uk(card.u)); }
+  else if (card.kind === 'retest') { if (show || card.now.w > card.before.w) out.add(uk(card.u)); }
+  else if (card.kind === 'effort') { if (WEIGHT_SHAPES.includes(card.shape) || (show && card.shape === 'reps' && card.b.w)) out.add(uk(card.u)); }
+  return out;
+}
+// A text's unit words that do not belong: a measure the card does not use, and (a Farsi card) any Latin unit at all.
+function strayUnits(text, lang, used) {
+  const out = [];
+  UNITS.forEach(x => {
+    if (!used.has(x) && wordRx(lang, x).test(text)) out.push(x);
+    if (lang === 'fa' && wordRx('en', x).test(text)) out.push('Latin ' + x);
+  });
+  return out;
+}
+// English plates: exactly 1 is "plate", every other count "plates" ("1 plate", "+0.5 plates", "10 plates"). Returns the breaches.
+function pluralBreaches(text) {
+  const out = [], rx = /(?<![\d.])(\d+(?:\.\d+)?) (plates?)\b/gi;
+  let m;
+  while ((m = rx.exec(text))) if ((Number(m[1]) === 1) !== (m[2].toLowerCase() === 'plate')) out.push(`"${m[1]} ${m[2]}"`);
+  return out;
+}
+
 const R = {
   paints: 'paints, and the page logs no error',
   room: 'no text past its room',
@@ -185,6 +276,10 @@ const R = {
   yesW: 'weights shown: the card shows its weights',
   noN: 'name hidden: no first name on the card',
   yesN: 'name shown: the first name is on the card',
+  noWu: 'weights hidden: no weight written with a unit (any measure)',
+  unitOn: "the card's measure (kg, lb or plates) is the unit word wherever a weight, or a weight change, is shown",
+  unitOff: 'no unit word of a measure the card does not use (kg on a lb or plates card), no Latin unit on a Farsi card',
+  plural: 'English plates: "1 plate", every other count "plates"',
 };
 const TALLY = {}, LONG_NOTES = [];
 function note(rule, name, ok, detail) {
@@ -267,7 +362,27 @@ function judge(name, s, cb, res) {
   // The switches. Hidden: nothing of it left anywhere. Shown (a normal sample, switch on): it is there, so the hidden check cannot pass for nothing.
   const secrets = weightsOf(s.card), seen = new Set();
   boxes.forEach(b => numbersIn(b.text).forEach(t => { if (secrets.includes(t)) seen.add(t); }));
-  if (cb.weights === false && secrets.length) note(R.noW, name, !seen.size, 'still shows ' + [...seen].join(', ') + ' (the card has ' + secrets.join(', ') + ')');
+  // The numeric check below reads any number equal to a weight, so it is exact only while the weights are the card's rarest numbers: the
+  // kg samples (the original ones). A lb or plates card (a plate count is a small number: 5 is also a rep count, a date, a week) is
+  // checked by the unit instead: a weight hidden is no "<weight> <unit word>" on the card.
+  const used = usedUnits(s.card), kgOnly = used.size === 1 && used.has('kg');
+  if (cb.weights === false && secrets.length && kgOnly) note(R.noW, name, !seen.size, 'still shows ' + [...seen].join(', ') + ' (the card has ' + secrets.join(', ') + ')');
+  const texts = boxes.map(b => toAscii(b.text));
+  if (cb.weights === false && secrets.length) {
+    const leaked = secrets.filter(w => texts.some(t => new RegExp('(?<![+\\d.])' + w.replace('.', '\\.') + ' (?:kg|lb|plates?|کیلو|پوند|پلیت)', 'i').test(t)));
+    note(R.noWu, name, !leaked.length, 'still writes ' + leaked.join(', ') + ' with a unit (the card has ' + secrets.join(', ') + ')');
+  }
+  // The measure's own unit word: on the card where a weight (a change) is shown, never a word of another measure, "1 plate" and no "1 plates".
+  const wrongWords = texts.map((t, i) => [i, strayUnits(t, cb.lang, used)]).filter(x => x[1].length);
+  note(R.unitOff, name, !wrongWords.length, list(wrongWords, x => `${bx(boxes[x[0]])} has ${x[1].join(', ')}`));
+  if (!s.long) {
+    const want = [...unitsShown(s.card, cb.weights !== false)], lack = want.filter(x => !texts.some(t => afterNumRx(cb.lang, x).test(t)));
+    note(R.unitOn, name, !lack.length, 'no number followed by the ' + lack.join(' / ') + ' word (' + (cb.lang === 'fa' ? UNIT_WORD.fa[lack[0]] : lack.join(', ')) + ') on the card; it reads: ' + snip(boxes.map(b => b.text).join(' | '), 160));
+  }
+  if (cb.lang === 'en' && used.has('plates')) {
+    const bad = []; boxes.forEach(b => pluralBreaches(toAscii(b.text)).forEach(x => bad.push(`${b.role} ${x}`)));
+    note(R.plural, name, !bad.length, bad.slice(0, 4).join(', '));
+  }
   if (cb.weights !== false && !cb.tag && !s.long && secrets.length) note(R.yesW, name, seen.size > 0, 'none of ' + secrets.join(', ') + ' is on the card');
   const named = boxes.filter(b => b.text.toLowerCase().includes(String(s.card.first).toLowerCase()));
   if (cb.name === false) note(R.noN, name, !named.length, list(named, bx));
@@ -363,8 +478,15 @@ async function main(browser, shots) {
     en: window.ShareCard.caption(c, { lang: 'en' }), fa: window.ShareCard.caption(c, { lang: 'fa' }),
     enH: window.ShareCard.caption(c, { lang: 'en', weights: false }), faH: window.ShareCard.caption(c, { lang: 'fa', weights: false }),
   })), normals.map(s => s.card));
-  const capBad = [], capLeak = [];
+  const capBad = [], capLeak = [], capUnit = [];
   normals.forEach((s, i) => {
+    // The caption's unit words are the card's measure too (shown: "100 lb × 5"; hidden: "+10 lb"), and no other measure's.
+    ['en', 'fa'].forEach(lang => [true, false].forEach(show => {
+      const t = toAscii(caps[i][lang + (show ? '' : 'H')]), used = usedUnits(s.card);
+      const stray = strayUnits(t, lang, used), lack = [...unitsInCaption(s.card, show)].filter(x => !afterNumRx(lang, x).test(t));
+      const plural = lang === 'en' && used.has('plates') ? pluralBreaches(t) : [];
+      if (stray.length || lack.length || plural.length) capUnit.push(`${s.id} ${lang}${show ? '' : ' hidden'}: "${snip(t, 70)}" ${stray.length ? 'has ' + stray.join(', ') : ''}${lack.length ? 'lacks ' + lack.join(', ') : ''}${plural.length ? 'plural ' + plural.join(', ') : ''}`);
+    }));
     ['en', 'fa'].forEach(lang => {
       const t = caps[i][lang];
       if (typeof t !== 'string' || !t.trim() || !t.includes('@amirardekanian') || BAD_TEXT.test(t)) capBad.push(`${s.id} ${lang}: ${snip(t, 60)}`);
@@ -374,6 +496,50 @@ async function main(browser, shots) {
   });
   C.check(`caption() is a non-empty line containing @amirardekanian for every normal sample, in both languages (${normals.length * 2})`, !capBad.length, capBad.slice(0, 3).join(' | ') + (capBad.length > 3 ? ` (+${capBad.length - 3} more)` : ''));
   C.check('caption() with the weights hidden shows no weight (extra: the painter says "the change only")', !capLeak.length, capLeak.slice(0, 3).join(' | ') + (capLeak.length > 3 ? ` (+${capLeak.length - 3} more)` : ''));
+  C.check(`caption() says the card's own measure (kg, lb or plates) and no other, shown and hidden, in both languages (${normals.length * 4})`, !capUnit.length, capUnit.slice(0, 3).join(' | ') + (capUnit.length > 3 ? ` (+${capUnit.length - 3} more)` : ''));
+
+  // Once: the exact words of the measures in caption(): "kg" when `u` is absent or unknown, lb, "1 plate" against "6 plates", the Farsi words.
+  const bestOf = (u, w, r, pw, pr) => ({ kind: 'best', first: FIRST, lift: 'Leg Press', u, w, r, date: D, prev: { w: pw, r: pr, date: '2026-09-12' }, cycle: CYC });
+  const retestOf = (u, bw, br, aw, ar) => ({ kind: 'retest', first: FIRST, lift: 'Leg Press', u, spec: '5RM', oneCycle: true, now: { w: bw, r: br, date: '2026-09-14' }, before: { w: aw, r: ar, date: '2026-08-03', test: true }, cycle: { n: 2 } });
+  const effortOf = (u, shape, aw, an, bw, bn) => ({ kind: 'effort', first: FIRST, lift: 'Leg Press', u, shape, same: true, date: D, cycle: CYC, a: { w: aw, n: an, r: 8, date: '2026-09-15', wk: 1 }, b: { w: bw, n: bn, r: 8, date: '2026-10-13', wk: 5 } });
+  const U_CASES = [
+    // [what, spec, language, weights shown, the words the caption must hold]
+    ['best, no u, shown', bestOf(undefined, 100, 5, 95, 5), 'en', true, '100 kg × 5'],
+    ['best, no u, hidden', bestOf(undefined, 100, 5, 95, 5), 'en', false, '+5 kg.'],
+    ['best, an unknown measure is kg', bestOf('stone', 100, 5, 95, 5), 'en', true, '100 kg × 5'],
+    ['best, kg, Farsi', bestOf('kg', 100, 5, 95, 5), 'fa', true, '۱۰۰ کیلو × ۵'],
+    ['best, lb, shown', bestOf('lb', 205, 5, 195, 5), 'en', true, '205 lb × 5'],
+    ['best, lb, hidden', bestOf('lb', 205, 5, 195, 5), 'en', false, '+10 lb.'],
+    ['best, lb, Farsi', bestOf('lb', 205, 5, 195, 5), 'fa', true, '۲۰۵ پوند × ۵'],
+    ['best, lb, Farsi, hidden', bestOf('lb', 205, 5, 195, 5), 'fa', false, '۱۰ پوند.'],
+    ['best, plates, shown', bestOf('plates', 6, 10, 5, 10), 'en', true, '6 plates × 10'],
+    ['best, plates, a gain of one is "plate"', bestOf('plates', 6, 10, 5, 10), 'en', false, '+1 plate.'],
+    ['best, exactly one plate', bestOf('plates', 1, 8, 0.5, 8), 'en', true, '1 plate × 8'],
+    ['best, half a plate more is "plates"', bestOf('plates', 1, 8, 0.5, 8), 'en', false, '+0.5 plates.'],
+    ['best, 2.5 plates more', bestOf('plates', 10, 8, 7.5, 8), 'en', false, '+2.5 plates.'],
+    ['best, plates, Farsi', bestOf('plates', 6, 10, 5, 10), 'fa', true, '۶ پلیت × ۱۰'],
+    ['best, plates, Farsi, hidden', bestOf('plates', 6, 10, 5, 10), 'fa', false, '۱ پلیت.'],
+    ['retest, lb', retestOf('lb', 200, 5, 180, 5), 'en', true, '180 lb → 200 lb'],
+    ['retest, lb, hidden', retestOf('lb', 200, 5, 180, 5), 'en', false, '+20 lb.'],
+    ['retest, plates', retestOf('plates', 6, 8, 5, 8), 'en', true, '5 plates → 6 plates'],
+    ['retest, plates, hidden', retestOf('plates', 6, 8, 5, 8), 'en', false, '+1 plate.'],
+    ['retest, plates, other reps', retestOf('plates', 6, 8, 5, 6), 'en', true, '5 plates × 6 → 6 plates × 8'],
+    ['retest, plates, Farsi', retestOf('plates', 6, 8, 5, 8), 'fa', true, '۵ پلیت → ۶ پلیت'],
+    ['effort, plates', effortOf('plates', 'kg', 11, 8, 12, 8), 'en', true, '+1 plate, same reps'],
+    ['effort, lb, weight and reps', effortOf('lb', 'kgReps', 90, 6, 100, 8), 'en', true, '+10 lb and +2 reps'],
+    ['effort, lb, more reps at one weight', effortOf('lb', 'reps', 45, 8, 45, 12), 'en', true, '+4 reps at 45 lb'],
+    ['effort, lb, Farsi', effortOf('lb', 'kg', 90, 5, 100, 5), 'fa', true, '۱۰ پوند بیشتر'],
+    ['effort, plates, Farsi', effortOf('plates', 'kg', 11, 8, 12, 8), 'fa', true, '۱ پلیت بیشتر'],
+  ];
+  const ucaps = await page.evaluate(cs => cs.map(c => window.ShareCard.caption(c[0], { lang: c[1], weights: c[2] })), U_CASES.map(c => [c[1], c[2], c[3]]));
+  const uBad = U_CASES.map((c, i) => [c, ucaps[i]]).filter(x => !String(x[1]).includes(x[0][4]))
+    .map(x => `${x[0][0]}: wanted "${x[0][4]}" in "${snip(x[1], 90)}"`);
+  C.check(`caption() writes the measure's words exactly: kg by default, lb, "1 plate" against "6 plates", the Farsi (${U_CASES.length})`, !uBad.length, uBad.slice(0, 3).join(' | ') + (uBad.length > 3 ? ` (+${uBad.length - 3} more)` : ''));
+  // The unit-word helpers the cards are drawn with (exported for the tests).
+  const uw = await page.evaluate(() => { const _ = window.ShareCard._; return [_.unitW('plates', 1, 'en'), _.unitW('plates', 1.2, 'en'), _.unitW('plates', 0.5, 'en'), _.unitW('plates', 2, 'en'), _.unitW('lb', 1, 'en'), _.unitW('kg', 1, 'en'), _.unitW(undefined, 5, 'en'), _.unitW('x', 5, 'en'), _.unitW('plates', 1, 'fa'), _.unitW('plates', 6, 'fa'), _.unitW('lb', 6, 'fa'), _.unitW('kg', 6, 'fa'), _.kgs(22.5, 'en', 'lb'), _.kgs(6, 'fa', 'plates'), _.plusKg(2.5, 'en', 'plates'), _.plusKg(1, 'en', 'plates'), _.plusKg(7.5, 'en'), _.plusKg(7.5, 'fa', 'lb')]; });
+  const uwWant = ['plate', 'plate', 'plates', 'plates', 'lb', 'kg', 'kg', 'kg', 'پلیت', 'پلیت', 'پوند', 'کیلو', '22.5 lb', '۶ پلیت', '+2.5 plates', '+1 plate', '+7.5 kg', '۷٫۵ پوند'];
+  C.check('unitW(), kgs() and plusKg() write each measure: plate at 1 (1.2 rounds to the half, 1), plates otherwise, kg when absent or unknown, the Farsi words',
+    JSON.stringify(uw) === JSON.stringify(uwWant), 'got ' + JSON.stringify(uw));
 
   // Once: can().
   const can = await page.evaluate(cards => cards.map(c => window.ShareCard.can(c)), live.map(s => s.card));

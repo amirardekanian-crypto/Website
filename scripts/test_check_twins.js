@@ -95,6 +95,19 @@ want('a function is renamed away', swap('coach.html', 'function spineForC(', 'fu
 // Career Mode's weeks held in a row (Home's Hold Serve row): the app's copy of get_profile()'s loop, held to scripts/career/hold_cases.json.
 want('Hold Serve stops starting again after a broken week (the app only)', swap('program.html', 'best = Math.max(best, now); } else now = 0;', 'best = Math.max(best, now); }'), 1, /holdCount: /);
 want('Hold Serve\'s best is the latest run, not the longest', swap('program.html', 'best = Math.max(best, now);', 'best = now;'), 1, /holdCount: /);
+// Career Mode's lift maths in a lift's own measure (§11): each mutation is the app's copy drifting on its own, against the pinned MEASURE_CASES in check_twins.js
+// (the server's copy is held to the same table by scripts/career/rehearse_measures.mjs).
+const MEAS = /a lift in its own measure|the measure of an exercise|what the This cycle card shows|what the server pays|weightOf: |estimateOneRM|winText: |setsMeasure: /;
+want('the app reads a pound weight as kilograms again (converted: 45 lb = 20.41)', swap('program.html', 'const w = wt.n;', "const w = wt.unit === 'lb' && wt.n != null ? Math.round(wt.n * 0.45359237 * 100) / 100 : wt.n;"), 1, MEAS);
+want('the app prices plates as no weight again (an unloaded set)', swap('program.html', 'const w = wt.n;', "const w = wt.unit === 'plates' ? null : wt.n;"), 1, MEAS);
+want('the measure of an exercise is always kilograms', swap('program.html', 'if (w.n != null) return w.unit;', 'if (w.n != null) return \'kg\';'), 1, MEAS);
+want('a pound set inside a kilogram exercise is no longer left out of the best (cycleBestSet)', swap('program.html', 'if (wt.n != null && wt.unit !== m) return;', 'if (false) return;'), 1, MEAS);
+want('a pound set inside a kilogram exercise is no longer left out of the estimate (histBestSet)', swap('program.html', 'if (wt.n == null || wt.unit !== m) return;', 'if (wt.n == null) return;'), 1, MEAS);
+want('a lift\'s wins are one series again, whatever the measure (cycleWins)', swap('program.html', "(uKey(best.u) === 'kg' ? '' : '|' + uKey(best.u))", "''"), 1, MEAS);
+want('a kilogram set and a pound set are a win again (winText stops asking for one measure)', swap('program.html', 'if (loaded && uKey(a.u) !== uKey(b.u)) return null;', ''), 1, MEAS);
+want('the estimate rounds to 2.5 whatever the measure', swap('program.html', 'const step = ONE_RM_ROUND[unit] || ONE_RM_ROUND_KG;', 'const step = ONE_RM_ROUND_KG;'), 1, MEAS);
+want('one plate is "plates"', swap('program.html', "(n === 1 ? 'plate' : 'plates')", "'plates'"), 1, MEAS);
+want('plates stop being a unit (weightOf reads them as kilograms)', swap('program.html', "(/\\d\\s*plates?(?![a-z])/i.test(t) ? 'plates' : 'kg')", "'kg'"), 1, MEAS);
 want('chips.js changes under an unchanged ?v=', (get, put) => put('assets/js/chips.js', get('assets/js/chips.js') + '\n// edited\n'), 1, /chips\.js changed but coach\.html still loads \?v=/);
 want('?v= bumped but the stamp not refreshed', swap('coach.html', 'chips.js?v=', 'chips.js?v=zz-'), 1, /stamp is out of date/);
 

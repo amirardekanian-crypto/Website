@@ -1,7 +1,7 @@
 // Career Mode, phase 1, rehearsed away from the live project (supabase/stage66_career_mode.sql; career/PROCEDURES.md → P14).
 //
 //     PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse.mjs [--data <folder>] [--expect <file>]
-//         [--phase1 <rev>] [--no-stage70]
+//         [--phase1 <rev>] [--no-stage70] [--no-stage72]
 //
 // PGlite is a real PostgreSQL compiled to WebAssembly (install it in a scratch folder: scripts/restore/lib.mjs, the top). Nothing here
 // touches a real project and nothing is written outside the system's temp folder.
@@ -20,7 +20,14 @@
 //   5. made-up athletes (zz_…) through the real doors: save_progress() and save_session() as the athlete, coach_hide_session() and a
 //      delete as the coach, log_library_session(), a programme with dated cycles, Personal Records; then the facts each must make
 //      (held, broken, bounce back, a return, a finished cycle, an effort win, a best, a retest beaten, a comeback), the voids, the
-//      row-level security, get_profile(), a save that still goes through when Career Mode breaks, idempotence, and an erasure.
+//      row-level security, get_profile(), a save that still goes through when Career Mode breaks, idempotence, and an erasure;
+//   6. stage72 (a lift's numbers in its own measure: kg, lb, plates; supabase/stage72_weight_measures.sql), applied twice after the stages above
+//      (stage71 first when the snapshot lacks it), and section 11: the stage66 functions kept as career_*_old(), every athlete above judged by
+//      both (a kilogram athlete's facts must be what the old functions make, byte for byte), and three made-up athletes in pounds and plates:
+//      a lift in kg then lb (a first lb record is no best, a later higher one is; a kg and an lb record on one day are two bests; a pound
+//      tombstone does not delete the kilogram record), pounds that win, a set in another measure left out, a retest in pounds judged against
+//      pounds only, and a lift on a machine's plates (a best, an effort win, a lift gain, a retest). --no-stage72 skips all of it (the
+//      behaviour before stage72, for comparing the two runs).
 // Exit code 1 if anything failed.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -37,6 +44,7 @@ const opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null
 const DATA = opt('--data'), EXPECT = opt('--expect'), REPORT = opt('--report');
 const PHASE1 = opt('--phase1') || PHASE1_REV;      // the commit the live project's phase 1 rulebook was seeded from
 const THROUGH = args.includes('--no-stage70') ? 69 : 70;
+const STAGE72 = !args.includes('--no-stage72');
 
 let passed = 0, failed = 0;
 function ok(cond, what, detail) {
@@ -109,6 +117,21 @@ async function main() {
   section('3. the stages the snapshot does not hold, then the phase 1 seed');
   const st = await ensureStages(db, THROUGH, m => console.log('         ' + m));
   ok(true, `the database holds stage66 and stage69 (${st.held.length ? 'from the snapshot' : 'applied here'})${THROUGH === 70 ? ' and stage70 (' + (st.applied.includes(70) ? 'applied here, twice' : 'from the snapshot') + ')' : ' (--no-stage70: phase 3 is not loaded)'}`);
+  // The stages that only replace functions (no table to tell they are held): stage71 when the snapshot's career_kg() does not read a unit yet,
+  // then stage72, each twice. Both are idempotent, and neither moves a fact for an athlete whose weights are all kilograms.
+  if (!(await one(db, `select position('plates' in pg_get_functiondef('public.career_kg(jsonb)'::regprocedure)) > 0 as held`)).held) {
+    const s71 = read(path.join(ROOT, 'supabase', 'stage71_weight_units.sql'));
+    await runSql(db, s71, 'stage71'); await runSql(db, s71, 'stage71 again');
+    console.log('         stage71: applied, and applied again without an error');
+  } else console.log('         stage71: the snapshot already holds it (career_kg() reads a unit); not applied again');
+  if (STAGE72) {
+    if ((await one(db, `select to_regprocedure('public.career_wn(jsonb)') is not null as held`)).held) console.log('         stage72: the snapshot already holds it; not applied again');
+    else {
+      const s72 = read(process.env.STAGE72_SQL || path.join(ROOT, 'supabase', 'stage72_weight_measures.sql'));   // STAGE72_SQL: a broken copy, to see this script fail
+      await runSql(db, s72, 'stage72'); await runSql(db, s72, 'stage72 again');
+      console.log('         stage72: applied, and applied again without an error');
+    }
+  } else console.log('         stage72: not applied (--no-stage72)');
   const erase = await eraseDef(db);
   ok((erase.match(/'career_facts'/g) || []).length === 1, 'coach_erase_person() lists career_facts exactly once (the patches are idempotent)');
   if (THROUGH === 70) ok((erase.match(/'career_awards'/g) || []).length === 1, 'and career_awards exactly once');
@@ -383,6 +406,189 @@ async function main() {
   ok(dry.ok && dry.counts.career_facts > 0, `the dry run lists career_facts (${dry.counts && dry.counts.career_facts} rows) and changes nothing`, JSON.stringify(dry));
   ok(real.ok && (await q(db, `select 1 from public.career_facts where athlete_id = 'zz_two'`)).length === 0, 'the real run leaves no fact of theirs', JSON.stringify(real));
 
+  if (STAGE72) {
+    section('11. weights in kilograms, pounds and plates (stage72)');
+    // 11a. the stage66 functions kept as *_old: what the database said before stage72. They call each other's *_old and career_kg() (stage71's).
+    const s66 = read(path.join(ROOT, 'supabase', 'stage66_career_mode.sql'));
+    const defOf = name => {
+      const m = s66.match(new RegExp('create or replace function public\\.' + name + '\\([\\s\\S]*?\\$function\\$;'));
+      if (!m) throw new Error('stage66 has no ' + name);
+      return m[0];
+    };
+    await runSql(db, ['career_entry_sets', 'career_cycle_wins', 'career_lift_gains', 'career_derive']
+      .map(n => defOf(n).replace(/public\.(career_entry_sets|career_cycle_wins|career_lift_gains|career_derive)\(/g, 'public.$1_old(')).join('\n'), 'old functions');
+    const DERIVED = ['week_held', 'week_broken', 'bounce_back', 'training_return', 'week_by_the_book', 'cycle_finished', 'roadmap_finished', 'effort_win',
+                     'month_with_amir', 'lift_gain', 'personal_best', 'retest_done', 'retest_beaten'];
+    // the athlete's live derived facts (a voided one is not a fact; a derive that wants fewer voids them, one that wants more inserts them)
+    const digest = async id => one(db, `select count(*)::int as n, md5(coalesce(string_agg(kind || '|' || ref || '|' || day::text || '|' || value::text, ',' order by kind, ref), '')) as h
+                                          from public.career_facts where athlete_id = $1 and kind = any ($2::text[]) and void_at is null`, [id, DERIVED]);
+    const sorted = async (id, kind) => (await refs(id, kind)).slice().sort();
+    const valueOf = async (id, kind, ref) => (await one(db, `select value from public.career_facts where athlete_id = $1 and kind = $2 and ref = $3 and void_at is null`, [id, kind, ref]) || {}).value;
+    const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+    // 11b. an athlete whose weights are all kilograms (every athlete there is today): the old derive finds nothing to change, and the new one
+    // puts back exactly what it wrote. Every athlete the run holds is one (the made-up zz_one, the real ones with --data, and zz_kg, who is
+    // made to be awkward: kilogram words, commas and Persian digits, a pair, two records on one day, a tombstone, an explicit u of kg, a
+    // retest read from the sessions and one read from the records).
+    const U5 = '10000000-0000-4000-8000-0000000000a5';
+    await q(db, `insert into auth.users (id, email) values ($1, 'athlete.zz_kg@amirardekani.com')`, [U5]);
+    await q(db, `insert into public.athlete_identities (user_id, athlete_id, email) values ($1, 'zz_kg', null)`, [U5]);
+    {
+      const Dk = off => addDays(today, off), stdk = (name, test) => Object.assign({ type: 'standard', name }, test ? { test } : {});
+      const dayk = (id, exs) => ({ id, blocks: [{ exercises: exs }] });
+      const Ek = (ex, reps, sets) => ({ ex, block: 'A', reps: String(reps), sets });
+      const sk = (w, n, r) => ({ w, n, r, d: true });
+      await q(db, `insert into public.programs (athlete_id, data) values ('zz_kg', $1::jsonb)`, [JSON.stringify({ athlete: { firstName: 'Kay', lastName: 'Gee' }, currentCycleIndex: 1,
+        cycles: [{ num: 1, startDate: Dk(-90), endDate: Dk(-56) }, { num: 2, startDate: Dk(-48), endDate: today }],
+        workouts: { days: [dayk(1, [stdk('Back Squat', '3RM'), stdk('Bench Press')]), dayk(2, [stdk('Row', true)]), dayk(3, [stdk('Deadlift')])] }, programHistory: [{ id: 'prog1', days: [{}, {}, {}] }] })]);
+      const sessk = async (dayNo, on, log) => {
+        await asAthlete(db, U5, 'zz_kg');
+        await q(db, `select public.save_session('zz_kg', 'Kay Gee', $1, $2::date, $3::jsonb, null)`, [dayNo, on, JSON.stringify(
+          { status: 'Complete', session_rpe: 7, duration_min: 50, readiness: { composite: 4, sleep: 4, energy: 4, soreness: 4, stress: 3, overall: 4 }, log, summary: 'Day ' + dayNo })]);
+        await asNobody(db);
+      };
+      await sessk(1, Dk(-90), [Ek('Back Squat', 5, [sk('100kg', 5, 8)]), Ek('Bench Press', 5, [sk('۶۰', 5, 8)]), Ek('Deadlift', 5, [sk('2×20', 5, 8)])]);
+      await sessk(1, Dk(-76), [Ek('Back Squat', 5, [sk('105 kg', 5, 8)]), Ek('bench  press', 5, [sk('62,5', 5, 8)]), Ek('Deadlift', 5, [sk('2x22.5 kg', 5, 8)])]);
+      await sessk(2, Dk(-3), [Ek('Row', 8, [sk('80', 8, 9)])]);
+      await sessk(1, Dk(-1), [Ek('Back Squat', 3, [sk('110 kg', 3, 9)])]);
+      const rk = (lift, kg, d, extra) => Object.assign({ lift, kg, w: kg - 10, r: 3, rpe: 8, d, t: 0 }, extra);
+      await asAthlete(db, U5, 'zz_kg');
+      await q(db, `select public.save_progress('zz_kg', 'Kay Gee', $1::jsonb, null, null)`, [JSON.stringify({ zz_kg_1rm: JSON.stringify([
+        rk('Back Squat', 120, Dk(-30), { t: 5 }), rk('Back Squat', 130, Dk(-20), { auto: true, t: 1 }), rk('Back Squat', 118, Dk(-20), { auto: true, t: 4 }),
+        rk('Back Squat', 140, Dk(-10), { auto: true }), { lift: 'Back Squat', d: Dk(-10), del: true, t: 9 }, rk('Back Squat', 122.5, Dk(-5), { auto: true, u: 'kg' }),
+        rk('Row', 80, Dk(-20), { t: 2 }), rk('Row', 90, Dk(-3), { test: true, t: 3 })]) })]);
+      await asNobody(db);
+      const zk = await kinds('zz_kg');
+      ok(zk.personal_best >= 1 && zk.effort_win >= 2 && zk.retest_done >= 2 && zk.retest_beaten >= 1 && zk.lift_gain >= 2,
+         'zz_kg (all kilograms, awkwardly written) has the facts that make the comparison below mean something: ' + JSON.stringify({ pb: zk.personal_best, win: zk.effort_win, done: zk.retest_done, beaten: zk.retest_beaten, gain: zk.lift_gain }));
+    }
+    const kgIds = (await q(db, `select distinct athlete_id as id from public.career_facts where kind in ('week_held', 'effort_win', 'personal_best', 'lift_gain', 'month_with_amir') order by 1`)).map(r => r.id);
+    const moved = [];
+    let kgFacts = 0;
+    for (const id of kgIds) {
+      const a = await digest(id);
+      await q(db, `select public.career_derive_old($1)`, [id]);
+      const b = await digest(id);
+      await q(db, `select public.career_derive($1)`, [id]);
+      const c = await digest(id);
+      kgFacts += a.n;
+      if (a.h !== b.h || a.n !== b.n || a.h !== c.h) moved.push(`${id}: ${a.n} facts, after the stage66 derive ${b.n} (${a.h === b.h ? 'same' : 'different'}), after the new one again ${c.n} (${a.h === c.h ? 'same' : 'different'})`);
+    }
+    ok(kgIds.length >= 1 && kgFacts > 0 && !moved.length,
+       `for ${kgIds.length} athlete${kgIds.length === 1 ? '' : 's'} whose weights are all kilograms (${kgIds.join(', ')}), the stage66 derive, run after the new one, changes none of their ${kgFacts} live derived facts (kind, ref, day, value), and the new one restores them`, moved.join('\n'));
+
+    // 11c. zz_lb: kilograms, then pounds. Two cycles as zz_one: one that ended, one that ends today (a retest week).
+    const U3 = '10000000-0000-4000-8000-0000000000a3', U4 = '10000000-0000-4000-8000-0000000000a4';
+    await q(db, `insert into auth.users (id, email) values ($1, 'athlete.zz_lb@amirardekani.com'), ($2, 'athlete.zz_plates@amirardekani.com')`, [U3, U4]);
+    await q(db, `insert into public.athlete_identities (user_id, athlete_id, email) values ($1, 'zz_lb', null), ($2, 'zz_plates', null)`, [U3, U4]);
+    const D = off => addDays(today, off);
+    const std = (name, test) => Object.assign({ type: 'standard', name }, test ? { test } : {});
+    const mkDay = (id, exs) => ({ id, blocks: [{ exercises: exs }] });
+    const E = (ex, reps, sets) => ({ ex, block: 'A', reps: String(reps), sets });
+    const st = (w, n, r) => ({ w, n, r, d: true });
+    const sess = async (uid, id, nm, dayNo, on, log) => {
+      await asAthlete(db, uid, id);
+      await q(db, `select public.save_session($1, $2, $3, $4::date, $5::jsonb, null)`, [id, nm, dayNo, on, JSON.stringify(
+        { status: 'Complete', session_rpe: 7, duration_min: 50, readiness: { composite: 4, sleep: 4, energy: 4, soreness: 4, stress: 3, overall: 4 }, log, summary: 'Day ' + dayNo })]);
+      await asNobody(db);
+    };
+    const prog = (first, last, days) => ({ athlete: { firstName: first, lastName: last }, currentCycleIndex: 1,
+      cycles: [{ num: 1, startDate: D(-90), endDate: D(-56) }, { num: 2, startDate: D(-48), endDate: today }],
+      workouts: { days }, programHistory: [{ id: 'prog1', days: [{}, {}, {}] }] });
+    await q(db, `insert into public.programs (athlete_id, data) values ('zz_lb', $1::jsonb)`, [JSON.stringify(prog('Lee', 'Bee', [
+      mkDay(1, [std('Bench Press', '5RM'), std('Back Squat')]), mkDay(2, [std('Seated Row', true)]), mkDay(3, [std('Back Squat')])]))]);
+    // the cycle that ended: Bench Press 60 kg twice, then 135 and 145 lb (a switch of measure, and a win in pounds); Back Squat 100, then 110 kg
+    // twice, each time with a 300 lb set beside it that is not that exercise's measure and must be left out (read as 136 kg it would hide the win)
+    const squat = (kg) => E('Back Squat', 5, [st(String(kg), 5, 8), st('300 lb', 5, 8)]);
+    const bench = (w, r) => E('Bench Press', 5, [st(w, 5, r || 8), st(w, 5, r || 8)]);
+    await sess(U3, 'zz_lb', 'Lee Bee', 1, addDays(D(-90), 0), [bench('60'), squat(100)]);
+    await sess(U3, 'zz_lb', 'Lee Bee', 1, addDays(D(-90), 7), [bench('60'), squat(110)]);
+    await sess(U3, 'zz_lb', 'Lee Bee', 1, addDays(D(-90), 14), [bench('135 lb'), squat(110)]);
+    await sess(U3, 'zz_lb', 'Lee Bee', 1, addDays(D(-90), 21), [bench('145 lb'), squat(110)]);
+    // the retest week: the row's first pound lift ever, and the bench at 160 lb × 5 @9 (an estimate of 190 lb)
+    await sess(U3, 'zz_lb', 'Lee Bee', 2, D(-2), [E('Seated Row', 8, [st('100 lb', 8, 8), st('100 lb', 8, 8)])]);
+    await sess(U3, 'zz_lb', 'Lee Bee', 1, D(-1), [bench('160 lb', 9)]);
+    const rc = (lift, kg, w, d, extra) => Object.assign({ lift, kg, w, r: 5, rpe: 8, d, t: 0, auto: true }, extra);
+    const recsLb = [
+      { lift: 'Back Squat', kg: 100, w: 85, r: 5, rpe: 8, d: D(-40), t: 5 },                              // kilograms, by hand
+      rc('Back Squat', 110, 95, D(-20)),                                                                  // a kilogram best
+      rc('Back Squat', 245, 225, D(-10), { u: 'lb' }),                                                    // the first number in pounds: nothing to beat
+      rc('Back Squat', 115, 100, D(-5)),                                                                  // a kilogram best
+      rc('Back Squat', 255, 235, D(-5), { u: 'lb' }),                                                     // a pound best, on the same day: a second fact
+      rc('Back Squat', 117.5, 102.5, D(-3)),                                                              // a kilogram best
+      rc('Back Squat', 265, 245, D(-3), { u: 'lb' }),                                                     // a pound entry on the day...
+      { lift: 'Back Squat', d: D(-3), del: true, t: 9, u: 'lb' },                                         // ...that a pound tombstone deletes, and only that one
+      { lift: 'Bench Press', kg: 300, w: 280, r: 3, rpe: 9, d: D(-40), t: 5 },                            // a big number in kilograms
+      { lift: 'Bench Press', kg: 175, w: 150, r: 5, rpe: 8, d: D(-30), t: 6, u: 'lb' },                   // the pound record the retest is judged against
+      { lift: 'Seated Row', kg: 80, w: 70, r: 5, rpe: 8, d: D(-20), t: 6 }];                              // kilograms only: the row's pound retest beats nothing
+    await asAthlete(db, U3, 'zz_lb');
+    await q(db, `select public.save_progress('zz_lb', 'Lee Bee', $1::jsonb, null, null)`, [JSON.stringify({ zz_lb_1rm: JSON.stringify(recsLb) })]);
+    await asNobody(db);
+    const bests = [`Back Squat|${D(-20)}`, `Back Squat|${D(-5)}`, `Back Squat|${D(-5)}|lb`, `Back Squat|${D(-3)}`].sort();
+    ok(eq(await sorted('zz_lb', 'personal_best'), bests),
+       'a lift in kilograms then pounds: the first pound record is no best, a higher one is; a kilogram and a pound best on one day are two facts; a pound tombstone deletes the pound entry only',
+       JSON.stringify({ got: await sorted('zz_lb', 'personal_best'), want: bests }));
+    const pbLb = await valueOf('zz_lb', 'personal_best', `Back Squat|${D(-5)}|lb`), pbKg = await valueOf('zz_lb', 'personal_best', `Back Squat|${D(-5)}`);
+    ok(pbLb && pbLb.u === 'lb' && Number(pbLb.kg) === 255 && pbKg && !('u' in pbKg) && Number(pbKg.kg) === 115,
+       'the pound best says its measure (value.u = lb, its estimate in pounds); the kilogram one is exactly what it always was (no u)', JSON.stringify({ pbLb, pbKg }));
+    ok(eq(await sorted('zz_lb', 'effort_win'), ['c1|back squat', 'c1|bench press|lb']),
+       'effort wins: the squat 100 → 110 kg (the 300 lb set beside it is left out) and the bench 135 → 145 lb, in pounds; 60 kg to 60 kg is none, and kg is never set against lb',
+       JSON.stringify(await sorted('zz_lb', 'effort_win')));
+    const winLb = await valueOf('zz_lb', 'effort_win', 'c1|bench press|lb'), winKg = await valueOf('zz_lb', 'effort_win', 'c1|back squat');
+    ok(winLb && Number(winLb.gain) === 0.0741 && winLb.lift === 'Bench Press' && winKg && Number(winKg.gain) === 0.1, 'with their gains (145 ÷ 135 − 1 and 110 ÷ 100 − 1)', JSON.stringify({ winLb, winKg }));
+    const gains = await q(db, `select ref, value from public.career_facts where athlete_id = 'zz_lb' and kind = 'lift_gain' and void_at is null order by ref`);
+    ok(eq(gains.map(g => g.ref), ['back squat', 'bench press|lb']) && Number(gains[0].value.pct) === 10 && Number(gains[1].value.pct) === 15.3,
+       'lift gains: one per lift AND measure (the squat +10%; the bench in pounds +15.3%: 160 lb × 5 @9 over 135 lb × 5 @8)', JSON.stringify(gains));
+    ok(eq(await sorted('zz_lb', 'retest_done'), ['bench press|lb|c2', 'seated row|lb|c2']) && eq(await sorted('zz_lb', 'retest_beaten'), ['bench press|lb|c2']),
+       'retests in pounds: both flagged lifts were retested in pounds; the bench beat its 175 lb record although a 300 kg record exists, and the row\'s first pound number beat nothing (kilograms 80 are not pounds)',
+       JSON.stringify({ done: await sorted('zz_lb', 'retest_done'), beaten: await sorted('zz_lb', 'retest_beaten') }));
+    const rdB = await valueOf('zz_lb', 'retest_done', 'bench press|lb|c2'), rbB = await valueOf('zz_lb', 'retest_beaten', 'bench press|lb|c2'), rdR = await valueOf('zz_lb', 'retest_done', 'seated row|lb|c2');
+    ok(rdB && Number(rdB.est) === 190 && rdB.u === 'lb' && rdB.lift === 'Bench Press' && rbB && Number(rbB.beat) === 175 && rdR && Number(rdR.est) === 135,
+       'the retests\' numbers are in pounds, to the 5 lb step (190 beat 175; the row 135)', JSON.stringify({ rdB, rbB, rdR }));
+
+    // 11d. zz_plates: a machine's stack. A best, an effort win, a lift gain and a retest, all in plates.
+    await q(db, `insert into public.programs (athlete_id, data) values ('zz_plates', $1::jsonb)`, [JSON.stringify(prog('Pat', 'Es', [
+      mkDay(1, [std('Leg Press Machine', '5RM')]), mkDay(2, [std('Hack Squat')]), mkDay(3, [std('Calf Raise')])]))]);
+    const lp = (w, reps, r) => E('Leg Press Machine', reps, [st(w, reps, r), st(w, reps, r)]);
+    await sess(U4, 'zz_plates', 'Pat Es', 1, addDays(D(-90), 0), [lp('6 plates', 10, 8)]);
+    await sess(U4, 'zz_plates', 'Pat Es', 1, addDays(D(-90), 14), [lp('7 plates', 10, 8)]);
+    await sess(U4, 'zz_plates', 'Pat Es', 1, D(-1), [lp('9 plates', 5, 9)]);
+    const recsPl = [rc('Leg Press Machine', 9, 8, D(-30), { u: 'plates' }), rc('Leg Press Machine', 9.5, 9, D(-12), { u: 'plates' })];
+    await asAthlete(db, U4, 'zz_plates');
+    await q(db, `select public.save_progress('zz_plates', 'Pat Es', $1::jsonb, null, null)`, [JSON.stringify({ zz_plates_1rm: JSON.stringify(recsPl) })]);
+    await asNobody(db);
+    ok(eq(await sorted('zz_plates', 'personal_best'), [`Leg Press Machine|${D(-12)}|plates`]),
+       'a plates lift gets a best in plates (9 → 9.5 plates; its first number is none)', JSON.stringify(await sorted('zz_plates', 'personal_best')));
+    ok(eq(await sorted('zz_plates', 'effort_win'), ['c1|leg press machine|plates']) && Number((await valueOf('zz_plates', 'effort_win', 'c1|leg press machine|plates') || {}).gain) === 0.1667,
+       'and an effort win in plates: 6 → 7 plates at the same reps and RPE is a LOADED win (+16.67%), as a weight in its own measure', JSON.stringify(await sorted('zz_plates', 'effort_win')));
+    const pg = await q(db, `select ref, value from public.career_facts where athlete_id = 'zz_plates' and kind = 'lift_gain' and void_at is null`);
+    ok(pg.length === 1 && pg[0].ref === 'leg press machine|plates' && Number(pg[0].value.pct) === 28.6, 'a lift gain in plates (10.8 over 8.4, +28.6%)', JSON.stringify(pg));
+    const rdP = await valueOf('zz_plates', 'retest_done', 'leg press machine|plates|c2'), rbP = await valueOf('zz_plates', 'retest_beaten', 'leg press machine|plates|c2');
+    ok(eq(await sorted('zz_plates', 'retest_done'), ['leg press machine|plates|c2']) && eq(await sorted('zz_plates', 'retest_beaten'), ['leg press machine|plates|c2'])
+       && rdP && Number(rdP.est) === 11 && rdP.u === 'plates' && rbP && Number(rbP.beat) === 9.5,
+       'and a retest in plates: 9 plates × 5 @9 is an estimate of 11 plates (half-plate step), and it beat 9.5', JSON.stringify({ rdP, rbP }));
+    const noPlain = await q(db, `select kind, ref from public.career_facts where athlete_id = 'zz_plates' and void_at is null and kind in ('effort_win', 'lift_gain', 'personal_best', 'retest_done', 'retest_beaten')
+                                   and ref !~ '(\\|plates|\\|plates\\|c2)$'`);
+    ok(noPlain.length === 0, 'and no fact of the plates lift is filed under the plain kilogram key', JSON.stringify(noPlain));
+
+    // 11e. the old functions disagree on the pound athlete (so section 11b could have failed), and everything is steady
+    const lbNew = await digest('zz_lb');
+    await q(db, `select public.career_derive_old('zz_lb')`);
+    const lbOld = await digest('zz_lb');
+    await q(db, `select public.career_derive('zz_lb')`);
+    const lbBack = await digest('zz_lb');
+    ok(lbNew.h !== lbOld.h && lbNew.h === lbBack.h, 'the stage66 derive reads the pound athlete differently (kilograms for pounds, plates as no weight), so the comparison in 11b can fail; the new one restores every fact',
+       JSON.stringify({ new: lbNew, old: lbOld, back: lbBack }));
+    const all72 = async () => one(db, `select count(*)::int as n, md5(string_agg(athlete_id || kind || ref || day || value::text || coalesce(void_at::text, ''), ',' order by athlete_id, kind, ref)) as h from public.career_facts`);
+    const x1 = await all72();
+    await q(db, `select public.career_backfill()`);
+    const x2 = await all72();
+    ok(x1.n === x2.n && x1.h === x2.h, `a backfill again rewrites no fact of anyone, the pound and plates athletes included (${x2.n} facts)`);
+    await asCoach(db);
+    const pl = (await one(db, `select public.get_profile('zz_lb') as p`)).p, pp = (await one(db, `select public.get_profile('zz_plates') as p`)).p;
+    await asNobody(db);
+    ok(pl && pl.ready && pp && pp.ready, 'get_profile() answers for both athletes');
+  }
   console.log(`\n${failed ? 'FAIL' : 'OK'}: ${passed} passed, ${failed} failed`);
   process.exitCode = failed ? 1 : 0;
 }

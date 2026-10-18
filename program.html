@@ -2638,6 +2638,10 @@
   #screen-ceiling .ex-1rm-field input::placeholder { color: var(--ph); opacity: 1; }
   #screen-ceiling .ex-1rm-field input:focus, #screen-ceiling .ceil-when input:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
   #screen-ceiling .ex-1rm-field span { display: block; margin: 0; font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  /* the unit under the weight box is a button (2026-10-18): kg, lb or plates, one tap to the next */
+  #screen-ceiling .ex-1rm-field .cf-unit { justify-self: center; min-height: 44px; min-width: 56px; padding: 0 12px; border: 1px solid var(--field); border-radius: 999px; background: none; cursor: pointer; -webkit-appearance: none; appearance: none;
+    font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--green-ink); }
+  #screen-ceiling .ex-1rm-field .cf-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   #screen-ceiling .cf-rpe { display: flex; flex-wrap: nowrap; align-items: center; gap: 6px; min-height: 64px; margin-top: 8px; padding: 8px 0; border-top: 0; }
   #screen-ceiling .cf-rpe .rpe-label { flex: 1 0 auto; min-height: 44px; margin: 0; padding: 0; border: 0; background: none; text-align: left; white-space: nowrap; cursor: pointer;
     font: 600 var(--fs-small)/1 'Barlow', sans-serif; letter-spacing: 0; text-transform: none; color: var(--green-ink); text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
@@ -3610,6 +3614,11 @@
   :where(#day-view, .step-scroll, #ws-body) .round-wt { grid-area: w; justify-self: end; width: 68px; height: 48px; margin: 0; padding: 0 2px; border: 1px solid var(--field); border-radius: 10px;
     background: var(--row); outline: none; font: 500 var(--fs-field)/1 'Barlow', sans-serif; color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
   :where(#day-view, .step-scroll, #ws-body) .round-wt::placeholder { color: var(--ph); opacity: 1; font-weight: 500; }
+  /* the unit over a circuit's weight boxes (2026-10-18): kg, lb or plates, one tap to the next, for every item of the circuit */
+  :where(#day-view, .step-scroll, #ws-body) .round-wt-head { display: flex; justify-content: flex-end; padding: 0 0 6px; }
+  :where(#day-view, .step-scroll, #ws-body) .circ-unit { min-height: 34px; margin: 0 -6px 0 0; padding: 0 12px; border: 1px solid var(--field); border-radius: 999px; background: none; cursor: pointer; -webkit-appearance: none; appearance: none;
+    font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .3px; text-transform: uppercase; color: var(--green-ink); white-space: nowrap; }
+  :where(#day-view, .step-scroll, #ws-body) .circ-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   :where(#day-view, .step-scroll, #ws-body) .round-wt:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
   :where(#day-view, .step-scroll, #ws-body) .round-row:not(.prep) .round-cues-slot { display: block; }
   :where(#day-view, .step-scroll, #ws-body) .round-row:not(.prep) .round-cues { padding-bottom: 4px; }
@@ -6121,7 +6130,7 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
         const byKey = {};
         L.concat(C).forEach(e => {
           if (!e || !e.lift || !e.d) return;
-          const k = e.lift + '|' + e.d;
+          const k = e.lift + '|' + e.d + '|' + uKey(e.u);   // a day in lb is not the same entry as that day in kg
           const seen = byKey[k];
           if (!seen || (e.t || 0) > (seen.t || 0)) byKey[k] = e;
         });
@@ -7275,26 +7284,29 @@ function paintFinishArt(day) {
 // Same-day saves replace each other, so comparing against today would make
 // every correction a "new best". A first-ever estimate is never celebrated:
 // there is nothing to beat, and a manufactured win is worth less than none.
-function ceilingPrevBest(lift, day) {
-  const l = (ceilingLifts() || []).find(x => x.lift === lift);   // resolves renamed lifts
-  if (!l) return null;
-  const others = l.entries.filter(e => e.d !== day).map(e => e.kg);
+// A best is judged against this lift's best in the SAME MEASURE (kg, lb or plates; 2026-10-18, Amir: "it's only an achievement if you
+// go higher than your previous record in the same measure"): the first record in a measure beats nothing, and 225 lb never beats 100 kg.
+function ceilingPrevBest(lift, day, u) {
+  const m = uKey(u);
+  const s = (ceilingSeries() || []).find(x => x.lift === lift && uKey(x.u) === m);   // resolves renamed lifts
+  if (!s) return null;
+  const others = s.entries.filter(e => e.d !== day).map(e => e.kg);
   return others.length ? Math.max.apply(null, others) : null;
 }
 // Highlight Reel: while Done files the session's records, every new best is collected here (finishDayNow()). A var, not a let:
 // fillRecordsFrom() can run from boot, and a let declared lower down would still be in its dead zone then.
 var _hlCollect = null;
-function noteNewBest(lift, est, day) {
-  const prev = ceilingPrevBest(lift, day);
+function noteNewBest(lift, est, day, u) {
+  const prev = ceilingPrevBest(lift, day, u);
   if (prev == null || !(est > prev)) return false;
   // Done is collecting this session's new bests for the finish card's band (finishDayNow(), Highlight Reel): a session can set more
   // than one, and _ceil_best below keeps only the last.
-  if (_hlCollect) _hlCollect.push({ lift: lift, d: day });
+  if (_hlCollect) _hlCollect.push(Object.assign({ lift: lift, d: day }, uStore(u) ? { u: uStore(u) } : {}));
   try {
-    localStorage.setItem(ATHLETE_ID + '_ceil_best', JSON.stringify({
+    localStorage.setItem(ATHLETE_ID + '_ceil_best', JSON.stringify(Object.assign({
       lift: lift, kg: est, prev: prev, d: day, t: Date.now(),
       i: Math.floor(Math.random() * APP_ART.pr.length),
-    }));
+    }, uStore(u) ? { u: uStore(u) } : {})));
   } catch (e) { /* storage blocked — the record still saves, only the band is lost */ }
   return true;
 }
@@ -8039,18 +8051,24 @@ window.dismissFiled = dismissFiled;
 // a percentage only, so the formula's bias at high reps cancels out). Works at any reps, for
 // bodyweight moves (reps to failure), and for holds (a lower RPE: holds log a tick, not seconds).
 function cycleSetOf(e, s) {
-  const w = parseLoggedKg(s.w);
-  const wt = weightOf(s.w);                       // wn, u: the number as typed and its unit, so a pounds win is worded in pounds
+  const wt = weightOf(s.w);                       // w and u: the weight as typed, in ITS OWN measure (kg, lb or plates), never converted
+  const w = wt.n;
   const n = (s.n != null && s.n !== '') ? Number(s.n) : (e.reps ? Number(e.reps) : null);
   const r = s.r ? Number(s.r) : null;
   const rir = (r >= 6 && r <= 10) ? 10 - r : 0;
   const idx = n ? (w ? w * (1 + (n + rir) / 30) : n + rir) : null;
-  return { w, n, r, idx, wn: wt.n, u: wt.unit };
+  return { w, n, r, idx, u: wt.unit };
 }
+// A lift's best set of one session, in the exercise's measure (setsMeasure()): a set typed in another measure is left out, so a win is
+// always one measure's first session against its own best since (2026-10-18: kg, lb and plates are never compared with each other).
 function cycleBestSet(e) {
+  const m = setsMeasure(e.sets);
   let best = null;
   (e.sets || []).filter(histSetLogged).forEach(s => {
+    const wt = weightOf(s.w);
+    if (wt.n != null && wt.unit !== m) return;
     const x = cycleSetOf(e, s);
+    x.u = m;
     if (!best || (x.idx != null && (best.idx == null || x.idx > best.idx))
               || (x.idx == null && best.idx == null && x.r != null && (best.r == null || x.r < best.r))) best = x;
   });
@@ -8073,20 +8091,21 @@ function winText(a, b) {
   const pct = Math.max(2, Math.round(gain * 100));
   const loaded = a.w != null && b.w != null;
   if (!loaded && (a.w != null || b.w != null)) return null;   // one set loaded, one not: nothing honest to say
-  // Both sets in pounds: said in pounds, the numbers as typed. Anything else is worded in kilograms (a pound set was converted).
-  const lb = loaded && a.u === 'lb' && b.u === 'lb', U = lb ? 'lb' : 'kg', val = x => lb ? x.wn : x.w;
+  // Both sets are in one measure (cycleWins() keeps them apart): said in it, the numbers as typed. A plates win says "plate".
+  if (loaded && uKey(a.u) !== uKey(b.u)) return null;
+  const U = loaded ? uKey(a.u) : 'kg', val = x => x.w, wd = (v) => uWord(U, v);
   const dw = loaded ? Math.round((val(b) - val(a)) * 2) / 2 : 0, dn = b.n - a.n;
   const same = rpeKnown && dr === 0;
-  let txt, shape, share = !(loaded && (a.u === 'lb' || b.u === 'lb'));   // a share card says kilograms: none for a pounds win
+  let txt, shape, share = true;
   if (!loaded) {
     if (dn > 0 && dr <= 0)               { txt = `${reps(dn)}${same ? ', same RPE' : ''}`; shape = 'bwReps'; }
     else if (dn === 0 && dr < 0)         { txt = `${b.n} reps felt easier: RPE ${a.r} → ${b.r}`; shape = 'bwEasier'; share = false; }
     else                                 { txt = `about ${pct}% stronger`; shape = 'pctBw'; share = dn > 0; }
-  } else if (dw > 0 && dn === 0 && dr === 0) { txt = `+${kg(dw)} ${U}, same reps${rpeKnown ? ', same RPE' : ''}`; shape = 'kg'; }
-  else if (dw > 0 && dn === 0 && dr < 0)     { txt = `+${kg(dw)} ${U}, and it felt easier`; shape = 'kgEasier'; }
-  else if (dw > 0 && dn > 0 && dr <= 0)      { txt = `+${kg(dw)} ${U} and ${reps(dn)}`; shape = 'kgReps'; }
-  else if (dw === 0 && dn > 0 && dr <= 0)    { txt = `${reps(dn)} at ${kg(val(b))} ${U}${same ? ', same RPE' : ''}`; shape = 'reps'; }
-  else if (dw === 0 && dn === 0 && dr < 0)   { txt = `${kg(val(b))} ${U} × ${b.n} felt easier: RPE ${a.r} → ${b.r}`; shape = 'easier'; share = false; }
+  } else if (dw > 0 && dn === 0 && dr === 0) { txt = `+${kg(dw)} ${wd(dw)}, same reps${rpeKnown ? ', same RPE' : ''}`; shape = 'kg'; }
+  else if (dw > 0 && dn === 0 && dr < 0)     { txt = `+${kg(dw)} ${wd(dw)}, and it felt easier`; shape = 'kgEasier'; }
+  else if (dw > 0 && dn > 0 && dr <= 0)      { txt = `+${kg(dw)} ${wd(dw)} and ${reps(dn)}`; shape = 'kgReps'; }
+  else if (dw === 0 && dn > 0 && dr <= 0)    { txt = `${reps(dn)} at ${kg(val(b))} ${wd(val(b))}${same ? ', same RPE' : ''}`; shape = 'reps'; }
+  else if (dw === 0 && dn === 0 && dr < 0)   { txt = `${kg(val(b))} ${wd(val(b))} × ${b.n} felt easier: RPE ${a.r} → ${b.r}`; shape = 'easier'; share = false; }
   else if (dw > 0 && dr > 0)                 { txt = `heavier and harder: about ${pct}% stronger`; shape = 'pctHarder'; }
   else if (dw > 0 && dn < 0)                 { txt = `heavier for fewer reps: about ${pct}% stronger`; shape = 'pctFewer'; }
   else if (dw < 0 && dn > 0)                 { txt = `more reps with less: about ${pct}% stronger`; shape = 'pctLess'; }
@@ -8101,7 +8120,7 @@ function cycleWins(rows) {
     const name = HIST_ALIAS[e.ex] || e.ex;
     const best = cycleBestSet(e);
     if (!name || !best) return;
-    const k = histNorm(name);
+    const k = histNorm(name) + (uKey(best.u) === 'kg' ? '' : '|' + uKey(best.u));   // one series per lift AND measure
     best.date = sess.date;   // a share card names the week each set was lifted in
     (lifts[k] = lifts[k] || { name, sets: [] }).sets.push(best);
   }));
@@ -8117,7 +8136,7 @@ function cycleWins(rows) {
       else if (x.idx == null && b.idx == null && x.r != null && (b.r == null || x.r < b.r)) b = x;
     });
     const w = b && winText(a, b);
-    // a and b: the first session's best set and the best since, as lifted ({ w, n, r, idx, date }), for the share card.
+    // a and b: the first session's best set and the best since, as lifted ({ w, n, r, idx, u, date }), for the share card.
     if (w) wins.push({ name: L.name, txt: w.txt, gain: w.gain, shape: w.shape, same: w.same, pct: w.pct, share: w.share, a, b });
   });
   return wins.sort((x, y) => y.gain - x.gain).slice(0, 3);
@@ -9383,7 +9402,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
       <div class="lt-slot"></div>`}
       ${renderCoachNote(ex.note)}
       <div class="ex-section-label">Rounds</div>
-      <div class="round-list">${roundsHtml}</div>
+      <div class="round-list">${logWeight ? `<div class="round-wt-head"><button type="button" class="circ-unit" aria-label="Weight unit. Tap to change it">kg</button></div>` : ''}${roundsHtml}</div>
       ${showLog ? `<div class="ex-section-label">Log</div>
       <div class="ex-log"></div>` : ''}
       ${restBottom}
@@ -10925,22 +10944,23 @@ function ceilingCardHtml() {
       ${hrowIc('records')}<span class="hrow-b"><span class="hrow-l">Personal records</span><span class="hrow-q">Fill in by themselves as you train.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
   }
 
-  const best = lifts.reduce((a, b) => (b.latest.kg > a.latest.kg ? b : a));
+  const best = ceilingBest(lifts);
   const bw   = latestBodyWeight();
-  const foot = bw
-    ? `${esc(shortLift(best.lift))} · <b>${(best.latest.kg / bw.kg).toFixed(2)}× bodyweight</b>`
+  const bkg  = recKgEq(best.latest);
+  const foot = bw && bkg != null
+    ? `${esc(shortLift(best.lift))} · <b>${(bkg / bw.kg).toFixed(2)}× bodyweight</b>`
     : `<b>${esc(shortLift(best.lift))}</b>`;
-  const delta = best.delta > 0 ? `▲ ${best.delta} KG` : '';
+  const delta = best.delta > 0 ? `▲ ${best.delta} ${uWord(best.u, best.delta).toUpperCase()}` : '';
 
   // Idea 3 — count to the new number. The figure animates ONLY when this lift's
   // best has moved since the athlete last saw this card; an unchanged number
-  // just sits there. ceilingSeen() below owns that comparison.
-  const seen = ceilingSeen();
+  // just sits there. ceilingSeen() below owns that comparison (in the same measure: a number in another one is no "last seen").
+  const seen = ceilingSeen(best.u);
   const from = (seen != null && seen !== best.latest.kg) ? seen : null;
 
   return `<button type="button" class="hrow" onclick="goTo('ceiling')">
     ${hrowIc('records')}<span class="hrow-b"><span class="hrow-l">Personal records</span>
-      <span class="hrow-v"><span class="hrow-vv"><span class="hrow-n" data-to="${best.latest.kg}"${from != null ? ` data-from="${from}"` : ''}>${from != null ? from : best.latest.kg}</span> kg</span><small>${esc(shortLift(best.lift))}${delta ? ' · ' + delta : ''}</small></span></span>
+      <span class="hrow-v"><span class="hrow-vv"><span class="hrow-n" data-to="${best.latest.kg}"${from != null ? ` data-from="${from}"` : ''}>${from != null ? from : best.latest.kg}</span> ${uWord(best.u, best.latest.kg)}</span><small>${esc(shortLift(best.lift))}${delta ? ' · ' + delta : ''}</small></span></span>
     <span class="hrow-sp">${ncSpark(best.entries)}</span><span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
 
@@ -10965,17 +10985,24 @@ window.paintNumbers = paintNumbers;
 // The best figure the athlete has already been shown, so a number that has not
 // moved never animates. Stored per-device; it is a "have you seen this yet"
 // marker, not data.
-function ceilingSeen() {
-  const v = parseFloat(localStorage.getItem(ATHLETE_ID + '_1rm_seen'));
-  return isNaN(v) ? null : v;
+function ceilingSeen(u) {
+  const raw = String(localStorage.getItem(ATHLETE_ID + '_1rm_seen') || '').split('|');
+  const v = parseFloat(raw[0]);
+  return isNaN(v) || (raw[1] || '') !== uStore(u) ? null : v;
+}
+// The lift to lead with, among every lift's current series: the highest estimate in kilograms (pounds converted; a plates lift has no
+// kilograms and never leads while any other lift has). All plates: the newest.
+function ceilingBest(lifts) {
+  const withKg = lifts.filter(l => recKgEq(l.latest) != null);
+  return withKg.length ? withKg.reduce((a, b) => (recKgEq(b.latest) > recKgEq(a.latest) ? b : a)) : lifts[0];
 }
 // Run the count-up on any card just rendered, then record what was shown.
 function ceilingCountUp(root) {
   const el = (root || document).querySelector('.nc-n[data-from], .hrow-n[data-from]');
   const best = ceilingLifts();
   if (best.length) {
-    const top = best.reduce((a, b) => (b.latest.kg > a.latest.kg ? b : a));
-    localStorage.setItem(ATHLETE_ID + '_1rm_seen', String(top.latest.kg));
+    const top = ceilingBest(best);
+    localStorage.setItem(ATHLETE_ID + '_1rm_seen', String(top.latest.kg) + (top.u ? '|' + top.u : ''));
   }
   if (!el) return;
   // Someone who has asked their phone for less motion gets the number, still.
@@ -11070,7 +11097,7 @@ function ceilingDue() {
   ceilingLifts().forEach(l => { known[l.lift] = l; });
   return ceilingCandidates().filter(c => c.test).map(c => {
     const l = known[c.name];
-    return { name: c.name, test: c.test, age: l ? l.age : null, kg: l ? l.latest.kg : null };
+    return { name: c.name, test: c.test, age: l ? l.age : null, kg: l ? l.latest.kg : null, u: l ? l.u : '' };
   }).filter(d => d.age == null || d.age >= RETEST_MIN_DAYS);
 }
 
@@ -11179,18 +11206,20 @@ function renderCeiling() {
   // Weight screen (it left AA Proof on 2026-09-12); if there is none, there is no ratio
   // on the cover and a door asks for it rather than quietly dropping the headline.
   const bw  = latestBodyWeight();
-  const best = lifts.reduce((a, b) => (b.latest.kg > a.latest.kg ? b : a));
+  const best = ceilingBest(lifts);
+  const bkg  = recKgEq(best.latest);
   const nLifts = [lifts.length, '', lifts.length === 1 ? 'Lift' : 'Lifts'];
-  const topCell = [best.latest.kg, '', 'kg ' + esc(shortLift(best.lift))];
+  const topCell = [best.latest.kg, '', uWord(best.u, best.latest.kg) + ' ' + esc(shortLift(best.lift))];
   let ask = '';
-  if (bw) {
-    const ratio = (best.latest.kg / bw.kg).toFixed(2);
+  if (bw && bkg != null) {
+    const ratio = (bkg / bw.kg).toFixed(2);
     paintCover('ceil-board', 'ceil-line', [topCell, [ratio + '×', '', 'Your own body weight'], nLifts],
       `You can lift ${ratio} times your own body weight on the ${esc(best.lift)}. On court that counts for more than the raw kilos.`);
   } else {
     paintCover('ceil-board', 'ceil-line', [topCell, nLifts], '');
-    ask = `<button type="button" class="hrow ceil-ask" onclick="goWeight()">${hrowIc('weight')}<span class="hrow-b"><span class="hrow-l">Add your body weight</span><span class="hrow-q">Lifting ${best.latest.kg} kg means one thing at 65 kg and
-      something else at 95 kg. What counts on court is how strong you are for your size.
+    // The ask is about body weight, so it only makes sense for a lift with a weight (kg or lb); a plates lift has none.
+    if (bkg != null) ask = `<button type="button" class="hrow ceil-ask" onclick="goWeight()">${hrowIc('weight')}<span class="hrow-b"><span class="hrow-l">Add your body weight</span><span class="hrow-q">Lifting ${best.latest.kg} ${uWord(best.u, best.latest.kg)} means one thing at ${best.u === 'lb' ? '145 lb' : '65 kg'} and
+      something else at ${best.u === 'lb' ? '210 lb' : '95 kg'}. What counts on court is how strong you are for your size.
       Add your weight and it shows up here.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
   }
 
@@ -11200,7 +11229,7 @@ function renderCeiling() {
   const rows = lifts.map((l, i) => {
     const up = l.delta > 0, flat = l.delta === 0;
     const trend = l.entries.length < 2 ? 'First estimate'
-      : (up ? '▲ ' : flat ? '' : '▼ ') + (flat ? 'No change yet' : Math.abs(l.delta) + ' kg since you started');
+      : (up ? '▲ ' : flat ? '' : '▼ ') + (flat ? 'No change yet' : Math.abs(l.delta) + ' ' + uWord(l.u, Math.abs(l.delta)) + ' since you started');
     return `
       <button type="button" class="ceil-lift" onclick="renderCeilingLiftAt(${i})">
         <span class="ceil-lift-m">
@@ -11208,7 +11237,7 @@ function renderCeiling() {
           <span class="ceil-lift-d"><span class="${up ? 'ceil-up' : (!flat && l.entries.length > 1) ? 'ceil-down' : ''}">${trend}</span> · ${esc(agoLabel(l.age))}</span>
         </span>
         <span class="${l.delta < 0 ? 'ceil-down' : 'ceil-up'}">${ceilSpark(l.entries)}</span>
-        <span class="ceil-lift-vv"><span class="ceil-lift-v">${l.latest.kg}</span><span class="ceil-lift-u">KG</span></span>
+        <span class="ceil-lift-vv"><span class="ceil-lift-v">${l.latest.kg}</span><span class="ceil-lift-u">${uWord(l.u, l.latest.kg).toUpperCase()}</span></span>
       </button>`;
   }).join('');
 
@@ -11255,7 +11284,7 @@ function dueHtml() {
   const cands = ceilingCandidates();
   const rows = due.map(d => {
     const i = cands.findIndex(c => c.name === d.name);
-    const meta = d.kg ? d.kg + ' kg · ' + agoLabel(d.age).toLowerCase() : 'nothing on the record yet';
+    const meta = d.kg ? d.kg + ' ' + uWord(d.u, d.kg) + ' · ' + agoLabel(d.age).toLowerCase() : 'nothing on the record yet';
     return `<button type="button" class="ceil-due-r" onclick="openCeilingForm(${i}, 1)">
       <div class="ceil-due-m">
         <div class="ceil-due-n">${esc(d.name)}</div>
@@ -11289,7 +11318,7 @@ function openCeilingAdd() {
 
   const rows = cands.map((c, i) => {
     const l = known[c.name];
-    const meta = l ? l.latest.kg + ' kg · ' + agoLabel(l.age).toLowerCase()
+    const meta = l ? l.latest.kg + ' ' + uWord(l.u, l.latest.kg) + ' · ' + agoLabel(l.age).toLowerCase()
                    : 'nothing on the record yet';
     return `<button type="button" class="ceil-lift" onclick="openCeilingForm(${i})">
       <span class="ceil-lift-m">
@@ -11320,7 +11349,9 @@ function openCeilingForm(i, asTest) {
   const c = ceilingCandidates()[i];
   if (!c) return;
   const spec = asTest ? c.test : null;
-  _ceilAdd = { lift: c.name, test: c.test, spec: spec };
+  // The measure the form opens in: the lift's own (where its records are), else the unit it was last logged in, else kg. One tap changes it.
+  const known = ceilingLifts().find(x => x.lift === c.name);
+  _ceilAdd = { lift: c.name, test: c.test, spec: spec, u: known ? uKey(known.u) : lastLoggedUnit(c.name) };
   _ceilLift = null;
   goTo('ceiling', null, true);
   ceilHeadPlain('Log a max');
@@ -11341,7 +11372,7 @@ function openCeilingForm(i, asTest) {
     <div class="prog-sec">What you lifted</div>
     <div class="ceil-form">
       <div class="ex-1rm-inputs">
-        <div class="ex-1rm-field"><input id="cf-kg" type="text" inputmode="decimal" aria-label="Weight in kilograms"><span>kg</span></div>
+        <div class="ex-1rm-field"><input id="cf-kg" type="text" inputmode="decimal" aria-label="Weight"><button type="button" class="cf-unit" id="cf-unit" onclick="cycleCeilingUnit()" aria-label="Weight unit. Tap to change it">${esc(uWord(_ceilAdd.u, 2))}</button></div>
         <div class="ex-1rm-field"><input id="cf-rp" type="text" inputmode="numeric" aria-label="Reps" value="${esc(String(reps))}"><span>reps</span></div>
       </div>
       <input id="cf-rpe" type="hidden" value="">
@@ -11391,10 +11422,11 @@ function paintCeilingForm() {
   const from  = document.getElementById('cf-from');
   const save  = document.getElementById('cf-save');
   if (!out) return;
-  const kg  = parseLoggedKg(document.getElementById('cf-kg').value);
+  const u   = uKey(_ceilAdd && _ceilAdd.u);
+  const kg  = weightOf(document.getElementById('cf-kg').value).n;   // the number as typed, in the form's measure
   const rp  = Number(document.getElementById('cf-rp').value);
   const rpe = Number(document.getElementById('cf-rpe').value);
-  const est = estimateOneRM(kg, rp, rpe);
+  const est = estimateOneRM(kg, rp, rpe, u);
 
   if (est == null) {
     out.innerHTML = '<b>&mdash;</b>';
@@ -11419,7 +11451,7 @@ function paintCeilingForm() {
   save.hidden = false;
   save.disabled = false;
   save.textContent = 'Save to Personal Records';
-  out.innerHTML = `<b>${est}</b><i>KG</i>`;
+  out.innerHTML = `<b>${est}</b><i>${esc(uWord(u, est).toUpperCase())}</i>`;
   grade.innerHTML = q.label + '<em>how much to trust it</em>';
   grade.className = 'ex-1rm-grade g' + (eff <= 3 ? '1' : eff <= 6 ? '2' : '3');
   // A prescribed test done properly must never be told to go heavier — it IS
@@ -11437,10 +11469,11 @@ window.paintCeilingForm = paintCeilingForm;
 function saveCeilingForm() {
   const a = _ceilAdd;
   if (!a || !a.lift) return;
-  const kg  = parseLoggedKg(document.getElementById('cf-kg').value);
+  const u   = uKey(a.u);
+  const kg  = weightOf(document.getElementById('cf-kg').value).n;
   const rp  = Number(document.getElementById('cf-rp').value);
   const rpe = Number(document.getElementById('cf-rpe').value);
-  const est = estimateOneRM(kg, rp, rpe);
+  const est = estimateOneRM(kg, rp, rpe, u);
   if (est == null) return;
   // A blank or future date falls back to today rather than filing the entry
   // under a day that has not happened — the merge sorts on this field.
@@ -11449,8 +11482,8 @@ function saveCeilingForm() {
     ? picked : ceilingToday();
   // Must run BEFORE the save: the save replaces this date's entry, and the
   // comparison is against the best on every other date.
-  noteNewBest(a.lift, est, day);
-  saveCeilingEntry(a.lift, est, kg, rp, rpe, day, !!a.spec);
+  noteNewBest(a.lift, est, day, u);
+  saveCeilingEntry(a.lift, est, kg, rp, rpe, day, !!a.spec, u);
   if (navigator.vibrate) navigator.vibrate(12);
   // Straight to that lift's history, so the number they just entered is the
   // thing on screen rather than a form that has quietly emptied itself.
@@ -11458,6 +11491,24 @@ function saveCeilingForm() {
   renderCeilingLift(a.lift);
 }
 window.saveCeilingForm = saveCeilingForm;
+// The unit the athlete last logged this lift in (a set of its history), for a form that opens on a lift with no record yet.
+function lastLoggedUnit(name) {
+  for (const h of (HIST ? historyFor(name) : [])) {
+    const m = setsMeasure((h.entry && h.entry.sets) || []);
+    if ((h.entry.sets || []).some(x => weightOf(x && x.w).n != null)) return m;
+  }
+  return 'kg';
+}
+// kg, then lb, then plates, then kg again, on the Log a max form: the weight and the estimate follow.
+function cycleCeilingUnit() {
+  if (!_ceilAdd) return;
+  const order = ['kg', 'lb', 'plates'];
+  _ceilAdd.u = order[(order.indexOf(uKey(_ceilAdd.u)) + 1) % order.length];
+  const b = document.getElementById('cf-unit');
+  if (b) b.textContent = uWord(_ceilAdd.u, 2);
+  paintCeilingForm();
+}
+window.cycleCeilingUnit = cycleCeilingUnit;
 
 // The full explainer, in place: ONE fold row, closed on every screen (it used to be open on the empty one, where it is the
 // only thing worth reading; the steps above it say what to do). Same prose as the help sheet's card.
@@ -11485,8 +11536,8 @@ function renderCeilingLift(lift) {
 
   const n = l.entries.length, d = Math.round(l.delta * 10) / 10;
   paintCover('ceil-board', 'ceil-line', [
-    [l.latest.kg, '', 'kg estimate'],
-    [n < 2 ? '—' : d > 0 ? '+' + d : d < 0 ? '−' + Math.abs(d) : '0', '', 'kg since first'],
+    [l.latest.kg, '', uWord(l.u, l.latest.kg) + ' estimate'],
+    [n < 2 ? '—' : d > 0 ? '+' + d : d < 0 ? '−' + Math.abs(d) : '0', '', uWord(l.u, Math.abs(d)) + ' since first'],
     [n, '', n === 1 ? 'Entry' : 'Entries'],
   ], '');
 
@@ -11497,12 +11548,12 @@ function renderCeilingLift(lift) {
   const fresh = best && best.lift === lift && best.t && (Date.now() - best.t) < 7 * 864e5;
   // Highlight Reel (2026-10-17): the band gets Share when its record makes a card (the set as lifted beat a best before it), and a
   // retest logged here in the last 7 days that beat the one before gets its own band.
-  const canBest = fresh && !window.IS_PREVIEW && !!hlBestSpec(lift, best.d);
+  const canBest = fresh && !window.IS_PREVIEW && !!hlBestSpec(lift, best.d, best.u);
   const share = (fn, what) => `<button type="button" class="ceil-pr-share" onclick="${fn}()" aria-label="Share your ${what}">Share</button>`;
   const rt = !window.IS_PREVIEW && hlLiftRetest(lift);
   const band = (rt ? `<div class="ceil-pr is-retest"><div class="ceil-pr-k">Retest beaten</div><div class="ceil-pr-row"><div class="ceil-pr-t">${esc(hlSetText(rt))}</div>${share('openShareRetest', 'retest')}</div></div>` : '')
     + (fresh && !(rt && rt.now.date === best.d)   // the same day's test is said once, as the retest
-    ? `<div class="ceil-pr"><div class="ceil-pr-k">New best</div><div class="ceil-pr-row"><div class="ceil-pr-t">${Math.round((best.kg - best.prev) * 10) / 10} kg over your last best</div>${canBest ? share('openShareBest', 'new best') : ''}</div></div>` : '');
+    ? `<div class="ceil-pr"><div class="ceil-pr-k">New best</div><div class="ceil-pr-row"><div class="ceil-pr-t">${Math.round((best.kg - best.prev) * 10) / 10} ${uWord(best.u, Math.round((best.kg - best.prev) * 10) / 10)} over your last best</div>${canBest ? share('openShareBest', 'new best') : ''}</div></div>` : '');
 
   const v = l.entries.map(e => e.kg);
   const lo = Math.min(...v), hi = Math.max(...v), span = (hi - lo) || 1;
@@ -11521,10 +11572,10 @@ function renderCeilingLift(lift) {
   // A row that set a record (it beat every entry before it) can be shared as a New best card, any time (Highlight Reel).
   const rows = l.entries.slice().reverse().map((e, i) => `
     <div class="ceil-row">
-      <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.u === 'lb' ? Math.round(e.w / 0.45359237 * 2) / 2 + ' lb (' + e.w + ' kg)' : e.w + ' kg'} × ${e.r} @ RPE ${e.rpe}${
+      <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} ${uWord(e.u, e.w)} × ${e.r} @ RPE ${e.rpe}${
         e.test ? ' · tested' : e.auto ? ' · from your sets' : ''}</span>
-      <b>${e.kg} kg</b>
-      ${!window.IS_PREVIEW && hlBestSpec(lift, e.d) ? `<button type="button" class="ceil-row-share" onclick="openShareRecord(${i})" aria-label="Share this record">Share</button>` : ''}
+      <b>${e.kg} ${uWord(e.u, e.kg)}</b>
+      ${!window.IS_PREVIEW && hlBestSpec(lift, e.d, e.u) ? `<button type="button" class="ceil-row-share" onclick="openShareRecord(${i})" aria-label="Share this record">Share</button>` : ''}
       <button type="button" class="wt-del" onclick="armedTap(this, 'Delete?', () => removeCeilingEntry(${i}))"
         aria-label="Delete this entry">✕</button>
     </div>`).join('');
@@ -11558,7 +11609,7 @@ function removeCeilingEntry(i) {
   const e = _ceilRows[i];
   if (!e) return;
   const lift = _ceilLift;
-  deleteCeilingEntry(e.lift, e.d);
+  deleteCeilingEntry(e.lift, e.d, e.u);
   renderCeilingLift(lift);
 }
 window.removeCeilingEntry = removeCeilingEntry;
@@ -14924,6 +14975,8 @@ function normDigits(v) {
 // printing a number it cannot stand behind.
 const ONE_RM_MAX_EFFECTIVE = 10;
 const ONE_RM_ROUND_KG      = 2.5;  // the smallest real plate jump; finer is fake precision
+// The same rounding in each measure (2026-10-18): 2.5 kg, 5 lb (the smallest pair of plates on a bar), half a plate on a machine's stack.
+const ONE_RM_ROUND         = { kg: 2.5, lb: 5, plates: 0.5 };
 
 // How much to trust the number, from the one thing that drives it: how close
 // the set was to a true single. Effective reps already fold in the RPE, so a
@@ -14945,13 +14998,16 @@ function ceilingQuality(effective) {
 
 // Epley, run on effective reps rather than performed reps. A true single taken
 // to RPE 10 estimates as itself (Epley alone would inflate it by 3%).
-function estimateOneRM(kg, reps, rpe) {
-  const w = Number(kg), r = Number(reps), e = Number(rpe);
+// `unit` ('kg' by default, 'lb' or 'plates'): the weight is in that measure and so is the answer, rounded to its own step
+// (ONE_RM_ROUND). Nothing is converted: a record in pounds is an estimate in pounds, a record on a stack is a number of plates.
+function estimateOneRM(w0, reps, rpe, unit) {
+  const w = Number(w0), r = Number(reps), e = Number(rpe);
   if (!(w > 0) || !(r > 0) || !(e > 0)) return null;
   const effective = r + Math.max(0, 10 - e);
   if (effective > ONE_RM_MAX_EFFECTIVE) return null;
   const raw = effective <= 1 ? w : w * (1 + effective / 30);
-  return Math.round(raw / ONE_RM_ROUND_KG) * ONE_RM_ROUND_KG;
+  const step = ONE_RM_ROUND[unit] || ONE_RM_ROUND_KG;
+  return Math.round(raw / step) * step;
 }
 
 // Pull a rep count out of a reps chip. Ranges ("10-12") take the LOW end — the
@@ -14971,9 +15027,12 @@ function prescribedReps(repsChip) {
 // pounds and "6 plates" is the count on a machine's stack. So one string travels everywhere a weight already did (the cloud merge,
 // the carried LAST, the saved session, the email, coach.html) and no field is added that a merge could drop. The weight box holds
 // the number only; the unit is the small button over it (setCardUnit()), kept per exercise by the sets themselves.
-// Plates are a position on a stack, never a load: no kilograms, no estimate, no record, no comparison with kg (parseLoggedKg() is
-// null for them). Pounds are converted to kilograms for every calculation and shown as typed everywhere a set is shown.
-// ⚠ Twins: career_kg() in the database (supabase/stage71_weight_units.sql) and wUnitOf() / loadSummary() in coach.html.
+// Each measure is its own scale: a record, a win or a best is only ever compared with the same lift in the same measure (the MEASURE
+// block below), so nothing is converted for them: 225 lb is a number of pounds, 9 plates a number of plates. Plates are a position
+// on a stack, never a load, so parseLoggedKg() (a weight in kilograms) is null for them and they never lead a kilograms line (body
+// weight ratio, "far above your numbers"). Pounds are kilograms there only: parseLoggedKg() converts them for those two uses.
+// ⚠ Twins: career_kg() / career_wn() / career_wu() in the database (supabase/stage71_weight_units.sql, stage72_weight_measures.sql)
+// and wUnitOf() / loadSummary() in coach.html.
 function weightOf(v) {
   const t = normDigits(v == null ? '' : v).replace(',', '.');
   const pair = t.match(/^\s*([1-4])\s*[×xX*]\s*(\d+(?:\.\d+)?)/);
@@ -15000,6 +15059,23 @@ function composeW(num, unit) {
 function weightText(w) {
   const s = String(w == null ? '' : w).trim();
   return weightOf(s).unit !== 'kg' || /kg$/i.test(s) ? s : s + ' kg';
+}
+// ── A MEASURE: kg, lb or plates (2026-10-18, Amir: "personal records can be in all measures, and it's only an achievement if you go
+// higher than your previous record in the same measure") ──
+// A lift's record, win and best are each kept IN ITS OWN MEASURE and never compared with another: 225 lb is not "higher" than 100 kg, and
+// a stack at 9 plates is not a weight at all. A Personal Records entry says its measure in `u` ('lb' or 'plates'; absent = kg), and its
+// `kg` (the estimate) and `w` (the set) are numbers in that measure: the names are the old ones, the numbers are the measure's own.
+// uKey() is the measure as a word, uStore() as the entry stores it, uWord() as a unit to print after a number.
+function uKey(u) { return u === 'lb' || u === 'plates' ? u : 'kg'; }
+function uStore(u) { return u === 'lb' || u === 'plates' ? u : ''; }
+function uWord(u, n) { return unitWord(uKey(u), n); }
+// An estimate in kilograms for the one place that must set lifts of different measures side by side (Home's best lift, the ratio to body
+// weight): pounds are converted, plates are none (a stack position is not a load, so a plates lift never leads that line).
+function recKgEq(e) {
+  if (!e) return null;
+  const v = Number(e.kg);
+  if (!(v > 0) || e.u === 'plates') return null;
+  return e.u === 'lb' ? v * 0.45359237 : v;
 }
 
 // Weight fields are free text ("60", "60kg", "62.5", "62,5"). Take the first
@@ -15072,17 +15148,20 @@ function writeCeiling(all) {
 }
 // `day` defaults to today; the Records page passes a date so a test done on
 // Saturday and logged on Monday lands on the day it was actually lifted.
-function saveCeilingEntry(lift, kg, w, r, rpe, day, test) {
+// `u` ('lb' or 'plates'; absent = kg): the measure. `kg` is the estimate and `w` the set, both in that measure (the names are the old ones).
+// One entry a day per lift AND measure: a day in lb does not replace the same day's kg entry.
+function saveCeilingEntry(lift, kg, w, r, rpe, day, test, u) {
   const d = day || ceilingToday();
-  const all = loadCeilingRaw().filter(e => !(e.lift === lift && e.d === d));
+  const all = loadCeilingRaw().filter(e => !(e.lift === lift && e.d === d && uKey(e.u) === uKey(u)));
   const entry = { lift: lift, kg: kg, w: w, r: r, rpe: rpe, d: d, t: Date.now() };
+  if (uStore(u)) entry.u = uStore(u);
   if (test) entry.test = true;
   all.push(entry);
   writeCeiling(all);
 }
-function deleteCeilingEntry(lift, day) {
-  const all = loadCeilingRaw().filter(e => !(e.lift === lift && e.d === day));
-  all.push({ lift: lift, d: day, del: true, t: Date.now() });
+function deleteCeilingEntry(lift, day, u) {
+  const all = loadCeilingRaw().filter(e => !(e.lift === lift && e.d === day && uKey(e.u) === uKey(u)));
+  all.push(Object.assign({ lift: lift, d: day, del: true, t: Date.now() }, uStore(u) ? { u: uStore(u) } : {}));
   writeCeiling(all);
 }
 
@@ -15113,16 +15192,41 @@ function deleteCeilingEntry(lift, day) {
 // (noteNewBest). History read at boot never does, or the first open after this
 // shipped would celebrate a session from weeks ago.
 // The lifts a one-rep max means something for, which are the only ones the app files a
-// record for by itself: a loaded strength pattern in the Spine, with no impact. A jump, a
-// throw, a sprint, a carry or a trunk drill is left out even with a weight and an RPE
-// logged on it: a 6 kg med ball slammed five times at RPE 7 is not "a 7.5 kg max". An
+// record for by itself: a loaded STRENGTH pattern in the Spine, with no impact. A jump, a
+// throw, a sprint, a carry, a trunk drill and, since 2026-10-18 (Amir: "those movements are mainly isolate or don't count as a
+// strength exercise"), isolation work (a curl, an external rotation, a wrist extension, a leg curl) is left out even with a weight and
+// an RPE logged on it: a 6 kg med ball slammed five times at RPE 7 is not "a 7.5 kg max". The one exception he named: a ONE-HANDED
+// CABLE exercise is used to build strength and is not isolation, so it counts wherever the Spine files it (oneHandedCable()). An
 // exercise the Spine does not know yet is left out until its entry exists. The athlete can
 // still put any lift on by hand (+ Log a max).
 const RECORD_PATTERNS = { squat: 1, hinge: 1, 'single-leg': 1, 'push-horizontal': 1,
-  'push-vertical': 1, 'pull-horizontal': 1, 'pull-vertical': 1, isolation: 1 };
+  'push-vertical': 1, 'pull-horizontal': 1, 'pull-vertical': 1 };
+function oneHandedCable(e) {
+  const eq = Array.isArray(e && e.equipment) ? e.equipment : [];
+  return eq.some(x => /cable/i.test(String(x))) && /(?:single|one)[- ]?(?:arm|hand|handed)\b/i.test(String((e && e.name) || ''));
+}
 function recordsItself(name, exId) {
   const e = spineFor(name, exId);
-  return !!(e && RECORD_PATTERNS[e.pattern] && (e.impact || 'none') === 'none');
+  if (!e || (e.impact || 'none') !== 'none') return false;
+  return !!RECORD_PATTERNS[e.pattern] || (e.pattern === 'isolation' && oneHandedCable(e));
+}
+// A lift that no longer earns a record by itself keeps none of its automatic ones (2026-10-18: the isolation lifts that had filed
+// records before the rule): each becomes a tombstone, the way a deleted record is, so every phone and the coach's dashboard drop it
+// together. Only automatic entries, and only for a lift whose Spine entry is KNOWN and says no: a phone with no Spine yet, or a name the
+// Spine does not resolve, changes nothing. What the athlete entered by hand or tested stays.
+function dropIneligibleRecords() {
+  if (!SPINE) return false;
+  const all = loadCeilingRaw(), now = Date.now(), verdict = {};
+  let changed = false;
+  const out = all.map(e => {
+    if (!e.auto || e.del || e.test) return e;
+    if (!(e.lift in verdict)) { const sp = spineFor(e.lift); verdict[e.lift] = sp && sp.pattern ? recordsItself(e.lift) : true; }   // no entry, or one with no pattern yet: unknown, left alone
+    if (verdict[e.lift]) return e;
+    changed = true;
+    return Object.assign({ lift: e.lift, d: e.d, del: true, t: now }, e.u ? { u: e.u } : {});
+  });
+  if (changed) writeCeiling(out);
+  return changed;
 }
 
 // ⚠ Every caller goes through this wrapper. recordSessionToCloud() fills the records
@@ -15133,18 +15237,20 @@ function fillRecordsFrom(sessions, celebrate) {
 }
 function fillRecords(sessions, celebrate) {
   if (!ATHLETE_ID || !DATA || window.IS_PREVIEW) return;
+  const dropped = dropIneligibleRecords();
   const want = {};
   ceilingCandidates().forEach(c => { if (recordsItself(c.name, c.exId)) want[histNorm(c.name)] = c.name; });
-  const found = {};                                   // lift -> date -> best set
+  const found = {};                                   // lift -> measure -> date -> best set (a record is kept per measure)
   (sessions || []).forEach(s => (s.entries || []).forEach(e => {
     const lift = s.date && want[histNorm(HIST_ALIAS[e.ex] || e.ex)];
     const b = lift ? histBestSet(e) : null;
     if (!b) return;
-    const f = (found[lift] = found[lift] || {});
+    const m = uKey(b.u);
+    const f = (((found[lift] = found[lift] || {})[m] = found[lift][m] || {}));
     if (!f[s.date] || b.est > f[s.date].est) f[s.date] = b;
   }));
   const lifts = Object.keys(found);
-  if (!lifts.length) return;
+  if (!lifts.length) { if (dropped) paintCeilingRow(); return; }
 
   // What each stored row reads as, a renamed lift's old rows and tombstones included:
   // a day deleted under the old name is still a deleted day.
@@ -15154,19 +15260,21 @@ function fillRecords(sessions, celebrate) {
   const alias = orphans.length ? matchRenamed(orphans, current) : {};
   const read = e => alias[e.lift] || e.lift;
   const same = (a, b) => a.lift === b.lift && a.kg === b.kg && a.w === b.w && a.r === b.r && a.rpe === b.rpe && (a.u || '') === (b.u || '');
-  let changed = false;
+  let changed = dropped;
 
-  lifts.forEach(lift => {
-    // One entry speaks for each day: the newest write, as in ceilingLifts().
+  lifts.forEach(lift => Object.keys(found[lift]).forEach(m => {
+    // One entry speaks for each day of a lift IN THIS MEASURE: the newest write, as in ceilingSeries(). The bar to beat is the best of
+    // this measure only: 225 lb does not beat 100 kg, and the first record in a measure beats nothing.
+    const F = found[lift][m];
     const top = {};
     all.forEach(e => {
-      if (read(e) !== lift) return;
+      if (read(e) !== lift || uKey(e.u) !== m) return;
       if (!top[e.d] || (e.t || 0) > (top[e.d].t || 0)) top[e.d] = e;
     });
-    const days = Object.keys(Object.assign({}, top, found[lift])).sort();
+    const days = Object.keys(Object.assign({}, top, F)).sort();
     let bar = -Infinity;
     days.forEach(d => {
-      const eff = top[d], h = found[lift][d];
+      const eff = top[d], h = F[d];
       let next = null;                                // the automatic entry this day should hold
       if (eff && eff.del) {
         // Deleted: no record, no bar.
@@ -15179,18 +15287,18 @@ function fillRecords(sessions, celebrate) {
           // Not a new best: no automatic entry here.
         } else {
           bar = v;
-          next = h ? Object.assign({ lift: lift, kg: h.est, w: h.kg, r: h.reps, rpe: h.rpe, d: d, t: 0, auto: true }, h.u ? { u: h.u } : {}) : eff;
+          next = h ? Object.assign({ lift: lift, kg: h.est, w: h.w, r: h.reps, rpe: h.rpe, d: d, t: 0, auto: true }, h.u ? { u: h.u } : {}) : eff;
         }
       }
-      const autos = all.filter(e => e.auto && !e.del && e.d === d && read(e) === lift);
+      const autos = all.filter(e => e.auto && !e.del && e.d === d && read(e) === lift && uKey(e.u) === m);
       if (next && autos.length === 1 && (autos[0] === next || same(autos[0], next))) return;
       if (!next && !autos.length) return;
-      if (celebrate && next && next !== eff && !(autos.length && autos[0].kg >= next.kg)) noteNewBest(lift, next.kg, d);
+      if (celebrate && next && next !== eff && !(autos.length && autos[0].kg >= next.kg)) noteNewBest(lift, next.kg, d, next.u);
       all = all.filter(e => autos.indexOf(e) < 0);
       if (next) all.push(next);
       changed = true;
     });
-  });
+  }));
   if (!changed) return;
   writeCeiling(all);
   // The Records row (Progress) is drawn at boot and on every visit to Progress; history arrives after
@@ -15282,24 +15390,36 @@ function currentCycleNames() {
   return out;
 }
 
-// Group into one row per lift, newest first, with the change since that lift's
-// first recorded estimate and how long ago it was last put on the record.
-function ceilingLifts() {
+// Every record series: one per lift AND measure (kg, lb or plates), oldest first. Records of different measures are never one line:
+// 225 lb is not a record "above" 100 kg. { lift, u, entries, latest, delta, age }, `u` '' | 'lb' | 'plates'.
+function ceilingSeries() {
   const alias = ceilAliasMap();
   const by = {};
   loadCeiling().forEach(e => {
-    const lift = alias[e.lift] || e.lift;
-    const day = (by[lift] = by[lift] || {});
+    const lift = alias[e.lift] || e.lift, m = uKey(e.u);
+    const day = ((by[lift] = by[lift] || {})[m] = by[lift][m] || {});
     // Two stored names now reading as one lift can each hold that day. Same
     // rule as everywhere else on this key: the newer write is the true one.
     if (!day[e.d] || (e.t || 0) > (day[e.d].t || 0)) day[e.d] = e;
   });
-  return Object.keys(by).map(lift => {
-    const es = Object.keys(by[lift]).sort().map(d => by[lift][d]);
+  const out = [];
+  Object.keys(by).forEach(lift => Object.keys(by[lift]).forEach(m => {
+    const es = Object.keys(by[lift][m]).sort().map(d => by[lift][m][d]);
     const latest = es[es.length - 1];
-    return { lift: lift, entries: es, latest: latest, delta: latest.kg - es[0].kg,
-             age: daysSince(latest.d) };
-  }).sort((a, b) => (a.latest.d < b.latest.d ? 1 : -1));
+    out.push({ lift: lift, u: uStore(m), entries: es, latest: latest, delta: latest.kg - es[0].kg, age: daysSince(latest.d) });
+  }));
+  return out;
+}
+// Group into one row per lift, newest first, with the change since that lift's
+// first recorded estimate and how long ago it was last put on the record. A lift lifted in two measures shows the one it was
+// last lifted in; the other stays on the record, untouched, and is its own series for every comparison (ceilingSeries()).
+function ceilingLifts() {
+  const best = {};
+  ceilingSeries().forEach(sr => {
+    const cur = best[sr.lift];
+    if (!cur || sr.latest.d > cur.latest.d || (sr.latest.d === cur.latest.d && (sr.latest.t || 0) > (cur.latest.t || 0))) best[sr.lift] = sr;
+  });
+  return Object.keys(best).map(k => best[k]).sort((a, b) => (a.latest.d < b.latest.d ? 1 : -1));
 }
 // Whole days between a stored date and today, on the local clock. Dates are
 // compared at midnight so a reading logged last night is "1 day ago" this
@@ -15721,19 +15841,24 @@ function attachCircuitLog(card) {
   const logWeight = card.dataset.logWeight === '1';
   const logRPE    = card.dataset.logRpe !== '0';
 
-  // Inline per-exercise weights — populate from storage + save on input.
+  // Inline per-exercise weights — populate from storage + save on input. The unit (kg, lb or plates) is written in each weight, as on a
+  // set (2026-10-18): the boxes hold the number, the pill over them is the circuit's unit (circuitUnit(), setCircuitUnit()).
   if (logWeight) {
     const inputs = card.querySelectorAll('.round-wt');
     const stored = loadCircuitWeights(name, inputs.length);
     inputs.forEach((inp, i) => {
-      inp.value = stored[i] || '';
+      inp.value = splitW(stored[i] || '').num;
       inp.addEventListener('click', e => e.stopPropagation());
       inp.addEventListener('input', () => {
         const g = loadCircuitWeights(name, inputs.length);
-        g[i] = inp.value;
+        g[i] = composeW(normDigits(inp.value), circuitUnit(card));
         saveCircuitWeights(name, g);
       });
     });
+    const ub = card.querySelector('.circ-unit');
+    if (ub) ub.addEventListener('click', ev => { ev.stopPropagation(); cycleCircuitUnit(card); });
+    card._paintCircuit = () => paintCircuitUnit(card);
+    paintCircuitUnit(card);
   }
 
   // One RPE per round — the whole superset/circuit gets a single rating per round.
@@ -15753,6 +15878,48 @@ function attachCircuitLog(card) {
       slot.appendChild(div);
     }
   }
+}
+
+// Which unit a circuit's weight boxes are in: the pick made this visit, else the unit already in its stored weights, else the unit it was
+// last logged in (its history), else kg. Like a set's (cardUnit()), it is never stored on its own.
+function circuitUnit(card) {
+  if (card._unit) return card._unit;
+  const name = card.querySelector('.item-name').textContent.trim();
+  const g = loadCircuitWeights(name, card.querySelectorAll('.round-wt').length);
+  const mine = g.find(x => weightOf(x).n != null);
+  if (mine) return weightOf(mine).unit;
+  if (HIST) {
+    for (const h of historyFor(name)) {
+      const it = ((h.entry && h.entry.items) || []).find(x => x && weightOf(x.w).n != null);
+      if (it) return weightOf(it.w).unit;
+    }
+  }
+  return 'kg';
+}
+function paintCircuitUnit(card) {
+  const u = circuitUnit(card);
+  const ub = card.querySelector('.circ-unit');
+  if (ub) { ub.textContent = u; ub.setAttribute('aria-label', `Weight in ${u}. Tap to change it`); }
+  card.querySelectorAll('.round-wt').forEach(inp => { if (inp.placeholder !== unitWord(u)) inp.placeholder = unitWord(u); });
+}
+function setCircuitUnit(card, unit) {
+  card._unit = unit;
+  const name = card.querySelector('.item-name').textContent.trim();
+  const inputs = card.querySelectorAll('.round-wt');
+  const g = loadCircuitWeights(name, inputs.length);
+  let changed = false;
+  g.forEach((w, i) => {
+    if (!w || weightOf(w).n == null) return;
+    const w2 = composeW(splitW(w).num, unit);
+    if (w2 !== w) { g[i] = w2; changed = true; }
+  });
+  if (changed) saveCircuitWeights(name, g);
+  paintCircuitUnit(card);
+}
+function cycleCircuitUnit(card) {
+  const order = ['kg', 'lb', 'plates'];
+  setCircuitUnit(card, order[(order.indexOf(circuitUnit(card)) + 1) % order.length]);
+  if (navigator.vibrate) navigator.vibrate(8);
 }
 
 // Circuit per-exercise weight store: a flat array [item] of weight strings, one
@@ -17035,15 +17202,28 @@ function histSetsText(sets, planned) {
 // was done for (its own `n`, else the plan's). { est, kg, reps, rpe } or null. ONE copy
 // of the maths, read by the History sheet's trend and by the records that fill
 // themselves (fillRecordsFrom), so the two can never show different numbers.
+// The measure an exercise's sets were lifted in: the unit of the first set that holds a weight, else kg. A session's exercise is in one
+// measure (the unit button relabels the whole card); a set typed in another is left out of every best, so two measures never meet.
+function setsMeasure(sets) {
+  for (const s of (sets || [])) {
+    if (!histSetLogged(s)) continue;
+    const w = weightOf(s.w);
+    if (w.n != null) return w.unit;
+  }
+  return 'kg';
+}
+// { est, w, reps, rpe, u }: `est` and `w` are in the measure (kg, lb or plates), `u` is '' for kg. Plates estimate like the rest: a
+// stack's setting is a number that goes up, and is compared only with that lift's earlier settings (a record per measure).
 function histBestSet(e) {
   if (!e || e.circuit) return null;
+  const m = setsMeasure(e.sets);
   let best = null;
   (e.sets || []).filter(histSetLogged).forEach(s => {
-    const kg = parseLoggedKg(s.w);
+    const wt = weightOf(s.w);
+    if (wt.n == null || wt.unit !== m) return;
     const n = (s.n != null && s.n !== '') ? Number(s.n) : (e.reps || null);
-    const est = (kg && n) ? estimateOneRM(kg, n, s.r) : null;
-    // `u`: a set lifted in pounds says so, so Records can show it in pounds and a share card is not drawn from converted kilograms.
-    if (est != null && (!best || est > best.est)) best = { est: est, kg: kg, reps: n, rpe: Number(s.r), u: weightOf(s.w).unit === 'lb' ? 'lb' : '' };
+    const est = (wt.n && n) ? estimateOneRM(wt.n, n, s.r, m) : null;
+    if (est != null && (!best || est > best.est)) best = { est: est, w: wt.n, reps: n, rpe: Number(s.r), u: uStore(m) };
   });
   return best;
 }
@@ -17071,6 +17251,7 @@ function paintLastTime(card) {
   const name = card.querySelector('.item-name').textContent.trim();
   const isCircuit = card.classList.contains('round-group');
   const hist = historyFor(name);
+  if (card._paintCircuit) card._paintCircuit();     // a circuit's unit may have just become known: the one it was last logged in
   if (!detail) return;
   const slot = detail.querySelector('.lt-slot');
   const logLabel = [...detail.querySelectorAll('.ex-section-label')].find(l => /log/i.test(l.textContent));
@@ -17228,8 +17409,8 @@ function openHistorySheet(card) {
       const w = weightOf(s.w);
       if (w.n != null && w.unit === lu && (top == null || w.n > top)) top = w.n;
     });
-    const estOk = best && ((best.u === 'lb') === (lu === 'lb'));
-    return { date: h.date, est: estOk ? (lu === 'lb' ? Math.round(best.est / 0.45359237) : best.est) : null, top };
+    const estOk = best && uKey(best.u) === lu;      // an estimate is in its measure's own number: drawn only beside the same measure
+    return { date: h.date, est: estOk ? best.est : null, top };
   }).filter(Boolean);
   const estPts = pts.filter(p => p.est != null);
   const series = estPts.length >= 2 ? { label: `Best set · estimated 1RM, ${lu}`, vals: estPts.map(p => p.est) }
@@ -18153,24 +18334,29 @@ function hlCycleOf(iso) {
   return c ? { n: i + 1, of: cs.length, name: c.name || '' } : null;
 }
 // A lift's records as Personal Records shows them (renames joined, one entry a day, oldest first).
-function hlLiftEntries(lift) { const l = ceilingLifts().find(x => x.lift === lift); return l ? l.entries : []; }
+// A lift's records in ONE measure (`u`; default: the measure it was last lifted in). A card compares a set only with the same measure.
+function hlLiftEntries(lift, u) {
+  if (u === undefined) { const l = ceilingLifts().find(x => x.lift === lift); return l ? l.entries : []; }
+  const sr = ceilingSeries().find(x => x.lift === lift && uKey(x.u) === uKey(u));
+  return sr ? sr.entries : [];
+}
 // A New best card for the record set on `day`: the set as lifted, and the best before it (the bar it beat) as lifted. A first record
 // beats nothing, so it has no card (the same rule as noteNewBest()).
-function hlBestSpec(lift, day) {
-  const es = hlLiftEntries(lift), e = es.find(x => x.d === day);
+// `u`: the record's measure (kg, lb or plates), the card says it. The bar it beat is the best before it IN THAT MEASURE.
+function hlBestSpec(lift, day, u) {
+  const es = hlLiftEntries(lift, u), e = es.find(x => x.d === day);
   if (!e || !(Number(e.w) > 0) || !(Number(e.r) > 0)) return null;
-  if (e.u === 'lb') return null;                      // lifted in pounds: a card says kilograms, so no card is drawn from converted ones
   const before = es.filter(x => x.d < day);
   if (!before.length) return null;
   const top = before.reduce((a, b) => (b.kg > a.kg ? b : a));
-  if (!(e.kg > top.kg) || top.u === 'lb') return null;
+  if (!(e.kg > top.kg)) return null;
   const prev = Number(top.w) > 0 && Number(top.r) > 0 ? { w: Number(top.w), r: Number(top.r), date: top.d } : null;
-  return { kind: 'best', first: hlFirst(), lift, w: Number(e.w), r: Number(e.r), date: day, prev, cycle: hlCycleOf(day) };
+  return { kind: 'best', first: hlFirst(), lift, u: uKey(e.u), w: Number(e.w), r: Number(e.r), date: day, prev, cycle: hlCycleOf(day) };
 }
 // A retest beaten (the comparison the design page added): `set` = { w, r, d } lifted on a test-flagged lift.
 function hlRetestSpec(lift, set, label) {
   if (!set || !(Number(set.w) > 0) || !(Number(set.r) > 0)) return null;
-  const es = hlLiftEntries(lift).filter(x => x.d < set.d);
+  const es = hlLiftEntries(lift, uStore(set.u)).filter(x => x.d < set.d);   // the retest is judged against this measure's records only
   let before = es.filter(x => x.test).pop() || null;   // the last test of this lift
   const wasTest = !!before;
   if (!before) {                                       // else the best before this cycle
@@ -18179,11 +18365,10 @@ function hlRetestSpec(lift, set, label) {
     if (pre.length) before = pre.reduce((a, b) => (b.kg > a.kg ? b : a));
   }
   if (!before || !(Number(before.w) > 0) || !(Number(before.r) > 0)) return null;
-  if (before.u === 'lb' || set.u === 'lb') return null;   // pounds: no card (see hlBestSpec())
   const a = { w: Number(before.w), r: Number(before.r) }, b = { w: Number(set.w), r: Number(set.r) };
   if (!((b.w > a.w && b.r >= a.r) || (b.w >= a.w && b.r > a.r))) return null;
   const ia = hlCycleIdxOf(before.d), ib = hlCycleIdxOf(set.d);
-  return { kind: 'retest', first: hlFirst(), lift, spec: label || '', now: { w: b.w, r: b.r, date: set.d },
+  return { kind: 'retest', first: hlFirst(), lift, u: uKey(set.u), spec: label || '', now: { w: b.w, r: b.r, date: set.d },
     before: { w: a.w, r: a.r, date: before.d, test: wasTest }, oneCycle: ia >= 0 && ib >= 0 && ib - ia <= 1, cycle: hlCycleOf(set.d) };
 }
 // The cycle week a day falls in (1 = the cycle's first), for the Same effort card's "Week 1 · Week 5".
@@ -18194,13 +18379,13 @@ function hlWeekOf(cur, iso) {
 function hlEffortSpec(w) {
   const cur = currentCycle();
   const set = x => ({ w: x.w, n: x.n, r: x.r, date: x.date, wk: hlWeekOf(cur, x.date) });
-  return { kind: 'effort', first: hlFirst(), lift: w.name, shape: w.shape, same: !!w.same, pct: w.pct, a: set(w.a), b: set(w.b),
+  return { kind: 'effort', first: hlFirst(), lift: w.name, u: uKey(w.b.u), shape: w.shape, same: !!w.same, pct: w.pct, a: set(w.a), b: set(w.b),
     cycle: hlCycleOf(), date: w.b.date };
 }
 // New bests set between two days (each beat every earlier record of its lift; a lift's first record beats nothing).
 function hlBestsIn(from, to) {
   let n = 0;
-  ceilingLifts().forEach(l => {
+  ceilingSeries().forEach(l => {   // every lift in every measure: a best is a best in its own measure
     let bar = null;
     l.entries.forEach(e => {
       if (bar != null && e.kg > bar && e.d >= from && e.d <= to) n++;
@@ -18216,7 +18401,7 @@ function hlCycleSpec() {
   const c = p.cur, from = String(c.startDate).slice(0, 10), to = String(c.endDate).slice(0, 10);
   return { kind: 'cycle', first: hlFirst(), cycle: { n: p.cIdx + 1, of: p.count, name: c.name || ('Cycle ' + (p.cIdx + 1)), art: cycleArtUrl(c) },
     done: p.done, planned: p.planned, bests: hlBestsIn(from, to), weeks: p.wk.total, end: to,
-    wins: p.wins.filter(w => w.share).map(w => ({ lift: w.name, shape: w.shape, same: !!w.same, pct: w.pct, a: w.a, b: w.b })) };
+    wins: p.wins.filter(w => w.share).map(w => ({ lift: w.name, u: uKey(w.b.u), shape: w.shape, same: !!w.same, pct: w.pct, a: w.a, b: w.b })) };
 }
 // The distance: every cycle by name, the weeks when every cycle is dated, the sessions from the session history (left out when the
 // history the phone holds starts after the roadmap did: it keeps the last 120).
@@ -18273,14 +18458,14 @@ function collectWins(day, bests) {
         const D = buildSessionData(day);
         ((D && D.log) || []).forEach(e => {
           const f = flagged[histNorm(HIST_ALIAS[e.ex] || e.ex)], s = f && histBestSet(e);
-          const spec = s && hlRetestSpec(f.name, { w: s.kg, r: s.reps, d: on, u: s.u }, f.label);
+          const spec = s && hlRetestSpec(f.name, { w: s.w, r: s.reps, d: on, u: s.u }, f.label);
           if (spec && !seen[f.name]) { out.push(spec); seen[f.name] = 1; }
         });
       }
     }
     (bests || []).forEach(b => {
       if (seen[b.lift]) return;
-      const spec = hlBestSpec(b.lift, b.d);
+      const spec = hlBestSpec(b.lift, b.d, b.u);
       if (spec) { out.push(spec); seen[b.lift] = 1; }
     });
     const sess = localStorage.getItem(ATHLETE_ID + '_completed_d' + day) || '';
@@ -18294,8 +18479,9 @@ function collectWins(day, bests) {
 // "100 kg × 5", or a retest's "90 → 100 kg": in the app the weights always show (they are the athlete's own screen).
 function hlSetText(s) {
   const kg = v => String(Math.round(Number(v) * 2) / 2).replace(/\.0$/, '');
-  if (s.kind === 'retest') return s.now.r === s.before.r ? `${kg(s.before.w)} → ${kg(s.now.w)} kg` : `${kg(s.now.w)} kg × ${s.now.r}`;
-  return `${kg(s.w)} kg × ${s.r}`;
+  const u = s.u || 'kg', w = v => uWord(u, Number(v));
+  if (s.kind === 'retest') return s.now.r === s.before.r ? `${kg(s.before.w)} → ${kg(s.now.w)} ${w(s.now.w)}` : `${kg(s.now.w)} ${w(s.now.w)} × ${s.now.r}`;
+  return `${kg(s.w)} ${w(s.w)} × ${s.r}`;
 }
 // What the share sheet can offer for the day: the New best and Retest specs, then the rewards the server has confirmed (a "Counting" band has no
 // card yet). A band's `si` is its place in this list.
@@ -18355,11 +18541,11 @@ window.openShareCycle = openShareCycle;
 function openShareBest() {
   let best = null;
   try { best = JSON.parse(localStorage.getItem(ATHLETE_ID + '_ceil_best') || 'null'); } catch (e) {}
-  const s = best && _ceilLift ? hlBestSpec(_ceilLift, best.d) : null;
+  const s = best && _ceilLift ? hlBestSpec(_ceilLift, best.d, best.u) : null;
   if (s) openShareSheet([s], 0);
 }
 window.openShareBest = openShareBest;
-function openShareRecord(i) { const e = _ceilRows[i], s = e && _ceilLift ? hlBestSpec(_ceilLift, e.d) : null; if (s) openShareSheet([s], 0); }
+function openShareRecord(i) { const e = _ceilRows[i], s = e && _ceilLift ? hlBestSpec(_ceilLift, e.d, e.u) : null; if (s) openShareSheet([s], 0); }
 window.openShareRecord = openShareRecord;
 // The lift page's latest entry when it is a test logged in the last 7 days that beat the one before (+ Log a max, as a test).
 function hlLiftRetest(lift) {

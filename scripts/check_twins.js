@@ -49,6 +49,10 @@
                                  Career Mode phase 3 (the catalogue switch), section 10: held to scripts/career/reward_cases.json (the server's answers,
                                  scripts/career/rehearse_catalogue.mjs) AND, for what those cases never cross, to a measure grown by hand, one a day, for every
                                  entry the phone decides and every tier. In index mode the toml, its seed script and the snapshot come from the index too.
+     weightOf, setsMeasure, histBestSet, cycleBestSet, winText, cycleWins, estimateOneRM
+                                 / career_w(), career_entry_sets(), career_win_gain(), career_derive() in SQL (supabase/stage72_weight_measures.sql)
+                                 Career Mode's lift maths in a lift's OWN measure (kg, lb or plates, never compared), section 11: held to the cases written in this
+                                 file (MEASURE_CASES), which scripts/career/rehearse_measures.mjs reads and holds the database to as well, on PGlite.
 
    Already guarded elsewhere (not repeated): rxOf/repCount/tempoDisplay (check_rx.js), the set-log grammar
    (check_setlog.js), the shared word lists (check_parity.py), the XP rules (check_xp_rules.py).
@@ -940,6 +944,129 @@ run('Career Mode phase 3: the five events\' goals (habits.html EVENTS / career/a
     if (!row) return;
     expect('EVENTS goals vs achievements.toml: ' + ev.id, ev.id, ev.goals.map(g => ({ kind: g.kind, need: g.need })), row.body.goals.map(g => ({ kind: g.kind, need: g.need })));
   });
+});
+
+/* ── 11. Career Mode: a lift's numbers in its own measure (program.html / supabase/stage72_weight_measures.sql) ─────── */
+// A logged weight is in one of three measures, written in its text: a bare number or "60kg" is kilograms, "45 lb" is pounds, "6 plates" is the count on a machine's stack
+// (Amir, 2026-10-18: "personal records can be in all measures, and it's only an achievement if you go higher than your previous record in the same measure"). A lift's
+// record, win and best are each kept IN ITS OWN MEASURE and never compared with another; nothing is converted. Career Mode's server half copies the maths in SQL
+// (career_w(), career_entry_sets(), career_win_gain(), career_derive()), so the cases are held to BOTH:
+//   · here, program.html's weightOf(), setsMeasure(), histBestSet(), cycleBestSet() and cycleWins() are run on them and must give the answers below;
+//   · scripts/career/rehearse_measures.mjs reads this same table (between the two MEASURE_CASES markers, as JSON) and holds the database to it on PGlite, and also
+//     runs thousands of generated logs through both, number by number.
+// `entries`: one logged exercise and its row (the measure, the best set's weight w, reps n, RPE r, effort index idx, and the best estimate est; null when no set is logged
+// or it is a circuit). `wins`: sessions in date order and what cycleWins() makes of them: `shown` is everything the This cycle card says (key = the lift's key, name|lb
+// and name|plates for the other measures, with the sentence), `pays` the subset the server pays (GAME-5: the weight or the reps went up, a hold never), with its gain.
+// `weights`: weightOf() on a value ({ n, unit }). After a deliberate change of the app's maths, change the answers here and in the stage72 functions together.
+// MEASURE_CASES:begin
+const MEASURE_CASES = {
+  "weights": [
+    {"w":"45","n":45,"u":"kg"},
+    {"w":"60kg","n":60,"u":"kg"},
+    {"w":"62,5","n":62.5,"u":"kg"},
+    {"w":"۲۵","n":25,"u":"kg"},
+    {"w":"BW+10","n":10,"u":"kg"},
+    {"w":"BW","n":null,"u":"kg"},
+    {"w":"","n":null,"u":"kg"},
+    {"w":"red band","n":null,"u":"kg"},
+    {"w":"0","n":null,"u":"kg"},
+    {"w":"2×20","n":20,"u":"kg"},
+    {"w":"2x22.5 kg","n":22.5,"u":"kg"},
+    {"w":"20x2","n":20,"u":"kg"},
+    {"w":"45 lb","n":45,"u":"lb"},
+    {"w":"45lb","n":45,"u":"lb"},
+    {"w":"135 lbs","n":135,"u":"lb"},
+    {"w":"۴۵ lb","n":45,"u":"lb"},
+    {"w":"17.5 LB","n":17.5,"u":"lb"},
+    {"w":"45 pounds","n":45,"u":"lb"},
+    {"w":"1 pound","n":1,"u":"lb"},
+    {"w":"2×20 lb","n":20,"u":"lb"},
+    {"w":"0 lb","n":null,"u":"kg"},
+    {"w":"lb 45","n":45,"u":"kg"},
+    {"w":"45 lbx","n":45,"u":"kg"},
+    {"w":"6 plates","n":6,"u":"plates"},
+    {"w":"1 plate","n":1,"u":"plates"},
+    {"w":"6plates","n":6,"u":"plates"},
+    {"w":"5 Plates","n":5,"u":"plates"},
+    {"w":"10 plateau","n":10,"u":"kg"},
+    {"w":"8 plate1","n":8,"u":"plates"},
+    {"w":"12,5 lb","n":12.5,"u":"lb"},
+    {"w":62.5,"n":62.5,"u":"kg"},
+    {"w":0,"n":null,"u":"kg"},
+    {"w":null,"n":null,"u":"kg"}
+  ],
+  "entries": [
+    {"name":"kg: 100 x 5 @8","entry":{"ex":"Back Squat","reps":"5","sets":[{"w":"100","n":5,"r":8,"d":true}]},"want":{"u":"kg","w":100,"n":5,"r":8,"idx":123.33333333333334,"est":122.5}},
+    {"name":"kg: a bare number and \"60kg\" are kilograms","entry":{"ex":"Bench Press","reps":"5","sets":[{"w":"60kg","n":5,"r":8,"d":true},{"w":"62.5","n":5,"r":8,"d":true}]},"want":{"u":"kg","w":62.5,"n":5,"r":8,"idx":77.08333333333334,"est":77.5}},
+    {"name":"lb: 135 lb x 5 @8","entry":{"ex":"Back Squat","reps":"5","sets":[{"w":"135 lb","n":5,"r":8,"d":true}]},"want":{"u":"lb","w":135,"n":5,"r":8,"idx":166.5,"est":165}},
+    {"name":"lb: Persian digits and \"lbs\"","entry":{"ex":"Back Squat","reps":"5","sets":[{"w":"۱۳۵ lbs","n":5,"r":8,"d":true}]},"want":{"u":"lb","w":135,"n":5,"r":8,"idx":166.5,"est":165}},
+    {"name":"plates: 6 plates x 10 @8 (12 effective reps: no estimate)","entry":{"ex":"Leg Press Machine","reps":"10","sets":[{"w":"6 plates","n":10,"r":8,"d":true}]},"want":{"u":"plates","w":6,"n":10,"r":8,"idx":8.399999999999999,"est":null}},
+    {"name":"plates: 9 plates x 5 @9 (an estimate, to half a plate)","entry":{"ex":"Leg Press Machine","reps":"5","sets":[{"w":"9 plates","n":5,"r":9,"d":true}]},"want":{"u":"plates","w":9,"n":5,"r":9,"idx":10.799999999999999,"est":11}},
+    {"name":"plates: one plate is \"plate\"","entry":{"ex":"Leg Press Machine","reps":"8","sets":[{"w":"1 plate","n":8,"r":8,"d":true}]},"want":{"u":"plates","w":1,"n":8,"r":8,"idx":1.3333333333333333,"est":1.5}},
+    {"name":"mixed, kg first: the pound set is left out","entry":{"ex":"Row","reps":"8","sets":[{"w":"60","n":8,"r":8,"d":true},{"w":"300 lb","n":8,"r":9,"d":true}]},"want":{"u":"kg","w":60,"n":8,"r":8,"idx":80,"est":80}},
+    {"name":"mixed, lb first: the kilogram set is left out","entry":{"ex":"Row","reps":"8","sets":[{"w":"135 lb","n":8,"r":8,"d":true},{"w":"200","n":8,"r":9,"d":true}]},"want":{"u":"lb","w":135,"n":8,"r":8,"idx":180,"est":180}},
+    {"name":"mixed, plates first: the pound set is left out","entry":{"ex":"Row","reps":"8","sets":[{"w":"7 plates","n":8,"r":8,"d":true},{"w":"300 lb","n":8,"r":9,"d":true}]},"want":{"u":"plates","w":7,"n":8,"r":8,"idx":9.333333333333332,"est":9.5}},
+    {"name":"the first logged set has no weight: the measure is the first weight","entry":{"ex":"Row","reps":"8","sets":[{"w":"","n":8,"r":7,"d":true},{"w":"45 lb","n":8,"r":8,"d":true}]},"want":{"u":"lb","w":45,"n":8,"r":8,"idx":60,"est":60}},
+    {"name":"a tick alone is a logged set; a \"0 lb\" weight is no weight","entry":{"ex":"Row","reps":"8","sets":[{"w":"0 lb","n":8,"r":"","d":true},{"w":"80","n":8,"r":8,"d":true}]},"want":{"u":"kg","w":80,"n":8,"r":8,"idx":106.66666666666666,"est":107.5}},
+    {"name":"bodyweight: no weight, kilograms by default","entry":{"ex":"Push-Up","reps":"10","sets":[{"w":"","n":10,"r":7,"d":true}]},"want":{"u":"kg","w":null,"n":10,"r":7,"idx":13,"est":null}},
+    {"name":"\"BW+10\" is 10 kg; a pair \"2×20 lb\" is one 20 lb dumbbell","entry":{"ex":"Chin-Up","reps":"6","sets":[{"w":"BW+10","n":6,"r":8,"d":true}]},"want":{"u":"kg","w":10,"n":6,"r":8,"idx":12.666666666666666,"est":12.5}},
+    {"name":"a pair in pounds","entry":{"ex":"DB Press","reps":"8","sets":[{"w":"2×20 lb","n":8,"r":8,"d":true}]},"want":{"u":"lb","w":20,"n":8,"r":8,"idx":26.666666666666664,"est":25}},
+    {"name":"a hold: no reps, only the RPE","entry":{"ex":"Plank","sets":[{"w":"","n":null,"r":6,"d":true}]},"want":{"u":"kg","w":null,"n":null,"r":6,"idx":null,"est":null}},
+    {"name":"no logged set: no row","entry":{"ex":"Row","reps":"8","sets":[{"w":"","n":8,"r":"","d":false}]},"want":null},
+    {"name":"a circuit is not read","entry":{"ex":"Circuit A","circuit":true,"reps":"8","sets":[{"w":"20","n":8,"r":8,"d":true}]},"want":null},
+    {"name":"the best set wins by the index: 3 heavy reps over 8 light ones, in pounds","entry":{"ex":"Deadlift","reps":"5","sets":[{"w":"225 lb","n":8,"r":8,"d":true},{"w":"315 lb","n":3,"r":9,"d":true}]},"want":{"u":"lb","w":315,"n":3,"r":9,"idx":357,"est":355}},
+    {"name":"an estimate rounds to 5 lb: 95 lb x 5 @8","entry":{"ex":"Press","reps":"5","sets":[{"w":"95 lb","n":5,"r":8,"d":true}]},"want":{"u":"lb","w":95,"n":5,"r":8,"idx":117.16666666666667,"est":115}}
+  ],
+  "wins": [
+    {"name":"lb: 135 to 145 lb at the same reps and RPE is a win in pounds","sessions":[{"date":"2026-09-01","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"135 lb","n":5,"r":8,"d":true},{"w":"135 lb","n":5,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"145 lb","n":5,"r":8,"d":true},{"w":"145 lb","n":5,"r":8,"d":true}]}]}],"shown":[{"key":"bench press|lb","txt":"+10 lb, same reps, same RPE"}],"pays":[{"key":"bench press|lb","name":"Bench Press","gain":0.0741}]},
+    {"name":"plates: 6 to 7 plates is a win in plates","sessions":[{"date":"2026-09-01","entries":[{"ex":"Leg Press Machine","reps":"10","sets":[{"w":"6 plates","n":10,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Leg Press Machine","reps":"10","sets":[{"w":"7 plates","n":10,"r":8,"d":true}]}]}],"shown":[{"key":"leg press machine|plates","txt":"+1 plate, same reps, same RPE"}],"pays":[{"key":"leg press machine|plates","name":"Leg Press Machine","gain":0.1667}]},
+    {"name":"kg history then pounds: only the pound series wins","sessions":[{"date":"2026-09-01","entries":[{"ex":"Back Squat","reps":"5","sets":[{"w":"100","n":5,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Back Squat","reps":"5","sets":[{"w":"100","n":5,"r":8,"d":true}]}]},{"date":"2026-09-15","entries":[{"ex":"Back Squat","reps":"5","sets":[{"w":"135 lb","n":5,"r":8,"d":true}]}]},{"date":"2026-09-22","entries":[{"ex":"Back Squat","reps":"5","sets":[{"w":"145 lb","n":5,"r":8,"d":true}]}]}],"shown":[{"key":"back squat|lb","txt":"+10 lb, same reps, same RPE"}],"pays":[{"key":"back squat|lb","name":"Back Squat","gain":0.0741}]},
+    {"name":"switching from 60 kg to 135 lb is no win (they are never compared)","sessions":[{"date":"2026-09-01","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"60","n":5,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"135 lb","n":5,"r":8,"d":true}]}]}],"shown":[],"pays":[]},
+    {"name":"switching from 135 lb back to 62 kg is no win either","sessions":[{"date":"2026-09-01","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"135 lb","n":5,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"62","n":5,"r":8,"d":true}]}]}],"shown":[],"pays":[]},
+    {"name":"a pound set inside a kilogram exercise is left out of the win","sessions":[{"date":"2026-09-01","entries":[{"ex":"Row","reps":"8","sets":[{"w":"50","n":8,"r":8,"d":true},{"w":"300 lb","n":8,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Row","reps":"8","sets":[{"w":"55","n":8,"r":8,"d":true},{"w":"300 lb","n":8,"r":8,"d":true}]}]}],"shown":[{"key":"row","txt":"+5 kg, same reps, same RPE"}],"pays":[{"key":"row","name":"Row","gain":0.1}]},
+    {"name":"more reps at the same weight, in pounds","sessions":[{"date":"2026-09-01","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"135 lb","n":5,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"135 lb","n":6,"r":8,"d":true}]}]}],"shown":[{"key":"bench press|lb","txt":"+1 rep at 135 lb, same RPE"}],"pays":[{"key":"bench press|lb","name":"Bench Press","gain":0.027}]},
+    {"name":"felt easier only (same weight, same reps, lower RPE): the app shows it, the server pays nothing","sessions":[{"date":"2026-09-01","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"135 lb","n":5,"r":9,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"135 lb","n":5,"r":7,"d":true}]}]}],"shown":[{"key":"bench press|lb","txt":"135 lb × 5 felt easier: RPE 9 → 7"}],"pays":[]},
+    {"name":"felt easier only, in plates","sessions":[{"date":"2026-09-01","entries":[{"ex":"Leg Press Machine","reps":"10","sets":[{"w":"7 plates","n":10,"r":9,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Leg Press Machine","reps":"10","sets":[{"w":"7 plates","n":10,"r":7,"d":true}]}]}],"shown":[{"key":"leg press machine|plates","txt":"7 plates × 10 felt easier: RPE 9 → 7"}],"pays":[]},
+    {"name":"bodyweight reps (no weight at all): a win in the plain key","sessions":[{"date":"2026-09-01","entries":[{"ex":"Push-Up","reps":"8","sets":[{"w":"","n":8,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Push-Up","reps":"8","sets":[{"w":"","n":10,"r":8,"d":true}]}]}],"shown":[{"key":"push-up","txt":"+2 reps, same RPE"}],"pays":[{"key":"push-up","name":"Push-Up","gain":0.2}]},
+    {"name":"unloaded first, loaded later: two series, no win","sessions":[{"date":"2026-09-01","entries":[{"ex":"Split Squat","reps":"8","sets":[{"w":"","n":8,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Split Squat","reps":"8","sets":[{"w":"45 lb","n":8,"r":8,"d":true}]}]}],"shown":[],"pays":[]},
+    {"name":"a hold: only its RPE moves, nothing to pay","sessions":[{"date":"2026-09-01","entries":[{"ex":"Plank","sets":[{"w":"","n":null,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Plank","sets":[{"w":"","n":null,"r":6,"d":true}]}]}],"shown":[{"key":"plank","txt":"felt easier: RPE 8 → 6"}],"pays":[]},
+    {"name":"a fifth of a pound is no gain in weight, but one more rep at it is a win (pounds)","sessions":[{"date":"2026-09-01","entries":[{"ex":"DB Curl","reps":"8","sets":[{"w":"20 lb","n":8,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"DB Curl","reps":"8","sets":[{"w":"20.2 lb","n":9,"r":8,"d":true}]}]}],"shown":[{"key":"db curl|lb","txt":"+1 rep at 20 lb, same RPE"}],"pays":[{"key":"db curl|lb","name":"DB Curl","gain":0.0353}]},
+    {"name":"best since the first, not the last: a back-off week does not take the win away (pounds)","sessions":[{"date":"2026-09-01","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"135 lb","n":5,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"150 lb","n":5,"r":8,"d":true}]}]},{"date":"2026-09-15","entries":[{"ex":"Bench Press","reps":"5","sets":[{"w":"120 lb","n":5,"r":8,"d":true}]}]}],"shown":[{"key":"bench press|lb","txt":"+15 lb, same reps, same RPE"}],"pays":[{"key":"bench press|lb","name":"Bench Press","gain":0.1111}]},
+    {"name":"three lifts, three measures, three wins","sessions":[{"date":"2026-09-01","entries":[{"ex":"Back Squat","reps":"5","sets":[{"w":"100","n":5,"r":8,"d":true}]},{"ex":"Bench Press","reps":"5","sets":[{"w":"135 lb","n":5,"r":8,"d":true}]},{"ex":"Leg Press Machine","reps":"10","sets":[{"w":"6 plates","n":10,"r":8,"d":true}]}]},{"date":"2026-09-08","entries":[{"ex":"Back Squat","reps":"5","sets":[{"w":"105","n":5,"r":8,"d":true}]},{"ex":"Bench Press","reps":"5","sets":[{"w":"145 lb","n":5,"r":8,"d":true}]},{"ex":"Leg Press Machine","reps":"10","sets":[{"w":"7 plates","n":10,"r":8,"d":true}]}]}],"shown":[{"key":"leg press machine|plates","txt":"+1 plate, same reps, same RPE"},{"key":"bench press|lb","txt":"+10 lb, same reps, same RPE"},{"key":"back squat","txt":"+5 kg, same reps, same RPE"}],"pays":[{"key":"leg press machine|plates","name":"Leg Press Machine","gain":0.1667},{"key":"bench press|lb","name":"Bench Press","gain":0.0741},{"key":"back squat","name":"Back Squat","gain":0.05}]}
+  ]
+};
+// MEASURE_CASES:end
+const A_MEAS = sandbox('var HIST_ALIAS = {};', [lineSrc(A_SRC, 'const ONE_RM_MAX_EFFECTIVE =', 'program.html'), lineSrc(A_SRC, 'const ONE_RM_ROUND_KG', 'program.html'), lineSrc(A_SRC, 'const ONE_RM_ROUND ', 'program.html')]
+  .concat(fromA('normDigits', 'weightOf', 'unitWord', 'uKey', 'uStore', 'uWord', 'histNorm', 'histSetLogged', 'setsMeasure', 'estimateOneRM', 'histBestSet', 'cycleSetOf', 'cycleBestSet', 'winText'))
+  // cycleWins() shows three wins; the cases ask for all of them, so its limit is lifted in this copy (and the copy must differ from the app's, or the limit has moved)
+  .concat([(() => { const s = fnSrc(A_SRC, 'cycleWins', 'program.html'); if (!s.includes('.slice(0, 3)')) bail('program.html: cycleWins() no longer ends in .slice(0, 3). Update scripts/check_twins.js (section 11).'); return s.replace('.slice(0, 3)', '.slice(0, 99)'); })()]),
+  ['weightOf', 'setsMeasure', 'histBestSet', 'cycleBestSet', 'winText', 'cycleWins', 'estimateOneRM', 'histNorm']);
+run('Career Mode: a lift in its own measure (program.html weightOf, setsMeasure, histBestSet, cycleBestSet, cycleWins / career_w, career_entry_sets, career_win_gain)', () => {
+  const near = (a, b) => (a == null || b == null) ? a === b : Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a));
+  MEASURE_CASES.weights.forEach(c => expect('weightOf: ' + J(c.w), c.w, A_MEAS.weightOf(c.w), { n: c.n, unit: c.u }));
+  MEASURE_CASES.entries.forEach(c => {
+    const e = c.entry, cb = (!e.circuit && e.ex) ? A_MEAS.cycleBestSet(e) : null, hb = cb ? A_MEAS.histBestSet(e) : null;
+    const got = cb ? { u: cb.u, w: cb.w, n: cb.n, r: cb.r, idx: cb.idx, est: hb ? hb.est : null } : null, w = c.want;
+    checks++;
+    if (!(got == null || w == null ? got === w : got.u === w.u && near(got.w, w.w) && near(got.n, w.n) && near(got.r, w.r) && near(got.idx, w.idx) && near(got.est, w.est)))
+      failures.push(`the measure of an exercise: ${c.name}\n    input    ${J(e)}\n    got      ${J(got)}\n    want     ${J(w)}`);
+    if (cb) {      // the measure is the same word everywhere: setsMeasure(), the best set's, the estimate's (uStore: kg is '')
+      expect('setsMeasure: ' + c.name, e.sets, [A_MEAS.setsMeasure(e.sets), hb ? (hb.u || 'kg') : cb.u], [cb.u, cb.u]);
+    }
+  });
+  const key = w => A_MEAS.histNorm(w.name) + (w.a.u === 'kg' ? '' : '|' + w.a.u);
+  // what the server pays of a win (GAME-5, 2026-10-17): both sets counted, and the weight (to the half unit, winText()'s round) or the reps went up
+  const pays = w => w.a.n != null && w.b.n != null && ((w.a.w != null && w.b.w != null && Math.round((w.b.w - w.a.w) * 2) / 2 > 0) || w.b.n > w.a.n);
+  MEASURE_CASES.wins.forEach(c => {
+    const all = A_MEAS.cycleWins(c.sessions);
+    expect('what the This cycle card shows: ' + c.name, c.sessions.map(s => s.date), all.map(w => ({ key: key(w), txt: w.txt })), c.shown);
+    expect('what the server pays: ' + c.name, c.sessions.map(s => s.date), all.filter(pays).map(w => ({ key: key(w), name: w.name, gain: Math.round(w.gain * 1e4) / 1e4 })), c.pays);
+  });
+  // Pinned by hand: the estimate rounds to the measure's own step (2.5 kg, 5 lb, half a plate), and two measures are never one win.
+  expect('estimateOneRM: 100 x 5 @8 in kg, lb and plates', null, [A_MEAS.estimateOneRM(100, 5, 8), A_MEAS.estimateOneRM(100, 5, 8, 'kg'), A_MEAS.estimateOneRM(100, 5, 8, 'lb'), A_MEAS.estimateOneRM(100, 5, 8, 'plates')], [122.5, 122.5, 125, 123.5]);
+  const a = { w: 100, n: 5, r: 8, idx: 123.3, u: 'kg' }, b = { w: 225, n: 5, r: 8, idx: 277.5, u: 'lb' };
+  expect('winText: a kilogram set and a pound set are never a win, whatever their numbers', null, [A_MEAS.winText(a, b), A_MEAS.winText(b, a)], [null, null]);
+  expect('winText: the same two pound sets are', null, A_MEAS.winText(Object.assign({}, b, { w: 205, idx: 252.8 }), b).txt, '+20 lb, same reps, same RPE');
 });
 
 /* ── report ───────────────────────────────────────────────────────────────── */

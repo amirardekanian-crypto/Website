@@ -16,6 +16,9 @@
    no person in a picture (the cycle covers are objects); no gold or yellow anywhere (the metals are Proof's: bronze, silver, emerald,
    amethyst, prismatic). Nothing leaves the phone until the athlete taps Share or Save: this file only draws.
    The decisions (which win, which numbers) are made by the caller; this file only words and draws them, in English and in Farsi.
+   A weight is written in the measure the athlete logged it in (2026-10-18): the spec's `u` is 'kg', 'lb' or 'plates' (the count on a
+   machine's stack); absent or anything else is 'kg'. The numbers are the ones typed, never converted, and the unit word after each
+   one follows `u` (best, retest and effort carry it on the spec, the cycle card on each win): kgs() / plusKg() / unitW() below.
    ⚠️ EVERY FARSI STRING IS IN ONE TABLE (FA, below) AND EVERY ONE IS A DRAFT FOR AMIR TO READ. Change the words there, never inline.
    Fonts: Barlow and Barlow Condensed from /assets/css/app-fonts.css (the app's own files), Vazirmatn from
    /assets/fonts/Vazirmatn-Variable.woff2, loaded only for a Farsi card. The arrows, ticks and stars are drawn as paths, because the
@@ -69,7 +72,7 @@
   // screen, Career Mode's catalogue), worded for someone who does not train with Amir: "effort", never "RPE", in a sentence.
   const EN = {
     coach: 'Amir Ardekani · Coach',
-    kg: 'kg', reps: n => n === 1 ? 'rep' : 'reps', sessions: 'sessions', weeks: 'weeks', cycles: 'cycles', newBests: 'new bests',
+    kg: 'kg', lb: 'lb', plate: 'plate', plates: 'plates', reps: n => n === 1 ? 'rep' : 'reps', sessions: 'sessions', weeks: 'weeks', cycles: 'cycles', newBests: 'new bests',
     personalRecords: 'Personal records',
     cycleEye: (n, name) => `Cycle ${n} · ${name}`,
     cycleOf: (n, of) => `Cycle ${n} of ${of}`,
@@ -160,7 +163,9 @@
   // level card (levelEye). The words below are still drafts waiting for his read.
   const FA = {
     coach: 'امیر اردکانی · مربی',
-    kg: 'کیلو', reps: () => 'تکرار', sessions: 'جلسه', weeks: 'هفته', cycles: 'دوره', newBests: 'رکورد جدید',
+    // The weight words (drafts for Amir to read, like every word here): پوند = lb and پلیت = a plate on a machine's stack (the number
+    // before it says how many, so Farsi has one form for "plate" and "plates"; EN has two, "1 plate" and "6 plates").
+    kg: 'کیلو', lb: 'پوند', plate: 'پلیت', plates: 'پلیت', reps: () => 'تکرار', sessions: 'جلسه', weeks: 'هفته', cycles: 'دوره', newBests: 'رکورد جدید',
     personalRecords: 'رکوردهای شخصی',
     cycleEye: (n, name) => `دورهٔ ${n} · ${name}`,
     cycleOf: (n, of) => `دورهٔ ${n} از ${of}`,
@@ -247,10 +252,19 @@
   }
   function L(lang) { return lang === 'fa' ? FA : EN; }
   function n(v, lang) { return lang === 'fa' ? faDigits(v) : String(v); }
-  // A weight as the app writes it: to the half kilo, no ".0".
+  // A weight as the app writes it: to the half unit (kilo, pound or plate), no ".0". It is the number the athlete typed, not a conversion.
   function kgNum(v) { return String(Math.round(Number(v) * 2) / 2).replace(/\.0$/, ''); }
-  function kgs(v, lang) { return n(kgNum(v), lang) + ' ' + L(lang).kg; }                       // "92.5 kg" · "۹۲٫۵ کیلو"
-  function plusKg(v, lang) { return lang === 'fa' ? n(kgNum(v), lang) + ' ' + FA.kg : '+' + kgNum(v) + ' kg'; }
+  // The measure a weight was logged in (program.html's uKey()): 'kg', 'lb' or 'plates' (the count on a machine's weight stack).
+  // Absent or anything else is 'kg', so every spec made before the measures existed draws as it always did.
+  function uOf(u) { return u === 'lb' || u === 'plates' ? u : 'kg'; }
+  // The word after a weight in that measure: kg · lb · "plate" for exactly 1, else "plates"; Farsi کیلو · پوند · پلیت.
+  function unitW(u, v, lang) {
+    const k = uOf(u), t = L(lang);
+    return k === 'plates' ? (Number(kgNum(v)) === 1 ? t.plate : t.plates) : t[k];
+  }
+  // The names say "kg" for history's sake: with the optional unit `u` (default kg) they write any of the three measures.
+  function kgs(v, lang, u) { return n(kgNum(v), lang) + ' ' + unitW(u, v, lang); }              // "92.5 kg" · "6 plates" · "۹۲٫۵ کیلو"
+  function plusKg(v, lang, u) { return lang === 'fa' ? kgs(v, lang, u) : '+' + kgNum(v) + ' ' + unitW(u, v, lang); }   // "+7.5 kg" · "+1 plate"
   function plusReps(v, lang) { return lang === 'fa' ? n(v, lang) + ' ' + FA.reps(v) : '+' + v + ' ' + EN.reps(v); }
   function pctStr(p, lang) { return lang === 'fa' ? '٪' + n(p, lang) : p + '%'; }
   // Gregorian to Shamsi (the jalaali algorithm; checked day by day against Intl's Persian calendar, 2024 to 2029).
@@ -961,16 +975,17 @@
   // ── 9. The cards ──────────────────────────────────────────────────────────────────────────────────────────────────────
   // Each takes the painter (p) and the card's data (d). The data shapes are written above each one; program.html builds the training
   // five (hlSpecs in PROGRAM-APP.md → Highlight Reel), Career Mode phase 3 builds the reward five from its catalogue.
-  const W_ = (lang, v) => kgs(v, lang);
+  const W_ = (lang, v, u) => kgs(v, lang, u);
   function cycleEye(p, c) {
     return c && c.n ? p.t.cycleEye(n(c.n, p.lang), c.name || '') : p.t.personalRecords;
   }
   const TPL = {};
 
-  // best: { lift, w, r, date, prev: { w, r, date } | null, cycle: { n, of, name } | null }
-  // The set as lifted (never the 1RM estimate). The gain only when the reps match (or, at the same weight, the reps it gained).
+  // best: { lift, u, w, r, date, prev: { w, r, date } | null, cycle: { n, of, name } | null }
+  // The set as lifted (never the 1RM estimate), in the measure `u` (kg, lb or plates; its bar is in the same measure). The gain only when
+  // the reps match (or, at the same weight, the reps it gained).
   TPL.best = function (p, d) {
-    const lang = p.lang, t = p.t, show = p.opts.weights !== false;
+    const lang = p.lang, t = p.t, show = p.opts.weights !== false, u = d.u;
     const pr = d.prev || null;
     const sameR = pr && +pr.r === +d.r && +d.w > +pr.w;
     const sameW = pr && +pr.w === +d.w && +d.r > +pr.r;
@@ -978,18 +993,19 @@
     p.big(t.bestHead, 40, 2);
     p.bar(48);
     p.lift(d.lift, 72);
-    if (show) p.num([{ t: n(kgNum(d.w), lang) }, { t: ' ' + t.kg + ' × ' + n(d.r, lang), s: 'small' }], 24);
-    else if (sameR) p.num([{ t: plusKg(d.w - pr.w, lang).replace(/\s.*$/, '') }, { t: ' ' + t.kg, s: 'small' }], 24);
+    if (show) p.num([{ t: n(kgNum(d.w), lang) }, { t: ' ' + unitW(u, d.w, lang) + ' × ' + n(d.r, lang), s: 'small' }], 24);
+    else if (sameR) p.num([{ t: plusKg(d.w - pr.w, lang, u).replace(/\s.*$/, '') }, { t: ' ' + unitW(u, d.w - pr.w, lang), s: 'small' }], 24);
     else if (sameW) p.num([{ t: (lang === 'fa' ? '' : '+') + n(d.r - pr.r, lang) }, { t: ' ' + t.reps(d.r - pr.r), s: 'small' }], 24);
-    if (pr && show && sameR) p.para(t.bestGainKg(plusKg(d.w - pr.w, lang), dateShort(pr.date, lang)), 40, { drop: 2 });
-    else if (pr && show && sameW) p.para(t.bestGainReps(plusReps(d.r - pr.r, lang), W_(lang, d.w), dateShort(pr.date, lang)), 40, { drop: 2 });
+    if (pr && show && sameR) p.para(t.bestGainKg(plusKg(d.w - pr.w, lang, u), dateShort(pr.date, lang)), 40, { drop: 2 });
+    else if (pr && show && sameW) p.para(t.bestGainReps(plusReps(d.r - pr.r, lang), W_(lang, d.w, u), dateShort(pr.date, lang)), 40, { drop: 2 });
     else if (pr && !show && sameR) p.para(t.bestHiddenKg(dateShort(pr.date, lang)), 40, { drop: 2 });
     else if (pr && !show && sameW) p.para(t.bestHiddenReps(dateShort(pr.date, lang)), 40, { drop: 2 });
     p.finish(d.date);
   };
   TPL.best.ok = d => !!(d && d.lift && d.w > 0 && d.r > 0);
 
-  // effort: { lift, shape, same, pct, a: { w, n, r, date, wk }, b: { w, n, r, date, wk }, cycle, date }
+  // effort: { lift, u, shape, same, pct, a: { w, n, r, date, wk }, b: { w, n, r, date, wk }, cycle, date }
+  // u: the measure both sets' weights are in (kg, lb or plates); on the cycle card each win carries its own.
   // shape (program.html's winText() names it): kg · reps · kgEasier · kgReps · bwReps · pctHarder · pctFewer · pctLess · pctBw. `same`: the RPE
   // is known and the same. RPE-only wins never reach a card.
   const EFFORT_KEY = d => {
@@ -1003,11 +1019,11 @@
     const lang = p.lang, t = p.t, show = !p.opts || p.opts.weights !== false;
     let key = EFFORT_KEY(d);
     // Weights hidden, "the change only": a reps win at the same weight drops the weight it was lifted at (+4 reps, same effort), the
-    // words a bodyweight reps win already has. A kilo win shows only its change anyway (+7.5 kg).
+    // words a bodyweight reps win already has. A weight win shows only its change anyway (+7.5 kg, +10 lb, +1 plate: the spec's `u`).
     if (!show && key === 'reps') key = 'bwReps';
     if (!show && key === 'repsSameWeight') key = 'bwRepsPlain';
     const dw = (d.b.w || 0) - (d.a.w || 0), dn = (d.b.n || 0) - (d.a.n || 0);
-    const g = plusKg(dw, lang), gr = plusReps(dn, lang), w = d.b.w ? W_(lang, d.b.w) : '', pc = pctStr(d.pct, lang);
+    const g = plusKg(dw, lang, d.u), gr = plusReps(dn, lang), w = d.b.w ? W_(lang, d.b.w, d.u) : '', pc = pctStr(d.pct, lang);
     const tab = short ? t.winShort : t.effortLine;
     const f = tab[key];
     if (!f) return null;
@@ -1027,7 +1043,7 @@
     // Before and after: the first session of the cycle and the best since, as lifted, each with its effort.
     const label = s => s.wk && d.a.wk !== d.b.wk ? t.week(n(s.wk, lang)) : dateShort(s.date, lang);
     const setTxt = s => {
-      const reps = s.n ? (s.w && show ? kgs(s.w, lang) + ' × ' + n(s.n, lang) : (s.w ? '× ' + n(s.n, lang) : n(s.n, lang) + ' ' + t.reps(s.n))) : '';
+      const reps = s.n ? (s.w && show ? kgs(s.w, lang, d.u) + ' × ' + n(s.n, lang) : (s.w ? '× ' + n(s.n, lang) : n(s.n, lang) + ' ' + t.reps(s.n))) : '';
       return [reps, s.r ? t.rpe(n(s.r, lang)) : ''].filter(Boolean).join(' · ');
     };
     const val = s => (s.w ? s.w : 1) * (1 + ((s.n || 0) + (s.r >= 6 && s.r <= 10 ? 10 - s.r : 0)) / 30);
@@ -1053,22 +1069,23 @@
   };
   TPL.effort.ok = d => !!(d && d.lift && d.a && d.b && d.shape && EFFORT_KEY(d) in EN.effortLine);
 
-  // retest: { lift, spec ('5RM'), now: { w, r, date }, before: { w, r, date, test }, oneCycle, cycle: { n } }
-  // Both sets and both dates, nothing else. A kilo gain only when the reps match.
+  // retest: { lift, u, spec ('5RM'), now: { w, r, date }, before: { w, r, date, test }, oneCycle, cycle: { n } }
+  // Both sets and both dates, nothing else, in the measure `u` (kg, lb or plates; the earlier set is in the same one). A weight gain only
+  // when the reps match.
   TPL.retest = function (p, d) {
-    const lang = p.lang, t = p.t, show = p.opts.weights !== false;
+    const lang = p.lang, t = p.t, show = p.opts.weights !== false, u = d.u;
     const a = d.before, b = d.now, sameR = +a.r === +b.r;
     p.eye(d.cycle && d.cycle.n ? t.testWeek(n(d.cycle.n, lang)) : t.personalRecords);
     p.big(t.retestHead, 40, 2);
     p.stamp(t.beaten, 40);
     p.lift(d.lift + (d.spec ? ' · ' + d.spec : ''), 56);
-    if (show && sameR) p.num([{ t: n(kgNum(a.w), lang) }, { arrow: 1 }, { t: n(kgNum(b.w), lang) }, { t: ' ' + t.kg, s: 'small' }], 20);
+    if (show && sameR) p.num([{ t: n(kgNum(a.w), lang) }, { arrow: 1 }, { t: n(kgNum(b.w), lang) }, { t: ' ' + unitW(u, b.w, lang), s: 'small' }], 20);
     else if (show) p.num([{ t: n(kgNum(a.w), lang) + '×' + n(a.r, lang), s: 'small' }, { arrow: 1 },
-      { t: n(kgNum(b.w), lang) }, { t: ' ' + t.kg + ' × ' + n(b.r, lang), s: 'small' }], 20);
-    else if (sameR && b.w > a.w) p.num([{ t: plusKg(b.w - a.w, lang).replace(/\s.*$/, '') }, { t: ' ' + t.kg, s: 'small' }], 20);
+      { t: n(kgNum(b.w), lang) }, { t: ' ' + unitW(u, b.w, lang) + ' × ' + n(b.r, lang), s: 'small' }], 20);
+    else if (sameR && b.w > a.w) p.num([{ t: plusKg(b.w - a.w, lang, u).replace(/\s.*$/, '') }, { t: ' ' + unitW(u, b.w - a.w, lang), s: 'small' }], 20);
     else if (+b.w === +a.w && b.r > a.r) p.num([{ t: (lang === 'fa' ? '' : '+') + n(b.r - a.r, lang) }, { t: ' ' + t.reps(b.r - a.r), s: 'small' }], 20);
     let gain = null;
-    if (sameR && b.w > a.w) gain = plusKg(b.w - a.w, lang);
+    if (sameR && b.w > a.w) gain = plusKg(b.w - a.w, lang, u);
     else if (+a.w === +b.w && b.r > a.r) gain = plusReps(b.r - a.r, lang);
     const d1 = dateShort(a.date, lang), d2 = dateShort(b.date, lang);
     const dates = a.test ? t.retestDates(d1, d2) : t.retestBefore(d1, d2);
@@ -1412,8 +1429,8 @@
     let s = '';
     if (d.kind === 'best') {
       const pr = d.prev;
-      const set = show ? kgs(d.w, lang) + ' × ' + n(d.r, lang)
-        : pr && +pr.r === +d.r ? plusKg(d.w - pr.w, lang) : pr && +pr.w === +d.w ? plusReps(d.r - pr.r, lang) : '';
+      const set = show ? kgs(d.w, lang, d.u) + ' × ' + n(d.r, lang)
+        : pr && +pr.r === +d.r ? plusKg(d.w - pr.w, lang, d.u) : pr && +pr.w === +d.w ? plusReps(d.r - pr.r, lang) : '';
       s = set ? t.capBest(bidi(d.lift, lang), set) : t.capBest(bidi(d.lift, lang), '').replace(/[:،]\s*\.$/, '.');
     } else if (d.kind === 'effort') {
       const p = { lang, t, opts: { weights: show } };
@@ -1421,9 +1438,10 @@
       s = t.capEffort(bidi(d.lift, lang), w || '');
     } else if (d.kind === 'retest') {
       const a = d.before, b = d.now;
-      const change = [b.w > a.w ? plusKg(b.w - a.w, lang) : '', b.r > a.r ? plusReps(b.r - a.r, lang) : ''].filter(Boolean).join(lang === 'fa' ? '، ' : ', ');
-      const what = +a.r === +b.r ? (show ? kgs(a.w, lang) + ' → ' + kgs(b.w, lang) : change)
-        : (show ? kgs(a.w, lang) + ' × ' + n(a.r, lang) + ' → ' + kgs(b.w, lang) + ' × ' + n(b.r, lang) : change);
+      const u = d.u;
+      const change = [b.w > a.w ? plusKg(b.w - a.w, lang, u) : '', b.r > a.r ? plusReps(b.r - a.r, lang) : ''].filter(Boolean).join(lang === 'fa' ? '، ' : ', ');
+      const what = +a.r === +b.r ? (show ? kgs(a.w, lang, u) + ' → ' + kgs(b.w, lang, u) : change)
+        : (show ? kgs(a.w, lang, u) + ' × ' + n(a.r, lang) + ' → ' + kgs(b.w, lang, u) + ' × ' + n(b.r, lang) : change);
       s = t.capRetest(bidi(d.lift, lang), what);
     } else if (d.kind === 'cycle') s = t.capCycle(bidi(d.cycle.name, lang), n(d.done, lang), n(d.planned, lang));
     else if (d.kind === 'roadmap') s = t.capRoad(n((d.cycles || []).length, lang), d.weeks ? n(d.weeks, lang) : '');
@@ -1443,6 +1461,6 @@
     // for the tests and Career Mode: the words a win gets, the dates, the digits
     _effortKey: EFFORT_KEY, _dateShort: dateShort, _dateLong: dateLong, _faDigits: faDigits, _toJalali: toJalali,
     // the internals the reward cards (and their tests) are drawn with
-    _: { Painter, ST, TPL, styleOf, textW, metrics, drawRun, roundRect, photo, signature, logo, tick, arrow, star, metalFill, n, kgs, dateShort, dateLong, ROMAN, isFaText },
+    _: { Painter, ST, TPL, styleOf, textW, metrics, drawRun, roundRect, photo, signature, logo, tick, arrow, star, metalFill, n, kgs, plusKg, unitW, uOf, dateShort, dateLong, ROMAN, isFaText },
   };
 })(typeof window !== 'undefined' ? window : this);

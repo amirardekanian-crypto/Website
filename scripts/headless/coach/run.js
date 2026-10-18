@@ -5434,6 +5434,33 @@ S['lb-sets'] = async (b) => {
   return r;
 };
 
+// A record is kept per measure (2026-10-18; program.html, "A MEASURE: kg, lb or plates"): an entry says `u` ('lb' or 'plates'; absent = kg)
+// and its numbers are in that measure. Two measures of one lift are two series that never meet, and the row is the newest one, in its unit.
+S['records-measure'] = async (b) => {
+  const r = { id: 'records-measure', title: 'Personal records read in their own measure, never converted, never one series', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await page.evaluate(() => {
+    const row = window.__DB.athlete_progress.find(p => p.athlete_id === 'ava_test');
+    const d = n => addDays(todayKey(), -n);
+    row.data.ava_test_1rm = [
+      { lift: 'Goblet Squat', kg: 40, w: 30, r: 5, rpe: 8, d: d(30), t: 1 },
+      { lift: 'Goblet Squat', kg: 280, w: 225, r: 5, rpe: 8, d: d(10), t: 1, u: 'lb' },
+      { lift: 'Goblet Squat', kg: 290, w: 235, r: 5, rpe: 8, d: d(3), t: 1, u: 'lb' },
+      { lift: 'Chest-Supported Dumbbell Row', kg: 9.5, w: 8, r: 5, rpe: 8, d: d(5), t: 1, u: 'plates' },
+      { lift: 'Chest-Supported Dumbbell Row', kg: 9, w: 7.5, r: 5, rpe: 8, d: d(40), t: 1 },
+    ];
+    return refetch(['prog']);
+  });
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 500);
+  const rows = await page.evaluate(() => [...document.querySelectorAll('.prlist .pr-row')].map(x => x.innerText.replace(/\s+/g, ' ').trim()));
+  const sq = rows.find(x => /^Goblet Squat/.test(x)) || '', rw = rows.find(x => /^Chest-Supported Dumbbell Row/.test(x)) || '';
+  check(r, 'the lift lifted in pounds reads 290 lb, +10 lb since the first (its pounds series only: the 40 kg record is not "the first")', /290\s*lb/.test(sq) && /\+10\.0 lb since the first/.test(sq) && !/ kg/.test(sq), sq);
+  check(r, 'a lift last lifted on a stack reads in plates (9.5 plates), and its kg record is another series', /9\.5\s*plates/.test(rw) && /first estimate/.test(rw) && !/kg/.test(rw), rw);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));

@@ -258,6 +258,11 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Personal Records fill themselves** (2026-09-26): a finished session's best set goes on when it beats every
   earlier number for the lift, marked `auto` and written with `t: 0` so anything the athlete does to that day wins.
   New bests only: every screen leads with the latest entry. "The Ceiling" is retired from the screens.
+  **A record is kept per measure** (kg, lb or plates; 2026-10-18, Amir): an entry says `u`, its `kg` and `w` are numbers in that
+  measure, never converted, and a new best is only a higher estimate in the SAME measure (the first record in a measure beats
+  nothing; `ceilingSeries()`, `ceilingPrevBest()`, `fillRecords()`; wins, share cards and the server's facts follow:
+  PROGRAM-APP.md *The unit button*). **Isolation lifts file no automatic record** except one-handed cable exercises
+  (`recordsItself()`, `oneHandedCable()`).
 - **Weight boxes open empty** (2026-09-26): last time's weight is `lw` on the set, shown under a LAST caption,
   and `w` is only ever today's. A tick on an empty box records no weight; a weight typed in a set fills the
   empty sets below. **No Same as last on the card** (Amir, 2026-09-27: *"its a duplicate of what can be seen in

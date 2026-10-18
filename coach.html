@@ -2451,20 +2451,31 @@ function ceilAliasMapC(entries, current) {
 }
 // One row per lift: the latest estimate, the change since the first one, and
 // how long the athlete has gone without putting a number on it.
+// A record is kept per MEASURE (program.html, "A MEASURE: kg, lb or plates"): an entry says `u` ('lb' or 'plates'; absent = kg) and its
+// `kg` and `w` are numbers in that measure. Two measures of one lift are two series that never meet (225 lb is not above 100 kg); the
+// row is the series of the lift's newest entry, and its `u` says the unit to print.
+const REC_UNIT_C = { lb: 'lb', plates: 'plates' };
+function recUnitC(u, n) { return u === 'plates' ? (n === 1 ? 'plate' : 'plates') : (REC_UNIT_C[u] || 'kg'); }
 function oneRmLifts(entries, current) {
   const alias = ceilAliasMapC(entries, current || []);
   const by = {};
   entries.forEach(e => {
-    const lift = alias[e.lift] || e.lift;
-    const day = (by[lift] = by[lift] || {});
+    const lift = alias[e.lift] || e.lift, m = REC_UNIT_C[e.u] ? e.u : '';
+    const day = ((by[lift] = by[lift] || {})[m] = by[lift][m] || {});
     if (!day[e.d] || (e.t || 0) > (day[e.d].t || 0)) day[e.d] = e;
   });
-  return Object.keys(by).map(lift => {
-    const es = Object.keys(by[lift]).sort().map(d => by[lift][d]);
-    const latest = es[es.length - 1];
-    return { lift: lift, entries: es, latest: latest, delta: latest.kg - es[0].kg,
-             age: daysSince(latest.d + 'T12:00:00') };
-  }).sort((a, b) => (a.latest.d < b.latest.d ? 1 : -1));
+  const rows = [];
+  Object.keys(by).forEach(lift => {
+    let best = null;
+    Object.keys(by[lift]).forEach(m => {
+      const es = Object.keys(by[lift][m]).sort().map(d => by[lift][m][d]);
+      const latest = es[es.length - 1];
+      if (!best || latest.d > best.latest.d || (latest.d === best.latest.d && (latest.t || 0) > (best.latest.t || 0))) best = { es, latest, m };
+    });
+    rows.push({ lift: lift, u: best.m, entries: best.es, latest: best.latest, delta: best.latest.kg - best.es[0].kg,
+                age: daysSince(best.latest.d + 'T12:00:00') });
+  });
+  return rows.sort((a, b) => (a.latest.d < b.latest.d ? 1 : -1));
 }
 
 function habDaysOf(blob, id) {
@@ -5081,22 +5092,20 @@ function maxesPanel(D) {
   const untested = Object.keys(flagged).filter(n => !lifts.some(l => l.lift === n));
   if (!lifts.length && !untested.length) return '';
 
-  const row = (name, kg, sub, tone) => `<div class="pr-row">
+  const row = (name, kg, sub, tone, u) => `<div class="pr-row">
       <div class="pr-n">${esc(name)}${flagged[name] ? `<span class="pr-tag">${esc(flagged[name])}</span>` : ''}</div>
       <div class="pr-s ${tone || ''}">${sub}</div>
-      <div class="pr-v">${kg == null ? '—' : round1(kg) + '<small>kg</small>'}</div>
+      <div class="pr-v">${kg == null ? '—' : round1(kg) + '<small>' + recUnitC(u, kg) + '</small>'}</div>
     </div>`;
 
   const rows = lifts.map(l => {
     const due = flagged[l.lift] && l.age >= RETEST_MIN_DAYS_C;
     const move = l.entries.length < 2 ? 'first estimate'
-      : (l.delta === 0 ? 'no change' : fmtDeltaKg(l.delta) + ' kg since the first');
+      : (l.delta === 0 ? 'no change' : fmtDeltaKg(l.delta) + ' ' + recUnitC(l.u, Math.abs(l.delta)) + ' since the first');
     const ago = l.age === 0 ? 'today' : l.age === 1 ? 'yesterday' : l.age + ' days ago';
-    // A record set in pounds says so (u: 'lb', written by the athlete's app): the estimate is kg, so its pounds ride beside it.
-    const lbNote = l.latest.u === 'lb' ? ` · ≈ ${Math.round(l.latest.kg / 0.45359237)} lb` : '';
     return row(l.lift, l.latest.kg,
-      `${move}${lbNote} · ${l.latest.test ? 'tested' : 'from a set'} ${ago}${due ? ' · <b>due a retest</b>' : ''}`,
-      due ? 'amber' : '');
+      `${move} · ${l.latest.test ? 'tested' : 'from a set'} ${ago}${due ? ' · <b>due a retest</b>' : ''}`,
+      due ? 'amber' : '', l.u);
   }).concat(untested.map(n => row(n, null, 'nothing on the record yet · <b>due a retest</b>', 'amber')));
 
   return `<div class="sec"><span>Personal records</span></div>

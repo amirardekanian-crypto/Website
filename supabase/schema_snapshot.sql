@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 46 tables, 143 functions, 7 sequences.
+-- 46 tables, 150 functions, 7 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -952,25 +952,32 @@ begin
   end if;
   if jsonb_typeof(v_recs) is distinct from 'array' then v_recs := '[]'::jsonb; end if;
 
+  -- A Personal Records entry says its measure in `u` ('lb' or 'plates'; absent = kg), and its `kg` is the estimate in THAT measure (program.html:
+  -- saveCeilingEntry(), fillRecords()). A lift's records are kept per measure, never compared across: one entry speaks for each day of a lift
+  -- IN A MEASURE, and a lift's first number in a measure is not a best (the bar to beat is that measure's own).
   with rec as (
-    select r0.e ->> 'lift' as lift, public.career_day(r0.e ->> 'd') as d, r0.e, r0.ord, coalesce(public.career_js_num(r0.e -> 't'), 0) as t
+    select r0.e ->> 'lift' as lift, public.career_rec_unit(r0.e) as u, public.career_day(r0.e ->> 'd') as d, r0.e, r0.ord,
+           coalesce(public.career_js_num(r0.e -> 't'), 0) as t
       from jsonb_array_elements(v_recs) with ordinality r0(e, ord)
      where jsonb_typeof(r0.e) = 'object' and public.career_truthy(r0.e -> 'lift') and public.career_truthy(r0.e -> 'd')
   ),
-  eff as (     -- one entry speaks for each day of a lift: the newest write (ceilingLifts(), fillRecords())
-    select distinct on (rec.lift, rec.d) rec.* from rec where rec.d is not null order by rec.lift, rec.d, rec.t desc, rec.ord
+  eff as (     -- one entry speaks for each day of a lift and measure: the newest write (ceilingLifts(), fillRecords())
+    select distinct on (rec.lift, rec.d, rec.u) rec.* from rec where rec.d is not null order by rec.lift, rec.d, rec.u, rec.t desc, rec.ord
   ),
   kept as (select eff.* from eff where not public.career_truthy(eff.e -> 'del') and coalesce(public.career_num(eff.e -> 'kg'), 0) > 0)
-  select v_want || coalesce(jsonb_agg(jsonb_build_object('kind', 'personal_best', 'ref', k.lift || '|' || k.d::text, 'day', k.d,
-                                                         'value', jsonb_build_object('lift', k.lift, 'kg', public.career_num(k.e -> 'kg')))), '[]'::jsonb)
+  select v_want || coalesce(jsonb_agg(jsonb_build_object('kind', 'personal_best',
+                                                         'ref', k.lift || '|' || k.d::text || case when k.u = 'kg' then '' else '|' || k.u end, 'day', k.d,
+                                                         'value', jsonb_build_object('lift', k.lift, 'kg', public.career_num(k.e -> 'kg'))
+                                                                  || case when k.u = 'kg' then '{}'::jsonb else jsonb_build_object('u', k.u) end)), '[]'::jsonb)
     into v_want
     from kept k
    where public.career_truthy(k.e -> 'auto')
-     and exists (select 1 from kept k2 where k2.lift = k.lift and k2.d < k.d);   -- a lift's first number is not a best: nothing to beat
+     and exists (select 1 from kept k2 where k2.lift = k.lift and k2.u = k.u and k2.d < k.d);   -- a lift's first number in a measure is not a best: nothing to beat
 
   -- retests: a test-flagged lift (exTestSpec(): true, or "<n>RM" up to 10) logged in its cycle's test week, the last [fact.retest_done]
   -- window_days of the cycle (inRetestWindow()) and after its end while it is still the current cycle, judged on its best estimate that
-  -- week; beaten when that tops the lift's previous test, or its best earlier record when there was none.
+  -- week; beaten when that tops the lift's previous test, or its best earlier record when there was none. All of it per lift AND measure
+  -- (kg, lb, plates): a retest in pounds is judged against pounds only, and the first one in a measure beats nothing.
   for x in
     with cyc as (select distinct on (cw.cycle_index) cw.* from public.career_weeks(p_athlete) cw order by cw.cycle_index),
     src as (
@@ -995,12 +1002,13 @@ begin
               or ((ex.v ->> 'test') ~* '^\d+\s*rm$' and (substring(ex.v ->> 'test' from '^(\d+)'))::int between 1 and 10))
     ),
     evidence as (
-      select f.cycle_index, f.cycle_num, f.name, f.lift, es.d, es.best_est as est
+      select f.cycle_index, f.cycle_num, f.name, es.lift, public.career_lift_unit(es.lift) as u, es.d, es.best_est as est
         from flagged f
         join lateral public.career_entry_sets(p_athlete, f.cend - v_window, case when f.is_current then current_date else f.cend end, null) es
-          on es.lift = f.lift
+          on public.career_lift_base(es.lift) = f.lift
       union all
-      select f.cycle_index, f.cycle_num, f.name, f.lift, public.career_day(r.e ->> 'd'), public.career_num(r.e -> 'kg')
+      select f.cycle_index, f.cycle_num, f.name, public.career_lift_key(r.e ->> 'lift', public.career_rec_unit(r.e)), public.career_rec_unit(r.e),
+             public.career_day(r.e ->> 'd'), public.career_num(r.e -> 'kg')
         from flagged f, jsonb_array_elements(v_recs) r(e)
        where jsonb_typeof(r.e) = 'object' and public.career_truthy(r.e -> 'test') and not public.career_truthy(r.e -> 'del')
          and public.career_norm(r.e ->> 'lift') = f.lift
@@ -1011,16 +1019,19 @@ begin
      order by ev.lift, ev.cycle_index, ev.est desc nulls last, ev.d
   loop
     v_want := v_want || jsonb_build_array(jsonb_build_object('kind', 'retest_done', 'ref', x.lift || '|c' || x.cycle_num, 'day', x.d,
-                'value', jsonb_strip_nulls(jsonb_build_object('lift', x.name, 'cycle', x.cycle_num, 'est', x.est))));
+                'value', jsonb_strip_nulls(jsonb_build_object('lift', x.name, 'cycle', x.cycle_num, 'est', x.est)
+                                           || case when x.u = 'kg' then '{}'::jsonb else jsonb_build_object('u', x.u) end)));
   end loop;
   -- beaten: against this lift's previous retest, else its best record before the retest day
   with t as (
-    select (e.v ->> 'ref') as ref, (e.v ->> 'day')::date as d, e.v -> 'value' as v, public.career_norm(e.v #>> '{value,lift}') as lift,
+    select (e.v ->> 'ref') as ref, (e.v ->> 'day')::date as d, e.v -> 'value' as v,
+           public.career_lift_key(e.v #>> '{value,lift}', e.v #>> '{value,u}') as lift,
            (e.v #>> '{value,cycle}')::int as cyc, public.career_num(e.v #> '{value,est}') as est
       from jsonb_array_elements(v_want) as e(v) where e.v ->> 'kind' = 'retest_done'
   ),
   recs as (
-    select public.career_norm(r1.e ->> 'lift') as lift, public.career_day(r1.e ->> 'd') as d, public.career_num(r1.e -> 'kg') as kg
+    select public.career_lift_key(r1.e ->> 'lift', public.career_rec_unit(r1.e)) as lift, public.career_day(r1.e ->> 'd') as d,
+           public.career_num(r1.e -> 'kg') as kg
       from jsonb_array_elements(v_recs) r1(e)
      where jsonb_typeof(r1.e) = 'object' and not public.career_truthy(r1.e -> 'del') and coalesce(public.career_num(r1.e -> 'kg'), 0) > 0
   ),
@@ -1099,6 +1110,7 @@ declare
   s record; e jsonb; eo integer; st jsonb;
   w numeric; n numeric; n_given boolean; r numeric; rir numeric; idx numeric; rpe numeric; eff numeric; est numeric;
   has_best boolean; bw numeric; bn numeric; bng boolean; br numeric; bidx numeric; best numeric;
+  sets jsonb; wu text; v_m text; v_step numeric; wr record;
 begin
   for s in
     select sh.completed_on, sh.day, sh.log from public.session_history sh
@@ -1112,13 +1124,25 @@ begin
       eo := eo + 1;
       if jsonb_typeof(e) <> 'object' or public.career_truthy(e -> 'circuit') or not public.career_truthy(e -> 'ex') then continue; end if;
       has_best := false; bw := null; bn := null; bng := false; br := null; bidx := null; best := null;
-      for st in select y.value from jsonb_array_elements(case when jsonb_typeof(e -> 'sets') = 'array' then e -> 'sets' else '[]'::jsonb end) y loop
+      sets := case when jsonb_typeof(e -> 'sets') = 'array' then e -> 'sets' else '[]'::jsonb end;
+      -- setsMeasure(): the measure of an exercise is the unit of the first logged set that holds a weight, else kilograms
+      v_m := 'kg';
+      for st in select y.value from jsonb_array_elements(sets) y loop
+        if jsonb_typeof(st) = 'object'
+           and (public.career_truthy(st -> 'w') or public.career_truthy(st -> 'r') or public.career_truthy(st -> 'd')) then
+          wr := public.career_w(st -> 'w');
+          if wr.n is not null then v_m := wr.u; exit; end if;
+        end if;
+      end loop;
+      v_step := case v_m when 'lb' then 5 when 'plates' then 0.5 else 2.5 end;      -- ONE_RM_ROUND
+      for st in select y.value from jsonb_array_elements(sets) y loop
         -- histSetLogged(): a weight, an RPE or a tick
         if jsonb_typeof(st) <> 'object'
            or not (public.career_truthy(st -> 'w') or public.career_truthy(st -> 'r') or public.career_truthy(st -> 'd')) then
           continue;
         end if;
-        w := public.career_kg(st -> 'w');
+        wr := public.career_w(st -> 'w'); w := wr.n; wu := wr.u;          -- the number as typed, in its own measure
+        if w is not null and wu <> v_m then continue; end if;          -- a set in another measure is left out (cycleBestSet(), histBestSet())
         if st ? 'n' and jsonb_typeof(st -> 'n') <> 'null' and not (jsonb_typeof(st -> 'n') = 'string' and st ->> 'n' = '') then
           n_given := true; n := public.career_js_num(st -> 'n');
         elsif public.career_truthy(e -> 'reps') then
@@ -1139,13 +1163,19 @@ begin
         if w is not null and n is not null and n > 0 and rpe > 0 then
           eff := n + greatest(0, 10 - rpe);
           if eff <= 10 then
-            est := round((case when eff <= 1 then w else w * (1 + eff / 30) end) / 2.5) * 2.5;
+            if v_m = 'kg' then
+              est := round((case when eff <= 1 then w else w * (1 + eff / 30) end) / v_step) * v_step;        -- exact numbers, as stage66 had it
+            else
+              -- pounds and plates in DOUBLES, operation for operation as estimateOneRM() computes them: an estimate that lands exactly on
+              -- half a step (225 lb x 5 @8 is 277.5) is rounded up there, and exact numbers (1/30 cut at 20 digits) would round it down
+              est := (floor((case when eff <= 1 then w::float8 else w::float8 * (1 + eff::float8 / 30) end) / v_step::float8 + 0.5) * v_step::float8)::numeric;
+            end if;
           end if;
         end if;
         if est is not null and (best is null or est > best) then best := est; end if;
       end loop;
       if has_best then
-        d := s.completed_on; plan_day := s.day; ord := eo; name := e ->> 'ex'; lift := public.career_norm(e ->> 'ex');
+        d := s.completed_on; plan_day := s.day; ord := eo; name := e ->> 'ex'; lift := public.career_lift_key(e ->> 'ex', v_m);
         b_w := bw; b_n := bn; b_n_given := bng; b_r := br; b_idx := bidx; best_est := best;
         return next;
       end if;
@@ -1482,6 +1512,13 @@ begin
   return total::bigint;
 end $function$;
 
+CREATE OR REPLACE FUNCTION public.career_lift_base(p_key text)
+ RETURNS text
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$ select regexp_replace(p_key, '\|(lb|plates)$', '') $function$;
+
 CREATE OR REPLACE FUNCTION public.career_lift_gains(p_athlete text)
  RETURNS TABLE(lift text, name text, pct numeric, d date)
  LANGUAGE plpgsql
@@ -1513,6 +1550,24 @@ begin
   end if;
   return query select y.l, y.nm, y.p, y.dd from jsonb_to_recordset(v_out) as y(l text, nm text, p numeric, dd date);
 end $function$;
+
+CREATE OR REPLACE FUNCTION public.career_lift_key(p_name text, p_unit text)
+ RETURNS text
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select public.career_norm(p_name) || case when p_unit in ('lb', 'plates') then '|' || p_unit else '' end
+$function$;
+
+CREATE OR REPLACE FUNCTION public.career_lift_unit(p_key text)
+ RETURNS text
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select case when p_key ~ '\|lb$' then 'lb' when p_key ~ '\|plates$' then 'plates' else 'kg' end
+$function$;
 
 CREATE OR REPLACE FUNCTION public.career_log(p_athlete text)
  RETURNS jsonb
@@ -1798,6 +1853,15 @@ begin
   v_back := public.hab_bonus_xp(p_log, p_cfg, p_season, p_season, p_to, v_base || jsonb_build_object('comebackXp', 1));
   return jsonb_build_object('perfect', v_perfect, 'on_target', v_on, 'comebacks', v_back);
 end $function$;
+
+CREATE OR REPLACE FUNCTION public.career_rec_unit(p jsonb)
+ RETURNS text
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select case when jsonb_typeof(p -> 'u') = 'string' and (p ->> 'u') in ('lb', 'plates') then p ->> 'u' else 'kg' end
+$function$;
 
 CREATE OR REPLACE FUNCTION public.career_rules_now()
  RETURNS jsonb
@@ -2128,6 +2192,32 @@ AS $function$
            else false end
 $function$;
 
+CREATE OR REPLACE FUNCTION public.career_w(p jsonb, OUT n numeric, OUT u text)
+ RETURNS record
+ LANGUAGE plpgsql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+declare t text; m text[];
+begin
+  n := null; u := 'kg';
+  if p is null or jsonb_typeof(p) not in ('string', 'number') then return; end if;
+  if not public.career_truthy(p) then return; end if;               -- String(v || ''): 0 and '' read as nothing
+  t := regexp_replace(public.career_digits(p #>> '{}'), ',', '.');   -- the first comma only, as String.replace does
+  m := regexp_match(t, '^\s*([1-4])\s*[×xX*]\s*([0-9]+(?:\.[0-9]+)?)');
+  if m is not null then
+    n := m[2]::numeric;
+  else
+    m := regexp_match(t, '[0-9]+(?:\.[0-9]+)?');
+    if m is null then return; end if;
+    n := m[1]::numeric;
+  end if;
+  if not (n > 0) then n := null; return; end if;
+  if t ~* '[0-9]\s*(lbs?|pounds?)([^a-z]|$)' then u := 'lb';
+  elsif t ~* '[0-9]\s*plates?([^a-z]|$)' then u := 'plates';
+  end if;
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.career_weeks(p_athlete text)
  RETURNS TABLE(cycle_index integer, cycle_num integer, week integer, weeks integer, wfrom date, wto date, cstart date, cend date, plan text[], is_current boolean, is_last boolean)
  LANGUAGE sql
@@ -2202,6 +2292,20 @@ begin
   if not (v_dw > 0 or v_dn > 0) then return null; end if;
   return v_g;
 end $function$;
+
+CREATE OR REPLACE FUNCTION public.career_wn(p jsonb)
+ RETURNS numeric
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$ select (public.career_w(p)).n $function$;
+
+CREATE OR REPLACE FUNCTION public.career_wu(p jsonb)
+ RETURNS text
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$ select (public.career_w(p)).u $function$;
 
 CREATE OR REPLACE FUNCTION public.career_xp_on()
  RETURNS boolean
@@ -5686,8 +5790,14 @@ revoke all on function public.career_level(p_xp bigint, p_rules jsonb) from publ
 grant execute on function public.career_level(p_xp bigint, p_rules jsonb) to service_role;
 revoke all on function public.career_level_floor(p_level integer, p_rules jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.career_level_floor(p_level integer, p_rules jsonb) to service_role;
+revoke all on function public.career_lift_base(p_key text) from public, anon, authenticated, service_role;
+grant execute on function public.career_lift_base(p_key text) to service_role;
 revoke all on function public.career_lift_gains(p_athlete text) from public, anon, authenticated, service_role;
 grant execute on function public.career_lift_gains(p_athlete text) to service_role;
+revoke all on function public.career_lift_key(p_name text, p_unit text) from public, anon, authenticated, service_role;
+grant execute on function public.career_lift_key(p_name text, p_unit text) to service_role;
+revoke all on function public.career_lift_unit(p_key text) from public, anon, authenticated, service_role;
+grant execute on function public.career_lift_unit(p_key text) to service_role;
 revoke all on function public.career_log(p_athlete text) from public, anon, authenticated, service_role;
 grant execute on function public.career_log(p_athlete text) to service_role;
 revoke all on function public.career_norm(p text) from public, anon, authenticated, service_role;
@@ -5712,6 +5822,8 @@ revoke all on function public.career_paid_rules(p_habit_rules jsonb, p_rules jso
 grant execute on function public.career_paid_rules(p_habit_rules jsonb, p_rules jsonb) to service_role;
 revoke all on function public.career_probe(p_log jsonb, p_cfg jsonb, p_season date, p_to date, p_rules jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.career_probe(p_log jsonb, p_cfg jsonb, p_season date, p_to date, p_rules jsonb) to service_role;
+revoke all on function public.career_rec_unit(p jsonb) from public, anon, authenticated, service_role;
+grant execute on function public.career_rec_unit(p jsonb) to service_role;
 revoke all on function public.career_rules_now() from public, anon, authenticated, service_role;
 grant execute on function public.career_rules_now() to service_role;
 revoke all on function public.career_score(p_athlete text, p_season date, p_from date, p_to date) from public, anon, authenticated, service_role;
@@ -5736,10 +5848,16 @@ revoke all on function public.career_sync(p_athlete text, p_kinds text[], p_want
 grant execute on function public.career_sync(p_athlete text, p_kinds text[], p_want jsonb, p_source text, p_refs text[], p_settled_before date) to service_role;
 revoke all on function public.career_truthy(p jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.career_truthy(p jsonb) to service_role;
+revoke all on function public.career_w(p jsonb, OUT n numeric, OUT u text) from public, anon, authenticated, service_role;
+grant execute on function public.career_w(p jsonb, OUT n numeric, OUT u text) to service_role;
 revoke all on function public.career_weeks(p_athlete text) from public, anon, authenticated, service_role;
 grant execute on function public.career_weeks(p_athlete text) to service_role;
 revoke all on function public.career_win_gain(a_w numeric, a_n numeric, a_ng boolean, a_idx numeric, b_w numeric, b_n numeric, b_ng boolean, b_idx numeric, p_min numeric) from public, anon, authenticated, service_role;
 grant execute on function public.career_win_gain(a_w numeric, a_n numeric, a_ng boolean, a_idx numeric, b_w numeric, b_n numeric, b_ng boolean, b_idx numeric, p_min numeric) to service_role;
+revoke all on function public.career_wn(p jsonb) from public, anon, authenticated, service_role;
+grant execute on function public.career_wn(p jsonb) to service_role;
+revoke all on function public.career_wu(p jsonb) from public, anon, authenticated, service_role;
+grant execute on function public.career_wu(p jsonb) to service_role;
 revoke all on function public.career_xp_on() from public, anon, authenticated, service_role;
 grant execute on function public.career_xp_on() to service_role;
 revoke all on function public.check_discount(p_code text) from public, anon, authenticated, service_role;
