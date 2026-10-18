@@ -1763,7 +1763,7 @@ and runs it; program.html owns the door and the layer.
 - The guide's *Built-in tools* card names the door (CNT-01). Tests: `node scripts/headless/rally.js` (29 checks; in *Amir alone* your racket is
   parked in the corner, since 2026-10-18: nobody defends, and he finishes the point) and `node scripts/test_rally_sim.js` (no browser, about 14 s: eight seeds, because a match share needs about 300 matches to hold still).
 
-### Full Time and Bajada: one match a session, and a goal off the glass counts 2 (2026-10-18)
+### Full Time and Bajada: one match a session, and a bank shot off the glass counts 2 (2026-10-18)
 
 Ideas #40 (Full Time) and #43 (Bajada) of the round-4 page (https://claude.ai/artifact/1qn7D8shTUmKrYDHo9UT9W), picked on Amir's *"Go with your
 picks on all nine decisions"*. Tests: `node scripts/headless/full-time.js` (83 checks, the last eleven are The Lob beside a parked match), `rally.js` (29), `serve-clock.js` (92) and `node scripts/test_rally_sim.js`.
@@ -1793,7 +1793,7 @@ picks on all nine decisions"*. Tests: `node scripts/headless/full-time.js` (83 c
   15–12*. `Rally.matchState(session)` → `{you, amir, over}` or null; given a session it answers only for that one, so a match left from another day never says
   "play resumes". Before `rally.js` has loaded (nothing was played this page) the line is the default.
 - **The first-open hint is two lines:** *Drag in your half. Hit it through Amir's gap.* and *First to 15. The match waits for your next rest.*, shrunk to a narrow court (never under 12 px).
-  The guide's Off the Glass sentence gains *You get one match a session: first to 15. A goal off the glass counts 2.* (CNT-01; the first draft said *lasts your whole session*, which a match that ends in rest 3 or 4 does not do).
+  The guide's Off the Glass sentence gains *You get one match a session: first to 15. A bank shot off the glass counts 2.* (CNT-01; the first draft said *lasts your whole session*, which a match that ends in rest 3 or 4 does not do).
   **Two small things from the review (2026-10-18):** the last point's banner is not drawn behind the Full time box (`draw()` skips it once `S.m.over`; `Rally._draw()` is the test hook), and opening the shelf scrolls its last row into view
   (`toggleRestGames()`, `scrollIntoView({block: 'nearest'})`), so on a 320 x 568 or 375 x 667 phone The Lob is not left under the fold.
 - **Bajada: a goal off the glass in play counts 2.** After a racket's last touch (`S.touch`, set by `hitRacket()` on a real contact) the ball hits the glass (a side wall or an

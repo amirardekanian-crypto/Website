@@ -300,7 +300,8 @@
 // v169: habits.html and program.html changed (2026-10-18): Career Mode phase 3, rewards with meanings, shipped dormant behind the catalogue switch (off): nothing an athlete sees moves until it is on.
 // v170: program.html and assets/js/rally.js changed (2026-10-18): The Read (Amir defends like a person) and Serve Clock (with 25 s left the rest games stop and the timer shows the next set and one cue).
 // v171: program.html and assets/js/rally.js changed (2026-10-18): Full Time (one match a session), Bajada (off the glass counts 2) and The Lob (a calm breathing door on the shelf).
-const CACHE = 'aap-v171';
+// v172: program.html changed (2026-10-18): the guide says a bank shot off the glass counts 2 (a clip near the goal counts 1).
+const CACHE = 'aap-v172';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
