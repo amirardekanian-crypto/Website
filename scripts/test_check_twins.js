@@ -6,7 +6,10 @@
 const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
 const ROOT = path.join(__dirname, '..');
 const FILES = ['program.html', 'coach.html', 'habits.html', 'assets/js/chips.js', 'scripts/twins_stamp.json', 'scripts/name_cases.json', 'scripts/career/hold_cases.json',
-  'scripts/career/xp_cases.json'];
+  'scripts/career/xp_cases.json', 'scripts/career/reward_cases.json',
+  // section 10 holds habits.html's EVENTS goals to career/achievements.toml through scripts/career_seed.py --json (and the checker it imports)
+  'scripts/career_seed.py', 'scripts/check_career.py', 'supabase/xp_rules_snapshot.json', 'career/tiers.lock.json']
+  .concat(['rulebook', 'badges', 'achievements', 'titles', 'missions', 'quests', 'recognition'].map(n => 'career/' + n + '.toml'));
 // No GIT_* variable reaches a git command in the temp folder, or the guard run on it. The pre-commit hook runs this test inside
 // `git commit`, which exports GIT_DIR and GIT_INDEX_FILE. On 2026-10-17 the temp folder's `git init` then re-initialised the REAL
 // repository (a worktree's GIT_DIR) as bare: core.bare = true in the shared config, and every checkout's git said "must be run in
@@ -33,7 +36,10 @@ function swap(file, from, to) {
 }
 
 let bad = 0;
+// TEST_ONLY=<regex> runs just the mutations whose name matches (a full run takes ten minutes): node scripts/test_check_twins.js with TEST_ONLY="Hold Serve".
+const ONLY = process.env.TEST_ONLY ? new RegExp(process.env.TEST_ONLY, 'i') : null;
 function want(name, mutate, expectCode, mustSay, opts) {
+  if (ONLY && !ONLY.test(name)) return;
   const r = runOn(mutate, opts);
   const ok = r.code === expectCode && (!mustSay || mustSay.test(r.out));
   console.log((ok ? 'ok   ' : 'FAIL ') + name);
@@ -123,6 +129,98 @@ want('the training app pays a full log when a set is left unrated',
   swap('program.html', "return !sets.some(x => asks.has(x.o) && !careerTruthy(val(x.st, 'r')));", 'return true;'), 1, /the facts of a session/);
 want('a server answer in the cases changes on its own',
   (get, put) => put('scripts/career/xp_cases.json', get('scripts/career/xp_cases.json').replace('"level_cost": 400', '"level_cost": 410')), 1, /career's curve/);
+
+// Career Mode phase 3 (§10): a phone's copy of a reward rule drifting from the server's answers in scripts/career/reward_cases.json, and the five events' goals
+// drifting from career/achievements.toml. Each mutation is ONE copy changing on its own, which is how a drift happens.
+want('the award id of a habit badge loses its subject (AA Proof)', swap('habits.html', "if (subject) s += ':' + subject;", ''), 1, /habits\.html awardId/);
+want('the award id of a habit badge loses its subject (the training app)', swap('program.html', "if (kind === 'badge' && subject) id += ':' + String(subject);", ''), 1, /program\.html awardId/);
+want('the award id writes the tier after a title (AA Proof)', swap('habits.html', "if (tier != null && tier !== '') s += ':' + tier;", "s += ':' + tier;"), 1, /habits\.html awardId/);
+want('a crossing on the switch day is new on the phone (history is d <= S)', swap('habits.html', '!(d > S) || d < floor', '!(d >= S) || d < floor'), 1, /phoneAwardsFrom: the switch day is history/);
+want('AA Proof shows a crossing from before the open window as pending again', swap('habits.html', '!(d > S) || d < floor || d > o.today', '!(d > S) || d > o.today'), 1, /phoneAwardsFrom: zz_twin/);
+want('AA Proof shows an award the server already owns (the core\'s list)', swap('habits.html', '|| owns(id) || wd.indexOf(id) >= 0) return;', '|| wd.indexOf(id) >= 0) return;'), 1, /phoneAwardsFrom: zz_twin/);
+want('AA Proof shows a withdrawn award again', swap('habits.html', '|| owns(id) || wd.indexOf(id) >= 0) return;', '|| owns(id)) return;'), 1, /a withdrawn id is left out/);
+want('a tier is crossed one step too late on the phone (> instead of >=)', swap('habits.html', 'if (st[j][1] >= at) return st[j][0]', 'if (st[j][1] > at) return st[j][0]'), 1, /awardMeasures: zz_twin/);
+want('the day streak counts every day on target, not the days in a row', swap('habits.html', "else if (kind === 'daystreak') pts = islandPts(inp.onTarget);", "else if (kind === 'daystreak') pts = countPts(inp.onTarget);"), 1, /awardMeasures: zz_twin/);
+want('a habit counts as done on any logged amount, not the target', swap('habits.html', "return typeof v === 'number' && t != null && v >= t; };", "return typeof v === 'number' && t != null && v > 0; };"), 1, /awardMeasures: zz_twin/);
+want('the finish card shows four lines, not three', swap('program.html', 'lines.slice(0, 3).map', 'lines.slice(0, 4).map'), 1, /careerMoves #/);
+want('the finish card sorts a tier not crossed before one crossed', swap('program.html', '(b.crossed - a.crossed) ||', '(a.crossed - b.crossed) ||'), 1, /careerMoves #/);
+want('the finish card calls a week ladder sure (not pending)', swap('program.html', 'pending = true;', 'pending = false;'), 1, /careerMoves #/);
+want('Hold Serve counts from its best on the finish card, not the run so far', swap('program.html', "const base = typeof en.now === 'number' ? en.now : (Number(en.have) || 0)", "const base = Number(en.have) || 0"), 1, /careerMoves, pinned: a run badge counts from the run so far/);
+want('an event\'s goal changes in AA Proof only (16 sessions become 17)', swap('habits.html', "need:16,     label:'16 sessions'", "need:17,     label:'16 sessions'"), 1, /EVENTS goals vs achievements\.toml: ev_foundry/);
+want('an event\'s goal changes in the catalogue only (career/achievements.toml)', swap('career/achievements.toml', '{ kind = "daysHit:strength", need = 16 }', '{ kind = "daysHit:strength", need = 15 }'), 1, /EVENTS goals vs achievements\.toml: ev_foundry/);
+want('an event is added to AA Proof and not to the catalogue', swap('habits.html', "{ id:'ev_bedrock', name:'BEDROCK'", "{ id:'ev_zz', name:'ZZ', tag:'x', blurb:'x', title:{ id:'t_zz', name:'ZZ', note:'x' }, goals:[ { kind:'qualify', need:1, label:'x' } ] },\n  { id:'ev_bedrock', name:'BEDROCK'"), 1, /every event achievement has an EVENTS twin/);
+want('a server answer in the reward cases changes on its own (a pending award\'s price)',
+  (get, put) => { const j = JSON.parse(get('scripts/career/reward_cases.json')); const a = j.athletes.find(x => (x.phone_awards || []).some(y => y.xp > 0)); a.phone_awards.find(y => y.xp > 0).xp += 10; put('scripts/career/reward_cases.json', JSON.stringify(j)); }, 1, /phoneAwardsFrom: zz_twin/);
+want('a moves case in the reward cases changes on its own',
+  (get, put) => { const j = JSON.parse(get('scripts/career/reward_cases.json')); j.moves[0].expect.more = 9; put('scripts/career/reward_cases.json', JSON.stringify(j)); }, 1, /careerMoves #0/);
+want('the reward cases file is emptied (a guard with nothing to hold must not pass)',
+  (get, put) => { const j = JSON.parse(get('scripts/career/reward_cases.json')); j.athletes = []; j.moves = []; j.ids = []; put('scripts/career/reward_cases.json', JSON.stringify(j)); }, 1, /has no (award id cases|athletes|moves cases)/);
+want('a phone function is renamed away (awardMeasures)', swap('habits.html', 'function awardMeasures(', 'function awardMeasuresZ('), 2, /could not find function awardMeasures/);
+want('a phone function is renamed away (careerMoves)', swap('program.html', 'function careerMoves(', 'function careerMovesZ('), 2, /could not find function careerMoves/);
+
+
+// Entries the server's cases never cross (habit_custom, the_centurion, backbone, cold_blood, habit_breathe/mobility/supps, every top tier) are held by the synthetic run in
+
+// section 10, a measure that grows by hand. Each mutation here is ONE phone function drifting on its own, and the failure must NAME the entry the cases cannot reach.
+
+want('AA Proof counts perfect days as a run of days, not a count (THE CENTURION, CLEAN SWEEP and COLD BLOOD read them)', swap('habits.html', "else if (kind === 'perfect') pts = countPts(inp.perfect);", "else if (kind === 'perfect') pts = islandPts(inp.perfect);"), 1, /synthetic (the_centurion|proof_clean_sweep|cold_blood)/);
+
+want('AA Proof reads a perfect-days goal as days on target (COLD BLOOD)', swap('habits.html', "perfect: 'perfect', qualify: 'qualify',", "perfect: 'qualify', qualify: 'qualify',"), 1, /synthetic cold_blood/);
+
+want('AA Proof reads a comeback run as comebacks that held (BACKBONE)', swap('habits.html', "comebackRun: 'cbrun', comebacksStuck: 'stuck' })[p[0]]", "comebackRun: 'stuck', comebacksStuck: 'stuck' })[p[0]]"), 1, /synthetic backbone/);
+
+want('AA Proof counts every comeback that held as one (BACKBONE)', swap('habits.html', "pts = (inp.stuck || []).slice().sort().map((k, j) => [k, j + 1]);", "pts = (inp.stuck || []).slice().sort().map((k, j) => [k, 1]);"), 1, /synthetic backbone/);
+
+want('HOUSE RULES reads only the first habit of the player\'s own (habit_custom)', swap('habits.html', "pts = h === 'custom' ? custom.map(runPts)", "pts = h === 'custom' ? custom.slice(0, 1).map(runPts)"), 1, /synthetic habit_custom/);
+
+want('HOUSE RULES reads the habit called "custom", which no one has (habit_custom)', swap('habits.html', "pts = h === 'custom' ? custom.map(runPts).reduce((a, b) => a.concat(b), []).sort(byDay) : runPts(h);", 'pts = runPts(h);'), 1, /synthetic habit_custom/);
+
+want('a habit is done above its target, not at it (every habit badge, the ones the cases never cross included)', swap('habits.html', "return typeof v === 'number' && t != null && v >= t; };", "return typeof v === 'number' && t != null && v > t; };"), 1, /synthetic habit_(breathe|mobility|supps|custom)/);
+
+want('an event\'s total counts only the days it reached the target (THE FOUNDRY\'s steps)', swap('habits.html', "if (typeof v === 'number' && v > 0) { s += v; pts.push([k, s]); }", "if (done(k, h)) { s += v; pts.push([k, s]); }"), 1, /synthetic (the_foundry|still_standing)/);
+
+
+
+// section 10 in index mode (what the pre-commit hook runs): the catalogue the events are held to comes from the INDEX, like habits.html. (Until 2026-10-18 it was cut from the working tree.)
+
+const EV_TOML = '{ kind = "daysHit:strength", need = 16 }', EV_TOML_17 = '{ kind = "daysHit:strength", need = 17 }';
+
+const EV_HTML = "need:16,     label:'16 sessions'", EV_HTML_17 = "need:17,     label:'16 sessions'";
+
+want('index mode: a toml goal changed in the working tree and NOT staged does not fail the hook (the staged pair agrees)',
+
+  swap('career/achievements.toml', EV_TOML, EV_TOML_17), 0, /all \d+ checks agree/, { index: true });
+
+want('index mode: a toml goal STAGED while the working tree keeps the old one fails (the staged pair disagrees)',
+
+  (get, put, git) => { const old = get('career/achievements.toml'); put('career/achievements.toml', old.replace(EV_TOML, EV_TOML_17)); git('add', 'career/achievements.toml'); put('career/achievements.toml', old); },
+
+  1, /EVENTS goals vs achievements\.toml: ev_foundry/, { index: true });
+
+want('index mode: habits.html and the toml changed together and STAGED pass even though the working tree is back at the old pair',
+
+  (get, put, git) => {
+
+    const t = get('career/achievements.toml'), h = get('habits.html');
+
+    put('career/achievements.toml', t.replace(EV_TOML, EV_TOML_17)); put('habits.html', h.replace(EV_HTML, EV_HTML_17)); git('add', 'career/achievements.toml', 'habits.html');
+
+    put('career/achievements.toml', t); put('habits.html', h);
+
+  }, 0, /all \d+ checks agree/, { index: true });
+
+want('index mode: habits.html STAGED with a new goal while the toml in the working tree was changed to match (but not staged) fails',
+
+  (get, put, git) => {
+
+    const t = get('career/achievements.toml'), h = get('habits.html');
+
+    put('habits.html', h.replace(EV_HTML, EV_HTML_17)); git('add', 'habits.html');
+
+    put('career/achievements.toml', t.replace(EV_TOML, EV_TOML_17));
+
+  }, 1, /EVENTS goals vs achievements\.toml: ev_foundry/, { index: true });
+
 
 console.log(bad ? '\n' + bad + ' mutation(s) NOT caught' : '\nthe guard catches every drift it is meant to');
 process.exit(bad ? 1 : 0);

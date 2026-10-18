@@ -12,8 +12,15 @@
 >
 > **Phase 2, the XP switch, is DONE: built, rehearsed, applied to the live project (2026-10-17) and switched on 2026-10-18** (`supabase/stage69_career_xp_switch.sql`,
 > *The decisions, round 3*, and `PROCEDURES.md` → *Phase 2, as built*). Season 1 opened at 06:00 UK on 2026-10-18 and the switch went on
-> shortly after, on Amir's yes to the dry run's list (`rulebook.toml` version 3). Nobody needed a level kept. Phase 3, the catalogue switch, is next and not started. The rest is the design
-> the build follows, phase by phase (*Build order*, below). Change anything here first, then build; a changed file is re-seeded
+> shortly after, on Amir's yes to the dry run's list (`rulebook.toml` version 3). Nobody needed a level kept.
+>
+> **Phase 3, rewards with meanings and the catalogue switch, is built and rehearsed (2026-10-18), not applied, switch off** (`supabase/stage70_career_rewards.sql`,
+> `scripts/career/rollback_stage70.sql`, both apps behind `catalogueOn()` / `catalogueOnT()`; *The decisions, round 4*, and `PROCEDURES.md` → *Phase 3, as built*).
+> The fix round of the same day split the profile in two reads, **the core (`get_profile()`) and the shelf (`get_awards()`)**, so the profile stays inside its
+> 14 KB budget however long a career is; AA Proof keeps the shelf on the phone. The three rehearsals were repaired to start from the schema snapshot
+> (phase 1: 50 of 50, phase 2: 49 of 49, phase 3: 163 of 163 on the real rows of 2026-10-17).
+> Nothing an athlete sees moves until the catalogue switch is on. It waits for the go-day decisions: D1 (when), D10 (every new string) and D11 (the catalogue
+> sign-off) are Amir's. The rest is the design the build follows, phase by phase (*Build order*, below). Change anything here first, then build; a changed file is re-seeded
 > (`README.md`, *How to change something*).
 
 ---
@@ -62,7 +69,7 @@ the crew.
 |---|---|---|
 | 1 | Tennis words in the names? | **Yes, each with a plain line under it**, so a runner gets it too: Hold Serve, Second Serve, Love Hold, All-Court, Grand Slam. |
 | 2 | One behaviour, one badge? | **Yes.** Each habit keeps one badge, its Proof name, on five steps (at the catalogue switch). A streak no longer pays twice. |
-| 3 | Retire HEAVY METAL, The Machinist and Day One? | **Yes.** HEAVY METAL paid for sessions on days in a row; the other two counted what Century and First Blood count. Anyone who has one keeps it. |
+| 3 | Retire HEAVY METAL and The Machinist? | **Yes.** HEAVY METAL paid for sessions on days in a row; The Machinist counted what Century counts. Anyone who has one keeps it. (**Day One never had an entry**, in any `.toml` or in `habits.html`: there was nothing to retire. Corrected 2026-10-18; it was named here by mistake.) |
 | 4 | A lower RPE alone earns nothing? | **Yes.** It still shows on the This cycle card; a Progress reward needs the weight or the reps to go up. |
 | 5 | The Grand Slam as the capstone? | **Yes.** A title in each meaning makes a fifth title. A Calendar Slam (all four in one season) can come later. |
 | 6 | Free athletes see the Progress shelf locked? | **Yes**, as the pitch for coaching, the way the locked WORKOUT habit works today. |
@@ -77,6 +84,29 @@ And with it, a rule: **every meaningful action answers at once, visibly** (GAME-
 | 1 | One switch, or two? | **Two** (`rulebook.toml` → `[switch]`). The **XP switch** (phase 2, now): training earns XP, the WORKOUT habit pays 0 a day so a session is never paid twice, a closed habit day settles, and the level becomes the career level (never resets; the rank from it). The **catalogue switch** (phase 3, later): the entries gated on it (`retire_at` / `starts_at = "catalogue"`: one badge per habit, HEAVY METAL and THE MACHINIST retire, the training badges and the awards). Each is `"off"` until a seed turns it on with its day, and a switch never goes back off. |
 | 2 | Does anybody's level go down at the XP switch? | **No.** An athlete whose career level would be below the highest level they reached in AA Proof (their best season record, `hab_season_results`, or Proof's level this season, whichever is higher) gets ONE `level_kept` fact at the XP switch that brings them to it. It counts toward the career, never a season's points. Measured on the real rows (2026-10-17): of 38 athletes (the demo included), 31 go up, 6 stay, and 1 is kept at 12 by a top-up of 630 XP (Amir's own test identity); athletes who train a lot jump most (9 → 24, 5 → 19, 8 → 15; the top athlete 22 → 27). **At the real switch (2026-10-18) nobody needed it:** the dry run's list matched the approved one for all 38 athletes, 31 went up, 7 stayed, nobody went down and no `level_kept` fact was written, because Amir's test identity had reached level 12 on its own XP by then. |
 | 3 | When does Season 1 start? | **2026-10-18**, Proof's own way (a scheduled task ran `start_season('Season 1', '2026-10-18')` at 06:00 UK): Pre-Season was archived with Proof's levels and its title at level 5 (30 athlete records, 18 titles). Phase 2 landed during Season 1 (the switch went on 2026-10-18, shortly after the season opened). Season points are derived from the facts, never stored, so at the XP switch Season 1's board is worked out again from 2026-10-18 under the new rules, training included: a session finished in Season 1 before the XP switch counts its 400, and its WORKOUT tick 0, from the moment the switch is on (checked in `scripts/career/rehearse_switch.mjs`). A season that closes under the XP switch archives its points and the career level, and gives its title at `[season] title_points` (2,000). |
+
+**The reward decisions (round 4, 2026-10-18, phase 3).** Amir has not answered these yet. The build follows the recommendation in each row, and each is
+one constant, one `.toml` key or one branch, so a different answer is a small change. D10 and D11 block the go-day; the rest have safe defaults.
+
+| # | The question | What is built (the recommendation) |
+|---|---|---|
+| D1 | When does the catalogue switch go on? | **The day Season 2 starts** (seasons start only on Amir's word; Pre-Season ran 12 weeks, so about 2027-01-10). Career XP and levels are the same either way. Season points move a little: the dry run lists each athlete's before and after |
+| D2 | Does history earned under the new entries pay? | **Yes, dated the day it was earned.** The dry run lists level before and after |
+| D3 | What is the Resilience number? | **Habit comebacks plus training returns.** Second Serve stays its own badge |
+| D4 | A free athlete's four numbers | **Day streak (best beside it), perfect days, habit steps, comebacks.** The Progress kind of win stays locked |
+| D5 | Old and new badges with one name | **Only the new badge on the shelf**, the old award a line in its detail ("Earned before: HUMAN SPRINKLER II"). HEAVY METAL folds under Hold Serve, THE MACHINIST under Century |
+| D6 | Custom habits | **One HOUSE RULES ladder over the best custom habit** |
+| D7 | Moments | **At most one full-screen moment per app open, of any kind**; one earned by acting in this visit opens right then; a full-screen award not shown in 14 days becomes a wins-card line |
+| D8 | The WORKOUT habit's weight | **Leave it** in the day gate |
+| D9 | Five achievements written as prose | **Read as listed in `achievements.toml`** (Flawless, By the Book, All-Court, All the Way Back, The Proving Ground) |
+| D10 | Every new athlete-visible string | **Amir reads the whole table before the go-day commit** (English only) |
+| D11 | The catalogue sign-off | **Amir signs off every name, caption, tier `at`, xp, size and the eight event meanings** before the go-day. Tier order is permanent after the switch |
+| D12 | Does a retune move XP already earned? | **Yes: an award is priced from the current catalogue at scoring time**, like every fact (its mint price is kept for display and as the fallback). A history crossing that pays 0 stays 0 |
+| D13 | Where the training app shows Career | **The Home strip only**: the Career row gains the four numbers and the nearest goal. No new screen |
+| D14 | `comebacks` history | **A history crossing pays unless the habit comebacks alone had already reached that tier** (Proof paid it) |
+| D15 | Proof's Progress statgrid | **Keep it**; Milestones counts catalogue awards; the shelf below is regrouped into the four kinds of win |
+| D16 | The finish card's moves | **Every ladder the session moves, crossed ones first, three lines and "+N more"** |
+| D17 | The day streak's repeat celebrations | **Keep the repeat takeovers**; the award is minted once, silently |
 
 ---
 
@@ -275,8 +305,10 @@ The full account is in [`PROCEDURES.md`](PROCEDURES.md). The shape:
   `recognition.toml`): every reward and every mission and quest, each a block of plain settings.
 - **One scorer** (`score()`, `evaluate()`): XP, level and season points are worked out from facts with the current
   rules; rewards are minted once and kept; missions and quests move; recognition is routed.
-- **One read** (`get_profile()`): both apps ask the server for the same profile. Courtside and the Bell have their own
-  reads.
+- **One profile, two reads** (`get_profile()` and, since the phase 3 fix round, `get_awards()`): both apps ask the server for the same
+  **core** profile (the numbers, the level, the ladder, the ids of every award owned, the moments to tell). The **shelf** (every badge row with
+  the day of each tier, the milestones, the full titles list, the recent awards) is `get_awards()`, read by AA Proof only when Progress opens.
+  Courtside and the Bell have their own reads.
 - **Offline:** the phone keeps the last profile, the way it keeps the plan, and shows a tick's XP at once, marked
   pending, until the server agrees.
 - **Proof's entries keep Proof's exact rules until the catalogue switch** (phase 3). Phase 1 runs in shadow and must match Proof's
@@ -337,7 +369,7 @@ Proof's to the point.
 |---|---|---|---|
 | 1 | **Facts, in shadow.** The fact ledger, `observe()` on sessions and the Proof log, the rulebook seeded from `rulebook.toml`, `get_profile()`. It runs beside Proof's scorers and must match `hab_xp()` for every athlete before anything switches | Hold Serve's line in the training app: **shipped 2026-10-17**, a row on Home above Daily habits, the weeks held in a row and the next step (Amir: *"B, show it at zero, words ok"*; `PROGRAM-APP.md` → *Hold Serve on Home*) | **live 2026-10-17, in shadow** (stage66, applied on Amir's yes and seeded; PROCEDURES.md → *Phase 1, as built*). On the live project 34 of 34 athletes' habit XP equals Proof's, this season, the rolling week and all time (`career_compare()`) |
 | 2 | **The XP switch: one profile.** Training earns XP, the WORKOUT habit pays 0 a day, closed days settle, the level is the career level (never resets) and nobody's level goes down (*The decisions, round 3*). Proof's level, rank and board read `get_profile()`; the phone scorer becomes the preview (P13); the board ranks season points from the facts, from a cache (`career_scores`) | The career level, revealed once in AA Proof; every tick answers with its XP and the bar; the training app's Career row on Home above Hold Serve, and the finish card saying what a session earns and the finished card what it earned (P17) | **DONE: built and rehearsed, applied to the live project 2026-10-17 with the switch off, switched on 2026-10-18** (stage69, both apps, 42 of 42 on the real rows, twins and a headless suite; `PROCEDURES.md` → *Phase 2, as built*; 34 of 34 identical before and after the apply; at the switch the dry run matched the approved list, 31 up, 7 the same, 0 levels kept) |
-| 3 | **Rewards with meanings, and the catalogue switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the catalogue switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row; the finish card listing every badge a session moved; each reward's moment and share card (the cards are drawn already: Highlight Reel, GAME-14) | not started |
+| 3 | **Rewards with meanings, and the catalogue switch.** The catalogue tables, `evaluate()`, awards. Proof's milestones, tiers and titles carried over; the training badges join; the entries gated on the catalogue switch take effect (one badge per habit, HEAVY METAL and THE MACHINIST retire) | The four numbers and the Grand Slam row; the finish card listing every badge a session moved; each reward's moment and share card (the cards are drawn already: Highlight Reel, GAME-14) | **built 2026-10-18, catalogue switch off, not applied** (stage70, both apps, rehearsed on the real rows: 163 of 163; the profile split in core and shelf; twins, headless and the checker green; `PROCEDURES.md` → *Phase 3, as built*). Waiting for the go-day decisions (D1, D10, D11), the schema snapshot and Amir's yes |
 | 4 | **Amir's column.** Courtside, reactions, commendations, Amir's Pick | coach.html → Today | not started |
 | 5 | **Weekly missions.** The planner, the three slots, the crew mission in place of Quest week | Missions in both apps | not started |
 | 6 | **The crew.** The Bell, kudos, the consent question at the first highlight, titles on every line | AA Proof → Crew | not started |
@@ -399,6 +431,23 @@ None of these blocks phase 1.
 - **The phones' copies of phase 2's rules** (the career's curve, the WORKOUT habit at 0 a day, a session's full log and check-in)
   are held to the server's own answers in `scripts/career/xp_cases.json` by `scripts/check_twins.js` §9, and the answers to the
   server by `scripts/career/rehearse_switch.mjs` (rewrite them with `--write-cases` after a deliberate change, on both sides).
+- **Phase 3 (the catalogue switch):** `career_awards` and `career_recognition` are in `coach_erase_person()` (stage70's patch), `BACKUP_TABLES` and
+  the schema snapshot (the coach.html lines wait for the snapshot commit, rollout step 2); **no trigger evaluates on a DELETE** (an erasure must not mint);
+  `career_evaluate()` stays inside its budget (a Proof save on the longest log costs about 44 ms more, a session save 2 ms, rehearsed); a badge's tiers are
+  **append-only** (the award id is the tier's place in the list: `career/tiers.lock.json`, rule 21 of the checker, `career_seed.py --write-lock`).
+- **The phones' copies of phase 3's rules** (the award id, the phone's scoring of the phone-decidable entries, the finish card's moves, the five events'
+  goals) are held to the server's own answers in `scripts/career/reward_cases.json` by `scripts/check_twins.js` §10, and the answers to the server by
+  `scripts/career/rehearse_catalogue.mjs` (`--write-cases` after a deliberate change, on both sides).
+- **The profile is two reads, and the two must agree** (phase 3 fix round, 2026-10-18). `get_profile()` is the core: `owned` (a **list** of award ids, sorted byte
+  by byte, no days; it grows by about 25 bytes an award and is the only part that does), `title_worn`, `slam`, `ladder`, `near`, `moments`,
+  `numbers.four` and `numbers.free`, `catalogue_version`; its `badges`, `achievements` and `recent` stay empty placeholders and it carries no `titles`
+  list (`titles_owned` is phase 2's). `get_awards(p_athlete_id)` is the shelf (`athlete_id`, `catalogue`, `catalogue_version`, `badges` with `days`,
+  `achievements`, `titles`, `recent`); catalogue off: the same keys, empty, `catalogue` null. It works nothing out and writes nothing, and has
+  `get_profile()`'s access rule. A reader of `owned` uses a list, never `Object.keys()` or `owned[id]`. `rehearse_catalogue.mjs` proves every owned
+  award is on the shelf with the day `career_awards` has, and that the core stays under 14 KB on the longest real career and on a simulated 200-award one.
+- **AA Proof keeps the last shelf on the phone** (`<id>_hab_shelf`, `{ v, n, at, a }`: a cache, never synced, never in `CFG`, never written in the preview or
+  the demo, never read in the embed). Progress shows it with no signal; it is read again when the catalogue version or the number of awards owned
+  differs from what it was read under (`HABITS.md` → *Two reads: the core and the shelf*). The training app never calls `get_awards()`.
 - **The score cache, `career_scores`,** is in `coach_erase_person()` (stage69's patch) and is in `BACKUP_TABLES` and the schema snapshot
   (`test_restore_backup.py` needs both at once). It holds no
   source: a stale or missing row is worked out again from the facts (`career_stamp()` says when).

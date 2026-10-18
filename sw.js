@@ -297,8 +297,9 @@
 // v166: program.html changed and /assets/js/between-sets.js joins the shell (2026-10-18): Between Sets, a tennis game for the rest, the third game on the shelf.
 // v167: assets/js/splitstep.js changed (2026-10-18): Split Step hands the screen back before Serve Clock does (handBack(done), handBackAt), and starts no round the hand-back would cut.
 // v168: assets/js/between-sets.js changed (2026-10-18): Between Sets hands the screen back gracefully (handBack(done)): a point in play may finish, then it parks on Time to lift.
+// v169: habits.html and program.html changed (2026-10-18): Career Mode phase 3, rewards with meanings, shipped dormant behind the catalogue switch (off): nothing an athlete sees moves until it is on.
+// v170: program.html and assets/js/rally.js changed (2026-10-18): The Read (Amir defends like a person) and Serve Clock (with 25 s left the rest games stop and the timer shows the next set and one cue).
 // v171: program.html changed (2026-10-18): the unit button over the weight boxes (kg, lb or plates), and a build-up of weights no longer asks "far above your numbers" at every heavier set.
-// (169 and 170 are taken by the unmerged career-phase-3 and glass-ship branches: a cache name must never be used by two different deploys.)
 const CACHE = 'aap-v171';
 
 // Pre-cached on install — the minimum needed to open the app offline.

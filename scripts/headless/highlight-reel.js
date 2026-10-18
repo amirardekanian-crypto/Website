@@ -5,6 +5,8 @@
 // the phone's share sheet ONE png with the caption; Save image; Copy caption; the tip; Back closes it; the choices are remembered) · Cycle complete:
 // the one-time moment (the card, Share your cycle, Back closes it, never twice), the card's Share your cycle, Roadmap complete's The Distance first ·
 // Personal Records: Share on a lift's New best band and on a record's row, never on a first record · reduced motion stops the bursts · 320 px.
+// Career Mode phase 3 (the catalogue switch): a badge, a milestone and a title are bands with Share on the finished card, and a reward moment's button
+// opens the SAME sheet (Share your badge, Share it, Share your title), Story and Post, English and فارسی, 320 px.
 // Serve the repo first (python3 -m http.server 8765 --bind 127.0.0.1, see lib.js), then: node scripts/headless/highlight-reel.js [--out <dir>]
 'use strict';
 const path = require('path');
@@ -252,6 +254,83 @@ const ready = p => p.waitForFunction(() => { const i = document.getElementById('
     await shot(p, 'sheet-320');
     t.check('no page errors (320 px)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
+  }
+
+  // ── 7. Career Mode phase 3: a reward band and a reward moment hand their spec to the SAME sheet (badge, milestone, title) ──
+  // The rewards come from get_profile()'s moments (scripts/headless/career.js builds the core and the shelf in their real shapes: stage70's split); the sheet and the cards are the Highlight Reel's.
+  {
+    const R = require('./career');
+    const T0 = ymd(new Date());
+    const tables = { career_rules: R.RW_RULES, career_facts: [], career_catalogue: R.catRows() };
+    const rows = [
+      R.mom('badge:habit_water:1', 'win', false, 20, R.badgeSpec('HUMAN SPRINKLER', 'consistency', 'bronze', 1, 5, '5 days in a row on full water.', T0)),
+      R.mom('achievement:the_foundry', 'highlight', false, 0, { kind: 'achievement', name: 'THE FOUNDRY', meaning: 'commitment', caption: 'Four weeks of putting the work in.', date: T0 }),
+      R.mom('title:bedrock', 'highlight', false, 0, { kind: 'title', name: 'BEDROCK', meaning: 'consistency', metal: 'prismatic', from: 'BEDROCK: four weeks of the boring half', date: T0 })];
+    const owned = {}; rows.forEach(m => { owned[m.award_id] = T0; });
+    const first = R.rwProfile(10000);
+    const { ctx, p } = await open(browser, { prog: prog(-4), hist: [], stub: { tables, profile: first, awards: R.rwShelf(first) } });
+    await R.toReady(p);
+    await p.evaluate(() => document.querySelector('#confirm-1 .complete-rpe-btn[data-rpe="7"]').click());
+    await p.evaluate(s => { eval(s); }, R.stubSet(R.rwProfile(10470, { owned, moments: rows })));
+    await p.evaluate(() => finishTap('1', document.querySelector('#confirm-1 .confirm-btn')));
+    await p.waitForFunction(() => [...document.querySelectorAll('#hlwin-1 .hl-band')].filter(b => b.tagName === 'BUTTON').length >= 3, null, { timeout: 8000 }).catch(() => {});
+    const bands = await p.evaluate(() => [...document.querySelectorAll('#hlwin-1 .hl-band')].map(el => ({ txt: el.innerText.replace(/\s+/g, ' ').trim(), tag: el.tagName, label: el.getAttribute('aria-label') })));
+    t.check('rewards on the finished card: a badge, a milestone and a title are three bands, each with Share, in the Highlight Reel\'s slot',
+      bands.length === 3 && bands.every(b => b.tag === 'BUTTON' && /SHARE$/.test(b.txt)) && bands.some(b => /^BADGE HUMAN SPRINKLER · BRONZE SHARE$/i.test(b.txt))
+      && bands.some(b => /^MOMENT THE FOUNDRY/i.test(b.txt)) && bands.some(b => /^TITLE BEDROCK/i.test(b.txt)), JSON.stringify(bands));
+    await shot(p, 'p3-bands');
+    const want = [['SPRINKLER', 'Share your badge', /HUMAN SPRINKLER/], ['THE FOUNDRY', 'Share it', /THE FOUNDRY/], ['BEDROCK', 'Share your title', /BEDROCK/]];
+    for (const [needle, title, alt] of want) {
+      const i = await p.evaluate(n => [...document.querySelectorAll('#hlwin-1 .hl-band')].findIndex(el => el.innerText.toUpperCase().includes(n)), needle);
+      await p.evaluate(i => document.querySelectorAll('#hlwin-1 .hl-band')[i].click(), i);
+      await ready(p);
+      const s = await sheet(p);
+      t.check(`its Share opens the sheet, "${title}": a 1080 × 1920 Story with ${needle} on it and the handle`, s.open && s.title === title && s.w === 1080 && s.h === 1920 && alt.test(s.alt) && /@amirardekanian/.test(s.alt) && !/undefined|NaN/.test(s.alt), JSON.stringify([s.title, s.w, s.h, s.alt]));
+      if (needle === 'SPRINKLER') {
+        await p.click('.hl-seg button[data-v="post"]'); await ready(p);
+        t.check('…as a Post it is 1080 × 1350', (await sheet(p)).h === 1350);
+        await p.click('.hl-seg button[data-v="fa"]'); await ready(p);
+        const sf = await sheet(p);
+        t.check('…in Farsi it still draws (no Farsi name yet, so the English name stands), nothing breaks', sf.w === 1080 && !/undefined|NaN/.test(sf.alt) && p.errs.length === 0, JSON.stringify([sf.w, sf.alt, p.errs]));
+        await p.click('.hl-seg button[data-v="en"]'); await p.click('.hl-seg button[data-v="story"]'); await ready(p);
+      }
+      await shot(p, 'p3-sheet-' + needle.toLowerCase().replace(/\W/g, '-'));
+      await p.evaluate(() => closeHistorySheet());
+      await p.waitForTimeout(250);
+    }
+    t.check('no page errors (reward bands)', p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+  {
+    // A reward moment: its button is the same sheet; Back closes the sheet, not the app.
+    const R = require('./career');
+    const T0 = ymd(new Date());
+    const m = R.mom('badge:held_weeks:3', 'milestone', true, 600, R.badgeSpec('Hold Serve', 'consistency', 'emerald', 3, 12, '12 weeks held in a row. You keep showing up.', T0));
+    const mp = R.rwProfile(10000, { moments: [m], owned: { 'badge:held_weeks:3': T0 } });
+    const stub = { tables: { career_rules: R.RW_RULES, career_facts: [], career_catalogue: R.catRows() }, profile: mp, awards: R.rwShelf(mp) };
+    const { ctx, p } = await open(browser, { prog: prog(-4), hist: hist(-4), stub });
+    await p.waitForSelector('.hl-moment', { timeout: 8000 }).catch(() => {});
+    const mo = await p.evaluate(() => { const el = document.querySelector('.hl-moment'); return el ? { eyebrow: el.querySelector('.hl-m-eyebrow').textContent, title: el.querySelector('.hl-m-title').textContent, go: el.querySelector('.hl-m-go').textContent } : null; });
+    t.check('a reward moment: the kind of win, "Hold Serve · Emerald", Share your badge', !!mo && mo.eyebrow === 'Consistency' && mo.title === 'Hold Serve · Emerald' && mo.go === 'Share your badge', JSON.stringify(mo));
+    await p.click('.hl-moment .hl-m-go'); await ready(p);
+    const s = await sheet(p);
+    t.check('its button closes the moment and opens "Share your badge" with the card on it', await p.evaluate(() => !document.querySelector('.hl-moment')) && s.title === 'Share your badge' && /Hold Serve/.test(s.alt) && s.w === 1080 && s.h === 1920, JSON.stringify([s.title, s.alt, s.w, s.h]));
+    // (The phone's Back from a sheet that a moment opened leaves the app, for the Cycle complete moment as much as for this one: the moment's guard entry is spent and the
+    // sheet pushes none. Left as it was; it is in the L6 report. The sheet's own Close is checked here.)
+    await p.evaluate(() => closeHistorySheet()); await p.waitForTimeout(400);
+    t.check('the sheet\'s Close shuts it, the moment does not come back and the app stays', !(await p.evaluate(() => { const o = document.getElementById('hist-overlay'); return !!o && o.classList.contains('visible'); }))
+      && !(await p.evaluate(() => !!document.querySelector('.hl-moment'))) && /\/program\.html/.test(p.url()), p.url());
+    t.check('no page errors (reward moment)', p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+    // 320 px: the badge sheet fits
+    const n = await open(browser, { w: 320, h: 640, prog: prog(-4), hist: hist(-4), stub });
+    await n.p.waitForSelector('.hl-moment', { timeout: 8000 }).catch(() => {});
+    await n.p.click('.hl-moment .hl-m-go'); await ready(n.p);
+    const s3 = await sheet(n.p);
+    const sizes = await n.p.evaluate(() => [...document.querySelectorAll('#hist-overlay .hl-seg button, #hist-overlay .hl-tg, #hl-share, #hl-save, #hl-copy')].filter(b => b.offsetParent).map(b => Math.round(b.getBoundingClientRect().height)));
+    t.check('320 px: the badge sheet has no sideways scroll and every control is 44 px or more', s3.sideways <= 0 && sizes.every(h => h >= 44), JSON.stringify([s3.sideways, sizes]));
+    t.check('no page errors (320 px badge sheet)', n.p.errs.length === 0, n.p.errs.join(' | '));
+    await n.ctx.close();
   }
 
   await browser.close();

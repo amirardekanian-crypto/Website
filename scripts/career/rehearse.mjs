@@ -1,6 +1,7 @@
 // Career Mode, phase 1, rehearsed away from the live project (supabase/stage66_career_mode.sql; career/PROCEDURES.md → P14).
 //
 //     PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse.mjs [--data <folder>] [--expect <file>]
+//         [--phase1 <rev>] [--no-stage70]
 //
 // PGlite is a real PostgreSQL compiled to WebAssembly (install it in a scratch folder: scripts/restore/lib.mjs, the top). Nothing here
 // touches a real project and nothing is written outside the system's temp folder.
@@ -9,8 +10,10 @@
 //   1. builds a database from supabase/schema_snapshot.sql (on scripts/restore/stand_in_supabase.sql), as the restore rehearsal does;
 //   2. with --data, loads the rows of a dump of the tables Career Mode reads (part1.json, part2.json, part3.json: made by the session that
 //      ran this, from the live project, read only; never committed) BEFORE stage66, as on the live project;
-//   3. applies stage66 twice (it must be safe to re-run), then the seed from `python scripts/career_seed.py`, which works every
-//      athlete's facts out over all history;
+//   3. applies the stages the snapshot does not hold yet, each twice (it must be safe to re-run: scripts/career/rehearse_lib.mjs; the
+//      snapshot has held stage66 and stage69 since 2026-10-18 and holds stage70 once that is live, so today only stage70 goes on, and with
+//      --no-stage70 nothing does), then the phase 1 seed (the career files of --phase1, default the commit the live project was seeded from,
+//      rulebook version 1: the XP switch and the catalogue switch off, phase 1's shadow), which works every athlete's facts out over all history;
 //   4. career_compare(): for every athlete with a Proof log, Career Mode's habit XP against hab_xp() + hab_bonus_xp() this season, the
 //      rolling week and all time, the rules key by key and the three probes. Every athlete must match. With --expect (Proof's XP read on
 //      the live project the same day), Proof's own numbers here must equal the live ones, so the comparison ran on the same data;
@@ -21,10 +24,10 @@
 // Exit code 1 if anything failed.
 import fs from 'node:fs';
 import path from 'node:path';
-import cp from 'node:child_process';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { openDb, runSql, read } from '../restore/lib.mjs';
+import { filesAt, seedFrom, seedSql, ensureStages, eraseDef, PHASE1_REV } from './rehearse_lib.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
@@ -32,6 +35,8 @@ const COACH_JWT = JSON.stringify({ email: 'amirardekanian@gmail.com', role: 'aut
 const args = process.argv.slice(2);
 const opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
 const DATA = opt('--data'), EXPECT = opt('--expect'), REPORT = opt('--report');
+const PHASE1 = opt('--phase1') || PHASE1_REV;      // the commit the live project's phase 1 rulebook was seeded from
+const THROUGH = args.includes('--no-stage70') ? 69 : 70;
 
 let passed = 0, failed = 0;
 function ok(cond, what, detail) {
@@ -45,16 +50,6 @@ const asCoach = db => q(db, `select set_config('request.jwt.claims', $1, false)`
 const asAthlete = (db, sub, id) => q(db, `select set_config('request.jwt.claims', $1, false)`,
                                      [JSON.stringify({ sub, role: 'authenticated', email: `athlete.${id}@amirardekani.com` })]);
 const asNobody = db => q(db, `select set_config('request.jwt.claims', '', false)`);
-
-function py(argv) {
-  for (const exe of [process.env.PYTHON, 'python', 'python3'].filter(Boolean)) {
-    const r = cp.spawnSync(exe, ['-X', 'utf8', ...argv], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-    if (r.error && r.error.code === 'ENOENT') continue;
-    if (r.status === 9009 || /Microsoft Store|was not found/i.test(r.stderr || '')) continue;   // the Windows Store stub of python3
-    return r;
-  }
-  throw new Error('No python found. Set PYTHON to its path.');
-}
 
 async function load(db, table, rows) {
   if (!rows || !rows.length) return 0;
@@ -111,18 +106,18 @@ async function main() {
     ok(true, 'no --data: made-up athletes only (xp_rules from supabase/xp_rules_snapshot.json, a season 60 days old)');
   }
 
-  section('3. stage66, twice, then the seed');
-  const stage = read(path.join(ROOT, 'supabase', 'stage66_career_mode.sql'));
-  await runSql(db, stage, 'stage66');
-  await runSql(db, stage, 'stage66 again');
-  ok(true, 'stage66 applied, and applied again without an error');
-  const erase = (await one(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure) as d`)).d;
-  ok((erase.match(/'career_facts'/g) || []).length === 1, 'coach_erase_person() lists career_facts exactly once (the patch is idempotent)');
+  section('3. the stages the snapshot does not hold, then the phase 1 seed');
+  const st = await ensureStages(db, THROUGH, m => console.log('         ' + m));
+  ok(true, `the database holds stage66 and stage69 (${st.held.length ? 'from the snapshot' : 'applied here'})${THROUGH === 70 ? ' and stage70 (' + (st.applied.includes(70) ? 'applied here, twice' : 'from the snapshot') + ')' : ' (--no-stage70: phase 3 is not loaded)'}`);
+  const erase = await eraseDef(db);
+  ok((erase.match(/'career_facts'/g) || []).length === 1, 'coach_erase_person() lists career_facts exactly once (the patches are idempotent)');
+  if (THROUGH === 70) ok((erase.match(/'career_awards'/g) || []).length === 1, 'and career_awards exactly once');
   ok((await q(db, `select 1 from public.career_facts`)).length === 0, 'no facts before the seed: with no rulebook, every trigger does nothing');
-  const seed = py([path.join(ROOT, 'scripts', 'career_seed.py')]);
-  ok(seed.status === 0, 'scripts/career_seed.py wrote the seed', seed.stderr);
+  const files = filesAt(PHASE1);
+  const seed = { status: 0, stdout: seedFrom(files) };
+  ok(seed.status === 0, `scripts/career_seed.py of ${PHASE1} wrote the seed`, seed.stderr);
   const t0 = Date.now();
-  const seeded = (await one(db, seed.stdout.replace(/;\s*$/, '').replace(/^--[^\n]*\n/, '') + ' as r')).r;
+  const seeded = (await one(db, seedSql(seed.stdout))).r;
   ok(seeded && seeded.version === 1 && seeded.catalogue > 100, `the seed loaded rulebook version ${seeded && seeded.version} and ${seeded && seeded.catalogue} catalogue rows, `
      + `then the backfill (${Date.now() - t0} ms): ${JSON.stringify(seeded && seeded.backfill)}`);
 

@@ -17,6 +17,11 @@ career's numbers live in `career/rulebook.toml` as well as here (§8). The serve
 (`career_scores`) so the board loads fast. It is worked out again from the facts whenever they change, and nothing in it is a
 source.
 
+**Once Career Mode's catalogue switch is on** (phase 3, `supabase/stage70_career_rewards.sql`, built and dormant on 2026-10-18:
+`HABITS.md` → *Career Mode, phase 3*) the consistency tiers and the milestones stop being Proof's: every badge tier and milestone
+is an **award** the server mints once in a career and pays through the facts, from `career/badges.toml` and
+`career/achievements.toml`. §4, §4.5, §4.6, §5 and §8 below each say what changes then. Until it is on, nothing here changes.
+
 ---
 
 ## Where the settings live
@@ -362,6 +367,14 @@ Across all eight habits the whole ladder is about **5,300 XP**. The flat values 
 replaced totalled 11,600, which was +46% on top of sixty perfect days (25,200) and
 made daily logging feel like the side dish.
 
+**Once the catalogue switch is on (phase 3): one badge per habit.** These ladders retire (`habit_tiers` in `badges.toml`, with
+the seven habit families of §4.6) into ONE badge per habit, `habit_water` … `habit_custom` (HOUSE RULES, the best custom habit,
+D6), on the same five steps and names. Each step's xp is the table above, rounded the same way, and it is the catalogue's number
+from then on (`badges.toml`, tunable; a tier's place in the list is its identity, so a step is only ever added at the end:
+`check_career.py` rule 21). A step pays **once in a career**, on the day the habit's best run reaches it. The phone no longer
+counts tiers in `bonusEvents()`; it decides the step itself with `awardMeasures()` so the tap still shows it (§5), and the server
+pays it as an award. Crossed before the switch: minted in silence with Proof's price (history), never paid twice.
+
 ---
 
 ## 4.5 What the badges pay, and why it is safe
@@ -392,6 +405,31 @@ season's points.
 **3. Bonuses land on the overall ladder only**, never on a habit's own. A habit's
 level has to stay a pure count of how often it was done (§2), and paying its ladder
 for its own streak would quietly break that.
+
+**Once the catalogue switch is on (phase 3), tiers and milestones leave this ledger.** `bonusEvents()` emits no `tier` and no
+`milestone` events (quests and comebacks are unchanged until phase 5), exactly as the server strips them from `hab_bonus_xp()`
+(`career_bonus_rules()`). They are **awards** instead (`career_awards`): one row per badge tier or milestone, minted once in a
+career on the day its measure crossed, priced from the CURRENT catalogue whenever the score is worked out (D12), and counted in
+the career, the season and the week like any fact (§8). Three things keep this safe:
+
+1. **Nothing drops at the switch.** Everything Proof had already paid is minted in silence with Proof's own price on its own
+   crossing day, so career XP after the switch is the XP before plus any back-pay of the new badges (D2). The phone drops the XP
+   of a push made before the flip (`_pushedXp`), so the number on screen does not move.
+2. **The phone still shows a step at the tap** (P13, GAME-13). `awardMeasures()` / `phoneAwards()` decide the awards a phone can
+   decide from its log (the habit badges, the day streak, DAWN PATROL, CLEAN SWEEP, BACK IN THE FIGHT, FIRST BLOOD, THE CENTURION,
+   FULL STACK and the five events) and `pendingAwardXp()` adds their XP to the career XP shown until the server owns them. A
+   crossing on the switch day or earlier is history and never pending (the switch day is history on both sides).
+3. **A disagreement is withdrawn, never kept.** A pending award the server still does not hold after a push of the same log is
+   withdrawn on that phone (`<id>_hab_awwd`), its XP and its line go, and the console names it (`[career] twin disagrees`).
+
+"Owned" is the core's: `get_profile().owned` is a **list** of award ids (byte order, no days, stage70's split), read through
+`ownedIds()`. The shelf's rows with their days are `get_awards()`'s, read only when Progress opens (`HABITS.md` → *Two reads: the
+core and the shelf*); no XP number reads them.
+
+**Retired, never removed.** HEAVY METAL (it paid sessions on days in a row, which means skipping a rest day: Hold Serve replaces
+it), THE MACHINIST (Century counts the same sessions), HARD TO KILL (widened to training returns as *comebacks*), the seven habit
+families and the per-habit tiers are earned as Proof earned them up to the switch and never after. Anyone who has one keeps it:
+on Progress it is a line under the badge that replaced it, *Earned before: HEAVY METAL II*.
 
 **4. Each day is counted against the habits it actually had.** The two milestones
 measured per day — `daysWith3` (DP, 75xp) and `perfectDays` (CN, 500xp) — need a
@@ -477,6 +515,11 @@ levels of them. so like some milestones can have different levels.")*
 
 A **family** is one achievement you can earn again at a higher bar: same name, a roman
 numeral after it. `HUMAN SPRINKLER I` (5 days) → `II` (20) → `III` (60).
+
+**Once the catalogue switch is on (phase 3)** the families that track one habit (HUMAN SPRINKLER, GROUND COVERED, FULLY FUELLED,
+ZEN MACHINE, BLACKOUT ARTIST, RUBBER BAND, IRON MONK) retire into that habit's one badge (§4), HEAVY METAL into Hold Serve, HARD TO
+KILL into *comebacks*, and THE MACHINIST into Century. DAWN PATROL, CLEAN SWEEP, BACK IN THE FIGHT, FIRST BLOOD and THE CENTURION
+stay, as catalogue awards paying Proof's numbers, once in a career. The five events become milestones that pay their title.
 
 `mark` is **display only**. Each rung is an ordinary independent row on the existing rail —
 its own `code`, `need` and `xp` — which is why adding twelve of them needed no new scoring
@@ -587,6 +630,18 @@ rewards on the road are yours · in your Locker*. `CFG.careerSeen` holds the swi
 cloud merge, so a second phone stays quiet. Someone who started after the switch gets none. A later season changes no level, so it
 fires no level-up either: a toast says *SEASON 2 has begun. The board starts from zero. Your level stays.* A re-seeded rulebook (a
 new `rules_version`) re-baselines quietly too.
+
+**Once the catalogue switch is on (phase 3)** a badge step or a milestone is an award, and its moment goes by its size (D7):
+*milestone* and *legend* take the whole screen, *win* and *highlight* land on the wins card. **One full-screen moment per open,
+of any kind**: when a level-up, a rank or a reveal had the screen this run, an award that arrives with the server's answer waits,
+unseen, for the next open; one a tap earned opens right then. The server's waiting moments (`get_profile().moments`) are shown
+only from an answer of this run, and each answer tells the server what Proof has shown (`mark_moments_told()`), so the training
+app never replays one. `CFG.seenAwards` holds every award id that has had its moment (synced, unioned). **The catalogue reveal**
+is the switch's one moment, once per athlete (`checkCatalogueReveal()`, `CFG.catalogueSeen`): *MY RECORD · Your record*, the
+four counts, the Grand Slam row and the road's rewards. The flip re-baselines in silence and never toasts *XP system updated*.
+The counts are read from the catalogue copy (or the shelf), never the core's placeholder lists, so the reveal waits, absorbing
+levels in silence and opening nothing else, until one of them is on the phone.
+The day streak keeps its takeover on every new streak (D17); its award, once a career, never opens a second one.
 
 **The day streak celebration is new** (Amir: *"the app used to say nothing about the
 one number the whole qualify rule exists to protect"*). `DAY_STREAK_MARKS` in
@@ -1148,6 +1203,19 @@ is held to the server's own answers in `scripts/career/xp_cases.json` by `script
 
 Change a rule on both sides, then in the cases file (`node scripts/career/rehearse_switch.mjs --write-cases` writes it from the
 server's answers).
+
+**Once the catalogue switch is on (phase 3)** rule 14 stops comparing: from then the catalogue's tier and milestone numbers are
+Amir's to tune in `career/*.toml` (re-seed; the server re-prices every award, D12), and `CONSISTENCY_TIERS` and `ACHIEVEMENTS` in
+`habits.html` stay only for the display that still reads them (a habit's page, the manual before the switch). One more twin then
+matters, held by `scripts/check_twins.js` §10 to `scripts/career/reward_cases.json` (the server's own answers, written by
+`scripts/career/rehearse_catalogue.mjs --write-cases`):
+
+| SQL | App | What breaks if they drift |
+|---|---|---|
+| `career_measures()` / `career_badge_eval()` / `career_achievement_eval()` for the phone-decidable entries | `awardMeasures()` (pure) in `habits.html` | A tap celebrates a step the server does not mint (withdrawn, quietly) or misses one it does |
+| the open window, the switch day as history, the price (§3.6 of the build spec) | `phoneAwardsFrom()` (pure), wrapped by `phoneAwards()`; `owned` is the core's list of ids (the older `{ id: day }` map reads the same) | The XP shown at the tap is not what the server pays |
+| `career_award_id()` | `awardId()` in both apps | One award gets two ids: shown twice, or never told |
+| the events' `goals` in `achievements.toml` | `EVENTS` in `habits.html` | An event finishes on the phone and not on the server |
 
 **Not on the row, deliberately:** `dailyCap` (a client write-time clamp in `setVal()`, with
 no server equivalent — §1) and `seasonStart` / `seasonName` (the authority is

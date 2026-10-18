@@ -159,7 +159,8 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
     data handling is `privacy.html` §2.2. Keep all of them in step.
 - **Off the Glass, the rest game (2026-10-17).** `assets/js/rally.js` (`window.Rally`, precached by `sw.js`, loaded by `restGameLib('rally')` on the
   first tap of its row on the shelf behind the rest band's door): a one-thumb air hockey on a padel court that stops when the rest does. program.html owns `#rallyOverlay`
-  (in `topLayer()`), `openRally()` (= `openRestGame('rally')`) and the two hooks in `timerDone()` / `closeTimer()`. `PROGRAM-APP.md` → *Off the Glass*.
+  (in `topLayer()`), `openRally()` (= `openRestGame('rally')`) and the two hooks in `timerDone()` / `closeTimer()`. `PROGRAM-APP.md` → *Off the Glass*. **Serve Clock (2026-10-18)** adds `SERVE_CLOCK`, the latch, `restDoorOn()`, `paintGetSet()` and `cueForRest()` beside the timer and `Rally.handBack(done)`: with 25 s left (30 s from a 100 s rest) the games stop and the band shows the next set and one cue (`PROGRAM-APP.md` → *Serve Clock*).
+  Amir's racket plays like a person since 2026-10-18 (The Read: the `AMIR` block, `amirMove()`, a form that moves between points), held by `scripts/test_rally_sim.js` (guard 22).
 - **Split Step, the second rest game (2026-10-18).** `assets/js/splitstep.js` (`window.SplitStep`, precached by `sw.js`, loaded by
   `restGameLib('splitstep')` from the shelf): four drills with the rest clock on the court, bests in `splitstep_stats`. The door
   is now one button, "Play while you rest" (`toggleRestGames()`), that opens the shelf `#timerGames`; program.html owns `#splitOverlay`
@@ -501,8 +502,8 @@ The site started with no backend. It now uses **Supabase** (a hosted Postgres da
   - `stage62_coach_whatsapp.sql` — `coach_set_whatsapp(athlete, number)`: the coach's WhatsApp number for an athlete, kept on their `hab_contacts` record (2026-10-11, audit FLOW-8; Amir: "a WhatsApp number field on each coached athlete's File, shown in the header with a WhatsApp button"). Coach only; a new record (`source 'coach'`) only when there is a number to keep; the dashboard does not count a `source 'coach'` record as a signup. Applied; rehearsed in a rolled-back transaction (13 checks).
   - `stage63_athlete_status.sql` — a status for each athlete: active, paused or former (2026-10-11, audit ROSTER-7; Amir: "a status: active, paused, former"). `athlete_status(athlete_id, status, since, note)` holds only the paused and former ones (no row = active), coach-only through RLS; `coach_set_status(athlete, status, since, note)` (coach only; 'active' removes the row; the demo and the dashboard's own identity have none); `coach_erase_person()` patched in place (the table joins its list). Applied; rehearsed in a rolled-back transaction (18 checks incl. RLS and a real erasure).
   - `stage67_site_chat.sql` — the website chatbot's conversations (2026-10-17). `chat_conversations` (site, page, a daily-rotating `visitor` hash, turns, handoff, tokens, cost) and `chat_messages`; written only by the Edge Function `site-chat` with the service role, read and deleted by the coach (Leads → Chats); kept 90 days. In `BACKUP_TABLES`; no `athlete_id`, so not in `coach_erase_person()`. Applied 2026-10-17.
-  - `stage71_weight_units.sql` (2026-10-18, **applied to the live project on Amir's yes**, `career_compare()` still `ok`; the snapshot has only this one function patched, because another branch's unmerged stage70 had already added tables to the live project) — `career_kg()`, Career Mode's copy of `parseLoggedKg()`, learns the unit written in a weight ("45 lb" = 20.41 kg, "6 plates" = no weight; a bare number or kg reads as before). One function, nothing stored. `node scripts/career/rehearse_units.mjs` runs it against the JavaScript on thousands of weights; `scripts/career/rollback_stage71.sql` is the way back.
-  - `stage66_career_mode.sql` and `stage69_career_xp_switch.sql` — Career Mode's server half (2026-10-17). Stage 66 is phase 1, the fact ledger, live in shadow. Stage 69 is phase 2, the XP switch (the level is the career level, training earns XP, the board ranks season points from the facts), applied to the live project 2026-10-17 and **switched on 2026-10-18**. Both are described under *Career Mode, phase 1* and *Career Mode, phase 2* below.
+  - `stage71_weight_units.sql` (2026-10-18, **applied to the live project on Amir's yes**, `career_compare()` still `ok`; the snapshot has only this one function patched, because stage70_career_rewards, applied the same day, had already added tables to the live project and its snapshot is not on main yet) — `career_kg()`, Career Mode's copy of `parseLoggedKg()`, learns the unit written in a weight ("45 lb" = 20.41 kg, "6 plates" = no weight; a bare number or kg reads as before). One function, nothing stored. `node scripts/career/rehearse_units.mjs` runs it against the JavaScript on thousands of weights; `scripts/career/rollback_stage71.sql` is the way back.
+  - `stage66_career_mode.sql`, `stage69_career_xp_switch.sql` and `stage70_career_rewards.sql` — Career Mode's server half (2026-10-17/18). Stage 66 is phase 1, the fact ledger, live in shadow. Stage 69 is phase 2, the XP switch (the level is the career level, training earns XP, the board ranks season points from the facts), applied to the live project 2026-10-17 and **switched on 2026-10-18**. Stage 70 is phase 3, rewards with meanings and the catalogue switch (awards, the moment queue, the go-day batches), **built and rehearsed 2026-10-18, not applied, switch off**. Described under *Career Mode, phase 1*, *phase 2* and *phase 3* below.
   - `stage65_spine_farsi.sql` — the Farsi course reads its exercises from the Spine (2026-10-12; Amir: "fed from spine"). `exercises.steps_fa`, `cues_fa`, `purpose_fa`, `tennis_fa`; `get_exercises_fa()` (anyone may call it, like `get_exercises()`); `coach_save_spine()` takes the four (patched in place from stage64's). Applied 2026-10-12.
   - `stage64_spine_steps.sql` — How to do it (2026-10-11, the exercise card blueprint; Amir: "all recommended, go ahead"; CUE-6, CUE-7). `exercises.steps text[] not null default '{}'`, held by `spine_steps_ok()` (0 to 6 steps, none blank, none over 140 characters); `get_exercises()` sends `steps` (`[]` when none) for approved entries; `coach_save_spine()` may also write `steps` and `exercise_coach.suggested_changes`, so Amir's Save approves Claude's pending steps, cues or purpose drafts and takes them off the list in the same guarded transaction (stage48's locks and clash rule unchanged). Apply it (migration `stage64_spine_steps`) before the coach.html that writes steps goes live: without it a save that carries steps or a draft is refused, and the page names the file.
   - `schema_snapshot.sql` — **generated, never hand-edited** (2026-10-11, audit TOOLS-4; Amir: "yes, build and rehearse it"): the whole `public` schema of the live project as SQL for a FRESH database — 6 sequences, 40 tables, 92 functions, constraints (foreign keys last), indexes, triggers, RLS and policies, every grant, and the trigger on `auth.users`. The structure half of a restore (`scripts/restore/README.md`); the rows come from a backup. Made again, in the same commit, after any stage file is applied to the live project (`scripts/restore/catalog.sql` → `make_schema_snapshot.py`; pre-commit guard 17 warns when a stage file is staged without it).
@@ -573,6 +574,7 @@ match and its `rally_stats`, Back and ✕ back to the running rest, the rest run
 `splitstep.js` (2026-10-18) plays Split Step in the real app: the shelf and its order, each of the four drills, foot faults, a round that
 needs more rest than is left, the rest running out mid-round, Back and ✕ back to the running rest, `splitstep_stats`, the host's loading rules (the last tap wins, a late load opens nothing over the next rest or the GO!, no focus pulled to the door as a rest ends), 320 px and no yellow.
 `between-sets.js` (2026-10-18) plays Between Sets in the real app: the third shelf row, the saved match and Continue, the rest clock and `timeUp()`, Back and ✕ back to the running rest, `courtduel.*` stays on the phone, 320 px and no yellow.
+`serve-clock.js` (2026-10-18) checks Serve Clock, the rest handing back to the set: the hand-back at 25 s (30 s from a 100 s rest) with Off the Glass saying *Last point.* and finishing its point (`Rally.handBack`), Split Step closed at once and Between Sets parking and closing itself (each has its own `handBack`), the door rules (under 45 s, a circuit round, a retest lift in its window, 10 s before the hand-back), the get-set block and `cueForRest()` in the list and in Guided (a struck-out card, a halved exercise, a one-set card, a rest before the tick and a Library session each keep the Next line honest; focus after a game closes itself), the latch (+15s keeps it, Reset clears it), the catch-up tick, `timerDone()` still stopping a game, 320 x 568 light and dark.
 `sharecard.js` and `highlight-reel.js` (2026-10-17) check Highlight Reel: the first paints every share card of `assets/js/sharecard.js`
 (ten templates, Story and post, English and Farsi, weights and names on and off, long names) in a page of its own and fails on text past
 its box, text in Instagram's bars, overlapping text, a Latin digit in Farsi and the EN and FA word tables drifting apart, and saves a PNG
@@ -589,6 +591,11 @@ habits row never saying a level, the finish card's *This session earns* line, th
 keys never synced, and 320 px. In AA Proof: the one reveal (once per athlete, no flood of level-ups), the career's level and curve, a tick moving
 the XP at once, WORKOUT at 0, the manual's wording, `?go=pass` opening the Locker, and the embedded strip never asking for the profile. Serve the
 repo first (see `lib.js`). `PROGRAM-APP.md` → *Career on Home, and what a session earns*, `HABITS.md` → *Career Mode (phase 2, the XP switch)*.
+Phase 3 (2026-10-18) extends it to 276 checks, with the catalogue switch OFF and ON: with it off both apps are byte for byte phase 2's; with it on, the
+four numbers and the nearest goal on Home's Career row, the finish card's `moves` lines, the reward bands on the finished card and the reward moment in
+the training app, and in AA Proof the catalogue reveal (which waits for the catalogue copy or the shelf, never counting four zeros), the shelf and its phone cache
+(`<id>_hab_shelf`, the stub's `get_awards`), the four numbers on Today's card, the Grand Slam row, award moments and wins lines.
+`sharecard.js`, `highlight-reel.js` and `proof-cards.js` also draw the badge, achievement and title cards (the Proof look for Proof's).
 `cycle-end.js` (2026-10-10) checks Home between cycles (PROG-02): the card and the week while the cycle runs and on its
 end date, Cycle complete, Up next and "Ready for Cycle N?" 4 and 40 days past, Roadmap complete on the last cycle (light,
 dark, 320 px), an undated cycle, the Repeat a session fold, Read more in place, a session under way unfolded, and Game
@@ -616,7 +623,8 @@ the drafts still waiting for Amir; `--list` prints every unlinked card.
 
 ### The twin guard (`scripts/check_twins.js`, 2026-10-10)
 
-Pre-commit guard 15, run whenever `program.html`, `coach.html` or `assets/js/chips.js` is staged. coach.html
+Pre-commit guard 15, run whenever `program.html`, `coach.html`, `assets/js/chips.js` or (since 2026-10-18) `habits.html`, a `career/*.toml`, `scripts/career_seed.py` or
+`scripts/career/{hold,xp,reward}_cases.json` is staged. coach.html
 re-implements some of the athlete app's rules, so a change to one copy alone makes the coach and the athlete
 see different numbers with nothing erroring (coach.html audit, TWIN-10). The script cuts each pair out of
 both files by function name, compiles each side in its own sandbox and runs the same vectors through both:
@@ -626,9 +634,12 @@ import's reader `parseCheckinPlan()`, 300 random answer sets included). A functi
 rename has to come here. It also checks coach.html's hand-typed `chips.js?v=` token: an edit to chips.js under
 an unchanged token fails (the service worker serves `/assets/` cache-first); bump it, then run
 `node scripts/check_twins.js --stamp` to refresh `scripts/twins_stamp.json`. `scripts/test_check_twins.js`
-breaks a copy of the files on purpose, twenty ways, and requires the guard to fail each time. The known, deliberate
+breaks a copy of the files on purpose, 94 ways, and requires the guard to fail each time. The known, deliberate
 differences (the week-note input, drafts, the leftover-session window, the retest flag) are in the script's header.
-Already guarded elsewhere: `rxOf()` (`check_rx.js`), the set-log grammar (`check_setlog.js`), the word lists
+Career Mode's phone copies are sections 8 to 10 (2026-10-17/18; 65,307 checks in all): the weeks held in a row, phase 2's curve and the day's XP, and phase 3's award id, the
+phone's scoring (`habits.html awardMeasures()` / `phoneAwardsFrom()`, held to the server's `reward_cases.json` and to a measure grown by hand for every entry and every tier),
+the finish card's lines and the five events' goals against `career/*.toml` (read through `career_seed.py --json`; in index mode the toml, the seed script, the checker and the
+snapshot come from the index, like `habits.html`). Already guarded elsewhere: `rxOf()` (`check_rx.js`), the set-log grammar (`check_setlog.js`), the word lists
 (`check_parity.py`), the XP rules (`check_xp_rules.py`).
 
 ---
@@ -664,12 +675,16 @@ Amir edits by hand: the rulebook, badges,
 achievements, titles, missions, quests and recognition. The checker (standard library only, `tomllib`) blocks a reward with
 no meaning, a fact nobody defined, a mission with a fixed XP of its own (GAME-7), a title or tier that points at nothing,
 tiers out of order, metals out of order and the banned colour words; coverage gaps (a meaning with no badge, a habit with no
-recovery mission) are warnings. `scripts/test_check_career.py` (68 tests on temp copies) runs when the checker or its test is
+recovery mission) are warnings. `scripts/test_check_career.py` (107 tests on temp copies, 2026-10-18) runs when the checker or its test is
 staged; each of 24 rules was disabled once on a throwaway copy (phase 1), and its test failed every time. Since phase 1 it also checks
 the fields that carry Proof's counting (`proof_measure`, `proof_kind`, `proof_need`) and, until `[switch] catalogue` is turned on (rule 14), that
 every habit number, tier, milestone and quest equals Proof's own in `supabase/xp_rules_snapshot.json`. Since phase 2 it checks the two switches
 (`[switch]` `xp` and `catalogue`, each `"off"` or a day, the catalogue one never before the XP one: rule 16), the catalogue's gates
 (`retire_at` and `starts_at` say `"catalogue"`: rule 15) and a fact paid from its own value (the level kept: `career_only`, meaning `"carried"`).
+Since phase 3 it also checks a `best_run` badge's `run` (rule 17), an achievement's `test` and exactly that test's keys (18), a title's `size` and the
+`[moments]` table (19), the gates agreeing (20, a warning) and **tiers append-only** against `career/tiers.lock.json` (21: an inserted, reordered or
+removed tier is an error, a badge missing from the lock a warning). `python scripts/career_seed.py --write-lock` rewrites the lock after the checker
+passes, and `--catalogue-steps` prints the go-day statements.
 
 ### Career Mode, phase 1 (`supabase/stage66_career_mode.sql`, 2026-10-17)
 
@@ -688,8 +703,9 @@ in `xp_rules`' shape (`career_habit_rules()`), and the rest from `[fact.*]` with
 `program.html`'s `holdCount()` (Home's Hold Serve row, 2026-10-17) copies `get_profile()`'s weeks held in a row: `scripts/check_twins.js`
 runs it on `scripts/career/hold_cases.json`, and the rehearsal holds the two equal on every athlete it builds.
 `scripts/career/rehearse.mjs` builds the snapshot on PGlite and replays saves, hides, deletes, the row-level security, the
-profile, a broken rulebook and an erasure (47 checks made up; 49 with a dump of the real rows, which also proves every athlete
-matches Proof). The restore puts `career_rules` back last (`restore_backup.py`, `RESTORE_LAST`) so no trigger works anything out
+profile, a broken rulebook and an erasure (50 checks, 2026-10-18; with a dump of the real rows it also proves every athlete
+matches Proof). Since 2026-10-18 the three Career Mode rehearsals start from `schema_snapshot.sql` as it is and apply only the stages it does not hold, through
+`scripts/career/rehearse_lib.mjs` (`ensureStages()`, `filesAt()` for the career files of an older commit); see *Phase 3* below. The restore puts `career_rules` back last (`restore_backup.py`, `RESTORE_LAST`) so no trigger works anything out
 half-restored.
 
 ### Career Mode, phase 2: the XP switch (`supabase/stage69_career_xp_switch.sql`, 2026-10-17)
@@ -714,7 +730,9 @@ around it:
 - **`scripts/career/rehearse_switch.mjs`**: `PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse_switch.mjs --backup
   <aa-backup-…json> [--report <file>] [--write-cases]`. PGlite in a scratch folder (`scripts/restore/lib.mjs`), nothing live: the schema snapshot, a
   full backup of the real rows, phase 1 as it stands on the live project (`--phase1 <rev>` names the commit it was seeded from), then the file,
-  Season 1, the dry run, the switch, the refusals, settling, a season closing, an erasure, the cache's cost and the way back. 42 of 42 on 2026-10-17.
+  Season 1, the dry run, the switch, the refusals, settling, a season closing, an erasure, the cache's cost and the way back. 42 of 42 on 2026-10-17; **49 of 49
+  on 2026-10-18** after the repair (the snapshot now holds stage69 and stage70, so it first takes both off with their own way-back files, then seeds phase 1 and
+  phase 2 from the commits the live project was seeded from: `--phase1`, `--phase2`, `--no-stage70`).
 - **`scripts/career/rollback_stage69.sql`**: the way back. Every function the file redefined goes back to what it was, the new functions and the
   table go, and `coach_erase_person()` forgets `career_scores`. Tested by the rehearsal. On Amir's word only. A level kept at the switch is
   voided, not deleted.
@@ -727,6 +745,90 @@ around it:
   `program.html` (the Career row, the finish card's line and the finished card's, and the keys `<id>_careercache` and `<id>_earn_d<N>`) and
   `coach.html` (`loadLevels()` reads `career_rules`, which sets the Proof level's caption). `HABITS.md` → *Career Mode (phase 2, the XP switch)*,
   `PROGRAM-APP.md` → *Career on Home, and what a session earns*, `XP_SYSTEM.md` §2, §5, §7 and §8, `COACH_DASHBOARD.md`.
+
+### Career Mode, phase 3: rewards with meanings (`supabase/stage70_career_rewards.sql`, 2026-10-18)
+
+Built and rehearsed on the real rows, **not applied to the live project, and the catalogue switch is off**: both apps behave exactly as in phase 2 until
+it is on. The go-day waits for Amir's answers on D1, D10 and D11 (`career/CAREER_MODE.md` → *round 4*). Every step is in `career/PROCEDURES.md` →
+*Phase 3, as built*; the files:
+- **`supabase/stage70_career_rewards.sql`** (safe to re-run). Two tables, `career_awards` (one row per badge tier, achievement or title earned, never
+  updated or deleted) and `career_recognition` (one row per moment to tell the athlete, told once by either app); the column `career_scores.rewards` (the
+  cache of `career_evaluate()`) and the index `career_facts_kind_idx`; `backup.career_catalogue_before`. Functions: `career_evaluate()` with
+  `career_measures()` (one pass), `career_badge_eval()`, `career_achievement_eval()`, `career_mint()`, `career_slam()`, `career_award_id()`,
+  `career_award_pays()`, `career_award_xp()`, `career_rewards_stamp()`; the seams (`career_bonus_rules()`, `career_facts_paid()` with the `award` branch,
+  `career_stamp()`, `career_score()`, `career_compute()`, `career_scored()`, `career_scores_for()`); `get_profile()` (the **core**, additive: `owned` as a sorted list of award ids with no days, `title_worn`, `slam`, `ladder`, `near`, `moments`,
+  `numbers.four` and `numbers.free`, `catalogue_version`; `badges` and `achievements` stay empty placeholders; 7.6 KB on the largest real career against the 14 KB budget),
+  **`get_awards(p_athlete_id)`** (the **shelf**, read when Progress opens: `badges` with `days`, `achievements`, `titles`, `recent`; `get_profile()`'s access rule; catalogue off:
+  the same keys, empty) and `mark_moments_told()`;
+  `career_seed()` (turns the catalogue switch on only alone); the go-day batches `career_catalogue_before()`, `career_catalogue_preview()` and
+  `career_rewards_batch()`; `career_compare()` after the switch. `career_sync()` and `career_keep_levels()` stamp with `clock_timestamp()` (a save that
+  waited on a lock never writes a stamp older than one already stored). The three save triggers evaluate with the kinds that changed, **never on a
+  DELETE**. `coach_erase_person()` is patched for the two tables (exactly one match or nothing changes).
+- **`scripts/career/rollback_stage70.sql`**: the way back, dry first; nobody's level goes down (a `level_kept` fact, `catalogue-rollback`). Tested by the rehearsal.
+- **`scripts/career/rehearse_catalogue.mjs`**: `PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse_catalogue.mjs --backup <file>
+  [--report <file outside the repo>] [--write-cases]`. The snapshot, a full backup of the real rows, phases 1 and 2 as live, stage70 twice, the go-day
+  (refusals, scores before, the dry run, the seed that only flips the switch, the baseline batches, conservation athlete by athlete), live mints, partial
+  calls, the stamp race, voids, the queue, timing and the profile's size, a re-seed, an erasure, reward_cases.json, the way back. **163 of 163 on 2026-10-18** on the real
+  rows of 2026-10-17 (196 s): the core profile 7.6 KB on the largest real career and 8.7 KB on a simulated 208-award one, `get_awards()` returning every owned award dated
+  as `career_awards` has it, `get_profile()` on the skip path no more than 0.1 ms over phase 2's on the same log (a growth budget of +100 ms), a Proof save +75 ms and a session save +12 ms
+  on the longest log (budget 300), the first full evaluate 123 ms (budget 500), the baseline of 43 athletes 5 s. `--cases-file <path>` writes the cases elsewhere to look first.
+- **`scripts/career/rehearse_lib.mjs`** (2026-10-18): what the three rehearsals share, not a rehearsal. `STAGES`, `heldStages()` and `ensureStages(db, through)` (apply,
+  each twice, only the stages the snapshot lacks), `eraseDef()`, and `filesAt(rev)` / `seedFrom()` / `withRulebook()` (the career files of a commit, cut out of git with that
+  commit's own checker and seed script, in a scratch folder; `PHASE1_REV`, `PHASE2_REV`).
+- **`scripts/career/reward_cases.json`**: the server's own answers on fixed inputs that the phones' copies are held to: `awardId()`, `awardMeasures()` +
+  `phoneAwardsFrom()` (habits.html) and `careerMoves()` (program.html). `scripts/check_twins.js` §10 reads it (and the five events' goals against
+  `career/achievements.toml`); the rehearsal writes it (`--write-cases`) and checks it on every run.
+- **`career/tiers.lock.json`**: the metal of every tier of every badge, so tiers stay append-only (the award id is the tier's place in the list).
+- **`career/*.toml`**: the new keys (`run`, `history_twin_counts`, a test and its params on every achievement, a title's `size`, `[moments]`), described in
+  `career/README.md`. `scripts/check_career.py` rules 17 to 21 and `scripts/test_check_career.py` (107 tests).
+- **In the apps:** `habits.html` (`catalogueOn()`, `catalogueReady()`, `awardMeasures()`, `phoneAwardsFrom()`, `awardId()`, `phoneAwards()`,
+  `checkCatalogueReveal()`, `catalogueShelf()`, `renderProgress()`; the shelf: `ownedIds()`, `careerView()`, `fetchShelf()`, `shelfStale()`, `loadShelf()`, the phone key
+  `<id>_hab_shelf`; the keys `CFG.seenAwards`, `CFG.catalogueSeen`, `CFG.heldBefore`) and `program.html`
+  (`catalogueOnT()`, `careerMoves()`, `awardId()`, `maybeRewardMoment()`, `rewardAfterAnswer()`, `rwCountingBands()`, `collectRewardBands()`,
+  `careerEarnAtDone()`, `paintWinBand()`, the new synced key `<id>_rw_seen`). `HABITS.md` → *Career Mode, phase 3 (the catalogue switch)*, `XP_SYSTEM.md`, `QUESTS.md`,
+  `PROGRAM-APP.md` → *Rewards on the finish card, the bands and the row*.
+- **Held until the snapshot commit (rollout step 2):** the lines for `career_awards` and `career_recognition` in coach.html's `BACKUP_TABLES` and `TABLE_KEYS`,
+  the comment in `scripts/restore/restore_backup.py`, the count in `scripts/test_restore_backup.py` (46 tables become 48) and
+  `supabase/schema_snapshot.sql` regenerated. Applying stage70 without them leaves two tables out of the backup.
+- **The rest of the checks that guard it:** `scripts/headless/career.js` (276 checks, switch off and on), `sharecard.js`, `highlight-reel.js`,
+  `proof-cards.js` and `stub.js` (the profile's rewards keys), `scripts/test_check_twins.js`.
+
+---
+
+### Off the Glass's opponent (`scripts/test_rally_sim.js`, 2026-10-18)
+
+Pre-commit guard 22, run when `assets/js/rally.js` or the test is staged. Amir's racket in the rest game used to chase the ball's current spot at a
+speed that rose and fell with the score, and a bot that only followed the ball beat him 58 points to 0. **The Read** (idea #38; Amir, 2026-10-18: *"go
+with your picks"*) made him play like a person, and the dozen numbers that decide how well live in the `AMIR` block at the top of `rally.js`. They
+lean on each other (his speed, where he waits and where he meets a shot, how late he sees the ball, how wide his aim and his read can be, how often a
+point starts with a mistimed read, how far his form moves a step), so moving one quietly makes him unbeatable or a doormat and nothing errors.
+- **How it runs.** The test reads the real `rally.js` as text, runs it as a function whose free names are stubs (window, document, a canvas context that
+  does nothing, localStorage, matchMedia; `Math.random` replaced by a seeded generator; a bare vm context was 3.6x slower), opens a 390 x 804 court and
+  drives it with `Rally._tick(1/60)` (one `step()` and `tickFx()`, nothing drawn). "Play again" is the click handler the real button has.
+- **The bots** steer `S.target` the way a thumb would: each sees the ball as it was `r` seconds ago (and makes up a fifth of that by knowing which way
+  it was going) and moves its target at most `v` court widths a second. While the ball is in its half it gets just below it and pushes it up toward the
+  open side of Amir's gap (with a little aim noise); otherwise it guards in front of its own gap. **Sharp** (r 0.10, v 4.0), **average** (0.20, 2.5),
+  **tired** (0.30, 1.5) and **the old perfect follower** (no delay, no speed limit). Every bot, the perfect one too, reads a point late now and then
+  (30% of points, 0.3 s), as Amir does: a bot that never errs cannot lose, so "the follower wins under 90%" would say nothing (`--slip 0` gives it
+  100%). A fifth, **the ace** (sharp's delay and speed, never late, shoots at the edges, reads ahead), is printed with a `*` and never asserted on: his
+  form is capped at 1, so it wins about 98% and shows the ceiling.
+- **What it holds** (each bot plays three 3,000 s games, 9,000 s of game time, pooled; about 4 s in all): every bot loses some points; the follower wins under
+  90% (measured about 86%); sharp > average > tired in point share (about 71, 57 and 51%); an average bot wins 52 to 64% (aim: 57%, which is about two
+  matches in three); a tired one 44 to 60%; he looks calm (his misjudgement is drawn once per shot and his aim once per strike: about 4 and 1.4 new
+  draws a point, the test allows 10 and 5; a mutant that redraws either every frame measures 69 and 40); no NaN; the ball never leaves the court except through a gap; it never exceeds its top speed; your racket never
+  moves faster than `YOU_SPEED` (read from `rally.js`) court widths a second; his form changes only between points and stays in 0 to 1 and **matters** (held at 0 an average bot wins 6
+  points more than held at 1; measured about 12); his top speed is one number, reached whether you lead or trail; the same seed plays the same game.
+- **To retune** change a number in the `AMIR` block and run `node scripts/test_rally_sim.js`. `--set speed=1.2 --set react=0.2,0.1` tries a number without
+  editing the file, `--seed N` starts from another seed (check three or four: a change should hold on all), `--seeds N` pools more games, `--only average
+  --trace 40` prints 40 s of one bot's play every 0.1 s. Measured 2026-10-18 over ten seed blocks: sharp 68 to 72%, average 54 to 58%, tired 51 to 54%,
+  follower 85 to 87%. The gap between average and tired is only about 5 points (r 0.2 against 0.3 s and 2.5 against 1.5 widths a second matter little
+  on a court this small), which is why each bot plays 9,000 s.
+- **The bands are wide on purpose** (the shares wobble 2 to 5 points with the seeds and the court size). `react` is the number they guard; `speed` 0.6
+  or 1.6 and `aim` 0 all still pass, so judge those two by playing.
+- **Not measured:** how it feels to a person. The bots are a ruler, not a player; Amir plays it before this ships.
+- **`scripts/headless/rally.js`** still plays the real game in a browser. Its *Amir alone* check parks your racket in the corner (it used to leave it dead
+  centre in front of his gap, and he now aims for the middle of the biggest hole beside your racket, two 14 px slivers for a racket parked in the middle) and
+  plays on in `Rally._tick` steps if he has not scored in 20 s.
 
 ---
 

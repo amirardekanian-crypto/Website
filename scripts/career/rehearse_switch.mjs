@@ -2,27 +2,31 @@
 // "Phase 2, as built").
 //
 //     PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/career/rehearse_switch.mjs --backup <aa-backup-YYYY-MM-DD.json> [--report <file>]
+//         [--phase1 <rev>] [--phase2 <rev>] [--no-stage70] [--write-cases]
 //
 // PGlite is a real PostgreSQL compiled to WebAssembly (install it in a scratch folder: scripts/restore/lib.mjs, the top). Nothing here touches a real
 // project. The backup is coach.html's ⤓ Backup (or the same shape): the real rows, read here and never written anywhere but this process's memory;
 // --report writes the switch's list (each athlete's level in AA Proof against the career level after the switch) to a file: keep it outside the repo.
 //
-// What it does, in order: the live project as it stands before stage69 (the schema snapshot, the backup's rows, stage66 and the phase 1 seed made
-// from the committed files at HEAD), then
-//   1. stage69 twice, then the seed of the working files ([switch] xp = "off"): nothing an athlete sees moves (the board, Proof's level, the profile);
+// What it does, in order: the live project as it stood before stage69. The schema snapshot is the live structure and already holds stage69 (and stage70
+// once that is live), so the rehearsal first takes them off with their own way back (scripts/career/rollback_stage70.sql, then rollback_stage69.sql:
+// the way back is tested by what comes after); then the backup's rows and the phase 1 seed made from the career files of --phase1 (what the live
+// project was seeded from). The phase 2 rulebook is the career files of --phase2 (version 2, both switches off), so this stays the rehearsal of phase 2
+// whatever the working files say now. Then
+//   1. stage69 twice, then the seed of the phase 2 files ([switch] xp = "off"): nothing an athlete sees moves (the board, Proof's level, the profile);
 //   2. Season 1 starts with the switch off: Proof's own season record, as before;
 //   3. the switch, dry run first (the list, then nothing changed), then for real: nobody's level goes down, the WORKOUT habit pays 0 a day, training
 //      pays, the board ranks season points with career levels, the road's titles follow the career level, the compare still holds;
 //   4. the switch seed again (nothing new), a switch turned back off and a day still to come (both refused);
 //   5. settling: a closed day's change keeps its fact, an open day's moves it; the compare calls that row settled, not failed;
 //   6. a season closing under the switch, an erasure, the score cache's timing, the way back (scripts/career/rollback_stage69.sql).
+//   7. with stage70 loaded (phase 3, the catalogue switch off) from step 4 on: everything above holds beside it, and the way back is both files, 70 then 69.
 // Exit code 1 if anything failed.
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
-import cp from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { openDb, runSql, read } from '../restore/lib.mjs';
+import { filesAt, seedFrom, seedSql, withRulebook, ensureStages, heldStages, eraseDef, PHASE1_REV, PHASE2_REV } from './rehearse_lib.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
@@ -30,8 +34,11 @@ const COACH_JWT = JSON.stringify({ email: 'amirardekanian@gmail.com', role: 'aut
 const args = process.argv.slice(2);
 const opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
 const BACKUP = opt('--backup'), REPORT = opt('--report');
-// The commit the live project's phase 1 rulebook was seeded from (2026-10-17, rulebook version 1: the phase 1 note). --phase1 <rev> for another.
-const PHASE1 = opt('--phase1') || '94cdc89';
+// The commits the live project's rulebooks were seeded from: phase 1 (2026-10-17, version 1) and phase 2 (version 2, both switches off). --phase1 and
+// --phase2 <rev> for others.
+const PHASE1 = opt('--phase1') || PHASE1_REV;
+const PHASE2 = opt('--phase2') || PHASE2_REV;
+const STAGE70 = !args.includes('--no-stage70');
 
 let passed = 0, failed = 0;
 function ok(cond, what, detail) {
@@ -46,16 +53,6 @@ const asNobody = db => q(db, `select set_config('request.jwt.claims', '', false)
 const asAthlete = (db, sub, id) => q(db, `select set_config('request.jwt.claims', $1, false)`,
                                      [JSON.stringify({ sub, role: 'authenticated', email: `athlete.${id}@amirardekani.com` })]);
 
-function py(argv, opts = {}) {
-  for (const exe of [process.env.PYTHON, 'python', 'python3'].filter(Boolean)) {
-    const r = cp.spawnSync(exe, ['-X', 'utf8', ...argv], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, ...opts });
-    if (r.error && r.error.code === 'ENOENT') continue;
-    if (r.status === 9009 || /Microsoft Store|was not found/i.test(r.stderr || '')) continue;
-    return r;
-  }
-  throw new Error('No python found. Set PYTHON to its path.');
-}
-const seedSql = out => out.replace(/;\s*$/, '').replace(/^--[^\n]*\n/, '') + ' as r';
 async function load(db, table, rows) {
   if (!rows || !rows.length) return 0;
   await db.query(`insert into public.${table} select * from jsonb_populate_recordset(null::public.${table}, $1::jsonb)`, [JSON.stringify(rows)]);
@@ -64,30 +61,6 @@ async function load(db, table, rows) {
 function ymd(d) { return d.toISOString().slice(0, 10); }
 function addDays(day, n) { const d = new Date(day + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return ymd(d); }
 const ms = async (fn) => { const t = Date.now(); const r = await fn(); return [r, Date.now() - t]; };
-
-// The career files of a commit (PHASE1: what the live project was seeded from) or of the working tree, with their own checker and seed script,
-// in a scratch folder; and a working copy of the career folder with one rulebook change (the switch).
-function filesAt(rev) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'career-' + (rev || 'work') + '-'));
-  fs.mkdirSync(path.join(dir, 'career')); fs.mkdirSync(path.join(dir, 'scripts')); fs.mkdirSync(path.join(dir, 'supabase'));
-  const want = ['rulebook', 'badges', 'achievements', 'titles', 'missions', 'quests', 'recognition'].map(f => `career/${f}.toml`)
-    .concat(['scripts/check_career.py', 'scripts/career_seed.py', 'supabase/xp_rules_snapshot.json']);
-  for (const f of want) {
-    const body = rev ? cp.execFileSync('git', ['show', `${rev}:${f}`], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 })
-                     : fs.readFileSync(path.join(ROOT, f), 'utf8');
-    fs.writeFileSync(path.join(dir, f), body.replace(/\r\n/g, '\n'));
-  }
-  return dir;
-}
-function seedFrom(dir, extra = []) {
-  const r = py([path.join(dir, 'scripts', 'career_seed.py'), path.join(dir, 'career'), ...extra]);
-  if (r.status !== 0) throw new Error('career_seed.py failed:\n' + r.stderr);
-  return r.stdout;
-}
-function withRulebook(dir, edit) {
-  const f = path.join(dir, 'career', 'rulebook.toml');
-  fs.writeFileSync(f, edit(fs.readFileSync(f, 'utf8')));
-}
 
 // The server's answers to what the two phones copy (P13, P17), on fixed inputs: scripts/career/xp_cases.json. Run with the XP switch on.
 //   levels    career_level() over XP values that cross levels, ranks and a prestige (habits.html levelInfo() on the career's curve,
@@ -175,6 +148,15 @@ async function main() {
   section('0. the live project before stage69');
   await runSql(db, read(path.join(ROOT, 'scripts', 'restore', 'stand_in_supabase.sql')), 'stand-in');
   await runSql(db, read(path.join(ROOT, 'supabase', 'schema_snapshot.sql')), 'snapshot');
+  // The snapshot is the live structure NOW: stage66 and stage69 are in it (stage70 too once it is live). The project before stage69 is what the
+  // way back puts back, so take them off with it (stage70 first). Their own files do it, so they are tested by everything that follows.
+  const held0 = await heldStages(db);
+  const rb70 = read(path.join(ROOT, 'scripts', 'career', 'rollback_stage70.sql')).replace(`'career.rollback70', 'dry'`, `'career.rollback70', 'real'`);
+  if (held0[70]) await runSql(db, rb70, 'rollback70 on the snapshot');
+  if (held0[69]) await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage69.sql')), 'rollback69 on the snapshot');
+  const held1 = await heldStages(db);
+  ok(!held1[69] && !held1[70], `the snapshot holds ${[66, 69, 70].filter(k => held0[k]).map(k => 'stage' + k).join(', ') || 'no career stage'}; its way back takes off stage69 `
+     + `(${held0[70] ? 'and stage70 ' : ''}so the project is as it stood on 2026-10-17, phase 1 in shadow)`);
   const T = backup.tables || {};
   const n = {};
   for (const t of ['seasons', 'xp_rules', 'programs', 'program_versions', 'library_sessions', 'athlete_status', 'hab_titles', 'leaderboard_optin',
@@ -182,12 +164,11 @@ async function main() {
   ok(backup.complete === true, `the backup is complete (${backup.exported_at}); loaded ` + Object.entries(n).map(([t, k]) => `${t} ${k}`).join(', '));
   // rows loaded with their ids leave a serial behind them: move it past the newest, as a restore does
   await q(db, `select setval(pg_get_serial_sequence('public.seasons', 'id'), greatest((select max(id) from public.seasons), 1))`);
-  // the backup predates stage66; the live project has had it since 2026-10-17, seeded from the files at HEAD
-  const s66 = read(path.join(ROOT, 'supabase', 'stage66_career_mode.sql'));
-  await runSql(db, s66, 'stage66');
+  // the backup predates stage66; the live project has had it since 2026-10-17 (the snapshot holds it; an older snapshot gets it here), seeded from the files at PHASE1
+  const st66 = await ensureStages(db, 66);
   const head = filesAt(PHASE1);
   const v1 = (await one(db, seedSql(seedFrom(head)))).r;
-  ok(v1 && v1.version === 1, `stage66 and the phase 1 seed from ${PHASE1}'s files (what the live project was seeded from): rulebook ${v1 && v1.version}, ${v1 && v1.catalogue} catalogue rows, `
+  ok(v1 && v1.version === 1, `stage66 (${st66.applied.length ? 'applied here, twice' : 'from the snapshot'}) and the phase 1 seed from ${PHASE1}'s files (what the live project was seeded from): rulebook ${v1 && v1.version}, ${v1 && v1.catalogue} catalogue rows, `
      + `${Object.values((v1 && v1.backfill && v1.backfill.facts) || {}).reduce((a, b) => a + b, 0)} facts`);
   let cmp = (await one(db, `select public.career_compare() as r`)).r;
   ok(cmp.ok, `phase 1's shadow check holds on the real rows: ${cmp.matched} of ${cmp.athletes}`, cmp.rows.filter(r => !r.ok).map(r => JSON.stringify(r)).join('\n'));
@@ -201,25 +182,25 @@ async function main() {
   await asNobody(db);
   const prof0 = {};
   for (const id of ids) prof0[id] = (await one(db, `select public.get_profile($1) as p`, [id])).p;
-  const erase0 = (await one(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure) as d`)).d;
+  const erase0 = await eraseDef(db);
   // a function's text as the database prints it; the files carry CRLF or LF as the checkout made them, which changes nothing it does
   const defs = async names => Object.fromEntries((await q(db, `select p.proname as n, pg_get_functiondef(p.oid) as d from pg_proc p
       join pg_namespace s on s.oid = p.pronamespace where s.nspname = 'public' and p.proname = any($1)`, [names])).map(r => [r.n, r.d.replace(/\r/g, '')]));
   const before = await defs(['hab_season_level', 'coach_season_levels', 'leaderboard_top', 'hab_close_season', 'career_score', 'career_facts_xp',
                              'career_settled_before', 'get_profile', 'career_compare', 'career_seed']);
 
-  section('1. stage69, twice, then the seed of the working files (both switches off)');
+  section('1. stage69, twice, then the phase 2 seed (both switches off)');
   const s68 = read(path.join(ROOT, 'supabase', 'stage69_career_xp_switch.sql'));
   await runSql(db, s68, 'stage69');
   await runSql(db, s68, 'stage69 again');
   ok(true, 'stage69 applied, and applied again without an error');
-  const erase1 = (await one(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure) as d`)).d;
+  const erase1 = await eraseDef(db);
   ok((erase1.match(/'career_scores'/g) || []).length === 1 && erase1.replace(`'career_facts', 'career_scores']`, `'career_facts']`) === erase0,
      'coach_erase_person() learns career_scores exactly once, and nothing else in it moves');
-  const work = filesAt(null);
+  const work = filesAt(PHASE2);
   const v2 = (await one(db, seedSql(seedFrom(work)))).r;
   ok(v2 && v2.version === 2 && v2.switch && v2.switch.xp === 'off' && v2.switch.catalogue === 'off' && !v2.turned_on && !v2.levels,
-     `the working files seed as rulebook 2, both switches off (backfill: ${JSON.stringify(v2 && v2.backfill && v2.backfill.athletes)} athletes)`, JSON.stringify(v2));
+     `the phase 2 files (${PHASE2}) seed as rulebook 2, both switches off (backfill: ${JSON.stringify(v2 && v2.backfill && v2.backfill.athletes)} athletes)`, JSON.stringify(v2));
   cmp = (await one(db, `select public.career_compare() as r`)).r;
   ok(cmp.ok && cmp.settled === 0, `the shadow check still holds: ${cmp.matched} of ${cmp.athletes}`, cmp.rows.filter(r => !r.ok).map(r => JSON.stringify(r)).join('\n'));
   await asCoach(db);
@@ -276,7 +257,7 @@ async function main() {
      `in shadow the session already counts in Career Mode's season (${zBefore.season.points} points), beside WORKOUT's 120`);
 
   section('3. the switch: the dry run (the list), then for real');
-  const sw = filesAt(null);
+  const sw = filesAt(PHASE2);
   withRulebook(sw, t => t.replace(/^version = 2$/m, 'version = 3').replace(/^xp = "off"$/m, `xp = "${today}"`));
   const dryOut = (await one(db, seedSql(seedFrom(sw, ['--dry-run'])))).r;
   const list = (dryOut && dryOut.levels) || [];
@@ -375,15 +356,32 @@ async function main() {
        onDisk ? 'they differ' : 'the file is missing');
   }
 
+  if (STAGE70) {
+    section('3c. stage70 on top (phase 3, the catalogue switch off): the project as it will stand when phase 3 ships');
+    const st70 = await ensureStages(db, 70, m => console.log('         ' + m));
+    ok(st70.applied.includes(70), 'stage70 applied twice on the project with the XP switch on', 'the database already held it');
+    ok(((await eraseDef(db)).match(/'career_awards'/g) || []).length === 1, 'coach_erase_person() learns career_awards exactly once');
+    cmp = (await one(db, `select public.career_compare() as r`)).r;
+    ok(cmp.ok && cmp.xp_switch === today, `with stage70 loaded and the catalogue switch off, the shadow check still holds: ${cmp.matched} of ${cmp.athletes}`,
+       cmp.rows.filter(r => !r.ok).map(r => JSON.stringify(r)).join('\n'));
+    const awards = Number((await one(db, `select count(*) as n from public.career_awards`)).n);
+    const prof70 = [];
+    for (const r of real.levels) {
+      const p = (await one(db, `select public.get_profile($1) as p`, [r.athlete_id])).p;
+      if (p.ready && (p.career.level !== r.level || p.switch.xp !== today || p.switch.catalogue !== null)) prof70.push(`${r.athlete_id}: level ${p.career.level} (list ${r.level}), switch ${JSON.stringify(p.switch)}`);
+    }
+    ok(awards === 0 && prof70.length === 0, `nothing an athlete sees moves: no award is minted (${awards}), every level is the switch list's (${real.levels.length}), the catalogue switch reads off`, prof70.join('\n'));
+  }
+
   section('4. again, and what the seed refuses');
   const again = (await one(db, seedSql(seedFrom(sw)))).r;
   ok(again && !again.turned_on && again.backfill.skipped && Number((await one(db, `select count(*) as n from public.career_facts where kind = 'level_kept'`)).n) === real.levels.filter(r => r.kept_xp).length,
      'the switch seed again: nothing turned on, no backfill, no new level kept');
   let refusedOff = '', refusedFuture = '', refusedCat = '';
-  const offAgain = filesAt(null);
+  const offAgain = filesAt(PHASE2);
   withRulebook(offAgain, t => t.replace(/^version = 2$/m, 'version = 4'));
   try { await one(db, seedSql(seedFrom(offAgain))); } catch (e) { refusedOff = e.message; }
-  const future = filesAt(null);
+  const future = filesAt(PHASE2);
   withRulebook(future, t => t.replace(/^version = 2$/m, 'version = 4').replace(/^xp = "off"$/m, `xp = "${addDays(today, 3)}"`));
   try { await one(db, seedSql(seedFrom(future))); } catch (e) { refusedFuture = e.message; }
   try {
@@ -440,6 +438,14 @@ async function main() {
   console.log(`         here (PGlite, slower than the live project): ${big}'s profile ${cold} ms cold, ${warm} ms warm; the board ${bcold} ms cold, ${bwarm} ms warm`);
   ok(warm < cold && bwarm < bcold, 'the cache pays: a warm read is quicker than a cold one, for the profile and the board');
 
+  if (STAGE70) {
+    await runSql(db, rb70, 'rollback70');
+    await runSql(db, rb70, 'rollback70 again');
+    const gone70 = await one(db, `select to_regclass('public.career_awards')::text as a, to_regclass('public.career_recognition')::text as r`);
+    ok(!gone70.a && !gone70.r, 'the way back of stage70 (run twice) takes career_awards and career_recognition away; stage69 is next');
+    cmp = (await one(db, `select public.career_compare() as r`)).r;
+    ok(cmp.ok, `and the compare holds with phase 2 as it was: ${cmp.matched} of ${cmp.athletes}`, cmp.rows.filter(r => !r.ok).map(r => JSON.stringify(r)).join('\n'));
+  }
   await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage69.sql')), 'rollback69');
   await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage69.sql')), 'rollback69 again');
   const after = await defs(Object.keys(before));
@@ -447,7 +453,7 @@ async function main() {
   const left = (await q(db, `select p.proname as n from pg_proc p join pg_namespace s on s.oid = p.pronamespace where s.nspname = 'public'
                              and p.proname in ('career_switch_day', 'career_xp_on', 'career_paid_rules', 'career_facts_paid', 'career_level_floor', 'career_stamp',
                                                'career_compute', 'career_scored', 'career_scores_for', 'career_keep_levels', 'hab_proof_level')`)).map(r => r.n);
-  const erase2 = (await one(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure) as d`)).d;
+  const erase2 = await eraseDef(db);
   ok(differ.length === 0 && left.length === 0 && erase2 === erase0 && !(await one(db, `select to_regclass('public.career_scores') as t`)).t,
      'the way back (run twice) leaves every function as it was before stage69, nothing it added, and coach_erase_person() byte-identical',
      JSON.stringify({ differ, left, erase: erase2 === erase0 }));

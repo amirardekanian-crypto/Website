@@ -56,6 +56,11 @@ Durable context for working in this repo. Read the linked docs before diving in.
   `scripts/career/xp_cases.json`, the server's answers, which `node scripts/career/rehearse_switch.mjs --backup <file>` writes
   (`--write-cases`) and checks (42 checks on the real rows); `scripts/headless/career.js` drives both apps. The way back is
   `scripts/career/rollback_stage69.sql`, on Amir's word only.
+  **Phase 3, rewards with meanings and the catalogue switch, is built and rehearsed (2026-10-18), not applied, switch off**
+  (`supabase/stage70_career_rewards.sql`; `PROCEDURES.md` → *Phase 3, as built*; Amir's go-day answers D1, D10, D11 are open). Pointers only:
+  `career_awards` and `career_recognition` go into `BACKUP_TABLES`, the snapshot and `coach_erase_person()` with the stage's apply (rollout step 2);
+  **no trigger runs `career_evaluate()` on a DELETE**; the evaluate budget is asserted by `rehearse_catalogue.mjs`; a badge's tiers are append-only
+  (`career/tiers.lock.json`); the phones' reward copies are held to `scripts/career/reward_cases.json` by `check_twins.js` §10.
 - `FARSI-PRODUCTS.md` — the paid course app (`/tennis/app/`), the testing app's page and the Farsi
   product pages: how they are built, deployed and introduced.
 - `PROGRAM-APP.md` — the athlete app's programme features in full (rx, week notes, the Spine, the Quality

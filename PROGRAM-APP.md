@@ -1172,7 +1172,10 @@ Highlight Reel), and added *"the achievements, badges and other things need to h
   3. **Cycle complete / Roadmap complete**: a one-time full-screen moment (`maybeHighlightMoment()`, `openMoment()`, the Welcome's recipe)
      at the first open in the 14 days after the end date: the cycle's cover with a burst of court lines, the card itself, his words and
      signature, **Share your cycle** and **Not now**. `<id>_hl_seen` (synced) marks it, so it shows once across phones. Never over the
-     Welcome, never in the demo or the preview. Back closes it (`topLayer()`).
+     Welcome, never in the demo or the preview. Back closes it (`topLayer()`). **Its Share button hands the moment's one guard history
+     entry to the share sheet** (`dropMoment(true)` then `openShareSheet()` then `navSync()`): popping the entry with `history.back()` and pushing the
+     sheet's own in the same tick let the late pop remove the sheet's entry, and closing the sheet (✕ or Back) then left the app (found 2026-10-18;
+     a reward's moment goes through the same `openMoment()`). Any new "close this layer, open that one" hand-off does the same, never `closeX(); openY()`.
   4. **Personal Records**: **Share** on a lift's New best band, on a **Retest beaten** band (a test logged there in the last 7 days that beat
      the one before), and on every row that set a record (it beat every entry before it). A lift's first record beats nothing: no card.
   5. **The share sheet** (`openShareSheet(specs, i)`, a page of the one sheet, wrapped by `sheetWrap()`): a picker when there is more than
@@ -1284,6 +1287,81 @@ level is the career's (every session, every habit, never reset by a season) and 
   finish card's line (plain, a repeat, a held week after a broken one), the finished card (*counting*, then the server's number), the
   keys never synced, the tap into the Locker and 320 px. The stub answers `get_profile` from `__STUB.profile` and `career_rules` from
   its `tables`.
+
+## 🏅 Rewards on the finish card, the bands and the row (Career Mode phase 3, 2026-10-18)
+
+The training app's half of Career Mode's catalogue switch (`career/CAREER_MODE.md`, GAME-13 and GAME-14; the server's half and AA Proof's
+are in `HABITS.md`). **Built behind `catalogueOnT()` and dormant:** with the catalogue switch off the app is exactly phase 2's (the finish
+card, the row and the finished card are byte for byte what they were; `scripts/headless/career.js` still passes). **No new screen**
+(decision D13): Proof is the career's home (the shelf, the Grand Slam, the titles), this app adds four small things to places that exist.
+
+- **The gate:** `catalogueOnT()` = `careerOnT()` and `p.switch.catalogue` and `p.ladder` and `p.owned`. It reads the profile of the
+  server's `get_profile()` (spec §6): `ladder` (every live badge with `have`, `now` for a run, `next`, `next_tier`, `metal_next`,
+  `size_next`, `phone`: `'session'` = this app moves it at Done, `'week'` = it moves when a week or cycle closes), `near`, `owned` (a
+  **list** of award ids, sorted, no days: the dedupe key; read through `ownedIds(p)`, never `Object.keys(p.owned)` or `owned[id]`),
+  `numbers.four` and `moments`. **The profile is split (stage70):** `get_profile()` is the core and carries no `recent`, `titles` or filled
+  `badges` / `achievements` (those are `get_awards()`'s, the shelf, which only AA Proof reads when its shelf opens). Nothing is asked of the
+  server that phase 2 did not ask: one `get_profile()` plus `mark_moments_told()`; this app never calls `get_awards()`. The one cost: a
+  reward AA Proof has already told is no longer in `moments` and, with no `recent`, draws no band here (`collectRewardBands()` still reads
+  `p.recent` if a profile ever carries it). A session's own reward is untold when the answer after Done arrives, so it is in `moments`.
+- **The finish card, before Done** (`careerMoves()`, `careerMovesHTML()`; `.cf-moves` under the XP lines in the same `.confirm-earn` box):
+  every ladder the session moves, **three lines at most**, then one grey *+N more in AA Proof*. A line is `Paper Trail 10 of 10 · bronze`
+  (a tier crossed: bold ink, the metal in lower case), `Century 24 of 25`, or `Hold Serve 5 of 8 · when the week counts` (a week ladder:
+  Hold Serve and The Long Count when the session closes the week, Love Hold when the week is by the book so far, Closer when it closes
+  the cycle; always pending, because the server decides a week). Order: crossed first, then the nearest (`next − have`), then the sure
+  before the pending. `careerMoves(e, ladder)` is PURE and a **twin** (`scripts/check_twins.js` §10, `scripts/career/reward_cases.json`):
+  `e = { early, fullLog, checkin, weekCloses, cycleCloses, byBook? }`; `byBook` is optional (without it the session alone is read);
+  each line is exactly `{ id, name, have, next, crossed, pending }`, and the metal word is read from the ladder when it is drawn.
+  A run badge (Hold Serve) counts from the ladder's `now`; if the ladder leaves it out, `careerLadderNow()` fills it from
+  `numbers.four` (one source). **Clay never shows here** (DS-01); no new card, `--fs-` tokens only.
+- **The finished card, after Done** (`rwCountingBands()`, `collectRewardBands()`, `paintWinBand()`; the Highlight Reel's slot
+  `#hlwin-<day>`, `<id>_hlwin_d<N>.rewards`): at Done `careerEarnAtDone()` also keeps `snap` (every award id the phone knew) and `moves`
+  in `<id>_earn_d<N>`. A tier the finish card showed as crossed (and is not full-screen) is a band at once with **Counting** in its mint
+  label and no Share. When an answer asked after the session reached the server arrives, `owned` minus `snap` is mapped to specs through
+  the answer's `moments` (and `recent`, if present): a Counting band whose award is owned becomes the real band (the label goes, Share is there), and
+  one the server did not give is taken away. A full-screen reward is never a band (it gets its moment); a `tick` is XP only; an older
+  reward this phone only just learned of is Proof's to tell. **Three bands at most across the Best/Retest specs and the rewards, the rest
+  one grey line.** The reward's name and, for a badge, its metal go in `<b>` as plain text, never `<em>` (that is clay on the green). Share
+  opens the sheet on the badge, achievement or title. **Only a reward drawn as a band is marked seen and told** (`mark_moments_told`, app
+  `'training'`): the room for rewards is `3 − the day's Best/Retest specs`, in the stored order, and one behind the *+N more in AA Proof* line
+  (or cut by the 8-reward cap) stays unseen and untold, so AA Proof's queue still announces it (GAME-14).
+  A reload paints the same bands from the key, quietly (the reward bands wait for the profile, so `paintCareer()` draws them).
+  **`paintWinBand()` with the catalogue off is phase 2's, exactly:** every paint that is not quiet re-draws the bands, runs their `is-new`
+  burst and buzzes (`navigator.vibrate`). With the catalogue on a band bursts, and the phone buzzes, only for a band key not on screen yet.
+- **Moments** (`maybeRewardMoment(reason)`, `rewardAfterAnswer()`, `openMoment()` with a new `onClose`): the queue of spec §7. **Only an
+  answer received in this run opens one** (`CAREER_T.at` newer than the page's `performance.timeOrigin`), never the phone's copy at
+  first paint. On every fresh answer the **cross-app catch-up** runs first: a waiting row this app has seen (`<id>_rw_seen`, which is
+  **synced**, merged as a union) is told on the server, so AA Proof never replays it. Then **one** full-screen moment per open of ANY kind
+  (`_rwOpened`: the cycle's own moment counts, `openMoment()` sets it): the first waiting `full` row, unless a moment already opened, a
+  session is under way (`body.session-on`), or `.wel`, `.hl-moment` or `.finish-rate:focus-within` is on screen. The first answer after a
+  session reached the server ('done') opens the biggest full-screen reward **that session earned** (not in `snap`), 0.7 s after the
+  answer so the finished card has scrolled in, never over the rating, even if one opened at boot. A row that does not open stays unseen
+  and untold: it comes at the next open. The seen list is written BEFORE the moment shows. A moment never blocks Done or the session
+  queue (`scripts/headless/session-queue.js` still passes, and Done works with `mark_moments_told` refused). Content: eyebrow = the
+  meaning (*Consistency*; *Grand Slam* for that title), title = *Hold Serve · Emerald*, sub = the server's caption, art = the current
+  cycle's cover, words = milestone *That one took weeks. It's yours for good.*, legend *This is rare. Well done.*, Grand Slam *A title
+  in all four. That's the whole game.*, go = `HL_TITLE[kind]`, specs = the award's share spec plus the title it minted. Not in the demo
+  or the coach's preview.
+- **Home's Career row** (`careerRowHTML()`): the level line is untouched. Two more small lines under it, each on its own line:
+  `.career-four` from `numbers.four` only (*7 weeks held · 41 sessions · 12 bests · 2 comebacks*, a zero cell left out, nothing when
+  all four are zero, singular at 1; **Sessions with Amir shows +1 from this phone** for a session finished here that no answer has
+  counted yet, never lower than the profile's) and `.career-next` (`near[0]` as *Paper Trail 9 of 10* when it is within two or at 80%).
+  The tap opens AA Proof's **Progress** (`&go=progress`) instead of the Locker; the `aria-label` names the numbers. Checked at 320 and
+  390 px, light and dark: the four wrap to two rows at most, the goal is one row, the rank line is never cut.
+- **The guide:** `APP_GUIDE` *Getting around*, *Finishing a session*, `key: 'career'` and `key: 'share'` each gained a sentence phrased
+  *Once Career Mode's rewards are on, …* until the go-day commit rewrites it to the plain present (Amir reads every new string first, D10). The guide says what the app does, no more: the goal line shows only *when you're close to a badge* (as `.career-next` does), the row opens **Progress** in AA Proof, a Counting band has no Share until my side has it, and a band can be a badge, a moment or a title.
+  `scripts/headless/guide-truth.js` passes.
+- **Keys:** `<id>_rw_seen` is new and **synced** (`_snapshot()` does not skip it; `mergeStoredValue()` unions it); `<id>_earn_d<N>` gains
+  `snap`, `moves` and `rm` (a moment was decided for this finish); `<id>_hlwin_d<N>` gains `rewards`. `program.html` still writes no
+  `<id>_hab_*` key.
+- **Boot-order lesson:** Home's first paint reaches `careerRowHTML()` before the script has evaluated its later `const` tables, so every
+  lookup the first paint can reach is a function (`careerFourWord()`, `rwMetalWord()`, `hlBandWord()`), and the new top-level state is
+  `var` with no initializer (`_momentQ`, `_rwOpened`).
+- Checked by `scripts/headless/career.js` and the other suites (the training half, with a stub profile that follows spec §6): the off
+  state is phase 2's, the row's lines (zero cells, far goal, aria-label, tap), the finish card's three lines and *+N more*, Counting
+  bands then confirmed or withdrawn, the cap, Share on a reward band, a reload, a moment per fresh answer only (none from the copy), one per
+  open, the catch-up, the Grand Slam's line, demo and preview silent, the Welcome blocking, the moment after Done, and a refused
+  `mark_moments_told` not touching Done.
 
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 
@@ -1684,9 +1762,29 @@ and runs it; program.html owns the door and the layer.
 - **The rest is the boss.** The court shows the rest clock the whole time (`left()` = `timerLeft()`), clay and pulsing in the last
   10 s, a tick and a buzz at 3, 2, 1. `timerDone()` calls `Rally.timeUp()` (the court freezes, *Time. Next set.*) and `closeTimer()`
   closes the game with the timer. ✕ and Back (`#rallyOverlay` is in `topLayer()` above the timer and in `initBackNav()`'s observer)
-  return to the timer, still running. It never runs past a rest.
-- **Short and fair:** first to 5. Amir's racket chases a ball in his half and guards his gap otherwise; its top speed rises while the
-  athlete leads and drops while they trail (`amirMove()`).
+  return to the timer, still running. It never runs past a rest, and Serve Clock hands the screen back 25 s early (below).
+- **Short and fair, and Amir plays like a person (The Read, 2026-10-18; idea #38 of the Rest in Play round, *"go with your picks"*).**
+  First to 5. The first Amir chased the ball's current spot at a speed that rose to 1.45x while the athlete led and fell to 0.65x while
+  they trailed, which players saw and resented, and a bot that only followed the ball beat him 58 points to 0. Now (`amirMove()`):
+  his top speed is **one fixed number** (`AMIR.speed`, nothing reads the score); he **sees the ball `react` seconds late** (a short
+  ring buffer of the ball's last 0.6 s, `S.hist`, with a part of that delay made up by knowing which way it was going, `AMIR.lead`), so a
+  hit or a bounce off the glass is news to him a moment late; a ball **coming at his end**: he works out where it will cross his line
+  (off the side glass too), **misjudges it a little** (`AMIR.read`, drawn once per shot) and walks there; a ball in his half that is
+  slow or leaving: he **strikes it toward the biggest hole beside your racket** in your gap, as he last saw it (`holeX()`), from an
+  aim point that **lands a little off** (`AMIR.aim`, drawn once per strike, never every frame); and **now and then a point starts with a
+  mistimed read** (`AMIR.late`, `lateBy` s more). While your half has the ball he waits at `AMIR.home`, and steps up to `AMIR.guard` to meet a shot.
+  **His form** (`S.form`, 0 to 1, `AMIR.start` 0.5 at the start of a match) sets the reaction (0.24 s at 0 to 0.12 s at 1), the aim and
+  read errors and the chance of a mistimed read, and **moves one step (`AMIR.step`) only in `point()`**: sharper after you score, softer
+  after he does. Nothing changes mid-rally and **nothing about form is shown**. Held at 0 an average player wins about 64% of the
+  points, held at 1 about 51%.
+- **Your racket has a top speed too** (`YOU_SPEED`, 6 court widths a second): a normal drag still feels instant, but a tap on the far
+  side is a sprint, not a jump across the court in one frame.
+- **The numbers are set against bots with a person's limits** (`scripts/test_rally_sim.js`, pre-commit guard 22; `CODEBASE.md` → *Off the
+  Glass's opponent*): a sharp bot (sees the ball 0.10 s late, thumb 4 court widths a second) wins about 70% of the points, an average one
+  (0.20 s, 2.5) about 57%, which is about two matches in three at first to 5, a tired one (0.30 s, 1.5) about 51%, and a bot with no delay and
+  no speed limit (that still misreads three points in ten, as he does) about 86%. A change to the `AMIR` block runs it; it prints the table, with
+  the *ace* (a sharp bot that never misreads and shoots at the edges) as an extra row it does not assert on: it wins about 98%, the ceiling of his
+  rubber band. Known: his look-ahead keeps the old `vx` when it folds off the side glass (comment in `rally.js`; fixing it needs a retune).
 - **A ball that goes nowhere for 3 s is served to the other half**, whether it died or is trapped and shaking between the rackets at
   the net or against the glass (2026-10-18: a bot found a trapped ball that buzzed every frame and ran the rally into the thousands).
   A jammed ball counts no hit and makes no sound; otherwise a hit counts 0.12 s after the last and rings 0.09 s apart per racket.
@@ -1694,7 +1792,59 @@ and runs it; program.html owns the door and the layer.
   buzzes; the sounds follow the timer's speaker (`rest_sound`); reduced motion drops the shake.
 - **Its numbers stay on the phone:** `rally_stats` (`best` rally, `wins`, `played`), no athlete prefix, never synced, never scored,
   never seen by the coach. No yellow: the ball is white, the court the brand green, Amir's racket clay.
-- The guide's *Built-in tools* card names the door (CNT-01). Test: `node scripts/headless/rally.js` (26 checks).
+- The guide's *Built-in tools* card names the door (CNT-01). Tests: `node scripts/headless/rally.js` (26 checks; in *Amir alone* your racket is
+  parked in the corner, since 2026-10-18: nobody defends, and he finishes the point) and `node scripts/test_rally_sim.js` (no browser, about 4 s).
+
+### Serve Clock: the rest hands back to the set (2026-10-18)
+
+Idea #39 of the round-4 page (https://claude.ai/artifact/1qn7D8shTUmKrYDHo9UT9W), built on Amir's *"Go with your picks on all nine decisions, and
+build The Read and Serve Clock first"*. The last 20 to 30 s of a rest are when getting ready for the next set helps (Hammoudi-Nassib 2014; Tod 2005;
+Cusimano 2026), and every rest game used to play to 0:00. Live data: median written rest 60 s, 83% of rests 90 s or less. So with 25 s left the rest
+takes the screen back from the games and says what is next.
+
+- **The numbers are one block** beside the timer in program.html: `SERVE_CLOCK = { at: 25, atLong: 30, longFrom: 100, noDoorUnder: 45, doorGone: 10 }`.
+  Coaching judgment, not measurements. The hand-back point is `at`, or `atLong` when the WRITTEN rest is `longFrom` s or more. The written rest is
+  `timerWritten`, set in `showTimer()`; +15s raises `timerDuration`, never it.
+- **The hand-back, once per rest** (`serveHandBack()`, a latch `serveHandedBack`). `timerTick()` calls it when the running rest reaches the point
+  (so does the catch-up tick when the page comes back to the front). It folds the shelf, takes the door away, drops a game still loading for a tap
+  (`_restGameWant`), asks every open game (a game with `handBack(done)` is closed when it calls `done()`, any other is closed at once) and paints the
+  get-set line. A rest written at or under the point is handed back from the start: the line shows at once and the door is never offered. The
+  latch clears in `showTimer()` and in `resetTimer()` (Reset restarts the rest, so the door comes back and the point comes round again);
+  **+15s never un-latches it**, and `openRestGame()` refuses once it is set. `timerDone()` and the GO! close are untouched: the `timeUp()` loop
+  over the open games is still the safety net (a rest that ends in the middle of a hand-back closes everything).
+- **The door** (`restDoorOn()` / `syncRestDoor()`, every tick) is hidden when the written rest is under 45 s, when the rest belongs to a circuit
+  round (`data-circuit="1"` on a circuit's Rest button; Guided's `item.circuit`), when it belongs to a flagged retest lift in its window
+  (`data-test="1"`, stamped by `restTestAttr(ex)` in `renderExercise()` from `exTestSpec()` and read with `inRetestWindow()` at the tap; a test set is
+  the one hard set of the week), once the rest is handed back, and once `timerLeft() <= hb + doorGone` (nobody opens a game with 35 s left).
+  Until the hand-back it follows the clock, so +15s can bring it back. **Unknown fails open**: the rest's context is `timerCtx = { card, circuit,
+  test }`, passed from `openTimer(e)` through `openRest(secs, name, ctx)` and `showTimer()`, and from `stepAfterDone()` for Guided; a rest opened with no
+  card (a script calling `openRest(120, name)`) shows the door as it always did.
+- **The get-set line** (`paintGetSet()`). The list has no paper, so the band shows a small block where the door was (`#timerGetSet`): the eyebrow
+  *Get set*, *Next: <exercise> · set N of M* (`restNextOfCard()`: the Rest button's own card and its first unticked set from `loadSetLog()`, else the
+  next unticked exercise in the day and its first unticked set; a circuit is named with no count because the list does not track its rounds; when
+  nothing follows there is no block) and the cue. **It keeps the day's own rules** (review fixes, 2026-10-18): a card the check-in struck out
+  (`rd-skip`) is passed over, a halved exercise (`data-rd-sets`) counts only the sets asked today (*set 2 of 2*), a Library session (a card outside
+  `#day-view`) names nothing because it keeps no set log, and since Rest means a set is over, a card with none ticked yet is named alone, with no
+  count (an athlete who ticks late or all at the end would otherwise read "set 1"), and a one-set card in that state is taken as done. Guided keeps its Next line (`paintTimerNext()`, `STEP.seq[STEP.pos + 1]`) and gets the cue under it
+  (`#timerCue`, on the paper). The cue sits behind the 3 px clay bar that means look here (the Coach's words), 15 px (`--fs-body`), white on the band,
+  ink on the paper. On a 568 px phone the list's ring shrinks to 140 px so the block fits (`.has-getset`); Guided's cue can sit below the first
+  screen there and the overlay scrolls (it never squashes, and nothing scrolls by itself: the clock must stay in view).
+- **`cueForRest(name, exId, setNo)`** is the one function that picks the line (The Corner, idea #20, will share it): the Spine entry through
+  `spineFor()` (approved entries only: the phone is served nothing else, and a card that names an entry that is not there gets none), rotated by the
+  next set's number through `[cues.good[0], cues.good[1], cues.bad[0]]`, missing ones skipped, so eighteen rests do not repeat one line. `''` when
+  the entry has none (the Next line shows alone). A circuit gets no cue.
+- **`Rally.handBack(done)`** (assets/js/rally.js): no game, `done()` at once; otherwise the held mint banner *Last point.*, Play again hidden, and
+  a point in play is let finish (`lastPointIn()`: nothing is served after it, the point's own banner shows 0.8 s, then `done()`); with no point in
+  play (the serve pause, a ball that died, a finished match) `done()` after 0.6 s; never later than 6 s. After it the court is `over` (no serve, no
+  auto-serve, no Play again) and the best rally is kept as `timeUp()` keeps it. It does not touch `amirMove()`, `youMove()` or `step()`.
+- **Every game gets `handBackAt: serveHb`** in `open()`, and every game has its own `handBack(done)`. Split Step uses `handBackAt` to start no round it
+  would cut and stops at once; Off the Glass finishes its point (above); Between Sets finishes a point in play for up to 6 s, parks on *Time to lift* and
+  calls `done()` about a second later (a76016d). Off the Glass and Between Sets ignore the option.
+- The guide's *Built-in tools* card says it in one sentence (CNT-01). No new data is stored.
+- Test: `node scripts/headless/serve-clock.js` (92 checks: the hand-back by the clock at 60, 100 and 150 s, the door rules, the line and the cue in
+  the list and in Guided, a struck-out card, a halved exercise, a one-set card and a Library session, focus after a game closes itself, the latch, +15s, Reset, the catch-up, `Rally.handBack` on a live, dead, endless and winning ball, 320 x 568 and 375 x 667
+  light and dark). The other games' suites switch the hand-back off (`SERVE_CLOCK.at = 0; SERVE_CLOCK.atLong = 0`) in the one check that is the rest
+  running out on an open game (`rally.js`, `splitstep.js`, `between-sets.js`).
 
 ## 🎾 Split Step: a reaction game for the rest (2026-10-18)
 
@@ -2226,6 +2376,9 @@ Seven small changes, all found while mapping the app as a first-time client and 
 - **The grey Begin button counts the answers** ("0 of 5 answered", then "Begin session ▶") so a first-timer sees why it is grey.
 - **After the last card closes the page scrolls to the finish card** (`nudgeFinishCard()`: a standard card's fold, a circuit's last round, a
   warm-up/simple tick), as a fold already scrolled to the next card. Never in Guided, which has its own way there.
+  Both it and Guided's last button go through `scrollFinishCard()`: plain centring, except when the card carries Career Mode's "what the session moves" lines
+  (`.cf-moves`, catalogue switch on). Those make it taller than a short phone, so it slides to put its top on screen if Done stays on screen, and Done wins when both cannot
+  (first-timer.js §7; at 320 × 640 the card is ~810 px, so only Done fits). Catalogue off, it is the plain centring it always was.
 
 The in-app guide's "Getting around" now lists the tabs in the bar's order (Home · Coach · Library · Game Plan) and "How your program is
 structured" puts the "Why This Cycle Matters" note on Game Plan, where it is.

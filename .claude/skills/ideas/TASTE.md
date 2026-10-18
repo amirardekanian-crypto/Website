@@ -5,6 +5,8 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-18 · Round 4 'Rest in Play': all nine picks.** *"Go with your picks on all nine decisions, and build The Read and Serve Clock first."* What it teaches (inferred, he wrote only the quote): a measured defect (a bot won 58 of 58 points) and one research-backed rule (the last 25 s of a rest belong to the set) beat any new feature; he took the fix-first order, a match that waits between rests, a coach-only rest receipt with a privacy line, and a calm door. Ideas that need something only he has (his voice, his name on athletes' Stories) stay his call.
+
 - **2026-10-17 · "go with your picks", then: the system goes into files he can read and change.** *"remeber to write
   down the functions and procedures into files i can then change, adjust or anything. i need to have this gamification
   system somewhere i can read and think about"*. So a picked system lands in the repo as plain docs (what it is and why;

@@ -76,6 +76,16 @@ const NORMAL = [
     caption: 'Three missions, three done.', captionFa: 'سه مأموریت، هر سه انجام شد.', date: D } },
   { id: 'title', card: { kind: 'title', first: FIRST, name: 'CLOCKWORK', meaning: 'consistency', metal: 'prismatic',
     from: 'Hold Serve, prismatic: 52 weeks held in a row', fromFa: 'هفته‌های کامل، منشوری: ۵۲ هفتهٔ پشت‌سرهم', date: D } },
+  // Career Mode phase 3 (the catalogue switch): the spec the server hands over for a reward (scripts/career/rehearse_catalogue.mjs; get_profile()'s moments[].spec and
+  // get_awards()'s recent[].spec), with no nameFa, captionFa or fromFa yet (Amir writes them): a Farsi card must fall back to the English words and still fit, in Persian digits.
+  { id: 'badge-server', card: { kind: 'badge', first: FIRST, name: 'Hold Serve', meaning: 'consistency', metal: 'emerald', tier: 3, n: 12, caption: '12 weeks held in a row. You keep showing up.', date: D } },
+  { id: 'badge-server-habit', card: { kind: 'badge', first: FIRST, name: 'HUMAN SPRINKLER', meaning: 'consistency', metal: 'bronze', tier: 1, n: 5, caption: '5 days in a row on full water.', date: D } },
+  { id: 'badge-server-upgrade', card: { kind: 'badge', first: FIRST, name: 'The Upgrade', meaning: 'progress', metal: 'silver', tier: 2, n: 22, caption: 'Your most improved lift is 22% stronger than its first session, at the same effort.', date: D } },
+  { id: 'badge-server-resilience', card: { kind: 'badge', first: FIRST, name: 'HARD TO KILL', meaning: 'resilience', metal: 'amethyst', tier: 4, n: 10, caption: '10 comebacks that stuck.', date: D } },
+  { id: 'achievement-server', card: { kind: 'achievement', first: FIRST, name: 'THE FOUNDRY', meaning: 'commitment', caption: 'Four weeks of putting the work in.', date: D } },
+  { id: 'achievement-server-best', card: { kind: 'achievement', first: FIRST, name: 'First Best', meaning: 'progress', caption: 'Your first personal best. Not the last.', date: D } },
+  { id: 'title-server', card: { kind: 'title', first: FIRST, name: 'BEDROCK', meaning: 'consistency', metal: 'prismatic', from: 'BEDROCK: four weeks of the boring half', date: D } },
+  { id: 'title-grand-slam', card: { kind: 'title', first: FIRST, name: 'GRAND SLAM', meaning: 'all', metal: 'prismatic', from: 'A title in all four', date: D } },
   { id: 'level', card: { kind: 'level', first: FIRST, level: 14, rank: 'GRINDER', sub: 4, metal: 'silver', prestige: 0, date: D } },
   { id: 'quest', card: { kind: 'quest', first: FIRST, name: 'Sleep Reset', nameFa: 'ریست خواب', meaning: 'consistency', weeks: 4,
     steps: ['Your sleep target on 5 nights in a week', '10 of 14 nights', '20 of 28 nights'],
