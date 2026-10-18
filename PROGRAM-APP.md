@@ -1653,8 +1653,26 @@ and runs it; program.html owns the door and the layer.
   10 s, a tick and a buzz at 3, 2, 1. `timerDone()` calls `Rally.timeUp()` (the court freezes, *Time. Next set.*) and `closeTimer()`
   closes the game with the timer. ✕ and Back (`#rallyOverlay` is in `topLayer()` above the timer and in `initBackNav()`'s observer)
   return to the timer, still running. It never runs past a rest.
-- **Short and fair:** first to 5. Amir's racket chases a ball in his half and guards his gap otherwise; its top speed rises while the
-  athlete leads and drops while they trail (`amirMove()`).
+- **Short and fair, and Amir plays like a person (The Read, 2026-10-18; idea #38 of the Rest in Play round, *"go with your picks"*).**
+  First to 5. The first Amir chased the ball's current spot at a speed that rose to 1.45x while the athlete led and fell to 0.65x while
+  they trailed, which players saw and resented, and a bot that only followed the ball beat him 58 points to 0. Now (`amirMove()`):
+  his top speed is **one fixed number** (`AMIR.speed`, nothing reads the score); he **sees the ball `react` seconds late** (a short
+  ring buffer of the ball's last 0.6 s, `S.hist`, with a part of that delay made up by knowing which way it was going, `AMIR.lead`), so a
+  hit or a bounce off the glass is news to him a moment late; a ball **coming at his end**: he works out where it will cross his line
+  (off the side glass too), **misjudges it a little** (`AMIR.read`, drawn once per shot) and walks there; a ball in his half that is
+  slow or leaving: he **strikes it toward the biggest hole beside your racket** in your gap, as he last saw it (`holeX()`), from an
+  aim point that **lands a little off** (`AMIR.aim`, drawn once per strike, never every frame); and **now and then a point starts with a
+  mistimed read** (`AMIR.late`, `lateBy` s more). While your half has the ball he waits at `AMIR.home`, and steps up to `AMIR.guard` to meet a shot.
+  **His form** (`S.form`, 0 to 1, `AMIR.start` 0.5 at the start of a match) sets the reaction (0.24 s at 0 to 0.12 s at 1), the aim and
+  read errors and the chance of a mistimed read, and **moves one step (`AMIR.step`) only in `point()`**: sharper after you score, softer
+  after he does. Nothing changes mid-rally and **nothing about form is shown**. Held at 0 an average player wins about 64% of the
+  points, held at 1 about 51%.
+- **Your racket has a top speed too** (`YOU_SPEED`, 6 court widths a second): a normal drag still feels instant, but a tap on the far
+  side is a sprint, not a jump across the court in one frame.
+- **The numbers are set against bots with a person's limits** (`scripts/test_rally_sim.js`, pre-commit guard 22; `CODEBASE.md` → *Off the
+  Glass's opponent*): a sharp bot (sees the ball 0.10 s late, thumb 4 court widths a second) wins about 70% of the points, an average one
+  (0.20 s, 2.5) about 57%, which is about two matches in three at first to 5, a tired one (0.30 s, 1.5) about 51%, and a bot that never errs
+  (no delay, no speed limit) about 86%. A change to the `AMIR` block runs it; it prints the table.
 - **A ball that goes nowhere for 3 s is served to the other half**, whether it died or is trapped and shaking between the rackets at
   the net or against the glass (2026-10-18: a bot found a trapped ball that buzzed every frame and ran the rally into the thousands).
   A jammed ball counts no hit and makes no sound; otherwise a hit counts 0.12 s after the last and rings 0.09 s apart per racket.
@@ -1662,7 +1680,8 @@ and runs it; program.html owns the door and the layer.
   buzzes; the sounds follow the timer's speaker (`rest_sound`); reduced motion drops the shake.
 - **Its numbers stay on the phone:** `rally_stats` (`best` rally, `wins`, `played`), no athlete prefix, never synced, never scored,
   never seen by the coach. No yellow: the ball is white, the court the brand green, Amir's racket clay.
-- The guide's *Built-in tools* card names the door (CNT-01). Test: `node scripts/headless/rally.js` (26 checks).
+- The guide's *Built-in tools* card names the door (CNT-01). Tests: `node scripts/headless/rally.js` (26 checks; in *Amir alone* your racket is
+  parked in the corner, since 2026-10-18: nobody defends, and he finishes the point) and `node scripts/test_rally_sim.js` (no browser, about 4 s).
 
 ## 🎾 Split Step: a reaction game for the rest (2026-10-18)
 

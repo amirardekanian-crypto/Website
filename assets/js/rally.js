@@ -5,7 +5,9 @@
 // What makes it a rest game, not just a game (PROGRAM-APP.md → *Off the Glass*):
 //   · The rest clock is always on screen, turns clay in the last 10 s, and the game stops the moment the rest ends
 //     (program.html calls Rally.timeUp() from timerDone(), then closeTimer() closes both). It never runs past a rest.
-//   · First to 5, so a match fits a 2-minute rest; Amir's racket gets quicker while you lead and slower while you trail.
+//   · First to 5, so a match fits a 2-minute rest. Amir defends like a person (The Read, 2026-10-18): he sees the ball a moment late,
+//     walks to where it will cross his end, aims with a small error and now and then mistimes one. His form moves a step after each
+//     point (sharper when you score, softer when he does); nothing changes mid-rally and nothing about it shows on screen.
 //   · One thumb: drag anywhere in your half; on a touch screen the racket sits above the finger so the thumb never hides it.
 //   · Nothing leaves the phone and nothing syncs: the best rally and the wins live in `rally_stats` on this phone only.
 //   · Sound follows the rest timer's speaker (`rest_sound`); a hit buzzes where the phone can; reduced motion drops the shake.
@@ -23,6 +25,27 @@
     you: '#FFFFFF', youHole: '#16603F', amir: '#C7552F', amirHole: '#8E3A1E', ball: '#FFFFFF', clay: '#E06B43', mint: '#7FD6AE',
   };
   const STORE = 'rally_stats';
+
+  // Amir's numbers (The Read, 2026-10-18). They were set against bots with a person's limits in scripts/test_rally_sim.js, which
+  // pre-commit guard 22 runs whenever this file changes: move one, run it. The aim is an average player at about 57% of the points
+  // (about two matches in three at first to 5), a sharp one near 70%, a tired one near 51%, and a bot that never errs still under 90%.
+  // A pair is [form 0, form 1]. `node scripts/test_rally_sim.js --set speed=1.2 --set react=0.2,0.1` tries a number without editing this.
+  const AMIR = {
+    speed: 0.95,           // top speed, in court widths a second. Fixed: nothing about him reads the score any more.
+    start: 0.5,            // his form at the start of a match (0 to 1: how sharp he is)
+    step: 0.2,             // how far his form moves after a point: up when you score, down when he does
+    react: [0.24, 0.12],   // seconds late that he sees the ball
+    aim: [0.28, 0.05],     // furthest his aim point can land from where he meant it in your gap, in court widths
+    read: [0.30, 0.015],   // how far off he can misjudge where a shot will cross his end, in court widths (drawn once per shot)
+    late: [0.30, 0.02],    // the chance that a point starts with a mistimed read
+    lateBy: 0.2,           // seconds that mistimed read adds to his reaction
+    home: 0.4,             // where he waits while the ball is in your half, as a share of his half (0 = on his glass, 1 = at the net)
+    guard: 0.8,            // how far up his half he steps to meet a shot, the same way
+    lean: 0.25,            // waiting: how far he leans from the middle of his gap toward the ball
+    lead: 0.3,             // how much of his delay he makes up by knowing which way the ball was going (0 = none, 1 = all of it)
+  };
+  const YOU_SPEED = 6;     // your racket's top speed, in court widths a second: it still feels instant, but it cannot jump
+  function byForm(pair) { return pair[0] + (pair[1] - pair[0]) * S.form; }
 
   let S = null;   // the open game, or null
 
@@ -93,6 +116,7 @@
     if (S.ball && oldW && oldH) {                // a turned phone keeps every body where it was, in proportion
       [S.ball, S.you, S.amir].forEach(b => { b.x *= W / oldW; b.y = S.top + (b.y - S.top) * (H - S.top) / (oldH - S.top); });
       S.target.x *= W / oldW; S.target.y = S.top + (S.target.y - S.top) * (H - S.top) / (oldH - S.top);
+      S.hist = [];
     }
   }
   function L() { return S.pad; }
@@ -118,11 +142,14 @@
     b.vx = 0; b.vy = 0;
     S.trail = []; S.rally = 0; S.freeze = 0.7; S.lastHit = ''; S.lastHitT = -1;
     S.anchor = { x: b.x, y: b.y, t: S.gt };
+    S.hist = []; S.striking = false; S.reading = false;   // Amir's short memory of the ball starts again with the ball
+    S.late = Math.random() < byForm(AMIR.late) ? AMIR.lateBy : 0;   // this point's one mistimed read, if it has one
   }
 
   function newMatch() {
     S.score = { you: 0, amir: 0 };
     S.over = false; S.rally = 0; S.best = 0;
+    S.form = AMIR.start;
     newBodies();
     serve(true);
     msg(null);
@@ -226,45 +253,104 @@
     else { tone(220, 0.25, 0.2, 'sawtooth'); buzz(40); }
     S.banner = { text: top ? 'Point!' : 'Amir scores', t: 0, c: top ? C.mint : C.clay };
     if (S.score[who] >= WIN_AT) { S.ball.vx = S.ball.vy = 0; S.ball.y = -9999; endMatch(); return; }
+    // Amir's form changes here and nowhere else: a step sharper after your point, a step softer after his
+    S.form = Math.max(0, Math.min(1, S.form + (top ? AMIR.step : -AMIR.step)));
     serve(!top);   // the one who lost the point serves
   }
 
-  // ── Amir's racket ──
-  // Chases the ball while it is in his half, falls back to guard the gap when it is not. His top speed rises while you lead
-  // and drops while you trail, so a match stays close whoever is playing.
+  // ── Amir's racket: The Read (2026-10-18) ──
+  // The first version chased the ball's current spot at a speed that rose and fell with the score, and a bot that only followed
+  // the ball won 58 of 58 points. Now his speed is fixed and he plays like a person:
+  //   · he sees the ball as it was `react` seconds ago (S.hist), so a quick hit or a bounce off the glass is news to him a moment
+  //     late; in smooth flight he knows where it is going and makes up part of that delay (AMIR.lead);
+  //   · a ball heading for his end: he works out where it will cross his guard line, off the side glass too, misjudges it a little
+  //     (drawn once per shot) and walks there;
+  //   · a ball in his half that is slow or going away: he strikes it toward the biggest hole beside your racket in your gap (as he
+  //     last saw it), from an aim point that lands a little off (drawn once per strike, never every frame, so he looks calm and
+  //     not twitchy);
+  //   · while your half has the ball he waits at `home` and leans toward it; to meet a shot he steps up to `guard`;
+  //   · now and then a point starts with a mistimed read (S.late): a fifth of a second more on top of his reaction.
+  // His form (S.form) sets the reaction, the aim and read errors and the chance of a mistimed read, and moves only between points.
+  function snap() { const b = S.ball; return { t: S.gt, x: b.x, y: b.y, vx: b.vx, vy: b.vy, px: S.you.x }; }
+  function seenBall() {
+    const h = S.hist, t = S.gt - byForm(AMIR.react) - S.late;
+    let b = h.length ? h[0] : snap();
+    for (let i = h.length - 1; i >= 0; i--) if (h[i].t <= t) { b = h[i]; break; }
+    // A person follows a ball in smooth flight and is only late to a change: a hit, or a bounce off the glass. So the old
+    // sighting is carried on along its own line (folded off the side glass) for `lead` of the time since.
+    const ahead = Math.max(0, S.gt - b.t) * AMIR.lead;
+    if (!ahead || (!b.vx && !b.vy)) return b;   // nothing yet to look ahead from, or a ball at rest
+    const lo = L() + S.br, w = R() - S.br - lo;
+    let x = ((b.x + b.vx * ahead - lo) % (2 * w) + 2 * w) % (2 * w);
+    return { t: b.t, x: lo + (x <= w ? x : 2 * w - x), y: Math.max(T(), Math.min(B(), b.y + b.vy * ahead)), vx: b.vx, vy: b.vy, px: b.px };
+  }
+  // Where a ball heading up the court will cross the line y, bouncing off the side glass on the way.
+  function crossX(b, y) {
+    const lo = L() + S.br, w = R() - S.br - lo;
+    let x = b.x + (b.vx / -b.vy) * Math.max(0, b.y - y);
+    x = ((x - lo) % (2 * w) + 2 * w) % (2 * w);
+    return lo + (x <= w ? x : 2 * w - x);
+  }
+  function rollRead() {   // two dice, so a small miss is more likely than a big one
+    return (Math.random() + Math.random() - 1) * S.W * byForm(AMIR.read);
+  }
+  // Where in your gap he shoots: the middle of the biggest hole beside your racket, as he saw it (a racket parked in the middle
+  // leaves two slivers at the posts; a racket in a corner leaves the whole gap, so he shoots at its middle).
+  function holeX(px) {
+    const half = S.gw / 2 - S.br, reach = S.rr + S.br, rel = px - S.W / 2;
+    const lt = Math.min(half, rel - reach), rf = Math.max(-half, rel + reach);   // the left hole is -half to lt, the right one rf to half
+    const lw = lt + half, rw = half - rf;                         // their widths in pixels
+    if (lw <= 0 && rw <= 0) return 0;                             // your racket covers it all: the middle
+    const lm = (lt - half) / 2, rm = (rf + half) / 2;             // the middle of each hole
+    if (Math.abs(lw - rw) < 4) return S.coin < 0 ? lm : rm;       // as good a hole on either side: toss for it
+    return lw > rw ? lm : rm;
+  }
+  function rollAim() {
+    const a = Math.random() * Math.PI * 2, r = S.W * byForm(AMIR.aim) * Math.sqrt(Math.random());
+    return { x: Math.cos(a) * r, y: Math.sin(a) * r };
+  }
   function amirMove(dt) {
-    const m = S.amir, b = S.ball, lead = S.score.you - S.score.amir;
-    const lvl = Math.max(0.65, Math.min(1.45, 1 + lead * 0.12));
-    const vmax = S.W * 1.15 * lvl;
-    const lo = T() + S.rr, hi = mid() - S.rr;
-    let tx, ty;
-    if (b.y < mid() && !S.freeze) {
-      if (b.y < m.y - S.rr * 0.5) {             // the ball got behind him: go round it, never push it into his own gap
-        tx = b.x + (b.x < S.W / 2 ? 1 : -1) * S.rr * 2.2; ty = b.y - S.rr * 1.2;
-      } else {                                  // strike: aim just behind the ball, toward the player's gap
-        const ax = S.W / 2 - b.x, ay = B() - b.y, al = Math.hypot(ax, ay) || 1;
-        tx = b.x - (ax / al) * S.rr * 0.6; ty = b.y - (ay / al) * S.rr * 0.6;
-        if (speed(b) < S.vmax * 0.1) { tx += (ax / al) * S.rr * 1.6; ty += (ay / al) * S.rr * 1.6; }   // a still ball: go through it
+    const m = S.amir, W = S.W, rr = S.rr, pb = seenBall();
+    const lo = T() + rr, hi = mid() - rr, gy = T() + (mid() - T()) * AMIR.guard, hy = T() + (mid() - T()) * AMIR.home;
+    const toward = pb.vy < -S.vmax * 0.3, awayFast = pb.vy > S.vmax * 0.3;   // clearly coming at his end, clearly leaving it
+    let tx, ty, striking = false;
+    if (toward) {                               // stand where it will cross his guard line (a hit during the serve pause counts)
+      if (!S.reading) S.miss = rollRead();      // his misjudgement is fixed for the shot, not redrawn every frame
+      tx = crossX(pb, gy) + S.miss; ty = gy;
+    } else if (!S.freeze && pb.y < mid() && !awayFast) {   // the pause only holds him back from his own serve
+      striking = true;                          // in his half, slow or going away: hit it toward your gap
+      if (!S.striking) { S.aim = rollAim(); S.coin = Math.random() < 0.5 ? -1 : 1; }
+      if (pb.y < m.y - rr * 0.5) {              // the ball got behind him: go round it, never push it into his own gap
+        tx = pb.x + (pb.x < W / 2 ? 1 : -1) * rr * 2.2; ty = pb.y - rr * 1.2;
+      } else {                                  // strike: aim just behind the ball, toward the aim point
+        const ax = W / 2 + holeX(pb.px) + S.aim.x - pb.x, ay = B() + S.aim.y - pb.y, al = Math.hypot(ax, ay) || 1;
+        tx = pb.x - (ax / al) * rr * 0.6; ty = pb.y - (ay / al) * rr * 0.6;
+        if (Math.hypot(pb.vx, pb.vy) < S.vmax * 0.1) { tx += (ax / al) * rr * 1.6; ty += (ay / al) * rr * 1.6; }   // a still ball: go through it
       }
     } else {                                    // guard: between the ball and his gap
-      tx = S.W / 2 + (b.x - S.W / 2) * 0.45 * lvl; ty = T() + S.rr * 1.8;
+      tx = W / 2 + (pb.x - W / 2) * AMIR.lean; ty = hy;
     }
-    tx = Math.max(L() + S.rr, Math.min(R() - S.rr, tx)); ty = Math.max(lo, Math.min(hi, ty));
-    let dx = tx - m.x, dy = ty - m.y; const d = Math.hypot(dx, dy), step = vmax * dt;
-    if (d > step) { dx *= step / d; dy *= step / d; }
+    S.striking = striking; S.reading = toward;
+    tx = Math.max(L() + rr, Math.min(R() - rr, tx)); ty = Math.max(lo, Math.min(hi, ty));
+    let dx = tx - m.x, dy = ty - m.y; const d = Math.hypot(dx, dy), stepMax = AMIR.speed * W * dt;
+    if (d > stepMax) { dx *= stepMax / d; dy *= stepMax / d; }
     return { dx, dy };
   }
 
-  function youMove() {
+  // Your racket follows your finger at up to YOU_SPEED court widths a second: quick enough that a normal drag feels instant,
+  // but it never jumps across the court in one frame, so a tap on the far side is a sprint and not a teleport.
+  function youMove(dt) {
     const m = S.you, t = S.target;
     const tx = Math.max(L() + S.rr, Math.min(R() - S.rr, t.x));
     const ty = Math.max(mid() + S.rr, Math.min(B() - S.rr, t.y));
-    return { dx: tx - m.x, dy: ty - m.y };
+    let dx = tx - m.x, dy = ty - m.y; const d = Math.hypot(dx, dy), cap = YOU_SPEED * S.W * dt;
+    if (d > cap) { dx *= cap / d; dy *= cap / d; }
+    return { dx, dy };
   }
 
   function step(dt) {
     if (S.freeze > 0) S.freeze = Math.max(0, S.freeze - dt);
-    const ym = youMove(), am = amirMove(dt);
+    const ym = youMove(dt), am = amirMove(dt);
     // Substeps so a fast racket or ball never passes through the other.
     const travel = Math.max(Math.hypot(ym.dx, ym.dy), Math.hypot(am.dx, am.dy), speed(S.ball) * dt);
     const n = Math.min(12, Math.max(1, Math.ceil(travel / (S.br * 0.8))));
@@ -291,7 +377,12 @@
     if (S.over || S.freeze || Math.hypot(S.ball.x - S.anchor.x, S.ball.y - S.anchor.y) > S.br * 2) {
       S.anchor.x = S.ball.x; S.anchor.y = S.ball.y; S.anchor.t = S.gt;
     } else if (S.gt - S.anchor.t > 3) serve(S.ball.y < mid());
-    if (!S.over) { S.trail.push({ x: S.ball.x, y: S.ball.y }); if (S.trail.length > 10) S.trail.shift(); }
+    if (!S.over) {
+      S.trail.push({ x: S.ball.x, y: S.ball.y }); if (S.trail.length > 10) S.trail.shift();
+      const h = S.hist;   // what Amir can look back on: the ball's last 0.6 s, and where your racket was
+      h.push(snap());
+      while (h.length > 2 && h[1].t < S.gt - 0.6) h.shift();
+    }
   }
 
   // ── Effects ──
@@ -529,5 +620,8 @@
     if (!quiet && s.opts.onClose) s.opts.onClose();
   }
 
-  window.Rally = { open, timeUp, close: () => close(), isOpen: () => !!S, stats: loadStats, _state: () => S };
+  // For scripts/test_rally_sim.js, which plays whole matches with no browser: one frame, with nothing drawn.
+  function tick(dt) { if (!S) return; if (!S.timeUp && dt > 0) step(dt); tickFx(dt); }
+
+  window.Rally = { open, timeUp, close: () => close(), isOpen: () => !!S, stats: loadStats, _state: () => S, _tick: tick };
 })();

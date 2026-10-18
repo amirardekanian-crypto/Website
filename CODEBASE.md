@@ -160,6 +160,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Off the Glass, the rest game (2026-10-17).** `assets/js/rally.js` (`window.Rally`, precached by `sw.js`, loaded by `restGameLib('rally')` on the
   first tap of its row on the shelf behind the rest band's door): a one-thumb air hockey on a padel court that stops when the rest does. program.html owns `#rallyOverlay`
   (in `topLayer()`), `openRally()` (= `openRestGame('rally')`) and the two hooks in `timerDone()` / `closeTimer()`. `PROGRAM-APP.md` → *Off the Glass*.
+  Amir's racket plays like a person since 2026-10-18 (The Read: the `AMIR` block, `amirMove()`, a form that moves between points), held by `scripts/test_rally_sim.js` (guard 22).
 - **Split Step, the second rest game (2026-10-18).** `assets/js/splitstep.js` (`window.SplitStep`, precached by `sw.js`, loaded by
   `restGameLib('splitstep')` from the shelf): four drills with the rest clock on the court, bests in `splitstep_stats`. The door
   is now one button, "Play while you rest" (`toggleRestGames()`), that opens the shelf `#timerGames`; program.html owns `#splitOverlay`
@@ -726,6 +727,38 @@ around it:
   `program.html` (the Career row, the finish card's line and the finished card's, and the keys `<id>_careercache` and `<id>_earn_d<N>`) and
   `coach.html` (`loadLevels()` reads `career_rules`, which sets the Proof level's caption). `HABITS.md` → *Career Mode (phase 2, the XP switch)*,
   `PROGRAM-APP.md` → *Career on Home, and what a session earns*, `XP_SYSTEM.md` §2, §5, §7 and §8, `COACH_DASHBOARD.md`.
+
+---
+
+### Off the Glass's opponent (`scripts/test_rally_sim.js`, 2026-10-18)
+
+Pre-commit guard 22, run when `assets/js/rally.js` or the test is staged. Amir's racket in the rest game used to chase the ball's current spot at a
+speed that rose and fell with the score, and a bot that only followed the ball beat him 58 points to 0. **The Read** (idea #38; Amir, 2026-10-18: *"go
+with your picks"*) made him play like a person, and the dozen numbers that decide how well live in the `AMIR` block at the top of `rally.js`. They
+lean on each other (his speed, where he waits and where he meets a shot, how late he sees the ball, how wide his aim and his read can be, how often a
+point starts with a mistimed read, how far his form moves a step), so moving one quietly makes him unbeatable or a doormat and nothing errors.
+- **How it runs.** The test reads the real `rally.js` as text, runs it as a function whose free names are stubs (window, document, a canvas context that
+  does nothing, localStorage, matchMedia; `Math.random` replaced by a seeded generator; a bare vm context was 3.6x slower), opens a 390 x 804 court and
+  drives it with `Rally._tick(1/60)` (one `step()` and `tickFx()`, nothing drawn). "Play again" is the click handler the real button has.
+- **The bots** steer `S.target` the way a thumb would: each sees the ball as it was `r` seconds ago (and makes up a fifth of that by knowing which way
+  it was going) and moves its target at most `v` court widths a second. While the ball is in its half it gets just below it and pushes it up toward the
+  open side of Amir's gap (with a little aim noise); otherwise it guards in front of its own gap. **Sharp** (r 0.10, v 4.0), **average** (0.20, 2.5),
+  **tired** (0.30, 1.5) and **the old perfect follower** (no delay, no speed limit). Every bot, the perfect one too, reads a point late now and then
+  (30% of points, 0.3 s), as Amir does: a bot that never errs cannot lose, so "the follower wins under 90%" would say nothing.
+- **What it holds** (each bot plays three 3,000 s games, 9,000 s of game time, pooled; about 4 s in all): every bot loses some points; the follower wins under
+  90% (measured about 86%); sharp > average > tired in point share (about 70, 57 and 51%); an average bot wins 50 to 72% (aim: 58%, which is about two
+  matches in three); a tired one at least 25%; no NaN; the ball never leaves the court except through a gap; it never exceeds its top speed; your racket never
+  moves faster than 6 court widths a second; his form changes only between points and stays in 0 to 1 and **matters** (held at 0 an average bot wins 6
+  points more than held at 1; measured about 12); his top speed is one number, reached whether you lead or trail; the same seed plays the same game.
+- **To retune** change a number in the `AMIR` block and run `node scripts/test_rally_sim.js`. `--set speed=1.2 --set react=0.2,0.1` tries a number without
+  editing the file, `--seed N` starts from another seed (check three or four: a change should hold on all), `--seeds N` pools more games, `--only average
+  --trace 40` prints 40 s of one bot's play every 0.1 s. Measured 2026-10-18 over ten seed blocks: sharp 68 to 72%, average 54 to 58%, tired 51 to 54%,
+  follower 85 to 87%. The gap between average and tired is only about 5 points (r 0.2 against 0.3 s and 2.5 against 1.5 widths a second matter little
+  on a court this small), which is why each bot plays 9,000 s.
+- **Not measured:** how it feels to a person. The bots are a ruler, not a player; Amir plays it before this ships.
+- **`scripts/headless/rally.js`** still plays the real game in a browser. Its *Amir alone* check parks your racket in the corner (it used to leave it dead
+  centre in front of his gap, and he now aims for the middle of the biggest hole beside your racket, two 14 px slivers for a racket parked in the middle) and
+  plays on in `Rally._tick` steps if he has not scored in 20 s.
 
 ---
 
