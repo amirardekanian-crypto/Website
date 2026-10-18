@@ -316,6 +316,27 @@ d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0].u
 SBT = SB + "\ntrap-bar-deadlift|approved|true|strength|hinge|none|trap bar|Trap Bar Deadlift||glutes:1,quads:1|heavy"
 out = run(d, ctx=[{"spine": SBT, "prev": None, "ledger": None}], spec=KITP('full commercial gym: barbell and rack, dumbbells, cables, machines'))
 expect('kit: a trap bar is never assumed, even in a full gym', has(out, 'WARN', 'kit not on the athlete\'s equipment list: trap bar'), out)
+# Ghazal's cycle 3 (2026-10-18): a Spine entry's kit written as alternatives was one item, and 'handles' lost its 'es'
+SBK = SB + "\n" + "\n".join([
+  "farmers-carry|approved|true|strength,armour|carry|none|dumbbells or kettlebells|Farmer's Carry||core:1,back:0.5|moderate",
+  "reverse-sled-drag|approved|true|engine,strength|conditioning|none|sled;strap or handles|Reverse Sled Drag||quads:1|moderate",
+  "leg-swings|approved|true|armour|isolation|none|wall or rail|Leg Swings||hips:1|isolation"])
+def kit_day(d, *items):
+    d['workouts']['days'][0]['blocks'][1]['exercises'] = [
+        {"type": "standard", "name": n, "exId": e, "rx": {"sets": 3, "reps": 8, "rpe": 7, "rest": 90}} for n, e in items]
+    return d
+KITDAY = kit_day(copy.deepcopy(BASE), ("Farmer's Carry", 'farmers-carry'), ('Reverse Sled Drag', 'reverse-sled-drag'), ('Leg Swings', 'leg-swings'))
+CTXK = [{"spine": SBK, "prev": None, "ledger": None}]
+out = run(KITDAY, ctx=CTXK, spec=KITP('full gym'))
+expect('kit: a full gym covers dumbbells or kettlebells, a sled with strap or handles, and a wall or rail', not has(out, 'WARN', 'kit not on the athlete'), out)
+out = run(KITDAY, ctx=CTXK, spec=KITP('home gym: kettlebell, wall'))
+expect('kit: one alternative on the list covers the item (kettlebell for dumbbells or kettlebells, a wall for wall or rail)',
+       not has(out, 'WARN', 'dumbbells or kettlebells') and not has(out, 'WARN', 'wall or rail'), out)
+expect('kit: ...but a strap or handles is still asked for when neither is on a home list', has(out, 'WARN', 'strap or handles') and has(out, 'WARN', 'sled'), out)
+out = run(KITDAY, ctx=CTXK, spec=KITP('home gym: dumbbells, sled, handles'))
+expect('kit: a plural on the list matches the singular alternative (handles for strap or handles)', not has(out, 'WARN', 'strap or handles'), out)
+out = run(KITDAY, ctx=CTXK, spec=KITP('home gym: bench, bands'))
+expect('kit: no alternative on the list still warns, naming the whole item', has(out, 'WARN', 'dumbbells or kettlebells (Day 1 Farmer'), out)
 
 # ── 3c. a roadmap on its own (2026-10-17) ─────────────────────────────────────
 RM = [{"num": 1, "name": "Cornerstone", "tagline": "Everything stands on this.", "art": "bedrock",
@@ -462,6 +483,21 @@ expect("a flagged Coach's Note that never landed warns", has(run(d, spec=SPEC2),
 d['workouts']['days'][1]['blocks'][1]['exercises'][0]['note'] = "Neutral grip only."
 expect('every flagged note placed: no warning', not has(run(d, spec=SPEC2), 'WARN', "Coach's Notes and the programme"))
 expect('template placeholders are not flags', not has(run(BASE, spec="note_flag: [optional]\nnote_flag: -\n"), 'WARN', "Coach's Notes and the programme"))
+# Ghazal's cycle 3 (2026-10-18): `note_flag: none (...)` was counted as a flag (19 flagged against 11 placed)
+SPEC_NONE = SPEC2 + ("Dead Bug | role: prep\nnote_flag: none (the steps and cues cover it)\n"
+                     "Glute Bridge | role: prep\nnote_flag: None. Nothing this athlete needs beyond the steps\n"
+                     "Goblet Squat | role: secondary\nnote_flag: none — standard\n"
+                     "Lat Pulldown | role: secondary | note_flag: none (no change) | rest: 90s\n"
+                     "why_flag: none (the main lift needs no reason)\n")
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['note'] = "Start shallow and let the first set tell you."
+d['workouts']['days'][1]['blocks'][1]['exercises'][0]['note'] = "Neutral grip only."
+out = run(d, spec=SPEC_NONE)
+expect('note_flag: none (...) is not a flag: 2 real flags, 2 notes placed, no warning', not has(out, 'WARN', "Coach's Notes and the programme"), out)
+expect('why_flag: none (...) is not a flag either', not has(out, 'WARN', 'Becauses and the programme'), out)
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['note'] = "Start shallow and let the first set tell you."
+expect('...and a real flag next to the none lines is still counted (2 flagged, 1 placed)', has(run(d, spec=SPEC_NONE), 'WARN', "flags 2 Coach's Notes and the programme carries 1"), run(d, spec=SPEC_NONE))
+expect('a flag that only starts with the letters of none is a flag (none-grip, nonexistent)',
+       has(run(BASE, spec="note_flag: none-grip pulldowns, elbow history\nnote_flag: nonexistent range at the hip\n"), 'WARN', "flags 2 Coach's Notes and the programme carries 0"))
 expect('a Because with no why_flag warns', has(run(with_why({"src": "goal", "text": "Your legs drive every serve."}), spec="bans: -\n"), 'WARN', 'flags 0 Becauses and the programme carries 1'))
 
 d = copy.deepcopy(BASE); d['notes'] = {"cards": [{"title": f"Card {i}", "body": "<p>One idea.</p>"} for i in range(9)]}
@@ -881,6 +917,27 @@ out = run(BASE, '--stage', 'build', spec=SPEC_ITEM, ctx=CTX)
 expect('why_flag: on an item, the build check warns with its spec line', has(out, 'WARN', 'spec line 6: Day 1 · Box Jump (in Jump Pair)')
        and has(out, 'WARN', 'spec line 8: Day 1 · Pogo Hop (in Jump Pair)'), out)
 expect('why_flag: a placeholder on an item and one on a card do not warn', 'Snap Down (in' not in out and 'Barbell Back Squat (in' not in out, out)
+
+# ── kit_has() on its own (2026-10-18): alternatives, plurals, what a full gym covers ──────────
+FG = 'full gym'
+expect('kit_singular: handles, plates, benches, batteries, press, glass',
+       [cp_mod.kit_singular(w) for w in ('handles', 'plates', 'benches', 'batteries', 'press', 'glass', 'bands', 'boxes')]
+       == ['handle', 'plate', 'bench', 'battery', 'press', 'glass', 'band', 'box'])
+expect('kit_has: "strap or handles" is covered by a full gym, by "handles", by "strap", by "handle"',
+       all(cp_mod.kit_has(k, 'strap or handles') for k in (FG, 'home: handles', 'home: a strap', 'home: handle')))
+expect('kit_has: "strap or handles" is not covered by a list with neither', not cp_mod.kit_has('home gym: dumbbells, bench', 'strap or handles'))
+expect('kit_has: "dumbbells or kettlebells" is covered by either alone and by a full gym',
+       all(cp_mod.kit_has(k, 'dumbbells or kettlebells') for k in ('dumbbells', 'kettlebell', 'two kettlebells', FG)))
+expect('kit_has: "wall or rail" is covered by a full gym, and a wall is free', cp_mod.kit_has(FG, 'wall or rail') and cp_mod.kit_has('bands only', 'wall or rail'))
+expect('kit_has: three alternatives, any one will do', cp_mod.kit_has('rings', 'bar or rings or rope') and not cp_mod.kit_has('bands', 'bar or rings or rope'))
+expect('kit_has: a full gym covers dumbbells, kettlebells, a sled and a rail on their own',
+       all(cp_mod.kit_has(FG, i) for i in ('dumbbell', 'dumbbells', 'kettlebell', 'sled', 'rail', 'plates', 'handles')))
+expect('kit_has: a full gym still assumes no trap bar, no EZ bar, no air bike',
+       not any(cp_mod.kit_has(FG, i) for i in ('trap bar', 'ez bar', 'air bike')))
+expect('kit_has: a trap bar is not saved by an alternative that is not on the list', not cp_mod.kit_has(FG, 'trap bar or ez bar'))
+expect('kit_has: without a full gym a home list does not cover a sled', not cp_mod.kit_has('home gym: dumbbells, bench, bands', 'sled'))
+expect('kit_has: an old match still works (a plural on the list, a multi-word item)',
+       cp_mod.kit_has('dumbbells, leg curl machines', 'leg curl machine') and cp_mod.kit_has('medicine ball', 'medicine ball'))
 
 print(f"{sum(1 for _, ok in results if ok)}/{len(results)} passed" + ('' if HAVE_NODE else ' (node not found: the node-backed checks were skipped)'))
 for n, ok in results:

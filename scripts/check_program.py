@@ -701,8 +701,10 @@ def check_placed(data, args):
     the way (a name that changed between the spec and the card) or invented without a flag."""
     if not args.spec: return
     text = open(args.spec, encoding='utf-8').read()
+    # `note_flag: none (the steps cover it)` says there is no flag: only a bare none was blank before (2026-10-18)
     real = lambda key: sum(1 for v in re.findall(rf'{key}\s*:\s*([^|\n]*)', text)
-                           if v.strip() and not v.strip().startswith('[') and not blank(v))
+                           if v.strip() and not v.strip().startswith('[') and not blank(v)
+                           and not re.match(r'none(?![\w-])', v.strip(), re.I))
     flags, wflags = real('note_flag'), real('why_flag')
     notes = sum(1 for d, b, ex, it in exercises(data) if (it or ex).get('note'))
     whys = sum(1 for d, b, ex, it in exercises(data) if not it and ex.get('why') is not None)
@@ -1266,16 +1268,36 @@ def check_block_promises(data, spine):
 
 KIT_FREE = {'floor', 'wall', 'mat', 'none', 'bodyweight', 'towel', 'timer', 'cone', 'cones', 'step', 'box'}
 KIT_SAME = {'medicine ball': 'med ball', 'dumbbells': 'dumbbell', 'kettlebells': 'kettlebell'}
+# What a full commercial gym has, by the item's last word (2026-10-18: dumbbells, kettlebells, sleds, rails added)
+KIT_FULL_GYM = ('bench', 'rack', 'plate', 'bar', 'machine', 'cable', 'band', 'rope', 'handle', 'strap',
+                'dumbbell', 'kettlebell', 'sled', 'rail', 'wall')
+
+def kit_singular(w):
+    """handles -> handle, plates -> plate, benches -> bench, batteries -> battery; press and glass keep their s.
+    (The old strip took 'es' off every word, so 'handles' became 'handl' and a full gym never matched it.)"""
+    if len(w) > 4 and w.endswith('ies'): return w[:-3] + 'y'
+    if re.search(r'(?:ss|sh|ch|x|z)es$', w): return w[:-2]
+    if w.endswith('s') and not w.endswith(('ss', 'us', 'is')): return w[:-1]
+    return w
+
+def kit_word_rx(w):
+    """One word of an item as a pattern that also finds its plural on the list (battery -> batteries)."""
+    if len(w) > 2 and w.endswith('y') and w[-2] not in 'aeiou': return re.escape(w[:-1]) + r'(?:y|ie)\w*'
+    return re.escape(w) + r'\w*'
 
 def kit_has(kit, item):
-    """Is this Spine equipment item on the athlete's list? Plurals match, a 'full gym' covers benches, racks,
-    plates and any '<something> machine' or cardio machine except an air bike, which many gyms lack."""
+    """Is this Spine equipment item on the athlete's list? Plurals match, an item written as alternatives
+    ('dumbbells or kettlebells', 'strap or handles') is covered when any one of them is, and a 'full gym' covers
+    benches, racks, plates, dumbbells, kettlebells, sleds, walls, rails and any '<something> machine' or cardio
+    machine except an air bike, which many gyms lack."""
+    alts = [a.strip() for a in re.split(r'\s+or\s+', item) if a.strip()]
+    if len(alts) > 1: return any(kit_has(kit, a) for a in alts)
     t = KIT_SAME.get(item, item)
-    words = [re.sub(r'(?:es|s)$', '', w) for w in re.findall(r'[a-z]+', t)]
+    words = [kit_singular(w) for w in re.findall(r'[a-z]+', t)]
     if not words or t in KIT_FREE: return True
-    if re.search(r'\b' + r'\w*[\s-]+'.join(re.escape(w) for w in words) + r'\w*', kit): return True
+    if re.search(r'\b' + r'[\s-]+'.join(kit_word_rx(w) for w in words), kit): return True
     full = re.search(r'\bfull\b.*\bgym\b|\bcommercial gym\b', kit)
-    generic = words[-1] in ('bench', 'rack', 'plate', 'bar', 'machine', 'cable', 'band', 'rope', 'handle', 'strap') or t in ('rower', 'bike', 'treadmill', 'pulley')
+    generic = words[-1] in KIT_FULL_GYM or t in ('rower', 'bike', 'treadmill', 'pulley')
     return bool(full and generic and 'trap' not in words and 'ez' not in words)
 
 def check_kit(data, prof, spine):
