@@ -1,5 +1,5 @@
 #!/bin/sh
-# Twenty guards. Each runs only when its own files are staged, so a commit that
+# Twenty-two guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -440,6 +440,27 @@ if git diff --cached --name-only --diff-filter=ACMD | grep -qE '^(Content/CHATBO
     echo "$chat_out"
     echo "pre-commit: BLOCKED — the chatbot's facts.ts does not match Content/CHATBOT-FACTS.md (run the line above, then redeploy site-chat)."
     failed=1
+  fi
+fi
+
+# ── 22. Off the Glass's opponent still plays like a person (added 2026-10-18) ───────────────────────────────────────────────
+# Why: Amir's racket in assets/js/rally.js used to chase the ball's current spot at a speed that rose and fell with the score, and a bot
+# that simply followed the ball won 58 points out of 58. He now sees the ball late, walks to where a shot will cross his end, aims with
+# an error and mistimes one now and then, and his form moves a step between points: a dozen numbers (the AMIR block) that lean on each
+# other, so moving one quietly makes him unbeatable or a doormat and nothing errors. scripts/test_rally_sim.js loads the real rally.js
+# in Node (no browser, about 4 s) and plays four bots with a person's limits against it, 9,000 s of game time each: the point share of
+# a sharp, an average and a tired bot must stay in order and in range (the average one near 58%), the one that never errs must still
+# lose some points, the ball must stay on the court, his form must change only between points and really matter, and his top speed
+# must be one number whoever leads. To retune: change a number in the AMIR block, run the test, read the table it prints.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(assets/js/rally\.js|scripts/test_rally_sim\.js)$'; then
+  echo "pre-commit: Off the Glass changed — playing the test bots against Amir..."
+  if ! rally_out=$(node scripts/test_rally_sim.js 2>&1); then
+    echo "$rally_out" | grep -v '^ok '
+    echo ""
+    echo "pre-commit: BLOCKED — Amir no longer plays like a person against the test bots (details above). Move a number in the AMIR block of assets/js/rally.js, then run: node scripts/test_rally_sim.js"
+    failed=1
+  else
+    echo "pre-commit: Off the Glass OK."
   fi
 fi
 

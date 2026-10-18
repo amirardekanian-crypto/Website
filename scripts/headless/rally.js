@@ -107,8 +107,12 @@ async function openGame(browser, opts = {}) {
     t.check('Play again starts at 0-0', again.sc.you === 0 && again.sc.amir === 0 && !again.over && again.hidden, JSON.stringify(again));
 
     // ── 3. Amir alone for 20 s: the bodies stay on the court ──
+    // Your racket is parked in the far corner: nobody defends. (It used to sit dead centre in front of his gap, and he now aims for
+    // the middle of the biggest hole beside your racket, which for a racket parked in the middle is two 14 px slivers at the posts:
+    // he scores on that too, but not within 20 s every time, and this check only ever meant "he can finish a point when nobody defends".)
     const solo = await p.evaluate(async () => {
       const s = Rally._state(); let bad = 0, maxV = 0;
+      s.target.x = 30; s.target.y = s.H - 40;
       const t0 = performance.now();
       while (performance.now() - t0 < 20000 && !s.over) {
         await new Promise(r => requestAnimationFrame(r));
@@ -118,6 +122,10 @@ async function openGame(browser, opts = {}) {
         if (b.y > -100 && (b.x < -5 || b.x > s.W + 5)) bad++;
         maxV = Math.max(maxV, Math.hypot(b.vx, b.vy));
       }
+      // The 20 s above ran in the page's own frames. He scores on a racket in the corner within 20 s nine times in ten (a dead ball waits
+      // 3 s for its re-serve, and his aim is off by design), so if he has not yet, play on in Rally._tick steps (no drawing) up to 90 s of game
+      // time: measured, he always scores by then.
+      for (let k = 0; k < 90 * 60 && s.score.amir < 1 && !s.over; k++) Rally._tick(1 / 60);
       return { bad, score: s.score, capped: maxV <= s.vmax + 1 };
     });
     t.check('twenty seconds of Amir alone: no NaN, nothing off the court, speed capped', solo.bad === 0 && solo.capped, JSON.stringify(solo));
