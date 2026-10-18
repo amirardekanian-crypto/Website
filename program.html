@@ -3806,6 +3806,11 @@
   :where(#day-view) .cf-earn-k { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
   :where(#day-view) .cf-earn b { font: 700 var(--fs-title)/1.1 'Barlow Condensed', sans-serif; letter-spacing: .4px; color: var(--ink); }
   :where(#day-view) .cf-earn small { font: 500 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  /* What the session moves (Career Mode phase 3, careerMoves()): at most three grey lines under the XP, a tier it crosses in ink, then "+N more in
+     AA Proof". The same box and the same grey as the XP lines, no card, no clay (DS-01: it asks for nothing). */
+  :where(#day-view) .cf-moves { display: grid; gap: 4px; margin-top: 10px; }
+  :where(#day-view) .cf-moves small { font: 500 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  :where(#day-view) .cf-moves small.is-crossed { font-weight: 700; color: var(--ink); }
   :where(#day-view) .ew-q { font-size: var(--fs-body); font-weight: 600; line-height: 1.3; color: var(--ink); }
   :where(#day-view) .ew-q span { margin-left: 6px; font-size: var(--fs-small); font-weight: 400; color: var(--grey); }
   :where(#day-view) .ew-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -4424,6 +4429,9 @@
   #home-overview .career-row { position: relative; overflow: hidden; }
   #home-overview .career-row .career-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--hair); }
   #home-overview .career-row .career-bar i { display: block; height: 100%; background: var(--fill); }
+  /* Career Mode phase 3 (careerRowHTML()): the four numbers and the nearest goal, each its own line under the level (two rows at most at 320 px) */
+  #home-overview .career-row .hrow-v small.career-four, #home-overview .career-row .hrow-v small.career-next { flex: 0 0 100%; margin-top: 2px; }
+  #home-overview .career-row .hrow-v small.career-next { font-weight: 600; }
 
   /* 4. Next up (.dc-hero): the suggested day as ONE card, the training day's cover on Home. The photo graded into the green
      (luminosity at .7, masked from the left), a scrim to the cover's last colour, "● NEXT UP · DAY 1" in Space Mono with a mint
@@ -4708,6 +4716,10 @@
     font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
   /* the burst: two clay and mint sparks run across the band once when it first appears (never again on a reload) */
   .hl-band.is-new { animation: hlPop .5s cubic-bezier(.2,.9,.3,1.3) both; }
+  /* a reward the phone has decided and the server has not confirmed yet (Career Mode phase 3): the same band with "Counting" in its mint label
+     and no Share until the answer; and the one grey line for what does not fit in three bands */
+  .hl-band.is-counting { cursor: default; }
+  .hl-band-more { padding: 0 4px; font: 500 var(--fs-small)/1.35 'Barlow', sans-serif; color: rgba(255,255,255,.72); }
   .hl-band.is-new::after { content: ''; position: absolute; inset: 0; pointer-events: none;
     background: linear-gradient(100deg, transparent 30%, rgba(109,190,149,.35) 45%, rgba(224,107,67,.35) 55%, transparent 70%) no-repeat;
     background-size: 220% 100%; animation: hlSweep 1.1s .25s ease-out both; }
@@ -6004,6 +6016,15 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
       }
     } catch (e) { /* not parseable — fall through */ }
   }
+  // The rewards this athlete has seen (Career Mode phase 3, <id>_rw_seen: award id → when): a union, so a phone that missed one never hands
+  // it back to the other to show again.
+  if (key.slice(-8) === '_rw_seen') {
+    try {
+      const L = JSON.parse(localVal) || {}, C = JSON.parse(cloudVal) || {}, out = {};
+      Object.keys(L).concat(Object.keys(C)).forEach(id => { out[id] = Math.min(Number(L[id]) || Infinity, Number(C[id]) || Infinity); if (!isFinite(out[id])) out[id] = Date.now(); });
+      return JSON.stringify(out);
+    } catch (e) { /* not parseable — fall through */ }
+  }
   // Body weight: union by DATE, newest write wins that day — and a delete is a
   // tombstone (kg:null), never a missing key. Carried over from Proof, which
   // owned this key until 2026-09-12, and it matters for the same reason it did
@@ -6750,6 +6771,7 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
     document.getElementById('screen-home').classList.add('active');
     maybeWelcome();
     maybeHighlightMoment();   // a cycle or the roadmap just complete: its moment, once (Highlight Reel; never over the Welcome)
+    maybeRewardMoment('open');   // Career Mode phase 3: a reward's moment, only from an answer received in this run (so none from the phone's copy here)
     // Reveal the global tab bar and mark Home (the training screen) as the
     // active tab on first load.
     const tabs = document.getElementById('global-tabs');
@@ -9622,7 +9644,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then <strong>Career</strong> (your level, once Career Mode is on), then <strong>Hold Serve</strong> (the weeks you've held in a row), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then <strong>Career</strong> (your level and, once Career Mode's rewards are on, your four numbers and, when you're close to a badge, a line showing it), then <strong>Hold Serve</strong> (the weeks you've held in a row), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -9643,13 +9665,13 @@ const APP_GUIDE = [
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>Once Career Mode's rewards are on, the card also lists the badges the session moves, like <strong>Paper Trail 9 of 10</strong>. It shows three lines at most. A tier you cross shows its metal. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a badge, moment or title you earned shows on the green card. While it says <strong>Counting</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
   { icon: 'activity', key: 'career', title: 'Career: your level',
-    body: `<p>Once Career Mode is on, Home has a <strong>Career</strong> row above Hold Serve. It shows your level and how far you are from the next one. Your level counts everything you do with me: every session you finish, your daily habits in AA Proof, and the weeks you hold. It never goes back to zero. A new season only restarts the board's points in AA Proof.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>counting</strong> until my side has it.</p><p>Tap the <strong>Career</strong> row to open your Locker in AA Proof: your rank, your titles and what is next on the road.</p>` },
+    body: `<p>Once Career Mode is on, Home has a <strong>Career</strong> row above Hold Serve. It shows your level and how far you are from the next one. Your level counts everything you do with me: every session you finish, your daily habits in AA Proof, and the weeks you hold. It never goes back to zero. A new season only restarts the board's points in AA Proof.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>counting</strong> until my side has it.</p><p>Tap the <strong>Career</strong> row to open your Locker in AA Proof: your rank, your titles and what is next on the road.</p><p>Once Career Mode's rewards are on, the row also shows four numbers: the weeks you've held, your sessions with me, your personal bests and your comebacks. When you're close to a badge, a line under them shows it, like <strong>Paper Trail 9 of 10</strong>. Tapping the row then opens <strong>Progress</strong> in AA Proof. That's where your badges and titles live, and the Grand Slam, a title in all four.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks held in a row',
     body: `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions don't.</p><p>Hold weeks in a row and the number on Home goes up. The dots are those weeks, and the dashed one is this week. The line under the number says what's left this week. Miss a week and the count starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
-    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
+    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p>Once Career Mode's rewards are on, a badge, a moment or a title you earn becomes a card too. Tap <strong>Share</strong> on its band on the finished session, or on the full-screen moment when it's a big one.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Once a week</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
@@ -10369,12 +10391,22 @@ function careerEarn(day, D, done) {
   if (careerCheckin(D.readiness)) parts.push({ k: 'checkin', xp: n(pr.checkin_done) });
   const ids = ((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id));
   const cur = (DATA.cycles || [])[Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0], w = cycleWeekInfo(cur);
-  if (!repeat && w && !w.before && !w.after && ids.length && ids.every(id => id === String(day) || done.has(id))) {
+  const weekCloses = !!(!repeat && w && !w.before && !w.after && ids.length && ids.every(id => id === String(day) || done.has(id)));
+  if (weekCloses) {
     parts.push({ k: 'week', xp: n(pr.week_held), pending: true });
     const last = HOLD && holdCount(HOLD.facts).last;
     if (last && last.kind === 'week_broken') parts.push({ k: 'back', xp: n(pr.bounce_back), pending: true });
   }
-  return { parts, xp: parts.reduce((s, p) => s + p.xp, 0), repeat };
+  // Career Mode phase 3: what the session moves on the badge ladders (careerMoves()), only once the catalogue switch is on.
+  let moves = null;
+  if (catalogueOnT()) {
+    try {
+      const fullLog = careerFullLog(D.log, early), checkin = careerCheckin(D.readiness);
+      moves = careerMoves({ early, fullLog, checkin, weekCloses, cycleCloses: weekCloses && !!w && w.wk === w.total,
+        byBook: weekCloses && careerWeekByBook(fullLog, checkin) }, careerLadderNow());
+    } catch (err) { moves = null; }
+  }
+  return { parts, xp: parts.reduce((s, p) => s + p.xp, 0), repeat, moves };
 }
 const CAREER_PART_WORDS = { session: 'Session', early: 'Session, finished early', log: 'Every set logged', checkin: 'Check-in',
                             week: 'Your week held', back: 'Back after a broken week' };
@@ -10388,8 +10420,292 @@ function careerEarnHTML(e) {
     + (sure.length ? `<small>${sure.map(p => esc(CAREER_PART_WORDS[p.k]) + ' ' + fmt(p.xp)).join(' · ')}</small>` : '')
     + (e.repeat ? `<small>Day ${esc(String(e.day || ''))} is done this week already, so the session itself pays once.</small>` : '')
     + (later.length ? `<small class="cf-earn-more">${later.map(p => esc(CAREER_PART_WORDS[p.k]) + ' +' + fmt(p.xp)).join(' · ')} when it counts</small>` : '')
-    + `</div>`;
+    + `</div>` + careerMovesHTML(e.moves);
 }
+// ── CAREER MODE PHASE 3: REWARDS WITH MEANINGS (the catalogue switch; career/CAREER_MODE.md, GAME-13, GAME-14) ─────────────────────────────
+// Once the catalogue switch is on the server fills get_profile() with the ladder (every badge the phone may name, with the count and the next
+// tier), `owned` (every award id, the dedupe key), `near`, `numbers.four`, `moments` and `recent` (the rewards to tell). This app shows them in
+// FOUR places and no new screen (D13): the finish card's lines (careerMoves(), under the XP), the finished card's bands (collectRewardBands(),
+// in the Highlight Reel's slot), reward moments (maybeRewardMoment(), through openMoment()) and two more small lines on Home's Career row. Every
+// branch is behind catalogueOnT(): with the switch off the app is exactly what phase 2 shipped. The full shelf, the Grand Slam and the
+// titles are AA Proof's (the Career row's tap opens its Progress). A reward is told ONCE: <id>_rw_seen (synced, award id → time) here and
+// told_at on the server through mark_moments_told() for the other app (the queue's rules: career phase 3 spec §7).
+// TWINS (scripts/check_twins.js §10, scripts/career/reward_cases.json): careerMoves() and awardId(). `var`, not `let` (boot reaches paintWeek()
+// before this point of the script has run).
+var _momentQ;        // the full-screen rewards waiting at the last answer (a list of moments, biggest first); read by nothing but the tests
+var _rwOpened;       // a full-screen moment of ANY kind opened in this run: no award opens full screen on top of it (D7: one per open)
+function catalogueOnT() {
+  return careerOnT() && !!(CAREER_T.p.switch && CAREER_T.p.switch.catalogue) && !!CAREER_T.p.ladder && !!CAREER_T.p.owned;
+}
+// The one key for a reward everywhere (the server's career_award_id()): badge:<item>:<tier>[:<subject>] · achievement:<item> · title:<item>.
+function awardId(kind, item, tier, subject) {
+  let id = String(kind) + ':' + String(item);
+  if (kind === 'badge') id += ':' + Number(tier);
+  if (kind === 'badge' && subject) id += ':' + String(subject);
+  return id;
+}
+// What a finished session moves on the ladders: e = { early, fullLog, checkin, weekCloses, cycleCloses, byBook? }, ladder = get_profile()'s
+// ladder → { lines: [≤ 3 × { id, name, have, next, crossed, pending }], more }. PURE (a twin). A session ladder (phone 'session': it counts
+// session_finished, session_finished_early, full_log or checkin_done) moves at once. A week ladder (phone 'week') moves only when the
+// session closes its week (week_held, week_by_the_book) or its cycle (cycle_finished), and is always pending: the server decides a week.
+// A run badge (Hold Serve) counts from `now`, the run so far, not from its best. Crossed lines first, then the nearest, then the sure
+// before the pending. byBook, when the caller knows it, says every session of the week was logged in full and checked in; without it this
+// session alone is read.
+function careerMoves(e, ladder) {
+  const lines = [];
+  if (!e || !ladder || typeof ladder !== 'object') return { lines, more: 0 };
+  const has = (en, k) => Array.isArray(en.counts) ? en.counts.indexOf(k) >= 0 : en.counts === k;
+  Object.keys(ladder).forEach((id, ord) => {
+    const en = ladder[id];
+    if (!en || typeof en !== 'object' || !(Number(en.next) > 0)) return;   // no entry, or already on its top tier
+    let inc = 0, pending = false;
+    if (en.phone === 'session') {
+      if (has(en, 'session_finished') && !e.early) inc += 1;
+      if (has(en, 'session_finished_early') && e.early) inc += 1;
+      if (has(en, 'full_log') && e.fullLog) inc += 1;
+      if (has(en, 'checkin_done') && e.checkin) inc += 1;
+    } else if (en.phone === 'week') {
+      pending = true;
+      if (e.weekCloses && has(en, 'week_held')) inc += 1;
+      if (e.weekCloses && has(en, 'week_by_the_book') && (e.byBook == null ? !!(e.fullLog && e.checkin) : !!e.byBook)) inc += 1;
+      if (e.cycleCloses && has(en, 'cycle_finished')) inc += 1;
+    }
+    if (!inc) return;
+    const base = typeof en.now === 'number' ? en.now : (Number(en.have) || 0), have = base + inc;
+    lines.push({ ord, id, name: String(en.name || id), have, next: Number(en.next), crossed: have >= Number(en.next), pending });
+  });
+  lines.sort((a, b) => (b.crossed - a.crossed) || ((a.next - a.have) - (b.next - b.have)) || (a.pending - b.pending) || (a.ord - b.ord));
+  return { lines: lines.slice(0, 3).map(l => ({ id: l.id, name: l.name, have: l.have, next: l.next, crossed: l.crossed, pending: l.pending })),
+           more: Math.max(0, lines.length - 3) };
+}
+// The profile's ladder with Hold Serve's run so far filled from the four numbers when the ladder leaves it out (numbers.four, one source).
+function careerLadderNow() {
+  const p = CAREER_T.p, lad = p.ladder || {}, f = p.numbers && p.numbers.four, c = f && f.consistency;
+  const hs = lad.held_weeks;
+  if (hs && typeof hs.now !== 'number' && c && c.key === 'weeks_held' && typeof c.value === 'number') {
+    return Object.assign({}, lad, { held_weeks: Object.assign({}, hs, { now: c.value }) });
+  }
+  return lad;
+}
+// Is this session, as far as the phone can see, a "by the book" week so far: logged in full and checked in, and so was every other session
+// of this training week it can read (the server decides: Love Hold stays pending).
+function careerWeekByBook(fullLog, checkin) {
+  if (!fullLog || !checkin) return false;
+  const win = weekWindow(), ids = ((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id));
+  return !(HIST || []).some(s => s.date >= win.from && s.date <= win.to && ids.indexOf(String(s.day)) >= 0
+    && !(careerFullLog(s.entries, false) && careerCheckin(s.ready)));
+}
+// The finish card's lines: "Paper Trail 10 of 10 · bronze" (a tier crossed), "Century 24 of 25", "Hold Serve 5 of 8 · when the week counts",
+// then one grey "+N more in AA Proof". Nothing outside Career Mode's catalogue, nothing when the session moves nothing.
+function careerMovesHTML(m) {
+  if (!m || !Array.isArray(m.lines) || !m.lines.length) return '';
+  const lad = (CAREER_T && CAREER_T.p && CAREER_T.p.ladder) || {};
+  const row = l => {
+    const en = lad[l.id] || {};
+    const text = `${l.name} ${l.have} of ${l.next}` + (l.crossed && en.metal_next ? ' · ' + en.metal_next : '') + (l.pending ? ' · when the week counts' : '');
+    return `<small class="${l.crossed ? 'is-crossed' : l.pending ? 'cf-earn-more' : ''}">${esc(text)}</small>`;
+  };
+  return `<div class="cf-moves">${m.lines.map(row).join('')}${m.more > 0 ? `<small class="cf-earn-more">+${m.more} more in AA Proof</small>` : ''}</div>`;
+}
+// Home's Career row: the four numbers from numbers.four only (both apps read the same keys), a zero cell left out. Sessions with Amir shows +1
+// from this phone for a session finished here that no answer has counted yet (never lower than the profile's).
+// (functions, not top-level tables: Home's first paint can reach these before the script has evaluated this far.)
+function careerFourWord(key, n) {
+  const w = { weeks_held: ['week held', 'weeks held'], sessions_with_amir: ['session', 'sessions'], personal_bests: ['best', 'bests'],
+    comebacks: ['comeback', 'comebacks'], day_streak: ['day streak', 'day streak'], perfect_days: ['perfect day', 'perfect days'],
+    habit_steps: ['habit step', 'habit steps'] }[key];
+  return w ? w[n === 1 ? 0 : 1] : '';
+}
+function careerPendingSessions() {
+  let n = 0;
+  try {
+    const pre = ATHLETE_ID + '_earn_d', now = Date.now();
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || k.indexOf(pre) !== 0) continue;
+      const raw = JSON.parse(localStorage.getItem(k) || 'null');
+      if (!raw || !(now - Date.parse(raw.t) < 3 * 86400000)) continue;
+      if (raw.saved && CAREER_T.at > raw.saved) continue;   // an answer asked after the session reached the server has counted it
+      n += 1;
+    }
+  } catch (e) { return 0; }
+  return n;
+}
+function careerFourCells(p) {
+  const f = (p.numbers && p.numbers.four) || {};
+  const out = [];
+  ['consistency', 'commitment', 'progress', 'resilience'].forEach(m => {
+    const c = f[m];
+    if (!c || c.locked) return;
+    let v = Number(c.value) || 0;
+    if (c.key === 'sessions_with_amir') v += careerPendingSessions();
+    if (v <= 0) return;
+    const w = careerFourWord(c.key, v);
+    if (!w) return;
+    out.push(v.toLocaleString('en-US') + ' ' + w);
+  });
+  return out;
+}
+// The nearest goal: near[0] as "Paper Trail 9 of 10" when it is within two, or at 80% or more.
+function careerNearText(p) {
+  const n = Array.isArray(p.near) ? p.near[0] : null;
+  if (!n || !n.name || !(Number(n.next) > 0)) return '';
+  if (!(Number(n.next) - Number(n.have) <= 2 || Number(n.pct) >= 80)) return '';
+  return n.name + ' ' + Number(n.have) + ' of ' + Number(n.next);
+}
+
+// ── the finished card's reward bands, and the moments ────────────────────────────────────────────────────────────────────────────────
+function rwSizeRank(size) { return { tick: 0, win: 1, highlight: 2, milestone: 3, legend: 4 }[size] || 0; }
+function rwMetalWord(m) { return { bronze: 'Bronze', silver: 'Silver', emerald: 'Emerald', amethyst: 'Amethyst', prismatic: 'Prismatic', prisma: 'Prismatic' }[m] || ''; }
+function rwMeaningWord(m) { return { consistency: 'Consistency', commitment: 'Commitment', progress: 'Progress', resilience: 'Resilience' }[m] || ''; }
+function rwFullSizes() {
+  const m = CAREER_T && CAREER_T.p && CAREER_T.p.rules && CAREER_T.p.rules.moments;
+  return (m && Array.isArray(m.full_screen) && m.full_screen) || ['milestone', 'legend'];
+}
+// A server row is a full-screen moment when it says so; a row from `recent` has no flag and is read by its size.
+function rwIsFull(m) { return m.full != null ? !!m.full : rwFullSizes().indexOf(m.size) >= 0; }
+function rwEarnRaw(day) { try { return JSON.parse(localStorage.getItem(ATHLETE_ID + '_earn_d' + day) || 'null'); } catch (e) { return null; } }
+function rwSeenGet() {
+  try { const o = JSON.parse(localStorage.getItem(ATHLETE_ID + '_rw_seen') || '{}'); return o && typeof o === 'object' && !Array.isArray(o) ? o : {}; }
+  catch (e) { return {}; }
+}
+// Marks ids seen BEFORE they are shown (synced: another phone does not show them again). false = storage blocked: show nothing, never every open.
+function rwSeenAdd(ids) {
+  const o = rwSeenGet(), t = Date.now();
+  ids.forEach(id => { if (!o[id]) o[id] = t; });
+  try { localStorage.setItem(ATHLETE_ID + '_rw_seen', JSON.stringify(o)); return true; } catch (e) { return false; }
+}
+// Tells the server (fire and forget): the other app never replays a reward this one showed. A lost call is made good by the next answer
+// (rewardCatchUp()), because the row is still waiting there.
+async function rwTold(ids) {
+  if (!ids.length || window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    await _withTimeout(sb.rpc('mark_moments_told', { p_athlete_id: ATHLETE_ID, p_award_ids: ids, p_app: 'training' }), 8000);
+  } catch (e) { /* the next answer tells it again */ }
+}
+// On EVERY fresh answer: a waiting row this app has already shown (or the other phone did, through the synced list) is told on the server.
+function rewardCatchUp() {
+  const seen = rwSeenGet(), ms = (CAREER_T.p.moments || []).filter(m => m && seen[m.award_id]).map(m => m.award_id);
+  if (ms.length) rwTold(ms);
+}
+// A phone-decided crossing from the finish card, kept for the finished card as a band that says "Counting" (and has no Share until the answer).
+function rwCountingBands(day) {
+  if (!catalogueOnT()) return [];
+  const raw = rwEarnRaw(day), lad = CAREER_T.p.ladder || {}, full = rwFullSizes();
+  if (!raw || !raw.moves || !Array.isArray(raw.moves.lines)) return [];
+  const on = sessionDateFor(day);
+  return raw.moves.lines.filter(l => l.crossed && !l.pending).map(l => {
+    const en = lad[l.id];
+    if (!en || !(Number(en.next_tier) > 0) || full.indexOf(en.size_next) >= 0) return null;   // a full-screen tier gets its moment from the answer
+    return { kind: 'badge', name: l.name, meaning: en.meaning, metal: en.metal_next, tier: Number(en.next_tier), n: l.have, caption: '', date: on,
+      first: hlFirst(), award_id: awardId('badge', l.id, en.next_tier, ''), counting: true };
+  }).filter(Boolean);
+}
+// After a fresh answer that came after the session reached the server: what the session earned, diffed against `owned` as it was at Done, is
+// mapped to share specs through the answer's moments and recent rows and kept beside the day's other bands (<id>_hlwin_d<N>.rewards). The
+// "Counting" bands are confirmed (their award is owned now: the label goes) or taken away (the server did not give it). A reward that is a
+// full-screen moment is never a band (maybeRewardMoment() tells it). Bands shown are told and marked seen.
+function collectRewardBands(day) {
+  if (!catalogueOnT() || window.IS_PREVIEW || !DATA) return;
+  const raw = rwEarnRaw(day);
+  if (!raw || !raw.saved || !(CAREER_T.at > raw.saved) || !Array.isArray(raw.snap)) return;
+  const sess = localStorage.getItem(ATHLETE_ID + '_completed_d' + day) || '';
+  if (!sess) return;
+  const p = CAREER_T.p, owned = p.owned || {}, was = new Set(raw.snap), on = sessionDateFor(day);
+  let cur = null;
+  try { cur = JSON.parse(localStorage.getItem(winKey(day)) || 'null'); } catch (e) { cur = null; }
+  if (!cur || cur.sess !== sess || !Array.isArray(cur.specs)) cur = { sess, specs: [] };
+  const had = (cur.rewards || []).filter(r => r && !r.counting);
+  const haveIds = new Set(had.map(r => r.award_id)), seen = rwSeenGet();
+  const rows = {};
+  (p.recent || []).concat(p.moments || []).forEach(m => { if (m && m.award_id && m.spec && m.spec.kind) rows[m.award_id] = m; });   // moments win
+  const add = [];
+  Object.keys(owned).forEach(id => {
+    if (was.has(id) || haveIds.has(id) || seen[id]) return;
+    const m = rows[id];
+    if (!m || !m.spec || m.size === 'tick' || rwIsFull(m)) return;
+    if (String(m.spec.date || m.day || '') < on) return;                  // an older reward this phone only learned of now is Proof's to tell
+    add.push({ m, spec: Object.assign({}, m.spec, { first: hlFirst(), award_id: id }) });
+  });
+  add.sort((a, b) => (rwSizeRank(b.m.size)) - (rwSizeRank(a.m.size)) || String(b.m.day || '').localeCompare(String(a.m.day || '')));
+  const rewards = had.concat(add.map(x => x.spec)).slice(0, 8);
+  const before = JSON.stringify([cur.rewards || [], cur.specs]), after = JSON.stringify([rewards, cur.specs]);
+  if (before === after) return;
+  cur.rewards = rewards;
+  _lsRawSet(winKey(day), JSON.stringify(cur));
+  paintWinBand(day);
+  // Only a reward that was DRAWN as a band is marked seen and told (GAME-14): paintWinBand() shows 3 bands across the day's New best / Retest
+  // specs and the rewards, in that order, and puts the rest behind "+N more in AA Proof". A reward behind that line stays unseen and untold, so
+  // AA Proof's queue still announces it. A reward cut by the slice above is in no list at all, so it is never told either.
+  const room = Math.max(0, 3 - cur.specs.length), drawn = new Set(rewards.slice(0, room).map(r => r && r.award_id));
+  const shown = add.map(x => x.spec.award_id).filter(id => drawn.has(id));
+  if (shown.length && rwSeenAdd(shown)) rwTold(shown);
+}
+// The moment for one waiting row (it carries the share spec, and the title it minted in `also`).
+function rwMomentFor(m) {
+  const first = hlFirst(), sp = Object.assign({ first }, m.spec);
+  const also = (m.also || []).filter(s => s && s.kind).map(s => Object.assign({ first }, s));
+  const grand = m.item === 'grand_slam';
+  const metal = rwMetalWord(sp.metal);
+  const cur = DATA && (DATA.cycles || [])[Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0];
+  return {
+    eyebrow: grand ? 'Grand Slam' : (rwMeaningWord(sp.meaning) || 'Career'),
+    title: sp.kind === 'badge' && metal ? sp.name + ' · ' + metal : sp.name,
+    sub: sp.kind === 'title' ? (sp.from || '') : (sp.caption || ''),
+    art: cur ? cycleArtUrl(cur) : '',
+    words: grand ? 'A title in all four. That\'s the whole game.' : m.size === 'legend' ? 'This is rare. Well done.' : 'That one took weeks. It\'s yours for good.',
+    go: HL_TITLE[sp.kind] || 'Share it',
+    specs: [sp].concat(also),
+  };
+}
+// A reward's full-screen moment (GAME-14; the queue, spec §7): never in the demo or the coach's preview, never from the phone's copy of an
+// answer (only one received in this run), never over the Welcome, another moment or the rating box, and at most ONE full-screen moment of any
+// kind per open (D7). 'done' (the answer to a session just finished): the biggest full-screen reward that session earned, once the finished
+// card is on screen. 'open' (any other fresh answer): the first waiting one, unless a moment already opened in this run or a session is under
+// way. What does not open stays untold and unseen, so it comes at the next open (never lost; the server turns it into a line after 14 days).
+// A row is marked seen BEFORE it is shown, then told.
+function maybeRewardMoment(reason, day) {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || !DATA || !catalogueOnT()) return;
+  if (!(CAREER_T.at >= ((window.performance && performance.timeOrigin) || 0))) return;   // a cached answer is never a trigger
+  rewardCatchUp();
+  if (document.querySelector('.wel, .hl-moment, .finish-rate:focus-within')) return;
+  const seen = rwSeenGet(), p = CAREER_T.p;
+  let list = (p.moments || []).filter(m => m && m.spec && m.spec.kind && rwIsFull(m) && !seen[m.award_id]);
+  if (reason === 'done') {
+    const raw = rwEarnRaw(day), was = new Set(raw && Array.isArray(raw.snap) ? raw.snap : []);
+    list = list.filter(m => !was.has(m.award_id) && p.owned[m.award_id]);
+  } else if (_rwOpened || document.body.classList.contains('session-on')) list = [];
+  list.sort((a, b) => (rwSizeRank(b.size)) - (rwSizeRank(a.size)) || String(b.day || '').localeCompare(String(a.day || '')));
+  _momentQ = list;
+  const m = list[0];
+  if (!m) return;
+  const open = () => {
+    if (document.querySelector('.wel, .hl-moment, .finish-rate:focus-within')) return;
+    if (!rwSeenAdd([m.award_id].concat((m.also || []).map(a => a && a.award_id).filter(Boolean)))) return;   // marked seen BEFORE it shows; storage blocked: never every open
+    openMoment(Object.assign(rwMomentFor(m), { onClose: () => { /* the next one waits for the next trigger: no chain */ } }));
+    rwTold([m.award_id]);
+  };
+  if (reason === 'done') setTimeout(open, 700); else open();   // 'done': after the finished card has scrolled in
+}
+// A fresh answer: the finish card's bands were drawn by paintCareer(); now decide the moment. The first answer after a session reached the
+// server is the session's own ('done'); any other is an open.
+function rewardAfterAnswer() {
+  if (!catalogueOnT()) return;
+  let doneDay = null;
+  document.querySelectorAll('.session-complete.visible[id^="complete-"]').forEach(c => {
+    const d = c.id.slice(9), raw = rwEarnRaw(d);
+    if (raw && raw.saved && CAREER_T.at > raw.saved && Array.isArray(raw.snap) && !raw.rm) doneDay = d;
+  });
+  if (doneDay != null) {
+    const raw = rwEarnRaw(doneDay);
+    raw.rm = 1;
+    try { _lsRawSet(ATHLETE_ID + '_earn_d' + doneDay, JSON.stringify(raw)); } catch (e) { /* the moment may be asked for twice: it is seen-guarded */ }
+    maybeRewardMoment('done', doneDay);
+  } else maybeRewardMoment('open');
+}
+
 function paintConfirmEarn(day, ready) {
   const card = document.getElementById('confirm-' + day);
   const el = card && card.querySelector('.confirm-earn');
@@ -10408,8 +10724,12 @@ function careerEarnAtDone(day) {
   try {
     const e = careerEarn(day, buildSessionData(day), weekDoneDays());
     if (!e) return;
-    _lsRawSet(ATHLETE_ID + '_earn_d' + day, JSON.stringify({ t: new Date().toISOString(), xp: e.xp, parts: e.parts,
-      before: Number(CAREER_T.p.career && CAREER_T.p.career.xp) || 0, saved: 0 }));
+    const rec = { t: new Date().toISOString(), xp: e.xp, parts: e.parts,
+      before: Number(CAREER_T.p.career && CAREER_T.p.career.xp) || 0, saved: 0 };
+    // Career Mode phase 3: every award this phone knows at Done (the finished card's new rewards are what the next answer adds to it) and
+    // the lines the finish card showed (the phone-decided crossings become "Counting" bands).
+    if (catalogueOnT()) { rec.snap = Object.keys(CAREER_T.p.owned || {}); rec.moves = e.moves; }
+    _lsRawSet(ATHLETE_ID + '_earn_d' + day, JSON.stringify(rec));
   } catch (err) { /* storage full: the finished card simply has no line */ }
 }
 function careerSessionSaved(entry) {
@@ -10449,9 +10769,14 @@ function careerRowHTML() {
   if (typeof c.level !== 'number') return '';
   const L = careerLevelOf(c.xp, p.rules);
   const pct = L.level_cost > 0 ? Math.max(0, Math.min(100, Math.round(L.xp_in_level / L.level_cost * 100))) : 0;
-  return `<button type="button" class="hrow career-row" onclick="goCareer()" aria-label="Your career: level ${L.level}, ${esc(L.rank)}. Open your Locker in AA Proof">
+  // Career Mode phase 3: the four numbers and the nearest goal, two more small lines under the level line (numbers.four only; D13).
+  const cells = catalogueOnT() ? careerFourCells(p) : [], goal = catalogueOnT() ? careerNearText(p) : '';
+  const say = 'Your career: level ' + L.level + ', ' + L.rank + '.' + (cells.length ? ' ' + cells.join(', ') + '.' : '') + (goal ? ' ' + goal + '.' : '')
+    + (catalogueOnT() ? ' Open your progress in AA Proof' : ' Open your Locker in AA Proof');
+  return `<button type="button" class="hrow career-row" onclick="goCareer()" aria-label="${esc(say).replace(/"/g, '&quot;')}">
     ${hrowIc('career')}<span class="hrow-b"><span class="hrow-l">Career</span>
-      <span class="hrow-v"><span class="hrow-vv">Level ${L.level}</span><small>${esc(L.rank)} · ${L.to_next.toLocaleString('en-US')} XP to level ${L.level + 1}</small></span></span>
+      <span class="hrow-v"><span class="hrow-vv">Level ${L.level}</span><small>${esc(L.rank)} · ${L.to_next.toLocaleString('en-US')} XP to level ${L.level + 1}</small>${
+        cells.length ? `<small class="career-four">${esc(cells.join(' · '))}</small>` : ''}${goal ? `<small class="career-next">${esc(goal)}</small>` : ''}</span></span>
     <span class="hrow-a" aria-hidden="true">›</span>
     <span class="career-bar" aria-hidden="true"><i style="width:${pct}%"></i></span></button>`;
 }
@@ -10462,9 +10787,18 @@ function paintCareer() {
     try { h = careerRowHTML(); } catch (e) { h = ''; }   // never let the row stop Home
     if (el.innerHTML !== h) el.innerHTML = h;
   }
-  document.querySelectorAll('.session-complete.visible[id^="complete-"]').forEach(c => paintCareerEarn(c.id.slice(9)));
+  document.querySelectorAll('.session-complete.visible[id^="complete-"]').forEach(c => {
+    paintCareerEarn(c.id.slice(9));
+    try {
+      collectRewardBands(c.id.slice(9));
+      // The reward bands are drawn once the profile is known (a reload paints the day before it): quietly, no burst again.
+      const slot = document.getElementById('hlwin-' + c.id.slice(9));
+      if (slot && !slot.firstElementChild && catalogueOnT()) paintWinBand(c.id.slice(9), true);
+    } catch (e) { /* the bands are extra: never stop the card */ }
+  });
 }
-function goCareer() { window.location.href = habitsUrl() + '&go=pass'; }
+// With the catalogue switch on, the tap opens AA Proof's Progress (the shelf, the four numbers); before it, the Locker (D13).
+function goCareer() { window.location.href = habitsUrl() + (catalogueOnT() ? '&go=progress' : '&go=pass'); }
 window.goCareer = goCareer;
 // The last profile this phone had, painted at once on open.
 function loadCareerCache() {
@@ -10488,6 +10822,7 @@ function careerSwitchSeen(sw) {
 async function refreshCareer() {
   if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || _careerBusy) return;
   _careerBusy = true;
+  let fresh = false;   // a real answer arrived in this run (Career Mode phase 3: only such an answer may open a moment)
   try {
     const sb = await _sbReady();
     if (!sb) return;
@@ -10496,9 +10831,14 @@ async function refreshCareer() {
     if (_noAnswer(r) || !r || r.error || !r.data || r.data.athlete_id !== ATHLETE_ID) return;   // offline or refused: keep the copy
     CAREER_T = { p: r.data, at: asked };
     _careerAt = Date.now();
+    fresh = true;
     try { _lsRawSet(careerKey(), JSON.stringify(CAREER_T)); } catch (e) { /* storage full: shown this visit */ }
   } catch (e) { /* keep the copy */ }
-  finally { _careerBusy = false; paintCareer(); }
+  finally {
+    _careerBusy = false;
+    paintCareer();
+    if (fresh) { try { rewardAfterAnswer(); } catch (e) { console.warn('[career] moment not decided:', e); } }
+  }
 }
 function refreshCareerSoon(ms) { clearTimeout(_careerSoonT); _careerSoonT = setTimeout(refreshCareer, ms == null ? 400 : ms); }
 
@@ -17490,7 +17830,9 @@ function collectWins(day, bests) {
       if (spec) { out.push(spec); seen[b.lift] = 1; }
     });
     const sess = localStorage.getItem(ATHLETE_ID + '_completed_d' + day) || '';
-    if (out.length) _lsRawSet(winKey(day), JSON.stringify({ sess, specs: out.slice(0, 3) }));
+    // Career Mode phase 3: a tier the finish card showed as crossed is a band at once, saying "Counting" until the server's answer confirms it.
+    const rewards = rwCountingBands(day);
+    if (out.length || rewards.length) _lsRawSet(winKey(day), JSON.stringify(rewards.length ? { sess, specs: out.slice(0, 3), rewards } : { sess, specs: out.slice(0, 3) }));
     else _lsRawRemove(winKey(day));
   } catch (e) { console.warn('[highlight] wins not collected:', e); }
   paintWinBand(day);
@@ -17501,21 +17843,47 @@ function hlSetText(s) {
   if (s.kind === 'retest') return s.now.r === s.before.r ? `${kg(s.before.w)} → ${kg(s.now.w)} kg` : `${kg(s.now.w)} kg × ${s.now.r}`;
   return `${kg(s.w)} kg × ${s.r}`;
 }
+// What the share sheet can offer for the day: the New best and Retest specs, then the rewards the server has confirmed (a "Counting" band has no
+// card yet). A band's `si` is its place in this list.
+function hlShareList(o) { return (o.specs || []).concat((o.rewards || []).filter(r => r && !r.counting)); }
+function hlBandWord(k) { return { best: 'New best', retest: 'Retest beaten', badge: 'Badge', achievement: 'Moment', title: 'Title' }[k] || 'Badge'; }
 function paintWinBand(day, quiet) {
   const slot = document.getElementById('hlwin-' + day);
   if (!slot) return;
   const o = !window.IS_PREVIEW && loadWins(day);
-  if (!o || !o.specs.length) { slot.innerHTML = ''; return; }
+  const rewards = o && catalogueOnT() ? (o.rewards || []).filter(r => r && r.kind) : [];
+  if (!o || !(o.specs.length || rewards.length)) { slot.innerHTML = ''; return; }
   const d = esc(String(day)), attr = t => esc(t).replace(/"/g, '&quot;');
-  slot.innerHTML = o.specs.map((s, i) => {
-    const what = s.kind === 'retest' ? 'Retest beaten' : 'New best';
-    return `<button type="button" class="hl-band${quiet ? '' : ' is-new'}" onclick="openShareFromBand('${d}', ${i})" aria-label="${attr(what + ': ' + s.lift + ', ' + hlSetText(s) + '. Share it')}">
+  const items = o.specs.map(s => ({ s, reward: false })).concat(rewards.map(s => ({ s, reward: true })));
+  const share = hlShareList(o);
+  const had = new Set(Array.prototype.map.call(slot.querySelectorAll('[data-bk]'), b => b.getAttribute('data-bk')));
+  let fresh = false;
+  const html = items.slice(0, 3).map((it, i) => {
+    const s = it.s;
+    const key = it.reward ? s.award_id : s.kind + ':' + s.lift;
+    const isNew = !quiet && !had.has(key);
+    if (isNew) fresh = true;
+    const cls = 'hl-band' + (isNew ? ' is-new' : '');
+    if (!it.reward) {
+      const what = s.kind === 'retest' ? 'Retest beaten' : 'New best';
+      return `<button type="button" class="${cls}" data-bk="${attr(key)}" onclick="openShareFromBand('${d}', ${share.indexOf(s)})" aria-label="${attr(what + ': ' + s.lift + ', ' + hlSetText(s) + '. Share it')}">
       <span class="hl-band-t"><small>${what}</small><b>${esc(s.lift)} <em>${esc(hlSetText(s))}</em></b></span>
       <span class="hl-band-go" aria-hidden="true">Share</span></button>`;
-  }).join('');
-  if (!quiet && navigator.vibrate) navigator.vibrate([12, 60, 12]);
+    }
+    // A reward: its name and, for a badge, its metal in the bold line as plain text (clay is "look here" only, DS-01: never the <em>).
+    const what = hlBandWord(s.kind), nm = s.kind === 'badge' && rwMetalWord(s.metal) ? s.name + ' · ' + rwMetalWord(s.metal) : s.name;
+    if (s.counting) {
+      return `<div class="${cls} is-counting" data-bk="${attr(key)}" role="group" aria-label="${attr(what + ', counting: ' + nm)}">
+      <span class="hl-band-t"><small>${esc(what)} · Counting</small><b>${esc(nm)}</b></span></div>`;
+    }
+    return `<button type="button" class="${cls}" data-bk="${attr(key)}" onclick="openShareFromBand('${d}', ${share.indexOf(s)})" aria-label="${attr(what + ': ' + nm + '. Share it')}">
+      <span class="hl-band-t"><small>${esc(what)}</small><b>${esc(nm)}</b></span>
+      <span class="hl-band-go" aria-hidden="true">Share</span></button>`;
+  }).join('') + (items.length > 3 ? `<small class="hl-band-more">+${items.length - 3} more in AA Proof</small>` : '');
+  if (slot.innerHTML !== html) slot.innerHTML = html;
+  if (fresh && navigator.vibrate) navigator.vibrate([12, 60, 12]);
 }
-function openShareFromBand(day, i) { const o = loadWins(day); if (o) openShareSheet(o.specs, i); }
+function openShareFromBand(day, i) { const o = loadWins(day); if (o) openShareSheet(hlShareList(o), i); }
 window.openShareFromBand = openShareFromBand;
 // This cycle's wins (Progress → This cycle → Share a win ›): each shareable win to pick from.
 function openShareWins() {
@@ -17742,12 +18110,15 @@ function maybeHighlightMoment() {
     specs,
   });
 }
-// o: { eyebrow, title, sub, art, words, go, specs }. Career Mode phase 3 opens a reward's moment with the same call (GAME-14).
+// o: { eyebrow, title, sub, art, words, go, specs, onClose? }. Career Mode phase 3 opens a reward's moment with the same call (GAME-14);
+// onClose runs when the moment closes (any way). Any moment that opens counts as this run's one full-screen moment (D7, _rwOpened).
 function openMoment(o) {
   if (window.IS_PREVIEW || !o || !o.specs || !o.specs.length) return;
   closeMoment();
+  _rwOpened = true;
   const el = document.createElement('div');
   el.className = 'hl-moment';
+  el._onClose = typeof o.onClose === 'function' ? o.onClose : null;
   el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'hl-m-title');
   const rays = Array.from({ length: 14 }, (_, i) => `<i style="rotate:${Math.round(i * 360 / 14)}deg;animation-delay:${(i % 3) * 60}ms"></i>`).join('');
   el.innerHTML = `
@@ -17785,7 +18156,11 @@ function openMoment(o) {
 }
 function closeMoment() {
   const el = document.querySelector('.hl-moment');
-  if (el) { el.remove(); navSync(); }
+  if (el) {
+    const f = el._onClose;
+    el.remove(); navSync();
+    if (f) { try { f(); } catch (e) { /* a callback never keeps a moment open */ } }
+  }
 }
 window.openMoment = openMoment;
 window.closeMoment = closeMoment;

@@ -34,7 +34,10 @@ xp = "off"
 #
 # catalogue, phase 3: the entries gated on it in badges.toml and achievements.toml (retire_at / starts_at = "catalogue")
 # take effect: one badge per habit, HEAVY METAL and THE MACHINIST retire, the training badges and the awards join. It
-# needs the XP switch on first.
+# needs the XP switch on first. Turning it on (phase 3, stage70) changes no number: Proof's habit tiers and milestones stop
+# paying through hab_bonus_xp() and pay once in a career as awards (the same crossing day, the same XP, so no level drops);
+# the retired entries stop, the starts_at entries start, and what was earned under the new entries before that day is
+# minted in silence at the switch. It is seeded alone, on today's day (or yesterday's), at the same rulebook version.
 catalogue = "off"
 
 [level]
@@ -69,6 +72,8 @@ mission_sweep = 200       # all three of a week's missions done
 
 [habits]
 # AA Proof's habit values as they are today (XP_RULES in habits.html, the xp_rules row). They carry over unchanged.
+# At the catalogue switch no number here moves: the day gate, the weights and the targets stay, and what a habit's tiers paid
+# is paid on by the awards (the weight x completion_bonus still prices a habit tier). WORKOUT's 100 stays in the day gate.
 completion_bonus = 1.2    # a habit that reaches its target pays weight × 1.2; part way, it pays its share of the weight
 daily_cap = 3             # a counter takes at most 3 × its target in a day (the phone clamps it; nothing to score)
 max_custom = 3            # at most three custom habits pay in a day

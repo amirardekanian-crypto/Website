@@ -9,6 +9,7 @@ in a temp dir and runs the checker as a subprocess, the way a person (or a hook)
 
 New entries use ids that start with zz_, so a test never depends on a real entry staying as it is.
 """
+import json
 import re
 import shutil
 import subprocess
@@ -57,6 +58,7 @@ GOOD_ACHIEVEMENT = """
 name = "ZZ Good"
 meaning = "progress"
 reads = "personal_best"
+test = "first"
 rule = "A test rule."
 xp = 10
 size = "win"
@@ -115,6 +117,43 @@ BEST_VALUE_BADGE = swap(swap(GOOD_BADGE.replace("zz_good", "zz_value"), 'kind = 
 RETIRING_BADGE = swap(GOOD_BADGE.replace("zz_good", "zz_old"), 'origin = "new"\n',
                       'origin = "new"\nretire_at = "catalogue"\nsuperseded_by = "zz_new"\n')
 REPLACEMENT_BADGE = swap(GOOD_BADGE.replace("zz_good", "zz_new"), 'origin = "new"\n', 'origin = "new"\nstarts_at = "catalogue"\n')
+
+
+LOCK = "tiers.lock.json"
+SEED = HERE / "career_seed.py"
+
+
+def best_run(run, counts="week_held", extra=""):
+    """A valid best_run badge (zz_run) with the given run (None: no run line), counts and extra lines."""
+    block = swap(GOOD_BADGE.replace("zz_good", "zz_run"), 'kind = "total"', f'kind = "best_run"\n{extra}')
+    block = swap(block, 'counts = "session_finished"', f'counts = "{counts}"')
+    return swap(block, 'origin = "new"\n', 'origin = "new"\n' + ("" if run is None else f'run = "{run}"\n'))
+
+
+def achievement(test_lines, reads="personal_best", name="zz_a", extra=""):
+    """A valid achievement whose `test = "first"` line is replaced by test_lines."""
+    block = GOOD_ACHIEVEMENT.replace("zz_good", name)
+    block = swap(block, 'reads = "personal_best"', f'reads = "{reads}"' + (f"\n{extra}" if extra else ""))
+    return swap(block, 'test = "first"', test_lines)
+
+
+# One valid achievement per test (rule 18).
+VALID_TESTS = {
+    "first": achievement('test = "first"', name="zz_first"),
+    "proof": achievement('test = "proof"\nproof_measure = "daysHit:strength"\nproof_need = 5', reads="proof",
+                         name="zz_proof", extra='proof_code = "ZZ"'),
+    "goals": achievement('test = "goals"\ngoals = [{ kind = "daysHit:strength", need = 4 }, { kind = "qualify", need = 3 }]',
+                         name="zz_goals"),
+    "cycle_all_held": achievement('test = "cycle_all_held"', name="zz_flaw"),
+    "cycle_by_the_book": achievement('test = "cycle_by_the_book"', name="zz_book"),
+    "cycle_with_broken": achievement('test = "cycle_with_broken"', name="zz_broke"),
+    "runs_together": achievement('test = "runs_together"\nhabits = ["steps", "sleep"]\nrun = 7', name="zz_together"),
+    "best_value": achievement('test = "best_value"\nat = 100', reads="lift_gain", name="zz_value"),
+    "patterns_in_cycle": achievement('test = "patterns_in_cycle"\ngroups = { squat = ["squat"], '
+                                     'push = ["push-horizontal", "push-vertical"] }', name="zz_patterns"),
+    "cycle_proving": achievement('test = "cycle_proving"\nbests = 3\nretests = 1', name="zz_proving"),
+    "run_regained": achievement('test = "run_regained"\naway_weeks = 4', name="zz_regained"),
+}
 
 
 class CareerCheckerTests(unittest.TestCase):
@@ -658,7 +697,8 @@ class CareerCheckerTests(unittest.TestCase):
             # is gone). Proof's entries are swapped out too, so the shadow is turned off: there is no parity to check.
             self.setUp()
             self.catalogue_on()
-            gate = 'free = true\nretire_at = "catalogue"\n' if retiring else "free = true\n"
+            (self.dir / "tiers.lock.json").unlink()      # the real lock names badges these small files do not have
+            gate ='free = true\nretire_at = "catalogue"\n' if retiring else "free = true\n"
             for filename, block in (("badges.toml", GOOD_BADGE), ("missions.toml", GOOD_MISSION)):
                 (self.dir / filename).write_text(swap(block, "free = true\n", gate), encoding="utf-8", newline="\n")
             (self.dir / "achievements.toml").write_text(GOOD_ACHIEVEMENT, encoding="utf-8", newline="\n")
@@ -689,6 +729,324 @@ class CareerCheckerTests(unittest.TestCase):
                 self.assertNotIn("Traceback", out)
                 self.assertNotIn("does not parse", out)          # it is valid TOML, just the wrong shape
                 self.assertEqual(rc, 1, out)
+
+    # ── phase 3: helpers ──────────────────────────────────────────────────────────────────────────────────────────
+    def drop_key(self, filename, table, key):
+        """Remove `key` from [table] (the key is on one line)."""
+        path = self.dir / filename
+        lines = path.read_text(encoding="utf-8").split("\n")
+        where = None
+        for i, line in enumerate(lines):
+            header = re.match(r"^\[([^\]]+)\]\s*(#.*)?$", line)
+            if header:
+                where = header.group(1)
+            elif where == table and re.match(rf"^{re.escape(key)}\s*=", line):
+                del lines[i]
+                path.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+                return
+        self.fail(f"{filename} has no `{key}` in [{table}]: update this test")
+
+    def lock(self, change=None):
+        """Read the copy's tiers lock, let `change` edit it, write it back; return it."""
+        path = self.dir / LOCK
+        lock = json.loads(path.read_text(encoding="utf-8"))
+        if change:
+            change(lock)
+            path.write_text(json.dumps(lock), encoding="utf-8", newline="\n")
+        return lock
+
+    # ── rule 17: a best_run badge says what a run is ──────────────────────────────────────────────────────────────
+    def test_rule_17_the_real_best_run_badges_carry_a_run(self):
+        text = (self.dir / "badges.toml").read_text(encoding="utf-8")
+        self.assertIn('run = "plan_weeks"', text)
+        self.assertIn('run = "iso_weeks"', text)
+        self.assertEqual(text.count('run = "days"'), 8)
+        self.assertIn('history_twin_counts = "comeback_stuck"', text)
+        self.assertPasses("OK: 0 errors")
+
+    def test_rule_17_each_run_passes_with_its_counts(self):
+        self.append("badges.toml", best_run("plan_weeks"))
+        self.append("badges.toml", best_run("iso_weeks", counts="mission_sweep").replace("zz_run", "zz_iso"))
+        self.append("badges.toml", best_run("days", counts="habit_done", extra='habit = "water"').replace("zz_run", "zz_days"))
+        self.assertPasses("OK: 0 errors")
+
+    def test_rule_17_a_best_run_badge_without_a_run_fails(self):
+        self.append("badges.toml", best_run(None))
+        self.assertFails("[badge.zz_run]", "needs run = one of plan_weeks, days, iso_weeks", "rule 17")
+
+    def test_rule_17_an_unknown_run_fails(self):
+        self.append("badges.toml", best_run("weekly"))
+        self.assertFails("[badge.zz_run]", "found 'weekly'", "rule 17")
+
+    def test_rule_17_a_real_best_run_badge_losing_its_run_fails(self):
+        self.drop_key("badges.toml", "badge.held_weeks", "run")
+        self.assertFails("[badge.held_weeks]", "needs run", "rule 17")
+
+    def test_rule_17_days_needs_habit_done_and_a_habit(self):
+        self.append("badges.toml", best_run("days", counts="habit_done"))                    # no habit
+        self.assertFails("[badge.zz_run]", 'run "days" needs habit', "rule 17")
+        self.setUp()
+        self.append("badges.toml", best_run("days", counts="week_held", extra='habit = "water"'))
+        self.assertFails("[badge.zz_run]", 'run "days" needs counts = "habit_done"')
+
+    def test_rule_17_plan_weeks_needs_week_held(self):
+        self.append("badges.toml", best_run("plan_weeks", counts="mission_sweep"))
+        self.assertFails("[badge.zz_run]", 'run "plan_weeks" needs counts = "week_held"')
+
+    def test_rule_17_run_on_a_total_badge_fails(self):
+        self.append("badges.toml", swap(GOOD_BADGE, 'origin = "new"\n', 'origin = "new"\nrun = "days"\n'))
+        self.assertFails("[badge.zz_good]", 'run is for kind "best_run" only', "rule 17")
+
+    # ── rule 18: an achievement's test and exactly its keys ───────────────────────────────────────────────────────
+    def test_rule_18_all_eleven_tests_pass(self):
+        self.assertEqual(len(VALID_TESTS), 11)
+        for block in VALID_TESTS.values():
+            self.append("achievements.toml", block)
+        self.assertPasses("OK: 0 errors")
+
+    def test_rule_18_every_real_achievement_has_a_test(self):
+        text = (self.dir / "achievements.toml").read_text(encoding="utf-8")
+        self.assertEqual(len(re.findall(r"(?m)^test = ", text)), 22)
+        self.assertEqual(text.count('test = "goals"'), 5)
+
+    def test_rule_18_a_missing_or_unknown_test_fails(self):
+        self.append("achievements.toml", swap(GOOD_ACHIEVEMENT, 'test = "first"\n', ""))
+        self.assertFails("[achievement.zz_good]", "test is missing", "rule 18")
+        self.setUp()
+        self.append("achievements.toml", swap(GOOD_ACHIEVEMENT, 'test = "first"', 'test = "sometimes"'))
+        self.assertFails("[achievement.zz_good]", "test 'sometimes' is not one of", "rule 18")
+
+    def test_rule_18_a_missing_param_fails_for_every_test_that_has_one(self):
+        needs = {"proof": "proof_need", "goals": "goals", "runs_together": "run", "best_value": "at",
+                 "patterns_in_cycle": "groups", "cycle_proving": "bests", "run_regained": "away_weeks"}
+        for test, key in needs.items():
+            with self.subTest(test=test):
+                self.setUp()
+                block = "\n".join(line for line in VALID_TESTS[test].split("\n") if not line.startswith(f"{key} = "))
+                self.assertNotEqual(block, VALID_TESTS[test])
+                self.append("achievements.toml", block)
+                self.assertFails(f'test "{test}" needs {key}')
+
+    def test_rule_18_a_param_of_another_test_fails(self):
+        self.append("achievements.toml", achievement('test = "first"\nbests = 3', name="zz_stray"))
+        self.assertFails("[achievement.zz_stray]", 'bests belongs to another test, not to test "first"', "rule 18")
+
+    def test_rule_18_first_reads_a_known_fact_and_proof_reads_proof(self):
+        self.append("achievements.toml", achievement('test = "first"', reads="no_such_fact", name="zz_ghost"))
+        self.assertFails("[achievement.zz_ghost]", "no_such_fact")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "proof"\nproof_measure = "daysHit:strength"\nproof_need = 5',
+                                                     name="zz_notproof", extra='proof_code = "ZZ"'))
+        self.assertFails("[achievement.zz_notproof]", 'test "proof" needs reads = "proof"')
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "best_value"\nat = 100', name="zz_notlift"))
+        self.assertFails("[achievement.zz_notlift]", 'test "best_value" reads the fact lift_gain')
+
+    def test_rule_18_goals_are_checked(self):
+        bad = {"an empty list": "goals = []", "an unknown kind": 'goals = [{ kind = "steps", need = 5 }]',
+               "a habit that is not there": 'goals = [{ kind = "daysHit:yoga", need = 5 }]',
+               "a need of 0": 'goals = [{ kind = "qualify", need = 0 }]',
+               "no need": 'goals = [{ kind = "qualify" }]', "custom": 'goals = [{ kind = "daysHit:custom", need = 2 }]'}
+        for label, goals in bad.items():
+            with self.subTest(goals=label):
+                self.setUp()
+                self.append("achievements.toml", achievement(f'test = "goals"\n{goals}', name="zz_goals"))
+                self.assertFails("[achievement.zz_goals]", "rule 18" if label == "an empty list" else "goal 1:")
+
+    def test_rule_18_the_events_goals_match_the_phone(self):
+        # habits.html EVENTS (l.3290) is the other copy; check_twins.js §10 compares the two, this pins the shape.
+        text = (self.dir / "achievements.toml").read_text(encoding="utf-8")
+        self.assertIn('{ kind = "comebacksStuck", need = 2 }', text)
+        self.assertIn('{ kind = "total:steps", need = 250000 }', text)
+
+    def test_rule_18_the_other_tests_params_are_checked(self):
+        cases = [("runs_together", 'habits = ["steps", "sleep"]', 'habits = ["steps", "yoga"]', "yoga"),
+                 ("runs_together", 'habits = ["steps", "sleep"]', "habits = []", "habits must be a non-empty list"),
+                 ("runs_together", "run = 7", "run = 0", "run = 0 must be above 0"),
+                 ("best_value", "at = 100", "at = 0", "at = 0 must be above 0"),
+                 ("patterns_in_cycle", '{ squat = ["squat"], ', "{ squat = [], ", "groups must be a table"),
+                 ("cycle_proving", "bests = 3", "bests = 0", "bests = 0 must be 1 or more"),
+                 ("cycle_proving", "retests = 1", "retests = -1", "retests = -1 must be 0 or more"),
+                 ("run_regained", "away_weeks = 4", "away_weeks = 0", "away_weeks = 0 must be 1 or more")]
+        for test, old, new, needle in cases:
+            with self.subTest(test=test, new=new):
+                self.setUp()
+                self.append("achievements.toml", swap(VALID_TESTS[test], old, new))
+                self.assertFails(needle)
+
+    # ── rule 19: a title's size, and [moments] ────────────────────────────────────────────────────────────────────
+    def test_rule_19_the_real_files_carry_the_grand_slams_size_and_the_moments(self):
+        self.assertIn('size = "legend"', (self.dir / "titles.toml").read_text(encoding="utf-8"))
+        self.assertIn("[moments]", (self.dir / "recognition.toml").read_text(encoding="utf-8"))
+
+    def test_rule_19_a_size_on_the_grand_slam_passes(self):
+        self.append("titles.toml", swap(swap(GOOD_TITLE, 'meaning = "progress"', 'meaning = "all"'), 'origin = "new"\n',
+                                        'origin = "new"\nsize = "milestone"\n'))
+        self.assertPasses("OK: 0 errors")
+
+    def test_rule_19_a_size_on_any_other_title_fails(self):
+        self.append("titles.toml", swap(GOOD_TITLE, 'origin = "new"\n', 'origin = "new"\nsize = "legend"\n'))
+        self.assertFails("[title.zz_good]", "size is for the Grand Slam", "rule 19")
+
+    def test_rule_19_a_size_that_is_not_one_of_the_five_fails(self):
+        self.append("titles.toml", swap(swap(GOOD_TITLE, 'meaning = "progress"', 'meaning = "all"'), 'origin = "new"\n',
+                                        'origin = "new"\nsize = "huge"\n'))
+        self.assertFails("[title.zz_good]", "size 'huge' is not one of", "rule 19")
+
+    def test_rule_19_the_moments_keys_are_checked(self):
+        for key, literal, needle in (("per_open", "0", "per_open = 0 must be 1 or more"),
+                                     ("keep_days", "1.5", "keep_days must be a whole number"),
+                                     ("max", "0", "max = 0 must be 1 or more"),
+                                     ("full_screen", '["milestone", "epic"]', "full_screen must be a non-empty list"),
+                                     ("full_screen", "[]", "full_screen must be a non-empty list")):
+            with self.subTest(key=key, literal=literal):
+                self.setUp()
+                self.set_key("recognition.toml", "moments", key, literal)
+                self.assertFails("[moments]", needle)
+
+    def test_rule_19_a_missing_moments_table_fails(self):
+        path = self.dir / "recognition.toml"
+        text = path.read_text(encoding="utf-8")
+        start = text.index("[moments]")
+        end = text.index("[feedback]", start)
+        path.write_text(text[:start] + text[end:], encoding="utf-8", newline="\n")
+        self.assertFails("[moments]", "the [moments] table is missing")
+
+    # ── rule 20: the gates agree (warnings) ───────────────────────────────────────────────────────────────────────
+    def test_rule_20_the_real_files_have_no_gate_warnings(self):
+        self.assertNotIn("rule 20", self.assertPasses("OK: 0 errors"))
+
+    def test_rule_20_a_starts_at_entry_nobody_supersedes_is_a_warning(self):
+        self.append("badges.toml", REPLACEMENT_BADGE)
+        out = self.assertPasses("OK: 0 errors")
+        self.assertIn("[badge.zz_new]", out)
+        self.assertIn("no retired entry names it in superseded_by", out)
+        self.setUp()
+        self.append("badges.toml", RETIRING_BADGE)
+        self.append("badges.toml", REPLACEMENT_BADGE)
+        self.assertNotIn("no retired entry names it", self.assertPasses("OK: 0 errors"))
+
+    def test_rule_20_a_superseding_pair_shares_a_meaning(self):
+        self.append("badges.toml", RETIRING_BADGE)
+        self.append("badges.toml", swap(REPLACEMENT_BADGE, 'meaning = "consistency"', 'meaning = "resilience"'))
+        out = self.assertPasses("OK: 0 errors")
+        self.assertIn("zz_old (consistency) is superseded by zz_new (resilience)", out)
+
+    def test_rule_20_history_twin_counts_goes_on_a_starts_at_entry_that_counts_the_kind(self):
+        twin = swap(REPLACEMENT_BADGE, 'counts = "session_finished"', 'counts = ["session_finished", "full_log"]')
+        self.append("badges.toml", RETIRING_BADGE)
+        self.append("badges.toml", swap(twin, 'starts_at = "catalogue"\n',
+                                        'starts_at = "catalogue"\nhistory_twin_counts = "session_finished"\n'))
+        self.assertNotIn("history_twin_counts", self.assertPasses("OK: 0 errors"))
+        self.setUp()
+        self.append("badges.toml", RETIRING_BADGE)
+        self.append("badges.toml", swap(twin, 'starts_at = "catalogue"\n',
+                                        'starts_at = "catalogue"\nhistory_twin_counts = "week_held"\n'))
+        self.assertIn("history_twin_counts 'week_held' must be a fact its counts include", self.assertPasses("OK: 0 errors"))
+        self.setUp()
+        self.append("badges.toml", swap(GOOD_BADGE, 'origin = "new"\n', 'origin = "new"\nhistory_twin_counts = "session_finished"\n'))
+        self.assertIn("history_twin_counts is for a starts_at entry only", self.assertPasses("OK: 0 errors"))
+
+    # ── rule 21: tiers are append-only ────────────────────────────────────────────────────────────────────────────
+    def test_rule_21_the_real_lock_matches_the_real_files(self):
+        lock = self.lock()
+        self.assertEqual(len(lock), 38)
+        self.assertEqual(lock["held_weeks"], ["bronze", "silver", "emerald", "amethyst", "prismatic"])
+        self.assertEqual(lock["comebacks"], ["bronze", "silver", "emerald"])
+        self.assertNotIn("rule 21", self.assertPasses("OK: 0 errors"))
+
+    def test_rule_21_appending_a_tier_passes_and_so_does_a_changed_at_or_xp(self):
+        self.lock(lambda lock: lock.update(held_weeks=lock["held_weeks"][:3]))      # the files now hold two MORE than the lock
+        self.assertPasses("OK: 0 errors")
+        self.setUp()
+        path = self.dir / "badges.toml"
+        text = path.read_text(encoding="utf-8")
+        start = text.index("[badge.held_weeks]")
+        path.write_text(text[:start] + re.sub(r"xp = \d+", "xp = 9999", text[start:], count=1) + "", encoding="utf-8", newline="\n")
+        self.assertPasses("OK: 0 errors")
+
+    def test_rule_21_a_changed_metal_or_an_inserted_tier_fails(self):
+        self.lock(lambda lock: lock["held_weeks"].__setitem__(1, "emerald"))        # the lock says tier 2 was emerald
+        out = self.assertFails("[badge.held_weeks]", "tier 2 is 'silver' but the lock holds 'emerald'")
+        self.assertIn("insert a tier at the end, never in the middle", out)
+
+    def test_rule_21_a_removed_tier_fails(self):
+        self.lock(lambda lock: lock["comebacks"].append("amethyst"))                # the lock holds four, the file three
+        self.assertFails("[badge.comebacks]", "has 3 tier(s), the lock holds 4", "a tier is never removed")
+
+    def test_rule_21_a_removed_badge_fails(self):
+        self.lock(lambda lock: lock.update(zz_gone=["bronze"]))
+        self.assertFails("[badge.zz_gone]", "an id is never removed")
+
+    def test_rule_21_a_new_badge_is_a_warning_until_the_lock_is_written(self):
+        self.append("badges.toml", GOOD_BADGE)
+        out = self.assertPasses("OK: 0 errors")
+        self.assertIn("[badge.zz_good]", out)
+        self.assertIn("is not in the tiers lock yet", out)
+
+    def test_rule_21_no_lock_no_rule(self):
+        (self.dir / LOCK).unlink()
+        self.assertNotIn("rule 21", self.assertPasses("OK: 0 errors"))
+
+    def test_rule_21_a_broken_lock_fails(self):
+        (self.dir / LOCK).write_text("[1, 2", encoding="utf-8")
+        self.assertFails("tiers.lock.json", "cannot be read")
+        (self.dir / LOCK).write_text('{"held_weeks": "bronze"}', encoding="utf-8")
+        self.assertFails("tiers.lock.json", "must be an object of lists of metals")
+
+    # ── the seed: --write-lock and --catalogue-steps ──────────────────────────────────────────────────────────────
+    def run_seed(self, *args):
+        p = subprocess.run([sys.executable, "-X", "utf8", str(SEED), str(self.dir), *args], capture_output=True,
+                           text=True, encoding="utf-8", timeout=120)
+        return p.returncode, p.stdout, p.stderr
+
+    def test_write_lock_makes_the_lock_again_from_the_files(self):
+        before = (self.dir / LOCK).read_text(encoding="utf-8")
+        (self.dir / LOCK).unlink()
+        rc, _, err = self.run_seed("--write-lock")
+        self.assertEqual(rc, 0, err)
+        self.assertEqual((self.dir / LOCK).read_text(encoding="utf-8"), before)
+        self.assertEqual(json.loads(before)["held_weeks"][0], "bronze")
+
+    def test_write_lock_lets_a_tier_be_appended_and_refuses_one_that_was_removed(self):
+        text = (self.dir / "badges.toml").read_text(encoding="utf-8")
+        start = text.index("[badge.comebacks]")
+        grown = text[:start] + text[start:].replace('{ at = 10, metal = "emerald", xp = 1200, size = "milestone" },',
+                                                    '{ at = 10, metal = "emerald", xp = 1200, size = "milestone" },\n'
+                                                    '  { at = 20, metal = "amethyst", xp = 2400, size = "milestone" },', 1)
+        self.assertNotEqual(grown, text)
+        (self.dir / "badges.toml").write_text(grown, encoding="utf-8", newline="\n")
+        rc, _, err = self.run_seed("--write-lock")
+        self.assertEqual(rc, 0, err)
+        self.assertEqual(self.lock()["comebacks"], ["bronze", "silver", "emerald", "amethyst"])
+        shrunk = grown.replace('  { at = 20, metal = "amethyst", xp = 2400, size = "milestone" },\n', "", 1)
+        (self.dir / "badges.toml").write_text(shrunk, encoding="utf-8", newline="\n")
+        rc, _, err = self.run_seed("--write-lock")
+        self.assertNotEqual(rc, 0)
+        self.assertIn("never removed", err)
+        self.assertEqual(self.lock()["comebacks"], ["bronze", "silver", "emerald", "amethyst"])     # not rewritten
+
+    def test_catalogue_steps_are_batches_of_five_from_0_to_95(self):
+        rc, out, err = self.run_seed("--catalogue-steps", "--day", "2027-01-10")
+        self.assertEqual(rc, 0, err)
+        for name in ("career_catalogue_before", "career_rewards_batch"):
+            self.assertEqual(len(re.findall(rf"select public\.{name}\(\d+", out)), 20)
+        self.assertIn("select public.career_catalogue_before(0, 5);", out)
+        self.assertIn("select public.career_rewards_batch(95, 5, 'baseline');", out)
+        self.assertEqual(len(re.findall(r"select public\.career_catalogue_preview\(", out)), 20)
+        self.assertIn("select public.career_compare();", out)
+        self.assertIn('"catalogue":"2027-01-10"', out)          # the dry run's rules carry the switch day, nothing else changed
+        rc, _, err = self.run_seed("--catalogue-steps", "--day", "next monday")
+        self.assertNotEqual(rc, 0)
+
+    def test_the_seed_carries_the_moments_setting_and_the_goals(self):
+        rc, out, err = self.run_seed("--json")
+        self.assertEqual(rc, 0, err)
+        rows = json.loads(out)["catalogue"]
+        self.assertIn(("setting", "moments"), {(r["kind"], r["id"]) for r in rows})
+        foundry = next(r for r in rows if (r["kind"], r["id"]) == ("achievement", "the_foundry"))
+        self.assertEqual(foundry["body"]["goals"][0], {"kind": "daysHit:strength", "need": 16})
+        self.assertEqual(foundry["body"]["test"], "goals")
 
 
 if __name__ == "__main__":

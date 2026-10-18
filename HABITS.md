@@ -851,6 +851,11 @@ Habits and achievements merged, because they were two views of one question.
 > the row opening the habit's page, and paused add-ons as dim rows. Its heading carries *N of 7 on
 > target · +XP*. The five consistency pips are on the habit's page. Milestones below are unchanged.
 
+> **Once the catalogue switch is on (Career Mode phase 3, D15):** the four stats stay exactly as they are (*Milestones* counts the
+> awards the server holds over every live tier and milestone), and the milestone block is the catalogue's, grouped by the four kinds
+> of win with the same folds, next three and Earned strip; a retired badge is a line, *Earned before: …*, under the badge that
+> replaced it. See *Career Mode, phase 3* below.
+
 Opens straight on **four season stats**: days logged, **milestones** (the same count as the
 section at the foot, since POL-02; the tile said *Badges 8/72*, tiers included), **day streak** (as the
 flame) and perfect days → a one-line **key explaining the consistency pips**, which had
@@ -1051,6 +1056,10 @@ rank lives here and nowhere else now that Progress dropped its strip; the profil
 the top of Settings; and Settings → *Locker*. A fifth comes from outside, once Career Mode's XP switch is on: the training
 app's Career row opens `habits.html?client=<id>&go=pass` (read at the end of boot, after `?open=<id>`, which wins if both are
 given, and never in the embed). Top to bottom it draws:
+
+> **Once the catalogue switch is on (Career Mode phase 3):** *What you have* opens with the **Grand Slam row** (a title per kind
+> of win, *Not yet* in grey, the GRAND SLAM plate when all four are held), and the title rail carries the catalogue's titles
+> (CLOCKWORK, CENTURY …) beside the road's, the events' and the seasons'.
 
 1. **The pass hero** — level ring, rank crest and name, its metal tier with the XP into this
    level, *N of 14 rewards kept*, and a **NEXT ON THE ROAD** button that scrolls the track
@@ -1465,6 +1474,10 @@ to explain the decision to the athlete.
 
 ## The tour — the game-style first run
 
+> **Once the catalogue switch is on (Career Mode phase 3):** a sixth step, after *Your level, and the Locker*, rings the four
+> numbers under the level bar (`.hero4`): *Your record. Four numbers that only go up. Tap one to see what's next.* The prompt on
+> Today and the manual's *Start here* say six steps then.
+
 > **2026-10-12 (the UX audit's batch E):** each step is under 40 words (the row step says the circle opens the number on a counted habit; the board step rings the *You appear as* row), and the tour's buttons are the app's pill buttons (the tour lives outside `#app`, so it had square, uppercase ones). The same pass made **the manual fold**: every section is a heading you tap (`UI.manOpen`, *Start here* open on arrival), the contents list opens and goes to a section, and `openManual(section, from)` opens the right one from Progress (*Consistency*), the Locker (*The Locker*) and Crew (*The leaderboard*). **The wins card shows two lines at most**, then *and N more*. **No em-dash in anything an athlete reads** (COM-3): 95 lines of toasts, notes, onboarding, Settings and the manual were rewritten; the session's locked hint says *Finish any session in your programme and this ticks itself.*, and onboarding's ALWAYS ON is Settings' pill.
 
 
@@ -1543,6 +1556,10 @@ nothing on this track costs Amir anything to hand over:
 
 A cosmetic is worth nothing without an audience — which is why most habit trackers cannot
 make rewards work. This one has two: the board, and a card built to be exported.
+
+**From the catalogue switch (Career Mode phase 3)** the road is unchanged and a third kind joins it: the catalogue's **titles**,
+paid by a badge's top steps, a few milestones and the events, minted by the server with their award and never by the phone, and
+the **Grand Slam**, a title in each of the four kinds of win (level and season titles never count). See *Career Mode, phase 3*.
 
 **They are kept, and that is the one exception in the whole app.** Every other number here
 is derived, so retuning a rule rescores all of history. Rewards are *recorded* in
@@ -1725,6 +1742,11 @@ the level being shared was never shown. The rest of the queue now waits in `UI.c
 | A season title (level 5 in a season that has closed, or 2,000 season points once the XP switch is on) | **the whole screen, kicker *Season over*** (new: it arrived in silence) | **Title**: the prismatic plate, *FINISHED PRE-SEASON*, the rank, level and XP it finished on |
 | A finished season with no title | **the wins card** (new) | none: the Rank card is already the new season's |
 | The career reveal (once the XP switch is on, once per athlete) | **the whole screen, kicker *Your career***, the rank's own ground | **Rank**, eyebrow *MY CAREER* |
+| **Once the catalogue switch is on (phase 3):** a badge step or milestone of size *win* or *highlight* | the wins card, its kind of win's emoji, *HUMAN SPRINKLER · Bronze* | **Milestone** on `{k: 'award', id}`: the tier's metal, the kind of win's emoji, the caption, the XP |
+| …of size *milestone* or *legend* (one per open, D7) | the whole screen, badge ground, kicker = its kind of win, the size's line | **Milestone** on the award |
+| …a catalogue title, the Grand Slam | rides on its award's screen; the Grand Slam is its own (*A title in all four. That's the whole game.*) | **Title**, eyebrow *TITLE · <KIND OF WIN>* or *GRAND SLAM* |
+| …a finished event | ONE takeover, the award's (the event's title arrives from the server) | **Milestone** on the award |
+| The catalogue reveal (once per athlete) | **the whole screen, kicker *My record***, the four counts and the Grand Slam row | **Rank**, eyebrow *MY RECORD* |
 
 The wins card has one Share it: it opens the newest win that has a card, and the picker holds the newest
 win of every other card too (a milestone and a perfect day from one evening are each one tap apart).
@@ -1765,6 +1787,10 @@ trust it.
 That difference is the whole design. `CFG.pass.owned` is localStorage, and devtools would
 hand anyone PROOF ITSELF, so the server keeps **its own record of what has been earned**
 (`public.hab_titles`) and refuses to publish anything else.
+
+**Catalogue titles (Career Mode phase 3).** From the catalogue switch the server mints a catalogue title with its award and writes
+its `hab_titles` row in the same breath (its Proof id where it has one, else its catalogue id: `clockwork`, `grand_slam`), so
+`set_title()`, `claim_titles()` and the board work unchanged; `titleName()` names them through `passItem()`'s fourth lookup.
 
 **The record is minted, not recomputed** — and that is the part worth remembering, because
 checking the title against the athlete's *current* level is the obvious design and it is
@@ -2606,6 +2632,85 @@ the strip never asking, and nothing changing before the switch.
 
 ---
 
+## Career Mode, phase 3 (the catalogue switch)
+
+> **Where it stands (2026-10-18).** Built in `habits.html`, dormant. Every branch below sits behind **`catalogueOn()`**: the
+> server's catalogue switch is on (`get_profile().switch.catalogue` is a day) AND the profile carries the awards (`badges`,
+> `owned`). With it off, or with no profile ever (a new install offline, the demo, a preview with nothing to read), the app is
+> exactly what the rest of this file says, screen for screen (the lane's headless check compares the rendered Today, Progress and
+> Locker with the previous build's). The server half is `supabase/stage70_career_rewards.sql`; the rules are
+> `career/CAREER_MODE.md` and `career/PROCEDURES.md` → *Phase 3, as built*. Turning it on waits for Amir's sign-off of the catalogue
+> (D11) and of every new line an athlete reads (D10), and the go-day he picks (D1: recommended, the day Season 2 starts).
+
+**What the switch is.** From its day every badge tier, milestone and catalogue title is an **award**: the server mints it once in a
+career (`career_awards`, never taken back), pays its XP through the facts, and tells the athlete once (`career_recognition`, read as
+`get_profile().moments`). Proof stops paying tiers and milestones itself: `bonusEvents()` emits neither (quests and comebacks are
+unchanged), exactly as the server strips them from `hab_bonus_xp()`. History is minted in silence at the switch; Proof's own ladders
+(`habit_tiers`, the seven habit families, HEAVY METAL, HARD TO KILL, THE MACHINIST) retire into the catalogue's: **one badge per
+habit** (`habit_water` … `habit_custom`, five steps KINDLED to UNBREAKABLE), Hold Serve, Century, the widened HARD TO KILL. Nothing
+already earned is ever taken away (below, *Earned before*).
+
+**The two gates.** `catalogueOn()` draws the shelf, the four numbers and the server's moments from the profile alone (it carries every
+name and caption). `catalogueReady()` is that AND this phone holding the **catalogue copy** (`<id>_hab_catalogue`, fetched by
+`fetchCatalogue()` from `career_catalogue` whenever `get_profile().catalogue_version` moves; never in `CFG`, never synced, never
+written in the preview or the demo, never read in the embed). Everything that reads the copy asks `catalogueReady()`: a first open
+offline has a profile and no copy, and then the phone simply does not score awards itself until the copy arrives.
+
+**Scored on the phone too (P13, GAME-13).** `awardMeasures(inp, cat)` is the phone's twin of the server's measures for the entries a
+phone can decide from its own log: the eight `habit_*` badges, `day_streak`, `dawn_patrol`, `proof_clean_sweep`, `back_in_the_fight`,
+`first_blood`, `the_centurion`, `full_stack` and the five events. It is PURE (its input, `awardInput()`, is built from the functions
+every badge here already read: `loggedDays()`, `isDone()`, `dayQualifies()`, `isPerfect()`, `comebackRuns()`), memoized beside the
+bonus cache. `phoneAwards()` keeps the crossings on a day AFTER the switch (the switch day is history on both sides), inside the open
+window (today and the 3 days before it, plus one), not owned, not withdrawn, priced as the server prices them. Their XP shows at the
+tap (`pendingAwardXp()`, added to `careerXp()` and the week) until the server's answer owns them. `scripts/check_twins.js` §10 holds
+the twin to the server's own answers (`scripts/career/reward_cases.json`).
+
+**A pending award the server does not hold is withdrawn, quietly.** Judged only on an answer that started after a push landed with
+nothing left to send: the id goes into `<id>_hab_awwd` (phone-local), its wins line goes, its XP goes, and the console says
+`[career] twin disagrees`. If the server owns it later it arrives as an ordinary server moment.
+
+**Moments (D7).** One full-screen moment per open, and that covers everything full-screen: a level-up, a rank, the reveal or an
+award. A milestone or legend award takes the screen; a win or highlight is a line on the wins card. A full-screen award earned by a
+tap opens right then; one that arrives with the server's answer opens only when nothing full-screen has opened this run, and
+otherwise waits, unseen, for the next open. Only what is shown goes into `CFG.seenAwards` (synced, unioned across phones). Each
+fresh answer tells the server, in one `mark_moments_told(…, 'proof')` call, what Proof has shown, including any waiting moment it
+had already celebrated itself, so the training app never replays it. A moment never opens from the cached profile at first paint.
+**The day streak keeps its takeover on every new streak (D17)**: its award (once a career) is recorded as seen whenever that
+takeover fires and never opens one of its own. An **event** finished is one takeover, the award's; its title reaches the Locker only
+from the server (`syncCatalogueTitles()`), because `CFG.pass.owned` can never give a pending one back (`claimEventTitles()` stands
+down).
+
+**The catalogue reveal, once per athlete.** The first open after the switch re-baselines in silence (levels, every award recorded as
+seen, the road's rewards it reaches) and shows ONE screen: *MY RECORD · Your record · Everything you've earned, counted once and kept
+for good.*, the four counts, the Grand Slam row and the road's rewards. `CFG.catalogueSeen` survives the cloud merge, so a second
+phone stays quiet, and the flip alone never toasts *XP system updated*. When the XP reveal had this open, it waits for the next.
+Share it opens the Rank card, eyebrow *MY RECORD*.
+
+**What the athlete sees.**
+
+- **Today:** under the level bar, **four numbers**, one per kind of win (`hero4()`): coached *Weeks held* (with its best) ·
+  *Sessions with Amir* · *Personal bests* · *Comebacks*; free *Day streak* · *Perfect days* · *Habit steps* · *Comebacks* (D4),
+  the free athlete's first three this phone's own, so they move at the tap. A tap opens Progress at that kind of win. Two by two
+  under 360 px.
+- **Progress:** the statgrid is unchanged (D15; *Milestones* now counts the awards held over every live tier and milestone). The
+  milestone block is the catalogue's, in four groups (*Consistency*, *Commitment*, *Progress*, *Resilience*), with the same folds,
+  next three and Earned strip. A badge row shows its held tier's metal and its count to the next step. A retired badge is never a
+  row of its own: it is a line under its successor, **Earned before: HUMAN SPRINKLER II**, from the server's record or from
+  `CFG.heldBefore` (what Proof's own shelf held at the switch, read once, synced). A free athlete's Progress group is locked:
+  *Coached athletes earn these from their programme.*
+- **Locker:** the **Grand Slam row** first under *What you have* (a title per kind of win, *Not yet* in grey, the GRAND SLAM plate
+  once all four are held), and the catalogue's titles on the title rail (`passItem()` resolves them through `catTitleByHabId()`).
+- **Share cards:** a badge or milestone opens the Milestone card on `{k: 'award', id}` (its tier's metal, its kind of win's emoji:
+  🔁 consistency, 📅 commitment, 📈 progress, 🛡️ resilience), a catalogue title the Title card (the Grand Slam's eyebrow is *GRAND
+  SLAM*). Proof's own painter; never `assets/js/sharecard.js`.
+- **The tour** gains a step on the four numbers; **the manual** gains *Four kinds of win* and says *one badge per habit*.
+- **`?go=progress`** opens Progress (the training app's Career row, once the switch is on).
+
+**Never in the embed** (`checkLevelUps()` returns at the top, no profile, no catalogue, no RPC) **and nothing written in the coach's
+preview.** The lane's checks (65, made-up profiles) and the repo's `scripts/headless/career.js` cover both.
+
+---
+
 ## The leaderboard
 
 - **Everyone is on it — joined automatically, once, after a first finished workout**
@@ -2811,13 +2916,17 @@ preference, so the newer config still wins — but never into an empty slot.
 
 Storage keys, all owned solely by Proof: `<id>_hab_cfg` (settings), `<id>_hab_log`
 (the daily log), `<id>_hab_meta` (sync state, which stays on the phone) and, once Career Mode's XP switch is on,
-`<id>_hab_career` (the last profile the server sent: a cache, kept on the phone and never synced). The first two ride the
+`<id>_hab_career` (the last profile the server sent: a cache, kept on the phone and never synced) and, once the catalogue switch
+is on, `<id>_hab_catalogue` (the catalogue copy, never synced) and `<id>_hab_awwd` (pending awards the server disagreed with,
+phone-local). The first two ride the
 existing `save_progress` /
 `get_progress` functions into the same `athlete_progress` row the programme app uses —
 **no table of its own for the log** (the board, roll call, titles, contacts and seasons have
 theirs: the stages under *The leaderboard*). `program.html` explicitly skips
 these keys when it syncs.
-`CFG.careerSeen` (the career reveal has been shown) is in `CFG`, so it does sync, and the cloud merge keeps it.
+`CFG.careerSeen` (the career reveal has been shown) is in `CFG`, so it does sync, and the cloud merge keeps it. So do phase 3's
+`CFG.catalogueSeen` (the catalogue reveal), `CFG.heldBefore` (Proof's shelf at the switch: the first one read wins) and
+`CFG.seenAwards` (every award that has had its moment: unioned, like the owned rewards above).
 
 ---
 
