@@ -83,8 +83,8 @@ const PLAY = `(async () => {
         names: [...g.querySelectorAll('.tg-row b')].map(x => x.textContent), lines: [...g.querySelectorAll('.tg-row small')].map(x => x.textContent),
         rowH: Math.min(...[...g.querySelectorAll('.tg-row')].map(x => x.getBoundingClientRect().height)), l: r.left, r: r.right, w: innerWidth }; });
     t.check('the door opens the shelf, aria-expanded true', !shelf.hidden && shelf.exp === 'true', JSON.stringify(shelf));
-    t.check('the shelf has three rows, Split Step first with no history', shelf.games.join() === 'splitstep,rally,sets', shelf.games.join());
-    t.check('the rows carry the names and lines', shelf.names.join('|') === 'Split Step|Off the Glass|Between Sets' && shelf.lines.join('|') === 'React to the hit · 4 drills|Air hockey against me · first to 5|Tennis against me · a set lasts your workout', shelf.names.join('|') + ' / ' + shelf.lines.join('|'));
+    t.check('the shelf has four rows (The Lob joined them 2026-10-18), Split Step first with no history', shelf.games.join() === 'splitstep,rally,sets,lob', shelf.games.join());
+    t.check('the rows carry the names and lines', shelf.names.join('|') === 'Split Step|Off the Glass|Between Sets|The Lob' && shelf.lines.join('|') === 'React to the hit · 4 drills|Air hockey against me · first to 5|Tennis against me · a set lasts your workout|Breathe with the ball · in 4, out 6', shelf.names.join('|') + ' / ' + shelf.lines.join('|'));
     t.check('each row is a 44 px target inside the screen', shelf.rowH >= 44 && shelf.l >= 0 && shelf.r <= shelf.w, JSON.stringify([shelf.rowH, shelf.l, shelf.r]));
     await p.screenshot({ path: path.join(out, 'shelf-390.png') });
     await p.click('#timerPlayBtn');
@@ -142,7 +142,7 @@ const PLAY = `(async () => {
 
     // ── 7. the shelf remembers the last game, on this phone only ──
     await reopenShelf(p);
-    t.check('the shelf lists Split Step first after playing it', (await rows(p)).join() === 'splitstep,rally,sets', (await rows(p)).join());
+    t.check('the shelf lists Split Step first after playing it', (await rows(p)).join() === 'splitstep,rally,sets,lob', (await rows(p)).join());
     await p.click('#timerGames [data-game="rally"]');
     await p.waitForFunction(() => window.Rally && Rally.isOpen(), null, { timeout: 8000 });
     await wait(p, 300);
@@ -152,7 +152,7 @@ const PLAY = `(async () => {
     await p.click('.rally-x');
     await wait(p, 300);
     await reopenShelf(p);
-    t.check('after Off the Glass, the shelf lists it first', (await rows(p)).join() === 'rally,splitstep,sets', (await rows(p)).join());
+    t.check('after Off the Glass, the shelf lists it first', (await rows(p)).join() === 'rally,splitstep,sets,lob', (await rows(p)).join());
     const keys = await p.evaluate(id => Object.keys(localStorage).filter(k => /rest_game/.test(k)).concat(Object.keys(localStorage).filter(k => k.startsWith(id) && /rest_game|splitstep|rally/i.test(k))), H.ID);
     t.check('rest_game_last is one unprefixed key, so it never syncs', keys.length === 1 && keys[0] === 'rest_game_last', keys.join(','));
     // opening one game while the other is open closes the other (the shelf is behind the full-screen game, so call the door's function)
