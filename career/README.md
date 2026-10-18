@@ -6,10 +6,10 @@ into the server's rows (`career_rules`, `career_catalogue`), so
 changing a file and seeding it again is how a detail changes (GAME-10). In phase 1 no Career Mode XP, badge or level reached an athlete; the one thing
 they saw was Hold Serve on the training app's Home (2026-10-17), the held weeks the server judges with `rulebook.toml` → `[week]`.
 **Phase 2, the XP switch, is done: applied to the live project on 2026-10-17 and switched on 2026-10-18**: `rulebook.toml` → `[switch] xp` is the switch
-(*Turning a switch on*, below). Since then the career level and its XP reach both apps; Career Mode's badges wait for phase 3.
-**Phase 3, the catalogue switch, is built, rehearsed and applied to the live project (2026-10-18); its switch is off.** `badges.toml`, `achievements.toml`,
-`titles.toml` and `recognition.toml` carry the keys it reads (below). **A fix of the same day, stage73, is built and not applied** (`supabase/stage73_career_main_lifts.sql`, its way back `scripts/career/rollback_stage73.sql`; it applies after the weight-units stages 71 and 72, which are live, and it replaces none of what they changed): The Upgrade and Double Up count main lifts only (the `patterns`, `qualities` and `exclude` keys, below: a lift counts when its Spine entry is on one of the seven main patterns, is tagged strength and is not one of the four accessories Amir excluded), and a count over a capped kind (Century) and Home's Sessions with Amir count paid sessions only (D19, waiting for Amir's word); it goes on before the catalogue switch (`PROCEDURES.md` → *Phase 3, as built* → *Stage 73*). Changing a toml file that a phone copies (an event's goals, a tier's `at`, a title) also runs
-the twin guard (`scripts/check_twins.js` §10) in the hook, and its tests of the phone's scoring read the catalogue through this folder's seed script. Their names, tiers, XP and sizes are drafts until Amir signs them off before the go-day.
+(*Turning a switch on*, below). Since then the career level and its XP reach both apps; Career Mode's badges and awards arrived with phase 3 (below).
+**Phase 3, the catalogue switch, is DONE: applied to the live project and switched on (2026-10-18)**: `rulebook.toml` → `[switch] catalogue = "2026-10-18"`, rulebook version 3, on Amir's word in chat. `badges.toml`, `achievements.toml`,
+`titles.toml` and `recognition.toml` carry the keys it reads (below). **Its fix of the same day, stage73, is applied too** (`supabase/stage73_career_main_lifts.sql`, its way back `scripts/career/rollback_stage73.sql`; it went on before the switch, after the weight-units stages 71 and 72, and replaced none of what they changed): The Upgrade and Double Up count main lifts only (the `patterns`, `qualities` and `exclude` keys, below: a lift counts when its Spine entry is on one of the seven main patterns, is tagged strength and is not one of the four accessories Amir excluded), and a count over a capped kind (Century) and Home's Sessions with Amir count paid sessions only (D19, in). Changing a toml file that a phone copies (an event's goals, a tier's `at`, a title) also runs
+the twin guard (`scripts/check_twins.js` §10) in the hook, and its tests of the phone's scoring read the catalogue through this folder's seed script. Names, tiers, XP and sizes went live as written, and Amir may change them. **From here a change applies forward only (D20, Amir 2026-10-18, decided and NOT BUILT):** a new rulebook version with a start day, awards keep the XP they were minted with, a rename changes only the label. Until D20 is built, change no XP value, cap, tier or what earns an achievement (a rename is safe; `CAREER_MODE.md`, the D20 row).
 
 ## What is here
 
@@ -27,6 +27,8 @@ the twin guard (`scripts/check_twins.js` §10) in the hook, and its tests of the
 
 ## How to change something
 
+**Since the catalogue switch (2026-10-18) every change applies forward only (D20, Amir, decided and not built).** Rename freely. Do not change an XP value, a cap, a tier or what earns an achievement until D20 is built (`CAREER_MODE.md`, the D20 row; `PROCEDURES.md`, *Open: D20*).
+
 | You want to | Edit |
 |---|---|
 | Make something worth more or less XP | `rulebook.toml` → that `[fact.…]` block → `xp` |
@@ -37,7 +39,7 @@ the twin guard (`scripts/check_twins.js` §10) in the hook, and its tests of the
 | Change a WhatsApp line | `recognition.toml` → `[message.…]` → `en` or `fa` |
 | Add a mission or a quest | copy a block in `missions.toml` or `quests.toml` and change it |
 | Add a tier to a badge | `badges.toml` → that badge → `tiers`: **add it at the END**, then `python scripts/career_seed.py --write-lock` and commit `career/tiers.lock.json` |
-| Change which lifts The Upgrade and Double Up count | `patterns`, `qualities` and `exclude` on `[badge.the_upgrade]` in `badges.toml` and `[achievement.double_up]` in `achievements.toml`, **the same in both** (the twin guard holds them equal). Patterns come from coach.html's `SPINE_PATTERNS`, qualities from its `QM_IDS`, `exclude` is Spine ids; the checker accepts `patterns` only on a best_value entry that reads `lift_gain`, `qualities` and `exclude` only beside `patterns`, and a staged `coach.html` runs the checker too. A lift counts when its Spine entry is on one of the `patterns`, carries one of the `qualities` and is not in `exclude`. To drop one more exercise, add its Spine id to `exclude` in both files, **spelled exactly as the Spine has it** (an entry that exists, a draft is fine: *The exclude list must stay true*, below). The server reads them once stage73 is applied; re-seed after the edit |
+| Change which lifts The Upgrade and Double Up count | `patterns`, `qualities` and `exclude` on `[badge.the_upgrade]` in `badges.toml` and `[achievement.double_up]` in `achievements.toml`, **the same in both** (the twin guard holds them equal). Patterns come from coach.html's `SPINE_PATTERNS`, qualities from its `QM_IDS`, `exclude` is Spine ids; the checker accepts `patterns` only on a best_value entry that reads `lift_gain`, `qualities` and `exclude` only beside `patterns`, and a staged `coach.html` runs the checker too. A lift counts when its Spine entry is on one of the `patterns`, carries one of the `qualities` and is not in `exclude`. To drop one more exercise, add its Spine id to `exclude` in both files, **spelled exactly as the Spine has it** (an entry that exists, a draft is fine: *The exclude list must stay true*, below). The server reads them (stage73 has been applied since 2026-10-18); re-seed after the edit |
 | Change how many full-screen moments an app opens, or for how long one waits | `recognition.toml` → `[moments]` |
 
 Then run:
@@ -48,7 +50,7 @@ python scripts/check_career.py
 
 It reads every file and refuses anything that breaks the rules: a reward with no meaning, a fact nobody defined, gold,
 a mission with its own fixed XP (GAME-7), a title that doesn't exist, tiers out of order, a switch that is neither `"off"` nor a
-day, and, until the catalogue switch, a habit number that is not Proof's own (`supabase/xp_rules_snapshot.json`). Or just ask
+day, and, only while the catalogue switch is off (it is on since 2026-10-18), a habit number that is not Proof's own (`supabase/xp_rules_snapshot.json`). Or just ask
 Claude to make the change.
 
 Then seed it, so the server scores with it (Claude does this with the Supabase tool; it re-works every athlete's facts):
@@ -76,7 +78,7 @@ stage goes on the live project and the snapshot is made again, nothing in these 
 A lift counts only when the approved Spine entry it names (by name or alias) is on one of the seven main patterns, carries the strength quality and is not
 in the `exclude` list: `back-extension-45`, `cable-face-pull`, `machine-reverse-fly` and `cable-straight-arm-pulldown`. The rule is Amir's (D18, 2026-10-18).
 Asked whether those accessories, which the Spine files under a main pattern, should count, he said: "Yes i want those to be exluded / You set up the rule
-for that". The same three lists sit on `[badge.the_upgrade]` and `[achievement.double_up]`, and the server reads them once stage73 is applied.
+for that". The same three lists sit on `[badge.the_upgrade]` and `[achievement.double_up]`, and the server reads them (stage73 is applied).
 
 **The exclude list must stay true.** Each `exclude` id must be a Spine id spelled exactly: `back-extension-45`, not `back-extension`. While any `exclude` id has no
 Spine entry at all (a typo, a deleted entry, or an entry given a new id), the server stops counting The Upgrade and Double Up for everyone and writes a WARNING in
@@ -87,6 +89,8 @@ a re-seed) or the Spine right (the entry restored under its id) mints everything
 files and not the Spine, so it cannot see this: check the ids against the Spine before every re-seed.
 
 ### Turning a switch on
+
+**Both switches are on** (`xp` and `catalogue`, both `"2026-10-18"`, rulebook version 3). This section is now the record of how each was turned on, and what the next switch would need.
 
 `rulebook.toml` → `[switch]` holds the two switches: `xp` (phase 2: training earns XP, the WORKOUT habit pays 0 a day, closed days
 settle, the level is the career level and never resets) and `catalogue` (phase 3: the entries with `retire_at` / `starts_at =
@@ -123,7 +127,7 @@ switch. The server refuses anything else. The order, with a statement per line f
 6. Straight after: `career_rewards_batch(offset, 5, 'baseline')`, offsets 0 to 95, until a batch answers with no lines. Every line `ok`.
 7. `select public.career_compare()` must say `"ok": true`.
 8. Commit the toml with its date, `privacy.html` §2.3 with its *Last updated*, the rewritten `APP_GUIDE` phrasing and the docs. 14 days later,
-   `drop table backup.career_catalogue_before`.
+   `drop table backup.career_catalogue_before`. **This was run on 2026-10-18** (`PROCEDURES.md` → *The go-day, as run*), so that drop is due on 2026-11-01, together with the five `backup.golive_20261018_*` safety copies.
 
 Do one statement per call. The way back is `scripts/career/rollback_stage70.sql`, on Amir's word only (dry first), then commit the toml with `catalogue = "off"`. With stage73 applied, `scripts/career/rollback_stage73.sql` runs before it, and before `rollback_stage72.sql` too if that one is ever run (`rollback_stage71.sql` is the weight units' way back, another stage, and has nothing to do with this fix).
 
