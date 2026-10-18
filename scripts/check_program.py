@@ -36,6 +36,9 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
   --new           a new athlete's first cycle: no weighted exercise under 8 reps, no working
                   circuits (supersets) at all, and a first-week note. Also switched on by
                   itself when currentCycleIndex is 0
+  --reentry       a returning athlete's first cycle after 3+ weeks off (VOL-11, 2026-10-18): only
+                  the 8-rep floor, none of --new's other checks, and a retest flag must be 8RM or
+                  more. Without it, the spec's "reentry: <reason>" line switches it on ("-" = no)
   --cap MIN       the session cap in minutes (default 60). SOFT: a day past it is a WARN, never a
                   FAIL (Amir, 2026-09-26: the form's session length is a guess). Pass the
                   athlete's real logged minutes when you have them.
@@ -310,7 +313,7 @@ def check_structure(data, args, spine=None, names=None):
             fail(f"{where}: tempo {rx['tempo']!r} should be iso or 3-4 numbers", 'CHP-3')
         if not prep and not it and ex.get('type') == 'standard':
             reps = num(rx.get('reps'))
-            if args.new and reps is not None and reps < 8:
+            if (args.new or args.reentry) and reps is not None and reps < 8:
                 # "Weighted" comes from the Spine entry when there is one (2026-09-26): a loaded
                 # implement, no impact, and not a jump, throw, sprint, carry or conditioning
                 # pattern. Only an exercise the Spine doesn't know falls back to the old proxy
@@ -319,7 +322,9 @@ def check_structure(data, args, spine=None, names=None):
                 if w is None: w, why = bool(rx.get('tempo')), 'no Spine entry, so read from the tempo'
                 else: why = 'from its Spine entry'
                 if w:
-                    fail(f"{where}: {int(reps)} reps. A new athlete's first cycle has no weighted exercise under 8 reps ({why})", 'VOL-11')
+                    whose = ("A new athlete's first cycle" if args.new else
+                             f"A first cycle back after 3+ weeks off (re-entry: {args.reentry_why})")
+                    fail(f"{where}: {int(reps)} reps. {whose} has no weighted exercise under 8 reps ({why})", 'VOL-11')
                 else:
                     info(f"{where}: {int(reps)} reps, not a weighted lift ({why}), so exempt from the 8-rep rule")
         # Each working exercise once per cycle, circuit items included (a conditioning finisher
@@ -389,6 +394,15 @@ def check_tests(data, args):
         if it or ex.get('type') != 'standard' or PREP.search(b.get('title') or '') or rx.get('time') or rx.get('distance'):
             warn(f"{where}: a retest flag belongs on a grinding standard lift, never a circuit item, a warm-up, "
                  "or anything timed or measured in metres", 'TST-5')
+    # A re-entry cycle (VOL-11, 2026-10-18) may carry a retest, but as a rep max of 8 or more: a bare flag is the 5RM default.
+    if args.reentry and not args.new:
+        for d, b, ex, it in exercises(data):
+            o = it or ex
+            if not o.get('test') or not test_flag_ok(o.get('test')): continue
+            n = 5 if o['test'] is True else int(re.match(r'[0-9]+', str(o['test'])).group(0))
+            if n < 8:
+                fail(f"Day {d.get('id')} · {o.get('name')}: a {n}RM retest in a first cycle back after 3+ weeks off "
+                     f"(re-entry: {args.reentry_why}): make it 8RM, nothing weighted under 8 reps", 'VOL-11')
     if flagged and args.new:
         fail(f"{len(flagged)} retest flag{'s' if len(flagged) > 1 else ''} in a first cycle ({'; '.join(flagged)}): "
              "a first cycle has no max-effort set and no test flag", 'TST-5')
@@ -1814,7 +1828,7 @@ def fingerprint(data, athlete_id):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('program')
-    ap.add_argument('--tables'); ap.add_argument('--new', action='store_true')
+    ap.add_argument('--tables'); ap.add_argument('--new', action='store_true'); ap.add_argument('--reentry', action='store_true')
     ap.add_argument('--log', help=argparse.SUPPRESS)  # retired 2026-09-26: the tables are counted, not typed
     ap.add_argument('--floor', action='store_true'); ap.add_argument('--floor-except')
     ap.add_argument('--proven', action='store_true'); ap.add_argument('--no-backoff', action='store_true')
@@ -1851,6 +1865,13 @@ def main():
     if prof: apply_profile(args, prof, 'spec')
     else: apply_profile(args, parse_profile(ctx.get('profile')), 'coaching log')
     check_aim_art(data, args, prof if prof else parse_profile(ctx.get('profile')))
+    # A returning athlete's first cycle after 3+ weeks off keeps VOL-11's 8-rep floor (Amir, 2026-10-18), and only that.
+    args.reentry_why = '--reentry' if args.reentry else ''
+    if not args.reentry:
+        why = next((r for r in spec_lines(args, r're-?entry') if r and r != '-'), '')
+        if why: args.reentry, args.reentry_why = True, why
+    if args.reentry and not args.new:
+        info(f"re-entry cycle ({args.reentry_why}): VOL-11's 8-rep floor applies, and a retest is 8RM or more")
     if not args.week and spec_lines(args, 'week'):
         args.week = spec_lines(args, 'week')[0]  # the spec's example week (2026-09-26)
     check_structure(data, args, ctx['spine'], ctx.get('names')); check_pill_layers(data, ctx)

@@ -261,6 +261,10 @@ ADD:      [new element → why THIS cycle]
 **→ CHECKPOINT:** show this analysis + the lists and ask Amir for changes before building. Show the
 profile's changes too (the whole block when it is new); a wrong `aim` or ban there mis-sets every
 check that follows.
+Show the **main lifts as a small table** (exercise · sets x reps · RPE · rest), so Amir makes any dosing
+call here and not after the build (2026-10-18: a late "no weighted lift under 8 reps" cost 5.3M tokens of
+rework). **When the Debrief shows 3 or more weeks with no training, say so here**: the spec then carries
+`reentry:` and the cycle follows VOL-11.
 Always add one fixed question: **the day the athlete starts this cycle** (default: their next
 usual training day, never the roadmap's nominal Monday). Assemble writes it as the cycle's
 `startDate`, the app's week counter and retest window read it, and the WhatsApp dates come from
@@ -639,6 +643,7 @@ weeknotes:
 - 5 | [setsDrop 1 · rpeCap 6, plus anything else that changes] (the final week, every cycle)
 bans: [one line, if any]
 floor-except: [muscle (reason), only when the aim is strength-muscle and a muscle is excused]
+reentry: [reason, e.g. "4 weeks off after the cycle ended"; only when the Debrief shows 3+ weeks with no training (VOL-11)]
 obligations:
 - backoff
 - [week1 · explainer · pain-ladder: knee · film: … · weigh-in · double-day · low-readiness · …, one per line]
@@ -686,6 +691,18 @@ SECTION: Core
 ---
 [repeat for all days]
 ````
+
+**SPEC PRE-FLIGHT (2026-10-18, before the spec leaves this stage).** Each of these cost a full Part A
+rebuild on one athlete's Cycle 3 (about 8M tokens each; PIPELINE-RUN.md → *Cheaper runs*). Check them on the
+spec itself, then hand it over:
+- [ ] **VOL-8**: an interval or round count is sets. Write blocks of rounds; never 5 or more sets of one
+  conditioning item (an 8-round bike interval written as 8 sets failed).
+- [ ] **CHP-2**: no pace or effort pill beside an RPE on the same card.
+- [ ] **CUE-4 / NAM-9**: every exercise the Spine match missed has its `new_exercise:` line, so its Spine
+  draft runs before the first build, not after it.
+- [ ] **VOL-11**: when the Debrief shows 3 or more weeks with no training, the `reentry:` line is in the
+  header. The checker then applies the 8-rep floor, and a rep-max retest is an 8RM.
+- [ ] The checkpoint showed the main lifts as a table (STEP 1A), so no dose is changed after the build.
 
 ---
 

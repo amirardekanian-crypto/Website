@@ -7,6 +7,14 @@ old one) and paste the summary into the handoff.
 
   python scripts/session_cost.py <transcript.jsonl>          # one session
   python scripts/session_cost.py --latest                    # the newest transcript of this repo's sessions
+  python scripts/session_cost.py --helpers <transcript.jsonl>   # same, and say so when there are no helpers
+
+Helpers (2026-10-18): the numbers above are the main conversation only. Subagents and workflow agents keep their own
+transcripts in <session id>/subagents/**/*.jsonl next to <session id>.jsonl, and a big run spends most of its tokens
+there. When that folder exists a short block follows the output: per model the calls, cache writes, cache reads, fresh
+input, output and total for main and helpers, a grand total, and the ten biggest helpers with their first-call and peak
+context. A message is counted ONCE: a transcript repeats a message id while it streams, so each usage field takes its
+maximum per id. --helpers also works with --latest.
 
 Transcripts live in ~/.claude/projects/<the repo folder, with / turned into ->/. Standard library only.
 """
@@ -75,12 +83,74 @@ def main(path):
         'thinking is over a third of the output: lower the effort of the mechanical stages' if think > sum(c['out'] for c in cl) / 3 else '',
         f'{len(stalls)} stall(s): read back after every timeout, arm a check-in' if stalls else ''] if x) or 'none')
 
+KEYS = ('input_tokens', 'cache_creation_input_tokens', 'cache_read_input_tokens', 'output_tokens')
+
+def read_msgs(f):
+    """One record per API message id in a transcript: the max of each usage field. Returns [(model, usage dict)] in order."""
+    recs, order = {}, []
+    for line in open(f, encoding='utf-8', errors='replace'):
+        try: o = json.loads(line)
+        except Exception: continue
+        m = o.get('message') if isinstance(o.get('message'), dict) else None
+        if not m or m.get('role') != 'assistant' or 'usage' not in m: continue
+        k = m.get('id') or id(o)
+        if k not in recs: order.append(k); recs[k] = {'model': m.get('model', '?')}
+        recs[k]['model'] = m.get('model', recs[k]['model'])
+        for x in KEYS: recs[k][x] = max(recs[k].get(x, 0), int(m['usage'].get(x) or 0))
+    return [recs[k] for k in order]
+
+def helpers(path, force=False):
+    sub = os.path.join(os.path.splitext(path)[0], 'subagents')
+    files = glob.glob(os.path.join(sub, '**', '*.jsonl'), recursive=True)
+    if not files:
+        if force: print('helpers: none (no subagents folder next to this transcript)')
+        return
+    tot, rows = {}, []
+    for who, fl in (('main', [path]), ('helpers', files)):
+        for f in fl:
+            msgs = read_msgs(f)
+            for r in msgs:
+                t = tot.setdefault((who, r['model']), dict.fromkeys(KEYS, 0) | {'calls': 0})
+                t['calls'] += 1
+                for x in KEYS: t[x] += r[x]
+            if who == 'helpers' and msgs:
+                ctx = [r['input_tokens'] + r['cache_creation_input_tokens'] + r['cache_read_input_tokens'] for r in msgs]
+                rows.append((sum(ctx) + sum(r['output_tokens'] for r in msgs), os.path.basename(f)[:28], msgs[-1]['model'].replace('claude-', ''), len(msgs), ctx[0], max(ctx)))
+    def line(label, t):
+        allin = t['input_tokens'] + t['cache_creation_input_tokens'] + t['cache_read_input_tokens']
+        return (f"{label} calls {t['calls']:4}  fresh-in {t['input_tokens']:>9,}  cache-write {t['cache_creation_input_tokens']:>11,}  "
+                f"cache-read {t['cache_read_input_tokens']:>12,}  out {t['output_tokens']:>9,}  total {allin + t['output_tokens']:>12,}")
+    print(f"\nhelpers: {len(files)} transcript(s) next to the main one")
+    g, gh = dict.fromkeys(KEYS, 0) | {'calls': 0}, dict.fromkeys(KEYS, 0) | {'calls': 0}
+    for (who, model), t in sorted(tot.items()):
+        print(line(f"{who:8} {model:26}", t))
+        for x in list(KEYS) + ['calls']:
+            g[x] += t[x]
+            if who == 'helpers': gh[x] += t[x]
+    print(line('helpers total'.ljust(35), gh))
+    print(line('GRAND TOTAL main + helpers'.ljust(35), g))
+    rows.sort(reverse=True)
+    print('biggest helpers (file, model, calls, first context, peak context, total):')
+    for t, n, mo, c, f0, pk in rows[:10]:
+        print(f"  {n:28} {mo:14} {c:5} {f0/1e3:7.0f}k {pk/1e3:7.0f}k {t/1e6:6.2f}M")
+
 if __name__ == '__main__':
-    if len(sys.argv) != 2: sys.exit(__doc__)
-    p = sys.argv[1]
+    args = [a for a in sys.argv[1:] if a != '--helpers']
+    force = len(args) != len(sys.argv) - 1
+    if len(args) != 1: sys.exit(__doc__)
+    p = args[0]
     if p == '--latest':
-        folder = os.path.join(os.path.expanduser('~'), '.claude', 'projects', os.getcwd().replace('/', '-').replace('\\', '-').replace(':', '-'))
+        import re
+        root = os.path.join(os.path.expanduser('~'), '.claude', 'projects')
+        # Claude turns every character that is not a letter, digit or dash into a dash (Cyrillic too).
+        folder = os.path.join(root, re.sub(r'[^A-Za-z0-9-]', '-', os.getcwd()))
         files = sorted(glob.glob(os.path.join(folder, '*.jsonl')), key=os.path.getmtime)
+        if not files:  # fall back to the newest folder that ends in this repo's name
+            alt = [d for d in glob.glob(os.path.join(root, '*GitHub-Website')) if glob.glob(os.path.join(d, '*.jsonl'))]
+            if alt:
+                folder = max(alt, key=lambda d: max(os.path.getmtime(f) for f in glob.glob(os.path.join(d, '*.jsonl'))))
+                files = sorted(glob.glob(os.path.join(folder, '*.jsonl')), key=os.path.getmtime)
         if not files: sys.exit(f'no transcripts in {folder}')
         p = files[-1]
     main(p)
+    helpers(p, force)

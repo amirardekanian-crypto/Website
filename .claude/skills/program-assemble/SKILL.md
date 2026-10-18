@@ -22,6 +22,8 @@ notes, Becauses and WhatsApp text describing the old programme, and the Spine ga
 not pass until the drafting (Step 8) had run. Now:
 
 **Part A — build and check. Straight after /program-design, BEFORE /program-engage.**
+When the spec has `new_exercise:` lines, the `/spine` drafting runs BEFORE the first build, so there is
+one Spine snapshot and one build (PIPELINE-RUN.md → *Cheaper runs*, rule 4).
 Step 1 · Step 2a–2e (the workouts, with `exId` stamped from design's match; `weekNotes` carries
 design's numbers, no words yet) · Step 3 with `--stage build` (it also resolves every card name) ·
 Step 4 (act on the names: stamp, snap, rename to the entry's name, or draft a new exercise into the Spine, then re-run

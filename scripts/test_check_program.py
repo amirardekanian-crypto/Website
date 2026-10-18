@@ -939,6 +939,31 @@ expect('kit_has: without a full gym a home list does not cover a sled', not cp_m
 expect('kit_has: an old match still works (a plural on the list, a multi-word item)',
        cp_mod.kit_has('dumbbells, leg curl machines', 'leg curl machine') and cp_mod.kit_has('medicine ball', 'medicine ball'))
 
+# ── 13. added 2026-10-18: VOL-11 re-entry, a first cycle back after 3+ weeks off ──────────
+RE = copy.deepcopy(BASE); RE['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx']['reps'] = 5  # a weighted 4 x 5 squat
+RE['workouts']['days'][1]['blocks'].append({"title": "Core", "exercises": [ex("Dead Bug", "dead-bug", sets=3, reps=6, rpe=7, rest=60)]})
+RESPEC = "bans: -\nreentry: 10 of 20 sessions, then 22 days off\n"
+out = run(RE, ctx=CTX, spec=RESPEC)
+expect('VOL-11 re-entry: a weighted 4 x 5 fails and names the re-entry', has(out, 'FAIL', 'Barbell Back Squat: 5 reps. A first cycle back after 3+ weeks off (re-entry: 10 of 20 sessions')
+       and has(out, 'FAIL', '[VOL-11]'), out)
+expect('VOL-11 re-entry: a bodyweight Dead Bug at 6 stays exempt', has(out, 'INFO', 'Dead Bug: 6 reps, not a weighted lift') and not has(out, 'FAIL', 'Dead Bug'), out)
+expect("VOL-11 re-entry: none of --new's other checks (no first-week note asked)", not has(out, 'FAIL', 'needs a week 1 note') and not has(out, 'INFO', 'new-athlete rules apply'), out)
+out = run(RE, ctx=CTX, spec="bans: -\n")
+expect('VOL-11: no reentry line, a returning 4 x 5 passes', not has(out, 'FAIL', '[VOL-11]'), out)
+expect("VOL-11: 'reentry: -' is no re-entry", not has(run(RE, ctx=CTX, spec="bans: -\nreentry: -\n"), 'FAIL', '[VOL-11]'))
+expect('VOL-11: --reentry on the command line does the same', has(run(RE, '--reentry', ctx=CTX, spec="bans: -\n"), 'FAIL', 're-entry: --reentry'))
+d = flag(copy.deepcopy(RE), 0, 1, 0); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx']['reps'] = 8
+out = run(d, ctx=CTX, spec=RESPEC)
+expect('VOL-11 re-entry: a 5RM retest flag fails', has(out, 'FAIL', 'a 5RM retest in a first cycle back'), out)
+expect('VOL-11 re-entry: a bare flag (the 5RM default) fails', has(run(flag(copy.deepcopy(d), 0, 1, 0, True), ctx=CTX, spec=RESPEC), 'FAIL', 'a 5RM retest in a first cycle back'))
+expect('VOL-11 re-entry: an 8RM retest flag passes', not has(run(flag(copy.deepcopy(d), 0, 1, 0, '8RM'), ctx=CTX, spec=RESPEC), 'FAIL', '[VOL-11'))
+expect('VOL-11: a 5RM flag outside re-entry is fine', not has(run(d, ctx=CTX, spec="bans: -\n"), 'FAIL', 'retest in a first cycle back'))
+d = copy.deepcopy(RE); d['currentCycleIndex'] = 0
+out = run(d, ctx=CTX)
+expect('VOL-11 --new unchanged: the new-athlete message and the first-week note', has(out, 'FAIL', "A new athlete's first cycle has no weighted exercise under 8 reps")
+       and has(out, 'FAIL', 'needs a week 1 note'), out)
+expect('VOL-11 --new unchanged: a flag in a first cycle is still TST-5', has(run(flag(d, 0, 1, 0, '8RM'), ctx=CTX), 'FAIL', 'retest flag in a first cycle'))
+
 print(f"{sum(1 for _, ok in results if ok)}/{len(results)} passed" + ('' if HAVE_NODE else ' (node not found: the node-backed checks were skipped)'))
 for n, ok in results:
     if not ok: print('  failed:', n)

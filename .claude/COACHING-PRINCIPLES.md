@@ -147,7 +147,7 @@ stale copy reached athletes.
 | PRG-7 | Never tell the athlete the coach sets their weight: progression is the programme changing, driven by what they log. | engage | |
 | PRG-8 | The progress-and-regress explainer is mandatory for a new athlete; for a returning one only when the review flags a reason. | engage | oblig `explainer` |
 | PRG-9 | Before a logged RPE drives a decision, check the athlete's share of sets logged at RPE 10: new athletes tap the button matching their reps. | report · design | |
-| PRG-10 | Outside a first cycle, dose follows the adaptation: strength 3–6 reps RPE 7–9; hypertrophy 6–12 RPE 7–9; power 1–5 explosive RPE 6–8; endurance 15+. | design | |
+| PRG-10 | Outside a VOL-11 cycle, dose follows the adaptation: strength 3–6 reps RPE 7–9; hypertrophy 6–12 RPE 7–9; power 1–5 explosive RPE 6–8; endurance 15+. | design | |
 | PRG-11 | Over 30% of sets at RPE 10 in the first ten sessions means that RPE is not effort: write no load note from it. | report · design | |
 
 ### Volume & dosing
@@ -163,7 +163,7 @@ stale copy reached athletes.
 | VOL-8 | Never more than 4 working sets on one exercise until our own logs prove more; add an exercise instead. | design | ✓ |
 | VOL-9 | A rounded-shoulder or forward-head client keeps chest volume low, as a stated exception, never loaded to reach a range. | design | |
 | VOL-10 | Count every exercise that loads a muscle (1, 0.5 or 0) from its Spine credits; warm-ups count only core. Both tables go in the log. | design · assemble | ✓ (counted from the Spine) |
-| VOL-11 | A new athlete's first cycle has no weighted exercise under 8 reps. | design | ✓ |
+| VOL-11 | A new athlete's first cycle, or a first cycle back after 3+ weeks off, has no weighted exercise under 8 reps. Any retest is 8RM. | design | ✓ |
 | VOL-12 | Small muscles (biceps, triceps) take 6–12 sets a week in a foundation cycle, more in later cycles. | design · edit | |
 | VOL-13 | A missing machine never bends the programme: clear the 10-set floor with what the gym has. | design · edit | |
 
@@ -172,7 +172,7 @@ stale copy reached athletes.
 |---|---|---|---|
 | TST-1 | Light testing: an e1RM from the heaviest logged set, tracked cycle to cycle; no separate test day. | design · report | |
 | TST-2 | No test goes to a grind: it stops at the first rep that slows, shortens or breaks position. Never a true 1RM. | design · engage | |
-| TST-3 | No max-effort set in a first cycle; its logs are the baseline. A flagged 5RM retest is one set of 3–5 at about RPE 9. | design | |
+| TST-3 | No max-effort set in a first cycle; logs are the baseline. A 5RM retest is one set of 3–5 at RPE ~9, 8RM under VOL-11. | design | |
 | TST-4 | A test that goes past the cycle's RPE ceiling is written as a stated exception to it. | design · engage | |
 | TST-5 | Flag two or three lifts a cycle for a retest (`test_flag`), never in a first cycle, in pain or with poor technique under load. | design | ✓ (a first cycle; more than 3; a value the app ignores) |
 | TST-6 | An e1RM graded Rough is a trend only: never set a starting load from a single Rough estimate. | design · report | |
@@ -766,7 +766,7 @@ same ID. Read a rule's story and its history before changing it.
   fades with exposure. So above ~30% at 10 in the first ten sessions the per-set RPE is not
   effort: write no starting-load note from it, and settle the question with a filmed set, never by
   asking. /cycle-report reports the rate.
-- `PRG-10` **The dose follows the cycle's adaptation.** Strength 3–6 reps at RPE 7–9 with 2–4 minutes' rest; hypertrophy 6–12 at RPE 7–9 with 1–2 minutes; power 1–5 explosive reps at RPE 6–8 with full rest; endurance and conditioning 15+ reps or time. Don't let a power cycle be programmed like hypertrophy. A first cycle keeps VOL-11 (nothing weighted under 8 reps), which is why its picture word is a foundation one (PRC-27).
+- `PRG-10` **The dose follows the cycle's adaptation.** Strength 3–6 reps at RPE 7–9 with 2–4 minutes' rest; hypertrophy 6–12 at RPE 7–9 with 1–2 minutes; power 1–5 explosive reps at RPE 6–8 with full rest; endurance and conditioning 15+ reps or time. Don't let a power cycle be programmed like hypertrophy. A first cycle keeps VOL-11 (nothing weighted under 8 reps), which is why its picture word is a foundation one (PRC-27). So does a first cycle back after 3+ weeks off (VOL-11): its ranges start at 8.
 - `PRG-11` **Over 30% of sets at RPE 10 means the RPE is a rep counter, not effort.** Measured over the first ten sessions; above that share, no starting-load note is written from the logged RPE and the cycle report teaches the scale instead (PRG-9, 2026-09-05).
 
 ## Volume & dosing
@@ -869,10 +869,18 @@ same ID. Read a rule's story and its history before changing it.
   glutes at **22 — over the 10-20 ceiling** — which the old convention had scored 13. The error
   runs in both directions. **A missing machine is not a reason to contort the programme:** clear
   the 10-set floor with what the gym has and move on.
-- `VOL-11` **A new athlete with no known lifts: no weighted exercise under 8 reps in the first cycle.**
+- `VOL-11` **A new athlete with no known lifts, or one back after 3+ weeks off: no weighted exercise under 8 reps in that first cycle.**
   Unweighted landing and jump drills (a snap down at 3 × 5, pogo contacts) and warm-up counts are
   exempt. Heavier, lower-rep work waits until the first cycle's logs and films show what the
   athlete can really do.
+  **The same floor holds for a returning athlete's first cycle after 3 or more weeks off** (2026-10-18).
+  After a long gap we no longer know what they can lift today, so the cycle restarts at 8 reps
+  like a first one. The 3 weeks is read from the Debrief: the longest run of days with no training, in the last cycle or between its end
+  and the new start. The spec says so on a `reentry: <reason>` line and the checker holds it
+  (`--reentry`). Only the rep floor comes back: supersets and the first-week note stay a new
+  athlete's (SES-11). A retest in such a cycle is an 8RM, not TST-3's 3-5 (the app reads 1RM to 10RM).
+  Bodyweight prep, landings, jumps and mobility sit outside it, as in a first cycle. The case: a
+  returning athlete's Cycle 3, after 10 of 20 sessions and then 22 days off.
 - `VOL-12` **Small muscles: 6–12 sets a week in a foundation cycle, more later.** Biceps and triceps sit below the major muscles' 10–20 (VOL-3) because the big pulls and presses already reach them at half a set (VOL-10). Whether the checker should report it is Amir's call at the end of the rule freeze (PRC-25).
 - `VOL-13` **A missing machine never bends the programme.** Clear the 10-set floor with what the gym has and move on (the VOL-10 story, 2026-09-08: *"when the machine is not there, just being able to hit the minimum of 10 sets a week is good"*).
 
@@ -890,7 +898,7 @@ same ID. Read a rule's story and its history before changing it.
   a green day, so it is capped like every lift and the bar says no exception.
 - `TST-2` `TST-3` **No test goes to a grind: every max-effort set stops at the first rep that slows, shortens or
   breaks position.** A flagged rep-max retest (`test: 5RM`) is one set of 3–5 reps at about
-  **RPE 9**, one rep left, never RPE 10. That is accurate enough for The Ceiling (a *Good*
+  **RPE 9**, one rep left, never RPE 10. In a first cycle back after 3+ weeks off it is an 8RM (VOL-11). That is accurate enough for The Ceiling (a *Good*
   estimate) and safe for an athlete training with nobody next to them. A first cycle has no
   max-effort set at all (TST-3). Never a true 1RM.
 - `TST-3` **A new athlete's first cycle has no max-effort test: the logged sets are its baseline.** The first
@@ -1447,6 +1455,6 @@ same ID. Read a rule's story and its history before changing it.
 - `PRC-26` **How the Quality mix counts.** Working sets, the primary quality 1 and a secondary ½, prep blocks skipped, an exercise dosed by time counting one set per 10 minutes (never less than 1), nothing shown under 70% tagged coverage, and a 12% cut; bedrock, peak and reset are phases with no headline (2026-09-24). The method exists four times (program.html, coach.html, /program-design, the checker) and they must match.
 - `PRC-27` **A first cycle's picture word is a foundation one.** bedrock, armour or build, never iron or voltage: a new athlete's first cycle has no weighted lift under 8 reps and no supersets (VOL-11, SES-11), so it is never a heavy, low-rep block.
 - `PRC-28` **The focus is the cycle's promise to the athlete, on his screen.** If it names squat, hinge, single-leg, push, pull or carry patterns, the build trains each of them in its working blocks. A gap is closed by adding the pattern or by a `roadmap_amend:` line that drops the word (PRC-17), never left for the athlete to notice.
-- `PRC-29` **One conversation, many helpers.** The main conversation asks Amir, saves to the database and publishes; the roadmap draft, the design analysis and spec, the Part A build and check, engage's words, Part B's preparation and the Spine upkeep each run as a fresh helper that reads its inputs from files and writes its outputs to files. Effort follows the job: max for the roadmap and design, high for engage, medium for the build, Part B and upkeep. A run kept in one conversation once re-read 500 to 780 thousand tokens on every step by Part B. How to run it: `.claude/skills/PIPELINE-RUN.md`.
+- `PRC-29` **One conversation, many helpers.** The main conversation asks Amir, saves to the database and publishes; the roadmap draft, the design analysis and spec, the Part A build and check, engage's words, Part B's preparation and the Spine upkeep each run as a fresh helper that reads its inputs from files and writes its outputs to files. Effort follows the job: max for the roadmap and design, high for engage, medium for the build, Part B and upkeep. A run kept in one conversation once re-read 500 to 780 thousand tokens on every step by Part B. A long write is sent by a helper, and the main conversation decides it and reads it back (PIPELINE-RUN.md). How to run it: `.claude/skills/PIPELINE-RUN.md`.
 - `PRC-4` **A late change gets a delta review.** When the design changes after the one review (Amir adds conditioning, an exercise is swapped, the reviewer's own suggestions go in), a helper reviews only the changed cards and their words before Part B: what changed, against the same rules. Once, the finishers added after the review reached the athlete unread, and his first question was how hard to go on them.
 

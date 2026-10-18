@@ -252,8 +252,9 @@ the principles (their *How to add*).
 - `VOL-10` **⚖️ COUNT EVERY EXERCISE THAT LOADS THE MUSCLE, NOT JUST THE ISOLATION WORK — and show the working in the coaching log.**
   - 2026-09-08, Amir, verbatim: "why are you calculating hamstring work just by isolated movements? she is getting them from rdls, hipthrusts and other stuff, all the muscles are like this, why are you focusing too much on isolation movements? … when the machine is not there, just being able to hit the minimum of 10 sets a week is good" and "i know sometimes you count some exercises as 0.5 a set, which is ok".
   - 2026-09-26, Amir: yes to "muscle credits + cost tier on each Spine entry so the checker computes volume tables and per-day load"
-- `VOL-11` **A new athlete with no known lifts: no weighted exercise under 8 reps in the first cycle.**
+- `VOL-11` **A new athlete with no known lifts, or one back after 3+ weeks off: no weighted exercise under 8 reps in that first cycle.**
   - 2026-09-24, Amir, verbatim: "i dont want to start with anything less that 8 reps in first cycle, because i dont know how good of athlete or how strong she really is". Saved as a principle 2026-09-25.
+  - 2026-10-18, extended to a returning athlete's first cycle after 3+ weeks off. Amir, verbatim, on one athlete's Cycle 3 before ship-it: "An athlete like her with this much gap in between her training shouldnt be doing anything under 8 reps". She had trained 10 of 20 sessions, then had 22 days off. Amir said yes to the wording: "A new athlete's first cycle, or a returning athlete's first cycle after 3+ weeks off, has no weighted exercise under 8 reps", with a rep-max retest in such a cycle as an 8RM. The checker holds it through the spec's `reentry:` line or `--reentry`.
 - `VOL-12` **Small muscles: 6–12 sets a week in a foundation cycle, more later.**
   - It lived only in /program-edit's Rule 4a, so no other stage saw it.
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
