@@ -539,10 +539,10 @@ select public.publish_cycle(
 (2026-10-18: Ghazal's Cycle 3 went up days-only, `workouts.label` vanished, the fingerprint came back one leaf short and
 her Home said "Training"; the function replaces `workouts` whole). Before running the generated script, check that its
 `p_workouts` carries a non-empty `label` (2a) and that it is the file's `workouts`, not a rebuilt `{days}`. Read the label back
-from the answer: `label` is what the row now holds. `supabase/stage74_publish_cycle_label.sql` makes the function write a
-missing label itself and answer `label_filled: true`; it is rehearsed, **not applied until Amir says yes**, so until then a
-missing label is lost without a word. When `label_filled` is `true` the file had no `workouts.label`: put the returned label
-in the file (the fingerprint then agrees) and do not resend.
+from the answer: `label` is what the row now holds. Since 2026-10-18 (`supabase/stage74_publish_cycle_label.sql`, applied on Amir's
+yes) the function writes a missing label itself and answers `label_filled: true`; it is a safety net, not the way. When
+`label_filled` is `true` the file had no `workouts.label`: put the returned label in the file (the fingerprint then agrees)
+and do not resend.
 
 `<N>` is the NEW `currentCycleIndex` (the old one + 1). **A new athlete**: `p_new_cycle => false` and
 `<N>` = 0. Their roadmap and first log are already on the server (saved when the roadmap locked,

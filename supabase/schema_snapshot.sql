@@ -5952,9 +5952,10 @@ declare
   v_data jsonb; v_who jsonb; v_cci int; v_n int; v_cycle jsonb; v_entry jsonb; v_key text; v_i int;
   v_body text; v_had_log boolean; v_s int; v_e int; v_len int; v_m text[];
   v_prof boolean := false; v_ledger boolean := false; v_out jsonb;
+  v_w jsonb; v_filled boolean := false;                -- stage74: the workouts object as stored, and whether its label had to be written
 begin
   if jsonb_typeof(p_workouts->'days') is distinct from 'array' then
-    raise exception 'publish_cycle: p_workouts must be {"days": [...]}';
+    raise exception 'publish_cycle: p_workouts must be the whole workouts object {"label": "Program 0N · <Cycle Name>", "days": [...]}';   -- stage74
   end if;
   if jsonb_typeof(p_notes) is distinct from 'object' then
     raise exception 'publish_cycle: p_notes must be an object, e.g. {"cards": [...]}';
@@ -5967,6 +5968,7 @@ begin
   v_who := v_data->'athlete';
   v_cci := coalesce((v_data->>'currentCycleIndex')::int, 0);
 
+  -- 1. The archive, built from the live row, newest FIRST, with an id (SCHEMA → programHistory).
   if p_new_cycle then
     if jsonb_typeof(v_data->'workouts'->'days') is distinct from 'array' then
       raise exception 'publish_cycle: % has no workouts to archive; a new athlete publishes with p_new_cycle = false', p_athlete_id;
@@ -5997,6 +5999,7 @@ begin
   end if;
   v_data := jsonb_set(v_data, '{currentCycleIndex}', to_jsonb(v_cci));
 
+  -- 2. The roadmap: whole only when there is none; otherwise only the fields the spec names.
   if p_cycles is not null then
     if jsonb_typeof(v_data->'cycles') = 'array' and jsonb_array_length(v_data->'cycles') > 0 then
       raise exception 'publish_cycle: % already has a roadmap; change it through p_cycle_patch (a roadmap_amend: line, PRC-17)', p_athlete_id;
@@ -6019,7 +6022,16 @@ begin
     raise exception 'publish_cycle: currentCycleIndex % has no cycle in the roadmap', v_cci;
   end if;
 
-  v_data := v_data || jsonb_build_object('workouts', p_workouts, 'notes', p_notes);
+  -- 3. The new cycle's days and notes, and the sport line if the spec gave one.
+  v_w := p_workouts;                                                                       -- stage74 from here to the end of the if
+  if jsonb_typeof(v_w->'label') is distinct from 'string' or btrim(v_w->>'label') = '' then
+    v_cycle := v_data->'cycles'->v_cci;                                                    -- the NEW cycle (the archive's v_cycle was the old one)
+    v_n := coalesce((v_cycle->>'num')::int, v_cci + 1);
+    v_w := jsonb_set(v_w, '{label}',
+             to_jsonb('Program ' || lpad(v_n::text, 2, '0') || coalesce(' · ' || nullif(v_cycle->>'name', ''), '')));
+    v_filled := true;
+  end if;
+  v_data := v_data || jsonb_build_object('workouts', v_w, 'notes', p_notes);
   if p_sport is not null then v_data := v_data || jsonb_build_object('sport', p_sport); end if;
   if (v_data->'athlete') is distinct from v_who then
     raise exception 'publish_cycle: the athlete block would change';
@@ -6027,8 +6039,10 @@ begin
   update public.programs set data = v_data, updated_by = 'publish_cycle' where athlete_id = p_athlete_id;
   v_out := jsonb_build_object('athlete_id', p_athlete_id, 'currentCycleIndex', v_cci,
              'archived', case when p_new_cycle then v_entry->>'id' end,
+             'label', v_w->>'label', 'label_filled', v_filled,                             -- stage74
              'fingerprint', public.programme_fingerprint(p_athlete_id));
 
+  -- 4. The coaching log: spliced, never retyped.
   if coalesce(p_log_section, p_log_profile, p_log_ledger, p_log_new) is not null then
     select l.body into v_body from public.coaching_logs l where l.athlete_id = p_athlete_id for update;
     v_had_log := found;
@@ -6043,11 +6057,11 @@ begin
 
     if p_log_profile is not null then
       v_s := strpos(v_body, '```profile');
-      if v_s > 0 then
+      if v_s > 0 then                                  -- replace the block, fences included
         v_e := strpos(substr(v_body, v_s + 10), '```');
         if v_e = 0 then raise exception 'publish_cycle: the profile block in the log has no closing fence'; end if;
         v_body := substr(v_body, 1, v_s - 1) || p_log_profile || substr(v_body, v_s + v_e + 12);
-      else
+      else                                             -- first profile: before the ledger, under its own heading
         v_s := coalesce(nullif(strpos(v_body, E'\n## Exercise Ledger'), 0) + 1,
                         nullif(regexp_instr(v_body, '\|\s*Exercise\s*\|\s*Status'), 0));
         if v_s is null then
@@ -6060,11 +6074,11 @@ begin
 
     if p_log_ledger is not null then
       v_s := regexp_instr(v_body, '\|\s*Exercise\s*\|\s*Status');
-      if v_s > 0 then
+      if v_s > 0 then                                  -- replace every consecutive table line
         v_m := regexp_match(substr(v_body, v_s), '^((?:\|[^\n]*(?:\n|$))+)');
         v_len := length(v_m[1]);
         v_body := substr(v_body, 1, v_s - 1) || rtrim(p_log_ledger, E'\n') || E'\n' || substr(v_body, v_s + v_len);
-      else
+      else                                             -- a log from before the ledger: before the first cycle
         v_s := coalesce(nullif(strpos(v_body, E'\n## Roadmap'), 0), nullif(strpos(v_body, E'\n## Cycle'), 0));
         if v_s is null then v_s := length(v_body) + 1; else v_s := v_s + 1; end if;
         v_body := substr(v_body, 1, v_s - 1) || '## Exercise Ledger' || E'\n\n' || rtrim(p_log_ledger, E'\n') || E'\n\n' || substr(v_body, v_s);

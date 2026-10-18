@@ -2,9 +2,11 @@
 //
 //     PGLITE=<scratch>/node_modules/@electric-sql/pglite node scripts/rehearse_stage74.mjs        (install: top of scripts/restore/lib.mjs)
 //
-// The database is built from supabase/schema_snapshot.sql, which holds the LIVE publish_cycle() (checked below by the md5 of its text), so what is
-// rehearsed is what the project would run. In order:
-//   1. before the stage: the snapshot's function is the one the project holds, and a days-only p_workouts loses workouts.label (the 2026-10-18 incident)
+// The database is built from supabase/schema_snapshot.sql. Before stage74 went on the project the snapshot held the project's own publish_cycle() (md5 of
+// its text checked below, 28a678a6…: stage38 without its comments), so what was rehearsed was what the project ran. The snapshot was remade after the
+// apply (2026-10-18) and now holds the stage; the script then rewinds publish_cycle() to stage38's text first (stage38_publish_cycle.sql) and goes on
+// from there, so it can still be run. In order:
+//   1. before the stage: the function is the old one, and a days-only p_workouts loses workouts.label (the 2026-10-18 incident)
 //   2. the same publish, with a label and with the coaching-log arguments, on the OLD function: its stored row, answer and log are kept
 //   3. the stage, twice (it must be safe to re-run), and the guard: it refuses a function that is not stage38's text
 //   4. the same publish on the NEW function: stored row, answer (but for the two new keys) and log are identical to step 2, byte for byte
@@ -24,7 +26,8 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const STAGE74 = read(path.join(ROOT, 'supabase', 'stage74_publish_cycle_label.sql'));
 const STAGE38 = read(path.join(ROOT, 'supabase', 'stage38_publish_cycle.sql'));
-const LIVE_MD5 = '28a678a6171f7a8b33b56fc48f87967d';      // md5(prosrc) of publish_cycle() on the project, read 2026-10-18
+const LIVE_MD5 = '28a678a6171f7a8b33b56fc48f87967d';      // md5(prosrc) of publish_cycle() on the project before stage74, read 2026-10-18
+const STAGE38_MD5 = '1530d79866d66b90b70ed3589cc402af';  // md5(prosrc) of stage38's own text, with its comments, LF
 const SIG = 'public.publish_cycle(text,jsonb,jsonb,boolean,jsonb,jsonb,jsonb,text,text,text,text)';
 
 let passed = 0, failed = 0;
@@ -73,8 +76,16 @@ const DAYS_ONLY = { days: days(5) };
 
 // ── 1. before ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
 section('1. Before the stage');
+const snapshotHadRule = (await src()).includes('label_filled');
+if (snapshotHadRule) {
+  const applied = (await q('select md5($1) as m', [await src()]))[0].m;
+  ok(applied === '6aa100caeae305675961597ea6720a94', 'the snapshot holds stage74 exactly as it was applied to the project (md5 6aa100ca…, read back 2026-10-18)', applied);
+  console.log('  (the snapshot was made after stage74 went on the project: rewinding publish_cycle() to stage38\'s text first)');
+  await runSql(db, STAGE38, 'stage38 (rewind)');
+}
 const md5Before = (await q('select md5($1) as m', [await src()]))[0].m;
-ok(md5Before === LIVE_MD5, 'the snapshot holds the same publish_cycle() text as the project (md5 ' + LIVE_MD5.slice(0, 8) + '…)', md5Before);
+const wantMd5 = snapshotHadRule ? STAGE38_MD5 : LIVE_MD5;
+ok(md5Before === wantMd5, (snapshotHadRule ? 'the rewound function is stage38\'s own text' : 'the snapshot holds the same publish_cycle() text as the project') + ' (md5 ' + wantMd5.slice(0, 8) + '…)', md5Before);
 await seed('inc_a');
 const inc = await publish('inc_a', DAYS_ONLY);
 const incRow = await rowData('inc_a');

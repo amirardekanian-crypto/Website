@@ -25,8 +25,10 @@
 -- tree), or already this stage's. Anything else means somebody changed the function after stage38: stop and read it before replacing it.
 --
 -- The way back: run supabase/stage38_publish_cycle.sql again (same logic, no label fill). Safe to re-run this file.
--- After it is applied to the project: remake supabase/schema_snapshot.sql in the same commit (scripts/restore/README.md, "Keeping the snapshot
--- current"; pre-commit guard 17) and run scripts/restore/rehearse.mjs.
+-- APPLIED to the live project 2026-10-18 on Amir's yes. Read back: md5(prosrc) = 6aa100caeae305675961597ea6720a94 = the function body below,
+-- anon and authenticated cannot execute it, service_role can, a live call with p_workouts = {"label": "x"} refused with the new message before
+-- touching a row. supabase/schema_snapshot.sql was remade in the same commit (it differs from the one before only in this function) and
+-- scripts/restore/rehearse.mjs passed (49 of 49).
 
 do $stage74_guard$
 declare
