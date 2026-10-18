@@ -296,7 +296,8 @@
 // v165: program.html changed and /assets/js/splitstep.js joins the shell (2026-10-18): Split Step, a reaction game for the rest, and one door with a shelf for both rest games.
 // v166: program.html changed and /assets/js/between-sets.js joins the shell (2026-10-18): Between Sets, a tennis game for the rest, the third game on the shelf.
 // v167: assets/js/splitstep.js changed (2026-10-18): Split Step hands the screen back before Serve Clock does (handBack(done), handBackAt), and starts no round the hand-back would cut.
-const CACHE = 'aap-v167';
+// v168: assets/js/between-sets.js changed (2026-10-18): Between Sets hands the screen back gracefully (handBack(done)): a point in play may finish, then it parks on Time to lift.
+const CACHE = 'aap-v168';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
