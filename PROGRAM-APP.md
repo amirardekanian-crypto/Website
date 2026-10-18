@@ -1679,6 +1679,12 @@ scores stay on the phone."* The prototype: https://claude.ai/artifact/DFZd4XE2Mg
   need (First Step 19 s, Fore or Back 23, In or Out 24, Sweet Spot 17: the 99th percentile of a clean round plus 1 s). `timerDone()`
   calls `SplitStep.timeUp()`, `closeTimer()` closes it, and ✕ and Back return to the running timer (`#splitOverlay` is in
   `topLayer()` and `initBackNav()`'s observer). It never runs past a rest.
+- **It hands the screen back before the Serve Clock takes it** (2026-10-18). With 25 s of rest left (30 s on rests of 100 s or more) the rest
+  timer takes the screen from any rest game: a game with `handBack(done)` is told and closes in `done()`, one without is closed at once.
+  The host opens Split Step with `handBackAt` (that 25 or 30, a number or a function). `canGo()` then starts a round only when
+  `left() - handBackAt` is at least the drill's need, so no round is cut. The clock pill still shows the real rest; its warning and the
+  3-2-1 count down to the hand-back. `SplitStep.handBack(done)` stops at once like `timeUp()` (the round dropped and never saved, *Time.
+  Next set.*), then calls `done()` on the next tick; a second call, or one while the game is closed, only calls `done`.
 - **Fair starts:** the wait before each hit is a floor plus an exponential tail, so "now" can never be guessed. A tap before the hit,
   or too soon after it to be a real reaction (`GUESS` per drill), is a foot fault and the ball is replayed.
 - **Seen, not heard:** the cue is movement, never a colour change alone, and sound comes only after a tap, so a phone on silent scores
