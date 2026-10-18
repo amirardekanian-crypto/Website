@@ -1639,9 +1639,16 @@ hockey pen, *"improve it in any way you think is good"*). Air hockey on a padel 
 Amir's (clay) at the top, a point is the ball through the gap in the other end's glass. `assets/js/rally.js` (`window.Rally`) draws
 and runs it; program.html owns the door and the layer.
 
-- **The door** is the rest band's last line, **Off the Glass · play while you rest** (`#timerPlayBtn`, `openRally()`), in the list's
-  rest and Guided's. It loads `rally.js` on the first tap (`rallyLib()`; sw.js keeps it in SHELL, so it plays with no signal and a
-  change to it ships with a CACHE bump), opens the audio context in that tap (`restAudioPrime()`; iPhone needs it) and starts a paused rest.
+- **The door is shared with Split Step** (2026-10-18). The rest band's last line reads **Play while you rest** (`#timerPlayBtn`,
+  `toggleRestGames()`, in the list's rest and Guided's) and opens a small shelf inline in the green band (`#timerGames`), one row
+  per game, the game played last on this phone first (`rest_game_last`, this phone only, never synced; Split Step first when there is
+  no history). **Off the Glass's row** (`openRestGame('rally')`, `openRally()` kept) loads `rally.js` on the first tap (`restGameLib()`;
+  sw.js keeps it in SHELL, so it plays with no signal and a change to it ships with a CACHE bump), opens the audio context in that tap
+  (`restAudioPrime()`; iPhone needs it) and starts a paused rest. The shelf folds when a new rest starts (`foldRestGames()`).
+  **Loading is first-come by tap, not by arrival** (`_restGameWant`): the last row tapped wins, so a slow load of the game tapped first never
+  takes the screen, and a load that finishes after its rest ended (`closeTimer()` / `showTimer()` clear the token) or during the 1.2 s GO!
+  opens nothing. A script that loads but defines no global (a gym wifi's login page) is a failure and the next tap tries the network again.
+  `closeTimer()` hides the timer before it closes a game, so the game's `onClose` does not pull focus to the door as the rest ends.
 - **The rest is the boss.** The court shows the rest clock the whole time (`left()` = `timerLeft()`), clay and pulsing in the last
   10 s, a tick and a buzz at 3, 2, 1. `timerDone()` calls `Rally.timeUp()` (the court freezes, *Time. Next set.*) and `closeTimer()`
   closes the game with the timer. ✕ and Back (`#rallyOverlay` is in `topLayer()` above the timer and in `initBackNav()`'s observer)
@@ -1656,6 +1663,32 @@ and runs it; program.html owns the door and the layer.
 - **Its numbers stay on the phone:** `rally_stats` (`best` rally, `wins`, `played`), no athlete prefix, never synced, never scored,
   never seen by the coach. No yellow: the ball is white, the court the brand green, Amir's racket clay.
 - The guide's *Built-in tools* card names the door (CNT-01). Test: `node scripts/headless/rally.js` (26 checks).
+
+## 🎾 Split Step: a reaction game for the rest (2026-10-18)
+
+Amir, 2026-10-17: *"can you create a game like this for my app? https://play.harmansharma.in/reaction ... i want my tennis and padel
+players to use this during their rest time"*. 2026-10-18: *"Go with your picks: Split Step, one door with a shelf for both games,
+scores stay on the phone."* The prototype: https://claude.ai/artifact/DFZd4XE2MgVtQhPpkSeCGL. `assets/js/splitstep.js`
+(`window.SplitStep`, the same API shape as Rally) draws and runs it; program.html owns the layer (`#splitOverlay`, beside
+`#rallyOverlay`), `REST_GAMES`, `openRestGame()` and the two hooks. It sits behind the same door as Off the Glass (see above).
+
+- **Four drills, each a tennis question:** *First Step* (tap the moment Amir hits), *Fore or Back* (tap the side the ball goes to),
+  *In or Out* (tap only what lands in; **on the line is in**, so a leave counts as much as a tap) and *Sweet Spot* (tap as the ball
+  reaches your racket; after the bounce it slows by a different amount each time, so the timing cannot be learned).
+- **The rest is the boss.** The rest clock is on the court the whole time. A round starts only when `left()` is at least its drill's
+  need (First Step 19 s, Fore or Back 23, In or Out 24, Sweet Spot 17: the 99th percentile of a clean round plus 1 s). `timerDone()`
+  calls `SplitStep.timeUp()`, `closeTimer()` closes it, and ✕ and Back return to the running timer (`#splitOverlay` is in
+  `topLayer()` and `initBackNav()`'s observer). It never runs past a rest.
+- **Fair starts:** the wait before each hit is a floor plus an exponential tail, so "now" can never be guessed. A tap before the hit,
+  or too soon after it to be a real reaction (`GUESS` per drill), is a foot fault and the ball is replayed.
+- **Seen, not heard:** the cue is movement, never a colour change alone, and sound comes only after a tap, so a phone on silent scores
+  the same. The 3-2-1 stays quiet during a wait or a live ball.
+- **Scoring:** a round's number is the median, so one missed tap does not ruin it. A best needs every ball right and no foot faults.
+- **Its numbers stay on the phone:** `splitstep_stats` (bests and the last rounds per drill), no athlete prefix, never synced, no XP,
+  no leaderboard, never seen by the coach. Phones differ in touch delay, so nobody is ranked against anyone.
+- No yellow: the ball is white, the court the brand green, Amir's racket clay. **Never call it reaction training** in copy; it is a
+  game for the rest. The guide's *Built-in tools* card names the door and both games (CNT-01).
+- Test: `node scripts/headless/splitstep.js`.
 
 ## 🧾 The working card (CARD-01/02/03, 2026-09-27)
 

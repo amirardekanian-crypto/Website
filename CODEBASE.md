@@ -157,9 +157,14 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   - Athlete-facing explanation is the **"Personal Records: the most you could lift once"** card
     in `APP_GUIDE` plus `CEILING_HELP` (the same prose, shown in place on the Records screen); the
     data handling is `privacy.html` §2.2. Keep all of them in step.
-- **Off the Glass, the rest game (2026-10-17).** `assets/js/rally.js` (`window.Rally`, precached by `sw.js`, loaded by `rallyLib()` on the
-  first tap of the rest band's door): a one-thumb air hockey on a padel court that stops when the rest does. program.html owns `#rallyOverlay`
-  (in `topLayer()`), `openRally()` and the two hooks in `timerDone()` / `closeTimer()`. `PROGRAM-APP.md` → *Off the Glass*.
+- **Off the Glass, the rest game (2026-10-17).** `assets/js/rally.js` (`window.Rally`, precached by `sw.js`, loaded by `restGameLib('rally')` on the
+  first tap of its row on the shelf behind the rest band's door): a one-thumb air hockey on a padel court that stops when the rest does. program.html owns `#rallyOverlay`
+  (in `topLayer()`), `openRally()` (= `openRestGame('rally')`) and the two hooks in `timerDone()` / `closeTimer()`. `PROGRAM-APP.md` → *Off the Glass*.
+- **Split Step, the second rest game (2026-10-18).** `assets/js/splitstep.js` (`window.SplitStep`, precached by `sw.js`, loaded by
+  `restGameLib('splitstep')` from the shelf): four drills with the rest clock on the court, bests in `splitstep_stats`. The door
+  is now one button, "Play while you rest" (`toggleRestGames()`), that opens the shelf `#timerGames`; program.html owns `#splitOverlay`
+  (in `topLayer()` and `initBackNav()`), `REST_GAMES`, `openRestGame()`, `closeRestGames()` and the same two hooks, which now act on every
+  open game. `PROGRAM-APP.md` → *Split Step*.
 - **Highlight Reel, share cards for a win (2026-10-17).** `assets/js/sharecard.js` (`window.ShareCard`, precached by `sw.js`, loaded by
   `hlLib()` the first time a card is drawn) paints a 1080 × 1920 Story or 1080 × 1350 post on a canvas, in English or Farsi (every Farsi
   word in its one `FA` table, drafts for Amir). program.html decides which wins and which numbers (the HIGHLIGHT REEL block at the end of
@@ -561,6 +566,8 @@ loaded, a Short, a non-YouTube link, the circuit pop-up on a 320 × 568 screen. 
 course app (`tennis/app/`) in demo mode, a right-to-left page, with `tps_demo()` answered by a made-up course.
 `rally.js` (2026-10-17) plays Off the Glass in the real app: the door, the rest clock on the court, a swipe, points both ways, a won
 match and its `rally_stats`, Back and ✕ back to the running rest, the rest running out mid-game, 320 px, the demo banner and no yellow.
+`splitstep.js` (2026-10-18) plays Split Step in the real app: the shelf and its order, each of the four drills, foot faults, a round that
+needs more rest than is left, the rest running out mid-round, Back and ✕ back to the running rest, `splitstep_stats`, the host's loading rules (the last tap wins, a late load opens nothing over the next rest or the GO!, no focus pulled to the door as a rest ends), 320 px and no yellow.
 `sharecard.js` and `highlight-reel.js` (2026-10-17) check Highlight Reel: the first paints every share card of `assets/js/sharecard.js`
 (ten templates, Story and post, English and Farsi, weights and names on and off, long names) in a page of its own and fails on text past
 its box, text in Instagram's bars, overlapping text, a Latin digit in Farsi and the EN and FA word tables drifting apart, and saves a PNG
