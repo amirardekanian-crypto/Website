@@ -23,10 +23,17 @@
 // plays with no signal, and a change to it ships with a CACHE bump. PROGRAM-APP.md -> Split Step describes it.
 //
 // API, the same shape as Off the Glass (assets/js/rally.js), so one rest door can open either game:
-//   SplitStep.open({ root, left, sound, audio, onClose, drill }) · SplitStep.timeUp() · SplitStep.close() · SplitStep.isOpen()
+//   SplitStep.open({ root, left, sound, audio, onClose, drill, handBackAt }) · SplitStep.timeUp() · SplitStep.handBack(done) · SplitStep.close() · SplitStep.isOpen()
 //   root    → an empty element the host shows over the rest timer; the game fills it and toggles its `visible` class.
 //   left()  → whole seconds of rest left, or null while the rest is paused.
 //   sound() → true when the rest timer's sound is on.  audio() → the page's AudioContext, opened in the tap on Play.
+//   handBackAt → seconds before the rest's end at which the host takes the screen back (a number, or a function returning one; default 0).
+//                A round starts only if it can finish before then, the clock's warning and the 3-2-1 count down to it, and the game stops itself at it.
+//   handBack(done) → stop at once, the way timeUp() does, then call done() on the next tick, where the host closes the game. Idempotent.
+//                Called while the game is closed, it just calls done().
+// Why handBack: program.html's Serve Clock takes the screen back from any rest game with 25 s of rest left (30 s on rests of 100 s or more).
+// A game with a handBack is told and closes when it calls done(); one without is closed at once. A round must never be cut by that, so
+// the game counts handBackAt as the end of its rest. PROGRAM-APP.md -> Split Step.
 (function () {
   'use strict';
 
@@ -353,7 +360,14 @@
     };
   }
 
-  function canGo() { const l = S.opts.left ? S.opts.left() : null; return l == null || l >= DRILLS[S.drill].need; }
+  // Seconds before the rest's end at which the host takes the screen back (opts.handBackAt: a number or a function); anything else is 0.
+  function handAt() {
+    let n = S.opts.handBackAt;
+    try { if (typeof n === 'function') n = n(); } catch (e) { n = 0; }
+    return typeof n === 'number' && isFinite(n) && n > 0 ? n : 0;
+  }
+  // A round may start only if it can finish before the hand-back, not just before the rest's end. A paused rest allows it.
+  function canGo() { const l = S.opts.left ? S.opts.left() : null; return l == null || l - handAt() >= DRILLS[S.drill].need; }
   function goHtml(label) {
     return canGo() ? `<button type="button" class="ss-btn" data-go>${label}</button>`
                    : `<p class="ss-wait">Not enough rest left for a round. Get set.</p>`;
@@ -545,17 +559,19 @@
   function paintClock() {
     const s = S;
     if (s.up) return;
-    const left = s.opts.left ? s.opts.left() : null, el = s.clock;
+    const left = s.opts.left ? s.opts.left() : null, el = s.clock, hand = handAt();
     if (left == null) {
       if (el._t !== '-') { el._t = '-'; el.querySelector('b').textContent = '–'; el.querySelector('span').textContent = 'Rest paused'; }
       el.classList.remove('low');
     } else {
-      const txt = clock(Math.max(0, left));
+      // the pill shows the real rest left, but the warning and the 3-2-1 count down to the hand-back, where the game ends
+      const txt = clock(Math.max(0, left)), toHand = left - hand;
       if (el._t !== txt) { el._t = txt; el.querySelector('b').textContent = txt; el.querySelector('span').textContent = 'Rest'; }
-      el.classList.toggle('low', left <= 10);
+      el.classList.toggle('low', toHand <= 10);
       // the 3-2-1 stays quiet during a wait or a live ball: a beep then would be a second, faster cue
-      if (left <= 3 && left > 0 && s._count !== left) { s._count = left; if (s.phase !== 'wait' && s.phase !== 'live') { buzz(12); tone(880, 0.07, 0.15, 'sine'); } }
+      if (toHand <= 3 && toHand > 0 && s._count !== toHand) { s._count = toHand; if (s.phase !== 'wait' && s.phase !== 'live') { buzz(12); tone(880, 0.07, 0.15, 'sine'); } }
       if (left <= 0) { timeUp(); return; }   // the host says so first; this is the backstop
+      if (hand > 0 && toHand <= 0) { timeUp(); return; }   // so is this: the host's hand-back, which stops the game the same way
     }
     if (s.phase === 'ready' || s.phase === 'done') {
       const go = canGo();
@@ -663,7 +679,8 @@
     S.raf = requestAnimationFrame(frame);
   }
 
-  // The rest is over: stop and say so. The host closes the layer a moment later (in program.html, closeTimer()).
+  // The rest is over, or the host is taking the screen back: stop and say so. Any round under way is dropped and never saved.
+  // The host closes the layer a moment later (in program.html, closeTimer(), or in the done() it gave handBack).
   function timeUp() {
     const s = S;
     if (!s || s.up) return;
@@ -672,6 +689,12 @@
     setFb(); hud('');
     card(`<div class="ss-eye">Rest</div><h3>Time. Next set.</h3><p>Back to work.</p>`);
     say('Rest over. Back to work.', true);
+  }
+  // The host's Serve Clock takes the screen back: stop at once, then tell the host on the next tick that it can close the layer.
+  // A second call, or one while the game is closed, only calls its done.
+  function handBack(done) {
+    timeUp();
+    if (typeof done === 'function') setTimeout(done, 0);
   }
 
   function close(quiet) {
@@ -690,5 +713,5 @@
     if (!quiet && s.opts.onClose) s.opts.onClose();
   }
 
-  window.SplitStep = { open, timeUp, close: () => close(), isOpen: () => !!S, stats: loadStats, _state: () => S };
+  window.SplitStep = { open, timeUp, handBack, close: () => close(), isOpen: () => !!S, stats: loadStats, _state: () => S };
 })();
