@@ -11,7 +11,7 @@ This is the document to read before touching progression.
 > "XP system updated — your levels were rescored." It will **not** fire a hundred
 > level-up celebrations they didn't earn today.
 
-**Once Career Mode's XP switch is on** (phase 2, applied to the live project 2026-10-17 with the switch still off: `HABITS.md` → *Career Mode (phase 2, the XP
+**Once Career Mode's XP switch is on** (phase 2, applied to the live project 2026-10-17 and switched on 2026-10-18: `HABITS.md` → *Career Mode (phase 2, the XP
 switch)*) this still holds for the rules, with two changes. The overall level is the career level and never resets (§7), and the
 career's numbers live in `career/rulebook.toml` as well as here (§8). The server also keeps a working copy of each athlete's numbers
 (`career_scores`) so the board loads fast. It is worked out again from the facts whenever they change, and nothing in it is a
@@ -980,9 +980,9 @@ counting toward streaks and consistency badges) but score nothing.
 whole career and never reset (`HABITS.md` → *Career Mode (phase 2, the XP switch)*). A season still starts both boards from zero,
 and it archives the season's points and the career level. The table under *What resets and what doesn't* has both columns.
 
-**Right now it is `Pre-Season`, opened 26 July 2026.** Athletes are trying the app and
-building a score from that date. Season 1 is scheduled to open on 2026-10-18 (Amir's scheduled task `start-season-1`, 06:00 UK, `start_season('Season 1','2026-10-18')`,
-Proof's own way: Pre-Season is archived with Proof's levels and its title at level 5).
+**Right now it is `Season 1`, opened 2026-10-18.** `Pre-Season` ran from 26 July 2026, with athletes trying the app and
+building a score from that date. Season 1 opened on 2026-10-18 at 06:00 UK (Amir's scheduled task `start-season-1`, `start_season('Season 1','2026-10-18')`,
+Proof's own way: Pre-Season was archived with Proof's levels, 30 athlete records and 18 Pre-Season titles at level 5).
 
 ### Starting a season — the command
 
@@ -1323,8 +1323,8 @@ The SQL began in `supabase/stage9_leaderboard.sql`, with seasons in
 (listed in `HABITS.md` → *The leaderboard*). The folder is a changelog, not a schema: the
 live `hab_bonus_xp()` and `hab_xp()` are **the latest definition, currently
 `stage24_marks_quests_customcap.sql`**; `leaderboard_top()` was last redefined in
-`stage17_titles.sql` (and again in `stage69_career_xp_switch.sql`, applied 2026-10-17 with the switch off, which answers Career Mode's scorer once
-the XP switch is on and Proof's own before it); and since 2026-09-07 the live board RPCs also carry a sign-in
+`stage17_titles.sql` (and again in `stage69_career_xp_switch.sql`, applied 2026-10-17, which answers Career Mode's scorer once
+the XP switch is on, as it is since 2026-10-18, and Proof's own before it); and since 2026-09-07 the live board RPCs also carry a sign-in
 identity check that no file holds. Read `pg_get_functiondef()` before trusting or
 re-running any of them.
 

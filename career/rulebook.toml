@@ -9,9 +9,10 @@
 #
 # How the server uses this file (phase 1, 2026-10-17): scripts/career_seed.py turns it into the career_rules row and
 # the other files into career_catalogue rows. Run `python scripts/check_career.py` first; the seed refuses a file with
-# an error. Version 2 (phase 2, 2026-10-17): phase 1's one shadow gate became the two switches below.
+# an error. Version 2 (phase 2, 2026-10-17): phase 1's one shadow gate became the two switches below. Version 3
+# (2026-10-18): the XP switch turned on, the day Season 1 opened (Amir: "switch after Season 1 starts").
 
-version = 2
+version = 3
 meanings = ["consistency", "commitment", "progress", "resilience"]
 
 [switch]
@@ -30,7 +31,8 @@ meanings = ["consistency", "commitment", "progress", "resilience"]
 #   · the level is the career level: it never resets (decision 1), the board ranks season points ([season]), and nobody's
 #     level goes down ([fact.level_kept]).
 # The seed that turns it on writes the levels kept and returns every athlete's line; `--dry-run` shows that list first.
-xp = "off"
+# Turned on 2026-10-18, after Season 1 opened at 06:00 UK, on Amir's yes to the list (CAREER_MODE.md → round 3).
+xp = "2026-10-18"
 #
 # catalogue, phase 3: the entries gated on it in badges.toml and achievements.toml (retire_at / starts_at = "catalogue")
 # take effect: one badge per habit, HEAVY METAL and THE MACHINIST retire, the training badges and the awards join. It

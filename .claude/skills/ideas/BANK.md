@@ -133,6 +133,46 @@ feedback, `PROCEDURES.md` → P17). In the repo: d2757b1 (the decisions, each me
 and Double Up earns NEW ENGINE; custom habits get HOUSE RULES; every change to a Proof entry waits for the switch,
 `retire_at` / `starts_at = "switch"`, so phase 1's shadow still matches `hab_xp()`).
 
+## Round 4 · 2026-10-18 · "Rest in Play" (Off the Glass, the rest-time game)
+
+Full write-up (8 fields per idea, three phone mockups, the evidence with PMIDs, the seven rules, a second-by-second rest, build order, dependency map, the cuts, nine decisions):
+https://claude.ai/artifact/1qn7D8shTUmKrYDHo9UT9W
+
+Brief: Amir, *"do you want to have a research and think and generate some ideas about how to improve this game if we can"*. Off the
+Glass (`assets/js/rally.js`) shipped 2026-10-17 on his own request, not from `/ideas`; Split Step, a second rest game, shares its door
+since 295c659. Two research passes (sports science, every PMID checked; game design). Live numbers on 17 Oct: median written rest 60 s,
+83% of 727 rests 90 s or less, 18 rests and about 24 min of rest a session, 27% of 1,584 logged sets with no RPE. Bots: a
+ball-following bot won 58 of 58 points (a point about 4 s, a match about 25 s); a bot also found a trapped-ball bug (fixed 2040aa9).
+Made with ten lens agents (54 ideas), one merge (30), three checks each (rules, evidence, build). The seven rules the round keeps: the
+rest is the boss; the last 25 s are for the set; only inside a rest and optional; a calm option beside the game; the game pays nothing
+(GAME-3, GAME-6); scores stay on the phone; no claim that it trains tennis.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 38 | The Read | Amir defends like a person: aims where the ball will cross, reacts a beat late, small aim error, form set between points; the score-based speed dial goes; a sim test with three human-like bots. Advanced: a visible head start ("Amir gives you a point") | — | pitched · **build first** (with 39) |
+| 39 | Serve Clock | At 25 s left (30 on rests of 100 s+) "Last point", then the next set and one Spine cue; no game door on rests under 45 s, circuit rounds or retest lifts; one `cueForRest()` shared with #20 | — | pitched · **build first** (with 38) |
+| 40 | Full Time | One match a session: the score waits between rests, first to 15, an 8-minute play cap, Done ends it | 39 | pitched |
+| 41 | Chair Umpire | A receipt per rest (written, run, how it ended, +15s) in the session log, read by coach.html, `/cycle-report` and `/program-design`; a line in privacy.html | — | pitched |
+| 42 | Clean Strike | Hit-stop up to 60 ms, a pitch ladder per rally hit, a white rim on Amir's racket, the thumb lift fading near the back glass | — | pitched |
+| 43 | Bajada | A real bank off the glass through the gap counts 2 | 38 | pitched |
+| 44 | The Lob | A calm breathing door on the shelf (in 4, out 6), handing back at 25 s; a mode of rally.js | 39 | pitched |
+| 45 | Call the Score | Guided: the door reads "Rate the set, then play" while the set just done has no RPE; nothing locks | — | pitched · check whose sets are blank first |
+| 46 | Walk-On | Amir's own recorded lines at the bell, English and Farsi | — | pitched · needs his recordings |
+| 47 | Passing Shot | A Story card for beating Amir, in the Highlight Reel family | 38, 40 | pitched · his call on being the opponent on athletes' Stories |
+
+Grown for #20 The Corner (slices, not new numbers; they share Serve Clock's cue function): Ball Change (the next exercise's Because
+at a changeover), Towel Break (why this rest is long or short, three sightings), Order of Play (why the block order, in the guide
+first), Down the Line ("7 sets to go" from halfway), Eight Means Two (a one-line RPE legend under Guided's keys), The Nod (the set beat
+the same set last time, in words only; needs a call on Career Mode's P17).
+
+Parked: Pared (a solo wall mode) and Call Your Glass (trick-shot puzzles), until usage of the shelf is visible; a weekly dial for how
+hard Amir plays (speed alone did not make him harder in the bot tests).
+
+Cut in the same round (listed so they are not re-pitched): Say the Number (the list already asks "How hard?" at the tick); In or Out
+(athletes rating their own technique, against PRC-7 and PRC-9); Sponsor Board (cues during play; the cue moved to Serve Clock); Davis
+Cup (a crew-against-Amir tally: game numbers off the phone, a league by another name, GAME-6); New Balls, Please (a new court each
+cycle, cosmetic); XP, badges or a board for the game; anything that lengthens a rest; any claim that the game trains tennis.
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |

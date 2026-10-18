@@ -4,8 +4,8 @@ Every function the system needs, step by step, in plain words. Each one says **w
 **steps**, what it **writes**, and the rules it obeys (GAME-n, in [`CAREER_MODE.md`](CAREER_MODE.md) → *The rules*).
 
 **Status (2026-10-17): phase 1 is live, in shadow** (P1, P2, P3, P4, P10, P12, P14, P15: *Phase 1, as built*, at the
-end; applied to the live project on Amir's yes, seeded, 34 of 34 athletes matching Proof). **Phase 2, the XP switch, is built
-and rehearsed, not yet switched on** (P1 step 4, P3, P4, P10, P13, P14 steps 4 to 6, P17: *Phase 2, as built*, at the end); the
+end; applied to the live project on Amir's yes, seeded, 34 of 34 athletes matching Proof). **Phase 2, the XP switch, is built,
+rehearsed and switched on (2026-10-18)** (P1 step 4, P3, P4, P10, P13, P14 steps 4 to 6, P17: *Phase 2, as built*, at the end); the
 rest is a specification. When a phase is built, its SQL follows these steps; when a step here changes, the code
 changes with it. The numbers they use live in `rulebook.toml`, and the rewards, missions and quests in the other `.toml`
 files: a procedure never hard-codes a number (GAME-10).
@@ -479,10 +479,10 @@ the schema snapshot, a dump of the real rows, then made-up athletes through the 
 became, and the choices the build had to make:
 
 - **Shadow.** `rulebook.toml` → `[shadow] on = true` (rulebook version 1; version 2 replaced it with `[switch]`, both `"off"`:
-  *Phase 2, as built*, below). The one thing an athlete sees is Hold Serve's row on the training app's Home
+  *Phase 2, as built*, below). Until the XP switch (2026-10-18) the one thing an athlete saw was Hold Serve's row on the training app's Home
   (2026-10-17): it reads the athlete's own `week_held` and `week_broken` facts, not `get_profile()`, and counts them as P10 does
-  (`holdCount()`, a twin; `PROGRAM-APP.md` → *Hold Serve on Home*). No XP, level or score reaches a screen; AA Proof's scorers and board
-  are untouched. While it is on, the habit numbers are Proof's own (strength 100, the gate, the targets) and the checker
+  (`holdCount()`, a twin; `PROGRAM-APP.md` → *Hold Serve on Home*). No XP, level or score reached a screen; AA Proof's scorers and board
+  were untouched. Then, and until the catalogue switch, the habit numbers are Proof's own (strength 100, the gate, the targets) and the checker
   holds them equal to `supabase/xp_rules_snapshot.json`.
 - **P1, observe.** Four triggers: `athlete_progress` (the Proof log, its config, the Personal Records), `session_history`,
   `library_sessions`, `programs`. A trigger never stops a save: an error is a database WARNING and the save goes through,
@@ -494,8 +494,8 @@ became, and the choices the build had to make:
     `full_log`: finished as written, every set ticked, every set rated where the card asks an RPE. The log does not carry
     the card's target, so an exercise rated on any set asks one on every set it ticked, and one rated on none asks none
     (the app asks only where the card sets a target: `noRpeCards()`). `checkin_done`: the check-in answered, not skipped.
-  - **Step 4, settling,** is built (`career_sync()`'s `p_settled_before`) and waits for the XP switch (phase 2): while the shadow is on a
-    closed day still follows the log, as Proof does, or the two could not match.
+  - **Step 4, settling,** is built (`career_sync()`'s `p_settled_before`) and is on since the XP switch (2026-10-18, phase 2). While the shadow was
+    all there was, a closed day still followed the log, as Proof does, or the two could not match.
 - **P2, derive.** On every training save, a programme change and a profile read (no cron, as P2 asks).
   - Training weeks are `cycleWeekInfo()`'s, for the published cycles (index ≤ `currentCycleIndex`) **that have dates**; a
     cycle with none has no training week, as in the app. A past cycle's plan days come from its newest saved version
@@ -522,8 +522,8 @@ became, and the choices the build had to make:
   (runs and comebacks measured from the season's first day). The quest *runs* are read where Proof keeps them
   (`xp_rules.questRuns`) until the crew mission replaces the lever. Every other fact pays `[fact.<kind>] xp`, capped by
   `limit` and `limit_per` (one session per plan day per training week, the better one paying; two Library sessions a week;
-  three effort wins a cycle). Nothing is stored. ⚠️ Until the XP switch the shadow's career XP counts a session twice, as the
-  WORKOUT habit (Proof's 120) and as the session fact (400).
+  three effort wins a cycle). Nothing is stored. ⚠️ Before the XP switch (2026-10-18) the shadow's career XP counted a session twice, as the
+  WORKOUT habit (Proof's 120) and as the session fact (400); since the switch the habit pays 0.
 - **P4.** `career_level()`: the rulebook's curve and ranks, no ceiling, no reset. `base` was re-anchored to 400 on the
   shadow data with the XP switch's numbers (the measurement is beside it in `rulebook.toml`).
 - **P10.** `get_profile(athlete)`: the athlete's own, the coach's anyone's (and the SQL editor's or the service role's, for a
@@ -560,7 +560,7 @@ became, and the choices the build had to make:
 `supabase/stage69_career_xp_switch.sql` (with the seed of `rulebook.toml` version 2: both switches `"off"`), rehearsed by
 `scripts/career/rehearse_switch.mjs` (PGlite, the schema snapshot, a full backup of the real rows, phase 1 as it stands on the live
 project, then stage69, Season 1, the dry run, the switch, the refusals, settling, a season closing under the switch, an erasure, the
-cache's cost and the way back: 42 of 42 on 2026-10-17), then applied to the live project late that day with the switches still off (every level, both boards and `career_compare()` identical before and after, 34 of 34); the way back is `scripts/career/rollback_stage69.sql`, tested there. What the
+cache's cost and the way back: 42 of 42 on 2026-10-17), then applied to the live project late that day with the switches still off (every level, both boards and `career_compare()` identical before and after, 34 of 34); the way back is `scripts/career/rollback_stage69.sql`, tested there. **Switched on 2026-10-18** (`rulebook.toml` version 3, `[switch] xp = "2026-10-18"`, the dry run first, on Amir's yes to its list: 31 up, 7 the same, nobody down, 0 levels kept). What the
 procedures above became, and the choices the build made:
 
 - **The two switches.** `rulebook.toml` → `[switch]`: `xp` (phase 2) and `catalogue` (phase 3), each `"off"` or the day it was turned on.
