@@ -987,9 +987,15 @@ tokens for one day; the copy is gone).
   - **A door that carries a FIGURE** keeps the figure as the headline and its name is a quiet green label (Barlow 600,
     `--fs-small`, `--green-ink`). Exactly five rows: Personal records, Body weight, Daily habits, Hold Serve, Career.
   - **Every other door** makes the NAME the headline, in the cycle card's fold-row recipe (`.road-ul`: Barlow 600,
-    `--fs-field`, ink, sentence case) — *Why your plan looks like this*, *Cycle 2 complete*, *Using the app*, *Tell the crew*.
-  - ⚠️ The test is **`.hrow-vv`**, the span holding the figure itself — never `.hrow-v`, which is a slot that also holds prose
-    (*How the app works*, *+ Log a max*, a session's name). ⚠️ The polarity is deliberate: the **headline is the default** and
+    `--fs-field`, ink, sentence case) — *Why your plan looks like this*, *Cycle 2 complete*, *How the app works*, *Tell the crew*.
+  - **A prose second line belongs in `.hrow-q`** (15 px grey), never in `.hrow-v`, the figure's slot, which renders at 18 px
+    bold and there outshouts the name above it. Two rows read that way until 2026-10-19 and were the odd ones out: *Tested a
+    lift?* over a louder *+ Log a max* (a question titling the action) and *Using the app* over a louder *How the app works*
+    (the same thing twice). Each is now named after what it opens, with the prompt on the quiet line — **Log a max** (*Tested
+    one in the gym? Add it here.*) and **How the app works** (*Start here if anything is unclear.*), the second matching the
+    Account page's row to that same sheet. The article reader's embedded session is the last prose row left in `.hrow-v`.
+  - ⚠️ The test is **`.hrow-vv`**, the span holding the figure itself — never `.hrow-v`, which can also hold
+    prose (a session's name). ⚠️ The polarity is deliberate: the **headline is the default** and
     the quiet label is the `:has()` branch, so a browser without `:has()` (iOS 15.0–15.3) shows every name loud instead of
     whispering the one row this was for. **It is ONE rule over all seven scopes** (`#home-overview`, `#screen-plan`,
     `#screen-ceiling`, `#screen-notes`, `#hist-overlay`, `#ar-body`, `#day-view .complete-crew`); the other blocks keep only
@@ -1088,7 +1094,7 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     with the old hero's sentence under it; a lift's page its latest estimate, the change since the first and the entries; Body weight
     the last reading, the change over the range (*−0.8 kg · DOWN OVER THE RANGE*) and the readings, with the average-to-average sentence.
     The green hero cards are gone. A **New best** is the cover's green foot (`--foot`), so the screen keeps one green thing.
-  - **Paper rows** for lifts, entries, readings and Log a max's picker; **+ Log a max** (*Tested a lift?*) and *Add your body weight* as
+  - **Paper rows** for lifts, entries, readings and Log a max's picker; **Log a max** (*Tested one in the gym? Add it here.*) and *Add your body weight* as
     door rows; **Due for a retest** as the day's banner (a 4 px clay stripe, *Test 5RM* as the green text link); **How this works** one
     fold, closed on every screen (it was open on the empty one); the empty state's four steps numbered 01–04.
   - **Log a max**: the set table's boxes (white, `--field`), the day's 48 px RPE keys, the estimate and its grade as a two-track

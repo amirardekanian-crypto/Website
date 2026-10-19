@@ -4672,7 +4672,7 @@
      and the other five blocks keep only their .hrow-b.
      The rule: THE LOUDEST THING IN A DOOR IS WHATEVER THAT DOOR IS FOR.
        · Default — the NAME is the headline, in the cycle card's fold-row recipe (.road-ul), so a door reads like the
-         rows above it: "Why your plan looks like this", "Cycle 2 complete", "Using the app", "Tell the crew".
+         rows above it: "Why your plan looks like this", "Cycle 2 complete", "How the app works", "Tell the crew".
        · A door that carries a FIGURE keeps the figure as the headline and the name becomes a quiet green label.
          The test is .hrow-vv, the span that holds the figure itself (Personal records, Body weight, Daily habits,
          Hold Serve, Career) — NOT .hrow-v, which is a slot that also holds prose ("How the app works", "+ Log a max").
@@ -10215,10 +10215,12 @@ function renderNotes() {
     </div>`).join('');
 
   // ── How the app works: the guide (APP_GUIDE) opens in the one sheet (COACH-02); the Coach tab keeps ONE door row for it
-  //    (Home's .hrow look), with no section label above it, and stays Amir's voice.
+  //    (Home's .hrow look), with no section label above it, and stays Amir's voice. It is named after the sheet it opens,
+  //    as the Account page's row to the same sheet already is (Amir, 2026-10-19): it read "Using the app" over a louder
+  //    "How the app works", the same thing said twice, because the prose sat in the figure's slot (.hrow-v) not .hrow-q.
   const door = `<button type="button" class="hrow" onclick="openHelp()">
       <span class="hrow-ic" aria-hidden="true">${window.ICON('help', 1.6)}</span>
-      <span class="hrow-b"><span class="hrow-l">Using the app</span><span class="hrow-v">How the app works</span></span>
+      <span class="hrow-b"><span class="hrow-l">How the app works</span><span class="hrow-q">Start here if anything is unclear.</span></span>
       <span class="hrow-a" aria-hidden="true">›</span>
     </button>`;
 
@@ -10228,7 +10230,7 @@ function renderNotes() {
     door;
 }
 
-// "Using the app" — the general how-to content shown to every athlete in the
+// "How the app works" — the general how-to content shown to every athlete in the
 // help sheet (openHelp(), COACH-02), opened from the Coach tab's row, the account
 // sheet and the jargon links. This is now the single source of truth: the old standalone App
 // Guide screen (#screen-guide) was removed, so the content lives here directly.
@@ -12784,9 +12786,12 @@ function ceilHeadPlain(kick) {
   paintCover('ceil-board', 'ceil-line', null, '');
 }
 
-// A door row (Home's and Progress's look) for the one hand-entry door: "+ Log a max". `onclick` is what the tap does.
+// A door row (Home's and Progress's look) for the one hand-entry door. `onclick` is what the tap does.
+// It is named after the form it opens, with the prompt on the quiet line under it (Amir, 2026-10-19). It read
+// "Tested a lift?" over "+ Log a max": a question titling the action, with the action the louder of the two,
+// because the prose sat in the figure's slot (.hrow-v, 18 px bold) instead of .hrow-q.
 function ceilDoor(onclick) {
-  return `<button type="button" class="hrow ceil-door" onclick="${onclick}">${hrowIc('plus')}<span class="hrow-b"><span class="hrow-l">Tested a lift?</span><span class="hrow-v">+ Log a max</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+  return `<button type="button" class="hrow ceil-door" onclick="${onclick}">${hrowIc('plus')}<span class="hrow-b"><span class="hrow-l">Log a max</span><span class="hrow-q">Tested one in the gym? Add it here.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
 
 // Personal Records (the screen was called The Ceiling until 2026-09-26) — the cover (the best lift, the ratio to body weight,

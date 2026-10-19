@@ -316,12 +316,14 @@
 // v185: the shell did not change. This worker now leaves /pushtest/ alone too — the push reachability test (2026-10-19), which ships its own worker and must hold the test's push subscription itself.
 // v186: program.html changed (2026-10-19, Amir's slow connection): Crew asks the server for nothing unless it is opened, a photo is downloaded once and kept on the phone, and a photo is made smaller (1080 px, under 200 KB).
 // v187: program.html changed (2026-10-19, Amir): a door row's name is readable — it leads in Barlow sentence case, except on the five doors that carry a figure, where the figure leads and the name is a small green label. It was 11 px tracked mono capitals on all 51 doors.
+
 // v188: program.html and habits.html changed (2026-10-19, Amir: "every time there is a change in the app, and its updated, i want everyone
 // to be notified to close their app from background and re open it"). Both apps now watch for the next worker themselves: when a bump
 // like this one takes the shell over, the app says "A new version of the app is ready" with a Reload, so nobody has to be told by hand.
 // This worker is unchanged apart from the name. The two apps are the ones that had to learn to listen, which means this bump is the last
 // one an athlete has to close and reopen for: from the next one on, their app tells them.
-const CACHE = 'aap-v188';
+// v189: program.html changed (2026-10-19, Amir): two door rows are named after what they open — "Log a max" and "How the app works" — each with its prompt on the quiet line, where they used to say a question or the same thing twice over a louder second line.
+const CACHE = 'aap-v189';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

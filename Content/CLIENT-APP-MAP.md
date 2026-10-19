@@ -289,7 +289,7 @@ Top to bottom:
 - **Coach Amir** — *Strength & conditioning coach*, with my photo.
 - **Message me on WhatsApp** — *"Questions, swaps, anything that hurts, form videos."* Number **+44 7435 363461**. It opens WhatsApp with *"Hi Amir, it's {first name} ({cycle name}, week {n}). "* ready for you to finish.
 - **Personal notes** — cards I wrote for you; tap one to read it (opening one closes the others).
-- **Using the app → How the app works ›** — the Help sheet.
+- **How the app works → Start here if anything is unclear. ›** — the Help sheet.
 
 There's no chat in the app. Notes you type at the end of a session reach me and I read them, but **I answer on WhatsApp**.
 
