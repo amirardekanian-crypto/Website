@@ -4,7 +4,7 @@
 |---|---|---|
 | **The door** | [`../CLAUDE.md`](../CLAUDE.md) | every session, automatically. Who/what this is, the non-negotiables, and the READ-LIST that says which files a given job opens. |
 | **Rules** | [`rules/`](rules/) | one short file per area, opened when you change that area. The rule, current tense. If a rules file and anything else disagree, the rules file wins. |
-| **Reference** | [`ref/`](ref/) | one file per section, looked up by name from an `INDEX.md`. Never read whole. |
+| **Reference** | [`ref/`](ref/) | one file per section, looked up by name from its index. The athlete app's index is [`../PROGRAM-APP.md`](../PROGRAM-APP.md) (49 sections), AA Proof's is [`../HABITS.md`](../HABITS.md) (19). Never read whole. |
 | **Record** | [`record/`](record/) | never, unless you ask for it. Dated audits, walkthroughs, histories. |
 
 The atlas across the whole repo — pages, assets, skills, scripts, docs — is
@@ -26,6 +26,17 @@ The atlas across the whole repo — pages, assets, skills, scripts, docs — is
 | [`rules/design.md`](rules/design.md) | design work |
 | [`rules/coaching.md`](rules/coaching.md) | the coaching pipeline and the rule index |
 | [`rules/working-with-amir.md`](rules/working-with-amir.md) | how Amir works; verifying the live site; the hooks setup |
+
+## The reference
+
+A monolith is its own index: one line per section, each line linking to that section's file. A reference written "`PROGRAM-APP.md` → *The working card*" is the row with that name — follow it, read that file, stop.
+
+| Index | Sections live in | Count |
+|---|---|---|
+| [`../PROGRAM-APP.md`](../PROGRAM-APP.md) | [`ref/program-app/`](ref/program-app/) | 49 |
+| [`../HABITS.md`](../HABITS.md) | [`ref/habits/`](ref/habits/) | 19 |
+
+A section of 20 KB or more with two or more sub-headings is split again into a folder with its own `INDEX.md`. Nothing is reworded in a split: every line of the monolith still exists, byte for byte, in exactly one file.
 
 ## House rules for these files
 

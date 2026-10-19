@@ -3,7 +3,7 @@
 <!-- Rules for one area. The door is CLAUDE.md; the atlas is MAP.md. One rule per line, wording unchanged. -->
 
 How the data and a session behave: [`program-app.md`](program-app.md).
-Reference, section by section: [`../ref/program-app/INDEX.md`](../ref/program-app/INDEX.md).
+Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
 
 ## What must never break
 

@@ -20,7 +20,7 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 |---|---|---|
 | **The door** | [`CLAUDE.md`](CLAUDE.md) | every session, automatically. Who/what this is, the non-negotiables, and the **READ-LIST**: per job, exactly which files to open. |
 | **Rules** | [`docs/rules/`](docs/README.md) | when you change that area. One short file per area, the rule in current tense. Twelve files, 2–17 KB each. |
-| **Reference** | [`docs/ref/`](docs/README.md) | by name, from an `INDEX.md`. One file per section; never read whole. |
+| **Reference** | [`PROGRAM-APP.md`](PROGRAM-APP.md) · [`HABITS.md`](HABITS.md) → one file per section in [`docs/ref/`](docs/README.md) | by name, from the index. Each of those two files is now a one-line-per-section index; the sections are their own files (49 and 19 of them). Never read whole. |
 | **Record** | [`docs/record/`](docs/record/INDEX.md) | never, unless you ask. Dated audits, walkthroughs, histories. |
 
 The layers, the rules-file list and the house rules for writing them are in [`docs/README.md`](docs/README.md).
@@ -356,8 +356,8 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`Content/SITE-AUDIT.md`](Content/SITE-AUDIT.md) | **The website audit** (2026-10-02) — 25 packages, the baseline scoreboard, the open questions, how to continue. Reviews in [`Content/site-audit/`](Content/site-audit/), measuring tools in [`scripts/site_audit/`](scripts/site_audit/README.md) |
 | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) | `coach.html` manual |
 | [`docs/record/COACH-AUDIT.md`](docs/record/COACH-AUDIT.md) | The coach dashboard audit (2026-10-10); §12 is the list to continue from |
-| [`PROGRAM-APP.md`](PROGRAM-APP.md) | The athlete app's features in full (read before changing `program.html`) |
-| [`HABITS.md`](HABITS.md) | AA Proof brief (start here for the habit tracker) |
+| [`PROGRAM-APP.md`](PROGRAM-APP.md) | **The index** to the athlete app's features — 49 sections, one file each in [`docs/ref/program-app/`](docs/ref/program-app/); open the row you need, never the whole reference |
+| [`HABITS.md`](HABITS.md) | **The index** to AA Proof — 19 sections, one file each in [`docs/ref/habits/`](docs/ref/habits/) |
 | [`FARSI-PRODUCTS.md`](FARSI-PRODUCTS.md) | The paid course app, the testing app and the Farsi product pages |
 | [`docs/record/SET-LOGGING-DESIGN.md`](docs/record/SET-LOGGING-DESIGN.md) | How set logging was designed |
 | [`Content/parity-drafts/`](Content/parity-drafts/) | Drafts for [`CONTENT-PARITY.md`](Content/CONTENT-PARITY.md): one folder per topic (lesson, article, verification notes) |

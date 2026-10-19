@@ -3,7 +3,7 @@
 <!-- Rules for one area. The door is CLAUDE.md; the atlas is MAP.md. One rule per line, wording unchanged. -->
 
 The look and the screens: [`program-app-look.md`](program-app-look.md).
-Reference, section by section: [`../ref/program-app/INDEX.md`](../ref/program-app/INDEX.md).
+Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
 The data shapes: [`../../SCHEMA.md`](../../SCHEMA.md). The coaching rules: the rule index in [`../../.claude/COACHING-PRINCIPLES.md`](../../.claude/COACHING-PRINCIPLES.md).
 
 ## What must never break

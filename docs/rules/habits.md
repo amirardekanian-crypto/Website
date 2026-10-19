@@ -2,7 +2,7 @@
 
 <!-- Rules for one area. The door is CLAUDE.md; the atlas is MAP.md. One rule per line, wording unchanged. -->
 
-Reference, section by section: [`../ref/habits/INDEX.md`](../ref/habits/INDEX.md). Every XP tunable: [`../../XP_SYSTEM.md`](../../XP_SYSTEM.md). Quest runs: [`../../QUESTS.md`](../../QUESTS.md).
+Reference, section by section: [`HABITS.md`](../../HABITS.md). Every XP tunable: [`../../XP_SYSTEM.md`](../../XP_SYSTEM.md). Quest runs: [`../../QUESTS.md`](../../QUESTS.md).
 
 ## The habit app (`habits.html`, AA Proof) — read `HABITS.md` before changing it
 

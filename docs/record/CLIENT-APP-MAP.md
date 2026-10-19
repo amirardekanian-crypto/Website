@@ -1,6 +1,6 @@
 # The athlete app — a map for someone opening it for the first time
 
-> ⚠ **Written 2026-10-11, before Centre Court (2026-10-12/13).** The screens, screenshots and tab names below are out of date: the bar is now **Home · Progress · Library · Coach** (Game Plan became the road on Progress), the Library has no doors page (one switch: Sessions · Playbook · Exercises), the This cycle card moved from Home to Progress, and every screen has the new look ([`APP-UI-KIT.md`](APP-UI-KIT.md)). Re-check each section against `PROGRAM-APP.md` and re-capture the shots before this goes to a client.
+> ⚠ **Written 2026-10-11, before Centre Court (2026-10-12/13).** The screens, screenshots and tab names below are out of date: the bar is now **Home · Progress · Library · Coach** (Game Plan became the road on Progress), the Library has no doors page (one switch: Sessions · Playbook · Exercises), the This cycle card moved from Home to Progress, and every screen has the new look ([`APP-UI-KIT.md`](../../Content/APP-UI-KIT.md)). Re-check each section against `PROGRAM-APP.md` and re-capture the shots before this goes to a client.
 
 **Status: DRAFT 5 · 2026-10-11 · English only** (Farsi follows once Amir has approved this text).
 **Who it is for:** a new client who is comfortable with phones but new to this system, and, further down, the returning athlete starting cycle 2, 3 or 4.
@@ -126,7 +126,7 @@ DAY  (opened from a day card; the tab bar hides once you tap Begin or Skip)
 
 ## 3. Before the app: getting in
 
-*Screens: [01-sign-in](client-app-map/01-sign-in.jpg) · [02-welcome](client-app-map/02-welcome.jpg)*
+*Screens: [01-sign-in](../../Content/client-app-map/01-sign-in.jpg) · [02-welcome](../../Content/client-app-map/02-welcome.jpg)*
 
 **What I send you.** After you've paid and I've built your plan, I send you a WhatsApp message with the link, your **username** and your **password**. Save the password when your phone offers (so next time it opens straight into your programme) and add the app to your home screen.
 
@@ -152,7 +152,7 @@ DAY  (opened from a day card; the tab bar hides once you tap Begin or Skip)
 
 ## 4. Your first session, step by step
 
-*Screens: [05-day-opened](client-app-map/05-day-opened.jpg) · [06-readiness-empty](client-app-map/06-readiness-empty.jpg) · [07-session-slim-bar](client-app-map/07-session-slim-bar.jpg) · [11-card-open](client-app-map/11-card-open.jpg) · [14-rpe-strip](client-app-map/14-rpe-strip.jpg) · [17-card-folds-next-opens](client-app-map/17-card-folds-next-opens.jpg) · [22-finish-card-in-progress](client-app-map/22-finish-card-in-progress.jpg) · [23-finish-card-all-done](client-app-map/23-finish-card-all-done.jpg) · [24-done-without-rating](client-app-map/24-done-without-rating.jpg) · [25-finished-card](client-app-map/25-finished-card.jpg) · [26-install-nudge](client-app-map/26-install-nudge.jpg) · [27-home-after-session](client-app-map/27-home-after-session.jpg)*
+*Screens: [05-day-opened](../../Content/client-app-map/05-day-opened.jpg) · [06-readiness-empty](../../Content/client-app-map/06-readiness-empty.jpg) · [07-session-slim-bar](../../Content/client-app-map/07-session-slim-bar.jpg) · [11-card-open](../../Content/client-app-map/11-card-open.jpg) · [14-rpe-strip](../../Content/client-app-map/14-rpe-strip.jpg) · [17-card-folds-next-opens](../../Content/client-app-map/17-card-folds-next-opens.jpg) · [22-finish-card-in-progress](../../Content/client-app-map/22-finish-card-in-progress.jpg) · [23-finish-card-all-done](../../Content/client-app-map/23-finish-card-all-done.jpg) · [24-done-without-rating](../../Content/client-app-map/24-done-without-rating.jpg) · [25-finished-card](../../Content/client-app-map/25-finished-card.jpg) · [26-install-nudge](../../Content/client-app-map/26-install-nudge.jpg) · [27-home-after-session](../../Content/client-app-map/27-home-after-session.jpg)*
 
 This is the order of a real first session, as the app behaves.
 
@@ -177,7 +177,7 @@ This is the order of a real first session, as the app behaves.
 
 ### 5.1 Home
 
-*Screens: [03-home-top](client-app-map/03-home-top.jpg) · [04-home-lower](client-app-map/04-home-lower.jpg) · [08-home-session-in-progress](client-app-map/08-home-session-in-progress.jpg) · [28-home-returning](client-app-map/28-home-returning.jpg) · [29-home-habits-strip](client-app-map/29-home-habits-strip.jpg) · [47-home-not-finished](client-app-map/47-home-not-finished.jpg) · [48-home-offline](client-app-map/48-home-offline.jpg)*
+*Screens: [03-home-top](../../Content/client-app-map/03-home-top.jpg) · [04-home-lower](../../Content/client-app-map/04-home-lower.jpg) · [08-home-session-in-progress](../../Content/client-app-map/08-home-session-in-progress.jpg) · [28-home-returning](../../Content/client-app-map/28-home-returning.jpg) · [29-home-habits-strip](../../Content/client-app-map/29-home-habits-strip.jpg) · [47-home-not-finished](../../Content/client-app-map/47-home-not-finished.jpg) · [48-home-offline](../../Content/client-app-map/48-home-offline.jpg)*
 
 Top to bottom:
 
@@ -200,7 +200,7 @@ Top to bottom:
 
 ### 5.2 The session (the day view)
 
-*Screens: [05-day-opened](client-app-map/05-day-opened.jpg) · [06-readiness-empty](client-app-map/06-readiness-empty.jpg) · [07-session-slim-bar](client-app-map/07-session-slim-bar.jpg) · [09-lower-day-banner](client-app-map/09-lower-day-banner.jpg) · [10-cards-closed](client-app-map/10-cards-closed.jpg) · [11-card-open](client-app-map/11-card-open.jpg) · [12-card-open-last-time](client-app-map/12-card-open-last-time.jpg) · [13-history-sheet](client-app-map/13-history-sheet.jpg) · [14-rpe-strip](client-app-map/14-rpe-strip.jpg) · [16-rest-timer](client-app-map/16-rest-timer.jpg) · [18-circuit-card](client-app-map/18-circuit-card.jpg) · [19-guided-set](client-app-map/19-guided-set.jpg) · [20-guided-rest](client-app-map/20-guided-rest.jpg) · [21-guided-complete](client-app-map/21-guided-complete.jpg)*
+*Screens: [05-day-opened](../../Content/client-app-map/05-day-opened.jpg) · [06-readiness-empty](../../Content/client-app-map/06-readiness-empty.jpg) · [07-session-slim-bar](../../Content/client-app-map/07-session-slim-bar.jpg) · [09-lower-day-banner](../../Content/client-app-map/09-lower-day-banner.jpg) · [10-cards-closed](../../Content/client-app-map/10-cards-closed.jpg) · [11-card-open](../../Content/client-app-map/11-card-open.jpg) · [12-card-open-last-time](../../Content/client-app-map/12-card-open-last-time.jpg) · [13-history-sheet](../../Content/client-app-map/13-history-sheet.jpg) · [14-rpe-strip](../../Content/client-app-map/14-rpe-strip.jpg) · [16-rest-timer](../../Content/client-app-map/16-rest-timer.jpg) · [18-circuit-card](../../Content/client-app-map/18-circuit-card.jpg) · [19-guided-set](../../Content/client-app-map/19-guided-set.jpg) · [20-guided-rest](../../Content/client-app-map/20-guided-rest.jpg) · [21-guided-complete](../../Content/client-app-map/21-guided-complete.jpg)*
 
 **The session bar.**
 - Before you start: *"Ready when you are"*, **00:00**, **Start ▶**, **Guided ▶** (Guided only appears if the day has lifts to log).
@@ -284,7 +284,7 @@ Top to bottom:
 
 ### 5.3 Coach
 
-*Screens: [30-coach-tab](client-app-map/30-coach-tab.jpg)*
+*Screens: [30-coach-tab](../../Content/client-app-map/30-coach-tab.jpg)*
 
 - **Coach Amir** — *Strength & conditioning coach*, with my photo.
 - **Message me on WhatsApp** — *"Questions, swaps, anything that hurts, form videos."* Number **+44 7435 363461**. It opens WhatsApp with *"Hi Amir, it's {first name} ({cycle name}, week {n}). "* ready for you to finish.
@@ -295,7 +295,7 @@ There's no chat in the app. Notes you type at the end of a session reach me and 
 
 ### 5.4 Library — "Train it, learn it, know it."
 
-*Screens: [31-library-doors](client-app-map/31-library-doors.jpg) · [32-sessions-world](client-app-map/32-sessions-world.jpg) · [33-library-session](client-app-map/33-library-session.jpg) · [34-playbook](client-app-map/34-playbook.jpg) · [35-exercises-list](client-app-map/35-exercises-list.jpg)*
+*Screens: [31-library-doors](../../Content/client-app-map/31-library-doors.jpg) · [32-sessions-world](../../Content/client-app-map/32-sessions-world.jpg) · [33-library-session](../../Content/client-app-map/33-library-session.jpg) · [34-playbook](../../Content/client-app-map/34-playbook.jpg) · [35-exercises-list](../../Content/client-app-map/35-exercises-list.jpg)*
 
 Separate from your programme. Three doors (counts as of 2026-10-11; they change as I add things):
 
@@ -313,7 +313,7 @@ Library sessions are **not** your programme's "sessions". A programme session is
 
 ### 5.5 Game Plan
 
-*Screens: [37-game-plan](client-app-map/37-game-plan.jpg)*
+*Screens: [37-game-plan](../../Content/client-app-map/37-game-plan.jpg)*
 
 The whole route, top to bottom:
 - Your name, your goal, and the current cycle's dates.
@@ -326,7 +326,7 @@ The whole route, top to bottom:
 
 ### 5.6 Personal Records
 
-*Screens: [38-records-empty](client-app-map/38-records-empty.jpg) · [39-records-with-lift](client-app-map/39-records-with-lift.jpg) · [40-log-a-max-form](client-app-map/40-log-a-max-form.jpg) · [41-records-lift-trend](client-app-map/41-records-lift-trend.jpg)*
+*Screens: [38-records-empty](../../Content/client-app-map/38-records-empty.jpg) · [39-records-with-lift](../../Content/client-app-map/39-records-with-lift.jpg) · [40-log-a-max-form](../../Content/client-app-map/40-log-a-max-form.jpg) · [41-records-lift-trend](../../Content/client-app-map/41-records-lift-trend.jpg)*
 
 From the **Personal records** row on Home (or **Open in Personal Records ›** in an exercise's History). **← steps back one screen at a time.**
 
@@ -344,7 +344,7 @@ From the **Personal records** row on Home (or **Open in Personal Records ›** i
 
 ### 5.7 Body Weight
 
-*Screens: [42-weight-empty](client-app-map/42-weight-empty.jpg) · [43-weight-readings](client-app-map/43-weight-readings.jpg)*
+*Screens: [42-weight-empty](../../Content/client-app-map/42-weight-empty.jpg) · [43-weight-readings](../../Content/client-app-map/43-weight-readings.jpg)*
 
 From the **Body weight** row on Home. **←** goes Home.
 
@@ -356,7 +356,7 @@ From the **Body weight** row on Home. **←** goes Home.
 
 ### 5.8 About this exercise (the ⓘ sheet)
 
-*Screens: [36-about-sheet](client-app-map/36-about-sheet.jpg)*
+*Screens: [36-about-sheet](../../Content/client-app-map/36-about-sheet.jpg)*
 
 Tap the **ⓘ** on a card, a row in Library → Exercises, or a linked name. A sheet slides up (since 2026-10-12, "Changeover"), each part a question:
 - **The green top**: the movement pattern as a small word and the name. When I wrote a reason: **Why am I doing this?**, my sentence, its tag (*Your goal · Your body · Your test · Last cycle · You said · Your game*; a body reason names the part, like *Your knee*) and my signature and photo.
@@ -374,7 +374,7 @@ Tap the **ⓘ** on a card, a row in Library → Exercises, or a linked name. A s
 
 ### 5.9 Account and Help
 
-*Screens: [44-account-sheet](client-app-map/44-account-sheet.jpg) · [45-help-sheet](client-app-map/45-help-sheet.jpg) · [49-home-dark](client-app-map/49-home-dark.jpg)*
+*Screens: [44-account-sheet](../../Content/client-app-map/44-account-sheet.jpg) · [45-help-sheet](../../Content/client-app-map/45-help-sheet.jpg) · [49-home-dark](../../Content/client-app-map/49-home-dark.jpg)*
 
 Your **initials**, top right of every main screen (inside a day it becomes a 🌙):
 - **Theme: Light | Dark.** Your choice, per phone. It never follows the phone's setting.
@@ -391,7 +391,7 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 
 ## 6. Your cycle, week by week
 
-*Screens: [46-home-between-cycles](client-app-map/46-home-between-cycles.jpg) · [28-home-returning](client-app-map/28-home-returning.jpg)*
+*Screens: [46-home-between-cycles](../../Content/client-app-map/46-home-between-cycles.jpg) · [28-home-returning](../../Content/client-app-map/28-home-returning.jpg)*
 
 **The rhythm.** A cycle is about five weeks: four loading weeks and a lighter last week.
 - **Week 1** is for finding your weights. A note from me says what to do.
@@ -531,56 +531,56 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 
 | File | Shows | § |
 |---|---|---|
-| [01-sign-in](client-app-map/01-sign-in.jpg) | Username, Password, eye, Sign in, "Lost your details?" | 3 |
-| [02-welcome](client-app-map/02-welcome.jpg) | The Welcome overlay, with its ✕ | 3 |
-| [03-home-top](client-app-map/03-home-top.jpg) | Home top for a new athlete, week-1 note, day cards | 5.1 |
-| [04-home-lower](client-app-map/04-home-lower.jpg) | The ringed next day; habits, records and weight rows (empty) | 5.1 |
-| [05-day-opened](client-app-map/05-day-opened.jpg) | A day opened: session bar and the first note | 4 |
-| [06-readiness-empty](client-app-map/06-readiness-empty.jpg) | Readiness check, Begin grey, Skip for today | 5.2 |
-| [07-session-slim-bar](client-app-map/07-session-slim-bar.jpg) | The slim session bar; no tab bar | 5.2 |
-| [08-home-session-in-progress](client-app-map/08-home-session-in-progress.jpg) | Home with "In progress" and Resume | 5.1 |
-| [09-lower-day-banner](client-app-map/09-lower-day-banner.jpg) | The Short day banner | 5.2 |
-| [10-cards-closed](client-app-map/10-cards-closed.jpg) | Closed cards: dot, pill, orange ⓘ, tempo digit | 5.2 |
-| [11-card-open](client-app-map/11-card-open.jpg) | An open card, first time | 5.2 |
-| [12-card-open-last-time](client-app-map/12-card-open-last-time.jpg) | LAST weights (taken before 2026-10-12: the Last time box in it is gone) | 5.2 |
-| [13-history-sheet](client-app-map/13-history-sheet.jpg) | The History sheet | 5.2 |
-| [14-rpe-strip](client-app-map/14-rpe-strip.jpg) | The RPE strip after a tick | 5.2 |
-| [16-rest-timer](client-app-map/16-rest-timer.jpg) | The Rest Timer | 5.2 |
-| [17-card-folds-next-opens](client-app-map/17-card-folds-next-opens.jpg) | A finished card folded; the next opens | 4 |
-| [18-circuit-card](client-app-map/18-circuit-card.jpg) | A circuit: Rounds and Log | 5.2 |
-| [19-guided-set](client-app-map/19-guided-set.jpg) | Guided, a set step | 5.2 |
-| [20-guided-rest](client-app-map/20-guided-rest.jpg) | Guided rest: Kg, Reps, RPE | 5.2 |
-| [21-guided-complete](client-app-map/21-guided-complete.jpg) | Guided: "Every set logged." | 5.2 |
-| [22-finish-card-in-progress](client-app-map/22-finish-card-in-progress.jpg) | Finish card, In progress | 4 |
-| [23-finish-card-all-done](client-app-map/23-finish-card-all-done.jpg) | All done: rating and Done | 4 |
-| [24-done-without-rating](client-app-map/24-done-without-rating.jpg) | "Rate the session first" | 4 |
-| [25-finished-card](client-app-map/25-finished-card.jpg) | The finished card | 4 |
-| [26-install-nudge](client-app-map/26-install-nudge.jpg) | The install toast | 4 |
-| [27-home-after-session](client-app-map/27-home-after-session.jpg) | Day 1 as a ✓ row | 4 |
-| [28-home-returning](client-app-map/28-home-returning.jpg) | Home for a returning athlete: Wins this cycle | 5.1 / 6 |
-| [29-home-habits-strip](client-app-map/29-home-habits-strip.jpg) | The AA Proof strip on Home | 5.1 / 5.10 |
-| [30-coach-tab](client-app-map/30-coach-tab.jpg) | The Coach tab | 5.3 |
-| [31-library-doors](client-app-map/31-library-doors.jpg) | The three Library doors | 5.4 |
-| [32-sessions-world](client-app-map/32-sessions-world.jpg) | Sessions shelves | 5.4 |
-| [33-library-session](client-app-map/33-library-session.jpg) | A Library session, Before you start | 5.4 |
-| [34-playbook](client-app-map/34-playbook.jpg) | The Playbook | 5.4 |
-| [35-exercises-list](client-app-map/35-exercises-list.jpg) | Exercises: search, chips, list | 5.4 |
-| [36-about-sheet](client-app-map/36-about-sheet.jpg) | The About sheet (Changeover, 2026-10-12): the green top with the reason, What does it do? and its tiles | 5.8 |
-| [37-game-plan](client-app-map/37-game-plan.jpg) | Game Plan: banner, meter, Done, Active | 5.5 |
-| [38-records-empty](client-app-map/38-records-empty.jpg) | Personal Records, empty | 5.6 |
-| [39-records-with-lift](client-app-map/39-records-with-lift.jpg) | Personal Records with a lift | 5.6 |
-| [40-log-a-max-form](client-app-map/40-log-a-max-form.jpg) | The Log a max form | 5.6 |
-| [41-records-lift-trend](client-app-map/41-records-lift-trend.jpg) | One lift's page | 5.6 |
-| [42-weight-empty](client-app-map/42-weight-empty.jpg) | Body Weight, empty | 5.7 |
-| [43-weight-readings](client-app-map/43-weight-readings.jpg) | Body Weight with seven readings | 5.7 |
-| [44-account-sheet](client-app-map/44-account-sheet.jpg) | The account sheet | 5.9 |
-| [45-help-sheet](client-app-map/45-help-sheet.jpg) | The 15 help cards | 5.9 |
-| [46-home-between-cycles](client-app-map/46-home-between-cycles.jpg) | Cycle complete, Ready for Cycle 3? | 6 |
-| [47-home-not-finished](client-app-map/47-home-not-finished.jpg) | The Not finished card | 5.1 / 7 |
-| [48-home-offline](client-app-map/48-home-offline.jpg) | The offline note | 7 |
-| [49-home-dark](client-app-map/49-home-dark.jpg) | Home in dark mode | 5.9 |
-| [50-closed-circle-note](client-app-map/50-closed-circle-note.jpg) | A first-timer taps the circle on a closed card: it opens, and a note box says how to log | 5.2 |
-| [51-clock-offer](client-app-map/51-clock-offer.jpg) | A set ticked with the clock not running: the one offer, Start or Not now | 4 |
+| [01-sign-in](../../Content/client-app-map/01-sign-in.jpg) | Username, Password, eye, Sign in, "Lost your details?" | 3 |
+| [02-welcome](../../Content/client-app-map/02-welcome.jpg) | The Welcome overlay, with its ✕ | 3 |
+| [03-home-top](../../Content/client-app-map/03-home-top.jpg) | Home top for a new athlete, week-1 note, day cards | 5.1 |
+| [04-home-lower](../../Content/client-app-map/04-home-lower.jpg) | The ringed next day; habits, records and weight rows (empty) | 5.1 |
+| [05-day-opened](../../Content/client-app-map/05-day-opened.jpg) | A day opened: session bar and the first note | 4 |
+| [06-readiness-empty](../../Content/client-app-map/06-readiness-empty.jpg) | Readiness check, Begin grey, Skip for today | 5.2 |
+| [07-session-slim-bar](../../Content/client-app-map/07-session-slim-bar.jpg) | The slim session bar; no tab bar | 5.2 |
+| [08-home-session-in-progress](../../Content/client-app-map/08-home-session-in-progress.jpg) | Home with "In progress" and Resume | 5.1 |
+| [09-lower-day-banner](../../Content/client-app-map/09-lower-day-banner.jpg) | The Short day banner | 5.2 |
+| [10-cards-closed](../../Content/client-app-map/10-cards-closed.jpg) | Closed cards: dot, pill, orange ⓘ, tempo digit | 5.2 |
+| [11-card-open](../../Content/client-app-map/11-card-open.jpg) | An open card, first time | 5.2 |
+| [12-card-open-last-time](../../Content/client-app-map/12-card-open-last-time.jpg) | LAST weights (taken before 2026-10-12: the Last time box in it is gone) | 5.2 |
+| [13-history-sheet](../../Content/client-app-map/13-history-sheet.jpg) | The History sheet | 5.2 |
+| [14-rpe-strip](../../Content/client-app-map/14-rpe-strip.jpg) | The RPE strip after a tick | 5.2 |
+| [16-rest-timer](../../Content/client-app-map/16-rest-timer.jpg) | The Rest Timer | 5.2 |
+| [17-card-folds-next-opens](../../Content/client-app-map/17-card-folds-next-opens.jpg) | A finished card folded; the next opens | 4 |
+| [18-circuit-card](../../Content/client-app-map/18-circuit-card.jpg) | A circuit: Rounds and Log | 5.2 |
+| [19-guided-set](../../Content/client-app-map/19-guided-set.jpg) | Guided, a set step | 5.2 |
+| [20-guided-rest](../../Content/client-app-map/20-guided-rest.jpg) | Guided rest: Kg, Reps, RPE | 5.2 |
+| [21-guided-complete](../../Content/client-app-map/21-guided-complete.jpg) | Guided: "Every set logged." | 5.2 |
+| [22-finish-card-in-progress](../../Content/client-app-map/22-finish-card-in-progress.jpg) | Finish card, In progress | 4 |
+| [23-finish-card-all-done](../../Content/client-app-map/23-finish-card-all-done.jpg) | All done: rating and Done | 4 |
+| [24-done-without-rating](../../Content/client-app-map/24-done-without-rating.jpg) | "Rate the session first" | 4 |
+| [25-finished-card](../../Content/client-app-map/25-finished-card.jpg) | The finished card | 4 |
+| [26-install-nudge](../../Content/client-app-map/26-install-nudge.jpg) | The install toast | 4 |
+| [27-home-after-session](../../Content/client-app-map/27-home-after-session.jpg) | Day 1 as a ✓ row | 4 |
+| [28-home-returning](../../Content/client-app-map/28-home-returning.jpg) | Home for a returning athlete: Wins this cycle | 5.1 / 6 |
+| [29-home-habits-strip](../../Content/client-app-map/29-home-habits-strip.jpg) | The AA Proof strip on Home | 5.1 / 5.10 |
+| [30-coach-tab](../../Content/client-app-map/30-coach-tab.jpg) | The Coach tab | 5.3 |
+| [31-library-doors](../../Content/client-app-map/31-library-doors.jpg) | The three Library doors | 5.4 |
+| [32-sessions-world](../../Content/client-app-map/32-sessions-world.jpg) | Sessions shelves | 5.4 |
+| [33-library-session](../../Content/client-app-map/33-library-session.jpg) | A Library session, Before you start | 5.4 |
+| [34-playbook](../../Content/client-app-map/34-playbook.jpg) | The Playbook | 5.4 |
+| [35-exercises-list](../../Content/client-app-map/35-exercises-list.jpg) | Exercises: search, chips, list | 5.4 |
+| [36-about-sheet](../../Content/client-app-map/36-about-sheet.jpg) | The About sheet (Changeover, 2026-10-12): the green top with the reason, What does it do? and its tiles | 5.8 |
+| [37-game-plan](../../Content/client-app-map/37-game-plan.jpg) | Game Plan: banner, meter, Done, Active | 5.5 |
+| [38-records-empty](../../Content/client-app-map/38-records-empty.jpg) | Personal Records, empty | 5.6 |
+| [39-records-with-lift](../../Content/client-app-map/39-records-with-lift.jpg) | Personal Records with a lift | 5.6 |
+| [40-log-a-max-form](../../Content/client-app-map/40-log-a-max-form.jpg) | The Log a max form | 5.6 |
+| [41-records-lift-trend](../../Content/client-app-map/41-records-lift-trend.jpg) | One lift's page | 5.6 |
+| [42-weight-empty](../../Content/client-app-map/42-weight-empty.jpg) | Body Weight, empty | 5.7 |
+| [43-weight-readings](../../Content/client-app-map/43-weight-readings.jpg) | Body Weight with seven readings | 5.7 |
+| [44-account-sheet](../../Content/client-app-map/44-account-sheet.jpg) | The account sheet | 5.9 |
+| [45-help-sheet](../../Content/client-app-map/45-help-sheet.jpg) | The 15 help cards | 5.9 |
+| [46-home-between-cycles](../../Content/client-app-map/46-home-between-cycles.jpg) | Cycle complete, Ready for Cycle 3? | 6 |
+| [47-home-not-finished](../../Content/client-app-map/47-home-not-finished.jpg) | The Not finished card | 5.1 / 7 |
+| [48-home-offline](../../Content/client-app-map/48-home-offline.jpg) | The offline note | 7 |
+| [49-home-dark](../../Content/client-app-map/49-home-dark.jpg) | Home in dark mode | 5.9 |
+| [50-closed-circle-note](../../Content/client-app-map/50-closed-circle-note.jpg) | A first-timer taps the circle on a closed card: it opens, and a note box says how to log | 5.2 |
+| [51-clock-offer](../../Content/client-app-map/51-clock-offer.jpg) | A set ticked with the clock not running: the one offer, Start or Not now | 4 |
 
 ---
 ---
