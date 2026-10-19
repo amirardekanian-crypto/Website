@@ -2497,12 +2497,12 @@
 
   /* 1. The cover (a compact one: no picture, it is the screen's one green thing). ← is the day cover's 44 px glass button. The
      eyebrow, the title and the scoreboard are the archive's and the day's; a long lift name wraps whole, never clipped. */
-  #screen-ceiling .ceil-head, #screen-weight .ceil-head { position: relative; padding: 74px var(--g) 22px; background: var(--hero); color: #fff; }
-  #screen-ceiling .nav-back, #screen-weight .nav-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  #screen-ceiling .ceil-head, #screen-weight .ceil-head, #screen-habits .ceil-head { position: relative; padding: 74px var(--g) 22px; background: var(--hero); color: #fff; }
+  #screen-ceiling .nav-back, #screen-weight .nav-back, #screen-habits .nav-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
     border: 0; border-radius: 50%; cursor: pointer; color: #fff; background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     font: 500 var(--fs-title)/1 'Barlow', sans-serif; -webkit-tap-highlight-color: transparent; }
-  #screen-ceiling .nav-back:active, #screen-weight .nav-back:active { transform: scale(0.92); }
-  #screen-ceiling .nav-back:focus-visible, #screen-weight .nav-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  #screen-ceiling .nav-back:active, #screen-weight .nav-back:active, #screen-habits .nav-back:active { transform: scale(0.92); }
+  #screen-ceiling .nav-back:focus-visible, #screen-weight .nav-back:focus-visible, #screen-habits .nav-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .ceil-kick { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
   .ceil-kick::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
   .ceil-title { margin: 10px 0 0; max-width: 330px;
@@ -4518,6 +4518,69 @@
   #home-overview .today-v.is-togo { color: var(--clay-ink); }
   #home-overview .today-v.is-ok { color: var(--green-ink); }
 
+
+  /* ══ THE HABIT HALF OF PROGRESS (2026-10-19) ════════════════════════════════════════════════════════════
+     Two figures, the last seven days as a table, one door. The figures wear the scoreboard's face (Barlow
+     Condensed over a Space Mono caption) so they read as the same kind of thing as the numbers above them. */
+  #screen-plan .hab-figs { display: flex; gap: 10px; margin: 0 var(--g) 12px; }
+  #screen-plan .hab-fig { flex: 1; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); padding: 12px 14px; }
+  #screen-plan .hab-fig b { display: block; font: 900 30px/1 'Barlow Condensed', sans-serif; }   /* display: a scoreboard figure, like Your numbers above */
+  #screen-plan .hab-fig span { display: block; margin-top: 3px; font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+
+  /* The week. The point is the SHAPE: a solid band on one row over a gap-toothed one says more about where
+     the week went than any percentage. A cell is a day: filled = done, half = part of a counter, empty =
+     missed, and nothing at all = not tracked that day (the roster is a timeline, never today's list). */
+  #screen-plan .hab-week { margin: 0 var(--g) 12px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); padding: 12px 14px; }
+  #screen-plan .hab-grid { display: grid; grid-template-columns: 84px repeat(7, minmax(0, 1fr)); gap: 6px; align-items: center; }
+  #screen-plan .hw-d { text-align: center; font: 400 var(--fs-label)/1 'Space Mono', monospace; color: var(--grey); }
+  #screen-plan .hw-d.is-today { color: var(--ink); font-weight: 700; }
+  #screen-plan .hw-n { font: 400 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #screen-plan .hw-c { height: 18px; border-radius: 4px; background: var(--sand); }
+  #screen-plan .hw-c.is-hit { background: var(--fill); }
+  #screen-plan .hw-c.is-part { background: var(--prog-track); }
+  /* Not tracked that day: nothing drawn at all, so the app never invents a failure out of a habit that did not exist yet. */
+  #screen-plan .hw-c.is-pre { background: transparent; box-shadow: inset 0 0 0 1px var(--hair); }
+
+  /* ══ THE LIST (#screen-habits) ══════════════════════════════════════════════════════════════════════════
+     One list, not two: the five that are the same for everyone, then whatever the athlete chose, then the
+     ways to add another. It wears Progress's own furniture — the compact green cover, .prog-sec titles and
+     paper rows under a hairline — so it is the same screen family as Personal records and Body weight. */
+  #screen-habits .hl-lead { margin: 16px var(--g) 0; font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--ink); }
+  #screen-habits .hl-group { margin: 0 var(--g); border: 1px solid var(--hair); border-radius: 12px; background: var(--row); overflow: hidden; }
+  #screen-habits .hl-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+  #screen-habits .hl-row + .hl-row { border-top: 1px solid var(--hair); }
+  #screen-habits .hl-nm { flex: 1; min-width: 0; font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; }
+  #screen-habits .hl-nm small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--grey); }
+  #screen-habits .hl-row.is-core .hl-nm { color: var(--ink); }
+  #screen-habits .hl-tag { flex: none; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
+  /* The switch. Armed (the first of the two taps to turn one ON) it outlines in clay and the row says why. */
+  #screen-habits .hl-sw { flex: none; width: 52px; height: 32px; border-radius: 99px; border: 1.5px solid var(--box); background: var(--sand); padding: 0; cursor: pointer; }
+  #screen-habits .hl-sw i { display: block; width: 24px; height: 24px; margin: 1px; border-radius: 99px; background: var(--row); box-shadow: 0 1px 2px rgba(0,0,0,.18); transition: transform .14s ease; }
+  #screen-habits .hl-sw.is-on { background: var(--fill); border-color: var(--fill); }
+  #screen-habits .hl-sw.is-on i { transform: translateX(20px); }
+  #screen-habits .hl-sw.is-arm { border-color: var(--clay); box-shadow: 0 0 0 2px rgba(199,85,47,.18); }
+  #screen-habits .hl-sw:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  #screen-habits .hl-x { flex: none; width: 36px; height: 36px; border-radius: 99px; border: 1px solid var(--hair); background: var(--paper); color: var(--clay-ink); font: 600 var(--fs-body)/1 'Barlow', sans-serif; cursor: pointer; }
+
+  #screen-habits .hl-adds { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 var(--g); }
+  #screen-habits .hl-add { min-height: 44px; padding: 0 14px; border: 1px solid var(--hair); border-radius: 99px; background: var(--row);
+    color: var(--green-ink); font: 600 var(--fs-body)/1 'Barlow', sans-serif; cursor: pointer; }
+  #screen-habits .hl-add[disabled] { opacity: .45; cursor: default; }
+  /* Armed: the first of the two taps that switch a habit on. Clay, because it is asking for something. */
+  #screen-habits .hl-add.is-arm { border-color: var(--clay); color: var(--clay-ink); box-shadow: 0 0 0 2px rgba(199,85,47,.18); }
+  #screen-habits .hl-new { display: flex; align-items: center; gap: 8px; margin: 12px var(--g) 0; }
+  #screen-habits .hl-field { flex: 1; min-width: 0; display: flex; border: 1.5px solid var(--field); border-radius: 10px; background: var(--row); padding: 10px 12px; }
+  #screen-habits .hl-field input { flex: 1; min-width: 0; width: 100%; border: 0; outline: none; background: transparent; color: var(--ink);
+    font: 400 var(--fs-field)/1.2 'Barlow', sans-serif; }
+  #screen-habits .hl-field input::placeholder { color: var(--ph); }
+  /* width: auto and flex: 0 0 auto are load-bearing: the app has global button rules that stretch a bare
+     button to its row, and the name field was squeezed to 26 px beside a 350 px Add. */
+  #screen-habits .hl-save { flex: 0 0 auto; width: auto; min-height: 44px; padding: 0 20px; border: 0; border-radius: 99px; background: var(--fill); color: #fff;
+    font: 700 var(--fs-body)/1 'Barlow', sans-serif; cursor: pointer; }
+  #screen-habits .hl-save[disabled] { opacity: .45; cursor: default; }
+  /* 96 px, not 28: the tab bar is fixed over the foot of every screen and the last line was under it. */
+  #screen-habits .hl-note { margin: 12px var(--g) 96px; font: 400 var(--fs-small)/1.5 'Barlow', sans-serif; color: var(--grey); }
+
   /* The backfill window, as four chips: today and the three days behind it. A dot means the day counts. */
   #home-overview .hb-days { display: flex; gap: 6px; padding: 10px 16px 2px; }
   #home-overview .hb-day { flex: 1; min-height: 40px; padding: 6px 2px; border: 1px solid var(--hair); border-radius: 9px;
@@ -5599,6 +5662,12 @@
   <div id="ceiling-row-wrap"></div>
   <div id="weight-row-wrap"></div>
 
+  <!-- Your habits (2026-10-19, direction B's second half): two figures, the last seven days as a table, and ONE door to
+       the list. No per-habit page: a habit's own level and ladder were AA Proof's, and the career above already answers
+       how it is going with numbers that count the training too. paintHabitsBlock(). -->
+  <h2 class="prog-sec" id="habits-title" hidden>Your habits</h2>
+  <div id="habits-block-wrap"></div>
+
   <!-- The Game Plan (Amir, 2026-10-13): its section title, then ONE road of paper rows, a row per cycle (paintRoad()):
        Done (the one before the current opens its archive), Now (open), Up next, Locked. -->
   <div id="road-wrap"></div>
@@ -5641,6 +5710,17 @@
     <p class="ceil-line" id="wt-line" hidden></p>
   </div>
   <div id="wt-body"></div>
+</div>
+
+<!-- ═══ YOUR HABITS ═══ what you track, and what you could: the five everyone tracks, yours, the ones you switched off,
+     and the ways to add another. Opened from Progress's one habit door (renderHabitList()). -->
+<div id="screen-habits" class="screen">
+  <div class="ceil-head">
+    <button class="nav-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
+    <div class="ceil-kick">Your habits</div>
+    <h1 class="ceil-title">What you track</h1>
+  </div>
+  <div id="hab-list-body"></div>
 </div>
 
 <!-- ═══ LIBRARY ═══ shared, app-wide content, in the Centre Court look (2026-10-13). One tab with a header (the eyebrow, the 44 px title) and ONE
@@ -7455,6 +7535,7 @@ setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS /
   if (PLAN_OFFLINE && PLAN_OFFLINE.fast) setTimeout(_resumeSync, 0);
   habLoad();
   paintTodayCard();
+  paintHabitsBlock();
 
   restoreState();
   // A day left unfinished on an earlier date is filed now, before anything can be tapped,
@@ -10668,8 +10749,10 @@ function goTo(screen, historyId, keepContent) {
   // Progress — rebuild the two number rows, the cycle card and the road. They were Home's until 2026-10-12 and had the same
   // reason: a max saved during today's session, or a weight logged, would show stale until a reload. The Records
   // row counts up to a new best here (paintNumbers() runs ceilingCountUp() while Progress is the screen on show).
+  if (screen === 'habits') renderHabitList();
   if (screen === 'plan') {
     paintNumbers();
+    paintHabitsBlock();
     refreshMomentsIfOld();   // Your moments, the goal and Amir's lines (Career Mode round 5)
     paintCycleCard();
     paintRoad();   // a cycle that ended while the app sat open reads Done; every row keeps its fold
@@ -10918,7 +11001,14 @@ function habLoad() {
   HAB_CFG = H.defaultCfg();
   try {
     const raw = JSON.parse(localStorage.getItem(habKeyCfg()) || '{}');
-    if (raw && typeof raw === 'object') HAB_CFG = Object.assign(HAB_CFG, raw);
+    if (raw && typeof raw === 'object') {
+      HAB_CFG = Object.assign(HAB_CFG, raw);
+      // ⚠️ `on` MERGES PER KEY, never wholesale. Assigning the stored map over the defaults drops the
+      // defaults for any habit it has never heard of, and live() reads a missing key as ON — so a habit
+      // added to the catalogue later would switch itself on, and start scoring, for every athlete whose
+      // config predates it. Add-ons are opt-in: a key nobody has chosen must read false.
+      HAB_CFG.on = Object.assign(H.defaultCfg().on, (raw && raw.on) || {});
+    }
   } catch (e) { /* unreadable: the defaults stand */ }
   try {
     const raw = JSON.parse(localStorage.getItem(habKeyLog()) || '{}');
@@ -11132,6 +11222,218 @@ function habTickSession(dayKey) {
   habSaveLog();
   paintTodayCard();
 }
+
+
+// ── THE HABIT HALF OF PROGRESS (2026-10-19, direction B's second screen) ──────────────────────────────
+// Amir: "i want the 7-day habit table / and days in a row and days this month / cut the per habit door /
+// and create the door to the list to be able to add other habits".
+//
+// So: two figures, the week as a table, and ONE door. There is no per-habit page — a habit's own level,
+// its consistency ladder and its history were AA Proof's, and the career on this screen already answers
+// "how am I doing" with numbers that count the training too.
+function paintHabitsBlock() {
+  const wrap = document.getElementById('habits-block-wrap'), head = document.getElementById('habits-title');
+  if (!wrap) return;
+  const h = (habOn() && HAB_CFG && HAB_CFG.onboarded) ? habBlockHtml() : '';
+  if (wrap.innerHTML !== h) wrap.innerHTML = h;
+  if (head) head.hidden = !h;
+}
+function habBlockHtml() {
+  const H = window.AAHabits;
+  const streak = H.dayStreak(), month = habDaysThisMonth();
+  const tracked = H.rosterOn(H.TKEY()).length;
+  return `<div class="hab-figs">
+      <div class="hab-fig"><b>${streak}</b><span>Day${streak === 1 ? '' : 's'} in a row</span></div>
+      <div class="hab-fig"><b>${month}</b><span>Days this month</span></div>
+    </div>
+    ${habWeekTableHtml()}
+    <button type="button" class="hrow" onclick="goTo('habits')">
+      ${hrowIc('habits')}<span class="hrow-b"><span class="hrow-l">Your habits</span>
+        <span class="hrow-v"><span class="hrow-vv">${tracked} tracked</span><small>add one, or stop one</small></span></span>
+      <span class="hrow-a" aria-hidden="true">›</span></button>`;
+}
+// The days THIS CALENDAR MONTH that counted — the same gate as the day streak, so the two figures can
+// never disagree about what a day is worth.
+function habDaysThisMonth() {
+  const H = window.AAHabits, now = H.today();
+  const from = H.fmtKey(new Date(now.getFullYear(), now.getMonth(), 1)), to = H.TKEY();
+  let n = 0;
+  Object.keys(HAB_LOG || {}).forEach(k => { if (k >= from && k <= to && H.dayQualifies(k)) n++; });
+  return n;
+}
+// ⚠️ EVERY CELL READS rosterOn(ITS OWN DAY), never today's list. A habit switched on midweek did not
+// exist on Monday, and drawing it as three misses is the app inventing failures. Those days read as
+// "not tracked" — the same rule as AA Proof's heat map, and the reason the roster is a timeline.
+function habWeekTableHtml() {
+  const H = window.AAHabits, days = [];
+  for (let i = 6; i >= 0; i--) days.push(H.fmtKey(H.addDays(H.today(), -i)));
+  const names = [];
+  H.rosterOn(H.TKEY()).forEach(hb => names.push(hb));
+  // A habit tracked earlier in the week but not today still owns its cells, so the week is honest.
+  days.forEach(d => H.rosterOn(d).forEach(hb => { if (!names.some(x => x.id === hb.id)) names.push(hb); }));
+  const head = days.map(d => `<span class="hw-d${d === H.TKEY() ? ' is-today' : ''}">${esc(H.dayShort(d).slice(0, 1))}</span>`).join('');
+  const rows = names.map(hb => {
+    const cells = days.map(d => {
+      const on = H.rosterOn(d).some(x => x.id === hb.id);
+      if (!on) return '<span class="hw-c is-pre"></span>';
+      const v = H.valOf(d, hb.id), done = v >= hb.target;
+      const part = !done && v > 0;
+      return `<span class="hw-c${done ? ' is-hit' : part ? ' is-part' : ''}" title="${esc(H.shortName(hb))} ${esc(H.dayShort(d))}"></span>`;
+    }).join('');
+    return `<span class="hw-n">${esc(H.shortName(hb))}</span>${cells}`;
+  }).join('');
+  return `<div class="hab-week" role="img" aria-label="Your last seven days, habit by habit">
+    <div class="hab-grid"><span></span>${head}${rows}</div>
+  </div>`;
+}
+
+// ── THE LIST: what you track, and what you could ─────────────────────────────────────────────────────
+// ONE list, not two. AA Proof kept "add-ons" (three fixtures) apart from "your own", and the data said
+// the fixtures were not special: breathing had 27 days across 7 athletes in six months. So the three are
+// three suggestions among others, and anything an athlete writes sits beside them.
+//
+// ⚠️ THREE OF YOUR OWN, AND THAT IS A SERVER RULE. hab_xp() pays for at most MAX_CUSTOM unrecognised
+// keys a day, so a fourth would be logged and never paid. The three suggestions below with real ids
+// (mobility, breathe, supps) are known to the server and cost nothing against that three.
+const HAB_SUGGEST = [
+  { id: 'mobility' }, { id: 'breathe' }, { id: 'supps' },
+  // What athletes actually wrote for themselves, so adding one is a tap rather than typing: half of the
+  // habits they made up were their own sport.
+  { own: 'Play your sport' }, { own: 'No sugar' }, { own: 'Read 10 minutes' },
+];
+function renderHabitList() {
+  const body = document.getElementById('hab-list-body');
+  if (!body || !habOn() || !HAB_CFG) return;
+  const H = window.AAHabits;
+  const core = H.HABITS.filter(hb => hb.core);
+  // ⚠️ "Switched off" is NOT the same as "never on". Every add-on ships off (defaultCfg()), so listing them
+  // as switched off would tell a new athlete they had turned three things off that they had never seen. A
+  // habit that is off belongs under "Add one"; the only exception is one switched off TODAY, which still
+  // counts today and stays in Yours saying so, because removal is dated tomorrow.
+  const mine = H.live().filter(hb => !hb.core);
+  // Switched off TODAY: it still counts today, because removal is dated tomorrow. It stays in the list
+  // saying so, instead of vanishing into "Add one" while it is still being scored.
+  const offToday = H.off().filter(hb => H.lockedOnToday(hb));
+  const room = H.customRoom();
+  const row = (hb, state) => {
+    const name = H.splitEmoji(hb.name)[1] || hb.name;
+    const custom = String(hb.id).indexOf('c_') === 0;
+    if (state === 'core') {
+      return `<div class="hl-row is-core"><span class="hl-nm">${esc(name)}<small>${esc(hb.goal || '')}</small></span>
+        <span class="hl-tag">Always on</span></div>`;
+    }
+    const arming = _habArm === hb.id;
+    return `<div class="hl-row"><span class="hl-nm">${esc(name)}<small>${arming
+        ? 'Tap again to switch it on. It counts from today, and it cannot come off until tomorrow.'
+        : state === 'off' ? 'Off from tomorrow. It still counts today.'
+        : esc(String(hb.goal || '') === name ? '' : (hb.goal || ''))}</small></span>
+      <button type="button" class="hl-sw${state === 'on' ? ' is-on' : ''}${arming ? ' is-arm' : ''}" role="switch" aria-checked="${state === 'on'}"
+        onclick="habToggleOn('${hb.id}')" aria-label="${state === 'on' ? 'Stop' : 'Start'} ${esc(name)}"><i></i></button>
+      ${custom ? `<button type="button" class="hl-x" onclick="habRemoveOwn('${hb.id}')" aria-label="Remove ${esc(name)} and its points">✕</button>` : ''}</div>`;
+  };
+  const suggest = HAB_SUGGEST.filter(s => {
+    if (s.id) return !mine.some(x => x.id === s.id) && !offToday.some(x => x.id === s.id);
+    return !(HAB_CFG.custom || []).some(c => String(c.name || '').toUpperCase() === s.own.toUpperCase());
+  }).map(s => {
+    if (s.id) {
+      const hb = H.byId(s.id), armed = _habArm === s.id;
+      // The two-tap confirm has to SHOW on a chip as well as on a switch, or the first tap reads as a
+      // button that did nothing. Armed, the chip says what the second tap signs up to.
+      return `<button type="button" class="hl-add${armed ? ' is-arm' : ''}" onclick="habToggleOn('${s.id}')">${armed
+        ? 'Counts from today · tap again' : '+ ' + esc(H.splitEmoji(hb.name)[1] || hb.name)}</button>`;
+    }
+    return `<button type="button" class="hl-add" onclick="habAddOwn('${esc(s.own)}')"${room <= 0 ? ' disabled' : ''}>+ ${esc(s.own)}</button>`;
+  }).join('');
+  body.innerHTML = `
+    <p class="hl-lead">Five are the same for everyone, so a day means the same thing for all of us. Everything under them is yours to choose.</p>
+    <h2 class="prog-sec">The five</h2>
+    <div class="hl-group">${core.map(hb => row(hb, 'core')).join('')}</div>
+    ${mine.length || offToday.length ? `<h2 class="prog-sec">Yours</h2><div class="hl-group">${mine.map(hb => row(hb, 'on')).join('')}${offToday.map(hb => row(hb, 'off')).join('')}</div>` : ''}
+    <h2 class="prog-sec">Add one</h2>
+    <div class="hl-adds">${suggest}</div>
+    <div class="hl-new">
+      <label class="hl-field"><input id="hab-new" type="text" maxlength="24" placeholder="Anything else you hold yourself to" aria-label="A habit of your own"${room <= 0 ? ' disabled' : ''}></label>
+      <button type="button" class="hl-save" onclick="habAddOwn()"${room <= 0 ? ' disabled' : ''}>Add</button>
+    </div>
+    <p class="hl-note">${room > 0
+      ? `You can keep ${room} more of your own.`
+      : `That is all ${H.MAX_CUSTOM} of your own. Remove one to make room.`} Switching one off keeps every point it has already earned; ✕ on one of your own takes its points with it.</p>`;
+}
+// ⚠️ ON TAKES EFFECT TODAY, OFF TAKES EFFECT TOMORROW — stampRoster() dates them, and that is the whole
+// answer to "why did Friday change Wednesday". Switching one ON is a two-tap confirm, never a toast,
+// because a toast is easy to have never read: the first tap only arms it and changes nothing.
+let _habArm = null, _habArmTimer = null;
+function habToggleOn(id) {
+  if (!habOn() || !HAB_CFG) return;
+  const H = window.AAHabits, hb = H.byId(id), isOn = H.live().some(x => x.id === id);
+  if (!isOn && _habArm !== id) {
+    _habArm = id;
+    renderHabitList();
+    clearTimeout(_habArmTimer);
+    _habArmTimer = setTimeout(() => { _habArm = null; renderHabitList(); }, 3200);
+    return;
+  }
+  clearTimeout(_habArmTimer);
+  _habArm = null;
+  HAB_CFG.on[id] = !isOn;
+  habSaveCfg();
+  renderHabitList();
+  paintTodayCard();
+  aaToast(isOn
+    ? (H.splitEmoji(hb.name)[1] || hb.name) + ' stops counting tomorrow. Today still counts.'
+    : (H.splitEmoji(hb.name)[1] || hb.name) + ' is on, from today.');
+}
+window.habToggleOn = habToggleOn;
+// A habit of their own. The rules are AA Proof's, and two of them are load-bearing: the name is compared
+// as it is DISPLAYED (the id carries a timestamp, so without it "Reading" twice is two habits that both
+// score for one behaviour), and the cap counts how many EXIST, not how many are on.
+function habAddOwn(preset) {
+  if (!habOn() || !HAB_CFG) return;
+  const H = window.AAHabits;
+  const el = document.getElementById('hab-new');
+  const name = String(preset || (el && el.value) || '').trim();
+  if (!name) { if (el) el.focus(); return; }
+  if (H.customRoom() <= 0) { aaToast('That is all ' + H.MAX_CUSTOM + ' of your own. Remove one to make room.'); return; }
+  const upper = name.toUpperCase();
+  if ((HAB_CFG.custom || []).some(c => String(c.name || '').toUpperCase() === upper)) { aaToast(name + ' is already on your list.'); return; }
+  const id = 'c_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 20) + '_' + Date.now().toString(36);
+  // Stored AS TYPED. AA Proof shouted every habit name in capitals and stored them that way; this app's
+  // names are sentence case ("Walk 10,000 steps"), and a habit is the athlete's own words either way. The
+  // duplicate test above still compares upper-cased, so Reading and READING are one habit.
+  HAB_CFG.custom = (HAB_CFG.custom || []).concat([{ id, name: name, goal: name }]);
+  HAB_CFG.on[id] = true;
+  habSaveCfg();
+  if (el) el.value = '';
+  renderHabitList();
+  paintTodayCard();
+  aaToast(name + ' is on, from today.');
+}
+window.habAddOwn = habAddOwn;
+// ✕ is the destructive door and says so: the habit goes AND every day it was logged goes with it. The
+// non-destructive one is the switch, which keeps every point. Two taps, like Reset.
+function habRemoveOwn(id) {
+  if (!habOn() || !HAB_CFG) return;
+  const H = window.AAHabits, hb = H.byId(id), name = H.splitEmoji(hb.name)[1] || hb.name;
+  if (_habArm !== 'x' + id) {
+    _habArm = 'x' + id;
+    aaToast('Tap ✕ again to remove ' + name + '. Its points go with it.');
+    clearTimeout(_habArmTimer);
+    _habArmTimer = setTimeout(() => { _habArm = null; renderHabitList(); }, 3200);
+    renderHabitList();
+    return;
+  }
+  clearTimeout(_habArmTimer);
+  _habArm = null;
+  HAB_CFG.custom = (HAB_CFG.custom || []).filter(c => c.id !== id);
+  delete HAB_CFG.on[id];
+  Object.keys(HAB_LOG).forEach(day => { if (HAB_LOG[day] && typeof HAB_LOG[day] === 'object') delete HAB_LOG[day][id]; });
+  habSaveLog();
+  habSaveCfg();
+  renderHabitList();
+  paintTodayCard();
+  aaToast(name + ' removed. Its points went with it.');
+}
+window.habRemoveOwn = habRemoveOwn;
 
 // The line icon at the left of a door row (Home's habits row, Progress's Records and Body weight rows, the road's Why your plan row). A function, not a const:
 // the rows are drawn from boot(), which can run before this line of the script has been evaluated (the temporal dead zone).

@@ -355,13 +355,18 @@
 //       the app sends that month as an ISO day; the card read only a `month` the app never set, so both cards drew their eyebrow
 //       with the month missing. They name the month themselves now, in the card's own language (a Farsi card writes the Gregorian
 //       month in Farsi letters, its date still Shamsi), and the test carries the spec shape the app really sends.
-// v198: program.html changed (2026-10-19). The photo flow driven with a real file and real finger events for the first time
+// v198: program.html changed (2026-10-19, Amir: "i want the 7-day habit table ... cut the per habit door ... create the door to the
+// list"). Progress carries the habit half now: days in a row, days this month, the last seven days as a table, and ONE door into the
+// list of what you track. The list is the five with no off switch, whatever the athlete chose, and the ways to add another — AA Proof's
+// three add-ons are suggestions among them, beside the ones athletes actually wrote for themselves. Three of their own is the cap,
+// because the server pays for no more.
+// v199: program.html changed (2026-10-19). The photo flow driven with a real file and real finger events for the first time
 //      (scripts/headless/highlight-reel.js section 8, 15 checks) found two things. `hidden` is only a default and a rule that
 //      sets `display` beats it, so the card's picture and the two layers were drawn SIDE BY SIDE and an empty green box sat
 //      beside every card that had no photo. And with a photo on, the sheet grew tall enough that the preview scrolled off the
 //      top while the zoom was in reach: the photo's controls now sit directly under the picture they change, and picking one
 //      scrolls it back into view.
-const CACHE = 'aap-v198';
+const CACHE = 'aap-v199';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

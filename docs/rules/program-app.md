@@ -76,18 +76,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   at the check-in and stored with it (`level`, `sore`, `drop`, `asWritten`); `paintToday()` only paints. The
   target rule exists twice, `rpeTargetOn()` here (`dayRpe()` is its lower-day wrapper, which draws the pill) and
   `dayTargetC()` in coach.html, both with the week note and the drop optional: change both (`check_twins.js` §4).
-- **The habits live in `program.html`** (2026-10-19, Amir: "Aa proof will die"). Home's **Today** card is the
-  session and the habits as ONE list, because they are one day (direction B, picked from three): the verdict,
-  the four days you may still fill in, a row per habit, and one line saying what to do now. It replaced the
-  Daily habits door row and the iframe of AA Proof under it. ⚠️ **The engine is `assets/js/habits-core.js`, and
-  it is GENERATED** from habits.html by `scripts/build_habits_core.js` (pre-commit guard 26): the roster, the
-  log, the verdict, the day streak and the backfill window are cut out of AA Proof function by function, never
-  retyped, because a second copy of that arithmetic is how the athlete and the board come to disagree with
-  nothing to show for it. The keys are AA Proof's own — `<id>_hab_cfg` and `<id>_hab_log` — so no athlete's
-  history moves and every server scorer reads them unchanged. This app is their WRITER now: `_snapshot()`
-  pushes them, and `mergeStoredValue()` merges the log as a **union by day, the larger number per habit**
-  (the scalar rule would delete a day the other phone logged). A finished session ticks `strength` here
-  (`habTickSession()`), where AA Proof used to read it back off the server.
+- **The habits are an area of their own now**: Today's card, the habit half of Progress and the list
+  behind it are [`docs/rules/habits-in-app.md`](habits-in-app.md). The engine they share is
+  `assets/js/habits-core.js`.
 - **Body weight lives in `program.html`** under the key `<id>_hab_wt`; AA Proof must never write it, and it
   is never scored.
 - **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`, `<id>_holdcache` (Hold Serve), `<id>_careercache` and `<id>_earn_d<N>`

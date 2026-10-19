@@ -17,7 +17,8 @@ The atlas across the whole repo — pages, assets, skills, scripts, docs — is
 | [`rules/server-and-data.md`](rules/server-and-data.md) | programmes live on the server; backups; coaching logs; erasure |
 | [`rules/program-app.md`](rules/program-app.md) | the athlete app: data, sessions, saving |
 | [`rules/program-app-look.md`](rules/program-app-look.md) | the athlete app: screens, cards, colour, navigation |
-| [`rules/habits.md`](rules/habits.md) | AA Proof, the habit app |
+| [`rules/habits.md`](rules/habits.md) | AA Proof, the habit app (being retired) |
+| [`rules/habits-in-app.md`](rules/habits-in-app.md) | the habits where they live now: Today's card, the habit half of Progress, the list |
 | [`rules/coach-dashboard.md`](rules/coach-dashboard.md) | the coach dashboard |
 | [`rules/career.md`](rules/career.md) | Career Mode |
 | [`rules/push.md`](rules/push.md) | reminders on a phone |

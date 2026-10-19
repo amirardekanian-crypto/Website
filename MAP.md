@@ -30,7 +30,8 @@ The layers, the rules-file list and the house rules for writing them are in [`do
 | [`docs/rules/server-and-data.md`](docs/rules/server-and-data.md) | programmes live on the server; backups; coaching logs; erasure |
 | [`docs/rules/program-app.md`](docs/rules/program-app.md) | the athlete app: data, sessions, saving |
 | [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) | the athlete app: screens, cards, colour, navigation |
-| [`docs/rules/habits.md`](docs/rules/habits.md) | AA Proof, the habit app |
+| [`docs/rules/habits.md`](docs/rules/habits.md) | AA Proof, the habit app (being retired) |
+| [`docs/rules/habits-in-app.md`](docs/rules/habits-in-app.md) | the habits where they live now: Today's card, the habit half of Progress, the list |
 | [`docs/rules/coach-dashboard.md`](docs/rules/coach-dashboard.md) | the coach dashboard |
 | [`docs/rules/career.md`](docs/rules/career.md) | Career Mode |
 | [`docs/rules/push.md`](docs/rules/push.md) | reminders on a phone |
