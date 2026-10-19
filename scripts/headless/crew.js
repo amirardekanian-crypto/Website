@@ -7,7 +7,8 @@
 // the composer (a message, a
 // photo made smaller on the phone to 1280 px JPEG, the limits); Tell the crew (a session only with a photo, Day N drafted); the switches
 // and the no; an athlete ticked under 13 reads only; the account sheet's door; the guide; Back closes the photo; never synced; 320 px and
-// dark mode. Made-up people only. The stub answers the crew_* calls by name (stub.js).
+// dark mode. The Monthly Open's card (stage84): the challenge, the board and its order, your own row, the WhatsApp door, an empty board,
+// a long one, no card without the stage. Made-up people only. The stub answers the crew_* calls by name (stub.js).
 // Serve the repo first (python -m http.server 8775 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
 const H = require('./lib');
@@ -327,6 +328,104 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('without stage83 the app falls back to get_bell and still draws the feed', (await calls(p, 'get_bell')).length >= 1 && await p.evaluate(() => !!document.querySelector('#crew-body .cr-post')));
     await ctx.close();
   }
+
+  // ── The Monthly Open (stage84): one card above the Bell, a board Amir fills, one door to WhatsApp ──────────────────────
+  const OPEN = (o = {}) => Object.assign({
+    id: 'aaaaaaaa-0000-4000-8000-000000000084', title: 'Wall Sit', how: 'Back to the wall, knees at 90. Send me the clip.',
+    unit: 'seconds', better: 'high',
+    board: [{ who: 'Reza K.', value: 120, place: 1, me: false }, { who: 'Alex R.', value: 95, place: 2, me: true }],
+    mine: { value: 95, day: iso(now).slice(0, 10) } }, o);
+  const openCrew = async (p) => { await waitTab(p); await p.evaluate(() => goTo('crew')); await p.waitForTimeout(700); };
+  {
+    const b = bell({ answer: 'yes', can_post: true });
+    b.open = OPEN();
+    const { ctx, p } = await open(browser, { bell: b });
+    await openCrew(p);
+    const o = await p.evaluate(() => {
+      const c = document.querySelector('#screen-crew .cr-open');
+      if (!c) return null;
+      const y = sel => { const e = document.querySelector(sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
+      return { k: c.querySelector('.k').textContent, title: c.querySelector('h3').textContent, how: (c.querySelector('.how') || {}).textContent || '',
+        rows: [...c.querySelectorAll('.cr-ob-r')].map(r => [r.querySelector('.p').textContent, r.querySelector('.n').textContent, r.querySelector('.v').textContent, r.classList.contains('me')]),
+        mine: (c.querySelector('.cr-o-mine') || {}).textContent || '', go: c.querySelector('.cr-o-go').textContent,
+        href: c.querySelector('.cr-o-go').getAttribute('href'), more: !!c.querySelector('.cr-o-more'),
+        above: [y('.cr-open'), y('#screen-crew .cr-comp')], text: c.innerText };
+    });
+    C.check('the Open: one card headed THE OPEN with the challenge and Amir\'s words', !!o && o.k === 'The Open' && o.title === 'Wall Sit' && /knees at 90/.test(o.how), JSON.stringify(o && [o.k, o.title]));
+    C.check('…the board is ranked by the result, with the unit and your own row as You', !!o && JSON.stringify(o.rows) === JSON.stringify([['1', 'Reza K.', '120 seconds', false], ['2', 'You', '95 seconds', true]]), JSON.stringify(o && o.rows));
+    C.check('…your own result is named under it', !!o && /Your result: 95 seconds/.test(o.mine), o && o.mine);
+    C.check('…and the one door is WhatsApp, drafting the challenge', !!o && o.go === 'Send a better one' && /wa\.me|whatsapp/.test(o.href) && /Wall%20Sit|Wall\+Sit|Wall Sit/.test(decodeURI(o.href)), o && [o.go, o.href].join(' '));
+    C.check('…it sits above the composer, under the honours', !!o && o.above[0] < o.above[1], JSON.stringify(o && o.above));
+    C.check('…no weight and no kg on the card', !!o && !/\bkg\b/i.test(o.text));
+    C.check('…no page errors', !p.errs.length, p.errs.join(' | '));
+    await p.screenshot({ path: require('path').join(H.outDir(), 'crew-open-390.png') }).catch(() => {});
+    await ctx.close();
+  }
+  {
+    // nobody has a result yet, and the athlete has none of their own
+    const b = bell({ answer: 'yes', can_post: true });
+    b.open = OPEN({ board: [], mine: null });
+    const { ctx, p } = await open(browser, { bell: b });
+    await openCrew(p);
+    const o = await p.evaluate(() => { const c = document.querySelector('#screen-crew .cr-open'); return c ? { none: !!c.querySelector('.cr-o-none'), txt: c.innerText, go: c.querySelector('.cr-o-go').textContent } : null; });
+    C.check('the Open with no results: it says so and asks for the first', !!o && o.none && /Be first/.test(o.txt) && o.go === 'Send Amir your result', JSON.stringify(o && [o.none, o.go]));
+    await ctx.close();
+  }
+  {
+    // they have not joined, so they are not on the board: their own result still shows, from `mine`
+    const b = bell({ answer: 'no' });
+    b.open = OPEN({ board: [{ who: 'Reza K.', value: 120, place: 1, me: false }], mine: { value: 80, day: iso(now).slice(0, 10) } });
+    const { ctx, p } = await open(browser, { bell: b });
+    await openCrew(p);
+    const o = await p.evaluate(() => { const c = document.querySelector('#screen-crew .cr-open'); return c ? { mine: (c.querySelector('.cr-o-mine') || {}).textContent || '', rows: c.querySelectorAll('.cr-ob-r').length } : null; });
+    C.check('not in the crew: the board is the members’, and your own result still shows under it', !!o && o.rows === 1 && /Your result: 80 seconds/.test(o.mine), JSON.stringify(o));
+    await ctx.close();
+  }
+  {
+    // a long board: the first five, Show all, and your own row even when it is outside them
+    const board = [];
+    for (let i = 1; i <= 9; i++) board.push({ who: 'Athlete ' + i, value: 200 - i * 10, place: i, me: i === 8 });
+    const b = bell({ answer: 'yes', can_post: true });
+    b.open = OPEN({ board, mine: { value: 130, day: iso(now).slice(0, 10) } });
+    const { ctx, p } = await open(browser, { bell: b });
+    await openCrew(p);
+    const first = await p.evaluate(() => ({ n: document.querySelectorAll('#screen-crew .cr-ob-r').length,
+      me: !!document.querySelector('#screen-crew .cr-ob-r.me'), more: (document.querySelector('.cr-o-more') || {}).textContent || '' }));
+    C.check('a long board: five rows, your own carried in beneath them, and Show all 9', first.n === 6 && first.me && /Show all 9/.test(first.more), JSON.stringify(first));
+    await p.evaluate(() => crewOpenAll()); await p.waitForTimeout(300);
+    const all = await p.evaluate(() => ({ n: document.querySelectorAll('#screen-crew .cr-ob-r').length, more: !!document.querySelector('.cr-o-more') }));
+    C.check('…Show all opens every row and the button goes', all.n === 9 && !all.more, JSON.stringify(all));
+    const fit = await p.evaluate(() => ({ wide: document.documentElement.scrollWidth > innerWidth + 1 }));
+    C.check('…no sideways scroll', !fit.wide);
+    await ctx.close();
+  }
+  {
+    // a server without stage84 (or no challenge set): no card at all, and the rest of Crew is untouched
+    for (const [what, open_] of [['a server without stage84', undefined], ['no challenge set', null]]) {
+      const b = bell({ answer: 'yes', can_post: true });
+      if (open_ !== undefined) b.open = open_;
+      const { ctx, p } = await open(browser, { bell: b });
+      await openCrew(p);
+      const o = await p.evaluate(() => ({ card: !!document.querySelector('.cr-open'), feed: !!document.querySelector('#crew-body .cr-post'), board: !!document.querySelector('.cr-brd') }));
+      C.check(`${what}: no Open card, and the feed and the board are as they were`, !o.card && o.feed && o.board, JSON.stringify(o));
+      C.check(`${what}: no page errors`, !p.errs.length, p.errs.join(' | '));
+      await ctx.close();
+    }
+  }
+  {
+    // 320 px and dark mode
+    const b = bell({ answer: 'yes', can_post: true });
+    b.open = OPEN();
+    const { ctx, p } = await open(browser, { bell: b, opts: { w: 320 } });
+    await openCrew(p);
+    const fit = await p.evaluate(() => ({ right: Math.max(...[...document.querySelectorAll('.cr-open, .cr-o-go')].map(e => e.getBoundingClientRect().right)), vw: innerWidth, wide: document.documentElement.scrollWidth > innerWidth + 1 }));
+    C.check('320 px: the Open card and its button fit', fit.right <= fit.vw && !fit.wide, JSON.stringify(fit));
+    await p.evaluate(() => document.body.setAttribute('data-dark', '1')); await p.waitForTimeout(200);
+    const dark = await p.evaluate(() => { const c = document.querySelector('.cr-open'); const bg = getComputedStyle(c).backgroundColor; const ink = getComputedStyle(c.querySelector('h3')).color; return { bg, ink }; });
+    C.check('dark mode: the card takes the dark paper and its title the dark ink', dark.bg !== 'rgb(255, 255, 255)' && dark.ink !== 'rgb(26, 26, 26)', JSON.stringify(dark));
+    await ctx.close();
+  }
+
 
   await browser.close();
   process.exit(C.report() ? 1 : 0);

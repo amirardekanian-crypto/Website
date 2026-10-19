@@ -148,6 +148,31 @@ function crewSeed(db) {
   };
 }
 
+// ── The Monthly Open (stage84), made up like everything here ─────────────────────────────────────────────────────
+// buildSeed({ open: true }) turns the stub's stage84 functions on (and stage81's, which they need: the crew is the Bell's yes answers, minus the former
+// athlete) and seeds TWO CLOSED challenges and nothing live, so the page starts on the empty state with a Past list: coach_open() answers
+// window.__DB.crew_open_state. The live challenge is started in the test, through the panel. Dates are fixed (the Bell's clock is 2026-11-12).
+const OPEN_IDS = ['c0000000-0000-4000-8000-0000000000a1', 'c0000000-0000-4000-8000-0000000000a2'];
+function openSeed(db, today) {
+  // Kim, whose "yes" the Bell's answers hold, is a former athlete: crew_members() leaves her out (courtSeed() says the same when it runs too).
+  if (!db.athlete_status.some(r => r.athlete_id === 'kim_former')) db.athlete_status.push({ athlete_id: 'kim_former', status: 'former', since: '2026-09-01', note: null, updated_at: '2026-09-01T09:00:00.000Z' });
+  // Three rows the result picker must leave out although each has a programme on the server: a former athlete (Kim), the public demo and the coach's own identity.
+  [['kim_former', 'Kim'], ['demo', 'Demo'], ['amir_ardekani', 'Coach']].forEach(([id, first]) => {
+    if (!db.programs.some(r => r.athlete_id === id)) db.programs.push({ athlete_id: id, data: programme(first, { athlete: { id, firstName: first, lastName: 'Example', tier: 'coached' } }), updated_at: iso(today, 5), updated_by: 'pipeline@example.invalid' });
+  });
+  db.crew_open_state = {
+    challenges: [
+      { id: OPEN_IDS[0], title: 'Plank Hold', how: 'Forearms on the floor, body in one line. Film it side-on.', unit: 'seconds', better: 'high', opened_on: '2026-08-03', closed_at: '2026-09-02T09:00:00.000Z', created_at: '2026-08-03T09:00:00.000Z' },
+      { id: OPEN_IDS[1], title: 'One Kilometre Row', how: 'On the rower, damper at 5. Film the screen at the end.', unit: 'seconds', better: 'low', opened_on: '2026-09-02', closed_at: '2026-10-05T09:00:00.000Z', created_at: '2026-09-02T09:00:00.000Z' },
+    ],
+    results: [
+      { open_id: OPEN_IDS[0], athlete_id: 'ava_test', value: 95, day: '2026-08-20' }, { open_id: OPEN_IDS[0], athlete_id: 'ben_test', value: 80, day: '2026-08-22' },
+      { open_id: OPEN_IDS[1], athlete_id: 'ava_test', value: 241.5, day: '2026-09-20' },
+    ],
+    rings: [],
+  };
+}
+
 function buildSeed(opt) {
   opt = opt || {};
   const today = opt.today;                     // the page's local YYYY-MM-DD
@@ -285,7 +310,8 @@ function buildSeed(opt) {
     ],
   };
   if (opt.court) courtSeed(db, today, opt.courtAwards !== false);
-  if (opt.crew) crewSeed(db);
+  if (opt.crew || opt.open) crewSeed(db);
+  if (opt.open) openSeed(db, today);
   if (opt.bigHistory) {
     for (let i = 0; i < opt.bigHistory; i++) {
       db.session_history.push(session('bulk_' + (i % 40), 'Bulk ' + (i % 40), (i % 3) + 1, daysAgo(today, 30 + Math.floor(i / 40))));
@@ -297,7 +323,8 @@ function buildSeed(opt) {
     levels: { cara_free: 4, ava_test: 3, dan_proof: 1 },
     board: [{ pos: 1, display_name: 'Cara', title: null, xp: 900, level: 4, rank_label: 'STARTER', is_me: false, joined: true }],
     stub: opt.stub || {},
-    crew: !!opt.crew,   // stub.js: the stage81 functions (the Bell) answer only when this is on
+    crew: !!(opt.crew || opt.open),   // stub.js: the stage81 functions (the Bell) answer only when this is on
+    open: !!opt.open,                 // stub.js: the stage84 functions (the Monthly Open) answer only when this is on
     // The month just gone's honours as the server would work them out (see stub.js: liveHonours). Made up; nothing is computed.
     honoursLive: opt.honoursLive !== undefined ? opt.honoursLive : opt.court ? {
       // A former athlete shares the top session count and the coach's own identity shares the top gain: the stub leaves both out, as
@@ -311,4 +338,4 @@ function buildSeed(opt) {
   };
 }
 
-module.exports = { buildSeed, daysAgo, dkey, BELL_IDS };
+module.exports = { buildSeed, daysAgo, dkey, BELL_IDS, OPEN_IDS };

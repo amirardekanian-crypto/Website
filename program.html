@@ -5062,6 +5062,27 @@
   #screen-crew .cr-hon b { display: block; margin-top: 4px; font: 900 var(--fs-lead)/1.05 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--ink);
     overflow-wrap: anywhere; }
   #screen-crew .cr-hon small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  /* The Monthly Open (stage84; Amir's pick A on the Crew and Open page): one card under the honours, above the Bell. The challenge in his words,
+     the board ranked by the result, your own row marked, and one door to WhatsApp: he confirms every result from the clip, so the app never takes
+     one. Green and grey, like the rest of Crew; the clay is only on the door, the one thing that asks for something (DS-01). */
+  #screen-crew .cr-open { margin: 12px var(--g) 14px; padding: 14px 16px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  #screen-crew .cr-open .k { display: block; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  #screen-crew .cr-open h3 { margin: 4px 0 0; font: 900 var(--fs-head)/1.1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--ink); }
+  #screen-crew .cr-open .how { margin: 6px 0 0; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
+  #screen-crew .cr-ob { margin-top: 12px; border-top: 1px solid var(--hair); }
+  #screen-crew .cr-ob-r { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: baseline; gap: 10px; padding: 8px 0 7px; border-bottom: 1px solid var(--hair); }
+  #screen-crew .cr-ob-r:last-child { border-bottom: 0; }
+  #screen-crew .cr-ob-r .p { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; color: var(--grey); font-variant-numeric: tabular-nums; }
+  #screen-crew .cr-ob-r .n { min-width: 0; font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #screen-crew .cr-ob-r .v { font: 700 var(--fs-body)/1.2 'Space Mono', monospace; color: var(--ink); font-variant-numeric: tabular-nums; }
+  #screen-crew .cr-ob-r.me { background: var(--tint); margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 8px; border-bottom-color: transparent; }
+  #screen-crew .cr-ob-r.me .n, #screen-crew .cr-ob-r.me .v, #screen-crew .cr-ob-r.me .p { color: var(--green-ink); }
+  #screen-crew .cr-o-none { margin: 10px 0 0; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--grey); }
+  #screen-crew .cr-o-go { display: inline-block; margin-top: 12px; padding: 10px 14px; border-radius: 8px; background: var(--clay-fill); color: #fff;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; }
+  #screen-crew .cr-o-mine { display: block; margin-top: 10px; font: 600 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--green-ink); }
+  #screen-crew .cr-o-more { display: block; width: 100%; margin-top: 2px; padding: 10px 0 2px; border: 0; background: none; font: 600 var(--fs-small)/1 'Barlow', sans-serif;
+    color: var(--green-ink); text-align: left; cursor: pointer; }
   /* the composer row: your initials, the prompt, the camera */
   #screen-crew .cr-comp { display: flex; align-items: center; gap: 10px; width: calc(100% - 2 * var(--g)); min-height: 52px; margin: 0 var(--g) 12px; padding: 6px 6px 6px 8px;
     border: 1px solid var(--hair); border-radius: 999px; background: var(--row); color: var(--grey); cursor: pointer; text-align: left; font: 400 var(--fs-body)/1.2 'Barlow', sans-serif; }
@@ -10209,7 +10230,7 @@ const APP_GUIDE = [
 // names a control the athlete cannot see (CNT-01).
 APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how often'), 0,
   { icon: 'compass', key: 'crew', title: 'Crew and the Bell', when: () => crewOn(),
-    body: `<p><strong>Crew</strong> is our crew's own place. The first time you open it I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. It's one line a day and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. Nothing on Crew earns XP. Under the Bell is the season board.</p><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
+    body: `<p><strong>Crew</strong> is our crew's own place. The first time you open it I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. It's one line a day and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. Nothing on Crew earns XP. Under the Bell is the season board.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with likes), last month\'s honours early in the month, and the season board.</li>';
   return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
@@ -12003,6 +12024,42 @@ function crewHonoursHTML() {
   }).join('');
   return tiles ? `<h2 class="prog-sec">${esc(M)} honours</h2><div class="cr-hon">${tiles}</div>` : '';
 }
+// ── The Monthly Open: one card on Crew (stage84; Amir, 2026-10-19: "for crew and the open go with your picks", direction A) ──────────────
+// get_bell() carries it as `open`: { id, title, how, unit, better, board: [{ who, value, place, me }], mine }. A challenge Amir has not set, or a
+// server without stage84, sends null or nothing and the card is not drawn. The app NEVER writes a result: he confirms every one from the clip on
+// WhatsApp (nothing is stored), so the only control here is that door. The board shows the first five, the athlete's own row wherever it is.
+var _openAll = false;
+function crewOpenNum(v) {
+  const n = Number(v);
+  return !isFinite(n) ? '' : (Math.round(n * 100) / 100).toLocaleString('en-GB');
+}
+function crewOpenHTML() {
+  const o = BELL && BELL.open;
+  if (!o || !o.title) return '';
+  const board = Array.isArray(o.board) ? o.board : [];
+  const unit = o.unit ? ' ' + o.unit : '';
+  // their own row when they are on the board, else the number the server sends anyway (`mine`): an athlete who has not joined the crew is not on
+  // the board, and would otherwise never see the result Amir confirmed for them
+  const mine = board.find(r => r && r.me) || null;
+  const myVal = mine ? mine.value : (o.mine && o.mine.value);
+  const shown = _openAll ? board : board.slice(0, 5);
+  const rows = shown.concat(mine && shown.indexOf(mine) < 0 ? [mine] : []).map(r =>
+    `<div class="cr-ob-r${r.me ? ' me' : ''}"><span class="p">${Number(r.place) || ''}</span>`
+    + `<span class="n">${esc(r.me ? 'You' : (r.who || 'Athlete'))}</span>`
+    + `<span class="v">${esc(crewOpenNum(r.value) + unit)}</span></div>`).join('');
+  const msg = `My result for ${o.title}: `;
+  return `<section class="cr-open" aria-labelledby="cr-open-h">
+    <span class="k">The Open</span>
+    <h3 id="cr-open-h">${esc(o.title)}</h3>
+    ${o.how ? `<p class="how">${esc(o.how)}</p>` : ''}
+    ${board.length ? `<div class="cr-ob">${rows}</div>` : '<p class="cr-o-none">Nobody has put a result up yet. Be first.</p>'}
+    ${!_openAll && board.length > 5 ? `<button type="button" class="cr-o-more" onclick="crewOpenAll()">Show all ${board.length}</button>` : ''}
+    ${myVal != null ? `<span class="cr-o-mine">Your result: ${esc(crewOpenNum(myVal) + unit)}. Beat it and send me the new one.</span>` : ''}
+    <a class="cr-o-go" href="${esc(coachWhatsAppUrl(msg))}" target="_blank" rel="noopener">${myVal != null ? 'Send a better one' : 'Send Amir your result'}</a>
+  </section>`;
+}
+function crewOpenAll() { _openAll = true; renderCrew(); }
+window.crewOpenAll = crewOpenAll;
 function crewPostHTML(it) {
   const name = it.amir ? 'Amir' : it.me ? 'You' : (it.who || 'Athlete');
   const ini = it.amir ? 'AA' : crewInitials(it.me ? crewMe().name : it.who);
@@ -12038,6 +12095,7 @@ function renderCrew() {
   let h = '';
   if (!me.answer && !me.under13) h += crewAskHTML();
   h += crewHonoursHTML();
+  h += crewOpenHTML();
   h += `<h2 class="prog-sec">The Bell<span class="prog-sec-n">Last 7 days</span></h2>`;
   if (me.can_post) h += `<button type="button" class="cr-comp" onclick="openCrewPost()"><span class="cr-ini" aria-hidden="true">${esc(crewInitials(me.name))}</span><span class="t">Share something with the crew</span><span class="cr-cam">${CREW_CAM_SVG}</span></button>`;
   else if (me.under13) h += '<p class="cr-quiet">You can read the crew here. Posting is off for your account.</p>';

@@ -6220,6 +6220,317 @@ S['bell-missing'] = async (b) => {
   return r;
 };
 
+// ── The Monthly Open (stage84; Career Mode round 5, the last step of plan A) ─────────────────────────────────────
+// One panel on Proof, under Who said yes: the live challenge (or the empty state), a form to set or correct it, a form to confirm a result, the board as the
+// crew sees it, and the last five closed challenges. The seed `{ open: true }` turns the stub's stage84 functions on (stub.js: openAnswer() and the five RPCs,
+// emulated from the SQL) and stage81's, which they need, and seeds two CLOSED challenges and no live one (fixtures.js: openSeed). Without it the server
+// "has not had stage84": every other scenario runs like that and none of them sees the panel. The live challenge below is started through the panel itself.
+const openRead = page => page.evaluate(() => {
+  const txt = el => el ? el.innerText.replace(/\s+/g, ' ').trim() : '';
+  const q = s => document.querySelector(s), all = s => [...document.querySelectorAll(s)];
+  return {
+    head: txt(q('#openHead')), now: txt(q('#openNow')), title: txt(q('#openNow .open-title')), how: txt(q('#openNow .open-how')), facts: txt(q('#openNow .open-facts')),
+    acts: all('#openNow .open-acts button').map(txt), board: txt(q('#openBoard')),
+    rows: all('#openBoard .open-row').map(el => ({ id: el.dataset.id, cls: el.className, pos: txt(el.querySelector('.pos')), name: txt(el.querySelector('.nm b')), chip: txt(el.querySelector('.chip')),
+      sub: txt(el.querySelector('.nm small')), value: txt(el.querySelector('.v')), take: !!el.querySelector('.btn.danger') })),
+    past: all('#openPast .open-p').map(el => ({ name: txt(el.querySelector('.nm')), when: txt(el.querySelector('.when')) })),
+    options: all('#openAth option').map(o => [o.value, o.textContent.trim()]),
+    groups: all('#openAth optgroup').map(g => [g.label, [...g.querySelectorAll('option')].map(o => [o.value, o.textContent.trim()])]), hint: txt(q('#openResHint')), confirm: txt(q('#openResBtn')),
+    sel: q('#openAth') ? q('#openAth').value : null, val: q('#openVal') ? q('#openVal').value : null, day: q('#openDay') ? q('#openDay').value : null,
+    form: !!q('#openTitle'), primaries: all('#openPanel .btn.primary').filter(e => e.getBoundingClientRect().width).map(txt),
+    text: txt(q('#openPanel')),
+  };
+});
+const openLiveId = page => page.evaluate(() => { const c = window.__DB.crew_open_state.challenges.find(x => !x.closed_at); return c ? c.id : null; });
+const openNow = page => page.locator('#openNow');
+const openBtn = (page, root, text) => page.locator(`${root} button`, { hasText: text }).first();
+const openRow = (page, id) => page.locator(`#openBoard .open-row[data-id="${id}"]`);
+
+S['open-panel'] = async (b) => {
+  const r = { id: 'open-panel', title: 'The Monthly Open on Proof: hidden without stage84; the empty state; set a challenge; confirm results and the board\'s order (places among the crew, a quiet mark for anyone not in it); correct the words; Take off, Close and Start-a-new-one ask first; the past list; errors in plain words; the look', checks: [] };
+  const calls0 = cs => cs.filter(c => c.kind === 'rpc' && /^coach_open/.test(c.name));
+
+  // 1. A server that has not had stage84, or that answers nothing: no panel and no warning, the Bell is untouched.
+  for (const [label, seed] of [['before stage84 (the functions are not there)', { crew: true }], ['PGRST202 on a seeded run', { open: true, stub: { missingRpc: ['coach_open'] } }], ['an answer of null', { open: true, stub: { openNull: true } }]]) {
+    const x = await L.openCoach(b, Object.assign({ seed }, BELL_T));
+    await x.page.waitForSelector('#bellPanel'); await L.settle(x.page, 400);
+    const cs = await L.calls(x.page);
+    check(r, `${label}: the page asked coach_open once and drew no Open panel, with the Bell, the wall and the board all there`,
+      calls0(cs).length === 1 && calls0(cs)[0].name === 'coach_open' && (await x.page.locator('#openPanel').count()) === 0 && (await x.page.locator('#bellPanel').count()) === 1
+      && (await x.page.locator('#wallPanel').count()) === 1 && (await x.page.locator('#boardPanel').count()) === 1, calls0(cs).map(c => c.name));
+    check(r, `${label}: no "Not everything loaded" banner, no line at the bottom, and the page knows it is off`,
+      !(await x.page.evaluate(() => { const w = document.getElementById('loadwarn'); return !!w && !w.hidden; })) && !(await L.failText(x.page)) && (await x.page.evaluate(() => S.open && S.open.on)) === false, await L.failText(x.page));
+    check(r, `${label}: no page errors`, !x.log.errors.length, x.log.errors);
+    await x.page.context().close();
+  }
+  // a real failure shows the panel with the reason and Try again, the banner names it, nothing can be written while the state is unknown
+  {
+    const x = await L.openCoach(b, Object.assign({ seed: { open: true, stub: { fail: [{ kind: 'rpc', name: 'coach_open', message: 'fixture: the Open is down', times: 1 }] } } }, BELL_T));
+    await x.page.waitForSelector('#openPanel'); await L.settle(x.page, 300);
+    const body = (await x.page.locator('#openPanel').innerText()).replace(/\s+/g, ' ');
+    const warn = await x.page.evaluate(() => { const w = document.getElementById('loadwarn'); return w && !w.hidden ? w.innerText.replace(/\s+/g, ' ') : ''; });
+    check(r, 'a real failure shows the panel with the reason and Try again, and the banner names the Monthly Open', /The Monthly Open did not load: fixture: the Open is down/.test(body) && /Try again/.test(body) && /Not everything loaded: the Monthly Open/.test(warn), { body: body.slice(0, 160), warn });
+    check(r, 'and no form, no Start button and no result box are drawn while the state is unknown', (await x.page.locator('#openTitle, #openAth, #openNow .open-acts').count()) === 0, '');
+    await x.page.locator('#openNow button', { hasText: 'Try again' }).click(); await L.settle(x.page, 500);
+    const back = await openRead(x.page);
+    check(r, 'Try again reads it: the empty state is there and the banner is gone', /Nothing is open/.test(back.now) && !(await x.page.evaluate(() => { const w = document.getElementById('loadwarn'); return !!w && !w.hidden; })), back.now);
+    check(r, 'no page errors (a real failure)', !x.log.errors.length, x.log.errors);
+    await x.page.context().close();
+  }
+
+  // 2. The panel, with the server on: the empty state and the past list
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { open: true } }, BELL_T));
+  await page.waitForSelector('#openPanel');
+  const cs0 = await L.calls(page);
+  check(r, 'the page asked coach_open once, after the first paint, with nothing to say, and made no other Open call', calls0(cs0).length === 1 && calls0(cs0)[0].name === 'coach_open' && calls0(cs0)[0].payload == null, calls0(cs0).map(c => c.name));
+  check(r, 'The Monthly Open sits under The Bell and Who said yes and above the board, in the left column', await page.evaluate(() => { const q = id => document.getElementById(id); const f = (a, c) => !!(q(a).compareDocumentPosition(q(c)) & Node.DOCUMENT_POSITION_FOLLOWING);
+    return f('wallPanel', 'bellPanel') && f('bellPanel', 'bellPeople') && f('bellPeople', 'openPanel') && f('openPanel', 'boardPanel') && q('openPanel').parentElement === q('wallPanel').parentElement; }), '');
+  let st = await openRead(page);
+  check(r, 'the head says when it was read and offers to read again', /^The Monthly Open As of 10:00\./.test(st.head) && /Reload/.test(st.head), st.head);
+  check(r, 'nothing is open: the empty state says so and offers to start one (the panel\'s one primary button)', /Nothing is open\. Start a challenge and it appears on Crew, under the feed\./.test(st.now) && JSON.stringify(st.acts) === JSON.stringify(['Start a challenge']) && JSON.stringify(st.primaries) === JSON.stringify(['Start a challenge']), { now: st.now, acts: st.acts, primaries: st.primaries });
+  check(r, 'there is no result form and no board while nothing is open', st.sel === null && st.board === '' && (await page.locator('#openAth').count()) === 0, st.board);
+  check(r, 'the past list has the two closed challenges, the one closed last first, with their dates and how many results',
+    JSON.stringify(st.past.map(p => [p.name, p.when])) === JSON.stringify([['One Kilometre Row seconds', '2 Sep to 5 Oct · 1 result'], ['Plank Hold seconds', '3 Aug to 2 Sep · 2 results']]), st.past);
+  check(r, 'the past list is read-only: no button in it', (await page.locator('#openPast button').count()) === 0, '');
+
+  // 3. Set a challenge
+  await openBtn(page, '#openNow', 'Start a challenge').click(); await L.settle(page, 300);
+  st = await openRead(page);
+  check(r, 'Start a challenge opens the form (name first, in focus) and the Start button leaves the empty state; the form\'s button is the one primary', st.form && (await page.evaluate(() => document.activeElement && document.activeElement.id)) === 'openTitle' && !st.acts.length && JSON.stringify(st.primaries) === JSON.stringify(['Start the challenge']), { primaries: st.primaries, acts: st.acts });
+  let n0 = await L.nCalls(page);
+  await openBtn(page, '#openFormBox', 'Start the challenge').click(); await L.settle(page, 250);
+  check(r, 'starting with no name says so and sends nothing', rpcs(await L.callsSince(page, n0), 'coach_open_set').length === 0 && /Give the challenge a name first/.test(await L.failText(page)), await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  await page.locator('#openTitle').fill('Wall Sit');
+  await page.locator('#openHow').fill('Back flat on the wall, thighs level with the floor. Film it side-on, one take.');
+  await page.locator('#openUnit').fill('seconds');
+  await openBtn(page, '#openFormBox', 'Lower wins').click();
+  const lo = await page.evaluate(() => [...document.querySelectorAll('#openFormBox .seg')].map(s => [s.textContent.trim(), s.getAttribute('aria-pressed'), s.classList.contains('active')]));
+  await openBtn(page, '#openFormBox', 'Higher wins').click();
+  const hi = await page.evaluate(() => [...document.querySelectorAll('#openFormBox .seg')].map(s => [s.textContent.trim(), s.getAttribute('aria-pressed'), s.classList.contains('active')]));
+  check(r, 'Higher / Lower wins is a switch: one is pressed at a time, and it can go back', JSON.stringify(lo) === JSON.stringify([['Higher wins', 'false', false], ['Lower wins', 'true', true]]) && JSON.stringify(hi) === JSON.stringify([['Higher wins', 'true', true], ['Lower wins', 'false', false]]), { lo, hi });
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openFormBox', 'Start the challenge').click(); await L.settle(page, 500);
+  let cs = await L.callsSince(page, n0), sc = rpcs(cs, 'coach_open_set');
+  check(r, 'Start sends coach_open_set with the words, the unit and which way wins, and NO p_id (a new one), without asking (nothing was open)',
+    sc.length === 1 && JSON.stringify(sc[0].payload) === JSON.stringify({ p_title: 'Wall Sit', p_how: 'Back flat on the wall, thighs level with the floor. Film it side-on, one take.', p_unit: 'seconds', p_better: 'high' }) && (await page.locator('.dangerask').count()) === 0, sc.map(c => c.payload));
+  check(r, 'the panel is drawn from the write\'s own answer: no second read', rpcs(cs, 'coach_open').length === 0, rpcs(cs, 'coach_open').length);
+  st = await openRead(page);
+  check(r, 'the challenge is on show: its name, its words and its facts (unit, which way wins, the day it opened)', st.title === 'Wall Sit' && st.how === 'Back flat on the wall, thighs level with the floor. Film it side-on, one take.' && st.facts === 'Counted in seconds · higher wins · opened 12 Nov', { title: st.title, how: st.how, facts: st.facts });
+  check(r, 'it offers Correct the words, Start a new one and Close the challenge, a line says it started, and the form is gone', JSON.stringify(st.acts) === JSON.stringify(['Correct the words', 'Start a new one', 'Close the challenge']) && !st.form && /Challenge started: Wall Sit/.test(await L.toastText(page)), { acts: st.acts, toast: await L.toastText(page) });
+  check(r, 'the picker offers every COACHED athlete the dashboard shows, by the dashboard\'s own name, in two groups: in the crew (with the name the crew sees: Ava, Ben) and not in the crew (Eli)',
+    JSON.stringify(st.groups) === JSON.stringify([['In the crew (on the board)', [['ava_test', 'Ava Example · Ava E. on Crew'], ['ben_test', 'Ben Example · Ben E. on Crew']]], ['Not in the crew (off the board)', [['eli_new', 'Eli Example']]]]), st.groups);
+  check(r, 'and leaves out Cara (free, with a programme row: Crew is a tab in the coached app only, so a result for her would reach nobody), Kim (a former athlete), the demo, the coach\'s own identity and Dan (no programme on the server, which would refuse him)',
+    st.options.length === 4 && !st.options.some(o => /cara_free|kim_former|demo|amir_ardekani|dan_proof/.test(o[0])) && !/Cara|Kim|Demo|Coach|Dan/.test(st.options.map(o => o[1]).join(' ')), st.options);
+  check(r, 'the board has nobody yet, and the one primary button is now Confirm result', st.board.indexOf('No result confirmed yet.') >= 0 && JSON.stringify(st.primaries) === JSON.stringify(['Confirm result']), { board: st.board, primaries: st.primaries });
+  check(r, 'the challenge stays out of the past list while it is open', st.past.length === 2, st.past.length);
+
+  // 4. Confirm two results; the board's order
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openResBox', 'Confirm result').click(); await L.settle(page, 200);
+  check(r, 'Confirm with no athlete says so and sends nothing', rpcs(await L.callsSince(page, n0), 'coach_open_result').length === 0 && /Pick the athlete first/.test(await L.failText(page)), await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  await page.selectOption('#openAth', 'ava_test');
+  await openBtn(page, '#openResBox', 'Confirm result').click(); await L.settle(page, 200);
+  check(r, 'Confirm with no number says so and sends nothing', rpcs(await L.callsSince(page, n0), 'coach_open_result').length === 0 && /Type the result as a number/.test(await L.failText(page)), await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  await page.locator('#openVal').fill('1000000');
+  await openBtn(page, '#openResBox', 'Confirm result').click(); await L.settle(page, 200);
+  check(r, 'a number of a million or more is refused here, in words, before it is sent', rpcs(await L.callsSince(page, n0), 'coach_open_result').length === 0 && /too big/.test(await L.failText(page)), await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  await page.locator('#openVal').fill('95'); await page.locator('#openDay').fill('2026-11-10');
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openResBox', 'Confirm result').click(); await L.settle(page, 500);
+  cs = await L.callsSince(page, n0);
+  const rc = rpcs(cs, 'coach_open_result');
+  check(r, 'Confirm calls coach_open_result with the athlete, the number (a number) and the day, and reads nothing again', rc.length === 1 && JSON.stringify(rc[0].payload) === JSON.stringify({ p_athlete: 'ava_test', p_value: 95, p_day: '2026-11-10' }) && rpcs(cs, 'coach_open').length === 0, rc.map(c => c.payload));
+  st = await openRead(page);
+  check(r, 'Ava is on the board, first, with her place, her number and its unit, her real name and the day', st.rows.length === 1 && st.rows[0].name === 'Ava E.' && st.rows[0].pos === '1' && st.rows[0].value === '95 seconds' && st.rows[0].sub === 'Ava Example · 10 Nov', st.rows);
+  check(r, 'a line says it was saved, and the form starts again for the next athlete (no athlete, no number, the hint back to its first words)', /Result saved for Ava/.test(await L.toastText(page)) && st.sel === '' && st.val === '' && /^Confirm only what you have seen on WhatsApp/.test(st.hint) && st.confirm === 'Confirm result', { toast: await L.toastText(page), sel: st.sel, val: st.val, hint: st.hint });
+  await page.selectOption('#openAth', 'ben_test'); await page.locator('#openVal').fill('120');
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openResBox', 'Confirm result').click(); await L.settle(page, 500);
+  const bc = rpcs(await L.callsSince(page, n0), 'coach_open_result');
+  check(r, 'with the day left alone the day sent is today\'s (12 Nov, the coach\'s clock)', bc.length === 1 && JSON.stringify(bc[0].payload) === JSON.stringify({ p_athlete: 'ben_test', p_value: 120, p_day: '2026-11-12' }), bc.map(c => c.payload));
+  st = await openRead(page);
+  check(r, 'the board ranks by the number, the higher first: Ben 120 is first, Ava 95 second, and the first three places are green', JSON.stringify(st.rows.map(x => [x.pos, x.name, x.value])) === JSON.stringify([['1', 'Ben E.', '120 seconds'], ['2', 'Ava E.', '95 seconds']]) && / top1/.test(' ' + st.rows[0].cls) && / top2/.test(' ' + st.rows[1].cls), st.rows);
+  // typing a result again replaces it
+  await page.selectOption('#openAth', 'ava_test'); await L.settle(page, 100);
+  st = await openRead(page);
+  check(r, 'picking an athlete who has a result shows it (in the box, with its day) and says that confirming replaces it', st.val === '95' && st.day === '2026-11-10' && st.hint === 'Ava E. already has 95 seconds from 10 Nov. Confirming replaces it.' && st.confirm === 'Replace result', { val: st.val, day: st.day, hint: st.hint, confirm: st.confirm });
+  await page.locator('#openVal').fill('100');
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openResBox', 'Replace result').click(); await L.settle(page, 500);
+  st = await openRead(page);
+  check(r, 'a second number for Ava replaces the first (one row for her, 100 now, still second) and the line says replaced', JSON.stringify(st.rows.map(x => [x.pos, x.name, x.value])) === JSON.stringify([['1', 'Ben E.', '120 seconds'], ['2', 'Ava E.', '100 seconds']]) && /Replaced Ava's result/.test(await L.toastText(page)), { rows: st.rows, toast: await L.toastText(page) });
+  // a tie shares a place
+  await page.selectOption('#openAth', 'ava_test'); await page.locator('#openVal').fill('120');
+  await openBtn(page, '#openResBox', 'Replace result').click(); await L.settle(page, 500);
+  st = await openRead(page);
+  check(r, 'a tie shares a place: Ava and Ben are both 1st at 120 (as the athletes\' board has it)', JSON.stringify(st.rows.map(x => [x.pos, x.name])) === JSON.stringify([['1', 'Ava E.'], ['1', 'Ben E.']]), st.rows.map(x => [x.pos, x.name]));
+  await page.selectOption('#openAth', 'ava_test'); await page.locator('#openVal').fill('100');
+  await openBtn(page, '#openResBox', 'Replace result').click(); await L.settle(page, 500);
+
+  // 5. Someone who is not in the crew: a result can be confirmed for them from the picker; it is real, never part of the board, and only they see it
+  const liveId = await openLiveId(page);
+  await page.selectOption('#openAth', 'eli_new'); await L.settle(page, 100);
+  st = await openRead(page);
+  check(r, 'picking someone who is not in the crew says what that means: off the board, and only they see it in their app (never that nobody does)', /They are not in the crew, so this stays off the board and only they see it, in their app\.$/.test(st.hint) && !/nobody|no one/i.test(st.hint), st.hint);
+  await page.locator('#openVal').fill('130'); await page.locator('#openDay').fill('2026-11-09');
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openResBox', 'Confirm result').click(); await L.settle(page, 500);
+  cs = await L.callsSince(page, n0);
+  check(r, 'Confirm calls coach_open_result for him like for anyone, and reads nothing again', rpcs(cs, 'coach_open_result').length === 1 && JSON.stringify(rpcs(cs, 'coach_open_result')[0].payload) === JSON.stringify({ p_athlete: 'eli_new', p_value: 130, p_day: '2026-11-09' }) && rpcs(cs, 'coach_open').length === 0, rpcs(cs, 'coach_open_result').map(c => c.payload));
+  n0 = await L.nCalls(page);
+  await page.locator('#openHead button', { hasText: 'Reload' }).click(); await L.settle(page, 500);
+  check(r, 'Reload reads coach_open once', rpcs(await L.callsSince(page, n0), 'coach_open').length === 1, '');
+  st = await openRead(page);
+  check(r, 'Eli\'s 130 is the best number but he is not in the crew: he is listed LAST with no place and a quiet mark, and the crew\'s places are still Ben 1 and Ava 2',
+    JSON.stringify(st.rows.map(x => [x.pos, x.name, x.chip, x.value])) === JSON.stringify([['1', 'Ben E.', '', '120 seconds'], ['2', 'Ava E.', '', '100 seconds'], ['–', 'Eli Example', 'Not in the crew', '130 seconds']]) && !/top/.test(st.rows[2].cls), st.rows.map(x => [x.pos, x.name, x.chip, x.value]));
+  check(r, 'he is shown by his name (never the id the server sends back as his name), and no athlete id is on the screen anywhere in the panel', st.rows[2].sub === '9 Nov' && !/eli_new|ava_test|ben_test|_test|_new/.test(st.text), st.text.slice(0, 300));
+  check(r, 'every row, his too, can be taken off', st.rows.every(x => x.take), st.rows.map(x => x.take));
+  // anyone the crew list names stays offered whatever their tier, so a result already recorded can be corrected: a free athlete who is in the crew list is in the crew group
+  await page.evaluate(() => { window.__DB.crew_bell.people.push({ athlete_id: 'cara_free', answer: 'yes', under13: false, answered_at: '2026-11-05T09:00:00.000Z', kinds_off: [] }); });
+  await page.locator('#openHead button', { hasText: 'Reload' }).click(); await L.settle(page, 500);
+  st = await openRead(page);
+  check(r, 'a free athlete the crew list DOES name is offered, in the crew group', JSON.stringify(st.groups.map(g => [g[0], g[1].map(o => o[0])])) === JSON.stringify([['In the crew (on the board)', ['ava_test', 'ben_test', 'cara_free']], ['Not in the crew (off the board)', ['eli_new']]]), st.groups);
+  await page.evaluate(() => { window.__DB.crew_bell.people = window.__DB.crew_bell.people.filter(p => p.athlete_id !== 'cara_free'); });
+  await page.locator('#openHead button', { hasText: 'Reload' }).click(); await L.settle(page, 500);
+  check(r, 'and once she is out of the crew list she is not offered again', !(await openRead(page)).options.some(o => o[0] === 'cara_free'), '');
+
+  // 6. The look, with the most on screen: the correct form open and a Take off panel open
+  await openBtn(page, '#openNow', 'Correct the words').click(); await L.settle(page, 250);
+  st = await openRead(page);
+  const fill = await page.evaluate(() => ({ title: document.getElementById('openTitle').value, how: document.getElementById('openHow').value, unit: document.getElementById('openUnit').value, better: document.querySelector('#openFormBox .seg.active').dataset.better }));
+  check(r, 'Correct the words opens the form with the live words, unit and direction in it, and the form\'s button is plain (Confirm result stays the one primary)', fill.title === 'Wall Sit' && /^Back flat on the wall/.test(fill.how) && fill.unit === 'seconds' && fill.better === 'high' && JSON.stringify(st.primaries) === JSON.stringify(['Confirm result']), { fill, primaries: st.primaries });
+  await openRow(page, 'ava_test').locator('button', { hasText: 'Take off' }).click(); await L.settle(page, 200);
+  for (const w of [1280, 390, 320]) {
+    await page.setViewportSize({ width: w, height: 900 });
+    await L.settle(page, 200);
+    const o = await page.evaluate(() => ({ over: document.documentElement.scrollWidth - document.documentElement.clientWidth, panel: document.getElementById('openPanel').scrollWidth - document.getElementById('openPanel').clientWidth }));
+    check(r, `at ${w} px the page and the panel do not scroll sideways`, o.over <= 0 && o.panel <= 0, o);
+    const bad = await lookOf(page, '#openPanel');
+    check(r, `at ${w} px the panel keeps the look (sizes, corners, faces, 32 px buttons, one primary button)`, bad.length === 0, bad.slice(0, 6));
+  }
+  await page.screenshot({ path: path.join(L.OUT, 'open-panel.png') });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.locator('#dangerNo').click(); await L.settle(page, 100);
+
+  // 7. Correct the words: the id goes with it, the results stay, a Reload does not lose what is typed
+  await page.locator('#openTitle').fill('Wall Sit, side-on');
+  n0 = await L.nCalls(page);
+  await page.locator('#openHead button', { hasText: 'Reload' }).click(); await L.settle(page, 400);
+  check(r, 'a Reload while the form is open keeps what was typed in it (and its focus place)', (await page.locator('#openTitle').inputValue()) === 'Wall Sit, side-on' && rpcs(await L.callsSince(page, n0), 'coach_open').length === 1, await page.locator('#openTitle').inputValue());
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'rpc', name: 'coach_open_set', message: 'no such challenge is open', times: 1 }); });
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openFormBox', 'Save the words').click(); await L.settle(page, 500);
+  check(r, '"no such challenge is open" (the challenge was closed or replaced elsewhere) is said in plain words, the form keeps what was typed, and the panel is read again', /That challenge is no longer open/.test(await L.failText(page)) && !/no such challenge is open/.test(await L.failText(page)) && (await page.locator('#openTitle').inputValue()) === 'Wall Sit, side-on' && rpcs(await L.callsSince(page, n0), 'coach_open').length === 1, await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openFormBox', 'Save the words').click(); await L.settle(page, 500);
+  cs = await L.callsSince(page, n0); sc = rpcs(cs, 'coach_open_set');
+  check(r, 'Save sends the live challenge\'s id (p_id) with the new words, without asking', sc.length === 1 && sc[0].payload.p_id === liveId && sc[0].payload.p_title === 'Wall Sit, side-on' && sc[0].payload.p_better === 'high' && (await page.locator('.dangerask').count()) === 0, sc.map(c => c.payload));
+  st = await openRead(page);
+  check(r, 'the title changed, the three results stayed, and the form is gone', st.title === 'Wall Sit, side-on' && st.rows.length === 3 && !st.form && /Words corrected/.test(await L.toastText(page)), { title: st.title, rows: st.rows.length });
+
+  // 8. Take off asks first
+  n0 = await L.nCalls(page);
+  await openRow(page, 'ava_test').locator('button', { hasText: 'Take off' }).click(); await L.settle(page, 200);
+  const ask = (await page.locator('#openBoard .dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'Take off opens a panel right under that row: whose result, the number that goes, what stays', /Take Ava E\.'s result off\?/.test(ask) && /Their 100 seconds leaves the board now/.test(ask) && /Stays: The challenge, everyone else's results/.test(ask) && (await openRow(page, 'ava_test').locator('xpath=following-sibling::*[1]').locator('.dangerask').count()) === 1, ask);
+  check(r, 'and nothing has been taken off yet', rpcs(await L.callsSince(page, n0), 'coach_open_remove').length === 0, '');
+  await page.locator('#dangerNo').click(); await L.settle(page, 150);
+  check(r, 'Cancel closes it with no call', (await page.locator('.dangerask').count()) === 0 && rpcs(await L.callsSince(page, n0), 'coach_open_remove').length === 0, '');
+  await openRow(page, 'ava_test').locator('button', { hasText: 'Take off' }).click(); await L.settle(page, 150);
+  await page.locator('#dangerGo').click(); await L.settle(page, 600);
+  cs = await L.callsSince(page, n0);
+  check(r, 'the final button calls coach_open_remove with that athlete, then the board is drawn from the answer (no second read)', rpcs(cs, 'coach_open_remove').length === 1 && JSON.stringify(rpcs(cs, 'coach_open_remove')[0].payload) === JSON.stringify({ p_athlete: 'ava_test' }) && rpcs(cs, 'coach_open').length === 0, rpcs(cs, 'coach_open_remove').map(c => c.payload));
+  st = await openRead(page);
+  check(r, 'Ava is off the board, Ben is 1st alone, Eli keeps his mark, and a line says so', JSON.stringify(st.rows.map(x => [x.pos, x.name])) === JSON.stringify([['1', 'Ben E.'], ['–', 'Eli Example']]) && /Ava's result is off/.test(await L.toastText(page)) && (await page.locator('.dangerask').count()) === 0, { rows: st.rows.map(x => [x.pos, x.name]), toast: await L.toastText(page) });
+
+  // 9. The server's refusals are said in plain words; a missing answer is a failure
+  await page.selectOption('#openAth', 'ava_test'); await page.locator('#openVal').fill('90');
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'rpc', name: 'coach_open_result', message: 'no challenge is open', times: 1 }); });
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openResBox', 'Confirm result').click(); await L.settle(page, 500);
+  check(r, '"no challenge is open" is said in plain words and the panel is read again', /No challenge is open any more/.test(await L.failText(page)) && rpcs(await L.callsSince(page, n0), 'coach_open').length === 1, await L.failText(page));
+  await page.evaluate(() => { failDismissAll(); window.__STUB.fail.push({ kind: 'rpc', name: 'coach_open_result', message: 'no athlete "ava_test"', times: 1 }); });
+  await page.selectOption('#openAth', 'ava_test'); await page.locator('#openVal').fill('90');
+  await openBtn(page, '#openResBox', 'Confirm result').click(); await L.settle(page, 400);
+  check(r, '"no athlete" is said in plain words, without printing the id', /The server has no athlete with that id/.test(await L.failText(page)) && !/ava_test/.test(await L.failText(page)), await L.failText(page));
+  await page.evaluate(() => { failDismissAll(); window.__STUB.fail.push({ kind: 'rpc', name: 'coach_open_result', message: 'TypeError: Failed to fetch', code: '', times: 1 }); });
+  await page.selectOption('#openAth', 'ava_test'); await page.locator('#openVal').fill('90'); n0 = await L.nCalls(page);
+  await openBtn(page, '#openResBox', 'Confirm result').click(); await L.settle(page, 500);
+  check(r, 'an answer that never arrived does not claim the result failed, and the panel is read again so Amir can look', /answer never arrived/.test(await L.failText(page)) && /cannot tell whether it went through/.test(await L.failText(page)) && rpcs(await L.callsSince(page, n0), 'coach_open').length === 1, await L.failText(page));
+  await page.evaluate(() => { failDismissAll(); window.__STUB.openWriteNull = 1; });
+  await page.selectOption('#openAth', 'ava_test'); await page.locator('#openVal').fill('90'); n0 = await L.nCalls(page);
+  await openBtn(page, '#openResBox', 'Confirm result').click(); await L.settle(page, 600);
+  check(r, 'a write that comes back with nothing in it is a failure (not a save): it says so, and the panel is read again', /server sent no answer, so nothing is known to have changed/.test(await L.failText(page)) && !/Result saved/.test(await L.toastText(page)) && rpcs(await L.callsSince(page, n0), 'coach_open').length === 1, await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  st = await openRead(page);
+  check(r, 'the read after it shows what the server really holds (Ava\'s 90 did go in): Ben 1, Ava 2, Eli with his mark', JSON.stringify(st.rows.map(x => [x.pos, x.name, x.value])) === JSON.stringify([['1', 'Ben E.', '120 seconds'], ['2', 'Ava E.', '90 seconds'], ['–', 'Eli Example', '130 seconds']]), st.rows.map(x => [x.pos, x.name, x.value]));
+
+  // 10. Starting a new challenge over an open one asks first (it closes that one)
+  await openBtn(page, '#openNow', 'Start a new one').click(); await L.settle(page, 250);
+  check(r, 'Start a new one opens an empty form', (await page.locator('#openTitle').inputValue()) === '' && /^a new challenge$/i.test(await page.locator('#openFormBox .eyebrow').innerText()), '');
+  await page.locator('#openTitle').fill('Burpee Test'); await page.locator('#openUnit').fill('reps');
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openFormBox', 'Start the challenge').click(); await L.settle(page, 250);
+  const ask2 = (await page.locator('#openFormBox .dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'Start asks first: it says which challenge closes and that its results are kept, and sends nothing yet', /Wall Sit, side-on closes now and its board leaves Crew/.test(ask2) && /kept, listed under Past challenges/.test(ask2) && rpcs(await L.callsSince(page, n0), 'coach_open_set').length === 0, ask2);
+  await page.locator('#dangerNo').click(); await L.settle(page, 150);
+  check(r, 'Cancel closes the question, keeps the form and what was typed, and sends nothing', (await page.locator('.dangerask').count()) === 0 && (await page.locator('#openTitle').inputValue()) === 'Burpee Test' && rpcs(await L.callsSince(page, n0), 'coach_open_set').length === 0, '');
+  await openBtn(page, '#openFormBox', 'Start the challenge').click(); await L.settle(page, 150);
+  await page.locator('#dangerGo').click(); await L.settle(page, 600);
+  sc = rpcs(await L.callsSince(page, n0), 'coach_open_set');
+  check(r, 'the final button starts it: no p_id, higher wins; the old challenge is now the newest past one with its three results', sc.length === 1 && JSON.stringify(sc[0].payload) === JSON.stringify({ p_title: 'Burpee Test', p_how: '', p_unit: 'reps', p_better: 'high' }), sc.map(c => c.payload));
+  st = await openRead(page);
+  check(r, 'the new challenge is on show with an empty board, the old one heads the past list (3 results, opened and closed on the 12th), and the result form started again', st.title === 'Burpee Test' && st.board.indexOf('No result confirmed yet.') >= 0 && st.past[0].name === 'Wall Sit, side-on seconds' && st.past[0].when === '12 Nov to 12 Nov · 3 results' && st.past.length === 3 && st.sel === '', { title: st.title, past: st.past, sel: st.sel });
+
+  // 11. Close asks first
+  n0 = await L.nCalls(page);
+  await openBtn(page, '#openNow', 'Close the challenge').click(); await L.settle(page, 200);
+  const ask3 = (await page.locator('#openNow .dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'Close opens a panel under its button: which challenge, that the board leaves Crew, and that its results are kept (0 results here)', /Close Burpee Test\?/.test(ask3) && /board leaves Crew now/.test(ask3) && /Its 0 results, kept under Past challenges/.test(ask3) && rpcs(await L.callsSince(page, n0), 'coach_open_close').length === 0, ask3);
+  await page.locator('#dangerNo').click(); await L.settle(page, 150);
+  check(r, 'Cancel closes it with no call', (await page.locator('.dangerask').count()) === 0 && rpcs(await L.callsSince(page, n0), 'coach_open_close').length === 0, '');
+  await openBtn(page, '#openNow', 'Close the challenge').click(); await L.settle(page, 150);
+  await page.locator('#dangerGo').click(); await L.settle(page, 600);
+  cs = await L.callsSince(page, n0);
+  check(r, 'the final button calls coach_open_close (no arguments), and nothing is read again', rpcs(cs, 'coach_open_close').length === 1 && rpcs(cs, 'coach_open_close')[0].payload == null && rpcs(cs, 'coach_open').length === 0, rpcs(cs, 'coach_open_close').map(c => c.payload));
+  st = await openRead(page);
+  check(r, 'the empty state is back, the result form and the board are gone, and the closed one is in the past list', /Nothing is open/.test(st.now) && st.board === '' && (await page.locator('#openAth').count()) === 0 && st.past[0].name === 'Burpee Test reps' && /Challenge closed/.test(await L.toastText(page)), { now: st.now, past: st.past.map(p => p.name) });
+
+  // 12. The past list is the last five closed, as the server sends them
+  await page.evaluate(() => {
+    const s = window.__DB.crew_open_state;
+    [['Test A', '2026-10-20'], ['Test B', '2026-10-25'], ['Test C', '2026-10-30']].forEach(([title, d], i) => s.challenges.push({ id: 'c0000000-0000-4000-8000-0000000000b' + i, title, how: '', unit: '', better: 'high', opened_on: d, closed_at: d + 'T09:00:00.000Z', created_at: d + 'T09:00:00.000Z' }));
+  });
+  await page.locator('#openHead button', { hasText: 'Reload' }).click(); await L.settle(page, 500);
+  st = await openRead(page);
+  check(r, 'seven challenges are closed and five are listed, the two oldest (Plank Hold, One Kilometre Row) gone; one without a unit shows no unit', st.past.length === 5 && !st.past.some(p => /Plank Hold|One Kilometre Row/.test(p.name)) && st.past.some(p => p.name === 'Test C'), st.past.map(p => p.name));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // 13. The challenge is closed in another tab while the correct form is open: the server refuses the correction (the real function, not a fixture failure), the panel says so and drops the form
+  const y = await L.openCoach(b, Object.assign({ seed: { open: true } }, BELL_T));
+  await y.page.waitForSelector('#openPanel');
+  await openBtn(y.page, '#openNow', 'Start a challenge').click(); await L.settle(y.page, 200);
+  await y.page.locator('#openTitle').fill('Plank'); await openBtn(y.page, '#openFormBox', 'Start the challenge').click(); await L.settle(y.page, 400);
+  await openBtn(y.page, '#openNow', 'Correct the words').click(); await L.settle(y.page, 200);
+  await y.page.locator('#openTitle').fill('Plank, side-on');
+  await y.page.evaluate(() => { window.__DB.crew_open_state.challenges.forEach(c => { if (!c.closed_at) c.closed_at = new Date().toISOString(); }); });
+  const m0 = await L.nCalls(y.page);
+  await openBtn(y.page, '#openFormBox', 'Save the words').click(); await L.settle(y.page, 600);
+  const ys = await openRead(y.page);
+  check(r, 'a correction of a challenge closed elsewhere is refused by the server, said in plain words, and the panel reads again: the empty state, the form gone, the closed one in the past list',
+    /That challenge is no longer open/.test(await L.failText(y.page)) && rpcs(await L.callsSince(y.page, m0), 'coach_open_set').length === 1 && rpcs(await L.callsSince(y.page, m0), 'coach_open').length === 1
+    && /Nothing is open/.test(ys.now) && !ys.form && ys.past[0].name === 'Plank', { fail: await L.failText(y.page), now: ys.now, past: ys.past.map(p => p.name) });
+  check(r, 'no page errors (closed elsewhere)', !y.log.errors.length, y.log.errors);
+  await y.page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));

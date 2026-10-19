@@ -658,6 +658,40 @@
   .bell-p .off { font-size: 12px; color: var(--muted); }
   .bell-u13 { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
 
+  /* ── The Monthly Open (stage84): the one challenge Amir sets, the results he confirms, the board the crew sees (Proof, under Who said yes). ── */
+  .open-title { font-size: 17px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+  .open-how { margin-top: 4px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-line; }
+  .open-facts { margin-top: 4px; }
+  .open-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+  .open-box { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rule); }
+  .open-box .cap { margin-bottom: 8px; }
+  .open-form { display: grid; gap: 12px; }
+  .open-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .open-grid.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .open-f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .open-f > span { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .open-f .segs { align-self: flex-start; }
+  .open-in { width: 100%; height: 32px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; font-size: 14px; }
+  textarea.open-in { height: auto; min-height: 64px; padding: 8px 12px; line-height: 1.45; resize: vertical; }
+  .open-in:focus { border-color: var(--court); }
+  .open-hint { margin-top: 8px; }
+  .open-eb { margin: 16px 0 4px; }
+  .open-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 12px 0; border-top: 1px solid var(--rule); }
+  .open-row .pos { flex: none; width: 32px; height: 32px; border-radius: 999px; display: flex; align-items: center; justify-content: center;
+                   font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; background: var(--track); color: var(--muted); }
+  .open-row.top1 .pos, .open-row.top2 .pos, .open-row.top3 .pos { background: var(--court); color: #fff; }
+  .open-row .nm { flex: 1 1 10em; min-width: 0; }
+  .open-row .nm b { font-weight: 600; font-size: 17px; overflow-wrap: anywhere; }
+  .open-row .nm small { display: block; font-size: 12px; color: var(--muted); }
+  .open-row .v { flex: none; text-align: right; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .open-row .v small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
+  .open-p { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 8px 0; border-top: 1px solid var(--rule); font-size: 14px; }
+  .open-p .nm { flex: 1 1 10em; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
+  .open-p .when { font-size: 12px; color: var(--muted); }
+  .open-f .seg { white-space: nowrap; }
+  @media (max-width: 560px) { .open-grid, .open-grid.two { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 899px) and (pointer: coarse) { .open-in { font-size: 16px; } }
+
   /* ── Quest panel ── */
   /* Proof's right column (about 490 px wide at most): no box around the live run (rows divided by hairlines), and a quest's note drops
      under its name and XP instead of squeezing between them. */
@@ -1703,6 +1737,7 @@ const S = {
   callLogs: {},    // athlete_id -> rows (fetched on detail)
   court: null,     // Courtside (stage75): { on, week, rows, err }; on is false while the server has no get_courtside() (loadCourt())
   bell: null,      // The Bell (stage81): { on, posts, people, rings, err, at }; on is false while the server has no coach_crew() (loadBell())
+  open: null,      // The Monthly Open (stage84): { on, open, results, past, crew, err, at }; on is false while the server has no coach_open() (loadOpen())
   honours: null,   // the month just gone: coach_honours()'s answer (frozen rows, or the live work and the Pick's shortlist)
   goals: {},       // athlete_id -> { 'YYYY-MM-01': career_goals row }
   amirNotes: {},   // athlete_id -> career_notes rows ("From Amir", one a day)
@@ -1811,7 +1846,7 @@ const LOAD_ERR_LABEL = {
   programs: 'programmes', logins: 'athlete logins', contacts: 'Proof contacts', intake: 'intake forms',
   assess: 'testing-app logins', course: 'course logins', buyerNotes: 'your notes about buyers', spine: 'the exercise library (Spine)',
   affiliates: 'affiliate codes', chats: 'website chats', status: 'paused and former marks', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
-  court: 'Courtside, the goals and your lines', bell: 'the Bell (the crew\'s posts and answers)',
+  court: 'Courtside, the goals and your lines', bell: 'the Bell (the crew\'s posts and answers)', open: 'the Monthly Open',
 };
 function paintLoadWarn() {
   const lw = $('loadwarn'), warn = loadWarnHtml();
@@ -2155,6 +2190,10 @@ const BACKUP_TABLES = [
   // (crew_posts, crew_photos, crew_kudos, crew_rings) are left OUT on purpose: they are deleted after 7 days, and a backup kept 12 weeks
   // would break that promise in privacy.html 2.12 (SHORT_LIVED in scripts/restore/restore_backup.py; test_restore_backup.py check 2h).
   'crew_consent',
+  // ⚠ The Monthly Open (stage84) is the other way round: a challenge and the results Amir confirmed are a RECORD, not a post. They are not deleted
+  // after 7 days, they are months of work in a handful of rows, and nothing else could rebuild them. So the Open's two tables are ADDED HERE the
+  // day stage84 is applied, in the same commit as the new schema snapshot (test_restore_backup.py check 1h holds the two equal, and it reads the
+  // quoted names out of this block, so do not write a table name in quotes in a comment).
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
   'library', 'library_categories', 'library_sessions',
@@ -2945,6 +2984,7 @@ async function hardRefresh() {
   loadLevels().then(() => { if (S.ready) paintLevels(); });   // ↻ used to drop the levels and never fetch them again; they are filled in place (ROSTER-15)
   loadCourt();
   loadBell();
+  loadOpen();
 }
 let _lastViewKey = '', _scrollMem = {}, _viaHistory = false, _pendingScroll = null;
 // Back keeps your place (audit BROWSER-4, 2026-10-11). A new screen starts at the top, but going Back to one you left lands where you were on it:
@@ -6619,6 +6659,7 @@ let _boardScope = 'season';
 async function renderProof() {
   const scope = _boardScope;
   if (S.bell && S.bell.on && S.bell.at && Date.now() - S.bell.at.getTime() > 60000) loadBell();   // a post can be minutes old: read the Bell again, behind the paint
+  if (S.open && S.open.on && S.open.at && Date.now() - S.open.at.getTime() > 60000) loadOpen();   // and so can a result (another tab, the SQL editor): read the Open again
   const held = DEMO ? (S.board[scope] || []) : S.board[scope];
   drawProof(held || undefined);                           // undefined = still to be read
   if (held) return;
@@ -6636,6 +6677,7 @@ function drawProof(rows) {
       <div class="colstack">
         <section class="panel" id="wallPanel">${wallPanelHtml()}</section>
         ${bellPanelsHtml()}
+        ${openPanelHtml()}
         <section class="panel" id="boardPanel">${boardPanelHtml(rows)}</section>
       </div>
       <div class="colstack">
@@ -6971,6 +7013,349 @@ async function bellSetUnder13(id, on) {
 }
 window.loadBell = loadBell; window.bellPost = bellPost; window.bellPick = bellPick; window.bellDropPhoto = bellDropPhoto;
 window.bellShowPhoto = bellShowPhoto; window.bellHidePhoto = bellHidePhoto; window.bellRemove = bellRemove; window.bellUnder13 = bellUnder13;
+
+// ── The Monthly Open (stage84; Career Mode round 5, the last step of plan A; Amir 2026-10-19: "for crew and the open go with your picks") ──────────────────
+// One challenge at a time, any kind Amir designs (not only the six tennis tests). On the athletes' Crew tab it is a card under the feed, with a board ranked by
+// the result. Athletes send the clip on WhatsApp and NOTHING is stored: the board holds only what Amir types in here. This panel (Proof, under Who said yes)
+// shows the live challenge, sets or corrects it (coach_open_set), confirms a result (coach_open_result; typed again, it replaces the first), takes one off
+// (coach_open_remove) and closes the challenge (coach_open_close). Taking a result off and closing ask first, and so does starting a new challenge over an open
+// one (it closes that one). All five answer coach_open()'s shape, {open, results, past, crew, at}, so the panel is drawn from whatever a write returns and
+// costs no second read. While the server has no coach_open() (stage84 not applied), or answers nothing at all, the page draws nothing and shows no warning, as
+// the Bell does; any other failure shows the panel with the reason and Try again. The board is the crew's: places are worked out among crew members only,
+// so they are the places the athletes see. A result can be confirmed for any COACHED athlete the dashboard shows (not the demo, not Amir's own identity, not a
+// former athlete, and only one with a programme: the server refuses anyone else), not only the crew; the picker marks who is in the crew. A free athlete is never
+// offered: Crew is a tab in the coached app only, so they could never see the challenge or their own result (anyone the crew list names stays offered, whatever
+// their tier, so a result already recorded can be corrected). A result for someone who is not in the crew stays off the board and shows only to that athlete,
+// in their own app, so it is listed after the board with a quiet mark and no place.
+// The Open pays no XP (GAME-6). Not in BACKUP_TABLES until stage84 is applied (see COACH_DASHBOARD.md).
+const OPEN_ERRS = [   // [a part of the server's message, plain words]
+  ['the challenge needs a name', 'Give the challenge a name first (up to 60 characters).'],
+  ['no challenge is open', 'No challenge is open any more, so nothing was changed. The panel is reloading.'],
+  ['no such challenge is open', 'That challenge is no longer open (it was closed or replaced, maybe in another tab), so nothing was changed. The panel is reloading.'],
+  ['no athlete "', 'The server has no athlete with that id, so the result was not saved. Refresh and try again.'],
+  ['coach only', 'The server does not see you signed in as the coach. Refresh, sign in again if asked, and redo it.'],
+  ['check constraint', 'The server refused that number. A result is a number under a million, up or down.'],
+  ['invalid input syntax', 'The server could not read that as a number.'],
+];
+const OPEN_HOW = [
+  '<b>How it works:</b> one challenge is open at a time, and it can be any kind you design. Athletes send the clip on WhatsApp; nothing is stored until you type the result here. A result typed again for the same athlete replaces the first one.',
+  '<b>The board</b> on Crew shows the crew members who said yes, ranked by the result: higher or lower wins, as you set it (a time is lower; reps and kilos are higher). Ties share a place. You can confirm a result for any athlete, in the crew or not. One who has not joined the crew stays off the board and is marked here; only they see their own result, in their own app.',
+  '<b>The Bell:</b> a confirmed result rings the Bell once for a crew member who has the Open switched on. Taking a result off takes its line away too.',
+  '<b>Closing</b> a challenge keeps every result under Past challenges and takes the board off Crew. Starting a new one closes the open one. The Open pays no XP (GAME-6).',
+];
+const openBlank = () => ({ title: '', how: '', unit: '', better: 'high' });
+let _openForm = null;                  // null = no form; { id: null } = a new challenge; { id: <the live one's id> } = correcting its words
+let _openDraft = openBlank();          // what is typed in the challenge form
+let _openRes = { athlete: '', value: '', day: '' };   // what is typed in the result form
+let _openBusy = false, _openSeq = 0, _openFormKey = '';
+// The server has no stage84 yet: the function is not there. Anything else is a real error and is said.
+const openMissing = res => !!res && !!res.error && (res.status === 404 || courtMissing(res.error)
+  || (/coach_open/.test(res.error.message || '') && /does not exist|could not find|not found/i.test(res.error.message || '')));
+const openValid = d => !!d && typeof d === 'object' && !Array.isArray(d) && Array.isArray(d.results);
+// Words for an error from an Open write. No database code means the answer never arrived: the write may have gone in, so the page does not say it did not.
+function openErrText(e, lead) {
+  const m = String((e && e.message) || '');
+  if (e && !e.code) return `The answer never arrived (${m || 'no reply'}), so the page cannot tell whether it went through. The panel is reloading: look at it before you try again.`;
+  const k = OPEN_ERRS.find(x => m.indexOf(x[0]) >= 0);
+  return k ? k[1] : lead + m;
+}
+const openNum = v => { const n = Number(v); return Number.isFinite(n) ? String(Math.round(n * 100) / 100) : String(v); };
+// "12 Nov" from a date or a timestamp, with the year only when it is not this one.
+function openDay(iso) {
+  if (!iso) return '';
+  const s = String(iso), k = /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : (isNaN(new Date(s)) ? '' : dkey(new Date(s)));
+  return k ? dayMonth(k) + (k.slice(0, 4) !== String(new Date().getFullYear()) ? ' ' + k.slice(0, 4) : '') : '';
+}
+const openCrewName = id => { const c = ((S.open && S.open.crew) || []).find(x => x.athlete_id === id); return c ? c.who : ''; };
+const openWho = id => openCrewName(id) || nameOf(id);       // never the raw id where a name is known
+const openReal = id => (S.ath[id] ? S.ath[id].name : '');
+const openResultOf = id => (id ? ((S.open && S.open.results) || []).find(r => r.athlete_id === id) || null : null);
+
+// What the server answered, kept. A form that points at a challenge that is no longer the live one (closed or replaced in another tab) is dropped, so a
+// correction never lands on the wrong one; a new live challenge starts the result form afresh.
+function setOpen(d) {
+  const was = S.open && S.open.on && S.open.open ? S.open.open.id : null;
+  S.open = { on: true, err: '', open: d.open || null, results: d.results || [], past: d.past || [], crew: d.crew || [], at: new Date() };
+  LOAD_ERR.open = '';
+  if ((S.open.open ? S.open.open.id : null) !== was) _openRes = { athlete: '', value: '', day: '' };
+  if (_openRes.athlete && !S.open.crew.some(c => c.athlete_id === _openRes.athlete)) _openRes.athlete = '';
+  if (_openForm && _openForm.id && !(S.open.open && S.open.open.id === _openForm.id)) _openForm = null;
+}
+async function loadOpen() {
+  if (DEMO) return;
+  const seq = ++_openSeq;
+  const res = await sb.rpc('coach_open');
+  if (seq !== _openSeq) return;
+  // Not there (stage84 not applied) or an answer with nothing in it: no panel and no warning.
+  if (openMissing(res) || (!res.error && !openValid(res.data))) { S.open = { on: false }; LOAD_ERR.open = ''; paintOpen(); return; }
+  if (res.error) { S.open = { on: true, err: res.error.message || 'no answer', open: null, results: [], past: [], crew: [], at: new Date() }; LOAD_ERR.open = S.open.err; paintOpen(); return; }
+  setOpen(res.data);
+  paintOpen();
+}
+// One write. Returns the new state, or null after saying why (a missing answer is a failure, like writeFailed(): a lapsed sign-in must not look like a save).
+async function openWrite(name, params, lead) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return null; }
+  if (_openBusy) return null;
+  _openBusy = true;
+  const btns = [...document.querySelectorAll('#openResBtn, #openFormBox .open-acts .btn')];
+  btns.forEach(b => { b.disabled = true; });
+  try {
+    const res = await sb.rpc(name, params);
+    if (res.error) {
+      fail(openErrText(res.error, lead));
+      if (!res.error.code || /no challenge is open|no such challenge/.test(res.error.message || '')) await loadOpen();
+      return null;
+    }
+    if (!openValid(res.data)) {
+      fail(`${lead}the server sent no answer, so nothing is known to have changed. Your sign-in may have lapsed. The panel is reloading: look at it, sign in again if asked, and redo it.`);
+      await loadOpen();
+      return null;
+    }
+    _openSeq++;          // a read still on its way is older than this answer: it must not draw over it
+    setOpen(res.data);
+    return S.open;
+  } finally { _openBusy = false; btns.forEach(b => { if (b.isConnected) b.disabled = false; }); }
+}
+
+// Draw what changed where it stands. The two forms are drawn again only when their shape changes (a challenge opened, closed or replaced, a form opened or
+// shut, a new crew list), so what is being typed keeps its focus through a Reload; the panel itself is drawn by drawProof() when it has just appeared or gone.
+function paintOpen() {
+  if (!S.ready || route().view !== 'proof') return;
+  const on = !!(S.open && S.open.on), el = $('openPanel');
+  if (!el || !on) { if (!!el !== on) render(); return; }
+  $('openHead').innerHTML = openHeadHtml();
+  $('openNow').innerHTML = openNowHtml();
+  $('openBoard').innerHTML = openBoardHtml();
+  $('openPast').innerHTML = openPastHtml();
+  const key = openFormsKey();
+  if (key !== _openFormKey) { _openFormKey = key; $('openFormBox').innerHTML = openFormHtml(); $('openResBox').innerHTML = openResHtml(); }
+}
+function openFormsKey() {
+  const b = S.open || {}, o = b.open;
+  const pl = openPickList();
+  return [b.err ? 'err' : 'ok', o ? o.id + '/' + o.unit : '-', _openForm ? (_openForm.id || 'new') : 'x', pl.inCrew.map(r => r.id).join(','), pl.others.map(r => r.id).join(',')].join('|');
+}
+function openPanelHtml() {
+  if (!(S.open && S.open.on)) return '';
+  _openFormKey = openFormsKey();
+  return `<section class="panel" id="openPanel"><div id="openHead">${openHeadHtml()}</div>
+      <div id="openNow">${openNowHtml()}</div>
+      <div id="openFormBox">${openFormHtml()}</div>
+      <div id="openResBox">${openResHtml()}</div>
+      <div id="openBoard">${openBoardHtml()}</div>
+      <div id="openPast">${openPastHtml()}</div>
+      ${howFold('how-open', OPEN_HOW)}</section>`;
+}
+function openHeadHtml() {
+  const at = S.open && S.open.at;
+  return `<div class="phead"><span class="t hd">The Monthly Open</span><span class="r">${at ? `As of ${pad2(at.getHours())}:${pad2(at.getMinutes())}. ` : ''}<button class="btn sm quiet" onclick="loadOpen()">↻ Reload</button></span></div>`;
+}
+// The live challenge, or the empty state that offers to start one.
+function openNowHtml() {
+  const b = S.open, o = b.open;
+  if (b.err) return `<p class="empty">The Monthly Open did not load: ${esc(b.err)}. <button class="btn sm" onclick="loadOpen()">↻ Try again</button></p>`;
+  if (!o) return `<p class="empty">Nothing is open. Start a challenge and it appears on Crew, under the feed.</p>` +
+    (_openForm ? '' : `<div class="open-acts"><button class="btn sm primary" onclick="openStart()">Start a challenge</button></div>`);
+  return `<div class="open-title" dir="auto">${esc(o.title)}</div>
+    ${o.how ? `<div class="open-how" dir="auto">${esc(o.how)}</div>` : ''}
+    <div class="muted t-sm open-facts">${o.unit ? `Counted in ${esc(o.unit)}` : 'A plain number'} · ${o.better === 'low' ? 'lower' : 'higher'} wins · opened ${esc(openDay(o.opened_on))}</div>
+    <div class="open-acts">
+      <button class="btn sm" onclick="openCorrect()">Correct the words</button>
+      <button class="btn sm" onclick="openStart()">Start a new one</button>
+      <button class="btn sm danger" onclick="openCloseAsk()">Close the challenge</button>
+    </div>
+    ${dangerSlot('open:close')}`;
+}
+// Set or correct the challenge. A new one is the panel's primary button only while nothing is open (the result form's button is the primary otherwise).
+function openFormHtml() {
+  const f = _openForm, b = S.open;
+  if (!f || b.err) return '';
+  const live = !!b.open, correcting = !!f.id, d = _openDraft;
+  return `<div class="open-box">
+      <div class="cap"><span class="eyebrow">${correcting ? 'Correct the words' : 'A new challenge'}</span></div>
+      <div class="open-form">
+        <label class="open-f"><span>Name</span><input id="openTitle" class="open-in" maxlength="60" dir="auto" value="${esc(d.title)}" placeholder="Wall Sit"
+          oninput="_openDraft.title=this.value" onkeydown="if(event.key==='Enter')openFormSave();if(event.key==='Escape')openFormClose()"></label>
+        <label class="open-f"><span>How to do it, and what counts</span><textarea id="openHow" class="open-in" maxlength="400" dir="auto"
+          placeholder="Back flat on the wall, thighs level with the floor. Film it side-on, one take." oninput="_openDraft.how=this.value">${esc(d.how)}</textarea></label>
+        <div class="open-grid two">
+          <label class="open-f"><span>Unit, shown after the number</span><input id="openUnit" class="open-in" maxlength="16" dir="auto" value="${esc(d.unit)}" placeholder="seconds" oninput="_openDraft.unit=this.value"></label>
+          <div class="open-f"><span>Which result wins</span><div class="segs" role="group" aria-label="Which result wins">
+            <button type="button" class="seg${d.better === 'low' ? '' : ' active'}" data-better="high" aria-pressed="${d.better === 'low' ? 'false' : 'true'}" onclick="openBetter('high')">Higher wins</button>
+            <button type="button" class="seg${d.better === 'low' ? ' active' : ''}" data-better="low" aria-pressed="${d.better === 'low' ? 'true' : 'false'}" onclick="openBetter('low')">Lower wins</button></div></div>
+        </div>
+      </div>
+      <div class="muted t-sm open-hint">${correcting ? 'Every result stays as it is.' : live ? 'The open challenge closes when this one starts. Its results are kept.' : 'It appears on Crew as soon as you start it.'}</div>
+      <div class="open-acts"><button class="btn sm${live ? '' : ' primary'}" onclick="openFormSave()">${correcting ? 'Save the words' : 'Start the challenge'}</button><button class="btn sm quiet" onclick="openFormClose()">Cancel</button></div>
+      ${dangerSlot('open:new')}
+    </div>`;
+}
+// Everyone a result can be confirmed for, in two groups by dashboard name: the COACHED athletes the dashboard shows (not the demo, not your own identity, not a
+// former athlete) who have a programme on the server (it refuses anyone else), plus anyone coach_open()'s crew list names, whatever their tier. A free athlete has no
+// Crew tab, so a result for them would reach nobody and nothing would say so. The crew's result reaches the board; the rest stay off it.
+function openPickList() {
+  const crew = {};
+  ((S.open && S.open.crew) || []).forEach(c => { crew[c.athlete_id] = c; });
+  const ids = new Set(Object.values(S.ath).filter(a => inTotals(a) && a.tier === 'coached' && S.programs[a.id]).map(a => a.id));
+  Object.keys(crew).forEach(id => ids.add(id));
+  const rows = [...ids].map(id => ({ id, name: nameOf(id), who: crew[id] ? crew[id].who : '', crew: !!crew[id] })).sort((x, y) => String(x.name).localeCompare(String(y.name)));
+  return { inCrew: rows.filter(r => r.crew), others: rows.filter(r => !r.crew) };
+}
+// Confirm a result: pick the athlete, type the number, say which day.
+function openResHtml() {
+  const b = S.open, o = b.open;
+  if (!o || b.err) return '';
+  const pl = openPickList();
+  if (!pl.inCrew.length && !pl.others.length) return `<div class="open-box"><div class="cap"><span class="eyebrow">Confirm a result</span></div><p class="empty">There is nobody to give a result to yet.</p></div>`;
+  const opt = r => `<option value="${esc(r.id)}"${r.id === _openRes.athlete ? ' selected' : ''}>${esc(r.name)}${r.who && r.who !== r.name ? ' · ' + esc(r.who) + ' on Crew' : ''}</option>`;
+  const opts = (pl.inCrew.length ? `<optgroup label="In the crew (on the board)">${pl.inCrew.map(opt).join('')}</optgroup>` : '')
+    + (pl.others.length ? `<optgroup label="Not in the crew (off the board)">${pl.others.map(opt).join('')}</optgroup>` : '');
+  return `<div class="open-box">
+      <div class="cap"><span class="eyebrow">Confirm a result</span></div>
+      <div class="open-grid">
+        <label class="open-f"><span>Athlete</span><select id="openAth" class="open-in" onchange="openPick(this.value)"><option value="">Choose an athlete</option>${opts}</select></label>
+        <label class="open-f"><span>Result${o.unit ? ` (${esc(o.unit)})` : ''}</span><input id="openVal" class="open-in" type="number" step="any" inputmode="decimal" value="${esc(_openRes.value)}"
+          oninput="_openRes.value=this.value" onkeydown="if(event.key==='Enter')openConfirm()"></label>
+        <label class="open-f"><span>Day they did it</span><input id="openDay" class="open-in" type="date" value="${esc(_openRes.day || todayKey())}" oninput="_openRes.day=this.value" onchange="_openRes.day=this.value"></label>
+      </div>
+      <div class="muted t-sm open-hint" id="openResHint" data-hint="open">${openResHintHtml()}</div>
+      <div class="open-acts"><button class="btn sm primary" id="openResBtn" onclick="openConfirm()">${openResultOf(_openRes.athlete) ? 'Replace result' : 'Confirm result'}</button></div>
+    </div>`;
+}
+function openResHintHtml() {
+  const o = S.open && S.open.open, id = _openRes.athlete, had = openResultOf(id);
+  const first = o && had ? `${esc(openWho(id))} already has ${esc(openNum(had.value))}${o.unit ? ' ' + esc(o.unit) : ''}${had.day ? ' from ' + esc(openDay(had.day)) : ''}. Confirming replaces it.`
+    : 'Confirm only what you have seen on WhatsApp. Typing one again replaces it.';
+  // who the result reaches: someone not in the crew is never on the board, and only they see it, in their own app
+  return first + (!id ? ' A result for someone not in the crew stays off the board.' : openCrewName(id) ? '' : ' They are not in the crew, so this stays off the board and only they see it, in their app.');
+}
+// The board as the crew sees it: places among crew members only (ties share one), then, set apart by a quiet mark and with no place, anyone who is not in the crew
+// (named from the dashboard's roster: the server sends their athlete id as `who`).
+function openBoardHtml() {
+  const b = S.open, o = b.open;
+  if (!o || b.err) return '';
+  const sign = o.better === 'low' ? 1 : -1, key = r => sign * Number(r.value), byWho = (x, y) => String(x.who).localeCompare(String(y.who));
+  const crewRows = (b.results || []).filter(r => r.in_crew).sort((x, y) => key(x) - key(y) || byWho(x, y));
+  const others = (b.results || []).filter(r => !r.in_crew).sort((x, y) => key(x) - key(y) || byWho(x, y));
+  const place = r => 1 + crewRows.filter(x => key(x) < key(r)).length;
+  const row = r => {
+    const inCrew = !!r.in_crew, pl = inCrew ? place(r) : 0, name = inCrew ? r.who : nameOf(r.athlete_id), real = inCrew ? openReal(r.athlete_id) : '';
+    const sub = [real && real !== name ? real : '', openDay(r.day)].filter(Boolean).join(' · ');
+    return `<div class="open-row${pl && pl <= 3 ? ' top' + pl : ''}" data-id="${esc(r.athlete_id)}">
+        <span class="pos">${pl || '–'}</span>
+        <span class="nm"><b dir="auto">${esc(name)}</b>${inCrew ? '' : ' <span class="chip" title="Kept, but never on the board. Only they see it, in their own app.">Not in the crew</span>'}${sub ? `<small>${esc(sub)}</small>` : ''}</span>
+        <span class="v">${esc(openNum(r.value))}${o.unit ? `<small>${esc(o.unit)}</small>` : ''}</span>
+        <button class="btn sm danger" onclick="openRemove(${jsq(r.athlete_id)})">Take off</button>
+      </div>${dangerSlot('open:rm:' + r.athlete_id)}`;
+  };
+  return `<div class="eyebrow open-eb">The board, as the crew sees it</div>` +
+    (crewRows.length || others.length ? crewRows.concat(others).map(row).join('') : '<p class="empty">No result confirmed yet.</p>');
+}
+// The last five closed challenges, newest first, as the server sent them.
+function openPastHtml() {
+  const b = S.open;
+  if (b.err || !(b.past || []).length) return '';
+  return `<div class="eyebrow open-eb">Past challenges</div>` + b.past.map(p => {
+    const n = Number(p.n) || 0;
+    return `<div class="open-p"><span class="nm" dir="auto">${esc(p.title)}${p.unit ? ` <span class="muted t-sm">${esc(p.unit)}</span>` : ''}</span>
+      <span class="when">${esc(openDay(p.opened_on))} to ${esc(openDay(p.closed_at))} · ${n} result${n === 1 ? '' : 's'}</span></div>`;
+  }).join('');
+}
+
+// ── the challenge form ──
+function openStart() { if (_openBusy) return; _openForm = { id: null }; _openDraft = openBlank(); paintOpen(); focusEnd('openTitle'); }
+function openCorrect() {
+  const o = S.open && S.open.open;
+  if (!o || _openBusy) return;
+  _openForm = { id: o.id }; _openDraft = { title: o.title, how: o.how || '', unit: o.unit || '', better: o.better === 'low' ? 'low' : 'high' };
+  paintOpen(); focusEnd('openTitle');
+}
+function openFormClose() {
+  if (_danger && _danger.key === 'open:new') dangerCancel();
+  _openForm = null; _openDraft = openBlank(); paintOpen();
+}
+function openBetter(v) {
+  _openDraft.better = v === 'low' ? 'low' : 'high';
+  document.querySelectorAll('#openFormBox .seg').forEach(s => { const on = s.dataset.better === _openDraft.better; s.classList.toggle('active', on); s.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+}
+function openFormSave() {
+  const f = _openForm;
+  if (!f || _openBusy) return;
+  const d = _openDraft, val = (id, fallback) => String($(id) ? $(id).value : fallback).trim();
+  const title = val('openTitle', d.title);
+  if (!title) { fail('Give the challenge a name first (up to 60 characters).'); return; }
+  const params = { p_title: title, p_how: val('openHow', d.how), p_unit: val('openUnit', d.unit), p_better: d.better === 'low' ? 'low' : 'high' };
+  if (f.id) { params.p_id = f.id; openSaveNow(params, true); return; }
+  const live = S.open && S.open.open;
+  if (!live) { openSaveNow(params, false); return; }
+  // Starting a new challenge closes the open one, and with it the board on Crew: ask first, as Close does.
+  dangerAsk('open:new', { title: `Start ${title} and close ${live.title}?`, goes: `${live.title} closes now and its board leaves Crew.`,
+    stays: 'Its results are kept, listed under Past challenges.', button: 'Start the new one', busyText: 'Starting…', run: () => openSaveNow(params, false) });
+}
+async function openSaveNow(params, correcting) {
+  const d = await openWrite('coach_open_set', params, correcting ? 'The words were not saved: ' : 'The challenge was not started: ');
+  if (!d) return;
+  _openForm = null; _openDraft = openBlank();
+  toast(correcting ? 'Words corrected' : `Challenge started: ${params.p_title}`);
+  paintOpen();
+}
+
+// ── results ──
+function openPick(id) {
+  _openRes.athlete = id;
+  const had = openResultOf(id), val = $('openVal'), day = $('openDay');
+  // An athlete who already has a result: the box shows it (when nothing is typed yet) and the hint says that confirming replaces it.
+  if (had && val && !String(val.value).trim()) { val.value = openNum(had.value); _openRes.value = val.value; if (day && had.day) { day.value = had.day; _openRes.day = had.day; } }
+  const h = $('openResHint'); if (h) h.innerHTML = openResHintHtml();
+  const bt = $('openResBtn'); if (bt) bt.textContent = had ? 'Replace result' : 'Confirm result';
+}
+async function openConfirm() {
+  if (!(S.open && S.open.on && S.open.open) || _openBusy) return;
+  const ath = ($('openAth') ? $('openAth').value : _openRes.athlete), raw = String($('openVal') ? $('openVal').value : _openRes.value).trim();
+  const day = ($('openDay') && $('openDay').value) || _openRes.day || todayKey();
+  if (!ath) { fail('Pick the athlete first.'); return; }
+  const v = raw === '' ? NaN : Number(raw);
+  if (!Number.isFinite(v)) { fail('Type the result as a number.'); return; }
+  if (Math.abs(v) >= 1000000) { fail('That result is too big. Use a number under a million.'); return; }
+  const had = !!openResultOf(ath), nm = openWho(ath);
+  const d = await openWrite('coach_open_result', { p_athlete: ath, p_value: v, p_day: day }, 'The result was not saved: ');
+  if (!d) return;
+  _openRes = { athlete: '', value: '', day: '' };
+  toast(had ? `Replaced ${firstWord(nm)}'s result` : `Result saved for ${firstWord(nm)}`);
+  paintOpen();
+  const rb = $('openResBox'); if (rb) rb.innerHTML = openResHtml();   // the form starts again for the next athlete
+}
+function openRemove(id) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const o = S.open && S.open.open;
+  if (!o) return;
+  const nm = openWho(id), r = openResultOf(id);
+  dangerAsk('open:rm:' + id, { title: `Take ${nm}'s result off?`,
+    goes: `${r ? `Their ${openNum(r.value)}${o.unit ? ' ' + o.unit : ''}` : 'Their result'} leaves the board now. If it rang the Bell, that line goes too.`,
+    stays: 'The challenge, everyone else\'s results and their place in the crew.', note: 'To change the number instead, confirm the right one for them: that replaces this one.',
+    button: 'Take it off', busyText: 'Taking off…', run: () => openRemoveNow(id, nm) });
+}
+async function openRemoveNow(id, nm) {
+  const d = await openWrite('coach_open_remove', { p_athlete: id }, 'The result was not taken off: ');
+  if (!d) return;
+  toast(`${firstWord(nm)}'s result is off`);
+  paintOpen();
+}
+function openCloseAsk() {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const o = S.open && S.open.open;
+  if (!o) return;
+  const n = (S.open.results || []).length;
+  dangerAsk('open:close', { title: `Close ${o.title}?`, goes: 'The board leaves Crew now, and no more results can be added to it.',
+    stays: `Its ${n} result${n === 1 ? '' : 's'}, kept under Past challenges.`, button: 'Close the challenge', busyText: 'Closing…', run: openCloseNow });
+}
+async function openCloseNow() {
+  const d = await openWrite('coach_open_close', undefined, 'The challenge was not closed: ');
+  if (!d) return;
+  toast('Challenge closed');
+  paintOpen();
+}
+Object.assign(window, { loadOpen, openStart, openCorrect, openFormClose, openBetter, openFormSave, openPick, openConfirm, openRemove, openCloseAsk });
 
 // The funnel: everyone who signed up through proof.html, newest first. One self-contained function that returns the whole section; it is Leads →
 // Free signups (it was the last panel on Proof until 2026-10-12).
@@ -9585,10 +9970,11 @@ async function boot() {
     $('content').innerHTML = `<p class="empty">Could not load the dashboard: ${esc(e.message)}</p>`; return;
   }
   render();
-  // Server-scored levels fill in behind the first paint; so do Courtside (stage75) and the Bell (stage81).
+  // Server-scored levels fill in behind the first paint; so do Courtside (stage75), the Bell (stage81) and the Monthly Open (stage84).
   loadLevels().then(() => { if (S.ready) paintLevels(); });
   loadCourt();
   loadBell();
+  loadOpen();
 }
 function showGate(err) { failDismissAll(); $('app').style.display = 'none'; $('gate').style.display = 'block'; $('gateErr').textContent = err || ''; }
 // supabase-js fires an auth event on load, on every hourly token refresh, when the tab comes

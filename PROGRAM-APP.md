@@ -1504,6 +1504,13 @@ changed: the server, the XP and the levels are exactly as before.
   of an achievement, from the same numbers: one plan session left this training week after this one, and holding the week gives Held or Back
   to Back (*One more session this week and you get Back to Back.*), or the next check-in gives Straight Talk. Never a weekday (athletes move
   their days). `careerEarn()` carries `weekLeft` and `checkin` for it.
+- **The Monthly Open, on Crew** (stage84; Amir's pick A on the Crew and Open page, 2026-10-19: *"for crew and the open go with your picks"*),
+  `crewOpenHTML()` in `renderCrew()`, under the honours and above the composer: **THE OPEN**, the challenge's name, Amir's words for what counts,
+  then the board ranked by the result (the first five, the athlete's own row carried in beneath them wherever it ranks, **Show all N** for the
+  rest), *Your result: 95 seconds* when they have one, and one clay door to WhatsApp (**Send Amir your result**, or **Send a better one**). The app
+  **never writes a result**: Amir confirms every one from the clip, so there is no form here at all. It comes inside `get_bell()` as `open`
+  (so Crew still costs one call, and stage83's etag covers it); null or missing, and no card is drawn. Checked by `scripts/headless/crew.js`
+  (the card, the order, your own row, the door, an empty board, a long one, no stage, 320 px and dark).
 - **Four Courts' tests:** `scripts/headless/career.js` → `fourCourts()` (14 checks: the section, its order, Next up, the tiles, no clay, a
   kind opened, Back, Next up's tap, both nudges and none, 320 px, no answer); the stub answers `get_achievements` from its `achievements`.
 

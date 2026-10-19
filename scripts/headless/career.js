@@ -341,7 +341,9 @@ async function trainingBase(browser, C) {
     C.check('no Career row (no answer, no copy): the Hold Serve row shows by itself', (await row(p)) === null && !!h && h.label === 'Hold Serve' && h.big === '3 weeks in a row', JSON.stringify(h));
     await p.evaluate(() => { window.__STUB.stall = {}; refreshCareer(); });
     await waitRow(p);
-    await p.waitForTimeout(200);
+    // wait for the hold row to empty, not a fixed moment: since main's slow-connection work (2026-10-19) the first paint can land later than
+    // a flat 200 ms, and a fixed wait made this check fail now and then while the app was right
+    await p.waitForFunction(() => document.getElementById('home-hold-wrap').innerHTML.trim() === '', null, { timeout: 8000 }).catch(() => {});
     C.check('…and the Career row takes it over once the profile arrives (the Hold Serve row empties)', !!(await row(p)) && await p.evaluate(() => document.getElementById('home-hold-wrap').innerHTML.trim() === ''));
     await ctx.close();
   }

@@ -67,6 +67,11 @@
   // against a server that has not had stage81, as before; `missingRpc: ['coach_crew']` takes them away again (the page draws no Bell).
   var CREW_RPCS = ['coach_crew', 'coach_crew_post', 'coach_crew_remove', 'coach_crew_under13', 'crew_photo'];
   function noStage81() { return !SEED.crew || (ST.missingRpc || []).indexOf('coach_crew') >= 0; }
+  // stage84's functions (the Monthly Open). Answered only when the seed says `open: true` (buildSeed({open: true}), which also turns stage81 on: stage84 needs it), so
+  // every other scenario runs against a server that has not had stage84; `missingRpc: ['coach_open']` takes them away from a seeded run too, and
+  // `window.__STUB.openNull = true` makes coach_open() answer nothing at all (a null, no error).
+  var OPEN_RPCS = ['coach_open', 'coach_open_set', 'coach_open_close', 'coach_open_result', 'coach_open_remove'];
+  function noStage84() { return !SEED.open || (ST.missingRpc || []).indexOf('coach_open') >= 0; }
   function persist() { if (ST.persist) { try { localStorage.setItem('__harness_db', JSON.stringify(DB)); } catch (e) {} } }
   function tbl(name) { return DB[name] || (DB[name] = []); }
   function nowIso() { return new Date().toISOString(); }
@@ -353,6 +358,44 @@
   function bell() { return DB.crew_bell || (DB.crew_bell = { posts: [], people: [], photos: {}, rings_week: 0 }); }
   function bellSweep() { var c = bell(); c.posts = c.posts.filter(function (p) { return p.ago_min <= 7 * 1440; }); return c; }   // crew_sweep(): a post goes 7 days after it was made
   var BELL_OK = 'crew:';
+  // The Open's state (stage84): every challenge ever set (the live one has no closed_at), every confirmed result, the Bell lines a result rang. Tests read and
+  // change it as window.__DB.crew_open_state. The crew is crew_members(): a yes (the Bell's people), not under 13, not a former athlete, not the demo,
+  // named by the board name, else the default name (first name and the last name's initial).
+  function openState() { return DB.crew_open_state || (DB.crew_open_state = { challenges: [], results: [], rings: [] }); }
+  function openLive() {
+    var live = openState().challenges.filter(function (x) { return !x.closed_at; });
+    live.sort(function (a, b) { return a.created_at < b.created_at ? 1 : a.created_at > b.created_at ? -1 : 0; });   // the newest row with no closed_at
+    return live[0] || null;
+  }
+  function openCrew() {
+    var former = function (id) { return tbl('athlete_status').some(function (s) { return s.athlete_id === id && s.status === 'former'; }); };
+    return bell().people.filter(function (p) { return p.answer === 'yes' && !p.under13 && p.athlete_id !== 'demo' && !former(p.athlete_id); }).map(function (p) {
+      var o = tbl('leaderboard_optin').find(function (r) { return r.athlete_id === p.athlete_id; }), pr = tbl('programs').find(function (r) { return r.athlete_id === p.athlete_id; });
+      var a = (pr && pr.data && pr.data.athlete) || {}, last = String(a.lastName || '').replace(/^ +| +$/g, '');
+      var def = pr ? (a.firstName ? a.firstName + (last ? ' ' + last.charAt(0).toUpperCase() + '.' : '') : 'Athlete').slice(0, 24) : null;
+      return { athlete_id: p.athlete_id, name: (o && String(o.display_name || '').replace(/^ +| +$/g, '')) || def || 'Athlete', kinds_off: p.kinds_off || [] };
+    });
+  }
+  // A write answers coach_open()'s shape too; `openWriteNull` makes it answer nothing after doing its work (a lost answer, a proxy that drops the body).
+  function openOut() { if (ST.openWriteNull > 0) { ST.openWriteNull--; return null; } return openAnswer(); }
+  // coach_open(): the live challenge, every result he confirmed (crew member or not; `who` is the athlete id when they are not in the crew, as the SQL's
+  // coalesce(m.name, res.athlete_id)), the last five closed challenges, the crew to pick from.
+  function openAnswer() {
+    var s = openState(), o = openLive(), crew = openCrew(), by = {};
+    crew.forEach(function (m) { by[m.athlete_id] = m; });
+    var key = function (v) { return o && o.better === 'low' ? Number(v) : -Number(v); };
+    var rows = !o ? [] : s.results.filter(function (r) { return r.open_id === o.id; }).sort(function (a, b) {
+      return (key(a.value) - key(b.value)) || (a.athlete_id < b.athlete_id ? -1 : a.athlete_id > b.athlete_id ? 1 : 0); });
+    // closed_at desc, limit 5 (two closed in the same instant: the one made later first; the SQL leaves that to chance, the stub must not)
+    var past = s.challenges.filter(function (x) { return x.closed_at; }).sort(function (a, b) {
+      return a.closed_at < b.closed_at ? 1 : a.closed_at > b.closed_at ? -1 : s.challenges.indexOf(b) - s.challenges.indexOf(a); }).slice(0, 5);
+    return {
+      open: o ? { id: o.id, title: o.title, how: o.how, unit: o.unit, better: o.better, opened_on: o.opened_on } : null,
+      results: rows.map(function (r) { return { athlete_id: r.athlete_id, who: by[r.athlete_id] ? by[r.athlete_id].name : r.athlete_id, in_crew: !!by[r.athlete_id], value: r.value, day: r.day }; }),
+      past: past.map(function (x) { return { id: x.id, title: x.title, unit: x.unit, opened_on: x.opened_on, closed_at: x.closed_at, n: s.results.filter(function (r) { return r.open_id === x.id; }).length }; }),
+      crew: crew.map(function (m) { return { athlete_id: m.athlete_id, who: m.name }; }).sort(function (a, b) { return a.who < b.who ? -1 : a.who > b.who ? 1 : 0; }),
+      at: nowIso() };
+  }
   var RPC = {
     // ---- stage81: the Bell (supabase/stage81_career_crew.sql) ----
     coach_crew: function () {
@@ -398,6 +441,59 @@
       var c = bellSweep(), ph = c.photos[p.p_post];
       if (!ph || !c.posts.some(function (x) { return x.id === p.p_post; })) return null;
       return { id: p.p_post, mime: ph.mime, w: ph.w, h: ph.h, b64: ph.b64 };
+    },
+    // ---- stage84: the Monthly Open (supabase/stage84_crew_open.sql). Every one answers coach_open()'s shape; the caller is always the coach. ----
+    // `window.__STUB.openNull = true` makes the read answer nothing; `window.__STUB.openWriteNull = n` makes the next n WRITES do their work and then answer nothing.
+    coach_open: function () { return ST.openNull ? null : openAnswer(); },
+    // Starts a new challenge (and closes whatever was open) or, with p_id, corrects the words of that one and keeps its results.
+    coach_open_set: function (p) {
+      var s = openState(), title = String(p.p_title == null ? '' : p.p_title).replace(/^ +| +$/g, ''), better = String(p.p_better == null ? 'high' : p.p_better).replace(/^ +| +$/g, '').toLowerCase();
+      if (title.length < 1 || title.length > 60) throw new Error('the challenge needs a name, up to 60 characters');
+      if (better !== 'high' && better !== 'low') throw new Error('better is high or low, not ' + better);
+      var how = String(p.p_how == null ? '' : p.p_how).slice(0, 400), unit = String(p.p_unit == null ? '' : p.p_unit).replace(/^ +| +$/g, '').slice(0, 16);
+      if (p.p_id != null) {
+        var c = s.challenges.find(function (x) { return x.id === p.p_id && !x.closed_at; });   // only the live one: a closed challenge is not corrected
+        if (!c) throw new Error('no such challenge is open');
+        c.title = title; c.how = how; c.unit = unit; c.better = better;
+      } else {
+        s.challenges.forEach(function (x) { if (!x.closed_at) x.closed_at = nowIso(); });
+        s.challenges.push({ id: 'c0000000-0000-4000-8000-' + String(++ST.seq).padStart(12, '0'), title: title, how: how, unit: unit, better: better,
+          opened_on: utcDate(), closed_at: null, created_at: nowIso() });
+      }
+      return openOut();
+    },
+    coach_open_close: function () {
+      openState().challenges.forEach(function (x) { if (!x.closed_at) x.closed_at = nowIso(); });
+      return openOut();
+    },
+    // One result per athlete per challenge (typed again, it replaces; the athlete must have a programme); a Bell line (kind 'open') only for a crew_members() member with the Open switched on.
+    coach_open_result: function (p) {
+      var s = openState(), ath = String(p.p_athlete == null ? '' : p.p_athlete).replace(/^ +| +$/g, '');
+      if (!ath) throw new Error('which athlete?');
+      if (p.p_value == null) throw new Error('what result?');
+      if (!tbl('programs').some(function (r) { return r.athlete_id === ath; })) throw new Error('no athlete "' + ath + '"');   // an athlete, not a typed id that belongs to nobody
+      var o = openLive();
+      if (!o) throw new Error('no challenge is open');
+      var v = Number(p.p_value);
+      if (isNaN(v)) { var bad = new Error('invalid input syntax for type numeric: "' + p.p_value + '"'); bad.code = '22P02'; throw bad; }
+      if (!(v > -1000000 && v < 1000000)) { var rng = new Error('new row for relation "crew_open_results" violates check constraint "crew_open_results_value_check"'); rng.code = '23514'; throw rng; }
+      var day = p.p_day || utcDate(), row = s.results.find(function (r) { return r.open_id === o.id && r.athlete_id === ath; });
+      if (row) { row.value = v; row.day = day; } else s.results.push({ open_id: o.id, athlete_id: ath, value: v, day: day });
+      var cons = openCrew().find(function (x) { return x.athlete_id === ath; });   // crew_members(): a stray "yes" of a former athlete or the demo rings nothing
+      if (cons && (cons.kinds_off || []).indexOf('open') < 0) {
+        var text = 'posted ' + String(Math.round(v * 100) / 100) + (o.unit ? ' ' + o.unit : '') + ' in ' + o.title;
+        var ring = s.rings.find(function (x) { return x.athlete_id === ath && x.kind === 'open' && x.ref === o.id; });
+        if (ring) ring.value = { text: text }; else s.rings.push({ athlete_id: ath, kind: 'open', ref: o.id, value: { text: text } });
+      }
+      return openOut();
+    },
+    // Takes one result off, and its Bell line with it.
+    coach_open_remove: function (p) {
+      var s = openState(), o = openLive(), ath = String(p.p_athlete == null ? '' : p.p_athlete).replace(/^ +| +$/g, '');
+      if (!o) throw new Error('no challenge is open');
+      s.results = s.results.filter(function (r) { return !(r.open_id === o.id && r.athlete_id === ath); });
+      s.rings = s.rings.filter(function (x) { return !(x.kind === 'open' && x.ref === o.id && x.athlete_id === ath); });
+      return openOut();
     },
     // The week's moments for Courtside: live awards (never the go-day's baseline) of highlight size and up, of the kinds that stay after the cut,
     // for clients only, minted inside the window. Every row of the week comes back, marked or not.
@@ -797,7 +893,7 @@
         await sleep(0);
         var f = takeFail('rpc', name);
         if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'P0001' }, status: 400 }; }
-        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0 || (noStage75() && COURT_RPCS.indexOf(name) >= 0) || (noStage81() && CREW_RPCS.indexOf(name) >= 0)) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
+        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0 || (noStage75() && COURT_RPCS.indexOf(name) >= 0) || (noStage81() && CREW_RPCS.indexOf(name) >= 0) || (noStage84() && OPEN_RPCS.indexOf(name) >= 0)) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
         try { var d = RPC[name](params || {}); persist(); call.result = { ok: true }; return { data: clone(d), error: null, status: 200 }; }
         catch (e) { call.result = { error: e.message }; return { data: null, error: { message: e.message, code: e.code || 'P0001' }, status: 400 }; }
       })();

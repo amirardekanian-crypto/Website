@@ -19,6 +19,7 @@
 //   13. line endings: the apply and the way back from files whose lines end differently (a Windows checkout ends them with CRLF)
 //   14. stage82: the emoji beside the Like (the set, the swap, the refusals, the feed, the way back)
 //   15. stage83: the feed only when it has changed (the hash, what moves it, the refusals, the way back)
+//   16. stage84: the Monthly Open (only Amir writes, the board and its order, the Bell line, who is left off, closing, the erasure, the way back)
 // A check that fails because stage81 is wrong is a finding: it is reported, not fixed here.
 // `--stage <file>` and `--rollback <file>` rehearse a modified copy, to see that a check bites (2026-10-19: run against 68 one-line breaks of both files; every one
 // was noticed except a weight added to a part that is never printed).
@@ -941,6 +942,167 @@ async function main() {
   ok((await bellAs('zz_emt')).items !== undefined, 'get_bell() is untouched, so the app simply asks for that again');
   await runSql(db, st83, 'stage83 after the way back');
   ok((await call('zz_emt', `select public.get_bell_if_new($1)`, ['zz_emt'])).etag !== null, 'stage83 goes on again after it');
+
+  // ═══ 16 ══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  section('16. stage84: the Monthly Open (one challenge Amir sets, results he confirms, one board)');
+  const st84 = read(opt('--stage84') || path.join(ROOT, 'supabase', 'stage84_crew_open.sql'));
+  const back84 = read(opt('--rollback84') || path.join(ROOT, 'scripts', 'career', 'rollback_stage84.sql'));
+  const bellTag = () => call('zz_emt', `select public.get_bell_if_new($1)`, ['zz_emt']).then(r => r.etag);
+  const openOf = async id => (await bellAs(id)).open;
+
+  ok((await bellAs('zz_emt')).open === undefined, 'before stage84 the feed carries no Open at all, so the app draws no card');
+  const tagBefore = await bellTag();
+
+  await runSql(db, st84, 'stage84'); await runSql(db, st84, 'stage84 again');
+  ok(true, 'stage84 applied, and applied again without an error');
+  ok((await val(`select count(*)::int from pg_tables where schemaname = 'public' and tablename in ('crew_open', 'crew_open_results')`)) === 2,
+     'both tables are there');
+  ok((await val(`select bool_and(c.relrowsecurity) from pg_class c where c.relnamespace = 'public'::regnamespace and c.relname in ('crew_open', 'crew_open_results')`)) === true,
+     'row-level security is on for both');
+  for (const f of ['coach_open()', 'coach_open_set(text,text,text,text,uuid)', 'coach_open_close()', 'coach_open_result(text,numeric,date)', 'coach_open_remove(text)']) {
+    ok(!(await val(`select has_function_privilege('anon', 'public.${f}', 'execute')`))
+       && (await val(`select has_function_privilege('authenticated', 'public.${f}', 'execute')`)), `anon cannot run ${f.split('(')[0]}(), a signed-in caller can`);
+  }
+  ok(!(await val(`select has_function_privilege('authenticated', 'public.crew_open_now(text)', 'execute')`)),
+     'the read inside get_bell() is the service role\'s: no athlete calls it directly');
+  ok((await bellAs('zz_emt')).open === null, 'with no challenge set, the feed says open: null (the app draws nothing)');
+
+  // only Amir writes
+  await refuses('an athlete cannot set a challenge', call('zz_emo', `select public.coach_open_set('Mine')`), /coach only/);
+  await refuses('an athlete cannot confirm a result', call('zz_emo', `select public.coach_open_result('zz_emo', 99)`), /coach only/);
+  await refuses('an athlete cannot read the coach\'s panel', call('zz_emo', `select public.coach_open()`), /coach only/);
+  await refuses('and a result cannot be confirmed before a challenge exists', coachCall(`select public.coach_open_result('zz_emo', 10)`), /no challenge is open/);
+  await refuses('a challenge needs a name', coachCall(`select public.coach_open_set('   ')`), /needs a name/);
+  await refuses('better is high or low', coachCall(`select public.coach_open_set('X', '', '', 'sideways')`), /high or low/);
+
+  // Amir sets one
+  const set1 = await coachCall(`select public.coach_open_set($1, $2, $3, $4)`, ['Wall Sit', 'Back to the wall, knees at 90. Send me the clip.', 'seconds', 'high']);
+  ok(set1.open && set1.open.title === 'Wall Sit' && set1.open.unit === 'seconds' && set1.open.better === 'high' && set1.results.length === 0,
+     'he sets one and his panel comes back with it', set1.open);
+  const o1 = await openOf('zz_emt');
+  ok(o1 && o1.title === 'Wall Sit' && o1.how.startsWith('Back to the wall') && o1.unit === 'seconds' && eq(o1.board, []) && o1.mine === null,
+     'the athlete\'s feed now carries the challenge, an empty board and no result of their own', o1);
+  ok((await bellTag()) !== tagBefore, 'the hash moved, so a phone holding the old feed is sent the new one (stage83)');
+
+  // results, the board and its order
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_emt', 95]);
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_emo', 120]);
+  const b1 = (await openOf('zz_emt')).board;
+  ok(b1.length === 2 && b1[0].value === 120 && b1[0].place === 1 && b1[1].value === 95 && b1[1].place === 2,
+     'higher wins: the board is ranked by the result', b1);
+  ok(b1.every(r => r.who && !/zz_/.test(JSON.stringify(r))), 'the board names the crew name and never an athlete id', b1);
+  ok(b1.find(r => r.value === 95).me === true && b1.find(r => r.value === 120).me === false, 'the viewer\'s own row is marked, nobody else\'s');
+  ok(eq((await openOf('zz_emt')).mine, { value: 95, day: await val(`select current_date::text`) }), 'and their own result comes back whole');
+  const lowSet = await coachCall(`select public.coach_open_set($1, $2, $3, $4, $5)`, ['Wall Sit', 'Back to the wall, knees at 90.', 'seconds', 'low', set1.open.id]);
+  ok(lowSet.open.id === set1.open.id && lowSet.open.better === 'low' && lowSet.results.length === 2,
+     'correcting the words keeps the same challenge and every result', [lowSet.open.better, lowSet.results.length]);
+  const b2 = (await openOf('zz_emt')).board;
+  ok(b2[0].value === 95 && b2[0].place === 1, 'with "low" the smallest number wins', b2);
+  await coachCall(`select public.coach_open_set($1, $2, $3, $4, $5)`, ['Wall Sit', 'Back to the wall, knees at 90.', 'seconds', 'high', set1.open.id]);
+
+  // the Bell line
+  const lines = (await bellAs('zz_emt')).items.filter(i => i.t === 'line' && (i.parts || []).some(p => p.k === 'open'));
+  ok(lines.length === 2, 'each confirmed result rang the Bell once', lines.length);
+  const mine = lines.find(l => l.me);
+  ok(mine && mine.parts.find(p => p.k === 'open').text === 'posted 95 seconds in Wall Sit',
+     'the line reads as a sentence after the name: "posted 95 seconds in Wall Sit"', mine && mine.parts);
+  ok(!/\bzz_/.test(JSON.stringify(lines)), 'no athlete id anywhere in those lines');
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_emt', 140]);
+  const after = (await bellAs('zz_emt')).items.filter(i => i.t === 'line' && (i.parts || []).some(p => p.k === 'open'));
+  ok(after.length === 2, 'a better result does not ring a second time');
+  ok(after.find(l => l.me).parts.find(p => p.k === 'open').text === 'posted 140 seconds in Wall Sit', 'but the line says the new number');
+  ok((await openOf('zz_emt')).board.find(r => r.me).value === 140, 'and the board shows it');
+  // a better result is news: the one row moves to today, so the line leaves its old day and the crew sees it again
+  await q(`update public.crew_rings set created_at = now() - interval '5 days', day = current_date - 5 where kind = 'open' and athlete_id = 'zz_emt'`);
+  const wasOld = await val(`select (created_at < now() - interval '4 days') from public.crew_rings where kind = 'open' and athlete_id = 'zz_emt'`);
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_emt', 160]);
+  const moved = await one(`select created_at > now() - interval '1 minute' as fresh, day = current_date as today, count(*) over () as rows
+                             from public.crew_rings where kind = 'open' and athlete_id = 'zz_emt'`);
+  ok(wasOld && moved.fresh && moved.today && Number(moved.rows) === 1, 'a better result moves the one line to today instead of adding a row', moved);
+  // the same number again is not news
+  const before2 = await val(`select created_at from public.crew_rings where kind = 'open' and athlete_id = 'zz_emt'`);
+  await sleep(20);
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_emt', 160]);
+  ok((await val(`select created_at from public.crew_rings where kind = 'open' and athlete_id = 'zz_emt'`)).getTime() === new Date(before2).getTime(),
+     'the same number typed again rings nothing');
+
+  // who is on the board, who is not
+  await mkAthlete('zz_opn', 'Opn', 'Tester');                                   // never answered the question
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_opn', 200]);
+  ok((await openOf('zz_emt')).board.length === 2, 'a result for someone who never joined the crew is NOT on the board (GAME-9)');
+  ok((await val(`select count(*)::int from public.crew_rings where kind = 'open' and athlete_id = 'zz_opn'`)) === 0, 'and it rings nothing');
+  ok((await coachCall(`select public.coach_open()`)).results.length === 3, 'Amir still sees all three in his panel, with who is in the crew');
+  ok((await coachCall(`select public.coach_open()`)).results.find(r => r.athlete_id === 'zz_opn').in_crew === false, 'and it says so');
+  await mkAthlete('zz_op13', 'Op13', 'Tester');
+  await member('zz_op13', 'Op13 T.', { under13: true });
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_op13', 150]);
+  ok((await val(`select count(*)::int from public.crew_rings where kind = 'open' and athlete_id = 'zz_op13'`)) === 0, 'an athlete Amir marked under 13 never rings (GAME-9)');
+  await mkAthlete('zz_opoff', 'Opoff', 'Tester');
+  await member('zz_opoff', 'Opoff T.', { kinds: { open: false } });
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_opoff', 111]);
+  ok((await val(`select count(*)::int from public.crew_rings where kind = 'open' and athlete_id = 'zz_opoff'`)) === 0, 'nor does one who turned the Open off in their switches');
+  ok((await openOf('zz_emt')).board.some(r => r.value === 111), '…but they are still on the board: the switch is about the Bell, not the result');
+
+  // the three the coach panel's review turned up
+  await refuses('a result cannot be recorded for an id that belongs to nobody', coachCall(`select public.coach_open_result('zz_nobody_at_all', 10)`), /no athlete/);
+  await mkAthlete('zz_opfm', 'Opfm', 'Tester');
+  await member('zz_opfm', 'Opfm T.');
+  await q(`insert into public.athlete_status (athlete_id, status) values ('zz_opfm', 'former') on conflict (athlete_id) do update set status = 'former'`);
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_opfm', 77]);
+  ok((await val(`select count(*)::int from public.crew_rings where kind = 'open' and athlete_id = 'zz_opfm'`)) === 0,
+     'a former athlete with an old yes leaves no ring behind (crew_members(), not crew_consent)');
+  ok((await val(`select count(*)::int from public.crew_open_results where athlete_id = 'zz_opfm'`)) === 1, '…but the result itself is recorded for Amir');
+  await coachCall(`select public.coach_open_remove($1)`, ['zz_opfm']);
+
+  // taking one off, and closing
+  await coachCall(`select public.coach_open_remove($1)`, ['zz_opoff']);
+  ok(!(await openOf('zz_emt')).board.some(r => r.value === 111), 'Amir can take a result off the board');
+  const closed = await coachCall(`select public.coach_open_close()`);
+  ok(closed.open === null && closed.past.length === 1 && closed.past[0].n === 4, 'closing it moves it to the past, with how many results it had', closed.past);
+  ok((await bellAs('zz_emt')).open === null, 'and the card leaves Crew');
+  ok((await val(`select count(*)::int from public.crew_open_results`)) === 4, 'the results themselves are kept: a closed Open is a record, not a post');
+  ok((await coachCall(`select public.coach_open_set($1, '', $2)`, ['Half Marathon', 'km'])) !== null, 'a challenge with a decimal result');
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_emt', 21.1]);
+  ok((await bellAs('zz_emt')).items.some(i => (i.parts || []).some(p => p.k === 'open' && p.text === 'posted 21.1 km in Half Marathon')),
+     'a decimal keeps its point and a whole number has none: "posted 21.1 km in Half Marathon"',
+     (await bellAs('zz_emt')).items.flatMap(i => (i.parts || []).filter(p => p.k === 'open')));
+  await coachCall(`select public.coach_open_close()`);
+  const oldId = closed.past[0].id;
+  await refuses('the words of a CLOSED challenge cannot be corrected (a tab left open)', coachCall(`select public.coach_open_set('X', '', '', 'high', $1)`, [oldId]), /no such challenge is open/);
+  const set2 = await coachCall(`select public.coach_open_set($1)`, ['The Hundred']);
+  ok(set2.open.title === 'The Hundred' && set2.results.length === 0 && (await openOf('zz_emt')).title === 'The Hundred', 'a new challenge starts empty');
+  ok((await val(`select count(*)::int from public.crew_open where closed_at is null`)) === 1, 'and only ever one is open at a time');
+
+  // nothing in the scorer moved
+  ok((await val(`select count(*)::int from public.career_facts where kind like '%open%'`)) === 0, 'the Open writes no fact');
+  ok((await val(`select count(*)::int from public.career_awards where item like '%open%'`)) === 0, 'and no award: it pays no XP (GAME-6, D20)');
+
+  // the erasure
+  await coachCall(`select public.coach_open_set($1, '', $2)`, ['One More', 'reps']);
+  await coachCall(`select public.coach_open_result($1, $2)`, ['zz_emt', 7]);
+  const erDef = await val(`select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure)`);
+  ok(/'crew_posts', 'crew_open_results', 'crew_rings'/.test(erDef), "coach_erase_person()'s table list learned crew_open_results, beside crew_rings");
+  const er = await coachCall(`select public.coach_erase_person('athlete', $1, null, null, true)`, ['zz_emt']);
+  ok(JSON.stringify(er).includes('crew_open_results'), 'and a dry run counts the rows it would take', JSON.stringify(er).slice(0, 400));
+  ok((await val(`select count(*)::int from public.crew_open_results where athlete_id = 'zz_emt'`)) > 0, 'a dry run takes nothing: the result is still there');
+  await coachCall(`select public.coach_erase_person('athlete', $1, $1, null, false)`, ['zz_emt']);
+  ok((await val(`select count(*)::int from public.crew_open_results where athlete_id = 'zz_emt'`)) === 0, 'a real erasure takes every result of theirs');
+  ok((await val(`select count(*)::int from public.crew_rings where kind = 'open' and athlete_id = 'zz_emt'`)) === 0, 'and their Open lines with them');
+  ok((await val(`select count(*)::int from public.crew_open_results where athlete_id <> 'zz_emt'`)) > 0, 'and nobody else’s');
+
+  // the way back
+  info('the way back, then stage84 again');
+  await runSql(db, back84, 'the way back from stage84');
+  ok((await val(`select to_regprocedure('public.coach_open()')::text`)) === null
+     && (await val(`select count(*)::int from pg_tables where schemaname = 'public' and tablename like 'crew_open%'`)) === 0,
+     'the way back drops the five, the read and both tables');
+  ok((await bellAs('zz_emo')).open === undefined, 'get_bell() answers without the Open again');
+  ok((await bellAs('zz_emo')).items !== undefined, 'and the rest of the feed is untouched');
+  ok((await val(`select count(*)::int from public.crew_rings where kind = 'open'`)) === 0, 'the Open\'s Bell lines went with it; every other line stayed');
+  ok((await val(`select position('crew_open_results' in pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure))`)) === 0,
+     'and coach_erase_person() forgot the table');
+  await runSql(db, st84, 'stage84 after the way back');
+  ok((await bellAs('zz_emo')).open === null && (await coachCall(`select public.coach_open()`)).open === null, 'stage84 goes on again after it');
 
   console.log(`\n${failed ? 'FAIL' : 'OK'}: ${passed} passed, ${failed} failed (${Math.round((Date.now() - t0) / 1000)} s)`);
   if (failed) fails.forEach(f => console.log('  - ' + f));
