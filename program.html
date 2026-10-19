@@ -7157,9 +7157,9 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   loadHoldCache();
   loadCareerCache();
   loadMomentsCache();
-  loadCrewCache();   // Crew (stage81): the tab from the phone's copy now; the server's Bell behind the first paint
+  loadCrewCache();   // Crew (stage81): the tab from the phone's copy; nothing is asked for unless Crew is opened (crewFirstLook())
   refreshHold();
-  setTimeout(refreshBell, 1500);
+  setTimeout(crewFirstLook, 2500);
   // The Spine: cues and the ⓘ from the phone's copy now, then from the server.
   paintSpine();
   paintDayQualities();
@@ -11720,8 +11720,31 @@ function achNudgeHTML(e) {
 // signal; <id>_crewseen is the newest post of Amir's opened on this phone (the tab's clay dot until then).
 var BELL = null;             // get_bell()'s answer: { athlete_id, me, items, honours, kinds, at } or null
 var CREW_BOARD = null;       // leaderboard_top()'s rows for the season board
-var _bellBusy = false, _bellAt = 0, _crewMissing = false, _crewDraft = null, _crewFreshPin = null;
-const CREW_PHOTOS = new Map();   // post id → an object URL of its photo (this visit only)
+var _bellBusy = false, _bellAt = 0, _boardAt = 0, _crewMissing = false, _crewDraft = null, _crewFreshPin = null;
+const CREW_PHOTOS = new Map();   // post id → an object URL of its photo (this visit; the bytes themselves are in CREW_PH_CACHE)
+// A photo is downloaded ONCE and kept on the phone (Amir, 2026-10-19: they cannot download everything at every open). Cache
+// Storage, not localStorage: the bytes are binary and a few hundred kilobytes each. The name does NOT start with aap-, so
+// sw.js's activate (which deletes every aap-* cache on a version bump) leaves it alone. crewSweepPhotos() drops anything the
+// feed no longer holds, so a photo leaves the phone when its post leaves the server at 7 days.
+const CREW_PH_CACHE = 'crew-photos-v1';
+const crewPhUrl = id => '/__crew-photo/' + encodeURIComponent(id);
+async function crewPhStore() { try { return window.caches ? await caches.open(CREW_PH_CACHE) : null; } catch (e) { return null; } }
+async function crewPhSaved(id) {
+  try { const c = await crewPhStore(); if (!c) return null; const r = await c.match(crewPhUrl(id)); return r ? await r.blob() : null; } catch (e) { return null; }
+}
+async function crewPhKeep(id, blob) {
+  try { const c = await crewPhStore(); if (c) await c.put(crewPhUrl(id), new Response(blob, { headers: { 'Content-Type': blob.type || 'image/jpeg' } })); } catch (e) { /* no room: it is asked for again */ }
+}
+// Everything the feed no longer names goes (a post is gone from the server after 7 days, so its photo goes from the phone too).
+async function crewSweepPhotos() {
+  try {
+    const c = await crewPhStore();
+    if (!c) return;
+    const keep = new Set(((BELL && BELL.items) || []).filter(i => i && i.t === 'post' && i.photo).map(i => crewPhUrl(i.id)));
+    const keys = await c.keys();
+    for (const req of keys) { if (!keep.has(new URL(req.url).pathname)) await c.delete(req); }
+  } catch (e) { /* nothing to sweep */ }
+}
 const CREW_BELL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16zM10 20a2 2 0 0 0 4 0"/></svg>';
 const CREW_CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>';
 function crewKey() { return ATHLETE_ID + '_crewcache'; }
@@ -11744,24 +11767,43 @@ function crewMissingErr(r) {
   const e = (r && r.error) || {};
   return e.code === 'PGRST202' || Number(r && r.status) === 404 || /could not find the function|does not exist/i.test(String(e.message || ''));
 }
+// The feed, asked for only when Crew is opened (or once, if this phone has never had an answer). It asks `get_bell_if_new`
+// (stage83) with the hash of the copy this phone holds: when nothing in the crew has changed the whole answer is
+// `{ same: true }`, 78 bytes against the feed's few thousand — Amir, 2026-10-19: "irans internet is very slow, and cant
+// download everything everytime they open the app". A server without stage83 answers "no such function" once, and from then
+// on this phone asks plain `get_bell()`, which is what it did before.
+var _bellPlain = false;   // this server has no get_bell_if_new: stop asking for it
 async function refreshBell() {
   if (!crewAllowed() || _bellBusy) return;
   _bellBusy = true;
   try {
     const sb = await _sbReady();
     if (!sb) return;
-    const r = await _withTimeout(sb.rpc('get_bell', { p_athlete_id: ATHLETE_ID }), 10000);
+    const args = { p_athlete_id: ATHLETE_ID };
+    if (!_bellPlain && BELL && BELL.etag) args.p_etag = BELL.etag;
+    let r = await _withTimeout(sb.rpc(_bellPlain ? 'get_bell' : 'get_bell_if_new', args), 10000);
+    if (!_bellPlain && r && r.error && crewMissingErr(r)) {   // stage83 is not on this server: the plain feed, from now on
+      _bellPlain = true;
+      delete args.p_etag;
+      r = await _withTimeout(sb.rpc('get_bell', args), 10000);
+    }
     if (_noAnswer(r)) return;   // no signal: keep the copy
     if (r.error) {
       if (crewMissingErr(r)) { _crewMissing = true; BELL = null; try { localStorage.removeItem(crewKey()); } catch (e) {} }
       return;
     }
-    if (!r.data || r.data.athlete_id !== ATHLETE_ID) return;
+    if (!r.data) return;
+    if (r.data.same) { _bellAt = Date.now(); _crewMissing = false; return; }   // nothing new: the copy stands, nothing was sent
+    if (r.data.athlete_id !== ATHLETE_ID) return;
     BELL = r.data; _bellAt = Date.now(); _crewMissing = false;
     try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) { /* storage full: shown this visit */ }
+    crewSweepPhotos();   // a photo whose post has gone leaves the phone with it
   } catch (e) { /* keep the copy */ }
   finally { _bellBusy = false; setCrewTab(); paintCrewTell(); if (onCrew()) renderCrew(); }
 }
+// The one ask that is not an open: a phone that has never had an answer does not know whether there is a Crew tab at all.
+// Once it has a copy, nothing is asked for again until Crew is opened.
+function crewFirstLook() { if (crewAllowed() && !BELL && !_crewMissing) refreshBell(); }
 // The newest post of Amir's still pinned (24 hours), and whether this phone has opened Crew since it came.
 function crewAmirPost() { return ((BELL && BELL.items) || []).find(i => i && i.t === 'post' && i.amir && i.pinned) || null; }
 function crewAmirNew() { const a = crewAmirPost(); if (!a) return false; try { return localStorage.getItem(crewSeenKey()) !== a.id; } catch (e) { return false; } }
@@ -11791,12 +11833,13 @@ function openCrew() {
   // Amir's pinned post wears its clay pin on the visit that first shows it; from then on it is seen (the tab's dot goes at once).
   _crewFreshPin = crewAmirNew() ? crewAmirPost().id : null;
   crewMarkSeen();
-  renderCrew();
-  if (Date.now() - _bellAt > 30000) refreshBell();
-  refreshCrewBoard();
+  renderCrew();   // the copy is on screen before anything is asked for
+  if (Date.now() - _bellAt > 10 * 60000) refreshBell();   // at most once every ten minutes, and only from this screen
+  if (Date.now() - _boardAt > 10 * 60000) refreshCrewBoard();
 }
 async function refreshCrewBoard() {
   if (!crewAllowed()) return;
+  _boardAt = Date.now();
   try {
     const sb = await _sbReady();
     if (!sb) return;
@@ -11974,7 +12017,11 @@ let _crewPhRun = 0, _crewIO = null;
 function crewFetchPhoto(id) {
   if (CREW_PHOTOS.has(id)) return Promise.resolve(CREW_PHOTOS.get(id));
   if (_crewPhP.has(id)) return _crewPhP.get(id);
-  const p = new Promise(res => { _crewPhQ.push({ id, res }); crewPhPump(); });
+  const p = (async () => {
+    const saved = await crewPhSaved(id);   // on the phone already: nothing is downloaded
+    if (saved) { const u = URL.createObjectURL(saved); CREW_PHOTOS.set(id, u); return u; }
+    return new Promise(res => { _crewPhQ.push({ id, res }); crewPhPump(); });
+  })();
   _crewPhP.set(id, p);
   return p;
 }
@@ -11990,7 +12037,9 @@ function crewPhPump() {
         if (r && !r.error && r.data && r.data.b64) {
           const bin = atob(r.data.b64), u8 = new Uint8Array(bin.length);
           for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
-          url = URL.createObjectURL(new Blob([u8], { type: r.data.mime || 'image/jpeg' }));
+          const blob = new Blob([u8], { type: r.data.mime || 'image/jpeg' });
+          await crewPhKeep(job.id, blob);   // kept, so it is never downloaded twice
+          url = URL.createObjectURL(blob);
           CREW_PHOTOS.set(job.id, url);
         }
       } catch (e) { url = null; }
@@ -12177,8 +12226,10 @@ function crewSessionDraft(dayId) {
 function blobToB64(blob) {
   return new Promise((ok, bad) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).replace(/^data:[^,]*,/, '')); fr.onerror = bad; fr.readAsDataURL(blob); });
 }
-// The photo, made smaller here before it leaves: at most 1280 px on its long side, JPEG at 75 %. Drawing it on a canvas and encoding it again
-// leaves its EXIF data behind, the location with it. Over 400 KB it tries a lower quality, then a smaller size (the server takes 450 KB at most).
+// The photo, made smaller here before it leaves. Drawing it on a canvas and encoding it again leaves its EXIF data behind, the
+// location with it. It keeps trying until it is under about 200 KB — 1080 px is already twice a phone card's width, and on a slow
+// connection (Amir, 2026-10-19: "irans internet is very slow") every athlete who opens Crew pays for this photo once. The first
+// try that fits wins; the last is taken whatever it weighs (the server's ceiling is 450 KB).
 async function crewShrink(file) {
   let src = null, w0 = 0, h0 = 0;
   try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); w0 = src.width; h0 = src.height; }
@@ -12187,7 +12238,7 @@ async function crewShrink(file) {
     w0 = src.naturalWidth; h0 = src.naturalHeight;
   }
   if (!w0 || !h0) throw new Error('crew:photo_bad');
-  for (const [side, q] of [[1280, 0.75], [1280, 0.6], [1280, 0.5], [1024, 0.6], [800, 0.6]]) {
+  for (const [side, q] of [[1080, 0.7], [1080, 0.6], [900, 0.6], [800, 0.6], [640, 0.55]]) {
     const s = Math.min(1, side / Math.max(w0, h0)), w = Math.max(1, Math.round(w0 * s)), h = Math.max(1, Math.round(h0 * s));
     const c = document.createElement('canvas');
     c.width = w; c.height = h;
@@ -12196,7 +12247,7 @@ async function crewShrink(file) {
     x.drawImage(src, 0, 0, w, h);
     const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', q));
     if (!blob) continue;
-    if (blob.size <= 400 * 1024 || side === 800) return { b64: await blobToB64(blob), w, h, url: URL.createObjectURL(blob), bytes: blob.size };
+    if (blob.size <= 200 * 1024 || side === 640) return { b64: await blobToB64(blob), w, h, url: URL.createObjectURL(blob), bytes: blob.size };
   }
   throw new Error('crew:photo_bad');
 }

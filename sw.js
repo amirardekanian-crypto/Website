@@ -311,7 +311,8 @@
 // v181: program.html changed (2026-10-19): Progress's open Now card is short (Doors): the tagline, the aims, Amir's first sentence signed, and the rest of his note and the outcomes behind two rows that open on a tap; the outcomes are dots, not ticks.
 // v182: program.html changed (2026-10-19, Amir): Kudos is a Like, the question is Join the crew, and a Like tapped by someone not in the crew offers to join instead of doing nothing.
 // v183: program.html changed (2026-10-19, Amir): the Like and four emoji (🔥 💪 👏 😍) all out on a Bell post, drawn only while the server offers the list (stage82).
-const CACHE = 'aap-v183';
+// v184: program.html changed (2026-10-19, Amir's slow connection): Crew asks the server for nothing unless it is opened, a photo is downloaded once and kept on the phone, and a photo is made smaller (1080 px, under 200 KB).
+const CACHE = 'aap-v184';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

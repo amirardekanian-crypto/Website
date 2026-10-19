@@ -4,7 +4,8 @@
 -- "on top of it i want to be able to send a phote but these messages and images should only exist for a little while", then "for a week, but a
 -- certain quality of photo, not to fill in our servers"; "Bell: go with your picks" on The Bell page (https://claude.ai/artifact/55fbdfUgJVxySL7EpihyWb):
 -- A, the Clubhouse feed (a photo post is a card with the photo at 4:5, a moment a slim green line, kudos with names, a composer at the top), a photo
--- 1280 px on its long side at JPEG 75 % (about 200 KB) with its location taken off, at most 3 a day per athlete, Amir's post at the top for a day,
+-- 1080 px on its long side (about 200 KB; it was 1280 px at 75 % until 2026-10-19, when the photos posted were landing at 312 KB and Amir
+-- said Iran's internet could not carry that) with its location taken off, at most 3 a day per athlete, Amir's post at the top for a day,
 -- kudos only (no replies), "Tell the crew" on the finished card; and the list of what rings ("a session finished should be only in the bell if they
 -- want to add a photo to it. im ok with your picks"). GAME-6: nothing here pays XP. GAME-9: nothing of an athlete reaches the crew before their yes.
 --

@@ -82,9 +82,22 @@
     // Crew and the Bell (stage81, scripts/headless/crew.js): get_bell answers the stub's `bell` (none set: no answer, so no Crew tab); bellMissing
     // answers as a server without stage81 (PGRST202, 404). crew_answer, crew_kinds, crew_post, crew_kudos and crew_delete_post change `bell` the way
     // the server would and keep it in '__stubcfg' (the next page sees it); crew_photo answers a tiny JPEG; leaderboard_top answers `board`.
-    if (name === 'get_bell') {
-      if (S.bellMissing) return res({ data: null, error: { message: 'Could not find the function public.get_bell(p_athlete_id) in the schema cache', code: 'PGRST202' }, status: 404 });
-      return res({ data: S.bell ? JSON.parse(JSON.stringify(S.bell)) : null, error: null, status: 200 });
+    if (name === 'get_bell' || name === 'get_bell_if_new') {
+      if (S.bellMissing) return res({ data: null, error: { message: 'Could not find the function public.' + name + '(p_athlete_id) in the schema cache', code: 'PGRST202' }, status: 404 });
+      // stage83: the app asks get_bell_if_new with the hash it holds. ifNewMissing = a server without that stage, so the app
+      // learns once and asks plain get_bell from then on.
+      if (name === 'get_bell_if_new' && S.ifNewMissing) return res({ data: null, error: { message: 'Could not find the function public.get_bell_if_new(p_athlete_id, p_etag) in the schema cache', code: 'PGRST202' }, status: 404 });
+      if (!S.bell) return res({ data: null, error: null, status: 200 });
+      // the hash the server takes over the payload: it MUST change when the feed does, or a new post would never arrive
+      var tag = (function (B) {
+        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji]), h = 0;
+        for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
+        return S.bell.etag && !S.bellTagMoves ? S.bell.etag : 'tag' + h;
+      })(S.bell);
+      if (name === 'get_bell_if_new' && params && params.p_etag && params.p_etag === tag) return res({ data: { same: true, etag: tag, at: new Date().toISOString() }, error: null, status: 200 });
+      var out = JSON.parse(JSON.stringify(S.bell));
+      out.etag = tag; out.at = new Date().toISOString();
+      return res({ data: out, error: null, status: 200 });
     }
     if (/^crew_/.test(name) && S.bell) {
       var B = S.bell, me = B.me = B.me || {}, keep = function () { try { var cb = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); cb.bell = B; localStorage.setItem('__stubcfg', JSON.stringify(cb)); } catch (e) {} };

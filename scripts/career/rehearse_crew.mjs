@@ -18,6 +18,7 @@
 //   6. kudos      7. photos      8. the coach's side      9. the erasure      10. nothing else moved      11. the way back      12. the cost
 //   13. line endings: the apply and the way back from files whose lines end differently (a Windows checkout ends them with CRLF)
 //   14. stage82: the emoji beside the Like (the set, the swap, the refusals, the feed, the way back)
+//   15. stage83: the feed only when it has changed (the hash, what moves it, the refusals, the way back)
 // A check that fails because stage81 is wrong is a finding: it is reported, not fixed here.
 // `--stage <file>` and `--rollback <file>` rehearse a modified copy, to see that a check bites (2026-10-19: run against 68 one-line breaks of both files; every one
 // was noticed except a weight added to a part that is never printed).
@@ -894,6 +895,52 @@ async function main() {
   ok((await kudos('zz_emt', emPost.id, false)).n === 1, 'and it still works');
   await runSql(db, st82, 'stage82 after the way back');
   ok((await val(`select public.crew_emoji_list()`)) !== null, 'stage82 goes on again after it');
+
+  // ═══ 15 ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  section('15. stage83: the feed only when it has changed (Amir, 2026-10-19: "irans internet is very slow")');
+  const st83 = read(opt('--stage83') || path.join(ROOT, 'supabase', 'stage83_crew_if_new.sql'));
+  const back83 = read(opt('--rollback83') || path.join(ROOT, 'scripts', 'career', 'rollback_stage83.sql'));
+  await runSql(db, st83, 'stage83'); await runSql(db, st83, 'stage83 again');
+  ok(true, 'stage83 applied, and applied again without an error');
+  ok(!(await val(`select has_function_privilege('anon', 'public.get_bell_if_new(text,text)', 'execute')`))
+     && (await val(`select has_function_privilege('authenticated', 'public.get_bell_if_new(text,text)', 'execute')`)),
+     'anon cannot ask for it; a signed-in athlete can');
+  const first = await call('zz_emt', `select public.get_bell_if_new($1)`, ['zz_emt']);
+  ok(first && first.etag && first.items !== undefined && first.same === undefined, 'with no hash it sends the feed, and the hash with it');
+  const again = await call('zz_emt', `select public.get_bell_if_new($1, $2)`, ['zz_emt', first.etag]);
+  ok(again.same === true && again.etag === first.etag && again.items === undefined, 'with the same hash it sends "same" and no feed', again);
+  info(`the feed is ${JSON.stringify(first).length} bytes, "same" is ${JSON.stringify(again).length}`);
+  ok(JSON.stringify(again).length < JSON.stringify(first).length / 4, 'and "same" is a small fraction of the feed');
+  const wrong = await call('zz_emt', `select public.get_bell_if_new($1, 'not-the-hash')`, ['zz_emt']);
+  ok(wrong.same === undefined && wrong.etag === first.etag, 'an old or wrong hash sends the feed');
+  ok((await call('zz_emt', `select public.get_bell_if_new($1, $2)`, ['zz_emt', first.etag])).same === true,
+     'the clock alone does not change the hash: a second call over an unchanged crew is still "same"');
+  // every way the feed can change must change the hash
+  const emPost2 = await post('zz_emo', 'Something new to see.');
+  const afterPost = await call('zz_emt', `select public.get_bell_if_new($1, $2)`, ['zz_emt', first.etag]);
+  ok(afterPost.same === undefined && afterPost.etag !== first.etag, 'a new post changes the hash, so the phone is sent the feed');
+  const tag2 = afterPost.etag;
+  await call('zz_emt', `select public.crew_kudos($1, true, '👏')`, [emPost2.id]);
+  const afterLike = await call('zz_emt', `select public.get_bell_if_new($1, $2)`, ['zz_emt', tag2]);
+  ok(afterLike.same === undefined && afterLike.etag !== tag2, 'a reaction changes it too');
+  const tag3 = afterLike.etag;
+  await call('zz_emo', `select public.crew_delete_post($1)`, [emPost2.id]);
+  const afterDel = await call('zz_emt', `select public.get_bell_if_new($1, $2)`, ['zz_emt', tag3]);
+  ok(afterDel.same === undefined && afterDel.etag !== tag3, 'and so does a post that was REMOVED: nothing stale can sit on a phone');
+  // it is still the same answer as get_bell, and it still refuses what get_bell refuses
+  const plain = await call('zz_emt', `select public.get_bell($1)`, ['zz_emt']);
+  const viaNew = await call('zz_emt', `select public.get_bell_if_new($1)`, ['zz_emt']);
+  ok(eq(plain.items, viaNew.items) && eq(plain.me, viaNew.me) && eq(plain.honours, viaNew.honours),
+     'the feed it sends is get_bell()\'s own, word for word');
+  await refuses('it refuses another athlete, as get_bell() does', call('zz_emt', `select public.get_bell_if_new($1)`, ['zz_emo']), /not your bell/);
+  await refuses('and refuses a caller who is not signed in', asNobody(() => val(`select public.get_bell_if_new('zz_emt')`)), /not signed in|not your bell/);
+  ok((await coachCall(`select public.get_bell_if_new($1)`, ['zz_emt'])).items !== undefined, 'the coach can read it as anyone, as before');
+  info('the way back, then stage83 again');
+  await runSql(db, back83, 'the way back from stage83');
+  ok((await val(`select to_regprocedure('public.get_bell_if_new(text,text)')::text`)) === null, 'the way back drops it');
+  ok((await bellAs('zz_emt')).items !== undefined, 'get_bell() is untouched, so the app simply asks for that again');
+  await runSql(db, st83, 'stage83 after the way back');
+  ok((await call('zz_emt', `select public.get_bell_if_new($1)`, ['zz_emt'])).etag !== null, 'stage83 goes on again after it');
 
   console.log(`\n${failed ? 'FAIL' : 'OK'}: ${passed} passed, ${failed} failed (${Math.round((Date.now() - t0) / 1000)} s)`);
   if (failed) fails.forEach(f => console.log('  - ' + f));

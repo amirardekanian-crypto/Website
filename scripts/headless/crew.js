@@ -55,12 +55,22 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }
-  // 2. a server without stage81: the copy goes, and so does the tab
+  // 2. a server without stage81 (it was rolled back): the tab stands on the copy until Crew is opened, then both go.
+  //    Since 2026-10-19 the app asks for nothing at boot when it holds a copy (Amir's slow connection), so this is where it learns.
   {
     const { ctx, p } = await open(browser, { bell: null, stub: { bellMissing: true }, seed: { _crewcache: bell({ answer: 'yes', can_post: true }) } });
-    await p.waitForTimeout(2200);
+    await p.waitForTimeout(3200);
+    C.check('with a copy, a boot asks nothing and the tab stands', (await tabs(p)).includes('crew') && !(await calls(p, 'get_bell')).length && !(await calls(p, 'get_bell_if_new')).length);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(900);
     const left = await p.evaluate(id => localStorage.getItem(id + '_crewcache'), H.ID);
-    C.check('get_bell missing on the server: no Crew tab, the copy deleted', (await tabs(p)) === 'home,plan,workouts,notes' && left === null, (await tabs(p)) + ' ' + String(left).slice(0, 40));
+    C.check('…opening Crew finds get_bell gone: no Crew tab, the copy deleted', (await tabs(p)) === 'home,plan,workouts,notes' && left === null, (await tabs(p)) + ' ' + String(left).slice(0, 40));
+    await ctx.close();
+  }
+  // 2b. a phone that has never had an answer asks once at boot, so a new athlete gets the tab without opening anything
+  {
+    const { ctx, p } = await open(browser);
+    await p.waitForTimeout(3200);
+    C.check('with no copy at all, the app asks once at boot and the tab appears', (await calls(p, 'get_bell_if_new')).length === 1 && (await tabs(p)).includes('crew'));
     await ctx.close();
   }
   // 3. the demo never asks
@@ -141,11 +151,11 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     });
     await p.waitForFunction(() => !document.querySelector('#hist-overlay .cr-prev').hidden, null, { timeout: 8000 }).catch(() => {});
     const d = await p.evaluate(() => _crewDraft && _crewDraft.photo ? { w: _crewDraft.photo.w, h: _crewDraft.photo.h, kb: Math.round(_crewDraft.photo.bytes / 1024), jpg: _crewDraft.photo.b64.slice(0, 4) } : null);
-    C.check('…a 3000 × 2250 photo becomes a 1280 × 960 JPEG under 400 KB', d && d.w === 1280 && d.h === 960 && d.kb <= 400 && d.jpg === '/9j/', JSON.stringify(d));
+    C.check('…a 3000 × 2250 photo becomes a 1080 × 810 JPEG under 200 KB', d && d.w === 1080 && d.h === 810 && d.kb <= 200 && d.jpg === '/9j/', JSON.stringify(d));
     await p.fill('#hist-overlay .cr-txt', 'First time on clay this year.');
     await p.evaluate(() => document.querySelector('#hist-overlay .cr-go').click()); await p.waitForTimeout(600);
     const post = (await calls(p, 'crew_post'))[0] || {};
-    C.check('…Post sends the words, the photo and its size, as a post', post.p_body === 'First time on clay this year.' && /^\/9j\//.test(post.p_photo || '') && post.p_w === 1280 && post.p_h === 960 && post.p_kind === 'post', JSON.stringify(Object.assign({}, post, { p_photo: String(post.p_photo).slice(0, 8) })));
+    C.check('…Post sends the words, the photo and its size, as a post', post.p_body === 'First time on clay this year.' && /^\/9j\//.test(post.p_photo || '') && post.p_w === 1080 && post.p_h === 810 && post.p_kind === 'post', JSON.stringify(Object.assign({}, post, { p_photo: String(post.p_photo).slice(0, 8) })));
     C.check('…the sheet closes and the post is first after Amir\'s, with Delete', await p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')
       && /First time on clay/.test((document.querySelectorAll('#crew-body .cr-post')[1] || {}).textContent || '') && !!document.querySelectorAll('#crew-body .cr-post')[1].querySelector('.cr-del')));
     C.check('…you cannot like your own post', await p.evaluate(() => document.querySelectorAll('#crew-body .cr-post')[1].querySelector('.cr-kd').disabled));
@@ -267,6 +277,54 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await waitTab(p);
     await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
     C.check('under 13: the Like and every emoji are dead', await p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-kd, #crew-body .cr-em')].every(b => b.disabled)));
+    await ctx.close();
+  }
+
+  // 10. a slow connection: nothing is asked for unless Crew is opened, and a photo is downloaded once (Amir, 2026-10-19)
+  {
+    const b = Object.assign(bell({ answer: 'yes', can_post: true }), { emoji: ['🔥', '💪', '👏', '😍'], etag: 'tag-A' });
+    const { ctx, p } = await open(browser, { bell: b, seed: { _crewcache: Object.assign({}, b, { at: new Date().toISOString() }) } });
+    await waitTab(p);
+    await p.waitForTimeout(3200);   // past the first-look (2.5 s): with a copy on the phone it must ask for nothing
+    C.check('with a copy on the phone, opening the app asks the server for nothing', (await calls(p, 'get_bell_if_new')).length === 0 && (await calls(p, 'get_bell')).length === 0,
+      JSON.stringify(await p.evaluate(() => (window.__STUB.calls || []).filter(c => /get_bell/.test(c)))));
+    C.check('…and the Crew tab is still there, from that copy', (await tabs(p)).includes('crew'));
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(700);
+    const asked = await calls(p, 'get_bell_if_new');
+    C.check('opening Crew asks once, with the hash of the copy', asked.length === 1 && asked[0].p_etag === 'tag-A', JSON.stringify(asked));
+    C.check('…and an unchanged feed sends nothing back: the copy stands', await p.evaluate(() => BELL && BELL.etag === 'tag-A' && !!document.querySelector('#crew-body .cr-post')));
+    await p.evaluate(() => { goTo('home'); goTo('crew'); }); await p.waitForTimeout(500);
+    C.check('…going back in within ten minutes asks nothing again', (await calls(p, 'get_bell_if_new')).length === 1);
+    // the photo: downloaded once, then kept on the phone
+    await p.evaluate(() => document.querySelector('.cr-ph').scrollIntoView()); await p.waitForTimeout(800);
+    C.check('the photo is downloaded on the first look', (await calls(p, 'crew_photo')).length === 1);
+    const kept = await p.evaluate(async () => { const c = await caches.open('crew-photos-v1'); return (await c.keys()).length; });
+    C.check('…and kept on the phone (Cache Storage, not memory)', kept === 1, String(kept));
+    await ctx.close();
+  }
+  {
+    // the same phone, opened again (a reload keeps Cache Storage, as closing and opening the app does)
+    const b = Object.assign(bell({ answer: 'yes', can_post: true }), { emoji: ['🔥'], etag: 'tag-A' });
+    const { ctx, p } = await open(browser, { bell: b, seed: { _crewcache: Object.assign({}, b, { at: new Date().toISOString() }) } });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(600);
+    await p.evaluate(() => document.querySelector('.cr-ph').scrollIntoView()); await p.waitForTimeout(900);
+    C.check('the first look downloads the photo', (await calls(p, 'crew_photo')).length === 1);
+    await p.reload({ waitUntil: 'domcontentloaded' });
+    await p.waitForFunction(() => document.getElementById('loading') && document.getElementById('loading').classList.contains('hidden'), null, { timeout: 20000 });
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(600);
+    await p.evaluate(() => document.querySelector('.cr-ph').scrollIntoView()); await p.waitForTimeout(900);
+    const shown = await p.evaluate(() => { const b2 = document.querySelector('.cr-ph'); return b2.classList.contains('is-in') && (b2.querySelector('img').getAttribute('src') || '').slice(0, 5); });
+    C.check('after closing and opening the app the photo comes off the phone, nothing is downloaded', shown === 'blob:' && (await calls(p, 'crew_photo')).length === 0,
+      JSON.stringify([shown, (await calls(p, 'crew_photo')).length]));
+    await ctx.close();
+  }
+  {
+    // a server without stage83: the app learns once and asks the plain feed from then on
+    const { ctx, p } = await open(browser, { bell: bell({ answer: 'yes', can_post: true }), stub: { ifNewMissing: true } });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(700);
+    C.check('without stage83 the app falls back to get_bell and still draws the feed', (await calls(p, 'get_bell')).length >= 1 && await p.evaluate(() => !!document.querySelector('#crew-body .cr-post')));
     await ctx.close();
   }
 

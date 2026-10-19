@@ -1535,9 +1535,10 @@ decides what rings and who can be seen, and never sends this app another athlete
   IntersectionObserver), two at once at most, kept as object URLs for the visit (`CREW_PHOTOS`); your own shows at once after posting. A tap opens
   **the viewer** (`openCrewPhoto()`, `#crew-viewer`, dark, the whole photo, *N days left*, the Like); ✕ or Back closes it (`topLayer()`).
 - **Posting** (`openCrewPost()`, in the one sheet): up to 280 characters with a counter, *Add a photo*, the notes (*Made smaller before it's sent…*,
-  *Gone after 7 days. Amir can remove any post…*). `crewShrink()` draws the photo on a canvas at most **1280 px** on its long side and encodes a
-  **JPEG at 0.75** (then 0.6, 0.5, 1024 px, 800 px until it is under 400 KB; the server takes 450 KB); the re-encode drops the EXIF data, location
-  included. The server's limits come back as words (`crewErrWords()`): 3 photos and 10 posts a day. No signal: the post stays in the sheet to send
+  *Gone after 7 days. Amir can remove any post…*). `crewShrink()` draws the photo on a canvas at most **1080 px** on its long side and encodes a
+  **JPEG at 0.7** (then 0.6, 900 px, 800 px, 640 px until it is **under 200 KB**; the server's ceiling is 450 KB). The re-encode drops the EXIF
+  data, location included. 1080 px is twice a card's width on a phone, and on 2026-10-19 the photos already posted were landing at **312 KB**
+  each while every promise said 200 KB — on a slow connection each one is paid for by every athlete who opens Crew. The server's limits come back as words (`crewErrWords()`): 3 photos and 10 posts a day. No signal: the post stays in the sheet to send
   again (nothing is queued).
 - **Tell the crew** (`paintCrewTell()`): a door row under the WhatsApp row of every finished card (`.complete-crew[data-day]` inside `.complete-wa`,
   so the card's grid rows did not move), shown while the athlete can post. It opens the composer as a session: *Day 2 done. 47 sessions with
@@ -1555,8 +1556,17 @@ decides what rings and who can be seen, and never sends this app another athlete
 - **The yes and the switches** (`openCrewSettings()`, from your initials → **Crew and the Bell**, and from *What the crew sees of you*): Yes / No,
   a switch per kind (`crew_kinds()`: a new level, a week held, a mark, an achievement, a personal best, a cycle finished, the month's honours, the
   Monthly Open), and what a no does. An athlete Amir ticked **under 13** reads only: no question, no composer, no Like, no Tell the crew.
-- **The data**: `refreshBell()` after the first paint (1.5 s), when Crew opens (at most every 30 s) and after a post or an answer; the answer is kept
-  in `<id>_crewcache` and `<id>_crewseen` holds the post seen; **neither syncs** (`_snapshot()`).
+- **The data, on a slow connection** (Amir, 2026-10-19: *"irans internet is very slow, and cant download everything everytime they open the
+  app"*): **nothing is asked for at an app open**. `crewFirstLook()` asks once in a phone's life, only while it has no copy at all (a new
+  athlete still gets the tab without opening anything); after that the tab, the dot and *Tell the crew* all come from `<id>_crewcache`.
+  Opening Crew draws the copy first, then asks **at most every ten minutes** (the board too). The ask is `get_bell_if_new` (stage83) carrying
+  the hash of the copy: an unchanged crew answers **`{ same: true }`**, 78 bytes against the feed's few thousand, and the copy stands. A server
+  without stage83 says so once and the phone asks plain `get_bell()` from then on (`_bellPlain`).
+- **A photo is downloaded once, ever.** `crewFetchPhoto()` looks in **Cache Storage** (`crew-photos-v1`) before the network, and what it
+  downloads it keeps there, so closing and opening the app costs nothing. The name does NOT start with `aap-`, because `sw.js`'s activate
+  deletes every `aap-*` cache on a version bump. `crewSweepPhotos()` runs after each fresh feed and drops everything the feed no longer names,
+  so a photo leaves the phone when its post leaves the server at 7 days. Photos are still only asked for when their card comes within 400 px
+  of the screen, so a long feed nobody scrolls costs one small read.
 - **The guide** (CNT-01): the card *Crew and the Bell* and Crew's line in *Getting around* show only while the tab does (`when: () => crewOn()`, the
   `<!--crew-->` mark in Getting around).
 - **Tests**: `scripts/headless/crew.js` (45 checks: no tab without an answer, a missing function or in the demo; the dot, the question, the feed's
