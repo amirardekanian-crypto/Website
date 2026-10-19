@@ -2638,7 +2638,7 @@
   #screen-ceiling .ex-1rm-field input::placeholder { color: var(--ph); opacity: 1; }
   #screen-ceiling .ex-1rm-field input:focus, #screen-ceiling .ceil-when input:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
   #screen-ceiling .ex-1rm-field span { display: block; margin: 0; font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
-  /* the unit under the weight box is a button (2026-10-18): kg, lb or plates, one tap to the next */
+  /* the unit under the weight box is a button (2026-10-18): kg, lb or plates; a tap opens the three to pick from (openUnitMenu(), 2026-10-19) */
   #screen-ceiling .ex-1rm-field .cf-unit { justify-self: center; min-height: 44px; min-width: 56px; padding: 0 12px; border: 1px solid var(--field); border-radius: 999px; background: none; cursor: pointer; -webkit-appearance: none; appearance: none;
     font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--green-ink); }
   #screen-ceiling .ex-1rm-field .cf-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
@@ -2893,6 +2893,24 @@
   .aa-toast-x { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.5); }
   .aa-toast-go, .aa-toast-x:only-child { background: var(--tile-on-green); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 10px 22px -10px rgba(0,0,0,.6); }
   .aa-toast-go:focus-visible, .aa-toast-x:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  /* aaToast(…, { pass: true }): the box lets a tap through to the boxes under it (the unit note sits over the set rows it is about); only its buttons catch one */
+  .aa-toast[data-pass] { pointer-events: none; }
+  .aa-toast[data-pass] button { pointer-events: auto; }
+
+  /* 10b. The unit menu (openUnitMenu(), 2026-10-19; Amir: "if someone miss clicks the weight measure it changes ... I want the person to be able
+     to choose between the 3"). A tap on a unit button opens these three rows under it and changes nothing; a pick changes the unit. Fixed to the
+     page and placed from its button's box, above the sheets (200, 210) and the note box (215). It sits on body, so it takes the app's colours. */
+  .unit-menu { position: fixed; z-index: 220; box-sizing: border-box; width: 232px; padding: 6px; border: 1px solid var(--box); border-radius: 14px; background: var(--row);
+    box-shadow: 0 14px 36px -10px rgba(0,0,0,.35); }
+  .unit-menu-k { padding: 8px 10px 6px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  .unit-opt { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; margin: 0; padding: 0 10px; border: 0; border-radius: 10px; background: none; cursor: pointer;
+    text-align: left; color: var(--ink); -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent; }
+  .unit-opt:active { background: var(--tint); }
+  .unit-opt:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  .unit-opt-dot { flex: none; width: 22px; height: 22px; box-sizing: border-box; border: 1.5px solid var(--field); border-radius: 50%; background: var(--row); }
+  .unit-opt[aria-checked="true"] .unit-opt-dot { border: 6px solid var(--green-ink); }
+  .unit-opt-n { font: 600 var(--fs-body)/1.2 'Barlow', sans-serif; }
+  .unit-opt-h { margin-left: auto; font: 500 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--grey); text-align: right; }
 
   /* 11. The install offer (drawn by assets/js/shared.js, which serves the public site too, so it is styled here and nowhere else): a card that
      rises from the bottom, white, 16 px top corners, the app's icon, the words as they are, Install as the primary green button and Not now
@@ -3479,9 +3497,13 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-set-log:not(.has-reps) .ex-set-header > div:nth-child(3) { text-align: center; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg .ex-set-header > div:nth-child(3) { text-align: left; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg:not(.has-reps) .ex-set-header { display: none; }
-  /* The unit button over the weight boxes (2026-10-18): kg, lb or plates, one tap to the next. A quiet pill, so it reads as a label that can be pressed. */
-  :where(#day-view, .step-scroll, #ws-body) .ex-set-unit { display: inline-block; min-height: 34px; margin: 0 -8px; padding: 0 8px; border: 1px solid var(--field); border-radius: 999px;
-    background: none; cursor: pointer; font: inherit; letter-spacing: .3px; text-transform: uppercase; color: var(--green-ink); white-space: nowrap; -webkit-appearance: none; appearance: none; }
+  /* The unit over the weight boxes (2026-10-18): kg, lb or plates; a tap opens the three to pick from (openUnitMenu(), 2026-10-19). Direction B, Name Tag (Amir, 2026-10-19,
+     "go with your picks"): in the set table it is the column's header word with a chevron, no pill (the boxes are about 60 px wide and carry the LAST caption, so no tag fits
+     in them); on a superset it is a tag inside each weight box (.wt-field). 44 px to hit, drawn over the header's own height. */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-unit { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; margin: -14px 0; padding: 0 6px; border: 0; border-radius: 6px;
+    background: none; cursor: pointer; font: inherit; font-weight: 700; letter-spacing: inherit; text-transform: uppercase; color: var(--green-ink); white-space: nowrap;
+    -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-unit::after { content: '\25BE'; font-weight: 400; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-log .ex-set-row { position: relative; align-items: center; min-height: 60px; padding-top: 6px; padding-bottom: 6px; border-top: 0;
     border-radius: 0; background: none; }
@@ -3581,6 +3603,11 @@
   :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed):not(.is-prep) { border-bottom: 1px solid var(--hair); }
   :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) > .item-main { grid-column: 1 / -1; margin: 0 calc(-1 * var(--g)); }
   :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) > .ex-detail { display: contents; }
+  /* The green head stays first. The body's `display: contents` puts the Coach's Note (order -2, so it leads a card's body) into THIS grid, where
+     it sat above the head (Amir, 2026-10-19: "the coach's note for this superset is on top of the card, should be under"). */
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) > .item-main { order: -3; }
+  /* a circuit has no How to do it or Last time row after its note (and a warm-up no pill), so the note gets its own air above the first round's hairline */
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) .ex-coach-note { padding-bottom: 12px; }
   :where(#day-view, .step-scroll, #ws-body) .round-list { display: block; margin: 0; }
   :where(#day-view, .step-scroll, #ws-body) .round-row, :where(#day-view, .step-scroll, #ws-body) .round-row.prep { position: relative; display: block; padding: 0; border: 0; color: var(--ink); }
   :where(#day-view, .step-scroll, #ws-body) .round-row::before { content: ''; position: absolute; top: 0; left: 56px; right: calc(-1 * var(--g)); height: 1px; background: var(--hair); }
@@ -3611,15 +3638,18 @@
   /* a working circuit: the green head (above), its rows on the paper: letter · name and dose · kg on the right edge, open cues,
      a small How to do it line under an item with steps, then one How hard? row per round */
   :where(#day-view, .step-scroll, #ws-body) .round-group:not(.is-prep) .round-row-main { grid-template-columns: 44px minmax(0, 1fr) auto auto; grid-template-areas: "l n w p" "l d w p"; cursor: default; }
-  :where(#day-view, .step-scroll, #ws-body) .round-wt { grid-area: w; justify-self: end; width: 68px; height: 48px; margin: 0; padding: 0 2px; border: 1px solid var(--field); border-radius: 10px;
-    background: var(--row); outline: none; font: 500 var(--fs-field)/1 'Barlow', sans-serif; color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
+  /* a superset's weight box (Name Tag, 2026-10-19): ONE box holds the number and, after it, the unit as a tag (kg, lb or plates), so a number never loses its
+     unit and the pill row over the boxes is gone. The tag is the unit button: a tap opens the menu (openUnitMenu()), it changes nothing until a pick. */
+  :where(#day-view, .step-scroll, #ws-body) .wt-field { grid-area: w; justify-self: end; display: flex; align-items: stretch; width: 108px; height: 48px; margin: 0; border: 1px solid var(--field); border-radius: 10px;
+    background: var(--row); overflow: hidden; }
+  :where(#day-view, .step-scroll, #ws-body) .wt-field:focus-within { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .round-wt { flex: 1 1 auto; min-width: 0; width: auto; height: auto; margin: 0; padding: 0 6px 0 4px; border: 0; border-radius: 0; background: none; outline: none;
+    font: 500 var(--fs-field)/1 'Barlow', sans-serif; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
   :where(#day-view, .step-scroll, #ws-body) .round-wt::placeholder { color: var(--ph); opacity: 1; font-weight: 500; }
-  /* the unit over a circuit's weight boxes (2026-10-18): kg, lb or plates, one tap to the next, for every item of the circuit */
-  :where(#day-view, .step-scroll, #ws-body) .round-wt-head { display: flex; justify-content: flex-end; padding: 0 0 6px; }
-  :where(#day-view, .step-scroll, #ws-body) .circ-unit { min-height: 34px; margin: 0 -6px 0 0; padding: 0 12px; border: 1px solid var(--field); border-radius: 999px; background: none; cursor: pointer; -webkit-appearance: none; appearance: none;
-    font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .3px; text-transform: uppercase; color: var(--green-ink); white-space: nowrap; }
-  :where(#day-view, .step-scroll, #ws-body) .circ-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
-  :where(#day-view, .step-scroll, #ws-body) .round-wt:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .circ-unit { flex: none; min-width: 40px; margin: 0; padding: 0 8px; border: 0; border-left: 1px solid var(--hair); border-radius: 0; background: var(--sand); cursor: pointer;
+    -webkit-appearance: none; appearance: none; font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .3px; text-transform: uppercase; color: var(--green-ink); white-space: nowrap;
+    -webkit-tap-highlight-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .circ-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   :where(#day-view, .step-scroll, #ws-body) .round-row:not(.prep) .round-cues-slot { display: block; }
   :where(#day-view, .step-scroll, #ws-body) .round-row:not(.prep) .round-cues { padding-bottom: 4px; }
   :where(#day-view, .step-scroll, #ws-body) .round-row.has-steps:not(.prep) .round-how-tog { display: inline-flex; margin: 2px 0 0 56px; gap: 0;
@@ -4173,7 +4203,7 @@
   .timer-log .tl-line { display: flex; align-items: center; gap: 6px; }
   .timer-log .tl-line + .tl-line { margin-top: 10px; }
   .timer-log .tl-lab { flex: none; width: 36px; font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
-  /* The unit is the label of the weight line and a button: kg, lb or plates, one tap to the next. Same look as its sisters, underlined so it reads as pressable. */
+  /* The unit is the label of the weight line and a button: kg, lb or plates; a tap opens the three to pick from (openUnitMenu(), 2026-10-19). Same look as its sisters, underlined so it reads as pressable. */
   .timer-log .tl-unit { width: auto; min-width: 36px; min-height: 44px; margin: 0; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; color: var(--green-ink);
     text-decoration: underline dotted; text-underline-offset: 4px; -webkit-appearance: none; appearance: none; }
   .timer-log .tl-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
@@ -9606,7 +9636,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
         <span class="round-letter">${letter}</span>
         <span class="round-name">${esc(item.name)}</span>
         <span class="round-detail">${esc(itemDose(item))}</span>
-        ${logWeight ? `<input class="round-wt" type="text" inputmode="decimal" placeholder="kg" data-item="${i}">` : ''}
+        ${logWeight ? `<span class="wt-field"><input class="round-wt" type="text" inputmode="decimal" placeholder="–" aria-label="Weight, ${esc(item.name)}" data-item="${i}"><button type="button" class="circ-unit" aria-haspopup="menu" aria-expanded="false" aria-label="Weight unit. Tap to choose">kg</button></span>` : ''}
         ${itemPlay}
         ${cueTog}
       </div>
@@ -9677,7 +9707,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
       <div class="lt-slot"></div>`}
       ${renderCoachNote(ex.note)}
       <div class="ex-section-label">Rounds</div>
-      <div class="round-list">${logWeight ? `<div class="round-wt-head"><button type="button" class="circ-unit" aria-label="Weight unit. Tap to change it">kg</button></div>` : ''}${roundsHtml}</div>
+      <div class="round-list">${roundsHtml}</div>
       ${showLog ? `<div class="ex-section-label">Log</div>
       <div class="ex-log"></div>` : ''}
       ${restBottom}
@@ -10000,13 +10030,13 @@ const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
     body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then <strong>Career</strong> (your level, <strong>Hold Serve</strong>: the weeks you've held in a row, and the next mark you're close to), then today's habits, ticked right there.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then <strong>Your numbers</strong> (your level, your four numbers and this month's goal), then <strong>Achievements</strong>, then <strong>Your moments</strong>, then your records and body weight, then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
-    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
+    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now. The card shows my first line. Tap <strong>Why this cycle matters</strong> for the rest of the note and <strong>Expected outcomes</strong> for what we're aiming to hit.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
     body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 3 or 4 numbers like <strong>3-1-1</strong> or <strong>3-1-1-0</strong>: down, pause, up, and sometimes a pause at the top. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small button over the weight boxes says <strong>kg</strong>. Some machines show pounds, and some show no weight at all. Tap the button to change it to <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small <strong>kg</strong> at the top of the weight boxes, or inside each box on a superset, is the unit. Some machines show pounds, and some show no weight at all. Tap it and pick <strong>kg</strong>, <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time. Picked the wrong one? Tap <strong>Undo</strong> in the note that shows.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. It starts with your warm-up: tick each part as you do it, or tap <strong>Done ✓</strong> for all of it. <strong>Skip</strong> moves on, and I see it was skipped. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ: what an exercise is for',
@@ -10234,6 +10264,7 @@ function _visibleBtn(root, sel) {
 }
 function topLayer() {
   const on = id => { const e = document.getElementById(id); return !!(e && e.classList.contains('visible')); };
+  if (document.querySelector('.unit-menu')) return () => closeUnitMenu(true);   // the unit menu is the top of anything it opened over
   if (document.querySelector('.wel')) return () => { const w = document.querySelector('.wel'); if (w) w.remove(); };   // the Welcome sits over everything
   if (document.querySelector('.hl-moment')) return closeMoment;   // a cycle's moment (Highlight Reel), the Welcome's recipe
   const vm = document.querySelector('.video-modal.is-open');
@@ -12598,7 +12629,7 @@ function openCeilingForm(i, asTest) {
   const c = ceilingCandidates()[i];
   if (!c) return;
   const spec = asTest ? c.test : null;
-  // The measure the form opens in: the lift's own (where its records are), else the unit it was last logged in, else kg. One tap changes it.
+  // The measure the form opens in: the lift's own (where its records are), else the unit it was last logged in, else kg. The unit button opens a menu of the three (chooseCeilingUnit()).
   const known = ceilingLifts().find(x => x.lift === c.name);
   _ceilAdd = { lift: c.name, test: c.test, spec: spec, u: known ? uKey(known.u) : lastLoggedUnit(c.name) };
   _ceilLift = null;
@@ -12621,7 +12652,7 @@ function openCeilingForm(i, asTest) {
     <div class="prog-sec">What you lifted</div>
     <div class="ceil-form">
       <div class="ex-1rm-inputs">
-        <div class="ex-1rm-field"><input id="cf-kg" type="text" inputmode="decimal" aria-label="Weight"><button type="button" class="cf-unit" id="cf-unit" onclick="cycleCeilingUnit()" aria-label="Weight unit. Tap to change it">${esc(uWord(_ceilAdd.u, 2))}</button></div>
+        <div class="ex-1rm-field"><input id="cf-kg" type="text" inputmode="decimal" aria-label="Weight"><button type="button" class="cf-unit" id="cf-unit" onclick="chooseCeilingUnit(this)" aria-haspopup="menu" aria-expanded="false" aria-label="Weight unit. Tap to choose">${esc(uWord(_ceilAdd.u, 2))}</button></div>
         <div class="ex-1rm-field"><input id="cf-rp" type="text" inputmode="numeric" aria-label="Reps" value="${esc(String(reps))}"><span>reps</span></div>
       </div>
       <input id="cf-rpe" type="hidden" value="">
@@ -12748,16 +12779,20 @@ function lastLoggedUnit(name) {
   }
   return 'kg';
 }
-// kg, then lb, then plates, then kg again, on the Log a max form: the weight and the estimate follow.
-function cycleCeilingUnit() {
+// The Log a max form's unit button opens the same three-row menu as the sets' (openUnitMenu()): the weight and the estimate follow a pick. Nothing
+// logged is relabelled here, so there is no note box.
+function chooseCeilingUnit(btn) {
   if (!_ceilAdd) return;
-  const order = ['kg', 'lb', 'plates'];
-  _ceilAdd.u = order[(order.indexOf(uKey(_ceilAdd.u)) + 1) % order.length];
+  openUnitMenu(btn, uKey(_ceilAdd.u), u => chooseCeilingUnitTo(u));
+}
+function chooseCeilingUnitTo(u) {
+  if (!_ceilAdd) return;
+  _ceilAdd.u = u;
   const b = document.getElementById('cf-unit');
   if (b) b.textContent = uWord(_ceilAdd.u, 2);
   paintCeilingForm();
 }
-window.cycleCeilingUnit = cycleCeilingUnit;
+window.chooseCeilingUnit = chooseCeilingUnit;
 
 // The full explainer, in place: ONE fold row, closed on every screen (it used to be open on the empty one, where it is the
 // only thing worth reading; the steps above it say what to do). Same prose as the help sheet's card.
@@ -15974,8 +16009,8 @@ function attachSetLog(card) {
   // No "Same as last" button above the table (removed 2026-09-27, Amir: "its a duplicate
   // of what can be seen in history"): each empty kg box shows last time's weight, and a
   // weight typed in set 1 fills the empty sets below it.
-  // The unit button over the weight boxes (2026-10-18): kg, lb or plates, one tap to the next (setCardUnit()). Painted by paintSets().
-  let html = `<div class="ex-set-header"><div>SET</div><div><button type="button" class="ex-set-unit" aria-label="Weight unit. Tap to change it">kg</button></div>${repsCol ? '<div>REPS</div>' : ''}<div></div><div></div></div>`;
+  // The unit button, the set table's header word over the weight boxes (2026-10-18; Name Tag, 2026-10-19): kg, lb or plates; a tap opens the three to pick from (openUnitMenu(), pickCardUnit()). Painted by paintSets().
+  let html = `<div class="ex-set-header"><div>SET</div><div><button type="button" class="ex-set-unit" aria-haspopup="menu" aria-expanded="false" aria-label="Weight unit. Tap to choose">kg</button></div>${repsCol ? '<div>REPS</div>' : ''}<div></div><div></div></div>`;
   log.forEach((s, i) => {
     const rpeBtns = [6,7,8,9,10].map(n =>
       `<button class="rpe-btn${String(s.r) === String(n) ? ' selected' : ''}" data-rpe="${n}" type="button" aria-label="RPE ${n}">${n}</button>`
@@ -15996,7 +16031,7 @@ function attachSetLog(card) {
   });
   wrap.innerHTML = html;
   slot.appendChild(wrap);
-  wrap.querySelector('.ex-set-unit').addEventListener('click', ev => { ev.stopPropagation(); cycleUnit(card); });
+  wrap.querySelector('.ex-set-unit').addEventListener('click', ev => { ev.stopPropagation(); openUnitMenu(ev.currentTarget, cardUnit(card), u => pickCardUnit(card, u)); });
   paintKgCol(card);
 
   const rows = Array.from(wrap.querySelectorAll('.ex-set-row'));
@@ -16016,7 +16051,7 @@ function attachSetLog(card) {
     const unit = cardUnit(card);
     const ub = wrap.querySelector('.ex-set-unit');
     if (ub && ub.textContent !== unit) ub.textContent = unit;
-    if (ub) ub.setAttribute('aria-label', `Weight in ${unit}. Tap to change it`);
+    if (ub) ub.setAttribute('aria-label', `Weight in ${unit}. Tap to choose a unit`);
     wrap.dataset.unit = unit;
     rows.forEach((row, i) => {
       const s = cur[i] || {};
@@ -16276,7 +16311,7 @@ function prescribedReps(repsChip) {
 // A weight is free text and the unit is WRITTEN IN IT: a bare number is kilograms (every weight logged before this day), "45 lb" is
 // pounds and "6 plates" is the count on a machine's stack. So one string travels everywhere a weight already did (the cloud merge,
 // the carried LAST, the saved session, the email, coach.html) and no field is added that a merge could drop. The weight box holds
-// the number only; the unit is the small button over it (setCardUnit()), kept per exercise by the sets themselves.
+// the number only; the unit is the header word over the column, or the tag inside a superset's box (setCardUnit()), kept per exercise by the sets themselves.
 // Each measure is its own scale: a record, a win or a best is only ever compared with the same lift in the same measure (the MEASURE
 // block below), so nothing is converted for them: 225 lb is a number of pounds, 9 plates a number of plates. Plates are a position
 // on a stack, never a load, so parseLoggedKg() (a weight in kilograms) is null for them and they never lead a kilograms line (body
@@ -17019,10 +17054,102 @@ function setCardUnit(card, unit) {
   if (changed) saveSetLogValue(name, cur, day);
   if (card._paintSets) card._paintSets();
 }
-function cycleUnit(card) {
-  const order = ['kg', 'lb', 'plates'], u = cardUnit(card);
-  setCardUnit(card, order[(order.indexOf(u) + 1) % order.length]);
+
+// THE UNIT MENU (2026-10-19; Amir: "if someone miss clicks the weight measure it changes. First a soft warning or notification. Second I want the
+// person to be able to choose between the 3"). A tap on a unit button used to go kg → lb → plates and relabel every weight typed on the card, so one
+// stray thumb changed them all. Now a tap opens three rows under the button and changes nothing; a pick changes the unit and SAYS so, with Undo
+// (pickCardUnit()). One menu for every unit button: the set table's, a circuit's, Guided's and Log a max's. It closes by a tap anywhere else, a
+// scroll, Escape or Back (topLayer()), and a tap on its own button again.
+const UNIT_CHOICES = [
+  { u: 'kg', name: 'Kilograms', hint: 'kg' },
+  { u: 'lb', name: 'Pounds', hint: 'lb' },
+  { u: 'plates', name: 'Plates', hint: 'count the stack' },
+];
+let _unitMenu = null;
+function closeUnitMenu(focusBack) {
+  const m = _unitMenu;
+  if (!m) return;
+  _unitMenu = null;
+  document.removeEventListener('pointerdown', m.onDown, true);
+  document.removeEventListener('scroll', m.onScroll, true);
+  window.removeEventListener('resize', m.onResize);
+  m.el.remove();
+  m.btn.setAttribute('aria-expanded', 'false');
+  if (focusBack && m.btn.isConnected) { try { m.btn.focus({ preventScroll: true }); } catch (e) {} }
+}
+// btn: the unit button the menu hangs from. current: the unit now. onPick(unit): called with a unit other than the current one.
+function openUnitMenu(btn, current, onPick) {
+  const reopen = _unitMenu && _unitMenu.btn === btn;
+  closeUnitMenu();
+  if (reopen) return;   // a second tap on the button puts the menu away
+  if (!_toastRun) hideAaToast();   // a plain note sits in the middle of the screen, where the menu opens; one with a button (the once-a-day clock offer) stays
+  const el = document.createElement('div');
+  el.className = 'unit-menu';
+  el.setAttribute('role', 'menu');
+  el.setAttribute('aria-label', 'Weight unit');
+  el.innerHTML = '<div class="unit-menu-k" aria-hidden="true">Weight in</div>' + UNIT_CHOICES.map(c =>
+    `<button type="button" class="unit-opt" role="menuitemradio" aria-checked="${c.u === current}" data-u="${c.u}">` +
+    `<span class="unit-opt-dot" aria-hidden="true"></span><span class="unit-opt-n">${c.name}</span><span class="unit-opt-h">${c.hint}</span></button>`).join('');
+  document.body.appendChild(el);
+  // Under the button, an edge level with the button's (the left one for a button in the left half, the right one for one in the right half), kept
+  // 12 px inside the screen; above it when the screen ends first.
+  const r = btn.getBoundingClientRect(), w = el.offsetWidth, h = el.offsetHeight, vw = document.documentElement.clientWidth, vh = window.innerHeight;
+  const x = (r.left + r.right) / 2 < vw / 2 ? r.left : r.right - w;
+  el.style.left = Math.max(12, Math.min(x, vw - w - 12)) + 'px';
+  el.style.top = Math.max(12, (r.bottom + 6 + h > vh - 12) ? r.top - 6 - h : r.bottom + 6) + 'px';
+  // A scroll puts the menu away only when it moves the button the menu hangs from: the scroll events a page still owes from before the tap (a thumb
+  // flick that was settling, the browser bringing the button into view) arrive after the menu is open and must not close it.
+  const m = {
+    el, btn,
+    onDown: ev => { if (!el.contains(ev.target) && !btn.contains(ev.target)) closeUnitMenu(); },
+    onScroll: ev => {
+      if (el.contains(ev.target)) return;
+      const b = btn.getBoundingClientRect();
+      if (!btn.isConnected || Math.abs(b.top - r.top) > 1 || Math.abs(b.left - r.left) > 1) closeUnitMenu();
+    },
+    onResize: () => closeUnitMenu(),
+  };
+  _unitMenu = m;
+  btn.setAttribute('aria-expanded', 'true');
+  document.addEventListener('pointerdown', m.onDown, true);
+  document.addEventListener('scroll', m.onScroll, true);
+  window.addEventListener('resize', m.onResize);
+  el.addEventListener('click', ev => {
+    ev.stopPropagation();
+    const o = ev.target.closest('.unit-opt');
+    if (!o) return;
+    const u = o.dataset.u;
+    closeUnitMenu(true);
+    if (u !== current) onPick(u);
+  });
+  el.addEventListener('keydown', ev => {
+    if (ev.key === 'Escape' || ev.key === 'Tab') { ev.preventDefault(); closeUnitMenu(true); return; }   // Tab leaves the menu: it closes, so no focus is stranded behind an open one
+    const opts = [...el.querySelectorAll('.unit-opt')], i = opts.indexOf(document.activeElement);
+    if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); opts[(i + (ev.key === 'ArrowDown' ? 1 : opts.length - 1)) % opts.length].focus(); }
+  });
+  const on = el.querySelector('.unit-opt[aria-checked="true"]') || el.querySelector('.unit-opt');
+  try { on.focus({ preventScroll: true }); } catch (e) {}
+}
+// How many weights are typed on a card today (a set's box, a circuit's box), to tell a pick that relabels numbers from one that relabels nothing.
+function typedWeightCount(card) {
+  const name = card.querySelector('.item-name').textContent.trim();
+  if (card.classList.contains('round-group'))
+    return loadCircuitWeights(name, card.querySelectorAll('.round-wt').length).filter(w => weightOf(w).n != null).length;
+  return loadSetLog(name, parseInt(card.dataset.sets, 10) || 1, card.dataset.day).filter(s => s.w && weightOf(s.w).n != null).length;
+}
+// A pick from the menu: change the card's unit (setCardUnit() / setCircuitUnit(): the numbers stay as typed, none is converted), then say so in the
+// note box with Undo, so a wrong pick is one tap to put back and a right one is seen to have happened. `after` redraws a screen that reads the unit
+// (Guided's weight line).
+function pickCardUnit(card, unit, after) {
+  const circuit = card.classList.contains('round-group');
+  const prev = circuit ? circuitUnit(card) : cardUnit(card);
+  if (unit === prev) return;
+  const apply = u => { (circuit ? setCircuitUnit : setCardUnit)(card, u); if (after) after(); };
+  const typed = typedWeightCount(card);
+  apply(unit);
   if (navigator.vibrate) navigator.vibrate(8);
+  aaToast(typed ? `Weights are now in ${unit}. The numbers you typed did not change.` : `Weights are now in ${unit} for this ${circuit ? 'circuit' : 'exercise'}.`,
+    { kicker: 'Weight unit', action: 'Undo', dismiss: 'Keep it', ms: 8000, pass: true, run: () => apply(prev) });
 }
 
 // Reflect "all sets done?" on the exercise-level check and the day progress.
@@ -17092,7 +17219,7 @@ function attachCircuitLog(card) {
   const logRPE    = card.dataset.logRpe !== '0';
 
   // Inline per-exercise weights — populate from storage + save on input. The unit (kg, lb or plates) is written in each weight, as on a
-  // set (2026-10-18): the boxes hold the number, the pill over them is the circuit's unit (circuitUnit(), setCircuitUnit()).
+  // set (2026-10-18): the box holds the number and the tag after it is the circuit's unit, the same in every box (circuitUnit(), setCircuitUnit(); Name Tag, 2026-10-19).
   if (logWeight) {
     const inputs = card.querySelectorAll('.round-wt');
     const stored = loadCircuitWeights(name, inputs.length);
@@ -17105,8 +17232,7 @@ function attachCircuitLog(card) {
         saveCircuitWeights(name, g);
       });
     });
-    const ub = card.querySelector('.circ-unit');
-    if (ub) ub.addEventListener('click', ev => { ev.stopPropagation(); cycleCircuitUnit(card); });
+    card.querySelectorAll('.circ-unit').forEach(ub => ub.addEventListener('click', ev => { ev.stopPropagation(); openUnitMenu(ub, circuitUnit(card), u => pickCardUnit(card, u)); }));
     card._paintCircuit = () => paintCircuitUnit(card);
     paintCircuitUnit(card);
   }
@@ -17148,9 +17274,7 @@ function circuitUnit(card) {
 }
 function paintCircuitUnit(card) {
   const u = circuitUnit(card);
-  const ub = card.querySelector('.circ-unit');
-  if (ub) { ub.textContent = u; ub.setAttribute('aria-label', `Weight in ${u}. Tap to change it`); }
-  card.querySelectorAll('.round-wt').forEach(inp => { if (inp.placeholder !== unitWord(u)) inp.placeholder = unitWord(u); });
+  card.querySelectorAll('.circ-unit').forEach(ub => { ub.textContent = u; ub.setAttribute('aria-label', `Weight in ${u}. Tap to choose a unit`); });   // the tag in every box
 }
 function setCircuitUnit(card, unit) {
   card._unit = unit;
@@ -17165,11 +17289,6 @@ function setCircuitUnit(card, unit) {
   });
   if (changed) saveCircuitWeights(name, g);
   paintCircuitUnit(card);
-}
-function cycleCircuitUnit(card) {
-  const order = ['kg', 'lb', 'plates'];
-  setCircuitUnit(card, order[(order.indexOf(circuitUnit(card)) + 1) % order.length]);
-  if (navigator.vibrate) navigator.vibrate(8);
 }
 
 // Circuit per-exercise weight store: a flat array [item] of weight strings, one
@@ -17771,6 +17890,7 @@ function aaToast(text, opts) {
   if (!el) return;
   opts = opts || {};
   _toastRun = opts.run || null;
+  el.toggleAttribute('data-pass', !!opts.pass);
   el.innerHTML = (opts.kicker ? '<div class="aa-toast-k"></div>' : '') + '<div class="aa-toast-t"></div><div class="aa-toast-row">' +
     (opts.action ? '<button type="button" class="aa-toast-go"></button>' : '') + '<button type="button" class="aa-toast-x"></button></div>';
   if (opts.kicker) el.querySelector('.aa-toast-k').textContent = opts.kicker;
@@ -17778,7 +17898,7 @@ function aaToast(text, opts) {
   const go = el.querySelector('.aa-toast-go');
   if (go) { go.textContent = opts.action; go.addEventListener('click', () => { const r = _toastRun; hideAaToast(); if (r) r(); }); }
   const x = el.querySelector('.aa-toast-x');
-  x.textContent = opts.action ? 'Not now' : 'Got it';
+  x.textContent = opts.dismiss || (opts.action ? 'Not now' : 'Got it');
   x.addEventListener('click', hideAaToast);
   el.hidden = false;
   clearTimeout(_toastT);
@@ -18164,7 +18284,7 @@ function paintTimerLog(row, item) {
     tl.innerHTML = `
       <div class="tl-head">Set ${item.setI + 1} of ${item.total} · how did it go?</div>
       ${kgOn ? `<div class="tl-line tl-kgline">
-        <button type="button" class="tl-lab tl-unit" aria-label="Weight in ${unit}. Tap to change it">${unit === 'plates' ? 'Plates' : unit === 'lb' ? 'Lb' : 'Kg'}</button>
+        <button type="button" class="tl-lab tl-unit" aria-haspopup="menu" aria-expanded="false" aria-label="Weight in ${unit}. Tap to choose a unit">${unit === 'plates' ? 'Plates' : unit === 'lb' ? 'Lb' : 'Kg'}</button>
         <input class="tl-kg" type="text" inputmode="decimal" autocomplete="off" value="${esc(wIn.value)}" placeholder="${lw ? 'last ' + esc(lastText(lw, unit)) : unitWord(unit)}" aria-label="Weight on set ${item.setI + 1}">
         ${lw ? `<button type="button" class="tl-same">Same as last</button>` : ''}
       </div>` : ''}
@@ -18181,7 +18301,7 @@ function paintTimerLog(row, item) {
       </div>${lim}`;
     const kgBox = tl.querySelector('.tl-kg');
     const unitBtn = tl.querySelector('.tl-unit');
-    if (unitBtn) unitBtn.addEventListener('click', () => { cycleUnit(item.card); draw(); });
+    if (unitBtn && item.card) unitBtn.addEventListener('click', () => openUnitMenu(unitBtn, cardUnit(item.card), u => pickCardUnit(item.card, u, draw)));
     if (kgBox) kgBox.addEventListener('change', () => kgCheckTicked(item.name, composeW(wIn.value, cardUnit(item.card)), item.card, item.setI));   // the set is ticked by now
     if (kgBox) kgBox.addEventListener('input', () => {
       const v = normDigits(kgBox.value);
