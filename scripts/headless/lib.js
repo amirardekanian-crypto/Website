@@ -107,7 +107,8 @@ function library() {
 
 async function context(browser, opts) {
   const ctx = await browser.newContext({ viewport: { width: opts.w || 390, height: opts.h || 844 },
-    isMobile: true, hasTouch: !!opts.touch, serviceWorkers: 'block', ...(opts.tz ? { timezoneId: opts.tz } : {}) });
+    isMobile: true, hasTouch: !!opts.touch, serviceWorkers: 'block', ...(opts.tz ? { timezoneId: opts.tz } : {}),
+    ...(opts.reduced ? { reducedMotion: 'reduce' } : {}) });
   // Only the local server: Plausible and the CDN fail fast, as they would with no signal. program.html's fonts are local since
   // 2026-10-13 and AA Proof's strip's since 2026-10-17, so opts.fonts (Google Fonts let through) changes nothing in either app;
   // it stays so the callers that pass it still run.

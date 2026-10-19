@@ -34,30 +34,36 @@ const H = require('./lib');
     const day = await p.evaluate(() => document.querySelectorAll('#day-view .checklist-item').length);
     t.check(`program ${tag}: Day 1 opens with its exercises`, day >= 4, day);
 
-    // Centre Court r2: the number is the tick (P24) and a chevron says a row opens. Every closed row: its zero-padded
-    // numeral centred in the 44 px tap column that covers it, a chevron on the name line, the ⓘ (44 px) at least 28 px
-    // under the chevron's centre; a done row has no chevron and a solid numeral.
+    // Centre Court r2: the number is the tick (P24), and a chevron says a row opens. Since 2026-10-19 that chevron FOLLOWS
+    // THE NAME (Amir: "everytime i want to click, i click on the i button instead"): it is drawn on .nm-tail, the name's
+    // last word, and the ⓘ has the right column to itself. So every closed row: its zero-padded numeral centred in the
+    // 44 px tap column that covers it, a chevron at the end of the name, and the ⓘ's 44 px target CLEAR OF IT — the two
+    // never share a pixel, which is what used to send a low thumb into About. A done row has no chevron, a solid numeral.
     const rowsOk = await p.evaluate(() => {
       const out = [];
       document.querySelectorAll('#day-view .day-content.active .checklist-item.collapsed').forEach(c => {
-        const im = c.querySelector('.item-main'), n = c.querySelector('.ex-num'), cb = c.querySelector('.check-box');
-        const ir = im.getBoundingClientRect(), nr = n.getBoundingClientRect(), br = cb.getBoundingClientRect();
-        const ns = getComputedStyle(n), af = getComputedStyle(im, '::after'), ab = c.querySelector('.ex-side .ex-about');
-        const chev = af.content !== 'none' && af.content !== 'normal';
-        const chevC = chev ? ir.top + parseFloat(getComputedStyle(im).paddingTop) + parseFloat(af.marginTop) + parseFloat(af.height) / 2 : null;
+        const n = c.querySelector('.ex-num'), cb = c.querySelector('.check-box');
+        const nr = n.getBoundingClientRect(), br = cb.getBoundingClientRect();
+        const ns = getComputedStyle(n), ab = c.querySelector('.ex-side .ex-about');
+        const tail = c.querySelector('.item-name .nm-tail');
+        const taf = tail ? getComputedStyle(tail, '::after') : null;
+        const chev = !!(taf && taf.content !== 'none' && taf.content !== 'normal');
+        // the chevron is the last inline box of the tail, so the tail's right edge is its right edge
+        const tr = tail ? tail.getBoundingClientRect() : null;
         const a = ab && ab.offsetParent ? ab.getBoundingClientRect() : null;
         out.push({ name: c.querySelector('.item-name').textContent.trim(), text: n.textContent, done: c.classList.contains('checked'),
           numCx: Math.round(nr.left + nr.width / 2), boxCx: Math.round(br.left + br.width / 2), boxW: Math.round(br.width), boxH: Math.round(br.height),
           covers: br.top <= nr.top - 10 && br.bottom >= nr.bottom + 10, stroke: ns.webkitTextStrokeWidth, fill: ns.color, fs: ns.fontSize,
-          chev, gap: a && chevC != null ? Math.round(a.top + a.height / 2 - chevC) : null, about: a ? Math.round(a.height) : null });
+          chev, chevW: chev ? Math.round(parseFloat(taf.width)) : null,
+          clear: a && chev ? Math.round(a.left - tr.right) : null, about: a ? Math.round(a.height) : null });
       });
       return out;
     });
     const badRows = rowsOk.filter(r => !/^\d\d$/.test(r.text) || Math.abs(r.numCx - r.boxCx) > 1 || r.boxW < 44 || r.boxH < 44 || !r.covers
       || r.fs !== '32px' || r.stroke !== '1.5px' || (r.done ? (r.chev || r.fill === 'rgba(0, 0, 0, 0)') : (!r.chev || r.fill !== 'rgba(0, 0, 0, 0)'))
-      || (r.gap != null && r.gap < 28) || (r.about != null && r.about < 44));
-    t.check(`program ${tag}: every closed row: its numeral is the tick, a chevron on its name line, the ⓘ 28+ px under it`,
-      rowsOk.length >= 4 && rowsOk.some(r => r.gap != null) && !badRows.length, JSON.stringify(badRows.length ? badRows : rowsOk.slice(0, 2)));
+      || (r.chev && r.chevW !== 18) || (r.clear != null && r.clear < 0) || (r.about != null && r.about < 44));
+    t.check(`program ${tag}: every closed row: its numeral is the tick, a chevron after its name, the ⓘ clear of it`,
+      rowsOk.length >= 4 && rowsOk.some(r => r.clear != null) && !badRows.length, JSON.stringify(badRows.length ? badRows : rowsOk.slice(0, 2)));
 
     await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; if (c.classList.contains('collapsed')) toggleExpand(c); c.scrollIntoView({ block: 'start' }); })()`);
     await p.waitForTimeout(300);

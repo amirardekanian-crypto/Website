@@ -311,8 +311,9 @@
 // v181: program.html changed (2026-10-19): Progress's open Now card is short (Doors): the tagline, the aims, Amir's first sentence signed, and the rest of his note and the outcomes behind two rows that open on a tap; the outcomes are dots, not ticks.
 // v182: program.html changed (2026-10-19, Amir): Kudos is a Like, the question is Join the crew, and a Like tapped by someone not in the crew offers to join instead of doing nothing.
 // v183: program.html changed (2026-10-19, Amir): the Like and four emoji (🔥 💪 👏 😍) all out on a Bell post, drawn only while the server offers the list (stage82).
-// v184: program.html changed (2026-10-19, Amir's slow connection): Crew asks the server for nothing unless it is opened, a photo is downloaded once and kept on the phone, and a photo is made smaller (1080 px, under 200 KB).
-const CACHE = 'aap-v184';
+// v184: program.html changed (2026-10-19, Amir): the chevron that opens an exercise card follows its name and the ⓘ has the right column to itself (it used to sit under the chevron, so a low thumb opened About); an open card is the same row turned green, with the body carried in and out on the card's own height.
+// v185: the shell did not change. This worker now leaves /pushtest/ alone too — the push reachability test (2026-10-19), which ships its own worker and must hold the test's push subscription itself.
+// v186: program.html changed (2026-10-19, Amir's slow connection): Crew asks the server for nothing unless it is opened, a photo is downloaded once and kept on the phone, and a photo is made smaller (1080 px, under 200 KB).
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -411,7 +412,10 @@ self.addEventListener('fetch', e => {
   // paid course app (which has its own worker and caches) would get stale files pinned.
   // Returning without respondWith() sends the request to the network untouched.
   // /tennis-testing/ is the testing app: it must always get its newest script, never a pinned copy.
-  if (/^\/(reach|tennis|tennis-testing)(\/|$)/.test(url.pathname)) return;
+  // /pushtest/ is the push reachability test (2026-10-19). It ships its own worker at /pushtest/sw.js,
+  // which must be the registration that holds the test subscription; answering it from this cache would
+  // also serve a stale page, the same trap as /reach/.
+  if (/^\/(reach|tennis|tennis-testing|pushtest)(\/|$)/.test(url.pathname)) return;
 
   // HTML (navigate) — STALE-WHILE-REVALIDATE (Amir, 2026-09-12: opening the
   // home-screen icon was slow). This was network-first, which meant every tap on
