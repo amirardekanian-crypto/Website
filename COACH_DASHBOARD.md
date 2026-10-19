@@ -88,7 +88,7 @@ at 599, 600, 750, 899, 900 and 1440.
 | **Today** | The day's play: who needs you (and why), what else is waiting, and a short Proof column (your line to the crew, today's wall lines, the quest week and who is drifting) |
 | **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done (a habit-only athlete opens on Proof) |
 | **Exercises** | The Spine (2026-09-24): one entry per exercise you programme. Coverage of the names in live programmes, Claude's drafts waiting for you, a search, and an editor (purpose, How to do it, cues, links, body parts and the muscle map, video, and the coach-only SFR rank, flags, counts and cost) showing who is doing each exercise now. Claude's draft steps, cues or purpose for an approved entry wait in the editor's boxes, and your Save approves them. A save sends only what you changed. **Approve** is what puts an entry on athletes' phones |
-| **Proof** | The crew's home: the wall and your line, the quest lever, the pulse, the board, titles minted, the season. (The signup funnel is no longer here: it is Leads → Free signups) |
+| **Proof** | The crew's home: the wall and your line, the quest lever, the pulse, the board, the season (titles left with the cut, stage78). (The signup funnel is no longer here: it is Leads → Free signups) |
 | **Leads** | Everyone who might become a client, in four sub-tabs: **Applications** (the coaching apply forms, English and Farsi, the whole questionnaire per lead; a clay count of the new ones), **Free signups** (the Proof funnel: everyone who signed up on `proof.html`, days logged, who is ready to upgrade) **Referral codes** (who holds which discount code; the apply forms accept exactly the live codes listed here) and **Chats** (what people asked the website chatbot, kept 90 days) |
 | **Library** | Publishes workouts and articles into the app's Library, and copies a link to each (the address is still `#links`; the tab was called Links until 2026-10-10) |
 | **Buyers** | Logins for the two apps people pay for, in two sub-tabs: the **Course** (the paid course app, `/tennis/app/`) and the **Testing app** (`/tennis-testing/app/`); each sub-tab shows its count of active logins |
@@ -1036,7 +1036,7 @@ board on every redraw), and it says **when it was read** (*As of 14:32*) with a 
 because the XP moved (audit MKT-3, 2026-10-11). When the read fails the page says why (*Couldn't fetch the board: <reason>*) and has **Try again**
 (MKT-8).
 
-**Titles minted** — the last 30 rows of `hab_titles`, newest first. A quiet
+**Titles minted** (GONE since the cut, stage78, 2026-10-19: titles left the server, the board shows `LV n` with no rank or title). It was the last 30 rows of `hab_titles`, newest first. A quiet
 health check: if this stops moving, minting has broken (it did once, silently,
 for four days — see stage23).
 

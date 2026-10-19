@@ -47,7 +47,6 @@ free = false
 size = "milestone"
 caption = "Every week of the pre-competition cycle, held."
 reward_badge = "Tournament Ready"
-title = "match_fit"
 origin = "new"
 steps = [
   { name = "Hold the first week", closes_on = "fact", counts = "week_held", target = 1 },
@@ -96,7 +95,6 @@ free = false
 size = "milestone"
 caption = "Back from an injury, one held week at a time."
 reward_badge = "Return to Court"
-title = "returned"
 origin = "new"
 steps = [
   { name = "Your first week back, held", closes_on = "fact", counts = "week_held", target = 1 },

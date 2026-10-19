@@ -81,6 +81,7 @@ DEFAULT_FOLDER = ROOT / "career"
 
 FILES = ["rulebook", "badges", "achievements", "titles", "missions", "quests", "recognition"]
 LOCK_FILE = "tiers.lock.json"   # rule 21: {badge id: [the metal of tier 1, tier 2, ...]}, written by career_seed.py --write-lock
+LOCK_REMOVED = "_removed"   # rule 21: the badge ids a cut took off the server (stage78, round 5): never in badges.toml again
 
 # The words the files may use.
 MEANINGS = ["consistency", "commitment", "progress", "resilience"]
@@ -100,7 +101,7 @@ TEST_PARAMS = {"first": set(), "proof": {"proof_measure", "proof_need"}, "goals"
 PARAM_KEYS = set().union(*TEST_PARAMS.values())
 GOAL_KINDS = ["daysHit:<habit>", "total:<habit>", "qualify", "perfect", "comebacksStuck", "comebackRun"]
 MOMENT_KEYS = ["per_open", "keep_days", "max", "full_screen"]
-NO_TWIN_OK = {"habit_custom"}   # rule 20: a starts_at entry that is new and has no Proof twin to retire
+NO_TWIN_OK = {"habit_custom", "comebacks"}   # rule 20: a starts_at entry with no Proof twin to retire (comebacks: its twin, hard_to_kill, left with the cut, stage78)
 SAME_MEANING_EXCEPTIONS = {("heavy_metal", "held_weeks")}   # rule 20: a pair whose meanings differ on purpose
 SOURCES = ["training", "proof", "coach", "server"]
 PAYS_FOR = ["act", "progress", "nothing"]
@@ -1015,8 +1016,8 @@ def check_recognition(rec, w, rep):
         if not isinstance(body, dict):
             c.error(f"the [tool.{name}] table is missing")
         elif name == "amirs_pick":
-            if "title" not in body:
-                c.error("title is missing (the title Amir's Pick awards)")
+            # Amir's Pick is one of the month's honours since round 5 (Courtside, stage75) and gives no title: titles left with the cut
+            # (stage78). A title it still names must exist.
             check_title_ref(c, body, w)
 
     for mid, m in entries(rec, "message", f, rep).items():
@@ -1058,12 +1059,15 @@ def check_coverage(data, w, rep):
     # Missions are actions for one week, and none asks for progress on purpose: a personal best can't be ordered for a
     # week without pushing past the RPE the plan sets (CAREER_MODE.md → Weekly missions). Progress lives in badges,
     # achievements and quests, so the missions shelf is only asked to cover the other three meanings.
+    # Titles left with the cut (stage78, round 5: "Just remove names and titles and badges"): an empty titles.toml asks for no coverage.
     shelves = [("badges", "badge", MEANINGS), ("achievements", "achievement", MEANINGS), ("titles", "title", MEANINGS),
                ("missions", "mission", [m for m in MEANINGS if m != "progress"])]
     for stem, key, wanted in shelves:
         if data[stem] is None:
             continue
         section = data[stem].get(key)
+        if key == "title" and not section:
+            continue
         have = {e["meaning"] for e in (section.values() if isinstance(section, dict) else [])
                 if isinstance(e, dict) and not retires(e) and isinstance(e.get("meaning"), str)}
         for meaning in wanted:
@@ -1305,7 +1309,9 @@ def tier_metals(badge):
 def check_tier_lock(folder, data, rep):
     """Rule 21. career/tiers.lock.json is {badge id: [metal of tier 1, tier 2, ...]}. An award's id holds its tier's place in
     the list (badge:<item>:<tier>), so once the lock exists a tier is never inserted, reordered or removed, and an id is never
-    removed. at and xp may change. No lock: nothing to hold (the lock is written by career_seed.py --write-lock)."""
+    removed. at and xp may change. No lock: nothing to hold (the lock is written by career_seed.py --write-lock).
+    The one way an id leaves: a cut on Amir's word (stage78, round 5, L5) moves it from the lock to its "_removed" list, and an id there never
+    comes back to badges.toml (its awards became nameless XP facts on the server; a new badge takes a new id)."""
     path = pathlib.Path(folder) / LOCK_FILE
     if not path.exists():
         return
@@ -1324,7 +1330,15 @@ def check_tier_lock(folder, data, rep):
     badges = data["badges"].get("badge")
     badges = badges if isinstance(badges, dict) else {}
     why = "a tier's place is its award's id: insert a tier at the end, never in the middle"
+    removed = lock.get(LOCK_REMOVED, [])
+    for ident in removed:
+        if ident in badges:
+            rep.error(f, f"badge.{ident}", "was taken off the server by the cut (stage78) and never comes back: give a new badge a new id (rule 21)")
+        if ident in lock and ident != LOCK_REMOVED:
+            rep.error(f, f"badge.{ident}", "is both in the lock and in its \"_removed\" list: it is one or the other (rule 21)")
     for ident, metals in lock.items():
+        if ident == LOCK_REMOVED:
+            continue
         c = Ctx(rep, f, f"badge.{ident}")
         if ident not in badges:
             c.error(f"is in the lock but not in badges.toml: an id is never removed ({why})")
@@ -1338,7 +1352,7 @@ def check_tier_lock(folder, data, rep):
                 c.error(f"tier {i} is {b!r} but the lock holds {a!r}: {why}")
                 break
     for ident in badges:
-        if ident not in lock:
+        if ident not in lock and ident not in removed:
             rep.warn(f, f"badge.{ident}", "is not in the tiers lock yet: run python scripts/career_seed.py --write-lock "
                                          "(rule 21)")
 

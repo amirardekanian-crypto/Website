@@ -916,7 +916,7 @@ S['danger-panels'] = async (b) => {
     back: async () => { await L.go(page, 'a/cara_free/file'); await openDanger(page); },
     opener: () => page.locator('#dangerzone button', { hasText: 'Forget their Proof data…' }),
     final: /^Forget Cara/,
-    words: [/Forget cara_free\?/, /PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines/, /no undo and no automatic backup: take a ⤓ Backup first/, /Stays: Their programme, login, session history, titles and season results stay/, /Erase completely/],
+    words: [/Forget cara_free\?/, /PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines/, /no undo and no automatic backup: take a ⤓ Backup first/, /Stays: Their programme, login, session history and season results stay/, /Erase completely/],
     redraw: () => { assemble(); render(); },
     calls: cs => cs.filter(c => c.kind === 'rpc' && c.name === 'forget_contact'),
     payload: c => c.payload.p_athlete_id === 'cara_free',
@@ -3044,16 +3044,16 @@ S['proof-home'] = async (b) => {
   check(r, 'Proof: one #coachLineInput; the wall, quest lever, pulse and board once each; the funnel is NOT here (it is Leads → Free signups); Today\'s column is gone', n.coachLineInput === 1 && n.wallPanel === 1 && n.questPanel === 1 && n.pulsePanel === 1 && n.boardPanel === 1 && n.funnelPanel === 0 && !n.proofToday, n);
   const geo = await page.evaluate(() => {
     const by = t => [...document.querySelectorAll('#content .panel')].find(p => (p.querySelector('.phead .t') || {}).textContent === t);
-    const P = { wall: by('The wall'), board: by('The board'), quest: by('Quest week'), pulse: by('Proof pulse'), titles: by('Titles minted'), season: by('Season') };
+    const P = { wall: by('The wall'), board: by('The board'), quest: by('Quest week'), pulse: by('Proof pulse'), season: by('Season') };
     const missing = Object.keys(P).filter(k => !P[k]);
     if (missing.length) return { missing };
     const R = {}; Object.keys(P).forEach(k => { const q = P[k].getBoundingClientRect(); R[k] = { l: Math.round(q.left), t: Math.round(q.top + scrollY), w: Math.round(q.width) }; });
     return R;
   });
   const colsOk = !geo.missing && geo.wall.l === geo.board.l && geo.wall.t < geo.board.t
-    && ['pulse', 'titles', 'season'].every(k => geo[k].l === geo.quest.l) && geo.quest.l > geo.wall.l + geo.wall.w - 1
-    && geo.quest.t < geo.pulse.t && geo.pulse.t < geo.titles.t && geo.titles.t < geo.season.t && Math.abs(geo.wall.t - geo.quest.t) < 3;
-  check(r, 'two columns: The wall then The board on the left; Quest week, Proof pulse, Titles minted and Season (last) on the right, level at the top', colsOk, geo);
+    && ['pulse', 'season'].every(k => geo[k].l === geo.quest.l) && geo.quest.l > geo.wall.l + geo.wall.w - 1
+    && geo.quest.t < geo.pulse.t && geo.pulse.t < geo.season.t && Math.abs(geo.wall.t - geo.quest.t) < 3;
+  check(r, 'two columns: The wall then The board on the left; Quest week, Proof pulse and Season (last) on the right, level at the top (no Titles minted: titles left with the cut, stage78)', colsOk, geo);
   check(r, 'the left column is the wider one (about 1.3 to 1)', !geo.missing && geo.wall.w / geo.quest.w > 1.2 && geo.wall.w / geo.quest.w < 1.4, geo.missing || [geo.wall.w, geo.quest.w]);
   const wallTxt = await txt('#wallPanel');
   check(r, 'the full wall: the composer holds the line posted from Today; yesterday\'s lines (the crew\'s with Hide, and yours) are here; Show the full week', (await page.locator('#wallPanel #coachLineInput').inputValue()) === 'Line from Today' && /Fixture wall line from Cara/.test(wallTxt) && /Fixture coach line yesterday/.test(wallTxt) && (await page.locator('#wallPanel .modbtn').count()) === 2 && /Show the full week/.test(wallTxt), wallTxt);
@@ -3080,7 +3080,7 @@ S['proof-home'] = async (b) => {
   const pulse = await page.evaluate(() => [...document.querySelectorAll('#pulsePanel .pulse')].map(x => x.innerText.replace(/\s+/g, ' ').trim()));
   check(r, 'Proof pulse lists every Proof athlete, most silent first (Dan, 5d silent, on top)', pulse.length === 3 && /^Dan/.test(pulse[0]) && /5d silent/.test(pulse[0]), pulse);
   const rest = await txt('#content');
-  check(r, 'Titles minted and Season are on Proof, and The funnel is not', /FIXTURE TITLE/.test(rest) && /Fixture Season/.test(rest) && !/The funnel/.test(rest), '');
+  check(r, 'Season is on Proof; no title is shown anywhere (the cut, stage78), and The funnel is not', !/FIXTURE TITLE/.test(rest) && !/Titles minted/.test(rest) && /Fixture Season/.test(rest) && !/The funnel/.test(rest), '');
   await L.go(page, 'leads/signups');
   const fn = await page.evaluate(() => { const h = funnelPanelHtml(); return { section: /^\s*<section[^>]*id="funnelPanel"/.test(h), head: /The funnel/.test(h), rows: document.querySelectorAll('#funnelPanel .fun').length, acts: [...document.querySelectorAll('#funnelPanel .fun')].map(f => f.querySelector('.acts').innerText.replace(/\s+/g, ' ').trim()) }; });
   check(r, 'The funnel (Leads → Free signups) comes from funnelPanelHtml() (one self-contained section) and keeps WhatsApp, copy email and open on each row', fn.section && fn.head && fn.rows === 2 && fn.acts.every(a => /WhatsApp/.test(a) && /copy email/.test(a) && /open/.test(a)), fn);

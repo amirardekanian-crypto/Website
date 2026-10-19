@@ -55,7 +55,7 @@ want('the dashboard ignores the week note on a normal day again (the old rule)',
 want('the dashboard stops treating a missing drop as 0 (an undefined drop makes a NaN target)', swap('coach.html', 'Number(drop) > 0 ? Number(drop) : 0', 'drop'), 1, /rpeTargetOn vs dayTargetC/);
 want('both copies go back to the old rule together (only the pinned answers can see it)', (get, put) => {
   swap('coach.html', 'if (!t) return t;', 'if (!t || !drop) return t;')(get, put);
-  swap('program.html', "if (!m) return '';", "if (!m || !drop) return '';")(get, put);
+  swap('program.html', "const d = Number(drop) > 0 ? Number(drop) : 0;", "if (!drop) return ''; const d = Number(drop) > 0 ? Number(drop) : 0;")(get, put);
 }, 1, /rpeTargetOn: a normal day in a week capped at 7/);
 want('the app draws the lower-day pill on a normal day too', swap('program.html', "return drop ? rpeTargetOn(written, drop, note) : '';", 'return rpeTargetOn(written, drop, note);'), 1, /dayRpe is empty on a normal day/);
 want('the retest window drifts (the dashboard opens it a day late)', swap('coach.html', 'return end - dayNumC(dayKey) <= RETEST_WINDOW_DAYS_C;', 'return end - dayNumC(dayKey) < RETEST_WINDOW_DAYS_C;'), 1, /inRetestWindow vs retestWindowOnC/);
@@ -251,27 +251,26 @@ want('index mode: habits.html STAGED with a new goal while the toml in the worki
   }, 1, /EVENTS goals vs achievements\.toml: ev_foundry/, { index: true });
 
 
-// GAME-10: The Upgrade and Double Up carry `patterns`, and scripts/check_career.py (which career_seed.py runs) holds each one to coach.html's SPINE_PATTERNS. Guard 15 runs on a coach.html change and
+// GAME-10: Double Up carries `patterns` (The Upgrade did too until the cut, stage78), and scripts/check_career.py (which career_seed.py runs) holds it to coach.html's SPINE_PATTERNS. Guard 15 runs on a coach.html change and
 // guard 20 does not, so a pattern dropped from that list is stopped HERE: the guard must say what the seed refused (its own words), not only that it could not run, and in index mode it reads the STAGED coach.html.
 const PAT_FROM = "const SPINE_PATTERNS = ['squat','hinge',", PAT_TO = "const SPINE_PATTERNS = ['hinge',", PAT_SAYS = /patterns 'squat' is not a Spine pattern in coach\.html's SPINE_PATTERNS/;
-want('a pattern is dropped from coach.html\'s SPINE_PATTERNS while The Upgrade lists it: the guard says what the seed refused', swap('coach.html', PAT_FROM, PAT_TO), 2, PAT_SAYS);
+want('a pattern is dropped from coach.html\'s SPINE_PATTERNS while Double Up lists it: the guard says what the seed refused', swap('coach.html', PAT_FROM, PAT_TO), 2, PAT_SAYS);
 want('index mode: a pattern dropped from coach.html in the working tree and NOT staged does not fail the hook (the staged coach.html still lists it)', swap('coach.html', PAT_FROM, PAT_TO), 0, /all \d+ checks agree/, { index: true });
-want('index mode: coach.html STAGED without a pattern The Upgrade lists fails the hook, in the seed script\'s own words',
+want('index mode: coach.html STAGED without a pattern Double Up lists fails the hook, in the seed script\'s own words',
   (get, put, git) => { const old = get('coach.html'); put('coach.html', old.replace(PAT_FROM, PAT_TO)); git('add', 'coach.html'); put('coach.html', old); }, 2, PAT_SAYS, { index: true });
-// `patterns`, `qualities` and `exclude` (Amir, 2026-10-18: accessories are out of The Upgrade and Double Up). scripts/check_career.py refuses each of these first, and the seed script refuses with it
+// `patterns`, `qualities` and `exclude` (Amir, 2026-10-18: accessories are out of Double Up). scripts/check_career.py refuses each of these first, and the seed script refuses with it
 // (exit 2, in the checker's own words). The guard's own lines are the second defence, so those cases loosen the checker's refusal in the copy and mutate the toml, to see the guard say it (exit 1).
-const TOTAL_UPGRADE = swap('career/badges.toml', 'kind = "best_value"', 'kind = "total"');
-const NO_PATTERNS = swap('career/badges.toml', 'patterns = ["squat"', 'zpatterns = ["squat"');
+// Double Up as a `first` achievement (its `at` goes too, or the checker refuses the stray key before it reaches `patterns`).
+const TOTAL_UPGRADE = swap('career/achievements.toml', 'test = "best_value"\nat = 100', 'test = "first"');
+const NO_PATTERNS = swap('career/achievements.toml', 'patterns = ["squat"', 'zpatterns = ["squat"');
 const together = (...muts) => (get, put, git) => muts.forEach(m => m(get, put, git));
-want('`patterns` on a badge that is not best_value: the seed script refuses first, in the checker\'s own words', TOTAL_UPGRADE, 2, /patterns is only for an entry that reads the fact lift_gain as its best value/);
-want('`patterns` on a badge that is not best_value, the checker loosened: the guard says the server ignores it there', together(TOTAL_UPGRADE, swap('scripts/check_career.py', 'if not reads_lift_gain:', 'if False:')), 1, /patterns \(GAME-10\) sit only on a best_value entry/);
+want('`patterns` on an achievement that is not best_value: the seed script refuses first, in the checker\'s own words', TOTAL_UPGRADE, 2, /patterns is only for an entry that reads the fact lift_gain as its best value/);
+want('`patterns` on an achievement that is not best_value, the checker loosened: the guard says the server ignores it there', together(TOTAL_UPGRADE, swap('scripts/check_career.py', 'if not reads_lift_gain:', 'if False:')), 1, /patterns \(GAME-10\) sit only on a best_value entry/);
 want('`qualities` and `exclude` on an entry with no `patterns`: the seed script refuses first, in the checker\'s own words', NO_PATTERNS, 2, /qualities narrows the lifts that patterns lists, so it needs patterns/);
 want('`qualities` and `exclude` on an entry with no `patterns`, the checker loosened: the guard says it', together(NO_PATTERNS, swap('scripts/check_career.py', 'if key in e and "patterns" not in e:', 'if False:')), 1, /qualities and exclude \(GAME-10\) sit only on an entry that carries patterns/);
-want('`qualities` on a badge that is not best_value, the checker loosened: the guard says it', together(TOTAL_UPGRADE, swap('scripts/check_career.py', 'if not reads_lift_gain:', 'if False:')), 1, /qualities and exclude \(GAME-10\) sit only on an entry that carries patterns, so only on a best_value one/);
-want('The Upgrade stops naming its qualities: it counts lifts Double Up does not', swap('career/badges.toml', 'qualities = ["strength"]', 'zqualities = ["strength"]'), 1, /The Upgrade and Double Up each name the lifts they count/);
-want('Double Up also counts muscle-tagged lifts and The Upgrade does not', swap('career/achievements.toml', 'qualities = ["strength"]', 'qualities = ["strength", "muscle"]'), 1, /The Upgrade and Double Up count the same lifts/);
-want('Double Up stops excluding the back extension and The Upgrade still does', swap('career/achievements.toml', 'exclude = ["back-extension-45", ', 'exclude = ['), 1, /The Upgrade and Double Up count the same lifts/);
-want('a quality dropped from coach.html\'s QM_IDS while The Upgrade lists it: the guard says what the seed refused', swap('coach.html', "const QM_IDS = ['strength','muscle',", "const QM_IDS = ['muscle',"), 2, /qualities 'strength' is not one of the Spine's qualities in coach\.html's QM_IDS/);
+want('`qualities` on an achievement that is not best_value, the checker loosened: the guard says it', together(TOTAL_UPGRADE, swap('scripts/check_career.py', 'if not reads_lift_gain:', 'if False:')), 1, /qualities and exclude \(GAME-10\) sit only on an entry that carries patterns, so only on a best_value one/);
+want('Double Up stops naming its qualities: it would count muscle and power lifts too', swap('career/achievements.toml', 'qualities = ["strength"]', 'zqualities = ["strength"]'), 1, /Double Up names the lifts it counts/);
+want('a quality dropped from coach.html\'s QM_IDS while Double Up lists it: the guard says what the seed refused', swap('coach.html', "const QM_IDS = ['strength','muscle',", "const QM_IDS = ['muscle',"), 2, /qualities 'strength' is not one of the Spine's qualities in coach\.html's QM_IDS/);
 
 console.log(bad ? '\n' + bad + ' mutation(s) NOT caught' : '\nthe guard catches every drift it is meant to');
 process.exit(bad ? 1 : 0);

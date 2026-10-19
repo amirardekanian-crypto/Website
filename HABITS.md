@@ -28,6 +28,11 @@ Start here if you're picking this up in a fresh chat.
 
 ## Career screens off (2026-10-19, Career Mode round 5 step 3)
 
+**And then the cut, the same day (stage78, `career/PROCEDURES.md` → *Stage 78*):** the server holds no title any more. `hab_titles` is empty,
+`claim_titles()` answers nothing, `set_title()` clears the worn title, `hab_close_season()` mints no season title, and the board and roll call answer
+no title and no rank name. Every badge but the four marks left the server too (their XP stays, as nameless facts). The dormant title, Locker and
+shelf code in habits.html now has nothing to read; it is removed in a later tidy.
+
 Amir cut Career Mode down to its lightest version (`career/CAREER_MODE.md` → *Round 5*, decisions L1 to L11). A coached athlete meets their
 level, their four numbers, their moments and Amir's notes in **AA Performance** (`program.html`, on Progress). **AA Proof keeps its habits,
 the week table, Today and the Crew board.** The career screens in this file are switched off for everyone, with ONE constant,

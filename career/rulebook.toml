@@ -16,7 +16,8 @@
 # a tier or what earns an achievement raises `version` and sets `starts_on = "YYYY-MM-DD"`, the day it is seeded: facts before that day
 # keep their prices, awards keep the XP they were minted with. The seed refuses a change to [habits], [level], [season], [week], [share] or
 # to how a fact is worked out (career/README.md; PROCEDURES.md → Stage 76).
-version = 3
+version = 4
+starts_on = "2026-10-19"   # stage78, the cut: the catalogue changed (D20: a new version starts on a day)
 meanings = ["consistency", "commitment", "progress", "resilience"]
 
 [switch]

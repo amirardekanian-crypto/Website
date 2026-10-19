@@ -406,7 +406,7 @@ class CareerCheckerTests(unittest.TestCase):
         self.assertFails("[message.zz_good]", "en must be non-empty text")
 
     def test_amirs_pick_must_name_a_real_title(self):
-        self.set_key("recognition.toml", "tool.amirs_pick", "title", '"nobody_has_this"')
+        self.put_key("recognition.toml", "tool.amirs_pick", "title", '"nobody_has_this"')   # it names none since the cut (stage78)
         self.assertFails("[tool.amirs_pick]", "title 'nobody_has_this' is not in titles.toml")
 
     def test_recognition_sizes_are_the_five(self):
@@ -496,15 +496,6 @@ class CareerCheckerTests(unittest.TestCase):
         self.set_key("rulebook.toml", "habits", "qualify_pct", "75")
         self.assertFails("[habits] qualify_pct is 75 but Proof's streakQualifyPct is 80")
 
-    def test_in_shadow_a_proof_milestone_must_match(self):
-        self.catalogue_off()
-        path = self.dir / "badges.toml"
-        text = path.read_text(encoding="utf-8")
-        tier = '{ at = 10, metal = "silver", xp = 75, size = "highlight" }'
-        self.assertIn(tier, text)
-        path.write_text(text.replace(tier, tier.replace("xp = 75", "xp = 80"), 1), encoding="utf-8", newline="\n")
-        self.assertFails("Proof pays the milestone DP (need 10, 75 XP, daysWith3)", "DP (need 10.0, 80.0 XP")
-
     def test_in_shadow_a_proof_quest_must_match(self):
         self.catalogue_off()
         self.set_key("missions.toml", "mission.no_negotiation", "proof_need", "6")
@@ -523,9 +514,9 @@ class CareerCheckerTests(unittest.TestCase):
         self.assertFails("[habits.weights] water is 31 but Proof's is 30", "until the catalogue switch")
 
     def test_a_proof_measure_or_kind_must_be_known(self):
-        self.set_key("badges.toml", "badge.zen_machine", "proof_measure", '"streak:nothing"')
+        # (the badge half of this case left with Proof's badges in the cut, stage78)
         self.set_key("missions.toml", "mission.dead_calm", "proof_kind", '"dayshit:breathe"')
-        self.assertFails("proof_measure 'streak:nothing' is not one of", "proof_kind 'dayshit:breathe' is not one of")
+        self.assertFails("proof_kind 'dayshit:breathe' is not one of")
 
     def test_the_new_rulebook_fields_are_checked(self):
         self.set_key("rulebook.toml", "habits", "one_miss_door", '"yes"')
@@ -832,8 +823,7 @@ class CareerCheckerTests(unittest.TestCase):
 
     def test_a_proof_entry_may_carry_retire_at_without_tripping_the_parity_check(self):
         # the shadow is on: Proof's own entries still equal Proof's numbers, and a retiring one may say when it stops
-        self.put_key("badges.toml", "badge.dawn_patrol", "retire_at", '"catalogue"')
-        self.put_key("badges.toml", "badge.dawn_patrol", "superseded_by", '"century"')
+        # (Proof's badges left with the cut, stage78: an achievement and a mission carry the case now)
         self.put_key("achievements.toml", "achievement.first_blood", "retire_at", '"catalogue"')
         self.put_key("achievements.toml", "achievement.first_blood", "superseded_by", '"century"')
         self.put_key("missions.toml", "mission.three_hard_days", "retire_at", '"catalogue"')
@@ -841,17 +831,9 @@ class CareerCheckerTests(unittest.TestCase):
         out = self.assertPasses("OK: 0 errors")
         self.assertNotIn("unknown key", out)
 
-    def test_a_retiring_proof_entry_must_still_match_proofs_numbers(self):
-        # retire_at is not a way round the parity check: until the switch the entry is earned exactly as Proof earns it
-        self.catalogue_off()
-        self.put_key("badges.toml", "badge.dawn_patrol", "retire_at", '"catalogue"')
-        self.put_key("badges.toml", "badge.dawn_patrol", "superseded_by", '"century"')
-        path = self.dir / "badges.toml"
-        text = path.read_text(encoding="utf-8")
-        tier = '{ at = 10, metal = "silver", xp = 75, size = "highlight" }'
-        self.assertIn(tier, text)
-        path.write_text(text.replace(tier, tier.replace("xp = 75", "xp = 80"), 1), encoding="utf-8", newline="\n")
-        self.assertFails("Proof pays the milestone DP (need 10, 75 XP, daysWith3)", "DP (need 10.0, 80.0 XP")
+    # test_a_retiring_proof_entry_must_still_match_proofs_numbers and test_in_shadow_a_proof_milestone_must_match held Proof's milestone DP to
+    # the Dawn Patrol badge while the shadow was on. Both the shadow (the catalogue switch is on since 2026-10-18) and the badge (the cut, stage78)
+    # are gone, so they went with them.
 
     def test_a_retiring_entry_does_not_count_for_coverage(self):
         def small_files(retiring):
@@ -920,9 +902,9 @@ class CareerCheckerTests(unittest.TestCase):
     # ── rule 17: a best_run badge says what a run is ──────────────────────────────────────────────────────────────
     def test_rule_17_the_real_best_run_badges_carry_a_run(self):
         text = (self.dir / "badges.toml").read_text(encoding="utf-8")
+        # since the cut (stage78) the one best-run badge left is Hold Serve (held_weeks), and comebacks keeps its history twin
         self.assertIn('run = "plan_weeks"', text)
-        self.assertIn('run = "iso_weeks"', text)
-        self.assertEqual(text.count('run = "days"'), 8)
+        self.assertEqual(text.count('run = "days"'), 0)
         self.assertIn('history_twin_counts = "comeback_stuck"', text)
         self.assertPasses("OK: 0 errors")
 
@@ -1037,8 +1019,9 @@ class CareerCheckerTests(unittest.TestCase):
                 self.assertFails(needle)
 
     # ── rule 19: a title's size, and [moments] ────────────────────────────────────────────────────────────────────
-    def test_rule_19_the_real_files_carry_the_grand_slams_size_and_the_moments(self):
-        self.assertIn('size = "legend"', (self.dir / "titles.toml").read_text(encoding="utf-8"))
+    def test_rule_19_the_real_files_carry_the_moments_and_no_title(self):
+        # the Grand Slam and every title left with the cut (stage78); rule 19 still holds for a title a test adds
+        self.assertNotIn("[title.", (self.dir / "titles.toml").read_text(encoding="utf-8"))
         self.assertIn("[moments]", (self.dir / "recognition.toml").read_text(encoding="utf-8"))
 
     def test_rule_19_a_size_on_the_grand_slam_passes(self):
@@ -1112,10 +1095,17 @@ class CareerCheckerTests(unittest.TestCase):
     # ── rule 21: tiers are append-only ────────────────────────────────────────────────────────────────────────────
     def test_rule_21_the_real_lock_matches_the_real_files(self):
         lock = self.lock()
-        self.assertEqual(len(lock), 38)
+        self.assertEqual(len(lock), 5)   # the four marks and the cut's "_removed" list (stage78)
+        self.assertEqual(len(lock["_removed"]), 34)
+        self.assertIn("the_upgrade", lock["_removed"])
         self.assertEqual(lock["held_weeks"], ["bronze", "silver", "emerald", "amethyst", "prismatic"])
         self.assertEqual(lock["comebacks"], ["bronze", "silver", "emerald"])
         self.assertNotIn("rule 21", self.assertPasses("OK: 0 errors"))
+
+    def test_rule_21_an_id_the_cut_removed_never_comes_back(self):
+        self.append("badges.toml", '\n[badge.the_upgrade]\nname = "Back Again"\nmeaning = "progress"\nkind = "count"\ncounts = "personal_best"\n'
+                    'caption = "{n} bests."\nfree = false\norigin = "new"\ntiers = [{ at = 5, metal = "bronze", xp = 100, size = "win" }]\n')
+        self.assertFails("[badge.the_upgrade]", "never comes back", "rule 21")
 
     def test_rule_21_appending_a_tier_passes_and_so_does_a_changed_at_or_xp(self):
         self.lock(lambda lock: lock.update(held_weeks=lock["held_weeks"][:3]))      # the files now hold two MORE than the lock
@@ -1192,11 +1182,15 @@ class CareerCheckerTests(unittest.TestCase):
 
     def test_write_lock_makes_the_lock_again_from_the_files(self):
         before = (self.dir / LOCK).read_text(encoding="utf-8")
+        rc, _, err = self.run_seed("--write-lock")
+        self.assertEqual(rc, 0, err)
+        self.assertEqual((self.dir / LOCK).read_text(encoding="utf-8"), before)   # the cut's "_removed" list is kept
+        self.assertEqual(json.loads(before)["held_weeks"][0], "bronze")
         (self.dir / LOCK).unlink()
         rc, _, err = self.run_seed("--write-lock")
         self.assertEqual(rc, 0, err)
-        self.assertEqual((self.dir / LOCK).read_text(encoding="utf-8"), before)
-        self.assertEqual(json.loads(before)["held_weeks"][0], "bronze")
+        again = json.loads((self.dir / LOCK).read_text(encoding="utf-8"))
+        self.assertEqual(sorted(again), ["bests", "century", "comebacks", "held_weeks"])   # from the files alone: the four marks
 
     def test_write_lock_lets_a_tier_be_appended_and_refuses_one_that_was_removed(self):
         text = (self.dir / "badges.toml").read_text(encoding="utf-8")

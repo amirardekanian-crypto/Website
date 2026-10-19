@@ -138,6 +138,12 @@ def write_lock(folder):
     payload(folder)    # raises SystemExit with the checker's errors
     path = folder / check_career.LOCK_FILE
     lock = lock_for(folder)
+    try:   # the ids a cut took off the server stay listed (rule 21: they never come back)
+        removed = json.loads(path.read_text(encoding="utf-8")).get(check_career.LOCK_REMOVED) or []
+    except (OSError, ValueError):
+        removed = []
+    if removed:
+        lock[check_career.LOCK_REMOVED] = sorted(removed)
     text = "{\n" + ",\n".join(f" {json.dumps(k)}: {json.dumps(v)}" for k, v in lock.items()) + "\n}\n"   # a line per badge
     path.write_text(text, encoding="utf-8", newline="\n")
     print(f"career_seed: wrote {path} ({len(json.loads(text))} badges)", file=sys.stderr)

@@ -1172,6 +1172,9 @@ begin
         into c_aw
         from public.career_awards aw join public.career_catalogue c on c.kind = aw.kind and c.id = aw.item
        where aw.athlete_id = a.athlete_id and aw.day <= v_cat and c.body ->> 'origin' = 'proof';
+      c_aw := c_aw + (select coalesce(sum(public.career_num(k.value -> 'xp')), 0)::bigint from public.career_facts k
+                       where k.athlete_id = a.athlete_id and k.kind = 'award_kept' and k.void_at is null
+                         and k.day <= v_cat and k.value ->> 'proof' = 'true');   -- stage78: the Proof awards that left with the cut
       v_row_ok := v_row_ok and p_aw = c_aw;
     end if;
     if not v_row_ok and v_closed > 0 then
@@ -1238,7 +1241,7 @@ begin
   return jsonb_build_object(
     'career', jsonb_build_object('habits', jsonb_build_object('daily', c_d, 'bonus', c_b, 'xp', c_d + c_b),
                                  'facts', c_f, 'facts_xp', round(c_r)::bigint, 'xp', v_cxp)
-              || public.career_level(v_cxp, v_rules),
+              || (public.career_level(v_cxp, v_rules) - 'rank'),   -- stage78: the level, no rank name
     'season', jsonb_build_object('name', v_name, 'starts_on', v_start, 'points', v_sxp,
                                  'parts', jsonb_build_object('habits', jsonb_build_object('daily', s_d, 'bonus', s_b, 'xp', s_d + s_b),
                                                              'facts', s_f, 'facts_xp', round(s_r)::bigint, 'xp', v_sxp)),
@@ -1983,7 +1986,7 @@ AS $function$
   f as (
     select f.kind, f.ref, f.day, f.value from public.career_facts f
      where f.athlete_id = p_athlete and f.void_at is null
-       and f.kind not in ('habit_done', 'habit_day', 'day_on_target', 'perfect_day', 'workout_tick', 'comeback')
+       and f.kind not in ('habit_done', 'habit_day', 'day_on_target', 'perfect_day', 'workout_tick', 'comeback', 'award_kept')   -- stage78
   ),
   priced as (
     select f.*,
@@ -2020,6 +2023,11 @@ AS $function$
   select 'award'::text, a.award_id, a.day, (case when not a.pays then 0 else a.xp end)::numeric, false   -- stage76: the minted XP (D20, D12 reversed)
     from public.career_awards a
    where a.athlete_id = p_athlete and public.career_catalogue_on()
+  union all
+  -- stage78: an award that left with the cut, paid as it was (its own XP, its own day, never career-only, only with the catalogue on)
+  select 'award_kept'::text, k.ref, k.day, coalesce(public.career_num(k.value -> 'xp'), 0), false
+    from public.career_facts k
+   where k.athlete_id = p_athlete and k.kind = 'award_kept' and k.void_at is null and public.career_catalogue_on()
 $function$;
 
 CREATE OR REPLACE FUNCTION public.career_facts_xp(p_athlete text, p_from date, p_to date)
@@ -2775,10 +2783,7 @@ begin
     insert into public.career_recognition (athlete_id, award_id, audience, size) values (p_athlete, v_id, 'athlete', v_size)
     on conflict (athlete_id, award_id, audience) do nothing;
   end if;
-  if p_kind = 'title' then
-    insert into public.hab_titles (athlete_id, title, earned_on) values (p_athlete, coalesce(p_body ->> 'proof_id', p_item), p_day)
-    on conflict (athlete_id, title) do nothing;
-  end if;
+  -- stage78: no title is minted any more (round 5, L5), so no hab_titles row
   return true;
 end $function$;
 
@@ -3933,10 +3938,7 @@ begin
   if not public.is_coach() and p_athlete_id is distinct from public.current_athlete_id() and (v_expected is null or p_key is null or p_key is distinct from v_expected) then
     raise exception 'invalid athlete key';
   end if;
-  perform public.hab_mint_titles(p_athlete_id);
-  return query
-    select t.title, t.earned_on from public.hab_titles t
-    where t.athlete_id = p_athlete_id order by t.earned_on, t.title;
+  return;   -- stage78: titles are gone (round 5, L5): no rows
 end; $function$;
 
 CREATE OR REPLACE FUNCTION public.clear_quests(p_start date)
@@ -5333,7 +5335,7 @@ begin
     'shadow', v_xp is null,
     'switch', jsonb_build_object('xp', v_xp, 'catalogue', public.career_switch_day(v_rules, 'catalogue')),
     'rules_version', (select max(r.version) from public.career_rules r),
-    'career', v_score -> 'career',
+    'career', (v_score -> 'career') - 'rank',   -- stage78: no rank name
     'season', v_score -> 'season',
     'week', v_score -> 'week',
     'since', (select min(cf.day) from public.career_facts cf
@@ -5349,13 +5351,11 @@ begin
                   'days_on_target', count(*) filter (where cf.kind = 'day_on_target'),
                   'perfect_days', count(*) filter (where cf.kind = 'perfect_day'))
                   from public.career_facts cf where cf.athlete_id = v_id and cf.void_at is null),
-    'titles_owned', coalesce((select jsonb_agg(t.title order by t.earned_on, t.title) from public.hab_titles t where t.athlete_id = v_id), '[]'::jsonb),
     'rules', jsonb_build_object(
       'version', (select max(r.version) from public.career_rules r),
       'level', jsonb_build_object('base', v_rules #> '{level,base}', 'growth', v_rules #> '{level,growth}',
-                                  'ranks', v_rules #> '{level,ranks}', 'levels_per_rank', v_rules #> '{level,levels_per_rank}',
-                                  'prestige_after', v_rules #> '{level,prestige_after}'),
-      'season', jsonb_build_object('title_points', v_rules #> '{season,title_points}'),
+                                  'levels_per_rank', v_rules #> '{level,levels_per_rank}', 'prestige_after', v_rules #> '{level,prestige_after}'),   -- stage78: no rank names
+      'season', '{}'::jsonb,   -- stage78: no season title
       'prices', coalesce((select jsonb_object_agg(k.key, public.career_num(v_rules #> array['fact', k.key, 'xp']))
                             from unnest(array['session_finished', 'session_finished_early', 'full_log', 'checkin_done', 'week_held',
                                               'bounce_back', 'training_return', 'library_session', 'retest_done']) as k(key)
@@ -5363,7 +5363,7 @@ begin
     'badges', '[]'::jsonb, 'achievements', '[]'::jsonb, 'missions', '[]'::jsonb, 'quest', null, 'moments', '[]'::jsonb
   );
   v_rp := public.career_rewards_profile(v_id, v_rw);
-  return v_out || (v_rp - 'numbers')
+  return v_out || (v_rp - 'numbers' - 'slam' - 'title_worn' - 'titles_owned')   -- stage78
          || case when v_rp ? 'numbers' then jsonb_build_object('numbers', (v_out -> 'numbers') || (v_rp -> 'numbers')) else '{}'::jsonb end;
 end $function$;
 
@@ -5788,7 +5788,7 @@ CREATE OR REPLACE FUNCTION public.hab_close_season(p_ended_on date)
  SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
-declare v_name text; v_start date; v_title text; v_rules jsonb; v_n integer := 0; v_need numeric;
+declare v_name text; v_start date; v_rules jsonb; v_n integer := 0;
 begin
   if not public.is_coach() then
     raise exception 'coach only';
@@ -5803,11 +5803,10 @@ begin
     raise exception 'cannot archive a season that has not finished yet (ends %, today is %)',
                     p_ended_on, current_date;
   end if;
-  v_title := 't_sn_' || to_char(v_start, 'YYYYMMDD');
+  -- stage78: the season is archived with no title (titles are gone, round 5, L5)
 
   if public.career_xp_on() then
     v_rules := public.career_rules_now();
-    v_need := coalesce(public.career_num(v_rules #> '{season,title_points}'), 2000);
     with who as (
       select distinct f.athlete_id as id from public.career_facts f where f.void_at is null
     ),
@@ -5823,12 +5822,6 @@ begin
      where s.pts > 0
     on conflict (athlete_id, starts_on) do nothing;
     get diagnostics v_n = row_count;
-
-    insert into public.hab_titles (athlete_id, title)
-    select r.athlete_id, v_title
-      from public.hab_season_results r
-     where r.starts_on = v_start and r.xp >= v_need
-    on conflict (athlete_id, title) do nothing;
     return v_n;
   end if;
 
@@ -5850,12 +5843,6 @@ begin
   where s.xp > 0
   on conflict (athlete_id, starts_on) do nothing;
   get diagnostics v_n = row_count;
-
-  insert into public.hab_titles (athlete_id, title)
-  select r.athlete_id, v_title
-  from public.hab_season_results r
-  where r.starts_on = v_start and r.level >= 5
-  on conflict (athlete_id, title) do nothing;
 
   return v_n;
 end $function$;
@@ -5915,19 +5902,8 @@ CREATE OR REPLACE FUNCTION public.hab_mint_titles(p_athlete_id text)
  SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
-declare v_rules jsonb; v_level int;
 begin
-  select rules into v_rules from public.xp_rules where id = 1;
-  if v_rules is null or v_rules -> 'passTrack' is null then return; end if;
-  v_level := public.hab_season_level(p_athlete_id);
-  insert into public.hab_titles (athlete_id, title)
-  select p_athlete_id, t ->> 'id'
-  from jsonb_array_elements(v_rules -> 'passTrack') t
-  where t ->> 'kind' = 'title'
-    and (t ->> 'lv') is not null
-    and (t ->> 'lv')::int > 0
-    and v_level >= (t ->> 'lv')::int
-  on conflict (athlete_id, title) do nothing;
+  return;   -- stage78: titles are gone (Career Mode round 5, L5); nothing is minted
 end; $function$;
 
 CREATE OR REPLACE FUNCTION public.hab_notes_floor()
@@ -6135,28 +6111,28 @@ begin
   select exists (select 1 from public.leaderboard_optin o where o.athlete_id = p_athlete_id)
     into v_joined;
 
+  -- stage78: no title and no rank name on the board (round 5, L5, L8: the board keeps its order, only the names go)
   if public.career_xp_on() then
     return query
     with board as (
-      select o.athlete_id as aid, o.display_name as dname, o.title as ttl from public.leaderboard_optin o
+      select o.athlete_id as aid, o.display_name as dname from public.leaderboard_optin o
     ),
     sc as (
       select s.athlete_id as aid, s.score
         from public.career_scores_for((select array_agg(b.aid) from board b), interval '2.5 seconds') s
     ),
     scored as (
-      select b.aid, b.dname, b.ttl,
+      select b.aid, b.dname,
              coalesce(case when p_scope = 'week' then (sc.score #>> '{week,points}')::bigint
                            else (sc.score #>> '{season,points}')::bigint end, 0) as x,
-             coalesce((sc.score #>> '{career,level}')::int, 1) as lv,
-             coalesce(sc.score #>> '{career,rank}', public.hab_rank_label(1)) as rk
+             coalesce((sc.score #>> '{career,level}')::int, 1) as lv
         from board b left join sc on sc.aid = b.aid
     ),
     ranked as (
       select row_number() over (order by s.x desc, lower(s.dname) asc) as rn, s.*
         from scored s
     )
-    select r.rn::int, r.dname, r.ttl, r.x, r.lv, r.rk, (r.aid = p_athlete_id), v_joined
+    select r.rn::int, r.dname, null::text, r.x, r.lv, null::text, (r.aid = p_athlete_id), v_joined
       from ranked r
      where r.rn <= greatest(1, p_limit) or r.aid = p_athlete_id
      order by r.rn;
@@ -6180,7 +6156,6 @@ begin
   with scored as (
     select o.athlete_id as aid,
            o.display_name as dname,
-           o.title as ttl,
            ( public.hab_xp(public.hab_log_of(ap.data, o.athlete_id), v_from, v_to, v_rules)
            + public.hab_bonus_xp(public.hab_log_of(ap.data, o.athlete_id),
                                  public.hab_cfg_of(ap.data, o.athlete_id),
@@ -6194,10 +6169,10 @@ begin
   )
   select r.rn::int,
          r.dname,
-         r.ttl,
+         null::text,
          r.x,
          public.hab_level(r.x, v_rules),
-         public.hab_rank_label(public.hab_level(r.x, v_rules)),
+         null::text,
          (r.aid = p_athlete_id),
          v_joined
   from ranked r
@@ -6630,47 +6605,33 @@ CREATE OR REPLACE FUNCTION public.roll_call(p_athlete_id text, p_key text DEFAUL
  SET search_path TO 'public'
 AS $function$
 declare
-  v_expected text; v_rules jsonb; v_from date; v_season_start date;
+  v_expected text; v_from date;
 begin
   select secret_key into v_expected from public.athlete_keys where athlete_id = p_athlete_id;
   if not public.is_coach() and p_athlete_id is distinct from public.current_athlete_id() and (v_expected is null or p_key is null or p_key is distinct from v_expected) then
     raise exception 'invalid athlete key';
   end if;
 
-  select rules into v_rules from public.xp_rules where id = 1;
-  select s.starts_on into v_season_start from public.current_season() s;
   v_from := current_date - greatest(1, least(60, coalesce(p_days, 7)));
 
+  -- stage78: no title and no rank name beside a line (round 5, L5)
   return query
   with visible as (
-    select n.athlete_id as aid, n.day as d, o.display_name as dname, o.title as ttl,
+    select n.athlete_id as aid, n.day as d, o.display_name as dname,
            n.body as b, n.pct as p, n.updated_at as ua, false as coach
     from public.hab_notes n
     join public.leaderboard_optin o on o.athlete_id = n.athlete_id
     where not n.hidden and n.day >= v_from and n.day <= current_date + 1
     union all
-    select n.athlete_id, n.day, 'AMIR'::text, null::text,
+    select n.athlete_id, n.day, 'AMIR'::text,
            n.body, n.pct, n.updated_at, true
     from public.hab_notes n
     where n.athlete_id = public.coach_note_id()
       and not n.hidden and n.day >= v_from and n.day <= current_date + 1
-  ),
-  scored as (
-    select v.aid as said,
-           public.hab_rank_label(public.hab_level(
-             ( public.hab_xp(public.hab_log_of(ap.data, v.aid),
-                             v_season_start, current_date, v_rules)
-             + public.hab_bonus_xp(public.hab_log_of(ap.data, v.aid),
-                                   public.hab_cfg_of(ap.data, v.aid),
-                                   v_season_start, v_season_start, current_date, v_rules) ),
-             v_rules)) as rlabel
-    from (select distinct aid from visible where not coach) v
-    left join public.athlete_progress ap on ap.athlete_id = v.aid
   )
-  select vi.d, vi.dname, vi.ttl, vi.b, vi.p,
-         sc.rlabel, (vi.aid = p_athlete_id), vi.coach
+  select vi.d, vi.dname, null::text, vi.b, vi.p,
+         null::text, (vi.aid = p_athlete_id), vi.coach
   from visible vi
-  left join scored sc on sc.said = vi.aid
   order by vi.d desc, vi.coach desc, vi.ua desc;
 end; $function$;
 
@@ -6999,45 +6960,14 @@ CREATE OR REPLACE FUNCTION public.set_title(p_athlete_id text, p_title text, p_k
  SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
-declare v_expected text; v_rules jsonb; v_entry jsonb; v_need int; v_title text;
+declare v_expected text;
 begin
   select secret_key into v_expected from public.athlete_keys where athlete_id = p_athlete_id;
   if not public.is_coach() and p_athlete_id is distinct from public.current_athlete_id() and (v_expected is null or p_key is null or p_key is distinct from v_expected) then
     raise exception 'invalid athlete key';
   end if;
-
-  v_title := nullif(btrim(coalesce(p_title, '')), '');
-
-  if v_title is not null then
-    select rules into v_rules from public.xp_rules where id = 1;
-    select t into v_entry
-      from jsonb_array_elements(coalesce(v_rules -> 'passTrack', '[]'::jsonb)) t
-      where t ->> 'id' = v_title and t ->> 'kind' = 'title'
-      limit 1;
-
-    if v_entry is null then
-      if not exists (select 1 from public.hab_titles t
-                     where t.athlete_id = p_athlete_id and t.title = v_title) then
-        raise exception 'unknown title';
-      end if;
-    else
-      v_need := nullif(v_entry ->> 'lv', '')::int;
-      if v_need is not null and v_need > 0 then
-        perform public.hab_mint_titles(p_athlete_id);
-        if not exists (select 1 from public.hab_titles t
-                       where t.athlete_id = p_athlete_id and t.title = v_title) then
-          raise exception 'title not earned: % needs level %', v_title, v_need;
-        end if;
-      else
-        insert into public.hab_titles (athlete_id, title)
-        values (p_athlete_id, v_title)
-        on conflict (athlete_id, title) do nothing;
-      end if;
-    end if;
-  end if;
-
-  update public.leaderboard_optin set title = v_title, updated_at = now()
-  where athlete_id = p_athlete_id;
+  -- stage78: titles are gone (round 5, L5). Whatever an old phone asks for, the board shows no title.
+  update public.leaderboard_optin set title = null, updated_at = now() where athlete_id = p_athlete_id;
   if not found then raise exception 'join the board first'; end if;
 end; $function$;
 

@@ -109,7 +109,7 @@
   .bar-fill.tone-green { background: var(--court); } .bar-fill.tone-plum { background: var(--ochre); } .bar-fill.tone-clay { background: var(--clay); } .bar-fill.tone-muted { background: var(--muted); }
   /* A number that lines up with others: Barlow's tabular figures (Space Mono is for numbers that must be exact: see THE LOOK). */
   .brand span, .who, .counter .n, .stab .n, .tab .n, .mp-v, .chart-big, .sp-n, .sp, .wday-n, .pct, .qday, .lib-n, .rf .c, .rgroup .c, .ffacts dd,
-  .meta-table td.v, .fun .days, .dv-sub, .tfeed .td, .pulse .tag, .readiness .r b, .wallday .d, .proofstrip .big, .bb-item .n, .ms-row .n, .tbtn .tn { font-variant-numeric: tabular-nums; }
+  .meta-table td.v, .fun .days, .dv-sub, .pulse .tag, .readiness .r b, .wallday .d, .proofstrip .big, .bb-item .n, .ms-row .n, .tbtn .tn { font-variant-numeric: tabular-nums; }
 
   /* ── Controls: ONE look each (round 3). Buttons come in four tiers at one height: PRIMARY (green fill; at most one per section), SECONDARY (outline; the
      default), QUIET (.quiet: text only) and DANGER (.danger: a clay outline; a clay fill only on the final button of a panel that asks first). .btn, .abtn, .modbtn,
@@ -326,8 +326,8 @@
   }
 
   /* ── Panels ── */
-  /* Proof (round 2: the community's home): the wall and the board on the left (the wider column), the quest lever, the pulse,
-     titles, the season and the funnel stacked on the right. One column below 900 px, the left column first. */
+  /* Proof (round 2: the community's home): the wall and the board on the left (the wider column), the quest lever, the pulse
+     and the season stacked on the right (titles left with the cut, stage78). One column below 900 px, the left column first. */
   .cols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: var(--gap); margin-top: var(--gap); align-items: start; }
   .colstack { display: grid; gap: var(--gap); }
   /* Today: Needs you wide on the left, Proof today (one short panel) on the right. One column
@@ -1249,12 +1249,6 @@
   .fun .days small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
   .fun .acts { flex: none; display: flex; gap: 8px; flex-wrap: wrap; }
   @media (max-width: 480px) { .fun .acts { flex: 1 1 100%; } }
-  /* Titles feed */
-  .tfeed { display: flex; align-items: baseline; gap: 12px; padding: 8px 4px; border-bottom: 1px solid var(--rule); font-size: 14px; }
-  .tfeed:last-child { border-bottom: 0; }
-  .tfeed .tnm { font-weight: 600; }
-  .tfeed .ttl { font-weight: 600; }
-  .tfeed .td { margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap; }
 
   /* Links (ported) */
   /* The Library (round 3 of the coach UX pass, 2026-10-12): one panel per kind, a fold per shelf with its count, and a compact row per item (about 44 px:
@@ -1663,7 +1657,6 @@ const S = {
   intake: [],      // hab_intake rows — coaching apply-form submissions, with the athlete each became and the outcome (stage61)
   rules: null,     // xp_rules.rules jsonb
   seasons: [],     // seasons rows, newest first
-  titles: [],      // hab_titles recent
   optin: {},       // athlete_id -> {display_name, title}
   programs: {},    // athlete_id -> programme JSON (the row in public.programs)
   progSrc: {},     // athlete_id -> 'db' | 'none'. Demo mode never calls
@@ -1755,20 +1748,19 @@ function ensureSessionsFull(athleteId) {
 
 async function loadAll() {
   if (DEMO) { demoStore(); S.ready = true; return; }
-  const [prog, hist, notes, contacts, rules, seasons, titles, optin, intake, affs, stat] = await Promise.all([
+  const [prog, hist, notes, contacts, rules, seasons, optin, intake, affs, stat] = await Promise.all([
     selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at'),
     loadHistory(),
     sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)),
     sb.rpc('contact_list'),
     sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle(),
     sb.from('seasons').select('*').order('starts_on', { ascending: false }),
-    sb.from('hab_titles').select('*').order('earned_on', { ascending: false }).limit(30),
     sb.from('leaderboard_optin').select('athlete_id, display_name, title'),
     selectAll('hab_intake', '*'),   // the table itself, paged (stage61): intake_list() cannot return the new columns and stops at the row cap
     sb.from('affiliates').select('*').order('code'),
     selectAll('athlete_status', '*'),
   ]);
-  const firstErr = [prog, hist, notes, rules, seasons, titles, optin].find(r => r && r.error);
+  const firstErr = [prog, hist, notes, rules, seasons, optin].find(r => r && r.error);
   if (firstErr) throw new Error(firstErr.error.message);
   S.prog = prog.data || [];
   S.hist = hist.data || [];
@@ -1776,7 +1768,6 @@ async function loadAll() {
   S.contacts = (contacts && contacts.data) || [];
   S.rules = (rules.data && rules.data.rules) || null;
   S.seasons = seasons.data || [];
-  S.titles = titles.data || [];
   S.optin = {}; (optin.data || []).forEach(r => S.optin[r.athlete_id] = r);
   S.intake = (intake && intake.data) || [];
   S.affiliates = (affs && !affs.error && affs.data) || [];
@@ -5764,7 +5755,6 @@ function proofTabHtml(D) {
         ${dots}
         <div class="meta" style="margin-top:8px">last 14 days · ${a.hab7}/7 in the last 7 days · ${a.habToday ? 'logged today' : a.habLast ? 'last log ' + timeAgo(a.habLast + 'T12:00:00') : 'never logged'}</div>
       </div>
-      ${o && o.title ? `<div class="meta">Wears <b>${esc(o.title)}</b></div>` : ''}
     </div>
     ${c ? `<div class="note-actions" style="margin-top:12px">
       ${waLink(c.whatsapp) ? `<a class="abtn" target="_blank" rel="noopener" href="${esc(waLink(c.whatsapp))}">WhatsApp ↗</a>` : ''}
@@ -5945,8 +5935,8 @@ function contactTierOf(c) { return (S.ath[c.athlete_id] && S.ath[c.athlete_id].t
 const THEIR_APP_HOW = id => `Open ${esc(id)}'s programme in the same screens and words as their phone. It shows the programme only: what they have logged (sets, weights, records, habits) is not in it, and that is under The work and Proof here. It is read-only: nothing you tap is saved.`;
 const NO_LOGIN_HOW = 'The old secret links were retired on 7 Sep 2026. Create a username and password here, then send it on WhatsApp (it waits under “Logins to send” on the Athletes tab until you mark it sent, or they sign in with it).';
 const DELETE_HISTORY_HOW = 'Deletes every finished session (the hidden ones too) and everything the app keeps for them on the server (habit log, body weight, personal records). Their programme, login, coaching log and calls stay, and so do they on the roster.';
-const ERASE_HOW = 'Or remove them completely: the programme and its saved versions, the login and sign-in account, sessions, app data, coaching log, calls, reports, titles, board place and contact, in one step. You see the exact list first and type their id to confirm. Intake forms that carry their email, WhatsApp number or name are offered, and you can look for any other form there.';
-const FORGET_HOW = 'Forget deletes the Proof contact details of someone who signed up for the free habit tracker, their whole habit log and progress, their board place and their roll-call lines. Their programme, login, session history, titles and season results stay. It is not offered for a coached athlete. To remove everything about a person, use Erase completely.';
+const ERASE_HOW = 'Or remove them completely: the programme and its saved versions, the login and sign-in account, sessions, app data, coaching log, calls, reports, board place and contact, in one step. You see the exact list first and type their id to confirm. Intake forms that carry their email, WhatsApp number or name are offered, and you can look for any other form there.';
+const FORGET_HOW = 'Forget deletes the Proof contact details of someone who signed up for the free habit tracker, their whole habit log and progress, their board place and their roll-call lines. Their programme, login, session history and season results stay. It is not offered for a coached athlete. To remove everything about a person, use Erase completely.';
 function fileTabHtml(D) {
   const { athleteId, a, program, programDays } = D;
   const cycles = (program && program.cycles) || [];
@@ -6621,7 +6611,6 @@ function drawProof(rows) {
       <div class="colstack">
         <section class="panel" id="questPanel">${questPanelHtml(activeQuestRun())}</section>
         <section class="panel" id="pulsePanel">${pulsePanelHtml(habAthletes)}</section>
-        ${titlesPanelHtml()}
         ${seasonPanelHtml()}
       </div>
     </div>`;
@@ -6644,25 +6633,14 @@ function boardPanelHtml(rows) {
       ? rows.map(r => `
         <div class="lbrow ${r.pos <= 3 ? 'top' + r.pos : ''} ${r.is_me ? 'me' : ''}">
           <span class="pos">${r.pos}</span>
-          <span class="nm"><b>${esc(r.display_name)}</b>${r.is_me ? ' <span class="chip court">you</span>' : ''}${r.title ? `<small>${esc(r.title)}</small>` : ''}</span>
-          <span class="xp">LV ${esc(r.level)} · ${esc(r.rank_label)}<small>${Number(r.xp).toLocaleString()} XP</small></span>
+          <span class="nm"><b>${esc(r.display_name)}</b>${r.is_me ? ' <span class="chip court">you</span>' : ''}</span>
+          <span class="xp">LV ${esc(r.level)}<small>${Number(r.xp).toLocaleString()} XP</small></span>
         </div>`).join('')
       : '<p class="empty">Nobody on the board yet.</p>';
   return `${head}
     <p class="psub" data-hint="board">${at ? `As of ${pad2(at.getHours())}:${pad2(at.getMinutes())}. <button class="btn sm" onclick="reloadBoard()">↻ Reload</button>` : 'Scored by the server.'}</p>
     ${list}
     ${howFold('how-board', ['Scored by the server — exactly what the crew sees in the app.'])}`;
-}
-function titlesPanelHtml() {
-  const titles = (S.titles || []).length ? S.titles.map(x => `
-    <div class="tfeed"><span class="tnm">${esc(nameOf(x.athlete_id))}</span>
-      <span>earned</span><span class="ttl">${esc(x.title)}</span>
-      <span class="td">${esc(prettyDate(x.earned_on))}</span></div>`).join('')
-    : '<p class="empty">No titles minted yet.</p>';
-  return `<section class="panel">
-      <div class="phead"><span class="t hd">Titles minted</span><span class="r">latest ${Math.min(S.titles.length, 30)}</span></div>
-      ${titles}
-    </section>`;
 }
 function seasonPanelHtml() {
   const season = currentSeason(), sd = seasonDay();
@@ -6734,7 +6712,7 @@ function forgetContact(athleteId) {
   dangerAsk('forget:' + athleteId, {
     title: `Forget ${athleteId}?`,
     goes: 'This PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines. There is no undo and no automatic backup: take a ⤓ Backup first if you are not sure.',
-    stays: 'Their programme, login, session history, titles and season results stay.',
+    stays: 'Their programme, login, session history and season results stay.',
     note: 'To remove everything about them, cancel this and use “Erase completely…” just above.',
     button: `Forget ${nameOf(athleteId)}`, busyText: 'Forgetting…', run: () => forgetContactNow(athleteId) });
 }
@@ -9198,12 +9176,8 @@ function demoStore() {
     questRuns: [{ start: d(2), ids: ['w_steps50k', 'w_train3', 'w_water5'] }],
   };
   S.seasons = [{ id: 1, name: 'Pre-Season', starts_on: d(10) }];
-  S.titles = [
-    { athlete_id: 'demo_ana', title: 'THE WELL RUNS DEEP', earned_on: d(2) },
-    { athlete_id: 'demo_tara', title: 'WEEK ONE DONE', earned_on: d(4) },
-  ];
   S.optin = {
-    demo_ana: { athlete_id: 'demo_ana', display_name: 'Ana', title: 'THE WELL RUNS DEEP' },
+    demo_ana: { athlete_id: 'demo_ana', display_name: 'Ana', title: null },
     demo_lena: { athlete_id: 'demo_lena', display_name: 'Lena', title: null },
     amir_ardekani: { athlete_id: 'amir_ardekani', display_name: 'Amir', title: null },
     demo_mina: { athlete_id: 'demo_mina', display_name: 'Mina', title: null },
@@ -9225,11 +9199,11 @@ function demoStore() {
   };
   S.levels = { demo_ana: 6, demo_lena: 4, amir_ardekani: 5, demo_mina: 3, demo_tara: 4, demo_omid: 2, demo_kian: 1 };
   S.board.season = [
-    { pos: 1, display_name: 'Ana', title: 'THE WELL RUNS DEEP', xp: 4120, level: 6, rank_label: 'CONTENDER', is_me: false, joined: true },
-    { pos: 2, display_name: 'Amir', title: null, xp: 3480, level: 5, rank_label: 'CONTENDER', is_me: true, joined: true },
-    { pos: 3, display_name: 'Lena', title: null, xp: 2950, level: 4, rank_label: 'STARTER', is_me: false, joined: true },
-    { pos: 4, display_name: 'Tara', title: null, xp: 2610, level: 4, rank_label: 'STARTER', is_me: false, joined: true },
-    { pos: 5, display_name: 'Mina', title: null, xp: 1800, level: 3, rank_label: 'STARTER', is_me: false, joined: true },
+    { pos: 1, display_name: 'Ana', title: null, xp: 4120, level: 6, rank_label: null, is_me: false, joined: true },
+    { pos: 2, display_name: 'Amir', title: null, xp: 3480, level: 5, rank_label: null, is_me: true, joined: true },
+    { pos: 3, display_name: 'Lena', title: null, xp: 2950, level: 4, rank_label: null, is_me: false, joined: true },
+    { pos: 4, display_name: 'Tara', title: null, xp: 2610, level: 4, rank_label: null, is_me: false, joined: true },
+    { pos: 5, display_name: 'Mina', title: null, xp: 1800, level: 3, rank_label: null, is_me: false, joined: true },
   ];
   S.board.week = S.board.season.slice(0, 4);
   // Courtside (stage75), made up like the rest: this week's moments, last month's honours (worked out, not frozen), one goal.

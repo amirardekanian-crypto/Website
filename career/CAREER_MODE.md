@@ -82,7 +82,11 @@ athlete's name; athletes see the goal, his line and "Amir saw this" with step 3;
 (`stage74_publish_cycle_label.sql` took 74), and again for step 3's server half (`stage77_career_my_moments.sql`, the athlete's own read of
 Courtside): D20 = stage76, the cut = stage78, Crew = stage79, the Monthly Open = stage80.
 
-**Step 3, the light screens, is BUILT (2026-10-19)** (`PROGRAM-APP.md` → *Career, the lightest version*; `HABITS.md` → *Career screens off*).
+**Step 4, the cut, is LIVE (2026-10-19)** (`supabase/stage78_career_cut.sql`, rulebook version 4; `PROCEDURES.md` → *Stage 78*): rank names, titles,
+the Grand Slam, skins and every badge but the four marks left the server; each paying badge award became a nameless XP fact on its day, so all 35
+athletes kept exactly their XP, level and season points. Amir's word: "yes, go live with the cut".
+
+**Step 3, the light screens, is LIVE (2026-10-19)** (`PROGRAM-APP.md` → *Career, the lightest version*; `HABITS.md` → *Career screens off*).
 Amir on the design page *Your Numbers* (https://claude.ai/artifact/6ZsZ5LsegSrJoT64ktnquK): *"go with
 your choices about your numbers"*: Direction A, the Scorecard (one card on Progress: the level and its bar, the four numbers 2 × 2 with the next
 mark; the goal under it; Your moments as a list), and the Crew tab arrives with the Bell in step 5, not before. **Share cards:** *"the cards are

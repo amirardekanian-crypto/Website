@@ -125,7 +125,6 @@ example = "Commended for resilience: trained through exam week."
 who = "Amir"
 when = "the 1st of each month"
 shortlist = ["the most weeks held last month", "the biggest effort-matched gain", "the best comeback or bounce back"]
-title = "amirs_pick"
 size = "legend"
 asks_before_story = "a pre-written WhatsApp asking whether Amir may feature them"
 

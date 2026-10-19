@@ -298,6 +298,9 @@ ends up GRINDER on water and ROOKIE on their workout — which is the honest pic
 
 ## 3. Ranks
 
+> **Since the cut (stage78, 2026-10-19) no rank name reaches any screen and none is sent by the server** (the level number stays). The names below
+> stay in `career/rulebook.toml` `[level]` only because D20 locks the level's rules; they are shown to nobody. No title is minted either.
+
 > **Rank names are not drawn since 2026-10-19** (Career Mode round 5, L5). AA Proof shows the level as a number and a bar, on Today and in the habit rings.
 > The names, the crests and the road below still exist in the code, and `rankFor()` still reads them, but no screen shows them until the cut removes them.
 > Nothing about the level curve (§2) changed.

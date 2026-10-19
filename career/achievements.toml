@@ -97,7 +97,6 @@ rule = "The whole roadmap finished. The fact itself pays 3,000."
 xp = 0
 size = "legend"
 caption = "Every cycle of the roadmap, finished."
-title = "the_distance"
 free = false
 origin = "new"
 
@@ -136,7 +135,7 @@ reads = "lift_gain"
 test = "best_value"
 at = 100
 # GAME-10: a lift counts toward Double Up only when its Spine entry is on one of these patterns, is tagged strength and is not in `exclude` (Amir, 2026-10-18: "Yes i want those to be exluded / You set up the rule for that").
-# Each `exclude` id must be a Spine id spelled exactly (a draft is fine): an id with no Spine row at all pauses both rewards (this one and The Upgrade) for everyone until it is fixed.
+# Each `exclude` id must be a Spine id spelled exactly (a draft is fine): an id with no Spine row at all pauses this reward for everyone until it is fixed (The Upgrade, which shared the rule, left with the cut, stage78).
 patterns = ["squat", "hinge", "single-leg", "push-horizontal", "push-vertical", "pull-horizontal", "pull-vertical"]
 qualities = ["strength"]
 exclude = ["back-extension-45", "cable-face-pull", "machine-reverse-fly", "cable-straight-arm-pulldown"]
@@ -144,7 +143,6 @@ rule = "A lift twice its first number (lift_gain 100% or more), at the same effo
 xp = 500
 size = "legend"
 caption = "Twice as strong as day one."
-title = "new_engine"
 free = false
 origin = "new"
 
@@ -160,7 +158,6 @@ rule = "In one cycle: three personal bests, a retest beaten and every week held.
 xp = 0
 size = "milestone"
 caption = "Proved it on the test and in the log."
-title = "proven"
 free = false
 origin = "new"
 
@@ -282,7 +279,6 @@ rule = "16 sessions · 200,000 steps · Protein on 20 days"
 xp = 0
 size = "milestone"
 caption = "Four weeks in the fire."
-title = "sun_forged"
 free = false
 origin = "proof"
 
@@ -302,7 +298,6 @@ rule = "20 nights on target · 16 mobility sessions · 20 days on target"
 xp = 0
 size = "milestone"
 caption = "Built the base nobody claps for."
-title = "bedrock"
 free = true
 origin = "proof"
 
@@ -322,7 +317,6 @@ rule = "18 sessions · Full water on 22 days · 6 perfect days"
 xp = 0
 size = "milestone"
 caption = "Kept going after it stopped being fun."
-title = "cold_forged"
 free = false
 origin = "proof"
 
@@ -342,7 +336,6 @@ rule = "24 days on target · 250,000 steps · Protein on 24 days"
 xp = 0
 size = "milestone"
 caption = "Starting is easy. This was not."
-title = "still_here"
 free = true
 origin = "proof"
 
@@ -361,6 +354,5 @@ rule = "2 comebacks that held a week · 14 straight days after a comeback · 30 
 xp = 0
 size = "milestone"
 caption = "Fell off. Came back. Did it again."
-title = "unbowed"
 free = true
 origin = "proof"

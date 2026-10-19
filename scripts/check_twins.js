@@ -1035,20 +1035,20 @@ run('Career Mode phase 3: the five events\' goals (habits.html EVENTS / career/a
   if (!seed) bail('python scripts/career_seed.py --json   (needed to hold habits.html EVENTS to career/achievements.toml) did not give a catalogue. ' + (SEED_WHY
     ? 'It said:\n' + SEED_WHY.split('\n').map(l => '    | ' + l).join('\n') + '\n  It refuses while scripts/check_career.py finds an error in career/*.toml, in supabase/xp_rules_snapshot.json or in coach.html\'s SPINE_PATTERNS (a `patterns` key must name a pattern that list still has, a `qualities` key a quality QM_IDS still has); python scripts/check_career.py prints the whole report.'
     : 'It said nothing: is Python on the PATH as `python`?'));
-  // GAME-10: a `patterns` key narrows a best_value entry (The Upgrade, Double Up) and nothing else. The server reads it in career_maxpct_key(), which only the best_value branches of
+  // GAME-10: a `patterns` key narrows a best_value entry (Double Up; The Upgrade too until the cut, stage78) and nothing else. The server reads it in career_maxpct_key(), which only the best_value branches of
   // career_measures() / career_achievement_eval() reach, so on any other entry it would be silently ignored. scripts/check_career.py refuses that too (check_patterns(), and the seed script
   // refuses while it finds an error), so this is the second line: it holds if that check is ever loosened. `qualities` and `exclude` (Amir, 2026-10-18: accessories are out) narrow what
-  // `patterns` lists, so they need `patterns` on the same entry and so a best_value one. The Upgrade and Double Up are one decision in two files: they must count the same lifts.
+  // `patterns` lists, so they need `patterns` on the same entry and so a best_value one.
   const isBestValue = r => (r.kind === 'badge' ? r.body.kind : r.body.test) === 'best_value';
   expect('patterns (GAME-10) sit only on a best_value entry, the one place the server reads them', null,
     seed.catalogue.filter(r => r.body && r.body.patterns !== undefined && !isBestValue(r)).map(r => r.kind + '.' + r.id), []);
   expect('qualities and exclude (GAME-10) sit only on an entry that carries patterns, so only on a best_value one', null,
     seed.catalogue.filter(r => r.body && (r.body.qualities !== undefined || r.body.exclude !== undefined) && (r.body.patterns === undefined || !isBestValue(r))).map(r => r.kind + '.' + r.id), []);
-  const upgrade = seed.catalogue.find(r => r.kind === 'badge' && r.id === 'the_upgrade'), doubleUp = seed.catalogue.find(r => r.kind === 'achievement' && r.id === 'double_up');
-  const liftRule = r => r ? { patterns: r.body.patterns, qualities: r.body.qualities, exclude: r.body.exclude } : null;
-  expect('The Upgrade and Double Up each name the lifts they count: patterns, qualities and exclude (GAME-10)', null,
-    [upgrade, doubleUp].map(r => !!r && ['patterns', 'qualities', 'exclude'].every(k => Array.isArray(r.body[k]) && r.body[k].length > 0)), [true, true]);
-  expect('The Upgrade and Double Up count the same lifts (patterns, qualities, exclude: one decision, two files; GAME-10)', null, liftRule(upgrade), liftRule(doubleUp));
+  // The Upgrade (a badge) left with the cut (stage78, round 5; its id can never come back, tiers.lock.json "_removed"): Double Up alone carries the main-lift rule, and Courtside's
+  // Most improved reads it.
+  const doubleUp = seed.catalogue.find(r => r.kind === 'achievement' && r.id === 'double_up');
+  expect('Double Up names the lifts it counts: patterns, qualities and exclude (GAME-10)', null,
+    !!doubleUp && ['patterns', 'qualities', 'exclude'].every(k => Array.isArray(doubleUp.body[k]) && doubleUp.body[k].length > 0), true);
   const evs = seed.catalogue.filter(r => r.kind === 'achievement' && r.body && r.body.test === 'goals');
   expect('every event achievement has an EVENTS twin and the other way round', null, evs.map(r => r.body.proof_code).sort(), H_EV.EVENTS.map(e => e.id).sort());
   H_EV.EVENTS.forEach(ev => {
