@@ -863,6 +863,62 @@ phone's sets from the next open. `scripts/headless/phone-first.js`.
   `node scripts/headless/clock-skew.js` runs the real page: the same page without the fix shows *Plan not available* (the field report), with it Home
   opens after one refresh and the saved plan stays.
 
+## 🔄 A new version is ready: the app asks for the reload itself (2026-10-19)
+
+Amir: *"every time there is a change in the app, and its updated, i want everyone to be notified to close their
+app from background and re open it. i dont know how to make this a rule or a memory."* **There is no rule to
+remember. The code is the rule.**
+
+An installed PWA left in the background keeps the OLD page in memory. `sw.js` takes the shell over the moment a
+`CACHE` bump deploys (`skipWaiting()` on install, `clients.claim()` on activate), so a **cold open is already the
+new version** — a page that is only *resumed* is not, until it reloads. That gap is what Amir had been closing by
+hand, telling athletes to swipe the app away and open it again. **Both apps now notice and say so.**
+
+- **The signal is `controllerchange`** on `navigator.serviceWorker`: a NEW worker has claimed this page.
+  A **first install fires it too**, with nothing stale behind it, and so does a hard refresh (the page is
+  uncontrolled, and `claim()` takes it). One guard covers all three: `_hadWorker`, read once while the page loads
+  — **it only counts when this page already had a worker.**
+- **Nothing finds the new worker unless someone looks.** A navigation makes the browser check `sw.js` by itself,
+  which covers every cold open. An app resumed from the background never navigates, so **`swCheck()` calls
+  `registration.update()`** when the app comes back to the foreground and when the connection returns, at most
+  once every `SW_CHECK_MS` (20 minutes: `sw.js` is 45 KB and Iran's lines are slow).
+- **NEVER mid-session** (the principle `_resumeSync()` already keeps for a changed plan): a reload would take the
+  sets on the screen with it. `paintNewVersion()` holds the line while `sessionUnderway()` is true and asks again
+  every 30 s, so it lands the moment the session is over. `swCheck()` holds the *check* for the same window, so a
+  worker does not start answering a running session's lazy loads (a rest game, the share card) from the new cache.
+- **The look is the note box, in clay** — Amir picked it from three directions (2026-10-19: *"lets go with C but
+  in ckay"*; the other two are kept as a parts bin on the board). Clay because it asks for something (DS-01). It
+  sits in the middle of the screen wherever the athlete is, so it is not missed on another tab, and it **does not
+  hide itself**: it stays until **Reload** or **Not now**. It never dims or blocks the page under it.
+  The words are **"A new version of the app is ready"** under a **NEW VERSION** kicker.
+- **program.html**: `aaToast()` with `tone: 'clay'` and `ms: 0`, from `paintNewVersion()`. The two options are new:
+  `tone` paints the box in the one accent (`.aa-toast[data-tone="clay"]`, **`--clay-hero`** and **`--clay-deep`**,
+  which joined THE APP'S ONE COLOUR SET on `body`, never `:root`), and **`ms: 0`** means a note that stays until it
+  is answered. `off` is what a REAL tap on the second button does — the box going for any other reason is not an
+  answer — so Not now sets `_newVerDone` (this run only: the next cold open is the new version anyway) and tapping
+  Reload does not. Ordinary toasts are untouched: no tone, 6 s, *Got it*.
+- **habits.html (AA Proof)**: the same box and the same words in its own look, `.newver`, from `UI.newver`, drawn
+  over every screen (z 96: above its sheet and its toast, under the tour and a takeover) until one button is
+  tapped. `dismissNewVersion()` is its Not now. Its ground is `--clay-deep` with `--on-clay` on it, both of which
+  invert between the themes, so it is deep clay with cream in light and light clay with near-black in dark. ⚠️ It
+  has **its own keyframe** (`nvIn`): the app's `riseIn` ends on `transform: none`, which threw the box's own
+  centring away for the whole animation and dropped it in 81 px low.
+- **⛔ Never in the embed** (`habits.html?embed=1` on Home). The iframe is a client of the **same worker at scope
+  `/`**, so it is claimed and `controllerchange` fires there too. A reload from inside it would reload the wrong
+  document, and the line would sit in the habit strip. `versionWatchOff()` stands the whole thing down there, and
+  `renderEmbed()` has no row to draw. **Not in the demo or the coach's preview either.**
+- **The functions exist twice, one set per app**: `swTookOver()`, `swCheck()`, `versionWatchOff()`,
+  `reloadNewVersion()`, `initVersionWatch()`. Change both.
+  `node scripts/headless/new-version.js` (34 checks) runs the real pages: the first-install guard, the box and its
+  colours in both themes, that it does not hide itself and does not block the page, the mid-session hold (it is
+  also taken down if a session starts under it) and its return, Reload, Not now, that an ordinary toast is
+  unchanged, the embed's silence, and that each app registers the worker through `initVersionWatch()` and nowhere
+  else. Playwright blocks service workers, so the lifecycle itself is not exercised there; the suite calls the
+  handler the lifecycle calls.
+- **What this means for a deploy**: a `CACHE` bump is now the whole message. Nobody has to be told anything.
+  ⚠️ An athlete only learns this from the version that *has* the watcher, so **v188 is the last bump anyone has to
+  close and reopen for**.
+
 ## 🌙 Midnight is not the end of a session (DATA-02, 2026-09-26)
 
 - **A session's date is the local day it was finished** (`sessionDateFor()`: the finish stamp, else today),
@@ -931,9 +987,32 @@ tokens for one day; the copy is gone).
   once done this week, the name, *N blocks · M movements* or *Done this week*, and a grey › or a green **Done**. Enter and
   Space open a row or the Next up card (a document keydown listener; there was none for the old cards).
 - **The door rows** (`.hrow`, Centre Court's *Your history* recipe): white, rounded 12, a 22 px green line icon
-  (`hrowIc()`), the Space Mono label in green capitals over one line, the value in ink, the sparkline (`ncSpark()` draws
+  (`hrowIc()`), **the door's name** (below), the value in ink, the sparkline (`ncSpark()` draws
   in `currentColor` now), a grey ›. **One look with or without data** (`.quiet` changes only the words; the dark green
   fill and the dashed empty row are gone). The habits verdict *N to go* stays clay; *On target* and *Perfect* are green.
+- **The door's name** (`.hrow-l`, Number First, Amir 2026-10-19: *"the mono door labels"*; the board is
+  claude.ai/artifact/P8LrDcyxi6ExRbupUvt8sf, direction B). It was 11 px Space Mono 700, tracked and in capitals, on all 51
+  doors: the name of the place you are going, set as the smallest and least readable thing in the row, wrapping to two lines
+  at 320, and declared **six times** over. **The rule is now: the loudest thing in a door is whatever that door is for.**
+  - **A door that carries a FIGURE** keeps the figure as the headline and its name is a quiet green label (Barlow 600,
+    `--fs-small`, `--green-ink`). Exactly five rows: Personal records, Body weight, Daily habits, Hold Serve, Career.
+  - **Every other door** makes the NAME the headline, in the cycle card's fold-row recipe (`.road-ul`: Barlow 600,
+    `--fs-field`, ink, sentence case) — *Why your plan looks like this*, *Cycle 2 complete*, *How the app works*, *Tell the crew*.
+  - **A prose second line belongs in `.hrow-q`** (15 px grey), never in `.hrow-v`, the figure's slot, which renders at 18 px
+    bold and there outshouts the name above it. Two rows read that way until 2026-10-19 and were the odd ones out: *Tested a
+    lift?* over a louder *+ Log a max* (a question titling the action) and *Using the app* over a louder *How the app works*
+    (the same thing twice). Each is now named after what it opens, with the prompt on the quiet line — **Log a max** (*Tested
+    one in the gym? Add it here.*) and **How the app works** (*Start here if anything is unclear.*), the second matching the
+    Account page's row to that same sheet. The article reader's embedded session is the last prose row left in `.hrow-v`.
+  - ⚠️ The test is **`.hrow-vv`**, the span holding the figure itself — never `.hrow-v`, which can also hold
+    prose (a session's name). ⚠️ The polarity is deliberate: the **headline is the default** and
+    the quiet label is the `:has()` branch, so a browser without `:has()` (iOS 15.0–15.3) shows every name loud instead of
+    whispering the one row this was for. **It is ONE rule over all seven scopes** (`#home-overview`, `#screen-plan`,
+    `#screen-ceiling`, `#screen-notes`, `#hist-overlay`, `#ar-body`, `#day-view .complete-crew`); the other blocks keep only
+    their `.hrow-b`. Two rows keep a rule of their own: **New from Amir** (no figure, but a 16 px headline would triple the
+    clay on Home, DS-01, so it stays small and clay) and the road's Because door, whose second line is 13 px to match the fold
+    rows it sits under. The `@media (max-width: 359px)` sparkline cut is gone with the tracked caps that caused it.
+    Guarded by `scripts/headless/home-progress.js` §5c, which also reads program.html and fails a seventh copy.
 - **Between cycles** (`betweenCyclesHTML()`): one door row first, **Cycle 2 complete** (or **Roadmap complete**),
   *Finished Oct 8 · see it on Progress*, which opens Progress, where the card says Cycle complete. Everything after it is
   unchanged.
@@ -1025,7 +1104,7 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     with the old hero's sentence under it; a lift's page its latest estimate, the change since the first and the entries; Body weight
     the last reading, the change over the range (*−0.8 kg · DOWN OVER THE RANGE*) and the readings, with the average-to-average sentence.
     The green hero cards are gone. A **New best** is the cover's green foot (`--foot`), so the screen keeps one green thing.
-  - **Paper rows** for lifts, entries, readings and Log a max's picker; **+ Log a max** (*Tested a lift?*) and *Add your body weight* as
+  - **Paper rows** for lifts, entries, readings and Log a max's picker; **Log a max** (*Tested one in the gym? Add it here.*) and *Add your body weight* as
     door rows; **Due for a retest** as the day's banner (a 4 px clay stripe, *Test 5RM* as the green text link); **How this works** one
     fold, closed on every screen (it was open on the empty one); the empty state's four steps numbered 01–04.
   - **Log a max**: the set table's boxes (white, `--field`), the day's 48 px RPE keys, the estimate and its grade as a two-track
@@ -1504,7 +1583,7 @@ changed: the server, the XP and the levels are exactly as before.
   of an achievement, from the same numbers: one plan session left this training week after this one, and holding the week gives Held or Back
   to Back (*One more session this week and you get Back to Back.*), or the next check-in gives Straight Talk. Never a weekday (athletes move
   their days). `careerEarn()` carries `weekLeft` and `checkin` for it.
-- **The Monthly Open, on Crew** (stage84; Amir's pick A on the Crew and Open page, 2026-10-19: *"for crew and the open go with your picks"*),
+- **The Monthly Open, on Crew** (stage85; Amir's pick A on the Crew and Open page, 2026-10-19: *"for crew and the open go with your picks"*),
   `crewOpenHTML()` in `renderCrew()`, under the honours and above the composer: **THE OPEN**, the challenge's name, Amir's words for what counts,
   then the board ranked by the result (the first five, the athlete's own row carried in beneath them wherever it ranks, **Show all N** for the
   rest), *Your result: 95 seconds* when they have one, and one clay door to WhatsApp (**Send Amir your result**, or **Send a better one**). The app

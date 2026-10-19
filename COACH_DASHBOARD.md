@@ -1016,7 +1016,7 @@ read 33%). Shown up to 100%, with "N more than planned" when they did extra. Gre
 ## 7. PROOF
 
 **Proof is the community's home** (round 2, 2026-10-12): everything about the crew is on this one screen, in two columns from 900 px (the left, about 1.3 to 1, is
-the wider; one column below that, the left first). **Left:** **The wall**, then **The Bell** and **Who said yes** (both only once stage81 is applied), then **The Monthly Open** (only once stage84 is applied), then **The board**. **Right:** **Quest week**, **Proof pulse**, **Titles minted** and
+the wider; one column below that, the left first). **Left:** **The wall**, then **The Bell** and **Who said yes** (both only once stage81 is applied), then **The Monthly Open** (only once stage85 is applied), then **The board**. **Right:** **Quest week**, **Proof pulse**, **Titles minted** and
 **Season**, last. (**The funnel** was the last panel here until 2026-10-12; it is Leads → Free signups now, because the people who signed up are leads to follow, not part of running the crew.) The wall, the quest lever and the pulse used to be on Today; Today keeps a short Proof column that links here
 (section 3, *Proof today*). One copy of each id is in the page at a time (`#wallPanel`, `#questPanel`, `#pulsePanel`, `#coachLineInput`: Today draws its own, `#proofToday`).
 A redraw (a line posted, a line hidden, a quest week started) is drawn at once from what the page holds: the board is read once and kept, and only a real first
@@ -1137,14 +1137,14 @@ Monthly Open, joining), and likes are the only reply. This is where you post to 
   `bell-compose`, `bell-who-said-yes` and `bell-missing` in `scripts/headless/coach/run.js` (the stub answers the five stage81 functions only when the seed says
   `crew: true`; every other scenario runs against a server without them).
 
-### The Monthly Open: set the challenge, confirm results, the board, close it (stage84, 2026-10-19)
+### The Monthly Open: set the challenge, confirm results, the board, close it (stage85, 2026-10-19)
 
-Career Mode round 5, the last step of plan A (Amir: *"for crew and the open go with your picks"*; the server side is `supabase/stage84_crew_open.sql`, not applied until
+Career Mode round 5, the last step of plan A (Amir: *"for crew and the open go with your picks"*; the server side is `supabase/stage85_crew_open.sql`, not applied until
 Amir says so). The Open is **one challenge at a time, any kind you design**, shown as a card on the athletes' Crew tab under the feed, with a board ranked by the
 result. Athletes send the clip on WhatsApp and **nothing is stored until you type the result here**. **It pays no XP** (GAME-6).
 
 - **Where.** One panel on Proof, **directly under Who said yes** (`#openPanel`; above the board, in the left column). `loadOpen()` reads `coach_open()` after the first paint,
-  on ↻ Refresh, on the panel's own **↻ Reload** and when Proof is opened a minute or more after the last read. **While the server has no `coach_open()` (stage84 not
+  on ↻ Refresh, on the panel's own **↻ Reload** and when Proof is opened a minute or more after the last read. **While the server has no `coach_open()` (stage85 not
   applied) or answers nothing at all, nothing is drawn and no warning is shown** (`openMissing()`, `openValid()`); any other failure shows the panel with the reason and
   **Try again**, the load banner names *the Monthly Open*, and no form is drawn while the state is unknown. Not drawn in demo mode.
 - **One read, five writes, one shape.** `coach_open()` and the four writes (`coach_open_set`, `coach_open_close`, `coach_open_result`, `coach_open_remove`) all answer
@@ -1171,10 +1171,10 @@ result. Athletes send the clip on WhatsApp and **nothing is stored until you typ
   asks first (a panel under the row: whose number goes, what stays) and calls `coach_open_remove(p_athlete)`; its Bell line goes with it.
 - **Close the challenge** asks first (the board leaves Crew now; its results are kept) and calls `coach_open_close()`. **Past challenges**: the last five closed, newest first, a plain
   list (title, unit, opened to closed, how many results), read-only.
-- **Not in `BACKUP_TABLES` yet, on purpose.** `crew_open` and `crew_open_results` are tables the backup MUST keep once stage84 is applied (months of results that exist nowhere else),
-  but listing them now would make every backup say *could not read* until then. **Add both to `BACKUP_TABLES` and to `supabase/schema_snapshot.sql` in the stage84 go-live commit** (`scripts/test_restore_backup.py` fails when the two disagree), as stage81 did for
+- **Not in `BACKUP_TABLES` yet, on purpose.** `crew_open` and `crew_open_results` are tables the backup MUST keep once stage85 is applied (months of results that exist nowhere else),
+  but listing them now would make every backup say *could not read* until then. **Add both to `BACKUP_TABLES` and to `supabase/schema_snapshot.sql` in the stage85 go-live commit** (`scripts/test_restore_backup.py` fails when the two disagree), as stage81 did for
   `crew_consent`, and check `scripts/restore/restore_backup.py` knows how to restore them (it refuses a table it does not).
-- **Tests:** `open-panel` in `scripts/headless/coach/run.js` (the stub answers the five stage84 functions only when the seed says `open: true`, which turns stage81 on too; every other
+- **Tests:** `open-panel` in `scripts/headless/coach/run.js` (the stub answers the five stage85 functions only when the seed says `open: true`, which turns stage81 on too; every other
   scenario runs against a server without them).
 
 ### Erasing a person
@@ -1284,7 +1284,7 @@ it in this file.
 | `leaderboard_optin` | Who's on the board, their display name and worn title |
 | `hab_titles` | Titles-minted feed |
 | `coach_crew()`, `crew_photo()` (stage81) | Proof → The Bell and Who said yes: the last 7 days' posts, every athlete's answer and under-13 tick; a photo only when asked for. Nothing is drawn while the server has no `coach_crew()` |
-| `coach_open()` (stage84) | Proof → The Monthly Open: the live challenge, every confirmed result (crew member or not), the crew to pick from, the last five closed challenges. Nothing is drawn while the server has no `coach_open()` |
+| `coach_open()` (stage85) | Proof → The Monthly Open: the live challenge, every confirmed result (crew member or not), the crew to pick from, the last five closed challenges. Nothing is drawn while the server has no `coach_open()` |
 | `xp_rules` | The quest pool and the live runs |
 | `seasons` | Which season, and what day of it |
 | `career_rules` (the newest row's `rules->switch`, read quietly by `loadLevels()`) | Whether Career Mode's XP switch is on (`S.careerXp`): the Proof level's caption reads *career level (server)* instead of *season level (server)* |
@@ -1329,6 +1329,6 @@ and one day card's quality chips with the 70% gate and the 12% cut, in the phone
 
 Some coach writes go through RPCs that check the coach themselves (`set_coach_note`, `hide_note`,
 `set_quests`, `end_quests` (stage55), `clear_quests`, `forget_contact`, `save_session`, `coach_season_levels`, and since stage48
-`coach_delete_training_history` and `coach_save_spine`, since stage54 `coach_erase_person`, since stage81 `coach_crew_post`, `coach_crew_remove` and `coach_crew_under13`, and since stage84 `coach_open_set`, `coach_open_close`, `coach_open_result` and `coach_open_remove`, each one transaction); the rest are
+`coach_delete_training_history` and `coach_save_spine`, since stage54 `coach_erase_person`, since stage81 `coach_crew_post`, `coach_crew_remove` and `coach_crew_under13`, and since stage85 `coach_open_set`, `coach_open_close`, `coach_open_result` and `coach_open_remove`, each one transaction); the rest are
 direct table writes that only the coach's RLS policies let through. Every one of them asks for its
 rows back, so a write RLS silently refused (a lapsed sign-in) says so instead of reporting success.

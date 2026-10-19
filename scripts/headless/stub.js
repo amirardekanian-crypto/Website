@@ -61,7 +61,7 @@
       if (whoA && S.identity && whoA !== S.identity) return res({ data: null, error: { message: 'not your profile', code: 'P0001' }, status: 400 });
       return res({ data: S.achievements ? JSON.parse(JSON.stringify(S.achievements)) : null, error: null, status: 200 });
     }
-    // The Monthly Open (stage84): the coach's five. get_achievements and get_bell carry their own; `openPanel` is what coach_open() answers.
+    // The Monthly Open (stage85): the coach's five. get_achievements and get_bell carry their own; `openPanel` is what coach_open() answers.
     if (name === 'coach_open' || name === 'coach_open_set' || name === 'coach_open_close' || name === 'coach_open_result' || name === 'coach_open_remove') {
       (S.openCalls = S.openCalls || []).push([name, params]);
       return res({ data: S.openPanel ? JSON.parse(JSON.stringify(S.openPanel)) : null, error: null, status: 200 });

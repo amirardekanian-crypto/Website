@@ -94,6 +94,20 @@ insert into public.crew_consent (athlete_id, answer, kinds, name, under13, crew_
   ('ava_test', 'yes', '{"best": false}', 'Ava T.', false, '11111111-2222-4333-8444-555555555555', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00'),
   ('gone_test', 'no', '{}', null, false, '22222222-3333-4444-8555-666666666666', '2026-10-18 10:00:00+00', '2026-10-18 09:30:00+00', null, '2026-10-18 10:00:00+00');
 
+-- The phones that asked for a reminder (stage84). This one IS backed up, because a restore without it
+-- would cost every athlete the single notification permission their browser gives, and that cannot be
+-- asked for twice. push_sent (what went out today) and push_config (the VAPID private key and the
+-- sender's shared secret) are deliberately left out, so nothing seeds them.
+insert into public.push_subs (endpoint, athlete_id, p256dh, auth, app, kinds, hour, quiet_days, tz_offset, lang, device, created_at, updated_at) values
+  ('https://web.push.apple.com/made-up-endpoint-for-the-rehearsal-0001', 'ava_test',
+   'BFNpLdIIpJ-1yq2puIicO5GJJTcbteUYElX75z32dK3UQv16g2H4YjDiiGVwB9psguu5f9rKU4d1NPhtBvmI7dM',
+   'made-up-auth-aaaa', 'proof', '{"workout": false}', 20, 2, 0, 'en', 'iOS18 · Safari18 · installed',
+   '2026-10-19 18:00:00+00', '2026-10-19 18:00:00+00'),
+  ('https://fcm.googleapis.com/made-up-endpoint-for-the-rehearsal-0002', 'gone_test',
+   'BFNpLdIIpJ-1yq2puIicO5GJJTcbteUYElX75z32dK3UQv16g2H4YjDiiGVwB9psguu5f9rKU4d1NPhtBvmI7dM',
+   'made-up-auth-bbbb', 'training', '{}', 19, 3, 210, 'fa', 'Android14 · Chrome130',
+   '2026-10-19 18:00:00+00', '2026-10-19 18:00:00+00');
+
 -- ── the programmes and what hangs off an athlete ──────────────────────────────────────────────────────────────────────────
 insert into public.programs (athlete_id, data, updated_at, updated_by) values
   ('ava_test', '{"athlete":{"firstName":"Ava","lastName":"Test","goal":"first serve \"speed\" $bk$ and $$ tags \\ backslash"},"cycles":[{"n":1,"startDate":"2026-09-07","endDate":"2026-10-04","weeks":4}],"notes":["پیام فارسی","line\nbreak","emoji 🎾"]}', '2026-10-01 08:00:00+00', 'coach'),

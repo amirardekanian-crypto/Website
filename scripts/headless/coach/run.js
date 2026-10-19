@@ -6220,11 +6220,11 @@ S['bell-missing'] = async (b) => {
   return r;
 };
 
-// ── The Monthly Open (stage84; Career Mode round 5, the last step of plan A) ─────────────────────────────────────
+// ── The Monthly Open (stage85; Career Mode round 5, the last step of plan A) ─────────────────────────────────────
 // One panel on Proof, under Who said yes: the live challenge (or the empty state), a form to set or correct it, a form to confirm a result, the board as the
-// crew sees it, and the last five closed challenges. The seed `{ open: true }` turns the stub's stage84 functions on (stub.js: openAnswer() and the five RPCs,
+// crew sees it, and the last five closed challenges. The seed `{ open: true }` turns the stub's stage85 functions on (stub.js: openAnswer() and the five RPCs,
 // emulated from the SQL) and stage81's, which they need, and seeds two CLOSED challenges and no live one (fixtures.js: openSeed). Without it the server
-// "has not had stage84": every other scenario runs like that and none of them sees the panel. The live challenge below is started through the panel itself.
+// "has not had stage85": every other scenario runs like that and none of them sees the panel. The live challenge below is started through the panel itself.
 const openRead = page => page.evaluate(() => {
   const txt = el => el ? el.innerText.replace(/\s+/g, ' ').trim() : '';
   const q = s => document.querySelector(s), all = s => [...document.querySelectorAll(s)];
@@ -6247,11 +6247,11 @@ const openBtn = (page, root, text) => page.locator(`${root} button`, { hasText: 
 const openRow = (page, id) => page.locator(`#openBoard .open-row[data-id="${id}"]`);
 
 S['open-panel'] = async (b) => {
-  const r = { id: 'open-panel', title: 'The Monthly Open on Proof: hidden without stage84; the empty state; set a challenge; confirm results and the board\'s order (places among the crew, a quiet mark for anyone not in it); correct the words; Take off, Close and Start-a-new-one ask first; the past list; errors in plain words; the look', checks: [] };
+  const r = { id: 'open-panel', title: 'The Monthly Open on Proof: hidden without stage85; the empty state; set a challenge; confirm results and the board\'s order (places among the crew, a quiet mark for anyone not in it); correct the words; Take off, Close and Start-a-new-one ask first; the past list; errors in plain words; the look', checks: [] };
   const calls0 = cs => cs.filter(c => c.kind === 'rpc' && /^coach_open/.test(c.name));
 
-  // 1. A server that has not had stage84, or that answers nothing: no panel and no warning, the Bell is untouched.
-  for (const [label, seed] of [['before stage84 (the functions are not there)', { crew: true }], ['PGRST202 on a seeded run', { open: true, stub: { missingRpc: ['coach_open'] } }], ['an answer of null', { open: true, stub: { openNull: true } }]]) {
+  // 1. A server that has not had stage85, or that answers nothing: no panel and no warning, the Bell is untouched.
+  for (const [label, seed] of [['before stage85 (the functions are not there)', { crew: true }], ['PGRST202 on a seeded run', { open: true, stub: { missingRpc: ['coach_open'] } }], ['an answer of null', { open: true, stub: { openNull: true } }]]) {
     const x = await L.openCoach(b, Object.assign({ seed }, BELL_T));
     await x.page.waitForSelector('#bellPanel'); await L.settle(x.page, 400);
     const cs = await L.calls(x.page);

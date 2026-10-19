@@ -16,7 +16,7 @@
 -- `get_bell()` is NOT touched (so stage82's way back still matches it word for word), and nothing else changes: no table, no grant on anything
 -- that already existed, no XP, no scorer. The app asks for `get_bell_if_new` and falls back to `get_bell` where this stage is not applied.
 --
--- ⚠️ The Monthly Open moves to stage84: this took 83.
+-- ⚠️ The Monthly Open moves to stage85: this took 83.
 --
 -- Rehearsed on PGlite: `scripts/career/rehearse_crew.mjs` section 15.
 -- The way back: `scripts/career/rollback_stage83.sql` (drops the one function; the app falls back to `get_bell`). Safe to re-run.

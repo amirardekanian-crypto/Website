@@ -187,6 +187,28 @@ like Safari — so the plain-iOS copy carries the same escape hatch as a second 
 instruction naming a button the athlete does not have reads as *"this app is broken"*, on
 the first screen they ever see.
 
+### A new version is ready (2026-10-19)
+
+An installed app left in the background keeps the OLD page in memory until it reloads, and Amir
+had been telling athletes by hand to close it and open it again. It says so itself now: when a
+`sw.js` `CACHE` bump takes the shell over, `swTookOver()` sets `UI.newver` and **the note box in the
+middle of the screen, in clay** (`.newver`) reads **"A new version of the app is ready"** with
+**Reload** and **Not now**. It never hides itself: it stays until one of them is tapped. Amir picked
+that look from three directions (2026-10-19). The same box is in `program.html`, in its own look, and
+the full account is `PROGRAM-APP.md` -> *A new version is ready*.
+
+What must not break here:
+- **NEVER in the embed** (`?embed=1`, the strip on the training app's Home). The iframe is a
+  client of the **same worker at scope `/`**, so it is claimed and `controllerchange` fires there
+  too, but a reload from inside it would reload the training app's Home, not AA Proof, and the row
+  would sit in the habit strip. `versionWatchOff()` stands the watch down and `renderEmbed()` has
+  no row to draw. Not in the demo or the coach's preview either.
+- **A first install says nothing** (`_hadWorker`): `clients.claim()` fires `controllerchange` on a
+  first install and after a hard refresh, with nothing stale behind either.
+- **The five functions exist twice**, once per app (`swTookOver()`, `swCheck()`,
+  `versionWatchOff()`, `reloadNewVersion()`, `initVersionWatch()`). Change both.
+  `node scripts/headless/new-version.js`.
+
 ---
 
 ## Two kinds of user — coached, and free

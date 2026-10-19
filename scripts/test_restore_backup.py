@@ -146,7 +146,7 @@ check('1c: digits9 folds Persian and Arabic-Indic digits and keeps the last nine
       rb.digits9('۰۹۱۲ ۰۰۰ ۰۰۰۱') == '120000001' and rb.digits9('+98 912 000 0001') == '120000001' and rb.digits9('٠٩١٢٠٠٠٠٠٠١') == '120000001' and rb.digits9('12345') is None and rb.digits9(None) is None)
 schema_sql = open(SCHEMA, encoding='utf-8').read()
 cols = rb.snapshot_tables(schema_sql)
-check('1d: the snapshot parser finds the 58 tables and their columns (46 + career_awards, career_recognition, stage70 + five of stage75 + five of stage81)', len(cols) == 58 and 'athlete_id' in cols['programs'] and 'steps' in cols['exercises'], len(cols))
+check('1d: the snapshot parser finds the 61 tables and their columns (46 + career_awards, career_recognition, stage70 + five of stage75 + five of stage81 + three of stage84)', len(cols) == 61 and 'athlete_id' in cols['programs'] and 'steps' in cols['exercises'], len(cols))
 html = open(os.path.join(ROOT, 'coach.html'), encoding='utf-8').read()
 listed = re.findall(r"'([a-z_]+)'", re.search(r"const BACKUP_TABLES = \[([\s\S]*?)\];", html).group(1))
 check('1h: coach.html BACKUP_TABLES lists every table of the schema snapshot except the two key-hash tables and the four short-lived Bell tables (stage81), and nothing else (a new table goes in both)',
@@ -187,7 +187,18 @@ short_in = sorted(t for t in rb.SHORT_LIVED if t in cols)
 bell_bad = (sorted(t for t in short_in if t in listed), sorted(t for t in short_in if t not in erased),
             [t for t in ('crew_consent',) if t in cols and (t not in listed or t not in erased)])
 check("2h: the Bell (stage81): the four short-lived tables in the snapshot are not in BACKUP_TABLES but are in coach_erase_person()'s list; crew_consent, if the snapshot has it, is in both",
-      rb.SHORT_LIVED == {'crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings'} and not any(bell_bad), bell_bad)
+      rb.SHORT_LIVED >= {'crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings'} and not any(bell_bad), bell_bad)
+
+# The reminders (stage84). push_subs is KEPT: a restore without it would cost every athlete the single
+# notification permission their browser gives, and that cannot be asked for twice. push_sent is only a
+# ledger of what went out today, and push_config holds the VAPID private key and the sender's shared
+# secret — a backup file on Amir's PC carrying those is worse than losing them, and losing them is
+# recoverable (a new pair, and each app re-subscribes silently, because the permission already stands).
+push_bad = ([t for t in ('push_subs',) if t in cols and (t not in listed or t not in erased)],
+            [t for t in ('push_sent',) if t in cols and (t in listed or t not in erased)],
+            [t for t in ('push_config',) if t in cols and t in listed])
+check("2i: the reminders (stage84): push_subs is backed up and erased with the person; push_sent and push_config are never in a backup",
+      'push_sent' in rb.SHORT_LIVED and 'push_config' in rb.SECRET_TABLES and not any(push_bad), push_bad)
 def one_do(text):
     try:
         s = sql_statements(text)

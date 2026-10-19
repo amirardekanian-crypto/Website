@@ -148,8 +148,8 @@ function crewSeed(db) {
   };
 }
 
-// ── The Monthly Open (stage84), made up like everything here ─────────────────────────────────────────────────────
-// buildSeed({ open: true }) turns the stub's stage84 functions on (and stage81's, which they need: the crew is the Bell's yes answers, minus the former
+// ── The Monthly Open (stage85), made up like everything here ─────────────────────────────────────────────────────
+// buildSeed({ open: true }) turns the stub's stage85 functions on (and stage81's, which they need: the crew is the Bell's yes answers, minus the former
 // athlete) and seeds TWO CLOSED challenges and nothing live, so the page starts on the empty state with a Past list: coach_open() answers
 // window.__DB.crew_open_state. The live challenge is started in the test, through the panel. Dates are fixed (the Bell's clock is 2026-11-12).
 const OPEN_IDS = ['c0000000-0000-4000-8000-0000000000a1', 'c0000000-0000-4000-8000-0000000000a2'];
@@ -324,7 +324,7 @@ function buildSeed(opt) {
     board: [{ pos: 1, display_name: 'Cara', title: null, xp: 900, level: 4, rank_label: 'STARTER', is_me: false, joined: true }],
     stub: opt.stub || {},
     crew: !!(opt.crew || opt.open),   // stub.js: the stage81 functions (the Bell) answer only when this is on
-    open: !!opt.open,                 // stub.js: the stage84 functions (the Monthly Open) answer only when this is on
+    open: !!opt.open,                 // stub.js: the stage85 functions (the Monthly Open) answer only when this is on
     // The month just gone's honours as the server would work them out (see stub.js: liveHonours). Made up; nothing is computed.
     honoursLive: opt.honoursLive !== undefined ? opt.honoursLive : opt.court ? {
       // A former athlete shares the top session count and the coach's own identity shares the top gain: the stub leaves both out, as

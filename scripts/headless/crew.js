@@ -7,7 +7,7 @@
 // the composer (a message, a
 // photo made smaller on the phone to 1280 px JPEG, the limits); Tell the crew (a session only with a photo, Day N drafted); the switches
 // and the no; an athlete ticked under 13 reads only; the account sheet's door; the guide; Back closes the photo; never synced; 320 px and
-// dark mode. The Monthly Open's card (stage84): the challenge, the board and its order, your own row, the WhatsApp door, an empty board,
+// dark mode. The Monthly Open's card (stage85): the challenge, the board and its order, your own row, the WhatsApp door, an empty board,
 // a long one, no card without the stage. Made-up people only. The stub answers the crew_* calls by name (stub.js).
 // Serve the repo first (python -m http.server 8775 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
@@ -329,7 +329,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await ctx.close();
   }
 
-  // ── The Monthly Open (stage84): one card above the Bell, a board Amir fills, one door to WhatsApp ──────────────────────
+  // ── The Monthly Open (stage85): one card above the Bell, a board Amir fills, one door to WhatsApp ──────────────────────
   const OPEN = (o = {}) => Object.assign({
     id: 'aaaaaaaa-0000-4000-8000-000000000084', title: 'Wall Sit', how: 'Back to the wall, knees at 90. Send me the clip.',
     unit: 'seconds', better: 'high',
@@ -400,8 +400,8 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await ctx.close();
   }
   {
-    // a server without stage84 (or no challenge set): no card at all, and the rest of Crew is untouched
-    for (const [what, open_] of [['a server without stage84', undefined], ['no challenge set', null]]) {
+    // a server without stage85 (or no challenge set): no card at all, and the rest of Crew is untouched
+    for (const [what, open_] of [['a server without stage85', undefined], ['no challenge set', null]]) {
       const b = bell({ answer: 'yes', can_post: true });
       if (open_ !== undefined) b.open = open_;
       const { ctx, p } = await open(browser, { bell: b });

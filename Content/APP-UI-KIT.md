@@ -237,7 +237,9 @@ stroke 45 % between green and `--ring`; locked: `--ring`), `.archive-ex-num`. On
 
 **Door row** `.hrow` (Home, Progress, Coach, Records, sheets): `display: flex; gap: 14px; min-height: 64px; margin: 0 var(--g) 10px;
 padding: 12px 14px 12px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row)`. A 22 px green line icon (`.hrow-ic`);
-the label in Space Mono 700, 11 px, 1.4 px tracking, capitals, `--green-ink` (`.hrow-l`); the value in Barlow 700 at `--fs-lead` ink (`.hrow-v`;
+the door's NAME (`.hrow-l`, Number First, 2026-10-19): Barlow 600 at `--fs-field`, sentence case, ink — the fold rows' recipe — **unless the door carries a figure**
+(`.hrow-b:has(.hrow-vv)`, the five number rows), where the figure leads and the name drops to Barlow 600 at `--fs-small` in `--green-ink`. ONE rule over all seven
+scopes; it was 11 px Space Mono tracked capitals declared six times. The value in Barlow 700 at `--fs-lead` ink (`.hrow-v`;
 `.is-togo` clay-ink for something that asks, `.is-ok` green-ink); an optional 60 × 24 sparkline in `currentColor`; a grey › (`.hrow-a`). It looks the same
 with or without data (`.quiet` changes only the words).
 

@@ -129,9 +129,11 @@ const COVER = `(() => {
     t.check('Records row: the mono line carries the words it always did (▲ 12 kg since you started · Logged 2 days ago; First estimate · Logged 12 days ago)',
       paper.lines[0] === '▲ 12 kg since you started · Logged 2 days ago' && paper.lines[1] === 'First estimate · Logged 12 days ago' && paper.value.join() === '104,40', JSON.stringify(paper.lines));
     // the door row, and what a tap does
-    const door = await p.evaluate(() => { const d = document.querySelector('#ceil-body .hrow.ceil-door'), c = d && getComputedStyle(d); return d && { label: d.querySelector('.hrow-l').textContent, line: d.querySelector('.hrow-v').textContent, onclick: d.getAttribute('onclick'),
+    const door = await p.evaluate(() => { const d = document.querySelector('#ceil-body .hrow.ceil-door'), c = d && getComputedStyle(d); return d && { label: d.querySelector('.hrow-l').textContent, line: d.querySelector('.hrow-q').textContent, quiet: !d.querySelector('.hrow-v'), onclick: d.getAttribute('onclick'),
       look: [c.backgroundColor, c.borderTopWidth, c.borderTopLeftRadius, c.minHeight, c.display].join('|'), icon: !!d.querySelector('.hrow-ic svg'), arrow: d.querySelector('.hrow-a').textContent }; });
-    t.check('+ Log a max is a door row: TESTED A LIFT? over "+ Log a max", an icon and a ›, white, a 1 px edge, 12 px corners, 64 px', !!door && door.label === 'Tested a lift?' && door.line === '+ Log a max' && door.onclick === 'openCeilingAdd()' && door.icon && door.arrow === '›'
+    // Named after the form it opens, with the prompt on the QUIET line (Amir, 2026-10-19). It was "Tested a lift?" over a louder
+    // "+ Log a max" — a question titling the action — because the prose sat in the figure's slot (.hrow-v, 18 px bold), not .hrow-q.
+    t.check('the hand-entry door: "Log a max" over the quiet prompt, never in the figure\'s slot, an icon and a ›, white, a 1 px edge, 12 px corners, 64 px', !!door && door.label === 'Log a max' && door.line === 'Tested one in the gym? Add it here.' && door.quiet && door.onclick === 'openCeilingAdd()' && door.icon && door.arrow === '›'
       && door.look === 'rgb(255, 255, 255)|1px|12px|64px|flex', JSON.stringify(door));
     const doorLook = await p.evaluate(() => { const h = document.querySelector('#ceil-body .hrow'), c = getComputedStyle(h); return [c.backgroundColor, c.borderTopWidth, c.borderTopLeftRadius, c.minHeight].join('|'); });
     await p.evaluate("goTo('plan')"); await p.waitForTimeout(400);

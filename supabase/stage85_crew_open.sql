@@ -1,4 +1,4 @@
--- stage84_crew_open.sql — the Monthly Open: one challenge Amir sets, results he confirms, one board on Crew
+-- stage85_crew_open.sql — the Monthly Open: one challenge Amir sets, results he confirms, one board on Crew
 -- (Career Mode round 5, the last step of plan A; career/CAREER_MODE.md → Round 5, L9 and the "Crew and the Open" bullets)
 --
 -- Amir decided all of this on the Crew and Open page (https://claude.ai/artifact/7fCYGFL6mboE3igFLUkE5E) with "for crew and the open go with your
@@ -27,19 +27,19 @@
 --     already draws (stage81 left that hook and the app already has the switch). Under 13 never rings (GAME-9), and neither does a result Amir
 --     records for someone who is not in the crew.
 --   · `coach_erase_person()` learns `crew_open_results` (the challenge itself names nobody).
--- Rehearsed in `scripts/career/rehearse_crew.mjs` section 16 (PGlite, beside the rest of Crew). The way back: `scripts/career/rollback_stage84.sql`.
+-- Rehearsed in `scripts/career/rehearse_crew.mjs` section 16 (PGlite, beside the rest of Crew). The way back: `scripts/career/rollback_stage85.sql`.
 -- Safe to re-run.
 -- NOT YET APPLIED.
 
 -- ── 0. The guard ────────────────────────────────────────────────────────────────────────────────────────────────────────
-do $stage84_guard$
+do $stage85_guard$
 begin
   if to_regclass('public.crew_rings') is null or to_regprocedure('public.crew_members()') is null
      or to_regprocedure('public.get_bell(text)') is null then
-    raise exception 'stage84: stage81 (Crew and the Bell) is not on this database. Nothing was changed.';
+    raise exception 'stage85: stage81 (Crew and the Bell) is not on this database. Nothing was changed.';
   end if;
 end
-$stage84_guard$;
+$stage85_guard$;
 
 -- ── 1. Tables ──────────────────────────────────────────────────────────────────────────────────────────────────────────
 -- The challenge. One is live at a time: the newest row with no `closed_at`. `better` says which way wins. Nothing here names an athlete.
@@ -69,7 +69,7 @@ create index if not exists crew_open_results_board_idx on public.crew_open_resul
 create index if not exists crew_open_results_who_idx on public.crew_open_results (athlete_id);
 
 -- ── 2. Policies and grants: the coach reads (so the backup is complete); nothing else reads or writes directly ──────────
-do $stage84_policies$
+do $stage85_policies$
 declare t text;
 begin
   foreach t in array array['crew_open', 'crew_open_results'] loop
@@ -80,7 +80,7 @@ begin
     execute format('create policy %I on public.%I for select to authenticated using (public.is_coach())', t || '_coach_read', t);
   end loop;
 end
-$stage84_policies$;
+$stage85_policies$;
 
 -- ── 3. The athlete's read, inside get_bell() ───────────────────────────────────────────────────────────────────────────
 -- The live challenge with its board, or null when there is none. The board is **crew members who said yes** (GAME-9: a result Amir recorded for
@@ -113,7 +113,7 @@ begin
 end $function$;
 
 -- get_bell() gains the one key. Patched in place (stage76's idiom), so the rest of a 140-line read is never copied and cannot drift.
-do $stage84_patch$
+do $stage85_patch$
 declare d text; n integer;
   -- the anchor is the last key alone, not the whole line: stage82 already added `emoji` between `days` and `at`, and a later stage may add another
   c_old constant text := ', ''at'', now());';
@@ -123,11 +123,11 @@ begin
   if position('crew_open_now' in d) > 0 then return; end if;                 -- patched already (a re-run)
   n := (length(d) - length(replace(d, c_old, ''))) / length(c_old);
   if n <> 1 then
-    raise exception 'stage84: get_bell() is not what this patch expects (its last line was found % times, not once). Nothing was changed.', n;
+    raise exception 'stage85: get_bell() is not what this patch expects (its last line was found % times, not once). Nothing was changed.', n;
   end if;
   execute replace(d, c_old, c_new);
 end
-$stage84_patch$;
+$stage85_patch$;
 
 -- ── 4. Amir's panel: coach.html → Proof → The Monthly Open ─────────────────────────────────────────────────────────────
 -- The live challenge, every result he has confirmed (crew member or not, so he can see what he typed), the crew to pick from, and the last five
@@ -267,20 +267,20 @@ grant execute on function public.coach_open_result(text, numeric, date) to authe
 grant execute on function public.coach_open_remove(text) to authenticated, service_role;
 
 -- ── 6. coach_erase_person() learns the results table (the challenge itself names nobody) ───────────────────────────────
-do $stage84_erase$
+do $stage85_erase$
 declare d text; n integer;
   c_old constant text := '''crew_rings''';
   c_new constant text := '''crew_open_results'', ''crew_rings''';
 begin
   if to_regprocedure('public.coach_erase_person(text,text,text,uuid[],boolean)') is null then
-    raise exception 'stage84: coach_erase_person() is missing (stage54 first). Nothing was changed.';
+    raise exception 'stage85: coach_erase_person() is missing (stage54 first). Nothing was changed.';
   end if;
   d := pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure);
   if position('crew_open_results' in d) > 0 then return; end if;              -- already learned (a re-run)
   n := (length(d) - length(replace(d, c_old, ''))) / length(c_old);
   if n <> 1 then
-    raise exception 'stage84: coach_erase_person() does not name crew_rings exactly once (found %). Nothing was changed.', n;
+    raise exception 'stage85: coach_erase_person() does not name crew_rings exactly once (found %). Nothing was changed.', n;
   end if;
   execute replace(d, c_old, c_new);
 end
-$stage84_erase$;
+$stage85_erase$;

@@ -19,7 +19,7 @@
 //   13. line endings: the apply and the way back from files whose lines end differently (a Windows checkout ends them with CRLF)
 //   14. stage82: the emoji beside the Like (the set, the swap, the refusals, the feed, the way back)
 //   15. stage83: the feed only when it has changed (the hash, what moves it, the refusals, the way back)
-//   16. stage84: the Monthly Open (only Amir writes, the board and its order, the Bell line, who is left off, closing, the erasure, the way back)
+//   16. stage85: the Monthly Open (only Amir writes, the board and its order, the Bell line, who is left off, closing, the erasure, the way back)
 // A check that fails because stage81 is wrong is a finding: it is reported, not fixed here.
 // `--stage <file>` and `--rollback <file>` rehearse a modified copy, to see that a check bites (2026-10-19: run against 68 one-line breaks of both files; every one
 // was noticed except a weight added to a part that is never printed).
@@ -944,17 +944,17 @@ async function main() {
   ok((await call('zz_emt', `select public.get_bell_if_new($1)`, ['zz_emt'])).etag !== null, 'stage83 goes on again after it');
 
   // ═══ 16 ══════════════════════════════════════════════════════════════════════════════════════════════════════════════
-  section('16. stage84: the Monthly Open (one challenge Amir sets, results he confirms, one board)');
-  const st84 = read(opt('--stage84') || path.join(ROOT, 'supabase', 'stage84_crew_open.sql'));
-  const back84 = read(opt('--rollback84') || path.join(ROOT, 'scripts', 'career', 'rollback_stage84.sql'));
+  section('16. stage85: the Monthly Open (one challenge Amir sets, results he confirms, one board)');
+  const st85 = read(opt('--stage85') || path.join(ROOT, 'supabase', 'stage85_crew_open.sql'));
+  const back85 = read(opt('--rollback85') || path.join(ROOT, 'scripts', 'career', 'rollback_stage85.sql'));
   const bellTag = () => call('zz_emt', `select public.get_bell_if_new($1)`, ['zz_emt']).then(r => r.etag);
   const openOf = async id => (await bellAs(id)).open;
 
-  ok((await bellAs('zz_emt')).open === undefined, 'before stage84 the feed carries no Open at all, so the app draws no card');
+  ok((await bellAs('zz_emt')).open === undefined, 'before stage85 the feed carries no Open at all, so the app draws no card');
   const tagBefore = await bellTag();
 
-  await runSql(db, st84, 'stage84'); await runSql(db, st84, 'stage84 again');
-  ok(true, 'stage84 applied, and applied again without an error');
+  await runSql(db, st85, 'stage85'); await runSql(db, st85, 'stage85 again');
+  ok(true, 'stage85 applied, and applied again without an error');
   ok((await val(`select count(*)::int from pg_tables where schemaname = 'public' and tablename in ('crew_open', 'crew_open_results')`)) === 2,
      'both tables are there');
   ok((await val(`select bool_and(c.relrowsecurity) from pg_class c where c.relnamespace = 'public'::regnamespace and c.relname in ('crew_open', 'crew_open_results')`)) === true,
@@ -1091,8 +1091,8 @@ async function main() {
   ok((await val(`select count(*)::int from public.crew_open_results where athlete_id <> 'zz_emt'`)) > 0, 'and nobody else’s');
 
   // the way back
-  info('the way back, then stage84 again');
-  await runSql(db, back84, 'the way back from stage84');
+  info('the way back, then stage85 again');
+  await runSql(db, back85, 'the way back from stage85');
   ok((await val(`select to_regprocedure('public.coach_open()')::text`)) === null
      && (await val(`select count(*)::int from pg_tables where schemaname = 'public' and tablename like 'crew_open%'`)) === 0,
      'the way back drops the five, the read and both tables');
@@ -1101,8 +1101,8 @@ async function main() {
   ok((await val(`select count(*)::int from public.crew_rings where kind = 'open'`)) === 0, 'the Open\'s Bell lines went with it; every other line stayed');
   ok((await val(`select position('crew_open_results' in pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure))`)) === 0,
      'and coach_erase_person() forgot the table');
-  await runSql(db, st84, 'stage84 after the way back');
-  ok((await bellAs('zz_emo')).open === null && (await coachCall(`select public.coach_open()`)).open === null, 'stage84 goes on again after it');
+  await runSql(db, st85, 'stage85 after the way back');
+  ok((await bellAs('zz_emo')).open === null && (await coachCall(`select public.coach_open()`)).open === null, 'stage85 goes on again after it');
 
   console.log(`\n${failed ? 'FAIL' : 'OK'}: ${passed} passed, ${failed} failed (${Math.round((Date.now() - t0) / 1000)} s)`);
   if (failed) fails.forEach(f => console.log('  - ' + f));

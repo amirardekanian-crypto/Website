@@ -8,6 +8,7 @@
 // so the row stays as the seeded snapshot draws it; one scenario lets the strip load and checks the row goes.
 'use strict';
 const path = require('path');
+const fs = require('fs');
 const H = require('./lib');
 const R = require('./career');
 
@@ -312,6 +313,63 @@ function noStrip(browser) {
     const dk = await d.p.evaluate(() => { const r = document.querySelector('#home-habits-wrap .hrow'); const c = getComputedStyle(r); return { row: c.backgroundColor, page: getComputedStyle(document.body).backgroundColor, edge: c.borderTopColor, on: getComputedStyle(r.querySelector('.hrow-v')).color }; });
     t.check('dark: the door row is #242424 on #181818, its verdict mint', dk.row === 'rgb(36, 36, 36)' && dk.page === 'rgb(24, 24, 24)' && dk.on === 'rgb(109, 190, 149)', JSON.stringify(dk));
     await d.ctx.close();
+  }
+
+  // ── 5c. the door's NAME (Number First, Amir 2026-10-19: "the mono door labels"). The loudest thing in a door is whatever that
+  //        door is for: a door that carries a figure keeps the figure and the name is a quiet green label; a door without one
+  //        makes the name the headline, in the cycle card's fold-row recipe. ONE rule over all seven scopes. ──
+  {
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(), w: 390, h: 844, seed: Object.assign({ _hab_card: hab('togo') }, SEED_NUMBERS) });
+    const face = async (sel, screen) => p.evaluate(([s, scr]) => {
+      if (scr) goTo(scr);
+      const l = document.querySelector(s); if (!l) return null;
+      const c = getComputedStyle(l);
+      return { style: [c.fontFamily.split(',')[0].replace(/["']/g, ''), c.fontSize, c.fontWeight, c.letterSpacing, c.textTransform, c.color].join('|'), clipped: l.scrollWidth > l.clientWidth + 1 };
+    }, [sel, screen]);
+    const QUIET = 'Barlow|13px|600|normal|none|rgb(14, 74, 54)';      // a door that carries a figure: the green label
+    const LOUD = 'Barlow|16px|600|normal|none|rgb(26, 26, 26)';        // every other door: the name as the headline
+    await p.evaluate(() => goTo('home')); await p.waitForTimeout(350);
+    const habits = await face('#home-habits-wrap .hrow-l');
+    await p.evaluate(() => goTo('plan')); await p.waitForTimeout(450);
+    const records = await face('#ceiling-row-wrap .hrow-l'), weight = await face('#weight-row-wrap .hrow-l'), why = await face('.road-why-door .hrow-l');
+    t.check('the door name: the three doors that carry a figure (Daily habits, Personal records, Body weight) wear the quiet green label',
+      [habits, records, weight].every(x => x && x.style === QUIET && !x.clipped), JSON.stringify([habits, records, weight]));
+    t.check('the door name: a door with no figure (Why your plan looks like this) is the headline instead, in ink',
+      !!why && why.style === LOUD && !why.clipped, JSON.stringify(why));
+    // the defect the first draft had: at 13 px grey the name was the twin of the metadata beside the figure ("Back Squat · ▲ 12 KG")
+    const twin = await p.evaluate(() => { const l = document.querySelector('#ceiling-row-wrap .hrow-l'), s = document.querySelector('#ceiling-row-wrap .hrow-v small');
+      const f = e => { const c = getComputedStyle(e); return [c.fontSize, c.fontWeight, c.color].join('|'); };
+      return s ? { name: f(l), meta: f(s) } : null; });
+    t.check('the door name: it is never the twin of the metadata beside the figure (same size, but green and heavier)',
+      !!twin && twin.name !== twin.meta && /rgb\(14, 74, 54\)/.test(twin.name) && /rgb\(92, 92, 92\)/.test(twin.meta), JSON.stringify(twin));
+    // every other scope follows the same one rule
+    const others = {};
+    for (const [screen, sel, want] of [['ceiling', '#ceil-body .hrow-l', LOUD], ['notes', '#screen-notes .hrow-l', LOUD]]) {
+      await p.evaluate(s => goTo(s), screen); await p.waitForTimeout(450);
+      others[screen] = await face(sel);
+      t.check(`the door name: the ${screen} screen's door follows the same rule (no figure, so the headline)`, !!others[screen] && others[screen].style === want && !others[screen].clipped, JSON.stringify(others[screen]));
+    }
+    t.check('no page errors (the door name)', p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+    // the narrowest phone: the label used to wrap to two tracked lines and a media query existed only to stop it
+    const n = await H.openProgram(browser, { prog: prog(), w: 320, h: 568, seed: Object.assign({ _hab_card: hab('togo') }, SEED_NUMBERS) });
+    await n.p.evaluate(() => goTo('plan')); await n.p.waitForTimeout(450);
+    const narrow = await n.p.evaluate(() => { const l = document.querySelector('.road-why-door .hrow-l'), sp = document.querySelector('#ceiling-row-wrap .nc-spark');
+      return { lines: Math.round(l.getBoundingClientRect().height / parseFloat(getComputedStyle(l).lineHeight)), clipped: l.scrollWidth > l.clientWidth + 1,
+        spark: sp && Math.round(sp.getBoundingClientRect().width), side: document.documentElement.scrollWidth - window.innerWidth }; });
+    t.check('the door name at 320: "Why your plan looks like this" is ONE line (it was two tracked ones), the sparkline keeps its full 60 px, nothing clipped or sideways',
+      narrow.lines === 1 && !narrow.clipped && narrow.spark === 60 && narrow.side <= 0, JSON.stringify(narrow));
+    await n.ctx.close();
+    // ONE rule, not seven copies: the sheet must declare the door's name once, and that declaration must name every scope that has a door
+    const src = fs.readFileSync(path.join(__dirname, '..', '..', 'program.html'), 'utf8');
+    // every rule that SETS THE FACE of a door's name: its selector (back to the line start) plus its declarations, which may wrap a line
+    const decls = (src.match(/^[^\n]*\.hrow-l \{[\s\S]*?\}/gm) || []).filter(d => /font:/.test(d));
+    const shared = decls.filter(d => /#home-overview/.test(d) && /#screen-plan/.test(d) && !/hrow-vv/.test(d));
+    const scopes = ['#home-overview', '#screen-plan', '#screen-ceiling', '#screen-notes', '#hist-overlay', '#ar-body', '#day-view .complete-crew'];
+    t.check('the door name: ONE shared declaration naming all seven scopes, and no scope keeps a copy of its own (the exceptions are .from-amir and the figure branch)',
+      shared.length === 1 && scopes.every(s => shared[0].indexOf(s) > -1) && decls.length === 3 && decls.filter(d => /from-amir/.test(d)).length === 1 && decls.filter(d => /hrow-vv/.test(d)).length === 1,
+      decls.length + ' declarations: ' + decls.map(d => d.trim().slice(0, 70)).join(' || '));
+    t.check('the door name: no scope still sets it in Space Mono', !/\.hrow-l \{[^}]*Space Mono/.test(src), (src.match(/\.hrow-l \{[^}]*Space Mono[^}]*\}/g) || []).join(' | '));
   }
 
   // ── 5b. AA Proof's strip is the habits once it is on screen: the Daily habits row goes (paintHabitsCard()); with the frame blocked the row stays ──

@@ -67,8 +67,8 @@
   // against a server that has not had stage81, as before; `missingRpc: ['coach_crew']` takes them away again (the page draws no Bell).
   var CREW_RPCS = ['coach_crew', 'coach_crew_post', 'coach_crew_remove', 'coach_crew_under13', 'crew_photo'];
   function noStage81() { return !SEED.crew || (ST.missingRpc || []).indexOf('coach_crew') >= 0; }
-  // stage84's functions (the Monthly Open). Answered only when the seed says `open: true` (buildSeed({open: true}), which also turns stage81 on: stage84 needs it), so
-  // every other scenario runs against a server that has not had stage84; `missingRpc: ['coach_open']` takes them away from a seeded run too, and
+  // stage85's functions (the Monthly Open). Answered only when the seed says `open: true` (buildSeed({open: true}), which also turns stage81 on: stage85 needs it), so
+  // every other scenario runs against a server that has not had stage85; `missingRpc: ['coach_open']` takes them away from a seeded run too, and
   // `window.__STUB.openNull = true` makes coach_open() answer nothing at all (a null, no error).
   var OPEN_RPCS = ['coach_open', 'coach_open_set', 'coach_open_close', 'coach_open_result', 'coach_open_remove'];
   function noStage84() { return !SEED.open || (ST.missingRpc || []).indexOf('coach_open') >= 0; }
@@ -358,7 +358,7 @@
   function bell() { return DB.crew_bell || (DB.crew_bell = { posts: [], people: [], photos: {}, rings_week: 0 }); }
   function bellSweep() { var c = bell(); c.posts = c.posts.filter(function (p) { return p.ago_min <= 7 * 1440; }); return c; }   // crew_sweep(): a post goes 7 days after it was made
   var BELL_OK = 'crew:';
-  // The Open's state (stage84): every challenge ever set (the live one has no closed_at), every confirmed result, the Bell lines a result rang. Tests read and
+  // The Open's state (stage85): every challenge ever set (the live one has no closed_at), every confirmed result, the Bell lines a result rang. Tests read and
   // change it as window.__DB.crew_open_state. The crew is crew_members(): a yes (the Bell's people), not under 13, not a former athlete, not the demo,
   // named by the board name, else the default name (first name and the last name's initial).
   function openState() { return DB.crew_open_state || (DB.crew_open_state = { challenges: [], results: [], rings: [] }); }
@@ -442,7 +442,7 @@
       if (!ph || !c.posts.some(function (x) { return x.id === p.p_post; })) return null;
       return { id: p.p_post, mime: ph.mime, w: ph.w, h: ph.h, b64: ph.b64 };
     },
-    // ---- stage84: the Monthly Open (supabase/stage84_crew_open.sql). Every one answers coach_open()'s shape; the caller is always the coach. ----
+    // ---- stage85: the Monthly Open (supabase/stage85_crew_open.sql). Every one answers coach_open()'s shape; the caller is always the coach. ----
     // `window.__STUB.openNull = true` makes the read answer nothing; `window.__STUB.openWriteNull = n` makes the next n WRITES do their work and then answer nothing.
     coach_open: function () { return ST.openNull ? null : openAnswer(); },
     // Starts a new challenge (and closes whatever was open) or, with p_id, corrects the words of that one and keeps its results.

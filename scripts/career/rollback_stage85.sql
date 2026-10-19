@@ -1,11 +1,11 @@
--- rollback_stage84.sql — takes supabase/stage84_crew_open.sql off. On Amir's word only.
+-- rollback_stage85.sql — takes supabase/stage85_crew_open.sql off. On Amir's word only.
 --
 -- In order: get_bell() stops answering the Open, the five coach functions and the read go, coach_erase_person() forgets the results table, and the
 -- two tables are dropped LAST. The Bell lines a result rang are deleted with them (crew_rings kind 'open'); every other line is untouched. Nothing
 -- in the scorer ever knew about any of this, so no XP, level or season point can move.
 -- ⚠️ Dropping the tables throws away every result Amir confirmed. To keep them, run everything except the last block.
 
-do $rollback84_patch$
+do $rollback85_patch$
 declare d text;
 begin
   if to_regprocedure('public.get_bell(text)') is not null then
@@ -21,7 +21,7 @@ begin
     end if;
   end if;
 end
-$rollback84_patch$;
+$rollback85_patch$;
 
 drop function if exists public.coach_open_remove(text);
 drop function if exists public.coach_open_result(text, numeric, date);

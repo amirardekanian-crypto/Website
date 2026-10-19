@@ -6,9 +6,9 @@
 -- It holds the structure only: tables, columns, constraints, indexes, row-level security and its policies, triggers, every function and who may run it,
 -- and every grant. The rows come from a backup file (scripts/restore/README.md). Nothing in the `auth`, `storage`, `realtime`, `vault` or `backup`
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
--- The extensions the live project has: pg_cron (pg_catalog), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
+-- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 58 tables, 221 functions, 8 sequences.
+-- 61 tables, 234 functions, 8 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -540,6 +540,42 @@ create table public.programs (
   data jsonb not null,
   updated_at timestamp with time zone default now() not null,
   updated_by text
+);
+
+create table public.push_config (
+  id boolean default true not null,
+  url text,
+  secret text,
+  updated_at timestamp with time zone default now() not null,
+  vapid_public text,
+  vapid_private text,
+  vapid_subject text
+);
+
+create table public.push_sent (
+  athlete_id text not null,
+  day date not null,
+  kind text not null,
+  at timestamp with time zone default now() not null
+);
+
+create table public.push_subs (
+  endpoint text not null,
+  athlete_id text not null,
+  p256dh text not null,
+  auth text not null,
+  app text default 'proof'::text not null,
+  kinds jsonb default '{}'::jsonb not null,
+  hour smallint default 20 not null,
+  quiet_days smallint default 2 not null,
+  tz_offset smallint default 0 not null,
+  lang text default 'en'::text not null,
+  device text,
+  created_at timestamp with time zone default now() not null,
+  updated_at timestamp with time zone default now() not null,
+  last_sent_at timestamp with time zone,
+  last_ok_at timestamp with time zone,
+  fails smallint default 0 not null
 );
 
 create table public.qualities (
@@ -4199,7 +4235,7 @@ declare
   c_athlete_tables constant text[] := array[
     'programs', 'program_versions', 'coaching_logs', 'coaching_log_versions',
     'session_history', 'athlete_progress', 'hab_notes', 'hab_titles', 'hab_season_results', 'leaderboard_optin',
-    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities', 'athlete_status', 'career_facts', 'career_scores', 'career_awards', 'career_recognition', 'courtside_marks', 'career_honours', 'career_goals', 'career_notes', 'crew_kudos', 'crew_photos', 'crew_posts', 'crew_rings', 'crew_consent'];
+    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities', 'athlete_status', 'career_facts', 'career_scores', 'career_awards', 'career_recognition', 'courtside_marks', 'career_honours', 'career_goals', 'career_notes', 'crew_kudos', 'crew_photos', 'crew_posts', 'crew_rings', 'crew_consent', 'push_sent', 'push_subs'];
   -- Not clients: the public demo, and the identity coach.html reads the board through (AMIR_ATHLETE_ID there).
   c_protected constant text[] := array['demo', 'amir_ardekani'];
   -- Arabic-Indic (U+0660-0669) and Persian (U+06F0-06F9) digits, and what they fold to.
@@ -7365,6 +7401,250 @@ begin
   return v_n;
 end; $function$;
 
+CREATE OR REPLACE FUNCTION public.push_done(p_athlete_id text, p_kind text, p_day date, p_ok boolean DEFAULT true)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  if p_ok then
+    insert into public.push_sent (athlete_id, day, kind) values (p_athlete_id, p_day, p_kind)
+    on conflict (athlete_id, day, kind) do nothing;
+  end if;
+  update public.push_subs
+     set last_sent_at = now(),
+         last_ok_at = case when p_ok then now() else last_ok_at end,
+         fails = case when p_ok then 0 else least(32767, fails + 1) end
+   where athlete_id = p_athlete_id;
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.push_drop(p_endpoint text)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  delete from public.push_subs where endpoint = p_endpoint;
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.push_due(p_now timestamp with time zone DEFAULT now())
+ RETURNS TABLE(endpoint text, p256dh text, auth text, athlete_id text, kind text, title text, body text, tag text, ttl integer, day date)
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  with phone as (
+    select s.*,
+           public.push_local(p_now, s.tz_offset) as local_at,
+           public.push_local(p_now, s.tz_offset)::date as local_day,
+           extract(hour from public.push_local(p_now, s.tz_offset))::int as local_hour
+      from public.push_subs s
+     where s.fails < 5
+  ),
+  ripe as (
+    select p.* from phone p where p.local_hour = p.hour
+  ),
+  coached as (
+    select r.*, (select coalesce(pr.data->'athlete'->>'tier', 'coached') <> 'free'
+                   from public.programs pr where pr.athlete_id = r.athlete_id) as is_coached
+      from ripe r
+  ),
+  judged as (
+    select c.*,
+      (c.is_coached and public.push_on(c.kinds, 'workout')
+        and not exists (select 1 from public.career_facts f
+                         where f.athlete_id = c.athlete_id and f.kind = 'session_finished'
+                           and f.void_at is null and f.day > c.local_day - c.quiet_days)
+        and not exists (select 1 from public.push_sent t
+                         where t.athlete_id = c.athlete_id and t.day = c.local_day and t.kind = 'workout')
+      ) as want_workout,
+      (public.push_on(c.kinds, 'habits')
+        and not exists (select 1 from public.career_facts f
+                         where f.athlete_id = c.athlete_id and f.kind = 'habit_day'
+                           and f.void_at is null and f.day = c.local_day)
+        and not exists (select 1 from public.push_sent t
+                         where t.athlete_id = c.athlete_id and t.day = c.local_day and t.kind = 'habits')
+      ) as want_habits
+      from coached c
+  ),
+  picked as (
+    select j.*, case when j.want_workout then 'workout'
+                     when j.want_habits then 'habits' end as kind
+      from judged j
+     where j.want_workout or j.want_habits
+  )
+  select p.endpoint, p.p256dh, p.auth, p.athlete_id, p.kind,
+         l.title, l.body, p.kind as tag, 7200 as ttl, p.local_day
+    from picked p
+    cross join lateral public.push_lines(p.kind, p.lang) l
+$function$;
+
+CREATE OR REPLACE FUNCTION public.push_fire()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare c record; req bigint;
+begin
+  select * into c from public.push_config where id;
+  if c.url is null or c.secret is null then
+    return jsonb_build_object('ok', false, 'why', 'push_config is not filled in yet');
+  end if;
+  if to_regproc('net.http_post') is null then
+    return jsonb_build_object('ok', false, 'why', 'pg_net is not installed');
+  end if;
+  execute format('select %s($1, $2::jsonb, ''{}''::jsonb, $3::jsonb, 20000)', 'net.http_post')
+    into req
+    using c.url, '{}'::jsonb,
+          jsonb_build_object('Content-Type', 'application/json', 'x-push-key', c.secret);
+  return jsonb_build_object('ok', true, 'request', req);
+exception when others then
+  raise warning 'push_fire: %', sqlerrm;
+  return jsonb_build_object('ok', false, 'why', sqlerrm);
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.push_forget(p_endpoint text DEFAULT NULL::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_id text := public.current_athlete_id();
+begin
+  if v_id is null then return null; end if;
+  delete from public.push_subs
+   where athlete_id = v_id and (p_endpoint is null or endpoint = p_endpoint);
+  return public.push_me();
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.push_kind_list()
+ RETURNS text[]
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select array['habits', 'workout', 'crew', 'cycle']::text[]
+$function$;
+
+CREATE OR REPLACE FUNCTION public.push_lines(p_kind text, p_lang text)
+ RETURNS TABLE(title text, body text)
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select t.title, t.body from (values
+    ('habits',  'en', 'Your day is still open',  'Tick what you did today.'),
+    ('habits',  'fa', 'روزت هنوز بازه',            'بزن ببینم امروز چی کار کردی.'),
+    ('workout', 'en', 'Time to train',            'It has been a couple of days.'),
+    ('workout', 'fa', 'وقتِ تمرینه',               'دو روزی می‌شه خبری نیست.')
+  ) as t(kind, lang, title, body)
+  where t.kind = p_kind and t.lang = (case when p_lang = 'fa' then 'fa' else 'en' end)
+$function$;
+
+CREATE OR REPLACE FUNCTION public.push_local(p_now timestamp with time zone, p_tz_offset integer)
+ RETURNS timestamp without time zone
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select (p_now at time zone 'utc') + make_interval(mins => p_tz_offset)
+$function$;
+
+CREATE OR REPLACE FUNCTION public.push_me()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_id text := public.current_athlete_id(); v jsonb;
+begin
+  if v_id is null then return null; end if;
+  select jsonb_build_object(
+           'on', count(*) > 0,
+           'phones', count(*),
+           'hour', coalesce(min(hour), 20),
+           'quiet_days', coalesce(min(quiet_days), 2),
+           'kinds', coalesce(min(kinds::text)::jsonb, '{}'::jsonb),
+           'lang', coalesce(min(lang), 'en'),
+           'list', public.push_kind_list())
+    into v
+    from public.push_subs where athlete_id = v_id;
+  return v;
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.push_on(p_kinds jsonb, p_kind text)
+ RETURNS boolean
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select coalesce((p_kinds ->> p_kind)::boolean, true)
+$function$;
+
+CREATE OR REPLACE FUNCTION public.push_set(p_kinds jsonb DEFAULT NULL::jsonb, p_hour integer DEFAULT NULL::integer, p_quiet_days integer DEFAULT NULL::integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_id text := public.current_athlete_id();
+begin
+  if v_id is null then return null; end if;
+  -- greatest() and least() IGNORE nulls in Postgres, so greatest(8, null) is 8, not null. The null
+  -- check has to come first, or "change nothing" quietly resets the hour to 8 and quiet days to 1.
+  update public.push_subs
+     set kinds = case when p_kinds is null or jsonb_typeof(p_kinds) <> 'object' then kinds
+                      else kinds || p_kinds end,
+         hour = case when p_hour is null then hour else least(22, greatest(8, p_hour)) end,
+         quiet_days = case when p_quiet_days is null then quiet_days else least(4, greatest(1, p_quiet_days)) end,
+         updated_at = now()
+   where athlete_id = v_id;
+  return public.push_me();
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.push_subscribe(p_endpoint text, p_p256dh text, p_auth text, p_app text DEFAULT 'proof'::text, p_hour integer DEFAULT 20, p_tz_offset integer DEFAULT 0, p_lang text DEFAULT 'en'::text, p_device text DEFAULT NULL::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_id text := public.current_athlete_id();
+begin
+  if v_id is null then return null; end if;
+  if p_endpoint is null or char_length(p_endpoint) < 20 or p_p256dh is null or p_auth is null then
+    raise exception 'push_subscribe: that is not a subscription';
+  end if;
+  insert into public.push_subs as s (endpoint, athlete_id, p256dh, auth, app, hour, tz_offset, lang, device)
+  values (p_endpoint, v_id, p_p256dh, p_auth,
+          case when p_app = 'training' then 'training' else 'proof' end,
+          least(22, greatest(8, coalesce(p_hour, 20))),
+          least(840, greatest(-840, coalesce(p_tz_offset, 0))),
+          case when p_lang = 'fa' then 'fa' else 'en' end,
+          left(nullif(btrim(coalesce(p_device, '')), ''), 120))
+  on conflict (endpoint) do update
+    set athlete_id = excluded.athlete_id, p256dh = excluded.p256dh, auth = excluded.auth,
+        app = excluded.app, tz_offset = excluded.tz_offset, lang = excluded.lang,
+        device = excluded.device, fails = 0, updated_at = now()
+  where s.endpoint = excluded.endpoint;
+  return public.push_me();
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.push_sweep()
+ RETURNS integer
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare n integer;
+begin
+  delete from public.push_sent where day < (now() at time zone 'utc')::date - 30;
+  get diagnostics n = row_count;
+  return n;
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.roll_call(p_athlete_id text, p_key text DEFAULT NULL::text, p_days integer DEFAULT 7)
  RETURNS TABLE(day date, display_name text, title text, body text, pct smallint, rank_label text, is_me boolean, is_coach boolean)
  LANGUAGE plpgsql
@@ -8172,6 +8452,17 @@ alter table public.messages add constraint messages_pkey PRIMARY KEY (id);
 alter table public.messages add constraint messages_sender_check CHECK ((sender = ANY (ARRAY['coach'::text, 'athlete'::text])));
 alter table public.program_versions add constraint program_versions_pkey PRIMARY KEY (id);
 alter table public.programs add constraint programs_pkey PRIMARY KEY (athlete_id);
+alter table public.push_config add constraint push_config_id_check CHECK (id);
+alter table public.push_config add constraint push_config_pkey PRIMARY KEY (id);
+alter table public.push_sent add constraint push_sent_pkey PRIMARY KEY (athlete_id, day, kind);
+alter table public.push_subs add constraint push_subs_app_check CHECK ((app = ANY (ARRAY['proof'::text, 'training'::text])));
+alter table public.push_subs add constraint push_subs_device_check CHECK (((device IS NULL) OR (char_length(device) <= 120)));
+alter table public.push_subs add constraint push_subs_hour_check CHECK (((hour >= 8) AND (hour <= 22)));
+alter table public.push_subs add constraint push_subs_kinds_check CHECK ((jsonb_typeof(kinds) = 'object'::text));
+alter table public.push_subs add constraint push_subs_lang_check CHECK ((lang = ANY (ARRAY['en'::text, 'fa'::text])));
+alter table public.push_subs add constraint push_subs_pkey PRIMARY KEY (endpoint);
+alter table public.push_subs add constraint push_subs_quiet_days_check CHECK (((quiet_days >= 1) AND (quiet_days <= 4)));
+alter table public.push_subs add constraint push_subs_tz_offset_check CHECK (((tz_offset >= '-840'::integer) AND (tz_offset <= 840)));
 alter table public.qualities add constraint qualities_id_check CHECK ((id ~ '^[a-z]+$'::text));
 alter table public.qualities add constraint qualities_pkey PRIMARY KEY (id);
 alter table public.qualities add constraint qualities_status_check CHECK ((status = ANY (ARRAY['draft'::text, 'approved'::text])));
@@ -8235,6 +8526,9 @@ CREATE INDEX library_kind_idx ON public.library USING btree (kind, published);
 CREATE INDEX library_sessions_athlete_day_idx ON public.library_sessions USING btree (athlete_id, completed_on DESC);
 CREATE INDEX messages_athlete_idx ON public.messages USING btree (athlete_id, created_at);
 CREATE INDEX program_versions_athlete_saved_idx ON public.program_versions USING btree (athlete_id, saved_at DESC);
+CREATE INDEX push_sent_day_idx ON public.push_sent USING btree (day);
+CREATE INDEX push_subs_athlete_idx ON public.push_subs USING btree (athlete_id);
+CREATE INDEX push_subs_hour_idx ON public.push_subs USING btree (hour);
 CREATE UNIQUE INDEX seasons_starts_on_key ON public.seasons USING btree (starts_on);
 CREATE INDEX session_history_athlete_idx ON public.session_history USING btree (athlete_id, completed_on DESC);
 CREATE INDEX spine_versions_row_idx ON public.spine_versions USING btree (tbl, row_id, id DESC);
@@ -8311,6 +8605,9 @@ alter table public.library_sessions enable row level security;
 alter table public.messages enable row level security;
 alter table public.program_versions enable row level security;
 alter table public.programs enable row level security;
+alter table public.push_config enable row level security;
+alter table public.push_sent enable row level security;
+alter table public.push_subs enable row level security;
 alter table public.qualities enable row level security;
 alter table public.seasons enable row level security;
 alter table public.session_history enable row level security;
@@ -8389,6 +8686,8 @@ create policy "athlete reads own program" on public.programs as permissive for S
    FROM athlete_identities ai
   WHERE (ai.user_id = auth.uid()))));
 create policy "coach manage programs" on public.programs as permissive for ALL to authenticated using (is_coach()) with check (is_coach());
+create policy "coach reads push_sent" on public.push_sent as permissive for SELECT to authenticated using (( SELECT is_coach() AS is_coach));
+create policy "coach reads push_subs" on public.push_subs as permissive for SELECT to authenticated using (( SELECT is_coach() AS is_coach));
 create policy "coach all qualities" on public.qualities as permissive for ALL to public using (is_coach()) with check (is_coach());
 create policy "coach manage seasons" on public.seasons as permissive for ALL to authenticated using (is_coach()) with check (is_coach());
 create policy "coach delete sessions" on public.session_history as permissive for DELETE to authenticated using (is_coach());
@@ -8566,6 +8865,14 @@ revoke all on table public.programs from public, anon, authenticated, service_ro
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.programs to anon;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.programs to authenticated;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.programs to service_role;
+revoke all on table public.push_config from public, anon, authenticated, service_role;
+grant select, insert, update, delete, truncate, references, trigger, maintain on table public.push_config to service_role;
+revoke all on table public.push_sent from public, anon, authenticated, service_role;
+grant select on table public.push_sent to authenticated;
+grant select, insert, update, delete, truncate, references, trigger, maintain on table public.push_sent to service_role;
+revoke all on table public.push_subs from public, anon, authenticated, service_role;
+grant select on table public.push_subs to authenticated;
+grant select, insert, update, delete, truncate, references, trigger, maintain on table public.push_subs to service_role;
 revoke all on table public.qualities from public, anon, authenticated, service_role;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.qualities to anon;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.qualities to authenticated;
@@ -8984,6 +9291,32 @@ revoke all on function public.publish_cycle(p_athlete_id text, p_workouts jsonb,
 grant execute on function public.publish_cycle(p_athlete_id text, p_workouts jsonb, p_notes jsonb, p_new_cycle boolean, p_cycle_patch jsonb, p_cycles jsonb, p_sport jsonb, p_log_section text, p_log_profile text, p_log_ledger text, p_log_new text) to service_role;
 revoke all on function public.purge_old_notes() from public, anon, authenticated, service_role;
 grant execute on function public.purge_old_notes() to service_role;
+revoke all on function public.push_done(p_athlete_id text, p_kind text, p_day date, p_ok boolean) from public, anon, authenticated, service_role;
+grant execute on function public.push_done(p_athlete_id text, p_kind text, p_day date, p_ok boolean) to service_role;
+revoke all on function public.push_drop(p_endpoint text) from public, anon, authenticated, service_role;
+grant execute on function public.push_drop(p_endpoint text) to service_role;
+revoke all on function public.push_due(p_now timestamp with time zone) from public, anon, authenticated, service_role;
+grant execute on function public.push_due(p_now timestamp with time zone) to service_role;
+revoke all on function public.push_fire() from public, anon, authenticated, service_role;
+grant execute on function public.push_fire() to service_role;
+revoke all on function public.push_forget(p_endpoint text) from public, anon, authenticated, service_role;
+grant execute on function public.push_forget(p_endpoint text) to authenticated, service_role;
+revoke all on function public.push_kind_list() from public, anon, authenticated, service_role;
+grant execute on function public.push_kind_list() to service_role;
+revoke all on function public.push_lines(p_kind text, p_lang text) from public, anon, authenticated, service_role;
+grant execute on function public.push_lines(p_kind text, p_lang text) to service_role;
+revoke all on function public.push_local(p_now timestamp with time zone, p_tz_offset integer) from public, anon, authenticated, service_role;
+grant execute on function public.push_local(p_now timestamp with time zone, p_tz_offset integer) to service_role;
+revoke all on function public.push_me() from public, anon, authenticated, service_role;
+grant execute on function public.push_me() to authenticated, service_role;
+revoke all on function public.push_on(p_kinds jsonb, p_kind text) from public, anon, authenticated, service_role;
+grant execute on function public.push_on(p_kinds jsonb, p_kind text) to service_role;
+revoke all on function public.push_set(p_kinds jsonb, p_hour integer, p_quiet_days integer) from public, anon, authenticated, service_role;
+grant execute on function public.push_set(p_kinds jsonb, p_hour integer, p_quiet_days integer) to authenticated, service_role;
+revoke all on function public.push_subscribe(p_endpoint text, p_p256dh text, p_auth text, p_app text, p_hour integer, p_tz_offset integer, p_lang text, p_device text) from public, anon, authenticated, service_role;
+grant execute on function public.push_subscribe(p_endpoint text, p_p256dh text, p_auth text, p_app text, p_hour integer, p_tz_offset integer, p_lang text, p_device text) to authenticated, service_role;
+revoke all on function public.push_sweep() from public, anon, authenticated, service_role;
+grant execute on function public.push_sweep() to service_role;
 revoke all on function public.roll_call(p_athlete_id text, p_key text, p_days integer) from public, anon, authenticated, service_role;
 grant execute on function public.roll_call(p_athlete_id text, p_key text, p_days integer) to anon, authenticated, service_role;
 revoke all on function public.save_progress(p_athlete_id text, p_athlete_name text, p_data jsonb, p_key text, p_drop text[]) from public, anon, authenticated, service_role;

@@ -186,6 +186,9 @@
      loads the same version from jsDelivr: bump all three together (a NEW file name), with scripts/headless/coach/reallib.js and
      scripts/headless/signin.js run first. -->
 <script defer src="/assets/js/supabase-2.117.3.js" onerror="window.SB_FAILED=true"></script>
+<!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
+     website, with one service worker and one notification permission between them. -->
+<script defer src="/assets/js/push.js?v=1"></script>
 <!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
      on `defer` it shares one ordered execution queue with the SDK above. -->
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
@@ -233,6 +236,10 @@
     --ink: #1A1A1A; --grey: #5C5C5C; --ring: #8A8378; --num: #5C5C5C; --info: var(--ring);
     --fill: #0E4A36; --green-ink: #0E4A36; --mint: #6DBE95;
     --clay: #C7552F; --clay-ink: #B5461F; --clay-big: #C7552F; --clay-fill: #C2512C; --clay-on-green: #E06B43; --steel: #3E6A92;
+    /* The clay note box (2026-10-19, Amir's pick for "a new version is ready"): the green box's shape in the one accent. Declared
+       on body ONLY, like --clay and --clay-fill: the box is its own surface, so white on it reads the same in either mode and the
+       brand clay does not move. Every stop is 4.6:1 or better under white; --clay-deep is the ink on the white button (8:1). */
+    --clay-hero: radial-gradient(125% 90% at 100% 0%, #C2512C 0%, #AC4523 46%, #8A3418 100%); --clay-deep: #8A3418;
     --tint: rgba(14,74,54,.08); --prog-track: rgba(14,74,54,.12); --ph: #6B6B6B;
     /* --field: the edge of a box a set is typed into (2.44:1 on paper, it holds in sun); --mark: a made tick, the live set */
     --field: #A89F92; --mark: var(--fill);
@@ -2475,8 +2482,7 @@
   :where(#screen-notes) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   :where(#screen-notes) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   :where(#screen-notes) .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#screen-notes) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  :where(#screen-notes) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#screen-notes) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
   :where(#screen-notes) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   :where(#screen-notes) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
   /* ══ RECORDS AND BODY WEIGHT IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════════════════════
@@ -2529,8 +2535,7 @@
   :where(#screen-ceiling) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   :where(#screen-ceiling) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   :where(#screen-ceiling) .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#screen-ceiling) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  :where(#screen-ceiling) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#screen-ceiling) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
   :where(#screen-ceiling) .hrow-v { font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   :where(#screen-ceiling) .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
   :where(#screen-ceiling) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
@@ -2759,8 +2764,7 @@
   :where(#hist-overlay) .hrow:active { background: var(--tint); }
   :where(#hist-overlay) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   :where(#hist-overlay) .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#hist-overlay) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  :where(#hist-overlay) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#hist-overlay) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
   :where(#hist-overlay) .hrow-v { font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   :where(#hist-overlay) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
 
@@ -2869,10 +2873,10 @@
      a hairline above and below, a 4 px stripe in the colour that asks (grey: offline; clay: look here), the label in that colour in Space Mono
      capitals, the sentence in ink, one green condensed link with the chevron. Home's offline line and the filed-day card; it is full width,
      so each piece carries the gutter itself. */
-  #home-overview #home-offline.plan-offline, #home-overview #home-unfinished-wrap .uf-card { display: grid; justify-items: start; gap: 6px; margin: 0 0 16px; padding: 16px var(--g) 6px; border: 0; border-radius: 0;
+  #home-overview .plan-offline, #home-overview #home-unfinished-wrap .uf-card { display: grid; justify-items: start; gap: 6px; margin: 0 0 16px; padding: 16px var(--g) 6px; border: 0; border-radius: 0;
     border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); background: var(--row); color: var(--ink); box-shadow: inset 4px 0 0 var(--ring); }
-  #home-overview #home-offline.plan-offline[hidden] { display: none; }
-  #home-overview #home-offline.plan-offline.is-ask, #home-overview #home-unfinished-wrap .uf-card { box-shadow: inset 4px 0 0 var(--clay-fill); }
+  #home-overview .plan-offline[hidden] { display: none; }
+  #home-overview .plan-offline.is-ask, #home-overview #home-unfinished-wrap .uf-card { box-shadow: inset 4px 0 0 var(--clay-fill); }
   .po-k, .uf-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
   .is-ask .po-k, .uf-k { color: var(--clay-ink); }
   .po-txt, .uf-s { margin: 0; font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
@@ -2898,6 +2902,13 @@
   /* aaToast(…, { pass: true }): the box lets a tap through to the boxes under it (the unit note sits over the set rows it is about); only its buttons catch one */
   .aa-toast[data-pass] { pointer-events: none; }
   .aa-toast[data-pass] button { pointer-events: auto; }
+  /* aaToast(…, { tone: 'clay' }): the same box in the one accent, for the one note that asks the athlete to do something to the
+     app itself ("A new version of the app is ready", 2026-10-19; Amir: "lets go with C but in ckay"). The primary button is the
+     paper with --clay-deep on it, which is the strongest thing that can sit on clay. */
+  .aa-toast[data-tone="clay"] { background: var(--clay-hero); }
+  .aa-toast[data-tone="clay"] .aa-toast-k::before { background: rgba(255,255,255,.78); }
+  .aa-toast[data-tone="clay"] .aa-toast-go, .aa-toast[data-tone="clay"] .aa-toast-x:only-child {
+    background: #fff; color: var(--clay-deep); box-shadow: 0 10px 22px -10px rgba(0,0,0,.6); }
 
   /* 10b. The unit menu (openUnitMenu(), 2026-10-19; Amir: "if someone miss clicks the weight measure it changes ... I want the person to be able
      to choose between the 3"). A tap on a unit button opens these three rows under it and changes nothing; a pick changes the unit. Fixed to the
@@ -4458,8 +4469,7 @@
   #ar-body .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   #ar-body .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   #ar-body .hrow-ic svg { width: 22px; height: 22px; }
-  #ar-body .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  #ar-body .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  #ar-body .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
   #ar-body .hrow-v { display: block; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   #ar-body .hrow-v small { display: block; margin-top: 3px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   #ar-body .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
@@ -4514,7 +4524,9 @@
      with a clay dot, the label in clay: the one clay thing on Home until it is read (DS-01). */
   #home-overview #home-note-wrap:not(:empty) { margin-top: 20px; }
   #home-overview #home-note-wrap:not(:empty) + #home-career-wrap:not(:empty) { margin-top: 0; }
-  #home-overview .from-amir .hrow-l { color: var(--clay-ink); }   /* not .note-row: that class is the exercise card's Note */
+  /* not .note-row: that class is the exercise card's Note. It carries no figure, so the shared rule would make it a 16 px
+     headline and triple the clay on Home; clay is for what asks the athlete to act (DS-01), so this row keeps the quiet size. */
+  #home-overview .from-amir .hrow-l { font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--clay-ink); text-wrap: normal; }
   #home-overview .note-av { position: relative; flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--fill);
     color: #fff; font: 700 var(--fs-label)/1 'Barlow', sans-serif; }
   #home-overview .note-av i { font-style: normal; }
@@ -4666,21 +4678,38 @@
   :where(#home-overview, #screen-plan) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   :where(#home-overview, #screen-plan) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   :where(#home-overview, #screen-plan) .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#home-overview, #screen-plan) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  :where(#home-overview, #screen-plan) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#home-overview, #screen-plan) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  /* ── THE DOOR'S NAME (Number First, Amir 2026-10-19: "the mono door labels") ────────────────────────────────────────
+     The label used to be 11 px Space Mono 700, tracked and in capitals, on all 51 doors: the name of the place you are
+     going, set as the smallest and least readable thing in the row, and declared SIX times (this block, #screen-notes,
+     #screen-ceiling, #hist-overlay, #ar-body and #day-view .complete-crew). It is ONE rule now, over all seven scopes,
+     and the other five blocks keep only their .hrow-b.
+     The rule: THE LOUDEST THING IN A DOOR IS WHATEVER THAT DOOR IS FOR.
+       · Default — the NAME is the headline, in the cycle card's fold-row recipe (.road-ul), so a door reads like the
+         rows above it: "Why your plan looks like this", "Cycle 2 complete", "How the app works", "Tell the crew".
+       · A door that carries a FIGURE keeps the figure as the headline and the name becomes a quiet green label.
+         The test is .hrow-vv, the span that holds the figure itself (Personal records, Body weight, Daily habits,
+         Hold Serve, Career) — NOT .hrow-v, which is a slot that also holds prose ("How the app works", "+ Log a max").
+     ⚠️ The polarity is deliberate: the headline is the DEFAULT and the quiet label is the :has() branch, so a browser
+     with no :has() (iOS 15.0–15.3) shows every name loud instead of whispering the one row this change was for. */
+  :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew) .hrow-l {
+    font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; letter-spacing: normal; text-transform: none; color: var(--ink); text-wrap: balance; }
+  :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew) .hrow-b:has(.hrow-vv) .hrow-l {
+    font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-wrap: normal; }
   :where(#home-overview, #screen-plan) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   :where(#home-overview, #screen-plan) .hrow-vv { white-space: nowrap; }   /* the value never breaks; the small line under it wraps whole */
   :where(#home-overview, #screen-plan) .hrow-v small { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   :where(#home-overview, #screen-plan) .hrow-v.is-togo { color: var(--clay-ink); }   /* "2 to go" asks for something */
   :where(#home-overview, #screen-plan) .hrow-v.is-ok { color: var(--green-ink); }
   :where(#home-overview, #screen-plan) .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); }
-  :where(#home-overview, #screen-plan) .hrow-sp { flex: none; color: var(--green-ink); }
+  /* the sparkline belongs to the number, so it sits on the number's line: cleared by the quiet name's own line height, never a fixed nudge (at 320 the metadata wraps to a third line) */
+  :where(#home-overview, #screen-plan) .hrow-sp { flex: none; align-self: start; margin-top: calc(var(--fs-small) * 1.3); color: var(--green-ink); }
   :where(#home-overview, #screen-plan) .hrow-sp .nc-spark { width: 60px; height: 24px; display: block; }
   :where(#home-overview, #screen-plan) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
   :where(#home-overview, #screen-plan) .hrow-sp + .hrow-a { margin-left: -4px; }
-  @media (max-width: 359px) {   /* the narrowest phone: a shorter sparkline and tighter gaps, so "PERSONAL RECORDS" stays on one line */
+  @media (max-width: 359px) {   /* the narrowest phone: tighter gaps, and one more pixel of air because 320 stacks the name, the figure and its line */
     :where(#home-overview, #screen-plan) .hrow { gap: 10px; padding-right: 12px; }
-    :where(#home-overview, #screen-plan) .hrow-sp .nc-spark { width: 44px; }
+    :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew) .hrow-b { gap: 3px; }
   }
 
   /* 7. Progress: the header (the name as the eyebrow, "Progress" as the title), a section title for each part. The This cycle cover and
@@ -4853,6 +4882,7 @@
   .road-door { padding: 2px 0 18px; }   /* past the end date the door sits directly under the current cycle's Done row */
   .road-door .hrow.road-why-door { margin: 0; }
   .road-why-door .hrow-l { text-wrap: balance; }   /* on the narrowest phone the label breaks in two even halves, never one word on a line of its own */
+  .road-why-door .hrow-q { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; }   /* this door sits inside the cycle card, under fold rows whose second line is 13 px: "7 reasons" matches them (every other .hrow-q is a sentence and keeps 15 px) */
   .bt-next { margin: 0 0 4px; }   /* Home between cycles: the road's one row, on the gutter (.road) */
 
   /* 3. The archive (a finished cycle's days, read only): a compact cover as the training day's, then each day as a block title (the
@@ -5062,7 +5092,7 @@
   #screen-crew .cr-hon b { display: block; margin-top: 4px; font: 900 var(--fs-lead)/1.05 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--ink);
     overflow-wrap: anywhere; }
   #screen-crew .cr-hon small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
-  /* The Monthly Open (stage84; Amir's pick A on the Crew and Open page): one card under the honours, above the Bell. The challenge in his words,
+  /* The Monthly Open (stage85; Amir's pick A on the Crew and Open page): one card under the honours, above the Bell. The challenge in his words,
      the board ranked by the result, your own row marked, and one door to WhatsApp: he confirms every result from the clip, so the app never takes
      one. Green and grey, like the rest of Crew; the clay is only on the door, the one thing that asks for something (DS-01). */
   #screen-crew .cr-open { margin: 12px var(--g) 14px; padding: 14px 16px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
@@ -5205,8 +5235,7 @@
     border: 1px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
   :where(#day-view) .complete-crew .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   :where(#day-view) .complete-crew .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#day-view) .complete-crew .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  :where(#day-view) .complete-crew .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .complete-crew .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
   :where(#day-view) .complete-crew .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ink); }   /* as the WhatsApp row above it */
   :where(#day-view) .complete-crew .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
 
@@ -6811,6 +6840,97 @@ function sessionUnderway() {
     sessionStartedToday(String(d.id), today) && !completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id)));
 }
 
+// ── A NEW VERSION IS READY (2026-10-19) ────────────────────────────────────────────────────
+// Amir: "every time there is a change in the app, and its updated, i want everyone to be
+// notified to close their app from background and re open it. i dont know how to make this a
+// rule or a memory." There is no rule to remember now: the app says it itself.
+//
+// An installed PWA left in the background keeps the OLD page in memory. sw.js takes the shell
+// over the moment a CACHE bump deploys (skipWaiting on install, clients.claim on activate), so
+// a cold open is already the new version, but a page that is only resumed stays the previous
+// one until it is reloaded. That gap is what this closes.
+//   · The signal is `controllerchange`: a NEW worker has claimed this page. A FIRST install
+//     fires it too, with nothing stale behind it, so it counts only when this page already had
+//     a worker when it loaded (_hadWorker). A hard refresh leaves the page uncontrolled, and
+//     claim() fires it there as well: same guard, same answer.
+//   · Nothing finds the new worker unless someone looks. A navigation makes the browser check
+//     sw.js by itself, which covers every cold open; an app resumed from the background never
+//     navigates, so swCheck() asks for a fresh sw.js when the app comes back to the foreground
+//     and when the connection returns, at most once every SW_CHECK_MS (sw.js is 45 KB and
+//     Iran's lines are slow).
+//   · NEVER mid-session, the same principle that stops _resumeSync() swapping a changed plan:
+//     a reload would take the sets on the screen with it. The line waits and tries again every
+//     30 s until the session is over.
+//   · The look is the note box, aaToast(), IN CLAY (Amir picked it from three, 2026-10-19: "lets go
+//     with C but in ckay"). Clay because it asks for something (DS-01). It sits in the middle of the
+//     screen wherever the athlete is, so it is not missed on another tab, and it does NOT hide itself
+//     (ms: 0): it stays until Reload or Not now. Not now (`off`) ends it for this run only, since the
+//     next cold open is the new version anyway. The box never dims or blocks the page under it.
+//   · Not in the demo or the coach's preview: neither is an installed app anybody trains in.
+// ⚠️ habits.html carries the same thing in its own look (swTookOver() there), and it must NEVER
+// run in the embed (habits.html?embed=1 on Home): the iframe is a client of this same worker, so
+// a reload there would reload the wrong document.
+const SW_CHECK_MS = 20 * 60 * 1000;      // the most often this page asks for a fresh sw.js
+let NEW_VERSION = false;                 // a new worker has taken this page's shell over
+let _newVerDone = false;                 // "Not now": nothing more this run, the next open is the new version anyway
+let _swReg = null, _swChecked = 0, _newVerTimer = null;
+// Read once, while this page loads, and never written again by the app (scripts/headless/new-version.js
+// sets it to exercise the real path, which is why it is a let).
+let _hadWorker = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+
+function versionWatchOff() { return !!(window.IS_DEMO || window.IS_PREVIEW); }
+
+// A new worker claimed this page. Nothing is stale behind a first install.
+function swTookOver() {
+  if (NEW_VERSION || !_hadWorker || versionWatchOff()) return;
+  NEW_VERSION = true;
+  paintNewVersion();
+}
+
+// The note box in the middle of the screen, in clay, once it can be said.
+function paintNewVersion() {
+  if (!NEW_VERSION || _newVerDone) { clearInterval(_newVerTimer); _newVerTimer = null; return; }
+  if (sessionUnderway()) {
+    // Never over a session, and never left over one it was already on: it comes back when the session is done.
+    if (newVerShowing()) hideAaToast();
+    if (!_newVerTimer) _newVerTimer = setInterval(paintNewVersion, 30000);
+    return;
+  }
+  if (newVerShowing()) return;              // already there: leave it rather than restart it
+  clearInterval(_newVerTimer); _newVerTimer = null;
+  if (typeof aaToast !== 'function') return;
+  aaToast('A new version of the app is ready', {
+    kicker: 'New version', tone: 'clay', ms: 0,
+    action: 'Reload', run: reloadNewVersion,
+    dismiss: 'Not now', off: () => { _newVerDone = true; }
+  });
+}
+function reloadNewVersion() { location.reload(); }
+
+// Ask the browser for a fresh sw.js. Held while a session is under way: a worker that activates
+// mid-session starts answering this page's lazy loads (a rest game, the share card) from the new
+// cache, and there is nothing to gain from it until the session is finished anyway.
+function swCheck() {
+  if (!_swReg || document.visibilityState !== 'visible') return;
+  if (Date.now() - _swChecked < SW_CHECK_MS || sessionUnderway()) return;
+  _swChecked = Date.now();
+  try { _swReg.update(); } catch (e) { /* the next nudge tries again */ }
+}
+
+function initVersionWatch() {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.addEventListener('controllerchange', swTookOver);
+  // This navigation already made the browser check sw.js, so the clock starts now.
+  navigator.serviceWorker.register('/sw.js').then(reg => { _swReg = reg; _swChecked = Date.now(); }, () => {});
+  if (versionWatchOff()) return;
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    swCheck();
+    paintNewVersion();
+  });
+  window.addEventListener('online', swCheck);
+}
+
 // One capped pull. If the cap wins, the answer is thrown away when it lands.
 async function _pullOnce(key) {
   let live = true;
@@ -7503,6 +7623,7 @@ function openAccount(e) {
           <button type="button" data-theme="dark" aria-pressed="${dark}">Dark</button>
         </span></div>
       ${install}
+      ${pushReady() ? door('acct-push', 'bell', 'Reminders') : ''}
       ${crewOn() ? door('acct-crew', 'crew', 'Crew and the Bell') : ''}
       ${door('acct-help', 'help', 'How the app works')}
       <a class="hrow" href="/privacy.html" target="_blank" rel="noopener">${acctIc('privacy')}<span class="hrow-b"><span class="hrow-v">Privacy</span></span><span class="hrow-a" aria-hidden="true">›</span></a>
@@ -7518,6 +7639,8 @@ function openAccount(e) {
     showInstallOffer();
   });
   document.getElementById('acct-help').addEventListener('click', () => openHelp());   // ‹ Back returns here
+  const psh = document.getElementById('acct-push');
+  if (psh) psh.addEventListener('click', () => openPushSettings());   // ‹ Back returns here
   const crw = document.getElementById('acct-crew');
   if (crw) crw.addEventListener('click', () => openCrewSettings());   // ‹ Back returns here
   const so = document.getElementById('acct-signout');
@@ -10129,10 +10252,12 @@ function renderNotes() {
     </div>`).join('');
 
   // ── How the app works: the guide (APP_GUIDE) opens in the one sheet (COACH-02); the Coach tab keeps ONE door row for it
-  //    (Home's .hrow look), with no section label above it, and stays Amir's voice.
+  //    (Home's .hrow look), with no section label above it, and stays Amir's voice. It is named after the sheet it opens,
+  //    as the Account page's row to the same sheet already is (Amir, 2026-10-19): it read "Using the app" over a louder
+  //    "How the app works", the same thing said twice, because the prose sat in the figure's slot (.hrow-v) not .hrow-q.
   const door = `<button type="button" class="hrow" onclick="openHelp()">
       <span class="hrow-ic" aria-hidden="true">${window.ICON('help', 1.6)}</span>
-      <span class="hrow-b"><span class="hrow-l">Using the app</span><span class="hrow-v">How the app works</span></span>
+      <span class="hrow-b"><span class="hrow-l">How the app works</span><span class="hrow-q">Start here if anything is unclear.</span></span>
       <span class="hrow-a" aria-hidden="true">›</span>
     </button>`;
 
@@ -10142,7 +10267,7 @@ function renderNotes() {
     door;
 }
 
-// "Using the app" — the general how-to content shown to every athlete in the
+// "How the app works" — the general how-to content shown to every athlete in the
 // help sheet (openHelp(), COACH-02), opened from the Coach tab's row, the account
 // sheet and the jargon links. This is now the single source of truth: the old standalone App
 // Guide screen (#screen-guide) was removed, so the content lives here directly.
@@ -10219,7 +10344,7 @@ const APP_GUIDE = [
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Once a week</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
-    body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p>` },
+    body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p><p>When I update the app, an orange note says <strong>A new version of the app is ready</strong>. Tap <strong>Reload</strong> and it loads in a second. You don't have to close it from your phone and open it again. <strong>Not now</strong> puts it away. Mid-session it waits until you've finished, so a reload never takes your sets with it.</p>` },
   { icon: 'tool', title: 'Built-in tools',
     body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. You get one match a session: first to 15. A bank shot off the glass counts 2. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. <strong>The Lob</strong> is a slow ball to breathe with: in as it rises, out as it falls. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
@@ -10361,6 +10486,7 @@ function goTo(screen, historyId, keepContent) {
   if (screen === 'home') {
     paintHabitsCard();
     paintWeekSugg();   // gone once its session has been opened (LIB-01)
+    paintNewVersion(); // ← Home is the usual way out of a session, and the box waits for that
   }
 
   // Progress — rebuild the two number rows, the cycle card and the road. They were Home's until 2026-10-12 and had the same
@@ -12024,9 +12150,9 @@ function crewHonoursHTML() {
   }).join('');
   return tiles ? `<h2 class="prog-sec">${esc(M)} honours</h2><div class="cr-hon">${tiles}</div>` : '';
 }
-// ── The Monthly Open: one card on Crew (stage84; Amir, 2026-10-19: "for crew and the open go with your picks", direction A) ──────────────
+// ── The Monthly Open: one card on Crew (stage85; Amir, 2026-10-19: "for crew and the open go with your picks", direction A) ──────────────
 // get_bell() carries it as `open`: { id, title, how, unit, better, board: [{ who, value, place, me }], mine }. A challenge Amir has not set, or a
-// server without stage84, sends null or nothing and the card is not drawn. The app NEVER writes a result: he confirms every one from the clip on
+// server without stage85, sends null or nothing and the card is not drawn. The app NEVER writes a result: he confirms every one from the clip on
 // WhatsApp (nothing is stored), so the only control here is that door. The board shows the first five, the athlete's own row wherever it is.
 var _openAll = false;
 function crewOpenNum(v) {
@@ -12276,6 +12402,114 @@ const CREW_KINDS = [
   ['level', 'A new level'], ['week', 'A week held', 'And how many in a row'], ['mark', 'A mark', '8 weeks held, 50 sessions with Amir, 10 bests…'],
   ['achievement', 'An achievement'], ['best', 'A personal best', 'The lift only, never the weight'], ['cycle', 'A cycle finished'],
   ['honour', "The month's honours"], ['open', 'The Monthly Open']];
+// ── Reminders (stage84, 2026-10-19) ──────────────────────────────────────────────────────────────
+// Amir: "the push should be automatically on, unless they want to turn off in their app settings."
+// So every kind is on from the moment the phone allows it, and this panel is where they come off.
+//
+// ⚠️ The phone's permission box cannot be skipped by anyone: Apple and Google both require the
+// athlete's own tap. "Automatically on" is therefore: no question about whether they want reminders,
+// one line about what arrives, their tap, then everything on. The line is not politeness — the box
+// can be shown only ONCE per phone for this whole website, and a "Don't allow" takes AA Proof's
+// reminders with it for good.
+//
+// The client is assets/js/push.js, shared with habits.html, because the two apps are one website.
+let PUSH_ME = null, _pushLoading = false;
+
+function pushReady() {
+  // ⚠ This app's own names: `window.IS_DEMO` and `ATHLETE_ID`. The copy that landed here used habits.html's `DEMO` and `athleteId()`, neither of
+  // which exists in program.html, so this threw a ReferenceError and took the whole account sheet down with it (openAccount() calls it before
+  // drawing the Reminders door). Caught by scripts/headless/crew.js on 2026-10-19, after it had gone live.
+  return !window.IS_DEMO && !window.IS_PREVIEW && !!window.AAPush && AAPush.state() !== 'unsupported' && !!ATHLETE_ID;
+}
+function pushLoadMe(then) {
+  if (!window.AAPush || _pushLoading || PUSH_ME !== null) { if (then) then(); return; }
+  _pushLoading = true;
+  _sbReady().then(sb => sb && AAPush.me(sb)).then(me => { PUSH_ME = me || { on: false }; if (then) then(); })
+    .catch(() => { PUSH_ME = { on: false }; if (then) then(); });
+}
+
+const PUSH_KINDS = [['workout', 'Train', 'When you have not trained for a couple of days'],
+                    ['habits', 'Log your habits', 'One a day, at the hour you pick'],
+                    ['crew', 'The crew', 'When Amir posts, or someone cheers you'],
+                    ['cycle', 'A new cycle', 'When Amir publishes your next one']];
+
+function openPushSettings() {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov) return;
+  pushLoadMe(() => { if (ov.classList.contains('visible')) openPushSettingsPage(); });
+  const st = window.AAPush ? AAPush.state() : 'unsupported';
+  const me = PUSH_ME, live = st === 'on' && me && me.on;
+  const hour = (me && me.hour) || 20;
+  const note = st === 'needs-install'
+      ? 'On an iPhone a reminder only works once the app is on your Home Screen. Add it, open it from there, and come back.'
+    : st === 'blocked'
+      ? 'Your phone is blocking notifications for this site. Nothing here can undo that: open your browser settings, allow notifications for amirardekani.com, then come back.'
+    : !live ? 'Off. Turn them on and you get a nudge when you have not trained, and one at the end of the day for your habits.'
+    : 'On. Nothing before 8am or after 10pm, and never more than two in a day.';
+  const rows = live ? PUSH_KINDS.map(k => `<label class="cr-sw"><span>${esc(k[1])}<small>${esc(k[2])}</small></span>
+      <input type="checkbox" data-pkind="${k[0]}" ${AAPush.kindOn(me, k[0]) ? 'checked' : ''}></label>`).join('') : '';
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Your phone</div>
+    <h2 class="readiness-title">Reminders</h2>
+    <p class="readiness-sub">${esc(note)}</p>
+    ${st === 'off' || (st === 'on' && !live) ? `<div class="acct-list">
+      <button type="button" class="hrow" id="push-on"><span class="hrow-b"><span class="hrow-l">Turn reminders on</span>
+        <span class="hrow-q">One tap, then your phone asks you once.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>
+    </div>` : ''}
+    ${live ? `<div class="cr-sws"><p class="cr-note">What reaches you. Turn any of them off.</p>${rows}</div>
+    <div class="acct-list"><div class="acct-theme"><span class="acct-lbl">Time of day</span>
+      <span class="acct-seg" role="group" aria-label="The hour your reminders arrive">
+        <button type="button" id="push-hour">${String(hour).padStart(2, '0')}:00</button></span></div></div>
+    <p class="cr-note">Tap the time to move it an hour, between 8am and 10pm.${me && me.phones > 1 ? ' It applies to all ' + me.phones + ' of your phones.' : ''}</p>
+    <div class="acct-list"><button type="button" class="hrow" id="push-off"><span class="hrow-b">
+      <span class="hrow-l">Turn them all off</span>
+      <span class="hrow-q">Your phone keeps the permission, so you can turn them back on here.</span></span>
+      <span class="hrow-a" aria-hidden="true">›</span></button></div>` : ''}`;
+  const onBtn = ov.querySelector('#push-on');
+  if (onBtn) onBtn.addEventListener('click', () => pushTurnOn());
+  const offBtn = ov.querySelector('#push-off');
+  if (offBtn) offBtn.addEventListener('click', () => armedTap(offBtn.querySelector('.hrow-l'), 'Tap again to turn them off', () => pushTurnOff()));
+  const hr = ov.querySelector('#push-hour');
+  if (hr) hr.addEventListener('click', () => pushBumpHour());
+  ov.querySelectorAll('input[data-pkind]').forEach(i =>
+    i.addEventListener('change', () => pushToggleKind(i.dataset.pkind, i.checked, i)));
+  ov.classList.add('visible');
+  paintSheetBack();
+}
+function openPushSettingsPage() { _SHEET.restoring = true; try { openPushSettings(); } finally { _SHEET.restoring = false; } }
+
+async function pushTurnOn() {
+  const sb = await _sbReady();
+  if (!sb || !window.AAPush) return;
+  AAPush.markAsked();
+  const r = await AAPush.enable(sb, 'training', 'en');
+  if (r && r.ok) { PUSH_ME = r.me || PUSH_ME; aaToast('Reminders are on'); }
+  else if (r && r.state === 'blocked') aaToast('Your phone said no. You can undo that in its settings.');
+  else if (r && r.state === 'needs-install') aaToast('Add the app to your Home Screen first');
+  else aaToast('That did not work. Try again later.');
+  openPushSettingsPage();
+}
+async function pushTurnOff() {
+  const sb = await _sbReady();
+  const r = sb ? await AAPush.disable(sb) : null;
+  PUSH_ME = (r && r.me) || { on: false };
+  aaToast(r && r.ok ? 'Reminders are off' : 'That did not save');
+  openPushSettingsPage();
+}
+async function pushToggleKind(kind, on, input) {
+  const sb = await _sbReady();
+  const me = sb ? await AAPush.set(sb, { [kind]: !!on }) : null;
+  if (me) PUSH_ME = me;
+  else { if (input) input.checked = !on; aaToast('That did not save'); }
+}
+async function pushBumpHour() {
+  const h = ((PUSH_ME && PUSH_ME.hour) || 20) + 1;
+  const sb = await _sbReady();
+  const me = sb ? await AAPush.set(sb, null, h > 22 ? 8 : h) : null;
+  if (me) PUSH_ME = me; else aaToast('That did not save');
+  openPushSettingsPage();
+}
+
 function openCrewSettings() {
   const ov = document.getElementById('hist-overlay');
   if (!ov || !BELL) return;
@@ -12734,9 +12968,12 @@ function ceilHeadPlain(kick) {
   paintCover('ceil-board', 'ceil-line', null, '');
 }
 
-// A door row (Home's and Progress's look) for the one hand-entry door: "+ Log a max". `onclick` is what the tap does.
+// A door row (Home's and Progress's look) for the one hand-entry door. `onclick` is what the tap does.
+// It is named after the form it opens, with the prompt on the quiet line under it (Amir, 2026-10-19). It read
+// "Tested a lift?" over "+ Log a max": a question titling the action, with the action the louder of the two,
+// because the prose sat in the figure's slot (.hrow-v, 18 px bold) instead of .hrow-q.
 function ceilDoor(onclick) {
-  return `<button type="button" class="hrow ceil-door" onclick="${onclick}">${hrowIc('plus')}<span class="hrow-b"><span class="hrow-l">Tested a lift?</span><span class="hrow-v">+ Log a max</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+  return `<button type="button" class="hrow ceil-door" onclick="${onclick}">${hrowIc('plus')}<span class="hrow-b"><span class="hrow-l">Log a max</span><span class="hrow-q">Tested one in the gym? Add it here.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
 
 // Personal Records (the screen was called The Ceiling until 2026-09-26) — the cover (the best lift, the ratio to body weight,
@@ -18186,30 +18423,39 @@ async function restWake(on) {
 // A note in a box in the middle of the screen: one at a time, a button, gone by itself. It never dims or blocks the page, so the athlete
 // can keep logging with it showing. Used for a first-timer's note on the closed number, the empty-weight nudge and the clock offer,
 // each with its label (opts.kicker, the mint-dot eyebrow): How to log, No weight, Session clock.
-let _toastT = null, _toastRun = null;
+// opts: kicker · action + run (the filled button) · dismiss + off (what the second button says, and what a REAL tap on it does:
+// the box going for any other reason is not an answer) · pass · tone ('clay') · ms (0 = it stays until it is answered).
+let _toastT = null, _toastRun = null, _toastOff = null;
 function aaToast(text, opts) {
   const el = document.getElementById('aaToast');
   if (!el) return;
   opts = opts || {};
   _toastRun = opts.run || null;
+  _toastOff = opts.off || null;
   el.toggleAttribute('data-pass', !!opts.pass);
+  if (opts.tone) el.setAttribute('data-tone', opts.tone); else el.removeAttribute('data-tone');
   el.innerHTML = (opts.kicker ? '<div class="aa-toast-k"></div>' : '') + '<div class="aa-toast-t"></div><div class="aa-toast-row">' +
     (opts.action ? '<button type="button" class="aa-toast-go"></button>' : '') + '<button type="button" class="aa-toast-x"></button></div>';
   if (opts.kicker) el.querySelector('.aa-toast-k').textContent = opts.kicker;
   el.querySelector('.aa-toast-t').textContent = text;
   const go = el.querySelector('.aa-toast-go');
-  if (go) { go.textContent = opts.action; go.addEventListener('click', () => { const r = _toastRun; hideAaToast(); if (r) r(); }); }
+  if (go) { go.textContent = opts.action; go.addEventListener('click', () => { const r = _toastRun; _toastOff = null; hideAaToast(); if (r) r(); }); }
   const x = el.querySelector('.aa-toast-x');
   x.textContent = opts.dismiss || (opts.action ? 'Not now' : 'Got it');
-  x.addEventListener('click', hideAaToast);
+  x.addEventListener('click', () => { const f = _toastOff; hideAaToast(); if (f) f(); });
   el.hidden = false;
-  clearTimeout(_toastT);
-  _toastT = setTimeout(hideAaToast, opts.ms || 6000);
+  clearTimeout(_toastT); _toastT = null;
+  if (opts.ms !== 0) _toastT = setTimeout(hideAaToast, opts.ms || 6000);
 }
 function hideAaToast() {
-  clearTimeout(_toastT); _toastT = null; _toastRun = null;
+  clearTimeout(_toastT); _toastT = null; _toastRun = null; _toastOff = null;
   const el = document.getElementById('aaToast');
   if (el) el.hidden = true;
+}
+// Is the new-version box the one on the screen right now?
+function newVerShowing() {
+  const el = document.getElementById('aaToast');
+  return !!(el && !el.hidden && el.getAttribute('data-tone') === 'clay');
 }
 // A set ticked with an empty kg box records no weight (the 2026-09-26 rule), so there will be no Last time, History or Personal
 // Record for it. Say so, once the athlete can see it: a first-timer every time, a returning athlete once a session (per day, in memory).
@@ -20502,10 +20748,9 @@ function esc(str) {
 <!-- Shared helpers: VideoModal + A2HS prompt -->
 <script defer src="/assets/js/shared.js"></script>
 <script>
-  // Register service worker — keeps the installed app up to date automatically.
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-  }
+  // Register the service worker, and watch for the next one: when a bump takes the shell over,
+  // Home says "A new version of the app is ready" with a Reload (initVersionWatch(), 2026-10-19).
+  initVersionWatch();
   wrapSheetOpeners();   // the sheet's ‹ Back (SHEET-01)
   initSheetBars();      // its top row joins the page once it has scrolled
   // Back closes the top layer instead of leaving the app (NAV-01).

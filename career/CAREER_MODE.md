@@ -86,7 +86,7 @@ Crew = stage80 and the Monthly Open = stage81.
 **The new achievements are LIVE (2026-10-19)** (`supabase/stage79_career_achievements.sql`, rulebook version 5; `PROCEDURES.md` → *Stage 79*): 13 of
 the 15 (Smooth Operator and Showed Up Anyway left out, GAME-5), three new tests (`total`, `best_run`, `month_held`), and a quiet back-pay of 51 awards
 and 7,050 XP to 22 athletes, nobody down. Amir's word: "yes, go live with the 13 new achievements". **Four Courts and the finish-card nudge are LIVE** (program.html; its read,
-`get_achievements()`, is stage80, applied 2026-10-19 on "yes, go live with Four Courts": `PROCEDURES.md` → *Stage 80*). Crew = stage81, the Monthly Open = stage82. Crew took stage81 to stage83 (its own fixes), so **the Monthly Open is stage84**.
+`get_achievements()`, is stage80, applied 2026-10-19 on "yes, go live with Four Courts": `PROCEDURES.md` → *Stage 80*). Crew = stage81, the Monthly Open = stage82. Crew took stage81 to stage83 (its own fixes), so **the Monthly Open is stage85**.
 
 **Step 5, Crew and the Bell, is BUILT (2026-10-19), not applied** (`supabase/stage81_career_crew.sql`; `PROCEDURES.md` → *Stage 81*; the app:
 `PROGRAM-APP.md` → *Crew and the Bell*; coach.html: `COACH_DASHBOARD.md` → *The Bell*). Exactly Amir's picks below: one feed, the Clubhouse, kudos

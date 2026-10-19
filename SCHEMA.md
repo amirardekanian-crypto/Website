@@ -1070,7 +1070,7 @@ list requires is really there. coach.html doesn't edit notes cards, so the tags 
 `card.body` renders as **HTML, not escaped plain text** — write it as 2–4 short `<p>`
 paragraphs, and use a `<ul><li>` list for anything enumerable (rules, steps, a keep/cut/skip
 breakdown). Use `<strong>` to bold the one phrase per paragraph that matters most; `<em>` for
-light emphasis. This matches the "Using the app" guide cards' convention — don't write a
+light emphasis. This matches the "How the app works" guide cards' convention — don't write a
 single unbroken paragraph, it renders as one dense block with no visual structure.
 
 ```json

@@ -1109,7 +1109,7 @@ bytes the second**, with a wrong hash still sending the feed.
 
 Amir, 2026-10-19: *"irans internet is very slow, and cant download everything everytime they open the app. can we do this in a way that the
 images and messages arent downloaded again? and then new images arent downloaded unless some one opens the crew?"*.
-⚠️ **The Monthly Open moves to stage84.**
+⚠️ **The Monthly Open moves to stage85.**
 
 Three things answer him, and only the first is a stage:
 1. **`supabase/stage83_crew_if_new.sql`**: `get_bell_if_new(p_athlete_id, p_etag)` **calls** `get_bell()` (so there is one copy of the rules),
@@ -1143,7 +1143,7 @@ with your picks"* and changed L9 himself the same day, so nothing here waited on
 - **What it is:** one challenge at a time, any kind he designs, open in every week (the back-off week included). A result counts only when **he**
   confirms it from the clip on WhatsApp; nothing of the clip is stored and **the app has no write at all**. The board is ranked by the result,
   `better` (high or low) saying which way wins.
-- **Two tables** (`supabase/stage84_crew_open.sql`): `crew_open` (title, how, unit, better, opened_on, closed_at — it names nobody) and
+- **Two tables** (`supabase/stage85_crew_open.sql`): `crew_open` (title, how, unit, better, opened_on, closed_at — it names nobody) and
   `crew_open_results` (open, athlete, value, day; one row per athlete per challenge, typing a better one replaces it). Coach-readable so the backup is
   complete, nobody writing directly. **Both are IN `BACKUP_TABLES`**, unlike Crew's posts: a result is a record worth months, a handful of rows, and
   the one thing here that could not be rebuilt from anything else. `crew_open_results` is in `coach_erase_person()`'s list and the schema snapshot.
@@ -1183,5 +1183,5 @@ with your picks"* and changed L9 himself the same day, so nothing here waited on
   to `BACKUP_TABLES` in coach.html** and remake the schema snapshot, both in the same commit — the list and the snapshot must agree
   (`scripts/test_restore_backup.py` check 1h fails otherwise, which is why the list could not be changed before the apply); (3) set the first
   challenge in coach.html → Proof → The Monthly Open.
-- **The way back**: `scripts/career/rollback_stage84.sql` — it undoes both patches, drops the five and the read, and drops the two tables LAST,
+- **The way back**: `scripts/career/rollback_stage85.sql` — it undoes both patches, drops the five and the read, and drops the two tables LAST,
   which is the one step that loses what Amir confirmed.

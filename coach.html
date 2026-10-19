@@ -658,7 +658,7 @@
   .bell-p .off { font-size: 12px; color: var(--muted); }
   .bell-u13 { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
 
-  /* ── The Monthly Open (stage84): the one challenge Amir sets, the results he confirms, the board the crew sees (Proof, under Who said yes). ── */
+  /* ── The Monthly Open (stage85): the one challenge Amir sets, the results he confirms, the board the crew sees (Proof, under Who said yes). ── */
   .open-title { font-size: 17px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
   .open-how { margin-top: 4px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-line; }
   .open-facts { margin-top: 4px; }
@@ -1737,7 +1737,7 @@ const S = {
   callLogs: {},    // athlete_id -> rows (fetched on detail)
   court: null,     // Courtside (stage75): { on, week, rows, err }; on is false while the server has no get_courtside() (loadCourt())
   bell: null,      // The Bell (stage81): { on, posts, people, rings, err, at }; on is false while the server has no coach_crew() (loadBell())
-  open: null,      // The Monthly Open (stage84): { on, open, results, past, crew, err, at }; on is false while the server has no coach_open() (loadOpen())
+  open: null,      // The Monthly Open (stage85): { on, open, results, past, crew, err, at }; on is false while the server has no coach_open() (loadOpen())
   honours: null,   // the month just gone: coach_honours()'s answer (frozen rows, or the live work and the Pick's shortlist)
   goals: {},       // athlete_id -> { 'YYYY-MM-01': career_goals row }
   amirNotes: {},   // athlete_id -> career_notes rows ("From Amir", one a day)
@@ -2190,9 +2190,16 @@ const BACKUP_TABLES = [
   // (crew_posts, crew_photos, crew_kudos, crew_rings) are left OUT on purpose: they are deleted after 7 days, and a backup kept 12 weeks
   // would break that promise in privacy.html 2.12 (SHORT_LIVED in scripts/restore/restore_backup.py; test_restore_backup.py check 2h).
   'crew_consent',
-  // ⚠ The Monthly Open (stage84) is the other way round: a challenge and the results Amir confirmed are a RECORD, not a post. They are not deleted
+  // Reminders (stage84): the phones that asked for one, so a restore does not cost every athlete the
+  // single notification permission their browser gives. push_sent is only a ledger of what went out
+  // today and rebuilds itself by not sending twice; push_config holds the VAPID private key and the
+  // sender's shared secret, and a backup file on this PC carrying those is worse than losing them
+  // (losing them is recoverable: a new pair, and each app re-subscribes silently, because the
+  // PERMISSION is already granted and only the key changes). Both are left out on purpose.
+  'push_subs',
+  // ⚠ The Monthly Open (stage85) is the other way round: a challenge and the results Amir confirmed are a RECORD, not a post. They are not deleted
   // after 7 days, they are months of work in a handful of rows, and nothing else could rebuild them. So the Open's two tables are ADDED HERE the
-  // day stage84 is applied, in the same commit as the new schema snapshot (test_restore_backup.py check 1h holds the two equal, and it reads the
+  // day stage85 is applied, in the same commit as the new schema snapshot (test_restore_backup.py check 1h holds the two equal, and it reads the
   // quoted names out of this block, so do not write a table name in quotes in a comment).
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
@@ -7014,20 +7021,20 @@ async function bellSetUnder13(id, on) {
 window.loadBell = loadBell; window.bellPost = bellPost; window.bellPick = bellPick; window.bellDropPhoto = bellDropPhoto;
 window.bellShowPhoto = bellShowPhoto; window.bellHidePhoto = bellHidePhoto; window.bellRemove = bellRemove; window.bellUnder13 = bellUnder13;
 
-// ── The Monthly Open (stage84; Career Mode round 5, the last step of plan A; Amir 2026-10-19: "for crew and the open go with your picks") ──────────────────
+// ── The Monthly Open (stage85; Career Mode round 5, the last step of plan A; Amir 2026-10-19: "for crew and the open go with your picks") ──────────────────
 // One challenge at a time, any kind Amir designs (not only the six tennis tests). On the athletes' Crew tab it is a card under the feed, with a board ranked by
 // the result. Athletes send the clip on WhatsApp and NOTHING is stored: the board holds only what Amir types in here. This panel (Proof, under Who said yes)
 // shows the live challenge, sets or corrects it (coach_open_set), confirms a result (coach_open_result; typed again, it replaces the first), takes one off
 // (coach_open_remove) and closes the challenge (coach_open_close). Taking a result off and closing ask first, and so does starting a new challenge over an open
 // one (it closes that one). All five answer coach_open()'s shape, {open, results, past, crew, at}, so the panel is drawn from whatever a write returns and
-// costs no second read. While the server has no coach_open() (stage84 not applied), or answers nothing at all, the page draws nothing and shows no warning, as
+// costs no second read. While the server has no coach_open() (stage85 not applied), or answers nothing at all, the page draws nothing and shows no warning, as
 // the Bell does; any other failure shows the panel with the reason and Try again. The board is the crew's: places are worked out among crew members only,
 // so they are the places the athletes see. A result can be confirmed for any COACHED athlete the dashboard shows (not the demo, not Amir's own identity, not a
 // former athlete, and only one with a programme: the server refuses anyone else), not only the crew; the picker marks who is in the crew. A free athlete is never
 // offered: Crew is a tab in the coached app only, so they could never see the challenge or their own result (anyone the crew list names stays offered, whatever
 // their tier, so a result already recorded can be corrected). A result for someone who is not in the crew stays off the board and shows only to that athlete,
 // in their own app, so it is listed after the board with a quiet mark and no place.
-// The Open pays no XP (GAME-6). Not in BACKUP_TABLES until stage84 is applied (see COACH_DASHBOARD.md).
+// The Open pays no XP (GAME-6). Not in BACKUP_TABLES until stage85 is applied (see COACH_DASHBOARD.md).
 const OPEN_ERRS = [   // [a part of the server's message, plain words]
   ['the challenge needs a name', 'Give the challenge a name first (up to 60 characters).'],
   ['no challenge is open', 'No challenge is open any more, so nothing was changed. The panel is reloading.'],
@@ -7048,7 +7055,7 @@ let _openForm = null;                  // null = no form; { id: null } = a new c
 let _openDraft = openBlank();          // what is typed in the challenge form
 let _openRes = { athlete: '', value: '', day: '' };   // what is typed in the result form
 let _openBusy = false, _openSeq = 0, _openFormKey = '';
-// The server has no stage84 yet: the function is not there. Anything else is a real error and is said.
+// The server has no stage85 yet: the function is not there. Anything else is a real error and is said.
 const openMissing = res => !!res && !!res.error && (res.status === 404 || courtMissing(res.error)
   || (/coach_open/.test(res.error.message || '') && /does not exist|could not find|not found/i.test(res.error.message || '')));
 const openValid = d => !!d && typeof d === 'object' && !Array.isArray(d) && Array.isArray(d.results);
@@ -7086,7 +7093,7 @@ async function loadOpen() {
   const seq = ++_openSeq;
   const res = await sb.rpc('coach_open');
   if (seq !== _openSeq) return;
-  // Not there (stage84 not applied) or an answer with nothing in it: no panel and no warning.
+  // Not there (stage85 not applied) or an answer with nothing in it: no panel and no warning.
   if (openMissing(res) || (!res.error && !openValid(res.data))) { S.open = { on: false }; LOAD_ERR.open = ''; paintOpen(); return; }
   if (res.error) { S.open = { on: true, err: res.error.message || 'no answer', open: null, results: [], past: [], crew: [], at: new Date() }; LOAD_ERR.open = S.open.err; paintOpen(); return; }
   setOpen(res.data);
@@ -9970,7 +9977,7 @@ async function boot() {
     $('content').innerHTML = `<p class="empty">Could not load the dashboard: ${esc(e.message)}</p>`; return;
   }
   render();
-  // Server-scored levels fill in behind the first paint; so do Courtside (stage75), the Bell (stage81) and the Monthly Open (stage84).
+  // Server-scored levels fill in behind the first paint; so do Courtside (stage75), the Bell (stage81) and the Monthly Open (stage85).
   loadLevels().then(() => { if (S.ready) paintLevels(); });
   loadCourt();
   loadBell();

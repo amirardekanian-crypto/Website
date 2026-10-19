@@ -87,6 +87,9 @@
      loads the same version from jsDelivr: bump all three together (a NEW file name), with scripts/headless/coach/reallib.js and
      scripts/headless/signin.js run first. -->
 <script defer src="/assets/js/supabase-2.117.3.js" onerror="window.SB_FAILED=true"></script>
+<!-- Reminders on the phone (stage84). One copy, shared with program.html: the two apps are one
+     website, with one service worker and one notification permission between them. -->
+<script defer src="/assets/js/push.js?v=1"></script>
 <style>
   /* ── Tokens ────────────────────────────────────────────────────────────
      PROOF's modernist structure on the AA Performance palette (the "green
@@ -1829,6 +1832,28 @@
   #app .savexp { margin-left: 10px; background: rgba(255,255,255,0.18); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; color: #B7F0E4; }
   #app .toast { border-radius: 20px; background: #231F35; color: #F6F4FF; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; text-transform: none; letter-spacing: 0; box-shadow: 0 14px 30px -16px rgba(35,31,53,0.7); }
   .demo-banner { background: var(--accent); color: #fff; font-family: 'Outfit', sans-serif; letter-spacing: 0.08em; }
+
+  /* A new version of the app is ready (2026-10-19; Amir picked the note box from three, "lets go with C but in ckay"):
+     the box in the middle of the screen, in clay, never dimming the page, with Reload and Not now. It stays until one
+     of them is tapped. Above the sheet (90) and the toast (95), under the tour (150) and a takeover (200). Never in the
+     embed. --clay-deep inverts between the themes and --on-clay with it, so both stay 4.5:1 or better. */
+  .newver { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 96;
+    width: min(86%, 320px); box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;
+    padding: 20px 18px 16px; border-radius: 20px; background: var(--clay-deep); color: var(--on-clay);
+    font-family: 'Outfit', sans-serif; box-shadow: 0 18px 44px -18px rgba(0,0,0,0.55); animation: nvIn .22s ease; }
+  /* Its OWN keyframe: riseIn ends on `transform: none`, which would throw the box's centring away for the whole
+     animation and drop it in 81 px low. */
+  @keyframes nvIn { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+  .newver .nv-k { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.86; }
+  .newver .nv-k::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .newver .nv-t { font-weight: 600; font-size: 15px; line-height: 1.4; }
+  .newver .nv-row { display: flex; gap: 10px; }
+  .newver button { min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; cursor: pointer;
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.02em; }
+  .newver .nv-go { background: var(--on-clay); color: var(--clay-deep); }
+  .newver .nv-x { background: transparent; color: var(--on-clay); box-shadow: inset 0 0 0 1.5px currentColor; }
+  .newver button:focus-visible { outline: 2px solid var(--on-clay); outline-offset: 2px; }
 
   /* XP flight */
   .xpfly > i { border-radius: 999px; background: var(--teal, #35D0BA); color: #0C4B43; font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: 0.02em; }
@@ -3676,6 +3701,9 @@ const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, to
              // The weigh-in sheet: the day being weighed (null = closed), and the
              // number as a STRING, because it is bound to a real input and a
              // half-typed "7" must survive until the second digit arrives.
+             // A new version of the app has taken this page's shell over (swTookOver()): one row
+             // under the header until it is tapped. Never set in the embed.
+             newver: false,
              wtSheet: null, wtVal: '' };
 let _toastTimer = null, _flashTimer = null, _confirmOnTimer = null;
 
@@ -8827,7 +8855,8 @@ function renderApp() {
     // No XP, no rank, no streak in this header on purpose — it is the one
     // screen in the app that is not scoring anything.
     // Settings is a list of doors, so its header names the door you are behind.
-    settings: UI.sub === 'habits'     ? ['Settings', 'Your habits']
+    settings: UI.sub === 'reminders'  ? ['Settings', 'Reminders']
+            : UI.sub === 'habits'     ? ['Settings', 'Your habits']
             : ['Day ' + dayNumber() + (CAREER_LIGHT ? '' : ' · ' + LI.label), 'You']   // CAREER_LIGHT: no rank name
   };
   const rights = {
@@ -8916,7 +8945,15 @@ function renderApp() {
     ${UI.share ? renderShareSheet() : ''}
     ${UI.install ? renderInstall() : ''}
     ${UI.toast && !UI.celebrate.length ? `<div class="toast${UI.sheet || UI.share || UI.install ? ' over' : ''}" data-k="toast">${esc(UI.toast)}</div>` : ''}
-    ${UI.celebrate.length ? renderCelebration(UI.celebrate[0]) : ''}`;
+    ${UI.celebrate.length ? renderCelebration(UI.celebrate[0]) : ''}
+    ${UI.newver ? `<div class="newver" data-k="newver" role="status">
+      <div class="nv-k">New version</div>
+      <div class="nv-t">A new version of the app is ready</div>
+      <div class="nv-row">
+        <button class="nv-go" data-k="nv-go" ${on(reloadNewVersion)}>Reload</button>
+        <button class="nv-x" data-k="nv-x" ${on(dismissNewVersion)}>Not now</button>
+      </div>
+    </div>` : ''}`;
 }
 function greeting() {
   const h = new Date().getHours();
@@ -9514,6 +9551,7 @@ function renderToday(LI, doneCount) {
            coached athlete's programme card went: the session row and Settings both open the programme. -->
       ${renderLibOffer()}
       ${renderBoardNotice()}
+      ${pushAskRow()}
       ${qrun ? questLine(qrun) : ''}
 
       ${past || CFG.toured ? '' : `
@@ -10771,6 +10809,7 @@ function renderManual() {
       ${block(h2('Your data') +
         p(`Everything is saved to your phone the moment you tap it, then synced to your coach when you have a connection. Losing signal, closing the app or flying somewhere loses nothing.`) +
         p(`<strong style="color:var(--ink)">You sign in with the username and password I sent you.</strong> Put the app on your home screen and it stays signed in. Forget the password and nothing is lost: ask me for a new one and your whole history is still there.`) +
+        p(`When I update the app, an orange note says <strong style="color:var(--ink)">A new version of the app is ready</strong>. Tap <strong style="color:var(--ink)">Reload</strong> and it loads in a second, or <strong style="color:var(--ink)">Not now</strong> to put it away. You don't have to close it from your phone and open it again.`) +
         p(`Your coach can see your habits, and your weight if you switched that on, as part of coaching you. Other athletes never see either: on the leaderboard they see only ${light ? 'your name and points' : 'your name, points, rank and title'}.`) +
         (isFree()
           ? p(`You signed up for this without a programme, so the only other things held about you are the <strong style="color:var(--ink)">email and number you gave</strong>, used to send you your sign-in and nothing else. Ask and it is all deleted, log included. The full notice is at <strong style="color:var(--ink)">amirardekani.com/privacy.html</strong>.`)
@@ -12209,7 +12248,127 @@ function navRow(icon, name, sub, right, handler, cls, attrs) {
 }
 function navVal(text) { return `<span class="navval">${esc(text)}</span>`; }
 
+// ── Reminders (stage84, 2026-10-19) ──────────────────────────────────────────
+// Amir: "the push should be automatically on, unless they want to turn off in their app settings."
+// Every kind is on from the moment the phone allows it, and Settings -> Reminders turns them off.
+//
+// ⚠️ The phone's own permission box CANNOT be skipped: Apple and Google both require the athlete's
+// own tap, and no app of any kind can turn notifications on for someone. So "automatically on" is
+// built as: no question about whether they want reminders, one line saying what will arrive, their
+// tap, and then everything on. The line matters because the box can only be shown ONCE per phone for
+// this whole website — a "Don't allow" is permanent until they dig into browser settings, and it
+// would take the training app's reminders with it.
+let PUSH_ME = null;        // what the server has, from push_me(); null until it answers
+
+function pushReady() {
+  return !window.IS_EMBED && !window.IS_DEMO && !window.IS_PREVIEW && !!window.AAPush && !!_sb() && !!athleteId();
+}
+
+// One slim row on Today, while this phone could have reminders and has not been asked.
+function pushAskRow() {
+  if (!pushReady() || editingPast()) return '';
+  const st = AAPush.state();
+  if (st !== 'off') return '';          // on, blocked, unsupported or needs-install: Settings says what to do
+  if (AAPush.asked()) return '';        // shown once; Settings keeps it available for ever
+  return `<button class="rcprompt" data-k="pushask" ${on(() => pushTurnOn())}>
+    <span>
+      <span class="eyebrow">Reminders</span>
+      <span class="rcq">A nudge at the end of the day, so you don't forget to log. Tap to let your phone show it.</span>
+    </span>
+    <span class="hd" style="font-size:20px;color:var(--accent);flex:none">→</span>
+  </button>`;
+}
+
+async function pushTurnOn() {
+  const sb = _sb();
+  if (!sb || !window.AAPush) return;
+  AAPush.markAsked();
+  const r = await AAPush.enable(sb, 'proof', 'en');
+  if (r && r.ok) { PUSH_ME = r.me || PUSH_ME; toast('Reminders are on'); }
+  else if (r && r.state === 'blocked') toast('Your phone said no. You can undo that in its settings.');
+  else if (r && r.state === 'needs-install') toast('Add the app to your Home Screen first');
+  else toast('That did not work. Try again later.');
+  render();
+}
+
+let _pushLoading = false;
+// Asked for once, the first time Settings is drawn with a phone that could have reminders. It is a
+// server read, so it never blocks a paint: the panel draws "Off" and redraws itself when the answer
+// lands. Not on boot, because most opens never go near Settings.
+function pushLoadMe() {
+  if (!pushReady() || _pushLoading || PUSH_ME !== null) return;
+  _pushLoading = true;
+  AAPush.me(_sb()).then(me => {
+    PUSH_ME = me || { on: false };
+    if (UI.screen === 'settings') render();
+  }).catch(() => { PUSH_ME = { on: false }; });
+}
+
+const PUSH_KINDS = [['habits', 'Log your habits', 'One a day, at the hour you pick'],
+                    ['workout', 'Train', 'When you have not trained for a couple of days'],
+                    ['crew', 'The crew', 'When Amir posts, or someone cheers you'],
+                    ['cycle', 'A new cycle', 'When Amir publishes your next one']];
+const PUSH_ICON = { habits: '✅', workout: '🏋', crew: '🔔', cycle: '🗓' };
+
+function renderSettingsReminders() {
+  const st = window.AAPush ? AAPush.state() : 'unsupported';
+  const me = PUSH_ME, live = st === 'on' && me && me.on;
+  const hour = (me && me.hour) || 20;
+  const rows = live ? PUSH_KINDS.map(k => `
+      <button class="navrow" ${on(() => pushToggleKind(k[0]))} role="switch" aria-checked="${AAPush.kindOn(me, k[0])}">
+        <span class="navtile" aria-hidden="true">${PUSH_ICON[k[0]]}</span>
+        <span class="navmid"><span class="navnm">${esc(k[1])}</span><span class="navsub">${esc(k[2])}</span></span>
+        <span class="sw ${AAPush.kindOn(me, k[0]) ? 'on' : ''}"><i></i></span>
+      </button>`).join('') : '';
+  const note = st === 'unsupported' ? 'This phone or browser cannot show notifications.'
+    : st === 'needs-install' ? 'On an iPhone, add the app to your Home Screen first, then open it from there. Notifications only work once it is installed.'
+    : st === 'blocked' ? 'Your phone is blocking notifications for this site. Nothing here can undo that: open your browser settings, allow notifications for amirardekani.com, then come back.'
+    : !live ? 'Off. Turn them on and you get one nudge at the end of the day, nothing else.'
+    : 'On. Nothing before 8am or after 10pm, and never more than two in a day.';
+  return `
+    <div data-k="screen:settings:reminders" style="${screenAnim()}">
+      ${sectionLabel('Reminders')}
+      <div class="setnote">${note}</div>
+      ${st === 'off' || (st === 'on' && !live) ? `<div class="cardgrp">
+        ${navRow('🔔', 'Turn reminders on', 'One a day, at the hour you pick', '', () => pushTurnOn())}
+      </div>` : ''}
+      ${live ? `
+      <div class="cardgrp">${rows}</div>
+      ${sectionLabel('When')}
+      <div class="cardgrp">
+        ${navRow('🕗', 'Time of day', 'Tap to move it an hour. Between 8am and 10pm.',
+                 navVal(String(hour).padStart(2, '0') + ':00'), () => pushBumpHour())}
+      </div>
+      ${me && me.phones > 1 ? `<div class="setnote">It applies to all ${me.phones} of your phones.</div>` : ''}
+      <div class="cardgrp">
+        ${navRow('🚫', 'Turn them all off', 'Your phone keeps the permission, so you can turn them back on here', '',
+                 () => pushTurnOff())}
+      </div>` : ''}
+    </div>`;
+}
+
+async function pushToggleKind(k) {
+  const now = AAPush.kindOn(PUSH_ME, k);
+  const me = await AAPush.set(_sb(), { [k]: !now });
+  if (me) PUSH_ME = me; else toast('That did not save');
+  render();
+}
+async function pushBumpHour() {
+  const h = ((PUSH_ME && PUSH_ME.hour) || 20) + 1;
+  const me = await AAPush.set(_sb(), null, h > 22 ? 8 : h);
+  if (me) PUSH_ME = me; else toast('That did not save');
+  render();
+}
+async function pushTurnOff() {
+  const r = await AAPush.disable(_sb());
+  PUSH_ME = (r && r.me) || null;
+  toast(r && r.ok ? 'Reminders are off' : 'That did not save');
+  render();
+}
+
 function renderSettings() {
+  pushLoadMe();   // fills PUSH_ME the first time; redraws itself when it lands
+  if (UI.sub === 'reminders')  return renderSettingsReminders();
   if (UI.sub === 'habits')     return renderSettingsHabits();
   if (UI.sub === 'appearance') return renderSettingsAppearance();
 
@@ -12259,6 +12418,10 @@ function renderSettings() {
           <span class="navmid"><span class="navnm">Tick sound</span><span class="navsub">A short blip when you tick something.</span></span>
           <span class="sw ${CFG.sound ? 'on' : ''}"><i></i></span>
         </button>
+        ${pushReady() && AAPush.state() !== 'unsupported' ? navRow('🔔', 'Reminders',
+                 'A nudge at the end of the day',
+                 navVal(AAPush.state() === 'on' && PUSH_ME && PUSH_ME.on ? 'On' : 'Off'),
+                 () => goSub('reminders')) : ''}
         ${installable() ? navRow('📱', 'Install on your phone',
                  'Open it in one tap, and keep it working with no signal', '',
                  () => { UI.install = true; render(); }) : ''}
@@ -12565,6 +12728,61 @@ function showError(msg, opts) {
   if (a) a.innerHTML = opts.actions || '';
   document.getElementById('error').classList.add('on');
 }
+
+// ── A NEW VERSION IS READY (2026-10-19) ────────────────────────────────────
+// The same thing program.html does, in AA Proof's own look, and for the same
+// reason: an installed app left in the background keeps the OLD page in memory,
+// and Amir had to tell athletes by hand to close it and open it again. sw.js
+// takes the shell over the moment a CACHE bump deploys, so a cold open is
+// already the new version; a page that is only resumed is not, until it reloads.
+//   · The signal is `controllerchange`: a NEW worker claimed this page. A first
+//     install fires it too, with nothing stale behind it, so it counts only when
+//     this page already had a worker when it loaded (_hadWorker).
+//   · An app resumed from the background never navigates, so nothing asks for a
+//     fresh sw.js unless swCheck() does, at most once every SW_CHECK_MS.
+//   · The look is the note box in the middle of the screen, in clay (Amir picked it
+//     from three, 2026-10-19). It never dims the page and never hides itself: it
+//     stays until Reload or Not now.
+//   · ⛔ NEVER IN THE EMBED (habits.html?embed=1 on the training app's Home).
+//     The iframe is a client of the same worker at scope '/', so it is claimed
+//     and controllerchange fires there too, but a reload from inside it would
+//     reload the wrong document and the line would sit in the habit strip. The
+//     training app shows its own line on the page that owns the reload.
+//   · Not in the demo or the coach's preview either.
+// ⚠️ program.html carries the same three functions. Change both.
+const SW_CHECK_MS = 20 * 60 * 1000;
+let _swReg = null, _swChecked = 0, _newVerDone = false;
+// Read once, while this page loads, and never written again by the app (the headless suite sets it).
+let _hadWorker = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+
+function versionWatchOff() { return !!(window.IS_EMBED || window.IS_DEMO || window.IS_PREVIEW); }
+
+function swTookOver() {
+  if (UI.newver || _newVerDone || !_hadWorker || versionWatchOff()) return;
+  UI.newver = true;
+  render();
+}
+function reloadNewVersion() { location.reload(); }
+// Not now: away for this run only. The next open is the new version anyway, so nothing is lost by it.
+function dismissNewVersion() { _newVerDone = true; UI.newver = false; render(); }
+
+function swCheck() {
+  if (!_swReg || document.visibilityState !== 'visible') return;
+  if (Date.now() - _swChecked < SW_CHECK_MS) return;
+  _swChecked = Date.now();
+  try { _swReg.update(); } catch (e) { /* the next nudge tries again */ }
+}
+
+function initVersionWatch() {
+  if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
+  if (versionWatchOff()) return;      // the embed registers nothing and watches nothing
+  navigator.serviceWorker.addEventListener('controllerchange', swTookOver);
+  // This navigation already made the browser check sw.js, so the clock starts now.
+  navigator.serviceWorker.register('/sw.js').then(reg => { _swReg = reg; _swChecked = Date.now(); }, () => {});
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') swCheck(); });
+  window.addEventListener('online', swCheck);
+}
+
 (async function boot() {
   const params = new URLSearchParams(window.location.search);
   let clientId = params.get('client');
@@ -12824,7 +13042,9 @@ function showError(msg, opts) {
     CFG.installAsked = true; saveCfg();
     render();                       // drops the Settings row — it has no job now
   });
-  if (!window.IS_EMBED && 'serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
+  // Register the service worker, and watch for the next one: when a bump takes the shell
+  // over, one row says "A new version of the app is ready" with a Reload (2026-10-19).
+  initVersionWatch();
 })();
 </script>
 </body>

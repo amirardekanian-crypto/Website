@@ -76,7 +76,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
   D20 locks); each paying badge award that left is an `award_kept` fact with its XP on its day (`"proof": true` for AA Proof's, which `career_compare()` reads).
   The Upgrade left with it: Double Up alone carries the main-lift rule. A removed badge id never comes back (`tiers.lock.json` `"_removed"`, checker rule 21).
   **Step 3, the light screens, is LIVE (2026-10-19)**: the athlete's own read of Courtside is `supabase/stage77_career_my_moments.sql` (applied); program.html shows the level with no rank, Your numbers and Your moments on Progress, New from Amir and one Career row on Home (`PROGRAM-APP.md` → *Career, the lightest version*); AA Proof's career screens are off (`HABITS.md` → *Career screens off*). The four marks the app names are `careerMarks()`, held to `career/badges.toml` by `check_career.py` rule 23. Share cards get their own design pass later (Amir: *"the cards are very important part of this app, because we want to use it to advertise our brand"*).
-  **The lightest version, decided 2026-10-20, steps 1 to 4 live (the cut 2026-10-19) and the 13 new achievements (stage79, rulebook version 5, 2026-10-19); Four Courts live (stage80); Crew with the Bell LIVE (stages 81 to 83, applied 2026-10-19); **the Monthly Open BUILT (stage84, waits for Amir's yes; `PROCEDURES.md` → *Stage 84*), which is the last build step of plan A** — then the share cards get their own careful design pass** (`career/CAREER_MODE.md` → *Round 5*, decisions L1 to L11): one app for coached athletes (AA Performance, tabs Home · Progress · Library · Crew · Coach); athletes see a level with no rank, the four numbers, moments (the four numbers' marks and the achievements), a simple monthly goal, the crew (the Monthly Open, honours, the Bell) and Amir (Courtside); badges, ranks, titles, the Grand Slam, the level road and card skins are removed, **from the server too** (Amir's word), once no app reads them. D20 comes first; until the cut ships, the live system is exactly as built above.
+  **The lightest version, decided 2026-10-20, steps 1 to 4 live (the cut 2026-10-19) and the 13 new achievements (stage79, rulebook version 5, 2026-10-19); Four Courts live (stage80); Crew with the Bell LIVE (stages 81 to 83, applied 2026-10-19); **the Monthly Open BUILT (stage85, waits for Amir's yes; `PROCEDURES.md` → *Stage 84*), which is the last build step of plan A** — then the share cards get their own careful design pass** (`career/CAREER_MODE.md` → *Round 5*, decisions L1 to L11): one app for coached athletes (AA Performance, tabs Home · Progress · Library · Crew · Coach); athletes see a level with no rank, the four numbers, moments (the four numbers' marks and the achievements), a simple monthly goal, the crew (the Monthly Open, honours, the Bell) and Amir (Courtside); badges, ranks, titles, the Grand Slam, the level road and card skins are removed, **from the server too** (Amir's word), once no app reads them. D20 comes first; until the cut ships, the live system is exactly as built above.
 - `FARSI-PRODUCTS.md` — the paid course app (`/tennis/app/`), the testing app's page and the Farsi
   product pages: how they are built, deployed and introduced.
 - `PROGRAM-APP.md` — the athlete app's programme features in full (rx, week notes, the Spine, the Quality
@@ -414,6 +414,20 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   and an athlete Amir ticks under 13 reads only. A new crew table goes into `coach_erase_person()` and the snapshot the same day.
   **Kudos is a Like** (Amir, 2026-10-19), with **🔥 💪 👏 😍** beside it (stage82, live 2026-10-19) (`crew_emoji_list()`; the app draws them only
   while `get_bell()` hands over the list, so it degrades to the Like alone). One reaction per person: another emoji swaps it.
+- **A CACHE bump tells the athletes by itself** (Amir, 2026-10-19: *"every time there is a change in the app, and
+  its updated, i want everyone to be notified to close their app from background and re open it. i dont know how
+  to make this a rule or a memory"*; `PROGRAM-APP.md` → *A new version is ready*). **There is no rule to remember:
+  the code is the rule.** An installed app left in the background keeps the OLD page until it reloads, so both
+  apps watch `navigator.serviceWorker` for `controllerchange` (`initVersionWatch()`, `swTookOver()`) and say
+  **"A new version of the app is ready"** with **Reload** and **Not now** — the note box in the middle of the
+  screen, **in clay** (Amir picked it from three, 2026-10-19: *"lets go with C but in ckay"*). It never hides
+  itself: program.html is `aaToast()` with the new `tone: 'clay'` and `ms: 0` (a note that stays until it is
+  answered) from `paintNewVersion()`, AA Proof the same box in its own look (`UI.newver`). A **first install** says nothing
+  (`_hadWorker`), nothing is said **mid-session** (the line waits and lands when the session is over), and the
+  whole thing stands down in the **embed**, the demo and the coach's preview (`versionWatchOff()`): the embed's
+  iframe is a client of the same worker, so a reload there would reload the wrong document. An app resumed from
+  the background never navigates, so `swCheck()` asks for a fresh `sw.js` on the foreground and on `online`, at
+  most once every 20 minutes. Five functions, one set per app: change both. `node scripts/headless/new-version.js`.
 - **Dark mode is the athlete's choice** (Amir, 2026-09-27: *"Let the client choose dark mode"*): both apps start
   light and switch only on the athlete's tap; neither follows the phone's setting.
 - **Clay means "look here"** (DS-01, Amir 2026-09-27; `PROGRAM-APP.md` → *Clay means look here*): the Coach's note,
@@ -468,6 +482,9 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   keeps 9, on purpose.
 - **Back closes the top layer here too** (NAV-01): `topLayer()` reads `UI`, `render()` ends with `navSync()`.
   **Never in the embed**: the iframe's history is the training app's, so it would steal that app's Back.
+- **A new version says so here too** (2026-10-19, the rule above): `swTookOver()` sets `UI.newver` and one clay
+  row under the header offers **Reload**. ⛔ **Never in the embed**: the iframe is a client of the same worker, so
+  a reload from inside it would reload the training app's Home, not AA Proof.
 - **Embedded (`?embed=1`, on the training app's Home) Proof only logs today** through its own doors;
   `checkLevelUps()`, the reward baseline, the tour, the install offer and the board sweep all stand down there,
   so every level-up and reward still gets its takeover in the full app (`HABITS.md` → *Embedded…*).
@@ -483,6 +500,49 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
 - Quest weeks are a lever Amir pulls from coach.html → Today (`QUESTS.md`); a new season starts only on
   his word, with `start_season()` (`HABITS.md` → Seasons). Body weight lives in `program.html` (above);
   the backtick guard is at the end of this file.
+
+## Reminders on a phone (stage84, LIVE 2026-10-19)
+
+Amir: *"im just talking about notifications we can send on peoples phone, when they have installed the
+app on their phone"*, then *"this is supposed to be a reminder, about their habits / and another
+reminder about their workout"*, then *"the push shoould be automatically on, unless they want to turn
+off in their app settings"*. Two reminders, both opt-out once the phone allows them.
+
+- **⚠️ ONE PERMISSION PER WEBSITE, AND ONLY ONE CHANCE.** amirardekani.com has a single notification
+  permission shared by `program.html`, `habits.html` and `/pushtest/`. A **"Don't allow" is permanent**
+  until the athlete digs into browser settings, and it takes BOTH apps with it. Nothing may ever fire
+  the browser's box without a line of context first; that is why "automatically on" is built as *no
+  question about whether they want reminders*, one line, their tap, then every kind on.
+- **The phone's box cannot be skipped by anyone.** Apple and Google both require the athlete's own tap.
+  No app of any kind can turn notifications on for someone, and no amount of design changes that.
+- **iPhone needs iOS 16.4+ AND the app on the Home Screen.** In Safari itself `AAPush.state()` is
+  `needs-install` and the app says so instead of showing a button that cannot work.
+- **`assets/js/push.js` is ONE copy, loaded by both apps**, because the two apps are one website with
+  one service worker and one permission between them. It never runs in the embedded Proof strip.
+- **The decision lives in SQL, not the sender**: `public.push_due()` says who is due, which kind, in
+  which language and with what words; `push-send` only carries it. That is what the rehearsal can run.
+- **Quiet hours are a CHECK on the column** (`hour between 8 and 22`), not a rule in code: no settings
+  bug can wake anybody at three in the morning.
+- **A kind nobody switched is ON**, the same rule `crew_consent` uses, so a kind added later is on for
+  everyone who already said yes. `kinds` already carries `crew` and `cycle` for the next stage.
+- **⚠️ Every send needs a short TTL.** Firebase keeps an undelivered message for **four weeks** by
+  default, so a 20:00 reminder would otherwise arrive at three in the morning a week later. `push_due()`
+  returns 7200 on every row and the sender must pass it.
+- **A reminder never carries** a weight, reps, an RPE, a check-in answer, pain, body weight or which
+  habits were missed: a lock screen is read by whoever picks the phone up.
+- **The keys live in `public.push_config`**, not in Edge Function secrets, so the hourly job and the
+  sender cannot disagree. That table is deliberately **out of** `BACKUP_TABLES` (a backup file holding
+  the VAPID private key is worse than losing it; losing it is recoverable, because each app
+  re-subscribes silently once the permission already stands). `push_subs` IS backed up, for the
+  opposite reason: a restore without it costs every athlete that one-shot permission.
+  ⚠️ `push_config.vapid_public` must equal `AAPush.VAPID_PUBLIC` in `assets/js/push.js`, or **every
+  push is refused 403 and nothing else looks wrong** (`scripts/headless/reminders.js` checks it).
+- Guards: `scripts/push/rehearse_push.mjs` (78, PGlite, both directions and the CRLF trap),
+  `scripts/push/test_webpush.mjs` (26, the crypto against `http_ece`, a different implementation),
+  `scripts/headless/reminders.js` (24). The way back is `scripts/push/rollback_stage84.sql`, on Amir's
+  word only. `/pushtest/` is the throwaway page that answered "does it reach Iran?" — delete it, and
+  the `/pushtest/` line in `sw.js`, once that question is closed.
+
 
 ## The coach dashboard (`coach.html`) — read `COACH_DASHBOARD.md` before changing it
 
