@@ -1135,7 +1135,14 @@ hash, `same` with it, the clock not moving the hash, a new post, a reaction and 
 
 **The way back**: `scripts/career/rollback_stage83.sql` — the app falls back to `get_bell()` by itself, so nothing else has to change.
 
-## Stage 84: the Monthly Open, as built (2026-10-19, not yet applied)
+## Stage 85: the Monthly Open, as built (2026-10-19)
+
+**APPLIED to the live project 2026-10-19** on Amir's word, *"yes, apply stage85 and switch the Monthly Open on"* (migration `stage85_crew_open`),
+read back whole: row-level security on both tables with one coach-read policy each, nothing for anon, `get_bell()` patched once and answering
+`open: null` until a challenge is set, `coach_erase_person()` holding `crew_open_results`. The snapshot was remade and both tables went into
+`BACKUP_TABLES` and `scripts/restore/seed_made_up.sql` in the same commit (restore rehearsal 49 of 49).
+**⚠️ It was built as stage84 and renumbered:** the reminders work took 84 and applied it while this was being written. Check `supabase/stage8*.sql`
+before picking a stage number while other sessions are running.
 
 The last build step of plan A (`CAREER_MODE.md` → Round 5, L9 and the Crew and Open bullets). Amir decided its shape with *"for crew and the open go
 with your picks"* and changed L9 himself the same day, so nothing here waited on a new question.
@@ -1179,9 +1186,8 @@ with your picks"* and changed L9 himself the same day, so nothing here waited on
   their own app through `mine`).
 - **The app**: `PROGRAM-APP.md` → *The Monthly Open, on Crew*; `scripts/headless/crew.js` covers it. The card is simply not drawn until the stage is
   applied, so the app side shipped first and safely.
-- **To apply**, on Amir's word, in this order: (1) the file through the Supabase tool (a migration); (2) **add `crew_open` and `crew_open_results`
-  to `BACKUP_TABLES` in coach.html** and remake the schema snapshot, both in the same commit — the list and the snapshot must agree
-  (`scripts/test_restore_backup.py` check 1h fails otherwise, which is why the list could not be changed before the apply); (3) set the first
-  challenge in coach.html → Proof → The Monthly Open.
+- **Applied** in that order (the migration; then `BACKUP_TABLES`, the snapshot, the restore seed and the table count in
+  `scripts/test_restore_backup.py` check 1d, all in the same commit). What is left is Amir's own: **set the first challenge** in coach.html →
+  Proof → The Monthly Open. Until he does, `get_bell()` answers `open: null` and no card is drawn.
 - **The way back**: `scripts/career/rollback_stage85.sql` — it undoes both patches, drops the five and the read, and drops the two tables LAST,
   which is the one step that loses what Amir confirmed.
