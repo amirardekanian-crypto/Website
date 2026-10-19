@@ -5038,7 +5038,7 @@
 
   /* ══ CREW AND THE BELL (Career Mode round 5, step 5; stage81, 2026-10-19) ══════════════════════════════════════════════════
      Amir's picks: Crew is a tab, one feed (A on the page Crew and the Open); the Bell is the Clubhouse (A on the page The Bell): a
-     photo post is a card with its photo at 4:5, a moment a slim green line, kudos with names, Amir's post pinned for a day, the composer
+     photo post is a card with its photo at 4:5, a moment a slim green line, likes with names, Amir's post pinned for a day, the composer
      at the top. Green and grey; clay only where Crew asks to be looked at: the tab's dot and the pin of a post of Amir's not opened yet
      (DS-01). Colours are the app's one set. renderCrew(), crewPostHTML(), crewLineHTML(), openCrewPost(), openCrewPhoto(). */
   .nav-item[data-tab="crew"] .nav-dot { position: absolute; top: 7px; left: calc(50% + 7px); width: 8px; height: 8px; border-radius: 50%; background: var(--clay);
@@ -5107,7 +5107,7 @@
   .cr-kd b { font-weight: 700; font-variant-numeric: tabular-nums; }
   .cr-del { flex: none; min-height: 36px; padding: 0 6px; border: 0; background: none; color: var(--grey); font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
   .cr-del.armed { color: var(--clay-ink); }
-  /* a moment: one slim green line, the bell, what happened, kudos */
+  /* a moment: one slim green line, the bell, what happened, the Like */
   #screen-crew .cr-line { display: flex; align-items: center; gap: 10px; margin: 0 var(--g) 10px; padding: 10px 10px 10px 12px; border-radius: 12px; background: var(--tint); }
   .cr-bell-ic { flex: none; color: var(--green-ink); }
   .cr-lw { flex: 1; min-width: 0; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
@@ -5155,7 +5155,7 @@
   #hist-overlay .cr-sw input { flex: none; width: 24px; height: 24px; accent-color: var(--fill); }
   #hist-overlay .cr-sws { margin-top: 16px; }
   #hist-overlay .cr-sws[hidden] { display: none; }
-  /* the photo, opened: full screen, dark, the whole photo, its words and kudos */
+  /* the photo, opened: full screen, dark, the whole photo, its words and likes */
   .cr-viewer { position: fixed; top: 0; bottom: 0; left: var(--app-gutter); right: var(--app-gutter); z-index: 212; display: none; flex-direction: column; gap: 12px;
     padding: calc(env(safe-area-inset-top, 0px) + 12px) var(--g) calc(env(safe-area-inset-bottom, 0px) + 16px); background: #0B0F0D; color: #fff; overflow-y: auto; }
   .cr-viewer.visible { display: flex; }
@@ -5675,7 +5675,7 @@
 
 <!-- ═══ CREW ═══ (Career Mode round 5, step 5, 2026-10-19; Amir's picks: one feed, the Clubhouse look). The crew's own place: the question
      asked once, last month's honours (the 1st to the 14th), the Bell (the composer, Amir's post pinned for a day, posts with photos and the
-     moments that ring, kudos with names), then the season board. renderCrew() fills #crew-body from get_bell() (stage81). The tab is
+     moments that ring, likes with names), then the season board. renderCrew() fills #crew-body from get_bell() (stage81). The tab is
      added to the bar only once the server answers get_bell() (setCrewTab()); never in the demo or the coach's preview. -->
 <div id="screen-crew" class="screen">
   <div class="crew-head">
@@ -5685,7 +5685,7 @@
   <div id="crew-body"></div>
 </div>
 
-<!-- A photo on the Bell, opened (openCrewPhoto()): the whole photo on dark, who and when, the words, kudos. ✕ closes; so does Back (topLayer()). -->
+<!-- A photo on the Bell, opened (openCrewPhoto()): the whole photo on dark, who and when, the words, the Like. ✕ closes; so does Back (topLayer()). -->
 <div class="cr-viewer" id="crew-viewer" role="dialog" aria-modal="true" aria-label="A photo from the crew"></div>
 
 <!-- ═══ NOTES ═══ -->
@@ -10157,9 +10157,9 @@ const APP_GUIDE = [
 // names a control the athlete cannot see (CNT-01).
 APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how often'), 0,
   { icon: 'compass', key: 'crew', title: 'Crew and the Bell', when: () => crewOn(),
-    body: `<p><strong>Crew</strong> is our crew's own place. The first time you open it I ask you one thing: <strong>Ring it</strong> or <strong>Keep it to me</strong>. Say yes and the Bell rings for you when you reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. It's one line a day and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Kudos</strong> on a post or a line tells the crew you saw it, with your name. Nothing on Crew earns XP. Under the Bell is the season board.</p><p>To change your answer, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
+    body: `<p><strong>Crew</strong> is our crew's own place. The first time you open it I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. It's one line a day and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. Nothing on Crew earns XP. Under the Bell is the season board.</p><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
-  const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with kudos), last month\'s honours early in the month, and the season board.</li>';
+  const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with likes), last month\'s honours early in the month, and the season board.</li>';
   return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
     <div class="note-card app-card${openKey && card.key === openKey ? ' open' : ''}" onclick="toggleNote(this)">
       <div class="note-card-header">
@@ -11698,10 +11698,10 @@ function achNudgeHTML(e) {
 
 // ── CREW AND THE BELL (Career Mode round 5, step 5; stage81, 2026-10-19) ─────────────────────────────────────────────────────────────
 // Amir's picks (career/CAREER_MODE.md → Round 5): Crew is a tab, one feed; the Bell is the Clubhouse (a photo post a card with its photo at
-// 4:5, a moment one slim green line, kudos with names, his post pinned for a day, the composer at the top); messages and photos live 7 days;
+// 4:5, a moment one slim green line, likes with names, his post pinned for a day, the composer at the top); messages and photos live 7 days;
 // a photo is made smaller on the phone (1280 px on its long side, JPEG at 75 %, about 200 KB, its location data gone with the re-encode), 3 a
 // day; Tell the crew on the finished card posts a session only with a photo; the question is asked on the first visit, one yes then a switch
-// per kind; never for an athlete Amir ticked under 13 (GAME-9). Kudos, lines and posts pay nothing (GAME-6). The server decides what rings and
+// per kind; never for an athlete Amir ticked under 13 (GAME-9). Likes, lines and posts pay nothing (GAME-6). The server decides what rings and
 // who can be seen (get_bell(), stage81); this app only draws it and never sees another athlete's id.
 // The tab is ADDED to the bar only once get_bell() has answered (setCrewTab()): before stage81 is on the server, and in the demo and the coach's
 // preview, there is no Crew. <id>_crewcache keeps the last answer (never synced, _snapshot()), so the tab is there at the next open with no
@@ -11718,7 +11718,7 @@ function crewAllowed() { return !window.IS_DEMO && !window.IS_PREVIEW && !!ATHLE
 function crewOn() { return crewAllowed() && !!BELL && !_crewMissing; }
 function onCrew() { const s = document.getElementById('screen-crew'); return !!(s && s.classList.contains('active')); }
 function crewMe() { return (BELL && BELL.me) || {}; }
-function crewCanKudos() { const m = crewMe(); return m.answer === 'yes' && !m.under13; }
+function crewCanLike() { const m = crewMe(); return m.answer === 'yes' && !m.under13; }
 function loadCrewCache() {
   if (!crewAllowed()) return;
   try {
@@ -11851,20 +11851,26 @@ function crewKudosWords(k) {
   if (rest > 0) return shown.join(', ') + ' and ' + rest + (rest === 1 ? ' other' : ' others');
   return crewList(shown);
 }
-function crewKudosBtn(target, k, own) {
-  const n = (k && Number(k.n)) || 0, can = !own && crewCanKudos();
-  const lbl = own ? `Kudos on yours: ${n}` : (k && k.mine ? 'Kudos given. Tap to take it back' : 'Give kudos');
-  return `<button type="button" class="cr-kd" data-kd="${esc(target)}" ${can ? `aria-pressed="${!!(k && k.mine)}" onclick="crewKudos(this)"` : 'disabled'} aria-label="${esc(lbl)}">Kudos${n ? ` <b>${n}</b>` : ''}</button>`;
+// A Like, and who gave it. Their own post or line: the count, nothing to tap. An athlete Amir ticked under 13 cannot join, so
+// theirs stays dead with a label that says why. Anyone else who has not joined CAN tap it: crewLikeAsk() offers to join (Amir,
+// 2026-10-19: "if some one want to like a photo and they are not allowed to do, they should be notified to join first").
+function crewLikeBtn(target, k, own) {
+  const n = (k && Number(k.n)) || 0, me = crewMe(), mine = !!(k && k.mine), body = `Like${n ? ` <b>${n}</b>` : ''}`;
+  const dead = lbl => `<button type="button" class="cr-kd" data-kd="${esc(target)}" disabled aria-label="${esc(lbl)}">${body}</button>`;
+  if (own) return dead(`Likes on yours: ${n}`);
+  if (me.under13) return dead('Likes are off for your account');
+  if (!crewCanLike()) return `<button type="button" class="cr-kd" data-kd="${esc(target)}" onclick="crewLikeAsk()" aria-label="Join the crew to like this">${body}</button>`;
+  return `<button type="button" class="cr-kd" data-kd="${esc(target)}" aria-pressed="${mine}" onclick="crewLike(this)" aria-label="${mine ? 'Liked. Tap to take it back' : 'Like this'}">${body}</button>`;
 }
 function crewItem(key) { return ((BELL && BELL.items) || []).find(i => i && (i.id === key || i.key === key)) || null; }
 
 // ── the screen ──
 function crewAskHTML() {
   return `<section class="cr-ask" id="crew-ask" aria-labelledby="crew-ask-h">
-    <h2 id="crew-ask-h">Ring the bell for the crew?</h2>
-    <p>When you reach a new level, hold a week, hit a mark or set a best, the crew sees your name and what you did, for 7 days. Never a weight. Say yes and you can post messages and photos here too.</p>
-    <p class="sm">Change it any time from your initials, under Crew and the Bell.</p>
-    <div class="cr-ask-btns"><button type="button" class="cr-go" onclick="crewAnswer('yes', this)">Ring it</button><button type="button" class="cr-no" onclick="crewAnswer('no', this)">Keep it to me</button></div>
+    <h2 id="crew-ask-h">Join the crew?</h2>
+    <p>When you reach a new level, hold a week, hit a mark or set a best, the crew sees your name and what you did, for 7 days. Never a weight. Join and you can post messages and photos here too.</p>
+    <p class="sm">You can leave any time from your initials, under Crew and the Bell.</p>
+    <div class="cr-ask-btns"><button type="button" class="cr-go" onclick="crewAnswer('yes', this)">Join the crew</button><button type="button" class="cr-no" onclick="crewAnswer('no', this)">Keep it to me</button></div>
   </section>`;
 }
 function crewHonoursHTML() {
@@ -11891,7 +11897,7 @@ function crewPostHTML(it) {
   return `<article class="cr-post${it.amir ? ' amir' : ''}" data-id="${esc(it.id)}">
     <div class="cr-who"><span class="cr-ini${it.amir ? ' am' : ''}" aria-hidden="true">${esc(ini)}</span><span class="cr-nm">${esc(name)}${sub}</span>${top}</div>
     ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}${ph}
-    <div class="cr-foot">${crewKudosBtn(it.id, it.kudos, it.me)}<small data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small>${del}</div>
+    <div class="cr-foot">${crewLikeBtn(it.id, it.kudos, it.me)}<small data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small>${del}</div>
   </article>`;
 }
 function crewLineHTML(it) {
@@ -11899,7 +11905,7 @@ function crewLineHTML(it) {
   if (!parts.length) return '';
   const txt = esc(it.me ? 'You' : (it.who || 'Someone')) + ' ' + parts.map(esc).join(' · ');
   const kw = crewKudosWords(it.kudos);
-  return `<div class="cr-line" data-key="${esc(it.key)}"><span class="cr-bell-ic">${CREW_BELL_SVG}</span><span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small></span>${crewKudosBtn(it.key, it.kudos, it.me)}</div>`;
+  return `<div class="cr-line" data-key="${esc(it.key)}"><span class="cr-bell-ic">${CREW_BELL_SVG}</span><span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small></span>${crewLikeBtn(it.key, it.kudos, it.me)}</div>`;
 }
 function crewBoardHTML() {
   if (!Array.isArray(CREW_BOARD) || !CREW_BOARD.length) return '<p class="cr-quiet">The board shows here once you have signal.</p>';
@@ -11974,7 +11980,7 @@ function crewWirePhotos(root) {
   if (!_crewIO) _crewIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { _crewIO.unobserve(e.target); crewShowPhoto(e.target); } }), { rootMargin: '400px 0px' });
   btns.forEach(b => { if (CREW_PHOTOS.has(b.dataset.ph)) crewShowPhoto(b); else _crewIO.observe(b); });
 }
-// A photo, opened: the whole photo on dark, who and when, the words, kudos. ✕ or Back closes it (topLayer()).
+// A photo, opened: the whole photo on dark, who and when, the words, the Like. ✕ or Back closes it (topLayer()).
 function openCrewPhoto(id) {
   const it = crewItem(id), v = document.getElementById('crew-viewer');
   if (!it || !v) return;
@@ -11985,7 +11991,7 @@ function openCrewPhoto(id) {
       <button type="button" class="cr-x" onclick="closeCrewPhoto()" aria-label="Close the photo">✕</button></div>
     <div class="cr-vimg"><img alt="${esc(name === 'You' ? 'Your photo' : name + "'s photo")}"></div>
     ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}
-    <div class="cr-foot">${crewKudosBtn(it.id, it.kudos, it.me)}<small data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small></div>`;
+    <div class="cr-foot">${crewLikeBtn(it.id, it.kudos, it.me)}<small data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small></div>`;
   v.classList.add('visible');
   crewFetchPhoto(id).then(url => { const im = v.querySelector('.cr-vimg img'); if (url && im) im.src = url; });
 }
@@ -11996,17 +12002,17 @@ function closeCrewPhoto() {
 window.openCrewPhoto = openCrewPhoto;
 window.closeCrewPhoto = closeCrewPhoto;
 
-// ── kudos: on at once here, then the server's answer (who gave it) replaces it; a refusal puts it back ──
+// ── a Like: on at once here, then the server's answer (who gave it) replaces it; a refusal puts it back ──
 function paintKudos(key) {
   const it = crewItem(key);
   if (!it) return;
   document.querySelectorAll('[data-kd]').forEach(b => {
     if (b.dataset.kd !== key) return;
     const n = Number(it.kudos && it.kudos.n) || 0;
-    b.innerHTML = 'Kudos' + (n ? ` <b>${n}</b>` : '');
+    b.innerHTML = 'Like' + (n ? ` <b>${n}</b>` : '');
     if (b.hasAttribute('aria-pressed')) {
       b.setAttribute('aria-pressed', String(!!(it.kudos && it.kudos.mine)));
-      b.setAttribute('aria-label', it.kudos && it.kudos.mine ? 'Kudos given. Tap to take it back' : 'Give kudos');
+      b.setAttribute('aria-label', it.kudos && it.kudos.mine ? 'Liked. Tap to take it back' : 'Like this');
     }
   });
   document.querySelectorAll('[data-kw]').forEach(s => {
@@ -12015,9 +12021,9 @@ function paintKudos(key) {
     s.textContent = it.t === 'line' ? (kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at)) : kw;
   });
 }
-async function crewKudos(btn) {
+async function crewLike(btn) {
   const key = btn && btn.dataset.kd, it = crewItem(key);
-  if (!it || !crewCanKudos() || it.me) return;
+  if (!it || !crewCanLike() || it.me) return;
   const on = btn.getAttribute('aria-pressed') !== 'true';
   const before = Object.assign({ n: 0, names: [], mine: false }, it.kudos || {});
   it.kudos = { n: Math.max(0, Number(before.n) + (on ? 1 : -1)), names: before.names || [], mine: on };
@@ -12025,11 +12031,19 @@ async function crewKudos(btn) {
   let r = null;
   try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_kudos', { p_target: key, p_on: on }), 8000); } catch (e) { r = null; }
   if (r && !r.error && r.data && typeof r.data.n !== 'undefined') it.kudos = r.data;
-  else { it.kudos = before; aaToast(_noAnswer(r) ? 'No signal. Kudos goes when you are back online.' : 'That kudos did not go. Try again.'); }
+  else { it.kudos = before; aaToast(_noAnswer(r) ? 'No signal. Your like goes when you are back online.' : 'That like did not go. Try again.'); }
   paintKudos(key);
   try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
 }
-window.crewKudos = crewKudos;
+window.crewLike = crewLike;
+// Not in the crew yet and they tapped Like: say so and offer the one tap that fixes it (never a dead button).
+function crewLikeAsk() {
+  const me = crewMe();
+  if (me.under13) return;
+  aaToast(me.answer === 'no' ? 'You kept yourself out of the crew, so you cannot like a post.' : 'Join the crew to like a post.',
+    { kicker: 'Crew', action: 'Join the crew', dismiss: 'Not now', run: () => crewAnswer('yes') });
+}
+window.crewLikeAsk = crewLikeAsk;
 async function crewDelete(id) {
   let r = null;
   try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_delete_post', { p_post: id }), 8000); } catch (e) { r = null; }
@@ -12059,7 +12073,7 @@ async function crewAnswer(ans, btn) {
   if (!r || r.error || !r.data) { aaToast(_noAnswer(r) ? 'No signal. Answer again when you are back online.' : 'That did not save. Try again.'); return false; }
   if (BELL) BELL.me = r.data;
   renderCrew();
-  aaToast(ans === 'yes' ? 'You are on the Bell. Welcome to the crew.' : 'Kept to you. Nothing of yours reaches the crew.');
+  aaToast(ans === 'yes' ? "You're in the crew. Your moments ring on the Bell." : 'Kept to you. Nothing of yours reaches the crew.');
   refreshBell();
   return true;
 }
@@ -12079,11 +12093,11 @@ function openCrewSettings() {
     <p class="readiness-sub">${me.under13 ? 'You can read the crew. Posting and the Bell are off for your account.'
       : yes ? `Your name on the Bell: <strong>${esc(me.name || '')}</strong>` : 'Nothing of yours reaches the crew.'}</p>
     ${me.under13 ? '' : `
-    <div class="acct-list"><div class="acct-theme"><span class="acct-lbl">Ring the bell</span>
-      <span class="acct-seg" role="group" aria-label="Ring the bell for the crew">
+    <div class="acct-list"><div class="acct-theme"><span class="acct-lbl">In the crew</span>
+      <span class="acct-seg" role="group" aria-label="In the crew">
         <button type="button" data-ans="yes" aria-pressed="${yes}">Yes</button><button type="button" data-ans="no" aria-pressed="${!yes}">No</button></span></div></div>
     <div class="cr-sws"${yes ? '' : ' hidden'}><p class="cr-note">What rings for you. Turn any of them off.</p>${sw}</div>
-    <p class="cr-note">A no takes your posts, photos and kudos off the server now. Everything you post is gone after 7 days anyway. Nothing on Crew earns XP.</p>`}`;
+    <p class="cr-note">Leaving takes your posts, photos and likes off the server now. Everything you post is gone after 7 days anyway. Nothing on Crew earns XP.</p>`}`;
   ov.querySelectorAll('.acct-seg button[data-ans]').forEach(b => b.addEventListener('click', async () => {
     if ((b.dataset.ans === 'yes') === (crewMe().answer === 'yes')) return;
     if (await crewAnswer(b.dataset.ans, b)) openCrewSettingsPage();

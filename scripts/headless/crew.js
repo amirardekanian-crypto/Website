@@ -1,8 +1,9 @@
 // Crew and the Bell (Career Mode round 5, step 5; stage81, 2026-10-19): node scripts/headless/crew.js
 //
 // The tab is added to the bar only once get_bell() answers (no answer, a server without stage81, the demo: no tab, the guide names no
-// Crew); the question asked once (Ring it / Keep it to me); the feed (Amir's pinned post with the tab's clay dot until Crew is opened, a
-// Bell line in words with no weight, a photo post that asks crew_photo() for its photo); kudos on and off; the composer (a message, a
+// Crew); the question asked once (Join the crew / Keep it to me); the feed (Amir's pinned post with the tab's clay dot until Crew is opened,
+// a Bell line in words with no weight, a photo post that asks crew_photo() for its photo); a Like on and off, and the join offer a
+// non-member gets when they tap it; the composer (a message, a
 // photo made smaller on the phone to 1280 px JPEG, the limits); Tell the crew (a session only with a photo, Day N drafted); the switches
 // and the no; an athlete ticked under 13 reads only; the account sheet's door; the guide; Back closes the photo; never synced; 320 px and
 // dark mode. Made-up people only. The stub answers the crew_* calls by name (stub.js).
@@ -68,7 +69,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('the demo: no Crew tab and no get_bell call', !(await tabs(p)).includes('crew') && !(await calls(p, 'get_bell')).length);
     await ctx.close();
   }
-  // 4. the first visit: the tab, its dot, the question, the feed, kudos, the photo, Back
+  // 4. the first visit: the tab, its dot, the question, the feed, the Like, the photo, Back
   {
     const { ctx, p } = await open(browser);
     C.check('get_bell answers: the Crew tab appears before Coach', await waitTab(p) && (await tabs(p)) === 'home,plan,workouts,crew,notes', await tabs(p));
@@ -78,6 +79,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     const s = await p.evaluate(() => ({
       lit: (document.querySelector('#global-tabs .nav-item.active') || {}).dataset.tab, dot: !!document.querySelector('#global-tabs [data-tab="crew"] .nav-dot'),
       ask: !!document.querySelector('#crew-ask'), askBtns: [...document.querySelectorAll('#crew-ask button')].map(b => b.textContent.trim()).join('|'),
+      askH: (document.querySelector('#crew-ask h2') || {}).textContent || '',
       comp: !!document.querySelector('.cr-comp'), pin: (document.querySelector('.cr-post.amir .cr-pin') || {}).className || '',
       first: (document.querySelector('#crew-body .cr-post, #crew-body .cr-line') || {}).className || '',
       line: ((document.querySelector('.cr-line .cr-lw') || {}).firstChild || {}).textContent || '',
@@ -87,14 +89,24 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     }));
     C.check('Crew opened: the tab is lit and its dot gone', s.lit === 'crew' && !s.dot, JSON.stringify([s.lit, s.dot]));
     C.check('…Amir\'s post counts as seen on this phone', (await p.evaluate(id => localStorage.getItem(id + '_crewseen'), H.ID)) === AMIR);
-    C.check('…the question, once: Ring it / Keep it to me, and no composer before the answer', s.ask && s.askBtns === 'Ring it|Keep it to me' && !s.comp, s.askBtns);
+    C.check('…the question, once: Join the crew / Keep it to me, and no composer before the answer', s.ask && s.askBtns === 'Join the crew|Keep it to me' && !s.comp, s.askBtns);
+    C.check('…it asks "Join the crew?", never "Ring the bell"', /Join the crew\?/.test(s.askH) && !/Ring (it|the bell)/i.test(s.text), s.askH);
     C.check('…Amir\'s post pinned first, its pin clay on the visit that first shows it', /cr-post amir/.test(s.first) && /cr-pin is-new/.test(s.pin), s.first + ' / ' + s.pin);
     C.check('…the Bell line in words: level, the lift (never a weight), the run', s.line === 'Mina S. reached level 14 · set a new best on Barbell Back Squat · held a week, 5 in a row', s.line);
     C.check('…no weight, no kg anywhere on Crew', !/\bkg\b|\d+\s*kg/i.test(s.text));
     C.check('…last month\'s honours: names and what they did', /Most sessions Reza K\. 14 plan sessions/.test(s.hon) && /Most improved Leila M\. Back Squat \+27\.1%/.test(s.hon), s.hon);
     C.check('…the season board: plain numbers, your row as You', s.board === '1Reza K.LV 226,240|2YouLV 195,910', s.board);
-    C.check('…kudos with names: "Mina S., Sara T. and 1 other"', /Mina S\., Sara T\. and 1 other/.test(s.text));
-    C.check('…before a yes, kudos cannot be given (disabled)', await p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-kd')].every(b => b.disabled)));
+    C.check('…likes with names: "Mina S., Sara T. and 1 other"', /Mina S\., Sara T\. and 1 other/.test(s.text));
+    C.check('…the button says Like, never Kudos', /\bLike\b/.test(s.text) && !/kudos/i.test(s.text), s.text.slice(0, 80));
+    // Before joining the button is NOT dead: it offers to join (Amir, 2026-10-19)
+    C.check('…before joining, Like is still tappable', await p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-kd')].every(b => !b.disabled && /crewLikeAsk/.test(b.getAttribute('onclick') || ''))));
+    await p.evaluate(() => document.querySelector('#crew-body .cr-kd').click());
+    await p.waitForTimeout(300);
+    const ask0 = await p.evaluate(() => { const t = document.getElementById('aaToast'); return { on: !t.hidden, txt: t.innerText.replace(/\s+/g, ' ').trim() }; });
+    C.check('…tapping it says to join first, with a Join the crew button', ask0.on && /Join the crew to like a post/.test(ask0.txt) && /Join the crew/.test(ask0.txt) && !(await calls(p, 'crew_kudos')).length, JSON.stringify(ask0));
+    C.check('…and the toast\'s button answers yes', await p.evaluate(async () => { [...document.querySelectorAll('#aaToast button')].find(b => /Join the crew/.test(b.textContent)).click(); return true; }) && (await p.waitForTimeout(500), (await calls(p, 'crew_answer')).some(x => x.p_answer === 'yes')));
+    await p.evaluate(() => crewAnswer('no'));
+    await p.waitForTimeout(400);
     // the photo: asked when its card comes near the screen
     await p.evaluate(() => document.querySelector('.cr-ph').scrollIntoView()); await p.waitForTimeout(600);
     const ph = await p.evaluate(() => { const b = document.querySelector('.cr-ph'); const im = b.querySelector('img'); return { in: b.classList.contains('is-in'), src: (im.getAttribute('src') || '').slice(0, 5), ratio: Math.round(b.getBoundingClientRect().height / b.getBoundingClientRect().width * 100) }; });
@@ -103,16 +115,17 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('the photo opens full screen, with its words and a ✕', await p.evaluate(() => { const v = document.getElementById('crew-viewer'); return v.classList.contains('visible') && /6 am session/.test(v.textContent) && !!v.querySelector('.cr-x'); }));
     await p.goBack(); await p.waitForTimeout(300);
     C.check('…the phone\'s Back closes it and stays on Crew', await p.evaluate(() => !document.getElementById('crew-viewer').classList.contains('visible') && document.getElementById('screen-crew').classList.contains('active')));
-    // the yes
-    await p.evaluate(() => document.querySelector('#crew-ask .cr-go').click()); await p.waitForTimeout(500);
+    // the yes, from the question itself
+    await p.evaluate(() => { if (document.querySelector('#crew-ask .cr-go')) document.querySelector('#crew-ask .cr-go').click(); else crewAnswer('yes'); });
+    await p.waitForTimeout(500);
     const ans = await calls(p, 'crew_answer');
-    C.check('Ring it: crew_answer("yes") with the board name', ans.length === 1 && ans[0].p_answer === 'yes' && ans[0].p_name === 'Alex R.', JSON.stringify(ans));
+    C.check('Join the crew: crew_answer("yes") with the board name', ans.some(x => x.p_answer === 'yes' && x.p_name === 'Alex R.'), JSON.stringify(ans));
     C.check('…the question goes and the composer comes', await p.evaluate(() => !document.querySelector('#crew-ask') && !!document.querySelector('.cr-comp')));
-    // kudos on a line, then off
+    // a Like on a line, then off
     await p.evaluate(() => document.querySelector('.cr-line .cr-kd').click()); await p.waitForTimeout(400);
     const k1 = await p.evaluate(() => { const b = document.querySelector('.cr-line .cr-kd'); return { pressed: b.getAttribute('aria-pressed'), txt: b.textContent.trim(), w: document.querySelector('.cr-line small').textContent }; });
-    C.check('kudos on a Bell line: pressed, counted, "You"', k1.pressed === 'true' && k1.txt === 'Kudos 1' && /^You · /.test(k1.w), JSON.stringify(k1));
-    C.check('…crew_kudos(the line\'s key, on)', (await calls(p, 'crew_kudos')).some(x => x.p_target === KEY && x.p_on === true));
+    C.check('a Like on a Bell line: pressed, counted, "You"', k1.pressed === 'true' && k1.txt === 'Like 1' && /^You · /.test(k1.w), JSON.stringify(k1));
+    C.check('…crew_kudos(the line\'s key, on) is the call behind it', (await calls(p, 'crew_kudos')).some(x => x.p_target === KEY && x.p_on === true));
     await p.evaluate(() => document.querySelector('.cr-line .cr-kd').click()); await p.waitForTimeout(400);
     C.check('…and off again', await p.evaluate(() => document.querySelector('.cr-line .cr-kd').getAttribute('aria-pressed') === 'false') && (await calls(p, 'crew_kudos')).some(x => x.p_target === KEY && x.p_on === false));
     // the composer: a message with a photo, made smaller here
@@ -134,7 +147,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…Post sends the words, the photo and its size, as a post', post.p_body === 'First time on clay this year.' && /^\/9j\//.test(post.p_photo || '') && post.p_w === 1280 && post.p_h === 960 && post.p_kind === 'post', JSON.stringify(Object.assign({}, post, { p_photo: String(post.p_photo).slice(0, 8) })));
     C.check('…the sheet closes and the post is first after Amir\'s, with Delete', await p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')
       && /First time on clay/.test((document.querySelectorAll('#crew-body .cr-post')[1] || {}).textContent || '') && !!document.querySelectorAll('#crew-body .cr-post')[1].querySelector('.cr-del')));
-    C.check('…your own post\'s kudos cannot be tapped', await p.evaluate(() => document.querySelectorAll('#crew-body .cr-post')[1].querySelector('.cr-kd').disabled));
+    C.check('…you cannot like your own post', await p.evaluate(() => document.querySelectorAll('#crew-body .cr-post')[1].querySelector('.cr-kd').disabled));
     // Tell the crew: a session only with a photo
     C.check('Tell the crew sits on every finished card once the athlete can post', await p.evaluate(() => { const e = [...document.querySelectorAll('.complete-crew[data-day]')]; return e.length > 0 && e.every(x => !x.hidden && /Tell the crew/.test(x.textContent)); }));
     await p.evaluate(() => openCrewPost('session', '2')); await p.waitForTimeout(300);
@@ -157,7 +170,8 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…it opens the settings with ‹ Back to the account', await p.evaluate(() => /Crew and the Bell/.test(document.querySelector('#hist-overlay .readiness-title').textContent) && !!document.querySelector('#hist-overlay .sheet-back')));
     await p.evaluate(() => closeHistorySheet());
     const g = await p.evaluate(() => buildAppGuideCards());
-    C.check('the guide: a Crew card naming its controls, and Crew among the tabs', /Crew and the Bell/.test(g) && /<strong>Crew<\/strong> is the crew/.test(g) && /Share something with the crew/.test(g) && /Tell the crew/.test(g) && /Ring it/.test(g));
+    C.check('the guide: a Crew card naming its controls, and Crew among the tabs', /Crew and the Bell/.test(g) && /<strong>Crew<\/strong> is the crew/.test(g) && /Share something with the crew/.test(g) && /Tell the crew/.test(g) && /<strong>Join the crew<\/strong>/.test(g));
+    C.check('…and it says Like, not Kudos, and never Ring it', /<strong>Like<\/strong>/.test(g) && !/kudos/i.test(g) && !/Ring it/.test(g));
     // never synced
     const synced = await p.evaluate(() => Object.keys(_snapshot()).filter(k => /crewcache|crewseen/.test(k)));
     C.check('the Bell\'s copy and the seen post never sync', synced.length === 0 && !!(await p.evaluate(id => localStorage.getItem(id + '_crewcache'), H.ID)), JSON.stringify(synced));
@@ -171,7 +185,8 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
     const u = await p.evaluate(() => ({ ask: !!document.querySelector('#crew-ask'), comp: !!document.querySelector('.cr-comp'), quiet: document.getElementById('crew-body').innerText,
       kd: [...document.querySelectorAll('#crew-body .cr-kd')].every(b => b.disabled), tell: [...document.querySelectorAll('.complete-crew[data-day]')].every(x => x.hidden) }));
-    C.check('under 13: no question, no composer, "Posting is off", no kudos, no Tell the crew', !u.ask && !u.comp && /Posting is off for your account/.test(u.quiet) && u.kd && u.tell, JSON.stringify(Object.assign({}, u, { quiet: '' })));
+    C.check('under 13: no question, no composer, "Posting is off", no Like, no Tell the crew', !u.ask && !u.comp && /Posting is off for your account/.test(u.quiet) && u.kd && u.tell, JSON.stringify(Object.assign({}, u, { quiet: '' })));
+    C.check('…and tapping their dead Like offers them nothing (they cannot join)', await p.evaluate(() => { crewLikeAsk(); return document.getElementById('aaToast').hidden; }));
     await ctx.close();
   }
   // 6. a narrow phone and dark mode: five tabs fit, nothing scrolls sideways

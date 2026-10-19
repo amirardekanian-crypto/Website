@@ -1103,7 +1103,7 @@ drive create, copy, mark sent, Manage, change password, revoke, restore and a fa
 
 Career Mode round 5, step 5 (Amir: *"Bell: go with your picks"*; the server side is `supabase/stage81_career_crew.sql`). The athlete app's Crew tab has a feed, the
 Bell: athletes post a short message and a photo, moments ring as lines (a level, a held week, the four marks, an achievement, a best, a cycle, the honours, the
-Monthly Open, joining), and kudos are the only reply. This is where you post to it and moderate it. **Nothing here pays XP** (GAME-6).
+Monthly Open, joining), and likes are the only reply. This is where you post to it and moderate it. **Nothing here pays XP** (GAME-6).
 
 - **Where.** Two panels on Proof, under the wall: **The Bell** (`#bellPanel`) and **Who said yes** (`#bellPeople`). `loadBell()` reads `coach_crew()` after the
   first paint, like Courtside, on ↻ Refresh, on the panel's own **↻ Reload** (the head says *As of 14:05*) and when Proof is opened a minute or more after the last read
@@ -1119,7 +1119,7 @@ Monthly Open, joining), and kudos are the only reply. This is where you post to 
   The server's refusals come back as `crew:too_long`, `crew:empty`, `crew:photo_big`, `crew:photo_bad` and are said in plain words; **no database code** (the answer never
   arrived) says so and reads the list again, because the post may have gone up.
 - **The last 7 days**, newest first. Each post: who (yours is *You (Amir)*; an athlete is the name the crew sees, with the dashboard's name beside it), a *Session* chip
-  for a finished session told to the crew, when (*3h*, *Yesterday*, *Mon*), the words, the kudos count, and **Show photo** when it has one. A photo is asked for
+  for a finished session told to the crew, when (*3h*, *Yesterday*, *Mon*), the words, the likes count, and **Show photo** when it has one. A photo is asked for
   only when you tap it (`crew_photo(p_post)`), drawn inline at most 240 px tall, with **Hide photo**; a photo the server no longer has (its post just went) is said and the
   list is read again. *not shown: their answer is no* marks a post whose author the crew can no longer see (the post is dimmed; Remove is still there).
   **Remove** asks in a panel under the post (*Remove this post? It goes from every phone and the server now.*), then `coach_crew_remove(p_post)` and a re-read. There is no undo.
@@ -1127,10 +1127,10 @@ Monthly Open, joining), and kudos are the only reply. This is where you post to 
 - **Who said yes** (`bellPeopleHtml()`). Every coached athlete the page knows (not the demo, not your own identity, not a former athlete; free and Proof-only people have
   no Crew tab), Yes first, then *Not asked yet*, then No. Each row: the name (a link to their file), their answer, the kinds they turned off (*bests, levels off*) and an
   **Under 13** box. The head counts them (*2 yes · 1 no · 4 not asked yet*). **Under 13 is GAME-9**: they read the Bell but never post, never ring and are never named.
-  **Ticking it ON asks first** (a panel under the row: their posts and photos, the kudos they gave and any level moment waiting to ring go now; their answer, their
+  **Ticking it ON asks first** (a panel under the row: their posts and photos, the likes they gave and any level moment waiting to ring go now; their answer, their
   login and the right to read stay) and the box stays unticked until you say yes; ticking it OFF needs no confirm. Both call `coach_crew_under13(p_athlete, p_on)`;
   an athlete nobody has asked can be ticked (the server makes the row; the answer stays *Not asked yet*).
-- **Short-lived on purpose.** Posts, photos and kudos live 7 days; the server sweeps them (`crew_sweep()`, on every read and post, and hourly where pg_cron exists). The four short-lived tables are
+- **Short-lived on purpose.** Posts, photos and likes live 7 days; the server sweeps them (`crew_sweep()`, on every read and post, and hourly where pg_cron exists). The four short-lived tables are
   **not in `BACKUP_TABLES`**, so a weekly backup kept twelve weeks never breaks the 7-day promise in `privacy.html`; only `crew_consent` (the answers and the under-13 tick) is a
   table the backup keeps, and it joins `BACKUP_TABLES` in the stage81 go-live commit, with the schema snapshot.
 - **What rings, and what never does**, is in the panel's **How this works** fold (the list is `stage81_career_crew.sql`'s header). **Tests:** `bell-panel`,

@@ -6688,7 +6688,7 @@ function seasonPanelHtml() {
 }
 // ── The Bell (stage81; Career Mode round 5, step 5; Amir 2026-10-19: "Bell: go with your picks") ───────────────────────────────────────
 // The athlete app's Crew tab has a feed, the Bell: athletes post a short message and a photo (both gone after 7 days), moments ring as lines,
-// kudos only. This is where Amir posts to it (pinned at the top of Crew for a day), reads the last 7 days, removes a post, and sees who said yes
+// likes only. This is where Amir posts to it (pinned at the top of Crew for a day), reads the last 7 days, removes a post, and sees who said yes
 // to the crew and ticks anyone under 13 (GAME-9: they read, never post, never ring, are never named). Every call is a stage81 function
 // (coach_crew, coach_crew_post, coach_crew_remove, coach_crew_under13, crew_photo). While the server has no coach_crew() (stage81 not applied)
 // the page draws nothing, as Courtside does. Posts and photos are NOT in BACKUP_TABLES on purpose (7 days, as privacy.html promises). Nothing
@@ -6706,7 +6706,7 @@ const BELL_ERRS = {   // the server's messages (raise exception 'crew:…') in p
 const BELL_HOW = [
   '<b>What rings the Bell:</b> a new level, a week held (with the run), the four marks, an achievement, a personal best (the lift only, never the weight), a cycle finished, the month\'s honours, a Monthly Open result and joining the crew. One line per athlete per day, only from their latest yes, and only the kinds they have not switched off.',
   '<b>What never rings:</b> a weight, an RPE, a check-in answer, pain, body weight, a habit or a broken week. A finished session reaches the Bell only when the athlete taps Tell the crew and adds a photo.',
-  '<b>Posts and photos</b> live 7 days, then the server deletes them. They are left out of the weekly backup on purpose, so a backup kept for twelve weeks never breaks that promise. Remove takes a post off every phone at once. <b>Kudos</b> pay nothing (GAME-6), and there are no replies.',
+  '<b>Posts and photos</b> live 7 days, then the server deletes them. They are left out of the weekly backup on purpose, so a backup kept for twelve weeks never breaks that promise. Remove takes a post off every phone at once. <b>Likes</b> pay nothing (GAME-6), and there are no replies.',
 ];
 let _bellDraft = '', _bellPhoto = null, _bellBusy = false, _bellSeq = 0;   // what is typed, the photo made ready ({busy} while it is being made, else {b64, w, h, kb}), a post going up, the read in flight
 const _bellPics = {};                  // post id -> { mime, b64 }: a photo the coach asked to see (the server is asked only then)
@@ -6894,7 +6894,7 @@ function bellPostHtml(p) {
       ${p.body ? `<div class="txt" dir="auto">${esc(p.body)}</div>` : ''}
       ${p.photo ? `<div class="bell-ph" id="bellPh-${esc(p.id)}">${bellPhotoHtml(p.id)}</div>` : ''}
       <div class="bell-acts">
-        <span class="muted t-sm">${Number(p.kudos) || 0} kudos</span>
+        <span class="muted t-sm">${Number(p.kudos) || 0} likes</span>
         ${p.seen === false ? '<span class="muted t-sm">not shown: their answer is no</span>' : ''}
         <button class="btn sm danger" onclick="bellRemove(${jsq(p.id)})">Remove</button>
       </div>
@@ -6919,7 +6919,7 @@ function bellHidePhoto(id) {
 }
 function bellRemove(id) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  dangerAsk('bell:post:' + id, { title: 'Remove this post?', goes: 'The post, its photo and its kudos. It goes from every phone and the server now.',
+  dangerAsk('bell:post:' + id, { title: 'Remove this post?', goes: 'The post, its photo and its likes. It goes from every phone and the server now.',
     stays: 'Nothing else. There is no undo, and its author can post again.', button: 'Remove the post', busyText: 'Removing…', run: () => bellRemoveNow(id) });
 }
 async function bellRemoveNow(id) {
@@ -6959,7 +6959,7 @@ function bellUnder13(id, on, box) {
   if (DEMO) { toast('Demo mode — nothing saved'); if (box) box.checked = !on; return; }
   if (!on) { if (box) box.disabled = true; bellSetUnder13(id, false); return; }
   if (box) box.checked = false;
-  dangerAsk('bell:u13:' + id, { title: `Tick ${nameOf(id)} as under 13?`, goes: 'Their posts and photos, the kudos they gave and any level moment waiting to ring. Their posts this week are removed now.',
+  dangerAsk('bell:u13:' + id, { title: `Tick ${nameOf(id)} as under 13?`, goes: 'Their posts and photos, the likes they gave and any level moment waiting to ring. Their posts this week are removed now.',
     stays: 'Their answer, their login and the right to read the Bell.', note: 'Under 13: they never post, never ring and are never named.',
     button: 'Tick under 13', busyText: 'Saving…', run: () => bellSetUnder13(id, true) });
 }

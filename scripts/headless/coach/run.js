@@ -5956,7 +5956,7 @@ S['courtside-from-amir'] = async (b) => {
 // the server "has not had stage81": every other scenario runs like that, and none of them sees the Bell.
 const BELL_T = { fixedTime: '2026-11-12T10:00:00Z', hash: 'proof' };   // a Thursday, 10:00 UTC: "3h", "Yesterday", "Tue" and "Mon" are the same on any day the harness runs
 const BELL_ID = n => 'b0000000-0000-4000-8000-00000000000' + n;
-// What the Bell shows: each post (name, the real name when different, chip, when, text, kudos, notes, buttons) and each answer (name, answer, off, ticked).
+// What the Bell shows: each post (name, the real name when different, chip, when, text, likes, notes, buttons) and each answer (name, answer, off, ticked).
 const bellState = page => page.evaluate(() => {
   const txt = el => el ? el.innerText.replace(/\s+/g, ' ').trim() : '';
   const posts = [...document.querySelectorAll('#bellPanel .bell-post')].map(el => ({
@@ -5974,7 +5974,7 @@ const bellJpegB64 = page => page.evaluate(() => { const c = document.createEleme
 const bellPngBytes = (page, w, h) => page.evaluate(({ w, h }) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#1b5e3c'); gr.addColorStop(1, '#c7552f'); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = '#fff'; g.fillRect(w / 4, h / 4, w / 2, h / 8); return c.toDataURL('image/png').split(',')[1]; }, { w, h });
 
 S['bell-panel'] = async (b) => {
-  const r = { id: 'bell-panel', title: 'The Bell on Proof: the last 7 days (newest first, who, when, kudos, photo on request), Remove asks first, the composer posts text and a photo made smaller, errors in plain words', checks: [] };
+  const r = { id: 'bell-panel', title: 'The Bell on Proof: the last 7 days (newest first, who, when, likes, photo on request), Remove asks first, the composer posts text and a photo made smaller, errors in plain words', checks: [] };
   const { page, log } = await L.openCoach(b, Object.assign({ seed: { crew: true } }, BELL_T));
   await page.waitForSelector('#bellPanel');
   const cs0 = await L.calls(page);
@@ -5983,8 +5983,8 @@ S['bell-panel'] = async (b) => {
   check(r, 'The Bell and Who said yes sit under the wall and above the board, in the left column', await page.evaluate(() => { const q = id => document.getElementById(id); const f = (a, b) => !!(q(a).compareDocumentPosition(q(b)) & Node.DOCUMENT_POSITION_FOLLOWING); return f('wallPanel', 'bellPanel') && f('bellPanel', 'bellPeople') && f('bellPeople', 'boardPanel') && q('bellPanel').parentElement === q('wallPanel').parentElement; }), '');
   let st = await bellState(page);
   check(r, 'four posts, newest first: Amir 3h ago, Ava yesterday, the unseen one on Tuesday, Ben\'s session on Monday', JSON.stringify(st.posts.map(p => [p.name, p.when])) === JSON.stringify([['You (Amir)', '3h'], ['Ava E.', 'Yesterday'], ['Gone E.', 'Tue'], ['Ben E.', 'Mon']]), st.posts.map(p => [p.name, p.when]));
-  check(r, 'Amir\'s own post is marked "You (Amir)" and says its words and "2 kudos"', st.posts[0].text === 'Great week, crew. Rest up and eat well.' && /2 kudos/.test(st.posts[0].acts), st.posts[0]);
-  check(r, 'Ava\'s post names the athlete as the crew sees her and as the dashboard knows her, with 3 kudos', /Ava E\./.test(st.posts[1].top) && /Ava Example/.test(st.posts[1].top) && /3 kudos/.test(st.posts[1].acts) && st.posts[1].text === 'First 50 sessions done!', st.posts[1]);
+  check(r, 'Amir\'s own post is marked "You (Amir)" and says its words and "2 likes"', st.posts[0].text === 'Great week, crew. Rest up and eat well.' && /2 likes/.test(st.posts[0].acts), st.posts[0]);
+  check(r, 'Ava\'s post names the athlete as the crew sees her and as the dashboard knows her, with 3 likes', /Ava E\./.test(st.posts[1].top) && /Ava Example/.test(st.posts[1].top) && /3 likes/.test(st.posts[1].acts) && st.posts[1].text === 'First 50 sessions done!', st.posts[1]);
   check(r, 'a post whose author is not shown says "not shown: their answer is no", is dimmed, and still has Remove', /not shown: their answer is no/.test(st.posts[2].acts) && st.posts[2].unseen && st.posts[2].remove && st.posts.filter(p => /not shown/.test(p.acts)).length === 1, st.posts[2]);
   check(r, 'a session told to the crew has its chip and no text; every post has Remove', st.posts[3].chip === 'Session' && st.posts[3].text === '' && st.posts.every(p => p.remove), st.posts[3]);
   check(r, 'only the two posts with a photo offer "Show photo" (none shows it yet)', JSON.stringify(st.posts.map(p => p.show)) === JSON.stringify([false, true, false, true]) && st.posts.every(p => !p.img), st.posts.map(p => [p.show, p.img]));
