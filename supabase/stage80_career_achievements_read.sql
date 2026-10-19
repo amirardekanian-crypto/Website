@@ -17,7 +17,8 @@
 --     with no progress anywhere, never a resilience one, then by kind, size and XP (the easiest first step). `month` is this month's {weeks, held, spoilt}.
 -- No table, no XP, no write, no change to the scorer: it only reads. Rehearsed in scripts/career/rehearse_achievements.mjs (section 8). The way back:
 -- scripts/career/rollback_stage80.sql (drops the function). Safe to re-run.
--- NOT YET APPLIED.
+-- APPLIED to the live project 2026-10-19 on Amir's word ("yes, go live with Four Courts"), as the migration stage80_career_achievements_read;
+-- the body read back equal to this file's, anon cannot run it, authenticated can; supabase/schema_snapshot.sql remade in the same commit (198 functions).
 
 do $stage80_guard$
 begin

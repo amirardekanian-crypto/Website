@@ -956,7 +956,10 @@ mostly for a day filed unfinished (`fileUnfinished()` files it as a partial sess
 - **Next (not built):** the Four Courts section on Progress (Amir's pick A: a Next up line, the four kinds as four tiles, a tap opens a kind) and the
   nudge on the finish card ("Hold Thursday and you get Back to Back").
 
-## Stage 80: the Four Courts read, as built (2026-10-19, not yet applied)
+## Stage 80: the Four Courts read, as built (2026-10-19)
+
+**APPLIED to the live project 2026-10-19** on Amir's word, *"yes, go live with Four Courts"* (migration `stage80_career_achievements_read`): the body
+read back equal to the file's, anon cannot run it and authenticated can, it answers; the schema snapshot was remade (198 functions).
 
 `supabase/stage80_career_achievements_read.sql` adds `get_achievements(p_athlete_id)`, the one read the Four Courts section in AA Performance draws
 from (`PROGRAM-APP.md` → *Achievements, Four Courts*). get_awards()'s identity rule (the athlete's own; the coach's preview names one; the SQL editor
@@ -973,6 +976,6 @@ size, the least XP. It writes nothing and pays nothing.
 - **Rehearsed** in `scripts/career/rehearse_achievements.mjs` section 8 (52 checks in all).
 - **The app goes first and is safe without it:** program.html asks for it beside the moments; until stage80 is applied the call fails and the section
   is simply not drawn.
-- **To apply**, on Amir's word: the file through the Supabase tool (a migration), then the schema snapshot (`scripts/restore/README.md`), then
-  open Progress on a real login.
+- **Applied** as above; the one thing no test can do is open Progress on a real login (signing in as an athlete signs out their phones),
+  so the first real look is Amir's own phone.
 - **The way back**: `scripts/career/rollback_stage80.sql` (drops the function; the section disappears).
