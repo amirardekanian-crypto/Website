@@ -42,8 +42,13 @@
 --     month; frozen rows never change (a late session no longer moves a winner).
 --
 -- Rehearsed on PGlite: scripts/career/rehearse_courtside.mjs (the schema snapshot, the backup's real facts, made-up live awards; twice; the way back).
--- The way back: scripts/career/rollback_stage75.sql (drops the functions and the four tables, puts coach_erase_person()'s list back). Nothing
+-- The way back: scripts/career/rollback_stage75.sql (drops the functions and the five tables, puts coach_erase_person()'s list back). Nothing
 -- else depends on them. Safe to re-run this file.
+-- APPLIED to the live project 2026-10-19 on Amir's yes ("Yes continue untill we are finished with our plan"), as the migration stage75_career_courtside.
+-- Read back: the five tables with row-level security on, anon executes none of the functions, the three helpers are the service role's only,
+-- coach_erase_person() lists the four tables, career_main_lift_names() 67 names, coach_honours('2026-09-01') as the coach: most sessions 14 (one
+-- athlete), no main-lift gain, Full Month 0, one week short 3. supabase/schema_snapshot.sql was remade in the same commit as BACKUP_TABLES (53 tables)
+-- and scripts/restore/rehearse.mjs passed (49 of 49).
 
 -- ── 0. The guard: the stages this one reads must be there ───────────────────────────────────────────────────────────────
 do $stage75_guard$

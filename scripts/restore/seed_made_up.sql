@@ -71,6 +71,22 @@ insert into public.career_awards (athlete_id, award_id, kind, item, tier, subjec
 insert into public.career_recognition (athlete_id, award_id, audience, size, due_at, told_at, told_by, created_at) values
   ('ava_test', 'badge:held_weeks:1', 'athlete', 'highlight', '2026-10-17 09:00:00+00', '2026-10-17 10:00:00+00', 'proof', '2026-10-17 09:00:00+00'),
   ('gone_test', 'achievement:first_best', 'athlete', 'highlight', '2026-10-17 09:00:00+00', null, null, '2026-10-17 09:00:00+00');
+-- Courtside (stage75): Amir's marks, a month's honours, a goal and a line from him; a person's own (the month row is not), so backed up and erased
+insert into public.courtside_marks (athlete_id, award_id, saw_at, sent_at, updated_at) values
+  ('ava_test', 'badge:held_weeks:1', '2026-10-17 11:00:00+00', '2026-10-17 11:00:00+00', '2026-10-17 11:00:00+00'),
+  ('gone_test', 'achievement:first_best', '2026-10-17 11:05:00+00', null, '2026-10-17 11:05:00+00');
+insert into public.career_honour_months (month, frozen_at, pick, pick_at) values
+  ('2026-09-01', '2026-10-08 09:00:00+00', 'picked', '2026-10-08 09:10:00+00');
+insert into public.career_honours (month, honour, athlete_id, value, sent_at, created_at) values
+  ('2026-09-01', 'sessions', 'ava_test', '{"n": 14}', '2026-10-08 09:05:00+00', '2026-10-08 09:00:00+00'),
+  ('2026-09-01', 'near', 'gone_test', '{"held": 3, "weeks": 4}', null, '2026-10-08 09:00:00+00'),
+  ('2026-09-01', 'pick', 'gone_test', '{"slot": "weeks_held", "n": 3}', null, '2026-10-08 09:10:00+00');
+insert into public.career_goals (athlete_id, month, line, done_at, created_at, updated_at) values
+  ('ava_test', '2026-10-01', 'Squat 3 times a week, every week. Don''t skip the "log"', null, '2026-10-01 09:00:00+00', '2026-10-01 09:00:00+00'),
+  ('gone_test', '2026-10-01', 'هر هفته سه جلسه ✓', '2026-10-15 09:00:00+00', '2026-10-01 09:00:00+00', '2026-10-15 09:00:00+00');
+insert into public.career_notes (athlete_id, day, line, award_id, created_at, read_at) values
+  ('ava_test', '2026-10-17', 'Trained through exam week. Proud of you.', 'badge:held_weeks:1', '2026-10-17 11:00:00+00', null),
+  ('gone_test', '2026-10-16', 'Back on it. Good.', null, '2026-10-16 11:00:00+00', null);
 
 -- ── the programmes and what hangs off an athlete ──────────────────────────────────────────────────────────────────────────
 insert into public.programs (athlete_id, data, updated_at, updated_by) values

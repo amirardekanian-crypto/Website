@@ -75,7 +75,7 @@ athletes active a week was too much. His aim: effort recognised by him and by ot
 | L10 | **The monthly goal, simple:** one line Amir writes for an athlete on coach.html, one tick when it is done. |
 | L11 | **Build order: Courtside first** (Amir's pick: his recognition), with the honours and the monthly goal, and **no new XP** in it, so it does not wait for D20 → D20 → the light screens in AA Performance, and AA Proof's career screens switched off → **the cut on the server, only after no app reads what it deletes** → Crew (the Bell) → the Monthly Open. Anything that adds or removes XP waits for D20. Every live database step waits for Amir's yes. |
 
-**Step 1, Courtside, is BUILT (2026-10-19), not yet applied** (`supabase/stage75_career_courtside.sql`; `PROCEDURES.md` → *Stage 75: Courtside, as built*;
+**Step 1, Courtside, is LIVE (built and applied 2026-10-19)** (`supabase/stage75_career_courtside.sql`; `PROCEDURES.md` → *Stage 75: Courtside, as built*;
 `COACH_DASHBOARD.md` → *Courtside*). Amir picked direction A of the design page (https://claude.ai/artifact/L3Tt3B6YPqMWcVgnN7nt9g) with *"Go with your
 picks"*: a Courtside panel at the top of Today's right column, the month's honours at its top in a month's first week, the goal and his line under the
 athlete's name; athletes see the goal, his line and "Amir saw this" with step 3; a tie shares an honour. No XP. **The stage numbers moved by one**

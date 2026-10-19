@@ -790,6 +790,11 @@ titles (phase 7); no Farsi name or caption for a reward (Amir writes them; the s
 
 ## Stage 75: Courtside, as built (2026-10-19)
 
+**APPLIED to the live project on 2026-10-19** (Amir: *"Yes continue untill we are finished with our plan"*): read back as the stage file's header says;
+the schema snapshot (53 tables), coach.html's `BACKUP_TABLES` and `scripts/test_restore_backup.py` (check 2g) were updated in one commit, and the restore
+rehearsal passed (49 of 49). September 2026's honours, worked out live: most sessions 14 (one athlete), no main-lift gain, Full Month nobody, three
+athletes one week short. coach.html freezes them on its first load (it is past the 8th).
+
 Round 5, step 1 (`CAREER_MODE.md` → *Round 5*, L2, L10, L11). Amir picked direction A of the design page (https://claude.ai/artifact/L3Tt3B6YPqMWcVgnN7nt9g)
 with "Go with your picks" on 2026-10-19, which also answered its two calls: athletes see the goal, his line and "Amir saw this" with the light
 screens (step 3), not before; a tie shares an honour. **Nothing here pays XP, mints an award or touches the scorer** (L11), so it did not wait
