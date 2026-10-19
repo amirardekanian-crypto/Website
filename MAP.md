@@ -12,6 +12,34 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 
 ---
 
+---
+
+## 🚪 The four doc layers (read only what your job needs)
+
+| Layer | Where | Read it… |
+|---|---|---|
+| **The door** | [`CLAUDE.md`](CLAUDE.md) | every session, automatically. Who/what this is, the non-negotiables, and the **READ-LIST**: per job, exactly which files to open. |
+| **Rules** | [`docs/rules/`](docs/README.md) | when you change that area. One short file per area, the rule in current tense. Twelve files, 2–17 KB each. |
+| **Reference** | [`docs/ref/`](docs/README.md) | by name, from an `INDEX.md`. One file per section; never read whole. |
+| **Record** | [`docs/record/`](docs/record/INDEX.md) | never, unless you ask. Dated audits, walkthroughs, histories. |
+
+The layers, the rules-file list and the house rules for writing them are in [`docs/README.md`](docs/README.md).
+
+| Rules file | Area |
+|---|---|
+| [`docs/rules/server-and-data.md`](docs/rules/server-and-data.md) | programmes live on the server; backups; coaching logs; erasure |
+| [`docs/rules/program-app.md`](docs/rules/program-app.md) | the athlete app: data, sessions, saving |
+| [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) | the athlete app: screens, cards, colour, navigation |
+| [`docs/rules/habits.md`](docs/rules/habits.md) | AA Proof, the habit app |
+| [`docs/rules/coach-dashboard.md`](docs/rules/coach-dashboard.md) | the coach dashboard |
+| [`docs/rules/career.md`](docs/rules/career.md) | Career Mode |
+| [`docs/rules/push.md`](docs/rules/push.md) | reminders on a phone |
+| [`docs/rules/site.md`](docs/rules/site.md) | the public site, the Farsi products, the chatbot |
+| [`docs/rules/seo.md`](docs/rules/seo.md) | article pages, SEO, content parity |
+| [`docs/rules/design.md`](docs/rules/design.md) | design work |
+| [`docs/rules/coaching.md`](docs/rules/coaching.md) | the coaching pipeline and the rule index |
+| [`docs/rules/working-with-amir.md`](docs/rules/working-with-amir.md) | how Amir works; verifying the live site; the hooks setup |
+
 ## 🔎 "Where do I find…?" — jump table
 
 | I'm looking for… | Go to |
@@ -31,14 +59,14 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 | How to run the coaching skills (intake → ship) | [`.claude/COACHING-HOWTO.md`](.claude/COACHING-HOWTO.md) |
 | The home page / hero | [`index.html`](index.html) (EN) · [`index-fa.html`](index-fa.html) (FA) |
 | The athlete training app | [`program.html`](program.html) · how its features work: [`PROGRAM-APP.md`](PROGRAM-APP.md) |
-| **The athlete app, as a first-time client sees it** (screens, first session, words, situations; plus findings for Amir) | [`Content/CLIENT-APP-MAP.md`](Content/CLIENT-APP-MAP.md) |
+| **The athlete app, as a first-time client sees it** (screens, first session, words, situations; plus findings for Amir) | [`docs/record/CLIENT-APP-MAP.md`](docs/record/CLIENT-APP-MAP.md) |
 | The Farsi products (the paid course app, the testing app's page) | [`FARSI-PRODUCTS.md`](FARSI-PRODUCTS.md) |
 | The coach dashboard ("The Coach's Box") | [`coach.html`](coach.html) · manual: [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | Where one athlete's program lives | a row in `public.programs` (Supabase; `data/<id>.json` is local scratch only) → [`SCHEMA.md`](SCHEMA.md) |
 | Brand images / icons / photos | [Assets ↓](#-assets--every-image-icon--photo) |
 | The checks (pre-commit guards, headless suites, restore, site audit) | [Scripts ↓](#-scripts--checks-and-tools) |
 | The athlete-app redesign audit (Quiet Frame) | <https://claude.ai/artifact/BBWjsR99FqthXmzCkeyK49> · local working kit `.claude/audit-kit/` (gitignored, never committed) |
-| Which doc owns a topic | [`CLAUDE.md`](CLAUDE.md) → *Reference docs* |
+| Which doc owns a topic, and what to open for a given job | [`CLAUDE.md`](CLAUDE.md) → *THE READ-LIST* · the layers: [`docs/README.md`](docs/README.md) |
 
 ---
 
@@ -73,7 +101,7 @@ English is the default (`/`); Farsi (`index-fa.html`) is for tennis and padel pl
 
 | File | What it is | Manual |
 |---|---|---|
-| [`program.html`](program.html) | The athlete PWA. Four tabs: **Home** (greeting, This Week, Next up, the other days, today's habits) · **Progress** (the This cycle card, **Your numbers**: Personal Records and Body weight, then the Game Plan road of cycles) · **Library** (one screen: Sessions · Playbook · Exercises; no doors page since 2026-10-13) · **Coach** (WhatsApp). Every screen is drawn in the **Centre Court look** (the Quiet Frame redesign, 2026-10-12/13; one CSS block per screen, headed "… IN THE CENTRE COURT LOOK"). Sheets: the ⓘ **About sheet** (Changeover), How to do it (steps and cues from the Spine), History. AA Proof (`habits.html`) opens from Home and is embedded on it. Loads the athlete's row in `public.programs` after sign-in (`get_program()`). Offline: `sw.js` cache `aap-v137`. Demo: `?client=demo`. Features in full: [`PROGRAM-APP.md`](PROGRAM-APP.md); a first-timer's walk-through: [`Content/CLIENT-APP-MAP.md`](Content/CLIENT-APP-MAP.md); the redesign audit, **Quiet Frame**: <https://claude.ai/artifact/BBWjsR99FqthXmzCkeyK49> | [`PROGRAM-APP.md`](PROGRAM-APP.md) · [`SCHEMA.md`](SCHEMA.md) |
+| [`program.html`](program.html) | The athlete PWA. Four tabs: **Home** (greeting, This Week, Next up, the other days, today's habits) · **Progress** (the This cycle card, **Your numbers**: Personal Records and Body weight, then the Game Plan road of cycles) · **Library** (one screen: Sessions · Playbook · Exercises; no doors page since 2026-10-13) · **Coach** (WhatsApp). Every screen is drawn in the **Centre Court look** (the Quiet Frame redesign, 2026-10-12/13; one CSS block per screen, headed "… IN THE CENTRE COURT LOOK"). Sheets: the ⓘ **About sheet** (Changeover), How to do it (steps and cues from the Spine), History. AA Proof (`habits.html`) opens from Home and is embedded on it. Loads the athlete's row in `public.programs` after sign-in (`get_program()`). Offline: `sw.js` cache `aap-v137`. Demo: `?client=demo`. Features in full: [`PROGRAM-APP.md`](PROGRAM-APP.md); a first-timer's walk-through: [`docs/record/CLIENT-APP-MAP.md`](docs/record/CLIENT-APP-MAP.md); the redesign audit, **Quiet Frame**: <https://claude.ai/artifact/BBWjsR99FqthXmzCkeyK49> | [`PROGRAM-APP.md`](PROGRAM-APP.md) · [`SCHEMA.md`](SCHEMA.md) |
 | [`habits.html`](habits.html) | **AA Proof** — habit tracker. Four tabs: Today · Progress · Crew · Locker (no chat; Settings sits behind the initials button in the header). **Per-habit levels + an overall level** on a 10-name × 5-sub rank ladder (ROOKIE→IMMORTAL, then prestige stars), **The long game** (a 14-reward track of titles + shareable-card looks, kept for good across season resets), full-screen level-up celebration, 5-tier consistency ladders, server-scored **leaderboard** (every athlete joins once, automatically, after a first finished workout; leaving sticks), **Roll Call** (one sentence a day, shared), a **3-day backfill window** on the log, offline-durable saving. **Installs to the home screen** (own manifest, `start_url` carries the athlete's link; offered once after their first log, plus a permanent Settings row). Reached from `program.html` (Home's Daily habits row, and a finished session's "open AA Proof" line), and **embedded on that app's Home** (`?embed=1`: today's rows only, ticked in place, `renderEmbed()`). Same login as the program — username and password (⚠️ the old `?client=<id>&key=<key>` links are retired and refused). **Also runs standalone for free (non-coached) users** — `"tier": "free"` in the `athlete` block of their `public.programs` row locks WORKOUT and swaps the programme links for coaching CTAs; they sign up at [`proof.html`](proof.html). Demo: `?client=demo` | [`HABITS.md`](HABITS.md) · [`XP_SYSTEM.md`](XP_SYSTEM.md) · [`QUESTS.md`](QUESTS.md) |
 | [`coach.html`](coach.html) | **The Coach's Box**, mission control for coaching *and* Proof. Seven places in one bar: **Today** (Needs you first, Also waiting, a short Proof column) · **Athletes** (one roster; one file per person: The work · Proof · File, Danger zone folded) · **Exercises** (Entries · Qualities · Coverage: the Spine) · **Proof** (the crew's home: wall, quest lever, board) · **Leads** (Applications · Free signups · Referral codes) · **Library** · **Buyers** (Course · Testing app). **⚙ Tools** (Backup, logins) sits in the top bar. Old hashes (`#intake`, `#affiliates`, `#assess`, `#course`) are rewritten by `fixLegacyHash()`. Google sign-in. Layout preview: `?demo=1`. Tested by the harness in [`scripts/headless/coach/`](scripts/headless/coach/README.md). ⚠ Never scores Proof itself | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | [`jump.html`](jump.html) | **Jump test** — measures countermovement jump and squat jump height, drop-jump RSI and the 10-5 repeated hop test from a phone video. Entirely on-device: the video is read in the browser, nothing is uploaded, there is no account and no backend. Opens as coaching (what the test is for, how to film it, how to perform it) and only then asks for a clip. Refuses clips under 120 fps, because below that the camera's own error is too big for the change rule. **History is split by athlete, scores each session by its best good rep, and only calls a change real past a line built from published test-retest error** (sessions and baseline in [`progress.js`](assets/js/jump/progress.js), the lines in each test's `changeRule`, no verdict yet for drop jump and the 10-5). **All the knowledge lives outside the page**, one file per thing that might change: [`assets/js/jump/`](assets/js/jump/) holds the physics, the change rule, the camera guide, the athlete questions and one file per test. Companion dev page [`jump-selftest.html`](jump-selftest.html) runs synthetic jumps with a known answer against the engine. `noindex`, not in the nav | [`assets/js/jump/README.md`](assets/js/jump/README.md) |
@@ -116,7 +144,7 @@ Three layers, in the order a designer should read them:
 
 The brain behind every program. Read the principles before touching sets/reps.
 
-- **Philosophy:** [`.claude/COACHING-PRINCIPLES.md`](.claude/COACHING-PRINCIPLES.md) — Amir's codified S&C method («هیچی بی‌دلیل نیست» — nothing without a reason): the rule index, then what each rule means. Its history (dates, Amir's words, where each rule came from) is [`.claude/COACHING-PRINCIPLES-HISTORY.md`](.claude/COACHING-PRINCIPLES-HISTORY.md), which no stage reads.
+- **Philosophy:** [`.claude/COACHING-PRINCIPLES.md`](.claude/COACHING-PRINCIPLES.md) — Amir's codified S&C method («هیچی بی‌دلیل نیست» — nothing without a reason): the rule index, then what each rule means. Its history (dates, Amir's words, where each rule came from) is [`docs/record/COACHING-PRINCIPLES-HISTORY.md`](docs/record/COACHING-PRINCIPLES-HISTORY.md), which no stage reads.
 - **How to run the pipeline:** [`.claude/COACHING-HOWTO.md`](.claude/COACHING-HOWTO.md)
 - **The brief agent:** [`.claude/agents/athlete-brief.md`](.claude/agents/athlete-brief.md) — data prep only: a new athlete's intake form from Gmail, and the Gmail session-report import /cycle-report runs first.
 - **Per-athlete rationale log:** coach-only *why* notes in `public.coaching_logs` on the server, read and written from coach.html → the athlete → File (it used to be `.claude/coaching-log/`, in this public repo).
@@ -324,14 +352,14 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`Content/PRODUCT.md`](Content/PRODUCT.md) | The business/product brief |
 | [`Content/HOW-IT-WORKS.md`](Content/HOW-IT-WORKS.md) | Customer-facing process explainer |
 | [`Content/exercise-card/blueprint.html`](Content/exercise-card/blueprint.html) | **The Exercise Card Blueprint** (2026-10-11): four layers, four jobs (steps, cues, pill, Coach's Note), the 13 answers Amir approved, the 12 pilot entries and the evidence; `HANDOFF.md` beside it says what shipped and what is open |
-| [`Content/FRESH-EYES.md`](Content/FRESH-EYES.md) | **The app audit** (2026-09-24) — what has shipped, what is next in order, the open calls, and how to continue |
+| [`docs/record/FRESH-EYES.md`](docs/record/FRESH-EYES.md) | **The app audit** (2026-09-24) — what has shipped, what is next in order, the open calls, and how to continue |
 | [`Content/SITE-AUDIT.md`](Content/SITE-AUDIT.md) | **The website audit** (2026-10-02) — 25 packages, the baseline scoreboard, the open questions, how to continue. Reviews in [`Content/site-audit/`](Content/site-audit/), measuring tools in [`scripts/site_audit/`](scripts/site_audit/README.md) |
 | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) | `coach.html` manual |
-| [`Content/COACH-AUDIT.md`](Content/COACH-AUDIT.md) | The coach dashboard audit (2026-10-10); §12 is the list to continue from |
+| [`docs/record/COACH-AUDIT.md`](docs/record/COACH-AUDIT.md) | The coach dashboard audit (2026-10-10); §12 is the list to continue from |
 | [`PROGRAM-APP.md`](PROGRAM-APP.md) | The athlete app's features in full (read before changing `program.html`) |
 | [`HABITS.md`](HABITS.md) | AA Proof brief (start here for the habit tracker) |
 | [`FARSI-PRODUCTS.md`](FARSI-PRODUCTS.md) | The paid course app, the testing app and the Farsi product pages |
-| [`Content/SET-LOGGING-DESIGN.md`](Content/SET-LOGGING-DESIGN.md) | How set logging was designed |
+| [`docs/record/SET-LOGGING-DESIGN.md`](docs/record/SET-LOGGING-DESIGN.md) | How set logging was designed |
 | [`Content/parity-drafts/`](Content/parity-drafts/) | Drafts for [`CONTENT-PARITY.md`](Content/CONTENT-PARITY.md): one folder per topic (lesson, article, verification notes) |
 | [`Content/exercise-demos/README.md`](Content/exercise-demos/README.md) | Plan for short exercise demo loops |
 | [`CALL_LOG.md`](CALL_LOG.md) | `call-log.html` manual |
@@ -340,7 +368,8 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md) | Import how-to |
 | [`QUESTS.md`](QUESTS.md) | **The quest catalogue** — what's running, the built quests, ready-made weeks, idea bank |
 | [`career/`](career/README.md) | **Career Mode** (2026-10-17, designed; phase 1 live in shadow, stage66; phase 2, the XP switch, applied 2026-10-17 and on since 2026-10-18, stage69; phase 3, rewards and the catalogue switch, built, applied and switched on 2026-10-18, stage70; its main-lift fix, stage73, applied the same day before the switch, after the weight units' stages 71 and 72): the gamification system for both apps. `CAREER_MODE.md` (the system, rules GAME-1 to GAME-14, decisions, build order), `PROCEDURES.md` (every function step by step), and the `.toml` files Amir edits (rulebook, badges, achievements, titles, missions, quests, recognition); `python scripts/check_career.py` checks them |
-| [`CLAUDE.md`](CLAUDE.md) | Working notes / preferences for AI assistants |
+| [`CLAUDE.md`](CLAUDE.md) | **The door** — read by every session: who/what this is, the non-negotiables, and the READ-LIST of what to open per job |
+| [`docs/README.md`](docs/README.md) | **The doc layers** — the rules files, the per-section reference, the record, and the house rules for writing them |
 
 ---
 

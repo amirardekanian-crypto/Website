@@ -538,7 +538,7 @@ recommended picks). `ex.why = { src, part?, text }`, spec in `SCHEMA.md` → *`w
 ## ✍️ The set log is COUNTERSIGNED, and the note belongs to ONE session (2026-09-24)
 
 Amir: *"do as you recommend"*, on top of The Card Remembers. Design and evidence in
-`Content/SET-LOGGING-DESIGN.md`. **Written by the coach, countersigned by the athlete:** every
+`docs/record/SET-LOGGING-DESIGN.md`. **Written by the coach, countersigned by the athlete:** every
 set arrives pre-written, the tick means "done as written", and only a set that went differently
 costs more than one tap.
 - **The row is SET · KG · REPS · RPE tag · tick.** RPE is no longer five ~20px buttons on every
@@ -2776,7 +2776,7 @@ would resurrect every reading on its next push, the identical failure mode the s
 tombstone fix (above) already exists to prevent. Proven across a simulated second device
 that still holds real readings: it ends up with every reading tombstoned too.
 
-## 🧭 First-timer fixes (2026-10-11, found by walking the app: `Content/CLIENT-APP-MAP.md`)
+## 🧭 First-timer fixes (2026-10-11, found by walking the app: `docs/record/CLIENT-APP-MAP.md`)
 
 Seven small changes, all found while mapping the app as a first-time client and each checked in a phone-width browser
 (`scripts/headless/first-timer.js`, which fails on the unfixed code):
@@ -2800,7 +2800,7 @@ structured" puts the "Why This Cycle Matters" note on Game Plan, where it is.
 
 ### The first-timer pass, part two (Amir's calls, 2026-10-11)
 
-Amir picked these after the map showed them (`Content/CLIENT-APP-MAP.md`, Part 2). They share one new piece, **`aaToast()`**: **a note in a box in the
+Amir picked these after the map showed them (`docs/record/CLIENT-APP-MAP.md`, Part 2). They share one new piece, **`aaToast()`**: **a note in a box in the
 middle of the screen** (Amir: "all the notes should appear in a box in the middle of the screen"), one at a time, a **Got it** button (or **Start** /
 **Not now** for the clock offer), gone by itself after six seconds (twenty for the clock offer). It never dims or blocks the page, so logging can go on
 under it. Since 2026-10-13 it is a green cover box above the sheets (z 215; *The sheets and the notices*, above). Checked in `scripts/headless/first-timer.js`.

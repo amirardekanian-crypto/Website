@@ -466,7 +466,7 @@ The screen they actually live on. **In this order, and the order is the point:**
    what a rest day uses. "Nothing logged yet" needs **nothing logged**: 3,000 steps is not done
    but it is logged, and used to be greeted with "You have logged nothing". Display only: no scorer
    moved, and a rest day still counts against the day exactly as before (see *Open calls* in
-   `Content/FRESH-EYES.md`).
+   `docs/record/FRESH-EYES.md`).
 6. **Roll call pointer** — a single row into the CREW tab, shown only while today's
    sentence is unwritten. The composer itself lives in CREW with its feed.
 7. **The recap** — a rolling seven-day block: days on target, XP earned, and the heat map

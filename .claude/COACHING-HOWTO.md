@@ -84,7 +84,7 @@ rule into one skill file: the other stages would never see it (PRC-23). The skil
 `.claude/COACHING-PRINCIPLES.md`. It starts with the **rule index**: every rule on one numbered
 line (like `VOL-8`, the 4-set cap), what stage uses it, and whether the checker enforces it. The
 stories below it say what each rule means in practice; the dates and your own words are in
-`.claude/COACHING-PRINCIPLES-HISTORY.md`. Change a rule on its line; the skills point to the
+`docs/record/COACHING-PRINCIPLES-HISTORY.md`. Change a rule on its line; the skills point to the
 number, so the change reaches every stage at once.
 
 ## Using it in other chats / on another computer

@@ -85,7 +85,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   row state (`.live`, `.done`, `.rpe-open`). Guided Mode's rest screen logs reps and RPE through the
   same row nodes (`paintTimerLog()`). The exercise note is per session: `<id>_snote_<Name>` =
   `{ d, v }`, valid only on day `d` (`loadSessionNote()`); `<id>_note_` is no longer read. Design:
-  `Content/SET-LOGGING-DESIGN.md`. **Since 2026-09-26 a set is `{ w, n, r, d, lw? }`**: `lw` is last
+  `docs/record/SET-LOGGING-DESIGN.md`. **Since 2026-09-26 a set is `{ w, n, r, d, lw? }`**: `lw` is last
   time's weight, shown under a LAST caption in an empty box, and `w` is only ever today's. A
   session's set is ended by ONE function, `carrySet()` (Done, the midnight sweep, the cloud copy and a
   rename all call it; since 2026-10-13 Done keeps the day's own copy in `<id>_donelog_d<N>` and a reader
@@ -566,7 +566,7 @@ A harness for looking at the two athlete apps in a headless browser with no serv
 this repo is public), `lib.js` opens `program.html` or `habits.html` signed in, and `smoke.js` walks both
 apps' main screens at 390 and 320 px, light and dark, with a screenshot of each. Serve the repo on
 127.0.0.1:8765 first. It is not a pre-commit check (it needs a browser): run it before a change to either
-app ships. Excluded from the site with the rest of `scripts/`. How to use it: `Content/FRESH-EYES.md` →
+app ships. Excluded from the site with the rest of `scripts/`. How to use it: `docs/record/FRESH-EYES.md` →
 *Render checks, headless*.
 `youtube.js` (2026-10-05) is a check built on it for one feature, the **Open in YouTube** bar under every player in
 `program.html` and its pop-up (`shared.js`): the link built from the stored video link, the bar reachable once the embed has

@@ -10,7 +10,7 @@ habit crew, the wall, the board or the funnel, which is most of what happens on
 a given day. It went unused. This version opens on **what today needs**, and it
 covers **both halves of the business** in one place.
 
-**Audited 2026-10-10** (`Content/COACH-AUDIT.md`: what was wrong, what changed, what is still
+**Audited 2026-10-10** (`docs/record/COACH-AUDIT.md`: what was wrong, what changed, what is still
 open, and the harness that tests the write paths). The short version of what changed for you:
 the inline editor can no longer overwrite a newer programme, every number that says "needs you"
 comes from one rule, the tabs fit a phone, and a failed load or save says so instead of looking

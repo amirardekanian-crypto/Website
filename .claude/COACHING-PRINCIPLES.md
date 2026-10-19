@@ -3,7 +3,7 @@
 This is Amir's codified coaching philosophy, in two parts: **the rule index** (one numbered
 line per rule, just below) and **the stories behind the rules** (the bullets after it: what each
 rule means in practice, with its examples). The history, meaning each rule's date, Amir's own words
-and the athlete it came from, is in **`COACHING-PRINCIPLES-HISTORY.md`** (moved there 2026-09-27).
+and the athlete it came from, is in **`../docs/record/COACHING-PRINCIPLES-HISTORY.md`** (moved there 2026-09-27).
 No stage reads that file; open it for a rule's origin. Every stage reads the whole index and only
 the story sections its job needs: `/program-design` the seven its decisions come from (its STEP 0
 lists them, since 2026-10-17), `/program-engage`, `/program-edit` and the reviewers theirs. Either
@@ -21,7 +21,7 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
 
 > How to add: one line in the rule index (the next free ID in its section, 25 words or fewer,
 > its stage and its check), then a story bullet under the right section, tagged with the same ID,
-> and its date and Amir's words under the same ID in `COACHING-PRINCIPLES-HISTORY.md`. Keep the
+> and its date and Amir's words under the same ID in `../docs/record/COACHING-PRINCIPLES-HISTORY.md`. Keep the
 > rule general (applies across athletes) and actionable.
 
 ---
@@ -30,7 +30,7 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
 
 **Read this first. One line per rule, and the line is the rule.** Everything below the index is
 the story behind each rule: what it means in practice and its examples (the date, Amir's words and
-the athlete it came from are in `COACHING-PRINCIPLES-HISTORY.md`). If a line and its story ever
+the athlete it came from are in `../docs/record/COACHING-PRINCIPLES-HISTORY.md`). If a line and its story ever
 disagree, **the line wins** and the story gets fixed. Search a rule's ID (`SEL-4`) to find its
 story. Built 2026-09-26 from the pipeline audit: the same rule lived in up to ten places, and a
 stale copy reached athletes.
@@ -258,7 +258,7 @@ stale copy reached athletes.
 ## The stories behind the rules
 
 Each bullet below is tagged with the rule it explains: what it means in practice and its examples.
-The dates, Amir's own words and what went wrong are in `COACHING-PRINCIPLES-HISTORY.md` under the
+The dates, Amir's own words and what went wrong are in `../docs/record/COACHING-PRINCIPLES-HISTORY.md` under the
 same ID. Read a rule's story and its history before changing it.
 
 ## Intake & assessment

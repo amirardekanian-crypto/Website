@@ -1,6 +1,6 @@
 # coach harness — coach.html in REAL mode against a fake Supabase
 
-Built during the coach.html audit (2026-10-10, `Content/COACH-AUDIT.md`). It drives `coach.html`
+Built during the coach.html audit (2026-10-10, `docs/record/COACH-AUDIT.md`). It drives `coach.html`
 (not `?demo=1`) in headless Chromium with a stubbed `window.supabase`, so the write paths that demo
 mode turns into no-ops actually run, and checks both the payload that leaves the page and what the
 screen shows afterwards. Every check is written as the CORRECT behaviour: a FAIL is a defect.
