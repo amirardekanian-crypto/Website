@@ -73,7 +73,7 @@ athletes active a week was too much. His aim: effort recognised by him and by ot
 | L8 | **The board keeps its order**; only the rank names go. |
 | L9 | **The Monthly Open** (new): one challenge a month for the whole crew (the six tennis tests in `course_en`, the 5K), a result counts only with proof, closed in back-off weeks, one board, the honours on the 1st (Most sessions counts plan sessions; Full Month for everyone who did every plan session; Most improved in percent on a main lift). |
 | L10 | **The monthly goal, simple:** one line Amir writes for an athlete on coach.html, one tick when it is done. |
-| L11 | **Build order:** D20 first → the light screens in AA Performance, and AA Proof's career screens switched off → **the cut on the server, only after no app reads what it deletes** → Courtside, the honours and the monthly goal → Crew (the Bell) → the Monthly Open. Every live database step waits for Amir's yes. |
+| L11 | **Build order: Courtside first** (Amir's pick: his recognition), with the honours and the monthly goal, and **no new XP** in it, so it does not wait for D20 → D20 → the light screens in AA Performance, and AA Proof's career screens switched off → **the cut on the server, only after no app reads what it deletes** → Crew (the Bell) → the Monthly Open. Anything that adds or removes XP waits for D20. Every live database step waits for Amir's yes. |
 
 **AA Proof:** frozen as the free door. Its career screens read what the cut deletes, so they are switched off before the cut (its habits keep working).
 The phases 4 to 7 plan outside the repo (`C:\Users\Amir\AA-Career\phases4to7\`) is amended by `AMENDED-LIGHTEST.md` there.
