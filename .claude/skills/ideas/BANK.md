@@ -193,6 +193,7 @@ Page (six versions, every direction kept): https://claude.ai/artifact/AriVWJQskS
 | Test week is challenge week | The plan's retest week opens the matching challenge | pitched |
 | The lesson arrives when it matters | The 24 lessons matched to plan moments | pitched |
 | The Road Remembers | Each finished cycle on Progress wears what it earned | pitched (grown idea) |
+| One Week Short | In a month's last week Courtside names whoever can still make Full Month by holding this week, the WhatsApp line written (nobody has a Full Month yet; three athletes were one week short in September) | pitched 2026-10-19 (grown idea, Courtside design page https://claude.ai/artifact/L3Tt3B6YPqMWcVgnN7nt9g) |
 | Gym photos, weekly missions, the full quest system | — | **parked** 2026-10-20: "later, only if the numbers say so" |
 
 ## Grown out of deep-dives
