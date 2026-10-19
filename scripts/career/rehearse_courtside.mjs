@@ -272,7 +272,46 @@ async function main() {
   section('10. nothing in the scorer moved');
   for (const t of ['career_facts', 'career_scores', 'career_rules', 'career_catalogue']) ok((await hashOf(db, t)) === before[t], `${t} is as the backup had it`);
 
+  section('12. stage77: an athlete reads their own goal, Amir\'s lines, "Amir saw this" and their honours');
+  const s77 = read(path.join(ROOT, 'supabase', 'stage77_career_my_moments.sql'));
+  await runSql(db, s77, 'stage77'); await runSql(db, s77, 'stage77 again');
+  ok(true, 'stage77 applied, and applied again without an error');
+  await q(db, `insert into auth.users (id, email) values ('00000000-0000-4000-8000-0000000000b1', 'athlete.zz_cs_b@example.test'), ('00000000-0000-4000-8000-0000000000c1', 'athlete.zz_cs_c@example.test') on conflict do nothing`);
+  await q(db, `insert into public.programs (athlete_id, data) values ('zz_cs_c', '{}') on conflict do nothing`);
+  await q(db, `insert into public.athlete_identities (user_id, athlete_id, email, linked_at) values
+                 ('00000000-0000-4000-8000-0000000000b1', 'zz_cs_b', 'athlete.zz_cs_b@example.test', now()),
+                 ('00000000-0000-4000-8000-0000000000c1', 'zz_cs_c', 'athlete.zz_cs_c@example.test', now()) on conflict do nothing`);
+  await asCoach(db, async () => {
+    await q(db, `select public.coach_set_goal('zz_cs_b', current_date, 'Every check-in, every session.')`);
+    await q(db, `select public.coach_from_amir('zz_cs_b', current_date, 'Saw your week. Good.')`);
+    await q(db, `select public.coach_set_goal('zz_cs_c', current_date, 'Not yours to read.')`);
+  });
+  await q(db, `insert into public.career_awards (athlete_id, award_id, kind, item, tier, day, pays, xp, size, meaning, evidence, how, rules_version)
+               values ('zz_cs_b', 'badge:century:1', 'badge', 'century', 1, current_date, true, 300, 'highlight', 'commitment', '{}', 'live', 3) on conflict do nothing`);
+  await asCoach(db, () => q(db, `select public.coach_courtside_mark('zz_cs_b', array['badge:century:1'], 'saw')`));
+  await q(db, `insert into public.career_honours (month, honour, athlete_id, value) values ((date_trunc('month', current_date) - interval '1 month')::date, 'sessions', 'zz_cs_b', '{"n": 12}'),
+                 ((date_trunc('month', current_date) - interval '1 month')::date, 'near', 'zz_cs_b', '{"held": 3, "weeks": 4}') on conflict do nothing`);
+  const asB = { sub: '00000000-0000-4000-8000-0000000000b1', role: 'authenticated' };
+  const mine = await asCoach(db, async () => (await one(db, `select public.get_my_moments() as m`)).m, asB);
+  ok(mine.athlete_id === 'zz_cs_b' && mine.goal && mine.goal.line === 'Every check-in, every session.' && mine.notes.length === 1 && !mine.notes[0].read,
+     'the athlete reads their own goal and Amir\'s unread line', mine);
+  ok(JSON.stringify(mine.saw) === JSON.stringify(['badge:century:1']) && mine.honours.length === 1 && mine.honours[0].honour === 'sessions',
+     'the athlete reads "Amir saw this" and their honour; a near miss is not one', { saw: mine.saw, honours: mine.honours });
+  ok(await raises(asCoach(db, () => q(db, `select public.get_my_moments('zz_cs_c')`), asB), /not your profile/), 'an athlete cannot read another athlete\'s');
+  const prev = await asCoach(db, async () => (await one(db, `select public.get_my_moments('zz_cs_b') as m`)).m);
+  ok(prev.goal && prev.goal.line === mine.goal.line, 'the coach\'s preview reads the athlete it names');
+  ok((await asCoach(db, () => val(db, `select public.mark_note_read('zz_cs_b', current_date)`))) === 0, 'the coach\'s preview marks nothing read');
+  ok((await asCoach(db, () => val(db, `select public.mark_note_read('zz_cs_c', current_date)`), asB)) === 0, 'an athlete cannot mark another\'s line');
+  ok((await asCoach(db, () => val(db, `select public.mark_note_read('zz_cs_b', current_date)`), asB)) === 1
+     && (await asCoach(db, async () => (await one(db, `select public.get_my_moments() as m`)).m.notes[0].read, asB)) === true, 'the athlete marks their line read, and it reads as read');
+  ok(await raises(asCoach(db, () => q(db, `select public.coach_from_amir('zz_cs_b', current_date, '')`)), /read it already/), 'once read, Amir can no longer take it back');
+  await db.exec('set role anon');
+  ok(await raises(q(db, `select public.get_my_moments('zz_cs_b')`), /permission denied/), 'anon cannot call get_my_moments()');
+  await db.exec('reset role');
+
   section('11. the way back, then stage75 again');
+  await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage77.sql')), 'rollback stage77');
+  ok(!(await val(db, `select to_regprocedure('public.get_my_moments(text)')::text`)), 'the way back from stage77 drops its two functions');
   await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage75.sql')), 'rollback');
   ok(!(await val(db, `select to_regclass('public.career_goals')::text`)) && !(await val(db, `select to_regprocedure('public.get_courtside(timestamptz,timestamptz)')::text`)), 'the tables and functions are gone');
   ok((await val(db, `select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure)`)) === erase0, 'coach_erase_person() is exactly as before stage75');

@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 53 tables, 195 functions, 7 sequences.
+-- 53 tables, 197 functions, 7 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -5258,6 +5258,38 @@ begin
   return v;
 end $function$;
 
+CREATE OR REPLACE FUNCTION public.get_my_moments(p_athlete_id text DEFAULT NULL::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  v_me text := public.current_athlete_id();
+  v_id text := coalesce(nullif(btrim(coalesce(p_athlete_id, '')), ''), v_me);
+  m0 date := date_trunc('month', current_date)::date;
+begin
+  if v_id is null then
+    raise exception 'not signed in';
+  end if;
+  if not (public.is_coach() or v_id is not distinct from v_me or coalesce(auth.jwt() ->> 'role', '') in ('', 'service_role')) then
+    raise exception 'not your profile';
+  end if;
+  return jsonb_build_object(
+    'athlete_id', v_id,
+    'goal', (select jsonb_build_object('month', g.month, 'line', g.line, 'done_at', g.done_at)
+               from public.career_goals g where g.athlete_id = v_id and g.month = m0),
+    'goals', (select coalesce(jsonb_agg(jsonb_build_object('month', g.month, 'line', g.line, 'done_at', g.done_at) order by g.month desc), '[]'::jsonb)
+                from public.career_goals g where g.athlete_id = v_id),
+    'notes', (select coalesce(jsonb_agg(jsonb_build_object('day', n.day, 'line', n.line, 'award_id', n.award_id, 'read', n.read_at is not null)
+                                        order by n.day desc), '[]'::jsonb)
+                from public.career_notes n where n.athlete_id = v_id),
+    'saw', (select coalesce(jsonb_agg(m.award_id order by m.award_id), '[]'::jsonb)
+              from public.courtside_marks m where m.athlete_id = v_id and m.saw_at is not null),
+    'honours', (select coalesce(jsonb_agg(jsonb_build_object('month', h.month, 'honour', h.honour, 'value', h.value) order by h.month desc, h.honour), '[]'::jsonb)
+                  from public.career_honours h where h.athlete_id = v_id and h.honour <> 'near'));
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.get_profile(p_athlete_id text DEFAULT NULL::text)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -6293,6 +6325,20 @@ begin
     returning 1
   )
   select count(*) into v_n from u;
+  return v_n;
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.mark_note_read(p_athlete_id text, p_day date)
+ RETURNS integer
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_n integer;
+begin
+  if p_athlete_id is null or p_athlete_id is distinct from public.current_athlete_id() then return 0; end if;   -- the athlete themself, never a preview
+  update public.career_notes set read_at = now() where athlete_id = p_athlete_id and day = p_day and read_at is null;
+  get diagnostics v_n = row_count;
   return v_n;
 end $function$;
 
@@ -8063,6 +8109,8 @@ revoke all on function public.get_messages(p_athlete_id text, p_key text) from p
 grant execute on function public.get_messages(p_athlete_id text, p_key text) to anon, authenticated, service_role;
 revoke all on function public.get_my_history(p_athlete_id text, p_days integer) from public, anon, authenticated, service_role;
 grant execute on function public.get_my_history(p_athlete_id text, p_days integer) to anon, authenticated, service_role;
+revoke all on function public.get_my_moments(p_athlete_id text) from public, anon, authenticated, service_role;
+grant execute on function public.get_my_moments(p_athlete_id text) to authenticated, service_role;
 revoke all on function public.get_profile(p_athlete_id text) from public, anon, authenticated, service_role;
 grant execute on function public.get_profile(p_athlete_id text) to authenticated, service_role;
 revoke all on function public.get_program(p_athlete_id text, p_key text) from public, anon, authenticated, service_role;
@@ -8127,6 +8175,8 @@ revoke all on function public.mark_athlete_read(p_athlete_id text, p_key text) f
 grant execute on function public.mark_athlete_read(p_athlete_id text, p_key text) to anon, authenticated, service_role;
 revoke all on function public.mark_moments_told(p_athlete_id text, p_award_ids text[], p_app text) from public, anon, authenticated, service_role;
 grant execute on function public.mark_moments_told(p_athlete_id text, p_award_ids text[], p_app text) to authenticated, service_role;
+revoke all on function public.mark_note_read(p_athlete_id text, p_day date) from public, anon, authenticated, service_role;
+grant execute on function public.mark_note_read(p_athlete_id text, p_day date) to authenticated, service_role;
 revoke all on function public.move_buyer_label() from public, anon, authenticated, service_role;
 grant execute on function public.move_buyer_label() to service_role;
 revoke all on function public.programme_fingerprint(p_id text) from public, anon, authenticated, service_role;
