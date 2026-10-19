@@ -340,7 +340,13 @@
 // line of every page for a name that is called and declared nowhere, and found two more, both leftovers of the body-weight move
 // to program.html. wtAvgSeries() called wtSeries() and wtNudge() called fmtKg(), neither of which exists here any more; nothing
 // called either of them, so the four dead functions are deleted. The guard now runs on every commit that touches a page.
-const CACHE = 'aap-v194';
+// v195: program.html and assets/js/sharecard.js changed (2026-10-19, the share cards' own design pass; Amir: "go with your picks").
+//       The cards are redrawn in the app's own cover language (a picture graded into the green, the mint-dot eyebrow with the athlete's
+//       name and the date, ONE huge number, a one-line foot with the mantra), four new kinds join them (a mark, the month's honour, the
+//       Monthly Open, the athlete's own card) and three more (a new level, the month's goal, a session). Every achievement can be shared
+//       from Your moments, whenever it was earned. Any card can take the athlete's own photo as its ground, moved and zoomed by hand; the
+//       picture never leaves the phone. The badge, title and quest cards go: the cut took them off the server.
+const CACHE = 'aap-v195';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

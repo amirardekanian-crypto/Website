@@ -14,7 +14,7 @@
 //        numbers 2 x 2 with the next mark and a bar), the month's goal, Your moments (the marks, achievements, Amir's lines with Reply on WhatsApp, honours, "Amir saw this", six shown and
 //        Show all), then Records and body · "New from Amir" on Home (clay, read at the tap on the phone and on the server, opens Progress on the line) · the finish card's moves are the
 //        four marks only ("25 of 25 sessions with Amir · a new mark", "4 of 8 weeks held · when the week counts"), never a badge name, a metal or "+N more in AA Proof" · the finished
-//        card's bands and the full-screen moments are achievements and the four marks' tiers only ("A new mark"; a mark shares as an achievement-style card), every other badge, a
+//        card's bands and the full-screen moments are achievements and the four marks' tiers only ("A new mark"; a mark has its own share card), every other badge, a
 //        title and the Grand Slam are neither, and are never marked seen or told · Counting bands at Done, confirmed (or taken away) by the answer · Sessions with Amir counts a
 //        paid session finished here that no answer has counted yet (GAME-4) · ?go=numbers lands on Your numbers · the session queue never waits on any of it.
 // AA PROOF has no career screens (CAREER_LIGHT; scripts/headless/proof-light.js tests what is gone and what stays). What this file keeps for it is the XP that still moves: the
@@ -742,7 +742,7 @@ async function trainingLight(browser, C) {
     await p.evaluate(() => document.querySelector('#hlwin-1 .hl-band').click());
     await p.waitForTimeout(700);
     const sheet = await p.evaluate(() => ({ title: (document.getElementById('hl-title') || {}).textContent, open: !!document.querySelector('#hist-overlay.visible') }));
-    C.check('Share on the band opens the share sheet, "Share it" (a mark shares as an achievement-style card)', sheet.open && sheet.title === 'Share it', JSON.stringify(sheet));
+    C.check('Share on the band opens the share sheet, "Share your mark" (a mark has its own card since the design pass, 2026-10-19)', sheet.open && sheet.title === 'Share your mark', JSON.stringify(sheet));
     C.check('bands: no page errors', !p.errs.length, JSON.stringify(p.errs));
     await p.reload({ waitUntil: 'domcontentloaded' });
     await p.waitForTimeout(1500);
@@ -1078,8 +1078,10 @@ async function trainingLight(browser, C) {
     C.check('the four marks: weeks held 4 · 8 · 12 · 24 · 52, sessions 25 · 50 · 100 · 200 · 500, bests 5 · 10 · 25 · 50 · 100, comebacks 3 · 5 · 10',
       JSON.stringify(mk.marks) === JSON.stringify({ held_weeks: { key: 'weeks_held', at: [4, 8, 12, 24, 52] }, century: { key: 'sessions_with_amir', at: [25, 50, 100, 200, 500] }, bests: { key: 'personal_bests', at: [5, 10, 25, 50, 100] }, comebacks: { key: 'comebacks', at: [3, 5, 10] } }), JSON.stringify(mk.marks));
     C.check('a mark\'s words: "week held" for one, "weeks held" otherwise, "session with Amir", "personal bests", "comebacks"', mk.words.join() === 'week held,weeks held,session with Amir,sessions with Amir,personal bests,comebacks', mk.words.join());
-    C.check('a mark\'s card is an achievement-style spec with mark: true and no metal; a badge that is no mark, and a tier past the last, have none', mk.spec && mk.spec.kind === 'achievement' && mk.spec.mark === true && mk.spec.name === '12 weeks held' && !('metal' in mk.spec) && mk.spec.award_id === 'badge:held_weeks:3'
-      && mk.spec.meaning === 'consistency' && mk.none === null && mk.over === null, JSON.stringify(mk));
+    // Since the share cards' design pass (2026-10-19) a mark has its OWN card: the number it reached, what it counts and the next mark.
+    C.check('a mark\'s card is a mark spec (its number, its key and the next mark) with no metal; a badge that is no mark, and a tier past the last, have none',
+      mk.spec && mk.spec.kind === 'mark' && mk.spec.key === 'weeks_held' && mk.spec.n === 12 && mk.spec.next === 24 && !('metal' in mk.spec)
+      && mk.spec.award_id === 'badge:held_weeks:3' && mk.none === null && mk.over === null, JSON.stringify(mk));
     await ctx.close();
   }
 }

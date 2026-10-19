@@ -1,7 +1,7 @@
 // Highlight Reel, the share cards (assets/js/sharecard.js, 2026-10-17): node scripts/headless/sharecard.js [--out <dir>] [--only <kind,kind>] [--verbose]
 //
 // ShareCard.paint() draws ten cards onto a canvas: the training app's five (best, effort, retest, cycle, roadmap) and Career Mode's five
-// rewards (badge, achievement, title, level, quest), at two sizes (a 1080 x 1920 Story and a 1080 x 1350 post), in English and in Farsi.
+// Career Mode cards (achievement, mark, honour, open, player, level, goal, session), at two sizes (a 1080 x 1920 Story and a 1080 x 1350 post), in English and in Farsi.
 // Every word goes through put(), which records where it sits (canvas._boxes), so this reads those boxes instead of looking at a picture.
 // Each kind is painted from a NORMAL sample (realistic values, which must fit whole) and a LONG one (long names, 187.5 kg x 12, six cycles,
 // five long steps, a 20-letter first name). Every sample runs at both sizes in both languages; the normal ones also with the weights hidden
@@ -69,32 +69,41 @@ const NORMAL = [
     ] } },
   { id: 'roadmap', card: { kind: 'roadmap', first: FIRST, weeks: 15, sessions: 58, start: '2026-07-07', end: D,
     cycles: [{ name: 'Foundation Forge', art: ART('bedrock') }, { name: 'Load & Build', art: ART('build') }, { name: 'Strength Engine', art: ART('iron') }] } },
-  // Career Mode's rewards (Amir's names of 2026-10-17: Hold Serve, Free Kilos, First Treble, CLOCKWORK; the Farsi is invented here, with Persian digits, as the catalogue's will have to be)
-  { id: 'badge', card: { kind: 'badge', first: FIRST, name: 'Hold Serve', nameFa: 'هفته‌های کامل', meaning: 'consistency', metal: 'emerald', tier: 3, n: 12,
-    caption: '12 weeks held in a row. You keep showing up.', captionFa: '۱۲ هفتهٔ پشت‌سرهم کامل. تو همیشه حاضری.', date: D } },
+  // Career Mode's cards (the 2026-10-19 pass: no badge, title or quest — they left the server with the cut). The Farsi here is
+  // invented for the test, with Persian digits, as the catalogue's will have to be.
   { id: 'achievement', card: { kind: 'achievement', first: FIRST, name: 'First Treble', nameFa: 'هفتهٔ بی‌نقص', meaning: 'consistency',
     caption: 'Three missions, three done.', captionFa: 'سه مأموریت، هر سه انجام شد.', date: D } },
-  { id: 'title', card: { kind: 'title', first: FIRST, name: 'CLOCKWORK', meaning: 'consistency', metal: 'prismatic',
-    from: 'Hold Serve, prismatic: 52 weeks held in a row', fromFa: 'هفته‌های کامل، منشوری: ۵۲ هفتهٔ پشت‌سرهم', date: D } },
-  // Career Mode phase 3 (the catalogue switch): the spec the server hands over for a reward (scripts/career/rehearse_catalogue.mjs; get_profile()'s moments[].spec and
-  // get_awards()'s recent[].spec), with no nameFa, captionFa or fromFa yet (Amir writes them): a Farsi card must fall back to the English words and still fit, in Persian digits.
-  { id: 'badge-server', card: { kind: 'badge', first: FIRST, name: 'Hold Serve', meaning: 'consistency', metal: 'emerald', tier: 3, n: 12, caption: '12 weeks held in a row. You keep showing up.', date: D } },
-  { id: 'badge-server-habit', card: { kind: 'badge', first: FIRST, name: 'HUMAN SPRINKLER', meaning: 'consistency', metal: 'bronze', tier: 1, n: 5, caption: '5 days in a row on full water.', date: D } },
-  { id: 'badge-server-upgrade', card: { kind: 'badge', first: FIRST, name: 'The Upgrade', meaning: 'progress', metal: 'silver', tier: 2, n: 22, caption: 'Your most improved lift is 22% stronger than its first session, at the same effort.', date: D } },
-  { id: 'badge-server-resilience', card: { kind: 'badge', first: FIRST, name: 'HARD TO KILL', meaning: 'resilience', metal: 'amethyst', tier: 4, n: 10, caption: '10 comebacks that stuck.', date: D } },
+  // The spec the server hands over, with no nameFa or captionFa yet (Amir writes them): a Farsi card falls back to the English
+  // words and must still fit, in Persian digits.
   { id: 'achievement-server', card: { kind: 'achievement', first: FIRST, name: 'THE FOUNDRY', meaning: 'commitment', caption: 'Four weeks of putting the work in.', date: D } },
   { id: 'achievement-server-best', card: { kind: 'achievement', first: FIRST, name: 'First Best', meaning: 'progress', caption: 'Your first personal best. Not the last.', date: D } },
-  { id: 'title-server', card: { kind: 'title', first: FIRST, name: 'BEDROCK', meaning: 'consistency', metal: 'prismatic', from: 'BEDROCK: four weeks of the boring half', date: D } },
-  { id: 'title-grand-slam', card: { kind: 'title', first: FIRST, name: 'GRAND SLAM', meaning: 'all', metal: 'prismatic', from: 'A title in all four', date: D } },
-  { id: 'level', card: { kind: 'level', first: FIRST, level: 14, rank: 'GRINDER', sub: 4, metal: 'silver', prestige: 0, date: D } },
-  { id: 'quest', card: { kind: 'quest', first: FIRST, name: 'Sleep Reset', nameFa: 'ریست خواب', meaning: 'consistency', weeks: 4,
-    steps: ['Your sleep target on 5 nights in a week', '10 of 14 nights', '20 of 28 nights'],
-    stepsFa: ['هدف خوابت در ۵ شب از هفته', '۱۰ شب از ۱۴ شب', '۲۰ شب از ۲۸ شب'],
-    caption: 'Four weeks of real sleep.', captionFa: 'چهار هفته خواب واقعی.', date: D } },
-  { id: 'quest-title', card: { kind: 'quest', first: FIRST, name: 'Tournament Ready', nameFa: 'آمادهٔ مسابقه', meaning: 'commitment', weeks: 5,
-    steps: ['Hold the first week', 'Hold three weeks in a row', 'Finish the cycle'],
-    stepsFa: ['هفتهٔ اول را کامل بزن', 'سه هفته پشت‌سرهم کامل', 'دوره را تمام کن'],
-    caption: 'Every week of the pre-competition cycle, held.', captionFa: 'همهٔ هفته‌های دورهٔ پیش از مسابقه، کامل.', title: 'MATCH FIT', date: D } },
+  { id: 'achievement-win', card: { kind: 'achievement', first: FIRST, name: 'FIRST BLOOD', meaning: 'commitment', caption: 'Your first session on the board', date: D } },
+  // The four numbers' marks (L3), one of each
+  { id: 'mark-weeks', card: { kind: 'mark', first: FIRST, key: 'weeks_held', n: 8, next: 12, date: D } },
+  { id: 'mark-sessions', card: { kind: 'mark', first: FIRST, key: 'sessions_with_amir', n: 50, next: 100, date: D } },
+  { id: 'mark-bests', card: { kind: 'mark', first: FIRST, key: 'personal_bests', n: 25, next: 50, date: D } },
+  { id: 'mark-comebacks', card: { kind: 'mark', first: FIRST, key: 'comebacks', n: 3, next: 5, date: D } },
+  { id: 'mark-last', card: { kind: 'mark', first: FIRST, key: 'weeks_held', n: 52, next: 0, date: D } },
+  // The month's honours (L9). A card never names another athlete: the place and the size of the field, nothing more.
+  { id: 'honour-sessions', card: { kind: 'honour', first: FIRST, honour: 'sessions', month: 'September', n: 18, place: 1, field: 14, date: D } },
+  { id: 'honour-improved', card: { kind: 'honour', first: FIRST, honour: 'improved', month: 'September', pct: 8.4, lift: 'Trap Bar Deadlift', place: 1, field: 14, date: D } },
+  { id: 'honour-full', card: { kind: 'honour', first: FIRST, honour: 'full_month', month: 'September', date: D } },
+  { id: 'honour-pick', card: { kind: 'honour', first: FIRST, honour: 'pick', month: 'September', date: D } },
+  // The Monthly Open (stage85): Amir's own words for what counts, and the athlete's place
+  { id: 'open', card: { kind: 'open', first: FIRST, title: 'The Spider', month: 'October', value: 14.2, unit: 'sec', place: 2, field: 11,
+    how: 'Six touches, baseline to each corner and back. Fastest time.', date: D } },
+  { id: 'open-noplace', card: { kind: 'open', first: FIRST, title: '5K', month: 'October', value: 24.5, unit: 'min', date: D } },
+  // The athlete's own card, any day
+  { id: 'player', card: { kind: 'player', first: FIRST, level: 17, weeks: 8, sessions: 64, bests: 23, comebacks: 2, since: '2026-02-11', date: D,
+    lifts: [{ name: 'Trap Bar Deadlift', w: 100, r: 5 }, { name: 'Barbell Back Squat', w: 90, r: 5 }, { name: 'Barbell Bench Press', w: 65, r: 6, u: 'kg' }] } },
+  { id: 'player-new', card: { kind: 'player', first: FIRST, level: 2, weeks: 1, sessions: 3, bests: 1, comebacks: 0, date: D, lifts: [] } },
+  // A new level (no rank name anywhere), the month's goal, a session
+  { id: 'level', card: { kind: 'level', first: FIRST, level: 14, date: D } },
+  { id: 'goal', card: { kind: 'goal', first: FIRST, month: 'October', text: 'Three sessions a week, every week, and log every set.',
+    textFa: 'هفته‌ای سه جلسه، هر هفته، و همهٔ ست‌ها رو ثبت کن.', date: D } },
+  { id: 'goal-server', card: { kind: 'goal', first: FIRST, month: 'October', text: 'Get the deadlift to 100 kg at RPE 8.', date: D } },
+  { id: 'session', card: { kind: 'session', first: FIRST, title: 'Lower Power', cycle: CYC, mins: 54, exercises: 7, sets: 22, date: D } },
+  { id: 'session-plain', card: { kind: 'session', first: FIRST, title: 'Banded Lower Burner', mins: 38, date: D } },
 ];
 
 // The stress samples: the longest names, the biggest numbers, the most rows. Cut text and left-out parts are allowed here (and listed).
@@ -118,30 +127,20 @@ const LONG = [
       { name: 'Power Phase: Speed Under Load', art: ART('voltage') }, { name: 'Peak Week and Pre-Competition Taper', art: ART('peak') },
       { name: 'Reset, Restore and Return to Play', art: ART('reset') }, { name: 'Voltage Season Opening Block', art: ART('spring') },
     ] } },
-  { id: 'badge-long', card: { kind: 'badge', first: FIRST_LONG, name: 'Free Kilos at the Same Effort, Cycle on Cycle', nameFa: 'همون فشار، وزنهٔ بیشتر، دوره به دوره', meaning: 'progress', metal: 'prismatic', tier: 5, n: 128,
-    caption: '128 lifts heavier at the same effort, cycle on cycle, with every retest on the calendar and not one of them skipped.',
-    captionFa: '۱۲۸ حرکت با وزنهٔ سنگین‌تر در همون فشار، دوره به دوره، و هیچ تستی از قلم نیفتاد و هیچ جلسه‌ای جا نموند.', date: D } },
   { id: 'achievement-long', card: { kind: 'achievement', first: FIRST_LONG, name: 'The First Held Week After the Long Comeback', nameFa: 'اولین هفتهٔ کامل بعد از بازگشت طولانی', meaning: 'resilience',
     caption: 'Your first held week back after the layoff. Every session, on your days, with nothing skipped and nothing rushed.',
     captionFa: 'اولین هفتهٔ کامل بعد از وقفه. همهٔ جلسه‌ها، توی روزهای خودت، بدون جا انداختن و بدون عجله.', date: D } },
-  { id: 'title-long', card: { kind: 'title', first: FIRST_LONG, name: 'UNSTOPPABLE ROADMAP FINISHER', meaning: 'commitment', metal: 'prismatic',
-    from: 'Hold Serve, prismatic: 52 weeks held in a row, across every cycle of the roadmap, without one missed session',
-    fromFa: 'هفته‌های کامل، منشوری: ۵۲ هفتهٔ پشت‌سرهم، در تمام دوره‌های برنامه، بدون حتی یک جلسهٔ جا افتاده', date: D } },
-  { id: 'level-long', card: { kind: 'level', first: FIRST_LONG, level: 195, rank: 'UNTOUCHABLE', sub: 5, metal: 'prismatic', prestige: 3, date: D } },
-  { id: 'quest-long', card: { kind: 'quest', first: FIRST_LONG, name: 'First Strict Pull-up and the Full Hang Rebuild Block', nameFa: 'اولین بارفیکس کامل و بازسازی آویزان شدن کامل', meaning: 'progress', weeks: 12,
-    steps: ['A 5-second lowering on video, with the shoulder blades held down for the whole rep',
-      'Three 5-second lowerings in one set, on video, with a full hang between every rep',
-      'One strict pull-up, on video, from a dead hang with no kick and no swing',
-      'Three strict pull-ups in a row, on video, from a dead hang each time',
-      'Five strict pull-ups in a row, on video, then repeat them a week later'],
-    stepsFa: ['یک پایین‌آوردن ۵ ثانیه‌ای، با ویدیو، با کتف‌های پایین و ثابت در تمام مدت تکرار',
-      'سه پایین‌آوردن ۵ ثانیه‌ای توی یک ست، با ویدیو، با آویزان شدن کامل بین هر تکرار',
-      'یک بارفیکس کامل، با ویدیو، از آویزان شدن کامل، بدون تاب خوردن و بدون ضربه',
-      'سه بارفیکس کامل پشت‌سرهم، با ویدیو، و هر بار از آویزان شدن کامل',
-      'پنج بارفیکس کامل پشت‌سرهم، با ویدیو، و یک هفته بعد دوباره تکرارش'],
-    caption: 'From a band to your own bodyweight, one slow lowering at a time, with Amir watching every rep on video.',
-    captionFa: 'از کش تا وزن بدن خودت، با هر پایین‌آوردن آهسته، و امیر هر تکرار رو توی ویدیو می‌بینه.',
-    title: 'UNTOUCHABLE PULL-UP ARTIST', date: D } },
+  { id: 'mark-long', card: { kind: 'mark', first: FIRST_LONG, key: 'sessions_with_amir', n: 500, next: 1000, date: D } },
+  { id: 'honour-long', card: { kind: 'honour', first: FIRST_LONG, honour: 'improved', month: 'September', pct: 128.5,
+    lift: 'Single-Arm Dumbbell Romanian Deadlift to Bench', place: 11, field: 128, date: D } },
+  { id: 'open-long', card: { kind: 'open', first: FIRST_LONG, title: 'The Spider Drill and the Baseline Shuttle', month: 'October', value: 128.75, unit: 'seconds', place: 12, field: 128,
+    how: 'Six touches, baseline to each corner and back, then the shuttle from the service line to the net and back twice, timed from the first step to the last touch.', date: D } },
+  { id: 'player-long', card: { kind: 'player', first: FIRST_LONG, level: 195, weeks: 52, sessions: 1280, bests: 128, comebacks: 12, since: '2024-02-11', date: D,
+    lifts: [{ name: LIFT_LONG, w: 187.5, r: 12 }, { name: 'Barbell Hip Thrust with Banded Abduction Hold', w: 197.5, r: 12 }, { name: 'Weighted Pull-Up with Slow Eccentric Lowering', w: 42.5, r: 10 }] } },
+  { id: 'level-long', card: { kind: 'level', first: FIRST_LONG, level: 195, date: D } },
+  { id: 'goal-long', card: { kind: 'goal', first: FIRST_LONG, month: 'September', text: 'Three sessions a week, every week of the month, every set logged and every check-in answered before you start, and the deadlift up to 110 kg at the same effort by the last week.',
+    textFa: 'هفته‌ای سه جلسه، همهٔ هفته‌های ماه، همهٔ ست‌ها ثبت شده و چک‌این قبل از شروع، و ددلیفت تا ۱۱۰ کیلو با همون فشار تا هفتهٔ آخر.', date: D } },
+  { id: 'session-long', card: { kind: 'session', first: FIRST_LONG, title: 'Foundation Forge and the Rebuild Engine, Lower Power Day', cycle: CYC_LONG, mins: 128, exercises: 14, sets: 48, date: D } },
 ];
 // ── The three measures (2026-10-18): a weight is in kg, lb or plates (the count on a machine's stack) ─────────────────────────────────
 // Every card that can show a weight (best, effort, retest, cycle) is drawn again in pounds and in plates, from its kg sample: the same
@@ -373,7 +372,11 @@ function judge(name, s, cb, res) {
     note(R.noWu, name, !leaked.length, 'still writes ' + leaked.join(', ') + ' with a unit (the card has ' + secrets.join(', ') + ')');
   }
   // The measure's own unit word: on the card where a weight (a change) is shown, never a word of another measure, "1 plate" and no "1 plates".
-  const wrongWords = texts.map((t, i) => [i, strayUnits(t, cb.lang, used)]).filter(x => x[1].length);
+  // Text Amir typed himself (the month's goal, what counts in the Open, a catalogue caption) is carried through as written, in either
+  // language: a "kg" inside his own sentence is his, not the card writing a unit.
+  const his = [s.card.text, s.card.textFa, s.card.how, s.card.caption, s.card.captionFa].filter(Boolean).join(' ⋄ ');
+  const mine = t => !(his && his.indexOf(String(t).replace(/…$/, '').trim()) >= 0);
+  const wrongWords = texts.map((t, i) => [i, mine(t) ? strayUnits(t, cb.lang, used) : []]).filter(x => x[1].length);
   note(R.unitOff, name, !wrongWords.length, list(wrongWords, x => `${bx(boxes[x[0]])} has ${x[1].join(', ')}`));
   if (!s.long) {
     const want = [...unitsShown(s.card, cb.weights !== false)], lack = want.filter(x => !texts.some(t => afterNumRx(cb.lang, x).test(t)));
@@ -391,10 +394,23 @@ function judge(name, s, cb, res) {
 
 // The page's own helper: paints one card and reads back what the checks need (boxes, fit, size, a 20 x 20 grid of pixels, optionally the PNG).
 function installHelpers() {
+  // The athlete's own picture, made up here: a 900 x 1600 photograph of nothing, with enough in it to show through the grade.
+  function madePhoto() {
+    const c = document.createElement('canvas'); c.width = 900; c.height = 1600;
+    const x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, 900, 1600);
+    g.addColorStop(0, '#8FA6B2'); g.addColorStop(0.5, '#C98E6A'); g.addColorStop(1, '#2A2F2B');
+    x.fillStyle = g; x.fillRect(0, 0, 900, 1600);
+    x.fillStyle = 'rgba(255,255,255,0.35)';
+    for (let i = 0; i < 40; i++) x.fillRect((i * 97) % 900, (i * 211) % 1600, 60, 8);
+    return c.toDataURL('image/jpeg', 0.8);
+  }
+  const PHOTO = madePhoto();
   window.__T = {
     async run(card, opts, png) {
       let c;
-      try { c = await window.ShareCard.paint(card, opts); }
+      const o = opts.photo ? Object.assign({}, opts, { photo: PHOTO, fit: { z: 1.6, dx: -0.3, dy: 0.4 } }) : opts;
+      try { c = await window.ShareCard.paint(card, o); }
       catch (e) { return { error: 'paint threw: ' + String((e && e.stack) || e).split('\n').slice(0, 3).join(' | ') }; }
       const out = { boxes: c._boxes || null, fit: c._fit || null, size: c._size || null, w: c.width, h: c.height };
       try {
@@ -557,12 +573,10 @@ async function main(browser, shots) {
       else if (Array.isArray(v)) v.forEach((x, i) => scan(x, `${p}[${i}]`));
       else if (v && typeof v === 'object') Object.keys(v).forEach(k => { if (rx.test(k)) out.push(`${p}.${k} (key)`); scan(v[k], `${p}.${k}`); });
     };
-    scan(window.ShareCard.METALS, 'METALS'); scan(window.ShareCard.EN, 'EN'); scan(window.ShareCard.FA, 'FA');
-    return { out, metals: Object.keys(window.ShareCard.METALS) };
+    scan(window.ShareCard.EN, 'EN'); scan(window.ShareCard.FA, 'FA');
+    return { out };
   });
-  C.check('no METALS key and no EN or FA word contains "gold" or "yellow"', !gold.out.length, gold.out.slice(0, 6).join(' | '));
-  const five = ['bronze', 'silver', 'emerald', 'amethyst', 'prismatic'].filter(m => !gold.metals.includes(m));
-  C.check("METALS holds Proof's five metals (bronze, silver, emerald, amethyst, prismatic)", !five.length, five.length ? 'missing ' + five.join(', ') : gold.metals.join(', '));
+  C.check('no EN or FA word contains "gold" or "yellow" (and no metal is left anywhere: the cut took them)', !gold.out.length, gold.out.slice(0, 6).join(' | '));
 
   // The runs.
   let runs = 0;
@@ -573,14 +587,16 @@ async function main(browser, shots) {
       combos.push({ size: 'story', lang, weights: false, name: true, tag: ' (weights hidden)' });
       combos.push({ size: 'story', lang, weights: true, name: false, tag: ' (name hidden)' });
     }
+    // On the athlete's own picture, zoomed in and dragged (Amir, 2026-10-19): the words must still sit inside their boxes.
+    if (!s.long) combos.push({ size: 'story', lang: 'en', weights: true, name: true, photo: true, tag: ' (photo)' });
     for (const cb of combos) {
       const name = `${s.id} ${cb.size} ${cb.lang}${cb.tag}`, before = errs.length;
       let res;
-      try { res = await page.evaluate(([c, o, p]) => window.__T.run(c, o, p), [s.card, { size: cb.size, lang: cb.lang, weights: cb.weights, name: cb.name }, !cb.tag]); }
+      try { res = await page.evaluate(([c, o, p]) => window.__T.run(c, o, p), [s.card, { size: cb.size, lang: cb.lang, weights: cb.weights, name: cb.name, photo: !!cb.photo }, !cb.tag || cb.tag === ' (photo)']); }
       catch (e) { res = { error: 'evaluate failed: ' + String((e && e.message) || e).split('\n')[0] }; }
       res.newErrs = errs.slice(before);
       runs++;
-      if (res.png) fs.writeFileSync(path.join(shots, s.long ? 'long' : '', `${s.id}-${cb.size}-${cb.lang}.png`), Buffer.from(res.png.split(',')[1], 'base64'));
+      if (res.png) fs.writeFileSync(path.join(shots, s.long ? 'long' : '', `${s.id}-${cb.size}-${cb.lang}${cb.photo ? '-photo' : ''}.png`), Buffer.from(res.png.split(',')[1], 'base64'));
       judge(name, s, cb, res);
     }
   }
@@ -588,8 +604,8 @@ async function main(browser, shots) {
   // Once, after all that painting: the fonts the cards need were really loaded (a card in Arial would measure fine and be wrong), and the
   // page got every file it asked for.
   const faces = await page.evaluate(() => [...document.fonts].filter(f => f.status === 'loaded').map(f => [String(f.family).replace(/["']/g, ''), String(f.weight)]));
-  const need = runs ? ['Barlow', 'Barlow Condensed', 'Vazirmatn'].filter(f => !faces.some(x => x[0] === f)) : [];
-  C.check('the fonts were loaded: Barlow, Barlow Condensed and Vazirmatn', !need.length, need.length ? 'not loaded: ' + need.join(', ') : faces.map(x => x.join(' ')).join(', '));
+  const need = runs ? ['Barlow', 'Barlow Condensed', 'Space Mono', 'Vazirmatn'].filter(f => !faces.some(x => x[0] === f)) : [];
+  C.check('the fonts were loaded: Barlow, Barlow Condensed, Space Mono and Vazirmatn', !need.length, need.length ? 'not loaded: ' + need.join(', ') : faces.map(x => x.join(' ')).join(', '));
   C.check('the page got every file it asked for (no failed request, no 4xx or 5xx, no console error)', !bad.length, bad.slice(0, 5).join(' | ') + (bad.length > 5 ? ` (+${bad.length - 5} more)` : ''));
   C.check('no uncaught error anywhere on the test page', !errs.length, errs.slice(0, 3).join(' | '));
   return `${runs} cards painted (${live.length} samples of ${[...new Set(live.map(s => s.kind))].length} kinds)`;

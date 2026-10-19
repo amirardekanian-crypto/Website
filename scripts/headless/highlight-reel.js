@@ -284,7 +284,7 @@ const ready = p => p.waitForFunction(() => { const i = document.getElementById('
       more: !!document.querySelector('#hlwin-1 .hl-band-more') }));
     const bs = bands.b;
     t.check('rewards on the finished card: two marks and an achievement are three bands, each with Share, in the Highlight Reel\'s slot',
-      bs.length === 3 && bs.every(b => b.tag === 'BUTTON' && /SHARE$/.test(b.txt)) && bs.some(b => /^A NEW MARK 12 WEEKS HELD SHARE$/i.test(b.txt)) && bs.some(b => /^A NEW MARK 50 SESSIONS WITH AMIR SHARE$/i.test(b.txt))
+      bs.length === 3 && bs.every(b => b.tag === 'BUTTON' && /SHARE$/.test(b.txt)) && bs.some(b => /^A NEW MARK 12 WEEKS HELD IN A ROW SHARE$/i.test(b.txt)) && bs.some(b => /^A NEW MARK 50 SESSIONS WITH AMIR SHARE$/i.test(b.txt))
       && bs.some(b => /^MOMENT THE FOUNDRY SHARE$/i.test(b.txt)), JSON.stringify(bands));
     t.check('…a mark\'s band names no badge and no metal; the other badge and the title are no band at all, and nothing says "more"',
       !bs.some(b => /SPRINKLER|BEDROCK|BADGE|TITLE|BRONZE|SILVER|EMERALD|PRISMATIC|AA PROOF/i.test(b.txt + ' ' + b.label)) && !bands.more, JSON.stringify(bands));
@@ -296,7 +296,8 @@ const ready = p => p.waitForFunction(() => { const i = document.getElementById('
       await p.evaluate(i => document.querySelectorAll('#hlwin-1 .hl-band')[i].click(), i);
       await ready(p);
       const s = await sheet(p);
-      t.check(`its Share opens the sheet, "Share it": a 1080 × 1920 Story with ${needle} on it and the handle`, s.open && s.title === 'Share it' && s.w === 1080 && s.h === 1920 && alt.test(s.alt) && /@amirardekanian/.test(s.alt) && !/undefined|NaN|bronze|silver|emerald/i.test(s.alt), JSON.stringify([s.title, s.w, s.h, s.alt]));
+      const wantT = needle === 'THE FOUNDRY' ? 'Share it' : 'Share your mark';   // a mark has its own card, and its own title, since the design pass
+      t.check(`its Share opens the sheet, "${wantT}": a 1080 × 1920 Story with ${needle} on it and the handle`, s.open && s.title === wantT && s.w === 1080 && s.h === 1920 && alt.test(s.alt) && /@amirardekanian/.test(s.alt) && !/undefined|NaN|bronze|silver|emerald/i.test(s.alt), JSON.stringify([s.title, s.w, s.h, s.alt]));
       if (needle === '12 WEEKS HELD') {
         await p.click('.hl-seg button[data-v="post"]'); await ready(p);
         t.check('…as a Post it is 1080 × 1350', (await sheet(p)).h === 1350);
@@ -326,7 +327,7 @@ const ready = p => p.waitForFunction(() => { const i = document.getElementById('
     t.check('a mark\'s moment: "A new mark", the number, what it counts, the next mark, Share the card', !!mo && mo.eyebrow === 'A new mark' && mo.num === '12' && /weeks held in a row$/.test(mo.title) && mo.next === 'Next mark · 24 weeks' && mo.go === 'Share the card', JSON.stringify(mo));
     await p.click('.hl-moment .hl-m-go'); await ready(p);
     const s = await sheet(p);
-    t.check('its button closes the moment and opens "Share it" with the mark\'s card on it (no metal)', await p.evaluate(() => !document.querySelector('.hl-moment')) && s.title === 'Share it' && /12 weeks held/.test(s.alt) && !/emerald/i.test(s.alt) && s.w === 1080 && s.h === 1920, JSON.stringify([s.title, s.alt, s.w, s.h]));
+    t.check('its button closes the moment and opens "Share your mark" with the mark\'s card on it (no metal)', await p.evaluate(() => !document.querySelector('.hl-moment')) && s.title === 'Share your mark' && /12 weeks held/.test(s.alt) && !/emerald/i.test(s.alt) && s.w === 1080 && s.h === 1920, JSON.stringify([s.title, s.alt, s.w, s.h]));
     // (The phone's Back from a sheet that a moment opened leaves the app, for the Cycle complete moment as much as for this one: the moment's guard entry is spent and the
     // sheet pushes none. Left as it was; it is in the L6 report. The sheet's own Close is checked here.)
     await p.evaluate(() => closeHistorySheet()); await p.waitForTimeout(400);

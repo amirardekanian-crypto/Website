@@ -31,33 +31,31 @@
   // ── 1. Sizes and colours ──────────────────────────────────────────────────────────────────────────────────────────────
   // top/bottom: where the content may sit. A Story keeps Instagram's top bar (about 250 px) and its reply bar (about 340 px)
   // clear; a post has only a margin. pad: the sides.
+  // eyeY: the top strip (the eyebrow, and the athlete's name and the date). bodyY..bodyEnd: the card's own words, laid out
+  // from the bottom up. footY: the hairline, his photo, his signature and the mantra. adY: the handle, the mark, the site.
+  // Everything ends by 1568 in a Story: Instagram's reply bar starts at 1580 (scripts/headless/sharecard.js, rule `bars`).
   const SIZES = {
-    story: { W: 1080, H: 1920, top: 280, bottom: 1576, pad: 84, cover: 845 },
-    post:  { W: 1080, H: 1350, top: 92, bottom: 1262, pad: 84, cover: 560 },
+    story: { W: 1080, H: 1920, top: 280, bottom: 1576, pad: 84, cover: 1020,
+             eyeY: 286, bodyY: 420, bodyEnd: 1220, footY: 1300, adY: 1496 },
+    post:  { W: 1080, H: 1350, top: 92, bottom: 1262, pad: 84, cover: 700,
+             eyeY: 96, bodyY: 230, bodyEnd: 930, footY: 1000, adY: 1190 },
   };
   // The card's colours: Centre Court's green cover, as the athlete sees it in the app (the design page's --c-* tokens).
   const C = {
     ink: '#FFFFFF', soft: '#CFE3D8', mute: '#9FC3B2', clay: '#F08A63', clayLine: '#E06B43',
-    line: 'rgba(255,255,255,0.16)', court: 'rgba(255,255,255,0.075)', bar: 'rgba(255,255,255,0.22)',
-    deep: '#082D20', mid: '#0E4A36', light: '#1B7254', foot: '#0C3F2E',
+    line: 'rgba(255,255,255,0.16)', court: 'rgba(255,255,255,0.11)', bar: 'rgba(255,255,255,0.22)', dim: 'rgba(255,255,255,0.52)',
+    deep: '#082D20', mid: '#0E4A36', light: '#1B7254', foot: '#0C3F2E', mint: '#6DBE95',
   };
-  // AA Proof's metals (habits.html, METALS), the same hex values: drawn rims and the ink each metal's words take. No gold.
-  const METALS = {
-    bronze:    { label: 'Bronze',    stops: ['#E2A377', '#B06A3B', '#8A4E28'], ink: '#E2A377' },
-    silver:    { label: 'Silver',    stops: ['#E8ECF5', '#AEB6C9', '#7C8499'], ink: '#C9CEDC' },
-    emerald:   { label: 'Emerald',   stops: ['#B5F2D2', '#2FB67A', '#137A4F'], ink: '#8BE8BC' },
-    amethyst:  { label: 'Amethyst',  stops: ['#C9B8FF', '#8F7BF0', '#5A48C9'], ink: '#C9B8FF' },
-    prismatic: { label: 'Prismatic', stops: ['#8F7BF0', '#3EC6E0', '#35D0BA'], ink: '#F6F4FF',
-                 conic: ['#6C5CE7', '#3EC6E0', '#35D0BA', '#FF8A5B', '#F27DA8', '#6C5CE7'] },
-  };
-  METALS.prisma = METALS.prismatic;   // Proof's own key for it
   const FAM = {
     disp: '"Barlow Condensed", "Arial Narrow", Arial, sans-serif',
     body: 'Barlow, Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
     fa: 'Vazirmatn, Tahoma, Arial, sans-serif',
   };
+  // The face a style's family asks document.fonts for (Space Mono ships 400 and 700 only).
+  const FACE = { disp: '"Barlow Condensed"', mono: '"Space Mono"', body: 'Barlow' };
   const ASSET = {
-    coach: '/assets/img/coach.jpg', logo: '/assets/img/icon-192.png',
+    coach: '/assets/img/coach.jpg', logo: '/assets/img/icon-192.png', court: '/court-sessions.jpg',
     vazir: '/assets/fonts/Vazirmatn-Variable.woff2', fonts: '/assets/css/app-fonts.css',
   };
   // Amir's signature: program.html's WN_SIG, the same two paths (viewBox 0 0 130 46, skewX(-12) translate(8 0)).
@@ -131,28 +129,62 @@
     roadLine: (d1, d2) => [[`Started ${d1}. Finished ${d2}.`]],
     // Career Mode's rewards
     meaning: { consistency: 'Consistency', commitment: 'Commitment', progress: 'Progress', resilience: 'Resilience', chosen: 'From Amir' },
-    badgeEye: m => `Badge · ${m}`,
     achievementEye: m => `Achievement · ${m}`,
-    titleEye: 'Title earned',
-    titleFrom: s => `For ${s}`,
     levelEye: 'Career Mode',
     levelHead: n => [['Level '], [n, 1]],
     levelLine: () => [['Your career level. It never resets.']],
-    questEye: m => `Quest complete · ${m}`,
-    questWeeks: n => `${n} weeks`,
-    questTitle: t => `Title earned: ${t}`,
-    questTitleRuns: t => [['Title earned: '], [t, 1]],
+    // ── The 2026-10-19 pass: the mantra, the four marks, the month's honour, the Open, the player card, a level, the
+    //    month's goal and a session. Amir, 2026-10-19: "go with your picks", and the photo decision below.
+    mantra: 'A coach in your pocket.',
+    markEye: 'A new mark',
+    // The words under a mark's number, and Amir's line about it. `n` arrives already written in the card's language.
+    markWords: { weeks_held: 'weeks held in a row', sessions_with_amir: 'sessions with Amir', personal_bests: 'personal bests', comebacks: 'comebacks' },
+    markLine: {
+      weeks_held: n => [['Every session, '], [`${n} weeks running.`, 1], [' Keep it boring.']],
+      sessions_with_amir: n => [[`${n} sessions in.`, 1], [' This is how it adds up.']],
+      personal_bests: n => [[`${n} personal bests.`, 1], [' You are getting stronger.']],
+      comebacks: n => [[`${n} times you came back.`, 1], [' That is the part that counts.']],
+    },
+    markUnit: { weeks_held: 'weeks', sessions_with_amir: 'sessions', personal_bests: 'bests', comebacks: 'comebacks' },
+    nextMark: s => `Next mark · ${s}`,
+    // The month's honour. A card never names another athlete (2026-10-19): the place and the field size, nothing else.
+    honourEye: m => `The crew · ${m}`,
+    honourName: { sessions: 'Most sessions', improved: 'Most improved', full_month: 'Full month', pick: 'Amir’s Pick' },
+    honourSub: { sessions: m => `With Amir in ${m}`, improved: m => `On a main lift in ${m}`, full_month: m => `Every training week of ${m}`, pick: m => `Chosen by Amir for ${m}` },
+    ord: v => { const k = Number(v) % 100, s = ['th', 'st', 'nd', 'rd'][k > 10 && k < 14 ? 0 : Number(v) % 10] || 'th'; return v + s; },
+    placeOf: (p, f) => `${p} of ${f}`,
+    // The Monthly Open
+    openEye: m => `The Open · ${m}`,
+    yourResult: 'Your result',
+    // The player card: their own card, any day
+    playerEye: 'The card',
+    playerNums: { weeks: 'weeks held', sessions: 'sessions with Amir', bests: 'personal bests', comebacks: 'comebacks' },
+    playerLifts: 'Best lifts',
+    playerSince: d => `With Amir since ${d}`,
+    // A new level, the month's goal, a session
+    levelUpEye: 'A new level',
+    goalEye: m => `${m} · the goal`,
+    goalDone: 'Done',
+    goalFrom: 'From Amir',
+    sessionEye: 'Session done',
+    mins: n => `${n} min`,
+    minsW: 'min',
+    exercises: n => Number(n) === 1 ? 'exercise' : 'exercises',
+    setsW: n => Number(n) === 1 ? 'set' : 'sets',
     // Copy caption (the share sheet)
     capBest: (lift, set) => `New best on the ${lift}: ${set}.`,
     capEffort: (lift, what) => `${lift}: ${what}.`,
     capRetest: (lift, what) => `${lift} retest, beaten: ${what}.`,
     capCycle: (name, done, planned) => `${name}, signed off: ${done} of ${planned} sessions.`,
     capRoad: (n, weeks) => `The whole roadmap: ${n} cycles${weeks ? ', ' + weeks + ' weeks' : ''}.`,
-    capBadge: (name, metal) => `${name}, ${metal}.`,
     capAchievement: name => `${name}.`,
-    capTitle: name => `New title: ${name}.`,
-    capLevel: (n, rank) => `Level ${n}, ${rank}.`,
-    capQuest: name => `Quest complete: ${name}.`,
+    capLevel: n => `Level ${n}.`,
+    capMark: (n, words) => `${n} ${words}.`,
+    capHonour: (name, month) => `${name}, ${month}.`,
+    capOpen: (title, result, place) => `${title}: ${result}${place ? ', ' + place : ''}.`,
+    capPlayer: level => `Level ${level} with Amir.`,
+    capGoal: month => `${month}'s goal, done.`,
+    capSession: title => `${title}, done.`,
     capTail: 'Coached by @amirardekanian · amirardekani.com',
   };
 
@@ -217,32 +249,58 @@
     roadHead: [['کل '], ['مسیر', 1]],
     roadLine: (d1, d2) => [[`شروع ${d1}. پایان ${d2}.`]],
     meaning: { consistency: 'ثبات', commitment: 'تعهد', progress: 'پیشرفت', resilience: 'تاب‌آوری', chosen: 'از طرف امیر' },
-    badgeEye: m => `نشان · ${m}`,
     achievementEye: m => `دستاورد · ${m}`,
-    titleEye: 'عنوان جدید',
-    titleFrom: s => `برای ${s}`,
     levelEye: 'Career Mode',
     levelHead: n => [['سطح '], [n, 1]],
     levelLine: () => [['سطح حرفه‌ای تو. هیچ‌وقت صفر نمی‌شه.']],
-    questEye: m => `مأموریت تمام شد · ${m}`,
-    questWeeks: n => `${n} هفته`,
-    questTitle: t => `عنوان جدید: ${t}`,
-    questTitleRuns: t => [['عنوان جدید: '], [t, 1]],
+    // ── The 2026-10-19 pass, in Farsi. DRAFTS, every one: Amir reads them before they ship.
+    mantra: 'یه مربی تو جیبت',
+    markEye: 'یک نشانهٔ تازه',
+    markWords: { weeks_held: 'هفته پشت سر هم', sessions_with_amir: 'جلسه با امیر', personal_bests: 'رکورد شخصی', comebacks: 'برگشت' },
+    markLine: {
+      weeks_held: n => [['هر جلسه، '], [`${n} هفتهٔ بی‌وقفه.`, 1], [' همین‌طور ساده نگهش دار.']],
+      sessions_with_amir: n => [[`${n} جلسه پشت سر گذاشتی.`, 1], [' این‌طوری جمع می‌شه.']],
+      personal_bests: n => [[`${n} رکورد شخصی.`, 1], [' داری قوی‌تر می‌شی.']],
+      comebacks: n => [[`${n} بار برگشتی.`, 1], [' همین قسمتش مهمه.']],
+    },
+    markUnit: { weeks_held: 'هفته', sessions_with_amir: 'جلسه', personal_bests: 'رکورد', comebacks: 'برگشت' },
+    nextMark: s => `نشانهٔ بعدی · ${s}`,
+    honourEye: m => `جمع ما · ${m}`,
+    honourName: { sessions: 'بیشترین جلسه', improved: 'بیشترین پیشرفت', full_month: 'ماه کامل', pick: 'انتخابِ امیر' },
+    honourSub: { sessions: m => `با امیر، توی ${m}`, improved: m => `روی یک حرکت اصلی، توی ${m}`, full_month: m => `همهٔ هفته‌های تمرینیِ ${m}`, pick: m => `انتخابِ امیر برای ${m}` },
+    ord: v => `رتبهٔ ${v}`,
+    placeOf: (p, f) => `${p} از ${f}`,
+    openEye: m => `اوپن · ${m}`,
+    yourResult: 'نتیجهٔ تو',
+    playerEye: 'کارت تو',
+    playerNums: { weeks: 'هفته پشت سر هم', sessions: 'جلسه با امیر', bests: 'رکورد شخصی', comebacks: 'برگشت' },
+    playerLifts: 'بهترین رکوردها',
+    playerSince: d => `با امیر از ${d}`,
+    levelUpEye: 'سطح جدید',
+    goalEye: m => `${m} · هدف ماه`,
+    goalDone: 'انجام شد',
+    goalFrom: 'از طرف امیر',
+    sessionEye: 'جلسه تمام شد',
+    mins: n => `${n} دقیقه`,
+    minsW: 'دقیقه',
+    exercises: () => 'حرکت',
+    setsW: () => 'ست',
     capBest: (lift, set) => `رکورد جدید توی ${lift}: ${set}.`,
     capEffort: (lift, what) => `${lift}: ${what}.`,
     capRetest: (lift, what) => `تست دوبارهٔ ${lift}، شکسته شد: ${what}.`,
     capCycle: (name, done, planned) => `${name} تمام شد: ${done} از ${planned} جلسه.`,
     capRoad: (n, weeks) => `کل نقشهٔ راه: ${n} دوره${weeks ? '، ' + weeks + ' هفته' : ''}.`,
-    capBadge: (name, metal) => `${name}، ${metal}.`,
     capAchievement: name => `${name}.`,
-    capTitle: name => `عنوان جدید: ${name}.`,
-    capLevel: (n, rank) => `سطح ${n}، ${rank}.`,
-    capQuest: name => `مأموریت تمام شد: ${name}.`,
+    capLevel: n => `سطح ${n}.`,
+    capMark: (n, words) => `${n} ${words}.`,
+    capHonour: (name, month) => `${name}، ${month}.`,
+    capOpen: (title, result, place) => `${title}: ${result}${place ? '، ' + place : ''}.`,
+    capPlayer: level => `سطح ${level} با امیر.`,
+    capGoal: month => `هدفِ ${month} انجام شد.`,
+    capSession: title => `${title} تمام شد.`,
     capTail: 'مربی: @amirardekanian · amirardekani.com',
-    metal: { bronze: 'برنز', silver: 'نقره', emerald: 'زمرد', amethyst: 'آمتیست', prismatic: 'منشوری' },
     months: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'],
   };
-  EN.metal = { bronze: 'Bronze', silver: 'Silver', emerald: 'Emerald', amethyst: 'Amethyst', prismatic: 'Prismatic' };
   EN.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   // ── 3. Numbers and dates, in the card's language ──────────────────────────────────────────────────────────────────────
@@ -296,7 +354,6 @@
     const j = toJalali(p[0], p[1], p[2]);
     return n(j[2], 'fa') + ' ' + FA.months[j[1] - 1] + ' ' + n(j[0], 'fa');
   }
-  const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
   const isFaText = s => /[\u0600-\u06FF]/.test(String(s || ''));
   // A Latin name inside a Farsi line ("Darya · ۲۵ مهر ۱۴۰۵"): a right-to-left mark after it, or the bidi rules glue the Persian
   // number that follows onto the Latin word and the line reads "۲۵ · Darya مهر".
@@ -330,7 +387,7 @@
     // Every Latin face the style table uses (a weight never loaded draws in the fallback: Barlow 500 did, until this list was read
     // off the table instead of typed).
     const want = {};
-    Object.keys(ST.en).forEach(k => { const s = ST.en[k]; want[s.w + ' 40px ' + (s.fam === 'disp' ? '"Barlow Condensed"' : 'Barlow')] = 1; });
+    Object.keys(ST.en).forEach(k => { const s = ST.en[k]; want[s.w + ' 40px ' + (FACE[s.fam] || 'Barlow')] = 1; });
     // A face that cannot load (no signal, not cached yet) draws in the fallback: a card in Arial beats no card.
     const jobs = Object.keys(want).map(f => document.fonts.load(f, 'AB12').catch(() => null));
     if (lang === 'fa') jobs.push(ensureVazir());
@@ -362,6 +419,23 @@
     x.fillStyle = g; x.fillRect(-S.W, 0, S.W * 2, S.H * rx / ry);
     x.restore();
   }
+  // The athlete's own photo as the card's ground (Amir, 2026-10-19: "any idea can be sent with their photo as a background
+  // like strava's photos"). It fills the card, is darkened and pulled towards the green so the brand still holds, and a veil
+  // carries the words at the bottom. The picture is drawn on the phone and never leaves it until Share or Save image.
+  function shot(x, S, im, fit) {
+    const f = fit || { z: 1, dx: 0, dy: 0 };
+    const s = Math.max(S.W / im.width, S.H / im.height) * f.z, dw = im.width * s, dh = im.height * s;
+    const slackX = Math.max(0, dw - S.W) / 2, slackY = Math.max(0, dh - S.H) / 2;
+    x.save();
+    x.drawImage(im, (S.W - dw) / 2 + f.dx * slackX, (S.H - dh) / 2 + f.dy * slackY, dw, dh);
+    x.globalCompositeOperation = 'multiply';            // the house grade: darker, green-leaning shadows
+    x.fillStyle = 'rgba(16,70,54,0.42)'; x.fillRect(0, 0, S.W, S.H);
+    x.restore();
+    const g = x.createLinearGradient(0, 0, 0, S.H);
+    g.addColorStop(0, 'rgba(4,16,11,0.62)'); g.addColorStop(0.28, 'rgba(4,16,11,0.12)');
+    g.addColorStop(0.56, 'rgba(4,16,11,0.52)'); g.addColorStop(0.80, 'rgba(4,16,11,0.93)'); g.addColorStop(1, '#04100B');
+    x.fillStyle = g; x.fillRect(0, 0, S.W, S.H);
+  }
   // The court: a tennis half court seen from above, faint, behind everything (the design page's motif, every card).
   function court(x, S) {
     const top = S.H === 1920 ? 384 : 160, bot = S.H === 1920 ? 1856 : 1280, mid = S.H === 1920 ? 1120 : 720;
@@ -389,12 +463,12 @@
     m.addColorStop(0, 'rgba(0,0,0,0.25)'); m.addColorStop(0.45, 'rgba(0,0,0,0.75)'); m.addColorStop(1, 'rgba(0,0,0,1)');
     y.fillStyle = m; y.fillRect(0, 0, W, H);
     x.save();
-    x.globalAlpha = 0.72;
+    x.globalAlpha = 0.82;
     x.globalCompositeOperation = 'luminosity';
     x.drawImage(o, 0, 0);
     x.restore();
     const g = x.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, 'rgba(6,36,26,0.30)'); g.addColorStop(0.55, 'rgba(6,36,26,0.62)'); g.addColorStop(1, C.foot);
+    g.addColorStop(0, 'rgba(6,36,26,0.20)'); g.addColorStop(0.55, 'rgba(6,36,26,0.56)'); g.addColorStop(1, C.foot);
     x.fillStyle = g; x.fillRect(0, 0, W, H);
     const fade = x.createLinearGradient(0, H - 2, 0, H + 160);   // the cover's last row melts into the card's green
     fade.addColorStop(0, 'rgba(12,63,46,1)'); fade.addColorStop(1, 'rgba(12,63,46,0)');
@@ -458,27 +532,6 @@
     else { x.moveTo(l, cy); x.lineTo(l + w - sw, cy); x.moveTo(l + w - h, cy - h); x.lineTo(l + w - sw * 0.6, cy); x.lineTo(l + w - h, cy + h); }
     x.stroke(); x.restore();
   }
-  function star(x, cx, cy, r, color) {
-    x.save(); x.fillStyle = color; x.beginPath();
-    for (let i = 0; i < 10; i++) {
-      const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r;
-      x.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
-    }
-    x.closePath(); x.fill(); x.restore();
-  }
-  // A metal's fill for a shape between t and b (Proof's rims: three stops at 145°; prismatic as a conic sweep where the phone can).
-  function metalFill(x, metal, cx, cy, r) {
-    const m = METALS[metal] || METALS.bronze;
-    if (m.conic && typeof x.createConicGradient === 'function') {
-      const g = x.createConicGradient(210 * Math.PI / 180, cx, cy);
-      m.conic.forEach((c, i) => g.addColorStop(i / (m.conic.length - 1), c));
-      return g;
-    }
-    const a = 145 * Math.PI / 180, dx = Math.sin(a) * r, dy = -Math.cos(a) * r;
-    const g = x.createLinearGradient(cx - dx, cy - dy, cx + dx, cy + dy);
-    g.addColorStop(0, m.stops[0]); g.addColorStop(0.52, m.stops[1]); g.addColorStop(1, m.stops[2]);
-    return g;
-  }
 
   // ── 6. Text: one style table, measured, fitted and recorded ───────────────────────────────────────────────────────────
   // Every word on a card goes through put(), which records its box: the headless test reads the records (canvas._boxes) and fails
@@ -487,14 +540,20 @@
   // Sizes are the design page's quarter-size card × 4 (eye 9.5 px → 38).
   const ST = {
     en: {
-      eye:   { fam: 'body', w: 600, size: 38, lh: 1.3, track: 0.16, upper: 1, color: C.mute },
+      // Space Mono is the app's own eyebrow and caption face (assets/css/app-fonts.css ships it), so the card's small
+      // capitals read like a screen of the app.
+      eye:   { fam: 'mono', w: 700, size: 34, lh: 1.3, track: 0.14, upper: 1, color: C.mute },
+      who:   { fam: 'mono', w: 400, size: 30, lh: 1.3, track: 0.10, upper: 1, color: C.dim },
+      mant:  { fam: 'mono', w: 400, size: 28, lh: 1.35, track: 0.12, upper: 1, color: C.mute },
+      next:  { fam: 'mono', w: 400, size: 32, lh: 1.3, track: 0.13, upper: 1, color: C.mute },
+      lab:   { fam: 'disp', w: 800, size: 54, lh: 1.15, track: 0.15, upper: 1, color: C.clay },
+      tag:   { fam: 'disp', w: 800, size: 46, lh: 1.15, track: 0.12, upper: 1, color: C.ink },
       big:   { fam: 'disp', w: 800, size: 184, lh: 0.9, track: 0.01, upper: 1, color: C.ink },
       lift:  { fam: 'disp', w: 700, size: 60, lh: 1.1, track: 0.06, upper: 1, color: C.soft },
       num:   { fam: 'disp', w: 800, size: 216, lh: 0.95, track: 0.005, color: C.ink },
       small: { fam: 'disp', w: 700, size: 104, lh: 0.95, track: 0.01, color: C.soft },
-      line:  { fam: 'body', w: 400, size: 52, lh: 1.35, color: C.soft },
-      lineB: { fam: 'body', w: 700, size: 52, lh: 1.35, color: C.clay },
-      who:   { fam: 'body', w: 600, size: 38, lh: 1.3, track: 0.16, upper: 1, color: C.mute },
+      line:  { fam: 'body', w: 400, size: 50, lh: 1.34, color: C.soft },
+      lineB: { fam: 'body', w: 700, size: 50, lh: 1.34, color: C.clay },
       sig:   { fam: 'body', w: 400, size: 42, lh: 1.3, color: C.soft },
       foot:  { fam: 'disp', w: 700, size: 36, lh: 1.2, track: 0.16, upper: 1, color: C.mute },
       stamp: { fam: 'disp', w: 800, size: 52, lh: 1, track: 0.14, upper: 1, color: C.clay },
@@ -504,6 +563,7 @@
       statL: { fam: 'body', w: 500, size: 38, lh: 1.2, color: C.soft },
       winN:  { fam: 'body', w: 600, size: 44, lh: 1.3, color: C.ink },
       winT:  { fam: 'body', w: 500, size: 44, lh: 1.3, color: C.clay },
+      quote: { fam: 'body', w: 600, size: 78, lh: 1.26, color: C.ink },
       road:  { fam: 'body', w: 500, size: 46, lh: 1.25, color: C.soft },
       roadN: { fam: 'disp', w: 800, size: 60, lh: 1, color: C.clay },
       plate: { fam: 'disp', w: 800, size: 120, lh: 1, track: 0.04, upper: 1, color: C.ink },
@@ -512,13 +572,17 @@
     },
     // Farsi: Vazirmatn, no capitals and no letter-spacing (the site's rule), a taller line for the script.
     fa: {
-      eye:   { fam: 'fa', w: 600, size: 42, lh: 1.5, color: C.mute },
+      eye:   { fam: 'fa', w: 600, size: 38, lh: 1.5, color: C.mute },
+      who:   { fam: 'fa', w: 500, size: 34, lh: 1.5, color: C.dim },
+      mant:  { fam: 'fa', w: 500, size: 32, lh: 1.5, color: C.mute },
+      next:  { fam: 'fa', w: 500, size: 34, lh: 1.5, color: C.mute },
+      lab:   { fam: 'fa', w: 800, size: 50, lh: 1.35, color: C.clay },
+      tag:   { fam: 'fa', w: 800, size: 44, lh: 1.35, color: C.ink },
       big:   { fam: 'fa', w: 800, size: 160, lh: 1.15, color: C.ink },
       num:   { fam: 'fa', w: 800, size: 184, lh: 1.1, color: C.ink },
       small: { fam: 'fa', w: 700, size: 88, lh: 1.1, color: C.soft },
-      line:  { fam: 'fa', w: 400, size: 52, lh: 1.6, color: C.soft },
-      lineB: { fam: 'fa', w: 700, size: 52, lh: 1.6, color: C.clay },
-      who:   { fam: 'fa', w: 600, size: 42, lh: 1.5, color: C.mute },
+      line:  { fam: 'fa', w: 400, size: 50, lh: 1.58, color: C.soft },
+      lineB: { fam: 'fa', w: 700, size: 50, lh: 1.58, color: C.clay },
       sig:   { fam: 'fa', w: 500, size: 42, lh: 1.5, color: C.soft },
       stamp: { fam: 'fa', w: 800, size: 50, lh: 1.2, color: C.clay },
       label: { fam: 'fa', w: 700, size: 42, lh: 1.4, color: C.ink },
@@ -526,6 +590,7 @@
       stat:  { fam: 'fa', w: 800, size: 76, lh: 1.15, color: C.ink },
       statL: { fam: 'fa', w: 500, size: 38, lh: 1.45, color: C.soft },
       winT:  { fam: 'fa', w: 500, size: 44, lh: 1.55, color: C.clay },
+      quote: { fam: 'fa', w: 600, size: 72, lh: 1.5, color: C.ink },
       road:  { fam: 'fa', w: 500, size: 46, lh: 1.45, color: C.soft },
       roadN: { fam: 'fa', w: 800, size: 56, lh: 1.2, color: C.clay },
       plate: { fam: 'fa', w: 800, size: 110, lh: 1.25, color: C.ink },
@@ -672,12 +737,27 @@
     const L1 = this.layoutRich(runs, roleA, roleB, size0, maxW, maxLines);
     const lh = stA.lh * L1.size, x = this.x;
     let y = top;
-    L1.lines.forEach((ln, li) => {
+    // Only the lines that were measured are drawn, and the last of them ends on "…": richH() reports maxLines, so a longer
+    // text used to be drawn past the box and over whatever came next (found by the headless test on a long month's goal).
+    const rows = L1.lines.slice(0, maxLines), over = L1.lines.length > maxLines;
+    if (over) {
+      const wOf = arr => arr.reduce((s, it) => s + it.gap + it.w, 0);
+      const dot = arr => {
+        const c = arr.slice(), it = c[c.length - 1], st2 = this.st(it.tk.role, it.tk.t), sz2 = L1.size * st2.size / stA.size;
+        const t2 = it.tk.t + '…';
+        c[c.length - 1] = { tk: { t: t2, role: it.tk.role, latin: it.tk.latin }, w: textW(x, st2, sz2, t2), gap: it.gap };
+        return c;
+      };
+      const last = rows[maxLines - 1].slice();
+      let line = dot(last);
+      while (wOf(line) > maxW && last.length > 1) { last.pop(); line = dot(last); }
+      rows[maxLines - 1] = line;
+    }
+    rows.forEach((ln, li) => {
       const m = metrics(x, stA, L1.size);
       const base = y + lh / 2 + (m.a - m.d) / 2;
       const lw = ln.reduce((s, it) => s + it.gap + it.w, 0);
-      let cut = false;
-      if (li === maxLines - 1 && L1.lines.length > maxLines) cut = true;
+      const cut = over && li === rows.length - 1;
       if (this.rtl) {
         let r = (o.x1 != null ? o.x1 : this.X1);
         ln.forEach(it => {
@@ -726,15 +806,65 @@
     }
     this.fit.k = k;
     this.fit.over = Math.max(0, Math.round(H(k, items) - (bottom - top)));
-    let y = top;
+    // The card's words sit on the foot, not under the eyebrow: a short card leaves its air at the top, where the picture is.
+    let y = Math.max(top, bottom - H(k, items));
     items.forEach((it, i) => { if (i) y += it.gap * k; it.draw(y, k); y += it.h(k); });
     this.fit.end = Math.round(y);
     return y;
   };
 
   // The parts every card is made of (the design page's classes: .eye, .big, .bar, .lift, .num, .line, .stamp, .stats …).
-  P.eye = function (t, gap) {
-    return this.add({ name: 'eye', gap: gap || 0, h: k => this.lineH('eye', t, k), draw: (y, k) => this.line1('eye', t, y, k) });
+  // The eyebrow is no longer a flow item: it is drawn on the top strip, beside the athlete's name and the date.
+  P.eye = function (t) { this.eyebrow = t == null ? '' : String(t); return this; };
+  // One line in clay, in capitals: what the card is (NEW BEST, WEEKS HELD IN A ROW, MOST SESSIONS).
+  P.lab = function (t, gap) {
+    return this.add({ name: 'lab', gap: gap || 0, h: k => this.lineH('lab', t, k), draw: (y, k) => this.line1('lab', t, y, k) });
+  };
+  // The outlined numeral, the day screen's P24: the card's one huge number where the number is a count, not a weight.
+  P.ghost = function (t, gap, o) {
+    o = o || {};
+    const x = this.x, st = Object.assign({}, this.st('num', t), { size: o.size || 400 });
+    return this.add({ name: 'ghost', gap: gap || 0, h: k => st.lh * st.size * k, draw: (y, k) => {
+      const f = this.fitLine(st, t, st.size * k, this.MW), lh = st.lh * st.size * k, m = metrics(x, st, f.size);
+      const base = y + lh / 2 + (m.a - m.d) / 2, l = this.rtl ? this.X1 - f.w : this.X0;
+      x.save();
+      x.font = fontStr(st, f.size); x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.direction = 'ltr';
+      x.lineWidth = Math.max(7, f.size * 0.028); x.lineJoin = 'round'; x.strokeStyle = C.ink;
+      x.strokeText(f.t, l, base);
+      x.restore();
+      this.rec('num', f.t, l, y, f.w, lh, this.MW, f.size, f.cut);
+    } });
+  };
+  // A word in a solid clay box, white on it (the atlas: a solid clay block always takes #fff, on --accent-2-fill).
+  P.tag = function (t, gap) {
+    const st = this.st('tag', t);
+    const dims = k => { const f = this.fitLine(st, t, st.size * k, this.MW - 60 * k); return { f, w: f.w + 48 * k, h: st.size * k * st.lh + 28 * k }; };
+    return this.add({ name: 'tag', gap: gap || 0, h: k => dims(k).h, draw: (y, k) => {
+      const d = dims(k), x = this.x, l = this.rtl ? this.X1 - d.w : this.X0;
+      roundRect(x, l, y, d.w, d.h, 10 * k); x.fillStyle = '#C2512C'; x.fill();
+      const m = metrics(x, st, d.f.size), base = y + d.h / 2 + (m.a - m.d) / 2;
+      drawRun(x, st, d.f.size, d.f.t, l + 24 * k, base, C.ink, this.rtl && isFaText(d.f.t));
+      this.rec('tag', d.f.t, l + 24 * k, y + 14 * k, d.f.w, st.size * k * st.lh, this.MW - 60 * k, d.f.size, d.f.cut);
+    } });
+  };
+  // The quiet line under a mark: what the next one is.
+  P.nextLine = function (t, gap) {
+    return this.add({ name: 'next', gap: gap || 0, drop: 1, h: k => this.lineH('next', t, k), draw: (y, k) => this.line1('next', t, y, k) });
+  };
+  // Four numbers, two by two (the player card's): [[value, label], …].
+  P.grid4 = function (cells, gap) {
+    const colGap = 36, rowGap = 30, colW = (this.MW - colGap) / 2;
+    const labH = k => Math.max.apply(null, cells.map(c => this.lineH('statL', c[1], k)));
+    const rowH = k => this.lineH('stat', '0', k) + 6 * k + labH(k);
+    return this.add({ name: 'grid', gap: gap || 0, h: k => rowH(k) * 2 + rowGap * k, draw: (y, k) => {
+      cells.slice(0, 4).forEach((c, i) => {
+        const col = i % 2, row = (i / 2) | 0;
+        const x0 = this.rtl ? this.X1 - (col + 1) * colW - col * colGap : this.X0 + col * (colW + colGap);
+        const top = y + row * (rowH(k) + rowGap * k);
+        const r = this.line1('stat', c[0], top, k, { maxW: colW, x0 });
+        this.line1('statL', c[1], top + r.h + 6 * k, k, { maxW: colW, x0 });
+      });
+    } });
   };
   // The headline: runs [text, clay?, newLine?]; up to `max` lines, shrunk to the width.
   P.big = function (runs, gap, max, o) {
@@ -915,61 +1045,54 @@
       } });
   };
 
-  // ── 8. The signature block: who and when, Amir's photo and signature, the mark and the handles ─────────────────────────
-  // A Story: the athlete's first name and the date on their own line, then the signature row, then the foot. A post (less room): the
-  // name and date sit at the far end of the signature row.
+  // ── 8. The top strip and the foot (the 2026-10-19 pass) ───────────────────────────────────────────────────────────────
+  // The top strip: a mint dot and the eyebrow at the card's start edge, the athlete's first name and the date at the end.
+  // The name sits HERE, not at the foot: it is the first thing read, and it is nowhere near Instagram's reply bar.
   P.whoText = function (iso) {
     const d = dateLong(iso, this.lang);
     const first = this.opts.name !== false && this.opts.first ? String(this.opts.first) : '';
     return first ? bidi(first, this.lang) + ' · ' + d : d;
   };
-  // Measured with the who line it will draw: a Farsi one is taller (Vazirmatn's line), and measuring a Latin sample put the Farsi
-  // block 14 px low, its mark into Instagram's reply bar (found by the headless test).
-  P.bottomH = function (story, iso) {
-    return (story ? this.lineH('who', this.whoText(iso), 1) + 48 : 0) + 4 + 44 + 120 + 36 + 72;
-  };
-  P.bottom = function (iso) {
-    const x = this.x, S = this.S, story = S.H === 1920, rtl = this.rtl;
-    let y = S.bottom - this.bottomH(story, iso);
-    const who = this.whoText(iso);
-    if (story) { this.line1('who', who, y, 1); y += this.lineH('who', who, 1) + 48; }
-    x.fillStyle = C.line; x.fillRect(this.X0, y, this.MW, 4);
-    y += 4 + 44;
-    const cx = rtl ? this.X1 - 60 : this.X0 + 60;
-    photo(x, cx, y + 60, 120, this.imgs.coach);
-    const sigW = 240, tx = rtl ? this.X1 - 120 - 36 : this.X0 + 120 + 36;
-    const roomW = story ? this.MW - 156 : (this.MW - 156) * 0.56;
-    signature(x, rtl ? tx - sigW : tx, y - 2, sigW, C.ink);
-    const coach = this.t.coach;
-    const st = this.st('sig', coach);
-    this.line1('sig', coach, y + 76, 1, rtl ? { l: null, maxW: roomW, x0: tx - roomW } : { maxW: roomW, x0: tx });
-    if (!story) {   // the post's name and date, at the far end of the row
-      const first = this.opts.name !== false && this.opts.first ? String(this.opts.first) : '';
-      const d = dateLong(iso, this.lang), w2 = this.MW - 156 - roomW - 24;
-      const x0 = rtl ? this.X0 : this.X1 - w2;
-      if (first) this.line1('who', first, y + 14, 1, { maxW: w2, x0, align: 'end' });
-      this.line1('who', d, y + (first ? 66 : 40), 1, { maxW: w2, x0, align: 'end' });
+  P.topStrip = function (iso) {
+    const S = this.S, x = this.x, y = S.eyeY, eye = this.eyebrow || '';
+    const st = this.st('eye', eye), lh = st.lh * st.size, dot = 17, gap = 16;
+    const wEye = this.MW * 0.52, wWho = this.MW * 0.40;   // 40 px of air between them, however long the eyebrow is
+    if (eye) {
+      const cx = this.rtl ? this.X1 - dot / 2 : this.X0 + dot / 2;
+      x.save(); x.fillStyle = C.mint;
+      x.beginPath(); x.arc(cx, y + lh / 2, dot / 2, 0, Math.PI * 2); x.fill(); x.restore();
+      this.line1('eye', eye, y, 1, { maxW: wEye, x0: this.rtl ? this.X1 - dot - gap - wEye : this.X0 + dot + gap });
     }
-    void st;
-    y += 120 + 36;
-    // The foot: the handle, the mark, the site (mirrored on a Farsi card).
+    const who = this.whoText(iso);
+    this.line1('who', who, y, 1, { maxW: wWho, x0: this.rtl ? this.X0 : this.X1 - wWho, align: 'end' });
+  };
+  // The foot: one hairline, his photo, his signature and the mantra, then the address line with the mark. "Amir Ardekani ·
+  // Coach" went with the 2026-10-19 pass: the handle names him, and six things in the bottom third were five too many.
+  P.foot = function () {
+    const x = this.x, S = this.S, rtl = this.rtl, y = S.footY;
+    x.fillStyle = C.line; x.fillRect(this.X0, y, this.MW, 4);
+    const fy = y + 44;
+    const cx = rtl ? this.X1 - 60 : this.X0 + 60;
+    photo(x, cx, fy + 60, 120, this.imgs.coach);
+    const sigW = 250, tx = rtl ? this.X1 - 120 - 36 : this.X0 + 120 + 36, room = this.MW - 156;
+    signature(x, rtl ? tx - sigW : tx, fy - 4, sigW, C.ink);
+    this.line1('mant', this.t.mantra, fy + 86, 1, { maxW: room, x0: rtl ? tx - room : tx });
+    // The address line: the handle, the mark, the site (mirrored on a Farsi card).
     const fst = ST.en.foot, a = '@amirardekanian', b = 'amirardekani.com';
-    const left = rtl ? b : a, right = rtl ? a : b;
-    const mid = y + 36, m = metrics(x, fst, fst.size), base = mid + (m.a - m.d) / 2;
+    const left = rtl ? b : a, right = rtl ? a : b, ay = S.adY;
+    const m = metrics(x, fst, fst.size), base = ay + 36 + (m.a - m.d) / 2;
     const wl = textW(x, fst, fst.size, left), wr = textW(x, fst, fst.size, right);
     drawRun(x, fst, fst.size, left, this.X0, base, null, false);
     drawRun(x, fst, fst.size, right, this.X1 - wr, base, null, false);
-    this.rec('foot', left, this.X0, y + 14, wl, 44, (this.MW - 72) / 2 - 24, fst.size, false);
-    this.rec('foot', right, this.X1 - wr, y + 14, wr, 44, (this.MW - 72) / 2 - 24, fst.size, false);
-    logo(x, S.W / 2 - 36, y, 72, this.imgs.logo);
-    return S.bottom - this.bottomH(story, iso);
+    this.rec('foot', left, this.X0, ay + 14, wl, 44, (this.MW - 72) / 2 - 24, fst.size, false);
+    this.rec('foot', right, this.X1 - wr, ay + 14, wr, 44, (this.MW - 72) / 2 - 24, fst.size, false);
+    logo(x, S.W / 2 - 36, ay, 72, this.imgs.logo);
   };
-  // Lays the flow out above the signature block and draws both.
+  // The top strip, the card's own words laid out from the foot up, then the foot.
   P.finish = function (iso) {
-    const story = this.S.H === 1920;
-    const top = this.S.top, bottom = this.S.bottom - this.bottomH(story, iso) - 44;
-    this.flow(top, bottom);
-    this.bottom(iso);
+    this.topStrip(iso);
+    this.flow(this.S.bodyY, this.S.bodyEnd);
+    this.foot();
   };
 
   // ── 9. The cards ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -979,6 +1102,8 @@
   function cycleEye(p, c) {
     return c && c.n ? p.t.cycleEye(n(c.n, p.lang), c.name || '') : p.t.personalRecords;
   }
+  // A headline's runs ([text, clay?, newLine?]) as one line of words, for the clay label at the top of a card.
+  const headText = runs => runs.map((r, i) => (i && r[2] ? ' ' : '') + r[0]).join('').replace(/\s+/g, ' ').trim();
   const TPL = {};
 
   // best: { lift, u, w, r, date, prev: { w, r, date } | null, cycle: { n, of, name } | null }
@@ -990,16 +1115,15 @@
     const sameR = pr && +pr.r === +d.r && +d.w > +pr.w;
     const sameW = pr && +pr.w === +d.w && +d.r > +pr.r;
     p.eye(cycleEye(p, d.cycle));
-    p.big(t.bestHead, 40, 2);
-    p.bar(48);
-    p.lift(d.lift, 72);
-    if (show) p.num([{ t: n(kgNum(d.w), lang) }, { t: ' ' + unitW(u, d.w, lang) + ' × ' + n(d.r, lang), s: 'small' }], 24);
-    else if (sameR) p.num([{ t: plusKg(d.w - pr.w, lang, u).replace(/\s.*$/, '') }, { t: ' ' + unitW(u, d.w - pr.w, lang), s: 'small' }], 24);
-    else if (sameW) p.num([{ t: (lang === 'fa' ? '' : '+') + n(d.r - pr.r, lang) }, { t: ' ' + t.reps(d.r - pr.r), s: 'small' }], 24);
-    if (pr && show && sameR) p.para(t.bestGainKg(plusKg(d.w - pr.w, lang, u), dateShort(pr.date, lang)), 40, { drop: 2 });
-    else if (pr && show && sameW) p.para(t.bestGainReps(plusReps(d.r - pr.r, lang), W_(lang, d.w, u), dateShort(pr.date, lang)), 40, { drop: 2 });
-    else if (pr && !show && sameR) p.para(t.bestHiddenKg(dateShort(pr.date, lang)), 40, { drop: 2 });
-    else if (pr && !show && sameW) p.para(t.bestHiddenReps(dateShort(pr.date, lang)), 40, { drop: 2 });
+    p.lab(headText(t.bestHead));
+    if (show) p.num([{ t: n(kgNum(d.w), lang) }, { t: ' ' + unitW(u, d.w, lang) + ' × ' + n(d.r, lang), s: 'small' }], 18);
+    else if (sameR) p.num([{ t: plusKg(d.w - pr.w, lang, u).replace(/\s.*$/, '') }, { t: ' ' + unitW(u, d.w - pr.w, lang), s: 'small' }], 18);
+    else if (sameW) p.num([{ t: (lang === 'fa' ? '' : '+') + n(d.r - pr.r, lang) }, { t: ' ' + t.reps(d.r - pr.r), s: 'small' }], 18);
+    p.lift(d.lift, 26);
+    if (pr && show && sameR) p.para(t.bestGainKg(plusKg(d.w - pr.w, lang, u), dateShort(pr.date, lang)), 32, { drop: 2 });
+    else if (pr && show && sameW) p.para(t.bestGainReps(plusReps(d.r - pr.r, lang), W_(lang, d.w, u), dateShort(pr.date, lang)), 32, { drop: 2 });
+    else if (pr && !show && sameR) p.para(t.bestHiddenKg(dateShort(pr.date, lang)), 32, { drop: 2 });
+    else if (pr && !show && sameW) p.para(t.bestHiddenReps(dateShort(pr.date, lang)), 32, { drop: 2 });
     p.finish(d.date);
   };
   TPL.best.ok = d => !!(d && d.lift && d.w > 0 && d.r > 0);
@@ -1038,8 +1162,8 @@
     const key = EFFORT_KEY(d);
     const head = /^pct/.test(key) ? t.effortHead.pct(pctStr(d.pct, lang)) : t.effortHead[key];
     p.eye(cycleEye(p, d.cycle));
-    p.big(head, 40, 3);
-    p.lift(d.lift, 64);
+    p.lab(headText(head));
+    p.lift(d.lift, 26);
     // Before and after: the first session of the cycle and the best since, as lifted, each with its effort.
     const label = s => s.wk && d.a.wk !== d.b.wk ? t.week(n(s.wk, lang)) : dateShort(s.date, lang);
     const setTxt = s => {
@@ -1051,7 +1175,7 @@
     const top = Math.max(val(d.a), val(d.b)) || 1;
     rows.forEach(r => { r.frac = Math.max(0.3, Math.min(1, val(r.s) / top)); });
     const rowH = k => 64 * k + 10 * k + p.lineH('row', 'A', k);
-    p.add({ name: 'vs', gap: 64, h: k => rowH(k) * 2 + 28 * k, draw: (y, k) => {
+    p.add({ name: 'vs', gap: 40, h: k => rowH(k) * 2 + 28 * k, draw: (y, k) => {
       rows.forEach((r, i) => {
         const top0 = y + i * (rowH(k) + 28 * k), labW = 176 * k, gapW = 32 * k, barW = p.MW - labW - gapW;
         const lab = label(r.s);
@@ -1064,7 +1188,7 @@
       });
     } });
     const words = effortWords(p, d, false);
-    if (words) p.para(words, 40, { drop: 2 });
+    if (words) p.para(words, 32, { drop: 2 });
     p.finish(d.date);
   };
   TPL.effort.ok = d => !!(d && d.lift && d.a && d.b && d.shape && EFFORT_KEY(d) in EN.effortLine);
@@ -1076,21 +1200,20 @@
     const lang = p.lang, t = p.t, show = p.opts.weights !== false, u = d.u;
     const a = d.before, b = d.now, sameR = +a.r === +b.r;
     p.eye(d.cycle && d.cycle.n ? t.testWeek(n(d.cycle.n, lang)) : t.personalRecords);
-    p.big(t.retestHead, 40, 2);
-    p.stamp(t.beaten, 40);
-    p.lift(d.lift + (d.spec ? ' · ' + d.spec : ''), 56);
-    if (show && sameR) p.num([{ t: n(kgNum(a.w), lang) }, { arrow: 1 }, { t: n(kgNum(b.w), lang) }, { t: ' ' + unitW(u, b.w, lang), s: 'small' }], 20);
+    p.lab(headText(t.retestHead) + ' · ' + t.beaten);
+    if (show && sameR) p.num([{ t: n(kgNum(a.w), lang) }, { arrow: 1 }, { t: n(kgNum(b.w), lang) }, { t: ' ' + unitW(u, b.w, lang), s: 'small' }], 18);
     else if (show) p.num([{ t: n(kgNum(a.w), lang) + '×' + n(a.r, lang), s: 'small' }, { arrow: 1 },
-      { t: n(kgNum(b.w), lang) }, { t: ' ' + unitW(u, b.w, lang) + ' × ' + n(b.r, lang), s: 'small' }], 20);
-    else if (sameR && b.w > a.w) p.num([{ t: plusKg(b.w - a.w, lang, u).replace(/\s.*$/, '') }, { t: ' ' + unitW(u, b.w - a.w, lang), s: 'small' }], 20);
-    else if (+b.w === +a.w && b.r > a.r) p.num([{ t: (lang === 'fa' ? '' : '+') + n(b.r - a.r, lang) }, { t: ' ' + t.reps(b.r - a.r), s: 'small' }], 20);
+      { t: n(kgNum(b.w), lang) }, { t: ' ' + unitW(u, b.w, lang) + ' × ' + n(b.r, lang), s: 'small' }], 18);
+    else if (sameR && b.w > a.w) p.num([{ t: plusKg(b.w - a.w, lang, u).replace(/\s.*$/, '') }, { t: ' ' + unitW(u, b.w - a.w, lang), s: 'small' }], 18);
+    else if (+b.w === +a.w && b.r > a.r) p.num([{ t: (lang === 'fa' ? '' : '+') + n(b.r - a.r, lang) }, { t: ' ' + t.reps(b.r - a.r), s: 'small' }], 18);
+    p.lift(d.lift + (d.spec ? ' · ' + d.spec : ''), 26);
     let gain = null;
     if (sameR && b.w > a.w) gain = plusKg(b.w - a.w, lang, u);
     else if (+a.w === +b.w && b.r > a.r) gain = plusReps(b.r - a.r, lang);
     const d1 = dateShort(a.date, lang), d2 = dateShort(b.date, lang);
     const dates = a.test ? t.retestDates(d1, d2) : t.retestBefore(d1, d2);
     const runs = gain ? (d.oneCycle ? t.retestOneCycle(gain) : t.retestSince(gain, d1)).concat([[dates]]) : [[dates.trim()]];
-    p.para(runs, 40, { drop: 2 });
+    p.para(runs, 32, { drop: 2 });
     p.finish(b.date);
   };
   TPL.retest.ok = d => !!(d && d.lift && d.now && d.before && d.now.w > 0 && d.before.w > 0);
@@ -1098,19 +1221,18 @@
   // cycle (Signed Off): { cycle: { n, of, name, art }, done, planned, bests, weeks, wins: [{ lift, shape, same, pct, a, b }], end }
   TPL.cycle = function (p, d) {
     const lang = p.lang, t = p.t, c = d.cycle || {};
-    cover(p.x, p.S, p.imgs.art, p.S.cover);
-    p.eye(c.of ? t.cycleOf(n(c.n, lang), n(c.of, lang)) : t.cycleEye(n(c.n, lang), ''), 0);
-    p.big([[c.name || '']], 36, 3, { floor: 0.42 });
-    p.stamp(t.signedOff, 36);
+    p.eye(c.of ? t.cycleOf(n(c.n, lang), n(c.of, lang)) : t.cycleEye(n(c.n, lang), ''));
+    p.big([[c.name || '']], 0, 2, { size: 136, floor: 0.42 });
+    p.stamp(t.signedOff, 20);
     const cells = [];
     if (d.planned) cells.push([n(d.done, lang) + '/' + n(d.planned, lang), t.sessions]);
     cells.push([n(d.bests || 0, lang), t.newBests]);
     if (d.weeks) cells.push([n(d.weeks, lang), t.weeks]);
-    p.stats(cells, 48);
+    p.stats(cells, 30);
     (d.wins || []).slice(0, 3).forEach((w, i) => {
       const words = effortWords(p, w, true);
       if (!words) return;
-      p.add({ name: 'win' + (i + 1), gap: i ? 24 : 44, drop: 3 - i,
+      p.add({ name: 'win' + (i + 1), gap: i ? 18 : 30, drop: 3 - i,
         h: k => p.lineH('winN', 'A', k) + p.richH([[words, 1]], k, { roleA: 'winT', roleB: 'winT', max: 2 }),
         draw: (y, k) => {
           const r = p.line1('winN', w.lift, y, k, { st: ST.en.winN });
@@ -1125,15 +1247,15 @@
   TPL.roadmap = function (p, d) {
     const lang = p.lang, t = p.t, x = p.x, cs = d.cycles || [];
     p.eye(t.roadEye);
-    p.big(t.roadHead, 40, 2);
+    p.big(t.roadHead, 0, 1, { size: 136 });
     const cells = [[n(cs.length, lang), t.cycles]];
     if (d.weeks) cells.push([n(d.weeks, lang), t.weeks]);
     if (d.sessions) cells.push([n(d.sessions, lang), t.sessions]);
-    p.stats(cells, 56);
+    p.stats(cells, 30);
     const rowH = k => 76 * k;
-    p.add({ name: 'road', gap: 52, h: k => cs.length * rowH(k) + Math.max(0, cs.length - 1) * 22 * k, draw: (y, k) => {
+    p.add({ name: 'road', gap: 34, h: k => cs.length * rowH(k) + Math.max(0, cs.length - 1) * 20 * k, draw: (y, k) => {
       cs.forEach((c, i) => {
-        const top = y + i * (rowH(k) + 22 * k), rtl = p.rtl;
+        const top = y + i * (rowH(k) + 20 * k), rtl = p.rtl;
         const numW = 64 * k, thW = 136 * k, gap = 24 * k, tickW = 56 * k;
         const nx = rtl ? p.X1 - numW : p.X0;
         p.line1('roadN', n(i + 1, lang), top + (rowH(k) - p.lineH('roadN', '1', k)) / 2, k, { maxW: numW, x0: nx, align: 'center' });
@@ -1152,92 +1274,38 @@
         tick(x, rtl ? p.X0 + tickW / 2 : p.X1 - tickW / 2, top + rowH(k) / 2, 44 * k, C.ink, 6 * k);
       });
     } });
-    if (d.start && d.end) p.para(t.roadLine(dateShort(d.start, lang), dateShort(d.end, lang)), 44, { drop: 1 });
+    if (d.start && d.end) p.para(t.roadLine(dateShort(d.start, lang), dateShort(d.end, lang)), 30, { drop: 1 });
     p.finish(d.end);
   };
   TPL.roadmap.ok = d => !!(d && Array.isArray(d.cycles) && d.cycles.length && d.end);
 
-  // ── Career Mode's rewards: drawn now with sample data, fed by phase 3. The words on them come from the catalogue
-  // (career/*.toml: name, caption, metal); a Farsi card takes `nameFa` / `captionFa` / `fromFa` when the catalogue has them.
-  // REWARD_TEMPLATES_START (Career Mode's five: badge, achievement, title, level, quest)
+  // ── Career Mode's cards (the 2026-10-19 pass): a mark, an achievement, the month's honour, the Monthly Open, a new level,
+  //    the month's goal, a session and the athlete's own card. No badge, metal, rank, title or quest anywhere: they left the
+  //    server with the cut (career/CAREER_MODE.md → Round 5, L2 and L5). Amir, 2026-10-19: "go with your picks", and
+  //    "all the achievements should get a card", so every achievement is shareable from Your moments, whenever it was earned.
+  // REWARD_TEMPLATES_START
 
-  // The parts the five share. The EMBLEM is each reward's own picture and the only place a metal's colours go (its rim, its plate),
-  // besides the metal's own label. It is all drawn as paths (the app's fonts carry Latin only), and every text on it goes through
-  // line1() or rich(), so the headless test sees its box. Every size scales with k, and the start edge is the right one on a Farsi card.
-  const CREST = [[0.5, 0], [1, 0.12], [1, 0.62], [0.5, 1], [0, 0.62], [0, 0.12]];   // Proof's crest (habits.html): fractions of w and h
   const startL = (p, w) => p.rtl ? p.X1 - w : p.X0;
-  const reach = (w, h) => (w / 2) * Math.sin(145 * Math.PI / 180) - (h / 2) * Math.cos(145 * Math.PI / 180);   // metalFill's r for a w × h shape
-  const rwEye = (f, word) => word ? f(word) : f('').replace(/\s*·\s*$/, '');          // "Badge · Progress", or "Badge" when no meaning came
-  // How far a reward's own name may shrink before the engine cuts it. The headline keeps its two lines and a long name gets smaller,
-  // not shorter: at the engine's default half size a 43-letter name lost its last word (the one in clay), and a 28-letter title on
-  // the plate ended in "…". Every name in career/*.toml already paints whole at the defaults; this is for the names written next.
-  const NAME_FLOOR = 0.36, PLATE_FLOOR = 0.4, RANK_FLOOR = 0.45;
-  // ROMAN stops at X, and Proof's Day Streak badge has twelve marks (career/badges.toml): the numeral for any mark is worked out here.
-  const romanOf = v => {
-    v = Math.floor(+v);
-    if (!(v > 0 && v < 4000)) return '';
-    if (ROMAN[v]) return ROMAN[v];
-    let s = '';
-    [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]
-      .forEach(r => { while (v >= r[0]) { s += r[1]; v -= r[0]; } });
-    return s;
-  };
-  // A convex polygon (clockwise on screen) pushed in by d on every side: each new corner is where two pushed edges meet.
-  function insetPoly(pts, d) {
-    const m = pts.length, ln = pts.map((a, i) => {
-      const b = pts[(i + 1) % m], len = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / len, uy = (b[1] - a[1]) / len;
-      return { px: a[0] - uy * d, py: a[1] + ux * d, ux, uy };
-    });
-    return pts.map((_, i) => {
-      const a = ln[(i + m - 1) % m], b = ln[i];
-      const t = ((b.px - a.px) * b.uy - (b.py - a.py) * b.ux) / (a.ux * b.uy - a.uy * b.ux);
-      return [a.px + a.ux * t, a.py + a.uy * t];
-    });
-  }
-  // The path of a polygon with its corners rounded: from the middle of the last edge, round every corner, back to the start.
-  function roundedPoly(x, pts, r) {
-    const m = pts.length;
-    x.beginPath(); x.moveTo((pts[m - 1][0] + pts[0][0]) / 2, (pts[m - 1][1] + pts[0][1]) / 2);
-    for (let i = 0; i < m; i++) x.arcTo(pts[i][0], pts[i][1], pts[(i + 1) % m][0], pts[(i + 1) % m][1], r);
-    x.closePath();
-  }
-  // Proof's crest: the metal rim, then the dark green face inside it (an even rim all round). Returns the face's middle and its width.
-  function crest(x, l, t, w, h, metal, rim, round) {
-    const pts = CREST.map(c => [l + c[0] * w, t + c[1] * h]), face = insetPoly(pts, rim);
-    roundedPoly(x, pts, round);
-    x.fillStyle = metalFill(x, metal, l + w / 2, t + h / 2, reach(w, h)); x.fill();
-    roundedPoly(x, face, Math.max(2, round - rim));
-    const g = x.createLinearGradient(0, t + rim, 0, t + h - rim);
-    g.addColorStop(0, C.mid); g.addColorStop(1, C.deep);   // #0E4A36 down to #082D20
-    x.fillStyle = g; x.fill();
-    return { cx: l + w / 2, cy: t + h * 0.45, innerW: w - 2 * rim };
-  }
+  const rwEye = (f, word) => word ? f(word) : f('').replace(/\s*·\s*$/, '');          // "Achievement · Progress", or "Achievement"
+  // How far a reward's own name may shrink before the engine cuts it: a long name is drawn smaller, never shorter.
+  const NAME_FLOOR = 0.36;
+  // The four numbers' marks (career/badges.toml, program.html's careerMarks()). A card is drawn for one of these keys only.
+  const MARK_KEYS = ['weeks_held', 'sessions_with_amir', 'personal_bests', 'comebacks'];
   // The ink of a fitted line: how far it rises above its baseline and falls below it (capitals fall nowhere, Farsi falls and rises).
   function inkOf(p, st, f) {
     p.x.font = fontStr(st, f.size);
     const mt = p.x.measureText(caseOf(st, f.t));
     return { asc: mt.actualBoundingBoxAscent > 0 ? mt.actualBoundingBoxAscent : f.size * 0.7, desc: Math.max(0, mt.actualBoundingBoxDescent || 0) };
   }
-  // The top of the line box, as P.line1 lays it out, that puts the INK of a fitted text on the line yc: the box's own middle is not
-  // where the eye finds the middle of a capital (no descender) or of a Farsi word. size: the size the line was asked for (st.size × k).
+  // The top of the line box, as P.line1 lays it out, that puts the INK of a fitted text on the line yc.
   function inkTop(p, st, size, yc, f) {
     const i = inkOf(p, st, f), m = metrics(p.x, st, f.size);
     return yc + (i.asc - i.desc) / 2 - (st.lh * size) / 2 - (m.a - m.d) / 2;
   }
-  // The tier, or the rank's sub-level, in Roman numerals, in the middle of a crest's face, in the metal's own ink.
-  function crestNumeral(p, roman, c, size, k, color) {
-    const st = Object.assign({}, ST.en.metal, { w: 800, size, lh: 1, track: 0.04 }), s = size * k, f = p.fitLine(st, roman, s, c.innerW);
-    return p.line1('metal', roman, inkTop(p, st, s, c.cy, f), k, { st, maxW: c.innerW, l: c.cx - f.w / 2, color });
-  }
-  // One fitted line as a flow item (a metal label, the quest's week count).
-  function lineItem(p, name, role, text, gap, o) {
-    const st = (o && o.st) || p.st(role, text), opts = Object.assign({}, o, { st });
-    return p.add({ name, gap, h: k => st.lh * st.size * k, draw: (y, k) => p.line1(role, text, y, k, opts) });
-  }
-  // A Farsi card is handed ENGLISH text whenever the catalogue has no Farsi for it yet (a caption, a step, what a title was earned for).
-  // The engine's rich() keeps a run of Latin words in ONE piece on a right-to-left card, so such a sentence never wraps and runs off the
-  // card. plainLines() breaks text of one style in the order it is written, and block() draws each line whole through line1(), on the
-  // card's start edge: a line with no Farsi in it left to right, a line with Farsi right to left (the canvas orders a mixed line itself).
+  // A Farsi card is handed ENGLISH text whenever the catalogue has no Farsi for it yet (a caption, what counts in the Open).
+  // The engine's rich() keeps a run of Latin words in ONE piece on a right-to-left card, so such a sentence never wraps and runs
+  // off the card. plainLines() breaks text of one style in the order it is written, and block() draws each line whole through
+  // line1(), on the card's start edge.
   const hasLatin = s => /[A-Za-z]/.test(String(s));
   function plainLines(p, st, text, size, maxW, maxLines) {
     const words = String(text).trim().split(/\s+/), floor = size * 0.62;
@@ -1261,137 +1329,145 @@
     const st = p.st(role, text), a = plainLines(p, st, text, st.size * k, o.maxW || p.MW, maxLines), lh = st.lh * a.size;
     return { h: a.lines.length * lh, draw: top => a.lines.forEach((ln, i) => p.line1(role, ln, top + i * lh, k, { st, maxW: o.maxW, x0: o.x0, size: a.size / k, floor: 1 })) };
   }
-  // A paragraph of one style as a flow item (a caption, what a title was earned for).
+  // A paragraph of one style as a flow item (a caption, what counts in the Open, the month's goal in Amir's words).
   function paraItem(p, text, gap, o) {
     o = o || {};
     return p.add({ name: o.name || 'line', gap: gap || 0, drop: o.drop, h: k => block(p, text, k, o).h, draw: (y, k) => block(p, text, k, o).draw(y) });
   }
 
-  // badge: { first, name, nameFa?, meaning, metal, tier (1..5), n, caption, captionFa?, date }
-  // Proof's crest in the badge's metal with its tier in Roman numerals; under the name, the metal and the tier in words. The caption is
-  // already filled in by the catalogue ("25 personal bests. You are getting better.").
-  TPL.badge = function (p, d) {
-    const t = p.t, x = p.x, fa = p.lang === 'fa', mk = d.metal === 'prisma' ? 'prismatic' : d.metal, m = METALS[mk] || METALS.bronze;
-    const roman = romanOf(d.tier), name = fa && d.nameFa ? d.nameFa : d.name, caption = fa && d.captionFa ? d.captionFa : d.caption;
-    p.eye(rwEye(t.badgeEye, t.meaning[d.meaning]));
-    p.add({ name: 'crest', gap: 48, h: k => 336 * k, draw: (y, k) => {
-      const w = 300 * k, c = crest(x, startL(p, w), y, w, 336 * k, mk, 16 * k, 24 * k);
-      if (roman) crestNumeral(p, roman, c, 132, k, m.ink);
-    } });
-    p.big([[name]], 40, 2, { floor: NAME_FLOOR });
-    lineItem(p, 'metal', 'metal', (t.metal[mk] || '') + ' · ' + roman, 24, { color: m.ink });
-    if (caption) paraItem(p, caption, 36, { name: 'caption', drop: 2 });
+  // mark: { first, key ('weeks_held' | 'sessions_with_amir' | 'personal_bests' | 'comebacks'), n, next, date }
+  // One of the four numbers crossing a mark (L3). The number is the outlined numeral, the day screen's own: a count, never a weight.
+  TPL.mark = function (p, d) {
+    const t = p.t, lang = p.lang, key = MARK_KEYS.indexOf(d.key) >= 0 ? d.key : MARK_KEYS[0];
+    const num = n(d.n, lang);
+    p.eye(t.markEye);
+    p.lab(t.markWords[key]);
+    p.ghost(num, 8);
+    p.para(t.markLine[key](num), 24, { drop: 2 });
+    if (d.next > 0) p.nextLine(t.nextMark(n(d.next, lang) + ' ' + t.markUnit[key]), 20);
     p.finish(d.date);
   };
-  TPL.badge.ok = d => !!(d && d.name && METALS[d.metal] && romanOf(d.tier));
+  TPL.mark.ok = d => !!(d && d.n > 0 && MARK_KEYS.indexOf(d.key) >= 0);
 
   // achievement: { first, name, nameFa?, meaning, caption, captionFa?, date }
-  // A round seal (a rosette of 28 strokes, a green disc, a white tick); the name's last word in clay.
+  // EVERY achievement gets one (Amir, 2026-10-19), whenever it was earned: a round seal, the name with its last word in clay, the line.
   TPL.achievement = function (p, d) {
     const t = p.t, x = p.x, fa = p.lang === 'fa', caption = fa && d.captionFa ? d.captionFa : d.caption;
     const words = String(fa && d.nameFa ? d.nameFa : d.name).trim().split(/\s+/), last = words.pop();
     p.eye(rwEye(t.achievementEye, t.meaning[d.meaning]));
-    p.add({ name: 'seal', gap: 48, h: k => 280 * k, draw: (y, k) => {
-      const R = 140 * k, cx = startL(p, 2 * R) + R, cy = y + R;
+    p.add({ name: 'seal', gap: 0, h: k => 232 * k, draw: (y, k) => {
+      const R = 116 * k, cx = startL(p, 2 * R) + R, cy = y + R;
       x.save();
-      x.strokeStyle = C.clayLine; x.lineWidth = 7 * k; x.lineCap = 'round';
+      x.strokeStyle = C.clayLine; x.lineWidth = 6 * k; x.lineCap = 'round';
       x.beginPath();
       for (let i = 0; i < 28; i++) {
-        const a = i * Math.PI * 2 / 28, r1 = (i % 2 ? 126 : 118) * k, r2 = 136 * k;
+        const a = i * Math.PI * 2 / 28, r1 = (i % 2 ? 104 : 97) * k, r2 = 113 * k;
         x.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1); x.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
       }
       x.stroke();
-      x.beginPath(); x.arc(cx, cy, 104 * k, 0, Math.PI * 2); x.fillStyle = C.mid; x.fill();
-      x.beginPath(); x.arc(cx, cy, 102 * k, 0, Math.PI * 2); x.strokeStyle = 'rgba(255,255,255,0.30)'; x.lineWidth = 4 * k; x.stroke();
+      x.beginPath(); x.arc(cx, cy, 86 * k, 0, Math.PI * 2); x.fillStyle = C.mid; x.fill();
+      x.beginPath(); x.arc(cx, cy, 84 * k, 0, Math.PI * 2); x.strokeStyle = 'rgba(255,255,255,0.30)'; x.lineWidth = 4 * k; x.stroke();
       x.restore();
-      tick(x, cx, cy, 120 * k, C.ink, 17 * k);
+      tick(x, cx, cy, 100 * k, C.ink, 15 * k);
     } });
-    p.big(words.length ? [[words.join(' ') + ' '], [last, 1]] : [[last, 1]], 40, 2, { floor: NAME_FLOOR });
-    if (caption) paraItem(p, caption, 40, { name: 'caption', drop: 2 });
+    p.big(words.length ? [[words.join(' ') + ' '], [last, 1]] : [[last, 1]], 26, 2, { size: 146, floor: NAME_FLOOR });
+    if (caption) paraItem(p, caption, 26, { name: 'caption', drop: 2 });
     p.finish(d.date);
   };
   TPL.achievement.ok = d => !!(d && d.name && String(d.name).trim());
 
-  // title: { first, name ('CLIMBER'), meaning, metal, from ('Record Breaker, emerald: 25 personal bests'), fromFa?, date }
-  // The plate is the headline: a metal rim round a dark face, the title in the middle; under it, what it was earned for.
-  TPL.title = function (p, d) {
-    const t = p.t, x = p.x, fa = p.lang === 'fa', mk = d.metal === 'prisma' ? 'prismatic' : d.metal, from = fa && d.fromFa ? d.fromFa : d.from;
-    p.eye(t.titleEye);
-    // The lightest card: half the spare room goes between the eye and the plate, so the plate sits in the middle of the card and is not
-    // hung from the top (the room is the flow's own, as P.finish works it out; the spacer never takes more than what is left over).
-    const air = { name: 'air', gap: 0, draw: () => {} }, room = p.S.bottom - p.bottomH(p.S.H === 1920, d.date) - 44 - p.S.top;
-    air.h = k => 0.5 * Math.max(0, room - p.items.reduce((s, it, i) => it === air ? s : s + (i ? it.gap * k : 0) + it.h(k), 0));
-    p.add(air);
-    p.add({ name: 'plate', gap: 52, h: k => 236 * k, draw: (y, k) => {
-      const w = p.MW, h = 236 * k, l = p.X0, rim = 10 * k, R = 28 * k, st = p.st('plate', d.name), maxW = w - 2 * rim - 80 * k;
-      roundRect(x, l, y, w, h, R); x.fillStyle = metalFill(x, mk, l + w / 2, y + h / 2, reach(w, h)); x.fill();
-      roundRect(x, l + rim, y + rim, w - 2 * rim, h - 2 * rim, R - rim); x.fillStyle = C.deep; x.fill();
-      const s = st.size * k, f = p.fitLine(st, d.name, s, maxW, PLATE_FLOOR);
-      p.line1('plate', d.name, inkTop(p, st, s, y + h / 2, f), k, { st, align: 'center', maxW, floor: PLATE_FLOOR });
-    } });
-    if (from) paraItem(p, t.titleFrom(from), 44, { name: 'from', drop: 2 });
+  // honour: { first, honour ('sessions' | 'improved' | 'full_month' | 'pick'), month, n?, pct?, lift?, place?, field?, date }
+  // One of the month's honours (L9). ⚠️ A card never names another athlete: the place and the size of the field, nothing more.
+  TPL.honour = function (p, d) {
+    const t = p.t, lang = p.lang, h = t.honourName[d.honour] ? d.honour : 'pick';
+    p.eye(t.honourEye(d.month || ''));
+    if (h === 'sessions' && d.n > 0) {
+      p.lab(t.honourName[h]);
+      p.num([{ t: n(d.n, lang) }, { t: ' ' + t.sessions, s: 'small' }], 18);
+    } else if (h === 'improved' && d.pct > 0) {
+      p.lab(t.honourName[h]);
+      p.num([{ t: pctStr(Math.round(d.pct * 10) / 10, lang) }], 18);
+      if (d.lift) p.lift(d.lift, 24);
+    } else {
+      p.big([[t.honourName[h]]], 0, 2, { size: 146, floor: 0.42 });
+    }
+    p.para([[t.honourSub[h](d.month || '')]], 26, { drop: 2 });
+    if (d.place > 0 && d.field > 0) p.tag(t.placeOf(t.ord(n(d.place, lang)), n(d.field, lang)), 26);
     p.finish(d.date);
   };
-  TPL.title.ok = d => !!(d && d.name && METALS[d.metal]);
+  TPL.honour.ok = d => !!(d && d.honour && d.month);
 
-  // level: { first, level, rank ('MACHINE'), sub (1..5), metal, prestige (0 or more), date }
-  // The career level (it never resets). The crest carries the rank's sub-level; the rank is named beside it, with a star for each
-  // prestige (up to 5) under the name.
+  // open: { first, title, how?, value, unit?, place?, field?, month, date }
+  // The Monthly Open (stage85). The result is the athlete's own, confirmed by Amir; the board is never drawn, only their place.
+  TPL.open = function (p, d) {
+    const t = p.t, lang = p.lang;
+    p.eye(t.openEye(d.month || ''));
+    p.lab(d.title || '');
+    const parts = [{ t: n(d.value, lang) }];
+    if (d.unit) parts.push({ t: ' ' + d.unit, s: 'small' });
+    p.num(parts, 18);
+    if (d.place > 0 && d.field > 0) p.tag(t.placeOf(t.ord(n(d.place, lang)), n(d.field, lang)), 26);
+    if (d.how) paraItem(p, d.how, 26, { name: 'how', drop: 2 });
+    p.finish(d.date);
+  };
+  TPL.open.ok = d => !!(d && d.title && d.value != null && d.value !== '');
+
+  // player: { first, level, weeks, sessions, bests, comebacks, lifts: [{ name, w, r, u }], since, date }
+  // Their own card, any day: the one card that waits for nothing to happen. Weights follow the share sheet's switch.
+  TPL.player = function (p, d) {
+    const t = p.t, lang = p.lang, show = p.opts.weights !== false;
+    const lifts = show ? (d.lifts || []).filter(w => w && w.name && w.w > 0).slice(0, 3) : [];
+    p.eye(t.playerEye);
+    p.big(t.levelHead(n(d.level, lang)), 0, 1, { size: 150 });
+    p.grid4([[n(d.weeks || 0, lang), t.playerNums.weeks], [n(d.sessions || 0, lang), t.playerNums.sessions],
+      [n(d.bests || 0, lang), t.playerNums.bests], [n(d.comebacks || 0, lang), t.playerNums.comebacks]], 44);
+    if (lifts.length) p.nextLine(t.playerLifts, 32);
+    lifts.forEach((w, i) => {
+      const half = p.MW * 0.60, rest = p.MW - half - 24;
+      p.add({ name: 'lift' + (i + 1), gap: i ? 14 : 20, drop: 3 - i, h: k => p.lineH('winN', 'A', k), draw: (y, k) => {
+        p.line1('winN', w.name, y, k, { st: ST.en.winN, maxW: half, x0: p.rtl ? p.X1 - half : p.X0 });
+        p.line1('winT', kgs(w.w, lang, w.u) + ' × ' + n(w.r, lang), y, k, { maxW: rest, x0: p.rtl ? p.X0 : p.X1 - rest, align: 'end' });
+      } });
+    });
+    if (d.since) p.nextLine(t.playerSince(dateLong(d.since, lang)), 26);
+    p.finish(d.date);
+  };
+  TPL.player.ok = d => !!(d && d.level > 0);
+
+  // level: { first, level, date } — the career level, which never resets. No rank name anywhere (L2).
   TPL.level = function (p, d) {
-    const t = p.t, x = p.x, lang = p.lang, mk = d.metal === 'prisma' ? 'prismatic' : d.metal, m = METALS[mk] || METALS.bronze;
-    const roman = romanOf(d.sub), stars = Math.max(0, Math.min(5, Math.floor(+d.prestige || 0)));
-    p.eye(t.levelEye);
-    p.big(t.levelHead(n(d.level, lang)), 40, 2);
-    p.add({ name: 'crest', gap: 48, h: k => 292 * k, draw: (y, k) => {
-      const w = 260 * k, h = 292 * k, c = crest(x, startL(p, w), y, w, h, mk, 14 * k, 22 * k);
-      if (roman) crestNumeral(p, roman, c, 116, k, m.ink);
-      // the rank, on the end side of the crest, with its prestige stars under it, the pair centred on the crest
-      const gap = 44 * k, room = p.MW - w - gap, x0 = p.rtl ? p.X0 : p.X0 + w + gap;
-      const st = Object.assign({}, p.st('metal', d.rank), { w: 800, size: 84 }), s = st.size * k, f = p.fitLine(st, d.rank, s, room, RANK_FLOOR);
-      const ink = inkOf(p, st, f), sr = 24 * k, sGap = 30 * k, inkH = ink.asc + ink.desc;
-      const top = y + h / 2 - (inkH + (stars ? sGap + 2 * sr : 0)) / 2;
-      p.line1('metal', d.rank, inkTop(p, st, s, top + inkH / 2, f), k, { st, maxW: room, x0, floor: RANK_FLOOR });
-      for (let i = 0; i < stars; i++) {
-        const sx = p.rtl ? p.X1 - w - gap - sr - i * 2.5 * sr : p.X0 + w + gap + sr + i * 2.5 * sr;
-        star(x, sx, top + inkH + sGap + sr, sr, C.clay);
-      }
-    } });
-    p.para(t.levelLine(), 44, { name: 'line', drop: 2 });
+    const t = p.t, lang = p.lang;
+    p.eye(t.levelUpEye);
+    p.big(t.levelHead(n(d.level, lang)), 0, 1, { size: 180 });
+    p.para(t.levelLine(), 26, { drop: 2 });
     p.finish(d.date);
   };
-  TPL.level.ok = d => !!(d && d.level > 0 && d.rank && romanOf(d.sub) && METALS[d.metal]);
+  TPL.level.ok = d => !!(d && d.level > 0);
 
-  // quest: { first, name, nameFa?, meaning, weeks, steps: [strings], stepsFa?: [strings], caption, captionFa?, title?, date }
-  // Every step is ticked: a clay disc with a white tick, then the step in up to two lines. The title the quest earned, if any, last.
-  TPL.quest = function (p, d) {
-    const t = p.t, x = p.x, lang = p.lang, fa = lang === 'fa', caption = fa && d.captionFa ? d.captionFa : d.caption;
-    const steps = (fa && d.stepsFa && d.stepsFa.length ? d.stepsFa : d.steps || []).slice(0, 5);
-    const dia = 56, indent = dia + 28, rowGap = 20;
-    // the text's room: past the disc, up to two lines (x0 is the room's left edge on an English card, x1 its right edge on a Farsi one)
-    const ro = k => ({ roleA: 'step', roleB: 'step', maxW: p.MW - indent * k, max: 2, x0: p.rtl ? p.X0 : p.X0 + indent * k, x1: p.X1 - indent * k });
-    // a row: the disc lines up with the step's first line; the text is nudged down if its line is shorter than the disc
-    const geom = (s, k) => {
-      const lh1 = p.lineH('step', s, k), off = Math.max(0, (dia * k - lh1) / 2), b = block(p, s, k, ro(k));
-      return { lh1, off, b, h: Math.max(dia * k, off + b.h) };
-    };
-    p.eye(rwEye(t.questEye, t.meaning[d.meaning]));
-    p.big([[fa && d.nameFa ? d.nameFa : d.name]], 40, 2, { floor: NAME_FLOOR });
-    if (d.weeks > 0) lineItem(p, 'weeks', 'metal', t.questWeeks(n(d.weeks, lang)), 20, { color: C.mute });
-    p.add({ name: 'steps', gap: 40, h: k => steps.reduce((a, s, i) => a + (i ? rowGap * k : 0) + geom(s, k).h, 0), draw: (y, k) => {
-      let top = y;
-      steps.forEach(s => {
-        const g = geom(s, k), cx = startL(p, dia * k) + dia * k / 2, cy = top + Math.max(dia * k, g.lh1) / 2;
-        x.beginPath(); x.arc(cx, cy, dia * k / 2, 0, Math.PI * 2); x.fillStyle = C.clayLine; x.fill();
-        tick(x, cx, cy, 34 * k, C.ink, 5.5 * k);
-        g.b.draw(top + g.off);
-        top += g.h + rowGap * k;
-      });
-    } });
-    if (caption) paraItem(p, caption, 36, { name: 'caption', drop: 2 });
-    if (d.title) p.para(t.questTitleRuns(d.title), 24, { name: 'title', drop: 1 });
+  // goal: { first, month, text, textFa?, date } — the month's goal, in Amir's own words, ticked (L10).
+  TPL.goal = function (p, d) {
+    const t = p.t, fa = p.lang === 'fa', text = fa && d.textFa ? d.textFa : d.text;
+    p.eye(t.goalEye(d.month || ''));
+    paraItem(p, text, 0, { name: 'goal', roleA: 'quote', roleB: 'quote', max: 4 });
+    p.tag(t.goalDone, 30);
     p.finish(d.date);
   };
-  TPL.quest.ok = d => !!(d && d.name && Array.isArray(d.steps) && d.steps.length);
+  TPL.goal.ok = d => !!(d && d.text && String(d.text).trim());
+
+  // session: { first, title, cycle?, mins?, exercises?, sets?, date } — a session done, the card the crew photo belongs on.
+  // Never an RPE, a check-in answer or anything about their body: it is a day's work, not a claim.
+  TPL.session = function (p, d) {
+    const t = p.t, lang = p.lang;
+    p.eye(d.cycle && d.cycle.n ? cycleEye(p, d.cycle) : t.sessionEye);
+    p.big([[d.title || '']], 0, 2, { size: 136, floor: 0.42 });
+    const cells = [];
+    if (d.mins > 0) cells.push([n(d.mins, lang), t.minsW]);
+    if (d.exercises > 0) cells.push([n(d.exercises, lang), t.exercises(d.exercises)]);
+    if (d.sets > 0) cells.push([n(d.sets, lang), t.setsW(d.sets)]);
+    if (cells.length) p.stats(cells, 30);
+    p.finish(d.date);
+  };
+  TPL.session.ok = d => !!(d && d.title && String(d.title).trim());
   // REWARD_TEMPLATES_END
 
   // ── 10. Painting, the picture, the caption ───────────────────────────────────────────────────────────────────────────
@@ -1400,24 +1476,52 @@
     if (spec.kind === 'roadmap') { const o = {}; (spec.cycles || []).forEach((c, i) => { o['art' + i] = c.art; }); return o; }
     return {};
   }
+  // How the athlete's own picture sits on the card: z 1 fills it, and dx / dy slide it inside what is left over, -1 to 1.
+  // They are clamped here, so a card can never show an edge however the phone's fingers moved.
+  function fitOf(f) {
+    f = f || {};
+    return { z: Math.max(1, Math.min(4, +f.z || 1)), dx: Math.max(-1, Math.min(1, +f.dx || 0)), dy: Math.max(-1, Math.min(1, +f.dy || 0)) };
+  }
+  // The card's ground. With the athlete's picture: the picture, graded, under a veil. Without: the green, the cycle's own
+  // cover (or the court) graded into it, then the court's lines.
+  function drawGround(x, S, imgs, fit) {
+    if (imgs.shot) { shot(x, S, imgs.shot, fit); return; }
+    ground(x, S);
+    const pic = imgs.art || imgs.court;
+    if (pic) cover(x, S, pic, S.cover);
+    court(x, S);
+  }
+  // layer: 'bg' draws the ground alone, 'fg' the words alone on a clear canvas (the share sheet draws the two, so a finger
+  // moving the picture repaints the cheap half only). No layer: the whole card, which is what Share and Save image export.
   async function paint(spec, opts) {
     opts = Object.assign({ size: 'story', lang: 'en', weights: true, name: true }, opts || {});
     const S = SIZES[opts.size] || SIZES.story, lang = opts.lang === 'fa' ? 'fa' : 'en';
     const tpl = TPL[spec && spec.kind];
     if (!tpl) throw new Error('sharecard: no card called ' + (spec && spec.kind));
     await fonts(lang);
-    const want = Object.assign({ coach: ASSET.coach, logo: ASSET.logo }, artList(spec));
+    const want = Object.assign({ coach: ASSET.coach, logo: ASSET.logo, court: ASSET.court }, artList(spec));
+    if (opts.photo) want.shot = opts.photo;
     const keys = Object.keys(want), got = await Promise.all(keys.map(k => img(want[k])));
     const imgs = {}; keys.forEach((k, i) => { imgs[k] = got[i]; });
     const c = document.createElement('canvas');
     c.width = S.W; c.height = S.H;
     const x = c.getContext('2d');
     const p = new Painter(x, S, lang, imgs, Object.assign({ first: spec.first }, opts));
-    ground(x, S);
-    court(x, S);
-    tpl(p, spec);
+    if (opts.layer !== 'fg') drawGround(x, S, imgs, fitOf(opts.fit));
+    if (opts.layer !== 'bg') tpl(p, spec);
     c._boxes = p.boxes; c._fit = p.fit; c._size = S;
     return c;
+  }
+  // The ground alone, drawn again into a canvas the share sheet already has: a finger dragging or pinching the picture
+  // costs one drawImage and two fills, never a new layout.
+  function reground(canvas, photo, fit) {
+    const S = (canvas && canvas._size) || SIZES.story;
+    return img(photo).then(im => {
+      const x = canvas.getContext('2d');
+      x.clearRect(0, 0, S.W, S.H);
+      if (im) shot(x, S, im, fitOf(fit)); else ground(x, S);
+      return canvas;
+    });
   }
   function toBlob(spec, opts) {
     return paint(spec, opts).then(c => new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error('toBlob')), 'image/png')));
@@ -1445,22 +1549,26 @@
       s = t.capRetest(bidi(d.lift, lang), what);
     } else if (d.kind === 'cycle') s = t.capCycle(bidi(d.cycle.name, lang), n(d.done, lang), n(d.planned, lang));
     else if (d.kind === 'roadmap') s = t.capRoad(n((d.cycles || []).length, lang), d.weeks ? n(d.weeks, lang) : '');
-    else if (d.kind === 'badge') s = t.capBadge(lang === 'fa' && d.nameFa ? d.nameFa : d.name, (t.metal || EN.metal)[d.metal] || d.metal);
     else if (d.kind === 'achievement') s = t.capAchievement(lang === 'fa' && d.nameFa ? d.nameFa : d.name);
-    else if (d.kind === 'title') s = t.capTitle(d.name);
-    else if (d.kind === 'level') s = t.capLevel(n(d.level, lang), d.rank + (d.sub ? ' ' + ROMAN[d.sub] : ''));
-    else if (d.kind === 'quest') s = t.capQuest(lang === 'fa' && d.nameFa ? d.nameFa : d.name);
+    else if (d.kind === 'level') s = t.capLevel(n(d.level, lang));
+    else if (d.kind === 'mark') s = t.capMark(n(d.n, lang), t.markWords[d.key] || '');
+    else if (d.kind === 'honour') s = t.capHonour(t.honourName[d.honour] || '', d.month || '');
+    else if (d.kind === 'open') s = t.capOpen(bidi(d.title, lang), n(d.value, lang) + (d.unit ? ' ' + d.unit : ''),
+      d.place > 0 && d.field > 0 ? t.placeOf(t.ord(n(d.place, lang)), n(d.field, lang)) : '');
+    else if (d.kind === 'player') s = t.capPlayer(n(d.level, lang));
+    else if (d.kind === 'goal') s = t.capGoal(d.month || '');
+    else if (d.kind === 'session') s = t.capSession(bidi(d.title, lang));
     return (s ? s + ' ' : '') + t.capTail;
   }
   function can(spec) { const tpl = spec && TPL[spec.kind]; return !!(tpl && (!tpl.ok || tpl.ok(spec))); }
 
   root.ShareCard = {
-    paint, toBlob, caption, can, fonts,
+    paint, toBlob, caption, can, fonts, reground, fitOf,
     kinds: () => Object.keys(TPL),
-    SIZES, METALS, EN, FA, C,
+    SIZES, EN, FA, C,
     // for the tests and Career Mode: the words a win gets, the dates, the digits
     _effortKey: EFFORT_KEY, _dateShort: dateShort, _dateLong: dateLong, _faDigits: faDigits, _toJalali: toJalali,
     // the internals the reward cards (and their tests) are drawn with
-    _: { Painter, ST, TPL, styleOf, textW, metrics, drawRun, roundRect, photo, signature, logo, tick, arrow, star, metalFill, n, kgs, plusKg, unitW, uOf, dateShort, dateLong, ROMAN, isFaText },
+    _: { Painter, ST, TPL, styleOf, textW, metrics, drawRun, roundRect, photo, signature, logo, tick, arrow, n, kgs, plusKg, unitW, uOf, dateShort, dateLong, isFaText },
   };
 })(typeof window !== 'undefined' ? window : this);
