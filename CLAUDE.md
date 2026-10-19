@@ -63,7 +63,7 @@ section. A reference `INDEX.md` is one line per section — read the index, open
 
 | The job | Open |
 |---|---|
-| **Change an exercise card** (the card, its ⓘ, cues, pill, note) | [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) + [`docs/rules/program-app.md`](docs/rules/program-app.md) → the twins rule + the sections [`PROGRAM-APP.md`](PROGRAM-APP.md) names for *the working card*, *the About sheet*, *the Spine* |
+| **Change an exercise card** (the card, its ⓘ, cues, pill, note) | [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) + [`docs/rules/program-app.md`](docs/rules/program-app.md) → the twins rule + rows 36 (*The working card*), 06 (*The Spine*) and 15 (*Every other screen in the Centre Court look*, which holds the About sheet) of [`PROGRAM-APP.md`](PROGRAM-APP.md) — about 45 KB in all, against 391 KB before |
 | **Change any other screen of the athlete app** | [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) + that screen's section from [`PROGRAM-APP.md`](PROGRAM-APP.md) |
 | **Change how a session is logged, saved or synced** | [`docs/rules/program-app.md`](docs/rules/program-app.md) + the set-log and session-queue sections from [`PROGRAM-APP.md`](PROGRAM-APP.md) |
 | **Change AA Proof** (habits.html) | [`docs/rules/habits.md`](docs/rules/habits.md) + the tab or feature's section from [`HABITS.md`](HABITS.md); an XP number also means [`XP_SYSTEM.md`](XP_SYSTEM.md) |
