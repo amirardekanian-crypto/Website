@@ -6,8 +6,9 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 ## Liked
 
 - **2026-10-20 · Standing rule: always three directions, one recommended.** *"when creating, you can think more about how each tab looks or
-  where to put things / Always give me 3 directions with your recommendation"*. Every design question (a tab, a screen, where a thing lives,
-  a plan) gets exactly three directions drawn in the app's own look, my pick marked, the other two kept on the page. Same day: *"Do not change
+  where to put things / Always give me 3 directions with your recommendation"*. Every question about **how the app looks** (a tab, a screen, a card)
+  gets exactly three directions drawn in the app's own look, my pick marked, the other two kept on the page. Corrected the same day:
+  *"I meant 3 directions on the design ( how app look )"*, so a plan or an order of work gets my recommendation, not three directions. Same day: *"Do not change
   people xp and level / Just remove names and titles and badges / Keep achievements, i like achievements"*: he likes achievements (moments that
   happen once); a cut never moves anyone's numbers.
 
