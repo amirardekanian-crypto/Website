@@ -336,7 +336,11 @@
 // which is what hid it (IS_EMBED is the first test in that function, so the throw was never reached there). Both apps also gained
 // a net under boot: an uncaught error, a rejected promise or a 60s ceiling now shows words and a Try again instead of a spinner
 // that never ends, and AA Proof's new-version notice no longer renders mid-boot.
-const CACHE = 'aap-v193';
+// v194: habits.html changed (2026-10-19). The sweep after v193's ghost call: guard 25 (scripts/check_ghost_calls.js) reads every
+// line of every page for a name that is called and declared nowhere, and found two more, both leftovers of the body-weight move
+// to program.html. wtAvgSeries() called wtSeries() and wtNudge() called fmtKg(), neither of which exists here any more; nothing
+// called either of them, so the four dead functions are deleted. The guard now runs on every commit that touches a page.
+const CACHE = 'aap-v194';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

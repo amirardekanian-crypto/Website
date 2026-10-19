@@ -3973,8 +3973,8 @@ function fmtVal(h, v) { return h.dec ? Number(v).toFixed(h.dec) : Math.round(v).
 // and every reading deletes in one action (privacy.html section 2.3). ~430 lines of it were deleted from this file once every
 // reference was gone and the closure was verified empty.
 //
-// ⚠️ A handful of small readers (wtKg, wtDays, wtSeries, wtAvgAt, wtAvgSeries,
-// wtChange, wtOn, wtRange) are deliberately LEFT. They are entangled with CFG.wt,
+// ⚠️ A handful of small readers (wtKg, wtDays, wtAvgAt, wtOn, wtRange) are
+// deliberately LEFT. They are entangled with CFG.wt,
 // which still exists on every athlete's synced config, and with loadLocal() and
 // migrateOld() — core functions that merely touch it in passing. Removing them
 // blind is how a white screen ships. They read nothing this app shows.
@@ -4002,17 +4002,10 @@ function wtAvgAt(dayKey) {
   if (!vals.length) return null;
   return vals.reduce((s, v) => s + v, 0) / vals.length;
 }
-function wtAvgSeries(days) {
-  return wtSeries(days).map(p => ({ day: p.day, kg: wtAvgAt(p.day) }));
-}
-// AVERAGE against AVERAGE, never first-reading against last. Two single
-// mornings can differ by a kilo of water and say nothing at all; this is the
-// only comparison that survives a Sunday roast.
-function wtChange(days) {
-  const s = wtAvgSeries(days);
-  if (s.length < 2) return null;
-  return { from: s[0].kg, to: s[s.length - 1].kg, delta: s[s.length - 1].kg - s[0].kg, n: s.length };
-}
+// wtAvgSeries() and wtChange() were deleted on 2026-10-19. They called wtSeries(), which went to
+// program.html with the chart, so the pair had been a ReferenceError waiting for a caller ever since
+// (guard 25, scripts/check_ghost_calls.js). Nothing called either of them. The readers above them
+// stay: those are the ones loadLocal() and migrateOld() touch in passing, and none of them is broken.
 
 // ── Persistence ───────────────────────────────────────────────────────────
 function loadLocal() {
@@ -10245,15 +10238,8 @@ function renderBoardNotice() {
 }
 
 
-function wtValNum() {
-  const n = parseFloat(String(UI.wtVal).replace(',', '.'));
-  return isFinite(n) ? n : null;
-}
-function wtNudge(by) {
-  const n = wtValNum();
-  UI.wtVal = fmtKg(Math.min(WT_MAX, Math.max(WT_MIN, (n === null ? 70 : n) + by)));
-  render();
-}
+// wtValNum() and wtNudge() were deleted on 2026-10-19, for the same reason: wtNudge() called fmtKg(),
+// which went to program.html with the weigh-in sheet, and no screen here called wtNudge().
 
 // ── Leaderboard screen ────────────────────────────────────────────────────
 function renderCrew() {

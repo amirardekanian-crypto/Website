@@ -1,5 +1,5 @@
 #!/bin/sh
-# Twenty-two guards. Each runs only when its own files are staged, so a commit that
+# Twenty-five guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -527,6 +527,31 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '(^|/)[^/]*\.md$|^
     if ! docs_test=$("$PY" -X utf8 scripts/check_docs.py --selftest 2>&1); then
       echo "$docs_test"
       echo "pre-commit: BLOCKED -- the doc guard no longer fails on a fault it must catch."
+      failed=1
+    fi
+  fi
+fi
+
+# -- 25. no ghost calls: every name a page CALLS is declared somewhere the page can see (added 2026-10-19) ----------
+# Why: twice in one day a pasted function kept the other app's names. program.html's pushReady() used `DEMO` and
+# `athleteId()` and the account sheet would not open; habits.html's copy kept `athleteId()`, renderToday() calls it,
+# so boot's own first render() threw and every signed-in athlete sat on "Loading proof" for ever. The embedded strip
+# on Home kept working, which hid it until Amir hit it on the live site. A ghost call is a ReferenceError the moment
+# the line runs, and in a render path it takes the whole screen. No test covers a line no test opens, so this reads
+# every line of every page instead. --selftest proves the guard still fails on both faults, and runs only when the
+# guard itself changes.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '\.html$|^assets/js/.*\.js$|^sw\.js$|^scripts/check_ghost_calls\.js$'; then
+  echo "pre-commit: a page's script changed -- checking every name it calls is declared..."
+  if ! ghost_out=$(node scripts/check_ghost_calls.js 2>&1); then
+    echo "$ghost_out"
+    echo ""
+    echo "pre-commit: BLOCKED -- a name is called that is declared nowhere (details above)."
+    failed=1
+  fi
+  if git diff --cached --name-only --diff-filter=ACM | grep -qE '^scripts/check_ghost_calls\.js$'; then
+    if ! ghost_test=$(node scripts/check_ghost_calls.js --selftest 2>&1); then
+      echo "$ghost_test"
+      echo "pre-commit: BLOCKED -- the ghost-call guard no longer fails on a fault it must catch."
       failed=1
     fi
   fi
