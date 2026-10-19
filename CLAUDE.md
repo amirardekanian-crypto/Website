@@ -405,7 +405,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   posts, photos and kudos live 7 days and are left out of `BACKUP_TABLES` on purpose (`SHORT_LIVED` in `restore_backup.py`), a photo is a JPEG made on the
   phone (1280 px, 75 %) and stored as a row (never Storage: a Storage file cannot be deleted from SQL), Tell the crew posts a session only with a photo,
   and an athlete Amir ticks under 13 reads only. A new crew table goes into `coach_erase_person()` and the snapshot the same day.
-  **Kudos is a Like** (Amir, 2026-10-19), with **🔥 💪 👏 😍** beside it once stage82 is applied (`crew_emoji_list()`; the app draws them only
+  **Kudos is a Like** (Amir, 2026-10-19), with **🔥 💪 👏 😍** beside it (stage82, live 2026-10-19) (`crew_emoji_list()`; the app draws them only
   while `get_bell()` hands over the list, so it degrades to the Like alone). One reaction per person: another emoji swaps it.
 - **Dark mode is the athlete's choice** (Amir, 2026-09-27: *"Let the client choose dark mode"*): both apps start
   light and switch only on the athlete's tap; neither follows the phone's setting.

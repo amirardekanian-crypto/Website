@@ -1070,7 +1070,12 @@ on his word only (it keeps the answers in `backup.crew_consent_<date>`).
 
 ## Stage 82: the emoji beside the Like, as built (2026-10-19)
 
-**BUILT, NOT APPLIED** (it waits for Amir's yes). Amir, 2026-10-19, on the page https://claude.ai/artifact/KkF7qE5yomcLdxKYF1mjo8:
+**APPLIED to the live project on 2026-10-19** (Amir: *"yes, apply stage82 and turn the emoji on"*), as the migration `stage82_crew_emoji`.
+Read back: the column, the set `🔥 💪 👏 😍`, the two-argument `crew_kudos()` gone and the three-argument one there, anon unable to send one,
+`authenticated` able to, `crew_emoji_list()` and `crew_kudos_of()` the service role's, and `get_bell()` carrying the list. **All three
+function bodies read back md5-equal to this file.** The six reactions already on the server stayed plain Likes (`by` empty, counted under
+`like`), and `get_bell()` for a real athlete came back with the list and six items. Amir, 2026-10-19, on the page
+https://claude.ai/artifact/KkF7qE5yomcLdxKYF1mjo8:
 *"instead of racket go with hearty eyes. but lets go with all five out style"*. So direction **A** (the Like and the four emoji all on the
 card, one tap each) and the set **🔥 💪 👏 😍**, with the Like itself the fifth and the default. ⚠️ **The Monthly Open moves to stage83.**
 

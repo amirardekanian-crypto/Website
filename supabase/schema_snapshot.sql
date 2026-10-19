@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 58 tables, 219 functions, 8 sequences.
+-- 58 tables, 220 functions, 8 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -327,7 +327,8 @@ create table public.crew_kudos (
   post_id uuid,
   to_athlete text,
   line_day date,
-  created_at timestamp with time zone default now() not null
+  created_at timestamp with time zone default now() not null,
+  emoji text
 );
 
 create table public.crew_photos (
@@ -5062,6 +5063,15 @@ begin
   return found;
 end $function$;
 
+CREATE OR REPLACE FUNCTION public.crew_emoji_list()
+ RETURNS text[]
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select array['🔥', '💪', '👏', '😍']::text[]
+$function$;
+
 CREATE OR REPLACE FUNCTION public.crew_kind_list()
  RETURNS text[]
  LANGUAGE sql
@@ -5087,7 +5097,7 @@ begin
   return public.crew_me(v_me);
 end $function$;
 
-CREATE OR REPLACE FUNCTION public.crew_kudos(p_target text, p_on boolean DEFAULT true)
+CREATE OR REPLACE FUNCTION public.crew_kudos(p_target text, p_on boolean DEFAULT true, p_emoji text DEFAULT NULL::text)
  RETURNS jsonb
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -5095,8 +5105,10 @@ CREATE OR REPLACE FUNCTION public.crew_kudos(p_target text, p_on boolean DEFAULT
 AS $function$
 declare
   v_me text := public.crew_who(); v_t text := btrim(coalesce(p_target, '')); v_post uuid; v_to text; v_day date; v_author text;
+  v_em text := nullif(btrim(coalesce(p_emoji, '')), '');
 begin
   if not exists (select 1 from public.crew_members() m where m.athlete_id = v_me) then raise exception 'crew:not_yes'; end if;
+  if v_em is not null and not (v_em = any (public.crew_emoji_list())) then raise exception 'crew:emoji'; end if;
   if v_t ~ '^[0-9a-f-]{36}$' then
     v_post := v_t::uuid;
     select p.athlete_id into v_author from public.crew_posts p
@@ -5105,7 +5117,9 @@ begin
     if v_author is null then raise exception 'crew:gone'; end if;
     if v_author = v_me then raise exception 'crew:own'; end if;
     if p_on then
-      insert into public.crew_kudos (athlete_id, post_id) values (v_me, v_post) on conflict do nothing;
+      insert into public.crew_kudos (athlete_id, post_id, emoji) values (v_me, v_post, v_em)
+      on conflict (athlete_id, post_id) where post_id is not null
+      do update set emoji = excluded.emoji, created_at = now();
     else
       delete from public.crew_kudos k where k.athlete_id = v_me and k.post_id = v_post;
     end if;
@@ -5120,7 +5134,9 @@ begin
   if v_to is null or v_day < current_date - 7 or v_day > current_date + 1 then raise exception 'crew:gone'; end if;
   if v_to = v_me then raise exception 'crew:own'; end if;
   if p_on then
-    insert into public.crew_kudos (athlete_id, to_athlete, line_day) values (v_me, v_to, v_day) on conflict do nothing;
+    insert into public.crew_kudos (athlete_id, to_athlete, line_day, emoji) values (v_me, v_to, v_day, v_em)
+    on conflict (athlete_id, to_athlete, line_day) where to_athlete is not null
+    do update set emoji = excluded.emoji, created_at = now();
   else
     delete from public.crew_kudos k where k.athlete_id = v_me and k.to_athlete = v_to and k.line_day = v_day;
   end if;
@@ -5134,13 +5150,16 @@ CREATE OR REPLACE FUNCTION public.crew_kudos_of(p_post uuid, p_to text, p_day da
  SET search_path TO 'public'
 AS $function$
   with k as (
-    select k.athlete_id, m.name, k.created_at
+    select k.athlete_id, m.name, k.created_at, k.emoji
       from public.crew_kudos k join public.crew_members() m on m.athlete_id = k.athlete_id
      where (p_post is not null and k.post_id = p_post) or (p_post is null and k.to_athlete = p_to and k.line_day = p_day)
   )
   select jsonb_build_object(
     'n', (select count(*) from k),
     'mine', exists (select 1 from k where k.athlete_id is not distinct from p_viewer),
+    'emoji', (select k.emoji from k where k.athlete_id is not distinct from p_viewer and p_viewer is not null limit 1),
+    'like', (select count(*) from k where k.emoji is null),
+    'by', coalesce((select jsonb_object_agg(x.emoji, x.c) from (select k.emoji, count(*) as c from k where k.emoji is not null group by k.emoji) x), '{}'::jsonb),
     'names', coalesce((select jsonb_agg(x.name order by x.created_at desc)
                          from (select k.name, k.created_at from k where k.athlete_id is distinct from p_viewer order by k.created_at desc limit 3) x), '[]'::jsonb))
 $function$;
@@ -5782,7 +5801,7 @@ begin
   end if;
 
   return jsonb_build_object('athlete_id', v_id, 'me', public.crew_me(v_id), 'items', v_items, 'honours', v_hon, 'kinds', to_jsonb(public.crew_kind_list()),
-                            'days', 7, 'at', now());
+                            'days', 7, 'emoji', to_jsonb(public.crew_emoji_list()), 'at', now());
 end $function$;
 
 CREATE OR REPLACE FUNCTION public.get_course()
@@ -8086,6 +8105,7 @@ alter table public.crew_consent add constraint crew_consent_answer_check CHECK (
 alter table public.crew_consent add constraint crew_consent_kinds_check CHECK ((jsonb_typeof(kinds) = 'object'::text));
 alter table public.crew_consent add constraint crew_consent_name_check CHECK (((name IS NULL) OR ((char_length(name) >= 1) AND (char_length(name) <= 24))));
 alter table public.crew_consent add constraint crew_consent_pkey PRIMARY KEY (athlete_id);
+alter table public.crew_kudos add constraint crew_kudos_emoji_check CHECK (((emoji IS NULL) OR ((char_length(emoji) >= 1) AND (char_length(emoji) <= 16))));
 alter table public.crew_kudos add constraint crew_kudos_line CHECK (((to_athlete IS NULL) = (line_day IS NULL)));
 alter table public.crew_kudos add constraint crew_kudos_one_target CHECK (((post_id IS NOT NULL) <> (to_athlete IS NOT NULL)));
 alter table public.crew_kudos add constraint crew_kudos_pkey PRIMARY KEY (id);
@@ -8808,12 +8828,14 @@ revoke all on function public.crew_default_name(p_athlete text) from public, ano
 grant execute on function public.crew_default_name(p_athlete text) to service_role;
 revoke all on function public.crew_delete_post(p_post uuid) from public, anon, authenticated, service_role;
 grant execute on function public.crew_delete_post(p_post uuid) to authenticated, service_role;
+revoke all on function public.crew_emoji_list() from public, anon, authenticated, service_role;
+grant execute on function public.crew_emoji_list() to service_role;
 revoke all on function public.crew_kind_list() from public, anon, authenticated, service_role;
 grant execute on function public.crew_kind_list() to service_role;
 revoke all on function public.crew_kinds(p_kinds jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.crew_kinds(p_kinds jsonb) to authenticated, service_role;
-revoke all on function public.crew_kudos(p_target text, p_on boolean) from public, anon, authenticated, service_role;
-grant execute on function public.crew_kudos(p_target text, p_on boolean) to authenticated, service_role;
+revoke all on function public.crew_kudos(p_target text, p_on boolean, p_emoji text) from public, anon, authenticated, service_role;
+grant execute on function public.crew_kudos(p_target text, p_on boolean, p_emoji text) to authenticated, service_role;
 revoke all on function public.crew_kudos_of(p_post uuid, p_to text, p_day date, p_viewer text) from public, anon, authenticated, service_role;
 grant execute on function public.crew_kudos_of(p_post uuid, p_to text, p_day date, p_viewer text) to service_role;
 revoke all on function public.crew_level_ring() from public, anon, authenticated, service_role;
