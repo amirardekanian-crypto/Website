@@ -5508,12 +5508,12 @@ const lookOf = (page, sel) => page.evaluate(sel => {
   for (const el of [root, ...root.querySelectorAll('*')]) {
     const cs = getComputedStyle(el), q = el.getBoundingClientRect();
     if (cs.display === 'none' || cs.visibility === 'hidden' || !q.width || !q.height) continue;
-    const field = el.tagName === 'INPUT' || el.tagName === 'TEXTAREA';
+    const field = (el.tagName === 'INPUT' && !['checkbox', 'radio', 'hidden', 'range', 'file'].includes(el.type)) || el.tagName === 'TEXTAREA';   // a checkbox is the browser's own (design-rules treats it so)
     if ([...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) || field) {
       const fs = parseFloat(cs.fontSize);
       if (![12, 14, 17, 22, 30].includes(fs) && !(fs === 16 && field && innerWidth < 900)) bad.push('size ' + desc(el) + ' ' + cs.fontSize);
       const fam = cs.fontFamily.split(',')[0].replace(/["']/g, '').trim();
-      if ((fam === 'Barlow Condensed' && !el.closest('.dethead h2')) || fam === 'Space Mono') bad.push('face ' + desc(el) + ' ' + fam);
+      if ((fam === 'Barlow Condensed' && !el.closest('.dethead h2')) || (fam === 'Space Mono' && !el.closest('.mic .count'))) bad.push('face ' + desc(el) + ' ' + fam);
       if (cs.textTransform === 'uppercase' && !el.closest('.eyebrow, .dethead h2')) bad.push('caps ' + desc(el));   // design-rules' allow-lists: group labels, the athlete's name
     }
     for (const k of ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius']) {
@@ -5947,6 +5947,276 @@ S['courtside-from-amir'] = async (b) => {
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.screenshot({ path: path.join(L.OUT, 'courtside-from-amir.png') });
   await page.context().close();
+  return r;
+};
+
+// ── The Bell (stage81; Career Mode round 5, step 5) ─────────────────────────────────────────────────────────
+// Two panels on Proof, under the wall: The Bell (Amir's composer, the last 7 days, Show photo, Remove) and Who said yes (the answers, Under 13).
+// The seed `{ crew: true }` turns the stub's stage81 functions on (stub.js) and seeds four posts and four answers (fixtures.js: crewSeed). Without it
+// the server "has not had stage81": every other scenario runs like that, and none of them sees the Bell.
+const BELL_T = { fixedTime: '2026-11-12T10:00:00Z', hash: 'proof' };   // a Thursday, 10:00 UTC: "3h", "Yesterday", "Tue" and "Mon" are the same on any day the harness runs
+const BELL_ID = n => 'b0000000-0000-4000-8000-00000000000' + n;
+// What the Bell shows: each post (name, the real name when different, chip, when, text, kudos, notes, buttons) and each answer (name, answer, off, ticked).
+const bellState = page => page.evaluate(() => {
+  const txt = el => el ? el.innerText.replace(/\s+/g, ' ').trim() : '';
+  const posts = [...document.querySelectorAll('#bellPanel .bell-post')].map(el => ({
+    name: txt(el.querySelector('.bell-top .nm')), top: txt(el.querySelector('.bell-top')), when: txt(el.querySelector('.bell-top .when')), text: txt(el.querySelector('.txt')),
+    chip: txt(el.querySelector('.bell-top .chip')), acts: txt(el.querySelector('.bell-acts')), unseen: el.classList.contains('unseen'),
+    show: !!el.querySelector('.bell-ph button'), img: !!el.querySelector('.bell-ph img'), remove: !![...el.querySelectorAll('.bell-acts button')].find(b => /^Remove$/.test(b.textContent.trim())) }));
+  const people = [...document.querySelectorAll('#bellPeople .bell-p')].map(el => ({
+    id: el.dataset.id, name: txt(el.querySelector('.nm')), answer: txt(el.querySelector('.chip')), off: txt(el.querySelector('.off')), ticked: el.querySelector('input[type=checkbox]').checked }));
+  return { posts, people, head: txt(document.querySelector('#bellPanel .phead')), peopleHead: txt(document.querySelector('#bellPeople .phead')), empty: txt(document.querySelector('#bellFeed .empty')) };
+});
+const bellPost = (page, id) => page.locator('#bellPanel .bell-post', { has: page.locator('.bell-top .nm', { hasText: id }) }).first();
+const bellPerson = (page, id) => page.locator(`#bellPeople .bell-p[data-id="${id}"]`);
+// A picture made in the page (the harness has no image library): a JPEG as base64, or a PNG File's bytes.
+const bellJpegB64 = page => page.evaluate(() => { const c = document.createElement('canvas'); c.width = 60; c.height = 40; const g = c.getContext('2d'); g.fillStyle = '#386'; g.fillRect(0, 0, 60, 40); g.fillStyle = '#fff'; g.fillRect(10, 10, 20, 10); return c.toDataURL('image/jpeg', 0.9).split(',')[1]; });
+const bellPngBytes = (page, w, h) => page.evaluate(({ w, h }) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#1b5e3c'); gr.addColorStop(1, '#c7552f'); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = '#fff'; g.fillRect(w / 4, h / 4, w / 2, h / 8); return c.toDataURL('image/png').split(',')[1]; }, { w, h });
+
+S['bell-panel'] = async (b) => {
+  const r = { id: 'bell-panel', title: 'The Bell on Proof: the last 7 days (newest first, who, when, kudos, photo on request), Remove asks first, the composer posts text and a photo made smaller, errors in plain words', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { crew: true } }, BELL_T));
+  await page.waitForSelector('#bellPanel');
+  const cs0 = await L.calls(page);
+  check(r, 'the page asked coach_crew once, after the first paint, with nothing to say', rpcs(cs0, 'coach_crew').length === 1 && rpcs(cs0, 'coach_crew')[0].payload == null, rpcs(cs0, 'coach_crew').map(c => c.payload));
+  check(r, 'and made no other Bell call and no photo call (a photo is asked for only when "Show photo" is tapped)', cs0.filter(c => c.kind === 'rpc' && /^(coach_crew_|crew_photo)/.test(c.name)).length === 0, cs0.filter(c => c.kind === 'rpc' && /crew/.test(c.name)).map(c => c.name));
+  check(r, 'The Bell and Who said yes sit under the wall and above the board, in the left column', await page.evaluate(() => { const q = id => document.getElementById(id); const f = (a, b) => !!(q(a).compareDocumentPosition(q(b)) & Node.DOCUMENT_POSITION_FOLLOWING); return f('wallPanel', 'bellPanel') && f('bellPanel', 'bellPeople') && f('bellPeople', 'boardPanel') && q('bellPanel').parentElement === q('wallPanel').parentElement; }), '');
+  let st = await bellState(page);
+  check(r, 'four posts, newest first: Amir 3h ago, Ava yesterday, the unseen one on Tuesday, Ben\'s session on Monday', JSON.stringify(st.posts.map(p => [p.name, p.when])) === JSON.stringify([['You (Amir)', '3h'], ['Ava E.', 'Yesterday'], ['Gone E.', 'Tue'], ['Ben E.', 'Mon']]), st.posts.map(p => [p.name, p.when]));
+  check(r, 'Amir\'s own post is marked "You (Amir)" and says its words and "2 kudos"', st.posts[0].text === 'Great week, crew. Rest up and eat well.' && /2 kudos/.test(st.posts[0].acts), st.posts[0]);
+  check(r, 'Ava\'s post names the athlete as the crew sees her and as the dashboard knows her, with 3 kudos', /Ava E\./.test(st.posts[1].top) && /Ava Example/.test(st.posts[1].top) && /3 kudos/.test(st.posts[1].acts) && st.posts[1].text === 'First 50 sessions done!', st.posts[1]);
+  check(r, 'a post whose author is not shown says "not shown: their answer is no", is dimmed, and still has Remove', /not shown: their answer is no/.test(st.posts[2].acts) && st.posts[2].unseen && st.posts[2].remove && st.posts.filter(p => /not shown/.test(p.acts)).length === 1, st.posts[2]);
+  check(r, 'a session told to the crew has its chip and no text; every post has Remove', st.posts[3].chip === 'Session' && st.posts[3].text === '' && st.posts.every(p => p.remove), st.posts[3]);
+  check(r, 'only the two posts with a photo offer "Show photo" (none shows it yet)', JSON.stringify(st.posts.map(p => p.show)) === JSON.stringify([false, true, false, true]) && st.posts.every(p => !p.img), st.posts.map(p => [p.show, p.img]));
+  check(r, 'the head says when it was read and offers to read again', /As of 10:00\./.test(st.head) && /Reload/.test(st.head), st.head);
+  // Show photo
+  const jpg = await bellJpegB64(page);
+  await page.evaluate(({ id, jpg }) => { window.__DB.crew_bell.photos[id] = { mime: 'image/jpeg', w: 60, h: 40, b64: jpg }; }, { id: BELL_ID(2), jpg });
+  let n0 = await L.nCalls(page);
+  await bellPost(page, 'Ava E.').locator('.bell-ph button', { hasText: 'Show photo' }).click(); await L.settle(page, 400);
+  let cs = await L.callsSince(page, n0);
+  check(r, 'Show photo asks crew_photo for that post only', rpcs(cs, 'crew_photo').length === 1 && rpcs(cs, 'crew_photo')[0].payload.p_post === BELL_ID(2), rpcs(cs, 'crew_photo').map(c => c.payload));
+  const im = await page.locator('#bellPanel .bell-ph img').evaluate(el => ({ src: el.src.slice(0, 30), h: el.getBoundingClientRect().height, max: getComputedStyle(el).maxHeight, w: el.naturalWidth }));
+  check(r, 'the photo is drawn inline, from the base64 the server sent, at most 240 px tall', /^data:image\/jpeg;base64,/.test(im.src) && im.w === 60 && im.h <= 240 && im.max === '240px', im);
+  await bellPost(page, 'Ava E.').locator('.bell-ph button', { hasText: 'Hide photo' }).click(); await L.settle(page, 200);
+  check(r, 'Hide photo puts the button back without another call', (await bellState(page)).posts[1].show && (await L.callsSince(page, n0)).filter(c => c.name === 'crew_photo').length === 1, '');
+  n0 = await L.nCalls(page);
+  await bellPost(page, 'Ben E.').locator('.bell-ph button', { hasText: 'Show photo' }).click(); await L.settle(page, 500);
+  check(r, 'a photo the server no longer has (null) is said, plainly, and the list is read again', /That photo is gone/.test(await L.failText(page)) && rpcs(await L.callsSince(page, n0), 'coach_crew').length === 1, await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  // Remove asks first
+  n0 = await L.nCalls(page);
+  await bellPost(page, 'Ben E.').locator('.bell-acts button', { hasText: 'Remove' }).click(); await L.settle(page, 200);
+  let ask = await page.locator('#bellPanel .dangerask').innerText();
+  check(r, 'Remove opens an inline panel under the post: "Remove this post?" and that it goes from every phone and the server now', /Remove this post\?/.test(ask) && /from every phone and the server now/.test(ask) && (await page.locator('#bellPanel .dangerask').count()) === 1 && await bellPost(page, 'Ben E.').locator('.dangerask').count() === 1, ask);
+  check(r, 'and nothing has been removed yet', rpcs(await L.callsSince(page, n0), 'coach_crew_remove').length === 0, '');
+  await page.locator('#dangerNo').click(); await L.settle(page, 150);
+  check(r, 'Cancel closes it with no call', (await page.locator('.dangerask').count()) === 0 && rpcs(await L.callsSince(page, n0), 'coach_crew_remove').length === 0, '');
+  await bellPost(page, 'Ben E.').locator('.bell-acts button', { hasText: 'Remove' }).click(); await L.settle(page, 150);
+  await page.locator('#dangerGo').click(); await L.settle(page, 600);
+  cs = await L.callsSince(page, n0);
+  check(r, 'the final button calls coach_crew_remove with that post\'s id, then the list is read again', rpcs(cs, 'coach_crew_remove').length === 1 && rpcs(cs, 'coach_crew_remove')[0].payload.p_post === BELL_ID(3) && rpcs(cs, 'coach_crew').length === 1, rpcs(cs, 'coach_crew_remove').map(c => c.payload));
+  st = await bellState(page);
+  check(r, 'Ben\'s post is gone, the other three stay, and the screen says so', st.posts.length === 3 && !st.posts.some(p => p.name === 'Ben E.') && /Post removed/.test(await L.toastText(page)), { names: st.posts.map(p => p.name), toast: await L.toastText(page) });
+  check(r, 'the dangerous panel closed after the work', (await page.locator('.dangerask').count()) === 0, '');
+  // Who said yes
+  check(r, 'Who said yes lists the coached athletes the page knows: Ava and Ben (Yes), then Eli (No); the former athlete with an answer is not there', JSON.stringify(st.people.map(p => [p.id, p.answer])) === JSON.stringify([['ava_test', 'Yes'], ['ben_test', 'Yes'], ['eli_new', 'No']]), st.people.map(p => [p.id, p.answer]));
+  check(r, 'Ben has turned two kinds off and it says so: "bests, levels off"; Ava has none', st.people[1].off === 'bests, levels off' && st.people[0].off === '', st.people.map(p => p.off));
+  check(r, 'the head counts them and the hint is one line with the rule', /2 yes · 1 no · 0 not asked yet/.test(st.peopleHead) && (await page.locator('#bellPeople [data-hint]').innerText()) === 'Under 13s read the Bell but never post or ring (GAME-9). Tick anyone under 13.', st.peopleHead);
+  check(r, 'nobody is ticked under 13 yet', st.people.every(p => !p.ticked), '');
+  // Under 13: ticking ON asks first
+  n0 = await L.nCalls(page);
+  await bellPerson(page, 'ava_test').locator('input[type=checkbox]').click(); await L.settle(page, 250);
+  ask = await page.locator('#bellPeople .dangerask').innerText();
+  check(r, 'ticking Under 13 opens a panel that says what it does ("they never post, never ring and are never named", "posts this week are removed now")', /never post, never ring and are never named/.test(ask) && /posts this week are removed now/.test(ask), ask);
+  check(r, 'the box stays unticked and nothing was sent', !(await bellPerson(page, 'ava_test').locator('input[type=checkbox]').isChecked()) && rpcs(await L.callsSince(page, n0), 'coach_crew_under13').length === 0, '');
+  await page.locator('#dangerNo').click(); await L.settle(page, 150);
+  check(r, 'Cancel closes it with no call', (await page.locator('.dangerask').count()) === 0 && rpcs(await L.callsSince(page, n0), 'coach_crew_under13').length === 0, '');
+  await bellPerson(page, 'ava_test').locator('input[type=checkbox]').click(); await L.settle(page, 200);
+  await page.locator('#dangerGo').click(); await L.settle(page, 600);
+  cs = await L.callsSince(page, n0);
+  check(r, 'the final button calls coach_crew_under13 with the athlete and p_on true, then reads the list again', rpcs(cs, 'coach_crew_under13').length === 1 && JSON.stringify(rpcs(cs, 'coach_crew_under13')[0].payload) === JSON.stringify({ p_athlete: 'ava_test', p_on: true }) && rpcs(cs, 'coach_crew').length === 1, rpcs(cs, 'coach_crew_under13').map(c => c.payload));
+  st = await bellState(page);
+  check(r, 'Ava is ticked and her post is gone from the feed (the server removed it)', st.people[0].ticked && !st.posts.some(p => p.name === 'Ava E.') && st.posts.length === 2, { ticked: st.people.map(p => p.ticked), posts: st.posts.map(p => p.name) });
+  // ticking it off needs no confirm
+  n0 = await L.nCalls(page);
+  await bellPerson(page, 'ava_test').locator('input[type=checkbox]').uncheck({ force: true }); await L.settle(page, 500);
+  cs = await L.callsSince(page, n0);
+  check(r, 'ticking it off asks nothing: one call with p_on false', (await page.locator('.dangerask').count()) === 0 && rpcs(cs, 'coach_crew_under13').length === 1 && rpcs(cs, 'coach_crew_under13')[0].payload.p_on === false, rpcs(cs, 'coach_crew_under13').map(c => c.payload));
+  check(r, 'and the box is unticked after the list is read', !(await bellState(page)).people[0].ticked, '');
+  // a refusal is said in words, and the box goes back
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'rpc', name: 'coach_crew_under13', message: 'crew:who', times: 1 }); });
+  await bellPerson(page, 'eli_new').locator('input[type=checkbox]').click(); await L.settle(page, 200);
+  await page.locator('#dangerGo').click(); await L.settle(page, 500);
+  check(r, 'a refused tick says why, in plain words, and the box is not left ticked', /no programme on the server/.test(await L.failText(page)) && !(await bellPerson(page, 'eli_new').locator('input[type=checkbox]').isChecked()), await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  await page.screenshot({ path: path.join(L.OUT, 'bell-panel.png') });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['bell-compose'] = async (b) => {
+  const r = { id: 'bell-compose', title: 'The Bell\'s composer: a live counter, Post sends the body, the photo is made smaller on this computer (1280 px, JPEG) before it leaves, the server\'s refusals are said in plain words, the draft is kept when a post fails', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { crew: true } }, BELL_T));
+  await page.waitForSelector('#bellPanel');
+  const hint = await page.locator('#bellPanel [data-hint=bell]').innerText();
+  check(r, 'the composer\'s one hint line says how long a post lives', hint === 'Pinned at the top of Crew for a day. Gone after 7 days.', hint);
+  check(r, 'the counter starts at 0/280 and the box takes 280 characters at most', (await page.locator('#bellCount').innerText()) === '0/280' && (await page.locator('#bellInput').getAttribute('maxlength')) === '280', await page.locator('#bellCount').innerText());
+  await page.locator('#bellInput').fill('Rest day. Eat well.');
+  check(r, 'typing moves the counter', (await page.locator('#bellCount').innerText()) === '19/280', await page.locator('#bellCount').innerText());
+  await page.locator('#bellInput').fill('x'.repeat(300));
+  check(r, 'a 300-character paste stops at 280', (await page.locator('#bellCount').innerText()) === '280/280', await page.locator('#bellCount').innerText());
+  // a Post with nothing in it
+  await page.locator('#bellInput').fill('');
+  let n0 = await L.nCalls(page);
+  await page.locator('#bellPostBtn').click(); await L.settle(page, 200);
+  check(r, 'Post with nothing to say sends nothing and says so', rpcs(await L.callsSince(page, n0), 'coach_crew_post').length === 0 && /Write something or add a photo first/.test(await L.failText(page)), await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  // a refusal keeps the draft
+  await page.locator('#bellInput').fill('Draft that the server refuses');
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'rpc', name: 'coach_crew_post', message: 'crew:too_long', times: 1 }); });
+  await page.locator('#bellPostBtn').click(); await L.settle(page, 400);
+  check(r, 'crew:too_long is said in words and the draft stays in the box', /over 280 characters/.test(await L.failText(page)) && (await page.locator('#bellInput').inputValue()) === 'Draft that the server refuses', await L.failText(page));
+  await page.evaluate(() => { failDismissAll(); window.__STUB.fail.push({ kind: 'rpc', name: 'coach_crew_post', message: 'crew:photo_big', times: 1 }); });
+  await page.locator('#bellPostBtn').click(); await L.settle(page, 400);
+  check(r, 'crew:photo_big and crew:photo_bad have their own words', /too big/.test(await L.failText(page)), await L.failText(page));
+  await page.evaluate(() => { failDismissAll(); window.__STUB.fail.push({ kind: 'rpc', name: 'coach_crew_post', message: 'crew:photo_bad', times: 1 }); });
+  await page.locator('#bellPostBtn').click(); await L.settle(page, 400);
+  check(r, '... photo_bad: not read as a JPEG', /could not read that photo as a JPEG/.test(await L.failText(page)), await L.failText(page));
+  // an answer that never arrives: the post may have gone up
+  await page.evaluate(() => { failDismissAll(); window.__STUB.fail.push({ kind: 'rpc', name: 'coach_crew_post', message: 'TypeError: Failed to fetch', code: '', times: 1 }); });
+  n0 = await L.nCalls(page);
+  await page.locator('#bellPostBtn').click(); await L.settle(page, 500);
+  check(r, 'an answer that never arrived does not claim the post failed, and the list is read again so Amir can look', /answer never arrived/.test(await L.failText(page)) && /cannot tell whether it went through/.test(await L.failText(page)) && rpcs(await L.callsSince(page, n0), 'coach_crew').length === 1, await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  // a good post
+  n0 = await L.nCalls(page);
+  await page.locator('#bellPostBtn').click(); await L.settle(page, 600);
+  let cs = await L.callsSince(page, n0), pc = rpcs(cs, 'coach_crew_post');
+  check(r, 'Post calls coach_crew_post with the text and no photo (the box held the draft)', pc.length === 1 && JSON.stringify(pc[0].payload) === JSON.stringify({ p_body: 'Draft that the server refuses', p_photo: null, p_w: null, p_h: null }), pc.map(c => c.payload));
+  check(r, 'the box and the counter are empty, a line says "Posted to the crew.", and the list was read again', (await page.locator('#bellInput').inputValue()) === '' && (await page.locator('#bellCount').innerText()) === '0/280' && log.dialogs.some(d => d.via === 'notice' && d.message === 'Posted to the crew.') && rpcs(cs, 'coach_crew').length === 1, log.dialogs.map(d => d.message));
+  let st = await bellState(page);
+  check(r, 'the new post is at the top, as "You (Amir)", just now', st.posts[0].name === 'You (Amir)' && st.posts[0].when === 'just now' && st.posts[0].text === 'Draft that the server refuses' && st.posts.length === 5, st.posts[0]);
+  // the photo
+  const big = await bellPngBytes(page, 3000, 2000);
+  await page.setInputFiles('#bellFile', { name: 'court.png', mimeType: 'image/png', buffer: Buffer.from(big, 'base64') });
+  await page.waitForSelector('#bellPrev img');
+  const prev = await page.evaluate(() => ({ photo: { w: _bellPhoto.w, h: _bellPhoto.h, kb: _bellPhoto.kb, jpeg: _bellPhoto.b64.slice(0, 4) }, text: document.getElementById('bellPrev').innerText.replace(/\s+/g, ' ').trim(), x: !!document.querySelector('#bellPrev button[aria-label]') }));
+  check(r, 'a 3000 × 2000 picture is made 1280 × 853 as a JPEG of at most 400 KB, in the browser', prev.photo.w === 1280 && prev.photo.h === 853 && prev.photo.kb <= 400 && prev.photo.jpeg === '/9j/', prev.photo);
+  check(r, 'the preview shows it with its size and a ×', /1280 × 853/.test(prev.text) && prev.x, prev.text);
+  await page.locator('#bellPrev button[aria-label]').click(); await L.settle(page, 150);
+  check(r, 'the × takes the photo off', (await page.locator('#bellPrev img').count()) === 0, '');
+  await page.setInputFiles('#bellFile', { name: 'court.png', mimeType: 'image/png', buffer: Buffer.from(big, 'base64') });
+  await page.waitForSelector('#bellPrev img');
+  await page.locator('#bellInput').fill('New drills on court');
+  n0 = await L.nCalls(page);
+  await page.locator('#bellPostBtn').click(); await L.settle(page, 700);
+  cs = await L.callsSince(page, n0); pc = rpcs(cs, 'coach_crew_post');
+  check(r, 'a post with a photo sends the JPEG as plain base64 (no data: prefix) with its width and height', pc.length === 1 && pc[0].payload.p_body === 'New drills on court' && /^\/9j\//.test(pc[0].payload.p_photo) && !/^data:/.test(pc[0].payload.p_photo) && pc[0].payload.p_w === 1280 && pc[0].payload.p_h === 853, pc.map(c => Object.assign({}, c.payload, { p_photo: String(c.payload.p_photo).slice(0, 8) })));
+  st = await bellState(page);
+  check(r, 'the preview is gone, and the new post has a Show photo button', (await page.locator('#bellPrev img').count()) === 0 && st.posts[0].text === 'New drills on court' && st.posts[0].show, st.posts[0]);
+  // a photo and no words
+  await page.setInputFiles('#bellFile', { name: 'court.png', mimeType: 'image/png', buffer: Buffer.from(big, 'base64') });
+  await page.waitForSelector('#bellPrev img');
+  n0 = await L.nCalls(page);
+  await page.locator('#bellPostBtn').click(); await L.settle(page, 700);
+  pc = rpcs(await L.callsSince(page, n0), 'coach_crew_post');
+  check(r, 'a photo with no words is a post too (the server allows it)', pc.length === 1 && pc[0].payload.p_body === '' && !!pc[0].payload.p_photo, pc.map(c => c.payload.p_body));
+  // not a picture
+  await page.setInputFiles('#bellFile', { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') });
+  await L.settle(page, 300);
+  check(r, 'a file that is not a picture is refused in words and nothing is kept', /not a picture/.test(await L.failText(page)) && (await page.locator('#bellPrev img').count()) === 0, await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  // the shrink rules, run on pictures made in the page: a gradient shrinks to 1280 on its long side; a photo too busy for 400 KB at 1280 px is tried smaller or refused, never sent over
+  const shr = await page.evaluate(async () => {
+    const mk = async (w, h, noise) => {
+      const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d');
+      if (noise) { const im = g.createImageData(w, h); for (let i = 0; i < im.data.length; i++) im.data[i] = i % 4 === 3 ? 255 : (Math.random() * 255) | 0; g.putImageData(im, 0, 0); }
+      else { g.fillStyle = '#386'; g.fillRect(0, 0, w, h); }
+      return new File([await new Promise(ok => c.toBlob(ok, 'image/png'))], 'x.png', { type: 'image/png' });
+    };
+    const run = async (w, h, noise) => { try { const o = await bellShrink(await mk(w, h, noise)); return { w: o.w, h: o.h, kb: o.kb }; } catch (e) { return { err: e.message }; } };
+    return { tall: await run(1000, 3000, false), small: await run(200, 100, false), noise: await run(1500, 1100, true) };
+  });
+  check(r, 'a tall picture is 427 × 1280 (the long side is 1280), and a small one is not made bigger', shr.tall.h === 1280 && shr.tall.w === 427 && shr.small.w === 200 && shr.small.h === 100, shr);
+  check(r, 'a picture too busy for 400 KB is either made smaller (at most 1280 on the long side, at most 400 KB) or refused with the "big" error; never sent over', (shr.noise.err === 'big') || (shr.noise.kb <= 400 && Math.max(shr.noise.w, shr.noise.h) <= 1280), shr.noise);
+  // the composer is where Amir left it after a redraw (a board switch redraws Proof)
+  await page.locator('#bellInput').fill('Typed and not posted');
+  await page.getByRole('button', { name: 'Week', exact: true }).click(); await L.settle(page, 700);
+  check(r, 'a redraw of Proof (the board\'s Season / Week switch) keeps what he typed', (await page.locator('#bellInput').inputValue()) === 'Typed and not posted' && (await page.locator('#bellCount').innerText()) === '20/280', await page.locator('#bellInput').inputValue());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.screenshot({ path: path.join(L.OUT, 'bell-compose.png') });
+  await page.context().close();
+  return r;
+};
+
+S['bell-who-said-yes'] = async (b) => {
+  const r = { id: 'bell-who-said-yes', title: 'Who said yes: every coached athlete (not the demo, not a former athlete), Yes / No / Not asked yet, the kinds they turned off, Under 13 with a confirm; the look at three widths', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { crew: true, court: true, courtAwards: false } }, BELL_T));
+  await page.waitForSelector('#bellPeople');
+  const st = await bellState(page);
+  check(r, 'the list is the coached athletes: Ava, Ben (Yes), then the four nobody has asked yet, then Eli (No); Kim (former) and the demo are not in it', JSON.stringify(st.people.map(p => [p.id, p.answer])) === JSON.stringify([['ava_test', 'Yes'], ['ben_test', 'Yes'], ['gia_court', 'Not asked yet'], ['hal_court', 'Not asked yet'], ['ivy_court', 'Not asked yet'], ['jon_court', 'Not asked yet'], ['eli_new', 'No']]), st.people.map(p => [p.id, p.answer]));
+  check(r, 'the head counts: 2 yes · 1 no · 4 not asked yet', /2 yes · 1 no · 4 not asked yet/.test(st.peopleHead), st.peopleHead);
+  check(r, 'the free athlete (Cara) is not there: the Crew tab is in the coached app', !st.people.some(p => /cara|dan/.test(p.id)), '');
+  // an athlete nobody has asked yet can still be ticked under 13: the server makes the row, the answer stays "Not asked yet"
+  const n0 = await L.nCalls(page);
+  await bellPerson(page, 'gia_court').locator('input[type=checkbox]').click(); await L.settle(page, 200);
+  await page.locator('#dangerGo').click(); await L.settle(page, 600);
+  const g = (await bellState(page)).people.find(p => p.id === 'gia_court');
+  check(r, 'ticking Gia (never asked) under 13 works: ticked, and still "Not asked yet"', g.ticked && g.answer === 'Not asked yet' && rpcs(await L.callsSince(page, n0), 'coach_crew_under13')[0].payload.p_athlete === 'gia_court', g);
+  // the look and the width
+  for (const w of [1280, 390, 320]) {
+    await page.setViewportSize({ width: w, height: 900 });
+    await L.settle(page, 200);
+    const o = await page.evaluate(() => ({ over: document.documentElement.scrollWidth - document.documentElement.clientWidth }));
+    check(r, `at ${w} px the page does not scroll sideways`, o.over <= 0, o);
+    check(r, `at ${w} px both panels keep the look (sizes, corners, faces, 32 px buttons, one primary button)`, (await lookOf(page, '#bellPanel')).length === 0 && (await lookOf(page, '#bellPeople')).length === 0, [...(await lookOf(page, '#bellPanel')), ...(await lookOf(page, '#bellPeople'))].slice(0, 6));
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['bell-missing'] = async (b) => {
+  const r = { id: 'bell-missing', title: 'A server that has not had stage81 applied: no Bell, no warning; any other failure is named; Proof reads the Bell again when it is opened after a minute', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { crew: true, stub: { missingRpc: ['coach_crew'] } } }, BELL_T));
+  await L.settle(page, 500);
+  const cs = await L.calls(page);
+  check(r, 'the page asked (coach_crew answered "could not find the function", PGRST202)', rpcs(cs, 'coach_crew').length === 1 && rpcs(cs, 'coach_crew')[0].result.error === 'missing', rpcs(cs, 'coach_crew').map(c => c.result));
+  check(r, 'Proof has no Bell and no Who said yes, and the wall, the board and the quest lever are all there', (await page.locator('#bellPanel').count()) === 0 && (await page.locator('#bellPeople').count()) === 0 && (await page.locator('#wallPanel').count()) === 1 && (await page.locator('#boardPanel').count()) === 1 && (await page.locator('#questPanel').count()) === 1, '');
+  check(r, 'no "Not everything loaded" banner, no line at the bottom', !(await page.evaluate(() => { const w = document.getElementById('loadwarn'); return !!w && !w.hidden; })) && !(await L.failText(page)), await L.failText(page));
+  check(r, 'the page knows it is off (S.bell.on false) and made no other Bell call', (await page.evaluate(() => S.bell && S.bell.on)) === false && !cs.some(c => c.kind === 'rpc' && /^(coach_crew_|crew_photo)/.test(c.name)), cs.filter(c => c.kind === 'rpc').map(c => c.name));
+  await L.go(page, 'today'); await L.go(page, 'athletes'); await L.go(page, 'proof');
+  check(r, 'the other tabs still open and Proof still has no Bell', (await page.locator('#bellPanel').count()) === 0 && (await page.locator('#boardPanel').count()) === 1, '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  // a server that never had the stub's seed (every other scenario): the same
+  const d = await L.openCoach(b, Object.assign({ seed: {} }, BELL_T));
+  await L.settle(d.page, 300);
+  check(r, 'without the Bell seed (the server before stage81) Proof draws no Bell either', (await d.page.locator('#bellPanel').count()) === 0 && (await d.page.locator('#wallPanel').count()) === 1, '');
+  await d.page.context().close();
+  // a real failure: the panel says so and the banner names it; Try again brings it back
+  const e = await L.openCoach(b, Object.assign({ seed: { crew: true, stub: { fail: [{ kind: 'rpc', name: 'coach_crew', message: 'fixture: the Bell is down', times: 1 }] } } }, BELL_T));
+  await e.page.waitForSelector('#bellPanel');
+  const warn = await e.page.evaluate(() => { const w = document.getElementById('loadwarn'); return w && !w.hidden ? w.innerText.replace(/\s+/g, ' ') : ''; });
+  const body = (await e.page.locator('#bellPanel').innerText()).replace(/\s+/g, ' ');
+  check(r, 'a real failure shows the panel with the reason and Try again, and the banner names it', /The Bell did not load: fixture: the Bell is down/.test(body) && /Try again/.test(body) && /Not everything loaded: the Bell/.test(warn) && /fixture: the Bell is down/.test(warn), { body: body.slice(0, 200), warn });
+  check(r, 'the answers are not listed as "Not asked yet" while they could not be read', /The answers did not load/.test((await e.page.locator('#bellPeople').innerText()).replace(/\s+/g, ' ')) && (await e.page.locator('#bellPeople .bell-p').count()) === 0, '');
+  await e.page.locator('#bellFeed button', { hasText: 'Try again' }).click(); await L.settle(e.page, 600);
+  const back = await bellState(e.page);
+  check(r, 'Try again reads it, the posts and answers are there, and the banner is gone', back.posts.length === 4 && back.people.length === 3 && !(await e.page.evaluate(() => { const w = document.getElementById('loadwarn'); return !!w && !w.hidden; })), { posts: back.posts.length, people: back.people.length });
+  // opened again after a minute: read behind the paint
+  const k0 = await L.nCalls(e.page);
+  await e.page.clock.setFixedTime(new Date(new Date(BELL_T.fixedTime).getTime() + 5 * 60000));
+  await L.go(e.page, 'today'); await L.go(e.page, 'proof'); await L.settle(e.page, 500);
+  check(r, 'Proof opened five minutes later reads the Bell again (a post can be minutes old)', rpcs(await L.callsSince(e.page, k0), 'coach_crew').length === 1, rpcs(await L.callsSince(e.page, k0), 'coach_crew').length);
+  const k1 = await L.nCalls(e.page);
+  await L.go(e.page, 'today'); await L.go(e.page, 'proof'); await L.settle(e.page, 300);
+  check(r, 'and not again within the minute', rpcs(await L.callsSince(e.page, k1), 'coach_crew').length === 0, '');
+  check(r, 'no page errors', !e.log.errors.length, e.log.errors);
+  await e.page.context().close();
   return r;
 };
 

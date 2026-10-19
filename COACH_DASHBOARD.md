@@ -1016,7 +1016,7 @@ read 33%). Shown up to 100%, with "N more than planned" when they did extra. Gre
 ## 7. PROOF
 
 **Proof is the community's home** (round 2, 2026-10-12): everything about the crew is on this one screen, in two columns from 900 px (the left, about 1.3 to 1, is
-the wider; one column below that, the left first). **Left:** **The wall**, then **The board**. **Right:** **Quest week**, **Proof pulse**, **Titles minted** and
+the wider; one column below that, the left first). **Left:** **The wall**, then **The Bell** and **Who said yes** (both only once stage81 is applied), then **The board**. **Right:** **Quest week**, **Proof pulse**, **Titles minted** and
 **Season**, last. (**The funnel** was the last panel here until 2026-10-12; it is Leads → Free signups now, because the people who signed up are leads to follow, not part of running the crew.) The wall, the quest lever and the pulse used to be on Today; Today keeps a short Proof column that links here
 (section 3, *Proof today*). One copy of each id is in the page at a time (`#wallPanel`, `#questPanel`, `#pulsePanel`, `#coachLineInput`: Today draws its own, `#proofToday`).
 A redraw (a line posted, a line hidden, a quest week started) is drawn at once from what the page holds: the board is read once and kept, and only a real first
@@ -1098,6 +1098,44 @@ bar (`renderBuyers()`); each sub-tab's count of active logins is read in the bac
 File tab (a double tap on *Save password* used to make two passwords and leave the message with the first), and after a create, reset or restore
 the page keeps saying what it did (*Login created for …*) instead of "Copied" a moment later. `buyer-logins-course` and `buyer-logins-assess`
 drive create, copy, mark sent, Manage, change password, revoke, restore and a failing function through both.
+
+### The Bell: post to the crew, read the last 7 days, remove, who said yes (stage81, 2026-10-19)
+
+Career Mode round 5, step 5 (Amir: *"Bell: go with your picks"*; the server side is `supabase/stage81_career_crew.sql`). The athlete app's Crew tab has a feed, the
+Bell: athletes post a short message and a photo, moments ring as lines (a level, a held week, the four marks, an achievement, a best, a cycle, the honours, the
+Monthly Open, joining), and kudos are the only reply. This is where you post to it and moderate it. **Nothing here pays XP** (GAME-6).
+
+- **Where.** Two panels on Proof, under the wall: **The Bell** (`#bellPanel`) and **Who said yes** (`#bellPeople`). `loadBell()` reads `coach_crew()` after the
+  first paint, like Courtside, on ↻ Refresh, on the panel's own **↻ Reload** (the head says *As of 14:05*) and when Proof is opened a minute or more after the last read
+  (a post can be minutes old). **While the server has no `coach_crew()` (stage81 not applied) nothing is drawn and no warning is shown** (`bellMissing()`:
+  `PGRST202`, a 404, or a message that names `coach_crew` as not found); any other failure shows the panel with the reason and **Try again**, and the load
+  banner names *the Bell*. **Who said yes** then says the answers did not load instead of listing everyone as *Not asked yet*.
+- **Your post** (the wall's composer look). A box of 280 characters with a live counter, **Add a photo**, **Post**. One hint line: *Pinned at the top of Crew for
+  a day. Gone after 7 days.* **The photo is made smaller on this computer before it leaves** (`bellShrink()`): at most 1280 px on the long side, JPEG at 75 %, then 60 %,
+  50 %, then the same at 1024 px, until it is at most 400 KB (the server allows 450 KB), or it is refused (*still over 400 KB*). The re-encode takes the camera's
+  location data off, a transparent picture goes on white, and the camera's rotation is applied (`createImageBitmap` with `imageOrientation: 'from-image'`, else an `<img>`).
+  It is sent as plain base64 with its width and height (`coach_crew_post(p_body, p_photo, p_w, p_h)`). A preview with a **×** shows it first. A photo with no words is a post.
+  What you typed stays through a redraw of Proof (`_bellDraft`) and after a refusal. On success the box clears and a line says *Posted to the crew.*
+  The server's refusals come back as `crew:too_long`, `crew:empty`, `crew:photo_big`, `crew:photo_bad` and are said in plain words; **no database code** (the answer never
+  arrived) says so and reads the list again, because the post may have gone up.
+- **The last 7 days**, newest first. Each post: who (yours is *You (Amir)*; an athlete is the name the crew sees, with the dashboard's name beside it), a *Session* chip
+  for a finished session told to the crew, when (*3h*, *Yesterday*, *Mon*), the words, the kudos count, and **Show photo** when it has one. A photo is asked for
+  only when you tap it (`crew_photo(p_post)`), drawn inline at most 240 px tall, with **Hide photo**; a photo the server no longer has (its post just went) is said and the
+  list is read again. *not shown: their answer is no* marks a post whose author the crew can no longer see (the post is dimmed; Remove is still there).
+  **Remove** asks in a panel under the post (*Remove this post? It goes from every phone and the server now.*), then `coach_crew_remove(p_post)` and a re-read. There is no undo.
+  Empty: *Nothing posted this week.*
+- **Who said yes** (`bellPeopleHtml()`). Every coached athlete the page knows (not the demo, not your own identity, not a former athlete; free and Proof-only people have
+  no Crew tab), Yes first, then *Not asked yet*, then No. Each row: the name (a link to their file), their answer, the kinds they turned off (*bests, levels off*) and an
+  **Under 13** box. The head counts them (*2 yes · 1 no · 4 not asked yet*). **Under 13 is GAME-9**: they read the Bell but never post, never ring and are never named.
+  **Ticking it ON asks first** (a panel under the row: their posts and photos, the kudos they gave and any level moment waiting to ring go now; their answer, their
+  login and the right to read stay) and the box stays unticked until you say yes; ticking it OFF needs no confirm. Both call `coach_crew_under13(p_athlete, p_on)`;
+  an athlete nobody has asked can be ticked (the server makes the row; the answer stays *Not asked yet*).
+- **Short-lived on purpose.** Posts, photos and kudos live 7 days; the server sweeps them (`crew_sweep()`, on every read and post, and hourly where pg_cron exists). The four short-lived tables are
+  **not in `BACKUP_TABLES`**, so a weekly backup kept twelve weeks never breaks the 7-day promise in `privacy.html`; only `crew_consent` (the answers and the under-13 tick) is a
+  table the backup keeps, and it joins `BACKUP_TABLES` in the stage81 go-live commit, with the schema snapshot.
+- **What rings, and what never does**, is in the panel's **How this works** fold (the list is `stage81_career_crew.sql`'s header). **Tests:** `bell-panel`,
+  `bell-compose`, `bell-who-said-yes` and `bell-missing` in `scripts/headless/coach/run.js` (the stub answers the five stage81 functions only when the seed says
+  `crew: true`; every other scenario runs against a server without them).
 
 ### Erasing a person
 
@@ -1205,6 +1243,7 @@ it in this file.
 | `hab_contacts` via `contact_list()` | The funnel (signups only: not a `source 'coach'` record), contact buttons, the header's WhatsApp button, days logged |
 | `leaderboard_optin` | Who's on the board, their display name and worn title |
 | `hab_titles` | Titles-minted feed |
+| `coach_crew()`, `crew_photo()` (stage81) | Proof → The Bell and Who said yes: the last 7 days' posts, every athlete's answer and under-13 tick; a photo only when asked for. Nothing is drawn while the server has no `coach_crew()` |
 | `xp_rules` | The quest pool and the live runs |
 | `seasons` | Which season, and what day of it |
 | `career_rules` (the newest row's `rules->switch`, read quietly by `loadLevels()`) | Whether Career Mode's XP switch is on (`S.careerXp`): the Proof level's caption reads *career level (server)* instead of *season level (server)* |
@@ -1249,6 +1288,6 @@ and one day card's quality chips with the 70% gate and the 12% cut, in the phone
 
 Some coach writes go through RPCs that check the coach themselves (`set_coach_note`, `hide_note`,
 `set_quests`, `end_quests` (stage55), `clear_quests`, `forget_contact`, `save_session`, `coach_season_levels`, and since stage48
-`coach_delete_training_history` and `coach_save_spine`, and since stage54 `coach_erase_person`, each one transaction); the rest are
+`coach_delete_training_history` and `coach_save_spine`, since stage54 `coach_erase_person`, and since stage81 `coach_crew_post`, `coach_crew_remove` and `coach_crew_under13`, each one transaction); the rest are
 direct table writes that only the coach's RLS policies let through. Every one of them asks for its
 rows back, so a write RLS silently refused (a lapsed sign-in) says so instead of reporting success.

@@ -25,6 +25,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
 const SNAPSHOT = path.join(ROOT, 'supabase', 'schema_snapshot.sql');
 const SECRET_TABLES = ['assess_publish_keys', 'tps_publish_keys'];       // the same two as restore_backup.py: never in a backup, on purpose
+const SHORT_LIVED = ['crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings'];   // the Bell's 7-day tables (stage81), as in restore_backup.py: never in a backup, on purpose
 const COACH_JWT = JSON.stringify({ email: 'amirardekanian@gmail.com', role: 'authenticated', sub: '00000000-0000-4000-8000-00000000c0c0' });
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'restore-rehearsal-'));
 
@@ -156,9 +157,9 @@ try {
   const A = await makeDb();
   const tablesInDb = (await q(A, `select tablename from pg_tables where schemaname = 'public' order by 1`)).map(r => r.tablename);
   ok(tablesInDb.length >= 45, `the snapshot built ${tablesInDb.length} tables`);
-  ok(JSON.stringify([...lists.backupTables].sort()) === JSON.stringify(tablesInDb.filter(t => !SECRET_TABLES.includes(t))),
-     'coach.html BACKUP_TABLES is every public table except the two key-hash tables',
-     'in the database but not in BACKUP_TABLES: ' + tablesInDb.filter(t => !SECRET_TABLES.includes(t) && !lists.backupTables.includes(t)).join(', ') +
+  ok(JSON.stringify([...lists.backupTables].sort()) === JSON.stringify(tablesInDb.filter(t => !SECRET_TABLES.includes(t) && !SHORT_LIVED.includes(t))),
+     'coach.html BACKUP_TABLES is every public table except the two key-hash tables and the four short-lived Bell tables (stage81)',
+     'in the database but not in BACKUP_TABLES: ' + tablesInDb.filter(t => !SECRET_TABLES.includes(t) && !SHORT_LIVED.includes(t) && !lists.backupTables.includes(t)).join(', ') +
      '\nin BACKUP_TABLES but not in the database: ' + lists.backupTables.filter(t => !tablesInDb.includes(t)).join(', '));
 
   // The snapshot, applied to a database and read back with catalog.sql, writes the same snapshot (comment lines aside): nothing the generator can see is lost on the way.

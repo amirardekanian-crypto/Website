@@ -63,6 +63,10 @@
   var COURT_RPCS = ['get_courtside', 'coach_courtside_mark', 'coach_honours', 'coach_honours_freeze', 'coach_honours_sent', 'coach_honours_pick',
     'coach_set_goal', 'coach_goal_done', 'coach_from_amir'];
   function noStage75() { return (ST.missingRpc || []).indexOf('get_courtside') >= 0; }
+  // stage81's functions (the Bell). The stub answers them only when the seed says `crew: true` (buildSeed({crew: true})), so every other scenario runs
+  // against a server that has not had stage81, as before; `missingRpc: ['coach_crew']` takes them away again (the page draws no Bell).
+  var CREW_RPCS = ['coach_crew', 'coach_crew_post', 'coach_crew_remove', 'coach_crew_under13', 'crew_photo'];
+  function noStage81() { return !SEED.crew || (ST.missingRpc || []).indexOf('coach_crew') >= 0; }
   function persist() { if (ST.persist) { try { localStorage.setItem('__harness_db', JSON.stringify(DB)); } catch (e) {} } }
   function tbl(name) { return DB[name] || (DB[name] = []); }
   function nowIso() { return new Date().toISOString(); }
@@ -344,7 +348,57 @@
     return honoursOf(m0, notClients);
   }
 
+  // The Bell's state (stage81): posts as coach_crew() returns them, but with `ago_min` (how old, in minutes, on the page's clock) in place of `at`;
+  // people as coach_crew() returns them; photos by post id. Tests read and change it as window.__DB.crew_bell.
+  function bell() { return DB.crew_bell || (DB.crew_bell = { posts: [], people: [], photos: {}, rings_week: 0 }); }
+  function bellSweep() { var c = bell(); c.posts = c.posts.filter(function (p) { return p.ago_min <= 7 * 1440; }); return c; }   // crew_sweep(): a post goes 7 days after it was made
+  var BELL_OK = 'crew:';
   var RPC = {
+    // ---- stage81: the Bell (supabase/stage81_career_crew.sql) ----
+    coach_crew: function () {
+      var c = bellSweep();
+      return { posts: clone(c.posts).sort(function (a, b) { return (a.ago_min - b.ago_min) || ((b.seq || 0) - (a.seq || 0)); }).map(function (p) {
+          var o = clone(p); o.at = new Date(Date.now() - p.ago_min * 60000).toISOString(); delete o.ago_min; delete o.seq; return o; }),
+        people: clone(c.people), rings_week: c.rings_week || 0 };
+    },
+    // crew_write_post() in the order the SQL checks: too long, then the photo (base64, a JPEG, at most 450 KB), then empty.
+    coach_crew_post: function (p) {
+      var c = bellSweep(), body = String(p.p_body == null ? '' : p.p_body).replace(/^\s+|\s+$/g, '');
+      if (body.length > 280) throw new Error(BELL_OK + 'too_long');
+      var b64 = p.p_photo ? String(p.p_photo).replace(/^data:[^,]*,/, '').replace(/\s/g, '') : '';
+      if (b64) {
+        var bin;
+        try { bin = atob(b64); } catch (e) { throw new Error(BELL_OK + 'photo_bad'); }
+        if (bin.length > 450000) throw new Error(BELL_OK + 'photo_big');
+        if (bin.length < 100 || bin.slice(0, 3) !== '\xff\xd8\xff') throw new Error(BELL_OK + 'photo_bad');
+      }
+      if (!b64 && !body) throw new Error(BELL_OK + 'empty');
+      var id = '00000000-0000-4000-8000-' + String(++ST.seq).padStart(12, '0');
+      c.posts.push({ seq: ST.seq, id: id, athlete_id: '__coach__', amir: true, who: 'Amir', seen: true, kind: 'post', body: body, photo: !!b64, ago_min: 0, kudos: 0 });
+      if (b64) c.photos[id] = { mime: 'image/jpeg', w: p.p_w || null, h: p.p_h || null, b64: b64 };
+      return { id: id };
+    },
+    coach_crew_remove: function (p) {
+      var c = bellSweep(), n = c.posts.length;
+      c.posts = c.posts.filter(function (x) { return x.id !== p.p_post; }); delete c.photos[p.p_post];
+      return c.posts.length < n;
+    },
+    // Needs a programme (the SQL checks programs); ON takes the athlete's posts off at once.
+    coach_crew_under13: function (p) {
+      var c = bellSweep();
+      if (!String(p.p_athlete || '').trim() || p.p_on == null) throw new Error(BELL_OK + 'who');
+      if (!tbl('programs').some(function (r) { return r.athlete_id === p.p_athlete; })) throw new Error(BELL_OK + 'who');
+      var row = c.people.find(function (x) { return x.athlete_id === p.p_athlete; });
+      if (!row) c.people.push(row = { athlete_id: p.p_athlete, answer: null, under13: false, answered_at: null, kinds_off: [] });
+      row.under13 = !!p.p_on;
+      if (p.p_on) c.posts = c.posts.filter(function (x) { return x.athlete_id !== p.p_athlete; });
+      return !!p.p_on;
+    },
+    crew_photo: function (p) {
+      var c = bellSweep(), ph = c.photos[p.p_post];
+      if (!ph || !c.posts.some(function (x) { return x.id === p.p_post; })) return null;
+      return { id: p.p_post, mime: ph.mime, w: ph.w, h: ph.h, b64: ph.b64 };
+    },
     // The week's moments for Courtside: live awards (never the go-day's baseline) of highlight size and up, of the kinds that stay after the cut,
     // for clients only, minted inside the window. Every row of the week comes back, marked or not.
     get_courtside: function (p) {
@@ -743,7 +797,7 @@
         await sleep(0);
         var f = takeFail('rpc', name);
         if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'P0001' }, status: 400 }; }
-        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0 || (noStage75() && COURT_RPCS.indexOf(name) >= 0)) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
+        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0 || (noStage75() && COURT_RPCS.indexOf(name) >= 0) || (noStage81() && CREW_RPCS.indexOf(name) >= 0)) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
         try { var d = RPC[name](params || {}); persist(); call.result = { ok: true }; return { data: clone(d), error: null, status: 200 }; }
         catch (e) { call.result = { error: e.message }; return { data: null, error: { message: e.message, code: e.code || 'P0001' }, status: 400 }; }
       })();

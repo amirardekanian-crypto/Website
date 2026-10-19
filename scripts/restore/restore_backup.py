@@ -24,6 +24,7 @@ is left out too: say --keep <id> if that id is a different person now.
 import argparse, hashlib, json, os, re, sys
 
 SECRET_TABLES = {'assess_publish_keys', 'tps_publish_keys'}      # hashes of revoked keys: never in a backup, on purpose
+SHORT_LIVED = {'crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings'}   # the Bell's 7-day tables (stage81): never in a backup, or a 12-week backup breaks the 7-day promise in privacy.html
 # The logins. Their rows are re-made by the dashboard's Create login (a new Supabase sign-in account each), never restored.
 ACCOUNT_TABLES = {'athlete_identities': 'athlete_id', 'tps_accounts': 'username', 'assess_accounts': 'username'}
 # Tables whose rows belong to a LOGIN, and the column that says which one: the old login's id is swapped for the new login's id.
@@ -314,7 +315,7 @@ def build(backup_path, schema_path, out_dir, receipt_paths=(), keep=(), allow_in
                          '. The snapshot is older than this backup. Bring the snapshot up to date (README), or say --drop-unknown-columns to restore without them.')
     for t, cs in sorted(extra.items()):
         report.append(f'{t}: columns left out because the schema does not have them: ' + ', '.join(cs))
-    missing = sorted(set(schema_cols) - set(tables) - SECRET_TABLES)
+    missing = sorted(set(schema_cols) - set(tables) - SECRET_TABLES - SHORT_LIVED)
     if missing:
         report.append('tables the schema has and the backup does not (they stay empty): ' + ', '.join(missing))
     login_dependent = {t for t, refs in fks.items() for _, ref in refs if ref == 'auth.users' or ref in ACCOUNT_TABLES}

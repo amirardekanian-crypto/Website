@@ -79,6 +79,46 @@
       }
       return res({ data: n, error: null, status: 200 });
     }
+    // Crew and the Bell (stage81, scripts/headless/crew.js): get_bell answers the stub's `bell` (none set: no answer, so no Crew tab); bellMissing
+    // answers as a server without stage81 (PGRST202, 404). crew_answer, crew_kinds, crew_post, crew_kudos and crew_delete_post change `bell` the way
+    // the server would and keep it in '__stubcfg' (the next page sees it); crew_photo answers a tiny JPEG; leaderboard_top answers `board`.
+    if (name === 'get_bell') {
+      if (S.bellMissing) return res({ data: null, error: { message: 'Could not find the function public.get_bell(p_athlete_id) in the schema cache', code: 'PGRST202' }, status: 404 });
+      return res({ data: S.bell ? JSON.parse(JSON.stringify(S.bell)) : null, error: null, status: 200 });
+    }
+    if (/^crew_/.test(name) && S.bell) {
+      var B = S.bell, me = B.me = B.me || {}, keep = function () { try { var cb = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); cb.bell = B; localStorage.setItem('__stubcfg', JSON.stringify(cb)); } catch (e) {} };
+      if (name === 'crew_answer') {
+        var a = params && params.p_answer;
+        me.answer = a; me.can_post = a === 'yes' && !me.under13; me.name = me.name || (params && params.p_name) || 'Athlete';
+        if (a === 'no') B.items = (B.items || []).filter(function (i) { return !(i && i.me && i.t === 'post'); });
+        keep(); return res({ data: JSON.parse(JSON.stringify(me)), error: null, status: 200 });
+      }
+      if (name === 'crew_kinds') { me.kinds = Object.assign({}, me.kinds || {}, (params && params.p_kinds) || {}); keep(); return res({ data: JSON.parse(JSON.stringify(me)), error: null, status: 200 }); }
+      if (name === 'crew_post') {
+        var p = params || {};
+        if (S.crewPostError) return res({ data: null, error: { message: S.crewPostError, code: 'P0001' }, status: 400 });
+        var id = 'p' + Date.now().toString(16) + Math.floor(Math.random() * 1e6).toString(16);
+        while (id.length < 36) id += '0';
+        B.items = B.items || [];
+        B.items.splice(B.items.filter(function (i) { return i && i.pinned; }).length, 0, { t: 'post', id: id, who: me.name, me: true, amir: false, kind: p.p_kind || 'post', body: p.p_body || '', session: p.p_session || null,
+          photo: !!p.p_photo, w: p.p_w, h: p.p_h, at: new Date().toISOString(), pinned: false, left: 7, kudos: { n: 0, mine: false, names: [] } });
+        if (p.p_photo) me.photos_left = Math.max(0, (me.photos_left || 0) - 1);
+        me.posts_left = Math.max(0, (me.posts_left || 0) - 1);
+        keep(); return res({ data: { id: id, me: JSON.parse(JSON.stringify(me)) }, error: null, status: 200 });
+      }
+      if (name === 'crew_kudos') {
+        var t = params && params.p_target, on = !!(params && params.p_on), it = (B.items || []).find(function (i) { return i && (i.id === t || i.key === t); });
+        if (!it) return res({ data: null, error: { message: 'crew:gone', code: 'P0001' }, status: 400 });
+        var k = it.kudos = it.kudos || { n: 0, mine: false, names: [] };
+        if (on && !k.mine) { k.n++; k.mine = true; } else if (!on && k.mine) { k.n--; k.mine = false; }
+        keep(); return res({ data: JSON.parse(JSON.stringify(k)), error: null, status: 200 });
+      }
+      if (name === 'crew_delete_post') { var before = (B.items || []).length; B.items = (B.items || []).filter(function (i) { return !(i && i.id === (params && params.p_post)); }); keep(); return res({ data: B.items.length < before, error: null, status: 200 }); }
+      if (name === 'crew_photo') return res({ data: { id: params && params.p_post, mime: 'image/jpeg', w: 4, h: 5,
+        b64: '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z' }, error: null, status: 200 });
+    }
+    if (name === 'leaderboard_top' && S.board) return res({ data: JSON.parse(JSON.stringify(S.board)), error: null, status: 200 });
     if (name === 'athlete_identities') return res({ data: S.identity ? { athlete_id: S.identity } : null, error: null, status: 200 });
     // A table read (sb.from(name)): tables ({ career_facts: [rows] }) answers rows as given (filters and order are not applied);
     // tableErr ({ career_rules: 404 }) answers that status as a refusal. Neither set: no rows and no error, as before.

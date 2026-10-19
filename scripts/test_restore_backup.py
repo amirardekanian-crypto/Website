@@ -149,8 +149,8 @@ cols = rb.snapshot_tables(schema_sql)
 check('1d: the snapshot parser finds the 53 tables and their columns (46 + career_awards, career_recognition, stage70 + five of stage75)', len(cols) == 53 and 'athlete_id' in cols['programs'] and 'steps' in cols['exercises'], len(cols))
 html = open(os.path.join(ROOT, 'coach.html'), encoding='utf-8').read()
 listed = re.findall(r"'([a-z_]+)'", re.search(r"const BACKUP_TABLES = \[([\s\S]*?)\];", html).group(1))
-check('1h: coach.html BACKUP_TABLES lists every table of the schema snapshot except the two key-hash tables, and nothing else (a new table goes in both)',
-      sorted(listed) == sorted(set(cols) - rb.SECRET_TABLES), (sorted(set(cols) - rb.SECRET_TABLES - set(listed)), sorted(set(listed) - set(cols))))
+check('1h: coach.html BACKUP_TABLES lists every table of the schema snapshot except the two key-hash tables and the four short-lived Bell tables (stage81), and nothing else (a new table goes in both)',
+      sorted(listed) == sorted(set(cols) - rb.SECRET_TABLES - rb.SHORT_LIVED), (sorted(set(cols) - rb.SECRET_TABLES - rb.SHORT_LIVED - set(listed)), sorted(set(listed) - set(cols))))
 fks = rb.foreign_keys(schema_sql)
 order = rb.table_order(cols, fks)
 check('1e: parents come before children (exercises before exercise_coach, players before their notes)',
@@ -181,6 +181,13 @@ COURT = ('courtside_marks', 'career_honours', 'career_goals', 'career_notes')
 check("2g: Courtside's tables are in BACKUP_TABLES and the snapshot, the four with a person in coach_erase_person()'s list too (stage75)",
       all(t in listed and t in cols for t in COURT + ('career_honour_months',)) and all(t in erased for t in COURT),
       (sorted(set(COURT + ('career_honour_months',)) - set(listed)), sorted(set(COURT) - set(erased))))
+# Holds whether or not the snapshot has stage81 yet (the Bell, Crew): the four tables that live 7 days are never backed up (a 12-week backup would break the
+# 7-day promise in privacy.html) but are erased with the person; crew_consent (each athlete's answer and Amir's under-13 ticks) is kept for good and backed up.
+short_in = sorted(t for t in rb.SHORT_LIVED if t in cols)
+bell_bad = (sorted(t for t in short_in if t in listed), sorted(t for t in short_in if t not in erased),
+            [t for t in ('crew_consent',) if t in cols and (t not in listed or t not in erased)])
+check("2h: the Bell (stage81): the four short-lived tables in the snapshot are not in BACKUP_TABLES but are in coach_erase_person()'s list; crew_consent, if the snapshot has it, is in both",
+      rb.SHORT_LIVED == {'crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings'} and not any(bell_bad), bell_bad)
 def one_do(text):
     try:
         s = sql_statements(text)

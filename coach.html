@@ -636,6 +636,28 @@
   .from-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
   @media (max-width: 899px) and (pointer: coarse) { .goal-in { font-size: 16px; } }
 
+  /* ── The Bell (stage81): the crew's feed, posted to and moderated here (Proof, under the wall). The composer is the wall's .mic. ── */
+  .bell-hint { margin: 4px 0 0; }
+  .bell-prev { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 8px; font-size: 14px; }
+  .bell-prev img { display: block; width: auto; height: auto; max-width: 100%; max-height: 96px; border-radius: 8px; border: 1px solid var(--line); }
+  .bell-eb { margin: 16px 0 4px; }
+  .bell-post { padding: 12px 0; border-top: 1px solid var(--rule); }
+  .bell-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: 14px; }
+  .bell-top .nm { font-weight: 600; }
+  .bell-top .muted, .bell-top .when { font-size: 12px; }
+  .bell-top .when { margin-left: auto; color: var(--muted); }
+  .bell-post .txt { margin-top: 4px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-line; }
+  .bell-ph { margin-top: 8px; }
+  .bell-img { display: block; width: auto; height: auto; max-width: 100%; max-height: 240px; border-radius: 8px; border: 1px solid var(--line); }
+  .bell-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 8px; }
+  .bell-acts .btn { margin-left: auto; }
+  .bell-post.unseen .bell-top, .bell-post.unseen .txt { opacity: .6; }
+  .bell-p { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 8px 0; border-top: 1px solid var(--rule); font-size: 14px; }
+  .bell-p .nm { flex: 1 1 10em; min-width: 0; font-weight: 600; color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+  .bell-p .nm:hover { color: var(--court); text-decoration: underline; }
+  .bell-p .off { font-size: 12px; color: var(--muted); }
+  .bell-u13 { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+
   /* ── Quest panel ── */
   /* Proof's right column (about 490 px wide at most): no box around the live run (rows divided by hairlines), and a quest's note drops
      under its name and XP instead of squeezing between them. */
@@ -1680,6 +1702,7 @@ const S = {
   boardErr: '',    // why the last board read failed
   callLogs: {},    // athlete_id -> rows (fetched on detail)
   court: null,     // Courtside (stage75): { on, week, rows, err }; on is false while the server has no get_courtside() (loadCourt())
+  bell: null,      // The Bell (stage81): { on, posts, people, rings, err, at }; on is false while the server has no coach_crew() (loadBell())
   honours: null,   // the month just gone: coach_honours()'s answer (frozen rows, or the live work and the Pick's shortlist)
   goals: {},       // athlete_id -> { 'YYYY-MM-01': career_goals row }
   amirNotes: {},   // athlete_id -> career_notes rows ("From Amir", one a day)
@@ -1788,7 +1811,7 @@ const LOAD_ERR_LABEL = {
   programs: 'programmes', logins: 'athlete logins', contacts: 'Proof contacts', intake: 'intake forms',
   assess: 'testing-app logins', course: 'course logins', buyerNotes: 'your notes about buyers', spine: 'the exercise library (Spine)',
   affiliates: 'affiliate codes', chats: 'website chats', status: 'paused and former marks', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
-  court: 'Courtside, the goals and your lines',
+  court: 'Courtside, the goals and your lines', bell: 'the Bell (the crew\'s posts and answers)',
 };
 function paintLoadWarn() {
   const lw = $('loadwarn'), warn = loadWarnHtml();
@@ -2917,6 +2940,7 @@ async function hardRefresh() {
   render();
   loadLevels().then(() => { if (S.ready) paintLevels(); });   // ↻ used to drop the levels and never fetch them again; they are filled in place (ROSTER-15)
   loadCourt();
+  loadBell();
 }
 let _lastViewKey = '', _scrollMem = {}, _viaHistory = false, _pendingScroll = null;
 // Back keeps your place (audit BROWSER-4, 2026-10-11). A new screen starts at the top, but going Back to one you left lands where you were on it:
@@ -6590,6 +6614,7 @@ let _boardScope = 'season';
 // hands (it used to replace the whole screen with "Fetching the board…" on every redraw).
 async function renderProof() {
   const scope = _boardScope;
+  if (S.bell && S.bell.on && S.bell.at && Date.now() - S.bell.at.getTime() > 60000) loadBell();   // a post can be minutes old: read the Bell again, behind the paint
   const held = DEMO ? (S.board[scope] || []) : S.board[scope];
   drawProof(held || undefined);                           // undefined = still to be read
   if (held) return;
@@ -6606,6 +6631,7 @@ function drawProof(rows) {
     <div class="cols" style="margin-top:0">
       <div class="colstack">
         <section class="panel" id="wallPanel">${wallPanelHtml()}</section>
+        ${bellPanelsHtml()}
         <section class="panel" id="boardPanel">${boardPanelHtml(rows)}</section>
       </div>
       <div class="colstack">
@@ -6615,6 +6641,7 @@ function drawProof(rows) {
       </div>
     </div>`;
   wireWallComposer();
+  wireBellComposer();
   if (_questPicked.size) questPickCount();
 }
 // The board panel's inside: the Season / Week switch, when it was read, and the rows. `rows` is undefined while the first read is on its way,
@@ -6655,6 +6682,292 @@ function seasonPanelHtml() {
       : '<p class="empty">No season live.</p>'}
     </section>`;
 }
+// ── The Bell (stage81; Career Mode round 5, step 5; Amir 2026-10-19: "Bell: go with your picks") ───────────────────────────────────────
+// The athlete app's Crew tab has a feed, the Bell: athletes post a short message and a photo (both gone after 7 days), moments ring as lines,
+// kudos only. This is where Amir posts to it (pinned at the top of Crew for a day), reads the last 7 days, removes a post, and sees who said yes
+// to the crew and ticks anyone under 13 (GAME-9: they read, never post, never ring, are never named). Every call is a stage81 function
+// (coach_crew, coach_crew_post, coach_crew_remove, coach_crew_under13, crew_photo). While the server has no coach_crew() (stage81 not applied)
+// the page draws nothing, as Courtside does. Posts and photos are NOT in BACKUP_TABLES on purpose (7 days, as privacy.html promises). Nothing
+// here pays XP (GAME-6). Two panels on Proof, under the wall: The Bell (compose, the last 7 days) and Who said yes (the answers, Under 13).
+const BELL_MAX = 280;                  // characters in a post (the table's check)
+const BELL_BYTES = 400 * 1024;         // the photo is made smaller on this computer until it is at most this (the server allows 450 KB)
+const BELL_KINDS = { level: 'levels', week: 'held weeks', mark: 'marks', achievement: 'achievements', best: 'bests', cycle: 'cycles', honour: 'honours', open: 'the Open' };
+const BELL_ERRS = {   // the server's messages (raise exception 'crew:…') in plain words
+  'crew:too_long': 'That post is over 280 characters. Shorten it and post again.',
+  'crew:empty': 'Write something or add a photo first.',
+  'crew:photo_big': 'The server says that photo is too big (over 450 KB even after making it smaller). Pick another one.',
+  'crew:photo_bad': 'The server could not read that photo as a JPEG. Pick another one.',
+  'crew:who': 'That athlete has no programme on the server, so there is nobody to tick.',
+};
+const BELL_HOW = [
+  '<b>What rings the Bell:</b> a new level, a week held (with the run), the four marks, an achievement, a personal best (the lift only, never the weight), a cycle finished, the month\'s honours, a Monthly Open result and joining the crew. One line per athlete per day, only from their latest yes, and only the kinds they have not switched off.',
+  '<b>What never rings:</b> a weight, an RPE, a check-in answer, pain, body weight, a habit or a broken week. A finished session reaches the Bell only when the athlete taps Tell the crew and adds a photo.',
+  '<b>Posts and photos</b> live 7 days, then the server deletes them. They are left out of the weekly backup on purpose, so a backup kept for twelve weeks never breaks that promise. Remove takes a post off every phone at once. <b>Kudos</b> pay nothing (GAME-6), and there are no replies.',
+];
+let _bellDraft = '', _bellPhoto = null, _bellBusy = false, _bellSeq = 0;   // what is typed, the photo made ready ({busy} while it is being made, else {b64, w, h, kb}), a post going up, the read in flight
+const _bellPics = {};                  // post id -> { mime, b64 }: a photo the coach asked to see (the server is asked only then)
+// The server has no stage81 yet: the function is not there. Anything else is a real error and is said.
+const bellMissing = res => !!res && !!res.error && (res.status === 404 || courtMissing(res.error)
+  || (/coach_crew/.test(res.error.message || '') && /does not exist|could not find|not found/i.test(res.error.message || '')));
+// Words for an error from a Bell write. No database code means the answer never arrived: the post may have gone up, so the page does not say it did not.
+function bellErrText(e, lead) {
+  const m = String((e && e.message) || '');
+  if (e && !e.code) return `The answer never arrived (${m || 'no reply'}), so the page cannot tell whether it went through. The list is reloading: look at it before you try again.`;
+  const k = Object.keys(BELL_ERRS).find(x => m.indexOf(x) >= 0);
+  return k ? BELL_ERRS[k] : lead + m;
+}
+// "just now", "2h", "Yesterday", "Mon", "12 Oct": when a post went up, on the coach's clock (a post is at most 7 days old).
+function bellWhen(iso) {
+  const t = new Date(iso);
+  if (isNaN(t)) return '';
+  const d = daysSince(iso);
+  if (d === 0) { const m = Math.floor((Date.now() - t.getTime()) / 60000); return m < 1 ? 'just now' : m < 60 ? m + 'm' : Math.floor(m / 60) + 'h'; }
+  if (d === 1) return 'Yesterday';
+  return d < 7 ? DOWS[t.getDay()] : dayMonth(dkey(t));
+}
+
+// One read for both panels, after the first paint (like Courtside). A newer read wins when two are in flight.
+async function loadBell() {
+  if (DEMO) return;
+  const seq = ++_bellSeq;
+  const res = await sb.rpc('coach_crew');
+  if (seq !== _bellSeq) return;
+  if (bellMissing(res)) { S.bell = { on: false }; LOAD_ERR.bell = ''; paintBell(); return; }
+  if (res.error) { S.bell = { on: true, err: res.error.message || 'no answer', posts: [], people: [], rings: 0, at: new Date() }; LOAD_ERR.bell = S.bell.err; paintBell(); return; }
+  const d = res.data || {};
+  S.bell = { on: true, err: '', posts: d.posts || [], people: d.people || [], rings: Number(d.rings_week) || 0, at: new Date() };
+  LOAD_ERR.bell = '';
+  Object.keys(_bellPics).forEach(id => { if (!S.bell.posts.some(p => p.id === id)) delete _bellPics[id]; });
+  paintBell();
+}
+// Draw what changed where it stands: the feed and the answers in place (the composer is never replaced, so typing keeps its focus), or the whole
+// Proof screen when the panels have just appeared or gone.
+function paintBell() {
+  if (!S.ready || route().view !== 'proof') return;
+  const on = !!(S.bell && S.bell.on), el = $('bellPanel');
+  if (!el || !on) { if (!!el !== on) render(); return; }
+  const head = $('bellHead'), feed = $('bellFeed'), ppl = $('bellPeople');
+  if (head && feed) { head.innerHTML = bellHeadHtml(); feed.innerHTML = bellFeedHtml(); } else el.innerHTML = bellHtml();
+  if (ppl) ppl.innerHTML = bellPeopleHtml();
+  wireBellComposer();
+}
+function bellPanelsHtml() {
+  if (!(S.bell && S.bell.on)) return '';
+  return `<section class="panel" id="bellPanel">${bellHtml()}</section>
+        <section class="panel" id="bellPeople">${bellPeopleHtml()}</section>`;
+}
+// The head says when the Bell was read and offers to read it again (a post can be minutes old; Proof also reads it again when it is opened after a minute).
+function bellHeadHtml() {
+  const at = S.bell && S.bell.at;
+  return `<div class="phead"><span class="t hd">The Bell</span><span class="r">${at ? `As of ${pad2(at.getHours())}:${pad2(at.getMinutes())}. ` : ''}<button class="btn sm quiet" onclick="loadBell()">↻ Reload</button></span></div>`;
+}
+function bellHtml() {
+  return `<div id="bellHead">${bellHeadHtml()}</div>
+    <div class="mic">
+      <div class="cap"><span class="eyebrow">Your post to the crew</span></div>
+      <textarea id="bellInput" dir="auto" maxlength="${BELL_MAX}" aria-label="Your post to the crew" placeholder="Say something to the crew…">${esc(_bellDraft)}</textarea>
+      <div id="bellPrev">${bellPrevHtml()}</div>
+      <div class="muted t-sm bell-hint" data-hint="bell">Pinned at the top of Crew for a day. Gone after 7 days.</div>
+      <div class="row">
+        <button class="btn primary sm" id="bellPostBtn" onclick="bellPost()" ${_bellBusy || (_bellPhoto && _bellPhoto.busy) ? 'disabled' : ''}>Post</button>
+        <button class="btn sm" id="bellAddBtn" onclick="document.getElementById('bellFile').click()">Add a photo</button>
+        <input type="file" id="bellFile" accept="image/*" hidden onchange="bellPick(this)">
+        <span class="count" id="bellCount"></span>
+      </div>
+    </div>
+    <div id="bellFeed">${bellFeedHtml()}</div>
+    ${howFold('how-bell', BELL_HOW)}`;
+}
+function wireBellComposer() {
+  const ta = $('bellInput');
+  if (!ta || ta._bellWired) return;
+  ta._bellWired = true;
+  const upd = () => { const c = $('bellCount'); if (c) c.textContent = `${ta.value.length}/${BELL_MAX}`; };
+  ta.addEventListener('input', () => { _bellDraft = ta.value; upd(); });
+  upd();
+}
+// The photo made ready, as a small preview with a ×; while it is being made, one line.
+function bellPrevHtml() {
+  const p = _bellPhoto;
+  if (!p) return '';
+  if (p.busy) return '<div class="bell-prev muted">Making the photo smaller…</div>';
+  return `<div class="bell-prev"><img src="data:image/jpeg;base64,${esc(p.b64)}" alt="The photo you will post">
+      <span class="muted t-sm">${p.w} × ${p.h} · ${p.kb} KB</span>
+      <button class="btn sm quiet" aria-label="Take the photo off" onclick="bellDropPhoto()">×</button></div>`;
+}
+function paintBellPrev() {
+  const el = $('bellPrev'); if (el) el.innerHTML = bellPrevHtml();
+  const b = $('bellPostBtn'); if (b) b.disabled = !!(_bellBusy || (_bellPhoto && _bellPhoto.busy));
+}
+function bellDropPhoto() { _bellPhoto = null; paintBellPrev(); }
+
+// The photo, made smaller on this computer before it leaves: at most 1280 px on the long side, JPEG at 75 %, then 60 %, 50 %, then 1024 px; at most
+// 400 KB. The re-encode takes the camera's location data off (the server expects that). A transparent picture goes on white (a JPEG has no alpha).
+async function bellDecode(file) {
+  if (window.createImageBitmap) {
+    try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) { /* the browser does not know the option or the format: the img element below */ }
+  }
+  return new Promise((ok, bad) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); ok(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); bad(new Error('decode')); };
+    img.src = url;
+  });
+}
+const bellJpeg = (canvas, q) => new Promise(ok => canvas.toBlob(ok, 'image/jpeg', q));
+const bellB64 = blob => new Promise((ok, bad) => {
+  const fr = new FileReader();
+  fr.onload = () => ok(String(fr.result).replace(/^data:[^,]*,/, ''));
+  fr.onerror = () => bad(fr.error || new Error('read'));
+  fr.readAsDataURL(blob);
+});
+async function bellShrink(file) {
+  const img = await bellDecode(file);
+  const iw = img.width || img.naturalWidth, ih = img.height || img.naturalHeight;
+  if (!iw || !ih) throw new Error('decode');
+  for (const long of [1280, 1024]) {
+    const k = Math.min(1, long / Math.max(iw, ih)), w = Math.max(1, Math.round(iw * k)), h = Math.max(1, Math.round(ih * k));
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.imageSmoothingQuality = 'high'; g.drawImage(img, 0, 0, w, h);
+    for (const q of [0.75, 0.6, 0.5]) {
+      const blob = await bellJpeg(c, q);
+      if (blob && blob.size <= BELL_BYTES) { if (img.close) img.close(); return { b64: await bellB64(blob), w, h, kb: Math.max(1, Math.round(blob.size / 1024)) }; }
+    }
+  }
+  if (img.close) img.close();
+  throw new Error('big');
+}
+async function bellPick(inp) {
+  const f = inp.files && inp.files[0];
+  inp.value = '';                       // the same file can be picked again
+  if (!f) return;
+  if (f.type && !/^image\//.test(f.type)) { fail('That file is not a picture. Pick a photo.'); return; }
+  _bellPhoto = { busy: true }; paintBellPrev();
+  try { _bellPhoto = await bellShrink(f); }
+  catch (e) {
+    _bellPhoto = null;
+    fail(e && e.message === 'big' ? 'That photo is still over 400 KB after making it smaller. Pick another one.' : 'Could not read that photo. Pick a JPEG or PNG.');
+  }
+  paintBellPrev();
+}
+
+async function bellPost() {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (_bellBusy) return;
+  if (_bellPhoto && _bellPhoto.busy) { toast('The photo is still being made smaller. One moment.'); return; }
+  const ta = $('bellInput'), body = String(ta ? ta.value : _bellDraft).trim(), ph = _bellPhoto;
+  if (!body && !ph) { fail(BELL_ERRS['crew:empty']); return; }
+  if (body.length > BELL_MAX) { fail(BELL_ERRS['crew:too_long']); return; }
+  _bellBusy = true; paintBellPrev();
+  try {
+    const res = await sb.rpc('coach_crew_post', { p_body: body, p_photo: ph ? ph.b64 : null, p_w: ph ? ph.w : null, p_h: ph ? ph.h : null });
+    if (res.error) { fail(bellErrText(res.error, 'Could not post: ')); if (!res.error.code) await loadBell(); return; }
+    _bellDraft = ''; _bellPhoto = null;
+    if (ta) { ta.value = ''; ta.dispatchEvent(new Event('input')); }
+    notice('Posted to the crew.');
+  } finally { _bellBusy = false; paintBellPrev(); }
+  await loadBell();
+}
+
+// The last 7 days, newest first.
+function bellFeedHtml() {
+  const b = S.bell;
+  if (b.err) return `<p class="empty">The Bell did not load: ${esc(b.err)}. <button class="btn sm" onclick="loadBell()">↻ Try again</button></p>`;
+  return `<div class="eyebrow bell-eb">The last 7 days</div>` +
+    (b.posts.length ? b.posts.map(bellPostHtml).join('') : '<p class="empty">Nothing posted this week.</p>');
+}
+function bellPhotoHtml(id) {
+  const d = _bellPics[id];
+  return d ? `<img class="bell-img" src="data:${esc(d.mime || 'image/jpeg')};base64,${esc(d.b64)}" alt="Photo in this post">
+      <div><button class="btn sm quiet" onclick="bellHidePhoto(${jsq(id)})">Hide photo</button></div>`
+    : `<button class="btn sm" onclick="bellShowPhoto(${jsq(id)}, this)">Show photo</button>`;
+}
+function bellPostHtml(p) {
+  const real = !p.amir && S.ath[p.athlete_id] ? S.ath[p.athlete_id].name : '';
+  const name = p.amir ? 'You (Amir)' : (p.who || nameOf(p.athlete_id));
+  return `<div class="bell-post${p.seen === false ? ' unseen' : ''}">
+      <div class="bell-top"><b class="nm">${esc(name)}</b>${real && real !== name ? `<span class="muted">${esc(real)}</span>` : ''}${p.kind === 'session' ? '<span class="chip">Session</span>' : ''}<span class="when" title="${esc(new Date(p.at).toLocaleString())}">${esc(bellWhen(p.at))}</span></div>
+      ${p.body ? `<div class="txt" dir="auto">${esc(p.body)}</div>` : ''}
+      ${p.photo ? `<div class="bell-ph" id="bellPh-${esc(p.id)}">${bellPhotoHtml(p.id)}</div>` : ''}
+      <div class="bell-acts">
+        <span class="muted t-sm">${Number(p.kudos) || 0} kudos</span>
+        ${p.seen === false ? '<span class="muted t-sm">not shown: their answer is no</span>' : ''}
+        <button class="btn sm danger" onclick="bellRemove(${jsq(p.id)})">Remove</button>
+      </div>
+      ${dangerSlot('bell:post:' + p.id)}
+    </div>`;
+}
+async function bellShowPhoto(id, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+  const res = await sb.rpc('crew_photo', { p_post: id });
+  if (res.error || !res.data || !res.data.b64) {
+    fail(res.error ? 'Could not load the photo: ' + res.error.message : 'That photo is gone: its post is past 7 days or was removed. The list is reloading.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Show photo'; }
+    if (!res.error) await loadBell();
+    return;
+  }
+  _bellPics[id] = { mime: res.data.mime, b64: res.data.b64 };
+  const slot = $('bellPh-' + id); if (slot) slot.innerHTML = bellPhotoHtml(id);
+}
+function bellHidePhoto(id) {
+  delete _bellPics[id];
+  const slot = $('bellPh-' + id); if (slot) slot.innerHTML = bellPhotoHtml(id);
+}
+function bellRemove(id) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  dangerAsk('bell:post:' + id, { title: 'Remove this post?', goes: 'The post, its photo and its kudos. It goes from every phone and the server now.',
+    stays: 'Nothing else. There is no undo, and its author can post again.', button: 'Remove the post', busyText: 'Removing…', run: () => bellRemoveNow(id) });
+}
+async function bellRemoveNow(id) {
+  const res = await sb.rpc('coach_crew_remove', { p_post: id });
+  if (res.error) { fail(bellErrText(res.error, 'Could not remove the post: ')); if (!res.error.code) await loadBell(); return; }
+  delete _bellPics[id];
+  toast(res.data === false ? 'That post was already gone' : 'Post removed');
+  await loadBell();
+}
+
+// Who said yes: every coached athlete, joined with the server's answers. An athlete with no row was never asked (the Crew tab asks on their first visit).
+function bellPeopleHtml() {
+  const b = S.bell;
+  const head = n => `<div class="phead"><span class="t hd">Who said yes</span><span class="r">${n}</span></div>`;
+  if (b.err) return `${head('')}<p class="empty">The answers did not load: ${esc(b.err)}. <button class="btn sm" onclick="loadBell()">↻ Try again</button></p>`;
+  const by = {};
+  (b.people || []).forEach(p => { by[p.athlete_id] = p; });
+  const rank = x => (x.p && x.p.answer === 'yes') ? 0 : (x.p && x.p.answer === 'no') ? 2 : 1;
+  const rows = Object.values(S.ath).filter(a => inTotals(a) && a.tier === 'coached').map(a => ({ a, p: by[a.id] || null }))
+    .sort((x, y) => rank(x) - rank(y) || String(x.a.name).localeCompare(String(y.a.name)));
+  const n = k => rows.filter(x => rank(x) === k).length;
+  const rowHtml = ({ a, p }) => {
+    const k = rank({ p }), off = p && Array.isArray(p.kinds_off) ? p.kinds_off.map(x => BELL_KINDS[x] || x) : [];
+    return `<div class="bell-p" data-id="${esc(a.id)}">
+        <a class="nm" href="#a/${encodeURIComponent(a.id)}">${esc(a.name)}</a>
+        <span class="chip${k === 0 ? ' court' : ''}">${k === 0 ? 'Yes' : k === 2 ? 'No' : 'Not asked yet'}</span>
+        ${off.length ? `<span class="off">${esc(off.join(', '))} off</span>` : ''}
+        <label class="bell-u13"><input type="checkbox" ${p && p.under13 ? 'checked' : ''} aria-label="${esc(a.name)} is under 13" onchange="bellUnder13(${jsq(a.id)}, this.checked, this)"> Under 13</label>
+      </div>${dangerSlot('bell:u13:' + a.id)}`;
+  };
+  return `${head(rows.length ? `${n(0)} yes · ${n(2)} no · ${n(1)} not asked yet` : '')}
+    <p class="psub" data-hint="bell-who">Under 13s read the Bell but never post or ring (GAME-9). Tick anyone under 13.</p>
+    ${rows.length ? rows.map(rowHtml).join('') : '<p class="empty">No coached athletes yet.</p>'}`;
+}
+// Ticking it ON asks first (it takes their posts off the server); the box stays as it was until the coach says yes. Ticking it off needs no confirm.
+function bellUnder13(id, on, box) {
+  if (DEMO) { toast('Demo mode — nothing saved'); if (box) box.checked = !on; return; }
+  if (!on) { if (box) box.disabled = true; bellSetUnder13(id, false); return; }
+  if (box) box.checked = false;
+  dangerAsk('bell:u13:' + id, { title: `Tick ${nameOf(id)} as under 13?`, goes: 'Their posts and photos, the kudos they gave and any level moment waiting to ring. Their posts this week are removed now.',
+    stays: 'Their answer, their login and the right to read the Bell.', note: 'Under 13: they never post, never ring and are never named.',
+    button: 'Tick under 13', busyText: 'Saving…', run: () => bellSetUnder13(id, true) });
+}
+async function bellSetUnder13(id, on) {
+  const res = await sb.rpc('coach_crew_under13', { p_athlete: id, p_on: on });
+  if (res.error) { fail(bellErrText(res.error, 'Could not save the under 13 tick: ')); paintBell(); if (!res.error.code) await loadBell(); return; }
+  toast(on ? `${firstWord(nameOf(id))} is ticked under 13` : `${firstWord(nameOf(id))} is no longer ticked under 13`);
+  await loadBell();
+}
+window.loadBell = loadBell; window.bellPost = bellPost; window.bellPick = bellPick; window.bellDropPhoto = bellDropPhoto;
+window.bellShowPhoto = bellShowPhoto; window.bellHidePhoto = bellHidePhoto; window.bellRemove = bellRemove; window.bellUnder13 = bellUnder13;
+
 // The funnel: everyone who signed up through proof.html, newest first. One self-contained function that returns the whole section; it is Leads →
 // Free signups (it was the last panel on Proof until 2026-10-12).
 function funnelPanelHtml() {
@@ -9268,9 +9581,10 @@ async function boot() {
     $('content').innerHTML = `<p class="empty">Could not load the dashboard: ${esc(e.message)}</p>`; return;
   }
   render();
-  // Server-scored levels fill in behind the first paint; so does Courtside (stage75).
+  // Server-scored levels fill in behind the first paint; so do Courtside (stage75) and the Bell (stage81).
   loadLevels().then(() => { if (S.ready) paintLevels(); });
   loadCourt();
+  loadBell();
 }
 function showGate(err) { failDismissAll(); $('app').style.display = 'none'; $('gate').style.display = 'block'; $('gateErr').textContent = err || ''; }
 // supabase-js fires an auth event on load, on every hourly token refresh, when the tab comes

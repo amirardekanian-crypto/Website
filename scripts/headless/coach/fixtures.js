@@ -123,6 +123,31 @@ function courtSeed(db, today, withAwards) {
   db.courtside_marks.push({ athlete_id: 'cara_free', award_id: 'achievement:back', saw_at: at(2, '20:00'), sent_at: at(2, '20:00'), updated_at: at(2, '20:00') });
 }
 
+// ── The Bell (stage81), made up like everything here ─────────────────────────────────────────────────────────
+// buildSeed({ crew: true }) turns the stub's stage81 functions on and seeds the Bell: coach_crew() answers with these posts (ago_min is how old a post
+// is on the page's clock; the stub turns it into `at`) and these answers. Use a fixed time of day (10:00 UTC) so "3h", "Yesterday" and "Mon" are the
+// same every day: from 10:00 on a Thursday, 20 hours back is Wednesday afternoon and 3 days back is Monday. A photo is made in the test (the harness
+// has no JPEG library): window.__DB.crew_bell.photos[<post id>] = { mime, w, h, b64 }.
+const BELL_IDS = ['b0000000-0000-4000-8000-000000000001', 'b0000000-0000-4000-8000-000000000002', 'b0000000-0000-4000-8000-000000000003', 'b0000000-0000-4000-8000-000000000004'];
+function crewSeed(db) {
+  db.crew_bell = {
+    rings_week: 4, photos: {},
+    posts: [
+      { id: BELL_IDS[0], athlete_id: '__coach__', amir: true, who: 'Amir', seen: true, kind: 'post', body: 'Great week, crew. Rest up and eat well.', photo: false, ago_min: 180, kudos: 2 },
+      { id: BELL_IDS[1], athlete_id: 'ava_test', amir: false, who: 'Ava E.', seen: true, kind: 'post', body: 'First 50 sessions done!', photo: true, ago_min: 1200, kudos: 3 },
+      { id: BELL_IDS[2], athlete_id: 'ben_test', amir: false, who: 'Ben E.', seen: true, kind: 'session', body: '', photo: true, ago_min: 4320, kudos: 0 },
+      // an author the crew can no longer see (a former athlete): the page shows what the server says, dimmed, with Remove still there
+      { id: BELL_IDS[3], athlete_id: 'gone_example', amir: false, who: 'Gone E.', seen: false, kind: 'post', body: 'Legs are cooked today.', photo: false, ago_min: 2900, kudos: 0 },
+    ],
+    people: [
+      { athlete_id: 'ava_test', answer: 'yes', under13: false, answered_at: '2026-11-01T09:00:00.000Z', kinds_off: [] },
+      { athlete_id: 'ben_test', answer: 'yes', under13: false, answered_at: '2026-11-02T09:00:00.000Z', kinds_off: ['best', 'level'] },
+      { athlete_id: 'eli_new', answer: 'no', under13: false, answered_at: '2026-11-03T09:00:00.000Z', kinds_off: [] },
+      { athlete_id: 'kim_former', answer: 'yes', under13: false, answered_at: '2026-11-04T09:00:00.000Z', kinds_off: [] },   // a former athlete: not in the list
+    ],
+  };
+}
+
 function buildSeed(opt) {
   opt = opt || {};
   const today = opt.today;                     // the page's local YYYY-MM-DD
@@ -260,6 +285,7 @@ function buildSeed(opt) {
     ],
   };
   if (opt.court) courtSeed(db, today, opt.courtAwards !== false);
+  if (opt.crew) crewSeed(db);
   if (opt.bigHistory) {
     for (let i = 0; i < opt.bigHistory; i++) {
       db.session_history.push(session('bulk_' + (i % 40), 'Bulk ' + (i % 40), (i % 3) + 1, daysAgo(today, 30 + Math.floor(i / 40))));
@@ -271,6 +297,7 @@ function buildSeed(opt) {
     levels: { cara_free: 4, ava_test: 3, dan_proof: 1 },
     board: [{ pos: 1, display_name: 'Cara', title: null, xp: 900, level: 4, rank_label: 'STARTER', is_me: false, joined: true }],
     stub: opt.stub || {},
+    crew: !!opt.crew,   // stub.js: the stage81 functions (the Bell) answer only when this is on
     // The month just gone's honours as the server would work them out (see stub.js: liveHonours). Made up; nothing is computed.
     honoursLive: opt.honoursLive !== undefined ? opt.honoursLive : opt.court ? {
       // A former athlete shares the top session count and the coach's own identity shares the top gain: the stub leaves both out, as
@@ -284,4 +311,4 @@ function buildSeed(opt) {
   };
 }
 
-module.exports = { buildSeed, daysAgo, dkey };
+module.exports = { buildSeed, daysAgo, dkey, BELL_IDS };

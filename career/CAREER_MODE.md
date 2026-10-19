@@ -88,6 +88,14 @@ the 15 (Smooth Operator and Showed Up Anyway left out, GAME-5), three new tests 
 and 7,050 XP to 22 athletes, nobody down. Amir's word: "yes, go live with the 13 new achievements". **Four Courts and the finish-card nudge are LIVE** (program.html; its read,
 `get_achievements()`, is stage80, applied 2026-10-19 on "yes, go live with Four Courts": `PROCEDURES.md` → *Stage 80*). Crew = stage81, the Monthly Open = stage82.
 
+**Step 5, Crew and the Bell, is BUILT (2026-10-19), not applied** (`supabase/stage81_career_crew.sql`; `PROCEDURES.md` → *Stage 81*; the app:
+`PROGRAM-APP.md` → *Crew and the Bell*; coach.html: `COACH_DASHBOARD.md` → *The Bell*). Exactly Amir's picks below: one feed, the Clubhouse, kudos
+with names, his post pinned a day, 7-day posts and photos (1280 px JPEG at 75 %, 3 a day), Tell the crew only with a photo, the question on the first
+visit, one yes then a switch per kind, under 13 never posts or rings, and the decided list of what rings. Three things the pages left to the build:
+the photos are **rows in the database, not Storage files** (a Storage file cannot be deleted from SQL, so the 7-day sweep and an erasure would need
+an Edge Function each); a moment rings only from the athlete's **latest yes on** (nothing from before it); a **no deletes** their posts, photos and
+kudos at once (consent withdrawn). Amir ticks who is under 13 in coach.html (no age is stored anywhere else). Shown nowhere until applied.
+
 **Step 4, the cut, is LIVE (2026-10-19)** (`supabase/stage78_career_cut.sql`, rulebook version 4; `PROCEDURES.md` → *Stage 78*): rank names, titles,
 the Grand Slam, skins and every badge but the four marks left the server; each paying badge award became a nameless XP fact on its day, so all 35
 athletes kept exactly their XP, level and season points. Amir's word: "yes, go live with the cut".

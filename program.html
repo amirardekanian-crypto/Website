@@ -2382,7 +2382,7 @@
      compact ones in a card or the session bar smaller, where their widths were measured (WK-02, WK-03).
      A new primary action joins this list; a secondary one is outlined (Guided, Reset). */
   .signin-go, .wel-go, .error-btn, .readiness-begin, .session-timer-btn:not(.guided), .step-primary-btn,
-  .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .wt-save, .rest-btn, .ex-1rm-save, .hl-share, .hl-m-go {
+  .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .wt-save, .rest-btn, .ex-1rm-save, .hl-share, .hl-m-go, .cr-go {
     background: var(--btn); color: var(--on-accent); border: 0; border-radius: 8px; min-height: 44px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
     cursor: pointer;
@@ -4969,6 +4969,151 @@
     .hl-tg i, .hl-tg i::after, .hl-prev .hl-img { transition: none; }
   }
 
+  /* ══ CREW AND THE BELL (Career Mode round 5, step 5; stage81, 2026-10-19) ══════════════════════════════════════════════════
+     Amir's picks: Crew is a tab, one feed (A on the page Crew and the Open); the Bell is the Clubhouse (A on the page The Bell): a
+     photo post is a card with its photo at 4:5, a moment a slim green line, kudos with names, Amir's post pinned for a day, the composer
+     at the top. Green and grey; clay only where Crew asks to be looked at: the tab's dot and the pin of a post of Amir's not opened yet
+     (DS-01). Colours are the app's one set. renderCrew(), crewPostHTML(), crewLineHTML(), openCrewPost(), openCrewPhoto(). */
+  .nav-item[data-tab="crew"] .nav-dot { position: absolute; top: 7px; left: calc(50% + 7px); width: 8px; height: 8px; border-radius: 50%; background: var(--clay);
+    box-shadow: 0 0 0 2px var(--row); }
+  .crew-head { margin: 14px var(--g) 6px; }
+  #screen-crew { padding-bottom: 110px; }
+  #screen-crew .prog-sec { display: flex; align-items: center; gap: 12px; margin: 22px 0 12px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
+  #screen-crew .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }
+  #screen-crew .prog-sec-n { order: 2; padding-right: var(--g); font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  #screen-crew .cr-quiet { margin: 4px var(--g) 12px; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--grey); }
+  /* the question, asked once: a card with a green edge and two buttons */
+  #screen-crew .cr-ask { margin: 12px var(--g) 8px; padding: 16px; border: 1.5px solid var(--fill); border-radius: 12px; background: var(--row); }
+  #screen-crew .cr-ask h2 { margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  #screen-crew .cr-ask p { margin: 8px 0 0; font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  #screen-crew .cr-ask p.sm { font-size: var(--fs-small); color: var(--grey); }
+  #screen-crew .cr-ask-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  #screen-crew .cr-ask-btns button { flex: 1 1 130px; min-height: 48px; padding: 0 14px; border-radius: 8px; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+    text-transform: uppercase; cursor: pointer; }
+  #screen-crew .cr-ask-btns .cr-no { border: 1.5px solid var(--field); background: transparent; color: var(--green-ink); }
+  /* the month's honours: four tiles 2 × 2 */
+  #screen-crew .cr-hon { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 var(--g) 6px; }
+  #screen-crew .cr-hon > div { min-width: 0; padding: 10px 12px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  #screen-crew .cr-hon .k { display: block; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
+  #screen-crew .cr-hon b { display: block; margin-top: 4px; font: 900 var(--fs-lead)/1.05 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--ink);
+    overflow-wrap: anywhere; }
+  #screen-crew .cr-hon small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  /* the composer row: your initials, the prompt, the camera */
+  #screen-crew .cr-comp { display: flex; align-items: center; gap: 10px; width: calc(100% - 2 * var(--g)); min-height: 52px; margin: 0 var(--g) 12px; padding: 6px 6px 6px 8px;
+    border: 1px solid var(--hair); border-radius: 999px; background: var(--row); color: var(--grey); cursor: pointer; text-align: left; font: 400 var(--fs-body)/1.2 'Barlow', sans-serif; }
+  #screen-crew .cr-comp span.t { flex: 1; min-width: 0; }
+  #screen-crew .cr-comp:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .cr-ini { flex: none; display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--tint); color: var(--green-ink);
+    font: 700 var(--fs-small)/1 'Barlow', sans-serif; }
+  .cr-ini.am { background: var(--fill); color: #fff; }
+  .cr-cam { flex: none; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--btn); color: #fff; }
+  .cr-cam svg, .cr-bell-ic svg { width: 18px; height: 18px; display: block; }
+  /* a post: a card; Amir's has a green edge and its pin */
+  #screen-crew .cr-post { margin: 0 var(--g) 10px; padding: 12px 12px 10px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  #screen-crew .cr-post.amir { border-color: var(--fill); box-shadow: inset 3px 0 0 var(--fill); }
+  .cr-who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .cr-nm { flex: 1; min-width: 0; font: 600 var(--fs-body)/1.2 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
+  .cr-nm small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--grey); }
+  .cr-when { flex: none; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--grey); }
+  .cr-pin { flex: none; padding: 5px 8px; border-radius: 999px; background: var(--tint); font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase;
+    color: var(--green-ink); }
+  .cr-pin.is-new { background: var(--clay); color: #fff; }   /* Amir's post nobody opened here yet: the one clay thing on Crew */
+  .cr-body { margin: 10px 0 0; font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); white-space: pre-line; overflow-wrap: anywhere; text-wrap: pretty; }
+  .cr-tag { display: inline-block; margin-top: 8px; padding: 4px 8px; border-radius: 999px; background: var(--tint); font: 700 var(--fs-label)/1 'Space Mono', monospace;
+    letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
+  /* the photo at 4:5, cropped to fill; the whole photo opens in the viewer */
+  .cr-ph { display: block; position: relative; width: 100%; aspect-ratio: 4 / 5; margin-top: 10px; padding: 0; border: 0; border-radius: 10px; overflow: hidden;
+    background: var(--sand); cursor: zoom-in; }
+  .cr-ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cr-ph img:not([src]) { visibility: hidden; }
+  .cr-ph:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .cr-ph .cr-ph-wait { position: absolute; inset: 0; display: grid; place-items: center; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--grey); }
+  .cr-ph.is-in .cr-ph-wait { display: none; }
+  .cr-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 10px; }
+  .cr-foot small { flex: 1; min-width: 0; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  .cr-kd { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 999px;
+    background: var(--row); color: var(--green-ink); font: 700 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
+  .cr-kd[aria-pressed="true"] { border-color: var(--fill); background: var(--fill); color: #fff; }
+  .cr-kd:disabled { cursor: default; opacity: .9; }
+  .cr-kd b { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .cr-del { flex: none; min-height: 36px; padding: 0 6px; border: 0; background: none; color: var(--grey); font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
+  .cr-del.armed { color: var(--clay-ink); }
+  /* a moment: one slim green line, the bell, what happened, kudos */
+  #screen-crew .cr-line { display: flex; align-items: center; gap: 10px; margin: 0 var(--g) 10px; padding: 10px 10px 10px 12px; border-radius: 12px; background: var(--tint); }
+  .cr-bell-ic { flex: none; color: var(--green-ink); }
+  .cr-lw { flex: 1; min-width: 0; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
+  .cr-lw small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  #screen-crew .cr-me-row { display: flex; align-items: center; gap: 10px; width: calc(100% - 2 * var(--g)); min-height: 48px; margin: 4px var(--g) 0; padding: 8px 0;
+    border: 0; border-top: 1px solid var(--hair); background: none; color: var(--green-ink); font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; text-align: left; cursor: pointer; }
+  #screen-crew .cr-me-row span:first-child { flex: 1; }
+  /* the season board: plain numbers, no medals (NO GOLD), your row tinted */
+  #screen-crew .cr-brd { margin: 0 var(--g); }
+  #screen-crew .cr-br { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 8px 0; border-top: 1px solid var(--hair);
+    font: 400 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  #screen-crew .cr-br:first-child { border-top: 0; }
+  #screen-crew .cr-br.me { margin: 0 -8px; padding: 8px; border-top: 0; border-radius: 8px; background: var(--tint); }
+  #screen-crew .cr-br.me + .cr-br { border-top: 0; }
+  #screen-crew .cr-br .p { font: 900 var(--fs-lead)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--green-ink); font-variant-numeric: tabular-nums; }
+  #screen-crew .cr-br .n { min-width: 0; overflow-wrap: anywhere; }
+  #screen-crew .cr-br .n small { margin-left: 6px; font: 700 var(--fs-label)/1 'Space Mono', monospace; color: var(--grey); }
+  #screen-crew .cr-br .x { font: 700 var(--fs-small)/1 'Space Mono', monospace; color: var(--grey); font-variant-numeric: tabular-nums; }
+  /* the composer sheet (openCrewPost(), in the one sheet) */
+  #hist-overlay .cr-txt { display: block; width: 100%; min-height: 96px; margin-top: 14px; padding: 12px; border: 1px solid var(--field); border-radius: 10px; background: var(--row);
+    color: var(--ink); font: 400 var(--fs-field)/1.45 'Barlow', sans-serif; resize: vertical; }
+  #hist-overlay .cr-txt:focus { outline: 2px solid var(--green-ink); outline-offset: 1px; }
+  #hist-overlay .cr-cnt { display: block; margin-top: 6px; text-align: right; font: 700 var(--fs-label)/1 'Space Mono', monospace; color: var(--grey); font-variant-numeric: tabular-nums; }
+  #hist-overlay .cr-prev { position: relative; width: 62%; max-width: 240px; margin-top: 12px; aspect-ratio: 4 / 5; border-radius: 10px; overflow: hidden; background: var(--sand); }
+  #hist-overlay .cr-prev img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #hist-overlay .cr-prev[hidden] { display: none; }
+  #hist-overlay .cr-rm { position: absolute; right: 6px; top: 6px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(0,0,0,.6); color: #fff;
+    font: 500 var(--fs-lead)/1 'Barlow', sans-serif; cursor: pointer; }
+  #hist-overlay .cr-add { display: flex; align-items: center; gap: 10px; min-height: 48px; margin-top: 12px; padding: 0 14px; border: 1.5px dashed var(--field); border-radius: 10px;
+    color: var(--green-ink); font: 600 var(--fs-body)/1.2 'Barlow', sans-serif; cursor: pointer; }
+  #hist-overlay .cr-add[hidden] { display: none; }
+  #hist-overlay .cr-add svg { flex: none; width: 22px; height: 22px; display: block; }
+  #hist-overlay .cr-add input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  #hist-overlay .cr-note { margin-top: 10px; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--grey); }
+  #hist-overlay .cr-note b { font-weight: 600; color: var(--ink); }
+  #hist-overlay .cr-go { display: block; width: 100%; min-height: 52px; margin-top: 16px; font-size: var(--fs-lead); }
+  #hist-overlay .cr-go:disabled { opacity: .45; cursor: default; }
+  #hist-overlay .cr-err { min-height: 0; margin-top: 10px; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--clay-ink); }
+  #hist-overlay .cr-err:empty { display: none; }
+  /* the settings page: the answer, then a switch per kind */
+  #hist-overlay .cr-sw { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 0; border-top: 1px solid var(--hair); font: 600 var(--fs-body)/1.3 'Barlow', sans-serif;
+    color: var(--ink); cursor: pointer; }
+  #hist-overlay .cr-sw span { flex: 1; min-width: 0; }
+  #hist-overlay .cr-sw small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  #hist-overlay .cr-sw input { flex: none; width: 24px; height: 24px; accent-color: var(--fill); }
+  #hist-overlay .cr-sws { margin-top: 16px; }
+  #hist-overlay .cr-sws[hidden] { display: none; }
+  /* the photo, opened: full screen, dark, the whole photo, its words and kudos */
+  .cr-viewer { position: fixed; top: 0; bottom: 0; left: var(--app-gutter); right: var(--app-gutter); z-index: 212; display: none; flex-direction: column; gap: 12px;
+    padding: calc(env(safe-area-inset-top, 0px) + 12px) var(--g) calc(env(safe-area-inset-bottom, 0px) + 16px); background: #0B0F0D; color: #fff; overflow-y: auto; }
+  .cr-viewer.visible { display: flex; }
+  .cr-viewer .cr-who { color: #fff; }
+  .cr-viewer .cr-nm { color: #fff; }
+  .cr-viewer .cr-nm small, .cr-viewer .cr-foot small { color: rgba(255,255,255,.75); }
+  .cr-viewer .cr-ini { background: rgba(255,255,255,.16); color: #fff; }
+  .cr-viewer .cr-x { flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); color: #fff; font: 500 var(--fs-lead)/1 'Barlow', sans-serif; cursor: pointer; }
+  .cr-viewer .cr-vimg { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
+  .cr-viewer .cr-vimg img { max-width: 100%; max-height: 72vh; border-radius: 12px; display: block; }
+  .cr-viewer .cr-body { color: #fff; }
+  .cr-viewer .cr-kd { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.1); color: #fff; }
+  .cr-viewer .cr-kd[aria-pressed="true"] { border-color: #fff; background: #fff; color: #0E4A36; }
+  /* Tell the crew, on the finished card, under the WhatsApp row (paintCrewTell()) */
+  :where(#day-view) .complete-crew { margin-top: 10px; }
+  :where(#day-view) .complete-crew[hidden] { display: none; }
+  :where(#day-view) .complete-crew .hrow { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; margin: 0; padding: 12px 14px 12px 16px;
+    border: 1px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
+  :where(#day-view) .complete-crew .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  :where(#day-view) .complete-crew .hrow-ic svg { width: 22px; height: 22px; }
+  :where(#day-view) .complete-crew .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
+  :where(#day-view) .complete-crew .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .complete-crew .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ink); }   /* as the WhatsApp row above it */
+  :where(#day-view) .complete-crew .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+
   /* ══ SIGN-IN, WELCOME, LOADING AND ERROR IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════
      Amir, 2026-10-13: "continue until everything has a consistent design". The four screens a person sees before or around their
      first plan wear Centre Court's look: Loading (the mark, a ring, one mono line, on the paper) · Sign in ("Baseline", Amir's pick of
@@ -5102,6 +5247,7 @@
   .error-btn { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; font-size: var(--fs-body); text-align: center; text-decoration: none; }
   .error-btn.ghost { background: transparent; color: var(--green-ink); box-shadow: inset 0 0 0 1.5px var(--field); }
   .error-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+
 </style>
 </head>
 <body>
@@ -5459,6 +5605,21 @@
   </div>
 
 </div>
+
+<!-- ═══ CREW ═══ (Career Mode round 5, step 5, 2026-10-19; Amir's picks: one feed, the Clubhouse look). The crew's own place: the question
+     asked once, last month's honours (the 1st to the 14th), the Bell (the composer, Amir's post pinned for a day, posts with photos and the
+     moments that ring, kudos with names), then the season board. renderCrew() fills #crew-body from get_bell() (stage81). The tab is
+     added to the bar only once the server answers get_bell() (setCrewTab()); never in the demo or the coach's preview. -->
+<div id="screen-crew" class="screen">
+  <div class="crew-head">
+    <div class="prog-eyebrow">Train together</div>
+    <h1 class="prog-title">Crew</h1>
+  </div>
+  <div id="crew-body"></div>
+</div>
+
+<!-- A photo on the Bell, opened (openCrewPhoto()): the whole photo on dark, who and when, the words, kudos. ✕ closes; so does Back (topLayer()). -->
+<div class="cr-viewer" id="crew-viewer" role="dialog" aria-modal="true" aria-label="A photo from the crew"></div>
 
 <!-- ═══ NOTES ═══ -->
 <div id="screen-notes" class="screen">
@@ -5882,6 +6043,8 @@ function _snapshot() {
     if (k === prefix + 'careercache' || (k && k.indexOf(prefix + 'earn_d') === 0)) continue;
     // Your moments (Career Mode round 5): a cache of get_my_moments() and get_awards(), never progress.
     if (k === prefix + 'momentscache') continue;
+    // Crew (stage81): a cache of get_bell(), and the newest post of Amir's opened on this phone. Neither is progress.
+    if (k === prefix + 'crewcache' || k === prefix + 'crewseen') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -6915,7 +7078,9 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   loadHoldCache();
   loadCareerCache();
   loadMomentsCache();
+  loadCrewCache();   // Crew (stage81): the tab from the phone's copy now; the server's Bell behind the first paint
   refreshHold();
+  setTimeout(refreshBell, 1500);
   // The Spine: cues and the ⓘ from the phone's copy now, then from the server.
   paintSpine();
   paintDayQualities();
@@ -7201,6 +7366,7 @@ function acctIc(kind) {
   const draw = {
     install: '<rect x="6" y="2" width="12" height="20" rx="2"/><polyline points="9.5 9 12 11.5 14.5 9"/><line x1="12" y1="5.5" x2="12" y2="11.5"/><line x1="10.5" y1="18.5" x2="13.5" y2="18.5"/>',
     privacy: '<rect x="5" y="11" width="14" height="9.5" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    crew: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16zM10 20a2 2 0 0 0 4 0"/>',
   }[kind] || '';
   return `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${draw}</svg></span>`;
 }
@@ -7241,6 +7407,7 @@ function openAccount(e) {
           <button type="button" data-theme="dark" aria-pressed="${dark}">Dark</button>
         </span></div>
       ${install}
+      ${crewOn() ? door('acct-crew', 'crew', 'Crew and the Bell') : ''}
       ${door('acct-help', 'help', 'How the app works')}
       <a class="hrow" href="/privacy.html" target="_blank" rel="noopener">${acctIc('privacy')}<span class="hrow-b"><span class="hrow-v">Privacy</span></span><span class="hrow-a" aria-hidden="true">›</span></a>
     </div>
@@ -7255,6 +7422,8 @@ function openAccount(e) {
     showInstallOffer();
   });
   document.getElementById('acct-help').addEventListener('click', () => openHelp());   // ‹ Back returns here
+  const crw = document.getElementById('acct-crew');
+  if (crw) crw.addEventListener('click', () => openCrewSettings());   // ‹ Back returns here
   const so = document.getElementById('acct-signout');
   if (so) so.addEventListener('click', () => armedTap(so, 'Tap again to sign out', () => signOutSafely(so)));
   ov.classList.add('visible');
@@ -8750,7 +8919,7 @@ function renderHome() {
       <div class="complete-actions">
         <div class="send-session-status" id="send-status-${day.id}" aria-live="polite"></div>
       </div>
-      <div class="complete-wa">${sessionWa}</div>
+      <div class="complete-wa">${sessionWa}<div class="complete-crew" data-day="${day.id}" hidden></div></div>
       <!-- The rating and the note fold behind this one row after Done (the panel moves into the slot, moveRatePanel()). Send the
            update and the send status stay outside the fold. paintRateFold() writes the line; toggleRateFold() opens it. -->
       <button type="button" class="rate-fold" aria-expanded="false" aria-controls="rate-slot-${day.id}" onclick="toggleRateFold('${day.id}')">
@@ -9829,7 +9998,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then <strong>Career</strong> (your level, <strong>Hold Serve</strong>: the weeks you've held in a row, and the next mark you're close to), then today's habits, ticked right there.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then <strong>Your numbers</strong> (your level, your four numbers and this month's goal), then <strong>Achievements</strong>, then <strong>Your moments</strong>, then your records and body weight, then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then <strong>Career</strong> (your level, <strong>Hold Serve</strong>: the weeks you've held in a row, and the next mark you're close to), then today's habits, ticked right there.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then <strong>Your numbers</strong> (your level, your four numbers and this month's goal), then <strong>Achievements</strong>, then <strong>Your moments</strong>, then your records and body weight, then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -9867,15 +10036,21 @@ const APP_GUIDE = [
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. During a session it's under <strong>⋯</strong> on the bar too, as <strong>Ask Amir</strong>, and it names the exercise you have open. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
 ];
 
+// Crew and the Bell (stage81): the card shows, and Getting around names the tab, only while the app has the tab (crewOn()), so the guide never
+// names a control the athlete cannot see (CNT-01).
+APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how often'), 0,
+  { icon: 'compass', key: 'crew', title: 'Crew and the Bell', when: () => crewOn(),
+    body: `<p><strong>Crew</strong> is our crew's own place. The first time you open it I ask you one thing: <strong>Ring it</strong> or <strong>Keep it to me</strong>. Say yes and the Bell rings for you when you reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. It's one line a day and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Kudos</strong> on a post or a line tells the crew you saw it, with your name. Nothing on Crew earns XP. Under the Bell is the season board.</p><p>To change your answer, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
-  return APP_GUIDE.map(card => `
+  const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with kudos), last month\'s honours early in the month, and the season board.</li>';
+  return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
     <div class="note-card app-card${openKey && card.key === openKey ? ' open' : ''}" onclick="toggleNote(this)">
       <div class="note-card-header">
         <div class="app-card-icon">${window.ICON(card.icon)}</div>
         <div class="note-card-title">${esc(card.title)}</div>
         <span class="note-chevron">▼</span>
       </div>
-      <div class="note-body">${card.body}</div>
+      <div class="note-body">${card.body.replace('<!--crew-->', crewOn() ? crewLi : '')}</div>
     </div>`).join('');
 }
 
@@ -10017,6 +10192,8 @@ function goTo(screen, historyId, keepContent) {
   // `keepContent` is set when renderCeilingLift() routes here itself; it has
   // already painted the per-lift view and must not be overwritten.
   if (screen === 'ceiling' && !keepContent) renderCeiling();
+  // Crew (stage81): the copy at once, then the server's Bell (at most every 30 s) and the season board; Amir's new post counts as seen.
+  if (screen === 'crew') openCrew();
   if (screen === 'weight') renderWeightScreen();
 
   // Update the global tab bar's active button. Personal Records and Body weight are reached from
@@ -10061,6 +10238,7 @@ function topLayer() {
   if (document.querySelector('.hl-moment')) return closeMoment;   // a cycle's moment (Highlight Reel), the Welcome's recipe
   const vm = document.querySelector('.video-modal.is-open');
   if (vm) return () => window.VideoModal && window.VideoModal.close();
+  if (on('crew-viewer')) return closeCrewPhoto;   // a photo from the crew, opened (it sits over the sheet)
   if (on('rallyOverlay')) return closeRally;   // the rest games sit over the rest timer
   if (on('splitOverlay')) return closeSplitStep;
   if (on('setsOverlay')) return closeBetweenSets;
@@ -10113,7 +10291,7 @@ function initBackNav() {
   // Every way a layer opens or closes goes through one of these nodes' class or hidden
   // attribute, so watching them catches all of them without touching each function.
   const mo = new MutationObserver(() => navSync());
-  ['rallyOverlay', 'splitOverlay', 'setsOverlay', 'timerOverlay', 'readiness-overlay', 'hist-overlay', 'stepOverlay', 'day-view'].forEach(id => {
+  ['rallyOverlay', 'splitOverlay', 'setsOverlay', 'timerOverlay', 'readiness-overlay', 'hist-overlay', 'stepOverlay', 'day-view', 'crew-viewer'].forEach(id => {
     const e = document.getElementById(id);
     if (e) mo.observe(e, { attributes: true, attributeFilter: ['class', 'hidden'] });
   });
@@ -11398,6 +11576,541 @@ function achNudgeHTML(e) {
   const ck = open.find(i => i.test === 'total' && i.reads === 'checkin_done' && Number(i.need) - Number(i.have) - (e.checkin ? 1 : 0) === 1);
   if (ck) return `<small class="cf-nudge">Answer the check-in before your next session and you get ${nm(ck)}.</small>`;
   return '';
+}
+
+// ── CREW AND THE BELL (Career Mode round 5, step 5; stage81, 2026-10-19) ─────────────────────────────────────────────────────────────
+// Amir's picks (career/CAREER_MODE.md → Round 5): Crew is a tab, one feed; the Bell is the Clubhouse (a photo post a card with its photo at
+// 4:5, a moment one slim green line, kudos with names, his post pinned for a day, the composer at the top); messages and photos live 7 days;
+// a photo is made smaller on the phone (1280 px on its long side, JPEG at 75 %, about 200 KB, its location data gone with the re-encode), 3 a
+// day; Tell the crew on the finished card posts a session only with a photo; the question is asked on the first visit, one yes then a switch
+// per kind; never for an athlete Amir ticked under 13 (GAME-9). Kudos, lines and posts pay nothing (GAME-6). The server decides what rings and
+// who can be seen (get_bell(), stage81); this app only draws it and never sees another athlete's id.
+// The tab is ADDED to the bar only once get_bell() has answered (setCrewTab()): before stage81 is on the server, and in the demo and the coach's
+// preview, there is no Crew. <id>_crewcache keeps the last answer (never synced, _snapshot()), so the tab is there at the next open with no
+// signal; <id>_crewseen is the newest post of Amir's opened on this phone (the tab's clay dot until then).
+var BELL = null;             // get_bell()'s answer: { athlete_id, me, items, honours, kinds, at } or null
+var CREW_BOARD = null;       // leaderboard_top()'s rows for the season board
+var _bellBusy = false, _bellAt = 0, _crewMissing = false, _crewDraft = null, _crewFreshPin = null;
+const CREW_PHOTOS = new Map();   // post id → an object URL of its photo (this visit only)
+const CREW_BELL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16zM10 20a2 2 0 0 0 4 0"/></svg>';
+const CREW_CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>';
+function crewKey() { return ATHLETE_ID + '_crewcache'; }
+function crewSeenKey() { return ATHLETE_ID + '_crewseen'; }
+function crewAllowed() { return !window.IS_DEMO && !window.IS_PREVIEW && !!ATHLETE_ID; }
+function crewOn() { return crewAllowed() && !!BELL && !_crewMissing; }
+function onCrew() { const s = document.getElementById('screen-crew'); return !!(s && s.classList.contains('active')); }
+function crewMe() { return (BELL && BELL.me) || {}; }
+function crewCanKudos() { const m = crewMe(); return m.answer === 'yes' && !m.under13; }
+function loadCrewCache() {
+  if (!crewAllowed()) return;
+  try {
+    const o = JSON.parse(localStorage.getItem(crewKey()) || 'null');
+    if (o && o.athlete_id === ATHLETE_ID && Array.isArray(o.items)) BELL = o;
+  } catch (e) { /* no copy yet */ }
+  setCrewTab(); paintCrewTell();
+}
+// "Not on the server": the function is missing (PostgREST's PGRST202, a 404). The tab goes, and the copy with it.
+function crewMissingErr(r) {
+  const e = (r && r.error) || {};
+  return e.code === 'PGRST202' || Number(r && r.status) === 404 || /could not find the function|does not exist/i.test(String(e.message || ''));
+}
+async function refreshBell() {
+  if (!crewAllowed() || _bellBusy) return;
+  _bellBusy = true;
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    const r = await _withTimeout(sb.rpc('get_bell', { p_athlete_id: ATHLETE_ID }), 10000);
+    if (_noAnswer(r)) return;   // no signal: keep the copy
+    if (r.error) {
+      if (crewMissingErr(r)) { _crewMissing = true; BELL = null; try { localStorage.removeItem(crewKey()); } catch (e) {} }
+      return;
+    }
+    if (!r.data || r.data.athlete_id !== ATHLETE_ID) return;
+    BELL = r.data; _bellAt = Date.now(); _crewMissing = false;
+    try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) { /* storage full: shown this visit */ }
+  } catch (e) { /* keep the copy */ }
+  finally { _bellBusy = false; setCrewTab(); paintCrewTell(); if (onCrew()) renderCrew(); }
+}
+// The newest post of Amir's still pinned (24 hours), and whether this phone has opened Crew since it came.
+function crewAmirPost() { return ((BELL && BELL.items) || []).find(i => i && i.t === 'post' && i.amir && i.pinned) || null; }
+function crewAmirNew() { const a = crewAmirPost(); if (!a) return false; try { return localStorage.getItem(crewSeenKey()) !== a.id; } catch (e) { return false; } }
+function crewMarkSeen() { const a = crewAmirPost(); if (!a) return; try { _lsRawSet(crewSeenKey(), a.id); } catch (e) {} setCrewTab(); }
+// The tab: added before Coach while the Bell answers, gone when it does not. Its clay dot: Amir's pinned post, not opened here yet.
+function setCrewTab() {
+  const bar = document.getElementById('global-tabs');
+  if (!bar) return;
+  let b = bar.querySelector('.nav-item[data-tab="crew"]');
+  if (!crewOn()) {
+    if (b) { b.remove(); if (onCrew()) goTo('home'); }
+    return;
+  }
+  if (!b) {
+    const coach = bar.querySelector('.nav-item[data-tab="notes"]');
+    const html = `<button class="nav-item" data-tab="crew" onclick="goTo('crew')"><span class="nav-icon">${CREW_BELL_SVG}</span><span class="nav-label">Crew</span></button>`;
+    if (coach) coach.insertAdjacentHTML('beforebegin', html); else bar.insertAdjacentHTML('beforeend', html);
+    b = bar.querySelector('.nav-item[data-tab="crew"]');
+    if (onCrew()) { b.classList.add('active'); b.setAttribute('aria-current', 'page'); }
+  }
+  const dot = b.querySelector('.nav-dot'), want = crewAmirNew() && !onCrew();
+  if (want && !dot) b.insertAdjacentHTML('beforeend', '<span class="nav-dot" aria-hidden="true"></span>');
+  else if (!want && dot) dot.remove();
+  b.setAttribute('aria-label', want ? 'Crew, a new post from Amir' : 'Crew');
+}
+function openCrew() {
+  // Amir's pinned post wears its clay pin on the visit that first shows it; from then on it is seen (the tab's dot goes at once).
+  _crewFreshPin = crewAmirNew() ? crewAmirPost().id : null;
+  crewMarkSeen();
+  renderCrew();
+  if (Date.now() - _bellAt > 30000) refreshBell();
+  refreshCrewBoard();
+}
+async function refreshCrewBoard() {
+  if (!crewAllowed()) return;
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    const r = await _withTimeout(sb.rpc('leaderboard_top', { p_athlete_id: ATHLETE_ID, p_key: null, p_scope: 'season', p_limit: 10 }), 10000);
+    if (!r || r.error || !Array.isArray(r.data)) return;
+    CREW_BOARD = r.data;
+    const el = document.getElementById('crew-board');
+    if (el) el.innerHTML = crewBoardHTML();
+  } catch (e) { /* the board stays as it was */ }
+}
+
+// ── the words ──
+function crewInitials(name) {
+  const w = String(name || '').replace(/[^\p{L}\p{N}\s]/gu, ' ').trim().split(/\s+/).filter(Boolean);
+  return ((w[0] || '?')[0] + (w[1] ? w[1][0] : '')).toUpperCase();
+}
+function crewMonth(iso) {
+  const m = /^(\d{4})-(\d{2})/.exec(String(iso || ''));
+  return m ? ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][Number(m[2]) - 1] || '' : '';
+}
+function crewWhen(at) {
+  const t = Date.parse(at);
+  if (!t) return '';
+  const min = Math.max(0, Math.round((Date.now() - t) / 60000));
+  if (min < 1) return 'Now';
+  if (min < 60) return min + 'm';
+  if (min < 24 * 60 && new Date(t).toDateString() === new Date().toDateString()) return Math.round(min / 60) + 'h';
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  if (new Date(t).toDateString() === y.toDateString()) return 'Yesterday';
+  return new Date(t).toLocaleDateString('en-GB', { weekday: 'short' });
+}
+function crewList(a) { return a.length < 2 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; }
+// One part of a Bell line, after the name: "reached level 14", "set a new best on Barbell Back Squat". Never a weight (the server sends none).
+function crewPartText(p) {
+  if (!p || !p.k) return '';
+  const M = crewMonth(p.month);
+  switch (p.k) {
+    case 'level': return p.n ? 'reached level ' + p.n : '';
+    case 'joined': return 'joined the crew';
+    case 'week': return Number(p.run) > 1 ? `held a week, ${p.run} in a row` : 'held a week';
+    case 'cycle': return p.n ? 'finished Cycle ' + p.n : 'finished a cycle';
+    case 'achievement': return 'earned ' + momName(p.name || p.id || 'an achievement');
+    case 'mark': {
+      if (!p.at) return '';
+      return ({ held_weeks: `reached ${p.at} weeks held in a row`, century: `reached ${p.at} sessions with Amir`,
+        bests: `reached ${p.at} personal bests`, comebacks: `made ${p.at} comebacks that stuck` })[p.item] || '';
+    }
+    case 'best': {
+      const l = (p.lifts || []).filter(Boolean), more = Number(p.more) || 0;
+      if (!l.length) return '';
+      if (l.length === 1 && !more) return 'set a new best on ' + l[0];
+      return 'set new bests on ' + (more ? l.join(', ') + ' and ' + more + ' more' : crewList(l));
+    }
+    case 'honour': return ({ sessions: `had the most sessions in ${M}`, improved: `won Most improved for ${M}`, full_month: `earned a Full Month in ${M}`,
+      pick: `got Amir's Pick for ${M}` })[p.honour] || '';
+    case 'open': return p.text ? String(p.text) : 'entered the Monthly Open';
+    default: return '';
+  }
+}
+// "You, Sara and 2 others": the viewer first when they gave it, then up to two names, then the rest as a count.
+function crewKudosWords(k) {
+  if (!k || !k.n) return '';
+  const names = (k.mine ? ['You'] : []).concat(k.names || []), shown = names.slice(0, 2), rest = Number(k.n) - shown.length;
+  if (rest > 0) return shown.join(', ') + ' and ' + rest + (rest === 1 ? ' other' : ' others');
+  return crewList(shown);
+}
+function crewKudosBtn(target, k, own) {
+  const n = (k && Number(k.n)) || 0, can = !own && crewCanKudos();
+  const lbl = own ? `Kudos on yours: ${n}` : (k && k.mine ? 'Kudos given. Tap to take it back' : 'Give kudos');
+  return `<button type="button" class="cr-kd" data-kd="${esc(target)}" ${can ? `aria-pressed="${!!(k && k.mine)}" onclick="crewKudos(this)"` : 'disabled'} aria-label="${esc(lbl)}">Kudos${n ? ` <b>${n}</b>` : ''}</button>`;
+}
+function crewItem(key) { return ((BELL && BELL.items) || []).find(i => i && (i.id === key || i.key === key)) || null; }
+
+// ── the screen ──
+function crewAskHTML() {
+  return `<section class="cr-ask" id="crew-ask" aria-labelledby="crew-ask-h">
+    <h2 id="crew-ask-h">Ring the bell for the crew?</h2>
+    <p>When you reach a new level, hold a week, hit a mark or set a best, the crew sees your name and what you did, for 7 days. Never a weight. Say yes and you can post messages and photos here too.</p>
+    <p class="sm">Change it any time from your initials, under Crew and the Bell.</p>
+    <div class="cr-ask-btns"><button type="button" class="cr-go" onclick="crewAnswer('yes', this)">Ring it</button><button type="button" class="cr-no" onclick="crewAnswer('no', this)">Keep it to me</button></div>
+  </section>`;
+}
+function crewHonoursHTML() {
+  const H = BELL && BELL.honours;
+  if (!H || !Array.isArray(H.rows) || !H.rows.length) return '';
+  const M = crewMonth(H.month), order = ['sessions', 'improved', 'full_month', 'pick'];
+  const lbl = { sessions: 'Most sessions', improved: 'Most improved', full_month: 'Full Month', pick: "Amir's Pick" };
+  const tiles = order.map(h => {
+    const rows = H.rows.filter(r => r && r.honour === h);
+    if (!rows.length) return '';
+    const v = rows[0].value || {}, who = crewList(rows.map(r => r.me ? 'You' : r.who));
+    const sub = h === 'sessions' ? (v.n ? v.n + ' plan sessions' : '') : h === 'improved' ? (v.lift ? `${v.lift} +${v.pct}%` : '') : h === 'full_month' ? 'every week held' : 'his pick of the month';
+    return `<div><span class="k">${lbl[h]}</span><b>${esc(who)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>`;
+  }).join('');
+  return tiles ? `<h2 class="prog-sec">${esc(M)} honours</h2><div class="cr-hon">${tiles}</div>` : '';
+}
+function crewPostHTML(it) {
+  const name = it.amir ? 'Amir' : it.me ? 'You' : (it.who || 'Athlete');
+  const ini = it.amir ? 'AA' : crewInitials(it.me ? crewMe().name : it.who);
+  const sub = it.amir ? '<small>to the crew</small>' : (it.kind === 'session' ? `<small>${it.session && it.session.day ? 'Day ' + Number(it.session.day) + ' done' : 'A session done'}</small>` : '');
+  const top = it.pinned ? `<span class="cr-pin${_crewFreshPin === it.id ? ' is-new' : ''}">Pinned</span>` : `<span class="cr-when">${esc(crewWhen(it.at))}</span>`;
+  const ph = it.photo ? `<button type="button" class="cr-ph" data-ph="${esc(it.id)}" onclick="openCrewPhoto('${esc(it.id)}')" aria-label="Open ${esc(it.amir ? "Amir's" : it.me ? 'your' : (it.who || 'their') + "'s")} photo"><img alt=""><span class="cr-ph-wait">Photo</span></button>` : '';
+  const del = it.me ? `<button type="button" class="cr-del" onclick="armedTap(this, 'Tap again to delete', () => crewDelete('${esc(it.id)}'))">Delete</button>` : '';
+  return `<article class="cr-post${it.amir ? ' amir' : ''}" data-id="${esc(it.id)}">
+    <div class="cr-who"><span class="cr-ini${it.amir ? ' am' : ''}" aria-hidden="true">${esc(ini)}</span><span class="cr-nm">${esc(name)}${sub}</span>${top}</div>
+    ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}${ph}
+    <div class="cr-foot">${crewKudosBtn(it.id, it.kudos, it.me)}<small data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small>${del}</div>
+  </article>`;
+}
+function crewLineHTML(it) {
+  const parts = (it.parts || []).map(crewPartText).filter(Boolean);
+  if (!parts.length) return '';
+  const txt = esc(it.me ? 'You' : (it.who || 'Someone')) + ' ' + parts.map(esc).join(' · ');
+  const kw = crewKudosWords(it.kudos);
+  return `<div class="cr-line" data-key="${esc(it.key)}"><span class="cr-bell-ic">${CREW_BELL_SVG}</span><span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small></span>${crewKudosBtn(it.key, it.kudos, it.me)}</div>`;
+}
+function crewBoardHTML() {
+  if (!Array.isArray(CREW_BOARD) || !CREW_BOARD.length) return '<p class="cr-quiet">The board shows here once you have signal.</p>';
+  return CREW_BOARD.map(r => `<div class="cr-br${r.is_me ? ' me' : ''}"><span class="p">${Number(r.pos) || ''}</span><span class="n">${esc(r.is_me ? 'You' : r.display_name || '')}<small>LV ${Number(r.level) || 1}</small></span><span class="x">${Number(r.xp || 0).toLocaleString('en-GB')}</span></div>`).join('');
+}
+function renderCrew() {
+  const el = document.getElementById('crew-body');
+  if (!el) return;
+  if (!BELL) { el.innerHTML = `<p class="cr-quiet">${navigator.onLine === false ? 'No signal. The crew shows here when you are back online.' : 'Loading the crew…'}</p>`; return; }
+  const me = crewMe(), items = (BELL.items || []).filter(i => i && (i.t === 'post' || i.t === 'line'));
+  let h = '';
+  if (!me.answer && !me.under13) h += crewAskHTML();
+  h += crewHonoursHTML();
+  h += `<h2 class="prog-sec">The Bell<span class="prog-sec-n">Last 7 days</span></h2>`;
+  if (me.can_post) h += `<button type="button" class="cr-comp" onclick="openCrewPost()"><span class="cr-ini" aria-hidden="true">${esc(crewInitials(me.name))}</span><span class="t">Share something with the crew</span><span class="cr-cam">${CREW_CAM_SVG}</span></button>`;
+  else if (me.under13) h += '<p class="cr-quiet">You can read the crew here. Posting is off for your account.</p>';
+  else if (me.answer === 'no') h += '<p class="cr-quiet">You keep your moments to yourself, so the crew does not see you here.</p>';
+  const feed = items.map(i => i.t === 'post' ? crewPostHTML(i) : crewLineHTML(i)).join('');
+  h += feed || `<p class="cr-quiet">Quiet so far this week.${me.can_post ? ' Share a photo from training and get it going.' : ''}</p>`;
+  if (!me.under13 && me.answer) h += `<button type="button" class="cr-me-row" onclick="openCrewSettings()"><span>What the crew sees of you</span><span aria-hidden="true">›</span></button>`;
+  h += `<h2 class="prog-sec">Season board</h2><div class="cr-brd" id="crew-board">${crewBoardHTML()}</div>`;
+  el.innerHTML = h;
+  crewWirePhotos(el);
+}
+window.renderCrew = renderCrew;
+
+// ── the photos: asked one at a time when their card comes near the screen, two at once at most, kept for this visit ──
+const _crewPhP = new Map(), _crewPhQ = [];
+let _crewPhRun = 0, _crewIO = null;
+function crewFetchPhoto(id) {
+  if (CREW_PHOTOS.has(id)) return Promise.resolve(CREW_PHOTOS.get(id));
+  if (_crewPhP.has(id)) return _crewPhP.get(id);
+  const p = new Promise(res => { _crewPhQ.push({ id, res }); crewPhPump(); });
+  _crewPhP.set(id, p);
+  return p;
+}
+function crewPhPump() {
+  while (_crewPhRun < 2 && _crewPhQ.length) {
+    const job = _crewPhQ.shift();
+    _crewPhRun++;
+    (async () => {
+      let url = null;
+      try {
+        const sb = await _sbReady();
+        const r = sb && await _withTimeout(sb.rpc('crew_photo', { p_post: job.id }), 15000);
+        if (r && !r.error && r.data && r.data.b64) {
+          const bin = atob(r.data.b64), u8 = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+          url = URL.createObjectURL(new Blob([u8], { type: r.data.mime || 'image/jpeg' }));
+          CREW_PHOTOS.set(job.id, url);
+        }
+      } catch (e) { url = null; }
+      if (!url) _crewPhP.delete(job.id);   // asked again next time the card shows
+      _crewPhRun--;
+      job.res(url);
+      crewPhPump();
+    })();
+  }
+}
+function crewShowPhoto(btn) {
+  const id = btn && btn.dataset.ph;
+  if (!id) return;
+  crewFetchPhoto(id).then(url => {
+    const im = btn.querySelector('img');
+    if (url && im) { im.src = url; btn.classList.add('is-in'); }
+  });
+}
+function crewWirePhotos(root) {
+  const btns = [...root.querySelectorAll('.cr-ph[data-ph]')];
+  if (!btns.length) return;
+  if (!('IntersectionObserver' in window)) { btns.forEach(crewShowPhoto); return; }
+  if (!_crewIO) _crewIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { _crewIO.unobserve(e.target); crewShowPhoto(e.target); } }), { rootMargin: '400px 0px' });
+  btns.forEach(b => { if (CREW_PHOTOS.has(b.dataset.ph)) crewShowPhoto(b); else _crewIO.observe(b); });
+}
+// A photo, opened: the whole photo on dark, who and when, the words, kudos. ✕ or Back closes it (topLayer()).
+function openCrewPhoto(id) {
+  const it = crewItem(id), v = document.getElementById('crew-viewer');
+  if (!it || !v) return;
+  const name = it.amir ? 'Amir' : it.me ? 'You' : (it.who || 'Athlete');
+  const left = Number(it.left) || 0;
+  v.innerHTML = `<div class="cr-who"><span class="cr-ini${it.amir ? ' am' : ''}" aria-hidden="true">${esc(it.amir ? 'AA' : crewInitials(it.me ? crewMe().name : it.who))}</span>
+      <span class="cr-nm">${esc(name)}<small>${esc(crewWhen(it.at))}${left ? ' · ' + left + (left === 1 ? ' day left' : ' days left') : ''}</small></span>
+      <button type="button" class="cr-x" onclick="closeCrewPhoto()" aria-label="Close the photo">✕</button></div>
+    <div class="cr-vimg"><img alt="${esc(name === 'You' ? 'Your photo' : name + "'s photo")}"></div>
+    ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}
+    <div class="cr-foot">${crewKudosBtn(it.id, it.kudos, it.me)}<small data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small></div>`;
+  v.classList.add('visible');
+  crewFetchPhoto(id).then(url => { const im = v.querySelector('.cr-vimg img'); if (url && im) im.src = url; });
+}
+function closeCrewPhoto() {
+  const v = document.getElementById('crew-viewer');
+  if (v) { v.classList.remove('visible'); v.innerHTML = ''; }
+}
+window.openCrewPhoto = openCrewPhoto;
+window.closeCrewPhoto = closeCrewPhoto;
+
+// ── kudos: on at once here, then the server's answer (who gave it) replaces it; a refusal puts it back ──
+function paintKudos(key) {
+  const it = crewItem(key);
+  if (!it) return;
+  document.querySelectorAll('[data-kd]').forEach(b => {
+    if (b.dataset.kd !== key) return;
+    const n = Number(it.kudos && it.kudos.n) || 0;
+    b.innerHTML = 'Kudos' + (n ? ` <b>${n}</b>` : '');
+    if (b.hasAttribute('aria-pressed')) {
+      b.setAttribute('aria-pressed', String(!!(it.kudos && it.kudos.mine)));
+      b.setAttribute('aria-label', it.kudos && it.kudos.mine ? 'Kudos given. Tap to take it back' : 'Give kudos');
+    }
+  });
+  document.querySelectorAll('[data-kw]').forEach(s => {
+    if (s.dataset.kw !== key) return;
+    const kw = crewKudosWords(it.kudos);
+    s.textContent = it.t === 'line' ? (kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at)) : kw;
+  });
+}
+async function crewKudos(btn) {
+  const key = btn && btn.dataset.kd, it = crewItem(key);
+  if (!it || !crewCanKudos() || it.me) return;
+  const on = btn.getAttribute('aria-pressed') !== 'true';
+  const before = Object.assign({ n: 0, names: [], mine: false }, it.kudos || {});
+  it.kudos = { n: Math.max(0, Number(before.n) + (on ? 1 : -1)), names: before.names || [], mine: on };
+  paintKudos(key);
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_kudos', { p_target: key, p_on: on }), 8000); } catch (e) { r = null; }
+  if (r && !r.error && r.data && typeof r.data.n !== 'undefined') it.kudos = r.data;
+  else { it.kudos = before; aaToast(_noAnswer(r) ? 'No signal. Kudos goes when you are back online.' : 'That kudos did not go. Try again.'); }
+  paintKudos(key);
+  try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
+}
+window.crewKudos = crewKudos;
+async function crewDelete(id) {
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_delete_post', { p_post: id }), 8000); } catch (e) { r = null; }
+  if (!r || r.error) { aaToast(_noAnswer(r) ? 'No signal. Try again when you are back online.' : 'That did not delete. Try again.'); return; }
+  if (BELL && BELL.items) BELL.items = BELL.items.filter(i => !(i && i.t === 'post' && i.id === id));
+  try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
+  renderCrew();
+  aaToast('Deleted. It is gone from every phone.');
+}
+window.crewDelete = crewDelete;
+
+// ── the yes or no, and a switch per kind ──
+function crewDefaultName() {
+  const a = (DATA && DATA.athlete) || {};
+  const asked = String(a.boardName || '').trim();
+  if (asked) return asked.slice(0, 24);
+  const f = String(a.firstName || 'Athlete').trim(), l = String(a.lastName || '').trim();
+  return (l ? f + ' ' + l[0].toUpperCase() + '.' : f).slice(0, 24);
+}
+async function crewAnswer(ans, btn) {
+  if (!crewAllowed()) return;
+  const was = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_answer', { p_answer: ans, p_name: crewDefaultName() }), 10000); } catch (e) { r = null; }
+  if (btn) { btn.disabled = false; btn.textContent = was; }
+  if (!r || r.error || !r.data) { aaToast(_noAnswer(r) ? 'No signal. Answer again when you are back online.' : 'That did not save. Try again.'); return false; }
+  if (BELL) BELL.me = r.data;
+  renderCrew();
+  aaToast(ans === 'yes' ? 'You are on the Bell. Welcome to the crew.' : 'Kept to you. Nothing of yours reaches the crew.');
+  refreshBell();
+  return true;
+}
+window.crewAnswer = crewAnswer;
+const CREW_KINDS = [
+  ['level', 'A new level'], ['week', 'A week held', 'And how many in a row'], ['mark', 'A mark', '8 weeks held, 50 sessions with Amir, 10 bests…'],
+  ['achievement', 'An achievement'], ['best', 'A personal best', 'The lift only, never the weight'], ['cycle', 'A cycle finished'],
+  ['honour', "The month's honours"], ['open', 'The Monthly Open']];
+function openCrewSettings() {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov || !BELL) return;
+  const me = crewMe(), yes = me.answer === 'yes', kinds = me.kinds || {};
+  const sw = CREW_KINDS.map(([k, w, s]) => `<label class="cr-sw"><span>${esc(w)}${s ? `<small>${esc(s)}</small>` : ''}</span><input type="checkbox" data-kind="${k}" ${kinds[k] === false ? '' : 'checked'}></label>`).join('');
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Crew</div>
+    <h2 class="readiness-title">Crew and the Bell</h2>
+    <p class="readiness-sub">${me.under13 ? 'You can read the crew. Posting and the Bell are off for your account.'
+      : yes ? `Your name on the Bell: <strong>${esc(me.name || '')}</strong>` : 'Nothing of yours reaches the crew.'}</p>
+    ${me.under13 ? '' : `
+    <div class="acct-list"><div class="acct-theme"><span class="acct-lbl">Ring the bell</span>
+      <span class="acct-seg" role="group" aria-label="Ring the bell for the crew">
+        <button type="button" data-ans="yes" aria-pressed="${yes}">Yes</button><button type="button" data-ans="no" aria-pressed="${!yes}">No</button></span></div></div>
+    <div class="cr-sws"${yes ? '' : ' hidden'}><p class="cr-note">What rings for you. Turn any of them off.</p>${sw}</div>
+    <p class="cr-note">A no takes your posts, photos and kudos off the server now. Everything you post is gone after 7 days anyway. Nothing on Crew earns XP.</p>`}`;
+  ov.querySelectorAll('.acct-seg button[data-ans]').forEach(b => b.addEventListener('click', async () => {
+    if ((b.dataset.ans === 'yes') === (crewMe().answer === 'yes')) return;
+    if (await crewAnswer(b.dataset.ans, b)) openCrewSettingsPage();
+  }));
+  ov.querySelectorAll('.cr-sw input[data-kind]').forEach(i => i.addEventListener('change', () => crewSetKind(i.dataset.kind, i.checked, i)));
+  ov.classList.add('visible');
+}
+function openCrewSettingsPage() { _SHEET.restoring = true; try { openCrewSettings(); } finally { _SHEET.restoring = false; } }   // redraw in place: not a new page
+async function crewSetKind(kind, on, input) {
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_kinds', { p_kinds: { [kind]: !!on } }), 8000); } catch (e) { r = null; }
+  if (!r || r.error || !r.data) {
+    if (input) input.checked = !on;
+    aaToast(_noAnswer(r) ? 'No signal. Try again when you are back online.' : 'That did not save. Try again.');
+    return;
+  }
+  if (BELL) BELL.me = r.data;
+  try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
+  if (onCrew()) renderCrew();
+}
+
+// ── posting: a message, a photo or both; Tell the crew (a session) needs the photo ──
+function crewSessionsN() {
+  try { const c = CAREER_T && CAREER_T.p ? careerMarkCells(CAREER_T.p).find(x => x.key === 'sessions_with_amir') : null; return c ? Number(c.value) || 0 : 0; } catch (e) { return 0; }
+}
+function crewSessionDraft(dayId) {
+  const n = crewSessionsN();
+  return `Day ${dayId} done.` + (n ? ` ${n} sessions with Amir.` : '');
+}
+function blobToB64(blob) {
+  return new Promise((ok, bad) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).replace(/^data:[^,]*,/, '')); fr.onerror = bad; fr.readAsDataURL(blob); });
+}
+// The photo, made smaller here before it leaves: at most 1280 px on its long side, JPEG at 75 %. Drawing it on a canvas and encoding it again
+// leaves its EXIF data behind, the location with it. Over 400 KB it tries a lower quality, then a smaller size (the server takes 450 KB at most).
+async function crewShrink(file) {
+  let src = null, w0 = 0, h0 = 0;
+  try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); w0 = src.width; h0 = src.height; }
+  catch (e) {
+    src = await new Promise((ok, bad) => { const im = new Image(); im.onload = () => ok(im); im.onerror = bad; im.src = URL.createObjectURL(file); });
+    w0 = src.naturalWidth; h0 = src.naturalHeight;
+  }
+  if (!w0 || !h0) throw new Error('crew:photo_bad');
+  for (const [side, q] of [[1280, 0.75], [1280, 0.6], [1280, 0.5], [1024, 0.6], [800, 0.6]]) {
+    const s = Math.min(1, side / Math.max(w0, h0)), w = Math.max(1, Math.round(w0 * s)), h = Math.max(1, Math.round(h0 * s));
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const x = c.getContext('2d');
+    x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
+    x.drawImage(src, 0, 0, w, h);
+    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', q));
+    if (!blob) continue;
+    if (blob.size <= 400 * 1024 || side === 800) return { b64: await blobToB64(blob), w, h, url: URL.createObjectURL(blob), bytes: blob.size };
+  }
+  throw new Error('crew:photo_bad');
+}
+function crewErrWords(msg) {
+  const m = /crew:[a-z_]+/.exec(String(msg || ''));
+  return ({
+    'crew:too_long': 'That is over 280 characters.', 'crew:empty': 'Write something or add a photo.',
+    'crew:photos_today': 'That is 3 photos today. More tomorrow.', 'crew:posts_today': 'That is 10 posts today. More tomorrow.',
+    'crew:photo_big': 'That photo did not work. Try another one.', 'crew:photo_bad': 'That photo did not work. Try another one.',
+    'crew:session_photo': 'Add a photo to tell the crew.', 'crew:not_yes': 'Say yes to the Bell on Crew first.',
+  })[m && m[0]] || 'That did not post. Try again.';
+}
+function openCrewPost(mode, dayId) {
+  const ov = document.getElementById('hist-overlay'), me = crewMe();
+  if (!ov || !BELL || !me.can_post) return;
+  const ses = mode === 'session', noPh = (Number(me.photos_left) || 0) <= 0, noPost = (Number(me.posts_left) || 0) <= 0;
+  _crewDraft = { mode: ses ? 'session' : 'post', day: dayId || null, photo: null };
+  const draft = ses ? crewSessionDraft(dayId) : '';
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">${ses ? 'Tell the crew' : 'Share with the crew'}</div>
+    <h2 class="readiness-title">${ses ? 'Day ' + esc(String(dayId)) + ' done' : 'The Bell'}</h2>
+    <textarea class="cr-txt" dir="auto" maxlength="280" aria-label="Your message to the crew" placeholder="${ses ? 'A line about the session' : 'What happened in training?'}">${esc(draft)}</textarea>
+    <span class="cr-cnt" aria-live="polite"></span>
+    <div class="cr-prev" hidden><img alt="Your photo"><button type="button" class="cr-rm" aria-label="Take the photo off">×</button></div>
+    <label class="cr-add"${noPh ? ' hidden' : ''}>${CREW_CAM_SVG}<span>Add a photo</span><input type="file" accept="image/*"></label>
+    ${noPh ? `<p class="cr-note">That is 3 photos today. More tomorrow.${ses ? ' A session goes to the crew with a photo, so this one waits.' : ''}</p>` : ''}
+    ${ses ? '<p class="cr-note">A session goes to the crew with a photo.</p>' : ''}
+    <p class="cr-note"><b>Made smaller before it's sent.</b> About 200 KB, and its location is taken off.</p>
+    <p class="cr-note">Gone after 7 days. Amir can remove any post. Only photos you would show your coach.</p>
+    <button type="button" class="cr-go"${noPost ? ' disabled' : ''}>${ses ? 'Post with the photo' : 'Post'}</button>
+    <p class="cr-err" role="status">${noPost ? 'That is 10 posts today. More tomorrow.' : ''}</p>`;
+  const m = ov.querySelector('.readiness-modal'), ta = m.querySelector('.cr-txt'), cnt = m.querySelector('.cr-cnt'), go = m.querySelector('.cr-go');
+  const prev = m.querySelector('.cr-prev'), add = m.querySelector('.cr-add'), file = m.querySelector('.cr-add input'), err = m.querySelector('.cr-err');
+  const sync = () => {
+    cnt.textContent = ta.value.length + ' / 280';
+    const has = !!_crewDraft.photo, ok = ses ? has : (has || ta.value.trim().length > 0);
+    go.disabled = noPost || !ok;
+  };
+  ta.addEventListener('input', sync);
+  file.addEventListener('change', async () => {
+    const f = file.files && file.files[0];
+    file.value = '';
+    if (!f) return;
+    err.textContent = '';
+    add.querySelector('span').textContent = 'Making it smaller…';
+    try {
+      const ph = await crewShrink(f);
+      if (_crewDraft.photo && _crewDraft.photo.url) URL.revokeObjectURL(_crewDraft.photo.url);
+      _crewDraft.photo = ph;
+      prev.querySelector('img').src = ph.url;
+      prev.hidden = false; add.hidden = true;
+    } catch (e) { err.textContent = crewErrWords('crew:photo_bad'); }
+    add.querySelector('span').textContent = 'Add a photo';
+    sync();
+  });
+  prev.querySelector('.cr-rm').addEventListener('click', () => {
+    if (_crewDraft.photo && _crewDraft.photo.url) URL.revokeObjectURL(_crewDraft.photo.url);
+    _crewDraft.photo = null; prev.hidden = true; add.hidden = noPh; sync();
+  });
+  go.addEventListener('click', () => crewSend(go, ta, err));
+  sync();
+  ov.classList.add('visible');
+}
+async function crewSend(go, ta, err) {
+  const d = _crewDraft;
+  if (!d) return;
+  const label = go.textContent;
+  go.disabled = true; go.textContent = 'Posting…'; err.textContent = '';
+  const p = { p_body: ta.value, p_photo: d.photo ? d.photo.b64 : null, p_w: d.photo ? d.photo.w : null, p_h: d.photo ? d.photo.h : null, p_kind: d.mode,
+    p_session: d.mode === 'session' ? { day: Number(d.day) || null, n: crewSessionsN() || null } : null };
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_post', p), 25000); } catch (e) { r = null; }
+  go.textContent = label;
+  if (_noAnswer(r)) { err.textContent = 'No signal. Your post is still here: tap Post again when you have signal.'; go.disabled = false; return; }
+  if (r.error || !r.data) { err.textContent = crewErrWords(r.error && r.error.message); go.disabled = false; return; }
+  if (r.data.me && BELL) BELL.me = r.data.me;
+  if (d.photo && d.photo.url && r.data.id) CREW_PHOTOS.set(r.data.id, d.photo.url);   // your own photo shows at once, no download
+  _crewDraft = null;
+  closeHistorySheet();
+  aaToast(onCrew() ? 'Posted to the crew.' : 'Posted. See it on Crew.');
+  _bellAt = 0;
+  refreshBell();
+}
+window.openCrewPost = openCrewPost;
+window.openCrewSettings = openCrewSettings;
+// Tell the crew, on every finished card: shown while this athlete can post (crewOn() and a yes), a door that opens the composer for that day.
+function paintCrewTell() {
+  const can = crewOn() && !!crewMe().can_post;
+  document.querySelectorAll('.complete-crew[data-day]').forEach(el => {
+    el.hidden = !can;
+    const html = can ? `<button type="button" class="hrow" onclick="openCrewPost('session', '${esc(el.dataset.day)}')"><span class="hrow-ic">${CREW_CAM_SVG}</span><span class="hrow-b"><span class="hrow-l">Tell the crew</span><span class="hrow-q">A photo from today, on the Bell for 7 days.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>` : '';
+    if (el.innerHTML !== html) el.innerHTML = html;
+  });
 }
 // A mark as a card to share, until the share cards' own design pass (Amir, 2026-10-19: "the cards are very important part of this app,
 // because we want to use it to advertise our brand. we need to design them carefull and with details later"): Highlight Reel's achievement
@@ -14008,6 +14721,7 @@ function finishDayNow(day, card) {
   if (!isPartial) paintFinishArt(day);
   completeEl.classList.add('visible');
   paintCareerEarn(day);   // "+470 XP · Level 24", counting until the server has the session
+  paintCrewTell();   // Tell the crew (stage81), while this athlete can post
   completeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   // The record for the coach dashboard, and the report, once (the outbox keeps it
   // until it goes: sendReport()). Its first step (before any await) files this session's Personal Records; every new best it
@@ -18087,6 +18801,8 @@ function wrapSheetOpeners() {
   window.openAccount = openAccount; window.openHelp = openHelp;
   openShareSheet = sheetWrap(openShareSheet); window.openShareSheet = openShareSheet;   // Highlight Reel's share sheet
   openCourt = sheetWrap(openCourt); window.openCourt = openCourt;   // Four Courts: a kind of achievements
+  openCrewPost = sheetWrap(openCrewPost); window.openCrewPost = openCrewPost;   // Crew: the composer (stage81)
+  openCrewSettings = sheetWrap(openCrewSettings); window.openCrewSettings = openCrewSettings;   // Crew: the yes and the switches; ‹ Back to the account
   window.openHistorySheet = openHistorySheet; window.openExerciseSheet = openExerciseSheet;
   window.openWhyPlan = openWhyPlan; window.openQualitySheet = openQualitySheet;
   const close0 = closeHistorySheet;

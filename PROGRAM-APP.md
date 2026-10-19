@@ -1483,6 +1483,52 @@ changed: the server, the XP and the levels are exactly as before.
 - **Four Courts' tests:** `scripts/headless/career.js` → `fourCourts()` (14 checks: the section, its order, Next up, the tiles, no clay, a
   kind opened, Back, Next up's tap, both nudges and none, 320 px, no answer); the stub answers `get_achievements` from its `achievements`.
 
+## 🔔 Crew and the Bell (Career Mode round 5, step 5, 2026-10-19)
+
+Amir's picks (`career/CAREER_MODE.md` → *Round 5*): Crew is a tab, **one feed** (A on the page *Crew and the Open*,
+https://claude.ai/artifact/7fCYGFL6mboE3igFLUkE5E); the Bell is the **Clubhouse** (A on the page *The Bell*,
+https://claude.ai/artifact/55fbdfUgJVxySL7EpihyWb). The server half is `supabase/stage81_career_crew.sql` (`career/PROCEDURES.md` → *Stage 81*); it
+decides what rings and who can be seen, and never sends this app another athlete's id. Nothing on Crew pays XP (GAME-6).
+
+- **The tab** (Home · Progress · Library · **Crew** · Coach) is ADDED to the bar by `setCrewTab()` only once `get_bell()` has answered, so
+  before stage81 is live, in the demo and in the coach's preview there is no Crew, and the static markup (and every older test) still has four
+  tabs. A server that says the function is missing (PGRST202, 404: `crewMissingErr()`) takes the tab and the copy away. Its icon is the bell;
+  a **clay dot** sits on it while Amir's pinned post has not been opened on this phone (`<id>_crewseen`), the one clay thing Crew shows (DS-01),
+  with the post's *Pinned* chip in clay on the visit that first shows it (`_crewFreshPin`).
+- **The screen** (`renderCrew()`, `#crew-body`): the eyebrow *Train together* and the title; **the question, once** (`crewAskHTML()`: *Ring the
+  bell for the crew?*, **Ring it** / **Keep it to me** → `crew_answer()` with the board name, `crewDefaultName()`); **last month's honours** from the
+  1st to the 14th (four tiles, crew members only); **The Bell** · *Last 7 days*: the composer row (*Share something with the crew*, only with a yes
+  and not under 13), then the feed in the server's order (Amir's post of the last 24 hours pinned first): a **post** is a card (`crewPostHTML()`:
+  initials, name, when, the words, the photo at 4:5 cropped to fill, Kudos with names, *Delete* on your own through `armedTap()`), a **moment** a
+  slim green line with the bell (`crewLineHTML()`: *Mina reached level 14 · set a new best on Barbell Back Squat · held a week, 5 in a row*,
+  `crewPartText()`; a best names the lift, never a weight); then *What the crew sees of you ›* and the **season board** (`leaderboard_top()`, plain
+  numbers, *You* tinted, no medals).
+- **Kudos** (`crewKudos()`): on at once here, the server's answer (who gave it) replaces it, a refusal puts it back. *You, Sara and 2 others*
+  (`crewKudosWords()`). Not on your own, and not before a yes (the button is disabled).
+- **Photos**: asked one at a time with `crew_photo()` when their card comes within 400 px of the screen (`crewWirePhotos()`, an
+  IntersectionObserver), two at once at most, kept as object URLs for the visit (`CREW_PHOTOS`); your own shows at once after posting. A tap opens
+  **the viewer** (`openCrewPhoto()`, `#crew-viewer`, dark, the whole photo, *N days left*, kudos); ✕ or Back closes it (`topLayer()`).
+- **Posting** (`openCrewPost()`, in the one sheet): up to 280 characters with a counter, *Add a photo*, the notes (*Made smaller before it's sent…*,
+  *Gone after 7 days. Amir can remove any post…*). `crewShrink()` draws the photo on a canvas at most **1280 px** on its long side and encodes a
+  **JPEG at 0.75** (then 0.6, 0.5, 1024 px, 800 px until it is under 400 KB; the server takes 450 KB); the re-encode drops the EXIF data, location
+  included. The server's limits come back as words (`crewErrWords()`): 3 photos and 10 posts a day. No signal: the post stays in the sheet to send
+  again (nothing is queued).
+- **Tell the crew** (`paintCrewTell()`): a door row under the WhatsApp row of every finished card (`.complete-crew[data-day]` inside `.complete-wa`,
+  so the card's grid rows did not move), shown while the athlete can post. It opens the composer as a session: *Day 2 done. 47 sessions with
+  Amir.* drafted (`crewSessionDraft()`, the count from `careerMarkCells()`), and **Post waits for a photo**: a finished session reaches the Bell
+  only with one (Amir's rule).
+- **The yes and the switches** (`openCrewSettings()`, from your initials → **Crew and the Bell**, and from *What the crew sees of you*): Yes / No,
+  a switch per kind (`crew_kinds()`: a new level, a week held, a mark, an achievement, a personal best, a cycle finished, the month's honours, the
+  Monthly Open), and what a no does. An athlete Amir ticked **under 13** reads only: no question, no composer, no kudos, no Tell the crew.
+- **The data**: `refreshBell()` after the first paint (1.5 s), when Crew opens (at most every 30 s) and after a post or an answer; the answer is kept
+  in `<id>_crewcache` and `<id>_crewseen` holds the post seen; **neither syncs** (`_snapshot()`).
+- **The guide** (CNT-01): the card *Crew and the Bell* and Crew's line in *Getting around* show only while the tab does (`when: () => crewOn()`, the
+  `<!--crew-->` mark in Getting around).
+- **Tests**: `scripts/headless/crew.js` (45 checks: no tab without an answer, a missing function or in the demo; the dot, the question, the feed's
+  words with no kg, the honours, the board, kudos on and off, the photo at 4:5 and Back, a 3000 × 2250 photo sent as a 1280 × 960 JPEG, Post's
+  words, Tell the crew's draft and its photo rule, the switches, the no, the account door, the guide, never synced, under 13, 320 px in dark mode).
+  The stub (`scripts/headless/stub.js`) answers `get_bell` from `bell`, the crew_* calls like the server, and `leaderboard_top` from `board`.
+
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 
 Home's week used to know only today: a Done pill lasted until midnight (the `<id>_completed_d<N>` stamp) and
