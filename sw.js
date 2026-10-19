@@ -360,16 +360,23 @@
 // list of what you track. The list is the five with no off switch, whatever the athlete chose, and the ways to add another — AA Proof's
 // three add-ons are suggestions among them, beside the ones athletes actually wrote for themselves. Three of their own is the cap,
 // because the server pays for no more.
-// v199: program.html and this worker changed (2026-10-19, Amir: "everything in the crew should ring for everyone: every post, photo,
+// v199: program.html changed (2026-10-19). The photo flow driven with a real file and real finger events for the first time
+//      (scripts/headless/highlight-reel.js section 8, 15 checks) found two things. `hidden` is only a default and a rule that
+//      sets `display` beats it, so the card's picture and the two layers were drawn SIDE BY SIDE and an empty green box sat
+//      beside every card that had no photo. And with a photo on, the sheet grew tall enough that the preview scrolled off the
+//      top while the zoom was in reach: the photo's controls now sit directly under the picture they change, and picking one
+//      scrolls it back into view.
+// v200: program.html and this worker changed (2026-10-19, Amir: "everything in the crew should ring for everyone: every post, photo,
 // like and line"). The crew half of the phone notifications (stage86, written and rehearsed, not applied): a crew notification lands on
 // the Bell rather than on Home — a cold open reads the #crew hash and clears it, and an app already running is FOCUSED and posted a
 // message instead, because navigating a running app is a reload and a reload loses the set log in the page. The Reminders panel's crew
 // line says what it now does.
-// v200: program.html changed (2026-10-19, the Progress tab audit "The Long Rally", Amir: "first fix the bugs"). Four things the
+// v201: program.html changed (2026-10-19, the Progress tab audit "The Long Rally", Amir: "first fix the bugs"). Four things the
 // audit found on Progress: the Why door said "1 reasons", the road's current row said NOW twice (the mono line and the green pill:
 // the line keeps the weeks, the pill keeps the word and is read out now), the Records row shouted "▲ 12 KG" with no period (it
 // says "▲ 12 kg since you started", the Records page's own words), and Amir's Pick drew as a name over an empty card.
-const CACHE = 'aap-v200';
+
+const CACHE = 'aap-v201';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
