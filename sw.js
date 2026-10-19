@@ -351,7 +351,12 @@
 // (direction B, picked from three). The engine is assets/js/habits-core.js, generated from habits.html so the two cannot drift;
 // the keys are AA Proof's own, so no athlete's history moves. The first screen comes with it, for anyone who has never set the
 // habits up. This app is now the writer of <id>_hab_cfg and <id>_hab_log: it pushes them, and merges a day by union.
-const CACHE = 'aap-v196';
+// v197: program.html changed (2026-10-19, Amir: "i want the 7-day habit table ... cut the per habit door ... create the door to the
+// list"). Progress carries the habit half now: days in a row, days this month, the last seven days as a table, and ONE door into the
+// list of what you track. The list is the five with no off switch, whatever the athlete chose, and the ways to add another — AA Proof's
+// three add-ons are suggestions among them, beside the ones athletes actually wrote for themselves. Three of their own is the cap,
+// because the server pays for no more.
+const CACHE = 'aap-v197';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
