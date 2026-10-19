@@ -658,8 +658,11 @@ begin
      order by f.day, f.ref limit 1;
     v_ev := jsonb_build_object('via', 'first', 'n', 1, 'facts', jsonb_build_array(jsonb_build_object('kind', v_kind, 'ref', v_ref)));
 
-  elsif v_test in ('proof', 'best_value') then
-    v_k := case when v_test = 'proof' then public.career_proof_key(p_body ->> 'proof_measure') else public.career_maxpct_key(p_body) end;
+  elsif v_test in ('proof', 'best_value', 'total', 'best_run') then
+    -- stage79: total and best_run read the measure their entry key names (career_entry_keys()), the first step that reaches `at`
+    v_k := case when v_test = 'proof' then public.career_proof_key(p_body ->> 'proof_measure')
+                when v_test = 'best_value' then public.career_maxpct_key(p_body)
+                else (public.career_entry_keys('achievement', p_body, p_ctx))[1] end;
     v_need := public.career_num(case when v_test = 'proof' then p_body -> 'proof_need' else p_body -> 'at' end);
     select x.s into s from jsonb_array_elements(coalesce(p_m -> v_k -> 'steps', '[]'::jsonb)) with ordinality x(s, o)
      where public.career_num(x.s -> 1) >= v_need order by x.o limit 1;
@@ -804,6 +807,23 @@ begin
         if not v_armed and v_away >= v_aw and v_best > 0 then v_armed := true; v_old := v_best; end if;
       end if;
     end loop;
+
+  elsif v_test = 'month_held' then
+    -- stage79: Full Month, the month's honour made personal, by Courtside's own rule (stage75): every training week that ENDS in a calendar
+    -- month (a plan week of a cycle, career_weeks()) has a week_held fact, and there are at least `weeks` of them. Decided once the month is
+    -- over, so a cycle published later can never add a week to a month already awarded. The day is the month's last day.
+    v_need := greatest(coalesce(public.career_num(p_body -> 'weeks'), 4), 1);
+    with wk as (
+      select date_trunc('month', w.wto)::date as m0,
+             exists (select 1 from public.career_facts f where f.athlete_id = p_athlete and f.kind = 'week_held' and f.void_at is null
+                       and f.ref = 'c' || w.cycle_num || '|w' || w.week) as held
+        from public.career_weeks(p_athlete) w
+       where w.wto is not null and coalesce(array_length(w.plan, 1), 0) > 0),
+    ms as (select wk.m0, count(*)::int as weeks, count(*) filter (where wk.held)::int as held from wk group by wk.m0)
+    select ((ms.m0 + interval '1 month')::date - 1), ms.weeks into v_day, v_num from ms
+     where ms.weeks >= v_need and ms.held = ms.weeks and (ms.m0 + interval '1 month')::date <= current_date
+     order by ms.m0 limit 1;
+    v_ev := jsonb_build_object('via', 'month_held', 'n', v_num, 'facts', '[]'::jsonb);
   end if;
 
   if v_day is null then return c_none; end if;
@@ -1698,6 +1718,10 @@ begin
     return array[public.career_maxpct_key(p_body)];
   elsif v_t = 'run_regained' then
     return array['weeks'];
+  elsif v_t = 'total' then      -- stage79: the at-th fact of its kind, counted as a badge of kind total counts it (a capped kind only as paid)
+    return array['count:' || coalesce(p_body ->> 'reads', '')];
+  elsif v_t = 'best_run' then   -- stage79: training weeks held in a row, the run the held_weeks mark walks
+    return array['weeks'];
   end if;
   return '{}'::text[];
 end $function$;
@@ -1740,6 +1764,8 @@ begin
       when 'best_value' then return array['lift_gain'];
       when 'cycle_proving' then return array['personal_best', 'retest_beaten', 'week_held', 'week_broken'];
       when 'run_regained' then return array['week_held', 'week_broken'];
+      when 'total' then return array[p_body ->> 'reads'];                        -- stage79
+      when 'best_run', 'month_held' then return array['week_held', 'week_broken'];   -- stage79
       else return '{}'::text[];
     end case;
   end if;
@@ -3155,7 +3181,10 @@ begin
     begin
       perform public.career_evaluate(v_id, null, p_how);
       v_after := public.career_scored(v_id);
-      select b.score into v_before from backup.career_catalogue_before b where b.athlete_id = v_id;
+      v_before := null;      -- stage79: the go-day's copy only while it exists (it is dropped on 2026-11-01)
+      if to_regclass('backup.career_catalogue_before') is not null then
+        execute 'select b.score from backup.career_catalogue_before b where b.athlete_id = $1' into v_before using v_id;
+      end if;
       v_line := public.career_rewards_line(v_id, coalesce(v_before, v_after), v_after);
     exception when others then
       v_line := jsonb_build_object('athlete_id', v_id, 'ok', false, 'error', sqlerrm);

@@ -80,7 +80,13 @@ athletes active a week was too much. His aim: effort recognised by him and by ot
 picks"*: a Courtside panel at the top of Today's right column, the month's honours at its top in a month's first week, the goal and his line under the
 athlete's name; athletes see the goal, his line and "Amir saw this" with step 3; a tie shares an honour. No XP. **The stage numbers moved by one**
 (`stage74_publish_cycle_label.sql` took 74), and again for step 3's server half (`stage77_career_my_moments.sql`, the athlete's own read of
-Courtside): D20 = stage76, the cut = stage78, Crew = stage79, the Monthly Open = stage80.
+Courtside): D20 = stage76, the cut = stage78, Crew = stage79, the Monthly Open = stage80. The new achievements took stage79 on 2026-10-19, so
+Crew = stage80 and the Monthly Open = stage81.
+
+**The new achievements are LIVE (2026-10-19)** (`supabase/stage79_career_achievements.sql`, rulebook version 5; `PROCEDURES.md` → *Stage 79*): 13 of
+the 15 (Smooth Operator and Showed Up Anyway left out, GAME-5), three new tests (`total`, `best_run`, `month_held`), and a quiet back-pay of 51 awards
+and 7,050 XP to 22 athletes, nobody down. Amir's word: "yes, go live with the 13 new achievements". The Four Courts section and the finish-card nudge
+are next.
 
 **Step 4, the cut, is LIVE (2026-10-19)** (`supabase/stage78_career_cut.sql`, rulebook version 4; `PROCEDURES.md` → *Stage 78*): rank names, titles,
 the Grand Slam, skins and every badge but the four marks left the server; each paying badge award became a nameless XP fact on its day, so all 35
@@ -112,7 +118,7 @@ the cut (a step of its own, three directions, the whole family: the training's f
 - **How the Bell, the photos and the messages look is still open** (*"lets think how we can show bell and community photos and messages on the app,
   this needs to be nice because community is a pillar in our app"*): a design page with three directions comes first (*The Bell*,
   https://claude.ai/artifact/55fbdfUgJVxySL7EpihyWb: A Clubhouse feed, recommended; B a story rail; C a week board). **Amir, the same day: "Bell: go
-  with your picks"**, so stage79 builds: **A, the Clubhouse feed** (one feed on Crew: a photo post is a card with the photo at 4:5, a moment a slim green
+  with your picks"**, so stage80 builds: **A, the Clubhouse feed** (one feed on Crew: a photo post is a card with the photo at 4:5, a moment a slim green
   line, kudos with names, a composer at the top); a photo is **1280 px on its long side, JPEG at 75%, about 200 KB**, its location data taken off, at
   most 3 a day per athlete; **Amir's post stays at the top for a day**; **kudos only, no replies** (a question still goes to WhatsApp); and **"Tell the
   crew" on the finished card** (one button that drafts the session's line, a photo optional). Posts are left out of `BACKUP_TABLES` on purpose (7 days).
@@ -132,6 +138,9 @@ the cut (a step of its own, three directions, the whole family: the training's f
   athletes who already did it get it quietly on the start day (a line in Your moments and its XP, no full-screen moment), **A, Four Courts** (a Next up
   line, the four kinds as four tiles, a tap opens a kind), and the nudge on the finish card ("Hold Thursday and you get Back to Back"). Built after
   the cut: the catalogue as rulebook version 4 (dry run to Amir first), the new fact for Showed Up Anyway in a small stage, then the section.
+  **Live as 13, not 15 (2026-10-19, Amir: "yes, go live with the 13 new achievements")**: Smooth Operator pays for an easier RPE alone and Showed
+  Up Anyway for a check-in answer, both ruled out by GAME-5; the act version of Showed Up Anyway (the first session finished early) would have gone to
+  20 athletes, mostly for a day filed unfinished. So no new fact; rulebook version 5 (not 4: the cut took 4), stage79 (`PROCEDURES.md` → *Stage 79*).
 
 **AA Proof:** frozen as the free door. Its career screens read what the cut deletes, so they are switched off before the cut (its habits keep working).
 The phases 4 to 7 plan outside the repo (`C:\Users\Amir\AA-Career\phases4to7\`) is amended by `AMENDED-LIGHTEST.md` there.

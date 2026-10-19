@@ -6,7 +6,9 @@
 # test (phase 3, rule 18) says how the server decides it, and carries that test's own keys; rule stays as the human text:
 #   first (reads a fact: the first one) · proof (proof_measure + proof_need, as Proof counts it) · goals (goals = [{ kind, need }], as
 #   habits.html EVENTS) · cycle_all_held · cycle_by_the_book · cycle_with_broken · runs_together (habits, run) · best_value (at) ·
-#   patterns_in_cycle (groups) · cycle_proving (bests, retests) · run_regained (away_weeks)
+#   patterns_in_cycle (groups) · cycle_proving (bests, retests) · run_regained (away_weeks) · total (at: the at-th fact read,
+#   counted as a badge counts it, a capped kind only as paid) · best_run (at: weeks held in a row, reads week_held) ·
+#   month_held (weeks: a calendar month whose training weeks were all held, at least that many, once the month is over)
 
 
 # ── Consistency ───────────────────────────────────────────────────────────────────────────────────────────────────
@@ -62,6 +64,34 @@ free = true
 origin = "new"
 
 
+# Version 5 (Career Mode round 5, Amir 2026-10-19: "Achievements: go with your picks"): new, dated from the version's start day (D20).
+[achievement.back_to_back]
+name = "Back to Back"
+meaning = "consistency"
+reads = "week_held"
+test = "best_run"
+at = 2
+rule = "Two training weeks held in a row, the first time."
+xp = 150
+size = "highlight"
+caption = "Two held weeks in a row. Keep it going."
+free = false
+origin = "new"
+
+[achievement.full_month]
+name = "Full Month"
+meaning = "consistency"
+reads = "week_held"
+test = "month_held"
+weeks = 4
+rule = "Every training week that ends in a calendar month held, and at least four of them (the month's honour Full Month, made personal). Decided once the month is over."
+xp = 400
+size = "milestone"
+caption = "Every week of the month, held. Full Month."
+free = false
+origin = "new"
+
+
 # ── Commitment ────────────────────────────────────────────────────────────────────────────────────────────────────
 
 [achievement.first_cycle]
@@ -97,6 +127,109 @@ rule = "The whole roadmap finished. The fact itself pays 3,000."
 xp = 0
 size = "legend"
 caption = "Every cycle of the roadmap, finished."
+free = false
+origin = "new"
+
+
+# Version 5 (Career Mode round 5, Amir 2026-10-19: "Achievements: go with your picks"): new, dated from the version's start day (D20).
+[achievement.every_rep_counted]
+name = "Every Rep Counted"
+meaning = "commitment"
+reads = "full_log"
+test = "first"
+rule = "The first session with every working set logged as the card asks."
+xp = 50
+size = "win"
+caption = "A session logged in full. Every set counted."
+free = false
+origin = "new"
+
+[achievement.the_notebook]
+name = "The Notebook"
+meaning = "commitment"
+reads = "week_by_the_book"
+test = "first"
+rule = "The first held week with every session logged in full and every check-in answered."
+xp = 200
+size = "highlight"
+caption = "A whole week logged in full, every check-in answered."
+free = false
+origin = "new"
+
+[achievement.extra_mile]
+name = "Extra Mile"
+meaning = "commitment"
+reads = "library_session"
+test = "first"
+rule = "The first Library session done."
+xp = 100
+size = "highlight"
+caption = "A Library session on top of your plan."
+free = false
+origin = "new"
+
+[achievement.extra_innings]
+name = "Extra Innings"
+meaning = "commitment"
+reads = "library_session"
+test = "total"
+at = 5
+rule = "Five Library sessions done (the ones that count: two a week at most)."
+xp = 300
+size = "milestone"
+caption = "Five Library sessions on top of your plan."
+free = false
+origin = "new"
+
+[achievement.straight_talk]
+name = "Straight Talk"
+meaning = "commitment"
+reads = "checkin_done"
+test = "total"
+at = 25
+rule = "25 check-ins answered before a session."
+xp = 150
+size = "highlight"
+caption = "25 honest check-ins. They keep your training right for the day."
+free = false
+origin = "new"
+
+[achievement.season_ticket]
+name = "Season Ticket"
+meaning = "commitment"
+reads = "month_with_amir"
+test = "total"
+at = 3
+rule = "Three whole months since the first session."
+xp = 300
+size = "milestone"
+caption = "Three months with Amir. Staying is what brings results."
+free = false
+origin = "new"
+
+[achievement.half_year]
+name = "Half Year"
+meaning = "commitment"
+reads = "month_with_amir"
+test = "total"
+at = 6
+rule = "Six whole months since the first session."
+xp = 500
+size = "milestone"
+caption = "Six months with Amir. Half a year of work."
+free = false
+origin = "new"
+
+[achievement.year_one]
+name = "Year One"
+meaning = "commitment"
+reads = "month_with_amir"
+test = "total"
+at = 12
+rule = "Twelve whole months since the first session."
+xp = 1000
+size = "legend"
+caption = "A year with Amir. Year one, done."
 free = false
 origin = "new"
 
@@ -162,6 +295,32 @@ free = false
 origin = "new"
 
 
+# Version 5 (Career Mode round 5, Amir 2026-10-19: "Achievements: go with your picks"): new, dated from the version's start day (D20).
+[achievement.moving_up]
+name = "Moving Up"
+meaning = "progress"
+reads = "effort_win"
+test = "first"
+rule = "The first effort-matched win at a cycle's end: a lift heavier, or more reps, at the same effort (2% or more; the This cycle card's win)."
+xp = 100
+size = "highlight"
+caption = "Stronger at the same effort. The plan is working."
+free = false
+origin = "new"
+
+[achievement.rematch_won]
+name = "Rematch Won"
+meaning = "progress"
+reads = "retest_beaten"
+test = "first"
+rule = "The first retest that beats the lift's last test, or its record when there was no test."
+xp = 300
+size = "milestone"
+caption = "Retest beaten. You came back stronger."
+free = false
+origin = "new"
+
+
 # ── Resilience ────────────────────────────────────────────────────────────────────────────────────────────────────
 
 [achievement.kept_going]
@@ -198,6 +357,20 @@ rule = "After four or more weeks away, the held-weeks run reaches its old best a
 xp = 400
 size = "milestone"
 caption = "All the way back to your best run."
+free = false
+origin = "new"
+
+
+# Version 5 (Career Mode round 5, Amir 2026-10-19: "Achievements: go with your picks"): new, dated from the version's start day (D20).
+[achievement.rebound]
+name = "Bounce Back"
+meaning = "resilience"
+reads = "bounce_back"
+test = "first"
+rule = "The first week held straight after a broken one."
+xp = 100
+size = "highlight"
+caption = "A week went wrong. The next one did not."
 free = false
 origin = "new"
 

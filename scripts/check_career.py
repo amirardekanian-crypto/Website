@@ -39,8 +39,9 @@ ERRORS (exit 1)
       paid from its own value (xp_from = "value": the level kept at the XP switch) has meaning "carried" and
       career_only = true, so a stored number never reaches a season's points; "carried" is for such a fact only
   17  best_run badges (phase 3): run is plan_weeks (counts week_held), days (counts habit_done, with a habit) or iso_weeks
-  18  achievements (phase 3): test is one of eleven, with exactly that test's own keys (goals, habits, run, at, groups, bests,
-      retests, away_weeks, proof_measure + proof_need)
+  18  achievements (phase 3): test is one of fourteen, with exactly that test's own keys (goals, habits, run, at, groups, bests,
+      retests, away_weeks, weeks, proof_measure + proof_need); total (at) reads a rulebook fact, best_run (at) and month_held (weeks)
+      read week_held (stage79)
   19  a title's size only on the Grand Slam (meaning "all"), one of the sizes; recognition.toml [moments] has its keys
   21  tiers are APPEND-ONLY once career/tiers.lock.json exists: an entry in the lock keeps its first tiers' metals and is never
       removed (a tier's place in the list is its award's id)
@@ -92,12 +93,12 @@ DOORS = ["coach", "cycle", "athlete"]
 ORIGINS = ["new", "proof"]
 RUNS = ["plan_weeks", "days", "iso_weeks"]    # rule 17: what a best_run badge's "run" is
 ACHIEVEMENT_TESTS = ["first", "proof", "goals", "cycle_all_held", "cycle_by_the_book", "cycle_with_broken", "runs_together",
-                      "best_value", "patterns_in_cycle", "cycle_proving", "run_regained"]
+                      "best_value", "patterns_in_cycle", "cycle_proving", "run_regained", "total", "best_run", "month_held"]
 # Rule 18: the keys each test carries, and no others (a stray one is an error).
 TEST_PARAMS = {"first": set(), "proof": {"proof_measure", "proof_need"}, "goals": {"goals"}, "cycle_all_held": set(),
                "cycle_by_the_book": set(), "cycle_with_broken": set(), "runs_together": {"habits", "run"},
                "best_value": {"at"}, "patterns_in_cycle": {"groups"}, "cycle_proving": {"bests", "retests"},
-               "run_regained": {"away_weeks"}}
+               "run_regained": {"away_weeks"}, "total": {"at"}, "best_run": {"at"}, "month_held": {"weeks"}}
 PARAM_KEYS = set().union(*TEST_PARAMS.values())
 GOAL_KINDS = ["daysHit:<habit>", "total:<habit>", "qualify", "perfect", "comebacksStuck", "comebackRun"]
 MOMENT_KEYS = ["per_open", "keep_days", "max", "full_screen"]
@@ -137,7 +138,7 @@ KNOWN_KEYS = {
     "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},
     "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code",
                     "retire_at", "starts_at", "superseded_by", "test", "goals", "habits", "run", "at", "groups", "bests",
-                    "retests", "away_weeks", "proof_measure", "proof_need", "patterns", "qualities", "exclude"},
+                    "retests", "away_weeks", "weeks", "proof_measure", "proof_need", "patterns", "qualities", "exclude"},
     "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id", "retire_at", "superseded_by", "size"},
     "skin": {"name", "from", "origin", "proof_id"},
     "mission": {"name", "slot", "meaning", "asks", "counts", "habit", "measure", "target", "picked_when", "free",
@@ -777,7 +778,7 @@ def check_goals(c, goals, w):
 
 
 def check_test(c, a, w):
-    """Rule 18. Every achievement says how the server decides it: test is one of eleven, and it carries exactly that test's
+    """Rule 18. Every achievement says how the server decides it: test is one of fourteen, and it carries exactly that test's
     keys (the params of another test, or a missing one, is an error)."""
     test = a.get("test")
     if test not in ACHIEVEMENT_TESTS:
@@ -796,6 +797,12 @@ def check_test(c, a, w):
         c.error('test "proof" needs reads = "proof" (rule 18)')
     if test == "best_value" and reads != "lift_gain":
         c.error('test "best_value" reads the fact lift_gain (rule 18)')
+    # stage79: total counts a fact as a badge of kind total counts it (career_measures()' count:<kind>); best_run and month_held walk
+    # the training weeks, so they read week_held and nothing else.
+    if test == "total" and (reads == "proof" or (w.facts is not None and reads not in w.facts)):
+        c.error('test "total" reads a fact from rulebook.toml (reads is the fact it counts) (rule 18)')
+    if test in ("best_run", "month_held") and reads != "week_held":
+        c.error(f'test "{test}" reads the fact week_held (rule 18)')
     if test == "goals":
         if "goals" in a:
             check_goals(c, a["goals"], w)
@@ -829,6 +836,12 @@ def check_test(c, a, w):
     elif test == "run_regained":
         if "away_weeks" in a:
             get_number(c, a, "away_weeks", ge=1, integer=True)
+    elif test in ("total", "best_run"):
+        if "at" in a:
+            get_number(c, a, "at", ge=2, integer=True)   # at 1 is test "first"
+    elif test == "month_held":
+        if "weeks" in a:
+            get_number(c, a, "weeks", ge=1, integer=True)
 
 
 def check_achievements(data, w, rep):

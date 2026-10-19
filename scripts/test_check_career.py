@@ -153,6 +153,9 @@ VALID_TESTS = {
                                      'push = ["push-horizontal", "push-vertical"] }', name="zz_patterns"),
     "cycle_proving": achievement('test = "cycle_proving"\nbests = 3\nretests = 1', name="zz_proving"),
     "run_regained": achievement('test = "run_regained"\naway_weeks = 4', name="zz_regained"),
+    "total": achievement('test = "total"\nat = 5', reads="library_session", name="zz_total"),
+    "best_run": achievement('test = "best_run"\nat = 2', reads="week_held", name="zz_backtoback"),
+    "month_held": achievement('test = "month_held"\nweeks = 4', reads="week_held", name="zz_month"),
 }
 
 
@@ -942,15 +945,15 @@ class CareerCheckerTests(unittest.TestCase):
         self.assertFails("[badge.zz_good]", 'run is for kind "best_run" only', "rule 17")
 
     # ── rule 18: an achievement's test and exactly its keys ───────────────────────────────────────────────────────
-    def test_rule_18_all_eleven_tests_pass(self):
-        self.assertEqual(len(VALID_TESTS), 11)
+    def test_rule_18_all_fourteen_tests_pass(self):
+        self.assertEqual(len(VALID_TESTS), 14)
         for block in VALID_TESTS.values():
             self.append("achievements.toml", block)
         self.assertPasses("OK: 0 errors")
 
     def test_rule_18_every_real_achievement_has_a_test(self):
         text = (self.dir / "achievements.toml").read_text(encoding="utf-8")
-        self.assertEqual(len(re.findall(r"(?m)^test = ", text)), 22)
+        self.assertEqual(len(re.findall(r"(?m)^test = ", text)), 35)
         self.assertEqual(text.count('test = "goals"'), 5)
 
     def test_rule_18_a_missing_or_unknown_test_fails(self):
@@ -962,7 +965,8 @@ class CareerCheckerTests(unittest.TestCase):
 
     def test_rule_18_a_missing_param_fails_for_every_test_that_has_one(self):
         needs = {"proof": "proof_need", "goals": "goals", "runs_together": "run", "best_value": "at",
-                 "patterns_in_cycle": "groups", "cycle_proving": "bests", "run_regained": "away_weeks"}
+                 "patterns_in_cycle": "groups", "cycle_proving": "bests", "run_regained": "away_weeks",
+                 "total": "at", "best_run": "at", "month_held": "weeks"}
         for test, key in needs.items():
             with self.subTest(test=test):
                 self.setUp()
@@ -985,6 +989,23 @@ class CareerCheckerTests(unittest.TestCase):
         self.setUp()
         self.append("achievements.toml", achievement('test = "best_value"\nat = 100', name="zz_notlift"))
         self.assertFails("[achievement.zz_notlift]", 'test "best_value" reads the fact lift_gain')
+
+    def test_rule_18_total_best_run_and_month_held_read_the_right_fact(self):
+        # stage79: total counts a rulebook fact; best_run and month_held walk the training weeks, so they read week_held
+        self.append("achievements.toml", achievement('test = "total"\nat = 5', reads="no_such_fact", name="zz_ghostcount"))
+        self.assertFails("[achievement.zz_ghostcount]", 'test "total" reads a fact from rulebook.toml', "rule 18")
+        for test, line in (("best_run", "at = 2"), ("month_held", "weeks = 4")):
+            with self.subTest(test=test):
+                self.setUp()
+                self.append("achievements.toml", achievement(f'test = "{test}"\n{line}', reads="personal_best", name="zz_weeks"))
+                self.assertFails("[achievement.zz_weeks]", f'test "{test}" reads the fact week_held', "rule 18")
+
+    def test_rule_18_total_and_best_run_start_at_two(self):
+        for test, reads in (("total", "library_session"), ("best_run", "week_held")):
+            with self.subTest(test=test):
+                self.setUp()
+                self.append("achievements.toml", achievement(f'test = "{test}"\nat = 1', reads=reads, name="zz_one"))
+                self.assertFails("[achievement.zz_one]", "at")
 
     def test_rule_18_goals_are_checked(self):
         bad = {"an empty list": "goals = []", "an unknown kind": 'goals = [{ kind = "steps", need = 5 }]',
