@@ -51,6 +51,16 @@ photos"* and *"Let people zoom in or out manually and move their image if they a
   still opens the phone's own sheet inside the tap (Safari refuses it after a wait).
 - **A paragraph never draws past its box** (found by the test on a long month's goal): `rich()` draws only the lines `richH()`
   measured and ends the last one on "…".
+- **The photo flow is driven by the test, not only painted** (2026-10-19): `scripts/headless/highlight-reel.js` section 8 hands the
+  file input a real 12 MP JPEG made in the page, then drags and pinches the picture with PointerEvents and moves the zoom through
+  the slider. It checks the two layers (the ground opaque and lit, the words on clear glass), the downscale to 1440 px, that Share
+  goes off while the finger moves and comes back when it stops, that zoom stops at 4, that a picture dragged past its edge still
+  covers the card, that Share hands over one PNG, Remove, a landscape picture (slack across, none down) and 320 px.
+  ⚠️ **It asks what is on the screen, never `el.hidden`:** `hidden` is a default that any rule setting `display` beats, and both
+  `.hl-img` and `.hl-live` set one — which is how the card's picture and the two layers came to be drawn SIDE BY SIDE, with an
+  empty green box beside every card that had no photo, while `el.hidden` said true. The CSS says it itself now.
+- **The photo's controls sit under the picture they change** (found the same way): with a photo on, the sheet is tall enough that
+  the preview had scrolled off the top by the time the zoom was in reach. Picking a picture also scrolls it back into view.
 - **Tests:** `node scripts/headless/sharecard.js` (11,902 checks over 915 cards: 13 kinds, both sizes, both languages, weights and
   name on and off, long names, and every normal sample once on the athlete's own picture, zoomed and dragged) and
   `node scripts/headless/highlight-reel.js` (62). A change to what a card draws ships with a **CACHE bump** (sharecard.js is in

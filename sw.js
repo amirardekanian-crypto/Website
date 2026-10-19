@@ -355,7 +355,13 @@
 //       the app sends that month as an ISO day; the card read only a `month` the app never set, so both cards drew their eyebrow
 //       with the month missing. They name the month themselves now, in the card's own language (a Farsi card writes the Gregorian
 //       month in Farsi letters, its date still Shamsi), and the test carries the spec shape the app really sends.
-const CACHE = 'aap-v197';
+// v198: program.html changed (2026-10-19). The photo flow driven with a real file and real finger events for the first time
+//      (scripts/headless/highlight-reel.js section 8, 15 checks) found two things. `hidden` is only a default and a rule that
+//      sets `display` beats it, so the card's picture and the two layers were drawn SIDE BY SIDE and an empty green box sat
+//      beside every card that had no photo. And with a photo on, the sheet grew tall enough that the preview scrolled off the
+//      top while the zoom was in reach: the photo's controls now sit directly under the picture they change, and picking one
+//      scrolls it back into view.
+const CACHE = 'aap-v198';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
