@@ -88,6 +88,12 @@ insert into public.career_notes (athlete_id, day, line, award_id, created_at, re
   ('ava_test', '2026-10-17', 'Trained through exam week. Proud of you.', 'badge:held_weeks:1', '2026-10-17 11:00:00+00', null),
   ('gone_test', '2026-10-16', 'Back on it. Good.', null, '2026-10-16 11:00:00+00', null);
 
+-- Crew and the Bell (stage81): only the ANSWER is kept in a backup. The posts, photos, kudos and rings are deleted after 7 days and are
+-- left out of BACKUP_TABLES on purpose (SHORT_LIVED in restore_backup.py), so a restore brings back who said yes and nothing they wrote.
+insert into public.crew_consent (athlete_id, answer, kinds, name, under13, crew_key, answered_at, first_yes_at, yes_since, updated_at) values
+  ('ava_test', 'yes', '{"best": false}', 'Ava T.', false, '11111111-2222-4333-8444-555555555555', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00'),
+  ('gone_test', 'no', '{}', null, false, '22222222-3333-4444-8555-666666666666', '2026-10-18 10:00:00+00', '2026-10-18 09:30:00+00', null, '2026-10-18 10:00:00+00');
+
 -- ── the programmes and what hangs off an athlete ──────────────────────────────────────────────────────────────────────────
 insert into public.programs (athlete_id, data, updated_at, updated_by) values
   ('ava_test', '{"athlete":{"firstName":"Ava","lastName":"Test","goal":"first serve \"speed\" $bk$ and $$ tags \\ backslash"},"cycles":[{"n":1,"startDate":"2026-09-07","endDate":"2026-10-04","weeks":4}],"notes":["پیام فارسی","line\nbreak","emoji 🎾"]}', '2026-10-01 08:00:00+00', 'coach'),

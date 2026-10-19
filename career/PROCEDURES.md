@@ -982,7 +982,16 @@ size, the least XP. It writes nothing and pays nothing.
 
 ## Stage 81: Crew and the Bell, as built (2026-10-19)
 
-**BUILT, NOT APPLIED** (waits for Amir's yes). Round 5, step 5 (`CAREER_MODE.md` → *Round 5*: one feed, the Clubhouse, what rings). The app half is in
+**APPLIED to the live project on 2026-10-19** (Amir: *"yes, go live with Crew and the Bell"*), as the migration `stage81_career_crew`.
+Read back: the five tables with row-level security on, 21 functions, **anon can run none of them**, the eleven an athlete or the coach calls
+are `authenticated`'s and the ten helpers the service role's only, the `crew_level_ring` trigger on `career_scores`, the hourly `crew-sweep`
+job in `cron.job`, the one policy on `crew_consent`, and `coach_erase_person()` listing the five tables with exactly one `to_athlete`
+statement. **All 21 function bodies read back md5-equal to this file.** `get_bell()` answered for an athlete (0 items: nobody had answered
+yet). One fix a minute later, the migration `stage81_crew_clean_tab_fix`: `replace()` takes a LITERAL string, so `E'\\t'` was a backslash
+and a `t`, not a tab, and a tab survived untouched; it is `chr(9)` now, checked on the live project (the Farsi joiner kept, an emoji whole,
+a tab to a space, two line breaks at most, invisibles and control characters gone).
+
+Round 5, step 5 (`CAREER_MODE.md` → *Round 5*: one feed, the Clubhouse, what rings). The app half is in
 program.html (`PROGRAM-APP.md` → *Crew and the Bell*) and shows nothing until this stage answers; coach.html's panel (`COACH_DASHBOARD.md` → *The Bell*)
 hides the same way. **Nothing here pays XP, mints an award or touches the scorer** (GAME-6); its one trigger only writes `crew_rings`.
 

@@ -2151,6 +2151,10 @@ const BACKUP_TABLES = [
   'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
   'career_facts', 'career_rules', 'career_catalogue', 'career_scores', 'career_awards', 'career_recognition',
   'courtside_marks', 'career_honour_months', 'career_honours', 'career_goals', 'career_notes',
+  // Crew and the Bell (stage81): the ANSWER each athlete gave is kept, so a restore knows who said yes. The four short-lived tables
+  // (crew_posts, crew_photos, crew_kudos, crew_rings) are left OUT on purpose: they are deleted after 7 days, and a backup kept 12 weeks
+  // would break that promise in privacy.html 2.12 (SHORT_LIVED in scripts/restore/restore_backup.py; test_restore_backup.py check 2h).
+  'crew_consent',
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
   'library', 'library_categories', 'library_sessions',

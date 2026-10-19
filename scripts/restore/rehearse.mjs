@@ -246,7 +246,7 @@ try {
   const chk2 = await check(B, dirB);
   ok(JSON.stringify(chk2) === JSON.stringify(chk), 'the second run leaves every count as it was');
   const nx = await nextIdsAfterMax(B);
-  ok(nx.n === 7 && nx.bad.length === 0, `all ${nx.n} id counters hand out an id past every restored one`, nx.bad.join('\n'));
+  ok(nx.n === 8 && nx.bad.length === 0, `all ${nx.n} id counters hand out an id past every restored one`, nx.bad.join('\n'));
 
   section('7. the logins come back in two steps; the rows that belong to a login follow');
   const made1 = await recreateLogins(B, reportB, new Set(['buyer_one', 'learner_one', 'ava_test']));

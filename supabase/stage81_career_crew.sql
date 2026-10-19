@@ -155,7 +155,7 @@ $function$;
 create or replace function public.crew_clean(p text) returns text
 language sql immutable set search_path to 'public' as $function$
   select btrim(regexp_replace(
-           regexp_replace(replace(coalesce(p, ''), E'\\t', ' '), E'[\\x01-\\x08\\x0b-\\x1f\\x7f\\u200b\\u200e\\u200f\\u202a-\\u202e\\u2066-\\u2069\\ufeff]', '', 'g'),
+           regexp_replace(replace(coalesce(p, ''), chr(9), ' '), E'[\\x01-\\x08\\x0b-\\x1f\\x7f\\u200b\\u200e\\u200f\\u202a-\\u202e\\u2066-\\u2069\\ufeff]', '', 'g'),
            E'\\n{3,}', E'\n\n', 'g'))
 $function$;
 
