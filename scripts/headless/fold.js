@@ -35,6 +35,7 @@ const card = nm => `[...document.querySelectorAll('#day-view .checklist-item')].
         nameSize: getComputedStyle(n).fontSize, nameLeft: Math.round(n.getBoundingClientRect().left),
         numLeft: Math.round(c.querySelector('.ex-num').getBoundingClientRect().left),
         turn: getComputedStyle(c.querySelector('.item-name .nm-tail'), '::after').transform,
+        nums: (c.querySelector('.ex-numline') || {}).textContent ? c.querySelector('.ex-numline').textContent.replace(/\s+/g, ' ').trim() : '',
         green: Math.round(parseFloat(getComputedStyle(m, '::before').opacity) * 100),
         cls: c.className, style: c.getAttribute('style') || '', body: box ? Math.round(box.getBoundingClientRect().width) : 0 }; })()`);
 
@@ -56,6 +57,26 @@ const card = nm => `[...document.querySelectorAll('#day-view .checklist-item')].
     C.check(`${kind}: once open, nothing is left behind (no pinned height, no folding class)`,
       !open.style && !/folding|closing/.test(open.cls) && !open.cls.includes('collapsed'), JSON.stringify([open.cls, open.style]));
 
+    C.check(`${kind}: the line of numbers reads the same open as closed — the scoreboard's words stay off it`,
+      open.nums === shut.nums && open.nums.length > 4, JSON.stringify({ shut: shut.nums, open: open.nums }));
+    if (kind === 'lift') {
+      // the tempo guide keeps its door (COACH-02): the word 'tempo' is off the line, so the hidden button is
+      // stretched over the digits and they carry the dotted underline
+      const t = await p.evaluate(`(() => { const e = ${card(nm)}.querySelector('.nl-tempo'), b = e.querySelector('.nl-help');
+        const r = e.getBoundingClientRect(), br = b.getBoundingClientRect();
+        return { size: getComputedStyle(b).fontSize, under: getComputedStyle(e).textDecorationLine, w: Math.round(br.width), h: Math.round(br.height),
+          x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; })()`);
+      C.check('lift: the tempo digits are the door — the word is off the line, the target is 44 px, the digits underlined',
+        t.size === '0px' && t.under === 'underline' && t.w >= 44 && t.h >= 44, JSON.stringify(t));
+      await p.mouse.click(t.x, t.y);
+      await p.waitForTimeout(500);
+      // .readiness-modal is the shared overlay class: the readiness check wears it too, hidden, so take the one on screen
+      const help = await p.evaluate(`(() => { const m = [...document.querySelectorAll('.readiness-modal')].find(e => e.getBoundingClientRect().height > 120);
+        return { open: !!m, tempo: !!(m && /tempo/i.test(m.innerText)), card: !${card(nm)}.classList.contains('collapsed') }; })()`);
+      C.check('lift: a tap on them opens How the app works, and leaves the card open', help.open && help.tempo && help.card, JSON.stringify(help));
+      await p.evaluate(() => { const m = [...document.querySelectorAll('.readiness-modal')].find(e => e.getBoundingClientRect().height > 120); const b = m && m.querySelector('button'); if (b) b.click(); });
+      await p.waitForTimeout(400);
+    }
     await p.evaluate(`(() => { toggleExpand(${card(nm)}); })()`);
     await p.waitForTimeout(90);
     const shutting = await read();
