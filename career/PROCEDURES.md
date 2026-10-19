@@ -990,6 +990,10 @@ statement. **All 21 function bodies read back md5-equal to this file.** `get_bel
 yet). One fix a minute later, the migration `stage81_crew_clean_tab_fix`: `replace()` takes a LITERAL string, so `E'\\t'` was a backslash
 and a `t`, not a tab, and a tab survived untouched; it is `chr(9)` now, checked on the live project (the Farsi joiner kept, an emoji whole,
 a tab to a space, two line breaks at most, invisibles and control characters gone).
+Supabase's own security advisors afterwards say exactly what this design means: the four short-lived tables have row-level security
+on with NO policy (nobody reads or writes them directly; every door is a `security definer` function), as the two publish-key tables
+already did; none of the 21 functions has a mutable search path; anon can run none of them; and the eleven an athlete or the coach
+calls are listed as `authenticated`-executable `security definer` functions, which is what they are, each checking identity itself.
 
 Round 5, step 5 (`CAREER_MODE.md` → *Round 5*: one feed, the Clubhouse, what rings). The app half is in
 program.html (`PROGRAM-APP.md` → *Crew and the Bell*) and shows nothing until this stage answers; coach.html's panel (`COACH_DASHBOARD.md` → *The Bell*)
