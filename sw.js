@@ -346,7 +346,11 @@
 //       Monthly Open, the athlete's own card) and three more (a new level, the month's goal, a session). Every achievement can be shared
 //       from Your moments, whenever it was earned. Any card can take the athlete's own photo as its ground, moved and zoomed by hand; the
 //       picture never leaves the phone. The badge, title and quest cards go: the cut took them off the server.
-const CACHE = 'aap-v195';
+// v196: assets/js/sharecard.js changed (2026-10-19). The month's honour and the Monthly Open belong to a calendar month, and
+//       the app sends that month as an ISO day; the card read only a `month` the app never set, so both cards drew their eyebrow
+//       with the month missing. They name the month themselves now, in the card's own language (a Farsi card writes the Gregorian
+//       month in Farsi letters, its date still Shamsi), and the test carries the spec shape the app really sends.
+const CACHE = 'aap-v196';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

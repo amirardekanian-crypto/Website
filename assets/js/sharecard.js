@@ -302,6 +302,11 @@
     months: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'],
   };
   EN.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // The honours and the Monthly Open belong to a CALENDAR month, not to a day, so they are named rather than dated: the app sends
+  // `monthIso` ('2026-09-01') and the card writes the month in its own language. A Farsi card writes the Gregorian month in Farsi
+  // letters — the month the crew competed in — while its date stays Shamsi, as it is on every other card.
+  EN.gMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  FA.gMonths = ['ژانویه', 'فوریه', 'مارس', 'آوریل', 'مه', 'ژوئن', 'ژوئیه', 'اوت', 'سپتامبر', 'اکتبر', 'نوامبر', 'دسامبر'];
 
   // ── 3. Numbers and dates, in the card's language ──────────────────────────────────────────────────────────────────────
   const FA_DIG = '۰۱۲۳۴۵۶۷۸۹';
@@ -353,6 +358,12 @@
     if (lang !== 'fa') return p[2] + ' ' + EN.months[p[1] - 1] + ' ' + p[0];
     const j = toJalali(p[0], p[1], p[2]);
     return n(j[2], 'fa') + ' ' + FA.months[j[1] - 1] + ' ' + n(j[0], 'fa');
+  }
+  // The month a card is about: the name the caller gave, else the one `monthIso` falls in, written in the card's language.
+  function monthOf(d, lang) {
+    if (d && d.month) return String(d.month);
+    const m = String((d && d.monthIso) || '').match(/^(\d{4})-(\d{2})/);
+    return m ? (L(lang).gMonths[+m[2] - 1] || '') : '';
   }
   const isFaText = s => /[\u0600-\u06FF]/.test(String(s || ''));
   // A Latin name inside a Farsi line ("Darya · ۲۵ مهر ۱۴۰۵"): a right-to-left mark after it, or the bidi rules glue the Persian
@@ -1379,8 +1390,8 @@
   // honour: { first, honour ('sessions' | 'improved' | 'full_month' | 'pick'), month, n?, pct?, lift?, place?, field?, date }
   // One of the month's honours (L9). ⚠️ A card never names another athlete: the place and the size of the field, nothing more.
   TPL.honour = function (p, d) {
-    const t = p.t, lang = p.lang, h = t.honourName[d.honour] ? d.honour : 'pick';
-    p.eye(t.honourEye(d.month || ''));
+    const t = p.t, lang = p.lang, h = t.honourName[d.honour] ? d.honour : 'pick', mon = monthOf(d, lang);
+    p.eye(t.honourEye(mon));
     if (h === 'sessions' && d.n > 0) {
       p.lab(t.honourName[h]);
       p.num([{ t: n(d.n, lang) }, { t: ' ' + t.sessions, s: 'small' }], 18);
@@ -1391,17 +1402,17 @@
     } else {
       p.big([[t.honourName[h]]], 0, 2, { size: 146, floor: 0.42 });
     }
-    p.para([[t.honourSub[h](d.month || '')]], 26, { drop: 2 });
+    p.para([[t.honourSub[h](mon)]], 26, { drop: 2 });
     if (d.place > 0 && d.field > 0) p.tag(t.placeOf(t.ord(n(d.place, lang)), n(d.field, lang)), 26);
     p.finish(d.date);
   };
-  TPL.honour.ok = d => !!(d && d.honour && d.month);
+  TPL.honour.ok = d => !!(d && d.honour && (d.month || d.monthIso));
 
   // open: { first, title, how?, value, unit?, place?, field?, month, date }
   // The Monthly Open (stage85). The result is the athlete's own, confirmed by Amir; the board is never drawn, only their place.
   TPL.open = function (p, d) {
     const t = p.t, lang = p.lang;
-    p.eye(t.openEye(d.month || ''));
+    p.eye(t.openEye(monthOf(d, lang)));
     p.lab(d.title || '');
     const parts = [{ t: n(d.value, lang) }];
     if (d.unit) parts.push({ t: ' ' + d.unit, s: 'small' });
@@ -1552,11 +1563,11 @@
     else if (d.kind === 'achievement') s = t.capAchievement(lang === 'fa' && d.nameFa ? d.nameFa : d.name);
     else if (d.kind === 'level') s = t.capLevel(n(d.level, lang));
     else if (d.kind === 'mark') s = t.capMark(n(d.n, lang), t.markWords[d.key] || '');
-    else if (d.kind === 'honour') s = t.capHonour(t.honourName[d.honour] || '', d.month || '');
+    else if (d.kind === 'honour') s = t.capHonour(t.honourName[d.honour] || '', monthOf(d, lang));
     else if (d.kind === 'open') s = t.capOpen(bidi(d.title, lang), n(d.value, lang) + (d.unit ? ' ' + d.unit : ''),
       d.place > 0 && d.field > 0 ? t.placeOf(t.ord(n(d.place, lang)), n(d.field, lang)) : '');
     else if (d.kind === 'player') s = t.capPlayer(n(d.level, lang));
-    else if (d.kind === 'goal') s = t.capGoal(d.month || '');
+    else if (d.kind === 'goal') s = t.capGoal(monthOf(d, lang));
     else if (d.kind === 'session') s = t.capSession(bidi(d.title, lang));
     return (s ? s + ' ' : '') + t.capTail;
   }
