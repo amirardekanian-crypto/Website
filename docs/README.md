@@ -38,6 +38,8 @@ A monolith is its own index: one line per section, each line linking to that sec
 | [`../COACH_DASHBOARD.md`](../COACH_DASHBOARD.md) | [`ref/coach-dashboard/`](ref/coach-dashboard/) | 9 |
 | [`../CODEBASE.md`](../CODEBASE.md) | [`ref/codebase/`](ref/codebase/) | 6 |
 | [`../XP_SYSTEM.md`](../XP_SYSTEM.md) | [`ref/xp-system/`](ref/xp-system/) | 19 |
+| [`../career/PROCEDURES.md`](../career/PROCEDURES.md) | [`ref/career-procedures/`](ref/career-procedures/) | 29 |
+| [`../career/CAREER_MODE.md`](../career/CAREER_MODE.md) | [`ref/career-mode/`](ref/career-mode/) | 17 |
 
 ### The line maps
 
@@ -55,8 +57,6 @@ purest kind: it points at code and restates no rule.
 | [`ref/line-map/habits.md`](ref/line-map/habits.md) | `habits.html` |
 | [`ref/line-map/coach-dashboard.md`](ref/line-map/coach-dashboard.md) | `coach.html` |
 | [`ref/line-map/service-worker.md`](ref/line-map/service-worker.md) | `sw.js` |
-| [`../career/PROCEDURES.md`](../career/PROCEDURES.md) | [`ref/career-procedures/`](ref/career-procedures/) | 29 |
-| [`../career/CAREER_MODE.md`](../career/CAREER_MODE.md) | [`ref/career-mode/`](ref/career-mode/) | 17 |
 
 `SCHEMA.md` is the exception: `scripts/check_parity.py` parses two of its tables, so it stays one file and carries a jump table at the top instead.
 `.claude/COACHING-PRINCIPLES.md` is the other: `scripts/check_rule_index.py` parses its rule index, and that index is already the pattern everything here copies.

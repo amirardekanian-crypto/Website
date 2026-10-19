@@ -71,7 +71,11 @@ section. A reference `INDEX.md` is one line per section — read the index, open
 | **Change the coach dashboard** | [`docs/rules/coach-dashboard.md`](docs/rules/coach-dashboard.md) + the section from [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md); then `node scripts/headless/coach/run.js` |
 | **Change a rule both the coach and the athlete copy** | [`docs/rules/program-app.md`](docs/rules/program-app.md) → *Things that exist more than once*, then `scripts/check_twins.js` |
 | **Write or edit a programme** | the skill (`/program-design`, `/program-assemble`, `/program-edit`) + the RULE INDEX in [`.claude/COACHING-PRINCIPLES.md`](.claude/COACHING-PRINCIPLES.md) + [`docs/rules/coaching.md`](docs/rules/coaching.md). Never touch app code in the same run (PRC-1). |
+| **Onboard a new athlete** | `/athlete-intake` (it pulls their intake form from Gmail), then `/program-roadmap` — run ONCE, and the roadmap is **locked** after it: `/program-design` and `/program-engage` read it, never rewrite it |
+| **The words of a cycle** (messages, notes, teasers) | `/program-engage`, straight after `/program-assemble` Part A — it changes no programming, and all in-app text is ENGLISH |
+| **End of a cycle** | `/cycle-report` — the athlete's WhatsApp report plus the coach-only `## Debrief` in their coaching log, which `/program-design` reads before the next cycle |
 | **Add or change an exercise in the Spine** | `/spine` + [`docs/rules/program-app.md`](docs/rules/program-app.md) → *The Spine*, *Seven pieces, seven jobs* in [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) |
+| **Add a Library session or workout** | `/workout` + [`SCHEMA.md`](SCHEMA.md) → *Library tab — Train section* and *`rx` — the prescription*. Every card carries its Spine entry's exact name and an `exId`, and never its own cues (CUE-7); pre-commit guard 14 fails a card without one |
 | **Apply a database stage** | [`docs/rules/server-and-data.md`](docs/rules/server-and-data.md) + that stage's procedure from [`career/PROCEDURES.md`](career/PROCEDURES.md) (Career Mode) or the file's own header; then the snapshot rule in [`scripts/restore/README.md`](scripts/restore/README.md) |
 | **Anything Career Mode** | [`docs/rules/career.md`](docs/rules/career.md), then [`career/CAREER_MODE.md`](career/CAREER_MODE.md) for the rule GAME-n and [`career/PROCEDURES.md`](career/PROCEDURES.md) for the function |
 | **Reminders / push** | [`docs/rules/push.md`](docs/rules/push.md) |
@@ -84,6 +88,8 @@ section. A reference `INDEX.md` is one line per section — read the index, open
 | **Find a file, or what a file does** | [`MAP.md`](MAP.md), then [`CODEBASE.md`](CODEBASE.md) |
 | **Commit, push, verify the live site** | [`docs/rules/working-with-amir.md`](docs/rules/working-with-amir.md) |
 | **Pick up an audit item** (`REL-01`, `CARD-01`, a COACH-AUDIT §12 item) | the record: [`docs/record/INDEX.md`](docs/record/INDEX.md) |
+| **Find the evidence behind a training decision** | `/sc-research` — not `/deep-research`, for anything in exercise science or a sport |
+| **Product ideas for any app** | `/ideas` — it reads the idea bank and Amir's taste notes first, so nothing is pitched twice |
 | **Restructure or add to the docs themselves** | [`docs/README.md`](docs/README.md) |
 
 If your job is not in that table, the nearest row plus [`MAP.md`](MAP.md) will get you
