@@ -1765,29 +1765,46 @@ dashboard do not change.
     and its white ✓ are gone): it is the invisible tap target, the whole height of the row's left column, and a tap ticks
     everything as before (`onCheckBoxTap()`; a first-timer's tap on a lift still opens it). It keeps its focus outline.
     Then the name (18 px), the line of numbers (15 px, the dose bold, the tempo's hot digits clay), the intent pill.
-  - **A row shows that it opens and closes** (round 2; Amir: *"how can we show in a way that these exercises are clickable?
-    and then can be clicked back to make it small?"*): a drawn chevron (CSS mask, 18 px, `--chev-down`) in the right column
-    on the NAME line, grey ⌄ on a closed row. The ⓘ moves under it to the numbers line, its centre 28 px below the
-    chevron's (a plain ⓘ is a 22 px grey ring, a Because the 28 px clay disc, both 44 px to hit); a row with no ⓘ has just
-    the chevron. The chevron is `.item-main::after`, not a button: the whole row is the tap (`onExerciseRowTap()`), and it
-    lets taps through to the ⓘ. Open, it turns up: a white ⌃ top right of the green head (on a lift's eyebrow line, the ⓘ
-    on the name line under it; on a circuit's or a Library exercise's name line), a grey ⌃ on a warm-up's paper. A done
-    row shows no chevron and keeps its ⓘ centred (a tap still opens it). The closed line of numbers no longer runs under
-    the ⓘ (the old -40 px). `smoke.js` measures every closed row at 390, 390 dark and 320.
+  - **The name carries the chevron** (2026-10-19; Amir: *"The button that shows the exercise cards are openable is in a bad
+    place, everytime i want to click, i click on the i button instead"*; he picked the direction *Name carries it* from
+    https://claude.ai/artifact/65NM4FGazLojSaA9Kuqo6J). Round 2 had drawn the chevron in the right column with the ⓘ 28 px
+    under it, and the ⓘ's 44 px target began about 6 px below the chevron's centre, so a thumb landing low opened About
+    instead of the card. Now the chevron **follows the exercise's name**, like a title that unfolds, and the right column
+    belongs to the ⓘ alone, **centred on the row**: a whole column apart, nothing stacked (`smoke.js` measures the clear
+    space on every closed row at 390, 390 dark and 320; it was 61 px or more). It is drawn on `.nm-tail`, the name's last
+    word (`itemNameHTML()`), so the word, the Coach's Note dot and the chevron never break apart when the name wraps; a card
+    drawn without that span keeps the chevron on the name itself. Still not a button: the whole row is the tap
+    (`onExerciseRowTap()`). Open, it turns over in place. A done row shows no chevron and keeps its ⓘ (a tap still opens it).
+    **The Coach's Note dot now stays when the card opens** (it used to be hidden): taking it away would shift the chevron.
   - **Done**: a receipt. The numeral turns SOLID green (its fill takes the stroke's colour), the name 15 px grey, what was
     done on one 13 px grey line, *4 · 4 · 4 · 4 · RPE 7 7 7 7* (a move with no weight drops the leading *×*).
   - **A warm-up is known by its title, `.is-prep`.** Both block templates (the day and a Library session) add `is-prep`
     when `isPrepBlockTitle()` says so, and every warm-up rule in the block keys on it. `block-warmup` is only
     `blockCategory()`'s colour class, and its index fallback hands it to any unknown title (*Core* at index 6), so it
     must never decide the look: a Core lift would lose its head and its Rest.
-  - **Open, the head** (a lift, and a circuit that logs; a warm-up stays on paper): the cover's green, *● 06* as its
-    eyebrow (mint, no stroke), the name in 28 px capitals, a hairline, then the **scoreboard**: one grid of four equal tracks, each a value
-    over its caption (*4 × 6* SETS×REPS, *7* RPE, *3-1-1* TEMPO, *2:30* REST), then the pill. The captions are in the
-    markup: `renderNumLine()` writes the dose's as `.nl-lab.nl-cap` (so `numLineText()` leaves it out) and RPE's word as
-    `.nl-k`; a circuit's *×2* and *Rounds* are split the same way. The text of the line is unchanged. A caption keeps 12 px
-    clear of the next cell. **An open lift has no tick-all numeral** when it has its own set circles (`:has(.ex-set-log
-    .ex-set-row)`): its number is the eyebrow. A working circuit keeps its numeral on the left of the head, its one *done*
-    (outlined in mint on the green, solid mint once done, no eyebrow), and so does an open Library exercise (no set table).
+  - **Open, the head: THE ROW STAYS PUT** (2026-10-19; Amir: *"i dont like the animation or how the exercise cards openes,
+    i think we need to change that in a way to make it smoother, i feel like everything moves"*; he picked the direction
+    *Stay put*). The head keeps the closed row to the pixel — the same numeral in the same column, the name at the same
+    size, the same line of numbers, the same pill — and **only turns green**. Nothing travels, nothing re-flows, nothing is
+    re-typeset. Gone with the move: the **scoreboard** of four tracks, the *● 06* eyebrow and the 28 px capitals name. The
+    line of numbers IS the scoreboard now, and **the tempo guide's door is the tempo digits themselves** (the hidden
+    *tempo* button is stretched over them and they carry a dotted underline, so the line's text never changes; COACH-02).
+    The difference between the two states is held in **one switch**, the `--head-*` tokens on `.checklist-item` (green,
+    ink, mute, hot, numeral, ring, halo, pill), which every part of the row reads and each reading property transitions —
+    so opening and closing are one fade, in step. A warm-up still stays on paper. **An open lift has no tick-all**: every
+    set has its own circle, so `.check-box` is hidden and the numeral is only drawn (`.item-body` is pinned to the middle
+    column by name, or it would auto-place into the numeral's).
+  - **The card opens and closes on its own height** (`foldCard()`, 260 ms, `cubic-bezier(.4, 0, .2, 1)`): the body is drawn
+    in and out behind a clip and the rows under it ride down and up instead of jumping. The clip is **vertical only**
+    (`clip-path: polygon(...)`, not `overflow: hidden`): a circuit's head is full-bleed by negative side margins and would
+    be cut in while it moves. While a card closes it carries **both** `.collapsed`, so the head is its closed self at once
+    with its colours fading there, and `.closing`, which keeps the body laid out until the box has finished shrinking (the
+    body's layout rules read `:is(:not(.collapsed), .closing)`). Every door into open and close goes through `foldCard()`:
+    the tap (`toggleExpand()`), the fold after the last RPE (`foldWhenDone()`) and a simple item's tick
+    (`toggleCheckOnly()`). **After the last RPE it is one settling, not three**: the card folds, the next one starts
+    opening 110 ms in, and the page waits for the fold to land before it slides — the fold is what moves the next card's
+    top, and a slide sent mid-fold lands short (the finish card's nudge waits for the same reason; `first-timer.js` caught
+    it 75 px high). A phone asking for less motion gets the old instant change. Check: `scripts/headless/fold.js`.
   - **Open, the body** on the paper: the Coach's Note as a pull quote (the clay quote mark on the ring column, 16 px,
     **3 lines**, then *More* with a drawn chevron: `fitNotes()` still decides), **How to do it** as one white rounded row
     (the About sheet's Your history recipe: a green ▶ only with a video, else a list glyph; *HOW TO DO IT* over the count

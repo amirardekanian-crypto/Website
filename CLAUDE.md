@@ -261,9 +261,16 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   the card suggests a weight mid-set. Records → "+ Log a max" (`paintCeilingForm()`) is the one hand-entry door.
 - **The working card** (Fresh Eyes, Amir 2026-09-27; `PROGRAM-APP.md` → *The working card*): a closed card shows
   **no history** (*"no history on the exercise card when not opened"*); its numbers are one line and a pill that says
-  something stays a pill (the green `intent` pill, the check-in's pills); the ⓘ sits at the right end, clay for a
-  Because, a clay dot after the name is a Coach's Note, and the exercise's number sits inside the tick-all ring (Centre Court,
-  Amir 2026-10-12: the day's look is ONE CSS block, `PROGRAM-APP.md` → *Centre Court*). **No Last time box on the open card either** (Amir,
+  something stays a pill (the green `intent` pill, the check-in's pills); the ⓘ has the right column to itself, centred,
+  clay for a Because, a clay dot after the name is a Coach's Note, and the exercise's number is the tick (Centre Court,
+  Amir 2026-10-12: the day's look is ONE CSS block, `PROGRAM-APP.md` → *Centre Court*).
+  **The chevron that opens a card follows the NAME, and an open card is the same row turned green** (Amir, 2026-10-19:
+  *"everytime i want to click, i click on the i button instead"* and *"i feel like everything moves"*; the directions he
+  picked are *Name carries it* and *Stay put*). Nothing in the head moves or changes size when a card opens — the
+  scoreboard, the *● 06* eyebrow and the 28 px capitals name are gone, the line of numbers is the scoreboard — and the
+  body is carried in and out on the card's own height (`foldCard()`, the one door for every open and close;
+  `scripts/headless/fold.js`). The green and the ink are ONE switch, the `--head-*` tokens on `.checklist-item`: a new
+  colour in the row reads them, or it will not fade with the rest. **No Last time box on the open card either** (Amir,
   2026-10-12: *"their last time, is actually already in the reps, weight box"*): last time's weight is each empty kg
   box's LAST, a set that ran over keeps its faint line, the whole history is the ⓘ's **Your history**, and only a
   circuit keeps its strip. The kg box follows the Spine's equipment (`kgWanted()`): hidden, never removed.

@@ -160,7 +160,11 @@ const HIST_MET = H.HISTORY.map(s => Object.assign({}, s, { log: s.log.concat([{ 
     t.check(`${tag}: a warm-up row with no entry has nothing to fold`, !warm.plainFolds && warm.over <= 0, JSON.stringify(warm));
     if (w === 360 && !dark) await shot(p, 'warmup-circuit-360');
 
-    const work = await p.evaluate(`(() => { const c = ${circuitCard('Press and Pull')}; if (c.classList.contains('collapsed')) toggleExpand(c);
+    // a card opens on its own height now (foldCard(), Stay put 2026-10-19), so the open has to land before anything
+    // is measured: mid-fold the body is still behind the clip, with no height of its own to read and nothing to hit
+    await p.evaluate(`(() => { const c = ${circuitCard('Press and Pull')}; if (c.classList.contains('collapsed')) toggleExpand(c); })()`);
+    await p.waitForTimeout(340);
+    const work = await p.evaluate(`(() => { const c = ${circuitCard('Press and Pull')};
       const rows = [...c.querySelectorAll('.round-row')];
       const press = rows.find(r => r.textContent.includes('Dumbbell Bench Press')), row2 = rows.find(r => r.textContent.includes('Single-Arm'));
       const vis = e => !!(e && e.offsetParent && e.getBoundingClientRect().height > 0);

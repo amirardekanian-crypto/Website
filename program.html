@@ -1008,10 +1008,12 @@
   /* Collapsed state is now the DEFAULT — every exercise starts as a thin row
      and expands when tapped. Hides the expandable detail area + the inline
      chip/rest/log/etc. sections that exist on circuits. */
-  .checklist-item.collapsed .weight-log,
-  .checklist-item.collapsed .rpe-row,
-  .checklist-item.collapsed .note-row,
-  .checklist-item.collapsed .round-list { display: none !important; }
+  /* :not(.closing) — a card that is folding shut already carries .collapsed, and its body has to stay drawn behind the
+     clip until the box has finished shrinking (foldCard(), CENTRE COURT 7a). */
+  .checklist-item.collapsed:not(.closing) .weight-log,
+  .checklist-item.collapsed:not(.closing) .rpe-row,
+  .checklist-item.collapsed:not(.closing) .note-row,
+  .checklist-item.collapsed:not(.closing) .round-list { display: none !important; }
 
   /* ── THE EXERCISE CARD ─────────────────────────────────────────────
      Tap-to-expand list view; its layout since 2026-09-27 is "The working card"
@@ -3194,6 +3196,36 @@
   /* 7a. The row. No card: no white, no shadow, no stripe, no press scale; a hairline from the name column between rows. */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item { position: relative; margin-top: 0; margin-bottom: 0; padding: 0; border: 0; border-radius: 0;
     background: transparent; box-shadow: none; overflow: visible; transition: none; }
+
+  /* THE OPEN HEAD IS ONE SWITCH (Stay put, Amir 2026-10-19). An open row is the closed row turned green: nothing moves,
+     nothing changes size, so the only difference is colour. These tokens hold that difference, every part of the row reads
+     them, and each reading property has its own transition — so opening and closing are one fade, in step. The tokens are
+     declared on the card (never on :root: they hold var() and would resolve light there, see THE APP'S ONE COLOUR SET).
+     A warm-up (.is-prep) never flips: green is for work you log. */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item {
+    --head-green: 0;                   /* the green layer's opacity */
+    --head-ink: var(--ink);            /* the name and the line of numbers */
+    --head-mute: var(--grey);          /* the "·" between them, the chevron, a done name and its line, the ⓘ's i */
+    --head-hot: var(--clay-ink);       /* the tempo's hot digits and the Coach's Note dot */
+    --head-num: var(--green-ink);      /* the numeral's stroke, and its fill once the exercise is done */
+    --head-ring: var(--ring);          /* the ⓘ's ring */
+    --head-halo: transparent;          /* a Because's clay disc needs an edge on the green, nothing on the paper */
+    --head-pill: var(--tint); --head-pill-ink: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) {
+    --head-green: 1; --head-ink: #fff; --head-mute: rgba(255,255,255,.78); --head-hot: var(--clay-on-green);
+    --head-num: var(--mint); --head-ring: rgba(255,255,255,.7); --head-halo: rgba(255,255,255,.85);
+    --head-pill: rgba(255,255,255,.14); --head-pill-ink: #fff; }
+
+  /* The card opens and closes ON ITS OWN HEIGHT (foldCard()), so the body is drawn in and out behind a clip and the rows
+     under it ride down and up instead of jumping. The clip is vertical ONLY: a circuit's head is full-bleed by negative
+     side margins, and overflow: hidden would cut it in while it moves. While a card closes it carries BOTH .collapsed (the
+     head is its closed self at once, its colours fading there) and .closing, which keeps the body laid out behind the clip
+     until the box has finished shrinking. */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.folding { transition: height .26s cubic-bezier(.4, 0, .2, 1);
+    clip-path: polygon(-50vw 0, 150vw 0, 150vw 100%, -50vw 100%); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed.closing:not(.round-group) > .ex-detail { display: grid; }
+  :where(#day-view, .step-scroll, #ws-body) .round-group.collapsed.closing > .ex-detail { display: contents; }
+  @media (prefers-reduced-motion: reduce) { :where(#day-view, .step-scroll, #ws-body) .checklist-item.folding { transition: none; } }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:active { transform: none; box-shadow: none; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked[class*="block-"] { background: transparent; border-color: transparent; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]::before { display: none; }
@@ -3201,8 +3233,12 @@
   :where(#day-view, .step-scroll, #ws-body) .section-header-prog.same-name + .checklist-item[class*="block-"]::before { content: ''; display: block; position: absolute;
     z-index: 1; top: 0; bottom: auto; left: calc(var(--g) + 56px); right: 0; width: auto; height: 1px; opacity: 1; background: var(--hair); }
   :where(#day-view, .step-scroll, #ws-body) .section-header-prog.same-name + .checklist-item { margin-top: 18px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item > .item-main { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px;
-    gap: 0 12px; align-items: center; min-height: 74px; padding: 14px var(--g); cursor: pointer; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item > .item-main { position: relative; isolation: isolate; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px;
+    gap: 0 12px; align-items: center; min-height: 74px; padding: 14px var(--g); color: var(--head-ink); cursor: pointer; }
+  /* The green is a LAYER that fades, because a gradient cannot be transitioned: it sits behind the row's own content, and
+     .item-main isolates so that z-index -1 stays inside the row instead of sinking behind the page. */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.is-prep) > .item-main::before { content: ''; position: absolute; z-index: -1; inset: 0;
+    background: var(--hero); opacity: var(--head-green); transition: opacity .22s linear; }
 
   /* The exercise's NUMBER is the tick (P24, Amir r2: "use p24 to number the exercises, so if the exercise is done, the number
      would turn green"): a big outlined numeral, "06", on the left column; solid green once the exercise is done (.checked).
@@ -3215,60 +3251,74 @@
   :where(#day-view, .step-scroll, #ws-body) .check-box::before, :where(#day-view, .step-scroll, #ws-body) .check-box::after,
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .check-box::before, :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .check-box::after { content: none; }
   :where(#day-view, .step-scroll, #ws-body) .check-box:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
-  :where(#day-view, .step-scroll, #ws-body) .item-body { min-width: 0; }
+  /* the middle column by name, never by luck: an open lift hides the tick (every set has its own circle), and without
+     this the body would auto-place into the numeral's 44 px column and the whole row would read one word a line */
+  :where(#day-view, .step-scroll, #ws-body) .item-body { grid-column: 2; min-width: 0; }
   :where(#day-view, .step-scroll, #ws-body) .item-name-row { display: flex; align-items: baseline; gap: 0; }
   /* line-height 12 px: the numeral's own line box stays shorter than the name's, so the baseline match never pushes the
      name down; the glyph overflows it, drawn, untouchable. top: 4px drops it from the shared baseline so its middle sits on
      the middle of the name's capitals (a 22 px figure beside 13 px capitals) */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item .ex-num { position: relative; top: 4px; flex: none; width: 44px; height: auto; margin: 0 12px 0 -56px; padding: 0;
-    text-align: center; pointer-events: none; letter-spacing: 0; transition: none; visibility: visible;
+    text-align: center; pointer-events: none; letter-spacing: 0; visibility: visible;
+    transition: color .22s linear, -webkit-text-stroke-color .22s linear;
     font: 900 32px/12px 'Barlow Condensed', 'AA Barlow Condensed', sans-serif;   /* display: P24 numeral */
-    color: transparent; -webkit-text-stroke: 1.5px var(--green-ink); paint-order: stroke fill; font-variant-numeric: tabular-nums; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { visibility: visible; color: var(--green-ink); }
+    color: transparent; -webkit-text-stroke: 1.5px var(--head-num); paint-order: stroke fill; font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { visibility: visible; color: var(--head-num); }
   :where(#day-view, .step-scroll, #ws-body) .item-name-row .item-name { flex: 1 1 auto; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .item-name { text-decoration: none; color: var(--grey); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item .item-name { min-width: 0; letter-spacing: 0; transition: none; text-decoration: none;
-    font: 600 var(--fs-lead)/22px 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; text-wrap: pretty; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .item-name { text-decoration: none; color: var(--head-mute); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item .item-name { min-width: 0; letter-spacing: 0; transition: color .22s linear; text-decoration: none;
+    font: 600 var(--fs-lead)/22px 'Barlow', sans-serif; color: var(--head-ink); overflow-wrap: anywhere; text-wrap: pretty; }
   /* the old closed-row sizes (.checklist-item.collapsed .item-name 700, .ex-num 22 px; 0,3,0) matched at their weight, so a
      closed row and an open warm-up draw the same name and the same 32 px numeral */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .item-name { font-size: var(--fs-lead); font-weight: 600; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .ex-num { font-size: 32px; }   /* display: P24 numeral */
-  :where(#day-view, .step-scroll, #ws-body) .ex-note-dot { display: inline-block; width: 7px; height: 7px; margin: 0 0 3px 7px; border-radius: 50%; background: var(--clay);
-    vertical-align: middle; }
-  /* Every row shows that it opens and closes (Amir r2: "how can we show in a way that these exercises are clickable? and then
-     can be clicked back to make it small?"): a drawn chevron in the right column, on the NAME line. Closed: a grey ⌄; open: ⌃
-     (white on the green head, grey on a warm-up's paper). It is not a button: the whole row is the tap (onExerciseRowTap()),
-     and it lets taps through to the ⓘ under it. The ⓘ moves down to the numbers line, its centre 28 px under the chevron's.
-     A done row stays quiet: no chevron, its ⓘ centred as before (a tap still opens it). */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed:not(.checked) > .item-main,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-prep:not(.collapsed) > .item-main { align-items: start; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed:not(.checked) > .item-main::after,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-prep:not(.collapsed) > .item-main::after {
-    content: ''; grid-column: 3; grid-row: 1; align-self: start; justify-self: center; width: 44px; height: 22px; pointer-events: none;
-    background-color: var(--grey); -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-prep:not(.collapsed) > .item-main::after { transform: rotate(180deg); }
-  /* the ⓘ on the numbers line: its centre 53 px down the row, 28 under the chevron's (the -17 keeps the row its height).
-     So the line no longer runs under it (the old rule's -40 px, 0,4,0, is matched here) */
+  :where(#day-view, .step-scroll, #ws-body) .ex-note-dot { display: inline-block; width: 7px; height: 7px; margin: 0 0 3px 7px; border-radius: 50%; background: var(--head-hot);
+    vertical-align: middle; transition: background-color .22s linear; }
+  /* the dot stays when the card opens (the old rule above hid it): taking it away would shift the chevron that follows it */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) .ex-note-dot { display: inline-block; }
+  /* THE NAME CARRIES THE CHEVRON (Amir, 2026-10-19: "everytime i want to click, i click on the i button instead"). It used to
+     be drawn in the right column with the ⓘ 28 px below it, and the ⓘ's 44 px target began about 6 px under the chevron's
+     centre, so a thumb that landed low opened About instead of the card. Now the chevron follows the exercise's NAME, like a
+     title that unfolds, and the right column belongs to the ⓘ alone, centred on the row: a whole column apart, nothing
+     stacked. It rides on .nm-tail, the name's last word, so the word, the Coach's Note dot and the chevron never break apart
+     (a card drawn without that span keeps the chevron on the name itself). Still not a button: the whole row is the tap
+     (onExerciseRowTap()). Open, it turns over, in place. A done row stays quiet: no chevron (a tap still opens it). */
+  :where(#day-view, .step-scroll, #ws-body) .nm-tail { white-space: nowrap; }
+  :where(#day-view, .step-scroll, #ws-body) .item-name .nm-tail::after,
+  :where(#day-view, .step-scroll, #ws-body) .item-name:not(:has(.nm-tail))::after { content: ''; display: inline-block; width: 18px; height: 18px;
+    margin: 0 0 -3px 8px; background-color: var(--head-mute); transition: transform .24s cubic-bezier(.2, .8, .2, 1), background-color .22s linear;
+    -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) .item-name :is(.nm-tail)::after,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) .item-name:not(:has(.nm-tail))::after { transform: rotate(180deg); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed.checked .item-name :is(.nm-tail)::after,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed.checked .item-name:not(:has(.nm-tail))::after { content: none; }
+  @media (prefers-reduced-motion: reduce) { :where(#day-view, .step-scroll, #ws-body) .item-name .nm-tail::after { transition: none; } }
+  /* the line of numbers has the middle column to itself now (the old -40 px, 0,4,0, is matched here) */
   :where(#day-view, .step-scroll, #ws-body) .item-main:has(> .ex-side:not(:empty)) .ex-numline { margin-right: 0; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed:not(.checked) .ex-side,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-prep:not(.collapsed) .ex-side { align-self: start; margin: 17px 0 -17px; }
   :where(#day-view, .step-scroll, #ws-body) .ex-doneline { display: none; }
   /* the line of numbers: 15 px, the dose bold, "·" between the parts; the tempo's hot digits clay */
   :where(#day-view, .step-scroll, #ws-body) .ex-numline { display: flex; flex-wrap: wrap; align-items: baseline; margin: 4px 0 0; letter-spacing: 0;
-    font: 500 var(--fs-body)/20px 'Barlow', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+    font: 500 var(--fs-body)/20px 'Barlow', sans-serif; color: var(--head-ink); font-variant-numeric: tabular-nums;
+    transition: color .22s linear; }
   :where(#day-view, .step-scroll, #ws-body) .ex-numline > span:not(:last-child)::after { content: none; }
-  :where(#day-view, .step-scroll, #ws-body) .ex-numline > span + span::before { content: '\00B7'; margin: 0 7px; font-weight: 400; color: var(--grey); }
-  :where(#day-view, .step-scroll, #ws-body) .ex-numline b { font-weight: 700; color: var(--ink); }
-  :where(#day-view, .step-scroll, #ws-body) .ex-numline .t-hot { color: var(--clay-ink); font-weight: 700; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-numline > span + span::before { content: '\00B7'; margin: 0 7px; font-weight: 400; color: var(--head-mute); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-numline b { font-weight: 700; color: var(--head-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-numline .t-hot { color: var(--head-hot); font-weight: 700; transition: color .22s linear; }
   :where(#day-view, .step-scroll, #ws-body) .nl-cap { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .nl-lab,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-prep .nl-lab { display: none; }
+  /* The line reads the same open or closed, so the scoreboard's words stay off it for good. The tempo guide keeps its door
+     (COACH-02): on an open card the hidden "tempo" button is stretched over the digits, which carry a dotted underline. */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item .nl-lab { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) .nl-tempo { position: relative;
+    text-decoration: underline dotted var(--head-mute); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) .nl-tempo .nl-help { display: block; position: absolute; inset: -13px -10px;
+    width: auto; margin: 0; padding: 0; border: 0; background: none; font-size: 0; line-height: 0; cursor: pointer; }
   .step-ex-nums .nl-cap { display: none; }   /* Guided's header copies the line: the scoreboard's captions stay off it */
   /* the intent pill, and the lower day's clay pills in its shape */
   :where(#day-view, .step-scroll, #ws-body) .ex-summary { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   :where(#day-view, .step-scroll, #ws-body) .ex-summary:empty { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier { padding: 6px 10px; border-radius: 999px; background: var(--tint); color: var(--green-ink); box-shadow: none;
-    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier { padding: 6px 10px; border-radius: 999px; background: var(--head-pill); color: var(--head-pill-ink); box-shadow: none;
+    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase;
+    transition: background-color .22s linear, color .22s linear; }
   :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier.nocaps { text-transform: none; letter-spacing: 0; }
   :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.rd-pill, :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.rd-tag,
   :where(#day-view, .step-scroll, #ws-body) .rd-tag.rd-item { display: inline-block; margin-left: 0; padding: 6px 10px; border-radius: 999px; box-shadow: none;
@@ -3280,11 +3330,15 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-side { grid-column: 3; grid-row: 1; display: flex; justify-content: center; align-self: center; padding: 0; }
   :where(#day-view, .step-scroll, #ws-body) .ex-side:empty { display: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about { position: relative; z-index: 0; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
-    border: 0; border-radius: 50%; background: none; font: 700 var(--fs-small)/1 'Barlow', sans-serif; color: var(--grey); opacity: 1; }
+    border: 0; border-radius: 50%; background: none; font: 700 var(--fs-small)/1 'Barlow', sans-serif; color: var(--head-mute); opacity: 1;
+    transition: color .22s linear; }
   :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about::after { content: none; }
-  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about::before { content: ''; position: absolute; z-index: -1; inset: 11px; border-radius: 50%; border: 1.5px solid var(--ring); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about::before { content: ''; position: absolute; z-index: -1; inset: 11px; border-radius: 50%; border: 1.5px solid var(--head-ring);
+    transition: border-color .22s linear, box-shadow .22s linear; }
   :where(#day-view, .step-scroll, #ws-body) .ex-about.has-why { background: none; border-color: transparent; color: #fff; font-size: var(--fs-body); }
-  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about.has-why::before { inset: 8px; background: var(--clay-fill); border-color: var(--clay-fill); }
+  /* a Because is the clay disc: on the green it needs an edge of its own, on the paper none (--head-halo) */
+  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about.has-why::before { inset: 8px; background: var(--clay-fill); border-color: var(--clay-fill);
+    box-shadow: 0 0 0 1.5px var(--head-halo); }
   :where(#day-view, .step-scroll, #ws-body) .ex-about:hover, :where(#day-view, .step-scroll, #ws-body) .ex-about:focus-visible { border-color: transparent; }
   :where(#day-view, .step-scroll, #ws-body) .ex-about:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed > .ex-detail, :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed > .note-row { display: none; }
@@ -3293,7 +3347,7 @@
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-main { min-height: 54px; padding-top: 5px; padding-bottom: 5px; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .check-box { width: 44px; height: auto; margin: -5px 0; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-num { font-size: 32px; }   /* display: P24 numeral (the old 18 px is 0,4,0) */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { font: 600 var(--fs-body)/20px 'Barlow', sans-serif; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { font: 600 var(--fs-body)/20px 'Barlow', sans-serif; color: var(--head-mute); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-note-dot { background: var(--ring); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-doneline { display: block; margin-top: 2px; letter-spacing: 0; word-spacing: 1px;
     font: 500 var(--fs-small)/17px 'Barlow', sans-serif; color: var(--grey); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
@@ -3301,88 +3355,36 @@
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-summary { display: none; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-about { opacity: 1; }
 
-  /* 7c. The OPEN card's head, centre court (a lift, and a circuit that logs; a warm-up stays on paper): the hero's green,
-     "● 6" as its eyebrow, the name 28 px capitals, a hairline, the scoreboard (four equal tracks, value over caption), the
-     pill. An open LIFT has no tick-all ring (every set has its own circle under it); a working circuit keeps its ring,
-     its one "done". */
+  /* 7c. The OPEN card's head: THE ROW STAYS PUT (Amir, 2026-10-19: "i dont like the animation or how the exercise cards
+     openes ... i feel like everything moves"; the direction he picked is "Stay put"). The head keeps the closed row to the
+     pixel — the same numeral in the same column, the name at the same size, the same line of numbers, the same pill — and
+     only turns green, through the --head-* tokens in 7a. Nothing travels, nothing re-flows, nothing is re-typeset; the body
+     unfolds underneath on the card's own height (foldCard()), so the rows below ride down instead of jumping. What went
+     with the move: the scoreboard of four tracks, the "● 06" eyebrow and the 28 px capitals name. THE LINE OF NUMBERS IS
+     THE SCOREBOARD now, and the tempo guide's door is the tempo digits themselves (7b). A warm-up stays on paper. */
   /* (the open head's own hairline at its top edge: [class*="block-"] so this ties the row rule's 0,4,1 and wins by order) */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]:not(.collapsed):not(.is-prep)::before,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]:not(.collapsed):not(.is-prep) + .checklist-item[class*="block-"]::before { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) > .item-main { grid-template-areas: "chk name side" ". nums nums" ". pill pill";
-    align-items: center; min-height: 0; padding: 12px var(--g) 14px; background: var(--hero); color: #fff; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-body { display: contents; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .check-box { grid-area: chk; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) > .item-main { grid-template-areas: "name name side" "nums nums nums" "pill pill pill"; }
-  /* only when the card has its own set circles: an open working circuit and an open Library exercise (no set table) keep their
-     tick in the head, the numeral, outlined in mint on the green (solid mint once done) */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]:is(:not(.collapsed), .closing):not(.is-prep)::before,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]:is(:not(.collapsed), .closing):not(.is-prep) + .checklist-item[class*="block-"]::before { display: none; }
+  /* an open lift logs set by set, so it has no tick-all: every set has its own circle, and the numeral is only drawn */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .check-box { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .check-box { margin: -12px 0 -14px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name-row { grid-area: name; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-num { -webkit-text-stroke-color: var(--mint); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked:not(.collapsed):not(.is-prep) .ex-num { color: var(--mint); }
-  /* an open lift (its sets have their own circles): the number is the head's eyebrow, "● 06" in mint, no stroke */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .item-name-row { flex-direction: column;
-    align-items: flex-start; gap: 0; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .ex-num { position: static; display: flex;
-    align-items: center; gap: 8px; width: auto; height: auto; margin: 0 0 6px; visibility: visible; -webkit-text-stroke: 0; text-align: left;
-    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 2px; color: var(--mint); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .ex-num::before { content: ''; width: 7px; height: 7px;
-    border-radius: 50%; background: var(--mint); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name { font: 900 var(--fs-head)/.94 'Barlow Condensed', sans-serif; letter-spacing: .4px;
-    text-transform: uppercase; color: #fff; text-wrap: balance; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-note-dot { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-side { grid-area: side; align-self: start; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-about:not(.has-why) { color: #fff; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-side .ex-about:not(.has-why)::before { border-color: rgba(255,255,255,.7); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-side .ex-about.has-why::before { box-shadow: 0 0 0 1.5px rgba(255,255,255,.85); }
-  /* the open head's ⌃, white, top right: on the eyebrow line of a lift, on the name line of a circuit or a Library exercise;
-     the ⓘ under it on the name line (28 px between their centres) */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) > .item-main::after { content: ''; grid-area: side; align-self: start; justify-self: center;
-    width: 44px; height: 22px; margin-top: 2px; pointer-events: none; transform: rotate(180deg); background-color: #fff;
-    -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) > .item-main::after { margin-top: -5px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-side { margin: 19px 0 -19px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .ex-side { margin: 12px 0 -12px; }
-  /* the scoreboard: one grid of four equal tracks under a hairline; each cell a value over its caption (.nl-cap, .nl-k,
-     .nl-lab). A long dose widens only its own track. */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline { grid-area: nums; display: grid; grid-auto-flow: column;
-    grid-template-columns: minmax(25%, max-content); grid-auto-columns: minmax(0, 25%); align-items: stretch; gap: 0; margin: 12px 0 0; padding-top: 12px;
-    border-top: 1px solid rgba(255,255,255,.16); font: 700 var(--fs-head)/.86 'Barlow Condensed', sans-serif; letter-spacing: .3px; color: #fff; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline > span { display: grid; grid-auto-flow: column; grid-template-rows: auto auto;
-    justify-content: start; justify-items: start; align-items: end; row-gap: 7px; min-width: 0; padding: 0; white-space: nowrap; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline > span + span::before { content: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline b { font-weight: 700; color: #fff; padding-right: 16px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-lab,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-k { display: block; grid-row: 2; grid-column: 1 / span 5; white-space: nowrap;
-    font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.72); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-lab.nl-help { position: relative; justify-self: start; padding: 0; border: 0;
-    background: none; cursor: pointer; text-decoration: underline dotted rgba(255,255,255,.6); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
-  /* a caption keeps 12 px clear of the next cell (SETS×REPS ran into RPE at 320 px): its track grows, never the text */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-k,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-lab:not(.nl-help) { padding-right: 12px; }
-  /* the tempo caption opens the tempo guide: its tap area covers the cell */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-help::after { content: ''; position: absolute; left: -12px; right: -12px; top: -34px; bottom: -14px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .t-hot { color: var(--clay-on-green); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-summary { grid-area: pill; margin-top: 14px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-summary-pill.modifier { background: rgba(255,255,255,.14); color: #fff; }
 
   /* 7d. The open card's body, on the paper: Coach's Note, How to do it, the First time line, the set table, then ONE foot
      row (P50): Note on the left, Rest ⏱ with its time on the right. Not sticky. An open Note's box spans the row under it. */
   :where(#day-view, .step-scroll, #ws-body) .ex-detail { padding: 0; border-top: 0; background: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing) > .ex-detail { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
     padding: 0 var(--g) 18px; border-top: 0; background: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) > .ex-detail { border-bottom: 1px solid var(--hair); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > *,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-log > * { grid-column: 1 / -1; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-coach-note { order: -2; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-how { order: -1; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail .ex-log { display: contents; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing):not(.is-prep) > .ex-detail { border-bottom: 1px solid var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing) > .ex-detail > *,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing) > .ex-detail > .ex-log > * { grid-column: 1 / -1; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing) > .ex-detail > .ex-coach-note { order: -2; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing) > .ex-detail > .ex-how { order: -1; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing) > .ex-detail .ex-log { display: contents; }
   :where(#day-view, .step-scroll, #ws-body) .ex-log { margin: 0; border: 0; border-radius: 0; background: none; overflow: visible; }
   /* the foot row: both on the same grid row, the last (Note spans it, so its open box runs under Rest) */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail .note-row,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .note-row { grid-column: 1 / -1; grid-row: 30; align-self: start; margin-top: 14px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-rest-bottom,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-log > .ex-rest-bottom { grid-column: 2; grid-row: 30; align-self: start; justify-self: end;
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing) > .ex-detail .note-row,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing) > .note-row { grid-column: 1 / -1; grid-row: 30; align-self: start; margin-top: 14px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing) > .ex-detail > .ex-rest-bottom,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:is(:not(.collapsed), .closing) > .ex-detail > .ex-log > .ex-rest-bottom { grid-column: 2; grid-row: 30; align-self: start; justify-self: end;
     position: relative; z-index: 1; margin-top: 14px; }
   :where(#day-view, .step-scroll, #ws-body) .ex-rest-bottom { display: flex; justify-content: flex-end; margin-top: 14px; }
 
@@ -3599,15 +3601,15 @@
   :where(#day-view, .step-scroll, #ws-body) .round-group > .ex-detail > .ex-section-label { display: none; }
   /* an open circuit is one grid: its body (display: contents) flows into the card, so the Note (after the body on a warm-up,
      inside the log on a working circuit) and Rest share the last row whichever box they sit in */
-  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 0 var(--g) 16px; }
-  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed):not(.is-prep) { border-bottom: 1px solid var(--hair); }
-  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) > .item-main { grid-column: 1 / -1; margin: 0 calc(-1 * var(--g)); }
-  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) > .ex-detail { display: contents; }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:is(:not(.collapsed), .closing) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 0 var(--g) 16px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:is(:not(.collapsed), .closing):not(.is-prep) { border-bottom: 1px solid var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:is(:not(.collapsed), .closing) > .item-main { grid-column: 1 / -1; margin: 0 calc(-1 * var(--g)); }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:is(:not(.collapsed), .closing) > .ex-detail { display: contents; }
   /* The green head stays first. The body's `display: contents` puts the Coach's Note (order -2, so it leads a card's body) into THIS grid, where
      it sat above the head (Amir, 2026-10-19: "the coach's note for this superset is on top of the card, should be under"). */
-  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) > .item-main { order: -3; }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:is(:not(.collapsed), .closing) > .item-main { order: -3; }
   /* a circuit has no How to do it or Last time row after its note (and a warm-up no pill), so the note gets its own air above the first round's hairline */
-  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) .ex-coach-note { padding-bottom: 12px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:is(:not(.collapsed), .closing) .ex-coach-note { padding-bottom: 12px; }
   :where(#day-view, .step-scroll, #ws-body) .round-list { display: block; margin: 0; }
   :where(#day-view, .step-scroll, #ws-body) .round-row, :where(#day-view, .step-scroll, #ws-body) .round-row.prep { position: relative; display: block; padding: 0; border: 0; color: var(--ink); }
   :where(#day-view, .step-scroll, #ws-body) .round-row::before { content: ''; position: absolute; top: 0; left: 56px; right: calc(-1 * var(--g)); height: 1px; background: var(--hair); }
@@ -3686,23 +3688,17 @@
      mirror them with the day's tokens (which flip on their own). */
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item { border-color: transparent; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked[class*="block-"] { background: transparent; border-color: transparent; }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .item-name { color: var(--ink); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { color: var(--grey); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name { color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .item-name { color: var(--head-ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { color: var(--head-mute); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-num { color: transparent; }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { color: var(--green-ink); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked:not(.collapsed):not(.is-prep) .ex-num,
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .ex-num { color: var(--mint); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-numline { color: var(--ink); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline { color: #fff; }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier { background: var(--tint); color: var(--green-ink); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-summary-pill.modifier { background: rgba(255,255,255,.14); color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { color: var(--head-num); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-numline { color: var(--head-ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier { background: var(--head-pill); color: var(--head-pill-ink); }
   /* the lower day's pills keep their clay fill in dark (they ask to look); the old dark .ex-summary-pill grey is 0,2,1 */
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill:is(.rd-pill, .rd-tag) { background: var(--clay-fill); color: #fff; box-shadow: none; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-coach-note::before { color: var(--clay-ink); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-about { color: var(--grey); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-about { color: var(--head-mute); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-about.has-why { background: none; border-color: transparent; color: #fff; }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-about:not(.has-why) { color: #fff; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-detail { background: none; border-top-color: transparent; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-coach-note { background: none; color: var(--ink); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-log { background: none; border-color: transparent; }
@@ -9372,6 +9368,14 @@ function repCount(ex) {
 // "tempo" and "rest" show once the card is open (.nl-lab). A lower day's check-in takes
 // the RPE out of this line and puts "RPE 7 → 6 today" among the pills (rdTarget()), so
 // the number is still said once. The separators are CSS, so a span can go on its own.
+// The exercise's name for a card, with its LAST WORD in a span: the word, the Coach's Note dot and the chevron drawn after
+// them (CENTRE COURT 7a) then never break apart onto a line of their own. The text of .item-name is untouched by this —
+// every lookup in the app reads it (the set log, the records, the Spine).
+function itemNameHTML(name, note) {
+  const n = esc(name), dot = note ? NOTE_DOT : '', i = n.lastIndexOf(' ');
+  return i < 0 ? `<span class="nm-tail">${n}${dot}</span>`
+               : `${n.slice(0, i + 1)}<span class="nm-tail">${n.slice(i + 1)}${dot}</span>`;
+}
 function renderNumLine(rx, rest) {
   const bits = [];
   const dose = rx.dose ? rx.dose.value + (rx.dose.side ? ' / side' : '') : '';
@@ -9636,7 +9640,7 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" role="button" tabindex="0" aria-label="Tick every set" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')" onkeydown="onCheckBoxKey(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
-        <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}${ex.note ? NOTE_DOT : ''}</div></div>
+        <div class="item-name-row">${numBadge}<div class="item-name">${itemNameHTML(ex.name, ex.note)}</div></div>
         <div class="ex-doneline"></div>
         ${numLine}
         ${setupHtml}
@@ -9797,7 +9801,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" role="button" tabindex="0" aria-label="Tick every round" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')" onkeydown="onCheckBoxKey(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
-        <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}${ex.note ? NOTE_DOT : ''}</div></div>
+        <div class="item-name-row">${numBadge}<div class="item-name">${itemNameHTML(ex.name, ex.note)}</div></div>
         <div class="ex-doneline"></div>
         ${numLine}
       </div>
@@ -9859,8 +9863,8 @@ function toggleCheckOnly(item, day) {
     const rpeRows = item.querySelectorAll('.rpe-row');
     rpeRows.forEach(r => r.classList.toggle('visible', item.classList.contains('checked')));
     // Simple items (no RPE): auto-collapse on check, expand on uncheck.
-    if (item.classList.contains('checked') && !rpeRows.length) { item.classList.add('collapsed'); setTimeout(() => nudgeFinishCard(day), 700); }
-    if (!item.classList.contains('checked'))         { item.classList.remove('collapsed'); fitNotes(item); }
+    if (item.classList.contains('checked') && !rpeRows.length) { foldCard(item, false); setTimeout(() => nudgeFinishCard(day), 700); }
+    if (!item.classList.contains('checked'))         { foldCard(item, true); }
   }
   saveState();
   markTouched(day);
@@ -9877,12 +9881,48 @@ function markTouched(day) {
   localStorage.setItem(ATHLETE_ID + '_touched_d' + day, new Date().toDateString());
 }
 
-// Toggle the .collapsed class (expand/collapse). An opened card's note is measured
-// now that it has a size (fitNotes()).
+// ── OPENING AND CLOSING A CARD: THE ROW STAYS PUT (Amir, 2026-10-19) ──────────────────────────────────────────────
+// "i dont like the animation or how the exercise cards openes ... i feel like everything moves." It was one frame: the head
+// turned green, the number left the left column and became an eyebrow, the name grew to 28 px capitals, the line of numbers
+// became a scoreboard, the controls moved and every row below dropped. Now the head does not move or change size at all
+// (CENTRE COURT 7c) and the card's OWN HEIGHT carries the body in and out, so the rows below ride with it instead of
+// jumping. Every door into open and close comes through foldCard(), so they all move the same way; a phone asking for less
+// motion gets the old instant change. While a card closes it holds BOTH classes: .collapsed, so the head is its closed self
+// at once with its colours fading there, and .closing, which keeps the body laid out behind the clip until the box has
+// finished shrinking.
+const FOLD_MS = 260;
+function prefersNoMotion() { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+// The state change itself, with what has to happen alongside it either way.
+function setFolded(card, open) {
+  card.classList.toggle('collapsed', !open);
+  if (open) fitNotes(card);                                           // the note has a size now, so More can be measured
+  else if (card.dataset.day) paintDoneLines(card.dataset.day);        // what changed while it was open
+}
+function foldCard(card, open) {
+  if (!card) return;
+  if (card._foldAnim) { clearTimeout(card._foldAnim); card._foldAnim = null; }   // a second tap lands on a settled card
+  card.classList.remove('folding', 'closing');
+  card.style.height = '';
+  if (card.classList.contains('collapsed') === !open) return;         // already where it was asked to be
+  if (isLoading || prefersNoMotion()) { setFolded(card, open); return; }
+  const h0 = card.offsetHeight;
+  setFolded(card, open);
+  const h1 = card.offsetHeight;                                       // the end state, measured before anything is painted
+  if (!open) card.classList.add('closing');
+  if (h0 === h1) { card.classList.remove('closing'); return; }
+  card.style.height = h0 + 'px';
+  card.classList.add('folding');
+  void card.offsetHeight;                                             // the start height has to be set before the end one
+  card.style.height = h1 + 'px';
+  card._foldAnim = setTimeout(() => {
+    card.classList.remove('folding', 'closing');
+    card.style.height = '';
+    card._foldAnim = null;
+  }, FOLD_MS + 40);
+}
+// The tap on a row: open what is closed, close what is open.
 function toggleExpand(item) {
-  item.classList.toggle('collapsed');
-  if (!item.classList.contains('collapsed')) fitNotes(item);
-  else if (item.dataset.day) paintDoneLines(item.dataset.day);   // what changed while it was open
+  foldCard(item, item.classList.contains('collapsed'));
   if (item.dataset.day) paintHints(item.dataset.day);
 }
 
@@ -14148,19 +14188,24 @@ function foldWhenDone(card, openStrips) {
   clearTimeout(card._foldT);
   card._foldT = setTimeout(() => {
     if ((typeof STEP !== 'undefined' && STEP) || card.classList.contains('collapsed') || !card.classList.contains('checked')) return;
-    card.classList.add('collapsed');
-    paintDoneLines(card.dataset.day);
     const cards = [...document.querySelectorAll(`.checklist-item[data-day="${card.dataset.day}"]`)];
     const next = cards.slice(cards.indexOf(card) + 1)
       .find(c => !c.classList.contains('checked') && !c.classList.contains('rd-skip'));
-    if (next) {
-      next.classList.remove('collapsed');
-      fitNotes(next);
-      next.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      nudgeFinishCard(card.dataset.day);
+    foldCard(card, false);
+    // nothing left to do: the finish card is the way on, and it waits for the fold too — its place on the page moves
+    // with this card's height, so a nudge sent mid-fold lands short (first-timer.js caught it 75 px high)
+    if (!next) {
+      const nudge = () => nudgeFinishCard(card.dataset.day);
+      if (prefersNoMotion()) nudge(); else setTimeout(nudge, FOLD_MS + 30);
+      paintHints(card.dataset.day); return;
     }
-    paintHints(card.dataset.day);
+    // ONE settling, not three (Stay put, 2026-10-19): the next card starts opening while this one is still folding, and the
+    // page waits for the fold to finish before it slides — the fold is what moves the next card's top, and a slide aimed
+    // mid-fold would land somewhere else. The next card growing below its own top never moves that mark.
+    const openNext = () => { foldCard(next, true); paintHints(card.dataset.day); };
+    const slide    = () => next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (prefersNoMotion()) { openNext(); slide(); }
+    else { setTimeout(openNext, 110); setTimeout(slide, FOLD_MS + 30); }
   }, 700);
 }
 
