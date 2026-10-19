@@ -67,6 +67,11 @@ A NEW rule goes in its area's rules file, one line, with its ID. Its story goes 
   in any `.md`. Two links were already dead when it went in, and sit in the baseline:
   `Content/DESIGN-ATLAS.md` → `app-warmup-preview.jpg` (the file exists nowhere any more) and
   `Content/showreel/README.md` → `../motion/kit/README.md`. Fix either and take its row out.
+- **A prose pointer must name something that is there.** A cross-reference written
+  `` `PROGRAM-APP.md` `` → *The working card*, chained or not, is checked too: the named part
+  must be a heading, a row of that doc's index, or a **bold lead-in**, which is how this repo
+  marks a sub-section where a heading would be too heavy. 159 of them exist; the guard holds
+  every one. Name the section as it reads — *If D19 is ever a no*, not *If D19 is a no*.
 - **A coaching rule ID cited in this layer must exist.** `scripts/check_rule_index.py` does
   that for the skills, the agents and `SCHEMA.md`; it used to cover `CLAUDE.md`, which no
   longer holds those citations, so guard 24 covers `rules/`, this file and `record/INDEX.md`.

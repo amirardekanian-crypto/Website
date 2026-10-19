@@ -18,10 +18,13 @@ What it checks:
      records it bigger (one does: a single phase-3 build record with no sub-headings)
   5. every relative markdown link in a tracked `.md` resolves, unless the baseline
      already records it dead
-  6. a coaching rule ID cited in the new layer exists in the rule index — the check
+  6. every prose cross-reference — "PROGRAM-APP.md -> *The working card*", chained or
+     not — names something that exists in that doc: a heading, a row of its index, or a
+     bold lead-in, which is how this repo marks a sub-section
+  7. a coaching rule ID cited in the new layer exists in the rule index — the check
      `scripts/check_rule_index.py` used to do for `CLAUDE.md`, which no longer holds
      those citations
-  7. every rules file is listed in `docs/README.md` and in `MAP.md`, so the atlas and
+  8. every rules file is listed in `docs/README.md` and in `MAP.md`, so the atlas and
      the layer index cannot go stale
 
 Growing an area means splitting it, not swelling it. If a ceiling is genuinely wrong,
@@ -56,6 +59,32 @@ PRINCIPLES = os.path.join('.claude', 'COACHING-PRINCIPLES.md')
 PREFIXES = ('INT', 'SEL', 'NAM', 'REC', 'SES', 'PRG', 'VOL', 'TST', 'COM', 'CUE', 'CHP', 'PRC')
 RULE_ID = re.compile(r'\b(?:' + '|'.join(PREFIXES) + r')-\d+\b')
 LINK = re.compile(r'\]\((?!https?:|mailto:|#)([^)\s]+?)(#[^)]*)?\)')
+
+# A prose cross-reference: `PROGRAM-APP.md` → *The working card*, optionally chained
+# (`PROCEDURES.md` → *Stage 73* → *To apply*). Every named part must exist in that doc,
+# as a heading, as a row of its index, or as a bold lead-in — which is how this repo
+# marks a sub-section when a heading would be too heavy.
+POINTER = re.compile(r'`?\b([A-Za-z0-9_.-]+\.md)`?\s*(?:→|->)\s*'
+                     r'\*([^*\n]{2,90})\*(?:\s*(?:→|->)\s*\*([^*\n]{2,90})\*)?')
+# doc as written -> (its path, the folder its sections live in)
+POINTED = {
+    'PROGRAM-APP.md': ('PROGRAM-APP.md', 'docs/ref/program-app'),
+    'HABITS.md': ('HABITS.md', 'docs/ref/habits'),
+    'COACH_DASHBOARD.md': ('COACH_DASHBOARD.md', 'docs/ref/coach-dashboard'),
+    'CODEBASE.md': ('CODEBASE.md', 'docs/ref/codebase'),
+    'XP_SYSTEM.md': ('XP_SYSTEM.md', 'docs/ref/xp-system'),
+    'PROCEDURES.md': ('career/PROCEDURES.md', 'docs/ref/career-procedures'),
+    'CAREER_MODE.md': ('career/CAREER_MODE.md', 'docs/ref/career-mode'),
+    'SCHEMA.md': ('SCHEMA.md', None),
+    'QUESTS.md': ('QUESTS.md', None),
+    'FARSI-PRODUCTS.md': ('FARSI-PRODUCTS.md', None),
+    'COACHING-PRINCIPLES.md': ('.claude/COACHING-PRINCIPLES.md', None),
+    'IMAGES.md': ('IMAGES.md', None),
+    'CONTENT-PARITY.md': ('Content/CONTENT-PARITY.md', None),
+    'DESIGN-ATLAS.md': ('Content/DESIGN-ATLAS.md', None),
+    'DESIGN_SYSTEM.md': ('Content/DESIGN_SYSTEM.md', None),
+    'SEO-SOP.md': ('.claude/SEO-SOP.md', None),
+}
 
 problems = []
 
@@ -103,6 +132,58 @@ def rule_ids():
         m = re.match(r'^\|\s*([A-Z]{3}-\d+)\s*\|', line)
         if m:
             out.add(m.group(1))
+    return out
+
+
+def norm_head(s):
+    """a heading, index row or bold lead-in, flattened for comparison"""
+    s = s.lower()
+    s = re.sub(r'\(\d{4}-\d{2}-\d{2}[^)]*\)', ' ', s)
+    s = ''.join(c for c in s if c.isalnum() or c in ' -')
+    return ' '.join(s.split())
+
+
+def doc_parts(name):
+    """every section name a pointer may legitimately use for this doc"""
+    path, folder = POINTED[name]
+    out = set()
+    files = ([os.path.join(REPO, path)] if os.path.exists(os.path.join(REPO, path)) else [])
+    if folder:
+        files += glob.glob(os.path.join(REPO, folder, '**', '*.md'), recursive=True)
+    for f in files:
+        for line in open(f, encoding='utf-8', errors='replace'):
+            if line.startswith('#'):
+                out.add(norm_head(line.lstrip('#')))
+            m = re.match(r'^\|\s*\d+\s*\|\s*\[([^\]]+)\]', line)      # an index row
+            if m:
+                out.add(norm_head(m.group(1)))
+            m = re.match(r'^- \[([^\]]+)\]\(', line)                  # a sub-index row
+            if m:
+                out.add(norm_head(m.group(1)))
+            for m in re.finditer(r'\*\*([^*]{2,110}?)\*\*', line):    # a bold lead-in
+                out.add(norm_head(m.group(1)))
+    return {h for h in out if h}
+
+
+def stale_pointers(root=None):
+    base = root or REPO
+    cache, out = {}, []
+    for f in md_files(root):
+        for i, line in enumerate(open(os.path.join(base, f), encoding='utf-8',
+                                      errors='replace'), 1):
+            for m in POINTER.finditer(line):
+                doc = m.group(1)
+                if doc not in POINTED:
+                    continue
+                parts = cache.setdefault(doc, doc_parts(doc))
+                for sec in (m.group(2), m.group(3)):
+                    if not sec:
+                        continue
+                    n = norm_head(sec)
+                    if not n or n == 'section':   # the illustration in each index's footer
+                        continue
+                    if not any(n == h or n in h or h in n for h in parts):
+                        out.append([f, doc, sec])
     return out
 
 
@@ -162,7 +243,14 @@ def check(root=None, baseline=None):
         if (f, tgt) not in allow_dead:
             bad(f'{f} links to {tgt}, which does not exist. Fix the link or the path.')
 
-    # 6 cited coaching rule IDs
+    # 6 prose cross-references name a section that exists
+    allow_ptr = {tuple(x) for x in bl.get('stale_pointers', [])}
+    for f, doc, sec in stale_pointers():
+        if (f, doc, sec) not in allow_ptr:
+            bad(f'{f} points at {doc} → *{sec}*, which is no heading, index row or bold '
+                'lead-in in that doc. Name the section as it reads, or fix the doc.')
+
+    # 7 cited coaching rule IDs
     if os.path.exists(os.path.join(REPO, PRINCIPLES)):
         known = rule_ids()
         for pat in CITING:
@@ -174,7 +262,7 @@ def check(root=None, baseline=None):
                             bad(f'{p}:{i} cites {rid}, which is not in the rule index '
                                 f'({PRINCIPLES}).')
 
-    # 7 the atlas and the layer index name every rules file
+    # 8 the atlas and the layer index name every rules file
     rules = rules_files()
     for listing in ('docs/README.md', 'MAP.md'):
         if not os.path.exists(os.path.join(REPO, listing)):
@@ -189,7 +277,8 @@ def check(root=None, baseline=None):
 
 
 def update_baseline():
-    bl = {'sizes': {}, 'dead_links': sorted(dead_links())}
+    bl = {'sizes': {}, 'dead_links': sorted(dead_links()),
+           'stale_pointers': sorted(stale_pointers())}
     for p in sorted(md_files()):
         over = ((p == DOOR and size(p) > DOOR_MAX)
                 or (p.startswith('docs/rules/') and size(p) > RULES_MAX)
@@ -221,6 +310,7 @@ def selftest():
             w('docs/README.md', 'one.md\n')
             w('MAP.md', 'one.md\n')
             w('docs/record/INDEX.md', 'record\n')
+            w('SCHEMA.md', '# Schema\n\n## A real one\n\nbody\n')
             w('.claude/COACHING-PRINCIPLES.md',
               '| PRC-1 | a rule | design | |\n## The stories behind the rules\n')
             build(d, w)
@@ -245,6 +335,11 @@ FAULTS = {
     'a dead link': lambda d, w: w('docs/rules/one.md', 'see [gone](../nowhere.md)\n'),
     'an invented rule ID': lambda d, w: w('docs/rules/one.md', 'cites PRC-999\n'),
     'a rules file missing from MAP.md': lambda d, w: w('MAP.md', 'nothing here\n'),
+    'a pointer at a section that is not there':
+        lambda d, w: w('docs/rules/one.md', 'see `SCHEMA.md` -> *no such section here*\n'),
+    'a pointer whose second level is not there':
+        lambda d, w: w('docs/rules/one.md',
+                       'see `SCHEMA.md` -> *a real one* -> *no such second level*\n'),
 }
 
 
@@ -262,7 +357,8 @@ def main():
             print('  ' + p)
         print('\nThe layers are docs/README.md. A ceiling is a ratchet: split, do not swell.')
         return 1
-    print('docs OK: the door, the rules files, the indexes, the reference and every link.')
+    print('docs OK: the door, the rules files, the indexes, the reference, every link '
+          'and every section pointer.')
     return 0
 
 

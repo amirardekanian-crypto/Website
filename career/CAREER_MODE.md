@@ -41,7 +41,7 @@
 > A lift counts toward The Upgrade and Double Up only when its Spine entry is on one of the seven main patterns, carries the strength tag and is not one of the four he named (Cable Face Pull,
 > Machine Reverse Fly, 45° Back Extension, Cable Straight-Arm Pulldown). A main lift logged in pounds or plates counts too, in its own measure. The go-day confirmed the rehearsal: The Upgrade's back-pay is 15,800 XP (not 23,900), every tier on a main strength lift, and Double Up paid none (*round 4, as amended*, below).
 > **The list of four fails closed, on a missing id, and that stays true now it is live:** if any of the four ids has no row in the Spine at all (a typo in the toml, the entry deleted or given a new id), The Upgrade and Double Up count no lift, for everyone, until it is put right, and the database log carries a warning that names the missing id. An entry taken back to draft does not stop them: a draft counts for nothing and keeps its place on the list. So check the four after any edit of those entries (`PROCEDURES.md` → *Stage 73* → *To apply*, step 0).
-> If D19 is ever a no, `PROCEDURES.md` → *Stage 73* → *If D19 is a no* lists what comes out; D18 stands.
+> If D19 is ever a no, `PROCEDURES.md` → *Stage 73* → *If D19 is ever a no* lists what comes out; D18 stands.
 
 ---
 
