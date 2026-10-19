@@ -52,8 +52,9 @@ off in their app settings"*. Two reminders, both opt-out once the phone allows t
 Amir: *"one of the notification rules in my app was that everytime anything happens in the crew, any
 lines, any new image, any likes, any new post, everyone should receive a notification"*, then
 *"Everything in the crew should ring for everyone: every post, photo, like and line. Build it that
-way."* So nothing is dropped and nothing is ranked. The full narration is the header of
-`supabase/stage86_crew_push.sql`.
+way."* So nothing is dropped and nothing is ranked. The full narration is
+[`PROCEDURES.md` → *Stage 86: the crew on a phone*](../ref/career-procedures/30-stage-86-the-crew-on-a-phone.md),
+and the stage file's own header.
 
 - **Everything rings, COLLECTED.** A tick every 15 minutes gathers what an athlete has not been told
   about and sends it as ONE notification ("The crew has been busy · 6 new things to see"). One thing

@@ -68,7 +68,8 @@ files: a procedure never hard-codes a number (GAME-10).
 | 27 | [Stage 82: the emoji beside the Like, as built (2026-10-19)](../docs/ref/career-procedures/27-stage-82-the-emoji-beside-the-like-as-built.md) | 3 KB |
 | 28 | [Stage 83: the Bell's feed only when it has changed (2026-10-19)](../docs/ref/career-procedures/28-stage-83-the-bells-feed-only-when-it-has-changed.md) | 2 KB |
 | 29 | [Stage 85: the Monthly Open, as built (2026-10-19)](../docs/ref/career-procedures/29-stage-85-the-monthly-open-as-built.md) | 6 KB |
+| 30 | [Stage 86: the crew on a phone, as built (2026-10-19, not applied)](../docs/ref/career-procedures/30-stage-86-the-crew-on-a-phone.md) | 11 KB |
 
 ---
 
-*29 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*
+*30 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*
