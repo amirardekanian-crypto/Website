@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 58 tables, 220 functions, 8 sequences.
+-- 58 tables, 221 functions, 8 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -5804,6 +5804,22 @@ begin
                             'days', 7, 'emoji', to_jsonb(public.crew_emoji_list()), 'at', now());
 end $function$;
 
+CREATE OR REPLACE FUNCTION public.get_bell_if_new(p_athlete_id text DEFAULT NULL::text, p_etag text DEFAULT NULL::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v jsonb; v_tag text;
+begin
+  v := public.get_bell(p_athlete_id) - 'at';   -- the clock is not part of what the phone is holding
+  v_tag := md5(v::text);
+  if p_etag is not null and p_etag = v_tag then
+    return jsonb_build_object('same', true, 'etag', v_tag, 'at', now());
+  end if;
+  return v || jsonb_build_object('etag', v_tag, 'at', now());
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.get_course()
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -8870,6 +8886,8 @@ revoke all on function public.get_awards(p_athlete_id text) from public, anon, a
 grant execute on function public.get_awards(p_athlete_id text) to authenticated, service_role;
 revoke all on function public.get_bell(p_athlete_id text) from public, anon, authenticated, service_role;
 grant execute on function public.get_bell(p_athlete_id text) to authenticated, service_role;
+revoke all on function public.get_bell_if_new(p_athlete_id text, p_etag text) from public, anon, authenticated, service_role;
+grant execute on function public.get_bell_if_new(p_athlete_id text, p_etag text) to authenticated, service_role;
 revoke all on function public.get_course() from public, anon, authenticated, service_role;
 grant execute on function public.get_course() to anon, authenticated, service_role;
 revoke all on function public.get_courtside(p_from timestamp with time zone, p_to timestamp with time zone, p_not_clients text[]) from public, anon, authenticated, service_role;
