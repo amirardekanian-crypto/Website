@@ -59,6 +59,36 @@ const sheet = p => p.evaluate(() => {
 const ready = p => p.waitForFunction(() => { const i = document.getElementById('hl-img'), s = document.getElementById('hl-share');
   return i && /^blob:/.test(i.getAttribute('src') || '') && i.complete && i.naturalWidth > 0 && s && !s.disabled; }, null, { timeout: 20000 });
 
+// The athlete's own picture, handed to the file input the way the phone's picker does: a real JPEG made in the page (a camera's
+// megapixels, not a thumbnail), then the change event the app listens for.
+const putPhoto = (p, w, h) => p.evaluate(async ([W, H]) => {
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, '#8FA6B2'); g.addColorStop(0.5, '#C98E6A'); g.addColorStop(1, '#2A2F2B');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  x.fillStyle = 'rgba(255,255,255,0.35)';
+  for (let i = 0; i < 60; i++) x.fillRect((i * 211) % W, (i * 97) % H, W / 12, H / 90);
+  const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.85));
+  const file = new File([blob], 'camera.jpg', { type: 'image/jpeg' });
+  const dt = new DataTransfer(); dt.items.add(file);
+  const input = document.getElementById('hl-ph-file');
+  input.files = dt.files;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+}, [w, h]);
+// The two layers are up and the picture that gets shared has been drawn.
+// The zoom, moved through the control the athlete has, never by reaching into the app.
+const setZoom = (p, z) => p.evaluate(async v => {
+  const el = document.getElementById('hl-ph-z');
+  el.value = String(v);
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  await new Promise(r => setTimeout(r, 450));
+}, z);
+const liveReady = p => p.waitForFunction(() => {
+  const bg = document.getElementById('hl-bg'), s = document.getElementById('hl-share');
+  return bg && bg.width === 1080 && document.getElementById('hl-fg') && s && !s.disabled;
+}, null, { timeout: 20000 });
+
 (async () => {
   const shots = H.outDir();
   const t = H.checker();
@@ -344,6 +374,161 @@ const ready = p => p.waitForFunction(() => { const i = document.getElementById('
     t.check('320 px: the mark\'s sheet has no sideways scroll and every control is 44 px or more', s3.sideways <= 0 && sizes.every(h => h >= 44), JSON.stringify([s3.sideways, sizes]));
     t.check('no page errors (320 px mark sheet)', n.p.errs.length === 0, n.p.errs.join(' | '));
     await n.ctx.close();
+  }
+
+
+  // ── 8. The athlete's own photo behind the card: pick it, drag it, pinch it, share it (2026-10-19) ──
+  // Everything a finger does to the picture, at phone size. The file is a real one, made in the page and handed to the input the
+  // way the phone's picker does, so the whole path runs: FileReader, the downscale on the phone, the two layers, the fit.
+  {
+    const today = ymd(new Date());
+    const seed = { _1rm: [{ lift: 'Barbell Back Squat', kg: 105, w: 90, r: 5, rpe: 9, d: dayAgo(30), t: 1 },
+      { lift: 'Barbell Back Squat', kg: 117.5, w: 100, r: 5, rpe: 9, d: today, t: 0, auto: true }],
+      _ceil_best: { lift: 'Barbell Back Squat', kg: 117.5, prev: 105, d: today, t: Date.now(), i: 0 } };
+    const { ctx, p } = await open(browser, { w: 390, h: 844, prog: prog(-4), hist: [], seed });
+    await p.evaluate(() => renderCeilingLift('Barbell Back Squat')); await p.waitForTimeout(300);
+    await p.click('.ceil-pr .ceil-pr-share'); await ready(p);
+    // ⚠️ `hidden` is a property, not proof: a rule that sets `display` beats it, which is how the picture and the two layers
+    // once drew side by side. Ask what is really on the screen.
+    const before = await p.evaluate(() => { const vis = id => { const e = document.getElementById(id); return !!(e && e.offsetParent && e.getBoundingClientRect().width > 0); };
+      return {
+      live: !vis('hl-live'), img: !vis('hl-img'),
+      btn: (document.getElementById('hl-ph-btn') || {}).textContent, on: (document.getElementById('hl-ph-on') || {}).hidden,
+    }; });
+    t.check('before any picture: the card is one image, the photo row offers "Use your own photo" and nothing else',
+      before.live === true && before.img === false && /Use your own photo/.test(before.btn || '') && before.on === true, JSON.stringify(before));
+
+    // A 12 megapixel portrait, as a phone's camera makes it, handed to the input exactly as the picker does.
+    await putPhoto(p, 3000, 4000);
+    await liveReady(p);
+    const on = await p.evaluate(() => {
+      const vis = id => { const e = document.getElementById(id); return !!(e && e.offsetParent && e.getBoundingClientRect().width > 0); };
+      const bg = document.getElementById('hl-bg'), fg = document.getElementById('hl-fg');
+      // the ground at the middle of the card; the words' layer where no word is drawn (above the top strip, and under the address row)
+      const bx = bg.getContext('2d').getImageData(540, 960, 1, 1).data;
+      const fg1 = fg.getContext('2d').getImageData(540, 100, 1, 1).data[3], fg2 = fg.getContext('2d').getImageData(540, 1800, 1, 1).data[3];
+      return { live: vis('hl-live'), img: !vis('hl-img'),
+        btn: document.getElementById('hl-ph-btn').textContent, on: !document.getElementById('hl-ph-on').hidden,
+        w: bg.width, h: bg.height, bgOpaque: bx[3] === 255, bgLit: bx[0] + bx[1] + bx[2] > 30, fgClear: fg1 === 0 && fg2 === 0,
+        pw: hlPhotoState().pw, ph: hlPhotoState().ph, share: !document.getElementById('hl-share').disabled };
+    });
+    t.check('the picture goes behind the card: two layers at 1080 x 1920, the ground opaque and lit, the words on clear glass, the image gone',
+      on.live && on.img === true && on.w === 1080 && on.h === 1920 && on.bgOpaque && on.bgLit && on.fgClear, JSON.stringify(on));
+    t.check('a 12 MP photo is made smaller on the phone (1440 px on its long side) before anything is drawn',
+      on.ph === 1440 && on.pw === 1080, JSON.stringify([on.pw, on.ph]));
+    t.check('…and the row now offers the zoom, the tip and Remove, with Share ready', on.on && on.share, JSON.stringify([on.on, on.share]));
+
+    // Dragging it: the fit follows the finger, Share waits for the picture to be drawn again, then comes back.
+    await setZoom(p, 2);
+    const drag = await p.evaluate(async () => {
+      const live = document.getElementById('hl-live'), r = live.getBoundingClientRect();
+      const was = hlPhotoState().fit;                              // zoomed in by the slider just now, so there is slack both ways
+      const ev = (type, x, y, id) => live.dispatchEvent(new PointerEvent(type, { pointerId: id || 1, clientX: x, clientY: y, bubbles: true, cancelable: true }));
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      ev('pointerdown', cx, cy);
+      ev('pointermove', cx + 40, cy + 60);
+      const mid = { fit: hlPhotoState().fit, share: !document.getElementById('hl-share').disabled };
+      ev('pointerup', cx + 40, cy + 60);
+      await new Promise(r2 => setTimeout(r2, 700));
+      return { was, mid, after: hlPhotoState().fit, share: !document.getElementById('hl-share').disabled };
+    });
+    t.check('a finger drags the picture: the fit follows it, down and to the right', drag.mid.fit.dx > 0 && drag.mid.fit.dy > 0, JSON.stringify(drag.mid.fit));
+    t.check('…and Share waits for the picture that is shared: off while the finger moves, on again once it is still',
+      drag.mid.share === false && drag.share === true, JSON.stringify([drag.mid.share, drag.share]));
+
+    // Pinching it, and the slider: both end at the same place, both clamped.
+    await setZoom(p, 1);
+    const pinch = await p.evaluate(async () => {
+      const live = document.getElementById('hl-live'), r = live.getBoundingClientRect();
+      const ev = (type, x, y, id) => live.dispatchEvent(new PointerEvent(type, { pointerId: id, clientX: x, clientY: y, bubbles: true, cancelable: true }));
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      ev('pointerdown', cx - 40, cy, 1); ev('pointerdown', cx + 40, cy, 2);
+      ev('pointermove', cx - 120, cy, 1); ev('pointermove', cx + 120, cy, 2);
+      const out = hlPhotoState().fit;
+      ev('pointerup', cx - 120, cy, 1); ev('pointerup', cx + 120, cy, 2);
+      // and the far end of it: four fingers' worth, clamped at 4
+      ev('pointerdown', cx - 10, cy, 3); ev('pointerdown', cx + 10, cy, 4);
+      ev('pointermove', cx - 2000, cy, 3); ev('pointermove', cx + 2000, cy, 4);
+      const far = hlPhotoState().fit.z;
+      ev('pointerup', cx - 2000, cy, 3); ev('pointerup', cx + 2000, cy, 4);
+      const z = document.getElementById('hl-ph-z');
+      z.value = '1.5'; z.dispatchEvent(new Event('input', { bubbles: true }));
+      await new Promise(r2 => setTimeout(r2, 500));
+      return { out, far, slider: hlPhotoState().fit.z, zBox: z.value };
+    });
+    t.check('two fingers zoom it, and the slider says the same thing', pinch.out.z > 1.2 && pinch.slider === 1.5, JSON.stringify(pinch));
+    t.check('zoom stops at 4, however far the fingers go', pinch.far === 4, String(pinch.far));
+
+    // However hard it is dragged, the picture still covers the card: an edge can never show.
+    await setZoom(p, 1.4);
+    const edges = await p.evaluate(async () => {
+      const live = document.getElementById('hl-live'), r = live.getBoundingClientRect();
+      const ev = (type, x, y) => live.dispatchEvent(new PointerEvent(type, { pointerId: 7, clientX: x, clientY: y, bubbles: true, cancelable: true }));
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      ev('pointerdown', cx, cy);                                  // dragged far past where the picture can go
+      ev('pointermove', cx + 4000, cy - 4000);
+      ev('pointerup', cx + 4000, cy - 4000);
+      await new Promise(r2 => setTimeout(r2, 500));
+      const g = document.getElementById('hl-bg').getContext('2d');
+      const px = [[2, 2], [1078, 2], [2, 1918], [1078, 1918], [540, 960]].map(([x, y]) => g.getImageData(x, y, 1, 1).data[3]);
+      return { px, fit: hlPhotoState().fit };
+    });
+    t.check('dragged past its edge the picture still covers the card: no corner is see-through, and the fit stops at 1',
+      edges.px.every(a => a === 255) && edges.fit.dx === 1 && edges.fit.dy === -1, JSON.stringify(edges));
+
+    // What gets shared is the two layers drawn into one.
+    await p.evaluate(() => { window.__shared = []; });
+    await p.waitForFunction(() => !document.getElementById('hl-share').disabled, null, { timeout: 8000 });
+    await p.click('#hl-share');
+    await p.waitForTimeout(500);
+    const sh = await p.evaluate(() => window.__shared);
+    t.check('Share hands the phone ONE png of the card with its picture in it', sh.length === 1 && sh[0].n === 1 && sh[0].type === 'image/png' && sh[0].size > 20000, JSON.stringify(sh));
+
+    // A landscape photo has its slack across, not down: at the size it fills the card, there is nothing to drag it up or down into.
+    await p.evaluate(() => { const b = document.getElementById('hl-ph-off'); if (b) b.click(); });
+    await p.waitForTimeout(300);
+    const off = await p.evaluate(() => { const vis = id => { const e = document.getElementById(id); return !!(e && e.offsetParent && e.getBoundingClientRect().width > 0); };
+      return { live: !vis('hl-live'), img: !vis('hl-img'), photo: hlPhotoState().on }; });
+    t.check('Remove the photo puts the card back as it was', off.live === true && off.img === false && off.photo === false, JSON.stringify(off));
+    await putPhoto(p, 4000, 3000);
+    await liveReady(p);
+    const land = await p.evaluate(() => {
+      const live = document.getElementById('hl-live'), r = live.getBoundingClientRect();
+      const ev = (type, x, y) => live.dispatchEvent(new PointerEvent(type, { pointerId: 9, clientX: x, clientY: y, bubbles: true, cancelable: true }));
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      ev('pointerdown', cx, cy); ev('pointermove', cx + 50, cy + 50); ev('pointerup', cx + 50, cy + 50);
+      return hlPhotoState().fit;
+    });
+    t.check('a landscape picture slides across but not up and down: at the size that fills a Story there is no room to', land.dx > 0 && land.dy === 0, JSON.stringify(land));
+    t.check('no page errors (the photo)', p.errs.length === 0, p.errs.join(' | '));
+    await shot(p, 'photo-390');
+    await ctx.close();
+  }
+
+  // ── 9. The photo controls on the narrowest phone ──
+  {
+    const today2 = ymd(new Date());
+    const seed2 = { _1rm: [{ lift: 'Barbell Back Squat', kg: 105, w: 90, r: 5, rpe: 9, d: dayAgo(30), t: 1 },
+      { lift: 'Barbell Back Squat', kg: 117.5, w: 100, r: 5, rpe: 9, d: today2, t: 0, auto: true }],
+      _ceil_best: { lift: 'Barbell Back Squat', kg: 117.5, prev: 105, d: today2, t: Date.now(), i: 0 } };
+    const { ctx, p } = await open(browser, { w: 320, h: 640, prog: prog(-4), hist: [], seed: seed2 });
+    await p.evaluate(() => renderCeilingLift('Barbell Back Squat')); await p.waitForTimeout(300);
+    await p.click('.ceil-pr .ceil-pr-share'); await ready(p);
+    await putPhoto(p, 3000, 4000);
+    await liveReady(p);
+    const n320 = await p.evaluate(() => { const vis = id => { const e = document.getElementById(id); return !!(e && e.offsetParent && e.getBoundingClientRect().width > 0); };
+      return {
+      one: vis('hl-live') && !vis('hl-img'),
+      sideways: document.documentElement.scrollWidth - window.innerWidth,
+      sizes: [...document.querySelectorAll('#hl-ph-btn, #hl-ph-off, #hl-ph-z input')].filter(b => b.offsetParent).map(b => Math.round(b.getBoundingClientRect().height)),
+      live: Math.round(document.getElementById('hl-live').getBoundingClientRect().width),
+      wide: document.getElementById('hl-live').getBoundingClientRect().width <= window.innerWidth,
+    }; });
+    t.check('320 px: ONE card on the screen (the picture, not the picture beside the plain card), it fits, nothing scrolls sideways, every photo control is 44 px or more',
+      n320.one && n320.sideways <= 0 && n320.wide && n320.sizes.every(h => h >= 44), JSON.stringify(n320));
+    t.check('no page errors (320 px, the photo)', p.errs.length === 0, p.errs.join(' | '));
+    await shot(p, 'photo-320');
+    await ctx.close();
   }
 
   await browser.close();

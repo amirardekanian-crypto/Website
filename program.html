@@ -5165,6 +5165,9 @@
   .hl-prev.is-post .hl-img { height: min(42vh, 380px); aspect-ratio: 4 / 5; }
   .hl-prev.is-busy .hl-img { opacity: .55; }
   /* The athlete's own picture: the ground and the words as two layers, so a finger moving the picture redraws the ground only. */
+  /* ⚠️ `hidden` is only a default: a rule that sets `display` beats it. Both of these set one, so both must say so themselves —
+     without this the card's picture and the two layers were drawn SIDE BY SIDE, and an empty green box sat beside every card. */
+  .hl-prev .hl-img[hidden], .hl-prev .hl-live[hidden] { display: none; }
   .hl-live { position: relative; display: block; width: auto; height: min(50vh, 440px); aspect-ratio: 9 / 16; max-width: 100%; border-radius: 12px; overflow: hidden;
     background: var(--hero); box-shadow: 0 10px 28px rgba(8,45,32,.24); touch-action: none; cursor: grab; }
   .hl-prev.is-post .hl-live { height: min(42vh, 380px); aspect-ratio: 4 / 5; }
@@ -21239,20 +21242,20 @@ function openShareSheet(specs, i) {
     ${specs.length > 1 ? `<div class="hl-pick" role="radiogroup" aria-label="Which card">${specs.map((x, j) =>
       `<button type="button" role="radio" data-j="${j}" aria-checked="${j === _HL.i}">${esc(hlLabel(x))}</button>`).join('')}</div>` : ''}
     <div class="hl-prev is-busy${pr.size === 'post' ? ' is-post' : ''}" id="hl-prev"><img class="hl-img" id="hl-img" alt="" width="1080" height="${pr.size === 'post' ? 1350 : 1920}"><div class="hl-live" id="hl-live" hidden></div><span class="hl-wait">Drawing your card…</span></div>
+    <div class="hl-ph">
+      <button type="button" class="hl-ph-btn" id="hl-ph-btn">Use your own photo</button>
+      <input type="file" id="hl-ph-file" accept="image/*" hidden>
+      <div class="hl-ph-on" id="hl-ph-on" hidden>
+        <label class="hl-ph-z" for="hl-ph-z"><span>Zoom</span><input type="range" id="hl-ph-z" min="1" max="4" step="0.01" value="1"></label>
+        <small class="hl-ph-tip">Drag the picture to move it, pinch to zoom.</small>
+        <button type="button" class="hl-ph-off" id="hl-ph-off">Remove the photo</button>
+      </div>
+    </div>
     <div class="hl-ctl">
       <div class="hl-seg" role="group" aria-label="Size">${seg('size', 'story', 'Story')}${seg('size', 'post', 'Post')}</div>
       <div class="hl-seg" role="group" aria-label="Language">${seg('lang', 'en', 'English')}${seg('lang', 'fa', 'فارسی', ' lang="fa" dir="rtl"')}</div>
       ${tg('weights', 'Show the weights')}
       ${tg('name', 'Show my name')}
-      <div class="hl-ph">
-        <button type="button" class="hl-ph-btn" id="hl-ph-btn">Use your own photo</button>
-        <input type="file" id="hl-ph-file" accept="image/*" hidden>
-        <div class="hl-ph-on" id="hl-ph-on" hidden>
-          <label class="hl-ph-z" for="hl-ph-z"><span>Zoom</span><input type="range" id="hl-ph-z" min="1" max="4" step="0.01" value="1"></label>
-          <small class="hl-ph-tip">Drag the picture to move it, pinch to zoom.</small>
-          <button type="button" class="hl-ph-off" id="hl-ph-off">Remove the photo</button>
-        </div>
-      </div>
     </div>
     <button type="button" class="hl-share" id="hl-share" disabled>Share</button>
     <button type="button" class="hl-save" id="hl-save" disabled>Save image</button>
@@ -21354,6 +21357,9 @@ function hlPhotoPick(f) {
       _HL.photo = url; _HL.pw = w; _HL.ph = h; _HL.fit = { z: 1, dx: 0, dy: 0 };
       hlPhotoUI();
       hlPaint();
+      // The picture is what they are about to move, so bring it back into view: the sheet is taller now, and on a small phone the
+      // preview had scrolled off the top by the time the zoom appeared.
+      try { const pv = document.getElementById('hl-prev'); if (pv && pv.scrollIntoView) pv.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
     };
     im.src = fr.result;
   };
@@ -21390,6 +21396,10 @@ function hlFitDrag(pts, base, live) {
   hlFitMoved();
 }
 function hlSize() { return hlOpts().size === 'post' ? { W: 1080, H: 1350 } : { W: 1080, H: 1920 }; }
+// Where the athlete has put their picture, read-only: how the headless test watches a finger drag and pinch it, and the one way
+// to see the fit from outside this file. It copies, so nothing out there can move the picture without going through the sheet.
+function hlPhotoState() { return { on: !!_HL.photo, fit: Object.assign({}, _HL.fit), pw: _HL.pw, ph: _HL.ph }; }
+window.hlPhotoState = hlPhotoState;
 // The two canvases into the preview, the ground under the words. The ground keeps the id the dragging redraws.
 function hlLiveSwap(bg, fg) {
   const live = document.getElementById('hl-live');
