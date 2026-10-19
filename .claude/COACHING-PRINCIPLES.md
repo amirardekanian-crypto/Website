@@ -109,7 +109,7 @@ stale copy reached athletes.
 | REC-1 | Recovery capacity gates everything: set the weekly volume ceiling before the number of sessions. | roadmap · design | |
 | REC-2 | Low-readiness days: amber, 1 off every RPE (never below 6); red, warm-up, first power and first primary, rest optional; sore, half the jumps and landings. | design · engage | oblig `low-readiness` |
 | REC-3 | Separate training fatigue from life load in every review. | design · report | |
-| REC-4 | Never program past a fatigue wall: every cycle's last week is a back-off, written as that week's week note. | design | ✓ |
+| REC-4 | No two slow weeks in a row: the final week trains as written, except a competition taper or less volume on some lifts for retests. | roadmap · design | ✓ (warn: a back-off with no competition) |
 | REC-5 | A concurrent athlete gets a double-day rule: gym after sport or 4–6 hours apart, otherwise the minimum dose with the primary at RPE 6. | design · engage | oblig `double-day` |
 | REC-6 | High-stress and concurrent athletes also get a flexible session order in their notes. | design · engage | |
 
@@ -236,7 +236,7 @@ stale copy reached athletes.
 | PRC-11 | A gate that waits on someone else holds back one variable, never the whole cycle. | design | |
 | PRC-12 | Every build ends with a coach handoff: measurements, gates, films, dated escalations and decisions made for Amir, each with its reason. | assemble | |
 | PRC-13 | Reassessment is scheduled: every cycle has a set length and a trigger (a primary stalled about two weeks). | design | |
-| PRC-14 | The roadmap is 5 cycles of 5 weeks, each 4 loading weeks and 1 back-off. Deviate only on Amir's word, and say so. | roadmap | |
+| PRC-14 | The roadmap is 5 cycles of 5 weeks. Deviate only on Amir's word, and say so. | roadmap | |
 | PRC-15 | A week note belongs to one week, shows on Home, and its number covers every lift: design sets numbers, engage the words. | design · engage · assemble | ✓ (warn: a scoped number) |
 | PRC-16 | One current athlete profile heads the coaching log: intake drafts it, every run keeps it current, and the checker reads it. | intake · design · edit | warn (missing) |
 | PRC-17 | The roadmap is written once and locked. A change goes through design's `roadmap_amend:` line at the checkpoint, never a quiet rewrite. | roadmap · design | warn (with PRC-28) |
@@ -548,9 +548,24 @@ same ID. Read a rule's story and its history before changing it.
 - `REC-3` **Separate training fatigue from life load** in every review — a readiness dip from
   poor sleep/stress is not the same as training fatigue (Athlete D's end-cycle dip was
   life, not load).
-- `REC-4` **Never program past a fatigue wall** — build a deload/back-off after dense weeks
-  (Athlete D ran 4 sessions in 5 days in C2 and hit a wall). Every cycle's
-  last week is that back-off, written as a week note on the final week (PRC-15).
+- `REC-4` **No two slow weeks in a row** (2026-10-19; until then every cycle's last week was a
+  back-off). Week 1 of every cycle is already slow: the athlete finds weights on new and rotated
+  exercises (SEL-4), and a new athlete or one back from a layoff has a week 1 note (PRG-5). A back-off
+  on the final week put a second slow week straight before it, for no reason. So the final week
+  trains as written, and the next cycle's week 1 is the reset. Two exceptions:
+  - **A competition Amir named** (SES-8) that the cycle ends into: the final week tapers into it.
+    Design writes the spec's `taper:` line (the competition and its date) and the dose as numbers,
+    engage the words, and the note needs no title (the app calls an untitled final-week note the
+    *Back-off week*). A competition inside a cycle gets a titled lighter week before it instead (PRC-15).
+  - **Retests:** a final week that holds the cycle's retests (TST-5) may cut volume on some lifts so
+    the tests go in fresh. It is a titled *Testing week*, and the cut is words with no number, because
+    a number covers every lift (PRC-15). The other lifts train as written.
+  - A fatigue wall mid-cycle is still read from the logs (Athlete D ran 4 sessions in 5 days in C2
+    and hit one): a titled lighter week where the logs show the need (PRC-15), never a default.
+  - `scripts/check_program.py` fails a `taper:` cycle with no back-off on its final week. With no
+    `taper:` line it warns on a number on the final week's note, and on a final-week note when no
+    lift is flagged for a retest. Cycles already published keep the back-off they were written
+    with; the rule applies from each athlete's next cycle.
 - `REC-5` **Concurrent athletes (heavy sport schedule alongside the gym) always get a double-day
   rule in autoregulation.** When most gym days will also be sport days, the program must say
   what to do on one: gym after the sport session, or at least 4–6 h apart; if the gap is
@@ -621,7 +636,8 @@ same ID. Read a rule's story and its history before changing it.
   **A new athlete has no logs yet: design to the form's minutes plus 15** (Amir, same day,
   "form + 15"), unless they said plainly that the time is a hard stop.
 - `SES-8` **No competition calendar unless Amir names one.** Design the 5×5 arc straight through; if an
-  athlete has tournaments or a season that should bend it, Amir says so.
+  athlete has tournaments or a season that should bend it, Amir says so. A cycle that ends into one he
+  named tapers on its final week (REC-4); with none named, no week is a taper.
 - `SES-9` **Sequencing:** power/CNS → primary strength → accessories → corrective/core.
 - `SES-9` **Standard section (block) names** — Activation & Prep → [power] → Primary → Accessory →
   Core → [conditioning]; use these so the app's section headers stay consistent across
@@ -701,7 +717,7 @@ same ID. Read a rule's story and its history before changing it.
   when something is reported. The athlete's job is to hit the RPE and log.
 - `PRG-4` **The RPE printed on a card is the athlete's NORMAL working target and never moves mid-cycle
   — every temporary reduction is explained in the notes, never baked into the prescription.**
-   Week-1 calibration and the back-off week are the cycle's **`weekNotes`**, which the
+   Week-1 calibration and a taper before a competition (REC-4) are the cycle's **`weekNotes`**, which the
   app shows during that week (2026-09-26, Amir: *"update the app in a way that it can show first
   week or last week"*); a low-readiness day, a medication change, a period week are
   **notes-card instructions to the athlete**. None of them is a lower number authored onto the
@@ -1248,7 +1264,7 @@ same ID. Read a rule's story and its history before changing it.
   2026-09-26), and every FAIL is fixed in the spec: the 10-set floor (strength-and-muscle aims only, `--floor`), the
   4-set cap (`--proven` once our logs show more), the new-athlete rules (automatic on a first
   cycle), a banned movement in any exercise or fallback, RPE floors in every note, the week-1
-  and back-off notes (`weekNotes`), back-to-back days, the Spine gate, and (since 2026-09-26) the
+  note and a taper's back-off (`weekNotes`), back-to-back days, the Spine gate, and (since 2026-09-26) the
   continuity checks against the cycle just trained: accessories carried over, a kept dose that
   didn't move, a Disliked / Pain-flagged / Banned ledger exercise brought back. A day past the time
   cap is only a warning (the cap is soft, 2026-09-26), and so is a Quality headline outside the
@@ -1351,8 +1367,8 @@ same ID. Read a rule's story and its history before changing it.
   A second, independent hit the same day: on Athlete P's roadmap the head-coach judge issued
   *"do not add a fifth cycle"* as a binding directive, on the science. It is overruled — fit the
   arc to 5×5 and make the extra block do real work rather than padding it with a retest or a
-  maintenance phase. Each cycle runs **4 loading weeks + 1 back-off week**, which is what
-  satisfies "never program past a fatigue wall" without a mid-cycle deload.
+  maintenance phase. Every week of a cycle trains: the final week is a back-off only when it tapers
+  into a competition Amir named (REC-4; until 2026-10-19 every cycle was 4 loading weeks + 1 back-off).
   **A week note belongs to one week (2026-09-26, widened 2026-10-11).** /program-design decides a special
   week's dose as numbers (how many sets fewer, how many RPE points off, or an RPE cap, never below 6),
   /program-engage writes the athlete's words, and /program-assemble stores both in the cycle's `weekNotes`
@@ -1368,10 +1384,11 @@ same ID. Read a rule's story and its history before changing it.
   for every card. A limit on only some lifts (*new exercises stay at RPE 7, known lifts go to the card*) is
   written in the note's words with no `rpeCap` or `rpeDrop`, and `scripts/check_program.py` warns when a note
   with a number scopes it in words to some lifts.
-  Every cycle has the back-off on its final week, and week 1 has a note when it differs (always for a new
-  athlete). Any other week that differs from the card, a testing week or a reduced-load week, gets its own
-  note with a title (*Testing week*, *Lighter week*). `first` and `last` still read as week 1 and the final
-  week on programmes written before 2026-10-11. `scripts/check_program.py` fails a cycle without its
+  Week 1 has a note when it differs (always for a new athlete), the final week only for a competition taper
+  or its retests (REC-4). Any other week that differs from the card, a testing week or a reduced-load week, gets
+  its own note with a title (*Testing week*, *Lighter week*), and so does a final-week note that is not a taper:
+  the app calls an untitled one the *Back-off week*. `first` and `last` still read as week 1 and the final
+  week on programmes written before 2026-10-11. `scripts/check_program.py` fails a taper cycle without its
   back-off and a new athlete's first cycle without the week 1 note.
 - `PRC-16` **One record of who the athlete is today: the athlete profile.** Goals in order, the bottleneck, days and real minutes, kit, standing bans, injuries with
   their status, recovery, and whether the aim is sport or strength-and-muscle live in a small

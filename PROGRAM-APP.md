@@ -130,6 +130,10 @@ used to exist only if a notes card said so. The pipeline audit that day found 16
 programmes with no back-off wording and no drop in week-5 session RPE across 12 finished cycles.
 Amir: *"update the app in a way that it can show first week or last week"*. On 2026-10-11 he made it
 any week: a note can sit on a test week or a lighter week, and shows only during its own week.
+**Since 2026-10-19 the pipeline writes a final-week back-off only as a taper before a competition Amir
+named** (REC-4: the next cycle's week 1 is already slow); a final week that holds the retests may be a
+titled *Testing week* that cuts some lifts, in words. The app did not change: it still shows whatever
+note a week has, and calls an untitled one on the final week the *Back-off week*.
 - **`cycles[n].weekNotes = { "1": note, "3": note, "5": note }`**: the keys are week numbers (strings),
   each note `{ text, title?, setsDrop?, rpeDrop?, rpeCap? }` (SCHEMA.md → `weekNotes`). **`first` and
   `last` still work** as aliases for week 1 and for the final week (about 35 live programmes were

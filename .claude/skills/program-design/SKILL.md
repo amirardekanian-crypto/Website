@@ -351,15 +351,20 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   Cycle 2 a rotated accessory can be paired), and never a unilateral Primary (SES-10). Spec the
   whole pair as ONE circuit-role entry (the STEP 3 template below), never two accessory-role
   entries carrying `intent: superset` (SES-12).
-- **WEEK NOTES (required output, 2026-09-26; any week since 2026-10-11).** Every cycle is four
-  loading weeks plus a back-off week, and the cards never change, so every week that differs from
-  the card gets a note, decided here as numbers. A note belongs to ONE week and the app shows it only
-  then (`cycles[n].weekNotes`, keyed by week number: SCHEMA.md, PRC-15).
-  - **The final week, every cycle:** the back-off dose. Pick from `setsDrop` (sets fewer on every
-    exercise), `rpeDrop` (RPE points off, never below 6) and `rpeCap` (no set above it, 6–9), and
-    say what else changes: retests on flagged lifts only, no new top sets, a shorter outside day.
-    The usual shape is one set fewer and every RPE at 6 or 7. The one exception is a cycle Amir
-    said has no back-off, and then say so at the checkpoint.
+- **WEEK NOTES (required output, 2026-09-26; any week since 2026-10-11).** The cards never change,
+  so every week that differs from the card gets a note, decided here as numbers. A note belongs to
+  ONE week and the app shows it only then (`cycles[n].weekNotes`, keyed by week number: SCHEMA.md, PRC-15).
+  - **The final week trains as written** (REC-4, since 2026-10-19: no back-off, because the next
+    cycle's week 1 is already slow). **Only when the cycle ends into a competition Amir named**
+    (SES-8) does it taper: write the spec's `taper:` line and the dose. Pick from `setsDrop` (sets
+    fewer on every exercise), `rpeDrop` (RPE points off, never below 6) and `rpeCap` (no set above
+    it, 6–9), and say what else changes: retests on flagged lifts only, no new top sets, a shorter
+    outside day. The usual shape is one set fewer and every RPE at 6 or 7. A competition inside the
+    cycle gets a titled lighter week before it instead (below).
+  - **A final week that holds the retests** (TST-5) may cut volume on some lifts so the tests go in
+    fresh (REC-4): a titled *Testing week*, which lifts test and which lose sets, as words for engage,
+    with no `setsDrop`, `rpeDrop` or `rpeCap` (a number covers every lift, PRC-15). Untitled, the app
+    would call it the *Back-off week*.
   - **Week 1, when it differs:** always for a new athlete, and for a returning one after a
     layoff, a return from injury, or a cycle full of new patterns. Usually an `rpeCap` of 7 or an
     `rpeDrop` of 1, which covers every lift that week (PRC-15), and what moves them back to the card
@@ -497,7 +502,7 @@ so what you write is what ships. You just decide the numbers + the coaching inte
 **OBLIGATIONS (required output, 2026-09-26): name every note this cycle MUST carry.** Engage writes
 each one, tags the card that carries it, and the checker fails a missing one, so a rule that
 lives only as "engage should write a card about X" can no longer slip. List every key that applies:
-- `backoff` — every cycle (carried by the week note on the cycle's final week).
+- `backoff` — only a cycle with a `taper:` line (carried by the week note on its final week, REC-4).
 - `week1` — a new athlete, a layoff, a return from injury, a cycle of new patterns (the week 1 note).
 - `explainer` — a new athlete; a returning one only when the read flags RPE drift or confusion.
 - `pain-ladder: <body part>` — any active injury, rehab stage or managed history.
@@ -640,13 +645,14 @@ week: [the usual training week, e.g. Sat:1, Mon:2, Wed:3 — turns on the back-t
 weeknotes:
 - 1 | [rpeCap 7 / rpeDrop 1 (every lift, PRC-15), and what moves them back to the card] (leave the line out when week 1 is "same as the card")
 - [N] | [title: Testing week / Lighter week] | [the dose, and what changes] (any other week that differs from the card)
-- 5 | [setsDrop 1 · rpeCap 6, plus anything else that changes] (the final week, every cycle)
+- 5 | [setsDrop 1 · rpeCap 6, plus anything else that changes] (the final week, ONLY with a taper: line, REC-4)
+- 5 | Testing week | [which lifts test, which lose sets, in words, no number] (the final week, when it holds the retests and there is no taper)
 bans: [one line, if any]
 floor-except: [muscle (reason), only when the aim is strength-muscle and a muscle is excused]
 reentry: [reason, e.g. "4 weeks off after the cycle ended"; only when the Debrief shows 3+ weeks with no training (VOL-11)]
+taper: [the competition and its date; only when Amir named one this cycle ends into (SES-8, REC-4)]
 obligations:
-- backoff
-- [week1 · explainer · pain-ladder: knee · film: … · weigh-in · double-day · low-readiness · …, one per line]
+- [week1 · explainer · pain-ladder: knee · film: … · weigh-in · double-day · low-readiness · backoff (only with taper:) · …, one per line]
 keep: [exercise (why it stays), … — returning athletes, anything carried over on purpose]
 reintroduce: [exercise (what earned it back), … — only for a Disliked / Pain-flagged / Banned ledger row]
 roadmap_amend: [cycle N: field → new value (the data point that forces it) — only when the locked roadmap must change]
@@ -747,7 +753,7 @@ where to invest if time allows (VOL-1), a muscle under 10 by choice and why (VOL
 (peak, moderate, low: VOL-2). A count that looks wrong for one exercise is fixed on its Spine
 entry (a proposal to Amir, /spine), never by hand in the log.
 
-**Week notes** — each as decided: week, title, numbers (one line each: week 1, the final week, and any testing or reduced-load week).
+**Week notes** — each as decided: week, title, numbers (one line each: week 1, a taper on the final week, and any testing or reduced-load week).
 ```
 *(Progression levers and an e1RM section used to close the entry. Amir doesn't read them, so they
 went on 2026-09-26. An e1RM that drove a decision belongs in "The read", with its grade.)*

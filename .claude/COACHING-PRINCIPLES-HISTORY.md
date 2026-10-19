@@ -132,6 +132,10 @@ the principles (their *How to add*).
   - 2026-06-15
 - `REC-4` **Never program past a fatigue wall**
   - 2026-06-15
+- `REC-4` **No two slow weeks in a row.**
+  - Amir, 2026-10-19, while reviewing a Career Mode design, verbatim: "the backoff week doesnt mean anything unless the person has a competition. on top of this in a new cycle my client get a slow starting week. it would be 2 slow week for no reason and thats not something i want for them".
+  - Until then every cycle ended on a back-off week (4 loading weeks + 1, PRC-14), `check_program.py` failed a cycle without one, and the next cycle opened with its own slow week 1 (weights found on new and rotated exercises, a week 1 note for a new athlete or after a layoff). The rule was reworded the same day: the final week trains as written and tapers only into a competition Amir named (SES-8), on the spec's `taper:` line. Cycles already published keep their back-off; the rule applies from each athlete's next cycle.
+  - Amir, the same day, shown the draft: "well if there are tests that needs to be done, then yes we can reduce volume on some". So a final week that holds the retests may cut volume on some lifts: a titled Testing week, the cut in words with no number (PRC-15).
 - `REC-5` **Concurrent athletes (heavy sport schedule alongside the gym) always get a double-day rule in autoregulation.**
   - 2026-08-02, Athlete J C1 — caught by the dose/time audit
 - `REC-6` **High-stress and concurrent athletes also get a flexible session order.**
@@ -160,6 +164,7 @@ the principles (their *How to add*).
   - 2026-09-26, Amir, verbatim: "sometimes an athlete when filling the form say i only have 60 minute, but then eveytime they go to the gym, they spend 75 minutes, and they NEVER complain, it means they could do more 😃 so days time cap, is usually not very important"
 - `SES-8` **No competition calendar unless Amir names one.**
   - Amir, 2026-09-26: "if there is, i would tell you so, otherwise assume no"
+  - 2026-10-19: a named competition is now the one reason for a final-week back-off, as a taper (REC-4).
 - `SES-9` **Sequencing:**
   - 2026-06-15
 - `SES-9` **Standard section (block) names**
@@ -425,6 +430,7 @@ the principles (their *How to add*).
   - The audit that day found 16 of 34 live programmes with no back-off at all, and no drop in week-5 session RPE across 12 finished cycles. Amir: "update the app in a way that it can show first week or last week".
   - 2026-10-11, Amir: "add to the pipeline that we can have week notes. but lets change the design of the week notes. and only make it appear on the assigned week. for example when some one has a testing week, or reduced load". Week notes went from two fixed slots (`first`, `last`) to a note per week number, shown only in that week (the week 1 note had also been showing the day before the cycle started).
   - 2026-10-12, Amir: "add the cap reminder to the session bar", then "colour against the cap in those weeks". Until then a week note's numbers reached a target only on a lower check-in day, so in a Max RPE 7 week a 7 logged on an RPE 8 card showed blue and an 8 showed nothing, while the bar said Max RPE 7. The note's limit became the colour target on every day of its week, with or without a check-in, skipped or trained as written, in the app and on the dashboard. A lower day takes the lower of the two, and a test-flagged lift in the closing week keeps its own card on a normal day (TST-4), as the bar says "except the retest". Asked whether a week note's number covers every lift or only some, Amir chose every lift: a limit on only some lifts is written in words with no `rpeCap` or `rpeDrop`. One live week 1 note had a cap its words scoped to the new exercises. Its number was removed and its words kept, and `check_program.py` now warns on that shape.
+  - 2026-10-19, Amir: the back-off left the house shape (REC-4). The roadmap is still 5 cycles of 5 weeks; every week trains, and a final week backs off only to taper into a competition he named.
 - `PRC-16` **One record of who the athlete is today: the athlete profile.**
   - 2026-09-26, from the pipeline audit.
 - `PRC-17` **Roadmap is created once and locked**
@@ -454,6 +460,7 @@ the principles (their *How to add*).
 - `PRC-25` **Rule freeze: no new rules until eight cycles have run on this pipeline.**
   - Amir, 2026-09-26, yes to the audit's recommendation.
   - 2026-10-11, an exception like SES-17: CUE-6 and CUE-7 were added, and CUE-1, CHP-2, NAM-5, NAM-7, COM-14 and SEL-11 reworded, because something broke. 141 of 320 approved entries had no video and three short cues were all such an athlete got; about a third of Coach's Notes were carrying the missing how-to; the pill had 116 labels. Amir, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP) (Q12 A): "all recommended, go ahead".
+  - 2026-10-19, on Amir's word (REC-4): REC-4 reworded from "every cycle's last week is a back-off" to "no two slow weeks in a row", and PRC-14's line lost "each 4 loading weeks and 1 back-off". What broke: every cycle put a back-off week straight before the next cycle's slow week 1, two slow weeks for no reason.
 - `PRC-26` **How the Quality mix counts.**
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
 - `PRC-27` **A first cycle's picture word is a foundation one.**

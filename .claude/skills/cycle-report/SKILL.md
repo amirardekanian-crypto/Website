@@ -113,7 +113,7 @@ Work through this list. Each line is a finding only if the data says so.
 | **Profile changes** | calls, messages, notes, the log: a new injury or one resolved, new kit or a new gym, a changed schedule or goal | They update the athlete profile at the top of the coaching log (/program-design applies them) |
 | **Units** | compare barbell and dumbbell loads at similar RPE | An empty-bar squat at RPE 8 next to 2 × 20 kg dumbbells = whole bar vs per side unknown |
 | **Typos** | a jump ×10 (250 after 20) | Never quote it; note it for Amir |
-| **Back-off week** | the closing week's `n_sets` and `top` vs weeks 1–4, against the cycle's final-week note in `weekNotes` (what it prescribed, since 2026-09-26) | Full sets and a new top = the back-off didn't happen |
+| **Back-off week** | only a cycle whose final week has a note in `weekNotes` (a taper before a competition since 2026-10-19, REC-4; every cycle before that): the closing week's `n_sets` and `top` vs weeks 1–4, against what the note prescribed | Full sets and a new top = the back-off didn't happen. No note = the week trains as written, nothing to check |
 | **Weigh-ins** | Q4 `weigh_ins` | Body weight promised in a notes card and never logged |
 | **Personal Records** | Q4 `ceiling` | Empty after a whole cycle = no strength baseline. Since 2026-09-26 the app adds a new best by itself (`auto`), so entries are not evidence the athlete opened the screen; `test` still is |
 | **Promises and gates** | each note card and each `message.outcomes` line against the evidence | Done / partly / not yet, with its number |

@@ -232,11 +232,11 @@ as the week's headline** with its numbers in clay, then the rest of the text, th
   in the text they would show twice. The checker warns on all three.
 - **The numbers exactly as design decided, in words:** "one set fewer on every exercise",
   "every RPE at 6". An RPE going down names the floor in the same sentence ("never below 6").
-- A few words of why, when it helps: *"You get stronger in the easy week, not only the hard ones."*
+- A few words of why, when it helps: *"Fresh legs for Saturday's tournament."*
 - **Say it once.** No notes card repeats it. A longer protocol (a staged return) can still have a
   card, and the week note can point to it.
-- The final week: every cycle. Week 1: whenever design wrote one (always for a new athlete). Any
-  other week: only the ones design gave a line.
+- The final week: only a taper or a Testing week design wrote (REC-4). Week 1: whenever
+  design wrote one (always for a new athlete). Any other week: only the ones design gave a line.
 List them as `WEEK <n>:` (n is the week number; `TITLE:` after it for a testing or lighter week), each with
 design's numbers, so assemble can store them under that week's number.
 
