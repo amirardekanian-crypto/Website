@@ -5,6 +5,18 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-20 · Career Mode's design round ended in the lightest version.** He asked where the system should live and whether AA Proof merges
+  (*"not many people are using the proof app … that's why i added these achievement to push people more into using this game"*), took the
+  one-app structure, added five future features (challenges, monthly goals, an Academy of talent trees, a community with photos, monthly honours),
+  then asked for honest advice (*"Am i adding things that are too much? Not many people like? … be my advisor"*) and, shown that about 17
+  mechanics met about 15 active athletes, cut hard: *"Youre right, this is too much"*, *"make it the lightest, but save the mechanics"*, no
+  badges, no ranks, no titles, no level road or card skins, *"keep only the things that is efficient to keep"*, then *"If anything is removed …
+  remove from server as well"*. What it teaches: (1) **measure usage before pitching more** (the October habit and app-open counts moved him
+  more than any mockup); (2) **an efficiency check per piece** (built already? build cost? his weekly time? which aim?) is how he likes to trim;
+  (3) **cut means gone**, not hidden: a removed kind leaves the server too, so say what that deletes and what it costs (levels) before building;
+  (4) he values being asked as an advisor, and an honest "too much" landed well; (5) his aim, in his words: effort recognised by him and by
+  others, a community, athletes doing more. Record: `career/CAREER_MODE.md` → *Round 5*; page https://claude.ai/artifact/AriVWJQskSFE7na1Nn7i24.
+
 - **2026-10-18 · Round 4 'Rest in Play': all nine picks.** *"Go with your picks on all nine decisions, and build The Read and Serve Clock first."* What it teaches (inferred, he wrote only the quote): a measured defect (a bot won 58 of 58 points) and one research-backed rule (the last 25 s of a rest belong to the set) beat any new feature; he took the fix-first order, a match that waits between rests, a coach-only rest receipt with a privacy line, and a calm door. Ideas that need something only he has (his voice, his name on athletes' Stories) stay his call.
 
 - **2026-10-17 · "go with your picks", then: the system goes into files he can read and change.** *"remeber to write
@@ -106,6 +118,11 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
   information architecture** over features. **No generic fitness-app features.**
 
 ## Rejected
+
+- **2026-10-20 · Cut from Career Mode, by him, after the advice:** the Academy of talent trees (his own idea the day before, eight trees; *"Lera
+  [Let's] remove the academy tree"*), badges, ranks, titles and the Grand Slam, the level road and card skins, and with them the Locker tab.
+  Weekly missions, the full quest system and photos are "later, only if the numbers say so". Do not pitch collection mechanics (shelves, metals,
+  tiers, title plates, skins) or a skill tree again unless he asks; recognition now runs through moments, the four numbers, the crew and him.
 
 - **2026-10-18 · #41 Chair Umpire (a coach-only receipt of how every rest ended), rejected while it was being built.** *"i dont want chair umpire"*, then *"reverse it"*. He gave no reason. Do not pitch rest-timing receipts or rest-adherence tracking again; if a question about real rest lengths comes up, ask him first.
 

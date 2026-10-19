@@ -173,6 +173,28 @@ Cut in the same round (listed so they are not re-pitched): Say the Number (the l
 Cup (a crew-against-Amir tally: game numbers off the phone, a league by another name, GAME-6); New Balls, Please (a new court each
 cycle, cosmetic); XP, badges or a board for the game; anything that lengthens a rest; any claim that the game trains tennis.
 
+## Career Mode design round · 2026-10-18 to 10-20 · "Where Career Lives"
+
+Page (six versions, every direction kept): https://claude.ai/artifact/AriVWJQskSFE7na1Nn7i24 · record: `career/CAREER_MODE.md` → *Round 5*.
+
+| Name | What | Status |
+|---|---|---|
+| One app (Home Court) | Coached athletes live in AA Performance only; AA Proof frozen as the free door | **picked** 2026-10-20 (L1) |
+| Locker tab | A fifth tab for the career (later with Me and Crew) | **dropped** 2026-10-20: the lightest career fits in Progress |
+| Academy | Library becomes an Academy of eight talent trees (Amir's list, his skill-tree picture) | **rejected** 2026-10-20 by Amir ("remove the academy tree") |
+| Coach Everywhere | Coach tab off the bar, Amir's photo on every screen opens his sheet | picked 2026-10-20, then **superseded** the same day: the Coach tab stays (L7) |
+| Moments instead of badges | The four numbers' marks and the achievements arrive as moments with a share card; no shelf | **picked** 2026-10-20 (L3, L4) |
+| The Monthly Open | One challenge a month for the whole crew, one board, the honours on the 1st | **picked** 2026-10-20 (L9) |
+| Monthly honours | Most sessions (plan sessions), Most improved (percent, a main lift), Full Month for all who did every plan session | **picked** 2026-10-20 |
+| The Bell replaces roll call | Achievements list themselves for the crew, kudos only | **picked** 2026-10-20 |
+| The simple monthly goal | One line Amir writes, one tick | **picked** 2026-10-20 (L10) |
+| Habit chips | Today's habits as one row of chips on Home | **picked** 2026-10-20 |
+| Courtside first | Amir's recognition before any athlete feature | **picked** 2026-10-20 (L11) |
+| Test week is challenge week | The plan's retest week opens the matching challenge | pitched |
+| The lesson arrives when it matters | The 24 lessons matched to plan moments | pitched |
+| The Road Remembers | Each finished cycle on Progress wears what it earned | pitched (grown idea) |
+| Gym photos, weekly missions, the full quest system | — | **parked** 2026-10-20: "later, only if the numbers say so" |
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |

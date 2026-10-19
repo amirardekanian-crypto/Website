@@ -45,6 +45,41 @@
 
 ---
 
+## Round 5: the lightest version (decided 2026-10-20, NOT BUILT)
+
+> **Read this first.** After the design round (the page *Where Career Lives*, https://claude.ai/artifact/AriVWJQskSFE7na1Nn7i24), Amir cut the
+> system down. Everything below this section that names badges, ranks, titles, the Grand Slam, the level road, card skins, weekly missions or
+> personal quests describes the system **as it is live today**, until the cut ships. Until then the live system stays exactly as built.
+
+**His words, in order (2026-10-19 and 20):** *"not many people are using the proof app … that's why i added these achievement to push people
+more into using this game"* · *"Youre right, this is too much"* · *"I want to make it the lightest, but save the mechanics. Lets get rid of
+badges. Lets get rid of ranks"* · *"Remove the titles"* · *"Remove the level road, card skins. Lets trim down what is not imporant and keep only
+the things that is efficient to keep"* · *"Go with your picks. If anything is removed, like titles, remove from server as well. We still have
+achievements right?"*
+
+**Why:** in October 4 athletes logged a real habit (12 in August), over half of AA Proof's habit days were only the automatic workout tick, 8 of 40
+athletes opened the full AA Proof app after the XP switch, and 17 trained in two weeks, all in AA Performance. About 17 mechanics for about 15
+athletes active a week was too much. His aim: effort recognised by him and by others, a community, athletes doing more.
+
+| # | Decision (all "go with your picks", 2026-10-20) |
+|---|---|
+| L1 | **One app for coached athletes: AA Performance** (`program.html`). Replaces decision 2 (AA Proof as the home) and D13 (the Home strip only). |
+| L2 | **Athletes see six things:** their level (a number and a bar, **no rank name**); the four numbers (weeks held, sessions with Amir, personal bests, comebacks), each with its next mark; **moments**; one **simple monthly goal**; the **crew** (the Monthly Open, the month's honours, the Bell with kudos); and **Amir** (Courtside messages on WhatsApp, "Amir saw this" on a moment). |
+| L3 | **Moments replace badges.** The four numbers' own badges become their **marks**: weeks held in a row 4 · 8 · 12 · 24 · 52 (Hold Serve, `held_weeks`), sessions 25 · 50 · 100 · 200 · 500 (Century), personal bests 5 · 10 · 25 · 50 · 100 (Record Breaker, `bests`), comebacks 3 · 5 · 10 (HARD TO KILL, `comebacks`). Crossing a mark is a moment with a share card and its XP, as today. No shelf, no metals. |
+| L4 | **Achievements stay, as moments** (Amir: "We still have achievements right?"). Proposed list, waiting for his word: FIRST BLOOD, Held, First Best, First Cycle, Back on Court, Flawless, By the Book, Played Through (`kept_going`), All-Court, Double Up, All the Way Back, The Distance. Proposed out: First Treble, Full Stack, The Proving Ground, THE MACHINIST, THE CENTURION (the 100 sessions mark says it), THE FOUNDRY, BEDROCK, COLD BLOOD, STILL STANDING, BACKBONE. |
+| L5 | **Removed: badges** (all but the four marks), **ranks**, **titles and the Grand Slam**, **the level road and card skins**, the **Academy** (never built; Amir's eight trees are kept as design input outside the repo). **Later, only if the numbers say so:** weekly missions, the full quest system, photos. Roll call is replaced by the Bell. |
+| L6 | **Removed means removed from the server too** (Amir). This overrides GAME-1 for the removed kinds: their catalogue entries, the code that mints or shows them and their award rows go. **Open, his call:** whether each athlete's XP from the deleted awards is kept as one fact so no level goes down (recommended; it is what round 3 and D20 promised). On 2026-10-20: 239 badge awards (32,435 XP, 23 athletes, at most 5,650 XP each), 2 catalogue titles and 72 `hab_titles` rows (24 athletes); the 11 mark awards (3,700 XP) and the 67 achievements (7,700 XP) stay. |
+| L7 | **Layout: Home · Progress · Library · Crew · Coach.** The level, the four numbers, the monthly goal and *Your moments* live in Progress's "Your numbers" section, beside personal records. No Locker tab; the Coach tab stays; Crew is the one new tab. Home keeps one Career row (level and the nearest mark; Hold Serve folds into it), habits as one row of chips, and a row for a new note from Amir until it is read. |
+| L8 | **The board keeps its order**; only the rank names go. |
+| L9 | **The Monthly Open** (new): one challenge a month for the whole crew (the six tennis tests in `course_en`, the 5K), a result counts only with proof, closed in back-off weeks, one board, the honours on the 1st (Most sessions counts plan sessions; Full Month for everyone who did every plan session; Most improved in percent on a main lift). |
+| L10 | **The monthly goal, simple:** one line Amir writes for an athlete on coach.html, one tick when it is done. |
+| L11 | **Build order:** D20 first → the light screens in AA Performance, and AA Proof's career screens switched off → **the cut on the server, only after no app reads what it deletes** → Courtside, the honours and the monthly goal → Crew (the Bell) → the Monthly Open. Every live database step waits for Amir's yes. |
+
+**AA Proof:** frozen as the free door. Its career screens read what the cut deletes, so they are switched off before the cut (its habits keep working).
+The phases 4 to 7 plan outside the repo (`C:\Users\Amir\AA-Career\phases4to7\`) is amended by `AMENDED-LIGHTEST.md` there.
+
+---
+
 ## In one breath
 
 Every meaningful action an athlete takes becomes a **fact**. Every fact earns **XP** and can unlock a **reward**, and
