@@ -360,7 +360,12 @@
 // list of what you track. The list is the five with no off switch, whatever the athlete chose, and the ways to add another — AA Proof's
 // three add-ons are suggestions among them, beside the ones athletes actually wrote for themselves. Three of their own is the cap,
 // because the server pays for no more.
-const CACHE = 'aap-v198';
+// v199: program.html and this worker changed (2026-10-19, Amir: "everything in the crew should ring for everyone: every post, photo,
+// like and line"). The crew half of the phone notifications (stage86, written and rehearsed, not applied): a crew notification lands on
+// the Bell rather than on Home — a cold open reads the #crew hash and clears it, and an app already running is FOCUSED and posted a
+// message instead, because navigating a running app is a reload and a reload loses the set log in the page. The Reminders panel's crew
+// line says what it now does.
+const CACHE = 'aap-v199';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -545,8 +550,10 @@ self.addEventListener('push', event => {
   try { d = event.data ? event.data.json() : {}; } catch (e) { d = {}; }
   const title = d.title || 'AA Performance';
   const kind = d.tag || 'reminder';
-  // Where a tap should land. The habit one belongs in AA Proof, the training ones in the plan app.
-  const url = d.url || (kind === 'habits' ? '/habits.html' : '/program.html');
+  // Where a tap should land. The habit one belongs in AA Proof, the training ones in the plan app,
+  // and a crew one (stage86) on the Bell itself rather than on Home — program.html reads the #crew
+  // hash on the way in and then clears it, so a reload does not jump back there.
+  const url = d.url || (kind === 'habits' ? '/habits.html' : kind === 'crew' ? '/program.html#crew' : '/program.html');
   event.waitUntil(
     self.registration.showNotification(title, {
       body: d.body || '',
@@ -564,12 +571,20 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const url = (event.notification.data && event.notification.data.url) || '/program.html';
+  // The screen the hash asks for, matched WITHOUT it: an app that is already open must be focused and
+  // told where to go, never navigated. A navigate is a reload, and a reload of the training app
+  // mid-session throws away the set log, which lives in the page.
+  const hash = url.indexOf('#') >= 0 ? url.slice(url.indexOf('#') + 1) : '';
+  const page = (hash ? url.slice(0, url.indexOf('#')) : url).replace(/^\//, '');
   event.waitUntil((async () => {
     const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     // An app already open is focused rather than opened again: a second copy of the training app
     // would be a second copy of a running session, and the set log lives in the page.
     for (const c of all) {
-      if (c.url.includes(url.replace(/^\//, '')) && 'focus' in c) return c.focus();
+      if (c.url.includes(page) && 'focus' in c) {
+        if (hash) { try { c.postMessage({ aa: 'go', screen: hash }); } catch (e) {} }
+        return c.focus();
+      }
     }
     for (const c of all) { if ('focus' in c) { try { await c.navigate(url); } catch (e) {} return c.focus(); } }
     if (self.clients.openWindow) return self.clients.openWindow(url);

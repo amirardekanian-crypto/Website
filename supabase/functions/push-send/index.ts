@@ -15,8 +15,17 @@
 // A service-role key is NOT used for that, because the cron command is stored in the database and the
 // key would be sitting in cron.job in plain text.
 //
-//   POST /push-send            send what is due
+//   POST /push-send            send what is due: the reminders AND the crew
+//   POST /push-send?only=crew  the crew only. What the 15-minute job calls (stage86).
 //   POST /push-send?dry=1      say what WOULD go, send nothing. Safe to run any time.
+//
+// THE CREW (stage86). public.crew_push_due() answers in exactly the same columns as push_due(), so
+// everything below carries both without knowing the difference. Two things do differ, and they are
+// the only two `kind === 'crew'` tests in this file: the crew's answer comes back from
+// crew_push_done(), which moves a watermark rather than writing a day to a ledger; and a dry run asks
+// for it with p_mark false, so saying what WOULD go never swallows an event.
+// Until stage86 is applied that function does not exist, which is not a failure of the reminders: the
+// error is read and ignored, and the hourly run carries on.
 //
 // WHERE THE KEYS LIVE. In public.push_config, a one-row table only the service role can read, NOT in
 // Edge Function secrets. Two reasons: the hourly job needs the same shared secret, so one place means
@@ -78,11 +87,25 @@ Deno.serve(async (req) => {
   const subject = pick('VAPID_SUBJECT', 'vapid_subject') || 'mailto:amirardekanian@gmail.com';
   if (!publicKey || !privateKey) return json({ error: 'the VAPID keys are not set' }, 500);
 
-  const dry = new URL(req.url).searchParams.get('dry') === '1';
+  const params = new URL(req.url).searchParams;
+  const dry = params.get('dry') === '1';
+  const only = params.get('only') ?? '';
 
-  const { data, error } = await db.rpc('push_due');
-  if (error) return json({ error: 'push_due: ' + error.message }, 500);
-  const due = (data ?? []) as Due[];
+  const due: Due[] = [];
+  if (only !== 'crew') {
+    const { data, error } = await db.rpc('push_due');
+    if (error) return json({ error: 'push_due: ' + error.message }, 500);
+    due.push(...((data ?? []) as Due[]));
+  }
+  if (only === '' || only === 'crew') {
+    // p_mark false on a dry run: decide everything, move no watermark.
+    const { data, error } = await db.rpc('crew_push_due', dry ? { p_mark: false } : {});
+    // Before stage86 is applied there is no such function. Anything else is a real error.
+    if (error && !/does not exist|could not find|schema cache/i.test(error.message)) {
+      return json({ error: 'crew_push_due: ' + error.message }, 500);
+    }
+    due.push(...((data ?? []) as Due[]));
+  }
 
   // One notification per athlete per kind, however many phones they have: the ledger is marked once,
   // after every one of their phones has been tried.
@@ -129,9 +152,15 @@ Deno.serve(async (req) => {
     // same reminder arrive again an hour later. If EVERY phone failed, push_done(ok => false) stamps
     // the failure but writes no ledger row, so the next run tries once more — and since push_due()
     // still only fires at the athlete's own hour, "once more" is that evening, not a retry storm.
-    await db.rpc('push_done', {
-      p_athlete_id: phones[0].athlete_id, p_kind: phones[0].kind, p_day: phones[0].day, p_ok: anyOk,
-    });
+    // The crew's ledger is a watermark instead of a day, so it has its own one-line answer; a total
+    // failure leaves the watermark where it was and the next 15-minute tick sends the same news.
+    if (phones[0].kind === 'crew') {
+      await db.rpc('crew_push_done', { p_athlete_id: phones[0].athlete_id, p_ok: anyOk });
+    } else {
+      await db.rpc('push_done', {
+        p_athlete_id: phones[0].athlete_id, p_kind: phones[0].kind, p_day: phones[0].day, p_ok: anyOk,
+      });
+    }
   }
 
   return json({ people: groups.size, sent, failed, dropped, trouble });

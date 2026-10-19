@@ -2196,6 +2196,9 @@ const BACKUP_TABLES = [
   // sender's shared secret, and a backup file on this PC carrying those is worse than losing them
   // (losing them is recoverable: a new pair, and each app re-subscribes silently, because the
   // PERMISSION is already granted and only the key changes). Both are left out on purpose.
+  // The crew's notification queue and its watermarks (stage86) are left out for the same two reasons at once: the
+  // queue keeps the Bell's own 7-day promise, so a 12-week backup of it would break that promise, and a watermark
+  // rebuilds itself by not sending twice. (Names unquoted on purpose: check 1h reads the quoted ones out of here.)
   'push_subs',
   // ⚠ The Monthly Open (stage85) is the other way round: a challenge and the results Amir confirmed are a RECORD, not a post. They are not deleted
   // after 7 days, they are months of work in a handful of rows, and nothing else could rebuild them. So the Open's two tables are ADDED HERE the

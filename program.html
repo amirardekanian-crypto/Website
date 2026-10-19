@@ -13043,7 +13043,10 @@ function pushLoadMe(then) {
 
 const PUSH_KINDS = [['workout', 'Train', 'When you have not trained for a couple of days'],
                     ['habits', 'Log your habits', 'One a day, at the hour you pick'],
-                    ['crew', 'The crew', 'When Amir posts, or someone cheers you'],
+                    // stage86 (Amir, 2026-10-19: "everything in the crew should ring for everyone"):
+                    // every post, photo, cheer and moment, collected so a busy evening is a handful
+                    // of notifications and not a hundred.
+                    ['crew', 'The crew', 'Anything new on the Bell, a few at a time'],
                     ['cycle', 'A new cycle', 'When Amir publishes your next one']];
 
 function openPushSettings() {
@@ -21611,6 +21614,36 @@ function esc(str) {
   d.textContent = str;
   return d.innerHTML;
 }
+
+// ── A notification that lands on a screen (stage86) ──
+// Tapping a crew notification should open the Bell, not Home. Two ways in, because the app may or may
+// not already be running:
+//   cold — sw.js opens /program.html#crew. The hash is read once and cleared, so a reload later does
+//          not teleport them back to the Bell.
+//   warm — the app is already open, so sw.js FOCUSES it and posts {aa:'go'} instead. It must never
+//          navigate a running app: that is a reload, and a reload loses the set log in the page.
+// Either way the jump waits for the app to be ready (signed in, the tab built, Crew switched on). It
+// gives up after six seconds rather than pouncing on someone who has started doing something else.
+function goToCrewSoon() {
+  let left = 20;
+  const tick = () => {
+    if (typeof crewOn !== 'function' || typeof goTo !== 'function') { if (--left > 0) setTimeout(tick, 300); return; }
+    if (!crewOn() || !document.getElementById('crew-body')) { if (--left > 0) setTimeout(tick, 300); return; }
+    goTo('crew');
+  };
+  tick();
+}
+function initCrewDeepLink() {
+  if (location.hash === '#crew') {
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    goToCrewSoon();
+  }
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data && e.data.aa === 'go' && e.data.screen === 'crew') goToCrewSoon();
+    });
+  }
+}
 </script>
 
 <!-- Shared helpers: VideoModal + A2HS prompt -->
@@ -21627,6 +21660,7 @@ function esc(str) {
   // A sheet slides down to close (NAV-01's close grammar).
   initSheetSwipe('hist-overlay', () => closeHistorySheet());
   initSheetSwipe('readiness-overlay', () => cancelReadiness());
+  initCrewDeepLink();   // a crew notification lands on the Bell (stage86)
 
   // Offer Add-to-Home-Screen once the athlete has FINISHED A SESSION, never on first open
   // (HOME-03, 2026-09-26): the toast used to land 2.5 s after the first sign-in, on top of
