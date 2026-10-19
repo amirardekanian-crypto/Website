@@ -323,11 +323,13 @@
 // This worker is unchanged apart from the name. The two apps are the ones that had to learn to listen, which means this bump is the last
 // one an athlete has to close and reopen for: from the next one on, their app tells them.
 // v189: program.html changed (2026-10-19, Amir): two door rows are named after what they open — "Log a max" and "How the app works" — each with its prompt on the quiet line, where they used to say a question or the same thing twice over a louder second line.
-
 // v190: program.html and habits.html changed (2026-10-19, Amir picked the look from three: "lets go with C but in ckay"). The
 // new-version notice is the note box in the middle of the screen, in clay, with Reload and Not now, in place of v188's line on Home.
 // aaToast() gained the tone and a note that stays until it is answered (ms: 0); AA Proof has the same box in its own look.
-const CACHE = 'aap-v190';
+// v191: the shell changed (2026-10-19): assets/js/push.js joins it, and this worker now has push and
+// notificationclick handlers, so a reminder can arrive when the app is shut. Both apps share one
+// registration and one notification permission, so the handlers live here once, not twice.
+const CACHE = 'aap-v191';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -350,6 +352,7 @@ const SHELL = [
   // Highlight Reel's painter (v160): a win's share card is drawn on the phone, signal or not. Served cache-first by this plain URL,
   // so a change to it needs a CACHE bump. (Its fonts, photo, mark and covers are kept as they are first used.)
   '/assets/js/sharecard.js',
+  '/assets/js/push.js',
   // Off the Glass, the rest game (v162): loaded on the first tap on Play. Cache-first by this plain URL: a change needs a CACHE bump.
   '/assets/js/rally.js',
   // Split Step, the second rest game (v165): loaded on the first tap on its row in the shelf. Cache-first by this plain URL: a change needs a CACHE bump.
@@ -490,4 +493,52 @@ self.addEventListener('fetch', e => {
       });
     })
   );
+});
+
+// ── Reminders (stage84, 2026-10-19) ────────────────────────────────────────────────────────────────
+// What makes a notification arrive when the app is shut. Both apps share this one registration, so
+// these handlers serve AA Performance and AA Proof together and must never assume which one is open.
+//
+// The sender is the Edge Function push-send; what it puts in the payload is decided by
+// public.push_due() in SQL. Here we only draw it and open the right screen.
+//
+// ⚠️ userVisibleOnly is true on the subscription, which is a promise to the browser that every push
+// SHOWS something. A push handled without showNotification() makes the browser warn the athlete that
+// the site is doing things in the background, and eventually stop delivering. So the catch below
+// still shows a plain line rather than failing silently.
+
+self.addEventListener('push', event => {
+  let d = {};
+  try { d = event.data ? event.data.json() : {}; } catch (e) { d = {}; }
+  const title = d.title || 'AA Performance';
+  const kind = d.tag || 'reminder';
+  // Where a tap should land. The habit one belongs in AA Proof, the training ones in the plan app.
+  const url = d.url || (kind === 'habits' ? '/habits.html' : '/program.html');
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: d.body || '',
+      icon: '/assets/img/icon-192.png',
+      badge: '/assets/img/icon-192.png',
+      // One tag per kind: a second habit reminder REPLACES the first on the lock screen instead of
+      // stacking, so nobody wakes up to four of them.
+      tag: kind,
+      renotify: true,
+      data: { url, kind, sent: d.sent || null }
+    }).catch(() => self.registration.showNotification(title, { body: d.body || '', tag: kind }))
+  );
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/program.html';
+  event.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    // An app already open is focused rather than opened again: a second copy of the training app
+    // would be a second copy of a running session, and the set log lives in the page.
+    for (const c of all) {
+      if (c.url.includes(url.replace(/^\//, '')) && 'focus' in c) return c.focus();
+    }
+    for (const c of all) { if ('focus' in c) { try { await c.navigate(url); } catch (e) {} return c.focus(); } }
+    if (self.clients.openWindow) return self.clients.openWindow(url);
+  })());
 });

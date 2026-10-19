@@ -349,11 +349,67 @@ begin
 end
 $stage84_grants$;
 
--- ── 8. The sweep, hourly where pg_cron exists (the live project yes, a rehearsal no) ───────────────
+-- ── 8. What makes it actually happen, once an hour ─────────────────────────────────────────────────
+-- An athlete's reminder goes at THEIR hour, so one hourly job serves every time zone: push_due() only
+-- returns the phones for whom it is their hour right now.
+--
+-- The call needs a URL and the sender's shared secret. Both live in a one-row table rather than in the
+-- cron command, because `cron.job` keeps its command as plain text that anybody who can read the
+-- table can see. push_fire() reads them; the job itself is only `select public.push_fire()`.
+create table if not exists public.push_config (
+  id         boolean primary key default true check (id),   -- one row, for ever
+  url        text,
+  secret     text,
+  updated_at timestamptz not null default now()
+);
+do $stage84_cfg$
+begin
+  alter table public.push_config enable row level security;
+  revoke all on table public.push_config from public, anon, authenticated;
+  grant all on table public.push_config to service_role;
+  insert into public.push_config (id) values (true) on conflict (id) do nothing;
+end
+$stage84_cfg$;
+
+-- Fires the sender. Returns what it did so a hand-run says something useful.
+-- pg_net answers asynchronously: this hands the request over and returns at once, which is what keeps
+-- the job well inside its timeout however many phones are due.
+create or replace function public.push_fire() returns jsonb
+language plpgsql security definer set search_path to 'public' as $function$
+declare c record; req bigint;
+begin
+  select * into c from public.push_config where id;
+  if c.url is null or c.secret is null then
+    return jsonb_build_object('ok', false, 'why', 'push_config is not filled in yet');
+  end if;
+  if to_regproc('net.http_post') is null then
+    return jsonb_build_object('ok', false, 'why', 'pg_net is not installed');
+  end if;
+  execute format('select %s($1, $2::jsonb, ''{}''::jsonb, $3::jsonb, 20000)', 'net.http_post')
+    into req
+    using c.url, '{}'::jsonb,
+          jsonb_build_object('Content-Type', 'application/json', 'x-push-key', c.secret);
+  return jsonb_build_object('ok', true, 'request', req);
+exception when others then
+  -- A sender that is down must never take the hourly job with it.
+  raise warning 'push_fire: %', sqlerrm;
+  return jsonb_build_object('ok', false, 'why', sqlerrm);
+end $function$;
+
+-- Granted here rather than in section 7, which runs before this function exists.
+do $stage84_fire_grant$
+begin
+  revoke all on function public.push_fire() from public, anon, authenticated;
+  grant execute on function public.push_fire() to service_role;
+end
+$stage84_fire_grant$;
+
 do $stage84_cron$
 begin
   if exists (select 1 from pg_available_extensions where name = 'pg_cron') then
     create extension if not exists pg_cron;
+    -- Four minutes past, so it never races the hour's own writes.
+    perform cron.schedule('push-send', '4 * * * *', 'select public.push_fire()');
     perform cron.schedule('push-sweep', '23 4 * * *', 'select public.push_sweep()');
   end if;
 end

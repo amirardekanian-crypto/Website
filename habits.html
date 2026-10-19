@@ -87,6 +87,9 @@
      loads the same version from jsDelivr: bump all three together (a NEW file name), with scripts/headless/coach/reallib.js and
      scripts/headless/signin.js run first. -->
 <script defer src="/assets/js/supabase-2.117.3.js" onerror="window.SB_FAILED=true"></script>
+<!-- Reminders on the phone (stage84). One copy, shared with program.html: the two apps are one
+     website, with one service worker and one notification permission between them. -->
+<script defer src="/assets/js/push.js?v=1"></script>
 <style>
   /* ── Tokens ────────────────────────────────────────────────────────────
      PROOF's modernist structure on the AA Performance palette (the "green
@@ -8852,7 +8855,8 @@ function renderApp() {
     // No XP, no rank, no streak in this header on purpose — it is the one
     // screen in the app that is not scoring anything.
     // Settings is a list of doors, so its header names the door you are behind.
-    settings: UI.sub === 'habits'     ? ['Settings', 'Your habits']
+    settings: UI.sub === 'reminders'  ? ['Settings', 'Reminders']
+            : UI.sub === 'habits'     ? ['Settings', 'Your habits']
             : ['Day ' + dayNumber() + (CAREER_LIGHT ? '' : ' · ' + LI.label), 'You']   // CAREER_LIGHT: no rank name
   };
   const rights = {
@@ -9547,6 +9551,7 @@ function renderToday(LI, doneCount) {
            coached athlete's programme card went: the session row and Settings both open the programme. -->
       ${renderLibOffer()}
       ${renderBoardNotice()}
+      ${pushAskRow()}
       ${qrun ? questLine(qrun) : ''}
 
       ${past || CFG.toured ? '' : `
@@ -12243,7 +12248,127 @@ function navRow(icon, name, sub, right, handler, cls, attrs) {
 }
 function navVal(text) { return `<span class="navval">${esc(text)}</span>`; }
 
+// ── Reminders (stage84, 2026-10-19) ──────────────────────────────────────────
+// Amir: "the push should be automatically on, unless they want to turn off in their app settings."
+// Every kind is on from the moment the phone allows it, and Settings -> Reminders turns them off.
+//
+// ⚠️ The phone's own permission box CANNOT be skipped: Apple and Google both require the athlete's
+// own tap, and no app of any kind can turn notifications on for someone. So "automatically on" is
+// built as: no question about whether they want reminders, one line saying what will arrive, their
+// tap, and then everything on. The line matters because the box can only be shown ONCE per phone for
+// this whole website — a "Don't allow" is permanent until they dig into browser settings, and it
+// would take the training app's reminders with it.
+let PUSH_ME = null;        // what the server has, from push_me(); null until it answers
+
+function pushReady() {
+  return !window.IS_EMBED && !window.IS_DEMO && !window.IS_PREVIEW && !!window.AAPush && !!_sb() && !!athleteId();
+}
+
+// One slim row on Today, while this phone could have reminders and has not been asked.
+function pushAskRow() {
+  if (!pushReady() || editingPast()) return '';
+  const st = AAPush.state();
+  if (st !== 'off') return '';          // on, blocked, unsupported or needs-install: Settings says what to do
+  if (AAPush.asked()) return '';        // shown once; Settings keeps it available for ever
+  return `<button class="rcprompt" data-k="pushask" ${on(() => pushTurnOn())}>
+    <span>
+      <span class="eyebrow">Reminders</span>
+      <span class="rcq">A nudge at the end of the day, so you don't forget to log. Tap to let your phone show it.</span>
+    </span>
+    <span class="hd" style="font-size:20px;color:var(--accent);flex:none">→</span>
+  </button>`;
+}
+
+async function pushTurnOn() {
+  const sb = _sb();
+  if (!sb || !window.AAPush) return;
+  AAPush.markAsked();
+  const r = await AAPush.enable(sb, 'proof', 'en');
+  if (r && r.ok) { PUSH_ME = r.me || PUSH_ME; toast('Reminders are on'); }
+  else if (r && r.state === 'blocked') toast('Your phone said no. You can undo that in its settings.');
+  else if (r && r.state === 'needs-install') toast('Add the app to your Home Screen first');
+  else toast('That did not work. Try again later.');
+  render();
+}
+
+let _pushLoading = false;
+// Asked for once, the first time Settings is drawn with a phone that could have reminders. It is a
+// server read, so it never blocks a paint: the panel draws "Off" and redraws itself when the answer
+// lands. Not on boot, because most opens never go near Settings.
+function pushLoadMe() {
+  if (!pushReady() || _pushLoading || PUSH_ME !== null) return;
+  _pushLoading = true;
+  AAPush.me(_sb()).then(me => {
+    PUSH_ME = me || { on: false };
+    if (UI.screen === 'settings') render();
+  }).catch(() => { PUSH_ME = { on: false }; });
+}
+
+const PUSH_KINDS = [['habits', 'Log your habits', 'One a day, at the hour you pick'],
+                    ['workout', 'Train', 'When you have not trained for a couple of days'],
+                    ['crew', 'The crew', 'When Amir posts, or someone cheers you'],
+                    ['cycle', 'A new cycle', 'When Amir publishes your next one']];
+const PUSH_ICON = { habits: '✅', workout: '🏋', crew: '🔔', cycle: '🗓' };
+
+function renderSettingsReminders() {
+  const st = window.AAPush ? AAPush.state() : 'unsupported';
+  const me = PUSH_ME, live = st === 'on' && me && me.on;
+  const hour = (me && me.hour) || 20;
+  const rows = live ? PUSH_KINDS.map(k => `
+      <button class="navrow" ${on(() => pushToggleKind(k[0]))} role="switch" aria-checked="${AAPush.kindOn(me, k[0])}">
+        <span class="navtile" aria-hidden="true">${PUSH_ICON[k[0]]}</span>
+        <span class="navmid"><span class="navnm">${esc(k[1])}</span><span class="navsub">${esc(k[2])}</span></span>
+        <span class="sw ${AAPush.kindOn(me, k[0]) ? 'on' : ''}"><i></i></span>
+      </button>`).join('') : '';
+  const note = st === 'unsupported' ? 'This phone or browser cannot show notifications.'
+    : st === 'needs-install' ? 'On an iPhone, add the app to your Home Screen first, then open it from there. Notifications only work once it is installed.'
+    : st === 'blocked' ? 'Your phone is blocking notifications for this site. Nothing here can undo that: open your browser settings, allow notifications for amirardekani.com, then come back.'
+    : !live ? 'Off. Turn them on and you get one nudge at the end of the day, nothing else.'
+    : 'On. Nothing before 8am or after 10pm, and never more than two in a day.';
+  return `
+    <div data-k="screen:settings:reminders" style="${screenAnim()}">
+      ${sectionLabel('Reminders')}
+      <div class="setnote">${note}</div>
+      ${st === 'off' || (st === 'on' && !live) ? `<div class="cardgrp">
+        ${navRow('🔔', 'Turn reminders on', 'One a day, at the hour you pick', '', () => pushTurnOn())}
+      </div>` : ''}
+      ${live ? `
+      <div class="cardgrp">${rows}</div>
+      ${sectionLabel('When')}
+      <div class="cardgrp">
+        ${navRow('🕗', 'Time of day', 'Tap to move it an hour. Between 8am and 10pm.',
+                 navVal(String(hour).padStart(2, '0') + ':00'), () => pushBumpHour())}
+      </div>
+      ${me && me.phones > 1 ? `<div class="setnote">It applies to all ${me.phones} of your phones.</div>` : ''}
+      <div class="cardgrp">
+        ${navRow('🚫', 'Turn them all off', 'Your phone keeps the permission, so you can turn them back on here', '',
+                 () => pushTurnOff())}
+      </div>` : ''}
+    </div>`;
+}
+
+async function pushToggleKind(k) {
+  const now = AAPush.kindOn(PUSH_ME, k);
+  const me = await AAPush.set(_sb(), { [k]: !now });
+  if (me) PUSH_ME = me; else toast('That did not save');
+  render();
+}
+async function pushBumpHour() {
+  const h = ((PUSH_ME && PUSH_ME.hour) || 20) + 1;
+  const me = await AAPush.set(_sb(), null, h > 22 ? 8 : h);
+  if (me) PUSH_ME = me; else toast('That did not save');
+  render();
+}
+async function pushTurnOff() {
+  const r = await AAPush.disable(_sb());
+  PUSH_ME = (r && r.me) || null;
+  toast(r && r.ok ? 'Reminders are off' : 'That did not save');
+  render();
+}
+
 function renderSettings() {
+  pushLoadMe();   // fills PUSH_ME the first time; redraws itself when it lands
+  if (UI.sub === 'reminders')  return renderSettingsReminders();
   if (UI.sub === 'habits')     return renderSettingsHabits();
   if (UI.sub === 'appearance') return renderSettingsAppearance();
 
@@ -12293,6 +12418,10 @@ function renderSettings() {
           <span class="navmid"><span class="navnm">Tick sound</span><span class="navsub">A short blip when you tick something.</span></span>
           <span class="sw ${CFG.sound ? 'on' : ''}"><i></i></span>
         </button>
+        ${pushReady() && AAPush.state() !== 'unsupported' ? navRow('🔔', 'Reminders',
+                 'A nudge at the end of the day',
+                 navVal(AAPush.state() === 'on' && PUSH_ME && PUSH_ME.on ? 'On' : 'Off'),
+                 () => goSub('reminders')) : ''}
         ${installable() ? navRow('📱', 'Install on your phone',
                  'Open it in one tap, and keep it working with no signal', '',
                  () => { UI.install = true; render(); }) : ''}

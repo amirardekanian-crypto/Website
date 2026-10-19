@@ -27,6 +27,7 @@ $rollback84_keep$;
 do $rollback84_cron$
 begin
   if to_regclass('cron.job') is not null then
+    perform cron.unschedule('push-send') where exists (select 1 from cron.job where jobname = 'push-send');
     perform cron.unschedule('push-sweep') where exists (select 1 from cron.job where jobname = 'push-sweep');
   end if;
 exception when others then
@@ -65,6 +66,8 @@ drop function if exists public.push_lines(text, text);
 drop function if exists public.push_local(timestamptz, integer);
 drop function if exists public.push_on(jsonb, text);
 drop function if exists public.push_kind_list();
+drop function if exists public.push_fire();
 
+drop table if exists public.push_config;   -- the URL and the sender's secret; nothing of an athlete's
 drop table if exists public.push_sent;
 drop table if exists public.push_subs;

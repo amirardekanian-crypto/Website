@@ -186,6 +186,9 @@
      loads the same version from jsDelivr: bump all three together (a NEW file name), with scripts/headless/coach/reallib.js and
      scripts/headless/signin.js run first. -->
 <script defer src="/assets/js/supabase-2.117.3.js" onerror="window.SB_FAILED=true"></script>
+<!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
+     website, with one service worker and one notification permission between them. -->
+<script defer src="/assets/js/push.js?v=1"></script>
 <!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
      on `defer` it shares one ordered execution queue with the SDK above. -->
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
@@ -7599,6 +7602,7 @@ function openAccount(e) {
           <button type="button" data-theme="dark" aria-pressed="${dark}">Dark</button>
         </span></div>
       ${install}
+      ${pushReady() ? door('acct-push', 'bell', 'Reminders') : ''}
       ${crewOn() ? door('acct-crew', 'crew', 'Crew and the Bell') : ''}
       ${door('acct-help', 'help', 'How the app works')}
       <a class="hrow" href="/privacy.html" target="_blank" rel="noopener">${acctIc('privacy')}<span class="hrow-b"><span class="hrow-v">Privacy</span></span><span class="hrow-a" aria-hidden="true">›</span></a>
@@ -7614,6 +7618,8 @@ function openAccount(e) {
     showInstallOffer();
   });
   document.getElementById('acct-help').addEventListener('click', () => openHelp());   // ‹ Back returns here
+  const psh = document.getElementById('acct-push');
+  if (psh) psh.addEventListener('click', () => openPushSettings());   // ‹ Back returns here
   const crw = document.getElementById('acct-crew');
   if (crw) crw.addEventListener('click', () => openCrewSettings());   // ‹ Back returns here
   const so = document.getElementById('acct-signout');
@@ -12338,6 +12344,111 @@ const CREW_KINDS = [
   ['level', 'A new level'], ['week', 'A week held', 'And how many in a row'], ['mark', 'A mark', '8 weeks held, 50 sessions with Amir, 10 bests…'],
   ['achievement', 'An achievement'], ['best', 'A personal best', 'The lift only, never the weight'], ['cycle', 'A cycle finished'],
   ['honour', "The month's honours"], ['open', 'The Monthly Open']];
+// ── Reminders (stage84, 2026-10-19) ──────────────────────────────────────────────────────────────
+// Amir: "the push should be automatically on, unless they want to turn off in their app settings."
+// So every kind is on from the moment the phone allows it, and this panel is where they come off.
+//
+// ⚠️ The phone's permission box cannot be skipped by anyone: Apple and Google both require the
+// athlete's own tap. "Automatically on" is therefore: no question about whether they want reminders,
+// one line about what arrives, their tap, then everything on. The line is not politeness — the box
+// can be shown only ONCE per phone for this whole website, and a "Don't allow" takes AA Proof's
+// reminders with it for good.
+//
+// The client is assets/js/push.js, shared with habits.html, because the two apps are one website.
+let PUSH_ME = null, _pushLoading = false;
+
+function pushReady() {
+  return !DEMO && !window.IS_PREVIEW && !!window.AAPush && AAPush.state() !== 'unsupported' && !!athleteId();
+}
+function pushLoadMe(then) {
+  if (!window.AAPush || _pushLoading || PUSH_ME !== null) { if (then) then(); return; }
+  _pushLoading = true;
+  _sbReady().then(sb => sb && AAPush.me(sb)).then(me => { PUSH_ME = me || { on: false }; if (then) then(); })
+    .catch(() => { PUSH_ME = { on: false }; if (then) then(); });
+}
+
+const PUSH_KINDS = [['workout', 'Train', 'When you have not trained for a couple of days'],
+                    ['habits', 'Log your habits', 'One a day, at the hour you pick'],
+                    ['crew', 'The crew', 'When Amir posts, or someone cheers you'],
+                    ['cycle', 'A new cycle', 'When Amir publishes your next one']];
+
+function openPushSettings() {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov) return;
+  pushLoadMe(() => { if (ov.classList.contains('visible')) openPushSettingsPage(); });
+  const st = window.AAPush ? AAPush.state() : 'unsupported';
+  const me = PUSH_ME, live = st === 'on' && me && me.on;
+  const hour = (me && me.hour) || 20;
+  const note = st === 'needs-install'
+      ? 'On an iPhone a reminder only works once the app is on your Home Screen. Add it, open it from there, and come back.'
+    : st === 'blocked'
+      ? 'Your phone is blocking notifications for this site. Nothing here can undo that: open your browser settings, allow notifications for amirardekani.com, then come back.'
+    : !live ? 'Off. Turn them on and you get a nudge when you have not trained, and one at the end of the day for your habits.'
+    : 'On. Nothing before 8am or after 10pm, and never more than two in a day.';
+  const rows = live ? PUSH_KINDS.map(k => `<label class="cr-sw"><span>${esc(k[1])}<small>${esc(k[2])}</small></span>
+      <input type="checkbox" data-pkind="${k[0]}" ${AAPush.kindOn(me, k[0]) ? 'checked' : ''}></label>`).join('') : '';
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Your phone</div>
+    <h2 class="readiness-title">Reminders</h2>
+    <p class="readiness-sub">${esc(note)}</p>
+    ${st === 'off' || (st === 'on' && !live) ? `<div class="acct-list">
+      <button type="button" class="hrow" id="push-on"><span class="hrow-b"><span class="hrow-l">Turn reminders on</span>
+        <span class="hrow-q">One tap, then your phone asks you once.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>
+    </div>` : ''}
+    ${live ? `<div class="cr-sws"><p class="cr-note">What reaches you. Turn any of them off.</p>${rows}</div>
+    <div class="acct-list"><div class="acct-theme"><span class="acct-lbl">Time of day</span>
+      <span class="acct-seg" role="group" aria-label="The hour your reminders arrive">
+        <button type="button" id="push-hour">${String(hour).padStart(2, '0')}:00</button></span></div></div>
+    <p class="cr-note">Tap the time to move it an hour, between 8am and 10pm.${me && me.phones > 1 ? ' It applies to all ' + me.phones + ' of your phones.' : ''}</p>
+    <div class="acct-list"><button type="button" class="hrow" id="push-off"><span class="hrow-b">
+      <span class="hrow-l">Turn them all off</span>
+      <span class="hrow-q">Your phone keeps the permission, so you can turn them back on here.</span></span>
+      <span class="hrow-a" aria-hidden="true">›</span></button></div>` : ''}`;
+  const onBtn = ov.querySelector('#push-on');
+  if (onBtn) onBtn.addEventListener('click', () => pushTurnOn());
+  const offBtn = ov.querySelector('#push-off');
+  if (offBtn) offBtn.addEventListener('click', () => armedTap(offBtn.querySelector('.hrow-l'), 'Tap again to turn them off', () => pushTurnOff()));
+  const hr = ov.querySelector('#push-hour');
+  if (hr) hr.addEventListener('click', () => pushBumpHour());
+  ov.querySelectorAll('input[data-pkind]').forEach(i =>
+    i.addEventListener('change', () => pushToggleKind(i.dataset.pkind, i.checked, i)));
+  ov.classList.add('visible');
+  paintSheetBack();
+}
+function openPushSettingsPage() { _SHEET.restoring = true; try { openPushSettings(); } finally { _SHEET.restoring = false; } }
+
+async function pushTurnOn() {
+  const sb = await _sbReady();
+  if (!sb || !window.AAPush) return;
+  AAPush.markAsked();
+  const r = await AAPush.enable(sb, 'training', 'en');
+  if (r && r.ok) { PUSH_ME = r.me || PUSH_ME; aaToast('Reminders are on'); }
+  else if (r && r.state === 'blocked') aaToast('Your phone said no. You can undo that in its settings.');
+  else if (r && r.state === 'needs-install') aaToast('Add the app to your Home Screen first');
+  else aaToast('That did not work. Try again later.');
+  openPushSettingsPage();
+}
+async function pushTurnOff() {
+  const sb = await _sbReady();
+  const r = sb ? await AAPush.disable(sb) : null;
+  PUSH_ME = (r && r.me) || { on: false };
+  aaToast(r && r.ok ? 'Reminders are off' : 'That did not save');
+  openPushSettingsPage();
+}
+async function pushToggleKind(kind, on, input) {
+  const sb = await _sbReady();
+  const me = sb ? await AAPush.set(sb, { [kind]: !!on }) : null;
+  if (me) PUSH_ME = me;
+  else { if (input) input.checked = !on; aaToast('That did not save'); }
+}
+async function pushBumpHour() {
+  const h = ((PUSH_ME && PUSH_ME.hour) || 20) + 1;
+  const sb = await _sbReady();
+  const me = sb ? await AAPush.set(sb, null, h > 22 ? 8 : h) : null;
+  if (me) PUSH_ME = me; else aaToast('That did not save');
+  openPushSettingsPage();
+}
+
 function openCrewSettings() {
   const ov = document.getElementById('hist-overlay');
   if (!ov || !BELL) return;
