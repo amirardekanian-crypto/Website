@@ -33,7 +33,6 @@ const SEED_NUMBERS = {
   _hab_wt: { [day(33)]: { kg: 81.4, t: 1 }, [day(18)]: { kg: 80.6, t: 2 }, [day(7)]: { kg: 80.1, t: 3 }, [day(1)]: { kg: 79.8, t: 4 } },
 };
 // AA Proof's snapshot for Home's habits row (it publishes it at every render).
-const hab = (verdict, extra) => ({ lv: 3, streak: 4, done: 2, total: 5, verdict, togo: 2, qualified: false, pct: 40, t: Date.now(), ...extra });
 
 // Every text node the active screen draws, as a client rect, against the account button's.
 const OVERLAP = `(() => {
@@ -144,7 +143,8 @@ function noStrip(browser) {
     const { ctx, p } = await H.openProgram(browser, { prog: prog(), seed: SEED_NUMBERS, stub: { tables: { career_rules: R.RW_RULES, career_facts: [] }, profile: prof, awards: R.rwShelf(prof), myMoments } });
     await R.waitRow(p);
     const home = await p.evaluate(() => ({ rows: [...document.querySelectorAll('#home-overview .hrow')].map(r => r.querySelector('.hrow-l').textContent.trim()), hold: document.getElementById('home-hold-wrap').innerHTML.trim() }));
-    t.check('Home with the career: the Career row, then the Daily habits row; Hold Serve folded into the Career row (its own row is empty)', home.rows.join() === 'Career,Daily habits' && home.hold === '', JSON.stringify(home));
+    t.check('Home with the career: the Career row is the one door (Daily habits became Today\u2019s card); Hold Serve folded into it (its own row is empty)',
+      home.rows.join() === 'Career' && home.hold === '', JSON.stringify(home));
     await p.evaluate(() => goTo('plan'));
     await p.waitForFunction(() => !!document.querySelector('#moments-title'), null, { timeout: 8000 }).catch(() => {});
     await p.waitForTimeout(400);
@@ -181,12 +181,13 @@ function noStrip(browser) {
         order: [...home.children].map(c => c.id || c.className).join(' | ') };
     });
     t.check('Home: no This cycle card, no small cycle line', !h.cyc, JSON.stringify(h.ids));
-    t.check('Home: no Records or Body weight row (they are on Progress), and none of the old wrappers', h.hrows.join() === 'Daily habits' && !h.text && h.ids.length === 0, JSON.stringify([h.hrows, h.text, h.ids]));
+    t.check('Home: no Records or Body weight row (they are on Progress), no Daily habits row (it is Today\u2019s card), and none of the old wrappers',
+      h.hrows.length === 0 && !h.text && h.ids.length === 0, JSON.stringify([h.hrows, h.text, h.ids]));
     t.check('Home: exactly one .day-ov-card, the Next up card (.dc-hero, data-dc, role button)',
       h.cards === 1 && /\bdc-hero\b/.test(h.hero.cls) && h.hero.role === 'button' && h.hero.tab === '0' && !!h.hero.dc && h.hero.click === `openDayView('${h.hero.dc}')`, JSON.stringify(h.hero));
     t.check('Home: every other day is a .dc-row with data-dl and no data-dc, in .dc-list', h.list && h.rows.length === h.days - 1 && h.rows.every(r => r.dl && !r.dc && r.role === 'button' && r.dl !== h.hero.dc), JSON.stringify(h.rows));
     t.check('Home: the fixture has Day 1 done this week, so Next up is Day 2 and Day 1 is a done row', h.hero.dc === '2' && h.rows[0].dl === '1' && h.rows[0].done && /done this week/.test(h.rows[0].label), JSON.stringify([h.hero.dc, h.rows]));
-    t.check('Home: order is the greeting, This Week, the days, then the habits row and the Proof strip', /home-greeting-wrap.*home-offline.*home-unfinished-wrap.*home-week-wrap.*day-cards-wrap.*home-sugg-wrap.*home-habits-wrap.*home-proof-strip/.test(h.order), h.order);
+    t.check('Home: order is the greeting, This Week, the days, then Today’s card', /home-greeting-wrap.*home-offline.*home-unfinished-wrap.*home-week-wrap.*day-cards-wrap.*home-sugg-wrap.*home-today-wrap/.test(h.order), h.order);
 
     const g = await p.evaluate(() => {
       const gh = [...APP_GUIDE].find(c => c.title === 'Getting around'), st = [...APP_GUIDE].find(c => c.title === 'How your programme is structured'), rec = [...APP_GUIDE].find(c => /Personal Records/.test(c.title));
@@ -287,31 +288,28 @@ function noStrip(browser) {
   // ── 5. the door rows: one look with and without data; the habits verdict colours ──
   {
     const rowLook = el => { const c = getComputedStyle(el); return [c.backgroundColor, c.borderTopWidth, c.borderTopStyle, c.borderTopColor, c.borderTopLeftRadius, c.minHeight, c.display].join('|'); };
-    // AA Proof's embedded strip publishes its own snapshot once it has loaded, so "no data" is made here, on the spot: the snapshot removed and the row drawn again
-    const look = (p, noHabits) => p.evaluate(`(() => { const f = ${rowLook.toString()}; goTo('home');
-      if (${!!noHabits}) { localStorage.removeItem(ATHLETE_ID + '_hab_card'); document.getElementById('home-habits-wrap').innerHTML = habitCardHtml(); }
-      const h = document.querySelector('#home-habits-wrap .hrow'), hh = Math.round(h.getBoundingClientRect().height); goTo('plan');
+    // Daily habits was the third of these doors until AA Proof was retired into this app (2026-10-19): it is
+    // Today's card now, and 5b holds it. The pair left is Personal records and Body weight, on Progress.
+    const look = (p) => p.evaluate(`(() => { const f = ${rowLook.toString()}; goTo('plan');
       const c = document.querySelector('#ceiling-row-wrap .hrow'), w = document.querySelector('#weight-row-wrap .hrow');
-      return { habits: f(h), records: f(c), weight: f(w), icons: [h, c, w].map(r => !!r.querySelector('.hrow-ic svg')).join(), quiet: [h, c, w].map(r => r.classList.contains('quiet')).join(),
-        dark: [h, c, w].some(r => /rgb\\(18, 42, 34\\)/.test(getComputedStyle(r).backgroundColor)), dashed: [h, c, w].some(r => getComputedStyle(r).borderTopStyle === 'dashed'),
-        minH: [hh, Math.round(c.getBoundingClientRect().height), Math.round(w.getBoundingClientRect().height)].join() }; })()`);
+      return { records: f(c), weight: f(w), icons: [c, w].map(r => !!r.querySelector('.hrow-ic svg')).join(), quiet: [c, w].map(r => r.classList.contains('quiet')).join(),
+        dark: [c, w].some(r => /rgb\\(18, 42, 34\\)/.test(getComputedStyle(r).backgroundColor)), dashed: [c, w].some(r => getComputedStyle(r).borderTopStyle === 'dashed'),
+        minH: [Math.round(c.getBoundingClientRect().height), Math.round(w.getBoundingClientRect().height)].join() }; })()`);
     const bare = await H.openProgram(browser, { prog: prog() });
-    const a = await look(bare.p, true);
+    const a = await look(bare.p);
     await bare.ctx.close();
-    const full = await H.openProgram(browser, { prog: prog(), seed: Object.assign({ _hab_card: hab('togo') }, SEED_NUMBERS) });
-    const b = await look(full.p, false);
-    const verdict = async (v, extra) => { const o = await H.openProgram(browser, { prog: prog(), seed: { _hab_card: hab(v, extra) } }); const r = await o.p.evaluate(() => { const e = document.querySelector('#home-habits-wrap .hrow-v'); return { text: e.firstChild.textContent.trim(), color: getComputedStyle(e).color, cls: e.className }; }); await o.ctx.close(); return r; };
+    const full = await H.openProgram(browser, { prog: prog(), seed: SEED_NUMBERS });
+    const b = await look(full.p);
     await full.ctx.close();
     t.check('door rows without data: all three quiet, with an icon, white with a 1 px edge, rounded 12, 64 px at least, never dark green, never dashed',
-      a.quiet === 'true,true,true' && a.icons === 'true,true,true' && !a.dark && !a.dashed && a.habits === a.records && a.records === a.weight && /^rgb\(255, 255, 255\)\|1px\|solid\|.*\|12px\|64px\|flex$/.test(a.habits) && a.minH.split(',').every(n => +n >= 64), JSON.stringify(a));
+      a.quiet === 'true,true' && a.icons === 'true,true' && !a.dark && !a.dashed && a.records === a.weight && /^rgb\(255, 255, 255\)\|1px\|solid\|.*\|12px\|64px\|flex$/.test(a.records) && a.minH.split(',').every(n => +n >= 64), JSON.stringify(a));
     t.check('door rows with data: not quiet, the same background, edge and corners as without data, never dark green, never dashed',
-      b.quiet === 'false,false,false' && b.icons === 'true,true,true' && !b.dark && !b.dashed && b.habits === a.habits && b.records === a.records && b.weight === a.weight, JSON.stringify([a.habits, b]));
-    const togo = await verdict('togo'), on = await verdict('on'), perfect = await verdict('perfect');
-    t.check('habits verdict: "2 to go" is clay ink (#B5461F, small text on the paper), On target and Perfect are green ink', togo.text === '2 to go' && togo.color === 'rgb(181, 70, 31)' && on.text === 'On target' && on.color === 'rgb(14, 74, 54)' && perfect.text === 'Perfect' && perfect.color === 'rgb(14, 74, 54)', JSON.stringify([togo, on, perfect]));
+      b.quiet === 'false,false' && b.icons === 'true,true' && !b.dark && !b.dashed && b.records === a.records && b.weight === a.weight, JSON.stringify([a.records, b]));
     // dark: the row is #242424 on #181818 like the day's rows
-    const d = await H.openProgram(browser, { prog: prog(), dark: true, seed: Object.assign({ _hab_card: hab('on') }, SEED_NUMBERS) });
-    const dk = await d.p.evaluate(() => { const r = document.querySelector('#home-habits-wrap .hrow'); const c = getComputedStyle(r); return { row: c.backgroundColor, page: getComputedStyle(document.body).backgroundColor, edge: c.borderTopColor, on: getComputedStyle(r.querySelector('.hrow-v')).color }; });
-    t.check('dark: the door row is #242424 on #181818, its verdict mint', dk.row === 'rgb(36, 36, 36)' && dk.page === 'rgb(24, 24, 24)' && dk.on === 'rgb(109, 190, 149)', JSON.stringify(dk));
+    const d = await H.openProgram(browser, { prog: prog(), dark: true, seed: SEED_NUMBERS });
+    const dk = await d.p.evaluate(() => { goTo('plan'); const r = document.querySelector('#ceiling-row-wrap .hrow'); const c = getComputedStyle(r);
+      return { row: c.backgroundColor, page: getComputedStyle(document.body).backgroundColor, edge: c.borderTopColor }; });
+    t.check('dark: the door row is #242424 on #181818', dk.row === 'rgb(36, 36, 36)' && dk.page === 'rgb(24, 24, 24)', JSON.stringify(dk));
     await d.ctx.close();
   }
 
@@ -319,7 +317,7 @@ function noStrip(browser) {
   //        door is for: a door that carries a figure keeps the figure and the name is a quiet green label; a door without one
   //        makes the name the headline, in the cycle card's fold-row recipe. ONE rule over all seven scopes. ──
   {
-    const { ctx, p } = await H.openProgram(browser, { prog: prog(), w: 390, h: 844, seed: Object.assign({ _hab_card: hab('togo') }, SEED_NUMBERS) });
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(), w: 390, h: 844, seed: SEED_NUMBERS });
     const face = async (sel, screen) => p.evaluate(([s, scr]) => {
       if (scr) goTo(scr);
       const l = document.querySelector(s); if (!l) return null;
@@ -329,11 +327,10 @@ function noStrip(browser) {
     const QUIET = 'Barlow|13px|600|normal|none|rgb(14, 74, 54)';      // a door that carries a figure: the green label
     const LOUD = 'Barlow|16px|600|normal|none|rgb(26, 26, 26)';        // every other door: the name as the headline
     await p.evaluate(() => goTo('home')); await p.waitForTimeout(350);
-    const habits = await face('#home-habits-wrap .hrow-l');
     await p.evaluate(() => goTo('plan')); await p.waitForTimeout(450);
     const records = await face('#ceiling-row-wrap .hrow-l'), weight = await face('#weight-row-wrap .hrow-l'), why = await face('.road-why-door .hrow-l');
-    t.check('the door name: the three doors that carry a figure (Daily habits, Personal records, Body weight) wear the quiet green label',
-      [habits, records, weight].every(x => x && x.style === QUIET && !x.clipped), JSON.stringify([habits, records, weight]));
+    t.check('the door name: the doors that carry a figure (Personal records, Body weight) wear the quiet green label',
+      [records, weight].every(x => x && x.style === QUIET && !x.clipped), JSON.stringify([records, weight]));
     t.check('the door name: a door with no figure (Why your plan looks like this) is the headline instead, in ink',
       !!why && why.style === LOUD && !why.clipped, JSON.stringify(why));
     // the defect the first draft had: at 13 px grey the name was the twin of the metadata beside the figure ("Back Squat · ▲ 12 KG")
@@ -352,7 +349,7 @@ function noStrip(browser) {
     t.check('no page errors (the door name)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
     // the narrowest phone: the label used to wrap to two tracked lines and a media query existed only to stop it
-    const n = await H.openProgram(browser, { prog: prog(), w: 320, h: 568, seed: Object.assign({ _hab_card: hab('togo') }, SEED_NUMBERS) });
+    const n = await H.openProgram(browser, { prog: prog(), w: 320, h: 568, seed: SEED_NUMBERS });
     await n.p.evaluate(() => goTo('plan')); await n.p.waitForTimeout(450);
     const narrow = await n.p.evaluate(() => { const l = document.querySelector('.road-why-door .hrow-l'), sp = document.querySelector('#ceiling-row-wrap .nc-spark');
       return { lines: Math.round(l.getBoundingClientRect().height / parseFloat(getComputedStyle(l).lineHeight)), clipped: l.scrollWidth > l.clientWidth + 1,
@@ -372,30 +369,113 @@ function noStrip(browser) {
     t.check('the door name: no scope still sets it in Space Mono', !/\.hrow-l \{[^}]*Space Mono/.test(src), (src.match(/\.hrow-l \{[^}]*Space Mono[^}]*\}/g) || []).join(' | '));
   }
 
-  // ── 5b. AA Proof's strip is the habits once it is on screen: the Daily habits row goes (paintHabitsCard()); with the frame blocked the row stays ──
+  // ── 5b. TODAY: the day as one card (2026-10-19, direction B). AA Proof was retired into this app, so the Daily habits door row
+  //        and the iframe of AA Proof under it are gone; the session and the habits are one list, logged here. ──
   {
-    // Proof says "ready" only when it is set up here (onboarded); otherwise "setup" and the strip stays hidden
-    const o = { prog: prog(), seed: { _hab_card: hab('togo'), _hab_cfg: { onboarded: true, toured: true, installAsked: true, boardSwept: true, updatedAt: Date.now() } } };
-    const blocked = await H.openProgram(browser, o);
-    await blocked.p.evaluate(() => document.getElementById('home-habits-wrap').scrollIntoView());
-    await blocked.p.waitForTimeout(1500);
-    const b = await blocked.p.evaluate(() => ({ row: !!document.querySelector('#home-habits-wrap .hrow'), strip: !document.getElementById('home-proof-strip').classList.contains('off') }));
-    t.check('the strip never comes (its frame blocked): the Daily habits row alone, the strip stays hidden', b.row && !b.strip, JSON.stringify(b));
-    await blocked.ctx.close();
-    const { ctx, p } = await H.openProgram(real, o);
-    await p.evaluate(() => document.getElementById('home-habits-wrap').scrollIntoView());
-    await p.waitForFunction(() => !document.getElementById('home-proof-strip').classList.contains('off'), null, { timeout: 15000 }).catch(() => {});
-    await p.waitForTimeout(500);
-    const s = await p.evaluate(() => ({ strip: !document.getElementById('home-proof-strip').classList.contains('off'), row: !!document.querySelector('#home-habits-wrap .hrow'), wrap: document.getElementById('home-habits-wrap').innerHTML.trim(),
-      frame: !!document.querySelector('#home-proof-strip iframe'), h: Math.round(document.getElementById('home-proof-strip').getBoundingClientRect().height) }));
-    t.check('the strip says it is ready: it IS the habits, the Daily habits row is gone (the wrap is empty)', s.strip && s.frame && s.h > 40 && !s.row && s.wrap === '', JSON.stringify(s));
-    // coming back to Home redraws the row's wrap: still none while the strip is on
-    await p.evaluate(() => { goTo('plan'); goTo('home'); });
-    await p.waitForTimeout(300);
-    t.check('…and it stays gone when Home is opened again', await p.evaluate(() => !document.querySelector('#home-habits-wrap .hrow')));
-    t.check('no page errors (the strip)', p.errs.length === 0, p.errs.join(' | '));
-    await shot(p, 'home-strip-on');
+    const CFG_ON = { onboarded: true, toured: true, installAsked: true, boardSwept: true, updatedAt: Date.now() };
+    const card = () => ({
+      head: (document.querySelector('.today-card .today-k') || {}).textContent,
+      verdict: (document.querySelector('.today-card .today-v') || {}).textContent,
+      vcolor: (() => { const e = document.querySelector('.today-card .today-v'); return e ? getComputedStyle(e).color : ''; })(),
+      rows: [...document.querySelectorAll('.today-card .hb-name')].map(n => n.textContent),
+      days: [...document.querySelectorAll('.today-card .hb-day')].map(n => n.textContent.trim()),
+      nudge: (document.querySelector('.today-card .today-nudge') || {}).textContent,
+      marks: [...document.querySelectorAll('.today-card .hb-mark')].map(m => m.classList.contains('is-done')).join(),
+      gone: !document.getElementById('home-habits-wrap') && !document.getElementById('home-proof-strip'),   // the row and the iframe both went with AA Proof
+    });
+
+    // Nobody has set the habits up: the first screen, which is the only place either app says what is tracked
+    // before it starts scoring it.
+    const fresh = await H.openProgram(browser, { prog: prog() });
+    const start = await fresh.p.evaluate(() => ({
+      head: (document.querySelector('.today-start .today-k') || {}).textContent,
+      five: [...document.querySelectorAll('.today-start .hs-five b')].map(b => b.textContent),
+      go: (document.querySelector('.today-start .hs-go') || {}).textContent,
+      noRows: !document.querySelector('.today-card .hb-row'),
+    }));
+    t.check('never set up: the first screen names the five and nothing is scored yet',
+      start.head === 'The other 23 hours' && start.five.length === 5 && start.five[0] === 'Finish your session'
+      && start.go === 'Start tracking' && start.noRows, JSON.stringify(start));
+    await fresh.p.click('.hs-go');
+    await fresh.p.waitForTimeout(250);
+    const after = await fresh.p.evaluate(card);
+    t.check('Start tracking: the card is the five habits, the four days you may still fill in, and the verdict',
+      after.head === 'Today' && after.rows.length === 5 && after.days.length === 4 && after.days[3] === 'Today'
+      && after.verdict === '3 to go' && after.gone, JSON.stringify(after));
+    t.check('the config it wrote is AA Proof\'s own key, so no history moves',
+      await fresh.p.evaluate(() => !!JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_cfg') || '{}').onboarded));
+    await fresh.ctx.close();
+
+    // Logging: a tick, a +, and a number row. Every one of them writes <id>_hab_log and nothing else.
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(), seed: { _hab_cfg: CFG_ON } });
+    await p.evaluate(() => habBump('water'));
+    await p.evaluate(() => habTap('sleep'));
+    await p.waitForTimeout(150);
+    const numRow = await p.evaluate(() => { const i = document.getElementById('hab-num-sleep'); return i && { v: i.value, unit: i.parentElement.querySelector('span').textContent }; });
+    t.check('a counted habit opens its number row, prefilled with the target (a full day is two taps)',
+      !!numRow && numRow.v === '7.5' && numRow.unit === 'hours', JSON.stringify(numRow));
+    await p.click('.hb-save');
+    await p.waitForTimeout(200);
+    const state = await p.evaluate(() => ({
+      log: JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_log') || '{}'),
+      marks: [...document.querySelectorAll('.today-card .hb-mark')].map(m => m.classList.contains('is-done')).join(),
+      verdict: (document.querySelector('.today-card .today-v') || {}).textContent,
+    }));
+    const today = Object.keys(state.log)[0];
+    t.check('+ and the number row both land in <id>_hab_log, on today, and the card follows',
+      state.log[today] && state.log[today].water === 1 && state.log[today].sleep === 7.5
+      && state.marks === 'false,false,true,false,false' && state.verdict === '2 to go', JSON.stringify(state));
+
+    // The verdict's three words, and its two colours: "N to go" asks for something and stays clay; the other two are the good news.
+    await p.evaluate(() => { const H2 = window.AAHabits, k = H2.TKEY(); habSetVal('steps', 10000); habSetVal('fuel', 3); habSetVal('water', 8); });
+    await p.waitForTimeout(200);
+    const on = await p.evaluate(card);
+    await p.evaluate(() => habTickSession());
+    await p.waitForTimeout(200);
+    const perfect = await p.evaluate(card);
+    t.check('the verdict: four of five is On target in green ink, all five is Perfect, and "to go" was clay',
+      on.verdict === 'On target' && on.vcolor === 'rgb(14, 74, 54)' && perfect.verdict === 'Perfect', JSON.stringify([on.verdict, on.vcolor, perfect.verdict]));
+    t.check('a finished session ticks the session habit here, not through another app', perfect.marks === 'true,true,true,true,true', perfect.marks);
+    t.check('the nudge says what is done, not what is missing', /perfect day/i.test(perfect.nudge), perfect.nudge);
+
+    // The backfill window: today and three days back, and the card says whose day it is.
+    await p.evaluate(() => document.querySelectorAll('.today-card .hb-day')[1].click());
+    await p.waitForTimeout(200);
+    const past = await p.evaluate(() => ({
+      head: (document.querySelector('.today-card .today-k') || {}).textContent,
+      clay: getComputedStyle(document.querySelector('.today-card')).borderTopColor,
+      marks: [...document.querySelectorAll('.today-card .hb-mark')].map(m => m.classList.contains('is-done')).join(),
+    }));
+    t.check('filling in an earlier day says so, takes the clay edge, and shows THAT day empty',
+      /^Filling in /.test(past.head) && past.clay === 'rgb(199, 85, 47)' && past.marks === 'false,false,false,false,false', JSON.stringify(past));
+    await p.evaluate(() => { const H2 = window.AAHabits; habSetVal('water', 8); });
+    await p.waitForTimeout(150);
+    const back = await p.evaluate(() => { const log = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_log') || '{}'); const ks = Object.keys(log).sort(); return { days: ks.length, oldest: log[ks[0]] }; });
+    t.check('…and it lands on that day, not on today', back.days === 2 && back.oldest.water === 8, JSON.stringify(back));
+    await p.evaluate(() => document.querySelectorAll('.today-card .hb-day')[3].click());
+    await p.waitForTimeout(150);
+    t.check('no page errors (Today)', p.errs.length === 0, p.errs.join(' | '));
+    await shot(p, 'home-today-card');
     await ctx.close();
+
+    // Dark: the card is the day's rows, #242424 on #181818, and the verdict reads mint rather than the light green.
+    const d = await H.openProgram(browser, { prog: prog(), dark: true, seed: { _hab_cfg: CFG_ON } });
+    const dk = await d.p.evaluate(() => { const c = document.querySelector('.today-card'); const s = getComputedStyle(c);
+      return { card: s.backgroundColor, page: getComputedStyle(document.body).backgroundColor, v: getComputedStyle(c.querySelector('.today-v')).color }; });
+    t.check('dark: the card is #242424 on #181818 and the verdict is legible on it',
+      dk.card === 'rgb(36, 36, 36)' && dk.page === 'rgb(24, 24, 24)' && dk.v !== dk.card, JSON.stringify(dk));
+    await d.ctx.close();
+
+    // The narrowest phone: nothing clipped and no sideways scroll, with the longest habit name on the roster.
+    const n = await H.openProgram(browser, { prog: prog(), w: 320, h: 568, seed: { _hab_cfg: CFG_ON } });
+    const nar = await n.p.evaluate(() => ({
+      side: document.documentElement.scrollWidth - window.innerWidth,
+      clipped: [...document.querySelectorAll('.today-card .hb-name')].some(e => e.scrollWidth > e.clientWidth + 1),
+      tap: Math.min(...[...document.querySelectorAll('.today-card .hb-main')].map(b => Math.round(b.getBoundingClientRect().height))),
+    }));
+    t.check('at 320: nothing sideways, no name clipped, every row still a 48 px tap target',
+      nar.side <= 0 && !nar.clipped && nar.tap >= 48, JSON.stringify(nar));
+    await n.ctx.close();
   }
 
   // ── 6. the account button: absolute, off every screen's text at the top, gone when scrolled away ──
@@ -442,7 +522,7 @@ function noStrip(browser) {
     const cyc = prog();
     const cur = cyc.cycles[cyc.currentCycleIndex];
     cur.weekNotes = { [String(1 + Math.floor(10 / 7))]: { text: 'Hold the load. Everything stays at RPE 7 this week.', rpeCap: 7 } };   // the fixture's cycle is in week 2
-    const { ctx, p } = await H.openProgram(browser, { prog: cyc, w, h: w === 320 ? 568 : 844, seed: Object.assign({ _hab_card: hab('togo'),
+    const { ctx, p } = await H.openProgram(browser, { prog: cyc, w, h: w === 320 ? 568 : 844, seed: Object.assign({ _hab_cfg: { onboarded: true, updatedAt: Date.now() },
       _autofiled: [{ on: day(1), day: '1', done: 3, total: 9, at: Date.now() }] }, SEED_NUMBERS) });
     const e = await p.evaluate(() => {
       const left = (sel, text) => { const el = document.querySelector(sel); if (!el) return null; if (!text) return Math.round(el.getBoundingClientRect().left * 10) / 10;
@@ -451,9 +531,8 @@ function noStrip(browser) {
       const padded = sel => { const el = document.querySelector(sel); if (!el) return null; return Math.round((el.getBoundingClientRect().left + parseFloat(getComputedStyle(el).paddingLeft)) * 10) / 10; };
       const off = document.getElementById('home-offline'); off.hidden = false; off.textContent = 'Saved plan';
       document.getElementById('home-sugg-wrap').innerHTML = '<div class="lib-sugg">Extra</div>';
-      document.getElementById('home-proof-strip').classList.remove('off');   // the strip is hidden until AA Proof says it is ready: show it to measure it
       return { greeting: null, name: left('.home-greet > span:last-child', true), offline: padded('#home-offline'), unfinished: padded('.uf-card'), thisWeek: left('.wn-kick .wn-name', true) || left('.home-section-title', true),
-        note: left('.wn'), hero: left('.dc-hero'), rows: left('.dc-row'), rowNum: left('.dc-row .dc-num', true), sugg: left('#home-sugg-wrap .lib-sugg'), habits: left('#home-habits-wrap .hrow'), proof: left('#home-proof-strip') };
+        note: left('.wn'), hero: left('.dc-hero'), rows: left('.dc-row'), rowNum: left('.dc-row .dc-num', true), sugg: left('#home-sugg-wrap .lib-sugg'), today: left('#home-today-wrap .today-card') };
     });
     // the greeting's eyebrow starts after its 7 px dot and 8 px gap: its box, not the text, is the gutter
     const gb = await p.evaluate(() => { const g = document.querySelector('.home-greet'); return Math.round((g.getBoundingClientRect().left + parseFloat(getComputedStyle(g).paddingLeft)) * 10) / 10; });
@@ -485,7 +564,7 @@ function noStrip(browser) {
 
   // ── 8. no sideways scroll, light and dark, on Home, Progress, Records and Body weight ──
   for (const [w, dark] of [[320, false], [375, false], [390, false], [320, true], [375, true], [390, true]]) {
-    const { ctx, p } = await H.openProgram(browser, { prog: prog(LONG), w, h: w === 320 ? 568 : 844, dark, seed: Object.assign({ _hab_card: hab('togo') }, SEED_NUMBERS) });
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(LONG), w, h: w === 320 ? 568 : 844, dark, seed: SEED_NUMBERS });
     const out = {};
     for (const [name, go] of [['Home', "goTo('home')"], ['Progress', "goTo('plan')"], ['Records', "goTo('ceiling')"], ['Body weight', "goTo('weight')"]]) {
       await p.evaluate(go); await p.waitForTimeout(450);

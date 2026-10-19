@@ -346,11 +346,16 @@
 //       Monthly Open, the athlete's own card) and three more (a new level, the month's goal, a session). Every achievement can be shared
 //       from Your moments, whenever it was earned. Any card can take the athlete's own photo as its ground, moved and zoomed by hand; the
 //       picture never leaves the phone. The badge, title and quest cards go: the cut took them off the server.
-// v196: assets/js/sharecard.js changed (2026-10-19). The month's honour and the Monthly Open belong to a calendar month, and
+// v196: program.html and sw.js changed (2026-10-19, Amir: "Aa proof will die"). THE HABITS ARE THIS APP'S NOW. Home's Daily habits
+// row and the iframe of AA Proof under it are one card, Today: the session and the habits as one list, because they are one day
+// (direction B, picked from three). The engine is assets/js/habits-core.js, generated from habits.html so the two cannot drift;
+// the keys are AA Proof's own, so no athlete's history moves. The first screen comes with it, for anyone who has never set the
+// habits up. This app is now the writer of <id>_hab_cfg and <id>_hab_log: it pushes them, and merges a day by union.
+// v197: assets/js/sharecard.js changed (2026-10-19). The month's honour and the Monthly Open belong to a calendar month, and
 //       the app sends that month as an ISO day; the card read only a `month` the app never set, so both cards drew their eyebrow
 //       with the month missing. They name the month themselves now, in the card's own language (a Farsi card writes the Gregorian
 //       month in Farsi letters, its date still Shamsi), and the test carries the spec shape the app really sends.
-const CACHE = 'aap-v196';
+const CACHE = 'aap-v197';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -374,6 +379,8 @@ const SHELL = [
   // so a change to it needs a CACHE bump. (Its fonts, photo, mark and covers are kept as they are first used.)
   '/assets/js/sharecard.js',
   '/assets/js/push.js',
+  // The habit engine (v195): the training app owns the habits now, so this is shell, not an extra.
+  '/assets/js/habits-core.js',
   // Off the Glass, the rest game (v162): loaded on the first tap on Play. Cache-first by this plain URL: a change needs a CACHE bump.
   '/assets/js/rally.js',
   // Split Step, the second rest game (v165): loaded on the first tap on its row in the shelf. Cache-first by this plain URL: a change needs a CACHE bump.

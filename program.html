@@ -189,6 +189,9 @@
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
+<!-- The habit engine (2026-10-19): the roster, the log, the verdict, the day streak and the backfill window, generated
+     from habits.html by scripts/build_habits_core.js while AA Proof is being retired into this app. -->
+<script defer src="/assets/js/habits-core.js?v=1"></script>
 <!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
      on `defer` it shares one ordered execution queue with the SDK above. -->
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
@@ -583,7 +586,6 @@
   .dc-nm { min-width: 0; font: 900 var(--fs-body)/1.1 'Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--grey-dark); }
   .dc-nm small { display: block; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; text-transform: none; color: var(--grey-text);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-  #home-habits-wrap { margin-top: 24px; }
   /* A session at the right moment (LIB-01, Amir 2026-09-27, pick C): Home offers one when the week is done, the
      finished card one after a sore check-in. Its kicker is clay because it asks the athlete to look (DS-01's
      "a banner that asks for something"); the rest is the row's grey. paintWeekSugg() / paintSoreSugg(). */
@@ -1806,13 +1808,6 @@
      Same structure so an athlete learns it once — XP ring around the level, the
      rank crest, distance to the next level, and the seven-day strip. The crest
      markup and every number arrive from Proof; nothing here re-derives them. ── */
-  /* Today's habits, embedded from AA Proof (mountProofStrip()). The frame draws its own
-     card; it only needs to sit flush under the Daily habits row. */
-  .proof-strip { margin: -2px 24px 14px; }       /* in line with the Home rows (.hrow); the gutter is set by the HOME AND PROGRESS block */
-  /* Collapsed, NOT display:none, while Proof loads: a frame that is not laid out
-     measures its page at 0px, and the strip would wait for ever for a height. */
-  .proof-strip.off { height: 0; margin: 0; overflow: hidden; visibility: hidden; }
-  .proof-frame { display: block; width: 100%; height: 0; border: 0; background: transparent; }
 
   /* ── Inline per-exercise weight field on round-format circuits / supersets ──
      A small box folded into each round row (one weight per exercise). Per-round
@@ -4501,20 +4496,91 @@
   #home-overview .home-week-sum { margin: -4px var(--g) 12px; }
   #home-overview .wn { margin: 24px var(--g) 22px; }
   #home-overview #home-sugg-wrap:not(:empty) { margin: 14px var(--g) 0; }
-  #home-overview .proof-strip:not(.off) { margin: -2px var(--g) 14px; }
-  #home-overview #home-habits-wrap:empty { margin-top: 0; }   /* round 5: the strip is the habits now (paintHabitsCard()) */
-  #home-overview #home-habits-wrap:empty + .proof-strip:not(.off) { margin-top: 22px; }
   #home-overview .bt-sum { margin: -6px var(--g) 12px; }
   #home-overview .bt-wa { margin: 0 var(--g) 26px; }
   #home-overview .bt-rep { width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 10px; }
-  #home-overview #home-habits-wrap { margin-top: 20px; }
-  /* Hold Serve's row (paintHold()) leads the pair of door rows under the week: it takes the 20 px, the habits row sits 10 px under it. */
+  #home-overview #home-today-wrap:not(:empty) { margin-top: 20px; }
+
+  /* ══ TODAY: THE DAY AS ONE CARD (2026-10-19, Amir picked direction B from three) ═════════════════════════
+     The session and the habits are one list, because they are one day. It replaced AA Proof's door row and
+     the iframe of AA Proof under it when that app was retired into this one. Drawn by paintTodayCard();
+     every colour is the app's one set, every size a --fs- token, and the gutter is --g like every other
+     piece of Home. A row is 48 px of tap target with a 24 px mark, which is the day screen's own hit size. */
+  #home-overview .today-card { width: calc(100% - 2 * var(--g)); margin: 0 var(--g); box-sizing: border-box;
+    border: 1px solid var(--hair); border-radius: 14px; background: var(--row); overflow: hidden; }
+  /* Filling in an earlier day: the card takes the clay edge, so the screen can never quietly be about Saturday. */
+  #home-overview .today-card.is-past { border-color: var(--clay); }
+  #home-overview .today-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+    padding: 14px 16px 10px; border-bottom: 1px solid var(--hair); }
+  #home-overview .today-k { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--green-ink); }
+  /* "N to go" asks for something, so it stays clay; On target and Perfect are the good news, green. */
+  #home-overview .today-v { font: 700 var(--fs-lead)/1.2 'Barlow', sans-serif; }
+  #home-overview .today-v.is-togo { color: var(--clay-ink); }
+  #home-overview .today-v.is-ok { color: var(--green-ink); }
+
+  /* The backfill window, as four chips: today and the three days behind it. A dot means the day counts. */
+  #home-overview .hb-days { display: flex; gap: 6px; padding: 10px 16px 2px; }
+  #home-overview .hb-day { flex: 1; min-height: 40px; padding: 6px 2px; border: 1px solid var(--hair); border-radius: 9px;
+    background: var(--paper); color: var(--grey); font: 600 var(--fs-small)/1.2 'Barlow', sans-serif; cursor: pointer; }
+  #home-overview .hb-day i { display: block; width: 6px; height: 6px; margin: 4px auto 0; border-radius: 99px; background: transparent; }
+  #home-overview .hb-day.is-ok i { background: var(--mint); }
+  #home-overview .hb-day.is-on { border-color: var(--fill); background: var(--fill); color: #fff; }
+  #home-overview .hb-day.is-on.is-ok i { background: #fff; }
+  #home-overview .hb-day:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  #home-overview .hb-wrap + .hb-wrap { border-top: 1px solid var(--hair); }
+  /* The row is a div holding two real buttons: the tap target, and the + beside it (a button inside a
+     button is invalid, and the browser pulls it apart). */
+  #home-overview .hb-row { display: flex; align-items: center; gap: 8px; padding-right: 12px; }
+  #home-overview .hb-main { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; min-height: 48px;
+    padding: 10px 4px 10px 16px; border: 0; background: transparent; text-align: left; cursor: pointer; color: var(--ink); font-family: inherit; }
+  #home-overview .hb-main:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  #home-overview .hb-row.is-locked .hb-main { cursor: default; }
+  #home-overview .hb-mark { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 99px;
+    border: 1.8px solid var(--field); box-sizing: border-box; font: 700 var(--fs-small)/1 'Barlow', sans-serif; color: transparent; }
+  #home-overview .hb-mark.is-done { border-color: var(--fill); background: var(--fill); color: #fff; }
+  #home-overview .hb-name { flex: 1; min-width: 0; font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; }
+  #home-overview .hb-row.is-done .hb-name { color: var(--grey); }
+  #home-overview .hb-val { flex: none; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  /* How far into a counted habit the day is. Green, never clay: it reports, it does not ask. */
+  #home-overview .hb-bar { flex: none; width: 54px; height: 6px; border-radius: 99px; background: var(--prog-track); overflow: hidden; }
+  #home-overview .hb-bar i { display: block; height: 100%; background: var(--fill); }
+  #home-overview .hb-plus { flex: none; width: 34px; height: 34px; border-radius: 99px; border: 1.5px solid var(--hair);
+    background: var(--paper); color: var(--green-ink); font: 600 var(--fs-lead)/1 'Barlow', sans-serif; cursor: pointer; }
+  #home-overview .hb-plus:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+
+  /* The number row, under its habit, prefilled with the target: a full day is two taps, a real number three. */
+  #home-overview .hb-edit { display: flex; align-items: center; gap: 8px; padding: 0 16px 12px; }
+  #home-overview .hb-field { flex: 1; display: flex; align-items: baseline; gap: 8px; min-width: 0;
+    border: 1.5px solid var(--fill); border-radius: 10px; padding: 8px 12px; background: var(--row); }
+  #home-overview .hb-field input { flex: 1; min-width: 0; width: 100%; border: 0; outline: none; background: transparent;
+    color: var(--ink); padding: 0; font: 700 var(--fs-field)/1.2 'Barlow', sans-serif; }
+  #home-overview .hb-field span { flex: none; font: 600 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  #home-overview .hb-save { flex: none; height: 40px; padding: 0 18px; border: 0; border-radius: 99px; background: var(--fill);
+    color: #fff; font: 700 var(--fs-body)/1 'Barlow', sans-serif; cursor: pointer; }
+
+  /* The one line that says what to do now. No button: its job is to be read. */
+  #home-overview .today-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    padding: 11px 16px 13px; border-top: 1px solid var(--hair); background: var(--paper); }
+  #home-overview .today-nudge { flex: 1; min-width: 0; font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ink); }
+  #home-overview .today-streak { flex: none; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); white-space: nowrap; }
+
+  /* THE FIRST SCREEN: what is tracked, said before anything is scored. The only place the app makes a deal
+     with the athlete before it starts marking them (AA Proof's onboarding, which came across with the habits). */
+  #home-overview .today-start { padding-bottom: 16px; }
+  #home-overview .hs-lead { margin: 12px 16px 0; font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--ink); }
+  #home-overview .hs-five { list-style: none; margin: 12px 16px 0; padding: 0; display: grid; gap: 8px; }
+  #home-overview .hs-five li { display: grid; gap: 1px; padding: 9px 12px; border: 1px solid var(--hair); border-radius: 10px; background: var(--paper); }
+  #home-overview .hs-five b { font: 600 var(--fs-body)/1.25 'Barlow', sans-serif; }
+  #home-overview .hs-five span { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  #home-overview .hs-note { margin: 10px 16px 0; font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--grey); }
+  #home-overview .hs-go { width: calc(100% - 32px); margin: 14px 16px 0; min-height: 48px; border: 0; border-radius: 99px;
+    background: var(--fill); color: #fff; font: 700 var(--fs-body)/1 'Barlow', sans-serif; cursor: pointer; }
+  /* Hold Serve's row (paintHold()) leads the rows under the week: it takes the 20 px, Today's card sits under it. */
   #home-overview #home-hold-wrap:not(:empty) { margin-top: 20px; }
-  #home-overview #home-hold-wrap:not(:empty) + #home-habits-wrap { margin-top: 0; }
   /* The Career row (paintCareer(), Career Mode phase 2) leads them once the XP switch is on: it takes the 20 px, the rows under it 10. */
   #home-overview #home-career-wrap:not(:empty) { margin-top: 20px; }
   #home-overview #home-career-wrap:not(:empty) + #home-hold-wrap:not(:empty) { margin-top: 0; }
-  #home-overview #home-career-wrap:not(:empty) + #home-hold-wrap:empty + #home-habits-wrap { margin-top: 0; }
+
   /* its level bar: a 3 px line along the row's foot, green filling toward the next level (never clay: it asks for nothing) */
   #home-overview .career-row { position: relative; overflow: hidden; }
   #home-overview .career-row .career-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--hair); }
@@ -5728,13 +5794,10 @@
          is not drawn (it carries the same line). Empty when there is nothing true to say: offline, the demo, the coach's preview, no
          rulebook on the server, or a week not judged yet. -->
     <div id="home-hold-wrap"></div>
-    <!-- Daily habits — one row, AA Proof's verdict for today and the streak (HOME-02). Training comes first (2026-09-26:
-         Amir left the order to the audit's call). It sat ABOVE the week from
-         2026-09-12, and in the fortnight after, 5 of 40 athletes logged a habit
-         in a week while 16 trained, so the session leads and habits follow. -->
-    <div id="home-habits-wrap"></div>
-    <!-- Today's habits, ticked right here: AA Proof itself, embedded (mountProofStrip()). -->
-    <div id="home-proof-strip" class="proof-strip off"></div>
+    <!-- TODAY: the session and the habits as one list, because they are one day (direction B, Amir's pick, 2026-10-19).
+         It replaced AA Proof's row and the iframe of AA Proof under it when that app was retired into this one.
+         paintTodayCard(); the engine is assets/js/habits-core.js. -->
+    <div id="home-today-wrap"></div>
 
     <!-- Personal Records and Body weight were the last two rows of Home. They are on Progress now (Amir, 2026-10-12),
          under "Your numbers": #ceiling-row-wrap and #weight-row-wrap. The habits row and the Proof strip end Home. -->
@@ -6151,16 +6214,19 @@ function _snapshot() {
   const out = {}, prefix = _sbId + '_';
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    // The habit tracker (habits.html) is a separate app that happens to share
-    // this origin's storage. It owns "<id>_hab_*" and syncs those itself, so
-    // this app must never push them — a stale copy here would overwrite habit
-    // progress the athlete logged on another device.
-    // ⚠️ ONE exception to that rule, since 2026-09-12: body weight moved OUT of
-    // Proof and lives here now, so this app is its writer and must push it. The
-    // key name is unchanged deliberately — renaming it would mean migrating
-    // every athlete's history across devices, and coach.html already reads it
-    // at this name. habits.html no longer sends it.
-    if (k && k.indexOf(prefix + 'hab_') === 0 && k !== prefix + 'hab_wt') continue;
+    // ⚠️ THE HABITS ARE THIS APP'S NOW (2026-10-19). "<id>_hab_*" belonged to habits.html,
+    // which synced them itself, and pushing them from here would have overwritten habit
+    // progress logged on another device. AA Proof is being retired into this app, so this
+    // app is their writer: the log and the config go up with everything else, and the merge
+    // below keeps a day another device logged. The key names are unchanged deliberately —
+    // renaming them would mean migrating every athlete's history, and the server's scorers,
+    // the board and coach.html all read them at these names.
+    // Still not ours: the caches Proof kept per phone (the career profile, the catalogue, the
+    // shelf). They are read-only copies of what the server already knows, they are big, and
+    // they were never synced. _hab_card was the snapshot Proof published for this app's Home
+    // row; nothing writes or reads it any more.
+    if (k && (k === prefix + 'hab_career' || k === prefix + 'hab_catalogue'
+              || k === prefix + 'hab_shelf' || k === prefix + 'hab_card')) continue;
     // Local-only freshness stamp — pushed as the snapshot-level 'snapAt' below,
     // never as its own key (a cloud copy restored onto a fresh device would
     // masquerade as local edit history there).
@@ -6500,6 +6566,51 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
       }
     } catch (e) { /* not parseable — fall through */ }
   }
+  // ⚠️ THE HABIT LOG IS A UNION BY DAY, and per habit the LARGER number wins (2026-10-19, carried over
+  // from AA Proof's own merge when the habits moved into this app). The scalar rule would take one side
+  // wholesale: a day logged on the tablet simply is not in the phone's copy, so the phone winning would
+  // delete it, and a glass of water logged on one device would erase four logged on the other.
+  // `preferLocal` is this app's version of Proof's _dirtyDays: this device edited more recently than the
+  // cloud snapshot was taken, so its own deliberate correction (a mis-tap un-ticked back to 0) holds that
+  // day outright rather than having the old number handed straight back.
+  if (key.slice(-8) === '_hab_log') {
+    try {
+      const L = JSON.parse(localVal) || {}, C = JSON.parse(cloudVal) || {}, out = Object.assign({}, L);
+      Object.keys(C).forEach(day => {
+        const mine = L[day], theirs = C[day] || {};
+        if (preferLocal && mine) return;                       // ours outright: see above
+        const row = Object.assign({}, mine || {});
+        Object.keys(theirs).forEach(id => { row[id] = Math.max(Number(theirs[id]) || 0, Number(row[id]) || 0); });
+        out[day] = row;
+      });
+      return JSON.stringify(out);
+    } catch (e) { /* not parseable — fall through */ }
+  }
+  // The habit config: newest wins wholesale, the way Proof merged it, because every field on it is a
+  // setting. Two exceptions, both the same rule as the rewards below — `pass.owned` is a possession and is
+  // unioned, and a field that records a moment already SHOWN is never handed back empty, or the athlete
+  // meets it twice on the other phone.
+  if (key.slice(-8) === '_hab_cfg') {
+    try {
+      const L = JSON.parse(localVal) || {}, C = JSON.parse(cloudVal) || {};
+      const newer = (Number(C.updatedAt) || 0) > (Number(L.updatedAt) || 0) && !preferLocal;
+      const win = newer ? Object.assign({}, L, C) : Object.assign({}, C, L);
+      win.on = Object.assign({}, C.on || {}, L.on || {});
+      if (newer) win.on = Object.assign({}, L.on || {}, C.on || {});
+      ['seen', 'rulesSig', 'careerSeen', 'catalogueSeen', 'heldBefore', 'seenTiers', 'seenPerfect']
+        .forEach(f => { if (!win[f]) win[f] = L[f] || C[f] || null; });
+      const owned = (((C.pass || {}).owned) || []).concat((((L.pass || {}).owned) || []));
+      win.pass = Object.assign({}, C.pass || {}, L.pass || {}, { owned: owned.filter((id, i) => owned.indexOf(id) === i) });
+      // The roster timeline only ever appends, and a day it has lost is a day scored against the wrong set
+      // of habits for ever. Keep every entry either side has, oldest first, one per date.
+      const t = {};
+      (Array.isArray(C.roster) ? C.roster : []).concat(Array.isArray(L.roster) ? L.roster : [])
+        .forEach(e => { if (e && e.from) t[e.from] = e; });
+      const days = Object.keys(t).sort();
+      if (days.length) win.roster = days.map(d => t[d]);
+      return JSON.stringify(win);
+    } catch (e) { /* not parseable — fall through */ }
+  }
   // The rewards this athlete has seen (Career Mode phase 3, <id>_rw_seen: award id → when): a union, so a phone that missed one never hands
   // it back to the other to show again.
   if (key.slice(-8) === '_rw_seen') {
@@ -6605,8 +6716,7 @@ function setupCloudBackup(athleteId, data, key) {
     _lsRawRemove(key);                                  // real delete always happens first
     try {
       if (typeof key === 'string'
-          && key.indexOf(_sbId + '_') === 0
-          && key.indexOf(_sbId + '_hab_') !== 0) {      // habits.html owns its own keys
+          && key.indexOf(_sbId + '_') === 0) {
         if (_sbDrop.indexOf(key) === -1) { _sbDrop.push(key); _persistDrops(); }
         _pushSnapshot();
       }
@@ -6962,6 +7072,9 @@ async function _pullOnce(key) {
   let live = true;
   const r = await _withTimeout(syncFromCloud(ATHLETE_ID, key, () => live), 6000);
   if (r === null) live = false;
+  // A merge rewrites <id>_hab_cfg and <id>_hab_log under the engine's feet (it was handed the objects, not
+  // the keys), so read them again and redraw. Anything the other phone logged shows up here at once.
+  if (r === 'pulled') { habLoad(); paintTodayCard(); }
   return r;
 }
 function _startHoldTimer() { if (!_holdTimer) _holdTimer = setInterval(_resumeSync, 60000); }
@@ -7337,8 +7450,8 @@ setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS /
   if (PLAN_OFFLINE && !PLAN_OFFLINE.fast) paintPlanOffline('offline');
   // Opened from the phone first: ask the server now, behind the first paint (_resumeSync() is held by _sbHold, set above).
   if (PLAN_OFFLINE && PLAN_OFFLINE.fast) setTimeout(_resumeSync, 0);
-  _proofCardSig = proofCardSig();
-  mountProofStrip();
+  habLoad();
+  paintTodayCard();
 
   restoreState();
   // A day left unfinished on an earlier date is filed now, before anything can be tapped,
@@ -9127,7 +9240,7 @@ function renderHome() {
 
   // The row under the week: Daily habits (AA Proof's strip under it), refreshed on every goTo('home') — renderHome() runs
   // once at boot. Personal records and Body weight are on Progress now (paintNumbers(), Amir 2026-10-12).
-  paintHabitsCard();
+  paintTodayCard();
 
   const tabsHtml = days.map((day, i) => {
     const total = countTotalUnits(day);
@@ -9239,12 +9352,12 @@ function renderHome() {
       <div class="hl-band-slot" id="hlwin-${day.id}"></div>
       <!-- After a sore check-in: the day-after session, until it has been opened (LIB-01, paintSoreSugg()) -->
       <div class="complete-sugg-slot" id="sugg-${day.id}"></div>
-      <!-- Confirms the WORKOUT habit was ticked in Proof, so the athlete can
-           see the two apps agreed without leaving this screen. -->
-      <button type="button" class="complete-habit" id="habit-tick-${day.id}" hidden onclick="goHabits()">
+      <!-- The session habit, ticked on this screen by habTickSession(). It was a door into AA Proof until that app
+           was retired into this one (2026-10-19); now it is a line that says what just happened. -->
+      <div class="complete-habit" id="habit-tick-${day.id}" hidden>
         <span class="complete-habit-mark">✓</span>
-        <span class="complete-habit-text">Counts as your Session habit <b>open AA Proof</b></span>
-      </button>
+        <span class="complete-habit-text">Ticked off on today's card</span>
+      </div>
       <div class="complete-actions">
         <div class="send-session-status" id="send-status-${day.id}" aria-live="polite"></div>
       </div>
@@ -10544,7 +10657,7 @@ function goTo(screen, historyId, keepContent) {
   // Proof and navigated back from would show stale numbers until a reload. Leaving to Proof and coming
   // back is the habit row's single most common journey.
   if (screen === 'home') {
-    paintHabitsCard();
+    paintTodayCard();
     paintWeekSugg();   // gone once its session has been opened (LIB-01)
     paintNewVersion(); // ← Home is the usual way out of a session, and the box waits for that
   }
@@ -10770,134 +10883,253 @@ function goLibrary() {
 }
 window.goLibrary = goLibrary;
 
-// ── Habits (Proof) ────────────────────────────────────────────────────────
-// A separate page, so we hand over the client id and key exactly as this app
-// resolved them — an installed PWA often opens without ?key=, and the habit
-// tracker needs it to write to the cloud.
-function habitsUrl() {
-  let url = 'habits.html?client=' + encodeURIComponent(ATHLETE_ID);
-  if (_sbKey) url += '&key=' + encodeURIComponent(_sbKey);
-  return url;
-}
-function goHabits() { window.location.href = habitsUrl(); }
-window.goHabits = goHabits;
+// ── THE OTHER 23 HOURS: today's habits, in this app (2026-10-19) ──────────────────────────────────────
+// AA Proof is being retired into this app (Amir: "Aa proof will die"), and the habits come with it. They
+// used to be habits.html in an iframe on this screen, with a snapshot row passed between the two apps;
+// now this app owns them outright.
+//
+// ⚠️ THE ENGINE IS NOT HERE. assets/js/habits-core.js is the roster, the log, the verdict, the day streak
+// and the backfill window, cut out of habits.html by scripts/build_habits_core.js and held to it by guard
+// 26. Nothing in this file scores a habit: it draws what the engine answers and writes what the athlete
+// taps. A second copy of that arithmetic is how the athlete and the board end up disagreeing with nothing
+// to show for it.
+//
+// THE DAY IS ONE CARD (Amir picked direction B from three, 2026-10-19). The session and the habits are one
+// list, because they are one day. The session's row is the ledger line, not the invitation — Next up above
+// is still the thing you tap to train. Under the list, one line that says what to do now.
+//
+// The keys are AA Proof's own, unchanged: <id>_hab_cfg and <id>_hab_log. Every athlete's history, every
+// board position and every XP row on the server reads them exactly as it did, so nothing migrates.
+let HAB_CFG = null, HAB_LOG = {}, HAB_UI = { day: null }, _habEdit = null, _habWaiting = false;
+const habKeyCfg = () => ATHLETE_ID + '_hab_cfg';
+const habKeyLog = () => ATHLETE_ID + '_hab_log';
+// Never in the coach's preview (a stray tap would land in that athlete's own log) and never before the
+// engine has loaded (it is `defer`, so an early paint can reach here first).
+function habOn() { return !!(window.AAHabits && ATHLETE_ID && !window.IS_PREVIEW); }
 
-// ── Today's habits on Home: AA Proof, embedded (Fork 1B, B2, Amir, 2026-09-26) ──────
-// "Part of the training app": the athlete ticks today's habits under the Daily Habits
-// card without leaving. AA Proof draws the rows itself (habits.html?embed=1 in a frame,
-// renderEmbed() there) and makes every write through its own toggleHabit(), bump() and
-// sync, so this app STILL holds no habit state, no XP maths and writes no <id>_hab_* key.
-//   · Loaded only once the card is near the screen, and shown only when Proof says it is
-//     ready; until then, and if it never is (Proof not set up, offline), the card alone.
-//   · Every Proof render republishes its card snapshot, so the card above is redrawn
-//     when (and only when) its numbers moved.
-//   · Never in the coach's preview: the frame would open Proof as the coach.
-let _proofStrip = null, _proofCardSig = '';
-function mountProofStrip() {
-  if (_proofStrip || window.IS_PREVIEW || !ATHLETE_ID) return;
-  const host = document.getElementById('home-proof-strip');
-  const card = document.getElementById('home-habits-wrap');
-  if (!host || !card || !('IntersectionObserver' in window)) return;
-  _proofStrip = { host: host, frame: null };
-  const io = new IntersectionObserver(entries => {
-    if (!entries.some(e => e.isIntersecting)) return;
-    io.disconnect();
-    const f = document.createElement('iframe');
-    f.className = 'proof-frame';
-    f.title = "Today's habits";
-    f.src = habitsUrl() + '&embed=1';
-    host.appendChild(f);
-    _proofStrip.frame = f;
-  }, { rootMargin: '300px 0px' });
-  io.observe(card);
-}
-function proofCardSig() {
-  const s = habCardSnapshot();
-  return s ? [s.t ? new Date(s.t).toDateString() : '', s.lv, s.streak, s.done, s.total, s.qualified, s.verdict, s.togo, s.pct, JSON.stringify(s.days || s.week || [])].join('|') : '';
-}
-window.addEventListener('message', e => {
-  if (e.origin !== location.origin || !e.data || e.data.type !== 'aa-proof-embed') return;
-  const ps = _proofStrip;
-  if (!ps || !ps.frame || e.source !== ps.frame.contentWindow) return;
-  if (e.data.state !== 'ready' || !(e.data.h > 0)) { ps.host.classList.add('off'); ps.on = false; paintHabitsCard(); return; }
-  ps.frame.style.height = e.data.h + 'px';
-  ps.host.classList.remove('off');
-  if (!ps.on) { ps.on = true; paintHabitsCard(); }
-  const sig = proofCardSig();
-  if (sig !== _proofCardSig) {
-    const first = !_proofCardSig;
-    _proofCardSig = sig;
-    paintHabitsCard();
-    // A habit ticked in the strip pays XP to the career (Career Mode): once Proof has sent it (about 1.2 s), ask for the level again.
-    if (!first && careerOnT()) refreshCareerSoon(3000);
-  }
-});
-function proofStripTheme() {
-  const ps = _proofStrip;
-  if (!ps || !ps.frame || !ps.frame.contentWindow) return;
-  try { ps.frame.contentWindow.postMessage({ type: 'aa-proof-theme', dark: document.body.hasAttribute('data-dark') }, location.origin); }
-  catch (e) { /* the strip follows on its next load */ }
-}
-
-
-// Home's habits (Career Mode round 5, the Scorecard): once AA Proof's strip is on screen it IS the habits (its own head, "Today's habits",
-// and the chips), so the Daily habits row goes; until then, and when the strip never comes (Proof not set up, offline), the row alone.
-function paintHabitsCard() {
-  const hw = document.getElementById('home-habits-wrap');
-  if (!hw) return;
-  let on = false;
-  try { on = !!(_proofStrip && _proofStrip.on); } catch (e) { on = false; }   // renderHome() can reach here from boot, before `let _proofStrip` has run
-  const h = on ? '' : habitCardHtml();
-  if (hw.innerHTML !== h) hw.innerHTML = h;
-}
-// The one row, on Home. Deliberately a plain
-// shortcut: this app knows nothing about levels, XP or what is ticked. Proof
-// owns all of that, and duplicating the scoring here would be a third copy of
-// the formula to keep in sync — and weight this app does not need to carry.
-// AA Proof's own numbers, published by habits.html at the end of every render
-// (see publishCardSnapshot() there). This app holds NO habit state and no XP
-// maths — it reads the answers Proof already worked out and draws them. Missing
-// means Proof has never been opened on this device, and the card drops to copy
-// with no numbers rather than inventing any.
-function habCardSnapshot() {
+// Read both keys off this phone and hand them to the engine. Called at boot and again after a cloud merge,
+// because the merge replaces the stored text under us.
+function habLoad() {
+  if (!habOn()) return;
+  const H = window.AAHabits;
+  HAB_CFG = H.defaultCfg();
   try {
-    const s = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_card'));
-    return (s && typeof s.lv === 'number') ? s : null;
-  } catch (e) { return null; }
+    const raw = JSON.parse(localStorage.getItem(habKeyCfg()) || '{}');
+    if (raw && typeof raw === 'object') HAB_CFG = Object.assign(HAB_CFG, raw);
+  } catch (e) { /* unreadable: the defaults stand */ }
+  try {
+    const raw = JSON.parse(localStorage.getItem(habKeyLog()) || '{}');
+    HAB_LOG = (raw && typeof raw === 'object') ? raw : {};
+  } catch (e) { HAB_LOG = {}; }
+  H.bind(HAB_CFG, HAB_LOG, HAB_UI);
+  // The timeline of which habits were tracked when: stamped from the first logged day on a phone that has
+  // never had one, so an athlete with history scores exactly as they did before.
+  H.anchorRoster();
+}
+// ⚠️ saveCfg() in AA Proof stamps the roster on every write, because every path that can change which
+// habits count goes through it. The same rule here.
+function habSaveCfg() {
+  if (!habOn() || !HAB_CFG) return;
+  window.AAHabits.stampRoster();
+  HAB_CFG.updatedAt = Date.now();
+  try { localStorage.setItem(habKeyCfg(), JSON.stringify(HAB_CFG)); } catch (e) { /* storage full */ }
+}
+function habSaveLog() {
+  if (!habOn()) return;
+  try { localStorage.setItem(habKeyLog(), JSON.stringify(HAB_LOG)); } catch (e) { /* storage full */ }
 }
 
-function habitCardHtml() {
-  const s = habCardSnapshot();
+// The day being filled in. HAB_UI.day is null for today; the engine's AKEY() self-heals when the window
+// slides out from under an app left open past midnight.
+function habDayKey() { return habOn() ? window.AAHabits.AKEY() : ''; }
+function habSetDay(k) {
+  if (!habOn()) return;
+  const H = window.AAHabits;
+  HAB_UI.day = (k === H.TKEY() ? null : k);
+  _habEdit = null;
+  paintTodayCard();
+}
+window.habSetDay = habSetDay;
 
-  // HOME-02 (Amir 2026-09-26: "I like how small the other cards are"): one row, the count and
-  // the streak. Today's habits are ticked right under it, in AA Proof's own strip (fork 1B).
-  // The three number rows (this one, Records, Body weight) are one door-row look, with or without data (Amir,
-  // 2026-10-12: "one look, always"): a green line icon, the label, one line, a ›. .quiet only changes the line's words.
-  if (!s) {
-    return `<button type="button" class="hrow quiet" onclick="goHabits()">
-      ${hrowIc('habits')}<span class="hrow-b"><span class="hrow-l">Daily habits</span><span class="hrow-q">Sleep, steps, water, protein: tick them in AA Proof.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+// ⚠️ THE CAP CLAMPS NEW INPUT, NEVER WHAT IS ALREADY THERE. A target lowered later strands real numbers
+// above the new ceiling, and re-clamping them on the next touch destroys them in silence. setVal() in AA
+// Proof carries the same line, and this is the same rule.
+function habSetVal(id, v) {
+  if (!habOn()) return;
+  const H = window.AAHabits, k = H.AKEY();
+  if (!H.canLog(k)) return;                       // the window has closed: write nothing
+  if (!HAB_LOG[k]) HAB_LOG[k] = {};
+  const h = H.byId(id);
+  const ceiling = Math.max((h.target || 1) * (H.XP_RULES.dailyCap || 3), Number(HAB_LOG[k][id]) || 0);
+  HAB_LOG[k][id] = Math.max(0, Math.min(Number(v) || 0, ceiling));
+  habSaveLog();
+  paintTodayCard();
+  // A habit ticked pays XP on the server's side of the career, so ask for the level again once the push
+  // has had time to land. The same wait the Proof strip used to take.
+  if (typeof careerOnT === 'function' && careerOnT() && typeof refreshCareerSoon === 'function') refreshCareerSoon(3000);
+}
+
+// One tap on a row. A locked habit says what earns it; a check toggles; a counter opens its number row.
+function habTap(id) {
+  if (!habOn()) return;
+  const H = window.AAHabits, h = H.byId(id), k = H.AKEY();
+  if (h.locked) { aaToast(h.lockedHint || 'This one is earned elsewhere.'); return; }
+  if (h.kind === 'count') { _habEdit = (_habEdit === id ? null : id); paintTodayCard(); return; }
+  habSetVal(id, H.isDone(h, k) ? 0 : h.target);
+}
+window.habTap = habTap;
+// The + on a counter: one step, clamped to the daily cap, never below what is already logged. A control
+// labelled + must never lower the number.
+function habBump(id, ev) {
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  if (!habOn()) return;
+  const H = window.AAHabits, h = H.byId(id), cur = H.valOf(H.AKEY(), id);
+  habSetVal(id, Math.max(cur, cur + (h.step || 1)));
+}
+window.habBump = habBump;
+// The number row under a counted habit, saved. Steps and sleep arrive prefilled with the target, so a full
+// day is two taps and a real number is three.
+function habSaveNum(id) {
+  const el = document.getElementById('hab-num-' + id);
+  if (!el) return;
+  const n = parseFloat(String(el.value).replace(',', '.'));
+  _habEdit = null;
+  if (isFinite(n)) habSetVal(id, n); else paintTodayCard();
+}
+window.habSaveNum = habSaveNum;
+
+// ── The card ──────────────────────────────────────────────────────────────────────────────────────────
+// Everything on it is logged, or says whether today counts. Nothing else earns a place.
+function paintTodayCard() {
+  const wrap = document.getElementById('home-today-wrap');
+  if (!wrap) return;
+  // ⚠️ habits-core.js is `defer`, and boot() can get here first: on a fast connection every server call
+  // it waits for answers before the parser reaches a deferred script. So the card loads the engine itself
+  // the first time it finds it, and asks once more on `load` for the open with no engine at all.
+  if (habOn() && !HAB_CFG) habLoad();
+  if (!window.AAHabits && !_habWaiting) {
+    _habWaiting = true;
+    window.addEventListener('load', () => { habLoad(); paintTodayCard(); }, { once: true });
   }
-  // PRF-03: the verdict AA Proof leads with, the same words in both apps ("2 to go", On target,
-  // Perfect), never "day complete" beside the strip's "1 of 5 done". It is about the day Proof wrote it:
-  // a snapshot from an earlier day says the level until the strip below boots Proof and writes today's.
-  // `done of total` is only for a Proof that has not been updated alongside.
-  const fresh = s.t && new Date(s.t).toDateString() === new Date().toDateString();
-  // In Career Mode the level is the Career row's (one number on Home): a snapshot Proof wrote before the switch, or on a phone that has
-  // not seen it yet, could say another. So this row says the habits' word, never a level.
-  const lvWord = careerOnT() ? 'Ready for today' : `Level ${s.lv}`;
-  const said = !fresh ? lvWord
-    : s.verdict === 'togo' ? `${s.togo} to go`
-    : s.verdict === 'on' ? 'On target'
-    : s.verdict === 'perfect' ? 'Perfect'
-    : (s.done != null && s.total ? `${s.done} of ${s.total}` : lvWord);
-  // "N to go" asks for something, so it stays clay; On target and Perfect are the good news, green.
-  const tone = fresh && s.verdict === 'togo' ? ' is-togo' : fresh && (s.verdict === 'on' || s.verdict === 'perfect') ? ' is-ok' : '';
-  return `<button type="button" class="hrow" onclick="goHabits()">
-    ${hrowIc('habits')}<span class="hrow-b"><span class="hrow-l">Daily habits</span>
-      <span class="hrow-v${tone}"><span class="hrow-vv">${said}</span><small>${s.streak} day${s.streak === 1 ? '' : 's'} in a row</small></span></span>
-    <span class="hrow-a" aria-hidden="true">›</span></button>`;
-
+  const h = habOn() ? todayCardHtml() : '';
+  if (wrap.innerHTML !== h) wrap.innerHTML = h;
 }
+function todayCardHtml() {
+  const H = window.AAHabits;
+  if (!HAB_CFG || !HAB_CFG.onboarded) return habStartHtml();
+  const k = H.AKEY(), isToday = k === H.TKEY();
+  const v = H.verdict(k);
+  const said = v.state === 'togo' ? v.n + ' to go' : v.state === 'perfect' ? 'Perfect' : 'On target';
+  const rows = H.rosterOn(k).map(hb => habRowHtml(hb, k)).join('');
+  const streak = H.dayStreak();
+  return `<section class="today-card${isToday ? '' : ' is-past'}" aria-label="Today's habits">
+    <div class="today-head">
+      <span class="today-k">${isToday ? 'Today' : 'Filling in ' + esc(H.dayLong(k))}</span>
+      <span class="today-v ${v.state === 'togo' ? 'is-togo' : 'is-ok'}">${esc(said)}</span>
+    </div>
+    ${habDaysHtml(k)}
+    ${rows}
+    <div class="today-foot">
+      <span class="today-nudge">${esc(habNudge(k, v))}</span>
+      ${streak > 0 ? `<span class="today-streak">${streak} day${streak === 1 ? '' : 's'} in a row</span>` : ''}
+    </div>
+  </section>`;
+}
+// The window you may still fill in: today and the three days behind it (BACKFILL_DAYS). Nobody logs
+// perfectly on the day, every day; past that the log closes, and the limit is the feature — a record you
+// can rewrite whenever you like is a diary, not evidence. A dot means that day already counts.
+function habDaysHtml(cur) {
+  const H = window.AAHabits, out = [];
+  for (let i = H.BACKFILL_DAYS; i >= 0; i--) {
+    const d = H.fmtKey(H.addDays(H.today(), -i));
+    const on = d === cur, counts = H.dayQualifies(d);
+    out.push(`<button type="button" class="hb-day${on ? ' is-on' : ''}${counts ? ' is-ok' : ''}" onclick="habSetDay('${d}')"
+      aria-pressed="${on}" aria-label="${esc(H.dayLong(d))}${counts ? ', on target' : ''}">
+      <span>${esc(i === 0 ? 'Today' : H.dayShort(d).slice(0, 3))}</span><i aria-hidden="true"></i></button>`);
+  }
+  return `<div class="hb-days" role="group" aria-label="The days you can still fill in">${out.join('')}</div>`;
+}
+// One row per habit. The session's is the ledger line: it never opens a sheet, because finishing a session
+// is what ticks it.
+function habRowHtml(hb, k) {
+  const H = window.AAHabits;
+  const done = H.isDone(hb, k), val = H.valOf(k, hb.id);
+  const name = H.splitEmoji(hb.name)[1] || hb.name;
+  const mark = done
+    ? `<span class="hb-mark is-done" aria-hidden="true">✓</span>`
+    : `<span class="hb-mark" aria-hidden="true"></span>`;
+  let right = '';
+  if (hb.kind === 'count') {
+    right = `<span class="hb-val">${done ? H.fmtVal(hb, val) : (val > 0 ? H.fmtVal(hb, val) + ' of ' + H.fmtVal(hb, hb.target) : '')}</span>`
+      + (hb.target > 0 && !done ? `<span class="hb-bar" aria-hidden="true"><i style="width:${Math.round(Math.min(1, val / hb.target) * 100)}%"></i></span>` : '');
+  } else if (hb.locked) {
+    right = `<span class="hb-val">${done ? 'Done' : 'Not yet'}</span>`;
+  }
+  const edit = _habEdit === hb.id ? `<div class="hb-edit">
+      <label class="hb-field"><input id="hab-num-${hb.id}" type="number" inputmode="decimal" step="${hb.step || 1}" value="${H.fmtVal(hb, val > 0 ? val : hb.target)}" aria-label="${esc(name)}"><span>${esc(hb.unit || '')}</span></label>
+      <button type="button" class="hb-save" onclick="habSaveNum('${hb.id}')">Save</button>
+    </div>` : '';
+  // ⚠️ THE + IS ITS OWN BUTTON, BESIDE THE ROW, NEVER INSIDE IT. A <button> nested in a <button> is
+  // invalid, and the browser un-nests it: the row came apart and the + lost its tap. The row is a plain
+  // div holding two buttons, so both are real controls and Tab reaches each of them.
+  const plus = (hb.kind === 'count' && !hb.locked)
+    ? `<button type="button" class="hb-plus" onclick="habBump('${hb.id}', event)" aria-label="Add one to ${esc(name)}">+</button>` : '';
+  return `<div class="hb-wrap">
+    <div class="hb-row${done ? ' is-done' : ''}${hb.locked ? ' is-locked' : ''}">
+      <button type="button" class="hb-main" onclick="habTap('${hb.id}')">
+        ${mark}<span class="hb-name">${esc(name)}</span>${right}
+      </button>${plus}
+    </div>${edit}
+  </div>`;
+}
+// The one "what now" line. Plain words, and it never asks for anything on a day that is already done.
+function habNudge(k, v) {
+  const H = window.AAHabits;
+  if (v.state === 'perfect') return 'Every one of them. That is a perfect day.';
+  if (v.state === 'on') return 'This day counts. Anything else is extra.';
+  const left = H.rosterOn(k).filter(hb => !H.isDone(hb, k) && !hb.locked).map(hb => H.shortName(hb).toLowerCase());
+  if (!left.length) return 'Finish your session and the day is yours.';
+  if (left.length === 1) return 'One thing left: ' + left[0].toLowerCase() + '.';
+  const say = left.length <= 3
+    ? left.slice(0, -1).join(', ') + ' and ' + left[left.length - 1] + ' left.'
+    : left.slice(0, 2).join(', ') + ' and ' + (left.length - 2) + ' more to go.';
+  return say.charAt(0).toUpperCase() + say.slice(1);
+}
+// The first screen, for an athlete who has never set the habits up: what is tracked, before anything is
+// scored. The only place either app makes a deal with the athlete before it starts marking them.
+function habStartHtml() {
+  const H = window.AAHabits;
+  const five = H.HABITS.filter(hb => hb.core).map(hb =>
+    `<li><b>${esc(H.splitEmoji(hb.name)[1] || hb.name)}</b><span>${esc(hb.goal || '')}</span></li>`).join('');
+  return `<section class="today-card today-start" aria-label="Set up your habits">
+    <div class="today-head"><span class="today-k">The other 23 hours</span></div>
+    <p class="hs-lead">Training is one hour. These five are the rest of it, and they are the same five for everyone, so a day means the same thing for all of us.</p>
+    <ul class="hs-five">${five}</ul>
+    <p class="hs-note">There is no off switch on these. You can add your own later.</p>
+    <button type="button" class="hs-go" onclick="habStart()">Start tracking</button>
+  </section>`;
+}
+function habStart() {
+  if (!habOn() || !HAB_CFG) return;
+  HAB_CFG.onboarded = true;
+  habSaveCfg();
+  paintTodayCard();
+}
+window.habStart = habStart;
+
+// A finished session ticks the session habit, on the day it was trained. AA Proof read this off the server
+// (fetchWorkoutDays) because it could not trust another app's storage; one app has no such problem.
+function habTickSession(dayKey) {
+  if (!habOn() || window.IS_DEMO) return;
+  const H = window.AAHabits, k = dayKey || H.TKEY();
+  if (!H.canLog(k)) return;                       // older than the window: the server still counts it
+  if (!HAB_LOG[k]) HAB_LOG[k] = {};
+  if ((Number(HAB_LOG[k].strength) || 0) >= 1) return;
+  HAB_LOG[k].strength = 1;
+  habSaveLog();
+  paintTodayCard();
+}
+
 // The line icon at the left of a door row (Home's habits row, Progress's Records and Body weight rows, the road's Why your plan row). A function, not a const:
 // the rows are drawn from boot(), which can run before this line of the script has been evaluated (the temporal dead zone).
 function hrowIc(kind) {
@@ -14282,14 +14514,14 @@ function _wsSaveChecks() {
 // Keys must match the server's whitelist in log_library_session() and the habit
 // ids in habits.html. Values are the habit's athlete-facing short name.
 const WS_COUNTS_AS_LABEL = { strength: 'Session', mobility: 'Mobility', breathe: 'Breathe' };
-// Does AA Proof count this habit for this athlete? READ ONLY: this app never writes a
-// <id>_hab_* key but body weight. `strength` is core in Proof, always on. Mobility and
-// Breathe are add-ons that start OFF and count only when switched on (habits.html
-// defaultCfg(): on[id] === true). No config on this phone → treat an add-on as off.
+// Does this athlete count this habit? `strength` is core, always on. Mobility and Breathe are
+// add-ons that start OFF and count only when switched on (defaultCfg(): on[id] === true). No
+// config on this phone → treat an add-on as off. Reads the live HAB_CFG where there is one, and
+// falls back to the stored key for a paint that reaches here before habLoad() has run.
 function _wsHabitOn(id) {
   if (id === 'strength') return true;
   try {
-    const cfg = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_cfg') || 'null');
+    const cfg = HAB_CFG || JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_cfg') || 'null');
     return !!(cfg && cfg.on && cfg.on[id] === true);
   } catch (e) { return false; }
 }
@@ -15396,25 +15628,23 @@ function finishDayNow(day, card) {
   // Both above built the record from the live keys before their first await. Now the session closes: the day keeps its
   // own copy and the per-name keys start the next day clean (closeSessionAtDone()).
   closeSessionAtDone(day);
-  // recordSessionToCloud() above already told the server this session happened.
-  // The habit tracker reads that record itself — this app writes nothing into
-  // Proof's space — so all we do here is say so.
+  // The session habit is this app's own now (2026-10-19): tick it here, on the day it was trained, and say so.
+  // It used to be ticked in AA Proof, which read the session off the server because it could not trust another
+  // app's storage. One app has no such problem.
   if (!window.IS_DEMO && !window.IS_PREVIEW) {   // nobody's habit ticked in a demo or a preview (POL-01)
+    habTickSession();                            // today: a session is finished on the day it is trained
     const tick = document.getElementById('habit-tick-' + day);
     if (tick) {
       tick.hidden = false;
-      // Someone who has never opened AA Proof has no idea what "your Workout
-      // habit" means (Amir, 2026-09-12: "some people dont know what it is").
-      // habCardSnapshot() is null until Proof has rendered once on this device,
-      // which is exactly the test for "never used it" — so they get told what
-      // it is and what just happened, instead of a word they have never seen.
-      if (!habCardSnapshot()) {
+      // Someone who has never opened the habits has no idea what "your Session habit" means (Amir, 2026-09-12:
+      // "some people dont know what it is"). An empty log is exactly the test for "never used it", so they get
+      // told what it is and what just happened, instead of a word they have never seen.
+      if (!HAB_LOG || Object.keys(HAB_LOG).length <= 1) {
         tick.classList.add('is-intro');
         tick.innerHTML =
           `<span class="complete-habit-mark">✓</span>
-           <span class="complete-habit-text">This session just ticked itself off in
-             <b>AA Proof</b>, your daily habit tracker. Sleep, steps, water and protein
-             live there too. <b>·&nbsp;take a look</b></span>`;
+           <span class="complete-habit-text">That ticks the first of today's five, on the card at the bottom of
+             <b>Home</b>. Sleep, steps, water and protein are the other four.</span>`;
       }
     }
   }
@@ -18016,7 +18246,7 @@ function toggleDark(e) {
   on ? document.body.removeAttribute('data-dark') : document.body.setAttribute('data-dark', '');
   localStorage.setItem('dark_mode', on ? '' : '1');
   syncDarkToggle();
-  proofStripTheme();
+
 }
 
 // The account button's face (the athlete's initials, NAV-02) and, when the account sheet
