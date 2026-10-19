@@ -109,7 +109,8 @@ Also an Artifact page. Reference: #5 The Card Remembers, https://claude.ai/artif
    Playwright (`PW=$(npm root -g)/playwright`, `executablePath` the chromium in `/opt/pw-browsers`),
    seed localStorage with `addInitScript`, screenshot. **Delete `data/demo.json` afterwards.**
 3. Sections, in order: **Coach hat** (the rules the feature must obey, quoting
-   `COACHING-PRINCIPLES.md`) → **Design directions** (2–3 options drawn as HTML mockups in the app's
+   `COACHING-PRINCIPLES.md`) → **Design directions** (always **three** options, Amir 2026-10-20: *"Always give
+   me 3 directions with your recommendation"*; drawn as HTML mockups in the app's
    own card style, each with strong/weak, one marked Recommended, plus the advanced view) → **What
    connects** → **Developer hat** (numbered build steps with the files and functions, MVP vs next,
    docs in the same PR) → **Traps** → **Your call** (the decisions to make, the recommended pick

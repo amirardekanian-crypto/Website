@@ -5,6 +5,12 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-20 · Standing rule: always three directions, one recommended.** *"when creating, you can think more about how each tab looks or
+  where to put things / Always give me 3 directions with your recommendation"*. Every design question (a tab, a screen, where a thing lives,
+  a plan) gets exactly three directions drawn in the app's own look, my pick marked, the other two kept on the page. Same day: *"Do not change
+  people xp and level / Just remove names and titles and badges / Keep achievements, i like achievements"*: he likes achievements (moments that
+  happen once); a cut never moves anyone's numbers.
+
 - **2026-10-20 · Career Mode's design round ended in the lightest version.** He asked where the system should live and whether AA Proof merges
   (*"not many people are using the proof app … that's why i added these achievement to push people more into using this game"*), took the
   one-app structure, added five future features (challenges, monthly goals, an Academy of talent trees, a community with photos, monthly honours),
