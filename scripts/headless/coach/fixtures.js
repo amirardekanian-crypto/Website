@@ -52,6 +52,77 @@ function session(id, name, day, completed_on, extra) {
     updated_at: completed_on + 'T18:00:00.000Z', coach_status: 'read', log: null }, extra || {});
 }
 
+// ── Courtside (stage75), made up like everything here ──────────────────────────────────────────────────────────
+// buildSeed({ court: true }) adds the cast below to the usual seed; { court: true, courtAwards: false } adds the same people with NO award, mark or
+// fact (the "without" side of "Courtside never changes Needs you"). Awards are dated inside the page's WEEK (Monday 00:00 to the next Monday, the
+// window courtWeek() asks for), by offsets from that Monday, so they land in the window whatever day the harness runs on (on a Monday, a later day of
+// the week is still in the window). Times are 09:00 to 18:00 UTC so the coach's day is the same in any zone within a few hours of UTC.
+function ymdAdd(day, n) { const p = day.split('-'); const d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+function mondayOf(day) { const p = day.split('-'); const dow = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])).getUTCDay(); return ymdAdd(day, -((dow + 6) % 7)); }
+const CAST = [   // [id, first name, WhatsApp]: coached, with a login sent, a programme and a session three days ago (nobody here "needs" anything)
+  ['gia_court', 'Gia', '+10000000021'], ['hal_court', 'Hal', '+10000000022'], ['ivy_court', 'Ivy', '+10000000023'], ['jon_court', 'Jon', '+10000000024'],
+  ['kim_former', 'Kim', '+10000000025'],
+];
+function courtSeed(db, today, withAwards) {
+  const mon = mondayOf(today), at = (k, hhmm) => ymdAdd(mon, k) + 'T' + hhmm + ':00.000Z', dy = k => ymdAdd(mon, k);
+  CAST.forEach(([id, first, wa]) => {
+    db.programs.push({ athlete_id: id, data: programme(first, { athlete: { id, firstName: first, lastName: 'Example', tier: 'coached' } }), updated_at: iso(today, 5), updated_by: 'pipeline@example.invalid' });
+    db.athlete_identities.push({ user_id: 'u-' + id, athlete_id: id, email: 'athlete.' + id + '@amirardekani.com', linked_at: iso(today, 30), initial_password: null, password_set_at: iso(today, 30), sent_at: iso(today, 29) });
+    db.session_history.push(session(id, first + ' Example', 1, daysAgo(today, 3)));
+  });
+  db.athlete_status.push({ athlete_id: 'kim_former', status: 'former', since: daysAgo(today, 40), note: null, updated_at: iso(today, 40) });
+  // A WhatsApp number the coach typed (source 'coach': not a signup) for everyone Courtside can name, so the panel can offer WhatsApp ↗.
+  ['ava_test', 'ben_test', 'eli_new'].concat(CAST.map(c => c[0])).forEach((id, i) => {
+    const row = CAST.find(c => c[0] === id);
+    db.hab_contacts.push({ athlete_id: id, email: null, whatsapp: row ? row[2] : '+1000000003' + i, source: 'coach', tier: 'coached', note: null, created_at: iso(today, 10), updated_at: iso(today, 10), display_name: null });
+  });
+  // (Cara keeps her own record, the signup she always was, with a WhatsApp number of its own.)
+  // The catalogue rows the awards name (the body is what career_award_spec() reads: name, caption with {n}, the tiers' metal).
+  const badge = (id, name, caption) => ({ kind: 'badge', id, body: { name, meaning: 'Fixture meaning.', caption, tiers: [{ metal: 'bronze' }, { metal: 'silver' }, { metal: 'emerald' }] } });
+  const ach = (id, name, caption) => ({ kind: 'achievement', id, body: { name, meaning: 'Fixture meaning.', caption } });
+  db.career_catalogue.push(
+    badge('held_weeks', 'Hold Serve', '{n} weeks held in a row.'), badge('century', 'Century', '{n} sessions with Amir.'), badge('bests', 'Personal Bests', '{n} personal bests.'),
+    badge('comebacks', 'Comebacks', '{n} comebacks.'), badge('daily_run', 'Daily Run', '{n} days in a row.'),
+    ach('held', 'Held', 'Your first held week. Every session, on your days.'), ach('first_best', 'First Best', 'Your first personal best. Not the last.'),
+    ach('first_cycle', 'First Cycle', 'A whole cycle, finished.'), ach('back', 'Back on Court', 'You came back.'), ach('double_up', 'Double Up', 'Two main lifts, up 10% each.'),
+    ach('small_win', 'Small Win', 'A small one.'), ach('last_week', 'Last Week', 'It was last week.'));
+  // The month's goal and a line "From Amir" for a few people (neutral: they change nothing on Needs you).
+  const m1 = today.slice(0, 7) + '-01';
+  db.career_goals.push(
+    { athlete_id: 'ben_test', month: m1, line: 'Squat three times a week and log every set.', done_at: null, created_at: iso(today, 6), updated_at: iso(today, 6) },
+    { athlete_id: 'eli_new', month: m1, line: 'Bench press 5 kg heavier by the end of the month.', done_at: iso(today, 1), created_at: iso(today, 6), updated_at: iso(today, 1) });
+  db.career_notes.push(
+    { athlete_id: 'ben_test', day: today, line: 'Trained through exam week. Proud of you.', award_id: null, created_at: iso(today, 0), read_at: null },
+    { athlete_id: 'eli_new', day: today, line: 'That first best was earned.', award_id: null, created_at: iso(today, 0), read_at: iso(today, 0) });
+  if (!withAwards) return;
+  const aw = (athlete, kind, item, tier, size, k, hhmm, evidence, how) => ({ athlete_id: athlete, award_id: kind + ':' + item + (tier ? ':' + tier : ''), kind, item, tier: tier || null, day: dy(k),
+    size, how: how || 'live', evidence: evidence || {}, created_at: at(k, hhmm) });
+  db.career_awards.push(
+    // the visible ones: 9 moments in 8 open groups (+ Cara's, already seen) so the cap of 5 matters
+    aw('ben_test', 'badge', 'held_weeks', 3, 'legend', 1, '10:00', { n: 12 }),
+    aw('gia_court', 'achievement', 'first_cycle', 0, 'milestone', 2, '15:00', { facts: [{ kind: 'cycle_finished', ref: 'c1' }] }),
+    aw('ava_test', 'badge', 'century', 2, 'milestone', 2, '12:00', { n: 50 }),
+    aw('ava_test', 'achievement', 'held', 0, 'highlight', 2, '12:30'),       // the same day as the century: ONE group, "and First full week held"
+    aw('cara_free', 'achievement', 'back', 0, 'highlight', 2, '09:00'),      // already seen (a mark below)
+    aw('jon_court', 'achievement', 'back', 0, 'highlight', 3, '17:00'),
+    aw('hal_court', 'badge', 'bests', 1, 'highlight', 3, '16:00', { n: 5 }),
+    aw('ivy_court', 'badge', 'comebacks', 1, 'highlight', 3, '15:00', { n: 3 }),
+    aw('eli_new', 'achievement', 'first_best', 0, 'highlight', 3, '14:00', { facts: [{ kind: 'personal_best', ref: 'goblet-squat|1' }] }),
+    aw('ben_test', 'achievement', 'double_up', 0, 'highlight', 3, '13:00'),  // Ben on ANOTHER day: a second group
+    // the ones that must never show (each is filtered by one of stage75's rules)
+    aw('eli_new', 'achievement', 'small_win', 0, 'win', 4, '10:00'),                              // too small
+    aw('ava_test', 'badge', 'century', 1, 'milestone', 4, '11:00', { n: 25 }, 'baseline'),        // the go-day's back-pay, not minted live
+    aw('demo', 'achievement', 'first_best', 0, 'highlight', 4, '12:00'),                          // not a client
+    aw('amir_ardekani', 'achievement', 'held', 0, 'highlight', 4, '12:30'),                       // not a client
+    aw('kim_former', 'achievement', 'first_best', 0, 'highlight', 4, '13:00'),                    // a former athlete
+    aw('jon_court', 'badge', 'daily_run', 2, 'milestone', 4, '14:00', { n: 30 }),                 // a badge that is not one of the four numbers
+    aw('gia_court', 'achievement', 'last_week', 0, 'highlight', -2, '12:00'));                    // last week's, outside the window
+  db.career_facts.push(
+    { athlete_id: 'gia_court', kind: 'cycle_finished', ref: 'c1', day: dy(2), value: { cycle: 1, done: 12, planned: 12 }, void_at: null },
+    { athlete_id: 'eli_new', kind: 'personal_best', ref: 'goblet-squat|1', day: dy(3), value: { lift: 'Goblet Squat', kg: 24 }, void_at: null });
+  db.courtside_marks.push({ athlete_id: 'cara_free', award_id: 'achievement:back', saw_at: at(2, '20:00'), sent_at: at(2, '20:00'), updated_at: at(2, '20:00') });
+}
+
 function buildSeed(opt) {
   opt = opt || {};
   const today = opt.today;                     // the page's local YYYY-MM-DD
@@ -174,6 +245,9 @@ function buildSeed(opt) {
       { user_id: 'u-assess-1', app: 'testing', note: 'Fixture academy note', updated_at: iso(today, 12) },
     ],
     erasure_log: [],
+    // Career Mode / Courtside (stage70, stage75): the tables exist and are empty unless opt.court fills them (courtSeed above).
+    career_awards: [], career_catalogue: [], career_facts: [], courtside_marks: [], career_honour_months: [], career_honours: [], career_goals: [], career_notes: [],
+    athlete_status: [],
     // a testing-app buyer's players, notes and results (made up). The coach reads them since stage50, for the backup only.
     assess_players: [
       { id: 'p-0001', account_id: 'u-assess-1', name: 'Fixture Player One', birth_year: 2012, birth_month: 4, sex: 'f', hand: 'r', squad: 'U14', created_at: iso(today, 20), updated_at: iso(today, 5), deleted_at: null },
@@ -185,6 +259,7 @@ function buildSeed(opt) {
       { player_id: 'p-0001', test: 'sprint-10m', day: daysAgo(today, 1), account_id: 'u-assess-1', value: 1.85, extra: { wind: 'none' }, updated_at: iso(today, 1), deleted_at: null },
     ],
   };
+  if (opt.court) courtSeed(db, today, opt.courtAwards !== false);
   if (opt.bigHistory) {
     for (let i = 0; i < opt.bigHistory; i++) {
       db.session_history.push(session('bulk_' + (i % 40), 'Bulk ' + (i % 40), (i % 3) + 1, daysAgo(today, 30 + Math.floor(i / 40))));
@@ -196,6 +271,16 @@ function buildSeed(opt) {
     levels: { cara_free: 4, ava_test: 3, dan_proof: 1 },
     board: [{ pos: 1, display_name: 'Cara', title: null, xp: 900, level: 4, rank_label: 'STARTER', is_me: false, joined: true }],
     stub: opt.stub || {},
+    // The month just gone's honours as the server would work them out (see stub.js: liveHonours). Made up; nothing is computed.
+    honoursLive: opt.honoursLive !== undefined ? opt.honoursLive : opt.court ? {
+      // A former athlete shares the top session count and the coach's own identity shares the top gain: the stub leaves both out, as
+      // career_honours_live() does (a former athlete by athlete_status, the coach's identity because the page names it in p_not_clients).
+      sessions: { n: 14, who: ['gia_court', 'kim_former'] },
+      improved: { pct: 27.1, who: [{ athlete_id: 'hal_court', lift: 'Barbell Back Squat', pct: 27.1 }, { athlete_id: 'amir_ardekani', lift: 'Barbell Back Squat', pct: 27.1 }] },
+      full_month: { who: [], near: [{ athlete_id: 'ivy_court', held: 3, weeks: 4 }, { athlete_id: 'jon_court', held: 3, weeks: 4 }] },
+      shortlist: [{ slot: 'weeks_held', athlete_id: 'ava_test', n: 4 }, { slot: 'gain', athlete_id: 'hal_court', lift: 'Barbell Back Squat', pct: 27.1 },
+                  { slot: 'comeback', athlete_id: 'jon_court', n: 2, gone: 16 }],
+    } : null,
   };
 }
 

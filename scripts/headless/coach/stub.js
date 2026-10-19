@@ -35,6 +35,10 @@
   if (!DB) DB = clone(SEED.db || {});
   var ST = window.__STUB = Object.assign({ maxRows: 1000, fail: [], rlsDeny: {}, delay: {}, emitInitial: true, persist: true, seq: 1000 },
     SEED.stub || {});
+  // The month's honours as the server would work them out (the stub does no maths): a fixture object, settable in a scenario as
+  // window.__STUB.honoursLive = { sessions: {n, who: [ids]}, improved: {pct, who: [{athlete_id, lift, pct}]},
+  //   full_month: {who: [{athlete_id, weeks}], near: [{athlete_id, held, weeks}]}, shortlist: [{slot, athlete_id, ...}] }.
+  if (ST.honoursLive === undefined) ST.honoursLive = SEED.honoursLive || null;
   var CALLS = window.__calls = [];
   window.__DB = DB;
   window.__authCbs = [];
@@ -48,7 +52,17 @@
     tps_accounts: ['username'], assess_accounts: ['username'], messages: ['id'], cycle_reports: ['id'], spine_versions: ['id'],
     assess_players: ['id'], assess_notes: ['id'], assess_results: ['player_id', 'test', 'day'],
     buyer_notes: ['user_id'], erasure_log: ['id'],
+    // stage70 and stage75 (Career Mode / Courtside)
+    career_facts: ['athlete_id', 'kind', 'ref'], career_catalogue: ['kind', 'id'], career_awards: ['athlete_id', 'award_id'],
+    courtside_marks: ['athlete_id', 'award_id'], career_honour_months: ['month'], career_honours: ['month', 'honour', 'athlete_id'],
+    career_goals: ['athlete_id', 'month'], career_notes: ['athlete_id', 'day'],
   };
+  // stage75's own tables and functions: a server that has not had that stage applied has none of them, so `missingRpc: ['get_courtside']` takes
+  // all of them away together (the page then shows no Courtside and no warning).
+  var COURT_TABLES = ['courtside_marks', 'career_honour_months', 'career_honours', 'career_goals', 'career_notes'];
+  var COURT_RPCS = ['get_courtside', 'coach_courtside_mark', 'coach_honours', 'coach_honours_freeze', 'coach_honours_sent', 'coach_honours_pick',
+    'coach_set_goal', 'coach_goal_done', 'coach_from_amir'];
+  function noStage75() { return (ST.missingRpc || []).indexOf('get_courtside') >= 0; }
   function persist() { if (ST.persist) { try { localStorage.setItem('__harness_db', JSON.stringify(DB)); } catch (e) {} } }
   function tbl(name) { return DB[name] || (DB[name] = []); }
   function nowIso() { return new Date().toISOString(); }
@@ -197,6 +211,11 @@
     await sleep(0);
     var f = takeFail('from', table, op);
     if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'XX000' }, status: f.status || 400, count: null }; }
+    // A table the server does not have (PostgREST's schema-cache answer): stage75's five while that stage is missing, or any in ST.missingTables.
+    if ((noStage75() && COURT_TABLES.indexOf(table) >= 0) || (ST.missingTables || []).indexOf(table) >= 0) {
+      call.result = { error: 'missing' };
+      return { data: null, error: { message: "Could not find the table 'public." + table + "' in the schema cache", code: 'PGRST205' }, status: 404, count: null };
+    }
     var rows = tbl(table);
     var match = function (r) { return self.filters.every(function (fn) { return fn(r); }); };
     var denied = (ST.rlsDeny[table] || []).indexOf(op) >= 0;
@@ -265,7 +284,173 @@
     var raw = blob && blob[id + '_hab_log']; var log = raw; try { if (typeof raw === 'string') log = JSON.parse(raw); } catch (e) { log = null; }
     return log && typeof log === 'object' ? Object.keys(log).filter(function (k) { var v = log[k]; return v && typeof v === 'object' && Object.keys(v).length; }).length : 0;
   }
+  // ---- stage75: Courtside, the monthly honours, the monthly goal and "From Amir" (supabase/stage75_career_courtside.sql) ----
+  // The caller is always the coach (is_coach() is implied). "current_date" is the server's UTC date, as everywhere in this stub.
+  var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var monthStart = function (d) { return String(d).slice(0, 7) + '-01'; };                                 // date_trunc('month', d)::date
+  var monthLabel = function (m0) { return MONTH_NAMES[+String(m0).slice(5, 7) - 1] + ' ' + String(m0).slice(0, 4); };   // to_char(m0, 'FMMonth YYYY')
+  var plusMonths = function (m0, n) { return new Date(Date.UTC(+m0.slice(0, 4), +m0.slice(5, 7) - 1 + n, 1)).toISOString().slice(0, 10); };
+  var plusDays = function (day, n) { return new Date(Date.parse(day + 'T00:00:00Z') + n * 86400e3).toISOString().slice(0, 10); };
+  var tidy = function (s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); };               // btrim(regexp_replace(coalesce(p, ''), '\s+', ' ', 'g'))
+  var hasProgramme = function (id) { return tbl('programs').some(function (r) { return r.athlete_id === id; }); };
+  // career_is_client(id, p_not_clients): not the demo, not an id the page names as no client (coach.html passes SYSTEM_IDS and its own identity,
+  // COURT_NOT_CLIENTS), not a former athlete. coach_from_amir() calls it with no list.
+  function isClient(id, notClients) {
+    id = id == null ? '' : String(id);
+    return ['', 'demo'].indexOf(id) < 0 && (notClients || []).indexOf(id) < 0 && !tbl('athlete_status').some(function (s) { return s.athlete_id === id && s.status === 'former'; });
+  }
+  // career_award_spec(): the name and caption come from the catalogue row's body, {n} is the evidence's n rounded.
+  function awardSpec(a, body) {
+    body = body || {};
+    var n = a.evidence && a.evidence.n != null ? Math.round(Number(a.evidence.n)) : null, cap = body.caption != null ? String(body.caption) : null;
+    if (cap != null && n != null) cap = cap.split('{n}').join(String(n));
+    if (a.kind === 'badge') {
+      var tb = body.tiers && a.tier ? body.tiers[a.tier - 1] : null;
+      return { kind: 'badge', name: body.name || a.item, meaning: body.meaning || null, metal: (tb && tb.metal) || null, tier: a.tier, n: n, caption: cap, date: a.day };
+    }
+    return { kind: 'achievement', name: body.name || a.item, meaning: body.meaning || null, caption: cap, date: a.day };
+  }
+  // career_honours_live(m0, p_not_clients): the fixture, in the function's shape, with every winner who is not a client left out (the real
+  // function only looks at clients). The count `n` / `pct` is the fixture's, not recomputed.
+  function liveHonours(m0, notClients) {
+    var h = clone(ST.honoursLive) || {}, ok = function (id) { return isClient(id, notClients); }, ids = function (l) { return (l || []).filter(ok); };
+    var rows = function (l) { return (l || []).filter(function (e) { return ok(e.athlete_id); }); };
+    return { month: m0, sessions: { n: h.sessions ? h.sessions.n : null, who: ids(h.sessions && h.sessions.who) },
+      improved: { pct: h.improved ? h.improved.pct : null, who: rows(h.improved && h.improved.who) },
+      full_month: { who: rows(h.full_month && h.full_month.who), near: rows(h.full_month && h.full_month.near) }, shortlist: rows(h.shortlist) };
+  }
+  // coach_honours(): the frozen rows once frozen, else the live work; only a month that has ended.
+  function honoursOf(p_month, notClients) {
+    var m0 = monthStart(p_month), cur = monthStart(utcDate());
+    if (m0 >= cur) throw new Error('coach_honours: ' + monthLabel(m0) + ' has not ended yet');
+    var vm = tbl('career_honour_months').find(function (r) { return r.month === m0; }) || null;
+    var rows = tbl('career_honours').filter(function (h) { return h.month === m0; })
+      .sort(function (a, b) { return a.honour < b.honour ? -1 : a.honour > b.honour ? 1 : a.athlete_id < b.athlete_id ? -1 : a.athlete_id > b.athlete_id ? 1 : 0; })
+      .map(function (h) { return { honour: h.honour, athlete_id: h.athlete_id, value: clone(h.value), sent_at: h.sent_at || null }; });
+    var live = !vm || vm.pick == null ? liveHonours(m0, notClients) : null;
+    return { month: m0, frozen: !!vm, frozen_at: vm ? vm.frozen_at : null, pick: vm ? vm.pick : null, pick_at: vm ? vm.pick_at : null,
+      pick_open: utcDate() < plusMonths(m0, 2), rows: rows, live: vm ? null : live, shortlist: vm && vm.pick != null ? null : live.shortlist };
+  }
+  function freezeHonours(p_month, notClients) {
+    var m0 = monthStart(p_month);
+    if (m0 >= monthStart(utcDate())) throw new Error('coach_honours_freeze: ' + monthLabel(m0) + ' has not ended yet');
+    if (tbl('career_honour_months').some(function (r) { return r.month === m0; })) return honoursOf(m0, notClients);   // idempotent
+    var v = liveHonours(m0, notClients), add = function (honour, id, value) { tbl('career_honours').push({ month: m0, honour: honour, athlete_id: id, value: value, sent_at: null, created_at: nowIso() }); };
+    tbl('career_honour_months').push({ month: m0, frozen_at: nowIso(), pick: null, pick_at: null });
+    v.sessions.who.forEach(function (id) { add('sessions', id, { n: v.sessions.n }); });
+    v.improved.who.forEach(function (e) { add('improved', e.athlete_id, { lift: e.lift, pct: e.pct }); });
+    v.full_month.who.forEach(function (e) { add('full_month', e.athlete_id, { weeks: e.weeks }); });
+    v.full_month.near.forEach(function (e) { add('near', e.athlete_id, { held: e.held, weeks: e.weeks }); });
+    return honoursOf(m0, notClients);
+  }
+
   var RPC = {
+    // The week's moments for Courtside: live awards (never the go-day's baseline) of highlight size and up, of the kinds that stay after the cut,
+    // for clients only, minted inside the window. Every row of the week comes back, marked or not.
+    get_courtside: function (p) {
+      var from = Date.parse(p.p_from), to = Date.parse(p.p_to);
+      if (!p.p_from || !p.p_to || isNaN(from) || isNaN(to) || to <= from || to - from > 35 * 86400e3)
+        throw new Error('get_courtside: give a window of at most 35 days (from ' + p.p_from + ', to ' + p.p_to + ')');
+      var marks = tbl('courtside_marks'), cat = tbl('career_catalogue'), facts = tbl('career_facts');
+      var rows = tbl('career_awards').filter(function (a) {
+        var at = Date.parse(a.created_at);
+        return a.how === 'live' && at >= from && at < to && ['highlight', 'milestone', 'legend'].indexOf(a.size) >= 0
+          && (a.kind === 'achievement' || (a.kind === 'badge' && ['held_weeks', 'century', 'bests', 'comebacks'].indexOf(a.item) >= 0)) && isClient(a.athlete_id, p.p_not_clients);
+      }).sort(function (a, b) { return a.created_at < b.created_at ? 1 : a.created_at > b.created_at ? -1 : a.award_id < b.award_id ? -1 : a.award_id > b.award_id ? 1 : 0; });
+      return { rows: rows.map(function (a) {
+        var c = cat.find(function (x) { return x.kind === a.kind && x.id === a.item; }), m = marks.find(function (x) { return x.athlete_id === a.athlete_id && x.award_id === a.award_id; });
+        var fs = [];
+        ((a.evidence && a.evidence.facts) || []).forEach(function (e) {
+          facts.forEach(function (f) { if (f.athlete_id === a.athlete_id && f.kind === e.kind && f.ref === e.ref) fs.push({ kind: f.kind, ref: f.ref, day: f.day, value: clone(f.value) }); });
+        });
+        return { athlete_id: a.athlete_id, award_id: a.award_id, kind: a.kind, item: a.item, tier: a.tier == null ? null : a.tier, day: a.day, size: a.size, at: a.created_at,
+          spec: awardSpec(a, c && c.body), evidence: clone(a.evidence), facts: fs, saw_at: m ? m.saw_at : null, sent_at: m ? m.sent_at : null };
+      }) };
+    },
+    // Saw it ('saw'), WhatsApp or Copy ('sent': seen too), Undo ('undo'). Returns how many of the ids were that athlete's (live, for saw and sent) awards.
+    coach_courtside_mark: function (p) {
+      if (['saw', 'sent', 'undo'].indexOf(p.p_what) < 0) throw new Error('coach_courtside_mark: ' + p.p_what + ' is not saw, sent or undo');
+      var ids = p.p_award_ids || [], marks = tbl('courtside_marks'), awards = tbl('career_awards');
+      if (p.p_what === 'undo') {
+        DB.courtside_marks = marks.filter(function (m) { return !(m.athlete_id === p.p_athlete_id && ids.indexOf(m.award_id) >= 0); });
+        return awards.filter(function (a) { return a.athlete_id === p.p_athlete_id && ids.indexOf(a.award_id) >= 0; }).length;
+      }
+      var n = 0;
+      awards.forEach(function (a) {
+        if (a.athlete_id !== p.p_athlete_id || ids.indexOf(a.award_id) < 0 || a.how !== 'live') return;
+        n++;
+        var m = marks.find(function (x) { return x.athlete_id === a.athlete_id && x.award_id === a.award_id; });
+        if (m) { m.saw_at = m.saw_at || nowIso(); m.sent_at = m.sent_at || (p.p_what === 'sent' ? nowIso() : null); m.updated_at = nowIso(); }
+        else marks.push({ athlete_id: a.athlete_id, award_id: a.award_id, saw_at: nowIso(), sent_at: p.p_what === 'sent' ? nowIso() : null, updated_at: nowIso() });
+      });
+      return n;
+    },
+    coach_honours: function (p) { return honoursOf(p.p_month, p.p_not_clients); },
+    coach_honours_freeze: function (p) { return freezeHonours(p.p_month, p.p_not_clients); },
+    // Returns 1, or 0 when that honour has no such winner (not frozen yet: freeze first).
+    coach_honours_sent: function (p) {
+      var m0 = monthStart(p.p_month), n = 0;
+      tbl('career_honours').forEach(function (h) { if (h.month === m0 && h.honour === p.p_honour && h.athlete_id === p.p_athlete_id) { h.sent_at = h.sent_at || nowIso(); n++; } });
+      return n;
+    },
+    // Amir's Pick: an athlete (any client) or nobody (null). Freezes the month first. Once decided it stays decided. Open until the end of the month after.
+    coach_honours_pick: function (p) {
+      var m0 = monthStart(p.p_month);
+      if (utcDate() >= plusMonths(m0, 2)) throw new Error(monthLabel(m0) + ' can no longer be picked');
+      freezeHonours(m0, p.p_not_clients);
+      var vm = tbl('career_honour_months').find(function (r) { return r.month === m0; });
+      if (vm.pick != null) throw new Error('Your ' + monthLabel(m0) + ' pick is already decided');
+      if (p.p_athlete_id == null) { vm.pick = 'nobody'; vm.pick_at = nowIso(); return honoursOf(m0, p.p_not_clients); }
+      if (!hasProgramme(p.p_athlete_id)) throw new Error('no such athlete: ' + p.p_athlete_id);
+      if (!isClient(p.p_athlete_id, p.p_not_clients)) throw new Error('not a client: the demo, a former athlete and your own login are never picked');
+      var slot = (liveHonours(m0, p.p_not_clients).shortlist || []).find(function (e) { return e.athlete_id === p.p_athlete_id; });
+      tbl('career_honours').push({ month: m0, honour: 'pick', athlete_id: p.p_athlete_id, value: slot ? clone(slot) : {}, sent_at: null, created_at: nowIso() });
+      vm.pick = 'picked'; vm.pick_at = nowIso();
+      return honoursOf(m0, p.p_not_clients);
+    },
+    // Write, rewrite or clear (an empty line) an athlete's goal for a month. A goal already ticked done is not cleared. Returns the row, or null.
+    coach_set_goal: function (p) {
+      var m0 = monthStart(p.p_month), line = tidy(p.p_line), goals = tbl('career_goals'), cur = monthStart(utcDate());
+      if (!hasProgramme(p.p_athlete_id)) throw new Error('no such athlete: ' + p.p_athlete_id);
+      if (m0 < plusMonths(cur, -1) || m0 > plusMonths(cur, 1)) throw new Error('a goal is for last month, this month or next month (not ' + monthLabel(m0) + ')');
+      if (/[\u0000-\u001f\u007f]/.test(line)) throw new Error('the goal has a control character');
+      var at = goals.findIndex(function (g) { return g.athlete_id === p.p_athlete_id && g.month === m0; });
+      if (line === '') {
+        if (at >= 0 && !goals[at].done_at) { goals.splice(at, 1); return null; }
+        if (at >= 0) throw new Error('that goal is ticked done: untick it first to clear it');
+        return null;
+      }
+      if (line.length > 140) throw new Error('a goal is at most 140 characters (this one is ' + line.length + ')');
+      if (at >= 0) { goals[at].line = line; goals[at].updated_at = nowIso(); return clone(goals[at]); }
+      var row = { athlete_id: p.p_athlete_id, month: m0, line: line, done_at: null, created_at: nowIso(), updated_at: nowIso() };
+      goals.push(row); return clone(row);
+    },
+    coach_goal_done: function (p) {
+      var m0 = monthStart(p.p_month), g = tbl('career_goals').find(function (x) { return x.athlete_id === p.p_athlete_id && x.month === m0; });
+      if (!g) throw new Error('no goal for ' + p.p_athlete_id + ' in ' + monthLabel(m0));
+      g.done_at = p.p_done ? (g.done_at || nowIso()) : null; g.updated_at = nowIso();
+      return clone(g);
+    },
+    // "From Amir": one line (1 to 90 characters) for an athlete on the coach's day; an empty line takes back that day's line while it is unread.
+    coach_from_amir: function (p) {
+      var line = tidy(p.p_line), notes = tbl('career_notes'), today = utcDate();
+      if (!p.p_day || p.p_day < plusDays(today, -1) || p.p_day > plusDays(today, 1)) throw new Error('from_amir: ' + p.p_day + ' is not today');
+      if (!hasProgramme(p.p_athlete_id)) throw new Error('no such athlete: ' + p.p_athlete_id);
+      var at = notes.findIndex(function (n) { return n.athlete_id === p.p_athlete_id && n.day === p.p_day; });
+      if (line === '') {
+        if (at >= 0 && !notes[at].read_at) { notes.splice(at, 1); return null; }
+        if (at >= 0) throw new Error('they have read it already: it stays');
+        return null;
+      }
+      if (!isClient(p.p_athlete_id)) throw new Error('not a client: the demo and a former athlete get no line');
+      if (/[\u0000-\u001f\u007f]/.test(line)) throw new Error('the line has a control character');
+      if (line.length > 90) throw new Error('one line is at most 90 characters (this one is ' + line.length + ')');
+      var award = p.p_award_id == null ? null : p.p_award_id;
+      if (award != null && !tbl('career_awards').some(function (a) { return a.athlete_id === p.p_athlete_id && a.award_id === award; })) throw new Error('that moment is not ' + p.p_athlete_id + "'s");
+      if (at >= 0) throw new Error('one line a day: ' + p.p_athlete_id + ' already has one today (take it back first to change it)');
+      var row = { athlete_id: p.p_athlete_id, day: p.p_day, line: line, award_id: award, created_at: nowIso(), read_at: null };
+      notes.push(row); return clone(row);
+    },
     contact_list: function () {
       return tbl('hab_contacts').map(function (c) {
         var o = tbl('leaderboard_optin').find(function (x) { return x.athlete_id === c.athlete_id; });
@@ -558,7 +743,7 @@
         await sleep(0);
         var f = takeFail('rpc', name);
         if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'P0001' }, status: 400 }; }
-        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
+        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0 || (noStage75() && COURT_RPCS.indexOf(name) >= 0)) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
         try { var d = RPC[name](params || {}); persist(); call.result = { ok: true }; return { data: clone(d), error: null, status: 200 }; }
         catch (e) { call.result = { error: e.message }; return { data: null, error: { message: e.message, code: e.code || 'P0001' }, status: 400 }; }
       })();

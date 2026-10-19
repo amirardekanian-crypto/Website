@@ -93,11 +93,13 @@ where = "AA Proof's Today, on the day it happens"
 line = "Comeback · +{xp} XP. Good to have you back."
 
 [courtside]
-# coach.html → Today. Good news is never a reason in reasonsOf(): it never counts as "needs you".
+# coach.html → Today, the top of the right column (stage75, built 2026-10-19; Amir picked direction A of the design page).
+# Good news is never a reason in reasonsOf(): it never counts as "needs you". Only the four numbers' marks and the achievements reach it
+# (minted live, from highlight up), grouped one per athlete per day; the month's honours sit on top in its first seven days.
 max_rows_per_week = 5
 order = "biggest size first, then newest"
-heads_up = ["session 100 within the next 2 sessions", "the roadmap's last week", "a retest week"]
-row = "the athlete, the moment in plain words, a WhatsApp link with the message filled in, Seen, a reaction"
+heads_up = ["session 100 within the next 2 sessions", "the roadmap's last week", "a retest week"]   # not built; One Week Short is pitched instead
+row = "the athlete, the moment in plain words, the WhatsApp line written, WhatsApp, Copy and Saw it"
 
 [bell]
 # AA Proof → Crew → Bell.
@@ -109,13 +111,13 @@ shows = "the board name, the kind of moment and the exercise; never a weight, ne
 
 [tool.reaction]
 who = "Amir"
-does = "one tap on a Courtside row; the athlete sees 'Amir saw this' on that moment"
+does = "Saw it on a Courtside row (or sending its WhatsApp); from step 3 the athlete sees 'Amir saw this' on that moment"
 pays = "nothing"
 note = "a mark, not a chat: Amir's words still go by WhatsApp"
 
 [tool.commendation]
 who = "Amir"
-does = "a badge only Amir gives, in the meaning he chooses, with one line of why"
+does = "From Amir: one line he writes under the athlete's name on coach.html, one a day, no badge and no XP (round 5: badges are removed); the athlete sees it from step 3"
 size = "milestone"
 example = "Commended for resilience: trained through exam week."
 
@@ -130,8 +132,50 @@ asks_before_story = "a pre-written WhatsApp asking whether Amir may feature them
 
 # ── The WhatsApp lines ────────────────────────────────────────────────────────────────────────────────────────────
 # What Amir's WhatsApp opens with from a Courtside row. He can change the words before he sends.
-# {name} {exercise} {gain} {n} {cycle} {sessions} {planned} {quest} {badge} {metal} {caption} are filled in.
+# {name} {exercise} {gain} {n} {cycle} {sessions} {planned} {quest} {badge} {metal} {caption} {achievement} {month} {lift} {pct} are filled in.
+# coach.html keeps a copy of the lines Courtside uses (COURT_LINES); scripts/check_career.py rule 22 holds the two equal: change both.
+# These lines reach career_catalogue at the next seed (D20's); nothing on the server reads them, coach.html reads its copy.
 # DRAFTS in Amir's voice (plain words, short sentences, COM-3): he rewrites them. Every Farsi line is his to write.
+
+[message.bests]
+used_for = "Record Breaker marks (personal bests 5 · 10 · 25 · 50 · 100)"
+en = "{n} personal bests now. Keep stacking them."
+fa = ""
+
+[message.comebacks]
+used_for = "HARD TO KILL marks (comebacks 3 · 5 · 10)"
+en = "You came back again. That's {n} times. Good."
+fa = ""
+
+[message.first_best]
+used_for = "the First Best achievement (never a weight: a best's number is an estimate, PROG-01)"
+en = "Saw your first best on the {exercise}. Many more to come."
+fa = ""
+
+[message.held]
+used_for = "the Held achievement (the first full week)"
+en = "First full week. Now do it again."
+fa = ""
+
+[message.achievement]
+used_for = "any other achievement: its name and its caption"
+en = "{achievement}. {caption}"
+fa = ""
+
+[message.honour_sessions]
+used_for = "the month's honour Most sessions (plan sessions, D19)"
+en = "Most sessions in {month}: {n}. Nobody trained more. Thank you."
+fa = ""
+
+[message.honour_improved]
+used_for = "the month's honour Most improved (a main lift, at the same effort, D18)"
+en = "Most improved in {month}. {lift} up {pct}% at the same effort. That's real strength."
+fa = ""
+
+[message.honour_full_month]
+used_for = "the month's honour Full Month (every plan session that month)"
+en = "Every plan session in {month}. Full Month. Respect."
+fa = ""
 
 [message.personal_best]
 used_for = "a personal best"

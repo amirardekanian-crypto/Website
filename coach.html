@@ -606,6 +606,35 @@
   .ptline b { font-weight: 600; }
   .ptline .dim { color: var(--muted); }
   .ptline.drift b.lead { color: var(--clay-ink); }
+  /* Courtside (stage75): good news, never a reason. In the narrow column a row is the moment, the line already written, then its buttons. */
+  .court .cs { display: grid; gap: 4px; padding: 12px 0; }
+  .court .cs + .cs { border-top: 1px solid var(--rule); }
+  .court .cs-l1 { display: flex; align-items: baseline; gap: 8px; min-width: 0; font-size: 14px; line-height: 1.4; }
+  .court .cs-l1 .dot { flex: none; width: 8px; height: 8px; border-radius: 999px; background: var(--court); transform: translateY(-1px); }
+  .court .cs-l1 .dot.dim { background: var(--muted-soft); }
+  .court .cs-l1 .m { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .court .cs-l1 .m b, .court .cs-name { font-weight: 600; color: var(--ink); text-decoration: none; }
+  .court .cs-name:hover { text-decoration: underline; }
+  .court .cs-when { flex: none; font-size: 12px; color: var(--muted); }
+  .court .cs-sub, .court .cs-msg { padding-left: 16px; font-size: 12px; line-height: 1.4; color: var(--muted); overflow-wrap: anywhere; }
+  .court .cs-msg { font-style: italic; }
+  .court .cs-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 4px 0 0 16px; }
+  .court .cs-acts a.btn { text-decoration: none; }
+  .court .cs-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding-left: 16px; font-size: 14px; }
+  .court .cs-pick .m { flex: 1 1 10em; min-width: 0; overflow-wrap: anywhere; }
+  .court .cs-eb { margin-top: 4px; }
+  .court .cs-fold { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .court .cs-fold > summary { font-size: 14px; font-weight: 600; cursor: pointer; }
+  /* The monthly goal and "From Amir" under the athlete's name (stage75) */
+  .det-goal { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 8px; font-size: 14px; }
+  .det-goal .gk { font-weight: 600; color: var(--court); }
+  .det-goal .gl { min-width: 0; overflow-wrap: anywhere; }
+  .det-goal .gdone { font-weight: 600; color: var(--court); }
+  .det-goal .from-sent { min-width: 0; color: var(--muted); overflow-wrap: anywhere; }
+  .goal-in { flex: 1 1 260px; min-width: 0; height: 32px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; font-size: 14px; }
+  .from-box { display: grid; gap: 4px; margin-top: 8px; }
+  .from-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  @media (max-width: 899px) and (pointer: coarse) { .goal-in { font-size: 16px; } }
 
   /* ── Quest panel ── */
   /* Proof's right column (about 490 px wide at most): no box around the live run (rows divided by hairlines), and a quest's note drops
@@ -1388,6 +1417,8 @@ const TABLE_KEYS = {
   library: ['slug'], buyer_notes: ['user_id'],
   career_facts: ['athlete_id', 'kind', 'ref'], career_rules: ['version'], career_catalogue: ['kind', 'id'],
   career_awards: ['athlete_id', 'award_id'], career_recognition: ['athlete_id', 'award_id', 'audience'],
+  courtside_marks: ['athlete_id', 'award_id'], career_honour_months: ['month'], career_honours: ['month', 'honour', 'athlete_id'],
+  career_goals: ['athlete_id', 'month'], career_notes: ['athlete_id', 'day'],
 };
 function keysOf(table) {
   return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys', 'athlete_status', 'career_scores']
@@ -1655,6 +1686,10 @@ const S = {
   boardAt: {},     // scope -> when the board was read (it is kept until ↻ Refresh, or a quest week starts or ends)
   boardErr: '',    // why the last board read failed
   callLogs: {},    // athlete_id -> rows (fetched on detail)
+  court: null,     // Courtside (stage75): { on, week, rows, err }; on is false while the server has no get_courtside() (loadCourt())
+  honours: null,   // the month just gone: coach_honours()'s answer (frozen rows, or the live work and the Pick's shortlist)
+  goals: {},       // athlete_id -> { 'YYYY-MM-01': career_goals row }
+  amirNotes: {},   // athlete_id -> career_notes rows ("From Amir", one a day)
   // Bumped by every assemble(). The athlete file caches its own context so that
   // switching sub-tabs costs nothing; this is what tells it the cache is stale
   // after a refetch, instead of it quietly showing pre-write data for ever.
@@ -1762,6 +1797,7 @@ const LOAD_ERR_LABEL = {
   programs: 'programmes', logins: 'athlete logins', contacts: 'Proof contacts', intake: 'intake forms',
   assess: 'testing-app logins', course: 'course logins', buyerNotes: 'your notes about buyers', spine: 'the exercise library (Spine)',
   affiliates: 'affiliate codes', chats: 'website chats', status: 'paused and former marks', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
+  court: 'Courtside, the goals and your lines',
 };
 function paintLoadWarn() {
   const lw = $('loadwarn'), warn = loadWarnHtml();
@@ -2888,6 +2924,7 @@ async function hardRefresh() {
   try { await loadAll(); } catch (e) { $('content').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; return; }
   render();
   loadLevels().then(() => { if (S.ready) paintLevels(); });   // ↻ used to drop the levels and never fetch them again; they are filled in place (ROSTER-15)
+  loadCourt();
 }
 let _lastViewKey = '', _scrollMem = {}, _viaHistory = false, _pendingScroll = null;
 // Back keeps your place (audit BROWSER-4, 2026-10-11). A new screen starts at the top, but going Back to one you left lands where you were on it:
@@ -3048,6 +3085,7 @@ function renderToday() {
     <div class="tcols">
       <section class="panel" id="needPanel" style="animation-delay:.05s">${needPanelHtml()}</section>
       <div class="colstack">
+        ${S.court && S.court.on ? `<section class="panel court" id="courtPanel" style="animation-delay:.06s">${courtsideHtml()}</section>` : ''}
         <section class="panel" id="proofToday" style="animation-delay:.08s">${proofTodayHtml(habAthletes)}</section>
       </div>
     </div>`;
@@ -3187,6 +3225,319 @@ async function toggleHide(athleteId, day, hide) {
 window.postCoachLine = postCoachLine;
 window.clearCoachLine = clearCoachLine;
 window.toggleHide = toggleHide;
+
+// ── Courtside (stage75; Career Mode round 5, step 1; Amir 2026-10-19, direction A of https://claude.ai/artifact/L3Tt3B6YPqMWcVgnN7nt9g) ──
+// Good news, NEVER a reason: nothing here reads or changes reasonsOf(), the people count, a tab badge or the board's counters.
+// Today's right column opens with the week's moments (the four numbers' marks and every achievement, minted live, from highlight up;
+// get_courtside()), the WhatsApp line already written, at most five groups (one per athlete per day, the biggest leads), and in a month's
+// first seven days the month just gone's honours above them (folded under the moments from the 8th, when they are frozen). The monthly goal and
+// "From Amir" sit under the athlete's name (goalLineHtml()). Athletes see the goal, his line and "Amir saw this" from step 3 (the light screens).
+// The page hides all of it while the server has no get_courtside() (stage75 not applied). Nothing here pays XP (L11).
+// Every line below is a DRAFT in Amir's voice, held equal to career/recognition.toml [message.*] by scripts/check_career.py: change both.
+const COURT_LINES = {
+  week_held: '{n} weeks in a row, every session. Keep it boring.',
+  century: "{n} sessions with me. Don't stop now.",
+  bests: '{n} personal bests now. Keep stacking them.',
+  comebacks: "You came back again. That's {n} times. Good.",
+  first_best: 'Saw your first best on the {exercise}. Many more to come.',
+  held: 'First full week. Now do it again.',
+  cycle_finished: '{cycle} done: {sessions} of {planned} sessions. Ready for the next one?',
+  comeback: "You're back. Good. One week at a time.",
+  achievement: '{achievement}. {caption}',
+  honour_sessions: 'Most sessions in {month}: {n}. Nobody trained more. Thank you.',
+  honour_improved: "Most improved in {month}. {lift} up {pct}% at the same effort. That's real strength.",
+  honour_full_month: 'Every plan session in {month}. Full Month. Respect.',
+  amirs_pick: "You're my pick this month. Can I put you in my story?",
+};
+const COURT_SIZE = { highlight: 2, milestone: 3, legend: 4 };
+const COURT_MARK_LINE = { held_weeks: 'week_held', century: 'century', bests: 'bests', comebacks: 'comebacks' };
+const COURT_CAP = 5;
+// Who is never a client, as inTotals() says: the server cannot name your own login in a public stage file (pre-commit guard 6), so the page passes it.
+const COURT_NOT_CLIENTS = SYSTEM_IDS.concat([AMIR_ATHLETE_ID]);
+let _courtAll = false, _goalEdit = null, _goalDraft = '', _fromEdit = null, _fromDraft = '';
+// The server has no stage75 yet: the function or the table is not there. Anything else is a real error and is said.
+const courtMissing = e => !!e && (['PGRST202', 'PGRST205', '42P01', '42883'].includes(e.code) || /Could not find the (function|table)|does not exist/i.test(e.message || ''));
+// This week on the coach's clock: Monday 00:00 to the next Monday.
+function courtWeek() {
+  const now = new Date(), back = (now.getDay() + 6) % 7;
+  const from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - back), to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 7);
+  return { from: from.toISOString(), to: to.toISOString(), key: dkey(from) };
+}
+const monthOf = iso => String(iso).slice(0, 7) + '-01';
+function lastMonthKey() { const t = todayKey(); return dkey(new Date(+t.slice(0, 4), +t.slice(5, 7) - 2, 1)); }
+function monthName(iso) { return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+String(iso).slice(5, 7) - 1] || ''; }
+const firstWord = s => String(s || '').trim().split(/\s+/)[0] || '';
+const listNames = ids => { const n = ids.map(nameOf); return n.length < 3 ? n.join(' and ') : n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1]; };
+const courtClient = id => inTotals(S.ath[id] || { id });
+
+// One read for the panel and the header: the week, the month just gone's honours, every goal and every line. From the 8th the month just gone
+// is frozen once, quietly (a late session no longer moves a winner).
+async function loadCourt() {
+  if (DEMO) { paintCourt(); return; }
+  const w = courtWeek(), m = lastMonthKey();
+  const [cs, hon, goals, notes] = await Promise.all([
+    sb.rpc('get_courtside', { p_from: w.from, p_to: w.to, p_not_clients: COURT_NOT_CLIENTS }),
+    sb.rpc('coach_honours', { p_month: m, p_not_clients: COURT_NOT_CLIENTS }),
+    selectAll('career_goals', '*'),
+    selectAll('career_notes', '*'),
+  ]);
+  if (courtMissing(cs.error)) { S.court = { on: false }; LOAD_ERR.court = ''; paintCourt(); return; }
+  // goalsErr / notesErr: a goal or a line that did not load must never look like none (Write one would then overwrite it on the server).
+  S.court = { on: true, week: w.key, rows: cs.error ? [] : ((cs.data && cs.data.rows) || []), err: cs.error ? cs.error.message : '',
+              goalsErr: goals && goals.error ? goals.error.message : '', notesErr: notes && notes.error ? notes.error.message : '' };
+  S.honours = hon.error ? { month: m, err: hon.error.message } : hon.data;
+  S.goals = {}; ((goals && !goals.error && goals.data) || []).forEach(g => { (S.goals[g.athlete_id] = S.goals[g.athlete_id] || {})[g.month] = g; });
+  S.amirNotes = {}; ((notes && !notes.error && notes.data) || []).forEach(n => { (S.amirNotes[n.athlete_id] = S.amirNotes[n.athlete_id] || []).push(n); });
+  LOAD_ERR.court = cs.error ? cs.error.message : goals && goals.error ? goals.error.message : notes && notes.error ? notes.error.message : '';
+  if (S.honours && !S.honours.err && !S.honours.frozen && Number(todayKey().slice(8)) >= 8) {
+    const r = await sb.rpc('coach_honours_freeze', { p_month: m, p_not_clients: COURT_NOT_CLIENTS });
+    if (!r.error && r.data) S.honours = r.data;
+  }
+  paintCourt();
+}
+// Repaint what shows Courtside on the screen open now: the panel on Today (drawn in place), the goal line in an athlete's header.
+function paintCourt() {
+  if (!S.ready) return;
+  const r = route(), on = !!(S.court && S.court.on);
+  if (r.view === 'today') {
+    const el = $('courtPanel');
+    if (el && on) el.innerHTML = courtsideHtml();
+    else if (!!el !== on) render();
+  } else if (r.view === 'detail' && on) render();
+}
+
+// The week's rows, one group per athlete per day (the coach's day), the biggest moment leading, then the newest. Clients only (the server
+// already leaves out the demo, your own login and former athletes; this is the page's second guard, inTotals()).
+function courtGroups() {
+  const by = {};
+  ((S.court && S.court.rows) || []).filter(x => courtClient(x.athlete_id)).forEach(x => {
+    const k = x.athlete_id + '|' + dkey(new Date(x.at));
+    (by[k] = by[k] || []).push(x);
+  });
+  const rank = x => COURT_SIZE[x.size] || 0;
+  return Object.values(by).map(list => {
+    list.sort((a, b) => rank(b) - rank(a) || String(b.at).localeCompare(String(a.at)) || String(a.award_id).localeCompare(String(b.award_id)));
+    return { id: list[0].athlete_id, lead: list[0], rows: list, ids: list.map(x => x.award_id), at: list.reduce((m, x) => (String(x.at) > m ? String(x.at) : m), ''),
+             seen: list.every(x => x.saw_at), sent: list.some(x => x.sent_at) };
+  }).sort((a, b) => rank(b.lead) - rank(a.lead) || b.at.localeCompare(a.at));
+}
+const courtFact = (row, kind) => (row.facts || []).find(f => f.kind === kind) || null;
+// The moment in plain words.
+function courtWords(row) {
+  const s = row.spec || {}, n = s.n;
+  if (row.kind === 'badge') return ({ held_weeks: `${n} weeks held in a row`, century: `${n} sessions with you`, bests: `${n} personal bests`, comebacks: `${n} comebacks` })[row.item] || s.name || row.item;
+  if (row.item === 'first_best') { const f = courtFact(row, 'personal_best'); return 'First best' + (f && f.value && f.value.lift ? ' · ' + f.value.lift : ''); }
+  if (row.item === 'first_cycle') { const v = (courtFact(row, 'cycle_finished') || {}).value; return v ? `First cycle done, ${v.done} of ${v.planned}` : 'First cycle done'; }
+  if (row.item === 'held') return 'First full week held';
+  if (row.item === 'back') return 'Back on court';
+  return s.name || row.item;
+}
+// A line with every {gap} filled, or null when one is left (the caller then uses the plainer line).
+function fillLine(t, v) {
+  const out = String(t || '').replace(/\{(\w+)\}/g, (m, k) => (v[k] != null && v[k] !== '' ? String(v[k]) : m));
+  return /\{\w+\}/.test(out) ? null : out;
+}
+// The WhatsApp line for a moment (never a weight: a best's number is an estimate, PROG-01).
+function courtLine(row) {
+  const s = row.spec || {}, v = { n: s.n };
+  let key = null;
+  if (row.kind === 'badge') key = COURT_MARK_LINE[row.item];
+  else if (row.item === 'first_best') { key = 'first_best'; const f = courtFact(row, 'personal_best'); v.exercise = f && f.value && f.value.lift; }
+  else if (row.item === 'first_cycle') { key = 'cycle_finished'; const x = (courtFact(row, 'cycle_finished') || {}).value; if (x) Object.assign(v, { cycle: 'Cycle ' + x.cycle, sessions: x.done, planned: x.planned }); }
+  else if (row.item === 'held') key = 'held';
+  else if (row.item === 'back') key = 'comeback';
+  return (key && fillLine(COURT_LINES[key], v)) || fillLine(COURT_LINES.achievement, { achievement: s.name, caption: s.caption }) || s.name || row.item;
+}
+function courtSendHtml(id, msg, onSend, waLabel) {
+  const a = S.ath[id], wa = a && a.contact && waLink(a.contact.whatsapp);
+  return `${wa ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(wa)}?text=${encodeURIComponent(msg)}" onclick="${onSend('sent')}">${esc(waLabel || 'WhatsApp ↗')}</a>` : ''}
+    <button class="btn sm" onclick="copyText(${jsq(msg)}, null, true); toast('Copied. Paste it in WhatsApp'); ${onSend('sent')}">Copy</button>`;
+}
+function courtRowHtml(g) {
+  const msg = courtLine(g.lead), ids = jsq(g.ids.join(',')), also = g.rows.slice(1).map(courtWords);
+  const act = what => `courtAct(${jsq(g.id)}, ${ids}, '${what}')`;
+  return `<div class="cs">
+      <div class="cs-l1"><span class="dot"></span><span class="m"><a class="cs-name" href="#a/${encodeURIComponent(g.id)}">${esc(nameOf(g.id))}</a> ${esc(courtWords(g.lead))}</span><span class="cs-when">${esc(DOWS[new Date(g.at).getDay()])}</span></div>
+      ${also.length ? `<div class="cs-sub">and ${esc(also.join(', '))}</div>` : ''}
+      <div class="cs-msg" dir="auto">“${esc(msg)}”</div>
+      <div class="cs-acts">${courtSendHtml(g.id, msg, act)}<button class="btn sm" onclick="${act('saw')}">Saw it</button></div>
+    </div>`;
+}
+function courtSeenHtml(g) {
+  return `<div class="cs"><div class="cs-l1"><span class="dot dim"></span><span class="m"><b>${esc(nameOf(g.id))}</b> ${esc(courtWords(g.lead))}${g.sent ? ' <span class="muted">· sent</span>' : ''}</span>
+      <button class="btn sm quiet" onclick="courtAct(${jsq(g.id)}, ${jsq(g.ids.join(','))}, 'undo')">Undo</button></div></div>`;
+}
+function courtsideHtml() {
+  const gs = courtGroups(), open = gs.filter(g => !g.seen), seen = gs.filter(g => g.seen);
+  const shown = _courtAll ? open : open.slice(0, COURT_CAP);
+  const firstWeek = Number(todayKey().slice(8)) <= 7, hon = honoursHtml(firstWeek);
+  return `
+    <div class="phead"><span class="t hd">Courtside</span><span class="r">this week${open.length > COURT_CAP ? ` · ${COURT_CAP} of ${open.length}` : ''}</span></div>
+    ${firstWeek ? hon : ''}
+    ${firstWeek && hon ? '<div class="eyebrow cs-eb">This week</div>' : ''}
+    ${S.court.err ? `<p class="empty">This week's moments did not load: ${esc(S.court.err)}</p>`
+      : shown.map(courtRowHtml).join('') || '<p class="empty">Nothing big this week yet. Moments land here as they happen.</p>'}
+    ${open.length > COURT_CAP ? `<button class="showweek" onclick="_courtAll=!_courtAll;paintCourt()">${_courtAll ? 'Show fewer' : `+ ${open.length - COURT_CAP} more this week`}</button>` : ''}
+    ${seen.length ? `<details class="cs-fold" id="courtSeen"><summary>Seen this week <span class="muted">${seen.length}</span></summary>${seen.map(courtSeenHtml).join('')}</details>` : ''}
+    ${firstWeek ? '' : hon}`;
+}
+// Saw it ('saw'), WhatsApp or Copy ('sent': seen too), Undo ('undo'). The row moves at once; a refusal is said.
+async function courtAct(id, idsCsv, what) {
+  const ids = String(idsCsv).split(',').filter(Boolean), now = new Date().toISOString();
+  const apply = () => ((S.court && S.court.rows) || []).forEach(x => {
+    if (x.athlete_id !== id || !ids.includes(x.award_id)) return;
+    if (what === 'undo') { x.saw_at = null; x.sent_at = null; } else { x.saw_at = x.saw_at || now; if (what === 'sent') x.sent_at = x.sent_at || now; }
+  });
+  if (DEMO) { setTimeout(() => { apply(); paintCourt(); }, 0); if (what !== 'sent') toast('Demo mode — nothing saved'); return; }   // after the tap: a link taken out of the page in its own click opens nothing
+  const r = await sb.rpc('coach_courtside_mark', { p_athlete_id: id, p_award_ids: ids, p_what: what });
+  if (r.error) { fail('Courtside: that was not saved: ' + r.error.message); return; }
+  if (!r.data) { fail(`Courtside: none of those moments is ${nameOf(id)}'s any more. Tap ↻ Refresh.`); return; }
+  apply(); paintCourt();
+  if (what === 'saw') toast('Moved to Seen');
+}
+window.courtAct = courtAct;
+
+// The month just gone: frozen rows once frozen, else the live work. Winners are clients only.
+function honoursData() {
+  const h = S.honours;
+  if (!h || h.err || !h.month) return null;
+  const L = h.live || {}, rows = h.frozen ? (h.rows || []) : [];
+  const pick = (honour, live) => (h.frozen ? rows.filter(r => r.honour === honour).map(r => Object.assign({}, r.value || {}, { id: r.athlete_id, sent: r.sent_at })) : live).filter(x => courtClient(x.id));
+  return {
+    month: h.month, frozen: !!h.frozen, pick: h.pick || null, pickOpen: !!h.pick_open,
+    sessions: pick('sessions', ((L.sessions && L.sessions.who) || []).map(id => ({ id, n: L.sessions.n }))),
+    improved: pick('improved', ((L.improved && L.improved.who) || []).map(x => ({ id: x.athlete_id, lift: x.lift, pct: x.pct }))),
+    full: pick('full_month', ((L.full_month && L.full_month.who) || []).map(x => ({ id: x.athlete_id, weeks: x.weeks }))),
+    near: pick('near', ((L.full_month && L.full_month.near) || []).map(x => ({ id: x.athlete_id, held: x.held, weeks: x.weeks }))),
+    picked: rows.filter(r => r.honour === 'pick').map(r => ({ id: r.athlete_id, sent: r.sent_at })),
+    shortlist: (h.shortlist || []).map(x => Object.assign({}, x, { id: x.athlete_id })).filter(x => courtClient(x.id)),
+  };
+}
+function honRow(k, words, msg, acts) {
+  return `<div class="cs"><div class="cs-l1"><span class="dot"></span><span class="m"><b>${esc(k)}</b> · ${esc(words)}</span></div>
+      ${msg ? `<div class="cs-msg" dir="auto">“${esc(msg)}”</div>` : ''}${acts ? `<div class="cs-acts">${acts}</div>` : ''}</div>`;
+}
+function honoursHtml(expanded) {
+  // Just after midnight on the 1st your clock can be ahead of the server's (UTC): the month has not ended there yet, so there is nothing to show.
+  if (S.honours && S.honours.err) return /has not ended yet/.test(S.honours.err) ? '' : `<p class="empty">Last month's honours did not load: ${esc(S.honours.err)}</p>`;
+  const d = honoursData();
+  if (!d) return '';
+  const mn = monthName(d.month), out = [];
+  const send = (honour, x, msg, label) => courtSendHtml(x.id, msg, () => `honourSent(${jsq(d.month)}, '${honour}', ${jsq(x.id)})`, label) + (x.sent ? '<span class="muted t-sm">sent ✓</span>' : '');
+  d.sessions.forEach(x => { const msg = fillLine(COURT_LINES.honour_sessions, { month: mn, n: x.n }); out.push(honRow('Most sessions', `${nameOf(x.id)}, ${x.n} plan session${x.n === 1 ? '' : 's'}`, msg, send('sessions', x, msg))); });
+  d.improved.forEach(x => { const msg = fillLine(COURT_LINES.honour_improved, { month: mn, lift: x.lift, pct: x.pct }); out.push(honRow('Most improved', `${nameOf(x.id)}, ${x.lift} +${x.pct}% at the same effort`, msg, send('improved', x, msg))); });
+  if (d.full.length) d.full.forEach(x => { const msg = fillLine(COURT_LINES.honour_full_month, { month: mn }); out.push(honRow('Full Month', `${nameOf(x.id)}, every plan session (${x.weeks} weeks)`, msg, send('full_month', x, msg))); });
+  else out.push(honRow('Full Month', 'Nobody this month.' + (d.near.length ? ` ${listNames(d.near.map(x => x.id))} ${d.near.length === 1 ? 'was' : 'were'} one week short.` : '')));
+  if (d.pick === 'picked') d.picked.forEach(x => out.push(honRow("Amir's Pick", nameOf(x.id), COURT_LINES.amirs_pick, send('pick', x, COURT_LINES.amirs_pick, 'Ask about the story ↗'))));
+  else if (d.pick === 'nobody') out.push(honRow("Amir's Pick", 'Nobody this month.'));
+  else if (d.pickOpen) {
+    const why = x => x.slot === 'weeks_held' ? `most weeks held: ${x.n}` : x.slot === 'gain' ? `biggest gain: ${x.lift} +${x.pct}%` : x.gone ? `back after ${x.gone} days away` : `${x.n} comebacks`;
+    out.push(`<div class="cs"><div class="cs-l1"><span class="dot"></span><span class="m"><b>Amir's Pick</b> · choose one, or nobody</span></div>
+      ${d.shortlist.map(x => `<div class="cs-pick"><span class="m">${esc(nameOf(x.id))} <span class="muted">· ${esc(why(x))}</span></span><button class="btn sm" onclick="honourPick(this, ${jsq(d.month)}, ${jsq(x.id)})">Pick ${esc(firstWord(nameOf(x.id)))}</button></div>`).join('')}
+      <div class="cs-acts"><button class="btn sm quiet" onclick="honourPick(this, ${jsq(d.month)}, '')">Nobody this month</button></div></div>`);
+  }
+  return expanded ? `<div class="eyebrow cs-eb">${esc(mn)} honours</div>${out.join('')}`
+                  : `<details class="cs-fold" id="courtHon"><summary>${esc(mn)} honours</summary>${out.join('')}</details>`;
+}
+// Sending (or copying) an honour fixes the month's winners first (frozen once), then marks that one sent.
+async function honourSent(month, honour, id) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (!S.honours || !S.honours.frozen) {
+    const f = await sb.rpc('coach_honours_freeze', { p_month: month, p_not_clients: COURT_NOT_CLIENTS });
+    if (f.error) { fail('Honours: the winners could not be fixed: ' + f.error.message); return; }
+    S.honours = f.data;
+  }
+  const r = await sb.rpc('coach_honours_sent', { p_month: month, p_honour: honour, p_athlete_id: id });
+  if (r.error) { fail('Honours: not marked as sent: ' + r.error.message); return; }
+  if (!r.data) fail(`Honours: the winners changed when they were fixed (a late session), and ${nameOf(id)} is not one of them now. Check the honours before you send.`);
+  else (S.honours.rows || []).forEach(x => { if (x.honour === honour && x.athlete_id === id && !x.sent_at) x.sent_at = new Date().toISOString(); });
+  paintCourt();
+}
+// Amir's Pick: two taps (the first says what the second does), because a pick stays picked.
+async function honourPick(btn, month, id) {
+  if (btn && !btn.dataset.armed) {
+    const was = btn.textContent;
+    btn.dataset.armed = '1'; btn.textContent = id ? `Tap again: ${firstWord(nameOf(id))} is your pick` : 'Tap again: nobody this month';
+    setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = was; } }, 4000);
+    return;
+  }
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const r = await sb.rpc('coach_honours_pick', { p_month: month, p_athlete_id: id || null, p_not_clients: COURT_NOT_CLIENTS });
+  if (r.error) { fail('Your pick was not saved: ' + r.error.message); return; }
+  S.honours = r.data;
+  toast(id ? `${firstWord(nameOf(id))} is your ${monthName(month)} pick` : `No pick for ${monthName(month)}`);
+  paintCourt();
+}
+window.honourSent = honourSent;
+window.honourPick = honourPick;
+
+// The monthly goal (one line, one tick) and "From Amir" (one line a day), under the athlete's name. Clients with a programme only.
+function goalLineHtml(a) {
+  if (!a || !S.court || !S.court.on || !inTotals(a) || !S.programs[a.id]) return '';
+  if (S.court.goalsErr) return `<div class="det-goal" id="goalLine"><span class="gk">The monthly goal did not load</span><span class="from-sent">${esc(S.court.goalsErr)} · tap ↻ Refresh</span></div>`;
+  const m = monthOf(todayKey()), mn = monthName(m), g = (S.goals[a.id] || {})[m], idq = jsq(a.id);
+  const line = (S.amirNotes[a.id] || []).find(n => n.day === todayKey());
+  let goal;
+  if (_goalEdit === a.id) goal = `<span class="gk">${esc(mn)} goal</span><input id="goalIn" class="goal-in" maxlength="140" value="${esc(_goalDraft)}" placeholder="One line: what this month is for" aria-label="${esc(mn)} goal for ${esc(a.name)}"
+      oninput="_goalDraft=this.value" onkeydown="if(event.key==='Enter')goalSave(${idq});if(event.key==='Escape')goalCancel()"><button class="btn sm primary" onclick="goalSave(${idq})">Save</button><button class="btn sm quiet" onclick="goalCancel()">Cancel</button>`;
+  else if (g) goal = `<span class="gk">${esc(mn)} goal</span><span class="gl" dir="auto">${esc(g.line)}</span>${g.done_at
+      ? `<span class="gdone">✓ Done ${esc(dayMonth(dkey(new Date(g.done_at))))}</span><button class="btn sm quiet" onclick="goalDone(${idq}, false)">Undo</button>`
+      : `<button class="btn sm" onclick="goalDone(${idq}, true)">✓ Mark done</button>`}<button class="btn sm quiet" onclick="goalEdit(${idq})">Edit</button>`;
+  else goal = `<span class="gk">No ${esc(mn)} goal yet</span><button class="btn sm" onclick="goalEdit(${idq})">Write one</button>`;
+  if (_fromEdit === a.id) {
+    return `<div class="det-goal" id="goalLine">${goal}</div>
+      <div class="from-box"><span class="t-sm muted">From Amir · one line, kept for their app (they see it once the app update ships) · <span id="fromCount">${_fromDraft.length}</span>/90</span>
+        <div class="from-row"><input id="fromIn" class="goal-in" maxlength="90" value="${esc(_fromDraft)}" placeholder="Trained through exam week. Proud of you." aria-label="A line from you to ${esc(a.name)}"
+          oninput="_fromDraft=this.value;document.getElementById('fromCount').textContent=this.value.length" onkeydown="if(event.key==='Enter')fromSend(${idq});if(event.key==='Escape')fromCancel()">
+          <button class="btn sm primary" onclick="fromSend(${idq})">Send to their app</button><button class="btn sm quiet" onclick="fromCancel()">Cancel</button></div></div>`;
+  }
+  const from = S.court.notesErr ? `<span class="from-sent">Your lines did not load · tap ↻ Refresh</span>`
+    : line ? `<span class="from-sent">From you today: <span dir="auto">“${esc(line.line)}”</span>${line.read_at ? ' · read' : ''}</span>${line.read_at ? '' : `<button class="btn sm quiet" onclick="fromTakeBack(${idq})">Take back</button>`}`
+    : `<button class="btn sm quiet" onclick="fromOpen(${idq})">From Amir…</button>`;
+  return `<div class="det-goal" id="goalLine">${goal}${from}</div>`;
+}
+const focusEnd = id => setTimeout(() => { const el = $(id); if (el) { el.focus(); try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) {} } }, 0);
+function goalEdit(id) { const g = (S.goals[id] || {})[monthOf(todayKey())]; _goalEdit = id; _goalDraft = g ? g.line : ''; _fromEdit = null; render(); focusEnd('goalIn'); }
+function goalCancel() { _goalEdit = null; _goalDraft = ''; render(); }
+async function goalSave(id) {
+  if (S.court && S.court.goalsErr) { fail('The goals did not load, so nothing was saved. Tap ↻ Refresh, then try again.'); return; }
+  const m = monthOf(todayKey()), line = ($('goalIn') ? $('goalIn').value : _goalDraft).trim();
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const r = await sb.rpc('coach_set_goal', { p_athlete_id: id, p_month: m, p_line: line });
+  if (r.error) { fail('The goal was not saved: ' + r.error.message); return; }
+  const mine = (S.goals[id] = S.goals[id] || {});
+  if (r.data) mine[m] = r.data; else delete mine[m];
+  _goalEdit = null; _goalDraft = '';
+  toast(r.data ? 'Goal saved' : 'Goal cleared');
+  render();
+}
+async function goalDone(id, done) {
+  const m = monthOf(todayKey());
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const r = await sb.rpc('coach_goal_done', { p_athlete_id: id, p_month: m, p_done: done });
+  if (r.error) { fail('The goal was not changed: ' + r.error.message); return; }
+  (S.goals[id] = S.goals[id] || {})[m] = r.data;
+  toast(done ? 'Goal done ✓' : 'Goal open again');
+  render();
+}
+function fromOpen(id) { _fromEdit = id; _fromDraft = ''; _goalEdit = null; render(); focusEnd('fromIn'); }
+function fromCancel() { _fromEdit = null; _fromDraft = ''; render(); }
+async function fromSend(id, take) {
+  if (S.court && S.court.notesErr) { fail('Your lines did not load, so nothing was sent. Tap ↻ Refresh, then try again.'); return; }
+  const line = take ? '' : ($('fromIn') ? $('fromIn').value : _fromDraft).trim();
+  if (!take && !line) { toast('Write the line first'); return; }
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const r = await sb.rpc('coach_from_amir', { p_athlete_id: id, p_day: todayKey(), p_line: line, p_award_id: null });
+  if (r.error) { fail('Your line was not kept: ' + r.error.message); return; }
+  const mine = (S.amirNotes[id] || []).filter(n => n.day !== todayKey());
+  if (r.data) mine.push(r.data);
+  S.amirNotes[id] = mine;
+  _fromEdit = null; _fromDraft = '';
+  toast(take ? 'Taken back' : 'Kept for their app');
+  render();
+}
+const fromTakeBack = id => fromSend(id, true);
+Object.assign(window, { goalEdit, goalCancel, goalSave, goalDone, fromOpen, fromCancel, fromSend, fromTakeBack });
 
 // Who needs the coach: one row per PERSON, from reasonsOf() (the same rule the roster uses), most
 // urgent first. A note row opens the day the note is on. Each row has ONE button on the right that names what the tap
@@ -5334,6 +5685,7 @@ async function renderDetail(athleteId, sub) {
           <div class="sub">${tierChip(a)}${statusChip(a)}${lvSlot('hchip', athleteId)} <span>${esc(sub2.join(' · '))}</span></div>
           ${cycleLineHtml(_D)}
           ${needsLineHtml(a)}
+          ${goalLineHtml(a)}
         </div>
       </div>
       ${acts ? `<div class="det-acts">${acts}</div>` : ''}
@@ -8879,6 +9231,22 @@ function demoStore() {
     { pos: 5, display_name: 'Mina', title: null, xp: 1800, level: 3, rank_label: 'STARTER', is_me: false, joined: true },
   ];
   S.board.week = S.board.season.slice(0, 4);
+  // Courtside (stage75), made up like the rest: this week's moments, last month's honours (worked out, not frozen), one goal.
+  const ago = h => new Date(Date.now() - h * 3600000).toISOString();
+  S.court = { on: true, week: courtWeek().key, err: '', rows: [
+    { athlete_id: 'demo_ana', award_id: 'badge:century:2', kind: 'badge', item: 'century', tier: 2, size: 'milestone', at: ago(1), spec: { name: 'Century', n: 50, caption: '50 sessions with Amir.' }, facts: [] },
+    { athlete_id: 'demo_ana', award_id: 'achievement:held', kind: 'achievement', item: 'held', size: 'highlight', at: ago(1), spec: { name: 'Held', caption: 'Your first held week. Every session, on your days.' }, facts: [] },
+    { athlete_id: 'demo_lena', award_id: 'achievement:first_cycle', kind: 'achievement', item: 'first_cycle', size: 'milestone', at: ago(2), spec: { name: 'First Cycle', caption: 'A whole cycle, finished.' }, facts: [{ kind: 'cycle_finished', value: { cycle: 1, done: 13, planned: 12 } }] },
+    { athlete_id: 'demo_mina', award_id: 'badge:held_weeks:2', kind: 'badge', item: 'held_weeks', tier: 2, size: 'highlight', at: ago(3), spec: { name: 'Hold Serve', n: 8 }, facts: [] },
+    { athlete_id: 'demo_omid', award_id: 'achievement:first_best', kind: 'achievement', item: 'first_best', size: 'highlight', at: ago(4), spec: { name: 'First Best', caption: 'Your first personal best. Not the last.' }, facts: [{ kind: 'personal_best', value: { lift: 'Goblet Squat', kg: 24 } }] },
+    { athlete_id: 'demo_lena', award_id: 'achievement:back', kind: 'achievement', item: 'back', size: 'highlight', at: ago(30), spec: { name: 'Back on Court' }, facts: [], saw_at: ago(20), sent_at: ago(20) },
+  ] };
+  S.honours = { month: lastMonthKey(), frozen: false, pick: null, pick_open: true, rows: [],
+    live: { sessions: { n: 14, who: ['demo_ana'] }, improved: { pct: 27.1, who: [{ athlete_id: 'demo_lena', lift: 'Barbell Back Squat', pct: 27.1 }] },
+            full_month: { who: [], near: [{ athlete_id: 'demo_mina', held: 3, weeks: 4 }, { athlete_id: 'demo_omid', held: 3, weeks: 4 }] } },
+    shortlist: [{ slot: 'weeks_held', athlete_id: 'demo_mina', n: 4 }, { slot: 'gain', athlete_id: 'demo_lena', lift: 'Barbell Back Squat', pct: 27.1 }, { slot: 'comeback', athlete_id: 'demo_omid', n: 2, gone: 16 }] };
+  S.goals = { demo_ana: { [monthOf(t)]: { athlete_id: 'demo_ana', month: monthOf(t), line: 'Squat 3 times a week, every week. Log every set.', done_at: null } } };
+  S.amirNotes = {};
   assemble();
 }
 
@@ -8925,8 +9293,9 @@ async function boot() {
     $('content').innerHTML = `<p class="empty">Could not load the dashboard: ${esc(e.message)}</p>`; return;
   }
   render();
-  // Server-scored levels fill in behind the first paint.
+  // Server-scored levels fill in behind the first paint; so does Courtside (stage75).
   loadLevels().then(() => { if (S.ready) paintLevels(); });
+  loadCourt();
 }
 function showGate(err) { failDismissAll(); $('app').style.display = 'none'; $('gate').style.display = 'block'; $('gateErr').textContent = err || ''; }
 // supabase-js fires an auth event on load, on every hourly token refresh, when the tab comes

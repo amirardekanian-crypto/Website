@@ -3774,12 +3774,12 @@ S['today-also-waiting'] = async (b) => {
     const n = document.getElementById('needPanel'), w = document.getElementById('proofToday');
     const rn = n.getBoundingClientRect(), rw = w.getBoundingClientRect(), F = Node.DOCUMENT_POSITION_FOLLOWING;
     return { order: !!(n.compareDocumentPosition(w) & F), fullOnToday: ['wallPanel', 'questPanel', 'pulsePanel'].filter(id => document.getElementById(id)),
-      left: rn.right <= rw.left + 1, ratio: Math.round(rn.width / rw.width * 100) / 100, top: Math.abs(rn.top - rw.top) < 2,
+      left: rn.right <= rw.left + 1, ratio: Math.round(rn.width / rw.width * 100) / 100, top: Math.abs(rn.top - document.querySelector('.colstack').getBoundingClientRect().top) < 2,   // the right column now opens with Courtside (stage75), Proof today under it
       h1: document.querySelectorAll('#content h1').length, strip: Math.round(document.querySelector('.board').getBoundingClientRect().height),
       counters: [...document.querySelectorAll('.board .counter')].map(a => a.textContent.replace(/\s+/g, ' ').trim()) };
   });
   check(r, '#needPanel comes before #proofToday in the page, and the full wall, quest lever and pulse are not on Today', lay.order && !lay.fullOnToday.length, lay);
-  check(r, 'on a wide screen Needs you is the left column, level with Proof today and about twice as wide', lay.left && lay.top && lay.ratio > 1.8 && lay.ratio < 2.3, lay);
+  check(r, 'on a wide screen Needs you is the left column, level with the top of the right column (Courtside, then Proof today) and about twice as wide as Proof today', lay.left && lay.top && lay.ratio > 1.8 && lay.ratio < 2.3, lay);
   check(r, 'the strip has no headline and is slim (under 110 px), with the four counters on it as number + label', lay.h1 === 0 && lay.strip < 110 && lay.counters.length === 4 && /^\d+\/\d+ on court today$/.test(lay.counters[0]) && /^\d+ notes? to read$/.test(lay.counters[3]), lay);
   for (const w of [390, 320]) {
     await page.setViewportSize({ width: w, height: 844 }); await L.settle(page, 250);
@@ -5457,6 +5457,495 @@ S['records-measure'] = async (b) => {
   check(r, 'the lift lifted in pounds reads 290 lb, +10 lb since the first (its pounds series only: the 40 kg record is not "the first")', /290\s*lb/.test(sq) && /\+10\.0 lb since the first/.test(sq) && !/ kg/.test(sq), sq);
   check(r, 'a lift last lifted on a stack reads in plates (9.5 plates), and its kg record is another series', /9\.5\s*plates/.test(rw) && /first estimate/.test(rw) && !/kg/.test(rw), rw);
   check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Courtside (stage75; Career Mode round 5, step 1) ─────────────────────────────────────────────────────────
+// Good news, never a reason: a panel at the top of Today's right column (this week's moments, the month just gone's honours), a goal line and
+// "From Amir" under an athlete's name. The seed `{ court: true }` adds the made-up cast and awards (fixtures.js: courtSeed), `courtAwards: false` the
+// same people with none. The stub answers get_courtside() & co as stage75's SQL does (stub.js).
+const COURT_T = { fixedTime: '2026-11-12T10:00:00Z' };   // a Thursday, day 12 of the month: the honours are folded and the month is frozen on load
+const rpcs = (cs, name) => cs.filter(c => c.kind === 'rpc' && c.name === name);
+// A link to WhatsApp is not followed (target=_blank would open a window the harness has no use for); the tap is a real click, its onclick runs.
+const noPopups = page => page.evaluate(() => { window.__opened = []; document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a[target="_blank"]'); if (a) { window.__opened.push(a.getAttribute('href')); e.preventDefault(); } }, true); });
+const courtRow = (page, name) => page.locator('#courtPanel .cs', { has: page.locator('a.cs-name', { hasText: name }) }).first();
+const seenRow = (page, name) => page.locator('#courtSeen .cs', { hasText: name }).first();
+const courtSeen = page => page.evaluate(() => { const d = document.getElementById('courtSeen'); if (d) d.open = true; });
+// What the panel shows: the open moments in order (a moment row is the one with a link on the name), the folded Seen rows, the honours.
+const courtState = page => page.evaluate(() => {
+  const panel = document.getElementById('courtPanel');
+  if (!panel) return null;
+  const txt = el => el.innerText.replace(/\s+/g, ' ').trim();
+  const open = [...panel.querySelectorAll('.cs')].filter(el => el.querySelector('a.cs-name')).map(el => {
+    const wa = el.querySelector('.cs-acts a.btn');
+    return { name: el.querySelector('a.cs-name').textContent.trim(), href: el.querySelector('a.cs-name').getAttribute('href'), text: txt(el.querySelector('.cs-l1')),
+      also: el.querySelector('.cs-sub') ? txt(el.querySelector('.cs-sub')) : '', msg: (el.querySelector('.cs-msg') || { textContent: '' }).textContent.replace(/^“|”$/g, ''),
+      wa: wa ? wa.getAttribute('href') : null, buttons: [...el.querySelectorAll('.cs-acts .btn')].map(x => x.textContent.trim()) };
+  });
+  const seen = [...panel.querySelectorAll('#courtSeen .cs')].map(el => el.textContent.replace(/\s+/g, ' ').trim());   // textContent: the fold is shut, innerText of a shut fold is empty
+  const more = panel.querySelector('.showweek');
+  const hon = panel.querySelector('#courtHon');
+  return { open, seen, seenCount: panel.querySelector('#courtSeen summary') ? txt(panel.querySelector('#courtSeen summary')) : '', head: txt(panel.querySelector('.phead')), more: more ? txt(more) : '',
+    hon: hon ? { open: hon.open, summary: txt(hon.querySelector('summary')) } : null, text: txt(panel) };
+});
+// Everything the page says about who needs the coach, so two pages can be compared.
+const needSnap = page => page.evaluate(() => ({
+  people: (document.querySelector('#needPanel .phead .r') || {}).textContent || '',
+  rows: [...document.querySelectorAll('#needPanel .need')].map(e => e.innerText.replace(/\s+/g, ' ').trim()),
+  counters: [...document.querySelectorAll('.counters .counter')].map(e => e.innerText.replace(/\s+/g, ' ').trim()),
+  rail: [...document.querySelectorAll('#rail a.tab')].map(e => e.innerText.replace(/\s+/g, ' ').trim()),
+  bar: [...document.querySelectorAll('#botbar .bb-item, #moreSheet .ms-row')].map(e => e.innerText.replace(/\s+/g, ' ').trim()),
+  badges: [...document.querySelectorAll('#rail .n, #botbar .n, #moreSheet .n')].map(e => e.textContent.trim()),
+  reasons: Object.values(S.ath).map(a => a.id + ':' + (a.reasons || []).map(r => r.key + '/' + r.tone).join(',')).sort(),
+  title: document.title,
+}));
+// The look (design-rules, round 3) on one part of a REAL-mode screen: sizes, corners, button height, one primary button.
+const lookOf = (page, sel) => page.evaluate(sel => {
+  const bad = [], root = document.querySelector(sel);
+  if (!root) return ['missing ' + sel];
+  const desc = el => (el.tagName.toLowerCase() + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).join('.') : '')).slice(0, 56) + ' "' + (el.textContent || '').trim().slice(0, 18) + '"';
+  for (const el of [root, ...root.querySelectorAll('*')]) {
+    const cs = getComputedStyle(el), q = el.getBoundingClientRect();
+    if (cs.display === 'none' || cs.visibility === 'hidden' || !q.width || !q.height) continue;
+    const field = el.tagName === 'INPUT' || el.tagName === 'TEXTAREA';
+    if ([...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) || field) {
+      const fs = parseFloat(cs.fontSize);
+      if (![12, 14, 17, 22, 30].includes(fs) && !(fs === 16 && field && innerWidth < 900)) bad.push('size ' + desc(el) + ' ' + cs.fontSize);
+      const fam = cs.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+      if ((fam === 'Barlow Condensed' && !el.closest('.dethead h2')) || fam === 'Space Mono') bad.push('face ' + desc(el) + ' ' + fam);
+      if (cs.textTransform === 'uppercase' && !el.closest('.eyebrow, .dethead h2')) bad.push('caps ' + desc(el));   // design-rules' allow-lists: group labels, the athlete's name
+    }
+    for (const k of ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius']) {
+      const v = cs[k];
+      if (v && v !== '0px' && v.split(' ').some(t => { const n = parseFloat(t); return !t.endsWith('%') && !(n === 8 || n === 12 || n >= 999); })) { bad.push('radius ' + desc(el) + ' ' + v); break; }
+    }
+    if (el.matches('.btn') && Math.abs(Math.round(q.height) - 32) > 1) bad.push('button ' + desc(el) + ' ' + Math.round(q.height) + 'px');
+  }
+  if ([...root.querySelectorAll('.btn.primary')].filter(x => x.getBoundingClientRect().width).length > 1) bad.push('more than one primary button in ' + sel);
+  return bad;
+}, sel);
+const sideways = page => page.evaluate(() => ({ over: document.documentElement.scrollWidth - document.documentElement.clientWidth, panel: (document.getElementById('courtPanel') || { scrollWidth: 0, clientWidth: 0 }).scrollWidth - (document.getElementById('courtPanel') || { clientWidth: 0 }).clientWidth }));
+
+S['courtside-panel'] = async (b) => {
+  const r = { id: 'courtside-panel', title: 'Courtside on Today: this week\'s moments, grouped, capped, with the line already written; Saw it, Undo, WhatsApp, Copy; never a reason', checks: [] };
+  const { page, log, today } = await L.openCoach(b, Object.assign({ seed: { court: true } }, COURT_T));
+  await page.waitForSelector('#courtPanel');
+  await noPopups(page);
+  const cs0 = await L.calls(page);
+  const get = rpcs(cs0, 'get_courtside')[0];
+  const st = await courtState(page);
+  const NOT_SHOWN = [/Small Win/, /25 sessions/, /Daily Run|30 days/, /Kim/, /\bdemo\b/i, /Last Week/, /amir_ardekani/];
+  check(r, 'the panel is the first thing in Today\'s right column, above Proof today', await page.evaluate(() => { const c = document.getElementById('courtPanel'), p = document.getElementById('proofToday'); return !!c && !!p && c.parentElement === p.parentElement && c === c.parentElement.firstElementChild && !!(c.compareDocumentPosition(p) & Node.DOCUMENT_POSITION_FOLLOWING); }), 'courtPanel / proofToday');
+  check(r, 'get_courtside is asked for this week: Monday 00:00 to the next Monday, on the coach\'s clock', !!get && await page.evaluate(p => { const f = new Date(p.p_from), t = new Date(p.p_to); return f.getDay() === 1 && f.getHours() === 0 && f.getMinutes() === 0 && Math.round((t - f) / 864e5) === 7; }, get.payload), get && get.payload);
+  check(r, 'and names the ids that are no client (the page\'s SYSTEM_IDS and the coach\'s own identity) in p_not_clients', !!get && Array.isArray(get.payload.p_not_clients) && get.payload.p_not_clients.includes('demo') && get.payload.p_not_clients.includes('amir_ardekani'), get && get.payload.p_not_clients);
+  check(r, 'five groups are open, the biggest first (a legend, two milestones, then the two newest highlights)', JSON.stringify(st.open.map(x => x.name)) === JSON.stringify(['Ben Example', 'Gia Example', 'Ava Example', 'Jon Example', 'Hal Example']), st.open.map(x => x.name));
+  check(r, 'the head counts them: "5 of 8"', /this week · 5 of 8/.test(st.head), st.head);
+  check(r, 'a button offers the three that are not shown, and the Seen fold holds the one already seen (Cara, "sent")', /\+ 3 more this week/.test(st.more) && /Seen this week\s*1/.test(st.seenCount), { more: st.more, seen: st.seenCount });
+  const ava = st.open.find(x => x.name === 'Ava Example') || {};
+  check(r, 'Ava\'s century and her held week, minted the same day, are ONE group: the century leads and the other is "and First full week held"', /50 sessions with you/.test(ava.text || '') && /^and First full week held$/.test(ava.also || '') && st.open.filter(x => x.name === 'Ava Example').length === 1, ava);
+  check(r, 'Ben has a second group on another day and it is not among the five (a group is one athlete on one day)', st.open.filter(x => x.name === 'Ben Example').length === 1 && /12 weeks held in a row/.test((st.open.find(x => x.name === 'Ben Example') || {}).text || ''), st.open.filter(x => x.name === 'Ben Example'));
+  check(r, 'the line already written for a century is "50 sessions with me. Don\'t stop now." and it is the text of the WhatsApp link', ava.msg === "50 sessions with me. Don't stop now." && !!ava.wa && new URL(ava.wa).searchParams.get('text') === ava.msg && /^https:\/\/wa\.me\/\d+\?text=/.test(ava.wa), { msg: ava.msg, wa: ava.wa });
+  const exp = { 'Ben Example': '12 weeks in a row, every session. Keep it boring.', 'Gia Example': 'Cycle 1 done: 12 of 12 sessions. Ready for the next one?', 'Jon Example': "You're back. Good. One week at a time.", 'Hal Example': '5 personal bests now. Keep stacking them.' };
+  check(r, 'the other lines are the drafts in Amir\'s voice, filled from the award', Object.keys(exp).every(n => (st.open.find(x => x.name === n) || {}).msg === exp[n]), Object.keys(exp).map(n => (st.open.find(x => x.name === n) || {}).msg));
+  check(r, 'every row offers WhatsApp ↗, Copy and Saw it, and the name links to the athlete', st.open.every(x => JSON.stringify(x.buttons) === JSON.stringify(['WhatsApp ↗', 'Copy', 'Saw it']) && /^#a\/[a-z_]+$/.test(x.href)), st.open.map(x => x.buttons.join('|')));
+  check(r, 'none of the awards the server must leave out shows: a "win", the go-day\'s baseline, the demo, the coach\'s own login, a former athlete, a badge that is not one of the four, last week\'s', NOT_SHOWN.every(re => !re.test(st.text)), NOT_SHOWN.filter(re => re.test(st.text)).map(String));
+  // + 3 more: all eight, then fewer again
+  await page.locator('#courtPanel .showweek').click(); await L.settle(page, 300);
+  const all = await courtState(page);
+  check(r, '"+ 3 more this week" opens all eight open groups, the same order, and still none of the filtered ones', all.open.length === 8 && all.open.slice(0, 5).map(x => x.name).join() === st.open.map(x => x.name).join() && NOT_SHOWN.every(re => !re.test(all.text)) && /Show fewer/.test(all.more), { names: all.open.map(x => x.name), more: all.more });
+  check(r, 'and the other three are Ivy, Eli and Ben\'s second day', JSON.stringify(all.open.slice(5).map(x => x.name).sort()) === JSON.stringify(['Ben Example', 'Eli Example', 'Ivy Example']), all.open.slice(5).map(x => x.name));
+  await page.locator('#courtPanel .showweek').click(); await L.settle(page, 300);
+  check(r, '"Show fewer" goes back to five', (await courtState(page)).open.length === 5, '');
+  // Saw it: every id of the group, then it moves under Seen
+  let n0 = await L.nCalls(page);
+  await courtRow(page, 'Ava Example').locator('button', { hasText: /^Saw it$/ }).click(); await L.settle(page, 500);
+  let cs = await L.callsSince(page, n0), mk = rpcs(cs, 'coach_courtside_mark');
+  check(r, 'Saw it sends every award id of the group (both), with "saw" and the athlete', mk.length === 1 && mk[0].payload.p_athlete_id === 'ava_test' && mk[0].payload.p_what === 'saw' && JSON.stringify([...mk[0].payload.p_award_ids].sort()) === JSON.stringify(['achievement:held', 'badge:century:2']), mk.map(c => c.payload));
+  let s2 = await courtState(page);
+  check(r, 'Ava leaves the open list (the next group takes the fifth place) and is under Seen, which now holds two', !s2.open.some(x => x.name === 'Ava Example') && s2.open.length === 5 && /Seen this week\s*2/.test(s2.seenCount) && s2.seen.some(x => /Ava Example/.test(x)) && /5 of 7/.test(s2.head), { open: s2.open.map(x => x.name), seen: s2.seenCount, head: s2.head });
+  check(r, 'the database holds a mark with saw_at set and no sent_at, for both awards', (await L.db(page)).courtside_marks.filter(m => m.athlete_id === 'ava_test').length === 2 && (await L.db(page)).courtside_marks.filter(m => m.athlete_id === 'ava_test').every(m => m.saw_at && !m.sent_at), (await L.db(page)).courtside_marks);
+  check(r, 'a toast says it moved', /Moved to Seen/.test(await L.toastText(page)), await L.toastText(page));
+  // Undo
+  await courtSeen(page);
+  n0 = await L.nCalls(page);
+  await seenRow(page, 'Ava Example').locator('button', { hasText: /^Undo$/ }).click(); await L.settle(page, 500);
+  mk = rpcs(await L.callsSince(page, n0), 'coach_courtside_mark');
+  check(r, 'Undo sends the same ids with "undo"', mk.length === 1 && mk[0].payload.p_what === 'undo' && mk[0].payload.p_athlete_id === 'ava_test' && JSON.stringify([...mk[0].payload.p_award_ids].sort()) === JSON.stringify(['achievement:held', 'badge:century:2']), mk.map(c => c.payload));
+  s2 = await courtState(page);
+  check(r, 'Ava is back among the open groups, in her place (third), the marks are gone, and Seen holds Cara again', s2.open[2] && s2.open[2].name === 'Ava Example' && !(await L.db(page)).courtside_marks.some(m => m.athlete_id === 'ava_test') && /Seen this week\s*1/.test(s2.seenCount), { open: s2.open.map(x => x.name), seen: s2.seenCount });
+  // Copy
+  n0 = await L.nCalls(page);
+  await courtRow(page, 'Ben Example').locator('button', { hasText: /^Copy$/ }).click(); await L.settle(page, 600);
+  mk = rpcs(await L.callsSince(page, n0), 'coach_courtside_mark');
+  const clip = await page.evaluate(() => navigator.clipboard.readText());
+  check(r, 'Copy puts the written line on the clipboard and marks the group "sent" (seen too)', clip === '12 weeks in a row, every session. Keep it boring.' && mk.length === 1 && mk[0].payload.p_what === 'sent' && mk[0].payload.p_athlete_id === 'ben_test' && mk[0].payload.p_award_ids.length === 1, { clip, calls: mk.map(c => c.payload) });
+  s2 = await courtState(page);
+  check(r, 'Ben\'s group moves under Seen as "sent"', !s2.open.some(x => x.name === 'Ben Example' && /12 weeks/.test(x.text)) && s2.seen.some(x => /Ben Example 12 weeks held in a row · sent/.test(x)) && /Copied/.test(await L.toastText(page)), { seen: s2.seen, toast: await L.toastText(page) });
+  // WhatsApp
+  n0 = await L.nCalls(page);
+  const waHref = await courtRow(page, 'Gia Example').locator('a.btn').getAttribute('href');
+  await courtRow(page, 'Gia Example').locator('a.btn').click(); await L.settle(page, 600);
+  mk = rpcs(await L.callsSince(page, n0), 'coach_courtside_mark');
+  check(r, 'WhatsApp ↗ opens the chat with the line in text= and marks the group "sent"', new URL(waHref).searchParams.get('text') === 'Cycle 1 done: 12 of 12 sessions. Ready for the next one?' && /^https:\/\/wa\.me\/10000000021\?text=/.test(waHref) && mk.length === 1 && mk[0].payload.p_what === 'sent' && mk[0].payload.p_athlete_id === 'gia_court' && (await page.evaluate(() => window.__opened)).length === 1, { waHref, calls: mk.map(c => c.payload) });
+  // a refusal is said, and nothing moves
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'rpc', name: 'coach_courtside_mark', message: 'fixture: nope', times: 1 }); });
+  const before = (await courtState(page)).open.map(x => x.name).join();
+  await courtRow(page, 'Jon Example').locator('button', { hasText: /^Saw it$/ }).click(); await L.settle(page, 500);
+  check(r, 'a refused Saw it is told in the bar and the row stays', /Courtside: that was not saved: fixture: nope/.test(await L.failText(page)) && (await courtState(page)).open.map(x => x.name).join() === before, await L.failText(page));
+  // the page's own second guard: a non-client in the rows (a stale copy, a server without the filter) is never drawn
+  await page.evaluate(() => { S.court.rows.push({ athlete_id: 'kim_former', award_id: 'achievement:first_best', kind: 'achievement', item: 'first_best', size: 'legend', at: new Date().toISOString(), spec: { name: 'First Best' }, facts: [] },
+    { athlete_id: 'demo', award_id: 'achievement:first_best', kind: 'achievement', item: 'first_best', size: 'legend', at: new Date().toISOString(), spec: { name: 'First Best' }, facts: [] },
+    { athlete_id: 'amir_ardekani', award_id: 'achievement:held', kind: 'achievement', item: 'held', size: 'legend', at: new Date().toISOString(), spec: { name: 'Held' }, facts: [] }); paintCourt(); });
+  check(r, 'the page leaves a former athlete, the demo and the coach\'s own login out even if the server sent them (a legend would lead)', (await courtState(page)).open.every(x => !/Kim|demo|Amir/i.test(x.text)) && !/href="#a\/(demo|amir_ardekani|kim_former)"/.test(await page.locator('#courtPanel').innerHTML()), (await courtState(page)).open.map(x => x.text));
+  const jonContact = await page.evaluate(() => { const c = S.ath.jon_court.contact; S.ath.jon_court.contact = null; paintCourt(); return c; });
+  check(r, 'an athlete with no WhatsApp number on file gets Copy and Saw it only (no dead link)', JSON.stringify((await courtState(page)).open.find(x => x.name === 'Jon Example').buttons) === JSON.stringify(['Copy', 'Saw it']), (await courtState(page)).open.map(x => x.buttons.join('|')));
+  await page.evaluate(c => { S.ath.jon_court.contact = c; paintCourt(); }, jonContact);
+  check(r, 'the panel keeps the look: the five sizes, three corners, 32 px buttons, one primary button at most', (await lookOf(page, '#courtPanel')).length === 0, (await lookOf(page, '#courtPanel')).slice(0, 6));
+  // a page that does not know about Courtside at all: the same Today without the awards
+  const clean = await L.openCoach(b, Object.assign({ seed: { court: true, courtAwards: false } }, COURT_T));
+  await clean.page.waitForSelector('#courtPanel');
+  const cst = await courtState(clean.page);
+  check(r, 'with no award in the database the panel says nothing big happened (and shows no row)', cst.open.length === 0 && /Nothing big this week yet/.test(cst.text), cst.text.slice(0, 160));
+  // never a reason: Needs you, the people count, the rail, the bar, the counters and every athlete's reasons are the same with and without the awards
+  await L.go(page, 'today'); await L.go(clean.page, 'today');
+  // the reasons are worked out when the store is assembled, which happens BEFORE Courtside loads: assemble again, as every later refetch does
+  await page.evaluate(() => { assemble(); render(); }); await clean.page.evaluate(() => { assemble(); render(); });
+  const withA = await needSnap(page), without = await needSnap(clean.page);
+  check(r, 'Needs you, its people count, every rail and bar badge, the four counters and every athlete\'s reasons are identical with and without the awards', JSON.stringify(withA) === JSON.stringify(without), { withA: withA.people + ' ' + withA.badges.join(','), without: without.people + ' ' + without.badges.join(',') });
+  check(r, 'no reason is a Courtside reason (no "good" tone from an award) and no number in the head of Needs you counts a moment', !withA.rows.some(t => /Century|Hold Serve|First|Back on|personal best|week held/i.test(t)), withA.rows);
+  await clean.ctx.close();
+  // narrow screens
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 }); await L.go(page, 'today'); await L.settle(page, 250);
+    const o = await sideways(page);
+    check(r, `Today at ${w} px: Courtside does not scroll sideways, and its look holds`, o.over <= 0 && o.panel <= 0 && (await lookOf(page, '#courtPanel')).length === 0, { o, look: (await lookOf(page, '#courtPanel')).slice(0, 4) });
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  check(r, 'no load warning, no page errors', !(await page.evaluate(() => { const w = document.getElementById('loadwarn'); return w && !w.hidden; })) && !log.errors.length, log.errors);
+  // the week on other days: the cap and the window hold on a Monday morning and a Sunday night
+  for (const at of ['2026-11-09T00:30:00Z', '2026-11-15T23:30:00Z']) {
+    const o = await L.openCoach(b, { seed: { court: true }, fixedTime: at });
+    await o.page.waitForSelector('#courtPanel');
+    const s3 = await courtState(o.page);
+    check(r, `on ${at.slice(0, 10)} at ${at.slice(11, 16)} the week is the same one: five open of eight, ${s3.open[0] ? s3.open[0].name : '?'} first`, s3.open.length === 5 && /5 of 8/.test(s3.head) && s3.open[0].name === 'Ben Example', { head: s3.head, names: s3.open.map(x => x.name) });
+    await o.ctx.close();
+  }
+  await page.screenshot({ path: path.join(L.OUT, 'courtside-panel.png') });
+  await page.context().close();
+  return r;
+};
+
+S['courtside-missing'] = async (b) => {
+  const r = { id: 'courtside-missing', title: 'A server that has not had stage75 applied: no Courtside, no goal line, no warning', checks: [] };
+  const { page, log } = await L.openCoach(b, { seed: { court: true, stub: { missingRpc: ['get_courtside'] } }, hash: 'today' });
+  await L.settle(page, 500);
+  const cs = await L.calls(page);
+  check(r, 'the page asked (get_courtside answered "could not find the function" with PGRST202)', rpcs(cs, 'get_courtside').length === 1 && rpcs(cs, 'get_courtside')[0].result.error === 'missing', rpcs(cs, 'get_courtside').map(c => c.result));
+  check(r, 'Today has no Courtside panel, and Needs you and Proof today are there', (await page.locator('#courtPanel').count()) === 0 && (await page.locator('#needPanel').count()) === 1 && (await page.locator('#proofToday').count()) === 1, '');
+  check(r, 'no "Not everything loaded" banner', !(await page.evaluate(() => { const w = document.getElementById('loadwarn'); return !!w && !w.hidden; })), await page.evaluate(() => (document.getElementById('loadwarn') || {}).innerText));
+  check(r, 'the page knows it is off (S.court.on false) and made no write', (await page.evaluate(() => S.court && S.court.on)) === false && !cs.some(c => c.kind === 'rpc' && /^coach_(courtside_mark|honours_(freeze|sent|pick)|set_goal|goal_done|from_amir)$/.test(c.name)), cs.filter(c => c.kind === 'rpc').map(c => c.name));
+  await L.go(page, 'a/ava_test');
+  check(r, 'an athlete\'s header has no goal line and no "From Amir…"', (await page.locator('#goalLine').count()) === 0 && !/From Amir/.test(await page.locator('.dethead').innerText()), await page.locator('.dethead').innerText());
+  check(r, 'the dashboard\'s other tabs still open (Athletes, Proof)', await (async () => { await L.go(page, 'athletes'); await L.go(page, 'proof'); return (await page.locator('#boardPanel').count()) === 1; })(), '');
+  check(r, 'the five tables read as missing too (PGRST205), and nothing was said about it', cs.filter(c => c.kind === 'from' && /^career_(goals|notes)$/.test(c.name)).every(c => c.result.error === 'missing') && !(await L.failText(page)), await L.failText(page));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  // the other way: Courtside is there, but the goals cannot be read: the banner names it
+  const e = await L.openCoach(b, { seed: { court: true, stub: { fail: [{ kind: 'from', name: 'career_goals', op: 'select', message: 'fixture: cannot read career_goals', times: 1 }] } }, hash: 'today' });
+  await e.page.waitForSelector('#courtPanel');
+  const warn = await e.page.evaluate(() => { const w = document.getElementById('loadwarn'); return w && !w.hidden ? w.innerText.replace(/\s+/g, ' ') : ''; });
+  check(r, 'when the goals cannot be read for a real reason, the banner says "Courtside, the goals and your lines" with the reason, and the panel is still there', /Not everything loaded: Courtside, the goals and your lines/.test(warn) && /fixture: cannot read career_goals/.test(warn), warn);
+  // Found 2026-10-19 and fixed the same day: with the goals unreadable, the header of someone who HAS a goal (Ben) said "No November goal yet" and
+  // offered Write one, so Save would have replaced the goal on the server. A goal that did not load now says so, and offers no write.
+  await L.go(e.page, 'a/ben_test');
+  const gl = await e.page.locator('#goalLine').evaluate(el => el.innerText.replace(/\s+/g, ' ').trim());
+  check(r, 'a goal that did not load says so, and offers no Write one, Edit or Mark done (Save would overwrite it)',
+    /did not load/.test(gl) && !/Write one|Edit|Mark done/.test(gl) && (await L.db(e.page)).career_goals.some(g => g.athlete_id === 'ben_test'), gl);
+  await e.ctx.close();
+  await page.context().close();
+  return r;
+};
+
+S['honours-first-week'] = async (b) => {
+  const r = { id: 'honours-first-week', title: 'Courtside in a month\'s first week: the month just gone\'s honours open at the top; sending freezes them first; Amir\'s Pick takes two taps', checks: [] };
+  const { page, log } = await L.openCoach(b, { seed: { court: true }, fixedTime: '2026-11-02T10:00:00Z' });
+  await page.waitForSelector('#courtPanel');
+  await noPopups(page);
+  let cs = await L.calls(page);
+  check(r, 'nothing is frozen on load before the 8th', rpcs(cs, 'coach_honours').length === 1 && rpcs(cs, 'coach_honours')[0].payload.p_month === '2026-10-01' && rpcs(cs, 'coach_honours_freeze').length === 0, rpcs(cs, 'coach_honours').map(c => c.payload));
+  const html = await page.locator('#courtPanel').innerHTML();
+  const st = await courtState(page);
+  const low = st.text.toLowerCase();   // the eyebrows are capitals on screen
+  const i1 = low.indexOf('october honours'), i2 = low.indexOf('most sessions'), i3 = low.indexOf('most improved'), i4 = low.indexOf('full month'), i5 = low.indexOf("amir's pick"), i6 = low.indexOf('this week', i5), i7 = low.indexOf('ben example', i6);
+  check(r, 'October\'s honours are open at the top, in order: Most sessions, Most improved, Full Month, Amir\'s Pick, then "This week" and the moments', i1 >= 0 && i1 < i2 && i2 < i3 && i3 < i4 && i4 < i5 && i5 < i6 && i6 < i7 && !st.hon, { i1, i2, i3, i4, i5, i6, i7 });
+  const honText = await page.locator('#courtPanel').evaluate(el => el.innerText.replace(/\s+/g, ' '));
+  check(r, 'Most sessions is Gia (14 plan sessions) only: the former athlete tied with her is left out', /Most sessions · Gia Example, 14 plan sessions/.test(honText) && !/Kim/.test(honText), honText.slice(0, 400));
+  check(r, 'Most improved is Hal alone, with the lift and the percent: the coach\'s own login tied with him is left out', /Most improved · Hal Example, Barbell Back Squat \+27\.1% at the same effort/.test(honText) && !/Amir/.test(honText.replace(/Amir's Pick/g, '')), '');
+  check(r, 'nobody held a Full Month: "Nobody this month. Ivy Example and Jon Example were one week short."', /Full Month · Nobody this month\. Ivy Example and Jon Example were one week short\./.test(honText), '');
+  check(r, 'the drafted lines are in Amir\'s voice with the month and the numbers filled in', /Most sessions in October: 14\. Nobody trained more\. Thank you\./.test(honText) && /Most improved in October\. Barbell Back Squat up 27\.1% at the same effort\. That's real strength\./.test(honText), '');
+  check(r, 'Amir\'s Pick lists three people, each with why, a Pick button for each and "Nobody this month"', /Choose one, or nobody|choose one, or nobody/i.test(honText) && /Ava Example · most weeks held: 4/.test(honText) && /Hal Example · biggest gain: Barbell Back Squat \+27\.1%/.test(honText) && /Jon Example · back after 16 days away/.test(honText) && (await page.locator('#courtPanel .cs-pick button').allInnerTexts()).join('|') === 'Pick Ava|Pick Hal|Pick Jon', await page.locator('#courtPanel .cs-pick').allInnerTexts());
+  check(r, 'the honours rows do not count as moments (five open groups, as ever)', st.open.length === 5, st.open.length);
+  // sending an honour: freeze first, then mark sent
+  let n0 = await L.nCalls(page);
+  const waHref = await page.locator('#courtPanel .cs', { hasText: 'Most sessions' }).first().locator('a.btn').getAttribute('href');
+  await page.locator('#courtPanel .cs', { hasText: 'Most sessions' }).first().locator('a.btn').click(); await L.settle(page, 700);
+  cs = await L.callsSince(page, n0);
+  const seq = cs.filter(c => c.kind === 'rpc' && /^coach_honours_(freeze|sent)$/.test(c.name));
+  check(r, 'WhatsApp on an honour calls coach_honours_freeze, then coach_honours_sent for that winner', seq.length === 2 && seq[0].name === 'coach_honours_freeze' && seq[0].payload.p_month === '2026-10-01' && seq[1].name === 'coach_honours_sent' && seq[1].payload.p_honour === 'sessions' && seq[1].payload.p_athlete_id === 'gia_court' && seq[1].payload.p_month === '2026-10-01' && seq[0].i < seq[1].i, seq.map(c => c.name + ' ' + JSON.stringify(c.payload)));
+  check(r, 'the link has the line (Most sessions in October…) in text= and goes to Gia\'s number', new URL(waHref).searchParams.get('text') === 'Most sessions in October: 14. Nobody trained more. Thank you.' && /wa\.me\/10000000021/.test(waHref), waHref);
+  let db = await L.db(page);
+  check(r, 'the month is frozen with the winners as rows (clients only, a tie would be several), "near" included, and only Gia\'s row is marked sent', db.career_honour_months.length === 1 && db.career_honours.length === 4 && JSON.stringify(db.career_honours.map(h => h.honour + ':' + h.athlete_id).sort()) === JSON.stringify(['improved:hal_court', 'near:ivy_court', 'near:jon_court', 'sessions:gia_court']) && db.career_honours.filter(h => h.sent_at).length === 1 && !!db.career_honours.find(h => h.honour === 'sessions' && h.sent_at), db.career_honours);
+  check(r, 'the row says "sent ✓"', /sent ✓/.test(await page.locator('#courtPanel .cs', { hasText: 'Most sessions' }).first().innerText()), '');
+  // Copy on the next one: only the sent call (already frozen)
+  n0 = await L.nCalls(page);
+  await page.locator('#courtPanel .cs', { hasText: 'Most improved' }).first().locator('button', { hasText: /^Copy$/ }).click(); await L.settle(page, 600);
+  cs = await L.callsSince(page, n0);
+  const clip = await page.evaluate(() => navigator.clipboard.readText());
+  check(r, 'Copy on Most improved copies its line and calls only coach_honours_sent (the month is frozen once)', clip === "Most improved in October. Barbell Back Squat up 27.1% at the same effort. That's real strength." && rpcs(cs, 'coach_honours_freeze').length === 0 && rpcs(cs, 'coach_honours_sent').length === 1 && rpcs(cs, 'coach_honours_sent')[0].payload.p_honour === 'improved' && rpcs(cs, 'coach_honours_sent')[0].payload.p_athlete_id === 'hal_court', { clip, calls: cs.filter(c => c.kind === 'rpc').map(c => c.name) });
+  // Amir's Pick: two taps
+  n0 = await L.nCalls(page);
+  const pickBtn = page.locator('#courtPanel .cs-pick button', { hasText: 'Pick Hal' });
+  await pickBtn.click(); await L.settle(page, 300);
+  check(r, 'the first tap on Pick Hal only arms it: the button says what the next tap does and nothing is sent', /Tap again: Hal is your pick/.test(await page.locator('#courtPanel .cs-pick button').nth(1).innerText()) && rpcs(await L.callsSince(page, n0), 'coach_honours_pick').length === 0, await page.locator('#courtPanel .cs-pick button').nth(1).innerText());
+  await page.locator('#courtPanel .cs-pick button').nth(1).click(); await L.settle(page, 700);
+  const pk = rpcs(await L.callsSince(page, n0), 'coach_honours_pick');
+  check(r, 'the second tap calls coach_honours_pick with the month and the id', pk.length === 1 && pk[0].payload.p_month === '2026-10-01' && pk[0].payload.p_athlete_id === 'hal_court', pk.map(c => c.payload));
+  const st2 = await page.locator('#courtPanel').evaluate(el => el.innerText.replace(/\s+/g, ' '));
+  db = await L.db(page);
+  check(r, 'the pick is decided: the row shows Hal with the story question and "Ask about the story ↗", the buttons are gone, and a toast says so', /Amir's Pick · Hal Example/.test(st2) && /You're my pick this month\. Can I put you in my story\?/.test(st2) && /Ask about the story ↗/.test(st2) && (await page.locator('#courtPanel .cs-pick').count()) === 0 && /Hal is your October pick/.test(await L.toastText(page)), st2.slice(0, 500));
+  check(r, 'the database holds the pick (month pick "picked", a pick row for Hal with his shortlist slot)', db.career_honour_months[0].pick === 'picked' && db.career_honours.some(h => h.honour === 'pick' && h.athlete_id === 'hal_court' && h.value.slot === 'gain'), db.career_honours.filter(h => h.honour === 'pick'));
+  n0 = await L.nCalls(page);
+  const storyHref = await page.locator('#courtPanel a.btn', { hasText: 'Ask about the story' }).getAttribute('href');
+  await page.locator('#courtPanel a.btn', { hasText: 'Ask about the story' }).click(); await L.settle(page, 500);
+  const ss = rpcs(await L.callsSince(page, n0), 'coach_honours_sent');
+  check(r, 'Ask about the story ↗ opens WhatsApp with the question in text= and marks the pick row sent', ss.length === 1 && ss[0].payload.p_honour === 'pick' && ss[0].payload.p_athlete_id === 'hal_court' && new URL(storyHref).searchParams.get('text') === "You're my pick this month. Can I put you in my story?" && /sent ✓/.test(await page.locator('#courtPanel .cs', { hasText: "Amir's Pick" }).first().innerText()), { storyHref, calls: ss.map(c => c.payload) });
+  await page.evaluate(() => honourPick(null, '2026-10-01', 'jon_court')); await L.settle(page, 500);
+  check(r, 'a second pick is refused by the server ("already decided") and said in the bar', /Your pick was not saved: Your October 2026 pick is already decided/.test(await L.failText(page)), await L.failText(page));
+  // "Nobody this month": a fresh page, two taps, null
+  const nb = await L.openCoach(b, { seed: { court: true }, fixedTime: '2026-11-02T10:00:00Z' });
+  await nb.page.waitForSelector('#courtPanel');
+  n0 = await L.nCalls(nb.page);
+  const nobody = nb.page.locator('#courtPanel .cs-acts button', { hasText: 'Nobody this month' });
+  await nobody.click(); await L.settle(nb.page, 300);
+  check(r, 'first tap on "Nobody this month" arms it ("Tap again: nobody this month") and sends nothing', /Tap again: nobody this month/.test(await nb.page.locator('#courtPanel .cs-acts button', { hasText: 'Tap again' }).innerText()) && rpcs(await L.callsSince(nb.page, n0), 'coach_honours_pick').length === 0, '');
+  await nb.page.locator('#courtPanel .cs-acts button', { hasText: 'Tap again' }).click(); await L.settle(nb.page, 700);
+  const pn = rpcs(await L.callsSince(nb.page, n0), 'coach_honours_pick');
+  check(r, 'second tap calls coach_honours_pick with p_athlete_id null', pn.length === 1 && pn[0].payload.p_athlete_id === null && pn[0].payload.p_month === '2026-10-01', pn.map(c => c.payload));
+  const t2 = await nb.page.locator('#courtPanel').evaluate(el => el.innerText.replace(/\s+/g, ' '));
+  check(r, 'the row reads "Amir\'s Pick · Nobody this month." with no buttons, the month is frozen, and the toast says no pick', /Amir's Pick · Nobody this month\./.test(t2) && (await nb.page.locator('#courtPanel .cs-pick').count()) === 0 && (await L.db(nb.page)).career_honour_months[0].pick === 'nobody' && /No pick for October/.test(await L.toastText(nb.page)), t2.slice(0, 300));
+  // a tie shares an honour; a month with no winner says so
+  const tie = await L.openCoach(b, { seed: { court: true, honoursLive: { sessions: { n: 1, who: ['gia_court', 'hal_court'] }, improved: { pct: null, who: [] }, full_month: { who: [{ athlete_id: 'ivy_court', weeks: 4 }], near: [] }, shortlist: [] } }, fixedTime: '2026-11-02T10:00:00Z' });
+  await tie.page.waitForSelector('#courtPanel');
+  const tt = await tie.page.locator('#courtPanel').evaluate(el => el.innerText.replace(/\s+/g, ' '));
+  check(r, 'a tie shares the honour: Gia and Hal both have a Most sessions row (1 plan session, singular), each with the line', /Most sessions · Gia Example, 1 plan session\b(?!s)/.test(tt) && /Most sessions · Hal Example, 1 plan session\b(?!s)/.test(tt) && (tt.match(/Most sessions in October: 1\./g) || []).length === 2, tt.slice(0, 500));
+  check(r, 'with no improver there is no Most improved row; a Full Month winner gets her own row and line, and no "one week short"', !/Most improved/.test(tt) && /Full Month · Ivy Example, every plan session \(4 weeks\)/.test(tt) && /Every plan session in October\. Full Month\. Respect\./.test(tt) && !/Nobody this month\. .*short|one week short/.test(tt), tt.slice(0, 600));
+  check(r, 'an empty shortlist offers no names, only "Nobody this month"', (await tie.page.locator('#courtPanel .cs-pick').count()) === 0 && (await tie.page.locator('#courtPanel .cs-acts button', { hasText: 'Nobody this month' }).count()) === 1, '');
+  await tie.page.locator('#courtPanel .cs', { hasText: 'Most sessions' }).nth(1).locator('button', { hasText: /^Copy$/ }).click(); await L.settle(tie.page, 600);
+  const tdb = await L.db(tie.page);
+  check(r, 'freezing wrote both tied winners as rows, and Copy marked only the one tapped (the second row) as sent', tdb.career_honours.filter(h => h.honour === 'sessions').length === 2 && tdb.career_honours.filter(h => h.sent_at).length === 1 && tdb.career_honours.filter(h => h.sent_at)[0].honour === 'sessions', tdb.career_honours);
+  const none = await L.openCoach(b, { seed: { court: true, honoursLive: null }, fixedTime: '2026-11-02T10:00:00Z' });
+  await none.page.waitForSelector('#courtPanel');
+  const nt = await none.page.locator('#courtPanel').evaluate(el => el.innerText.replace(/\s+/g, ' '));
+  check(r, 'a month with no winner at all shows only "Full Month · Nobody this month." and the Pick question, no Most sessions or Most improved', !/Most sessions|Most improved|one week short/.test(nt) && /Full Month · Nobody this month\./.test(nt) && /choose one, or nobody/i.test(nt), nt.slice(0, 300));
+  await tie.ctx.close(); await none.ctx.close();
+  // the page's own guard on winners: a former athlete in a frozen row is not drawn
+  await nb.page.evaluate(() => { S.honours.rows.push({ honour: 'sessions', athlete_id: 'kim_former', value: { n: 14 }, sent_at: null }); paintCourt(); });
+  check(r, 'a frozen row for a former athlete is not drawn either', !/Kim/.test(await nb.page.locator('#courtPanel').innerText()), '');
+  check(r, 'the honours keep the look (sizes, corners, 32 px buttons) and Today does not scroll sideways at 390 px', (await lookOf(page, '#courtPanel')).length === 0 && await (async () => { await page.setViewportSize({ width: 390, height: 844 }); await L.go(page, 'today'); const o = await sideways(page); await page.setViewportSize({ width: 1280, height: 900 }); return o.over <= 0 && o.panel <= 0; })(), (await lookOf(page, '#courtPanel')).slice(0, 4));
+  check(r, 'no page errors', !log.errors.length && !nb.log.errors.length, log.errors.concat(nb.log.errors));
+  await page.screenshot({ path: path.join(L.OUT, 'honours-first-week.png') });
+  await nb.ctx.close();
+  await page.context().close();
+  return r;
+};
+
+S['honours-folded'] = async (b) => {
+  const r = { id: 'honours-folded', title: 'Courtside from the 8th: the month just gone is frozen once on load and its honours fold under the moments', checks: [] };
+  const { page, log } = await L.openCoach(b, { seed: { court: true }, fixedTime: '2026-11-09T10:00:00Z' });
+  await page.waitForSelector('#courtPanel');
+  await noPopups(page);
+  let cs = await L.calls(page);
+  const fz = rpcs(cs, 'coach_honours_freeze');
+  check(r, 'on load the page freezes October exactly once (after reading it, not frozen yet)', fz.length === 1 && fz[0].payload.p_month === '2026-10-01' && rpcs(cs, 'coach_honours')[0].i < fz[0].i, fz.map(c => c.payload));
+  check(r, 'and passes p_not_clients to the freeze as it does to every read', Array.isArray(fz[0].payload.p_not_clients) && fz[0].payload.p_not_clients.includes('amir_ardekani'), fz[0].payload);
+  let db = await L.db(page);
+  check(r, 'the database holds the frozen month and its winners (clients only)', db.career_honour_months.length === 1 && db.career_honour_months[0].month === '2026-10-01' && db.career_honour_months[0].pick === null && db.career_honours.length === 4 && !db.career_honours.some(h => h.sent_at), db.career_honours);
+  const st = await courtState(page);
+  check(r, 'the honours are in a CLOSED <details> "October honours", below the moments and the Seen fold, not at the top', !!st.hon && st.hon.open === false && /^October honours/.test(st.hon.summary) && st.text.indexOf('Ben Example') < st.text.indexOf('October honours') && !/This week$/.test(st.text) && (await page.locator('#courtPanel .eyebrow').count()) === 0, st.hon);
+  check(r, 'the first thing under the head is a moment (no honours above it, no "This week" label)', await page.evaluate(() => { const p = document.getElementById('courtPanel'); const first = [...p.children].filter(e => !e.classList.contains('phead'))[0]; return !!first && first.classList.contains('cs') && !!first.querySelector('a.cs-name'); }), '');
+  await page.evaluate(() => { document.getElementById('courtHon').open = true; });
+  const honText = await page.locator('#courtHon').evaluate(el => el.innerText.replace(/\s+/g, ' '));
+  check(r, 'opened, it holds the same honours as in the first week (Gia, Hal, the near misses, the Pick to choose)', /Most sessions · Gia Example, 14 plan sessions/.test(honText) && /Most improved · Hal Example/.test(honText) && /one week short/.test(honText) && (await page.locator('#courtHon .cs-pick button').allInnerTexts()).length === 3, honText.slice(0, 300));
+  // sending from the folded honours: the month is already frozen, so only the sent call
+  const n0 = await L.nCalls(page);
+  await page.locator('#courtHon .cs', { hasText: 'Most sessions' }).first().locator('button', { hasText: /^Copy$/ }).click(); await L.settle(page, 600);
+  cs = await L.callsSince(page, n0);
+  check(r, 'Copy on a folded honour calls coach_honours_sent only (no second freeze)', rpcs(cs, 'coach_honours_freeze').length === 0 && rpcs(cs, 'coach_honours_sent').length === 1 && rpcs(cs, 'coach_honours_sent')[0].payload.p_athlete_id === 'gia_court', cs.filter(c => c.kind === 'rpc').map(c => c.name));
+  // a reload: it is frozen, so nothing is frozen again
+  await page.reload();
+  await page.waitForFunction(() => document.querySelector('#rail a.tab') && !document.querySelector('#content .loading'), null, { timeout: 15000 });
+  await page.waitForSelector('#courtPanel'); await L.settle(page, 500);
+  const calls2 = await L.calls(page);
+  const rd = rpcs(calls2, 'coach_honours');
+  check(r, 'after a reload the month reads as frozen and is not frozen again', rd.length >= 1 && (await page.evaluate(() => S.honours && S.honours.frozen)) === true && rpcs(calls2, 'coach_honours_freeze').length === 0, { reads: rd.length, freezes: rpcs(calls2, 'coach_honours_freeze').length });
+  check(r, 'the honours are closed again after the reload, and the sent mark is kept ("sent ✓")', (await page.evaluate(() => document.getElementById('courtHon').open)) === false && /sent ✓/.test(await page.locator('#courtHon').evaluate(el => { el.open = true; return el.innerText; })), '');
+  check(r, 'on the 7th (the first week) nothing is frozen on load and the honours are open at the top; on the 8th the month is frozen and they are folded (day 8 of the month)', await (async () => {
+    const o = await L.openCoach(b, { seed: { court: true }, fixedTime: '2026-12-08T10:00:00Z' });
+    await o.page.waitForSelector('#courtPanel');
+    const f8 = rpcs(await L.calls(o.page), 'coach_honours_freeze').length, fold8 = await o.page.evaluate(() => !!document.getElementById('courtHon') && !document.querySelector('#courtPanel .cs-eb'));
+    await o.ctx.close();
+    const p = await L.openCoach(b, { seed: { court: true }, fixedTime: '2026-12-07T10:00:00Z' });
+    await p.page.waitForSelector('#courtPanel');
+    const f7 = rpcs(await L.calls(p.page), 'coach_honours_freeze').length, open7 = await p.page.evaluate(() => !document.getElementById('courtHon') && /november honours/i.test(document.getElementById('courtPanel').innerText));
+    await p.ctx.close();
+    return f8 === 1 && fold8 && f7 === 0 && open7;
+  })(), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['courtside-goal'] = async (b) => {
+  const r = { id: 'courtside-goal', title: 'An athlete\'s header: the month\'s goal (Write one, Edit, Mark done, Undo, clear) and who gets none', checks: [] };
+  const { page, log, today } = await L.openCoach(b, Object.assign({ seed: { court: true }, hash: 'a/ava_test' }, COURT_T));
+  await L.settle(page, 500);
+  const line = () => page.locator('#goalLine').evaluate(el => el.innerText.replace(/\s+/g, ' ').trim());
+  const goals = async () => (await L.db(page)).career_goals;
+  check(r, 'the header carries the goal line under the cycle line, with "Write one" and "From Amir…"', /^No November goal yet Write one From Amir…$/.test(await line()) && await page.evaluate(() => { const g = document.getElementById('goalLine'); return !!g && !!g.closest('.dethead') && !!document.querySelector('.dethead .sub') && !!(document.querySelector('.dethead .sub').compareDocumentPosition(g) & Node.DOCUMENT_POSITION_FOLLOWING); }), await line());
+  await page.locator('#goalLine button', { hasText: 'Write one' }).click(); await L.settle(page, 200);
+  check(r, 'Write one opens an empty box with the cursor in it, a limit of 140 characters and a name for screen readers', await page.evaluate(() => { const i = document.getElementById('goalIn'); return !!i && i.value === '' && document.activeElement === i && i.maxLength === 140 && /November goal for Ava/.test(i.getAttribute('aria-label')); }), '');
+  let n0 = await L.nCalls(page);
+  await page.locator('#goalIn').fill('Squat three times a week. Log every set.');
+  await page.locator('#goalLine button', { hasText: /^Save$/ }).click(); await L.settle(page, 500);
+  let sg = rpcs(await L.callsSince(page, n0), 'coach_set_goal');
+  check(r, 'Save calls coach_set_goal with the athlete, the FIRST day of the month and the line', sg.length === 1 && sg[0].payload.p_athlete_id === 'ava_test' && sg[0].payload.p_month === '2026-11-01' && sg[0].payload.p_line === 'Squat three times a week. Log every set.', sg.map(c => c.payload));
+  check(r, 'the line now reads "November goal", the goal, ✓ Mark done and Edit; a toast says saved; the database holds it', /^November goal Squat three times a week\. Log every set\. ✓ Mark done Edit From Amir…$/.test(await line()) && /Goal saved/.test(await L.toastText(page)) && (await goals()).some(g => g.athlete_id === 'ava_test' && g.month === '2026-11-01' && !g.done_at), await line());
+  n0 = await L.nCalls(page);
+  await page.locator('#goalLine button', { hasText: '✓ Mark done' }).click(); await L.settle(page, 500);
+  let gd = rpcs(await L.callsSince(page, n0), 'coach_goal_done');
+  check(r, 'Mark done calls coach_goal_done with p_done true', gd.length === 1 && gd[0].payload.p_athlete_id === 'ava_test' && gd[0].payload.p_month === '2026-11-01' && gd[0].payload.p_done === true, gd.map(c => c.payload));
+  check(r, 'the line shows "✓ Done 12 Nov" and Undo instead of Mark done', /✓ Done 12 Nov/.test(await line()) && (await page.locator('#goalLine button', { hasText: 'Undo' }).count()) === 1 && (await page.locator('#goalLine button', { hasText: 'Mark done' }).count()) === 0, await line());
+  // a done goal cannot be cleared
+  await page.locator('#goalLine button', { hasText: 'Edit' }).click(); await L.settle(page, 200);
+  check(r, 'Edit opens the box with the goal in it', (await page.locator('#goalIn').inputValue()) === 'Squat three times a week. Log every set.', await page.locator('#goalIn').inputValue());
+  await page.locator('#goalIn').fill('');
+  await page.locator('#goalLine button', { hasText: /^Save$/ }).click(); await L.settle(page, 500);
+  check(r, 'clearing a goal that is ticked done is refused by the server and said in the bar; the goal stays and the box stays open', /The goal was not saved: that goal is ticked done: untick it first to clear it/.test(await L.failText(page)) && (await goals()).some(g => g.athlete_id === 'ava_test') && (await page.locator('#goalIn').count()) === 1, await L.failText(page));
+  await page.locator('#goalLine button', { hasText: 'Cancel' }).click(); await L.settle(page, 200);
+  n0 = await L.nCalls(page);
+  await page.locator('#goalLine button', { hasText: 'Undo' }).click(); await L.settle(page, 500);
+  gd = rpcs(await L.callsSince(page, n0), 'coach_goal_done');
+  check(r, 'Undo calls coach_goal_done with p_done false and the Mark done button is back', gd.length === 1 && gd[0].payload.p_done === false && (await page.locator('#goalLine button', { hasText: '✓ Mark done' }).count()) === 1 && /Goal open again/.test(await L.toastText(page)), gd.map(c => c.payload));
+  // Escape cancels, Enter saves
+  await page.locator('#goalLine button', { hasText: 'Edit' }).click(); await L.settle(page, 200);
+  n0 = await L.nCalls(page);
+  await page.locator('#goalIn').fill('Something else'); await page.keyboard.press('Escape'); await L.settle(page, 200);
+  check(r, 'Escape closes the box and sends nothing; the goal is as it was', (await page.locator('#goalIn').count()) === 0 && rpcs(await L.callsSince(page, n0), 'coach_set_goal').length === 0 && /Squat three times a week/.test(await line()), await line());
+  await page.locator('#goalLine button', { hasText: 'Edit' }).click(); await L.settle(page, 200);
+  await page.locator('#goalIn').fill('Bench 60 kg for 5. Log every set.'); await page.keyboard.press('Enter'); await L.settle(page, 500);
+  check(r, 'Enter saves, and a rewrite keeps the same row (one goal a month)', (await goals()).filter(g => g.athlete_id === 'ava_test').length === 1 && (await goals()).find(g => g.athlete_id === 'ava_test').line === 'Bench 60 kg for 5. Log every set.', await goals());
+  // a long unbroken word still fits, at 390 and 320
+  await page.locator('#goalLine button', { hasText: 'Edit' }).click(); await L.settle(page, 200);
+  await page.locator('#goalIn').fill('x'.repeat(60) + ' ' + 'y'.repeat(79)); await page.locator('#goalLine button', { hasText: /^Save$/ }).click(); await L.settle(page, 400);
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 }); await L.settle(page, 250);
+    const o = await sideways(page);
+    await page.locator('#goalLine button', { hasText: 'Edit' }).click(); await L.settle(page, 200);
+    const o2 = await sideways(page);
+    await page.locator('#goalLine button', { hasText: 'Cancel' }).click(); await L.settle(page, 200);
+    check(r, `at ${w} px a 140-character goal (and the box while editing) does not scroll sideways`, o.over <= 0 && o2.over <= 0, { o, o2 });
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  // clearing
+  await page.locator('#goalLine button', { hasText: 'Edit' }).click(); await L.settle(page, 200);
+  n0 = await L.nCalls(page);
+  await page.locator('#goalIn').fill('   ');
+  await page.locator('#goalLine button', { hasText: /^Save$/ }).click(); await L.settle(page, 500);
+  sg = rpcs(await L.callsSince(page, n0), 'coach_set_goal');
+  check(r, 'an empty Save (spaces only) clears the goal: coach_set_goal with an empty line, "Goal cleared", back to "No November goal yet", no row left', sg.length === 1 && sg[0].payload.p_line === '' && /Goal cleared/.test(await L.toastText(page)) && /^No November goal yet Write one/.test(await line()) && !(await goals()).some(g => g.athlete_id === 'ava_test'), { call: sg.map(c => c.payload), line: await line() });
+  // others
+  await L.go(page, 'a/ben_test');
+  check(r, 'Ben has a goal and it is open (✓ Mark done, Edit)', /^November goal Squat three times a week and log every set\. ✓ Mark done Edit/.test(await line()), await line());
+  await L.go(page, 'a/eli_new');
+  check(r, 'Eli\'s goal is done: "✓ Done 11 Nov" (the day it was ticked) and Undo', /November goal Bench press 5 kg heavier by the end of the month\. ✓ Done 11 Nov Undo Edit/.test(await line()), await line());
+  await L.go(page, 'a/kim_former');
+  check(r, 'a former athlete has no goal line', (await page.locator('#goalLine').count()) === 0, '');
+  await L.go(page, 'a/dan_proof');
+  check(r, 'a person with no programme (a Proof signup) has none either', (await page.locator('#goalLine').count()) === 0, '');
+  // the goal never touches the dashboard's reasons
+  const a = await needSnap(page);
+  check(r, 'writing, ticking and clearing goals never changed Needs you or a badge (the same as a page that did none of it)', await (async () => { const o = await L.openCoach(b, Object.assign({ seed: { court: true }, hash: 'today' }, COURT_T)); const s = await needSnap(o.page); await o.ctx.close(); await L.go(page, 'today'); const t = await needSnap(page); return JSON.stringify(Object.assign({}, s, { title: '' })) === JSON.stringify(Object.assign({}, t, { title: '' })); })(), a.people);
+  check(r, 'the goal line keeps the look (sizes, corners, 32 px buttons, one primary button) in view and in edit', await (async () => { await L.go(page, 'a/ava_test'); const v = await lookOf(page, '#goalLine'); await page.locator('#goalLine button', { hasText: 'Write one' }).click(); await L.settle(page, 200); const e = await lookOf(page, '#goalLine'); return v.length === 0 && e.length === 0; })(), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.screenshot({ path: path.join(L.OUT, 'courtside-goal.png') });
+  await page.context().close();
+  return r;
+};
+
+S['courtside-from-amir'] = async (b) => {
+  const r = { id: 'courtside-from-amir', title: 'An athlete\'s header: "From Amir…" (one line a day, kept for their app) and Take back', checks: [] };
+  // Tehran at 01:30 on the 10th is still the 9th in UTC: the day sent is the page's own, not the server's
+  const { page, log, today } = await L.openCoach(b, { tz: 'Asia/Tehran', fixedTime: '2026-11-09T22:00:00Z', seed: { court: true }, hash: 'a/ava_test' });
+  await L.settle(page, 500);
+  const line = () => page.locator('#goalLine').evaluate(el => el.innerText.replace(/\s+/g, ' ').trim());
+  const notes = async () => (await L.db(page)).career_notes;
+  check(r, 'the page\'s day is 2026-11-10 while the server\'s date is the 9th', today === '2026-11-10', today);
+  await page.locator('#goalLine button', { hasText: 'From Amir…' }).click(); await L.settle(page, 200);
+  check(r, 'From Amir… opens a box (90 characters), the cursor in it, a counter at 0, and Send to their app', await page.evaluate(() => { const i = document.getElementById('fromIn'); return !!i && i.value === '' && document.activeElement === i && i.maxLength === 90 && document.getElementById('fromCount').textContent === '0'; }) && (await page.locator('.from-box button', { hasText: 'Send to their app' }).count()) === 1, '');
+  check(r, 'the box says it is kept for their app and that they see it once the app update ships', /kept for their app \(they see it once the app update ships\)/.test(await page.locator('.from-box').innerText()), await page.locator('.from-box').innerText());
+  let n0 = await L.nCalls(page);
+  await page.locator('.from-box button', { hasText: 'Send to their app' }).click(); await L.settle(page, 300);
+  check(r, 'Send with an empty box says "Write the line first" and sends nothing', /Write the line first/.test(await L.toastText(page)) && rpcs(await L.callsSince(page, n0), 'coach_from_amir').length === 0, await L.toastText(page));
+  await page.locator('#fromIn').fill('Trained through exam week. Proud of you.');
+  check(r, 'the counter follows what is typed', (await page.locator('#fromCount').innerText()) === '40', await page.locator('#fromCount').innerText());
+  await page.locator('.from-box button', { hasText: 'Send to their app' }).click(); await L.settle(page, 500);
+  let fa = rpcs(await L.callsSince(page, n0), 'coach_from_amir');
+  check(r, 'Send calls coach_from_amir with the athlete, the page\'s local today, the line and no award', fa.length === 1 && fa[0].payload.p_athlete_id === 'ava_test' && fa[0].payload.p_day === '2026-11-10' && fa[0].payload.p_line === 'Trained through exam week. Proud of you.' && fa[0].payload.p_award_id === null, fa.map(c => c.payload));
+  check(r, 'the header now says "From you today", the line and Take back; the database holds it unread; a toast says kept', /From you today: “Trained through exam week\. Proud of you\.”/.test(await line()) && !/ · read/.test(await line()) && (await page.locator('#goalLine button', { hasText: 'Take back' }).count()) === 1 && (await page.locator('#goalLine button', { hasText: 'From Amir…' }).count()) === 0 && (await notes()).some(n => n.athlete_id === 'ava_test' && n.day === '2026-11-10' && !n.read_at) && /Kept for their app/.test(await L.toastText(page)), await line());
+  n0 = await L.nCalls(page);
+  await page.locator('#goalLine button', { hasText: 'Take back' }).click(); await L.settle(page, 500);
+  fa = rpcs(await L.callsSince(page, n0), 'coach_from_amir');
+  check(r, 'Take back calls coach_from_amir with the same day and an empty line', fa.length === 1 && fa[0].payload.p_line === '' && fa[0].payload.p_day === '2026-11-10' && fa[0].payload.p_athlete_id === 'ava_test' && fa[0].payload.p_award_id === null, fa.map(c => c.payload));
+  check(r, 'and the line is gone: "From Amir…" is back, nothing in the database, a toast says taken back', (await page.locator('#goalLine button', { hasText: 'From Amir…' }).count()) === 1 && !(await notes()).some(n => n.athlete_id === 'ava_test') && /Taken back/.test(await L.toastText(page)), await line());
+  // Escape cancels
+  await page.locator('#goalLine button', { hasText: 'From Amir…' }).click(); await L.settle(page, 200);
+  n0 = await L.nCalls(page);
+  await page.locator('#fromIn').fill('never sent'); await page.keyboard.press('Escape'); await L.settle(page, 200);
+  check(r, 'Escape closes the box and sends nothing', (await page.locator('#fromIn').count()) === 0 && rpcs(await L.callsSince(page, n0), 'coach_from_amir').length === 0, '');
+  // Enter sends, and a refusal is said
+  await page.locator('#goalLine button', { hasText: 'From Amir…' }).click(); await L.settle(page, 200);
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'rpc', name: 'coach_from_amir', message: 'fixture: one line a day', times: 1 }); });
+  await page.locator('#fromIn').fill('Second try'); await page.keyboard.press('Enter'); await L.settle(page, 500);
+  check(r, 'a refused line is said in the bar and the box stays with the text', /Your line was not kept: fixture: one line a day/.test(await L.failText(page)) && (await page.locator('#fromIn').inputValue()) === 'Second try', await L.failText(page));
+  await page.keyboard.press('Enter'); await L.settle(page, 500);
+  check(r, 'Enter sends it (the second try goes through)', /From you today: “Second try”/.test(await line()), await line());
+  // a read line cannot be taken back; an unread one can
+  await L.go(page, 'a/eli_new');
+  check(r, 'Eli\'s line was read: it says "· read" and offers no Take back', /From you today: “That first best was earned\.” · read/.test(await line()) && (await page.locator('#goalLine button', { hasText: 'Take back' }).count()) === 0, await line());
+  await page.evaluate(() => fromTakeBack('eli_new')); await L.settle(page, 500);
+  check(r, 'and the server refuses it if tried anyway ("they have read it already"), the line stays', /Your line was not kept: they have read it already: it stays/.test(await L.failText(page)) && (await notes()).some(n => n.athlete_id === 'eli_new'), await L.failText(page));
+  await L.go(page, 'a/ben_test');
+  check(r, 'Ben\'s unread line shows Take back', /From you today: “Trained through exam week\. Proud of you\.”/.test(await line()) && (await page.locator('#goalLine button', { hasText: 'Take back' }).count()) === 1, await line());
+  await L.go(page, 'a/kim_former');
+  check(r, 'a former athlete gets no From Amir', (await page.locator('#goalLine').count()) === 0, '');
+  // narrow screens and the look: Ava's second try goes back first, then the box is opened (with a full 90 characters in it) at each width
+  await L.go(page, 'a/ava_test');
+  await page.locator('#goalLine button', { hasText: 'Take back' }).click(); await L.settle(page, 400);
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 });
+    await L.go(page, 'a/ava_test');
+    await page.locator('#goalLine button', { hasText: 'From Amir…' }).click(); await L.settle(page, 200);
+    await page.locator('#fromIn').fill('x'.repeat(40) + ' ' + 'y'.repeat(49));
+    const o = await sideways(page);
+    await page.locator('#goalLine ~ .from-box button', { hasText: 'Cancel' }).click(); await L.settle(page, 200);
+    check(r, `at ${w} px the header with the box open and 90 characters in it does not scroll sideways`, o.over <= 0, o);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await L.go(page, 'a/ava_test');
+  await page.locator('#goalLine button', { hasText: 'From Amir…' }).click(); await L.settle(page, 200);
+  check(r, 'the box keeps the look (sizes, corners, 32 px buttons, one primary button)', (await lookOf(page, '.dethead')).length === 0, (await lookOf(page, '.dethead')).slice(0, 5));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.screenshot({ path: path.join(L.OUT, 'courtside-from-amir.png') });
   await page.context().close();
   return r;
 };

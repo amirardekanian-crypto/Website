@@ -189,7 +189,7 @@ Page (six versions, every direction kept): https://claude.ai/artifact/AriVWJQskS
 | The Bell replaces roll call | Achievements list themselves for the crew, kudos only | **picked** 2026-10-20 |
 | The simple monthly goal | One line Amir writes, one tick | **picked** 2026-10-20 (L10) |
 | Habit chips | Today's habits as one row of chips on Home | **picked** 2026-10-20 |
-| Courtside first | Amir's recognition before any athlete feature | **picked** 2026-10-20 (L11) |
+| Courtside first | Amir's recognition before any athlete feature | **picked** 2026-10-20 (L11); direction A picked 2026-10-19 and **built** (stage75, not yet applied) |
 | Test week is challenge week | The plan's retest week opens the matching challenge | pitched |
 | The lesson arrives when it matters | The 24 lessons matched to plan moments | pitched |
 | The Road Remembers | Each finished cycle on Progress wears what it earned | pitched (grown idea) |

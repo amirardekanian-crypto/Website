@@ -1338,6 +1338,41 @@ def check_tier_lock(folder, data, rep):
                                          "(rule 21)")
 
 
+# ── Rule 22: coach.html's Courtside lines are recognition.toml's ─────────────────────────────────────────────────────
+
+def courtside_lines():
+    """coach.html's COURT_LINES (stage75: the WhatsApp lines Courtside drafts), read from the file; None when the page has none."""
+    try:
+        text = (ROOT / "coach.html").read_text(encoding="utf-8")
+    except OSError:
+        return None
+    m = re.search(r"const COURT_LINES\s*=\s*\{(.*?)\n\};", text, re.S)
+    if not m:
+        return None
+    out = {}
+    for line in m.group(1).splitlines():
+        t = re.match(r"""^\s*(\w+):\s*(['"])(.*)\2,?\s*$""", line)
+        if t:
+            out[t.group(1)] = t.group(3).replace("\\'", "'").replace('\\"', '"')
+    return out
+
+
+def check_courtside_lines(rec, rep):
+    """Rule 22. Every line coach.html's Courtside drafts (COURT_LINES) is the en of the [message.<same id>] in recognition.toml, word for
+    word: Amir changes a line in the file, and the page must say the same. A page without COURT_LINES (an older commit) is not checked."""
+    lines = courtside_lines()
+    if lines is None:
+        return
+    f = "recognition.toml"
+    msgs = rec.get("message") if isinstance(rec.get("message"), dict) else {}
+    for mid, en in lines.items():
+        m = msgs.get(mid)
+        if not isinstance(m, dict):
+            rep.error(f, f"message.{mid}", "coach.html's COURT_LINES uses this message, but recognition.toml has no [message." + mid + "] (rule 22)")
+        elif m.get("en") != en:
+            rep.error(f, f"message.{mid}", f"coach.html's COURT_LINES says {en!r}, the file says {m.get('en')!r}: change both (rule 22)")
+
+
 # ── The run, and the summary ──────────────────────────────────────────────────────────────────────────────────────
 
 def check_folder(folder):
@@ -1358,6 +1393,7 @@ def check_folder(folder):
         check_quests(data["quests"], w, rep)
     if data["recognition"] is not None:
         check_recognition(data["recognition"], w, rep)
+        check_courtside_lines(data["recognition"], rep)
     if data["titles"] is not None:
         check_title_use(w, rep)
     check_brand(data, rep)

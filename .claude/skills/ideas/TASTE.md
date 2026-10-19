@@ -5,6 +5,12 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-19 · Courtside's design page: "Go with your picks".** Three directions for his recognition on coach.html (A, a Courtside panel in Today's
+  right column; B, a band of moment cards under the strip; C, good news inside Needs you), A recommended; he took A and both calls (athletes see the goal
+  and his line with step 3; a tie shares an honour). What it teaches (inferred, he wrote only the quote): the round-1 rule "Needs you first and wide" still
+  holds for him, so new panels go beside the work, not above it; a real screen beside the three directions and live numbers in the hero (4 to 7 moments a
+  week, nobody with a Full Month yet) let him answer in one line. Page: https://claude.ai/artifact/L3Tt3B6YPqMWcVgnN7nt9g
+
 - **2026-10-20 · Standing rule: always three directions, one recommended.** *"when creating, you can think more about how each tab looks or
   where to put things / Always give me 3 directions with your recommendation"*. Every question about **how the app looks** (a tab, a screen, a card)
   gets exactly three directions drawn in the app's own look, my pick marked, the other two kept on the page. Corrected the same day:

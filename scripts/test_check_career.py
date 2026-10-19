@@ -1156,6 +1156,22 @@ class CareerCheckerTests(unittest.TestCase):
         (self.dir / LOCK).write_text('{"held_weeks": "bronze"}', encoding="utf-8")
         self.assertFails("tiers.lock.json", "must be an object of lists of metals")
 
+    # ── rule 22: coach.html's Courtside lines (COURT_LINES, stage75) are recognition.toml's ───────────────────────────
+    def test_rule_22_a_line_changed_in_the_file_only_fails(self):
+        path = self.dir / "recognition.toml"
+        text = path.read_text(encoding="utf-8")
+        self.assertIn('en = "{n} sessions with me. Don\'t stop now."', text)
+        path.write_text(text.replace('en = "{n} sessions with me. Don\'t stop now."', 'en = "{n} sessions. Keep going."', 1), encoding="utf-8", newline="\n")
+        self.assertFails("[message.century]", "coach.html's COURT_LINES says", "change both (rule 22)")
+
+    def test_rule_22_a_line_the_page_uses_must_exist(self):
+        path = self.dir / "recognition.toml"
+        text = path.read_text(encoding="utf-8")
+        cut = re.sub(r'\[message\.honour_full_month\]\nused_for = "[^"]*"\nen = "[^"]*"\nfa = ""\n', "", text.replace("\r\n", "\n"), count=1)
+        self.assertNotEqual(cut, text.replace("\r\n", "\n"))
+        path.write_text(cut, encoding="utf-8", newline="\n")
+        self.assertFails("[message.honour_full_month]", "recognition.toml has no [message.honour_full_month] (rule 22)")
+
     # ── the seed: --write-lock and --catalogue-steps ──────────────────────────────────────────────────────────────
     def run_seed(self, *args):
         p = subprocess.run([sys.executable, "-X", "utf8", str(SEED), str(self.dir), *args], capture_output=True,

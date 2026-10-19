@@ -421,8 +421,8 @@ Action first: what needs you is the first thing on the screen, and it is wide.
 - **A slim strip** (about 70 px on a desktop, under 150 px on a phone) instead of the old banner and its headline: the date and the season pill, then the
   four counters on one line, each as number + label (*2/3 on court today*, *1 note to read*). Each counter is still a link to the panel that explains it
   (`scrollPanel`). On a phone the counters wrap 2 x 2.
-- **Two columns from 900 px**, `minmax(0,2fr) minmax(0,1fr)` (`.tcols`): **Needs you** on the left (`#needPanel`); on the right **Proof today** (`#proofToday`),
-  one short panel (round 2, 2026-10-12; see below). Under 900 px it is one column in that same order, Needs you first: there is
+- **Two columns from 900 px**, `minmax(0,2fr) minmax(0,1fr)` (`.tcols`): **Needs you** on the left (`#needPanel`); on the right **Courtside** (`#courtPanel`,
+  stage75, 2026-10-19; see below) and then **Proof today** (`#proofToday`), one short panel (round 2, 2026-10-12; see below). Under 900 px it is one column in that same order, Needs you first: there is
   no reordering on a phone. The full wall, the full quest lever and the full pulse moved to **Proof** (section 7), so none of `#wallPanel`, `#questPanel` or
   `#pulsePanel` is on Today: one copy of an id in the page at a time.
 - One white panel per section and **no card inside a card**: Needs you's rows are divided by hairlines.
@@ -441,6 +441,36 @@ One panel (`proofTodayHtml()`), four parts with a hairline between them, in this
 
 Needs you and Also waiting are unchanged. The *on court today* counter opens Proof (the pulse is there); *wall lines today* scrolls to this panel.
 `proof-home` drives it.
+
+### Courtside — the week's good news (stage75, 2026-10-19)
+
+Career Mode round 5, step 1 (Amir picked direction A of https://claude.ai/artifact/L3Tt3B6YPqMWcVgnN7nt9g: *"Go with your picks"*). The server side is
+`supabase/stage75_career_courtside.sql` (`career/PROCEDURES.md` → *Stage 75: Courtside, as built*). **Good news is never a reason**: nothing here reads or
+changes `reasonsOf()`, the *N people* count, a tab badge or the strip's counters, and a harness scenario holds that.
+
+- **Where.** `#courtPanel`, the first panel of Today's right column, above *Proof today* (on a phone: after Needs you, then Proof today). It is drawn only
+  while the server answers `get_courtside()`; before stage75 is applied there is no panel, no goal line and no load warning (`courtMissing()`).
+- **This week's moments** (`loadCourt()` after the first paint and on ↻ Refresh; `get_courtside()` for Monday 00:00 to the next Monday on your clock): the
+  four numbers' marks (weeks held, sessions, personal bests, comebacks) and every achievement, minted live (never the go-day's back-pay), from highlight up,
+  clients only. One group per athlete per day, the biggest moment leading (*and First full week held* under it), at most **five** groups, biggest first,
+  then newest; *+ N more this week* shows the rest. Each group: the name (a link to their file), the moment in plain words, the day, the WhatsApp line in
+  your voice, then **WhatsApp ↗** (opens the chat with the line written; only with a number WhatsApp can open), **Copy** (for a chat already open) and
+  **Saw it**. WhatsApp and Copy mark it sent and seen; Saw it marks it seen. A seen group folds under **Seen this week** with **Undo**. From step 3 the
+  athlete sees *Amir saw this* on that moment.
+- **The lines** are `COURT_LINES`, a copy of `career/recognition.toml` `[message.*]` (drafts; you change the words before you send). Change a line in both;
+  `scripts/check_career.py` rule 22 fails a commit where they differ. No line ever quotes a weight (a best's number is an estimate, PROG-01).
+- **The month's honours.** In a month's first seven days the month just gone's honours sit at the top of the panel (*October honours*, then *This week*):
+  **Most sessions** (plan sessions, D19), **Most improved** (the biggest effort-matched gain on a main lift that month, D18), **Full Month** (every plan
+  session that month) or *Nobody this month. X and Y were one week short.*, and **Amir's Pick**: a shortlist of three (most weeks held, biggest gain, best
+  comeback), each with **Pick <name>**, and *Nobody this month*; two taps each (the first says what the second does), because a pick stays picked. A tie
+  shares an honour (one row each). Each winner has WhatsApp ↗ and Copy with its line; your pick's row asks about the story. The winners are worked out live
+  until you send one or pick (`coach_honours_freeze()` first), and the page freezes them by itself on its first load from the 8th; from then the honours fold
+  under the moments as *October honours* until November's arrive. A send that finds its winner changed at the freeze (a late session) says so.
+- **The monthly goal and "From Amir"**, under the athlete's name (`goalLineHtml()`, `#goalLine`; clients with a programme): *No October goal yet ·
+  Write one*, or the goal with **✓ Mark done** (then *✓ Done 24 Oct* and Undo) and Edit. Enter saves, Escape cancels, an empty Save clears a goal that is
+  not ticked. **From Amir…** opens one line (90 characters) kept for their app, one a day; *Take back* while unread. Athletes see the goal and the line
+  from step 3 (the light screens), not before: until then they reach them on WhatsApp.
+- **Your time** (GAME-11): about five messages a week at 20 seconds each, two minutes on the 1st, a minute per goal.
 
 | Counter | What it counts |
 |---|---|
