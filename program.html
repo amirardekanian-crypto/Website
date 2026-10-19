@@ -2866,10 +2866,10 @@
      a hairline above and below, a 4 px stripe in the colour that asks (grey: offline; clay: look here), the label in that colour in Space Mono
      capitals, the sentence in ink, one green condensed link with the chevron. Home's offline line and the filed-day card; it is full width,
      so each piece carries the gutter itself. */
-  #home-overview #home-offline.plan-offline, #home-overview #home-unfinished-wrap .uf-card { display: grid; justify-items: start; gap: 6px; margin: 0 0 16px; padding: 16px var(--g) 6px; border: 0; border-radius: 0;
+  #home-overview .plan-offline, #home-overview #home-unfinished-wrap .uf-card { display: grid; justify-items: start; gap: 6px; margin: 0 0 16px; padding: 16px var(--g) 6px; border: 0; border-radius: 0;
     border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); background: var(--row); color: var(--ink); box-shadow: inset 4px 0 0 var(--ring); }
-  #home-overview #home-offline.plan-offline[hidden] { display: none; }
-  #home-overview #home-offline.plan-offline.is-ask, #home-overview #home-unfinished-wrap .uf-card { box-shadow: inset 4px 0 0 var(--clay-fill); }
+  #home-overview .plan-offline[hidden] { display: none; }
+  #home-overview .plan-offline.is-ask, #home-overview #home-unfinished-wrap .uf-card { box-shadow: inset 4px 0 0 var(--clay-fill); }
   .po-k, .uf-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
   .is-ask .po-k, .uf-k { color: var(--clay-ink); }
   .po-txt, .uf-s { margin: 0; font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
@@ -5646,6 +5646,10 @@
          greeting, not above it: the account button owns the top right corner. -->
     <div id="home-offline" class="plan-offline" role="status" hidden></div>
 
+    <!-- A new version of the app has taken over the shell (paintNewVersion(), 2026-10-19):
+         the same banner, in clay, with Reload. Held while a session is under way. -->
+    <div id="home-newver" class="plan-offline" role="status" hidden></div>
+
     <!-- What fileUnfinished() filed (DATA-02), then "This Week": its header and the week's
          session count (paintWeek()), or, in a week with a note, the note in their place (weekNoteHTML) -->
     <div id="home-unfinished-wrap"></div>
@@ -6803,6 +6807,94 @@ function sessionUnderway() {
   const today = new Date().toDateString();
   return ((DATA && DATA.workouts && DATA.workouts.days) || []).some(d =>
     sessionStartedToday(String(d.id), today) && !completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id)));
+}
+
+// ── A NEW VERSION IS READY (2026-10-19) ────────────────────────────────────────────────────
+// Amir: "every time there is a change in the app, and its updated, i want everyone to be
+// notified to close their app from background and re open it. i dont know how to make this a
+// rule or a memory." There is no rule to remember now: the app says it itself.
+//
+// An installed PWA left in the background keeps the OLD page in memory. sw.js takes the shell
+// over the moment a CACHE bump deploys (skipWaiting on install, clients.claim on activate), so
+// a cold open is already the new version, but a page that is only resumed stays the previous
+// one until it is reloaded. That gap is what this closes.
+//   · The signal is `controllerchange`: a NEW worker has claimed this page. A FIRST install
+//     fires it too, with nothing stale behind it, so it counts only when this page already had
+//     a worker when it loaded (_hadWorker). A hard refresh leaves the page uncontrolled, and
+//     claim() fires it there as well: same guard, same answer.
+//   · Nothing finds the new worker unless someone looks. A navigation makes the browser check
+//     sw.js by itself, which covers every cold open; an app resumed from the background never
+//     navigates, so swCheck() asks for a fresh sw.js when the app comes back to the foreground
+//     and when the connection returns, at most once every SW_CHECK_MS (sw.js is 45 KB and
+//     Iran's lines are slow).
+//   · NEVER mid-session, the same principle that stops _resumeSync() swapping a changed plan:
+//     a reload would take the sets on the screen with it. The line waits and tries again every
+//     30 s until the session is over.
+//   · The look is Home's banner (SHEETS AND NOTICES #9), in clay because it asks for something
+//     (DS-01). A banner, not aaToast(): a note in the middle of the screen hides itself after a
+//     few seconds and this has to still be there when they look up. It is not urgent either —
+//     the programme comes live from the server, so the old version still shows today's training.
+//   · Not in the demo or the coach's preview: neither is an installed app anybody trains in.
+// ⚠️ habits.html carries the same thing in its own look (swTookOver() there), and it must NEVER
+// run in the embed (habits.html?embed=1 on Home): the iframe is a client of this same worker, so
+// a reload there would reload the wrong document.
+const SW_CHECK_MS = 20 * 60 * 1000;      // the most often this page asks for a fresh sw.js
+let NEW_VERSION = false;                 // a new worker has taken this page's shell over
+let _swReg = null, _swChecked = 0, _newVerTimer = null;
+// Read once, while this page loads, and never written again by the app (scripts/headless/new-version.js
+// sets it to exercise the real path, which is why it is a let).
+let _hadWorker = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+
+function versionWatchOff() { return !!(window.IS_DEMO || window.IS_PREVIEW); }
+
+// A new worker claimed this page. Nothing is stale behind a first install.
+function swTookOver() {
+  if (NEW_VERSION || !_hadWorker || versionWatchOff()) return;
+  NEW_VERSION = true;
+  paintNewVersion();
+}
+
+// The one line at the top of Home, once it can be said.
+function paintNewVersion() {
+  const el = document.getElementById('home-newver');
+  if (!el) return;
+  if (!NEW_VERSION || sessionUnderway()) {
+    el.hidden = true; el.innerHTML = '';
+    // Mid-session: come back and ask again, so the line lands as soon as the session is over.
+    if (NEW_VERSION && !_newVerTimer) _newVerTimer = setInterval(paintNewVersion, 30000);
+    return;
+  }
+  clearInterval(_newVerTimer); _newVerTimer = null;
+  el.innerHTML = '<span class="po-k">New version</span>' +
+                 '<span class="po-txt">A new version of the app is ready</span>' +
+                 '<button type="button" class="po-btn" onclick="reloadNewVersion()">Reload</button>';
+  el.classList.add('is-ask');
+  el.hidden = false;
+}
+function reloadNewVersion() { location.reload(); }
+
+// Ask the browser for a fresh sw.js. Held while a session is under way: a worker that activates
+// mid-session starts answering this page's lazy loads (a rest game, the share card) from the new
+// cache, and there is nothing to gain from it until the session is finished anyway.
+function swCheck() {
+  if (!_swReg || document.visibilityState !== 'visible') return;
+  if (Date.now() - _swChecked < SW_CHECK_MS || sessionUnderway()) return;
+  _swChecked = Date.now();
+  try { _swReg.update(); } catch (e) { /* the next nudge tries again */ }
+}
+
+function initVersionWatch() {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.addEventListener('controllerchange', swTookOver);
+  // This navigation already made the browser check sw.js, so the clock starts now.
+  navigator.serviceWorker.register('/sw.js').then(reg => { _swReg = reg; _swChecked = Date.now(); }, () => {});
+  if (versionWatchOff()) return;
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    swCheck();
+    paintNewVersion();
+  });
+  window.addEventListener('online', swCheck);
 }
 
 // One capped pull. If the cap wins, the answer is thrown away when it lands.
@@ -10213,7 +10305,7 @@ const APP_GUIDE = [
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Once a week</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
-    body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p>` },
+    body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p><p>When I update the app, Home says <strong>A new version of the app is ready</strong>. Tap <strong>Reload</strong> and it loads in a second. You don't have to close it from your phone and open it again. Mid-session it waits until you've finished, so a reload never takes your sets with it.</p>` },
   { icon: 'tool', title: 'Built-in tools',
     body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. You get one match a session: first to 15. A bank shot off the glass counts 2. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. <strong>The Lob</strong> is a slow ball to breathe with: in as it rises, out as it falls. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
@@ -10355,6 +10447,7 @@ function goTo(screen, historyId, keepContent) {
   if (screen === 'home') {
     paintHabitsCard();
     paintWeekSugg();   // gone once its session has been opened (LIB-01)
+    paintNewVersion(); // a new version took over while they were on another tab, or mid-session
   }
 
   // Progress — rebuild the two number rows, the cycle card and the road. They were Home's until 2026-10-12 and had the same
@@ -20459,10 +20552,9 @@ function esc(str) {
 <!-- Shared helpers: VideoModal + A2HS prompt -->
 <script defer src="/assets/js/shared.js"></script>
 <script>
-  // Register service worker — keeps the installed app up to date automatically.
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-  }
+  // Register the service worker, and watch for the next one: when a bump takes the shell over,
+  // Home says "A new version of the app is ready" with a Reload (initVersionWatch(), 2026-10-19).
+  initVersionWatch();
   wrapSheetOpeners();   // the sheet's ‹ Back (SHEET-01)
   initSheetBars();      // its top row joins the page once it has scrolled
   // Back closes the top layer instead of leaving the app (NAV-01).

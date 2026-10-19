@@ -414,6 +414,18 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   and an athlete Amir ticks under 13 reads only. A new crew table goes into `coach_erase_person()` and the snapshot the same day.
   **Kudos is a Like** (Amir, 2026-10-19), with **🔥 💪 👏 😍** beside it (stage82, live 2026-10-19) (`crew_emoji_list()`; the app draws them only
   while `get_bell()` hands over the list, so it degrades to the Like alone). One reaction per person: another emoji swaps it.
+- **A CACHE bump tells the athletes by itself** (Amir, 2026-10-19: *"every time there is a change in the app, and
+  its updated, i want everyone to be notified to close their app from background and re open it. i dont know how
+  to make this a rule or a memory"*; `PROGRAM-APP.md` → *A new version is ready*). **There is no rule to remember:
+  the code is the rule.** An installed app left in the background keeps the OLD page until it reloads, so both
+  apps watch `navigator.serviceWorker` for `controllerchange` (`initVersionWatch()`, `swTookOver()`) and say
+  **"A new version of the app is ready"** with a **Reload** — program.html as Home's clay banner (`#home-newver`,
+  `paintNewVersion()`), AA Proof as one row under its header (`UI.newver`). A **first install** says nothing
+  (`_hadWorker`), nothing is said **mid-session** (the line waits and lands when the session is over), and the
+  whole thing stands down in the **embed**, the demo and the coach's preview (`versionWatchOff()`): the embed's
+  iframe is a client of the same worker, so a reload there would reload the wrong document. An app resumed from
+  the background never navigates, so `swCheck()` asks for a fresh `sw.js` on the foreground and on `online`, at
+  most once every 20 minutes. Five functions, one set per app: change both. `node scripts/headless/new-version.js`.
 - **Dark mode is the athlete's choice** (Amir, 2026-09-27: *"Let the client choose dark mode"*): both apps start
   light and switch only on the athlete's tap; neither follows the phone's setting.
 - **Clay means "look here"** (DS-01, Amir 2026-09-27; `PROGRAM-APP.md` → *Clay means look here*): the Coach's note,
@@ -468,6 +480,9 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   keeps 9, on purpose.
 - **Back closes the top layer here too** (NAV-01): `topLayer()` reads `UI`, `render()` ends with `navSync()`.
   **Never in the embed**: the iframe's history is the training app's, so it would steal that app's Back.
+- **A new version says so here too** (2026-10-19, the rule above): `swTookOver()` sets `UI.newver` and one clay
+  row under the header offers **Reload**. ⛔ **Never in the embed**: the iframe is a client of the same worker, so
+  a reload from inside it would reload the training app's Home, not AA Proof.
 - **Embedded (`?embed=1`, on the training app's Home) Proof only logs today** through its own doors;
   `checkLevelUps()`, the reward baseline, the tour, the install offer and the board sweep all stand down there,
   so every level-up and reward still gets its takeover in the full app (`HABITS.md` → *Embedded…*).

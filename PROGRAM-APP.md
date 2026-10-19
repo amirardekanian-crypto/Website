@@ -863,6 +863,52 @@ phone's sets from the next open. `scripts/headless/phone-first.js`.
   `node scripts/headless/clock-skew.js` runs the real page: the same page without the fix shows *Plan not available* (the field report), with it Home
   opens after one refresh and the saved plan stays.
 
+## 🔄 A new version is ready: the app asks for the reload itself (2026-10-19)
+
+Amir: *"every time there is a change in the app, and its updated, i want everyone to be notified to close their
+app from background and re open it. i dont know how to make this a rule or a memory."* **There is no rule to
+remember. The code is the rule.**
+
+An installed PWA left in the background keeps the OLD page in memory. `sw.js` takes the shell over the moment a
+`CACHE` bump deploys (`skipWaiting()` on install, `clients.claim()` on activate), so a **cold open is already the
+new version** — a page that is only *resumed* is not, until it reloads. That gap is what Amir had been closing by
+hand, telling athletes to swipe the app away and open it again. **Both apps now notice and say so.**
+
+- **The signal is `controllerchange`** on `navigator.serviceWorker`: a NEW worker has claimed this page.
+  A **first install fires it too**, with nothing stale behind it, and so does a hard refresh (the page is
+  uncontrolled, and `claim()` takes it). One guard covers all three: `_hadWorker`, read once while the page loads
+  — **it only counts when this page already had a worker.**
+- **Nothing finds the new worker unless someone looks.** A navigation makes the browser check `sw.js` by itself,
+  which covers every cold open. An app resumed from the background never navigates, so **`swCheck()` calls
+  `registration.update()`** when the app comes back to the foreground and when the connection returns, at most
+  once every `SW_CHECK_MS` (20 minutes: `sw.js` is 45 KB and Iran's lines are slow).
+- **NEVER mid-session** (the principle `_resumeSync()` already keeps for a changed plan): a reload would take the
+  sets on the screen with it. `paintNewVersion()` holds the line while `sessionUnderway()` is true and asks again
+  every 30 s, so it lands the moment the session is over. `swCheck()` holds the *check* for the same window, so a
+  worker does not start answering a running session's lazy loads (a rest game, the share card) from the new cache.
+- **program.html**: one line in **Home's banner** (SHEETS AND NOTICES #9, the `.plan-offline` look), under the
+  plan line, in **clay with `is-ask`** because it asks for something (DS-01) — `#home-newver`, painted by
+  `paintNewVersion()`, repainted by `goTo('home')`. A **banner, not `aaToast()`**: the note box hides itself after
+  a few seconds and this has to still be there when they look up. It is not urgent either, since the programme
+  comes live from the server, so the old version still shows today's training.
+  The words are **"A new version of the app is ready"** and the button is **Reload** (`reloadNewVersion()`, one
+  `location.reload()`), named in the guide's *Install the app* card (CNT-01).
+- **habits.html (AA Proof)**: the same words in its own look, `.newver` — one clay-striped row between the header
+  and the scroll, `UI.newver`, drawn on every screen until it is tapped.
+- **⛔ Never in the embed** (`habits.html?embed=1` on Home). The iframe is a client of the **same worker at scope
+  `/`**, so it is claimed and `controllerchange` fires there too. A reload from inside it would reload the wrong
+  document, and the line would sit in the habit strip. `versionWatchOff()` stands the whole thing down there, and
+  `renderEmbed()` has no row to draw. **Not in the demo or the coach's preview either.**
+- **The functions exist twice, one set per app**: `swTookOver()`, `swCheck()`, `versionWatchOff()`,
+  `reloadNewVersion()`, `initVersionWatch()`. Change both.
+  `node scripts/headless/new-version.js` (26 checks) runs the real pages: the first-install guard, the line, the
+  mid-session hold and its return, the Reload, the embed's silence, and that each app registers the worker through
+  `initVersionWatch()` and nowhere else. Playwright blocks service workers, so the lifecycle itself is not
+  exercised there; the suite calls the handler the lifecycle calls.
+- **What this means for a deploy**: a `CACHE` bump is now the whole message. Nobody has to be told anything.
+  ⚠️ An athlete only learns this from the version that *has* the watcher, so **v188 is the last bump anyone has to
+  close and reopen for**.
+
 ## 🌙 Midnight is not the end of a session (DATA-02, 2026-09-26)
 
 - **A session's date is the local day it was finished** (`sessionDateFor()`: the finish stamp, else today),
