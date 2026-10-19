@@ -116,10 +116,16 @@ const state = p => p.evaluate(() => {
 
   // ── 3c. Pounds are compared as kilograms, plates are never "far above" anything ──
   const sets = p => p.evaluate(() => loadSetLog('Barbell Back Squat', 4, '1').map(s => ({ w: s.w, d: !!s.d })));
+  // A tap on the unit button opens a menu of the three (2026-10-19); pick a row, then put the note box that says so away.
+  const pickUnit = async (p, u) => {
+    await p.click('#sq .ex-set-unit'); await p.waitForTimeout(120);
+    await p.click('.unit-menu .unit-opt[data-u="' + u + '"]'); await p.waitForTimeout(150);
+    await p.evaluate(() => { try { hideAaToast(); } catch (e) {} });
+  };
   {
     const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), seed: { _setlog_Barbell_Back_Squat: LW }, stub: { library: H.library() } });
     await openSquat(p);
-    await p.click(`#sq .ex-set-unit`); await p.waitForTimeout(150);          // kg -> lb
+    await pickUnit(p, 'lb');                                                  // kg -> lb
     await p.fill(`${row(0)} .ex-set-weight`, '300');                         // 300 lb = 136 kg, over 1.5 × 80
     await p.click(`${row(0)} .ex-set-check`); await p.waitForTimeout(250);
     const a = await state(p);
@@ -133,7 +139,7 @@ const state = p => p.evaluate(() => {
   {
     const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), seed: { _setlog_Barbell_Back_Squat: LW }, stub: { library: H.library() } });
     await openSquat(p);
-    await p.click(`#sq .ex-set-unit`); await p.click(`#sq .ex-set-unit`); await p.waitForTimeout(150);   // kg -> lb -> plates
+    await pickUnit(p, 'plates');                                              // kg -> plates
     await p.fill(`${row(0)} .ex-set-weight`, '600');
     await p.click(`${row(0)} .ex-set-check`); await p.waitForTimeout(250);
     const c = await sets(p), t = await state(p);

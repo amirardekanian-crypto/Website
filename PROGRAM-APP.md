@@ -625,9 +625,20 @@ costs more than one tap.
     day), `45 lb` is pounds, `6 plates` is the count on a machine's stack (`1 plate`). So it rides every pipe a weight
     already rode (the cloud merge, the carried LAST, the saved session and its email, coach.html) and no field is added
     that `mergeStoredValue()` could drop. `weightOf()`, `splitW()`, `composeW()`, `weightText()`, `unitWord()` sit above
-    `parseLoggedKg()`. The weight box holds the **number only**; the unit is the small pill over the boxes (`.ex-set-unit`,
-    list) or the label of the weight line (`.tl-unit`, Guided's rest screen): one tap goes kg → lb → plates → kg
-    (`cycleUnit()`), and a pick **relabels what is already typed on that card** ("100" becomes "100 lb"; the numbers
+    `parseLoggedKg()`. The weight box holds the **number only**; the unit is the set table's column header word with a chevron (`.ex-set-unit`,
+    list; a plain word, no pill: **Name Tag**, Amir 2026-10-19, *"go with your picks"*, the board's direction B), the tag inside each box of a
+    superset (`.circ-unit` in `.wt-field`, 108 × 48 px, the same unit in every box, no pill row over the boxes) or the label of the weight line
+    (`.tl-unit`, Guided's rest screen). A set table's boxes are about 60 px wide and carry the LAST caption, so no tag fits in them. **A tap on a unit button opens a menu of the three and
+    changes nothing** (2026-10-19, Amir: *"if someone miss clicks the weight measure it changes: first a soft warning or notification,
+    second let the person choose between the 3"*; it used to cycle kg → lb → plates on the tap, so one stray thumb relabelled every
+    weight on the card): `openUnitMenu(btn, current, onPick)` draws three rows (Kilograms, Pounds, Plates · count the stack; the
+    current one marked) under the button, `.unit-menu` on `body`, z 220 over the sheets and the note box. A pick calls
+    `pickCardUnit()`, which changes the unit and then says so in the note box (`aaToast()`: *Weights are now in lb. The numbers you
+    typed did not change.*, or *… in lb for this exercise.* / *… for this circuit.* with nothing typed) with **Undo** and *Keep it*,
+    8 s; the note lets taps through to the boxes under it (`aaToast(…, { pass: true })`, only its two buttons catch one), and opening the menu
+    puts away a plain note but keeps one with a button (the once-a-day clock offer). The menu closes on a tap elsewhere, Escape, Tab, a scroll that
+    moves its button, a second tap on the button and Back (`topLayer()` returns `closeUnitMenu`, NAV-01). The same menu is on the circuit's pill and on Log a max's (`chooseCeilingUnit()`: nothing
+    logged is relabelled there, so no note). A pick **relabels what is already typed on that card** ("100" becomes "100 lb"; the numbers
     stay, this is *I chose the wrong unit*, never a conversion; `setCardUnit()`). **Which unit a card is in** is never
     stored: `cardUnit()` reads the pick made this visit (`card._unit`), else the unit already in today's sets, else last
     time's (`lw`, which carries its own unit), else the lift's last logged session, else kg. Pick pounds once and the
@@ -640,7 +651,7 @@ costs more than one tap.
     `histSetsText()`, `histWt()`; a list that mixes units names every unit; the History chart is drawn in the lift's
     last measure, a plates lift as *Top stack, plates*). In coach.html a set reads as typed in the athlete's own
     unit and the load column says `45 → 50 lb` or `6 → 7 plates` (`wUnitOf()`, `loadSummary()`); sets in two units are
-    listed as typed, never folded into one range. Circuits have the same pill over their weight boxes (`.circ-unit`,
+    listed as typed, never folded into one range. Circuits show the unit as a tag inside each weight box (`.circ-unit`,
     `circuitUnit()`, `setCircuitUnit()`: one unit for the whole circuit, the unit written in each item's weight).
     **Twins**: `career_kg()` / `career_wn()` / `career_wu()` in the database (`supabase/stage71_weight_units.sql`,
     `stage72_weight_measures.sql`; `node scripts/career/rehearse_units.mjs` and `rehearse_measures.mjs` run them against
@@ -660,7 +671,7 @@ costs more than one tap.
     pounds records alone. One entry a day per lift AND measure (`saveCeilingEntry()`, the merge key lift|day|measure,
     `deleteCeilingEntry(lift, day, u)`: a tombstone carries `u`). Every Records screen says its unit (`uWord()`); Home's best
     lift and the body-weight ratio use `recKgEq()` (pounds converted, plates none, so a plates lift never leads that line);
-    + Log a max opens in the lift's own measure with a unit button (`cycleCeilingUnit()`, `cf-unit`). **Wins are per measure
+    + Log a max opens in the lift's own measure with a unit button (`chooseCeilingUnit()`, `cf-unit`; it opens the same menu). **Wins are per measure
     too** (`cycleBestSet()`, `cycleWins()` keys name + measure, `winText()` words a win in its own unit: *+10 lb, same reps*,
     *+1 plate, same reps*), and a kg win against a lb one is no win. **Share cards say the measure** (`spec.u`;
     `assets/js/sharecard.js` `unitW()`; the Farsi words for lb and plates are drafts for Amir).
@@ -1505,7 +1516,7 @@ Screens, sheets and overlays are shown and hidden in place, so until now the pho
 swipe) **left the app** from any of them. Now, while anything is open over Home's overview, there is exactly
 **one guard entry** in history (`history.pushState`, same URL, so `?workout=` and other deep links are
 untouched). Back pops it; `topLayer()` names what is visibly on top and it is closed; if something is still
-open the guard is re-armed. Top first: the video pop-up, the rest timer (in Guided this ends the rest, as Skip
+open the guard is re-armed. Top first: the unit menu (a Back puts it away and changes nothing: `openUnitMenu()`, 2026-10-19), the video pop-up, the rest timer (in Guided this ends the rest, as Skip
 does), the readiness check (cancelled, nothing starts), the sheet (History, About, Why, Quality), Guided (the
 clock keeps running), then a non-Home screen, which presses **its own ←** (Records → the exercise it was opened
 from, a session → its Library pane at the same scroll, the archive → Progress; a Library pane is a tab root since 2026-10-13) or goes Home for a tab, then the day
@@ -1710,7 +1721,11 @@ dashboard do not change.
     **3 lines**, then *More* with a drawn chevron: `fitNotes()` still decides), **How to do it** as one white rounded row
     (the About sheet's Your history recipe: a green ▶ only with a video, else a list glyph; *HOW TO DO IT* over the count
     on its own line; *More* is 44 px tall itself; its text stays *How to do it · video · 5 steps · 4 cues*: `paintHowTo()` puts the leading dot in
-    `.ex-how-lead`, which CSS hides), the *First time* line with no box, then the set table.
+    `.ex-how-lead`, which CSS hides), the *First time* line with no box, then the set table. **A circuit's Coach's Note sits
+    under its green head** (Amir, 2026-10-19: *"the coach's note for this superset is on top of the card, should be under"*): an open
+    circuit is one grid whose body is `display: contents`, so the note's `order: -2` (which leads a card's body) lifted it above the head;
+    `.round-group:not(.collapsed) > .item-main { order: -3 }` keeps the head first (`scripts/headless/unit-menu.js` measures it at
+    320 and 390 px, light and dark, for a superset, a warm-up circuit and a standard card).
   - **The set table**: white boxes edged `--field`, the set numbers grey and the live set the one green number (a
     disc), LAST inside an empty kg box, a done set 700 with no box, the RPE tag in its own column 40+ px clear of the
     tick, **How hard?** a sand band that hangs off its set with 48 px keys, and the ghost line in that row's RPE slot,

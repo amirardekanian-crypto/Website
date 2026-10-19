@@ -2,7 +2,8 @@
 // node scripts/headless/weight-units.js
 //
 // The unit is WRITTEN IN the weight's text ("45 lb", "6 plates", a bare number is kg), so it rides every pipe a weight already rode. The weight
-// box holds the number; the button over it cycles kg → lb → plates and relabels what is typed; the next session opens in the unit last used.
+// box holds the number; the button over it opens a menu of the three (2026-10-19: it used to cycle on a tap) and a pick relabels what is typed;
+// the next session opens in the unit last used. The menu itself, its note with Undo and Back are in unit-menu.js.
 // Serve the repo first (python -m http.server 8775 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
 const H = require('./lib');
@@ -17,7 +18,12 @@ async function openSquat(p) {
 const unit = p => p.evaluate(() => document.querySelector('#sq .ex-set-unit').textContent);
 const boxes = p => p.evaluate(() => [...document.querySelectorAll('#sq .ex-set-weight')].map(i => ({ v: i.value, ph: i.placeholder })));
 const stored = p => p.evaluate(() => loadSetLog('Barbell Back Squat', 4, '1').map(s => s.w));
-const tapUnit = async p => { await p.click('#sq .ex-set-unit'); await p.waitForTimeout(150); };
+// Pick a unit the way an athlete does: the button, then the row in the menu it opens; then put the note box away (it sits mid-screen).
+const pickUnit = async (p, u, btn = '#sq .ex-set-unit') => {
+  await p.click(btn); await p.waitForTimeout(120);
+  await p.click(`.unit-menu .unit-opt[data-u="${u}"]`); await p.waitForTimeout(150);
+  await p.evaluate(() => { try { hideAaToast(); } catch (e) {} });
+};
 
 (async () => {
   const C = H.checker();
@@ -33,7 +39,7 @@ const tapUnit = async p => { await p.click('#sq .ex-set-unit'); await p.waitForT
     C.check('a kg weight is stored as the bare number', s.join('|') === '100|100|100|100', s.join('|'));
 
     // ── 2. pounds: the box keeps the number, the text keeps the unit ──
-    await tapUnit(p);
+    await pickUnit(p, 'lb');
     const s2 = await stored(p), b2 = await boxes(p);
     C.check('picking lb relabels what is typed (100 → "100 lb") and the boxes still show 100', (await unit(p)) === 'lb' && s2.join('|') === '100 lb|100 lb|100 lb|100 lb' && b2.every(b => b.v === '100'), JSON.stringify([s2, b2]));
     await p.fill(`${row(0)} .ex-set-weight`, '135');
@@ -45,7 +51,7 @@ const tapUnit = async p => { await p.click('#sq .ex-set-unit'); await p.waitForT
     await p.fill(`${row(0)} .ex-set-weight`, '135');
 
     // ── 3. plates ──
-    await tapUnit(p);
+    await pickUnit(p, 'plates');
     const s4 = await stored(p);
     C.check('picking plates relabels again ("135 plates"); the button says plates', (await unit(p)) === 'plates' && s4.every(w => w === '135 plates'), JSON.stringify([await unit(p), s4]));
     await p.fill(`${row(1)} .ex-set-weight`, '6');
@@ -53,9 +59,9 @@ const tapUnit = async p => { await p.click('#sq .ex-set-unit'); await p.waitForT
     C.check('typing 6 in plates stores "6 plates" (and a following set takes it)', s5[1] === '6 plates' && s5[2] === '6 plates', JSON.stringify(s5));
 
     // ── 4. and back to kg ──
-    await tapUnit(p);
+    await pickUnit(p, 'kg');
     const s6 = await stored(p);
-    C.check('the third tap is kg again and the weights are bare numbers', (await unit(p)) === 'kg' && s6[0] === '135' && s6[1] === '6' && !s6.some(w => /[a-z]/i.test(w)), JSON.stringify([await unit(p), s6]));
+    C.check('picking kg again makes the weights bare numbers', (await unit(p)) === 'kg' && s6[0] === '135' && s6[1] === '6' && !s6.some(w => /[a-z]/i.test(w)), JSON.stringify([await unit(p), s6]));
     C.check('no page errors (picking a unit)', !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -67,7 +73,7 @@ const tapUnit = async p => { await p.click('#sq .ex-set-unit'); await p.waitForT
     await openSquat(p);
     const b = await boxes(p);
     C.check('last time in pounds: the card opens in lb, and LAST shows the number alone ("45")', (await unit(p)) === 'lb' && b[0].ph === '45', JSON.stringify([await unit(p), b[0]]));
-    await tapUnit(p); await tapUnit(p);   // lb → plates → kg
+    await pickUnit(p, 'kg');   // from lb
     const b2 = await boxes(p);
     C.check('picked kg over a pounds LAST: the hint names its own unit ("45 lb"), so it is never read as kilograms', (await unit(p)) === 'kg' && b2[0].ph === '45 lb', JSON.stringify([await unit(p), b2[0]]));
     await ctx.close();
@@ -101,7 +107,7 @@ const tapUnit = async p => { await p.click('#sq .ex-set-unit'); await p.waitForT
     C.check('histWt() shows a weight as typed', JSON.stringify(t.wt) === '["80","45 lb","6 plates","1 plate",null]', JSON.stringify(t.wt));
 
     // the saved record: the summary line the email and coach.html read, and the structured log beside it
-    await tapUnit(p);                                                         // kg → lb
+    await pickUnit(p, 'lb');                                                  // kg → lb
     await p.fill(`${row(0)} .ex-set-weight`, '135');
     await p.click(`${row(0)} .ex-set-check`); await p.waitForTimeout(300);
     const rec = await p.evaluate(() => { const D = buildSessionData('1'); const e = D && D.log.find(x => x.ex === 'Barbell Back Squat');
@@ -235,6 +241,7 @@ const tapUnit = async p => { await p.click('#sq .ex-set-unit'); await p.waitForT
     await p.fill('#cf-kg', '240'); await p.fill('#cf-rp', '5'); await p.click('.cf-rpe .rpe-btn[data-rpe="8"]'); await p.waitForTimeout(150);
     const o1 = await p.evaluate(() => ({ out: document.getElementById('cf-out').innerText.replace(/\s+/g, ' ') }));
     await p.click('#cf-unit'); await p.waitForTimeout(150);
+    await p.click('.unit-menu .unit-opt[data-u="plates"]'); await p.waitForTimeout(150);
     const o2 = await p.evaluate(() => ({ unit: document.getElementById('cf-unit').textContent, out: document.getElementById('cf-out').innerText.replace(/\s+/g, ' ') }));
     C.check('the estimate follows the unit: 240 lb × 5 @ RPE 8 is 295 LB, and plates give a number of plates', /295/.test(o1.out) && /LB/i.test(o1.out) && o2.unit === 'plates' && /PLATES/i.test(o2.out), JSON.stringify([o1, o2]));
     await p.click('#cf-save'); await p.waitForTimeout(300);
@@ -258,9 +265,10 @@ const tapUnit = async p => { await p.click('#sq .ex-set-unit'); await p.waitForT
     await p.fill('#timerLog .tl-kg', '50'); await p.waitForTimeout(200);
     const c = await p.evaluate(() => loadSetLog('Barbell Back Squat', 4, '1')[0].w);
     C.check('typing in Guided saves in the card\'s unit', c === '50 lb', c);
-    await p.click('#timerLog .tl-unit'); await p.waitForTimeout(300);
+    await p.click('#timerLog .tl-unit'); await p.waitForTimeout(150);
+    await p.click('.unit-menu .unit-opt[data-u="plates"]'); await p.waitForTimeout(300);
     const d = await p.evaluate(() => ({ lab: document.querySelector('#timerLog .tl-unit').textContent, w: loadSetLog('Barbell Back Squat', 4, '1')[0].w }));
-    C.check('the Guided label is a button too: one tap goes to plates and relabels the set ("50 plates")', d.lab === 'Plates' && d.w === '50 plates', JSON.stringify(d));
+    C.check('the Guided label is a button too: it opens the same menu and a pick of plates relabels the set ("50 plates")', d.lab === 'Plates' && d.w === '50 plates', JSON.stringify(d));
     C.check('no page errors (Guided)', !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();
   }
