@@ -576,4 +576,20 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|h
   fi
 fi
 
+# -- 26. the habit engine is ONE copy (added 2026-10-19) -------------------------------------------------------------
+# Why: AA Proof is being retired into program.html, and the training app now owns the habits -- the roster, the log, the
+# verdict, the day streak, the backfill. Retyping that engine into a second file is the failure this repo already has a
+# guard for: when two copies drift NOTHING ERRORS, the athlete and the board simply disagree. So nothing is retyped.
+# assets/js/habits-core.js is CUT OUT of habits.html by scripts/build_habits_core.js, function by function, and this
+# fails the commit if habits.html has moved and the generated file has not. When AA Proof is deleted, habits-core.js
+# becomes the source of truth: drop the generator and this guard with it.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(habits\.html|assets/js/habits-core\.js|scripts/build_habits_core\.js)$'; then
+  echo "pre-commit: habits.html or the habit engine changed -- checking they are still in step..."
+  if ! core_out=$(node scripts/build_habits_core.js --check 2>&1); then
+    echo "$core_out"
+    echo "pre-commit: BLOCKED -- the habit engine is stale (details above)."
+    failed=1
+  fi
+fi
+
 exit $failed

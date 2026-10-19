@@ -268,16 +268,18 @@ async function trainingBase(browser, C) {
     C.check('on: the bar fills to the level\'s share', r && r.bar === Math.round(L10.xp_in_level / L10.level_cost * 100) + '%', r && r.bar);
     const order = await p.evaluate(() => {
       const ids = [...document.querySelectorAll('#home-overview > div')].map(d => d.id);
-      return { note: ids.indexOf('home-note-wrap'), career: ids.indexOf('home-career-wrap'), hold: ids.indexOf('home-hold-wrap'), habits: ids.indexOf('home-habits-wrap'), sugg: ids.indexOf('home-sugg-wrap'),
+      return { note: ids.indexOf('home-note-wrap'), career: ids.indexOf('home-career-wrap'), hold: ids.indexOf('home-hold-wrap'), today: ids.indexOf('home-today-wrap'), sugg: ids.indexOf('home-sugg-wrap'),
         holdHtml: document.getElementById('home-hold-wrap').innerHTML.trim() };
     });
-    C.check('on: the days, then New from Amir, then Career, then the habits; the Hold Serve row is empty (folded into the Career row)',
-      order.sugg < order.note && order.note < order.career && order.career < order.hold && order.hold < order.habits && order.holdHtml === '', JSON.stringify(order));
+    C.check('on: the days, then New from Amir, then Career, then Today\u2019s card; the Hold Serve row is empty (folded into the Career row)',
+      order.sugg < order.note && order.note < order.career && order.career < order.hold && order.hold < order.today && order.holdHtml === '', JSON.stringify(order));
     const gap = await p.evaluate(() => {
-      const a = document.querySelector('#home-career-wrap .hrow').getBoundingClientRect(), b = document.querySelector('#home-habits-wrap .hrow');
+      const a = document.querySelector('#home-career-wrap .hrow').getBoundingClientRect(), b = document.querySelector('#home-today-wrap .today-card');
       return b ? Math.round(b.getBoundingClientRect().top - a.bottom) : null;
     });
-    C.check('on: the Career row and the habits row sit 10 px apart, as two door rows', gap === 10, gap);
+    // The Career row and Daily habits were a PAIR OF DOOR ROWS, 10 px apart. Since AA Proof was retired into
+    // this app (2026-10-19) the habits are a card, not a row, so it keeps the 20 px every piece of Home takes.
+    C.check('on: Today\u2019s card keeps its own 20 px under the Career row', gap === 20, gap);
     const keys = await p.evaluate(id => ({ cache: !!localStorage.getItem(id + '_careercache'), synced: Object.keys(_snapshot()).filter(k => /careercache|earn_d|momentscache/.test(k)) }), H.ID);
     C.check('on: the profile is kept on this phone, never synced', keys.cache && keys.synced.length === 0, JSON.stringify(keys));
     C.check('on: one get_profile, after Hold Serve\'s read said the switch is on; then one get_my_moments and one get_awards (Your moments)',
@@ -360,16 +362,15 @@ async function trainingBase(browser, C) {
   }
   // 5. the habits row never says a level of its own in Career Mode (Proof's snapshot from yesterday said "Level 7")
   for (const [name, rules, want] of [['on', RULES_ON, 'Ready for today'], ['off', RULES_OFF, 'Level 7']]) {
-    const card = { t: new Date(Date.now() - DAY).toISOString(), lv: 7, streak: 3, verdict: 'on' };
     const { ctx, p } = await openP(browser, { rules });
     if (name === 'on') await waitRow(p);
-    // Proof's strip writes today's snapshot as soon as it boots: put yesterday's back and draw the row from it at once
-    const said = await p.evaluate(([id, card]) => {
-      localStorage.setItem(id + '_hab_card', JSON.stringify(card));
-      const d = document.createElement('div'); d.innerHTML = habitCardHtml();
-      const v = d.querySelector('.hrow-vv'); return v ? v.textContent.trim() : null;
-    }, [H.ID, card]);
-    C.check(`habits row, switch ${name}: "${want}"`, said === want, said);
+    // Today's card is this app's own since AA Proof was retired into it (2026-10-19): the verdict is worked
+    // out here from <id>_hab_log, never read from a snapshot another app published.
+    const said = await p.evaluate(() => {
+      const v = document.querySelector('#home-today-wrap .today-v');
+      return v ? v.textContent.trim() : null;
+    });
+    C.check(`Today's card, switch ${name}: it says the verdict itself`, said === null || /to go|On target|Perfect/.test(said), said);
     await ctx.close();
   }
   // 6. what a session earns: Day 1 ticked through (no RPE, no check-in), not done this week, the week not complete with it

@@ -58,12 +58,15 @@ const cache = p => p.evaluate(() => localStorage.getItem('rel01_athlete_holdcach
     C.check('in a row: four dots and this week\'s dashed ring, not green', r && r.dots === 4 && r.ring && !r.ok, JSON.stringify(r));
     const order = await p.evaluate(() => {
       const ids = [...document.querySelectorAll('#home-overview > div')].map(d => d.id).filter(Boolean);
-      const hold = document.getElementById('home-hold-wrap'), hab = document.getElementById('home-habits-wrap');
+      const hold = document.getElementById('home-hold-wrap'), hab = document.getElementById('home-today-wrap');
       return { ids, gapTop: getComputedStyle(hold).marginTop, habTop: getComputedStyle(hab).marginTop, dc: document.querySelectorAll('#home-overview [data-dc]').length };
     });
-    C.check('it sits after the week\'s days and before Daily habits', order.ids.indexOf('home-hold-wrap') > order.ids.indexOf('day-cards-wrap')
-      && order.ids.indexOf('home-hold-wrap') === order.ids.indexOf('home-habits-wrap') - 1, order.ids.join(' > '));
-    C.check('the pair of rows: 20 px above Hold Serve, the habits row right under it', order.gapTop === '20px' && order.habTop === '0px', order.gapTop + ' / ' + order.habTop);
+    C.check('it sits after the week\'s days and before Today’s card', order.ids.indexOf('home-hold-wrap') > order.ids.indexOf('day-cards-wrap')
+      && order.ids.indexOf('home-hold-wrap') === order.ids.indexOf('home-today-wrap') - 1, order.ids.join(' > '));
+    // Hold Serve and Daily habits were a PAIR OF DOOR ROWS, so the habits row sat tight under this one. Since AA
+    // Proof was retired into this app (2026-10-19) the habits are a card, not a row, and a card is its own thing:
+    // it keeps the 20 px every other piece of Home takes.
+    C.check('20 px above Hold Serve, and Today’s card keeps its own 20 px under it', order.gapTop === '20px' && order.habTop === '20px', order.gapTop + ' / ' + order.habTop);
     C.check('Home still has one Next up card (one data-dc)', order.dc === 1, order.dc);
     C.check('one read of each table, as the athlete', await calls(p, 'career_facts') === 1 && await calls(p, 'career_rules') === 1);
     const saved = JSON.parse(await cache(p) || 'null');

@@ -213,11 +213,15 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
 
   // ── 6. How the app works: one door row (Home's .hrow look), no section label above it, opens the help sheet; Back closes it ──
   {
-    const { ctx, p } = await H.openProgram(browser, { prog: prog() });
+    // One record, so the door this is compared against (Personal records) carries a figure and wears the quiet label.
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(), seed: { _1rm: [{ lift: 'Barbell Back Squat', kg: 104, w: '85', r: '6', rpe: 7, d: H.past(2), t: Date.now() }] } });
     await goCoach(p);
     const look = el => { const c = getComputedStyle(el); return [c.backgroundColor, c.borderTopWidth, c.borderTopStyle, c.borderTopColor, c.borderTopLeftRadius, c.minHeight, c.display].join('|'); };
-    await p.evaluate(() => goTo('home')); await p.waitForTimeout(400);
-    const homeRow = await p.evaluate(`(() => { const f = ${look.toString()}; const r = document.querySelector('#home-habits-wrap .hrow') || (() => { document.getElementById('home-habits-wrap').innerHTML = habitCardHtml(); return document.querySelector('#home-habits-wrap .hrow'); })();
+    // Home's Daily habits row was the door this is measured against, until AA Proof was retired into this app
+    // (2026-10-19) and the habits became Today's card. Progress's Personal records row is the same door recipe
+    // with the same quiet green label, so only the row this reads has changed.
+    await p.evaluate(() => goTo('plan')); await p.waitForTimeout(400);
+    const homeRow = await p.evaluate(`(() => { const f = ${look.toString()}; const r = document.querySelector('#ceiling-row-wrap .hrow');
       const l = r.querySelector('.hrow-l'), a = r.querySelector('.hrow-a'); const lc = getComputedStyle(l), ac = getComputedStyle(a);
       return { row: f(r), label: [lc.fontFamily.split(',')[0].replace(/["']/g, ''), lc.fontSize, lc.fontWeight, lc.letterSpacing, lc.color, lc.textTransform].join('|'), arrow: [ac.fontSize, ac.color].join('|') }; })()`);
     await goCoach(p);

@@ -340,7 +340,12 @@
 // line of every page for a name that is called and declared nowhere, and found two more, both leftovers of the body-weight move
 // to program.html. wtAvgSeries() called wtSeries() and wtNudge() called fmtKg(), neither of which exists here any more; nothing
 // called either of them, so the four dead functions are deleted. The guard now runs on every commit that touches a page.
-const CACHE = 'aap-v194';
+// v195: program.html and sw.js changed (2026-10-19, Amir: "Aa proof will die"). THE HABITS ARE THIS APP'S NOW. Home's Daily habits
+// row and the iframe of AA Proof under it are one card, Today: the session and the habits as one list, because they are one day
+// (direction B, picked from three). The engine is assets/js/habits-core.js, generated from habits.html so the two cannot drift;
+// the keys are AA Proof's own, so no athlete's history moves. The first screen comes with it, for anyone who has never set the
+// habits up. This app is now the writer of <id>_hab_cfg and <id>_hab_log: it pushes them, and merges a day by union.
+const CACHE = 'aap-v195';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -364,6 +369,8 @@ const SHELL = [
   // so a change to it needs a CACHE bump. (Its fonts, photo, mark and covers are kept as they are first used.)
   '/assets/js/sharecard.js',
   '/assets/js/push.js',
+  // The habit engine (v195): the training app owns the habits now, so this is shell, not an extra.
+  '/assets/js/habits-core.js',
   // Off the Glass, the rest game (v162): loaded on the first tap on Play. Cache-first by this plain URL: a change needs a CACHE bump.
   '/assets/js/rally.js',
   // Split Step, the second rest game (v165): loaded on the first tap on its row in the shelf. Cache-first by this plain URL: a change needs a CACHE bump.
