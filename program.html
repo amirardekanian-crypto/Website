@@ -2497,12 +2497,12 @@
 
   /* 1. The cover (a compact one: no picture, it is the screen's one green thing). ← is the day cover's 44 px glass button. The
      eyebrow, the title and the scoreboard are the archive's and the day's; a long lift name wraps whole, never clipped. */
-  #screen-ceiling .ceil-head, #screen-weight .ceil-head, #screen-habits .ceil-head { position: relative; padding: 74px var(--g) 22px; background: var(--hero); color: #fff; }
-  #screen-ceiling .nav-back, #screen-weight .nav-back, #screen-habits .nav-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  #screen-ceiling .ceil-head, #screen-weight .ceil-head, #screen-habits .ceil-head, #screen-moments .ceil-head, #screen-achievements .ceil-head { position: relative; padding: 74px var(--g) 22px; background: var(--hero); color: #fff; }
+  #screen-ceiling .nav-back, #screen-weight .nav-back, #screen-habits .nav-back, #screen-moments .nav-back, #screen-achievements .nav-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
     border: 0; border-radius: 50%; cursor: pointer; color: #fff; background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     font: 500 var(--fs-title)/1 'Barlow', sans-serif; -webkit-tap-highlight-color: transparent; }
-  #screen-ceiling .nav-back:active, #screen-weight .nav-back:active, #screen-habits .nav-back:active { transform: scale(0.92); }
-  #screen-ceiling .nav-back:focus-visible, #screen-weight .nav-back:focus-visible, #screen-habits .nav-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  #screen-ceiling .nav-back:active, #screen-weight .nav-back:active, #screen-habits .nav-back:active, #screen-moments .nav-back:active, #screen-achievements .nav-back:active { transform: scale(0.92); }
+  #screen-ceiling .nav-back:focus-visible, #screen-weight .nav-back:focus-visible, #screen-habits .nav-back:focus-visible, #screen-moments .nav-back:focus-visible, #screen-achievements .nav-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .ceil-kick { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
   .ceil-kick::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
   .ceil-title { margin: 10px 0 0; max-width: 330px;
@@ -2520,9 +2520,9 @@
   #ceil-body, #wt-body { padding: 0 0 110px; }
   .ceil-intro { margin: 22px var(--g) 0; font: 400 var(--fs-lead)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
   .ceil-note { margin: 20px var(--g) 0; font: 400 var(--fs-small)/1.55 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
-  :where(#screen-ceiling, #screen-weight) .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 8px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
+  :where(#screen-ceiling, #screen-weight, #screen-habits, #screen-moments, #screen-achievements) .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 8px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
     letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
-  :where(#screen-ceiling, #screen-weight) .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }   /* to the right edge, as Progress's section titles */
+  :where(#screen-ceiling, #screen-weight, #screen-habits, #screen-moments, #screen-achievements) .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }   /* to the right edge, as Progress's section titles */
 
   /* 3. Door rows (Home's and Progress's .hrow recipe): + Log a max, and Add your weight when there is no body weight yet. */
   :where(#screen-ceiling) .hrow { display: flex; align-items: center; gap: 14px; width: calc(100% - 2 * var(--g)); min-height: 64px; margin: 22px var(--g) 0;
@@ -4519,27 +4519,30 @@
   #home-overview .today-v.is-ok { color: var(--green-ink); }
 
 
-  /* ══ THE HABIT HALF OF PROGRESS (2026-10-19) ════════════════════════════════════════════════════════════
-     Two figures, the last seven days as a table, one door. The figures wear the scoreboard's face (Barlow
-     Condensed over a Space Mono caption) so they read as the same kind of thing as the numbers above them. */
-  #screen-plan .hab-figs { display: flex; gap: 10px; margin: 0 var(--g) 12px; }
-  #screen-plan .hab-fig { flex: 1; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); padding: 12px 14px; }
-  #screen-plan .hab-fig b { display: block; font: 900 30px/1 'Barlow Condensed', sans-serif; }   /* display: a scoreboard figure, like Your numbers above */
-  #screen-plan .hab-fig span { display: block; margin-top: 3px; font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  /* ══ THE HABIT FIGURES AND THE WEEK (2026-10-19) ════════════════════════════════════════════════════════
+     Two figures and the last seven days as a table. They were the habit half of Progress until THE SCOREBOARD
+     the same day; they live on the habits page now (#screen-habits, over the list of what you track), and
+     Progress keeps one door. The figures wear the scoreboard's face (Barlow Condensed over a Space Mono
+     caption) so they read as the same kind of thing as Your numbers. */
+  #screen-habits .hab-figs { margin-top: 18px; }
+  :where(#screen-plan, #screen-habits) .hab-figs { display: flex; gap: 10px; margin: 0 var(--g) 12px; }
+  :where(#screen-plan, #screen-habits) .hab-fig { flex: 1; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); padding: 12px 14px; }
+  :where(#screen-plan, #screen-habits) .hab-fig b { display: block; font: 900 30px/1 'Barlow Condensed', sans-serif; }   /* display: a scoreboard figure, like Your numbers above */
+  :where(#screen-plan, #screen-habits) .hab-fig span { display: block; margin-top: 3px; font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
 
   /* The week. The point is the SHAPE: a solid band on one row over a gap-toothed one says more about where
      the week went than any percentage. A cell is a day: filled = done, half = part of a counter, empty =
      missed, and nothing at all = not tracked that day (the roster is a timeline, never today's list). */
-  #screen-plan .hab-week { margin: 0 var(--g) 12px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); padding: 12px 14px; }
-  #screen-plan .hab-grid { display: grid; grid-template-columns: 84px repeat(7, minmax(0, 1fr)); gap: 6px; align-items: center; }
-  #screen-plan .hw-d { text-align: center; font: 400 var(--fs-label)/1 'Space Mono', monospace; color: var(--grey); }
-  #screen-plan .hw-d.is-today { color: var(--ink); font-weight: 700; }
-  #screen-plan .hw-n { font: 400 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #screen-plan .hw-c { height: 18px; border-radius: 4px; background: var(--sand); }
-  #screen-plan .hw-c.is-hit { background: var(--fill); }
-  #screen-plan .hw-c.is-part { background: var(--prog-track); }
+  :where(#screen-plan, #screen-habits) .hab-week { margin: 0 var(--g) 12px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); padding: 12px 14px; }
+  :where(#screen-plan, #screen-habits) .hab-grid { display: grid; grid-template-columns: 84px repeat(7, minmax(0, 1fr)); gap: 6px; align-items: center; }
+  :where(#screen-plan, #screen-habits) .hw-d { text-align: center; font: 400 var(--fs-label)/1 'Space Mono', monospace; color: var(--grey); }
+  :where(#screen-plan, #screen-habits) .hw-d.is-today { color: var(--ink); font-weight: 700; }
+  :where(#screen-plan, #screen-habits) .hw-n { font: 400 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  :where(#screen-plan, #screen-habits) .hw-c { height: 18px; border-radius: 4px; background: var(--sand); }
+  :where(#screen-plan, #screen-habits) .hw-c.is-hit { background: var(--fill); }
+  :where(#screen-plan, #screen-habits) .hw-c.is-part { background: var(--prog-track); }
   /* Not tracked that day: nothing drawn at all, so the app never invents a failure out of a habit that did not exist yet. */
-  #screen-plan .hw-c.is-pre { background: transparent; box-shadow: inset 0 0 0 1px var(--hair); }
+  :where(#screen-plan, #screen-habits) .hw-c.is-pre { background: transparent; box-shadow: inset 0 0 0 1px var(--hair); }
 
   /* ══ THE LIST (#screen-habits) ══════════════════════════════════════════════════════════════════════════
      One list, not two: the five that are the same for everyone, then whatever the athlete chose, then the
@@ -4668,64 +4671,79 @@
   /* Progress → Your numbers (careerCardHTML()): one white card, the level and its bar on top, the four numbers 2 × 2 with the next mark and a
      small bar each; the month's goal as a door-row-like line under it; then Your moments as paper rows (momentsHTML()). Green and grey only:
      nothing here asks for anything. */
-  #screen-plan .cs-card { position: relative; margin: 0 var(--g) 10px; padding: 14px 16px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
-  #screen-plan .cs-l { display: block; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
-  #screen-plan .cs-lvl { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; margin-top: 4px; }
-  #screen-plan .cs-lvl b { font: 900 var(--fs-display)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
-  #screen-plan .cs-lvl span { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
-  #screen-plan .cs-bar { display: block; height: 4px; margin-top: 10px; border-radius: 4px; background: var(--hair); overflow: hidden; }
-  #screen-plan .cs-bar i { display: block; height: 100%; border-radius: 4px; background: var(--fill); }
-  #screen-plan .cs-bar.sm { height: 3px; margin-top: 8px; }
-  #screen-plan .cs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-  #screen-plan .cs-n { min-width: 0; padding: 10px 12px; border-radius: 8px; background: var(--paper); }
-  #screen-plan .cs-n b { display: block; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
-  #screen-plan .cs-nm { display: block; margin-top: 2px; font: 600 var(--fs-small)/1.25 'Barlow', sans-serif; color: var(--ink); }
-  #screen-plan .cs-mk { display: block; margin-top: 6px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--grey); }
-  #screen-plan .cs-goal { display: flex; align-items: center; gap: 12px; margin: 0 var(--g) 10px; padding: 12px 14px 12px 16px; border: 1px solid var(--hair);
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-card { position: relative; margin: 0 var(--g) 10px; padding: 14px 16px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-l { display: block; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-lvl { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; margin-top: 4px; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-lvl b { font: 900 var(--fs-display)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-lvl span { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-bar { display: block; height: 4px; margin-top: 10px; border-radius: 4px; background: var(--hair); overflow: hidden; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-bar i { display: block; height: 100%; border-radius: 4px; background: var(--fill); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-bar.sm { height: 3px; margin-top: 8px; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-n { min-width: 0; padding: 10px 12px; border-radius: 8px; background: var(--paper); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-n b { display: block; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-nm { display: block; margin-top: 2px; font: 600 var(--fs-small)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-mk { display: block; margin-top: 6px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--grey); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-goal { display: flex; align-items: center; gap: 12px; margin: 0 var(--g) 10px; padding: 12px 14px 12px 16px; border: 1px solid var(--hair);
     border-radius: 12px; background: var(--row); }
-  #screen-plan .cs-ring { position: relative; flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ring); }
-  #screen-plan .cs-goal.is-done .cs-ring { border-color: var(--fill); background: var(--fill); }
-  #screen-plan .cs-goal.is-done .cs-ring::after { content: ''; position: absolute; left: 6px; top: 2px; width: 5px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
-  #screen-plan .cs-gb { min-width: 0; display: grid; gap: 3px; }
-  #screen-plan .cs-gl { font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); }
-  #screen-plan .prog-sec-n { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; color: var(--grey); }
-  #screen-plan .mo-list { margin: 0 var(--g); }
-  #screen-plan .mo { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--hair); }
-  #screen-plan .mo:first-child { border-top: 0; padding-top: 2px; }
-  #screen-plan .mo-list:not(.all) .mo:nth-child(n+7) { display: none; }
-  #screen-plan .mo.is-new { animation: moNew 2.4s ease-out; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-ring { position: relative; flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ring); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-goal.is-done .cs-ring { border-color: var(--fill); background: var(--fill); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-goal.is-done .cs-ring::after { content: ''; position: absolute; left: 6px; top: 2px; width: 5px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-gb { min-width: 0; display: grid; gap: 3px; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-gl { font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .prog-sec-n { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; color: var(--grey); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-list { margin: 0 var(--g); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--hair); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo:first-child { border-top: 0; padding-top: 2px; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-list:not(.all) .mo:nth-child(n+7) { display: none; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo.is-new { animation: moNew 2.4s ease-out; }
   @keyframes moNew { 0%, 40% { background: var(--tint); } 100% { background: transparent; } }
-  #screen-plan .mo-d { font: 700 var(--fs-label)/1.1 'Space Mono', monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--grey); }
-  #screen-plan .mo-d b { display: block; font: 900 var(--fs-title)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: 0; color: var(--ink); }
-  #screen-plan .mo-b { min-width: 0; display: grid; gap: 3px; justify-items: start; }
-  #screen-plan .mo-w { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
-  #screen-plan .mo-s { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
-  #screen-plan .mo-from { font: italic 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--clay-ink); quotes: "\201C" "\201D"; }   /* his words: the Coach's note's clay */
-  #screen-plan .mo-reply { padding: 4px 0; font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-decoration: underline; text-underline-offset: 3px; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-d { font: 700 var(--fs-label)/1.1 'Space Mono', monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--grey); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-d b { display: block; font: 900 var(--fs-title)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: 0; color: var(--ink); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-b { min-width: 0; display: grid; gap: 3px; justify-items: start; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-w { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-s { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-from { font: italic 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--clay-ink); quotes: "\201C" "\201D"; }   /* his words: the Coach's note's clay */
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-reply { padding: 4px 0; font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-decoration: underline; text-underline-offset: 3px; }
   /* Share, on every moment that can be drawn and on the month's goal once it is done (the share cards' pass, 2026-10-19). */
-  #screen-plan .mo-share { justify-self: start; margin-top: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 999px;
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-share { justify-self: start; margin-top: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 999px;
     background: var(--paper); color: var(--green-ink); cursor: pointer; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
-  #screen-plan .mo-share:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
-  #screen-plan .cs-share { width: 100%; min-height: 44px; margin-top: 14px; border: 0; border-radius: 12px; background: var(--btn); color: #fff; cursor: pointer;
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-share:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .cs-share { width: 100%; min-height: 44px; margin-top: 14px; border: 0; border-radius: 12px; background: var(--btn); color: #fff; cursor: pointer;
     font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
-  #screen-plan .mo-saw { margin-top: 3px; padding: 4px 8px; border-radius: 999px; background: var(--tint); font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px;
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-saw { margin-top: 3px; padding: 4px 8px; border-radius: 999px; background: var(--tint); font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px;
     text-transform: uppercase; color: var(--green-ink); }
-  #screen-plan .mo-more { display: block; margin: 2px var(--g) 0; padding: 12px 0; border: 0; background: none; font: 600 var(--fs-body)/1 'Barlow', sans-serif; color: var(--green-ink); cursor: pointer; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-more { display: block; margin: 2px var(--g) 0; padding: 12px 0; border: 0; background: none; font: 600 var(--fs-body)/1 'Barlow', sans-serif; color: var(--green-ink); cursor: pointer; }
   /* Progress → Achievements, Four Courts (Career Mode round 5; Amir's pick A on the page Achievements, 2026-10-19): the Next up card (the one the
      athlete is closest to, its line and bar; a tap opens its kind), then the four kinds as four tiles 2 × 2 (how many earned of how many, and the
      newest); a tile opens its kind in the sheet (openCourt()). Green and grey only: it asks for nothing (DS-01). From get_achievements() (stage80). */
-  #screen-plan .ac-next { display: block; width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 10px; padding: 14px 16px 16px; border: 1px solid var(--hair);
+  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-next { display: block; width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 10px; padding: 14px 16px 16px; border: 1px solid var(--hair);
     border-radius: 12px; background: var(--row); text-align: left; font: inherit; color: inherit; cursor: pointer; }
-  #screen-plan .ac-nm { display: block; margin-top: 4px; font: 900 var(--fs-head)/1.1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); }
-  #screen-plan .ac-s { display: block; margin-top: 4px; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
-  #screen-plan .ac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 var(--g) 10px; }
-  #screen-plan .ac-tile { min-width: 0; display: grid; gap: 2px; justify-items: start; padding: 12px; border: 1px solid var(--hair); border-radius: 12px;
+  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-nm { display: block; margin-top: 4px; font: 900 var(--fs-head)/1.1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-s { display: block; margin-top: 4px; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 var(--g) 10px; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-tile { min-width: 0; display: grid; gap: 2px; justify-items: start; padding: 12px; border: 1px solid var(--hair); border-radius: 12px;
     background: var(--row); text-align: left; font: inherit; color: inherit; cursor: pointer; }
-  #screen-plan .ac-k { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
-  #screen-plan .ac-n { margin-top: 4px; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
-  #screen-plan .ac-n small { margin-left: 4px; font: 600 var(--fs-small)/1 'Barlow', sans-serif; color: var(--grey); }
-  #screen-plan .ac-new { max-width: 100%; margin-top: 4px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey);
+  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-k { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-n { margin-top: 4px; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-n small { margin-left: 4px; font: 600 var(--fs-small)/1 'Barlow', sans-serif; color: var(--grey); }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-new { max-width: 100%; margin-top: 4px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* THE SCOREBOARD (2026-10-19, the audit The Long Rally; Amir: "we want to go with scoreboard"): the level as the card's quiet
+     foot (it led the card, with an XP figure beside it), and the two pages the doors open — Achievements and Your moments, whose
+     blocks are the same ones they wore on the tab (the rules above are scoped to all three screens). */
+  #screen-plan .cs-foot { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hair); }
+  #screen-plan .cs-lw { flex: none; font: 600 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--grey); }
+  #screen-plan .cs-foot .cs-bar { flex: 1; margin-top: 0; }
+  #screen-moments #mom-body, #screen-achievements #ach-body { padding: 4px 0 28px; }
+  #screen-achievements #ach-body > .ac-next:first-child { margin-top: 18px; }
+  /* A month's heading on Your moments: four honours of one month ran as four near-identical cards on the tab. */
+  #screen-moments .mom-month { display: flex; align-items: baseline; gap: 8px; margin: 22px var(--g) 6px;
+    font: 900 var(--fs-title)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--ink); }
+  #screen-moments .mom-month:first-child { margin-top: 14px; }
+  #screen-moments .mom-yr { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; color: var(--grey); }
+  #screen-moments .mom-month .prog-sec-n { margin-left: auto; }
+  #screen-moments .mom-none { margin: 20px var(--g); font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--grey); }
   /* A kind, opened (openCourt(), in the shared sheet): earned ones first with their day, then the rest with what earns them and, once started, a
      bar; the kind's nearest wears Next. */
   #hist-overlay .ac-list { margin-top: 6px; }
@@ -4905,6 +4923,17 @@
   .cyc-bar i.on { background: var(--clay-on-green); }
   .cyc-bar-solid { display: block; height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; }
   .cyc-bar-solid i { display: block; height: 100%; background: var(--clay-on-green); }
+  /* Amir's first sentence on the cover, and the way to the rest of it (THE SCOREBOARD, 2026-10-19: Amir picked "a teaser line and
+     a jump" for this card). A plain button, the width of the body: his line in italic, then Read it in mint. The cover keeps its
+     one strong thing — nothing here is clay. */
+  .cyc-note { display: block; width: 100%; margin: 20px 0 0; padding: 14px 0 0; border: 0; border-top: 1px solid rgba(255,255,255,.14); background: none;
+    text-align: left; font: inherit; color: inherit; cursor: pointer; }
+  .cyc-note-q { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    font: italic 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: rgba(255,255,255,.92); quotes: "\201C" "\201D"; }
+  .cyc-note-go { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font: 700 var(--fs-label)/1 'Space Mono', monospace;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--mint); }
+  .cyc-note-go i { font-style: normal; font-size: var(--fs-body); }
+  .cyc-note:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
   .cyc-wins-h { display: block; margin: 20px 0 2px; font: 700 var(--fs-label) 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.7); }
   .cyc-win { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-top: 1px solid rgba(255,255,255,.14);
     font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; }
@@ -5650,23 +5679,23 @@
        then where the cycle is, sessions done, the wins. It lived on Home until 2026-10-12. -->
   <div id="cycle-card-wrap"></div>
 
-  <!-- Your numbers (Amir, 2026-10-12: Personal records and Body weight moved here from Home). Career Mode round 5 (Amir, 2026-10-19:
-       "go with your choices about your numbers", the Scorecard): the career's card (the level and its bar, the four numbers with the next
-       mark), the month's goal, then Your moments, then Records and body with the two door rows. Without the career (offline with no copy,
-       the demo, the coach's preview) only the two rows, under Your numbers. paintNumbers(). -->
+  <!-- Your numbers, then the doors (THE SCOREBOARD, Amir 2026-10-19: "we want to go with scoreboard", direction A of the audit
+       The Long Rally). ONE card of four figures with the level under them, and then every long thing on this tab as a door row to
+       its own page: Personal records · Body weight · Daily habits · Achievements · Your moments. The training's own numbers come
+       first, the career's after them. Four section titles went with the move: the rows say what they are.
+       Without the career (offline with no copy, the demo, the coach's preview) the card and the last two doors are not drawn, and
+       Records, Body weight and the habits stand on their own. paintNumbers(). -->
   <h2 class="prog-sec" id="numbers-title">Your numbers</h2>
   <div id="career-card-wrap"></div>
-  <div id="career-courts-wrap"></div>
-  <div id="career-moments-wrap"></div>
-  <h2 class="prog-sec" id="records-title" hidden>Records and body</h2>
   <div id="ceiling-row-wrap"></div>
   <div id="weight-row-wrap"></div>
-
-  <!-- Your habits (2026-10-19, direction B's second half): two figures, the last seven days as a table, and ONE door to
-       the list. No per-habit page: a habit's own level and ladder were AA Proof's, and the career above already answers
-       how it is going with numbers that count the training too. paintHabitsBlock(). -->
-  <h2 class="prog-sec" id="habits-title" hidden>Your habits</h2>
+  <!-- The habits are ONE door now (2026-10-19): the two figures and the last seven days moved onto the page behind it, where
+       the list of what you track already lived. Home's Today card is the place a habit is ticked. paintHabitsBlock(). -->
   <div id="habits-block-wrap"></div>
+  <!-- Achievements (Four Courts) and Your moments are door rows here and pages behind them (#screen-achievements,
+       #screen-moments). They were 1,102 px of this tab until the audit. paintCareerCard(). -->
+  <div id="career-courts-wrap"></div>
+  <div id="career-moments-wrap"></div>
 
   <!-- The Game Plan (Amir, 2026-10-13): its section title, then ONE road of paper rows, a row per cycle (paintRoad()):
        Done (the one before the current opens its archive), Now (open), Up next, Locked. -->
@@ -5718,9 +5747,36 @@
   <div class="ceil-head">
     <button class="nav-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
     <div class="ceil-kick">Your habits</div>
-    <h1 class="ceil-title">What you track</h1>
+    <h1 class="ceil-title">Daily habits</h1>
   </div>
+  <!-- The two figures and the last seven days, which were on Progress until THE SCOREBOARD (2026-10-19), then what you
+       track. renderHabitList() paints both. -->
+  <div id="hab-figs-body"></div>
   <div id="hab-list-body"></div>
+</div>
+
+<!-- ═══ ACHIEVEMENTS ═══ Four Courts, on its own page since THE SCOREBOARD (2026-10-19): Next up, then the four kinds as
+     tiles, each opening its kind in the shared sheet (openCourt()). A sub-screen of Progress, reached from its door row
+     under Your numbers; never in the demo or the coach's preview (no get_achievements answer, so no door and no page). -->
+<div id="screen-achievements" class="screen">
+  <div class="ceil-head">
+    <button class="nav-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
+    <div class="ceil-kick">Your numbers</div>
+    <h1 class="ceil-title">Achievements</h1>
+  </div>
+  <div id="ach-body"></div>
+</div>
+
+<!-- ═══ YOUR MOMENTS ═══ every mark, achievement, line from Amir and honour, newest first and GROUPED BY MONTH (2026-10-19,
+     THE SCOREBOARD: on the tab it was a 716 px list that printed four honours of one month in a row). A sub-screen of
+     Progress, reached from its door row. renderMoments(). -->
+<div id="screen-moments" class="screen">
+  <div class="ceil-head">
+    <button class="nav-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
+    <div class="ceil-kick">Your numbers</div>
+    <h1 class="ceil-title">Your moments</h1>
+  </div>
+  <div id="mom-body"></div>
 </div>
 
 <!-- ═══ LIBRARY ═══ shared, app-wide content, in the Centre Court look (2026-10-13). One tab with a header (the eyebrow, the 44 px title) and ONE
@@ -9036,16 +9092,34 @@ function paintCycleCard() {
   const left = cycleDayNo(p.cur.endDate) - todayDayNo();
   const sd = cycDate(p.cur.startDate), ed = cycDate(p.cur.endDate);
   const dates = (sd && ed ? sd + ' – ' + ed : sd || ed) + (left >= 0 && left <= 14 ? ` · <b>${left} ${left === 1 ? 'day' : 'days'} left</b>` : '');
+  // Amir's first sentence, on the cover (THE SCOREBOARD, 2026-10-19; Amir picked direction B for this card: a teaser and a jump,
+  // not the whole note moved up). Until now the cover gave the name and two bars, and what the cycle was FOR sat 2,600 px below
+  // it inside the road. The words are not repeated: this is the same sentence the road's Now row leads with, and Read it goes
+  // there (openCycleNote()).
+  const msg = (p.cur.message && Array.isArray(p.cur.message.paragraphs)) ? p.cur.message.paragraphs.filter(Boolean) : [];
+  const lead = msg.length ? firstSentence(String(msg[0])).first : '';
+  const note = lead ? `<button type="button" class="cyc-note" onclick="openCycleNote()" aria-label="${esc('From Amir: ' + lead + ' Read the whole note.').replace(/"/g, '&quot;')}">
+      <q class="cyc-note-q">${esc(lead)}</q><span class="cyc-note-go">Read it<i aria-hidden="true">›</i></span></button>` : '';
   paintInto(wrap, `<div class="cyc-card">${photo}<div class="cyc-body">
       <span class="cyc-top">This cycle · ${p.cIdx + 1} of ${p.count}</span>
       ${name}
       ${dates ? `<span class="cyc-dates">${dates}</span>` : ''}
       <span class="cyc-row"><span class="cyc-k">Week ${p.wk.wk}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.wk)}</span>
       <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} sessions</small></span>${bar(p.planned, p.done)}</span>
+      ${note}
       ${wins}
     </div></div>`);
 }
 window.paintCycleCard = paintCycleCard;
+// Read it, on the cover's teaser (2026-10-19): the road's Now row, opened if the athlete had folded it, and scrolled to.
+function openCycleNote() {
+  const row = document.querySelector('#road-wrap .road-row.is-now');
+  if (!row) return;
+  const head = row.querySelector('.road-head');
+  if (!row.classList.contains('is-open') && head && head.tagName === 'BUTTON') toggleRoad(head);
+  setTimeout(() => row.scrollIntoView({ block: 'start', behavior: 'smooth' }), 0);
+}
+window.openCycleNote = openCycleNote;
 
 // Home between cycles (PROG-02): where This Week was, the next cycle (Progress's own Up next row, folded: roadRowHTML()) when the
 // roadmap has one, the one ask, Ready for Cycle N?, and one row that unfolds the cycle's day cards.
@@ -10574,7 +10648,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then <strong>Career</strong> (your level, <strong>Hold Serve</strong>: the weeks you've held in a row, and the next mark you're close to), then today's habits, ticked right there.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then <strong>Your numbers</strong> (your level, your four numbers and this month's goal), then <strong>Achievements</strong>, then <strong>Your moments</strong>, then your records and body weight, then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then <strong>Career</strong> (your level, <strong>Hold Serve</strong>: the weeks you've held in a row, and the next mark you're close to), then today's habits, ticked right there.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then <strong>Your numbers</strong> (your four numbers, your level and this month's goal), then one row each for your records, your body weight, your habits, your achievements and your moments — every one opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now. The card shows my first line. Tap <strong>Why this cycle matters</strong> for the rest of the note and <strong>Expected outcomes</strong> for what we're aiming to hit.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -10597,11 +10671,11 @@ const APP_GUIDE = [
   { icon: 'check-circle', title: 'Finishing a session',
     body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Counting</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
   { icon: 'activity', key: 'career', title: 'Career: your level',
-    body: `<p>Home has a <strong>Career</strong> row. It shows your level, the weeks you've held in a row and the next mark you're close to. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>counting</strong> until my side has it.</p><p>Tap the <strong>Career</strong> row to open <strong>Your numbers</strong> on Progress. Your four numbers are there: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks. Each one shows its next mark. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> sit under your numbers, in four groups: consistency, commitment, progress and resilience. <strong>Next up</strong> is the one you're closest to. Tap a group to see every achievement in it and what earns it. When a session leaves you one step short of one, its card tells you.</p><p>When I set you a goal for the month, it sits under your numbers. Under them, <strong>Your moments</strong> keeps your marks, your achievements, the notes I write you and the month's honours. <strong>Amir saw this</strong> under one means I've seen it. A new note from me shows on Home until you open it. To answer it, tap <strong>Reply on WhatsApp</strong>.</p>` },
+    body: `<p>Home has a <strong>Career</strong> row. It shows your level, the weeks you've held in a row and the next mark you're close to. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>counting</strong> until my side has it.</p><p>Tap the <strong>Career</strong> row to open <strong>Your numbers</strong> on Progress. Your four numbers are there: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers; it says how many you have and which one you're closest to. Open it for the four groups — consistency, commitment, progress and resilience — and tap a group to see every achievement in it and what earns it. When a session leaves you one step short of one, its card tells you.</p><p>When I set you a goal for the month, it sits under your numbers. The <strong>Your moments</strong> row opens the lot, month by month: your marks, your achievements, the notes I write you and the month's honours. <strong>Amir saw this</strong> under one means I've seen it. A new note from me shows on Home until you open it. To answer it, tap <strong>Reply on WhatsApp</strong>.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks held in a row',
     body: `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count on Home's <strong>Career</strong> row goes up. The same line says what's left this week. Miss a week and the count starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
-    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p><strong>Use your own photo</strong> puts a picture from your phone behind the card. Drag it to move it and pinch to zoom, or use the <strong>Zoom</strong> slider. <strong>Remove the photo</strong> puts the card back as it was. The picture stays on your phone: only the finished card goes anywhere, and only when you tap Share or Save image.</p><p>Everything in <strong>Your moments</strong> on Progress has its own <strong>Share</strong> — every mark, every achievement and every honour, however long ago you earned it. <strong>Share your card</strong>, under your numbers, makes a card of where you are right now: your level, your four numbers and your best lifts. The month's goal gets one once it's done, a new level gets one on the finished session, your result in <strong>The Open</strong> gets one on Crew, and <strong>Share the session</strong> on the finished card makes one of the session itself.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
+    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p><strong>Use your own photo</strong> puts a picture from your phone behind the card. Drag it to move it and pinch to zoom, or use the <strong>Zoom</strong> slider. <strong>Remove the photo</strong> puts the card back as it was. The picture stays on your phone: only the finished card goes anywhere, and only when you tap Share or Save image.</p><p>Everything in <strong>Your moments</strong>, behind its row on Progress, has its own <strong>Share</strong> — every mark, every achievement and every honour, however long ago you earned it. <strong>Share your card</strong>, under your numbers, makes a card of where you are right now: your level, your four numbers and your best lifts. The month's goal gets one once it's done, a new level gets one on the finished session, your result in <strong>The Open</strong> gets one on Crew, and <strong>Share the session</strong> on the finished card makes one of the session itself.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Once a week</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
@@ -10754,6 +10828,9 @@ function goTo(screen, historyId, keepContent) {
   // reason: a max saved during today's session, or a weight logged, would show stale until a reload. The Records
   // row counts up to a new best here (paintNumbers() runs ceilingCountUp() while Progress is the screen on show).
   if (screen === 'habits') renderHabitList();
+  // Progress's own pages (THE SCOREBOARD, 2026-10-19): built on every visit from the same copy the doors read.
+  if (screen === 'moments') renderMoments();
+  if (screen === 'achievements') renderAchievements();
   if (screen === 'plan') {
     paintNumbers();
     paintHabitsBlock();
@@ -10778,7 +10855,8 @@ function goTo(screen, historyId, keepContent) {
   // Update the global tab bar's active button. Personal Records and Body weight are reached from
   // Progress (Amir, 2026-10-12), so that tab stays lit while you are inside them.
   // Every screen lights the tab it belongs to (POL-01: Workout, Article and Archive lit none).
-  const litTab = ({ ceiling: 'plan', weight: 'plan', workout: 'workouts', article: 'workouts', archive: 'plan' })[screen] || screen;
+  const litTab = ({ ceiling: 'plan', weight: 'plan', workout: 'workouts', article: 'workouts', archive: 'plan',
+                    habits: 'plan', moments: 'plan', achievements: 'plan' })[screen] || screen;
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
     n.classList.toggle('active', n.dataset.tab === litTab);
     if (n.dataset.tab === litTab) n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');   // a screen reader says which tab is open
@@ -11236,25 +11314,33 @@ function habTickSession(dayKey) {
 // its consistency ladder and its history were AA Proof's, and the career on this screen already answers
 // "how am I doing" with numbers that count the training too.
 function paintHabitsBlock() {
-  const wrap = document.getElementById('habits-block-wrap'), head = document.getElementById('habits-title');
+  const wrap = document.getElementById('habits-block-wrap');
   if (!wrap) return;
-  const h = (habOn() && HAB_CFG && HAB_CFG.onboarded) ? habBlockHtml() : '';
+  const h = (habOn() && HAB_CFG && HAB_CFG.onboarded) ? habDoorHtml() : '';
   if (wrap.innerHTML !== h) wrap.innerHTML = h;
-  if (head) head.hidden = !h;
 }
-function habBlockHtml() {
+// ONE door on Progress (THE SCOREBOARD, 2026-10-19): the month's figure, the run under it. The two figures and the week's
+// table are on the page behind it now (habFigsHtml()), beside the list of what you track — they were 331 px of the tab, and
+// the seven days they drew are the seven Home's Today card already walks through.
+function habDoorHtml() {
   const H = window.AAHabits;
   const streak = H.dayStreak(), month = habDaysThisMonth();
-  const tracked = H.rosterOn(H.TKEY()).length;
+  const run = streak > 0 ? `${streak} day${streak === 1 ? '' : 's'} in a row` : 'Tick them on Home as the day goes';
+  return `<button type="button" class="hrow" onclick="goTo('habits')" aria-label="${esc('Daily habits: ' + month + ' days this month, ' + run).replace(/"/g, '&quot;')}">
+      ${hrowIc('habits')}<span class="hrow-b"><span class="hrow-l">Daily habits</span>
+        <span class="hrow-v"><span class="hrow-vv">${month} day${month === 1 ? '' : 's'}</span><small>this month · ${esc(run)}</small></span></span>
+      <span class="hrow-a" aria-hidden="true">›</span></button>`;
+}
+// The habits page's own head: the two figures and the last seven days, habit by habit (#hab-figs-body, renderHabitList()).
+function habFigsHtml() {
+  const H = window.AAHabits;
+  if (!habOn() || !HAB_CFG || !HAB_CFG.onboarded) return '';
+  const streak = H.dayStreak(), month = habDaysThisMonth();
   return `<div class="hab-figs">
       <div class="hab-fig"><b>${streak}</b><span>Day${streak === 1 ? '' : 's'} in a row</span></div>
       <div class="hab-fig"><b>${month}</b><span>Days this month</span></div>
     </div>
-    ${habWeekTableHtml()}
-    <button type="button" class="hrow" onclick="goTo('habits')">
-      ${hrowIc('habits')}<span class="hrow-b"><span class="hrow-l">Your habits</span>
-        <span class="hrow-v"><span class="hrow-vv">${tracked} tracked</span><small>add one, or stop one</small></span></span>
-      <span class="hrow-a" aria-hidden="true">›</span></button>`;
+    ${habWeekTableHtml()}`;
 }
 // The days THIS CALENDAR MONTH that counted — the same gate as the day streak, so the two figures can
 // never disagree about what a day is worth.
@@ -11307,6 +11393,8 @@ const HAB_SUGGEST = [
 ];
 function renderHabitList() {
   const body = document.getElementById('hab-list-body');
+  const figs = document.getElementById('hab-figs-body');
+  if (figs) figs.innerHTML = habFigsHtml();   // the two figures and the week's table (THE SCOREBOARD, 2026-10-19)
   if (!body || !habOn() || !HAB_CFG) return;
   const H = window.AAHabits;
   const core = H.HABITS.filter(hb => hb.core);
@@ -11450,6 +11538,10 @@ function hrowIc(kind) {
     why: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.4a2.6 2.6 0 1 1 3.9 2.2c-.9.5-1.4 1.1-1.4 2"/><path d="M12 16.9h.01"/>',
     ball: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3.2 3.2 3.2 9.6 0 12.8"/><path d="M18.4 5.6c-3.2 3.2-3.2 9.6 0 12.8"/>',
     career: '<path d="M4 20h5v-5h5v-5h6V5"/>',   // steps up: the career level (no rank's chevrons since round 5, L2)
+    // THE SCOREBOARD's two new doors (2026-10-19): a flag for the achievements, a calendar page for the moments. No metal and
+    // no rosette on either — this app draws no badge (round 5, L5).
+    ach: '<path d="M6 21V4"/><path d="M6 5h11.5l-2.8 3.8 2.8 3.8H6"/>',
+    moments: '<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3.5v3M16 3.5v3M3.5 10h17"/>',
   }[kind] || '';
   return `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${draw}</svg></span>`;
 }
@@ -12215,7 +12307,7 @@ window.goCareer = goCareer;
 // every award with its day (the marks' tiers and the achievements). Both are asked after a fresh profile answer and when Progress opens (at
 // most every 2 minutes), and kept in <id>_momentscache (never synced, _snapshot()). Never in the demo or the coach's preview.
 var MOM_T = null;            // { my: get_my_moments(), aw: get_awards(), ach: get_achievements(), at } or null
-var _momBusy = false, _momAt = 0, _momAll = false;
+var _momBusy = false, _momAt = 0;
 var _noteReadQ = {};         // days of Amir's lines read in this run: the row stays gone even before the server has it
 function momKey() { return ATHLETE_ID + '_momentscache'; }
 function loadMomentsCache() {
@@ -12267,15 +12359,15 @@ function paintNote() {
   } catch (e) { h = ''; }
   if (el.innerHTML !== h) el.innerHTML = h;
 }
-// A tap: the line is read (here at once, then on the server: mark_note_read(), the athlete themself only), and Progress opens on it.
+// A tap: the line is read (here at once, then on the server: mark_note_read(), the athlete themself only), and Your moments opens
+// on it. It opened Progress scrolled to the list until THE SCOREBOARD (2026-10-19) — the list is its own page now, so the tap
+// goes straight there and nobody reads the same line twice on the way.
 function openNote(day) {
   _noteReadQ[day] = 1;
   paintNote();
-  goTo('plan');
+  goTo('moments');
   setTimeout(() => {
-    const find = () => document.querySelector('#career-moments-wrap .mo[data-note="' + day + '"]');
-    let row = find();
-    if (row && !row.offsetParent) { momShowAll(); row = find(); }   // folded under Show all: open the list
+    const row = document.querySelector('#mom-body .mo[data-note="' + day + '"]');
     if (row) { row.scrollIntoView({ block: 'center' }); row.classList.add('is-new'); }
   }, 0);
   markNoteRead(day);
@@ -12302,13 +12394,15 @@ function paintCareerCard() {
   if (!cw || !mw) return;
   let c = '', m = '', a = '';
   try { c = careerCardHTML(); } catch (e) { c = ''; }
-  try { a = c ? courtsHTML() : ''; } catch (e) { a = ''; }
-  try { m = c ? momentsHTML() : ''; } catch (e) { m = ''; }
+  try { a = c ? courtsDoorHTML() : ''; } catch (e) { a = ''; }
+  try { m = c ? momentsDoorHTML() : ''; } catch (e) { m = ''; }
   if (c !== _ccHtml) { cw.innerHTML = c; _ccHtml = c; }
   if (aw && a !== _acHtml) { aw.innerHTML = a; _acHtml = a; }
   if (m !== _moHtml) { mw.innerHTML = m; _moHtml = m; }
-  const rt = document.getElementById('records-title');
-  if (rt) rt.hidden = !c;
+  // A page that is open repaints with the door that leads to it (an answer can land while the athlete is reading it).
+  const on = (document.querySelector('.screen.active') || {}).id;
+  if (on === 'screen-moments') renderMoments();
+  if (on === 'screen-achievements') renderAchievements();
 }
 function careerCardHTML() {
   if (!careerOnT() || !DATA) return '';
@@ -12318,14 +12412,15 @@ function careerCardHTML() {
   const pct = L.level_cost > 0 ? Math.max(0, Math.min(100, Math.round(L.xp_in_level / L.level_cost * 100))) : 0;
   const cells = catalogueOnT() ? careerMarkCells(p) : [];
   const fmt = v => v.toLocaleString('en-US');
-  const cell = x => `<div class="cs-n"><b>${fmt(x.value)}</b><span class="cs-nm">${esc(careerMarkWords(x.key, x.value))}</span>`
-    + `<span class="cs-mk">${x.next ? 'Next ' + fmt(x.next) : 'Every mark'}${x.key === 'weeks_held' && x.best > x.value ? ' · best ' + fmt(x.best) : ''}</span>`
-    + `<span class="cs-bar sm" aria-hidden="true"><i style="width:${x.pct}%"></i></span></div>`;
-  let h = `<div class="cs-card" role="group" aria-label="${esc('Level ' + L.level + ', ' + fmt(L.to_next) + ' XP to level ' + (L.level + 1)).replace(/"/g, '&quot;')}">
-    <span class="cs-l">Level</span>
-    <div class="cs-lvl"><b>${L.level}</b><span>${fmt(L.to_next)} XP to level ${L.level + 1}</span></div>
-    <span class="cs-bar" aria-hidden="true"><i style="width:${pct}%"></i></span>
+  // THE SCOREBOARD (2026-10-19, the audit The Long Rally; Amir: "we want to go with scoreboard"). The four numbers LEAD and the
+  // level is a quiet line under them. What went: the XP figure ("1,310 XP to level 12" — the one piece of arcade on a coach's
+  // screen, and no athlete knows what an XP is), each cell's "Next 25" and its own bar (five bars in one card; the nearest mark
+  // is on Home's Career row and on the finish card, where there is room to say what it means), and "best 7" on weeks held (a
+  // mark above the best run read as an error). Nothing on the server changed: the numbers and the level are exactly as they were.
+  const cell = x => `<div class="cs-n"><b>${fmt(x.value)}</b><span class="cs-nm">${esc(careerMarkWords(x.key, x.value))}</span></div>`;
+  let h = `<div class="cs-card" role="group" aria-label="${esc('Your numbers. Level ' + L.level + '.').replace(/"/g, '&quot;')}">
     ${cells.length ? `<div class="cs-grid">${cells.map(cell).join('')}</div>` : ''}
+    <div class="cs-foot"><span class="cs-lw">Level ${L.level}</span><span class="cs-bar" aria-hidden="true"><i style="width:${pct}%"></i></span></div>
     ${window.IS_PREVIEW ? '' : '<button type="button" class="cs-share" onclick="sharePlayerCard()">Share your card</button>'}</div>`;
   const g = MOM_T && MOM_T.my && MOM_T.my.goal;
   if (g && g.line) {
@@ -12393,10 +12488,31 @@ function momentsList() {
   out.forEach(x => { x.saw = !!(x.award_id && saw.has(x.award_id)); });
   return out.sort((a, b) => String(b.sort).localeCompare(String(a.sort)) || (a.kind === 'note' ? -1 : 0));
 }
+// Progress's door to Your moments (THE SCOREBOARD, 2026-10-19): the count as the figure, the newest moment as the quiet line.
+// The list itself is the page behind it (#screen-moments, renderMoments()); it was 716 px of the tab, the tallest block on it.
+function momentsDoorHTML() {
+  const list = momentsList();
+  if (!list.length) return '';
+  const top = list[0];
+  // A line from Amir is titled "From Amir" in the list, which says nothing on a door: the door carries his words themselves.
+  const sub = top.kind === 'note' && top.s ? top.s : top.w;
+  return `<button type="button" class="hrow" onclick="goTo('moments')" aria-label="${esc('Your moments: ' + list.length + '. Newest: ' + sub).replace(/"/g, '&quot;')}">
+    ${hrowIc('moments')}<span class="hrow-b"><span class="hrow-l">Your moments</span>
+      <span class="hrow-v"><span class="hrow-vv">${list.length}</span><small>${esc(sub)}</small></span></span>
+    <span class="hrow-a" aria-hidden="true">›</span></button>`;
+}
+// The page: every moment, newest first, under its month (2026-10-19). On the tab they ran as one flat list, so four honours of
+// the same month read as four near-identical cards in a row; a month's heading says what they are at once.
+function renderMoments() {
+  const body = document.getElementById('mom-body');
+  if (!body) return;
+  const h = momentsHTML();
+  body.innerHTML = h || `<p class="mom-none">Your marks, your achievements, Amir's lines and the month's honours land here as you earn them.</p>`;
+}
+window.renderMoments = renderMoments;
 function momentsHTML() {
   const list = momentsList();
   if (!list.length) return '';
-  const SHOW = 6;
   const row = (x, i) => {
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(x.day));
     const d = x.honour ? `<b>${esc(momMonth(x.day))}</b>${m ? m[1] : ''}` : m ? `<b>${m[3]}</b>${esc(momMonth(x.day))}` : '';
@@ -12409,12 +12525,20 @@ function momentsHTML() {
       + (x.kind === 'note' ? `<q class="mo-from">${esc(x.s)}</q>${reply}` : x.s ? `<span class="mo-s">${esc(x.s)}</span>` : '')
       + (x.saw ? '<span class="mo-saw">Amir saw this</span>' : '') + share + `</span></div>`;
   };
-  return `<h2 class="prog-sec" id="moments-title">Your moments <span class="prog-sec-n">${list.length}</span></h2>
-    <div class="mo-list${_momAll || list.length <= SHOW ? ' all' : ''}">${list.map(row).join('')}</div>`
-    + (list.length > SHOW && !_momAll ? `<button type="button" class="mo-more" onclick="momShowAll()">Show all ${list.length}</button>` : '');
+  // One block per month, newest month first. A moment's index in the FLAT list is what shareMoment() takes, so the rows keep it.
+  let out = '', month = '';
+  list.forEach((x, i) => {
+    const m = String(x.day || '').slice(0, 7);
+    if (m !== month) {
+      if (month) out += '</div>';
+      month = m;
+      const n = list.filter(y => String(y.day || '').slice(0, 7) === m).length;
+      out += `<h2 class="mom-month">${esc(momMonth(m + '-01', true))} <span class="mom-yr">${esc(m.slice(0, 4))}</span><span class="prog-sec-n">${n}</span></h2><div class="mo-list all">`;
+    }
+    out += row(x, i);
+  });
+  return out + (month ? '</div>' : '');
 }
-function momShowAll() { _momAll = true; _moHtml = ''; paintCareerCard(); }
-window.momShowAll = momShowAll;
 // ── Progress → Achievements: Four Courts (Career Mode round 5; Amir's pick A, 2026-10-19) ─────────────────────────────────────────────────────
 // get_achievements() (stage80) is every achievement the athlete can see: earned ones with their day, the rest with have and need from the
 // server's own measures, and `next`, the one to lead with. It comes with get_my_moments() and get_awards() (refreshMoments()) and is kept in the
@@ -12456,12 +12580,33 @@ function achLine(it) {
 }
 function achPct(it) { const n = Math.max(1, Number(it.need) || 1); return Math.max(0, Math.min(100, Math.round((Number(it.have) || 0) / n * 100))); }
 var _acHtml = '';
-function courtsHTML() {
+// Progress's door to Achievements (THE SCOREBOARD, 2026-10-19): earned of all as the figure, and what is closest as the quiet
+// line, so the one forward-looking thing stays in sight. The four kinds are the page behind it (renderAchievements()).
+function courtsDoorHTML() {
   const items = achItems();
   if (!items.length) return '';
   const earned = items.filter(i => i.day);
   const nx = MOM_T.ach.next && !MOM_T.ach.next.day ? items.find(i => i.id === MOM_T.ach.next.id) : null;
-  let h = `<h2 class="prog-sec" id="ach-title">Achievements <span class="prog-sec-n">${earned.length} of ${items.length}</span></h2>`;
+  const sub = nx ? momName(nx.name) + ' · ' + achLine(nx) : 'Every one of them, earned.';
+  return `<button type="button" class="hrow" onclick="goTo('achievements')" aria-label="${esc('Achievements: ' + earned.length + ' of ' + items.length + '. ' + sub).replace(/"/g, '&quot;')}">
+    ${hrowIc('ach')}<span class="hrow-b"><span class="hrow-l">Achievements</span>
+      <span class="hrow-v"><span class="hrow-vv">${earned.length} of ${items.length}</span><small>${esc(sub)}</small></span></span>
+    <span class="hrow-a" aria-hidden="true">›</span></button>`;
+}
+// The page: Next up, then the four kinds (#screen-achievements). It was a section of the tab until 2026-10-19.
+function renderAchievements() {
+  const body = document.getElementById('ach-body');
+  if (!body) return;
+  let h = '';
+  try { h = courtsHTML(); } catch (e) { h = ''; }
+  body.innerHTML = h;
+}
+window.renderAchievements = renderAchievements;
+function courtsHTML() {
+  const items = achItems();
+  if (!items.length) return '';
+  const nx = MOM_T.ach.next && !MOM_T.ach.next.day ? items.find(i => i.id === MOM_T.ach.next.id) : null;
+  let h = '';
   if (nx) {
     h += `<button type="button" class="ac-next" onclick="openCourt('${esc(nx.meaning)}', '${esc(nx.id)}')" aria-label="${esc('Next up: ' + momName(nx.name) + '. ' + achLine(nx)).replace(/"/g, '&quot;')}">
       <span class="cs-l">Next up</span><span class="ac-nm">${esc(momName(nx.name))}</span><span class="ac-s">${esc(achLine(nx))}</span>`

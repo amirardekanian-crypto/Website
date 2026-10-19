@@ -20,11 +20,13 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   pushes them, and `mergeStoredValue()` merges the log as a **union by day, the larger number per habit**
   (the scalar rule would delete a day the other phone logged). A finished session ticks `strength` here
   (`habTickSession()`), where AA Proof used to read it back off the server.
-- **Progress carries the habit half** (2026-10-19, Amir: "i want the 7-day habit table / and days in a row
-  and days this month / cut the per habit door / and create the door to the list"): two figures, the last
-  seven days as a table, and ONE door into the list. **There is no per-habit page** — a habit's own level and
-  its consistency ladder were AA Proof's, and the career above already answers how it is going with numbers
-  that count the training too. ⚠️ **Every cell of the table reads `rosterOn(ITS OWN DAY)`**, never today's
+- **Progress carries ONE habit door; the figures and the week are the page behind it** (2026-10-19, Amir:
+  "i want the 7-day habit table / and days in a row and days this month / cut the per habit door / and create
+  the door to the list", then THE SCOREBOARD the same day: "we want to go with scoreboard"). The door is the
+  month's figure with the run under it (**Daily habits · 8 days · this month · 2 days in a row**); behind it,
+  over the list of what you track, are the two figures and the last seven days as a table. **There is no
+  per-habit page** — a habit's own level and its consistency ladder were AA Proof's, and the career already
+  answers how it is going with numbers that count the training too. ⚠️ **Every cell of the table reads `rosterOn(ITS OWN DAY)`**, never today's
   list: a habit switched on midweek did not exist on Monday, and drawing it as three misses is the app
   inventing failures. The list (`#screen-habits`) is ONE list, not two — the five with no off switch, then
   whatever the athlete chose, then suggestions: Proof's three add-ons are suggestions among them, because the

@@ -29,20 +29,30 @@ const key = n => { const d = new Date(Date.now() - n * DAY); return d.getFullYea
     const { ctx, p } = await H.openProgram(browser, { seed: { _hab_cfg: CFG, _hab_log: LOG } });
     await p.evaluate(() => goTo('plan'));
     await p.waitForTimeout(400);
+    // THE SCOREBOARD (2026-10-19): Progress carries ONE habit door; the figures and the table are on the page behind it.
     const b = await p.evaluate(() => ({
-      title: !document.getElementById('habits-title').hidden,
-      figs: [...document.querySelectorAll('#screen-plan .hab-fig')].map(f => f.textContent.replace(/\s+/g, ' ').trim()),
-      rows: [...document.querySelectorAll('#screen-plan .hab-grid .hw-n')].map(n => n.textContent),
-      cells: document.querySelectorAll('#screen-plan .hab-grid .hw-c').length,
-      part: document.querySelectorAll('#screen-plan .hw-c.is-part').length,
+      doors: document.querySelectorAll('#habits-block-wrap .hrow').length,
+      name: (document.querySelector('#habits-block-wrap .hrow-l') || {}).textContent,
       door: (document.querySelector('#habits-block-wrap .hrow-vv') || {}).textContent,
-      perHabitDoors: document.querySelectorAll('#habits-block-wrap .hrow').length,
+      sub: (document.querySelector('#habits-block-wrap .hrow-v small') || {}).textContent,
+      onPlan: document.querySelectorAll('#screen-plan .hab-fig, #screen-plan .hab-grid').length,
     }));
-    t.check('Progress carries the habit half: the section, two figures, the table and ONE door', b.title && b.figs.length === 2 && b.rows.length === 5 && b.cells === 35 && b.perHabitDoors === 1, JSON.stringify(b));
+    t.check('Progress carries ONE habit door, named Daily habits, and neither the figures nor the table',
+      b.doors === 1 && b.name === 'Daily habits' && b.onPlan === 0, JSON.stringify(b));
+    t.check('the door is the month\'s figure with the run under it', /^\d+ days?$/.test(b.door || '') && /this month · 4 days in a row/.test(b.sub || ''), JSON.stringify([b.door, b.sub]));
+    await p.evaluate(() => goTo('habits'));
+    await p.waitForTimeout(400);
+    const g = await p.evaluate(() => ({
+      figs: [...document.querySelectorAll('#screen-habits .hab-fig')].map(f => f.textContent.replace(/\s+/g, ' ').trim()),
+      rows: [...document.querySelectorAll('#screen-habits .hab-grid .hw-n')].map(n => n.textContent),
+      cells: document.querySelectorAll('#screen-habits .hab-grid .hw-c').length,
+      part: document.querySelectorAll('#screen-habits .hw-c.is-part').length,
+      title: (document.querySelector('#screen-habits .ceil-title') || {}).textContent,
+    }));
+    t.check('the habits page: its title, two figures, the table of five habits over seven days', g.title === 'Daily habits' && g.figs.length === 2 && g.rows.length === 5 && g.cells === 35, JSON.stringify(g));
     t.check('the figures are the day streak and the days this month, both by the same gate',
-      /^4Days? in a row$/.test(b.figs[0]) && /^\d+Days this month$/.test(b.figs[1]), JSON.stringify(b.figs));
-    t.check('a counter left part way draws as part of the job, not as a miss', b.part >= 1, b.part);
-    t.check('the door says how many are tracked', b.door === '5 tracked', b.door);
+      /^4Days? in a row$/.test(g.figs[0]) && /^\d+Days this month$/.test(g.figs[1]), JSON.stringify(g.figs));
+    t.check('a counter left part way draws as part of the job, not as a miss', g.part >= 1, g.part);
     t.check('no page errors (Progress)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
@@ -53,12 +63,12 @@ const key = n => { const d = new Date(Date.now() - n * DAY); return d.getFullYea
     const cfg = Object.assign({}, CFG, { roster: [{ from: key(6), ids: ['strength', 'steps', 'sleep', 'fuel', 'water'] }] });
     const LOG = {}; [0, 1, 2, 3, 4, 5, 6].forEach(n => { LOG[key(n)] = { sleep: 8 }; });
     const { ctx, p } = await H.openProgram(browser, { seed: { _hab_cfg: cfg, _hab_log: LOG } });
-    await p.evaluate(() => { habToggleOn('mobility'); habToggleOn('mobility'); goTo('plan'); });
+    await p.evaluate(() => { habToggleOn('mobility'); habToggleOn('mobility'); goTo('habits'); });
     await p.waitForTimeout(400);
     const r = await p.evaluate(() => {
-      const names = [...document.querySelectorAll('#screen-plan .hab-grid .hw-n')].map(n => n.textContent);
+      const names = [...document.querySelectorAll('#screen-habits .hab-grid .hw-n')].map(n => n.textContent);
       const i = names.indexOf('Mobility');
-      const all = [...document.querySelectorAll('#screen-plan .hab-grid .hw-c')];
+      const all = [...document.querySelectorAll('#screen-habits .hab-grid .hw-c')];
       const row = all.slice(i * 7, i * 7 + 7);
       return { has: i >= 0, pre: row.filter(c => c.classList.contains('is-pre')).length, last: row[6].className };
     });

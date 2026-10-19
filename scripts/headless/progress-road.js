@@ -86,6 +86,24 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     t.check('the cover: the cycle\'s own picture (iron), loaded, in luminosity at about .66, masked from the left, with a scrim', !!c && c.img && /assets\/art\/cycles\/iron-v1\.webp$/.test(c.src) && c.loaded && c.blend === 'luminosity' && Math.abs(parseFloat(c.opacity) - 0.66) < 0.05 && /gradient/.test(c.mask) && c.scrim, JSON.stringify(c && [c.src, c.loaded, c.blend, c.opacity, c.mask, c.scrim]));
     t.check('the cover: its text is white (title, eyebrow, dates, small lines), the week number is the clay on green', !!c && c.white.every(([s, v]) => v.rgb === '255,255,255' && v.a >= 0.7) && c.week === 'rgb(224, 107, 67)', JSON.stringify(c && [c.white, c.week]));
     t.check('the cover: the bars stay (week and sessions), and the days-left banner and the header\'s dates line are gone', !!c && c.bars === 2 && !c.hasBanner, JSON.stringify(c && [c.bars, c.hasBanner]));
+    // THE SCOREBOARD (2026-10-19, Amir's pick B for this card): the cover carries Amir's first sentence and Read it, which opens
+    // the road's Now row and scrolls to it. The cycle's meaning was 2,600 px below the cover until then.
+    const n = await p.evaluate(() => {
+      const b = document.querySelector('#cycle-card-wrap .cyc-note');
+      return b ? { q: b.querySelector('.cyc-note-q').textContent.trim(), go: b.querySelector('.cyc-note-go').textContent.replace(/\s+/g, ' ').trim(), label: b.getAttribute('aria-label') } : null;
+    });
+    const first = (H.fixture().cycles[1].message.paragraphs[0] || '').split(/(?<=[.!?])\s+/)[0];
+    t.check('the cover: Amir\'s first sentence and Read it, and nothing of the rest of his note', !!n && n.q === first && /^Read it/.test(n.go) && /From Amir/.test(n.label || ''), JSON.stringify(n));
+    const jump = await p.evaluate(async () => {
+      const row = document.querySelector('#road-wrap .road-row.is-now');
+      row.querySelector('.road-head').click();                       // fold it first, so Read it has to open it
+      const folded = !row.classList.contains('is-open');
+      document.querySelector('.cyc-note').click();
+      await new Promise(r => setTimeout(r, 400));
+      const b = row.getBoundingClientRect();
+      return { folded, open: row.classList.contains('is-open'), top: Math.round(b.top), vh: window.innerHeight };
+    });
+    t.check('Read it opens the Now row if it was folded and brings it onto the screen', jump.folded && jump.open && jump.top < jump.vh, JSON.stringify(jump));
     t.check('no page errors (cover)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }

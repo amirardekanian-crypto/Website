@@ -295,7 +295,10 @@ const CONTROLS = '.sheet-back, .sheet-close, .acct-seg button, .hrow, .acct-sign
         signout: (() => { const s = m.querySelector('.acct-signout'), c = getComputedStyle(s); return { text: s.textContent, colour: c.color, bg: c.backgroundColor, border: c.borderTopWidth }; })(), tiles: m.querySelectorAll('.app-card-icon').length }; });
     t.check('Account: the name as the title, a mono line under it, the eyebrow', a.eyebrow === 'Your account' && a.title === 'Alex Rivera' && /Space Mono/.test(a.subFont) && /signed in on this phone/i.test(a.sub), JSON.stringify(a));
     t.check('Account: Theme is two buttons, Light chosen', a.seg.join() === 'Light:true,Dark:false', a.seg.join());
-    t.check('Account: Install, How the app works and Privacy are door rows (icon, ›)', a.rows.length === 3 && /Install the app/.test(a.rows[0]) && /How the app works/.test(a.rows[1]) && /Privacy/.test(a.rows[2]) && a.arrows.every(Boolean) && a.icons.every(Boolean), JSON.stringify(a.rows));
+    // Reminders (stage84, 2026-10-19) sits between Install and How the app works when push is ready, so the row is optional here.
+    t.check('Account: Install, How the app works and Privacy are door rows (icon, ›), with Reminders among them once push is ready',
+      a.rows.length >= 3 && /Install the app/.test(a.rows[0]) && /How the app works/.test(a.rows[a.rows.length - 2]) && /Privacy/.test(a.rows[a.rows.length - 1])
+      && a.rows.slice(1, -2).every(r => /Reminders/.test(r)) && a.arrows.every(Boolean) && a.icons.every(Boolean), JSON.stringify(a.rows));
     t.check('Account: Privacy is the notice, in a new tab', a.privacy === '/privacy.html|_blank', a.privacy);
     t.check('Account: Sign out is quiet clay text (no box)', a.signout.text === 'Sign out' && a.signout.colour === 'rgb(181, 70, 31)' && a.signout.bg === 'rgba(0, 0, 0, 0)' && a.signout.border === '0px', JSON.stringify(a.signout));
     // Theme

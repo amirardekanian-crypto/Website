@@ -97,7 +97,6 @@ function noStrip(browser) {
       const top = sel => { const e = document.querySelector('#screen-plan ' + sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
       const eyebrow = document.querySelector('#athlete-card-wrap .prog-eyebrow'), title = document.querySelector('#athlete-card-wrap .prog-title');
       const sec = [...document.querySelectorAll('#screen-plan .prog-sec')].filter(e => !e.hidden && getComputedStyle(e).display !== 'none').map(e => e.textContent.trim());
-      const rt = document.getElementById('records-title');
       const gp = document.querySelector('#road-wrap .prog-sec');
       const card = document.querySelector('#cycle-card-wrap .cyc-card');
       return { eyebrow: eyebrow && eyebrow.textContent.trim(), title: title && title.textContent.trim(), titleTag: title && title.tagName, titleSize: title && getComputedStyle(title).fontSize,
@@ -106,7 +105,7 @@ function noStrip(browser) {
         old: !!document.querySelector('#screen-plan .home-name'),
         y: { title: top('.prog-title'), badge: top('.sport-badge'), card: top('.cyc-card'), numbers: top('#numbers-title'), ceil: top('#ceiling-row-wrap .hrow'),
              weight: top('#weight-row-wrap .hrow'), plan: gp ? Math.round(gp.getBoundingClientRect().top + scrollY) : null, road: top('.road') },
-        sec, recordsTitle: rt && { hidden: rt.hidden, shown: getComputedStyle(rt).display !== 'none' }, career: !!document.querySelector('#career-card-wrap .cs-card, #career-moments-wrap .mo'),
+        sec, career: !!document.querySelector('#career-card-wrap .cs-card, #career-moments-wrap .hrow'),
         card: card && { tag: card.tagName, onclick: card.getAttribute('onclick'), arrow: !!card.querySelector('.cyc-top i'), text: card.innerText },
         gp: gp && { size: getComputedStyle(gp).fontSize, caps: getComputedStyle(gp).textTransform, color: getComputedStyle(gp).color, spacing: getComputedStyle(gp).letterSpacing } };
     });
@@ -117,9 +116,10 @@ function noStrip(browser) {
     const y = o.y;
     t.check('Progress order: header, This cycle card, Your numbers (Records, Body weight), then the Game Plan and its road',
       y.badge < y.card && y.card < y.numbers && y.numbers < y.ceil && y.ceil < y.weight && y.weight < y.plan && y.plan < y.road, JSON.stringify(y));
-    // Without the career (the demo's way: no profile) "Records and body" is in the page but hidden, and the two rows sit straight under Your numbers.
-    t.check('Progress: two section titles, Your numbers and Game Plan; "Records and body" is hidden without the career, and there is no career card', o.sec.join('|') === 'Your numbers|Game Plan'
-      && !!o.recordsTitle && o.recordsTitle.hidden && !o.recordsTitle.shown && !o.career, JSON.stringify([o.sec, o.recordsTitle, o.career]));
+    // THE SCOREBOARD (2026-10-19): two titles on the whole tab. Without the career (the demo's way: no profile) there is no career
+    // card and no Achievements or Your moments door either; Records and Body weight stand on their own under Your numbers.
+    t.check('Progress: two section titles, Your numbers and Game Plan, and no career card or career doors without the career',
+      o.sec.join('|') === 'Your numbers|Game Plan' && !o.career, JSON.stringify([o.sec, o.career]));
     t.check('Progress: the Game Plan title is 15 px capitals in green ink with a hairline to the edge',
       !!o.gp && o.gp.size === '15px' && o.gp.caps === 'uppercase' && o.gp.color === 'rgb(14, 74, 54)' && parseFloat(o.gp.spacing) > 0, JSON.stringify(o.gp));
     t.check('This cycle card on Progress: a plain card, no tap, no ›', !!o.card && o.card.tag === 'DIV' && !o.card.onclick && !o.card.arrow, JSON.stringify(o.card && [o.card.tag, o.card.onclick, o.card.arrow]));
@@ -146,19 +146,25 @@ function noStrip(browser) {
     t.check('Home with the career: the Career row is the one door (Daily habits became Today\u2019s card); Hold Serve folded into it (its own row is empty)',
       home.rows.join() === 'Career' && home.hold === '', JSON.stringify(home));
     await p.evaluate(() => goTo('plan'));
-    await p.waitForFunction(() => !!document.querySelector('#moments-title'), null, { timeout: 8000 }).catch(() => {});
+    await p.waitForFunction(() => !!document.querySelector('#career-moments-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
     await p.waitForTimeout(400);
     const o = await p.evaluate(() => {
       const y = sel => { const e = document.querySelector('#screen-plan ' + sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
       return { sec: [...document.querySelectorAll('#screen-plan .prog-sec')].filter(e => !e.hidden && getComputedStyle(e).display !== 'none').map(e => e.textContent.replace(/\s+/g, ' ').trim()),
-        y: { card: y('.cyc-card'), numbers: y('#numbers-title'), career: y('.cs-card'), goal: y('.cs-goal'), moments: y('#moments-title'), records: y('#records-title'), ceil: y('#ceiling-row-wrap .hrow'), weight: y('#weight-row-wrap .hrow'), plan: y('#road-wrap .prog-sec') },
+        y: { card: y('.cyc-card'), numbers: y('#numbers-title'), career: y('.cs-card'), goal: y('.cs-goal'), ceil: y('#ceiling-row-wrap .hrow'), weight: y('#weight-row-wrap .hrow'),
+             hab: y('#habits-block-wrap .hrow'), ach: y('#career-courts-wrap .hrow'), moments: y('#career-moments-wrap .hrow'), plan: y('#road-wrap .prog-sec') },
+        doors: ['#ceiling-row-wrap', '#weight-row-wrap', '#habits-block-wrap', '#career-courts-wrap', '#career-moments-wrap']
+          .map(w => { const l = document.querySelector(w + ' .hrow .hrow-l'); return l ? l.textContent.trim() : null; }).filter(Boolean),
         goal: (document.querySelector('.cs-goal') || {}).innerText };
     });
     // 2 marks (4 and 8 weeks held), the achievement, Amir's line and two honours
-    t.check('Progress with the career: four section titles, Your numbers, Your moments (6), Records and body, Game Plan', o.sec.join('|') === 'Your numbers|Your moments 6|Records and body|Game Plan', o.sec.join('|'));
+    t.check('Progress with the career: two section titles, Your numbers and Game Plan (THE SCOREBOARD, 2026-10-19)', o.sec.join('|') === 'Your numbers|Game Plan', o.sec.join('|'));
+    // This athlete has no habit config and no get_achievements answer, so those two doors are not drawn: the order is what is there.
+    t.check('Progress with the career: the doors in order under the card, the training\'s own first (Personal records, Body weight, then Your moments)',
+      o.doors.join('|') === 'Personal records|Body weight|Your moments', o.doors.join('|'));
     const y = o.y;
-    t.check('Progress with the career, in order: This cycle, Your numbers, the career\'s card, the goal, Your moments, Records and body, the two rows, the Game Plan',
-      y.card < y.numbers && y.numbers < y.career && y.career < y.goal && y.goal < y.moments && y.moments < y.records && y.records < y.ceil && y.ceil < y.weight && y.weight < y.plan, JSON.stringify(y));
+    t.check('Progress with the career, in order: This cycle, Your numbers, the card, the goal, the doors, the Game Plan',
+      y.card < y.numbers && y.numbers < y.career && y.career < y.goal && y.goal < y.ceil && y.ceil < y.weight && y.weight < y.moments && y.moments < y.plan, JSON.stringify(y));
     t.check('…the goal is Amir\'s line for this month', /goal · from Amir/i.test(o.goal || '') && /Four sessions a week, no gaps\./.test(o.goal || ''), o.goal);
     t.check('no page errors (Progress with the career)', p.errs.length === 0, p.errs.join(' | '));
     await shot(p, 'progress-career');

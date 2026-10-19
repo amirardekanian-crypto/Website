@@ -376,7 +376,11 @@
 // the line keeps the weeks, the pill keeps the word and is read out now), the Records row shouted "▲ 12 KG" with no period (it
 // says "▲ 12 kg since you started", the Records page's own words), and Amir's Pick drew as a name over an empty card.
 
-const CACHE = 'aap-v201';
+// v202: program.html changed (2026-10-19, THE SCOREBOARD — Amir: "we want to go with scoreboard", direction A of the audit The
+// Long Rally). Progress is one screen now: the cover carries Amir's first sentence and Read it, Your numbers is the four figures
+// with the level as its quiet foot (no XP figure, no next-mark bars), and Your moments, Achievements and the habits are door rows
+// to three pages — two of them new screens, #screen-moments (grouped by month) and #screen-achievements. 3,408 px → 2,176.
+const CACHE = 'aap-v202';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

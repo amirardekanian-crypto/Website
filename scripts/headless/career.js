@@ -299,12 +299,13 @@ async function trainingBase(browser, C) {
     await p.evaluate(() => goTo('plan'));
     await p.waitForTimeout(600);
     const o = await p.evaluate(() => {
-      const c = document.querySelector('#career-card-wrap .cs-card'), rt = document.getElementById('records-title');
-      return { card: !!c, lvl: c && c.querySelector('.cs-lvl b').textContent, to: c && c.querySelector('.cs-lvl span').textContent, grid: !!document.querySelector('#career-card-wrap .cs-grid'), goal: !!document.querySelector('.cs-goal'),
-        moments: !!document.getElementById('moments-title'), recordsShown: !!rt && !rt.hidden, rows: !!document.querySelector('#ceiling-row-wrap .hrow') && !!document.querySelector('#weight-row-wrap .hrow') };
+      const c = document.querySelector('#career-card-wrap .cs-card');
+      return { card: !!c, lvl: c && c.querySelector('.cs-lw').textContent, xp: c ? /XP/.test(c.innerText) : false, grid: !!document.querySelector('#career-card-wrap .cs-grid'), goal: !!document.querySelector('.cs-goal'),
+        moments: !!document.querySelector('#career-moments-wrap .hrow'), rows: !!document.querySelector('#ceiling-row-wrap .hrow') && !!document.querySelector('#weight-row-wrap .hrow') };
     });
-    C.check('Progress with only the XP switch: the career\'s card (level and XP to the next), no four numbers, no goal, no moments; Records and body and the two rows under it',
-      o.card && o.lvl === String(L10.level) && o.to === `${fmt(L10.to_next)} XP to level ${L10.level + 1}` && !o.grid && !o.goal && !o.moments && o.recordsShown && o.rows, JSON.stringify(o));
+    // THE SCOREBOARD (2026-10-19): the level is the card's quiet foot and the XP figure is gone from the athlete's view.
+    C.check('Progress with only the XP switch: the career\'s card is the level alone, no four numbers, no XP figure, no goal, no moments door; the two rows are there',
+      o.card && o.lvl === `Level ${L10.level}` && !o.xp && !o.grid && !o.goal && !o.moments && o.rows, JSON.stringify(o));
     C.check('Progress with only the XP switch: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -316,9 +317,9 @@ async function trainingBase(browser, C) {
     C.check(`${name}: get_profile and get_my_moments are never asked`, await calls(p, 'rpc:get_profile') === 0 && await calls(p, 'rpc:get_my_moments') === 0, JSON.stringify([await calls(p, 'rpc:get_profile'), await calls(p, 'rpc:get_my_moments')]));
     await p.evaluate(() => goTo('plan'));
     await p.waitForTimeout(500);
-    const pr = await p.evaluate(() => ({ card: !!document.querySelector('#career-card-wrap .cs-card'), moments: !!document.getElementById('moments-title'), records: !document.getElementById('records-title').hidden,
-      rows: !!document.querySelector('#ceiling-row-wrap .hrow') }));
-    C.check(`${name}: Progress has no career card and no moments, the title Records and body is hidden and the two rows are there`, !pr.card && !pr.moments && !pr.records && pr.rows, JSON.stringify(pr));
+    const pr = await p.evaluate(() => ({ card: !!document.querySelector('#career-card-wrap .cs-card'), moments: !!document.querySelector('#career-moments-wrap .hrow'),
+      ach: !!document.querySelector('#career-courts-wrap .hrow'), rows: !!document.querySelector('#ceiling-row-wrap .hrow') }));
+    C.check(`${name}: Progress has no career card and neither career door, and the two rows are there`, !pr.card && !pr.moments && !pr.ach && pr.rows, JSON.stringify(pr));
     C.check(`${name}: no page errors`, p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -355,9 +356,10 @@ async function trainingBase(browser, C) {
     await p.waitForTimeout(1200);
     await p.evaluate(() => goTo('plan'));
     await p.waitForTimeout(500);
-    const o = await p.evaluate(() => ({ note: document.getElementById('home-note-wrap').innerHTML.trim(), card: !!document.querySelector('#career-card-wrap .cs-card'), recordsTitle: !document.getElementById('records-title').hidden }));
-    C.check(`${name}: no Career row, no profile asked, no moments asked, no note, no career card on Progress`, (await row(p)) === null && await calls(p, 'rpc:get_profile') === 0 && await calls(p, 'rpc:get_my_moments') === 0
-      && await calls(p, 'rpc:get_awards') === 0 && o.note === '' && !o.card && !o.recordsTitle, JSON.stringify({ row: await row(p), asked: await calls(p, 'rpc:get_profile'), o }));
+    const o = await p.evaluate(() => ({ note: document.getElementById('home-note-wrap').innerHTML.trim(), card: !!document.querySelector('#career-card-wrap .cs-card'),
+      doors: document.querySelectorAll('#career-courts-wrap .hrow, #career-moments-wrap .hrow').length }));
+    C.check(`${name}: no Career row, no profile asked, no moments asked, no note, no career card and neither career door on Progress`, (await row(p)) === null && await calls(p, 'rpc:get_profile') === 0 && await calls(p, 'rpc:get_my_moments') === 0
+      && await calls(p, 'rpc:get_awards') === 0 && o.note === '' && !o.card && o.doors === 0, JSON.stringify({ row: await row(p), asked: await calls(p, 'rpc:get_profile'), o }));
     await ctx.close();
   }
   // 5. the habits row never says a level of its own in Career Mode (Proof's snapshot from yesterday said "Level 7")
@@ -444,7 +446,7 @@ async function openRW(browser, o = {}) {
   return H.openProgram(browser, Object.assign({ w: o.w || 390, h: 844, tz: 'UTC', prog: o.prog || prog(), hist: o.hist || [], stub, seed: o.seed || {}, query: o.query || '' }, o.opts || {}));
 }
 const goProgress = async p => { await p.evaluate(() => goTo('plan')); await p.waitForTimeout(500); };
-const momentsReady = p => p.waitForFunction(() => !!document.querySelector('#moments-title'), null, { timeout: 8000 }).catch(() => {});
+const momentsReady = p => p.waitForFunction(() => !!document.querySelector('#career-moments-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
 async function trainingLight(browser, C) {
   const OUT = H.outDir();
   const shot = (p, name) => p.screenshot({ path: path.join(OUT, name) }).catch(() => {});
@@ -473,8 +475,9 @@ async function trainingLight(browser, C) {
     const r2 = await row(o2.p);
     C.check('light, on: far from every mark, only this week\'s line is under "Level N"', r2 && r2.smalls.length === 1 && !(await o2.p.$('#home-career-wrap .career-next')), JSON.stringify(r2 && r2.smalls));
     await goProgress(o2.p);
-    const cells = await o2.p.evaluate(() => [...document.querySelectorAll('#career-card-wrap .cs-n')].map(n => n.querySelector('b').textContent + ' ' + n.querySelector('.cs-nm').textContent + ' | ' + n.querySelector('.cs-mk').textContent));
-    C.check('light, on: all four numbers show on Progress even when small or zero, each with its next mark', cells.join(' ; ') === '0 weeks held | Next 4 ; 3 sessions with Amir | Next 25 ; 1 personal best | Next 5 ; 5 comebacks | Next 10', cells.join(' ; '));
+    // The next mark left the card with THE SCOREBOARD (2026-10-19); the four numbers themselves still all show, small or zero.
+    const cells = await o2.p.evaluate(() => [...document.querySelectorAll('#career-card-wrap .cs-n')].map(n => n.querySelector('b').textContent + ' ' + n.querySelector('.cs-nm').textContent));
+    C.check('light, on: all four numbers show on Progress even when small or zero', cells.join(' ; ') === '0 weeks held ; 3 sessions with Amir ; 1 personal best ; 5 comebacks', cells.join(' ; '));
     await o2.ctx.close();
     // a number at 0 is never the nearest mark: 0 comebacks is 3 from 3, but "3 comebacks to 3 comebacks" says nothing, so Home stays quiet
     const z = rwProfile(10000, { sessions: 3, four: { consistency: { key: 'weeks_held', value: 0, best: 0 }, commitment: { key: 'sessions_with_amir', value: 3 }, progress: { key: 'personal_bests', value: 1 }, resilience: { key: 'comebacks', value: 0 } },
@@ -518,53 +521,73 @@ async function trainingLight(browser, C) {
     const card = await p.evaluate(() => {
       const c = document.querySelector('#career-card-wrap .cs-card');
       if (!c) return null;
-      return { label: c.getAttribute('aria-label'), l: c.querySelector('.cs-l').textContent.trim(), lvl: c.querySelector('.cs-lvl b').textContent, to: c.querySelector('.cs-lvl span').textContent.replace(/ /g, ' '),
-        bar: c.querySelector(':scope > .cs-bar i').style.width, text: c.innerText.replace(/\s+/g, ' '),
-        cells: [...c.querySelectorAll('.cs-n')].map(n => ({ v: n.querySelector('b').textContent, nm: n.querySelector('.cs-nm').textContent, mk: n.querySelector('.cs-mk').textContent, bar: n.querySelector('.cs-bar i').style.width })),
-        gridCols: getComputedStyle(c.querySelector('.cs-grid')).gridTemplateColumns.split(' ').length };
+      return { label: c.getAttribute('aria-label'), lw: c.querySelector('.cs-lw').textContent.trim(), xp: /XP/.test(c.innerText),
+        bar: c.querySelector('.cs-foot .cs-bar i').style.width, text: c.innerText.replace(/\s+/g, ' '),
+        cells: [...c.querySelectorAll('.cs-n')].map(n => ({ v: n.querySelector('b').textContent, nm: n.querySelector('.cs-nm').textContent, mk: !!n.querySelector('.cs-mk'), bar: !!n.querySelector('.cs-bar') })),
+        gridCols: getComputedStyle(c.querySelector('.cs-grid')).gridTemplateColumns.split(' ').length,
+        order: [...c.children].map(e => e.className.split(' ')[0]).join('|') };
     });
-    C.check('Your numbers: LEVEL, the level in display size, "N XP to level N+1" and its bar', !!card && card.l === 'Level' && card.lvl === String(L10.level) && card.to === `${fmt(L10.to_next)} XP to level ${L10.level + 1}`
-      && card.bar === Math.round(L10.xp_in_level / L10.level_cost * 100) + '%' && card.label === `Level ${L10.level}, ${fmt(L10.to_next)} XP to level ${L10.level + 1}`, JSON.stringify(card && [card.l, card.lvl, card.to, card.bar, card.label]));
-    C.check('Your numbers: the four numbers 2 x 2, each with its next mark and a bar toward it (weeks held also its best, as the run now is below it)',
+    // THE SCOREBOARD (2026-10-19): the four numbers lead and the level is the card's quiet foot. The XP figure, each cell's next
+    // mark and its bar, and "best 7" on weeks held are gone from the athlete's view (the nearest mark is on Home's Career row).
+    C.check('Your numbers: the four numbers first, then "Level N" and its bar as the foot, and no XP figure anywhere on the card',
+      !!card && card.order === 'cs-grid|cs-foot|cs-share' && card.lw === `Level ${L10.level}` && !card.xp
+      && card.bar === Math.round(L10.xp_in_level / L10.level_cost * 100) + '%' && card.label === `Your numbers. Level ${L10.level}.`,
+      JSON.stringify(card && [card.order, card.lw, card.xp, card.bar, card.label]));
+    C.check('Your numbers: the four numbers 2 x 2, each its figure and its name alone (no next mark, no bar of its own)',
       !!card && card.gridCols === 2 && JSON.stringify(card.cells) === JSON.stringify([
-        { v: '3', nm: 'weeks held', mk: 'Next 8 · best 7', bar: '38%' }, { v: '24', nm: 'sessions with Amir', mk: 'Next 25', bar: '96%' },
-        { v: '12', nm: 'personal bests', mk: 'Next 25', bar: '48%' }, { v: '5', nm: 'comebacks', mk: 'Next 10', bar: '50%' }]), JSON.stringify(card && [card.gridCols, card.cells]));
+        { v: '3', nm: 'weeks held', mk: false, bar: false }, { v: '24', nm: 'sessions with Amir', mk: false, bar: false },
+        { v: '12', nm: 'personal bests', mk: false, bar: false }, { v: '5', nm: 'comebacks', mk: false, bar: false }]), JSON.stringify(card && [card.gridCols, card.cells]));
     C.check('Your numbers: no rank, no badge name, no metal, no Grand Slam on the card', !!card && !RANKS.test(card.text) && !METALS.test(card.text) && !/Hold Serve|Century|Record Breaker|HARD TO KILL|Grand Slam|title/i.test(card.text), card && card.text);
     const goal = await p.evaluate(() => { const g = document.querySelector('#career-card-wrap .cs-goal'); return g ? { cls: g.className, l: g.querySelector('.cs-l').textContent.replace(/\s+/g, ' ').trim(), line: g.querySelector('.cs-gl').textContent.trim(), ring: !!g.querySelector('.cs-ring') } : null; });
     C.check('Your numbers: the month\'s goal, "<Month> goal · from Amir" and his line, a ring', !!goal && goal.l === monthName(monthStart(0)) + ' goal · from Amir' && goal.line === 'Four sessions a week, no gaps.' && goal.ring && !/is-done/.test(goal.cls), JSON.stringify(goal));
+    // The two career doors on the tab, and nothing of their lists left on it.
+    const doors = await p.evaluate(() => {
+      const d = sel => { const b = document.querySelector(sel); return b ? { l: b.querySelector('.hrow-l').textContent.trim(), v: b.querySelector('.hrow-vv').textContent.trim(), s: (b.querySelector('.hrow-v small') || {}).textContent.trim() } : null; };
+      return { ach: d('#career-courts-wrap .hrow'), mom: d('#career-moments-wrap .hrow'), onTab: document.querySelectorAll('#screen-plan .mo, #screen-plan .ac-tile, #screen-plan .ac-next').length };
+    });
+    C.check('Progress: Your moments is a door with its count and the newest moment, and nothing of the list is left on the tab',
+      !!doors.mom && doors.mom.l === 'Your moments' && doors.mom.v === '9' && doors.mom.s === MM.notes[0].line && doors.onTab === 0, JSON.stringify(doors));
+    await shot(p, 'light-progress-390.png');
+    const order = await p.evaluate(() => {
+      const y = sel => { const e = document.querySelector(sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
+      return { numbers: y('#numbers-title'), card: y('.cs-card'), goal: y('.cs-goal'), ceil: y('#ceiling-row-wrap .hrow'), weight: y('#weight-row-wrap .hrow'),
+        hab: y('#habits-block-wrap .hrow'), ach: y('#career-courts-wrap .hrow'), moments: y('#career-moments-wrap .hrow'), road: y('#road-wrap .prog-sec') };
+    });
+    // The habits door needs a habit config and the Achievements door a get_achievements answer; this athlete has neither, so the
+    // order is of the doors that are there. Their full set is checked in home-progress.js and in fourCourts() below.
+    const seq = ['numbers', 'card', 'goal', 'ceil', 'weight', 'hab', 'ach', 'moments', 'road'].map(k => order[k]).filter(v => v != null);
+    C.check('Progress: Your numbers, the card, the goal, then the doors (Records, Body weight, Your moments), then the Game Plan',
+      seq.length >= 6 && seq.every((v, i) => i === 0 || v > seq[i - 1]), JSON.stringify(order));
+    // The page behind the door: every moment, under a heading for its month.
+    await p.evaluate(() => goTo('moments'));
+    await p.waitForTimeout(300);
     const mo = await p.evaluate(() => ({
-      title: document.getElementById('moments-title').textContent.replace(/\s+/g, ' ').trim(),
-      rows: [...document.querySelectorAll('#career-moments-wrap .mo')].map(r => ({ kind: r.className.replace('mo ', '').replace('mo-', ''), shown: !!r.offsetParent, w: r.querySelector('.mo-w').textContent.trim(),
+      screen: (document.querySelector('.screen.active') || {}).id,
+      title: (document.querySelector('#screen-moments .ceil-title') || {}).textContent.trim(),
+      lit: [...document.querySelectorAll('#global-tabs .nav-item.active')].map(n => n.dataset.tab).join(),
+      months: [...document.querySelectorAll('#mom-body .mom-month')].map(h => h.textContent.replace(/\s+/g, ' ').trim()),
+      rows: [...document.querySelectorAll('#mom-body .mo')].map(r => ({ kind: r.className.replace('mo ', '').replace('mo-', ''), shown: !!r.offsetParent, w: r.querySelector('.mo-w').textContent.trim(),
         s: ((r.querySelector('.mo-s') || r.querySelector('.mo-from') || {}).textContent || '').trim(), saw: !!r.querySelector('.mo-saw'), href: (r.querySelector('.mo-reply') || {}).href || null,
         blank: r.querySelector('.mo-reply') ? r.querySelector('.mo-reply').target : null, note: r.dataset.note || null })),
-      more: (document.querySelector('.mo-more') || {}).textContent || null }));
+    }));
     const pm = monthName(monthStart(-1));
     const by = w => mo.rows.find(r => r.w === w);
-    // 2 marks (4 and 8 weeks held), 1 achievement, 2 of Amir's lines, 4 honours (the near miss is never shown) = 9
-    C.check('Your moments: the title with its count (9), six shown, and "Show all 9"', mo.title === 'Your moments 9' && mo.rows.length === 9 && mo.rows.filter(r => r.shown).length === 6 && mo.more === 'Show all 9', JSON.stringify([mo.title, mo.rows.length, mo.more]));
+    C.check('Your moments: its own page with the Progress tab lit, all nine shown, each under its month\'s heading',
+      mo.screen === 'screen-moments' && mo.title === 'Your moments' && mo.lit === 'plan' && mo.rows.length === 9 && mo.rows.every(r => r.shown) && mo.months.length >= 2, JSON.stringify([mo.screen, mo.title, mo.lit, mo.rows.length, mo.months]));
     C.check('Your moments: Amir\'s newest line is first, in his words, with Reply on WhatsApp (a new tab) under it', mo.rows[0].kind === 'note' && mo.rows[0].s === MM.notes[0].line && mo.rows[0].note === MM.notes[0].day
-      && !!mo.rows[0].href && /wa\.me|whatsapp/i.test(mo.rows[0].href) && decodeURIComponent(mo.rows[0].href).indexOf('About your note: “' + MM.notes[0].line + '”') >= 0 && mo.rows[0].blank === '_blank', JSON.stringify(mo.rows[0]));
+      && !!mo.rows[0].href && /wa\.me|whatsapp/i.test(mo.rows[0].href) && decodeURIComponent(mo.rows[0].href).indexOf('About your note: \u201c' + MM.notes[0].line + '\u201d') >= 0 && mo.rows[0].blank === '_blank', JSON.stringify(mo.rows[0]));
     C.check('Your moments: a mark is one row per tier, in the number\'s words ("8 weeks held in a row"), the newest tier first', !!by('8 weeks held in a row') && !!by('4 weeks held in a row')
       && mo.rows.indexOf(by('8 weeks held in a row')) < mo.rows.indexOf(by('4 weeks held in a row')), JSON.stringify(mo.rows.map(r => r.w)));
     C.check('Your moments: an achievement keeps its name (a name in capitals reads as a name) and its line', !!by('First Best') && by('First Best').s === 'Your first personal best. Not the last.', JSON.stringify(by('First Best')));
-    C.check('Your moments: honours say their month and what they were for (Most sessions, Most improved, Full month, Amir\'s Pick), read from the stored jsonb; a near miss is never shown',
+    C.check('Your moments: honours say their month and what they were for (Most sessions, Most improved, Full month, Amir\'s Pick, which carries a line of its own now), read from the stored jsonb; a near miss is never shown',
       !!by('Most sessions in ' + pm) && by('Most sessions in ' + pm).s === '14 sessions with Amir that month.' && !!by('Most improved in ' + pm) && by('Most improved in ' + pm).s === '+27.1% on Barbell Back Squat.'
-      && !!by('Full month: ' + pm) && by('Full month: ' + pm).s === 'All 4 training weeks held.' && !!by('Amir’s Pick for ' + pm) && !mo.rows.some(r => /near/i.test(r.w)), JSON.stringify(mo.rows.map(r => r.w)));
+      && !!by('Full month: ' + pm) && by('Full month: ' + pm).s === 'All 4 training weeks held.' && !!by('Amir\u2019s Pick for ' + pm) && by('Amir\u2019s Pick for ' + pm).s === 'Amir picked you that month.'
+      && !mo.rows.some(r => /near/i.test(r.w)), JSON.stringify(mo.rows.map(r => r.w + ' / ' + r.s)));
     C.check('Your moments: "Amir saw this" sits under the moments whose award id he marked Saw it (First Best, 8 weeks held), and under no other', mo.rows.filter(r => r.saw).map(r => r.w).sort().join() === '8 weeks held in a row,First Best', JSON.stringify(mo.rows.filter(r => r.saw).map(r => r.w)));
     C.check('Your moments: no other badge, no retired badge, no title, no Grand Slam, no metal', !mo.rows.some(r => /SPRINKLER|Sprinkler|CLOCKWORK|Clockwork|Grand Slam|Hold Serve|Century/.test(r.w + ' ' + r.s)) && !METALS.test(mo.rows.map(r => r.w + ' ' + r.s).join(' ')), JSON.stringify(mo.rows.map(r => r.w)));
-    await shot(p, 'light-progress-390.png');
-    await p.click('#career-moments-wrap .mo-more');
-    await p.waitForTimeout(200);
-    const all = await p.evaluate(() => ({ shown: [...document.querySelectorAll('#career-moments-wrap .mo')].filter(r => !!r.offsetParent).length, more: !!document.querySelector('.mo-more') }));
-    C.check('Show all 9 shows every moment and the button goes', all.shown === 9 && !all.more, JSON.stringify(all));
-    const order = await p.evaluate(() => {
-      const y = sel => { const e = document.querySelector(sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
-      const rt = document.getElementById('records-title');
-      return { numbers: y('#numbers-title'), card: y('.cs-card'), goal: y('.cs-goal'), moments: y('#moments-title'), records: y('#records-title'), ceil: y('#ceiling-row-wrap .hrow'), weight: y('#weight-row-wrap .hrow'), road: y('#road-wrap .prog-sec'),
-        recordsText: rt.textContent.trim(), recordsShown: !rt.hidden };
-    });
-    C.check('Progress: Your numbers, the card, the goal, Your moments, then Records and body with its two rows, then the Game Plan', order.numbers < order.card && order.card < order.goal && order.goal < order.moments && order.moments < order.records
-      && order.records < order.ceil && order.ceil < order.weight && order.weight < order.road && order.recordsShown && order.recordsText === 'Records and body', JSON.stringify(order));
+    await shot(p, 'light-moments-390.png');
+    const back = await p.evaluate(() => { document.querySelector('#screen-moments .nav-back').click(); return (document.querySelector('.screen.active') || {}).id; });
+    C.check('Your moments: the back arrow lands on Progress', back === 'screen-plan', back);
     C.check('Progress: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
     // a goal that is done: the ring fills green and the label says done; no goal this month: no goal card
@@ -579,8 +602,8 @@ async function trainingLight(browser, C) {
     await waitRow(n0.p);
     await goProgress(n0.p);
     await momentsReady(n0.p);
-    const ng = await n0.p.evaluate(() => ({ goal: !!document.querySelector('.cs-goal'), moments: !!document.getElementById('moments-title'), marks: document.querySelectorAll('#career-moments-wrap .mo').length }));
-    C.check('no goal this month and nothing from Amir: no goal card; the marks and the achievement are still the moments (3)', !ng.goal && ng.moments && ng.marks === 3, JSON.stringify(ng));
+    const ng = await n0.p.evaluate(() => ({ goal: !!document.querySelector('.cs-goal'), door: (document.querySelector('#career-moments-wrap .hrow-vv') || {}).textContent }));
+    C.check('no goal this month and nothing from Amir: no goal card; the marks and the achievement are still the moments (3)', !ng.goal && ng.door === '3', JSON.stringify(ng));
     await n0.ctx.close();
     // 320 px and dark: the card, the goal and the moments fit
     for (const [w, dark] of [[320, false], [320, true], [390, true]]) {
@@ -589,7 +612,7 @@ async function trainingLight(browser, C) {
       await goProgress(x.p);
       await momentsReady(x.p);
       await x.p.waitForTimeout(200);
-      const g = await x.p.evaluate(() => { const r = el => el.getBoundingClientRect(); const cs = document.querySelector('.cs-card'), mo = document.querySelector('#career-moments-wrap .mo-list');
+      const g = await x.p.evaluate(() => { const r = el => el.getBoundingClientRect(); const cs = document.querySelector('.cs-card'), mo = document.querySelector('#career-moments-wrap .hrow');
         return { side: document.documentElement.scrollWidth - innerWidth, card: Math.round(r(cs).right), moments: Math.round(r(mo).right), vw: innerWidth, cells: [...document.querySelectorAll('.cs-n')].map(n => Math.round(r(n).right)) }; });
       C.check(`Your numbers ${w}px${dark ? ' dark' : ''}: the card, its four numbers and the moments fit, no sideways scroll`, g.side <= 0 && g.card <= g.vw && g.moments <= g.vw && g.cells.every(v => v <= g.vw), JSON.stringify(g));
       await shot(x.p, `light-progress-${w}${dark ? '-dark' : ''}.png`);
@@ -613,9 +636,10 @@ async function trainingLight(browser, C) {
     await shot(p, 'light-home-note-390.png');
     await p.click('#home-note-wrap .from-amir');
     await p.waitForTimeout(900);
-    const s = await p.evaluate(day => { const row = document.querySelector('#career-moments-wrap .mo[data-note="' + day + '"]'); const r = row && row.getBoundingClientRect();
+    // THE SCOREBOARD (2026-10-19): the list is its own page, so the tap lands there, on that line, instead of Progress scrolled.
+    const s = await p.evaluate(day => { const row = document.querySelector('#mom-body .mo[data-note="' + day + '"]'); const r = row && row.getBoundingClientRect();
       return { screen: document.querySelector('.screen.active').id, row: !!row, isNew: !!row && row.classList.contains('is-new'), visible: !!row && !!row.offsetParent, inView: !!r && r.top >= 0 && r.bottom <= innerHeight }; }, MM.notes[0].day);
-    C.check('a tap on it opens Progress on that line (marked, scrolled into view)', s.screen === 'screen-plan' && s.row && s.isNew && s.visible && s.inView, JSON.stringify(s));
+    C.check('a tap on it opens Your moments on that line (marked, scrolled into view)', s.screen === 'screen-moments' && s.row && s.isNew && s.visible && s.inView, JSON.stringify(s));
     const rd = await params(p, 'mark_note_read');
     C.check('…and tells the server it was read: mark_note_read(athlete, that day), once', rd.length === 1 && rd[0].p_athlete_id === H.ID && rd[0].p_day === MM.notes[0].day, JSON.stringify(rd));
     await p.evaluate(() => goTo('home'));
@@ -640,7 +664,7 @@ async function trainingLight(browser, C) {
     const again = await params(lost.p, 'mark_note_read');
     C.check('a mark_note_read the server refused: the row is gone here at once, and the next answer tells the server again', first === 1 && again.length === 2 && await lost.p.evaluate(() => document.getElementById('home-note-wrap').innerHTML.trim() === ''), JSON.stringify([first, again.length]));
     await lost.ctx.close();
-    // no unread line, no row; a line folded under Show all is opened by the tap
+    // no unread line, no row; an old line far down the list is on the page like any other (there is no Show all any more)
     const quiet = await openRW(browser, { stub: { myMoments: myMomentsFx({ notes: [{ day: at(-9), line: 'New block starts Monday. Same standard.', award_id: null, read: true }] }) } });
     await waitRow(quiet.p);
     await quiet.p.waitForTimeout(500);
@@ -651,8 +675,9 @@ async function trainingLight(browser, C) {
     await fold.p.waitForFunction(() => !!document.querySelector('#home-note-wrap .from-amir'), null, { timeout: 8000 }).catch(() => {});
     await fold.p.click('#home-note-wrap .from-amir');
     await fold.p.waitForTimeout(900);
-    const f = await fold.p.evaluate(day => { const row = document.querySelector('#career-moments-wrap .mo[data-note="' + day + '"]'); return { visible: !!row && !!row.offsetParent, isNew: !!row && row.classList.contains('is-new') }; }, many.notes[0].day);
-    C.check('a line folded under Show all: the tap opens the whole list and marks that line', f.visible && f.isNew, JSON.stringify(f));
+    const f = await fold.p.evaluate(day => { const row = document.querySelector('#mom-body .mo[data-note="' + day + '"]'); const r = row && row.getBoundingClientRect();
+      return { visible: !!row && !!row.offsetParent, isNew: !!row && row.classList.contains('is-new'), inView: !!r && r.top >= 0 && r.bottom <= innerHeight }; }, many.notes[0].day);
+    C.check('an old line far down the list: the tap opens the page, marks that line and brings it into view', f.visible && f.isNew && f.inView, JSON.stringify(f));
     await fold.ctx.close();
     // dark: the row keeps the door rows' edge
     const dk = await openRW(browser, { opts: { dark: true }, stub: { myMoments: myMomentsFx() } });
@@ -1049,7 +1074,7 @@ async function trainingLight(browser, C) {
     await m.p.waitForTimeout(1500);
     const q2 = await m.p.evaluate(id => ({ csq: localStorage.getItem(id + '_csq'), done: !!document.querySelector('#complete-1.visible') }), H.ID);
     await goProgress(m.p);
-    const card = await m.p.evaluate(() => ({ card: !!document.querySelector('.cs-card'), moments: !!document.getElementById('moments-title') }));
+    const card = await m.p.evaluate(() => ({ card: !!document.querySelector('.cs-card'), moments: !!document.querySelector('#career-moments-wrap .hrow') }));
     C.check('the moments\' read refused: Done finishes, the queue empties, and Progress still shows the career\'s card (no moments, no goal)', q2.done && (!q2.csq || q2.csq === '[]') && card.card && !card.moments && !m.p.errs.length, JSON.stringify([q2, card, m.p.errs]));
     await m.ctx.close();
   }
@@ -1324,17 +1349,27 @@ async function fourCourts(browser, C) {
     const { ctx, p } = await openRW(browser, { facts: HOLD_FACTS, hist: ONE_DONE, stub: { myMoments: myMomentsFx(), achievements: achFx() } });
     await waitRow(p);
     await goProgress(p);
-    await p.waitForFunction(() => !!document.querySelector('#ach-title'), null, { timeout: 8000 }).catch(() => {});
-    const s = await p.evaluate(() => {
-      const t = document.getElementById('ach-title'), n = document.querySelector('#career-courts-wrap .ac-next');
+    await p.waitForFunction(() => !!document.querySelector('#career-courts-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
+    // THE SCOREBOARD (2026-10-19): Achievements is a door row on Progress and the four kinds are the page behind it.
+    const d = await p.evaluate(() => {
+      const b = document.querySelector('#career-courts-wrap .hrow');
       const y = sel => { const e = document.querySelector(sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
-      return t ? { title: t.textContent.replace(/\s+/g, ' ').trim(),
-        next: n && { l: n.querySelector('.cs-l').textContent, nm: n.querySelector('.ac-nm').textContent, s: n.querySelector('.ac-s').textContent, bar: (n.querySelector('.cs-bar i') || {}).style && n.querySelector('.cs-bar i').style.width },
-        tiles: [...document.querySelectorAll('#career-courts-wrap .ac-tile')].map(b => ({ k: b.querySelector('.ac-k').textContent, n: b.querySelector('.ac-n').textContent.replace(/\s+/g, ' ').trim(), nw: b.querySelector('.ac-new').textContent })),
-        order: [y('.cs-card'), y('#ach-title'), y('#moments-title')],
-        clay: [...document.querySelectorAll('#career-courts-wrap, #career-courts-wrap *')].map(e => getComputedStyle(e).color + ' ' + getComputedStyle(e).backgroundColor).join('|') } : null;
+      return b ? { l: b.querySelector('.hrow-l').textContent.trim(), v: b.querySelector('.hrow-vv').textContent.trim(), s: b.querySelector('.hrow-v small').textContent.trim(),
+        order: [y('.cs-card'), y('#career-courts-wrap .hrow'), y('#career-moments-wrap .hrow')] } : null;
     });
-    C.check('Four Courts: "Achievements 3 of 8" under Your numbers and above Your moments', !!s && s.title === 'Achievements 3 of 8' && s.order[0] < s.order[1] && s.order[1] < s.order[2], JSON.stringify(s && [s.title, s.order]));
+    C.check('Achievements: a door saying "3 of 8" with what is closest, under Your numbers and above Your moments',
+      !!d && d.l === 'Achievements' && d.v === '3 of 8' && d.s === 'Straight Talk · 2 more check-ins before a session.' && d.order[0] < d.order[1] && d.order[1] < d.order[2], JSON.stringify(d));
+    await p.evaluate(() => goTo('achievements'));
+    await p.waitForTimeout(300);
+    const s = await p.evaluate(() => {
+      const n = document.querySelector('#ach-body .ac-next');
+      return { screen: (document.querySelector('.screen.active') || {}).id, title: (document.querySelector('#screen-achievements .ceil-title') || {}).textContent.trim(),
+        lit: [...document.querySelectorAll('#global-tabs .nav-item.active')].map(x => x.dataset.tab).join(),
+        next: n && { l: n.querySelector('.cs-l').textContent, nm: n.querySelector('.ac-nm').textContent, s: n.querySelector('.ac-s').textContent, bar: (n.querySelector('.cs-bar i') || {}).style && n.querySelector('.cs-bar i').style.width },
+        tiles: [...document.querySelectorAll('#ach-body .ac-tile')].map(b => ({ k: b.querySelector('.ac-k').textContent, n: b.querySelector('.ac-n').textContent.replace(/\s+/g, ' ').trim(), nw: b.querySelector('.ac-new').textContent })),
+        clay: [...document.querySelectorAll('#ach-body, #ach-body *')].map(e => getComputedStyle(e).color + ' ' + getComputedStyle(e).backgroundColor).join('|') };
+    });
+    C.check('Achievements: its own page, titled Achievements, with the Progress tab lit', s.screen === 'screen-achievements' && s.title === 'Achievements' && s.lit === 'plan', JSON.stringify([s.screen, s.title, s.lit]));
     C.check('Four Courts: Next up names the closest one with its line and bar (Straight Talk, 2 more check-ins, 92%)',
       !!s && !!s.next && s.next.l === 'Next up' && s.next.nm === 'Straight Talk' && s.next.s === '2 more check-ins before a session.' && s.next.bar === '92%', JSON.stringify(s && s.next));
     C.check('Four Courts: four tiles in order, each with earned of all and the newest (a capitals name reads as a name)', !!s && JSON.stringify(s.tiles) === JSON.stringify([
@@ -1345,7 +1380,7 @@ async function fourCourts(browser, C) {
     C.check('Four Courts: no clay anywhere in the section (it asks for nothing, DS-01)', !!s && !CLAY.test(s.clay), s && s.clay.slice(0, 300));
     await p.screenshot({ path: path.join(OUT, 'four-courts-390.png'), fullPage: true }).catch(() => {});
     // 2. a tile opens its kind: earned first with the day, then the rest furthest along first, Next on the nearest, a bar once started
-    await p.click('#career-courts-wrap .ac-tile:nth-child(1)');
+    await p.click('#ach-body .ac-tile:nth-child(1)');
     await p.waitForTimeout(300);
     const k = await p.evaluate(() => {
       const ov = document.getElementById('hist-overlay');
@@ -1362,7 +1397,7 @@ async function fourCourts(browser, C) {
     await p.waitForTimeout(300);
     C.check('Back closes the kind', await p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')));
     // 3. Next up's tap opens its kind
-    await p.click('#career-courts-wrap .ac-next');
+    await p.click('#ach-body .ac-next');
     await p.waitForTimeout(300);
     C.check('Next up opens its kind (Commitment)', await p.evaluate(() => { const ov = document.getElementById('hist-overlay'); return ov.classList.contains('visible') && ov.querySelector('.readiness-title').textContent === 'Commitment'; }));
     // 4. the nudge: one step short of a held week, of a check-in total; nothing otherwise
@@ -1370,6 +1405,8 @@ async function fourCourts(browser, C) {
       week: achNudgeHTML({ weekLeft: 1, checkin: true }), week0: achNudgeHTML({ weekLeft: 0, checkin: false }), two: achNudgeHTML({ weekLeft: 2, checkin: false }) }));
     C.check('the nudge: one more session this week gives Back to Back', /One more session this week and you get Back to Back\./.test(nud.week), nud.week);
     C.check('the nudge: none when the session holds the week itself or two are left (Straight Talk at 23 of 25 with no check-in today is two away)', nud.week0 === '' && nud.two === '', JSON.stringify(nud));
+    const ab = await p.evaluate(() => { document.querySelector('#screen-achievements .nav-back').click(); return (document.querySelector('.screen.active') || {}).id; });
+    C.check('Achievements: the back arrow lands on Progress', ab === 'screen-plan', ab);
     C.check('Four Courts: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -1378,10 +1415,12 @@ async function fourCourts(browser, C) {
     const { ctx, p } = await openRW(browser, { w: 320, facts: HOLD_FACTS, hist: ONE_DONE, stub: { myMoments: myMomentsFx(), achievements: achFx({ checkins: 23 }) } });
     await waitRow(p);
     await goProgress(p);
-    await p.waitForFunction(() => !!document.querySelector('#ach-title'), null, { timeout: 8000 }).catch(() => {});
+    await p.waitForFunction(() => !!document.querySelector('#career-courts-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
+    await p.evaluate(() => goTo('achievements'));
+    await p.waitForTimeout(300);
     const n = await p.evaluate(() => achNudgeHTML({ weekLeft: 3, checkin: true }));
     C.check('the nudge: today\'s check-in makes 24 of 25, so the next one gives Straight Talk', /Answer the check-in before your next session and you get Straight Talk\./.test(n), n);
-    const fit = await p.evaluate(() => { const r = [...document.querySelectorAll('#career-courts-wrap .ac-next, #career-courts-wrap .ac-tile')].map(e => e.getBoundingClientRect().right); return { right: Math.max(...r), vw: innerWidth, sideways: document.documentElement.scrollWidth > innerWidth + 1 }; });
+    const fit = await p.evaluate(() => { const r = [...document.querySelectorAll('#ach-body .ac-next, #ach-body .ac-tile')].map(e => e.getBoundingClientRect().right); return { right: Math.max(...r), vw: innerWidth, sideways: document.documentElement.scrollWidth > innerWidth + 1 }; });
     C.check('320 px: Next up and the tiles fit, no sideways scroll', fit.right <= fit.vw && !fit.sideways, JSON.stringify(fit));
     await ctx.close();
   }
@@ -1391,8 +1430,8 @@ async function fourCourts(browser, C) {
     await waitRow(p);
     await goProgress(p);
     await momentsReady(p);
-    const o = await p.evaluate(() => ({ title: !!document.getElementById('ach-title'), moments: !!document.getElementById('moments-title'), card: !!document.querySelector('.cs-card') }));
-    C.check('no get_achievements answer: no Achievements section, Your numbers and Your moments as before', !o.title && o.moments && o.card, JSON.stringify(o));
+    const o = await p.evaluate(() => ({ door: !!document.querySelector('#career-courts-wrap .hrow'), moments: !!document.querySelector('#career-moments-wrap .hrow'), card: !!document.querySelector('.cs-card') }));
+    C.check('no get_achievements answer: no Achievements door, Your numbers and the Your moments door as before', !o.door && o.moments && o.card, JSON.stringify(o));
     C.check('no answer: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
