@@ -1,5 +1,22 @@
 # S&C Program Platform — JSON Schema Guide
 
+> **This file is not split, and is not read whole.** A pre-commit guard (`scripts/check_parity.py`) parses two of its tables, so the sections stay in one file.
+> Jump to the one you need; the rules that must never break are in [`docs/rules/`](docs/README.md).
+
+| Section | Line |
+|---|---|
+| [AI Generation Guide (for producing a new client JSON)](#ai-generation-guide-for-producing-a-new-client-json) | 3 |
+| [Architecture Overview](#architecture-overview) | 187 |
+| [High-Level Shape](#high-level-shape) | 200 |
+| [How `currentCycleIndex` Drives the Home Screen](#how-currentcycleindex-drives-the-home-screen) | 223 |
+| [Field Reference](#field-reference) | 247 |
+| [Common Workflows](#common-workflows) | 1091 |
+| [Flexible Day Structure Examples](#flexible-day-structure-examples) | 1135 |
+| [Library tab — Train section (on-demand workouts)](#library-tab--train-section-on-demand-workouts) | 1169 |
+| [Library tab — Read section (articles / blog)](#library-tab--read-section-articles--blog) | 1367 |
+| [Migration Notes (from the old schema)](#migration-notes-from-the-old-schema) | 1489 |
+
+
 ## AI Generation Guide (for producing a new client JSON)
 
 **Role:** You are generating a client JSON file for a fitness coaching web app.

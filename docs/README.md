@@ -35,10 +35,24 @@ A monolith is its own index: one line per section, each line linking to that sec
 |---|---|---|
 | [`../PROGRAM-APP.md`](../PROGRAM-APP.md) | [`ref/program-app/`](ref/program-app/) | 49 |
 | [`../HABITS.md`](../HABITS.md) | [`ref/habits/`](ref/habits/) | 19 |
+| [`../COACH_DASHBOARD.md`](../COACH_DASHBOARD.md) | [`ref/coach-dashboard/`](ref/coach-dashboard/) | 9 |
+| [`../CODEBASE.md`](../CODEBASE.md) | [`ref/codebase/`](ref/codebase/) | 6 |
+| [`../XP_SYSTEM.md`](../XP_SYSTEM.md) | [`ref/xp-system/`](ref/xp-system/) | 19 |
+| [`../career/PROCEDURES.md`](../career/PROCEDURES.md) | [`ref/career-procedures/`](ref/career-procedures/) | 29 |
+| [`../career/CAREER_MODE.md`](../career/CAREER_MODE.md) | [`ref/career-mode/`](ref/career-mode/) | 17 |
+
+`SCHEMA.md` is the exception: `scripts/check_parity.py` parses two of its tables, so it stays one file and carries a jump table at the top instead.
+`.claude/COACHING-PRINCIPLES.md` is the other: `scripts/check_rule_index.py` parses its rule index, and that index is already the pattern everything here copies.
 
 A section of 20 KB or more with two or more sub-headings is split again into a folder with its own `INDEX.md`. Nothing is reworded in a split: every line of the monolith still exists, byte for byte, in exactly one file.
 
 ## House rules for these files
+### Why the rules layer was not mined out of the reference
+
+Every rule that must never break was already in `CLAUDE.md`, which is why that file had grown to 99 KB. Those sections are the twelve rules files, moved verbatim. Lifting more lines out of the reference would make a second copy of a rule — the exact fault `scripts/check_twins.js` exists to catch. So the reference keeps the full account and the rules files stay the one short place a rule is stated.
+
+A NEW rule goes in its area's rules file, one line, with its ID. Its story goes in the reference section it belongs to, or in `record/`.
+
 
 - **A rule's wording and its ID never change in a move.** `VOL-8`, `CUE-7`, `PRC-29`,
   `GAME-14`, `D20`, `REL-01`, `NAV-01`, `TWIN-1` and the rest keep their exact text. Where

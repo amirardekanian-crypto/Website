@@ -10,7 +10,7 @@ Web3Forms email). You turn it into a working account and hand him a message to
 paste into WhatsApp. Target: under two minutes, no questions asked unless
 something is genuinely ambiguous.
 
-The form at [`proof.html`](../../proof.html) collects exactly three things:
+The form at [`proof.html`](../../../proof.html) collects exactly three things:
 **display name · email · WhatsApp**.
 
 > ⚠️ **There are no secret links any more** (retired 2026-09-07). `public.athlete_keys`

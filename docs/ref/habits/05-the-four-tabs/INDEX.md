@@ -35,7 +35,7 @@ on the phone either way. Never in the demo or a coach preview; the embed has no 
 
 ## The parts
 
-- [01 · TODAY — the daily loop](01-01-today-the-daily-loop.md)
+- [01 · TODAY — the daily loop](01-01-today-the-daily-loop/INDEX.md)
 - [The wall is SEVEN DAYS, and nothing older is kept](02-the-wall-is-seven-days-and-nothing-older-is-kept.md)
 - [02 · PROGRESS — where do I stand](03-02-progress-where-do-i-stand.md)
 - [03 · CREW — everyone else](04-03-crew-everyone-else.md)
