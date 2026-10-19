@@ -55,5 +55,6 @@ photos"* and *"Let people zoom in or out manually and move their image if they a
   name on and off, long names, and every normal sample once on the athlete's own picture, zoomed and dragged) and
   `node scripts/headless/highlight-reel.js` (62). A change to what a card draws ships with a **CACHE bump** (sharecard.js is in
   sw.js's SHELL): this pass is `aap-v193`.
-- **Still Amir's to read:** every Farsi word on a card is a draft in `FA` in `assets/js/sharecard.js`, the pass's new lines included
-  (the mark's four lines, the honours, the Open, the player card, the level, the goal, the session and the mantra).
+- **The Farsi is read and approved** (Amir, 2026-10-19). He was shown the thirteen cards drawn in Farsi and the written list of every
+  new line (https://claude.ai/artifact/Sww6XioHxhpZi1z92Cd4hu) and said *"The Farsi is fine, leave it"*. The words in `FA` are his now;
+  a Farsi word added after that day is a draft again until he reads it. What is still open: a look at the cards on a real phone.

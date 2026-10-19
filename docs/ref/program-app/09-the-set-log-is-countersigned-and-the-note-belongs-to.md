@@ -137,7 +137,7 @@ costs more than one tap.
     + Log a max opens in the lift's own measure with a unit button (`chooseCeilingUnit()`, `cf-unit`; it opens the same menu). **Wins are per measure
     too** (`cycleBestSet()`, `cycleWins()` keys name + measure, `winText()` words a win in its own unit: *+10 lb, same reps*,
     *+1 plate, same reps*), and a kg win against a lb one is no win. **Share cards say the measure** (`spec.u`;
-    `assets/js/sharecard.js` `unitW()`; the Farsi words for lb and plates are drafts for Amir).
+    `assets/js/sharecard.js` `unitW()`; Amir approved the Farsi words for lb and plates on 2026-10-19).
   - **Which movements earn a record by themselves** (Amir, 2026-10-18: *"those movements are mainly isolate or don't count as a
     strength exercise, but one handed cable machines are used to build strength and are not isolate exercises"*): a strength
     pattern only (`RECORD_PATTERNS`: squat, hinge, single-leg, the two pushes and the two pulls), no impact. **Isolation no

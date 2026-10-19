@@ -188,14 +188,17 @@
     capTail: 'Coached by @amirardekanian · amirardekani.com',
   };
 
-  // ⚠️ FARSI: DRAFTS, EVERY ONE. Amir writes or approves every Farsi word before it ships (the design page, decision 2). The voice is
-  // the Farsi site's: warm and colloquial ("همون"). A lift's name and a cycle's name stay in English, as they are in the app.
+  // ✅ FARSI: READ AND APPROVED (Amir, 2026-10-19). He was shown the thirteen cards drawn in Farsi, and the written list of every
+  // line this pass added (https://claude.ai/artifact/Sww6XioHxhpZi1z92Cd4hu), and said: "The Farsi is fine, leave it." So the words
+  // below are his, not drafts. ⚠️ A Farsi word ADDED after that day is a draft again until he reads it: the rule did not change,
+  // only the words it has already covered. The voice is the Farsi site's: warm and colloquial ("همون"). A lift's name and a cycle's
+  // name stay in English, as they are in the app.
   // DECIDED (Amir, 2026-10-17: "Keep all three Farsi choices"): Iranian (Shamsi) dates on a Farsi card (۲۵ مهر ۱۴۰۵, not the design
   // page's Gregorian); the athlete's name in English letters (a programme holds no Farsi spelling of it); "Career Mode" in English on the
-  // level card (levelEye). The words below are still drafts waiting for his read.
+  // level card (levelEye).
   const FA = {
     coach: 'امیر اردکانی · مربی',
-    // The weight words (drafts for Amir to read, like every word here): پوند = lb and پلیت = a plate on a machine's stack (the number
+    // The weight words: پوند = lb and پلیت = a plate on a machine's stack (the number
     // before it says how many, so Farsi has one form for "plate" and "plates"; EN has two, "1 plate" and "6 plates").
     kg: 'کیلو', lb: 'پوند', plate: 'پلیت', plates: 'پلیت', reps: () => 'تکرار', sessions: 'جلسه', weeks: 'هفته', cycles: 'دوره', newBests: 'رکورد جدید',
     personalRecords: 'رکوردهای شخصی',
@@ -253,7 +256,7 @@
     levelEye: 'Career Mode',
     levelHead: n => [['سطح '], [n, 1]],
     levelLine: () => [['سطح حرفه‌ای تو. هیچ‌وقت صفر نمی‌شه.']],
-    // ── The 2026-10-19 pass, in Farsi. DRAFTS, every one: Amir reads them before they ship.
+    // ── The 2026-10-19 pass, in Farsi. Read and approved by Amir the same day (see the head of this table).
     mantra: 'یه مربی تو جیبت',
     markEye: 'یک نشانهٔ تازه',
     markWords: { weeks_held: 'هفته پشت سر هم', sessions_with_amir: 'جلسه با امیر', personal_bests: 'رکورد شخصی', comebacks: 'برگشت' },

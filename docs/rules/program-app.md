@@ -119,7 +119,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   `PROGRAM-APP.md` → *Highlight Reel*). `assets/js/sharecard.js` draws the cards on the phone; program.html decides which win and which numbers from
   the app's own rules (`winText()`'s `shape` and `share`, the records, the retest comparison). A card never claims beyond the sets (PROG-01: the set
   as lifted, never the estimate, no RPE-only win), never shows body weight, a check-in answer or pain, and nothing leaves the phone until Share or
-  Save image. **Every Farsi word on a card is in sharecard.js's `FA` table, a draft for Amir.** sharecard.js is in sw.js's SHELL, served cache-first
+  Save image. **Every Farsi word on a card is in sharecard.js's `FA` table; Amir read and approved them on 2026-10-19, and a word added after that day is a draft until he reads it.** sharecard.js is in sw.js's SHELL, served cache-first
   by its plain URL: a change to what it draws ships with a CACHE bump (a comment alone does not need one), and `node scripts/headless/sharecard.js`
   runs after it (every card, both sizes, both languages, text inside its box). Farsi cards: Shamsi dates, the athlete's name in English letters.
 - **The cards had their own design pass** (2026-10-19; `PROGRAM-APP.md` → *The share cards' design pass*; the page
@@ -129,9 +129,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   honour, open, player, level, goal and session); badge, title and quest went with the cut. **Every achievement has a card, whenever it was earned**:
   Share sits on every row of Your moments (Amir: *"all the achievements should get a card"*), not only on a band that happened to be drawn.
   **⚠️ A card never names another athlete** — the crew's yes covers the Bell inside the app, not Instagram — so an honour and an Open result carry
-  their own place and the size of the field. **Any card can take the athlete's own photo as its ground**, dragged and pinched into place (Amir:
-  *"like strava's photos"*, *"let people zoom in or out manually and move their image"*): it is made smaller and drawn on the phone, is never
-  uploaded and is never stored, and the preview is two layers (`paint({layer})`, `reground()`) so a finger costs one drawImage, not a new layout.
+  their own place and the size of the field. **Any card can take the athlete's own photo as its ground**, dragged and pinched into place
+  (Amir: *"like strava's photos"*): made smaller and drawn on the phone, never uploaded, never stored; the preview is two layers
+  (`paint({layer})`, `reground()`) so a finger costs one drawImage, not a new layout.
 - **Signing out never loses training** (NAV-02, 2026-09-27; `PROGRAM-APP.md` → *Your account*): the initials
   button (top right of every tab screen, in the page: it scrolls away with the screen since 2026-10-12, so it never sits
   over content) → Sign out runs `signOutSafely()`: the waiting report, the
