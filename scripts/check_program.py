@@ -32,7 +32,11 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   is used
   --proven        the athlete has PROVEN the volume in our own logs, so an exercise may carry
                   more than 4 sets (Amir, 2026-09-26: a self-described "pro" is not proof)
-  --no-backoff    this cycle has no back-off week, ONLY because Amir said so for this athlete
+  --taper TEXT    the competition (and its date) this cycle's final week tapers into, ONLY one Amir named
+                  (REC-4, 2026-10-19): the final week's back-off is then required. Without it, the spec's
+                  "taper: ..." line is used ("-" = none), and with none the final week trains as written:
+                  a number there warns, and so does a note when no lift is flagged for a retest (a
+                  Testing week cuts volume on some lifts, in words). (--no-backoff, its opposite, is retired.)
   --new           a new athlete's first cycle: no weighted exercise under 8 reps, no working
                   circuits (supersets) at all, and a first-week note. Also switched on by
                   itself when currentCycleIndex is 0
@@ -69,6 +73,7 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
 
 In the full run it also reads the spec's "obligations:" block (the notes this cycle must carry)
 and fails any key that no notes card's `tags` (or, for backoff/week1, the week note on that week) carries.
+`backoff` belongs on that list only with a taper (REC-4), and listing it without one warns.
 
 The athlete profile (a ```profile block at the top of the spec, else the one stored at the top of
 the coaching log, which --spine-sql returns) sets --floor (aim: strength-muscle), --proven, the
@@ -772,12 +777,17 @@ def week_notes(cyc):
 
 def check_week_notes(data, args):
     """The week notes of the cycle being built (cycles[currentCycleIndex].weekNotes).
-    Every cycle is 4 loading weeks + 1 back-off week, and the card never changes mid-cycle, so
-    the back-off only happens if something tells the athlete. Before 2026-09-26 that was a
-    notes card nobody was required to write: 16 of 34 live programmes had none. The app shows a
-    note in its own week and nowhere else (program.html weekNoteHTML), so each is data. The final
-    week's back-off is required, week 1's note is required for a new athlete, and design may
-    assign a note to any other week that differs from the card (a testing week, a lighter week)."""
+    The card never changes mid-cycle, so a week that differs from it only happens if something tells
+    the athlete. Before 2026-09-26 that was a notes card nobody was required to write: 16 of 34 live
+    programmes had none. The app shows a note in its own week and nowhere else (program.html
+    weekNoteHTML), so each is data. Week 1's note is required for a new athlete, and design may
+    assign a note to any other week that differs from the card (a testing week, a lighter week).
+    The final week trains as written (REC-4, Amir 2026-10-19: "it would be 2 slow week for no
+    reason", the next cycle's week 1 being the slow one): its back-off is required only when the
+    cycle tapers into a competition Amir named (--taper / the spec's taper: line), and a lower dose
+    there without one warns. A week that holds the retests may cut volume on some lifts, in words
+    (a titled Testing week); a final-week note with neither warns. Until that day every cycle
+    failed here without a back-off."""
     cycles = data.get('cycles') or []
     i = data.get('currentCycleIndex') or 0
     cyc = cycles[i] if 0 <= i < len(cycles) else {}
@@ -824,17 +834,35 @@ def check_week_notes(data, args):
                     and not re.search(r"\bevery (set|lift|exercise|weighted set|rpe)\b|\beverything\b", text, re.I):
                 warn(f"{where}: the text limits only some lifts, but a number (rpeCap / rpeDrop) covers every lift that week: the "
                      "session bar shows it and the set colours judge against it. For some lifts, keep the words and drop the number", 'PRC-15')
-        # The final week is the back-off and the app names it so (weekNoteLast() in program.html): no title needed.
+        # The final week's title is judged below: the app calls an untitled one the Back-off week (weekNoteLast()).
         if key not in ('first', 'last') and 1 < wk < total and not n.get('title'):
             warn(f"{where}: give week {wk}'s note a title (Testing week, Lighter week) so the athlete sees what kind of week it is", 'PRC-15')
     key, last = found.get(total, (None, None))
-    if args.no_backoff:
-        info('no back-off week this cycle (--no-backoff: only on Amir\'s word)')
-    elif not isinstance(last, dict):
-        fail(f"cycle {cn}: no week note on the final week (week {total}). Every cycle ends with a back-off week: "
-             "design sets the dose (setsDrop / rpeDrop / rpeCap) and engage writes the text", 'REC-4', 'PRC-15')
-    elif not any(k in last for k in ('setsDrop', 'rpeDrop', 'rpeCap')):
-        fail(f"cycle {cn} weekNotes.{key}: name the back-off dose as numbers (setsDrop, rpeDrop or rpeCap), not only words", 'PRC-15')
+    if args.taper:
+        info(f"cycle {cn}: the final week tapers into a competition ({args.taper}), so it is the back-off (REC-4)")
+        if not isinstance(last, dict):
+            fail(f"cycle {cn}: no week note on the final week (week {total}). This cycle tapers into {args.taper}: "
+                 "design sets the back-off dose (setsDrop / rpeDrop / rpeCap) and engage writes the text", 'REC-4', 'PRC-15')
+        elif not any(k in last for k in ('setsDrop', 'rpeDrop', 'rpeCap')):
+            fail(f"cycle {cn} weekNotes.{key}: name the back-off dose as numbers (setsDrop, rpeDrop or rpeCap), not only words", 'PRC-15')
+    elif isinstance(last, dict):
+        # The second exception (Amir, the same day): "if there are tests that needs to be done, then yes we can reduce
+        # volume on some". A Testing week, the cut in words, since a number covers every lift (PRC-15).
+        retests = any(test_flag_ok((it or ex).get('test')) for _d, _b, ex, it in exercises(data))
+        where = f"cycle {cn} weekNotes.{key}"
+        if any(k in last for k in ('setsDrop', 'rpeDrop', 'rpeCap')):
+            warn(f"{where}: a lower dose on the final week, with no competition named. The next cycle's week 1 is already "
+                 "the slow week, so the final week trains as written: take the numbers off (a Testing week cuts volume on "
+                 "some lifts in words, since a number covers every lift), or put the competition Amir named on the spec's "
+                 "taper: line", 'REC-4')
+        elif not retests:
+            warn(f"{where}: a note on the final week, with no competition named and no lift flagged for a retest. The final "
+                 "week trains as written: drop the note, or say at the checkpoint why this week differs", 'REC-4')
+        if not last.get('title'):
+            warn(f"{where}: give the final week's note a title (Testing week): untitled, the app calls it the Back-off week", 'REC-4', 'PRC-15')
+    if 'backoff' in spec_obligations(args) and not args.taper:
+        warn("obligations list backoff, but no competition is named: the final week trains as written. Drop the key, "
+             "or name the competition on the spec's taper: line", 'REC-4', 'COM-9')
     if args.new and not isinstance(found.get(1, (None, None))[1], dict):
         fail(f"cycle {cn}: a new athlete's first cycle needs a week 1 note (weekNotes \"1\": how week 1 finds their weights, with the number)", 'PRG-5', 'PRC-15')
     elif 1 not in found:
@@ -1831,7 +1859,8 @@ def main():
     ap.add_argument('--tables'); ap.add_argument('--new', action='store_true'); ap.add_argument('--reentry', action='store_true')
     ap.add_argument('--log', help=argparse.SUPPRESS)  # retired 2026-09-26: the tables are counted, not typed
     ap.add_argument('--floor', action='store_true'); ap.add_argument('--floor-except')
-    ap.add_argument('--proven', action='store_true'); ap.add_argument('--no-backoff', action='store_true')
+    ap.add_argument('--proven', action='store_true'); ap.add_argument('--taper')
+    ap.add_argument('--no-backoff', action='store_true', help=argparse.SUPPRESS)  # retired 2026-10-19: no back-off is the default (REC-4)
     ap.add_argument('--female', action='store_true', help=argparse.SUPPRESS)  # retired 2026-09-26
     ap.add_argument('--cap', type=float, default=None); ap.add_argument('--ban'); ap.add_argument('--spec')
     ap.add_argument('--week'); ap.add_argument('--spine'); ap.add_argument('--art')
@@ -1872,6 +1901,11 @@ def main():
         if why: args.reentry, args.reentry_why = True, why
     if args.reentry and not args.new:
         info(f"re-entry cycle ({args.reentry_why}): VOL-11's 8-rep floor applies, and a retest is 8RM or more")
+    # The final week is a back-off only when the cycle tapers into a competition Amir named (REC-4, 2026-10-19).
+    if args.no_backoff:
+        info('--no-backoff is retired and did nothing: the final week trains as written unless --taper or a taper: line names a competition (REC-4)')
+    if not args.taper:
+        args.taper = next((t for t in spec_lines(args, 'taper') if t and t != '-'), '')
     if not args.week and spec_lines(args, 'week'):
         args.week = spec_lines(args, 'week')[0]  # the spec's example week (2026-09-26)
     check_structure(data, args, ctx['spine'], ctx.get('names')); check_pill_layers(data, ctx)

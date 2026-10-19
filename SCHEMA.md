@@ -83,7 +83,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
       },
       "weekNotes": {
         "1": { "rpeCap": 7, "text": "What week 1 does differently, with the number." },
-        "5": { "setsDrop": 1, "rpeCap": 6, "text": "What the back-off week does, never below RPE 6." }
+        "5": { "setsDrop": 1, "rpeCap": 6, "text": "What the taper week does before the competition, never below RPE 6." }
       }
     },
     {
@@ -177,7 +177,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 - `message.outcomes[]` → 3–6 concrete, measurable expected outcomes.
 - `teaser` → hype section for the NEXT cycle only. Omit the whole `teaser` object if there is no next cycle planned.
 - `art` (cycle and day) → the picture word; see `cycles[n]` and "How a day finds its picture".
-- `weekNotes` → required on every new cycle: week 1 and the back-off week (see below).
+- `weekNotes` → week 1 when it differs (always for a new athlete), the final week only as a taper before a competition Amir named or a Testing week for its retests (REC-4), any other week that differs (see below).
 - `rx` → the prescription as data: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe` · `tempo` · `rest` · `rounds` (circuits). **Write what you prescribed and omit the rest** — an absent field draws no cell. Full table under "`rx` — the prescription". Beside it: `exId` (the exercise's Spine id), `intent` (the one green pill: one or two values from the pill list, CHP-2), `note` (the Coach's Note, COM-14) and `why` (Because). **No `cues`** (they come from the Spine entry), no `setup` (no floating text), never `chips[]`.
 - `videoUrl` → normally leave it out: the app plays the exercise's Spine entry's video (by `exId`, then name). A URL here overrides that.
 - `notes` → optional. Each card's `body` is HTML (`<p>`, `<ul><li>`), and `tags` names the obligation keys it carries. Remove the whole object if there are no notes.
@@ -309,12 +309,12 @@ Each cycle describes one training phase.
 | `focuses` | string[] | optional | Unlimited list of focus statements |
 | `message` | object | optional | Only used when this is the current cycle (see below) |
 | `teaser` | object | optional | Only used when this is the next cycle (see below) |
-| `weekNotes` | object | **required on every new cycle** | A note per week number, each shown by the app only while its own week is on: the back-off on the final week always, week 1 when it differs, and any other week that differs from the card (see below). ⚠️ Not `weeks`, which is the "Weeks 1–5" label. |
+| `weekNotes` | object | **required when a week differs from the card** | A note per week number, each shown by the app only while its own week is on: week 1 when it differs (always for a new athlete), the final week only as a taper before a competition Amir named or a Testing week for its retests (REC-4, since 2026-10-19), and any other week that differs from the card (see below). ⚠️ Not `weeks`, which is the "Weeks 1–5" label. |
 
 #### `weekNotes` — a note for one week of the cycle (2026-09-26, any week since 2026-10-11)
 
-Amir, 2026-09-26: *"update the app in a way that it can show first week or last week."* Every cycle is
-four loading weeks plus a back-off week, and the exercise cards never change mid-cycle, so until then the
+Amir, 2026-09-26: *"update the app in a way that it can show first week or last week."* Every cycle was
+then four loading weeks plus a back-off week (until 2026-10-19, REC-4), and the exercise cards never change mid-cycle, so until then the
 back-off existed only if a notes card said so (16 of 34 live programmes had no such card). On 2026-10-11 he
 widened it: *"we can have week notes ... and only make it appear on the assigned week. for example when some
 one has a testing week, or reduced load."* A note is now assigned to a week by its number and the app shows
@@ -333,7 +333,7 @@ it in that week only: not before the cycle starts, not after it ends.
 
 | Key / field | Type | Meaning |
 |-------------|------|---------|
-| `"1"` … `"N"` | object | The note for that week of the cycle (N is the cycle's length: its dates, else its `weeks` label, else 5). Shown in that week only. **The final week's note is required on every cycle** (the back-off; the one exception is a cycle Amir said has no back-off, checked with `--no-backoff`). **Week 1's is required for a new athlete's first cycle**, and for a returning athlete when week 1 really differs (new exercises, a layoff, a return from injury). Any other week that differs from the card (a testing week, a reduced-load week) gets a note too. |
+| `"1"` … `"N"` | object | The note for that week of the cycle (N is the cycle's length: its dates, else its `weeks` label, else 5). Shown in that week only. **The final week trains as written** (REC-4, 2026-10-19: until then its back-off note was required on every cycle). Its note is required only when the cycle tapers into a competition Amir named (the spec's `taper:` line, checked with `--taper`), and a final-week note that is not a taper needs a title: a *Testing week* when it holds the retests, its cut on some lifts in words with no number. **Week 1's is required for a new athlete's first cycle**, and for a returning athlete when week 1 really differs (new exercises, a layoff, a return from injury). Any other week that differs from the card (a testing week, a reduced-load week) gets a note too. |
 | `first`, `last` | object | The older names for week 1 and the final week, still read on every programme written before 2026-10-11. A numeric key wins over them for the same week. New programmes write the number. |
 | `.text` | string | What the athlete reads, in Amir's voice: plain, short, under ~260 characters, the numbers in words. Starts with the instruction, never with its own label. An RPE going down names the floor in the same sentence ("never below 6"). |
 | `.title` | string | The label above the text. Defaults to **Week N** (and **Back-off week** for the older `last`). Give a week other than 1 a title: *Testing week*, *Lighter week*. |
@@ -341,7 +341,7 @@ it in that week only: not before the cycle starts, not after it ends.
 | `.rpeDrop` | number | Optional, 1–3: how many points off every RPE on every lift that week, never below 6. Ignored when there is a cap. |
 | `.rpeCap` | number | Optional, 6–9: no set above this RPE this week, on every lift. A limit on only some lifts goes in `text` with neither number (PRC-15). |
 
-The final week's note must carry at least one of the three numbers, so the dose is a decision and not only a
+A taper's note on the final week must carry at least one of the three numbers, so the dose is a decision and not only a
 feeling. The numbers never change a card: the app shows the note on Home only, as the This Week section that week
 (`weekNoteHTML()` in `program.html`, Front Page since 2026-10-12: the athlete's first name, the text's first
 sentence as the headline with `rpeCap` / `setsDrop` coloured where the words say them, the rest, Amir's signature;
@@ -349,7 +349,7 @@ a number the words do not say gets its own small line). So `text` opens with the
 characters and carries no greeting, name or sign-off (COM-16). Its words are not shown in a session; its numbers are, on the session bar's last row (*Max RPE 7 · 1 set fewer*), so an
 exception the numbers do not hold means no number (words only). The app knows one by itself: a test-flagged lift in the
 closing week (the retest window), where the bar reads *Max RPE 7 except the retest*, except on a lower check-in day. An untitled note on the cycle's final week shows as the
-*Back-off week*, so the back-off needs no title. `rpeCap` (else `rpeDrop`)
+*Back-off week*, so a taper needs no title and any other final-week note does. `rpeCap` (else `rpeDrop`)
 is that week's RPE target, on every lift and every day of it, and only that week's (2026-10-12): every logged RPE is
 coloured against it in the app and judged against it on the dashboard, a lower day takes the lower of the two, and a
 test-flagged lift in the closing week keeps its own card on a normal day (`paintWeekTargets()`, `compareDay()`, TST-4). The card's printed RPE never

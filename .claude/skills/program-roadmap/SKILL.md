@@ -63,12 +63,11 @@ never drift from the plan.
   ⚠️ It will seem to: on one roadmap (2026-08-17) the old panel's judge issued "do not add a
   fifth cycle" as a binding directive. It is overruled. Fit the arc to 5×5 and
   make the extra block do real work rather than padding it with a retest or a maintenance phase.
-- **Each cycle is 4 loading weeks + 1 back-off week.** The back-off is the 5th week of every
-  cycle, which is what satisfies "never program past a fatigue wall" without a mid-cycle
-  deload. ⚠️ The back-off week is **NOT authored into the exercise cards**: /program-design sets
-  its dose as numbers and it ships as the cycle's week note on its final week, which the app shows
-  during that week only (2026-09-26; SCHEMA.md → `weekNotes`).
-- ⚠️ **The cards carry the athlete's NORMAL prescription.** Week 1, the back-off week and any testing or lighter week live in
+- **Every week of a cycle trains; there is no back-off week by default** (REC-4, 2026-10-19: the
+  next cycle's week 1 is already the slow one). A cycle's final week tapers only into a
+  competition Amir named (SES-8): then say which cycle and which competition in that cycle's
+  rationale, and /program-design sets the dose as a week note. Never plan a back-off into the arc.
+- ⚠️ **The cards carry the athlete's NORMAL prescription.** Week 1, a taper and any testing or lighter week live in
   the cycle's `weekNotes`; a low-readiness stretch lives in a notes card. None of these is ever
   written as a lower RPE/volume on the exercise itself. Amir does not change a program
   mid-cycle, so the card is a stable reference all cycle (PRG-4, PRC-15). Write

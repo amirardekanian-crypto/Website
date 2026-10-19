@@ -35,7 +35,7 @@ You can talk normally — "design [name]'s next cycle," "write her notes,"
    cycle the way we did (your coaching log), and **stop to check with you** on any real
    decision. Answer my questions.
 3. Say **"go ahead."** → I write the programme, build it and run every check on it, and then
-   write the app message, notes, the week-1 and back-off notes and WhatsApp. If a check overturns
+   write the app message, notes, the week notes and WhatsApp. If a check overturns
    something you decided, I stop and show you first.
 4. Read it all, then say **"ship it."** → it goes live on their phone, and this cycle's reasoning
    is saved to their coaching log.

@@ -289,7 +289,7 @@ count and what landed on the cards differ, which is how a dropped or invented on
   **The spec sets the flags**: its athlete profile turns on `--floor` (aim: strength-muscle),
   `--proven`, the bans, `floor-except` and the cap; its `week:` line turns on the back-to-back
   check; a first cycle switches the new-athlete rules on by itself. Type a flag only to override
-  one, and `--no-backoff` only on Amir's word. **Fix every FAIL and re-run until 0 FAIL; read every
+  one. The spec's `taper:` line (a competition Amir named, REC-4) makes the final week's back-off required; with none, a lower dose on the final week warns. **Fix every FAIL and re-run until 0 FAIL; read every
   WARN.** Every message starts with the rule it enforces (`[VOL-8]`), and the rule index's Check
   column is the list of what the script covers, so it isn't repeated here. Two WARNs are soft by
   design: a Quality headline outside the week's top two (PRC-24: report it with your
@@ -324,7 +324,7 @@ rule index, then the Intake & assessment and Exercise selection stories in full,
 every must-fix by rule ID), and say in so many words: *do not call the database or
 any MCP tool* (PRC-5). Its job
 is only what a script cannot judge: the injury logic against the brief, exercise choice and
-transfer, whether a fallback is safe for THIS athlete, whether week 1, the back-off and the
+transfer, whether a fallback is safe for THIS athlete, whether week 1, a taper and the
 outside days are dosed sensibly, and what the notes must cover (the period card, an arm or knee
 menu), as keys added to the spec's `obligations:` list, which engage then writes to. Apply every must-fix, re-run the build check, then hand
 to engage.
