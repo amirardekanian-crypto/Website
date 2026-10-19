@@ -10,12 +10,19 @@
 <!--
   Does a notification reach this phone?
 
-  Built 2026-10-19 so Amir can answer one question before any of it is built into the apps: a web
+  Built 2026-10-19 so one question gets answered before any of it is built into the apps: a web
   notification travels through Google's Firebase on Android and Apple's APNs on iPhone, and neither
-  has a published measurement from inside Iran. See the decision page for the evidence.
+  has a published measurement from inside Iran. Proved working on Amir's own iPhone the same day,
+  app shut. The athletes in Iran are the test that still matters.
+
+  BILINGUAL (2026-10-19). Most of the athletes who will open this are in Iran, so it opens in Farsi
+  when the phone is set to Farsi, English otherwise, and either can be switched by the button at the
+  top. Every user-visible string goes through T(), so the two copies cannot drift apart silently.
+  ⚠️ The Farsi is a DRAFT for Amir to read, the same rule as the privacy lines.
 
   Kept COMPLETELY self-contained, the same rule as /reach/: no external CSS, fonts, scripts or
-  analytics, because every one of those is itself something that may be blocked.
+  analytics, because every one of those is itself something that may be blocked. The Farsi font is
+  whatever the phone has (Vazirmatn, then Tahoma), never a web font.
 
   It sends NOTHING anywhere. The subscription code is shown on this screen for the person to copy
   and send to Amir themselves; there is no server call on this page at all.
@@ -23,7 +30,7 @@
   ⚠️ ONE PERMISSION PER WEBSITE, ONE CHANCE. Notification permission belongs to the whole origin, so
   amirardekani.com has one: program.html, habits.html and this page share it. A "don't allow" here
   blocks the real apps on this phone for good, until the person digs into browser settings. That is
-  why the warning below sits ABOVE the button and why the button is not the first thing on the page.
+  why the warning sits ABOVE the button and why the button is not the first thing on the page.
 
   ⚠️ iPhone: Web Push needs iOS 16.4+ AND the page added to the Home Screen and opened from there.
   In Safari itself the button cannot work, so the page says so instead of failing silently. The
@@ -39,14 +46,16 @@
 <meta name="theme-color" content="#0E4A36">
 <link rel="apple-touch-icon" href="/assets/img/icon-192.png">
 <style>
-  :root { --green:#0E4A36; --green-ink:#0E4A36; --clay:#C7552F; --clay-ink:#B5461F; --clay-fill:#C2512C;
+  :root { --green:#0E4A36; --green-ink:#0E4A36; --clay:#C7552F; --clay-ink:#B5461F;
           --paper:#FAF7F2; --row:#fff; --line:#E4DDD0; --ink:#1F2A24; --muted:#66756C; color-scheme: light; }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--paper); color:var(--ink);
          font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
          padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); }
-  main { max-width:520px; margin:0 auto; padding-block:24px 60px; }
-  h1 { font-size:26px; line-height:1.2; margin:0 0 6px; color:var(--green); }
+  /* Farsi: the phone's own Persian font, never a web font — a blocked font would take the page with it. */
+  html[lang="fa"] body { font-family: Vazirmatn, Tahoma, "Segoe UI", system-ui, sans-serif; line-height:1.85; }
+  main { max-width:520px; margin:0 auto; padding-block:18px 60px; }
+  h1 { font-size:26px; line-height:1.25; margin:0 0 6px; color:var(--green); }
   h2 { font-size:17px; margin:0 0 6px; }
   p { margin:0 0 13px; }
   .muted { color:var(--muted); font-size:15px; }
@@ -58,6 +67,10 @@
   button.alt { background:transparent; color:var(--green-ink); border:1px solid var(--line); font-size:16px; }
   button[disabled] { opacity:.45; cursor:default; }
   button + button { margin-top:9px; }
+  /* the language switch: small, quiet, and the one control above the title */
+  #langrow { display:flex; justify-content:flex-end; margin:0 0 10px; }
+  #lang { width:auto; padding:7px 14px; font-size:14px; font-weight:700; background:transparent;
+          color:var(--muted); border:1px solid var(--line); border-radius:999px; }
   #steps { list-style:none; padding:0; margin:14px 0 0; }
   #steps li { display:flex; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line);
               padding:7px 0; font-size:15px; }
@@ -75,19 +88,21 @@
   .log div { padding:5px 0; border-bottom:1px solid var(--line); }
   .log div:last-child { border-bottom:0; }
   .ios { background:#FBEDE7; border-color:var(--clay); }
-  ol.how { margin:8px 0 0; padding-left:20px; }
+  ol.how { margin:8px 0 0; padding-inline-start:20px; }
   ol.how li { margin-bottom:5px; }
 </style>
 </head>
 <body>
 <main>
-  <h1>Does a notification reach this phone?</h1>
-  <p class="muted">One question, two minutes. This page sends nothing anywhere. Whatever it finds out stays on your screen until you copy it and send it to Amir yourself.</p>
+  <div id="langrow"><button id="lang" type="button">فارسی</button></div>
+
+  <h1 data-t="h1">Does a notification reach this phone?</h1>
+  <p class="muted" data-t="lede">One question, two minutes. This page sends nothing anywhere. Whatever it finds out stays on your screen until you copy it and send it to Amir yourself.</p>
 
   <div class="box ios" id="iosbox" hidden>
-    <h2>On an iPhone, add this to your Home Screen first</h2>
-    <p class="muted" style="margin:0">Apple only lets a web page send notifications once it is installed. In Safari it cannot work at all, so do this first:</p>
-    <ol class="how muted">
+    <h2 data-t="iosH">On an iPhone, add this to your Home Screen first</h2>
+    <p class="muted" style="margin:0" data-t="iosP">Apple only lets a web page send notifications once it is installed. In Safari it cannot work at all, so do this first:</p>
+    <ol class="how muted" data-t="iosSteps">
       <li>Tap the <b>Share</b> button at the bottom of Safari.</li>
       <li>Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.</li>
       <li>Close Safari and open <b>Push test</b> from your Home Screen.</li>
@@ -96,33 +111,33 @@
   </div>
 
   <div class="box warn">
-    <h2>Read this before you tap</h2>
-    <p style="margin:0 0 9px">A phone gives permission to a <b>whole website</b>, once. amirardekani.com has one permission, shared by the training app, AA Proof and this page.</p>
-    <p class="muted" style="margin:0">So if you tap <b>Don't allow</b>, this phone can never be sent a notification by any of them again, until you go into your browser settings and undo it. There is no second chance. Tap <b>Allow</b>.</p>
+    <h2 data-t="warnH">Read this before you tap</h2>
+    <p style="margin:0 0 9px" data-t="warnP1">A phone gives permission to a <b>whole website</b>, once. amirardekani.com has one permission, shared by the training app, AA Proof and this page.</p>
+    <p class="muted" style="margin:0" data-t="warnP2">So if you tap <b>Don't allow</b>, this phone can never be sent a notification by any of them again, until you go into your browser settings and undo it. There is no second chance. Tap <b>Allow</b>.</p>
   </div>
 
   <div class="box">
-    <button id="go" type="button">Turn on notifications</button>
-    <button id="local" class="alt" type="button" hidden>Show me one right now</button>
+    <button id="go" type="button" data-t="goBtn">Turn on notifications</button>
+    <button id="local" class="alt" type="button" hidden data-t="localBtn">Show me one right now</button>
     <ul id="steps"></ul>
   </div>
 
   <div class="box" id="out" hidden>
-    <h2>Done. Send this to Amir</h2>
-    <p class="muted">Tap the code once to select it all, or use the button. It is the address his server needs to reach this phone, and nothing else.</p>
+    <h2 data-t="outH">Done. Send this to Amir</h2>
+    <p class="muted" data-t="outP">Tap the code once to select it all, or use the button. It is the address his server needs to reach this phone, and nothing else.</p>
     <div id="code"></div>
-    <button id="copy" type="button" style="margin-top:10px">Copy</button>
+    <button id="copy" type="button" style="margin-top:10px" data-t="copyBtn">Copy</button>
   </div>
 
   <div class="box" id="logbox" hidden>
-    <h2>What has arrived</h2>
+    <h2 data-t="logH">What has arrived</h2>
     <div class="log" id="log"></div>
-    <p class="muted" style="margin:10px 0 0">Open this page again later to see whether the slow one landed. It is remembered even if you swipe the notification away.</p>
+    <p class="muted" style="margin:10px 0 0" data-t="logP">Open this page again later to see whether the slow one landed. It is remembered even if you swipe the notification away.</p>
   </div>
 
   <div class="box">
-    <h2>This phone</h2>
-    <div id="dev">reading…</div>
+    <h2 data-t="devH">This phone</h2>
+    <div id="dev">…</div>
   </div>
 </main>
 
@@ -135,16 +150,125 @@
   var $ = function (id) { return document.getElementById(id); };
   var reg = null;
 
+  // ── the two copies ─────────────────────────────────────────────────────────
+  // Every user-visible string lives here, so neither language can quietly fall behind the other.
+  // The Farsi is a draft for Amir to read before this goes to anyone.
+  var EN = {
+    title: 'Push test · AA Performance',
+    other: 'فارسی',
+    stepsBlocked: 'Can this phone do it', no: 'no', yes: 'yes',
+    notHttps: 'This page has to be opened over https.',
+    noNotify: 'This browser cannot do notifications at all.',
+    addFirst: 'Add it to your Home Screen first (above), then open it from there.',
+    noPush: 'This browser has no push support.',
+    alreadyNo: 'This phone has already refused notifications for this website. Undo it in your browser settings, then come back.',
+    sStart: 'Start the worker', sRunning: 'running', sRefused: 'refused',
+    workerRefused: 'This browser will not run a background worker, so it can never be sent a notification. If you opened this from inside another app, open it in Safari or Chrome instead. A private window will not work either.',
+    sAsk: 'Ask this phone', sAllowed: 'allowed', sDismissed: 'dismissed',
+    saidNo: 'This phone said no. Undo it in your browser settings if you want to try again.',
+    wasDismissed: 'The box was dismissed without an answer. Reload and tap again.',
+    sAddress: 'Get an address for this phone', sGot: 'got one',
+    cannotReach: 'Allowed, but this phone could not reach the push service. That is the answer we were looking for. Send Amir the "This phone" line at the bottom.',
+    sSend: 'Send the code to Amir', sYourTurn: 'your turn',
+    sLocal: 'Shown by the phone itself',
+    localTitle: 'This one came from the phone itself',
+    localBody: 'No server involved. If you can see this, the display works.',
+    copied: 'Copied', selected: 'Selected — now copy it',
+    installed: 'installed', inBrowser: 'in the browser',
+    lArrived: 'arrived', lTapped: 'you tapped one', lFailed: 'arrived but could not show: ',
+    lAfter: ' after it was sent', lSec: 's', lMin: ' min'
+  };
+  var FA = {
+    title: 'آزمون نوتیفیکیشن · AA Performance',
+    other: 'English',
+    h1: 'آیا نوتیفیکیشن به این گوشی می‌رسد؟',
+    lede: 'یک سؤال، دو دقیقه. این صفحه هیچ چیزی جایی نمی‌فرستد. هرچه پیدا کند روی صفحهٔ خودتان می‌ماند تا خودتان کپی کنید و برای امیر بفرستید.',
+    iosH: 'روی آیفون، اول این صفحه را به صفحهٔ اصلی اضافه کنید',
+    iosP: 'اپل فقط وقتی اجازهٔ نوتیفیکیشن می‌دهد که صفحه نصب شده باشد. داخل خودِ سافاری اصلاً کار نمی‌کند، پس اول این کار را بکنید:',
+    iosSteps: '<li>دکمهٔ <b>Share</b> پایین سافاری را بزنید.</li>' +
+              '<li>پایین بروید و <b>Add to Home Screen</b> بعد <b>Add</b> را بزنید.</li>' +
+              '<li>سافاری را ببندید و <b>Push test</b> را از صفحهٔ اصلی باز کنید.</li>' +
+              '<li>همان‌جا به این صفحه برگردید و ادامه بدهید.</li>',
+    warnH: 'قبل از زدن، این را بخوانید',
+    warnP1: 'گوشی اجازه را به <b>کل یک سایت</b> می‌دهد، آن هم یک بار. amirardekani.com یک اجازه دارد که بین برنامهٔ تمرین، AA Proof و این صفحه مشترک است.',
+    warnP2: 'پس اگر <b>Don’t allow</b> را بزنید، دیگر هیچ‌کدامشان نمی‌توانند به این گوشی نوتیفیکیشن بفرستند، تا وقتی که بروید در تنظیمات مرورگر و برش گردانید. فرصت دوم ندارد. <b>Allow</b> را بزنید.',
+    goBtn: 'نوتیفیکیشن را روشن کن',
+    localBtn: 'همین حالا یکی نشانم بده',
+    outH: 'تمام شد. این را برای امیر بفرستید',
+    outP: 'یک بار روی کد بزنید تا همه‌اش انتخاب شود، یا دکمه را بزنید. این فقط آدرسی است که سرور امیر برای رسیدن به این گوشی لازم دارد، و چیز دیگری نیست.',
+    copyBtn: 'کپی',
+    logH: 'چه چیزهایی رسیده',
+    logP: 'بعداً دوباره این صفحه را باز کنید تا ببینید آن دیررسیده هم آمده یا نه. حتی اگر نوتیفیکیشن را پاک کرده باشید یادش می‌ماند.',
+    devH: 'این گوشی',
+    stepsBlocked: 'این گوشی می‌تواند؟', no: 'نه', yes: 'بله',
+    notHttps: 'این صفحه باید با https باز شود.',
+    noNotify: 'این مرورگر اصلاً نوتیفیکیشن ندارد.',
+    addFirst: 'اول آن را به صفحهٔ اصلی اضافه کنید (بالا)، بعد از همان‌جا بازش کنید.',
+    noPush: 'این مرورگر push ندارد.',
+    alreadyNo: 'این گوشی قبلاً نوتیفیکیشن این سایت را رد کرده. از تنظیمات مرورگر برش گردانید و دوباره بیایید.',
+    sStart: 'راه‌اندازی', sRunning: 'فعال', sRefused: 'رد شد',
+    workerRefused: 'این مرورگر اجازهٔ اجرای worker پس‌زمینه نمی‌دهد، پس هیچ‌وقت نمی‌شود برایش نوتیفیکیشن فرستاد. اگر این صفحه را از داخل یک برنامهٔ دیگر باز کرده‌اید، در سافاری یا کروم بازش کنید. پنجرهٔ ناشناس هم کار نمی‌کند.',
+    sAsk: 'پرسیدن از گوشی', sAllowed: 'اجازه داد', sDismissed: 'بسته شد',
+    saidNo: 'گوشی نه گفت. اگر می‌خواهید دوباره امتحان کنید، از تنظیمات مرورگر برش گردانید.',
+    wasDismissed: 'کادر بدون جواب بسته شد. صفحه را دوباره باز کنید و بزنید.',
+    sAddress: 'گرفتن آدرس این گوشی', sGot: 'گرفته شد',
+    cannotReach: 'اجازه داد، ولی این گوشی نتوانست به سرویس push برسد. دقیقاً همین جوابی است که دنبالش بودیم. خطِ «این گوشی» را از پایین صفحه برای امیر بفرستید.',
+    sSend: 'کد را برای امیر بفرستید', sYourTurn: 'نوبت شماست',
+    sLocal: 'نمایش از خودِ گوشی',
+    localTitle: 'این یکی از خودِ گوشی آمد',
+    localBody: 'هیچ سروری وسط نبود. اگر می‌بینیدش، یعنی نمایش کار می‌کند.',
+    copied: 'کپی شد', selected: 'انتخاب شد — حالا کپی کنید',
+    installed: 'installed', inBrowser: 'in the browser',
+    lArrived: 'رسید', lTapped: 'یکی را زدید', lFailed: 'رسید ولی نشان داده نشد: ',
+    lAfter: ' بعد از فرستادن', lSec: ' ثانیه', lMin: ' دقیقه'
+  };
+
+  var LS = 'pushtest_lang';
+  var lang = (function () {
+    try { var v = localStorage.getItem(LS); if (v === 'fa' || v === 'en') return v; } catch (e) {}
+    return /^fa\b/i.test(navigator.language || '') ? 'fa' : 'en';
+  })();
+  function T(k) { return (lang === 'fa' && FA[k] !== undefined) ? FA[k] : EN[k]; }
+
+  function paintLang() {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+    document.title = T('title');
+    $('lang').textContent = T('other');
+    if (lang === 'fa') {
+      var nodes = document.querySelectorAll('[data-t]');
+      for (var i = 0; i < nodes.length; i++) {
+        var k = nodes[i].getAttribute('data-t');
+        if (FA[k] !== undefined) nodes[i].innerHTML = FA[k];
+      }
+    }
+  }
+  $('lang').addEventListener('click', function () {
+    lang = lang === 'fa' ? 'en' : 'fa';
+    try { localStorage.setItem(LS, lang); } catch (e) {}
+    location.reload();   // simplest and safest: every string is painted once, at load
+  });
+  paintLang();
+
+  // ── the step list ──────────────────────────────────────────────────────────
   function step(label, state, note) {
     var li = document.createElement('li');
     var l = document.createElement('span');
     l.textContent = label;
     var r = document.createElement('span');
     r.className = state === 'ok' ? 'ok' : state === 'bad' ? 'bad' : 'wait';
-    r.textContent = note || (state === 'ok' ? 'yes' : state === 'bad' ? 'no' : '…');
+    r.textContent = note || (state === 'ok' ? T('yes') : state === 'bad' ? T('no') : '…');
     li.appendChild(l); li.appendChild(r);
     $('steps').appendChild(li);
     return r;
+  }
+
+  function say(text) {
+    var p = document.createElement('p');
+    p.className = 'muted';
+    p.style.margin = '12px 0 0';
+    p.textContent = text;
+    $('steps').parentNode.appendChild(p);
   }
 
   // The VAPID public key travels as base64url and the browser wants raw bytes.
@@ -161,6 +285,7 @@
   var isIOS = /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   var installed = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
+  // Deliberately English and LTR whatever the language: it is a line for Amir to read, not the athlete.
   function deviceLine() {
     var m, os = isIOS ? ('iOS' + (((m = ua.match(/OS (\d+)[_.](\d+)/)) && (m[1] + '.' + m[2])) || '?'))
       : (m = ua.match(/Android (\d+)/)) ? 'Android' + m[1]
@@ -174,7 +299,7 @@
     return [os, br, installed ? 'installed' : 'in the browser',
             'perm=' + (('Notification' in window) ? Notification.permission : 'unsupported'),
             'sw=' + ('serviceWorker' in navigator), 'push=' + ('PushManager' in window),
-            'tz=' + (-new Date().getTimezoneOffset() / 60)].join(' · ');
+            'lang=' + lang, 'tz=' + (-new Date().getTimezoneOffset() / 60)].join(' · ');
   }
   $('dev').textContent = deviceLine();
 
@@ -190,22 +315,15 @@
   if (isIOS && !installed) $('iosbox').hidden = false;
 
   var blocked = null;
-  if (!secure) blocked = 'This page has to be opened over https.';
-  else if (!canSW || !canNotify) blocked = 'This browser cannot do notifications at all.';
-  else if (!canPush) blocked = isIOS && !installed
-    ? 'Add it to your Home Screen first (above), then open it from there.'
-    : 'This browser has no push support.';
-  else if (canNotify && Notification.permission === 'denied') blocked =
-    'This phone has already refused notifications for this website. Undo it in your browser settings, then come back.';
+  if (!secure) blocked = T('notHttps');
+  else if (!canSW || !canNotify) blocked = T('noNotify');
+  else if (!canPush) blocked = (isIOS && !installed) ? T('addFirst') : T('noPush');
+  else if (canNotify && Notification.permission === 'denied') blocked = T('alreadyNo');
 
   if (blocked) {
     $('go').disabled = true;
-    step('Can this phone do it', 'bad', 'no');
-    var p = document.createElement('p');
-    p.className = 'muted';
-    p.style.margin = '12px 0 0';
-    p.textContent = blocked;
-    $('steps').parentNode.appendChild(p);
+    step(T('stepsBlocked'), 'bad', T('no'));
+    say(blocked);
   }
 
   // ── the log the worker keeps ───────────────────────────────────────────────
@@ -218,8 +336,8 @@
       var when = new Date(r.at);
       var lag = r.sent ? Math.round((r.at - r.sent) / 1000) : null;
       d.textContent = when.toLocaleString() + ' · ' +
-        (r.error ? 'arrived but could not show: ' + r.error : r.tapped ? 'you tapped one' : (r.title || 'arrived')) +
-        (lag !== null ? ' · ' + (lag < 90 ? lag + 's' : Math.round(lag / 60) + ' min') + ' after it was sent' : '');
+        (r.error ? T('lFailed') + r.error : r.tapped ? T('lTapped') : (r.title || T('lArrived'))) +
+        (lag !== null ? ' · ' + (lag < 90 ? lag + T('lSec') : Math.round(lag / 60) + T('lMin')) + T('lAfter') : '');
       $('log').appendChild(d);
     });
   }
@@ -231,6 +349,11 @@
       ch.port1.onmessage = function (e) { paintLog(e.data); };
       reg.active.postMessage({ q: 'log' }, [ch.port2]);
     } catch (e) {}
+  }
+
+  function showCode(sub) {
+    $('out').hidden = false;
+    $('code').textContent = JSON.stringify(sub);
   }
 
   // ── register the worker up front, so the log can be read before any tap ────
@@ -253,68 +376,54 @@
     document.addEventListener('visibilitychange', function () { if (!document.hidden) askLog(); });
   }
 
-  function showCode(sub) {
-    $('out').hidden = false;
-    $('code').textContent = JSON.stringify(sub);
-  }
-
   // ── the one button that matters ────────────────────────────────────────────
   $('go').addEventListener('click', function () {
     $('go').disabled = true;
     $('steps').textContent = '';
-    var s1 = step('Start the worker', 'wait');
+    var s1 = step(T('sStart'), 'wait');
 
     navigator.serviceWorker.register('/pushtest/sw.js')
       .then(function () { return navigator.serviceWorker.ready; })
       .catch(function () {
         // A browser that refuses service workers altogether (a private window, a locked-down or
         // automated browser, some in-app browsers) fails here with an unhelpful "unknown error".
-        s1.className = 'bad'; s1.textContent = 'refused';
-        throw new Error('This browser will not run a background worker, so it can never be sent a ' +
-                        'notification. If you opened this from inside another app, open it in Safari ' +
-                        'or Chrome instead. A private window will not work either.');
+        s1.className = 'bad'; s1.textContent = T('sRefused');
+        throw new Error(T('workerRefused'));
       })
       .then(function (r) {
         reg = r;
-        s1.className = 'ok'; s1.textContent = 'running';
-        var s2 = step('Ask this phone', 'wait');
+        s1.className = 'ok'; s1.textContent = T('sRunning');
+        var s2 = step(T('sAsk'), 'wait');
         return Notification.requestPermission().then(function (perm) {
           if (perm !== 'granted') {
             s2.className = 'bad';
-            s2.textContent = perm === 'denied' ? 'refused' : 'dismissed';
-            throw new Error(perm === 'denied'
-              ? 'This phone said no. Undo it in your browser settings if you want to try again.'
-              : 'The box was dismissed without an answer. Reload and tap again.');
+            s2.textContent = perm === 'denied' ? T('sRefused') : T('sDismissed');
+            throw new Error(perm === 'denied' ? T('saidNo') : T('wasDismissed'));
           }
-          s2.className = 'ok'; s2.textContent = 'allowed';
+          s2.className = 'ok'; s2.textContent = T('sAllowed');
         });
       })
       .then(function () {
-        var s3 = step('Get an address for this phone', 'wait');
+        var s3 = step(T('sAddress'), 'wait');
         return reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlB64ToUint8Array(PUBLIC_KEY)
         }).then(function (sub) {
-          s3.className = 'ok'; s3.textContent = 'got one';
+          s3.className = 'ok'; s3.textContent = T('sGot');
           showCode(sub);
           $('local').hidden = false;
           $('dev').textContent = deviceLine();
-          step('Send the code to Amir', 'wait', 'your turn');
+          step(T('sSend'), 'wait', T('sYourTurn'));
         }, function (e) {
           s3.className = 'bad';
           s3.textContent = String(e && e.name || 'failed').slice(0, 24);
           // This is the interesting failure: permission was granted but the phone could not reach
           // Google's or Apple's push service. That is exactly the Iran question.
-          throw new Error('Allowed, but this phone could not reach the push service. That is the ' +
-                          'answer we were looking for. Send Amir this page’s "This phone" line.');
+          throw new Error(T('cannotReach'));
         });
       })
       .catch(function (e) {
-        var p = document.createElement('p');
-        p.className = 'muted';
-        p.style.margin = '12px 0 0';
-        p.textContent = String(e && e.message || e);
-        $('steps').parentNode.appendChild(p);
+        say(String(e && e.message || e));
         $('go').disabled = false;
         $('dev').textContent = deviceLine();
       });
@@ -324,16 +433,16 @@
   // "this phone cannot display notifications" from "nothing reached this phone".
   $('local').addEventListener('click', function () {
     if (!reg) return;
-    reg.showNotification('This one came from the phone itself', {
-      body: 'No server involved. If you can see this, the display works.',
+    reg.showNotification(T('localTitle'), {
+      body: T('localBody'),
       icon: '/assets/img/icon-192.png',
       badge: '/assets/img/icon-192.png',
       tag: 'pushtest-local',
       data: { url: '/pushtest/' }
     }).then(function () {
-      step('Shown by the phone itself', 'ok', 'yes');
+      step(T('sLocal'), 'ok', T('yes'));
     }, function (e) {
-      step('Shown by the phone itself', 'bad', String(e && e.name || 'failed').slice(0, 24));
+      step(T('sLocal'), 'bad', String(e && e.name || 'failed').slice(0, 24));
     });
   });
 
@@ -344,11 +453,11 @@
       r.selectNodeContents($('code'));
       var sel = window.getSelection();
       sel.removeAllRanges(); sel.addRange(r);
-      $('copy').textContent = 'Selected — now copy it';
+      $('copy').textContent = T('selected');
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () {
-        $('copy').textContent = 'Copied';
+        $('copy').textContent = T('copied');
       }, fallback);
     } else fallback();
   });
