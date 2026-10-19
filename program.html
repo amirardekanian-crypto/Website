@@ -7012,6 +7012,39 @@ const COACH_WHATSAPP = '447435363461';        // the number the site's buy butto
 const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
 
 // ── 1. BOOT ──
+// ── THE LOADING SCREEN IS NEVER THE WHOLE APP (2026-10-19) ──────────────────
+// Every server call in boot() has a ceiling, but a THROW had none: an exception
+// anywhere in boot left the spinner on the screen for ever, with no words and no
+// way out. Three nets, all of them only while the loading screen is still up: an
+// uncaught error, a rejected promise nobody caught, and a ceiling for anything
+// that neither answers nor throws. The ceiling is long on purpose — boot's own
+// ceilings stack on a stalled connection, and a slow phone must never be told it
+// is broken.
+// ⚠️ habits.html carries the same net. Change both.
+const BOOT_CEILING_MS = 60000;
+let _appUp = false, _bootNetOff = false;
+function bootStuck(detail) {
+  if (_appUp || _bootNetOff) return;
+  const el = document.getElementById('loading');
+  if (!el || el.classList.contains('hidden')) return;    // sign-in, an error screen, or already open
+  _bootNetOff = true;
+  showError('The app got stuck opening. Tap Try again. If it keeps happening, send me the line under the button on WhatsApp.', {
+    title: 'Stuck opening',
+    actions: '<button type="button" class="btn-primary" style="width:100%" onclick="location.reload()">Try again</button>'
+      + '<div style="margin-top:14px;font-size:var(--fs-label);line-height:1.5;opacity:.7;word-break:break-word">'
+      + String(detail || 'nothing reported').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])).slice(0, 300) + '</div>'
+  });
+}
+window.addEventListener('error', e => {
+  if (!e || (e.target && e.target !== window)) return;   // a picture or a stylesheet that failed is not this
+  bootStuck((e.message || 'error') + ' · ' + String(e.filename || '').split('/').pop() + ':' + e.lineno);
+});
+window.addEventListener('unhandledrejection', e => {
+  const r = e && e.reason;
+  bootStuck('unhandled · ' + ((r && (r.message || r.msg)) || String(r)));
+});
+setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS / 1000) + 's'), BOOT_CEILING_MS);
+
 (async function boot() {
   const params = new URLSearchParams(window.location.search);
   let clientId = params.get('client');
@@ -7320,6 +7353,7 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   // athlete on every open after all the network work was already done.
   setTimeout(() => {
     document.getElementById('loading').classList.add('hidden');
+    _appUp = true;                 // the app is on screen: the boot nets stand down
     document.getElementById('screen-home').classList.add('active');
     maybeWelcome();
     maybeHighlightMoment();   // a cycle or the roadmap just complete: its moment, once (Highlight Reel; never over the Welcome)

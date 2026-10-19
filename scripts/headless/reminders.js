@@ -86,7 +86,8 @@ const ok = (c, what, detail) => {
 
   ok(/IS_EMBED/.test(proof.slice(proof.indexOf('function pushReady'), proof.indexOf('function pushReady') + 300)),
      'AA Proof never offers reminders in the embedded strip (one phone would be asked twice)');
-  ok(/!DEMO/.test(train.slice(train.indexOf('function pushReady'), train.indexOf('function pushReady') + 300)),
+  // `!window.IS_DEMO` is the name program.html uses; the regex looked for habits.html's old `!DEMO` and so passed on nothing.
+  ok(/IS_DEMO/.test(train.slice(train.indexOf('function pushReady'), train.indexOf('function pushReady') + 300)),
      'the training app never offers them in the demo');
   for (const [name, src] of [['habits.html', proof], ['program.html', train]]) {
     ok(src.includes('/assets/js/push.js'), `${name} loads the shared client`);

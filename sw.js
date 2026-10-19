@@ -330,7 +330,13 @@
 // notificationclick handlers, so a reminder can arrive when the app is shut. Both apps share one
 // registration and one notification permission, so the handlers live here once, not twice.
 // v192: program.html changed (2026-10-19, Career Mode round 5, the last step): the Monthly Open's card at the top of Crew (the challenge, the board ranked by the result, your own row, one door to WhatsApp), drawn only once the server answers with an open challenge (stage85).
-const CACHE = 'aap-v192';
+// v193: habits.html and program.html changed (2026-10-19, URGENT). AA Proof would not open at all: pushReady() in habits.html
+// called `athleteId()`, a name that exists in neither app, so the very first render() threw a ReferenceError inside boot and
+// every signed-in athlete was left on "Loading proof" for ever. The embedded strip on the training app's Home went on working,
+// which is what hid it (IS_EMBED is the first test in that function, so the throw was never reached there). Both apps also gained
+// a net under boot: an uncaught error, a rejected promise or a 60s ceiling now shows words and a Try again instead of a spinner
+// that never ends, and AA Proof's new-version notice no longer renders mid-boot.
+const CACHE = 'aap-v193';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -12260,8 +12260,13 @@ function navVal(text) { return `<span class="navval">${esc(text)}</span>`; }
 // would take the training app's reminders with it.
 let PUSH_ME = null;        // what the server has, from push_me(); null until it answers
 
+// ⚠ This app's own name is `ATHLETE_ID`. pushReady() said `athleteId()`, which exists in neither app, so this threw a
+// ReferenceError inside renderToday() — and that took the WHOLE app down to a "Loading proof" that never ended,
+// because boot's own render() is what threw. The embed never reached it (IS_EMBED is the first test), so the
+// habits strip on the training app's Home went on working while AA Proof itself would not open. program.html
+// carries the same trap in its own copy of this function, caught there on 2026-10-19 before this one was.
 function pushReady() {
-  return !window.IS_EMBED && !window.IS_DEMO && !window.IS_PREVIEW && !!window.AAPush && !!_sb() && !!athleteId();
+  return !window.IS_EMBED && !window.IS_DEMO && !window.IS_PREVIEW && !!window.AAPush && !!_sb() && !!ATHLETE_ID;
 }
 
 // One slim row on Today, while this phone could have reminders and has not been asked.
@@ -12760,7 +12765,12 @@ function versionWatchOff() { return !!(window.IS_EMBED || window.IS_DEMO || wind
 function swTookOver() {
   if (UI.newver || _newVerDone || !_hadWorker || versionWatchOff()) return;
   UI.newver = true;
-  render();
+  // ⚠️ Only once the app is on screen. A CACHE bump deploys while a phone is
+  // opening the app, so the new worker claims this page MID-BOOT and this fires
+  // with CFG still null — and a render() from here then threw inside the loading
+  // screen, which is what left "Loading proof" on the screen for ever. Mid-boot
+  // the row needs no render of its own: boot's own first paint draws it.
+  if (_appUp) render();
 }
 function reloadNewVersion() { location.reload(); }
 // Not now: away for this run only. The next open is the new version anyway, so nothing is lost by it.
@@ -12782,6 +12792,44 @@ function initVersionWatch() {
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') swCheck(); });
   window.addEventListener('online', swCheck);
 }
+
+// ── THE LOADING SCREEN IS NEVER THE WHOLE APP (2026-10-19) ──────────────────
+// Every server call in boot() has a ceiling (the warning inside it), but a THROW
+// had none. An exception anywhere in boot — or in a render() a service-worker
+// event fired off mid-boot — left "Loading proof" on the screen for ever, with
+// no words, no error and no way out. Three nets, all of them only while the
+// loading screen is still up:
+//   · an uncaught error says so at once, with the line to send Amir,
+//   · so does a rejected promise nobody caught,
+//   · and a ceiling catches anything that neither answers nor throws.
+// The ceiling is long on purpose: boot's own ceilings stack to about 35s on a
+// stalled connection, and a slow phone must never be told it is broken.
+// ⚠️ Never in the embed: the strip says nothing, and the training app's own
+// habits row stands in for it (mountProofStrip() there).
+// ⚠️ program.html carries the same net. Change both.
+const BOOT_CEILING_MS = 60000;
+let _appUp = false, _bootNetOff = false;
+function bootStuck(detail) {
+  if (_appUp || _bootNetOff || window.IS_EMBED) return;
+  const el = document.getElementById('loading');
+  if (!el || el.classList.contains('hidden')) return;    // sign-in, an error screen, or already open
+  _bootNetOff = true;
+  showError('AA Proof got stuck opening. Tap Try again. If it keeps happening, send Amir the line under the button.', {
+    title: 'Stuck opening',
+    actions: '<button type="button" class="btn btn-primary btn-block" onclick="location.reload()">Try again</button>'
+      + '<div style="margin-top:14px;font-size:12px;line-height:1.5;color:#5C5C5C;word-break:break-word">'
+      + String(detail || 'nothing reported').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])).slice(0, 300) + '</div>'
+  });
+}
+window.addEventListener('error', e => {
+  if (!e || (e.target && e.target !== window)) return;   // a picture or a stylesheet that failed is not this
+  bootStuck((e.message || 'error') + ' · ' + String(e.filename || '').split('/').pop() + ':' + e.lineno);
+});
+window.addEventListener('unhandledrejection', e => {
+  const r = e && e.reason;
+  bootStuck('unhandled · ' + ((r && (r.message || r.msg)) || String(r)));
+});
+setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS / 1000) + 's'), BOOT_CEILING_MS);
 
 (async function boot() {
   const params = new URLSearchParams(window.location.search);
@@ -12989,6 +13037,7 @@ function initVersionWatch() {
   render();
   armIdle();
   document.getElementById('loading').classList.add('hidden');
+  _appUp = true;                 // the app is on screen: the boot nets stand down, and swTookOver() may render
   if (window.IS_EMBED) {
     // Web fonts land after the first paint and change the height; so does a toast.
     if ('ResizeObserver' in window) new ResizeObserver(() => embedPost()).observe(document.getElementById('app'));
