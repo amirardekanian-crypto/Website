@@ -57,10 +57,23 @@ A NEW rule goes in its area's rules file, one line, with its ID. Its story goes 
 - **A rule's wording and its ID never change in a move.** `VOL-8`, `CUE-7`, `PRC-29`,
   `GAME-14`, `D20`, `REL-01`, `NAV-01`, `TWIN-1` and the rest keep their exact text. Where
   the coaching rule index restates one, the index wins (PRC-23).
-- **A rules file stays small.** `scripts/check_docs.py` (pre-commit) holds each one to its
-  recorded size and fails a commit that grows it past the ceiling, the same ratchet idea as
-  `scripts/check_site_style.py`. Growing an area means splitting it, not swelling it.
-- **A cross-reference must resolve.** The same guard fails a commit with a dead link
-  between docs.
+- **Nothing swells back.** `scripts/check_docs.py` is pre-commit guard 24, the same ratchet
+  idea as `scripts/check_site_style.py`: a baseline (`scripts/docs_baseline.json`) records
+  what is there today and only shrinks. The ceilings are **12 KB for the door**, **20 KB for
+  a rules file**, **12 KB for an index** and **30 KB for a reference section**. Growing an
+  area means splitting it, not swelling it; if a ceiling is genuinely wrong, move the number
+  in the guard and say why in the commit, rather than adding the file to the baseline.
+- **A cross-reference must resolve.** The same guard fails a commit with a dead relative link
+  in any `.md`. Two links were already dead when it went in, and sit in the baseline:
+  `Content/DESIGN-ATLAS.md` → `app-warmup-preview.jpg` (the file exists nowhere any more) and
+  `Content/showreel/README.md` → `../motion/kit/README.md`. Fix either and take its row out.
+- **A coaching rule ID cited in this layer must exist.** `scripts/check_rule_index.py` does
+  that for the skills, the agents and `SCHEMA.md`; it used to cover `CLAUDE.md`, which no
+  longer holds those citations, so guard 24 covers `rules/`, this file and `record/INDEX.md`.
+- **The listings cannot go stale.** Guard 24 fails a commit where a rules file is not named
+  in this file and in `MAP.md`.
+- **The guard proves itself.** `python scripts/check_docs.py --selftest` builds a decoy tree
+  and checks each of the seven faults is still caught; the hook runs it whenever the guard
+  itself changes. Re-record the baseline with `--update-baseline`.
 - **New narration goes in `record/`, not in a rules file.** The rule is the line; the story
   of who decided it and when is the record.

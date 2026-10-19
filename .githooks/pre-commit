@@ -508,4 +508,28 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(sw[.]js|scripts
   fi
 fi
 
+# -- 24. the doc layers stay small, and every cross-reference resolves (added 2026-10-19) -----------------------------
+# Why: CLAUDE.md had grown to 99 KB and loads before every session's first message, and PROGRAM-APP.md to 292 KB, so
+# changing one exercise card meant reading 385 KB. The fix was four layers -- the door, the rules, the per-section
+# reference and the record (docs/README.md) -- and it only holds if nothing swells back and no link rots as files move.
+# scripts/check_docs.py is the ratchet: a ceiling per door, per rules file, per index and per reference section, plus a
+# link check and the rule-ID check that check_rule_index.py used to do for CLAUDE.md. scripts/docs_baseline.json keeps
+# what already existed, and only shrinks. --selftest proves the guard still fails on each fault, and runs only when the
+# guard itself changes.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '(^|/)[^/]*\.md$|^scripts/(check_docs\.py|docs_baseline\.json)$'; then
+  echo "pre-commit: a doc changed -- checking the layers stay small and every cross-reference resolves..."
+  if ! "$PY" -X utf8 scripts/check_docs.py; then
+    echo ""
+    echo "pre-commit: BLOCKED -- a doc layer grew past its ceiling or a cross-reference is dead (details above)."
+    failed=1
+  fi
+  if git diff --cached --name-only --diff-filter=ACM | grep -qE '^scripts/check_docs\.py$'; then
+    if ! docs_test=$("$PY" -X utf8 scripts/check_docs.py --selftest 2>&1); then
+      echo "$docs_test"
+      echo "pre-commit: BLOCKED -- the doc guard no longer fails on a fault it must catch."
+      failed=1
+    fi
+  fi
+fi
+
 exit $failed
