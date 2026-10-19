@@ -116,13 +116,22 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   RPE, more reps at the same weight, the same set at a lower RPE); only when two things moved at once is it "about X%
   stronger", from the effort-adjusted index, as a percentage only. Holds log no seconds, so a hold's win is an easier RPE.
 - **Highlight Reel: a share card for each win** (Amir, 2026-10-17: *"go with your picks"* on https://claude.ai/artifact/SuyYRPeX9n2SdbiUvoHhkF;
-  `PROGRAM-APP.md` → *Highlight Reel*). `assets/js/sharecard.js` draws the cards on the phone (the training's five, and Career Mode's five reward
-  cards for Career Mode phase 3, GAME-14); program.html decides which win and which numbers from the app's own rules (`winText()`'s `shape` and `share`, the
-  records, the retest comparison). A card never claims beyond the sets (PROG-01: the set as lifted, never the estimate, no RPE-only win), never
-  shows body weight, a check-in answer or pain, and nothing leaves the phone until Share or Save image. **Every Farsi word on a card is in
-  sharecard.js's `FA` table, a draft for Amir.** sharecard.js is in sw.js's SHELL, served cache-first by its plain URL: a change to what it draws
-  ships with a CACHE bump (a comment alone does not need one), and `node scripts/headless/sharecard.js` runs after it (every card, both sizes,
-  both languages, text inside its box). Farsi cards: Shamsi dates, the athlete's name in English letters, "Career Mode" in English (Amir, 2026-10-17).
+  `PROGRAM-APP.md` → *Highlight Reel*). `assets/js/sharecard.js` draws the cards on the phone; program.html decides which win and which numbers from
+  the app's own rules (`winText()`'s `shape` and `share`, the records, the retest comparison). A card never claims beyond the sets (PROG-01: the set
+  as lifted, never the estimate, no RPE-only win), never shows body weight, a check-in answer or pain, and nothing leaves the phone until Share or
+  Save image. **Every Farsi word on a card is in sharecard.js's `FA` table, a draft for Amir.** sharecard.js is in sw.js's SHELL, served cache-first
+  by its plain URL: a change to what it draws ships with a CACHE bump (a comment alone does not need one), and `node scripts/headless/sharecard.js`
+  runs after it (every card, both sizes, both languages, text inside its box). Farsi cards: Shamsi dates, the athlete's name in English letters.
+- **The cards had their own design pass** (2026-10-19; `PROGRAM-APP.md` → *The share cards' design pass*; the page
+  https://claude.ai/artifact/LiVQZ1kM3Cihz5FWRHvZPv, Amir: *"go with your picks"*). Direction A, the app's cover language as a poster: a picture
+  graded into the green, the athlete's name and the date on the top strip, ONE huge number (a count is the outlined P24 numeral), one clay thing,
+  a foot of his photo, his signature and the mantra, everything above y 1568. **Thirteen kinds** (the training's five, plus achievement, mark,
+  honour, open, player, level, goal and session); badge, title and quest went with the cut. **Every achievement has a card, whenever it was earned**:
+  Share sits on every row of Your moments (Amir: *"all the achievements should get a card"*), not only on a band that happened to be drawn.
+  **⚠️ A card never names another athlete** — the crew's yes covers the Bell inside the app, not Instagram — so an honour and an Open result carry
+  their own place and the size of the field. **Any card can take the athlete's own photo as its ground**, dragged and pinched into place (Amir:
+  *"like strava's photos"*, *"let people zoom in or out manually and move their image"*): it is made smaller and drawn on the phone, is never
+  uploaded and is never stored, and the preview is two layers (`paint({layer})`, `reground()`) so a finger costs one drawImage, not a new layout.
 - **Signing out never loses training** (NAV-02, 2026-09-27; `PROGRAM-APP.md` → *Your account*): the initials
   button (top right of every tab screen, in the page: it scrolls away with the screen since 2026-10-12, so it never sits
   over content) → Sign out runs `signOutSafely()`: the waiting report, the

@@ -3904,6 +3904,8 @@
   :where(#day-view) .session-complete .complete-by .complete-earn[hidden] { display: none; }
   :where(#day-view) .complete-earn .earn-xp { font: 900 var(--fs-title)/1 'Barlow Condensed', sans-serif; letter-spacing: .4px; color: #fff; }
   :where(#day-view) .complete-earn .earn-lv { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--mint); }
+  :where(#day-view) .complete-earn .earn-share { margin-left: auto; min-height: 36px; padding: 0 12px; border: 1px solid rgba(255,255,255,.3); border-radius: 999px;
+    background: transparent; color: #fff; cursor: pointer; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
   :where(#day-view) .session-complete > .complete-habit + .complete-actions { grid-row: 6; display: block; margin: 0; padding: 20px var(--g) 0; }
   :where(#day-view) .session-complete > .complete-habit { grid-row: 7; width: auto; max-width: none; margin: 12px var(--g) 0; cursor: pointer; }
   :where(#day-view) .session-complete > .complete-habit[hidden] { display: none; }
@@ -4637,6 +4639,12 @@
   #screen-plan .mo-s { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
   #screen-plan .mo-from { font: italic 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--clay-ink); quotes: "\201C" "\201D"; }   /* his words: the Coach's note's clay */
   #screen-plan .mo-reply { padding: 4px 0; font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-decoration: underline; text-underline-offset: 3px; }
+  /* Share, on every moment that can be drawn and on the month's goal once it is done (the share cards' pass, 2026-10-19). */
+  #screen-plan .mo-share { justify-self: start; margin-top: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 999px;
+    background: var(--paper); color: var(--green-ink); cursor: pointer; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+  #screen-plan .mo-share:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  #screen-plan .cs-share { width: 100%; min-height: 44px; margin-top: 14px; border: 0; border-radius: 12px; background: var(--btn); color: #fff; cursor: pointer;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
   #screen-plan .mo-saw { margin-top: 3px; padding: 4px 8px; border-radius: 999px; background: var(--tint); font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px;
     text-transform: uppercase; color: var(--green-ink); }
   #screen-plan .mo-more { display: block; margin: 2px var(--g) 0; padding: 12px 0; border: 0; background: none; font: 600 var(--fs-body)/1 'Barlow', sans-serif; color: var(--green-ink); cursor: pointer; }
@@ -4748,7 +4756,7 @@
   /* ── THE DOOR'S NAME (Number First, Amir 2026-10-19: "the mono door labels") ────────────────────────────────────────
      The label used to be 11 px Space Mono 700, tracked and in capitals, on all 51 doors: the name of the place you are
      going, set as the smallest and least readable thing in the row, and declared SIX times (this block, #screen-notes,
-     #screen-ceiling, #hist-overlay, #ar-body and #day-view .complete-crew). It is ONE rule now, over all seven scopes,
+     #screen-ceiling, #hist-overlay, #ar-body, #day-view .complete-crew and #day-view .complete-share). It is ONE rule now, over all eight scopes,
      and the other five blocks keep only their .hrow-b.
      The rule: THE LOUDEST THING IN A DOOR IS WHATEVER THAT DOOR IS FOR.
        · Default — the NAME is the headline, in the cycle card's fold-row recipe (.road-ul), so a door reads like the
@@ -4758,9 +4766,9 @@
          Hold Serve, Career) — NOT .hrow-v, which is a slot that also holds prose ("How the app works", "+ Log a max").
      ⚠️ The polarity is deliberate: the headline is the DEFAULT and the quiet label is the :has() branch, so a browser
      with no :has() (iOS 15.0–15.3) shows every name loud instead of whispering the one row this change was for. */
-  :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew) .hrow-l {
+  :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-l {
     font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; letter-spacing: normal; text-transform: none; color: var(--ink); text-wrap: balance; }
-  :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew) .hrow-b:has(.hrow-vv) .hrow-l {
+  :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-b:has(.hrow-vv) .hrow-l {
     font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-wrap: normal; }
   :where(#home-overview, #screen-plan) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   :where(#home-overview, #screen-plan) .hrow-vv { white-space: nowrap; }   /* the value never breaks; the small line under it wraps whole */
@@ -4775,7 +4783,7 @@
   :where(#home-overview, #screen-plan) .hrow-sp + .hrow-a { margin-left: -4px; }
   @media (max-width: 359px) {   /* the narrowest phone: tighter gaps, and one more pixel of air because 320 stacks the name, the figure and its line */
     :where(#home-overview, #screen-plan) .hrow { gap: 10px; padding-right: 12px; }
-    :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew) .hrow-b { gap: 3px; }
+    :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-b { gap: 3px; }
   }
 
   /* 7. Progress: the header (the name as the eyebrow, "Progress" as the title), a section title for each part. The This cycle cover and
@@ -5093,6 +5101,22 @@
     box-shadow: 0 10px 28px rgba(8,45,32,.24); transition: opacity .2s ease; }
   .hl-prev.is-post .hl-img { height: min(42vh, 380px); aspect-ratio: 4 / 5; }
   .hl-prev.is-busy .hl-img { opacity: .55; }
+  /* The athlete's own picture: the ground and the words as two layers, so a finger moving the picture redraws the ground only. */
+  .hl-live { position: relative; display: block; width: auto; height: min(50vh, 440px); aspect-ratio: 9 / 16; max-width: 100%; border-radius: 12px; overflow: hidden;
+    background: var(--hero); box-shadow: 0 10px 28px rgba(8,45,32,.24); touch-action: none; cursor: grab; }
+  .hl-prev.is-post .hl-live { height: min(42vh, 380px); aspect-ratio: 4 / 5; }
+  .hl-live:active { cursor: grabbing; }
+  .hl-live .hl-lay { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .hl-prev.is-busy .hl-live { opacity: .55; }
+  .hl-ph { display: grid; gap: 10px; padding-top: 12px; border-top: 1px solid var(--hair); }
+  .hl-ph-btn, .hl-ph-off { min-height: 44px; padding: 0 14px; border: 1px solid var(--hair); border-radius: 12px; background: var(--sand); color: var(--ink); cursor: pointer;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .hl-ph-off { color: var(--grey); }
+  .hl-ph-on { display: grid; gap: 10px; }
+  .hl-ph-z { display: flex; align-items: center; gap: 12px; }
+  .hl-ph-z span { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  .hl-ph-z input { flex: 1; min-width: 0; accent-color: var(--green-ink); }
+  .hl-ph-tip { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
   .hl-wait { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 8px 12px; border-radius: 999px; background: rgba(6,36,26,.7);
     font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: #fff; white-space: nowrap; }
   .hl-prev:not(.is-busy) .hl-wait { display: none; }
@@ -5174,6 +5198,8 @@
   #screen-crew .cr-ob-r.me { background: var(--tint); margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 8px; border-bottom-color: transparent; }
   #screen-crew .cr-ob-r.me .n, #screen-crew .cr-ob-r.me .v, #screen-crew .cr-ob-r.me .p { color: var(--green-ink); }
   #screen-crew .cr-o-none { margin: 10px 0 0; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--grey); }
+  #screen-crew .cr-o-share { display: block; margin-top: 12px; min-height: 40px; padding: 0 14px; border: 1px solid var(--hair); border-radius: 8px; background: var(--paper);
+    color: var(--green-ink); cursor: pointer; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
   #screen-crew .cr-o-go { display: inline-block; margin-top: 12px; padding: 10px 14px; border-radius: 8px; background: var(--clay-fill); color: #fff;
     font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; }
   #screen-crew .cr-o-mine { display: block; margin-top: 10px; font: 600 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--green-ink); }
@@ -5295,15 +5321,15 @@
   .cr-viewer .cr-kd { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.1); color: #fff; }
   .cr-viewer .cr-kd[aria-pressed="true"] { border-color: #fff; background: #fff; color: #0E4A36; }
   /* Tell the crew, on the finished card, under the WhatsApp row (paintCrewTell()) */
-  :where(#day-view) .complete-crew { margin-top: 10px; }
-  :where(#day-view) .complete-crew[hidden] { display: none; }
-  :where(#day-view) .complete-crew .hrow { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; margin: 0; padding: 12px 14px 12px 16px;
+  :where(#day-view) .complete-crew, :where(#day-view) .complete-share { margin-top: 10px; }
+  :where(#day-view) .complete-crew[hidden], :where(#day-view) .complete-share[hidden] { display: none; }
+  :where(#day-view) .complete-crew .hrow, :where(#day-view) .complete-share .hrow { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; margin: 0; padding: 12px 14px 12px 16px;
     border: 1px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
-  :where(#day-view) .complete-crew .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
-  :where(#day-view) .complete-crew .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#day-view) .complete-crew .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
-  :where(#day-view) .complete-crew .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ink); }   /* as the WhatsApp row above it */
-  :where(#day-view) .complete-crew .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+  :where(#day-view) .complete-crew .hrow-ic, :where(#day-view) .complete-share .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  :where(#day-view) .complete-crew .hrow-ic svg, :where(#day-view) .complete-share .hrow-ic svg { width: 22px; height: 22px; }
+  :where(#day-view) .complete-crew .hrow-b, :where(#day-view) .complete-share .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
+  :where(#day-view) .complete-crew .hrow-q, :where(#day-view) .complete-share .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ink); }   /* as the WhatsApp row above it */
+  :where(#day-view) .complete-crew .hrow-a, :where(#day-view) .complete-share .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
 
   /* ══ SIGN-IN, WELCOME, LOADING AND ERROR IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════
      Amir, 2026-10-13: "continue until everything has a consistent design". The four screens a person sees before or around their
@@ -9335,7 +9361,7 @@ function renderHome() {
       <div class="complete-actions">
         <div class="send-session-status" id="send-status-${day.id}" aria-live="polite"></div>
       </div>
-      <div class="complete-wa">${sessionWa}<div class="complete-crew" data-day="${day.id}" hidden></div></div>
+      <div class="complete-wa">${sessionWa}<div class="complete-crew" data-day="${day.id}" hidden></div><div class="complete-share" data-day="${day.id}" hidden></div></div>
       <!-- The rating and the note fold behind this one row after Done (the panel moves into the slot, moveRatePanel()). Send the
            update and the send status stay outside the fold. paintRateFold() writes the line; toggleRateFold() opens it. -->
       <button type="button" class="rate-fold" aria-expanded="false" aria-controls="rate-slot-${day.id}" onclick="toggleRateFold('${day.id}')">
@@ -10487,7 +10513,7 @@ const APP_GUIDE = [
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks held in a row',
     body: `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count on Home's <strong>Career</strong> row goes up. The same line says what's left this week. Miss a week and the count starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
-    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p>A mark or an achievement you earn becomes a card too. Tap <strong>Share</strong> on its band on the finished session, or on the full-screen moment when it's a big one.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
+    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p><strong>Use your own photo</strong> puts a picture from your phone behind the card. Drag it to move it and pinch to zoom, or use the <strong>Zoom</strong> slider. <strong>Remove the photo</strong> puts the card back as it was. The picture stays on your phone: only the finished card goes anywhere, and only when you tap Share or Save image.</p><p>Everything in <strong>Your moments</strong> on Progress has its own <strong>Share</strong> — every mark, every achievement and every honour, however long ago you earned it. <strong>Share your card</strong>, under your numbers, makes a card of where you are right now: your level, your four numbers and your best lifts. The month's goal gets one once it's done, a new level gets one on the finished session, your result in <strong>The Open</strong> gets one on Crew, and <strong>Share the session</strong> on the finished card makes one of the session itself.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Once a week</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
@@ -11731,8 +11757,12 @@ function paintCareerEarn(day) {
       const p = CAREER_T.p, fresh = !!raw.saved && (CAREER_T.at || 0) > raw.saved;
       const gained = fresh ? Math.max(0, (Number(p.career && p.career.xp) || 0) - raw.before) : raw.xp;
       const L = careerLevelOf((fresh ? 0 : raw.xp) + (Number(p.career && p.career.xp) || 0), p.rules);
+      // A level the session took them up: its own card, offered here and nowhere else (the level is on Progress, not a moment).
+      const was = fresh && raw.before > 0 ? careerLevelOf(raw.before, p.rules).level : L.level;
+      const up = fresh && L.level > was && !window.IS_PREVIEW;
       h = `<span class="earn-xp">+${gained.toLocaleString('en-US')} XP</span>`
-        + `<span class="earn-lv">Level ${L.level} · ${fresh ? `${L.to_next.toLocaleString('en-US')} to ${L.level + 1}` : 'counting'}</span>`;
+        + `<span class="earn-lv">Level ${L.level} · ${fresh ? `${L.to_next.toLocaleString('en-US')} to ${L.level + 1}` : 'counting'}</span>`
+        + (up ? `<button type="button" class="earn-share" onclick="shareLevel(${L.level})">Share level ${L.level}</button>` : '');
     }
   } catch (err) { h = ''; }
   if (el.innerHTML !== h) el.innerHTML = h;
@@ -11986,12 +12016,15 @@ function careerCardHTML() {
     <span class="cs-l">Level</span>
     <div class="cs-lvl"><b>${L.level}</b><span>${fmt(L.to_next)} XP to level ${L.level + 1}</span></div>
     <span class="cs-bar" aria-hidden="true"><i style="width:${pct}%"></i></span>
-    ${cells.length ? `<div class="cs-grid">${cells.map(cell).join('')}</div>` : ''}</div>`;
+    ${cells.length ? `<div class="cs-grid">${cells.map(cell).join('')}</div>` : ''}
+    ${window.IS_PREVIEW ? '' : '<button type="button" class="cs-share" onclick="sharePlayerCard()">Share your card</button>'}</div>`;
   const g = MOM_T && MOM_T.my && MOM_T.my.goal;
   if (g && g.line) {
     const mon = momMonth(g.month, true);
     h += `<div class="cs-goal${g.done_at ? ' is-done' : ''}"><span class="cs-ring" aria-hidden="true"></span>
-      <span class="cs-gb"><span class="cs-l">${esc(mon)} goal · ${g.done_at ? 'done' : 'from Amir'}</span><span class="cs-gl">${esc(g.line)}</span></span></div>`;
+      <span class="cs-gb"><span class="cs-l">${esc(mon)} goal · ${g.done_at ? 'done' : 'from Amir'}</span><span class="cs-gl">${esc(g.line)}</span>`
+      + (g.done_at && !window.IS_PREVIEW ? '<button type="button" class="mo-share" onclick="shareGoal()">Share</button>' : '')
+      + `</span></div>`;
   }
   return h;
 }
@@ -12017,12 +12050,13 @@ function momentsList() {
       const n = mk.at[i];
       if (!n || !day) return;
       out.push({ day, sort: day, kind: 'mark', w: n + ' ' + careerMarkWords(mk.key, n) + (mk.key === 'weeks_held' ? ' in a row' : ''), s: '',
-        award_id: awardId('badge', b.id, i + 1, '') });
+        markKey: mk.key, markN: n, markNext: mk.at[i + 1] || 0, award_id: awardId('badge', b.id, i + 1, '') });
     });
   });
   ((aw && aw.achievements) || []).forEach(a => {
     if (!a || !a.id || !a.day) return;
-    out.push({ day: a.day, sort: a.day, kind: 'achievement', w: momName(a.name || a.id), s: a.caption || '', award_id: awardId('achievement', a.id) });
+    out.push({ day: a.day, sort: a.day, kind: 'achievement', w: momName(a.name || a.id), s: a.caption || '',
+      meaning: achMeaningOf(a.id), award_id: awardId('achievement', a.id) });
   });
   ((my && my.notes) || []).forEach(n => {
     if (!n || !n.line || !n.day) return;
@@ -12041,7 +12075,8 @@ function momentsList() {
     // An honour is for a month and is given after it: it sorts at the next month's first day, and shows its month.
     const m = /^(\d{4})-(\d{2})/.exec(h.month), nx = m ? new Date(Number(m[1]), Number(m[2]), 1) : null;
     const sort = nx ? nx.getFullYear() + '-' + String(nx.getMonth() + 1).padStart(2, '0') + '-01' : h.month;
-    out.push({ day: h.month, sort, kind: 'honour', w, s, honour: true });
+    const hv = h.honour === 'sessions' && n > 0 ? { n } : h.honour === 'improved' && pct > 0 ? { pct, lift: v.lift ? String(v.lift) : '' } : {};
+    out.push({ day: h.month, sort, kind: 'honour', w, s, honour: true, hKind: h.honour, hv });
   });
   const saw = new Set(((my && my.saw) || []).filter(x => typeof x === 'string'));
   out.forEach(x => { x.saw = !!(x.award_id && saw.has(x.award_id)); });
@@ -12051,14 +12086,17 @@ function momentsHTML() {
   const list = momentsList();
   if (!list.length) return '';
   const SHOW = 6;
-  const row = x => {
+  const row = (x, i) => {
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(x.day));
     const d = x.honour ? `<b>${esc(momMonth(x.day))}</b>${m ? m[1] : ''}` : m ? `<b>${m[3]}</b>${esc(momMonth(x.day))}` : '';
     const reply = x.kind === 'note' ? `<a class="mo-reply" href="${esc(coachWhatsAppUrl('About your note: “' + x.s + '” '))}" target="_blank" rel="noopener">Reply on WhatsApp</a>` : '';
+    // Every moment that can be drawn carries Share, however long ago it was earned (Amir, 2026-10-19).
+    const share = !window.IS_PREVIEW && hlMomentSpec(x)
+      ? `<button type="button" class="mo-share" onclick="shareMoment(${i})" aria-label="${esc('Share: ' + x.w).replace(/"/g, '&quot;')}">Share</button>` : '';
     return `<div class="mo mo-${x.kind}"${x.note ? ` data-note="${esc(x.note)}"` : ''}><span class="mo-d">${d}</span><span class="mo-b">`
       + `<span class="mo-w">${esc(x.w)}</span>`
       + (x.kind === 'note' ? `<q class="mo-from">${esc(x.s)}</q>${reply}` : x.s ? `<span class="mo-s">${esc(x.s)}</span>` : '')
-      + (x.saw ? '<span class="mo-saw">Amir saw this</span>' : '') + `</span></div>`;
+      + (x.saw ? '<span class="mo-saw">Amir saw this</span>' : '') + share + `</span></div>`;
   };
   return `<h2 class="prog-sec" id="moments-title">Your moments <span class="prog-sec-n">${list.length}</span></h2>
     <div class="mo-list${_momAll || list.length <= SHOW ? ' all' : ''}">${list.map(row).join('')}</div>`
@@ -12080,6 +12118,12 @@ function achKinds() {
 function achItems() {
   const a = MOM_T && MOM_T.ach;
   return a && a.ready && Array.isArray(a.items) ? a.items.filter(i => i && i.id && i.meaning) : [];
+}
+// An achievement's meaning (consistency · commitment · progress · resilience), for the eyebrow of its share card. The awards
+// list carries no meaning, so it comes from get_achievements(); without that answer the card's eyebrow is just "Achievement".
+function achMeaningOf(id) {
+  const it = achItems().find(i => String(i.id) === String(id));
+  return it ? it.meaning : '';
 }
 // "2026-10-03" → "3 Oct".
 function achDay(d) { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d || '')); return m ? Number(m[3]) + ' ' + momMonth(d) : ''; }
@@ -12213,7 +12257,7 @@ function loadCrewCache() {
     const o = JSON.parse(localStorage.getItem(crewKey()) || 'null');
     if (o && o.athlete_id === ATHLETE_ID && Array.isArray(o.items)) BELL = o;
   } catch (e) { /* no copy yet */ }
-  setCrewTab(); paintCrewTell();
+  setCrewTab(); paintCrewTell(); paintSessionShare();
 }
 // "Not on the server": the function is missing (PostgREST's PGRST202, a 404). The tab goes, and the copy with it.
 function crewMissingErr(r) {
@@ -12252,7 +12296,7 @@ async function refreshBell() {
     try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) { /* storage full: shown this visit */ }
     crewSweepPhotos();   // a photo whose post has gone leaves the phone with it
   } catch (e) { /* keep the copy */ }
-  finally { _bellBusy = false; setCrewTab(); paintCrewTell(); if (onCrew()) renderCrew(); }
+  finally { _bellBusy = false; setCrewTab(); paintCrewTell(); paintSessionShare(); if (onCrew()) renderCrew(); }
 }
 // The one ask that is not an open: a phone that has never had an answer does not know whether there is a Crew tab at all.
 // Once it has a copy, nothing is asked for again until Crew is opened.
@@ -12447,6 +12491,7 @@ function crewOpenHTML() {
     ${board.length ? `<div class="cr-ob">${rows}</div>` : '<p class="cr-o-none">Nobody has put a result up yet. Be first.</p>'}
     ${!_openAll && board.length > 5 ? `<button type="button" class="cr-o-more" onclick="crewOpenAll()">Show all ${board.length}</button>` : ''}
     ${myVal != null ? `<span class="cr-o-mine">Your result: ${esc(crewOpenNum(myVal) + unit)}. Beat it and send me the new one.</span>` : ''}
+    ${myVal != null && !window.IS_PREVIEW ? '<button type="button" class="cr-o-share" onclick="shareOpen()">Share your result</button>' : ''}
     <a class="cr-o-go" href="${esc(coachWhatsAppUrl(msg))}" target="_blank" rel="noopener">${myVal != null ? 'Send a better one' : 'Send Amir your result'}</a>
   </section>`;
 }
@@ -12940,18 +12985,27 @@ function paintCrewTell() {
     if (el.innerHTML !== html) el.innerHTML = html;
   });
 }
-// A mark as a card to share, until the share cards' own design pass (Amir, 2026-10-19: "the cards are very important part of this app,
-// because we want to use it to advertise our brand. we need to design them carefull and with details later"): Highlight Reel's achievement
-// card (a seal, the name, a line), so no metal shows (L2). sharecard.js is not changed.
+// The session's own share card, under Tell the crew but nothing to do with it: this one goes to Instagram, with the athlete's own
+// photo behind it if they want one, and nothing leaves the phone until they tap Share (so the crew's rules do not govern it).
+function paintSessionShare() {
+  const on = !window.IS_PREVIEW && !window.IS_DEMO;
+  document.querySelectorAll('.complete-share[data-day]').forEach(el => {
+    el.hidden = !on;
+    const d = esc(el.dataset.day);
+    const html = on ? `<button type="button" class="hrow" onclick="shareSession('${d}')"><span class="hrow-ic">${CREW_CAM_SVG}</span><span class="hrow-b"><span class="hrow-l">Share the session</span><span class="hrow-q">A card for Instagram, with your own photo behind it.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>` : '';
+    if (el.innerHTML !== html) el.innerHTML = html;
+  });
+}
+function shareSession(day) { const s = hlSessionSpec(day); if (s) openShareSheet([s], 0); }
+window.shareSession = shareSession;
+// A mark's own share card (the share cards' design pass, 2026-10-19): the outlined numeral, what it counts, Amir's line and the
+// next mark. It used to borrow the achievement card as a stand-in, with no next mark and the name in English on a Farsi card.
 function careerMarkSpec(item, tier, date) {
   const mk = careerMarks()[item];
   if (!mk) return null;
   const n = mk.at[tier - 1];
   if (!n) return null;
-  const line = { weeks_held: 'In a row. Every session, every week.', sessions_with_amir: 'One session at a time.',
-    personal_bests: 'Stronger, one best at a time.', comebacks: 'Every time it stopped, back again.' }[mk.key];
-  const meaning = { weeks_held: 'consistency', sessions_with_amir: 'commitment', personal_bests: 'progress', comebacks: 'resilience' }[mk.key];
-  return { kind: 'achievement', mark: true, name: n + ' ' + careerMarkWords(mk.key, n), meaning, caption: line, date: date || '', first: hlFirst(),
+  return { kind: 'mark', key: mk.key, n, next: mk.at[tier] || 0, date: date || '', first: hlFirst(),
     award_id: awardId('badge', item, tier, '') };
 }
 // Is a waiting reward one this app tells? An achievement, or a tier of one of the four marks. Every other badge, a title, the Grand Slam,
@@ -15561,7 +15615,7 @@ function finishDayNow(day, card) {
   if (!isPartial) paintFinishArt(day);
   completeEl.classList.add('visible');
   paintCareerEarn(day);   // "+470 XP · Level 24", counting until the server has the session
-  paintCrewTell();   // Tell the crew (stage81), while this athlete can post
+  paintCrewTell(); paintSessionShare();   // Tell the crew (stage81), while this athlete can post
   completeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   // The record for the coach dashboard, and the report, once (the outbox keeps it
   // until it goes: sendReport()). Its first step (before any await) files this session's Personal Records; every new best it
@@ -20671,7 +20725,7 @@ function hlSetText(s) {
 // What the share sheet can offer for the day: the New best and Retest specs, then the rewards the server has confirmed (a "Counting" band has no
 // card yet). A band's `si` is its place in this list.
 function hlShareList(o) { return (o.specs || []).concat((o.rewards || []).filter(r => r && !r.counting)); }
-function hlBandWord(k) { return { best: 'New best', retest: 'Retest beaten', badge: 'Badge', achievement: 'Moment', title: 'Title' }[k] || 'Badge'; }
+function hlBandWord(k) { return { best: 'New best', retest: 'Retest beaten', mark: 'A new mark', achievement: 'Moment', level: 'A new level' }[k] || 'Moment'; }
 function paintWinBand(day, quiet) {
   const slot = document.getElementById('hlwin-' + day);
   if (!slot) return;
@@ -20698,9 +20752,10 @@ function paintWinBand(day, quiet) {
       <span class="hl-band-t"><small>${what}</small><b>${esc(s.lift)} <em>${esc(hlSetText(s))}</em></b></span>
       <span class="hl-band-go" aria-hidden="true">Share</span></button>`;
     }
-    // A reward: its name in the bold line as plain text (clay is "look here" only, DS-01: never the <em>). No metal since round 5 (L2); a mark
-    // (careerMarkSpec()) says so.
-    const what = s.mark ? 'A new mark' : hlBandWord(s.kind), nm = s.name;
+    // A reward: its name in the bold line as plain text (clay is "look here" only, DS-01: never the <em>). No metal since round 5 (L2).
+    // A mark has no name of its own (it is its number and what it counts), so the band writes that.
+    const what = hlBandWord(s.kind);
+    const nm = s.kind === 'mark' ? s.n + ' ' + careerMarkWords(s.key, s.n) + (s.key === 'weeks_held' ? ' in a row' : '') : s.name;
     if (s.counting) {
       return `<div class="${cls} is-counting" data-bk="${attr(key)}" role="group" aria-label="${attr(what + ', counting: ' + nm)}">
       <span class="hl-band-t"><small>${esc(what)} · Counting</small><b>${esc(nm)}</b></span></div>`;
@@ -20746,7 +20801,9 @@ window.openShareRetest = openShareRetest;
 // ── The share sheet: one page of the one sheet (#hist-overlay), its top row drawn by paintSheetBack() ──
 // The preview IS the picture that is shared (painted by the same code). The choices are remembered on this phone (aa_hl_prefs: no
 // athlete prefix, never synced): Story or Post, English or Farsi, the weights, the name.
-const _HL = { specs: [], i: 0, blob: null, url: '', seq: 0 };
+// photo / fit / pw / ph: the athlete's own picture behind the card and how they placed it (2026-10-19). It is held for this sheet
+// only: a new sheet starts with the card's own ground, and nothing about it is ever written to storage or sent anywhere.
+const _HL = { specs: [], i: 0, blob: null, url: '', seq: 0, photo: null, fit: { z: 1, dx: 0, dy: 0 }, pw: 0, ph: 0, fitT: 0 };
 function hlPrefs() {
   const d = { size: 'story', lang: 'en', weights: true, name: true };
   try { const o = JSON.parse(localStorage.getItem('aa_hl_prefs') || '{}'); return Object.assign(d, o && typeof o === 'object' ? o : {}); } catch (e) { return d; }
@@ -20756,17 +20813,108 @@ function hlSetPref(k, v) {
   try { _lsRawSet('aa_hl_prefs', JSON.stringify(p)); } catch (e) { /* private window: it just forgets */ }
 }
 const HL_TITLE = { best: 'Share your best', effort: 'Share a win', retest: 'Share your retest', cycle: 'Share your cycle', roadmap: 'Share the whole road',
-  badge: 'Share your badge', achievement: 'Share it', title: 'Share your title', level: 'Share your level', quest: 'Share your quest' };
+  achievement: 'Share it', mark: 'Share your mark', honour: 'Share your honour', open: 'Share your result',
+  player: 'Share your card', level: 'Share your level', goal: 'Share the goal', session: 'Share your session' };
 function hlLabel(s) {
   return s.kind === 'roadmap' ? 'The whole road' : s.kind === 'cycle' ? (s.cycle && s.cycle.name) || 'This cycle'
-    : s.kind === 'retest' ? s.lift + ' retest' : s.lift || s.name || HL_TITLE[s.kind] || '';
+    : s.kind === 'retest' ? s.lift + ' retest' : s.kind === 'mark' ? careerMarkWords(s.key, s.n) : s.kind === 'player' ? 'Your card'
+    : s.lift || s.name || s.title || HL_TITLE[s.kind] || '';
 }
 // Does the card carry kilos the switch can hide? (A cycle's wins can.)
 function hlHasWeights(s) {
   if (s.kind === 'best' || s.kind === 'retest') return true;
   if (s.kind === 'effort') return !!(s.a && s.a.w) || !!(s.b && s.b.w);
   if (s.kind === 'cycle') return (s.wins || []).some(w => (w.a && w.a.w) || (w.b && w.b.w));
+  if (s.kind === 'player') return !!(s.lifts || []).length;
   return false;
+}
+// ── The doors the 2026-10-19 pass opened (PROGRAM-APP.md → Highlight Reel) ────────────────────────────────────────────────
+// Amir: "all the achievements should get a card". A card used to exist only where a band was DRAWN on the finished card or a
+// full-screen moment opened, so an achievement behind "+N more in Your moments", or one back-paid quietly, had none at all.
+// Every row of Your moments that can be drawn now carries Share, whenever it was earned.
+function hlMomentSpec(x) {
+  if (!x) return null;
+  const first = hlFirst();
+  if (x.kind === 'mark' && x.markKey && x.markN > 0) return { kind: 'mark', key: x.markKey, n: x.markN, next: x.markNext || 0, date: x.day, first };
+  if (x.kind === 'achievement') return { kind: 'achievement', name: x.w, caption: x.s || '', meaning: x.meaning || '', date: x.day, first };
+  if (x.kind === 'honour' && x.hKind) return Object.assign({ kind: 'honour', honour: x.hKind, monthIso: x.day, date: x.sort, first }, x.hv || {});
+  return null;
+}
+function shareMoment(i) {
+  const sp = hlMomentSpec(momentsList()[Number(i)]);
+  if (sp) openShareSheet([sp], 0);
+}
+window.shareMoment = shareMoment;
+// Their own card, any day (Progress → Your numbers): the one card that waits for nothing to happen. The lifts are the three with
+// the highest estimate, each PRINTED as the set it was lifted at, never the estimate (PROG-01).
+function hlTopLifts(n) {
+  try {
+    return ceilingLifts().filter(sr => sr.latest && Number(sr.latest.w) > 0 && Number(sr.latest.r) > 0)
+      .sort((a, b) => (Number(b.latest.kg) || 0) - (Number(a.latest.kg) || 0)).slice(0, n || 3)
+      .map(sr => ({ name: sr.lift, w: Number(sr.latest.w), r: Number(sr.latest.r), u: uKey(sr.latest.u) }));
+  } catch (e) { return []; }
+}
+function hlPlayerSpec() {
+  if (!careerOnT() || !CAREER_T || !CAREER_T.p) return null;
+  const p = CAREER_T.p, c = p.career || {};
+  if (typeof c.level !== 'number') return null;
+  const L = careerLevelOf(c.xp, p.rules);
+  const cells = catalogueOnT() ? careerMarkCells(p) : [];
+  const by = k => { const x = cells.find(y => y.key === k); return x ? x.value : 0; };
+  const c0 = ((DATA && DATA.cycles) || [])[0];
+  return { kind: 'player', first: hlFirst(), level: L.level, weeks: by('weeks_held'), sessions: by('sessions_with_amir'),
+    bests: by('personal_bests'), comebacks: by('comebacks'), lifts: hlTopLifts(3),
+    since: c0 && c0.startDate ? String(c0.startDate).slice(0, 10) : '', date: ymdLocal(new Date()) };
+}
+function sharePlayerCard() { const s = hlPlayerSpec(); if (s) openShareSheet([s], 0); }
+window.sharePlayerCard = sharePlayerCard;
+// The month's goal, ticked (L10): Amir's own line, in his words, with DONE on it.
+function hlGoalSpec() {
+  const g = MOM_T && MOM_T.my && MOM_T.my.goal;
+  if (!g || !g.line || !g.done_at) return null;
+  return { kind: 'goal', first: hlFirst(), month: momMonth(g.month, true), text: g.line, date: String(g.done_at).slice(0, 10) };
+}
+function shareGoal() { const s = hlGoalSpec(); if (s) openShareSheet([s], 0); }
+window.shareGoal = shareGoal;
+// A new level, offered on the finished card when the session took them up one.
+function shareLevel(lv) {
+  const n = Number(lv) || 0;
+  if (n > 0) openShareSheet([{ kind: 'level', first: hlFirst(), level: n, date: ymdLocal(new Date()) }], 0);
+}
+window.shareLevel = shareLevel;
+// The Monthly Open, from Crew. ⚠️ Never another athlete's name: the crew's yes covers the Bell INSIDE the app, not Instagram,
+// so the card carries their own result, their place and the size of the field, and nothing else of anybody else.
+function hlOpenSpec() {
+  const o = BELL && BELL.open;
+  if (!o || !o.title) return null;
+  const board = Array.isArray(o.board) ? o.board : [];
+  const mine = board.find(r => r && r.me) || null;
+  const v = mine ? mine.value : (o.mine && o.mine.value);
+  if (v == null || v === '') return null;
+  const place = mine && Number(mine.place) > 0 ? Number(mine.place) : 0;
+  const today = ymdLocal(new Date());
+  return { kind: 'open', first: hlFirst(), title: o.title, how: o.how || '', value: Math.round(Number(v) * 100) / 100, unit: o.unit || '',
+    place, field: place ? board.length : 0, monthIso: today.slice(0, 8) + '01', date: today };
+}
+function shareOpen() { const s = hlOpenSpec(); if (s) openShareSheet([s], 0); }
+window.shareOpen = shareOpen;
+// A finished session: the card the athlete's own photo belongs on (Amir, 2026-10-19: "I liked the session with photo idea").
+// Its numbers are the day's own work: how long it took, how many exercises, how many sets were logged. Never an RPE, never a
+// check-in answer, never anything about their body.
+function hlSessionSpec(day) {
+  const days = (DATA && DATA.workouts && DATA.workouts.days) || [];
+  const D = days.find(x => String(x.id) === String(day));
+  if (!D) return null;
+  const ex = (D.blocks || []).reduce((k, b) => k + ((b.exercises || []).length), 0);
+  let mins = 0;
+  try { const t = loadTimer(day); mins = t && t.acc > 0 ? Math.round(t.acc / 60000) : 0; } catch (e) { mins = 0; }
+  const on = sessionDateFor(day);
+  return { kind: 'session', first: hlFirst(), title: D.title || ('Day ' + day), cycle: hlCycleOf(on),
+    mins, exercises: ex, sets: hlSetsLogged(day), date: on };
+}
+// How many sets the athlete ticked that day: the app's own count, the one the finished card and the report already use.
+function hlSetsLogged(day) {
+  try { const st = getDayCompletion(day); return Math.max(0, Number(st && st.done) || 0); } catch (e) { return 0; }
 }
 function openShareSheet(specs, i) {
   if (window.IS_PREVIEW) return;
@@ -20775,6 +20923,8 @@ function openShareSheet(specs, i) {
   const ov = document.getElementById('hist-overlay'), m = ov && ov.querySelector('.readiness-modal');
   if (!m) return;
   _HL.specs = specs; _HL.i = Math.max(0, Math.min(Number(i) || 0, specs.length - 1));
+  _HL.photo = null; _HL.fit = { z: 1, dx: 0, dy: 0 }; _HL.pw = 0; _HL.ph = 0;
+  clearTimeout(_HL.fitT);
   const pr = hlPrefs(), s = specs[_HL.i];
   const seg = (k, v, label, extra) => `<button type="button" data-k="${k}" data-v="${v}" aria-pressed="${pr[k] === v}"${extra || ''}>${label}</button>`;
   const tg = (k, label) => `<button type="button" class="hl-tg" role="switch" data-k="${k}" aria-checked="${pr[k] !== false}"><span>${label}</span><i aria-hidden="true"></i></button>`;
@@ -20783,12 +20933,21 @@ function openShareSheet(specs, i) {
     <h2 class="readiness-title" id="hl-title">${esc(HL_TITLE[s.kind] || 'Share it')}</h2>
     ${specs.length > 1 ? `<div class="hl-pick" role="radiogroup" aria-label="Which card">${specs.map((x, j) =>
       `<button type="button" role="radio" data-j="${j}" aria-checked="${j === _HL.i}">${esc(hlLabel(x))}</button>`).join('')}</div>` : ''}
-    <div class="hl-prev is-busy${pr.size === 'post' ? ' is-post' : ''}" id="hl-prev"><img class="hl-img" id="hl-img" alt="" width="1080" height="${pr.size === 'post' ? 1350 : 1920}"><span class="hl-wait">Drawing your card…</span></div>
+    <div class="hl-prev is-busy${pr.size === 'post' ? ' is-post' : ''}" id="hl-prev"><img class="hl-img" id="hl-img" alt="" width="1080" height="${pr.size === 'post' ? 1350 : 1920}"><div class="hl-live" id="hl-live" hidden></div><span class="hl-wait">Drawing your card…</span></div>
     <div class="hl-ctl">
       <div class="hl-seg" role="group" aria-label="Size">${seg('size', 'story', 'Story')}${seg('size', 'post', 'Post')}</div>
       <div class="hl-seg" role="group" aria-label="Language">${seg('lang', 'en', 'English')}${seg('lang', 'fa', 'فارسی', ' lang="fa" dir="rtl"')}</div>
       ${tg('weights', 'Show the weights')}
       ${tg('name', 'Show my name')}
+      <div class="hl-ph">
+        <button type="button" class="hl-ph-btn" id="hl-ph-btn">Use your own photo</button>
+        <input type="file" id="hl-ph-file" accept="image/*" hidden>
+        <div class="hl-ph-on" id="hl-ph-on" hidden>
+          <label class="hl-ph-z" for="hl-ph-z"><span>Zoom</span><input type="range" id="hl-ph-z" min="1" max="4" step="0.01" value="1"></label>
+          <small class="hl-ph-tip">Drag the picture to move it, pinch to zoom.</small>
+          <button type="button" class="hl-ph-off" id="hl-ph-off">Remove the photo</button>
+        </div>
+      </div>
     </div>
     <button type="button" class="hl-share" id="hl-share" disabled>Share</button>
     <button type="button" class="hl-save" id="hl-save" disabled>Save image</button>
@@ -20821,6 +20980,134 @@ function hlWire(m) {
   document.getElementById('hl-share').addEventListener('click', hlShareNow);
   document.getElementById('hl-save').addEventListener('click', () => hlSaveNow(false));
   document.getElementById('hl-copy').addEventListener('click', hlCopy);
+  hlWirePhoto(m);
+}
+// ── The athlete's own picture behind the card (Amir, 2026-10-19: "any idea can be sent with their photo as a background like
+//    strava's photos", and "let people zoom in or out manually and move their image if they are using it") ────────────────────
+// The picture is read on the phone, made smaller on the phone, drawn on the phone. Nothing leaves it until Share or Save image,
+// and the file itself never does: only the finished card.
+function hlWirePhoto(m) {
+  const file = m.querySelector('#hl-ph-file'), btn = m.querySelector('#hl-ph-btn'), off = m.querySelector('#hl-ph-off'), z = m.querySelector('#hl-ph-z');
+  if (btn && file) btn.addEventListener('click', () => file.click());
+  if (file) file.addEventListener('change', () => { hlPhotoPick(file.files && file.files[0]); file.value = ''; });
+  if (off) off.addEventListener('click', hlPhotoOff);
+  if (z) z.addEventListener('input', () => { _HL.fit = Object.assign({}, _HL.fit, { z: Number(z.value) || 1 }); hlFitMoved(); });
+  const live = m.querySelector('#hl-live');
+  if (!live) return;
+  const pts = new Map();
+  let base = null;
+  const grab = e => { if (!_HL.photo) return; try { live.setPointerCapture(e.pointerId); } catch (err) {} pts.set(e.pointerId, e); base = hlFitBase(pts); };
+  const move = e => {
+    if (!_HL.photo || !pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, e);
+    e.preventDefault();
+    hlFitDrag(pts, base, live);
+  };
+  const drop = e => { pts.delete(e.pointerId); base = pts.size ? hlFitBase(pts) : null; };
+  live.addEventListener('pointerdown', grab);
+  live.addEventListener('pointermove', move);
+  live.addEventListener('pointerup', drop);
+  live.addEventListener('pointercancel', drop);
+}
+function hlPhotoUI() {
+  const on = !!_HL.photo;
+  const box = document.getElementById('hl-ph-on'), btn = document.getElementById('hl-ph-btn');
+  const live = document.getElementById('hl-live'), img = document.getElementById('hl-img');
+  if (box) box.hidden = !on;
+  if (btn) btn.textContent = on ? 'Choose another photo' : 'Use your own photo';
+  if (live) live.hidden = !on;
+  if (img) img.hidden = on;
+  const z = document.getElementById('hl-ph-z');
+  if (z) z.value = String((_HL.fit && _HL.fit.z) || 1);
+}
+function hlPhotoOff() {
+  _HL.photo = null; _HL.fit = { z: 1, dx: 0, dy: 0 }; _HL.pw = 0; _HL.ph = 0;
+  hlPhotoUI();
+  hlPaint();
+}
+// A phone's photo is 12 megapixels; the card is 1080 wide. It is made smaller once, here, so a finger moving it redraws fast.
+function hlPhotoPick(f) {
+  if (!f) return;
+  hlMsg('');
+  const fr = new FileReader();
+  fr.onerror = () => hlMsg('That picture could not be read.');
+  fr.onload = () => {
+    const im = new Image();
+    im.onerror = () => hlMsg('That picture could not be opened.');
+    im.onload = () => {
+      let url = fr.result, w = im.width, h = im.height;
+      const s = Math.min(1, 1440 / Math.max(w, h));
+      if (s < 1) {
+        try {
+          const c = document.createElement('canvas');
+          c.width = Math.round(w * s); c.height = Math.round(h * s);
+          c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+          url = c.toDataURL('image/jpeg', 0.88);
+          w = c.width; h = c.height;
+        } catch (e) { /* keep the original */ }
+      }
+      _HL.photo = url; _HL.pw = w; _HL.ph = h; _HL.fit = { z: 1, dx: 0, dy: 0 };
+      hlPhotoUI();
+      hlPaint();
+    };
+    im.src = fr.result;
+  };
+  fr.readAsDataURL(f);
+}
+function hlFitBase(pts) {
+  const a = Array.prototype.slice.call(pts.values ? [...pts.values()] : []);
+  if (!a.length) return null;
+  const cx = a.reduce((s, p) => s + p.clientX, 0) / a.length, cy = a.reduce((s, p) => s + p.clientY, 0) / a.length;
+  const d = a.length > 1 ? Math.hypot(a[0].clientX - a[1].clientX, a[0].clientY - a[1].clientY) : 0;
+  return { cx, cy, d, fit: Object.assign({ z: 1, dx: 0, dy: 0 }, _HL.fit) };
+}
+// How much of the picture hangs outside the card at this zoom, in card pixels: dragging moves inside that and no further, so an
+// edge can never show.
+function hlSlack(z, S) {
+  const iw = _HL.pw || 0, ih = _HL.ph || 0;
+  if (!iw || !ih) return { x: 0, y: 0 };
+  const s = Math.max(S.W / iw, S.H / ih) * z;
+  return { x: Math.max(0, iw * s - S.W) / 2, y: Math.max(0, ih * s - S.H) / 2 };
+}
+function hlFitDrag(pts, base, live) {
+  if (!base) return;
+  const a = [...pts.values()];
+  const cx = a.reduce((s, p) => s + p.clientX, 0) / a.length, cy = a.reduce((s, p) => s + p.clientY, 0) / a.length;
+  const d = a.length > 1 ? Math.hypot(a[0].clientX - a[1].clientX, a[0].clientY - a[1].clientY) : 0;
+  const z = base.d > 8 && d > 8 ? Math.max(1, Math.min(4, base.fit.z * d / base.d)) : base.fit.z;
+  const S = hlSize(), box = live.getBoundingClientRect(), k = box.width > 0 ? box.width / S.W : 1;
+  const sl = hlSlack(z, S);
+  const dx = sl.x > 0 ? base.fit.dx + ((cx - base.cx) / k) / sl.x : 0;
+  const dy = sl.y > 0 ? base.fit.dy + ((cy - base.cy) / k) / sl.y : 0;
+  _HL.fit = { z, dx: Math.max(-1, Math.min(1, dx)), dy: Math.max(-1, Math.min(1, dy)) };
+  const zi = document.getElementById('hl-ph-z');
+  if (zi) zi.value = String(z);
+  hlFitMoved();
+}
+function hlSize() { return hlOpts().size === 'post' ? { W: 1080, H: 1350 } : { W: 1080, H: 1920 }; }
+// The two canvases into the preview, the ground under the words. The ground keeps the id the dragging redraws.
+function hlLiveSwap(bg, fg) {
+  const live = document.getElementById('hl-live');
+  if (!live) return;
+  bg.id = 'hl-bg'; fg.id = 'hl-fg';
+  bg.className = 'hl-lay'; fg.className = 'hl-lay';
+  live.innerHTML = '';
+  live.appendChild(bg); live.appendChild(fg);
+  live.hidden = false;
+  const img = document.getElementById('hl-img');
+  if (img) img.hidden = true;
+}
+// A finger moving the picture redraws the GROUND only (one drawImage and two fills), never the words. The picture that gets
+// shared is drawn again once the finger has been still for a moment, and Share waits for it.
+function hlFitMoved() {
+  const bg = document.getElementById('hl-bg');
+  if (bg && _HL.photo && window.ShareCard) { try { window.ShareCard.reground(bg, _HL.photo, _HL.fit); } catch (e) {} }
+  const sh = document.getElementById('hl-share'), sv = document.getElementById('hl-save');
+  if (sh) sh.disabled = true;
+  if (sv) sv.disabled = true;
+  _HL.blob = null;
+  clearTimeout(_HL.fitT);
+  _HL.fitT = setTimeout(() => hlPaint(), 240);
 }
 function hlMsg(t) { const el = document.getElementById('hl-msg'); if (el) el.textContent = t || ''; }
 function hlOpts() { const p = hlPrefs(); return { size: p.size === 'post' ? 'post' : 'story', lang: p.lang === 'fa' ? 'fa' : 'en', weights: p.weights !== false, name: p.name !== false }; }
@@ -20839,7 +21126,22 @@ async function hlPaint() {
   hlMsg('');
   try {
     const SC = await hlLib();
-    const blob = await SC.toBlob(spec, o);
+    let blob;
+    if (_HL.photo) {
+      // Two layers: the ground (their picture, graded) and the words on clear glass. The preview keeps both, so dragging the
+      // picture redraws the ground alone; what is shared is the two drawn into one.
+      const po = Object.assign({}, o, { photo: _HL.photo, fit: _HL.fit });
+      const pair = await Promise.all([SC.paint(spec, Object.assign({}, po, { layer: 'bg' })), SC.paint(spec, Object.assign({}, o, { layer: 'fg' }))]);
+      if (seq !== _HL.seq) return;
+      hlLiveSwap(pair[0], pair[1]);
+      const out = document.createElement('canvas');
+      out.width = pair[0].width; out.height = pair[0].height;
+      const cx = out.getContext('2d');
+      cx.drawImage(pair[0], 0, 0); cx.drawImage(pair[1], 0, 0);
+      blob = await new Promise((res, rej) => out.toBlob(b => b ? res(b) : rej(new Error('toBlob')), 'image/png'));
+    } else {
+      blob = await SC.toBlob(spec, o);
+    }
     if (seq !== _HL.seq) return;   // a newer choice is already drawing
     if (_HL.url) URL.revokeObjectURL(_HL.url);
     _HL.blob = blob; _HL.url = URL.createObjectURL(blob);

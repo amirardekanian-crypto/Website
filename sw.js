@@ -340,12 +340,18 @@
 // line of every page for a name that is called and declared nowhere, and found two more, both leftovers of the body-weight move
 // to program.html. wtAvgSeries() called wtSeries() and wtNudge() called fmtKg(), neither of which exists here any more; nothing
 // called either of them, so the four dead functions are deleted. The guard now runs on every commit that touches a page.
-// v195: program.html and sw.js changed (2026-10-19, Amir: "Aa proof will die"). THE HABITS ARE THIS APP'S NOW. Home's Daily habits
+// v195: program.html and assets/js/sharecard.js changed (2026-10-19, the share cards' own design pass; Amir: "go with your picks").
+//       The cards are redrawn in the app's own cover language (a picture graded into the green, the mint-dot eyebrow with the athlete's
+//       name and the date, ONE huge number, a one-line foot with the mantra), four new kinds join them (a mark, the month's honour, the
+//       Monthly Open, the athlete's own card) and three more (a new level, the month's goal, a session). Every achievement can be shared
+//       from Your moments, whenever it was earned. Any card can take the athlete's own photo as its ground, moved and zoomed by hand; the
+//       picture never leaves the phone. The badge, title and quest cards go: the cut took them off the server.
+// v196: program.html and sw.js changed (2026-10-19, Amir: "Aa proof will die"). THE HABITS ARE THIS APP'S NOW. Home's Daily habits
 // row and the iframe of AA Proof under it are one card, Today: the session and the habits as one list, because they are one day
 // (direction B, picked from three). The engine is assets/js/habits-core.js, generated from habits.html so the two cannot drift;
 // the keys are AA Proof's own, so no athlete's history moves. The first screen comes with it, for anyone who has never set the
 // habits up. This app is now the writer of <id>_hab_cfg and <id>_hab_log: it pushes them, and merges a day by union.
-const CACHE = 'aap-v195';
+const CACHE = 'aap-v196';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

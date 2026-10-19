@@ -1,5 +1,10 @@
 ## 🎬 Highlight Reel: a share card for each win, and a moment for each (2026-10-17)
 
+> ⚠️ **The cards had their own design pass on 2026-10-19** (`PROGRAM-APP.md` → *The share cards' design pass*).
+> Where the two disagree, that one wins: the look, the thirteen kinds, where Share is offered and the athlete's own photo
+> are all from it. What stays true here: one painter, the two sizes, both languages, the rules a card obeys, and the five
+> places a win shows.
+
 Amir asked to celebrate athletes' wins and let them share them on Instagram, approved the design page
 (https://claude.ai/artifact/SuyYRPeX9n2SdbiUvoHhkF) with *"go with your picks"* on all five decisions (all five cards at once; the
 athlete picks English or Farsi; the weights shown, with a switch to hide them; his photo and signature on every card; the name

@@ -63,7 +63,8 @@ athlete ids replaced by plain descriptions (the repo is public).
 | 47 | [🏋️ Personal Records — two write doors (a finished session, + Log a max), and what to keep in step](docs/ref/program-app/47-personal-records-two-write-doors-a-finished-session-.md) | 3 KB |
 | 48 | [Body weight — the 2026-09-03 design, built in AA Proof](docs/ref/program-app/48-body-weight-the-2026-09-03-design-built-in-aa-proof.md) | 6 KB |
 | 49 | [🧭 First-timer fixes (2026-10-11, found by walking the app: `docs/record/CLIENT-APP-MAP.md`)](docs/ref/program-app/49-first-timer-fixes.md) | 4 KB |
+| 50 | [🖼️ The share cards' design pass (2026-10-19)](docs/ref/program-app/50-the-share-cards-design-pass.md) | 6 KB |
 
 ---
 
-*49 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*
+*50 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*
