@@ -293,12 +293,18 @@ $function$;
 
 -- ── 6. What the sender tells us back ───────────────────────────────────────────────────────────────
 -- Marked once per athlete, day and kind, after every one of their phones has been tried.
+-- ⚠️ A day is written to the ledger ONLY when a phone actually took it. If every phone failed, the
+-- day stays unmarked so the next run tries again — and because push_due() still only fires at the
+-- athlete's own hour, "again" means once more that evening, not a retry storm. Marking a total
+-- failure as sent would lose the reminder silently, which is the worst of both.
 create or replace function public.push_done(p_athlete_id text, p_kind text, p_day date, p_ok boolean default true)
 returns void
 language plpgsql security definer set search_path to 'public' as $function$
 begin
-  insert into public.push_sent (athlete_id, day, kind) values (p_athlete_id, p_day, p_kind)
-  on conflict (athlete_id, day, kind) do nothing;
+  if p_ok then
+    insert into public.push_sent (athlete_id, day, kind) values (p_athlete_id, p_day, p_kind)
+    on conflict (athlete_id, day, kind) do nothing;
+  end if;
   update public.push_subs
      set last_sent_at = now(),
          last_ok_at = case when p_ok then now() else last_ok_at end,

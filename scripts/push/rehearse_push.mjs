@@ -324,6 +324,17 @@ const atUtc = h => `2026-11-12T${String(h).padStart(2, '0')}:00:00Z`;
   row = await one(db, `select * from public.push_subs where endpoint=$1`, [EP.uk]);
   ok(row.fails === 1, 'a bad one counts against it');
 
+  // A send that failed on every phone must NOT be written down as sent, or the reminder is lost in
+  // silence. push_due() still only fires at the athlete's own hour, so "try again" is once more that
+  // evening, never a retry storm.
+  await db.query(`delete from public.push_sent where athlete_id='zz_uk'`);
+  await one(db, `select public.push_done('zz_uk','habits','2026-11-12',false) as r`);
+  ok((await all(db, `select 1 from public.push_sent where athlete_id='zz_uk'`)).length === 0,
+     'a send that failed everywhere leaves the day UNMARKED, so it is tried again');
+  await one(db, `select public.push_done('zz_uk','habits','2026-11-12',true) as r`);
+  ok((await all(db, `select 1 from public.push_sent where athlete_id='zz_uk'`)).length === 1,
+     'and the day is written down as soon as one phone takes it');
+
   await one(db, `select public.push_drop($1) as r`, [EP.uk]);
   ok((await all(db, `select 1 from public.push_subs where endpoint=$1`, [EP.uk])).length === 0,
      'push_drop() removes a dead subscription (a 404 or 410 from the push service)');
