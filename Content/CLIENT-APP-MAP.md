@@ -320,7 +320,7 @@ The whole route, top to bottom:
 - *"**5 days** left in cycle · ends OCT 24"* — only in the last 14 days (it isn't a billing message; it has no button).
 - **Cycle meter:** one segment per cycle, labelled **C1 C2 … Cn**. Finished ones are faded green, the current one is solid dark green with a glow and a bold label, the rest grey. Not tappable. (The pills are **Done** in orange and **Active** in green.)
 - **Done** — the cycle just finished. Tap it to open the **Archive** (that cycle's plan as I wrote it, read-only, without your numbers).
-- **Active** — this cycle, the only one open by default: **The Aims**, **Why This Cycle Matters**, **Expected outcomes after this cycle** (✓ list). Tap its picture banner to jump to Home; reading its text stays on this screen.
+- **Active** — this cycle, the only one open by default, and short: its tagline, **The aims**, then Amir's first sentence signed. Two rows open on a tap: **Why this cycle matters** (*The rest of my note*) and **Expected outcomes** (*6 things to hit*, a dotted list, not ticks: they have not happened yet). Nothing on it jumps Home.
 - **Why your plan looks like this · N reasons ›** — appears when I've given at least three personal reasons (§5.8).
 - **Up next!** and **Locked** — later cycles, folded; **Read more** shows their teaser. They can't be opened further.
 

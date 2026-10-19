@@ -293,7 +293,7 @@ Notices have **three looks only**, plus the install card: the banner (§5.10), t
   border-radius: 16px; padding: 20px 18px 16px; gap: 12px`; a mint-dot eyebrow (`.aa-toast-k`: *How to log*, *No weight*), text Barlow 500 at `--fs-body`, buttons
   44 px: a light-ring OK, an outlined one beside it.
 - **Coach's note** (a pull quote on paper): no box; `padding: 16px 0 0 56px`; Barlow 500 at `--fs-field`, ink; a clay “ at the left (Barlow Condensed 900 at
-  `--fs-display`, `--clay`; dark `--clay-ink`) in a 44 px column; three lines then *More*. The same pull quote carries `.ar-callout` and `.road-why`; on a cover it is
+  `--fs-display`, `--clay`; dark `--clay-ink`) in a 44 px column; three lines then *More*. The same pull quote carries `.ar-callout`; the road's Now card no longer wears it (2026-10-19, Doors: Amir's first sentence there keeps one 3 px clay stripe, `.road-from`, and no glyph, which drew as two slabs); on a cover it is
   `--clay-on-green`.
 - **First-session hint** `.onb-hint` (P66): `background: var(--tile)`, radius 14, `padding: 14px 6px 10px 14px`, a 12 px rotated notch, Amir's 32 px photo, a mint *GOT IT*.
 - **Textarea:** min-height 88 px (96 in the finish), `padding: 12px 14px`, `1px solid var(--box)`, radius 12, `--row`, 16 px.
@@ -330,7 +330,7 @@ His photo shows **once** per card; where the signature already carries it, no se
 - **Inputs** `.xl-search`, `.signin-f input`, `.wt-input`: 48 px, `1px solid var(--field)`, radius 10, `--row`, 500 at 16 px; focus is `--green-ink` plus `0 0 0 1px var(--green-ink)`.
 - **The slim session bar** (L3031): sticky, a 56 px row on `--bar`, a 3 px progress line with a mint fill; the week's limits are its one extra row (Space Mono 700 at 11 px; the numbers in `--clay-on-green`).
 - **Rest timer:** a green band then paper; ring 220 px (it shrinks at 720 and 620 px of height), stroke 5, mint progress, white 96 px digits.
-- **Progress's road** `.road-row` (L4507): `is-done / is-now / is-next / is-locked`, the P24 numeral, a mint *NOW* tag, a fold on the current cycle.
+- **Progress's road** `.road-row` (L4507): `is-done / is-now / is-next / is-locked`, the P24 numeral, a mint *NOW* tag, a fold on the current cycle. Inside Now (Doors): the tagline, the aims (`.road-aims`, one text edge `--road-edge`), Amir's first sentence signed (`.road-from`), two fold rows (`.road-unit`, the `.ceil-help` grammar) and the Because door.
 - **Charts:** the line and every dot green, grey axes; clay only for a real fall.
 
 ---

@@ -964,8 +964,8 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
   open at a time, `aria-expanded`); **How the app works** as one door row. The hero, the coloured icon tiles, *Tap to read* and
   the section labels are gone.
 
-- **Progress's road and the archive** (`paintCycleCard()`, `paintRoad()`, `roadRowHTML()`, `toggleRoad()`, `roadDoorHTML()`,
-  `paintArchiveCover()`; `scripts/headless/progress-road.js`, 161 checks):
+- **Progress's road and the archive** (`paintCycleCard()`, `paintRoad()`, `roadRowHTML()`, `roadAimsHTML()`, `roadUnitHTML()`, `firstSentence()`, `toggleRoad()`,
+  `toggleRoadUnit()`, `roadDoorHTML()`, `paintArchiveCover()`; `scripts/headless/progress-road.js`, 186 checks):
   - **The This cycle card is the screen's one green cover**: the current cycle's art (`cycleArtUrl()`) graded into `--hero`, the
     eyebrow *● THIS CYCLE · 2 OF 3* (a mint tick and *CYCLE COMPLETE* past the end date, *ROADMAP COMPLETE* on the last), the name in
     capitals, one mono line with the dates (`cycDate()`) and, in the last 14 days, *· 9 DAYS LEFT* (`cycleDayNo()` / `todayDayNo()`),
@@ -973,12 +973,25 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     both).
   - **The road** (`#road-wrap` under the Game Plan title) replaces the C1–Cn meter and the photo cards: one `.road-row` per cycle,
     `is-done` / `is-now` / `is-next` / `is-locked`, the P24 numeral (solid when done), the name, a mono line (*WEEKS 6–10 · NOW*). Now is
-    a fold, open by default (PLAN-01), holding the tagline, **The aims** (01, 02), **Why this cycle matters** behind the clay quote
-    mark and **signed** (`WN_SIG` and his photo, as the week note signs), **Expected outcomes** (green ✓) and the *Why your plan looks
-    like this* door (≥ 3 reasons). Past the end date that door sits under the current cycle's Done row. Up next and Locked are folds
-    holding the tagline, the aims and the teaser; a Locked cycle with none of them is a plain row with its lock. The cycle before the
-    current one opens its archive (›); earlier done cycles are plain rows. Folds keep their state across visits; Enter and Space work.
-    `cycleCardHTML()` and `toggleCycleCard()` are gone, and nothing on Progress jumps Home any more (the Active card's banner did).
+    a fold, open by default (PLAN-01), and **short: Doors** (Amir, 2026-10-19, *"i actually like the doors, being closed, and then can be
+    opened to read"*; it was *"not easy on the eyes"*: three identical 11 px mono labels, a 54 px indent, ticks on things not done, a quote
+    glyph that drew as two slabs; the board is claude.ai/artifact/D8m45y13GcDWgPB3e4gjVL, direction C, 645 px closed at 390 against 1150).
+    It holds the tagline, **The aims** (`roadAimsHTML()`: a 22 px green condensed numeral and the aim at 18 px / 600 on the card's ONE text
+    edge, `--road-edge`, 38 px from the gutter; Up next, Locked and Home between cycles draw the same block), **Amir's first sentence,
+    signed** (`firstSentence()`, the week note's cut plus two guards, which Home's week note keeps without (COM-16 and `check_program.py` too): a sentence ends at . ! or ? before a capital, a
+    digit or a quote, and e.g. / i.e. / vs. / approx. / Dr. / Mr. / Mrs. / No. or a lead under three words does not end it; over 100
+    characters it is set quieter at 16 px; his photo, then `WN_SIG`, left under it, a 3 px clay stripe beside both, no quote glyph) and
+    two fold rows (`roadUnitHTML()`, `toggleRoadUnit()`, `.road-unit`, the `.ceil-help` grammar, 64 px): **Why this cycle matters** (*The
+    rest of my note*: what is left of paragraph one, then the others, verbatim; none when the note is one sentence) and **Expected
+    outcomes** (*N things to hit*; a plain 6 px dot, never a tick, which means Done, and never a ring, which is the tap-to-log circle),
+    then the *Why your plan looks like this* door (from one reason, since 2026-10-13). Every word of his is shown once. The two folds
+    open on their own, keep their state across a repaint (`paintRoad()` reads `.road-unit.is-open`), and an open fold is
+    `visibility: inherit`, never `visible`, so a folded Now row hides it from the eye, the keyboard and a screen reader. Past the end date
+    the door sits under the current cycle's Done row. Up next and Locked are folds holding the tagline, the aims and the teaser (on the
+    same text edge); a Locked cycle with none of them is a plain row with its lock. The cycle before the current one opens its archive
+    (›); earlier done cycles are plain rows. Folds keep their state across visits; Enter and Space work. **The first sentence of
+    `message.paragraphs[0]` is what an athlete reads without a tap**, so it should stand alone. `cycleCardHTML()` and
+    `toggleCycleCard()` are gone, and nothing on Progress jumps Home any more (the Active card's banner did).
   - **Home between cycles** draws the next cycle as the same Up next row (`.bt-next`, its body ids `bt-road-body-N`).
   - **The archive** (`#screen-archive`): a cover with the archived cycle's art (`archiveCycleOf()`), ← as the 44 px glass button
     (Back to Progress), *● COMPLETED · CYCLE 1*, the name and its weeks; each day as a green section title and its exercises as
@@ -1622,7 +1635,8 @@ tints, the running bar, labels, and so it marked nothing. Now:
   dot after the name; *More* is green), a Because (the solid clay ⓘ), an RPE over its target (the set's RPE tag, the selected
   button, a circuit's Last time strip and the ghost line under a set that ran over), the tempo digit, a banner that asks
   for something (a day filed unfinished, a report waiting, the lower-day banner's stripe and label), a suggestion's kicker (LIB-01: *Sore today*, *Week done*),
-  the finished card's quote mark (Amir's voice, as on the Coach's note), what is not done when finishing early (only the tags),
+  the finished card's quote mark (Amir's voice, as on the Coach's note), the 3 px stripe beside his first sentence on Progress's Now card (Doors, 2026-10-19: the same voice,
+  in place of a quote mark that drew as two slabs), what is not done when finishing early (only the tags),
   the numbers in a week note's headline (Front Page, 2026-10-12: *RPE 7*, *One set fewer*), and the same numbers on
   the session bar's limits row (*Max RPE 7 · 1 set fewer*; only the numbers, light clay `#E06B43` on the green bar
   since Centre Court, the words white and the label a paler white),

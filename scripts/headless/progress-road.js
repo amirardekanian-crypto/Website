@@ -18,7 +18,7 @@ const norm = s => String(s || '').replace(/\s+/g, ' ').trim();
 // Five cycles, the current one at idx, ending `endsIn` days from today (negative: ended that many days ago), five weeks each. Cycle 2 has its tagline, two aims, two paragraphs
 // and two outcomes; cycle 3 its tagline, an aim and a teaser (subtitle and two paragraphs); cycle 4 the same; cycle 5 whatever `c5` says. Three exercises carry a reason (so Why your plan has its door row),
 // and the archive has two days.
-function prog({ endsIn = 20, idx = 1, whys = 3, name, c5 = 'tagline' } = {}) {
+function prog({ endsIn = 20, idx = 1, whys = 3, name, c5 = 'tagline', msg } = {}) {
   const P = H.fixture();
   P.currentCycleIndex = idx;
   P.cycles.push(
@@ -28,7 +28,7 @@ function prog({ endsIn = 20, idx = 1, whys = 3, name, c5 = 'tagline' } = {}) {
   const c2 = P.cycles[1];
   c2.tagline = 'Earn the adaptation';
   c2.focuses = ['Progress the squat and hinge with real, trackable load.', 'Keep the knee quiet.'];
-  c2.message = { paragraphs: ['This is where the body starts genuinely changing.', 'Load goes up, the reps stay honest.'], outcomes: ['Measurable strength gains in the back squat', 'A hinge you trust'] };
+  c2.message = msg || { paragraphs: ['This is where the body starts genuinely changing.', 'Load goes up, the reps stay honest.'], outcomes: ['Measurable strength gains in the back squat', 'A hinge you trust'] };
   P.cycles[2].teaser = { subtitle: 'Strength becomes court speed.', paragraphs: ['Cycle 3 is where the weights get lighter and the movements get faster.', 'Expect it to feel quick.'] };
   P.cycles.forEach((c, i) => { c.startDate = calDay(endsIn - 34 + (i - idx) * 35); c.endDate = calDay(endsIn + (i - idx) * 35); });
   if (name) P.cycles[idx].name = name;
@@ -163,7 +163,7 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
       rows[1].open && rows[1].exp === 'true' && !rows[2].open && rows[2].exp === 'false' && !rows[3].open && rows[3].exp === 'false' && rows[3].button && !rows[4].open && rows[4].exp === 'false' && rows[4].button && !rows[0].exp, JSON.stringify(rows.map(r => [r.n, r.state, r.exp, r.button])));
     t.check('folds: every fold\'s aria-controls names its body (road-body-N), which exists', await p.evaluate(() => [...document.querySelectorAll('#road-wrap .road-head[aria-controls]')].every(h => { const b = document.getElementById(h.getAttribute('aria-controls')); return b && /^road-body-\d$/.test(b.id) && b.classList.contains('road-body'); })));
     const vis = sel => p.isVisible(sel);
-    t.check('folds: Now shows its body, Up next shows none of it', await vis('#road-body-2 .road-aims') && await vis('#road-body-2 .road-why') && !(await vis('#road-body-3 .road-lead')) && !(await vis('#road-body-3 .road-paras')), 'now ' + await vis('#road-body-2 .road-aims') + ' next ' + await vis('#road-body-3 .road-lead'));
+    t.check('folds: Now shows its body, Up next shows none of it', await vis('#road-body-2 .road-aims') && await vis('#road-body-2 .road-from') && !(await vis('#road-body-3 .road-lead')) && !(await vis('#road-body-3 .road-paras')), 'now ' + await vis('#road-body-2 .road-aims') + ' next ' + await vis('#road-body-3 .road-lead'));
     const state = n => p.evaluate(n => { const r = document.querySelector(`#road-wrap .road-row[data-cycle="${n}"]`), h = r.querySelector('.road-head'), b = r.querySelector('.road-body'), ch = r.querySelector('.road-chev');
       return { open: r.classList.contains('is-open'), exp: h.getAttribute('aria-expanded'), height: b ? Math.round(b.getBoundingClientRect().height) : null, turn: ch ? getComputedStyle(ch).transform : null, on: document.querySelector('.screen.active').id }; }, n);
     await p.click('#road-wrap .road-row[data-cycle="3"] .road-head'); await p.waitForTimeout(450);
@@ -171,14 +171,14 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     t.check('folds: a tap on Up next opens it (aria-expanded true, the body grows, the chevron turns), and stays on Progress', s.open && s.exp === 'true' && s.height > 60 && s.turn !== 'none' && s.on === 'screen-plan' && await vis('#road-body-3 .road-lead') && await vis('#road-body-3 .road-paras'), JSON.stringify(s));
     const teaser = await p.evaluate(() => ({ lead: document.querySelector('#road-body-3 .road-lead').textContent, paras: [...document.querySelectorAll('#road-body-3 .road-paras p')].map(x => x.textContent), em: [...document.querySelectorAll('#road-body-3 .road-paras p')].map(x => !!x.querySelector('em')).join() }));
     t.check('folds: Up next\'s teaser is the subtitle as the lead line, then the paragraphs, the last one in italics', teaser.lead === 'Strength becomes court speed.' && teaser.paras.length === 2 && teaser.em === 'false,true', JSON.stringify(teaser));
-    // nothing the old folded cards showed is lost: the tagline (one italic line), then The aims (01, 02 rows as in Now), then the teaser
+    // nothing the old folded cards showed is lost: the tagline (one italic line), then The aims (1, 2 as in Now), then the teaser
     const fb = n => p.evaluate(n => { const body = document.querySelector('#road-body-' + n), kids = [...body.querySelector('.road-in').children];
       return { order: kids.map(e => e.className.split(' ')[0] + (e.tagName === 'H3' ? ':' + e.textContent : '')).join(' | '), tagline: (body.querySelector('.road-tagline') || {}).textContent || null, taglineStyle: body.querySelector('.road-tagline') && getComputedStyle(body.querySelector('.road-tagline')).fontStyle,
         aims: [...body.querySelectorAll('.road-aims li')].map(li => li.querySelector('.road-n').textContent + ' ' + li.querySelector('.road-aim').textContent), nFont: body.querySelector('.road-n') && getComputedStyle(body.querySelector('.road-n')).fontFamily.split(',')[0],
-        nColor: body.querySelector('.road-n') && getComputedStyle(body.querySelector('.road-n')).color, why: !!body.querySelector('.road-why, .road-outs, .road-why-door, .wn-sign') }; }, n);
+        nColor: body.querySelector('.road-n') && getComputedStyle(body.querySelector('.road-n')).color, why: !!body.querySelector('.road-from, .road-units, .road-outs, .road-why-door, .wn-sign') }; }, n);
     const u = await fb(3);
-    t.check('folds: Up next opens on the tagline (italic), then The aims as 01 rows (Space Mono green), then the teaser, and has no Now-only parts (why, outcomes, door, signature)',
-      u.order === 'road-tagline | road-sec:The aims | road-aims | road-lead | road-paras' && u.tagline === 'Turn strength into speed' && u.taglineStyle === 'italic' && u.aims.join() === '01 Convert strength into usable court speed.' && /Space Mono/.test(u.nFont) && u.nColor === 'rgb(14, 74, 54)' && !u.why, JSON.stringify(u));
+    t.check('folds: Up next opens on the tagline (italic), then The aims as numbered rows (a green Barlow Condensed numeral), then the teaser, and has no Now-only parts (his line, folds, door, signature)',
+      u.order === 'road-tagline | road-sec:The aims | road-aims | road-lead | road-paras' && u.tagline === 'Turn strength into speed' && u.taglineStyle === 'italic' && u.aims.join() === '1 Convert strength into usable court speed.' && /Barlow Condensed/.test(u.nFont) && u.nColor === 'rgb(14, 74, 54)' && !u.why, JSON.stringify(u));
     // the keyboard: Enter folds it, Space opens it again
     await p.focus('#road-wrap .road-row[data-cycle="3"] .road-head');
     await p.keyboard.press('Enter'); await p.waitForTimeout(450);
@@ -197,50 +197,83 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     await p.click('#road-wrap .road-row[data-cycle="4"] .road-head'); await p.waitForTimeout(450);
     const lk = await fb(4);
     t.check('folds: a Locked cycle opens to its tagline, its aims and its teaser', (await state(4)).open && await vis('#road-body-4 .road-lead') && (await p.textContent('#road-body-4 .road-lead')) === 'Control the stop.'
-      && lk.order === 'road-tagline | road-sec:The aims | road-aims | road-lead | road-paras' && lk.tagline === 'Stop well' && lk.aims.join() === '01 Land softly.' && !lk.why, JSON.stringify(lk));
+      && lk.order === 'road-tagline | road-sec:The aims | road-aims | road-lead | road-paras' && lk.tagline === 'Stop well' && lk.aims.join() === '1 Land softly.' && !lk.why, JSON.stringify(lk));
     await p.click('#road-wrap .road-row[data-cycle="5"] .road-head'); await p.waitForTimeout(450);
     const t5 = await fb(5);
     t.check('folds: a Locked cycle with only a tagline is a fold too, and opens to that line', (await state(5)).open && t5.order === 'road-tagline' && t5.tagline === 'Peak', JSON.stringify(t5));
     // the folds are kept across a tab change
-    await p.evaluate(() => { goTo('home'); goTo('plan'); }); await p.waitForTimeout(450);
+    await p.evaluate(() => { document.getElementById('road-wrap')._painted = null; goTo('home'); goTo('plan'); }); await p.waitForTimeout(450);   // _painted = null: paintInto() skips an identical string, so force a real rewrite
     const kept = await roadOf(p);
     t.check('folds: they stay as the athlete left them after leaving Progress and coming back', kept.map(r => r.open ? 1 : 0).join('') === '01111', kept.map(r => r.open ? 1 : 0).join(''));
     t.check('no page errors (folds)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
 
-  // ── 6. the Now row's body: tagline, the aims, why it matters (the clay quote), the outcomes, then Why your plan looks like this ──
+  // ── 6. the Now row's body, Doors (Amir, 2026-10-19): the tagline, The aims, his first sentence signed, two folds (the rest of his note, the outcomes), then Why your plan looks like this ──
   {
     const { ctx, p } = await H.openProgram(browser, { prog: prog({ whys: 3 }), w: 390, h: 844 });
     await toPlan(p);
     const b = await p.evaluate(() => {
       const body = document.querySelector('#road-body-2'), q = s => body.querySelector(s), qa = s => [...body.querySelectorAll(s)], cs = (el, pse) => getComputedStyle(el, pse);
       const order = [...body.querySelector('.road-in').children].map(e => e.className.split(' ')[0] + (e.tagName === 'H3' ? ':' + e.textContent : '')).join(' | ');
-      const why = q('.road-why');
+      const from = q('.road-from');
       return { order, tagline: q('.road-tagline').textContent, taglineStyle: cs(q('.road-tagline')).fontStyle, secs: qa('.road-sec').map(e => e.innerText.trim()), secColor: cs(q('.road-sec')).color, secFont: cs(q('.road-sec')).fontFamily.split(',')[0],
-        aims: qa('.road-aims li').map(li => [li.querySelector('.road-n').textContent, li.querySelector('.road-aim').textContent]), nFont: cs(q('.road-n')).fontFamily.split(',')[0], nColor: cs(q('.road-n')).color,
-        paras: qa('.road-why p').length, quote: cs(why, '::before').content, quoteColor: cs(why, '::before').color, quoteFont: cs(why, '::before').fontFamily.split(',')[0],
-        outs: qa('.road-outs li').map(li => [li.querySelector('.road-out').textContent, !!li.querySelector('.road-ck svg')]), door: q('.road-why-door') && { tag: q('.road-why-door').tagName, text: q('.road-why-door').innerText.replace(/\s+/g, ' ').trim(), cls: q('.road-why-door').className },
+        aims: qa('.road-aims li').map(li => [li.querySelector('.road-n').textContent, li.querySelector('.road-aim').textContent]), nFont: cs(q('.road-n')).fontFamily.split(',')[0], nSize: cs(q('.road-n')).fontSize, nColor: cs(q('.road-n')).color,
+        aimSize: cs(q('.road-aim')).fontSize, aimWeight: cs(q('.road-aim')).fontWeight, first: q('.road-first').textContent, firstSize: cs(q('.road-first')).fontSize, firstLong: q('.road-first').classList.contains('is-long'),
+        stripe: cs(from, '::before').backgroundColor, stripeW: cs(from, '::before').width, stripeContent: cs(from, '::before').content, firstBefore: cs(q('.road-first'), '::before').content, secCase: cs(q('.road-sec')).textTransform, doorsOrder: [...q('.road-doors').children].map(e => e.className.split(' ')[0]).join(' | '), label: from.getAttribute('aria-label'),
+        units: qa('.road-unit').map(x => [x.dataset.k, x.querySelector('.road-ul').textContent, x.querySelector('.road-uq').textContent, x.querySelector('.road-ubtn').getAttribute('aria-expanded'), Math.round(x.querySelector('.road-ufold').getBoundingClientRect().height),
+          x.querySelector('.road-ubtn').getAttribute('aria-controls'), !!document.getElementById(x.querySelector('.road-ubtn').getAttribute('aria-controls'))]),
+        outs: qa('.road-outs li').map(li => [li.querySelector('.road-out').textContent, !!li.querySelector('svg, .road-ck'), li.querySelector('.road-dot') ? getComputedStyle(li.querySelector('.road-dot')).width : null]),
+        door: q('.road-why-door') && { tag: q('.road-why-door').tagName, text: q('.road-why-door').innerText.replace(/\s+/g, ' ').trim(), cls: q('.road-why-door').className },
         doorFont: q('.road-why-door .hrow-l') && cs(q('.road-why-door .hrow-l')).fontFamily.split(',')[0], doorLeft: Math.round(q('.road-why-door').getBoundingClientRect().left), doorW: Math.round(q('.road-why-door').getBoundingClientRect().width) };
     });
-    t.check('Now body: the tagline as one italic line first, then The aims, Why this cycle matters, Expected outcomes, then the door row', b.order === 'road-tagline | road-sec:The aims | road-aims | road-sec:Why this cycle matters | road-why | road-sec:Expected outcomes | road-outs | hrow', b.order);
-    t.check('Now body: the tagline is italic, the section titles are small green Space Mono titles', b.tagline === 'Earn the adaptation' && b.taglineStyle === 'italic' && b.secs.map(s => s.toLowerCase()).join('|') === 'the aims|why this cycle matters|expected outcomes' && b.secColor === 'rgb(14, 74, 54)' && /Space Mono/.test(b.secFont), JSON.stringify([b.tagline, b.taglineStyle, b.secs, b.secColor, b.secFont]));
-    t.check('Now body: the aims are numbered rows (01, 02 in Space Mono green, the aim in Barlow)', b.aims.map(a => a[0]).join() === '01,02' && b.aims[0][1] === 'Progress the squat and hinge with real, trackable load.' && /Space Mono/.test(b.nFont) && b.nColor === 'rgb(14, 74, 54)', JSON.stringify(b.aims));
-    t.check('Now body: why it matters carries Amir\'s paragraphs behind the clay quote mark of the Coach\'s note', b.paras === 2 && /201C|“/.test(b.quote) && b.quoteColor === 'rgb(199, 85, 47)' && /Barlow Condensed/.test(b.quoteFont), JSON.stringify([b.paras, b.quote, b.quoteColor, b.quoteFont]));
-    t.check('Now body: the outcomes are rows with a green tick', b.outs.length === 2 && b.outs.every(o => o[1]) && b.outs[0][0] === 'Measurable strength gains in the back squat', JSON.stringify(b.outs));
+    t.check('Now body: the tagline, The aims, his line, the two folds, then the door row (a short card)', b.order === 'road-tagline | road-sec:The aims | road-aims | road-from | road-doors' && b.doorsOrder === 'road-units | hrow', b.order + ' / ' + b.doorsOrder);
+    t.check('Now body: the tagline is italic, and the one section title is The aims, in condensed green capitals', b.tagline === 'Earn the adaptation' && b.taglineStyle === 'italic' && b.secs.map(s => s.toLowerCase()).join('|') === 'the aims' && b.secColor === 'rgb(14, 74, 54)' && /Barlow Condensed/.test(b.secFont) && b.secCase === 'uppercase', JSON.stringify([b.tagline, b.taglineStyle, b.secs, b.secColor, b.secFont, b.secCase]));
+    t.check('Now body: the aims are the loudest text: a 22 px green condensed numeral (1, 2) and the aim at 18 px, 600', b.aims.map(a => a[0]).join() === '1,2' && b.aims[0][1] === 'Progress the squat and hinge with real, trackable load.' && /Barlow Condensed/.test(b.nFont) && b.nSize === '22px' && b.nColor === 'rgb(14, 74, 54)' && b.aimSize === '18px' && b.aimWeight === '600', JSON.stringify([b.aims, b.nFont, b.nSize, b.aimSize, b.aimWeight]));
+    t.check('Now body: his first sentence is the headline (18 px), under a 3 px clay stripe, and there is no quote glyph', b.first === 'This is where the body starts genuinely changing.' && b.firstSize === '18px' && !b.firstLong && b.stripe === 'rgb(199, 85, 47)' && b.stripeW === '3px' && b.stripeContent === '""' && b.firstBefore === 'none' && b.label === 'From Amir', JSON.stringify([b.first, b.firstSize, b.stripe, b.stripeW, b.stripeContent, b.firstBefore, b.label]));
+    t.check('Now body: two folds, both closed: Why this cycle matters (The rest of my note) and Expected outcomes (2 things to hit), each with an id its button controls',
+      b.units.length === 2 && b.units[0].join('|') === 'note|Why this cycle matters|The rest of my note|false|0|road-body-2-note|true' && b.units[1].join('|') === 'fin|Expected outcomes|2 things to hit|false|0|road-body-2-fin|true', JSON.stringify(b.units));
+    t.check('Now body: the outcomes are rows with a 6 px dot, never a tick (a tick is Done)', b.outs.length === 2 && b.outs.every(o => !o[1] && o[2] === '6px') && b.outs[0][0] === 'Measurable strength gains in the back squat', JSON.stringify(b.outs));
     t.check('Now body: Why your plan looks like this is a door row (.hrow) with its 3 reasons, the full width of the road', !!b.door && b.door.tag === 'BUTTON' && /\bhrow\b/.test(b.door.cls) && /^Why your plan looks like this 3 reasons$/i.test(b.door.text.replace(/\s*›$/, '')) && b.doorLeft === 20 && b.doorW === 350 && /Space Mono/.test(b.doorFont), JSON.stringify(b.door) + ' ' + b.doorLeft + ' ' + b.doorW);
-    // Amir's words are signed as the week note and the finished band sign them: his signature (WN_SIG, green ink) and photo, right-aligned, the week note's size, after the paragraphs
+    // His line is signed as the week note and the finished band sign it: his photo, then his signature (WN_SIG, green ink), left under his words, the week note's size, no hairline
     const sg = await p.evaluate(() => {
-      const why = document.querySelector('#road-body-2 .road-why'), sign = why.querySelector('.wn-sign'), sig = sign && sign.querySelector('svg.wn-sig'), av = sign && sign.querySelector('.wn-av'), img = av && av.querySelector('img');
-      const ps = why.querySelectorAll('p'), r = e => e.getBoundingClientRect(), road = r(document.querySelector('.road'));
-      return { last: why.lastElementChild === sign, below: !!sign && r(sign).top >= r(ps[ps.length - 1]).bottom - 0.5, aria: sig && sig.getAttribute('aria-label'), role: sig && sig.getAttribute('role'), color: sig && getComputedStyle(sig).color,
-        sig: sig && [Math.round(r(sig).width), Math.round(r(sig).height)], av: av && [Math.round(r(av).width), Math.round(r(av).height)], src: img && img.getAttribute('src'), avRight: av && Math.round(r(av).right), roadRight: Math.round(road.right),
-        sigBeforePhoto: !!sig && !!av && r(sig).right <= r(av).left + 0.5, justify: sign && getComputedStyle(sign).justifyContent, week: !!document.querySelector('.wn-sign') && getComputedStyle(sig).width === '124px',
-        quote: getComputedStyle(why, '::before').color, hairline: sign && getComputedStyle(sign).borderTopWidth };
+      const from = document.querySelector('#road-body-2 .road-from'), sign = from.querySelector('.wn-sign'), sig = sign && sign.querySelector('svg.wn-sig'), av = sign && sign.querySelector('.wn-av'), img = av && av.querySelector('img');
+      const line = from.querySelector('.road-first'), r = e => e.getBoundingClientRect();
+      return { last: from.lastElementChild === sign, below: !!sign && r(sign).top >= r(line).bottom - 0.5, aria: sig && sig.getAttribute('aria-label'), role: sig && sig.getAttribute('role'), color: sig && getComputedStyle(sig).color,
+        sig: sig && [Math.round(r(sig).width), Math.round(r(sig).height)], av: av && [Math.round(r(av).width), Math.round(r(av).height)], src: img && img.getAttribute('src'),
+        photoFirst: !!sig && !!av && r(av).right <= r(sig).left + 0.5, photoLeft: !!av && Math.abs(r(av).left - r(line).left) <= 1, hairline: sign && getComputedStyle(sign).borderTopWidth };
     });
-    t.check('Now body: why it matters is signed: his signature (green ink, 124 × 44) and photo (44 × 44, assets/img/coach.jpg), after the paragraphs, right-aligned to the road\'s edge',
-      sg.last && sg.below && sg.aria === 'Amir' && sg.role === 'img' && sg.color === 'rgb(14, 74, 54)' && sg.sig.join('x') === '124x44' && sg.av.join('x') === '44x44' && sg.src === 'assets/img/coach.jpg' && sg.justify === 'flex-end' && sg.sigBeforePhoto && Math.abs(sg.avRight - sg.roadRight) <= 1, JSON.stringify(sg));
-    t.check('Now body: the clay quote mark stays with the signed paragraphs', sg.quote === 'rgb(199, 85, 47)', sg.quote);
+    t.check('Now body: his line is signed: his photo (44 × 44, assets/img/coach.jpg), then his signature (green ink, 124 × 44), left under his words on the same edge, no hairline',
+      sg.last && sg.below && sg.aria === 'Amir' && sg.role === 'img' && sg.color === 'rgb(14, 74, 54)' && sg.sig.join('x') === '124x44' && sg.av.join('x') === '44x44' && sg.src === 'assets/img/coach.jpg' && sg.photoFirst && sg.photoLeft && sg.hairline === '0px', JSON.stringify(sg));
+    // the folds: each opens on its own, by tap and by keyboard, and what is inside is Amir's own words
+    const unit = k => p.evaluate(k => { const x = document.querySelector(`#road-body-2 .road-unit[data-k="${k}"]`), f = x.querySelector('.road-ufold'); return { open: x.classList.contains('is-open'), exp: x.querySelector('.road-ubtn').getAttribute('aria-expanded'), h: Math.round(f.getBoundingClientRect().height),
+      vis: getComputedStyle(x.querySelector('.road-uin')).visibility, turn: getComputedStyle(x.querySelector('.road-chev')).transform, texts: [...x.querySelectorAll('.road-note p, .road-out')].map(e => e.textContent) }; }, k);
+    await p.click('#road-body-2 .road-unit[data-k="note"] .road-ubtn'); await p.waitForTimeout(450);
+    let n1 = await unit('note'), f1 = await unit('fin');
+    t.check('folds in Now: a tap on the note row opens it alone (aria-expanded true, the body grows, the chevron turns) and shows the rest of his note, verbatim; the outcomes stay shut',
+      n1.open && n1.exp === 'true' && n1.h > 30 && n1.vis === 'visible' && n1.turn !== 'none' && n1.texts.join('|') === 'Load goes up, the reps stay honest.' && !f1.open && f1.exp === 'false' && f1.h === 0, JSON.stringify([n1, f1]));
+    await p.click('#road-body-2 .road-unit[data-k="fin"] .road-ubtn'); await p.waitForTimeout(450);
+    f1 = await unit('fin');
+    t.check('folds in Now: the outcomes row opens on its own and lists the two outcomes, verbatim', f1.open && f1.exp === 'true' && f1.h > 30 && f1.texts.join('|') === 'Measurable strength gains in the back squat|A hinge you trust', JSON.stringify(f1));
+    await p.focus('#road-body-2 .road-unit[data-k="note"] .road-ubtn');
+    await p.keyboard.press('Enter'); await p.waitForTimeout(450);
+    n1 = await unit('note');
+    t.check('folds in Now: Enter on the focused note row folds it (aria-expanded false, no height, hidden)', !n1.open && n1.exp === 'false' && n1.h === 0 && n1.vis === 'hidden', JSON.stringify(n1));
+    await p.keyboard.press('Space'); await p.waitForTimeout(450);
+    n1 = await unit('note');
+    t.check('folds in Now: Space opens it again', n1.open && n1.exp === 'true' && n1.h > 30, JSON.stringify(n1));
+    // a repaint of the road (leaving Progress and coming back) keeps both folds as the athlete left them
+    await p.evaluate(() => { document.getElementById('road-wrap')._painted = null; goTo('home'); goTo('plan'); }); await p.waitForTimeout(450);   // a real rewrite of the road, so o.units is what keeps the folds
+    n1 = await unit('note'); f1 = await unit('fin');
+    t.check('folds in Now: both stay open after leaving Progress and coming back', n1.open && n1.exp === 'true' && n1.h > 30 && f1.open && f1.exp === 'true' && f1.h > 30, JSON.stringify([n1, f1]));
+    // the Now row folds: what is inside an open fold is hidden to the eye and the keyboard too, and comes back when the row opens
+    await p.click('#road-wrap .road-row[data-cycle="2"] .road-head'); await p.waitForTimeout(450);
+    const shut = await p.evaluate(() => { const bt = document.querySelector('#road-body-2 .road-unit[data-k="note"] .road-ubtn'), p1 = document.querySelector('#road-body-2 .road-note p');
+      return { btn: getComputedStyle(bt).visibility, note: getComputedStyle(p1).visibility, size: Math.round(document.querySelector('#road-body-2').getBoundingClientRect().height) }; });
+    t.check('folds in Now: with the Now row folded, an open note is hidden (visibility hidden, so no focus and no screen reader), and the row has no height', shut.btn === 'hidden' && shut.note === 'hidden' && shut.size === 0, JSON.stringify(shut));
+    await p.click('#road-wrap .road-row[data-cycle="2"] .road-head'); await p.waitForTimeout(450);
+    n1 = await unit('note');
+    t.check('folds in Now: and opening the row brings the open note back', n1.open && n1.vis === 'visible' && n1.h > 30, JSON.stringify(n1));
     await p.click('#road-body-2 .road-why-door'); await p.waitForTimeout(400);
     t.check('Now body: the door opens the Why page', await p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible') && /Why Cycle 2 looks like this|looks like this/.test(document.querySelector('#hist-overlay .readiness-title').textContent)));
     t.check('no page errors (Now body)', p.errs.length === 0, p.errs.join(' | '));
@@ -250,6 +283,39 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     await toPlan(few.p);
     t.check('Why your plan: with 2 reasons the door row is there (from one, since 2026-10-13)', await few.p.evaluate(() => !!document.querySelector('.road-why-door')));
     await few.ctx.close();
+  }
+
+  // ── 6d. Doors: where his note is cut. Every word is shown once, verbatim (his first sentence on the card, the rest behind the door) ──
+  {
+    const LONGFIRST = 'This cycle is the one where everything you built over the last two months finally has to show up in the gym, week after week.';
+    for (const [tag, paras, want] of [
+      ['three sentences in paragraph one, and a second paragraph', ['Last month went well. Most sessions landed at an 8. Your legs went up.', 'Week 1 starts easier.'], { first: 'Last month went well.', note: ['Most sessions landed at an 8. Your legs went up.', 'Week 1 starts easier.'], long: false, units: 'note,fin' }],
+      ['a first sentence over 100 characters (set quieter, not a headline)', [LONGFIRST + ' Then the rest.'], { first: LONGFIRST, note: ['Then the rest.'], long: true, units: 'note,fin' }],
+      ['an abbreviation inside the first sentence (e.g. does not end it)', ['Train hard, e.g. Heavy singles. Then rest well.'], { first: 'Train hard, e.g. Heavy singles.', note: ['Then rest well.'], long: false, units: 'note,fin' }],
+      ['a one-word lead is no sentence (Yes. does not end it)', ['Yes. Do it. Then rest.'], { first: 'Yes. Do it.', note: ['Then rest.'], long: false, units: 'note,fin' }],
+      ['one sentence only: no note fold', ['Just the one sentence.'], { first: 'Just the one sentence.', note: [], long: false, units: 'fin' }],
+      ['no paragraphs at all: no line, no note fold', [], { first: '', note: [], long: false, units: 'fin' }],
+      ['a two-word lead is no sentence either (Go light. does not end it)', ['Go light. Then rest well.'], { first: 'Go light. Then rest well.', note: [], long: false, units: 'fin' }],
+      ['a three-word lead is a sentence (Go light today. ends it)', ['Go light today. Then rest well.'], { first: 'Go light today.', note: ['Then rest well.'], long: false, units: 'note,fin' }],
+      ['vs. does not end the first sentence', ['Squat vs. Deadlift is the question. Then rest.'], { first: 'Squat vs. Deadlift is the question.', note: ['Then rest.'], long: false, units: 'note,fin' }],
+      ['Dr. does not end the first sentence', ['Ask Dr. Smith about it. Then rest.'], { first: 'Ask Dr. Smith about it.', note: ['Then rest.'], long: false, units: 'note,fin' }],
+      ['No. does not end the first sentence', ['This is No. 1 on the list. Then rest.'], { first: 'This is No. 1 on the list.', note: ['Then rest.'], long: false, units: 'note,fin' }],
+      ['i.e. and approx. do not end the first sentence', ['Rest i.e. Sleep, approx. Eight hours is the plan. Then train.'], { first: 'Rest i.e. Sleep, approx. Eight hours is the plan.', note: ['Then train.'], long: false, units: 'note,fin' }],
+      ['no outcomes: no outcomes fold, the note fold stays', ['A line to start. And the rest.'], { first: 'A line to start.', note: ['And the rest.'], long: false, units: 'note', outs: [] }],
+      ['neither a note nor outcomes: no folds at all, only the aims and the Because door', [], { first: '', note: [], long: false, units: '', outs: [] }],
+    ]) {
+      const outs = want.outs || ['One thing to do.'];
+      const { ctx, p } = await H.openProgram(browser, { prog: prog({ msg: { paragraphs: paras, outcomes: outs } }), w: 390, h: 844 });
+      await toPlan(p);
+      const r = await p.evaluate(() => { const body = document.querySelector('#road-body-2'), f = body.querySelector('.road-first');
+        return { first: f ? f.textContent : '', long: !!f && f.classList.contains('is-long'), note: [...body.querySelectorAll('.road-note p')].map(e => e.textContent), units: [...body.querySelectorAll('.road-unit')].map(u => u.dataset.k).join(','),
+          sub: (body.querySelector('.road-unit[data-k="fin"] .road-uq') || {}).textContent, sign: !!body.querySelector('.road-from .wn-sign') }; });
+      const joined = [r.first].concat(r.note).filter(Boolean).join(' ');
+      t.check(`Doors, ${tag}: his first sentence on the card, the rest behind the door`, r.first === want.first && r.note.join('|') === want.note.join('|') && r.long === want.long && r.units === want.units && r.sign === !!want.first, JSON.stringify(r));
+      t.check(`Doors, ${tag}: every word once, verbatim (the card and the fold together read his paragraphs)${outs.length === 1 ? '; one outcome says "1 thing to hit"' : ''}`, joined === paras.join(' ') && (outs.length === 1 ? r.sub === '1 thing to hit' : !r.sub), JSON.stringify([joined, r.sub]));
+      t.check(`Doors, ${tag}: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+      await ctx.close();
+    }
   }
 
   // ── 6b. Why your plan looks like this keeps showing between cycles: inside Now's body while running, directly under the current cycle's Done row past its end ──
@@ -393,7 +459,7 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     t.check('Home between cycles: the row folds open in place (the teaser shows) and Home stays Home', o.open && o.exp === 'true' && o.home && o.lead === 'Strength becomes court speed.' && o.vis && o.h > 60, JSON.stringify(o));
     const hb = await p.evaluate(() => { const body = document.querySelector('.bt-next .road-in'); return { order: [...body.children].map(e => e.className.split(' ')[0] + (e.tagName === 'H3' ? ':' + e.textContent : '')).join(' | '),
       tagline: (body.querySelector('.road-tagline') || {}).textContent, aims: [...body.querySelectorAll('.road-aims li')].map(li => li.textContent.replace(/\s+/g, ' ').trim()).join('|') }; });
-    t.check('Home between cycles: Up next opens on the tagline, The aims, then the teaser (the same body as on Progress)', hb.order === 'road-tagline | road-sec:The aims | road-aims | road-lead | road-paras' && hb.tagline === 'Turn strength into speed' && hb.aims === '01Convert strength into usable court speed.', JSON.stringify(hb));
+    t.check('Home between cycles: Up next opens on the tagline, The aims, then the teaser (the same body as on Progress)', hb.order === 'road-tagline | road-sec:The aims | road-aims | road-lead | road-paras' && hb.tagline === 'Turn strength into speed' && hb.aims === '1Convert strength into usable court speed.', JSON.stringify(hb));
     await p.focus('.bt-next .road-head'); await p.keyboard.press('Enter'); await p.waitForTimeout(450);
     t.check('Home between cycles: Enter folds it again', await p.evaluate(() => !document.querySelector('.bt-next .road-row').classList.contains('is-open') && document.querySelector('.bt-next .road-head').getAttribute('aria-expanded') === 'false'));
     t.check('no page errors (Home between)', p.errs.length === 0, p.errs.join(' | '));
@@ -410,14 +476,14 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     const { ctx, p } = await H.openProgram(browser, { prog: prog({ endsIn: 9, name: LONG }), w, h, dark });
     await toPlan(p);
     // open every fold, so the longest page is the one measured
-    await p.evaluate(() => document.querySelectorAll('#road-wrap .road-head[aria-expanded="false"]').forEach(b => b.click())); await p.waitForTimeout(500);
+    await p.evaluate(() => document.querySelectorAll('#road-wrap .road-head[aria-expanded="false"], #road-wrap .road-ubtn[aria-expanded="false"]').forEach(b => b.click())); await p.waitForTimeout(500);
     const m = await p.evaluate(() => {
       const r = s => { const e = document.querySelector(s); if (!e) return null; const b = e.getBoundingClientRect(); return { l: Math.round(b.left * 10) / 10, r: Math.round(b.right * 10) / 10 }; };
       const card = document.querySelector('#cycle-card-wrap .cyc-card'), cr = card.getBoundingClientRect();
       const inside = ['.cyc-top', '.cyc-name', '.cyc-dates', '.cyc-k', '.cyc-bar'].map(s => { const e = card.querySelector(s), b = e.getBoundingClientRect(); return [s, b.left >= cr.left - 0.5 && b.right <= cr.right + 0.5]; });
       const name = card.querySelector('.cyc-name');   // clipped = wider than its box: the title's line-height is under 1, so its glyphs may pass a line box by a pixel or two (nothing clips them; the card has room)
       const heads = [...document.querySelectorAll('#road-wrap .road-head')].map(e => { const b = e.getBoundingClientRect(); return [Math.round(b.left * 10) / 10, Math.round(b.right * 10) / 10]; });
-      const texts = [...document.querySelectorAll('#road-wrap .road-nm, #road-wrap .road-ln, #road-wrap .road-aim, #road-wrap .road-out, #road-wrap .road-why p, #road-wrap .road-lead, #road-wrap .road-paras p, #road-wrap .road-tagline')]
+      const texts = [...document.querySelectorAll('#road-wrap .road-nm, #road-wrap .road-ln, #road-wrap .road-aim, #road-wrap .road-out, #road-wrap .road-first, #road-wrap .road-note p, #road-wrap .road-ul, #road-wrap .road-uq, #road-wrap .road-lead, #road-wrap .road-paras p, #road-wrap .road-tagline')]
         .filter(e => e.getClientRects().length).map(e => { const b = e.getBoundingClientRect(); return b.right <= document.documentElement.clientWidth + 0.5 && e.scrollWidth <= e.clientWidth + 1; });
       return { side: document.documentElement.scrollWidth - window.innerWidth, card: r('.cyc-card'), road: r('.road'), rows: [...document.querySelectorAll('#road-wrap .road-row')].map(e => { const b = e.getBoundingClientRect(); return b.left; }), heads, door: r('.road-why-door'), inside,
         nameClipped: name.scrollWidth > name.clientWidth + 1, nameLines: Math.round(name.getBoundingClientRect().height / parseFloat(getComputedStyle(name).lineHeight)), nameSize: getComputedStyle(name).fontSize, title: r('.prog-title'), sec: r('#road-wrap .prog-sec'),
