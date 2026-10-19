@@ -38,6 +38,23 @@ A monolith is its own index: one line per section, each line linking to that sec
 | [`../COACH_DASHBOARD.md`](../COACH_DASHBOARD.md) | [`ref/coach-dashboard/`](ref/coach-dashboard/) | 9 |
 | [`../CODEBASE.md`](../CODEBASE.md) | [`ref/codebase/`](ref/codebase/) | 6 |
 | [`../XP_SYSTEM.md`](../XP_SYSTEM.md) | [`ref/xp-system/`](ref/xp-system/) | 19 |
+
+### The line maps
+
+The docs told you what the rule is; the line map tells you where the code is. The three apps
+are one file each — 20,809 lines, 12,831 and 9,613 — so [`ref/line-map/`](ref/line-map/program-app.md)
+names every top-level function with its line number, grouped by the area of the app it belongs
+to, with the named style blocks and the screens. It is **generated** by
+[`../scripts/build_line_map.py`](../scripts/build_line_map.py) from the files themselves and
+never hand-edited; pre-commit guard 26 fails a commit whose map is stale. It is reference of the
+purest kind: it points at code and restates no rule.
+
+| Map | For |
+|---|---|
+| [`ref/line-map/program-app.md`](ref/line-map/program-app.md) | `program.html` |
+| [`ref/line-map/habits.md`](ref/line-map/habits.md) | `habits.html` |
+| [`ref/line-map/coach-dashboard.md`](ref/line-map/coach-dashboard.md) | `coach.html` |
+| [`ref/line-map/service-worker.md`](ref/line-map/service-worker.md) | `sw.js` |
 | [`../career/PROCEDURES.md`](../career/PROCEDURES.md) | [`ref/career-procedures/`](ref/career-procedures/) | 29 |
 | [`../career/CAREER_MODE.md`](../career/CAREER_MODE.md) | [`ref/career-mode/`](ref/career-mode/) | 17 |
 

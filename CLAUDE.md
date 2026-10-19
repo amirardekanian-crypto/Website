@@ -63,6 +63,7 @@ section. A reference `INDEX.md` is one line per section — read the index, open
 
 | The job | Open |
 |---|---|
+| **Find where anything lives in the app code** | [`docs/ref/line-map/`](docs/ref/line-map/program-app.md) — every top-level function with its line number, grouped by area, for `program.html`, `habits.html`, `coach.html` and `sw.js`, plus the named style blocks and the screens. Generated from the files themselves: jump by line, never grep-and-guess. Open this BEFORE any app change. |
 | **Change an exercise card** (the card, its ⓘ, cues, pill, note) | [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) + [`docs/rules/program-app.md`](docs/rules/program-app.md) → the twins rule + rows 36 (*The working card*), 06 (*The Spine*) and 15 (*Every other screen in the Centre Court look*, which holds the About sheet) of [`PROGRAM-APP.md`](PROGRAM-APP.md) — about 45 KB in all, against 391 KB before |
 | **Change any other screen of the athlete app** | [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) + that screen's section from [`PROGRAM-APP.md`](PROGRAM-APP.md) |
 | **Change how a session is logged, saved or synced** | [`docs/rules/program-app.md`](docs/rules/program-app.md) + the set-log and session-queue sections from [`PROGRAM-APP.md`](PROGRAM-APP.md) |

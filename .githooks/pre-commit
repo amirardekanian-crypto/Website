@@ -532,4 +532,23 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '(^|/)[^/]*\.md$|^
   fi
 fi
 
+# -- 26. the line map still matches the files it maps (added 2026-10-19) ----------------------------------------------
+# Why: program.html is 20,809 lines, habits.html 12,831 and coach.html 9,613, each one file. Once the docs were split
+# down to an 8.7 KB door, FINDING the code became what cost a session its time -- every edit started with grep-and-guess.
+# docs/ref/line-map/ names every top-level function with its line number, grouped by area, and that is worth having only
+# while the numbers are right: any edit to those files moves them. scripts/build_line_map.py is derived from the source
+# and regenerates deterministically, so --check can say whether what is committed is what it would write now. The map is
+# reference, never rules: it points at code and restates nothing.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|habits\.html|coach\.html|sw\.js|scripts/build_line_map\.py|docs/ref/line-map/.+\.md)$'; then
+  echo "pre-commit: an app file or the line map changed -- checking the map still matches..."
+  if ! lm_out=$("$PY" -X utf8 scripts/build_line_map.py --check 2>&1); then
+    echo "$lm_out"
+    echo ""
+    echo "pre-commit: BLOCKED -- the line map is stale. Run: python scripts/build_line_map.py   then stage docs/ref/line-map/"
+    failed=1
+  else
+    echo "pre-commit: $lm_out"
+  fi
+fi
+
 exit $failed

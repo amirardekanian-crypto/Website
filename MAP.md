@@ -44,6 +44,7 @@ The layers, the rules-file list and the house rules for writing them are in [`do
 
 | I'm looking for… | Go to |
 |---|---|
+| **A function, a style block or a screen inside an app file** | [`docs/ref/line-map/`](docs/ref/line-map/program-app.md) — the generated line map for `program.html`, `habits.html`, `coach.html` and `sw.js`. Jump by line number instead of searching 20,809 lines. |
 | **Anything design** — assets, format recipes, current rules, app look | [`Content/DESIGN-ATLAS.md`](Content/DESIGN-ATLAS.md) ← the designer's working file |
 | The look/brand rules (colours, fonts, marks, reels) | [`Content/DESIGN_SYSTEM.md`](Content/DESIGN_SYSTEM.md) · [colour tokens](assets/css/tokens.css) |
 | A specific image (logo, court photo, banner, headshot) | [Asset shelf](Content/DESIGN-ATLAS.md#asset-shelf--grab--go) in the atlas |
