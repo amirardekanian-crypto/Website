@@ -314,6 +314,7 @@
 // v184: program.html changed (2026-10-19, Amir): the chevron that opens an exercise card follows its name and the ⓘ has the right column to itself (it used to sit under the chevron, so a low thumb opened About); an open card is the same row turned green, with the body carried in and out on the card's own height.
 // v185: the shell did not change. This worker now leaves /pushtest/ alone too — the push reachability test (2026-10-19), which ships its own worker and must hold the test's push subscription itself.
 // v186: program.html changed (2026-10-19, Amir's slow connection): Crew asks the server for nothing unless it is opened, a photo is downloaded once and kept on the phone, and a photo is made smaller (1080 px, under 200 KB).
+const CACHE = 'aap-v186';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

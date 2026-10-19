@@ -481,4 +481,31 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(assets/js/rally
   fi
 fi
 
+# -- 23. The service worker still names its cache (added 2026-10-19) ---------------------------------------------------
+# Why: sw.js sits in front of the WHOLE origin, and `const CACHE = 'aap-vN'` is the one line every part of it reads
+# (install, activate and each of the three fetch paths). On 2026-10-19 a conflict resolution kept both sides' version
+# notes and dropped the line between them: sw.js still PARSED, every check here passed, the build shipped, and the live
+# worker threw ReferenceError on install, so no athlete's app shell could update and a fresh install got no offline copy.
+# Nothing caught it until the served file was read by hand. scripts/check_sw_cache.py checks two things -- the line exists,
+# and its version is the highest // vN: note, so a new note written without a bump is caught too.
+# test_check_sw_cache.py proves the guard still fails on each fault, and runs only when the guard or its test changes.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(sw[.]js|scripts/(check|test_check)_sw_cache[.]py)$'; then
+  echo "pre-commit: sw.js or its guard changed -- checking the worker still names its cache..."
+  if ! sw_out=$("$PY" -X utf8 scripts/check_sw_cache.py 2>&1); then
+    echo "$sw_out"
+    echo ""
+    echo "pre-commit: BLOCKED -- sw.js would ship broken (details above)."
+    failed=1
+  else
+    echo "pre-commit: $sw_out"
+  fi
+  if git diff --cached --name-only --diff-filter=ACM | grep -qE '^scripts/(check|test_check)_sw_cache[.]py$'; then
+    if ! sw_test=$("$PY" -X utf8 scripts/test_check_sw_cache.py 2>&1); then
+      echo "$sw_test" | grep -v '^ok '
+      echo "pre-commit: BLOCKED -- the sw.js cache guard no longer fails on a fault it must catch."
+      failed=1
+    fi
+  fi
+fi
+
 exit $failed
