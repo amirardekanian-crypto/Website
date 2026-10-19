@@ -18,12 +18,20 @@
 //   POST /push-send            send what is due
 //   POST /push-send?dry=1      say what WOULD go, send nothing. Safe to run any time.
 //
-// Secrets it needs (Supabase → Edge Functions → Secrets):
-//   VAPID_PUBLIC      the same key the apps subscribe with. If these two ever disagree, every push is
-//                     refused with 403 and nothing else looks wrong.
-//   VAPID_PRIVATE     never anywhere else. Not in the repo, not in the apps.
-//   VAPID_SUBJECT     mailto: or https:, who a push service should contact about this sender.
-//   PUSH_CRON_SECRET  the shared secret above.
+// WHERE THE KEYS LIVE. In public.push_config, a one-row table only the service role can read, NOT in
+// Edge Function secrets. Two reasons: the hourly job needs the same shared secret, so one place means
+// the two can never disagree; and it is one fewer thing for Amir to set by hand in a dashboard.
+// Environment variables of the same names still win if they are set, so the keys can be moved into
+// Supabase's own secret store later without touching this code.
+//   url / secret                the sender's address and the shared secret the hourly job sends
+//   vapid_public / vapid_private / vapid_subject
+//
+// ⚠️ push_config is deliberately NOT in BACKUP_TABLES: a weekly backup file on Amir's PC holding the
+// private key and the shared secret is worse than losing them. Losing them is recoverable — generate
+// a new pair, and each app re-subscribes silently the next time it opens, because the PERMISSION is
+// already granted and only the key changes. That is the one thing that must not be lost.
+// ⚠️ vapid_public must be the key the apps subscribe with (assets/js/push.js). If they ever disagree,
+// every push is refused with 403 and nothing else looks wrong.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { sendPush } from './webpush.ts';
@@ -45,7 +53,19 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'POST only' }, 405);
 
-  const secret = Deno.env.get('PUSH_CRON_SECRET') ?? '';
+  const db = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    { auth: { persistSession: false } },
+  );
+
+  // The keys and the shared secret, from the table the hourly job also reads. An environment
+  // variable of the same name wins, so they can be moved into Supabase's secret store later.
+  const { data: cfgRow } = await db.from('push_config').select('*').eq('id', true).maybeSingle();
+  const cfg = (cfgRow ?? {}) as Record<string, string | null>;
+  const pick = (env: string, col: string) => Deno.env.get(env) || cfg[col] || '';
+
+  const secret = pick('PUSH_CRON_SECRET', 'secret');
   const given = req.headers.get('x-push-key') ?? '';
   // Constant-time-ish: compare lengths first, then every character, so a wrong key cannot be found
   // one character at a time by timing the answer.
@@ -53,16 +73,10 @@ Deno.serve(async (req) => {
     given.split('').reduce((a, c, i) => a | (c.charCodeAt(0) ^ secret.charCodeAt(i)), 0) === 0;
   if (!same) return json({ error: 'no' }, 401);
 
-  const publicKey = Deno.env.get('VAPID_PUBLIC') ?? '';
-  const privateKey = Deno.env.get('VAPID_PRIVATE') ?? '';
-  const subject = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:amirardekanian@gmail.com';
+  const publicKey = pick('VAPID_PUBLIC', 'vapid_public');
+  const privateKey = pick('VAPID_PRIVATE', 'vapid_private');
+  const subject = pick('VAPID_SUBJECT', 'vapid_subject') || 'mailto:amirardekanian@gmail.com';
   if (!publicKey || !privateKey) return json({ error: 'the VAPID keys are not set' }, 500);
-
-  const db = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-    { auth: { persistSession: false } },
-  );
 
   const dry = new URL(req.url).searchParams.get('dry') === '1';
 

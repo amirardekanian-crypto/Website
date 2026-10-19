@@ -2155,6 +2155,13 @@ const BACKUP_TABLES = [
   // (crew_posts, crew_photos, crew_kudos, crew_rings) are left OUT on purpose: they are deleted after 7 days, and a backup kept 12 weeks
   // would break that promise in privacy.html 2.12 (SHORT_LIVED in scripts/restore/restore_backup.py; test_restore_backup.py check 2h).
   'crew_consent',
+  // Reminders (stage84): the phones that asked for one, so a restore does not cost every athlete the
+  // single notification permission their browser gives. push_sent is only a ledger of what went out
+  // today and rebuilds itself by not sending twice; push_config holds the VAPID private key and the
+  // sender's shared secret, and a backup file on this PC carrying those is worse than losing them
+  // (losing them is recoverable: a new pair, and each app re-subscribes silently, because the
+  // PERMISSION is already granted and only the key changes). Both are left out on purpose.
+  'push_subs',
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
   'library', 'library_categories', 'library_sessions',
