@@ -8278,7 +8278,7 @@ function roadUnitHTML(id, k, icon, title, sub, inner, open) {
 // Why your plan looks like this · N reasons: a door row (.hrow) to the Why page. Inside the Now row while the cycle runs, under its Done row after it.
 function roadDoorHTML(n) {
   return `<button type="button" class="hrow road-why-door" onclick="openWhyPlan()">${hrowIc('why')}`
-    + `<span class="hrow-b"><span class="hrow-l">Why your plan looks like this</span><span class="hrow-q">${n} reasons</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+    + `<span class="hrow-b"><span class="hrow-l">Why your plan looks like this</span><span class="hrow-q">${n} reason${n === 1 ? '' : 's'}</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
 function roadRowHTML(c, i, o) {
   o = o || {};
@@ -8316,9 +8316,13 @@ function roadRowHTML(c, i, o) {
   }
   const fold = !!body, open = fold && (o.open != null ? !!o.open : state === 'now');
   const archive = state === 'done' && !fold && o.archive ? String(o.archive) : '';
+  // The Now row says NOW once (2026-10-19, The Long Rally audit): the green pill is the state, so the mono line keeps only the
+  // weeks. The pill is NOT aria-hidden any more — it is the row's only state word now, and the button's name must still carry it.
+  const word = state === 'now' ? '' : roadWord(state);
+  const line = (c.weeks ? esc(c.weeks) : '') + (c.weeks && word ? ' · ' : '') + (word ? `<b>${word}</b>` : '');
   const inner = `<span class="road-num" aria-hidden="true">${n}</span>`
-    + `<span class="road-tx"><span class="road-nm">${esc(name)}</span><span class="road-ln">${c.weeks ? esc(c.weeks) + ' · ' : ''}<b>${roadWord(state)}</b></span></span>`
-    + `<span class="road-st">${state === 'now' ? '<span class="road-tag" aria-hidden="true">Now</span>' : ''}${state === 'locked' ? `<span class="road-lock" aria-hidden="true">${roadIc('lock')}</span>` : ''}`
+    + `<span class="road-tx"><span class="road-nm">${esc(name)}</span><span class="road-ln">${line}</span></span>`
+    + `<span class="road-st">${state === 'now' ? '<span class="road-tag">Now</span>' : ''}${state === 'locked' ? `<span class="road-lock" aria-hidden="true">${roadIc('lock')}</span>` : ''}`
     + `${fold ? '<i class="road-chev" aria-hidden="true"></i>' : archive ? '<span class="road-go" aria-hidden="true">›</span>' : ''}</span>`;
   const head = fold
     ? `<button type="button" class="road-head" aria-expanded="${open ? 'true' : 'false'}" aria-controls="${idp}${n}" onclick="toggleRoad(this)">${inner}</button>`
@@ -12371,9 +12375,11 @@ function momentsList() {
     const w = { sessions: 'Most sessions in ' + mon, improved: 'Most improved in ' + mon, full_month: 'Full month: ' + mon, pick: 'Amir’s Pick for ' + mon }[h.honour];
     if (!w) return;
     const n = Number(v.n), pct = Number(v.pct), wk = Number(v.weeks);
+    // Amir's Pick had no line at all, so its card drew as a name over an empty body (2026-10-19, The Long Rally audit).
     const s = h.honour === 'sessions' && n > 0 ? n + ' sessions with Amir that month.'
       : h.honour === 'improved' && pct > 0 ? '+' + (Math.round(pct * 10) / 10) + '% on ' + (v.lift ? String(v.lift) : 'a main lift') + '.'
-      : h.honour === 'full_month' ? (wk > 0 ? 'All ' + wk + ' training weeks held.' : 'Every training week held.') : '';
+      : h.honour === 'full_month' ? (wk > 0 ? 'All ' + wk + ' training weeks held.' : 'Every training week held.')
+      : h.honour === 'pick' ? 'Amir picked you that month.' : '';
     // An honour is for a month and is given after it: it sorts at the next month's first day, and shows its month.
     const m = /^(\d{4})-(\d{2})/.exec(h.month), nx = m ? new Date(Number(m[1]), Number(m[2]), 1) : null;
     const sort = nx ? nx.getFullYear() + '-' + String(nx.getMonth() + 1).padStart(2, '0') + '-01' : h.month;
@@ -13386,7 +13392,11 @@ function ceilingCardHtml() {
   const foot = bw && bkg != null
     ? `${esc(shortLift(best.lift))} · <b>${(bkg / bw.kg).toFixed(2)}× bodyweight</b>`
     : `<b>${esc(shortLift(best.lift))}</b>`;
-  const delta = best.delta > 0 ? `▲ ${best.delta} ${uWord(best.u, best.delta).toUpperCase()}` : '';
+  // The change and the period it covers (2026-10-19, The Long Rally audit): "▲ 12 kg since you started" — the words the Records
+  // page itself puts on this very number (renderCeiling()), so the row and the page it opens say the same thing. It was
+  // "▲ 12 KG": the measure shouted in capitals where the figure above it says kg, and no period at all, so the number could have
+  // been this cycle's or this year's. delta is measured from the lift's FIRST entry (ceilingSeries()).
+  const delta = best.delta > 0 ? `▲ ${best.delta} ${uWord(best.u, best.delta)} since you started` : '';
 
   // Idea 3 — count to the new number. The figure animates ONLY when this lift's
   // best has moved since the athlete last saw this card; an unchanged number

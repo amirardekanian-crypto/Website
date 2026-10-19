@@ -365,7 +365,11 @@
 // the Bell rather than on Home — a cold open reads the #crew hash and clears it, and an app already running is FOCUSED and posted a
 // message instead, because navigating a running app is a reload and a reload loses the set log in the page. The Reminders panel's crew
 // line says what it now does.
-const CACHE = 'aap-v199';
+// v200: program.html changed (2026-10-19, the Progress tab audit "The Long Rally", Amir: "first fix the bugs"). Four things the
+// audit found on Progress: the Why door said "1 reasons", the road's current row said NOW twice (the mono line and the green pill:
+// the line keeps the weeks, the pill keeps the word and is read out now), the Records row shouted "▲ 12 KG" with no period (it
+// says "▲ 12 kg since you started", the Records page's own words), and Amir's Pick drew as a name over an empty card.
+const CACHE = 'aap-v200';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

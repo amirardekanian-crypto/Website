@@ -67,7 +67,9 @@ const state = p => p.evaluate(() => ({
     t.check(`${tag}: This Week, nothing between cycles (no Cycle complete card on Progress, no row on Home)`, !s.fin && !s.bt && !s.upnext && !s.rep && s.weekSum && !s.folded, JSON.stringify(s));
     t.check(`${tag}: the This cycle card is on Progress and not on Home`, !s.cardOnHome && await p.evaluate(() => !!document.querySelector('#screen-plan .cyc-card .cyc-k')), JSON.stringify(s));
     const g = await plan(p);
-    t.check(`${tag}: Game Plan's road says Now on cycle 2 (cycle 1 done, cycle 3 up next), open`, g.states === 'done now next' && /\bNOW$/i.test((g.now || '').trim()) && g.tag === 'Now' && g.open === 'shut open shut', JSON.stringify(g));
+    // The pill is the state word now, and the mono line keeps only the weeks (2026-10-19, The Long Rally audit: the row said NOW twice).
+    t.check(`${tag}: Game Plan's road says Now on cycle 2 ONCE, in the pill (cycle 1 done, cycle 3 up next), open`,
+      g.states === 'done now next' && /WEEKS/i.test((g.now || '').trim()) && !/NOW/i.test((g.now || '').trim()) && g.tag === 'Now' && g.open === 'shut open shut', JSON.stringify(g));
     await ctx.close();
   }
 

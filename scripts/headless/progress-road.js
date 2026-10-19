@@ -130,7 +130,8 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
   // ── 4. the road: one row per cycle in order, the right state before, during and after a cycle's dates, the numeral solid only when done ──
   const states = {};
   for (const [tag, ends, want, lines] of [
-    ['during (ends in 20 days)', 20, 'done now next locked locked', ['WEEKS 1–5 · DONE', 'WEEKS 6–10 · NOW', 'WEEKS 11–15 · UP NEXT', 'WEEKS 16–20 · LOCKED', 'WEEKS 21–25 · LOCKED']],
+    // The Now row's mono line is the weeks ALONE since 2026-10-19 (The Long Rally audit): the green Now pill is the state, and the row said it twice.
+    ['during (ends in 20 days)', 20, 'done now next locked locked', ['WEEKS 1–5 · DONE', 'WEEKS 6–10', 'WEEKS 11–15 · UP NEXT', 'WEEKS 16–20 · LOCKED', 'WEEKS 21–25 · LOCKED']],
     ['before (starts tomorrow)', 34 + 1, 'done now next locked locked', null],
     ['on its last day', 0, 'done now next locked locked', null],
     ['after (ended yesterday)', -1, 'done done next locked locked', ['WEEKS 1–5 · DONE', 'WEEKS 6–10 · DONE', 'WEEKS 11–15 · UP NEXT', 'WEEKS 16–20 · LOCKED', 'WEEKS 21–25 · LOCKED']],
