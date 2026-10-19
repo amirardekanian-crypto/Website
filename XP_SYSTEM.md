@@ -17,6 +17,12 @@ career's numbers live in `career/rulebook.toml` as well as here (§8). The serve
 (`career_scores`) so the board loads fast. It is worked out again from the facts whenever they change, and nothing in it is a
 source.
 
+**Career screens off (2026-10-19, Career Mode round 5 step 3):** `habits.html` no longer DRAWS the career. There is no rank name, no Locker tab, no title, no
+badge shelf, no four numbers, no first-open reveal and no level-up, reward or award takeover. This is display only. **No number in this file moved.** Habit
+XP is earned, scored and synced exactly as before, `scoreDays()`, `paidXp()`, `bonusEvents()` and `levelInfo()` are untouched, and the twins still agree.
+A level is a number and a bar in AA Proof, and AA Performance shows the rest (`HABITS.md` → *Career screens off*). Sections 3 and 5 below say what is no
+longer drawn. The server keeps scoring and minting as before until "the cut" (round 5, step 4).
+
 **Once Career Mode's catalogue switch is on** (phase 3, `supabase/stage70_career_rewards.sql`, built and dormant on 2026-10-18:
 `HABITS.md` → *Career Mode, phase 3*) the consistency tiers and the milestones stop being Proof's: every badge tier and milestone
 is an **award** the server mints once in a career and pays through the facts, from `career/badges.toml` and
@@ -292,6 +298,10 @@ ends up GRINDER on water and ROOKIE on their workout — which is the honest pic
 
 ## 3. Ranks
 
+> **Rank names are not drawn since 2026-10-19** (Career Mode round 5, L5). AA Proof shows the level as a number and a bar, on Today and in the habit rings.
+> The names, the crests and the road below still exist in the code, and `rankFor()` still reads them, but no screen shows them until the cut removes them.
+> Nothing about the level curve (§2) changed.
+
 Ten names, five sub-levels each — 50 levels per cycle.
 
 ```js
@@ -563,6 +573,12 @@ has to climb in a new season — which is part of what §12.2 was about.
 ---
 
 ## 5. Celebrations
+
+> **Since 2026-10-19 (Career Mode round 5) AA Proof opens no level-up, rank-up, reward, title, award or reveal takeover, and the wins card has no line for a
+> tier, a milestone, a habit's rank, an award or a season.** What still opens is the day streak takeover (from `STREAK_TAKEOVER` days) and a finished
+> quest, and what still lands on the wins card is a perfect day, a comeback and the shorter streak marks. The baselines in this section (`CFG.seen`,
+> `seenTiers`, `seenAch`, `seenAwards`) keep moving in silence, so nothing replays later. The rows below that name a level, a rank, a tier, a milestone or
+> an award describe the code as it is, behind `CAREER_LIGHT`.
 
 **Since PRF-02 (2026-09-27, Amir's 1A) only a few things take the whole screen** (six since a
 season's title joined them, 2026-10-17, and a seventh, once per athlete, for the career reveal below); the rest land on

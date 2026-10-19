@@ -2,9 +2,14 @@
 // card, Your numbers, the Game Plan), Home (This Week, Next up as one card, the other days as rows, the habits door row), the one door-row look,
 // the one gutter, the account button that scrolls away with its screen, and Records and Body weight going back to Progress. Serve the repo first
 // (python -m http.server 8765 --bind 127.0.0.1, see lib.js), then: node scripts/headless/home-progress.js [--out <dir>]
+// Career Mode round 5 (the light screens): "Records and body" is a title only when the career is on (Your numbers, Your moments, Records and body, Game Plan,
+// in that order; without the career the two rows sit straight under Your numbers), the Career row carries Hold Serve's line, and the Daily habits row goes
+// once AA Proof's embedded strip says it is ready (paintHabitsCard()). Every scenario that reads the habits row blocks the strip's frame (habits.html?embed=1)
+// so the row stays as the seeded snapshot draws it; one scenario lets the strip load and checks the row goes.
 'use strict';
 const path = require('path');
 const H = require('./lib');
+const R = require('./career');
 
 const DAY = 86400000;
 const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');   // the LOCAL calendar day
@@ -51,10 +56,25 @@ const sideways = p => p.evaluate(() => document.documentElement.scrollWidth - wi
 const active = p => p.evaluate(() => document.querySelector('.screen.active').id);
 const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .nav-item.active')].map(n => n.dataset.tab).join());
 
+// A browser whose pages cannot load AA Proof's embedded strip (the iframe on Home, habits.html?embed=1): the strip publishes its own habit snapshot and, once it is
+// ready, takes the Daily habits row away. The route is added after the harness's own, so it answers first (career.js's atBaseline() does the same).
+function noStrip(browser) {
+  return { newContext: async (...a) => {
+    const ctx = await browser.newContext(...a);
+    const np = ctx.newPage.bind(ctx);
+    ctx.newPage = async () => {
+      await ctx.route(u => u.pathname === '/habits.html' && u.searchParams.get('embed') === '1', r => r.abort());
+      return np();
+    };
+    return ctx;
+  } };
+}
+
 (async () => {
   const shots = H.outDir();
   const t = H.checker();
-  const browser = await H.launch();
+  const real = await H.launch();       // the strip loads in pages opened on this one
+  const browser = noStrip(real);       // …and not in these
   const shot = (p, name) => p.screenshot({ path: path.join(shots, name + '.png'), fullPage: true });
 
   // ── 1. the tab bar, and Progress with its header, its card, Your numbers and the Game Plan, in that order ──
@@ -76,7 +96,8 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
     const o = await p.evaluate(() => {
       const top = sel => { const e = document.querySelector('#screen-plan ' + sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
       const eyebrow = document.querySelector('#athlete-card-wrap .prog-eyebrow'), title = document.querySelector('#athlete-card-wrap .prog-title');
-      const sec = [...document.querySelectorAll('#screen-plan .prog-sec')].map(e => e.textContent.trim());
+      const sec = [...document.querySelectorAll('#screen-plan .prog-sec')].filter(e => !e.hidden && getComputedStyle(e).display !== 'none').map(e => e.textContent.trim());
+      const rt = document.getElementById('records-title');
       const gp = document.querySelector('#road-wrap .prog-sec');
       const card = document.querySelector('#cycle-card-wrap .cyc-card');
       return { eyebrow: eyebrow && eyebrow.textContent.trim(), title: title && title.textContent.trim(), titleTag: title && title.tagName, titleSize: title && getComputedStyle(title).fontSize,
@@ -85,7 +106,8 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
         old: !!document.querySelector('#screen-plan .home-name'),
         y: { title: top('.prog-title'), badge: top('.sport-badge'), card: top('.cyc-card'), numbers: top('#numbers-title'), ceil: top('#ceiling-row-wrap .hrow'),
              weight: top('#weight-row-wrap .hrow'), plan: gp ? Math.round(gp.getBoundingClientRect().top + scrollY) : null, road: top('.road') },
-        sec, card: card && { tag: card.tagName, onclick: card.getAttribute('onclick'), arrow: !!card.querySelector('.cyc-top i'), text: card.innerText },
+        sec, recordsTitle: rt && { hidden: rt.hidden, shown: getComputedStyle(rt).display !== 'none' }, career: !!document.querySelector('#career-card-wrap .cs-card, #career-moments-wrap .mo'),
+        card: card && { tag: card.tagName, onclick: card.getAttribute('onclick'), arrow: !!card.querySelector('.cyc-top i'), text: card.innerText },
         gp: gp && { size: getComputedStyle(gp).fontSize, caps: getComputedStyle(gp).textTransform, color: getComputedStyle(gp).color, spacing: getComputedStyle(gp).letterSpacing } };
     });
     t.check('Progress header: the name as the eyebrow, "Progress" as a 44 px title, no big two-line name',
@@ -95,7 +117,9 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
     const y = o.y;
     t.check('Progress order: header, This cycle card, Your numbers (Records, Body weight), then the Game Plan and its road',
       y.badge < y.card && y.card < y.numbers && y.numbers < y.ceil && y.ceil < y.weight && y.weight < y.plan && y.plan < y.road, JSON.stringify(y));
-    t.check('Progress: two section titles, Your numbers and Game Plan', o.sec.join('|') === 'Your numbers|Game Plan', o.sec.join('|'));
+    // Without the career (the demo's way: no profile) "Records and body" is in the page but hidden, and the two rows sit straight under Your numbers.
+    t.check('Progress: two section titles, Your numbers and Game Plan; "Records and body" is hidden without the career, and there is no career card', o.sec.join('|') === 'Your numbers|Game Plan'
+      && !!o.recordsTitle && o.recordsTitle.hidden && !o.recordsTitle.shown && !o.career, JSON.stringify([o.sec, o.recordsTitle, o.career]));
     t.check('Progress: the Game Plan title is 15 px capitals in green ink with a hairline to the edge',
       !!o.gp && o.gp.size === '15px' && o.gp.caps === 'uppercase' && o.gp.color === 'rgb(14, 74, 54)' && parseFloat(o.gp.spacing) > 0, JSON.stringify(o.gp));
     t.check('This cycle card on Progress: a plain card, no tap, no ›', !!o.card && o.card.tag === 'DIV' && !o.card.onclick && !o.card.arrow, JSON.stringify(o.card && [o.card.tag, o.card.onclick, o.card.arrow]));
@@ -104,6 +128,39 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
       await p.evaluate(() => /104\s*kg/.test(document.querySelector('#ceiling-row-wrap').innerText) && /79\.8\s*kg/.test(document.querySelector('#weight-row-wrap').innerText)));
     await shot(p, 'progress-data');
     t.check('no page errors (tabs and Progress)', p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+
+  // ── 1b. the career on (round 5): Progress = header, This cycle, Your numbers (the career's card, the month's goal, Your moments, Records and body), the Game Plan ──
+  {
+    const prof = R.rwProfile(10000);
+    const first = new Date(), month = first.getFullYear() + '-' + String(first.getMonth() + 1).padStart(2, '0') + '-01';
+    const prev = new Date(first.getFullYear(), first.getMonth() - 1, 1), pm = prev.getFullYear() + '-' + String(prev.getMonth() + 1).padStart(2, '0') + '-01';
+    // get_my_moments() as stage77 answers it; an honour's value is the jsonb stage75 stores ({n}, {lift, pct}, {weeks})
+    const myMoments = { athlete_id: H.ID, goal: { month, line: 'Four sessions a week, no gaps.', done_at: null }, goals: [],
+      notes: [{ day: day(3), line: 'Your squat looked sharp on Tuesday.', award_id: null, read: true }], saw: ['achievement:first_best'],
+      honours: [{ month: pm, honour: 'sessions', value: { n: 14 } }, { month: pm, honour: 'improved', value: { lift: 'Barbell Back Squat', pct: 27.1 } }] };
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(), seed: SEED_NUMBERS, stub: { tables: { career_rules: R.RW_RULES, career_facts: [] }, profile: prof, awards: R.rwShelf(prof), myMoments } });
+    await R.waitRow(p);
+    const home = await p.evaluate(() => ({ rows: [...document.querySelectorAll('#home-overview .hrow')].map(r => r.querySelector('.hrow-l').textContent.trim()), hold: document.getElementById('home-hold-wrap').innerHTML.trim() }));
+    t.check('Home with the career: the Career row, then the Daily habits row; Hold Serve folded into the Career row (its own row is empty)', home.rows.join() === 'Career,Daily habits' && home.hold === '', JSON.stringify(home));
+    await p.evaluate(() => goTo('plan'));
+    await p.waitForFunction(() => !!document.querySelector('#moments-title'), null, { timeout: 8000 }).catch(() => {});
+    await p.waitForTimeout(400);
+    const o = await p.evaluate(() => {
+      const y = sel => { const e = document.querySelector('#screen-plan ' + sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
+      return { sec: [...document.querySelectorAll('#screen-plan .prog-sec')].filter(e => !e.hidden && getComputedStyle(e).display !== 'none').map(e => e.textContent.replace(/\s+/g, ' ').trim()),
+        y: { card: y('.cyc-card'), numbers: y('#numbers-title'), career: y('.cs-card'), goal: y('.cs-goal'), moments: y('#moments-title'), records: y('#records-title'), ceil: y('#ceiling-row-wrap .hrow'), weight: y('#weight-row-wrap .hrow'), plan: y('#road-wrap .prog-sec') },
+        goal: (document.querySelector('.cs-goal') || {}).innerText };
+    });
+    // 2 marks (4 and 8 weeks held), the achievement, Amir's line and two honours
+    t.check('Progress with the career: four section titles, Your numbers, Your moments (6), Records and body, Game Plan', o.sec.join('|') === 'Your numbers|Your moments 6|Records and body|Game Plan', o.sec.join('|'));
+    const y = o.y;
+    t.check('Progress with the career, in order: This cycle, Your numbers, the career\'s card, the goal, Your moments, Records and body, the two rows, the Game Plan',
+      y.card < y.numbers && y.numbers < y.career && y.career < y.goal && y.goal < y.moments && y.moments < y.records && y.records < y.ceil && y.ceil < y.weight && y.weight < y.plan, JSON.stringify(y));
+    t.check('…the goal is Amir\'s line for this month', /goal · from Amir/i.test(o.goal || '') && /Four sessions a week, no gaps\./.test(o.goal || ''), o.goal);
+    t.check('no page errors (Progress with the career)', p.errs.length === 0, p.errs.join(' | '));
+    await shot(p, 'progress-career');
     await ctx.close();
   }
 
@@ -255,6 +312,32 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
     const dk = await d.p.evaluate(() => { const r = document.querySelector('#home-habits-wrap .hrow'); const c = getComputedStyle(r); return { row: c.backgroundColor, page: getComputedStyle(document.body).backgroundColor, edge: c.borderTopColor, on: getComputedStyle(r.querySelector('.hrow-v')).color }; });
     t.check('dark: the door row is #242424 on #181818, its verdict mint', dk.row === 'rgb(36, 36, 36)' && dk.page === 'rgb(24, 24, 24)' && dk.on === 'rgb(109, 190, 149)', JSON.stringify(dk));
     await d.ctx.close();
+  }
+
+  // ── 5b. AA Proof's strip is the habits once it is on screen: the Daily habits row goes (paintHabitsCard()); with the frame blocked the row stays ──
+  {
+    // Proof says "ready" only when it is set up here (onboarded); otherwise "setup" and the strip stays hidden
+    const o = { prog: prog(), seed: { _hab_card: hab('togo'), _hab_cfg: { onboarded: true, toured: true, installAsked: true, boardSwept: true, updatedAt: Date.now() } } };
+    const blocked = await H.openProgram(browser, o);
+    await blocked.p.evaluate(() => document.getElementById('home-habits-wrap').scrollIntoView());
+    await blocked.p.waitForTimeout(1500);
+    const b = await blocked.p.evaluate(() => ({ row: !!document.querySelector('#home-habits-wrap .hrow'), strip: !document.getElementById('home-proof-strip').classList.contains('off') }));
+    t.check('the strip never comes (its frame blocked): the Daily habits row alone, the strip stays hidden', b.row && !b.strip, JSON.stringify(b));
+    await blocked.ctx.close();
+    const { ctx, p } = await H.openProgram(real, o);
+    await p.evaluate(() => document.getElementById('home-habits-wrap').scrollIntoView());
+    await p.waitForFunction(() => !document.getElementById('home-proof-strip').classList.contains('off'), null, { timeout: 15000 }).catch(() => {});
+    await p.waitForTimeout(500);
+    const s = await p.evaluate(() => ({ strip: !document.getElementById('home-proof-strip').classList.contains('off'), row: !!document.querySelector('#home-habits-wrap .hrow'), wrap: document.getElementById('home-habits-wrap').innerHTML.trim(),
+      frame: !!document.querySelector('#home-proof-strip iframe'), h: Math.round(document.getElementById('home-proof-strip').getBoundingClientRect().height) }));
+    t.check('the strip says it is ready: it IS the habits, the Daily habits row is gone (the wrap is empty)', s.strip && s.frame && s.h > 40 && !s.row && s.wrap === '', JSON.stringify(s));
+    // coming back to Home redraws the row's wrap: still none while the strip is on
+    await p.evaluate(() => { goTo('plan'); goTo('home'); });
+    await p.waitForTimeout(300);
+    t.check('…and it stays gone when Home is opened again', await p.evaluate(() => !document.querySelector('#home-habits-wrap .hrow')));
+    t.check('no page errors (the strip)', p.errs.length === 0, p.errs.join(' | '));
+    await shot(p, 'home-strip-on');
+    await ctx.close();
   }
 
   // ── 6. the account button: absolute, off every screen's text at the top, gone when scrolled away ──
@@ -414,7 +497,7 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
     await ctx.close();
   }
 
-  await browser.close();
+  await real.close();
   const failed = t.report();
   console.log('screenshots: ' + shots);
   process.exit(failed ? 1 : 0);

@@ -1439,6 +1439,15 @@
   #app .statgrid > div, #app .statgrid > div:nth-child(odd), #app .statgrid > div:nth-last-child(-n+2) {
     border: 0; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); padding: 12px 14px;
   }
+  /* CAREER_LIGHT (round 5): three season facts on Progress, the door card that says where the career went, and
+     the level on Today with no rank name (the ring is a plain element, nothing opens). */
+  #app .statgrid.s3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  #app .statgrid.s3 > div, #app .statgrid.s3 > div:nth-child(odd), #app .statgrid.s3 > div:nth-last-child(-n+2) { padding: 12px 12px; }
+  #app .doorcard { margin: 4px 16px 12px; padding: 16px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 14px; }
+  #app .doorcard p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink); }
+  #app div.lvring { cursor: default; }
+  #app .heroxp.lite { font-size: 14px; line-height: 1.3; }
   /* Grids & heat map */
   #app .grid35 .c { border: 0; border-radius: 6px; background: var(--surface); }
   #app .grid35 .c.hit { background: var(--hcol, var(--accent)); }
@@ -2332,55 +2341,42 @@
   .tourlay .btn { border-radius: 999px; font-family: 'Outfit', sans-serif; text-transform: none; letter-spacing: 0; font-weight: 700; }
 </style>
 <style>
-  /* ── Embedded on the training app's Home (Fork 1B, 2026-09-26) — see renderEmbed() ──
+  /* ── Embedded on the training app's Home (Fork 1B, 2026-09-26; one row of chips, 2026-10-19) — see renderEmbed() ──
      That app's own clothes: paper, green, clay, Barlow. Every rule is scoped to
      html.embed, so the full AA Proof never meets one of them. The page sizes to its
-     rows (the frame's height follows it), instead of filling a phone screen. */
+     chips (the frame's height follows it), instead of filling a phone screen. No card
+     around it: the head and the chips sit straight on the training app's paper. */
   html.embed, html.embed body { height: auto; overflow: visible; background: transparent; }
   html.embed .loading, html.embed .errscreen, html.embed .signin-screen { display: none !important; }
   html.embed #app.app.emb { height: auto; max-width: none; margin: 0; display: block; overflow: visible; background: transparent; }
   html.embed #app.emb, html.embed #app.emb * { font-family: 'Barlow', system-ui, sans-serif; }
-  html.embed #app.emb .e-wrap { background: #FFFFFF; border: 1px solid #EDE8E0; border-radius: 14px; overflow: hidden; }
-  html.embed #app.emb .e-head { display: flex; align-items: baseline; gap: 8px; padding: 11px 14px 9px; border-bottom: 1px solid #EDE8E0; }
-  html.embed #app.emb .e-k { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #5C5C5C; }
-  html.embed #app.emb .e-n { font-size: 13px; font-weight: 600; color: #1A1A1A; }
-  html.embed #app.emb .e-open { margin-left: auto; font-size: 13px; font-weight: 600; color: #C7552F; text-decoration: none; white-space: nowrap; }
-  html.embed #app.emb .e-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 12px; border-bottom: 1px solid #EDE8E0; }
-  html.embed #app.emb .e-row:last-of-type { border-bottom: 0; }
-  html.embed #app.emb .e-row.done { background: rgba(14,74,54,0.06); }
-  html.embed #app.emb .e-box { position: relative; flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px; background: #EDE8E0;
-    display: flex; align-items: center; justify-content: center; font-size: 20px; line-height: 1; color: #1A1A1A; }
-  html.embed #app.emb .e-row.done .e-box { background: #0E4A36; }
-  html.embed #app.emb .e-mark { position: absolute; right: -4px; bottom: -4px; width: 20px; height: 20px; border-radius: 99px;
-    background: #FFFFFF; border: 2px solid #D8D1C5; display: flex; align-items: center; justify-content: center; }
-  html.embed #app.emb .e-row.done .e-mark { background: #0E4A36; border-color: #FFFFFF; }
-  html.embed #app.emb .e-mark svg.tick { width: 12px; height: 12px; }
-  html.embed #app.emb .e-mark svg.tick path { fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-  html.embed #app.emb .e-row.locked .e-box { opacity: 0.55; }
-  html.embed #app.emb .e-body { flex: 1 1 auto; min-width: 0; display: grid; gap: 2px; text-decoration: none; color: inherit; }
-  html.embed #app.emb .e-nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.01em; color: #1A1A1A; }
-  html.embed #app.emb .e-st { font-size: 12.5px; line-height: 1.3; color: #5C5C5C; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  html.embed #app.emb .e-plus { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 99px; border: 1.5px solid #0E4A36;
-    color: #0E4A36; font-size: 22px; font-weight: 600; line-height: 1; display: flex; align-items: center; justify-content: center; }
-  html.embed #app.emb .e-toast { padding: 9px 14px 11px; font-size: 13px; color: #0E4A36; font-weight: 600; background: rgba(14,74,54,0.06); }
-  html.embed body[data-dark] #app.emb .e-wrap { background: #202020; border-color: #2a2a2a; }
-  html.embed body[data-dark] #app.emb .e-head, html.embed body[data-dark] #app.emb .e-row { border-color: #2a2a2a; }
-  html.embed body[data-dark] #app.emb .e-k, html.embed body[data-dark] #app.emb .e-st { color: #888; }
-  html.embed body[data-dark] #app.emb .e-n, html.embed body[data-dark] #app.emb .e-nm, html.embed body[data-dark] #app.emb .e-box { color: #EEE; }
-  html.embed body[data-dark] #app.emb .e-box { background: #2a2a2a; }
-  html.embed body[data-dark] #app.emb .e-row.done { background: rgba(62,156,116,0.12); }
-  html.embed body[data-dark] #app.emb .e-row.done .e-box, html.embed body[data-dark] #app.emb .e-row.done .e-mark { background: #3E9C74; }
-  html.embed body[data-dark] #app.emb .e-mark { background: #202020; border-color: #444; }
-  html.embed body[data-dark] #app.emb .e-plus { color: #9fd3bd; border-color: #9fd3bd; }
-  html.embed body[data-dark] #app.emb .e-open { color: #E06B43; }
-  html.embed body[data-dark] #app.emb .e-toast { color: #9fd3bd; background: rgba(62,156,116,0.12); }
-  /* The whole circle is the tick (2026-10-12), and a counted habit's number row opens under it. */
-  html.embed #app.emb .e-box { border-radius: 99px; background: #FFFFFF; border: 2px solid #CFC7B9; }
-  html.embed #app.emb .e-row.done .e-box { background: #0E4A36; border-color: #0E4A36; }
-  html.embed #app.emb .e-tk svg.tick { width: 20px; height: 20px; display: block; }
-  html.embed #app.emb .e-tk svg.tick path { fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-  html.embed #app.emb .e-row.editing { border-bottom: 0; }
-  html.embed #app.emb .e-edit { padding: 2px 10px 12px 66px; border-bottom: 1px solid #EDE8E0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  html.embed #app.emb .e-wrap { background: transparent; border: 0; padding: 2px 0 0; }
+  html.embed #app.emb .e-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 0 2px 10px; }
+  html.embed #app.emb .e-k { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: #0E4A36; }
+  html.embed #app.emb .e-r { display: flex; align-items: baseline; gap: 12px; margin-left: auto; }
+  html.embed #app.emb .e-n { font-size: 14px; font-weight: 600; color: #0E4A36; white-space: nowrap; }
+  html.embed #app.emb .e-n.togo { color: #B5461F; }
+  html.embed #app.emb .e-open { font-size: 14px; font-weight: 600; color: #0E4A36; text-decoration: none; white-space: nowrap; }
+  html.embed #app.emb .e-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  html.embed #app.emb .e-pill { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; box-sizing: border-box; max-width: 100%;
+    border: 1px solid #E4DDD1; border-radius: 999px; background: #FFFFFF; color: #1A1A1A; font-size: 14px; font-weight: 600; line-height: 1; white-space: nowrap; cursor: pointer; }
+  html.embed #app.emb .e-pill:focus-visible { outline: 2px solid #0E4A36; outline-offset: 2px; }
+  html.embed #app.emb .e-pill.open { border-color: #0E4A36; box-shadow: 0 0 0 1px #0E4A36; }
+  html.embed #app.emb .e-ring { flex: 0 0 auto; width: 14px; height: 14px; box-sizing: border-box; border: 1.5px solid #8A8378; border-radius: 99px;
+    display: flex; align-items: center; justify-content: center; }
+  html.embed #app.emb .e-ring svg.tick { width: 10px; height: 10px; display: block; }
+  html.embed #app.emb .e-ring svg.tick path { fill: none; stroke: #0E4A36; stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; }
+  html.embed #app.emb .e-cn { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  html.embed #app.emb .e-cc { flex: 0 0 auto; font-size: 13px; font-weight: 400; color: #5C5C5C; }
+  html.embed #app.emb .e-pill.done { background: #0E4A36; border-color: #0E4A36; color: #FFFFFF; }
+  html.embed #app.emb .e-pill.done .e-ring { background: #FFFFFF; border-color: #FFFFFF; }
+  html.embed #app.emb .e-pill.done .e-cc { color: rgba(255,255,255,.8); }
+  html.embed #app.emb .e-pill.locked { cursor: default; }
+  html.embed #app.emb .e-pill.locked:not(.done) { border-style: dashed; color: #5C5C5C; background: transparent; }
+  html.embed #app.emb .e-toast { padding: 10px 2px 0; font-size: 13px; color: #0E4A36; font-weight: 600; }
+  /* The number row (openEmbedEdit()): the same field, buttons and save as the sheet (saveSheetLog()). A chip opens it for a counted
+     habit with a big target (Steps, Sleep: embedBigCount()), prefilled with the target; the frame's height message follows it. */
+  html.embed #app.emb .e-edit { padding: 10px 2px 2px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
   html.embed #app.emb .e-field { min-width: 0; display: flex; align-items: baseline; gap: 8px; border: 1.5px solid #0E4A36; border-radius: 10px; padding: 6px 10px; background: #FFFFFF; }
   html.embed #app.emb .e-field input { flex: 1; min-width: 0; width: 100%; border: 0; outline: none; background: transparent; color: #1A1A1A; padding: 0;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.1; }
@@ -2389,11 +2385,23 @@
   html.embed #app.emb .e-sm { width: 40px; height: 40px; border-radius: 99px; border: 1.5px solid #CFC7B9; color: #1A1A1A; font-size: 18px; font-weight: 600; }
   html.embed #app.emb .e-chip { height: 40px; border-radius: 99px; border: 1.5px solid #CFC7B9; padding: 0 12px; font-size: 14px; font-weight: 600; color: #1A1A1A; }
   html.embed #app.emb .e-save { height: 40px; border-radius: 99px; background: #0E4A36; color: #FFFFFF; padding: 0 18px; font-size: 14px; font-weight: 700; }
-  html.embed body[data-dark] #app.emb .e-box { background: #202020; border-color: #444; }
-  html.embed body[data-dark] #app.emb .e-row.done .e-box { background: #3E9C74; border-color: #3E9C74; }
-  html.embed body[data-dark] #app.emb .e-edit { border-color: #2a2a2a; }
+  /* Dark: the training app's dark palette (#202020 surfaces, #3E9C74 green, #9fd3bd green text, #E06B43 clay text). */
+  html.embed body[data-dark] #app.emb .e-k, html.embed body[data-dark] #app.emb .e-n, html.embed body[data-dark] #app.emb .e-open { color: #9fd3bd; }
+  html.embed body[data-dark] #app.emb .e-n.togo { color: #E06B43; }
+  html.embed body[data-dark] #app.emb .e-pill { background: #202020; border-color: #3A3A3A; color: #EEEEEE; }
+  html.embed body[data-dark] #app.emb .e-pill:focus-visible { outline-color: #9fd3bd; }
+  html.embed body[data-dark] #app.emb .e-pill.open { border-color: #3E9C74; box-shadow: 0 0 0 1px #3E9C74; }
+  html.embed body[data-dark] #app.emb .e-ring { border-color: #8A8A8A; }
+  html.embed body[data-dark] #app.emb .e-cc { color: #999999; }
+  html.embed body[data-dark] #app.emb .e-pill.done { background: #3E9C74; border-color: #3E9C74; color: #0E1A15; }
+  html.embed body[data-dark] #app.emb .e-pill.done .e-ring { background: #0E1A15; border-color: #0E1A15; }
+  html.embed body[data-dark] #app.emb .e-pill.done .e-ring svg.tick path { stroke: #3E9C74; }
+  html.embed body[data-dark] #app.emb .e-pill.done .e-cc { color: rgba(14,26,21,.75); }
+  html.embed body[data-dark] #app.emb .e-pill.locked:not(.done) { color: #999999; background: transparent; }
+  html.embed body[data-dark] #app.emb .e-toast { color: #9fd3bd; }
   html.embed body[data-dark] #app.emb .e-field { background: #202020; border-color: #3E9C74; }
   html.embed body[data-dark] #app.emb .e-field input, html.embed body[data-dark] #app.emb .e-sm, html.embed body[data-dark] #app.emb .e-chip { color: #EEE; }
+  html.embed body[data-dark] #app.emb .e-field span { color: #999999; }
   html.embed body[data-dark] #app.emb .e-sm, html.embed body[data-dark] #app.emb .e-chip { border-color: #444; }
   html.embed body[data-dark] #app.emb .e-save { background: #3E9C74; color: #0E1A15; }
 </style>
@@ -2470,6 +2478,21 @@
 // ════════════════════════════════════════════════════════════════════════
 const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
 const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
+
+// ── CAREER LIGHT (Career Mode round 5, step 3; career/CAREER_MODE.md → Round 5, L1, L2, L5; Amir, 2026-10-20) ──
+// The lightest version: the level, the four numbers, the moments, the monthly goal and Amir's notes live in AA
+// Performance (program.html → Progress). AA Proof keeps its habits, the week table, Today and the Crew board.
+// While this is true AA Proof draws NO career screen: no Locker tab, no rank names, no titles, no badge shelf,
+// no Grand Slam, no level road, no card skins, no four numbers, no first-open reveal, no level-up, reward or
+// award takeover, and no medal emojis or titles on the board. It is DISPLAY ONLY: habit XP is earned, scored and
+// synced exactly as before (scoreDays(), paidXp(), bonusEvents(), levelInfo() and every twin are untouched), the
+// profile and the baselines (CFG.seen, careerSeen, catalogueSeen, seenAwards) keep moving silently so nothing
+// replays later, and the drawing code below stays where it is until "the cut" (round 5, step 4) removes it from the
+// app and the server together. A coached athlete meets ONE door card on Progress that points at AA Performance.
+const CAREER_LIGHT = true;
+// The wins-card lines (CFG.wins) CAREER_LIGHT never writes or draws: badges, achievements, a habit's rank name, a
+// catalogue award, a finished season's record. A perfect day, a day streak mark and a comeback stay.
+const LIGHT_NO_WINS = ['milestone', 'tier', 'hrank', 'award', 'season'];
 
 // ── THE XP SYSTEM — every tunable lives here ─────────────────────────────
 // Read XP_SYSTEM.md before changing these. Nothing about XP is persisted, so
@@ -5129,7 +5152,7 @@ async function fetchCareer() {
   if (fresh && catalogueOn()) {
     if (CAREER.p.catalogue_version && (!CATALOGUE || CATALOGUE.version !== CAREER.p.catalogue_version)) fetchCatalogue();
     // The shelf on screen while the core moved under it (a new award, a new catalogue): read it again.
-    if (UI.screen === 'progress' && shelfStale()) fetchShelf(false);
+    if (UI.screen === 'progress' && !CAREER_LIGHT && shelfStale()) fetchShelf(false);   // CAREER_LIGHT: no shelf is drawn, so none is read
     let again = syncCatalogueTitles();
     if (checkWithdrawals(started)) again = true;
     if (serverMoments()) again = true;
@@ -5249,7 +5272,7 @@ async function fetchCatalogue() {
     invalidateBonus();
     // A new copy names catalogue titles the Locker could not name before; a shelf read under the old one is read again.
     syncCatalogueTitles();
-    if (SHELF && shelfStale()) fetchShelf(false);
+    if (SHELF && !CAREER_LIGHT && shelfStale()) fetchShelf(false);
     // The catalogue reveal waited for this copy to name each award's kind (checkCatalogueReveal()): it opens now.
     if (catalogueRevealDue()) checkLevelUps();
     render();
@@ -5568,6 +5591,9 @@ function seedAwardsSeen() {
 // a row that does not open stays unseen and waits for the next open. A wins-card row lands on Today's wins card.
 // The day streak keeps its own takeover (D17): its award is recorded and told, never shown again.
 function serverMoments() {
+  // CAREER_LIGHT: AA Proof neither shows nor TELLS a waiting moment. Telling would mark it shown on the server, and
+  // the athlete would never meet it in AA Performance, which is where moments live now (round 5, L2).
+  if (CAREER_LIGHT) return false;
   if (!catalogueOn() || window.IS_DEMO || window.IS_PREVIEW || window.IS_EMBED || !ATHLETE_ID || !CFG) return false;
   if (!Array.isArray(CFG.seenAwards)) return false;       // not baselined on this phone yet: the reveal seeds it
   if (catalogueRevealDue()) return false;                 // the reveal, still waiting, is the open's one moment (D7)
@@ -5681,6 +5707,9 @@ function checkCatalogueReveal() {
   if (UI.celebrate.some(e => e.kind === 'career')) return false;
   if (!CFG.heldBefore) CFG.heldBefore = { tiers: currentTiers(), ach: currentAch() };
   seedSeenLevels();
+  // CAREER_LIGHT: the baseline is taken and the switch is recorded as seen, but there is no reveal moment (and
+  // nothing to wait for: the reveal needed the shelf or the catalogue copy to name each award's kind).
+  if (CAREER_LIGHT) { claimRewards(false); CFG.catalogueSeen = S; saveCfg(); return true; }
   const counts = ownedByMeaning();
   if (!counts) return true;
   const fresh = claimRewards(false);
@@ -5757,7 +5786,7 @@ function openWins(meaning) {
   }, 60);
 }
 function hero4() {
-  if (!catalogueOn()) return '';
+  if (!catalogueOn() || CAREER_LIGHT) return '';   // CAREER_LIGHT: the four numbers are AA Performance's (round 5, L2)
   return `<div class="hero4" data-k="hero4">${fourNumbers().map(c => `<button class="h4" data-k="h4:${c.meaning}" ${on(() => openWins(c.meaning))}
       aria-label="${esc(c.label)}: ${c.value}${c.best > c.value ? ', best ' + c.best : ''}. Open ${esc(WIN_WORDS[c.meaning])} on Progress">
       <span class="figure" data-static data-num="h4${c.meaning}" data-to="${c.value}">${c.value}</span>
@@ -6313,6 +6342,7 @@ function checkSeasonMoments() {
       if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
       const owned = CFG.pass.owned || (CFG.pass.owned = []);
       if (owned.indexOf(t.id) < 0) owned.push(t.id);
+      if (CAREER_LIGHT) return;     // recorded, not shown: no title moment in AA Proof (round 5, L5)
       UI.celebrate.push({ kind: 'reward', id: t.id, reward: Object.assign({}, t, { rec: r }) });
       haptic('rank');
     } else addWin({ k: 'season', id: key(r) });
@@ -6346,7 +6376,8 @@ function checkLevelUps() {
       const fresh = claimRewards(false);
       CFG.careerSeen = CAREER.p.switch.xp;
       saveCfg();
-      if (CAREER.p.since && String(CAREER.p.since) < String(CAREER.p.switch.xp)) {
+      // CAREER_LIGHT: the baseline moves, the moment does not (the level is AA Performance's now).
+      if (!CAREER_LIGHT && CAREER.p.since && String(CAREER.p.since) < String(CAREER.p.switch.xp)) {
         UI.celebrate.push({ kind: 'career', id: CAREER.p.switch.xp, since: String(CAREER.p.since), rewards: fresh });
         haptic('rank');
       }
@@ -6376,8 +6407,10 @@ function checkLevelUps() {
   });
   CFG.seen = now;
   saveCfg();
+  // CAREER_LIGHT: no level-up takeover for the overall level and no rank card for a habit (round 5, L5). A habit's own
+  // level still flashes in its row. The baseline above moves either way, so nothing replays later.
   events.forEach(e => {
-    if (e.big) { UI.celebrate.push(e); haptic(e.rankChanged ? 'rank' : 'level'); }
+    if (e.big) { if (!CAREER_LIGHT) { UI.celebrate.push(e); haptic(e.rankChanged ? 'rank' : 'level'); } }
     else {
       UI.flash[e.id] = e.to;
       if (e.rankChanged) addWin({ k: 'hrank', id: e.id, to: e.to });
@@ -6386,15 +6419,19 @@ function checkLevelUps() {
   // A reward is shown ON the level that earned it (PRF-02): one screen, cause and effect together.
   // It had a takeover of its own queued behind the level. Only a reward with no level in this pass
   // (a rules change, a sync) still gets its own.
+  // CAREER_LIGHT: still recorded (append-only, never revoked), never shown.
   const rewards = claimRewards(false), host = events.filter(e => e.big).pop();
-  if (rewards.length && host) host.rewards = rewards;
-  else rewards.forEach(r => UI.celebrate.push({ kind: 'reward', id: r.id, reward: r }));
-  if (rewards.length) haptic('rank');
+  if (!CAREER_LIGHT) {
+    if (rewards.length && host) host.rewards = rewards;
+    else rewards.forEach(r => UI.celebrate.push({ kind: 'reward', id: r.id, reward: r }));
+    if (rewards.length) haptic('rank');
+  }
   // Finishing an event is the biggest single thing in the app that is not a
   // level, so it takes over the screen like one.
   // From the catalogue switch an event is an award (checkUnlocks() opens it), and its title reaches the Locker only
   // from the server (syncCatalogueTitles()): CFG.pass.owned can never give a pending one back.
   if (!catalogueOn()) claimEventTitles(false).forEach(r => {
+    if (CAREER_LIGHT) return;
     UI.celebrate.push({ kind: 'reward', id: r.id, reward: r });
     haptic('rank');
   });
@@ -6536,7 +6573,14 @@ function checkUnlocks() {
   // The whole screen for a day streak from STREAK_TAKEOVER days and a quest; the rest land on the
   // wins card on Today, which stays until it is tapped (PRF-02).
   const full = e => e.kind === 'quest' || (e.kind === 'streak' && e.days >= STREAK_TAKEOVER);
-  if (cat) unlockAwards(UI.celebrate.length > 0 || events.some(full));
+  // CAREER_LIGHT: a tier and a milestone are badges and achievements, which are AA Performance's moments now, and a
+  // catalogue award is never minted or shown from here. A day streak mark, a perfect day, a comeback and a quest are
+  // habits, so they keep their takeover or their line on Today. The seen-lists above moved either way.
+  if (CAREER_LIGHT) {
+    const keep = events.filter(e => e.kind !== 'tier' && e.kind !== 'milestone');
+    events.length = 0; keep.forEach(e => events.push(e));
+  }
+  if (cat && !CAREER_LIGHT) unlockAwards(UI.celebrate.length > 0 || events.some(full));
   saveCfg();
   if (!events.length) return;
   events.filter(full).forEach(e => UI.celebrate.push(e));
@@ -6583,6 +6627,8 @@ function actionLevelUps() { _actionPass = true; try { checkLevelUps(); } finally
 // syncs). What is stored is WHICH win, never its XP: points are recomputed, never stored (privacy.html
 // §2.3), so winLine() asks the ledger when it draws, exactly as the takeovers did.
 function addWin(w) {
+  // CAREER_LIGHT: no line for a badge, a milestone, a rank, an award or a season's record (round 5, L5).
+  if (CAREER_LIGHT && LIGHT_NO_WINS.indexOf(w.k) >= 0) return;
   CFG.wins = (CFG.wins || []).filter(x => !(x.k === w.k && x.id === w.id)).concat([w]).slice(-12);
   saveCfg();
 }
@@ -6595,6 +6641,7 @@ function dismissWins() {
 // `share` is [card, subject]: the card that shows THIS win (2026-10-17). A medal or a tier opened the
 // newest milestone whatever had landed, a comeback the Rank card, and a habit's rank nothing at all.
 function winLine(w) {
+  if (CAREER_LIGHT && LIGHT_NO_WINS.indexOf(w.k) >= 0) return null;   // one saved before the switch: not drawn
   const emo = h => splitEmoji(h.name)[0] || '✨';
   if (w.k === 'milestone') {
     const a = ACHIEVEMENTS.find(x => x.code === w.id);
@@ -7004,7 +7051,8 @@ function openEmbedEdit(h) {
 // initials button in the header. The slot it freed went to the social layer,
 // which is the thing that brings people back daily and which used to be a chip
 // inside another tab.
-const TAB_ORDER = ['today', 'progress', 'crew', 'pass'];
+// CAREER_LIGHT: the Locker ('pass') is not a tab any more; go('pass') opens Progress.
+const TAB_ORDER = CAREER_LIGHT ? ['today', 'progress', 'crew'] : ['today', 'progress', 'crew', 'pass'];
 function navDir(from, to) {
   // Settings joins the list of screens that push in from the right and pop
   // back out to the left — it is no longer a tab you slide sideways into.
@@ -7025,6 +7073,8 @@ function openHabit(id, from) {
   haptic('tab'); render(); resetScroll();
 }
 function go(screen) {
+  // CAREER_LIGHT: ?go=pass, an old link and any leftover door to the Locker land on Progress.
+  if (CAREER_LIGHT && screen === 'pass') screen = 'progress';
   UI._navDir = navDir(UI.screen, screen);
   // Leaving Today drops the backfill day — except into a habit's detail, which
   // is a round trip you take mid-edit to check the history you are filling in.
@@ -7038,7 +7088,7 @@ function go(screen) {
   resetScroll();
   if (screen === 'crew') { fetchBoard(); if (!RC.loaded) fetchRollCall(); }
   // Progress opened: its shelf is read now (get_awards()); the copy this phone kept is on screen meanwhile.
-  if (screen === 'progress' && catalogueOn()) fetchShelf(true);
+  if (screen === 'progress' && catalogueOn() && !CAREER_LIGHT) fetchShelf(true);
 }
 // Settings sub-screens travel like screens — in from the right, out to the
 // left — without being screens, so the tab bar and the header stay put.
@@ -7730,10 +7780,10 @@ if (!window.IS_EMBED && !window.IS_PREVIEW) {
 
 // ── Embedded on the training app's Home (Fork 1B, B2, Amir, 2026-09-26) ──────────
 // program.html loads this app with ?embed=1 in a frame under its Daily Habits card, so an
-// athlete ticks today's habits where they train. It draws today's rows in that app's
-// clothes (the html.embed styles), and every tap goes through the same doors as the full
-// app: toggleHabit(), bump(), setVal(), the sync. Nothing is scored, stored or synced twice,
-// and program.html still holds no habit state.
+// athlete ticks today's habits where they train. It draws today's habits as ONE ROW OF CHIPS
+// in that app's clothes (the html.embed styles; Career Mode round 5, 2026-10-19), and every
+// tap goes through the same doors as the full app: toggleHabit(), bump(), setVal(), the sync.
+// Nothing is scored, stored or synced twice, and program.html still holds no habit state.
 // What waits for the full app: level-ups and rewards (checkLevelUps() stands down here, so
 // CFG.seen does not move and the moment is still there the next time AA Proof opens), the
 // tour, the install offer, the XP flights, the board sweep, and Progress, Crew and the
@@ -7752,30 +7802,52 @@ function renderEmbed() {
   const t = TKEY(), rows = rosterOn(t);
   // The same verdict as Today's tile and the training app's row above this strip (PRF-03).
   const v = verdictOf(t), said = v.state === 'togo' ? v.n + ' to go' : v.state === 'perfect' ? 'Perfect' : 'On target';
+  // ONE ROW OF CHIPS (2026-10-19, Career Mode round 5): no card, no row per habit. The unlocked habits first, the session last.
+  const edit = UI.embedEdit && habitById(UI.embedEdit);
   return `<div class="e-wrap">
-    <div class="e-head"><span class="e-k">Today</span><span class="e-n">${said}</span>
-      <a class="e-open" href="${esc(proofUrl())}" target="_top">Open AA Proof →</a></div>
-    ${rows.filter(h => !h.locked).concat(rows.filter(h => h.locked)).map(h => embedRow(h, t)).join('')}
+    <div class="e-head"><span class="e-k">Today's habits</span>
+      <span class="e-r"><span class="e-n ${v.state}">${said}</span>
+        <a class="e-open" href="${esc(proofUrl())}" target="_top">Open AA Proof ›</a></span></div>
+    <div class="e-chips" data-k="echips">${rows.filter(h => !h.locked).concat(rows.filter(h => h.locked)).map(h => embedChip(h, t)).join('')}</div>
+    ${edit ? embedEdit(edit) : ''}
     ${UI.toast ? `<div class="e-toast">${esc(UI.toast)}</div>` : ''}
   </div>`;
 }
-function embedRow(h, t) {
-  const v = valOf(t, h.id), done = isDone(h, t), locked = !!h.locked && !done;
-  const left = h.kind === 'count' && !done && !locked ? h.target - v : 0;
-  // A locked habit says where it comes from; its full lockedHint is one tap away in AA Proof.
-  const status = locked ? ((isFree() && h.freeHint) || h.source || 'Earned elsewhere.')
-    : h.kind === 'count'
-      ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit + (left > 0 ? ' · ' + fmtVal(h, left) + ' to go' : '')
-      : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source || ''));
-  const parts = splitEmoji(h.name), emo = parts[0], label = parts[1];
-  // THE WHOLE CIRCLE IS THE TICK here too (2026-10-12): the strip still drew the small corner ring
-  // the full app gave up in PRF-01, and a done tile hid its emoji under a solid fill.
-  const editing = UI.embedEdit === h.id;
-  return `<div class="e-row${done ? ' done' : ''}${locked ? ' locked' : ''}${editing ? ' editing' : ''}" data-k="erow:${h.id}">
-    <button class="e-box" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(label) + ' is earned in your programme' : h.kind === 'count' ? 'Log ' + esc(label) : (done ? 'Clear ' : 'Tick ') + esc(label)}">${done ? `<span class="e-tk">${TICK}</span>` : (emo || esc(h.code))}</button>
-    <a class="e-body" href="${esc(proofUrl(h.id))}" target="_top"><span class="e-nm">${esc(label)}</span><span class="e-st">${esc(status)}</span></a>
-    ${h.kind === 'count' && !h.locked ? `<button class="e-plus" ${on(() => bump(h))} aria-label="Add to ${esc(label)}">+</button>` : ''}
-  </div>${editing ? embedEdit(h) : ''}`;
+// A chip's name: the habit's short name (Steps, Sleep, Protein, Water, Mobility, Breathe, Supps, Session), the same one the
+// week table uses. A habit the athlete made has no short name: its own, in sentence case, cut at a word at 12 characters.
+function embedLabel(h) {
+  if (h.short) return h.short;
+  const nm = String(splitEmoji(h.name)[1] || h.name || '').trim().toLowerCase();
+  const full = nm.charAt(0).toUpperCase() + nm.slice(1);
+  if (full.length <= 12) return full;
+  let cut = '';
+  full.split(/\s+/).some(w => { const next = cut ? cut + ' ' + w : w; if (next.length > 12) return true; cut = next; return false; });
+  return (cut || full.slice(0, 11)) + '…';
+}
+// "6.2k" for a big count, the habit's own format otherwise ("2", "7.5").
+function embedNum(h, n) {
+  if (!h.dec && n >= 1000) { const k = n / 1000; return (Number.isInteger(k) ? String(k) : k.toFixed(1)) + 'k'; }
+  return fmtVal(h, n);
+}
+// A counted habit whose full day takes more than ten taps of its + (Steps: 20, Sleep: 15). Its chip opens the number row,
+// prefilled with the target, as the old circle did. Water (8) and Protein (3) are small counts: a tap on their chip is + .
+function embedBigCount(h) { return h.kind === 'count' && !h.locked && h.target / (h.step || 1) > 10; }
+// One habit, one chip. A tap does what the habit's + (a small counted one) or its circle (a checked one, or a counted one with
+// a big target) did on the old rows: bump() adds one step, toggleHabit() ticks or clears or opens the number row (openEmbedEdit()),
+// all through the same doors as the full app. The locked session is not a button: it is on when the programme says the session
+// is done (importWorkoutDays()).
+function embedChip(h, t) {
+  const v = valOf(t, h.id), done = isDone(h, t), label = embedLabel(h);
+  const count = h.kind === 'count' && !h.locked ? embedNum(h, v) + '/' + embedNum(h, h.target) : '';
+  const inner = `<span class="e-ring" aria-hidden="true">${done ? TICK : ''}</span><span class="e-cn">${esc(label)}</span>${count ? `<span class="e-cc">${esc(count)}</span>` : ''}`;
+  if (h.locked) {
+    return `<span class="e-pill locked${done ? ' done' : ''}" data-k="epill:${h.id}" role="img"
+      aria-label="${esc(label)}: ${done ? 'done' : 'not done yet'}. It ticks itself when you finish your session in your programme">${inner}</span>`;
+  }
+  const big = embedBigCount(h), open = big && UI.embedEdit === h.id;
+  const say = big ? esc(label) + ', ' + esc(count.replace('/', ' of ')) + '. Set the number'
+    : h.kind === 'count' ? esc(label) + ', ' + esc(count.replace('/', ' of ')) + '. Add one' : esc(label) + (done ? ', done. Tap to clear it' : '. Tap to tick it');
+  return `<button class="e-pill${done ? ' done' : ''}${open ? ' open' : ''}" data-k="epill:${h.id}" ${on(() => (h.kind === 'count' && !big ? bump(h) : toggleHabit(h)))}${big ? ` aria-expanded="${open}"` : ''} aria-label="${say}">${inner}</button>`;
 }
 // The strip's number row (see openEmbedEdit()): the same field, buttons and save as the sheet (saveSheetLog()).
 function embedEdit(h) {
@@ -8373,7 +8445,16 @@ function tourSteps() {
     screen: 'today', sel: () => $t('.wk2')
   });
 
-  S.push({
+  // CAREER_LIGHT (round 5): no ranks, no Locker, no four numbers here. The step still rings the level, and says
+  // where the rest of the career went.
+  S.push(CAREER_LIGHT ? {
+    title: 'Your level',
+    body: careerOn()
+      ? `Everything you log pays XP${isFree() ? '' : ', and so does every session you train'}. XP builds your level, which is your career:
+           it never resets. The bar under it is how far you are from the next one.${isFree() ? '' : ' Your four numbers and your moments are in AA Performance, on Progress.'}`
+      : `Everything you log pays XP. XP builds your level, and the bar under it is how far you are from the next one.`,
+    screen: 'today', sel: () => $t('.hero-top')
+  } : {
     title: 'Your level, and the Locker',
     body: careerOn()
       ? `Everything you log pays XP${isFree() ? '' : ', and so does every session you train'}. XP builds your level, which is your career:
@@ -8385,7 +8466,7 @@ function tourSteps() {
   });
 
   // Career Mode phase 3: the four numbers under the bar, one per kind of win (only once the catalogue switch is on).
-  if (catalogueOn()) S.push({
+  if (catalogueOn() && !CAREER_LIGHT) S.push({
     title: 'Your record',
     body: `Four numbers that only go up. <strong>Tap one</strong> to see what's next.`,
     screen: 'today', sel: () => $t('.hero4')
@@ -8404,10 +8485,10 @@ function tourSteps() {
       : bs === 'coming'
       ? `Everyone training with me is on it. Finish your first session in the programme app and you
          appear here as <strong>${esc(CFG.boardName || defaultDisplayName())}</strong>. Other athletes see
-         <strong>that name, your points, your rank and your title</strong>, nothing else. Pick another name
+         <strong>${CAREER_LIGHT ? 'that name and your points' : 'that name, your points, your rank and your title'}</strong>, nothing else. Pick another name
          here, or keep yourself off before it happens; rename or leave any time after.`
       : `Nobody can see you until you join, and joining takes a name you pick yourself. Other
-         athletes see <strong>that name, your points, your rank and your title</strong>, nothing else. Join and you also get
+         athletes see <strong>${CAREER_LIGHT ? 'that name and your points' : 'that name, your points, your rank and your title'}</strong>, nothing else. Join and you also get
          <strong>one sentence a day</strong> on the wall. Leave whenever you like.`,
     screen: 'crew', before: () => { LB.view = 'board'; },
     sel: () => $t('[data-tour="join"]')
@@ -8747,7 +8828,7 @@ function renderApp() {
     // screen in the app that is not scoring anything.
     // Settings is a list of doors, so its header names the door you are behind.
     settings: UI.sub === 'habits'     ? ['Settings', 'Your habits']
-            : ['Day ' + dayNumber() + ' · ' + LI.label, 'You']
+            : ['Day ' + dayNumber() + (CAREER_LIGHT ? '' : ' · ' + LI.label), 'You']   // CAREER_LIGHT: no rank name
   };
   const rights = {
     // Today's header says nothing on the right: the verdict tile in the hero answers (PRF-03).
@@ -8773,7 +8854,8 @@ function renderApp() {
   // achievements are one "Progress" tab — they were two views of one question —
   // and CREW holds the whole social layer, which was previously a chip inside
   // a tab named after only half of what it contained.
-  const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['CREW','crew','03'],['LOCKER','pass','04']];
+  // CAREER_LIGHT: no Locker tab (round 5, L7): Today, Progress, Crew.
+  const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['CREW','crew','03']].concat(CAREER_LIGHT ? [] : [['LOCKER','pass','04']]);
   // Settings and the manual are not tabs. They sit "above" the tab
   // bar, so no tab lights up while you are in them and the initials button
   // becomes the way out. The Locker IS a tab now — it is the battle pass, and
@@ -9376,7 +9458,16 @@ function renderToday(LI, doneCount) {
            about 360 px to about 200, so most of the list is above the fold again. -->
       <div class="block hero-lv${past ? ' past' : ''}">
         <div class="hero-top">
-          <button class="lvring" data-k="lvring" ${on(() => go('pass'))} aria-label="Open the Locker. The ladder and the rewards">
+          ${CAREER_LIGHT
+            /* The level is a number and a bar, no rank name, and nothing to open (the Locker is gone; round 5, L2). */
+            ? `<div class="lvring" data-k="lvring" role="img" aria-label="Level ${LI.lv}">
+            <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rail" cx="18" cy="18" r="15.5"></circle><circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - LI.pct / 100)).toFixed(1)}"></circle></svg>
+            <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 16 : 20}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
+          </div>
+          <div class="herobody">
+            <div class="heroxp lite"><b>${esc(String(LI.toNext).replace(/\B(?=(\d{3})+(?!\d))/g, ','))}</b> XP to level ${LI.lv + 1}</div>
+          </div>`
+            : `<button class="lvring" data-k="lvring" ${on(() => go('pass'))} aria-label="Open the Locker. The ladder and the rewards">
             <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rail" cx="18" cy="18" r="15.5"></circle><circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - LI.pct / 100)).toFixed(1)}"></circle></svg>
             <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 16 : 20}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
           </button>
@@ -9387,7 +9478,7 @@ function renderToday(LI, doneCount) {
               <span class="go">›</span>
             </button>
             <div class="heroxp"><b>${esc(String(LI.toNext).replace(/\B(?=(\d{3})+(?!\d))/g, ','))}</b> XP to level ${LI.lv + 1}</div>
-          </div>
+          </div>`}
           ${streakFlame(currentDayStreak(), bestDayStreak())}
         </div>
         <div class="herobar"><span data-fill style="width:${LI.pct}%"></span></div>${hero4()}
@@ -9430,8 +9521,8 @@ function renderToday(LI, doneCount) {
           <span>
             <span class="eyebrow">The tour</span>
             <span class="rcq">${loggedDays().length
-              ? 'New: ' + (catalogueOn() ? 'six' : 'five') + ' steps on what the buttons in here do.'
-              : 'Want the ' + (catalogueOn() ? 'six' : 'five') + '-step tour of what everything does?'}</span>
+              ? 'New: ' + (catalogueOn() && !CAREER_LIGHT ? 'six' : 'five') + ' steps on what the buttons in here do.'
+              : 'Want the ' + (catalogueOn() && !CAREER_LIGHT ? 'six' : 'five') + '-step tour of what everything does?'}</span>
           </span>
           <span class="hd" style="font-size:20px;color:var(--accent);flex:none">→</span>
         </button>`}
@@ -9716,6 +9807,16 @@ function catalogueShelf() {
     + near.map(row).join('')
     + `<button class="msall" data-k="msall" ${on(flip)}><span>All ${total} milestones</span><span class="go">›</span></button>`;
 }
+// THE DOOR (CAREER_LIGHT, round 5, L1, L2): where the career's shelf used to be, a coached athlete meets ONE card
+// that says where it went. A free athlete has no programme and no career: Progress shows their habits and nothing
+// empty. The button is programUrl() with &go=numbers: the training app opens its Progress at Your numbers.
+function doorCard() {
+  if (isFree()) return '';
+  return `<div class="doorcard" data-k="doorcard">
+    <p>Your level, your four numbers, your moments and Amir's notes are in AA Performance now, on Progress. Your habits stay right here.</p>
+    <button class="btn btn-primary btn-block" ${on(() => { window.location.href = programUrl() + '&go=numbers'; })}>Open AA Performance</button>
+  </div>`;
+}
 function renderProgress(LI, earned, totalAch) {
   const hs = live(), off = offHabits();
   // ⚠️ bestDayStreak(), NOT bestHabitRun(). This tile is captioned DAY STREAK,
@@ -9742,11 +9843,11 @@ function renderProgress(LI, earned, totalAch) {
            that is almost always positive, and it is the one that earns the rest. -->
       <!-- QUESTS FIRST while a run is on (2026-10-12): the one thing here that expires. -->
       ${(run => run && runQuests(run).length ? sectionLabel('Quests', 'Seven days') + renderQuestBlock() : '')(activeQuestRun())}
-      <div class="statgrid">
+      <div class="statgrid${CAREER_LIGHT ? ' s3' : ''}">
         <div><div class="figure" data-static data-num="logged" data-to="${daysLogged}">${daysLogged}</div>
           <div class="eyebrow">Days logged</div></div>
-        <div><div class="hd statfrac"><span data-static data-num="unlocked" data-to="${earned}">${earned}</span><span class="of">/${totalAch}</span></div>
-          <div class="eyebrow">Milestones</div></div>
+        ${CAREER_LIGHT ? '' : `<div><div class="hd statfrac"><span data-static data-num="unlocked" data-to="${earned}">${earned}</span><span class="of">/${totalAch}</span></div>
+          <div class="eyebrow">Milestones</div></div>`}
         <div><div class="figure flamefig ${dayStreakNow > 0 ? 'lit' : ''}" data-lvl="${emberLevel(dayStreakNow)}">${FLAME}<span data-static data-num="streak" data-to="${dayStreakNow}">${dayStreakNow}</span></div>
           <div class="eyebrow">Day streak${bestDay > dayStreakNow ? ' · best ' + bestDay : ''}</div></div>
         <div><div class="figure" data-static data-num="perfect" data-to="${perfectDays}">${perfectDays}</div>
@@ -9763,14 +9864,20 @@ function renderProgress(LI, earned, totalAch) {
            separate them by SCOPE — a habit's own, versus the whole day's.
            (No backticks in here: this comment lives inside a template literal
            and one would close it.) -->
-      ${daysLogged === 0 ? `<div class="statnote" data-k="statnote">
+      ${daysLogged === 0 ? (CAREER_LIGHT ? `<div class="statnote" data-k="statnote">
+        Tap a habit in the table below for its history.
+        Every habit has <strong>its own streak</strong>: consecutive days you did that one thing.
+        Your <strong>day streak</strong>, at the top, is consecutive days where you cleared
+        ${XP_RULES.streakQualifyPct}% of what you could do that day, or left no more than one thing undone.
+        A <strong>perfect day</strong> is all of it. All three start at zero and the first one moves today.
+      </div>` : `<div class="statnote" data-k="statnote">
         A <strong>milestone</strong> is one of the ${totalAch} at the foot of this screen;
         a habit's page shows its five consistency tiers.
         Every habit has <strong>its own streak</strong>: consecutive days you did that one thing.
         Your <strong>day streak</strong>, at the top, is consecutive days where you cleared
         ${XP_RULES.streakQualifyPct}% of what you could do that day, or left no more than one thing undone.
         A <strong>perfect day</strong> is all of it. All four start at zero and the first one moves today.
-      </div>` : ''}
+      </div>`) : ''}
 
 
       ${weekTable(hs, off)}
@@ -9801,7 +9908,7 @@ function renderProgress(LI, earned, totalAch) {
            reachable row above nine walls, and gave a two-year athlete nothing
            left to want. The tier is the promise: a good week, the long haul, or
            something most people never get. -->
-      ${catalogueOn() ? catalogueShelf() : (() => {
+      ${CAREER_LIGHT ? doorCard() : catalogueOn() ? catalogueShelf() : (() => {
         const rows = ACHIEVEMENTS.map(a => {
           // Clamped: THE CENTURION reads 143/100 without it, and a bar past
           // 100% would run outside its own track.
@@ -10009,7 +10116,7 @@ function renderDetail(h) {
       <div class="block dt-level">
         ${habitRing(hl)}
         <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
-          <div class="hd" style="font-size:16px;line-height:1.1">Level ${hl.lv} · ${esc(hl.label)}</div>
+          <div class="hd" style="font-size:16px;line-height:1.1">Level ${hl.lv}${CAREER_LIGHT ? '' : ' · ' + esc(hl.label)}</div>
           <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="hxp:${h.id}" data-to="${hl.xp}">${hl.xp.toLocaleString()}</span> XP banked · ${hl.toNext} to level ${hl.lv + 1}</div>
           <div style="font-size:14px;line-height:1.4;color:var(--muted)">${esc(QUIPS[h.id] || h.goal || '')}</div>
         </div>
@@ -10092,7 +10199,7 @@ function renderBoardNotice() {
     <span>
       <span class="eyebrow">You are on the leaderboard</span>
       <span class="rcq">Everyone training with me is. Other athletes see
-        <b>${esc(CFG.boardName || defaultDisplayName())}</b>, your level and your rank.
+        <b>${esc(CFG.boardName || defaultDisplayName())}</b>${CAREER_LIGHT ? ' and your points.' : ', your level and your rank.'}
         Leave any time in Settings.</span>
     </span>
     <span class="hd" style="font-size:20px;color:var(--accent);flex:none">&rarr;</span>
@@ -10253,8 +10360,9 @@ function rcChips(r) {
   const st = (r.streak !== null && r.streak !== undefined) ? Number(r.streak)
            : (r.is_me ? dayStreakAt(r.day) : 0);
   if (st > 0) out.push(`<span class="rchip fire">🔥 ${st}-day streak</span>`);
-  if (r.rank_label) out.push(`<span class="rchip">${rankIcon(rankNameOf(r.rank_label), 12, 'stroke-width:2.4')}${esc(r.rank_label)}</span>`);
-  const t = titleName(r.title);
+  // CAREER_LIGHT (round 5, L5): no rank name and no title on a line of the wall.
+  if (r.rank_label && !CAREER_LIGHT) out.push(`<span class="rchip">${rankIcon(rankNameOf(r.rank_label), 12, 'stroke-width:2.4')}${esc(r.rank_label)}</span>`);
+  const t = CAREER_LIGHT ? '' : titleName(r.title);
   if (t) out.push(titlePlate(passItem(r.title) || { name: t }, true));
   return out.length ? `<div class="rc-chips">${out.join('')}</div>` : '';
 }
@@ -10287,7 +10395,9 @@ function boardRow(r, ahead, i) {
   const xp = Number(r.xp || 0);
   const gap = r.is_me && ahead ? Math.max(0, Number(ahead.xp || 0) - xp) : 0;
   const d = LB.deltas[r.display_name];
-  const t = titleName(r.title);
+  // CAREER_LIGHT (round 5, L5, L8): the board keeps its order and its points, and loses the rank name, the title and the
+  // gold, silver and bronze emojis. A place is a plain number.
+  const t = CAREER_LIGHT ? '' : titleName(r.title);
   // EVERY ROW READS THE SAME, INCLUDING YOUR OWN — rank, then title.
   //
   // ⚠️ This used to special-case `is_me` into a streak-and-week line, on the
@@ -10302,17 +10412,19 @@ function boardRow(r, ahead, i) {
   // the owner could not, so it read as a dead button. The streak and the week
   // are both already on Today and Progress; the rank was nowhere on this
   // screen. Do not reintroduce a self-only sub-line here.
-  const sub = `${rankIcon(rankNameOf(r.rank_label), 13, 'stroke-width:2.4')}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.rank_label)}</span>`;
+  const sub = CAREER_LIGHT ? '' : `${rankIcon(rankNameOf(r.rank_label), 13, 'stroke-width:2.4')}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.rank_label)}</span>`;
+  const medal = r.pos <= 3 && !CAREER_LIGHT;
+  const subline = `${sub}
+        ${d ? `<span class="mono delta ${d > 0 ? 'up' : 'down'}" style="flex:none">${d > 0 ? '▲' : '▼'}${Math.abs(d)}</span>` : ''}
+        ${t ? `<span style="flex:none">${titlePlate(passItem(r.title) || { name: t }, true)}</span>` : ''}`;
   return `<div class="lbrow ${r.is_me ? 'me' : ''}" data-k="brow:${esc(String(r.display_name || r.pos))}"
     style="animation-delay:${((i || 0) * 0.05).toFixed(2)}s">
-    <span class="lbpos ${r.pos <= 3 ? 'medal' : ''}">${r.pos <= 3 ? MEDALS[r.pos - 1] : r.pos}</span>
+    <span class="lbpos ${medal ? 'medal' : ''}">${medal ? MEDALS[r.pos - 1] : r.pos}</span>
     <span class="lbmid">
       <span class="lbnm">${esc(r.is_me ? 'You' : r.display_name)}</span>
-      <span class="lbsub">
-        ${sub}
-        ${d ? `<span class="mono delta ${d > 0 ? 'up' : 'down'}" style="flex:none">${d > 0 ? '▲' : '▼'}${Math.abs(d)}</span>` : ''}
-        ${t ? `<span style="flex:none">${titlePlate(passItem(r.title) || { name: t }, true)}</span>` : ''}
-      </span>
+      ${CAREER_LIGHT && !d ? '' : `<span class="lbsub">
+        ${subline}
+      </span>`}
     </span>
     <span class="lbright">
       <span class="lbxp">${xp.toLocaleString()} XP</span>
@@ -10332,7 +10444,7 @@ function renderBoardJoin() {
       <div class="block" data-k="join" data-tour="join" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
         <div class="hd" style="font-size:20px;line-height:1">You go on after your first session</div>
         <div style="font-size:14px;line-height:1.5;color:var(--muted)">
-          Everyone training with me is on the board. Finish your first session in the programme app and you appear here as <b style="color:var(--ink)">${esc(nm)}</b>, with your points, your rank and the title you wear. No habits, no logs, no real name unless you use it. Rename or leave any time after.
+          Everyone training with me is on the board. Finish your first session in the programme app and you appear here as <b style="color:var(--ink)">${esc(nm)}</b>, with your points${CAREER_LIGHT ? '' : ', your rank and the title you wear'}. No habits, no logs, no real name unless you use it. Rename or leave any time after.
         </div>
         <div style="display:flex;gap:8px">
           <input class="input" id="boardname" maxlength="24" placeholder="${esc(nm)}" value="${esc(LB.nameDraft)}" style="flex:1">
@@ -10354,7 +10466,7 @@ function renderBoardJoin() {
       <div class="block" data-k="join" data-tour="join" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
         <div class="hd" style="font-size:20px;line-height:1">Join the board</div>
         <div style="font-size:14px;line-height:1.5;color:var(--muted)">
-          Other athletes will see the name you pick here, your points, your rank and the title you wear. No habits, no logs, no real name unless you use it. You can leave any time.
+          Other athletes will see the name you pick here${CAREER_LIGHT ? ' and your points' : ', your points, your rank and the title you wear'}. No habits, no logs, no real name unless you use it. You can leave any time.
         </div>
         <div style="display:flex;gap:8px">
           <input class="input" id="boardname" maxlength="24" placeholder="${esc(defaultDisplayName())}" value="${esc(LB.nameDraft)}" style="flex:1">
@@ -10420,8 +10532,10 @@ function renderManual() {
     const el = document.getElementById(slug(t));
     if (el) el.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
   })}>${esc(t)}</button>`;
+  // CAREER_LIGHT: no ranks, no Locker, no four kinds of win here (round 5): "Your level" replaces "Levels and ranks".
+  const light = CAREER_LIGHT;
   const CONTENTS = ['Start here', 'The daily loop', 'Forgot to log a day?', 'Roll call', 'What each habit is worth',
-                    'How to earn more', 'Levels and ranks', 'The Locker'].concat(cat ? ['Four kinds of win'] : []).concat(['Consistency', 'Quests',
+                    'How to earn more', light ? 'Your level' : 'Levels and ranks'].concat(light ? [] : ['The Locker']).concat(cat && !light ? ['Four kinds of win'] : []).concat(['Consistency', 'Quests',
                     'Seasons', 'The leaderboard', 'Body weight', 'Your data']);
 
   return `
@@ -10441,34 +10555,42 @@ function renderManual() {
             <strong style="color:var(--ink)">circle</strong> logs it. On a habit you count it opens the number with the target
             filled in: save it, or type what you really did. The <strong style="color:var(--ink)">name</strong>
             opens that habit's history. <strong style="color:var(--ink)">+</strong> adds one unit at a time, and holding it goes faster.</div>
-          <div>▸ <strong style="color:var(--ink)">Four tabs.</strong> Today is where you log, Progress is where you stand, Crew is everyone else, and Locker holds what you have earned.</div>
+          <div>▸ <strong style="color:var(--ink)">${light ? 'Three tabs.' : 'Four tabs.'}</strong> Today is where you log, Progress is where you stand, ${light ? 'and Crew is everyone else.' : 'Crew is everyone else, and Locker holds what you have earned.'}</div>
           <div>▸ <strong style="color:var(--ink)">Your initials, top right,</strong> open Settings from any screen, and close it again. Everything not on a tab is behind them, including this page.</div>
           <div>▸ <strong style="color:var(--ink)">Everything you log pays XP</strong>, and XP is the only currency here. There is nothing to buy.</div>
         </div>` +
         `<button class="btn btn-primary btn-block" ${on(() => { UI.backTo = 'settings'; startTour('settings'); })}>Show me around instead</button>` +
         `<div style="height:12px"></div>` +
-        p(cat
+        p(cat && !CAREER_LIGHT
           ? `Six steps on the real screen: the row, the week, your level, your four numbers, the board and your initials. It is also in Settings under <strong style="color:var(--ink)">The tour</strong>, any time.`
           : `Five steps on the real screen: the row, the week, your level, the board and your initials. It is also in Settings under <strong style="color:var(--ink)">The tour</strong>, any time.`))}
 
       ${block(h2('The daily loop') +
-        p(`Tick off what you did today. Every habit is worth points, and points are the whole game. They build your level, your rank in each habit, and your place on the leaderboard.`) +
+        p(light
+          ? `Tick off what you did today. Every habit is worth points, and points are the whole game. They build your level, a level in each habit, and your place on the leaderboard.`
+          : `Tick off what you did today. Every habit is worth points, and points are the whole game. They build your level, your rank in each habit, and your place on the leaderboard.`) +
         p(`The tile beside your week answers the one question that matters: <strong style="color:var(--ink)">does today count?</strong> It says how many habits are still to go, then <strong style="color:var(--ink)">On target</strong> once the day keeps your streak, then <strong style="color:var(--ink)">Perfect</strong> when the list is clear.`) +
-        (cat
+        (light
+          ? p(`The big ones stop the app to say so: a day streak of <strong style="color:var(--ink)">${STREAK_TAKEOVER} days or more</strong> and a finished quest, one at a time. A <strong style="color:var(--ink)">perfect day</strong> (the whole list cleared) and a comeback land in a card at the top of Today instead, with the XP they paid. It stays there until you tap it. A habit's own level just flashes in its row and gets out of your way.${isFree() ? '' : ' Your four numbers and your moments are in AA Performance, on Progress.'}`)
+          : cat
           ? p(`The big ones stop the app to say so: a <strong style="color:var(--ink)">new level</strong> or <strong style="color:var(--ink)">rank</strong>, a day streak of <strong style="color:var(--ink)">${STREAK_TAKEOVER} days or more</strong>, a finished quest, the biggest badges and milestones, and a season's title. One at a time: if something big already had the screen when you opened the app, the next one waits for your next visit. Any reward the level unlocked is on the same screen. A smaller badge step, a milestone, a habit's new rank, a <strong style="color:var(--ink)">perfect day</strong> (the whole list cleared), a comeback and a finished season land in a card at the top of Today instead, with the XP they paid. It stays there until you tap it. A habit's own level just flashes in its row and gets out of your way.`)
           : p(`The big ones stop the app to say so: a <strong style="color:var(--ink)">new level</strong> or <strong style="color:var(--ink)">rank</strong>, a day streak of <strong style="color:var(--ink)">${STREAK_TAKEOVER} days or more</strong>, a finished quest or event, and a season's title. Any reward the level unlocked is on the same screen. A milestone, a consistency tier, a habit's new rank, a <strong style="color:var(--ink)">perfect day</strong> (the whole list cleared), a comeback and a finished season land in a card at the top of Today instead, with the XP they paid. It stays there until you tap it. A habit's own level just flashes in its row and gets out of your way.`)) +
-        p(`Every one of them has <strong style="color:var(--ink)">Share it</strong>. It opens a card of that exact thing, like the milestone you just earned or a title on its plate, in the shape Instagram wants for a post or a story. Nothing leaves your phone until you tap it.`) +
+        p(light
+          ? `Every one of them has <strong style="color:var(--ink)">Share it</strong>. It opens a card of that exact thing, like your day streak or a perfect day, in the shape Instagram wants for a post or a story. Nothing leaves your phone until you tap it.`
+          : `Every one of them has <strong style="color:var(--ink)">Share it</strong>. It opens a card of that exact thing, like the milestone you just earned or a title on its plate, in the shape Instagram wants for a post or a story. Nothing leaves your phone until you tap it.`) +
         p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`) +
-        (isFree() ? '' : p(`<strong style="color:var(--ink)">You can tick today's list from your training app too</strong>, on its Home under Daily Habits. It is this same list, saved the same way, for the same points. A new level or a reward waits for you here, so the moment is never spent on a small strip.`)) +
+        (isFree() ? '' : p(light
+          ? `<strong style="color:var(--ink)">You can tick today's list from your training app too</strong>, on its Home under Daily Habits. It is this same list, saved the same way, for the same points.`
+          : `<strong style="color:var(--ink)">You can tick today's list from your training app too</strong>, on its Home under Daily Habits. It is this same list, saved the same way, for the same points. A new level or a reward waits for you here, so the moment is never spent on a small strip.`)) +
         p(`<strong style="color:var(--ink)">Put it on your home screen</strong> and it opens in one tap, looks like any other app and keeps working with no signal. ${isIOS() ? 'Tap Share in the browser bar, then Add to Home Screen.' : 'There is a row for it in Settings.'} There is nothing to download. It is this page, kept somewhere you can reach it.`))}
 
       ${block(h2('Forgot to log a day?') +
         p(`Tap the day on your week, in the card at the top of Today. You can go back <strong style="color:var(--ink)">${BACKFILL_DAYS} days</strong> and fill in or correct anything you missed. A ticked day was on target, a pale one was started and a grey one has nothing in it, so the one you forgot is easy to spot.`) +
         p(`While you are on an earlier day the screen turns clay and says so, and everything you tap lands on <em>that</em> day. Tap <strong style="color:var(--ink)">Back to today</strong> when you're done.`) +
-        p(`Older than ${BACKFILL_DAYS} days and the log is closed. That is on purpose: a record you can rewrite whenever you like is a diary, not proof. Filling a day in still counts for everything. Points, streaks, milestones, quests.`))}
+        p(`Older than ${BACKFILL_DAYS} days and the log is closed. That is on purpose: a record you can rewrite whenever you like is a diary, not proof. Filling a day in still counts for everything. Points, streaks, ${light ? '' : 'milestones, '}quests.`))}
 
       ${block(h2('Roll call') +
-        p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>. Write it on the <strong style="color:var(--ink)">CREW</strong> tab, under <strong style="color:var(--ink)">Roll call</strong> (Crew opens on the leaderboard). Everyone else on the board sees it, next to your name, your rank and how much of that day you finished.`) +
+        p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>. Write it on the <strong style="color:var(--ink)">CREW</strong> tab, under <strong style="color:var(--ink)">Roll call</strong> (Crew opens on the leaderboard). Everyone else on the board sees it, next to your name${light ? '' : ', your rank'} and how much of that day you finished.`) +
         p(`Change it as many times as you like until midnight. After that it stands. You can fix an old day's <em>log</em>, but not what you said about it.`) +
         p(`It is worth <strong style="color:var(--ink)">no points at all</strong>, deliberately. It is not another box to tick; it is the one place in here where you get to say something. Everyone else's lines are right underneath yours.`) +
         p(`Keep it to things you don't mind other athletes reading. This is a shared wall, not a message to your coach.${isFree() ? '' : ' Anything private goes to me on WhatsApp: the button is at the top of the programme app&rsquo;s Coach tab.'}`))}
@@ -10498,26 +10620,27 @@ function renderManual() {
           ${isFree() ? '' : `<div>▸ <strong style="color:var(--ink)">Use the Library.</strong> Open a workout in your programme app and mark it done. A strength, conditioning or on-court session ticks your session. A mobility flow or a recovery session ticks Mobility. Anything in Breath ticks Breathe. A warm-up ticks nothing, because a warm-up is part of a session rather than a session of its own. If the habit it counts towards is one you are not tracking, this screen will offer to switch it on.</div>`}
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
           <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings, under <strong style="color:var(--ink)">Your habits</strong>.</div>
-          ${cat ? `<div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Every habit has one badge with ${stepRows(live()[0] || HABITS[0]).length} steps, worth up to ${stepRows(live()[0] || HABITS[0]).reduce((s, t) => s + t.xp, 0).toLocaleString()} XP on a single habit. They only come from unbroken streaks, and each step pays once.</div>
+          ${light ? `<div>▸ <strong style="color:var(--ink)">Show up daily.</strong> An unbroken streak on a habit pays extra XP at set steps, ${(cat ? stepRows(live()[0] || HABITS[0]).length : CONSISTENCY_TIERS.length)} of them, worth up to ${(cat ? stepRows(live()[0] || HABITS[0]).reduce((s, t) => s + t.xp, 0) : (() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0); })()).toLocaleString()} XP on a single habit. Open a habit to see its steps. Each step pays once.</div>`
+          : cat ? `<div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Every habit has one badge with ${stepRows(live()[0] || HABITS[0]).length} steps, worth up to ${stepRows(live()[0] || HABITS[0]).reduce((s, t) => s + t.xp, 0).toLocaleString()} XP on a single habit. They only come from unbroken streaks, and each step pays once.</div>
           <div>▸ <strong style="color:var(--ink)">Go after the badges.</strong> There are ${catalogueTotal().toLocaleString()} badge steps and milestones on your Progress tab, in four kinds of win. Each one pays once in your career.</div>`
           : `<div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points, up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit. And they only come from unbroken streaks.</div>
           <div>▸ <strong style="color:var(--ink)">Go after the milestones.</strong> The ${ACHIEVEMENTS.length} on your Progress tab pay ${ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0).toLocaleString()} XP between them, once each.</div>`}
         </div>`)}
 
-      ${block(h2('Levels and ranks') +
+      ${block(h2(light ? 'Your level' : 'Levels and ranks') +
         (career ? p(`<strong style="color:var(--ink)">Your level is your career.</strong> It counts everything you have logged since you started${isFree() ? '' : ', your training too'}. It never resets. A new season only starts the board's points again.`) +
           (isFree() ? '' : p(`Training pays here as well. A finished session is worth ${xpn(prices.session_finished)} XP, or ${xpn(prices.session_finished_early)} if you finish it early. Log every set and it pays ${xpn(prices.full_log)} more. Answer the check-in first and it pays ${xpn(prices.checkin_done)}. Train every day of your plan in a week and the week pays ${xpn(prices.week_held)}. The WORKOUT habit stays on your list for your day streak, but it pays nothing itself. That way a session is never paid twice.`)) : '') +
         p(`Every level costs more than the one before it: ${levelCost(ob, 1, og).toLocaleString()} XP for level 2, ${levelCost(ob, 10, og).toLocaleString()} for level 11. ${career ? '' : 'One full day gets you to level 2. '}Level 20 is about two months of solid work (${cum(20).toLocaleString()} XP).`) +
-        p(`There are <strong style="color:var(--ink)">${RANKS.length} ranks with ${SUBS_PER_RANK} levels each</strong>. Level ${SUBS_PER_RANK + 1} makes you ${esc(rankFor(SUBS_PER_RANK + 1).label)}, level 20 is ${esc(rankFor(20).label)}. Every rank has its own insignia. <strong style="color:var(--ink)">tap your rank anywhere in the app</strong> to see the whole ladder and what each one costs.`) +
+        (light ? '' : p(`There are <strong style="color:var(--ink)">${RANKS.length} ranks with ${SUBS_PER_RANK} levels each</strong>. Level ${SUBS_PER_RANK + 1} makes you ${esc(rankFor(SUBS_PER_RANK + 1).label)}, level 20 is ${esc(rankFor(20).label)}. Every rank has its own insignia. <strong style="color:var(--ink)">tap your rank anywhere in the app</strong> to see the whole ladder and what each one costs.`) +
         `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
           ${RANKS.map(r => `<span style="display:flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--rule);color:var(--muted)">
             ${rankIcon(r, 14, 'stroke-width:2.4')}<span class="mono" style="font-size:12px;letter-spacing:.04em">${esc(r)}</span>
           </span>`).join('')}
         </div>` +
-        p(`Past level ${RANKS.length * SUBS_PER_RANK} you start again carrying a star (${esc(rankFor(RANKS.length * SUBS_PER_RANK + 1).label)}), and there is no ceiling after that.`) +
-        p(`<strong style="color:var(--ink)">Each habit has its own level too.</strong> They all climb at the same rate, so your level in a habit is really a measure of how often you do it. Drink water every day and train twice a week, and your water rank will leave your workout rank behind. That is the point.`))}
+        p(`Past level ${RANKS.length * SUBS_PER_RANK} you start again carrying a star (${esc(rankFor(RANKS.length * SUBS_PER_RANK + 1).label)}), and there is no ceiling after that.`)) +
+        p(`<strong style="color:var(--ink)">Each habit has its own level too.</strong> They all climb at the same rate, so your level in a habit is really a measure of how often you do it. Drink water every day and train twice a week, and your water ${light ? 'level' : 'rank'} will leave your workout ${light ? 'level' : 'rank'} behind. That is the point.`))}
 
-      ${(() => {
+      ${light ? '' : (() => {
         const nx = nextReward(), got = passOwned().length, eq = passTitle();
         return block(h2('The Locker') +
           p(`Levels pay out. There are <strong style="color:var(--ink)">${PASS_TRACK.length} rewards</strong> spread up the ladder, and reaching the level is all it takes. There is nothing to buy and nothing to claim.`) +
@@ -10532,7 +10655,7 @@ function renderManual() {
           p(`It has its own tab now, <strong style="color:var(--ink)">Locker</strong>, last on the bar. What you are wearing is up top, everything you own under it, and below that <strong style="color:var(--ink)">the road</strong>. One track with every rank and reward threaded on it, and a marker showing exactly where you stand. It opens on the rank you are in and the next three rewards; <strong style="color:var(--ink)">The whole road</strong> under them shows the rest.`));
       })()}
 
-      ${cat ? (() => {
+      ${cat && !light ? (() => {
         const four = fourNumbers();
         return block(h2('Four kinds of win') +
           p(`Every badge and milestone counts toward one of four kinds of win. <strong style="color:var(--ink)">Consistency</strong> is turning up, day after day and week after week. <strong style="color:var(--ink)">Commitment</strong> is doing the work as it was written. <strong style="color:var(--ink)">Progress</strong> is getting stronger. <strong style="color:var(--ink)">Resilience</strong> is coming back after a bad patch.`) +
@@ -10574,7 +10697,7 @@ function renderManual() {
         // the top of Today and Progress is always "DAY STREAK".
         p(`Two streaks, and it is worth knowing which is which. Every habit has <strong style="color:var(--ink)">its own streak</strong>: consecutive days you did that one thing, so 24 days of water is a 24-day streak, and it is the number on the habit's row. Your <strong style="color:var(--ink)">day streak</strong> is different: consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of <strong style="color:var(--ink)">what you could actually do that day</strong>. <strong style="color:var(--ink)">or left no more than one thing undone</strong>, whichever is kinder. It is exactly what the tile beside your week reads out: <strong style="color:var(--ink)">2 to go</strong> is how many more habits stand between you and a day that counts, and it turns to <strong style="color:var(--ink)">On target</strong> the moment the day would keep the streak. The day's own percentage, on the leaderboard and in your history, counts your whole roster, while this one leaves out a locked session you had no way to tick, which is why a rest day can read low and still keep the streak. Miss one habit and the day still counts, every time, whatever you track. The day streak is the flame at the top of Today. They move at different speeds, and a bad day breaks the second long before it breaks the first.`) +
         p(`Part of a counter counts toward it, too. Nine thousand of your ten thousand steps is not nothing, and the day streak no longer pretends it is. It reads that as nearly all of your steps rather than none of them.`) +
-        p(`<strong style="color:var(--ink)">And if you disappear, coming back pays.</strong> Miss ${LAPSE_DAYS} days or more, then have a day that counts, and that is a comeback: <strong style="color:var(--ink)">${COMEBACK_XP} XP</strong> on the spot, every time it happens, and the app will say so. Hold it for a week and there is a milestone in it; do that ${3} times and there is another. Nobody gets a clean run, and the days behind you do not have to be paid off before today counts.`) +
+        p(`<strong style="color:var(--ink)">And if you disappear, coming back pays.</strong> Miss ${LAPSE_DAYS} days or more, then have a day that counts, and that is a comeback: <strong style="color:var(--ink)">${COMEBACK_XP} XP</strong> on the spot, every time it happens, and the app will say so.${light ? '' : ` Hold it for a week and there is a milestone in it; do that ${3} times and there is another.`} Nobody gets a clean run, and the days behind you do not have to be paid off before today counts.`) +
         // The athlete-facing half of the weighted day score. Without this, a rest
         // day reading 71% while the streak survives looks like a bug on the one
         // screen they check every morning.
@@ -10591,7 +10714,9 @@ function renderManual() {
           return p(`<strong style="color:var(--ink)">Your streak does not punish you for that.</strong> It only asks about what you could actually tick, so a locked session you have not earned is left out of the sum entirely. Do everything else on a rest day and the streak sees a full day. Even while the score above it reads ${Math.round((tot - lock) / tot * 100)}%. Do the session and it counts twice over: it comes back into the day already finished.`);
         })()) +
         p(`Your day streak is on the card at the top of <strong style="color:var(--ink)">Today</strong>, above your last seven days, and again on <strong style="color:var(--ink)">Progress</strong> beside the best you have ever had. Each habit shows its own streak in its row from 3 days, and Progress shows every habit's week in one table.`) +
-        p(`Every tier and milestone is earned on your longest streak ever, the ${CONSISTENCY_TIERS.length} tiers on each habit and the streak milestones alike, so breaking a streak never takes one back.`) +
+        p(light
+          ? `Every step is earned on your longest streak ever, the ${CONSISTENCY_TIERS.length} steps on each habit, so breaking a streak never takes one back.`
+          : `Every tier and milestone is earned on your longest streak ever, the ${CONSISTENCY_TIERS.length} tiers on each habit and the streak milestones alike, so breaking a streak never takes one back.`) +
         // The athlete-facing half of "days are settled units". They will not read
         // the word roster, and they should not have to: what they need to know is
         // that changing the list is safe.
@@ -10600,7 +10725,9 @@ function renderManual() {
         // tracking works rather than just showing it.
         p(`<strong style="color:var(--ink)">Five habits are fixed.</strong> Your session, steps, sleep, protein and water are the same for everyone on the board. That is what makes a day score mean the same thing for all of you, and they have no off switch. Everything else is an add-on: optional, worth real points on top, and once one is on it counts like anything else.`) +
         p(`<strong style="color:var(--ink)">Changing what you track is safe.</strong> A day is judged on the habits you had switched on <em>that day</em>. Add an add-on today and the days behind you keep the scores they earned; switch one off and it does not go back and make old days look better than they were. Today counts from now, because today is still yours to finish.`) +
-        (cat
+        (light
+          ? p(`<strong style="color:var(--ink)">Clearing a step pays.</strong> What it pays depends on the habit: a step on your workout is worth more than the same step on your supplements, because a day of it is worth more. The figures below are for ${esc((live()[0] || HABITS[0]).name.toLowerCase())}; open any habit to see its own.`)
+          : cat
           ? p(`<strong style="color:var(--ink)">One badge per habit.</strong> Each habit has its own badge with the same ${stepRows(live()[0] || HABITS[0]).length} steps, and a step pays the day you reach it. What it pays depends on the habit: a step on your workout is worth more than the same step on your supplements, because a day of it is worth more. The figures below are for ${esc((live()[0] || HABITS[0]).name.toLowerCase())}; Progress shows every badge.`)
           : p(`<strong style="color:var(--ink)">Clearing a tier pays.</strong> What it pays depends on the habit: a tier on your workout is worth more than the same tier on your supplements, because a day of it is worth more. The figures below are for ${esc((live()[0] || HABITS[0]).name.toLowerCase())}; open any habit to see its own.`)) +
         `<div style="display:flex;flex-direction:column;gap:0">
@@ -10614,7 +10741,7 @@ function renderManual() {
         </div>` +
         `<div style="height:12px"></div>` +
         p(cat
-          ? `A step is paid once in your career, on the day you reach it. It counts toward your level for good, and the badge keeps it.`
+          ? `A step is paid once in your career, on the day you reach it. It counts toward your level for good${light ? '.' : ', and the badge keeps it.'}`
           : career
           ? `Tier points are paid on the day you cross the tier, once. They count toward your level for good, and the tiers themselves stay yours.`
           : `Tier points are paid on the day you cross the tier, so they belong to the season you earned them in. A new season starts your points again, but the tiers themselves stay yours.`))}
@@ -10622,19 +10749,19 @@ function renderManual() {
       ${block(h2('Seasons') + (career
         ? p(`The board runs in seasons, like ranked play in a game. You are in <strong style="color:var(--ink)">${esc(seasonName())}</strong>, which opened on ${esc(parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }))}.`) +
           p(`Your level counts everything you have ever logged. The board counts only the points you earn this season${isFree() ? '' : ', your training included'}.`) +
-          p(`When a new season opens, <strong style="color:var(--ink)">the board's points go back to zero</strong> and everyone starts together. Your level, your rank and your habit levels stay where they are. Nothing is deleted.`) +
-          p(`Earn <strong style="color:var(--ink)">${xpn(CAREER.p.rules && CAREER.p.rules.season && CAREER.p.rules.season.title_points || 2000)} points</strong> in a season and, when it closes, you keep a title that names it. It gets its own screen that day, and nobody can earn it after. Where you finished stays in your Locker either way.`)
+          p(`When a new season opens, <strong style="color:var(--ink)">the board's points go back to zero</strong> and everyone starts together. Your level${light ? '' : ', your rank'} and your habit levels stay where they are. Nothing is deleted.`) +
+          (light ? '' : p(`Earn <strong style="color:var(--ink)">${xpn(CAREER.p.rules && CAREER.p.rules.season && CAREER.p.rules.season.title_points || 2000)} points</strong> in a season and, when it closes, you keep a title that names it. It gets its own screen that day, and nobody can earn it after. Where you finished stays in your Locker either way.`))
         : p(`Scoring runs in seasons, like ranked play in a game. You are in <strong style="color:var(--ink)">${esc(seasonName())}</strong>, which opened on ${esc(parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }))}.`) +
           p(`Only days from the start of the season earn points. Anything you logged before it still sits in your history and still counts toward your streaks and consistency tiers. It just does not score.`) +
           p(`When a new season opens, <strong style="color:var(--ink)">every score goes back to zero</strong> and everyone starts together. Nothing is deleted, and your consistency tiers stay yours.`) +
-          p(`Reach <strong style="color:var(--ink)">level 5</strong> in a season and, when it closes, you keep a title that names it. It gets its own screen that day, and nobody can earn it after. Where you finished stays in your Locker either way.`)))}
+          (light ? '' : p(`Reach <strong style="color:var(--ink)">level 5</strong> in a season and, when it closes, you keep a title that names it. It gets its own screen that day, and nobody can earn it after. Where you finished stays in your Locker either way.`))))}
 
       ${block(h2('The leaderboard') +
         p(isFree()
           ? `You join it from Crew when you want to. Nobody sees you before that.`
           : `Once you finish your first workout in the programme app, you are put on it under your first name and last initial.`) +
-        p(`You can rename yourself whenever you like (it does not have to be your real name), or leave: tap <strong style="color:var(--ink)">You appear as</strong> under the board on Crew, or <strong style="color:var(--ink)">Board name</strong> in Settings. <strong style="color:var(--ink)">If you leave, you stay off.</strong> Other athletes see <strong style="color:var(--ink)">your name, your points, your rank and the title you wear</strong>. They never see your habits, your logs, your programme or anything else.`) +
-        p(`There are two boards. <strong style="color:var(--ink)">This season</strong> is every point since ${esc(seasonName().toLowerCase())} opened. <strong style="color:var(--ink)">Past week</strong> is a rolling seven days, so a strong week always shows and anyone can win it.${career ? ' Your points count your training sessions as well as your habits, and the level beside your name is your career level.' : ''}`) +
+        p(`You can rename yourself whenever you like (it does not have to be your real name), or leave: tap <strong style="color:var(--ink)">You appear as</strong> under the board on Crew, or <strong style="color:var(--ink)">Board name</strong> in Settings. <strong style="color:var(--ink)">If you leave, you stay off.</strong> Other athletes see <strong style="color:var(--ink)">${light ? 'your name and your points' : 'your name, your points, your rank and the title you wear'}</strong>. They never see your habits, your logs, your programme or anything else.`) +
+        p(`There are two boards. <strong style="color:var(--ink)">This season</strong> is every point since ${esc(seasonName().toLowerCase())} opened. <strong style="color:var(--ink)">Past week</strong> is a rolling seven days, so a strong week always shows and anyone can win it.${career ? (light ? ' Your points count your training sessions as well as your habits.' : ' Your points count your training sessions as well as your habits, and the level beside your name is your career level.') : ''}`) +
         p(`Your points are worked out on the server from what you have actually logged, so the board is honest, and there is nothing to gain from fiddling with your phone.`))}
 
       ${block(h2('Body weight') +
@@ -10644,7 +10771,7 @@ function renderManual() {
       ${block(h2('Your data') +
         p(`Everything is saved to your phone the moment you tap it, then synced to your coach when you have a connection. Losing signal, closing the app or flying somewhere loses nothing.`) +
         p(`<strong style="color:var(--ink)">You sign in with the username and password I sent you.</strong> Put the app on your home screen and it stays signed in. Forget the password and nothing is lost: ask me for a new one and your whole history is still there.`) +
-        p(`Your coach can see your habits, and your weight if you switched that on, as part of coaching you. Other athletes never see either: on the leaderboard they see only your name, points, rank and title.`) +
+        p(`Your coach can see your habits, and your weight if you switched that on, as part of coaching you. Other athletes never see either: on the leaderboard they see only ${light ? 'your name and points' : 'your name, points, rank and title'}.`) +
         (isFree()
           ? p(`You signed up for this without a programme, so the only other things held about you are the <strong style="color:var(--ink)">email and number you gave</strong>, used to send you your sign-in and nothing else. Ask and it is all deleted, log included. The full notice is at <strong style="color:var(--ink)">amirardekani.com/privacy.html</strong>.`)
           : ''))}
@@ -11066,6 +11193,9 @@ async function buildShareCard(kind, sizeKey, subj) {
 // what each card shows when the picker was opened from a moment. Switching cards keeps them, so the
 // medal is still that medal after a look at the Rank card. Nothing in it is stored.
 function openShare(kind, subj) {
+  // CAREER_LIGHT: the Rank and Title cards are not offered (no rank names, no titles; round 5, L5), so a door that still
+  // names one opens the day's card instead. The painters stay in the file until the cut.
+  if (CAREER_LIGHT && (!kind || kind === 'rank' || kind === 'title')) kind = 'receipt';
   UI.share = { kind: kind || 'rank', size: 'post', busy: true, subj: subj || {} };
   render();
   paintSharePreview();
@@ -11083,6 +11213,13 @@ function setShare(patch) {
   paintSharePreview();
 }
 function shareSubj(kind) { return (UI.share && UI.share.subj && UI.share.subj[kind]) || null; }
+// The cards the picker offers. CAREER_LIGHT: not Rank, not Title, and the Milestone card only for a subject that is
+// still a habit thing (a quest, a comeback): a badge, a tier or an award has no card here any more.
+function shareCards() {
+  if (!CAREER_LIGHT) return SHARE_CARDS;
+  const ok = sc => sc.id === 'receipt' || sc.id === 'streak' || sc.id === 'wrap' || (sc.id === 'medal' && !!shareSubj('medal') && ['quest', 'comeback'].indexOf(shareSubj('medal').k) >= 0);
+  return SHARE_CARDS.filter(ok);
+}
 // A card's name, emoji and note in the rail, as its subject makes it: the Milestone card holding a
 // quest says Quest.
 function shareCardView(sc, s) { return Object.assign({ name: sc.name, emoji: sc.emoji, note: sc.note }, (s && sc.as && sc.as(s)) || {}); }
@@ -11110,7 +11247,7 @@ async function doShare(saveOnly) {
   if (!UI.share) return;
   const blob = UI.share.blob || await buildShareCard(UI.share.kind, UI.share.size, shareSubj(UI.share.kind));
   if (!blob) { toast('Could not build the card on this phone.'); return; }
-  const card = SHARE_CARDS.find(s => s.id === UI.share.kind) || SHARE_CARDS[0];
+  const card = shareCards().find(s => s.id === UI.share.kind) || shareCards()[0];
   const name = 'aa-proof-' + UI.share.kind + '-' + UI.share.size + '.png';
   const LI = overallLevel();
   const text = card.caption(LI, shareSubj(card.id)) + '. Tracked on AA Proof · @amirardekanian · amirardekani.com';
@@ -11148,13 +11285,13 @@ function renderShareSheet() {
           ${S.busy ? '<span class="spinner"></span>' : ''}
         </div>
         <div class="sharerail">
-          ${SHARE_CARDS.map(sc => `<button class="scard ${S.kind === sc.id ? 'on' : ''}" data-k="sc:${sc.id}"
+          ${shareCards().map(sc => `<button class="scard ${S.kind === sc.id ? 'on' : ''}" data-k="sc:${sc.id}"
             ${on(() => setShare({ kind: sc.id }))}>
             <span class="scard-em">${esc(view(sc).emoji)}</span>
             <span class="scard-nm">${esc(view(sc).name)}</span>
           </button>`).join('')}
         </div>
-        <div class="sharenote">${esc(view(SHARE_CARDS.find(s => s.id === S.kind) || SHARE_CARDS[0]).note)}</div>
+        <div class="sharenote">${esc(view(shareCards().find(s => s.id === S.kind) || shareCards()[0]).note)}</div>
         <div class="sharesizes">
           ${sizeChip('post', 'Post 4:5')}${sizeChip('story', 'Story 9:16')}${sizeChip('square', 'Square 1:1')}
         </div>
@@ -12084,7 +12221,13 @@ function renderSettings() {
       <!-- The rank on this card is a LINK, not a label: the rank lives in the
            Locker and nowhere else, so the one place it appears outside it opens
            it rather than restating it. -->
-      <button class="profcard" ${on(() => go('pass'))} aria-label="Open the Locker">
+      ${CAREER_LIGHT ? `<div class="profcard" data-k="profcard">
+        <span class="profav">${esc(initials)}</span>
+        <span class="navmid">
+          <span class="navnm" style="font-size:16px">${esc(ATHLETE_NAME || 'Athlete')}</span>
+          <span class="navsub">Day ${dayNumber()} · ${esc(isFree() ? 'AA Proof · free' : 'Coached by Amir')}</span>
+        </span>
+      </div>` : `<button class="profcard" ${on(() => go('pass'))} aria-label="Open the Locker">
         <span class="profav">${esc(initials)}</span>
         <span class="navmid">
           <span class="navnm" style="font-size:16px">${esc(ATHLETE_NAME || 'Athlete')}</span>
@@ -12093,7 +12236,7 @@ function renderSettings() {
           <span class="navsub">Day ${dayNumber()} · ${esc(LI.label)} · ${esc(isFree() ? 'AA Proof · free' : 'Coached by Amir')}</span>
         </span>
         <span class="navgo">&#8250;</span>
-      </button>
+      </button>`}
 
       ${sectionLabel('Your habits')}
       <div class="cardgrp">
@@ -12133,7 +12276,7 @@ function renderSettings() {
         ${navRow('🧭', 'The tour', 'Five steps on the real screen', '',
                  () => { UI.backTo = 'settings'; startTour('settings'); })}
         ${navRow('📖', 'The manual',
-                 'How XP, levels, ranks, consistency and the board work', '',
+                 CAREER_LIGHT ? 'How XP, levels, consistency and the board work' : 'How XP, levels, ranks, consistency and the board work', '',
                  () => go('manual'), '', 'data-tour="manual"')}
       </div>
 
@@ -12345,7 +12488,7 @@ function renderBoardSheet() {
       <div class="sh-top">
         <div style="min-width:0">
           <div class="sh-t">Your name on the board</div>
-          <div class="sh-sub">Others see this name, your points, your rank and the title you wear. Nothing else.</div>
+          <div class="sh-sub">${CAREER_LIGHT ? 'Others see this name and your points. Nothing else.' : 'Others see this name, your points, your rank and the title you wear. Nothing else.'}</div>
         </div>
         <button class="sh-x" aria-label="Close" ${on(close)}>&#10005;</button>
       </div>
@@ -12640,7 +12783,8 @@ function showError(msg, opts) {
     // A door from the training app's strip straight to one habit: ?open=<id>.
     const openId = params.get('open');
     if (openId && rosterOn(TKEY()).some(h => h.id === openId)) openHabit(openId, 'today');
-    // And one to the Locker: ?go=pass, from the training app's Career row (Career Mode phase 2).
+    // And one to the Locker: ?go=pass, from the training app's Career row (Career Mode phase 2). CAREER_LIGHT: there is no
+    // Locker, so go('pass') opens Progress, and an old link or a training app that still sends ?go=pass lands there.
     else if (params.get('go') === 'pass') go('pass');
     // And one to Progress: ?go=progress, the training app's Career row once the catalogue switch is on (phase 3).
     else if (params.get('go') === 'progress') go('progress');

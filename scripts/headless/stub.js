@@ -47,6 +47,20 @@
       if (S.profile) return res({ data: { athlete_id: mine, catalogue: null, badges: [], achievements: [], titles: [], recent: [] }, error: null, status: 200 });
       return res({ data: null, error: null, status: 200 });
     }
+    // Career Mode round 5 (stage77): get_my_moments answers the stub's `myMoments` (the athlete's goal, Amir's lines, "saw", honours), refusing another
+    // athlete's id like the server; mark_note_read marks the line read in it and answers 1 (0 when there was nothing unread on that day).
+    if (name === 'get_my_moments') {
+      var whoM = params && params.p_athlete_id;
+      if (whoM && S.identity && whoM !== S.identity) return res({ data: null, error: { message: 'not your profile', code: 'P0001' }, status: 400 });
+      return res({ data: S.myMoments ? JSON.parse(JSON.stringify(S.myMoments)) : null, error: null, status: 200 });
+    }
+    if (name === 'mark_note_read') {
+      var hit = 0;
+      ((S.myMoments && S.myMoments.notes) || []).forEach(function (n) { if (n && n.day === (params && params.p_day) && !n.read) { n.read = true; hit++; } });
+      (S.noteRead = S.noteRead || []).push(params && params.p_day);
+      try { var cm = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); cm.myMoments = S.myMoments; cm.noteRead = S.noteRead; localStorage.setItem('__stubcfg', JSON.stringify(cm)); } catch (e) {}
+      return res({ data: hit, error: null, status: 200 });
+    }
     // Career Mode phase 3 (the athlete's door to the moment queue, spec section 7): it answers the count told; with tellRemoves it behaves like
     // the server (the rows leave `moments`, the profile is kept for the next page of this browser).
     if (name === 'mark_moments_told') {

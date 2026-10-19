@@ -799,7 +799,8 @@ Round 5, step 1 (`CAREER_MODE.md` → *Round 5*, L2, L10, L11). Amir picked dire
 with "Go with your picks" on 2026-10-19, which also answered its two calls: athletes see the goal, his line and "Amir saw this" with the light
 screens (step 3), not before; a tie shares an honour. **Nothing here pays XP, mints an award or touches the scorer** (L11), so it did not wait
 for D20. The stage number: `stage74_publish_cycle_label.sql` took 74 on 2026-10-19, so Courtside is **stage75** and every later step of plan A
-moves up one (D20 = stage76, the cut = stage77, Crew = stage78, the Monthly Open = stage79).
+moves up one (D20 = stage76, the cut = stage77, Crew = stage78, the Monthly Open = stage79), and again with step 3's read (stage77,
+`get_my_moments()`): the cut = stage78, Crew = stage79, the Monthly Open = stage80.
 
 **The file** `supabase/stage75_career_courtside.sql` (safe to re-run; a guard refuses without stages 66 to 73):
 - **Five tables, coach-only** (select for the coach, so the backup reads them; no direct write for anyone, every write is a function below):

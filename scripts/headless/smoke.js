@@ -117,8 +117,9 @@ const H = require('./lib');
   // ── habits.html (AA Proof), the full app and Home's embedded strip ──
   for (const [url, dark, file] of [['/habits.html', false, 'proof-390'], ['/habits.html', true, 'proof-390-dark'], ['/habits.html?embed=1', false, 'proof-embed']]) {
     const { ctx, p } = await H.openProof(browser, { url, dark });
-    const s = await p.evaluate(() => ({ screen: typeof UI !== 'undefined' ? UI.screen : null, text: document.getElementById('app').innerText.length }));
-    t.check(`proof ${file}: renders${url.includes('embed') ? '' : ' on Today'}`, s.text > 100 && (url.includes('embed') || s.screen === 'today'), JSON.stringify(s));
+    const s = await p.evaluate(() => ({ screen: typeof UI !== 'undefined' ? UI.screen : null, text: document.getElementById('app').innerText.length, chips: document.querySelectorAll('#app .e-pill').length }));
+    // The strip on Home is one row of chips since 2026-10-19: it is under 100 characters on a short roster, so it renders when it holds chips.
+    t.check(`proof ${file}: renders${url.includes('embed') ? '' : ' on Today'}`, url.includes('embed') ? s.chips >= 5 : (s.text > 100 && s.screen === 'today'), JSON.stringify(s));
     t.check(`proof ${file}: no sideways scroll, no page errors`, (await noSideways(p)) <= 0 && p.errs.length === 0, p.errs.join(' | '));
     await shot(p, file);
     await ctx.close();

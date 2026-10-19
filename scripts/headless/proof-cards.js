@@ -30,6 +30,24 @@ const fs = require('fs'), path = require('path');
 const H = require('./lib');
 
 const TZ = 'Europe/London';   // the browser's zone, so "today" is the same day here and in the page
+// habits.html draws no Rank card, no Title card and no Locker while CAREER_LIGHT is true (Career Mode round 5, 2026-10-19: the lightest version).
+// The routing below (section 5) walks those doors, so it runs on the page with the switch set false: that drawing code stays under test
+// until "the cut" removes it. scripts/headless/proof-light.js tests the light version (the picker's rail, the doors that fall back to the day's card).
+const LEGACY_HTML = fs.readFileSync(path.join(__dirname, '..', '..', 'habits.html'), 'utf8');
+if (LEGACY_HTML.split('const CAREER_LIGHT = true;').length !== 2) throw new Error('proof-cards.js: habits.html has no "const CAREER_LIGHT = true;" to switch off');
+const LEGACY_PAGE = LEGACY_HTML.replace('const CAREER_LIGHT = true;', 'const CAREER_LIGHT = false;');
+function legacyBrowser(browser) {
+  return { newContext: async (...a) => {
+    const ctx = await browser.newContext(...a);
+    const np = ctx.newPage.bind(ctx);
+    ctx.newPage = async () => {
+      await ctx.route(u => u.origin === new URL(H.BASE).origin && u.pathname === '/habits.html',
+        r => r.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: LEGACY_PAGE }));
+      return np();
+    };
+    return ctx;
+  } };
+}
 const SIZES = ['post', 'story', 'square'];
 const DIMS = { post: [1080, 1350], story: [1080, 1920], square: [1080, 1080] };
 const COVERED = { top: 250, bottom: 1580 };   // Story: Instagram covers the top 250 px and the bottom 340 px of 1920
@@ -392,7 +410,7 @@ const GOLD_EMOJI = /[🏆🥇🏅🎖⭐🌟✨💫⚡☀🌞💡💰🪙👑�
   t.check('no award or catalogue title card draws a gold-looking emoji', painted.filter(s => /^(medal-award-|title-cat-)/.test(s.id)).every(s => !s.texts.some(x => (x.text.match(GOLD_EMOJI) || []).length)), '');
 
   // 5. The routing, in the real UI. A fresh page, and every step is a real click.
-  const C = await open(habitLog(false)), p = C.p;
+  const C = await H.openProof(legacyBrowser(browser), { w: 390, h: 844, tz: TZ, cfg: CFG_SEED, seed: { _hab_log: habitLog(false) } }), p = C.p;
   await p.evaluate(installCapture);
   const tap = sel => p.click(sel, { timeout: 5000 });
   // A picker paints its preview in the background; wait for it, so nothing is half drawn when the next step starts.

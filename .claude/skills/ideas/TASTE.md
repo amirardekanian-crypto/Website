@@ -5,6 +5,26 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-19 · Achievements: "go with your picks".** He asked for it: *"a good big section on achievements ... everything we think is good to be
+  celebrated and will help them to move more"*. The page listed all 22 by the four kinds with real counts, 15 new ones (each with why it moves them
+  more and how many would hold it today), quiet back-pay and three looks (Four Courts recommended); he took all of it. What it teaches: he wants a
+  generous, full catalogue of one-time achievements organised by meaning (the collection he rejected was metals, tiers and titles, not achievements).
+  Page: https://claude.ai/artifact/WPHuuK2Y2z4jfEQUPVdqNt
+- **2026-10-19 · The Bell: "Bell: go with your picks".** Three looks for the crew's messages, photos and moments (A, a Clubhouse feed of cards; B, a
+  story rail; C, a week board), A recommended, plus four calls (photo size, his post pinned a day, kudos only, Tell the crew from the finish card); he
+  took them all. He had asked for it himself: *"this needs to be nice because community is a pillar in our app"*. What it teaches: community is a
+  pillar to him, as much as the training; photos and names are welcome, kept short-lived and light (no replies). Page: https://claude.ai/artifact/55fbdfUgJVxySL7EpihyWb
+- **2026-10-19 · Your Numbers (Career Mode step 3): "go with your choices about your numbers".** Three directions in AA Performance's look (A, the
+  Scorecard; B, road rows; C, a green panel), A recommended; he took A, and the Crew tab with step 5. Then, unasked: *"the cards are very important
+  part of this app, because we want to use it to advertise our brand. we need to design them carefull and with details later"*. What it teaches:
+  **share cards are brand advertising to him, not a reward detail**: never ship a hasty new card family; give them their own design pass with the
+  care of a campaign.
+- **2026-10-19 · The Crew and Open page: three corrections, one ask.** He read the rules line by line and pushed back on two of Claude's picks: the
+  Open closed in back-off weeks (*"i dont like this"*: a back-off week means nothing without a competition, and a new cycle already starts slow;
+  the Open *"can be any kind of challenge that i design"*) and anonymous kudos (*"why shouldnt someone know who sent them kudos?"*). And he asked
+  for the free-text place back, with photos that *"only exist for a little while"*. What it teaches (inferred): he wants the crew warm and
+  social (names, messages, photos), short-lived rather than locked down; and a rule Claude adds for safety needs its reason on the page.
+
 - **2026-10-19 · Courtside's design page: "Go with your picks".** Three directions for his recognition on coach.html (A, a Courtside panel in Today's
   right column; B, a band of moment cards under the strip; C, good news inside Needs you), A recommended; he took A and both calls (athletes see the goal
   and his line with step 3; a tie shares an honour). What it teaches (inferred, he wrote only the quote): the round-1 rule "Needs you first and wide" still

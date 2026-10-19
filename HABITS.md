@@ -26,6 +26,54 @@ Start here if you're picking this up in a fresh chat.
 
 ---
 
+## Career screens off (2026-10-19, Career Mode round 5 step 3)
+
+Amir cut Career Mode down to its lightest version (`career/CAREER_MODE.md` → *Round 5*, decisions L1 to L11). A coached athlete meets their
+level, their four numbers, their moments and Amir's notes in **AA Performance** (`program.html`, on Progress). **AA Proof keeps its habits,
+the week table, Today and the Crew board.** The career screens in this file are switched off for everyone, with ONE constant,
+`const CAREER_LIGHT = true;` at the top of the script in `habits.html`.
+
+**Display only.** Habit XP is earned, scored and synced exactly as before. `scoreDays()`, `paidXp()`, `bonusEvents()`, `levelInfo()` and every
+twin are untouched, and `scripts/check_twins.js` still passes. The profile and the baselines keep moving in silence (`CFG.seen`, `careerSeen`,
+`catalogueSeen`, `seenAwards`, `seenTiers`, `seenAch`, `CFG.pass.owned`), so nothing replays when the screens come back or when the cut removes them.
+
+**What left**
+- **The Locker tab.** The bar is Today, Progress, Crew. `go('pass')` opens Progress, so `?go=pass` (the training app's old Career row) and `?go=progress`
+  both land there. `fetchShelf()` is not asked on Progress any more, so `get_awards()` is not called from here.
+- **Today:** the rank name, the crest, the link to the Locker and the four numbers under the bar. The level stays as a ring with its number, the bar
+  and *N XP to level N+1*. Nothing opens from it.
+- **Progress:** the Milestones tile and the whole shelf (badges, achievements, the Earned strip, the Grand Slam row). What stays is three season facts
+  (Days logged, Day streak, Perfect days), the week table and the quests while a run is on.
+- **Settings:** the profile card is not a link and shows no rank. **Habit detail:** its level line has no rank name.
+- **Crew:** no rank name and no title on a board row or a wall line, and no gold, silver or bronze emoji. A place is a plain number. The order, the
+  points and the *moved since you last looked* marker stay. The leaderboard RPC still sends `rank_label` and `title`. The phone does not draw them.
+- **Moments:** no first-open career reveal, no catalogue reveal, no level-up or rank-up takeover, no reward, title or award takeover, no season title
+  screen, no waiting server moment. No wins line for a tier, a milestone, a habit's rank, an award or a season (`LIGHT_NO_WINS`).
+- **The share picker** offers The day, Streak and Month, plus Quest or Comeback when it is opened for one. A door that still names Rank or Title opens The
+  day. A milestone has no card.
+- **The manual and the tour.** *Levels and ranks* became *Your level*, and *The Locker* and *Four kinds of win* are gone. The tour is five steps, and *Your level*
+  says where the rest went.
+
+**What stays:** the habits, the week table, Today, the day streak and its takeover from `STREAK_TAKEOVER` days, quests, a perfect day and a comeback on the
+wins card, roll call, the board (points and order), each habit's own level ring and its consistency steps on its page (they still pay XP).
+
+**Waiting moments are never told from here.** `serverMoments()` returns false while the switch is on. Telling the server a moment was shown would mark it
+shown, and the athlete would never meet it in AA Performance. The training app owns `mark_moments_told` now.
+
+**The door card.** On Progress, where the shelf was, a coached athlete (not `isFree()`) sees ONE card (`doorCard()`): *Your level, your four numbers, your
+moments and Amir's notes are in AA Performance now, on Progress. Your habits stay right here.* and a button, *Open AA Performance*. The button opens
+`programUrl()` plus `&go=numbers`: `program.html` reads `?go=numbers` and opens its Progress at *Your numbers*. A free athlete sees no card: Progress shows their habits and day streak, and nothing empty about a career.
+
+**Where it went:** AA Performance → Progress (round 5, L7). Another build, in `program.html`.
+
+**The code stays until the cut.** The drawing code (the Locker, the shelf, the reveals, the takeovers, the Rank and Title painters) stays in the file, unreachable,
+until step 4, "the cut", removes it together with the server data (L6). To see the old screens again, set `CAREER_LIGHT` to `false`.
+`scripts/headless/proof-light.js` tests the light version. `scripts/headless/proof-cards.js` runs its Rank, Title and Locker routing on the page with the
+switch set to false, so that code stays under test. `scripts/headless/career.js` still drives the old Locker and shelf, so its AA Proof checks describe screens
+that are off until it is updated.
+
+---
+
 ## The product in one breath
 
 **AA Proof** is a gamified daily habit tracker for Amir's coaching clients. The training
@@ -33,8 +81,9 @@ programme (`program.html`) covers what happens in the gym; Proof covers the othe
 twenty-three hours — sleep, steps, water, food, mobility, breathing, supplements.
 
 The hook is progression borrowed from competitive games: every habit earns points,
-points build levels, levels carry rank names, and one shared leaderboard lets clients
-race each other (see *The leaderboard* for who is on it and how they got there). The
+points build levels, and one shared leaderboard lets clients race each other (see
+*The leaderboard* for who is on it and how they got there). Rank names, titles and the
+Locker are switched off since 2026-10-19 (*Career screens off*). The
 tone is dry and a bit rude — a coach who notices, not a wellness app that congratulates
 you for existing.
 
@@ -59,8 +108,8 @@ The two apps are **linked both ways**:
 | From | To | Where |
 |---|---|---|
 | `program.html` | Proof | **Daily Habits card** on Home *and* at the end of Game Plan (a plain shortcut — it shows no level or XP, because that is Proof's job). On Home it sits **below** This Week and the day cards since 2026-09-26: training leads, habits follow. Under it on Home, **today's habits, ticked in place** (Proof embedded, `?embed=1`; see *Embedded on the training app's Home*) |
-| `program.html` | Proof's Locker | **Once Career Mode's XP switch is on:** the **Career** row on Home, above Hold Serve, shows the athlete's level and what the next one needs, and a tap opens `habits.html?client=<id>&go=pass`, the Locker (*Career Mode (phase 2, the XP switch)*). The Daily Habits row still shows no level of its own: where it would have said one, it says *Ready for today* |
-| Proof | `program.html` | The session row at the end of Today's list (its → opens the programme), and a row in Settings (behind the initials button). The **Your training programme** card at the bottom of Today went on 2026-10-12; a free athlete keeps **Want the training too?** there |
+| `program.html` | Proof's Locker | **Once Career Mode's XP switch is on:** the **Career** row on Home, above Hold Serve, shows the athlete's level and what the next one needs, and a tap opens `habits.html?client=<id>&go=pass`, the Locker (*Career Mode (phase 2, the XP switch)*). **Since 2026-10-19 there is no Locker:** `go=pass` opens Progress (*Career screens off*). The Daily Habits row still shows no level of its own: where it would have said one, it says *Ready for today* |
+| Proof | `program.html` | The session row at the end of Today's list (its → opens the programme), a row in Settings (behind the initials button) and, since 2026-10-19, the **door card** on Progress for a coached athlete (*Open AA Performance*). The **Your training programme** card at the bottom of Today went on 2026-10-12; a free athlete keeps **Want the training too?** there |
 
 Both are the same origin with the same PWA scope, so tapping through from an installed
 app stays inside the app shell — no browser bounce, no second install. The handover
@@ -219,6 +268,8 @@ raise `coach only` from the plain SQL editor.
 ---
 
 ## The four tabs
+
+> **Three tabs since 2026-10-19: Today, Progress, Crew.** See *Career screens off*.
 
 `TODAY · PROGRESS · CREW · LOCKER` — `TAB_ORDER` is `['today', 'progress', 'crew',
 'pass']`, `pass` being the Locker's screen id. Amir's own redesign (2026-07-29) promoted
@@ -841,6 +892,8 @@ count; that rule (previously local to `currentDayStreak`) lives inside `dayStrea
 the hero tile and the wall chip can never disagree about the same integer.
 
 ### 02 · PROGRESS — where do I stand
+
+> **Since 2026-10-19 Progress has three season facts and no Milestones tile, the week table, and for a coached athlete ONE door card to AA Performance where the milestone shelf was.** See *Career screens off*.
 Habits and achievements merged, because they were two views of one question.
 
 > **Since 2026-10-12 (the UX audit):** quests come **first** while a run is on (the one thing here that
@@ -963,6 +1016,8 @@ always on the right and the streak on the status line, from 1 day.)
 
 ### 03 · CREW — everyone else
 
+> **Since 2026-10-19 a board row and a wall line carry no rank name, no title and no gold, silver or bronze emoji. Points and order stay.** See *Career screens off*.
+
 > **Since 2026-10-12 (the UX audit):** the header says **Crew** once (eyebrow *Season 1 · day 31*;
 > "Leaderboard" was written three times), one switch **Board | Roll call**, and *This season / Past
 > week* sits in the list's heading (*Top 10*). The board is **one grouped list** with hairlines, your
@@ -1044,6 +1099,8 @@ Nobody else's streak or days-on-target is ever invented. Teaching either RPC to 
 per-athlete streak is the whole change needed for everyone's cards to carry one.
 
 ### 04 · LOCKER — the long game
+
+> **Not drawn since 2026-10-19.** See *Career screens off*.
 
 > **Since 2026-10-12 (the UX audit), the order stays and the repeats go:** no *4/14* in the header
 > (eyebrow *Kept for good*), *4 of 14 rewards kept* once, in the hero; *What you have* has no count; the
@@ -1409,6 +1466,8 @@ recap — and doesn't ask athletes to configure it.
 > *The tour* is the first row in the second card.
 
 ### The rank ladder lives on the Locker's road now
+
+> **Not drawn since 2026-10-19.** See *Career screens off*.
 It used to be its own screen, reached by tapping your rank; that screen is **gone**
 (Amir's redesign, 2026-07-30: *"two screens were describing the same climb"*). Tapping
 your rank — or the level ring beside it — on **Today's hero**, the only place either
@@ -1536,6 +1595,8 @@ moment the tour has run.
 ---
 
 ## The long game — rewards a season cannot take
+
+> **Not drawn or celebrated since 2026-10-19.** See *Career screens off*.
 
 A reward track up the level ladder: **14 rewards**, reached by levelling and nothing
 else. There is nothing to buy, nothing to claim, and no second currency. It exists
@@ -1723,6 +1784,8 @@ the level being shared was never shown. The rest of the queue now waits in `UI.c
 
 ### Every reward, its moment and its card (2026-10-17)
 
+> **No moment and no card since 2026-10-19.** See *Career screens off*.
+
 | Reward | Its moment | Share it opens |
 |---|---|---|
 | A new overall level | the whole screen, grape | **Rank**, eyebrow *LEVEL UP* |
@@ -1778,6 +1841,8 @@ actually needs — cells go a little short of square only when a 5th (or 6th) ro
 otherwise overflow. Story, with 570px more room, never needs to shrink at all.
 
 ### Titles on the board (stage 17)
+
+> **Titles are not shown on the board or the wall since 2026-10-19.** See *Career screens off*.
 
 A title now appears **beside the athlete's name on the leaderboard and on the roll-call
 wall** — the audience that makes a cosmetic worth having. Cards deliberately do not: a
@@ -2045,11 +2110,20 @@ Amir: Proof should be *"part of the training app"*, and of the ways to build it 
 strip itself**. Home loads `habits.html?client=<id>&embed=1` in a frame under the Daily
 Habits card (`mountProofStrip()` there), only once the card is near the screen, and shows
 it only when this app says it is ready. The card stays either way.
-- **`renderEmbed()`** draws today's roster (`rosterOn(TKEY())`) as compact rows in the
+- **`renderEmbed()`** draws today's roster (`rosterOn(TKEY())`) as **one row of chips** (since 2026-10-19, Career Mode round 5) in the
   training app's clothes: paper, green, clay, Barlow (the `html.embed` styles, scoped so the
-  full app never meets them). The box is `toggleHabit()`, **+** is `bump()`, the name opens
-  the full app on that habit (`?open=<id>`, handled at the end of boot). A locked habit says
-  where it comes from (`h.source`). Only today: earlier days are filled in here.
+  full app never meets them). There is no card: the head and the chips sit on that app's paper. The head is
+  *Today's habits* (Space Mono), the verdict Proof already computes (*2 to go* in clay, *On target* or *Perfect* in green) and
+  *Open AA Proof ›*. A chip (`embedChip()`) is a 36 px pill with a ring, the habit's short name (`embedLabel()`: the name the week
+  table uses, and a custom habit's own name in sentence case cut at a word at 12 characters) and, on a counted habit, its count small
+  (*Protein 2/3*, *Steps 6.2k/10k*). A done chip is solid green with a white ring and a green tick.
+  **A tap does what the habit's + or circle did:** `bump()` on a small counted habit (Water, Protein: one step of it), `toggleHabit()` on a checked one, and,
+  on a counted habit whose full day takes more than ten taps of its + (`embedBigCount()`: Steps 20, Sleep 15), **the number row** (`openEmbedEdit()`,
+  `embedEdit()`), prefilled with the target (or what is logged, when that is over it), as the old circle did. The row opens under the chips with the same
+  field, buttons and Save as the full app's sheet, the open chip says so (`aria-expanded`, a green outline), a second tap on the chip or the cancel button
+  closes it, and the frame's height message follows it both ways. The locked session is a chip that is not a button, on when the programme says the session
+  is done. The name no longer opens the full app on that habit (`?open=<id>` is still handled at the end of boot, and the head's link opens the full app).
+  Only today: earlier days are filled in here.
 - **Every write is this app's own**: `setVal()`, the log, the sync. Nothing is scored, stored
   or synced twice, and `program.html` still writes no `<id>_hab_*` key (body weight, which
   it owns, aside). It redraws its card from the snapshot `publishCardSnapshot()` republishes.
@@ -2057,7 +2131,7 @@ it only when this app says it is ready. The card stays either way.
   does not move and every level-up, reward, quest and season title is still waiting for its
   takeover, and a medal or a perfect day for the wins card, the next time Proof opens. So are the tour, the install offer, the XP flights,
   the board sweep (`autoJoinBoard()`), the silent reward baseline, title minting, and
-  Progress, Crew and the Locker. The toast shows inline under the rows.
+  Progress and Crew. The toast shows inline under the chips.
   **Career Mode** (once the XP switch is on): the strip never asks the server for the profile (`fetchCareer()` stands down when
   `IS_EMBED`). It reads the copy in `<id>_hab_career`, which only the full app writes. The career reveal waits for the full app,
   like every takeover.
@@ -2518,6 +2592,8 @@ would have landed as an instant head start. Full detail in
 
 ## Career Mode (phase 2, the XP switch)
 
+> **The reveal, the level-up takeovers and the Locker are switched off since 2026-10-19. The scoring below is unchanged.** See *Career screens off*.
+
 > **Where it stands (2026-10-18).** Done. **The server half (`supabase/stage69_career_xp_switch.sql`) was applied to the live project on 2026-10-17, and the XP switch was turned on 2026-10-18**, shortly after Season 1 opened, on Amir's yes to the dry run's list (`rulebook.toml` version 3; `career_compare()` ok, 34 of 34). Both
 > apps read the career profile now. The catalogue switch (phase 3) is next and not started. Every "once the XP switch is on"
 > in this file points here.
@@ -2633,6 +2709,8 @@ the strip never asking, and nothing changing before the switch.
 ---
 
 ## Career Mode, phase 3 (the catalogue switch)
+
+> **The shelf, the four numbers on Today, the reveals and the award moments are switched off since 2026-10-19. The scoring below is unchanged.** See *Career screens off*.
 
 > **Where it stands (2026-10-18).** Built in `habits.html`, dormant. Every branch below sits behind **`catalogueOn()`**: the
 > server's catalogue switch is on (`get_profile().switch.catalogue` is a day) AND the profile carries the awards (`owned`).

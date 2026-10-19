@@ -3819,8 +3819,8 @@
   :where(#day-view) .cf-earn-k { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
   :where(#day-view) .cf-earn b { font: 700 var(--fs-title)/1.1 'Barlow Condensed', sans-serif; letter-spacing: .4px; color: var(--ink); }
   :where(#day-view) .cf-earn small { font: 500 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
-  /* What the session moves (Career Mode phase 3, careerMoves()): at most three grey lines under the XP, a tier it crosses in ink, then "+N more in
-     AA Proof". The same box and the same grey as the XP lines, no card, no clay (DS-01: it asks for nothing). */
+  /* What the session moves (Career Mode phase 3, careerMoves(); round 5: the four marks only): at most three grey lines under the XP, a mark it
+     reaches in ink. The same box and the same grey as the XP lines, no card, no clay (DS-01: it asks for nothing). */
   :where(#day-view) .cf-moves { display: grid; gap: 4px; margin-top: 10px; }
   :where(#day-view) .cf-moves small { font: 500 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
   :where(#day-view) .cf-moves small.is-crossed { font-weight: 700; color: var(--ink); }
@@ -4462,6 +4462,8 @@
   #home-overview .wn { margin: 24px var(--g) 22px; }
   #home-overview #home-sugg-wrap:not(:empty) { margin: 14px var(--g) 0; }
   #home-overview .proof-strip:not(.off) { margin: -2px var(--g) 14px; }
+  #home-overview #home-habits-wrap:empty { margin-top: 0; }   /* round 5: the strip is the habits now (paintHabitsCard()) */
+  #home-overview #home-habits-wrap:empty + .proof-strip:not(.off) { margin-top: 22px; }
   #home-overview .bt-sum { margin: -6px var(--g) 12px; }
   #home-overview .bt-wa { margin: 0 var(--g) 26px; }
   #home-overview .bt-rep { width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 10px; }
@@ -4480,6 +4482,59 @@
   /* Career Mode phase 3 (careerRowHTML()): the four numbers and the nearest goal, each its own line under the level (two rows at most at 320 px) */
   #home-overview .career-row .hrow-v small.career-four, #home-overview .career-row .hrow-v small.career-next { flex: 0 0 100%; margin-top: 2px; }
   #home-overview .career-row .hrow-v small.career-next { font-weight: 600; }
+  /* Career Mode round 5 (the Scorecard, Amir 2026-10-19): New from Amir leads the rows under the week while his line is unread. His photo
+     with a clay dot, the label in clay: the one clay thing on Home until it is read (DS-01). */
+  #home-overview #home-note-wrap:not(:empty) { margin-top: 20px; }
+  #home-overview #home-note-wrap:not(:empty) + #home-career-wrap:not(:empty) { margin-top: 0; }
+  #home-overview .from-amir .hrow-l { color: var(--clay-ink); }   /* not .note-row: that class is the exercise card's Note */
+  #home-overview .note-av { position: relative; flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--fill);
+    color: #fff; font: 700 var(--fs-label)/1 'Barlow', sans-serif; }
+  #home-overview .note-av i { font-style: normal; }
+  #home-overview .note-av img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  #home-overview .note-av::after { content: ''; position: absolute; right: -2px; top: -2px; width: 10px; height: 10px; border-radius: 50%; background: var(--clay); border: 2px solid var(--row); }
+  #home-overview .note-q { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font: italic 400 var(--fs-body)/1.35 'Barlow', sans-serif;
+    color: var(--ink); quotes: "\201C" "\201D"; }
+  /* Progress → Your numbers (careerCardHTML()): one white card, the level and its bar on top, the four numbers 2 × 2 with the next mark and a
+     small bar each; the month's goal as a door-row-like line under it; then Your moments as paper rows (momentsHTML()). Green and grey only:
+     nothing here asks for anything. */
+  #screen-plan .cs-card { position: relative; margin: 0 var(--g) 10px; padding: 14px 16px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  #screen-plan .cs-l { display: block; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  #screen-plan .cs-lvl { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; margin-top: 4px; }
+  #screen-plan .cs-lvl b { font: 900 var(--fs-display)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  #screen-plan .cs-lvl span { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  #screen-plan .cs-bar { display: block; height: 4px; margin-top: 10px; border-radius: 4px; background: var(--hair); overflow: hidden; }
+  #screen-plan .cs-bar i { display: block; height: 100%; border-radius: 4px; background: var(--fill); }
+  #screen-plan .cs-bar.sm { height: 3px; margin-top: 8px; }
+  #screen-plan .cs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  #screen-plan .cs-n { min-width: 0; padding: 10px 12px; border-radius: 8px; background: var(--paper); }
+  #screen-plan .cs-n b { display: block; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  #screen-plan .cs-nm { display: block; margin-top: 2px; font: 600 var(--fs-small)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  #screen-plan .cs-mk { display: block; margin-top: 6px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--grey); }
+  #screen-plan .cs-goal { display: flex; align-items: center; gap: 12px; margin: 0 var(--g) 10px; padding: 12px 14px 12px 16px; border: 1px solid var(--hair);
+    border-radius: 12px; background: var(--row); }
+  #screen-plan .cs-ring { position: relative; flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ring); }
+  #screen-plan .cs-goal.is-done .cs-ring { border-color: var(--fill); background: var(--fill); }
+  #screen-plan .cs-goal.is-done .cs-ring::after { content: ''; position: absolute; left: 6px; top: 2px; width: 5px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  #screen-plan .cs-gb { min-width: 0; display: grid; gap: 3px; }
+  #screen-plan .cs-gl { font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); }
+  #screen-plan .prog-sec-n { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; color: var(--grey); }
+  #screen-plan .mo-list { margin: 0 var(--g); }
+  #screen-plan .mo { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--hair); }
+  #screen-plan .mo:first-child { border-top: 0; padding-top: 2px; }
+  #screen-plan .mo-list:not(.all) .mo:nth-child(n+7) { display: none; }
+  #screen-plan .mo.is-new { animation: moNew 2.4s ease-out; }
+  @keyframes moNew { 0%, 40% { background: var(--tint); } 100% { background: transparent; } }
+  #screen-plan .mo-d { font: 700 var(--fs-label)/1.1 'Space Mono', monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--grey); }
+  #screen-plan .mo-d b { display: block; font: 900 var(--fs-title)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: 0; color: var(--ink); }
+  #screen-plan .mo-b { min-width: 0; display: grid; gap: 3px; justify-items: start; }
+  #screen-plan .mo-w { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  #screen-plan .mo-s { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  #screen-plan .mo-from { font: italic 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--clay-ink); quotes: "\201C" "\201D"; }   /* his words: the Coach's note's clay */
+  #screen-plan .mo-reply { padding: 4px 0; font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-decoration: underline; text-underline-offset: 3px; }
+  #screen-plan .mo-saw { margin-top: 3px; padding: 4px 8px; border-radius: 999px; background: var(--tint); font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px;
+    text-transform: uppercase; color: var(--green-ink); }
+  #screen-plan .mo-more { display: block; margin: 2px var(--g) 0; padding: 12px 0; border: 0; background: none; font: 600 var(--fs-body)/1 'Barlow', sans-serif; color: var(--green-ink); cursor: pointer; }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
   /* 4. Next up (.dc-hero): the suggested day as ONE card, the training day's cover on Home. The photo graded into the green
      (luminosity at .7, masked from the left), a scrim to the cover's last colour, "● NEXT UP · DAY 1" in Space Mono with a mint
@@ -4580,6 +4635,7 @@
   #screen-plan .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 12px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
     letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
   #screen-plan .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }   /* to the right edge, as the training day's block titles */
+  #screen-plan .prog-sec[hidden] { display: none; }   /* Records and body hides without the career (paintCareerCard()) */
 
   /* ══ PROGRESS'S ROAD AND THE ARCHIVE IN THE CENTRE COURT LOOK (2026-10-13) ══════════════════════════════════════════════
      Amir, 2026-10-13: "then do Progress's road cards in the Centre Court look". Progress keeps ONE green thing, the This cycle
@@ -4807,6 +4863,8 @@
   .hl-m-title { margin: 10px 0 0; max-width: 340px;
     font: 900 clamp(32px, 10vw, 44px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the moment, 32 to 44 px */
     letter-spacing: .3px; text-transform: uppercase; color: var(--on-accent); text-wrap: balance; }
+  .hl-m-num { margin: 10px 0 0; font: 900 120px/.85 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }   /* a mark's number (round 5): the moment's one big thing */
+  .hl-m-next { margin: 12px 0 0; font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.78); }
   .hl-m-sub { margin: 10px 0 0; font: 400 var(--fs-label)/1.4 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.82); }
   .hl-m-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 8px); right: 8px; z-index: 3; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0;
     border-radius: 50%; cursor: pointer; color: var(--on-accent); background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
@@ -5130,9 +5188,14 @@
        then where the cycle is, sessions done, the wins. It lived on Home until 2026-10-12. -->
   <div id="cycle-card-wrap"></div>
 
-  <!-- Your numbers (Amir, 2026-10-12: Personal records and Body weight moved here from Home): two door rows,
-       painted by paintNumbers(). -->
+  <!-- Your numbers (Amir, 2026-10-12: Personal records and Body weight moved here from Home). Career Mode round 5 (Amir, 2026-10-19:
+       "go with your choices about your numbers", the Scorecard): the career's card (the level and its bar, the four numbers with the next
+       mark), the month's goal, then Your moments, then Records and body with the two door rows. Without the career (offline with no copy,
+       the demo, the coach's preview) only the two rows, under Your numbers. paintNumbers(). -->
   <h2 class="prog-sec" id="numbers-title">Your numbers</h2>
+  <div id="career-card-wrap"></div>
+  <div id="career-moments-wrap"></div>
+  <h2 class="prog-sec" id="records-title" hidden>Records and body</h2>
   <div id="ceiling-row-wrap"></div>
   <div id="weight-row-wrap"></div>
 
@@ -5323,11 +5386,16 @@
     <!-- The week is done: one short extra from the Library, until it has been opened (LIB-01, paintWeekSugg()) -->
     <div id="home-sugg-wrap"></div>
 
-    <!-- Career (Career Mode phase 2, 2026-10-17): the athlete's level, never reset, with the level bar; one door row (paintCareer()),
-         a tap opens AA Proof's Locker. Empty until the server's XP switch is on, and in the demo and the coach's preview. -->
+    <!-- New from Amir (Career Mode round 5, step 3): his newest line not read yet (Courtside's "From Amir", get_my_moments()), in clay
+         until it is read; a tap marks it read and opens it under Your moments on Progress (paintNote()). Empty otherwise. -->
+    <div id="home-note-wrap"></div>
+    <!-- Career (Career Mode round 5, the lightest version): the level with no rank name, this week's Hold Serve line and the nearest
+         mark, the level bar; one door row (paintCareer()) to Your numbers on Progress. Empty until the server's XP switch is on, and
+         in the demo and the coach's preview. -->
     <div id="home-career-wrap"></div>
-    <!-- Hold Serve (Career Mode, 2026-10-17): the training weeks held in a row, one door row (paintHold()). Empty when there is
-         nothing true to say: offline, the demo, the coach's preview, no rulebook on the server, or a week not judged yet. -->
+    <!-- Hold Serve (Career Mode, 2026-10-17): the training weeks held in a row, one door row (paintHold()), only while the Career row
+         is not drawn (it carries the same line). Empty when there is nothing true to say: offline, the demo, the coach's preview, no
+         rulebook on the server, or a week not judged yet. -->
     <div id="home-hold-wrap"></div>
     <!-- Daily habits — one row, AA Proof's verdict for today and the streak (HOME-02). Training comes first (2026-09-26:
          Amir left the order to the audit's call). It sat ABOVE the week from
@@ -5778,6 +5846,8 @@ function _snapshot() {
     if (k === prefix + 'holdcache') continue;
     // The career's profile (Career Mode phase 2): a cache of get_profile(); and what a finished day earned, this phone's view of it.
     if (k === prefix + 'careercache' || (k && k.indexOf(prefix + 'earn_d') === 0)) continue;
+    // Your moments (Career Mode round 5): a cache of get_my_moments() and get_awards(), never progress.
+    if (k === prefix + 'momentscache') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -6810,6 +6880,7 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   // The same read says whether the XP switch is on, and then the career's profile follows (careerSwitchSeen()).
   loadHoldCache();
   loadCareerCache();
+  loadMomentsCache();
   refreshHold();
   // The Spine: cues and the ⓘ from the phone's copy now, then from the server.
   paintSpine();
@@ -6865,6 +6936,8 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
     // ?pane=sessions|playbook (2026-10-13): the site's Sessions and Playbook doors open that Library pane, not the demo's Home.
     const pParam = params.get('pane');
     if (!wParam && !aParam && (pParam === 'sessions' || pParam === 'playbook')) { goLibrary(); setLibPane(pParam); }
+    // ?go=numbers (Career Mode round 5): AA Proof's door card opens Your numbers on Progress, where the career lives now.
+    if (!wParam && !aParam && params.get('go') === 'numbers') goCareer();
   }, 0);
 })();
 
@@ -8522,8 +8595,7 @@ function renderHome() {
 
   // The row under the week: Daily habits (AA Proof's strip under it), refreshed on every goTo('home') — renderHome() runs
   // once at boot. Personal records and Body weight are on Progress now (paintNumbers(), Amir 2026-10-12).
-  const habWrap = document.getElementById('home-habits-wrap');
-  if (habWrap) habWrap.innerHTML = habitCardHtml();
+  paintHabitsCard();
 
   const tabsHtml = days.map((day, i) => {
     const total = countTotalUnits(day);
@@ -9723,7 +9795,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then <strong>Career</strong> (your level and, once Career Mode's rewards are on, your four numbers and, when you're close to a badge, a line showing it), then <strong>Hold Serve</strong> (the weeks you've held in a row), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then <strong>Career</strong> (your level, <strong>Hold Serve</strong>: the weeks you've held in a row, and the next mark you're close to), then today's habits, ticked right there.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then <strong>Your numbers</strong> (your level, your four numbers and this month's goal), then <strong>Your moments</strong>, then your records and body weight, then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -9744,13 +9816,13 @@ const APP_GUIDE = [
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also lists the badges the session moves, like <strong>Paper Trail 9 of 10</strong>. It shows three lines at most. A tier you cross shows its metal. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a badge, moment or title you earned shows on the green card. While it says <strong>Counting</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Counting</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
   { icon: 'activity', key: 'career', title: 'Career: your level',
-    body: `<p>Once Career Mode is on, Home has a <strong>Career</strong> row above Hold Serve. It shows your level and how far you are from the next one. Your level counts everything you do with me: every session you finish, your daily habits in AA Proof, and the weeks you hold. It never goes back to zero. A new season only restarts the board's points in AA Proof.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>counting</strong> until my side has it.</p><p>Tap the <strong>Career</strong> row to open your Locker in AA Proof: your rank, your titles and what is next on the road.</p><p>The row also shows four numbers: the weeks you've held, your sessions with me, your personal bests and your comebacks. When you're close to a badge, a line under them shows it, like <strong>Paper Trail 9 of 10</strong>. Tapping the row then opens <strong>Progress</strong> in AA Proof. That's where your badges and titles live, and the Grand Slam, a title in all four.</p>` },
+    body: `<p>Home has a <strong>Career</strong> row. It shows your level, the weeks you've held in a row and the next mark you're close to. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>counting</strong> until my side has it.</p><p>Tap the <strong>Career</strong> row to open <strong>Your numbers</strong> on Progress. Your four numbers are there: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks. Each one shows its next mark. Reach a mark and it opens full screen.</p><p>When I set you a goal for the month, it sits under your numbers. Under them, <strong>Your moments</strong> keeps your marks, your achievements, the notes I write you and the month's honours. <strong>Amir saw this</strong> under one means I've seen it. A new note from me shows on Home until you open it. To answer it, tap <strong>Reply on WhatsApp</strong>.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks held in a row',
-    body: `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions don't.</p><p>Hold weeks in a row and the number on Home goes up. The dots are those weeks, and the dashed one is this week. The line under the number says what's left this week. Miss a week and the count starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
+    body: `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count on Home's <strong>Career</strong> row goes up. The same line says what's left this week. Miss a week and the count starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
-    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p>A badge, a moment or a title you earn becomes a card too. Tap <strong>Share</strong> on its band on the finished session, or on the full-screen moment when it's a big one.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
+    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p>A mark or an achievement you earn becomes a card too. Tap <strong>Share</strong> on its band on the finished session, or on the full-screen moment when it's a big one.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Once a week</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
@@ -9888,8 +9960,7 @@ function goTo(screen, historyId, keepContent) {
   // Proof and navigated back from would show stale numbers until a reload. Leaving to Proof and coming
   // back is the habit row's single most common journey.
   if (screen === 'home') {
-    const hh = document.getElementById('home-habits-wrap');
-    if (hh) hh.innerHTML = habitCardHtml();
+    paintHabitsCard();
     paintWeekSugg();   // gone once its session has been opened (LIB-01)
   }
 
@@ -9898,6 +9969,7 @@ function goTo(screen, historyId, keepContent) {
   // row counts up to a new best here (paintNumbers() runs ceilingCountUp() while Progress is the screen on show).
   if (screen === 'plan') {
     paintNumbers();
+    refreshMomentsIfOld();   // Your moments, the goal and Amir's lines (Career Mode round 5)
     paintCycleCard();
     paintRoad();   // a cycle that ended while the app sat open reads Done; every row keeps its fold
   }
@@ -10158,15 +10230,15 @@ window.addEventListener('message', e => {
   if (e.origin !== location.origin || !e.data || e.data.type !== 'aa-proof-embed') return;
   const ps = _proofStrip;
   if (!ps || !ps.frame || e.source !== ps.frame.contentWindow) return;
-  if (e.data.state !== 'ready' || !(e.data.h > 0)) { ps.host.classList.add('off'); return; }
+  if (e.data.state !== 'ready' || !(e.data.h > 0)) { ps.host.classList.add('off'); ps.on = false; paintHabitsCard(); return; }
   ps.frame.style.height = e.data.h + 'px';
   ps.host.classList.remove('off');
+  if (!ps.on) { ps.on = true; paintHabitsCard(); }
   const sig = proofCardSig();
   if (sig !== _proofCardSig) {
     const first = !_proofCardSig;
     _proofCardSig = sig;
-    const hw = document.getElementById('home-habits-wrap');
-    if (hw) hw.innerHTML = habitCardHtml();
+    paintHabitsCard();
     // A habit ticked in the strip pays XP to the career (Career Mode): once Proof has sent it (about 1.2 s), ask for the level again.
     if (!first && careerOnT()) refreshCareerSoon(3000);
   }
@@ -10179,6 +10251,16 @@ function proofStripTheme() {
 }
 
 
+// Home's habits (Career Mode round 5, the Scorecard): once AA Proof's strip is on screen it IS the habits (its own head, "Today's habits",
+// and the chips), so the Daily habits row goes; until then, and when the strip never comes (Proof not set up, offline), the row alone.
+function paintHabitsCard() {
+  const hw = document.getElementById('home-habits-wrap');
+  if (!hw) return;
+  let on = false;
+  try { on = !!(_proofStrip && _proofStrip.on); } catch (e) { on = false; }   // renderHome() can reach here from boot, before `let _proofStrip` has run
+  const h = on ? '' : habitCardHtml();
+  if (hw.innerHTML !== h) hw.innerHTML = h;
+}
 // The one row, on Home. Deliberately a plain
 // shortcut: this app knows nothing about levels, XP or what is ticked. Proof
 // owns all of that, and duplicating the scoring here would be a third copy of
@@ -10237,7 +10319,7 @@ function hrowIc(kind) {
     weight: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 10.5a4.5 4.5 0 0 1 8 0"/><path d="M12 10.5l1.7-2"/>',
     why: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.4a2.6 2.6 0 1 1 3.9 2.2c-.9.5-1.4 1.1-1.4 2"/><path d="M12 16.9h.01"/>',
     ball: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3.2 3.2 3.2 9.6 0 12.8"/><path d="M18.4 5.6c-3.2 3.2-3.2 9.6 0 12.8"/>',
-    career: '<path d="M6 14l6-5 6 5"/><path d="M6 19l6-5 6 5"/><path d="M12 3.5v3"/>',   // a rank's chevrons: the career level
+    career: '<path d="M4 20h5v-5h5v-5h6V5"/>',   // steps up: the career level (no rank's chevrons since round 5, L2)
   }[kind] || '';
   return `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${draw}</svg></span>`;
 }
@@ -10346,13 +10428,8 @@ function holdRowHTML(st) {
       <span class="hrow-v${st.held ? ' is-ok' : ''}"><span class="hrow-vv">${big}</span><small>${small}</small></span></span>
     ${dots}<span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
-function paintHold() {
-  const el = document.getElementById('home-hold-wrap');
-  if (!el) return;
-  let h = '';
-  try { h = holdRowHTML(holdState()); } catch (e) { h = ''; }   // never let the row stop Home
-  if (el.innerHTML !== h) el.innerHTML = h;
-}
+// Hold Serve's row and the Career row are drawn together (paintHomeCareer()): the Career row carries this week's Hold Serve line.
+function paintHold() { paintHomeCareer(); }
 // The last answer this phone had, painted at once on open, unless the app already knows it has no signal.
 function loadHoldCache() {
   if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
@@ -10484,7 +10561,7 @@ function careerEarn(day, D, done) {
     try {
       const fullLog = careerFullLog(D.log, early), checkin = careerCheckin(D.readiness);
       moves = careerMoves({ early, repeat, fullLog, checkin, weekCloses, cycleCloses: weekCloses && !!w && w.wk === w.total,
-        byBook: weekCloses && careerWeekByBook(fullLog, checkin) }, careerLadderNow());
+        byBook: weekCloses && careerWeekByBook(fullLog, checkin) }, careerLadderLight());
     } catch (err) { moves = null; }
   }
   return { parts, xp: parts.reduce((s, p) => s + p.xp, 0), repeat, moves };
@@ -10586,28 +10663,21 @@ function careerWeekByBook(fullLog, checkin) {
   return !(HIST || []).some(s => s.date >= win.from && s.date <= win.to && ids.indexOf(String(s.day)) >= 0
     && !(careerFullLog(s.entries, false) && careerCheckin(s.ready)));
 }
-// The finish card's lines: "Paper Trail 10 of 10 · bronze" (a tier crossed), "Century 24 of 25", "Hold Serve 5 of 8 · when the week counts",
-// then one grey "+N more in AA Proof". Nothing outside Career Mode's catalogue, nothing when the session moves nothing.
+// The finish card's lines on the four numbers' marks (round 5): "24 of 25 sessions with Amir", "5 of 8 weeks held · when the week counts",
+// "a new mark" when the session reaches one. No badge name, no metal (L2). Nothing when the session moves no mark.
 function careerMovesHTML(m) {
   if (!m || !Array.isArray(m.lines) || !m.lines.length) return '';
-  const lad = (CAREER_T && CAREER_T.p && CAREER_T.p.ladder) || {};
-  const row = l => {
-    const en = lad[l.id] || {};
-    const text = `${l.name} ${l.have} of ${l.next}` + (l.crossed && en.metal_next ? ' · ' + en.metal_next : '') + (l.pending ? ' · when the week counts' : '');
+  const marks = careerMarks();
+  const rows = m.lines.filter(l => marks[l.id]).map(l => {
+    const text = `${l.have} of ${l.next} ${careerMarkWords(marks[l.id].key, l.next)}` + (l.crossed ? ' · a new mark' : '') + (l.pending ? ' · when the week counts' : '');
     return `<small class="${l.crossed ? 'is-crossed' : l.pending ? 'cf-earn-more' : ''}">${esc(text)}</small>`;
-  };
-  return `<div class="cf-moves">${m.lines.map(row).join('')}${m.more > 0 ? `<small class="cf-earn-more">+${m.more} more in AA Proof</small>` : ''}</div>`;
+  });
+  return rows.length ? `<div class="cf-moves">${rows.join('')}</div>` : '';
 }
-// Home's Career row: the four numbers from numbers.four only (both apps read the same keys), a zero cell left out. Sessions with Amir shows +1
-// from this phone for a PAID session finished here that no answer has counted yet (never lower than the profile's): the server's number counts
-// what career_facts_paid() pays, one session per plan day per training week (GAME-4), so a plan day done again in its week adds nothing.
+// The four numbers (careerMarkCells(), from numbers.four only): Sessions with Amir shows +1 from this phone for a PAID session finished here that
+// no answer has counted yet (never lower than the profile's): the server's number counts what career_facts_paid() pays, one session per plan
+// day per training week (GAME-4), so a plan day done again in its week adds nothing.
 // (functions, not top-level tables: Home's first paint can reach these before the script has evaluated this far.)
-function careerFourWord(key, n) {
-  const w = { weeks_held: ['week held', 'weeks held'], sessions_with_amir: ['session', 'sessions'], personal_bests: ['best', 'bests'],
-    comebacks: ['comeback', 'comebacks'], day_streak: ['day streak', 'day streak'], perfect_days: ['perfect day', 'perfect days'],
-    habit_steps: ['habit step', 'habit steps'] }[key];
-  return w ? w[n === 1 ? 0 : 1] : '';
-}
 // What one waiting record (<id>_earn_d<N>) adds to Sessions with Amir until an answer counts it: 1 for a paid session, 0 for a plan day done again in its
 // training week (GAME-4; D19, Claude's pick, waiting for Amir's word: career_facts_paid() pays one session per plan day per week, and the server's number
 // counts only what it pays). Once the catalogue switch is on, careerEarnAtDone() writes two things on the record: `repeat` (this finish was a repeat) and
@@ -10646,29 +10716,6 @@ function careerPendingSessions() {
   } catch (e) { return 0; }
   return n;
 }
-function careerFourCells(p) {
-  const f = (p.numbers && p.numbers.four) || {};
-  const out = [];
-  ['consistency', 'commitment', 'progress', 'resilience'].forEach(m => {
-    const c = f[m];
-    if (!c || c.locked) return;
-    let v = Number(c.value) || 0;
-    if (c.key === 'sessions_with_amir') v += careerPendingSessions();
-    if (v <= 0) return;
-    const w = careerFourWord(c.key, v);
-    if (!w) return;
-    out.push(v.toLocaleString('en-US') + ' ' + w);
-  });
-  return out;
-}
-// The nearest goal: near[0] as "Paper Trail 9 of 10" when it is within two, or at 80% or more.
-function careerNearText(p) {
-  const n = Array.isArray(p.near) ? p.near[0] : null;
-  if (!n || !n.name || !(Number(n.next) > 0)) return '';
-  if (!(Number(n.next) - Number(n.have) <= 2 || Number(n.pct) >= 80)) return '';
-  return n.name + ' ' + Number(n.have) + ' of ' + Number(n.next);
-}
-
 // ── the finished card's reward bands, and the moments ────────────────────────────────────────────────────────────────────────────────
 function rwSizeRank(size) { return { tick: 0, win: 1, highlight: 2, milestone: 3, legend: 4 }[size] || 0; }
 function rwMetalWord(m) { return { bronze: 'Bronze', silver: 'Silver', emerald: 'Emerald', amethyst: 'Amethyst', prismatic: 'Prismatic', prisma: 'Prismatic' }[m] || ''; }
@@ -10711,11 +10758,11 @@ function rwCountingBands(day) {
   const raw = rwEarnRaw(day), lad = CAREER_T.p.ladder || {}, full = rwFullSizes();
   if (!raw || !raw.moves || !Array.isArray(raw.moves.lines)) return [];
   const on = sessionDateFor(day);
-  return raw.moves.lines.filter(l => l.crossed && !l.pending).map(l => {
+  return raw.moves.lines.filter(l => l.crossed && !l.pending && careerMarks()[l.id]).map(l => {
     const en = lad[l.id];
     if (!en || !(Number(en.next_tier) > 0) || full.indexOf(en.size_next) >= 0) return null;   // a full-screen tier gets its moment from the answer
-    return { kind: 'badge', name: l.name, meaning: en.meaning, metal: en.metal_next, tier: Number(en.next_tier), n: l.have, caption: '', date: on,
-      first: hlFirst(), award_id: awardId('badge', l.id, en.next_tier, ''), counting: true };
+    const sp = careerMarkSpec(l.id, Number(en.next_tier), on);   // round 5: a mark's own card, no metal (L2)
+    return sp ? Object.assign(sp, { counting: true }) : null;
   }).filter(Boolean);
 }
 // After a fresh answer that came after the session reached the server: what the session earned, diffed against `owned` as it was at Done, is
@@ -10742,9 +10789,10 @@ function collectRewardBands(day) {
   owned.forEach(id => {
     if (was.has(id) || haveIds.has(id) || seen[id]) return;
     const m = rows[id];
-    if (!m || !m.spec || m.size === 'tick' || rwIsFull(m)) return;
-    if (String(m.spec.date || m.day || '') < on) return;                  // an older reward this phone only learned of now is Proof's to tell
-    add.push({ m, spec: Object.assign({}, m.spec, { first: hlFirst(), award_id: id }) });
+    if (!m || !m.spec || m.size === 'tick' || rwIsFull(m) || !rwLight(m)) return;   // round 5: achievements and the four marks only (L2)
+    if (String(m.spec.date || m.day || '') < on) return;                  // an older reward this phone only learned of now is told by Your moments
+    const sp = rwLightSpec(m);
+    if (sp) add.push({ m, spec: Object.assign({}, sp, { first: hlFirst(), award_id: id }) });
   });
   add.sort((a, b) => (rwSizeRank(b.m.size)) - (rwSizeRank(a.m.size)) || String(b.m.day || '').localeCompare(String(a.m.day || '')));
   const rewards = had.concat(add.map(x => x.spec)).slice(0, 8);
@@ -10754,27 +10802,35 @@ function collectRewardBands(day) {
   _lsRawSet(winKey(day), JSON.stringify(cur));
   paintWinBand(day);
   // Only a reward that was DRAWN as a band is marked seen and told (GAME-14): paintWinBand() shows 3 bands across the day's New best / Retest
-  // specs and the rewards, in that order, and puts the rest behind "+N more in AA Proof". A reward behind that line stays unseen and untold, so
-  // AA Proof's queue still announces it. A reward cut by the slice above is in no list at all, so it is never told either.
+  // specs and the rewards, in that order, and puts the rest behind "+N more in Your moments" (round 5: the list on Progress shows every one). A
+  // reward behind that line stays unseen and untold. A reward cut by the slice above is in no list at all, so it is never told either.
   const room = Math.max(0, 3 - cur.specs.length), drawn = new Set(rewards.slice(0, room).map(r => r && r.award_id));
   const shown = add.map(x => x.spec.award_id).filter(id => drawn.has(id));
   if (shown.length && rwSeenAdd(shown)) rwTold(shown);
 }
-// The moment for one waiting row (it carries the share spec, and the title it minted in `also`).
+// The moment for one waiting row (round 5, the Scorecard's moment): a mark opens with its number, what it counts and the next mark; an
+// achievement with its name and its line. No metal, no title, no Grand Slam (L2). The card to share is rwLightSpec()'s.
 function rwMomentFor(m) {
-  const first = hlFirst(), sp = Object.assign({ first }, m.spec);
-  const also = (m.also || []).filter(s => s && s.kind).map(s => Object.assign({ first }, s));
-  const grand = m.item === 'grand_slam';
-  const metal = rwMetalWord(sp.metal);
+  const sp = rwLightSpec(m) || {};
   const cur = DATA && (DATA.cycles || [])[Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0];
+  const art = cur ? cycleArtUrl(cur) : '';
+  const mk = m.spec && m.spec.kind === 'badge' ? careerMarks()[m.item] : null;
+  if (mk) {
+    const tier = Number(m.spec.tier || m.tier), n = mk.at[tier - 1], nx = mk.at[tier];
+    const unit = { weeks_held: 'weeks', sessions_with_amir: 'sessions', personal_bests: 'bests', comebacks: 'comebacks' }[mk.key];
+    const words = { weeks_held: `Every session, ${n} weeks running. Keep it boring.`, sessions_with_amir: `${n} sessions in. This is how it adds up.`,
+      personal_bests: `${n} personal bests. You're getting stronger.`, comebacks: `${n} times you came back. That's the part that counts.` }[mk.key];
+    return { eyebrow: 'A new mark', num: n, title: careerMarkWords(mk.key, n) + (mk.key === 'weeks_held' ? ' in a row' : ''), sub: '',
+      next: nx ? 'Next mark · ' + nx + ' ' + unit : '', art, words, go: 'Share the card', specs: [sp] };
+  }
   return {
-    eyebrow: grand ? 'Grand Slam' : (rwMeaningWord(sp.meaning) || 'Career'),
-    title: sp.kind === 'badge' && metal ? sp.name + ' · ' + metal : sp.name,
-    sub: sp.kind === 'title' ? (sp.from || '') : (sp.caption || ''),
-    art: cur ? cycleArtUrl(cur) : '',
-    words: grand ? 'A title in all four. That\'s the whole game.' : m.size === 'legend' ? 'This is rare. Well done.' : 'That one took weeks. It\'s yours for good.',
-    go: HL_TITLE[sp.kind] || 'Share it',
-    specs: [sp].concat(also),
+    eyebrow: rwMeaningWord(sp.meaning) || 'Career',
+    title: sp.name || '',
+    sub: sp.caption || '',
+    art,
+    words: m.size === 'legend' ? 'This is rare. Well done.' : 'That one took weeks. It\'s yours for good.',
+    go: 'Share it',
+    specs: [sp],
   };
 }
 // A reward's full-screen moment (GAME-14; the queue, spec §7): never in the demo or the coach's preview, never from the phone's copy of an
@@ -10789,7 +10845,7 @@ function maybeRewardMoment(reason, day) {
   rewardCatchUp();
   if (document.querySelector('.wel, .hl-moment, .finish-rate:focus-within')) return;
   const seen = rwSeenGet(), p = CAREER_T.p;
-  let list = (p.moments || []).filter(m => m && m.spec && m.spec.kind && rwIsFull(m) && !seen[m.award_id]);
+  let list = (p.moments || []).filter(m => m && m.spec && m.spec.kind && rwIsFull(m) && rwLight(m) && !seen[m.award_id]);
   if (reason === 'done') {
     const raw = rwEarnRaw(day), was = new Set(raw && Array.isArray(raw.snap) ? raw.snap : []);
     const own = new Set(ownedIds(p));
@@ -10885,32 +10941,122 @@ function paintCareerEarn(day) {
   if (el.innerHTML !== h) el.innerHTML = h;
   el.hidden = !h;
 }
-// Home's row (Amir 2026-10-17, decision 2: "the training app shows one strip on Home: the level"). The big line is the level, the small
-// one the rank and what the next level needs, the bar under it the way to the next. A tap opens AA Proof's Locker, the career's home.
+// ── CAREER, THE LIGHTEST VERSION (Career Mode round 5, step 3; career/CAREER_MODE.md → L1 to L11) ────────────────────────────────────
+// Amir, 2026-10-20: athletes see a level with NO rank name, the four numbers, their moments, the monthly goal, the crew and him (L2). Badges,
+// ranks, titles, the Grand Slam, the level road and card skins show nowhere. Amir, 2026-10-19, on the Scorecard (Direction A): "go with your
+// choices about your numbers". So: Home has ONE Career row (the level, this week's Hold Serve line, the nearest mark; the Hold Serve row folds
+// into it), a "New from Amir" row while his newest line is unread, and the habits; Progress → Your numbers has the career's card (the level
+// and its bar, the four numbers with the next mark), the month's goal and Your moments (the marks, the achievements, Amir's lines, the
+// month's honours, "Amir saw this"). The Career row opens Your numbers: AA Proof's career screens are off.
+// The four numbers' MARKS (L3) are the tiers of four badges in career/badges.toml (held_weeks, century, bests, comebacks). They stay on the
+// server after the cut (step 4). scripts/check_career.py rule 23 holds this list to the file: change both.
+function careerMarks() {
+  return {
+    held_weeks: { key: 'weeks_held', at: [4, 8, 12, 24, 52] },
+    century: { key: 'sessions_with_amir', at: [25, 50, 100, 200, 500] },
+    bests: { key: 'personal_bests', at: [5, 10, 25, 50, 100] },
+    comebacks: { key: 'comebacks', at: [3, 5, 10] },
+  };
+}
+// The mark id of a number's key (weeks_held → held_weeks), or ''.
+function careerMarkId(key) {
+  const m = careerMarks();
+  return Object.keys(m).find(id => m[id].key === key) || '';
+}
+// A number's name after a count: "8 weeks held", "1 session with Amir".
+function careerMarkWords(key, n) {
+  const one = n === 1;
+  return { weeks_held: one ? 'week held' : 'weeks held', sessions_with_amir: one ? 'session with Amir' : 'sessions with Amir',
+    personal_bests: one ? 'personal best' : 'personal bests', comebacks: one ? 'comeback' : 'comebacks' }[key] || '';
+}
+// The profile's ladder with only the four marks in it: the finish card moves on them and nothing else (careerMoves() is a twin and stays
+// as it is; it is handed a smaller ladder).
+function careerLadderLight() {
+  const lad = careerLadderNow(), marks = careerMarks(), out = {};
+  Object.keys(marks).forEach(id => { if (lad && lad[id]) out[id] = lad[id]; });
+  return out;
+}
+// The four numbers as the card shows them: [{ id, key, meaning, value, best, next, pct }] in the meanings' order. `next` is the next mark
+// not reached (the ladder's when the profile has it), null on the top one. Weeks held is the run now; its marks are a run's length, so
+// the next one is above the best run, and the bar shows the run now toward it. Sessions with Amir adds what this phone finished that no
+// answer has counted yet (careerPendingSessions(), as before).
+function careerMarkCells(p) {
+  const f = (p.numbers && p.numbers.four) || {}, lad = p.ladder || {}, marks = careerMarks(), out = [];
+  ['consistency', 'commitment', 'progress', 'resilience'].forEach(meaning => {
+    const c = f[meaning];
+    if (!c || c.locked) return;
+    const id = careerMarkId(c.key);
+    if (!id) return;
+    let value = Math.max(0, Number(c.value) || 0);
+    if (c.key === 'sessions_with_amir') value += careerPendingSessions();
+    const best = Math.max(value, Number(c.best) || 0), at = marks[id].at, en = lad[id];
+    let next = en && Number(en.next) > 0 ? Number(en.next) : null;
+    if (!en) next = at.find(a => a > (c.key === 'weeks_held' ? best : value)) || null;
+    if (next != null && value >= next) next = at.find(a => a > value) || null;   // crossed here, not in the profile yet
+    out.push({ id, key: c.key, meaning, value, best, next, pct: next ? Math.max(0, Math.min(100, Math.round(value / next * 100))) : 100 });
+  });
+  return out;
+}
+// Home's nearest mark: "1 week to 8 weeks held", for the number closest to its next mark when it is within 3 or at 70% or more, never from 0.
+function careerNearMark(p) {
+  const near = careerMarkCells(p).filter(c => c.next && c.value > 0 && (c.next - c.value <= 3 || c.pct >= 70))   // a number at 0 is never "near"
+    .sort((a, b) => (b.pct - a.pct) || ((a.next - a.value) - (b.next - b.value)))[0];
+  if (!near) return '';
+  const r = near.next - near.value, s = r === 1 ? '' : 's';
+  return { weeks_held: `${r} week${s} to ${near.next} weeks held`, sessions_with_amir: `${r} session${s} to ${near.next} with Amir`,
+    personal_bests: `${r} best${s} to ${near.next} personal bests`, comebacks: `${r} comeback${s} to ${near.next} comebacks` }[near.key] || '';
+}
+// This week's Hold Serve line for the Career row (holdState(), the old row's words in one line): "7 weeks in a row · 1 more session this week".
+function holdLineText(st) {
+  if (!st) return '';
+  const NB = ' ';
+  const run = !st.now ? '' : st.now === 1 ? '1 week held' : `${st.now} weeks in a row`;
+  let next;
+  if (st.carry != null) next = st.carry ? `it carries into ${st.carry.replace(' ', NB)}` : 'it carries into your next cycle';
+  else if (st.held) next = 'this week is held';
+  else {
+    const left = st.total - st.done;
+    if (left <= 0) next = `all ${st.total} done this week`;
+    else if (!st.done) { const all = st.total === 2 ? 'both' : 'all ' + st.total; next = run ? `do ${all} this week` : `do ${all} sessions this week to hold it`; }
+    else next = `${left} more session${left === 1 ? '' : 's'} this week` + (run ? '' : ' to hold it');
+  }
+  const line = run ? run + ' · ' + next : next;
+  return line.charAt(0).toUpperCase() + line.slice(1);
+}
+// Home's row. The big line is the level (no rank name, L2), the small lines this week's Hold Serve line and the nearest mark, the bar under it
+// the way to the next level. A tap opens Your numbers on Progress.
 function careerRowHTML() {
   if (!careerOnT() || !DATA) return '';
   const p = CAREER_T.p, c = p.career || {};
   if (typeof c.level !== 'number') return '';
   const L = careerLevelOf(c.xp, p.rules);
   const pct = L.level_cost > 0 ? Math.max(0, Math.min(100, Math.round(L.xp_in_level / L.level_cost * 100))) : 0;
-  // Career Mode phase 3: the four numbers and the nearest goal, two more small lines under the level line (numbers.four only; D13).
-  const cells = catalogueOnT() ? careerFourCells(p) : [], goal = catalogueOnT() ? careerNearText(p) : '';
-  const say = 'Your career: level ' + L.level + ', ' + L.rank + '.' + (cells.length ? ' ' + cells.join(', ') + '.' : '') + (goal ? ' ' + goal + '.' : '')
-    + (catalogueOnT() ? ' Open your progress in AA Proof' : ' Open your Locker in AA Proof');
+  let hold = '';
+  try { hold = holdLineText(holdState()); } catch (e) { hold = ''; }
+  const near = catalogueOnT() ? careerNearMark(p) : '';
+  const say = 'Your career: level ' + L.level + '.' + (hold ? ' ' + hold + '.' : '') + (near ? ' ' + near + '.' : '') + ' Open your numbers';
   return `<button type="button" class="hrow career-row" onclick="goCareer()" aria-label="${esc(say).replace(/"/g, '&quot;')}">
     ${hrowIc('career')}<span class="hrow-b"><span class="hrow-l">Career</span>
-      <span class="hrow-v"><span class="hrow-vv">Level ${L.level}</span><small>${esc(L.rank)} · ${L.to_next.toLocaleString('en-US')} XP to level ${L.level + 1}</small>${
-        cells.length ? `<small class="career-four">${esc(cells.join(' · '))}</small>` : ''}${goal ? `<small class="career-next">${esc(goal)}</small>` : ''}</span></span>
+      <span class="hrow-v"><span class="hrow-vv">Level ${L.level}</span>${
+        hold ? `<small class="career-four">${esc(hold)}</small>` : `<small>${L.to_next.toLocaleString('en-US')} XP to level ${L.level + 1}</small>`}${
+        near ? `<small class="career-next">${esc(near)}</small>` : ''}</span></span>
     <span class="hrow-a" aria-hidden="true">›</span>
     <span class="career-bar" aria-hidden="true"><i style="width:${pct}%"></i></span></button>`;
 }
+// Home's Career and Hold Serve rows, drawn together: Hold Serve shows only while there is no Career row (the Career row carries its line).
+function paintHomeCareer() {
+  const ce = document.getElementById('home-career-wrap'), he = document.getElementById('home-hold-wrap');
+  let c = '';
+  try { c = careerRowHTML(); } catch (e) { c = ''; }   // never let the row stop Home
+  if (ce && ce.innerHTML !== c) ce.innerHTML = c;
+  let h = '';
+  if (!c) { try { h = holdRowHTML(holdState()); } catch (e) { h = ''; } }
+  if (he && he.innerHTML !== h) he.innerHTML = h;
+}
 function paintCareer() {
-  const el = document.getElementById('home-career-wrap');
-  if (el) {
-    let h = '';
-    try { h = careerRowHTML(); } catch (e) { h = ''; }   // never let the row stop Home
-    if (el.innerHTML !== h) el.innerHTML = h;
-  }
+  paintHomeCareer();
+  paintNote();
+  paintCareerCard();
   document.querySelectorAll('.session-complete.visible[id^="complete-"]').forEach(c => {
     paintCareerEarn(c.id.slice(9));
     try {
@@ -10921,9 +11067,231 @@ function paintCareer() {
     } catch (e) { /* the bands are extra: never stop the card */ }
   });
 }
-// With the catalogue switch on, the tap opens AA Proof's Progress (the shelf, the four numbers); before it, the Locker (D13).
-function goCareer() { window.location.href = habitsUrl() + (catalogueOnT() ? '&go=progress' : '&go=pass'); }
+// The Career row opens Your numbers on Progress (round 5: the career's home is this app now).
+function goCareer() {
+  goTo('plan');
+  setTimeout(() => { const t = document.getElementById('numbers-title'); if (t) t.scrollIntoView({ block: 'start' }); }, 0);
+}
 window.goCareer = goCareer;
+
+// ── Your moments, the goal and Amir's lines (Courtside, stage75; the athlete's own read, stage77) ─────────────────────────────────────────
+// get_my_moments() is the athlete's own goal, Amir's lines ("From Amir"), the award ids he marked "Saw it" and their honours; get_awards() is
+// every award with its day (the marks' tiers and the achievements). Both are asked after a fresh profile answer and when Progress opens (at
+// most every 2 minutes), and kept in <id>_momentscache (never synced, _snapshot()). Never in the demo or the coach's preview.
+var MOM_T = null;            // { my: get_my_moments(), aw: get_awards(), at } or null
+var _momBusy = false, _momAt = 0, _momAll = false;
+var _noteReadQ = {};         // days of Amir's lines read in this run: the row stays gone even before the server has it
+function momKey() { return ATHLETE_ID + '_momentscache'; }
+function loadMomentsCache() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
+  try {
+    const o = JSON.parse(localStorage.getItem(momKey()) || 'null');
+    if (o && ((o.my && o.my.athlete_id === ATHLETE_ID) || (o.aw && o.aw.athlete_id === ATHLETE_ID))) MOM_T = o;
+  } catch (e) { /* no copy yet */ }
+}
+async function refreshMoments() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || _momBusy) return;
+  _momBusy = true;
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    const [m, a] = await Promise.all([
+      _withTimeout(sb.rpc('get_my_moments', { p_athlete_id: ATHLETE_ID }), 10000),
+      _withTimeout(sb.rpc('get_awards', { p_athlete_id: ATHLETE_ID }), 10000)]);
+    const ok = r => !!r && !_noAnswer(r) && !r.error && !!r.data && r.data.athlete_id === ATHLETE_ID;
+    if (!ok(m) && !ok(a)) return;   // offline or refused: keep the copy
+    const prev = MOM_T || {};
+    MOM_T = { my: ok(m) ? m.data : (prev.my || null), aw: ok(a) ? a.data : (prev.aw || null), at: Date.now() };
+    _momAt = Date.now();
+    // A line read in this run that the server still has unread: tell it again (the first call may have been lost).
+    ((MOM_T.my && MOM_T.my.notes) || []).forEach(n => { if (n && !n.read && _noteReadQ[n.day]) markNoteRead(n.day); });
+    try { _lsRawSet(momKey(), JSON.stringify(MOM_T)); } catch (e) { /* storage full: shown this visit */ }
+  } catch (e) { /* keep the copy */ }
+  finally { _momBusy = false; paintNote(); paintCareerCard(); }
+}
+function refreshMomentsIfOld() { if (Date.now() - _momAt > 2 * 60000) refreshMoments(); }
+
+// Home's "New from Amir": his newest line not read yet, the one clay thing on Home until it is read (DS-01).
+function noteNew() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !MOM_T || !MOM_T.my || !Array.isArray(MOM_T.my.notes)) return null;
+  return MOM_T.my.notes.find(n => n && n.line && !n.read && !_noteReadQ[n.day] && /^\d{4}-\d{2}-\d{2}$/.test(String(n.day))) || null;
+}
+function paintNote() {
+  const el = document.getElementById('home-note-wrap');
+  if (!el) return;
+  let h = '';
+  try {
+    const n = noteNew();
+    if (n) h = `<button type="button" class="hrow from-amir" onclick="openNote('${n.day}')" aria-label="${esc('New from Amir: ' + n.line).replace(/"/g, '&quot;')}">
+      <span class="note-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span>
+      <span class="hrow-b"><span class="hrow-l">New from Amir</span><q class="note-q">${esc(n.line)}</q></span>
+      <span class="hrow-a" aria-hidden="true">›</span></button>`;
+  } catch (e) { h = ''; }
+  if (el.innerHTML !== h) el.innerHTML = h;
+}
+// A tap: the line is read (here at once, then on the server: mark_note_read(), the athlete themself only), and Progress opens on it.
+function openNote(day) {
+  _noteReadQ[day] = 1;
+  paintNote();
+  goTo('plan');
+  setTimeout(() => {
+    const find = () => document.querySelector('#career-moments-wrap .mo[data-note="' + day + '"]');
+    let row = find();
+    if (row && !row.offsetParent) { momShowAll(); row = find(); }   // folded under Show all: open the list
+    if (row) { row.scrollIntoView({ block: 'center' }); row.classList.add('is-new'); }
+  }, 0);
+  markNoteRead(day);
+}
+window.openNote = openNote;
+async function markNoteRead(day) {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    const r = await _withTimeout(sb.rpc('mark_note_read', { p_athlete_id: ATHLETE_ID, p_day: day }), 8000);
+    if (r && !_noAnswer(r) && !r.error && MOM_T && MOM_T.my && Array.isArray(MOM_T.my.notes)) {
+      MOM_T.my.notes.forEach(n => { if (n && n.day === day) n.read = true; });
+      try { _lsRawSet(momKey(), JSON.stringify(MOM_T)); } catch (e) { /* the next answer says it */ }
+    }
+  } catch (e) { /* the next answer tells it again (refreshMoments()) */ }
+}
+
+// Progress → Your numbers: the career's card and the month's goal (careerCardHTML()), then Your moments (momentsHTML()). Nothing without
+// the career (careerOnT()); then the two rows stay under Your numbers and the Records and body title hides.
+var _ccHtml = '', _moHtml = '';
+function paintCareerCard() {
+  const cw = document.getElementById('career-card-wrap'), mw = document.getElementById('career-moments-wrap');
+  if (!cw || !mw) return;
+  let c = '', m = '';
+  try { c = careerCardHTML(); } catch (e) { c = ''; }
+  try { m = c ? momentsHTML() : ''; } catch (e) { m = ''; }
+  if (c !== _ccHtml) { cw.innerHTML = c; _ccHtml = c; }
+  if (m !== _moHtml) { mw.innerHTML = m; _moHtml = m; }
+  const rt = document.getElementById('records-title');
+  if (rt) rt.hidden = !c;
+}
+function careerCardHTML() {
+  if (!careerOnT() || !DATA) return '';
+  const p = CAREER_T.p, c = p.career || {};
+  if (typeof c.level !== 'number') return '';
+  const L = careerLevelOf(c.xp, p.rules);
+  const pct = L.level_cost > 0 ? Math.max(0, Math.min(100, Math.round(L.xp_in_level / L.level_cost * 100))) : 0;
+  const cells = catalogueOnT() ? careerMarkCells(p) : [];
+  const fmt = v => v.toLocaleString('en-US');
+  const cell = x => `<div class="cs-n"><b>${fmt(x.value)}</b><span class="cs-nm">${esc(careerMarkWords(x.key, x.value))}</span>`
+    + `<span class="cs-mk">${x.next ? 'Next ' + fmt(x.next) : 'Every mark'}${x.key === 'weeks_held' && x.best > x.value ? ' · best ' + fmt(x.best) : ''}</span>`
+    + `<span class="cs-bar sm" aria-hidden="true"><i style="width:${x.pct}%"></i></span></div>`;
+  let h = `<div class="cs-card" role="group" aria-label="${esc('Level ' + L.level + ', ' + fmt(L.to_next) + ' XP to level ' + (L.level + 1)).replace(/"/g, '&quot;')}">
+    <span class="cs-l">Level</span>
+    <div class="cs-lvl"><b>${L.level}</b><span>${fmt(L.to_next)} XP to level ${L.level + 1}</span></div>
+    <span class="cs-bar" aria-hidden="true"><i style="width:${pct}%"></i></span>
+    ${cells.length ? `<div class="cs-grid">${cells.map(cell).join('')}</div>` : ''}</div>`;
+  const g = MOM_T && MOM_T.my && MOM_T.my.goal;
+  if (g && g.line) {
+    const mon = momMonth(g.month, true);
+    h += `<div class="cs-goal${g.done_at ? ' is-done' : ''}"><span class="cs-ring" aria-hidden="true"></span>
+      <span class="cs-gb"><span class="cs-l">${esc(mon)} goal · ${g.done_at ? 'done' : 'from Amir'}</span><span class="cs-gl">${esc(g.line)}</span></span></div>`;
+  }
+  return h;
+}
+// "2026-09-01" → "September" (long) or "Sep".
+function momMonth(d, long) {
+  const m = /^(\d{4})-(\d{2})/.exec(String(d || ''));
+  if (!m) return '';
+  const i = Number(m[2]) - 1, L = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  return L[i] ? (long ? L[i] : L[i].slice(0, 3)) : '';
+}
+// A name the catalogue writes in capitals ("FIRST BLOOD") reads as a name in a list: "First Blood".
+function momName(s) {
+  const t = String(s || '').trim();
+  return t && t === t.toUpperCase() && /[A-Z]/.test(t) ? t.toLowerCase().replace(/\b[a-z]/g, ch => ch.toUpperCase()) : t;
+}
+// Every moment, newest first: { day, sort, w, s, kind, award_id?, note?, honour? }.
+function momentsList() {
+  const out = [], marks = careerMarks(), aw = MOM_T && MOM_T.aw, my = MOM_T && MOM_T.my;
+  ((aw && aw.badges) || []).forEach(b => {
+    const mk = b && marks[b.id];
+    if (!mk || !Array.isArray(b.days)) return;
+    b.days.forEach((day, i) => {
+      const n = mk.at[i];
+      if (!n || !day) return;
+      out.push({ day, sort: day, kind: 'mark', w: n + ' ' + careerMarkWords(mk.key, n) + (mk.key === 'weeks_held' ? ' in a row' : ''), s: '',
+        award_id: awardId('badge', b.id, i + 1, '') });
+    });
+  });
+  ((aw && aw.achievements) || []).forEach(a => {
+    if (!a || !a.id || !a.day) return;
+    out.push({ day: a.day, sort: a.day, kind: 'achievement', w: momName(a.name || a.id), s: a.caption || '', award_id: awardId('achievement', a.id) });
+  });
+  ((my && my.notes) || []).forEach(n => {
+    if (!n || !n.line || !n.day) return;
+    out.push({ day: n.day, sort: n.day, kind: 'note', w: 'From Amir', s: n.line, note: n.day });
+  });
+  ((my && my.honours) || []).forEach(h => {
+    if (!h || !h.month || !h.honour) return;
+    // value is the honour's jsonb (stage75): {n} for Most sessions, {lift, pct} for Most improved, {weeks} for Full Month.
+    const mon = momMonth(h.month, true), v = (h.value && typeof h.value === 'object') ? h.value : {};
+    const w = { sessions: 'Most sessions in ' + mon, improved: 'Most improved in ' + mon, full_month: 'Full month: ' + mon, pick: 'Amir’s Pick for ' + mon }[h.honour];
+    if (!w) return;
+    const n = Number(v.n), pct = Number(v.pct), wk = Number(v.weeks);
+    const s = h.honour === 'sessions' && n > 0 ? n + ' sessions with Amir that month.'
+      : h.honour === 'improved' && pct > 0 ? '+' + (Math.round(pct * 10) / 10) + '% on ' + (v.lift ? String(v.lift) : 'a main lift') + '.'
+      : h.honour === 'full_month' ? (wk > 0 ? 'All ' + wk + ' training weeks held.' : 'Every training week held.') : '';
+    // An honour is for a month and is given after it: it sorts at the next month's first day, and shows its month.
+    const m = /^(\d{4})-(\d{2})/.exec(h.month), nx = m ? new Date(Number(m[1]), Number(m[2]), 1) : null;
+    const sort = nx ? nx.getFullYear() + '-' + String(nx.getMonth() + 1).padStart(2, '0') + '-01' : h.month;
+    out.push({ day: h.month, sort, kind: 'honour', w, s, honour: true });
+  });
+  const saw = new Set(((my && my.saw) || []).filter(x => typeof x === 'string'));
+  out.forEach(x => { x.saw = !!(x.award_id && saw.has(x.award_id)); });
+  return out.sort((a, b) => String(b.sort).localeCompare(String(a.sort)) || (a.kind === 'note' ? -1 : 0));
+}
+function momentsHTML() {
+  const list = momentsList();
+  if (!list.length) return '';
+  const SHOW = 6;
+  const row = x => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(x.day));
+    const d = x.honour ? `<b>${esc(momMonth(x.day))}</b>${m ? m[1] : ''}` : m ? `<b>${m[3]}</b>${esc(momMonth(x.day))}` : '';
+    const reply = x.kind === 'note' ? `<a class="mo-reply" href="${esc(coachWhatsAppUrl('About your note: “' + x.s + '” '))}" target="_blank" rel="noopener">Reply on WhatsApp</a>` : '';
+    return `<div class="mo mo-${x.kind}"${x.note ? ` data-note="${esc(x.note)}"` : ''}><span class="mo-d">${d}</span><span class="mo-b">`
+      + `<span class="mo-w">${esc(x.w)}</span>`
+      + (x.kind === 'note' ? `<q class="mo-from">${esc(x.s)}</q>${reply}` : x.s ? `<span class="mo-s">${esc(x.s)}</span>` : '')
+      + (x.saw ? '<span class="mo-saw">Amir saw this</span>' : '') + `</span></div>`;
+  };
+  return `<h2 class="prog-sec" id="moments-title">Your moments <span class="prog-sec-n">${list.length}</span></h2>
+    <div class="mo-list${_momAll || list.length <= SHOW ? ' all' : ''}">${list.map(row).join('')}</div>`
+    + (list.length > SHOW && !_momAll ? `<button type="button" class="mo-more" onclick="momShowAll()">Show all ${list.length}</button>` : '');
+}
+function momShowAll() { _momAll = true; _moHtml = ''; paintCareerCard(); }
+window.momShowAll = momShowAll;
+// A mark as a card to share, until the share cards' own design pass (Amir, 2026-10-19: "the cards are very important part of this app,
+// because we want to use it to advertise our brand. we need to design them carefull and with details later"): Highlight Reel's achievement
+// card (a seal, the name, a line), so no metal shows (L2). sharecard.js is not changed.
+function careerMarkSpec(item, tier, date) {
+  const mk = careerMarks()[item];
+  if (!mk) return null;
+  const n = mk.at[tier - 1];
+  if (!n) return null;
+  const line = { weeks_held: 'In a row. Every session, every week.', sessions_with_amir: 'One session at a time.',
+    personal_bests: 'Stronger, one best at a time.', comebacks: 'Every time it stopped, back again.' }[mk.key];
+  const meaning = { weeks_held: 'consistency', sessions_with_amir: 'commitment', personal_bests: 'progress', comebacks: 'resilience' }[mk.key];
+  return { kind: 'achievement', mark: true, name: n + ' ' + careerMarkWords(mk.key, n), meaning, caption: line, date: date || '', first: hlFirst(),
+    award_id: awardId('badge', item, tier, '') };
+}
+// Is a waiting reward one this app tells? An achievement, or a tier of one of the four marks. Every other badge, a title, the Grand Slam,
+// a level or a quest card: no (L2; they leave the server with the cut).
+function rwLight(m) {
+  const sp = m && m.spec;
+  if (!sp || !sp.kind) return false;
+  if (sp.kind === 'achievement') return true;
+  return sp.kind === 'badge' && !!careerMarks()[m.item] && Number(sp.tier || m.tier) > 0;
+}
+// A waiting reward's share spec in the light version: a mark's tier becomes careerMarkSpec(), an achievement stays as the server wrote it.
+function rwLightSpec(m) {
+  if (m.spec.kind === 'badge') return careerMarkSpec(m.item, Number(m.spec.tier || m.tier), m.spec.date || m.day);
+  return Object.assign({}, m.spec, { name: momName(m.spec.name) });
+}
 // The last profile this phone had, painted at once on open.
 function loadCareerCache() {
   if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
@@ -10962,6 +11330,7 @@ async function refreshCareer() {
     _careerBusy = false;
     paintCareer();
     if (fresh) { try { rewardAfterAnswer(); } catch (e) { console.warn('[career] moment not decided:', e); } }
+    if (fresh) refreshMomentsIfOld();
   }
 }
 function refreshCareerSoon(ms) { clearTimeout(_careerSoonT); _careerSoonT = setTimeout(refreshCareer, ms == null ? 400 : ms); }
@@ -11012,7 +11381,7 @@ function paintWeightRow() {
   const hw = document.getElementById('weight-row-wrap');
   if (hw) hw.innerHTML = weightCardHtml();
 }
-function paintNumbers() { paintCeilingRow(); paintWeightRow(); }
+function paintNumbers() { paintCareerCard(); paintCeilingRow(); paintWeightRow(); }
 window.paintNumbers = paintNumbers;
 
 // The best figure the athlete has already been shown, so a number that has not
@@ -18546,8 +18915,9 @@ function paintWinBand(day, quiet) {
       <span class="hl-band-t"><small>${what}</small><b>${esc(s.lift)} <em>${esc(hlSetText(s))}</em></b></span>
       <span class="hl-band-go" aria-hidden="true">Share</span></button>`;
     }
-    // A reward: its name and, for a badge, its metal in the bold line as plain text (clay is "look here" only, DS-01: never the <em>).
-    const what = hlBandWord(s.kind), nm = s.kind === 'badge' && rwMetalWord(s.metal) ? s.name + ' · ' + rwMetalWord(s.metal) : s.name;
+    // A reward: its name in the bold line as plain text (clay is "look here" only, DS-01: never the <em>). No metal since round 5 (L2); a mark
+    // (careerMarkSpec()) says so.
+    const what = s.mark ? 'A new mark' : hlBandWord(s.kind), nm = s.name;
     if (s.counting) {
       return `<div class="${cls} is-counting" data-bk="${attr(key)}" role="group" aria-label="${attr(what + ', counting: ' + nm)}">
       <span class="hl-band-t"><small>${esc(what)} · Counting</small><b>${esc(nm)}</b></span></div>`;
@@ -18555,7 +18925,7 @@ function paintWinBand(day, quiet) {
     return `<button type="button" class="${cls}" data-bk="${attr(key)}" onclick="openShareFromBand('${d}', ${share.indexOf(s)})" aria-label="${attr(what + ': ' + nm + '. Share it')}">
       <span class="hl-band-t"><small>${esc(what)}</small><b>${esc(nm)}</b></span>
       <span class="hl-band-go" aria-hidden="true">Share</span></button>`;
-  }).join('') + (items.length > 3 ? `<small class="hl-band-more">+${items.length - 3} more in AA Proof</small>` : '');
+  }).join('') + (items.length > 3 ? `<small class="hl-band-more">+${items.length - 3} more in Your moments, on Progress</small>` : '');
   if (!on || slot.innerHTML !== html) slot.innerHTML = html;
   if ((on ? fresh : !quiet) && navigator.vibrate) navigator.vibrate([12, 60, 12]);
 }
@@ -18786,7 +19156,7 @@ function maybeHighlightMoment() {
     specs,
   });
 }
-// o: { eyebrow, title, sub, art, words, go, specs, onClose? }. Career Mode phase 3 opens a reward's moment with the same call (GAME-14);
+// o: { eyebrow, num?, title, sub, next?, art, words, go, specs, onClose? } (num and next: a mark's moment, Career Mode round 5). Career Mode phase 3 opens a reward's moment with the same call (GAME-14);
 // onClose runs when the moment closes (any way). Any moment that opens counts as this run's one full-screen moment (D7, _rwOpened).
 function openMoment(o) {
   if (window.IS_PREVIEW || !o || !o.specs || !o.specs.length) return;
@@ -18805,8 +19175,10 @@ function openMoment(o) {
       <button type="button" class="hl-m-x" aria-label="Close">✕</button>
       <div class="hl-m-copy">
         <div class="hl-m-eyebrow">${esc(o.eyebrow || '')}</div>
-        <h2 class="hl-m-title" id="hl-m-title">${esc(o.title || '')}</h2>
+        ${o.num != null ? `<div class="hl-m-num" aria-hidden="true">${esc(String(o.num))}</div>` : ''}
+        <h2 class="hl-m-title" id="hl-m-title">${o.num != null ? `<span class="sr-only">${esc(String(o.num))} </span>` : ''}${esc(o.title || '')}</h2>
         ${o.sub ? `<div class="hl-m-sub">${esc(o.sub)}</div>` : ''}
+        ${o.next ? `<div class="hl-m-next">${esc(o.next)}</div>` : ''}
       </div>
     </div>
     <div class="hl-m-sheet">

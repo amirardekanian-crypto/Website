@@ -163,7 +163,8 @@ async function openProof(browser, opts = {}) {
     Object.entries(seed).forEach(([k, v]) => localStorage.setItem(id + k, typeof v === 'string' ? v : JSON.stringify(v)));
   }, [opts.prog || fixture(), ID, cfg, opts.seed || {}, opts.stub || {}]);
   await p.goto(BASE + (opts.url || '/habits.html'), { waitUntil: 'domcontentloaded' });
-  await p.waitForFunction(() => document.getElementById('app') && document.getElementById('app').textContent.length > 200, null, { timeout: 20000 });
+  // The strip on Home (?embed=1) is one row of chips since 2026-10-19: a short roster is under 200 characters, so a chip counts as content too.
+  await p.waitForFunction(() => document.getElementById('app') && (document.getElementById('app').textContent.length > 200 || !!document.querySelector('#app .e-chips')), null, { timeout: 20000 });
   await p.waitForTimeout(400);
   return { ctx, p };
 }

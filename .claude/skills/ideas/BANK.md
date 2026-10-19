@@ -194,7 +194,12 @@ Page (six versions, every direction kept): https://claude.ai/artifact/AriVWJQskS
 | The lesson arrives when it matters | The 24 lessons matched to plan moments | pitched |
 | The Road Remembers | Each finished cycle on Progress wears what it earned | pitched (grown idea) |
 | One Week Short | In a month's last week Courtside names whoever can still make Full Month by holding this week, the WhatsApp line written (nobody has a Full Month yet; three athletes were one week short in September) | pitched 2026-10-19 (grown idea, Courtside design page https://claude.ai/artifact/L3Tt3B6YPqMWcVgnN7nt9g) |
-| Gym photos, weekly missions, the full quest system | — | **parked** 2026-10-20: "later, only if the numbers say so" |
+| Gym photos, weekly missions, the full quest system | — | **parked** 2026-10-20: "later, only if the numbers say so"; photos came back 2026-10-19 for Crew's short-lived messages (CAREER_MODE.md → round 5) |
+| The Next Mark on the finish card | The finish card names the mark the session moves you closest to ("3 sessions to 50 with Amir") | grown idea on *Your Numbers*; **built** 2026-10-19 with step 3 (the finish card's lines are the four marks) |
+| The nudge on the finish card | One line when a session ends one step short of an achievement ("Hold Thursday and you get Back to Back") | **picked** 2026-10-19 (grown idea, Achievements page https://claude.ai/artifact/WPHuuK2Y2z4jfEQUPVdqNt) |
+| 15 new achievements, Four Courts | Back to Back, Full Month, Every Rep Counted, The Notebook, Extra Mile, Extra Innings, Straight Talk, Season Ticket, Half Year, Year One, Smooth Operator, Moving Up, Rematch Won, Bounce Back, Showed Up Anyway; a section by the four kinds | **picked** 2026-10-19 (built after the cut) |
+| Tell the crew | One button on the finished card drafts the session's line for the Bell, a photo optional | **picked** 2026-10-19 (grown idea, The Bell page https://claude.ai/artifact/55fbdfUgJVxySL7EpihyWb; built with stage79) |
+| Beat Your October | When a test comes back in a later Open, each card shows the athlete's own last result beside the board | pitched 2026-10-19 (grown idea, Crew and Open page https://claude.ai/artifact/7fCYGFL6mboE3igFLUkE5E) |
 
 ## Grown out of deep-dives
 

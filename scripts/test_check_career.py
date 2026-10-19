@@ -1172,6 +1172,18 @@ class CareerCheckerTests(unittest.TestCase):
         path.write_text(cut, encoding="utf-8", newline="\n")
         self.assertFails("[message.honour_full_month]", "recognition.toml has no [message.honour_full_month] (rule 22)")
 
+    # ── rule 23: program.html's four marks (careerMarks(), round 5) are badges.toml's tiers ──────────────────────────
+    def test_rule_23_a_tier_changed_in_the_file_only_fails(self):
+        path = self.dir / "badges.toml"
+        text = path.read_text(encoding="utf-8")
+        old = '{ at = 8, metal = "silver", xp = 400, size = "highlight" },'
+        self.assertIn(old, text)
+        path.write_text(text.replace(old, '{ at = 9, metal = "silver", xp = 400, size = "highlight" },', 1), encoding="utf-8", newline="\n")
+        self.assertFails("[badge.held_weeks]", "program.html's careerMarks() says the marks are", "change both (rule 23)")
+
+    def test_rule_23_the_files_as_they_are_agree(self):
+        self.assertNotIn("rule 23", self.assertPasses("OK: 0 errors"))
+
     # ── the seed: --write-lock and --catalogue-steps ──────────────────────────────────────────────────────────────
     def run_seed(self, *args):
         p = subprocess.run([sys.executable, "-X", "utf8", str(SEED), str(self.dir), *args], capture_output=True,

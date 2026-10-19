@@ -1378,6 +1378,48 @@ def check_courtside_lines(rec, rep):
             rep.error(f, f"message.{mid}", f"coach.html's COURT_LINES says {en!r}, the file says {m.get('en')!r}: change both (rule 22)")
 
 
+# ── Rule 23: program.html's four marks are badges.toml's tiers ──────────────────────────────────────────────────────
+
+def program_marks():
+    """program.html's careerMarks() (Career Mode round 5: the four numbers' marks the light screens show), read from the file:
+    {badge id: (number key, [at, ...])}; None when the page has none."""
+    try:
+        text = (ROOT / "program.html").read_text(encoding="utf-8")
+    except OSError:
+        return None
+    m = re.search(r"function careerMarks\(\)\s*\{\s*return\s*\{(.*?)\};", text, re.S)
+    if not m:
+        return None
+    out = {}
+    for t in re.finditer(r"(\w+):\s*\{\s*key:\s*'(\w+)',\s*at:\s*\[([\d,\s]*)\]\s*\}", m.group(1)):
+        out[t.group(1)] = (t.group(2), [int(x) for x in t.group(3).replace(" ", "").split(",") if x])
+    return out
+
+
+def check_program_marks(badges, rep):
+    """Rule 23. Each mark program.html's careerMarks() lists is a badge in badges.toml, and its marks are that badge's tiers (`at`), in order:
+    the app's Your numbers card, its moments and its finish-card lines name those numbers, so a tier changed in the file only would show a mark
+    the server never gives. A page without careerMarks() (an older commit) is not checked."""
+    marks = program_marks()
+    if marks is None:
+        return
+    f = "badges.toml"
+    bs = badges.get("badge") if isinstance(badges.get("badge"), dict) else {}
+    if not any(ident in bs for ident in marks):
+        return   # a catalogue with none of the four (a test's small one): nothing to compare
+    for ident, (_key, ats) in marks.items():
+        b = bs.get(ident)
+        if not isinstance(b, dict):
+            rep.error(f, f"badge.{ident}", "program.html's careerMarks() names this badge, but badges.toml has no [badge." + ident + "] (rule 23)")
+            continue
+        tiers = [t.get("at") for t in (b.get("tiers") or []) if isinstance(t, dict)]
+        if len(tiers) > len(ats) and tiers[:len(ats)] == ats:
+            # a tier appended (tiers are append-only): the app simply does not name the new mark yet
+            rep.warn(f, f"badge.{ident}", f"has marks program.html's careerMarks() does not list yet: {tiers[len(ats):]}; add them there (rule 23)")
+        elif tiers != ats:
+            rep.error(f, f"badge.{ident}", f"program.html's careerMarks() says the marks are {ats}, the file's tiers are {tiers}: change both (rule 23)")
+
+
 # ── The run, and the summary ──────────────────────────────────────────────────────────────────────────────────────
 
 def check_folder(folder):
@@ -1406,6 +1448,8 @@ def check_folder(folder):
     check_proof_fields(data, w, rep)
     check_gate_agreement(data, rep)
     check_tier_lock(folder, data, rep)
+    if data["badges"] is not None:
+        check_program_marks(data["badges"], rep)
     if all(data[stem] is not None for stem in ("rulebook", "badges", "achievements", "missions")):
         check_proof_parity(data, rep)
     return rep, data
