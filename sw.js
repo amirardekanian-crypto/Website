@@ -351,12 +351,16 @@
 // (direction B, picked from three). The engine is assets/js/habits-core.js, generated from habits.html so the two cannot drift;
 // the keys are AA Proof's own, so no athlete's history moves. The first screen comes with it, for anyone who has never set the
 // habits up. This app is now the writer of <id>_hab_cfg and <id>_hab_log: it pushes them, and merges a day by union.
-// v197: program.html changed (2026-10-19, Amir: "i want the 7-day habit table ... cut the per habit door ... create the door to the
+// v197: assets/js/sharecard.js changed (2026-10-19). The month's honour and the Monthly Open belong to a calendar month, and
+//       the app sends that month as an ISO day; the card read only a `month` the app never set, so both cards drew their eyebrow
+//       with the month missing. They name the month themselves now, in the card's own language (a Farsi card writes the Gregorian
+//       month in Farsi letters, its date still Shamsi), and the test carries the spec shape the app really sends.
+// v198: program.html changed (2026-10-19, Amir: "i want the 7-day habit table ... cut the per habit door ... create the door to the
 // list"). Progress carries the habit half now: days in a row, days this month, the last seven days as a table, and ONE door into the
 // list of what you track. The list is the five with no off switch, whatever the athlete chose, and the ways to add another — AA Proof's
 // three add-ons are suggestions among them, beside the ones athletes actually wrote for themselves. Three of their own is the cap,
 // because the server pays for no more.
-const CACHE = 'aap-v197';
+const CACHE = 'aap-v198';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

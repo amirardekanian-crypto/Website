@@ -188,14 +188,17 @@
     capTail: 'Coached by @amirardekanian · amirardekani.com',
   };
 
-  // ⚠️ FARSI: DRAFTS, EVERY ONE. Amir writes or approves every Farsi word before it ships (the design page, decision 2). The voice is
-  // the Farsi site's: warm and colloquial ("همون"). A lift's name and a cycle's name stay in English, as they are in the app.
+  // ✅ FARSI: READ AND APPROVED (Amir, 2026-10-19). He was shown the thirteen cards drawn in Farsi, and the written list of every
+  // line this pass added (https://claude.ai/artifact/Sww6XioHxhpZi1z92Cd4hu), and said: "The Farsi is fine, leave it." So the words
+  // below are his, not drafts. ⚠️ A Farsi word ADDED after that day is a draft again until he reads it: the rule did not change,
+  // only the words it has already covered. The voice is the Farsi site's: warm and colloquial ("همون"). A lift's name and a cycle's
+  // name stay in English, as they are in the app.
   // DECIDED (Amir, 2026-10-17: "Keep all three Farsi choices"): Iranian (Shamsi) dates on a Farsi card (۲۵ مهر ۱۴۰۵, not the design
   // page's Gregorian); the athlete's name in English letters (a programme holds no Farsi spelling of it); "Career Mode" in English on the
-  // level card (levelEye). The words below are still drafts waiting for his read.
+  // level card (levelEye).
   const FA = {
     coach: 'امیر اردکانی · مربی',
-    // The weight words (drafts for Amir to read, like every word here): پوند = lb and پلیت = a plate on a machine's stack (the number
+    // The weight words: پوند = lb and پلیت = a plate on a machine's stack (the number
     // before it says how many, so Farsi has one form for "plate" and "plates"; EN has two, "1 plate" and "6 plates").
     kg: 'کیلو', lb: 'پوند', plate: 'پلیت', plates: 'پلیت', reps: () => 'تکرار', sessions: 'جلسه', weeks: 'هفته', cycles: 'دوره', newBests: 'رکورد جدید',
     personalRecords: 'رکوردهای شخصی',
@@ -253,7 +256,7 @@
     levelEye: 'Career Mode',
     levelHead: n => [['سطح '], [n, 1]],
     levelLine: () => [['سطح حرفه‌ای تو. هیچ‌وقت صفر نمی‌شه.']],
-    // ── The 2026-10-19 pass, in Farsi. DRAFTS, every one: Amir reads them before they ship.
+    // ── The 2026-10-19 pass, in Farsi. Read and approved by Amir the same day (see the head of this table).
     mantra: 'یه مربی تو جیبت',
     markEye: 'یک نشانهٔ تازه',
     markWords: { weeks_held: 'هفته پشت سر هم', sessions_with_amir: 'جلسه با امیر', personal_bests: 'رکورد شخصی', comebacks: 'برگشت' },
@@ -302,6 +305,11 @@
     months: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'],
   };
   EN.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // The honours and the Monthly Open belong to a CALENDAR month, not to a day, so they are named rather than dated: the app sends
+  // `monthIso` ('2026-09-01') and the card writes the month in its own language. A Farsi card writes the Gregorian month in Farsi
+  // letters — the month the crew competed in — while its date stays Shamsi, as it is on every other card.
+  EN.gMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  FA.gMonths = ['ژانویه', 'فوریه', 'مارس', 'آوریل', 'مه', 'ژوئن', 'ژوئیه', 'اوت', 'سپتامبر', 'اکتبر', 'نوامبر', 'دسامبر'];
 
   // ── 3. Numbers and dates, in the card's language ──────────────────────────────────────────────────────────────────────
   const FA_DIG = '۰۱۲۳۴۵۶۷۸۹';
@@ -353,6 +361,12 @@
     if (lang !== 'fa') return p[2] + ' ' + EN.months[p[1] - 1] + ' ' + p[0];
     const j = toJalali(p[0], p[1], p[2]);
     return n(j[2], 'fa') + ' ' + FA.months[j[1] - 1] + ' ' + n(j[0], 'fa');
+  }
+  // The month a card is about: the name the caller gave, else the one `monthIso` falls in, written in the card's language.
+  function monthOf(d, lang) {
+    if (d && d.month) return String(d.month);
+    const m = String((d && d.monthIso) || '').match(/^(\d{4})-(\d{2})/);
+    return m ? (L(lang).gMonths[+m[2] - 1] || '') : '';
   }
   const isFaText = s => /[\u0600-\u06FF]/.test(String(s || ''));
   // A Latin name inside a Farsi line ("Darya · ۲۵ مهر ۱۴۰۵"): a right-to-left mark after it, or the bidi rules glue the Persian
@@ -1379,8 +1393,8 @@
   // honour: { first, honour ('sessions' | 'improved' | 'full_month' | 'pick'), month, n?, pct?, lift?, place?, field?, date }
   // One of the month's honours (L9). ⚠️ A card never names another athlete: the place and the size of the field, nothing more.
   TPL.honour = function (p, d) {
-    const t = p.t, lang = p.lang, h = t.honourName[d.honour] ? d.honour : 'pick';
-    p.eye(t.honourEye(d.month || ''));
+    const t = p.t, lang = p.lang, h = t.honourName[d.honour] ? d.honour : 'pick', mon = monthOf(d, lang);
+    p.eye(t.honourEye(mon));
     if (h === 'sessions' && d.n > 0) {
       p.lab(t.honourName[h]);
       p.num([{ t: n(d.n, lang) }, { t: ' ' + t.sessions, s: 'small' }], 18);
@@ -1391,17 +1405,17 @@
     } else {
       p.big([[t.honourName[h]]], 0, 2, { size: 146, floor: 0.42 });
     }
-    p.para([[t.honourSub[h](d.month || '')]], 26, { drop: 2 });
+    p.para([[t.honourSub[h](mon)]], 26, { drop: 2 });
     if (d.place > 0 && d.field > 0) p.tag(t.placeOf(t.ord(n(d.place, lang)), n(d.field, lang)), 26);
     p.finish(d.date);
   };
-  TPL.honour.ok = d => !!(d && d.honour && d.month);
+  TPL.honour.ok = d => !!(d && d.honour && (d.month || d.monthIso));
 
   // open: { first, title, how?, value, unit?, place?, field?, month, date }
   // The Monthly Open (stage85). The result is the athlete's own, confirmed by Amir; the board is never drawn, only their place.
   TPL.open = function (p, d) {
     const t = p.t, lang = p.lang;
-    p.eye(t.openEye(d.month || ''));
+    p.eye(t.openEye(monthOf(d, lang)));
     p.lab(d.title || '');
     const parts = [{ t: n(d.value, lang) }];
     if (d.unit) parts.push({ t: ' ' + d.unit, s: 'small' });
@@ -1552,11 +1566,11 @@
     else if (d.kind === 'achievement') s = t.capAchievement(lang === 'fa' && d.nameFa ? d.nameFa : d.name);
     else if (d.kind === 'level') s = t.capLevel(n(d.level, lang));
     else if (d.kind === 'mark') s = t.capMark(n(d.n, lang), t.markWords[d.key] || '');
-    else if (d.kind === 'honour') s = t.capHonour(t.honourName[d.honour] || '', d.month || '');
+    else if (d.kind === 'honour') s = t.capHonour(t.honourName[d.honour] || '', monthOf(d, lang));
     else if (d.kind === 'open') s = t.capOpen(bidi(d.title, lang), n(d.value, lang) + (d.unit ? ' ' + d.unit : ''),
       d.place > 0 && d.field > 0 ? t.placeOf(t.ord(n(d.place, lang)), n(d.field, lang)) : '');
     else if (d.kind === 'player') s = t.capPlayer(n(d.level, lang));
-    else if (d.kind === 'goal') s = t.capGoal(d.month || '');
+    else if (d.kind === 'goal') s = t.capGoal(monthOf(d, lang));
     else if (d.kind === 'session') s = t.capSession(bidi(d.title, lang));
     return (s ? s + ' ' : '') + t.capTail;
   }

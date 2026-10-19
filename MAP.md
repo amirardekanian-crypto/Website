@@ -134,7 +134,7 @@ Three layers, in the order a designer should read them:
   The chat bubble on both homepages and the two Farsi product pages is [`assets/js/site-chat.js`](assets/js/site-chat.js); its answers come from the Edge Function `site-chat` and [`Content/CHATBOT-FACTS.md`](Content/CHATBOT-FACTS.md) (CLAUDE.md → *The website chatbot*).
   [`assets/js/track.js`](assets/js/track.js) counts Apply, WhatsApp and demo clicks and the apply form's steps in Plausible (funnel pages only).
   [`assets/js/sharecard.js`](assets/js/sharecard.js) is **Highlight Reel**, the training app's share cards (a win drawn as an Instagram Story or post,
-  English or Farsi; every Farsi word in its `FA` table is a draft for Amir): [`PROGRAM-APP.md`](PROGRAM-APP.md) → *Highlight Reel*.
+  English or Farsi; every Farsi word in its `FA` table was approved by Amir on 2026-10-19): [`PROGRAM-APP.md`](PROGRAM-APP.md) → *Highlight Reel*.
 - **Master marks:** [`icon-192.png`](assets/img/icon-192.png) (app tile; masters in
   [`assets/img/source/`](assets/img/source/)) ·
   [`og-image.jpg`](assets/img/og-image.jpg) (wordmark lockup / share image) ·

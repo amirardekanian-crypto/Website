@@ -20,7 +20,7 @@ Highlight Reel), and added *"the achievements, badges and other things need to h
   digits, no letter-spacing, a lift's and a cycle's name in English. **Decided** (Amir, 2026-10-17: *"Keep all three Farsi choices"*):
   Iranian (Shamsi) dates on a Farsi card (the design page had shown Gregorian), the athlete's name in English letters, and "Career Mode"
   in English on the level card. Arrows, ticks and stars are drawn (the font files carry Latin only). **Every Farsi word is in ONE table,
-  `FA`, and every one is still a draft for Amir to read.** program.html loads the painter the first time a card is drawn (`hlLib()`);
+  `FA`; Amir read and approved them on 2026-10-19.** program.html loads the painter the first time a card is drawn (`hlLib()`);
   sw.js precaches it.
 - **The rules (the design page's):** a card says what the app says, from the same rules (PROG-01): the set as lifted (`w × r` from the
   record), never the 1RM estimate; a kilo gain only at the same reps (or a reps gain at the same weight). Never body weight, a check-in

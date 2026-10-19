@@ -89,10 +89,13 @@ const NORMAL = [
   { id: 'honour-improved', card: { kind: 'honour', first: FIRST, honour: 'improved', month: 'September', pct: 8.4, lift: 'Trap Bar Deadlift', place: 1, field: 14, date: D } },
   { id: 'honour-full', card: { kind: 'honour', first: FIRST, honour: 'full_month', month: 'September', date: D } },
   { id: 'honour-pick', card: { kind: 'honour', first: FIRST, honour: 'pick', month: 'September', date: D } },
+  // As program.html really sends them (hlMomentSpec / hlOpenSpec): the month as an ISO day, named by the card in its own language.
+  { id: 'honour-iso', card: { kind: 'honour', first: FIRST, honour: 'sessions', monthIso: '2026-09-01', n: 18, place: 1, field: 14, date: D } },
   // The Monthly Open (stage85): Amir's own words for what counts, and the athlete's place
   { id: 'open', card: { kind: 'open', first: FIRST, title: 'The Spider', month: 'October', value: 14.2, unit: 'sec', place: 2, field: 11,
     how: 'Six touches, baseline to each corner and back. Fastest time.', date: D } },
   { id: 'open-noplace', card: { kind: 'open', first: FIRST, title: '5K', month: 'October', value: 24.5, unit: 'min', date: D } },
+  { id: 'open-iso', card: { kind: 'open', first: FIRST, title: 'The Spider', monthIso: '2026-10-01', value: 14.2, unit: 'sec', place: 2, field: 11, date: D } },
   // The athlete's own card, any day
   { id: 'player', card: { kind: 'player', first: FIRST, level: 17, weeks: 8, sessions: 64, bests: 23, comebacks: 2, since: '2026-02-11', date: D,
     lifts: [{ name: 'Trap Bar Deadlift', w: 100, r: 5 }, { name: 'Barbell Back Squat', w: 90, r: 5 }, { name: 'Barbell Bench Press', w: 65, r: 6, u: 'kg' }] } },
@@ -102,6 +105,7 @@ const NORMAL = [
   { id: 'goal', card: { kind: 'goal', first: FIRST, month: 'October', text: 'Three sessions a week, every week, and log every set.',
     textFa: 'هفته‌ای سه جلسه، هر هفته، و همهٔ ست‌ها رو ثبت کن.', date: D } },
   { id: 'goal-server', card: { kind: 'goal', first: FIRST, month: 'October', text: 'Get the deadlift to 100 kg at RPE 8.', date: D } },
+  { id: 'goal-iso', card: { kind: 'goal', first: FIRST, monthIso: '2026-10-01', text: 'Three sessions a week, every week.', date: D } },
   { id: 'session', card: { kind: 'session', first: FIRST, title: 'Lower Power', cycle: CYC, mins: 54, exercises: 7, sets: 22, date: D } },
   { id: 'session-plain', card: { kind: 'session', first: FIRST, title: 'Banded Lower Burner', mins: 38, date: D } },
 ];
