@@ -3,7 +3,8 @@
 // The tab is added to the bar only once get_bell() answers (no answer, a server without stage81, the demo: no tab, the guide names no
 // Crew); the question asked once (Join the crew / Keep it to me); the feed (Amir's pinned post with the tab's clay dot until Crew is opened,
 // a Bell line in words with no weight, a photo post that asks crew_photo() for its photo); a Like on and off, and the join offer a
-// non-member gets when they tap it; the composer (a message, a
+// non-member gets when they tap it; the five-chip row once the server offers the emoji (stage82) and the Like alone without it;
+// the composer (a message, a
 // photo made smaller on the phone to 1280 px JPEG, the limits); Tell the crew (a session only with a photo, Day N drafted); the switches
 // and the no; an athlete ticked under 13 reads only; the account sheet's door; the guide; Back closes the photo; never synced; 320 px and
 // dark mode. Made-up people only. The stub answers the crew_* calls by name (stub.js).
@@ -198,6 +199,74 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       tabs: [...document.querySelectorAll('#global-tabs .nav-item')].map(b => { const r = b.getBoundingClientRect(), l = b.querySelector('.nav-label'); return l.scrollWidth <= l.clientWidth + 1 && r.right <= innerWidth + 1; }) }));
     C.check('320 px, dark: five tabs, every label whole, no sideways scroll', n.tabs.length === 5 && n.tabs.every(Boolean) && n.sw <= n.w, JSON.stringify(n));
     C.check('…no page errors', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+
+  // 7. the emoji beside the Like (stage82): drawn only while the server hands over the list
+  {
+    const { ctx, p } = await open(browser, { me: { answer: 'yes', can_post: true }, bell: Object.assign(bell({ answer: 'yes', can_post: true }), { emoji: ['🔥', '💪', '👏', '😍'] }) });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
+    const row = await p.evaluate(() => {
+      const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
+      return { kinds: [...r.children].map(b => b.className), chips: [...r.querySelectorAll('.cr-em i')].map(i => i.textContent).join(''),
+               like: r.querySelector('.cr-kd').textContent.trim(), wide: r.scrollWidth <= r.clientWidth + 1 };
+    });
+    C.check('the Like and the four emoji are all out, in order', row.chips === '🔥💪👏😍' && row.kinds[0] === 'cr-kd' && row.kinds.length === 5, JSON.stringify(row));
+    C.check('…and the row does not scroll sideways at 390 px', row.wide, JSON.stringify(row));
+    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => /🔥/.test(b.textContent)).click());
+    await p.waitForTimeout(400);
+    const after = await p.evaluate(() => {
+      const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
+      return { fire: r.querySelector('.cr-em[aria-pressed="true"] i').textContent, n: r.querySelector('.cr-em[aria-pressed="true"] b').textContent,
+               like: r.querySelector('.cr-kd').textContent.trim(), pressedLike: r.querySelector('.cr-kd').getAttribute('aria-pressed') };
+    });
+    const sent = await calls(p, 'crew_kudos');
+    C.check('tapping 🔥 sends it and marks it', after.fire === '🔥' && after.n === '1' && sent.some(x => x.p_emoji === '🔥' && x.p_on === true), JSON.stringify([after, sent]));
+    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => /💪/.test(b.textContent)).click());
+    await p.waitForTimeout(400);
+    const swap = await p.evaluate(() => {
+      const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
+      return { on: [...r.querySelectorAll('.cr-em[aria-pressed="true"] i')].map(i => i.textContent), counts: [...r.querySelectorAll('.cr-em')].map(b => (b.querySelector('b') || {}).textContent || '') };
+    });
+    C.check('…sending another swaps it: only one is pressed and 🔥 goes back to none', swap.on.join('') === '💪' && swap.counts[0] === '', JSON.stringify(swap));
+    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => /💪/.test(b.textContent)).click());
+    await p.waitForTimeout(400);
+    C.check('…tapping the one you sent takes it back', await p.evaluate(() => {
+      const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
+      return !r.querySelector('[aria-pressed="true"]');
+    }) && (await calls(p, 'crew_kudos')).some(x => x.p_on === false));
+    await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react .cr-em').click());
+    await p.waitForTimeout(400);
+    C.check('a Bell line takes one too, under its words', await p.evaluate(() => !!document.querySelector('#crew-body .cr-line .cr-react .cr-em[aria-pressed="true"]')));
+    C.check('no page errors (the emoji row)', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+  // 8. a server without stage82: no list, so the Like alone
+  {
+    const { ctx, p } = await open(browser, { me: { answer: 'yes', can_post: true } });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
+    C.check('without the list (no stage82) the row is the Like alone', await p.evaluate(() => !document.querySelector('#crew-body .cr-em') && !!document.querySelector('#crew-body .cr-kd')));
+    await ctx.close();
+  }
+  // 9. not joined: every chip offers to join, and under 13 none of them does anything
+  {
+    const { ctx, p } = await open(browser, { me: { answer: null, can_post: false }, bell: Object.assign(bell({ answer: null, can_post: false }), { emoji: ['🔥', '💪', '👏', '😍'] }) });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
+    C.check('not joined: the emoji are tappable and all offer to join', await p.evaluate(() =>
+      [...document.querySelectorAll('#crew-body .cr-em')].every(b => !b.disabled && /crewLikeAsk/.test(b.getAttribute('onclick') || ''))));
+    await p.evaluate(() => document.querySelector('#crew-body .cr-em').click());
+    await p.waitForTimeout(300);
+    C.check('…tapping one says to join first', await p.evaluate(() => !document.getElementById('aaToast').hidden) && !(await calls(p, 'crew_kudos')).length);
+    await ctx.close();
+  }
+  {
+    const { ctx, p } = await open(browser, { me: { answer: 'yes', under13: true, can_post: false }, bell: Object.assign(bell({ answer: 'yes', under13: true, can_post: false }), { emoji: ['🔥', '💪', '👏', '😍'] }) });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
+    C.check('under 13: the Like and every emoji are dead', await p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-kd, #crew-body .cr-em')].every(b => b.disabled)));
     await ctx.close();
   }
 

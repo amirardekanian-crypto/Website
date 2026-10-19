@@ -17,6 +17,7 @@
 //      joining, the switches
 //   6. kudos      7. photos      8. the coach's side      9. the erasure      10. nothing else moved      11. the way back      12. the cost
 //   13. line endings: the apply and the way back from files whose lines end differently (a Windows checkout ends them with CRLF)
+//   14. stage82: the emoji beside the Like (the set, the swap, the refusals, the feed, the way back)
 // A check that fails because stage81 is wrong is a finding: it is reported, not fixed here.
 // `--stage <file>` and `--rollback <file>` rehearse a modified copy, to see that a check bites (2026-10-19: run against 68 one-line breaks of both files; every one
 // was noticed except a weight added to a part that is never printed).
@@ -809,6 +810,90 @@ async function main() {
     catch (e) { dry = { error: String(e.message || e) }; }
     ok(e1 === e0 && dry.ok === true, `${what}: coach_erase_person() is back to what it was and an erasure works`, dry.error || (e1 === e0 ? dry : 'the definition differs'));
   }
+
+  // ═══ 14 ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  section('14. stage82: the emoji beside the Like (Amir, 2026-10-19: "all five out", and hearty eyes in place of the racket)');
+  const st82 = read(opt('--stage82') || path.join(ROOT, 'supabase', 'stage82_crew_emoji.sql'));
+  const back82 = read(opt('--rollback82') || path.join(ROOT, 'scripts', 'career', 'rollback_stage82.sql'));
+  await mkAthlete('zz_emo', 'Emo', 'Tester');
+  await mkAthlete('zz_emt', 'Emt', 'Tester');
+  await member('zz_emo', 'Emo T.');
+  await member('zz_emt', 'Emt T.');
+  const emPost = await post('zz_emo', 'React to this one.');
+  const likeBefore = await kudos('zz_emt', emPost.id, true);          // a plain Like, written by stage81's two-argument form
+  ok(likeBefore.n === 1 && likeBefore.mine === true, 'before stage82: a plain Like is one reaction');
+  const bell81 = await bellAs('zz_emt');
+  ok(bell81.emoji === undefined, "before stage82 get_bell() hands the app no emoji list, so the app draws the Like alone");
+
+  await runSql(db, st82, 'stage82'); await runSql(db, st82, 'stage82 again');
+  ok(true, 'stage82 applied, and applied again without an error');
+  ok((await val(`select count(*)::int from information_schema.columns where table_schema = 'public' and table_name = 'crew_kudos' and column_name = 'emoji'`)) === 1,
+     'crew_kudos has the emoji column');
+  ok(eq(await val(`select public.crew_emoji_list()`), ['🔥', '💪', '👏', '😍']), 'the set is 🔥 💪 👏 😍, in the order the card draws them');
+  ok((await val(`select to_regprocedure('public.crew_kudos(text,boolean)')::text`)) === null
+     && (await val(`select to_regprocedure('public.crew_kudos(text,boolean,text)')::text`)) !== null,
+     'the two-argument crew_kudos() is gone and the three-argument one is there');
+  ok(!(await val(`select has_function_privilege('anon', 'public.crew_kudos(text,boolean,text)', 'execute')`))
+     && (await val(`select has_function_privilege('authenticated', 'public.crew_kudos(text,boolean,text)', 'execute')`))
+     && !(await val(`select has_function_privilege('authenticated', 'public.crew_emoji_list()', 'execute')`)),
+     'anon cannot send one, a signed-in athlete can, and the list is the service role\'s');
+
+  const kept = await val(`select public.crew_kudos_of($1, null, null, 'zz_emt')`, [emPost.id]);
+  ok(kept.n === 1 && kept.like === 1 && kept.emoji === null && eq(kept.by, {}) && kept.mine === true,
+     'a Like written before stage82 is still a Like: emoji null, counted under "like"', kept);
+  const bell82 = await bellAs('zz_emt');
+  ok(eq(bell82.emoji, ['🔥', '💪', '👏', '😍']), 'get_bell() now hands the app the list, which is how it knows it may draw them');
+
+  const fire = await call('zz_emt', `select public.crew_kudos($1, true, '🔥')`, [emPost.id]);
+  ok(fire.n === 1 && fire.like === 0 && fire.emoji === '🔥' && eq(fire.by, { '🔥': 1 }),
+     'sending an emoji SWAPS the Like in place: still one reaction, now counted under its emoji', fire);
+  const flex = await call('zz_emt', `select public.crew_kudos($1, true, '💪')`, [emPost.id]);
+  ok(flex.n === 1 && flex.emoji === '💪' && eq(flex.by, { '💪': 1 }), 'sending a different one swaps again, never adds a second', flex);
+  ok((await cnt('crew_kudos', `post_id = $1`, [emPost.id])) === 1, 'one row per person per post, as before');
+  const gone = await call('zz_emt', `select public.crew_kudos($1, false)`, [emPost.id]);
+  ok(gone.n === 0 && gone.emoji === null && eq(gone.by, {}), 'taking it back removes it, whatever it was', gone);
+  await call('zz_emt', `select public.crew_kudos($1, true, '😍')`, [emPost.id]);
+  const plainAgain = await call('zz_emt', `select public.crew_kudos($1, true)`, [emPost.id]);
+  ok(plainAgain.n === 1 && plainAgain.like === 1 && plainAgain.emoji === null && eq(plainAgain.by, {}), 'sending the plain Like again swaps the emoji off', plainAgain);
+  await refuses('an emoji that is not on the list is refused', call('zz_emt', `select public.crew_kudos($1, true, '🥇')`, [emPost.id]), /crew:emoji/);
+  await refuses('…and so is a word', call('zz_emt', `select public.crew_kudos($1, true, 'nice')`, [emPost.id]), /crew:emoji/);
+  await refuses('their own post still refuses, emoji or not', call('zz_emo', `select public.crew_kudos($1, true, '🔥')`, [emPost.id]), /crew:own/);
+
+  // several people, so the counts and the names are real
+  await mkAthlete('zz_em3', 'Emth', 'Ree'); await member('zz_em3', 'Emth R.');
+  await call('zz_emt', `select public.crew_kudos($1, true, '🔥')`, [emPost.id]);
+  await sleep(5);
+  await call('zz_em3', `select public.crew_kudos($1, true, '🔥')`, [emPost.id]);
+  const many = await val(`select public.crew_kudos_of($1, null, null, 'zz_emt')`, [emPost.id]);
+  ok(many.n === 2 && eq(many.by, { '🔥': 2 }) && many.like === 0 && eq(many.names, ['Emth R.']) && many.emoji === '🔥',
+     'two of the same emoji count together, and the names still leave the viewer out', many);
+  const seen = await val(`select public.crew_kudos_of($1, null, null, 'zz_emo')`, [emPost.id]);
+  ok(seen.mine === false && seen.emoji === null && seen.n === 2 && eq(seen.names.slice().sort(), ['Emt T.', 'Emth R.']),
+     'the author sees both, as somebody who sent none', seen);
+
+  // a Bell line takes one too
+  await fact('zz_emo', 'week_held', 'c9|w1', 0, { cycle: 9, week: 1 });
+  const emLine = lineOf(await view('zz_emt'), 'Emo T.');
+  const lineEm = await call('zz_emt', `select public.crew_kudos($1, true, '👏')`, [emLine.key]);
+  ok(lineEm.n === 1 && lineEm.emoji === '👏' && eq(lineEm.by, { '👏': 1 }), 'a Bell line takes an emoji the same way', lineEm);
+  const feed82 = await view('zz_emt');
+  ok(lineOf(feed82, 'Emo T.').kudos.emoji === '👏' && postsOf(feed82, 'Emo T.')[0].kudos.by['🔥'] === 2,
+     'the feed carries them: the viewer\'s own on the line, the counts on the post');
+
+  info('the way back, then stage82 again');
+  const emojiRows = await cnt('crew_kudos', `emoji is not null`);
+  await runSql(db, back82, 'the way back from stage82');
+  ok((await val(`select count(*)::int from information_schema.columns where table_schema = 'public' and table_name = 'crew_kudos' and column_name = 'emoji'`)) === 0
+     && (await val(`select to_regprocedure('public.crew_emoji_list()')::text`)) === null,
+     'the way back takes the column and the list off');
+  const afterBack = await val(`select public.crew_kudos_of($1, null, null, 'zz_emt')`, [emPost.id]);
+  ok(afterBack.n === 2 && afterBack.mine === true && afterBack.by === undefined,
+     `every reaction survives as a plain Like (${emojiRows} carried an emoji), and the answer is stage81's shape again`, afterBack);
+  ok(((await bellAs('zz_emt')).emoji) === undefined, 'get_bell() stops handing out the list, so an updated app draws the Like alone');
+  ok((await val(`select to_regprocedure('public.crew_kudos(text,boolean)')::text`)) !== null, 'the two-argument crew_kudos() is back');
+  ok((await kudos('zz_emt', emPost.id, false)).n === 1, 'and it still works');
+  await runSql(db, st82, 'stage82 after the way back');
+  ok((await val(`select public.crew_emoji_list()`)) !== null, 'stage82 goes on again after it');
 
   console.log(`\n${failed ? 'FAIL' : 'OK'}: ${passed} passed, ${failed} failed (${Math.round((Date.now() - t0) / 1000)} s)`);
   if (failed) fails.forEach(f => console.log('  - ' + f));

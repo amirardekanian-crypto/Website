@@ -5103,14 +5103,26 @@
   .cr-kd { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 999px;
     background: var(--row); color: var(--green-ink); font: 700 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
   .cr-kd[aria-pressed="true"] { border-color: var(--fill); background: var(--fill); color: #fff; }
-  .cr-kd:disabled { cursor: default; opacity: .9; }
-  .cr-kd b { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .cr-kd:disabled, .cr-em:disabled { cursor: default; opacity: .9; }
+  .cr-kd b, .cr-em b { font-weight: 700; font-variant-numeric: tabular-nums; }
+  /* the four emoji beside the Like (stage82; all five out, Amir 2026-10-19). Drawn only while the server offers the list. */
+  .cr-react { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+  .cr-em { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 44px; min-height: 36px; padding: 0 9px;
+    border: 1px solid var(--hair); border-radius: 999px; background: var(--row); color: var(--ink); cursor: pointer; font: 400 var(--fs-body)/1 'Barlow', sans-serif; }
+  .cr-em i { font-style: normal; font-size: var(--fs-lead); line-height: 1; }
+  .cr-em[aria-pressed="true"] { border-color: var(--fill); background: var(--tint); }
+  .cr-em b { font-size: var(--fs-small); color: var(--ink); }
+  #screen-crew .cr-line .cr-react { margin-top: 8px; }
+  @media (max-width: 359px) { .cr-em { min-width: 38px; padding: 0 6px; gap: 3px; } .cr-react { gap: 4px; } #screen-crew .cr-kd { padding: 0 9px; } }
   .cr-del { flex: none; min-height: 36px; padding: 0 6px; border: 0; background: none; color: var(--grey); font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
   .cr-del.armed { color: var(--clay-ink); }
   /* a moment: one slim green line, the bell, what happened, the Like */
   #screen-crew .cr-line { display: flex; align-items: center; gap: 10px; margin: 0 var(--g) 10px; padding: 10px 10px 10px 12px; border-radius: 12px; background: var(--tint); }
   .cr-bell-ic { flex: none; color: var(--green-ink); }
   .cr-lw { flex: 1; min-width: 0; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
+  #screen-crew .cr-names { display: block; margin-top: -2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  #screen-crew .cr-post .cr-foot + .cr-foot { margin-top: 6px; }
+  #screen-crew .cr-post .cr-foot + .cr-foot .cr-del { margin-left: auto; }
   .cr-lw small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   #screen-crew .cr-me-row { display: flex; align-items: center; gap: 10px; width: calc(100% - 2 * var(--g)); min-height: 48px; margin: 4px var(--g) 0; padding: 8px 0;
     border: 0; border-top: 1px solid var(--hair); background: none; color: var(--green-ink); font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; text-align: left; cursor: pointer; }
@@ -11854,13 +11866,34 @@ function crewKudosWords(k) {
 // A Like, and who gave it. Their own post or line: the count, nothing to tap. An athlete Amir ticked under 13 cannot join, so
 // theirs stays dead with a label that says why. Anyone else who has not joined CAN tap it: crewLikeAsk() offers to join (Amir,
 // 2026-10-19: "if some one want to like a photo and they are not allowed to do, they should be notified to join first").
-function crewLikeBtn(target, k, own) {
-  const n = (k && Number(k.n)) || 0, me = crewMe(), mine = !!(k && k.mine), body = `Like${n ? ` <b>${n}</b>` : ''}`;
-  const dead = lbl => `<button type="button" class="cr-kd" data-kd="${esc(target)}" disabled aria-label="${esc(lbl)}">${body}</button>`;
-  if (own) return dead(`Likes on yours: ${n}`);
-  if (me.under13) return dead('Likes are off for your account');
-  if (!crewCanLike()) return `<button type="button" class="cr-kd" data-kd="${esc(target)}" onclick="crewLikeAsk()" aria-label="Join the crew to like this">${body}</button>`;
-  return `<button type="button" class="cr-kd" data-kd="${esc(target)}" aria-pressed="${mine}" onclick="crewLike(this)" aria-label="${mine ? 'Liked. Tap to take it back' : 'Like this'}">${body}</button>`;
+// The Like and, once the server offers them (stage82: BELL.emoji), the four emoji beside it — all five out, Amir's pick of
+// 2026-10-19. One per person: tapping another swaps yours, tapping yours again takes it back. The Like's own count is `like`
+// and each emoji's is in `by`; `emoji` is the viewer's own (null when theirs is the plain Like). A server without stage82
+// sends no list and no `by`, so the row is the Like alone, exactly as it was.
+function crewEmoji() { return (BELL && Array.isArray(BELL.emoji)) ? BELL.emoji.slice(0, 6) : []; }
+function crewReactRow(target, k, own) {
+  const me = crewMe(), kk = k || {}, t = esc(target);
+  const total = Number(kk.n) || 0, by = (kk.by && typeof kk.by === 'object') ? kk.by : {};
+  // `like` is stage82's; before it, a Like is simply every reaction there is
+  const likeN = typeof kk.like === 'number' ? kk.like : total;
+  const liked = !!kk.mine && !kk.emoji;
+  const num = v => v ? ` <b>${v}</b>` : '';
+  const dead = (cls, body, lbl) => `<button type="button" class="${cls}" data-kd="${t}" disabled aria-label="${esc(lbl)}">${body}</button>`;
+  const live = (cls, body, lbl, press, call) => `<button type="button" class="${cls}" data-kd="${t}" ${press === null ? '' : `aria-pressed="${press}"`} onclick="${call}" aria-label="${esc(lbl)}">${body}</button>`;
+  const can = crewCanLike() && !own, ask = !own && !me.under13 && !crewCanLike();
+  let h = own ? dead('cr-kd', 'Like' + num(likeN), `Likes on yours: ${likeN}`)
+    : me.under13 ? dead('cr-kd', 'Like' + num(likeN), 'Likes are off for your account')
+    : ask ? live('cr-kd', 'Like' + num(likeN), 'Join the crew to like this', null, 'crewLikeAsk()')
+    : live('cr-kd', 'Like' + num(likeN), liked ? 'Liked. Tap to take it back' : 'Like this', liked, 'crewLike(this)');
+  crewEmoji().forEach(em => {
+    const n = Number(by[em]) || 0, mine = kk.emoji === em, body = `<i aria-hidden="true">${esc(em)}</i>${num(n)}`;
+    const said = `${em} ${n === 1 ? '1 person' : n + ' people'}`;
+    h += own ? dead('cr-em', body, said)
+      : me.under13 ? dead('cr-em', body, said)
+      : ask ? live('cr-em', body, `Join the crew to send ${em}`, null, 'crewLikeAsk()')
+      : live('cr-em', body, mine ? `${em} sent. Tap to take it back` : `Send ${em}`, mine, `crewLike(this, '${esc(em)}')`);
+  });
+  return h;
 }
 function crewItem(key) { return ((BELL && BELL.items) || []).find(i => i && (i.id === key || i.key === key)) || null; }
 
@@ -11897,7 +11930,8 @@ function crewPostHTML(it) {
   return `<article class="cr-post${it.amir ? ' amir' : ''}" data-id="${esc(it.id)}">
     <div class="cr-who"><span class="cr-ini${it.amir ? ' am' : ''}" aria-hidden="true">${esc(ini)}</span><span class="cr-nm">${esc(name)}${sub}</span>${top}</div>
     ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}${ph}
-    <div class="cr-foot">${crewLikeBtn(it.id, it.kudos, it.me)}<small data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small>${del}</div>
+    <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span></div>
+    <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small>${del}</div>
   </article>`;
 }
 function crewLineHTML(it) {
@@ -11905,7 +11939,9 @@ function crewLineHTML(it) {
   if (!parts.length) return '';
   const txt = esc(it.me ? 'You' : (it.who || 'Someone')) + ' ' + parts.map(esc).join(' · ');
   const kw = crewKudosWords(it.kudos);
-  return `<div class="cr-line" data-key="${esc(it.key)}"><span class="cr-bell-ic">${CREW_BELL_SVG}</span><span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small></span>${crewLikeBtn(it.key, it.kudos, it.me)}</div>`;
+  return `<div class="cr-line" data-key="${esc(it.key)}"><span class="cr-bell-ic">${CREW_BELL_SVG}</span>
+    <span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small>
+      <span class="cr-react on-line" data-row="${esc(it.key)}">${crewReactRow(it.key, it.kudos, it.me)}</span></span></div>`;
 }
 function crewBoardHTML() {
   if (!Array.isArray(CREW_BOARD) || !CREW_BOARD.length) return '<p class="cr-quiet">The board shows here once you have signal.</p>';
@@ -11991,7 +12027,8 @@ function openCrewPhoto(id) {
       <button type="button" class="cr-x" onclick="closeCrewPhoto()" aria-label="Close the photo">✕</button></div>
     <div class="cr-vimg"><img alt="${esc(name === 'You' ? 'Your photo' : name + "'s photo")}"></div>
     ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}
-    <div class="cr-foot">${crewLikeBtn(it.id, it.kudos, it.me)}<small data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small></div>`;
+    <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span></div>
+    <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small></div>`;
   v.classList.add('visible');
   crewFetchPhoto(id).then(url => { const im = v.querySelector('.cr-vimg img'); if (url && im) im.src = url; });
 }
@@ -12006,14 +12043,11 @@ window.closeCrewPhoto = closeCrewPhoto;
 function paintKudos(key) {
   const it = crewItem(key);
   if (!it) return;
-  document.querySelectorAll('[data-kd]').forEach(b => {
-    if (b.dataset.kd !== key) return;
-    const n = Number(it.kudos && it.kudos.n) || 0;
-    b.innerHTML = 'Like' + (n ? ` <b>${n}</b>` : '');
-    if (b.hasAttribute('aria-pressed')) {
-      b.setAttribute('aria-pressed', String(!!(it.kudos && it.kudos.mine)));
-      b.setAttribute('aria-label', it.kudos && it.kudos.mine ? 'Liked. Tap to take it back' : 'Like this');
-    }
+  // the whole row at once: a tap can move the Like's count, an emoji's, and which one is pressed
+  document.querySelectorAll('.cr-react').forEach(row => {
+    if (row.dataset.row !== key) return;
+    const h = crewReactRow(key, it.kudos, it.me);
+    if (row.innerHTML !== h) row.innerHTML = h;
   });
   document.querySelectorAll('[data-kw]').forEach(s => {
     if (s.dataset.kw !== key) return;
@@ -12021,17 +12055,30 @@ function paintKudos(key) {
     s.textContent = it.t === 'line' ? (kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at)) : kw;
   });
 }
-async function crewLike(btn) {
+// `em` is one of crewEmoji(), or nothing for the plain Like. Tapping the one you already sent takes it back; tapping another
+// swaps it, so the total never moves for the same person. Shown here at once, then the server's answer (with the names) replaces it.
+async function crewLike(btn, em) {
   const key = btn && btn.dataset.kd, it = crewItem(key);
   if (!it || !crewCanLike() || it.me) return;
-  const on = btn.getAttribute('aria-pressed') !== 'true';
   const before = Object.assign({ n: 0, names: [], mine: false }, it.kudos || {});
-  it.kudos = { n: Math.max(0, Number(before.n) + (on ? 1 : -1)), names: before.names || [], mine: on };
+  const was = before.mine && (before.emoji || null) === (em || null);   // the same one again: take it back
+  const on = !was;
+  const by = Object.assign({}, before.by || {});
+  const hadLike = before.mine && !before.emoji, likeWas = typeof before.like === 'number' ? before.like : Number(before.n) || 0;
+  if (before.mine && before.emoji) by[before.emoji] = Math.max(0, (Number(by[before.emoji]) || 0) - 1);
+  let like = Math.max(0, likeWas - (hadLike ? 1 : 0));
+  if (on) { if (em) by[em] = (Number(by[em]) || 0) + 1; else like += 1; }
+  Object.keys(by).forEach(k => { if (!by[k]) delete by[k]; });
+  it.kudos = Object.assign({}, before, { mine: on, emoji: on ? (em || null) : null, by,
+    n: Math.max(0, Number(before.n) + (before.mine ? 0 : 1) - (on ? 0 : 1)),
+    like: typeof before.like === 'number' ? like : undefined, names: before.names || [] });
   paintKudos(key);
   let r = null;
-  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_kudos', { p_target: key, p_on: on }), 8000); } catch (e) { r = null; }
+  const args = { p_target: key, p_on: on };
+  if (em) args.p_emoji = em;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_kudos', args), 8000); } catch (e) { r = null; }
   if (r && !r.error && r.data && typeof r.data.n !== 'undefined') it.kudos = r.data;
-  else { it.kudos = before; aaToast(_noAnswer(r) ? 'No signal. Your like goes when you are back online.' : 'That like did not go. Try again.'); }
+  else { it.kudos = before; aaToast(_noAnswer(r) ? 'No signal. It goes when you are back online.' : 'That did not go. Try again.'); }
   paintKudos(key);
   try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
 }
@@ -12040,7 +12087,7 @@ window.crewLike = crewLike;
 function crewLikeAsk() {
   const me = crewMe();
   if (me.under13) return;
-  aaToast(me.answer === 'no' ? 'You kept yourself out of the crew, so you cannot like a post.' : 'Join the crew to like a post.',
+  aaToast(me.answer === 'no' ? 'You kept yourself out of the crew, so you cannot react to a post.' : 'Join the crew to like a post.',
     { kicker: 'Crew', action: 'Join the crew', dismiss: 'Not now', run: () => crewAnswer('yes') });
 }
 window.crewLikeAsk = crewLikeAsk;

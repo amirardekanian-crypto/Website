@@ -107,11 +107,20 @@
         me.posts_left = Math.max(0, (me.posts_left || 0) - 1);
         keep(); return res({ data: { id: id, me: JSON.parse(JSON.stringify(me)) }, error: null, status: 200 });
       }
+      // stage82: one reaction per person, the emoji swapping in place. Without B.emoji (no stage82) p_emoji is refused, as the old
+      // two-argument function would have been.
       if (name === 'crew_kudos') {
-        var t = params && params.p_target, on = !!(params && params.p_on), it = (B.items || []).find(function (i) { return i && (i.id === t || i.key === t); });
+        var t = params && params.p_target, on = !!(params && params.p_on), em = (params && params.p_emoji) || null;
+        var it = (B.items || []).find(function (i) { return i && (i.id === t || i.key === t); });
         if (!it) return res({ data: null, error: { message: 'crew:gone', code: 'P0001' }, status: 400 });
+        if (em && (!B.emoji || B.emoji.indexOf(em) < 0)) return res({ data: null, error: { message: 'crew:emoji', code: 'P0001' }, status: 400 });
         var k = it.kudos = it.kudos || { n: 0, mine: false, names: [] };
-        if (on && !k.mine) { k.n++; k.mine = true; } else if (!on && k.mine) { k.n--; k.mine = false; }
+        if (B.emoji) {
+          k.by = k.by || {}; if (typeof k.like !== 'number') k.like = k.n - Object.keys(k.by).reduce(function (a, x) { return a + k.by[x]; }, 0);
+          if (k.mine) { if (k.emoji) { k.by[k.emoji] = Math.max(0, (k.by[k.emoji] || 0) - 1); if (!k.by[k.emoji]) delete k.by[k.emoji]; } else k.like = Math.max(0, k.like - 1); k.n--; }
+          k.mine = !!on; k.emoji = on ? em : null;
+          if (on) { if (em) k.by[em] = (k.by[em] || 0) + 1; else k.like++; k.n++; }
+        } else if (on && !k.mine) { k.n++; k.mine = true; } else if (!on && k.mine) { k.n--; k.mine = false; }
         keep(); return res({ data: JSON.parse(JSON.stringify(k)), error: null, status: 200 });
       }
       if (name === 'crew_delete_post') { var before = (B.items || []).length; B.items = (B.items || []).filter(function (i) { return !(i && i.id === (params && params.p_post)); }); keep(); return res({ data: B.items.length < before, error: null, status: 200 }); }

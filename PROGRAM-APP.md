@@ -1543,6 +1543,12 @@ decides what rings and who can be seen, and never sends this app another athlete
   so the card's grid rows did not move), shown while the athlete can post. It opens the composer as a session: *Day 2 done. 47 sessions with
   Amir.* drafted (`crewSessionDraft()`, the count from `careerMarkCells()`), and **Post waits for a photo**: a finished session reaches the Bell
   only with one (Amir's rule).
+- **The Like and four emoji, all five out** (Amir, 2026-10-19, direction A of https://claude.ai/artifact/KkF7qE5yomcLdxKYF1mjo8: *"lets go
+  with all five out style"*, and *"instead of racket go with hearty eyes"*): `crewReactRow()` draws the Like then **🔥 💪 👏 😍**, each its own
+  chip with its count. One per person (`crewLike(btn, em)`): tapping another **swaps** yours, tapping yours takes it back, so the total never
+  moves twice for one athlete. The row is drawn **only while the server hands over the list** (`BELL.emoji`, stage82): without it the Like
+  stands alone, exactly as stage81 left it, so the app shipped before the stage was applied. The whole row repaints after a tap
+  (`paintKudos()`), the names line sits under it, and at 320 px the chips tighten so all five still fit on one line.
 - **The words** (Amir, 2026-10-19): the button is **Like**, never Kudos; the question is **Join the crew?** with *Join the crew* and
   *Keep it to me*; the account sheet says **In the crew**. The server's function is still `crew_kudos()` and the payload is still `kudos`:
   nobody reads those.

@@ -310,7 +310,8 @@
 // v180: program.html changed (2026-10-19, Career Mode round 5 step 5): Crew and the Bell, a tab that appears only once the server answers get_bell() (stage81); Tell the crew on the finished card.
 // v181: program.html changed (2026-10-19): Progress's open Now card is short (Doors): the tagline, the aims, Amir's first sentence signed, and the rest of his note and the outcomes behind two rows that open on a tap; the outcomes are dots, not ticks.
 // v182: program.html changed (2026-10-19, Amir): Kudos is a Like, the question is Join the crew, and a Like tapped by someone not in the crew offers to join instead of doing nothing.
-const CACHE = 'aap-v182';
+// v183: program.html changed (2026-10-19, Amir): the Like and four emoji (🔥 💪 👏 😍) all out on a Bell post, drawn only while the server offers the list (stage82).
+const CACHE = 'aap-v183';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
