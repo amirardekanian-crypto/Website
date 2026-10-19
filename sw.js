@@ -323,7 +323,11 @@
 // This worker is unchanged apart from the name. The two apps are the ones that had to learn to listen, which means this bump is the last
 // one an athlete has to close and reopen for: from the next one on, their app tells them.
 // v189: program.html changed (2026-10-19, Amir): two door rows are named after what they open — "Log a max" and "How the app works" — each with its prompt on the quiet line, where they used to say a question or the same thing twice over a louder second line.
-const CACHE = 'aap-v189';
+
+// v190: program.html and habits.html changed (2026-10-19, Amir picked the look from three: "lets go with C but in ckay"). The
+// new-version notice is the note box in the middle of the screen, in clay, with Reload and Not now, in place of v188's line on Home.
+// aaToast() gained the tone and a note that stays until it is answered (ms: 0); AA Proof has the same box in its own look.
+const CACHE = 'aap-v190';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

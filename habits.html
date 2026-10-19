@@ -1830,14 +1830,27 @@
   #app .toast { border-radius: 20px; background: #231F35; color: #F6F4FF; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; text-transform: none; letter-spacing: 0; box-shadow: 0 14px 30px -16px rgba(35,31,53,0.7); }
   .demo-banner { background: var(--accent); color: #fff; font-family: 'Outfit', sans-serif; letter-spacing: 0.08em; }
 
-  /* A new version of the app is ready (2026-10-19, paintable only outside the embed): one row under the
-     header, clay because it asks for something, with the Reload beside it. It stays until it is tapped. */
-  .newver { display: flex; align-items: center; gap: 12px; padding: 11px 20px; background: var(--clay-100);
-    box-shadow: inset 4px 0 0 var(--clay); font-family: 'Outfit', sans-serif; }
-  .newver .nv-t { flex: 1; min-width: 0; font-weight: 600; font-size: 14px; line-height: 1.3; color: var(--ink); }
-  .newver .nv-go { flex: none; min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; cursor: pointer;
-    background: var(--clay); color: var(--on-clay); font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.04em; }
-  .newver .nv-go:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  /* A new version of the app is ready (2026-10-19; Amir picked the note box from three, "lets go with C but in ckay"):
+     the box in the middle of the screen, in clay, never dimming the page, with Reload and Not now. It stays until one
+     of them is tapped. Above the sheet (90) and the toast (95), under the tour (150) and a takeover (200). Never in the
+     embed. --clay-deep inverts between the themes and --on-clay with it, so both stay 4.5:1 or better. */
+  .newver { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 96;
+    width: min(86%, 320px); box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;
+    padding: 20px 18px 16px; border-radius: 20px; background: var(--clay-deep); color: var(--on-clay);
+    font-family: 'Outfit', sans-serif; box-shadow: 0 18px 44px -18px rgba(0,0,0,0.55); animation: nvIn .22s ease; }
+  /* Its OWN keyframe: riseIn ends on `transform: none`, which would throw the box's centring away for the whole
+     animation and drop it in 81 px low. */
+  @keyframes nvIn { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+  .newver .nv-k { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.86; }
+  .newver .nv-k::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .newver .nv-t { font-weight: 600; font-size: 15px; line-height: 1.4; }
+  .newver .nv-row { display: flex; gap: 10px; }
+  .newver button { min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; cursor: pointer;
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.02em; }
+  .newver .nv-go { background: var(--on-clay); color: var(--clay-deep); }
+  .newver .nv-x { background: transparent; color: var(--on-clay); box-shadow: inset 0 0 0 1.5px currentColor; }
+  .newver button:focus-visible { outline: 2px solid var(--on-clay); outline-offset: 2px; }
 
   /* XP flight */
   .xpfly > i { border-radius: 999px; background: var(--teal, #35D0BA); color: #0C4B43; font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: 0.02em; }
@@ -8915,10 +8928,6 @@ function renderApp() {
         </span>
       </div>
     </div>
-    ${UI.newver ? `<div class="newver" data-k="newver" role="status">
-      <span class="nv-t">A new version of the app is ready</span>
-      <button class="nv-go" data-k="nv-go" ${on(reloadNewVersion)}>Reload</button>
-    </div>` : ''}
     <div class="scroll" id="scroll" data-k="scroll">${screenHtml}</div>
     <div class="tabs" data-k="tabs"${OVERLAY ? ' hidden' : ''}>
       <div class="tabslab" data-k="tabslab" style="width:calc(100% / ${tabDefs.length});transform:translateX(${Math.max(0, tabAt) * 100}%)${tabAt < 0 ? ';opacity:0' : ''}"></div>
@@ -8932,7 +8941,15 @@ function renderApp() {
     ${UI.share ? renderShareSheet() : ''}
     ${UI.install ? renderInstall() : ''}
     ${UI.toast && !UI.celebrate.length ? `<div class="toast${UI.sheet || UI.share || UI.install ? ' over' : ''}" data-k="toast">${esc(UI.toast)}</div>` : ''}
-    ${UI.celebrate.length ? renderCelebration(UI.celebrate[0]) : ''}`;
+    ${UI.celebrate.length ? renderCelebration(UI.celebrate[0]) : ''}
+    ${UI.newver ? `<div class="newver" data-k="newver" role="status">
+      <div class="nv-k">New version</div>
+      <div class="nv-t">A new version of the app is ready</div>
+      <div class="nv-row">
+        <button class="nv-go" data-k="nv-go" ${on(reloadNewVersion)}>Reload</button>
+        <button class="nv-x" data-k="nv-x" ${on(dismissNewVersion)}>Not now</button>
+      </div>
+    </div>` : ''}`;
 }
 function greeting() {
   const h = new Date().getHours();
@@ -10787,7 +10804,7 @@ function renderManual() {
       ${block(h2('Your data') +
         p(`Everything is saved to your phone the moment you tap it, then synced to your coach when you have a connection. Losing signal, closing the app or flying somewhere loses nothing.`) +
         p(`<strong style="color:var(--ink)">You sign in with the username and password I sent you.</strong> Put the app on your home screen and it stays signed in. Forget the password and nothing is lost: ask me for a new one and your whole history is still there.`) +
-        p(`When I update the app, a line under the header says <strong style="color:var(--ink)">A new version of the app is ready</strong>. Tap <strong style="color:var(--ink)">Reload</strong> and it loads in a second. You don't have to close it from your phone and open it again.`) +
+        p(`When I update the app, an orange note says <strong style="color:var(--ink)">A new version of the app is ready</strong>. Tap <strong style="color:var(--ink)">Reload</strong> and it loads in a second, or <strong style="color:var(--ink)">Not now</strong> to put it away. You don't have to close it from your phone and open it again.`) +
         p(`Your coach can see your habits, and your weight if you switched that on, as part of coaching you. Other athletes never see either: on the leaderboard they see only ${light ? 'your name and points' : 'your name, points, rank and title'}.`) +
         (isFree()
           ? p(`You signed up for this without a programme, so the only other things held about you are the <strong style="color:var(--ink)">email and number you gave</strong>, used to send you your sign-in and nothing else. Ask and it is all deleted, log included. The full notice is at <strong style="color:var(--ink)">amirardekani.com/privacy.html</strong>.`)
@@ -12594,6 +12611,9 @@ function showError(msg, opts) {
 //     this page already had a worker when it loaded (_hadWorker).
 //   · An app resumed from the background never navigates, so nothing asks for a
 //     fresh sw.js unless swCheck() does, at most once every SW_CHECK_MS.
+//   · The look is the note box in the middle of the screen, in clay (Amir picked it
+//     from three, 2026-10-19). It never dims the page and never hides itself: it
+//     stays until Reload or Not now.
 //   · ⛔ NEVER IN THE EMBED (habits.html?embed=1 on the training app's Home).
 //     The iframe is a client of the same worker at scope '/', so it is claimed
 //     and controllerchange fires there too, but a reload from inside it would
@@ -12602,18 +12622,20 @@ function showError(msg, opts) {
 //   · Not in the demo or the coach's preview either.
 // ⚠️ program.html carries the same three functions. Change both.
 const SW_CHECK_MS = 20 * 60 * 1000;
-let _swReg = null, _swChecked = 0;
+let _swReg = null, _swChecked = 0, _newVerDone = false;
 // Read once, while this page loads, and never written again by the app (the headless suite sets it).
 let _hadWorker = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
 
 function versionWatchOff() { return !!(window.IS_EMBED || window.IS_DEMO || window.IS_PREVIEW); }
 
 function swTookOver() {
-  if (UI.newver || !_hadWorker || versionWatchOff()) return;
+  if (UI.newver || _newVerDone || !_hadWorker || versionWatchOff()) return;
   UI.newver = true;
   render();
 }
 function reloadNewVersion() { location.reload(); }
+// Not now: away for this run only. The next open is the new version anyway, so nothing is lost by it.
+function dismissNewVersion() { _newVerDone = true; UI.newver = false; render(); }
 
 function swCheck() {
   if (!_swReg || document.visibilityState !== 'visible') return;

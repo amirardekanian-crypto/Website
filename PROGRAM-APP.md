@@ -886,25 +886,35 @@ hand, telling athletes to swipe the app away and open it again. **Both apps now 
   sets on the screen with it. `paintNewVersion()` holds the line while `sessionUnderway()` is true and asks again
   every 30 s, so it lands the moment the session is over. `swCheck()` holds the *check* for the same window, so a
   worker does not start answering a running session's lazy loads (a rest game, the share card) from the new cache.
-- **program.html**: one line in **Home's banner** (SHEETS AND NOTICES #9, the `.plan-offline` look), under the
-  plan line, in **clay with `is-ask`** because it asks for something (DS-01) — `#home-newver`, painted by
-  `paintNewVersion()`, repainted by `goTo('home')`. A **banner, not `aaToast()`**: the note box hides itself after
-  a few seconds and this has to still be there when they look up. It is not urgent either, since the programme
-  comes live from the server, so the old version still shows today's training.
-  The words are **"A new version of the app is ready"** and the button is **Reload** (`reloadNewVersion()`, one
-  `location.reload()`), named in the guide's *Install the app* card (CNT-01).
-- **habits.html (AA Proof)**: the same words in its own look, `.newver` — one clay-striped row between the header
-  and the scroll, `UI.newver`, drawn on every screen until it is tapped.
+- **The look is the note box, in clay** — Amir picked it from three directions (2026-10-19: *"lets go with C but
+  in ckay"*; the other two are kept as a parts bin on the board). Clay because it asks for something (DS-01). It
+  sits in the middle of the screen wherever the athlete is, so it is not missed on another tab, and it **does not
+  hide itself**: it stays until **Reload** or **Not now**. It never dims or blocks the page under it.
+  The words are **"A new version of the app is ready"** under a **NEW VERSION** kicker.
+- **program.html**: `aaToast()` with `tone: 'clay'` and `ms: 0`, from `paintNewVersion()`. The two options are new:
+  `tone` paints the box in the one accent (`.aa-toast[data-tone="clay"]`, **`--clay-hero`** and **`--clay-deep`**,
+  which joined THE APP'S ONE COLOUR SET on `body`, never `:root`), and **`ms: 0`** means a note that stays until it
+  is answered. `off` is what a REAL tap on the second button does — the box going for any other reason is not an
+  answer — so Not now sets `_newVerDone` (this run only: the next cold open is the new version anyway) and tapping
+  Reload does not. Ordinary toasts are untouched: no tone, 6 s, *Got it*.
+- **habits.html (AA Proof)**: the same box and the same words in its own look, `.newver`, from `UI.newver`, drawn
+  over every screen (z 96: above its sheet and its toast, under the tour and a takeover) until one button is
+  tapped. `dismissNewVersion()` is its Not now. Its ground is `--clay-deep` with `--on-clay` on it, both of which
+  invert between the themes, so it is deep clay with cream in light and light clay with near-black in dark. ⚠️ It
+  has **its own keyframe** (`nvIn`): the app's `riseIn` ends on `transform: none`, which threw the box's own
+  centring away for the whole animation and dropped it in 81 px low.
 - **⛔ Never in the embed** (`habits.html?embed=1` on Home). The iframe is a client of the **same worker at scope
   `/`**, so it is claimed and `controllerchange` fires there too. A reload from inside it would reload the wrong
   document, and the line would sit in the habit strip. `versionWatchOff()` stands the whole thing down there, and
   `renderEmbed()` has no row to draw. **Not in the demo or the coach's preview either.**
 - **The functions exist twice, one set per app**: `swTookOver()`, `swCheck()`, `versionWatchOff()`,
   `reloadNewVersion()`, `initVersionWatch()`. Change both.
-  `node scripts/headless/new-version.js` (26 checks) runs the real pages: the first-install guard, the line, the
-  mid-session hold and its return, the Reload, the embed's silence, and that each app registers the worker through
-  `initVersionWatch()` and nowhere else. Playwright blocks service workers, so the lifecycle itself is not
-  exercised there; the suite calls the handler the lifecycle calls.
+  `node scripts/headless/new-version.js` (34 checks) runs the real pages: the first-install guard, the box and its
+  colours in both themes, that it does not hide itself and does not block the page, the mid-session hold (it is
+  also taken down if a session starts under it) and its return, Reload, Not now, that an ordinary toast is
+  unchanged, the embed's silence, and that each app registers the worker through `initVersionWatch()` and nowhere
+  else. Playwright blocks service workers, so the lifecycle itself is not exercised there; the suite calls the
+  handler the lifecycle calls.
 - **What this means for a deploy**: a `CACHE` bump is now the whole message. Nobody has to be told anything.
   ⚠️ An athlete only learns this from the version that *has* the watcher, so **v188 is the last bump anyone has to
   close and reopen for**.

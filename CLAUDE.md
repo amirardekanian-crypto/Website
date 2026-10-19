@@ -419,8 +419,10 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   to make this a rule or a memory"*; `PROGRAM-APP.md` → *A new version is ready*). **There is no rule to remember:
   the code is the rule.** An installed app left in the background keeps the OLD page until it reloads, so both
   apps watch `navigator.serviceWorker` for `controllerchange` (`initVersionWatch()`, `swTookOver()`) and say
-  **"A new version of the app is ready"** with a **Reload** — program.html as Home's clay banner (`#home-newver`,
-  `paintNewVersion()`), AA Proof as one row under its header (`UI.newver`). A **first install** says nothing
+  **"A new version of the app is ready"** with **Reload** and **Not now** — the note box in the middle of the
+  screen, **in clay** (Amir picked it from three, 2026-10-19: *"lets go with C but in ckay"*). It never hides
+  itself: program.html is `aaToast()` with the new `tone: 'clay'` and `ms: 0` (a note that stays until it is
+  answered) from `paintNewVersion()`, AA Proof the same box in its own look (`UI.newver`). A **first install** says nothing
   (`_hadWorker`), nothing is said **mid-session** (the line waits and lands when the session is over), and the
   whole thing stands down in the **embed**, the demo and the coach's preview (`versionWatchOff()`): the embed's
   iframe is a client of the same worker, so a reload there would reload the wrong document. An app resumed from

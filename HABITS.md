@@ -191,10 +191,11 @@ the first screen they ever see.
 
 An installed app left in the background keeps the OLD page in memory until it reloads, and Amir
 had been telling athletes by hand to close it and open it again. It says so itself now: when a
-`sw.js` `CACHE` bump takes the shell over, `swTookOver()` sets `UI.newver` and **one clay row
-under the header** reads **"A new version of the app is ready"** with a **Reload**. It stays until
-it is tapped. The same line is in `program.html`, in its own look, and the full account is
-`PROGRAM-APP.md` -> *A new version is ready*.
+`sw.js` `CACHE` bump takes the shell over, `swTookOver()` sets `UI.newver` and **the note box in the
+middle of the screen, in clay** (`.newver`) reads **"A new version of the app is ready"** with
+**Reload** and **Not now**. It never hides itself: it stays until one of them is tapped. Amir picked
+that look from three directions (2026-10-19). The same box is in `program.html`, in its own look, and
+the full account is `PROGRAM-APP.md` -> *A new version is ready*.
 
 What must not break here:
 - **NEVER in the embed** (`?embed=1`, the strip on the training app's Home). The iframe is a
