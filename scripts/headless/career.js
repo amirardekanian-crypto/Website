@@ -1161,7 +1161,10 @@ async function proofXp(browser, C) {
     C.check('Proof, embedded: no page errors', em.p.errs.length === 0, JSON.stringify(em.p.errs));
     await em.ctx.close();
   }
-  // 5. a phone-decided award: its XP at once (GAME-13), then withdrawn when the server says no (the award itself is the training app's now; Proof draws no line for it)
+  // 5. since the cut (stage78, 2026-10-19) there is no habit badge in the catalogue, so a tick that would have made five days of water decides
+  // nothing on the phone: no pending award, nothing to withdraw, the career XP moves by the habit alone (GAME-13). (Before the cut this block held
+  // the phone-decided habit_water tier: its XP at once, then withdrawn when the server said no. That path stays in habits.html for any badge the
+  // catalogue may hold again; with none, it is dormant.)
   {
     const prof = rwProfile(10000), waterLog = {};
     for (let i = 1; i <= 4; i++) waterLog[at(-i)] = { water: 8 };       // four days of full water: today's tick makes five
@@ -1169,25 +1172,15 @@ async function proofXp(browser, C) {
     await p.waitForTimeout(2500);
     const xp0 = await ev(p, `careerXp()`);
     await ev(p, `(setVal('water', 8), actionLevelUps(), render(), 0)`);
-    const pend = await ev(p, `phoneAwards().map(a => a.award_id + ':' + a.xp + ':' + a.size + ':' + a.day)`);
-    C.check('Proof, a tick that makes five days of water: the phone decides habit_water tier 1 at once (20 XP, a win, today)', pend.some(x => x === 'badge:habit_water:1:20:win:' + at(0)), JSON.stringify(pend));
+    const pend = await ev(p, `phoneAwards().map(a => a.award_id)`);
+    C.check('Proof, after the cut: a tick that makes five days of water decides no award on the phone (there is no habit badge)', pend.length === 0 && !catRows().some(r => r.kind === 'badge' && /^habit_/.test(r.id)), JSON.stringify(pend));
     const xp = await ev(p, `({ shown: careerXp(), pend: pendingAwardXp(), water: xpFor(habitById('water'), 8) })`);
-    C.check('Proof, the tick moves the career XP by the habit AND the pending award at once (GAME-13)', xp.pend === 20 && xp.shown === xp0 + xp.water + 20, JSON.stringify([xp0, xp]));
-    C.check('Proof, …and no takeover and no wins line for the award (it is the training app\'s)', (await celebrating(p)).length === 0 && !(await ev(p, `(CFG.wins || []).some(w => w.k === 'award')`)), JSON.stringify(await celebrating(p)));
-    // withdrawal: the push lands, the answer after it lacks the award
+    C.check('Proof, after the cut: the tick moves the career XP by the habit alone, nothing pending (GAME-13)', xp.pend === 0 && xp.shown === xp0 + xp.water, JSON.stringify([xp0, xp]));
+    C.check('Proof, …and no takeover and no wins line for an award', (await celebrating(p)).length === 0 && !(await ev(p, `(CFG.wins || []).some(w => w.k === 'award')`)), JSON.stringify(await celebrating(p)));
     await p.waitForTimeout(3500);
-    const wd = await ev(p, `({ wd: loadWithdrawn(), pend: pendingAwardXp(), pushOk: _pushOkAt > 0, shown: careerXp() })`);
-    C.check('Proof, withdrawal: after a push the server lacks it, it is withdrawn and its XP leaves (careerXp())', wd.pushOk && wd.wd.indexOf('badge:habit_water:1') >= 0 && wd.pend === 0, JSON.stringify(wd));
-    C.check('Proof, withdrawal: the XP shown falls by exactly what the pending award had added', wd.shown <= xp.shown - 20, JSON.stringify([xp.shown, wd.shown]));
-    // and when the server owns it: nothing withdrawn, nothing pending
-    await ev(p, `(localStorage.removeItem(ATHLETE_ID + '_hab_awwd'), _awwd = null, 0)`);
-    const own = rwProfile(10020, { owned: { 'badge:habit_water:1': at(0) } });
-    await ev(p, `(${stubSet(own)}, 0)`);
-    await ev(p, `fetchCareer()`);
-    await p.waitForTimeout(300);
-    const ok = await ev(p, `({ wd: loadWithdrawn().length, pend: pendingAwardXp() })`);
-    C.check('Proof, the server owns it: nothing withdrawn, nothing pending', ok.wd === 0 && ok.pend === 0, JSON.stringify(ok));
-    C.check('Proof, phone-decided award: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
+    const wd = await ev(p, `({ wd: loadWithdrawn(), pend: pendingAwardXp(), pushOk: _pushOkAt > 0 })`);
+    C.check('Proof, after the cut: after a push nothing is withdrawn and nothing is pending', wd.pushOk && wd.wd.length === 0 && wd.pend === 0, JSON.stringify(wd));
+    C.check('Proof, after the cut: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
   // 6. a dirty push, then the catalogue newly on: the XP shown does not move
@@ -1301,11 +1294,112 @@ async function crossApp(browser, C) {
 }
 
 
+// ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// FOUR COURTS: Achievements on Progress (get_achievements(), stage80), a kind opened in the sheet, the finish card's nudge
+// ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// get_achievements() as stage80 answers it: earned ones with their day, the rest with have and need, `next` the one to lead with.
+function achFx(o = {}) {
+  const items = [
+    { id: 'held', name: 'Held', meaning: 'consistency', test: 'first', reads: 'week_held', caption: 'Your first held week. Every session, on your days.', rule: 'The first week held.', size: 'highlight', xp: 100, origin: 'new', day: at(-20) },
+    { id: 'back_to_back', name: 'Back to Back', meaning: 'consistency', test: 'best_run', reads: 'week_held', caption: 'Two held weeks in a row. Keep it going.', rule: 'Two training weeks held in a row, the first time.', size: 'highlight', xp: 150, origin: 'new', have: 1, need: 2 },
+    { id: 'full_month', name: 'Full Month', meaning: 'consistency', test: 'month_held', reads: 'week_held', caption: 'Every week of the month, held. Full Month.', rule: 'Every training week that ends in a calendar month held.', size: 'milestone', xp: 400, origin: 'new', have: 0, need: 4, spoilt: true },
+    { id: 'straight_talk', name: 'Straight Talk', meaning: 'commitment', test: 'total', reads: 'checkin_done', caption: '25 honest check-ins.', rule: '25 check-ins answered before a session.', size: 'highlight', xp: 150, origin: 'new', have: o.checkins == null ? 23 : o.checkins, need: 25 },
+    { id: 'first_blood', name: 'FIRST BLOOD', meaning: 'commitment', test: 'proof', reads: 'proof', caption: 'Your first session on the board', rule: 'The first day with a session done.', size: 'win', xp: 50, origin: 'proof', day: at(-40) },
+    { id: 'season_ticket', name: 'Season Ticket', meaning: 'commitment', test: 'total', reads: 'month_with_amir', caption: 'Three months with Amir.', rule: 'Three whole months since the first session.', size: 'milestone', xp: 300, origin: 'new', have: 2, need: 3 },
+    { id: 'moving_up', name: 'Moving Up', meaning: 'progress', test: 'first', reads: 'effort_win', caption: 'Stronger at the same effort.', rule: 'The first effort-matched win at a cycle\'s end.', size: 'highlight', xp: 100, origin: 'new', have: 0, need: 1 },
+    { id: 'rebound', name: 'Bounce Back', meaning: 'resilience', test: 'first', reads: 'bounce_back', caption: 'A week went wrong. The next one did not.', rule: 'The first week held straight after a broken one.', size: 'highlight', xp: 100, origin: 'new', day: at(-6) }];
+  const nx = items.find(i => i.id === (o.next || 'straight_talk'));
+  return { athlete_id: H.ID, ready: true, items, next: nx, month: { weeks: 4, held: 1, spoilt: true } };
+}
+async function fourCourts(browser, C) {
+  const OUT = H.outDir();
+  const CLAY = /199, 85, 47|181, 70, 31|224, 107, 67/;
+  // 1. the section: the title with its count, Next up, the four tiles
+  {
+    const { ctx, p } = await openRW(browser, { facts: HOLD_FACTS, hist: ONE_DONE, stub: { myMoments: myMomentsFx(), achievements: achFx() } });
+    await waitRow(p);
+    await goProgress(p);
+    await p.waitForFunction(() => !!document.querySelector('#ach-title'), null, { timeout: 8000 }).catch(() => {});
+    const s = await p.evaluate(() => {
+      const t = document.getElementById('ach-title'), n = document.querySelector('#career-courts-wrap .ac-next');
+      const y = sel => { const e = document.querySelector(sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
+      return t ? { title: t.textContent.replace(/\s+/g, ' ').trim(),
+        next: n && { l: n.querySelector('.cs-l').textContent, nm: n.querySelector('.ac-nm').textContent, s: n.querySelector('.ac-s').textContent, bar: (n.querySelector('.cs-bar i') || {}).style && n.querySelector('.cs-bar i').style.width },
+        tiles: [...document.querySelectorAll('#career-courts-wrap .ac-tile')].map(b => ({ k: b.querySelector('.ac-k').textContent, n: b.querySelector('.ac-n').textContent.replace(/\s+/g, ' ').trim(), nw: b.querySelector('.ac-new').textContent })),
+        order: [y('.cs-card'), y('#ach-title'), y('#moments-title')],
+        clay: [...document.querySelectorAll('#career-courts-wrap, #career-courts-wrap *')].map(e => getComputedStyle(e).color + ' ' + getComputedStyle(e).backgroundColor).join('|') } : null;
+    });
+    C.check('Four Courts: "Achievements 3 of 8" under Your numbers and above Your moments', !!s && s.title === 'Achievements 3 of 8' && s.order[0] < s.order[1] && s.order[1] < s.order[2], JSON.stringify(s && [s.title, s.order]));
+    C.check('Four Courts: Next up names the closest one with its line and bar (Straight Talk, 2 more check-ins, 92%)',
+      !!s && !!s.next && s.next.l === 'Next up' && s.next.nm === 'Straight Talk' && s.next.s === '2 more check-ins before a session.' && s.next.bar === '92%', JSON.stringify(s && s.next));
+    C.check('Four Courts: four tiles in order, each with earned of all and the newest (a capitals name reads as a name)', !!s && JSON.stringify(s.tiles) === JSON.stringify([
+      { k: 'Consistency', n: '1of 3', nw: 'Held · ' + Number(at(-20).slice(8)) + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(at(-20).slice(5, 7)) - 1] },
+      { k: 'Commitment', n: '1of 3', nw: 'First Blood · ' + Number(at(-40).slice(8)) + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(at(-40).slice(5, 7)) - 1] },
+      { k: 'Progress', n: '0of 1', nw: 'None yet' },
+      { k: 'Resilience', n: '1of 1', nw: 'Bounce Back · ' + Number(at(-6).slice(8)) + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(at(-6).slice(5, 7)) - 1] }]), JSON.stringify(s && s.tiles));
+    C.check('Four Courts: no clay anywhere in the section (it asks for nothing, DS-01)', !!s && !CLAY.test(s.clay), s && s.clay.slice(0, 300));
+    await p.screenshot({ path: path.join(OUT, 'four-courts-390.png'), fullPage: true }).catch(() => {});
+    // 2. a tile opens its kind: earned first with the day, then the rest furthest along first, Next on the nearest, a bar once started
+    await p.click('#career-courts-wrap .ac-tile:nth-child(1)');
+    await p.waitForTimeout(300);
+    const k = await p.evaluate(() => {
+      const ov = document.getElementById('hist-overlay');
+      return ov && ov.classList.contains('visible') ? { title: ov.querySelector('.readiness-title').textContent, eyebrow: ov.querySelector('.readiness-eyebrow').textContent,
+        rows: [...ov.querySelectorAll('.ac-row')].map(r => ({ id: r.dataset.ach, earned: r.classList.contains('is-earned'), w: r.querySelector('.ac-w').textContent, sub: r.querySelector('.ac-sub').textContent, bar: !!r.querySelector('.ac-bar') })) } : null;
+    });
+    C.check('a tile opens its kind in the sheet: "Consistency", Achievements · 1 of 3', !!k && k.title === 'Consistency' && k.eyebrow === 'Achievements · 1 of 3', JSON.stringify(k && [k.title, k.eyebrow]));
+    C.check('the kind: Held first (earned, its caption and day), then Back to Back (Next, its line and bar), then Full Month (what earns it, no bar: this month is spoilt)',
+      !!k && k.rows.map(r => r.id).join() === 'held,back_to_back,full_month' && k.rows[0].earned && /Your first held week/.test(k.rows[0].sub)
+      && k.rows[1].w === 'Back to BackNext' && k.rows[1].sub === 'Hold this week too. 1 week to go.' && k.rows[1].bar
+      && !k.rows[2].earned && !k.rows[2].bar && /calendar month/.test(k.rows[2].sub), JSON.stringify(k && k.rows));
+    await p.screenshot({ path: path.join(OUT, 'four-courts-kind-390.png') }).catch(() => {});
+    await p.evaluate(() => history.back());
+    await p.waitForTimeout(300);
+    C.check('Back closes the kind', await p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')));
+    // 3. Next up's tap opens its kind
+    await p.click('#career-courts-wrap .ac-next');
+    await p.waitForTimeout(300);
+    C.check('Next up opens its kind (Commitment)', await p.evaluate(() => { const ov = document.getElementById('hist-overlay'); return ov.classList.contains('visible') && ov.querySelector('.readiness-title').textContent === 'Commitment'; }));
+    // 4. the nudge: one step short of a held week, of a check-in total; nothing otherwise
+    const nud = await p.evaluate(() => ({
+      week: achNudgeHTML({ weekLeft: 1, checkin: true }), week0: achNudgeHTML({ weekLeft: 0, checkin: false }), two: achNudgeHTML({ weekLeft: 2, checkin: false }) }));
+    C.check('the nudge: one more session this week gives Back to Back', /One more session this week and you get Back to Back\./.test(nud.week), nud.week);
+    C.check('the nudge: none when the session holds the week itself or two are left (Straight Talk at 23 of 25 with no check-in today is two away)', nud.week0 === '' && nud.two === '', JSON.stringify(nud));
+    C.check('Four Courts: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
+    await ctx.close();
+  }
+  // 5. the check-in nudge, and 320 px
+  {
+    const { ctx, p } = await openRW(browser, { w: 320, facts: HOLD_FACTS, hist: ONE_DONE, stub: { myMoments: myMomentsFx(), achievements: achFx({ checkins: 23 }) } });
+    await waitRow(p);
+    await goProgress(p);
+    await p.waitForFunction(() => !!document.querySelector('#ach-title'), null, { timeout: 8000 }).catch(() => {});
+    const n = await p.evaluate(() => achNudgeHTML({ weekLeft: 3, checkin: true }));
+    C.check('the nudge: today\'s check-in makes 24 of 25, so the next one gives Straight Talk', /Answer the check-in before your next session and you get Straight Talk\./.test(n), n);
+    const fit = await p.evaluate(() => { const r = [...document.querySelectorAll('#career-courts-wrap .ac-next, #career-courts-wrap .ac-tile')].map(e => e.getBoundingClientRect().right); return { right: Math.max(...r), vw: innerWidth, sideways: document.documentElement.scrollWidth > innerWidth + 1 }; });
+    C.check('320 px: Next up and the tiles fit, no sideways scroll', fit.right <= fit.vw && !fit.sideways, JSON.stringify(fit));
+    await ctx.close();
+  }
+  // 6. no answer (the server without stage80): no section, nothing else changes
+  {
+    const { ctx, p } = await openRW(browser, { facts: HOLD_FACTS, hist: ONE_DONE, stub: { myMoments: myMomentsFx() } });
+    await waitRow(p);
+    await goProgress(p);
+    await momentsReady(p);
+    const o = await p.evaluate(() => ({ title: !!document.getElementById('ach-title'), moments: !!document.getElementById('moments-title'), card: !!document.querySelector('.cs-card') }));
+    C.check('no get_achievements answer: no Achievements section, Your numbers and Your moments as before', !o.title && o.moments && o.card, JSON.stringify(o));
+    C.check('no answer: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
+    await ctx.close();
+  }
+}
+
+
 async function main() {
   const C = H.checker();
   const browser = await H.launch();
   await trainingBase(browser, C);       // the XP switch on, the catalogue off
   await trainingLight(browser, C);      // the catalogue on: Your numbers, New from Amir, the marks
+  await fourCourts(browser, C);         // Achievements on Progress: Four Courts, a kind, the nudge
   await proofXp(browser, C);            // AA Proof: the XP that still moves
   await crossApp(browser, C);           // a moment is the training app's alone
   await browser.close();

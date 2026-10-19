@@ -955,3 +955,24 @@ mostly for a day filed unfinished (`fileUnfinished()` files it as a partial sess
   and every award already minted keeps its XP; to take them off the screens too, seed a version 6 without them).
 - **Next (not built):** the Four Courts section on Progress (Amir's pick A: a Next up line, the four kinds as four tiles, a tap opens a kind) and the
   nudge on the finish card ("Hold Thursday and you get Back to Back").
+
+## Stage 80: the Four Courts read, as built (2026-10-19, not yet applied)
+
+`supabase/stage80_career_achievements_read.sql` adds `get_achievements(p_athlete_id)`, the one read the Four Courts section in AA Performance draws
+from (`PROGRAM-APP.md` → *Achievements, Four Courts*). get_awards()'s identity rule (the athlete's own; the coach's preview names one; the SQL editor
+or the service role, a report). It returns every achievement the athlete can see (one with nothing left to earn it by, a retired one, a mission's,
+a commendation's, is left out unless held; a free athlete sees the free ones), each with its kind, name, caption, rule, size, XP, the day it was
+earned, and, when not earned, `have` and `need` from the same measures `career_evaluate()` reads (one `career_measures()` pass): a count of `at`
+(a capped kind as paid), the CURRENT run of held weeks of `at`, Proof's measure, the best lift gain, goals met, this month's held weeks of the weeks
+ending in it (0 and `spoilt` once one has ended unheld), else 0 of 1. `next` leads the section: the furthest along among those with progress,
+then the nearest to done; with no progress anywhere, never a resilience one (nobody aims to miss a week), then consistency first, the smallest
+size, the least XP. It writes nothing and pays nothing.
+
+- **Measured on the live data** (a rolled-back dry run, 2026-10-19): about 0.3 s an athlete; Next up came out as Straight Talk 24/25, Half Year 5/6,
+  Back to Back 1/2, Double Up 84/100, Season Ticket 2/3, and Held for an athlete with nothing yet.
+- **Rehearsed** in `scripts/career/rehearse_achievements.mjs` section 8 (52 checks in all).
+- **The app goes first and is safe without it:** program.html asks for it beside the moments; until stage80 is applied the call fails and the section
+  is simply not drawn.
+- **To apply**, on Amir's word: the file through the Supabase tool (a migration), then the schema snapshot (`scripts/restore/README.md`), then
+  open Progress on a real login.
+- **The way back**: `scripts/career/rollback_stage80.sql` (drops the function; the section disappears).

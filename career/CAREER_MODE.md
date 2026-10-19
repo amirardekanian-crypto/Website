@@ -85,8 +85,8 @@ Crew = stage80 and the Monthly Open = stage81.
 
 **The new achievements are LIVE (2026-10-19)** (`supabase/stage79_career_achievements.sql`, rulebook version 5; `PROCEDURES.md` → *Stage 79*): 13 of
 the 15 (Smooth Operator and Showed Up Anyway left out, GAME-5), three new tests (`total`, `best_run`, `month_held`), and a quiet back-pay of 51 awards
-and 7,050 XP to 22 athletes, nobody down. Amir's word: "yes, go live with the 13 new achievements". The Four Courts section and the finish-card nudge
-are next.
+and 7,050 XP to 22 athletes, nobody down. Amir's word: "yes, go live with the 13 new achievements". **Four Courts and the finish-card nudge are built** (program.html; its read,
+`get_achievements()`, is stage80, which waits for Amir's word: `PROCEDURES.md` → *Stage 80*). Crew = stage81, the Monthly Open = stage82.
 
 **Step 4, the cut, is LIVE (2026-10-19)** (`supabase/stage78_career_cut.sql`, rulebook version 4; `PROCEDURES.md` → *Stage 78*): rank names, titles,
 the Grand Slam, skins and every badge but the four marks left the server; each paying badge award became a nameless XP fact on its day, so all 35

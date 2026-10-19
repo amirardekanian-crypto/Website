@@ -54,6 +54,13 @@
       if (whoM && S.identity && whoM !== S.identity) return res({ data: null, error: { message: 'not your profile', code: 'P0001' }, status: 400 });
       return res({ data: S.myMoments ? JSON.parse(JSON.stringify(S.myMoments)) : null, error: null, status: 200 });
     }
+    // Four Courts (stage80): get_achievements answers the stub's `achievements` (every achievement with its day or its progress, and `next`), refusing
+    // another athlete's id like the server; none set: no answer, so the section is not drawn.
+    if (name === 'get_achievements') {
+      var whoA = params && params.p_athlete_id;
+      if (whoA && S.identity && whoA !== S.identity) return res({ data: null, error: { message: 'not your profile', code: 'P0001' }, status: 400 });
+      return res({ data: S.achievements ? JSON.parse(JSON.stringify(S.achievements)) : null, error: null, status: 200 });
+    }
     if (name === 'mark_note_read') {
       var hit = 0;
       ((S.myMoments && S.myMoments.notes) || []).forEach(function (n) { if (n && n.day === (params && params.p_day) && !n.read) { n.read = true; hit++; } });

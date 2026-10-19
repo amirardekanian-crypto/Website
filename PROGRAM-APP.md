@@ -1465,6 +1465,23 @@ changed: the server, the XP and the levels are exactly as before.
   its badge, title and level cards stay drawable but nothing opens them. The Farsi card shows the mark's name in English until the pass.
 - **Tests:** `scripts/headless/career.js` (both apps), `scripts/headless/hold-serve.js`, `node scripts/check_twins.js` (`careerMoves()` is
   unchanged), `python scripts/check_career.py` (rule 23), `scripts/headless/signin.js`.
+- **Achievements, Four Courts** (Amir's pick A on the page *Achievements*, https://claude.ai/artifact/WPHuuK2Y2z4jfEQUPVdqNt; 2026-10-19), in
+  `#career-courts-wrap` between Your numbers and Your moments (`courtsHTML()`, painted by `paintCareerCard()`): the title **Achievements**
+  with *earned of all*; **Next up**, one card (the server's `next`: the furthest along, else the easiest first step, never a resilience one),
+  its name, the line of what is left (`achLine()`: *Hold this week too. 1 week to go.*, *2 more check-ins before a session.*, *1 more month with
+  Amir.*, *Your best lift is up 84%. 100% gets it.*, or the rule for a first one) and its bar; then the four kinds as four tiles 2 × 2
+  (Consistency, Commitment, Progress, Resilience: *earned of all*, the newest earned with its day, or *None yet*). A tile, or Next up, opens the
+  kind in the shared sheet (`openCourt()`, wrapped by `sheetWrap()`, so Back closes it): earned ones newest first with their caption and day,
+  then the rest, furthest along first, with what earns them (a started one: its line and a bar), the kind's nearest marked **Next**. Green and
+  grey only (DS-01). A capitals name reads as a name (`momName()`: *First Blood*). The data is `get_achievements()` (stage80), asked with
+  get_my_moments() and get_awards() in `refreshMoments()` and kept in the same `<id>_momentscache` (`MOM_T.ach`); no answer (the server without
+  stage80, offline with no copy, the demo, the coach's preview): no section, nothing else changes.
+- **The nudge on the finish card** (`achNudgeHTML()`, under the marks' lines): one green line when the session leaves the athlete one step short
+  of an achievement, from the same numbers: one plan session left this training week after this one, and holding the week gives Held or Back
+  to Back (*One more session this week and you get Back to Back.*), or the next check-in gives Straight Talk. Never a weekday (athletes move
+  their days). `careerEarn()` carries `weekLeft` and `checkin` for it.
+- **Four Courts' tests:** `scripts/headless/career.js` → `fourCourts()` (14 checks: the section, its order, Next up, the tiles, no clay, a
+  kind opened, Back, Next up's tap, both nudges and none, 320 px, no answer); the stub answers `get_achievements` from its `achievements`.
 
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 

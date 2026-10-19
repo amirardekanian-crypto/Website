@@ -16,6 +16,8 @@
 //   5. month_held's edges, by the function itself: a month not over is never decided; three weeks are not four; one broken week spoils it;
 //   6. the cost: a full evaluate and a session save, against their budgets (500 and 300 ms);
 //   7. the way back (scripts/career/rollback_stage79.sql) puts the four functions back exactly; stage79 again after it.
+//   8. stage80's read, get_achievements(): every one with its day or its progress, what is left out, Next up (and its no-progress fallback),
+//      its cost and its way back.
 // The batch's fix is proved by section 3 itself: the scratch database has no backup.career_catalogue_before, as the live one will not after 2026-11-01.
 // Who gets what on the live project is a dry run inside a rolled-back transaction (career/PROCEDURES.md → Stage 79).
 import path from 'node:path';
@@ -226,6 +228,35 @@ async function main() {
   ok(await val(db, `select count(*)::int from public.career_awards`) === nAfter, 'with the functions back, an evaluate mints nothing more (the three tests decide nothing) and takes nothing back');
   await runSql(db, stage, 'stage79 after the way back');
   ok(true, 'stage79 goes on again after the way back');
+
+  section('8. stage80: get_achievements(), what the Four Courts section reads');
+  const st80 = read(path.join(ROOT, 'supabase', 'stage80_career_achievements_read.sql'));
+  await runSql(db, st80, 'stage80'); await runSql(db, st80, 'stage80 again');
+  let gA = null;
+  const tGet = await ms(async () => { gA = await val(db, `select public.get_achievements($1)`, [A]); });
+  ok(gA && gA.ready === true && Array.isArray(gA.items), 'it answers for A, ready', gA && Object.keys(gA));
+  ok(tGet < 300, `in ${tGet} ms (budget 300)`);
+  const byId = Object.fromEntries(gA.items.map(i => [i.id, i]));
+  const earnedA = (await awardsOf(db, A)).map(a => a.item).sort();
+  ok(JSON.stringify(gA.items.filter(i => i.day).map(i => i.id).sort()) === JSON.stringify(earnedA), 'every achievement A holds is there with its day, and no other has a day', { got: gA.items.filter(i => i.day).map(i => i.id), earnedA });
+  ok(gA.items.filter(i => i.day).every(i => i.have === undefined && i.need === undefined), 'an earned one carries no progress');
+  ok(byId.half_year && byId.half_year.have === 3 && byId.half_year.need === 6 && byId.year_one.have === 3 && byId.year_one.need === 12,
+     'Half Year 3 of 6 and Year One 3 of 12 (three whole months with Amir)', [byId.half_year, byId.year_one]);
+  ok(byId.moving_up && byId.moving_up.have === 0 && byId.moving_up.need === 1, 'a "first" one not yet done: 0 of 1', byId.moving_up);
+  ok(!byId.clean_sheet && !byId.the_machinist, 'one with nothing left to earn it by (First Treble: missions are gone; The Machinist: retired) is left out unless held');
+  ok(gA.next && gA.next.id === 'half_year', `Next up is the furthest along: ${gA.next && gA.next.id}`, gA.next);
+  ok(['consistency', 'commitment', 'progress', 'resilience'].every(k => gA.items.some(i => i.meaning === k)) && gA.items.every(i => i.meaning && i.name && (i.rule || i.caption)),
+     'every item has its kind, a name and words for what earns it; all four kinds have some');
+  const gB = await val(db, `select public.get_achievements($1)`, [B]);
+  const bB = Object.fromEntries(gB.items.map(i => [i.id, i]));
+  ok(bB.back_to_back && bB.back_to_back.have === 0 && bB.back_to_back.need === 2, 'B: Back to Back reads the CURRENT run, 0 of 2 (its one held week was followed by a broken one)', bB.back_to_back);
+  ok(bB.extra_innings && bB.extra_innings.day === today, 'B: Extra Innings, earned today in section 4, has its day', bB.extra_innings);
+  ok(gB.next && gB.next.id === 'back_to_back', `B, with no progress anywhere: Next up is the easiest consistency step, Back to Back, never a resilience one or The Distance (${gB.next && gB.next.id})`, gB.next);
+  ok(gB.month && typeof gB.month.weeks === 'number' && typeof gB.month.spoilt === 'boolean', 'it says this month\'s weeks for the nudge', gB.month);
+  await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage80.sql')), 'rollback80');
+  ok(await val(db, `select to_regprocedure('public.get_achievements(text)')::text`) === null, 'the way back drops it');
+  await runSql(db, st80, 'stage80 after the way back');
+  ok(await val(db, `select to_regprocedure('public.get_achievements(text)')::text`) !== null, 'stage80 goes on again after the way back');
 
   console.log(`\n${passed} passed, ${failed} failed (${((Date.now() - t0) / 1000).toFixed(1)} s)`);
   if (failed) { console.log('\nFailed:\n  ' + fails.join('\n  ')); process.exit(1); }

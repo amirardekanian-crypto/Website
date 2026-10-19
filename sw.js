@@ -306,7 +306,7 @@
 // v175: program.html changed (2026-10-18, Career Mode phase 3, the main-lifts fix): a plan day done again in its week moves no session count (Century) and adds nothing to Home's Sessions with Amir, shipped dormant behind the catalogue switch (off): nothing an athlete sees moves until it is on.
 // v176: program.html changed (2026-10-18): Career Mode's rewards are on (the catalogue switch went on that day), so the in-app guide says it in the plain present.
 // v177: program.html and habits.html changed (2026-10-19, Career Mode round 5 step 3, the light screens): the level with no rank, Your numbers and Your moments on Progress, New from Amir on Home, habits as chips; AA Proof's career screens off.
-const CACHE = 'aap-v177';
+const CACHE = 'aap-v178';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
