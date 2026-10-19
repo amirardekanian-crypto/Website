@@ -931,9 +931,26 @@ tokens for one day; the copy is gone).
   once done this week, the name, *N blocks · M movements* or *Done this week*, and a grey › or a green **Done**. Enter and
   Space open a row or the Next up card (a document keydown listener; there was none for the old cards).
 - **The door rows** (`.hrow`, Centre Court's *Your history* recipe): white, rounded 12, a 22 px green line icon
-  (`hrowIc()`), the Space Mono label in green capitals over one line, the value in ink, the sparkline (`ncSpark()` draws
+  (`hrowIc()`), **the door's name** (below), the value in ink, the sparkline (`ncSpark()` draws
   in `currentColor` now), a grey ›. **One look with or without data** (`.quiet` changes only the words; the dark green
   fill and the dashed empty row are gone). The habits verdict *N to go* stays clay; *On target* and *Perfect* are green.
+- **The door's name** (`.hrow-l`, Number First, Amir 2026-10-19: *"the mono door labels"*; the board is
+  claude.ai/artifact/P8LrDcyxi6ExRbupUvt8sf, direction B). It was 11 px Space Mono 700, tracked and in capitals, on all 51
+  doors: the name of the place you are going, set as the smallest and least readable thing in the row, wrapping to two lines
+  at 320, and declared **six times** over. **The rule is now: the loudest thing in a door is whatever that door is for.**
+  - **A door that carries a FIGURE** keeps the figure as the headline and its name is a quiet green label (Barlow 600,
+    `--fs-small`, `--green-ink`). Exactly five rows: Personal records, Body weight, Daily habits, Hold Serve, Career.
+  - **Every other door** makes the NAME the headline, in the cycle card's fold-row recipe (`.road-ul`: Barlow 600,
+    `--fs-field`, ink, sentence case) — *Why your plan looks like this*, *Cycle 2 complete*, *Using the app*, *Tell the crew*.
+  - ⚠️ The test is **`.hrow-vv`**, the span holding the figure itself — never `.hrow-v`, which is a slot that also holds prose
+    (*How the app works*, *+ Log a max*, a session's name). ⚠️ The polarity is deliberate: the **headline is the default** and
+    the quiet label is the `:has()` branch, so a browser without `:has()` (iOS 15.0–15.3) shows every name loud instead of
+    whispering the one row this was for. **It is ONE rule over all seven scopes** (`#home-overview`, `#screen-plan`,
+    `#screen-ceiling`, `#screen-notes`, `#hist-overlay`, `#ar-body`, `#day-view .complete-crew`); the other blocks keep only
+    their `.hrow-b`. Two rows keep a rule of their own: **New from Amir** (no figure, but a 16 px headline would triple the
+    clay on Home, DS-01, so it stays small and clay) and the road's Because door, whose second line is 13 px to match the fold
+    rows it sits under. The `@media (max-width: 359px)` sparkline cut is gone with the tracked caps that caused it.
+    Guarded by `scripts/headless/home-progress.js` §5c, which also reads program.html and fails a seventh copy.
 - **Between cycles** (`betweenCyclesHTML()`): one door row first, **Cycle 2 complete** (or **Roadmap complete**),
   *Finished Oct 8 · see it on Progress*, which opens Progress, where the card says Cycle complete. Everything after it is
   unchanged.

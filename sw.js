@@ -312,9 +312,11 @@
 // v182: program.html changed (2026-10-19, Amir): Kudos is a Like, the question is Join the crew, and a Like tapped by someone not in the crew offers to join instead of doing nothing.
 // v183: program.html changed (2026-10-19, Amir): the Like and four emoji (🔥 💪 👏 😍) all out on a Bell post, drawn only while the server offers the list (stage82).
 // v184: program.html changed (2026-10-19, Amir): the chevron that opens an exercise card follows its name and the ⓘ has the right column to itself (it used to sit under the chevron, so a low thumb opened About); an open card is the same row turned green, with the body carried in and out on the card's own height.
+
 // v185: the shell did not change. This worker now leaves /pushtest/ alone too — the push reachability test (2026-10-19), which ships its own worker and must hold the test's push subscription itself.
 // v186: program.html changed (2026-10-19, Amir's slow connection): Crew asks the server for nothing unless it is opened, a photo is downloaded once and kept on the phone, and a photo is made smaller (1080 px, under 200 KB).
-const CACHE = 'aap-v186';
+// v187: program.html changed (2026-10-19, Amir): a door row's name is readable — it leads in Barlow sentence case, except on the five doors that carry a figure, where the figure leads and the name is a small green label. It was 11 px tracked mono capitals on all 51 doors.
+const CACHE = 'aap-v187';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

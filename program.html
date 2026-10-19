@@ -2475,8 +2475,7 @@
   :where(#screen-notes) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   :where(#screen-notes) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   :where(#screen-notes) .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#screen-notes) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  :where(#screen-notes) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#screen-notes) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
   :where(#screen-notes) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   :where(#screen-notes) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
   /* ══ RECORDS AND BODY WEIGHT IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════════════════════
@@ -2529,8 +2528,7 @@
   :where(#screen-ceiling) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   :where(#screen-ceiling) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   :where(#screen-ceiling) .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#screen-ceiling) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  :where(#screen-ceiling) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#screen-ceiling) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
   :where(#screen-ceiling) .hrow-v { font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   :where(#screen-ceiling) .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
   :where(#screen-ceiling) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
@@ -2759,8 +2757,7 @@
   :where(#hist-overlay) .hrow:active { background: var(--tint); }
   :where(#hist-overlay) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   :where(#hist-overlay) .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#hist-overlay) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  :where(#hist-overlay) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#hist-overlay) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
   :where(#hist-overlay) .hrow-v { font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   :where(#hist-overlay) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
 
@@ -4458,8 +4455,7 @@
   #ar-body .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   #ar-body .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   #ar-body .hrow-ic svg { width: 22px; height: 22px; }
-  #ar-body .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  #ar-body .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  #ar-body .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
   #ar-body .hrow-v { display: block; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   #ar-body .hrow-v small { display: block; margin-top: 3px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   #ar-body .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
@@ -4514,7 +4510,9 @@
      with a clay dot, the label in clay: the one clay thing on Home until it is read (DS-01). */
   #home-overview #home-note-wrap:not(:empty) { margin-top: 20px; }
   #home-overview #home-note-wrap:not(:empty) + #home-career-wrap:not(:empty) { margin-top: 0; }
-  #home-overview .from-amir .hrow-l { color: var(--clay-ink); }   /* not .note-row: that class is the exercise card's Note */
+  /* not .note-row: that class is the exercise card's Note. It carries no figure, so the shared rule would make it a 16 px
+     headline and triple the clay on Home; clay is for what asks the athlete to act (DS-01), so this row keeps the quiet size. */
+  #home-overview .from-amir .hrow-l { font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--clay-ink); text-wrap: normal; }
   #home-overview .note-av { position: relative; flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--fill);
     color: #fff; font: 700 var(--fs-label)/1 'Barlow', sans-serif; }
   #home-overview .note-av i { font-style: normal; }
@@ -4666,21 +4664,38 @@
   :where(#home-overview, #screen-plan) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   :where(#home-overview, #screen-plan) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   :where(#home-overview, #screen-plan) .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#home-overview, #screen-plan) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  :where(#home-overview, #screen-plan) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#home-overview, #screen-plan) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  /* ── THE DOOR'S NAME (Number First, Amir 2026-10-19: "the mono door labels") ────────────────────────────────────────
+     The label used to be 11 px Space Mono 700, tracked and in capitals, on all 51 doors: the name of the place you are
+     going, set as the smallest and least readable thing in the row, and declared SIX times (this block, #screen-notes,
+     #screen-ceiling, #hist-overlay, #ar-body and #day-view .complete-crew). It is ONE rule now, over all seven scopes,
+     and the other five blocks keep only their .hrow-b.
+     The rule: THE LOUDEST THING IN A DOOR IS WHATEVER THAT DOOR IS FOR.
+       · Default — the NAME is the headline, in the cycle card's fold-row recipe (.road-ul), so a door reads like the
+         rows above it: "Why your plan looks like this", "Cycle 2 complete", "Using the app", "Tell the crew".
+       · A door that carries a FIGURE keeps the figure as the headline and the name becomes a quiet green label.
+         The test is .hrow-vv, the span that holds the figure itself (Personal records, Body weight, Daily habits,
+         Hold Serve, Career) — NOT .hrow-v, which is a slot that also holds prose ("How the app works", "+ Log a max").
+     ⚠️ The polarity is deliberate: the headline is the DEFAULT and the quiet label is the :has() branch, so a browser
+     with no :has() (iOS 15.0–15.3) shows every name loud instead of whispering the one row this change was for. */
+  :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew) .hrow-l {
+    font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; letter-spacing: normal; text-transform: none; color: var(--ink); text-wrap: balance; }
+  :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew) .hrow-b:has(.hrow-vv) .hrow-l {
+    font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-wrap: normal; }
   :where(#home-overview, #screen-plan) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   :where(#home-overview, #screen-plan) .hrow-vv { white-space: nowrap; }   /* the value never breaks; the small line under it wraps whole */
   :where(#home-overview, #screen-plan) .hrow-v small { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   :where(#home-overview, #screen-plan) .hrow-v.is-togo { color: var(--clay-ink); }   /* "2 to go" asks for something */
   :where(#home-overview, #screen-plan) .hrow-v.is-ok { color: var(--green-ink); }
   :where(#home-overview, #screen-plan) .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); }
-  :where(#home-overview, #screen-plan) .hrow-sp { flex: none; color: var(--green-ink); }
+  /* the sparkline belongs to the number, so it sits on the number's line: cleared by the quiet name's own line height, never a fixed nudge (at 320 the metadata wraps to a third line) */
+  :where(#home-overview, #screen-plan) .hrow-sp { flex: none; align-self: start; margin-top: calc(var(--fs-small) * 1.3); color: var(--green-ink); }
   :where(#home-overview, #screen-plan) .hrow-sp .nc-spark { width: 60px; height: 24px; display: block; }
   :where(#home-overview, #screen-plan) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
   :where(#home-overview, #screen-plan) .hrow-sp + .hrow-a { margin-left: -4px; }
-  @media (max-width: 359px) {   /* the narrowest phone: a shorter sparkline and tighter gaps, so "PERSONAL RECORDS" stays on one line */
+  @media (max-width: 359px) {   /* the narrowest phone: tighter gaps, and one more pixel of air because 320 stacks the name, the figure and its line */
     :where(#home-overview, #screen-plan) .hrow { gap: 10px; padding-right: 12px; }
-    :where(#home-overview, #screen-plan) .hrow-sp .nc-spark { width: 44px; }
+    :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew) .hrow-b { gap: 3px; }
   }
 
   /* 7. Progress: the header (the name as the eyebrow, "Progress" as the title), a section title for each part. The This cycle cover and
@@ -4853,6 +4868,7 @@
   .road-door { padding: 2px 0 18px; }   /* past the end date the door sits directly under the current cycle's Done row */
   .road-door .hrow.road-why-door { margin: 0; }
   .road-why-door .hrow-l { text-wrap: balance; }   /* on the narrowest phone the label breaks in two even halves, never one word on a line of its own */
+  .road-why-door .hrow-q { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; }   /* this door sits inside the cycle card, under fold rows whose second line is 13 px: "7 reasons" matches them (every other .hrow-q is a sentence and keeps 15 px) */
   .bt-next { margin: 0 0 4px; }   /* Home between cycles: the road's one row, on the gutter (.road) */
 
   /* 3. The archive (a finished cycle's days, read only): a compact cover as the training day's, then each day as a block title (the
@@ -5184,8 +5200,7 @@
     border: 1px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
   :where(#day-view) .complete-crew .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
   :where(#day-view) .complete-crew .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#day-view) .complete-crew .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  :where(#day-view) .complete-crew .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .complete-crew .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }   /* .hrow-l: THE DOOR'S NAME, one shared rule (Number First, in the HOME AND PROGRESS block) */
   :where(#day-view) .complete-crew .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ink); }   /* as the WhatsApp row above it */
   :where(#day-view) .complete-crew .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
 
