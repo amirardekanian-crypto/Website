@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 61 tables, 234 functions, 8 sequences.
+-- 63 tables, 240 functions, 8 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -329,6 +329,26 @@ create table public.crew_kudos (
   line_day date,
   created_at timestamp with time zone default now() not null,
   emoji text
+);
+
+create table public.crew_open (
+  id uuid default gen_random_uuid() not null,
+  title text not null,
+  how text default ''::text not null,
+  unit text default ''::text not null,
+  better text default 'high'::text not null,
+  opened_on date default CURRENT_DATE not null,
+  closed_at timestamp with time zone,
+  created_at timestamp with time zone default now() not null
+);
+
+create table public.crew_open_results (
+  open_id uuid not null,
+  athlete_id text not null,
+  value numeric not null,
+  day date default CURRENT_DATE not null,
+  created_at timestamp with time zone default now() not null,
+  updated_at timestamp with time zone default now() not null
 );
 
 create table public.crew_photos (
@@ -4235,7 +4255,7 @@ declare
   c_athlete_tables constant text[] := array[
     'programs', 'program_versions', 'coaching_logs', 'coaching_log_versions',
     'session_history', 'athlete_progress', 'hab_notes', 'hab_titles', 'hab_season_results', 'leaderboard_optin',
-    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities', 'athlete_status', 'career_facts', 'career_scores', 'career_awards', 'career_recognition', 'courtside_marks', 'career_honours', 'career_goals', 'career_notes', 'crew_kudos', 'crew_photos', 'crew_posts', 'crew_rings', 'crew_consent', 'push_sent', 'push_subs'];
+    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities', 'athlete_status', 'career_facts', 'career_scores', 'career_awards', 'career_recognition', 'courtside_marks', 'career_honours', 'career_goals', 'career_notes', 'crew_kudos', 'crew_photos', 'crew_posts', 'crew_open_results', 'crew_rings', 'crew_consent', 'push_sent', 'push_subs'];
   -- Not clients: the public demo, and the identity coach.html reads the board through (AMIR_ATHLETE_ID there).
   c_protected constant text[] := array['demo', 'amir_ardekani'];
   -- Arabic-Indic (U+0660-0669) and Persian (U+06F0-06F9) digits, and what they fold to.
@@ -4758,6 +4778,130 @@ CREATE OR REPLACE FUNCTION public.coach_note_id()
  IMMUTABLE
 AS $function$ select '__coach__'::text $function$;
 
+CREATE OR REPLACE FUNCTION public.coach_open()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare o record; v_rows jsonb; v_past jsonb; v_crew jsonb;
+begin
+  if not public.is_coach() then raise exception 'coach only'; end if;
+  select * into o from public.crew_open where closed_at is null order by created_at desc limit 1;
+
+  if found then
+    with mem as (select * from public.crew_members())
+    select coalesce(jsonb_agg(jsonb_build_object('athlete_id', res.athlete_id, 'who', coalesce(m.name, res.athlete_id),
+                                                 'in_crew', m.athlete_id is not null, 'value', res.value, 'day', res.day)
+                              order by case when o.better = 'low' then res.value else -res.value end, res.athlete_id), '[]'::jsonb)
+      into v_rows
+      from public.crew_open_results res left join mem m on m.athlete_id = res.athlete_id
+     where res.open_id = o.id;
+  end if;
+
+  select coalesce(jsonb_agg(jsonb_build_object('id', p.id, 'title', p.title, 'unit', p.unit, 'opened_on', p.opened_on,
+                                               'closed_at', p.closed_at, 'n', (select count(*) from public.crew_open_results x where x.open_id = p.id))
+                            order by p.closed_at desc), '[]'::jsonb)
+    into v_past
+    from (select * from public.crew_open where closed_at is not null order by closed_at desc limit 5) p;
+
+  select coalesce(jsonb_agg(jsonb_build_object('athlete_id', m.athlete_id, 'who', m.name) order by m.name), '[]'::jsonb)
+    into v_crew from public.crew_members() m;
+
+  return jsonb_build_object(
+    'open', case when o.id is null then null else
+      jsonb_build_object('id', o.id, 'title', o.title, 'how', o.how, 'unit', o.unit, 'better', o.better, 'opened_on', o.opened_on) end,
+    'results', coalesce(v_rows, '[]'::jsonb), 'past', v_past, 'crew', v_crew, 'at', now());
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.coach_open_close()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  if not public.is_coach() then raise exception 'coach only'; end if;
+  update public.crew_open set closed_at = now() where closed_at is null;
+  return public.coach_open();
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.coach_open_remove(p_athlete text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare o record;
+begin
+  if not public.is_coach() then raise exception 'coach only'; end if;
+  select * into o from public.crew_open where closed_at is null order by created_at desc limit 1;
+  if not found then raise exception 'no challenge is open'; end if;
+  delete from public.crew_open_results where open_id = o.id and athlete_id = btrim(coalesce(p_athlete, ''));
+  delete from public.crew_rings where kind = 'open' and ref = o.id::text and athlete_id = btrim(coalesce(p_athlete, ''));
+  return public.coach_open();
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.coach_open_result(p_athlete text, p_value numeric, p_day date DEFAULT NULL::date)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare o record; v_text text; v_rings boolean;
+begin
+  if not public.is_coach() then raise exception 'coach only'; end if;
+  if nullif(btrim(coalesce(p_athlete, '')), '') is null then raise exception 'which athlete?'; end if;
+  if p_value is null then raise exception 'what result?'; end if;
+  if not exists (select 1 from public.programs p where p.athlete_id = btrim(p_athlete)) then
+    raise exception 'no athlete "%"', btrim(p_athlete);
+  end if;
+  select * into o from public.crew_open where closed_at is null order by created_at desc limit 1;
+  if not found then raise exception 'no challenge is open'; end if;
+
+  insert into public.crew_open_results (open_id, athlete_id, value, day)
+       values (o.id, btrim(p_athlete), p_value, coalesce(p_day, current_date))
+  on conflict (open_id, athlete_id) do update set value = excluded.value, day = excluded.day, updated_at = now();
+
+  v_text := 'posted ' || rtrim(btrim(to_char(p_value, 'FM999999990.99')), '.')
+            || case when o.unit <> '' then ' ' || o.unit else '' end || ' in ' || o.title;
+  select coalesce((m.kinds ->> 'open')::boolean, true)
+    into v_rings from public.crew_members() m where m.athlete_id = btrim(p_athlete);
+  if coalesce(v_rings, false) then
+    insert into public.crew_rings (athlete_id, kind, ref, day, value)
+         values (btrim(p_athlete), 'open', o.id::text, current_date, jsonb_build_object('text', v_text))
+    on conflict (athlete_id, kind, ref) do update
+      set value = excluded.value, day = excluded.day, created_at = now()
+    where public.crew_rings.value is distinct from excluded.value;
+  end if;
+  return public.coach_open();
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.coach_open_set(p_title text, p_how text DEFAULT ''::text, p_unit text DEFAULT ''::text, p_better text DEFAULT 'high'::text, p_id uuid DEFAULT NULL::uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_id uuid; v_title text := btrim(coalesce(p_title, '')); v_better text := lower(btrim(coalesce(p_better, 'high')));
+begin
+  if not public.is_coach() then raise exception 'coach only'; end if;
+  if char_length(v_title) < 1 or char_length(v_title) > 60 then raise exception 'the challenge needs a name, up to 60 characters'; end if;
+  if v_better not in ('high', 'low') then raise exception 'better is high or low, not %', v_better; end if;
+
+  if p_id is not null then
+    update public.crew_open set title = v_title, how = left(coalesce(p_how, ''), 400), unit = left(btrim(coalesce(p_unit, '')), 16), better = v_better
+     where id = p_id and closed_at is null returning id into v_id;
+    if v_id is null then raise exception 'no such challenge is open'; end if;
+  else
+    update public.crew_open set closed_at = now() where closed_at is null;
+    insert into public.crew_open (title, how, unit, better)
+         values (v_title, left(coalesce(p_how, ''), 400), left(btrim(coalesce(p_unit, '')), 16), v_better)
+      returning id into v_id;
+  end if;
+  return public.coach_open();
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.coach_save_spine(p_id text, p_entry jsonb, p_entry_snap jsonb, p_coach jsonb, p_coach_snap jsonb)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -5258,6 +5402,36 @@ AS $function$
    where c.answer = 'yes' and not c.under13 and c.athlete_id not in ('demo', public.coach_note_id())
      and not exists (select 1 from public.athlete_status s where s.athlete_id = c.athlete_id and s.status = 'former')
 $function$;
+
+CREATE OR REPLACE FUNCTION public.crew_open_now(p_viewer text DEFAULT NULL::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare o record; v_rows jsonb; v_me jsonb;
+begin
+  select * into o from public.crew_open where closed_at is null order by created_at desc limit 1;
+  if not found then return null; end if;
+
+  with mem as (select * from public.crew_members()),
+  r as (
+    select res.athlete_id, res.value, res.day, m.name
+      from public.crew_open_results res join mem m on m.athlete_id = res.athlete_id
+     where res.open_id = o.id),
+  ranked as (
+    select r.*, rank() over (order by case when o.better = 'low' then r.value else -r.value end) as place from r)
+  select coalesce(jsonb_agg(jsonb_build_object('who', ranked.name, 'value', ranked.value, 'place', ranked.place,
+                                               'me', ranked.athlete_id is not distinct from p_viewer)
+                            order by ranked.place, ranked.name), '[]'::jsonb)
+    into v_rows from ranked;
+
+  select jsonb_build_object('value', res.value, 'day', res.day) into v_me
+    from public.crew_open_results res where res.open_id = o.id and res.athlete_id is not distinct from p_viewer;
+
+  return jsonb_build_object('id', o.id, 'title', o.title, 'how', o.how, 'unit', o.unit, 'better', o.better,
+                            'opened_on', o.opened_on, 'board', v_rows, 'mine', v_me);
+end $function$;
 
 CREATE OR REPLACE FUNCTION public.crew_photo(p_post uuid)
  RETURNS jsonb
@@ -5837,7 +6011,7 @@ begin
   end if;
 
   return jsonb_build_object('athlete_id', v_id, 'me', public.crew_me(v_id), 'items', v_items, 'honours', v_hon, 'kinds', to_jsonb(public.crew_kind_list()),
-                            'days', 7, 'emoji', to_jsonb(public.crew_emoji_list()), 'at', now());
+                            'days', 7, 'emoji', to_jsonb(public.crew_emoji_list()), 'open', public.crew_open_now(v_id), 'at', now());
 end $function$;
 
 CREATE OR REPLACE FUNCTION public.get_bell_if_new(p_athlete_id text DEFAULT NULL::text, p_etag text DEFAULT NULL::text)
@@ -8405,6 +8579,13 @@ alter table public.crew_kudos add constraint crew_kudos_emoji_check CHECK (((emo
 alter table public.crew_kudos add constraint crew_kudos_line CHECK (((to_athlete IS NULL) = (line_day IS NULL)));
 alter table public.crew_kudos add constraint crew_kudos_one_target CHECK (((post_id IS NOT NULL) <> (to_athlete IS NOT NULL)));
 alter table public.crew_kudos add constraint crew_kudos_pkey PRIMARY KEY (id);
+alter table public.crew_open add constraint crew_open_better_check CHECK ((better = ANY (ARRAY['high'::text, 'low'::text])));
+alter table public.crew_open add constraint crew_open_how_check CHECK ((char_length(how) <= 400));
+alter table public.crew_open add constraint crew_open_pkey PRIMARY KEY (id);
+alter table public.crew_open add constraint crew_open_title_check CHECK (((char_length(btrim(title)) >= 1) AND (char_length(btrim(title)) <= 60)));
+alter table public.crew_open add constraint crew_open_unit_check CHECK ((char_length(unit) <= 16));
+alter table public.crew_open_results add constraint crew_open_results_pkey PRIMARY KEY (open_id, athlete_id);
+alter table public.crew_open_results add constraint crew_open_results_value_check CHECK (((value > ('-1000000'::integer)::numeric) AND (value < (1000000)::numeric)));
 alter table public.crew_photos add constraint crew_photos_bytes_check CHECK (((octet_length(bytes) >= 100) AND (octet_length(bytes) <= 450000)));
 alter table public.crew_photos add constraint crew_photos_h_check CHECK (((h IS NULL) OR ((h >= 1) AND (h <= 4000))));
 alter table public.crew_photos add constraint crew_photos_mime_check CHECK ((mime = 'image/jpeg'::text));
@@ -8489,6 +8670,7 @@ alter table public.athlete_identities add constraint athlete_identities_user_id_
 alter table public.buyer_notes add constraint buyer_notes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
 alter table public.chat_messages add constraint chat_messages_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE;
 alter table public.crew_kudos add constraint crew_kudos_post_id_fkey FOREIGN KEY (post_id) REFERENCES crew_posts(id) ON DELETE CASCADE;
+alter table public.crew_open_results add constraint crew_open_results_open_id_fkey FOREIGN KEY (open_id) REFERENCES crew_open(id) ON DELETE CASCADE;
 alter table public.crew_photos add constraint crew_photos_post_id_fkey FOREIGN KEY (post_id) REFERENCES crew_posts(id) ON DELETE CASCADE;
 alter table public.exercise_coach add constraint exercise_coach_id_fkey FOREIGN KEY (id) REFERENCES exercises(id) ON DELETE CASCADE;
 alter table public.tps_accounts add constraint tps_accounts_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
@@ -8513,6 +8695,9 @@ CREATE UNIQUE INDEX crew_kudos_line_uq ON public.crew_kudos USING btree (athlete
 CREATE UNIQUE INDEX crew_kudos_post_uq ON public.crew_kudos USING btree (athlete_id, post_id) WHERE (post_id IS NOT NULL);
 CREATE INDEX crew_kudos_postx_idx ON public.crew_kudos USING btree (post_id) WHERE (post_id IS NOT NULL);
 CREATE INDEX crew_kudos_to_idx ON public.crew_kudos USING btree (to_athlete, line_day) WHERE (to_athlete IS NOT NULL);
+CREATE INDEX crew_open_live_idx ON public.crew_open USING btree (created_at DESC) WHERE (closed_at IS NULL);
+CREATE INDEX crew_open_results_board_idx ON public.crew_open_results USING btree (open_id, value);
+CREATE INDEX crew_open_results_who_idx ON public.crew_open_results USING btree (athlete_id);
 CREATE INDEX crew_photos_who_idx ON public.crew_photos USING btree (athlete_id, created_at);
 CREATE INDEX crew_posts_at_idx ON public.crew_posts USING btree (created_at DESC);
 CREATE INDEX crew_posts_who_idx ON public.crew_posts USING btree (athlete_id, created_at);
@@ -8586,6 +8771,8 @@ alter table public.course_en enable row level security;
 alter table public.courtside_marks enable row level security;
 alter table public.crew_consent enable row level security;
 alter table public.crew_kudos enable row level security;
+alter table public.crew_open enable row level security;
+alter table public.crew_open_results enable row level security;
 alter table public.crew_photos enable row level security;
 alter table public.crew_posts enable row level security;
 alter table public.crew_rings enable row level security;
@@ -8665,6 +8852,8 @@ create policy "coach manage coaching logs" on public.coaching_logs as permissive
 create policy "coach manages course_en" on public.course_en as permissive for ALL to authenticated using (( SELECT is_coach() AS is_coach)) with check (( SELECT is_coach() AS is_coach));
 create policy "coach reads courtside marks" on public.courtside_marks as permissive for SELECT to authenticated using (( SELECT is_coach() AS is_coach));
 create policy "coach reads crew consent" on public.crew_consent as permissive for SELECT to authenticated using (( SELECT is_coach() AS is_coach));
+create policy "crew_open_coach_read" on public.crew_open as permissive for SELECT to authenticated using (is_coach());
+create policy "crew_open_results_coach_read" on public.crew_open_results as permissive for SELECT to authenticated using (is_coach());
 create policy "coach manage cycle_reports" on public.cycle_reports as permissive for ALL to authenticated using (is_coach()) with check (is_coach());
 create policy "coach reads erasure log" on public.erasure_log as permissive for SELECT to authenticated using (( SELECT is_coach() AS is_coach));
 create policy "coach all exercise_coach" on public.exercise_coach as permissive for ALL to public using (is_coach()) with check (is_coach());
@@ -8797,6 +8986,12 @@ grant select on table public.crew_consent to authenticated;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.crew_consent to service_role;
 revoke all on table public.crew_kudos from public, anon, authenticated, service_role;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.crew_kudos to service_role;
+revoke all on table public.crew_open from public, anon, authenticated, service_role;
+grant select on table public.crew_open to authenticated;
+grant select, insert, update, delete, truncate, references, trigger, maintain on table public.crew_open to service_role;
+revoke all on table public.crew_open_results from public, anon, authenticated, service_role;
+grant select on table public.crew_open_results to authenticated;
+grant select, insert, update, delete, truncate, references, trigger, maintain on table public.crew_open_results to service_role;
 revoke all on table public.crew_photos from public, anon, authenticated, service_role;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.crew_photos to service_role;
 revoke all on table public.crew_posts from public, anon, authenticated, service_role;
@@ -9127,6 +9322,16 @@ revoke all on function public.coach_login_use() from public, anon, authenticated
 grant execute on function public.coach_login_use() to authenticated, service_role;
 revoke all on function public.coach_note_id() from public, anon, authenticated, service_role;
 grant execute on function public.coach_note_id() to anon, authenticated, service_role, public;
+revoke all on function public.coach_open() from public, anon, authenticated, service_role;
+grant execute on function public.coach_open() to authenticated, service_role;
+revoke all on function public.coach_open_close() from public, anon, authenticated, service_role;
+grant execute on function public.coach_open_close() to authenticated, service_role;
+revoke all on function public.coach_open_remove(p_athlete text) from public, anon, authenticated, service_role;
+grant execute on function public.coach_open_remove(p_athlete text) to authenticated, service_role;
+revoke all on function public.coach_open_result(p_athlete text, p_value numeric, p_day date) from public, anon, authenticated, service_role;
+grant execute on function public.coach_open_result(p_athlete text, p_value numeric, p_day date) to authenticated, service_role;
+revoke all on function public.coach_open_set(p_title text, p_how text, p_unit text, p_better text, p_id uuid) from public, anon, authenticated, service_role;
+grant execute on function public.coach_open_set(p_title text, p_how text, p_unit text, p_better text, p_id uuid) to authenticated, service_role;
 revoke all on function public.coach_save_spine(p_id text, p_entry jsonb, p_entry_snap jsonb, p_coach jsonb, p_coach_snap jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.coach_save_spine(p_id text, p_entry jsonb, p_entry_snap jsonb, p_coach jsonb, p_coach_snap jsonb) to authenticated, service_role;
 revoke all on function public.coach_season_levels(p_ids text[]) from public, anon, authenticated, service_role;
@@ -9167,6 +9372,8 @@ revoke all on function public.crew_me(p_id text) from public, anon, authenticate
 grant execute on function public.crew_me(p_id text) to service_role;
 revoke all on function public.crew_members() from public, anon, authenticated, service_role;
 grant execute on function public.crew_members() to service_role;
+revoke all on function public.crew_open_now(p_viewer text) from public, anon, authenticated, service_role;
+grant execute on function public.crew_open_now(p_viewer text) to service_role;
 revoke all on function public.crew_photo(p_post uuid) from public, anon, authenticated, service_role;
 grant execute on function public.crew_photo(p_post uuid) to authenticated, service_role;
 revoke all on function public.crew_post(p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb) from public, anon, authenticated, service_role;

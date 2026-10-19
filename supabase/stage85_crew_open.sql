@@ -29,7 +29,11 @@
 --   · `coach_erase_person()` learns `crew_open_results` (the challenge itself names nobody).
 -- Rehearsed in `scripts/career/rehearse_crew.mjs` section 16 (PGlite, beside the rest of Crew). The way back: `scripts/career/rollback_stage85.sql`.
 -- Safe to re-run.
--- NOT YET APPLIED.
+-- APPLIED to the live project 2026-10-19 on Amir's word ("yes, apply stage85 and switch the Monthly Open on"), as the migration stage85_crew_open.
+-- Read back: both tables with row-level security on and one coach-read policy each, nothing for anon, the five coach functions signed-in only and
+-- the read the service role's, get_bell() patched once and answering `open: null` until a challenge is set, coach_erase_person() holding
+-- crew_open_results. supabase/schema_snapshot.sql remade in the same commit (63 tables, 240 functions) with both tables in BACKUP_TABLES and in
+-- scripts/restore/seed_made_up.sql, so the restore path stays whole (49 of 49).
 
 -- ── 0. The guard ────────────────────────────────────────────────────────────────────────────────────────────────────────
 do $stage85_guard$

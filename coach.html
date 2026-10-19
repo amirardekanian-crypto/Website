@@ -2200,7 +2200,8 @@ const BACKUP_TABLES = [
   // ⚠ The Monthly Open (stage85) is the other way round: a challenge and the results Amir confirmed are a RECORD, not a post. They are not deleted
   // after 7 days, they are months of work in a handful of rows, and nothing else could rebuild them. So the Open's two tables are ADDED HERE the
   // day stage85 is applied, in the same commit as the new schema snapshot (test_restore_backup.py check 1h holds the two equal, and it reads the
-  // quoted names out of this block, so do not write a table name in quotes in a comment).
+  // quoted names out of this block, so do not write a table name in quotes in a comment). Applied 2026-10-19, so here they are:
+  'crew_open', 'crew_open_results',
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
   'library', 'library_categories', 'library_sessions',

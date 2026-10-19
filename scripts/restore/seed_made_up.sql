@@ -94,6 +94,15 @@ insert into public.crew_consent (athlete_id, answer, kinds, name, under13, crew_
   ('ava_test', 'yes', '{"best": false}', 'Ava T.', false, '11111111-2222-4333-8444-555555555555', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00'),
   ('gone_test', 'no', '{}', null, false, '22222222-3333-4444-8555-666666666666', '2026-10-18 10:00:00+00', '2026-10-18 09:30:00+00', null, '2026-10-18 10:00:00+00');
 
+-- The Monthly Open (stage85): the other way round from the Bell's short-lived tables. A challenge and the results Amir confirmed are a RECORD,
+-- not a post: they are never swept, and a restore must bring them back, so both ARE backed up and both are seeded here.
+insert into public.crew_open (id, title, how, unit, better, opened_on, closed_at, created_at) values
+  ('33333333-4444-4555-8666-777777777777', 'Wall Sit', 'Back to the wall, knees at 90. Send me the clip.', 'seconds', 'high', '2026-10-18', null, '2026-10-18 08:00:00+00'),
+  ('44444444-5555-4666-8777-888888888888', 'The Hundred', 'A hundred reps, any way you like.', 'minutes', 'low', '2026-09-01', '2026-09-30 20:00:00+00', '2026-09-01 08:00:00+00');
+insert into public.crew_open_results (open_id, athlete_id, value, day, created_at, updated_at) values
+  ('33333333-4444-4555-8666-777777777777', 'ava_test', 95, '2026-10-18', '2026-10-18 12:00:00+00', '2026-10-18 12:00:00+00'),
+  ('44444444-5555-4666-8777-888888888888', 'gone_test', 7.5, '2026-09-20', '2026-09-20 12:00:00+00', '2026-09-20 12:00:00+00');
+
 -- The phones that asked for a reminder (stage84). This one IS backed up, because a restore without it
 -- would cost every athlete the single notification permission their browser gives, and that cannot be
 -- asked for twice. push_sent (what went out today) and push_config (the VAPID private key and the
