@@ -1,0 +1,16 @@
+{
+  "name": "Push test",
+  "short_name": "Push test",
+  "description": "Checks whether a notification can reach this phone.",
+  "start_url": "/pushtest/",
+  "scope": "/pushtest/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAF7F2",
+  "theme_color": "#0E4A36",
+  "lang": "en-GB",
+  "icons": [
+    { "src": "/assets/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
