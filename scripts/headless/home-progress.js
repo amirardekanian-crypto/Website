@@ -191,7 +191,7 @@ function noStrip(browser) {
       const gh = [...APP_GUIDE].find(c => c.title === 'Getting around'), st = [...APP_GUIDE].find(c => c.title === 'How your programme is structured'), rec = [...APP_GUIDE].find(c => /Personal Records/.test(c.title));
       const labels = (gh.body.match(/<li><strong>([^<]+)<\/strong>/g) || []).map(s => s.replace(/<[^>]+>/g, ''));
       return { labels, game: /<strong>Game Plan<\/strong> —/.test(gh.body), progress: /Progress<\/strong> is how it's going/.test(gh.body), home: /Home<\/strong> is your week/.test(gh.body),
-        struct: /Game Plan<\/strong> explains/.test(st.body), structOk: /on <strong>Progress<\/strong>, in the Game Plan/.test(st.body), rec: /Open <strong>Progress<\/strong>/.test(rec.body) };
+        struct: /Game Plan<\/strong> explains/.test(st.body), structOk: /on <strong>Progress<\/strong>, in the Game Plan/.test(st.body) && /Tap <strong>Why this cycle matters<\/strong> for the rest of the note and <strong>Expected outcomes<\/strong>/.test(st.body), rec: /Open <strong>Progress<\/strong>/.test(rec.body) };
     });
     t.check('the guide, Getting around: the tabs in the new order and names, Game Plan no longer a tab', g.labels.join() === 'Home,Progress,Library,Coach' && !g.game && g.progress && g.home, JSON.stringify(g));
     t.check('the guide: "Why This Cycle Matters" is on Progress; Personal Records is opened from Progress', g.structOk && !g.struct && g.rec, JSON.stringify(g));
@@ -410,15 +410,17 @@ function noStrip(browser) {
       const sec = document.querySelector('#road-wrap .prog-sec'), numbers = document.getElementById('numbers-title');
       const pad = el => Math.round((el.getBoundingClientRect().left + parseFloat(getComputedStyle(el).paddingLeft)) * 10) / 10;
       return { title: left('.prog-title', true), badge: left('.sport-badge'), card: left('.cyc-card'), numbers: pad(numbers), ceiling: left('#ceiling-row-wrap .hrow'), weight: left('#weight-row-wrap .hrow'),
-        plan: pad(sec), road: left('.road'), row: left('.road-row'), nowRow: left('.road-row.is-now .road-head'), why: left('.road-why-door'), aims: left('.road-row.is-now .road-n', true), whyText: left('.road-row.is-now .road-sec', true) };
+        plan: pad(sec), road: left('.road'), row: left('.road-row'), nowRow: left('.road-row.is-now .road-head'), why: left('.road-why-door'), aims: left('.road-row.is-now .road-n', true), secText: left('.road-row.is-now .road-sec', true), aimText: left('.road-row.is-now .road-aim', true) };
     });
     const prEdges = Object.entries(q).filter(([k, v]) => v != null);
-    // the title's glyph has a side bearing: allow 3 px for the 44 px capitals. The road's rows, the Now row's head and its door row start on the gutter; the aim numbers (01) sit in
-    // the numeral's column, so they start there too; the section titles inside a row start under the cycle's name (the 54 px of the numeral column and its gap).
-    const inner = prEdges.filter(([k]) => k !== 'whyText');
+    // the title's glyph has a side bearing: allow 3 px for the 44 px capitals. The road's rows, the Now row's head and its door row start on the gutter; the aim numbers (1, 2) sit in
+    // the numeral column of the aims, so they start there too (Doors, 2026-10-19); the section title inside a row starts on the gutter as well (its hairline runs to the edge), and the
+    // aims' text sits on the card's one text edge, 38 px in (a 30 px numeral column and an 8 px gap).
+    const inner = prEdges.filter(([k]) => k !== 'secText' && k !== 'aimText');
     t.check(`Progress ${w}: the header, the card, both section titles, the number rows, the road, its rows and the Why your plan row start at ${want} px`,
       inner.length >= 11 && inner.every(([k, v]) => Math.abs(v - want) <= (k === 'title' ? 3 : k === 'aims' ? 2 : 0.6)), JSON.stringify(prEdges));
-    t.check(`Progress ${w}: a section title inside the Now row starts under the cycle's name (${want} + 54 px)`, q.whyText != null && Math.abs(q.whyText - (want + 54)) <= 1, JSON.stringify(q));
+    t.check(`Progress ${w}: the section title inside the Now row starts on the gutter (${want} px) and the aims' text on the card's text edge (${want} + 38 px)`,
+      q.secText != null && Math.abs(q.secText - want) <= 1 && q.aimText != null && Math.abs(q.aimText - (want + 38)) <= 1, JSON.stringify(q));
     t.check(`gutter ${w}: no page errors`, p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }

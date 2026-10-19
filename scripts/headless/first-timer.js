@@ -173,7 +173,7 @@ const t = H.checker();
     await p.evaluate(() => goTo('plan')); await p.waitForTimeout(300);
     const on = () => p.evaluate(() => document.querySelector('.screen.active').id);
     const row = () => p.evaluate(() => { const r = document.querySelector('#road-wrap .road-row.is-now'); return { open: r.classList.contains('is-open'), exp: r.querySelector('.road-head').getAttribute('aria-expanded') }; });
-    await p.evaluate(() => { const b = document.querySelector('#road-wrap .road-row.is-now .road-aims, #road-wrap .road-row.is-now .road-why'); if (b) b.click(); });
+    await p.evaluate(() => { for (const sel of ['.road-aims', '.road-from', '.road-ubtn']) { const b = document.querySelector('#road-wrap .road-row.is-now ' + sel); if (!b) throw new Error('the Now card has no ' + sel); b.click(); } });   // his line, the aims and a fold row: none of them leaves Progress
     t.check('tapping the current cycle\'s text stays on Progress, still open', (await on()) === 'screen-plan' && (await row()).open, await on());
     await p.evaluate(() => document.querySelector('#road-wrap .road-row.is-now .road-head').click()); await p.waitForTimeout(300);
     t.check('tapping the current cycle\'s row folds it, and stays on Progress', (await on()) === 'screen-plan' && !(await row()).open && (await row()).exp === 'false', JSON.stringify(await row()));

@@ -308,7 +308,8 @@
 // v177: program.html and habits.html changed (2026-10-19, Career Mode round 5 step 3, the light screens): the level with no rank, Your numbers and Your moments on Progress, New from Amir on Home, habits as chips; AA Proof's career screens off.
 // v179: program.html changed (2026-10-19): the Coach's Note on an open circuit sits under its green head, a tap on a unit button (kg, lb or plates) opens a menu of the three and says what it changed, with Undo, instead of cycling, and the unit is a tag inside each superset weight box (Name Tag) and a plain header word over a set table's weights.
 // v180: program.html changed (2026-10-19, Career Mode round 5 step 5): Crew and the Bell, a tab that appears only once the server answers get_bell() (stage81); Tell the crew on the finished card.
-const CACHE = 'aap-v180';
+// v181: program.html changed (2026-10-19): Progress's open Now card is short (Doors): the tagline, the aims, Amir's first sentence signed, and the rest of his note and the outcomes behind two rows that open on a tap; the outcomes are dots, not ticks.
+const CACHE = 'aap-v181';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

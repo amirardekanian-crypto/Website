@@ -51,8 +51,13 @@ weight from" are wrong and must not appear in the cycle message, outcomes, or no
 is the *program* changing (RPE targets, rep numbers, exercise selection) driven by what they
 log — never "here's your number." (PRG-7)
 
+Progress's Now card shows only the FIRST SENTENCE of paragraph 1 (signed, as a headline up to
+100 characters); the rest of the note sits behind a tap (Doors, 2026-10-19). Write that sentence
+so it stands alone: no greeting, no name.
+
 **OUTCOMES** — 3–6 concrete, measurable, athlete-specific results for THIS cycle. Short
-phrases, not sentences (they render as a ticked checklist).
+phrases, not sentences (they render as a dotted list behind an "Expected outcomes" row; a tick
+would say they are done).
 
 ## PART 2 — NEXT CYCLE TEASER
 3–4 lines that make them want to earn it; reveal no specific exercises or structure.

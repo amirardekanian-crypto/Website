@@ -4760,7 +4760,7 @@
      Barlow 600 over a mono line ("WEEKS 6–10 · NOW"); at the right a chevron (a fold: grey ⌄, turned when open), a grey › (the cycle
      before this one opens its archive), a lock (a cycle that is not open yet) or the Now tag. Done: the numeral solid. Now: outlined
      green, a mint tag, OPEN. Up next: outlined grey-green, closed. Locked: outlined grey, a lock. The same row is Home's Up next. */
-  .road { --road-ind: 54px; margin: 0 var(--g); }
+  .road { --road-ind: 54px; --road-edge: 38px; margin: 0 var(--g); }   /* --road-edge: the text edge inside an open row (a 30 px numeral column and an 8 px gap) */
   .road-row ~ .road-row { border-top: 1px solid var(--hair); }   /* ~, not +: the Why door can sit between two rows */
   .road-head { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; column-gap: 10px; width: 100%; min-height: 64px; margin: 0; padding: 10px 0;
     border: 0; border-radius: 0; background: transparent; color: var(--ink); text-align: left; font: inherit; cursor: default; }
@@ -4793,29 +4793,66 @@
   .road-row.is-open > .road-body > .road-in { visibility: visible; transition-delay: 0s; }
   .road-in::after { content: ''; display: block; height: 18px; }
   @media (prefers-reduced-motion: reduce) { .road-body, .road-in, .road-chev { transition: none; } }
-  /* inside a row: the tagline, the aims (01, 02 in Space Mono green), why it matters (Amir's words, the clay quote of the Coach's note),
-     the outcomes (a green tick). Text starts under the cycle's name; each marker sits in the numeral's column. */
+  /* inside a row: DOORS (Amir, 2026-10-19: "i actually like the doors, being closed, and then can be opened to read"; board
+     claude.ai/artifact/D8m45y13GcDWgPB3e4gjVL, direction C). The card is short. Every row opens on the tagline (it hangs from the cycle's
+     name) and The aims: a green numeral, the sentence at the card's ONE text edge (--road-edge, 38 px from the gutter). The Now row
+     adds Amir's first sentence, signed; the rest of his note and the outcomes fold behind two rows (.road-unit, the .ceil-help grammar:
+     a hairline, a 22 px green icon, the title, a grey line, the one chevron) above the Because door. The outcomes are expectations, so
+     a plain 6 px dot: never a tick (a tick is Done) and never a ring (a ring is the tap-to-log circle). One clay thing: the stripe on
+     his signed line. Every word is Amir's, shown once, verbatim. */
   .road-tagline { margin: 0 0 2px var(--road-ind); font: italic 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--grey); }
-  .road-sec { margin: 20px 0 4px var(--road-ind); font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.6px; text-transform: uppercase; color: var(--green-ink); }
-  .road-aims, .road-outs { list-style: none; margin: 0; padding: 0; }
-  .road-aims li, .road-outs li { display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 10px; padding: 10px 0; }
-  .road-aims li { align-items: baseline; }
-  .road-aims li + li, .road-outs li + li { border-top: 1px solid var(--hair); }
-  .road-n { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; color: var(--green-ink); }
-  .road-aim, .road-out { font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
-  .road-ck { display: inline-flex; width: 18px; height: 18px; margin-top: 2px; color: var(--green-ink); }
-  .road-ck svg { width: 18px; height: 18px; }
-  .road-why { position: relative; margin: 2px 0 0; padding: 8px 0 0 var(--road-ind); }
-  .road-why::before { content: '\201C'; position: absolute; left: 0; top: 6px; width: 44px; font: 900 var(--fs-display)/1 'Barlow Condensed', sans-serif; color: var(--clay); }
-  .road-why p { font: 500 var(--fs-field)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
-  .road-why p + p { margin-top: 10px; }
-  .road-lead { margin: 2px 0 0 var(--road-ind); font: 500 var(--fs-lead)/1.35 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
-  .road-paras { margin: 8px 0 0 var(--road-ind); }
+  /* a section title: the training day's block-title look (condensed capitals in green, a hairline to the edge) */
+  .road-sec { display: flex; align-items: center; gap: 12px; margin: 24px 0 10px; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
+  .road-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }
+  .road-aims { list-style: none; margin: 0; padding: 0; }
+  .road-aims li { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 8px; align-items: baseline; padding: 0 0 14px; }
+  .road-aims li:last-child { padding-bottom: 0; }
+  .road-n { font: 900 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: var(--green-ink); font-variant-numeric: tabular-nums; }
+  .road-aim { font: 600 var(--fs-lead)/1.3 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; overflow-wrap: break-word; }
+  /* Amir: his first sentence, signed. The clay stripe sits in the numeral column's right edge, so the text starts on the aims' edge. */
+  .road-from { position: relative; margin: 26px 0 0 30px; padding: 0 3px 0 8px; }   /* 3 px on the right so the photo's white ring is not clipped by the fold */
+  .road-from::before { content: ''; position: absolute; left: 0; top: 3px; bottom: 6px; width: 3px; border-radius: 2px; background: var(--clay); }
+  .road-first { margin: 0; font: 500 var(--fs-lead)/1.35 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; overflow-wrap: break-word; }
+  .road-first.is-long { font: 400 var(--fs-field)/1.5 'Barlow', sans-serif; }   /* a first sentence over 100 characters is no headline: the same sentence, set quieter */
+  .road-from .wn-sign { margin-top: 12px; padding-top: 0; border-top: 0; flex-direction: row-reverse; justify-content: flex-end; gap: 12px; }   /* his photo, then his signature, left under his words */
+  /* the two folds: each opens and closes on its own, inside the row's own fold */
+  .road-doors { margin: 26px 0 0; }
+  .road-units { border-bottom: 1px solid var(--hair); }
+  .road-unit { border-top: 1px solid var(--hair); }
+  .road-ubtn { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 64px; margin: 0; padding: 12px 0; border: 0; border-radius: 0; background: transparent;
+    -webkit-appearance: none; appearance: none; color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
+  .road-ubtn:active { background: var(--tint); }
+  .road-ubtn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  .road-ubtn .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  .road-ubtn .hrow-ic svg { width: 22px; height: 22px; }
+  .road-ubtn .road-chev { flex: none; }
+  .road-ut { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  .road-ul { font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; color: var(--ink); text-wrap: balance; }
+  .road-uq { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  .road-unit.is-open .road-chev { transform: rotate(180deg); }
+  .road-ufold { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+  .road-unit.is-open > .road-ufold { grid-template-rows: 1fr; }
+  .road-uin { min-height: 0; overflow: hidden; visibility: hidden; transition: visibility 0s linear .3s; }
+  .road-unit.is-open > .road-ufold > .road-uin { visibility: inherit; transition-delay: 0s; }   /* inherit, never visible: a folded Now row must still hide an open note from the eye and a screen reader */
+  @media (prefers-reduced-motion: reduce) { .road-ufold, .road-uin { transition: none; } }
+  .road-doors .hrow:focus-visible { outline-offset: -2px; }   /* the Because door's focus ring sits inside the row's clip */
+  /* inside the note fold: Amir's words on the same text edge, with a grey stripe so they read as the rest of his signed line */
+  .road-note { position: relative; padding: 2px 3px 22px var(--road-edge); }
+  .road-note::before { content: ''; position: absolute; left: 30px; top: 6px; bottom: 26px; width: 3px; border-radius: 2px; background: var(--ring); }
+  .road-note p { font: 400 var(--fs-body)/1.55 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; overflow-wrap: break-word; }
+  .road-note p + p { margin-top: 10px; }
+  .road-outs { list-style: none; margin: 0; padding: 0 3px 20px 0; }
+  .road-outs li { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 8px; align-items: start; padding: 5px 0; }
+  .road-dot { justify-self: end; display: block; width: 6px; height: 6px; margin-top: 8px; border-radius: 50%; background: var(--grey); }
+  .road-out { font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; overflow-wrap: break-word; }
+  /* Up next and Locked: the teaser follows the aims on the same text edge */
+  .road-lead { margin: 2px 0 0 var(--road-edge); font: 600 var(--fs-field)/1.35 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .road-paras { margin: 8px 0 0 var(--road-edge); }
   .road-paras p { font: 400 var(--fs-body)/1.55 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
   .road-paras p + p { margin-top: 10px; }
   .road-tagline + .road-lead, .road-tagline + .road-paras { margin-top: 8px; }
-  .road-aims + .road-lead, .road-aims + .road-paras { margin-top: 16px; }   /* the teaser follows the aims */
-  .road-sign { justify-content: flex-end; margin: 12px 0 0; }   /* Amir's signature and photo (the week note's .wn-sign, its size), right-aligned under his words */
+  .road-aims + .road-lead, .road-aims + .road-paras { margin-top: 18px; }   /* the teaser follows the aims */
   .road .hrow.road-why-door { width: 100%; margin: 20px 0 0; }   /* a door row: the full width of the road, not the gutter twice */
   .road-door { padding: 2px 0 18px; }   /* past the end date the door sits directly under the current cycle's Done row */
   .road-door .hrow.road-why-door { margin: 0; }
@@ -7775,10 +7812,12 @@ function dayImgError(img) {
 // ── THE ROAD (Amir, 2026-10-13: "do Progress's road cards in the Centre Court look") ─────────────────────────────────
 // One row per cycle, on the paper: the cycle's number as the outlined numeral (solid green once it is done), its name over a mono
 // line ("WEEKS 6–10 · NOW"), a chevron when the row folds. Done (every cycle before the current one, and the current one past its
-// end date: PROG-02), Now (OPEN: the tagline, the aims, why it matters, the outcomes, then Why your plan looks like this), Up next
-// (closed: the teaser), Locked (a lock, and a fold only when it has a teaser). The cycle before the current one opens its archive
+// end date: PROG-02), Now (OPEN, and short: the tagline, the aims, Amir's first sentence signed, then two folds, the rest of his note and the
+// outcomes, then Why your plan looks like this: Doors, 2026-10-19), Up next (closed: the aims, the teaser), Locked (a lock, and a fold only
+// when it has a tagline, aims or a teaser). The cycle before the current one opens its archive
 // when it has one. Home between cycles draws the next cycle's row with the same function (betweenCyclesHTML()).
-// o = { state, idp (the body's id prefix), archive (a programHistory id), whyN (reasons: Now only), open (the fold's last state) }.
+// o = { state, idp (the body's id prefix), archive (a programHistory id), whyN (reasons: Now only), open (the fold's last state),
+//       units ({ note, fin }: the Now row's two folds as the athlete left them) }.
 // Functions, not consts: the road is drawn from boot(), which can run before a const further down has been evaluated.
 // Written only when it changed: goTo('plan') repaints the cover and the road on every visit, and a new <img> each time would flash the cover's
 // picture (it decodes after the green is already there). The last string written is kept on the element.
@@ -7794,8 +7833,41 @@ function roadStateOf(i, idx, over) {
 }
 function roadWord(state) { return { done: 'Done', now: 'Now', next: 'Up next', locked: 'Locked' }[state] || ''; }
 function roadIc(kind) {
-  const d = { lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>' }[kind] || '';
+  const d = { lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>' }[kind] || '';
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+}
+// The first sentence of a text and the rest, for Progress's road (Amir's first sentence, signed): a sentence ends at . ! or ? followed by a space
+// and a capital, a digit or an opening quote, and an abbreviation (e.g. i.e. vs. approx. Dr. Mr. Mrs. No.) or a lead of under three words does
+// not end it. Home's week note (weekNoteHTML()) keeps its own plain cut, the same regex without the two guards, and so does check_program.py (COM-16).
+function firstSentence(text) {
+  const s = String(text == null ? '' : text).trim();
+  const re = /[.!?]\s+(?=[A-Z0-9"'(“])/g;
+  let m;
+  while ((m = re.exec(s))) {
+    const first = s.slice(0, m.index + 1);
+    if (/\b(?:e\.g|i\.e|vs|approx|Dr|Mr|Mrs|No)\.$/.test(first) || first.split(/\s+/).length < 3) continue;
+    return { first, rest: s.slice(m.index + m[0].length) };
+  }
+  return { first: s, rest: '' };
+}
+function roadList(v) { return (Array.isArray(v) ? v : []).map(x => String(x == null ? '' : x).trim()).filter(Boolean); }
+// The tagline (one italic line) and The aims: the top of every open row on the road, Now, Up next and Locked, and so of Home between cycles.
+function roadAimsHTML(c) {
+  const aims = roadList(c.focuses);
+  let h = '';
+  if (c.tagline) h += `<p class="road-tagline">${esc(c.tagline)}</p>`;
+  if (aims.length) h += `<h3 class="road-sec">The aims</h3><ol class="road-aims" role="list">${aims.map((a, k) =>
+    `<li><span class="road-n" aria-hidden="true">${k + 1}</span><span class="road-aim">${esc(a)}</span></li>`).join('')}</ol>`;
+  return h;
+}
+// A fold inside the Now row (the rest of Amir's note, the outcomes): a row in the .ceil-help grammar that opens and closes on its own. k keys it, so a
+// repaint of the road (paintRoad()) keeps it as the athlete left it.
+function roadUnitHTML(id, k, icon, title, sub, inner, open) {
+  const ic = { note: '<path d="M5 6.5h14M5 12h14M5 17.5h8.5"/>', flag: '<path d="M6 21V4"/><path d="M6 5h11.5l-2.8 3.8 2.8 3.8H6"/>' }[icon] || '';
+  return `<div class="road-unit${open ? ' is-open' : ''}" data-k="${k}"><button type="button" class="road-ubtn" aria-expanded="${open ? 'true' : 'false'}" aria-controls="${id}" onclick="toggleRoadUnit(this)">`
+    + `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ic}</svg></span>`
+    + `<span class="road-ut"><span class="road-ul">${esc(title)}</span><span class="road-uq">${esc(sub)}</span></span><i class="road-chev" aria-hidden="true"></i></button>`
+    + `<div class="road-ufold" id="${id}"><div class="road-uin">${inner}</div></div></div>`;
 }
 // Why your plan looks like this · N reasons: a door row (.hrow) to the Why page. Inside the Now row while the cycle runs, under its Done row after it.
 function roadDoorHTML(n) {
@@ -7805,27 +7877,32 @@ function roadDoorHTML(n) {
 function roadRowHTML(c, i, o) {
   o = o || {};
   const state = o.state || 'locked', n = i + 1, idp = o.idp || 'road-body-';
-  const list = v => (Array.isArray(v) ? v : []).map(x => String(x == null ? '' : x).trim()).filter(Boolean);
+  const list = roadList;
   const attr = s => esc(s).replace(/"/g, '&quot;');   // esc() leaves a quote alone, and these go inside attributes
   const name = c.name || ('Cycle ' + n);
   let body = '';
-  // Now, Up next and Locked all open on the cycle's tagline (one italic line) and The aims (01, 02 rows); nothing the old folded cards showed is lost.
-  if (state === 'now' || state === 'next' || state === 'locked') {
-    const aims = list(c.focuses);
-    if (c.tagline) body += `<p class="road-tagline">${esc(c.tagline)}</p>`;
-    if (aims.length) body += `<h3 class="road-sec">The aims</h3><ol class="road-aims">${aims.map((a, k) =>
-      `<li><span class="road-n" aria-hidden="true">${String(k + 1).padStart(2, '0')}</span><span class="road-aim">${esc(a)}</span></li>`).join('')}</ol>`;
-  }
+  // Now, Up next and Locked all open on the cycle's tagline (one italic line) and The aims; nothing the old folded cards showed is lost.
+  if (state === 'now' || state === 'next' || state === 'locked') body += roadAimsHTML(c);
   if (state === 'now') {
-    const msg = c.message || {}, why = list(msg.paragraphs), outs = list(msg.outcomes);
-    // Amir's words, signed as the week note and the finished band sign them: the clay quote, then his signature (green ink) and photo, right-aligned.
-    if (why.length) body += `<h3 class="road-sec">Why this cycle matters</h3><div class="road-why">${why.map(p => `<p>${esc(p)}</p>`).join('')}`
-      + `<div class="wn-sign road-sign">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div></div>`;
-    if (outs.length) body += `<h3 class="road-sec">Expected outcomes</h3><ul class="road-outs">${outs.map(t =>
-      `<li><span class="road-ck">${roadIc('check')}</span><span class="road-out">${esc(t)}</span></li>`).join('')}</ul>`;
+    const msg = c.message || {}, why = list(msg.paragraphs), outs = list(msg.outcomes), units = o.units || {};
+    // Doors: Amir's first sentence on the card, signed as the week note signs (his photo, then his signature, left under his words, a clay stripe
+    // beside them); the rest of his note (what is left of paragraph one, then the others) and the outcomes fold behind two rows. Every word once, verbatim.
+    const fs = why.length ? firstSentence(why[0]) : { first: '', rest: '' };
+    const noteParas = [fs.rest].concat(why.slice(1)).filter(Boolean);
+    if (fs.first) body += `<section class="road-from" aria-label="From Amir"><p class="road-first${fs.first.length > 100 ? ' is-long' : ''}">${esc(fs.first)}</p>`
+      + `<div class="wn-sign">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div></section>`;
+    let doors = '';
+    if (noteParas.length || outs.length) {
+      doors += '<div class="road-units">';
+      if (noteParas.length) doors += roadUnitHTML(`${idp}${n}-note`, 'note', 'note', 'Why this cycle matters', 'The rest of my note', `<div class="road-note">${noteParas.map(p => `<p>${esc(p)}</p>`).join('')}</div>`, !!units.note);
+      if (outs.length) doors += roadUnitHTML(`${idp}${n}-fin`, 'fin', 'flag', 'Expected outcomes', `${outs.length} thing${outs.length === 1 ? '' : 's'} to hit`,
+        `<ul class="road-outs" role="list">${outs.map(t => `<li><span class="road-dot" aria-hidden="true"></span><span class="road-out">${esc(t)}</span></li>`).join('')}</ul>`, !!units.fin);
+      doors += '</div>';
+    }
     // Because: the cycle's reasons on one page, from the first one (Line Call, 2026-10-13: it needed three, and the guide sent
     // athletes to a door that was not there). Past the end date the same door sits under the current cycle's Done row instead (paintRoad()).
-    if (o.whyN >= 1) body += roadDoorHTML(o.whyN);
+    if (o.whyN >= 1) doors += roadDoorHTML(o.whyN);
+    if (doors) body += `<div class="road-doors">${doors}</div>`;
   } else if (state === 'next' || state === 'locked') {
     const t = c.teaser || {}, lead = String(t.subtitle || '').trim(), paras = list(t.paragraphs);
     if (lead) body += `<p class="road-lead">${esc(lead)}</p>`;
@@ -7852,8 +7929,16 @@ function toggleRoad(btn) {
   btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 window.toggleRoad = toggleRoad;
+// The two folds inside the Now row open and close on their own (Enter and Space too: they are buttons).
+function toggleRoadUnit(btn) {
+  const unit = btn && btn.closest('.road-unit');
+  if (!unit) return;
+  const open = unit.classList.toggle('is-open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+window.toggleRoadUnit = toggleRoadUnit;
 // Progress's road, under the Game Plan title (#road-wrap). renderPlan() paints it at boot and goTo('plan') on every visit (so a
-// cycle that ended while the app sat open reads Done), keeping each row's fold as the athlete left it.
+// cycle that ended while the app sat open reads Done), keeping each row's fold, and the two folds inside the Now row, as the athlete left them.
 function paintRoad() {
   const wrap = document.getElementById('road-wrap');
   const cycles = (DATA && Array.isArray(DATA.cycles)) ? DATA.cycles : [];
@@ -7862,11 +7947,13 @@ function paintRoad() {
   const over = !!cycleOver();
   const was = {};
   wrap.querySelectorAll('.road-row').forEach(r => { was[r.dataset.cycle] = r.classList.contains('is-open'); });
+  const wasUnits = {};
+  wrap.querySelectorAll('.road-unit').forEach(u => { const r = u.closest('.road-row'); if (r) (wasUnits[r.dataset.cycle] = wasUnits[r.dataset.cycle] || {})[u.dataset.k] = u.classList.contains('is-open'); });
   const hist = Array.isArray(DATA.programHistory) ? DATA.programHistory : [];
   const nWhy = whyList().length;
   paintInto(wrap, `<h2 class="prog-sec">Game Plan</h2><div class="road">` + cycles.map((c, i) => {
     const state = roadStateOf(i, idx, over);
-    return roadRowHTML(c, i, { state, whyN: state === 'now' ? nWhy : 0, archive: i === idx - 1 && hist.length ? hist[0].id : '', open: was[i + 1] })
+    return roadRowHTML(c, i, { state, whyN: state === 'now' ? nWhy : 0, archive: i === idx - 1 && hist.length ? hist[0].id : '', open: was[i + 1], units: wasUnits[i + 1] })
       + (i === idx && over && nWhy >= 1 ? `<div class="road-door">${roadDoorHTML(nWhy)}</div>` : '');   // past its end date: directly under the current cycle's Done row
   }).join('') + `</div>`);
 }

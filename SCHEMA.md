@@ -362,8 +362,8 @@ back-off. `/program-design` decides which weeks get a note and the dose, `/progr
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `paragraphs` | string[] | Body text under "Why This Cycle Matters" |
-| `outcomes` | string[] | Checklist under "Expected outcomes after this cycle:" |
+| `paragraphs` | string[] | Amir's note on Progress's Now card: the first sentence of `paragraphs[0]` is shown on the card (so it should stand alone), the rest is behind the "Why this cycle matters" row |
+| `outcomes` | string[] | The "Expected outcomes" row on the Now card, a dotted list ("6 things to hit") |
 
 #### `teaser` (only rendered on the next cycle)
 
