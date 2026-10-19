@@ -146,7 +146,7 @@ KNOWN_KEYS = {
     "message": {"en", "fa", "used_for"},
 }
 TOP_LEVEL_KEYS = {
-    "rulebook": {"version", "meanings", "switch", "level", "season", "week", "share", "habits", "fact"},
+    "rulebook": {"version", "starts_on", "meanings", "switch", "level", "season", "week", "share", "habits", "fact"},
     "badges": {"badge"},
     "achievements": {"achievement"},
     "titles": {"title", "skin"},
@@ -438,6 +438,11 @@ def catalogue_off(rb):
 
 def check_rulebook(rb, rep):
     f = "rulebook.toml"
+    if "starts_on" in rb:   # D20 (stage76): the day a new version starts, the day it is seeded; the server refuses any other day
+        c = Ctx(rep, f, "starts_on")
+        so = rb.get("starts_on")
+        if not (isinstance(so, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", so)):
+            c.error(f"starts_on must be a day, \"YYYY-MM-DD\" (the day this version is seeded), found {so!r} (D20)")
     c = Ctx(rep, f, "meanings")
     if rb.get("meanings") != MEANINGS:
         c.error(f"must be exactly {MEANINGS}, found {rb.get('meanings')!r}")

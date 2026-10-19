@@ -11,7 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { openDb, runSql, read } from '../restore/lib.mjs';
-import { ROOT, py } from './rehearse_lib.mjs';
+import { ROOT, py, snapshotWithout } from './rehearse_lib.mjs';
 
 const args = process.argv.slice(2);
 const opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
@@ -51,7 +51,9 @@ async function main() {
 
   section('0. the live structure and the backup\'s rows');
   await runSql(db, read(path.join(ROOT, 'scripts', 'restore', 'stand_in_supabase.sql')), 'stand-in');
-  await runSql(db, read(path.join(ROOT, 'supabase', 'schema_snapshot.sql')), 'snapshot');
+  const snap = snapshotWithout(/create table public\.career_goals/i);
+  info('the structure starts from ' + snap.says);
+  await runSql(db, snap.sql, 'snapshot');
   ok(!(await val(db, `select to_regclass('public.career_goals')::text`)), 'the snapshot does not hold stage75 yet');
   await db.exec(`set session_replication_role = replica`);
   const n = {};

@@ -12,6 +12,10 @@
 # an error. Version 2 (phase 2, 2026-10-17): phase 1's one shadow gate became the two switches below. Version 3
 # (2026-10-18): the XP switch turned on, the day Season 1 opened (Amir: "switch after Season 1 starts").
 
+# D20 (stage76, 2026-10-19): a change applies forward only. A rename is re-seeded at the same version. A change of an XP value, a cap,
+# a tier or what earns an achievement raises `version` and sets `starts_on = "YYYY-MM-DD"`, the day it is seeded: facts before that day
+# keep their prices, awards keep the XP they were minted with. The seed refuses a change to [habits], [level], [season], [week], [share] or
+# to how a fact is worked out (career/README.md; PROCEDURES.md → Stage 76).
 version = 3
 meanings = ["consistency", "commitment", "progress", "resilience"]
 

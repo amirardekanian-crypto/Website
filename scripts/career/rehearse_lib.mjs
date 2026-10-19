@@ -110,4 +110,14 @@ export async function ensureStages(db, through, say = () => {}) {
   }
   return { applied, held: already };
 }
+// The schema snapshot a rehearsal of one stage starts from: the working copy when it does not hold the stage yet (`marker`, a regex on the text),
+// else the newest committed snapshot that does not (the stage is live and the snapshot was remade after it). Returns { sql, says }.
+export function snapshotWithout(marker) {
+  const now = read(path.join(ROOT, 'supabase', 'schema_snapshot.sql'));
+  if (!marker.test(now)) return { sql: now, says: 'the working copy of supabase/schema_snapshot.sql' };
+  const show = rev => cp.execFileSync('git', ['show', `${rev}:supabase/schema_snapshot.sql`], { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 << 20 });
+  const revs = cp.execFileSync('git', ['log', '--format=%h', '-n', '40', '--', 'supabase/schema_snapshot.sql'], { cwd: ROOT, encoding: 'utf8' }).split(/\s+/).filter(Boolean);
+  for (const r of revs) { let t; try { t = show(r); } catch (e) { continue; } if (!marker.test(t)) return { sql: t.split('\r\n').join('\n'), says: `supabase/schema_snapshot.sql as committed at ${r} (the working copy already holds the stage, which is live)` }; }
+  throw new Error('No committed schema snapshot without the stage was found in the last 40 commits of supabase/schema_snapshot.sql');
+}
 export const eraseDef = async db => (await db.query(`select pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure) as d`)).rows[0].d;

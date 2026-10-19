@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 53 tables, 191 functions, 7 sequences.
+-- 53 tables, 195 functions, 7 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -242,7 +242,8 @@ create table public.career_rules (
   version integer not null,
   rules jsonb not null,
   source text,
-  loaded_at timestamp with time zone default now() not null
+  loaded_at timestamp with time zone default now() not null,
+  starts_on date
 );
 
 create table public.career_scores (
@@ -1167,7 +1168,7 @@ begin
       -- the tiers and milestones Proof paid up to the switch, against what the awards carried over (spec §5.3)
       p_aw := public.hab_bonus_xp(v_log, v_cfg, null, null, v_cat, v_x || '{"quests": [], "questRuns": [], "comebackXp": 0}'::jsonb);
       select coalesce(sum(case when not aw.pays then 0
-                               else coalesce(public.career_award_xp(aw.kind, aw.tier, aw.subject, c.body, v_r), aw.xp) end), 0)::bigint
+                               else aw.xp /* stage76: minted XP */ end), 0)::bigint
         into c_aw
         from public.career_awards aw join public.career_catalogue c on c.kind = aw.kind and c.id = aw.item
        where aw.athlete_id = a.athlete_id and aw.day <= v_cat and c.body ->> 'origin' = 'proof';
@@ -1292,6 +1293,73 @@ begin
      order by y.g desc, y.met
      limit v_limit;
 end $function$;
+
+CREATE OR REPLACE FUNCTION public.career_d20_check(p_version integer, p_rules jsonb, p_catalogue jsonb)
+ RETURNS void
+ LANGUAGE plpgsql
+ STABLE
+ SET search_path TO 'public'
+AS $function$
+declare
+  v_newest integer; v_old jsonb; v_starts text := p_rules ->> 'starts_on'; v_cat jsonb; k text;
+  c_by_day constant text[] := array['when', 'cap', 'source', 'pays_for', 'meaning', 'xp', 'xp_from', 'career_only', 'limit', 'limit_per'];
+begin
+  select max(r.version) into v_newest from public.career_rules r;
+  if v_newest is null then return; end if;                                  -- the first seed (a fresh database): nothing to protect yet
+  select r.rules into v_old from public.career_rules r where r.version = v_newest;
+  if p_version = v_newest then
+    if public.career_d20_prices(v_old) is distinct from public.career_d20_prices(p_rules) then
+      raise exception 'D20: rulebook version % is loaded, and a seed of the same version may change only names and captions. A change of XP, a cap, the habits, the level curve or how a fact is worked out is a NEW version with starts_on = today (rulebook.toml → version and starts_on). Nothing was changed', p_version;
+    end if;
+    select coalesce(jsonb_agg(jsonb_build_object('kind', c.kind, 'id', c.id, 'body', c.body)), '[]'::jsonb) into v_cat from public.career_catalogue c;
+    if public.career_d20_core(v_cat) is distinct from public.career_d20_core(p_catalogue) then
+      raise exception 'D20: the catalogue changed more than its names and captions (what earns a reward, its tiers or its XP). That is a NEW rulebook version with starts_on = today; awards already minted keep theirs. Nothing was changed';
+    end if;
+    return;
+  end if;
+  -- a new version
+  if v_starts is null or v_starts !~ '^\d{4}-\d{2}-\d{2}$' or v_starts::date not between current_date - 1 and current_date then
+    raise exception 'D20: a new rulebook version (%) needs starts_on = today (or yesterday, for a time zone) in rulebook.toml, found %. Nothing was changed', p_version, coalesce(v_starts, 'none');
+  end if;
+  foreach k in array array['habits', 'level', 'season', 'week', 'share'] loop
+    if (v_old -> k) is distinct from (p_rules -> k) then
+      raise exception 'D20: [%] cannot change forward only (it would re-work every past day). That is Amir''s decision as a bug fix, backwards or forwards, not a seed. Nothing was changed', k;
+    end if;
+  end loop;
+  for k in select jsonb_object_keys(case when jsonb_typeof(v_old -> 'fact') = 'object' then v_old -> 'fact' else '{}'::jsonb end) loop
+    if p_rules -> 'fact' ? k and ((v_old -> 'fact' -> k) - c_by_day) is distinct from ((p_rules -> 'fact' -> k) - c_by_day) then
+      raise exception 'D20: how the fact % is worked out changed (%). Only its xp, career_only and cap can change forward only; this is Amir''s decision as a bug fix. Nothing was changed',
+        k, (select string_agg(x, ', ') from jsonb_object_keys(((v_old -> 'fact' -> k) - c_by_day) || ((p_rules -> 'fact' -> k) - c_by_day)) x
+             where (v_old -> 'fact' -> k -> x) is distinct from (p_rules -> 'fact' -> k -> x));
+    end if;
+  end loop;
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.career_d20_core(p_catalogue jsonb)
+ RETURNS text
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select md5(coalesce(string_agg(x.kind || '|' || x.id || '|' ||
+           (case when jsonb_typeof(x.body -> 'tiers') = 'array'
+                 then (x.body - array['name', 'caption', 'from', 'rule', 'note', 'notes', 'origin', 'tiers'])
+                      || jsonb_build_object('tiers', (select jsonb_agg(t.v - 'tier_name' order by t.o) from jsonb_array_elements(x.body -> 'tiers') with ordinality t(v, o)))
+                 else x.body - array['name', 'caption', 'from', 'rule', 'note', 'notes', 'origin'] end)::text, ',' order by x.kind, x.id), ''))
+    from jsonb_to_recordset(case when jsonb_typeof(p_catalogue) = 'array' then p_catalogue else '[]'::jsonb end) as x(kind text, id text, body jsonb)
+   where x.kind in ('badge', 'achievement', 'title', 'mission', 'quest', 'skin')
+$function$;
+
+CREATE OR REPLACE FUNCTION public.career_d20_prices(p jsonb)
+ RETURNS jsonb
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select jsonb_build_object('habits', p -> 'habits', 'level', p -> 'level', 'season', p -> 'season', 'week', p -> 'week', 'share', p -> 'share',
+           'fact', coalesce((select jsonb_object_agg(e.key, e.value - array['when', 'cap', 'source', 'pays_for', 'meaning'])
+                               from jsonb_each(case when jsonb_typeof(p -> 'fact') = 'object' then p -> 'fact' else '{}'::jsonb end) e), '{}'::jsonb))
+$function$;
 
 CREATE OR REPLACE FUNCTION public.career_day(p text)
  RETURNS date
@@ -1911,7 +1979,7 @@ CREATE OR REPLACE FUNCTION public.career_facts_paid(p_athlete text)
  STABLE
  SET search_path TO 'public'
 AS $function$
-  with r as (select public.career_rules_now() as j),
+  with v as (select r.version, r.starts_on, r.rules as j from public.career_rules r),   -- stage76
   f as (
     select f.kind, f.ref, f.day, f.value from public.career_facts f
      where f.athlete_id = p_athlete and f.void_at is null
@@ -1924,7 +1992,7 @@ AS $function$
            coalesce(r.j -> 'fact' -> f.kind -> 'career_only' = 'true'::jsonb, false) as conly,
            r.j -> 'fact' -> f.kind ->> 'limit_per' as per,
            coalesce(public.career_num(r.j -> 'fact' -> f.kind -> 'limit'), 0) as lim
-      from f, r
+      from f cross join lateral (select v.j from v where v.starts_on is null or v.starts_on <= f.day order by v.version desc limit 1) r   -- stage76
   ),
   weeks as (select * from public.career_weeks(p_athlete)),
   keyed as (
@@ -1949,13 +2017,8 @@ AS $function$
     from ranked
    where ranked.grp is null or ranked.rn <= ranked.lim
   union all
-  select 'award'::text, a.award_id, a.day,
-         (case when not a.pays then 0
-               else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, h.hr), a.xp) end)::numeric,
-         false
+  select 'award'::text, a.award_id, a.day, (case when not a.pays then 0 else a.xp end)::numeric, false   -- stage76: the minted XP (D20, D12 reversed)
     from public.career_awards a
-    left join public.career_catalogue c on c.kind = a.kind and c.id = a.item
-    cross join (select public.career_habit_rules() as hr) h
    where a.athlete_id = p_athlete and public.career_catalogue_on()
 $function$;
 
@@ -2692,6 +2755,8 @@ declare
   v_S date := (p_ctx ->> 'S')::date; v_hist boolean; v_pays boolean; v_xp integer; v_how text; v_size text; v_id text; v_n integer;
 begin
   if p_athlete is null or p_day is null or v_S is null then return false; end if;
+  -- stage76 (D20): a reward a rule change reveals for an earlier day is dated no earlier than that version's start day (forward only)
+  if (select r.starts_on from public.career_rules r order by r.version desc limit 1) > p_day then p_day := (select r.starts_on from public.career_rules r order by r.version desc limit 1); end if;
   v_hist := p_day <= v_S;
   if coalesce(p_body, '{}'::jsonb) ? 'retire_at' and not v_hist then return false; end if;   -- never earned after the switch
   v_id := public.career_award_id(p_kind, p_item, p_tier, coalesce(p_subject, ''));
@@ -3105,7 +3170,7 @@ AS $function$
   with s as (select public.career_switch_day(public.career_rules_now(), 'catalogue') as d, public.career_habit_rules() as hr),
   aw as (
     select a.*, c.body,
-           case when not a.pays then 0 else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, s.hr), a.xp) end as px
+           case when not a.pays then 0 else a.xp /* stage76: minted XP */ end as px
       from public.career_awards a left join public.career_catalogue c on c.kind = a.kind and c.id = a.item cross join s
      where a.athlete_id = p_athlete
   )
@@ -3260,7 +3325,7 @@ begin
                  jsonb_build_object(
                    'award_id', r.award_id, 'kind', a.kind, 'item', a.item, 'tier', a.tier, 'size', r.size, 'day', a.day,
                    'full', (v_full ? r.size) and r.due_at >= now() - make_interval(days => v_keep),
-                   'xp', case when not a.pays then 0 else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, v_hr), a.xp) end,
+                   'xp', case when not a.pays then 0 else a.xp /* stage76: minted XP */ end,
                    'spec', public.career_award_spec(a.kind, a.item, a.tier, a.day, a.evidence, c.body))
                  || coalesce((select jsonb_build_object('also', jsonb_agg(public.career_award_spec('title', ta.item, null, ta.day, ta.evidence, tc.body)
                                                                           order by ta.item))
@@ -3310,6 +3375,15 @@ CREATE OR REPLACE FUNCTION public.career_rules_now()
  SET search_path TO 'public'
 AS $function$
   select r.rules from public.career_rules r order by r.version desc limit 1
+$function$;
+
+CREATE OR REPLACE FUNCTION public.career_rules_on(p_day date)
+ RETURNS jsonb
+ LANGUAGE sql
+ STABLE
+ SET search_path TO 'public'
+AS $function$
+  select r.rules from public.career_rules r where r.starts_on is null or r.starts_on <= p_day order by r.version desc limit 1
 $function$;
 
 CREATE OR REPLACE FUNCTION public.career_score(p_athlete text, p_season date, p_from date, p_to date)
@@ -3446,6 +3520,7 @@ begin
   if v_newest is not null and p_version < v_newest then
     raise exception 'rulebook version % is older than the one loaded (%): nothing was changed', p_version, v_newest;
   end if;
+  perform public.career_d20_check(p_version, p_rules, p_catalogue);   -- stage76 (D20): forward only
   foreach v_which in array array['xp', 'catalogue'] loop
     v_will := p_rules #>> array['switch', v_which];
     v_was := public.career_switch_day(v_old, v_which);
@@ -3483,7 +3558,7 @@ begin
   end if;
 
   begin
-    insert into public.career_rules (version, rules, source, loaded_at) values (p_version, p_rules, p_source, now())
+    insert into public.career_rules (version, rules, source, loaded_at, starts_on) values (p_version, p_rules, p_source, now(), case when v_newest is not null and p_version > v_newest then (p_rules ->> 'starts_on')::date end)   /* stage76 */
     on conflict (version) do update set rules = excluded.rules, source = excluded.source, loaded_at = now();
     delete from public.career_catalogue;
     insert into public.career_catalogue (kind, id, body, version, loaded_at)
@@ -4969,7 +5044,7 @@ begin
       select jsonb_agg(z.j order by z.created_at desc, z.award_id)
         from (select a.award_id, a.created_at,
                      jsonb_build_object('award_id', a.award_id, 'kind', a.kind, 'item', a.item, 'tier', a.tier, 'size', a.size, 'day', a.day,
-                       'xp', case when not a.pays then 0 else coalesce(public.career_award_xp(a.kind, a.tier, a.subject, c.body, v_hr), a.xp) end)
+                       'xp', case when not a.pays then 0 else a.xp /* stage76: minted XP */ end)
                      || jsonb_build_object('spec', public.career_award_spec(a.kind, a.item, a.tier, a.day, a.evidence, c.body)) as j
                 from public.career_awards a left join public.career_catalogue c on c.kind = a.kind and c.id = a.item
                where a.athlete_id = v_id and a.how <> 'baseline' and a.created_at >= now() - interval '7 days'
@@ -7772,6 +7847,12 @@ revoke all on function public.career_compute(p_athlete text) from public, anon, 
 grant execute on function public.career_compute(p_athlete text) to service_role;
 revoke all on function public.career_cycle_wins(p_athlete text, p_from date, p_to date, p_plan text[], p_rules jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.career_cycle_wins(p_athlete text, p_from date, p_to date, p_plan text[], p_rules jsonb) to service_role;
+revoke all on function public.career_d20_check(p_version integer, p_rules jsonb, p_catalogue jsonb) from public, anon, authenticated, service_role;
+grant execute on function public.career_d20_check(p_version integer, p_rules jsonb, p_catalogue jsonb) to service_role;
+revoke all on function public.career_d20_core(p_catalogue jsonb) from public, anon, authenticated, service_role;
+grant execute on function public.career_d20_core(p_catalogue jsonb) to service_role;
+revoke all on function public.career_d20_prices(p jsonb) from public, anon, authenticated, service_role;
+grant execute on function public.career_d20_prices(p jsonb) to service_role;
 revoke all on function public.career_day(p text) from public, anon, authenticated, service_role;
 grant execute on function public.career_day(p text) to service_role;
 revoke all on function public.career_derive(p_athlete text) from public, anon, authenticated, service_role;
@@ -7868,6 +7949,8 @@ revoke all on function public.career_rewards_stamp(p_athlete text) from public, 
 grant execute on function public.career_rewards_stamp(p_athlete text) to service_role;
 revoke all on function public.career_rules_now() from public, anon, authenticated, service_role;
 grant execute on function public.career_rules_now() to service_role;
+revoke all on function public.career_rules_on(p_day date) from public, anon, authenticated, service_role;
+grant execute on function public.career_rules_on(p_day date) to service_role;
 revoke all on function public.career_score(p_athlete text, p_season date, p_from date, p_to date) from public, anon, authenticated, service_role;
 grant execute on function public.career_score(p_athlete text, p_season date, p_from date, p_to date) to service_role;
 revoke all on function public.career_scored(p_athlete text, p_recompute boolean) from public, anon, authenticated, service_role;

@@ -27,7 +27,7 @@ the twin guard (`scripts/check_twins.js` §10) in the hook, and its tests of the
 
 ## How to change something
 
-**Since the catalogue switch (2026-10-18) every change applies forward only (D20, Amir, decided and not built).** Rename freely. Do not change an XP value, a cap, a tier or what earns an achievement until D20 is built (`CAREER_MODE.md`, the D20 row; `PROCEDURES.md`, *Open: D20*).
+**Since the catalogue switch (2026-10-18) every change applies forward only (D20, built 2026-10-19: `supabase/stage76_career_forward_only.sql`).** Rename freely: a name or caption is re-seeded at the same version. A change of an XP value, a cap, a tier or what earns an achievement goes in a NEW version: raise `version` in `rulebook.toml` and set `starts_on` to the day you seed it; facts before that day keep their prices, awards keep the XP they were minted with, and a reward the new rule reveals for an earlier day is dated the start day. The seed refuses a change to `[habits]`, `[level]`, `[season]`, `[week]`, `[share]` or to how a fact is worked out (`min_share`, `weeks_away`, `window_days`, `min_gain`): those would re-work every past day, so they are Amir's decision as a bug fix (`PROCEDURES.md` → *Stage 76*).
 
 | You want to | Edit |
 |---|---|
