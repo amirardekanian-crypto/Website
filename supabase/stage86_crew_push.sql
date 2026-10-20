@@ -72,6 +72,11 @@
 -- scripts/push/rollback_stage84.sql. stage84's way back looks for the end of coach_erase_person()'s
 -- table list as stage84 left it, and this stage puts two more names after it.
 --
+-- APPLIED to the live project 2026-10-20 on Amir's word ("Yes go on"), as the migration
+-- `stage86_crew_push`, and read back whole. See docs/rules/push.md for the read-back and the one thing
+-- that went wrong: a push-send deploy must SAY verify_jwt false, or the gateway refuses pg_net's call
+-- with a 401 and both the reminders and the crew go silent with nothing looking wrong.
+--
 -- Rehearsed on PGlite: scripts/push/rehearse_crew_push.mjs (the stage twice, the way back twice, every
 -- branch of the decision, the night, the folding, every trigger, the erasure, the CRLF trap, and that
 -- nothing in the scorer moved).

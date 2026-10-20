@@ -27,7 +27,8 @@ const SNAPSHOT = path.join(ROOT, 'supabase', 'schema_snapshot.sql');
 const SECRET_TABLES = ['assess_publish_keys', 'tps_publish_keys',
                        'push_config'];                   // and the reminders' VAPID private key and shared secret (stage84): see restore_backup.py
 const SHORT_LIVED = ['crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings',   // the Bell's 7-day tables (stage81), as in restore_backup.py: never in a backup, on purpose
-                     'push_sent'];                              // and what went out today (stage84): it rebuilds itself by not sending twice
+                     'push_sent',                               // and what went out today (stage84): it rebuilds itself by not sending twice
+                     'crew_push_q', 'crew_push_seen'];          // the crew's queue and its watermarks (stage86): the queue keeps the Bell's own 7 days, the watermarks rebuild themselves
 const COACH_JWT = JSON.stringify({ email: 'amirardekanian@gmail.com', role: 'authenticated', sub: '00000000-0000-4000-8000-00000000c0c0' });
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'restore-rehearsal-'));
 
@@ -248,7 +249,7 @@ try {
   const chk2 = await check(B, dirB);
   ok(JSON.stringify(chk2) === JSON.stringify(chk), 'the second run leaves every count as it was');
   const nx = await nextIdsAfterMax(B);
-  ok(nx.n === 8 && nx.bad.length === 0, `all ${nx.n} id counters hand out an id past every restored one`, nx.bad.join('\n'));
+  ok(nx.n === 9 && nx.bad.length === 0, `all ${nx.n} id counters hand out an id past every restored one`, nx.bad.join('\n'));
 
   section('7. the logins come back in two steps; the rows that belong to a login follow');
   const made1 = await recreateLogins(B, reportB, new Set(['buyer_one', 'learner_one', 'ava_test']));

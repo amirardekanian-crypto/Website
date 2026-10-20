@@ -47,7 +47,7 @@ off in their app settings"*. Two reminders, both opt-out once the phone allows t
   word only. `/pushtest/` is the throwaway page that answered "does it reach Iran?" — delete it, and
   the `/pushtest/` line in `sw.js`, once that question is closed.
 
-## The crew on a phone (stage86, written 2026-10-19, NOT APPLIED — waits on Amir's word)
+## The crew on a phone (stage86, LIVE 2026-10-20)
 
 Amir: *"one of the notification rules in my app was that everytime anything happens in the crew, any
 lines, any new image, any likes, any new post, everyone should receive a notification"*, then
@@ -86,20 +86,28 @@ and the stage file's own header.
   every trigger, the erasure and the CRLF trap; 5 of 6 one-line breaks of the stage are caught, and
   the sixth — the order the folded events are named in — changes no answer while a folded notification
   names nobody). The way back is `scripts/push/rollback_stage86.sql`, on Amir's word only.
+- **⚠️ A deploy of `push-send` must SAY `verify_jwt: false`.** It defaults to true, and then pg_net's
+  call is refused at the gateway with a 401 before a line of the function runs: the reminders and the
+  crew both go silent and nothing in the database looks wrong. It happened on the stage86 deploy
+  (2026-10-20), caught by firing the two jobs and reading `net._http_response`. The function does its
+  own authentication — a shared secret in `x-push-key` — which is why the platform's check must be off.
 - **⚠️ If stage84 and stage86 both come off, run stage86's way back FIRST.** stage84's looks for the
   end of `coach_erase_person()`'s table list as stage84 left it, and stage86 puts two names after it.
 
-**To apply** (Amir's yes first). No backup is needed for the apply itself: it adds two tables, fifteen
-functions and seven triggers, and changes no row; the one existing object it touches,
-`coach_erase_person()`'s list, is put back exactly by the way back.
-1. `supabase/stage86_crew_push.sql` (`apply_migration`). Read back: both tables with row-level
-   security on and no policy, `anon` and `authenticated` execute none of the functions, the seven
-   triggers, the `crew-push` and `crew-push-sweep` jobs in `cron.job`, and the erase function's list
-   ending `'push_subs', 'crew_push_q', 'crew_push_seen']`.
-2. Deploy `push-send` again (its `?only=crew` arm and the `crew_push_done` answer are in this commit).
-   Check with `POST /push-send?only=crew&dry=1`, which decides everything and moves no watermark.
-3. Then, in ONE commit: `supabase/schema_snapshot.sql` remade (`scripts/restore/README.md`), and
-   `scripts/test_restore_backup.py` check **1d's count 63 → 65** (the two new tables).
-   `BACKUP_TABLES` and `SHORT_LIVED` are already done, in this commit.
-4. Nobody is subscribed yet (`push_subs` is empty), so nothing rings until the first athlete taps the
-   permission — which is also why this stage costs nothing the day it goes on.
+**Applied 2026-10-20** on Amir's word, *"Yes go on"*, as the migration `stage86_crew_push`. Read back whole:
+both tables with row-level security on and **no policy at all**, `anon` and `authenticated` able to select
+neither and to execute none of the fourteen functions (every one with a fixed search path), the seven triggers
+on their seven tables, `crew-push` (`*/15 * * * *`) and `crew-push-sweep` (`38 4 * * *`) in `cron.job` with
+stage84's `push-send` and `push-sweep` and stage81's `crew-sweep` untouched, and `coach_erase_person()`'s list
+ending `'push_subs', 'crew_push_q', 'crew_push_seen']`. `crew_push_due()` answered 0 rows, and both jobs were
+fired by hand: each came back **200** through the gateway (`net._http_response`), which is what proves the
+shared secret and the `?only=crew` arm together. `push-send` is deployed at version 3.
+
+The snapshot was remade in the same commit (65 tables) and `scripts/test_restore_backup.py` check 1d moved
+63 → 65. The restore rehearsal caught two things the stage had not registered with it — its own short-lived
+list, and the count of identity counters (8 → 9, `crew_push_q.id`) — both fixed in the same commit; it is
+49 of 49 now.
+
+**Nothing rings yet, and that is not a fault.** `push_subs` is still empty: until an athlete taps the
+permission there is nobody to send to, and `crew_push_add()` returns before writing a row, so the queue stays
+empty too. The first real proof of this stage is the first subscribed phone.

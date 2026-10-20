@@ -1,8 +1,23 @@
 ## Stage 86: the crew on a phone, as built (2026-10-19)
 
-**WRITTEN AND REHEARSED, NOT APPLIED.** It waits on Amir's word. Nothing of it is on the live project; what IS live, pushed the same evening
-(`5fa0719`, worker `aap-v200`), is the app half: the Reminders panel's crew line now says what it will do, and a crew notification lands on the
-Bell rather than on Home. The apply order, step by step with the read-backs, is [`docs/rules/push.md`](../../rules/push.md) → *The crew on a phone*.
+**APPLIED to the live project 2026-10-20** on Amir's word, *"Yes go on"* (migration `stage86_crew_push`). Read back whole: both tables with
+row-level security on and **no policy at all** (nobody reads or writes them directly; every door is a `security definer` function), `anon` and
+`authenticated` able to select neither and to execute none of the fourteen functions, none of which has a mutable search path; the seven triggers on
+their seven tables; `crew-push` (`*/15 * * * *`) and `crew-push-sweep` (`38 4 * * *`) in `cron.job`, with stage84's `push-send` and `push-sweep` and
+stage81's `crew-sweep` untouched; and `coach_erase_person()`'s list ending `'push_subs', 'crew_push_q', 'crew_push_seen']`. `crew_push_due()`
+answered 0 rows and wrote no watermark. **Both jobs were then fired by hand and each came back 200 through the gateway**
+(`net._http_response`), which is the one check that covers the shared secret and the `?only=crew` arm at the same time. The app half had gone live
+the evening before (`5fa0719`, worker `aap-v200`): the Reminders panel's crew line, and a crew notification landing on the Bell rather than on Home.
+
+**Nothing rings yet, and that is not a fault.** `push_subs` is empty — no athlete has tapped the permission — so there is nobody to send to, and
+`crew_push_add()` returns before writing a row, which is why the stage costs nothing the day it goes on. The first real proof of it is the first
+subscribed phone.
+
+**⚠️ THE ONE THING THAT WENT WRONG, AND IS NOW A RULE.** The first `push-send` deploy did not say `verify_jwt: false` — the parameter defaults to
+true — so the platform's own check went back on, and pg_net's call would have been refused with a 401 at the gateway before a line of the function
+ran: **the reminders and the crew both silent, with nothing in the database looking wrong.** The function authenticates itself with a shared secret
+in `x-push-key`, exactly so that check can be off. Caught within the minute by firing the jobs and reading their responses, fixed by redeploying
+(version 3), and written into [`docs/rules/push.md`](../../rules/push.md) so the next deploy cannot repeat it.
 
 **Why it exists.** Amir: *"one of the notification rules in my app was that everytime anything happens in the crew, any lines, any new image, any
 likes, any new post, everyone should receive a notification"* — then *"why didnt i?"* Because it had never been built. stage84 shipped the habit
@@ -86,6 +101,11 @@ because a folded notification names nobody.
 back looks for the end of `coach_erase_person()`'s table list as stage84 left it, and this stage puts two more names after it; undo them the other
 way round and that patch finds nothing, leaving stage84's two tables named in a list of dropped tables — and every later erasure fails. Both files
 say so.
+
+**What the restore path needed, found by its own rehearsal rather than by remembering:** the snapshot remade (65 tables),
+`scripts/test_restore_backup.py` check 1d 63 → 65, and two things in `scripts/restore/rehearse.mjs` that the stage had not registered with it — its
+own short-lived list (so `BACKUP_TABLES` is allowed not to hold the two new tables) and the number of identity counters a restore must advance
+(8 → 9, `crew_push_q.id`). All in the same commit; that rehearsal is 49 of 49.
 
 **Still the same fault, left as it is and flagged for Amir:** the Reminders panel's *"A new cycle — When Amir publishes your next one"* has no
 sender either. It is the exact thing he found in `crew`, and it is written down in [`docs/rules/push.md`](../../rules/push.md) rather than quietly
