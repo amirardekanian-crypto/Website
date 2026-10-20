@@ -447,7 +447,16 @@
 // Second, his next two answers: your own post carries no reactions at all, and once you have chosen the row is your pick and a
 // plus to change it, not the whole menu (a plus that was opened has a cross to put it away again). Also the photo viewer: his
 // pick was a faint ring with an unreadable count in light mode.
-const CACHE = 'aap-v215';
+// v216: program.html and this worker changed (2026-10-20, a quality pass: bugs found by reading and reproducing, no new looks).
+// The phone keeps what the coach should get: an exercise note reaches a session saved after midnight or filed the next morning,
+// a weight fixed after Done is sent again, a day filed with its clock still running goes with no duration, opening the app no
+// longer counts as an edit (so a newer change from another phone wins), a delete made with no signal is not undone by the pull,
+// and a Reset leaves alone a second session under way with the same lift. Guided skips what the check-in struck out, a crew
+// notification no longer pulls an athlete out of a session, Reminders has its Back, and quotes are escaped in every attribute.
+// This worker: a fetched file is cloned before the page reads it (cloned later it threw, so nothing beyond the shell was ever
+// kept), push.js and habits-core.js are precached under the URLs the pages ask for, and a notification tap never takes over
+// a window that is not one of the two athlete apps.
+const CACHE = 'aap-v216';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -470,9 +479,11 @@ const SHELL = [
   // Highlight Reel's painter (v160): a win's share card is drawn on the phone, signal or not. Served cache-first by this plain URL,
   // so a change to it needs a CACHE bump. (Its fonts, photo, mark and covers are kept as they are first used.)
   '/assets/js/sharecard.js',
-  '/assets/js/push.js',
+  // These two by the exact URL the pages ask for, ?v= and all: a cache match is by the whole URL, so the plain names were never
+  // found with no signal, and offline the habit engine and the reminders' client did not load (2026-10-20; check_sw_cache.py holds it).
+  '/assets/js/push.js?v=1',
   // The habit engine (v195): the training app owns the habits now, so this is shell, not an extra.
-  '/assets/js/habits-core.js',
+  '/assets/js/habits-core.js?v=1',
   // Off the Glass, the rest game (v162): loaded on the first tap on Play. Cache-first by this plain URL: a change needs a CACHE bump.
   '/assets/js/rally.js',
   // Split Step, the second rest game (v165): loaded on the first tap on its row in the shelf. Cache-first by this plain URL: a change needs a CACHE bump.
@@ -588,7 +599,9 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(request)
         .then(res => {
-          if (res.ok) caches.open(CACHE).then(c => c.put(request, res.clone()));
+          // Cloned HERE, before the page gets the response: a clone made later, inside caches.open()'s then, comes after the
+          // page has started reading the body, throws "Response body is already used", and nothing was ever kept (2026-10-20).
+          if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(request, copy)); }
           return res;
         })
         .catch(() => caches.match(request))
@@ -608,7 +621,8 @@ self.addEventListener('fetch', e => {
         // had spent months probing four extensions for every missing cycle
         // banner. No CACHE bump: the art ships under new paths, and bumping
         // would throw away every athlete's offline copy of the app for nothing.
-        if (res && res.ok) caches.open(CACHE).then(c => c.put(request, res.clone()));
+        // Cloned before the page reads it, as in the JSON branch above: cloned inside the then, it threw and nothing was kept.
+        if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(request, copy)); }
         return res;
       });
     })
@@ -668,7 +682,13 @@ self.addEventListener('notificationclick', event => {
         return c.focus();
       }
     }
-    for (const c of all) { if ('focus' in c) { try { await c.navigate(url); } catch (e) {} return c.focus(); } }
+    // Otherwise the other athlete app's window takes it (the two share this registration). Never any other page of the site: it
+    // navigated the first window of any kind, so a tap replaced the coach's dashboard with an unsaved draft, or the course app (2026-10-20).
+    for (const c of all) {
+      let path = '';
+      try { path = new URL(c.url).pathname; } catch (e) {}
+      if (/^\/(program|habits)\.html$/.test(path) && 'focus' in c) { try { await c.navigate(url); } catch (e) {} return c.focus(); }
+    }
     if (self.clients.openWindow) return self.clients.openWindow(url);
   })());
 });

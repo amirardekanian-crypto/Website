@@ -96,7 +96,9 @@ const ok = (c, what, detail) => {
   ok(sw.includes("addEventListener('push'") && sw.includes("addEventListener('notificationclick'"),
      'the service worker has both handlers');
   ok(/showNotification/.test(sw), 'and always shows something (userVisibleOnly is a promise to the browser)');
-  ok(sw.includes("'/assets/js/push.js'"), 'push.js is in the precached shell');
+  // Under the exact URL the training app asks for, ?v= and all: a cache match is by the whole URL (2026-10-20, check_sw_cache.py).
+  const pushUrl = (train.match(/\/assets\/js\/push\.js[^"'\s>]*/) || [''])[0];
+  ok(!!pushUrl && sw.includes("'" + pushUrl + "'"), 'push.js is in the precached shell, by the URL the app loads (' + pushUrl + ')');
 
   // The lock screen is read by whoever picks the phone up.
   const stage = fs.readFileSync(path.join(ROOT, 'supabase', 'stage84_push.sql'), 'utf8');
