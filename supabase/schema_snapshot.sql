@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 65 tables, 254 functions, 9 sequences.
+-- 66 tables, 259 functions, 9 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -586,6 +586,13 @@ create table public.push_config (
   vapid_public text,
   vapid_private text,
   vapid_subject text
+);
+
+create table public.push_cycle_seen (
+  athlete_id text not null,
+  cycle_index integer,
+  pending integer,
+  at timestamp with time zone default now() not null
 );
 
 create table public.push_sent (
@@ -4271,7 +4278,7 @@ declare
   c_athlete_tables constant text[] := array[
     'programs', 'program_versions', 'coaching_logs', 'coaching_log_versions',
     'session_history', 'athlete_progress', 'hab_notes', 'hab_titles', 'hab_season_results', 'leaderboard_optin',
-    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities', 'athlete_status', 'career_facts', 'career_scores', 'career_awards', 'career_recognition', 'courtside_marks', 'career_honours', 'career_goals', 'career_notes', 'crew_kudos', 'crew_photos', 'crew_posts', 'crew_open_results', 'crew_rings', 'crew_consent', 'push_sent', 'push_subs', 'crew_push_q', 'crew_push_seen'];
+    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities', 'athlete_status', 'career_facts', 'career_scores', 'career_awards', 'career_recognition', 'courtside_marks', 'career_honours', 'career_goals', 'career_notes', 'crew_kudos', 'crew_photos', 'crew_posts', 'crew_open_results', 'crew_rings', 'crew_consent', 'push_sent', 'push_subs', 'crew_push_q', 'crew_push_seen', 'push_cycle_seen'];
   -- Not clients: the public demo, and the identity coach.html reads the board through (AMIR_ATHLETE_ID there).
   c_protected constant text[] := array['demo', 'amir_ardekani'];
   -- Arabic-Indic (U+0660-0669) and Persian (U+06F0-06F9) digits, and what they fold to.
@@ -5916,6 +5923,121 @@ AS $function$
   where s.starts_on <= current_date
   order by s.starts_on desc, s.id desc
   limit 1;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.cycle_push_done(p_athlete_id text, p_ok boolean DEFAULT true)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  update public.push_cycle_seen
+     set cycle_index = case when p_ok then greatest(coalesce(cycle_index, pending), pending) else cycle_index end,
+         pending = null,
+         at = now()
+   where athlete_id = p_athlete_id;
+  -- The same bookkeeping push_done() does, so a handset that has stopped answering runs out of
+  -- patience (fails = 5) on this path too.
+  update public.push_subs
+     set last_sent_at = now(),
+         last_ok_at = case when p_ok then now() else last_ok_at end,
+         fails = case when p_ok then 0 else least(32767, fails + 1) end
+   where athlete_id = p_athlete_id;
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.cycle_push_due(p_now timestamp with time zone DEFAULT now(), p_mark boolean DEFAULT true)
+ RETURNS TABLE(endpoint text, p256dh text, auth text, athlete_id text, kind text, title text, body text, tag text, ttl integer, day date)
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+-- ⚠️ The returned column athlete_id is also a column of push_cycle_seen, so a bare name inside the
+-- writes below is ambiguous; the column is what is meant. (stage86 hit this and says more about it.)
+#variable_conflict use_column
+begin
+  -- First sight: write down where they are and tell them nothing. An athlete who subscribes today is
+  -- not news-flashed about the cycle they are already training.
+  if coalesce(p_mark, true) then
+    insert into public.push_cycle_seen (athlete_id, cycle_index, at)
+    select f.athlete_id, f.cci, now() from public.cycle_push_fold(p_now) f where f.seen is null
+    on conflict (athlete_id) do nothing;
+  end if;
+
+  -- The cutoff this send covers, written before a single push leaves.
+  if coalesce(p_mark, true) then
+    update public.push_cycle_seen s
+       set pending = f.cci, at = now()
+      from public.cycle_push_fold(p_now) f
+     where s.athlete_id = f.athlete_id and f.seen is not null and f.cci > f.seen;
+  end if;
+
+  return query
+    select f.endpoint, f.p256dh, f.auth, f.athlete_id, 'cycle'::text,
+           w.title, w.body, 'cycle'::text, 7200, f.day
+      from public.cycle_push_fold(p_now) f
+      cross join lateral public.cycle_push_words(f.lang) w
+     where f.seen is not null and f.cci > f.seen;
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.cycle_push_fold(p_now timestamp with time zone DEFAULT now())
+ RETURNS TABLE(athlete_id text, endpoint text, p256dh text, auth text, lang text, day date, cci integer, seen integer)
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  with phone as (
+    select s.endpoint, s.p256dh, s.auth, s.athlete_id, s.lang, s.kinds,
+           public.push_local(p_now, s.tz_offset)::date as local_day,
+           extract(hour from public.push_local(p_now, s.tz_offset))::int as local_hour
+      from public.push_subs s
+     where s.fails < 5
+  ),
+  -- Awake where they are, and the switch left on.
+  awake as (
+    select p.* from phone p
+     where p.local_hour between 8 and 21 and public.push_on(p.kinds, 'cycle')
+  ),
+  -- A coached athlete with a roadmap. A free Proof athlete has no cycles to be told about, and a
+  -- programme with no roadmap yet (an athlete mid-intake) has nothing to announce either.
+  prog as (
+    select a.*, (pr.data ->> 'currentCycleIndex')::int as cci
+      from awake a
+      join public.programs pr on pr.athlete_id = a.athlete_id
+     where coalesce(pr.data -> 'athlete' ->> 'tier', 'coached') <> 'free'
+       and jsonb_typeof(pr.data -> 'cycles') = 'array'
+       and jsonb_array_length(pr.data -> 'cycles') > 0
+       and (pr.data ->> 'currentCycleIndex') ~ '^\d{1,3}$'
+  )
+  select g.athlete_id, g.endpoint, g.p256dh, g.auth, g.lang, g.local_day, g.cci, sn.cycle_index
+    from prog g left join public.push_cycle_seen sn on sn.athlete_id = g.athlete_id
+$function$;
+
+CREATE OR REPLACE FUNCTION public.cycle_push_sweep()
+ RETURNS integer
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare n integer;
+begin
+  delete from public.push_cycle_seen s
+   where not exists (select 1 from public.push_subs p where p.athlete_id = s.athlete_id);
+  get diagnostics n = row_count;
+  return n;
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.cycle_push_words(p_lang text)
+ RETURNS TABLE(title text, body text)
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select t.title, t.body from (values
+    ('en', 'Your next cycle is ready', 'Open the app and have a look.'),
+    ('fa', 'سایکل بعدیت آماده‌ست',      'برنامه رو باز کن و یه نگاه بنداز.')
+  ) as t(lang, title, body)
+  where t.lang = (case when p_lang = 'fa' then 'fa' else 'en' end)
 $function$;
 
 CREATE OR REPLACE FUNCTION public.delete_intake(p_id uuid)
@@ -8991,6 +9113,7 @@ alter table public.program_versions add constraint program_versions_pkey PRIMARY
 alter table public.programs add constraint programs_pkey PRIMARY KEY (athlete_id);
 alter table public.push_config add constraint push_config_id_check CHECK (id);
 alter table public.push_config add constraint push_config_pkey PRIMARY KEY (id);
+alter table public.push_cycle_seen add constraint push_cycle_seen_pkey PRIMARY KEY (athlete_id);
 alter table public.push_sent add constraint push_sent_pkey PRIMARY KEY (athlete_id, day, kind);
 alter table public.push_subs add constraint push_subs_app_check CHECK ((app = ANY (ARRAY['proof'::text, 'training'::text])));
 alter table public.push_subs add constraint push_subs_device_check CHECK (((device IS NULL) OR (char_length(device) <= 120)));
@@ -9159,6 +9282,7 @@ alter table public.messages enable row level security;
 alter table public.program_versions enable row level security;
 alter table public.programs enable row level security;
 alter table public.push_config enable row level security;
+alter table public.push_cycle_seen enable row level security;
 alter table public.push_sent enable row level security;
 alter table public.push_subs enable row level security;
 alter table public.qualities enable row level security;
@@ -9432,6 +9556,8 @@ grant select, insert, update, delete, truncate, references, trigger, maintain on
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.programs to service_role;
 revoke all on table public.push_config from public, anon, authenticated, service_role;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.push_config to service_role;
+revoke all on table public.push_cycle_seen from public, anon, authenticated, service_role;
+grant select, insert, update, delete, truncate, references, trigger, maintain on table public.push_cycle_seen to service_role;
 revoke all on table public.push_sent from public, anon, authenticated, service_role;
 grant select on table public.push_sent to authenticated;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.push_sent to service_role;
@@ -9786,6 +9912,16 @@ revoke all on function public.current_athlete_id() from public, anon, authentica
 grant execute on function public.current_athlete_id() to service_role;
 revoke all on function public.current_season() from public, anon, authenticated, service_role;
 grant execute on function public.current_season() to anon, authenticated, service_role, public;
+revoke all on function public.cycle_push_done(p_athlete_id text, p_ok boolean) from public, anon, authenticated, service_role;
+grant execute on function public.cycle_push_done(p_athlete_id text, p_ok boolean) to service_role;
+revoke all on function public.cycle_push_due(p_now timestamp with time zone, p_mark boolean) from public, anon, authenticated, service_role;
+grant execute on function public.cycle_push_due(p_now timestamp with time zone, p_mark boolean) to service_role;
+revoke all on function public.cycle_push_fold(p_now timestamp with time zone) from public, anon, authenticated, service_role;
+grant execute on function public.cycle_push_fold(p_now timestamp with time zone) to service_role;
+revoke all on function public.cycle_push_sweep() from public, anon, authenticated, service_role;
+grant execute on function public.cycle_push_sweep() to service_role;
+revoke all on function public.cycle_push_words(p_lang text) from public, anon, authenticated, service_role;
+grant execute on function public.cycle_push_words(p_lang text) to service_role;
 revoke all on function public.delete_intake(p_id uuid) from public, anon, authenticated, service_role;
 grant execute on function public.delete_intake(p_id uuid) to authenticated, service_role;
 revoke all on function public.end_quests(p_start date, p_end date) from public, anon, authenticated, service_role;

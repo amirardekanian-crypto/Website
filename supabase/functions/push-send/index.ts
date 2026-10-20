@@ -14,6 +14,11 @@
 // check is below — a shared secret in a header that only the cron job knows (PUSH_CRON_SECRET).
 // A service-role key is NOT used for that, because the cron command is stored in the database and the
 // key would be sitting in cron.job in plain text.
+// ⚠️ A DEPLOY MUST SAY verify_jwt false. It defaults to TRUE, and then pg_net's call is refused at the
+// gateway with a 401 before a line of this runs — every reminder, the crew and the cycle all silent,
+// with nothing in the database looking wrong. It happened on 2026-10-20 with stage86's deploy; the
+// check that catches it is firing push_fire() and crew_push_fire() by hand and reading
+// net._http_response for a 200.
 //
 //   POST /push-send            send what is due: the reminders, the crew AND a published cycle
 //   POST /push-send?only=crew  the crew only. What the 15-minute job calls (stage86).

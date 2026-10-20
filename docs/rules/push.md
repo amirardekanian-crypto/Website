@@ -126,7 +126,7 @@ list, and the count of identity counters (8 → 9, `crew_push_q.id`) — both fi
 permission there is nobody to send to, and `crew_push_add()` returns before writing a row, so the queue stays
 empty too. The first real proof of this stage is the first subscribed phone.
 
-## A published cycle on a phone (stage87, written 2026-10-20, NOT APPLIED — waits on Amir's word)
+## A published cycle on a phone (stage87, LIVE 2026-10-20)
 
 Amir: *"Build the sender for the cycle notification too, so the switch stops promising nothing."* The
 last of stage84's four kinds. The full narration is the header of `supabase/stage87_cycle_push.sql`.
@@ -159,16 +159,17 @@ last of stage84's four kinds. The full narration is the header of `supabase/stag
   own names on the end of `coach_erase_person()`'s table list, and each way back looks for the end as
   its own stage left it.
 
-**To apply** (Amir's yes first). It adds one table and five functions and changes no row; the one
-existing object it touches, `coach_erase_person()`'s list, is put back exactly by the way back.
-1. `supabase/stage87_cycle_push.sql` (`apply_migration`). Read back: the table with row-level security
-   on and no policy, `anon` and `authenticated` executing none of the five, and the erase function's
-   list ending `'crew_push_seen', 'push_cycle_seen']`.
-2. Deploy `push-send` again — **passing `verify_jwt: false`** (see the rule above). Then
-   `POST /push-send?dry=1`, which decides everything and moves nothing.
-3. Then, in ONE commit: `supabase/schema_snapshot.sql` remade, `scripts/test_restore_backup.py` check
-   **1d's count 65 → 66**, and in `scripts/restore/rehearse.mjs` the new table added to its own
-   short-lived list. (`BACKUP_TABLES` and `SHORT_LIVED` in `restore_backup.py` are already done, in
-   this commit.)
-4. The first notification of this kind goes out the first time Amir publishes a cycle for an athlete
-   whose phone was already subscribed — not for the cycle they are on now.
+**Applied 2026-10-20** on Amir's word (*"Build the sender … so the switch stops promising nothing"*),
+as the migration `stage87_cycle_push`. Read back: the table with row-level security on and no policy,
+`anon` and `authenticated` executing none of the five functions (each with a fixed search path), and
+`coach_erase_person()`'s list ending `'crew_push_seen', 'push_cycle_seen']`. `push-send` is deployed at
+version 4 **with `verify_jwt: false`**, and the hourly job fired by hand came back 200 with all four
+kinds wired.
+
+The marks were primed by hand straight after (`cycle_push_due(now(), true)`) rather than waiting for the
+hourly tick: both subscribed phones were written down where they are and **nothing was sent**, which is
+the first-sight rule doing its job. The snapshot was remade in the same commit (66 tables) and check 1d
+moved 65 → 66.
+
+**The first notification of this kind goes out the first time Amir publishes a cycle** for an athlete
+whose phone was already subscribed — never for the cycle they are on now.

@@ -41,6 +41,10 @@
 -- QUIET HOURS are 08:00 to 21:59 where the athlete is, written here as stage86 writes them — not as a
 -- CHECK on a column, because the hour is their own clock at the moment of sending and is not stored.
 --
+-- APPLIED to the live project 2026-10-20 on Amir's word, as the migration `stage87_cycle_push`, and
+-- read back. See docs/rules/push.md for the read-back. ⚠️ A push-send deploy must SAY verify_jwt
+-- false, or the gateway refuses pg_net's call with a 401 and all four kinds go silent.
+--
 -- Rehearsed on PGlite: scripts/push/rehearse_cycle_push.mjs.
 -- The way back: scripts/push/rollback_stage87.sql, on Amir's word only. Safe to re-run this file.
 --

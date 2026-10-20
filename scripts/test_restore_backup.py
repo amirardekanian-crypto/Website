@@ -146,7 +146,7 @@ check('1c: digits9 folds Persian and Arabic-Indic digits and keeps the last nine
       rb.digits9('۰۹۱۲ ۰۰۰ ۰۰۰۱') == '120000001' and rb.digits9('+98 912 000 0001') == '120000001' and rb.digits9('٠٩١٢٠٠٠٠٠٠١') == '120000001' and rb.digits9('12345') is None and rb.digits9(None) is None)
 schema_sql = open(SCHEMA, encoding='utf-8').read()
 cols = rb.snapshot_tables(schema_sql)
-check('1d: the snapshot parser finds the 65 tables and their columns (46 + career_awards, career_recognition, stage70 + five of stage75 + five of stage81 + three of stage84 + two of stage85 + two of stage86)', len(cols) == 65 and 'athlete_id' in cols['programs'] and 'steps' in cols['exercises'], len(cols))
+check('1d: the snapshot parser finds the 65 tables and their columns (46 + career_awards, career_recognition, stage70 + five of stage75 + five of stage81 + three of stage84 + two of stage85 + two of stage86 + one of stage87)', len(cols) == 66 and 'athlete_id' in cols['programs'] and 'steps' in cols['exercises'], len(cols))
 html = open(os.path.join(ROOT, 'coach.html'), encoding='utf-8').read()
 listed = re.findall(r"'([a-z_]+)'", re.search(r"const BACKUP_TABLES = \[([\s\S]*?)\];", html).group(1))
 check('1h: coach.html BACKUP_TABLES lists every table of the schema snapshot except the two key-hash tables and the four short-lived Bell tables (stage81), and nothing else (a new table goes in both)',
