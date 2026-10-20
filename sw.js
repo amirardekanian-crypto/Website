@@ -426,7 +426,11 @@
 // own deleted with two taps and any of them removable by Amir. No likes on a reply -- the Like stays on the post. A post also
 // carries a key made on the phone now, so a slow photo that outlasts the composer's wait is never written twice. And Home
 // offers the crew once, under This Week, for the sixteen athletes who have never seen the question.
-const CACHE = 'aap-v211';
+// v212: program.html changed (2026-10-20, Amir: "why cant i see the history of an exercise in the exercise library?").
+// Your history now shows on the exercise sheet opened from the Library's Exercises pane, not only from a card in a session.
+// The sheet took the name off the programme card it was opened from, so from the library it asked about '' and axHistRow()
+// drew nothing; the entry's own name stands in, which is all historyFor() ever needed.
+const CACHE = 'aap-v212';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
