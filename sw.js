@@ -404,7 +404,11 @@
 // every Farsi line in all three senders was unreachable — written, read and chosen, and able to reach nobody. The programme decides
 // (athlete.lang), the app passes it at the athlete's tap, and stage88's hourly sync brings a phone already subscribed, or one whose
 // language is corrected later, into line.
-const CACHE = 'aap-v207';
+// v208: program.html changed (2026-10-20, Amir: "i need to have proper buttons to add to sleep and reduce it. better function").
+// Every counted habit on Today's card has a − and a +, with its number between them. Each steps by the habit's own step, the −
+// stops at 0 and the + at the daily cap, and holding either repeats, faster the longer it is held. The XP pop adds a whole hold
+// up instead of flashing every step, and says what a number taken back cost.
+const CACHE = 'aap-v208';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

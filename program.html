@@ -4630,6 +4630,7 @@
   .hb-pop { position: absolute; right: 14px; top: 8px; z-index: 3; pointer-events: none; white-space: nowrap;
     font: 700 var(--fs-small)/1 'Space Mono', monospace; letter-spacing: .5px; color: var(--green-ink);
     animation: habPop 1.3s ease-out forwards; }
+  .hb-pop.is-down { color: var(--grey); }   /* XP going back out: said plainly, never in red */
   @keyframes habPop { 0% { opacity: 0; transform: translateY(8px); } 12% { opacity: 1; transform: translateY(0); }
     70% { opacity: 1; transform: translateY(-14px); } 100% { opacity: 0; transform: translateY(-22px); } }
   @media (prefers-reduced-motion: reduce) { .hb-pop { animation: habPopQuiet 1.3s linear forwards; } }
@@ -4650,9 +4651,26 @@
   /* How far into a counted habit the day is. Green, never clay: it reports, it does not ask. */
   #home-overview .hb-bar { flex: none; width: 54px; height: 6px; border-radius: 99px; background: var(--prog-track); overflow: hidden; }
   #home-overview .hb-bar i { display: block; height: 100%; background: var(--fill); }
-  #home-overview .hb-plus { flex: none; width: 34px; height: 34px; border-radius: 99px; border: 1.5px solid var(--hair);
-    background: var(--paper); color: var(--green-ink); font: 600 var(--fs-lead)/1 'Barlow', sans-serif; cursor: pointer; }
-  #home-overview .hb-plus:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* − and + (2026-10-20): one pill holding two buttons, so the pair reads as one control and the row keeps its name.
+     34 px of ink inside a 44 px tap target (the padding is the target), and a held button stays pressed while it repeats. */
+  #home-overview .hb-steps { flex: none; display: flex; align-items: center; gap: 2px; }
+  /* The number between them, in the row's own figures: 44 px wide so 7.5 and 10,000 leave the buttons where they are. */
+  #home-overview .hb-now { flex: none; min-width: 48px; text-align: center; font: 700 var(--fs-field)/1 'Barlow', sans-serif;
+    font-variant-numeric: tabular-nums; color: var(--ink); }
+  #home-overview .hb-now.is-done { color: var(--green-ink); }
+  /* The narrowest phone: the pair keeps its 34 px targets and the row buys the space back from the gaps, so
+     "Sleep 7.5+ hours" still gets one line. */
+  @media (max-width: 359px) {
+    #home-overview .hb-main { gap: 8px; padding-left: 12px; }
+    #home-overview .hb-now { min-width: 36px; }
+    #home-overview .hb-row { gap: 4px; padding-right: 8px; }
+  }
+  #home-overview .hb-step { flex: none; width: 34px; height: 34px; margin: 5px 0; border-radius: 99px; border: 1.5px solid var(--hair);
+    background: var(--paper); color: var(--green-ink); font: 600 var(--fs-lead)/1 'Barlow', sans-serif; cursor: pointer;
+    touch-action: none; -webkit-user-select: none; user-select: none; }
+  #home-overview .hb-step:disabled { color: var(--grey); opacity: .45; cursor: default; }
+  #home-overview .hb-step:not(:disabled):active { border-color: var(--fill); background: var(--tint); }
+  #home-overview .hb-step:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
 
   /* The number row, under its habit, prefilled with the target: a full day is two taps, a real number three. */
   #home-overview .hb-edit { display: flex; align-items: center; gap: 8px; padding: 0 16px 12px; }
@@ -11244,9 +11262,9 @@ function habSetVal(id, v) {
   paintTodayCard();
   // What it just paid (2026-10-20, Amir: "It doesnt show xp so the people dont fill like their progressing"). Habits have always
   // paid; this is the app finally saying so, at the moment of the tap. It rises off the row and goes: a toast would be a box to
-  // dismiss five times a day. Only a tick that EARNED something says anything.
+  // dismiss five times a day. Taking a number back says so too, in grey: XP that quietly left would be the app lying by omission.
   const got = habXpOf(h, k) - was;
-  if (got > 0 && careerOnT()) habXpPop(id, got);
+  if (got !== 0 && careerOnT()) habXpPop(id, got);
   // A habit ticked pays XP on the server's side of the career, so ask for the level again once the push
   // has had time to land. The same wait the Proof strip used to take.
   if (typeof careerOnT === 'function' && careerOnT() && typeof refreshCareerSoon === 'function') refreshCareerSoon(3000);
@@ -11261,14 +11279,63 @@ function habTap(id) {
   habSetVal(id, H.isDone(h, k) ? 0 : h.target);
 }
 window.habTap = habTap;
-// The + on a counter: one step, clamped to the daily cap, never below what is already logged. A control
-// labelled + must never lower the number.
+// ── The − and + on a counted habit (2026-10-20, Amir: "i need to have proper buttons to add to sleep and reduce it") ──
+// There was a + and nothing else, so the only way down was to tap the row, type the number and save: four taps to undo one.
+// Both buttons step by the habit's own step (sleep 0.5 h, steps 500, the rest 1), the − stops at 0 and the + at the daily cap,
+// and HOLDING EITHER ONE REPEATS, faster the longer it is held: 7.5 hours of sleep is one hold, not fifteen taps.
+const HAB_HOLD_FIRST = 420, HAB_HOLD_MIN = 70;
+let _habHold = null, _habPtrAt = 0;
+function habStepOnce(id, dir) {
+  if (!habOn()) return false;
+  const H = window.AAHabits, h = H.byId(id);
+  if (!h || h.locked || h.kind !== 'count') return false;
+  const step = Number(h.step) || 1, cur = H.valOf(H.AKEY(), id);
+  const cap = Math.max((h.target || 1) * (H.XP_RULES.dailyCap || 3), cur);
+  const next = Math.min(cap, Math.max(0, Math.round((cur + dir * step) * 100) / 100));
+  if (next === cur) return false;
+  habSetVal(id, next);
+  return true;
+}
+// The hold runs off the id, never off the button: every step repaints the card, so the element under the finger is replaced
+// between ticks. For the same reason the release is listened for on the document, where it always lands.
+function habHoldStop() {
+  if (_habHold) { clearTimeout(_habHold.t); _habHold = null; }
+  document.removeEventListener('pointerup', habHoldStop, true);
+  document.removeEventListener('pointercancel', habHoldStop, true);
+  window.removeEventListener('blur', habHoldStop, true);
+}
+function habStepDown(ev, el) {
+  if (ev && ev.preventDefault) ev.preventDefault();      // no text selection, no ghost click on the row
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  if (!el || el.disabled) return;
+  _habPtrAt = Date.now();
+  const id = el.dataset.h, dir = Number(el.dataset.d) || 1;
+  habStepOnce(id, dir);
+  habHoldStop();
+  let wait = HAB_HOLD_FIRST;
+  const tick = () => {
+    if (!habStepOnce(id, dir)) { habHoldStop(); return; }   // at 0 or at the cap: the hold is over
+    wait = Math.max(HAB_HOLD_MIN, Math.round(wait * 0.72));
+    if (_habHold) _habHold.t = setTimeout(tick, wait);
+  };
+  _habHold = { id: id, t: setTimeout(tick, wait) };
+  document.addEventListener('pointerup', habHoldStop, true);
+  document.addEventListener('pointercancel', habHoldStop, true);
+  window.addEventListener('blur', habHoldStop, true);
+}
+// The click after a tap is the pointer's own echo and is ignored; a click with no pointer before it is the keyboard, which
+// gets its one step here.
+function habStepClick(ev, el) {
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  if (Date.now() - _habPtrAt < 800) return;
+  if (el && !el.disabled) habStepOnce(el.dataset.h, Number(el.dataset.d) || 1);
+}
 function habBump(id, ev) {
   if (ev && ev.stopPropagation) ev.stopPropagation();
-  if (!habOn()) return;
-  const H = window.AAHabits, h = H.byId(id), cur = H.valOf(H.AKEY(), id);
-  habSetVal(id, Math.max(cur, cur + (h.step || 1)));
+  habStepOnce(id, 1);
 }
+window.habStepDown = habStepDown;
+window.habStepClick = habStepClick;
 window.habBump = habBump;
 // The number row under a counted habit, saved. Steps and sleep arrive prefilled with the target, so a full
 // day is two taps and a real number is three.
@@ -11384,7 +11451,9 @@ function habRowHtml(hb, k) {
   // is the progress. "Walk 10,000 steps" was folding onto three lines to make room for a bar nobody read.
   let right = '';
   if (hb.kind === 'count') {
-    right = `<span class="hb-val">${done ? H.fmtVal(hb, val) : (val > 0 ? H.fmtVal(hb, val) + ' of ' + H.fmtVal(hb, hb.target) : '')}</span>`;
+    // The number sits between the − and the + since 2026-10-20, so the row reads as one control; it is not repeated here, and
+    // "of 10,000" is not said either, because the name already is "Walk 10,000 steps".
+    right = hb.locked ? `<span class="hb-val">${done ? H.fmtVal(hb, val) : ''}</span>` : '';
   } else if (hb.locked) {
     right = `<span class="hb-val">${done ? 'Done' : 'Not yet'}</span>`;
   }
@@ -11392,11 +11461,16 @@ function habRowHtml(hb, k) {
       <label class="hb-field"><input id="hab-num-${hb.id}" type="number" inputmode="decimal" step="${hb.step || 1}" value="${H.fmtVal(hb, val > 0 ? val : hb.target)}" aria-label="${esc(name)}"><span>${esc(hb.unit || '')}</span></label>
       <button type="button" class="hb-save" onclick="habSaveNum('${hb.id}')">Save</button>
     </div>` : '';
-  // ⚠️ THE + IS ITS OWN BUTTON, BESIDE THE ROW, NEVER INSIDE IT. A <button> nested in a <button> is
+  // ⚠️ THE − AND + ARE THEIR OWN BUTTONS, BESIDE THE ROW, NEVER INSIDE IT. A <button> nested in a <button> is
   // invalid, and the browser un-nests it: the row came apart and the + lost its tap. The row is a plain
-  // div holding two buttons, so both are real controls and Tab reaches each of them.
+  // div holding real buttons, so each is a control of its own and Tab reaches every one.
+  const step = H.fmtVal(hb, hb.step || 1), cap = (hb.target || 1) * (H.XP_RULES.dailyCap || 3);
   const plus = (hb.kind === 'count' && !hb.locked)
-    ? `<button type="button" class="hb-plus" onclick="habBump('${hb.id}', event)" aria-label="Add one to ${esc(name)}">+</button>` : '';
+    ? `<span class="hb-steps">
+      <button type="button" class="hb-step" data-h="${hb.id}" data-d="-1"${val <= 0 ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Take ${step} off ${esc(name)}">−</button>
+      <output class="hb-now${done ? ' is-done' : ''}" aria-label="${esc(name)}: ${H.fmtVal(hb, val)} of ${H.fmtVal(hb, hb.target)} ${esc(hb.unit || '')}">${H.fmtVal(hb, val)}</output>
+      <button type="button" class="hb-step" data-h="${hb.id}" data-d="1"${val >= cap ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Add ${step} to ${esc(name)}">+</button>
+    </span>` : '';
   return `<div class="hb-wrap" data-h="${hb.id}">
     <div class="hb-row${done ? ' is-done' : ''}${hb.locked ? ' is-locked' : ''}">
       <button type="button" class="hb-main" onclick="habTap('${hb.id}')">
@@ -11406,13 +11480,20 @@ function habRowHtml(hb, k) {
   </div>`;
 }
 // The XP a tick just earned, over the row it came from: it rises, fades and is gone. Nothing to dismiss, nothing to tap.
+let _habPop = null;
 function habXpPop(id, n) {
   const wrap = document.querySelector('.hb-wrap[data-h="' + id + '"]');
   if (!wrap || !n) return;
+  // A held − or + steps many times a second, so the pop ADDS UP instead of flashing a new number each step: one rising
+  // "+72 XP" for the whole hold, not fifteen "+5"s. ⚠️ The running total is kept HERE, not on the element: every step
+  // repaints the card, so the element the last step made is already gone.
+  const now = Date.now();
+  _habPop = (_habPop && _habPop.id === id && now - _habPop.at < 1300) ? { id: id, n: _habPop.n + n, at: now } : { id: id, n: n, at: now };
+  if (!_habPop.n) return;                         // a hold that went up and came back down again says nothing
   const el = document.createElement('span');
-  el.className = 'hb-pop';
+  el.className = 'hb-pop' + (_habPop.n < 0 ? ' is-down' : '');
   el.setAttribute('aria-hidden', 'true');
-  el.textContent = '+' + n + ' XP';
+  el.textContent = (_habPop.n > 0 ? '+' : '−') + Math.abs(_habPop.n) + ' XP';
   wrap.appendChild(el);
   setTimeout(() => el.remove(), 1400);
 }

@@ -22,8 +22,21 @@ one number that brings anyone back — was 13 px grey in the corner.
   and the gate gets its own, better moment: when the day passes it, the headline turns green and says **Today counts**
   (**Perfect** when every one is done). The sub-line is the run, or — when one habit is left and the day does not count yet —
   that one named: *One thing left: water.*
-- **The rows give the name the row**: a mark, a name, a small value, and the **+** for a counted habit. The per-row bars are
+- **The rows give the name the row**: a mark, a name, and for a counted habit a stepper. The per-row bars are
   gone; the ring is the progress. The session's row is still the ledger line that only a finished session ticks.
+- **The stepper: − number +** (2026-10-20, Amir: *"i need to have proper buttons to add to sleep and reduce it. better
+  function"*). There used to be a **+** and nothing else, so the only way down was to tap the row, type the number and save:
+  four taps to undo one. Both buttons step by the habit's OWN step (sleep 0.5 h, steps 500, the rest 1), the − stops at 0 and
+  the + at the daily cap (3 × the target), and each says so by going quiet. **Holding either one repeats**, starting at 420 ms
+  and accelerating to 70 ms, so 7.5 hours of sleep is one hold, not fifteen taps (`habStepOnce()`, `habStepDown()`).
+  ⚠️ **The hold runs off the habit's id and the release is heard on the document**, because every step repaints the card and
+  replaces the button under the finger. The click that follows a tap is the pointer's own echo and is ignored; a click with no
+  pointer before it is the keyboard, and it gets one step. The number lives between the buttons (`.hb-now`), so the row reads
+  as one control and the value is not said twice; *of 10,000* is not said either, because the name already is *Walk 10,000
+  steps*. The typed field is still there, on the name.
+- **The XP pop adds up**: a held + would otherwise flash a new number every step, so the running total is kept outside the DOM
+  (`_habPop`) and the pop reads **+72 XP** for the whole hold. Taking a number back pops the same way in grey (**−36 XP**):
+  XP that left in silence would be the app lying by omission.
 - **The level's middle has a fallback**: without the career (offline with no copy, the demo, the coach's preview, the switch
   off) the ring's middle is the day's own count, `2/5` over *Done*. ⚠️ `paintHomeCareer()` repaints the card, because the
   profile answers after Home is already on screen and the ring would otherwise keep showing the count where the level belongs.
@@ -38,7 +51,8 @@ one number that brings anyone back — was 13 px grey in the corner.
   (`8 days · this month`) and opens the same page. Neither prints the other's number.
 - **The guide follows** (CNT-01): *Getting around* says Home is the week, a line from Amir and today's habits as one card with
   the level in its ring, and the **Hold Serve** card says the count shows beside This Week instead of on a row.
-- **Tests**: `home-progress.js` §5b (the ring's segments, the state's three words, the sub-line, the › and no per-row bars),
+- **Tests**: `home-progress.js` §5b (the ring's segments, the state's three words, the sub-line, the › and no per-row bars, and the
+  stepper: the step per habit, both ways, the floor, the cap, and a hold that repeats),
   `career.js` (no door row on Home, the level in the ring, the run beside the week, the ring not a button, 320 px and dark),
   `hold-serve.js` (every case of the run, now read off the week's line), `habits-list.js` (Progress keeps the month alone).
 

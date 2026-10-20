@@ -443,6 +443,43 @@ function noStrip(browser) {
 
     // Logging: a tick, a +, and a number row. Every one of them writes <id>_hab_log and nothing else.
     const { ctx, p } = await H.openProgram(browser, { prog: prog(), seed: { _hab_cfg: CFG_ON } });
+
+    // ── − and + on a counted habit (2026-10-20, Amir: "i need to have proper buttons to add to sleep and reduce it") ──
+    // Before this there was a + and no way back but typing the number: four taps to undo one.
+    const stepper = () => p.evaluate(() => {
+      const row = id => document.querySelector('.hb-wrap[data-h="' + id + '"]');
+      const of = id => { const r = row(id); const b = [...r.querySelectorAll('.hb-step')];
+        return { now: (r.querySelector('.hb-now') || {}).textContent, off: b.map(x => x.disabled), n: b.length }; };
+      return { sleep: of('sleep'), steps: of('steps'), session: row('strength').querySelectorAll('.hb-step').length,
+               val: id => 0, sleepV: AAHabits.valOf(AAHabits.AKEY(), 'sleep') };
+    });
+    const tap = (id, d) => p.evaluate(([i, dd]) => document.querySelector('.hb-wrap[data-h="' + i + '"] .hb-step[data-d="' + dd + '"]').click(), [id, d]);
+    const s0 = await stepper();
+    t.check('every counted habit has a − and a +, with the number between them, and the session habit has neither',
+      s0.sleep.n === 2 && s0.steps.n === 2 && s0.session === 0 && s0.sleep.now === '0.0' && s0.steps.now === '0', JSON.stringify(s0));
+    t.check('nothing logged yet: the − is off, the + is on', JSON.stringify(s0.sleep.off) === '[true,false]', JSON.stringify(s0.sleep.off));
+    await tap('sleep', '1'); await tap('sleep', '1'); await p.waitForTimeout(150);
+    const up = await stepper();
+    t.check('the + steps by the habit\'s own step, not by one (sleep: half an hour a tap)', up.sleepV === 1 && up.sleep.now === '1.0', JSON.stringify([up.sleepV, up.sleep.now]));
+    await tap('sleep', '-1'); await p.waitForTimeout(150);
+    const down = await stepper();
+    t.check('the − takes the same step back off', down.sleepV === 0.5 && JSON.stringify(down.sleep.off) === '[false,false]', JSON.stringify([down.sleepV, down.sleep.off]));
+    await tap('sleep', '-1'); await p.waitForTimeout(150);
+    t.check('it stops at nothing, and says so', await p.evaluate(() => AAHabits.valOf(AAHabits.AKEY(), 'sleep')) === 0
+      && (await stepper()).sleep.off[0] === true);
+    // Holding it repeats, faster the longer it is held, and the XP pop adds the whole hold up instead of flashing every step.
+    const box = await p.evaluate(() => { const b = document.querySelector('.hb-wrap[data-h="steps"] .hb-step[data-d="1"]').getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; });
+    await p.mouse.move(box.x, box.y); await p.mouse.down(); await p.waitForTimeout(1500); await p.mouse.up();
+    await p.waitForTimeout(250);
+    const held = await p.evaluate(() => AAHabits.valOf(AAHabits.AKEY(), 'steps'));
+    t.check('holding the + repeats: a second and a half of it is thousands of steps, not 500', held >= 2500, held);
+    t.check('the release stops it', held === (await p.evaluate(() => AAHabits.valOf(AAHabits.AKEY(), 'steps'))), held);
+    // The daily cap (3 x the target) is the ceiling, and the + says so when it is reached.
+    await p.evaluate(() => habSetVal('steps', 30000)); await p.waitForTimeout(150);
+    const capped = await stepper();
+    t.check('at the daily cap the + is off and the − is on', JSON.stringify(capped.steps.off) === '[false,true]', JSON.stringify(capped.steps.off));
+    await p.evaluate(() => { habSetVal('steps', 0); habSetVal('sleep', 0); }); await p.waitForTimeout(150);
+
     await p.evaluate(() => habBump('water'));
     await p.evaluate(() => habTap('sleep'));
     await p.waitForTimeout(150);

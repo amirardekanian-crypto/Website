@@ -1563,12 +1563,15 @@ async function habitXp(browser, C) {
       stub: { profile: prof, awards: rwShelf(prof), myMoments: myMomentsFx() } });
     await waitRow(p);
     // The tick's own flourish: a +N XP over the row that rises and goes (no box to dismiss five times a day).
-    const said = async (src) => { await p.evaluate(() => document.querySelectorAll('.hb-pop').forEach(e => e.remove())); await p.evaluate(src); await p.waitForTimeout(300);
+    // ⚠️ The pop ADDS UP while it is on screen (a held − or + is many steps a second), so each case here starts from a clean
+    // count; without that, three steps in a row would read as one growing number, which is exactly what a hold should look like.
+    const said = async (src) => { await p.evaluate(() => { _habPop = null; document.querySelectorAll('.hb-pop').forEach(e => e.remove()); }); await p.evaluate(src); await p.waitForTimeout(300);
       return await p.evaluate(() => { const e = document.querySelector('.hb-pop'); return e ? e.textContent.trim() : null; }); };
     C.check('a habit done pays, and the tick says so (mobility 30 × 1.2)', (await said(() => { habToggleOn('mobility'); habToggleOn('mobility'); habSetVal('mobility', 1); })) === '+36 XP');
     C.check('part of a counter pays its share (half of 8 glasses: 30 × 0.5)', (await said(() => habSetVal('water', 4))) === '+15 XP');
     C.check('the rest of it pays the rest (the full 36, less the 15 already paid)', (await said(() => habSetVal('water', 8))) === '+21 XP');
-    C.check('taking a habit back says nothing', (await said(() => habSetVal('water', 0))) === null);
+    // Taking a number back says so too (2026-10-20, with the − button): XP that left in silence would be the app lying by omission.
+    C.check('taking a habit back says what it cost, in grey', (await said(() => habSetVal('water', 0))) === '−36 XP');
     C.check('the day\'s own XP is counted the server\'s way', await p.evaluate(() => habDayXp()) === 36);
     C.check('the tick: no page errors', !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();
