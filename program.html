@@ -6673,6 +6673,9 @@ function _snapshot() {
     if (k === prefix + 'momentscache') continue;
     // Crew (stage81): a cache of get_bell(), and the newest post of Amir's opened on this phone. Neither is progress.
     if (k === prefix + 'crewcache' || k === prefix + 'crewseen') continue;
+    // The crew's board (loadCrewBoard()): a cache of crew_board(), other athletes' names and points. Never progress, and
+    // never this athlete's to keep in their own row.
+    if (k === prefix + 'crewboard') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -6766,11 +6769,20 @@ async function syncFromCloud(athleteId, key, isLive) {
     // A day the CLOUD still thinks is finished must not be restored onto this
     // device — see staleCloudPlan() for why that was destroying live sessions.
     const plan = staleCloudPlan(data, prefix);
+    // Deletes this phone made and has not told the server about yet (<id>_drops, setupCloudBackup()). The cloud still
+    // holds those keys until the next push lands, and merging them back would undo the delete: a Reset made with no
+    // signal came back as Done at the next open (2026-10-20). Skipped only while pending: the push clears the list.
+    let dropped = [];
+    try { dropped = JSON.parse(localStorage.getItem(prefix + 'drops') || '[]') || []; } catch (e) {}
+    if (!Array.isArray(dropped)) dropped = [];
+    dropped = dropped.concat(_sbDrop);
     Object.keys(data).forEach(k => {
       if (k.indexOf(prefix) !== 0) return;
       if (k === prefix + 'snapAt' || k === prefix + 'lastEditAt') return;  // bookkeeping, not data
       if (k === prefix + 'drops'  || k === prefix + 'skey')       return;  // ditto — see _snapshot()
       if (k === prefix + 'csq' || k === prefix + 'autofiled')     return;  // this phone's own; old blobs still hold a queue
+      if (k === prefix + 'crewboard')                             return;  // a cache; old blobs still hold one (_snapshot())
+      if (dropped.indexOf(k) >= 0)                                return;  // deleted here, the delete not sent yet
       if (plan.skip.has(k)) return;
       // Weights are the athlete's working loads and always come back; the RPE and
       // done-ticks of a session that is already over must not, or they re-tick
@@ -7107,9 +7119,15 @@ function setupCloudBackup(athleteId, data, key) {
   const a = (data && data.athlete) || {};
   _sbName = [a.firstName, a.lastName].filter(Boolean).join(' ');
   localStorage.setItem = function (key, val) {
+    // The same value written again is not an edit (2026-10-20). Every open redraws the cards and writes back what they
+    // already hold (restoreState() → saveState(), attachSetLog()), and stamping those made a phone that had only been
+    // OPENED fresher than a newer edit made on another phone: since the pull runs behind the first paint, that phone won
+    // every conflict in syncFromCloud() and pushed its older copy over the newer one.
+    let same = false;
+    try { same = localStorage.getItem(key) === String(val); } catch (e) { /* unreadable: treat it as an edit */ }
     _lsRawSet(key, val);                                // real save always happens first
     try {
-      if (typeof key === 'string' && key.indexOf(_sbId + '_') === 0) {
+      if (!same && typeof key === 'string' && key.indexOf(_sbId + '_') === 0) {
         // Stamp when this device last edited real progress data — the freshness
         // signal syncFromCloud uses. Raw write: must not recurse into the hook.
         _lsRawSet(_sbId + '_lastEditAt', new Date().toISOString());
@@ -9112,6 +9130,10 @@ function _awaitingFile(id) {
 function closeUnfinished(id) {
   const on = localStorage.getItem(ATHLETE_ID + '_touched_d' + id);
   localStorage.setItem(ATHLETE_ID + '_completed_d' + id, on + '|' + progToken());
+  // A clock still running has no end anybody knows: Done was never pressed, so the time since is the night, not the
+  // session (a 19:00 start filed at 06:30 said "Duration: 690 min"). The record goes with no duration (2026-10-20).
+  const t = loadTimer(id);
+  if (t && t.running && !t.finished) saveTimer(id, Object.assign(t, { running: false, resumeAt: null, acc: 0 }));
 }
 // From boot, once the days are drawn (getDayCompletion() counts the drawn sets). Files each
 // unfinished day into the session queue, notes what it filed for Home, and answers true when
@@ -17633,8 +17655,12 @@ function markSuggestedDay() {
 function resetDay(day) {
   // A finished day's own copy (closeSessionAtDone()) goes back into the per-name keys first, so the reset below starts the
   // SAME session again from what it held: its typed weights stay, as they always did.
+  // A name another day is still using (a double day: the same lift under way in a second session) is that day's sets in
+  // those keys, and the Reset leaves them alone: putting this day's copy back or clearing the ticks there wiped them (2026-10-20).
+  const held = namesHeldBesides(day);
+  const mine = nm => !held.has(String(nm).replace(/\s+/g, '_'));
   const dl = loadDoneLog(day);
-  if (dl) Object.keys(dl.sets || {}).forEach(nm => saveSetLogValue(nm, dl.sets[nm]));
+  if (dl) Object.keys(dl.sets || {}).forEach(nm => { if (mine(nm)) saveSetLogValue(nm, dl.sets[nm]); });
   if (localStorage.getItem(doneLogKey(day)) != null) localStorage.removeItem(doneLogKey(day));
   localStorage.removeItem(ATHLETE_ID + '_touched_d' + day);   // nothing left to call unfinished (DATA-02)
   localStorage.removeItem(ATHLETE_ID + '_whyearly_d' + day);  // why it ended early belongs to the session being reset
@@ -17656,8 +17682,10 @@ function resetDay(day) {
     if (card.dataset.sets && !card.classList.contains('round-group')) {
       const name  = card.querySelector('.item-name').textContent.trim();
       const total = parseInt(card.dataset.sets, 10) || 1;
-      const log = loadSetLog(name, total).map(s => Object.assign({}, s, { w: s.w || '', n: '', r: '', d: false }));
-      saveSetLogValue(name, log);
+      if (mine(name)) {
+        const log = loadSetLog(name, total).map(s => Object.assign({}, s, { w: s.w || '', n: '', r: '', d: false }));
+        saveSetLogValue(name, log);
+      }
       // Refresh the rendered set rows
       card.querySelectorAll('.ex-set-row').forEach((row, i) => {
         row.classList.remove('done');
@@ -17672,7 +17700,7 @@ function resetDay(day) {
   document.querySelectorAll(`[data-day="${day}"].round-group`).forEach(card => {
     const nm = card.querySelector('.item-name').textContent.trim();
     const rounds = parseInt(card.dataset.rounds, 10) || 1;
-    for (let r = 1; r <= rounds; r++) localStorage.removeItem(circuitRpeKey(nm, r));
+    if (mine(nm)) for (let r = 1; r <= rounds; r++) localStorage.removeItem(circuitRpeKey(nm, r));
     card.querySelectorAll('.rpe-row .rpe-btn.selected').forEach(b => b.classList.remove('selected'));
   });
   // Hide RPE row indicator (used by circuits + simple exercises)
@@ -17917,14 +17945,11 @@ function carryExerciseKeys(ex) {
   try { log = JSON.parse(localStorage.getItem(setKey)) || []; } catch (e) {}
   if (log.length) localStorage.setItem(setKey, JSON.stringify(log.map(carrySet)));
 }
-// Done closes the session (see "A SESSION CLOSES AT DONE" by loadSetLog()). Called by finishDay() after the record and the
-// report were built from the live keys. Names another day still needs are left alone: a day under way today and not finished,
-// or one waiting to be filed (liveExerciseKeys()'s rule without the finished days, whose own copies are closed already).
-function closeSessionAtDone(day) {
+// The exercise names (as the per-name keys spell them) that a day other than `day` still holds: one under way today and not
+// finished, or one waiting to be filed (liveExerciseKeys()'s rule without the finished days, whose own copies are closed
+// already). Done leaves their keys alone, and so does a Reset (resetDay()).
+function namesHeldBesides(day) {
   const days = (DATA && DATA.workouts && DATA.workouts.days) || [];
-  const dayData = days.find(d => String(d.id) === String(day));
-  const stamp = localStorage.getItem(ATHLETE_ID + '_completed_d' + day);
-  if (!dayData || !stamp) return;
   const today = new Date().toDateString();
   const keep = new Set();
   days.forEach(d => {
@@ -17933,6 +17958,16 @@ function closeSessionAtDone(day) {
     if (!sessionStartedToday(d.id, today) && !_awaitingFile(d.id)) return;
     (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => keep.add(String(ex.name || '').replace(/\s+/g, '_'))));
   });
+  return keep;
+}
+// Done closes the session (see "A SESSION CLOSES AT DONE" by loadSetLog()). Called by finishDay() after the record and the
+// report were built from the live keys. Names another day still needs are left alone (namesHeldBesides()).
+function closeSessionAtDone(day) {
+  const days = (DATA && DATA.workouts && DATA.workouts.days) || [];
+  const dayData = days.find(d => String(d.id) === String(day));
+  const stamp = localStorage.getItem(ATHLETE_ID + '_completed_d' + day);
+  if (!dayData || !stamp) return;
+  const keep = namesHeldBesides(day);
   const exs = [];
   (dayData.blocks || []).forEach(b => (b.exercises || []).forEach(ex => { if (ex && ex.name) exs.push(ex); }));
   const dl = { sess: stamp, sets: {}, rpe: {} };
@@ -18268,10 +18303,13 @@ function buildSessionData(day) {
   //   { ex, block, reps (planned), sets: [{ w, n, r, d }], note }            standard
   //   { ex, block, circuit: true, items: [{ name, w }], rounds: [{ round, r }], note }
   const log = [];
+  // The dates this session's notes were typed on: the day it is filed under, and the day its clock started.
+  const noteDays = [onDay];
+  if (timerState && timerState.sessionStart && !isNaN(new Date(timerState.sessionStart))) noteDays.push(ymdLocal(new Date(timerState.sessionStart)));
   const collectFor = (ex, isCircuit) => {
     const name = ex.name;
     const k = name.replace(/\s+/g, '_');
-    const n = loadSessionNote(name);
+    const n = loadSessionNote(name, noteDays);
     if (isCircuit) {
       const card = Array.from(document.querySelectorAll('.round-group'))
         .find(c => (c.querySelector('.item-name')?.textContent || '').trim() === name);
@@ -18446,7 +18484,10 @@ function rpeOn(day, key) {
 }
 function setRpeOn(day, key, v) {
   const dl = loadDoneLog(day);
-  if (dl && dl.rpe && Object.prototype.hasOwnProperty.call(dl.rpe, key)) { dl.rpe[key] = v || ''; saveDoneLog(day, dl); return; }
+  if (dl && dl.rpe && Object.prototype.hasOwnProperty.call(dl.rpe, key)) {
+    if ((dl.rpe[key] || '') === (v || '')) return;
+    dl.rpe[key] = v || ''; saveDoneLog(day, dl); resaveFinished(day); return;
+  }
   if (v) localStorage.setItem(key, v); else localStorage.removeItem(key);
 }
 function loadSetLog(exName, totalSets, day) {
@@ -18510,8 +18551,21 @@ function setReps(s, planned) {
 }
 function saveSetLogValue(exName, log, day) {
   const dl = loadDoneLog(day);
-  if (dl && dl.sets && Array.isArray(dl.sets[exName])) { dl.sets[exName] = log; saveDoneLog(day, dl); return; }
+  if (dl && dl.sets && Array.isArray(dl.sets[exName])) {
+    // A card redrawn writes the same sets back: not a change. A real one is re-sent (resaveFinished()).
+    if (JSON.stringify(dl.sets[exName]) === JSON.stringify(log)) return;
+    dl.sets[exName] = log; saveDoneLog(day, dl); resaveFinished(day); return;
+  }
   localStorage.setItem(setLogKey(exName), JSON.stringify(log));
+}
+// A set or a round rating changed on a FINISHED day's card (a typo fixed in the weight box after Done, as kgCheckTicked()
+// asks) re-saves the record the coach has, as a rating or note changed later does (initDayWrapup()), once the athlete stops
+// typing. Until 2026-10-20 the card showed the fix and the server kept the typo. The timers live on the function, so nothing
+// here can be read before its declaration while boot() runs.
+function resaveFinished(day) {
+  const T = resaveFinished.t || (resaveFinished.t = {});
+  clearTimeout(T[day]);
+  T[day] = setTimeout(() => { recordSessionToCloud(day); }, 1200);
 }
 
 // ── The set log: WRITTEN BY THE COACH, COUNTERSIGNED BY THE ATHLETE ──────────
@@ -19926,10 +19980,15 @@ function saveCircuitWeights(name, g) {
 // shows it (the ⓘ's Your history; a circuit's strip too; it comes from the session record). The old <id>_note_ keys are no
 // longer read.
 function sessionNoteKey(name) { return ATHLETE_ID + '_snote_' + String(name).replace(/\s+/g, '_'); }
-function loadSessionNote(name) {
+// `days`: the other dates this note may carry, for the session record only (buildSessionData()). A record is saved on a
+// later date than its notes were typed when a day is filed the next morning (fileUnfinished()), when a session runs past
+// midnight, or when its rating changes inside the grace; "today" alone sent those records with every note blank, and
+// save_session keeps the newest log, so the notes were gone from the coach's copy too (2026-10-20).
+function loadSessionNote(name, days) {
   try {
     const o = JSON.parse(localStorage.getItem(sessionNoteKey(name)));
-    return (o && o.d === ceilingToday() && typeof o.v === 'string') ? o.v : '';
+    if (!o || typeof o.v !== 'string') return '';
+    return (o.d === ceilingToday() || (days || []).indexOf(o.d) >= 0) ? o.v : '';
   } catch (e) { return ''; }
 }
 function saveSessionNote(name, v) {
