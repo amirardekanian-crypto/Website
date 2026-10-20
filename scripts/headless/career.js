@@ -844,12 +844,16 @@ async function trainingLight(browser, C) {
     const owned = {}; ms.forEach(m => { owned[m.award_id] = TODAY; });
     await q.p.evaluate(s => { eval(s); finishTap('1', document.querySelector('#confirm-1 .confirm-btn')); }, stubSet(rwProfile(10470, { owned, moments: ms })));
     await q.p.waitForTimeout(2200);
-    const bands = await q.p.evaluate(() => ({ b: [...document.querySelectorAll('#hlwin-1 .hl-band')].map(b => b.innerText.replace(/\s+/g, ' ').trim()), more: (document.querySelector('#hlwin-1 .hl-band-more') || {}).textContent }));
-    C.check('five rewards it tells: three bands (the highlight first) and one grey "+2 more in Your moments, on Progress"; the badge and the title are neither', bands.b.length === 3 && /The Foundry/i.test(bands.b[0]) && bands.more === '+2 more in Your moments, on Progress'
-      && !bands.b.some(t => /SPRINKLER|BEDROCK/i.test(t)), JSON.stringify(bands));
+    const bands = await q.p.evaluate(() => ({ b: [...document.querySelectorAll('#hlwin-1 .hl-band')].map(b => b.innerText.replace(/\s+/g, ' ').trim()), more: (document.querySelector('#hlwin-1 .hl-band-more') || {}).textContent,
+      moment: (document.querySelector('.hl-moment .hl-m-title') || {}).textContent }));
+    // Since 2026-10-20 an achievement is never a band: the biggest one opens the big moment (one per open), the two marks stay bands, and the two
+    // achievements left over wait unseen for their own moment on a later open. Your moments holds every one of them meanwhile.
+    C.check('five rewards it tells: the achievement opens the moment, the two marks are bands, and no achievement is a band', bands.b.length === 2
+      && bands.moment === 'The Foundry' && !bands.more
+      && !bands.b.some(t => /FOUNDRY|SPRINKLER|BEDROCK/i.test(t)), JSON.stringify(bands));
     const seen = (await rwSeenOf(q.p)) || {}, told = (await params(q.p, 'mark_moments_told')).filter(a => a.p_app === 'training').reduce((s, a) => s.concat(a.p_award_ids), []);
-    const drawn = ms.map(m => m.award_id).filter(id => bands.b.some(t => t.toUpperCase().includes(({ 'badge:bests:1': '5 PERSONAL BESTS', 'badge:comebacks:1': '3 COMEBACKS', 'achievement:the_foundry': 'THE FOUNDRY', 'achievement:first_serve': 'FIRST SERVE', 'achievement:night_shift': 'NIGHT SHIFT' })[id] || '#')));
-    C.check('only a reward that was DRAWN is marked seen and told: the two behind "+2 more", the other badge and the title are none of those', drawn.length === 3 && drawn.every(id => seen[id] && told.includes(id))
+    const drawn = ['badge:bests:1', 'badge:comebacks:1', 'achievement:the_foundry'];
+    C.check('only a reward that was DRAWN is marked seen and told: the two bands and the moment; the two achievements behind "+3 more", the other badge and the title are none of those', drawn.every(id => seen[id] && told.includes(id))
       && ms.map(m => m.award_id).filter(id => drawn.indexOf(id) < 0).every(id => !seen[id] && !told.includes(id)), JSON.stringify({ drawn, seen: Object.keys(seen), told }));
     await q.ctx.close();
     // an answer that predates the save is no trigger for a confirmed band: while get_profile stalls after Done only the phone's own Counting band shows
@@ -1023,7 +1027,40 @@ async function trainingLight(browser, C) {
     const ac = await p.evaluate(() => { const m = document.querySelector('.hl-moment'); const q = s => { const e = m.querySelector(s); return e ? e.textContent.trim() : null; };
       return m ? { eb: q('.hl-m-eyebrow'), num: q('.hl-m-num'), t: q('.hl-m-title'), sub: q('.hl-m-sub'), w: q('.hl-m-sheet p'), go: q('.hl-m-go') } : null; });
     C.check('an achievement\'s moment keeps its name and its line: kind of win, "The Foundry", the caption, Amir\'s milestone line, Share it', !!ac && ac.eb === 'Commitment' && ac.num === null && ac.t === 'The Foundry'
-      && ac.sub === 'Four weeks of putting the work in.' && ac.w === 'That one took weeks. It\'s yours for good.' && ac.go === 'Share it', JSON.stringify(ac));
+      && ac.sub === 'Four weeks of putting the work in.' && ac.w === 'That took weeks. It stays yours.' && ac.go === 'Share it', JSON.stringify(ac));
+    await ctx.close();
+    // EVERY achievement opens the big moment, whatever its size (2026-10-20, Amir: "like in a computer games when you have got an
+    // achievement. Something big on screen would come up"). A win-sized one used to be a band on the finish card and nothing else.
+    const crewOn = { athlete_id: H.ID, at: new Date().toISOString(), days: 7, kinds: ['achievement'],
+      me: { answer: 'yes', name: 'Alex R.', on_board: true, under13: false, can_post: true, photos_left: 3, posts_left: 10, kinds: { achievement: true } },
+      honours: { month: null, rows: [] }, items: [] };
+    const firstBlood = rwProfile(10000, { owned: { 'achievement:first_blood': TODAY },
+      moments: [mom('achievement:first_blood', 'win', false, 50, { kind: 'achievement', name: 'FIRST BLOOD', meaning: 'commitment', caption: 'Your first session on the board', date: TODAY })] });
+    ({ ctx, p } = await openRW(browser, { profile: firstBlood, stub: { bell: JSON.parse(JSON.stringify(crewOn)) } }));
+    await p.waitForSelector('.hl-moment', { timeout: 6000 }).catch(() => {});
+    const win = await p.evaluate(() => { const m = document.querySelector('.hl-moment'); const q = s => { const e = m && m.querySelector(s); return e ? e.textContent.trim() : null; };
+      return m ? { eb: q('.hl-m-eyebrow'), t: q('.hl-m-title'), sub: q('.hl-m-sub'), w: q('.hl-m-sheet p'), go: q('.hl-m-go') } : null; });
+    C.check('a win-sized achievement opens the full-screen moment too, with its own words', !!win && win.t === 'First Blood' && win.eb === 'Commitment'
+      && win.sub === 'Your first session on the board' && win.w === 'That one is on the board now. It stays yours.' && win.go === 'Share it', JSON.stringify(win));
+    // and it carries one line for the crew, sent only on the tap (Amir: "i want a line in the crew so everyone else can see")
+    await p.waitForFunction(() => { const b = document.querySelector('.hl-m-crew'); return !!b && !b.hidden; }, null, { timeout: 8000 }).catch(() => {});
+    const tell = await p.evaluate(() => { const b = document.querySelector('.hl-m-crew'); return b ? { t: b.textContent.trim(), line: b.dataset.line, hidden: b.hidden } : null; });
+    C.check('the moment offers "Tell the crew", with the line it would post', !!tell && !tell.hidden && tell.t === 'Tell the crew'
+      && tell.line === 'Just won First Blood. Your first session on the board.', JSON.stringify(tell));
+    C.check('nothing is posted before the tap', (await calls(p, 'rpc:crew_post')) === 0);
+    await p.evaluate(() => document.querySelector('.hl-m-crew').click());
+    await p.waitForFunction(() => /crew knows/i.test(document.querySelector('.hl-m-crew').textContent), null, { timeout: 8000 }).catch(() => {});
+    const sent = await p.evaluate(() => ({ t: document.querySelector('.hl-m-crew').textContent.trim(), off: document.querySelector('.hl-m-crew').disabled,
+      posted: (JSON.parse(localStorage.getItem('__stubcfg') || '{}').bell.items || []).filter(i => i && i.me).map(i => i.kind + '|' + i.body) }));
+    C.check('the tap puts that one line on the Bell, as a plain post, and the button stops being one', sent.off && /crew knows/i.test(sent.t)
+      && sent.posted.length === 1 && sent.posted[0] === 'post|Just won First Blood. Your first session on the board.', JSON.stringify(sent));
+    C.check('the crew line: no page errors', !p.errs.length, JSON.stringify(p.errs));
+    await ctx.close();
+    // the crew is opt-in: no Bell, no button (and the moment is unchanged)
+    ({ ctx, p } = await openRW(browser, { profile: firstBlood }));
+    await p.waitForSelector('.hl-moment', { timeout: 6000 }).catch(() => {});
+    await p.waitForTimeout(900);
+    C.check('no crew (or no answer yet): the moment shows no "Tell the crew"', await p.evaluate(() => { const b = document.querySelector('.hl-m-crew'); return !!document.querySelector('.hl-moment') && (!b || b.hidden); }));
     await ctx.close();
     // every other reward opens no moment: a title, the Grand Slam, another badge, a level: not shown, not marked seen, not told
     const other = [mom('title:grand_slam', 'legend', true, 0, { kind: 'title', name: 'GRAND SLAM', meaning: 'all', metal: 'prismatic', from: 'A title in all four', date: TODAY }),
@@ -1482,12 +1519,69 @@ async function fourCourts(browser, C) {
 }
 
 
+// ── The habits page says what the habits have paid (2026-10-20, Amir: "I want the habits to give xp as well. Like before. It
+// doesnt show xp so the people dont fill like their progressing") ─────────────────────────────────────────────────────────
+// Habits have always paid into the level (public.hab_xp: the weight times the completion bonus); no screen in this app said so.
+async function habitXp(browser, C) {
+  const LOG = rwLog(6);
+  // 1. the card, the price on every row, and the door into the one cabinet
+  {
+    const prof = rwProfile(13495);
+    prof.career.habits = { xp: 8190, daily: 7490, bonus: 700 };
+    const { ctx, p } = await openRW(browser, { facts: HOLD_FACTS, hist: ONE_DONE, seed: { _hab_cfg: HAB_ON, _hab_log: LOG },
+      stub: { profile: prof, awards: rwShelf(prof), myMoments: myMomentsFx(), achievements: achFx() } });
+    await waitRow(p);
+    await p.evaluate(() => goTo('habits'));
+    await p.waitForTimeout(600);
+    const h = await p.evaluate(() => ({
+      xp: (document.querySelector('#screen-habits .hab-xp b') || {}).textContent,
+      line: (document.querySelector('#screen-habits .hab-xp-t small') || {}).textContent,
+      label: (document.querySelector('#screen-habits .hab-xp-t span') || {}).textContent,
+      prices: [...document.querySelectorAll('#screen-habits .hl-row.is-core')].map(r => (r.querySelector('.hl-tag small') || {}).textContent),
+      door: (() => { const b = [...document.querySelectorAll('#screen-habits .hrow')].find(x => /From your habits/.test(x.textContent));
+        return b ? { v: b.querySelector('.hrow-vv').textContent, s: b.querySelector('.hrow-v small').textContent } : null; })(),
+      sideways: document.documentElement.scrollWidth > innerWidth + 1,
+    }));
+    C.check('the habits page says what the habits have paid: the server\'s own number and its share of the level', h.xp === '8,190' && h.label === 'XP from your habits'
+      && /^61% of your level/.test(h.line || ''), JSON.stringify(h));
+    // steps 60, sleep 50, protein 40, water 30, each times the 1.2 completion bonus; the session is locked and the session pays it
+    C.check('every habit says what it pays a day, and the session row says where its XP comes from instead',
+      JSON.stringify(h.prices) === JSON.stringify(['Session pays it', '+72 XP a day', '+60 XP a day', '+48 XP a day', '+36 XP a day']), JSON.stringify(h.prices));
+    C.check('a door into the one cabinet, counting the achievements the habits themselves can win', !!h.door && /^\d+ of \d+$/.test(h.door.v) && !!h.door.s, JSON.stringify(h.door));
+    C.check('the habits page fits (no sideways scroll)', !h.sideways);
+    await p.evaluate(() => { const b = [...document.querySelectorAll('#screen-habits .hrow')].find(x => /From your habits/.test(x.textContent)); b.click(); });
+    await p.waitForTimeout(400);
+    C.check('that door opens Achievements, the same page Progress opens', await p.evaluate(() => (document.querySelector('.screen.active') || {}).id) === 'screen-achievements');
+    C.check('the habits page: no page errors', !p.errs.length, JSON.stringify(p.errs));
+    await ctx.close();
+  }
+  // 2. a tick says what it just paid, and only a tick that earned something says anything
+  {
+    const prof = rwProfile(13495);
+    prof.career.habits = { xp: 8190, daily: 7490, bonus: 700 };
+    const { ctx, p } = await openRW(browser, { facts: HOLD_FACTS, hist: ONE_DONE, seed: { _hab_cfg: HAB_ON, _hab_log: {} },
+      stub: { profile: prof, awards: rwShelf(prof), myMoments: myMomentsFx() } });
+    await waitRow(p);
+    // The tick's own flourish: a +N XP over the row that rises and goes (no box to dismiss five times a day).
+    const said = async (src) => { await p.evaluate(() => document.querySelectorAll('.hb-pop').forEach(e => e.remove())); await p.evaluate(src); await p.waitForTimeout(300);
+      return await p.evaluate(() => { const e = document.querySelector('.hb-pop'); return e ? e.textContent.trim() : null; }); };
+    C.check('a habit done pays, and the tick says so (mobility 30 × 1.2)', (await said(() => { habToggleOn('mobility'); habToggleOn('mobility'); habSetVal('mobility', 1); })) === '+36 XP');
+    C.check('part of a counter pays its share (half of 8 glasses: 30 × 0.5)', (await said(() => habSetVal('water', 4))) === '+15 XP');
+    C.check('the rest of it pays the rest (the full 36, less the 15 already paid)', (await said(() => habSetVal('water', 8))) === '+21 XP');
+    C.check('taking a habit back says nothing', (await said(() => habSetVal('water', 0))) === null);
+    C.check('the day\'s own XP is counted the server\'s way', await p.evaluate(() => habDayXp()) === 36);
+    C.check('the tick: no page errors', !p.errs.length, JSON.stringify(p.errs));
+    await ctx.close();
+  }
+}
+
 async function main() {
   const C = H.checker();
   const browser = await H.launch();
   await trainingBase(browser, C);       // the XP switch on, the catalogue off
   await trainingLight(browser, C);      // the catalogue on: Your numbers, New from Amir, the marks
   await fourCourts(browser, C);         // Achievements on Progress: Four Courts, a kind, the nudge
+  await habitXp(browser, C);            // the habits page: what they have paid, what each one pays, the door
   await proofXp(browser, C);            // AA Proof: the XP that still moves
   await crossApp(browser, C);           // a moment is the training app's alone
   await browser.close();

@@ -393,7 +393,13 @@
 // nice. maybe we can show the level there in a ring"). The card's head is the ring of the day's habits with the career level
 // in the middle, the state at display size, the run, the backfill days and a › to the habits page. Home's Career row and Hold
 // Serve's row are gone with it ("i think the career row is redundant"): the run sits beside This Week's count.
-const CACHE = 'aap-v205';
+// v206: program.html changed (2026-10-20, Amir: "The suggestion was like in a computer games when you have got an achievement.
+// Something big on screen would come up … And at the same time i want a line in the crew so everyone else can see", and "I want
+// the habits to give xp as well. Like before. It doesnt show xp so the people dont fill like their progressing"). Every
+// achievement now opens the full-screen moment, whatever its size, and carries one line the athlete can put on the Bell with a
+// tap. The habits page says what the habits have earned, every habit says what it pays a day, and a tick makes a +36 XP rise
+// off the row.
+const CACHE = 'aap-v206';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

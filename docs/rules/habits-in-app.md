@@ -42,6 +42,16 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   name is compared as it is displayed so one behaviour cannot score twice, **switching one ON is a two-tap
   confirm** (a toast is easy to have never read) and the armed state shows on the chip as well as the switch,
   and ✕ on a habit of their own takes its days with it while the switch keeps every point.
+- **The habits SAY what they pay** (2026-10-20, Amir: *"I want the habits to give xp as well. Like before. It
+  doesnt show xp so the people dont fill like their progressing"*). They always have paid; no screen said so.
+  The habits page carries what they have earned (the SERVER's `career.habits.xp`, its share of the level and
+  today's), every habit in the list says what it pays a day, and a tick makes a **`+36 XP` rise off the row**
+  and go. ⚠️ **Never a toast** — a box with a button, five times a day, is a chore. ⚠️ **The arithmetic is the
+  server's** (`hab_xp()`: the weight times the 1.2 completion bonus, a counter part way pays its share), read
+  from the engine's own `XP_RULES.weights`, so the number on the phone is the number that lands; **the session's
+  row pays nothing here** (`strength` is locked and the session pays it, so no habit is paid twice), and one
+  door, *From your habits*, opens the same Achievements page Progress opens. Detail:
+  [`PROGRAM-APP.md`](../../PROGRAM-APP.md) → *The Ring* → **What the habits pay**.
 
 ---
 

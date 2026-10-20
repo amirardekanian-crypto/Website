@@ -4546,6 +4546,13 @@
      Progress keeps one door. The figures wear the scoreboard's face (Barlow Condensed over a Space Mono
      caption) so they read as the same kind of thing as Your numbers. */
   #screen-habits .hab-figs { margin-top: 18px; }
+  /* What the habits have earned (2026-10-20): the server's own number, in the scoreboard's face, with its share of the level. */
+  #screen-habits .hab-xp { display: flex; align-items: center; gap: 12px; margin: 0 var(--g) 12px;
+    padding: 12px 14px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  #screen-habits .hab-xp > b { flex: none; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--green-ink); font-variant-numeric: tabular-nums; }
+  #screen-habits .hab-xp-t { min-width: 0; display: grid; gap: 2px; }
+  #screen-habits .hab-xp-t span { font: 600 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--ink); }
+  #screen-habits .hab-xp-t small { font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .6px; color: var(--grey); }
   :where(#screen-plan, #screen-habits) .hab-figs { display: flex; gap: 10px; margin: 0 var(--g) 12px; }
   :where(#screen-plan, #screen-habits) .hab-fig { flex: 1; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); padding: 12px 14px; }
   :where(#screen-plan, #screen-habits) .hab-fig b { display: block; font: 900 30px/1 'Barlow Condensed', sans-serif; }   /* display: a scoreboard figure, like Your numbers above */
@@ -4576,7 +4583,10 @@
   #screen-habits .hl-nm { flex: 1; min-width: 0; font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; }
   #screen-habits .hl-nm small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--grey); }
   #screen-habits .hl-row.is-core .hl-nm { color: var(--ink); }
-  #screen-habits .hl-tag { flex: none; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
+  #screen-habits .hl-tag { flex: none; display: grid; gap: 3px; justify-items: end; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
+  /* What the habit pays, beside its name (2026-10-20): the price list, in the same quiet mono as the tag. */
+  #screen-habits .hl-tag small, #screen-habits .hl-pay { font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .6px; text-transform: none; color: var(--grey); }
+  #screen-habits .hl-pay { flex: none; }
   /* The switch. Armed (the first of the two taps to turn one ON) it outlines in clay and the row says why. */
   #screen-habits .hl-sw { flex: none; width: 52px; height: 32px; border-radius: 99px; border: 1.5px solid var(--box); background: var(--sand); padding: 0; cursor: pointer; }
   #screen-habits .hl-sw i { display: block; width: 24px; height: 24px; margin: 1px; border-radius: 99px; background: var(--row); box-shadow: 0 1px 2px rgba(0,0,0,.18); transition: transform .14s ease; }
@@ -4615,6 +4625,15 @@
   #home-overview .hb-day.is-on.is-ok i { background: #fff; }
   #home-overview .hb-day:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   #home-overview .hb-wrap + .hb-wrap { border-top: 1px solid var(--hair); }
+  /* What the tick just paid (2026-10-20): it rises off the row and goes. */
+  .hb-wrap { position: relative; }
+  .hb-pop { position: absolute; right: 14px; top: 8px; z-index: 3; pointer-events: none; white-space: nowrap;
+    font: 700 var(--fs-small)/1 'Space Mono', monospace; letter-spacing: .5px; color: var(--green-ink);
+    animation: habPop 1.3s ease-out forwards; }
+  @keyframes habPop { 0% { opacity: 0; transform: translateY(8px); } 12% { opacity: 1; transform: translateY(0); }
+    70% { opacity: 1; transform: translateY(-14px); } 100% { opacity: 0; transform: translateY(-22px); } }
+  @media (prefers-reduced-motion: reduce) { .hb-pop { animation: habPopQuiet 1.3s linear forwards; } }
+  @keyframes habPopQuiet { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
   /* The row is a div holding two real buttons: the tap target, and the + beside it (a button inside a
      button is invalid, and the browser pulls it apart). */
   #home-overview .hb-row { display: flex; align-items: center; gap: 8px; padding-right: 12px; }
@@ -4879,16 +4898,17 @@
 
   /* 6. The door rows: the About sheet's "Your history" row. White, rounded 12, a 1 px edge, a 22 px green line icon, a green Space
      Mono label over one line, a grey ›. One look with or without data (.quiet only changes the words). No dark fill, no dashes. */
-  :where(#home-overview, #screen-plan) .hrow { display: flex; align-items: center; gap: 14px; width: calc(100% - 2 * var(--g)); min-height: 64px; margin: 0 var(--g) 10px;
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow { display: flex; align-items: center; gap: 14px; width: calc(100% - 2 * var(--g)); min-height: 64px; margin: 0 var(--g) 10px;
     padding: 12px 14px 12px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
-  :where(#home-overview, #screen-plan) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
-  :where(#home-overview, #screen-plan) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
-  :where(#home-overview, #screen-plan) .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#home-overview, #screen-plan) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-ic svg { width: 22px; height: 22px; }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }
   /* ── THE DOOR'S NAME (Number First, Amir 2026-10-19: "the mono door labels") ────────────────────────────────────────
      The label used to be 11 px Space Mono 700, tracked and in capitals, on all 51 doors: the name of the place you are
      going, set as the smallest and least readable thing in the row, and declared SIX times (this block, #screen-notes,
-     #screen-ceiling, #hist-overlay, #ar-body, #day-view .complete-crew and #day-view .complete-share). It is ONE rule now, over all eight scopes,
+     #screen-ceiling, #hist-overlay, #ar-body, #day-view .complete-crew and #day-view .complete-share). It is ONE rule now, over all nine scopes
+     (#screen-habits joined on 2026-10-20, when the habits page grew a door of its own),
      and the other five blocks keep only their .hrow-b.
      The rule: THE LOUDEST THING IN A DOOR IS WHATEVER THAT DOOR IS FOR.
        · Default — the NAME is the headline, in the cycle card's fold-row recipe (.road-ul), so a door reads like the
@@ -4898,24 +4918,24 @@
          Hold Serve, Career) — NOT .hrow-v, which is a slot that also holds prose ("How the app works", "+ Log a max").
      ⚠️ The polarity is deliberate: the headline is the DEFAULT and the quiet label is the :has() branch, so a browser
      with no :has() (iOS 15.0–15.3) shows every name loud instead of whispering the one row this change was for. */
-  :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-l {
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-l {
     font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; letter-spacing: normal; text-transform: none; color: var(--ink); text-wrap: balance; }
-  :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-b:has(.hrow-vv) .hrow-l {
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-b:has(.hrow-vv) .hrow-l {
     font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-wrap: normal; }
-  :where(#home-overview, #screen-plan) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
-  :where(#home-overview, #screen-plan) .hrow-vv { white-space: nowrap; }   /* the value never breaks; the small line under it wraps whole */
-  :where(#home-overview, #screen-plan) .hrow-v small { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
-  :where(#home-overview, #screen-plan) .hrow-v.is-togo { color: var(--clay-ink); }   /* "2 to go" asks for something */
-  :where(#home-overview, #screen-plan) .hrow-v.is-ok { color: var(--green-ink); }
-  :where(#home-overview, #screen-plan) .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-vv { white-space: nowrap; }   /* the value never breaks; the small line under it wraps whole */
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-v small { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-v.is-togo { color: var(--clay-ink); }   /* "2 to go" asks for something */
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-v.is-ok { color: var(--green-ink); }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); }
   /* the sparkline belongs to the number, so it sits on the number's line: cleared by the quiet name's own line height, never a fixed nudge (at 320 the metadata wraps to a third line) */
-  :where(#home-overview, #screen-plan) .hrow-sp { flex: none; align-self: start; margin-top: calc(var(--fs-small) * 1.3); color: var(--green-ink); }
-  :where(#home-overview, #screen-plan) .hrow-sp .nc-spark { width: 60px; height: 24px; display: block; }
-  :where(#home-overview, #screen-plan) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
-  :where(#home-overview, #screen-plan) .hrow-sp + .hrow-a { margin-left: -4px; }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-sp { flex: none; align-self: start; margin-top: calc(var(--fs-small) * 1.3); color: var(--green-ink); }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-sp .nc-spark { width: 60px; height: 24px; display: block; }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+  :where(#home-overview, #screen-plan, #screen-habits) .hrow-sp + .hrow-a { margin-left: -4px; }
   @media (max-width: 359px) {   /* the narrowest phone: tighter gaps, and one more pixel of air because 320 stacks the name, the figure and its line */
-    :where(#home-overview, #screen-plan) .hrow { gap: 10px; padding-right: 12px; }
-    :where(#home-overview, #screen-plan, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-b { gap: 3px; }
+    :where(#home-overview, #screen-plan, #screen-habits) .hrow { gap: 10px; padding-right: 12px; }
+    :where(#home-overview, #screen-plan, #screen-habits, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-b { gap: 3px; }
   }
 
   /* 7. Progress: the header (the name as the eyebrow, "Progress" as the title), a section title for each part. The This cycle cover and
@@ -5220,6 +5240,12 @@
   .hl-m-sheet p { margin: 0 0 10px; font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
   .hl-m-sheet .wn-sign { margin-top: 8px; }
   .hl-m-go { display: block; width: 100%; min-height: 52px; margin-top: 16px; padding: 0 16px; font-size: var(--fs-lead); }   /* look: the one primary button */
+  /* Tell the crew, under Share it (2026-10-20): the quiet twin of the green button, and once it is sent it stops being one. */
+  .hl-m-crew { display: block; width: 100%; min-height: 48px; margin-top: 10px; border: 1.5px solid var(--hair); border-radius: 12px;
+    background: var(--row); color: var(--green-ink); cursor: pointer; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
+    letter-spacing: 1px; text-transform: uppercase; }
+  .hl-m-crew:disabled { cursor: default; }
+  .hl-m-crew.is-sent { border-color: var(--mark); background: var(--tint); }
   .hl-m-skip { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 0 12px; border: 0; background: none; color: var(--green-ink); cursor: pointer;
     font: 600 var(--fs-body)/1 'Barlow', sans-serif; }
   .hl-m-go:focus-visible, .hl-m-skip:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
@@ -10903,7 +10929,7 @@ function goTo(screen, historyId, keepContent) {
   // Progress — rebuild the two number rows, the cycle card and the road. They were Home's until 2026-10-12 and had the same
   // reason: a max saved during today's session, or a weight logged, would show stale until a reload. The Records
   // row counts up to a new best here (paintNumbers() runs ceilingCountUp() while Progress is the screen on show).
-  if (screen === 'habits') renderHabitList();
+  if (screen === 'habits') { refreshMomentsIfOld(); renderHabitList(); }   // the achievements door reads the same answer Progress asks for
   // Progress's own pages (THE SCOREBOARD, 2026-10-19): built on every visit from the same copy the doors read.
   if (screen === 'moments') renderMoments();
   if (screen === 'achievements') renderAchievements();
@@ -11212,9 +11238,15 @@ function habSetVal(id, v) {
   if (!HAB_LOG[k]) HAB_LOG[k] = {};
   const h = H.byId(id);
   const ceiling = Math.max((h.target || 1) * (H.XP_RULES.dailyCap || 3), Number(HAB_LOG[k][id]) || 0);
+  const was = habXpOf(h, k);
   HAB_LOG[k][id] = Math.max(0, Math.min(Number(v) || 0, ceiling));
   habSaveLog();
   paintTodayCard();
+  // What it just paid (2026-10-20, Amir: "It doesnt show xp so the people dont fill like their progressing"). Habits have always
+  // paid; this is the app finally saying so, at the moment of the tap. It rises off the row and goes: a toast would be a box to
+  // dismiss five times a day. Only a tick that EARNED something says anything.
+  const got = habXpOf(h, k) - was;
+  if (got > 0 && careerOnT()) habXpPop(id, got);
   // A habit ticked pays XP on the server's side of the career, so ask for the level again once the push
   // has had time to land. The same wait the Proof strip used to take.
   if (typeof careerOnT === 'function' && careerOnT() && typeof refreshCareerSoon === 'function') refreshCareerSoon(3000);
@@ -11365,13 +11397,50 @@ function habRowHtml(hb, k) {
   // div holding two buttons, so both are real controls and Tab reaches each of them.
   const plus = (hb.kind === 'count' && !hb.locked)
     ? `<button type="button" class="hb-plus" onclick="habBump('${hb.id}', event)" aria-label="Add one to ${esc(name)}">+</button>` : '';
-  return `<div class="hb-wrap">
+  return `<div class="hb-wrap" data-h="${hb.id}">
     <div class="hb-row${done ? ' is-done' : ''}${hb.locked ? ' is-locked' : ''}">
       <button type="button" class="hb-main" onclick="habTap('${hb.id}')">
         ${mark}<span class="hb-name">${esc(name)}</span>${right}
       </button>${plus}
     </div>${edit}
   </div>`;
+}
+// The XP a tick just earned, over the row it came from: it rises, fades and is gone. Nothing to dismiss, nothing to tap.
+function habXpPop(id, n) {
+  const wrap = document.querySelector('.hb-wrap[data-h="' + id + '"]');
+  if (!wrap || !n) return;
+  const el = document.createElement('span');
+  el.className = 'hb-pop';
+  el.setAttribute('aria-hidden', 'true');
+  el.textContent = '+' + n + ' XP';
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 1400);
+}
+// What one habit pays, and what a day has paid so far. The arithmetic is the SERVER's (public.hab_xp): the weight times the
+// completion bonus when the target is met, and a counter part-way pays its share. The engine carries the same weights as the
+// rules table, so these numbers are the ones that land. The session habit is the one exception: it is locked, the server zeroes
+// its weight, and the session itself pays (no habit is paid twice).
+function habXpOf(hb, k) {
+  const H = window.AAHabits;
+  if (!hb || hb.locked) return 0;
+  const w = (H.XP_RULES.weights || {})[hb.id];
+  const base = typeof w === 'number' ? w : (H.XP_RULES.customXp || 25);
+  const tgt = Number(hb.target) || 1, val = H.valOf(k || H.AKEY(), hb.id);
+  if (val >= tgt) return Math.round(base * (H.XP_RULES.completionBonus || 1.2));
+  return val > 0 ? Math.round(base * Math.min(1, val / tgt)) : 0;
+}
+// What one habit is worth when it is done, before anything is logged.
+function habXpFull(hb) {
+  const H = window.AAHabits;
+  if (!hb || hb.locked) return 0;
+  const w = (H.XP_RULES.weights || {})[hb.id];
+  return Math.round((typeof w === 'number' ? w : (H.XP_RULES.customXp || 25)) * (H.XP_RULES.completionBonus || 1.2));
+}
+function habDayXp(k) {
+  const H = window.AAHabits;
+  if (!habOn()) return 0;
+  const day = k || H.AKEY();
+  return H.rosterOn(day).reduce((n, hb) => n + habXpOf(hb, day), 0);
 }
 // The one "what now" line. Plain words, and it never asks for anything on a day that is already done.
 function habNudge(k, v) {
@@ -11447,7 +11516,8 @@ function habDoorHtml() {
         <span class="hrow-v"><span class="hrow-vv">${month} day${month === 1 ? '' : 's'}</span><small>this month</small></span></span>
       <span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
-// The habits page's own head: the two figures and the last seven days, habit by habit (#hab-figs-body, renderHabitList()).
+// The habits page's own head: the two figures, what the habits have earned, the last seven days, and the door to the
+// achievements they can win (#hab-figs-body, renderHabitList()).
 function habFigsHtml() {
   const H = window.AAHabits;
   if (!habOn() || !HAB_CFG || !HAB_CFG.onboarded) return '';
@@ -11456,7 +11526,42 @@ function habFigsHtml() {
       <div class="hab-fig"><b>${streak}</b><span>Day${streak === 1 ? '' : 's'} in a row</span></div>
       <div class="hab-fig"><b>${month}</b><span>Days this month</span></div>
     </div>
-    ${habWeekTableHtml()}`;
+    ${habXpHtml()}
+    ${habWeekTableHtml()}
+    ${habAchDoorHtml()}`;
+}
+// What the habits have earned (2026-10-20, Amir: "i want the habits to give xp as well. Like before. It doesnt show xp so the
+// people dont fill like their progressing"). They have always paid — habit_done pays from the habits rules, and for the
+// athletes who track them it is most of their level — but no screen in this app has ever said so. The number is the SERVER's
+// own (get_profile's career.habits: the daily XP and the completion bonus), never worked out here.
+function habXpHtml() {
+  let h = null;
+  try { h = careerOnT() && CAREER_T.p && CAREER_T.p.career && CAREER_T.p.career.habits; } catch (e) { h = null; }
+  const xp = h && Number(h.xp) > 0 ? Math.round(Number(h.xp)) : 0;
+  if (!xp) return '';
+  const share = (() => {
+    try { const all = Number(CAREER_T.p.career.xp) || 0; return all > 0 ? Math.round(xp / all * 100) : 0; } catch (e) { return 0; }
+  })();
+  const today = habDayXp();
+  const line = [share ? share + '% of your level' : '', today > 0 ? '+' + today + ' today' : ''].filter(Boolean).join(' · ');
+  return `<div class="hab-xp"><b>${xp.toLocaleString('en-US')}</b><span class="hab-xp-t"><span>XP from your habits</span>`
+    + (line ? `<small>${line}</small>` : '') + `</span></div>`;
+}
+// The achievements the habits themselves can win, as one door into the one cabinet (Progress → Achievements). They are not a
+// second cabinet: this row counts the habit-driven ones and says which is closest, and the page behind it is the same four kinds.
+function habAchList() {
+  return achItems().filter(i => ['proof', 'goals', 'runs_together'].indexOf(String(i.test)) >= 0 || ['habit_done', 'proof'].indexOf(String(i.reads)) >= 0);
+}
+function habAchDoorHtml() {
+  const list = habAchList();
+  if (!list.length) return '';
+  const got = list.filter(i => i.day), left = list.filter(i => !i.day);
+  const nx = left.slice().sort((a, b) => achPct(b) - achPct(a))[0];
+  const sub = nx ? momName(nx.name) + ' · ' + achLine(nx) : 'Every one of them, won.';
+  return `<button type="button" class="hrow" onclick="goTo('achievements')" aria-label="${esc('From your habits: ' + got.length + ' of ' + list.length + '. ' + sub).replace(/"/g, '&quot;')}">
+    ${hrowIc('ach')}<span class="hrow-b"><span class="hrow-l">From your habits</span>
+      <span class="hrow-v"><span class="hrow-vv">${got.length} of ${list.length}</span><small>${esc(sub)}</small></span></span>
+    <span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
 // The days THIS CALENDAR MONTH that counted — the same gate as the day streak, so the two figures can
 // never disagree about what a day is worth.
@@ -11526,15 +11631,20 @@ function renderHabitList() {
   const row = (hb, state) => {
     const name = H.splitEmoji(hb.name)[1] || hb.name;
     const custom = String(hb.id).indexOf('c_') === 0;
+    // Every row says what it pays (2026-10-20): the price list the athlete never had. The session row says where its XP
+    // comes from instead, because the session pays it and the habit does not.
+    const price = careerOnT()
+      ? (hb.locked ? `<small>Session pays it</small>` : `<small>+${habXpFull(hb)} XP a day</small>`) : '';
     if (state === 'core') {
       return `<div class="hl-row is-core"><span class="hl-nm">${esc(name)}<small>${esc(hb.goal || '')}</small></span>
-        <span class="hl-tag">Always on</span></div>`;
+        <span class="hl-tag">Always on${price}</span></div>`;
     }
     const arming = _habArm === hb.id;
     return `<div class="hl-row"><span class="hl-nm">${esc(name)}<small>${arming
         ? 'Tap again to switch it on. It counts from today, and it cannot come off until tomorrow.'
         : state === 'off' ? 'Off from tomorrow. It still counts today.'
         : esc(String(hb.goal || '') === name ? '' : (hb.goal || ''))}</small></span>
+      ${price && state !== 'off' ? `<span class="hl-pay">+${habXpFull(hb)} XP</span>` : ''}
       <button type="button" class="hl-sw${state === 'on' ? ' is-on' : ''}${arming ? ' is-arm' : ''}" role="switch" aria-checked="${state === 'on'}"
         onclick="habToggleOn('${hb.id}')" aria-label="${state === 'on' ? 'Stop' : 'Start'} ${esc(name)}"><i></i></button>
       ${custom ? `<button type="button" class="hl-x" onclick="habRemoveOwn('${hb.id}')" aria-label="Remove ${esc(name)} and its points">✕</button>` : ''}</div>`;
@@ -12036,7 +12146,24 @@ function rwFullSizes() {
   return (m && Array.isArray(m.full_screen) && m.full_screen) || ['milestone', 'legend'];
 }
 // A server row is a full-screen moment when it says so; a row from `recent` has no flag and is read by its size.
-function rwIsFull(m) { return m.full != null ? !!m.full : rwFullSizes().indexOf(m.size) >= 0; }
+// EVERY ACHIEVEMENT COMES UP FULL SCREEN (2026-10-20, Amir: "like in a computer games when you have got an achievement.
+// Something big on screen would come up. I want something like that. It can be shared as well"). The server's `full` says two
+// things at once — the size is in the moments setting's full_screen list, AND the award is still fresh (keep_days) — so an
+// achievement takes the freshness half and ignores the size half: a win-sized one (FIRST BLOOD) is as much a moment as a
+// milestone. A mark's tier keeps the size rule: those repeat, and four numbers bursting every few weeks is noise.
+function rwIsFull(m) {
+  if (m && m.spec && m.spec.kind === 'achievement') return rwFresh(m);
+  return m.full != null ? !!m.full : rwFullSizes().indexOf(m.size) >= 0;
+}
+// Within the moments setting's keep_days (14): older than that and the server turns it into a line in Your moments instead.
+function rwFresh(m) {
+  const ms = CAREER_T && CAREER_T.p && CAREER_T.p.rules && CAREER_T.p.rules.moments;
+  const keep = (ms && Number(ms.keep_days)) || 14;
+  const d = String((m && (m.day || (m.spec && m.spec.date))) || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return true;
+  const age = (Date.now() - new Date(d + 'T00:00:00').getTime()) / 86400000;
+  return age <= keep + 1;
+}
 function rwEarnRaw(day) { try { return JSON.parse(localStorage.getItem(ATHLETE_ID + '_earn_d' + day) || 'null'); } catch (e) { return null; } }
 function rwSeenGet() {
   try { const o = JSON.parse(localStorage.getItem(ATHLETE_ID + '_rw_seen') || '{}'); return o && typeof o === 'object' && !Array.isArray(o) ? o : {}; }
@@ -12121,6 +12248,7 @@ function collectRewardBands(day) {
 }
 // The moment for one waiting row (round 5, the Scorecard's moment): a mark opens with its number, what it counts and the next mark; an
 // achievement with its name and its line. No metal, no title, no Grand Slam (L2). The card to share is rwLightSpec()'s.
+// Since 2026-10-20 an achievement's moment also carries `crew`: the one line the athlete can put on the Bell with a tap.
 function rwMomentFor(m) {
   const sp = rwLightSpec(m) || {};
   const cur = DATA && (DATA.cycles || [])[Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0];
@@ -12139,8 +12267,13 @@ function rwMomentFor(m) {
     title: sp.name || '',
     sub: sp.caption || '',
     art,
-    words: m.size === 'legend' ? 'This is rare. Well done.' : 'That one took weeks. It\'s yours for good.',
+    // What Amir says under the card, by what the achievement cost: a small one never claims it took weeks.
+    words: m.size === 'legend' ? 'This one is rare. Well done.'
+      : m.size === 'milestone' ? 'That took weeks. It stays yours.'
+      : 'That one is on the board now. It stays yours.',
     go: 'Share it',
+    // The one line for the Bell, in the athlete's own voice, sent only if they tap Tell the crew (2026-10-20).
+    crew: sp.name ? 'Just won ' + momName(sp.name) + '.' + (sp.caption ? ' ' + sp.caption.replace(/\.$/, '') + '.' : '') : '',
     specs: [sp],
   };
 }
@@ -13580,9 +13713,40 @@ async function crewSend(go, ta, err) {
 }
 window.openCrewPost = openCrewPost;
 window.openCrewSettings = openCrewSettings;
+// Can this athlete put a line on the Bell right now? (The crew is opt-in and Amir can make an athlete read-only.)
+function crewCanTell() {
+  try { return !window.IS_PREVIEW && !window.IS_DEMO && crewOn() && !!crewMe().can_post; } catch (e) { return false; }
+}
+// The moment's one-tap line: a plain crew post in the athlete's own words, then the button says it is done.
+async function crewTellMoment(btn) {
+  if (!btn || btn.disabled) return;
+  const line = btn.dataset.line || '';
+  if (!line) return;
+  btn.disabled = true;
+  const was = btn.textContent;
+  btn.textContent = 'Telling the crew…';
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_post', { p_body: line, p_photo: null, p_w: null, p_h: null, p_kind: 'post', p_session: null }), 20000); }
+  catch (e) { r = null; }
+  if (!r || _noAnswer(r) || r.error || !r.data) {
+    btn.textContent = was; btn.disabled = false;
+    aaToast('No signal. The crew did not get it.');
+    return;
+  }
+  if (r.data.me && BELL) BELL.me = r.data.me;
+  btn.textContent = 'The crew knows ✓';
+  btn.classList.add('is-sent');
+  _bellAt = 0;
+  try { refreshBell(); } catch (e) { /* the Bell catches up on its own */ }
+}
+window.crewTellMoment = crewTellMoment;
+
 // Tell the crew, on every finished card: shown while this athlete can post (crewOn() and a yes), a door that opens the composer for that day.
 function paintCrewTell() {
   const can = crewOn() && !!crewMe().can_post;
+  // An open moment's own line (2026-10-20): the moment can be on screen before the Bell answers, so it is shown here.
+  const tell = document.querySelector('.hl-m-crew');
+  if (tell && !tell.classList.contains('is-sent')) tell.hidden = !crewCanTell();
   document.querySelectorAll('.complete-crew[data-day]').forEach(el => {
     el.hidden = !can;
     const html = can ? `<button type="button" class="hrow" onclick="openCrewPost('session', '${esc(el.dataset.day)}')"><span class="hrow-ic">${CREW_CAM_SVG}</span><span class="hrow-b"><span class="hrow-l">Tell the crew</span><span class="hrow-q">A photo from today, on the Bell for 7 days.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>` : '';
@@ -21940,6 +22104,7 @@ function openMoment(o) {
       <p>${esc(o.words || '')}</p>
       <div class="wn-sign">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>
       <button type="button" class="hl-m-go">${esc(o.go || 'Share it')}</button>
+      ${o.crew ? `<button type="button" class="hl-m-crew" data-line="${esc(o.crew)}"${crewCanTell() ? '' : ' hidden'}>Tell the crew</button>` : ''}
       <button type="button" class="hl-m-skip">Not now</button>
     </div>`;
   document.body.appendChild(el);
@@ -21949,6 +22114,11 @@ function openMoment(o) {
   // in the same tick let the late pop remove the SHEET's entry, and closing the sheet then left the app. navSync() settles it afterwards:
   // if the sheet opened, the one guard stays; if it did not (preview, no card), the guard is taken off.
   el.querySelector('.hl-m-go').addEventListener('click', () => { dropMoment(true); openShareSheet(o.specs, 0); navSync(); });
+  // One line to the crew, from the moment itself (2026-10-20, Amir: "at the same time i want a line in the crew so everyone
+  // else can see"). It is the athlete's own post, sent on their tap — nothing of an athlete reaches the crew before their yes
+  // — and it is a plain post, so it needs no photo. The button says what happened and then stops being a button.
+  const tell = el.querySelector('.hl-m-crew');
+  if (tell) tell.addEventListener('click', () => crewTellMoment(tell));
   navSync();
   if (navigator.vibrate && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) navigator.vibrate([16, 80, 16]);
   // The card itself, small, as it will be shared (a Story, in the athlete's last choices).

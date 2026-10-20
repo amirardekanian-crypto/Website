@@ -42,5 +42,26 @@ one number that brings anyone back — was 13 px grey in the corner.
   `career.js` (no door row on Home, the level in the ring, the run beside the week, the ring not a button, 320 px and dark),
   `hold-serve.js` (every case of the run, now read off the week's line), `habits-list.js` (Progress keeps the month alone).
 
+## What the habits pay (2026-10-20)
+
+Amir: *"I want the habits to give xp as well. Like before. It doesnt show xp so the people dont fill like their progressing."*
+They always have paid — `public.hab_xp()` pays a habit's weight times the completion bonus (1.2), and for the athletes who
+track them it is most of their level (Elmira 15,338 of 47,573; Amir 8,190 of 13,495). No screen in this app said so.
+
+- **The habits page says what they have earned**: one card under the two figures, the SERVER's own number
+  (`get_profile` → `career.habits.xp`, never worked out here), with its share of the level and what today has paid
+  (`habXpHtml()`, `habDayXp()`). It shows nothing until the career is on and the number is above zero.
+- **Every habit says what it pays a day**, beside its name in the list (`+72 XP a day`, `habXpFull()`). The session's row says
+  **Session pays it** instead: `strength` is locked, the server zeroes its weight (`career_paid_rules()`), and the session
+  itself pays — no habit is ever paid twice.
+- **A tick says what it just earned**: a `+36 XP` rises off the row and goes (`habXpPop()`, `.hb-pop`). ⚠️ **Not a toast** —
+  the toast is a box with a button, and five of those a day is a chore. Only a tick that EARNED something says anything, so
+  taking a habit back is silent, and a counter part way pays its share (half of eight glasses is `+15 XP`, the rest `+21`).
+- **The arithmetic is the server's**, from the engine's own `XP_RULES.weights` (the same table as `career_rules.habits`), so
+  the number on the phone is the number that lands. A habit the athlete added pays `customXp` (25 × 1.2).
+- **One door into the one cabinet**: *From your habits · 1 of 4* opens the same **Achievements** page Progress opens
+  (`habAchList()`, `habAchDoorHtml()`). It is not a second cabinet — it counts the habit-driven ones and names the closest.
+- **Tests**: `career.js` → `habitXp()` (the card, the price on all five rows, the door, the pop, part credit, silence on undo).
+
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*

@@ -103,5 +103,29 @@ no card under three readings) and §11 (day one, and that it is only day one), `
 clay, its done state in green, the order down the tab, the one Share door and the sheet it opens) and
 `highlight-reel.js` §1 (the verdict's singular).
 
+## Every achievement comes up full screen, and can tell the crew (2026-10-20)
+
+Amir: *"The suggestion was like in a computer games when you have got an achievement. Something big on screen would come up.
+I want something like that. It can be shared as well … And at the same time i want a line in the crew so everyone else can see."*
+
+- **An achievement is never a band now.** `rwIsFull()` used to read the SIZE (`milestone`, `legend`): a win-sized one, like
+  FIRST BLOOD, was a line on the finished card and nothing more. An achievement now takes only the FRESHNESS half of the
+  server's `full` (`rwFresh()`, the moments setting's `keep_days`, 14) and ignores the size, so every one of them opens the
+  moment: the hero, the name at display size, its caption, the drawn card, Amir's signature and **Share it**. ⚠️ **A mark's
+  tier keeps the size rule** — those repeat, and four numbers bursting every few weeks is noise.
+- **One moment per open, still** (D7). Earn three at once and the biggest opens; the rest stay unseen and each gets its own
+  moment on a later open. They are in **Your moments** the whole time, so nothing is lost, and nothing is told or marked seen
+  that was not drawn (GAME-14).
+- **The words fit what it cost**: *This one is rare. Well done.* (legend) · *That took weeks. It stays yours.* (milestone) ·
+  *That one is on the board now. It stays yours.* (the rest). A small win never claims it took weeks.
+- **Tell the crew**, under Share it: one tap puts ONE line on the Bell in the athlete's own voice — *"Just won First Blood.
+  Your first session on the board."* — as a plain `crew_post` (`crewTellMoment()`), then the button says **The crew knows ✓**
+  and stops being a button. ⚠️ **Nothing reaches the crew before the tap**, and the button is built hidden and shown by
+  `paintCrewTell()` once the Bell answers, because the moment is usually on screen before the crew's answer lands. No Bell,
+  no answer yet, read-only, the demo or the coach's preview: no button.
+- **Tests**: `career.js` (a win-sized achievement opens the moment with its own words; the line it would post; nothing posted
+  before the tap; the line on the Bell after it; no crew, no button; and the finished card's five rewards, where the
+  achievement opens the moment and the two marks stay bands).
+
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*
