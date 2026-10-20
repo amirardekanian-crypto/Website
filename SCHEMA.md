@@ -271,6 +271,7 @@ card has something to open (see "Advancing to the Next Cycle").
 | `athlete.key` | string | ⚠️ **retired** | Dead field. Authorises nothing (`athlete_keys` is empty and every keyed path fails closed). Don't add it; drop it from old files. |
 | `athlete.tier` | string | optional | `"free"` = free Proof user (locks WORKOUT, swaps programme links for coaching CTAs). Absent or anything else = coached. |
 | `athlete.boardName` | string | optional | The name AA Proof puts them on the shared leaderboard under, once they have finished a workout (since 2026-09-12). They can rename it or leave in Crew. |
+| `athlete.lang` | string | optional | `"fa"` or `"en"`: the language their **notifications** go out in, set at intake from their form (stage88, 2026-10-20). Absent = English. It is only the notifications — every word of in-app text is English (COM-3). A phone follows this field within the hour (`push_lang_sync()`), so correcting it here is the whole of changing it. |
 | `athlete.firstName` | string | ✅ | First name (white in hero) |
 | `athlete.lastName` | string | ✅ | Last name (yellow accent in hero) |
 | `athlete.avatar` | string | optional | URL or path to athlete's photo. Falls back to initials when missing. |

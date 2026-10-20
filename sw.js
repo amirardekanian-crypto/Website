@@ -399,7 +399,12 @@
 // achievement now opens the full-screen moment, whatever its size, and carries one line the athlete can put on the Bell with a
 // tap. The habits page says what the habits have earned, every habit says what it pays a day, and a tick makes a +36 XP rise
 // off the row.
-const CACHE = 'aap-v206';
+// v207: program.html changed (2026-10-20, Amir: "use the language from their intake form: put it on the programme and have the app
+// pass it"). A notification now goes out in the athlete's own language. Both subscribe call sites passed a hardcoded 'en' until now, so
+// every Farsi line in all three senders was unreachable — written, read and chosen, and able to reach nobody. The programme decides
+// (athlete.lang), the app passes it at the athlete's tap, and stage88's hourly sync brings a phone already subscribed, or one whose
+// language is corrected later, into line.
+const CACHE = 'aap-v207';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

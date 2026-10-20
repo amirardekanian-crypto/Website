@@ -13408,6 +13408,18 @@ function pushReady() {
   // drawing the Reminders door). Caught by scripts/headless/crew.js on 2026-10-19, after it had gone live.
   return !window.IS_DEMO && !window.IS_PREVIEW && !!window.AAPush && AAPush.state() !== 'unsupported' && !!ATHLETE_ID;
 }
+// The language a notification goes out in (Amir, 2026-10-20: "use the language from their intake
+// form: put it on the programme and have the app pass it"). The programme is the one place that knows
+// an athlete; `athlete.lang` is set from their intake form at onboarding.
+//
+// ⚠️ Every Farsi line in all three senders was unreachable until this existed, because this call site
+// and the two beside it passed a hardcoded 'en'. The phone keeps whatever it was subscribed with, so
+// stage88's hourly push_lang_sync() is what brings a phone already subscribed — or one whose language
+// Amir corrects later — into line with the programme. This only has to be right for a new phone.
+function pushLang() {
+  const l = String(((DATA && DATA.athlete) || {}).lang || '').toLowerCase();
+  return l === 'fa' ? 'fa' : 'en';
+}
 function pushLoadMe(then) {
   if (!window.AAPush || _pushLoading || PUSH_ME !== null) { if (then) then(); return; }
   _pushLoading = true;
@@ -13475,7 +13487,7 @@ async function pushTurnOn() {
   const sb = await _sbReady();
   if (!sb || !window.AAPush) return;
   AAPush.markAsked();
-  const r = await AAPush.enable(sb, 'training', 'en');
+  const r = await AAPush.enable(sb, 'training', pushLang());
   if (r && r.ok) { PUSH_ME = r.me || PUSH_ME; aaToast('Reminders are on'); }
   else if (r && r.state === 'blocked') aaToast('Your phone said no. You can undo that in its settings.');
   else if (r && r.state === 'needs-install') aaToast('Add the app to your Home Screen first');
@@ -13506,7 +13518,7 @@ async function pushTurnOnHere() {
   const sb = await _sbReady();
   if (!sb || !window.AAPush) return;
   AAPush.markAsked();
-  const r = await AAPush.enable(sb, 'training', 'en');
+  const r = await AAPush.enable(sb, 'training', pushLang());
   if (r && r.ok) { PUSH_ME = r.me || PUSH_ME; aaToast('Your phone is on. Nothing before 8am or after 10pm.'); }
   else if (r && r.state === 'blocked') aaToast('Your phone said no. You can undo that in its settings.');
   else if (r && r.state === 'needs-install') aaToast('Add the app to your Home Screen first.');

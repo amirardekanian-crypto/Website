@@ -87,12 +87,20 @@ Grouped into one round of questions, the genuine gaps to close:
     '<id>',
     jsonb_build_object(
       'athlete', jsonb_build_object(
-        'id','<id>', 'firstName','<First>', 'lastName','<Last>', 'boardName','<First Last>'),
+        'id','<id>', 'firstName','<First>', 'lastName','<Last>', 'boardName','<First Last>',
+        'lang','<en|fa>'),
       'sport',   jsonb_build_object('badge','🎾 Tennis Performance')   -- optional
     ),
     'intake')
   on conflict (athlete_id) do nothing;
   ```
+  **`lang` is the language their NOTIFICATIONS go out in** (Amir, 2026-10-20: *"use the language from
+  their intake form"*). Take it from the intake row's own `lang` — `fa` for a Farsi form, `en` for an
+  English one — and set it here, at onboarding, so it is never a backfill again. The phone follows the
+  programme within the hour (`push_lang_sync()`, stage88), so correcting it later is just an edit to
+  this field. **Leave it out and they get English**, which is what 36 existing programmes do until
+  Amir says otherwise. It is only the notifications: every word of in-app text is English (COM-3).
+
   No `tier` key = a coaching client (free Proof signups carry `athlete.tier = "free"`,
   which is `/proof-signup`'s job, not this one). `boardName` only pre-fills the join box
   in Proof — it never joins anyone to the leaderboard. `/program-assemble` later fills

@@ -39,6 +39,21 @@ off in their app settings"*. Two reminders, both opt-out once the phone allows t
   bug can wake anybody at three in the morning.
 - **A kind nobody switched is ON**, the same rule `crew_consent` uses, so a kind added later is on for
   everyone who already said yes. `kinds` carries `crew` (stage86, below) and `cycle` (no sender yet).
+- **The language a notification goes out in is `programs.data.athlete.lang`** ('fa' or 'en'), set at
+  intake from the athlete's own form (Amir, 2026-10-20: *"use the language from their intake form:
+  put it on the programme and have the app pass it"*). Absent = English. **It is only the
+  notifications**: every word of in-app text is English (COM-3).
+- **⚠️ A whole half of this feature was unreachable for a day and no test noticed.** All three Farsi
+  word tables existed, were read and were chosen — and every call site passed a hardcoded `'en'`, so
+  `push_subs.lang` was 'en' for every phone ever subscribed. Found by reading the live rows, not by a
+  guard. `scripts/push/rehearse_lang.mjs` now asks the three REAL senders what they would say to a
+  Farsi athlete, rather than checking a column.
+- **A phone subscribes once, so the app's tap is not enough.** `push_subscribe()` is only ever called
+  from that tap, so stage88's `push_lang_sync()` runs hourly at :03 (a minute before the sender) and
+  brings every subscription into line with its programme. That is what makes the programme the truth
+  rather than the first tap, and what lets a correction take effect without the athlete touching
+  anything. It never writes a value the column refuses. **No sender was changed to do this** — all
+  three already read `push_subs.lang`.
 - **The Farsi is Amir's, read on a lock screen and chosen there** (2026-10-20): تیم for the crew, not a
   transliteration of "crew"; دوره for a cycle, in both the crew's line and the cycle sender's;
   **دستاورد for BOTH a mark and an achievement**, which is his answer to whether the two read
