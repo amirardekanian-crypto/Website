@@ -78,6 +78,56 @@
     return navigator.serviceWorker.register('/sw.js')
       .then(function () { return navigator.serviceWorker.ready; });
   }
+  function subscribe(reg) {
+    return function () { return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC) }); };
+  }
+
+  // A subscription is bound to the key it was made with (VAPID_PUBLIC). If the key pair is ever replaced, every subscription made
+  // under the old one is refused by the push service, so it has to be made again (2026-10-20: nothing did, though the backup notes
+  // in coach.html promised each app would). True only when the browser says which key it used and that key is not this one: a
+  // browser that does not say is left alone, so a working phone is never subscribed over and over.
+  function staleKey(sub) {
+    try {
+      var k = sub && sub.options && sub.options.applicationServerKey;
+      if (!k) return false;
+      var a = new Uint8Array(k), b = urlB64ToUint8Array(VAPID_PUBLIC);
+      if (a.length !== b.length) return true;
+      for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return true;
+      return false;
+    } catch (e) { return false; }
+  }
+
+  /**
+   * At an open, with no prompt: a phone that has reminders on and a subscription made under an old key subscribes again and keeps
+   * its settings (the hour, the quiet days, which kinds). The permission is already granted; only the key changed. The new phone row
+   * takes the old one's hour, the old row is forgotten, and push_set puts the switches back. Resolves true when it subscribed again.
+   */
+  function pushRefresh(sb, app, lang) {
+    if (!sb || pushState() !== 'on') return Promise.resolve(false);
+    return ready().then(function (reg) {
+      return reg.pushManager.getSubscription().then(function (old) {
+        if (!old || !staleKey(old)) return false;
+        var oldEp = old.endpoint;
+        return pushMe(sb).then(function (me) {
+          return old.unsubscribe().catch(function () {}).then(subscribe(reg)).then(function (sub) {
+            var j = sub.toJSON ? sub.toJSON() : sub, keys = j.keys || {};
+            return sb.rpc('push_subscribe', {
+              p_endpoint: j.endpoint, p_p256dh: keys.p256dh, p_auth: keys.auth,
+              p_app: app === 'training' ? 'training' : 'proof',
+              p_hour: (me && me.hour) || 20, p_tz_offset: tzOffset(),
+              p_lang: (me && me.lang === 'fa') || lang === 'fa' ? 'fa' : 'en', p_device: deviceLine()
+            }).then(function (r) {
+              if (r.error) return false;
+              var gone = j.endpoint !== oldEp ? sb.rpc('push_forget', { p_endpoint: oldEp }) : Promise.resolve();
+              return gone.then(function () {
+                return me ? pushSet(sb, me.kinds || null, me.hour, me.quiet_days) : null;
+              }).then(function () { return true; });
+            });
+          });
+        });
+      });
+    }).catch(function () { return false; });
+  }
 
   /**
    * Ask the phone, then tell the server. Returns { ok, state, me } — `state` is pushState() after the
@@ -94,10 +144,9 @@
       return Notification.requestPermission().then(function (perm) {
         if (perm !== 'granted') return { ok: false, state: pushState() };
         return reg.pushManager.getSubscription().then(function (existing) {
-          return existing || reg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC)
-          });
+          // One made under an older key is refused by the push service for ever, so it is made again (staleKey()).
+          if (existing && !staleKey(existing)) return existing;
+          return (existing ? existing.unsubscribe().catch(function () {}) : Promise.resolve()).then(subscribe(reg));
         }).then(function (sub) {
           var j = sub.toJSON ? sub.toJSON() : sub;
           var keys = j.keys || {};
@@ -155,7 +204,7 @@
   }
 
   root.AAPush = {
-    state: pushState, enable: pushEnable, disable: pushDisable, me: pushMe, set: pushSet,
+    state: pushState, enable: pushEnable, disable: pushDisable, me: pushMe, set: pushSet, refresh: pushRefresh, staleKey: staleKey,
     asked: pushAsked, markAsked: pushMarkAsked, kindOn: pushKindOn,
     device: deviceLine, tzOffset: tzOffset, VAPID_PUBLIC: VAPID_PUBLIC
   };

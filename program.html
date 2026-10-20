@@ -7907,6 +7907,7 @@ setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS /
   loadCrewCache();   // Crew (stage81): the tab from the phone's copy; nothing is asked for unless Crew is opened (crewFirstLook())
   refreshHold();
   setTimeout(crewFirstLook, 2500);
+  setTimeout(pushRefreshQuiet, 4000);   // reminders made under an old key subscribe again, quietly (AAPush.refresh())
   // The Spine: cues and the ⓘ from the phone's copy now, then from the server.
   paintSpine();
   paintDayQualities();
@@ -14217,6 +14218,12 @@ function pushReady() {
 function pushLang() {
   const l = String(((DATA && DATA.athlete) || {}).lang || '').toLowerCase();
   return l === 'fa' ? 'fa' : 'en';
+}
+// Once an open: a phone whose reminders were subscribed under a key that has since been replaced subscribes again, with its
+// settings, and no prompt (assets/js/push.js pushRefresh(); every other phone does nothing). An older push.js has no refresh.
+function pushRefreshQuiet() {
+  if (!pushReady() || AAPush.state() !== 'on' || typeof AAPush.refresh !== 'function') return;
+  _sbReady().then(sb => sb && AAPush.refresh(sb, 'training', pushLang())).catch(() => {});
 }
 function pushLoadMe(then) {
   if (!window.AAPush || _pushLoading || PUSH_ME !== null) { if (then) then(); return; }

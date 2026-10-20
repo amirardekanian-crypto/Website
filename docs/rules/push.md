@@ -74,8 +74,9 @@ off in their app settings"*. Two reminders, both opt-out once the phone allows t
   habits were missed: a lock screen is read by whoever picks the phone up.
 - **The keys live in `public.push_config`**, not in Edge Function secrets, so the hourly job and the
   sender cannot disagree. That table is deliberately **out of** `BACKUP_TABLES` (a backup file holding
-  the VAPID private key is worse than losing it; losing it is recoverable, because each app
-  re-subscribes silently once the permission already stands). `push_subs` IS backed up, for the
+  the VAPID private key is worse than losing it; losing it is recoverable, because the training app
+  re-subscribes silently at its next open once the permission already stands, keeping the hour, quiet
+  days and switches: `AAPush.refresh()`, since 2026-10-20). `push_subs` IS backed up, for the
   opposite reason: a restore without it costs every athlete that one-shot permission.
   ⚠️ `push_config.vapid_public` must equal `AAPush.VAPID_PUBLIC` in `assets/js/push.js`, or **every
   push is refused 403 and nothing else looks wrong** (`scripts/headless/reminders.js` checks it).
