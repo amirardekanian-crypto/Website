@@ -4452,6 +4452,8 @@
   .ws-done-btn:disabled { opacity: .55; cursor: default; }
   .ws-done-btn.is-done { background: transparent; color: var(--green-ink); box-shadow: inset 0 0 0 1.5px var(--green-ink); }
   .ws-done-note { margin: 12px 0 0; font: 400 var(--fs-small)/1.6 'Barlow', sans-serif; color: var(--grey); }
+  .ws-track { margin-top: 12px; }
+  .ws-track[hidden] { display: none; }
 
   /* 6. An article. The cover is the session's: --hero, the category as the mint-dot eyebrow, the title in condensed capitals, the date and
      minutes in mono, ← as the glass button. The body keeps its reading layout (the paragraphs, headings, lists and pictures are above, in the
@@ -10952,7 +10954,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then today's habits as one card: the five you tick, your <strong>level</strong> in the ring, and the weeks you have held in a row beside <strong>This Week</strong>.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers and your level), <strong>Getting stronger</strong> (your best lift, week by week), <strong>Your body</strong> (your records, your body weight and your habits) and <strong>What you've earned</strong> (your achievements and your moments) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then today's habits as one card: the five you tick, your <strong>level</strong> in the ring, and the weeks you have held in a row beside <strong>This Week</strong>.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers and your level), <strong>Getting stronger</strong> (your best lift, week by week), <strong>Your body</strong> (your records, your body weight and your habits) and <strong>What you've earned</strong> (your achievements and your moments) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit on your Today card when you track that habit. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now. The card shows my first line. Tap <strong>Why this cycle matters</strong> for the rest of the note and <strong>Expected outcomes</strong> for what we're aiming to hit.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -11757,15 +11759,23 @@ window.habStart = habStart;
 
 // A finished session ticks the session habit, on the day it was trained. AA Proof read this off the server
 // (fetchWorkoutDays) because it could not trust another app's storage; one app has no such problem.
-function habTickSession(dayKey) {
-  if (!habOn() || window.IS_DEMO) return;
+function habTickSession(dayKey) { habTickOn('strength', dayKey); }
+// One habit ticked to its target on a day: the session habit when a session finishes, and the habit a Library session counts
+// as when it is marked done (markLibraryDone(), 2026-10-20: AA Proof did that from the server, and since it was retired nothing
+// did). Only a habit that day's roster holds, as AA Proof's importLibraryDays() kept it: one the athlete does not track would add
+// XP the day's denominator never counted. True when the habit is ticked.
+function habTickOn(id, dayKey) {
+  if (!habOn() || window.IS_DEMO || !id) return false;
   const H = window.AAHabits, k = dayKey || H.TKEY();
-  if (!H.canLog(k)) return;                       // older than the window: the server still counts it
+  if (!H.canLog(k)) return false;                 // older than the window: the server still counts it
+  if (!H.rosterOn(k).some(h => h.id === id)) return false;
+  const hb = H.byId(id), target = (hb && hb.target) || 1;
   if (!HAB_LOG[k]) HAB_LOG[k] = {};
-  if ((Number(HAB_LOG[k].strength) || 0) >= 1) return;
-  HAB_LOG[k].strength = 1;
+  if ((Number(HAB_LOG[k][id]) || 0) >= target) return true;
+  HAB_LOG[k][id] = target;
   habSaveLog();
   paintTodayCard();
+  return true;
 }
 
 
@@ -16243,7 +16253,7 @@ function _wsSaveChecks() {
 //
 // The only thing on this screen that reaches the server. Pressing Done writes
 // one row to public.library_sessions (stage28), which two things then read:
-// Proof ticks the habit that workout counts as, and the coach's report lists
+// the app ticks the habit that workout counts as (habTickOn()), and the coach's report lists
 // what the athlete actually did.
 //
 // WHAT IT COUNTS AS IS NOT DECIDED HERE. `countsAs` is read off the workout for
@@ -16265,7 +16275,7 @@ function _wsHabitOn(id) {
     return !!(cfg && cfg.on && cfg.on[id] === true);
   } catch (e) { return false; }
 }
-// The habit a Library session ticks in AA Proof, in Proof's words, or '' when it will not tick one: no record to
+// The habit a Library session ticks on Today's card, in the habit's short name, or '' when it will not tick one: no record to
 // write to (the demo, the coach's preview), a session that counts as nothing, or an add-on not switched on. The
 // shelf rows, the suggestions and the session's own Done note all ask this (LIB-01).
 function libTickLabel(countsAs) {
@@ -16305,18 +16315,44 @@ function renderLibraryDone() {
   btn.classList.toggle('is-done', done);
   btn.textContent = done ? 'Done today ✓' : 'Mark as done';
 
-  // Promise a habit tick only when AA Proof will give one (CNT-01, libTickLabel()): an add-on habit counts
-  // only once the athlete has switched it on there. Otherwise the Done still reaches the coach.
+  // Promise a habit tick only when Done gives one (CNT-01, libTickLabel()): an add-on habit counts only once the athlete has
+  // switched it on. Otherwise the Done still reaches the coach. The tick is on Today's card now: AA Proof is retired.
   if (done) {
     note.textContent = label
-      ? 'Done today. This ticks your ' + label + ' habit next time you open AA Proof.'
+      ? 'Done today. Your ' + label + ' habit is ticked.'
       : 'Done today. Your coach can see you did it.';
   } else {
     note.textContent = label
-      ? 'Tap when you finish. It ticks your ' + label + ' habit in AA Proof.'
+      ? 'Tap when you finish. It ticks your ' + label + ' habit.'
       : 'Tap when you finish. Your coach can see you did it.';
   }
+  // An add-on habit this session counts as, which they do not track: offered once it is done, as AA Proof offered it.
+  let offer = document.getElementById('ws-track');
+  const want = done && libTrackOffer(_wsCurrent.countsAs);
+  if (want && !offer) {
+    offer = document.createElement('button');
+    offer.type = 'button'; offer.id = 'ws-track'; offer.className = 'ws-done-btn is-done ws-track';
+    offer.onclick = () => libTrackHabit();
+    wrap.appendChild(offer);
+  }
+  if (offer) { offer.hidden = !want; if (want) offer.textContent = 'Track ' + WS_COUNTS_AS_LABEL[_wsCurrent.countsAs] + ' from today'; }
 }
+// Mobility or Breathe, habits set up, and the athlete does not track it: the Done can count, if they turn it on.
+function libTrackOffer(countsAs) {
+  if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW || !habOn() || !HAB_CFG || !HAB_CFG.onboarded) return false;
+  return (countsAs === 'mobility' || countsAs === 'breathe') && !_wsHabitOn(countsAs);
+}
+// One tap, as AA Proof's offer was: the habit is on from today, and today's Done ticks it.
+function libTrackHabit() {
+  const id = _wsCurrent && _wsCurrent.countsAs;
+  if (!libTrackOffer(id)) return;
+  HAB_CFG.on[id] = true;
+  habSaveCfg();
+  habTickOn(id);
+  aaToast(WS_COUNTS_AS_LABEL[id] + ' is on, from today.');
+  renderLibraryDone();
+}
+window.libTrackHabit = libTrackHabit;
 
 async function markLibraryDone() {
   if (!_wsCurrent || !ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return;
@@ -16336,6 +16372,7 @@ async function markLibraryDone() {
     if (error) throw error;
     localStorage.setItem(_wsDoneKey(_wsCurrent.id),
       JSON.stringify({ date: new Date().toDateString() }));
+    habTickOn(_wsCurrent.countsAs);   // the habit it counts as, when they track it (Today's card)
     if (navigator.vibrate) navigator.vibrate([15, 40, 15]);
     renderLibraryDone();
   } catch (e) {
