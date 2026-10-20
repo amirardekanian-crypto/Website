@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 66 tables, 259 functions, 9 sequences.
+-- 66 tables, 262 functions, 9 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -6014,6 +6014,31 @@ AS $function$
     from prog g left join public.push_cycle_seen sn on sn.athlete_id = g.athlete_id
 $function$;
 
+CREATE OR REPLACE FUNCTION public.cycle_push_on_publish()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  -- Only a cycle ADVANCE is news. Every other write to programs — the dashboard's inline editor, a
+  -- mid-cycle correction, a Spine rename moving history — leaves currentCycleIndex alone and must stay
+  -- silent. A first programme arrives as an INSERT, which this trigger does not watch: a new athlete is
+  -- onboarded by hand, and cycle_push_due()'s first-sight rule would hold its tongue anyway.
+  if coalesce(new.data ->> 'currentCycleIndex', '') = coalesce(old.data ->> 'currentCycleIndex', '') then
+    return new;
+  end if;
+
+  begin
+    perform public.push_fire();
+  exception when others then
+    -- A sender that is down must never cost the athlete their new cycle. The hourly job will carry it.
+    raise warning 'cycle_push_on_publish: %', sqlerrm;
+  end;
+
+  return new;
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.cycle_push_sweep()
  RETURNS integer
  LANGUAGE plpgsql
@@ -8178,6 +8203,35 @@ AS $function$
   select array['habits', 'workout', 'crew', 'cycle']::text[]
 $function$;
 
+CREATE OR REPLACE FUNCTION public.push_lang_of(p_athlete_id text)
+ RETURNS text
+ LANGUAGE sql
+ STABLE
+ SET search_path TO 'public'
+AS $function$
+  select case when p.data -> 'athlete' ->> 'lang' in ('en', 'fa') then p.data -> 'athlete' ->> 'lang' end
+    from public.programs p where p.athlete_id = p_athlete_id
+$function$;
+
+CREATE OR REPLACE FUNCTION public.push_lang_sync()
+ RETURNS integer
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare n integer;
+begin
+  update public.push_subs s
+     set lang = l.lang, updated_at = now()
+    from (select s2.endpoint, public.push_lang_of(s2.athlete_id) as lang
+            from public.push_subs s2) l
+   where l.endpoint = s.endpoint
+     and l.lang is not null
+     and l.lang <> s.lang;
+  get diagnostics n = row_count;
+  return n;
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.push_lines(p_kind text, p_lang text)
  RETURNS TABLE(title text, body text)
  LANGUAGE sql
@@ -9222,6 +9276,7 @@ CREATE TRIGGER hab_notes_prune_trg AFTER INSERT OR UPDATE ON public.hab_notes FO
 CREATE TRIGGER library_touch_trg BEFORE UPDATE ON public.library FOR EACH ROW EXECUTE FUNCTION library_touch();
 CREATE TRIGGER career_library_trg AFTER INSERT OR DELETE OR UPDATE ON public.library_sessions FOR EACH ROW EXECUTE FUNCTION career_on_library();
 CREATE TRIGGER career_programme_trg AFTER INSERT OR UPDATE OF data ON public.programs FOR EACH ROW EXECUTE FUNCTION career_on_programme();
+CREATE TRIGGER programs_cycle_push_trg AFTER UPDATE OF data ON public.programs FOR EACH ROW EXECUTE FUNCTION cycle_push_on_publish();
 CREATE TRIGGER programs_version_trg BEFORE UPDATE ON public.programs FOR EACH ROW EXECUTE FUNCTION programs_version_snapshot();
 CREATE TRIGGER qualities_touch_updated_at BEFORE UPDATE ON public.qualities FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 CREATE TRIGGER qualities_version_trg BEFORE DELETE OR UPDATE ON public.qualities FOR EACH ROW EXECUTE FUNCTION spine_keep_version();
@@ -9919,6 +9974,8 @@ revoke all on function public.cycle_push_due(p_now timestamp with time zone, p_m
 grant execute on function public.cycle_push_due(p_now timestamp with time zone, p_mark boolean) to service_role;
 revoke all on function public.cycle_push_fold(p_now timestamp with time zone) from public, anon, authenticated, service_role;
 grant execute on function public.cycle_push_fold(p_now timestamp with time zone) to service_role;
+revoke all on function public.cycle_push_on_publish() from public, anon, authenticated, service_role;
+grant execute on function public.cycle_push_on_publish() to service_role, public;
 revoke all on function public.cycle_push_sweep() from public, anon, authenticated, service_role;
 grant execute on function public.cycle_push_sweep() to service_role;
 revoke all on function public.cycle_push_words(p_lang text) from public, anon, authenticated, service_role;
@@ -10045,6 +10102,10 @@ revoke all on function public.push_forget(p_endpoint text) from public, anon, au
 grant execute on function public.push_forget(p_endpoint text) to authenticated, service_role;
 revoke all on function public.push_kind_list() from public, anon, authenticated, service_role;
 grant execute on function public.push_kind_list() to service_role;
+revoke all on function public.push_lang_of(p_athlete_id text) from public, anon, authenticated, service_role;
+grant execute on function public.push_lang_of(p_athlete_id text) to service_role;
+revoke all on function public.push_lang_sync() from public, anon, authenticated, service_role;
+grant execute on function public.push_lang_sync() to service_role;
 revoke all on function public.push_lines(p_kind text, p_lang text) from public, anon, authenticated, service_role;
 grant execute on function public.push_lines(p_kind text, p_lang text) to service_role;
 revoke all on function public.push_local(p_now timestamp with time zone, p_tz_offset integer) from public, anon, authenticated, service_role;
