@@ -17717,7 +17717,7 @@ function resetDay(day) {
   // SAME session again from what it held: its typed weights stay, as they always did.
   // A name another day is still using (a double day: the same lift under way in a second session) is that day's sets in
   // those keys, and the Reset leaves them alone: putting this day's copy back or clearing the ticks there wiped them (2026-10-20).
-  const held = namesHeldBesides(day);
+  const held = namesHeldBesides(day, true);
   const mine = nm => !held.has(String(nm).replace(/\s+/g, '_'));
   const dl = loadDoneLog(day);
   if (dl) Object.keys(dl.sets || {}).forEach(nm => { if (mine(nm)) saveSetLogValue(nm, dl.sets[nm]); });
@@ -17968,6 +17968,10 @@ function sessionDateFor(day) {
 // protective while a session is actually running on it (timer or readiness
 // stamped today), which is the same pair the abandoned-session sweep in
 // autoResetStaleDays() already uses to decide a session was started.
+// A day ticked today and not finished is under way too, whether or not its clock was started (2026-10-20: a set ticked with
+// no Start was left out, so a Reset of another day that shares a lift wiped it). markTouched() writes the day only on
+// a real tick, so this ends with the day and pins nothing for good: the next morning that day is _awaitingFile()'s.
+function touchedToday(dayId, today) { return localStorage.getItem(ATHLETE_ID + '_touched_d' + dayId) === today; }
 // Shared by autoResetStaleDays() and migrateCarriedWeights().
 function liveExerciseKeys(days, today) {
   const liveNames = new Set();
@@ -17975,7 +17979,7 @@ function liveExerciseKeys(days, today) {
     const on = completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id));
     if (on) {
       if (on !== today) return;                     // finished on an earlier day — stale
-    } else if (!sessionStartedToday(d.id, today) && !_awaitingFile(d.id)) {
+    } else if (!sessionStartedToday(d.id, today) && !_awaitingFile(d.id) && !touchedToday(d.id, today)) {
       return;                                       // never finished, not underway, nothing to file — not protective
     }
     (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
@@ -18007,15 +18011,17 @@ function carryExerciseKeys(ex) {
 }
 // The exercise names (as the per-name keys spell them) that a day other than `day` still holds: one under way today and not
 // finished, or one waiting to be filed (liveExerciseKeys()'s rule without the finished days, whose own copies are closed
-// already). Done leaves their keys alone, and so does a Reset (resetDay()).
-function namesHeldBesides(day) {
+// already). Done leaves their keys alone, and so does a Reset (resetDay()). `ticked`: a day only ticked today, its clock never
+// started, holds its names too (touchedToday()). A Reset asks that, since putting a finished day back over those keys wipes real
+// sets. Done does not: there a stray tap on another day would leave the finished day's ticks showing on it as in progress.
+function namesHeldBesides(day, ticked) {
   const days = (DATA && DATA.workouts && DATA.workouts.days) || [];
   const today = new Date().toDateString();
   const keep = new Set();
   days.forEach(d => {
     if (String(d.id) === String(day)) return;
     if (completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id))) return;
-    if (!sessionStartedToday(d.id, today) && !_awaitingFile(d.id)) return;
+    if (!sessionStartedToday(d.id, today) && !_awaitingFile(d.id) && !(ticked && touchedToday(d.id, today))) return;
     (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => keep.add(String(ex.name || '').replace(/\s+/g, '_'))));
   });
   return keep;

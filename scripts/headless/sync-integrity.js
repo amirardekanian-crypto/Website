@@ -241,6 +241,24 @@ const hoursAgo = h => new Date(Date.now() - h * 3600e3).toISOString();
     t.check('5. …at the weight and rating it typed', sets.length >= 2 && sets[0].w === '90' && sets[0].r === '8' && sets[1].w === '90', JSON.stringify(sets.slice(0, 2).map(s => [s.w, s.r])));
     await done(ctx, p);
   }
+  // 5b. The same when Day 2 was only ticked, its clock never started (touchedToday(), 2026-10-20).
+  {
+    const prog = H.fixture();
+    prog.workouts.days[1].blocks[1].exercises.unshift({ name: 'Barbell Back Squat', exId: 'barbell-back-squat', type: 'standard', rx: { sets: 3, reps: 5, rest: 120 } });
+    const { ctx, p } = await H.openProgram(browser, { prog });
+    const squat = () => p.evaluate(id => JSON.parse(localStorage.getItem(id + '_setlog_Barbell_Back_Squat') || 'null'), ID);
+    await finishDay1(p);
+    await p.waitForTimeout(300);
+    await p.evaluate(id => {
+      localStorage.setItem(id + '_setlog_Barbell_Back_Squat', JSON.stringify([{ w: '90', n: '', r: '8', d: true, lw: '70' }, { w: '90', n: '', r: '8', d: true, lw: '70' }, { w: '', n: '', r: '', d: false, lw: '70' }]));
+      localStorage.setItem(id + '_touched_d2', new Date().toDateString());
+    }, ID);
+    await p.evaluate(() => resetDay('1'));
+    await p.waitForTimeout(300);
+    const sets = (await squat()) || [];
+    t.check('5b. ticked with no clock: Day 2\'s sets are still ticked, at 90 kg and RPE 8', sets.filter(s => s.d).length === 2 && sets[0].w === '90' && sets[0].r === '8', JSON.stringify(sets.slice(0, 3)));
+    await done(ctx, p);
+  }
 
   // 6. A weight fixed on a finished day's card is sent again; opening the app is not an edit.
   {
