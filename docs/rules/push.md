@@ -44,7 +44,8 @@ off in their app settings"*. Two reminders, both opt-out once the phone allows t
   **دستاورد for BOTH a mark and an achievement**, which is his answer to whether the two read
   differently in Farsi — they do not, so the two notifications are deliberately identical; سطح for a
   level, as سطحش رفت بالا. **The folded count is in Persian digits**, because nothing else in that
-  line is Latin. He read the two reminders' lines at the same time and changed nothing in them.
+  line is Latin. He read the two reminders' lines at the same time and changed nothing in them
+  — **the kasra on وقتِ تمرینه is deliberate**, kept when asked directly, so it is not a typo to tidy away.
   Guards: both rehearsals check his words by name, so a later hand cannot tidy a transliteration
   back in. The board he read them on: https://claude.ai/artifact/JFeyXV9dGJv9f1WsF1eFcX
 - **⚠️ A switch in the Reminders panel must have a sender.** That is the fault Amir found on
