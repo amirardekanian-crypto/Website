@@ -17,7 +17,8 @@ function overProg() {
   return P;
 }
 // This suite is about Home between cycles, so the athlete has already seen the cycle's one-time Cycle complete moment (Highlight Reel,
-// 2026-10-17: it opens full screen at the first open in the 14 days after the end date, and would cover Home). <id>_hl_seen marks it.
+// 2026-10-17: it opens full screen at the first open after the end date and waits for them with no window since 2026-10-20, and it
+// would cover Home). <id>_hl_seen marks it.
 const seen = P => ({ _hl_seen: { ['cycle' + (P.currentCycleIndex + 1) + '|' + P.cycles[P.currentCycleIndex].endDate]: 1 } });
 
 (async () => {

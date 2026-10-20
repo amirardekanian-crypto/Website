@@ -2555,6 +2555,9 @@
   /* 5. Rows on the paper: the lifts, the picker. A hairline between rows (not above the first), no box. The name in Barlow 600, a mono
      line under it, the sparkline and the number (Barlow Condensed 900 over KG) at the right; the picker's rows end in a grey ›. */
   .ceil-list { margin: 0 var(--g); }
+  /* Log a max's search field: the set table's input, the Library's Exercises pane look (.xl-search), on the screen's own gutter. */
+  .ceil-find { margin: 0 var(--g); }
+  .ceil-find-n { margin: 12px var(--g) 0; font: 400 var(--fs-small)/1.55 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
   .ceil-lift { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; margin: 0; padding: 10px 0; border: 0; border-radius: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
   .ceil-lift + .ceil-lift { border-top: 1px solid var(--hair); }
   .ceil-lift:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
@@ -14370,6 +14373,12 @@ let _ceilLift = null;
 // chevron unwinds it one step at a time like everything else here.
 let _ceilAdd = null;
 
+// ⚠ The ONE array every "log a max" row indexes into (ceilingPicks()). Rows carry an index, not a
+// name, and three places build rows: the picker's three sections, the retest banner and a lift's own
+// page. This cycle's candidates always sit at its head, in ceilingCandidates()'s own order, so an
+// index taken anywhere means the same lift everywhere. Rebuilt by every one of those places.
+let _ceilPicks = null;
+
 // ── The retest nudge ──────────────────────────────────────────────────────
 // Anchored to the CYCLE, not the calendar. Cycles run about five weeks and each
 // chases one quality, so a test in the closing week measures that block and
@@ -14487,10 +14496,11 @@ function renderCeiling() {
   const intro = `<p class="ceil-intro">The most you could lift for one rep, on each exercise.
     Worked out from your normal sets, so you never have to test it.</p>`;
 
-  // Only offered when the current cycle actually holds a liftable movement —
-  // a button that opens an empty list is worse than no button.
-  const canAdd = ceilingCandidates().length > 0;
-  const addBtn = canAdd ? ceilDoor('openCeilingAdd()') : '';
+  // Always offered since 2026-10-20: the picker holds this cycle, the lifts already on the record and
+  // a search over the rest, so it can no longer open an empty list. (It used to need a liftable
+  // movement in the current cycle, because that was the whole of what it offered.)
+  const canAdd = true;
+  const addBtn = ceilDoor('openCeilingAdd()');
 
   if (!lifts.length) {
     body.innerHTML = intro + dueHtml() + `
@@ -14591,7 +14601,7 @@ function dueHtml() {
   // A flagged retest waits for a green day (REC-2): the strip stays, and says why not today.
   const wait = todayLowLevel()
     ? `<div class="ceil-due-wait">Not today: your check-in says a lower day. A retest waits for a green one.</div>` : '';
-  const cands = ceilingCandidates();
+  const cands = ceilingPicks('').all;   // rebuilt here too, so the index in the attribute is this moment's
   const rows = due.map(d => {
     const i = cands.findIndex(c => c.name === d.name);
     const meta = d.kg ? d.kg + ' ' + uWord(d.u, d.kg) + ' · ' + agoLabel(d.age).toLowerCase() : 'nothing on the record yet';
@@ -14613,21 +14623,26 @@ function dueHtml() {
 }
 
 // ── Log a max, step 1: pick the lift ──────────────────────────────────────
-// Rows carry their INDEX into ceilingCandidates(), never their name — esc()
-// leaves quotes alone, so a name like `6" Deficit Deadlift` would break out of
-// the attribute. Same rule the lift rows follow.
+// Rows carry their INDEX into _ceilPicks, never their name — esc() leaves quotes
+// alone, so a name like `6" Deficit Deadlift` would break out of the attribute.
+// Same rule the lift rows follow.
+//
+// Three sections since 2026-10-20 (ceilingPicks(), which holds the rule and Amir's words): this
+// cycle, then the lifts that already hold a record and have left it, then a search over the Spine
+// for anything else a one-rep max means something for. Typing redraws the hits alone, so the box
+// keeps the keyboard and its place.
 function openCeilingAdd() {
   _ceilAdd = {};
   _ceilLift = null;
   goTo('ceiling', null, true);
   ceilHeadPlain('Personal records');
   document.getElementById('ceil-title').textContent = 'Log a max';
-  const cands = ceilingCandidates();
+  const picks = ceilingPicks('');
   const known = {};
   ceilingLifts().forEach(l => { known[l.lift] = l; });
 
-  const rows = cands.map((c, i) => {
-    const l = known[c.name];
+  const row = (c, i) => {
+    const l = c.known || known[c.name];
     const meta = l ? l.latest.kg + ' ' + uWord(l.u, l.latest.kg) + ' · ' + agoLabel(l.age).toLowerCase()
                    : 'nothing on the record yet';
     return `<button type="button" class="ceil-lift" onclick="openCeilingForm(${i})">
@@ -14638,17 +14653,50 @@ function openCeilingAdd() {
       </span>
       <span class="ceil-go" aria-hidden="true">›</span>
     </button>`;
-  }).join('');
+  };
+  const rows = picks.cur.map((c, i) => row(c, i)).join('');
+  const before = picks.past.map((c, i) => row(c, picks.cur.length + i)).join('');
 
   document.getElementById('ceil-body').innerHTML = `
-    <p class="ceil-intro">Pick the lift, then put in what you actually did. Every exercise
-      in this cycle that carries a weight and a rep count is here.</p>
+    <p class="ceil-intro">Pick the lift, then put in what you actually did. This cycle is first.
+      Under it is every other lift you can put a number on.</p>
     <div class="prog-sec">This cycle</div><div class="ceil-list">${rows}</div>
-    <p class="ceil-note">Only lifts from your current programme.<br>
+    ${before ? `<div class="prog-sec">Lifts you've done before</div><div class="ceil-list">${before}</div>` : ''}
+    <div class="prog-sec">Any other lift</div>
+    <div class="ceil-find"><input id="ceil-q" class="xl-search" type="search" placeholder="Search for a lift"
+      autocomplete="off" aria-label="Search for a lift to log a max for"></div>
+    <div class="ceil-list" id="ceil-hits"></div>
+    <p class="ceil-find-n" id="ceil-find-n">Start typing and the lifts that can hold a record show up.</p>
+    <p class="ceil-note">Pick from a list, never type a name.<br>
       That is what keeps one exercise from becoming two records.</p>`;
+  const q = document.getElementById('ceil-q');
+  if (q) q.addEventListener('input', paintCeilingHits);
   window.scrollTo(0, 0);
 }
 window.openCeilingAdd = openCeilingAdd;
+
+// The search section's own rows, redrawn on every keystroke. It rebuilds _ceilPicks, whose head
+// (this cycle, then the known lifts) does not move, so the rows already on screen keep their index.
+function paintCeilingHits() {
+  const q = document.getElementById('ceil-q'), list = document.getElementById('ceil-hits'), note = document.getElementById('ceil-find-n');
+  if (!q || !list) return;
+  const picks = ceilingPicks(q.value);
+  list.innerHTML = picks.hits.map((c, i) => `<button type="button" class="ceil-lift" onclick="openCeilingForm(${picks.from + i})">
+      <span class="ceil-lift-m">
+        <span class="ceil-lift-n">${esc(c.name)}</span>
+        <span class="ceil-pick-s">nothing on the record yet</span>
+      </span>
+      <span class="ceil-go" aria-hidden="true">›</span>
+    </button>`).join('');
+  if (!note) return;
+  note.textContent = !q.value.trim()
+    ? 'Start typing and the lifts that can hold a record show up.'
+    : picks.hits.length ? ''
+    : !SPINE ? 'The exercise list is still loading. Try again in a moment.'
+    : 'Nothing matches that. A jump, a throw, a carry or a single-muscle lift holds no record, so it is not here.';
+  note.hidden = !note.textContent;
+}
+window.paintCeilingHits = paintCeilingHits;
 
 // ── Log a max, step 2: the numbers ────────────────────────────────────────
 // Three fields (kg, reps, RPE), the estimator and the Sharp/Good/Rough grade.
@@ -14656,7 +14704,9 @@ window.openCeilingAdd = openCeilingAdd;
 // prefilled to whatever the coach asked for, and the copy stops nagging the
 // athlete to go heavier when going heavier is exactly what they just did.
 function openCeilingForm(i, asTest) {
-  const c = ceilingCandidates()[i];
+  // _ceilPicks is the picker's one combined array (ceilingPicks()); its head is ceilingCandidates()
+  // in the same order, so a caller that has only ever built candidate rows still lands on its lift.
+  const c = (_ceilPicks && _ceilPicks[i]) || ceilingCandidates()[i];
   if (!c) return;
   const spec = asTest ? c.test : null;
   // The measure the form opens in: the lift's own (where its records are), else the unit it was last logged in, else kg. The unit button opens a menu of the three (chooseCeilingUnit()).
@@ -14898,9 +14948,10 @@ function renderCeilingLift(lift) {
   // the index in the attribute and the entry it names cannot drift apart.
   _ceilRows = l.entries.slice().reverse();
 
-  // -1 when this lift has left the programme: its history stays readable, but
-  // there is nothing in the current cycle to file a new entry against.
-  const at = ceilingCandidates().findIndex(c => c.name === l.lift);
+  // A lift that has left the programme can still be given a number (2026-10-20): it is in the
+  // picker's second section, so the door is here as well. -1 only for a lift the picker cannot
+  // reach at all, and then there is nothing to file against.
+  const at = ceilingPicks('').all.findIndex(c => c.name === l.lift);
   document.getElementById('ceil-body').innerHTML = band + `
     <div class="ceil-chartwrap">
       <svg class="ceil-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${axes}${line}${dots}</svg>
@@ -18493,9 +18544,10 @@ function deleteCeilingEntry(lift, day, u) {
 //   · Only new bests, on purpose. Every screen leads with a lift's LATEST entry, so
 //     an entry for every session would put a deload week's lower number on top as
 //     "▼ 12.5 kg". History is where every session lives; this is the record.
-//   · Lifts: ceilingCandidates(), the current cycle's loaded, rep-counted movements
-//     (the list "+ Log a max" offers), narrowed by recordsItself() to the strength
-//     patterns. A lift renamed between cycles is joined through HIST_ALIAS.
+//   · Lifts: ceilingCandidates(), the current cycle's loaded, rep-counted movements, plus every lift
+//     the sessions being read actually name (2026-10-20, so a lift that has rotated out still files
+//     from its own history), both narrowed by recordsItself() to the strength patterns. A lift
+//     renamed between cycles is joined through HIST_ALIAS.
 //   · Date: the session's completed_on, the date History shows it under, so the
 //     session just finished and the same session read back from the server land
 //     on ONE entry, never two.
@@ -18556,8 +18608,21 @@ function fillRecordsFrom(sessions, celebrate) {
 function fillRecords(sessions, celebrate) {
   if (!ATHLETE_ID || !DATA || window.IS_PREVIEW) return;
   const dropped = dropIneligibleRecords();
+  // This cycle's candidates, PLUS every lift the sessions in hand name (2026-10-20). A lift that
+  // rotates out of the programme could never file a record again, not even from sessions already
+  // logged: that is how a 180 kg × 10 leg press on 18 October never became one. Each name is still
+  // gated by recordsItself(), so a jump, a throw, a carry or an isolation lift is left out wherever
+  // it is named, and a name the Spine does not know yet waits for its entry. ⚠ Still SILENT for
+  // history: noteNewBest() runs only on `celebrate`, which recordSessionToCloud() alone passes, or
+  // the boot would hand out fireworks for a lift done in June.
   const want = {};
   ceilingCandidates().forEach(c => { if (recordsItself(c.name, c.exId)) want[histNorm(c.name)] = c.name; });
+  (sessions || []).forEach(s => (s.entries || []).forEach(e => {
+    const nm = String((e && (HIST_ALIAS[e.ex] || e.ex)) || '').trim();
+    const k = histNorm(nm);
+    if (!nm || k in want) return;                     // asked once per name, the noes remembered as null
+    want[k] = recordsItself(nm) ? nm : null;
+  }));
   const found = {};                                   // lift -> measure -> date -> best set (a record is kept per measure)
   (sessions || []).forEach(s => (s.entries || []).forEach(e => {
     const lift = s.date && want[histNorm(HIST_ALIAS[e.ex] || e.ex)];
@@ -18678,6 +18743,46 @@ function ceilingCandidates() {
       out.push({ name: name, reps: r.dose ? r.dose.value : '', test: exTestSpec(ex), exId: ex.exId || '' });
     })));
   return out;
+}
+
+// ── Every lift "+ Log a max" can file, as ONE array ──────────────────────
+// Amir, 2026-10-20: "when the cycle is finished, it doesnt mean that my record logs should be emptied
+// even if they are recorded automatically, because 6 month later i may want to have a look, add my own
+// records and check them". The picker was this cycle's candidates and nothing else, so a lift that
+// rotated out could never be given a number by hand again. Three sections now:
+//   1. this cycle (ceilingCandidates(), unchanged, and still at the HEAD of the array)
+//   2. the lifts that already hold a record and have left the cycle (ceilingLifts())
+//   3. anything else, searched in the Spine: approved entries only, and only the ones recordsItself()
+//      accepts, because offering a carry or an isolation lift a record it can never keep is a lie.
+// Every row carries the name it will be FILED under: a known lift its own stored name (which is what
+// its series is keyed on), a searched one the Spine entry's exact name and its id (NAM-8, one name
+// since 2026-10-09). Nothing is ever typed free-hand, so one exercise cannot become two series.
+// `q` is the search box's text; with none, section 3 is empty.
+function ceilingPicks(q) {
+  const cur = ceilingCandidates(), seen = {};
+  cur.forEach(c => { seen[histNorm(c.name)] = 1; });
+  const past = [];
+  ceilingLifts().forEach(l => {
+    const k = histNorm(l.lift);
+    if (seen[k]) return;
+    seen[k] = 1;
+    const e = spineFor(l.lift);
+    past.push({ name: l.lift, reps: '', test: null, exId: (e && e.id) || '', known: l });
+  });
+  const hits = [], words = String(q || '').trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (words.length) {
+    (SPINE || []).forEach(e => {
+      if (!e || !e.name || (e.status && e.status !== 'approved')) return;
+      if (seen[histNorm(e.name)]) return;
+      if (!recordsItself(e.name, e.id)) return;
+      const hay = [e.name].concat(e.aliases || [], [SPINE_PATTERN[e.pattern] || '', (e.equipment || []).join(' ')]).join(' ').toLowerCase();
+      if (!words.every(w => hay.indexOf(w) !== -1)) return;
+      hits.push({ name: e.name, reps: '', test: null, exId: e.id });
+    });
+    hits.sort((a, b) => a.name.localeCompare(b.name));
+  }
+  _ceilPicks = cur.concat(past, hits);
+  return { all: _ceilPicks, cur: cur, past: past, hits: hits, from: cur.length + past.length };
 }
 
 // The coach's retest flag on an exercise: "test": "5RM" (or any "<n>RM"), or a
@@ -22386,38 +22491,100 @@ function hlCopy() {
 
 // ── The moment: a cycle (or the whole roadmap) complete, once, full screen, at the first open after the end date ──
 // The Welcome's recipe (.wel): the cycle's own cover with a burst of court lines, then the card itself on the paper, signed. Shown once
-// per cycle (<id>_hl_seen, synced, so another phone does not show it again), only in the 14 days after the end date, never over the
-// Welcome, never in the demo or the coach's preview. Back closes it (topLayer()).
+// per cycle (<id>_hl_seen, synced, so another phone does not show it again), never over the Welcome, never in the demo or the coach's
+// preview. Back closes it (topLayer()).
+//
+// IT WAITS FOR THE ATHLETE (2026-10-20, Amir: "even if the window is small, the person should still get all those, the first time
+// they enter the app."). Two ways an athlete used to be silently never celebrated: they did not open the app inside 14 days of the
+// end date, or the next cycle was published first, which made the finished cycle no longer current and shut the door for good.
+//   · No ceiling. It still never fires before the day after the end date, and it still needs a session trained.
+//   · A cycle the programme has moved on from is still celebrated, from the archive (hlPastCycles(), hlPastCycleSpec()).
+//   · ONE moment per open (D7, _rwOpened): the oldest unseen cycle shows, the rest wait for the next open.
+// <id>_hl_seen's ids are unchanged ('cycle2|2026-10-19'), so nothing already marked seen can fire again.
+// Home's "Cycle N complete" door row and Progress's cycle card are deliberately untouched: they describe the CURRENT cycle's live
+// state and would be lying if a finished one took them over. Only the moment waits.
+
+// The cycles the programme has already moved on from, oldest first. An archived programme
+// (DATA.programHistory) names its cycle through archiveCycleOf() — that is the shape, not a guess —
+// and the cycle's own dates say whether it is finished. Never the current cycle or a later one:
+// cycleOver() owns that one. An undated cycle cannot end (PROG-02), so it never appears.
+function hlPastCycles() {
+  const cycles = (DATA && DATA.cycles) || [];
+  const idx = Number.isInteger(DATA && DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+  const out = [], seen = {};
+  ((DATA && DATA.programHistory) || []).forEach(prog => {
+    const a = prog && archiveCycleOf(prog);
+    if (!a || !a.c) return;
+    const i = a.n - 1, c = a.c;
+    if (i < 0 || i >= idx || seen[i] || !c.startDate || !c.endDate) return;
+    const end = String(c.endDate).slice(0, 10), d = cycleDayNo(end);
+    if (isNaN(d) || todayDayNo() - d < 1) return;
+    seen[i] = 1;
+    out.push({ cIdx: i, cur: c, next: cycles[i + 1] || null, count: cycles.length, end: end, prog: prog });
+  });
+  return out.sort((x, y) => (x.end < y.end ? -1 : x.end > y.end ? 1 : 0));
+}
+// A finished cycle's Signed Off card, built the way hlCycleSpec() builds the current one's but from the
+// archive: the cycle's own dates, the archived programme's days for what was planned, the sessions HIST
+// holds inside the range for what was done, hlBestsIn() for the bests and cycleWins() for the wins.
+// Null when nothing was trained in it (hlCycleSpec()'s own rule: a cycle with no session has nothing to
+// sign off), which is also what retires a cycle whose sessions have aged out of the phone's history.
+function hlPastCycleSpec(cd) {
+  const c = cd.cur, from = String(c.startDate).slice(0, 10), to = cd.end;
+  const wk = cycleWeekInfo(c), weeks = (wk && wk.total) || 0;
+  const rows = (HIST || []).filter(x => x.date >= from && x.date <= to);
+  const done = new Set(rows.map(x => x.date + '|' + x.day)).size;
+  if (!done) return null;
+  const days = (Array.isArray(cd.prog.days) ? cd.prog.days : []).length;
+  const wins = cycleWins(rows);
+  return { kind: 'cycle', first: hlFirst(),
+    cycle: { n: cd.cIdx + 1, of: cd.count, name: c.name || ('Cycle ' + (cd.cIdx + 1)), art: cycleArtUrl(c) },
+    done: done, planned: (days && weeks) ? days * weeks : done, bests: hlBestsIn(from, to), weeks: weeks, end: to,
+    wins: wins.filter(w => w.share).map(w => ({ lift: w.name, u: uKey(w.b.u), shape: w.shape, same: !!w.same, pct: w.pct, a: w.a, b: w.b })) };
+}
 function maybeHighlightMoment() {
   if (window.IS_PREVIEW || window.IS_DEMO || !ATHLETE_ID || !DATA) return;
   if (document.querySelector('.wel, .hl-moment')) return;
-  const o = cycleOver();
-  if (!o) return;
-  const end = String(o.cur.endDate).slice(0, 10), past = todayDayNo() - cycleDayNo(end);
-  if (!(past >= 1 && past <= 14)) return;
-  const key = ATHLETE_ID + '_hl_seen', id = (o.next ? 'cycle' : 'road') + (o.cIdx + 1) + '|' + end;
+  const key = ATHLETE_ID + '_hl_seen';
   let seen = {};
   try { seen = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) { seen = {}; }
-  if (seen[id]) return;
-  const specs = hlCycleSpecs();
-  if (!specs.length) return;
-  seen[id] = Date.now();
-  try { localStorage.setItem(key, JSON.stringify(seen)); } catch (e) { return; }   // storage blocked: never show it every open
-  const p = cycleProgress(), n = o.cIdx + 1;
-  const last = !o.next;
-  const sub = last
-    ? `${(DATA.cycles || []).length} cycles${specs[0].weeks ? ' · ' + specs[0].weeks + ' weeks' : ''}`
-    : `${p ? p.done + ' of ' + p.planned + ' sessions · ' : ''}${p ? p.wk.total + ' weeks' : ''}`;
-  openMoment({
-    eyebrow: last ? 'Roadmap complete' : 'Cycle complete',
-    title: last ? 'The distance' : (o.cur.name || 'Cycle ' + n),
-    sub,
-    art: cycleArtUrl(o.cur),
-    words: last ? 'You’ve trained the whole plan, every cycle of it. Here’s your card if you want to share it.'
-                : `Cycle ${n} is done, and I’ve signed it off. Here’s your card if you want to share it.`,
-    go: last ? 'Share the whole road' : 'Share your cycle',
-    specs,
-  });
+  // Oldest first: the cycles already archived, then the current one if it is past its end date.
+  const cands = hlPastCycles();
+  const o = cycleOver();
+  if (o) {
+    const end = String(o.cur.endDate).slice(0, 10);
+    if (todayDayNo() - cycleDayNo(end) >= 1) cands.push({ cIdx: o.cIdx, cur: o.cur, next: o.next, count: o.count, end: end, current: true });
+  }
+  for (let k = 0; k < cands.length; k++) {
+    const cd = cands[k];
+    const id = (cd.next ? 'cycle' : 'road') + (cd.cIdx + 1) + '|' + cd.end;
+    if (seen[id]) continue;
+    const spec = cd.current ? null : hlPastCycleSpec(cd);
+    const specs = cd.current ? hlCycleSpecs() : (spec ? [spec] : []);
+    if (!specs.length) continue;                 // nothing trained in it: nothing to sign off, and it is not marked seen
+    seen[id] = Date.now();
+    try { localStorage.setItem(key, JSON.stringify(seen)); } catch (e) { return; }   // storage blocked: never show it every open
+    const p = cd.current ? cycleProgress() : null;
+    const n = cd.cIdx + 1;
+    // The roadmap is complete only when the cycle with no cycle after it is the one the programme is
+    // on: an archived cycle is never "the whole road", however short DATA.cycles has become.
+    const last = !!cd.current && !cd.next;
+    const sub = last
+      ? `${(DATA.cycles || []).length} cycles${specs[0].weeks ? ' · ' + specs[0].weeks + ' weeks' : ''}`
+      : p ? `${p.done + ' of ' + p.planned + ' sessions · '}${p.wk.total + ' weeks'}`
+      : spec ? `${spec.done} of ${spec.planned} sessions${spec.weeks ? ' · ' + spec.weeks + ' weeks' : ''}` : '';
+    openMoment({
+      eyebrow: last ? 'Roadmap complete' : 'Cycle complete',
+      title: last ? 'The distance' : (cd.cur.name || 'Cycle ' + n),
+      sub,
+      art: cycleArtUrl(cd.cur),
+      words: last ? 'You’ve trained the whole plan, every cycle of it. Here’s your card if you want to share it.'
+                  : `Cycle ${n} is done, and I’ve signed it off. Here’s your card if you want to share it.`,
+      go: last ? 'Share the whole road' : 'Share your cycle',
+      specs,
+    });
+    return;                                      // one full-screen moment per open (D7): the rest wait
+  }
 }
 // o: { eyebrow, num?, title, sub, next?, art, words, go, specs, onClose? } (num and next: a mark's moment, Career Mode round 5). Career Mode phase 3 opens a reward's moment with the same call (GAME-14);
 // onClose runs when the moment closes (any way). Any moment that opens counts as this run's one full-screen moment (D7, _rwOpened).

@@ -37,7 +37,10 @@ Highlight Reel), and added *"the achievements, badges and other things need to h
      dates; `hlEffortSpec()` names their cycle weeks). Past the end date the card has **Share your cycle** (**Share the whole road** on the
      roadmap's last cycle) and its sheet offers the cycle, then each win.
   3. **Cycle complete / Roadmap complete**: a one-time full-screen moment (`maybeHighlightMoment()`, `openMoment()`, the Welcome's recipe)
-     at the first open in the 14 days after the end date: the cycle's cover with a burst of court lines, the card itself, his words and
+     at the first open after the end date — **it waits for the athlete** (2026-10-20, Amir: *"even if the window is small, the person
+     should still get all those, the first time they enter the app."*): the 14-day ceiling is gone, and a cycle the programme has
+     already moved on from is still celebrated, from its archived programme (`hlPastCycles()`, `hlPastCycleSpec()`). One moment per
+     open (D7), the oldest unseen cycle first. It shows the cycle's cover with a burst of court lines, the card itself, his words and
      signature, **Share your cycle** and **Not now**. `<id>_hl_seen` (synced) marks it, so it shows once across phones. Never over the
      Welcome, never in the demo or the preview. Back closes it (`topLayer()`). **Its Share button hands the moment's one guard history
      entry to the share sheet** (`dropMoment(true)` then `openShareSheet()` then `navSync()`): popping the entry with `history.back()` and pushing the

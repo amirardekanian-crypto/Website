@@ -192,7 +192,8 @@ const liveReady = p => p.waitForFunction(() => {
     await ctx.close();
   }
   {
-    // The roadmap's last cycle: Roadmap complete, The Distance first. 40 days past: no moment (it is for the first two weeks).
+    // The roadmap's last cycle: Roadmap complete, The Distance first. 40 days past: the moment still waits for them
+    // (2026-10-20, Amir: "even if the window is small, the person should still get all those, the first time they enter the app").
     const { ctx, p } = await open(browser, { prog: prog(3, 2), hist: hist(3) });
     await p.waitForTimeout(600);
     const m = await p.evaluate(() => { const el = document.querySelector('.hl-moment'); return el ? { eye: el.querySelector('.hl-m-eyebrow').textContent, title: el.querySelector('.hl-m-title').textContent, go: el.querySelector('.hl-m-go').textContent } : null; });
@@ -205,7 +206,10 @@ const liveReady = p => p.waitForFunction(() => {
     await ctx.close();
     const r2 = await open(browser, { prog: prog(40), hist: hist(40) });
     await r2.p.waitForTimeout(500);
-    t.check('40 days past: no moment (only in the two weeks after the end date)', await r2.p.evaluate(() => !document.querySelector('.hl-moment')));
+    t.check('40 days past: the moment still waits for them (no 14-day window since 2026-10-20)', await r2.p.evaluate(() => {
+      const el = document.querySelector('.hl-moment');
+      return !!el && el.querySelector('.hl-m-eyebrow').textContent === 'Cycle complete';
+    }));
     await r2.ctx.close();
   }
 

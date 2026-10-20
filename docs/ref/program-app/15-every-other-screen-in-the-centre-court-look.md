@@ -78,8 +78,11 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
   - **Paper rows** for lifts, entries, readings and Log a max's picker; **Log a max** (*Tested one in the gym? Add it here.*) and *Add your body weight* as
     door rows; **Due for a retest** as the day's banner (a 4 px clay stripe, *Test 5RM* as the green text link); **How this works** one
     fold, closed on every screen (it was open on the empty one); the empty state's four steps numbered 01–04.
-  - **Log a max**: the set table's boxes (white, `--field`), the day's 48 px RPE keys, the estimate and its grade as a two-track
-    scoreboard, Save as the primary green.
+  - **Log a max**: the picker is three sections of paper rows (2026-10-20, Amir: *"6 month later i may want to have a look, add my own
+    records and check them"*) — **This cycle**, **Lifts you've done before** and **Any other lift**, the last a search over the Spine in the
+    Exercises pane's own box (`.xl-search`), offering only approved entries that `recordsItself()` accepts. Every row carries its index
+    into ONE array (`ceilingPicks()`), so a row can never open the wrong lift. Then the form: the set table's boxes (white, `--field`),
+    the day's 48 px RPE keys, the estimate and its grade as a two-track scoreboard, Save as the primary green.
   - **Charts green**: the line and every dot (the dots were clay; clay is "look here" only), grey axes; a sparkline is clay only for a
     real fall. **The range chips** have their own class, `.wt-chip` with `aria-pressed` (defect D6: a second global `.chip` rule had
     restyled them). Every ✕ is a 44 px target (it was 26). *Delete all my weight history* is quiet clay text, two taps as before.
