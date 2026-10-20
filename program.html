@@ -5509,16 +5509,27 @@
   .cr-kd b, .cr-em b { font-weight: 700; font-variant-numeric: tabular-nums; }
   /* the four emoji beside the Like (stage82; all five out, Amir 2026-10-19). Drawn only while the server offers the list. */
   .cr-react { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+  /* their own item draws no reactions at all (2026-10-20): the empty span must not leave a gap or a margin behind */
+  .cr-react:empty { display: none; }
   .cr-em { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 44px; min-height: 44px; padding: 0 9px;
     border: 1px solid var(--hair); border-radius: 999px; background: var(--row); color: var(--ink); cursor: pointer; font: 400 var(--fs-body)/1 'Barlow', sans-serif; }
   /* ＋ on a moment line: the Like stands alone and the four emoji open on a tap (2026-10-20). Five chips under a one-line
      moment made the row of buttons taller than the news it was about. A post keeps all five out, Amir's pick of 2026-10-19. */
   .cr-em.cr-plus { color: var(--green-ink); font-weight: 700; }
+  .cr-fold { flex: none; min-width: 32px; min-height: 44px; padding: 0; border: 1px solid transparent; border-radius: 999px; background: none; color: var(--grey);
+    font: 400 var(--fs-body)/1 'Barlow', sans-serif; cursor: pointer; }
   .cr-em i { font-style: normal; font-size: var(--fs-lead); line-height: 1; }
-  .cr-em[aria-pressed="true"] { border-color: var(--fill); background: var(--tint); }
+  /* 2px, not 1, and the green ink in both modes: in dark mode --fill against --row is 1.6:1, so which emoji you chose was
+     carried by a border nobody could see, on a row where the count is 1 whether it was you or somebody else (2026-10-20). */
+  .cr-em[aria-pressed="true"] { border: 2px solid var(--green-ink); background: var(--tint); }
+  /* A RECEIPT, not a menu: an account with reactions off shows what people gave and nothing to press.
+     These are spans, so nothing is dimmed, nothing is in the tab order, and nothing says "0 people". */
+  .cr-kd.is-tally, .cr-em.is-tally { border-color: transparent; background: none; color: var(--grey); cursor: default; min-height: 0; min-width: 0; justify-content: flex-start; padding: 0 10px 0 0; }
+  .cr-em.is-tally i { font-size: var(--fs-body); }
+  .cr-kd.is-tally b, .cr-em.is-tally b { color: var(--ink); }
   .cr-em b { font-size: var(--fs-small); color: var(--ink); }
   #screen-crew .cr-line .cr-react { margin-top: 8px; }
-  @media (max-width: 359px) { .cr-em { min-width: 38px; padding: 0 6px; gap: 3px; } .cr-react { gap: 4px; } #screen-crew .cr-kd { padding: 0 9px; } }
+  @media (max-width: 359px) { .cr-em { min-width: 38px; padding: 0 6px; gap: 3px; } .cr-react { gap: 4px; } #screen-crew .cr-kd:not(.is-tally) { padding: 0 9px; } }
   .cr-del { flex: none; min-height: 36px; padding: 0 6px; border: 0; background: none; color: var(--grey); font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
   .cr-del.armed { color: var(--clay-ink); }
   /* a moment: one slim green line, the bell, what happened, the Like */
@@ -5529,7 +5540,7 @@
   #screen-crew .cr-reps:empty { display: none; }
   #screen-crew .cr-rep { display: flex; align-items: flex-start; gap: 8px; padding-top: 8px; border-top: 1px solid var(--hair); }
   #screen-crew .cr-rep .cr-ini { flex: none; margin-top: 1px; }
-  #screen-crew .cr-rb { flex: 1; min-width: 0; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
+  #screen-crew .cr-rb { flex: 1; min-width: 0; font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
   #screen-crew .cr-rb b { font-weight: 700; }
   #screen-crew .cr-rep-add { justify-self: start; min-height: 44px; padding: 0 2px; border: 0; background: none; color: var(--green-ink);
     font: 600 var(--fs-small)/1 'Barlow', sans-serif; text-align: left; cursor: pointer; }
@@ -5545,7 +5556,7 @@
   .cr-lw { flex: 1; min-width: 0; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
   #screen-crew .cr-names { display: block; margin-top: -2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   #screen-crew .cr-post .cr-foot + .cr-foot { margin-top: 6px; }
-  #screen-crew .cr-post .cr-foot + .cr-foot .cr-del { margin-left: auto; }
+  #screen-crew .cr-post .cr-foot .cr-del { margin-left: auto; }
   .cr-lw small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   #screen-crew .cr-me-row { display: flex; align-items: center; gap: 10px; width: calc(100% - 2 * var(--g)); min-height: 48px; margin: 4px var(--g) 0; padding: 8px 0;
     border: 0; border-top: 1px solid var(--hair); background: none; color: var(--green-ink); font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; text-align: left; cursor: pointer; }
@@ -5609,6 +5620,16 @@
   .cr-viewer .cr-body { color: #fff; }
   .cr-viewer .cr-kd { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.1); color: #fff; }
   .cr-viewer .cr-kd[aria-pressed="true"] { border-color: #fff; background: #fff; color: #0E4A36; }
+  /* the emoji chips and the ＋ on the same dark ground (2026-10-20): they had no override, so in light mode a chosen emoji was a faint
+     ring with its count in --ink on near-black, beside a white ＋ that outshone it */
+  .cr-viewer .cr-em { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.1); color: #fff; }
+  .cr-viewer .cr-em b { color: #fff; }
+  .cr-viewer .cr-em.cr-plus { color: #fff; }
+  .cr-viewer .cr-em[aria-pressed="true"] { border-color: #fff; background: #fff; color: #0E4A36; }
+  .cr-viewer .cr-em[aria-pressed="true"] b { color: #0E4A36; }
+  .cr-viewer .cr-fold { color: rgba(255,255,255,.75); }
+  .cr-viewer .cr-kd.is-tally, .cr-viewer .cr-em.is-tally { border-color: transparent; background: none; color: rgba(255,255,255,.75); }
+  .cr-viewer .cr-kd.is-tally b, .cr-viewer .cr-em.is-tally b { color: #fff; }
   /* Tell the crew, on the finished card, under the WhatsApp row (paintCrewTell()) */
   :where(#day-view) .complete-crew, :where(#day-view) .complete-share { margin-top: 10px; }
   :where(#day-view) .complete-crew[hidden], :where(#day-view) .complete-share[hidden] { display: none; }
@@ -13341,7 +13362,11 @@ function onCrewPage() {
   return !!(s && (s.id === 'screen-crewboard' || s.id === 'screen-crewwho'));
 }
 function crewMe() { return (BELL && BELL.me) || {}; }
-function crewCanLike() { const m = crewMe(); return m.answer === 'yes' && !m.under13; }
+// The SERVER's gate, not a guess at it (2026-10-20). This read `answer === 'yes' && !under13`, but crew_members() also
+// drops a FORMER athlete and the demo, so one of those kept a live Like on every post and every tap flashed on and then
+// came back with "That did not go". `can_post` is that same gate, sent on every get_bell, and it is what the Reply door
+// beside it already uses.
+function crewCanLike() { return !!crewMe().can_post; }
 function loadCrewCache() {
   if (!crewAllowed()) return;
   try {
@@ -13429,6 +13454,7 @@ function setCrewTab() {
   b.setAttribute('aria-label', want ? 'Crew, a new post from Amir' : 'Crew');
 }
 function openCrew() {
+  _crewOpenEm = {};   // a menu the ＋ opened lasts for this visit only (it used to last until the app was reloaded)
   // Amir's pinned post wears its clay pin on the visit that first shows it; from then on it is seen (the tab's dot goes at once).
   _crewFreshPin = crewAmirNew() ? crewAmirPost().id : null;
   crewMarkSeen();
@@ -13550,7 +13576,11 @@ function crewEmoji() { return (BELL && Array.isArray(BELL.emoji)) ? BELL.emoji.s
 // about. The ＋ unfolds the same row in place — `_crewOpenEm` remembers which targets are open, for this visit only.
 var _crewOpenEm = {};
 function crewUnfold(key) { _crewOpenEm[key] = true; paintKudos(key); }
+// The ✕ at the end of a menu the ＋ opened (2026-10-20): the only other ways out were to swap or to take your own back, so
+// opening it by mistake cost you your reaction.
+function crewFold(key) { delete _crewOpenEm[key]; paintKudos(key); }
 window.crewUnfold = crewUnfold;
+window.crewFold = crewFold;
 function crewReactRow(target, k, own, folded) {
   const me = crewMe(), kk = k || {}, t = esc(target);
   const total = Number(kk.n) || 0, by = (kk.by && typeof kk.by === 'object') ? kk.by : {};
@@ -13558,34 +13588,66 @@ function crewReactRow(target, k, own, folded) {
   const likeN = typeof kk.like === 'number' ? kk.like : total;
   const liked = !!kk.mine && !kk.emoji;
   const num = v => v ? ` <b>${v}</b>` : '';
-  const dead = (cls, body, lbl) => `<button type="button" class="${cls}" data-kd="${t}" disabled aria-label="${esc(lbl)}">${body}</button>`;
-  const live = (cls, body, lbl, press, call) => `<button type="button" class="${cls}" data-kd="${t}" ${press === null ? '' : `aria-pressed="${press}"`} onclick="${call}" aria-label="${esc(lbl)}">${body}</button>`;
-  const can = crewCanLike() && !own, ask = !own && !me.under13 && !crewCanLike();
-  let h = own ? dead('cr-kd', 'Like' + num(likeN), `Likes on yours: ${likeN}`)
-    : me.under13 ? dead('cr-kd', 'Like' + num(likeN), 'Likes are off for your account')
-    : ask ? live('cr-kd', 'Like' + num(likeN), 'Join the crew to like this', null, 'crewLikeAsk()')
-    : live('cr-kd', 'Like' + num(likeN), liked ? 'Liked. Tap to take it back' : 'Like this', liked, 'crewLike(this)');
-  // Folded (a moment line): the row shows the Like, then ONLY the emoji somebody has actually used on this item, then a ＋
-  // for the rest. It closes again the moment a choice is made — Amir, 2026-10-20: *"when you click to see the emotes you can
-  // pick, the bar stay opened, and even after choosing, you will see other emojis. it should close after you choosed. and
-  // only show the ones that is replied to a post"*. (The first cut kept the whole row out once anyone had used one, which is
-  // exactly the five-chips-under-one-line problem it was meant to fix.) Never folded for an athlete ticked under 13:
-  // unfolding four dead chips is noise.
+  // `em` is the chip's own hook: '' for the Like, the emoji itself, '+' for the opener. paintKudos uses it to put the
+  // keyboard back on the same chip after the row has been replaced under it. There is no dead() any more: nothing on this
+  // row is ever a disabled button, because a disabled button that says "0 people" is worse than no button.
+  const live = (cls, body, lbl, press, call, em) => `<button type="button" class="${cls}" data-kd="${t}" data-em="${esc(em || '')}" ${press === null ? '' : `aria-pressed="${press}"`} onclick="${call}" aria-label="${esc(lbl)}">${body}</button>`;
+  const ask = !own && !me.under13 && !crewCanLike();
+  const all = crewEmoji();
+  const used = all.filter(e => Number(by[e]) > 0 || kk.emoji === e);
+  //
+  // ── A ROW YOU CAN USE, OR NO ROW (2026-10-20) ────────────────────────────────────────────────────────────────────────
+  // Amir, from his live phone: *"First i cant like my photos, which is ok, why do i have those under my posts then?"*,
+  // *"If i chose like under a post, why are there more emotes to choose?"*, *"When i choose emote, why others are still
+  // there?"*. Then, once more, on the live app: *"it still shows reactions to my own post which i cant choose. then remove
+  // the reactions under your own post"* and *"if under another post i have chose to send a fire emote or like, why is all
+  // my other emotes opened? just show the fire and a + so i can change"*.
+  //
+  // The row belongs to the viewer's STATE, never to the item's type. Five states:
+  //
+  //   own item                 → NOTHING. Not a dimmed chip, not a tally: he asked for it gone. Who reacted is still on
+  //                              the names line under the post.
+  //   ticked under 13          → a RECEIPT of what people gave, plain text, no button (their Likes are off).
+  //   not joined               → the menu, every chip offering to join (Amir's rule of 2026-10-19: never a dead Like).
+  //   joined, HAS chosen       → ONLY THEIR PICK, marked, and a ＋ to change it. The other four stay away until the ＋ is
+  //                              tapped; then the whole menu is out with theirs marked, and the next tap (a swap, or theirs
+  //                              again to take it back) closes it. Without stage82 there is nothing to swap to, so no ＋.
+  //   joined, has NOT chosen   → the menu. All five out on a post (his pick of 2026-10-19, where there is room for them);
+  //                              on a moment line the Like and whatever has been used, the rest behind a ＋, because five
+  //                              chips under a one-line moment are taller than the news.
+  //
+  // `folded` means only "this is a slim line, keep the menu small before a choice".
+  const chosen = !!kk.mine;
+  // Nothing to choose and nothing to say: their own item draws no row at all (the empty span is hidden by .cr-react:empty).
+  if (own) return '';
+  // The receipt, for an account with reactions off: spans, not buttons, so nothing is dimmed and nothing is in the tab order.
+  if (me.under13) {
+    return (likeN ? `<span class="cr-kd is-tally">Like${num(likeN)}</span>` : '')
+      + used.filter(e => Number(by[e]) > 0).map(e => `<span class="cr-em is-tally"><i aria-hidden="true">${esc(e)}</i>${num(Number(by[e]))}</span>`).join('');
+  }
   const chip = em => {
     const n = Number(by[em]) || 0, mine = kk.emoji === em, body = `<i aria-hidden="true">${esc(em)}</i>${num(n)}`;
-    const said = `${em} ${n === 1 ? '1 person' : n + ' people'}`;
-    return own ? dead('cr-em', body, said)
-      : me.under13 ? dead('cr-em', body, said)
-      : ask ? live('cr-em', body, `Join the crew to send ${em}`, null, 'crewLikeAsk()')
-      : live('cr-em', body, mine ? `${em} sent. Tap to take it back` : `Send ${em}`, mine, `crewLike(this, '${esc(em)}')`);
+    // the count belongs in the label too, or a blind athlete never learns it (the visible number is in a <b> they cannot reach)
+    const tail = n ? `. ${n} sent` : '';
+    return ask ? live('cr-em', body, `Join the crew to send ${em}${tail}`, null, 'crewLikeAsk()', em)
+      : live('cr-em', body, (mine ? `${em} sent. Tap to take it back` : `Send ${em}`) + tail, mine, `crewLike(this, '${esc(em)}')`, em);
   };
-  const all = crewEmoji();
-  if (folded && !me.under13 && !_crewOpenEm[target]) {
-    const used = all.filter(e => Number(by[e]) > 0 || kk.emoji === e);
+  const likeTail = likeN ? `. ${likeN} liked` : '';
+  const likeBtn = ask ? live('cr-kd', 'Like' + num(likeN), `Join the crew to like this${likeTail}`, null, 'crewLikeAsk()', '')
+    : live('cr-kd', 'Like' + num(likeN), (liked ? 'Liked. Tap to take it back' : 'Like this') + likeTail, liked, 'crewLike(this)', '');
+  // They have chosen: their pick and a ＋, until the ＋ is tapped. crewLike() closes it again on the next choice.
+  if (chosen && !_crewOpenEm[target]) {
+    return (kk.emoji ? chip(kk.emoji) : likeBtn)
+      + (all.length ? live('cr-em cr-plus', '＋', 'Change your reaction', null, `crewUnfold('${esc(target)}')`, '+') : '');
+  }
+  let h = likeBtn;
+  if (folded && !chosen && !_crewOpenEm[target]) {
     used.forEach(em => { h += chip(em); });
-    return used.length < all.length ? h + live('cr-em cr-plus', '＋', 'More ways to say it', null, `crewUnfold('${esc(target)}')`) : h;
+    return used.length < all.length ? h + live('cr-em cr-plus', '＋', 'More ways to say it', null, `crewUnfold('${esc(target)}')`, '+') : h;
   }
   all.forEach(em => { h += chip(em); });
+  // a menu the ＋ opened can be put away again without touching what you chose
+  if (_crewOpenEm[target] && all.length) h += `<button type="button" class="cr-fold" data-kd="${t}" data-em="+" onclick="crewFold('${esc(target)}')" aria-label="Close">✕</button>`;
   return h;
 }
 function crewItem(key) { return ((BELL && BELL.items) || []).find(i => i && (i.id === key || i.key === key)) || null; }
@@ -13656,12 +13718,15 @@ function crewPostHTML(it) {
   const sub = it.amir ? '<small>to the crew</small>' : (it.kind === 'session' ? `<small>${it.session && it.session.day ? 'Day ' + Number(it.session.day) + ' done' : 'A session done'}</small>` : '');
   const top = it.pinned ? `<span class="cr-pin${_crewFreshPin === it.id ? ' is-new' : ''}">Pinned</span>` : `<span class="cr-when">${esc(crewWhen(it.at))}</span>`;
   const ph = it.photo ? `<button type="button" class="cr-ph" data-ph="${esc(it.id)}" onclick="openCrewPhoto('${esc(it.id)}')" aria-label="Open ${esc(it.amir ? "Amir's" : it.me ? 'your' : (it.who || 'their') + "'s")} photo"><img alt=""><span class="cr-ph-wait">Photo</span></button>` : '';
-  const del = it.me ? `<button type="button" class="cr-del" onclick="armedTap(this, 'Tap again to delete', () => crewDelete('${esc(it.id)}'))">Delete</button>` : '';
+  // The post's own Delete now sits in the REACTION foot, beside what the post got (2026-10-20). It used to sit on the
+  // names line, directly above the replies, where it read as the thread's heading — and on his own post with his own
+  // reply there were two identical Deletes in the same column. Its armed words name what it takes with it.
+  const del = it.me ? `<button type="button" class="cr-del" onclick="armedTap(this, 'Tap again to delete the post', () => crewDelete('${esc(it.id)}'))">Delete</button>` : '';
   return `<article class="cr-post${it.amir ? ' amir' : ''}" data-id="${esc(it.id)}">
     <div class="cr-who"><span class="cr-ini${it.amir ? ' am' : ''}" aria-hidden="true">${esc(ini)}</span><span class="cr-nm">${esc(name)}${sub}</span>${top}</div>
     ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}${ph}
-    <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span></div>
-    <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small>${del}</div>
+    <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span>${del}</div>
+    <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}" aria-live="polite">${esc(crewKudosWords(it.kudos))}</small></div>
     <div class="cr-reps" data-rep="${esc(it.id)}">${crewRepsHTML(it)}</div>
   </article>`;
 }
@@ -13943,7 +14008,7 @@ function openCrewPhoto(id) {
       <button type="button" class="cr-x" onclick="closeCrewPhoto()" aria-label="Close the photo">✕</button></div>
     <div class="cr-vimg"><img alt="${esc(name === 'You' ? 'Your photo' : name + "'s photo")}"></div>
     ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}
-    <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span></div>
+    ${it.me ? '' : `<div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span></div>`}
     <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small></div>`;
   v.classList.add('visible');
   crewFetchPhoto(id).then(url => { const im = v.querySelector('.cr-vimg img'); if (url && im) im.src = url; });
@@ -13962,8 +14027,17 @@ function paintKudos(key) {
   // the whole row at once: a tap can move the Like's count, an emoji's, and which one is pressed
   document.querySelectorAll('.cr-react').forEach(row => {
     if (row.dataset.row !== key) return;
-    const h = crewReactRow(key, it.kudos, it.me, it.t === 'line');   // a moment line keeps the Like alone until ＋ is tapped
-    if (row.innerHTML !== h) row.innerHTML = h;
+    const h = crewReactRow(key, it.kudos, it.me, it.t === 'line');   // a slim line keeps its menu small; the fold after a choice is the row's own
+    if (row.innerHTML === h) return;
+    // Where the keyboard was, before the row is replaced under it (2026-10-20). Replacing innerHTML drops focus to the
+    // top of the page, so a keyboard athlete who liked the fourth post had to tab back past the band, the faces and
+    // three cards to reach the fifth. The chips carry data-em so the same one can be found again afterwards.
+    const had = row.contains(document.activeElement) ? (document.activeElement.dataset.em || '') : null;
+    row.innerHTML = h;
+    if (had !== null) {
+      const back = [...row.querySelectorAll('button')].find(b => (b.dataset.em || '') === had) || row.querySelector('[aria-pressed="true"]') || row.querySelector('button');
+      if (back) try { back.focus({ preventScroll: true }); } catch (e) { back.focus(); }
+    }
   });
   document.querySelectorAll('[data-kw]').forEach(s => {
     if (s.dataset.kw !== key) return;
@@ -13997,7 +14071,7 @@ async function crewLike(btn, em) {
   if (em) args.p_emoji = em;
   try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_kudos', args), 8000); } catch (e) { r = null; }
   if (r && !r.error && r.data && typeof r.data.n !== 'undefined') it.kudos = r.data;
-  else { it.kudos = before; aaToast(_noAnswer(r) ? 'No signal. It goes when you are back online.' : 'That did not go. Try again.'); }
+  else { it.kudos = before; aaToast(_noAnswer(r) ? 'That did not reach the crew. Tap it again when you have signal.' : 'That did not go. Try again.'); }
   paintKudos(key);
   try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
 }

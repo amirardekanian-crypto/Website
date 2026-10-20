@@ -243,33 +243,60 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…and the row does not scroll sideways at 390 px', row.wide, JSON.stringify(row));
     await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => /🔥/.test(b.textContent)).click());
     await p.waitForTimeout(400);
-    const after = await p.evaluate(() => {
+    // what is on the 6 am post's row, as the athlete sees it: the buttons in order ('like', each emoji, '+'), which are pressed, and the pressed one's count
+    const rowOf = () => p.evaluate(() => {
       const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
-      return { fire: r.querySelector('.cr-em[aria-pressed="true"] i').textContent, n: r.querySelector('.cr-em[aria-pressed="true"] b').textContent,
-               like: r.querySelector('.cr-kd').textContent.trim(), pressedLike: r.querySelector('.cr-kd').getAttribute('aria-pressed') };
+      return { btns: [...r.querySelectorAll('button')].map(b => b.dataset.em || 'like').join(','), pressed: [...r.querySelectorAll('[aria-pressed="true"]')].map(b => b.dataset.em || 'like').join(','),
+               n: ((r.querySelector('[aria-pressed="true"] b') || {}).textContent || '') };
     });
+    const clickOn = em => p.evaluate(e => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-react button')]
+      .find(b => (b.dataset.em || 'like') === e).click(), em);
+    const after = await rowOf();
     const sent = await calls(p, 'crew_kudos');
-    C.check('tapping 🔥 sends it and marks it', after.fire === '🔥' && after.n === '1' && sent.some(x => x.p_emoji === '🔥' && x.p_on === true), JSON.stringify([after, sent]));
-    // SINCE 2026-10-20 there is no swap in place: once you have chosen, the row shows only what has been used, so the
-    // way to change your mind is to take yours back first (Amir: "When i choose emote, why others are still there?").
-    C.check('…and the unused ones go: only the one he sent is left', await p.evaluate(() => {
-      const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
-      return [...r.querySelectorAll('.cr-em')].map(b => b.dataset.em).join('') === '🔥';
-    }), await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].map(b => b.dataset.em).join('')));
-    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => b.dataset.em === '🔥').click());
-    await p.waitForTimeout(400);
-    C.check('…tapping the one you sent takes it back, and the menu comes back with it', await p.evaluate(() => {
-      const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
-      return !r.querySelector('[aria-pressed="true"]') && [...r.querySelectorAll('.cr-em')].length === 4;
-    }) && (await calls(p, 'crew_kudos')).some(x => x.p_on === false));
-    // the one-per-person rule still holds: send one, take it back, send another
-    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => b.dataset.em === '💪').click());
-    await p.waitForTimeout(400);
-    C.check('…and another can then be sent, alone', await p.evaluate(() => {
-      const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
-      return [...r.querySelectorAll('.cr-em')].map(b => b.dataset.em).join('') === '💪' && !!r.querySelector('[aria-pressed="true"]');
-    }) && (await calls(p, 'crew_kudos')).some(x => x.p_emoji === '💪'));
-    // A moment line keeps the Like ALONE, with the four behind a ＋ (2026-10-20): five chips under a one-line moment made the
+    C.check('tapping 🔥 sends it and marks it', after.pressed === '🔥' && after.n === '1' && sent.some(x => x.p_emoji === '🔥' && x.p_on === true), JSON.stringify([after, sent]));
+    // Amir, 2026-10-20, on the live app: "if under another post i have chose to send a fire emote or like, why is all my other
+    // emotes opened? just show the fire and a + so i can change".
+    C.check('…and the others go: just the 🔥 and a ＋ to change it', after.btns === '🔥,+', JSON.stringify(after));
+    C.check('…not even the Like stays, though the post has Likes', await p.evaluate(() =>
+      !([...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react .cr-kd'))));
+    // the ＋ opens the whole menu, his pick marked
+    await clickOn('+'); await p.waitForTimeout(300);
+    const menu = await rowOf();
+    C.check('…the ＋ opens the whole menu with his 🔥 marked, and a ✕ at the end', menu.btns === 'like,🔥,💪,👏,😍,+' && menu.pressed === '🔥', JSON.stringify(menu));
+    // the ✕ puts the menu away again and does not touch what he chose (no write to the server)
+    const writesBefore = (await calls(p, 'crew_kudos')).length;
+    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-react button')].find(b => b.classList.contains('cr-fold')).click());
+    await p.waitForTimeout(300);
+    const folded = await rowOf();
+    C.check('…the ✕ closes it again: the 🔥 and the ＋, nothing written', folded.btns === '🔥,+' && folded.pressed === '🔥' && (await calls(p, 'crew_kudos')).length === writesBefore, JSON.stringify(folded));
+    // a menu the ＋ opened lasts for this visit: leave Crew and come back and it is closed
+    await clickOn('+'); await p.waitForTimeout(300);
+    await p.evaluate(() => goTo('home')); await p.waitForTimeout(300);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(500);
+    C.check('…and leaving Crew closes it too', (await rowOf()).btns === '🔥,+', JSON.stringify(await rowOf()));
+    await clickOn('+'); await p.waitForTimeout(300);
+    // choosing another swaps it, and the row closes again on the new pick
+    await clickOn('💪'); await p.waitForTimeout(500);
+    const swapped = await rowOf();
+    C.check('…choosing another swaps it and closes again: the 💪 and a ＋', swapped.btns === '💪,+' && swapped.pressed === '💪'
+      && (await calls(p, 'crew_kudos')).some(x => x.p_emoji === '💪' && x.p_on === true), JSON.stringify(swapped));
+    // the photo, opened: the chip he chose is the bright one on the dark ground, with its count readable, and the ＋ does not outshine it
+    await p.evaluate(id => openCrewPhoto(id), PHOTO); await p.waitForTimeout(300);
+    const viewer = await p.evaluate(() => {
+      const v = document.getElementById('crew-viewer'), pick = v.querySelector('.cr-em[aria-pressed="true"]'), plus = v.querySelector('.cr-plus');
+      if (!pick || !plus) return null;
+      const cs = el => getComputedStyle(el);
+      return { pickBg: cs(pick).backgroundColor, pickCount: cs(pick.querySelector('b')).color, plusBg: cs(plus).backgroundColor };
+    });
+    C.check('…and in the dark photo viewer his pick is the bright chip, its count readable, the ＋ quiet',
+      viewer && viewer.pickBg === 'rgb(255, 255, 255)' && viewer.pickCount !== 'rgb(26, 26, 26)' && viewer.plusBg !== 'rgb(255, 255, 255)', JSON.stringify(viewer));
+    await p.evaluate(() => closeCrewPhoto());
+    // taking it back (open the ＋, tap the marked one) brings the menu back
+    await clickOn('+'); await p.waitForTimeout(300);
+    await clickOn('💪'); await p.waitForTimeout(500);
+    const back = await rowOf();
+    C.check('…taking it back brings the whole menu back', back.btns === 'like,🔥,💪,👏,😍' && back.pressed === '' && (await calls(p, 'crew_kudos')).some(x => x.p_on === false), JSON.stringify(back));
+    // a moment line keeps the Like ALONE, with the four behind a ＋ (2026-10-20): five chips under a one-line moment made the
     // row of buttons taller than the news. A post still carries all five out, Amir's pick of 2026-10-19.
     C.check('a moment line: the Like and a ＋, not five chips', await p.evaluate(() => {
       const r = document.querySelector('#crew-body .cr-line .cr-react');
@@ -288,17 +315,17 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react .cr-em').click());
     await p.waitForTimeout(400);
     C.check('a Bell line takes one too, under its words', await p.evaluate(() => !!document.querySelector('#crew-body .cr-line .cr-react .cr-em[aria-pressed="true"]')));
-    // Amir, 2026-10-20: "it should close after you choosed. and only show the ones that is replied to a post".
-    C.check('…and the picker CLOSES on the choice, leaving only what was used', await p.evaluate(() => {
+    // Amir, 2026-10-20: "it should close after you choosed", then "just show the fire and a + so i can change".
+    C.check('…and the picker CLOSES on the choice: his pick and a ＋ to change it', await p.evaluate(() => {
       const r = document.querySelector('#crew-body .cr-line .cr-react');
-      const em = [...r.querySelectorAll('.cr-em')];
-      return em.length === 1 && !r.querySelector('.cr-plus') && em[0].getAttribute('aria-pressed') === 'true';   // no plus either: nothing more is offered once you have chosen
+      const b = [...r.querySelectorAll('button')];
+      return b.length === 2 && b[0].getAttribute('aria-pressed') === 'true' && b[1].classList.contains('cr-plus') && !r.querySelector('.cr-kd');
     }), await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react').textContent.replace(/\s+/g, ' ')));
     await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react .cr-em[aria-pressed="true"]').click());
     await p.waitForTimeout(400);
     C.check('…and taking it back leaves the Like and the ＋ again', await p.evaluate(() => {
       const r = document.querySelector('#crew-body .cr-line .cr-react');
-      return r.querySelectorAll('.cr-em').length === 1 && !!r.querySelector('.cr-plus');
+      return r.querySelectorAll('.cr-em').length === 1 && !!r.querySelector('.cr-plus') && !!r.querySelector('.cr-kd');
     }), await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react').textContent.replace(/\s+/g, ' ')));
     C.check('no page errors (the emoji row)', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
@@ -812,10 +839,14 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await ctx.close();
   }
 
-  // ── 19. A MENU UNTIL YOU CHOOSE, A RECEIPT AFTERWARDS (2026-10-20) ──────────────────────────────────────────────────
+  // ── 19. A ROW YOU CAN USE, OR NO ROW (2026-10-20) ──────────────────────────────────────────────────
   // Amir, from his live phone: "First i cant like my photos, which is ok, why do i have those under my posts then?",
   // "If i chose like under a post, why are there more emotes to choose?", "When i choose emote, why others are still
-  // there?". The fold had been wired to the item TYPE (moment lines only) when it belongs to the viewer's STATE.
+  // there?". The fold had been wired to the item TYPE (moment lines only) when it belongs to the viewer's STATE. Then, on the
+  // live app, once more: "it still shows reactions to my own post which i cant choose. then remove the reactions under your own
+  // post" and "if under another post i have chose to send a fire emote or like, why is all my other emotes opened? just show
+  // the fire and a + so i can change". (That second round was also a regression: a later commit had written program.html over
+  // the first fix from an older copy, so the live app was still showing the old row.)
   {
     const EM = ['🔥', '💪', '👏', '😍'];
     const b = bell({ answer: 'yes', can_post: true });
@@ -827,6 +858,9 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     b.items.push({ t: 'post', id: 'own-1', who: 'You', me: true, amir: false, kind: 'post', body: 'Day 2 done.',
       photo: false, at: iso(now - 5000e3), pinned: false, left: 7,
       kudos: { n: 3, like: 2, mine: false, emoji: null, names: ['Mina S.', 'Sara T.'], by: { '🔥': 1 } } });
+    // [5] the viewer's OWN moment line, with two Likes on it
+    b.items.push({ t: 'line', key: 'own-line-key', who: 'You', me: true, at: iso(now - 6500e3),
+      kudos: { n: 2, like: 2, mine: false, emoji: null, names: ['Mina S.', 'Sara T.'], by: {} }, parts: [{ k: 'level', n: 15 }] });
     // [4] the viewer's own post with nothing on it at all
     b.items.push({ t: 'post', id: 'own-2', who: 'You', me: true, amir: false, kind: 'post', body: 'Quiet one.',
       photo: false, at: iso(now - 6000e3), pinned: false, left: 7,
@@ -839,13 +873,17 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       if (!r) return null;
       return { btns: [...r.querySelectorAll('button')].map(x => (x.dataset.em || 'like')),
                tally: [...r.querySelectorAll('.is-tally')].map(x => x.textContent.replace(/\s+/g, '')),
+               text: r.textContent.trim(), shown: getComputedStyle(r).display !== 'none',
                pressed: [...r.querySelectorAll('[aria-pressed="true"]')].map(x => x.dataset.em || 'like') };
     }, sel);
     // HIS COMPLAINT A: his own post
     const own1 = await row('[data-id="own-1"] .cr-react');
-    C.check('your own post: no buttons, only what people gave', own1 && own1.btns.length === 0 && own1.tally.join('|') === 'Like2|🔥1', JSON.stringify(own1));
+    C.check('your own post: no reactions under it at all, not even a tally', own1 && own1.btns.length === 0 && own1.tally.length === 0 && !own1.text && !own1.shown, JSON.stringify(own1));
+    C.check('…the names line under it still says who reacted', await p.evaluate(() => /Mina S\./.test(document.querySelector('[data-id="own-1"] .cr-names').textContent)));
+    const ownLine = await row('.cr-line[data-key="own-line-key"] .cr-react');
+    C.check('…and the same under your own moment line', ownLine && ownLine.btns.length === 0 && !ownLine.text && !ownLine.shown, JSON.stringify(ownLine));
     const own2 = await row('[data-id="own-2"] .cr-react');
-    C.check('…and nothing at all when nobody has reacted', own2 && own2.btns.length === 0 && own2.tally.length === 0, JSON.stringify(own2));
+    C.check('…and the same when nobody has reacted', own2 && own2.btns.length === 0 && own2.tally.length === 0 && !own2.text, JSON.stringify(own2));
     C.check('…so no dead button is left anywhere on the feed', await p.evaluate(() => !document.querySelector('#crew-body .cr-react [disabled]')));
     // the post's Delete is out of the reply thread's path
     C.check('…and its Delete sits with the reactions, not above the replies', await p.evaluate(() => {
@@ -860,8 +898,25 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await p.evaluate(id => document.querySelector('[data-id="' + id + '"] .cr-react .cr-kd').click(), AMIR);
     await p.waitForTimeout(500);
     const afterLike = await row('[data-id="' + AMIR + '"] .cr-react');
-    C.check('he taps Like: only the Like is left, pressed, and nothing else is offered',
-      afterLike && afterLike.btns.join('') === 'like' && afterLike.pressed.join('') === 'like', JSON.stringify(afterLike));
+    C.check('he taps Like: the Like, pressed, and a ＋ to change it; nothing else is offered',
+      afterLike && afterLike.btns.join(',') === 'like,+' && afterLike.pressed.join('') === 'like', JSON.stringify(afterLike));
+    // the ＋ opens the whole menu, the Like marked; an emoji swaps to it and the row closes on the new pick
+    await p.evaluate(id => document.querySelector('[data-id="' + id + '"] .cr-react .cr-plus').click(), AMIR);
+    await p.waitForTimeout(300);
+    const opened = await row('[data-id="' + AMIR + '"] .cr-react');
+    C.check('…the ＋ opens all five with the Like marked, and a ✕ to put it away again', opened && opened.btns.join('') === 'like🔥💪👏😍+' && opened.pressed.join('') === 'like', JSON.stringify(opened));
+    await p.evaluate(id => document.querySelector('[data-id="' + id + '"] .cr-react [data-em="😍"]').click(), AMIR);
+    await p.waitForTimeout(500);
+    const swappedTo = await row('[data-id="' + AMIR + '"] .cr-react');
+    C.check('…choosing the 😍 swaps the Like for it, and the row closes on the 😍 and a ＋',
+      swappedTo && swappedTo.btns.join(',') === '😍,+' && swappedTo.pressed.join('') === '😍', JSON.stringify(swappedTo));
+    // take the 😍 back (open the ＋, tap it), then put the Like on again so the take-back step below has something to take back
+    await p.evaluate(id => document.querySelector('[data-id="' + id + '"] .cr-react .cr-plus').click(), AMIR);
+    await p.waitForTimeout(300);
+    await p.evaluate(id => document.querySelector('[data-id="' + id + '"] .cr-react [data-em="😍"]').click(), AMIR);
+    await p.waitForTimeout(500);
+    await p.evaluate(id => document.querySelector('[data-id="' + id + '"] .cr-react .cr-kd').click(), AMIR);
+    await p.waitForTimeout(500);
     // taking it back brings the menu straight back
     await p.evaluate(id => document.querySelector('[data-id="' + id + '"] .cr-react .cr-kd').click(), AMIR);
     await p.waitForTimeout(500);
@@ -870,9 +925,9 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await p.evaluate(() => document.querySelector('[data-id="66666666-7777-8888-9999-000000000000"] .cr-react [data-em="💪"]').click());
     await p.waitForTimeout(500);
     const afterEm = await row('[data-id="66666666-7777-8888-9999-000000000000"] .cr-react');
-    C.check('he taps an emoji: only the used ones are left, his pressed, no unused and no ＋',
-      afterEm && afterEm.btns.join('') === '🔥💪' && afterEm.pressed.join('') === '💪', JSON.stringify(afterEm));
-    C.check('…the Like goes with them when nobody has liked it', await p.evaluate(() =>
+    C.check('he taps an emoji: just his 💪 and a ＋, though somebody else sent a 🔥',
+      afterEm && afterEm.btns.join(',') === '💪,+' && afterEm.pressed.join('') === '💪', JSON.stringify(afterEm));
+    C.check('…and no Like beside it', await p.evaluate(() =>
       !document.querySelector('[data-id="66666666-7777-8888-9999-000000000000"] .cr-react .cr-kd')));
     C.check('no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();

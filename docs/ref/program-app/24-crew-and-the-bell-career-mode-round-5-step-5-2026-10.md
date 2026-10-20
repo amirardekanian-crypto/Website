@@ -99,21 +99,27 @@ decides what rings and who can be seen, and never sends this app another athlete
   - **The composer keeps what was typed** (`<id>_crewkept`, `crewKeepKey()`): a sheet swiped down by accident took 280 characters with it. Only a
     plain post is kept — a session's draft is written fresh by `crewSessionDraft()` — and it is forgotten the moment the post goes.
   - **The reaction chips are 44 px**, not 36: they were the smallest buttons in the app, on a screen where everything else is 48 or 52.
-  - **The reaction row is A MENU UNTIL YOU HAVE CHOSEN AND A RECEIPT AFTERWARDS** (`crewReactRow()`, 2026-10-20). Amir, from his live phone on three
+  - **The reaction row is A ROW YOU CAN USE, OR NO ROW** (`crewReactRow()`, 2026-10-20). Amir, from his live phone on three
     screenshots: *"First i cant like my photos, which is ok, why do i have those under my posts then?"*, *"If i chose like under a post, why are
     there more emotes to choose?"*, *"When i choose emote, why others are still there?"* — and, the message before, *"it should close after you
-    choosed. and only show the ones that is replied to a post"*. The first cut read "post" as "moment line" and hung the fold off the item's TYPE, so
-    a POST kept all five out for ever and three chips he had just decided against went on asking to be tapped. **The fold belongs to the viewer's
-    state, not the item's type.** Four states, one rule:
-    - **own, or ticked under 13** → a receipt, and never a button: `.is-tally` SPANS of what people actually gave, and nothing at all when nobody has
-      given anything. (Five disabled chips under his own photo said nothing, took a 44 px row, and read to a screen reader as *"🔥 0 people, dimmed"*
-      four times. `dead()` is gone from the function: nothing on this row is ever a disabled button.)
+    choosed. and only show the ones that is replied to a post"*. Then, on the live app: *"it still shows reactions to my own post which i cant
+    choose. then remove the reactions under your own post"* and *"if under another post i have chose to send a fire emote or like, why is all my
+    other emotes opened? just show the fire and a + so i can change"*. (The second round was also a regression: a later commit, `f715819`, wrote
+    program.html over the first fix from an older copy, so the live app was still showing the old row; it was restored on 2026-10-20.) **The row
+    belongs to the viewer's state, not the item's type.** Five states:
+    - **own item** → NOTHING: `crewReactRow()` returns `''` and `.cr-react:empty { display: none }` hides the span. No tally, no chips. The names
+      line under the post (`.cr-names`) still says who reacted, and the post's Delete sits in the same foot, pushed right.
+    - **ticked under 13** → a receipt: `.is-tally` SPANS of what people gave, nothing to press. (`dead()` is gone from the function: nothing on this
+      row is ever a disabled button.)
     - **not joined** → the menu, every chip offering to join (his rule of 2026-10-19: never a dead Like).
-    - **joined, HAS chosen** → only what has been used, theirs marked, no unused chips and **no ＋**. The Like goes too when nobody has liked it.
-      Tapping theirs takes it back and the menu comes straight back with it, which is also how you change your mind: there is no swap in place.
+    - **joined, HAS chosen** → ONLY THEIR PICK (the Like or the emoji, marked, with its count) and a **＋** labelled *Change your reaction*. Others'
+      emoji and the unused four are not drawn. The ＋ sets `_crewOpenEm[target]` and shows the whole menu with theirs marked and a **✕** (`.cr-fold`,
+      `crewFold()`) at the end; `crewLike()` deletes that flag on every tap, so a swap closes the row on the new pick and a take-back brings the plain
+      menu back, the ✕ closes it without writing anything, and `openCrew()` clears every flag so a menu never outlasts a visit to Crew. Without stage82 (`BELL.emoji`
+      empty) there is nothing to change to, so no ＋.
     - **joined, has NOT chosen** → the menu. All five out on a **post** (his pick of 2026-10-19, where there is room); on a **moment line** the Like
-      alone with the rest behind a **＋** (`.cr-plus`, `crewUnfold()`, `_crewOpenEm`), because five chips under a one-line moment are taller than the
-      news. `folded` now means only *"this is a slim line, keep the menu small"*.
+      and whatever has been used, the rest behind a **＋** (`.cr-plus`, `crewUnfold()`), because five chips under a one-line moment are taller than
+      the news. `folded` means only *"this is a slim line, keep the menu small before a choice"*.
   - **Nothing on the row is dimmed, and the keyboard stays where it was.** Every chip carries `data-em` (`''` for the Like, the emoji itself, `'+'`
     for the opener) and `paintKudos()` puts focus back on the same chip after replacing the row — it used to drop to the top of the page, so a
     keyboard athlete who liked the fourth post tabbed back past the band, the faces and three cards. The names line is `aria-live="polite"`, and a

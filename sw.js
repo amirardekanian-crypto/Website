@@ -439,7 +439,15 @@
 // achievements, 20 of them, and renames version 9's ten into the families they belong to. And "How it works" is a page of
 // its own, reached from the habits page and from Achievements: what a day counts for, what everything pays, what there is
 // to win. program.html changed, so the worker has to hand out the new copy.
-const CACHE = 'aap-v214';
+// v215: program.html changed (2026-10-20). The crew's reaction row, twice. First, the fix Amir asked for on three screenshots of
+// his own crew ("why do i have those under my posts then?", "If i chose like under a post, why are there more emotes to choose?")
+// had been shipped as v214 and then written over by the habits commit that also called itself v214, from an older copy of
+// program.html, so phones were still being handed the old row; it is back, with its seven audit fixes (a former athlete is not
+// offered a Like the server refuses, a refusal no longer promises to send later, the keyboard stays on the chip it pressed).
+// Second, his next two answers: your own post carries no reactions at all, and once you have chosen the row is your pick and a
+// plus to change it, not the whole menu (a plus that was opened has a cross to put it away again). Also the photo viewer: his
+// pick was a faint ring with an unreadable count in light mode.
+const CACHE = 'aap-v215';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
