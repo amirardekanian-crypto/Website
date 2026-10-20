@@ -8633,7 +8633,7 @@ function roadRowHTML(c, i, o) {
   o = o || {};
   const state = o.state || 'locked', n = i + 1, idp = o.idp || 'road-body-';
   const list = roadList;
-  const attr = s => esc(s).replace(/"/g, '&quot;');   // esc() leaves a quote alone, and these go inside attributes
+  const attr = s => esc(s).replace(/"/g, '&quot;');   // these go inside attributes (esc() escapes quotes itself since 2026-10-20)
   const name = c.name || ('Cycle ' + n);
   let body = '';
   // Now, Up next and Locked all open on the cycle's tagline (one italic line) and The aims; nothing the old folded cards showed is lost.
@@ -8943,7 +8943,7 @@ function dayCardHTML(day, dayNum, total, opts) {
   const moveCount = blocks.reduce((n, b) => n + ((b.exercises || []).length), 0);
   const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
   const sub = `${plural(blockCount, 'block')} · ${plural(moveCount, 'movement')}`;
-  const attr = s => esc(s).replace(/"/g, '&quot;');   // esc() leaves a quote alone, and these go inside attributes
+  const attr = s => esc(s).replace(/"/g, '&quot;');   // these go inside attributes (esc() escapes quotes itself since 2026-10-20)
 
   // The rest of the week (HOME-02, Amir 2026-09-26: "If the days are done, make the day card into that small one"; the
   // Centre Court look, 2026-10-12): a row on the paper, the day's number as an outlined numeral, a green Done once it is
@@ -15092,8 +15092,8 @@ function dueHtml() {
 }
 
 // ── Log a max, step 1: pick the lift ──────────────────────────────────────
-// Rows carry their INDEX into _ceilPicks, never their name — esc() leaves quotes
-// alone, so a name like `6" Deficit Deadlift` would break out of the attribute.
+// Rows carry their INDEX into _ceilPicks, never their name: a name like `6" Deficit Deadlift`
+// inside an onclick string is fragile however it is escaped.
 // Same rule the lift rows follow.
 //
 // Three sections since 2026-10-20 (ceilingPicks(), which holds the rule and Amir's words): this
@@ -23193,7 +23193,10 @@ function esc(str) {
   if (!str) return '';
   const d = document.createElement('div');
   d.textContent = str;
-  return d.innerHTML;
+  // The quotes too (2026-10-20). Nearly a hundred calls sit inside an attribute value (aria-label="${esc(…)}"), where a
+  // `"` closed the attribute, and two take a name another athlete typed (crewPostHTML(), openCrewPhoto()). Both entities
+  // read back as the same quote in text and in attributes, so nothing on a screen changes.
+  return d.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 // ── A notification that lands on a screen (stage86) ──
