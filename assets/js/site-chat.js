@@ -186,31 +186,37 @@
   }
 
   // ── talking ──────────────────────────────────────────────────────────────
-  var busy = false;
+  var busy = false, inflight = null;
   function ask(text) {
     text = String(text || '').trim();
     if (!text || busy) return;
     if (text.length > 800) { input.setCustomValidity(T.too); input.reportValidity(); return; }
     busy = true; send.disabled = true;
-    st.log.push({ who: 'me', text: text }); save(); paint();
+    // The chat this question belongs to. "New chat" while the answer is on its way starts another one, and the answer must not
+    // land in it, nor its conversation id be reused for it (2026-10-20).
+    var mine = st;
+    mine.log.push({ who: 'me', text: text }); save(); paint();
     input.value = ''; grow();
     var typing = el('div', 'aac-typing', T.thinking); log.appendChild(typing); log.scrollTop = log.scrollHeight;
     var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    inflight = ctl;
     var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 35000);
     fetch(URL_FN, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + KEY },
-      body: JSON.stringify({ conversation_id: st.id || undefined, site: SITE, page: location.pathname, message: text }),
+      body: JSON.stringify({ conversation_id: mine.id || undefined, site: SITE, page: location.pathname, message: text }),
       signal: ctl ? ctl.signal : undefined
     }).then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j && j.error || r.status); return j; }); })
       .then(function (j) {
-        if (j.conversation_id) st.id = j.conversation_id;
-        st.log.push({ who: 'bot', text: j.reply || T.err, handoff: j.handoff || null });
+        if (j.conversation_id) mine.id = j.conversation_id;
+        mine.log.push({ who: 'bot', text: j.reply || T.err, handoff: j.handoff || null });
       })
-      .catch(function () { st.log.push({ who: 'bot', text: T.err, handoff: 'whatsapp' }); })
+      .catch(function () { mine.log.push({ who: 'bot', text: T.err, handoff: 'whatsapp' }); })
       .then(function () {
-        clearTimeout(timer); busy = false; send.disabled = false; save(); paint();
+        clearTimeout(timer);
         try { if (window.plausible) window.plausible('Chat message', { props: { site: SITE } }); } catch (e) { /* analytics is optional */ }
+        if (st !== mine) return;   // the chat was started again meanwhile: this answer belonged to the one that was cleared
+        inflight = null; busy = false; send.disabled = false; save(); paint();
       });
   }
   function grow() {
@@ -235,7 +241,11 @@
   input.addEventListener('input', function () { input.setCustomValidity(''); grow(); });
   input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); ask(input.value); } });
   panel.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
-  restart.onclick = function () { st = { id: '', log: [] }; save(); paint(); input.focus(); };
+  restart.onclick = function () {
+    if (inflight) { try { inflight.abort(); } catch (e) { /* already done */ } inflight = null; }
+    busy = false; send.disabled = false;
+    st = { id: '', log: [] }; save(); paint(); input.focus();
+  };
 
   function mount() { document.body.appendChild(btn); document.body.appendChild(panel); }
   if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
