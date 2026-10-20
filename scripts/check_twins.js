@@ -56,6 +56,14 @@
                                  Career Mode's lift maths in a lift's OWN measure (kg, lb or plates, never compared), section 11: held to the cases written in this
                                  file (MEASURE_CASES), which scripts/career/rehearse_measures.mjs reads and holds the database to as well, on PGlite.
 
+     unitWord                    / recUnitC (+ REC_UNIT_C)        a measure printed as a word ("plate", "plates", "lb", "kg"). They differed on a measure
+                                                                  that is none of the three: the app printed it as stored, the dashboard said kg;
+                                                                  the app says kg too since 2026-10-20.
+
+   Same name, NOT twins (they answer different questions, so do not make one the other's copy): daysSince (the app's returns null
+   for a bad date, the dashboard's 9999, and they feed different screens), loadHistory, markNoteRead, histKey. And estimateOneRM in the
+   two Farsi apps is held to the training app's by scripts/test_one_rm_copies.js, not here.
+
    Already guarded elsewhere (not repeated): rxOf/repCount/tempoDisplay (check_rx.js), the set-log grammar
    (check_setlog.js), the shared word lists (check_parity.py), the XP rules (check_xp_rules.py).
 
@@ -1179,6 +1187,14 @@ run('Career Mode: a lift in its own measure (program.html weightOf, setsMeasure,
   const a = { w: 100, n: 5, r: 8, idx: 123.3, u: 'kg' }, b = { w: 225, n: 5, r: 8, idx: 277.5, u: 'lb' };
   expect('winText: a kilogram set and a pound set are never a win, whatever their numbers', null, [A_MEAS.winText(a, b), A_MEAS.winText(b, a)], [null, null]);
   expect('winText: the same two pound sets are', null, A_MEAS.winText(Object.assign({}, b, { w: 205, idx: 252.8 }), b).txt, '+20 lb, same reps, same RPE');
+});
+
+/* ── the unit word (unitWord / recUnitC), 2026-10-20 ─────────────────────────── */
+const A_UNIT = sandbox(null, fromA('unitWord'), ['unitWord']);
+const D_UNIT = sandbox(null, [lineSrc(D_SRC, 'const REC_UNIT_C =', 'coach.html')].concat(fromD('recUnitC')), ['recUnitC']);
+run('the unit word (unitWord, recUnitC)', () => {
+  [undefined, null, '', 'kg', 'lb', 'plates', 'kgs', 'LB', 'plate', '<b>x</b>'].forEach(u => [0, 1, 2, 2.5, undefined].forEach(n =>
+    same('unitWord vs recUnitC', [u, n], A_UNIT.unitWord(u, n), D_UNIT.recUnitC(u, n))));
 });
 
 /* ── report ───────────────────────────────────────────────────────────────── */

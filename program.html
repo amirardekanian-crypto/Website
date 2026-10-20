@@ -19006,7 +19006,7 @@ function weightOf(v) {
   const unit = /\d\s*(?:lbs?|pounds?)(?![a-z])/i.test(t) ? 'lb' : (/\d\s*plates?(?![a-z])/i.test(t) ? 'plates' : 'kg');
   return { n, unit };
 }
-function unitWord(unit, n) { return unit === 'plates' ? (n === 1 ? 'plate' : 'plates') : (unit || 'kg'); }
+function unitWord(unit, n) { return unit === 'plates' ? (n === 1 ? 'plate' : 'plates') : (unit === 'lb' ? 'lb' : 'kg'); }   // a stray measure is kg, as recUnitC() says it (check_twins.js)
 // "45 lb" -> { num: '45', unit: 'lb' }. Anything else is all number: { num: v, unit: null } (a bare number, "60kg", "BW+10").
 function splitW(v) {
   const s = String(v == null ? '' : v).trim();

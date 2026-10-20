@@ -592,4 +592,27 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(habits\.html|as
   fi
 fi
 
+# -- 27. a reminder made under an old key is made again, and nothing else is (added 2026-10-20) ----------------------------
+# Why: a push subscription is bound to the key it was made with. Nothing re-made one after a key change, though the backup notes
+# promised it; push.js now does, quietly at an open (pushRefresh()) and on the athlete's tap (pushEnable()), keeping their hour,
+# quiet days and switches. A wrong comparison would re-subscribe every working phone at every open, so the test holds both sides.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(assets/js/push[.]js|scripts/test_push_resubscribe[.]js)$'; then
+  if ! push_out=$(node scripts/test_push_resubscribe.js 2>&1); then
+    echo "$push_out" | grep -v '^ok '
+    echo "pre-commit: BLOCKED -- the reminder re-subscribe no longer does its job (details above)."
+    failed=1
+  fi
+fi
+
+# -- 28. the estimated max is one formula in three apps (added 2026-10-20) ------------------------------------------------
+# Why: estimateOneRM() is written out in the training app, the course app and the testing app, and only the first was held to
+# anything. scripts/test_one_rm_copies.js holds the shared formula equal in all three and pins how each shows it.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program[.]html|tennis/app/app[.]js|tennis-testing/app/app[.]js|scripts/test_one_rm_copies[.]js)$'; then
+  if ! orm_out=$(node scripts/test_one_rm_copies.js 2>&1); then
+    echo "$orm_out" | grep -v '^ok '
+    echo "pre-commit: BLOCKED -- the estimated max differs between the apps (details above). Change every copy."
+    failed=1
+  fi
+fi
+
 exit $failed
