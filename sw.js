@@ -434,7 +434,14 @@
 // achievement row now says what to DO first and how far along second: the rule, then "6 of 7". The row used to drop the rule
 // the moment anything was done and show the score of a game whose instructions it had just taken away. Ten plain
 // achievements came with it (rulebook version 9): one thing, one number, the number in the name.
-const CACHE = 'aap-v213';
+// v214: program.html changed (2026-10-20). Amir, from his live phone, on three screenshots of his own crew: "First i cant
+// like my photos, which is ok, why do i have those under my posts then?", "If i chose like under a post, why are there more
+// emotes to choose?", "When i choose emote, why others are still there?". The reaction row is now a menu until you have
+// chosen and a receipt afterwards: your own post carries a quiet tally and no button at all, and once you have reacted only
+// what has actually been used is left. Plus seven more an audit found behind those three, among them a former athlete being
+// offered a Like the server always refused, a refusal that promised to send later when nothing was ever queued, and every
+// tap throwing the keyboard back to the top of the page.
+const CACHE = 'aap-v214';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

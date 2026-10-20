@@ -171,7 +171,10 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…Post sends the words, the photo and its size, as a post', post.p_body === 'First time on clay this year.' && /^\/9j\//.test(post.p_photo || '') && post.p_w === 1080 && post.p_h === 810 && post.p_kind === 'post', JSON.stringify(Object.assign({}, post, { p_photo: String(post.p_photo).slice(0, 8) })));
     C.check('…the sheet closes and the post is first after Amir\'s, with Delete', await p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')
       && /First time on clay/.test((document.querySelectorAll('#crew-body .cr-post')[1] || {}).textContent || '') && !!document.querySelectorAll('#crew-body .cr-post')[1].querySelector('.cr-del')));
-    C.check('…you cannot like your own post', await p.evaluate(() => document.querySelectorAll('#crew-body .cr-post')[1].querySelector('.cr-kd').disabled));
+    C.check('…and your own post offers no reaction at all, not a dead one', await p.evaluate(() => {
+      const own = document.querySelectorAll('#crew-body .cr-post')[1];
+      return !own.querySelector('.cr-react button') && !own.querySelector('.cr-react [disabled]');
+    }));
     // Tell the crew: a session only with a photo
     C.check('Tell the crew sits on every finished card once the athlete can post', await p.evaluate(() => { const e = [...document.querySelectorAll('.complete-crew[data-day]')]; return e.length > 0 && e.every(x => !x.hidden && /Tell the crew/.test(x.textContent)); }));
     await p.evaluate(() => openCrewPost('session', '2')); await p.waitForTimeout(300);
@@ -209,9 +212,9 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await waitTab(p);
     await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
     const u = await p.evaluate(() => ({ ask: !!document.querySelector('#crew-ask'), comp: !!document.querySelector('.cr-comp'), quiet: document.getElementById('crew-body').innerText,
-      kd: [...document.querySelectorAll('#crew-body .cr-kd')].every(b => b.disabled), tell: [...document.querySelectorAll('.complete-crew[data-day]')].every(x => x.hidden) }));
+      kd: !document.querySelector('#crew-body .cr-react button'), tell: [...document.querySelectorAll('.complete-crew[data-day]')].every(x => x.hidden) }));
     C.check('under 13: no question, no composer, "Posting is off", no Like, no Tell the crew', !u.ask && !u.comp && /Posting is off for your account/.test(u.quiet) && u.kd && u.tell, JSON.stringify(Object.assign({}, u, { quiet: '' })));
-    C.check('…and tapping their dead Like offers them nothing (they cannot join)', await p.evaluate(() => { crewLikeAsk(); return document.getElementById('aaToast').hidden; }));
+    C.check('…and the join offer stays shut for them (they cannot join)', await p.evaluate(() => { crewLikeAsk(); return document.getElementById('aaToast').hidden; }));
     await ctx.close();
   }
   // 6. a narrow phone and dark mode: five tabs fit, nothing scrolls sideways
@@ -247,19 +250,25 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     });
     const sent = await calls(p, 'crew_kudos');
     C.check('tapping 🔥 sends it and marks it', after.fire === '🔥' && after.n === '1' && sent.some(x => x.p_emoji === '🔥' && x.p_on === true), JSON.stringify([after, sent]));
-    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => /💪/.test(b.textContent)).click());
-    await p.waitForTimeout(400);
-    const swap = await p.evaluate(() => {
+    // SINCE 2026-10-20 there is no swap in place: once you have chosen, the row shows only what has been used, so the
+    // way to change your mind is to take yours back first (Amir: "When i choose emote, why others are still there?").
+    C.check('…and the unused ones go: only the one he sent is left', await p.evaluate(() => {
       const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
-      return { on: [...r.querySelectorAll('.cr-em[aria-pressed="true"] i')].map(i => i.textContent), counts: [...r.querySelectorAll('.cr-em')].map(b => (b.querySelector('b') || {}).textContent || '') };
-    });
-    C.check('…sending another swaps it: only one is pressed and 🔥 goes back to none', swap.on.join('') === '💪' && swap.counts[0] === '', JSON.stringify(swap));
-    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => /💪/.test(b.textContent)).click());
+      return [...r.querySelectorAll('.cr-em')].map(b => b.dataset.em).join('') === '🔥';
+    }), await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].map(b => b.dataset.em).join('')));
+    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => b.dataset.em === '🔥').click());
     await p.waitForTimeout(400);
-    C.check('…tapping the one you sent takes it back', await p.evaluate(() => {
+    C.check('…tapping the one you sent takes it back, and the menu comes back with it', await p.evaluate(() => {
       const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
-      return !r.querySelector('[aria-pressed="true"]');
+      return !r.querySelector('[aria-pressed="true"]') && [...r.querySelectorAll('.cr-em')].length === 4;
     }) && (await calls(p, 'crew_kudos')).some(x => x.p_on === false));
+    // the one-per-person rule still holds: send one, take it back, send another
+    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => b.dataset.em === '💪').click());
+    await p.waitForTimeout(400);
+    C.check('…and another can then be sent, alone', await p.evaluate(() => {
+      const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
+      return [...r.querySelectorAll('.cr-em')].map(b => b.dataset.em).join('') === '💪' && !!r.querySelector('[aria-pressed="true"]');
+    }) && (await calls(p, 'crew_kudos')).some(x => x.p_emoji === '💪'));
     // A moment line keeps the Like ALONE, with the four behind a ＋ (2026-10-20): five chips under a one-line moment made the
     // row of buttons taller than the news. A post still carries all five out, Amir's pick of 2026-10-19.
     C.check('a moment line: the Like and a ＋, not five chips', await p.evaluate(() => {
@@ -283,7 +292,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…and the picker CLOSES on the choice, leaving only what was used', await p.evaluate(() => {
       const r = document.querySelector('#crew-body .cr-line .cr-react');
       const em = [...r.querySelectorAll('.cr-em')];
-      return em.length === 2 && !!r.querySelector('.cr-plus') && em.filter(b => b.getAttribute('aria-pressed') === 'true').length === 1;
+      return em.length === 1 && !r.querySelector('.cr-plus') && em[0].getAttribute('aria-pressed') === 'true';   // no plus either: nothing more is offered once you have chosen
     }), await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react').textContent.replace(/\s+/g, ' ')));
     await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react .cr-em[aria-pressed="true"]').click());
     await p.waitForTimeout(400);
@@ -326,7 +335,13 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     const { ctx, p } = await open(browser, { me: { answer: 'yes', under13: true, can_post: false }, bell: Object.assign(bell({ answer: 'yes', under13: true, can_post: false }), { emoji: ['🔥', '💪', '👏', '😍'] }) });
     await waitTab(p);
     await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
-    C.check('under 13: the Like and every emoji are dead', await p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-kd, #crew-body .cr-em')].every(b => b.disabled)));
+    // A RECEIPT, never a dead button (2026-10-20): an account with reactions off sees what people gave and nothing to press.
+    C.check('under 13: no buttons on the row at all, only what people gave', await p.evaluate(() =>
+      !document.querySelector('#crew-body .cr-react button')
+      && [...document.querySelectorAll('#crew-body .cr-react .is-tally')].length > 0));
+    C.check('…and nothing on it is in the tab order or says "0 people"', await p.evaluate(() =>
+      !document.querySelector('#crew-body .cr-react [disabled]')
+      && !/0 people/.test(document.querySelector('#crew-body').innerHTML)));
     await ctx.close();
   }
 
@@ -794,6 +809,98 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await waitTab(p);
     await p.waitForTimeout(500);
     C.check('without the crew list, Home offers nothing', await p.evaluate(() => !document.querySelector('#home-sugg-wrap .lib-sugg[data-sugg="crew"]')));
+    await ctx.close();
+  }
+
+  // ── 19. A MENU UNTIL YOU CHOOSE, A RECEIPT AFTERWARDS (2026-10-20) ──────────────────────────────────────────────────
+  // Amir, from his live phone: "First i cant like my photos, which is ok, why do i have those under my posts then?",
+  // "If i chose like under a post, why are there more emotes to choose?", "When i choose emote, why others are still
+  // there?". The fold had been wired to the item TYPE (moment lines only) when it belongs to the viewer's STATE.
+  {
+    const EM = ['🔥', '💪', '👏', '😍'];
+    const b = bell({ answer: 'yes', can_post: true });
+    b.emoji = EM;
+    // [0] Amir's pinned post, nobody has reacted; [1] a moment line; [2] a post with one 🔥 from somebody else
+    b.items[0].kudos = { n: 0, like: 0, mine: false, emoji: null, names: [], by: {} };
+    b.items[2].kudos = { n: 1, like: 0, mine: false, emoji: null, names: ['Mina S.'], by: { '🔥': 1 } };
+    // [3] the viewer's OWN post, with two reactions on it
+    b.items.push({ t: 'post', id: 'own-1', who: 'You', me: true, amir: false, kind: 'post', body: 'Day 2 done.',
+      photo: false, at: iso(now - 5000e3), pinned: false, left: 7,
+      kudos: { n: 3, like: 2, mine: false, emoji: null, names: ['Mina S.', 'Sara T.'], by: { '🔥': 1 } } });
+    // [4] the viewer's own post with nothing on it at all
+    b.items.push({ t: 'post', id: 'own-2', who: 'You', me: true, amir: false, kind: 'post', body: 'Quiet one.',
+      photo: false, at: iso(now - 6000e3), pinned: false, left: 7,
+      kudos: { n: 0, like: 0, mine: false, emoji: null, names: [], by: {} } });
+    const { ctx, p } = await open(browser, { bell: b });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(600);
+    const row = sel => p.evaluate(s => {
+      const r = document.querySelector(s);
+      if (!r) return null;
+      return { btns: [...r.querySelectorAll('button')].map(x => (x.dataset.em || 'like')),
+               tally: [...r.querySelectorAll('.is-tally')].map(x => x.textContent.replace(/\s+/g, '')),
+               pressed: [...r.querySelectorAll('[aria-pressed="true"]')].map(x => x.dataset.em || 'like') };
+    }, sel);
+    // HIS COMPLAINT A: his own post
+    const own1 = await row('[data-id="own-1"] .cr-react');
+    C.check('your own post: no buttons, only what people gave', own1 && own1.btns.length === 0 && own1.tally.join('|') === 'Like2|🔥1', JSON.stringify(own1));
+    const own2 = await row('[data-id="own-2"] .cr-react');
+    C.check('…and nothing at all when nobody has reacted', own2 && own2.btns.length === 0 && own2.tally.length === 0, JSON.stringify(own2));
+    C.check('…so no dead button is left anywhere on the feed', await p.evaluate(() => !document.querySelector('#crew-body .cr-react [disabled]')));
+    // the post's Delete is out of the reply thread's path
+    C.check('…and its Delete sits with the reactions, not above the replies', await p.evaluate(() => {
+      const art = document.querySelector('[data-id="own-1"]');
+      const foots = [...art.querySelectorAll('.cr-foot')];
+      return !!foots[0].querySelector('.cr-del') && !foots[1].querySelector('.cr-del');
+    }));
+    // BEFORE a choice, a post still carries all five out (his pick of 2026-10-19)
+    const fresh = await row('[data-id="' + AMIR + '"] .cr-react');
+    C.check('a post nobody has reacted to: all five out, as he picked', fresh && fresh.btns.join('') === 'like🔥💪👏😍', JSON.stringify(fresh));
+    // HIS COMPLAINT C: he taps Like, and the four must go
+    await p.evaluate(id => document.querySelector('[data-id="' + id + '"] .cr-react .cr-kd').click(), AMIR);
+    await p.waitForTimeout(500);
+    const afterLike = await row('[data-id="' + AMIR + '"] .cr-react');
+    C.check('he taps Like: only the Like is left, pressed, and nothing else is offered',
+      afterLike && afterLike.btns.join('') === 'like' && afterLike.pressed.join('') === 'like', JSON.stringify(afterLike));
+    // taking it back brings the menu straight back
+    await p.evaluate(id => document.querySelector('[data-id="' + id + '"] .cr-react .cr-kd').click(), AMIR);
+    await p.waitForTimeout(500);
+    C.check('…and taking it back brings the menu back', (await row('[data-id="' + AMIR + '"] .cr-react')).btns.join('') === 'like🔥💪👏😍');
+    // HIS COMPLAINT B: he taps an emoji on a post that already has one
+    await p.evaluate(() => document.querySelector('[data-id="66666666-7777-8888-9999-000000000000"] .cr-react [data-em="💪"]').click());
+    await p.waitForTimeout(500);
+    const afterEm = await row('[data-id="66666666-7777-8888-9999-000000000000"] .cr-react');
+    C.check('he taps an emoji: only the used ones are left, his pressed, no unused and no ＋',
+      afterEm && afterEm.btns.join('') === '🔥💪' && afterEm.pressed.join('') === '💪', JSON.stringify(afterEm));
+    C.check('…the Like goes with them when nobody has liked it', await p.evaluate(() =>
+      !document.querySelector('[data-id="66666666-7777-8888-9999-000000000000"] .cr-react .cr-kd')));
+    C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+  {
+    // the keyboard stays on the chip it pressed
+    const b = bell({ answer: 'yes', can_post: true });
+    b.emoji = ['🔥', '💪', '👏', '😍'];
+    const { ctx, p } = await open(browser, { bell: b });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(500);
+    await p.evaluate(id => { const x = document.querySelector('[data-id="' + id + '"] .cr-react .cr-kd'); x.focus(); x.click(); }, AMIR);
+    await p.waitForTimeout(600);
+    C.check('a tap leaves the keyboard on the chip it pressed, not at the top of the page', await p.evaluate(() => {
+      const a = document.activeElement;
+      return !!a && a.classList.contains('cr-kd') && (a.dataset.em || '') === '';
+    }), await p.evaluate(() => (document.activeElement || {}).className || 'none'));
+    await ctx.close();
+  }
+  {
+    // a former athlete: the server would refuse, so the app must not offer
+    const b = bell({ answer: 'yes', can_post: false });
+    b.emoji = ['🔥', '💪', '👏', '😍'];
+    const { ctx, p } = await open(browser, { bell: b });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(500);
+    C.check('a yes the server will not accept (a former athlete): the row offers to join, never a tap that fails', await p.evaluate(() =>
+      [...document.querySelectorAll('#crew-body .cr-post .cr-react button')].every(x => /crewLikeAsk/.test(x.getAttribute('onclick') || ''))));
     await ctx.close();
   }
 

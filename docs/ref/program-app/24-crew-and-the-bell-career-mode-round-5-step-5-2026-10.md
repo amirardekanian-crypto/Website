@@ -99,9 +99,36 @@ decides what rings and who can be seen, and never sends this app another athlete
   - **The composer keeps what was typed** (`<id>_crewkept`, `crewKeepKey()`): a sheet swiped down by accident took 280 characters with it. Only a
     plain post is kept — a session's draft is written fresh by `crewSessionDraft()` — and it is forgotten the moment the post goes.
   - **The reaction chips are 44 px**, not 36: they were the smallest buttons in the app, on a screen where everything else is 48 or 52.
-  - **A moment line keeps the Like alone**, with the four emoji behind a **＋** (`.cr-plus`, `crewUnfold()`, `_crewOpenEm`): five chips under a
-    one-line moment made the row of buttons taller than the news. A **post** still carries all five out, Amir's pick of 2026-10-19. Never folded for
-    an athlete ticked under 13 (four dead chips are noise), and never once somebody has used one, because then they are the news.
+  - **The reaction row is A MENU UNTIL YOU HAVE CHOSEN AND A RECEIPT AFTERWARDS** (`crewReactRow()`, 2026-10-20). Amir, from his live phone on three
+    screenshots: *"First i cant like my photos, which is ok, why do i have those under my posts then?"*, *"If i chose like under a post, why are
+    there more emotes to choose?"*, *"When i choose emote, why others are still there?"* — and, the message before, *"it should close after you
+    choosed. and only show the ones that is replied to a post"*. The first cut read "post" as "moment line" and hung the fold off the item's TYPE, so
+    a POST kept all five out for ever and three chips he had just decided against went on asking to be tapped. **The fold belongs to the viewer's
+    state, not the item's type.** Four states, one rule:
+    - **own, or ticked under 13** → a receipt, and never a button: `.is-tally` SPANS of what people actually gave, and nothing at all when nobody has
+      given anything. (Five disabled chips under his own photo said nothing, took a 44 px row, and read to a screen reader as *"🔥 0 people, dimmed"*
+      four times. `dead()` is gone from the function: nothing on this row is ever a disabled button.)
+    - **not joined** → the menu, every chip offering to join (his rule of 2026-10-19: never a dead Like).
+    - **joined, HAS chosen** → only what has been used, theirs marked, no unused chips and **no ＋**. The Like goes too when nobody has liked it.
+      Tapping theirs takes it back and the menu comes straight back with it, which is also how you change your mind: there is no swap in place.
+    - **joined, has NOT chosen** → the menu. All five out on a **post** (his pick of 2026-10-19, where there is room); on a **moment line** the Like
+      alone with the rest behind a **＋** (`.cr-plus`, `crewUnfold()`, `_crewOpenEm`), because five chips under a one-line moment are taller than the
+      news. `folded` now means only *"this is a slim line, keep the menu small"*.
+  - **Nothing on the row is dimmed, and the keyboard stays where it was.** Every chip carries `data-em` (`''` for the Like, the emoji itself, `'+'`
+    for the opener) and `paintKudos()` puts focus back on the same chip after replacing the row — it used to drop to the top of the page, so a
+    keyboard athlete who liked the fourth post tabbed back past the band, the faces and three cards. The names line is `aria-live="polite"`, and a
+    chip's count is in its label as well as its `<b>`, since a blind athlete cannot reach the `<b>`.
+  - **The chosen emoji's ring is 2 px of `--green-ink`**, not 1 px of `--fill`: in dark mode `--fill` on `--row` is 1.6:1, so which one you chose was
+    carried by a border nobody could see, on a row where the count reads 1 whether it was you or somebody else.
+  - **The post's own Delete sits in the reaction foot**, beside what the post got. It used to sit on the names line directly above the replies, where
+    it read as the thread's heading, and on his own post with his own reply there were two identical Deletes in one column. Its armed words are now
+    *Tap again to delete the post*.
+  - **`crewCanLike()` is the SERVER's gate**, `crewMe().can_post`, not a guess at it. It read `answer === 'yes' && !under13`, but `crew_members()`
+    also drops a **former** athlete, so one of those kept a live Like on every post and every tap flashed on and came back with *"That did not go"*.
+  - **A refusal says what actually happened**: *"That did not reach the crew. Tap it again when you have signal."* It used to promise *"It goes when
+    you are back online"*, and nothing is queued, so it never went.
+  - **A reply's words are `--fs-body`**, the size its own comment always claimed, not `--fs-small`: the thread was set smaller than the post it was
+    about and read as small print.
 - **The data, on a slow connection** (Amir, 2026-10-19: *"irans internet is very slow, and cant download everything everytime they open the
   app"*): **nothing is asked for at an app open**. `crewFirstLook()` asks once in a phone's life, only while it has no copy at all (a new
   athlete still gets the tab without opening anything); after that the tab, the dot and *Tell the crew* all come from `<id>_crewcache`.

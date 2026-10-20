@@ -99,8 +99,14 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   phone (1080 px, about 200 KB: Amir, 2026-10-19, *"irans internet is very slow"*) and stored as a row (never Storage: a Storage file cannot be deleted from SQL), Tell the crew posts a session only with a photo,
   and an athlete Amir ticks under 13 reads only. A new crew table goes into `coach_erase_person()` and the snapshot the same day.
   **Kudos is a Like** (Amir, 2026-10-19), with **🔥 💪 👏 😍** beside it (stage82, live 2026-10-19) (`crew_emoji_list()`; the app draws them only
-  while `get_bell()` hands over the list, so it degrades to the Like alone). One reaction per person: another emoji swaps it. On a **moment line** the
-  Like stands alone and the four wait behind a **＋** (2026-10-20); a post keeps all five out.
+  while `get_bell()` hands over the list, so it degrades to the Like alone). One reaction per person.
+  **THE REACTION ROW IS A MENU UNTIL YOU HAVE CHOSEN AND A RECEIPT AFTERWARDS** (2026-10-20, Amir from his live phone: *"why do i have those under my
+  posts then?"*, *"If i chose like under a post, why are there more emotes to choose?"*, *"When i choose emote, why others are still there?"*). The
+  fold belongs to the viewer's STATE, never the item's type: **your own item, or an account with reactions off, carries no button at all** — a quiet
+  tally of what people gave, and nothing when nobody gave anything; **once you have chosen**, only what has been used, with no unused chip and no ＋
+  (take yours back and the menu returns — there is no swap in place); **before you choose**, the menu, all five out on a post and the Like with the
+  rest behind a **＋** on a moment line. Nothing on this row is ever a disabled button, the keyboard stays on the chip it pressed, and what the app
+  lets an athlete tap is the server's own gate (`can_post`), so a former athlete is never offered a reaction that will be refused.
   **The week comes first, and nothing on Crew is ranked by two ladders** (stage91, 2026-10-20, direction B of the audit *The Empty Room*): the top of
   the tab is the crew's own week (sessions and weeks held over the Bell's same 7 days) and it is never empty; **a finished session rings as ONE line a
   day for the whole crew**, naming only members whose switch is on, on by default and **with no notification** (Amir: *"unless if 20 ppl train, we wil
