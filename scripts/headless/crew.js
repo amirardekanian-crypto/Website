@@ -266,6 +266,10 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       const r = document.querySelector('#crew-body .cr-line .cr-react');
       return !!r && r.querySelectorAll('.cr-em').length === 1 && !!r.querySelector('.cr-plus');
     }));
+    // a post is NOT folded: Amir's pick of 2026-10-19 was all five out, and that stands where there is room
+    C.check('…while a post still carries all five out', await p.evaluate(() =>
+      document.querySelector('#crew-body .cr-post .cr-react').querySelectorAll('.cr-em').length === 4
+      && !document.querySelector('#crew-body .cr-post .cr-plus')));
     await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react .cr-plus').click());
     await p.waitForTimeout(300);
     C.check('…＋ unfolds the four in place', await p.evaluate(() => {
@@ -275,6 +279,18 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react .cr-em').click());
     await p.waitForTimeout(400);
     C.check('a Bell line takes one too, under its words', await p.evaluate(() => !!document.querySelector('#crew-body .cr-line .cr-react .cr-em[aria-pressed="true"]')));
+    // Amir, 2026-10-20: "it should close after you choosed. and only show the ones that is replied to a post".
+    C.check('…and the picker CLOSES on the choice, leaving only what was used', await p.evaluate(() => {
+      const r = document.querySelector('#crew-body .cr-line .cr-react');
+      const em = [...r.querySelectorAll('.cr-em')];
+      return em.length === 2 && !!r.querySelector('.cr-plus') && em.filter(b => b.getAttribute('aria-pressed') === 'true').length === 1;
+    }), await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react').textContent.replace(/\s+/g, ' ')));
+    await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react .cr-em[aria-pressed="true"]').click());
+    await p.waitForTimeout(400);
+    C.check('…and taking it back leaves the Like and the ＋ again', await p.evaluate(() => {
+      const r = document.querySelector('#crew-body .cr-line .cr-react');
+      return r.querySelectorAll('.cr-em').length === 1 && !!r.querySelector('.cr-plus');
+    }), await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react').textContent.replace(/\s+/g, ' ')));
     C.check('no page errors (the emoji row)', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }
