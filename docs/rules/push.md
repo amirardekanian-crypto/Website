@@ -14,6 +14,19 @@ off in their app settings"*. Two reminders, both opt-out once the phone allows t
   until the athlete digs into browser settings, and it takes BOTH apps with it. Nothing may ever fire
   the browser's box without a line of context first; that is why "automatically on" is built as *no
   question about whether they want reminders*, one line, their tap, then every kind on.
+- **The app asks at TWO moments, and only those** (Amir, 2026-10-20: *"the person who installs the
+  app, ask for notifications to be turned on"*, and *"if some one joins the crew, again it should ask
+  for permission for their notification"*): **installed and opened from the Home Screen**, and
+  **joining the crew**. Both are real intent — they have just chosen to keep the app, or to be seen by
+  the crew. Nothing is ever asked on a first visit in a browser tab.
+- **Our line is not the phone's box, which is why asking twice is safe.** The ask is one line with a
+  button (`pushAsk()`, an `aaToast` with `ms: 0` so it waits for them); `Notification.requestPermission()`
+  runs inside that button's click and nowhere else. One ask per reason, remembered on that phone, and
+  **nothing at all when the answer is already in** — on, blocked, or waiting for the Home Screen.
+  Joining the crew makes the join toast ITSELF the ask rather than stacking a second one behind it:
+  two toasts in a row is how a person learns to swipe them away.
+  Guard: `scripts/headless/crew.js` (16 checks, including that nothing reaches the phone until the
+  button is tapped).
 - **The phone's box cannot be skipped by anyone.** Apple and Google both require the athlete's own tap.
   No app of any kind can turn notifications on for someone, and no amount of design changes that.
 - **iPhone needs iOS 16.4+ AND the app on the Home Screen.** In Safari itself `AAPush.state()` is

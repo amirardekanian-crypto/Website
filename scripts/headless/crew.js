@@ -425,7 +425,83 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('dark mode: the card takes the dark paper and its title the dark ink', dark.bg !== 'rgb(255, 255, 255)' && dark.ink !== 'rgb(26, 26, 26)', JSON.stringify(dark));
     await ctx.close();
   }
+  {
+    // Asking for the phone (Amir, 2026-10-20): "the person who installs the app, ask for notifications
+    // to be turned on", and "if some one joins the crew, again it should ask".
+    //
+    // ⚠️ What matters here is not that the line appears but that the PHONE'S BOX is never opened by us:
+    // the ask is a toast with a button, and the box opens only inside that button's click. A real grant
+    // cannot be driven headlessly (that is the point of the feature), so AAPush is stubbed and what is
+    // checked is every decision around the tap.
+    const b = bell({ answer: 'no', can_post: false });
+    const { ctx, p } = await open(browser, { bell: b });
+    await p.waitForTimeout(1500);
+    // 'off' is "they have not answered the box yet" — the only state worth asking in.
+    const stub = (state) => p.evaluate(s => {
+      window.__ASKS = [];
+      window.AAPush = Object.assign({}, window.AAPush, {
+        state: () => s,
+        markAsked: () => {},
+        enable: () => { window.__ASKS.push('enable'); return Promise.resolve({ ok: true, me: { on: true } }); },
+      });
+      try { Object.keys(localStorage).filter(k => k.indexOf('aa_push_ask_') === 0).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+      const t = document.getElementById('aaToast'); if (t) t.hidden = true;
+    }, state);
+    const toast = () => p.evaluate(() => {
+      const el = document.getElementById('aaToast');
+      if (!el || el.hidden) return null;
+      const go = el.querySelector('.aa-toast-go'), x = el.querySelector('.aa-toast-x');
+      return { text: (el.querySelector('.aa-toast-t') || {}).textContent, action: go && go.textContent, dismiss: x && x.textContent };
+    });
 
+    await stub('off');
+    const shown = await p.evaluate(() => pushAsk('zz', 'a line about what arrives'));
+    let t = await toast();
+    C.check('push off: the ask is a toast with a Turn them on button', shown === true && !!t && t.action === 'Turn them on', JSON.stringify(t));
+    C.check('…and it waits for them instead of fading (ms: 0)', await p.evaluate(() => new Promise(r => setTimeout(() => r(!document.getElementById('aaToast').hidden), 7000))));
+    C.check('…nothing was sent to the phone until the button is tapped', (await p.evaluate(() => window.__ASKS)).length === 0);
+    await p.evaluate(() => document.querySelector('#aaToast .aa-toast-go').click());
+    await p.waitForTimeout(300);
+    C.check('…the tap is what calls enable(), so the box opens inside their own gesture',
+      (await p.evaluate(() => window.__ASKS)).join() === 'enable');
+
+    // One ask per reason: the same reason again says nothing, a different one may.
+    await p.evaluate(() => { document.getElementById('aaToast').hidden = true; });
+    C.check('the same reason is never asked twice', (await p.evaluate(() => pushAsk('zz', 'again'))) === false && !(await toast()));
+    C.check('a different reason may still ask once', (await p.evaluate(() => pushAsk('zz2', 'another'))) === true);
+
+    // The states where asking is wrong: already on, refused for good, or waiting for the Home Screen.
+    for (const s of ['on', 'blocked', 'needs-install', 'unsupported']) {
+      await stub(s);
+      C.check(`push ${s}: nothing is asked`, (await p.evaluate(() => pushAsk('zz3', 'x'))) === false && !(await toast()));
+    }
+
+    // Joining the crew IS the second moment, and the ask replaces the join toast rather than stacking
+    // a second one behind it.
+    await stub('off');
+    await p.evaluate(() => { window.BELL = window.BELL || {}; });
+    const joined = await p.evaluate(async () => { await crewAnswer('yes'); return true; });
+    t = await toast();
+    C.check('joining the crew with the phone off: one toast, and it is the ask',
+      joined && !!t && t.action === 'Turn them on' && /crew/i.test(t.text), JSON.stringify(t));
+
+    // With the phone already on, joining says the plain thing and offers nothing.
+    await stub('on');
+    await p.evaluate(async () => { await crewAnswer('yes'); });
+    t = await toast();
+    C.check('…and with the phone already on, the plain join toast, no button',
+      !!t && !t.action && /crew/i.test(t.text), JSON.stringify(t));
+    C.check('no page errors through any of it', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+  {
+    // The install ask is gated on the Home Screen, which on an iPhone is the only place a push works.
+    const src = require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'program.html'), 'utf8');
+    const fn = src.slice(src.indexOf('function pushAskOnInstall'), src.indexOf('function pushAskOnInstall') + 600);
+    C.check('the install ask asks only when the app is on the Home Screen', /_isStandalone\(\)/.test(fn), fn.slice(0, 120));
+    C.check('…and only once per phone', /pushAsked\('install'\)/.test(fn));
+    C.check('…and it is wired into boot', /pushAskOnInstall\(\);/.test(src.slice(src.indexOf('initCrewDeepLink();'))));
+  }
 
   await browser.close();
   process.exit(C.report() ? 1 : 0);

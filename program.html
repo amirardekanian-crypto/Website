@@ -13160,6 +13160,13 @@ async function crewAnswer(ans, btn) {
   if (!r || r.error || !r.data) { aaToast(_noAnswer(r) ? 'No signal. Answer again when you are back online.' : 'That did not save. Try again.'); return false; }
   if (BELL) BELL.me = r.data;
   renderCrew();
+  // Joining is the second moment worth asking for a phone (Amir, 2026-10-20): they have just chosen to
+  // be seen by the crew, and the crew is the one thing here that happens while the app is shut. The ask
+  // IS this toast rather than a second one behind it — two in a row is how a person learns to swipe.
+  if (ans === 'yes' && pushAsk('crew', "You're in the crew. Turn your phone on and their moments reach you.")) {
+    refreshBell();
+    return true;
+  }
   aaToast(ans === 'yes' ? "You're in the crew. Your moments ring on the Bell." : 'Kept to you. Nothing of yours reaches the crew.');
   refreshBell();
   return true;
@@ -13259,6 +13266,61 @@ async function pushTurnOn() {
   else aaToast('That did not work. Try again later.');
   openPushSettingsPage();
 }
+// ── Asking for notifications at the two moments that earn it (Amir, 2026-10-20) ──
+// "can you make it in a way that the person who installs the app, ask for notifications to be turned
+// on?" and "if some one joins the crew, again it should ask for permission for their notification".
+// Both are moments of real intent: they have just chosen to keep the app, or just chosen to be seen by
+// the crew. Nothing is asked on a first visit in a browser tab.
+//
+// ⚠️ THIS LINE IS NOT THE PHONE'S PERMISSION BOX. The box opens only on their tap of "Turn them on",
+// which is the whole reason our own line can be shown twice at no cost: a "Don't allow" is permanent
+// until they dig into browser settings, and it takes AA Proof with it (one permission per website, and
+// only one chance). So: one ask per reason, remembered on this phone, never when the answer is already
+// in — on, blocked, or waiting for the Home Screen — and never a second browser box.
+const PUSH_ASK_KEY = 'aa_push_ask_';   // + the reason. Per browser, never synced: it is about this phone.
+function pushAsked(why) { try { return localStorage.getItem(PUSH_ASK_KEY + why) === '1'; } catch (e) { return false; } }
+function pushAskMark(why) { try { localStorage.setItem(PUSH_ASK_KEY + why, '1'); } catch (e) {} }
+// True when there is something worth asking for: the athlete is real, the phone can take a push, and
+// they have not answered the box yet.
+function pushWorthAsking() { return pushReady() && window.AAPush && AAPush.state() === 'off'; }
+
+// Turn them on from a nudge rather than from inside the Reminders sheet: the same call, without
+// opening a page the athlete never asked to see.
+async function pushTurnOnHere() {
+  const sb = await _sbReady();
+  if (!sb || !window.AAPush) return;
+  AAPush.markAsked();
+  const r = await AAPush.enable(sb, 'training', 'en');
+  if (r && r.ok) { PUSH_ME = r.me || PUSH_ME; aaToast('Your phone is on. Nothing before 8am or after 10pm.'); }
+  else if (r && r.state === 'blocked') aaToast('Your phone said no. You can undo that in its settings.');
+  else if (r && r.state === 'needs-install') aaToast('Add the app to your Home Screen first.');
+  else aaToast('That did not work. Account, then Reminders, when you want to try again.');
+}
+window.pushTurnOnHere = pushTurnOnHere;
+
+// One ask, with its own line, left on screen until they answer it (ms: 0 — a six-second toast is no way
+// to put a one-chance decision to somebody).
+function pushAsk(why, line) {
+  if (!pushWorthAsking() || pushAsked(why)) return false;
+  pushAskMark(why);
+  aaToast(line, { kicker: 'Your phone', action: 'Turn them on', dismiss: 'Not now', ms: 0,
+                  run: () => pushTurnOnHere() });
+  return true;
+}
+
+// The install. Only from the Home Screen, which is the act of keeping the app — and on an iPhone it is
+// also the only place a push can work at all. It waits for the app to be up and signed in, and gives up
+// rather than interrupting someone who has already started doing something.
+function pushAskOnInstall() {
+  if (!_isStandalone() || pushAsked('install')) return;
+  let left = 24;
+  const tick = () => {
+    if (!pushWorthAsking()) { if (--left > 0) setTimeout(tick, 500); return; }
+    pushAsk('install', 'Reminders for your training and your habits, and the crew when something happens.');
+  };
+  setTimeout(tick, 2500);
+}
+
 async function pushTurnOff() {
   const sb = await _sbReady();
   const r = sb ? await AAPush.disable(sb) : null;
@@ -21826,6 +21888,7 @@ function initCrewDeepLink() {
   initSheetSwipe('hist-overlay', () => closeHistorySheet());
   initSheetSwipe('readiness-overlay', () => cancelReadiness());
   initCrewDeepLink();   // a crew notification lands on the Bell (stage86)
+  pushAskOnInstall();   // installed from the Home Screen: ask for the phone once (Amir, 2026-10-20)
 
   // Offer Add-to-Home-Screen once the athlete has FINISHED A SESSION, never on first open
   // (HOME-03, 2026-09-26): the toast used to land 2.5 s after the first sign-in, on top of

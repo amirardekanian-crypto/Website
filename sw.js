@@ -380,7 +380,12 @@
 // Long Rally). Progress is one screen now: the cover carries Amir's first sentence and Read it, Your numbers is the four figures
 // with the level as its quiet foot (no XP figure, no next-mark bars), and Your moments, Achievements and the habits are door rows
 // to three pages — two of them new screens, #screen-moments (grouped by month) and #screen-achievements. 3,408 px → 2,176.
-const CACHE = 'aap-v202';
+// v203: program.html changed (2026-10-20, Amir: "can you make it in a way that the person who installs the app, ask for notifications to be
+// turned on?" and "if some one joins the crew, again it should ask for permission for their notification"). The app now asks for the phone at
+// those two moments, and only those: installed and opened from the Home Screen, and joining the crew. The ask is one line with a button; the
+// phone's own box opens only inside that tap, which is why our line can be shown twice at no cost while a "Don't allow" is permanent and takes
+// AA Proof with it. Nothing is asked when the answer is already in — on, blocked, or waiting for the Home Screen.
+const CACHE = 'aap-v203';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
