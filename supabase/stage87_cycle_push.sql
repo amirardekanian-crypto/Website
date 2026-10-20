@@ -88,13 +88,15 @@ $stage87_policies$;
 
 -- ── 2. The words ───────────────────────────────────────────────────────────────────────────────────
 -- Here and not in the sender, so there is one copy and the rehearsal can read them.
--- ⚠️ The Farsi is a DRAFT for Amir to read, as stage84's and stage86's lines are.
+-- ⚠️ The Farsi is Amir's own, read and chosen on 2026-10-20: دوره for a cycle, the same word
+-- stage86's crew line uses. The ezafe is written with a zero-width non-joiner and a ی (دوره‌ی), which
+-- crew_clean() keeps on purpose. It is no longer a draft.
 create or replace function public.cycle_push_words(p_lang text)
 returns table (title text, body text)
 language sql immutable set search_path to 'public' as $function$
   select t.title, t.body from (values
     ('en', 'Your next cycle is ready', 'Open the app and have a look.'),
-    ('fa', 'سایکل بعدیت آماده‌ست',      'برنامه رو باز کن و یه نگاه بنداز.')
+    ('fa', 'دوره‌ی بعدیت آماده‌ست',      'برنامه رو باز کن و یه نگاه بنداز.')
   ) as t(lang, title, body)
   where t.lang = (case when p_lang = 'fa' then 'fa' else 'en' end)
 $function$;

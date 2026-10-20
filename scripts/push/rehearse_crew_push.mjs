@@ -341,8 +341,10 @@ const EARLY = '2026-11-12T06:00:00Z';     // 06:00 in the UK (asleep), 09:30 in 
   await stamp();
   rows = await due();
   ok(rows.length === 1, 'three things in the crew are ONE notification, not three', rows.length);
-  ok(/3/.test(rows[0].body) && !/zz_a/.test(rows[0].title),
-     'and it says how many there are, naming nobody', { t: rows[0].title, b: rows[0].body });
+  // Amir's words (2026-10-20): the count is in Persian digits, because nothing else in that line is
+  // Latin. zz_b reads Farsi, so this is ۳ and not 3.
+  ok(/۳/.test(rows[0].body) && !/3/.test(rows[0].body) && !/zz_a/.test(rows[0].title),
+     'and it says how many there are in Persian digits, naming nobody', { t: rows[0].title, b: rows[0].body });
   // The same fold in English, read over zz_c's shoulder.
   await db.query(`update public.push_subs set kinds = '{}'::jsonb where athlete_id='zz_c'`);
   const en = (await due()).find(r => r.athlete_id === 'zz_c');
@@ -374,6 +376,24 @@ const EARLY = '2026-11-12T06:00:00Z';     // 06:00 in the UK (asleep), 09:30 in 
   rows = await due();
   const fa = rows.find(r => r.athlete_id === 'zz_b');
   ok(fa && /[؀-ۿ]/.test(fa.title), 'a Farsi athlete gets Farsi words', fa && fa.title);
+
+  // The words Amir read and chose on 2026-10-20. Checked here because a later hand could "tidy" a
+  // transliteration back in, and these are his, not a translator's.
+  const his = await one(db, `select
+      (select title from public.crew_push_words(1, 'joined', 'X', false, 'fa')) as joined,
+      (select title from public.crew_push_words(9, 'post', 'X', false, 'fa')) as many,
+      (select title from public.crew_push_words(1, 'level', 'X', false, 'fa')) as level,
+      (select title from public.crew_push_words(1, 'mark', 'X', false, 'fa')) as mark,
+      (select title from public.crew_push_words(1, 'achievement', 'X', false, 'fa')) as achievement,
+      (select title from public.crew_push_words(1, 'cycle', 'X', false, 'fa')) as cycle,
+      (select title from public.crew_push_words(1, 'zz_unknown', 'X', false, 'fa')) as fallback`);
+  ok(/تیم/.test(his.joined) && !/کرو/.test(his.joined), 'the crew is تیم, not a transliteration', his.joined);
+  ok(/تیم/.test(his.many) && !/کرو/.test(his.many), '…in the folded line too', his.many);
+  ok(/تیم/.test(his.fallback), '…and in the fallback a kind with no words falls back to', his.fallback);
+  ok(/سطح/.test(his.level), 'a level is سطح', his.level);
+  ok(/دوره/.test(his.cycle) && !/سایکل/.test(his.cycle), 'a cycle is دوره', his.cycle);
+  ok(his.mark === his.achievement && /دستاورد/.test(his.mark),
+     'a mark and an achievement are BOTH دستاورد — his answer: in Farsi they are one thing', his.mark);
 
   // A phone that has stopped answering is left alone.
   await db.query(`update public.push_subs set fails = 5 where athlete_id='zz_b'`);

@@ -146,6 +146,9 @@ const NIGHT = '2026-11-12T23:30:00Z';
   rows = await due(T, false);
   const fa = rows.find(r => r.athlete_id === 'zz_ir');
   ok(fa && /[؀-ۿ]/.test(fa.title), 'a Farsi athlete gets Farsi words', fa && fa.title);
+  // Amir's word, read and chosen 2026-10-20: دوره, the same one stage86's crew line uses.
+  ok(/دوره/.test(fa.title) && !/سایکل/.test(fa.title),
+     'a cycle is دوره, not a transliteration', fa.title);
 
   section('4. Who is never told');
   ok((await due(NIGHT)).length === 0, 'at half past eleven at night, nobody');

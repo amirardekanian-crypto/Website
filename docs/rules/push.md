@@ -39,6 +39,14 @@ off in their app settings"*. Two reminders, both opt-out once the phone allows t
   bug can wake anybody at three in the morning.
 - **A kind nobody switched is ON**, the same rule `crew_consent` uses, so a kind added later is on for
   everyone who already said yes. `kinds` carries `crew` (stage86, below) and `cycle` (no sender yet).
+- **The Farsi is Amir's, read on a lock screen and chosen there** (2026-10-20): تیم for the crew, not a
+  transliteration of "crew"; دوره for a cycle, in both the crew's line and the cycle sender's;
+  **دستاورد for BOTH a mark and an achievement**, which is his answer to whether the two read
+  differently in Farsi — they do not, so the two notifications are deliberately identical; سطح for a
+  level, as سطحش رفت بالا. **The folded count is in Persian digits**, because nothing else in that
+  line is Latin. He read the two reminders' lines at the same time and changed nothing in them.
+  Guards: both rehearsals check his words by name, so a later hand cannot tidy a transliteration
+  back in. The board he read them on: https://claude.ai/artifact/JFeyXV9dGJv9f1WsF1eFcX
 - **⚠️ A switch in the Reminders panel must have a sender.** That is the fault Amir found on
   2026-10-19 (*"why didnt i?"*): `crew` had been offered since stage84 with nothing behind it, and
   `cycle` after it. **All four have one now** — habits and workout (stage84), crew (stage86), cycle
