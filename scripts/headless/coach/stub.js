@@ -65,7 +65,8 @@
   function noStage75() { return (ST.missingRpc || []).indexOf('get_courtside') >= 0; }
   // stage81's functions (the Bell). The stub answers them only when the seed says `crew: true` (buildSeed({crew: true})), so every other scenario runs
   // against a server that has not had stage81, as before; `missingRpc: ['coach_crew']` takes them away again (the page draws no Bell).
-  var CREW_RPCS = ['coach_crew', 'coach_crew_post', 'coach_crew_remove', 'coach_crew_under13', 'crew_photo'];
+  // get_bell and coach_crew_remove_reply are stage92's way to read and remove a reply; they come and go with the Bell here (a server without stage81 has neither).
+  var CREW_RPCS = ['coach_crew', 'coach_crew_post', 'coach_crew_remove', 'coach_crew_under13', 'crew_photo', 'get_bell', 'coach_crew_remove_reply'];
   function noStage81() { return !SEED.crew || (ST.missingRpc || []).indexOf('coach_crew') >= 0; }
   // stage85's functions (the Monthly Open). Answered only when the seed says `open: true` (buildSeed({open: true}), which also turns stage81 on: stage85 needs it), so
   // every other scenario runs against a server that has not had stage85; `missingRpc: ['coach_open']` takes them away from a seeded run too, and
@@ -356,7 +357,11 @@
   // The Bell's state (stage81): posts as coach_crew() returns them, but with `ago_min` (how old, in minutes, on the page's clock) in place of `at`;
   // people as coach_crew() returns them; photos by post id. Tests read and change it as window.__DB.crew_bell.
   function bell() { return DB.crew_bell || (DB.crew_bell = { posts: [], people: [], photos: {}, rings_week: 0 }); }
-  function bellSweep() { var c = bell(); c.posts = c.posts.filter(function (p) { return p.ago_min <= 7 * 1440; }); return c; }   // crew_sweep(): a post goes 7 days after it was made
+  function bellSweep() {   // crew_sweep(): a post goes 7 days after it was made, and its replies go with it (on delete cascade)
+    var c = bell(); c.posts = c.posts.filter(function (p) { return p.ago_min <= 7 * 1440; });
+    c.replies = (c.replies || []).filter(function (r) { return c.posts.some(function (p) { return p.id === r.post_id; }); });
+    return c;
+  }
   var BELL_OK = 'crew:';
   // The Open's state (stage85): every challenge ever set (the live one has no closed_at), every confirmed result, the Bell lines a result rang. Tests read and
   // change it as window.__DB.crew_open_state. The crew is crew_members(): a yes (the Bell's people), not under 13, not a former athlete, not the demo,
@@ -424,7 +429,30 @@
     coach_crew_remove: function (p) {
       var c = bellSweep(), n = c.posts.length;
       c.posts = c.posts.filter(function (x) { return x.id !== p.p_post; }); delete c.photos[p.p_post];
+      c.replies = c.replies.filter(function (r) { return r.post_id !== p.p_post; });
       return c.posts.length < n;
+    },
+    // stage92: Amir removes any reply; true when one was there (the SQL's `found`). Never touches a post.
+    coach_crew_remove_reply: function (p) {
+      var c = bellSweep(), n = c.replies.length;
+      c.replies = c.replies.filter(function (r) { return r.id !== p.p_id; });
+      return c.replies.length < n;
+    },
+    // get_bell() as the coach reads it (no viewer): the athlete feed, of which the page keeps only the posts and their replies. Like the SQL, a post shows only when its
+    // author is Amir or in the crew (newest first, at most 80), and a reply only when its author is Amir or in the crew (oldest first, `who` the crew name).
+    // Other items (a line, the week's sessions) come too, so the page has to pick the posts out.
+    get_bell: function () {
+      var c = bellSweep(), crew = {};
+      openCrew().forEach(function (m) { crew[m.athlete_id] = m; });
+      var at = function (ago) { return new Date(Date.now() - ago * 60000).toISOString(); };
+      var items = c.posts.filter(function (p) { return p.amir || crew[p.athlete_id]; }).sort(function (a, b) { return (a.ago_min - b.ago_min) || ((b.seq || 0) - (a.seq || 0)); }).slice(0, 80).map(function (p) {
+        return { t: 'post', id: p.id, who: p.amir ? 'Amir' : crew[p.athlete_id].name, me: false, amir: !!p.amir, kind: p.kind, body: p.body, session: null, photo: !!p.photo, at: at(p.ago_min),
+          kudos: { n: p.kudos || 0, mine: false, names: [] },
+          replies: c.replies.filter(function (r) { return r.post_id === p.id && (r.amir || crew[r.athlete_id]); }).sort(function (a, b) { return b.ago_min - a.ago_min; }).map(function (r) {
+            return { id: r.id, who: r.amir ? 'Amir' : crew[r.athlete_id].name, me: false, amir: !!r.amir, body: r.body, at: at(r.ago_min) }; }) };
+      });
+      items.push({ t: 'line', key: 'fixture:line', who: 'Ava E.', me: false, at: at(30), parts: [{ k: 'joined' }], kudos: { n: 0, mine: false, names: [] } });
+      return { athlete_id: null, me: null, items: items, honours: null, days: 7, week: { members: Object.keys(crew).length, sessions: 0, held: 0 }, crew: [], at: nowIso() };
     },
     // Needs a programme (the SQL checks programs); ON takes the athlete's posts off at once.
     coach_crew_under13: function (p) {
@@ -434,7 +462,7 @@
       var row = c.people.find(function (x) { return x.athlete_id === p.p_athlete; });
       if (!row) c.people.push(row = { athlete_id: p.p_athlete, answer: null, under13: false, answered_at: null, kinds_off: [] });
       row.under13 = !!p.p_on;
-      if (p.p_on) c.posts = c.posts.filter(function (x) { return x.athlete_id !== p.p_athlete; });
+      if (p.p_on) { c.posts = c.posts.filter(function (x) { return x.athlete_id !== p.p_athlete; }); bellSweep(); }   // their posts go, and the replies under them
       return !!p.p_on;
     },
     crew_photo: function (p) {

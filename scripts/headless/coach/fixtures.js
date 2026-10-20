@@ -129,9 +129,18 @@ function courtSeed(db, today, withAwards) {
 // same every day: from 10:00 on a Thursday, 20 hours back is Wednesday afternoon and 3 days back is Monday. A photo is made in the test (the harness
 // has no JPEG library): window.__DB.crew_bell.photos[<post id>] = { mime, w, h, b64 }.
 const BELL_IDS = ['b0000000-0000-4000-8000-000000000001', 'b0000000-0000-4000-8000-000000000002', 'b0000000-0000-4000-8000-000000000003', 'b0000000-0000-4000-8000-000000000004'];
+// The replies under those posts (stage92), as crew_replies holds them: the stub's get_bell() shows a reply as the crew sees it (from Amir or a crew member), so
+// Kim's, a former athlete's, is in the table and never reaches the page. Ben's reply holds markup and a quote on purpose: the page must show them as text.
+const REPLY_IDS = ['e0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000002', 'e0000000-0000-4000-8000-000000000003', 'e0000000-0000-4000-8000-000000000004'];
 function crewSeed(db) {
   db.crew_bell = {
     rings_week: 4, photos: {},
+    replies: [
+      { id: REPLY_IDS[0], post_id: BELL_IDS[0], athlete_id: 'ava_test', amir: false, body: 'Thanks coach. Rest day it is.', ago_min: 120 },
+      { id: REPLY_IDS[1], post_id: BELL_IDS[0], athlete_id: 'ben_test', amir: false, body: '<b>Legs</b> say "no" today', ago_min: 60 },
+      { id: REPLY_IDS[2], post_id: BELL_IDS[1], athlete_id: '__coach__', amir: true, body: 'Well done, Ava.', ago_min: 600 },
+      { id: REPLY_IDS[3], post_id: BELL_IDS[1], athlete_id: 'eli_new', amir: false, body: 'A reply from somebody who is not in the crew.', ago_min: 500 },
+    ],
     posts: [
       { id: BELL_IDS[0], athlete_id: '__coach__', amir: true, who: 'Amir', seen: true, kind: 'post', body: 'Great week, crew. Rest up and eat well.', photo: false, ago_min: 180, kudos: 2 },
       { id: BELL_IDS[1], athlete_id: 'ava_test', amir: false, who: 'Ava E.', seen: true, kind: 'post', body: 'First 50 sessions done!', photo: true, ago_min: 1200, kudos: 3 },
@@ -338,4 +347,4 @@ function buildSeed(opt) {
   };
 }
 
-module.exports = { buildSeed, daysAgo, dkey, BELL_IDS, OPEN_IDS };
+module.exports = { buildSeed, daysAgo, dkey, BELL_IDS, REPLY_IDS, OPEN_IDS };

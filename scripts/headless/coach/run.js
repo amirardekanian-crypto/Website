@@ -6056,6 +6056,113 @@ S['bell-panel'] = async (b) => {
   return r;
 };
 
+// ── The Bell's replies (stage92): under their post, each with a Remove ───────────────────────────────────────
+// coach_crew() carries no replies and the replies table is closed to the coach, so the page reads them from get_bell() (the stub's, which shows a reply as the crew
+// sees it: from Amir or a crew member) and removes one with coach_crew_remove_reply(p_id). The seed (fixtures.js: crewSeed) holds four replies: two under Amir's post
+// (Ava, then Ben, whose words are markup and a quote), Amir's own under Ava's post, and Eli's (his answer is no) under Ava's post, which the crew never sees.
+const REPLY_ID = n => 'e0000000-0000-4000-8000-00000000000' + n;
+const replyState = page => page.evaluate(() => {
+  const txt = el => el ? el.innerText.replace(/\s+/g, ' ').trim() : '';
+  return [...document.querySelectorAll('#bellPanel .bell-post')].map(post => ({
+    name: txt(post.querySelector('.bell-top .nm')), box: post.querySelectorAll('.bell-replies').length, acts: txt(post.querySelector('.bell-acts')),
+    replies: [...post.querySelectorAll('.bell-reply')].map(el => {
+      const t = el.querySelector('.bell-rtxt');
+      return { name: txt(el.querySelector('.bell-rtop .nm')), when: txt(el.querySelector('.bell-rtop .when')), text: t.textContent, html: t.innerHTML, kids: t.querySelectorAll('*').length,
+        remove: [...el.querySelectorAll('.bell-rtop button')].filter(x => /^Remove$/.test(x.textContent.trim())).length };
+    }) }));
+});
+const replyBox = (page, text) => page.locator('#bellPanel .bell-reply', { hasText: text }).first();
+const loadWarn = page => page.evaluate(() => { const e = document.getElementById('loadwarn'); return e && !e.hidden ? e.innerText.replace(/\s+/g, ' ').trim() : ''; });
+
+S['bell-replies'] = async (b) => {
+  const r = { id: 'bell-replies', title: 'The Bell\'s replies: under their post with who, when and the words as text; a post with none shows nothing extra; Remove asks first, calls coach_crew_remove_reply with the reply\'s id and never removes a post; a refused or lost answer is said and the reply stays; a replies read that fails is said, not taken for "no replies"', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { crew: true } }, BELL_T));
+  await page.waitForSelector('#bellPanel .bell-reply');
+  const cs0 = await L.calls(page);
+  check(r, 'the page asked coach_crew once and get_bell once (the replies), each with nothing to say', rpcs(cs0, 'coach_crew').length === 1 && rpcs(cs0, 'get_bell').length === 1 && rpcs(cs0, 'coach_crew')[0].payload == null && rpcs(cs0, 'get_bell')[0].payload == null, cs0.filter(c => c.kind === 'rpc' && /crew|bell/.test(c.name)).map(c => [c.name, c.payload]));
+  check(r, 'and called no remove', cs0.filter(c => c.kind === 'rpc' && /remove/.test(c.name)).length === 0, '');
+  let st = await replyState(page);
+  check(r, 'the four posts are as before, newest first', JSON.stringify(st.map(p => p.name)) === JSON.stringify(['You (Amir)', 'Ava E.', 'Gone E.', 'Ben E.']), st.map(p => p.name));
+  check(r, 'under Amir\'s post: Ava 2h ago, then Ben 1h ago (oldest first), each with a Remove', JSON.stringify(st[0].replies.map(x => [x.name, x.when, x.remove])) === JSON.stringify([['Ava E.', '2h', 1], ['Ben E.', '1h', 1]]) && st[0].replies[0].text === 'Thanks coach. Rest day it is.', st[0].replies.map(x => [x.name, x.when, x.remove]));
+  check(r, 'under Ava\'s post: Amir\'s own reply, named "You (Amir)"', JSON.stringify(st[1].replies.map(x => [x.name, x.when, x.text])) === JSON.stringify([['You (Amir)', '10h', 'Well done, Ava.']]), st[1].replies);
+  check(r, 'Eli\'s reply (his answer is no, so the crew cannot see it) is not shown', !(await page.locator('#bellPanel').innerText()).includes('somebody who is not in the crew'), '');
+  check(r, 'a post with no replies shows nothing extra: no box, no line', st[2].box === 0 && st[3].box === 0 && st[2].replies.length === 0 && st[3].replies.length === 0 && st[0].box === 1 && st[1].box === 1, st.map(p => p.box));
+  check(r, 'a reply sits inside its own post, after the post\'s likes and Remove, and the post\'s own line is unchanged', /2 likes/.test(st[0].acts) && !/Thanks coach|Legs/.test(st[0].acts), st[0].acts);
+  check(r, 'every post still has exactly one Remove of its own on its likes line', await page.evaluate(() => [...document.querySelectorAll('#bellPanel .bell-post')].every(p => [...p.querySelectorAll('.bell-acts button')].filter(x => /^Remove$/.test(x.textContent.trim())).length === 1)), '');
+  // The words are text, never markup
+  const ben = st[0].replies[1];
+  check(r, 'Ben\'s reply is shown as the words he typed: the tag and the quote are visible text', ben.text === '<b>Legs</b> say "no" today' && ben.kids === 0 && /&lt;b&gt;Legs&lt;\/b&gt;/.test(ben.html), ben);
+  await page.evaluate(() => { window.__DB.leaderboard_optin = (window.__DB.leaderboard_optin || []).filter(x => x.athlete_id !== 'ben_test').concat([{ athlete_id: 'ben_test', display_name: 'Ben "<i>E</i>."' }]); });
+  await page.locator('#bellHead button', { hasText: 'Reload' }).click(); await L.settle(page, 500);
+  const nm = await page.evaluate(() => { const el = [...document.querySelectorAll('#bellPanel .bell-reply .bell-rtop .nm')].find(x => /Ben/.test(x.textContent)); return el ? { text: el.textContent, kids: el.querySelectorAll('*').length } : null; });
+  check(r, 'a name holding markup and a quote is shown as text too', nm && nm.text === 'Ben "<i>E</i>."' && nm.kids === 0, nm);
+  // The look: the five sizes, three radii, a 32 px button, nothing sideways at phone width
+  check(r, 'the panel keeps the look rules (sizes, corners, button height) with replies in it', (await lookOf(page, '#bellPanel')).length === 0, await lookOf(page, '#bellPanel'));
+  await page.setViewportSize({ width: 390, height: 900 }); await L.settle(page, 200);
+  const sw = await sideways(page);
+  check(r, 'and at phone width nothing runs off the side', sw.over <= 0, sw);
+  check(r, 'and the look rules hold there too', (await lookOf(page, '#bellPanel')).length === 0, await lookOf(page, '#bellPanel'));
+  await page.locator('#bellPanel').screenshot({ path: path.join(L.OUT, 'bell-replies-phone.png') });
+  await page.setViewportSize({ width: 1280, height: 900 }); await L.settle(page, 200);
+  // The help text
+  const how = await page.locator('#how-bell').textContent();
+  check(r, 'the help text no longer says there are no replies; it says they sit under the post, that the coach sees what the crew sees and that Remove takes one off', !/no replies/.test(how) && /Replies sit under their post and go with it at 7 days/.test(how) && /You see the replies the crew sees/.test(how) && /Remove on a reply takes just that reply off every phone/.test(how), how.slice(-420));
+  // Remove asks first
+  let n0 = await L.nCalls(page);
+  await replyBox(page, 'Legs').locator('.bell-rtop button', { hasText: 'Remove' }).click(); await L.settle(page, 200);
+  let ask = await page.locator('#bellPanel .dangerask').innerText();
+  check(r, 'Remove opens the inline panel under that reply: "Remove this reply?", that it goes from every phone and the server now, and that the post stays', /Remove this reply\?/.test(ask) && /from every phone and the server now/.test(ask) && /The post and the other replies/.test(ask) && (await page.locator('#bellPanel .dangerask').count()) === 1 && (await replyBox(page, 'Legs').locator('.dangerask').count()) === 1, ask);
+  check(r, 'and nothing has been removed yet', (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && /remove/.test(c.name)).length === 0, '');
+  await page.locator('#dangerNo').click(); await L.settle(page, 150);
+  check(r, 'Cancel closes it with no call', (await page.locator('.dangerask').count()) === 0 && (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && /remove/.test(c.name)).length === 0, '');
+  await replyBox(page, 'Legs').locator('.bell-rtop button', { hasText: 'Remove' }).click(); await L.settle(page, 150);
+  await page.locator('#dangerGo').click(); await L.settle(page, 700);
+  let cs = await L.callsSince(page, n0);
+  check(r, 'the final button calls coach_crew_remove_reply once, with that reply\'s id, and then reads the list again (posts and replies)', rpcs(cs, 'coach_crew_remove_reply').length === 1 && JSON.stringify(rpcs(cs, 'coach_crew_remove_reply')[0].payload) === JSON.stringify({ p_id: REPLY_ID(2) }) && rpcs(cs, 'coach_crew').length === 1 && rpcs(cs, 'get_bell').length === 1, rpcs(cs, 'coach_crew_remove_reply').map(c => c.payload));
+  check(r, 'and never removes a post', rpcs(cs, 'coach_crew_remove').length === 0, '');
+  st = await replyState(page);
+  check(r, 'Ben\'s reply is gone, Ava\'s and Amir\'s stay, all four posts stay, and the screen says "Reply removed"', JSON.stringify(st[0].replies.map(x => x.name)) === JSON.stringify(['Ava E.']) && st[1].replies.length === 1 && st.length === 4 && /Reply removed/.test(await L.toastText(page)), { names: st.map(p => p.replies.map(x => x.name)), toast: await L.toastText(page) });
+  check(r, 'the server kept every post and the other replies; the panel closed after the work', (await page.evaluate(() => window.__DB.crew_bell.posts.length)) === 4 && JSON.stringify(await page.evaluate(() => window.__DB.crew_bell.replies.map(x => x.id))) === JSON.stringify([REPLY_ID(1), REPLY_ID(3), REPLY_ID(4)]) && (await page.locator('.dangerask').count()) === 0, '');
+  // A refused remove: said in words, the reply stays, no second read
+  n0 = await L.nCalls(page);
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'rpc', name: 'coach_crew_remove_reply', message: 'coach only', times: 1 }); });
+  await replyBox(page, 'Thanks coach').locator('.bell-rtop button', { hasText: 'Remove' }).click(); await L.settle(page, 150);
+  await page.locator('#dangerGo').click(); await L.settle(page, 500);
+  cs = await L.callsSince(page, n0);
+  check(r, 'a refused remove says why and the reply is still on the screen', /Could not remove the reply: coach only/.test(await L.failText(page)) && (await replyBox(page, 'Thanks coach').count()) === 1, await L.failText(page));
+  check(r, 'and the list was not read again (the answer arrived, so nothing is in doubt), with the panel closed', rpcs(cs, 'coach_crew').length === 0 && rpcs(cs, 'get_bell').length === 0 && (await page.locator('.dangerask').count()) === 0, cs.filter(c => c.kind === 'rpc').map(c => c.name));
+  await page.evaluate(() => failDismissAll());
+  // A lost answer: the page does not say it failed, and reads the list
+  n0 = await L.nCalls(page);
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'rpc', name: 'coach_crew_remove_reply', message: 'TypeError: Failed to fetch', code: '', times: 1 }); });
+  await replyBox(page, 'Thanks coach').locator('.bell-rtop button', { hasText: 'Remove' }).click(); await L.settle(page, 150);
+  await page.locator('#dangerGo').click(); await L.settle(page, 700);
+  cs = await L.callsSince(page, n0);
+  check(r, 'an answer that never arrived is said so, the list is read again, and the reply that is still there stays', /The answer never arrived/.test(await L.failText(page)) && rpcs(cs, 'coach_crew').length === 1 && rpcs(cs, 'get_bell').length === 1 && (await replyBox(page, 'Thanks coach').count()) === 1, await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  // Gone already (removed by the author, or by the sweep, in the meantime)
+  n0 = await L.nCalls(page);
+  await page.evaluate(id => { window.__DB.crew_bell.replies = window.__DB.crew_bell.replies.filter(x => x.id !== id); }, REPLY_ID(3));
+  await replyBox(page, 'Well done').locator('.bell-rtop button', { hasText: 'Remove' }).click(); await L.settle(page, 150);
+  await page.locator('#dangerGo').click(); await L.settle(page, 700);
+  check(r, 'a reply that was already gone says so, and the list shows it gone', /That reply was already gone/.test(await L.toastText(page)) && (await replyBox(page, 'Well done').count()) === 0 && ((rpcs(await L.callsSince(page, n0), 'coach_crew_remove_reply')[0] || {}).payload || {}).p_id === REPLY_ID(3), await L.toastText(page));
+  // The replies read fails: the posts stay, and the page says the replies are not known
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'rpc', name: 'get_bell', message: 'fixture: the bell is down', times: 1 }); });
+  await page.locator('#bellHead button', { hasText: 'Reload' }).click(); await L.settle(page, 500);
+  st = await replyState(page);
+  check(r, 'the four posts are still there, with no replies drawn', st.length === 4 && st.every(p => p.replies.length === 0 && p.box === 0), st.map(p => p.replies.length));
+  const rerr = await page.evaluate(() => { const e = document.querySelector('#bellFeed .bell-rerr'); return e ? e.innerText.replace(/\s+/g, ' ').trim() : ''; });
+  check(r, 'and the Bell says the replies did not load, and why, with Try again', /The replies did not load: fixture: the bell is down/.test(rerr) && /Try again/.test(rerr), rerr);
+  check(r, 'and the banner under the tabs names them', /the replies under the crew's posts/.test(await loadWarn(page)), await loadWarn(page));
+  await page.locator('#bellFeed .bell-rerr button').click(); await L.settle(page, 500);
+  st = await replyState(page);
+  check(r, 'Try again brings the reply back, and the line and the banner go', st[0].replies.length === 1 && (await page.locator('#bellFeed .bell-rerr').count()) === 0 && (await loadWarn(page)) === '', { n: st[0].replies.length, warn: await loadWarn(page) });
+  await page.screenshot({ path: path.join(L.OUT, 'bell-replies.png') });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 S['bell-compose'] = async (b) => {
   const r = { id: 'bell-compose', title: 'The Bell\'s composer: a live counter, Post sends the body, the photo is made smaller on this computer (1280 px, JPEG) before it leaves, the server\'s refusals are said in plain words, the draft is kept when a post fails', checks: [] };
   const { page, log } = await L.openCoach(b, Object.assign({ seed: { crew: true } }, BELL_T));

@@ -59,7 +59,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (121 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (133 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **The UX pass (2026-10-12; Amir's answers in memory `coach-redesign-2026-10-12`)**, round 1 shipped: Today puts Needs you first and wide,
   each row's button names what it does, and **"Also waiting"** (applications, logins to send, backup, older notes) is NOT a reason, so it never
   touches `reasonsOf()` or the people count. The roster is one aligned table (Athlete · Cycle · Last session · Proof · Why); the athlete header

@@ -652,6 +652,15 @@
   .bell-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 8px; }
   .bell-acts .btn { margin-left: auto; }
   .bell-post.unseen .bell-top, .bell-post.unseen .txt { opacity: .6; }
+  .bell-replies { margin: 8px 0 0 4px; padding-left: 12px; border-left: 2px solid var(--rule); }
+  .bell-reply { padding: 8px 0; }
+  .bell-reply + .bell-reply { border-top: 1px solid var(--rule); }
+  .bell-rtop { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; }
+  .bell-rtop .nm { font-weight: 600; }
+  .bell-rtop .when { font-size: 12px; color: var(--muted); }
+  .bell-rtop .btn { margin-left: auto; }
+  .bell-rtxt { margin-top: 2px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-line; }
+  .bell-rerr { margin: 8px 0 0; }
   .bell-p { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 8px 0; border-top: 1px solid var(--rule); font-size: 14px; }
   .bell-p .nm { flex: 1 1 10em; min-width: 0; font-weight: 600; color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
   .bell-p .nm:hover { color: var(--court); text-decoration: underline; }
@@ -1738,7 +1747,7 @@ const S = {
   boardErr: '',    // why the last board read failed
   callLogs: {},    // athlete_id -> rows (fetched on detail)
   court: null,     // Courtside (stage75): { on, week, rows, err }; on is false while the server has no get_courtside() (loadCourt())
-  bell: null,      // The Bell (stage81): { on, posts, people, rings, err, at }; on is false while the server has no coach_crew() (loadBell())
+  bell: null,      // The Bell (stage81): { on, posts, people, rings, replies, repErr, err, at }; on is false while the server has no coach_crew() (loadBell()); replies is post id -> its replies (stage92)
   open: null,      // The Monthly Open (stage85): { on, open, results, past, crew, err, at }; on is false while the server has no coach_open() (loadOpen())
   honours: null,   // the month just gone: coach_honours()'s answer (frozen rows, or the live work and the Pick's shortlist)
   goals: {},       // athlete_id -> { 'YYYY-MM-01': career_goals row }
@@ -1848,7 +1857,7 @@ const LOAD_ERR_LABEL = {
   programs: 'programmes', logins: 'athlete logins', contacts: 'Proof contacts', intake: 'intake forms',
   assess: 'testing-app logins', course: 'course logins', buyerNotes: 'your notes about buyers', spine: 'the exercise library (Spine)',
   affiliates: 'affiliate codes', chats: 'website chats', status: 'paused and former marks', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
-  court: 'Courtside, the goals and your lines', bell: 'the Bell (the crew\'s posts and answers)', open: 'the Monthly Open',
+  court: 'Courtside, the goals and your lines', bell: 'the Bell (the crew\'s posts and answers)', bellReplies: 'the replies under the crew\'s posts', open: 'the Monthly Open',
 };
 function paintLoadWarn() {
   const lw = $('loadwarn'), warn = loadWarnHtml();
@@ -6743,10 +6752,12 @@ function seasonPanelHtml() {
 }
 // ── The Bell (stage81; Career Mode round 5, step 5; Amir 2026-10-19: "Bell: go with your picks") ───────────────────────────────────────
 // The athlete app's Crew tab has a feed, the Bell: athletes post a short message and a photo (both gone after 7 days), moments ring as lines,
-// likes only. This is where Amir posts to it (pinned at the top of Crew for a day), reads the last 7 days, removes a post, and sees who said yes
+// likes and replies. This is where Amir posts to it (pinned at the top of Crew for a day), reads the last 7 days, removes a post or a reply, and sees who said yes
 // to the crew and ticks anyone under 13 (GAME-9: they read, never post, never ring, are never named). Every call is a stage81 function
-// (coach_crew, coach_crew_post, coach_crew_remove, coach_crew_under13, crew_photo). While the server has no coach_crew() (stage81 not applied)
-// the page draws nothing, as Courtside does. Posts and photos are NOT in BACKUP_TABLES on purpose (7 days, as privacy.html promises). Nothing
+// (coach_crew, coach_crew_post, coach_crew_remove, coach_crew_under13, crew_photo) or a stage92 one (coach_crew_remove_reply, and get_bell for the replies:
+// coach_crew() does not carry them and the replies table is closed to the coach, so the coach reads them from the Bell itself, which lets the coach in and
+// gives each post its replies as the crew sees them: posts from crew members and from Amir, the 80 newest, replies from crew members and from Amir).
+// While the server has no coach_crew() (stage81 not applied) the page draws nothing, as Courtside does. Posts and photos are NOT in BACKUP_TABLES on purpose (7 days, as privacy.html promises). Nothing
 // here pays XP (GAME-6). Two panels on Proof, under the wall: The Bell (compose, the last 7 days) and Who said yes (the answers, Under 13).
 const BELL_MAX = 280;                  // characters in a post (the table's check)
 const BELL_BYTES = 400 * 1024;         // the photo is made smaller on this computer until it is at most this (the server allows 450 KB)
@@ -6761,7 +6772,7 @@ const BELL_ERRS = {   // the server's messages (raise exception 'crew:…') in p
 const BELL_HOW = [
   '<b>What rings the Bell:</b> a new level, a week held (with the run), the four marks, an achievement, a personal best (the lift only, never the weight), a cycle finished, the month\'s honours, a Monthly Open result and joining the crew. One line per athlete per day, only from their latest yes, and only the kinds they have not switched off.',
   '<b>What never rings:</b> a weight, an RPE, a check-in answer, pain, body weight, a habit or a broken week. A finished session reaches the Bell only when the athlete taps Tell the crew and adds a photo.',
-  '<b>Posts and photos</b> live 7 days, then the server deletes them. They are left out of the weekly backup on purpose, so a backup kept for twelve weeks never breaks that promise. Remove takes a post off every phone at once. <b>Likes</b> pay nothing (GAME-6), and there are no replies.',
+  '<b>Posts and photos</b> live 7 days, then the server deletes them. They are left out of the weekly backup on purpose, so a backup kept for twelve weeks never breaks that promise. Remove takes a post off every phone at once. <b>Replies</b> sit under their post and go with it at 7 days. You see the replies the crew sees. Remove on a reply takes just that reply off every phone. <b>Likes</b> and replies pay nothing (GAME-6).',
 ];
 let _bellDraft = '', _bellPhoto = null, _bellBusy = false, _bellSeq = 0;   // what is typed, the photo made ready ({busy} while it is being made, else {b64, w, h, kb}), a post going up, the read in flight
 const _bellPics = {};                  // post id -> { mime, b64 }: a photo the coach asked to see (the server is asked only then)
@@ -6789,13 +6800,17 @@ function bellWhen(iso) {
 async function loadBell() {
   if (DEMO) return;
   const seq = ++_bellSeq;
-  const res = await sb.rpc('coach_crew');
+  // The posts and the replies are two reads (coach_crew() carries no replies, see the header above), asked together. A failed replies read never takes
+  // the posts away, but it is said (repErr and the banner), so no reply is ever taken for "no replies".
+  const [res, rep] = await Promise.all([sb.rpc('coach_crew'), sb.rpc('get_bell')]);
   if (seq !== _bellSeq) return;
-  if (bellMissing(res)) { S.bell = { on: false }; LOAD_ERR.bell = ''; paintBell(); return; }
-  if (res.error) { S.bell = { on: true, err: res.error.message || 'no answer', posts: [], people: [], rings: 0, at: new Date() }; LOAD_ERR.bell = S.bell.err; paintBell(); return; }
-  const d = res.data || {};
-  S.bell = { on: true, err: '', posts: d.posts || [], people: d.people || [], rings: Number(d.rings_week) || 0, at: new Date() };
-  LOAD_ERR.bell = '';
+  if (bellMissing(res)) { S.bell = { on: false }; LOAD_ERR.bell = ''; LOAD_ERR.bellReplies = ''; paintBell(); return; }
+  if (res.error) { S.bell = { on: true, err: res.error.message || 'no answer', posts: [], people: [], rings: 0, replies: {}, repErr: '', at: new Date() }; LOAD_ERR.bell = S.bell.err; LOAD_ERR.bellReplies = ''; paintBell(); return; }
+  const d = res.data || {}, replies = {};
+  const repErr = rep && rep.error ? (rep.error.message || 'no answer') : '';
+  if (!repErr) ((rep && rep.data && rep.data.items) || []).forEach(it => { if (it && it.t === 'post' && it.id && Array.isArray(it.replies) && it.replies.length) replies[it.id] = it.replies; });
+  S.bell = { on: true, err: '', posts: d.posts || [], people: d.people || [], rings: Number(d.rings_week) || 0, replies, repErr, at: new Date() };
+  LOAD_ERR.bell = ''; LOAD_ERR.bellReplies = repErr;
   Object.keys(_bellPics).forEach(id => { if (!S.bell.posts.some(p => p.id === id)) delete _bellPics[id]; });
   paintBell();
 }
@@ -6933,6 +6948,7 @@ function bellFeedHtml() {
   const b = S.bell;
   if (b.err) return `<p class="empty">The Bell did not load: ${esc(b.err)}. <button class="btn sm" onclick="loadBell()">↻ Try again</button></p>`;
   return `<div class="eyebrow bell-eb">The last 7 days</div>` +
+    (b.repErr ? `<p class="muted t-sm bell-rerr">The replies did not load: ${esc(b.repErr)}. <button class="btn sm" onclick="loadBell()">↻ Try again</button></p>` : '') +
     (b.posts.length ? b.posts.map(bellPostHtml).join('') : '<p class="empty">Nothing posted this week.</p>');
 }
 function bellPhotoHtml(id) {
@@ -6954,7 +6970,22 @@ function bellPostHtml(p) {
         <button class="btn sm danger" onclick="bellRemove(${jsq(p.id)})">Remove</button>
       </div>
       ${dangerSlot('bell:post:' + p.id)}
+      ${bellRepliesHtml(p.id)}
     </div>`;
+}
+// The replies under one post, oldest first (the server's order), each with its own Remove. A post with none shows nothing.
+function bellRepliesHtml(postId) {
+  const list = (S.bell.replies || {})[postId];
+  if (!list || !list.length) return '';
+  return `<div class="bell-replies">${list.map(bellReplyHtml).join('')}</div>`;
+}
+function bellReplyHtml(r) {
+  const name = r.amir ? 'You (Amir)' : (r.who || 'Athlete');
+  return `<div class="bell-reply">
+        <div class="bell-rtop"><b class="nm">${esc(name)}</b><span class="when" title="${esc(new Date(r.at).toLocaleString())}">${esc(bellWhen(r.at))}</span><button class="btn sm danger" onclick="bellReplyRemove(${jsq(r.id)})">Remove</button></div>
+        <div class="bell-rtxt" dir="auto">${esc(r.body)}</div>
+        ${dangerSlot('bell:reply:' + r.id)}
+      </div>`;
 }
 async function bellShowPhoto(id, btn) {
   if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
@@ -6982,6 +7013,18 @@ async function bellRemoveNow(id) {
   if (res.error) { fail(bellErrText(res.error, 'Could not remove the post: ')); if (!res.error.code) await loadBell(); return; }
   delete _bellPics[id];
   toast(res.data === false ? 'That post was already gone' : 'Post removed');
+  await loadBell();
+}
+// A reply goes the way a post does: the panel asks first, one call by the reply's id (coach_crew_remove_reply never touches the post), then the list is read again.
+function bellReplyRemove(id) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  dangerAsk('bell:reply:' + id, { title: 'Remove this reply?', goes: 'The reply. It goes from every phone and the server now.',
+    stays: 'The post and the other replies. There is no undo, and its author can reply again.', button: 'Remove the reply', busyText: 'Removing…', run: () => bellReplyRemoveNow(id) });
+}
+async function bellReplyRemoveNow(id) {
+  const res = await sb.rpc('coach_crew_remove_reply', { p_id: id });
+  if (res.error) { fail(bellErrText(res.error, 'Could not remove the reply: ')); if (!res.error.code) await loadBell(); return; }
+  toast(res.data === false ? 'That reply was already gone' : 'Reply removed');
   await loadBell();
 }
 
@@ -7026,6 +7069,7 @@ async function bellSetUnder13(id, on) {
 }
 window.loadBell = loadBell; window.bellPost = bellPost; window.bellPick = bellPick; window.bellDropPhoto = bellDropPhoto;
 window.bellShowPhoto = bellShowPhoto; window.bellHidePhoto = bellHidePhoto; window.bellRemove = bellRemove; window.bellUnder13 = bellUnder13;
+window.bellReplyRemove = bellReplyRemove;
 
 // ── The Monthly Open (stage85; Career Mode round 5, the last step of plan A; Amir 2026-10-19: "for crew and the open go with your picks") ──────────────────
 // One challenge at a time, any kind Amir designs (not only the six tennis tests). On the athletes' Crew tab it is a card under the feed, with a board ranked by
