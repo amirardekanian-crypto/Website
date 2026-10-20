@@ -460,7 +460,12 @@
 // reopened, its not live"). Crew is asked again every 30 seconds while it is on the screen, straight away when the app comes back from
 // the background or back online, and the screen is redrawn only when the crew really changed. The server side of the same day: the
 // season board counts what was done in the season (stage95), so back-paid achievements no longer show as season points.
-const CACHE = 'aap-v217';
+// v218: program.html, this worker and push.js changed (2026-10-20, the quality pass, round 2). Marking a Library session done ticks
+// the habit it counts as on the Today card, and offers Mobility or Breathe to an athlete who does not track it, as AA Proof did. A Reset
+// leaves alone another day ticked today even when its clock was never started. A sign-in refresh that gets no answer is no signal,
+// not a refusal, so the saved plan is kept. The coach's dashboard always comes from the network, a habit reminder opens this app,
+// and a phone whose reminder subscription was made with an old key subscribes again by itself, its settings kept.
+const CACHE = 'aap-v218';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -568,6 +573,9 @@ self.addEventListener('fetch', e => {
   // which must be the registration that holds the test subscription; answering it from this cache would
   // also serve a stale page, the same trap as /reach/.
   if (/^\/(reach|tennis|tennis-testing|pushtest)(\/|$)/.test(url.pathname)) return;
+  // The coach's dashboard always comes from the network (Amir's pick of two, 2026-10-20). Served from this cache it was one
+  // deploy behind on its first open after every push, and it is opened on a PC, where no signal is rare.
+  if (url.pathname === '/coach.html') return;
 
   // HTML (navigate) — STALE-WHILE-REVALIDATE (Amir, 2026-09-12: opening the
   // home-screen icon was slow). This was network-first, which meant every tap on
@@ -653,7 +661,8 @@ self.addEventListener('push', event => {
   // Where a tap should land. The habit one belongs in AA Proof, the training ones in the plan app,
   // and a crew one (stage86) on the Bell itself rather than on Home — program.html reads the #crew
   // hash on the way in and then clears it, so a reload does not jump back there.
-  const url = d.url || (kind === 'habits' ? '/habits.html' : kind === 'crew' ? '/program.html#crew' : '/program.html');
+  // Habits open the training app: they live on its Today card now, and AA Proof (habits.html) is being retired (2026-10-20).
+  const url = d.url || (kind === 'crew' ? '/program.html#crew' : '/program.html');
   event.waitUntil(
     self.registration.showNotification(title, {
       body: d.body || '',
