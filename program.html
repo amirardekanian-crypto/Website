@@ -11160,7 +11160,7 @@ function goTo(screen, historyId, keepContent) {
   // Progress (Amir, 2026-10-12), so that tab stays lit while you are inside them.
   // Every screen lights the tab it belongs to (POL-01: Workout, Article and Archive lit none).
   const litTab = ({ ceiling: 'plan', weight: 'plan', workout: 'workouts', article: 'workouts', archive: 'plan',
-                    habits: 'plan', moments: 'plan', achievements: 'plan' })[screen] || screen;
+                    habits: 'plan', moments: 'plan', achievements: 'plan', system: 'plan', crewboard: 'crew', crewwho: 'crew' })[screen] || screen;
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
     n.classList.toggle('active', n.dataset.tab === litTab);
     if (n.dataset.tab === litTab) n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');   // a screen reader says which tab is open
@@ -13907,7 +13907,10 @@ function renderCrew() {
   let day = null, feed = '';
   items.forEach(i => {
     if (i.t === 'post' && i.pinned) { feed += crewPostHTML(i); return; }
-    const d = crewDayWord(i.t === 'sess' ? i.day : (String(i.at || '').slice(0, 10)));
+    // A post is filed under the athlete's own day, as a session is: its stamp's UTC date put a post made at 00:30 in Tehran under "Yesterday".
+    // (Only a stamp with a time: a bare date read by new Date() is UTC midnight, the evening before west of Greenwich.)
+    const raw = String(i.at || ''), at = /\d[T ]\d/.test(raw) ? new Date(raw) : null;
+    const d = crewDayWord(i.t === 'sess' ? i.day : (at && !isNaN(at) ? ymdLocal(at) : raw.slice(0, 10)));
     if (d && d !== day) { day = d; feed += `<h3 class="cr-day">${esc(d)}</h3>`; }
     feed += i.t === 'post' ? crewPostHTML(i) : i.t === 'sess' ? crewSessHTML(i) : crewLineHTML(i);
   });
@@ -20631,7 +20634,11 @@ function buildStepSeq(day) {
   const all = Array.from(document.querySelectorAll(`.checklist-item[data-day="${day}"]`));
   const logs = c => !!c.querySelector('.rest-btn') && (!c.classList.contains('round-group')
     || c.dataset.logRpe === '1' || c.dataset.logWeight === '1');
-  const cards = all.filter(logs);
+  // The check-in's rules, as getDayCompletion() and restNextOfCard() keep them (2026-10-20): a card it struck out (rd-skip) is not
+  // a step, and a halved exercise (data-rd-sets) asks only today's sets. Guided walked both, so on a sore day the athlete was
+  // led through the jumps the check-in had just taken away, and the record said they were done.
+  const struck = c => c.classList.contains('rd-skip');
+  const cards = all.filter(c => logs(c) && !struck(c));
   // The block each card sits in, from the day's data: the cards are drawn one per exercise, in order (as paintWeekTargets() reads them).
   const dayData = ((DATA && DATA.workouts && DATA.workouts.days) || []).find(d => String(d.id) === String(day));
   const blockOf = [];
@@ -20639,6 +20646,7 @@ function buildStepSeq(day) {
   const seq = [];
   let group = null;
   all.forEach((card, i) => {
+    if (struck(card)) { if (logs(card)) group = null; return; }
     if (!logs(card)) {
       if (!group) { group = { group: true, cards: [], name: blockOf[i] || 'Warm-up' }; seq.push(group); }
       group.cards.push(card);
@@ -20647,7 +20655,8 @@ function buildStepSeq(day) {
     group = null;
     const exI = cards.indexOf(card);
     const circuit = card.classList.contains('round-group');
-    const total = parseInt(circuit ? card.dataset.rounds : card.dataset.sets, 10) || 1;
+    const written = parseInt(circuit ? card.dataset.rounds : card.dataset.sets, 10) || 1;
+    const total = (!circuit && card.dataset.rdSets) ? Math.min(parseInt(card.dataset.rdSets, 10) || written, written) : written;
     const name = card.querySelector('.item-name').textContent.trim();
     for (let setI = 0; setI < total; setI++) seq.push({ card, exI, exCount: cards.length, total, setI, name, circuit });
   });
@@ -21544,6 +21553,7 @@ function wrapSheetOpeners() {
   openCourt = sheetWrap(openCourt); window.openCourt = openCourt;   // Four Courts: a kind of achievements
   openCrewPost = sheetWrap(openCrewPost); window.openCrewPost = openCrewPost;   // Crew: the composer (stage81)
   openCrewSettings = sheetWrap(openCrewSettings); window.openCrewSettings = openCrewSettings;   // Crew: the yes and the switches; ‹ Back to the account
+  openPushSettings = sheetWrap(openPushSettings); window.openPushSettings = openPushSettings;   // Reminders: ‹ Back to the account, as its door says
   window.openHistorySheet = openHistorySheet; window.openExerciseSheet = openExerciseSheet;
   window.openWhyPlan = openWhyPlan; window.openQualitySheet = openQualitySheet;
   const close0 = closeHistorySheet;
@@ -23160,6 +23170,10 @@ function goToCrewSoon() {
   const tick = () => {
     if (typeof crewOn !== 'function' || typeof goTo !== 'function') { if (--left > 0) setTimeout(tick, 300); return; }
     if (!crewOn() || !document.getElementById('crew-body')) { if (--left > 0) setTimeout(tick, 300); return; }
+    // Mid-session it stays put (2026-10-20): the session screen hides the tab bar, so Crew opened under it had no way back on an
+    // iPhone, and Guided, the rest clock and the check-in sit on top of whatever is behind them. The post waits on Crew for later.
+    if (document.body.classList.contains('session-on')
+        || document.querySelector('#stepOverlay.visible, #timerOverlay.visible, #readiness-overlay.visible')) return;
     goTo('crew');
   };
   tick();
