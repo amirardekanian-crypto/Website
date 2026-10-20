@@ -73,8 +73,13 @@ track them it is most of their level (Elmira 15,338 of 47,573; Amir 8,190 of 13,
   taking a habit back is silent, and a counter part way pays its share (half of eight glasses is `+15 XP`, the rest `+21`).
 - **The arithmetic is the server's**, from the engine's own `XP_RULES.weights` (the same table as `career_rules.habits`), so
   the number on the phone is the number that lands. A habit the athlete added pays `customXp` (25 × 1.2).
-- **One door into the one cabinet**: *From your habits · 1 of 4* opens the same **Achievements** page Progress opens
-  (`habAchList()`, `habAchDoorHtml()`). It is not a second cabinet — it counts the habit-driven ones and names the closest.
+- **One door, and it opens the habit ones themselves**: *From your habits · 2 of 9* counts the habit-driven achievements, names
+  the closest, and opens THEM (`habAchList()`, `habAchDoorHtml()`, `openCourt('habits')` — a fifth door into the same sheet a
+  court uses). ⚠️ **It used to jump to the whole cabinet**, where the nine are scattered across the four kinds and nothing said
+  which came from the habits: the door counted them and then lost them (Amir, 2026-10-20: *"i asked if i can see what
+  achievements i can get through habits, or what ones i do own now"*). Owned first with the day they were won, then the rest
+  furthest-along first with what is left, and each row says which court it counts toward, because this is the one list that
+  mixes all four. They are not a second cabinet: the same nine are in Progress → Achievements under their own kinds.
 - **Tests**: `career.js` → `habitXp()` (the card, the price on all five rows, the door, the pop, part credit, silence on undo).
 
 ---

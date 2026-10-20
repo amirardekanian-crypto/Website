@@ -417,7 +417,11 @@
 // The Cycle complete moment no longer expires after 14 days, and a cycle the programme has moved past is still celebrated from its
 // archived copy -- CAPPED to the newest finished cycle, so a missed celebration waits but a backlog never queues.
 // The crew (8ca41e4): the crew's week comes first, and a finished session rings.
-const CACHE = 'aap-v209';
+// v210: program.html changed (2026-10-20, Amir: "i asked if i can see what achievements i can get through habits, or what ones i do
+// own now"). The From your habits row now OPENS those nine, owned first with the day they were won and the rest with how far along
+// they are, each saying which court it counts toward. It used to jump to the whole cabinet, where they are scattered across the four
+// kinds and nothing says which came from the habits.
+const CACHE = 'aap-v210';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

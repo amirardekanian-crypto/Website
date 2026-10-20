@@ -1530,6 +1530,8 @@ async function habitXp(browser, C) {
     prof.career.habits = { xp: 8190, daily: 7490, bonus: 700 };
     const { ctx, p } = await openRW(browser, { facts: HOLD_FACTS, hist: ONE_DONE, seed: { _hab_cfg: HAB_ON, _hab_log: LOG },
       stub: { profile: prof, awards: rwShelf(prof), myMoments: myMomentsFx(), achievements: achFx() } });
+    // the habit-driven ones the door counts: the same filter the app uses (test proof/goals/runs_together, or reads proof/habit_done)
+    const habAch = achFx().items.filter(i => ['proof', 'goals', 'runs_together'].indexOf(String(i.test)) >= 0 || ['habit_done', 'proof'].indexOf(String(i.reads)) >= 0);
     await waitRow(p);
     await p.evaluate(() => goTo('habits'));
     await p.waitForTimeout(600);
@@ -1551,7 +1553,20 @@ async function habitXp(browser, C) {
     C.check('the habits page fits (no sideways scroll)', !h.sideways);
     await p.evaluate(() => { const b = [...document.querySelectorAll('#screen-habits .hrow')].find(x => /From your habits/.test(x.textContent)); b.click(); });
     await p.waitForTimeout(400);
-    C.check('that door opens Achievements, the same page Progress opens', await p.evaluate(() => (document.querySelector('.screen.active') || {}).id) === 'screen-achievements');
+    // ⚠️ It opens the HABIT ones themselves (2026-10-20, Amir: "i asked if i can see what achievements i can get through habits,
+    // or what ones i do own now"). It used to jump to the whole cabinet, where the nine are scattered across the four kinds.
+    const sheet = await p.evaluate(() => {
+      const ov = document.getElementById('hist-overlay');
+      return ov && ov.classList.contains('visible')
+        ? { title: ov.querySelector('.readiness-title').textContent, eyebrow: ov.querySelector('.readiness-eyebrow').textContent,
+            rows: [...ov.querySelectorAll('.ac-row')].map(r => ({ w: r.querySelector('.ac-w').textContent, done: r.classList.contains('is-earned'), kd: (r.querySelector('.ac-kd') || {}).textContent })),
+            screen: (document.querySelector('.screen.active') || {}).id }
+        : null;
+    });
+    C.check('the door opens the habit achievements, owned first with the day, in a sheet over the habits page', !!sheet && sheet.title === 'From your habits'
+      && /^Achievements · \d+ of \d+$/.test(sheet.eyebrow) && sheet.screen === 'screen-habits' && sheet.rows.length === habAch.length
+      && sheet.rows.filter(r => r.done).length === habAch.filter(i => i.day).length, JSON.stringify(sheet));
+    C.check('each row says which court it counts toward, since this one list mixes all four', !!sheet && sheet.rows.every(r => !!r.kd), JSON.stringify(sheet && sheet.rows));
     C.check('the habits page: no page errors', !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();
   }
