@@ -16,8 +16,8 @@
 # a tier or what earns an achievement raises `version` and sets `starts_on = "YYYY-MM-DD"`, the day it is seeded: facts before that day
 # keep their prices, awards keep the XP they were minted with. The seed refuses a change to [habits], [level], [season], [week], [share] or
 # to how a fact is worked out (career/README.md; PROCEDURES.md → Stage 76).
-version = 6
-starts_on = "2026-10-20"   # the seven achievements that paid nothing now pay (Amir: "I want them to give xp"); D20: forward only, the two awards already held keep their 0. Version 5 (2026-10-19) was the new achievements, stage79; version 4 (2026-10-19) the cut, stage78.
+version = 7
+starts_on = "2026-10-20"   # the day pays: a day that counts 50, a perfect day 100 more (Amir: "50 for a day that counts, 100 more for a perfect day"). Version 6 (the same day) gave the seven achievements that paid nothing their XP; version 5 (2026-10-19) the new achievements, stage79; version 4 (2026-10-19) the cut, stage78. D20: forward only, every time.
 meanings = ["consistency", "commitment", "progress", "resilience"]
 
 [switch]
@@ -190,17 +190,17 @@ cap = "daily_cap and max_custom, in [habits]."
 
 [fact.day_on_target]
 meaning = "consistency"
-xp = 0
+xp = 50
 source = "proof"
 pays_for = "act"
-when = "A day passes Proof's two-door gate (dayQualifies()). It pays through badges, not by itself."
+when = "A day passes Proof's two-door gate (dayQualifies()): everything done, or one thing missed. Version 7 (2026-10-20): it pays 50 of its own, for finishing the day instead of abandoning it at four of five."
 
 [fact.perfect_day]
 meaning = "commitment"
-xp = 0
+xp = 100
 source = "proof"
 pays_for = "act"
-when = "Every habit on the day's list is done (isPerfect()). It pays through badges, not by itself."
+when = "Every habit on the day's list is done (isPerfect()). Version 7 (2026-10-20): 100 on top of the day's 50, so a whole day is worth chasing."
 
 [fact.workout_tick]
 meaning = "commitment"
