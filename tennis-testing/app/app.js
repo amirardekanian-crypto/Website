@@ -1156,13 +1156,19 @@
       let said = '';
       try { said = await res.clone().text(); } catch (e) { /* unreadable: leave it */ }
       if (!/JWT expired|PGRST301/.test(said)) return res;
-      let token = null;
+      let token = null, noAnswer = false;
       try {
         const client = getClient();
-        const r = client ? await client.auth.refreshSession() : null;
+        // Capped at 10 s: supabase-js retries a refresh that gets no answer for about 25 s before it gives up.
+        const r = client ? await Promise.race([client.auth.refreshSession(), new Promise(ok => setTimeout(() => ok({ timedOut: true }), 10000))]) : null;
         token = r && r.data && r.data.session ? r.data.session.access_token : null;
+        // NO ANSWER IS NOT A REFUSAL (2026-10-20). A refresh that timed out, could not connect or met a 5xx is no signal, and the app must
+        // keep its saved plan: the stale 401 read as "the server said no", so the plan was thrown away. Only a refresh the server refused
+        // (a 4xx: the refresh token is gone) lets the 401 stand. scripts/test_fetch_retry.js, scenario 12.
+        const err = r && r.error, st = err ? Number(err.status) || 0 : 0;
+        noAnswer = !token && !!r && (!!r.timedOut || (!!err && !(st >= 400 && st < 500)));
       } catch (e) { /* no session to refresh: the 401 stands */ }
-      if (!token) return res;
+      if (!token) { if (noAnswer) throw new TypeError('Failed to fetch'); return res; }
       const headers = new Headers((init && init.headers) || undefined);
       headers.set('Authorization', 'Bearer ' + token);
       return fetch(input, Object.assign({}, init, { headers }));

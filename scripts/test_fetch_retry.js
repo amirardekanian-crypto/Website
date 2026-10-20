@@ -189,6 +189,19 @@ const tags = log => log.map(e => `${e.method} ${e.url.split('?')[0]} [${e.tag}]`
       const out = await fetchRetryExpired(() => fakeClient)(URL_ + '/rest/v1/rpc/a', { method: 'POST', headers, body: '{"x":1}' });
       check(`headers as ${what}: the repeat keeps every other header and swaps only the token`, out.status === 200 && repeated && repeated.get('x-test') === 'a' && repeated.get('apikey') === KEY, out.status);
     }
+
+    // 12. the refresh itself gets no answer (a connection that drops between the two calls, 2026-10-20). That is NO SIGNAL, not a refusal: the app must see a
+    //     network error (status 0, which _noAnswer() reads as "unreachable" and keeps the saved plan for), never the stale 401, which reads as "the server said
+    //     no" and threw the saved plan away. A refresh the server REFUSES (scenario 6) still hands back the 401.
+    for (const [what, tokenAnswer] of [['the token call throws (no signal)', () => { throw new TypeError('Failed to fetch'); }],
+                                       ['the token call answers 503', () => new Response('{"message":"upstream down"}', { status: 503, headers: { 'Content-Type': 'application/json' } })]]) {
+      s = server({ valid: ['new'], override: e => (e.url.includes('/auth/v1/token') ? tokenAnswer() : null) }); globalThis.fetch = s.fetchMock;
+      const t0 = Date.now();
+      r = await phone().rpc('get_program', {});
+      check(`${what}: the app gets no answer (status 0), not the stale 401`, r.status === 0 && r.error && !/JWT expired/.test(r.error.message || ''), JSON.stringify(r) + '\n' + tags(s.log).join('\n'));
+      check(`${what}: and the call is not repeated with the old token`, s.log.filter(e => e.url.includes('/rest/v1/')).length === 1, tags(s.log).join('\n'));
+      check(`${what}: within a few seconds`, Date.now() - t0 < 15000, (Date.now() - t0) + ' ms');
+    }
   } catch (e) {
     failed++; console.log('CRASH ' + (e && e.stack || e));
   } finally {
