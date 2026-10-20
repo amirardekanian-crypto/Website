@@ -65,7 +65,8 @@ athlete ids replaced by plain descriptions (the repo is public).
 | 49 | [🧭 First-timer fixes (2026-10-11, found by walking the app: `docs/record/CLIENT-APP-MAP.md`)](docs/ref/program-app/49-first-timer-fixes.md) | 4 KB |
 | 50 | [🖼️ The share cards' design pass (2026-10-19)](docs/ref/program-app/50-the-share-cards-design-pass.md) | 6 KB |
 | 51 | [🧮 The Scoreboard: Progress cut to one screen (2026-10-19)](docs/ref/program-app/51-the-scoreboard.md) | 9 KB |
+| 52 | [⭕ The Ring: Home's habit card, and the Career row's end (2026-10-20)](docs/ref/program-app/52-the-ring.md) | 5 KB |
 
 ---
 
-*51 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*
+*52 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*

@@ -31,14 +31,14 @@ async function open(browser, o = {}) {
   return H.openProgram(browser, Object.assign({ w: 390, h: 844, tz: 'UTC', prog: o.prog || prog(), hist: o.hist || THIS_WEEK_DAY1,
     stub: Object.assign({ tables }, o.tableErr ? { tableErr: o.tableErr } : {}, o.stub || {}), seed: o.seed || {} }, o.opts || {}));
 }
-// What the row says, read off the page.
+// What Home says about the weeks held, read off the page. The ROW is gone (2026-10-20, Amir: "i think the career row is
+// redundant"): what is left of it is the run, beside This Week's own count — "1 of 2 sessions done this week · 4 weeks in a
+// row". The next step is not said twice: the count beside it already says what is left. null when there is no run to show.
 const row = p => p.evaluate(() => {
-  const r = document.querySelector('#home-hold-wrap .hrow');
-  if (!r) return null;
-  const sp = r.querySelector('.hrow-sp svg');
-  return { label: r.querySelector('.hrow-l').textContent.trim(), big: r.querySelector('.hrow-vv').textContent.trim(),
-           small: r.querySelector('.hrow-v small').textContent.replace(/ /g, ' ').trim(), ok: r.querySelector('.hrow-v').classList.contains('is-ok'),
-           dots: sp ? sp.querySelectorAll('circle[fill="currentColor"]').length : 0, ring: !!(sp && sp.querySelector('circle[stroke-dasharray]')) };
+  const el = document.getElementById('home-week-sum');
+  const t = el ? String(el.textContent || '').replace(/\s+/g, ' ').trim() : '';
+  const m = /^(.*?) · (\d+ weeks? in a row|1 week held)$/.exec(t);
+  return m ? { count: m[1], run: m[2], text: t } : null;
 });
 const calls = (p, t) => p.evaluate(t => (window.__STUB.calls || []).filter(c => c === 'from:' + t).length, t);
 const cache = p => p.evaluate(() => localStorage.getItem('rel01_athlete_holdcache'));
@@ -52,37 +52,25 @@ const cache = p => p.evaluate(() => localStorage.getItem('rel01_athlete_holdcach
   {
     const { ctx, p } = await open(browser, { facts: RUN4 });
     const r = await row(p);
-    C.check('in a row: the row is on Home, labelled Hold Serve', r && r.label === 'Hold Serve', JSON.stringify(r));
-    C.check('in a row: "4 weeks in a row"', r && r.big === '4 weeks in a row', r && r.big);
-    C.check('in a row: the next step from This Week\'s count, "1 more this week to make it 5"', r && r.small === '1 more this week to make it 5', r && r.small);
-    C.check('in a row: four dots and this week\'s dashed ring, not green', r && r.dots === 4 && r.ring && !r.ok, JSON.stringify(r));
-    const order = await p.evaluate(() => {
-      const ids = [...document.querySelectorAll('#home-overview > div')].map(d => d.id).filter(Boolean);
-      const hold = document.getElementById('home-hold-wrap'), hab = document.getElementById('home-today-wrap');
-      return { ids, gapTop: getComputedStyle(hold).marginTop, habTop: getComputedStyle(hab).marginTop, dc: document.querySelectorAll('#home-overview [data-dc]').length };
-    });
-    C.check('it sits after the week\'s days and before Today’s card', order.ids.indexOf('home-hold-wrap') > order.ids.indexOf('day-cards-wrap')
-      && order.ids.indexOf('home-hold-wrap') === order.ids.indexOf('home-today-wrap') - 1, order.ids.join(' > '));
-    // Hold Serve and Daily habits were a PAIR OF DOOR ROWS, so the habits row sat tight under this one. Since AA
-    // Proof was retired into this app (2026-10-19) the habits are a card, not a row, and a card is its own thing:
-    // it keeps the 20 px every other piece of Home takes.
-    C.check('20 px above Hold Serve, and Today’s card keeps its own 20 px under it', order.gapTop === '20px' && order.habTop === '20px', order.gapTop + ' / ' + order.habTop);
+    C.check('in a row: "4 weeks in a row", beside the week\'s own count', r && r.run === '4 weeks in a row' && /^1 of 2 sessions done this week$/.test(r.count || ''), JSON.stringify(r));
+    C.check('in a row: what is left this week is said once, by the count', r && !/more this week|hold it/.test(r.text || ''), r && r.text);
+    const order = await p.evaluate(() => ({
+      rows: document.querySelectorAll('#home-overview .hrow').length,
+      hold: document.getElementById('home-hold-wrap').innerHTML.trim(), career: document.getElementById('home-career-wrap').innerHTML.trim(),
+      habTop: getComputedStyle(document.getElementById('home-today-wrap')).marginTop, dc: document.querySelectorAll('#home-overview [data-dc]').length }));
+    C.check('no row of its own, and none of the Career row either', order.rows === 0 && order.hold === '' && order.career === '', JSON.stringify(order));
+    C.check('Today’s card keeps its own 20 px', order.habTop === '20px', order.habTop);
     C.check('Home still has one Next up card (one data-dc)', order.dc === 1, order.dc);
     C.check('one read of each table, as the athlete', await calls(p, 'career_facts') === 1 && await calls(p, 'career_rules') === 1);
     const saved = JSON.parse(await cache(p) || 'null');
     C.check('the answer is kept on the phone (<id>_holdcache)', saved && Array.isArray(saved.facts) && saved.facts.length === 4, await cache(p));
     const synced = await p.evaluate(() => Object.keys(_snapshot()).filter(k => /holdcache/.test(k)));
     C.check('and never synced with the progress', synced.length === 0, synced.join(','));
-    // the tap opens the guide at its own card
-    await p.click('#home-hold-wrap .hrow');
-    await p.waitForTimeout(250);
-    const help = await p.evaluate(() => {
-      const c = document.querySelector('#hist-overlay.visible .help-list .note-card.open');
-      return c ? c.textContent.replace(/\s+/g, ' ').trim().slice(0, 80) : null;
-    });
-    C.check('a tap opens How the app works at the Hold Serve card', !!help && /Hold Serve: weeks held in a row/.test(help), help);
+    // The guide keeps its Hold Serve card — the rule has not changed, only where the count shows (CNT-01).
+    const card = await p.evaluate(() => (APP_GUIDE.find(c => c.key === 'hold') || {}).body || '');
+    C.check('the guide still explains Hold Serve, and says where the count shows now', /This Week<\/strong> on Home/.test(card) && !/Career<\/strong> row/.test(card), card.slice(0, 160));
     const guide = await p.evaluate(() => APP_GUIDE[0].body);
-    C.check('the guide\'s Getting around names the row on Home', /<strong>Hold Serve<\/strong>/.test(guide));
+    C.check('the guide\'s Getting around no longer names a row that is not there', !/<strong>Hold Serve<\/strong>/.test(guide) && !/<strong>Career<\/strong> \(your level/.test(guide));
     C.check('no page errors', !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -91,8 +79,7 @@ const cache = p => p.evaluate(() => localStorage.getItem('rel01_athlete_holdcach
   {
     const { ctx, p } = await open(browser, { facts: RUN4.concat([W('H', 2, 2, -1)]), hist: BOTH_THIS_WEEK });
     const r = await row(p);
-    C.check('held: "5 weeks in a row", in green', r && r.big === '5 weeks in a row' && r.ok, JSON.stringify(r));
-    C.check('held: "This week is held", five dots and no ring', r && r.small === 'This week is held' && r.dots === 5 && !r.ring, JSON.stringify(r));
+    C.check('held: "5 weeks in a row", beside a count that says the week is done', r && r.run === '5 weeks in a row' && /^All 2 sessions done this week$/.test(r.count || ''), JSON.stringify(r));
     await ctx.close();
   }
 
@@ -100,19 +87,20 @@ const cache = p => p.evaluate(() => localStorage.getItem('rel01_athlete_holdcach
   {
     const { ctx, p } = await open(browser, { facts: [W('H', 2, 1, -6)] });
     const r = await row(p);
-    C.check('one week: "1 week held", "1 more this week to make it 2"', r && r.big === '1 week held' && r.small === '1 more this week to make it 2', JSON.stringify(r));
+    C.check('one week: "1 week held" (never "1 weeks")', r && r.run === '1 week held', JSON.stringify(r));
     await ctx.close();
   }
   {
     const { ctx, p } = await open(browser, { facts: [W('H', 2, 1, -6)], hist: BOTH_THIS_WEEK });
     const r = await row(p);
-    C.check('every day done here, not judged on the server yet: the server\'s count, "All 2 done this week"', r && r.big === '1 week held' && r.small === 'All 2 done this week', JSON.stringify(r));
+    C.check('every day done here, not judged on the server yet: the run is still the server\'s, and the count is this phone\'s',
+      r && r.run === '1 week held' && /^All 2 sessions done this week$/.test(r.count || ''), JSON.stringify(r));
     await ctx.close();
   }
   {
     const { ctx, p } = await open(browser, { facts: RUN4, hist: [] });
     const r = await row(p);
-    C.check('nothing done this week yet: "Do all 2 this week to make it 5"', r && r.small === 'Do all 2 this week to make it 5', JSON.stringify(r));
+    C.check('nothing done this week yet: the run stands, and the count says none are done', r && r.run === '4 weeks in a row' && /^0 of 2 sessions done this week$/.test(r.count || ''), JSON.stringify(r));
     await ctx.close();
   }
 
@@ -120,22 +108,21 @@ const cache = p => p.evaluate(() => localStorage.getItem('rel01_athlete_holdcach
   {
     const { ctx, p } = await open(browser, { facts: [W('H', 1, 5, -13), W('B', 2, 1, -4)] });
     const r = await row(p);
-    C.check('after a broken week: "Hold this week", "1 more session this week to hold it", no dots',
-      r && r.big === 'Hold this week' && r.small === '1 more session this week to hold it' && r.dots === 0 && !r.ring, JSON.stringify(r));
+    // A run of zero has nothing to say beside the count: "Hold this week" was the row's own words, and the row is gone.
+    C.check('after a broken week: no run beside the count', r === null, JSON.stringify(r));
     await ctx.close();
   }
   {
     const { ctx, p } = await open(browser, { facts: [], hist: [] });
     const r = await row(p);
-    C.check('no week judged yet (a new athlete): "Hold this week", "Do all 2 sessions this week to hold it"',
-      r && r.big === 'Hold this week' && r.small === 'Do all 2 sessions this week to hold it', JSON.stringify(r));
+    C.check('no week judged yet (a new athlete): no run beside the count', r === null, JSON.stringify(r));
     await ctx.close();
   }
 
   // ── 5. not sure yet: the week after the newest held one has ended with no fact ──
   {
     const { ctx, p } = await open(browser, { facts: [W('H', 1, 4, -20), W('H', 1, 5, -13)] });
-    C.check('a week ended with nothing saved since (Cycle 2 week 1, no fact): no row', await row(p) === null);
+    C.check('a week ended with nothing saved since (Cycle 2 week 1, no fact): no run', await row(p) === null);
     C.check('…and the answer is still kept for the next open', !!(await cache(p)));
     await ctx.close();
   }
@@ -145,8 +132,8 @@ const cache = p => p.evaluate(() => localStorage.getItem('rel01_athlete_holdcach
     const P = prog({ start: -36 });                              // Cycle 2 ended 2 days ago
     const { ctx, p } = await open(browser, { prog: P, facts: [W('H', 2, 4, -9), W('H', 2, 5, -3)], hist: [] });
     const r = await row(p);
-    C.check('between cycles: "2 weeks in a row", "It carries into Cycle 3"', r && r.big === '2 weeks in a row' && r.small === 'It carries into Cycle 3', JSON.stringify(r));
-    C.check('between cycles: two dots, no ring', r && r.dots === 2 && !r.ring, JSON.stringify(r));
+    // Between cycles Home is the between-cycles block, which has no week count — so there is no line to sit beside.
+    C.check('between cycles: no run (there is no week count to carry it)', r === null, JSON.stringify(r));
     await ctx.close();
   }
   {
@@ -154,13 +141,13 @@ const cache = p => p.evaluate(() => localStorage.getItem('rel01_athlete_holdcach
     P.cycles[0].startDate = at(-40); P.cycles[0].endDate = at(-6);
     const { ctx, p } = await open(browser, { prog: P, facts: [W('H', 1, 4, -15), W('H', 1, 5, -8)], hist: [] });
     const r = await row(p);
-    C.check('before the cycle starts: "2 weeks in a row", "It carries into Cycle 2"', r && r.big === '2 weeks in a row' && r.small === 'It carries into Cycle 2', JSON.stringify(r));
+    C.check('before the cycle starts: the run waits with the week', r === null || r.run === '2 weeks in a row', JSON.stringify(r));
     await ctx.close();
   }
   {
     const P = prog({ start: -36 });
     const { ctx, p } = await open(browser, { prog: P, facts: [W('H', 2, 4, -9), W('B', 2, 5, -2)], hist: [] });
-    C.check('between cycles at zero: no row (there is no week to hold)', await row(p) === null);
+    C.check('between cycles at zero: no run (there is no week to hold)', await row(p) === null);
     await ctx.close();
   }
 
@@ -168,36 +155,36 @@ const cache = p => p.evaluate(() => localStorage.getItem('rel01_athlete_holdcach
   const COPY = { _holdcache: { t: new Date().toISOString(), facts: RUN4 } };
   {
     const { ctx, p } = await open(browser, { facts: RUN4, tableErr: { career_facts: 503 }, seed: COPY });
-    C.check('no answer (offline): no row', await row(p) === null);
+    C.check('no answer (offline): no run beside the count', await row(p) === null);
     C.check('…and the phone keeps its copy for the next open', !!(await cache(p)));
     await ctx.close();
   }
   {
     const { ctx, p } = await open(browser, { tables: { career_rules: [], career_facts: RUN4 }, seed: COPY });
-    C.check('no rulebook on the server (Career Mode off): no row', await row(p) === null);
+    C.check('no rulebook on the server (Career Mode off): no run', await row(p) === null);
     C.check('…and the copy is gone', (await cache(p)) === null);
     await ctx.close();
   }
   {
     const { ctx, p } = await open(browser, { facts: RUN4, tableErr: { career_rules: 404 }, seed: COPY });
-    C.check('a refused read: no row, and the copy is gone', await row(p) === null && (await cache(p)) === null);
+    C.check('a refused read: no run, and the copy is gone', await row(p) === null && (await cache(p)) === null);
     await ctx.close();
   }
   {
     const P = prog();
     const { ctx, p } = await open(browser, { prog: P, facts: RUN4, opts: { query: '?client=demo' }, stub: { demo: P } });
-    C.check('the demo: no row and no Career Mode read', await row(p) === null && await calls(p, 'career_facts') === 0);
+    C.check('the demo: no run and no Career Mode read', await row(p) === null && await calls(p, 'career_facts') === 0);
     await ctx.close();
   }
   {
     const { ctx, p } = await open(browser, { facts: RUN4, opts: { query: '?client=rel01_athlete&preview=1' } });
     const isPrev = await p.evaluate(() => !!window.IS_PREVIEW);
-    C.check('the coach\'s preview: no row and no Career Mode read', isPrev && await row(p) === null && await calls(p, 'career_facts') === 0, 'IS_PREVIEW ' + isPrev);
+    C.check('the coach\'s preview: no run and no Career Mode read', isPrev && await row(p) === null && await calls(p, 'career_facts') === 0, 'IS_PREVIEW ' + isPrev);
     await ctx.close();
   }
   {
     const { ctx, p } = await open(browser, { prog: prog({ dated: false }), facts: RUN4 });
-    C.check('a cycle with no dates (no training week on the server): no row', await row(p) === null);
+    C.check('a cycle with no dates (no training week on the server): no run', await row(p) === null);
     await ctx.close();
   }
 
@@ -211,19 +198,20 @@ const cache = p => p.evaluate(() => localStorage.getItem('rel01_athlete_holdcach
     await ctx.close();
   }
 
-  // ── 9. the narrowest phone, and dark mode ──
+  // ── 9. the narrowest phone, and dark mode: the run rides on the week's own line, so it must not push it off ──
   for (const o of [{ w: 320, h: 640 }, { w: 390, h: 844, dark: true }]) {
     const { ctx, p } = await open(browser, { facts: RUN4, opts: o });
     const fit = await p.evaluate(() => {
-      const r = document.querySelector('#home-hold-wrap .hrow'), b = r && r.getBoundingClientRect();
-      const kids = r ? [...r.querySelectorAll('.hrow-l, .hrow-vv, .hrow-v small')] : [];
-      return { right: b ? Math.round(b.right) : null, vw: document.documentElement.clientWidth, sideways: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-               clipped: kids.filter(k => k.scrollWidth > k.clientWidth + 1).map(k => k.textContent), lines: r ? Math.round(r.querySelector('.hrow-v small').getBoundingClientRect().height) : 0,
-               ink: r ? getComputedStyle(r.querySelector('.hrow-vv')).color : '', bg: r ? getComputedStyle(r).backgroundColor : '' };
+      const el = document.getElementById('home-week-sum'), b = el && el.getBoundingClientRect();
+      return { right: b ? Math.round(b.right) : null, vw: document.documentElement.clientWidth,
+               sideways: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+               clipped: el ? el.scrollWidth > el.clientWidth + 1 : false, text: el ? el.textContent.replace(/\s+/g, ' ').trim() : '',
+               ink: el ? getComputedStyle(el).color : '', bg: getComputedStyle(document.body).backgroundColor };
     });
     const tag = o.dark ? 'dark' : o.w + ' px';
-    C.check(`${tag}: the row fits, no sideways scroll, nothing clipped`, fit.right != null && fit.right <= fit.vw && !fit.sideways && !fit.clipped.length, JSON.stringify(fit));
-    if (o.dark) C.check('dark: light text on a dark row', /rgb\(2[0-9]{2}/.test(fit.ink) && !/255, 255, 255\)$/.test(fit.bg), fit.ink + ' on ' + fit.bg);
+    C.check(`${tag}: the week's line carries the run, fits, and is not clipped`,
+      fit.right != null && fit.right <= fit.vw && !fit.sideways && !fit.clipped && / · 4 weeks in a row$/.test(fit.text), JSON.stringify(fit));
+    if (o.dark) C.check('dark: the line reads light on the dark page', /rgb\((2[0-9]{2}|1[5-9][0-9])/.test(fit.ink) && !/255, 255, 255\)$/.test(fit.bg), fit.ink + ' on ' + fit.bg);
     C.check(`${tag}: no page errors`, !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();
   }

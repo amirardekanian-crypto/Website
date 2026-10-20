@@ -9,9 +9,15 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
 ## The habits in `program.html`
 
 - **The habits live in `program.html`** (2026-10-19, Amir: "Aa proof will die"). Home's **Today** card is the
-  session and the habits as ONE list, because they are one day (direction B, picked from three): the verdict,
-  the four days you may still fill in, a row per habit, and one line saying what to do now. It replaced the
-  Daily habits door row and the iframe of AA Proof under it. ⚠️ **The engine is `assets/js/habits-core.js`, and
+  session and the habits as ONE list, because they are one day (direction B, picked from three), and since
+  2026-10-20 it is **The Ring** (direction A of three, Amir: *"make it very nice. maybe we can show the level
+  there in a ring"*): a ring whose segments are the day's habits, filling as each is ticked, with the **career
+  level in the middle**; beside it the state at display size, the run under it, the four days you may still fill
+  in, and a **›** to the habits page. ⚠️ **The headline and the ring count the same thing** — the habits left,
+  not what the gate still wants (`dayToGo()` is weighted and a day counts with one missing), so a card showing
+  two ticks of five can never say "1 to go" again; the gate's own moment is the headline turning green and
+  saying **Today counts**.
+  The card replaced AA Proof's Daily habits door row and the iframe of AA Proof under it. ⚠️ **The engine is `assets/js/habits-core.js`, and
   it is GENERATED** from habits.html by `scripts/build_habits_core.js` (pre-commit guard 26): the roster, the
   log, the verdict, the day streak and the backfill window are cut out of AA Proof function by function, never
   retyped, because a second copy of that arithmetic is how the athlete and the board come to disagree with

@@ -140,11 +140,23 @@ function noStrip(browser) {
     const myMoments = { athlete_id: H.ID, goal: { month, line: 'Four sessions a week, no gaps.', done_at: null }, goals: [],
       notes: [{ day: day(3), line: 'Your squat looked sharp on Tuesday.', award_id: null, read: true }], saw: ['achievement:first_best'],
       honours: [{ month: pm, honour: 'sessions', value: { n: 14 } }, { month: pm, honour: 'improved', value: { lift: 'Barbell Back Squat', pct: 27.1 } }] };
-    const { ctx, p } = await H.openProgram(browser, { prog: prog(), seed: SEED_NUMBERS, stub: { tables: { career_rules: R.RW_RULES, career_facts: [] }, profile: prof, awards: R.rwShelf(prof), myMoments } });
-    await R.waitRow(p);
-    const home = await p.evaluate(() => ({ rows: [...document.querySelectorAll('#home-overview .hrow')].map(r => r.querySelector('.hrow-l').textContent.trim()), hold: document.getElementById('home-hold-wrap').innerHTML.trim() }));
-    t.check('Home with the career: the Career row is the one door (Daily habits became Today\u2019s card); Hold Serve folded into it (its own row is empty)',
-      home.rows.join() === 'Career' && home.hold === '', JSON.stringify(home));
+    // the habits are set up here too: the level lives in the habit card's ring since 2026-10-20, and with no card there is no ring
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(), stub: { tables: { career_rules: R.RW_RULES, career_facts: [] }, profile: prof, awards: R.rwShelf(prof), myMoments },
+      seed: Object.assign({ _hab_cfg: { onboarded: true, toured: true, installAsked: true, boardSwept: true, updatedAt: Date.now() } }, SEED_NUMBERS) });
+    await p.waitForFunction(() => { const e = document.querySelector('#home-overview .today-mid span'); return !!e && e.textContent === 'Level'; }, null, { timeout: 8000 }).catch(() => {});
+    await p.waitForTimeout(400);
+    const home = await p.evaluate(() => ({ rows: [...document.querySelectorAll('#home-overview .hrow')].map(r => r.querySelector('.hrow-l').textContent.trim()),
+      hold: document.getElementById('home-hold-wrap').innerHTML.trim(), career: document.getElementById('home-career-wrap').innerHTML.trim(),
+      level: (document.querySelector('#home-overview .today-mid b') || {}).textContent, kick: (document.querySelector('#home-overview .today-mid span') || {}).textContent,
+      week: (document.getElementById('home-week-sum') || {}).textContent }));
+    // 2026-10-20 (Amir: "i think the career row is redundant, it just shows level when we can see level 10 times"): Home has no
+    // Career row and no Hold Serve row. The level is in the habit card's ring, and the weeks held in a row sit beside the
+    // week's own count under This Week, where the week already is.
+    t.check('Home with the career: no Career row, no Hold Serve row, no door row at all',
+      home.rows.join() === '' && home.hold === '' && home.career === '', JSON.stringify(home));
+    t.check('Home with the career: the level is in the habit card\'s ring', home.level === '11' && home.kick === 'Level', JSON.stringify([home.level, home.kick]));
+    // (no career_facts in this fixture, so there is no run to sit beside the count: hold-serve.js owns that check)
+    t.check('Home with the career: the week\'s count says only the week when there is no run', /sessions? done this week$/.test((home.week || '').trim()), home.week);
     await p.evaluate(() => goTo('plan'));
     await p.waitForFunction(() => !!document.querySelector('#career-moments-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
     await p.waitForTimeout(400);
@@ -161,8 +173,8 @@ function noStrip(browser) {
     t.check('Progress with the career: five section titles, each naming a different subject (2026-10-20)',
       o.sec.join('|') === "Your numbers|Getting stronger|Your body|What you've earned|Game Plan", o.sec.join('|'));
     // This athlete has no habit config and no get_achievements answer, so those two doors are not drawn: the order is what is there.
-    t.check('Progress with the career: the doors in order under the card, the training\'s own first (Personal records, Body weight, then Your moments)',
-      o.doors.join('|') === 'Personal records|Body weight|Your moments', o.doors.join('|'));
+    t.check('Progress with the career: the doors in order under the card, the training\'s own first (Personal records, Body weight, Daily habits, then Your moments)',
+      o.doors.join('|') === 'Personal records|Body weight|Daily habits|Your moments', o.doors.join('|'));
     const y = o.y;
     t.check('Progress with the career, in order: This cycle, the month\'s goal, Your numbers, the card, the doors, the Game Plan',
       y.card < y.goal && y.goal < y.numbers && y.numbers < y.career && y.career < y.ceil && y.ceil < y.weight && y.weight < y.moments && y.moments < y.plan, JSON.stringify(y));
@@ -387,13 +399,21 @@ function noStrip(browser) {
   {
     const CFG_ON = { onboarded: true, toured: true, installAsked: true, boardSwept: true, updatedAt: Date.now() };
     const card = () => ({
-      head: (document.querySelector('.today-card .today-k') || {}).textContent,
+      head: (document.querySelector('.today-card .today-k') || {}).textContent || '',
       verdict: (document.querySelector('.today-card .today-v') || {}).textContent,
       vcolor: (() => { const e = document.querySelector('.today-card .today-v'); return e ? getComputedStyle(e).color : ''; })(),
       rows: [...document.querySelectorAll('.today-card .hb-name')].map(n => n.textContent),
       days: [...document.querySelectorAll('.today-card .hb-day')].map(n => n.textContent.trim()),
-      nudge: (document.querySelector('.today-card .today-nudge') || {}).textContent,
+      sub: (document.querySelector('.today-card .today-s') || {}).textContent,
       marks: [...document.querySelectorAll('.today-card .hb-mark')].map(m => m.classList.contains('is-done')).join(),
+      // THE RING (2026-10-20): a segment per habit on the roster, the done ones drawn over them, the level in the middle.
+      segs: document.querySelectorAll('.today-card .tr-seg').length,
+      on: document.querySelectorAll('.today-card .tr-on').length,
+      mid: (document.querySelector('.today-card .today-mid b') || {}).textContent,
+      kick: (document.querySelector('.today-card .today-mid span') || {}).textContent,
+      ringSay: (document.querySelector('.today-card .today-ring') || {}).getAttribute && document.querySelector('.today-card .today-ring').getAttribute('aria-label'),
+      bars: document.querySelectorAll('.today-card .hb-bar').length,            // the per-row bars went: the ring is the progress
+      go: !!document.querySelector('.today-card .today-go'),                    // the way to the habits page, which Home had none
       gone: !document.getElementById('home-habits-wrap') && !document.getElementById('home-proof-strip'),   // the row and the iframe both went with AA Proof
     });
 
@@ -412,9 +432,11 @@ function noStrip(browser) {
     await fresh.p.click('.hs-go');
     await fresh.p.waitForTimeout(250);
     const after = await fresh.p.evaluate(card);
-    t.check('Start tracking: the card is the five habits, the four days you may still fill in, and the verdict',
-      after.head === 'Today' && after.rows.length === 5 && after.days.length === 4 && after.days[3] === 'Today'
-      && after.verdict === '3 to go' && after.gone, JSON.stringify(after));
+    t.check('Start tracking: the card is the five habits, the four days you may still fill in, and the state',
+      after.head === '' && after.rows.length === 5 && after.days.length === 4 && after.days[3] === 'Today'
+      && after.verdict === '5 left' && after.gone, JSON.stringify(after));
+    t.check('Start tracking: the ring has a segment per habit, none of them filled, and a › to the habits page',
+      after.segs === 5 && after.on === 0 && after.bars === 0 && after.go && after.ringSay === '0 of 5 done today', JSON.stringify([after.segs, after.on, after.bars, after.go, after.ringSay]));
     t.check('the config it wrote is AA Proof\'s own key, so no history moves',
       await fresh.p.evaluate(() => !!JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_cfg') || '{}').onboarded));
     await fresh.ctx.close();
@@ -433,11 +455,12 @@ function noStrip(browser) {
       log: JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_log') || '{}'),
       marks: [...document.querySelectorAll('.today-card .hb-mark')].map(m => m.classList.contains('is-done')).join(),
       verdict: (document.querySelector('.today-card .today-v') || {}).textContent,
+      on: document.querySelectorAll('.today-card .tr-on').length,
     }));
     const today = Object.keys(state.log)[0];
     t.check('+ and the number row both land in <id>_hab_log, on today, and the card follows',
       state.log[today] && state.log[today].water === 1 && state.log[today].sleep === 7.5
-      && state.marks === 'false,false,true,false,false' && state.verdict === '2 to go', JSON.stringify(state));
+      && state.marks === 'false,false,true,false,false' && state.verdict === '4 left' && state.on === 1, JSON.stringify(state));
 
     // The verdict's three words, and its two colours: "N to go" asks for something and stays clay; the other two are the good news.
     await p.evaluate(() => { const H2 = window.AAHabits, k = H2.TKEY(); habSetVal('steps', 10000); habSetVal('fuel', 3); habSetVal('water', 8); });
@@ -446,16 +469,22 @@ function noStrip(browser) {
     await p.evaluate(() => habTickSession());
     await p.waitForTimeout(200);
     const perfect = await p.evaluate(card);
-    t.check('the verdict: four of five is On target in green ink, all five is Perfect, and "to go" was clay',
-      on.verdict === 'On target' && on.vcolor === 'rgb(14, 74, 54)' && perfect.verdict === 'Perfect', JSON.stringify([on.verdict, on.vcolor, perfect.verdict]));
+    // ⚠️ THE HEADLINE AND THE RING COUNT THE SAME THING (2026-10-20). The headline used to say what the gate still wanted
+    // (dayToGo(): weighted, and a day counts with one missing), so a card showing four ticks of five said "On target" while the
+    // open segment beside it said one was left. The headline is the habits left; the gate's own moment is "Today counts".
+    t.check('the state: four of five is "Today counts" in green ink, all five is Perfect, and what is left was clay',
+      on.verdict === 'Today counts' && on.vcolor === 'rgb(14, 74, 54)' && perfect.verdict === 'Perfect', JSON.stringify([on.verdict, on.vcolor, perfect.verdict]));
+    t.check('the ring counts what the headline counts: four filled while one is left, five when it is perfect',
+      on.on === 4 && on.segs === 5 && perfect.on === 5 && perfect.ringSay === '5 of 5 done today', JSON.stringify([on.on, perfect.on, perfect.ringSay]));
     t.check('a finished session ticks the session habit here, not through another app', perfect.marks === 'true,true,true,true,true', perfect.marks);
-    t.check('the nudge says what is done, not what is missing', /perfect day/i.test(perfect.nudge), perfect.nudge);
+    t.check('the line under the state is the run, not a second copy of the state', /days? in a row/.test(perfect.sub), perfect.sub);
 
     // The backfill window: today and three days back, and the card says whose day it is.
     await p.evaluate(() => document.querySelectorAll('.today-card .hb-day')[1].click());
     await p.waitForTimeout(200);
     const past = await p.evaluate(() => ({
       head: (document.querySelector('.today-card .today-k') || {}).textContent,
+      verdict: (document.querySelector('.today-card .today-v') || {}).textContent,
       clay: getComputedStyle(document.querySelector('.today-card')).borderTopColor,
       marks: [...document.querySelectorAll('.today-card .hb-mark')].map(m => m.classList.contains('is-done')).join(),
     }));

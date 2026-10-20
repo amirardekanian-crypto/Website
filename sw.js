@@ -389,7 +389,11 @@
 // the wins, the month's goal as its own card in clay (his job for the month, not the cycle's outcome), Getting stronger (the
 // best lift's trend, the only thing on the tab that shows a change over time), Your body as one card of three rows, one Share
 // door on Your moments instead of a button a row, and day one: before the first session the tab is not a screen of zeros.
-const CACHE = 'aap-v204';
+// v205: program.html changed (2026-10-20, THE RING — Amir picked direction A of three for Home's habit card: "make it very
+// nice. maybe we can show the level there in a ring"). The card's head is the ring of the day's habits with the career level
+// in the middle, the state at display size, the run, the backfill days and a › to the habits page. Home's Career row and Hold
+// Serve's row are gone with it ("i think the career row is redundant"): the run sits beside This Week's count.
+const CACHE = 'aap-v205';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -41,15 +41,17 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   in the Centre Court look*): the greeting, This Week (the week note in its week), **Next up** (the suggested day,
   `suggestedDayId()`: since 2026-10-13 the day AFTER the last one trained, so short weeks rotate through every day; as the day's
   cover with one green button: Open Day N, or Resume and its clock), the other days as
-  paper rows (`.dc-row`, `data-dl`, the P24 numeral, solid green when done), then **Hold Serve** (Career Mode's training weeks held
-  in a row, 2026-10-17: display only, read from the athlete's own `career_facts`, never `get_profile()`; `holdCount()` is a twin of
-  `get_profile()`'s loop; it says nothing when it cannot be sure; `PROGRAM-APP.md` → *Hold Serve on Home*), then the habits row. Once
-  Career Mode's XP switch is on, a **Career** row takes Hold Serve's place and carries its line (round 5, 2026-10-19: the career level
-  with **no rank name**, this week's Hold Serve line, the nearest mark, the bar to the next level), from `get_profile()` (kept in
-  `<id>_careercache`), a tap to **Your numbers on Progress**; above it **New from Amir** while his newest line is unread; once AA Proof's
-  strip is on screen it is the habits (chips) and the habits row goes. The finish card says what a session earns and the marks it moves,
-  the finished card what it earned (`PROGRAM-APP.md` → *Career, the lightest version*); the habits row then never shows a level. Only Next up carries
-  `data-dc`. **The This cycle card, Personal records and Body weight live on Progress**, not Home. **Home never names a rest
+  paper rows (`.dc-row`, `data-dl`, the P24 numeral, solid green when done), then **New from Amir** while his newest line is unread,
+  then **today's habits as one card** (`PROGRAM-APP.md` → *The Ring*).
+  **HOME CARRIES NO DOOR ROW OF ITS OWN** (2026-10-20, Amir: *"i think the career row is redundant, it just shows level when we can
+  see level 10 times"*): the **Career row and Hold Serve's row are gone**, and what they said is where it can be acted on — the
+  **level is the number inside the habit card's ring** (`habRingHtml()`, from `get_profile()` kept in `<id>_careercache`), the
+  **weeks held in a row sit beside This Week's own count** (`holdRunText()` — the RUN only, because what is left this week is what
+  the count beside it already says; still the athlete's own `career_facts`, never `get_profile()`; `holdCount()` is a twin of
+  `get_profile()`'s loop and says nothing when it cannot be sure), and the **nearest mark is on Progress**, where the Achievements
+  door names it. Without the career the ring's middle is the day's own count instead. The finish card still says what a session
+  earns and the marks it moves, the finished card what it earned (`PROGRAM-APP.md` → *Career, the lightest version*). Only Next up
+  carries `data-dc`. **The This cycle card, Personal records and Body weight live on Progress**, not Home. **Home never names a rest
   day**: athletes move their days. **The day after the cycle's end date Home is between cycles** (PROG-02, Amir 2026-10-10,
   option B): a **Cycle N complete** door row first (it opens Progress, where the card says Cycle complete), Up next shows
   the next cycle, the one ask is **"Ready for Cycle N? Message Amir to start it."** in all situations (never "Amir is

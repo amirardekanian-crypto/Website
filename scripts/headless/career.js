@@ -74,22 +74,34 @@ const W = (kind, c, w, n) => ({ kind: kind === 'H' ? 'week_held' : 'week_broken'
 const HOLD_FACTS = [W('H', 1, 4, -20), W('H', 1, 5, -13), W('H', 2, 1, -6)];
 const ONE_DONE = [{ completed_on: at(-2), day: '1', readiness: 4, log: [] }];
 
+const HAB_ON = { onboarded: true, toured: true, installAsked: true, boardSwept: true, updatedAt: Date.now() };
 async function openP(browser, o = {}) {
   const stub = Object.assign({ tables: { career_rules: o.rules || RULES_ON, career_facts: o.facts || [] } },
     o.profile === null ? {} : { profile: o.profile || profile(10000) }, o.stub || {});
-  return H.openProgram(browser, Object.assign({ w: o.w || 390, h: 844, tz: 'UTC', prog: o.prog || prog(), hist: o.hist || [], stub, seed: o.seed || {},
-    query: o.query || '' }, o.opts || {}));
+  // The habits are set up in every career scenario: the level lives in the habit card's ring now, and an athlete who has never
+  // started tracking sees the start screen instead of a card (2026-10-20).
+  return H.openProgram(browser, Object.assign({ w: o.w || 390, h: 844, tz: 'UTC', prog: o.prog || prog(), hist: o.hist || [], stub,
+    seed: Object.assign({ _hab_cfg: HAB_ON }, o.seed || {}), query: o.query || '' }, o.opts || {}));
 }
 const nb = s => String(s == null ? '' : s).replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
-// Home's Career row, as the eye reads it.
+// What Home says about the career since 2026-10-20 (Amir: "i think the career row is redundant, it just shows level when we can
+// see level 10 times"): there is no Career row and no Hold Serve row. The level is the number inside the habit card's ring, the
+// weeks held in a row sit beside the week's own count, and the nearest mark is on Progress, where there is room to say it.
+// `row()` answers null until the ring carries a LEVEL, which is what the old helper meant by "the row is on Home".
 const row = p => p.evaluate(() => {
-  const r = document.querySelector('#home-career-wrap .hrow');
-  if (!r) return null;
-  const n = s => String(s == null ? '' : s).replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
-  return { label: n(r.querySelector('.hrow-l').textContent), big: n(r.querySelector('.hrow-vv').textContent), smalls: [...r.querySelectorAll('.hrow-v small')].map(s => n(s.textContent)),
-           aria: n(r.getAttribute('aria-label')), text: n(r.innerText), bar: r.querySelector('.career-bar i') ? r.querySelector('.career-bar i').style.width : null };
+  const mid = document.querySelector('#home-overview .today-mid');
+  if (!mid || (mid.querySelector('span') || {}).textContent !== 'Level') return null;
+  const n = s => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+  const ring = document.querySelector('#home-overview .today-ring');
+  return { big: 'Level ' + n(mid.querySelector('b').textContent), kick: n(mid.querySelector('span').textContent),
+           segs: ring.querySelectorAll('.tr-seg').length, on: ring.querySelectorAll('.tr-on').length,
+           aria: n(ring.getAttribute('aria-label')), week: n((document.getElementById('home-week-sum') || {}).textContent),
+           text: n(document.querySelector('#home-today-wrap').innerText),
+           rows: [...document.querySelectorAll('#home-overview .hrow')].map(r => n(r.querySelector('.hrow-l').textContent)),
+           career: document.getElementById('home-career-wrap').innerHTML.trim(), hold: document.getElementById('home-hold-wrap').innerHTML.trim() };
 });
-const waitRow = (p, ms) => p.waitForFunction(() => !!document.querySelector('#home-career-wrap .hrow'), null, { timeout: ms || 5000 }).then(() => true, () => false);
+const waitRow = (p, ms) => p.waitForFunction(() => { const s = document.querySelector('#home-overview .today-mid span'); return !!s && s.textContent === 'Level'; },
+  null, { timeout: ms || 5000 }).then(() => true, () => false);
 const calls = (p, name) => p.evaluate(n => (window.__STUB.calls || []).filter(c => c === n).length, name);
 const params = (p, name) => p.evaluate(n => (window.__STUB.params || []).filter(c => c[0] === n).map(c => c[1]), name);
 // What a node says, line by line as the eye reads it (innerText keeps the breaks between its lines), spaces collapsed.
@@ -261,34 +273,31 @@ async function trainingBase(browser, C) {
     const { ctx, p } = await openP(browser, { facts: HOLD_FACTS, hist: ONE_DONE });
     const shown = await waitRow(p);
     const r = await row(p);
-    C.check('on: the Career row is on Home', shown && r && r.label === 'Career', JSON.stringify(r));
-    C.check('on: the big line is "Level ' + L10.level + '", and no rank name is said anywhere in the row', r && r.big === 'Level ' + L10.level && !RANKS.test(r.text), JSON.stringify(r));
-    C.check('on: under it this week\'s Hold Serve line, and no mark yet (the catalogue is off)', r && r.smalls.length === 1 && r.smalls[0] === '3 weeks in a row · 1 more session this week', JSON.stringify(r && r.smalls));
-    C.check('on: the aria-label says the level, the week and where it goes', r && r.aria === `Your career: level ${L10.level}. 3 weeks in a row · 1 more session this week. Open your numbers`, r && r.aria);
-    C.check('on: the bar fills to the level\'s share', r && r.bar === Math.round(L10.xp_in_level / L10.level_cost * 100) + '%', r && r.bar);
+    C.check('on: Home has no Career row and no Hold Serve row — no door row at all', shown && r && r.rows.join() === '' && r.career === '' && r.hold === '', JSON.stringify(r && [r.rows, r.career, r.hold]));
+    C.check('on: the level is the number inside the habit card\'s ring, and no rank name is said on the card', r && r.big === 'Level ' + L10.level && !RANKS.test(r.text), JSON.stringify(r));
+    C.check('on: the ring is the day, a segment per habit, and says so', r && r.segs === 5 && /^\d of 5 done today$/.test(r.aria || ''), JSON.stringify(r && [r.segs, r.on, r.aria]));
+    C.check('on: the weeks held in a row sit beside the week\'s own count, and what is left this week is not said twice',
+      r && / · 3 weeks in a row$/.test(r.week || '') && !/more session/.test(r.week || ''), r && r.week);
     const order = await p.evaluate(() => {
       const ids = [...document.querySelectorAll('#home-overview > div')].map(d => d.id);
-      return { note: ids.indexOf('home-note-wrap'), career: ids.indexOf('home-career-wrap'), hold: ids.indexOf('home-hold-wrap'), today: ids.indexOf('home-today-wrap'), sugg: ids.indexOf('home-sugg-wrap'),
-        holdHtml: document.getElementById('home-hold-wrap').innerHTML.trim() };
+      return { note: ids.indexOf('home-note-wrap'), today: ids.indexOf('home-today-wrap'), sugg: ids.indexOf('home-sugg-wrap'),
+        careerHtml: document.getElementById('home-career-wrap').innerHTML.trim(), holdHtml: document.getElementById('home-hold-wrap').innerHTML.trim() };
     });
-    C.check('on: the days, then New from Amir, then Career, then Today\u2019s card; the Hold Serve row is empty (folded into the Career row)',
-      order.sugg < order.note && order.note < order.career && order.career < order.hold && order.hold < order.today && order.holdHtml === '', JSON.stringify(order));
-    const gap = await p.evaluate(() => {
-      const a = document.querySelector('#home-career-wrap .hrow').getBoundingClientRect(), b = document.querySelector('#home-today-wrap .today-card');
-      return b ? Math.round(b.getBoundingClientRect().top - a.bottom) : null;
-    });
-    // The Career row and Daily habits were a PAIR OF DOOR ROWS, 10 px apart. Since AA Proof was retired into
-    // this app (2026-10-19) the habits are a card, not a row, so it keeps the 20 px every piece of Home takes.
-    C.check('on: Today\u2019s card keeps its own 20 px under the Career row', gap === 20, gap);
+    C.check('on: the days, then New from Amir, then Today\u2019s card, and the two old wraps stay in the page empty',
+      order.sugg < order.note && order.note < order.today && order.careerHtml === '' && order.holdHtml === '', JSON.stringify(order));
     const keys = await p.evaluate(id => ({ cache: !!localStorage.getItem(id + '_careercache'), synced: Object.keys(_snapshot()).filter(k => /careercache|earn_d|momentscache/.test(k)) }), H.ID);
     C.check('on: the profile is kept on this phone, never synced', keys.cache && keys.synced.length === 0, JSON.stringify(keys));
     C.check('on: one get_profile, after Hold Serve\'s read said the switch is on; then one get_my_moments and one get_awards (Your moments)',
       await calls(p, 'rpc:get_profile') === 1 && await calls(p, 'rpc:get_my_moments') === 1 && await calls(p, 'rpc:get_awards') === 1,
       JSON.stringify([await calls(p, 'rpc:get_profile'), await calls(p, 'rpc:get_my_moments'), await calls(p, 'rpc:get_awards')]));
-    await p.evaluate(() => document.querySelector('#home-career-wrap .hrow').click());
+    // The ring is display only: Your numbers is one tap away in the tab bar, and the card's own › goes to the habits page.
+    // goCareer() stays for the deep link AA Proof's door card uses (?go=numbers).
+    const ringTap = await p.evaluate(() => ({ button: document.querySelector('#home-overview .today-ring').tagName, go: (document.querySelector('.today-go') || {}).getAttribute('aria-label') }));
+    C.check('on: the ring is not a button, and the card\'s › opens the habits page', ringTap.button === 'DIV' && ringTap.go === 'Open your habits', JSON.stringify(ringTap));
+    await p.evaluate(() => goCareer());
     await p.waitForTimeout(800);
     const tap = await p.evaluate(() => ({ screen: document.querySelector('.screen.active').id, url: location.pathname + location.search, top: Math.round(document.getElementById('numbers-title').getBoundingClientRect().top) }));
-    C.check('on: a tap opens Progress at Your numbers (scrolled to its title), and AA Proof is not opened', tap.screen === 'screen-plan' && /program\.html/.test(tap.url) && !/habits/.test(tap.url) && tap.top >= 0 && tap.top < 160, JSON.stringify(tap));
+    C.check('on: goCareer() still opens Progress at Your numbers (the deep link), and AA Proof is not opened', tap.screen === 'screen-plan' && /program\.html/.test(tap.url) && !/habits/.test(tap.url) && tap.top >= 0 && tap.top < 160, JSON.stringify(tap));
     C.check('on: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -327,27 +336,29 @@ async function trainingBase(browser, C) {
   {
     const seed = { _careercache: { p: profile(10000), at: Date.now() - 3600000 } };
     let { ctx, p } = await openP(browser, { seed, stub: { stall: { get_profile: true } }, facts: HOLD_FACTS, hist: ONE_DONE });
-    C.check('copy: the row from the phone\'s copy while the server is still thinking', !!(await row(p)) && (await row(p)).big === 'Level ' + L10.level, JSON.stringify(await row(p)));
-    C.check('copy: Hold Serve has no row of its own while the Career row is there', await p.evaluate(() => document.getElementById('home-hold-wrap').innerHTML.trim() === ''));
+    C.check('copy: the level from the phone\'s copy while the server is still thinking', !!(await row(p)) && (await row(p)).big === 'Level ' + L10.level, JSON.stringify(await row(p)));
+    C.check('copy: no row of any kind on Home', await p.evaluate(() => document.getElementById('home-hold-wrap').innerHTML.trim() === '' && document.getElementById('home-career-wrap').innerHTML.trim() === ''));
     await ctx.close();
     ({ ctx, p } = await openP(browser, { seed, rules: RULES_OFF }));
     await p.waitForTimeout(1200);
-    C.check('copy: the switch off on the server takes the row and the copy away', (await row(p)) === null
-      && !(await p.evaluate(id => localStorage.getItem(id + '_careercache'), H.ID)), JSON.stringify(await row(p)));
+    // No career: the ring's middle falls back to the day's own count, which is the one thing it can always say.
+    const off = await p.evaluate(() => ({ kick: (document.querySelector('#home-overview .today-mid span') || {}).textContent, mid: (document.querySelector('#home-overview .today-mid b') || {}).textContent }));
+    C.check('copy: the switch off on the server takes the level and the copy away, and the ring counts the day instead',
+      (await row(p)) === null && off.kick === 'Done' && /^\d\/5$/.test(off.mid || '')
+      && !(await p.evaluate(id => localStorage.getItem(id + '_careercache'), H.ID)), JSON.stringify([off, await row(p)]));
     await ctx.close();
   }
-  // 3b. no Career row (the server says nothing and there is no copy): Hold Serve keeps its own row, until the profile comes
+  // 3b. no level yet (the server says nothing and there is no copy): the weeks held still show beside the week, because they are
+  //     read from career_facts and not from the profile; the level lands in the ring when the profile does.
   {
     const { ctx, p } = await openP(browser, { stub: { stall: { get_profile: true } }, facts: HOLD_FACTS, hist: ONE_DONE });
-    await p.waitForFunction(() => !!document.querySelector('#home-hold-wrap .hrow'), null, { timeout: 5000 }).catch(() => {});
-    const h = await p.evaluate(() => { const r = document.querySelector('#home-hold-wrap .hrow'); return r ? { label: r.querySelector('.hrow-l').textContent.trim(), big: r.querySelector('.hrow-vv').textContent.trim() } : null; });
-    C.check('no Career row (no answer, no copy): the Hold Serve row shows by itself', (await row(p)) === null && !!h && h.label === 'Hold Serve' && h.big === '3 weeks in a row', JSON.stringify(h));
+    await p.waitForFunction(() => / · 3 weeks in a row$/.test((document.getElementById('home-week-sum') || {}).textContent || ''), null, { timeout: 5000 }).catch(() => {});
+    const h = await p.evaluate(() => ({ week: (document.getElementById('home-week-sum') || {}).textContent, kick: (document.querySelector('#home-overview .today-mid span') || {}).textContent }));
+    C.check('no level yet (no answer, no copy): the run shows beside the week and the ring counts the day', (await row(p)) === null && / · 3 weeks in a row$/.test(h.week || '') && h.kick === 'Done', JSON.stringify(h));
     await p.evaluate(() => { window.__STUB.stall = {}; refreshCareer(); });
     await waitRow(p);
-    // wait for the hold row to empty, not a fixed moment: since main's slow-connection work (2026-10-19) the first paint can land later than
-    // a flat 200 ms, and a fixed wait made this check fail now and then while the app was right
-    await p.waitForFunction(() => document.getElementById('home-hold-wrap').innerHTML.trim() === '', null, { timeout: 8000 }).catch(() => {});
-    C.check('…and the Career row takes it over once the profile arrives (the Hold Serve row empties)', !!(await row(p)) && await p.evaluate(() => document.getElementById('home-hold-wrap').innerHTML.trim() === ''));
+    C.check('…and the level lands in the ring once the profile arrives, with the run still beside the week',
+      !!(await row(p)) && / · 3 weeks in a row$/.test((await row(p)).week || ''), JSON.stringify(await row(p)));
     await ctx.close();
   }
   // 4. never in the demo or the coach's preview
@@ -372,7 +383,7 @@ async function trainingBase(browser, C) {
       const v = document.querySelector('#home-today-wrap .today-v');
       return v ? v.textContent.trim() : null;
     });
-    C.check(`Today's card, switch ${name}: it says the verdict itself`, said === null || /to go|On target|Perfect/.test(said), said);
+    C.check(`Today's card, switch ${name}: it says the state itself`, said === null || /left|counts|Perfect/.test(said), said);
     await ctx.close();
   }
   // 6. what a session earns: Day 1 ticked through (no RPE, no check-in), not done this week, the week not complete with it
@@ -425,10 +436,11 @@ async function trainingBase(browser, C) {
     const { ctx, p } = await openP(browser, { w: 320, facts: HOLD_FACTS, hist: ONE_DONE });
     await waitRow(p);
     const fit = await p.evaluate(() => {
-      const r = document.querySelector('#home-career-wrap .hrow').getBoundingClientRect();
-      return { right: Math.round(r.right), vw: innerWidth, sideways: document.documentElement.scrollWidth > innerWidth };
+      const head = document.querySelector('#home-overview .today-head').getBoundingClientRect();
+      const bits = [...document.querySelectorAll('#home-overview .today-ring, #home-overview .today-v, #home-overview .hb-day, #home-overview .today-go')].map(e => Math.round(e.getBoundingClientRect().right));
+      return { right: Math.round(head.right), bits, vw: innerWidth, sideways: document.documentElement.scrollWidth > innerWidth };
     });
-    C.check('320 px: the Career row fits, no sideways scroll', fit.right <= fit.vw && !fit.sideways, JSON.stringify(fit));
+    C.check('320 px: the ring, the state, the days and the › all fit, no sideways scroll', fit.right <= fit.vw && fit.bits.every(v => v <= fit.vw) && !fit.sideways, JSON.stringify(fit));
     await ctx.close();
   }
 }
@@ -443,7 +455,8 @@ async function openRW(browser, o = {}) {
   const prof = o.profile === null ? null : (o.profile || rwProfile(10000));
   const stub = Object.assign({ tables: { career_rules: RW_RULES, career_facts: o.facts || [], career_catalogue: catRows() } },
     prof === null ? {} : { profile: prof, awards: rwShelf(prof) }, o.stub || {});
-  return H.openProgram(browser, Object.assign({ w: o.w || 390, h: 844, tz: 'UTC', prog: o.prog || prog(), hist: o.hist || [], stub, seed: o.seed || {}, query: o.query || '' }, o.opts || {}));
+  return H.openProgram(browser, Object.assign({ w: o.w || 390, h: 844, tz: 'UTC', prog: o.prog || prog(), hist: o.hist || [], stub,
+    seed: Object.assign({ _hab_cfg: HAB_ON }, o.seed || {}), query: o.query || '' }, o.opts || {}));
 }
 const goProgress = async p => { await p.evaluate(() => goTo('plan')); await p.waitForTimeout(500); };
 const momentsReady = p => p.waitForFunction(() => !!document.querySelector('#career-moments-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
@@ -453,16 +466,17 @@ async function trainingLight(browser, C) {
   const TODAY = at(0);
   const CLAY = /199, 85, 47|181, 70, 31|224, 107, 67/;                    // --clay, --clay-ink, dark mode's clay text
   const L10 = lvl(10000);
-  // 1. the Career row with the catalogue on: the level, this week's line, the nearest mark
+  // 1. the catalogue on, and what is left of the Career row on Home: the level in the ring, the run beside the week, and the
+  //    nearest mark NOT on Home at all — it is on Progress, where the Achievements door names what is closest.
   {
     const { ctx, p } = await openRW(browser, { facts: HOLD_FACTS, hist: ONE_DONE });
     await waitRow(p);
     const r = await row(p);
-    C.check('light, on: Level N, this week\'s line, the nearest mark (within 3, or at 70%): 24 of 25 sessions', r && r.big === 'Level ' + L10.level
-      && r.smalls.join('|') === '3 weeks in a row · 1 more session this week|1 session to 25 with Amir', JSON.stringify(r));
-    C.check('light, on: no rank, no badge name, no metal in the row, and the aria-label ends "Open your numbers"', r && !RANKS.test(r.text) && !METALS.test(r.text) && !/Hold Serve|Century|Paper Trail|AA Proof|Locker/i.test(r.text + ' ' + r.aria)
-      && r.aria === `Your career: level ${L10.level}. 3 weeks in a row · 1 more session this week. 1 session to 25 with Amir. Open your numbers`, r && r.aria);
-    C.check('light, on: the level bar is still the level\'s share', r && r.bar === Math.round(L10.xp_in_level / L10.level_cost * 100) + '%', r && r.bar);
+    C.check('light, on: the level is in the ring and the run is beside the week\'s count', r && r.big === 'Level ' + L10.level
+      && / · 3 weeks in a row$/.test(r.week || ''), JSON.stringify(r));
+    C.check('light, on: the nearest mark is not said on Home any more (Progress names it)', r && !/to 25 with Amir/.test(r.text + ' ' + r.week), JSON.stringify([r && r.text, r && r.week]));
+    C.check('light, on: no rank, no badge name, no metal on the card', r && !RANKS.test(r.text) && !METALS.test(r.text) && !/Hold Serve|Century|Paper Trail|AA Proof|Locker/i.test(r.text), r && r.text);
+    C.check('light, on: the ring says the day in words for a screen reader', r && /^\d of 5 done today$/.test(r.aria || ''), r && r.aria);
     await shot(p, 'light-home-row-390.png');
     C.check('light, on: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
@@ -473,7 +487,8 @@ async function trainingLight(browser, C) {
     const o2 = await openRW(browser, { profile: far, facts: HOLD_FACTS, hist: ONE_DONE });
     await waitRow(o2.p);
     const r2 = await row(o2.p);
-    C.check('light, on: far from every mark, only this week\'s line is under "Level N"', r2 && r2.smalls.length === 1 && !(await o2.p.$('#home-career-wrap .career-next')), JSON.stringify(r2 && r2.smalls));
+    C.check('light, on: far from every mark, Home still says the level and the run, and no mark line', r2 && r2.big === 'Level ' + L10.level
+      && / · 3 weeks in a row$/.test(r2.week || '') && !/to 4 |to 5 |to 25 /.test(r2.text || ''), JSON.stringify(r2 && [r2.big, r2.week]));
     await goProgress(o2.p);
     // The next mark left the card with THE SCOREBOARD (2026-10-19); the four numbers themselves still all show, small or zero.
     const cells = await o2.p.evaluate(() => [...document.querySelectorAll('#career-card-wrap .cs-n')].map(n => n.querySelector('b').textContent + ' ' + n.querySelector('.cs-nm').textContent));
@@ -486,7 +501,7 @@ async function trainingLight(browser, C) {
     const o5 = await openRW(browser, { profile: z, facts: HOLD_FACTS, hist: ONE_DONE });
     await waitRow(o5.p);
     const r5 = await row(o5.p);
-    C.check('light, on: a number at 0 is never the nearest mark (no "3 comebacks to 3 comebacks")', r5 && r5.smalls.length === 1 && !r5.smalls.some(s => /comebacks to/.test(s)), JSON.stringify(r5 && r5.smalls));
+    C.check('light, on: a number at 0 is never named on Home (no "3 comebacks to 3 comebacks")', r5 && !/comebacks to/.test(r5.text + ' ' + r5.week), JSON.stringify(r5 && [r5.text, r5.week]));
     await o5.ctx.close();
     // a free athlete's four (day streak, perfect days, habit steps locked, comebacks): only a number that has a mark is a cell
     const o3 = await openRW(browser, { profile: rwProfile(10000, { free: true }) });
@@ -496,17 +511,23 @@ async function trainingLight(browser, C) {
     C.check('light, on, a free athlete\'s four: only Comebacks has a mark, so it is the one cell', c3.join() === '5 comebacks', c3.join());
     await o3.ctx.close();
   }
-  // 2. 320 px and dark: the row's lines wrap to two rows at most, the mark line to one
+  // 2. 320 px and dark: the ring, the state and the four days fit, and the run sits beside the week's count (2026-10-20: the
+  //    Career row's two lines are the ring's number and that one line now)
   for (const [w, dark] of [[320, false], [320, true], [390, true]]) {
     const { ctx, p } = await openRW(browser, { w, opts: { dark }, facts: HOLD_FACTS, hist: ONE_DONE });
     await waitRow(p);
     const m = await p.evaluate(() => {
-      const r = document.querySelector('#home-career-wrap .hrow'), rr = r.getBoundingClientRect();
-      const rows = el => { const lh = parseFloat(getComputedStyle(el).lineHeight) || 16; return Math.round(el.getBoundingClientRect().height / lh); };
-      const four = r.querySelector('.career-four'), next = r.querySelector('.career-next');
-      return { right: Math.round(rr.right), vw: innerWidth, side: document.documentElement.scrollWidth > innerWidth, four: rows(four), next: rows(next), h: Math.round(rr.height) };
+      const head = document.querySelector('#home-overview .today-head'), hr = head.getBoundingClientRect();
+      const bits = [...head.querySelectorAll('.today-ring, .today-v, .today-s, .hb-day, .today-go')].map(e => Math.round(e.getBoundingClientRect().right));
+      const v = head.querySelector('.today-v'), lh = parseFloat(getComputedStyle(v).lineHeight) || 28;
+      return { right: Math.round(hr.right), vw: innerWidth, side: document.documentElement.scrollWidth > innerWidth, bits,
+               lines: Math.round(v.getBoundingClientRect().height / lh), week: (document.getElementById('home-week-sum') || {}).textContent,
+               ink: getComputedStyle(document.querySelector('.today-mid b')).color, bg: getComputedStyle(document.querySelector('.today-card')).backgroundColor };
     });
-    C.check(`light ${w}px${dark ? ' dark' : ''}: the row fits, this week's line takes at most 2 rows, the mark line 1`, m.right <= m.vw && !m.side && m.four <= 2 && m.next === 1, JSON.stringify(m));
+    C.check(`light ${w}px${dark ? ' dark' : ''}: the ring, the state, the days and the › all fit, the state takes at most two lines`,
+      m.right <= m.vw && !m.side && m.bits.every(v => v <= m.vw) && m.lines <= 2, JSON.stringify(m));
+    C.check(`light ${w}px${dark ? ' dark' : ''}: the run is beside the week's count`, / · 3 weeks in a row$/.test(m.week || ''), m.week);
+    if (dark) C.check(`light ${w}px dark: the level reads light on the card's own dark`, /rgb\(2[0-9]{2}/.test(m.ink) && !/255, 255, 255\)$/.test(m.bg), m.ink + ' on ' + m.bg);
     await shot(p, `light-home-row-${w}${dark ? '-dark' : ''}.png`);
     await ctx.close();
   }
@@ -702,12 +723,12 @@ async function trainingLight(browser, C) {
       return { visible: !!row && !!row.offsetParent, isNew: !!row && row.classList.contains('is-new'), inView: !!r && r.top >= 0 && r.bottom <= innerHeight }; }, many.notes[0].day);
     C.check('an old line far down the list: the tap opens the page, marks that line and brings it into view', f.visible && f.isNew && f.inView, JSON.stringify(f));
     await fold.ctx.close();
-    // dark: the row keeps the door rows' edge
+    // dark: New from Amir is the only row left on Home, so it is held to the habit card's own edge and fill instead
     const dk = await openRW(browser, { opts: { dark: true }, stub: { myMoments: myMomentsFx() } });
     await waitRow(dk.p);
     await dk.p.waitForFunction(() => !!document.querySelector('#home-note-wrap .from-amir'), null, { timeout: 8000 }).catch(() => {});
-    const edge = await dk.p.evaluate(() => { const n = document.querySelector('#home-note-wrap .from-amir'), c = document.querySelector('#home-career-wrap .hrow'); return n && c ? { note: getComputedStyle(n).borderTopColor, career: getComputedStyle(c).borderTopColor, noteBg: getComputedStyle(n).backgroundColor, careerBg: getComputedStyle(c).backgroundColor } : null; });
-    C.check('dark: New from Amir has the same edge and fill as the Career row (one door-row look)', !!edge && edge.note === edge.career && edge.noteBg === edge.careerBg, JSON.stringify(edge));
+    const edge = await dk.p.evaluate(() => { const n = document.querySelector('#home-note-wrap .from-amir'), c = document.querySelector('#home-overview .today-card'); return n && c ? { note: getComputedStyle(n).borderTopColor, career: getComputedStyle(c).borderTopColor, noteBg: getComputedStyle(n).backgroundColor, careerBg: getComputedStyle(c).backgroundColor } : null; });
+    C.check('dark: New from Amir has the same edge and fill as the habit card (one paper look)', !!edge && edge.note === edge.career && edge.noteBg === edge.careerBg, JSON.stringify(edge));
     await shot(dk.p, 'light-home-note-dark.png');
     await dk.ctx.close();
   }

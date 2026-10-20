@@ -39,7 +39,9 @@ const key = n => { const d = new Date(Date.now() - n * DAY); return d.getFullYea
     }));
     t.check('Progress carries ONE habit door, named Daily habits, and neither the figures nor the table',
       b.doors === 1 && b.name === 'Daily habits' && b.onPlan === 0, JSON.stringify(b));
-    t.check('the door is the month\'s figure with the run under it', /^\d+ days?$/.test(b.door || '') && /this month · 4 days in a row/.test(b.sub || ''), JSON.stringify([b.door, b.sub]));
+    // The run moved to Home's card with the ring (2026-10-20): this row is the MONTH, and only the month, so the two places
+    // answer different questions — Home "what is left now", Progress "how is the month going".
+    t.check('the door is the month\'s figure, and the run is not said here too', /^\d+ days?$/.test(b.door || '') && b.sub === 'this month', JSON.stringify([b.door, b.sub]));
     await p.evaluate(() => goTo('habits'));
     await p.waitForTimeout(400);
     const g = await p.evaluate(() => ({

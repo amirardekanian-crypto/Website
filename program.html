@@ -4510,13 +4510,34 @@
     border: 1px solid var(--hair); border-radius: 14px; background: var(--row); overflow: hidden; }
   /* Filling in an earlier day: the card takes the clay edge, so the screen can never quietly be about Saturday. */
   #home-overview .today-card.is-past { border-color: var(--clay); }
-  #home-overview .today-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
-    padding: 14px 16px 10px; border-bottom: 1px solid var(--hair); }
-  #home-overview .today-k { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--green-ink); }
+  /* THE RING (2026-10-20, Amir picked direction A from three): the head is one object and one sentence. The ring is the DAY —
+     a segment per habit on the roster, filling as each is ticked — and the level sits inside it, because Home's Career row
+     (which said the level and nothing anyone could act on) went the same day. Under the state: the run, or the last thing
+     left, named. Then the four days you may still fill in, and a › to the habits page, which Home could not reach at all. */
+  #home-overview .today-head { display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 12px 14px 16px; border-bottom: 1px solid var(--hair); }
+  #home-overview .today-ring { position: relative; flex: none; width: 84px; height: 84px; }
+  #home-overview .today-ring svg { display: block; width: 84px; height: 84px; transform: rotate(-90deg); }
+  #home-overview .tr-seg { stroke: var(--prog-track); }
+  #home-overview .tr-on { stroke: var(--mark); }
+  /* A disc behind the number, so the segments can never cross the word under it whatever the roster's length. */
+  /* flex, not grid: a two-row grid STRETCHES its rows over the 84 px and the label lands a third of the way down the ring,
+     across the stroke. Flex keeps the number and its label together in the middle, whatever either one measures. */
+  #home-overview .today-mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  #home-overview .today-mid::before { content: ''; position: absolute; width: 64px; height: 64px; border-radius: 50%; background: var(--row); }
+  #home-overview .today-mid b, #home-overview .today-mid span { position: relative; }
+  #home-overview .today-mid b { display: block; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  #home-overview .today-mid span { display: block; margin-top: 1px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .4px; text-transform: uppercase; color: var(--ring); }
+  #home-overview .today-b { flex: 1; min-width: 0; }
+  #home-overview .today-k { display: block; margin-bottom: 3px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--clay-ink); }
   /* "N to go" asks for something, so it stays clay; On target and Perfect are the good news, green. */
-  #home-overview .today-v { font: 700 var(--fs-lead)/1.2 'Barlow', sans-serif; }
+  #home-overview .today-v { display: block; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; text-transform: uppercase; }
   #home-overview .today-v.is-togo { color: var(--clay-ink); }
   #home-overview .today-v.is-ok { color: var(--green-ink); }
+  #home-overview .today-s { display: block; margin-top: 5px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  #home-overview .today-go { flex: none; width: 32px; height: 32px; margin: -4px -4px 0 0; border: 0; border-radius: 99px; background: none;
+    color: var(--ring); font: 400 var(--fs-title)/1 'Barlow', sans-serif; cursor: pointer; }
+  #home-overview .today-go:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
 
 
   /* ══ THE HABIT FIGURES AND THE WEEK (2026-10-19) ════════════════════════════════════════════════════════
@@ -4585,8 +4606,8 @@
   #screen-habits .hl-note { margin: 12px var(--g) 96px; font: 400 var(--fs-small)/1.5 'Barlow', sans-serif; color: var(--grey); }
 
   /* The backfill window, as four chips: today and the three days behind it. A dot means the day counts. */
-  #home-overview .hb-days { display: flex; gap: 6px; padding: 10px 16px 2px; }
-  #home-overview .hb-day { flex: 1; min-height: 40px; padding: 6px 2px; border: 1px solid var(--hair); border-radius: 9px;
+  #home-overview .hb-days { display: flex; gap: 5px; padding: 10px 0 0; }
+  #home-overview .hb-day { flex: 1; min-height: 34px; padding: 5px 2px; border: 1px solid var(--hair); border-radius: 8px;
     background: var(--paper); color: var(--grey); font: 600 var(--fs-small)/1.2 'Barlow', sans-serif; cursor: pointer; }
   #home-overview .hb-day i { display: block; width: 6px; height: 6px; margin: 4px auto 0; border-radius: 99px; background: transparent; }
   #home-overview .hb-day.is-ok i { background: var(--mint); }
@@ -4648,12 +4669,7 @@
   #home-overview #home-career-wrap:not(:empty) + #home-hold-wrap:not(:empty) { margin-top: 0; }
 
   /* its level bar: a 3 px line along the row's foot, green filling toward the next level (never clay: it asks for nothing) */
-  #home-overview .career-row { position: relative; overflow: hidden; }
-  #home-overview .career-row .career-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--hair); }
-  #home-overview .career-row .career-bar i { display: block; height: 100%; background: var(--fill); }
   /* Career Mode phase 3 (careerRowHTML()): the four numbers and the nearest goal, each its own line under the level (two rows at most at 320 px) */
-  #home-overview .career-row .hrow-v small.career-four, #home-overview .career-row .hrow-v small.career-next { flex: 0 0 100%; margin-top: 2px; }
-  #home-overview .career-row .hrow-v small.career-next { font-weight: 600; }
   /* Career Mode round 5 (the Scorecard, Amir 2026-10-19): New from Amir leads the rows under the week while his line is unread. His photo
      with a clay dot, the label in clay: the one clay thing on Home until it is read (DS-01). */
   #home-overview #home-note-wrap:not(:empty) { margin-top: 20px; }
@@ -9278,6 +9294,8 @@ function paintWeek() {
     ? (n >= ids.length ? `All ${ids.length} done` : `${n} of ${ids.length} done`)
     : n >= ids.length ? `All ${ids.length} sessions done this week` : `${n} of ${ids.length} sessions done this week`;
   el.classList.toggle('all', n >= ids.length);
+  el.dataset.count = el.textContent;
+  paintWeekRun();   // the weeks held in a row sit beside the count (2026-10-20: Home's Hold Serve row went with the Career row)
   paintWeekSugg();   // the week is done: one short extra (LIB-01)
 }
 
@@ -10706,7 +10724,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then <strong>Career</strong> (your level, <strong>Hold Serve</strong>: the weeks you've held in a row, and the next mark you're close to), then today's habits, ticked right there.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers and your level), <strong>Getting stronger</strong> (your best lift, week by week), <strong>Your body</strong> (your records, your body weight and your habits) and <strong>What you've earned</strong> (your achievements and your moments) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then today's habits as one card: the five you tick, your <strong>level</strong> in the ring, and the weeks you have held in a row beside <strong>This Week</strong>.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers and your level), <strong>Getting stronger</strong> (your best lift, week by week), <strong>Your body</strong> (your records, your body weight and your habits) and <strong>What you've earned</strong> (your achievements and your moments) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now. The card shows my first line. Tap <strong>Why this cycle matters</strong> for the rest of the note and <strong>Expected outcomes</strong> for what we're aiming to hit.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -10731,7 +10749,7 @@ const APP_GUIDE = [
   { icon: 'activity', key: 'career', title: 'Career: your level',
     body: `<p>Home has a <strong>Career</strong> row. It shows your level, the weeks you've held in a row and the next mark you're close to. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>counting</strong> until my side has it.</p><p>Tap the <strong>Career</strong> row to open <strong>Your numbers</strong> on Progress. Your four numbers are there: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers; it says how many you have and which one you're closest to. Open it for the four groups — consistency, commitment, progress and resilience — and tap a group to see every achievement in it and what earns it. When a session leaves you one step short of one, its card tells you.</p><p>When I set you a job for the month, it sits right under this cycle's card, with a ring beside it. It is something to do, not a target for your training — I tick it off when you have done it. The <strong>Your moments</strong> row opens the lot, month by month: your marks, your achievements, the notes I write you and the month's honours. <strong>Amir saw this</strong> under one means I've seen it. A new note from me shows on Home until you open it. To answer it, tap <strong>Reply on WhatsApp</strong>.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks held in a row',
-    body: `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count on Home's <strong>Career</strong> row goes up. The same line says what's left this week. Miss a week and the count starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
+    body: `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count beside <strong>This Week</strong> on Home goes up — the count next to it says what is left this week. Miss a week and it starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
     body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p><strong>Use your own photo</strong> puts a picture from your phone behind the card. Drag it to move it and pinch to zoom, or use the <strong>Zoom</strong> slider. <strong>Remove the photo</strong> puts the card back as it was. The picture stays on your phone: only the finished card goes anywhere, and only when you tap Share or Save image.</p><p>Everything in <strong>Your moments</strong>, behind its row on Progress, has its own <strong>Share</strong> — every mark, every achievement and every honour, however long ago you earned it. <strong>Share your card</strong>, under your numbers, makes a card of where you are right now: your level, your four numbers and your best lifts. The month's goal gets one once it's done, a new level gets one on the finished session, your result in <strong>The Open</strong> gets one on Crew, and <strong>Share the session</strong> on the finished card makes one of the session itself.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
@@ -11252,21 +11270,60 @@ function todayCardHtml() {
   if (!HAB_CFG || !HAB_CFG.onboarded) return habStartHtml();
   const k = H.AKEY(), isToday = k === H.TKEY();
   const v = H.verdict(k);
-  const said = v.state === 'togo' ? v.n + ' to go' : v.state === 'perfect' ? 'Perfect' : 'On target';
-  const rows = H.rosterOn(k).map(hb => habRowHtml(hb, k)).join('');
+  const list = H.rosterOn(k);
+  const rows = list.map(hb => habRowHtml(hb, k)).join('');
   const streak = H.dayStreak();
+  // ⚠️ THE HEADLINE AND THE RING COUNT THE SAME THING (2026-10-20). They did not: the headline said what the GATE still wants
+  // (dayToGo(), weighted, and a day counts with one missing), so a card showing two ticks of five said "1 to go" and the three
+  // open segments beside it made a liar of it. The headline is the habits left now, which is what the ring draws — and the
+  // gate gets its own, better moment: the day it passes, the headline turns green and says so.
+  const undone = list.filter(hb => !H.isDone(hb, k)).length;
+  const counts = v.state !== 'togo';
+  const said = v.state === 'perfect' ? 'Perfect'
+    : counts ? (isToday ? 'Today counts' : esc(H.dayLong(k)) + ' counts')
+    : undone + ' left';
+  // THE RING (2026-10-20, Amir picked direction A from three): the state is said ONCE, at display size, with the ring beside it.
+  // The old foot survives only in its best case — the last thing left, named — and otherwise the line under the headline is the
+  // run, which is the number that brings anyone back. The ring is the day; the level inside it is what the days add up to.
+  const left = list.filter(hb => !H.isDone(hb, k) && !hb.locked);
+  const sub = (!counts && left.length === 1) ? 'One thing left: ' + H.shortName(left[0]).toLowerCase() + '.'
+    : streak > 0 ? streak + ' day' + (streak === 1 ? '' : 's') + ' in a row'
+    : counts ? 'Anything else is extra.' : 'Tick them off as the day goes.';
   return `<section class="today-card${isToday ? '' : ' is-past'}" aria-label="Today's habits">
     <div class="today-head">
-      <span class="today-k">${isToday ? 'Today' : 'Filling in ' + esc(H.dayLong(k))}</span>
-      <span class="today-v ${v.state === 'togo' ? 'is-togo' : 'is-ok'}">${esc(said)}</span>
+      ${habRingHtml(k, list)}
+      <div class="today-b">
+        ${isToday ? '' : `<span class="today-k">Filling in ${esc(H.dayLong(k))}</span>`}
+        <span class="today-v ${counts ? 'is-ok' : 'is-togo'}">${said}</span>
+        ${sub ? `<span class="today-s">${esc(sub)}</span>` : ''}
+        ${habDaysHtml(k)}
+      </div>
+      <button type="button" class="today-go" onclick="goTo('habits')" aria-label="Open your habits">›</button>
     </div>
-    ${habDaysHtml(k)}
     ${rows}
-    <div class="today-foot">
-      <span class="today-nudge">${esc(habNudge(k, v))}</span>
-      ${streak > 0 ? `<span class="today-streak">${streak} day${streak === 1 ? '' : 's'} in a row</span>` : ''}
-    </div>
   </section>`;
+}
+// The ring: one segment per habit on the day's roster, filled as each is done, and the level in the middle — the Career row on
+// Home said the level on its own and nothing else could be done about it (Amir, 2026-10-20: "i think the career row is
+// redundant, it just shows level when we can see level 10 times"), so the level lives here now, where the work is. Without the
+// career (offline with no copy, the demo, the coach's preview, the switch off) the middle holds the day's own count instead.
+function habRingHtml(k, list) {
+  const H = window.AAHabits, n = Math.max(1, list.length);
+  const done = list.filter(hb => H.isDone(hb, k)).length;
+  const R = 34, C = 2 * Math.PI * R, gap = n > 6 ? 4 : 6, seg = C / n - gap;
+  const arc = (i, cls) => `<circle class="${cls}" cx="42" cy="42" r="${R}" fill="none" stroke-width="8" stroke-linecap="round"
+    stroke-dasharray="${seg.toFixed(1)} ${(C - seg).toFixed(1)}" stroke-dashoffset="${(-i * (C / n)).toFixed(1)}"/>`;
+  let mid = '', kick = '';
+  try {
+    if (careerOnT() && CAREER_T.p && CAREER_T.p.career && typeof CAREER_T.p.career.level === 'number') {
+      mid = String(careerLevelOf(CAREER_T.p.career.xp, CAREER_T.p.rules).level); kick = 'Level';
+    }
+  } catch (e) { mid = ''; }
+  if (!mid) { mid = done + '/' + n; kick = 'Done'; }
+  return `<div class="today-ring" role="img" aria-label="${esc(done + ' of ' + n + ' done today')}">
+    <svg viewBox="0 0 84 84" aria-hidden="true">${list.map((hb, i) => arc(i, 'tr-seg')).join('')}${list.map((hb, i) => H.isDone(hb, k) ? arc(i, 'tr-on') : '').join('')}</svg>
+    <span class="today-mid"><b>${esc(mid)}</b><span>${esc(kick)}</span></span>
+  </div>`;
 }
 // The window you may still fill in: today and the three days behind it (BACKFILL_DAYS). Nobody logs
 // perfectly on the day, every day; past that the log closes, and the limit is the feature — a record you
@@ -11291,10 +11348,11 @@ function habRowHtml(hb, k) {
   const mark = done
     ? `<span class="hb-mark is-done" aria-hidden="true">✓</span>`
     : `<span class="hb-mark" aria-hidden="true"></span>`;
+  // The name gets the row (2026-10-20): the value is small, last and never wraps, and the per-row bar is gone — the ring above
+  // is the progress. "Walk 10,000 steps" was folding onto three lines to make room for a bar nobody read.
   let right = '';
   if (hb.kind === 'count') {
-    right = `<span class="hb-val">${done ? H.fmtVal(hb, val) : (val > 0 ? H.fmtVal(hb, val) + ' of ' + H.fmtVal(hb, hb.target) : '')}</span>`
-      + (hb.target > 0 && !done ? `<span class="hb-bar" aria-hidden="true"><i style="width:${Math.round(Math.min(1, val / hb.target) * 100)}%"></i></span>` : '');
+    right = `<span class="hb-val">${done ? H.fmtVal(hb, val) : (val > 0 ? H.fmtVal(hb, val) + ' of ' + H.fmtVal(hb, hb.target) : '')}</span>`;
   } else if (hb.locked) {
     right = `<span class="hb-val">${done ? 'Done' : 'Not yet'}</span>`;
   }
@@ -11381,12 +11439,12 @@ function paintHabitsBlock() {
 // table are on the page behind it now (habFigsHtml()), beside the list of what you track — they were 331 px of the tab, and
 // the seven days they drew are the seven Home's Today card already walks through.
 function habDoorHtml() {
-  const H = window.AAHabits;
-  const streak = H.dayStreak(), month = habDaysThisMonth();
-  const run = streak > 0 ? `${streak} day${streak === 1 ? '' : 's'} in a row` : 'Tick them on Home as the day goes';
-  return `<button type="button" class="hrow" onclick="goTo('habits')" aria-label="${esc('Daily habits: ' + month + ' days this month, ' + run).replace(/"/g, '&quot;')}">
+  const month = habDaysThisMonth();
+  // The MONTH, and only the month (2026-10-20). Home's card owns the day and the run now and opens the same page, so the two
+  // say different things: Home answers "what is left now", this row answers "how is the month going".
+  return `<button type="button" class="hrow" onclick="goTo('habits')" aria-label="${esc('Daily habits: ' + month + ' days this month').replace(/"/g, '&quot;')}">
       ${hrowIc('habits')}<span class="hrow-b"><span class="hrow-l">Daily habits</span>
-        <span class="hrow-v"><span class="hrow-vv">${month} day${month === 1 ? '' : 's'}</span><small>this month · ${esc(run)}</small></span></span>
+        <span class="hrow-v"><span class="hrow-vv">${month} day${month === 1 ? '' : 's'}</span><small>this month</small></span></span>
       <span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
 // The habits page's own head: the two figures and the last seven days, habit by habit (#hab-figs-body, renderHabitList()).
@@ -11680,36 +11738,6 @@ function holdState() {
   const held = !!(last && last.kind === 'week_held' && Number(lv.cycle) === holdCycleNum(cur, cci) && Number(lv.week) === w.wk);
   return { now, best, held, done, total: ids.length };
 }
-// The weeks in a row as dots, this week as a dashed ring while it is open (up to five in all).
-function holdDots(n, open) {
-  const k = Math.min(n, open ? 4 : 5), all = k + (open ? 1 : 0);
-  let s = '', x = 6 + (5 - all) * 12;
-  for (let i = 0; i < k; i++) { s += `<circle cx="${x}" cy="12" r="4.5" fill="currentColor"/>`; x += 12; }
-  if (open) s += `<circle cx="${x}" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2.2 2"/>`;
-  return `<svg class="nc-spark" viewBox="0 0 60 24" aria-hidden="true">${s}</svg>`;
-}
-// The row (Amir's words, 2026-10-17). The big line is the count, the small line the next step. A tap opens the guide's Hold Serve card.
-function holdRowHTML(st) {
-  if (!st) return '';
-  const NB = '&nbsp;';
-  const big = !st.now ? 'Hold this week' : st.now === 1 ? '1 week held' : `${st.now} weeks in a row`;
-  let small, open = false;
-  if (st.carry != null) small = st.carry ? `It carries into ${st.carry.replace(' ', NB)}` : 'It carries into your next cycle';
-  else if (st.held) small = 'This week is held';
-  else {
-    open = true;
-    const left = st.total - st.done;
-    if (left <= 0) small = `All ${st.total} done this week`;   // finished here, not on the server yet: its answer comes after the save
-    else if (st.now) small = (st.done ? `${left} more this week` : `Do all ${st.total} this week`) + ` to make it${NB}${st.now + 1}`;
-    else small = st.done ? `${left} more session${left === 1 ? '' : 's'} this week to hold it` : `Do all ${st.total} sessions this week to hold it`;
-  }
-  const dots = st.now ? `<span class="hrow-sp" aria-hidden="true">${holdDots(st.now, open)}</span>` : '';
-  return `<button type="button" class="hrow hold-row" onclick="openHelp('hold')">
-    ${hrowIc('ball')}<span class="hrow-b"><span class="hrow-l">Hold Serve</span>
-      <span class="hrow-v${st.held ? ' is-ok' : ''}"><span class="hrow-vv">${big}</span><small>${small}</small></span></span>
-    ${dots}<span class="hrow-a" aria-hidden="true">›</span></button>`;
-}
-// Hold Serve's row and the Career row are drawn together (paintHomeCareer()): the Career row carries this week's Hold Serve line.
 function paintHold() { paintHomeCareer(); }
 // The last answer this phone had, painted at once on open, unless the app already knows it has no signal.
 function loadHoldCache() {
@@ -12284,61 +12312,32 @@ function careerMarkCells(p) {
   });
   return out;
 }
-// Home's nearest mark: "1 week to 8 weeks held", for the number closest to its next mark when it is within 3 or at 70% or more, never from 0.
-function careerNearMark(p) {
-  const near = careerMarkCells(p).filter(c => c.next && c.value > 0 && (c.next - c.value <= 3 || c.pct >= 70))   // a number at 0 is never "near"
-    .sort((a, b) => (b.pct - a.pct) || ((a.next - a.value) - (b.next - b.value)))[0];
-  if (!near) return '';
-  const r = near.next - near.value, s = r === 1 ? '' : 's';
-  return { weeks_held: `${r} week${s} to ${near.next} weeks held`, sessions_with_amir: `${r} session${s} to ${near.next} with Amir`,
-    personal_bests: `${r} best${s} to ${near.next} personal bests`, comebacks: `${r} comeback${s} to ${near.next} comebacks` }[near.key] || '';
-}
-// This week's Hold Serve line for the Career row (holdState(), the old row's words in one line): "7 weeks in a row · 1 more session this week".
-function holdLineText(st) {
-  if (!st) return '';
-  const NB = ' ';
-  const run = !st.now ? '' : st.now === 1 ? '1 week held' : `${st.now} weeks in a row`;
-  let next;
-  if (st.carry != null) next = st.carry ? `it carries into ${st.carry.replace(' ', NB)}` : 'it carries into your next cycle';
-  else if (st.held) next = 'this week is held';
-  else {
-    const left = st.total - st.done;
-    if (left <= 0) next = `all ${st.total} done this week`;
-    else if (!st.done) { const all = st.total === 2 ? 'both' : 'all ' + st.total; next = run ? `do ${all} this week` : `do ${all} sessions this week to hold it`; }
-    else next = `${left} more session${left === 1 ? '' : 's'} this week` + (run ? '' : ' to hold it');
-  }
-  const line = run ? run + ' · ' + next : next;
-  return line.charAt(0).toUpperCase() + line.slice(1);
-}
-// Home's row. The big line is the level (no rank name, L2), the small lines this week's Hold Serve line and the nearest mark, the bar under it
-// the way to the next level. A tap opens Your numbers on Progress.
-function careerRowHTML() {
-  if (!careerOnT() || !DATA) return '';
-  const p = CAREER_T.p, c = p.career || {};
-  if (typeof c.level !== 'number') return '';
-  const L = careerLevelOf(c.xp, p.rules);
-  const pct = L.level_cost > 0 ? Math.max(0, Math.min(100, Math.round(L.xp_in_level / L.level_cost * 100))) : 0;
-  let hold = '';
-  try { hold = holdLineText(holdState()); } catch (e) { hold = ''; }
-  const near = catalogueOnT() ? careerNearMark(p) : '';
-  const say = 'Your career: level ' + L.level + '.' + (hold ? ' ' + hold + '.' : '') + (near ? ' ' + near + '.' : '') + ' Open your numbers';
-  return `<button type="button" class="hrow career-row" onclick="goCareer()" aria-label="${esc(say).replace(/"/g, '&quot;')}">
-    ${hrowIc('career')}<span class="hrow-b"><span class="hrow-l">Career</span>
-      <span class="hrow-v"><span class="hrow-vv">Level ${L.level}</span>${
-        hold ? `<small class="career-four">${esc(hold)}</small>` : `<small>${L.to_next.toLocaleString('en-US')} XP to level ${L.level + 1}</small>`}${
-        near ? `<small class="career-next">${esc(near)}</small>` : ''}</span></span>
-    <span class="hrow-a" aria-hidden="true">›</span>
-    <span class="career-bar" aria-hidden="true"><i style="width:${pct}%"></i></span></button>`;
-}
-// Home's Career and Hold Serve rows, drawn together: Hold Serve shows only while there is no Career row (the Career row carries its line).
+// Home has no Career row and no Hold Serve row since 2026-10-20 (Amir: "i think the career row is redundant, it just shows
+// level when we can see level 10 times"). The level is in the habit card's ring; the weeks held in a row join the week's own
+// count under This Week, where the week already is; and the nearest mark is on Progress twice over (the Achievements door
+// names it, the finish card moves it). The two wraps stay in the page, empty, so nothing else has to move.
 function paintHomeCareer() {
-  const ce = document.getElementById('home-career-wrap'), he = document.getElementById('home-hold-wrap');
-  let c = '';
-  try { c = careerRowHTML(); } catch (e) { c = ''; }   // never let the row stop Home
-  if (ce && ce.innerHTML !== c) ce.innerHTML = c;
-  let h = '';
-  if (!c) { try { h = holdRowHTML(holdState()); } catch (e) { h = ''; } }
-  if (he && he.innerHTML !== h) he.innerHTML = h;
+  ['home-career-wrap', 'home-hold-wrap'].forEach(id => { const e = document.getElementById(id); if (e && e.innerHTML !== '') e.innerHTML = ''; });
+  paintWeekRun();
+  // ⚠️ The level is drawn INSIDE the habit card now, so the card has to be repainted when the career lands — the profile
+  // answers after Home is already on screen, and without this the ring keeps showing the day's count where the level belongs.
+  try { paintTodayCard(); } catch (e) { /* the card paints itself at boot anyway */ }
+}
+// The run, beside the week's count: "2 of 4 sessions done this week · 3 weeks in a row". Only the RUN half of Hold Serve's
+// line comes here — what is left this week is what the count beside it already says.
+function holdRunText(st) {
+  if (!st || !st.now) return '';
+  return st.now === 1 ? '1 week held' : st.now + ' weeks in a row';
+}
+function paintWeekRun() {
+  const el = document.getElementById('home-week-sum');
+  if (!el) return;
+  let run = '';
+  try { run = holdRunText(holdState()); } catch (e) { run = '' }
+  const base = el.dataset.count != null ? el.dataset.count : el.textContent;
+  el.dataset.count = base;
+  const want = base && run ? base + ' · ' + run : (base || run);
+  if (el.textContent !== want) el.textContent = want;
 }
 function paintCareer() {
   paintHomeCareer();
