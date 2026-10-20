@@ -16,8 +16,8 @@
 # a tier or what earns an achievement raises `version` and sets `starts_on = "YYYY-MM-DD"`, the day it is seeded: facts before that day
 # keep their prices, awards keep the XP they were minted with. The seed refuses a change to [habits], [level], [season], [week], [share] or
 # to how a fact is worked out (career/README.md; PROCEDURES.md → Stage 76).
-version = 7
-starts_on = "2026-10-20"   # the day pays: a day that counts 50, a perfect day 100 more (Amir: "50 for a day that counts, 100 more for a perfect day"). Version 6 (the same day) gave the seven achievements that paid nothing their XP; version 5 (2026-10-19) the new achievements, stage79; version 4 (2026-10-19) the cut, stage78. D20: forward only, every time.
+version = 8
+starts_on = "2026-10-20"   # the day pays: a day that counts 40, a perfect day 60 in all (version 7, the same day, had 50 and 150) (Amir: "50 for a day that counts, 100 more for a perfect day"). Version 6 (the same day) gave the seven achievements that paid nothing their XP; version 5 (2026-10-19) the new achievements, stage79; version 4 (2026-10-19) the cut, stage78. D20: forward only, every time.
 meanings = ["consistency", "commitment", "progress", "resilience"]
 
 [switch]
@@ -190,17 +190,17 @@ cap = "daily_cap and max_custom, in [habits]."
 
 [fact.day_on_target]
 meaning = "consistency"
-xp = 50
+xp = 40
 source = "proof"
 pays_for = "act"
-when = "A day passes Proof's two-door gate (dayQualifies()): everything done, or one thing missed. Version 7 (2026-10-20): it pays 50 of its own, for finishing the day instead of abandoning it at four of five."
+when = "A day passes Proof's two-door gate (dayQualifies()): everything done, or one thing missed. It pays 40 of its own (version 8, 2026-10-20, Amir's own number), for finishing the day instead of abandoning it at four of five."
 
 [fact.perfect_day]
 meaning = "commitment"
-xp = 100
+xp = 20
 source = "proof"
 pays_for = "act"
-when = "Every habit on the day's list is done (isPerfect()). Version 7 (2026-10-20): 100 on top of the day's 50, so a whole day is worth chasing."
+when = "Every habit on the day's list is done (isPerfect()). Version 8 (2026-10-20): a perfect day is worth 60 IN ALL, Amir's own number, and the day already carries day_on_target, so this one is priced at the difference: 40 + 20 = 60."
 
 [fact.workout_tick]
 meaning = "commitment"

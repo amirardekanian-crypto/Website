@@ -2143,7 +2143,7 @@ AS $function$
   f as (
     select f.kind, f.ref, f.day, f.value from public.career_facts f
      where f.athlete_id = p_athlete and f.void_at is null
-       and f.kind not in ('habit_done', 'habit_day', 'day_on_target', 'perfect_day', 'workout_tick', 'comeback', 'award_kept')   -- stage78
+       and f.kind not in ('habit_done', 'habit_day', 'workout_tick', 'comeback', 'award_kept')   -- stage78, stage90
   ),
   priced as (
     select f.*,
