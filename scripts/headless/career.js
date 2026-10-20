@@ -1471,7 +1471,7 @@ async function fourCourts(browser, C) {
     C.check('a tile opens its kind in the sheet: "Consistency", Achievements · 1 of 3', !!k && k.title === 'Consistency' && k.eyebrow === 'Achievements · 1 of 3', JSON.stringify(k && [k.title, k.eyebrow]));
     C.check('the kind: Held first (earned, its caption and day), then Back to Back (Next, its line and bar), then Full Month (what earns it, no bar: this month is spoilt)',
       !!k && k.rows.map(r => r.id).join() === 'held,back_to_back,full_month' && k.rows[0].earned && /Your first held week/.test(k.rows[0].sub)
-      && k.rows[1].w === 'Back to BackNext' && k.rows[1].sub === 'Hold this week too. 1 week to go.' && k.rows[1].bar
+      && k.rows[1].w === 'Back to BackNext' && k.rows[1].sub === 'Two training weeks held in a row, the first time. · 1 of 2' && k.rows[1].bar
       && !k.rows[2].earned && !k.rows[2].bar && /calendar month/.test(k.rows[2].sub), JSON.stringify(k && k.rows));
     await p.screenshot({ path: path.join(OUT, 'four-courts-kind-390.png') }).catch(() => {});
     await p.evaluate(() => history.back());

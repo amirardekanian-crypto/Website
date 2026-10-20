@@ -3259,6 +3259,7 @@ CREATE OR REPLACE FUNCTION public.career_proof_key(p_measure text)
  SET search_path TO 'public'
 AS $function$
   select case when p_measure is null then 'daystreak'
+              when p_measure = 'dayStreak' then 'daystreak'   -- stage93: days in a row that counted, by name
               when p_measure like 'streak:%' then 'run:' || substr(p_measure, 8)
               when p_measure like 'daysHit:%' then 'hits:' || substr(p_measure, 9)
               when p_measure like 'total:%' then 'sum:' || substr(p_measure, 7)

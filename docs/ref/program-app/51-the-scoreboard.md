@@ -127,5 +127,25 @@ I want something like that. It can be shared as well … And at the same time i 
   before the tap; the line on the Bell after it; no crew, no button; and the finished card's five rewards, where the
   achievement opens the moment and the two marks stay bands).
 
+## An achievement says what to do, then how far along (2026-10-20)
+
+Amir, on BEDROCK: *"what the fuck is bedrock 2of 3 goals done? what are my goals?"* — a fair question. The row showed the
+rule only while nothing was done and swapped it for *2 of 3 goals done* the moment one goal was met: the score of a game
+whose instructions had just been taken away.
+
+- **`achSub()` is the rule first, the count second**, on every row that is not won yet: *3 protein meals, 7 days in a row ·
+  6 of 7* · *24 days on target · 250,000 steps · Protein on 24 days · 2 of 3 done*. Nothing done yet shows the rule alone.
+  The *From your habits* door names what is closest and says what it ASKS (the rule), not a bare count.
+- **Ten plain achievements** (rulebook version 9, 2026-10-20, Amir: *"in proof i had achievement like finish your drinking
+  habit 5 days in a row … you would understand what each means and what you need to do to get them"*). The habit
+  achievements that survived the cut are all `goals` ones — three month-long conditions at once — so these are the other
+  kind: ONE thing, ONE number, and the number in the name. Full Tank · Lights Out · Well Fed · On Your Feet (a week each of
+  water, sleep, protein, steps) · A Complete Day · Ten Complete Days · Seven Days Running · Thirty Days Running · Quarter of
+  a Million · A Million Steps. The last two are the habits' first entries in the **Progress** court, which had none.
+- **Two of them needed a name for a number the server already kept** (`supabase/stage93_plain_achievements.sql`):
+  `career_measures()` has always counted `daystreak` and `sum:<habit>`, but `career_proof_key()` could not name either, so no
+  catalogue entry could ask for them. `dayStreak` names the first; `total:<habit>` already worked and only the catalogue
+  checker refused it.
+
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*

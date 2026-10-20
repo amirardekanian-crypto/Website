@@ -529,3 +529,160 @@ size = "milestone"
 caption = "Fell off. Came back. Did it again."
 free = true
 origin = "proof"
+
+# ── Version 9 (2026-10-20): the plain ones ───────────────────────────────────────────────────────────────────────────
+# Amir: "in proof i had achievement like finish your drinking habit 5 days in a row / have 5 days of complete days / have
+# 5 days of complete in a row / such achievements / you would understand what each means and what you need to do to get
+# them". The habit achievements that survived the cut are all `goals` ones: three conditions at once, each a month long,
+# nobody holds most of them. These are the other kind — ONE thing, ONE number, and the number is in the name. The rule
+# line is the whole instruction. Each reads a measure career_measures() already keeps (career_proof_key()).
+
+[achievement.full_tank]
+name = "Full Tank"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_fulltank"
+proof_measure = "streak:water"
+proof_need = 7
+rule = "8 glasses of water, 7 days in a row."
+xp = 150
+size = "highlight"
+caption = "A week without missing a glass."
+free = true
+origin = "new"
+
+[achievement.lights_out]
+name = "Lights Out"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_lightsout"
+proof_measure = "streak:sleep"
+proof_need = 7
+rule = "7.5 hours of sleep, 7 nights in a row."
+xp = 150
+size = "highlight"
+caption = "Seven nights of real sleep."
+free = true
+origin = "new"
+
+[achievement.well_fed]
+name = "Well Fed"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_wellfed"
+proof_measure = "streak:fuel"
+proof_need = 7
+rule = "3 protein meals, 7 days in a row."
+xp = 150
+size = "highlight"
+caption = "A week of eating like you train."
+free = true
+origin = "new"
+
+[achievement.on_your_feet]
+name = "On Your Feet"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_onyourfeet"
+proof_measure = "streak:steps"
+proof_need = 7
+rule = "10,000 steps, 7 days in a row."
+xp = 150
+size = "highlight"
+caption = "A week on your feet."
+free = true
+origin = "new"
+
+[achievement.complete_day]
+name = "A Complete Day"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_completeday"
+proof_measure = "perfectDays"
+proof_need = 1
+rule = "Every habit on your list done, in one day."
+xp = 50
+size = "win"
+caption = "Everything on the list, done."
+free = true
+origin = "new"
+
+[achievement.ten_complete_days]
+name = "Ten Complete Days"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_tendays"
+proof_measure = "perfectDays"
+proof_need = 10
+rule = "10 days with every habit on your list done."
+xp = 400
+size = "milestone"
+caption = "Ten days with nothing left out."
+free = true
+origin = "new"
+
+[achievement.week_that_counted]
+name = "Seven Days Running"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_sevenrunning"
+proof_measure = "dayStreak"
+proof_need = 7
+rule = "7 days in a row that counted. One miss is allowed in a day, not two."
+xp = 150
+size = "highlight"
+caption = "Seven days in a row."
+free = true
+origin = "new"
+
+[achievement.thirty_days_running]
+name = "Thirty Days Running"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_thirtyrunning"
+proof_measure = "dayStreak"
+proof_need = 30
+rule = "30 days in a row that counted."
+xp = 500
+size = "milestone"
+caption = "A month without breaking the run."
+free = true
+origin = "new"
+
+[achievement.quarter_million]
+name = "Quarter of a Million"
+meaning = "progress"
+reads = "proof"
+test = "proof"
+proof_code = "ev_quartermil"
+proof_measure = "total:steps"
+proof_need = 250000
+rule = "250,000 steps, counted from your first day."
+xp = 400
+size = "milestone"
+caption = "A quarter of a million steps."
+free = true
+origin = "new"
+
+[achievement.million_steps]
+name = "A Million Steps"
+meaning = "progress"
+reads = "proof"
+test = "proof"
+proof_code = "ev_millionsteps"
+proof_measure = "total:steps"
+proof_need = 1000000
+rule = "1,000,000 steps, counted from your first day."
+xp = 1000
+size = "legend"
+caption = "A million steps. Most people never count that high."
+free = true
+origin = "new"

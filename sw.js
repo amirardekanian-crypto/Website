@@ -430,7 +430,11 @@
 // Your history now shows on the exercise sheet opened from the Library's Exercises pane, not only from a card in a session.
 // The sheet took the name off the programme card it was opened from, so from the library it asked about '' and axHistRow()
 // drew nothing; the entry's own name stands in, which is all historyFor() ever needed.
-const CACHE = 'aap-v212';
+// v213: program.html changed (2026-10-20, Amir: "what the fuck is bedrock 2of 3 goals done? what are my goals?"). Every
+// achievement row now says what to DO first and how far along second: the rule, then "6 of 7". The row used to drop the rule
+// the moment anything was done and show the score of a game whose instructions it had just taken away. Ten plain
+// achievements came with it (rulebook version 9): one thing, one number, the number in the name.
+const CACHE = 'aap-v213';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

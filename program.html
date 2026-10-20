@@ -11717,7 +11717,7 @@ function habAchDoorHtml() {
   if (!list.length) return '';
   const got = list.filter(i => i.day), left = list.filter(i => !i.day);
   const nx = left.slice().sort((a, b) => achPct(b) - achPct(a))[0];
-  const sub = nx ? momName(nx.name) + ' · ' + achLine(nx) : 'Every one of them, won.';
+  const sub = nx ? momName(nx.name) + ' · ' + String(nx.rule || achLine(nx)) : 'Every one of them, won.';
   // ⚠️ It opens the HABIT ones (2026-10-20, Amir: "i asked if i can see what achievements i can get through habits, or what
   // ones i do own now"). It used to jump to the whole cabinet, where the nine are scattered across the four kinds and nothing
   // says which came from the habits — the door counted them and then lost them.
@@ -12955,6 +12955,18 @@ function achLine(it) {
   if (it.test === 'proof' && n > 1) return `${h.toLocaleString('en-US')} of ${n.toLocaleString('en-US')}.`;
   return String(it.rule || it.caption || '');
 }
+// What is left, for a row that is not won yet. ⚠️ A GOALS ONE ALWAYS SAYS ITS GOALS (2026-10-20, Amir: "what the fuck is
+// bedrock 2of 3 goals done? what are my goals?"). The row used to show the rule only while nothing was done, and swap it for
+// "2 of 3 goals done" the moment one was — the athlete was told the score of a game whose rules had just been taken away.
+function achSub(it) {
+  const rule = String(it.rule || it.caption || '');
+  const h = Number(it.have) || 0, n = Number(it.need) || 0;
+  if (!(h > 0)) return rule || achLine(it);                      // nothing done yet: the instruction, and only that
+  const num = x => Math.round(x * 100) / 100 >= 1000 ? Math.round(x).toLocaleString('en-US') : String(Math.round(x * 10) / 10);
+  const tail = it.test === 'goals' ? h + ' of ' + Math.max(1, n) + ' done' : (n > 1 ? num(h) + ' of ' + num(n) : '');
+  if (!tail) return rule || achLine(it);
+  return rule ? rule + ' · ' + tail : achLine(it);
+}
 function achPct(it) { const n = Math.max(1, Number(it.need) || 1); return Math.max(0, Math.min(100, Math.round((Number(it.have) || 0) / n * 100))); }
 var _acHtml = '';
 // Progress's door to Achievements (THE SCOREBOARD, 2026-10-19): earned of all as the figure, and what is closest as the quiet
@@ -13014,7 +13026,7 @@ function openCourt(kind, focus) {
   const row = (i, done) => `<div class="ac-row${done ? ' is-earned' : ''}" data-ach="${esc(i.id)}"><span class="ac-dot" aria-hidden="true"></span><span class="ac-b">`
     + `<span class="ac-w">${esc(momName(i.name))}${hab && i.meaning ? `<i class="ac-kd">${esc(rwMeaningWord(i.meaning))}</i>` : ''}${!done && i.id === nextId ? '<em>Next</em>' : ''}</span>`
     + (done ? `<span class="ac-sub">${esc(i.caption || i.rule || '')}${i.caption || i.rule ? ' · ' : ''}${esc(achDay(i.day))}</span>`
-            : `<span class="ac-sub">${esc(Number(i.have) > 0 ? achLine(i) : (i.rule || i.caption || ''))}</span>`
+            : `<span class="ac-sub">${esc(achSub(i))}</span>`
               + (Number(i.have) > 0 && Number(i.need) > 1 ? `<span class="ac-bar" aria-hidden="true"><i style="width:${achPct(i)}%"></i></span>` : ''))
     + `</span></div>`;
   ov.querySelector('.readiness-modal').innerHTML = `
@@ -13324,20 +13336,27 @@ function crewReactRow(target, k, own, folded) {
     : me.under13 ? dead('cr-kd', 'Like' + num(likeN), 'Likes are off for your account')
     : ask ? live('cr-kd', 'Like' + num(likeN), 'Join the crew to like this', null, 'crewLikeAsk()')
     : live('cr-kd', 'Like' + num(likeN), liked ? 'Liked. Tap to take it back' : 'Like this', liked, 'crewLike(this)');
-  // folded, and nothing of this athlete's own is on the row yet: the four wait behind a ＋. Never for an athlete ticked under
-  // 13 — unfolding four dead chips is noise — and never once somebody has used one, because then they are the news.
-  const sent = crewEmoji().some(em => Number(by[em]) > 0) || !!kk.emoji;
-  if (folded && !me.under13 && !_crewOpenEm[target] && !sent && crewEmoji().length) {
-    return h + live('cr-em cr-plus', '＋', 'More ways to say it', null, `crewUnfold('${esc(target)}')`);
-  }
-  crewEmoji().forEach(em => {
+  // Folded (a moment line): the row shows the Like, then ONLY the emoji somebody has actually used on this item, then a ＋
+  // for the rest. It closes again the moment a choice is made — Amir, 2026-10-20: *"when you click to see the emotes you can
+  // pick, the bar stay opened, and even after choosing, you will see other emojis. it should close after you choosed. and
+  // only show the ones that is replied to a post"*. (The first cut kept the whole row out once anyone had used one, which is
+  // exactly the five-chips-under-one-line problem it was meant to fix.) Never folded for an athlete ticked under 13:
+  // unfolding four dead chips is noise.
+  const chip = em => {
     const n = Number(by[em]) || 0, mine = kk.emoji === em, body = `<i aria-hidden="true">${esc(em)}</i>${num(n)}`;
     const said = `${em} ${n === 1 ? '1 person' : n + ' people'}`;
-    h += own ? dead('cr-em', body, said)
+    return own ? dead('cr-em', body, said)
       : me.under13 ? dead('cr-em', body, said)
       : ask ? live('cr-em', body, `Join the crew to send ${em}`, null, 'crewLikeAsk()')
       : live('cr-em', body, mine ? `${em} sent. Tap to take it back` : `Send ${em}`, mine, `crewLike(this, '${esc(em)}')`);
-  });
+  };
+  const all = crewEmoji();
+  if (folded && !me.under13 && !_crewOpenEm[target]) {
+    const used = all.filter(e => Number(by[e]) > 0 || kk.emoji === e);
+    used.forEach(em => { h += chip(em); });
+    return used.length < all.length ? h + live('cr-em cr-plus', '＋', 'More ways to say it', null, `crewUnfold('${esc(target)}')`) : h;
+  }
+  all.forEach(em => { h += chip(em); });
   return h;
 }
 function crewItem(key) { return ((BELL && BELL.items) || []).find(i => i && (i.id === key || i.key === key)) || null; }
@@ -13430,7 +13449,8 @@ function crewRepsHTML(it) {
   const rows = reps.map(r => {
     const who = r.amir ? 'Amir' : r.me ? 'You' : (r.who || 'Athlete');
     const x = r.me ? `<button type="button" class="cr-del" onclick="armedTap(this, 'Tap again to delete', () => crewReplyDelete('${esc(r.id)}'))">Delete</button>` : '';
-    return `<div class="cr-rep"><span class="cr-ini${r.amir ? ' am' : ''}" aria-hidden="true">${esc(crewInitials(r.amir ? 'Amir' : (r.me ? me.name : r.who)))}</span>`
+    // AA for Amir, the same two letters his post wears, not the one letter his name would give
+    return `<div class="cr-rep"><span class="cr-ini${r.amir ? ' am' : ''}" aria-hidden="true">${r.amir ? 'AA' : esc(crewInitials(r.me ? me.name : r.who))}</span>`
       + `<span class="cr-rb" dir="auto"><b>${esc(who)}</b> ${esc(r.body || '')}</span>${x}</div>`;
   }).join('');
   const can = !!me.can_post, ask = !me.under13 && !can;
@@ -13727,6 +13747,9 @@ function paintKudos(key) {
 async function crewLike(btn, em) {
   const key = btn && btn.dataset.kd, it = crewItem(key);
   if (!it || !crewCanLike() || it.me) return;
+  // The picker closes on the choice (Amir, 2026-10-20). A folded row then shows the Like and whatever has actually been
+  // used, which after this tap includes theirs; taking it back leaves the row with the ＋ again.
+  delete _crewOpenEm[key];
   const before = Object.assign({ n: 0, names: [], mine: false }, it.kudos || {});
   const was = before.mine && (before.emoji || null) === (em || null);   // the same one again: take it back
   const on = !was;
