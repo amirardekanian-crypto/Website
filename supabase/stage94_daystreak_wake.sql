@@ -1,5 +1,9 @@
 -- stage94: the day-streak achievements wake up when a day lands (2026-10-20)
 --
+-- APPLIED to the live project 2026-10-20, on Amir's "Go live now", with rulebook version 10 seeded straight after it.
+-- Checked after: career_entry_kinds('achievement', {proof_measure: 'dayStreak'}) returns {day_on_target}, and get_profile()'s
+-- rules.prices now carries day_on_target 40 and perfect_day 20. The snapshot was remade in the same commit.
+--
 -- Stage93 gave `dayStreak` a NAME (career_proof_key), so a catalogue entry could finally ask for days in a row that
 -- counted. It did not give it a WAKE: career_entry_kinds() says which fact kinds an entry listens for, and after a save
 -- career_evaluate() only looks at entries whose kinds overlap the kinds that just changed. `dayStreak` fell off the end

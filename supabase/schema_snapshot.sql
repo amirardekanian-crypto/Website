@@ -1914,6 +1914,7 @@ begin
               when v_m like 'streak:%' or v_m like 'daysHit:%' or v_m like 'total:%' then array['habit_done']
               when v_m = 'daysWith3' then array['habit_done', 'habit_day']
               when v_m in ('perfectDays', 'perfect') then array['perfect_day']
+              when v_m = 'dayStreak' then array['day_on_target']   -- stage94: the run of days that counted
               when v_m = 'qualify' then array['day_on_target']
               when v_m = 'comebackRun' then array['comeback', 'day_on_target']
               when v_m = 'comebacksStuck' then array['comeback_stuck']
@@ -6999,7 +7000,7 @@ begin
       'season', '{}'::jsonb,   -- stage78: no season title
       'prices', coalesce((select jsonb_object_agg(k.key, public.career_num(v_rules #> array['fact', k.key, 'xp']))
                             from unnest(array['session_finished', 'session_finished_early', 'full_log', 'checkin_done', 'week_held',
-                                              'bounce_back', 'training_return', 'library_session', 'retest_done']) as k(key)
+                                              'bounce_back', 'training_return', 'library_session', 'retest_done', 'day_on_target', 'perfect_day']) as k(key)
                            where public.career_num(v_rules #> array['fact', k.key, 'xp']) is not null), '{}'::jsonb)),
     'badges', '[]'::jsonb, 'achievements', '[]'::jsonb, 'missions', '[]'::jsonb, 'quest', null, 'moments', '[]'::jsonb
   );

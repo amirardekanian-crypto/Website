@@ -67,12 +67,15 @@ The system and rules GAME-1 to GAME-14: [`../../career/CAREER_MODE.md`](../../ca
   running, which pays an athlete to skip the rest days their coach wrote. ⚠️ **No HARD TO KILL** — `badge.comebacks`
   already wears that name at the same numbers and the same XP. ⚠️ **Every entry is `origin = "new"`**, including the
   ones wearing Proof's names: `origin = "proof"` is a claim `career_compare()` checks, not a label.
-  `supabase/stage94_daystreak_wake.sql` is the one SQL this needed: `career_entry_kinds()` had no case for `dayStreak`,
+  `supabase/stage94_daystreak_wake.sql` (APPLIED 2026-10-20, with the seed) is the one SQL this needed: `career_entry_kinds()` had no case for `dayStreak`,
   so version 9's two day-streak achievements never woke on the partial evaluate after a save and minted only at the
   next `get_profile()`; it also widens that function's `rules.prices` whitelist, which predated the day paying anything
   (stage90), by a guarded textual patch that raises rather than rewrite a `get_profile()` that has moved on.
   `qualify` needed one word in `scripts/check_career.py`. Detail: [`PROGRAM-APP.md`](../../PROGRAM-APP.md) → *The
-  ladders come back*.
+  ladders come back*. Seeded and back-paid the same day on Amir's "Go live now": 54 awards, 6,740 XP, 5 athletes up a level,
+  nobody down and nobody's XP lower, `career_compare()` ok with 35 matched and `rules_equal`, and all 65 achievement rows equal the
+  toml value for value (fingerprint `811b37300ec03e9fa43ef2cf850c86b3` on both sides). `backup.v10_before_20261020` is the safety
+  copy of every athlete's XP and level from before it; drop it after 2026-11-03.
 - **The week comes first on Crew, and a finished session rings once a day** (stage91, applied 2026-10-20 on Amir's answers to the audit
   *The Empty Room*; `PROCEDURES.md` → *Stage 91*). The tab had six members, four posts ever and ONE moment in eight weeks, and the whole feed was
   about to sweep. Now: a green band of the crew's own week at the top (never empty), a finished session as **one folded line a day** for the whole
