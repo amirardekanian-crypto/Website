@@ -37,7 +37,10 @@ SHORT_LIVED = {'crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings',   # the 
                # The crew's queue and its watermarks (stage86). The queue keeps the Bell's own 7-day promise, so a
                # 12-week backup of it would break that promise exactly as a backup of crew_posts would; the
                # watermarks rebuild themselves by simply not sending twice.
-               'crew_push_q', 'crew_push_seen'}
+               'crew_push_q', 'crew_push_seen',
+               # Which cycle each athlete was last told about (stage87). It rebuilds itself: the first sight of a
+               # phone is never a notification, so a restore cannot announce a cycle anybody already has.
+               'push_cycle_seen'}
 # The logins. Their rows are re-made by the dashboard's Create login (a new Supabase sign-in account each), never restored.
 ACCOUNT_TABLES = {'athlete_identities': 'athlete_id', 'tps_accounts': 'username', 'assess_accounts': 'username'}
 # Tables whose rows belong to a LOGIN, and the column that says which one: the old login's id is swapped for the new login's id.

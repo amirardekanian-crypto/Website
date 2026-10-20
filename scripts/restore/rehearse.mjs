@@ -28,7 +28,8 @@ const SECRET_TABLES = ['assess_publish_keys', 'tps_publish_keys',
                        'push_config'];                   // and the reminders' VAPID private key and shared secret (stage84): see restore_backup.py
 const SHORT_LIVED = ['crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings',   // the Bell's 7-day tables (stage81), as in restore_backup.py: never in a backup, on purpose
                      'push_sent',                               // and what went out today (stage84): it rebuilds itself by not sending twice
-                     'crew_push_q', 'crew_push_seen'];          // the crew's queue and its watermarks (stage86): the queue keeps the Bell's own 7 days, the watermarks rebuild themselves
+                     'crew_push_q', 'crew_push_seen',
+                     'push_cycle_seen'];          // which cycle each athlete was last told about (stage87): it rebuilds itself          // the crew's queue and its watermarks (stage86): the queue keeps the Bell's own 7 days, the watermarks rebuild themselves
 const COACH_JWT = JSON.stringify({ email: 'amirardekanian@gmail.com', role: 'authenticated', sub: '00000000-0000-4000-8000-00000000c0c0' });
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'restore-rehearsal-'));
 

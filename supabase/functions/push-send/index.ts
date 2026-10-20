@@ -15,9 +15,15 @@
 // A service-role key is NOT used for that, because the cron command is stored in the database and the
 // key would be sitting in cron.job in plain text.
 //
-//   POST /push-send            send what is due: the reminders AND the crew
+//   POST /push-send            send what is due: the reminders, the crew AND a published cycle
 //   POST /push-send?only=crew  the crew only. What the 15-minute job calls (stage86).
 //   POST /push-send?dry=1      say what WOULD go, send nothing. Safe to run any time.
+//
+// THE FOUR KINDS, and where each one is decided: habits and workout in push_due() (stage84, hourly,
+// at the athlete's own hour), crew in crew_push_due() (stage86, every 15 minutes), cycle in
+// cycle_push_due() (stage87, hourly). All four answer in the same columns, so the loop below carries
+// them without knowing which is which; the only places this file can tell them apart are the three
+// `kind ===` tests, because each kind writes down what it sent in its own way.
 //
 // THE CREW (stage86). public.crew_push_due() answers in exactly the same columns as push_due(), so
 // everything below carries both without knowing the difference. Two things do differ, and they are
@@ -106,6 +112,15 @@ Deno.serve(async (req) => {
     }
     due.push(...((data ?? []) as Due[]));
   }
+  if (only === '') {
+    // "Your next cycle is ready" (stage87). On the HOURLY run only: a published cycle is a state that
+    // stays true, so there is nothing to catch quickly, and the crew's 15-minute tick is left alone.
+    const { data, error } = await db.rpc('cycle_push_due', dry ? { p_mark: false } : {});
+    if (error && !/does not exist|could not find|schema cache/i.test(error.message)) {
+      return json({ error: 'cycle_push_due: ' + error.message }, 500);
+    }
+    due.push(...((data ?? []) as Due[]));
+  }
 
   // One notification per athlete per kind, however many phones they have: the ledger is marked once,
   // after every one of their phones has been tried.
@@ -156,6 +171,9 @@ Deno.serve(async (req) => {
     // failure leaves the watermark where it was and the next 15-minute tick sends the same news.
     if (phones[0].kind === 'crew') {
       await db.rpc('crew_push_done', { p_athlete_id: phones[0].athlete_id, p_ok: anyOk });
+    } else if (phones[0].kind === 'cycle') {
+      // stage87's mark is which cycle they were told about, not a day in a ledger.
+      await db.rpc('cycle_push_done', { p_athlete_id: phones[0].athlete_id, p_ok: anyOk });
     } else {
       await db.rpc('push_done', {
         p_athlete_id: phones[0].athlete_id, p_kind: phones[0].kind, p_day: phones[0].day, p_ok: anyOk,

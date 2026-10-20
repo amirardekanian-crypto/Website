@@ -39,9 +39,10 @@ off in their app settings"*. Two reminders, both opt-out once the phone allows t
   bug can wake anybody at three in the morning.
 - **A kind nobody switched is ON**, the same rule `crew_consent` uses, so a kind added later is on for
   everyone who already said yes. `kinds` carries `crew` (stage86, below) and `cycle` (no sender yet).
-- **⚠️ A switch in the Reminders panel must have a sender.** `cycle` is the one left: the panel offers
-  "A new cycle — When Amir publishes your next one" and nothing sends it. That is the exact fault
-  Amir found in `crew` on 2026-10-19 ("why didn't I?"), and it is still open for `cycle`.
+- **⚠️ A switch in the Reminders panel must have a sender.** That is the fault Amir found on
+  2026-10-19 (*"why didnt i?"*): `crew` had been offered since stage84 with nothing behind it, and
+  `cycle` after it. **All four have one now** — habits and workout (stage84), crew (stage86), cycle
+  (stage87) — and a fifth switch does not go in the panel before its sender does.
 - **⚠️ Every send needs a short TTL.** Firebase keeps an undelivered message for **four weeks** by
   default, so a 20:00 reminder would otherwise arrive at three in the morning a week later. `push_due()`
   returns 7200 on every row and the sender must pass it.
@@ -124,3 +125,50 @@ list, and the count of identity counters (8 → 9, `crew_push_q.id`) — both fi
 **Nothing rings yet, and that is not a fault.** `push_subs` is still empty: until an athlete taps the
 permission there is nobody to send to, and `crew_push_add()` returns before writing a row, so the queue stays
 empty too. The first real proof of this stage is the first subscribed phone.
+
+## A published cycle on a phone (stage87, written 2026-10-20, NOT APPLIED — waits on Amir's word)
+
+Amir: *"Build the sender for the cycle notification too, so the switch stops promising nothing."* The
+last of stage84's four kinds. The full narration is the header of `supabase/stage87_cycle_push.sql`.
+
+- **No queue, no trigger, no new job** — and each absence is the point. A crew event is a moment that
+  passes; **a published cycle is a STATE**, `currentCycleIndex` in the programme, which simply stays
+  advanced. So the decision is read from the programme every time ("is their current cycle further on
+  than the one we last told them about"), which means a phone that was off for a week still gets told,
+  once, when it comes back. Nothing hangs off `publish_cycle()`, which is the most important write in
+  the product (PRC-1) and must not carry a notification's risk. And stage84's hourly `push-send` already
+  asks every sender, so a cycle lands within the hour with no new machinery; the crew's 15-minute tick
+  (`?only=crew`) is left alone.
+- **The first sight of a phone is never a notification.** An athlete who subscribes today must not be
+  news-flashed about the cycle they are already training, so the first run writes down where they are
+  and sends nothing; only an advance after that rings. (Break that and they are told about every cycle
+  they have ever had — a mutation the rehearsal catches.)
+- **The words are the fact and nothing else**: "Your next cycle is ready." No cycle name, no number, no
+  load — the lock-screen rule. TTL two hours: if the phone was off longer the cycle is still there.
+- **Who is never told**: the switch off, the night (08:00–21:59 local, as stage86 writes it), a free
+  Proof athlete (no cycles to announce), an athlete whose programme has no roadmap yet (mid-intake),
+  and a phone that has failed five times.
+- The mark is the two-column shape stage86 explains (`cycle_index`, then `pending`), so a publish that
+  lands mid-send is not stepped over, and a send that failed everywhere is simply owed again — which,
+  for a state rather than a moment, can be the next hour or tomorrow with nothing lost.
+- Guards: `scripts/push/rehearse_cycle_push.mjs` (55, PGlite, both directions and the CRLF trap; **10
+  of 10 one-line breaks of the stage are caught**, after the first mutation run found a real gap in the
+  rehearsal itself — the free athlete had been failing two tests at once, so a break in either passed
+  unnoticed). The way back is `scripts/push/rollback_stage87.sql`, on Amir's word only.
+- **⚠️ If these come off, run them NEWEST FIRST**: stage87, then stage86, then stage84. Each puts its
+  own names on the end of `coach_erase_person()`'s table list, and each way back looks for the end as
+  its own stage left it.
+
+**To apply** (Amir's yes first). It adds one table and five functions and changes no row; the one
+existing object it touches, `coach_erase_person()`'s list, is put back exactly by the way back.
+1. `supabase/stage87_cycle_push.sql` (`apply_migration`). Read back: the table with row-level security
+   on and no policy, `anon` and `authenticated` executing none of the five, and the erase function's
+   list ending `'crew_push_seen', 'push_cycle_seen']`.
+2. Deploy `push-send` again — **passing `verify_jwt: false`** (see the rule above). Then
+   `POST /push-send?dry=1`, which decides everything and moves nothing.
+3. Then, in ONE commit: `supabase/schema_snapshot.sql` remade, `scripts/test_restore_backup.py` check
+   **1d's count 65 → 66**, and in `scripts/restore/rehearse.mjs` the new table added to its own
+   short-lived list. (`BACKUP_TABLES` and `SHORT_LIVED` in `restore_backup.py` are already done, in
+   this commit.)
+4. The first notification of this kind goes out the first time Amir publishes a cycle for an athlete
+   whose phone was already subscribed — not for the cycle they are on now.
