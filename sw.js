@@ -385,7 +385,11 @@
 // those two moments, and only those: installed and opened from the Home Screen, and joining the crew. The ask is one line with a button; the
 // phone's own box opens only inside that tap, which is why our line can be shown twice at no cost while a "Don't allow" is permanent and takes
 // AA Proof with it. Nothing is asked when the answer is already in — on, blocked, or waiting for the Home Screen.
-const CACHE = 'aap-v203';
+// v204: program.html changed (2026-10-20, Amir: "build all of them" — the five the audit left open). The cover's verdict over
+// the wins, the month's goal as its own card in clay (his job for the month, not the cycle's outcome), Getting stronger (the
+// best lift's trend, the only thing on the tab that shows a change over time), Your body as one card of three rows, one Share
+// door on Your moments instead of a button a row, and day one: before the first session the tab is not a screen of zeros.
+const CACHE = 'aap-v204';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

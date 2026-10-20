@@ -23,7 +23,8 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
 - **Progress carries ONE habit door; the figures and the week are the page behind it** (2026-10-19, Amir:
   "i want the 7-day habit table / and days in a row and days this month / cut the per habit door / and create
   the door to the list", then THE SCOREBOARD the same day: "we want to go with scoreboard"). The door is the
-  month's figure with the run under it (**Daily habits · 8 days · this month · 2 days in a row**); behind it,
+  month's figure with the run under it (**Daily habits · 8 days · this month · 2 days in a row**), the third row of
+  the **Your body** card since 2026-10-20; behind it,
   over the list of what you track, are the two figures and the last seven days as a table. **There is no
   per-habit page** — a habit's own level and its consistency ladder were AA Proof's, and the career already
   answers how it is going with numbers that count the training too. ⚠️ **Every cell of the table reads `rosterOn(ITS OWN DAY)`**, never today's

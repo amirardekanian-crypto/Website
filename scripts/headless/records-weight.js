@@ -137,8 +137,11 @@ const COVER = `(() => {
       && door.look === 'rgb(255, 255, 255)|1px|12px|64px|flex', JSON.stringify(door));
     const doorLook = await p.evaluate(() => { const h = document.querySelector('#ceil-body .hrow'), c = getComputedStyle(h); return [c.backgroundColor, c.borderTopWidth, c.borderTopLeftRadius, c.minHeight].join('|'); });
     await p.evaluate("goTo('plan')"); await p.waitForTimeout(400);
-    const progLook = await p.evaluate(() => { const h = document.querySelector('#ceiling-row-wrap .hrow'), c = getComputedStyle(h); return [c.backgroundColor, c.borderTopWidth, c.borderTopLeftRadius, c.minHeight].join('|'); });
-    t.check('the door row here is the same look as Progress\'s door rows', doorLook === progLook, doorLook + ' vs ' + progLook);
+    // On Progress the Records row is one row of the Your body card since 2026-10-20, so the card is what carries that look: the
+    // white box, the 1 px edge and the 12 px corners. The row inside it keeps the height and adds nothing of its own.
+    const progLook = await p.evaluate(() => { const card = document.getElementById('body-card'), c = getComputedStyle(card), h = getComputedStyle(document.querySelector('#ceiling-row-wrap .hrow'));
+      return [c.backgroundColor, c.borderTopWidth, c.borderTopLeftRadius, h.minHeight].join('|'); });
+    t.check('the door row here is the look the Your body card carries on Progress', doorLook === progLook, doorLook + ' vs ' + progLook);
     await p.evaluate("goTo('ceiling')"); await p.waitForTimeout(400);
     // How this works: ONE fold row, closed, opens and closes, the same text
     const hw = await p.evaluate(() => ({ n: document.querySelectorAll('#ceil-body details.ceil-help').length, open: document.querySelector('.ceil-help').open, label: document.querySelector('.ceil-help summary').textContent.trim(),

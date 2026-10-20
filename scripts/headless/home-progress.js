@@ -118,8 +118,8 @@ function noStrip(browser) {
       y.badge < y.card && y.card < y.numbers && y.numbers < y.ceil && y.ceil < y.weight && y.weight < y.plan && y.plan < y.road, JSON.stringify(y));
     // THE SCOREBOARD (2026-10-19): two titles on the whole tab. Without the career (the demo's way: no profile) there is no career
     // card and no Achievements or Your moments door either; Records and Body weight stand on their own under Your numbers.
-    t.check('Progress: two section titles, Your numbers and Game Plan, and no career card or career doors without the career',
-      o.sec.join('|') === 'Your numbers|Game Plan' && !o.career, JSON.stringify([o.sec, o.career]));
+    t.check('Progress: its four section titles (Your numbers, Getting stronger, Your body, Game Plan), and no career card or career doors without the career',
+      o.sec.join('|') === 'Your numbers|Getting stronger|Your body|Game Plan' && !o.career, JSON.stringify([o.sec, o.career]));
     t.check('Progress: the Game Plan title is 15 px capitals in green ink with a hairline to the edge',
       !!o.gp && o.gp.size === '15px' && o.gp.caps === 'uppercase' && o.gp.color === 'rgb(14, 74, 54)' && parseFloat(o.gp.spacing) > 0, JSON.stringify(o.gp));
     t.check('This cycle card on Progress: a plain card, no tap, no ›', !!o.card && o.card.tag === 'DIV' && !o.card.onclick && !o.card.arrow, JSON.stringify(o.card && [o.card.tag, o.card.onclick, o.card.arrow]));
@@ -151,21 +151,22 @@ function noStrip(browser) {
     const o = await p.evaluate(() => {
       const y = sel => { const e = document.querySelector('#screen-plan ' + sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
       return { sec: [...document.querySelectorAll('#screen-plan .prog-sec')].filter(e => !e.hidden && getComputedStyle(e).display !== 'none').map(e => e.textContent.replace(/\s+/g, ' ').trim()),
-        y: { card: y('.cyc-card'), numbers: y('#numbers-title'), career: y('.cs-card'), goal: y('.cs-goal'), ceil: y('#ceiling-row-wrap .hrow'), weight: y('#weight-row-wrap .hrow'),
+        y: { card: y('.cyc-card'), goal: y('.goal-card'), numbers: y('#numbers-title'), career: y('.cs-card'), ceil: y('#ceiling-row-wrap .hrow'), weight: y('#weight-row-wrap .hrow'),
              hab: y('#habits-block-wrap .hrow'), ach: y('#career-courts-wrap .hrow'), moments: y('#career-moments-wrap .hrow'), plan: y('#road-wrap .prog-sec') },
         doors: ['#ceiling-row-wrap', '#weight-row-wrap', '#habits-block-wrap', '#career-courts-wrap', '#career-moments-wrap']
           .map(w => { const l = document.querySelector(w + ' .hrow .hrow-l'); return l ? l.textContent.trim() : null; }).filter(Boolean),
-        goal: (document.querySelector('.cs-goal') || {}).innerText };
+        goal: (document.querySelector('.goal-card') || {}).innerText };
     });
     // 2 marks (4 and 8 weeks held), the achievement, Amir's line and two honours
-    t.check('Progress with the career: two section titles, Your numbers and Game Plan (THE SCOREBOARD, 2026-10-19)', o.sec.join('|') === 'Your numbers|Game Plan', o.sec.join('|'));
+    t.check('Progress with the career: five section titles, each naming a different subject (2026-10-20)',
+      o.sec.join('|') === "Your numbers|Getting stronger|Your body|What you've earned|Game Plan", o.sec.join('|'));
     // This athlete has no habit config and no get_achievements answer, so those two doors are not drawn: the order is what is there.
     t.check('Progress with the career: the doors in order under the card, the training\'s own first (Personal records, Body weight, then Your moments)',
       o.doors.join('|') === 'Personal records|Body weight|Your moments', o.doors.join('|'));
     const y = o.y;
-    t.check('Progress with the career, in order: This cycle, Your numbers, the card, the goal, the doors, the Game Plan',
-      y.card < y.numbers && y.numbers < y.career && y.career < y.goal && y.goal < y.ceil && y.ceil < y.weight && y.weight < y.moments && y.moments < y.plan, JSON.stringify(y));
-    t.check('…the goal is Amir\'s line for this month', /goal · from Amir/i.test(o.goal || '') && /Four sessions a week, no gaps\./.test(o.goal || ''), o.goal);
+    t.check('Progress with the career, in order: This cycle, the month\'s goal, Your numbers, the card, the doors, the Game Plan',
+      y.card < y.goal && y.goal < y.numbers && y.numbers < y.career && y.career < y.ceil && y.ceil < y.weight && y.weight < y.moments && y.moments < y.plan, JSON.stringify(y));
+    t.check('…the goal is Amir\'s line for this month', /· from Amir/i.test(o.goal || '') && /Four sessions a week, no gaps\./.test(o.goal || ''), o.goal);
     t.check('no page errors (Progress with the career)', p.errs.length === 0, p.errs.join(' | '));
     await shot(p, 'progress-career');
     await ctx.close();
@@ -297,9 +298,10 @@ function noStrip(browser) {
     // Daily habits was the third of these doors until AA Proof was retired into this app (2026-10-19): it is
     // Today's card now, and 5b holds it. The pair left is Personal records and Body weight, on Progress.
     const look = (p) => p.evaluate(`(() => { const f = ${rowLook.toString()}; goTo('plan');
-      const c = document.querySelector('#ceiling-row-wrap .hrow'), w = document.querySelector('#weight-row-wrap .hrow');
-      return { records: f(c), weight: f(w), icons: [c, w].map(r => !!r.querySelector('.hrow-ic svg')).join(), quiet: [c, w].map(r => r.classList.contains('quiet')).join(),
-        dark: [c, w].some(r => /rgb\\(18, 42, 34\\)/.test(getComputedStyle(r).backgroundColor)), dashed: [c, w].some(r => getComputedStyle(r).borderTopStyle === 'dashed'),
+      const c = document.querySelector('#ceiling-row-wrap .hrow'), w = document.querySelector('#weight-row-wrap .hrow'), card = document.getElementById('body-card');
+      return { card: f(card), icons: [c, w].map(r => !!r.querySelector('.hrow-ic svg')).join(), quiet: [c, w].map(r => r.classList.contains('quiet')).join(),
+        dark: [c, w, card].some(r => /rgb\\(18, 42, 34\\)/.test(getComputedStyle(r).backgroundColor)), dashed: [c, w, card].some(r => getComputedStyle(r).borderTopStyle === 'dashed'),
+        hair: getComputedStyle(w).borderTopWidth, bare: [c, w].map(r => getComputedStyle(r).borderLeftWidth).join(),
         minH: [Math.round(c.getBoundingClientRect().height), Math.round(w.getBoundingClientRect().height)].join() }; })()`);
     const bare = await H.openProgram(browser, { prog: prog() });
     const a = await look(bare.p);
@@ -307,15 +309,20 @@ function noStrip(browser) {
     const full = await H.openProgram(browser, { prog: prog(), seed: SEED_NUMBERS });
     const b = await look(full.p);
     await full.ctx.close();
-    t.check('door rows without data: all three quiet, with an icon, white with a 1 px edge, rounded 12, 64 px at least, never dark green, never dashed',
-      a.quiet === 'true,true' && a.icons === 'true,true' && !a.dark && !a.dashed && a.records === a.weight && /^rgb\(255, 255, 255\)\|1px\|solid\|.*\|12px\|64px\|flex$/.test(a.records) && a.minH.split(',').every(n => +n >= 64), JSON.stringify(a));
-    t.check('door rows with data: not quiet, the same background, edge and corners as without data, never dark green, never dashed',
-      b.quiet === 'false,false' && b.icons === 'true,true' && !b.dark && !b.dashed && b.records === a.records && b.weight === a.weight, JSON.stringify([a.records, b]));
-    // dark: the row is #242424 on #181818 like the day's rows
+    // Your body (2026-10-20): the CARD is the white box with the 1 px edge and the 12 px corners; its rows are rows, divided
+    // by one hairline, with no edge of their own. Without data they still say what they are, quietly, with their icon.
+    t.check('Your body without data: the rows are quiet, with an icon, divided by a hairline inside one white card rounded 12, 64 px at least, never dark green, never dashed',
+      a.quiet === 'true,true' && a.icons === 'true,true' && !a.dark && !a.dashed && a.bare === '0px,0px' && a.hair === '1px'
+      && /^rgb\(255, 255, 255\)\|1px\|solid\|.*\|12px\|.*\|block$/.test(a.card) && a.minH.split(',').every(n => +n >= 64), JSON.stringify(a));
+    t.check('Your body with data: not quiet, the same card background, edge and corners as without data, never dark green, never dashed',
+      b.quiet === 'false,false' && b.icons === 'true,true' && !b.dark && !b.dashed && b.card === a.card && b.hair === a.hair && b.bare === a.bare, JSON.stringify([a.card, b]));
+    // dark: the card is #242424 on #181818 like the day's rows (its rows carry no background of their own since 2026-10-20)
     const d = await H.openProgram(browser, { prog: prog(), dark: true, seed: SEED_NUMBERS });
-    const dk = await d.p.evaluate(() => { goTo('plan'); const r = document.querySelector('#ceiling-row-wrap .hrow'); const c = getComputedStyle(r);
-      return { row: c.backgroundColor, page: getComputedStyle(document.body).backgroundColor, edge: c.borderTopColor }; });
-    t.check('dark: the door row is #242424 on #181818', dk.row === 'rgb(36, 36, 36)' && dk.page === 'rgb(24, 24, 24)', JSON.stringify(dk));
+    const dk = await d.p.evaluate(() => { goTo('plan'); const card = document.getElementById('body-card'), c = getComputedStyle(card);
+      return { row: c.backgroundColor, page: getComputedStyle(document.body).backgroundColor, edge: c.borderTopColor,
+        inner: getComputedStyle(document.querySelector('#ceiling-row-wrap .hrow')).backgroundColor }; });
+    t.check('dark: Your body is #242424 on #181818, and its rows add no background of their own',
+      dk.row === 'rgb(36, 36, 36)' && dk.page === 'rgb(24, 24, 24)' && dk.inner === 'rgba(0, 0, 0, 0)', JSON.stringify(dk));
     await d.ctx.close();
   }
 
@@ -552,7 +559,7 @@ function noStrip(browser) {
         const n = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: x => x.textContent.trim() ? 1 : 3 }).nextNode(); const r = document.createRange(); r.selectNodeContents(n); return Math.round(r.getClientRects()[0].left * 10) / 10; };
       const sec = document.querySelector('#road-wrap .prog-sec'), numbers = document.getElementById('numbers-title');
       const pad = el => Math.round((el.getBoundingClientRect().left + parseFloat(getComputedStyle(el).paddingLeft)) * 10) / 10;
-      return { title: left('.prog-title', true), badge: left('.sport-badge'), card: left('.cyc-card'), numbers: pad(numbers), ceiling: left('#ceiling-row-wrap .hrow'), weight: left('#weight-row-wrap .hrow'),
+      return { title: left('.prog-title', true), badge: left('.sport-badge'), card: left('.cyc-card'), numbers: pad(numbers), ceiling: left('#body-card'), weight: left('#body-card'),
         plan: pad(sec), road: left('.road'), row: left('.road-row'), nowRow: left('.road-row.is-now .road-head'), why: left('.road-why-door'), aims: left('.road-row.is-now .road-n', true), secText: left('.road-row.is-now .road-sec', true), aimText: left('.road-row.is-now .road-aim', true) };
     });
     const prEdges = Object.entries(q).filter(([k, v]) => v != null);
@@ -640,6 +647,67 @@ function noStrip(browser) {
     }
     t.check('no page errors (Records and Body weight)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
+  }
+
+  // ── 10. Getting stronger: the best lift's trend, from the same series the Records row draws (2026-10-20) ──
+  {
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(), seed: SEED_NUMBERS });
+    await p.evaluate(() => goTo('plan'));
+    await p.waitForTimeout(450);
+    const tr = await p.evaluate(() => {
+      const c = document.querySelector('#trend-wrap .tr-card'), head = document.getElementById('trend-title');
+      return c ? { title: head && !head.hidden && head.textContent.trim(), name: c.querySelector('.tr-n').textContent.trim(), v: c.querySelector('.tr-v').textContent.trim(),
+        pts: c.querySelectorAll('.tr-pt').length + c.querySelectorAll('.tr-dot').length, foot: [...c.querySelectorAll('.tr-f span')].map(e => e.textContent.trim()),
+        line: !!c.querySelector('.tr-line'), aria: c.getAttribute('aria-label'), caps: /KG|LB/.test(c.innerText) } : null;
+    });
+    // The seed is three squat estimates: 92 kg, 98 kg, 104 kg.
+    t.check('Getting stronger: the best lift, its gain, one point per reading and the period under it',
+      !!tr && tr.title === 'Getting stronger' && tr.name === 'Back Squat' && tr.v === '\u25b2 12 kg' && tr.pts === 3 && tr.line
+      && /^\d+ \w+ · 92 kg$/.test(tr.foot[0]) && tr.foot[1] === '104 kg' && !tr.caps, JSON.stringify(tr));
+    t.check('Getting stronger: the card says in words what the line draws', !!tr && /Back Squat, 104 kg, up 12 kg since/.test(tr.aria || ''), tr && tr.aria);
+    await p.click('#trend-wrap .tr-card');
+    await p.waitForTimeout(450);
+    t.check('Getting stronger: a tap opens that lift\'s own page in Personal Records', (await active(p)) === 'screen-ceiling'
+      && await p.evaluate(() => (document.querySelector('#screen-ceiling .ceil-title') || {}).textContent === 'Barbell Back Squat'), await active(p));
+    t.check('no page errors (Getting stronger)', p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+    // one reading is a sparkline, not a trend: no card and no title
+    const one = await H.openProgram(browser, { prog: prog(), seed: { _1rm: [SEED_NUMBERS._1rm[0]] } });
+    await one.p.evaluate(() => goTo('plan'));
+    await one.p.waitForTimeout(400);
+    const no = await one.p.evaluate(() => ({ card: !!document.querySelector('#trend-wrap .tr-card'), title: !document.getElementById('trend-title').hidden,
+      row: !!document.querySelector('#ceiling-row-wrap .hrow') }));
+    t.check('Getting stronger: under three readings there is no card and no title, and the Records row still says what it has', !no.card && !no.title && no.row, JSON.stringify(no));
+    await one.ctx.close();
+  }
+
+  // ── 11. Day one: before the first finished session, no screen full of zeros (2026-10-20) ──
+  {
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(), hist: [] });
+    await p.evaluate(() => goTo('plan'));
+    await p.waitForTimeout(450);
+    const d1 = await p.evaluate(() => {
+      const shown = id => { const e = document.getElementById(id); return !!e && !e.hidden && getComputedStyle(e).display !== 'none'; };
+      return { line: (document.querySelector('#dayone-wrap .day1') || {}).textContent || null,
+        numbers: shown('numbers-title'), card: shown('career-card-wrap'), records: shown('ceiling-row-wrap'),
+        weight: !!document.querySelector('#weight-row-wrap .hrow'), habits: shown('habits-block-wrap'),
+        ach: shown('career-courts-wrap'), moments: shown('career-moments-wrap'),
+        cover: !!document.querySelector('.cyc-card'), road: !!document.querySelector('#road-wrap .road-row') };
+    });
+    t.check('Day one: one line instead of the zeros — no Your numbers, no Records row, neither earned door',
+      /Nothing here yet/.test(d1.line || '') && !d1.numbers && !d1.card && !d1.records && !d1.ach && !d1.moments, JSON.stringify(d1));
+    t.check('Day one: the cover, the plan and what can be filled in today (body weight) stay', d1.cover && d1.road && d1.weight, JSON.stringify(d1));
+    t.check('no page errors (day one)', p.errs.length === 0, p.errs.join(' | '));
+    await shot(p, 'progress-day-one');
+    await ctx.close();
+    // and once a session is finished the screen fills in again
+    const after = await H.openProgram(browser, { prog: prog(), seed: SEED_NUMBERS });
+    await after.p.evaluate(() => goTo('plan'));
+    await after.p.waitForTimeout(400);
+    const on = await after.p.evaluate(() => ({ line: !!document.querySelector('#dayone-wrap .day1'), numbers: !document.getElementById('numbers-title').hidden,
+      records: !!document.querySelector('#ceiling-row-wrap .hrow') }));
+    t.check('Day one is only day one: with a finished session the line goes and Your numbers is back', !on.line && on.numbers && on.records, JSON.stringify(on));
+    await after.ctx.close();
   }
 
   await real.close();

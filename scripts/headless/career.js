@@ -300,7 +300,7 @@ async function trainingBase(browser, C) {
     await p.waitForTimeout(600);
     const o = await p.evaluate(() => {
       const c = document.querySelector('#career-card-wrap .cs-card');
-      return { card: !!c, lvl: c && c.querySelector('.cs-lw').textContent, xp: c ? /XP/.test(c.innerText) : false, grid: !!document.querySelector('#career-card-wrap .cs-grid'), goal: !!document.querySelector('.cs-goal'),
+      return { card: !!c, lvl: c && c.querySelector('.cs-lw').textContent, xp: c ? /XP/.test(c.innerText) : false, grid: !!document.querySelector('#career-card-wrap .cs-grid'), goal: !!document.querySelector('.goal-card'),
         moments: !!document.querySelector('#career-moments-wrap .hrow'), rows: !!document.querySelector('#ceiling-row-wrap .hrow') && !!document.querySelector('#weight-row-wrap .hrow') };
     });
     // THE SCOREBOARD (2026-10-19): the level is the card's quiet foot and the XP figure is gone from the athlete's view.
@@ -538,8 +538,14 @@ async function trainingLight(browser, C) {
         { v: '3', nm: 'weeks held', mk: false, bar: false }, { v: '24', nm: 'sessions with Amir', mk: false, bar: false },
         { v: '12', nm: 'personal bests', mk: false, bar: false }, { v: '5', nm: 'comebacks', mk: false, bar: false }]), JSON.stringify(card && [card.gridCols, card.cells]));
     C.check('Your numbers: no rank, no badge name, no metal, no Grand Slam on the card', !!card && !RANKS.test(card.text) && !METALS.test(card.text) && !/Hold Serve|Century|Record Breaker|HARD TO KILL|Grand Slam|title/i.test(card.text), card && card.text);
-    const goal = await p.evaluate(() => { const g = document.querySelector('#career-card-wrap .cs-goal'); return g ? { cls: g.className, l: g.querySelector('.cs-l').textContent.replace(/\s+/g, ' ').trim(), line: g.querySelector('.cs-gl').textContent.trim(), ring: !!g.querySelector('.cs-ring') } : null; });
-    C.check('Your numbers: the month\'s goal, "<Month> goal · from Amir" and his line, a ring', !!goal && goal.l === monthName(monthStart(0)) + ' goal · from Amir' && goal.line === 'Four sessions a week, no gaps.' && goal.ring && !/is-done/.test(goal.cls), JSON.stringify(goal));
+    // The goal is a job Amir set, so since 2026-10-20 it is its own card under the cover, above Your numbers. Progress is a
+    // single-accent screen (PROGRESS ONLY: single accent remaps --clay-ink inside #screen-plan), so the empty ring does the
+    // asking and the label stays green; the ring filling is the only thing that changes when he ticks it off.
+    const goal = await p.evaluate(() => { const g = document.querySelector('#goal-wrap .goal-card'); const c = g && getComputedStyle(g.querySelector('.goal-k')).color;
+      return g ? { cls: g.className, l: g.querySelector('.goal-k').textContent.replace(/\s+/g, ' ').trim(), line: g.querySelector('.goal-l').textContent.trim(), ring: !!g.querySelector('.goal-ring'), clay: c, inCard: !!document.querySelector('#career-card-wrap .goal-card') } : null; });
+    C.check('The month\'s goal: its own card, "<Month> · from Amir" over his line, an empty ring, green like the rest of Progress, and not inside the numbers card',
+      !!goal && goal.l === monthName(monthStart(0)) + ' · from Amir' && goal.line === 'Four sessions a week, no gaps.' && goal.ring && !/is-done/.test(goal.cls)
+      && !CLAY.test(goal.clay) && !goal.inCard, JSON.stringify(goal));
     // The two career doors on the tab, and nothing of their lists left on it.
     const doors = await p.evaluate(() => {
       const d = sel => { const b = document.querySelector(sel); return b ? { l: b.querySelector('.hrow-l').textContent.trim(), v: b.querySelector('.hrow-vv').textContent.trim(), s: (b.querySelector('.hrow-v small') || {}).textContent.trim() } : null; };
@@ -550,14 +556,14 @@ async function trainingLight(browser, C) {
     await shot(p, 'light-progress-390.png');
     const order = await p.evaluate(() => {
       const y = sel => { const e = document.querySelector(sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
-      return { numbers: y('#numbers-title'), card: y('.cs-card'), goal: y('.cs-goal'), ceil: y('#ceiling-row-wrap .hrow'), weight: y('#weight-row-wrap .hrow'),
-        hab: y('#habits-block-wrap .hrow'), ach: y('#career-courts-wrap .hrow'), moments: y('#career-moments-wrap .hrow'), road: y('#road-wrap .prog-sec') };
+      return { goal: y('.goal-card'), numbers: y('#numbers-title'), card: y('.cs-card'), trend: y('.tr-card'), body: y('#body-title'), ceil: y('#ceiling-row-wrap .hrow'),
+        weight: y('#weight-row-wrap .hrow'), hab: y('#habits-block-wrap .hrow'), ach: y('#career-courts-wrap .hrow'), moments: y('#career-moments-wrap .hrow'), road: y('#road-wrap .prog-sec') };
     });
     // The habits door needs a habit config and the Achievements door a get_achievements answer; this athlete has neither, so the
     // order is of the doors that are there. Their full set is checked in home-progress.js and in fourCourts() below.
-    const seq = ['numbers', 'card', 'goal', 'ceil', 'weight', 'hab', 'ach', 'moments', 'road'].map(k => order[k]).filter(v => v != null);
-    C.check('Progress: Your numbers, the card, the goal, then the doors (Records, Body weight, Your moments), then the Game Plan',
-      seq.length >= 6 && seq.every((v, i) => i === 0 || v > seq[i - 1]), JSON.stringify(order));
+    const seq = ['goal', 'numbers', 'card', 'trend', 'body', 'ceil', 'weight', 'hab', 'ach', 'moments', 'road'].map(k => order[k]).filter(v => v != null);
+    C.check('Progress in order (2026-10-20): the goal, Your numbers, the card, Getting stronger, Your body and its rows, the earned doors, the Game Plan',
+      seq.length >= 7 && seq.every((v, i) => i === 0 || v > seq[i - 1]), JSON.stringify(order));
     // The page behind the door: every moment, under a heading for its month.
     await p.evaluate(() => goTo('moments'));
     await p.waitForTimeout(300);
@@ -585,6 +591,20 @@ async function trainingLight(browser, C) {
       && !mo.rows.some(r => /near/i.test(r.w)), JSON.stringify(mo.rows.map(r => r.w + ' / ' + r.s)));
     C.check('Your moments: "Amir saw this" sits under the moments whose award id he marked Saw it (First Best, 8 weeks held), and under no other', mo.rows.filter(r => r.saw).map(r => r.w).sort().join() === '8 weeks held in a row,First Best', JSON.stringify(mo.rows.filter(r => r.saw).map(r => r.w)));
     C.check('Your moments: no other badge, no retired badge, no title, no Grand Slam, no metal', !mo.rows.some(r => /SPRINKLER|Sprinkler|CLOCKWORK|Clockwork|Grand Slam|Hold Serve|Century/.test(r.w + ' ' + r.s)) && !METALS.test(mo.rows.map(r => r.w + ' ' + r.s).join(' ')), JSON.stringify(mo.rows.map(r => r.w)));
+    // ONE share door at the top of the page, and no Share on any row (2026-10-20).
+    const sd = await p.evaluate(() => ({ door: !!document.querySelector('#mom-body .mom-share-door'),
+      l: (document.querySelector('#mom-body .mom-share-door .hrow-l') || {}).textContent,
+      q: (document.querySelector('#mom-body .mom-share-door .hrow-q') || {}).textContent,
+      first: document.querySelector('#mom-body > *').className, perRow: document.querySelectorAll('#mom-body .mo-share').length }));
+    C.check('Your moments: ONE Share door above the list, and no Share button on any row',
+      sd.door && sd.perRow === 0 && sd.l === 'Share a moment' && /cards to pick from/.test(sd.q || '') && /mom-share-door/.test(sd.first), JSON.stringify(sd));
+    await p.click('#mom-body .mom-share-door');
+    await p.waitForTimeout(700);
+    const sh = await p.evaluate(() => { const ov = document.getElementById('hist-overlay');
+      return { open: ov.classList.contains('visible'), title: (ov.querySelector('.readiness-title') || {}).textContent, picks: ov.querySelectorAll('.hl-pick button').length }; });
+    C.check('Your moments: the door opens the share sheet with every card in it to pick from', sh.open && sh.picks >= 5, JSON.stringify(sh));
+    await p.evaluate(() => history.back());
+    await p.waitForTimeout(300);
     await shot(p, 'light-moments-390.png');
     const back = await p.evaluate(() => { document.querySelector('#screen-moments .nav-back').click(); return (document.querySelector('.screen.active') || {}).id; });
     C.check('Your moments: the back arrow lands on Progress', back === 'screen-plan', back);
@@ -595,14 +615,15 @@ async function trainingLight(browser, C) {
     await waitRow(d.p);
     await goProgress(d.p);
     await momentsReady(d.p);
-    const dg = await d.p.evaluate(() => { const g = document.querySelector('.cs-goal'); return g ? { cls: g.className, l: g.querySelector('.cs-l').textContent.replace(/\s+/g, ' ').trim() } : null; });
-    C.check('a goal that is done: "<Month> goal · done" and the done look', !!dg && /is-done/.test(dg.cls) && dg.l === monthName(monthStart(0)) + ' goal · done', JSON.stringify(dg));
+    const dg = await d.p.evaluate(() => { const g = document.querySelector('.goal-card'); const r = g && g.querySelector('.goal-ring');
+      return g ? { cls: g.className, l: g.querySelector('.goal-k').textContent.replace(/\s+/g, ' ').trim(), ring: r && getComputedStyle(r).backgroundColor } : null; });
+    C.check('a goal Amir ticked off: "<Month> · done" and the ring filled green', !!dg && /is-done/.test(dg.cls) && dg.l === monthName(monthStart(0)) + ' · done' && /rgb\(14, 74, 54\)/.test(dg.ring || ''), JSON.stringify(dg));
     await d.ctx.close();
     const n0 = await openRW(browser, { stub: { myMoments: myMomentsFx({ goal: null, notes: [], honours: [], saw: [] }) } });
     await waitRow(n0.p);
     await goProgress(n0.p);
     await momentsReady(n0.p);
-    const ng = await n0.p.evaluate(() => ({ goal: !!document.querySelector('.cs-goal'), door: (document.querySelector('#career-moments-wrap .hrow-vv') || {}).textContent }));
+    const ng = await n0.p.evaluate(() => ({ goal: !!document.querySelector('.goal-card'), door: (document.querySelector('#career-moments-wrap .hrow-vv') || {}).textContent }));
     C.check('no goal this month and nothing from Amir: no goal card; the marks and the achievement are still the moments (3)', !ng.goal && ng.door === '3', JSON.stringify(ng));
     await n0.ctx.close();
     // 320 px and dark: the card, the goal and the moments fit
@@ -613,8 +634,10 @@ async function trainingLight(browser, C) {
       await momentsReady(x.p);
       await x.p.waitForTimeout(200);
       const g = await x.p.evaluate(() => { const r = el => el.getBoundingClientRect(); const cs = document.querySelector('.cs-card'), mo = document.querySelector('#career-moments-wrap .hrow');
-        return { side: document.documentElement.scrollWidth - innerWidth, card: Math.round(r(cs).right), moments: Math.round(r(mo).right), vw: innerWidth, cells: [...document.querySelectorAll('.cs-n')].map(n => Math.round(r(n).right)) }; });
-      C.check(`Your numbers ${w}px${dark ? ' dark' : ''}: the card, its four numbers and the moments fit, no sideways scroll`, g.side <= 0 && g.card <= g.vw && g.moments <= g.vw && g.cells.every(v => v <= g.vw), JSON.stringify(g));
+        const extra = [...document.querySelectorAll('.goal-card, .tr-card, .body-card')].map(e => Math.round(r(e).right));
+        return { side: document.documentElement.scrollWidth - innerWidth, card: Math.round(r(cs).right), moments: Math.round(r(mo).right), vw: innerWidth, extra, cells: [...document.querySelectorAll('.cs-n')].map(n => Math.round(r(n).right)) }; });
+      C.check(`Your numbers ${w}px${dark ? ' dark' : ''}: the card, its four numbers, the goal, the trend, Your body and the moments fit, no sideways scroll`,
+        g.side <= 0 && g.card <= g.vw && g.moments <= g.vw && g.cells.every(v => v <= g.vw) && g.extra.every(v => v <= g.vw), JSON.stringify(g));
       await shot(x.p, `light-progress-${w}${dark ? '-dark' : ''}.png`);
       C.check(`Your numbers ${w}px${dark ? ' dark' : ''}: no page errors`, x.p.errs.length === 0, JSON.stringify(x.p.errs));
       await x.ctx.close();

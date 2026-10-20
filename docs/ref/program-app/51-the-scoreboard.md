@@ -66,8 +66,42 @@ keeps the word and is no longer `aria-hidden`); the Records row shouted *▲ 12 
 *▲ 12 kg since you started* now, the words the Records page itself uses); and *Amir's Pick* drew as a name over
 an empty card (*Amir picked you that month.*).
 
-**Still open from the audit**: the one chart Progress does not have — a main lift's best set across the cycles —
-and the first-two-weeks version of the screen, which is at its emptiest exactly when the athlete is newest.
+## The five the audit left open, built the next day (2026-10-20)
+
+Amir, on the board rebuilt as what-is-left: *"build all of them"*, with one correction — *"for the goal of the
+month, i built something to give one person or the whole squad a goal they have to do. not their cycle outcome"*.
+The tab is 2,534 px now, and carries five section titles, each naming a different subject: Your numbers ·
+Getting stronger · Your body · What you've earned · Game Plan.
+
+- **The verdict** (`paintCycleCard()`): the heading over the wins is a sentence that answers the question the tab
+  is named after — **N lifts up this cycle** (singular at one) — instead of the label *Wins this cycle*. It counts
+  what the rows under it prove, so nothing is said twice, and with no wins yet there is still nothing there.
+- **The month's goal is a job, not a statistic** (`goalCardHTML()`, `#goal-wrap`): his line has its own card under
+  the cover, above Your numbers, with the month and **from Amir** in clay (DS-01 — it asks for something), his
+  words in ink and a ring that fills green when he ticks it off in Courtside. It sat inside the numbers card,
+  between the four figures and the doors, where it read as one more number. It is one line per athlete per month
+  (`career_goals`, `coach_set_goal()`), so a goal he sets for the whole squad is that line on each of them.
+- **Getting stronger** (`trendCardHTML()`, `#trend-wrap`): the one thing on this tab that shows a change over
+  time. The best lift's estimates, one point per reading, the gain beside its name and the period under it — the
+  SAME lift the Records row headlines and the SAME series its sparkline draws (`ceilingBest()`, `ceilingSeries()`),
+  so the two can never tell different stories, and a tap opens that lift's own page. Under three readings there is
+  no card and no title: the sparkline says it better.
+- **Your body** (`#body-card`): Personal records, Body weight and Daily habits are three rows of ONE card, divided
+  by hairlines. They are one subject, and three separate doors for it was the audit's *three box grids on one
+  screen*. The rows keep their own doors and their quiet empty states; the card carries the edge, the corners and
+  the background, so dark mode moves once.
+- **One Share door** (`openShareMoments()`): Your moments had a Share button on every row — in the quietest list in
+  the app, the buttons were the loudest thing on it. One door above the list opens the share sheet with every card
+  that can be drawn, and the sheet's own picker chooses between them. `shareMoment()` went with the buttons.
+- **Day one** (`paintDayOne()`): before the first finished session (`hasFinishedASession()`) Your numbers, the
+  trend, Personal records and both earned doors are every zero in the app at once, so they wait. The tab is the
+  cover, one line — *Nothing here yet. Your numbers, your records and your moments fill in as you train.* — what
+  can be filled in today (body weight, the habits) and the plan.
+
+**Checked by** `scripts/headless/home-progress.js` §10 (the trend: its figures, one point per reading, the tap, and
+no card under three readings) and §11 (day one, and that it is only day one), `career.js` (the goal's own card in
+clay, its done state in green, the order down the tab, the one Share door and the sheet it opens) and
+`highlight-reel.js` §1 (the verdict's singular).
 
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*

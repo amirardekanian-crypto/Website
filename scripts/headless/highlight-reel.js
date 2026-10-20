@@ -99,8 +99,11 @@ const liveReady = p => p.waitForFunction(() => {
   {
     const { ctx, p } = await open(browser, { prog: prog(-4), hist: hist(-4) });
     await p.evaluate(() => goTo('plan'));
-    const row = await p.evaluate(() => { const b = document.querySelector('#screen-plan .cyc-card .cyc-share'); return b ? { txt: [...b.children].map(s => s.textContent.trim()).join(' '), h: b.getBoundingClientRect().height, wins: document.querySelectorAll('#screen-plan .cyc-win').length } : null; });
+    const row = await p.evaluate(() => { const b = document.querySelector('#screen-plan .cyc-card .cyc-share'); return b ? { txt: [...b.children].map(s => s.textContent.trim()).join(' '), h: b.getBoundingClientRect().height, wins: document.querySelectorAll('#screen-plan .cyc-win').length,
+      verdict: (document.querySelector('#screen-plan .cyc-wins-h') || {}).textContent || null } : null; });
     t.check('This cycle: one "Share a win ›" row under the wins (a Same effort win), 48 px', !!row && row.txt === 'Share a win ›' && row.h >= 44 && row.wins === 1, JSON.stringify(row));
+    // The verdict (2026-10-20): the heading over the wins answers "is this working?" instead of labelling the list.
+    t.check('This cycle: the line over the wins counts them, in singular when there is one', !!row && row.verdict === '1 lift up this cycle', row && row.verdict);
     t.check('This cycle: no Share your cycle while the cycle runs', await p.evaluate(() => !document.querySelector('#screen-plan .cyc-share-go')));
     await p.click('#screen-plan .cyc-share');
     await ready(p);
