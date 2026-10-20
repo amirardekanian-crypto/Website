@@ -3855,12 +3855,12 @@ function computeAcwr(daily, ref) {
   const refMid = new Date(r.getFullYear(), r.getMonth(), r.getDate());
   let acute = 0, chronic = 0, earliest = null;
   keys.forEach(iso => {
-    const d = pDate(iso), diff = Math.floor((refMid - d) / 86400000);
+    const d = pDate(iso), diff = Math.round((refMid - d) / 86400000);   // round, as daysBetween() does: a spring clock change makes one day 23 h, and floor counted 7 days ago as 6
     if (earliest === null || d < earliest) earliest = d;
     if (diff >= 0 && diff < 7)  acute   += daily[iso];
     if (diff >= 0 && diff < 28) chronic += daily[iso];
   });
-  const spanDays = earliest !== null ? Math.floor((refMid - earliest) / 86400000) : 0;
+  const spanDays = earliest !== null ? Math.round((refMid - earliest) / 86400000) : 0;
   // The weekly average over the weeks that actually have history in the 28-day window. Dividing by
   // 4 regardless made every new athlete read a false "High load" (1.7 at two weeks) for about a week.
   const weeksCovered = Math.min(4, (Math.min(spanDays, 27) + 1) / 7);
@@ -3949,7 +3949,7 @@ function adherence(sessions, daysPerWeek, weeks, ref) {
   const r = ref || new Date();
   const refMid = new Date(r.getFullYear(), r.getMonth(), r.getDate());
   if (!earliest) return null;
-  const daysActive = Math.floor((refMid - earliest) / 86400000) + 1;
+  const daysActive = Math.round((refMid - earliest) / 86400000) + 1;
   // Pro-rated to the days since they started (at most the window). Charging a whole week of
   // planned sessions for a week that had only begun read a perfectly adherent new athlete as 33%.
   const effDays = Math.max(1, Math.min(weeks * 7, daysActive));
