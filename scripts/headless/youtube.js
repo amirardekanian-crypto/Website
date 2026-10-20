@@ -223,6 +223,7 @@ function spine() {
     // a working circuit (Centre Court r2, E's s): no ▶ disc on its rows; the ▶ is in How to do it, which opens the
     // card's player with its bar above the steps, built on the first open
     await circuit(p, 'Press and Pull');
+    await p.waitForTimeout(350);   // 2d80ea58: a card opens on its own height over FOLD_MS (260 ms) and clips its body until then, so a hit test at once lands on the day, not the bar
     const wc = await p.evaluate(() => {
       const c = [...document.querySelectorAll('#day-view .round-group')].find(x => x.textContent.includes('Press and Pull'));
       const row = [...c.querySelectorAll('.round-row')].find(r => r.textContent.includes('Dumbbell Bench Press'));

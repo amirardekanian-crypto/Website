@@ -32,7 +32,13 @@ function runOn(mutate, opts) {
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 }
 function swap(file, from, to) {
-  return (get, put) => { const t = get(file); if (!t.includes(from)) throw new Error('test is stale: ' + file + ' no longer contains ' + JSON.stringify(from)); put(file, t.replace(from, to)); };
+  // A checkout with core.autocrlf (every Windows clone) holds these files with CRLF, and a `from` that spans two lines ('test = "best_value"\nat = 100') then
+  // matches nothing: the test said "stale" about career/achievements.toml, which has had those two lines since a9e14697. The pair is written with the file's own line ends.
+  return (get, put) => {
+    const t = get(file), eol = s => (t.includes('\r\n') ? s.replace(/\r?\n/g, '\r\n') : s);
+    if (!t.includes(eol(from))) throw new Error('test is stale: ' + file + ' no longer contains ' + JSON.stringify(from));
+    put(file, t.replace(eol(from), () => eol(to)));
+  };
 }
 
 let bad = 0;

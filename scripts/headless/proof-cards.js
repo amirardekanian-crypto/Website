@@ -21,7 +21,9 @@
 // streak mark, a skin, a rank-up, a tier, a comeback, a habit's rank, a season with no title).
 // Career Mode phase 3 (the catalogue switch): the same cards for the subjects it adds, on a page whose profile has the catalogue on (scripts/headless/career.js
 // builds the answer in the shape get_profile() really gives): a badge of each kind of win and an achievement as {k: 'award', id} on the Milestone card (its tier's
-// metal, its kind of win's emoji, none of them gold), a catalogue title and the Grand Slam on the Title card, an event title that is also a catalogue title.
+// metal, its kind of win's emoji, none of them gold), an event title on the Title card. Since the cut (50f29083, stage78: "no titles, ranks, Grand Slam, skins or
+// badges but the four marks") the catalogue holds the four marks and the achievements and NO title and NO habit badge, so a habit badge, a catalogue title and the
+// Grand Slam are no longer subjects: they are asked for anyway ("gone-" cases) and must fall back to a whole card (the newest milestone, the worn title).
 // A made-up athlete (lib.js stub), 40 days of log ending today. Serve the repo first
 // (python -m http.server 8765 --bind 127.0.0.1, see lib.js), then:
 //   node scripts/headless/proof-cards.js [--out <dir for the PNGs>]
@@ -124,12 +126,14 @@ CASES.push(
   A('badge:century:2', 'CENTURY · SILVER', 'Commitment', '📅'),
   A('badge:bests:3', 'RECORD BREAKER · EMERALD', 'Progress', '📈'),
   A('badge:comebacks:2', 'HARD TO KILL · SILVER', 'Resilience', '🛡️'),
-  A('badge:habit_water:1', 'HUMAN SPRINKLER · BRONZE', 'Consistency', '🔁'),
   A('achievement:the_foundry', 'THE FOUNDRY', 'Commitment', '📅'),
-  { card: 'title', slug: 'cat-clockwork', subj: { id: 'clockwork' }, cat: true, show: () => [has('CLOCKWORK'), has('TITLE · CONSISTENCY')] },
-  { card: 'title', slug: 'cat-the-constant', subj: { id: 'the_constant' }, cat: true, show: () => [has('THE CONSTANT')] },
-  { card: 'title', slug: 'cat-grand-slam', subj: { id: 'grand_slam' }, cat: true, show: () => [has('GRAND SLAM'), has('A TITLE IN ALL FOUR')] },
   { card: 'title', slug: 'cat-event-sun-forged', subj: { id: 't_sunforged' }, cat: true, show: () => [has('SUN-FORGED'), has('FINISHED THE FOUNDRY')] },
+  // 50f29083 (the cut) took the habit badges and every catalogue title off the server: these four were real subjects until then, and the rule that keeps them gone
+  // is checked in section 4. A card still asked for one (a win saved before the cut) draws a whole card of what the athlete does have: the newest milestone, the worn title.
+  { card: 'medal', slug: 'gone-habit-water', subj: { k: 'award', id: 'badge:habit_water:1' }, cat: true, show: () => [starts('MILESTONE ·')] },
+  { card: 'title', slug: 'gone-clockwork', subj: { id: 'clockwork' }, cat: true, show: () => [has('EARLY DOORS'), starts('TITLE ·')] },
+  { card: 'title', slug: 'gone-the-constant', subj: { id: 'the_constant' }, cat: true, show: () => [has('EARLY DOORS'), starts('TITLE ·')] },
+  { card: 'title', slug: 'gone-grand-slam', subj: { id: 'grand_slam' }, cat: true, show: () => [has('EARLY DOORS'), starts('TITLE ·')] },
 );
 CASES.forEach(c => { c.id = c.card + '-' + c.slug; });
 
@@ -298,19 +302,19 @@ const GOLD_EMOJI = /[🏆🥇🏅🎖⭐🌟✨💫⚡☀🌞💡💰🪙👑�
   errs.push(...B.p.errs);
   await B.ctx.close();
 
-  // 2b. The catalogue switch on: the same athlete, with a profile that has the awards, the titles and a full Grand Slam, and the catalogue copy the cards name them from.
+  // 2b. The catalogue switch on: the same athlete, with a profile that has the awards, and the catalogue copy the cards name them from. As the server answers since the
+  // cut (50f29083): the four marks and the achievements, no title, no worn title, no Grand Slam, no habit badge (the profile's slam and shelf titles are emptied here; rwProfile's default owned list is career.js's, not touched).
   const R = require('./career');
-  const slamTitles = { consistency: { id: 'clockwork', name: 'CLOCKWORK' }, commitment: { id: 'sun_forged', name: 'SUN-FORGED' }, progress: { id: 'proven', name: 'PROVEN' }, resilience: { id: 'second_wind', name: 'SECOND WIND' } };
-  const slam = Object.fromEntries(Object.entries(slamTitles).map(([k, v]) => [k, Object.assign({ day: R.at(-2) }, v)]).concat([['grand', { id: 'grand_slam', name: 'GRAND SLAM', day: R.at(-1) }]]));
-  const prof = R.rwProfile(10000, { slam, worn: null,
-    owned: { 'title:grand_slam': R.at(-1), 'title:sun_forged': R.at(-2), 'badge:held_weeks:3': R.at(-2), 'badge:century:2': R.at(-9), 'badge:bests:3': R.at(-8), 'badge:comebacks:2': R.at(-7), 'badge:habit_water:1': R.at(-5), 'achievement:the_foundry': R.at(-2) },
-    titles: [{ id: 'clockwork', hab_id: 'clockwork', name: 'CLOCKWORK', meaning: 'consistency', metal: 'prismatic', from: 'Hold Serve, prismatic: 52 weeks held in a row', day: R.at(-20), source: 'award' },
-      { id: 'the_constant', hab_id: 'the_constant', name: 'THE CONSTANT', meaning: 'consistency', metal: 'prismatic', from: 'Long Count, prismatic: 100 weeks held', day: R.at(-20), source: 'award' },
-      { id: 'grand_slam', hab_id: 'grand_slam', name: 'GRAND SLAM', meaning: 'all', metal: 'prismatic', from: 'A title in all four', day: R.at(-1), source: 'award' }] });
+  const noSlam = { consistency: null, commitment: null, progress: null, resilience: null, grand: null };
+  const prof = R.rwProfile(10000, { slam: noSlam, worn: null, titles: [],
+    owned: { 'badge:held_weeks:3': R.at(-2), 'badge:century:2': R.at(-9), 'badge:bests:3': R.at(-8), 'badge:comebacks:2': R.at(-7), 'achievement:the_foundry': R.at(-2) } });
   const D = await H.openProof(browser, { w: 390, h: 844, tz: TZ, cfg: Object.assign({}, CFG_SEED, { careerSeen: R.SWX, catalogueSeen: R.at(-3) }), seed: { _hab_log: habitLog(false) },
     stub: { profile: prof, awards: R.rwShelf(prof), tables: { career_rules: R.RW_RULES, career_facts: [], career_catalogue: R.catRows() } } });
   await D.p.waitForFunction(() => typeof catalogueReady === 'function' && catalogueReady(), null, { timeout: 15000 }).catch(() => {});
   t.check('setup: the third page has the catalogue on and holds the catalogue copy', await D.p.evaluate(() => catalogueReady()));
+  // The reason the "gone-" cases are not asked for their subject: the catalogue copy the cards read holds no title and no habit badge (the cut, 50f29083). A title or a habit badge
+  // coming back to career/*.toml would have to bring its cards back to this list (scripts/check_career.py rule 21 refuses it, tiers.lock.json "_removed").
+  t.check('the cut stays cut: the catalogue copy holds no title and no habit_* badge, so no card is about one', await D.p.evaluate(() => !Object.keys(CATALOGUE.rows.title || {}).length && !Object.keys(CATALOGUE.rows.badge || {}).some(k => /^habit_/.test(k))), '');
   await D.p.evaluate(installCapture);
   await paintAll(D.p, CASES.filter(c => c.cat));
   errs.push(...D.p.errs);
@@ -407,7 +411,7 @@ const GOLD_EMOJI = /[🏆🥇🏅🎖⭐🌟✨💫⚡☀🌞💡💰🪙👑�
   const drawnEmoji = new Set();
   painted.filter(s => /^medal-award-/.test(s.id)).forEach(s => s.texts.forEach(x => WIN_EMOJI_SET.forEach(e => { if (x.text.includes(e)) drawnEmoji.add(e); })));
   t.check('the award cards draw all four emoji between them', WIN_EMOJI_SET.every(e => drawnEmoji.has(e)), [...drawnEmoji].join(' '));
-  t.check('no award or catalogue title card draws a gold-looking emoji', painted.filter(s => /^(medal-award-|title-cat-)/.test(s.id)).every(s => !s.texts.some(x => (x.text.match(GOLD_EMOJI) || []).length)), '');
+  t.check('no award or catalogue title card draws a gold-looking emoji', painted.filter(s => /^(medal-award-|title-cat-|medal-gone-|title-gone-)/.test(s.id)).every(s => !s.texts.some(x => (x.text.match(GOLD_EMOJI) || []).length)), '');
 
   // 5. The routing, in the real UI. A fresh page, and every step is a real click.
   const C = await H.openProof(legacyBrowser(browser), { w: 390, h: 844, tz: TZ, cfg: CFG_SEED, seed: { _hab_log: habitLog(false) } }), p = C.p;

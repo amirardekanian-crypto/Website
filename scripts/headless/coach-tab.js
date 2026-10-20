@@ -223,7 +223,12 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
     await p.evaluate(() => goTo('plan')); await p.waitForTimeout(400);
     const homeRow = await p.evaluate(`(() => { const f = ${look.toString()}; const r = document.querySelector('#ceiling-row-wrap .hrow');
       const l = r.querySelector('.hrow-l'), a = r.querySelector('.hrow-a'); const lc = getComputedStyle(l), ac = getComputedStyle(a);
-      return { row: f(r), label: [lc.fontFamily.split(',')[0].replace(/["']/g, ''), lc.fontSize, lc.fontWeight, lc.letterSpacing, lc.color, lc.textTransform].join('|'), arrow: [ac.fontSize, ac.color].join('|') }; })()`);
+      // 45b20400 (2026-10-20) made Personal records, Body weight and the habits ONE card of three rows: the card paints the white, the 1 px edge
+      // and the 12 px corners and its rows are bare (#screen-plan .body-card .hrow { background: none; border: 0 }). So the row LOOK is read off
+      // a door that still stands alone on Progress (the first .hrow outside the card, "Why your plan looks like this"), the card is read for the same paint,
+      // and the label and arrow are still read off the Personal records row.
+      const alone = [...document.querySelectorAll('#screen-plan .hrow')].find(e => !e.closest('.body-card') && e.offsetHeight > 0), card = document.querySelector('#screen-plan .body-card'), cc = getComputedStyle(card);
+      return { row: f(alone), alone: alone.className + ' ' + alone.getAttribute('onclick'), card: [cc.backgroundColor, cc.borderTopWidth, cc.borderTopStyle, cc.borderTopColor, cc.borderTopLeftRadius].join('|'), label: [lc.fontFamily.split(',')[0].replace(/["']/g, ''), lc.fontSize, lc.fontWeight, lc.letterSpacing, lc.color, lc.textTransform].join('|'), arrow: [ac.fontSize, ac.color].join('|') }; })()`);
     await goCoach(p);
     const d = await p.evaluate(`(() => { const f = ${look.toString()}; const s = document.getElementById('screen-notes'), r = s.querySelector('.hrow'), l = r.querySelector('.hrow-l'), v = r.querySelector('.hrow-v, .hrow-q'), a = r.querySelector('.hrow-a'), ic = r.querySelector('.hrow-ic svg');
       const lc = getComputedStyle(l), ac = getComputedStyle(a), vc = getComputedStyle(v);
@@ -237,7 +242,8 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
     // "Using the app" over a LOUDER "How the app works" — the same thing twice — because the prose sat in the figure's slot.
     t.check('door row: the label is the sheet\'s own name, "How the app works", over one quiet Barlow line, a grey ›',
       d.label === 'How the app works' && d.line === 'Start here if anything is unclear.' && d.lineCls === 'hrow-q' && d.lineFont === 'Barlow' && d.arrow === '›' && d.arrowF === homeRow.arrow, JSON.stringify([d.label, d.line, d.lineCls, d.arrow, d.arrowF]));
-    t.check('door row: the same look as Home\'s .hrow (white, 1 px edge, 12 px corners, 64 px at least)', d.row === homeRow.row && /^rgb\(255, 255, 255\)\|1px\|solid\|.*\|12px\|64px\|flex$/.test(d.row), JSON.stringify([d.row, homeRow.row]));
+    t.check('door row: the same look as Progress\'s stand-alone .hrow (white, 1 px edge, 12 px corners, 64 px at least)', d.row === homeRow.row && /^rgb\(255, 255, 255\)\|1px\|solid\|.*\|12px\|64px\|flex$/.test(d.row), JSON.stringify([d.row, homeRow.row, homeRow.alone]));
+    t.check('door row: the Your body card paints that same white, 1 px edge and 12 px corners for its three rows (45b20400)', homeRow.card === d.row.split('|').slice(0, 5).join('|'), JSON.stringify([homeRow.card, d.row]));
     // Number First (2026-10-19): the two doors are deliberately NOT set the same. This one carries no figure, so its name is the
     // headline (Barlow 600, 16 px, ink, sentence case); Home's habits row carries one ("3 to go"), so its name is the quiet green label.
     t.check('door row: its name is the headline voice, and Home\'s habits row — which carries a figure — is the quiet green label instead',
