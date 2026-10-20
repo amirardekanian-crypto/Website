@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 67 tables, 267 functions, 9 sequences.
+-- 67 tables, 269 functions, 9 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -170,7 +170,8 @@ create table public.career_awards (
   evidence jsonb default '{}'::jsonb not null,
   how text not null,
   rules_version integer not null,
-  created_at timestamp with time zone default clock_timestamp() not null
+  created_at timestamp with time zone default clock_timestamp() not null,
+  earned_on date
 );
 
 create table public.career_catalogue (
@@ -1817,6 +1818,55 @@ AS $function$
                    '01234567890123456789..')
 $function$;
 
+CREATE OR REPLACE FUNCTION public.career_earned_days(p_athlete text)
+ RETURNS TABLE(award_id text, earned date)
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
+declare
+  v_rules jsonb := public.career_rules_now(); v_S date; v_hr jsonb; v_ctx jsonb; v_commended boolean; v_cycles boolean := false;
+  c record; t record; x jsonb; r jsonb; v_woken jsonb := '[]'::jsonb; v_keys text[] := '{}'::text[]; v_m jsonb;
+begin
+  if p_athlete is null or v_rules is null or not public.career_catalogue_on() then return; end if;
+  v_S := public.career_switch_day(v_rules, 'catalogue');
+  v_hr := public.career_habit_rules();
+  v_ctx := jsonb_build_object(
+    'S', v_S, 'hr', v_hr, 'targets', coalesce(v_hr -> 'targets', '{}'::jsonb),
+    'custom', coalesce((select f.value -> 'custom' from public.career_facts f
+                         where f.athlete_id = p_athlete and f.kind = 'habit_day' and f.void_at is null and jsonb_typeof(f.value -> 'custom') = 'array'
+                         order by f.day desc limit 1), '[]'::jsonb),
+    'weights', v_hr -> 'weights', 'cb', v_hr -> 'completionBonus', 'cx', v_hr -> 'customXp',
+    'version', (select max(rr.version) from public.career_rules rr), 'owned', '{}'::jsonb);
+  v_commended := exists (select 1 from public.career_facts f where f.athlete_id = p_athlete and f.kind = 'commendation' and f.void_at is null);
+  for c in select cc.kind, cc.id, cc.body from public.career_catalogue cc where cc.kind in ('badge', 'achievement')
+            order by (cc.kind = 'badge') desc, cc.id loop
+    if c.body ->> 'meaning' = 'chosen' and not v_commended then continue; end if;
+    if c.body ? 'retire_at' then continue; end if;
+    if c.kind = 'achievement' and public.career_achievement_test(c.body) in ('patterns_in_cycle', 'cycle_proving') then v_cycles := true; end if;
+    v_woken := v_woken || jsonb_build_array(jsonb_build_object('kind', c.kind, 'id', c.id, 'body', c.body));
+    v_keys := v_keys || public.career_entry_keys(c.kind, c.body, v_ctx);
+  end loop;
+  if v_cycles then
+    v_ctx := v_ctx || jsonb_build_object('cycles', coalesce((
+      select jsonb_agg(jsonb_build_object('num', z.cycle_num, 'cstart', z.cstart, 'cend', z.cend) order by z.cycle_index)
+        from (select distinct on (w.cycle_index) w.cycle_index, w.cycle_num, w.cstart, w.cend
+                from public.career_weeks(p_athlete) w order by w.cycle_index) z), '[]'::jsonb));
+  end if;
+  v_m := public.career_measures(p_athlete, v_ctx, v_keys);
+  for x in select e from jsonb_array_elements(v_woken) e loop
+    if x ->> 'kind' = 'badge' then
+      r := public.career_badge_eval(x ->> 'id', x -> 'body', v_m, v_ctx);
+    else
+      r := public.career_achievement_eval(p_athlete, x ->> 'id', x -> 'body', v_m, v_ctx);
+    end if;
+    for t in select e from jsonb_array_elements(coalesce(r -> 'crossed', '[]'::jsonb)) e loop
+      award_id := public.career_award_id(x ->> 'kind', x ->> 'id', (t.e ->> 'tier')::int, coalesce(t.e ->> 'subject', ''));
+      earned := (t.e ->> 'day')::date;
+      return next;
+    end loop;
+  end loop;
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.career_entry_keys(p_kind text, p_body jsonb, p_ctx jsonb)
  RETURNS text[]
  LANGUAGE plpgsql
@@ -1904,17 +1954,16 @@ begin
       when 'best_value' then return array['lift_gain'];
       when 'cycle_proving' then return array['personal_best', 'retest_beaten', 'week_held', 'week_broken'];
       when 'run_regained' then return array['week_held', 'week_broken'];
-      when 'total' then return array[p_body ->> 'reads'];                        -- stage79
-      when 'best_run', 'month_held' then return array['week_held', 'week_broken'];   -- stage79
+      when 'total' then return array[p_body ->> 'reads'];
+      when 'best_run', 'month_held' then return array['week_held', 'week_broken'];
       else return '{}'::text[];
     end case;
   end if;
-  -- a Proof measure
   return case when v_m is null then array['day_on_target']
               when v_m like 'streak:%' or v_m like 'daysHit:%' or v_m like 'total:%' then array['habit_done']
               when v_m = 'daysWith3' then array['habit_done', 'habit_day']
               when v_m in ('perfectDays', 'perfect') then array['perfect_day']
-              when v_m = 'dayStreak' then array['day_on_target']   -- stage94: the run of days that counted
+              when v_m = 'dayStreak' then array['day_on_target']
               when v_m = 'qualify' then array['day_on_target']
               when v_m = 'comebackRun' then array['comeback', 'day_on_target']
               when v_m = 'comebacksStuck' then array['comeback_stuck']
@@ -2149,11 +2198,11 @@ CREATE OR REPLACE FUNCTION public.career_facts_paid(p_athlete text)
  STABLE
  SET search_path TO 'public'
 AS $function$
-  with v as (select r.version, r.starts_on, r.rules as j from public.career_rules r),   -- stage76
+  with v as (select r.version, r.starts_on, r.rules as j from public.career_rules r),
   f as (
     select f.kind, f.ref, f.day, f.value from public.career_facts f
      where f.athlete_id = p_athlete and f.void_at is null
-       and f.kind not in ('habit_done', 'habit_day', 'workout_tick', 'comeback', 'award_kept')   -- stage78, stage90
+       and f.kind not in ('habit_done', 'habit_day', 'workout_tick', 'comeback', 'award_kept')
   ),
   priced as (
     select f.*,
@@ -2162,7 +2211,7 @@ AS $function$
            coalesce(r.j -> 'fact' -> f.kind -> 'career_only' = 'true'::jsonb, false) as conly,
            r.j -> 'fact' -> f.kind ->> 'limit_per' as per,
            coalesce(public.career_num(r.j -> 'fact' -> f.kind -> 'limit'), 0) as lim
-      from f cross join lateral (select v.j from v where v.starts_on is null or v.starts_on <= f.day order by v.version desc limit 1) r   -- stage76
+      from f cross join lateral (select v.j from v where v.starts_on is null or v.starts_on <= f.day order by v.version desc limit 1) r
   ),
   weeks as (select * from public.career_weeks(p_athlete)),
   keyed as (
@@ -2187,11 +2236,11 @@ AS $function$
     from ranked
    where ranked.grp is null or ranked.rn <= ranked.lim
   union all
-  select 'award'::text, a.award_id, a.day, (case when not a.pays then 0 else a.xp end)::numeric, false   -- stage76: the minted XP (D20, D12 reversed)
+  select 'award'::text, a.award_id, a.day, (case when not a.pays then 0 else a.xp end)::numeric,
+         coalesce(a.earned_on < public.season_start_of(a.day), false)
     from public.career_awards a
    where a.athlete_id = p_athlete and public.career_catalogue_on()
   union all
-  -- stage78: an award that left with the cut, paid as it was (its own XP, its own day, never career-only, only with the catalogue on)
   select 'award_kept'::text, k.ref, k.day, coalesce(public.career_num(k.value -> 'xp'), 0), false
     from public.career_facts k
    where k.athlete_id = p_athlete and k.kind = 'award_kept' and k.void_at is null and public.career_catalogue_on()
@@ -2928,21 +2977,21 @@ CREATE OR REPLACE FUNCTION public.career_mint(p_athlete text, p_kind text, p_ite
 AS $function$
 declare
   v_S date := (p_ctx ->> 'S')::date; v_hist boolean; v_pays boolean; v_xp integer; v_how text; v_size text; v_id text; v_n integer;
+  v_earned date := p_day;
 begin
   if p_athlete is null or p_day is null or v_S is null then return false; end if;
-  -- stage76 (D20): a reward a rule change reveals for an earlier day is dated no earlier than that version's start day (forward only)
   if (select r.starts_on from public.career_rules r order by r.version desc limit 1) > p_day then p_day := (select r.starts_on from public.career_rules r order by r.version desc limit 1); end if;
   v_hist := p_day <= v_S;
-  if coalesce(p_body, '{}'::jsonb) ? 'retire_at' and not v_hist then return false; end if;   -- never earned after the switch
+  if coalesce(p_body, '{}'::jsonb) ? 'retire_at' and not v_hist then return false; end if;
   v_id := public.career_award_id(p_kind, p_item, p_tier, coalesce(p_subject, ''));
   v_pays := p_kind <> 'title' and public.career_award_pays(p_athlete, p_body, p_tier_body, p_day, p_ctx);
   v_xp := case when v_pays then greatest(coalesce(public.career_award_xp(p_kind, p_tier, coalesce(p_subject, ''), p_body, p_ctx -> 'hr'), 0), 0) else 0 end;
   v_how := case when v_hist then 'baseline' else p_how end;
   v_size := coalesce(p_tier_body ->> 'size', p_body ->> 'size', 'win');
   if v_size not in ('tick', 'win', 'highlight', 'milestone', 'legend') then v_size := 'win'; end if;
-  insert into public.career_awards (athlete_id, award_id, kind, item, tier, subject, day, pays, xp, size, meaning, evidence, how, rules_version)
+  insert into public.career_awards (athlete_id, award_id, kind, item, tier, subject, day, pays, xp, size, meaning, evidence, how, rules_version, earned_on)
   values (p_athlete, v_id, p_kind, p_item, p_tier, coalesce(p_subject, ''), p_day, v_pays, v_xp, v_size,
-          coalesce(p_body ->> 'meaning', ''), coalesce(p_evidence, '{}'::jsonb), v_how, coalesce((p_ctx ->> 'version')::int, 0))
+          coalesce(p_body ->> 'meaning', ''), coalesce(p_evidence, '{}'::jsonb), v_how, coalesce((p_ctx ->> 'version')::int, 0), least(v_earned, p_day))
   on conflict (athlete_id, award_id) do nothing;
   get diagnostics v_n = row_count;
   if v_n = 0 then return false; end if;
@@ -2950,7 +2999,6 @@ begin
     insert into public.career_recognition (athlete_id, award_id, audience, size) values (p_athlete, v_id, 'athlete', v_size)
     on conflict (athlete_id, award_id, audience) do nothing;
   end if;
-  -- stage78: no title is minted any more (round 5, L5), so no hab_titles row
   return true;
 end $function$;
 
@@ -8653,6 +8701,15 @@ begin
     order by r.starts_on desc;
 end; $function$;
 
+CREATE OR REPLACE FUNCTION public.season_start_of(p_day date)
+ RETURNS date
+ LANGUAGE sql
+ STABLE
+ SET search_path TO 'public'
+AS $function$
+  select s.starts_on from public.seasons s where s.starts_on <= p_day order by s.starts_on desc, s.id desc limit 1
+$function$;
+
 CREATE OR REPLACE FUNCTION public.send_athlete_message(p_athlete_id text, p_body text, p_context text DEFAULT NULL::text, p_key text DEFAULT NULL::text)
  RETURNS void
  LANGUAGE plpgsql
@@ -9881,6 +9938,8 @@ revoke all on function public.career_derive_days(p_athlete text) from public, an
 grant execute on function public.career_derive_days(p_athlete text) to service_role;
 revoke all on function public.career_digits(p text) from public, anon, authenticated, service_role;
 grant execute on function public.career_digits(p text) to service_role;
+revoke all on function public.career_earned_days(p_athlete text) from public, anon, authenticated, service_role;
+grant execute on function public.career_earned_days(p_athlete text) to service_role;
 revoke all on function public.career_entry_keys(p_kind text, p_body jsonb, p_ctx jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.career_entry_keys(p_kind text, p_body jsonb, p_ctx jsonb) to service_role;
 revoke all on function public.career_entry_kinds(p_kind text, p_body jsonb) from public, anon, authenticated, service_role;
@@ -10313,6 +10372,8 @@ revoke all on function public.season_list() from public, anon, authenticated, se
 grant execute on function public.season_list() to anon, authenticated, service_role;
 revoke all on function public.season_record(p_athlete_id text, p_key text) from public, anon, authenticated, service_role;
 grant execute on function public.season_record(p_athlete_id text, p_key text) to anon, authenticated, service_role;
+revoke all on function public.season_start_of(p_day date) from public, anon, authenticated, service_role;
+grant execute on function public.season_start_of(p_day date) to anon, authenticated, service_role, public;
 revoke all on function public.send_athlete_message(p_athlete_id text, p_body text, p_context text, p_key text) from public, anon, authenticated, service_role;
 grant execute on function public.send_athlete_message(p_athlete_id text, p_body text, p_context text, p_key text) to anon, authenticated, service_role;
 revoke all on function public.session_ex_notes(p_log jsonb, p_summary text) from public, anon, authenticated, service_role;

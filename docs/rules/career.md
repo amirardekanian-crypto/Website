@@ -89,6 +89,20 @@ The system and rules GAME-1 to GAME-14: [`../../career/CAREER_MODE.md`](../../ca
   deleted with two taps and any of them removable by Amir. It also carries the key that stops a slow post being written twice. ⚠️ `crew_replies` is a
   new table under an athlete id, so it joined `coach_erase_person()` in the SAME stage (that function refuses to erase anybody while a table it does
   not know still holds rows) and the snapshot in the same commit, and it stays OUT of `BACKUP_TABLES` as `SHORT_LIVED`, like every 7-day crew table.
+- **A season counts what was DONE in it** (stage95, applied 2026-10-20 on Amir's word; `PROCEDURES.md` → *Stage 95*). Amir, looking at
+  the Crew board two days into Season 1 (Elmira A. 3,280, of which 2,910 was achievements and none of it training): *"every achievement
+  from past season is theirs … its xp is once given to them. why did you give the xp to them again this season? … the xp should only be
+  counted from the activity in this season. if they finish an unfinished achievement now, they should get xp."* A rule change that
+  reveals an achievement already earned still pays its XP once, into the CAREER, dated on the seed day (D20), but that award is
+  **career-only in the season, the week and every window**: `career_awards.earned_on` is the day the activity was done, and an award
+  dated inside a season whose `earned_on` is before it carries `career_only` in `career_facts_paid()`. No award was removed and no
+  career XP or level moved (0 down across 40 athletes); 120 awards, 16,000 XP, 26 athletes left the season board. An achievement
+  finished in the season counts in full. A change to how a score is worked out must empty `career_scores.stamp` and recompute
+  (`career_stamp()` does not see a new function).
+- **The Crew screen is live while it is open** (2026-10-20, Amir: *"the crew doesnt update automatically, it needs to be closed from the
+  background and reopened, its not live"*): a 30-second tick asks again, coming back from the background or online asks at once, and
+  the screen is redrawn only when the feed or the board came back different (`crewLive()` in program.html;
+  `PROGRAM-APP.md` → *Crew and the Bell*). It used to ask only on opening the tab, at most every ten minutes.
 - **Every achievement comes up full screen, and can tell the crew** (2026-10-20, Amir: *"like in a computer games when you have
   got an achievement. Something big on screen would come up. It can be shared as well … And at the same time i want a line in
   the crew so everyone else can see"*). An achievement ignores the size half of `full` and keeps only the freshness half
