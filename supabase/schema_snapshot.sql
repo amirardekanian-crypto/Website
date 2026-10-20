@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 66 tables, 262 functions, 9 sequences.
+-- 66 tables, 263 functions, 9 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -5231,6 +5231,42 @@ begin
   return public.crew_me(v_me);
 end $function$;
 
+CREATE OR REPLACE FUNCTION public.crew_board(p_limit integer DEFAULT 25)
+ RETURNS TABLE(pos integer, who text, points bigint, level integer, is_me boolean)
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  v_me text := public.current_athlete_id();
+  v_coach boolean := public.is_coach();
+  v_report boolean := coalesce(auth.jwt() ->> 'role', '') in ('', 'service_role');
+begin
+  if v_me is null and not (v_coach or v_report) then
+    raise exception 'not signed in';
+  end if;
+  return query
+  with mem as (select * from public.crew_members()),
+  sc as (
+    select s.athlete_id as aid, s.score
+      from public.career_scores_for((select array_agg(m.athlete_id) from mem m), interval '2.5 seconds') s
+  ),
+  scored as (
+    select m.athlete_id as aid, m.name,
+           coalesce((sc.score #>> '{season,points}')::bigint, 0) as x,
+           coalesce((sc.score #>> '{career,level}')::int, 1) as lv
+      from mem m left join sc on sc.aid = m.athlete_id
+  ),
+  ranked as (
+    select row_number() over (order by s.x desc, lower(s.name) asc) as rn, s.*
+      from scored s
+  )
+  select r.rn::int, r.name, r.x, r.lv, (r.aid is not distinct from v_me)
+    from ranked r
+   where r.rn <= greatest(1, p_limit) or r.aid is not distinct from v_me
+   order by r.rn;
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.crew_clean(p text)
  RETURNS text
  LANGUAGE sql
@@ -5281,7 +5317,7 @@ CREATE OR REPLACE FUNCTION public.crew_kind_list()
  IMMUTABLE
  SET search_path TO 'public'
 AS $function$
-  select array['level', 'week', 'mark', 'achievement', 'best', 'cycle', 'honour', 'open']::text[]
+  select array['session', 'level', 'week', 'mark', 'achievement', 'best', 'cycle', 'honour', 'open']::text[]
 $function$;
 
 CREATE OR REPLACE FUNCTION public.crew_kinds(p_kinds jsonb)
@@ -6381,6 +6417,7 @@ declare
   v_id text := coalesce(nullif(btrim(coalesce(p_athlete_id, '')), ''), v_me);
   v_from timestamptz := now() - interval '7 days';
   v_items jsonb; v_hon jsonb := null; v_m0 date := (date_trunc('month', current_date) - interval '1 month')::date;
+  v_week jsonb; v_crew jsonb;
 begin
   if v_id is null and not (v_coach or v_report) then
     raise exception 'not signed in';
@@ -6393,7 +6430,6 @@ begin
   with mem as (select * from public.crew_members()),
   on_kind as (select m.athlete_id, k.kind from mem m cross join unnest(public.crew_kind_list()) k(kind)
                where coalesce((m.kinds ->> k.kind)::boolean, true)),
-  -- the week runs: a twin of get_profile()'s loop (only a broken week ends a run)
   wk as (
     select f.athlete_id, f.kind, f.ref, f.day, f.created_at,
            count(*) filter (where f.kind = 'week_broken') over (partition by f.athlete_id order by f.day, f.ref rows unbounded preceding) as grp
@@ -6403,31 +6439,25 @@ begin
     select wk.*, count(*) filter (where wk.kind = 'week_held') over (partition by wk.athlete_id, wk.grp order by wk.day, wk.ref rows unbounded preceding) as run
       from wk),
   parts as (
-    -- a new level (the score cache's trigger)
     select r.athlete_id, r.created_at as at, 'level' as kind, jsonb_build_object('k', 'level', 'n', (r.value ->> 'n')::int) as p
       from public.crew_rings r where r.kind = 'level' and r.created_at >= v_from
     union all
-    -- a Monthly Open result (stage82 writes it)
     select r.athlete_id, r.created_at, 'open', r.value || jsonb_build_object('k', 'open')
       from public.crew_rings r where r.kind = 'open' and r.created_at >= v_from
     union all
-    -- a week held, with the run it makes
     select ru.athlete_id, ru.created_at, 'week', jsonb_build_object('k', 'week', 'run', ru.run)
       from runs ru where ru.kind = 'week_held' and ru.created_at >= v_from and ru.day >= current_date - 14
     union all
-    -- a personal best: the lift, never the weight
     select f.athlete_id, f.created_at, 'best', jsonb_build_object('k', 'best', 'lift', f.value ->> 'lift')
       from public.career_facts f
      where f.athlete_id in (select athlete_id from mem) and f.void_at is null and f.kind = 'personal_best'
        and f.day >= current_date - 14 and f.created_at >= v_from and nullif(btrim(f.value ->> 'lift'), '') is not null
     union all
-    -- a cycle finished
     select f.athlete_id, f.created_at, 'cycle', jsonb_build_object('k', 'cycle', 'n', (f.value ->> 'cycle')::int)
       from public.career_facts f
      where f.athlete_id in (select athlete_id from mem) and f.void_at is null and f.kind = 'cycle_finished'
        and f.day >= current_date - 14 and f.created_at >= v_from
     union all
-    -- the four numbers' marks and every achievement, minted live (a quiet back-pay never rings)
     select a.athlete_id, a.created_at,
            case when a.kind = 'badge' then 'mark' else 'achievement' end,
            case when a.kind = 'badge'
@@ -6442,12 +6472,10 @@ begin
      where a.athlete_id in (select athlete_id from mem) and a.how = 'live' and a.created_at >= v_from
        and (a.kind = 'achievement' or (a.kind = 'badge' and a.item in ('held_weeks', 'century', 'bests', 'comebacks')))
     union all
-    -- the month's honours, once frozen (never "one week short")
     select h.athlete_id, h.created_at, 'honour', jsonb_build_object('k', 'honour', 'honour', h.honour, 'month', h.month)
       from public.career_honours h
      where h.athlete_id in (select athlete_id from mem) and h.honour <> 'near' and h.created_at >= v_from
     union all
-    -- joining the crew: the first yes
     select m.athlete_id, m.first_yes_at, 'joined', jsonb_build_object('k', 'joined')
       from mem m where m.first_yes_at >= v_from
   ),
@@ -6459,8 +6487,6 @@ begin
   kept as (
     select k.*, bool_or(k.kind = 'mark' and k.p ->> 'item' = 'held_weeks') over (partition by k.athlete_id, k.d) as hw_mark
       from kept0 k),
-  -- one line per athlete per day, each kind once: the newest level; the marks, achievements, honours and the Open as they came; the bests as one
-  -- part naming the lifts; the longest run of held weeks (none when its own Hold Serve mark rang the same day); the latest cycle
   lines as (
     select k.athlete_id, k.d, max(k.at) as at,
            max((k.p ->> 'n')::int) filter (where k.kind = 'level') as lvl,
@@ -6481,6 +6507,26 @@ begin
                       || case when l.cyc is not null then jsonb_build_array(jsonb_build_object('k', 'cycle', 'n', l.cyc)) else '[]'::jsonb end,
              'kudos', public.crew_kudos_of(null, l.athlete_id, l.d, v_id)) as j
       from lines l join mem m on m.athlete_id = l.athlete_id),
+  -- the week's attendance, ONE item a day for the whole crew, never one line each. Grouped on the session's own `day`, from
+  -- the day the athlete joined, so the 17 October back-pay cannot announce 39 sessions in an afternoon.
+  sess as (
+    select f.day as d, m.athlete_id, m.name, count(*) as n
+      from public.career_facts f
+      join mem m on m.athlete_id = f.athlete_id
+     where f.void_at is null
+       and f.kind in ('session_finished', 'session_finished_early', 'library_session')
+       and f.day >= (current_date - 7) and f.day <= current_date
+       and f.day >= coalesce((m.yes_since at time zone 'UTC')::date, f.day)
+       and exists (select 1 from on_kind o where o.athlete_id = m.athlete_id and o.kind = 'session')
+     group by f.day, m.athlete_id, m.name),
+  sess_items as (
+    select least(now(), ((s.d + 1)::timestamptz)) as at,
+           jsonb_build_object(
+             't', 'sess', 'key', 'sess:' || s.d::text, 'day', s.d,
+             'n', sum(s.n),
+             'names', coalesce(jsonb_agg(s.name order by lower(s.name)) filter (where s.athlete_id is distinct from v_id), '[]'::jsonb),
+             'me', bool_or(s.athlete_id is not distinct from v_id)) as j
+      from sess s group by s.d),
   post_items as (
     select p.created_at as at, (p.athlete_id = public.coach_note_id() and p.created_at >= now() - interval '24 hours') as pinned,
            jsonb_build_object(
@@ -6495,13 +6541,36 @@ begin
       left join mem m on m.athlete_id = p.athlete_id
       left join public.crew_photos ph on ph.post_id = p.id
      where p.created_at >= v_from and (p.athlete_id = public.coach_note_id() or m.athlete_id is not null)
-     -- pinned first, THEN newest: the limit can never drop Amir's pinned post out of a very busy day
      order by (p.athlete_id = public.coach_note_id() and p.created_at >= now() - interval '24 hours') desc, p.created_at desc
      limit 80)
   select coalesce(jsonb_agg(x.j order by x.pinned desc, x.at desc), '[]'::jsonb) into v_items
-    from (select at, pinned, j from post_items union all select at, false, j from line_items) x;
+    from (select at, pinned, j from post_items
+          union all select at, false, j from line_items
+          union all select at, false, j from sess_items) x;
 
-  -- last month's honours, from the 1st to the 14th, crew members only (and only those who keep the honour switch on)
+  -- the band's three numbers: the same 7 days as the Bell, the same switches, and nobody named.
+  with mem as (select * from public.crew_members())
+  select jsonb_build_object(
+           'members', (select count(*) from mem),
+           'sessions', (select count(*) from public.career_facts f join mem m on m.athlete_id = f.athlete_id
+                         where f.void_at is null and f.kind in ('session_finished', 'session_finished_early', 'library_session')
+                           and f.day >= (current_date - 7) and f.day <= current_date
+                           and f.day >= coalesce((m.yes_since at time zone 'UTC')::date, f.day)
+                           and coalesce((m.kinds ->> 'session')::boolean, true)),
+           'held', (select count(*) from public.career_facts f join mem m on m.athlete_id = f.athlete_id
+                     where f.void_at is null and f.kind = 'week_held'
+                       and f.day >= (current_date - 7) and f.day <= current_date
+                       and f.day >= coalesce((m.yes_since at time zone 'UTC')::date, f.day)
+                       and coalesce((m.kinds ->> 'week')::boolean, true)))
+    into v_week;
+
+  -- who is in the room: names only. The level sits on the board, which the app keeps on the phone.
+  with mem as (select * from public.crew_members())
+  select coalesce(jsonb_agg(jsonb_build_object('who', m.name, 'me', m.athlete_id is not distinct from v_id,
+                                               'since', (m.first_yes_at at time zone 'UTC')::date)
+                            order by lower(m.name)), '[]'::jsonb)
+    into v_crew from mem m;
+
   if extract(day from current_date) <= 14 and exists (select 1 from public.career_honour_months hm where hm.month = v_m0) then
     select jsonb_build_object('month', v_m0, 'rows', coalesce(jsonb_agg(jsonb_build_object('honour', h.honour, 'who', m.name, 'me', h.athlete_id is not distinct from v_id,
                                                                                          'value', h.value - 'slot') order by h.honour, m.name), '[]'::jsonb))
@@ -6511,7 +6580,8 @@ begin
   end if;
 
   return jsonb_build_object('athlete_id', v_id, 'me', public.crew_me(v_id), 'items', v_items, 'honours', v_hon, 'kinds', to_jsonb(public.crew_kind_list()),
-                            'days', 7, 'emoji', to_jsonb(public.crew_emoji_list()), 'open', public.crew_open_now(v_id), 'at', now());
+                            'days', 7, 'emoji', to_jsonb(public.crew_emoji_list()), 'open', public.crew_open_now(v_id),
+                            'week', v_week, 'crew', v_crew, 'at', now());
 end $function$;
 
 CREATE OR REPLACE FUNCTION public.get_bell_if_new(p_athlete_id text DEFAULT NULL::text, p_etag text DEFAULT NULL::text)
@@ -9902,6 +9972,8 @@ revoke all on function public.contact_list() from public, anon, authenticated, s
 grant execute on function public.contact_list() to authenticated, service_role;
 revoke all on function public.crew_answer(p_answer text, p_name text) from public, anon, authenticated, service_role;
 grant execute on function public.crew_answer(p_answer text, p_name text) to authenticated, service_role;
+revoke all on function public.crew_board(p_limit integer) from public, anon, authenticated, service_role;
+grant execute on function public.crew_board(p_limit integer) to authenticated, service_role;
 revoke all on function public.crew_clean(p text) from public, anon, authenticated, service_role;
 grant execute on function public.crew_clean(p text) to service_role;
 revoke all on function public.crew_default_name(p_athlete text) from public, anon, authenticated, service_role;

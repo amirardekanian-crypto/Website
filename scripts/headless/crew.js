@@ -62,9 +62,20 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     const { ctx, p } = await open(browser, { bell: null, stub: { bellMissing: true }, seed: { _crewcache: bell({ answer: 'yes', can_post: true }) } });
     await p.waitForTimeout(3200);
     C.check('with a copy, a boot asks nothing and the tab stands', (await tabs(p)).includes('crew') && !(await calls(p, 'get_bell')).length && !(await calls(p, 'get_bell_if_new')).length);
+    // TWO bad answers, not one, and the copy is never deleted (2026-10-20, the audit *The Empty Room*). PostgREST answers
+    // "could not find the function" for a few seconds after any stage is applied, and one of those used to take the tab away,
+    // delete the feed and throw the athlete back to Home mid-read.
     await p.evaluate(() => goTo('crew')); await p.waitForTimeout(900);
-    const left = await p.evaluate(id => localStorage.getItem(id + '_crewcache'), H.ID);
-    C.check('…opening Crew finds get_bell gone: no Crew tab, the copy deleted', (await tabs(p)) === 'home,plan,workouts,notes' && left === null, (await tabs(p)) + ' ' + String(left).slice(0, 40));
+    const left1 = await p.evaluate(id => localStorage.getItem(id + '_crewcache'), H.ID);
+    C.check('…one bad answer changes nothing: the tab stands and the copy is kept',
+      (await tabs(p)).includes('crew') && left1 !== null, (await tabs(p)) + ' ' + String(left1).slice(0, 30));
+    C.check('…and nobody is moved off the screen they were reading', await p.evaluate(() => !!document.querySelector('#screen-crew.active')));
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(900);
+    const left2 = await p.evaluate(id => localStorage.getItem(id + '_crewcache'), H.ID);
+    C.check('…a second one hides the tab, still without deleting the copy or moving them',
+      left2 !== null && await p.evaluate(() => !!document.querySelector('#screen-crew.active')), String(left2).slice(0, 30));
+    await p.evaluate(() => goTo('home')); await p.waitForTimeout(400);
+    C.check('…and once they leave, the tab is gone', (await tabs(p)) === 'home,plan,workouts,notes', await tabs(p));
     await ctx.close();
   }
   // 2b. a phone that has never had an answer asks once at boot, so a new athlete gets the tab without opening anything
@@ -107,7 +118,8 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…the Bell line in words: level, the lift (never a weight), the run', s.line === 'Mina S. reached level 14 · set a new best on Barbell Back Squat · held a week, 5 in a row', s.line);
     C.check('…no weight, no kg anywhere on Crew', !/\bkg\b|\d+\s*kg/i.test(s.text));
     C.check('…last month\'s honours: names and what they did', /Most sessions Reza K\. 14 plan sessions/.test(s.hon) && /Most improved Leila M\. Back Squat \+27\.1%/.test(s.hon), s.hon);
-    C.check('…the season board: plain numbers, your row as You', s.board === '1Reza K.LV 226,240|2YouLV 195,910', s.board);
+    // ONE ladder (2026-10-20): the LV chip is gone, because the level is lifetime and the number that sorts is this season's.
+    C.check('…the board: plain numbers, your row as You, and no LV beside them', s.board === '1Reza K.6,240|2You5,910', s.board);
     C.check('…likes with names: "Mina S., Sara T. and 1 other"', /Mina S\., Sara T\. and 1 other/.test(s.text));
     C.check('…the button says Like, never Kudos', /\bLike\b/.test(s.text) && !/kudos/i.test(s.text), s.text.slice(0, 80));
     // Before joining the button is NOT dead: it offers to join (Amir, 2026-10-19)
@@ -168,7 +180,8 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await p.evaluate(() => closeHistorySheet());
     // the switches and the no
     await p.evaluate(() => openCrewSettings()); await p.waitForTimeout(300);
-    C.check('the settings: Yes pressed and a switch per kind (8)', await p.evaluate(() => document.querySelector('#hist-overlay .acct-seg [data-ans="yes"]').getAttribute('aria-pressed') === 'true' && document.querySelectorAll('#hist-overlay .cr-sw input').length === 8));
+    // nine since stage91: a finished session is a kind, with its own switch, on by default (Amir, 2026-10-20)
+    C.check('the settings: Yes pressed and a switch per kind (9)', await p.evaluate(() => document.querySelector('#hist-overlay .acct-seg [data-ans="yes"]').getAttribute('aria-pressed') === 'true' && document.querySelectorAll('#hist-overlay .cr-sw input').length === 9));
     await p.evaluate(() => { const i = document.querySelector('#hist-overlay .cr-sw input[data-kind="best"]'); i.checked = false; i.dispatchEvent(new Event('change')); }); await p.waitForTimeout(400);
     C.check('…a switch off: crew_kinds({ best: false })', (await calls(p, 'crew_kinds')).some(x => x.p_kinds && x.p_kinds.best === false));
     await p.evaluate(() => document.querySelector('#hist-overlay .acct-seg [data-ans="no"]').click()); await p.waitForTimeout(600);
@@ -247,6 +260,18 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
       return !r.querySelector('[aria-pressed="true"]');
     }) && (await calls(p, 'crew_kudos')).some(x => x.p_on === false));
+    // A moment line keeps the Like ALONE, with the four behind a ＋ (2026-10-20): five chips under a one-line moment made the
+    // row of buttons taller than the news. A post still carries all five out, Amir's pick of 2026-10-19.
+    C.check('a moment line: the Like and a ＋, not five chips', await p.evaluate(() => {
+      const r = document.querySelector('#crew-body .cr-line .cr-react');
+      return !!r && r.querySelectorAll('.cr-em').length === 1 && !!r.querySelector('.cr-plus');
+    }));
+    await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react .cr-plus').click());
+    await p.waitForTimeout(300);
+    C.check('…＋ unfolds the four in place', await p.evaluate(() => {
+      const r = document.querySelector('#crew-body .cr-line .cr-react');
+      return !!r && r.querySelectorAll('.cr-em').length === 4 && !r.querySelector('.cr-plus');
+    }));
     await p.evaluate(() => document.querySelector('#crew-body .cr-line .cr-react .cr-em').click());
     await p.waitForTimeout(400);
     C.check('a Bell line takes one too, under its words', await p.evaluate(() => !!document.querySelector('#crew-body .cr-line .cr-react .cr-em[aria-pressed="true"]')));
@@ -267,8 +292,16 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await waitTab(p);
     await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
     C.check('not joined: the emoji are tappable and all offer to join', await p.evaluate(() =>
-      [...document.querySelectorAll('#crew-body .cr-em')].every(b => !b.disabled && /crewLikeAsk/.test(b.getAttribute('onclick') || ''))));
-    await p.evaluate(() => document.querySelector('#crew-body .cr-em').click());
+      [...document.querySelectorAll('#crew-body .cr-post .cr-em')].every(b => !b.disabled && /crewLikeAsk/.test(b.getAttribute('onclick') || ''))));
+    // a moment line's ＋ unfolds rather than asking: what it shows then is four chips that each offer to join
+    C.check('…and a moment line\'s ＋ unfolds to four that offer to join', await p.evaluate(() => {
+      const plus = document.querySelector('#crew-body .cr-line .cr-react .cr-plus');
+      if (!plus) return false;
+      plus.click();
+      const r = document.querySelector('#crew-body .cr-line .cr-react');
+      return [...r.querySelectorAll('.cr-em')].length === 4 && [...r.querySelectorAll('.cr-em')].every(b => /crewLikeAsk/.test(b.getAttribute('onclick') || ''));
+    }));
+    await p.evaluate(() => document.querySelector('#crew-body .cr-post .cr-em').click());
     await p.waitForTimeout(300);
     C.check('…tapping one says to join first', await p.evaluate(() => !document.getElementById('aaToast').hidden) && !(await calls(p, 'crew_kudos')).length);
     await ctx.close();
@@ -501,6 +534,125 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('the install ask asks only when the app is on the Home Screen', /_isStandalone\(\)/.test(fn), fn.slice(0, 120));
     C.check('…and only once per phone', /pushAsked\('install'\)/.test(fn));
     C.check('…and it is wired into boot', /pushAskOnInstall\(\);/.test(src.slice(src.indexOf('initCrewDeepLink();'))));
+  }
+
+  // ── 16. THE WEEK FIRST (stage91, 2026-10-20: the audit *The Empty Room*, direction B) ──────────────────────────────────
+  // The band at the top, the day's attendance folded to one line, day headings down the feed, the board behind a door, and
+  // the room itself on a page. The fixture is its own, so every check above stands on exactly the ground it did before.
+  {
+    const today = iso(now).slice(0, 10), yday = iso(now - 86400e3).slice(0, 10);
+    const b = bell({ answer: 'yes', can_post: true });
+    b.week = { members: 6, sessions: 14, held: 3 };
+    b.crew = [{ who: 'Alex R.', me: true, since: '2026-10-19' }, { who: 'Mina S.', me: false, since: '2026-10-19' },
+      { who: 'Reza K.', me: false, since: '2026-10-19' }];
+    b.items = b.items.concat([
+      { t: 'sess', key: 'sess:' + today, day: today, n: 3, me: true, names: ['Mina S.', 'Reza K.'] },
+      { t: 'sess', key: 'sess:' + yday, day: yday, n: 1, me: false, names: ['Mina S.'] },
+    ]);
+    const { ctx, p } = await open(browser, { bell: b });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(600);
+    const s = await p.evaluate(() => ({
+      band: (document.querySelector('#crew-body .cr-week') || {}).textContent || '',
+      faces: [...document.querySelectorAll('#crew-body .cr-faces .cr-face')].map(f => f.textContent).join('|'),
+      days: [...document.querySelectorAll('#crew-body .cr-day')].map(d => d.textContent).join('|'),
+      sess: [...document.querySelectorAll('#crew-body .cr-sess .cr-lw')].map(l => l.textContent.replace(/\s+/g, ' ').trim()),
+      sessReact: !!document.querySelector('#crew-body .cr-sess .cr-react'),
+      secs: [...document.querySelectorAll('#crew-body .prog-sec')].map(x => x.textContent),
+      bandTop: (document.querySelector('#crew-body .cr-week') || {}).offsetTop,
+      bellTop: (document.querySelector('#crew-body .cr-comp') || {}).offsetTop,
+    }));
+    C.check('the band: the week\'s sessions, the weeks held and how many are in the crew', /Last 7 days · 6 in the crew/.test(s.band) && /14 sessions/.test(s.band) && /3 weeks held/.test(s.band), s.band.replace(/\s+/g, ' '));
+    C.check('…it is the FIRST thing on the screen, above the Bell', s.bandTop >= 0 && s.bandTop < s.bellTop, s.bandTop + ' < ' + s.bellTop);
+    C.check('…with the crew\'s initials under it, the athlete\'s own marked', s.faces === 'AR|MS|RK' && await p.evaluate(() => !!document.querySelector('#crew-body .cr-faces .cr-face.me')), s.faces);
+    C.check('the day\'s attendance: ONE line a day, the athlete first as You', s.sess[0] === 'You, Mina S. and Reza K. trained today3 sessions', JSON.stringify(s.sess));
+    C.check('…yesterday\'s says yesterday, and names only those who trained', s.sess[1] === 'Mina S. trained yesterday1 session', JSON.stringify(s.sess));
+    C.check('…and it carries no Like: there is nothing here anyone earned', !s.sessReact);
+    C.check('the feed runs under day headings', /Today/.test(s.days) && /Yesterday/.test(s.days), s.days);
+    C.check('the board is titled This season, not Season board', s.secs.join(' ').includes('This season') && !s.secs.join(' ').includes('Season board'), s.secs.join(' | '));
+    C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+    // 320 px, where the band's numbers and the faces have the least room
+    await p.setViewportSize({ width: 320, height: 720 }); await p.waitForTimeout(300);
+    C.check('320 px: nothing on the band runs off the side', await p.evaluate(() => {
+      const e = document.querySelector('#crew-body .cr-week');
+      return !!e && e.getBoundingClientRect().right <= 320 && document.documentElement.scrollWidth <= 320;
+    }));
+    await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(200);
+    // the room, on its own page
+    await p.evaluate(() => document.querySelector('#crew-body .cr-faces').click());
+    await p.waitForTimeout(400);
+    const w = await p.evaluate(() => ({
+      on: !!document.querySelector('#screen-crewwho.active'),
+      title: (document.querySelector('#screen-crewwho .ceil-title') || {}).textContent,
+      rows: [...document.querySelectorAll('#crewwho-body .cr-br')].map(r => r.textContent.replace(/\s+/g, ' ').trim()),
+      back: !!document.querySelector('#screen-crewwho .nav-back'),
+    }));
+    C.check('the faces open In the crew: every member, the athlete as You', w.on && w.title === 'In the crew' && w.rows.length === 3 && /^ARYou/.test(w.rows[0]), JSON.stringify(w.rows));
+    C.check('…with the level beside a name, from the board already on this phone', /LV 19/.test(w.rows.join(' ')), w.rows.join(' | '));
+    C.check('…and a ← back to Crew', w.back && await p.evaluate(() => { document.querySelector('#screen-crewwho .nav-back').click(); return true; }));
+    await p.waitForTimeout(300);
+    C.check('…which lands back on Crew', await p.evaluate(() => !!document.querySelector('#screen-crew.active')));
+    await ctx.close();
+  }
+  // the board behind a door, and the board kept on the phone so it works with no signal
+  {
+    const b = bell({ answer: 'yes', can_post: true });
+    b.week = { members: 6, sessions: 14, held: 3 };
+    const long = [];
+    for (let i = 1; i <= 8; i++) long.push({ pos: i, who: 'Athlete ' + i, points: 900 - i * 10, level: 5, is_me: i === 7 });
+    const { ctx, p } = await open(browser, { bell: b, stub: { crewBoard: long } });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(700);
+    const s = await p.evaluate(ID => ({
+      rows: [...document.querySelectorAll('#crew-body .cr-br')].length,
+      me: !!document.querySelector('#crew-body .cr-br.me'),
+      door: [...document.querySelectorAll('#crew-body .cr-me-row')].map(x => x.textContent.replace(/›/, '').trim()),
+      asked: (window.__STUB.params || []).filter(x => x[0] === 'crew_board').length,
+      kept: localStorage.getItem(ID + '_crewboard'),
+    }), H.ID);
+    C.check('the board on the tab: five rows, the athlete\'s own carried in beneath them', s.rows === 6 && s.me, s.rows + ' rows');
+    C.check('…and the rest behind a door', s.door.includes('The whole board'), s.door.join(' | '));
+    C.check('…it asks crew_board, the crew only, never leaderboard_top', s.asked === 1 && !(await calls(p, 'leaderboard_top')).length);
+    C.check('…and keeps it on the phone, so the bottom of Crew needs no signal', !!s.kept && /Athlete 1/.test(s.kept));
+    await p.evaluate(() => goTo('crewboard')); await p.waitForTimeout(400);
+    const bd = await p.evaluate(() => ({
+      title: (document.querySelector('#screen-crewboard .ceil-title') || {}).textContent,
+      rows: [...document.querySelectorAll('#crewboard-body .cr-br')].length,
+      lv: /LV/.test((document.getElementById('crewboard-body') || {}).textContent || ''),
+    }));
+    C.check('the whole board is a page titled This season, with every row and no LV chip', bd.title === 'This season' && bd.rows === 8 && !bd.lv, JSON.stringify(bd));
+    C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+  // a server without stage91: no band, no attendance, and the board falls back to leaderboard_top
+  {
+    const { ctx, p } = await open(browser, { me: { answer: 'yes', can_post: true }, stub: { noCrewBoard: true } });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(700);
+    C.check('without stage91: no band and no attendance line, and the feed is as it was', await p.evaluate(() =>
+      !document.querySelector('#crew-body .cr-week') && !document.querySelector('#crew-body .cr-sess') && !!document.querySelector('#crew-body .cr-post')));
+    C.check('…and the board falls back to leaderboard_top', (await calls(p, 'leaderboard_top')).length === 1
+      && await p.evaluate(() => !!document.querySelector('#crew-body .cr-br')));
+    C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+  // what was typed and not sent comes back (2026-10-20)
+  {
+    const { ctx, p } = await open(browser, { me: { answer: 'yes', can_post: true } });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
+    await p.evaluate(() => openCrewPost()); await p.waitForTimeout(300);
+    await p.evaluate(() => { const t = document.querySelector('#hist-overlay .cr-txt'); t.value = 'Legs are gone'; t.dispatchEvent(new Event('input')); });
+    await p.waitForTimeout(200);
+    await p.evaluate(() => closeHistorySheet()); await p.waitForTimeout(300);
+    await p.evaluate(() => openCrewPost()); await p.waitForTimeout(300);
+    C.check('the composer gives back what was typed and not sent', await p.evaluate(() => document.querySelector('#hist-overlay .cr-txt').value === 'Legs are gone'));
+    await p.evaluate(() => document.querySelector('#hist-overlay .cr-go').click());
+    await p.waitForTimeout(600);
+    await p.evaluate(() => openCrewPost()); await p.waitForTimeout(300);
+    C.check('…and forgets it once it has gone to the crew', await p.evaluate(() => document.querySelector('#hist-overlay .cr-txt').value === ''));
+    C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
   }
 
   await browser.close();

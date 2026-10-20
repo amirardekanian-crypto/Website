@@ -69,7 +69,8 @@ files: a procedure never hard-codes a number (GAME-10).
 | 28 | [Stage 83: the Bell's feed only when it has changed (2026-10-19)](../docs/ref/career-procedures/28-stage-83-the-bells-feed-only-when-it-has-changed.md) | 2 KB |
 | 29 | [Stage 85: the Monthly Open, as built (2026-10-19)](../docs/ref/career-procedures/29-stage-85-the-monthly-open-as-built.md) | 6 KB |
 | 30 | [Stage 86: the crew on a phone, as built (2026-10-20)](../docs/ref/career-procedures/30-stage-86-the-crew-on-a-phone.md) | 13 KB |
+| 31 | [Stage 91: the week first on Crew, as built (2026-10-20)](../docs/ref/career-procedures/31-stage-91-the-week-first-on-crew.md) | 6 KB |
 
 ---
 
-*30 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*
+*31 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*

@@ -2497,12 +2497,12 @@
 
   /* 1. The cover (a compact one: no picture, it is the screen's one green thing). ← is the day cover's 44 px glass button. The
      eyebrow, the title and the scoreboard are the archive's and the day's; a long lift name wraps whole, never clipped. */
-  #screen-ceiling .ceil-head, #screen-weight .ceil-head, #screen-habits .ceil-head, #screen-moments .ceil-head, #screen-achievements .ceil-head { position: relative; padding: 74px var(--g) 22px; background: var(--hero); color: #fff; }
-  #screen-ceiling .nav-back, #screen-weight .nav-back, #screen-habits .nav-back, #screen-moments .nav-back, #screen-achievements .nav-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  #screen-ceiling .ceil-head, #screen-weight .ceil-head, #screen-habits .ceil-head, #screen-moments .ceil-head, #screen-achievements .ceil-head, #screen-crewboard .ceil-head, #screen-crewwho .ceil-head { position: relative; padding: 74px var(--g) 22px; background: var(--hero); color: #fff; }
+  #screen-ceiling .nav-back, #screen-weight .nav-back, #screen-habits .nav-back, #screen-moments .nav-back, #screen-achievements .nav-back, #screen-crewboard .nav-back, #screen-crewwho .nav-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
     border: 0; border-radius: 50%; cursor: pointer; color: #fff; background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     font: 500 var(--fs-title)/1 'Barlow', sans-serif; -webkit-tap-highlight-color: transparent; }
-  #screen-ceiling .nav-back:active, #screen-weight .nav-back:active, #screen-habits .nav-back:active, #screen-moments .nav-back:active, #screen-achievements .nav-back:active { transform: scale(0.92); }
-  #screen-ceiling .nav-back:focus-visible, #screen-weight .nav-back:focus-visible, #screen-habits .nav-back:focus-visible, #screen-moments .nav-back:focus-visible, #screen-achievements .nav-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  #screen-ceiling .nav-back:active, #screen-weight .nav-back:active, #screen-habits .nav-back:active, #screen-moments .nav-back:active, #screen-achievements .nav-back:active, #screen-crewboard .nav-back:active, #screen-crewwho .nav-back:active { transform: scale(0.92); }
+  #screen-ceiling .nav-back:focus-visible, #screen-weight .nav-back:focus-visible, #screen-habits .nav-back:focus-visible, #screen-moments .nav-back:focus-visible, #screen-achievements .nav-back:focus-visible, #screen-crewboard .nav-back:focus-visible, #screen-crewwho .nav-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .ceil-kick { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
   .ceil-kick::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
   .ceil-title { margin: 10px 0 0; max-width: 330px;
@@ -2520,9 +2520,9 @@
   #ceil-body, #wt-body { padding: 0 0 110px; }
   .ceil-intro { margin: 22px var(--g) 0; font: 400 var(--fs-lead)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
   .ceil-note { margin: 20px var(--g) 0; font: 400 var(--fs-small)/1.55 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
-  :where(#screen-ceiling, #screen-weight, #screen-habits, #screen-moments, #screen-achievements) .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 8px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
+  :where(#screen-ceiling, #screen-weight, #screen-habits, #screen-moments, #screen-achievements, #screen-crewboard, #screen-crewwho) .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 8px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
     letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
-  :where(#screen-ceiling, #screen-weight, #screen-habits, #screen-moments, #screen-achievements) .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }   /* to the right edge, as Progress's section titles */
+  :where(#screen-ceiling, #screen-weight, #screen-habits, #screen-moments, #screen-achievements, #screen-crewboard, #screen-crewwho) .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }   /* to the right edge, as Progress's section titles */
 
   /* 3. Door rows (Home's and Progress's .hrow recipe): + Log a max, and Add your weight when there is no body weight yet. */
   :where(#screen-ceiling) .hrow { display: flex; align-items: center; gap: 14px; width: calc(100% - 2 * var(--g)); min-height: 64px; margin: 22px var(--g) 0;
@@ -5373,6 +5373,28 @@
   #screen-crew .cr-hon b { display: block; margin-top: 4px; font: 900 var(--fs-lead)/1.05 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--ink);
     overflow-wrap: anywhere; }
   #screen-crew .cr-hon small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  /* ── THE WEEK FIRST (2026-10-20, direction B of the audit *The Empty Room*; Amir picked it) ───────────────────────────────
+     A green band at the top of Crew holding what the crew did over the same 7 days the Bell covers. It is the one block on
+     this screen that is never empty, because somebody always trained: before it, the first thing under the title on a quiet
+     week was a sentence apologising for the silence. The strip of initials under the numbers is the door to who is in the
+     crew — an athlete had no way to see the room at all, and joining a room you cannot see is not joining anything. */
+  #screen-crew .cr-week { margin: 0 var(--g) 14px; padding: 14px 16px 12px; border-radius: 14px; background: var(--hero); color: #fff; }
+  #screen-crew .cr-week .k { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px;
+    text-transform: uppercase; color: var(--mint); }
+  #screen-crew .cr-week .k::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  #screen-crew .cr-week b { display: block; margin-top: 7px; font: 900 var(--fs-head)/1.05 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; text-transform: uppercase; color: #fff; }
+  #screen-crew .cr-week .q { display: block; margin-top: 3px; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: rgba(255,255,255,.74); text-wrap: pretty; }
+  /* the faces: a door, so it is a real 44 px target even though the circles are 26 px */
+  #screen-crew .cr-faces { display: flex; align-items: center; width: 100%; min-height: 44px; margin-top: 10px; padding: 0; border: 0; background: none; cursor: pointer; }
+  #screen-crew .cr-faces .cr-face { flex: none; display: grid; place-items: center; width: 26px; height: 26px; margin-right: -6px; border: 1.5px solid #0E4A36; border-radius: 50%;
+    background: rgba(255,255,255,.18); color: #fff; font: 700 var(--fs-label)/1 'Barlow', sans-serif; }
+  #screen-crew .cr-faces .cr-face.me { background: var(--mint); color: #0E4A36; }
+  #screen-crew .cr-faces .go { margin-left: auto; padding-left: 10px; font: 600 var(--fs-small)/1 'Barlow', sans-serif; color: rgba(255,255,255,.74); }
+  #screen-crew .cr-faces:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 8px; }
+  /* a day heading inside the feed: Today, Yesterday, then the day's own name. Quieter than a section title (.prog-sec), which
+     names a subject; this only says when. */
+  #screen-crew .cr-day { margin: 16px var(--g) 8px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  #screen-crew .cr-day:first-child { margin-top: 2px; }
   /* The Monthly Open (stage85; Amir's pick A on the Crew and Open page): one card under the honours, above the Bell. The challenge in his words,
      the board ranked by the result, your own row marked, and one door to WhatsApp: he confirms every result from the clip, so the app never takes
      one. Green and grey, like the rest of Crew; the clay is only on the door, the one thing that asks for something (DS-01). */
@@ -5430,15 +5452,19 @@
   .cr-ph.is-in .cr-ph-wait { display: none; }
   .cr-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 10px; }
   .cr-foot small { flex: 1; min-width: 0; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
-  .cr-kd { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 999px;
+  /* 44 px, not 36 (2026-10-20): these were the smallest buttons in the app, on a screen where everything else is 48 or 52. */
+  .cr-kd { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1px solid var(--hair); border-radius: 999px;
     background: var(--row); color: var(--green-ink); font: 700 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
   .cr-kd[aria-pressed="true"] { border-color: var(--fill); background: var(--fill); color: #fff; }
   .cr-kd:disabled, .cr-em:disabled { cursor: default; opacity: .9; }
   .cr-kd b, .cr-em b { font-weight: 700; font-variant-numeric: tabular-nums; }
   /* the four emoji beside the Like (stage82; all five out, Amir 2026-10-19). Drawn only while the server offers the list. */
   .cr-react { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
-  .cr-em { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 44px; min-height: 36px; padding: 0 9px;
+  .cr-em { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 44px; min-height: 44px; padding: 0 9px;
     border: 1px solid var(--hair); border-radius: 999px; background: var(--row); color: var(--ink); cursor: pointer; font: 400 var(--fs-body)/1 'Barlow', sans-serif; }
+  /* ＋ on a moment line: the Like stands alone and the four emoji open on a tap (2026-10-20). Five chips under a one-line
+     moment made the row of buttons taller than the news it was about. A post keeps all five out, Amir's pick of 2026-10-19. */
+  .cr-em.cr-plus { color: var(--green-ink); font-weight: 700; }
   .cr-em i { font-style: normal; font-size: var(--fs-lead); line-height: 1; }
   .cr-em[aria-pressed="true"] { border-color: var(--fill); background: var(--tint); }
   .cr-em b { font-size: var(--fs-small); color: var(--ink); }
@@ -5448,6 +5474,10 @@
   .cr-del.armed { color: var(--clay-ink); }
   /* a moment: one slim green line, the bell, what happened, the Like */
   #screen-crew .cr-line { display: flex; align-items: center; gap: 10px; margin: 0 var(--g) 10px; padding: 10px 10px 10px 12px; border-radius: 12px; background: var(--tint); }
+  /* the day's attendance (2026-10-20): the same slim line, on the paper instead of the green, because it is the week's roll
+     call and not a moment anyone earned. No reactions on it: there is nothing here to congratulate. */
+  #screen-crew .cr-line.cr-sess { background: var(--row); border: 1px solid var(--hair); }
+  #screen-crew .cr-line.cr-sess .cr-lw { font-weight: 400; }
   .cr-bell-ic { flex: none; color: var(--green-ink); }
   .cr-lw { flex: 1; min-width: 0; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
   #screen-crew .cr-names { display: block; margin-top: -2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
@@ -5457,17 +5487,22 @@
   #screen-crew .cr-me-row { display: flex; align-items: center; gap: 10px; width: calc(100% - 2 * var(--g)); min-height: 48px; margin: 4px var(--g) 0; padding: 8px 0;
     border: 0; border-top: 1px solid var(--hair); background: none; color: var(--green-ink); font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; text-align: left; cursor: pointer; }
   #screen-crew .cr-me-row span:first-child { flex: 1; }
-  /* the season board: plain numbers, no medals (NO GOLD), your row tinted */
-  #screen-crew .cr-brd { margin: 0 var(--g); }
-  #screen-crew .cr-br { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 8px 0; border-top: 1px solid var(--hair);
+  /* the season board: plain numbers, no medals (NO GOLD), your row tinted. Its own page since 2026-10-20 (#screen-crewboard),
+     because on the tab it was 440 px of tail — and a board of people who were not in the crew. Who is in the crew is a page
+     of the same rows (#screen-crewwho), the level beside each name where the board's copy on this phone knows it. */
+  :where(#screen-crew, #screen-crewboard, #screen-crewwho) .cr-brd { margin: 0 var(--g); }
+  :where(#screen-crew, #screen-crewboard, #screen-crewwho) .cr-br { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 8px 0; border-top: 1px solid var(--hair);
     font: 400 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
-  #screen-crew .cr-br:first-child { border-top: 0; }
-  #screen-crew .cr-br.me { margin: 0 -8px; padding: 8px; border-top: 0; border-radius: 8px; background: var(--tint); }
-  #screen-crew .cr-br.me + .cr-br { border-top: 0; }
-  #screen-crew .cr-br .p { font: 900 var(--fs-lead)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--green-ink); font-variant-numeric: tabular-nums; }
-  #screen-crew .cr-br .n { min-width: 0; overflow-wrap: anywhere; }
-  #screen-crew .cr-br .n small { margin-left: 6px; font: 700 var(--fs-label)/1 'Space Mono', monospace; color: var(--grey); }
-  #screen-crew .cr-br .x { font: 700 var(--fs-small)/1 'Space Mono', monospace; color: var(--grey); font-variant-numeric: tabular-nums; }
+  :where(#screen-crew, #screen-crewboard, #screen-crewwho) .cr-br:first-child { border-top: 0; }
+  :where(#screen-crew, #screen-crewboard, #screen-crewwho) .cr-br.me { margin: 0 -8px; padding: 8px; border-top: 0; border-radius: 8px; background: var(--tint); }
+  :where(#screen-crew, #screen-crewboard, #screen-crewwho) .cr-br.me + .cr-br { border-top: 0; }
+  :where(#screen-crew, #screen-crewboard, #screen-crewwho) .cr-br .p { font: 900 var(--fs-lead)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--green-ink); font-variant-numeric: tabular-nums; }
+  :where(#screen-crew, #screen-crewboard, #screen-crewwho) .cr-br .n { min-width: 0; overflow-wrap: anywhere; }
+  :where(#screen-crew, #screen-crewboard, #screen-crewwho) .cr-br .n small { margin-left: 6px; font: 700 var(--fs-label)/1 'Space Mono', monospace; color: var(--grey); }
+  :where(#screen-crew, #screen-crewboard, #screen-crewwho) .cr-br .x { font: 700 var(--fs-small)/1 'Space Mono', monospace; color: var(--grey); font-variant-numeric: tabular-nums; }
+  /* the crew list: the initials circle in place of a position number */
+  #screen-crewwho .cr-br .p.ini { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--tint); font: 700 var(--fs-small)/1 'Barlow', sans-serif; }
+  :where(#screen-crewboard, #screen-crewwho) .cr-note { margin: 10px var(--g) 0; font: 400 var(--fs-small)/1.5 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
   /* the composer sheet (openCrewPost(), in the one sheet) */
   #hist-overlay .cr-txt { display: block; width: 100%; min-height: 96px; margin-top: 14px; padding: 12px; border: 1px solid var(--field); border-radius: 10px; background: var(--row);
     color: var(--ink); font: 400 var(--fs-field)/1.45 'Barlow', sans-serif; resize: vertical; }
@@ -6085,6 +6120,25 @@
     <h1 class="prog-title">Crew</h1>
   </div>
   <div id="crew-body"></div>
+</div>
+
+<!-- Crew's own two pages (2026-10-20, the audit *The Empty Room*). Both are screens with the green head and a ← back to Crew,
+     the same recipe as Progress's pages: on the tab the board was 440 px of tail and there was no way at all to see the room. -->
+<div id="screen-crewboard" class="screen">
+  <div class="ceil-head">
+    <button class="nav-back" onclick="goTo('crew')" aria-label="Back to Crew">←</button>
+    <div class="ceil-kick">The crew</div>
+    <h1 class="ceil-title">This season</h1>
+  </div>
+  <div id="crewboard-body"></div>
+</div>
+<div id="screen-crewwho" class="screen">
+  <div class="ceil-head">
+    <button class="nav-back" onclick="goTo('crew')" aria-label="Back to Crew">←</button>
+    <div class="ceil-kick">Train together</div>
+    <h1 class="ceil-title">In the crew</h1>
+  </div>
+  <div id="crewwho-body"></div>
 </div>
 
 <!-- A photo on the Bell, opened (openCrewPhoto()): the whole photo on dark, who and when, the words, the Like. ✕ closes; so does Back (topLayer()). -->
@@ -10810,7 +10864,7 @@ const APP_GUIDE = [
 // names a control the athlete cannot see (CNT-01).
 APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how often'), 0,
   { icon: 'compass', key: 'crew', title: 'Crew and the Bell', when: () => crewOn(),
-    body: `<p><strong>Crew</strong> is our crew's own place. The first time you open it I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. It's one line a day and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. Nothing on Crew earns XP. Under the Bell is the season board.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
+    body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with likes), last month\'s honours early in the month, and the season board.</li>';
   return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
@@ -10951,6 +11005,11 @@ function goTo(screen, historyId, keepContent) {
   // Progress's own pages (THE SCOREBOARD, 2026-10-19): built on every visit from the same copy the doors read.
   if (screen === 'moments') renderMoments();
   if (screen === 'achievements') renderAchievements();
+  // Crew's own two pages: built from the copy on this phone, so they open with no signal (2026-10-20).
+  if (screen === 'crewboard' || screen === 'crewwho') { renderCrewPage(); if (Date.now() - _boardAt > 10 * 60000) refreshCrewBoard(); }
+  // The tab is settled on every move (2026-10-20). It is kept while the athlete is ON Crew even after the server stops
+  // answering — nobody is moved off a screen mid-read — so leaving is the moment that decision gets taken again.
+  try { setCrewTab(); } catch (e) {}
   if (screen === 'plan') {
     paintNumbers();
     paintHabitsBlock();
@@ -12968,6 +13027,12 @@ function achNudgeHTML(e) {
 var BELL = null;             // get_bell()'s answer: { athlete_id, me, items, honours, kinds, at } or null
 var CREW_BOARD = null;       // leaderboard_top()'s rows for the season board
 var _bellBusy = false, _bellAt = 0, _boardAt = 0, _crewMissing = false, _crewDraft = null, _crewFreshPin = null;
+// How many "no such function" answers in a row (2026-10-20). The tab goes on the SECOND, never the first: PostgREST says it
+// for a few seconds after any stage is applied, and one of those used to empty the phone's copy mid-read.
+var _crewMiss2 = 0;
+// What was typed and not sent, kept on the phone until it is (2026-10-20). A sheet swiped down by accident took 280
+// characters with it. The photo cannot be kept here (it is an object URL belonging to this page), so only the words are.
+function crewKeepKey() { return ATHLETE_ID + '_crewkept'; }
 const CREW_PHOTOS = new Map();   // post id → an object URL of its photo (this visit; the bytes themselves are in CREW_PH_CACHE)
 // A photo is downloaded ONCE and kept on the phone (Amir, 2026-10-19: they cannot download everything at every open). Cache
 // Storage, not localStorage: the bytes are binary and a few hundred kilobytes each. The name does NOT start with aap-, so
@@ -12993,12 +13058,19 @@ async function crewSweepPhotos() {
   } catch (e) { /* nothing to sweep */ }
 }
 const CREW_BELL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16zM10 20a2 2 0 0 0 4 0"/></svg>';
-const CREW_CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>';
+// The day's attendance wears a tick, not the bell: it is the roll call, not a moment anyone earned.
+const CREW_TICK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>';
+const CREW_CAM_SVG ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>';
 function crewKey() { return ATHLETE_ID + '_crewcache'; }
 function crewSeenKey() { return ATHLETE_ID + '_crewseen'; }
 function crewAllowed() { return !window.IS_DEMO && !window.IS_PREVIEW && !!ATHLETE_ID; }
 function crewOn() { return crewAllowed() && !!BELL && !_crewMissing; }
 function onCrew() { const s = document.getElementById('screen-crew'); return !!(s && s.classList.contains('active')); }
+// Crew's own two pages (This season, In the crew): open over the tab, with their own ← back to it.
+function onCrewPage() {
+  const s = document.querySelector('.screen.active');
+  return !!(s && (s.id === 'screen-crewboard' || s.id === 'screen-crewwho'));
+}
 function crewMe() { return (BELL && BELL.me) || {}; }
 function crewCanLike() { const m = crewMe(); return m.answer === 'yes' && !m.under13; }
 function loadCrewCache() {
@@ -13007,6 +13079,7 @@ function loadCrewCache() {
     const o = JSON.parse(localStorage.getItem(crewKey()) || 'null');
     if (o && o.athlete_id === ATHLETE_ID && Array.isArray(o.items)) BELL = o;
   } catch (e) { /* no copy yet */ }
+  loadCrewBoard();   // the board is kept beside the feed, so the bottom of Crew works with no signal
   setCrewTab(); paintCrewTell(); paintSessionShare();
 }
 // "Not on the server": the function is missing (PostgREST's PGRST202, a 404). The tab goes, and the copy with it.
@@ -13036,9 +13109,14 @@ async function refreshBell() {
     }
     if (_noAnswer(r)) return;   // no signal: keep the copy
     if (r.error) {
-      if (crewMissingErr(r)) { _crewMissing = true; BELL = null; try { localStorage.removeItem(crewKey()); } catch (e) {} }
+      // TWO bad answers, not one, and the copy STAYS (2026-10-20). PostgREST answers "could not find the function" for a few
+      // seconds after any stage is applied, and one of those used to take the Crew tab away, delete the saved feed and throw
+      // the athlete back to Home in the middle of reading it — then the next open downloaded the whole thing again. The tab
+      // hides for this session only, and what is on the phone is kept: it is 7 days old at worst and the sweep is the server's.
+      if (crewMissingErr(r)) { _crewMiss2 = _crewMiss2 + 1; if (_crewMiss2 >= 2) _crewMissing = true; }
       return;
     }
+    _crewMiss2 = 0;
     if (!r.data) return;
     if (r.data.same) { _bellAt = Date.now(); _crewMissing = false; return; }   // nothing new: the copy stands, nothing was sent
     if (r.data.athlete_id !== ATHLETE_ID) return;
@@ -13061,7 +13139,9 @@ function setCrewTab() {
   if (!bar) return;
   let b = bar.querySelector('.nav-item[data-tab="crew"]');
   if (!crewOn()) {
-    if (b) { b.remove(); if (onCrew()) goTo('home'); }
+    // The tab goes, but NOBODY IS MOVED (2026-10-20). This used to call goTo('home') and take the athlete off Crew in the
+    // middle of reading it, on one bad answer from the server. If they are on the screen, they keep it until they leave.
+    if (b && !onCrew() && !onCrewPage()) b.remove();
     return;
   }
   if (!b) {
@@ -13084,17 +13164,48 @@ function openCrew() {
   if (Date.now() - _bellAt > 10 * 60000) refreshBell();   // at most once every ten minutes, and only from this screen
   if (Date.now() - _boardAt > 10 * 60000) refreshCrewBoard();
 }
+// The board: `crew_board()` (stage91), which is the CREW only. It used to be `leaderboard_top()`, the whole board, so on
+// 20 October it listed 23 names under a screen that promises nothing of yours reaches the crew before your yes — six of them
+// had never been asked, and one had said *Keep it to me*. leaderboard_top() itself is untouched: coach.html and habits.html
+// both mean the whole board by it, and a server without stage91 still answers it, which is the fallback below.
+//
+// It is its own call and NOT part of get_bell(), on purpose: stage83 hashes get_bell()'s payload to answer `{same:true}` in
+// 78 bytes, and season points move whenever anybody ticks a habit, so a board inside it would break that saving every day.
+// What it answers is kept on the phone under its own key, so the bottom of Crew is no longer the one block that needs signal.
+var _boardPlain = false;   // this server has no crew_board(): ask leaderboard_top() from now on
+function crewBoardKey() { return ATHLETE_ID + '_crewboard'; }
+function loadCrewBoard() {
+  if (!crewAllowed() || CREW_BOARD) return;
+  try {
+    const o = JSON.parse(localStorage.getItem(crewBoardKey()) || 'null');
+    if (Array.isArray(o)) CREW_BOARD = o;
+  } catch (e) { /* no copy yet */ }
+}
 async function refreshCrewBoard() {
   if (!crewAllowed()) return;
   _boardAt = Date.now();
   try {
     const sb = await _sbReady();
     if (!sb) return;
-    const r = await _withTimeout(sb.rpc('leaderboard_top', { p_athlete_id: ATHLETE_ID, p_key: null, p_scope: 'season', p_limit: 10 }), 10000);
-    if (!r || r.error || !Array.isArray(r.data)) return;
-    CREW_BOARD = r.data;
-    const el = document.getElementById('crew-board');
-    if (el) el.innerHTML = crewBoardHTML();
+    let rows = null;
+    if (!_boardPlain) {
+      const r = await _withTimeout(sb.rpc('crew_board', { p_limit: 25 }), 10000);
+      if (r && r.error && crewMissingErr(r)) _boardPlain = true;        // stage91 is not on this server
+      else if (!r || r.error || !Array.isArray(r.data)) return;         // no signal, or a refusal: the copy stands
+      else rows = r.data.map(x => ({ pos: x.pos, who: x.who, xp: x.points, level: x.level, is_me: x.is_me }));
+    }
+    if (!rows) {
+      const r = await _withTimeout(sb.rpc('leaderboard_top', { p_athlete_id: ATHLETE_ID, p_key: null, p_scope: 'season', p_limit: 10 }), 10000);
+      if (!r || r.error || !Array.isArray(r.data)) return;
+      rows = r.data.map(x => ({ pos: x.pos, who: x.display_name, xp: x.xp, level: x.level, is_me: x.is_me }));
+    }
+    CREW_BOARD = rows;
+    try { _lsRawSet(crewBoardKey(), JSON.stringify(rows)); } catch (e) { /* storage full: shown this visit */ }
+    // The whole screen, not just the rows: a first board also decides whether *The whole board ›* is there at all, and
+    // patching #crew-board alone left the door off until the next open. The feed is redrawn from the same copy, and a photo
+    // already downloaded is in CREW_PHOTOS, so nothing is fetched twice.
+    if (onCrew()) renderCrew();
+    if (onCrewPage()) renderCrewPage();
   } catch (e) { /* the board stays as it was */ }
 }
 
@@ -13161,7 +13272,13 @@ function crewKudosWords(k) {
 // and each emoji's is in `by`; `emoji` is the viewer's own (null when theirs is the plain Like). A server without stage82
 // sends no list and no `by`, so the row is the Like alone, exactly as it was.
 function crewEmoji() { return (BELL && Array.isArray(BELL.emoji)) ? BELL.emoji.slice(0, 6) : []; }
-function crewReactRow(target, k, own) {
+// `folded` (a moment line, 2026-10-20): the Like stands alone and the four emoji wait behind a ＋. All five out is Amir's
+// pick for a POST and it stays there, but under a one-line moment the row of five chips was taller than the news it was
+// about. The ＋ unfolds the same row in place — `_crewOpenEm` remembers which targets are open, for this visit only.
+var _crewOpenEm = {};
+function crewUnfold(key) { _crewOpenEm[key] = true; paintKudos(key); }
+window.crewUnfold = crewUnfold;
+function crewReactRow(target, k, own, folded) {
   const me = crewMe(), kk = k || {}, t = esc(target);
   const total = Number(kk.n) || 0, by = (kk.by && typeof kk.by === 'object') ? kk.by : {};
   // `like` is stage82's; before it, a Like is simply every reaction there is
@@ -13175,6 +13292,12 @@ function crewReactRow(target, k, own) {
     : me.under13 ? dead('cr-kd', 'Like' + num(likeN), 'Likes are off for your account')
     : ask ? live('cr-kd', 'Like' + num(likeN), 'Join the crew to like this', null, 'crewLikeAsk()')
     : live('cr-kd', 'Like' + num(likeN), liked ? 'Liked. Tap to take it back' : 'Like this', liked, 'crewLike(this)');
+  // folded, and nothing of this athlete's own is on the row yet: the four wait behind a ＋. Never for an athlete ticked under
+  // 13 — unfolding four dead chips is noise — and never once somebody has used one, because then they are the news.
+  const sent = crewEmoji().some(em => Number(by[em]) > 0) || !!kk.emoji;
+  if (folded && !me.under13 && !_crewOpenEm[target] && !sent && crewEmoji().length) {
+    return h + live('cr-em cr-plus', '＋', 'More ways to say it', null, `crewUnfold('${esc(target)}')`);
+  }
   crewEmoji().forEach(em => {
     const n = Number(by[em]) || 0, mine = kk.emoji === em, body = `<i aria-hidden="true">${esc(em)}</i>${num(n)}`;
     const said = `${em} ${n === 1 ? '1 person' : n + ' people'}`;
@@ -13191,7 +13314,7 @@ function crewItem(key) { return ((BELL && BELL.items) || []).find(i => i && (i.i
 function crewAskHTML() {
   return `<section class="cr-ask" id="crew-ask" aria-labelledby="crew-ask-h">
     <h2 id="crew-ask-h">Join the crew?</h2>
-    <p>When you reach a new level, hold a week, hit a mark or set a best, the crew sees your name and what you did, for 7 days. Never a weight. Join and you can post messages and photos here too.</p>
+    <p>Finish a session and your name joins one line a day saying who trained. Reach a new level, hold a week, hit a mark or set a best and the crew sees that too, for 7 days. Never a weight. Join and you can post messages and photos here as well.</p>
     <p class="sm">You can leave any time from your initials, under Crew and the Bell.</p>
     <div class="cr-ask-btns"><button type="button" class="cr-go" onclick="crewAnswer('yes', this)">Join the crew</button><button type="button" class="cr-no" onclick="crewAnswer('no', this)">Keep it to me</button></div>
   </section>`;
@@ -13261,6 +13384,52 @@ function crewPostHTML(it) {
     <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small>${del}</div>
   </article>`;
 }
+// ── The week first (direction B, Amir's pick, 2026-10-20) ────────────────────────────────────────────────────────────────
+// The band at the top of Crew: what the crew did over the same 7 days the Bell covers, and a strip of initials that opens the
+// room. It is drawn whenever the server sends the numbers, even when they are nought — "nobody has trained yet this week" is
+// still the week, and it is the one block here that cannot be empty of meaning. A server without stage91 sends no `week` and
+// the band is simply not there.
+function crewWeekHTML() {
+  const w = BELL && BELL.week;
+  if (!w || typeof w.sessions !== 'number') return '';
+  const n = Number(w.sessions) || 0, held = Number(w.held) || 0, mem = Number(w.members) || 0;
+  const big = n ? `${n} session${n === 1 ? '' : 's'}` : 'Nobody has trained yet';
+  const two = held ? `<br>${held} week${held === 1 ? '' : 's'} held` : '';
+  const crew = (BELL && Array.isArray(BELL.crew)) ? BELL.crew : [];
+  const faces = crew.slice(0, 6).map(c => `<i class="cr-face${c && c.me ? ' me' : ''}" aria-hidden="true">${esc(crewInitials(c && c.who))}</i>`).join('')
+    + (crew.length > 6 ? `<i class="cr-face" aria-hidden="true">+${crew.length - 6}</i>` : '');
+  const door = crew.length
+    ? `<button type="button" class="cr-faces" onclick="goTo('crewwho')" aria-label="See who is in the crew">${faces}<span class="go">In the crew ›</span></button>`
+    : '';
+  return `<section class="cr-week" aria-label="The crew this week">
+    <p class="k">Last 7 days · ${mem} in the crew</p>
+    <b>${esc(big)}${two}</b>
+    ${n ? '' : '<span class="q">Finish one and the crew sees it.</span>'}
+    ${door}</section>`;
+}
+// The day's attendance: ONE line a day for the whole crew, never one each (Amir, 2026-10-20: *"only if they want to, unless
+// if 20 ppl train, we wil have 20 bells"*). The server folds it and names only the athletes whose switch is on; this writes
+// the sentence. No reactions on it — there is nothing here anyone earned. It never rings a phone (stage91's note says why).
+function crewSessHTML(it) {
+  const names = (it.names || []).filter(Boolean).map(String);
+  const all = (it.me ? ['You'] : []).concat(names);
+  if (!all.length) return '';
+  const when = crewDayWord(it.day), n = Number(it.n) || all.length;
+  const tail = when === 'Today' ? 'today' : when === 'Yesterday' ? 'yesterday' : 'on ' + when;
+  return `<div class="cr-line cr-sess" data-key="${esc(it.key)}"><span class="cr-bell-ic">${CREW_TICK_SVG}</span>
+    <span class="cr-lw">${esc(crewList(all))} trained ${esc(tail)}<small>${n} session${n === 1 ? '' : 's'}</small></span></div>`;
+}
+// Today, Yesterday, then the day's own name — for a day heading in the feed and for the attendance sentence.
+function crewDayWord(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ''));
+  if (!m) return '';
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  const diff = Math.round((t - d) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  return d.toLocaleDateString('en-GB', { weekday: 'long' });
+}
 function crewLineHTML(it) {
   const parts = (it.parts || []).map(crewPartText).filter(Boolean);
   if (!parts.length) return '';
@@ -13268,33 +13437,87 @@ function crewLineHTML(it) {
   const kw = crewKudosWords(it.kudos);
   return `<div class="cr-line" data-key="${esc(it.key)}"><span class="cr-bell-ic">${CREW_BELL_SVG}</span>
     <span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small>
-      <span class="cr-react on-line" data-row="${esc(it.key)}">${crewReactRow(it.key, it.kudos, it.me)}</span></span></div>`;
+      <span class="cr-react on-line" data-row="${esc(it.key)}">${crewReactRow(it.key, it.kudos, it.me, true)}</span></span></div>`;
 }
-function crewBoardHTML() {
-  if (!Array.isArray(CREW_BOARD) || !CREW_BOARD.length) return '<p class="cr-quiet">The board shows here once you have signal.</p>';
-  return CREW_BOARD.map(r => `<div class="cr-br${r.is_me ? ' me' : ''}"><span class="p">${Number(r.pos) || ''}</span><span class="n">${esc(r.is_me ? 'You' : r.display_name || '')}<small>LV ${Number(r.level) || 1}</small></span><span class="x">${Number(r.xp || 0).toLocaleString('en-GB')}</span></div>`).join('');
+// ONE ladder on one block (2026-10-20). It used to read "1. Ehsan A. LV 14 — 3,153" above "4. Elmira A. LV 29 — 1,114": the
+// level is lifetime and the number that sorts is this SEASON's, and the season was two days old, so a level-29 athlete sat
+// below a level-14 one with both numbers on the same row. The LV chip is gone and the block is titled *This season*, which is
+// what it has always ranked. The level still has a home — the ring on Home, and beside a name on *In the crew*.
+function crewBoardHTML(all) {
+  if (!Array.isArray(CREW_BOARD) || !CREW_BOARD.length) {
+    return `<p class="cr-quiet">${navigator.onLine === false ? 'The board shows here when you are back online.' : 'The board shows here once you have signal.'}</p>`;
+  }
+  const rows = all ? CREW_BOARD : CREW_BOARD.slice(0, 5).concat(CREW_BOARD.slice(5).filter(r => r.is_me));
+  return rows.map(r => `<div class="cr-br${r.is_me ? ' me' : ''}"><span class="p">${Number(r.pos) || ''}</span><span class="n">${esc(r.is_me ? 'You' : r.who || '')}</span><span class="x">${Number(r.xp || 0).toLocaleString('en-GB')}</span></div>`).join('');
+}
+// The level beside a name on *In the crew*, from the board's copy on this phone when it holds one. Nothing is asked for it.
+function crewLevelOf(name) {
+  const r = (CREW_BOARD || []).find(x => x && x.who === name);
+  return r && Number(r.level) ? Number(r.level) : 0;
 }
 function renderCrew() {
   const el = document.getElementById('crew-body');
   if (!el) return;
   if (!BELL) { el.innerHTML = `<p class="cr-quiet">${navigator.onLine === false ? 'No signal. The crew shows here when you are back online.' : 'Loading the crew…'}</p>`; return; }
-  const me = crewMe(), items = (BELL.items || []).filter(i => i && (i.t === 'post' || i.t === 'line'));
+  const me = crewMe(), items = (BELL.items || []).filter(i => i && (i.t === 'post' || i.t === 'line' || i.t === 'sess'));
   let h = '';
   if (!me.answer && !me.under13) h += crewAskHTML();
+  h += crewWeekHTML();          // the week first (direction B): never an empty room
   h += crewHonoursHTML();
   h += crewOpenHTML();
   h += `<h2 class="prog-sec">The Bell<span class="prog-sec-n">Last 7 days</span></h2>`;
   if (me.can_post) h += `<button type="button" class="cr-comp" onclick="openCrewPost()"><span class="cr-ini" aria-hidden="true">${esc(crewInitials(me.name))}</span><span class="t">Share something with the crew</span><span class="cr-cam">${CREW_CAM_SVG}</span></button>`;
   else if (me.under13) h += '<p class="cr-quiet">You can read the crew here. Posting is off for your account.</p>';
-  else if (me.answer === 'no') h += '<p class="cr-quiet">You keep your moments to yourself, so the crew does not see you here.</p>';
-  const feed = items.map(i => i.t === 'post' ? crewPostHTML(i) : crewLineHTML(i)).join('');
+  // A no is not a door closing (Amir, 2026-10-20: *"if ghazal wants to come back, let her have a way"*). The way back was
+  // always there, under the row below — it just never said so.
+  else if (me.answer === 'no') h += '<p class="cr-quiet">You keep your moments to yourself, so the crew does not see you here. You can join whenever you like, just below.</p>';
+  // The feed, under day headings (2026-10-20): Today, Yesterday, then each day by name. Amir's pinned post stays above them
+  // all, where the server puts it, because it is pinned to the top and not to a day.
+  let day = null, feed = '';
+  items.forEach(i => {
+    if (i.t === 'post' && i.pinned) { feed += crewPostHTML(i); return; }
+    const d = crewDayWord(i.t === 'sess' ? i.day : (String(i.at || '').slice(0, 10)));
+    if (d && d !== day) { day = d; feed += `<h3 class="cr-day">${esc(d)}</h3>`; }
+    feed += i.t === 'post' ? crewPostHTML(i) : i.t === 'sess' ? crewSessHTML(i) : crewLineHTML(i);
+  });
   h += feed || `<p class="cr-quiet">Quiet so far this week.${me.can_post ? ' Share a photo from training and get it going.' : ''}</p>`;
   if (!me.under13 && me.answer) h += `<button type="button" class="cr-me-row" onclick="openCrewSettings()"><span>What the crew sees of you</span><span aria-hidden="true">›</span></button>`;
-  h += `<h2 class="prog-sec">Season board</h2><div class="cr-brd" id="crew-board">${crewBoardHTML()}</div>`;
+  // The board is a DOOR now, not 440 px of tail: the top five, then the page (2026-10-20).
+  h += `<h2 class="prog-sec">This season</h2><div class="cr-brd" id="crew-board">${crewBoardHTML()}</div>`;
+  if (Array.isArray(CREW_BOARD) && CREW_BOARD.length > 5) {
+    h += `<button type="button" class="cr-me-row" onclick="goTo('crewboard')"><span>The whole board</span><span aria-hidden="true">›</span></button>`;
+  }
   el.innerHTML = h;
   crewWirePhotos(el);
 }
 window.renderCrew = renderCrew;
+
+// ── Crew's two pages (2026-10-20) ────────────────────────────────────────────────────────────────────────────────────────
+// *This season* is the whole board, which used to be 440 px at the bottom of the tab. *In the crew* is the room itself: there
+// was no way for an athlete to see who was in it, and the level sits here, where nothing else is ranking anybody, rather than
+// on the board, where it disagreed with the number beside it. Both are built from the copy on this phone, so both work with
+// no signal; both repaint themselves when a fresh answer lands while they are open.
+function renderCrewPage() {
+  const b = document.getElementById('crewboard-body');
+  if (b && document.getElementById('screen-crewboard').classList.contains('active')) {
+    b.innerHTML = `<div class="cr-brd" style="margin-top:22px">${crewBoardHTML(true)}</div>`
+      + `<p class="cr-note">Points for this season only. Everything you train and every habit you tick adds to it. Nothing on Crew earns a point.</p>`;
+  }
+  const w = document.getElementById('crewwho-body');
+  if (w && document.getElementById('screen-crewwho').classList.contains('active')) {
+    const crew = (BELL && Array.isArray(BELL.crew)) ? BELL.crew : [];
+    const rows = crew.map(c => {
+      const lv = crewLevelOf(c.who);
+      return `<div class="cr-br${c.me ? ' me' : ''}"><span class="p ini" aria-hidden="true">${esc(crewInitials(c.who))}</span>`
+        + `<span class="n">${esc(c.me ? 'You' : c.who || '')}</span>`
+        + `<span class="x">${lv ? 'LV ' + lv : ''}</span></div>`;
+    }).join('');
+    w.innerHTML = rows
+      ? `<div class="cr-brd" style="margin-top:22px">${rows}</div><p class="cr-note">Everyone here said yes to the Bell. They see your name and what you did. They never see a weight or your check-in. You can leave any time from <strong>What the crew sees of you</strong>.</p>`
+      : '<p class="cr-quiet">The crew shows here once you have signal.</p>';
+  }
+}
+window.renderCrewPage = renderCrewPage;
 
 // ── the photos: asked one at a time when their card comes near the screen, two at once at most, kept for this visit ──
 const _crewPhP = new Map(), _crewPhQ = [];
@@ -13380,7 +13603,7 @@ function paintKudos(key) {
   // the whole row at once: a tap can move the Like's count, an emoji's, and which one is pressed
   document.querySelectorAll('.cr-react').forEach(row => {
     if (row.dataset.row !== key) return;
-    const h = crewReactRow(key, it.kudos, it.me);
+    const h = crewReactRow(key, it.kudos, it.me, it.t === 'line');   // a moment line keeps the Like alone until ＋ is tapped
     if (row.innerHTML !== h) row.innerHTML = h;
   });
   document.querySelectorAll('[data-kw]').forEach(s => {
@@ -13466,7 +13689,10 @@ async function crewAnswer(ans, btn) {
   return true;
 }
 window.crewAnswer = crewAnswer;
+// ⚠ The twin of `crew_kind_list()` (stage91). The server decides what reaches the crew; this list is only the words and the
+// order the sheet shows them in. A kind the server has and this does not gets no switch, and nobody can turn it off.
 const CREW_KINDS = [
+  ['session', 'A session finished', 'One line a day, naming whoever trained'],
   ['level', 'A new level'], ['week', 'A week held', 'And how many in a row'], ['mark', 'A mark', '8 weeks held, 50 sessions with Amir, 10 bests…'],
   ['achievement', 'An achievement'], ['best', 'A personal best', 'The lift only, never the weight'], ['cycle', 'A cycle finished'],
   ['honour', "The month's honours"], ['open', 'The Monthly Open']];
@@ -13738,7 +13964,11 @@ function openCrewPost(mode, dayId) {
   if (!ov || !BELL || !me.can_post) return;
   const ses = mode === 'session', noPh = (Number(me.photos_left) || 0) <= 0, noPost = (Number(me.posts_left) || 0) <= 0;
   _crewDraft = { mode: ses ? 'session' : 'post', day: dayId || null, photo: null };
-  const draft = ses ? crewSessionDraft(dayId) : '';
+  // What was typed and not sent comes back (2026-10-20): the sheet swipes down on an accident, and 280 characters went with
+  // it. A session's own draft is written fresh by crewSessionDraft(), so only a plain post is kept.
+  let kept = '';
+  if (!ses) { try { kept = String(localStorage.getItem(crewKeepKey()) || ''); } catch (e) { kept = ''; } }
+  const draft = ses ? crewSessionDraft(dayId) : kept;
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">${ses ? 'Tell the crew' : 'Share with the crew'}</div>
     <h2 class="readiness-title">${ses ? 'Day ' + esc(String(dayId)) + ' done' : 'The Bell'}</h2>
@@ -13759,7 +13989,11 @@ function openCrewPost(mode, dayId) {
     const has = !!_crewDraft.photo, ok = ses ? has : (has || ta.value.trim().length > 0);
     go.disabled = noPost || !ok;
   };
-  ta.addEventListener('input', sync);
+  ta.addEventListener('input', () => {
+    sync();
+    if (ses) return;
+    try { if (ta.value) _lsRawSet(crewKeepKey(), ta.value); else localStorage.removeItem(crewKeepKey()); } catch (e) {}
+  });
   file.addEventListener('change', async () => {
     const f = file.files && file.files[0];
     file.value = '';
@@ -13784,6 +14018,9 @@ function openCrewPost(mode, dayId) {
   sync();
   ov.classList.add('visible');
 }
+// How many posts on the Bell are this athlete's own: the way to tell whether a post that timed out actually landed.
+function crewMinePosts() { return ((BELL && BELL.items) || []).filter(i => i && i.t === 'post' && i.me).length; }
+function crewForgetKept() { try { localStorage.removeItem(crewKeepKey()); } catch (e) {} }
 async function crewSend(go, ta, err) {
   const d = _crewDraft;
   if (!d) return;
@@ -13792,13 +14029,28 @@ async function crewSend(go, ta, err) {
   const p = { p_body: ta.value, p_photo: d.photo ? d.photo.b64 : null, p_w: d.photo ? d.photo.w : null, p_h: d.photo ? d.photo.h : null, p_kind: d.mode,
     p_session: d.mode === 'session' ? { day: Number(d.day) || null, n: crewSessionsN() || null } : null };
   let r = null;
-  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_post', p), 25000); } catch (e) { r = null; }
+  // 45 seconds with a photo, 25 without (2026-10-20). A 200 KB photo on Iran's connection can take longer than 25 s, and the
+  // old timeout then said "No signal. Tap Post again" while the upload was still on its way: the server wrote it, the second
+  // tap wrote it again, and the athlete had two posts and two of their three photos for the day gone.
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_post', p), d.photo ? 45000 : 25000); } catch (e) { r = null; }
   go.textContent = label;
-  if (_noAnswer(r)) { err.textContent = 'No signal. Your post is still here: tap Post again when you have signal.'; go.disabled = false; return; }
+  if (_noAnswer(r)) {
+    // NEVER offer a blind retry after a timeout: ask the server what it actually has. If the post landed, the sheet closes
+    // on it. The complete fix is a key made on the phone that the server refuses twice — stage92, with the replies.
+    err.textContent = 'Still sending. Checking…';
+    const before = crewMinePosts();
+    _bellAt = 0;
+    await refreshBell();
+    if (crewMinePosts() > before) { _crewDraft = null; crewForgetKept(); closeHistorySheet(); aaToast('It went. See it on Crew.'); return; }
+    err.textContent = 'No signal. Your post is still here: tap Post again when you have signal.';
+    go.disabled = false;
+    return;
+  }
   if (r.error || !r.data) { err.textContent = crewErrWords(r.error && r.error.message); go.disabled = false; return; }
   if (r.data.me && BELL) BELL.me = r.data.me;
   if (d.photo && d.photo.url && r.data.id) CREW_PHOTOS.set(r.data.id, d.photo.url);   // your own photo shows at once, no download
   _crewDraft = null;
+  crewForgetKept();
   closeHistorySheet();
   aaToast(onCrew() ? 'Posted to the crew.' : 'Posted. See it on Crew.');
   _bellAt = 0;

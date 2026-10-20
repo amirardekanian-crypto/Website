@@ -10,14 +10,43 @@ decides what rings and who can be seen, and never sends this app another athlete
   tabs. A server that says the function is missing (PGRST202, 404: `crewMissingErr()`) takes the tab and the copy away. Its icon is the bell;
   a **clay dot** sits on it while Amir's pinned post has not been opened on this phone (`<id>_crewseen`), the one clay thing Crew shows (DS-01),
   with the post's *Pinned* chip in clay on the visit that first shows it (`_crewFreshPin`).
+- **THE WEEK FIRST** (stage91, 2026-10-20; direction B of the audit *The Empty Room*, https://claude.ai/artifact/6VAMqcv12S9Y7rNCLEwmdM, Amir's
+  pick). The tab was well built and almost empty: 6 in the crew, 4 posts ever, ONE moment rang in eight weeks, and six of the Bell's ten items were
+  *joined the crew*, a line each person gets once — so on 26 October the whole feed would have swept to *"Quiet so far this week"*. What was missing
+  was the thing an athlete actually does every week. Now:
+  - **A green band at the top** (`crewWeekHTML()`, `.cr-week` on `--hero`): *Last 7 days · N in the crew*, then the crew's sessions and weeks held
+    over the same 7 days the Bell covers, then a strip of initials (`.cr-faces`) that opens **In the crew**. It is the one block that is never
+    empty, because somebody always trained; with no sessions it says *Nobody has trained yet · Finish one and the crew sees it*. Both counts come
+    from `get_bell()`'s `week` and respect each member's own switches, so a count can only move on the same event that moves the feed — which is why
+    it is in the payload at all and the board is not (stage83's `{same:true}` would otherwise break every time anybody ticked a habit).
+  - **A finished session rings, folded** (Amir, asked whether it should: *"only if they want to, unless if 20 ppl train, we wil have 20 bells."*):
+    ONE item a day for the whole crew (`t: 'sess'`, `crewSessHTML()`), *You, Dela and Mehraneh trained today · 3 sessions*, naming only members whose
+    **session** switch is on — a new kind in `crew_kind_list()` and `CREW_KINDS`, **on by default**, and it **never sends a notification** (nothing
+    queues one: `crew_push_queue`'s CHECK has no such kind and no trigger adds one). It carries no Like: there is nothing on it anyone earned.
+    ⚠️ Folded on the session's own `day`, never `created_at`: the career back-pay wrote 39 of one athlete's sessions in one afternoon, which on
+    `created_at` would have announced *"trained 39 times today"*. The consent test is the day too — from the day they joined — because all six joined
+    mid-afternoon and comparing write times dropped the sessions they had logged an hour earlier.
+  - **Day headings** (`.cr-day`, `crewDayWord()`): Today, Yesterday, then each day by name. Amir's pinned post stays above them all.
+  - **The board is a door**: the top five, then **The whole board ›** → `#screen-crewboard`, titled **This season**. **In the crew** is
+    `#screen-crewwho`, every member with the level beside their name where the board's copy on the phone has one. Both are screens with the green head
+    and a ← back to Crew (`renderCrewPage()`), both built from the copy on the phone, so both open with no signal.
 - **The screen** (`renderCrew()`, `#crew-body`): the eyebrow *Train together* and the title; **the question, once** (`crewAskHTML()`: *Ring the
   bell for the crew?*, **Ring it** / **Keep it to me** → `crew_answer()` with the board name, `crewDefaultName()`); **last month's honours** from the
   1st to the 14th (four tiles, crew members only); **The Bell** · *Last 7 days*: the composer row (*Share something with the crew*, only with a yes
   and not under 13), then the feed in the server's order (Amir's post of the last 24 hours pinned first): a **post** is a card (`crewPostHTML()`:
   initials, name, when, the words, the photo at 4:5 cropped to fill, Likes with names, *Delete* on your own through `armedTap()`), a **moment** a
   slim green line with the bell (`crewLineHTML()`: *Mina reached level 14 · set a new best on Barbell Back Squat · held a week, 5 in a row*,
-  `crewPartText()`; a best names the lift, never a weight); then *What the crew sees of you ›* and the **season board** (`leaderboard_top()`, plain
-  numbers, *You* tinted, no medals).
+  `crewPartText()`; a best names the lift, never a weight); then *What the crew sees of you ›* and the **board** (`crew_board()`, stage91: the CREW
+  only, plain numbers, *You* tinted, no medals).
+  **The board shows the crew and nothing else** (2026-10-20): it was `leaderboard_top()`, which is the whole board, so it listed 23 names — six who
+  had never been asked the crew question, and Ghazal, who chose *Keep it to me*, by name and level — under a screen that promises nothing of yours
+  reaches the crew before your yes. `leaderboard_top()` itself is UNTOUCHED (coach.html and habits.html both mean the whole board by it) and is still
+  the fallback where stage91 is not applied. **The LV chip is gone and the block is titled *This season***: the level is lifetime and the number that
+  sorts is this season's, so on 20 October it read *1. Ehsan A. LV 14 — 3,153* above *4. Elmira A. LV 29 — 1,114*. One ladder on one block. The rows
+  are kept on the phone under `<id>_crewboard`, so the bottom of Crew is no longer the one piece that needs signal.
+  **A no is not a door closing** (Amir, 2026-10-20: *"if ghazal wants to come back, let her have a way"*): the line for an athlete who kept it to
+  themselves now ends *"You can join whenever you like, just below"*, and the row under it is the settings page with the Yes/No toggle that was
+  always there and never said so.
 - **A Like** (`crewLike()`): on at once here, the server's answer (who gave it) replaces it, a refusal puts it back. *You, Sara and 2 others*
   (`crewKudosWords()`). Not on your own. **A non-member's Like is not dead** (Amir, 2026-10-19: *"if some one want to like a photo and
   they are not allowed to do, they should be notified to join first"*): it calls `crewLikeAsk()`, a toast that says to join with one
@@ -47,6 +76,22 @@ decides what rings and who can be seen, and never sends this app another athlete
 - **The yes and the switches** (`openCrewSettings()`, from your initials → **Crew and the Bell**, and from *What the crew sees of you*): Yes / No,
   a switch per kind (`crew_kinds()`: a new level, a week held, a mark, an achievement, a personal best, a cycle finished, the month's honours, the
   Monthly Open), and what a no does. An athlete Amir ticked **under 13** reads only: no question, no composer, no Like, no Tell the crew.
+- **Five things that were broken, fixed 2026-10-20** (the audit's bug list; the three above it — the board's membership, its LV chip, and a no with
+  no way back — are in the lines above):
+  - **One bad answer no longer empties the phone.** PostgREST answers *could not find the function* for a few seconds after any stage is applied, and
+    one of those used to set `_crewMissing`, null `BELL`, delete `<id>_crewcache` and `goTo('home')` mid-read, so the next open downloaded the whole
+    feed again. Now it takes **two in a row** (`_crewMiss2`), the copy is never deleted, and `setCrewTab()` **moves nobody**: the tab is kept while
+    the athlete is on Crew or one of its pages, and the decision is taken again on their next move (`goTo()` ends with `setCrewTab()`).
+  - **A slow photo cannot post twice.** The composer gave up at 25 s and said *"No signal… tap Post again"* while a 200 KB upload was still on its
+    way, so the server wrote it and the second tap wrote it again — two posts and two of the day's three photos gone. A post with a photo now waits
+    **45 s**, and a timeout never offers a blind retry: it asks the server what it actually has (`crewMinePosts()` before and after a `refreshBell()`)
+    and closes on the post if it landed. The complete fix is a key made on the phone that the server refuses twice — **stage92, with the replies**.
+  - **The composer keeps what was typed** (`<id>_crewkept`, `crewKeepKey()`): a sheet swiped down by accident took 280 characters with it. Only a
+    plain post is kept — a session's draft is written fresh by `crewSessionDraft()` — and it is forgotten the moment the post goes.
+  - **The reaction chips are 44 px**, not 36: they were the smallest buttons in the app, on a screen where everything else is 48 or 52.
+  - **A moment line keeps the Like alone**, with the four emoji behind a **＋** (`.cr-plus`, `crewUnfold()`, `_crewOpenEm`): five chips under a
+    one-line moment made the row of buttons taller than the news. A **post** still carries all five out, Amir's pick of 2026-10-19. Never folded for
+    an athlete ticked under 13 (four dead chips are noise), and never once somebody has used one, because then they are the news.
 - **The data, on a slow connection** (Amir, 2026-10-19: *"irans internet is very slow, and cant download everything everytime they open the
   app"*): **nothing is asked for at an app open**. `crewFirstLook()` asks once in a phone's life, only while it has no copy at all (a new
   athlete still gets the tab without opening anything); after that the tab, the dot and *Tell the crew* all come from `<id>_crewcache`.
@@ -60,7 +105,10 @@ decides what rings and who can be seen, and never sends this app another athlete
   of the screen, so a long feed nobody scrolls costs one small read.
 - **The guide** (CNT-01): the card *Crew and the Bell* and Crew's line in *Getting around* show only while the tab does (`when: () => crewOn()`, the
   `<!--crew-->` mark in Getting around).
-- **Tests**: `scripts/headless/crew.js` (45 checks: no tab without an answer, a missing function or in the demo; the dot, the question, the feed's
+- **Tests**: `scripts/headless/crew.js` (**140 checks** since 2026-10-20 — section 16 is the band, the attendance line folded to one a day, the day
+  headings, the board behind its door and kept on the phone, both pages and their ←, a server without stage91 falling back to `leaderboard_top`, the
+  kept draft, two bad answers instead of one, and the ＋ on a moment line; the stub answers `crew_board` from `crewBoard`, or from `board` translated,
+  and `noCrewBoard` makes it say the function is missing. Before that, 45 checks: no tab without an answer, a missing function or in the demo; the dot, the question, the feed's
   words with no kg, the honours, the board, a Like on and off, the photo at 4:5 and Back, a 3000 × 2250 photo sent as a 1280 × 960 JPEG, Post's
   words, Tell the crew's draft and its photo rule, the switches, the no, the account door, the guide, never synced, under 13, 320 px in dark mode).
   The stub (`scripts/headless/stub.js`) answers `get_bell` from `bell`, the crew_* calls like the server, and `leaderboard_top` from `board`.

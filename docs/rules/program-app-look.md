@@ -99,7 +99,16 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   phone (1080 px, about 200 KB: Amir, 2026-10-19, *"irans internet is very slow"*) and stored as a row (never Storage: a Storage file cannot be deleted from SQL), Tell the crew posts a session only with a photo,
   and an athlete Amir ticks under 13 reads only. A new crew table goes into `coach_erase_person()` and the snapshot the same day.
   **Kudos is a Like** (Amir, 2026-10-19), with **🔥 💪 👏 😍** beside it (stage82, live 2026-10-19) (`crew_emoji_list()`; the app draws them only
-  while `get_bell()` hands over the list, so it degrades to the Like alone). One reaction per person: another emoji swaps it.
+  while `get_bell()` hands over the list, so it degrades to the Like alone). One reaction per person: another emoji swaps it. On a **moment line** the
+  Like stands alone and the four wait behind a **＋** (2026-10-20); a post keeps all five out.
+  **The week comes first, and nothing on Crew is ranked by two ladders** (stage91, 2026-10-20, direction B of the audit *The Empty Room*): the top of
+  the tab is the crew's own week (sessions and weeks held over the Bell's same 7 days) and it is never empty; **a finished session rings as ONE line a
+  day for the whole crew**, naming only members whose switch is on, on by default and **with no notification** (Amir: *"unless if 20 ppl train, we wil
+  have 20 bells"*); that line is folded on the session's **day**, never the row's write time, or a back-pay announces 39 sessions in an afternoon; the
+  **board on Crew is `crew_board()`, crew members only** — `leaderboard_top()` is the whole board and is what coach.html and habits.html mean by it, so
+  it is never changed for this — and it shows **one** number, this season's, with no lifetime LV chip beside it.
+  **Nobody is moved off a screen they are reading, and the phone's copy is never deleted to save it** (2026-10-20): a missing-function answer hides the
+  tab on the SECOND in a row, keeps `<id>_crewcache`, and leaves whoever is on Crew where they are until they move.
 - **Dark mode is the athlete's choice** (Amir, 2026-09-27: *"Let the client choose dark mode"*): both apps start
   light and switch only on the athlete's tap; neither follows the phone's setting.
 - **Clay means "look here"** (DS-01, Amir 2026-09-27; `PROGRAM-APP.md` → *Clay means look here*): the Coach's note,

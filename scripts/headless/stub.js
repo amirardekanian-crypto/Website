@@ -145,6 +145,15 @@
       if (name === 'crew_photo') return res({ data: { id: params && params.p_post, mime: 'image/jpeg', w: 4, h: 5,
         b64: '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z' }, error: null, status: 200 });
     }
+    // crew_board (stage91): the season board, crew members only, in its own shape (who/points, no display_name/xp). Answered
+    // from `crewBoard` when a fixture sets one, else from `board` translated, so every older fixture keeps working. A fixture
+    // that sets `noCrewBoard` answers "no such function", which is how the app falls back to leaderboard_top.
+    if (name === 'crew_board') {
+      if (S.noCrewBoard) return res({ data: null, error: { message: 'Could not find the function public.crew_board', code: 'PGRST202' }, status: 404 });
+      if (S.crewBoard) return res({ data: JSON.parse(JSON.stringify(S.crewBoard)), error: null, status: 200 });
+      if (S.board) return res({ data: S.board.map(function (r) { return { pos: r.pos, who: r.display_name, points: r.xp, level: r.level, is_me: r.is_me }; }), error: null, status: 200 });
+      return res({ data: [], error: null, status: 200 });
+    }
     if (name === 'leaderboard_top' && S.board) return res({ data: JSON.parse(JSON.stringify(S.board)), error: null, status: 200 });
     if (name === 'athlete_identities') return res({ data: S.identity ? { athlete_id: S.identity } : null, error: null, status: 200 });
     // A table read (sb.from(name)): tables ({ career_facts: [rows] }) answers rows as given (filters and order are not applied);
