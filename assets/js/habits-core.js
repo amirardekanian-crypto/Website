@@ -122,6 +122,8 @@
     supps:    ['#89C540', '#EDF6DC']
   };
 
+  const HUE_CYCLE = Object.values(HABIT_HUES);
+
   const MAX_CUSTOM = 3;
 
   const BACKFILL_DAYS = 3;                                 // today plus this many days back

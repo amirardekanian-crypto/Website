@@ -68,7 +68,9 @@ function lineSrc(src, start) {
 
 // Everything the engine is made of, in the order it must be declared.
 const CONSTS = ['XP_RULES', 'HABITS', 'HABIT_HUES'];
-const LINES = ['const MAX_CUSTOM =', 'const BACKFILL_DAYS =', 'const TKEY =', 'const AKEY ='];
+// HUE_CYCLE is habitHue()'s colour for a habit with none of its own (a custom one): left out until 2026-10-20, so the
+// training app's Today card threw for every athlete with a custom habit once each row asked for its hue.
+const LINES = ['const HUE_CYCLE =', 'const MAX_CUSTOM =', 'const BACKFILL_DAYS =', 'const TKEY =', 'const AKEY ='];
 const FNS = [
   // dates and the backfill window
   'today', 'addDays', 'fmtKey', 'parseKey', 'oldestLoggable', 'canLog', 'editingPast', 'dayShort', 'dayLong',
