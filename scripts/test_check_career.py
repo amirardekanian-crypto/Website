@@ -952,11 +952,11 @@ class CareerCheckerTests(unittest.TestCase):
         self.assertPasses("OK: 0 errors")
 
     def test_rule_18_every_real_achievement_has_a_test(self):
-        # 45 since rulebook version 9 (2026-10-20): ten plain habit achievements, each one thing and one number.
+        # 65 since rulebook version 10 (2026-10-20): AA Proof's habit ladders, 20 of them, on top of version 9's ten.
         text = (self.dir / "achievements.toml").read_text(encoding="utf-8")
-        self.assertEqual(len(re.findall(r"(?m)^test = ", text)), 45)
+        self.assertEqual(len(re.findall(r"(?m)^test = ", text)), 65)
         self.assertEqual(text.count('test = "goals"'), 5)
-        self.assertEqual(text.count('test = "proof"'), 13)
+        self.assertEqual(text.count('test = "proof"'), 33)
 
     def test_rule_18_a_missing_or_unknown_test_fails(self):
         self.append("achievements.toml", swap(GOOD_ACHIEVEMENT, 'test = "first"\n', ""))

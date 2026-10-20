@@ -54,6 +54,25 @@ The system and rules GAME-1 to GAME-14: [`../../career/CAREER_MODE.md`](../../ca
   **Step 3, the light screens, is LIVE (2026-10-19)**: the athlete's own read of Courtside is `supabase/stage77_career_my_moments.sql` (applied); program.html shows the level with no rank, Your numbers and Your moments on Progress, New from Amir and one Career row on Home (`PROGRAM-APP.md` → *Career, the lightest version*); AA Proof's career screens are off (`HABITS.md` → *Career screens off*). The four marks the app names are `careerMarks()`, held to `career/badges.toml` by `check_career.py` rule 23. Share cards get their own design pass later (Amir: *"the cards are very important part of this app, because we want to use it to advertise our brand"*).
   **The lightest version, decided 2026-10-20, steps 1 to 4 live (the cut 2026-10-19) and the 13 new achievements (stage79, rulebook version 5, 2026-10-19); Four Courts live (stage80); Crew with the Bell LIVE (stages 81 to 83, applied 2026-10-19); **the Monthly Open LIVE (stage85, applied 2026-10-19; `PROCEDURES.md` → *Stage 85*), the last build step of plan A, so plan A is DONE** — what is left of Career Mode is the share cards' own careful design pass** (`career/CAREER_MODE.md` → *Round 5*, decisions L1 to L11): one app for coached athletes (AA Performance, tabs Home · Progress · Library · Crew · Coach); athletes see a level with no rank, the four numbers, moments (the four numbers' marks and the achievements), a simple monthly goal, the crew (the Monthly Open, honours, the Bell) and Amir (Courtside); badges, ranks, titles, the Grand Slam, the level road and card skins are removed, **from the server too** (Amir's word), once no app reads them. D20 comes first; until the cut ships, the live system is exactly as built above.
 
+- **AA Proof's habit ladders come back as achievements, and the day-streak ones finally wake up** (rulebook version 10,
+  2026-10-20, Amir: *"i used to have loads of achievements related to my habits in proof or habits.html / i want them
+  back audited and added to ones i have now in the right place"*, then *"lets have 3 rungs, 5 core habits / but have
+  some about days that count, perfect days, days in row / we dont want duplicates ofcourse"*, and Proof's names back in
+  caps). Version 9's ten plain ones are RENAMED into the families they belonged to (same ids, same XP, every award
+  already minted untouched — a name, a caption and a rule are cut out of the fingerprint `career_compare()` reads) and
+  twenty more are built on top: HUMAN SPRINKLER · BLACKOUT ARTIST · FULLY FUELLED · GROUND COVERED (7 · 21 · 60 days in
+  a row each), HEAVY METAL (3 · 5), UNBROKEN (7 · 30 · 100 days that counted), CLEAN SWEEP (1 · 10 · 30 perfect days),
+  DAWN PATROL (1 · 10 · 50 days with three habits), ON TARGET (10 · 50 · 150 days on target), BACK IN THE FIGHT (7 ·
+  21 days after a comeback). ⚠️ **The session stops at two rungs on purpose**: Proof's HEAVY METAL ran to 30 days
+  running, which pays an athlete to skip the rest days their coach wrote. ⚠️ **No HARD TO KILL** — `badge.comebacks`
+  already wears that name at the same numbers and the same XP. ⚠️ **Every entry is `origin = "new"`**, including the
+  ones wearing Proof's names: `origin = "proof"` is a claim `career_compare()` checks, not a label.
+  `supabase/stage94_daystreak_wake.sql` is the one SQL this needed: `career_entry_kinds()` had no case for `dayStreak`,
+  so version 9's two day-streak achievements never woke on the partial evaluate after a save and minted only at the
+  next `get_profile()`; it also widens that function's `rules.prices` whitelist, which predated the day paying anything
+  (stage90), by a guarded textual patch that raises rather than rewrite a `get_profile()` that has moved on.
+  `qualify` needed one word in `scripts/check_career.py`. Detail: [`PROGRAM-APP.md`](../../PROGRAM-APP.md) → *The
+  ladders come back*.
 - **The week comes first on Crew, and a finished session rings once a day** (stage91, applied 2026-10-20 on Amir's answers to the audit
   *The Empty Room*; `PROCEDURES.md` → *Stage 91*). The tab had six members, four posts ever and ONE moment in eight weeks, and the whole feed was
   about to sweep. Now: a green band of the crew's own week at the top (never empty), a finished session as **one folded line a day** for the whole

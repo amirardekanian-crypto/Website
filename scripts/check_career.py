@@ -116,10 +116,12 @@ TOOLS = ["reaction", "commendation", "amirs_pick"]
 SIZE_AUDIENCES = ["athlete", "coach", "crew", "beyond"]
 LIMIT_PER = ["plan_day_week", "week", "cycle"]
 # How Proof counts a milestone (hab_bonus_xp()'s measures) and a quest inside a run (its kinds). <habit> is a habit id.
+# "qualify" joined on 2026-10-20 with the ladders (version 10): career_proof_key() has always named it, and the ON TARGET
+# ladder is the first entry to ask for a day on target by itself rather than inside a goals list.
 # "total:<habit>" and "dayStreak" joined on 2026-10-20 with the plain achievements: career_measures() has always kept
 # sum:<habit> and daystreak, and career_proof_key() now names them (supabase/stage93).
 PROOF_MEASURES = ["streak:<habit>", "daysHit:<habit>", "total:<habit>", "daysWith3", "perfectDays", "dayStreak",
-                  "comebackRun", "comebacksStuck"]
+                  "qualify", "comebackRun", "comebacksStuck"]
 PROOF_KINDS = ["daysHit:<habit>", "total:<habit>", "qualify", "perfect"]
 PROOF_SNAPSHOT = ROOT / "supabase" / "xp_rules_snapshot.json"
 SWITCH = "catalogue"   # the one value retire_at and starts_at may take: the catalogue switch, phase 3 ([switch] catalogue)

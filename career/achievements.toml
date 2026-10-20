@@ -538,7 +538,7 @@ origin = "proof"
 # line is the whole instruction. Each reads a measure career_measures() already keeps (career_proof_key()).
 
 [achievement.full_tank]
-name = "Full Tank"
+name = "HUMAN SPRINKLER I"
 meaning = "consistency"
 reads = "proof"
 test = "proof"
@@ -553,7 +553,7 @@ free = true
 origin = "new"
 
 [achievement.lights_out]
-name = "Lights Out"
+name = "BLACKOUT ARTIST I"
 meaning = "consistency"
 reads = "proof"
 test = "proof"
@@ -568,7 +568,7 @@ free = true
 origin = "new"
 
 [achievement.well_fed]
-name = "Well Fed"
+name = "FULLY FUELLED I"
 meaning = "consistency"
 reads = "proof"
 test = "proof"
@@ -583,7 +583,7 @@ free = true
 origin = "new"
 
 [achievement.on_your_feet]
-name = "On Your Feet"
+name = "GROUND COVERED I"
 meaning = "consistency"
 reads = "proof"
 test = "proof"
@@ -598,7 +598,7 @@ free = true
 origin = "new"
 
 [achievement.complete_day]
-name = "A Complete Day"
+name = "CLEAN SWEEP I"
 meaning = "commitment"
 reads = "proof"
 test = "proof"
@@ -613,7 +613,7 @@ free = true
 origin = "new"
 
 [achievement.ten_complete_days]
-name = "Ten Complete Days"
+name = "CLEAN SWEEP II"
 meaning = "commitment"
 reads = "proof"
 test = "proof"
@@ -628,7 +628,7 @@ free = true
 origin = "new"
 
 [achievement.week_that_counted]
-name = "Seven Days Running"
+name = "UNBROKEN I"
 meaning = "consistency"
 reads = "proof"
 test = "proof"
@@ -643,7 +643,7 @@ free = true
 origin = "new"
 
 [achievement.thirty_days_running]
-name = "Thirty Days Running"
+name = "UNBROKEN II"
 meaning = "consistency"
 reads = "proof"
 test = "proof"
@@ -658,7 +658,7 @@ free = true
 origin = "new"
 
 [achievement.quarter_million]
-name = "Quarter of a Million"
+name = "QUARTER OF A MILLION"
 meaning = "progress"
 reads = "proof"
 test = "proof"
@@ -673,7 +673,7 @@ free = true
 origin = "new"
 
 [achievement.million_steps]
-name = "A Million Steps"
+name = "THE MILLION"
 meaning = "progress"
 reads = "proof"
 test = "proof"
@@ -684,5 +684,338 @@ rule = "1,000,000 steps, counted from your first day."
 xp = 1000
 size = "legend"
 caption = "A million steps. Most people never count that high."
+free = true
+origin = "new"
+
+# ── Version 10 (2026-10-20): AA Proof's ladders ────────────────────────────────────────────────────────────
+# Amir, 2026-10-20: "i used to have loads of achievements related to my habits in proof ... i want them back audited and
+# added to ones i have now in the right place", then "lets have 3 rungs, 5 core habits / but have some about days that
+# count, perfect days, days in row / we dont want duplicates ofcourse", and the names in Proof's own caps.
+#
+# AA Proof had 31 of these in FAMILIES: one name you could earn again at a higher bar. The cut (stage78) took them out as
+# BADGES and nothing replaced them, so the only habit achievements left were the five month-long `goals` ones and three
+# standalones. Version 9 added ten plain ones that morning; this version makes those ten the FIRST RUNG of the families
+# they always belonged to (a rename only — same ids, same XP, every award already minted untouched) and builds the rest
+# of the ladder on top.
+#
+# Two rules the ladder keeps, both AA Proof's:
+#   1. Inside a family, a higher mark ALWAYS pays more than the one below it.
+#   2. Whichever habit an athlete favours, there is always a next rung in something they actually do.
+# And one rule this app adds: a week, three weeks, two months — one shape for all four daily habits, so the manual can say
+# it in a line instead of a table.
+#
+# ⚠️ THE SESSION STOPS AT TWO RUNGS, ON PURPOSE. Proof's HEAVY METAL went to 30 days running, which is an app paying an
+# athlete to skip every rest day a coach wrote for them. Three days and five days are a block; past that the ladder is
+# Century's marks (25 · 50 · 100 · 200 · 500 sessions) and THE MACHINIST at 150, and a third rung here would pay twice for
+# one day's work.
+#
+# ⚠️ Every entry here is origin = "new", including the ones wearing Proof's names. origin = "proof" is not a label, it is
+# a claim career_compare() checks: it means AA Proof's own client pays this too. These rows AA Proof never knew.
+#
+# Nothing here needed new SQL — career_measures() has always counted all of it — except `dayStreak`'s wake-up
+# (supabase/stage94_daystreak_wake.sql) and one word in scripts/check_career.py, which refused `qualify` in a
+# proof_measure although career_proof_key() has always named it.
+
+[achievement.human_sprinkler_2]
+name = "HUMAN SPRINKLER II"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_sprinkler2"
+proof_measure = "streak:water"
+proof_need = 21
+rule = "8 glasses of water, 21 days in a row."
+xp = 350
+size = "milestone"
+caption = "Three weeks. Not one dry day."
+free = true
+origin = "new"
+
+[achievement.human_sprinkler_3]
+name = "HUMAN SPRINKLER III"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_sprinkler3"
+proof_measure = "streak:water"
+proof_need = 60
+rule = "8 glasses of water, 60 days in a row."
+xp = 700
+size = "milestone"
+caption = "Two months on full water. Hardly anyone does this."
+free = true
+origin = "new"
+
+[achievement.blackout_artist_2]
+name = "BLACKOUT ARTIST II"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_blackout2"
+proof_measure = "streak:sleep"
+proof_need = 21
+rule = "7.5 hours of sleep, 21 nights in a row."
+xp = 350
+size = "milestone"
+caption = "Three weeks of proper nights."
+free = true
+origin = "new"
+
+[achievement.blackout_artist_3]
+name = "BLACKOUT ARTIST III"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_blackout3"
+proof_measure = "streak:sleep"
+proof_need = 60
+rule = "7.5 hours of sleep, 60 nights in a row."
+xp = 700
+size = "milestone"
+caption = "Two months of proper nights. That is a different athlete."
+free = true
+origin = "new"
+
+[achievement.fully_fuelled_2]
+name = "FULLY FUELLED II"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_fuelled2"
+proof_measure = "streak:fuel"
+proof_need = 21
+rule = "3 protein meals, 21 days in a row."
+xp = 350
+size = "milestone"
+caption = "Three weeks of eating like you train."
+free = true
+origin = "new"
+
+[achievement.fully_fuelled_3]
+name = "FULLY FUELLED III"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_fuelled3"
+proof_measure = "streak:fuel"
+proof_need = 60
+rule = "3 protein meals, 60 days in a row."
+xp = 700
+size = "milestone"
+caption = "Two months. Nothing left to chance."
+free = true
+origin = "new"
+
+[achievement.ground_covered_2]
+name = "GROUND COVERED II"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_ground2"
+proof_measure = "streak:steps"
+proof_need = 21
+rule = "10,000 steps, 21 days in a row."
+xp = 350
+size = "milestone"
+caption = "Three weeks on your feet."
+free = true
+origin = "new"
+
+[achievement.ground_covered_3]
+name = "GROUND COVERED III"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_ground3"
+proof_measure = "streak:steps"
+proof_need = 60
+rule = "10,000 steps, 60 days in a row."
+xp = 700
+size = "milestone"
+caption = "Two months on your feet."
+free = true
+origin = "new"
+
+[achievement.heavy_metal_1]
+name = "HEAVY METAL I"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_metal1"
+proof_measure = "streak:strength"
+proof_need = 3
+rule = "A session three days running."
+xp = 120
+size = "highlight"
+caption = "Three days straight with a session."
+free = true
+origin = "new"
+
+[achievement.heavy_metal_2]
+name = "HEAVY METAL II"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_metal2"
+proof_measure = "streak:strength"
+proof_need = 5
+rule = "A session five days running."
+xp = 300
+size = "milestone"
+caption = "Five days straight. That is a block, not a week."
+free = true
+origin = "new"
+
+[achievement.unbroken_3]
+name = "UNBROKEN III"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_unbroken3"
+proof_measure = "dayStreak"
+proof_need = 100
+rule = "100 days in a row that counted."
+xp = 1000
+size = "legend"
+caption = "A hundred days. The run never broke."
+free = true
+origin = "new"
+
+[achievement.clean_sweep_3]
+name = "CLEAN SWEEP III"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_sweep3"
+proof_measure = "perfectDays"
+proof_need = 30
+rule = "30 days with every habit on your list done."
+xp = 700
+size = "milestone"
+caption = "Thirty days with nothing left out."
+free = true
+origin = "new"
+
+[achievement.dawn_patrol_1]
+name = "DAWN PATROL I"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_dawn1"
+proof_measure = "daysWith3"
+proof_need = 1
+rule = "Three habits ticked in one day."
+xp = 40
+size = "win"
+caption = "Three habits, one day. You started."
+free = true
+origin = "new"
+
+[achievement.dawn_patrol_2]
+name = "DAWN PATROL II"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_dawn2"
+proof_measure = "daysWith3"
+proof_need = 10
+rule = "Three habits or more, on 10 days."
+xp = 100
+size = "highlight"
+caption = "Ten days of turning up."
+free = true
+origin = "new"
+
+[achievement.dawn_patrol_3]
+name = "DAWN PATROL III"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_dawn3"
+proof_measure = "daysWith3"
+proof_need = 50
+rule = "Three habits or more, on 50 days."
+xp = 300
+size = "milestone"
+caption = "Fifty days of turning up."
+free = true
+origin = "new"
+
+[achievement.on_target_1]
+name = "ON TARGET I"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_ontarget1"
+proof_measure = "qualify"
+proof_need = 10
+rule = "10 days on target. A day is on target with your list done bar one."
+xp = 150
+size = "highlight"
+caption = "Ten days that counted."
+free = true
+origin = "new"
+
+[achievement.on_target_2]
+name = "ON TARGET II"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_ontarget2"
+proof_measure = "qualify"
+proof_need = 50
+rule = "50 days on target."
+xp = 400
+size = "milestone"
+caption = "Fifty days that counted."
+free = true
+origin = "new"
+
+[achievement.on_target_3]
+name = "ON TARGET III"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_ontarget3"
+proof_measure = "qualify"
+proof_need = 150
+rule = "150 days on target."
+xp = 800
+size = "milestone"
+caption = "A hundred and fifty days that counted."
+free = true
+origin = "new"
+
+# ⚠️ NO HARD TO KILL HERE. Proof's HARD TO KILL I and II (3 and 5 comebacks that stuck, 300 and 600 XP) already came
+# back, as badge.comebacks: the same name, the same numbers, the same XP, and a third tier at 10. An achievement for it
+# would pay an athlete twice on one day for one comeback. BACK IN THE FIGHT stays, because nothing else counts the days
+# AFTER a comeback.
+[achievement.back_in_the_fight_1]
+name = "BACK IN THE FIGHT I"
+meaning = "resilience"
+reads = "proof"
+test = "proof"
+proof_code = "ev_fight1"
+proof_measure = "comebackRun"
+proof_need = 7
+rule = "Fall off, come back, and hold it a week."
+xp = 200
+size = "highlight"
+caption = "Back, and it stuck."
+free = true
+origin = "new"
+
+[achievement.back_in_the_fight_2]
+name = "BACK IN THE FIGHT II"
+meaning = "resilience"
+reads = "proof"
+test = "proof"
+proof_code = "ev_fight2"
+proof_measure = "comebackRun"
+proof_need = 21
+rule = "Three weeks straight after a comeback."
+xp = 400
+size = "milestone"
+caption = "Three weeks after coming back."
 free = true
 origin = "new"

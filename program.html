@@ -2497,12 +2497,12 @@
 
   /* 1. The cover (a compact one: no picture, it is the screen's one green thing). ← is the day cover's 44 px glass button. The
      eyebrow, the title and the scoreboard are the archive's and the day's; a long lift name wraps whole, never clipped. */
-  #screen-ceiling .ceil-head, #screen-weight .ceil-head, #screen-habits .ceil-head, #screen-moments .ceil-head, #screen-achievements .ceil-head, #screen-crewboard .ceil-head, #screen-crewwho .ceil-head { position: relative; padding: 74px var(--g) 22px; background: var(--hero); color: #fff; }
-  #screen-ceiling .nav-back, #screen-weight .nav-back, #screen-habits .nav-back, #screen-moments .nav-back, #screen-achievements .nav-back, #screen-crewboard .nav-back, #screen-crewwho .nav-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  #screen-ceiling .ceil-head, #screen-weight .ceil-head, #screen-habits .ceil-head, #screen-moments .ceil-head, #screen-achievements .ceil-head, #screen-crewboard .ceil-head, #screen-crewwho .ceil-head, #screen-system .ceil-head { position: relative; padding: 74px var(--g) 22px; background: var(--hero); color: #fff; }
+  #screen-ceiling .nav-back, #screen-weight .nav-back, #screen-habits .nav-back, #screen-moments .nav-back, #screen-achievements .nav-back, #screen-crewboard .nav-back, #screen-crewwho .nav-back, #screen-system .nav-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
     border: 0; border-radius: 50%; cursor: pointer; color: #fff; background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     font: 500 var(--fs-title)/1 'Barlow', sans-serif; -webkit-tap-highlight-color: transparent; }
-  #screen-ceiling .nav-back:active, #screen-weight .nav-back:active, #screen-habits .nav-back:active, #screen-moments .nav-back:active, #screen-achievements .nav-back:active, #screen-crewboard .nav-back:active, #screen-crewwho .nav-back:active { transform: scale(0.92); }
-  #screen-ceiling .nav-back:focus-visible, #screen-weight .nav-back:focus-visible, #screen-habits .nav-back:focus-visible, #screen-moments .nav-back:focus-visible, #screen-achievements .nav-back:focus-visible, #screen-crewboard .nav-back:focus-visible, #screen-crewwho .nav-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  #screen-ceiling .nav-back:active, #screen-weight .nav-back:active, #screen-habits .nav-back:active, #screen-moments .nav-back:active, #screen-achievements .nav-back:active, #screen-crewboard .nav-back:active, #screen-crewwho .nav-back:active, #screen-system .nav-back:active { transform: scale(0.92); }
+  #screen-ceiling .nav-back:focus-visible, #screen-weight .nav-back:focus-visible, #screen-habits .nav-back:focus-visible, #screen-moments .nav-back:focus-visible, #screen-achievements .nav-back:focus-visible, #screen-crewboard .nav-back:focus-visible, #screen-crewwho .nav-back:focus-visible, #screen-system .nav-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .ceil-kick { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
   .ceil-kick::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
   .ceil-title { margin: 10px 0 0; max-width: 330px;
@@ -2520,9 +2520,9 @@
   #ceil-body, #wt-body { padding: 0 0 110px; }
   .ceil-intro { margin: 22px var(--g) 0; font: 400 var(--fs-lead)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
   .ceil-note { margin: 20px var(--g) 0; font: 400 var(--fs-small)/1.55 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
-  :where(#screen-ceiling, #screen-weight, #screen-habits, #screen-moments, #screen-achievements, #screen-crewboard, #screen-crewwho) .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 8px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
+  :where(#screen-ceiling, #screen-weight, #screen-habits, #screen-moments, #screen-achievements, #screen-crewboard, #screen-crewwho, #screen-system) .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 8px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
     letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
-  :where(#screen-ceiling, #screen-weight, #screen-habits, #screen-moments, #screen-achievements, #screen-crewboard, #screen-crewwho) .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }   /* to the right edge, as Progress's section titles */
+  :where(#screen-ceiling, #screen-weight, #screen-habits, #screen-moments, #screen-achievements, #screen-crewboard, #screen-crewwho, #screen-system) .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }   /* to the right edge, as Progress's section titles */
 
   /* 3. Door rows (Home's and Progress's .hrow recipe): + Log a max, and Add your weight when there is no body weight yet. */
   :where(#screen-ceiling) .hrow { display: flex; align-items: center; gap: 14px; width: calc(100% - 2 * var(--g)); min-height: 64px; margin: 22px var(--g) 0;
@@ -4575,6 +4575,24 @@
   /* Not tracked that day: nothing drawn at all, so the app never invents a failure out of a habit that did not exist yet. */
   :where(#screen-plan, #screen-habits) .hw-c.is-pre { background: transparent; box-shadow: inset 0 0 0 1px var(--hair); }
 
+  /* ══ THE MANUAL (#screen-system) ═══════════════════════════════════════════════════════════════════════
+     "What all this means" (2026-10-20, Amir: "we used to have a what all this means, and explanation of how habit system
+     works, and how the xp works, what the prizes are", then "it shouldnt be specific to achievements from habits only,
+     should be about those coming from training as well. its just a guide to the system"). AA Proof had one, called The
+     manual, and the training app never did. It is the help sheet's own fold list (.help-list / .note-card, declared with
+     the SHEETS block) on this screen's paper: nothing new to draw, so the guide and the manual can never drift apart in
+     the way they look. The first section is open on arrival; the rest are headers until they are asked for. */
+  #screen-system { background: var(--grey-bg); }
+  #screen-system #sys-body { padding: 0 var(--g) 40px; }
+  #screen-system .sys-lead { margin: 18px 0 0; font: 400 var(--fs-body)/1.55 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  #screen-system .help-list { margin: 18px 0 0; }
+  /* The price list inside a section: the thing on the left, what it pays on the right, a hairline between. Space Mono on
+     the figure, because it is a figure and the app says figures in Space Mono. */
+  #screen-system .sys-pr { margin: 6px 0 12px; border-top: 1px solid var(--hair); }
+  #screen-system .sys-pr div { display: flex; align-items: baseline; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--hair); }
+  #screen-system .sys-pr span { flex: 1; min-width: 0; font: 400 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); }
+  #screen-system .sys-pr b { flex: none; font: 700 var(--fs-small)/1 'Space Mono', monospace; color: var(--green-ink); font-variant-numeric: tabular-nums; }
+
   /* ══ THE LIST (#screen-habits) ══════════════════════════════════════════════════════════════════════════
      One list, not two: the five that are the same for everyone, then whatever the athlete chose, then the
      ways to add another. It wears Progress's own furniture — the compact green cover, .prog-sec titles and
@@ -4645,15 +4663,38 @@
     padding: 10px 4px 10px 16px; border: 0; background: transparent; text-align: left; cursor: pointer; color: var(--ink); font-family: inherit; }
   #home-overview .hb-main:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   #home-overview .hb-row.is-locked .hb-main { cursor: default; }
-  #home-overview .hb-mark { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 99px;
-    border: 1.8px solid var(--field); box-sizing: border-box; font: 700 var(--fs-small)/1 'Barlow', sans-serif; color: transparent; }
-  #home-overview .hb-mark.is-done { border-color: var(--fill); background: var(--fill); color: #fff; }
-  #home-overview .hb-name { flex: 1; min-width: 0; font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; }
+  /* THE CIRCLE IS THE TICK, AND IT CARRIES THE HABIT'S ICON (2026-10-20, Amir: "i liked the icons and how the bar under
+     was like that ... you can create new icons"). AA Proof put each habit's emoji in a circle in its own colour; this is
+     that object in this app's hand — the icon set the door rows use, at 21 px, the habit's colour on the rim and its tint
+     inside, and the whole circle solid green with a tick the moment the day's target is met. ⚠️ The habit's colour LABELS
+     a row, it is never an accent: the app still paints with one, and it is clay. */
+  #home-overview .hb-ic { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%;
+    box-sizing: border-box; background: var(--hbg, var(--tint)); color: var(--hcol, var(--fill));
+    box-shadow: inset 0 0 0 2px var(--hcol, var(--fill)); }
+  #home-overview .hb-ic svg { display: block; width: 21px; height: 21px; }
+  #home-overview .hb-row.is-done .hb-ic { background: var(--fill); color: #fff; box-shadow: none; }
+  /* Dark: the colour stays on the rim and the icon, where it labels the row; the pale tint behind it does not. A
+     pastel disc on near-black is the brightest thing on the card, and a habit's row is not the loudest thing on Home. */
+  body[data-dark] #home-overview .hb-ic { background: transparent; }
+  body[data-dark] #home-overview .hb-row.is-done .hb-ic { background: var(--fill); }
+  #home-overview .hb-row.is-locked .hb-ic { opacity: .5; }
+  #home-overview .hb-row.is-locked.is-done .hb-ic { opacity: 1; }
+  /* The name, what is left, and the meter: one stack, so the row has a left edge and a right edge and nothing in between
+     competes for the middle. */
+  #home-overview .hb-b { flex: 1; min-width: 0; display: grid; gap: 1px; }
+  #home-overview .hb-name { min-width: 0; font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; }
   #home-overview .hb-row.is-done .hb-name { color: var(--grey); }
-  #home-overview .hb-val { flex: none; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
-  /* How far into a counted habit the day is. Green, never clay: it reports, it does not ask. */
-  #home-overview .hb-bar { flex: none; width: 54px; height: 6px; border-radius: 99px; background: var(--prog-track); overflow: hidden; }
-  #home-overview .hb-bar i { display: block; height: 100%; background: var(--fill); }
+  #home-overview .hb-sub { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* ONE PIP PER STEP, NEVER A STRAIGHT BAR (Amir, on water and protein: "its not a straight bar"). The meter counts the
+     same unit the + adds, so eight glasses is eight pips and one tap fills one — which a 0–100% bar could never say.
+     Capped at 20, or 10,000 steps is a comb; the leading part-pip keeps part-way progress visible at any cap. It came
+     back with the icons on 2026-10-20: the straight 54 px bar it replaces had been cut eight days earlier for taking
+     the name's room and saying nothing with it. */
+  #home-overview .hb-bar { display: flex; gap: 3px; height: 6px; margin-top: 4px; }
+  #home-overview .hb-bar i { flex: 1; min-width: 2px; border-radius: 99px; background: var(--prog-track); }
+  #home-overview .hb-bar i.on { background: var(--hcol, var(--fill)); }
+  #home-overview .hb-bar i.part { background: var(--hcol, var(--fill)); opacity: .4; }
   /* − and + (2026-10-20): one pill holding two buttons, so the pair reads as one control and the row keeps its name.
      34 px of ink inside a 44 px tap target (the padding is the target), and a held button stays pressed while it repeats. */
   #home-overview .hb-steps { flex: none; display: flex; align-items: center; gap: 2px; }
@@ -4667,6 +4708,8 @@
     #home-overview .hb-main { gap: 8px; padding-left: 12px; }
     #home-overview .hb-now { min-width: 36px; }
     #home-overview .hb-row { gap: 4px; padding-right: 8px; }
+    #home-overview .hb-ic { width: 38px; height: 38px; }
+    #home-overview .hb-ic svg { width: 19px; height: 19px; }
   }
   #home-overview .hb-step { flex: none; width: 34px; height: 34px; margin: 5px 0; border-radius: 99px; border: 1.5px solid var(--hair);
     background: var(--paper); color: var(--green-ink); font: 600 var(--fs-lead)/1 'Barlow', sans-serif; cursor: pointer;
@@ -5472,14 +5515,7 @@
      moment made the row of buttons taller than the news it was about. A post keeps all five out, Amir's pick of 2026-10-19. */
   .cr-em.cr-plus { color: var(--green-ink); font-weight: 700; }
   .cr-em i { font-style: normal; font-size: var(--fs-lead); line-height: 1; }
-  /* 2px, not 1, and the green ink in both modes: in dark mode --fill against --row is 1.6:1, so which emoji you chose was
-     carried by a border nobody could see, on a row where the count is 1 whether it was you or somebody else (2026-10-20). */
-  .cr-em[aria-pressed="true"] { border: 2px solid var(--green-ink); background: var(--tint); }
-  /* A RECEIPT, not a menu: your own item, or an account with reactions off, shows what people gave and nothing to press.
-     These are spans, so nothing is dimmed, nothing is in the tab order, and nothing says "0 people". */
-  .cr-kd.is-tally, .cr-em.is-tally { border-color: transparent; background: none; color: var(--grey); cursor: default; min-height: 0; padding: 0 10px 0 0; }
-  .cr-em.is-tally i { font-size: var(--fs-body); }
-  .cr-kd.is-tally b, .cr-em.is-tally b { color: var(--ink); }
+  .cr-em[aria-pressed="true"] { border-color: var(--fill); background: var(--tint); }
   .cr-em b { font-size: var(--fs-small); color: var(--ink); }
   #screen-crew .cr-line .cr-react { margin-top: 8px; }
   @media (max-width: 359px) { .cr-em { min-width: 38px; padding: 0 6px; gap: 3px; } .cr-react { gap: 4px; } #screen-crew .cr-kd { padding: 0 9px; } }
@@ -5493,7 +5529,7 @@
   #screen-crew .cr-reps:empty { display: none; }
   #screen-crew .cr-rep { display: flex; align-items: flex-start; gap: 8px; padding-top: 8px; border-top: 1px solid var(--hair); }
   #screen-crew .cr-rep .cr-ini { flex: none; margin-top: 1px; }
-  #screen-crew .cr-rb { flex: 1; min-width: 0; font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
+  #screen-crew .cr-rb { flex: 1; min-width: 0; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
   #screen-crew .cr-rb b { font-weight: 700; }
   #screen-crew .cr-rep-add { justify-self: start; min-height: 44px; padding: 0 2px; border: 0; background: none; color: var(--green-ink);
     font: 600 var(--fs-small)/1 'Barlow', sans-serif; text-align: left; cursor: pointer; }
@@ -5945,6 +5981,18 @@
   <div id="ach-body"></div>
 </div>
 
+<!-- ═══ THE MANUAL ═══ "What all this means": how a day counts, what the habits pay, what training pays, the level, the
+     achievements, the four numbers and the crew. One page for the WHOLE system (Amir, 2026-10-20: "its just a guide to the
+     system"), reached from the habits page and from Achievements, and its ← goes back to whichever opened it. -->
+<div id="screen-system" class="screen">
+  <div class="ceil-head">
+    <button class="nav-back" onclick="sysBack()" aria-label="Back">←</button>
+    <div class="ceil-kick">Everything, explained</div>
+    <h1 class="ceil-title">How it works</h1>
+  </div>
+  <div id="sys-body"></div>
+</div>
+
 <!-- ═══ YOUR MOMENTS ═══ every mark, achievement, line from Amir and honour, newest first and GROUPED BY MONTH (2026-10-19,
      THE SCOREBOARD: on the tab it was a 716 px list that printed four honours of one month in a row). A sub-screen of
      Progress, reached from its door row. renderMoments(). -->
@@ -6364,6 +6412,12 @@ window.__ICONS = {
   technique:  `<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/>`,
   tracking:   `<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>`,
   mobility:   `<circle cx="12" cy="4" r="2"/><path d="M5 9l4.5 1.5L12 9l2.5 1.5L19 9"/><path d="M9.5 10.5 8 21M14.5 10.5 16 21"/>`,
+  /* The habits' own four (2026-10-20). Sleep, protein, the session and mobility already had one here, so a habit row
+     and a door row are drawn by one pen; these are the rest. */
+  steps:      `<circle cx="12.5" cy="4" r="1.9"/><path d="M12.3 6.3 11.3 12.2"/><path d="M11.3 12.2 13.7 15.3 14.3 20"/><path d="M11.3 12.2 8.9 15.3 8.3 20"/><path d="M11.9 7.9 14.8 10.3"/>`,
+  water:      `<path d="M12 3.4c3.6 4.1 5.6 6.8 5.6 9.4a5.6 5.6 0 0 1-11.2 0c0-2.6 2-5.3 5.6-9.4z"/>`,
+  breathe:    `<path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 13h13.5a3 3 0 1 1-3 3"/><path d="M3 17.5h7.5"/>`,
+  supps:      `<path d="M10.5 20.5 20.5 10.5a5 5 0 0 0-7-7l-10 10a5 5 0 0 0 7 7z"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/>`,
   newinfo:    `<polygon points="12 2.5 14.6 8.6 21 9.2 16 13.5 17.6 20 12 16.4 6.4 20 8 13.5 3 9.2 9.4 8.6"/>`,
   note:       `<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14 3 14 8 19 8"/><line x1="8.5" y1="13" x2="15.5" y2="13"/><line x1="8.5" y1="16.5" x2="13" y2="16.5"/>`,
   period:     `<path d="M12 2.5C12 2.5 5.5 10.5 5.5 15a6.5 6.5 0 0 0 13 0c0-4.5-6.5-12.5-6.5-12.5z"/>`,
@@ -11032,6 +11086,7 @@ function goTo(screen, historyId, keepContent) {
   // Progress's own pages (THE SCOREBOARD, 2026-10-19): built on every visit from the same copy the doors read.
   if (screen === 'moments') renderMoments();
   if (screen === 'achievements') renderAchievements();
+  if (screen === 'system') renderSystemGuide();
   // Crew's own two pages: built from the copy on this phone, so they open with no signal (2026-10-20).
   if (screen === 'crewboard' || screen === 'crewwho') { renderCrewPage(); if (Date.now() - _boardAt > 10 * 60000) refreshCrewBoard(); }
   // The tab is settled on every move (2026-10-20). It is kept while the athlete is ON Crew even after the server stops
@@ -11524,25 +11579,46 @@ function habDaysHtml(cur) {
   }
   return `<div class="hb-days" role="group" aria-label="The days you can still fill in">${out.join('')}</div>`;
 }
-// One row per habit. The session's is the ledger line: it never opens a sheet, because finishing a session
-// is what ticks it.
+// Each habit's icon, from the app's own set (2026-10-20). A habit of the athlete's own has no id we know, so the emoji
+// they typed in its name picks one, and anything with no emoji falls back to the pulse line.
+const HAB_ICONS = { steps:'steps', sleep:'sleep', fuel:'nutrition', water:'water', strength:'strength', mobility:'mobility', breathe:'breathe', supps:'supps' };
+const HAB_TICK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 12.5 9.5 17.5 19.5 6.5"/></svg>`;
+function habIconKey(hb) {
+  if (HAB_ICONS[hb.id]) return HAB_ICONS[hb.id];
+  const emo = window.AAHabits.splitEmoji(hb.name)[0];
+  return emo ? window.resolveIconKey(emo) : 'activity';
+}
+// ONE PIP PER STEP of the habit, so the meter counts the thing the + button adds: eight glasses is eight pips and one tap
+// fills one, which a 0–100% bar could never say. Capped at 20 (10,000 steps would be a comb) and the leading part-pip is
+// dimmed, so part-way progress shows at any cap. Cut from AA Proof's segBar() function for function, same arithmetic.
+function habBarHtml(hb, val) {
+  const target = Number(hb.target) || 1, step = Number(hb.step) || 1;
+  let n = Math.round(target / step);
+  if (!isFinite(n) || n < 1) n = 1;
+  if (n > 20) n = 20;
+  const per = target / n;
+  const full = Math.max(0, Math.min(n, Math.floor(val / per + 1e-9)));
+  const part = full < n && val - full * per > 1e-9;
+  let out = '';
+  for (let i = 0; i < n; i++) out += `<i class="${i < full ? 'on' : (i === full && part ? 'part' : '')}"></i>`;
+  return `<span class="hb-bar" aria-hidden="true">${out}</span>`;
+}
+// One row per habit: the circle that ticks it and carries its icon, the name, what is still left, and the meter under it —
+// AA Proof's row in this app's hand (2026-10-20, Amir: "i liked the icons and how the bar under was like that"). The
+// session's is the ledger line: it never opens a sheet, because finishing a session is what ticks it.
 function habRowHtml(hb, k) {
   const H = window.AAHabits;
   const done = H.isDone(hb, k), val = H.valOf(k, hb.id);
   const name = H.splitEmoji(hb.name)[1] || hb.name;
-  const mark = done
-    ? `<span class="hb-mark is-done" aria-hidden="true">✓</span>`
-    : `<span class="hb-mark" aria-hidden="true"></span>`;
-  // The name gets the row (2026-10-20): the value is small, last and never wraps, and the per-row bar is gone — the ring above
-  // is the progress. "Walk 10,000 steps" was folding onto three lines to make room for a bar nobody read.
-  let right = '';
-  if (hb.kind === 'count') {
-    // The number sits between the − and the + since 2026-10-20, so the row reads as one control; it is not repeated here, and
-    // "of 10,000" is not said either, because the name already is "Walk 10,000 steps".
-    right = hb.locked ? `<span class="hb-val">${done ? H.fmtVal(hb, val) : ''}</span>` : '';
-  } else if (hb.locked) {
-    right = `<span class="hb-val">${done ? 'Done' : 'Not yet'}</span>`;
-  }
+  const hue = H.hue(hb) || [];
+  const mark = `<span class="hb-ic" aria-hidden="true">${done ? HAB_TICK : window.ICON(habIconKey(hb), 2)}</span>`;
+  // WHAT IS LEFT, never where you are (AA Proof's own note on this line): the − and + already say the number, and "3,500
+  // steps to go" is the half an athlete acts on. A habit you tick rather than count says what it ASKS for instead, which
+  // is how the session's row stops reading "Not yet" at someone who has not trained yet today.
+  const left = hb.kind === 'count' && !done ? Math.max(0, (Number(hb.target) || 0) - val) : 0;
+  const sub = done ? 'Done'
+    : hb.kind === 'count' ? H.fmtVal(hb, left) + ' ' + String(hb.unit || '') + ' to go'
+    : String(hb.goal || hb.source || '');
   const edit = _habEdit === hb.id ? `<div class="hb-edit">
       <label class="hb-field"><input id="hab-num-${hb.id}" type="number" inputmode="decimal" step="${hb.step || 1}" value="${H.fmtVal(hb, val > 0 ? val : hb.target)}" aria-label="${esc(name)}"><span>${esc(hb.unit || '')}</span></label>
       <button type="button" class="hb-save" onclick="habSaveNum('${hb.id}')">Save</button>
@@ -11558,9 +11634,9 @@ function habRowHtml(hb, k) {
       <button type="button" class="hb-step" data-h="${hb.id}" data-d="1"${val >= cap ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Add ${step} to ${esc(name)}">+</button>
     </span>` : '';
   return `<div class="hb-wrap" data-h="${hb.id}">
-    <div class="hb-row${done ? ' is-done' : ''}${hb.locked ? ' is-locked' : ''}">
+    <div class="hb-row${done ? ' is-done' : ''}${hb.locked ? ' is-locked' : ''}" style="--hcol:${esc(hue[0] || '')};--hbg:${esc(hue[1] || '')}">
       <button type="button" class="hb-main" onclick="habTap('${hb.id}')">
-        ${mark}<span class="hb-name">${esc(name)}</span>${right}
+        ${mark}<span class="hb-b"><span class="hb-name">${esc(name)}</span>${sub ? `<span class="hb-sub">${esc(sub)}</span>` : ''}${hb.kind === 'count' ? habBarHtml(hb, val) : ''}</span>
       </button>${plus}
     </div>${edit}
   </div>`;
@@ -11695,7 +11771,8 @@ function habFigsHtml() {
     </div>
     ${habXpHtml()}
     ${habWeekTableHtml()}
-    ${habAchDoorHtml()}`;
+    ${habAchDoorHtml()}
+    ${sysDoorHtml('habits')}`;
 }
 // What the habits have earned (2026-10-20, Amir: "i want the habits to give xp as well. Like before. It doesnt show xp so the
 // people dont fill like their progressing"). They have always paid — habit_done pays from the habits rules, and for the
@@ -11733,6 +11810,145 @@ function habAchDoorHtml() {
       <span class="hrow-v"><span class="hrow-vv">${got.length} of ${list.length}</span><small>${esc(sub)}</small></span></span>
     <span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
+// ── THE MANUAL ────────────────────────────────────────────────────────────────────────────────────────────────────
+// "What all this means" (2026-10-20, Amir: "we used to have a what all this means, and explanation of how habit system
+// works, and how the xp works, what the prizes are", then "it shouldnt be specific to achievements from habits only,
+// should be about those coming from training as well. its just a guide to the system"). AA Proof had one, called The
+// manual; this app had the guide, which says how to USE it and never what anything is WORTH.
+// ⚠️ EVERY NUMBER ON THIS PAGE IS READ, NEVER TYPED. The habits' prices come from the engine's own XP_RULES (which is
+// the server's hab_xp(), generated from habits.html), the training prices from get_profile()'s own rules, the counts
+// from the same achievements answer the cabinet reads. A manual that quotes a figure is a second copy of that figure,
+// and the two drift the first time Amir changes one. A section whose numbers are not loaded simply does not draw.
+let _sysFrom = 'habits';
+function openSystemGuide(from) { _sysFrom = from === 'achievements' ? 'achievements' : 'habits'; goTo('system'); window.scrollTo(0, 0); }
+function sysBack() { goTo(_sysFrom === 'achievements' ? 'achievements' : 'habits'); }
+window.openSystemGuide = openSystemGuide;
+window.sysBack = sysBack;
+// The door, on both pages that lead here. Its name says what it opens, and the line under it is prose, so it sits in
+// .hrow-q and not in the figure's slot.
+function sysDoorHtml(from) {
+  return `<button type="button" class="hrow" onclick="openSystemGuide('${from}')" aria-label="How it works: what a day counts for, and what everything is worth">
+    ${hrowIc('why')}<span class="hrow-b"><span class="hrow-l">How it works</span>
+      <span class="hrow-q">What a day counts for, and what everything is worth.</span></span>
+    <span class="hrow-a" aria-hidden="true">›</span></button>`;
+}
+function sysCard(title, icon, body, open) {
+  if (!body) return '';
+  return `<div class="note-card app-card${open ? ' open' : ''}" onclick="toggleNote(this)">
+      <div class="note-card-header">
+        <div class="app-card-icon">${window.ICON(icon)}</div>
+        <div class="note-card-title">${esc(title)}</div>
+        <span class="note-chevron">▼</span>
+      </div>
+      <div class="note-body">${body}</div>
+    </div>`;
+}
+// A price list: the thing on the left, what it pays on the right. Rows whose number is missing are left out rather than
+// drawn as a zero, because "0 XP" reads as a promise that it pays nothing.
+function sysPrices(rows) {
+  const on = rows.filter(r => Number(r[1]) > 0);
+  if (!on.length) return '';
+  return `<div class="sys-pr">` + on.map(r => `<div><span>${esc(r[0])}</span><b>+${Number(r[1]).toLocaleString('en-US')} XP</b></div>`).join('') + `</div>`;
+}
+function renderSystemGuide() {
+  const body = document.getElementById('sys-body');
+  if (!body) return;
+  const H = window.AAHabits, R = (habOn() && H && H.XP_RULES) || null;
+  let pr = {};
+  try { pr = (careerOnT() && CAREER_T.p.rules && CAREER_T.p.rules.prices) || {}; } catch (e) { pr = {}; }
+  const n = v => Number(v) || 0;
+  const items = (() => { try { return achItems(); } catch (e) { return []; } })();
+  const got = items.filter(i => i.day).length;
+
+  // 1. the whole thing in three sentences, open on arrival
+  let h = `<p class="sys-lead">Nothing here is a mystery. This page says what counts, and what everything is worth.</p>`;
+  h += `<div class="help-list">`;
+  h += sysCard('Start here', 'compass',
+    `<p>Everything you do with me earns <strong>XP</strong>. XP makes a <strong>level</strong>, and the level never goes back to zero. Not at the end of a cycle, not at the end of a season.</p>`
+    + `<p>Two things feed it. Your <strong>training</strong>, which is the sessions I write you. And your <strong>habits</strong>, the five on Home plus anything you add.</p>`
+    + `<p>Some of it also wins an <strong>achievement</strong>. That is a moment you keep, and you can share it.</p>`, true);
+
+  // 2. the gate
+  if (R) {
+    const back = n(H.BACKFILL_DAYS);
+    h += sysCard('What makes a day count', 'check-circle',
+      `<p>A day <strong>counts</strong> when you get most of your list done. The bar is ${n(R.streakQualifyPct)}% of what that day was worth, and a day that left only one thing undone counts anyway.</p>`
+      + `<p>On a day with no session, the session is not held against you. It joins the sum once you have done it.</p>`
+      + `<p>A day where every habit on your list is done is a <strong>perfect day</strong>.</p>`
+      + sysPrices([['A day that counts', pr.day_on_target], ['A perfect day, on top of that', pr.perfect_day]])
+      + `<p>Days that count, one after another, are your <strong>run</strong>. Miss one and it starts again from the next day that counts.</p>`
+      + `<p>You can fill in today and the ${back} days behind it. After that the day closes. A record you can rewrite whenever you like is a diary, not evidence.</p>`);
+
+    // 3. what the habits pay
+    const live = (() => { try { return H.live(); } catch (e) { return []; } })();
+    const rows = live.filter(hb => !hb.locked).map(hb => [H.splitEmoji(hb.name)[1] || hb.name, habXpFull(hb)]);
+    h += sysCard('What your habits pay', 'activity',
+      (rows.length ? `<p>Each one pays once a day, when it is done:</p>` + sysPrices(rows) : '')
+      + `<p>Part of one pays part of it. Five of eight glasses pays five eighths.</p>`
+      + `<p>Your session is on that list too, but the session itself pays for it, so nothing is paid twice.</p>`
+      + `<p>A counter stops counting at ${n(R.dailyCap)} times its target in a day.</p>`
+      + `<p>You can keep ${n(H.MAX_CUSTOM)} habits of your own. Each pays ${Math.round(n(R.customXp) * n(R.completionBonus))} XP a day. Switching one off keeps every point it has earned. Removing one takes its points with it.</p>`);
+  }
+
+  // 4. what training pays
+  h += sysCard('What training pays', 'strength',
+    sysPrices([['A session finished', pr.session_finished], ['A session finished early', pr.session_finished_early],
+               ['Every set logged, on top', pr.full_log], ['The readiness check, on top', pr.checkin_done],
+               ['A retest', pr.retest_done], ['A session from the Library', pr.library_session],
+               ['A week held', pr.week_held], ['Holding a week after a broken one', pr.bounce_back]])
+    + `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions do not.</p>`
+    + `<p>The weeks between cycles never count against you.</p>`);
+
+  // 5. the level
+  h += sysCard('Your level', 'progress',
+    `<p>Your level is all of it added together. Every level costs a little more than the one before, so the climb is slower the higher you go.</p>`
+    + `<p>It is in the middle of the ring on Home, with today's habits around it, and under <strong>Your numbers</strong> on Progress.</p>`
+    + `<p>It never resets.</p>`);
+
+  // 6. the achievements
+  h += sysCard('Achievements', 'technique',
+    `<p>An achievement is won once and kept.${items.length ? ` There are ${items.length} of them, and you have ${got}.` : ''}</p>`
+    + `<p>They come in four kinds:</p><ul>` + achKinds().map(K => `<li><strong>${esc(K.t)}</strong>. ${esc(K.s)}</li>`).join('') + `</ul>`
+    + `<p>Some come in threes, like <strong>Human Sprinkler I, II and III</strong>. One name, three bars, and each one pays more than the one below it. Whichever habit you favour, there is always a next one.</p>`
+    + `<p>Every row says what it asks for, then how far along you are.</p>`
+    + `<p>When you win one it comes up full screen. <strong>Share</strong> makes a card for it. <strong>Tell the crew</strong> puts one line on the Bell, and only if you tap it.</p>`
+    + `<p>An achievement keeps the XP it was worth on the day you won it. If I change a price later, what you already have does not move.</p>`);
+
+  // 7. the four numbers
+  const marks = (() => { try { return careerMarks(); } catch (e) { return null; } })();
+  if (marks) {
+    h += sysCard('Your four numbers', 'tracking',
+      `<p>Four numbers follow you, and each has <strong>marks</strong> along it:</p><ul>`
+      + Object.keys(marks).map(id => {
+          const m = marks[id];
+          return `<li>${esc(careerMarkWords(m.key, 2).replace(/^./, c => c.toUpperCase()))}: ${m.at.join(' · ')}</li>`;
+        }).join('') + `</ul>`
+      + `<p>A mark is not an achievement. It repeats, at a higher number each time, and the finished session tells you when one is close.</p>`);
+  }
+
+  // 8. moments and sharing
+  h += sysCard('Your moments, and sharing them', 'book',
+    `<p>Everything you have won is in <strong>Your moments</strong> on Progress, newest first and grouped by month. Your marks, your achievements, the notes I write you and the month's honours.</p>`
+    + `<p>Each one has its own <strong>Share</strong>, however long ago you earned it. The card is drawn on your phone, and nothing leaves it until you tap Share or Save image.</p>`);
+
+  // 9. the crew, only while the app has the tab
+  if ((() => { try { return crewOn(); } catch (e) { return false; } })()) {
+    h += sysCard('The crew', 'mindset',
+      `<p>Nothing on <strong>Crew</strong> earns XP. It is the one part of the app that is not scoring you.</p>`
+      + `<p>The Bell rings for the crew when you finish a session, reach a level, hold a week, hit a mark or win an achievement. Weights, RPE, your check-in, pain, body weight and habits never go there.</p>`
+      + `<p><strong>The Open</strong> is one challenge for the whole crew. I set it, I say what counts, and I put your result on the board.</p>`);
+  }
+
+  // 10. who decides
+  h += sysCard('Who decides, and when', 'help',
+    `<p>Every number here is worked out on my side, from what you logged. Your phone does the same arithmetic so you are not left waiting, but my side is the one that counts.</p>`
+    + `<p>While something says <strong>Counting</strong>, my side has not confirmed it yet. It usually catches up by your next session.</p>`
+    + `<p>If a number looks wrong, message me. I can see every day you have logged.</p>`);
+
+  h += `</div>`;
+  body.innerHTML = h;
+}
+window.renderSystemGuide = renderSystemGuide;
 // The days THIS CALENDAR MONTH that counted — the same gate as the day streak, so the two figures can
 // never disagree about what a day is worth.
 function habDaysThisMonth() {
@@ -12812,9 +13028,13 @@ function momMonth(d, long) {
   return L[i] ? (long ? L[i] : L[i].slice(0, 3)) : '';
 }
 // A name the catalogue writes in capitals ("FIRST BLOOD") reads as a name in a list: "First Blood".
+// A catalogue name in caps, said the way this app says things. ⚠️ A ROMAN NUMERAL STAYS A ROMAN NUMERAL (2026-10-20,
+// with the ladders): the plain title-case rule turned HUMAN SPRINKLER III into "Human Sprinkler Iii".
 function momName(s) {
   const t = String(s || '').trim();
-  return t && t === t.toUpperCase() && /[A-Z]/.test(t) ? t.toLowerCase().replace(/\b[a-z]/g, ch => ch.toUpperCase()) : t;
+  if (!(t && t === t.toUpperCase() && /[A-Z]/.test(t))) return t;
+  return t.toLowerCase().replace(/\b[a-z]+\b/g, w => /^(i|ii|iii|iv|v|vi|vii|viii|ix|x)$/.test(w) && w !== 'i'
+    ? w.toUpperCase() : w.replace(/^[a-z]/, c => c.toUpperCase()));
 }
 // Every moment, newest first: { day, sort, w, s, kind, award_id?, note?, honour? }.
 function momentsList() {
@@ -12995,7 +13215,9 @@ function renderAchievements() {
   if (!body) return;
   let h = '';
   try { h = courtsHTML(); } catch (e) { h = ''; }
-  body.innerHTML = h;
+  // The manual's door is OUTSIDE courtsHTML(), which returns nothing at all until the first achievement answer lands: a
+  // page with no cabinet yet is exactly when an athlete wants to be told how the cabinet works.
+  body.innerHTML = h + sysDoorHtml('achievements');
 }
 window.renderAchievements = renderAchievements;
 function courtsHTML() {
@@ -13119,11 +13341,7 @@ function onCrewPage() {
   return !!(s && (s.id === 'screen-crewboard' || s.id === 'screen-crewwho'));
 }
 function crewMe() { return (BELL && BELL.me) || {}; }
-// The SERVER's gate, not a guess at it (2026-10-20). This read `answer === 'yes' && !under13`, but crew_members() also
-// drops a FORMER athlete and the demo, so one of those kept a live Like on every post and every tap flashed on and then
-// came back with "That did not go". `can_post` is that same gate, sent on every get_bell, and it is what the Reply door
-// beside it already uses.
-function crewCanLike() { return !!crewMe().can_post; }
+function crewCanLike() { const m = crewMe(); return m.answer === 'yes' && !m.under13; }
 function loadCrewCache() {
   if (!crewAllowed()) return;
   try {
@@ -13340,57 +13558,32 @@ function crewReactRow(target, k, own, folded) {
   const likeN = typeof kk.like === 'number' ? kk.like : total;
   const liked = !!kk.mine && !kk.emoji;
   const num = v => v ? ` <b>${v}</b>` : '';
-  // `em` is the chip's own hook: '' for the Like, the emoji itself, '+' for the opener. paintKudos uses it to put the
-  // keyboard back on the same chip after the row has been replaced under it. There is no dead() any more: nothing on this
-  // row is ever a disabled button, because a disabled button that says "0 people" is worse than no button.
-  const live = (cls, body, lbl, press, call, em) => `<button type="button" class="${cls}" data-kd="${t}" data-em="${esc(em || '')}" ${press === null ? '' : `aria-pressed="${press}"`} onclick="${call}" aria-label="${esc(lbl)}">${body}</button>`;
-  const ask = !own && !me.under13 && !crewCanLike();
-  const all = crewEmoji();
-  const used = all.filter(e => Number(by[e]) > 0 || kk.emoji === e);
-  //
-  // ── A MENU UNTIL YOU HAVE CHOSEN, A RECEIPT AFTERWARDS (2026-10-20) ──────────────────────────────────────────────────
-  // Amir, from his live phone, on three screenshots: *"First i cant like my photos, which is ok, why do i have those
-  // under my posts then?"*, *"If i chose like under a post, why are there more emotes to choose?"*, *"When i choose
-  // emote, why others are still there?"* — and, the message before: *"it should close after you choosed. and only show
-  // the ones that is replied to a post"*.
-  //
-  // The first cut read "post" as "moment line" and wired the fold to `crewLineHTML` alone, so a POST kept all five out
-  // for ever: after choosing, three chips he had just decided against were still asking to be tapped. The fold does not
-  // belong to the item's TYPE, it belongs to the viewer's STATE. Four states, one rule:
-  //
-  //   own, or ticked under 13  → a RECEIPT, and never a button. Only what people actually gave, as plain text. Nothing
-  //                              at all when nobody has given anything. (Five dead chips under your own photo said
-  //                              nothing, took a 44 px row, and read to a screen reader as "🔥 0 people, dimmed" ×4.)
-  //   not joined               → the menu, every chip offering to join (Amir's rule of 2026-10-19: never a dead Like).
-  //   joined, HAS chosen       → only what has been used, theirs marked. No unused chips and no ＋: they have chosen.
-  //                              Tapping theirs takes it back, and the menu comes straight back with it.
-  //   joined, has NOT chosen   → the menu. All five out on a post (his pick of 2026-10-19, where there is room for
-  //                              them); on a moment line the Like alone with the rest behind a ＋, because five chips
-  //                              under a one-line moment are taller than the news.
-  //
-  // `folded` now means only "this is a slim line, keep the menu small", never "collapse after a choice".
-  const chosen = !!kk.mine;
-  // The receipt: spans, not buttons, so nothing is dimmed and nothing is in the tab order.
-  if (own || me.under13) {
-    const tally = (likeN ? `<span class="cr-kd is-tally">Like${num(likeN)}</span>` : '')
-      + used.filter(e => Number(by[e]) > 0).map(e => `<span class="cr-em is-tally"><i aria-hidden="true">${esc(e)}</i>${num(Number(by[e]))}</span>`).join('');
-    return tally;
-  }
+  const dead = (cls, body, lbl) => `<button type="button" class="${cls}" data-kd="${t}" disabled aria-label="${esc(lbl)}">${body}</button>`;
+  const live = (cls, body, lbl, press, call) => `<button type="button" class="${cls}" data-kd="${t}" ${press === null ? '' : `aria-pressed="${press}"`} onclick="${call}" aria-label="${esc(lbl)}">${body}</button>`;
+  const can = crewCanLike() && !own, ask = !own && !me.under13 && !crewCanLike();
+  let h = own ? dead('cr-kd', 'Like' + num(likeN), `Likes on yours: ${likeN}`)
+    : me.under13 ? dead('cr-kd', 'Like' + num(likeN), 'Likes are off for your account')
+    : ask ? live('cr-kd', 'Like' + num(likeN), 'Join the crew to like this', null, 'crewLikeAsk()')
+    : live('cr-kd', 'Like' + num(likeN), liked ? 'Liked. Tap to take it back' : 'Like this', liked, 'crewLike(this)');
+  // Folded (a moment line): the row shows the Like, then ONLY the emoji somebody has actually used on this item, then a ＋
+  // for the rest. It closes again the moment a choice is made — Amir, 2026-10-20: *"when you click to see the emotes you can
+  // pick, the bar stay opened, and even after choosing, you will see other emojis. it should close after you choosed. and
+  // only show the ones that is replied to a post"*. (The first cut kept the whole row out once anyone had used one, which is
+  // exactly the five-chips-under-one-line problem it was meant to fix.) Never folded for an athlete ticked under 13:
+  // unfolding four dead chips is noise.
   const chip = em => {
     const n = Number(by[em]) || 0, mine = kk.emoji === em, body = `<i aria-hidden="true">${esc(em)}</i>${num(n)}`;
-    // the count belongs in the label too, or a blind athlete never learns it (the visible number is in a <b> they cannot reach)
-    const tail = n ? `. ${n} sent` : '';
-    return ask ? live('cr-em', body, `Join the crew to send ${em}${tail}`, null, 'crewLikeAsk()', em)
-      : live('cr-em', body, (mine ? `${em} sent. Tap to take it back` : `Send ${em}`) + tail, mine, `crewLike(this, '${esc(em)}')`, em);
+    const said = `${em} ${n === 1 ? '1 person' : n + ' people'}`;
+    return own ? dead('cr-em', body, said)
+      : me.under13 ? dead('cr-em', body, said)
+      : ask ? live('cr-em', body, `Join the crew to send ${em}`, null, 'crewLikeAsk()')
+      : live('cr-em', body, mine ? `${em} sent. Tap to take it back` : `Send ${em}`, mine, `crewLike(this, '${esc(em)}')`);
   };
-  const likeTail = likeN ? `. ${likeN} liked` : '';
-  let h = ask ? live('cr-kd', 'Like' + num(likeN), `Join the crew to like this${likeTail}`, null, 'crewLikeAsk()', '')
-    : (chosen && !liked && !likeN) ? ''   // chosen an emoji and nobody has liked: the Like is an unused option, so it goes
-    : live('cr-kd', 'Like' + num(likeN), (liked ? 'Liked. Tap to take it back' : 'Like this') + likeTail, liked, 'crewLike(this)', '');
-  if (chosen) { used.forEach(em => { h += chip(em); }); return h; }
-  if (folded && !_crewOpenEm[target]) {
+  const all = crewEmoji();
+  if (folded && !me.under13 && !_crewOpenEm[target]) {
+    const used = all.filter(e => Number(by[e]) > 0 || kk.emoji === e);
     used.forEach(em => { h += chip(em); });
-    return used.length < all.length ? h + live('cr-em cr-plus', '＋', 'More ways to say it', null, `crewUnfold('${esc(target)}')`, '+') : h;
+    return used.length < all.length ? h + live('cr-em cr-plus', '＋', 'More ways to say it', null, `crewUnfold('${esc(target)}')`) : h;
   }
   all.forEach(em => { h += chip(em); });
   return h;
@@ -13463,15 +13656,12 @@ function crewPostHTML(it) {
   const sub = it.amir ? '<small>to the crew</small>' : (it.kind === 'session' ? `<small>${it.session && it.session.day ? 'Day ' + Number(it.session.day) + ' done' : 'A session done'}</small>` : '');
   const top = it.pinned ? `<span class="cr-pin${_crewFreshPin === it.id ? ' is-new' : ''}">Pinned</span>` : `<span class="cr-when">${esc(crewWhen(it.at))}</span>`;
   const ph = it.photo ? `<button type="button" class="cr-ph" data-ph="${esc(it.id)}" onclick="openCrewPhoto('${esc(it.id)}')" aria-label="Open ${esc(it.amir ? "Amir's" : it.me ? 'your' : (it.who || 'their') + "'s")} photo"><img alt=""><span class="cr-ph-wait">Photo</span></button>` : '';
-  // The post's own Delete now sits in the REACTION foot, beside what the post got (2026-10-20). It used to sit on the
-  // names line, directly above the replies, where it read as the thread's heading — and on his own post with his own
-  // reply there were two identical Deletes in the same column. Its armed words name what it takes with it.
-  const del = it.me ? `<button type="button" class="cr-del" onclick="armedTap(this, 'Tap again to delete the post', () => crewDelete('${esc(it.id)}'))">Delete</button>` : '';
+  const del = it.me ? `<button type="button" class="cr-del" onclick="armedTap(this, 'Tap again to delete', () => crewDelete('${esc(it.id)}'))">Delete</button>` : '';
   return `<article class="cr-post${it.amir ? ' amir' : ''}" data-id="${esc(it.id)}">
     <div class="cr-who"><span class="cr-ini${it.amir ? ' am' : ''}" aria-hidden="true">${esc(ini)}</span><span class="cr-nm">${esc(name)}${sub}</span>${top}</div>
     ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}${ph}
-    <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span>${del}</div>
-    <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}" aria-live="polite">${esc(crewKudosWords(it.kudos))}</small></div>
+    <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span></div>
+    <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small>${del}</div>
     <div class="cr-reps" data-rep="${esc(it.id)}">${crewRepsHTML(it)}</div>
   </article>`;
 }
@@ -13772,17 +13962,8 @@ function paintKudos(key) {
   // the whole row at once: a tap can move the Like's count, an emoji's, and which one is pressed
   document.querySelectorAll('.cr-react').forEach(row => {
     if (row.dataset.row !== key) return;
-    const h = crewReactRow(key, it.kudos, it.me, it.t === 'line');   // a slim line keeps its menu small; the fold after a choice is the row's own
-    if (row.innerHTML === h) return;
-    // Where the keyboard was, before the row is replaced under it (2026-10-20). Replacing innerHTML drops focus to the
-    // top of the page, so a keyboard athlete who liked the fourth post had to tab back past the band, the faces and
-    // three cards to reach the fifth. The chips carry data-em so the same one can be found again afterwards.
-    const had = row.contains(document.activeElement) ? (document.activeElement.dataset.em || '') : null;
-    row.innerHTML = h;
-    if (had !== null) {
-      const back = [...row.querySelectorAll('button')].find(b => (b.dataset.em || '') === had) || row.querySelector('button');
-      if (back) try { back.focus({ preventScroll: true }); } catch (e) { back.focus(); }
-    }
+    const h = crewReactRow(key, it.kudos, it.me, it.t === 'line');   // a moment line keeps the Like alone until ＋ is tapped
+    if (row.innerHTML !== h) row.innerHTML = h;
   });
   document.querySelectorAll('[data-kw]').forEach(s => {
     if (s.dataset.kw !== key) return;
@@ -13816,7 +13997,7 @@ async function crewLike(btn, em) {
   if (em) args.p_emoji = em;
   try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_kudos', args), 8000); } catch (e) { r = null; }
   if (r && !r.error && r.data && typeof r.data.n !== 'undefined') it.kudos = r.data;
-  else { it.kudos = before; aaToast(_noAnswer(r) ? 'That did not reach the crew. Tap it again when you have signal.' : 'That did not go. Try again.'); }
+  else { it.kudos = before; aaToast(_noAnswer(r) ? 'No signal. It goes when you are back online.' : 'That did not go. Try again.'); }
   paintKudos(key);
   try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
 }

@@ -405,14 +405,14 @@ function noStrip(browser) {
       rows: [...document.querySelectorAll('.today-card .hb-name')].map(n => n.textContent),
       days: [...document.querySelectorAll('.today-card .hb-day')].map(n => n.textContent.trim()),
       sub: (document.querySelector('.today-card .today-s') || {}).textContent,
-      marks: [...document.querySelectorAll('.today-card .hb-mark')].map(m => m.classList.contains('is-done')).join(),
+      marks: [...document.querySelectorAll('.today-card .hb-row')].map(m => m.classList.contains('is-done')).join(),
       // THE RING (2026-10-20): a segment per habit on the roster, the done ones drawn over them, the level in the middle.
       segs: document.querySelectorAll('.today-card .tr-seg').length,
       on: document.querySelectorAll('.today-card .tr-on').length,
       mid: (document.querySelector('.today-card .today-mid b') || {}).textContent,
       kick: (document.querySelector('.today-card .today-mid span') || {}).textContent,
       ringSay: (document.querySelector('.today-card .today-ring') || {}).getAttribute && document.querySelector('.today-card .today-ring').getAttribute('aria-label'),
-      bars: document.querySelectorAll('.today-card .hb-bar').length,            // the per-row bars went: the ring is the progress
+      bars: document.querySelectorAll('.today-card .hb-bar').length,            // one segmented meter per COUNTED habit, back with the icons (2026-10-20)
       go: !!document.querySelector('.today-card .today-go'),                    // the way to the habits page, which Home had none
       gone: !document.getElementById('home-habits-wrap') && !document.getElementById('home-proof-strip'),   // the row and the iframe both went with AA Proof
     });
@@ -436,7 +436,7 @@ function noStrip(browser) {
       after.head === '' && after.rows.length === 5 && after.days.length === 4 && after.days[3] === 'Today'
       && after.verdict === '5 left' && after.gone, JSON.stringify(after));
     t.check('Start tracking: the ring has a segment per habit, none of them filled, and a › to the habits page',
-      after.segs === 5 && after.on === 0 && after.bars === 0 && after.go && after.ringSay === '0 of 5 done today', JSON.stringify([after.segs, after.on, after.bars, after.go, after.ringSay]));
+      after.segs === 5 && after.on === 0 && after.bars === 4 && after.go && after.ringSay === '0 of 5 done today', JSON.stringify([after.segs, after.on, after.bars, after.go, after.ringSay]));
     t.check('the config it wrote is AA Proof\'s own key, so no history moves',
       await fresh.p.evaluate(() => !!JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_cfg') || '{}').onboarded));
     await fresh.ctx.close();
@@ -490,7 +490,7 @@ function noStrip(browser) {
     await p.waitForTimeout(200);
     const state = await p.evaluate(() => ({
       log: JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_log') || '{}'),
-      marks: [...document.querySelectorAll('.today-card .hb-mark')].map(m => m.classList.contains('is-done')).join(),
+      marks: [...document.querySelectorAll('.today-card .hb-row')].map(m => m.classList.contains('is-done')).join(),
       verdict: (document.querySelector('.today-card .today-v') || {}).textContent,
       on: document.querySelectorAll('.today-card .tr-on').length,
     }));
@@ -523,7 +523,7 @@ function noStrip(browser) {
       head: (document.querySelector('.today-card .today-k') || {}).textContent,
       verdict: (document.querySelector('.today-card .today-v') || {}).textContent,
       clay: getComputedStyle(document.querySelector('.today-card')).borderTopColor,
-      marks: [...document.querySelectorAll('.today-card .hb-mark')].map(m => m.classList.contains('is-done')).join(),
+      marks: [...document.querySelectorAll('.today-card .hb-row')].map(m => m.classList.contains('is-done')).join(),
     }));
     t.check('filling in an earlier day says so, takes the clay edge, and shows THAT day empty',
       /^Filling in /.test(past.head) && past.clay === 'rgb(199, 85, 47)' && past.marks === 'false,false,false,false,false', JSON.stringify(past));

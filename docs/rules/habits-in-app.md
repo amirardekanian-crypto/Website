@@ -52,6 +52,25 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   row pays nothing here** (`strength` is locked and the session pays it, so no habit is paid twice), and one
   door, *From your habits*, opens the same Achievements page Progress opens. Detail:
   [`PROGRAM-APP.md`](../../PROGRAM-APP.md) → *The Ring* → **What the habits pay**.
+- **The row wears the habit's icon, and the meter is back under the name** (2026-10-20, Amir: *"i liked the icons and
+  how the bar under was like that, apply the current design but bring these back, you can create new icons"*; direction
+  B of three). The circle IS the tick: 42 px, the habit's colour on the rim and its tint inside, the icon drawn at
+  21 px from the app's own set, the whole circle solid green with a tick once the day's target is met. ⚠️ **The habit's
+  colour labels a row and is never an accent** — the app still paints with one, and it is clay. ⚠️ **Dark mode drops
+  the tint and keeps the rim**, because a pale pastel disc on near-black is the brightest thing on the card. The meter
+  is **one pip per step, never a straight bar** (`habBarHtml()`, cut from AA Proof's `segBar()`): eight glasses is
+  eight pips, capped at 20, the leading part-pip dimmed, and only on a habit you count. The line under the name says
+  what is **left**, never where you are, because the − and + already say the number. This reverses the 12 October
+  decision that cut the per-row bar: that bar was a straight 54 px one that took the name's room and said nothing.
+  Detail: [`PROGRAM-APP.md`](../../PROGRAM-APP.md) → *The ladders come back*.
+- **One page explains the whole system, and nothing on it is typed twice** (2026-10-20, Amir: *"we used to have a what
+  all this means ... put it where you think is a fit"*, then *"it shouldnt be specific to achievements from habits
+  only, should be about those coming from training as well. its just a guide to the system"*). `#screen-system`, *How
+  it works*, behind a door on the habits page and a second on Achievements, its ← going back to whichever opened it.
+  ⚠️ **Every number on it is READ, never typed**: the habits' prices from the engine's `XP_RULES`, the training prices
+  from `get_profile()`'s `rules.prices`, the counts from the achievements answer, the marks from `careerMarks()`. A
+  section whose numbers have not loaded draws no price list rather than drawing zeros. Detail:
+  [`PROGRAM-APP.md`](../../PROGRAM-APP.md) → *The ladders come back*.
 
 ---
 
