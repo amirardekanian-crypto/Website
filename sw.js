@@ -408,7 +408,16 @@
 // Every counted habit on Today's card has a − and a +, with its number between them. Each steps by the habit's own step, the −
 // stops at 0 and the + at the daily cap, and holding either repeats, faster the longer it is held. The XP pop adds a whole hold
 // up instead of flashing every step, and says what a number taken back cost.
-const CACHE = 'aap-v208';
+// v209: program.html changed TWICE since v208, and this one bump carries both (2026-10-20).
+// Amir: "when the cycle is finished, it doesnt mean that my record logs should be emptied ... because 6 month later i may want to
+// have a look, add my own records and check them", "even if the window is small, the person should still get all those, the first
+// time they enter the app", then "Go live now" for the crew half.
+// Records: Log a max offers ANY lift, not only this cycle's (This cycle, Lifts you've done before, and a search over the Spine, all
+// one indexed array), and records fill from a lift's own logged history after it has left the programme, silently.
+// The Cycle complete moment no longer expires after 14 days, and a cycle the programme has moved past is still celebrated from its
+// archived copy -- CAPPED to the newest finished cycle, so a missed celebration waits but a backlog never queues.
+// The crew (8ca41e4): the crew's week comes first, and a finished session rings.
+const CACHE = 'aap-v209';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

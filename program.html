@@ -4848,6 +4848,9 @@
   #hist-overlay .ac-w { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
   #hist-overlay .ac-w em { margin-left: 8px; padding: 3px 7px; border-radius: 999px; background: var(--tint); font: 700 var(--fs-label)/1 'Space Mono', monospace;
     font-style: normal; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); vertical-align: 2px; }
+  /* Which court it counts toward: said only in the habits list, the one list that mixes all four (2026-10-20). */
+  #hist-overlay .ac-w .ac-kd { margin-left: 8px; font: 400 var(--fs-label)/1 'Space Mono', monospace; font-style: normal;
+    letter-spacing: .6px; text-transform: uppercase; color: var(--grey); vertical-align: 2px; }
   #hist-overlay .ac-sub { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
   #hist-overlay .ac-bar { display: block; height: 3px; margin-top: 6px; border-radius: 3px; background: var(--hair); overflow: hidden; }
   #hist-overlay .ac-bar i { display: block; height: 100%; border-radius: 3px; background: var(--fill); }
@@ -5477,6 +5480,20 @@
   .cr-del.armed { color: var(--clay-ink); }
   /* a moment: one slim green line, the bell, what happened, the Like */
   #screen-crew .cr-line { display: flex; align-items: center; gap: 10px; margin: 0 var(--g) 10px; padding: 10px 10px 10px 12px; border-radius: 12px; background: var(--tint); }
+  /* replies (stage92, 2026-10-20): one level, under the Like and the names, set in from the post's own edge so the thread
+     reads as hanging off it. The reply's own text is 15px prose, the name bold in front of it, as a comment reads. */
+  #screen-crew .cr-reps { display: grid; gap: 8px; margin-top: 10px; }
+  #screen-crew .cr-reps:empty { display: none; }
+  #screen-crew .cr-rep { display: flex; align-items: flex-start; gap: 8px; padding-top: 8px; border-top: 1px solid var(--hair); }
+  #screen-crew .cr-rep .cr-ini { flex: none; margin-top: 1px; }
+  #screen-crew .cr-rb { flex: 1; min-width: 0; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
+  #screen-crew .cr-rb b { font-weight: 700; }
+  #screen-crew .cr-rep-add { justify-self: start; min-height: 44px; padding: 0 2px; border: 0; background: none; color: var(--green-ink);
+    font: 600 var(--fs-small)/1 'Barlow', sans-serif; text-align: left; cursor: pointer; }
+  #screen-crew .cr-rep-add:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; border-radius: 6px; }
+  /* the post being replied to, quoted at the top of the sheet */
+  #hist-overlay .cr-quote { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--tint);
+    font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
   /* the day's attendance (2026-10-20): the same slim line, on the paper instead of the green, because it is the week's roll
      call and not a moment anyone earned. No reactions on it: there is nothing here to congratulate. */
   #screen-crew .cr-line.cr-sess { background: var(--row); border: 1px solid var(--hair); }
@@ -11701,7 +11718,10 @@ function habAchDoorHtml() {
   const got = list.filter(i => i.day), left = list.filter(i => !i.day);
   const nx = left.slice().sort((a, b) => achPct(b) - achPct(a))[0];
   const sub = nx ? momName(nx.name) + ' · ' + achLine(nx) : 'Every one of them, won.';
-  return `<button type="button" class="hrow" onclick="goTo('achievements')" aria-label="${esc('From your habits: ' + got.length + ' of ' + list.length + '. ' + sub).replace(/"/g, '&quot;')}">
+  // ⚠️ It opens the HABIT ones (2026-10-20, Amir: "i asked if i can see what achievements i can get through habits, or what
+  // ones i do own now"). It used to jump to the whole cabinet, where the nine are scattered across the four kinds and nothing
+  // says which came from the habits — the door counted them and then lost them.
+  return `<button type="button" class="hrow" onclick="openCourt('habits')" aria-label="${esc('From your habits: ' + got.length + ' of ' + list.length + '. ' + sub).replace(/"/g, '&quot;')}">
     ${hrowIc('ach')}<span class="hrow-b"><span class="hrow-l">From your habits</span>
       <span class="hrow-v"><span class="hrow-vv">${got.length} of ${list.length}</span><small>${esc(sub)}</small></span></span>
     <span class="hrow-a" aria-hidden="true">›</span></button>`;
@@ -12931,6 +12951,7 @@ function achLine(it) {
   }
   if (it.test === 'best_value') return `Your best lift is up ${Math.round(h)}%. ${Math.round(n)}% gets it.`;
   if (it.test === 'goals') return `${h} of ${n} goals done.`;
+  if (it.test === 'runs_together') return `${h} of ${n} days with all four.`;
   if (it.test === 'proof' && n > 1) return `${h.toLocaleString('en-US')} of ${n.toLocaleString('en-US')}.`;
   return String(it.rule || it.caption || '');
 }
@@ -12980,14 +13001,18 @@ function courtsHTML() {
 // them; the kind's nearest wears Next. `focus` scrolls to one (Next up's tap).
 function openCourt(kind, focus) {
   const ov = document.getElementById('hist-overlay');
-  const K = achKinds().find(x => x.k === kind), items = achItems().filter(i => i.meaning === kind);
+  // 'habits' is a fifth door into the same sheet: the achievements the daily habits win, which cut across all four kinds.
+  const hab = kind === 'habits';
+  const K = hab ? { k: 'habits', t: 'From your habits', s: 'What your daily habits can win. They count toward the four kinds too.' }
+                : achKinds().find(x => x.k === kind);
+  const items = hab ? habAchList() : achItems().filter(i => i.meaning === kind);
   if (!ov || !K || !items.length) return;
   const sz = ['tick', 'win', 'highlight', 'milestone', 'legend'];
   const got = items.filter(i => i.day).sort((a, b) => String(b.day).localeCompare(String(a.day)));
   const rest = items.filter(i => !i.day).sort((a, b) => (achPct(b) - achPct(a)) || (sz.indexOf(a.size) - sz.indexOf(b.size)) || ((Number(a.xp) || 0) - (Number(b.xp) || 0)));
   const nextId = rest.length && achPct(rest[0]) > 0 ? rest[0].id : (MOM_T.ach.next && MOM_T.ach.next.meaning === kind ? MOM_T.ach.next.id : '');
   const row = (i, done) => `<div class="ac-row${done ? ' is-earned' : ''}" data-ach="${esc(i.id)}"><span class="ac-dot" aria-hidden="true"></span><span class="ac-b">`
-    + `<span class="ac-w">${esc(momName(i.name))}${!done && i.id === nextId ? '<em>Next</em>' : ''}</span>`
+    + `<span class="ac-w">${esc(momName(i.name))}${hab && i.meaning ? `<i class="ac-kd">${esc(rwMeaningWord(i.meaning))}</i>` : ''}${!done && i.id === nextId ? '<em>Next</em>' : ''}</span>`
     + (done ? `<span class="ac-sub">${esc(i.caption || i.rule || '')}${i.caption || i.rule ? ' · ' : ''}${esc(achDay(i.day))}</span>`
             : `<span class="ac-sub">${esc(Number(i.have) > 0 ? achLine(i) : (i.rule || i.caption || ''))}</span>`
               + (Number(i.have) > 0 && Number(i.need) > 1 ? `<span class="ac-bar" aria-hidden="true"><i style="width:${achPct(i)}%"></i></span>` : ''))
@@ -13385,7 +13410,85 @@ function crewPostHTML(it) {
     ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}${ph}
     <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span></div>
     <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small>${del}</div>
+    <div class="cr-reps" data-rep="${esc(it.id)}">${crewRepsHTML(it)}</div>
   </article>`;
+}
+// ── Replies (stage92, 2026-10-20) ────────────────────────────────────────────────────────────────────────────────────────
+// Amir: *"replies and likes like instagram"*. He had chosen likes only, and the first week produced Ehsan posting
+// *"what's the meaning of Kudos?"* into a room with no way to answer. Asked again: **no likes on replies** ("dont need the
+// likes on replies"), so a reply is text and the Like stays where it was, on the post.
+// One level, 140 characters, gone with the post at 7 days, your own taken back with two taps, and Amir can remove any.
+// A non-member's Reply is not dead, exactly as their Like is not: it offers to join (Amir's rule of 2026-10-19).
+function crewRepsHTML(it) {
+  const reps = Array.isArray(it.replies) ? it.replies : null;
+  if (!reps) return '';   // a server without stage92 sends none, and there is no Reply door at all
+  const me = crewMe();
+  const rows = reps.map(r => {
+    const who = r.amir ? 'Amir' : r.me ? 'You' : (r.who || 'Athlete');
+    const x = r.me ? `<button type="button" class="cr-del" onclick="armedTap(this, 'Tap again to delete', () => crewReplyDelete('${esc(r.id)}'))">Delete</button>` : '';
+    return `<div class="cr-rep"><span class="cr-ini${r.amir ? ' am' : ''}" aria-hidden="true">${esc(crewInitials(r.amir ? 'Amir' : (r.me ? me.name : r.who)))}</span>`
+      + `<span class="cr-rb" dir="auto"><b>${esc(who)}</b> ${esc(r.body || '')}</span>${x}</div>`;
+  }).join('');
+  const can = !!me.can_post, ask = !me.under13 && !can;
+  const add = me.under13 ? ''
+    : ask ? `<button type="button" class="cr-rep-add" onclick="crewLikeAsk()">Join the crew to reply</button>`
+    : can ? `<button type="button" class="cr-rep-add" onclick="openCrewReply('${esc(it.id)}')">${reps.length ? 'Add a reply' : 'Reply'}</button>` : '';
+  return rows + add;
+}
+// The sheet: 140 characters, and nothing else. It does not keep a draft — a reply is one line, and the post it belongs to
+// is on the screen behind it.
+function openCrewReply(postId) {
+  const ov = document.getElementById('hist-overlay'), me = crewMe();
+  if (!ov || !BELL || !me.can_post) return;
+  const it = crewItem(postId);
+  if (!it) return;
+  const whose = it.amir ? "Amir's post" : it.me ? 'your post' : (it.who || 'their') + "'s post";
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Reply</div>
+    <h2 class="readiness-title">To ${esc(whose)}</h2>
+    ${it.body ? `<p class="cr-quote" dir="auto">${esc(it.body)}</p>` : ''}
+    <textarea class="cr-txt cr-rtxt" dir="auto" maxlength="140" aria-label="Your reply" placeholder="Say something"></textarea>
+    <span class="cr-cnt" aria-live="polite"></span>
+    <p class="cr-note">Gone after 7 days with the post. Amir can remove any reply.</p>
+    <button type="button" class="cr-go" disabled>Reply</button>
+    <p class="cr-err" role="status"></p>`;
+  const m = ov.querySelector('.readiness-modal'), ta = m.querySelector('.cr-rtxt'), cnt = m.querySelector('.cr-cnt');
+  const go = m.querySelector('.cr-go'), err = m.querySelector('.cr-err');
+  const sync = () => { cnt.textContent = ta.value.length + ' / 140'; go.disabled = !ta.value.trim(); };
+  ta.addEventListener('input', sync);
+  go.addEventListener('click', () => crewReplySend(postId, go, ta, err));
+  sync();
+  ov.classList.add('visible');
+}
+window.openCrewReply = openCrewReply;
+async function crewReplySend(postId, go, ta, err) {
+  const label = go.textContent;
+  go.disabled = true; go.textContent = 'Sending…'; err.textContent = '';
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_reply', { p_post: postId, p_body: ta.value }), 15000); } catch (e) { r = null; }
+  go.textContent = label;
+  if (_noAnswer(r)) { err.textContent = 'No signal. Your reply is still here: tap Reply again when you have signal.'; go.disabled = false; return; }
+  if (r.error || !r.data) { err.textContent = crewErrWords(r.error && r.error.message); go.disabled = false; return; }
+  crewPutReplies(postId, r.data.replies);
+  closeHistorySheet();
+}
+async function crewReplyDelete(id) {
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_reply_delete', { p_id: id }), 15000); } catch (e) { r = null; }
+  if (_noAnswer(r)) { aaToast('No signal. Try again when you are back online.'); return; }
+  if (r.error || !r.data) { aaToast(crewErrWords(r.error && r.error.message)); return; }
+  crewPutReplies(r.data.post, r.data.replies);
+}
+window.crewReplyDelete = crewReplyDelete;
+// The server's answer is the truth: put it on the copy and repaint that one post, never the whole feed.
+function crewPutReplies(postId, replies) {
+  const it = crewItem(postId);
+  if (!it || !Array.isArray(replies)) return;
+  it.replies = replies;
+  try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
+  document.querySelectorAll('.cr-reps').forEach(box => {
+    if (box.dataset.rep === String(postId)) box.innerHTML = crewRepsHTML(it);
+  });
 }
 // ── The week first (direction B, Amir's pick, 2026-10-20) ────────────────────────────────────────────────────────────────
 // The band at the top of Crew: what the crew did over the same 7 days the Bell covers, and a strip of initials that opens the
@@ -13960,6 +14063,8 @@ function crewErrWords(msg) {
     'crew:photos_today': 'That is 3 photos today. More tomorrow.', 'crew:posts_today': 'That is 10 posts today. More tomorrow.',
     'crew:photo_big': 'That photo did not work. Try another one.', 'crew:photo_bad': 'That photo did not work. Try another one.',
     'crew:session_photo': 'Add a photo to tell the crew.', 'crew:not_yes': 'Say yes to the Bell on Crew first.',
+    'crew:reply_long': 'That is over 140 characters.', 'crew:replies_today': 'That is 30 replies today. More tomorrow.',
+    'crew:replies_full': 'This post has all the replies it can hold.', 'crew:gone': 'That post has gone.',
   })[m && m[0]] || 'That did not post. Try again.';
 }
 function openCrewPost(mode, dayId) {
@@ -14023,14 +14128,26 @@ function openCrewPost(mode, dayId) {
 }
 // How many posts on the Bell are this athlete's own: the way to tell whether a post that timed out actually landed.
 function crewMinePosts() { return ((BELL && BELL.items) || []).filter(i => i && i.t === 'post' && i.me).length; }
+// One key per draft, so the same post sent twice is written once (stage92). crypto.randomUUID is not on every phone this
+// app runs on, so there is a plain fallback: the server only ever compares it with this athlete's own keys.
+function crewNewKey() {
+  try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+  const h = '0123456789abcdef';
+  let s = '';
+  for (let i = 0; i < 36; i++) s += (i === 8 || i === 13 || i === 18 || i === 23) ? '-' : (i === 14 ? '4' : h[Math.floor(Math.random() * 16)]);
+  return s;
+}
 function crewForgetKept() { try { localStorage.removeItem(crewKeepKey()); } catch (e) {} }
 async function crewSend(go, ta, err) {
   const d = _crewDraft;
   if (!d) return;
   const label = go.textContent;
   go.disabled = true; go.textContent = 'Posting…'; err.textContent = '';
+  // The key is made ONCE for this draft and sent with every attempt (stage92), so a post that is already on the server
+  // comes back as the one it is instead of being written a second time. A server without stage92 ignores the argument.
+  if (!d.key) d.key = crewNewKey();
   const p = { p_body: ta.value, p_photo: d.photo ? d.photo.b64 : null, p_w: d.photo ? d.photo.w : null, p_h: d.photo ? d.photo.h : null, p_kind: d.mode,
-    p_session: d.mode === 'session' ? { day: Number(d.day) || null, n: crewSessionsN() || null } : null };
+    p_session: d.mode === 'session' ? { day: Number(d.day) || null, n: crewSessionsN() || null } : null, p_key: d.key };
   let r = null;
   // 45 seconds with a photo, 25 without (2026-10-20). A 200 KB photo on Iran's connection can take longer than 25 s, and the
   // old timeout then said "No signal. Tap Post again" while the upload was still on its way: the server wrote it, the second
@@ -22555,8 +22672,13 @@ function maybeHighlightMoment() {
     const end = String(o.cur.endDate).slice(0, 10);
     if (todayDayNo() - cycleDayNo(end) >= 1) cands.push({ cIdx: o.cIdx, cur: o.cur, next: o.next, count: o.count, end: end, current: true });
   }
-  for (let k = 0; k < cands.length; k++) {
-    const cd = cands[k];
+  // CAPPED to the newest finished cycle (2026-10-20, Amir: "cap to the most recent"). The 14-day window is
+  // gone, so a celebration still waits however late the athlete opens the app, but a backlog never queues:
+  // one who missed three cycles gets the latest, not three moments over three opens. Older archived cycles
+  // never fire, and one left unseen stays unmarked rather than shown later.
+  const capped = cands.length ? [cands[cands.length - 1]] : [];
+  for (let k = 0; k < capped.length; k++) {
+    const cd = capped[k];
     const id = (cd.next ? 'cycle' : 'road') + (cd.cIdx + 1) + '|' + cd.end;
     if (seen[id]) continue;
     const spec = cd.current ? null : hlPastCycleSpec(cd);
