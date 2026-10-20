@@ -11131,7 +11131,7 @@ function goTo(screen, historyId, keepContent) {
   if (screen === 'achievements') renderAchievements();
   if (screen === 'system') renderSystemGuide();
   // Crew's own two pages: built from the copy on this phone, so they open with no signal (2026-10-20).
-  if (screen === 'crewboard' || screen === 'crewwho') { renderCrewPage(); if (Date.now() - _boardAt > 10 * 60000) refreshCrewBoard(); }
+  if (screen === 'crewboard' || screen === 'crewwho') { renderCrewPage(); if (Date.now() - _boardAt > 55000) refreshCrewBoard(); if (Date.now() - _bellAt > 20000) refreshBell(); }
   // The tab is settled on every move (2026-10-20). It is kept while the athlete is ON Crew even after the server stops
   // answering — nobody is moved off a screen mid-read — so leaving is the moment that decision gets taken again.
   try { setCrewTab(); } catch (e) {}
@@ -13323,7 +13323,7 @@ function achNudgeHTML(e) {
 // signal; <id>_crewseen is the newest post of Amir's opened on this phone (the tab's clay dot until then).
 var BELL = null;             // get_bell()'s answer: { athlete_id, me, items, honours, kinds, at } or null
 var CREW_BOARD = null;       // leaderboard_top()'s rows for the season board
-var _bellBusy = false, _bellAt = 0, _boardAt = 0, _crewMissing = false, _crewDraft = null, _crewFreshPin = null;
+var _bellBusy = false, _bellAt = 0, _boardAt = 0, _crewMissing = false, _crewDraft = null, _crewFreshPin = null, _bellSig = '';
 // How many "no such function" answers in a row (2026-10-20). The tab goes on the SECOND, never the first: PostgREST says it
 // for a few seconds after any stage is applied, and one of those used to empty the phone's copy mid-read.
 var _crewMiss2 = 0;
@@ -13397,6 +13397,7 @@ var _bellPlain = false;   // this server has no get_bell_if_new: stop asking for
 async function refreshBell() {
   if (!crewAllowed() || _bellBusy) return;
   _bellBusy = true;
+  let changed = false;   // only a feed that really changed repaints the screen (Crew is asked again every 30 seconds now, 2026-10-20)
   try {
     const sb = await _sbReady();
     if (!sb) return;
@@ -13422,13 +13423,20 @@ async function refreshBell() {
     if (r.data.same) { _bellAt = Date.now(); _crewMissing = false; return; }   // nothing new: the copy stands, nothing was sent
     if (r.data.athlete_id !== ATHLETE_ID) return;
     BELL = r.data; _bellAt = Date.now(); _crewMissing = false;
-    try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) { /* storage full: shown this visit */ }
+    const sig = JSON.stringify(BELL);
+    changed = sig !== _bellSig; _bellSig = sig;
+    try { _lsRawSet(crewKey(), sig); } catch (e) { /* storage full: shown this visit */ }
     crewSweepPhotos();   // a photo whose post has gone leaves the phone with it
   } catch (e) { /* keep the copy */ }
   // paintWeekSugg() too (2026-10-20): Home is drawn at boot, before the Bell has answered, so the crew's one invitation
   // would never appear on the open that first learns there is a crew. It returns at once when the week's own suggestion
   // owns the slot, so this costs nothing.
-  finally { _bellBusy = false; setCrewTab(); paintCrewTell(); paintSessionShare(); paintWeekSugg(); if (onCrew()) renderCrew(); }
+  // The screen is redrawn only when the feed changed, or when there is still nothing to show (so "No signal" and "Loading" stay
+  // honest): a tick that finds the same crew must not rebuild the feed under a thumb, or disarm a Delete half-tapped.
+  finally {
+    _bellBusy = false; setCrewTab(); paintCrewTell(); paintSessionShare(); paintWeekSugg();
+    if (changed || !BELL) { if (onCrew()) renderCrew(); if (onCrewPage()) renderCrewPage(); }
+  }
 }
 // The one ask that is not an open: a phone that has never had an answer does not know whether there is a Crew tab at all.
 // Once it has a copy, nothing is asked for again until Crew is opened.
@@ -13467,8 +13475,8 @@ function openCrew() {
   crewMarkSeen();
   crewInvSeen();   // the invitation on Home has done its job (2026-10-20)
   renderCrew();   // the copy is on screen before anything is asked for
-  if (Date.now() - _bellAt > 10 * 60000) refreshBell();   // at most once every ten minutes, and only from this screen
-  if (Date.now() - _boardAt > 10 * 60000) refreshCrewBoard();
+  if (Date.now() - _bellAt > 20000) refreshBell();   // at most once every 20 seconds (ten minutes until 2026-10-20), and only from this screen
+  if (Date.now() - _boardAt > 55000) refreshCrewBoard();
 }
 // The board: `crew_board()` (stage91), which is the CREW only. It used to be `leaderboard_top()`, the whole board, so on
 // 20 October it listed 23 names under a screen that promises nothing of yours reaches the crew before your yes — six of them
@@ -13505,15 +13513,36 @@ async function refreshCrewBoard() {
       if (!r || r.error || !Array.isArray(r.data)) return;
       rows = r.data.map(x => ({ pos: x.pos, who: x.display_name, xp: x.xp, level: x.level, is_me: x.is_me }));
     }
+    const sig = JSON.stringify(rows), same = sig === JSON.stringify(CREW_BOARD);
     CREW_BOARD = rows;
-    try { _lsRawSet(crewBoardKey(), JSON.stringify(rows)); } catch (e) { /* storage full: shown this visit */ }
+    try { _lsRawSet(crewBoardKey(), sig); } catch (e) { /* storage full: shown this visit */ }
     // The whole screen, not just the rows: a first board also decides whether *The whole board ›* is there at all, and
     // patching #crew-board alone left the door off until the next open. The feed is redrawn from the same copy, and a photo
-    // already downloaded is in CREW_PHOTOS, so nothing is fetched twice.
+    // already downloaded is in CREW_PHOTOS, so nothing is fetched twice. A board that came back the same is not redrawn:
+    // it is asked for every minute now while Crew is open.
+    if (same) return;
     if (onCrew()) renderCrew();
     if (onCrewPage()) renderCrewPage();
   } catch (e) { /* the board stays as it was */ }
 }
+
+// ── Crew is live while it is on the screen (2026-10-20) ──────────────────────────────────────────────────────────────────
+// Amir: *"the crew doesnt update automatically, it needs to be closed from the background and reopened, its not live"*. The
+// feed was asked for in ONE place, openCrew(), at most once every ten minutes. Coming back to the app from the background keeps
+// the page and its clocks, so an athlete looking at Crew saw whatever the last open had fetched; only closing the app (a new page,
+// the clocks back at zero) made the next tap ask. Now a tick every 30 seconds asks while Crew, its board or its list is on the
+// screen and the app is in front, and coming back to the app, or back online, asks at once. It is the cheap ask: an unchanged
+// crew answers `{ same: true }` in 78 bytes (Iran's internet is slow, Amir 2026-10-19), the board is a few dozen small rows asked
+// for once a minute at most, and neither redraws anything unless it came back different.
+function crewWatching() { return !document.hidden && crewOn() && (onCrew() || onCrewPage()); }
+function crewLive() {
+  if (!crewWatching()) return;
+  if (Date.now() - _bellAt > 20000) refreshBell();
+  if (Date.now() - _boardAt > 55000) refreshCrewBoard();
+}
+setInterval(crewLive, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) crewLive(); });
+window.addEventListener('online', crewLive);
 
 // ── the words ──
 function crewInitials(name) {

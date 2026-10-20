@@ -386,7 +386,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('opening Crew asks once, with the hash of the copy', asked.length === 1 && asked[0].p_etag === 'tag-A', JSON.stringify(asked));
     C.check('…and an unchanged feed sends nothing back: the copy stands', await p.evaluate(() => BELL && BELL.etag === 'tag-A' && !!document.querySelector('#crew-body .cr-post')));
     await p.evaluate(() => { goTo('home'); goTo('crew'); }); await p.waitForTimeout(500);
-    C.check('…going back in within ten minutes asks nothing again', (await calls(p, 'get_bell_if_new')).length === 1);
+    C.check('…going back in within 20 seconds asks nothing again', (await calls(p, 'get_bell_if_new')).length === 1);
     // the photo: downloaded once, then kept on the phone
     await p.evaluate(() => document.querySelector('.cr-ph').scrollIntoView()); await p.waitForTimeout(800);
     C.check('the photo is downloaded on the first look', (await calls(p, 'crew_photo')).length === 1);
@@ -417,6 +417,43 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await waitTab(p);
     await p.evaluate(() => goTo('crew')); await p.waitForTimeout(700);
     C.check('without stage83 the app falls back to get_bell and still draws the feed', (await calls(p, 'get_bell')).length >= 1 && await p.evaluate(() => !!document.querySelector('#crew-body .cr-post')));
+    await ctx.close();
+  }
+  {
+    // Crew is LIVE while it is on the screen (Amir, 2026-10-20: "the crew doesnt update automatically, it needs to be closed from the
+    // background and reopened"). A tick asks again, coming back from the background asks at once, a hidden app asks nothing, and only
+    // a feed that really changed is redrawn.
+    const b = Object.assign(bell({ answer: 'yes', can_post: true }), { emoji: ['🔥'] });
+    const { ctx, p } = await open(browser, { bell: b });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(700);
+    const asked = async () => (await calls(p, 'get_bell_if_new')).length + (await calls(p, 'get_bell')).length;
+    const n0 = await asked();
+    await p.evaluate(() => { crewLive(); }); await p.waitForTimeout(300);
+    C.check('live: asked a moment ago, so the tick asks nothing', (await asked()) === n0, String(n0));
+    // 25 seconds later: an unchanged crew answers "same" and the screen is NOT rebuilt (a marker on the feed survives)
+    await p.evaluate(() => { document.querySelector('#crew-body').setAttribute('data-mark', 'kept'); _bellAt = Date.now() - 25000; crewLive(); }); await p.waitForTimeout(500);
+    C.check('live: 25 seconds on, the tick asks again', (await asked()) === n0 + 1, String(await asked()));
+    C.check('…and a crew that did not change is not redrawn under a thumb', await p.evaluate(() => document.querySelector('#crew-body').getAttribute('data-mark') === 'kept' && !!document.querySelector('#crew-body .cr-post')));
+    // someone posts: the next tick brings it to the screen with no tap
+    await p.evaluate(() => {
+      window.__STUB.bell.items.splice(1, 0, { t: 'post', id: '99999999-0000-4000-8000-000000000001', who: 'Mina S.', me: false, amir: false, kind: 'post', body: 'Fresh from the gym.', photo: false, at: new Date().toISOString(), pinned: false, left: 7, kudos: { n: 0, mine: false, names: [] } });
+      _bellAt = Date.now() - 25000; crewLive();
+    }); await p.waitForTimeout(700);
+    C.check('live: a new post appears on the open screen, with no tap and no reopening', await p.evaluate(() => /Fresh from the gym/.test(document.querySelector('#crew-body').textContent)));
+    // the app is in the background: nothing is asked; in front again: it asks at once
+    const n1 = await asked();
+    await p.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); _bellAt = Date.now() - 60000; crewLive(); }); await p.waitForTimeout(300);
+    C.check('live: an app in the background asks nothing', (await asked()) === n1, String(await asked()));
+    await p.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => false }); document.dispatchEvent(new Event('visibilitychange')); }); await p.waitForTimeout(500);
+    C.check('live: coming back to the app asks at once', (await asked()) === n1 + 1, String(await asked()));
+    // the board moves too, and only a changed board is redrawn
+    const bd = await p.evaluate(() => { _boardAt = 0; return (CREW_BOARD || []).length; });
+    await p.evaluate(() => { window.__STUB.crewBoard = [{ pos: 1, who: 'Mina S.', points: 900, level: 5, is_me: false }, { pos: 2, who: 'Alex R.', points: 400, level: 19, is_me: true }]; _boardAt = Date.now() - 60000; crewLive(); });
+    await p.waitForTimeout(500);
+    C.check('live: the board follows (it is asked every minute at most)', await p.evaluate(() => /900/.test(document.querySelector('#crew-board').textContent)), String(bd));
+    C.check('…and the tick on the Crew screen of a hidden tab or another screen asks nothing', await p.evaluate(() => { goTo('home'); const n = (window.__STUB.params || []).length; _bellAt = 0; _boardAt = 0; crewLive(); return (window.__STUB.params || []).length === n; }));
+    C.check('…no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }
 

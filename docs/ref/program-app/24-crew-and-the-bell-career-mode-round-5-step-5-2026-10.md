@@ -138,7 +138,10 @@ decides what rings and who can be seen, and never sends this app another athlete
 - **The data, on a slow connection** (Amir, 2026-10-19: *"irans internet is very slow, and cant download everything everytime they open the
   app"*): **nothing is asked for at an app open**. `crewFirstLook()` asks once in a phone's life, only while it has no copy at all (a new
   athlete still gets the tab without opening anything); after that the tab, the dot and *Tell the crew* all come from `<id>_crewcache`.
-  Opening Crew draws the copy first, then asks **at most every ten minutes** (the board too). The ask is `get_bell_if_new` (stage83) carrying
+  Opening Crew draws the copy first, then asks (the Bell at most every 20 seconds, the board every minute). **It is live while it is
+  open (2026-10-20, Amir: *"it needs to be closed from the background and reopened, its not live"*):** `crewLive()` ticks every 30
+  seconds, asks only while Crew or one of its two pages is on the screen and the app is in front, and `visibilitychange` / `online` ask at
+  once; a feed or board that came back the same is not redrawn (`_bellSig`), so a tick never rebuilds the screen under a thumb. The ask is `get_bell_if_new` (stage83) carrying
   the hash of the copy: an unchanged crew answers **`{ same: true }`**, 78 bytes against the feed's few thousand, and the copy stands. A server
   without stage83 says so once and the phone asks plain `get_bell()` from then on (`_bellPlain`).
 - **A photo is downloaded once, ever.** `crewFetchPhoto()` looks in **Cache Storage** (`crew-photos-v1`) before the network, and what it

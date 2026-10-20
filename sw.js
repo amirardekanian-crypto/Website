@@ -456,7 +456,11 @@
 // This worker: a fetched file is cloned before the page reads it (cloned later it threw, so nothing beyond the shell was ever
 // kept), push.js and habits-core.js are precached under the URLs the pages ask for, and a notification tap never takes over
 // a window that is not one of the two athlete apps.
-const CACHE = 'aap-v216';
+// v217: program.html changed (2026-10-20, Amir: "the crew doesnt update automatically, it needs to be closed from the background and
+// reopened, its not live"). Crew is asked again every 30 seconds while it is on the screen, straight away when the app comes back from
+// the background or back online, and the screen is redrawn only when the crew really changed. The server side of the same day: the
+// season board counts what was done in the season (stage95), so back-paid achievements no longer show as season points.
+const CACHE = 'aap-v217';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
