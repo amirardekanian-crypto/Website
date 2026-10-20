@@ -151,6 +151,16 @@ html = open(os.path.join(ROOT, 'coach.html'), encoding='utf-8').read()
 listed = re.findall(r"'([a-z_]+)'", re.search(r"const BACKUP_TABLES = \[([\s\S]*?)\];", html).group(1))
 check('1h: coach.html BACKUP_TABLES lists every table of the schema snapshot except the two key-hash tables and the four short-lived Bell tables (stage81), and nothing else (a new table goes in both)',
       sorted(listed) == sorted(set(cols) - rb.SECRET_TABLES - rb.SHORT_LIVED), (sorted(set(cols) - rb.SECRET_TABLES - rb.SHORT_LIVED - set(listed)), sorted(set(listed) - set(cols))))
+# selectAll() pages every backed-up table in its keysOf() order, and keysOf() falls back to ['id'] for a table it does not name. Three tables
+# added from stage81 on (crew_consent, push_subs, crew_open_results) have no id, so their read failed and every backup was INCOMPLETE (2026-10-20).
+tk = re.search(r"const TABLE_KEYS = \{([\s\S]*?)\};", html).group(1)
+table_keys = {m.group(1): re.findall(r"'([a-z_0-9]+)'", m.group(2)) for m in re.finditer(r"([a-z_0-9]+): \[([^\]]*)\]", tk)}
+by_athlete = re.findall(r"'([a-z_0-9]+)'", re.search(r"function keysOf\(table\) \{[\s\S]*?\(\[([\s\S]*?)\]\s*\.includes", html).group(1))
+def keys_of(t):
+    return table_keys.get(t) or (['athlete_id'] if t in by_athlete else ['id'])
+unpaged = {t: keys_of(t) for t in listed if t in cols and any(k not in cols[t] for k in keys_of(t))}
+check('1i: every table in BACKUP_TABLES is paged by columns it has (coach.html keysOf(): its TABLE_KEYS entry, else athlete_id, else id)',
+      not unpaged, unpaged)
 fks = rb.foreign_keys(schema_sql)
 order = rb.table_order(cols, fks)
 check('1e: parents come before children (exercises before exercise_coach, players before their notes)',

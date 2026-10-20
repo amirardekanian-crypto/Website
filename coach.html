@@ -1468,6 +1468,8 @@ const TABLE_KEYS = {
   career_facts: ['athlete_id', 'kind', 'ref'], career_rules: ['version'], career_catalogue: ['kind', 'id'],
   career_awards: ['athlete_id', 'award_id'], career_recognition: ['athlete_id', 'award_id', 'audience'],
   courtside_marks: ['athlete_id', 'award_id'], career_honour_months: ['month'], career_honours: ['month', 'honour', 'athlete_id'],
+  // No id column in these three (stage81, 84, 85): paged by ['id'] they could not be read, and every backup was INCOMPLETE (2026-10-20).
+  crew_consent: ['athlete_id'], push_subs: ['endpoint'], crew_open_results: ['open_id', 'athlete_id'],
   career_goals: ['athlete_id', 'month'], career_notes: ['athlete_id', 'day'],
 };
 function keysOf(table) {
