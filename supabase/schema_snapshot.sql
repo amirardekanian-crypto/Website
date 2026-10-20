@@ -5802,27 +5802,28 @@ AS $function$
   with l as (select case when p_lang = 'fa' then 'fa' else 'en' end as lang),
   -- more than one thing to tell them: the count, and nothing about who or what
   many as (
-    select case when l.lang = 'fa' then 'تو کرو خبر هست' else 'The crew has been busy' end as title,
-           case when l.lang = 'fa' then p_n::text || ' چیز تازه.' else p_n::text || ' new things to see.' end as body
+    select case when l.lang = 'fa' then 'تو تیم خبر هست' else 'The crew has been busy' end as title,
+           case when l.lang = 'fa' then translate(p_n::text, '0123456789', '۰۱۲۳۴۵۶۷۸۹') || ' چیز تازه.'
+                else p_n::text || ' new things to see.' end as body
       from l),
   -- exactly one: who, and which kind of thing
   one as (
-    select case when l.lang = 'fa' then coalesce(w.fa, 'یه خبر تو کرو') else coalesce(w.en, 'Something in the crew') end as title,
+    select case when l.lang = 'fa' then coalesce(w.fa, 'یه خبر تو تیم') else coalesce(w.en, 'Something in the crew') end as title,
            case when l.lang = 'fa' then 'یه سر بزن.' else 'Have a look.' end as body
       from l
       left join (values
         ('post',        p_who || ' posted',                 p_who || ' پست گذاشت'),
         ('kudos_you',   p_who || ' cheered you',            p_who || ' برات دست زد'),
         ('kudos',       p_who || ' gave a cheer',           p_who || ' یه دست زد'),
-        ('level',       p_who || ' reached a new level',    p_who || ' لِوِل گرفت'),
+        ('level',       p_who || ' reached a new level',    p_who || ' سطحش رفت بالا'),
         ('week',        p_who || ' held their week',        p_who || ' هفته‌شو کامل کرد'),
-        ('mark',        p_who || ' hit a new mark',         p_who || ' یه نشان گرفت'),
+        ('mark',        p_who || ' hit a new mark',         p_who || ' یه دستاورد گرفت'),
         ('achievement', p_who || ' earned an achievement',  p_who || ' یه دستاورد گرفت'),
         ('best',        p_who || ' set a personal best',    p_who || ' رکورد زد'),
-        ('cycle',       p_who || ' finished a cycle',       p_who || ' یه سایکل تموم کرد'),
+        ('cycle',       p_who || ' finished a cycle',       p_who || ' یه دوره تموم کرد'),
         ('honour',      p_who || ' took an honour',         p_who || ' یه افتخار برد'),
         ('open',        p_who || ' played the Monthly Open', p_who || ' تو مسابقهٔ ماه بازی کرد'),
-        ('joined',      p_who || ' joined the crew',        p_who || ' اومد تو کرو')
+        ('joined',      p_who || ' joined the crew',        p_who || ' اومد تو تیم')
       ) as w(k, en, fa)
         on w.k = case when p_kind = 'kudos' and coalesce(p_mine, false) then 'kudos_you' else p_kind end)
   select title, body from many where p_n > 1
@@ -6035,7 +6036,7 @@ CREATE OR REPLACE FUNCTION public.cycle_push_words(p_lang text)
 AS $function$
   select t.title, t.body from (values
     ('en', 'Your next cycle is ready', 'Open the app and have a look.'),
-    ('fa', 'سایکل بعدیت آماده‌ست',      'برنامه رو باز کن و یه نگاه بنداز.')
+    ('fa', 'دوره‌ی بعدیت آماده‌ست',     'برنامه رو باز کن و یه نگاه بنداز.')
   ) as t(lang, title, body)
   where t.lang = (case when p_lang = 'fa' then 'fa' else 'en' end)
 $function$;
