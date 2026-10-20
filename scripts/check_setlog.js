@@ -55,7 +55,7 @@ vm.runInContext([
   // A finished day's own copy (closeSessionAtDone(), 2026-10-13): buildSessionData() reads it first. None is stored here.
   slice(prog, 'program.html', 'function doneLogKey(day) {', 'function loadSetLog('),
   slice(prog, 'program.html', 'function normDigits(v) {', 'const ONE_RM_MAX_EFFECTIVE'),   // ends on code, not a comment a docs pass may reword
-  slice(prog, 'program.html', '// ── THE UNIT A WEIGHT IS IN', '// The set that produces the HIGHEST'),   // weightOf(), splitW(), composeW(), weightText(), parseLoggedKg()
+  slice(prog, 'program.html', '// ── THE UNIT A WEIGHT IS IN', '// ── THE CEILING — the saved history'),   // weightOf(), splitW(), composeW(), weightText(), parseLoggedKg()
   slice(prog, 'program.html', 'function buildSessionData(day) {', '// Saves a permanent session record'),
   slice(prog, 'program.html', 'function parseSetText(t) {', 'function histFromRows('),
 ].join('\n'), P);

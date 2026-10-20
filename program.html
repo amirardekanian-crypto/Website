@@ -6337,11 +6337,11 @@
   </div>
 </div>
 
-<!-- Off the Glass, the rest game (assets/js/rally.js fills it; openRally() / closeRally()). Over the rest timer, under the demo banner. -->
+<!-- Off the Glass, the rest game (assets/js/rally.js fills it; openRestGame('rally') / closeRally()). Over the rest timer, under the demo banner. -->
 <div class="rally-overlay" id="rallyOverlay" role="dialog" aria-modal="true" aria-label="Off the Glass"></div>
-<!-- Split Step, the other rest game (assets/js/splitstep.js fills it; openSplitStep() / closeSplitStep()). Same layer look as Off the Glass. -->
+<!-- Split Step, the other rest game (assets/js/splitstep.js fills it; openRestGame('splitstep') / closeSplitStep()). Same layer look as Off the Glass. -->
 <div class="rally-overlay" id="splitOverlay" role="dialog" aria-modal="true" aria-label="Split Step"></div>
-<!-- Between Sets, the third rest game (assets/js/between-sets.js fills it; openBetweenSets() / closeBetweenSets()). Same layer look. -->
+<!-- Between Sets, the third rest game (assets/js/between-sets.js fills it; openRestGame('sets') / closeBetweenSets()). Same layer look. -->
 <div class="rally-overlay" id="setsOverlay" role="dialog" aria-modal="true" aria-label="Between Sets"></div>
 
 <!-- A note in a box in the middle of the screen: aaToast() fills it. One at a time, with a button. -->
@@ -11420,7 +11420,6 @@ function habSaveLog() {
 
 // The day being filled in. HAB_UI.day is null for today; the engine's AKEY() self-heals when the window
 // slides out from under an app left open past midnight.
-function habDayKey() { return habOn() ? window.AAHabits.AKEY() : ''; }
 function habSetDay(k) {
   if (!habOn()) return;
   const H = window.AAHabits;
@@ -11727,19 +11726,6 @@ function habDayXp(k) {
   if (!habOn()) return 0;
   const day = k || H.AKEY();
   return H.rosterOn(day).reduce((n, hb) => n + habXpOf(hb, day), 0);
-}
-// The one "what now" line. Plain words, and it never asks for anything on a day that is already done.
-function habNudge(k, v) {
-  const H = window.AAHabits;
-  if (v.state === 'perfect') return 'Every one of them. That is a perfect day.';
-  if (v.state === 'on') return 'This day counts. Anything else is extra.';
-  const left = H.rosterOn(k).filter(hb => !H.isDone(hb, k) && !hb.locked).map(hb => H.shortName(hb).toLowerCase());
-  if (!left.length) return 'Finish your session and the day is yours.';
-  if (left.length === 1) return 'One thing left: ' + left[0].toLowerCase() + '.';
-  const say = left.length <= 3
-    ? left.slice(0, -1).join(', ') + ' and ' + left[left.length - 1] + ' left.'
-    : left.slice(0, 2).join(', ') + ' and ' + (left.length - 2) + ' more to go.';
-  return say.charAt(0).toUpperCase() + say.slice(1);
 }
 // The first screen, for an athlete who has never set the habits up: what is tracked, before anything is
 // scored. The only place either app makes a deal with the athlete before it starts marking them.
@@ -12568,7 +12554,6 @@ function careerPendingSessions() {
 }
 // ── the finished card's reward bands, and the moments ────────────────────────────────────────────────────────────────────────────────
 function rwSizeRank(size) { return { tick: 0, win: 1, highlight: 2, milestone: 3, legend: 4 }[size] || 0; }
-function rwMetalWord(m) { return { bronze: 'Bronze', silver: 'Silver', emerald: 'Emerald', amethyst: 'Amethyst', prismatic: 'Prismatic', prisma: 'Prismatic' }[m] || ''; }
 function rwMeaningWord(m) { return { consistency: 'Consistency', commitment: 'Commitment', progress: 'Progress', resilience: 'Resilience' }[m] || ''; }
 function rwFullSizes() {
   const m = CAREER_T && CAREER_T.p && CAREER_T.p.rules && CAREER_T.p.rules.moments;
@@ -18983,22 +18968,6 @@ function parseLoggedKg(v) {
   return w.unit === 'lb' ? Math.round(w.n * 0.45359237 * 100) / 100 : w.n;
 }
 
-// The set that produces the HIGHEST estimate — the athlete's real best effort
-// of the day, not simply the last row they happened to fill in.
-// Each set is read at the reps it was actually done for (setReps), so a short
-// set logged as 4 of 5 estimates off 4, not the 5 that was planned.
-function bestCeilingSet(log, reps) {
-  let best = null;
-  (log || []).forEach((s, i) => {
-    const rp  = setReps(s, reps);
-    const est = estimateOneRM(parseLoggedKg(s.w), rp, s.r);
-    if (est != null && (!best || est > best.est)) {
-      best = { est: est, kg: parseLoggedKg(s.w), rpe: Number(s.r), reps: rp, idx: i };
-    }
-  });
-  return best;
-}
-
 // ── THE CEILING — the saved history behind the estimates ───────────────
 // One array per athlete: [{ lift, kg, w, r, rpe, d, t, test? }, …] where `kg`
 // is the estimate, `w/r/rpe` the set it came from, `d` the date it happened on
@@ -20021,11 +19990,6 @@ function initNotes() {
   });
 }
 
-// initRPE was replaced by initSetOrRPE() (per-set table for standard, single
-// overall RPE for circuits). Keeping the name available as an alias for any
-// future caller, but the implementation now delegates.
-function initRPE() { initSetOrRPE(); }
-
 function selectRPE(btn, key, e) {
   e.stopPropagation();
   // Tap the picked number again to clear it, as on a set (CONS-01). removeItem is hooked:
@@ -20453,11 +20417,8 @@ function paintRestGameLines() {
   const el = document.querySelector('#timerGames [data-game="rally"] small');
   if (el) el.textContent = rallyRowLine();
 }
-function openRally() { openRestGame('rally'); }
 function closeRally() { if (window.Rally) Rally.close(); }
-function openSplitStep() { openRestGame('splitstep'); }
 function closeSplitStep() { if (window.SplitStep) SplitStep.close(); }
-function openBetweenSets() { openRestGame('sets'); }
 function closeBetweenSets() { if (window.BetweenSets) BetweenSets.close(); }
 function foldRestGames() {
   const sh = document.getElementById('timerGames'), b = document.getElementById('timerPlayBtn');
@@ -21209,11 +21170,6 @@ function histDateLabel(iso) {
             : Math.round(days / 30) + ' months ago';
   return { when, ago };
 }
-// A logged weight in KILOGRAMS (pounds converted, plates and no number → null). Every calculation reads this one.
-function histKg(v) {
-  const k = parseLoggedKg(v);
-  return k == null ? null : String(Math.round(k * 100) / 100);
-}
 // The same weight as the athlete typed it, to SHOW: "80", "45 lb", "6 plates" (kg stays a bare number); null with no number.
 function histWt(v) {
   const w = weightOf(v);
@@ -21268,15 +21224,6 @@ function histBestSet(e) {
     const n = (s.n != null && s.n !== '') ? Number(s.n) : (e.reps || null);
     const est = (wt.n && n) ? estimateOneRM(wt.n, n, s.r, m) : null;
     if (est != null && (!best || est > best.est)) best = { est: est, w: wt.n, reps: n, rpe: Number(s.r), u: uStore(m) };
-  });
-  return best;
-}
-function histTopSet(sets, planned) {
-  let best = null;
-  (sets || []).filter(histSetLogged).forEach(s => {
-    const w = parseLoggedKg(s.w);
-    const n = (s.n != null && s.n !== '') ? Number(s.n) : planned;
-    if (!best || (w || 0) > (best.w || 0)) best = { w, n };
   });
   return best;
 }

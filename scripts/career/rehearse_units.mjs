@@ -29,7 +29,7 @@ const prog = read(path.join(ROOT, 'program.html'));
 const slice = (a, b) => { const i = prog.indexOf(a), j = prog.indexOf(b, i + 1); if (i < 0 || j <= i) throw new Error('could not find ' + a); return prog.slice(i, j); };
 const P = {};
 vm.createContext(P);
-vm.runInContext([slice('function normDigits(v) {', 'const ONE_RM_MAX_EFFECTIVE'), slice('// ── THE UNIT A WEIGHT IS IN', '// The set that produces the HIGHEST')].join('\n'), P);
+vm.runInContext([slice('function normDigits(v) {', 'const ONE_RM_MAX_EFFECTIVE'), slice('// ── THE UNIT A WEIGHT IS IN', '// ── THE CEILING — the saved history')].join('\n'), P);
 const jsKg = vm.runInContext('parseLoggedKg', P);
 
 // ── the database side ──
