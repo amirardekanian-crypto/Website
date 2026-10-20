@@ -141,6 +141,31 @@
         } else if (on && !k.mine) { k.n++; k.mine = true; } else if (!on && k.mine) { k.n--; k.mine = false; }
         keep(); return res({ data: JSON.parse(JSON.stringify(k)), error: null, status: 200 });
       }
+      // Replies (stage92): held on the post in `bell`, so a reply, a delete and the redraw all read the same place the
+      // app does. A fixture that sets `noReplies` answers "no such function", which is a server without stage92.
+      if (name === 'crew_reply' || name === 'crew_reply_delete') {
+        if (S.noReplies) return res({ data: null, error: { message: 'Could not find the function public.' + name, code: 'PGRST202' }, status: 404 });
+        var post = null;
+        if (name === 'crew_reply') {
+          post = (B.items || []).filter(function (i) { return i && i.id === (params && params.p_post); })[0];
+          if (!post) return res({ data: null, error: { message: 'crew:gone' }, status: 400 });
+          var body = String((params && params.p_body) || '').trim();
+          if (!body) return res({ data: null, error: { message: 'crew:empty' }, status: 400 });
+          if (body.length > 140) return res({ data: null, error: { message: 'crew:reply_long' }, status: 400 });
+          if (!Array.isArray(post.replies)) post.replies = [];
+          post.replies.push({ id: 'rep-' + (++S._repN || (S._repN = 1)), who: (B.me && B.me.name) || 'You', me: true, amir: false, body: body, at: new Date().toISOString() });
+        } else {
+          (B.items || []).forEach(function (i) {
+            if (i && Array.isArray(i.replies) && i.replies.some(function (r) { return r.id === (params && params.p_id); })) {
+              i.replies = i.replies.filter(function (r) { return r.id !== (params && params.p_id); });
+              post = i;
+            }
+          });
+          if (!post) return res({ data: null, error: { message: 'crew:gone' }, status: 400 });
+        }
+        keep();
+        return res({ data: { post: post.id, replies: JSON.parse(JSON.stringify(post.replies || [])) }, error: null, status: 200 });
+      }
       if (name === 'crew_delete_post') { var before = (B.items || []).length; B.items = (B.items || []).filter(function (i) { return !(i && i.id === (params && params.p_post)); }); keep(); return res({ data: B.items.length < before, error: null, status: 200 }); }
       if (name === 'crew_photo') return res({ data: { id: params && params.p_post, mime: 'image/jpeg', w: 4, h: 5,
         b64: '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z' }, error: null, status: 200 });

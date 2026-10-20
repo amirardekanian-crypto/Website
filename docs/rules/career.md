@@ -62,6 +62,11 @@ The system and rules GAME-1 to GAME-14: [`../../career/CAREER_MODE.md`](../../ca
   number. `leaderboard_top()` is never changed for Crew: coach.html and habits.html mean the whole board by it. Nothing here pays (GAME-6).
   ⚠️ A session is folded on its **day**, never the row's `created_at`, consent included — the 17 October back-pay wrote 39 of one athlete's sessions
   in an afternoon. The board is deliberately outside `get_bell()`'s payload so stage83's `{same:true}` keeps working.
+- **The crew can answer each other** (stage92, applied 2026-10-20; `PROCEDURES.md` → *Stage 92*). Amir: *"replies and likes like instagram"*, then
+  *"dont need the likes on replies"*. One level of replies, text, 140 characters, gone with the post at 7 days, 30 a day and 50 a post, your own
+  deleted with two taps and any of them removable by Amir. It also carries the key that stops a slow post being written twice. ⚠️ `crew_replies` is a
+  new table under an athlete id, so it joined `coach_erase_person()` in the SAME stage (that function refuses to erase anybody while a table it does
+  not know still holds rows) and the snapshot in the same commit, and it stays OUT of `BACKUP_TABLES` as `SHORT_LIVED`, like every 7-day crew table.
 - **Every achievement comes up full screen, and can tell the crew** (2026-10-20, Amir: *"like in a computer games when you have
   got an achievement. Something big on screen would come up. It can be shared as well … And at the same time i want a line in
   the crew so everyone else can see"*). An achievement ignores the size half of `full` and keeps only the freshness half

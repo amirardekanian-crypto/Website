@@ -421,7 +421,12 @@
 // own now"). The From your habits row now OPENS those nine, owned first with the day they were won and the rest with how far along
 // they are, each saying which court it counts toward. It used to jump to the whole cabinet, where they are scattered across the four
 // kinds and nothing says which came from the habits.
-const CACHE = 'aap-v210';
+// v211: program.html changed (2026-10-20, Amir: "replies and likes like instagram", then "dont need the likes on replies").
+// The crew can answer each other now: one level of replies under a post, 140 characters, gone with the post after 7 days, your
+// own deleted with two taps and any of them removable by Amir. No likes on a reply -- the Like stays on the post. A post also
+// carries a key made on the phone now, so a slow photo that outlasts the composer's wait is never written twice. And Home
+// offers the crew once, under This Week, for the sixteen athletes who have never seen the question.
+const CACHE = 'aap-v211';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

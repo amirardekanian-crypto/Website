@@ -109,6 +109,13 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   it is never changed for this — and it shows **one** number, this season's, with no lifetime LV chip beside it.
   **Nobody is moved off a screen they are reading, and the phone's copy is never deleted to save it** (2026-10-20): a missing-function answer hides the
   tab on the SECOND in a row, keeps `<id>_crewcache`, and leaves whoever is on Crew where they are until they move.
+  **A post can be replied to; a moment cannot** (stage92, 2026-10-20, Amir: *"replies and likes like instagram"* and *"dont need the likes on
+  replies"*): one level, text, 140 characters, dies with its post at 7 days, your own takes two taps to delete and Amir can remove any. There are no
+  likes on a reply. **A crew post is written once however slow the line**: the phone makes one key per draft and sends it with every attempt, and the
+  server hands back the post it already wrote rather than writing a second.
+  **Home's one crew invitation is a PICKED LINE, not a door row** (2026-10-20): it uses the Library suggestion's slot and grammar, the week's own
+  suggestion wins that slot when both want it, and it goes for good the first time Crew is opened (`<id>_crewinv`). Home still carries no door row of
+  its own.
 - **Dark mode is the athlete's choice** (Amir, 2026-09-27: *"Let the client choose dark mode"*): both apps start
   light and switch only on the athlete's tap; neither follows the phone's setting.
 - **Clay means "look here"** (DS-01, Amir 2026-09-27; `PROGRAM-APP.md` → *Clay means look here*): the Coach's note,

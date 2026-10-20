@@ -70,6 +70,16 @@ decides what rings and who can be seen, and never sends this app another athlete
   moves twice for one athlete. The row is drawn **only while the server hands over the list** (`BELL.emoji`, stage82): without it the Like
   stands alone, exactly as stage81 left it, so the app shipped before the stage was applied. The whole row repaints after a tap
   (`paintKudos()`), the names line sits under it, and at 320 px the chips tighten so all five still fit on one line.
+- **Replies** (stage92, 2026-10-20; Amir: *"replies and likes like instagram"*, then *"dont need the likes on replies"* — so a reply is text and the
+  Like stays on the post). One level, **140 characters**, under the Like and the names (`crewRepsHTML()`, `.cr-reps`), gone with the post at 7 days,
+  your own taken back with two taps, and Amir can remove any (`coach_crew_remove_reply()`). The sheet (`openCrewReply()`) quotes the post, counts to
+  140 and keeps no draft: a reply is one line and its post is on the screen behind it. `crewPutReplies()` puts the server's answer on the phone's copy
+  and repaints that **one** post, never the feed. A **moment line has no Reply** — a moment is not a post. A non-member's Reply is not dead: it offers
+  to join, exactly as their Like does; an athlete ticked under 13 reads them and is offered nothing. A server without stage92 sends no `replies` key
+  and there is no Reply door anywhere.
+  **A post is written once, however slow the line**: the composer makes one key per draft (`crewNewKey()`, kept on `_crewDraft.key`) and sends it with
+  every attempt, and the server hands back the post it already has instead of writing a second one. This is the complete fix for the double post that
+  stage91 could only narrow.
 - **The words** (Amir, 2026-10-19): the button is **Like**, never Kudos; the question is **Join the crew?** with *Join the crew* and
   *Keep it to me*; the account sheet says **In the crew**. The server's function is still `crew_kudos()` and the payload is still `kudos`:
   nobody reads those.

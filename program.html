@@ -10884,7 +10884,7 @@ const APP_GUIDE = [
 // names a control the athlete cannot see (CNT-01).
 APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how often'), 0,
   { icon: 'compass', key: 'crew', title: 'Crew and the Bell', when: () => crewOn(),
-    body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
+    body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with likes), last month\'s honours early in the month, and the season board.</li>';
   return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
@@ -13152,7 +13152,10 @@ async function refreshBell() {
     try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) { /* storage full: shown this visit */ }
     crewSweepPhotos();   // a photo whose post has gone leaves the phone with it
   } catch (e) { /* keep the copy */ }
-  finally { _bellBusy = false; setCrewTab(); paintCrewTell(); paintSessionShare(); if (onCrew()) renderCrew(); }
+  // paintWeekSugg() too (2026-10-20): Home is drawn at boot, before the Bell has answered, so the crew's one invitation
+  // would never appear on the open that first learns there is a crew. It returns at once when the week's own suggestion
+  // owns the slot, so this costs nothing.
+  finally { _bellBusy = false; setCrewTab(); paintCrewTell(); paintSessionShare(); paintWeekSugg(); if (onCrew()) renderCrew(); }
 }
 // The one ask that is not an open: a phone that has never had an answer does not know whether there is a Crew tab at all.
 // Once it has a copy, nothing is asked for again until Crew is opened.
@@ -13188,6 +13191,7 @@ function openCrew() {
   // Amir's pinned post wears its clay pin on the visit that first shows it; from then on it is seen (the tab's dot goes at once).
   _crewFreshPin = crewAmirNew() ? crewAmirPost().id : null;
   crewMarkSeen();
+  crewInvSeen();   // the invitation on Home has done its job (2026-10-20)
   renderCrew();   // the copy is on screen before anything is asked for
   if (Date.now() - _bellAt > 10 * 60000) refreshBell();   // at most once every ten minutes, and only from this screen
   if (Date.now() - _boardAt > 10 * 60000) refreshCrewBoard();
@@ -15343,10 +15347,31 @@ function weekSuggWanted() {
   if (!on) return false;
   return !((libSeen()[LIB_PICKS.weekDone.id] || 0) >= new Date(on + 'T00:00:00').getTime());
 }
+// The crew's one invitation (2026-10-20, the audit *The Empty Room*, Amir's pick). Sixteen athletes have never seen the
+// join question, because it is only asked if they tap a bell nobody told them about. This is a PICKED LINE in the Library's
+// own grammar, in the slot the week's suggestion uses, and it goes the moment Crew is opened — Home carries no door row of
+// its own (2026-10-20), and this is not one: it is shown once, ever, on this phone.
+// The week's own suggestion wins the slot when both want it: that one is about training.
+function crewInvKey() { return ATHLETE_ID + '_crewinv'; }
+function crewInvWanted() {
+  if (window.IS_PREVIEW || !crewOn()) return false;
+  if (crewMe().under13) return false;
+  if (!(BELL && Array.isArray(BELL.crew) && BELL.crew.length)) return false;
+  try { return localStorage.getItem(crewInvKey()) !== '1'; } catch (e) { return false; }
+}
+function crewInvSeen() { try { _lsRawSet(crewInvKey(), '1'); } catch (e) {} }
+function crewInvHTML() {
+  const n = BELL.crew.length, yes = crewMe().answer === 'yes';
+  const say = yes ? 'See what the crew has been doing' : 'Train together, or keep it to yourself';
+  return `<button type="button" class="lib-sugg" data-sugg="crew" onclick="goTo('crew')">
+      <span class="lib-sugg-b"><span class="lib-sugg-k">The crew</span>
+        <span class="lib-sugg-q"><b>The crew is open</b>: ${esc(say)}. ${n} ${n === 1 ? 'is' : 'are'} in.</span></span>
+      <span class="lib-sugg-a" aria-hidden="true">›</span></button>`;
+}
 async function paintWeekSugg() {
   const wrap = document.getElementById('home-sugg-wrap');
   if (!wrap) return;
-  if (!weekSuggWanted()) { wrap.innerHTML = ''; return; }
+  if (!weekSuggWanted()) { wrap.innerHTML = crewInvWanted() ? crewInvHTML() : ''; return; }
   await ensureLibManifests();
   const w = weekSuggWanted() && libPickItem(LIB_PICKS.weekDone.id);
   wrap.innerHTML = w ? libSuggHtml('weekDone', w) : '';

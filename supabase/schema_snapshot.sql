@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 66 tables, 263 functions, 9 sequences.
+-- 67 tables, 267 functions, 9 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -368,7 +368,8 @@ create table public.crew_posts (
   body text default ''::text not null,
   session jsonb,
   has_photo boolean default false not null,
-  created_at timestamp with time zone default now() not null
+  created_at timestamp with time zone default now() not null,
+  client_key uuid
 );
 
 create table public.crew_push_q (
@@ -385,6 +386,14 @@ create table public.crew_push_seen (
   upto timestamp with time zone,
   pending timestamp with time zone,
   at timestamp with time zone default now() not null
+);
+
+create table public.crew_replies (
+  id uuid default gen_random_uuid() not null,
+  post_id uuid not null,
+  athlete_id text not null,
+  body text not null,
+  created_at timestamp with time zone default now() not null
 );
 
 create table public.crew_rings (
@@ -4222,6 +4231,18 @@ begin
   return found;
 end $function$;
 
+CREATE OR REPLACE FUNCTION public.coach_crew_remove_reply(p_id uuid)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  if not public.is_coach() then raise exception 'coach only'; end if;
+  delete from public.crew_replies where id = p_id;
+  return found;
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.coach_crew_under13(p_athlete text, p_on boolean)
  RETURNS boolean
  LANGUAGE plpgsql
@@ -4278,7 +4299,7 @@ declare
   c_athlete_tables constant text[] := array[
     'programs', 'program_versions', 'coaching_logs', 'coaching_log_versions',
     'session_history', 'athlete_progress', 'hab_notes', 'hab_titles', 'hab_season_results', 'leaderboard_optin',
-    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities', 'athlete_status', 'career_facts', 'career_scores', 'career_awards', 'career_recognition', 'courtside_marks', 'career_honours', 'career_goals', 'career_notes', 'crew_kudos', 'crew_photos', 'crew_posts', 'crew_open_results', 'crew_rings', 'crew_consent', 'push_sent', 'push_subs', 'crew_push_q', 'crew_push_seen', 'push_cycle_seen'];
+    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities', 'athlete_status', 'career_facts', 'career_scores', 'career_awards', 'career_recognition', 'courtside_marks', 'career_honours', 'career_goals', 'career_notes', 'crew_replies', 'crew_kudos', 'crew_photos', 'crew_posts', 'crew_open_results', 'crew_rings', 'crew_consent', 'push_sent', 'push_subs', 'crew_push_q', 'crew_push_seen', 'push_cycle_seen'];
   -- Not clients: the public demo, and the identity coach.html reads the board through (AMIR_ATHLETE_ID there).
   c_protected constant text[] := array['demo', 'amir_ardekani'];
   -- Arabic-Indic (U+0660-0669) and Persian (U+06F0-06F9) digits, and what they fold to.
@@ -5514,7 +5535,7 @@ begin
   return jsonb_build_object('id', p_post, 'mime', r.mime, 'w', r.w, 'h', r.h, 'b64', replace(r.b64, E'\n', ''));
 end $function$;
 
-CREATE OR REPLACE FUNCTION public.crew_post(p_body text, p_photo text DEFAULT NULL::text, p_w integer DEFAULT NULL::integer, p_h integer DEFAULT NULL::integer, p_kind text DEFAULT 'post'::text, p_session jsonb DEFAULT NULL::jsonb)
+CREATE OR REPLACE FUNCTION public.crew_post(p_body text, p_photo text DEFAULT NULL::text, p_w integer DEFAULT NULL::integer, p_h integer DEFAULT NULL::integer, p_kind text DEFAULT 'post'::text, p_session jsonb DEFAULT NULL::jsonb, p_key uuid DEFAULT NULL::uuid)
  RETURNS jsonb
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -5526,7 +5547,7 @@ begin
     raise exception 'crew:not_yes';
   end if;
   perform public.crew_sweep();
-  v_out := public.crew_write_post(v_me, p_body, p_photo, p_w, p_h, p_kind, p_session, true);
+  v_out := public.crew_write_post(v_me, p_body, p_photo, p_w, p_h, p_kind, p_session, true, p_key);
   return v_out || jsonb_build_object('me', public.crew_me(v_me));
 end $function$;
 
@@ -5867,6 +5888,68 @@ AS $function$
   select title, body from one where p_n <= 1
 $function$;
 
+CREATE OR REPLACE FUNCTION public.crew_reply(p_post uuid, p_body text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_me text := public.crew_who(); v_body text := public.crew_clean(p_body); v_author text;
+begin
+  if not exists (select 1 from public.crew_members() m where m.athlete_id = v_me) then raise exception 'crew:not_yes'; end if;
+  if v_body = '' then raise exception 'crew:empty'; end if;
+  if char_length(v_body) > 140 then raise exception 'crew:reply_long'; end if;
+  perform public.crew_sweep();
+  select p.athlete_id into v_author from public.crew_posts p
+   where p.id = p_post and p.created_at >= now() - interval '7 days'
+     and (p.athlete_id = public.coach_note_id() or exists (select 1 from public.crew_members() m where m.athlete_id = p.athlete_id));
+  if v_author is null then raise exception 'crew:gone'; end if;
+  -- Two caps under one lock, so two taps cannot both pass: what one athlete may say in a day, and how long one post's
+  -- thread may get (everybody's, so a thread cannot be driven past reading length).
+  perform pg_advisory_xact_lock(hashtext('crew_reply:' || v_me));
+  if (select count(*) from public.crew_replies r where r.athlete_id = v_me and r.created_at >= date_trunc('day', now())) >= 30 then
+    raise exception 'crew:replies_today';
+  end if;
+  if (select count(*) from public.crew_replies r where r.post_id = p_post) >= 50 then
+    raise exception 'crew:replies_full';
+  end if;
+  insert into public.crew_replies (post_id, athlete_id, body) values (p_post, v_me, v_body);
+  return jsonb_build_object('post', p_post, 'replies', public.crew_reply_rows(p_post, v_me));
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.crew_reply_delete(p_id uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_me text := public.crew_who(); v_post uuid;
+begin
+  select r.post_id into v_post from public.crew_replies r where r.id = p_id and r.athlete_id = v_me;
+  if v_post is null then raise exception 'crew:gone'; end if;
+  delete from public.crew_replies where id = p_id and athlete_id = v_me;
+  return jsonb_build_object('post', v_post, 'replies', public.crew_reply_rows(v_post, v_me));
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.crew_reply_rows(p_post uuid, p_viewer text)
+ RETURNS jsonb
+ LANGUAGE sql
+ STABLE
+ SET search_path TO 'public'
+AS $function$
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'id', r.id,
+           'who', case when r.athlete_id = public.coach_note_id() then 'Amir' else m.name end,
+           'me', r.athlete_id is not distinct from p_viewer,
+           'amir', r.athlete_id = public.coach_note_id(),
+           'body', r.body,
+           'at', r.created_at) order by r.created_at), '[]'::jsonb)
+    from public.crew_replies r
+    left join public.crew_members() m on m.athlete_id = r.athlete_id
+   where r.post_id = p_post
+     and (r.athlete_id = public.coach_note_id() or m.athlete_id is not null)
+$function$;
+
 CREATE OR REPLACE FUNCTION public.crew_sweep()
  RETURNS integer
  LANGUAGE plpgsql
@@ -5897,7 +5980,7 @@ begin
   return v_me;
 end $function$;
 
-CREATE OR REPLACE FUNCTION public.crew_write_post(p_who text, p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb, p_capped boolean)
+CREATE OR REPLACE FUNCTION public.crew_write_post(p_who text, p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb, p_capped boolean, p_key uuid DEFAULT NULL::uuid)
  RETURNS jsonb
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -5905,8 +5988,13 @@ CREATE OR REPLACE FUNCTION public.crew_write_post(p_who text, p_body text, p_pho
 AS $function$
 declare
   v_body text := public.crew_clean(p_body); v_kind text := coalesce(nullif(btrim(coalesce(p_kind, '')), ''), 'post');
-  v_bytes bytea; v_id uuid; v_ses jsonb := null;
+  v_bytes bytea; v_id uuid; v_ses jsonb := null; v_seen uuid;
 begin
+  -- The same key again is the same post: hand back what was written the first time and write nothing.
+  if p_key is not null then
+    select cp.id into v_seen from public.crew_posts cp where cp.athlete_id = p_who and cp.client_key = p_key;
+    if v_seen is not null then return jsonb_build_object('id', v_seen, 'again', true); end if;
+  end if;
   if char_length(v_body) > 280 then raise exception 'crew:too_long'; end if;
   if v_kind not in ('post', 'session') then raise exception 'crew:kind'; end if;
   if nullif(btrim(coalesce(p_photo, '')), '') is not null then
@@ -5927,6 +6015,11 @@ begin
   end if;
   if p_capped then
     perform pg_advisory_xact_lock(hashtext('crew_post:' || p_who));
+    -- the key again, now under the lock: the race this is here to stop is two taps a second apart
+    if p_key is not null then
+      select cp.id into v_seen from public.crew_posts cp where cp.athlete_id = p_who and cp.client_key = p_key;
+      if v_seen is not null then return jsonb_build_object('id', v_seen, 'again', true); end if;
+    end if;
     if (select count(*) from public.crew_posts cp where cp.athlete_id = p_who and cp.created_at >= date_trunc('day', now())) >= 10 then
       raise exception 'crew:posts_today';
     end if;
@@ -5934,8 +6027,8 @@ begin
       raise exception 'crew:photos_today';
     end if;
   end if;
-  insert into public.crew_posts (athlete_id, kind, body, session, has_photo)
-  values (p_who, v_kind, v_body, v_ses, v_bytes is not null) returning id into v_id;
+  insert into public.crew_posts (athlete_id, kind, body, session, has_photo, client_key)
+  values (p_who, v_kind, v_body, v_ses, v_bytes is not null, p_key) returning id into v_id;
   if v_bytes is not null then
     insert into public.crew_photos (post_id, athlete_id, w, h, bytes)
     values (v_id, p_who, case when p_w between 1 and 4000 then p_w end, case when p_h between 1 and 4000 then p_h end, v_bytes);
@@ -6536,7 +6629,7 @@ begin
              'w', ph.w, 'h', ph.h, 'at', p.created_at,
              'pinned', (p.athlete_id = public.coach_note_id() and p.created_at >= now() - interval '24 hours'),
              'left', greatest(0, ceil(extract(epoch from (p.created_at + interval '7 days' - now())) / 86400.0))::int,
-             'kudos', public.crew_kudos_of(p.id, null, null, v_id)) as j
+             'kudos', public.crew_kudos_of(p.id, null, null, v_id), 'replies', public.crew_reply_rows(p.id, v_id)) as j
       from public.crew_posts p
       left join mem m on m.athlete_id = p.athlete_id
       left join public.crew_photos ph on ph.post_id = p.id
@@ -9200,6 +9293,7 @@ alter table public.crew_push_q add constraint crew_push_q_kind_check CHECK ((kin
 alter table public.crew_push_q add constraint crew_push_q_pkey PRIMARY KEY (id);
 alter table public.crew_push_q add constraint crew_push_q_value_check CHECK ((jsonb_typeof(value) = 'object'::text));
 alter table public.crew_push_seen add constraint crew_push_seen_pkey PRIMARY KEY (athlete_id);
+alter table public.crew_replies add constraint crew_replies_pkey PRIMARY KEY (id);
 alter table public.crew_rings add constraint crew_rings_kind_check CHECK ((kind = ANY (ARRAY['level'::text, 'open'::text])));
 alter table public.crew_rings add constraint crew_rings_pkey PRIMARY KEY (athlete_id, kind, ref);
 alter table public.crew_rings add constraint crew_rings_value_check CHECK ((jsonb_typeof(value) = 'object'::text));
@@ -9276,6 +9370,7 @@ alter table public.chat_messages add constraint chat_messages_conversation_id_fk
 alter table public.crew_kudos add constraint crew_kudos_post_id_fkey FOREIGN KEY (post_id) REFERENCES crew_posts(id) ON DELETE CASCADE;
 alter table public.crew_open_results add constraint crew_open_results_open_id_fkey FOREIGN KEY (open_id) REFERENCES crew_open(id) ON DELETE CASCADE;
 alter table public.crew_photos add constraint crew_photos_post_id_fkey FOREIGN KEY (post_id) REFERENCES crew_posts(id) ON DELETE CASCADE;
+alter table public.crew_replies add constraint crew_replies_post_id_fkey FOREIGN KEY (post_id) REFERENCES crew_posts(id) ON DELETE CASCADE;
 alter table public.exercise_coach add constraint exercise_coach_id_fkey FOREIGN KEY (id) REFERENCES exercises(id) ON DELETE CASCADE;
 alter table public.tps_accounts add constraint tps_accounts_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
 
@@ -9304,8 +9399,11 @@ CREATE INDEX crew_open_results_board_idx ON public.crew_open_results USING btree
 CREATE INDEX crew_open_results_who_idx ON public.crew_open_results USING btree (athlete_id);
 CREATE INDEX crew_photos_who_idx ON public.crew_photos USING btree (athlete_id, created_at);
 CREATE INDEX crew_posts_at_idx ON public.crew_posts USING btree (created_at DESC);
+CREATE UNIQUE INDEX crew_posts_client_uq ON public.crew_posts USING btree (athlete_id, client_key) WHERE (client_key IS NOT NULL);
 CREATE INDEX crew_posts_who_idx ON public.crew_posts USING btree (athlete_id, created_at);
 CREATE INDEX crew_push_q_at_idx ON public.crew_push_q USING btree (created_at);
+CREATE INDEX crew_replies_post_idx ON public.crew_replies USING btree (post_id, created_at);
+CREATE INDEX crew_replies_who_idx ON public.crew_replies USING btree (athlete_id, created_at);
 CREATE INDEX crew_rings_at_idx ON public.crew_rings USING btree (created_at);
 CREATE INDEX cycle_reports_athlete_idx ON public.cycle_reports USING btree (athlete_id, cycle);
 CREATE INDEX hab_contacts_created_idx ON public.hab_contacts USING btree (created_at DESC);
@@ -9390,6 +9488,7 @@ alter table public.crew_photos enable row level security;
 alter table public.crew_posts enable row level security;
 alter table public.crew_push_q enable row level security;
 alter table public.crew_push_seen enable row level security;
+alter table public.crew_replies enable row level security;
 alter table public.crew_rings enable row level security;
 alter table public.cycle_reports enable row level security;
 alter table public.erasure_log enable row level security;
@@ -9616,6 +9715,8 @@ revoke all on table public.crew_push_q from public, anon, authenticated, service
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.crew_push_q to service_role;
 revoke all on table public.crew_push_seen from public, anon, authenticated, service_role;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.crew_push_seen to service_role;
+revoke all on table public.crew_replies from public, anon, authenticated, service_role;
+grant select, insert, update, delete, truncate, references, trigger, maintain on table public.crew_replies to service_role;
 revoke all on table public.crew_rings from public, anon, authenticated, service_role;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.crew_rings to service_role;
 revoke all on table public.cycle_reports from public, anon, authenticated, service_role;
@@ -9920,6 +10021,8 @@ revoke all on function public.coach_crew_post(p_body text, p_photo text, p_w int
 grant execute on function public.coach_crew_post(p_body text, p_photo text, p_w integer, p_h integer) to authenticated, service_role;
 revoke all on function public.coach_crew_remove(p_post uuid) from public, anon, authenticated, service_role;
 grant execute on function public.coach_crew_remove(p_post uuid) to authenticated, service_role;
+revoke all on function public.coach_crew_remove_reply(p_id uuid) from public, anon, authenticated, service_role;
+grant execute on function public.coach_crew_remove_reply(p_id uuid) to authenticated, service_role;
 revoke all on function public.coach_crew_under13(p_athlete text, p_on boolean) from public, anon, authenticated, service_role;
 grant execute on function public.coach_crew_under13(p_athlete text, p_on boolean) to authenticated, service_role;
 revoke all on function public.coach_delete_training_history(p_athlete_id text) from public, anon, authenticated, service_role;
@@ -10000,8 +10103,8 @@ revoke all on function public.crew_open_now(p_viewer text) from public, anon, au
 grant execute on function public.crew_open_now(p_viewer text) to service_role;
 revoke all on function public.crew_photo(p_post uuid) from public, anon, authenticated, service_role;
 grant execute on function public.crew_photo(p_post uuid) to authenticated, service_role;
-revoke all on function public.crew_post(p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb) from public, anon, authenticated, service_role;
-grant execute on function public.crew_post(p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb) to authenticated, service_role;
+revoke all on function public.crew_post(p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb, p_key uuid) from public, anon, authenticated, service_role;
+grant execute on function public.crew_post(p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb, p_key uuid) to authenticated, service_role;
 revoke all on function public.crew_push_add(p_who text, p_kind text, p_target_key uuid, p_value jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.crew_push_add(p_who text, p_kind text, p_target_key uuid, p_value jsonb) to service_role;
 revoke all on function public.crew_push_done(p_athlete_id text, p_ok boolean) from public, anon, authenticated, service_role;
@@ -10030,12 +10133,18 @@ revoke all on function public.crew_push_t_ring() from public, anon, authenticate
 grant execute on function public.crew_push_t_ring() to service_role;
 revoke all on function public.crew_push_words(p_n integer, p_kind text, p_who text, p_mine boolean, p_lang text) from public, anon, authenticated, service_role;
 grant execute on function public.crew_push_words(p_n integer, p_kind text, p_who text, p_mine boolean, p_lang text) to service_role;
+revoke all on function public.crew_reply(p_post uuid, p_body text) from public, anon, authenticated, service_role;
+grant execute on function public.crew_reply(p_post uuid, p_body text) to authenticated, service_role;
+revoke all on function public.crew_reply_delete(p_id uuid) from public, anon, authenticated, service_role;
+grant execute on function public.crew_reply_delete(p_id uuid) to authenticated, service_role;
+revoke all on function public.crew_reply_rows(p_post uuid, p_viewer text) from public, anon, authenticated, service_role;
+grant execute on function public.crew_reply_rows(p_post uuid, p_viewer text) to service_role;
 revoke all on function public.crew_sweep() from public, anon, authenticated, service_role;
 grant execute on function public.crew_sweep() to service_role;
 revoke all on function public.crew_who() from public, anon, authenticated, service_role;
 grant execute on function public.crew_who() to service_role;
-revoke all on function public.crew_write_post(p_who text, p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb, p_capped boolean) from public, anon, authenticated, service_role;
-grant execute on function public.crew_write_post(p_who text, p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb, p_capped boolean) to service_role;
+revoke all on function public.crew_write_post(p_who text, p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb, p_capped boolean, p_key uuid) from public, anon, authenticated, service_role;
+grant execute on function public.crew_write_post(p_who text, p_body text, p_photo text, p_w integer, p_h integer, p_kind text, p_session jsonb, p_capped boolean, p_key uuid) to service_role;
 revoke all on function public.current_athlete_id() from public, anon, authenticated, service_role;
 grant execute on function public.current_athlete_id() to service_role;
 revoke all on function public.current_season() from public, anon, authenticated, service_role;

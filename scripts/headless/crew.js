@@ -655,6 +655,132 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await ctx.close();
   }
 
+  // ── 17. REPLIES (stage92, 2026-10-20) ───────────────────────────────────────────────────────────────────────────────
+  // Amir: "replies and likes like instagram", then "dont need the likes on replies". One level, text, 140 characters,
+  // gone with the post at 7 days, your own taken back with two taps, and a non-member is offered the join instead.
+  {
+    const b = bell({ answer: 'yes', can_post: true });
+    b.items[0].replies = [{ id: 'r1', who: 'Mina S.', me: false, amir: false, body: 'What does Kudos mean?', at: iso(now - 600e3) }];
+    b.items[1] = b.items[1];   // the Bell line keeps no replies: a moment is not a post
+    b.items[2].replies = [];
+    const { ctx, p } = await open(browser, { bell: b });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(500);
+    const s = await p.evaluate(() => ({
+      shown: [...document.querySelectorAll('#crew-body .cr-post .cr-rep .cr-rb')].map(x => x.textContent.replace(/\s+/g, ' ').trim()),
+      adds: [...document.querySelectorAll('#crew-body .cr-rep-add')].map(x => x.textContent),
+      onLine: !!document.querySelector('#crew-body .cr-line .cr-rep-add'),
+    }));
+    C.check('a reply shows under its post, the name in front of it', s.shown[0] === 'Mina S. What does Kudos mean?', JSON.stringify(s.shown));
+    C.check('…a post with none says Reply, one with some says Add a reply', s.adds.includes('Reply') && s.adds.includes('Add a reply'), s.adds.join(' | '));
+    C.check('…and a moment line has no Reply: a moment is not a post', !s.onLine);
+    // writing one
+    await p.evaluate(() => document.querySelector('#crew-body .cr-post .cr-rep-add').click());
+    await p.waitForTimeout(300);
+    C.check('the sheet quotes the post and counts to 140', await p.evaluate(() =>
+      !!document.querySelector('#hist-overlay .cr-quote') && /\/ 140/.test(document.querySelector('#hist-overlay .cr-cnt').textContent)));
+    C.check('…and Reply is dead until something is typed', await p.evaluate(() => document.querySelector('#hist-overlay .cr-go').disabled));
+    await p.evaluate(() => { const t = document.querySelector('#hist-overlay .cr-rtxt'); t.value = 'It means well done'; t.dispatchEvent(new Event('input')); });
+    await p.waitForTimeout(150);
+    await p.evaluate(() => document.querySelector('#hist-overlay .cr-go').click());
+    await p.waitForTimeout(500);
+    C.check('…it posts, the sheet closes and the reply is on the card', await p.evaluate(() =>
+      !document.getElementById('hist-overlay').classList.contains('visible')
+      && /It means well done/.test(document.querySelector('#crew-body .cr-reps').textContent)));
+    C.check('…and it was sent as crew_reply with the post and the words', (await calls(p, 'crew_reply')).some(x => x.p_body === 'It means well done' && !!x.p_post));
+    // taking your own back: two taps
+    const del = await p.evaluate(() => {
+      const b2 = [...document.querySelectorAll('#crew-body .cr-reps .cr-del')];
+      return b2.length;
+    });
+    C.check('…your own reply has a Delete, and only your own', del === 1, String(del));
+    await p.evaluate(() => document.querySelector('#crew-body .cr-reps .cr-del').click());
+    await p.waitForTimeout(150);
+    C.check('…which arms first and acts on the second tap', await p.evaluate(() => /again/i.test(document.querySelector('#crew-body .cr-reps .cr-del').textContent)));
+    await p.evaluate(() => document.querySelector('#crew-body .cr-reps .cr-del').click());
+    await p.waitForTimeout(500);
+    C.check('…and then it is gone', await p.evaluate(() => !/It means well done/.test(document.querySelector('#crew-body .cr-reps').textContent))
+      && (await calls(p, 'crew_reply_delete')).length === 1);
+    C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+  {
+    // not in the crew: the Reply offers to join, exactly as the Like does
+    const b = bell({ answer: null, can_post: false });
+    b.items[0].replies = [{ id: 'r1', who: 'Mina S.', me: false, amir: false, body: 'What does Kudos mean?', at: iso(now - 600e3) }];
+    const { ctx, p } = await open(browser, { bell: b });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
+    C.check('not joined: the replies are readable and Reply offers to join', await p.evaluate(() =>
+      /What does Kudos mean/.test(document.querySelector('#crew-body .cr-reps').textContent)
+      && /Join the crew to reply/.test(document.querySelector('#crew-body .cr-rep-add').textContent)));
+    await ctx.close();
+  }
+  {
+    // under 13 reads them and is offered nothing
+    const b = bell({ answer: 'yes', under13: true, can_post: false });
+    b.items[0].replies = [{ id: 'r1', who: 'Mina S.', me: false, amir: false, body: 'What does Kudos mean?', at: iso(now - 600e3) }];
+    const { ctx, p } = await open(browser, { bell: b });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
+    C.check('under 13: the replies are readable and there is no Reply at all', await p.evaluate(() =>
+      /What does Kudos mean/.test(document.querySelector('#crew-body .cr-reps').textContent)
+      && !document.querySelector('#crew-body .cr-rep-add')));
+    await ctx.close();
+  }
+  {
+    // a server without stage92: no replies anywhere, and the rest of the card is as it was
+    const { ctx, p } = await open(browser, { me: { answer: 'yes', can_post: true }, stub: { noReplies: true } });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
+    C.check('without stage92: no Reply door and no replies block, and the post is otherwise whole', await p.evaluate(() =>
+      !document.querySelector('#crew-body .cr-rep-add') && !!document.querySelector('#crew-body .cr-post .cr-kd')));
+    C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+  {
+    // the post is written once, however slow the line: the same key on every attempt
+    const { ctx, p } = await open(browser, { me: { answer: 'yes', can_post: true } });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
+    await p.evaluate(() => openCrewPost()); await p.waitForTimeout(300);
+    await p.evaluate(() => { const t = document.querySelector('#hist-overlay .cr-txt'); t.value = 'Legs are gone'; t.dispatchEvent(new Event('input')); });
+    await p.evaluate(() => document.querySelector('#hist-overlay .cr-go').click());
+    await p.waitForTimeout(600);
+    const keys = (await calls(p, 'crew_post')).map(x => x.p_key);
+    C.check('a post carries a key made on the phone', keys.length === 1 && /^[0-9a-f-]{36}$/.test(String(keys[0])), JSON.stringify(keys));
+    await ctx.close();
+  }
+  // ── 18. The crew's one invitation on Home (2026-10-20) ──────────────────────────────────────────────────────────────
+  {
+    const b = bell({ answer: null, can_post: false });
+    b.week = { members: 6, sessions: 14, held: 3 };
+    b.crew = [{ who: 'Mina S.', me: false, since: '2026-10-19' }, { who: 'Reza K.', me: false, since: '2026-10-19' }];
+    const { ctx, p } = await open(browser, { bell: b });
+    await waitTab(p);
+    await p.waitForTimeout(600);
+    C.check('Home offers the crew once, as a picked line and not a door row', await p.evaluate(() => {
+      const e = document.querySelector('#home-sugg-wrap .lib-sugg[data-sugg="crew"]');
+      return !!e && /The crew is open/.test(e.textContent) && /2 are in/.test(e.textContent);
+    }), await p.evaluate(() => (document.getElementById('home-sugg-wrap') || {}).textContent || ''));
+    await p.evaluate(() => document.querySelector('#home-sugg-wrap .lib-sugg').click());
+    await p.waitForTimeout(500);
+    C.check('…it opens Crew', await p.evaluate(() => !!document.querySelector('#screen-crew.active')));
+    await p.evaluate(() => goTo('home')); await p.waitForTimeout(400);
+    C.check('…and never comes back on this phone', await p.evaluate(() => !document.querySelector('#home-sugg-wrap .lib-sugg[data-sugg="crew"]'))
+      && await p.evaluate(id => localStorage.getItem(id + '_crewinv') === '1', H.ID));
+    C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+  {
+    // no crew at all (a server without stage91): no invitation
+    const { ctx, p } = await open(browser, { me: { answer: null, can_post: false } });
+    await waitTab(p);
+    await p.waitForTimeout(500);
+    C.check('without the crew list, Home offers nothing', await p.evaluate(() => !document.querySelector('#home-sugg-wrap .lib-sugg[data-sugg="crew"]')));
+    await ctx.close();
+  }
+
   await browser.close();
   process.exit(C.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });
