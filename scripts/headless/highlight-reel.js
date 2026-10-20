@@ -5,9 +5,10 @@
 // the phone's share sheet ONE png with the caption; Save image; Copy caption; the tip; Back closes it; the choices are remembered) · Cycle complete:
 // the one-time moment (the card, Share your cycle, Back closes it, never twice), the card's Share your cycle, Roadmap complete's The Distance first ·
 // Personal Records: Share on a lift's New best band and on a record's row, never on a first record · reduced motion stops the bursts · 320 px.
-// Career Mode round 5 (the light screens): on the finished card only an achievement and a mark's tier (one of the four numbers' marks) are bands with Share, a mark's
+// Career Mode round 5 (the light screens): on the finished card only a mark's tier (one of the four numbers' marks) is a band with Share, a mark's
 // band says "A new mark" and shares as an achievement-style card (no metal; any other badge and a title are no band); a mark's moment's button opens the SAME
-// sheet ("Share it"), Story and Post, English and فارسی, 320 px.
+// sheet ("Share it"), Story and Post, English and فارسی, 320 px. Since 2026-10-20 (d38333c) an ACHIEVEMENT is no band: a fresh one opens as a full-screen
+// moment once the finished card is up, and its Share is that moment's button.
 // Serve the repo first (python3 -m http.server 8765 --bind 127.0.0.1, see lib.js), then: node scripts/headless/highlight-reel.js [--out <dir>]
 'use strict';
 const path = require('path');
@@ -294,7 +295,7 @@ const liveReady = p => p.waitForFunction(() => {
     await ctx.close();
   }
 
-  // ── 7. Career Mode round 5 (the light screens): only an achievement and a mark's tier are bands with Share; a mark shares as an achievement-style card ──
+  // ── 7. Career Mode round 5 (the light screens): only a mark's tier is a band with Share, an achievement is a full-screen moment (d38333c); a mark shares as an achievement-style card ──
   // The rewards come from get_profile()'s moments (scripts/headless/career.js builds the core and the shelf in their real shapes: stage70's split); the sheet and the cards are the Highlight Reel's.
   // A mark is a tier of one of the four numbers' badges (careerMarks(): weeks held, sessions with Amir, personal bests, comebacks). Its band says "A new mark" and shares as
   // kind 'achievement' (a seal, "12 weeks HELD", a line, the date), so no metal shows; every other badge and every title is neither a band nor a moment (L2).
@@ -316,24 +317,39 @@ const liveReady = p => p.waitForFunction(() => {
     await p.evaluate(() => document.querySelector('#confirm-1 .complete-rpe-btn[data-rpe="7"]').click());
     await p.evaluate(s => { eval(s); }, R.stubSet(R.rwProfile(10470, { owned, moments: rows })));
     await p.evaluate(() => finishTap('1', document.querySelector('#confirm-1 .confirm-btn')));
-    await p.waitForFunction(() => [...document.querySelectorAll('#hlwin-1 .hl-band')].filter(b => b.tagName === 'BUTTON').length >= 3, null, { timeout: 8000 }).catch(() => {});
+    await p.waitForFunction(() => [...document.querySelectorAll('#hlwin-1 .hl-band')].filter(b => b.tagName === 'BUTTON').length >= 2, null, { timeout: 8000 }).catch(() => {});
     const bands = await p.evaluate(() => ({ b: [...document.querySelectorAll('#hlwin-1 .hl-band')].map(el => ({ txt: el.innerText.replace(/\s+/g, ' ').trim(), tag: el.tagName, label: el.getAttribute('aria-label') })),
       more: !!document.querySelector('#hlwin-1 .hl-band-more') }));
     const bs = bands.b;
-    t.check('rewards on the finished card: two marks and an achievement are three bands, each with Share, in the Highlight Reel\'s slot',
-      bs.length === 3 && bs.every(b => b.tag === 'BUTTON' && /SHARE$/.test(b.txt)) && bs.some(b => /^A NEW MARK 12 WEEKS HELD IN A ROW SHARE$/i.test(b.txt)) && bs.some(b => /^A NEW MARK 50 SESSIONS WITH AMIR SHARE$/i.test(b.txt))
-      && bs.some(b => /^MOMENT THE FOUNDRY SHARE$/i.test(b.txt)), JSON.stringify(bands));
+    // An achievement is no band since d38333c (2026-10-20: every fresh achievement comes up full screen): rwIsFull() takes a fresh one, collectRewardBands() leaves it out and
+    // maybeRewardMoment('done') opens it full screen once the finished card is up. So the two marks are the two bands, and THE FOUNDRY is the moment checked below.
+    t.check('rewards on the finished card: the two marks are two bands, each with Share, in the Highlight Reel\'s slot; the achievement is not a band',
+      bs.length === 2 && bs.every(b => b.tag === 'BUTTON' && /SHARE$/.test(b.txt)) && bs.some(b => /^A NEW MARK 12 WEEKS HELD IN A ROW SHARE$/i.test(b.txt)) && bs.some(b => /^A NEW MARK 50 SESSIONS WITH AMIR SHARE$/i.test(b.txt))
+      && !bs.some(b => /FOUNDRY/i.test(b.txt + ' ' + b.label)), JSON.stringify(bands));
     t.check('…a mark\'s band names no badge and no metal; the other badge and the title are no band at all, and nothing says "more"',
       !bs.some(b => /SPRINKLER|BEDROCK|BADGE|TITLE|BRONZE|SILVER|EMERALD|PRISMATIC|AA PROOF/i.test(b.txt + ' ' + b.label)) && !bands.more, JSON.stringify(bands));
+    // …and the achievement came up as the full-screen moment instead (after the finished card scrolled in), naming THE FOUNDRY.
+    await p.waitForSelector('.hl-moment', { timeout: 8000 }).catch(() => {});
+    const mo = await p.evaluate(() => { const el = document.querySelector('.hl-moment'); const q = s => (el && el.querySelector(s) || {}).textContent || null;
+      return el ? { eyebrow: q('.hl-m-eyebrow'), title: (q('.hl-m-title') || '').replace(/\s+/g, ' ').trim(), sub: q('.hl-m-sub'), go: q('.hl-m-go') } : null; });
+    t.check('…the achievement opens as a full-screen moment instead: Commitment, THE FOUNDRY, its line, Share it',
+      !!mo && mo.eyebrow === 'Commitment' && /^the foundry$/i.test(mo.title) && mo.sub === 'Four weeks of putting the work in.' && mo.go === 'Share it', JSON.stringify(mo));
+    // Its Share is what the old third band's Share was: the same sheet, "Share it", a 1080 × 1920 Story of the achievement.
+    await p.click('.hl-moment .hl-m-go'); await ready(p);
+    const sa = await sheet(p);
+    t.check('its Share closes the moment and opens the sheet, "Share it": a 1080 × 1920 Story with THE FOUNDRY on it and the handle',
+      !(await p.evaluate(() => !!document.querySelector('.hl-moment'))) && sa.open && sa.title === 'Share it' && sa.w === 1080 && sa.h === 1920 && /The Foundry/.test(sa.alt) && /@amirardekanian/.test(sa.alt) && !/undefined|NaN|bronze|silver|emerald/i.test(sa.alt), JSON.stringify([sa.title, sa.w, sa.h, sa.alt]));
+    await p.evaluate(() => closeHistorySheet());
+    await p.waitForTimeout(250);
     await shot(p, 'p3-bands');
     // every band shares through the SAME sheet as an achievement-style card ("Share it"); a mark's card carries its number and name, never a metal
-    const want = [['12 WEEKS HELD', /12 weeks held/], ['THE FOUNDRY', /The Foundry/], ['50 SESSIONS WITH AMIR', /50 sessions with Amir/]];
+    const want = [['12 WEEKS HELD', /12 weeks held/], ['50 SESSIONS WITH AMIR', /50 sessions with Amir/]];
     for (const [needle, alt] of want) {
       const i = await p.evaluate(n => [...document.querySelectorAll('#hlwin-1 .hl-band')].findIndex(el => el.innerText.toUpperCase().includes(n)), needle);
       await p.evaluate(i => document.querySelectorAll('#hlwin-1 .hl-band')[i].click(), i);
       await ready(p);
       const s = await sheet(p);
-      const wantT = needle === 'THE FOUNDRY' ? 'Share it' : 'Share your mark';   // a mark has its own card, and its own title, since the design pass
+      const wantT = 'Share your mark';   // a mark has its own card, and its own title, since the design pass
       t.check(`its Share opens the sheet, "${wantT}": a 1080 × 1920 Story with ${needle} on it and the handle`, s.open && s.title === wantT && s.w === 1080 && s.h === 1920 && alt.test(s.alt) && /@amirardekanian/.test(s.alt) && !/undefined|NaN|bronze|silver|emerald/i.test(s.alt), JSON.stringify([s.title, s.w, s.h, s.alt]));
       if (needle === '12 WEEKS HELD') {
         await p.click('.hl-seg button[data-v="post"]'); await ready(p);

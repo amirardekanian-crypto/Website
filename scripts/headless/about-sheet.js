@@ -1,7 +1,7 @@
 // The About sheet (the ⓘ), Changeover (Amir, 2026-10-12: "lets go with A"). Opened from a card and from
 // Library → Exercises, light and dark, at 390 and 320 px: the questions it asks, the green tiles with their
 // marks, the body at its old size with the line under it ("Mostly your ● quads."), the three lists,
-// Your history, and what it must NOT carry any more (the WhatsApp door, impact). Also: the open exercise card
+// Your history (from a card AND, since db286aa, from the Library), and what it must NOT carry any more (the WhatsApp door, impact). Also: the open exercise card
 // has no Last time box, and the sheet's look comes off when History or a quality draws into the same frame and
 // comes back with ‹ Back. Serve the repo first (see lib.js); screenshots go to --out.
 'use strict';
@@ -136,7 +136,9 @@ function programme() {
     const L = await read(p);
     t.check(`${tag}: from the Library: How do I do it? with the player, steps folded after two`, L.how && L.video && L.steps === 5 && L.stepsShown === 2, JSON.stringify({ how: L.how, v: L.video, n: L.steps, shown: L.stepsShown }));
     t.check(`${tag}: from the Library: three cues, the fault marked, In my plan names Day 1`, L.cues === 4 && L.bad === 1 && /day 1/i.test(L.plan), JSON.stringify({ c: L.cues, b: L.bad, plan: L.plan }));
-    t.check(`${tag}: from the Library: no history row, no WhatsApp, no impact`, !L.hist && !L.wa && !L.impact, JSON.stringify({ h: L.hist, wa: L.wa, imp: L.impact }));
+    // Your history shows from the Library too (db286aa, 2026-10-20, Amir: "why cant i see the history of an exercise in the exercise library?"): the entry's own name stands
+    // in where there is no card, so the row reads as it does from a card. The WhatsApp door and impact are still not on the sheet.
+    t.check(`${tag}: from the Library: Your history says the count and last time, no WhatsApp, no impact`, /your history/i.test(L.hist) && /1 session\. Last time 70 kg × 6 · 6 · 6 · 5\./.test(L.hist) && !L.wa && !L.impact, JSON.stringify({ h: L.hist, wa: L.wa, imp: L.impact }));
     await p.evaluate(() => document.querySelector('#hist-overlay .ax-unfold').click());
     const shown = await p.evaluate(() => [...document.querySelectorAll('#hist-overlay .ax-steps li')].filter(li => li.offsetParent).length);
     t.check(`${tag}: All 5 steps unfolds them`, shown === 5, shown);
