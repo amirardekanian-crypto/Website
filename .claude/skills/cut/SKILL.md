@@ -272,5 +272,12 @@ colour language) and the order to build them: `IDEAS.md`.
   its reveal clip on a wrapper). A stroke draws with the dash trick (`strokeDasharray = length`, tween the offset); a glowing head that follows it is
   keyframed along the same polyline through the inverse of the ease (`easeAt`), never from a callback. Do not measure text at build time to place things
   (a font that has not loaded gives a wrong width): anchor to an edge and let the line end under the plate.
+- **Look at the background before anything is built** (learned on reel 10, Mehraneh's padel clips, 2026-10-21): a stranger's ad with a phone number and a QR code, a café sign that names the
+  venue, club logos and a person in a doorway were all in shot. Scan a contact sheet of every frame, zoom where text is, and fix it in the footage, tracked, with the person matted out.
+  **Fill from the surrounding wall, don't blur**: a blur leaves a smudge where a QR was, and a hard blur box reads as censorship. A punch-in that crops the mark out is the cheapest fix.
+- **Slow motion on movement (not speech): never cross-fade neighbouring frames.** At 0.5x that showed a double face on every other frame. Use a motion-interpolated copy,
+  `ffmpeg -i in.mp4 -vf "minterpolate=fps=60:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1" slow_src.mp4`, then slow that. Speech at 0.85-0.95x through `atempo` is fine as it is.
+- **Keep the cost down** (reel 10 cost about $75-90 in API terms, three-quarters of it helper agents): the plan is yours to decide, the gate and `freezedetect` are free, and a multi-agent
+  review is only worth it when Amir asks for one. Start each reel in a fresh session that reads its notes rather than one long chat.
 - Proven on a real reel: custom wipes, ticks, cutaways, the behind-you cut-out, synthesised sound effects. Still
   unproven: the catalog's shader transitions and `hyperframes add`.

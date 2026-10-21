@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مهرانه ظهوریان — کلاس پدل (ریل)</title>
+<!--
+  Reel 10 — Mehraneh Zohourian's PADEL classes ad, Farsi, 1080x1920 (2026-10-21). Built on the timeline kit (engine.js / driver.js), like reel 9.
+  Her brand, not Amir's: padel blue #0250B0 + volt lime #D0FF41, her tennis past in spruce #003320 + pink #EC99AF; Lalezar + Vazirmatn.
+  THE PAGE IS A PURE FUNCTION OF TIME: window.__render(t) paints the frame for t seconds. Her footage is drawn from numbered stills (plates),
+  never a <video>, so stills (?t=5.2), the real-time preview and the frame-accurate render (tools/render_timeline.js) all agree.
+  Modes: default = autoplay + loop + scrub bar | ?t=SECONDS = frozen frame | ?capture=1 = exact size, no chrome | ?noball=1 = clean frame (cover) | ?raw=1 = unblurred plates (dev only)
+  Files: engine.js + driver.js (the kit) · scenes.js (this reel) · this file (DOM + CSS).
+-->
+<style>
+@font-face{font-family:Lalezar;font-weight:400;font-display:block;src:url(../assets/fonts/Lalezar-arabic.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+200C-200E,U+2010-2011,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:Lalezar;font-weight:400;font-display:block;src:url(../assets/fonts/Lalezar-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122}
+@font-face{font-family:Vazirmatn;font-weight:100 900;font-display:block;src:url(../assets/fonts/Vazirmatn-Variable.woff2) format('woff2')}
+
+:root{
+  /* padel skin ("court") */
+  --blue:#0250B0; --blue-2:#023E8C; --blue-3:#2E86F0; --blue-deep:#013C86; --lime:#D0FF41; --lime-soft:#E9FF9E; --silver:#C6D0DD; --navy:#011E45;
+  /* tennis skin ("spruce"): her past */
+  --spruce:#003320; --spruce-2:#2B5646; --pink:#EC99AF; --pink-soft:#FFE9E8; --pink-deep:#CD83A8;
+  --d:Lalezar,Vazirmatn,Tahoma,sans-serif; --v:Vazirmatn,Tahoma,"Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+body{font-family:var(--v)}
+#viewport{position:fixed;inset:0;background:#000;overflow:hidden}
+#fit{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0}
+#stage{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;background:var(--navy);direction:rtl;color:#fff;
+  -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;font-kerning:normal}
+#cam{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:540px 960px}
+.sc{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;z-index:0}   /* each scene is its own stacking context: z-indexes inside never leak to the next scene */
+.full{position:absolute;left:0;top:0;width:1080px;height:1920px}
+.ctr{position:absolute;left:0;width:1080px;text-align:center}
+/* word masks: a headline rises word by word. Persian letters JOIN, so the unit is the WORD, never the letter */
+.wm{display:inline-block;overflow:hidden;padding:.2em .08em .3em;margin:-.2em -.08em -.3em;vertical-align:top}
+.wi{display:inline-block;will-change:transform}
+.ln{fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.ltr{direction:ltr;unicode-bidi:isolate}
+/* frosted glass card: the padel walls are glass, so are the cards */
+.gcard{position:absolute;border-radius:40px;background:rgba(1,30,69,.62);border:3px solid rgba(255,255,255,.22);
+  box-shadow:0 30px 70px -24px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.25);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);overflow:hidden}
+.gcard::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.16),rgba(255,255,255,0) 38%,rgba(255,255,255,0) 72%,rgba(255,255,255,.06));pointer-events:none}
+.bolt{position:absolute;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#9aa6b4 60%,#5f6b78);box-shadow:0 1px 2px rgba(0,0,0,.5)}
+
+/* ============ S1 — the hook: her overhead (IMG_4633) ============ */
+#s1{background:#000}
+
+/* ============ S2 — the name over her close-up (IMG_4631) ============ */
+#s2w{perspective:2200px;perspective-origin:1080px 960px;overflow:visible}
+#s2{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;transform-origin:1080px 960px;background:#000}
+#s2 .shade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
+#s2 .scrimT{position:absolute;left:0;top:0;width:1080px;height:820px;background:linear-gradient(rgba(1,20,48,.55),rgba(1,20,48,0));pointer-events:none}
+#card2{left:90px;top:292px;width:900px;height:330px}
+#pill2{position:absolute;left:0;width:900px;top:44px;display:flex;justify-content:center}
+#pill2 span{display:inline-flex;align-items:center;gap:16px;padding:16px 34px;border-radius:999px;background:var(--lime);color:var(--blue-deep);font:800 46px/1 var(--v)}
+#pill2 i{display:block;width:16px;height:16px;border-radius:50%;background:var(--blue-deep)}
+#nm2{position:absolute;left:0;width:900px;top:150px;text-align:center;font:400 128px/1 var(--d);color:#fff;white-space:nowrap}
+#bar2{position:absolute;left:150px;top:276px;width:600px;height:20px;border-radius:10px;background:var(--lime);transform-origin:100% 50%;box-shadow:0 0 22px rgba(208,255,65,.55)}
+
+/* ============ S3 — behind me: her tennis (spruce world, no walls) ============ */
+#s3{background:var(--spruce)}
+#s3::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 50% 100%,rgba(0,0,0,.34),transparent 70%)}
+#court3{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#court3 .ln{stroke:var(--pink);opacity:.2}
+#hd3{position:absolute;left:0;top:250px;width:1080px;text-align:center}
+#n13{font:400 330px/1 var(--d);color:var(--pink);direction:ltr;height:360px}
+#l13{font:400 104px/1 var(--d);color:#fff;margin-top:-10px}
+.rc{position:absolute;left:100px;width:840px;height:178px;border-radius:36px;overflow:hidden;background:var(--pink-soft);color:var(--spruce);box-shadow:0 26px 60px -22px rgba(0,0,0,.7)}
+.rc .tx{position:absolute;right:46px;left:190px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:12px;text-align:right}
+.rc b{display:block;font:400 74px/1 var(--d);color:var(--spruce);white-space:nowrap}
+.rc span{display:block;font:700 44px/1.1 var(--v);color:#9C3F6A;white-space:nowrap}
+.rc .ico{position:absolute;left:34px;top:24px;width:130px;height:130px;border-radius:34px;background:var(--spruce);display:grid;place-content:center}
+.rc .ico svg{width:96px;height:96px;fill:none;stroke:var(--pink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.rc .ico .dg{font:400 92px/1 var(--d);color:var(--pink);position:absolute;inset:0;display:grid;place-content:center;padding-top:8px}
+#c1{top:800px} #c2{top:1010px} #c3{top:1220px}
+
+/* ============ S4 — padel now: blue world, then her wide clip (IMG_4630) ============ */
+#s4{background:var(--blue)}
+#s4::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 50% 100%,rgba(0,0,0,.32),transparent 70%)}
+#court4{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#court4 .ln{stroke:var(--lime);opacity:.24}
+#court4 .mesh{stroke:#fff;opacity:.08;stroke-width:2}
+#two{position:absolute;left:0;top:250px;width:1080px;text-align:center}
+#n2{font:400 420px/1 var(--d);color:var(--lime);direction:ltr;height:440px;text-shadow:0 30px 70px rgba(0,0,0,.35)}
+#l2{font:400 108px/1 var(--d);color:#fff;margin-top:-6px}
+#foot4{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden}
+#foot4 .scrimB{position:absolute;left:0;top:1180px;width:1080px;height:740px;background:linear-gradient(rgba(1,20,48,0),rgba(1,20,48,.55) 45%,rgba(1,20,48,.7));pointer-events:none}
+#b4{left:70px;top:1290px;width:830px;height:300px}
+#b4 .row{position:absolute;left:0;width:830px;text-align:center}
+#b1l,#b3l{font:800 54px/1.15 var(--v);color:#fff;white-space:nowrap}
+#b1l{top:30px} #b3l{top:212px}
+#chips{top:120px;font:400 52px/1 var(--d);color:var(--lime);white-space:nowrap;word-spacing:.12em}
+
+/* ============ S5 — classes, then where (one scene, the header changes) ============ */
+#s5{background:var(--blue-deep)}
+#s5::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 50% 0%,rgba(46,134,240,.22),transparent 60%)}
+#court5,#court4{z-index:1} .kc,.vr,.hd,#two{z-index:2} #foot4{z-index:3} #b4{z-index:4}
+#court5{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#court5 .ln{stroke:var(--lime);opacity:.14}
+.hd{position:absolute;left:0;width:1080px;text-align:center;font:400 100px/1.12 var(--d);color:#fff}
+.hd .hi{color:var(--lime)}
+#hd5{top:262px} #hd6{top:300px}
+.kc{position:absolute;left:90px;width:880px;height:232px;border-radius:38px;background:linear-gradient(160deg,#0B4FA8,#023E8C);border:3px solid rgba(198,208,221,.55);
+  box-shadow:0 30px 70px -26px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.3);transform-origin:50% 0%;overflow:hidden}
+.kc::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.16),rgba(255,255,255,0) 40%);pointer-events:none}
+.kc .tx{position:absolute;right:66px;left:200px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:16px;text-align:right}
+.kc b{display:block;font:400 82px/1 var(--d);color:#fff;white-space:nowrap}
+.kc span{display:block;font:600 46px/1 var(--v);color:var(--lime-soft);white-space:nowrap}
+.kc svg.mc{position:absolute;left:24px;top:26px;width:120px;height:180px}
+.mc .cl{fill:rgba(2,62,140,.6);stroke:var(--lime);stroke-width:3}
+.mc .nt{stroke:#fff;stroke-width:3}
+.shine{position:absolute;top:-20px;bottom:-20px;left:-220px;width:140px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);transform:skewX(-18deg);pointer-events:none;z-index:3}
+.mc .mb{fill:#D0FF41;filter:drop-shadow(0 0 4px rgba(208,255,65,.9))}
+.mc .dot{fill:#fff} .mc .co{fill:var(--lime)} .mc .rl{fill:none;stroke:var(--lime);stroke-width:2.5;stroke-dasharray:4 6}
+.kc .b1{left:16px;top:16px} .kc .b2{right:16px;top:16px} .kc .b3{left:16px;bottom:16px} .kc .b4{right:16px;bottom:16px}
+#k1{top:560px} #k2{top:832px} #k3{top:1104px}
+.vr{position:absolute;left:110px;width:860px;height:170px}
+.vr .pin{position:absolute;right:0;top:20px;width:110px;height:130px}
+.vr .pin svg{width:110px;height:130px}
+.vr .tx{position:absolute;right:140px;left:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:12px;text-align:right}
+.vr b{display:block;font:400 84px/1 var(--d);color:#fff;white-space:nowrap}
+.vr span{display:block;font:700 44px/1 var(--v);color:var(--lime-soft);white-space:nowrap}
+#v1{top:480px} #v2{top:740px} #v3{top:1000px}
+
+/* ============ S7 — the DM ============ */
+#s7{background:var(--blue-deep)}
+#s7::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(110% 70% at 50% 30%,rgba(46,134,240,.25),transparent 65%)}
+#court7{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#court7 .ln{stroke:var(--lime);opacity:.12}
+#panel7{position:absolute;left:255px;top:240px;width:570px;height:640px;border-radius:44px;overflow:hidden;border:6px solid var(--lime);
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.75),0 0 40px -6px rgba(208,255,65,.35);background:#000}
+#panel7 canvas{position:absolute;left:0;top:0;width:558px;height:628px}
+#panel7 .glare{position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.18),rgba(255,255,255,0) 32%,rgba(255,255,255,0) 70%,rgba(255,255,255,.06));pointer-events:none}
+#pill7{position:absolute;left:0;width:1080px;top:846px;display:flex;justify-content:center}
+#pill7 span{display:inline-flex;align-items:center;gap:14px;padding:14px 30px;border-radius:999px;background:#fff;color:var(--blue-deep);font:800 42px/1 var(--v);box-shadow:0 18px 40px -16px rgba(0,0,0,.6)}
+#pill7 i{display:block;width:14px;height:14px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 3px var(--blue-deep)}
+#cta{position:absolute;left:0;width:1080px;top:960px;text-align:center;font:400 104px/1.14 var(--d);color:#fff}
+#cta .hi{color:var(--lime)}
+#handle{position:absolute;left:150px;top:1222px;width:750px;height:120px;border-radius:60px;background:var(--lime);color:var(--blue-deep);display:flex;align-items:center;justify-content:center;gap:0;
+  font:800 56px/1 var(--v);box-shadow:0 30px 70px -24px rgba(0,0,0,.7),0 0 0 6px rgba(208,255,65,.18);overflow:visible}
+#handle .ltr{padding-left:120px}
+#sock{position:absolute;left:14px;top:14px;width:92px;height:92px;border-radius:50%;background:var(--blue-deep);display:grid;place-content:center}
+#plane{width:54px;height:54px;stroke:var(--lime);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+#ask{position:absolute;left:190px;width:700px;top:1384px;text-align:center;font:700 54px/1.25 var(--v);color:rgba(255,255,255,.9)}
+
+/* ============ transitions ============ */
+#pane{position:absolute;top:-40px;width:64px;height:2000px;left:1080px;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.55) 40%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.55) 60%,rgba(255,255,255,0));
+  box-shadow:0 0 60px 18px rgba(208,255,65,.35)}
+#racket{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:visible}
+#seam{position:absolute;left:-200px;top:1920px;width:1480px;height:16px;margin-top:-8px;background:var(--lime);box-shadow:0 0 50px 14px rgba(208,255,65,.55)}
+
+/* ============ fx + finish ============ */
+#fx{position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none}
+#vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(130% 90% at 50% 50%,transparent 62%,rgba(0,0,0,.30))}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+
+/* ============ preview chrome (not in ?capture=1) ============ */
+#ui{position:fixed;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;gap:12px;padding:0 14px;color:#fff;font:600 13px var(--v);
+  background:linear-gradient(transparent,rgba(0,0,0,.7));direction:ltr;user-select:none}
+#ui button{all:unset;cursor:pointer;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.14)}
+#bar{flex:1;height:6px;background:rgba(255,255,255,.18);border-radius:3px;position:relative;cursor:pointer}
+#bar i{position:absolute;left:0;top:0;bottom:0;width:0;background:#D0FF41;border-radius:3px}
+body.capture #ui{display:none}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="fit"><div id="stage"><div id="cam">
+
+  <!-- S4: padel now (blue world, «۲ سال پدل», then her wide clip with the bridge line) -->
+  <div class="sc" id="s4">
+    <canvas id="fc4b" class="full" width="1080" height="1920"></canvas>
+    <svg id="court4" viewBox="0 0 1080 1920"><g id="g4"></g></svg>
+    <div id="two"><div id="n2">۲</div><div id="l2" data-safe>سال پدل</div></div>
+    <div id="foot4"><canvas id="fc4" width="1080" height="1920"></canvas><div class="scrimB"></div></div>
+    <div class="gcard" id="b4">
+      <div class="row" id="b1l" data-safe>چیزهایی که توی پدل دیر جا می‌افتن</div>
+      <div class="row" id="b3l" data-safe>برای من از قبل جا افتاده‌ن</div>
+      <div class="row" id="chips" data-safe>مثل والی، اسمش، حرکت پا و خوندن توپ</div>
+    </div>
+  </div>
+
+  <!-- S3: behind me, her tennis (spruce, no walls) -->
+  <div class="sc" id="s3">
+    <svg id="court3" viewBox="0 0 1080 1920"><g id="g3"></g></svg>
+    <div id="hd3"><div id="n13">۱۳</div><div id="l13" data-safe>سال تنیس پشتمه</div></div>
+    <div class="rc" id="c1"><i class="shine"></i><div class="ico"><div class="dg" id="c1dg">۱</div></div><div class="tx" data-safe><b>رنکینگ ۱ بانوان کشور</b><span>تنیس</span></div></div>
+    <div class="rc" id="c2"><i class="shine"></i><div class="ico"><svg viewBox="0 0 24 24" id="c2ic"><path pathLength="1" d="M8 4h8v4.5a4 4 0 0 1-8 0Z"/><path pathLength="1" d="M8 6H5.2a2.6 2.6 0 0 0 2.9 3.6M16 6h2.8a2.6 2.6 0 0 1-2.9 3.6"/><path pathLength="1" d="M12 12.5V16M8.6 20h6.8M9.6 20l.6-4h3.6l.6 4"/></svg></div><div class="tx" data-safe><b>نایب‌قهرمانی تور جهانی</b><span>تنیس <span class="ltr" style="display:inline">ITF</span> · رده‌ی زیر ۱۸ سال</span></div></div>
+    <div class="rc" id="c3"><i class="shine"></i><div class="ico"><svg viewBox="0 0 24 24" id="c3ic"><path pathLength="1" d="M12 3.2 19 5.6v5.9c0 4.2-2.9 7.6-7 9.4-4.1-1.8-7-5.2-7-9.4V5.6Z"/><path pathLength="1" d="m9.2 12 2 2 3.6-3.9"/></svg></div><div class="tx" data-safe><b>بازیکن تیم ملی</b><span>رده‌های ۱۲، ۱۴ و ۱۶ سال و بزرگسال</span></div></div>
+  </div>
+
+  <!-- S1: the hook, her overhead -->
+  <div class="sc" id="s1"><canvas id="fc1" width="1080" height="1920"></canvas></div>
+
+  <!-- S2: her name over her close-up; it swings open like a court door -->
+  <div class="sc" id="s2w"><div id="s2">
+    <canvas id="fc2" width="1080" height="1920"></canvas>
+    <div class="scrimT"></div>
+    <div class="gcard" id="card2">
+      <div id="pill2"><span data-safe><i></i>مربی پدل · مشهد</span></div>
+      <div id="nm2" data-safe>مهرانه ظهوریان</div>
+      <i id="bar2"></i>
+    </div>
+    <div class="shade" id="shade2"></div>
+  </div></div>
+
+  <!-- S5: classes, then where we train -->
+  <div class="sc" id="s5">
+    <canvas id="fc5" class="full" width="1080" height="1920"></canvas>
+    <svg id="court5" viewBox="0 0 1080 1920"><g id="g5"></g></svg>
+    <div class="hd" id="hd5"><div id="hd5a" data-safe>از صفر تا</div><div id="hd5b" data-safe><span class="hi">بازی</span> توی زمین</div></div>
+    <div class="kc" id="k1"><i class="shine"></i><svg class="mc" viewBox="0 0 120 180"><rect class="cl" x="6" y="6" width="108" height="168" rx="6"/><line class="nt" x1="6" y1="90" x2="114" y2="90"/><circle class="co" cx="60" cy="48" r="11"/><circle class="dot" cx="60" cy="132" r="10"/><circle class="mb" cx="60" cy="90" r="7"/></svg>
+      <i class="bolt b1"></i><i class="bolt b2"></i><i class="bolt b3"></i><i class="bolt b4"></i>
+      <div class="tx" data-safe><b>کلاس خصوصی</b><span>یک به یک</span></div></div>
+    <div class="kc" id="k2"><i class="shine"></i><svg class="mc" viewBox="0 0 120 180"><rect class="cl" x="6" y="6" width="108" height="168" rx="6"/><line class="nt" x1="6" y1="90" x2="114" y2="90"/><circle class="co" cx="60" cy="48" r="11"/><circle class="dot" cx="34" cy="132" r="10"/><circle class="dot" cx="86" cy="132" r="10"/><circle class="mb" cx="60" cy="90" r="7"/></svg>
+      <i class="bolt b1"></i><i class="bolt b2"></i><i class="bolt b3"></i><i class="bolt b4"></i>
+      <div class="tx" data-safe><b>کلاس نیمه‌خصوصی</b><span>دو نفر، یک مربی</span></div></div>
+    <div class="kc" id="k3"><i class="shine"></i><svg class="mc" viewBox="0 0 120 180"><rect class="cl" x="6" y="6" width="108" height="168" rx="6"/><line class="nt" x1="6" y1="90" x2="114" y2="90"/><path class="rl" d="M40 44 L82 136 M82 136 L36 128"/><circle class="co" cx="40" cy="44" r="11"/><circle class="dot" cx="82" cy="136" r="10"/><circle class="mb" cx="60" cy="90" r="7"/></svg>
+      <i class="bolt b1"></i><i class="bolt b2"></i><i class="bolt b3"></i><i class="bolt b4"></i>
+      <div class="tx" data-safe><b>هیتینگ پارتنر</b><span>بدون درس · فقط بازی</span></div></div>
+    <div class="hd" id="hd6" data-safe>کجا تمرین می‌کنیم</div>
+    <div class="vr" id="v1"><div class="pin"><svg viewBox="0 0 24 28"><path d="M12 27s9-7.4 9-14.2a9 9 0 1 0-18 0C3 19.6 12 27 12 27Z" fill="#D0FF41"/><circle cx="12" cy="12.6" r="4.2" fill="#013C86"/></svg></div><div class="tx" data-safe><b>پدل هاب</b><span>سجاد</span></div></div>
+    <div class="vr" id="v2"><div class="pin"><svg viewBox="0 0 24 28"><path d="M12 27s9-7.4 9-14.2a9 9 0 1 0-18 0C3 19.6 12 27 12 27Z" fill="#D0FF41"/><circle cx="12" cy="12.6" r="4.2" fill="#013C86"/></svg></div><div class="tx" data-safe><b>بوتیک پدل</b><span>هفت تیر</span></div></div>
+    <div class="vr" id="v3"><div class="pin"><svg viewBox="0 0 24 28"><path d="M12 27s9-7.4 9-14.2a9 9 0 1 0-18 0C3 19.6 12 27 12 27Z" fill="#D0FF41"/><circle cx="12" cy="12.6" r="4.2" fill="#013C86"/></svg></div><div class="tx" data-safe><b>نارون پدل</b><span>مجموعه‌ی سوارکاری ارشاد</span></div></div>
+  </div>
+
+  <!-- S7: the DM -->
+  <div class="sc" id="s7">
+    <svg id="court7" viewBox="0 0 1080 1920"><g id="g7"></g></svg>
+    <div id="panel7"><canvas id="fc7" width="558" height="628"></canvas><div class="glare"></div></div>
+    <div id="pill7"><span data-safe><i></i>مربی پدل · مشهد</span></div>
+    <div id="cta"><div id="cta1" data-safe>بهم دایرکت بده</div><div id="cta2" data-safe>تا <span class="hi">شروع کنیم</span></div></div>
+    <div id="handle" data-safe><div id="sock"><svg id="plane" viewBox="0 0 24 24"><path d="M21 3 10.2 13.8M21 3l-6.6 18-4.2-7.2L3 9.6Z"/></svg></div><span class="ltr">@mehraneh_zohourian</span></div>
+    <div id="ask" data-safe>بگو کجای شهری<br>و چه ساعتی وقت داری</div>
+  </div>
+
+  <div id="pane"></div>
+  <svg id="racket" viewBox="0 0 1080 1920"><g id="rk"></g></svg>
+  <div id="seam"></div>
+
+  <canvas id="fx" width="1080" height="1920"></canvas>
+</div>
+<div id="vig"></div><div id="flash"></div>
+</div></div></div>
+
+<div id="ui"><button id="pp">⏸</button><span id="tt">0.00</span><div id="bar"><i id="bari"></i></div><span id="hint">space = play/pause · ← → = ±0.1 s</span></div>
+
+<script src="engine.js"></script>
+<script src="scenes.js"></script>
+<script src="driver.js"></script>
+<script>
+/* her real racket pops ride along with the sound plan (tools/mix_clip_audio.py reads them; make_sfx.py ignores the extra key) */
+if (window.__sound) { const base = window.__sound; window.__sound = () => Object.assign(base(), { clips: clipAudioPlan() }); }
+</script>
+</body>
+</html>

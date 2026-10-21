@@ -157,6 +157,12 @@ CSS-timer scene-swap for any reel that is mostly motion graphics, real captures 
    **`read_audit.js` (can a person read it? a word the hero is sitting on counts as unread)**, `copy_audit.py` (every line traced to its source; the new lines are listed for Amir to read). `ball_audit.js` lists every place the hero covers a word, so you know what to move.
 6. **Sound from the same plan**: `export_sound.js` → `make_sfx.py` (synthesized, nothing downloaded) → `mux_sfx.py` (PASS). Say it was never auditioned by ear. Music still goes on in Instagram.
 7. **Real UI**: `tools/capture_tiles.js` shoots any page (his sites, the apps' demos, a client's site) as phone tiles. **His own footage**: `tools/extract_plate.py` + `plateDraw` (a plate, not a `<video>`).
+8. **A client's own footage** (reel 10, `Content/reel-10-mehraneh-padel/`, Mehraneh's padel ad, 2026-10-21, "looks good"): read `timeline/README.md` § Reel 10 first. In short: contacts from the audio,
+   confirmed on frames, mapped onto beats; every third party (ads, phone numbers, QR codes, venue signs, logos, people) filled out of the plates with the person matted; slow motion only from a
+   `minterpolate` 60 fps plate, never blended frames; one ball on screen at a time; `face_audit.js` keeps the ball off her face.
+
+**Keep the cost down (reel 10 cost about $75-90 in API terms, three-quarters in helper agents).** Decide the concept yourself, analyse clips with one agent or a script, gate with the scripted
+audits, and use at most one frame-review agent after the render. Run multi-agent panels only when Amir asks for them.
 
 **The reading rule (Amir, 2026-10-02, on the first 17 s cut: "the changes are too fast, there is no time to read").** A block of text needs **0.8 s + 0.25 s per word** fully visible
 (max 2.4 s). Plan the length from that budget, not from "10-20 s": hook 3-4 s, one fact per beat at 2.5-3 s, the link 4 s. **Never cut content to hit a length, and never speed up** (Amir, 2026-10-02,

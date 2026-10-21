@@ -103,3 +103,24 @@ Tools (all in `../tools/`, shared): `setup_tools.py` · `still.js` · `sheet.py`
 * **A footage plate is not a `<video>`** (neither clock controls it): `extract_plate.py` → `plateLoad` → `plateDraw(ctx, 'take', t - AT + IN, ...)`; his voice goes back on with `mux_audio.py` using the same IN / AT numbers.
 * **A cover frame is a clean frame**: `?noball=1` must hide the ball AND its comet trail, dust, rings and confetti (the first reel-9 cover showed the trail of a ball that was not there). Both `starter.scenes.js` and reel 9 do it; keep it when you replace the fx layer.
 * **Re-timing can silently drop a beat.** Reel 9's slower cut folded a whole section into a badge; list the previous cut's beats beside the new one's before you send it.
+
+## Reel 10: a timeline ad on the client's own phone footage (2026-10-21, `Content/reel-10-mehraneh-padel/`, Amir: "looks good")
+Mehraneh's padel ad: three 3-6 s phone clips of her playing, one lime ball, the reel-9 look. What it taught:
+* **Find the real hits first.** Racket/ball contacts come out of the clip's audio (sharp broadband onsets, 5 ms hops) and are confirmed on a labelled strip of frames around each one. Every footage map
+  (`MAP`: reel time -> source time, held outside) is built from those frame numbers so a contact lands on a beat, with a 0.1 s hit-stop, a ring and her real pop. The pop reaches the phone 17-45 ms
+  after the hit: place its onset on the picture's contact frame. Under a 1x stretch, lay the clip's own audio as a bed (`tools/mix_clip_audio.py` with `norm: false`): the off-camera partner's shots give the rally its rhythm.
+* **Scan every frame for other people's things before anything else**: a stranger's ad with a phone number and a QR code, a café sign that names the venue, club logos, a person in a doorway.
+  Fix them in the plate frames, tracked, with her pixels matted out (difference against a drift-compensated median plate). **Fill from the surrounding wall, don't blur**: a blur leaves a smudge
+  where a QR was and a hard blur box reads as censorship. Brief this once, completely; reel 10 redid it.
+* **Never blend neighbouring frames for slow motion.** At 0.5x every other output frame was a 50/50 mix and her face showed twice. Make a 60 fps plate with
+  `ffmpeg -framerate 30 -start_number N -t <s> -i f_%05d.jpg -vf "minterpolate=fps=60:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1"` and draw the nearest frame (`drawClip` takes `fps`/`t0`).
+  At 1x pick the nearest frame of the OUTPUT frame (`qt(t)`), so the 20 sub-frames never mix two source frames.
+* **The graphic ball and the real ball never share the screen.** Hide the graphic ball (an `alpha:[0,0]` hold) while the real one is in the picture; hand over at a frame edge (glass flash) where the real ball leaves.
+* **Her face is an obstacle like text**: `Content/reel-10-mehraneh-padel/tools/face_audit.js` maps her tracked face boxes through the page's own framing and fails if the ball touches them. Rings and shockwaves
+  must fade before they reach her face too (no audit catches those).
+* **Footage beats diagrams.** Long graphic stretches felt empty next to her clips: a dim, desaturated plate of her playing, multiplied into the court colour, behind the cards keeps it hers (pick frames with no ball in them).
+* **Gotchas:** every `.sc` scene needs `z-index:0` (its own stacking context) or a z-index inside it covers the next scene; a CSS rule with `display:none` beats `show(el, true)` (which only clears the
+  inline style); a waiting word's dots peek out of its mask (keep it at opacity 0 until its rise starts); scale the camera up while it shakes or the stage edges show; a huge sweep (the racket)
+  strobes at peak speed under 20 sub-frames: ease into the hit and hold it 0.15 s; dust from a graphic bounce survives a wipe onto footage (make that bounce burst-free).
+* **Cost (reel 10 used ~200M tokens, about $75-90 at API prices, three-quarters of it helper agents):** decide the concept yourself (no concept/judge panels), analyse clips with one agent or a script,
+  review with the scripted audits plus ONE frame-review agent (no per-finding verifiers: most findings were one bug seen through several lenses), and start each new reel in a fresh session that reads its README.
