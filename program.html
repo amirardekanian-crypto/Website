@@ -14225,11 +14225,15 @@ function pushRefreshQuiet() {
   if (!pushReady() || AAPush.state() !== 'on' || typeof AAPush.refresh !== 'function') return;
   _sbReady().then(sb => sb && AAPush.refresh(sb, 'training', pushLang())).catch(() => {});
 }
+// Asks the server once. `then` runs when the answer is in. A second call while the first is out does nothing: the first
+// answer repaints. Until 2026-10-21 it called back at once when the answer was already in, and openPushSettings() is its
+// own callback, so every open of Reminders looped until the stack ran out, and threw before it could paint (Love All B5:
+// "Turn reminders on" left the sheet saying Off).
 function pushLoadMe(then) {
-  if (!window.AAPush || _pushLoading || PUSH_ME !== null) { if (then) then(); return; }
+  if (!window.AAPush || PUSH_ME !== null || _pushLoading) return;
   _pushLoading = true;
-  _sbReady().then(sb => sb && AAPush.me(sb)).then(me => { PUSH_ME = me || { on: false }; if (then) then(); })
-    .catch(() => { PUSH_ME = { on: false }; if (then) then(); });
+  const done = me => { _pushLoading = false; PUSH_ME = me || { on: false }; if (then) then(); };
+  _sbReady().then(sb => sb && AAPush.me(sb)).then(done, () => done(null));
 }
 
 const PUSH_KINDS = [['workout', 'Train', 'When you have not trained for a couple of days'],
