@@ -6,6 +6,7 @@
 //       and a rating tapped first still lets the finish card's New best band show at Done.
 //   B2  this week's setsDrop counts: 3 of 4 sets on every set-logged lift is a finished day, Guided walks 3, a circuit and a 1-set card keep theirs.
 //   B5  Reminders opens twice in a row without a stack overflow, and "Turn reminders on" repaints the sheet with the switches.
+//   nudge  every set done and a warm-up row unticked: one box names it, once a session
 //   B3  a first-timer's tap on a warm-up row's circle ticks it (no "Log each set" note); a real lift's closed card still opens with it.
 // Serve the repo first (python -m http.server <port>; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js), then:
 //   node scripts/headless/love-all.js
@@ -291,6 +292,39 @@ async function b3(browser) {
   await ctx.close();
 }
 
+// ═════════ Warm-up nudge: every set done, a warm-up row left unticked: one box names it, once ═════════
+async function nudge(browser) {
+  const { ctx, p } = await openDay(browser);
+  const said = () => p.evaluate(() => { const el = document.getElementById('aaToast'); return el && !el.hidden ? el.innerText : ''; });
+  const tickWork = skipLast => p.evaluate(skipLast => {
+    const work = [...document.querySelectorAll('#day1 .checklist-item')].filter(c => !c.classList.contains('is-prep'));
+    work.forEach((c, i) => {
+      if (skipLast && i === work.length - 1) return;
+      hideAaToast();
+      if (c.classList.contains('collapsed')) toggleExpand(c);
+      if (!c.classList.contains('checked')) toggleCheckOnly(c, '1');
+    });
+    return { prep: document.querySelectorAll('#day1 .checklist-item.is-prep').length, work: work.length };
+  }, skipLast);
+  const n = await tickWork(true);
+  t.check('nudge: the day has warm-up rows and work', n.prep > 0 && n.work > 1, JSON.stringify(n));
+  t.check('nudge: a lift still to do: no box about the warm-up', !/haven't ticked/.test(await said()));
+  await tickWork(false);
+  await p.waitForTimeout(300);
+  const txt = await said();
+  t.check('nudge: every set done, warm-up unticked: one box names it and says skipping is fine', /You haven't ticked .+\. Done (it|them)\? Tap (its number|their numbers)\. Skipped (it|them)\? That's fine\./.test(txt), txt);
+  t.check('nudge: …it stays until answered (no 6 s timer)', await p.evaluate(() => _toastT === null));
+  await p.click('#aaToast .aa-toast-go');
+  await p.waitForTimeout(600);
+  t.check('nudge: Show me closes the box', !(await said()));
+  // Once a session: untick and tick a lift again, no second box.
+  await p.evaluate(() => { const c = [...document.querySelectorAll('#day1 .checklist-item')].filter(c => !c.classList.contains('is-prep')).pop(); toggleCheckOnly(c, '1'); hideAaToast(); toggleCheckOnly(c, '1'); });
+  await p.waitForTimeout(300);
+  t.check('nudge: once a session: no second box', !/haven't ticked/.test(await said()));
+  t.check('nudge: no page errors', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await l1(browser);
@@ -298,6 +332,7 @@ async function b3(browser) {
   await b2(browser);
   await b5(browser);
   await b3(browser);
+  await nudge(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

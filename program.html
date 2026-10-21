@@ -10657,7 +10657,7 @@ function toggleCheckOnly(item, day) {
   saveState();
   markTouched(day);
   updateProgress(day);
-  if (item.classList.contains('checked')) offerClock(day);
+  if (item.classList.contains('checked')) { offerClock(day); nudgeUnticked(day); }
 }
 
 // The day this session was trained on (DATA-02). Ticks carry no time of their own, so without
@@ -19904,6 +19904,29 @@ function syncExerciseCheck(card, log) {
   saveState();
   markTouched(card.dataset.day);
   updateProgress(card.dataset.day);
+  if (allDone) nudgeUnticked(card.dataset.day);
+}
+
+// Every set is done and only warm-up rows are left unticked: one box names them, once a session (Amir, 2026-10-21: "pointing
+// out at the things they forgot to tick, may be helpful, or maybe they wanted to skip, just a one time nodge"). The number stays
+// the tick, so the box points at it, and "Show me" brings the first row up. Skipping is fine and the box says so. Never in
+// Guided, which walks the warm-up as a step of its own, and never on a day Done has filed. In memory, per day.
+const _leftNudged = {};
+function nudgeUnticked(day) {
+  if (isLoading || window.IS_PREVIEW || day == null || _leftNudged[day] || (typeof STEP !== 'undefined' && STEP)) return;
+  if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day))) return;
+  const miss = getDayCompletion(day).missing;
+  const left = [...document.querySelectorAll(`.checklist-item[data-day="${day}"]`)]
+    .filter(c => c.closest('#day-view') && c.classList.contains('is-prep') && !c.classList.contains('checked')
+      && !c.classList.contains('rd-skip') && !c.classList.contains('rd-optional'));
+  if (!left.length || miss.length !== left.length) return;   // a lift still has sets to do: not yet
+  _leftNudged[day] = true;
+  const names = left.map(c => c.querySelector('.item-name').textContent.trim());
+  const list = names.length === 1 ? names[0] : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+  const one = names.length === 1;
+  aaToast(`You haven't ticked ${list}. Done ${one ? 'it' : 'them'}? Tap ${one ? 'its number' : 'their numbers'}. Skipped ${one ? 'it' : 'them'}? That's fine.`,
+    { kicker: 'Warm-up', action: 'Show me', dismiss: 'Got it', ms: 0,
+      run: () => { const c = left.find(x => !x.classList.contains('checked')); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); } });
 }
 
 // Mark every set as done (or undone) — used when the row's check circle is
