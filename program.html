@@ -18247,6 +18247,10 @@ function restoreState() {
 function initDayWrapup() {
   // The day number is the trailing part of the storage key (e.g. "..._srpe_3").
   const dayOf = (key) => (key || '').split('_').pop();
+  // One session is one record, and Done closes it (Love All B1, 2026-10-21). Until Done the rating and the note stay on
+  // the phone, and Done's own save carries them. A tap before Done used to file the session as Complete, file its
+  // records (so the New best band never showed at Done), and leave it on the server after a Reset.
+  const filed = (day) => completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day));
   document.querySelectorAll('.complete-note-input').forEach(ta => {
     const key = ta.dataset.key;
     let _noteT = null;
@@ -18255,7 +18259,7 @@ function initDayWrapup() {
       paintRateFold(dayOf(key));   // the "Your rating" row's line follows the note as it is typed
       // Debounced: refresh the cloud record so a late-added note reaches the coach.
       clearTimeout(_noteT);
-      _noteT = setTimeout(() => { recordSessionToCloud(dayOf(key)); refreshPendingReport(dayOf(key)); paintSendStatus(dayOf(key)); }, 1200);
+      _noteT = setTimeout(() => { if (filed(dayOf(key))) recordSessionToCloud(dayOf(key)); refreshPendingReport(dayOf(key)); paintSendStatus(dayOf(key)); }, 1200);
     });
     ta.addEventListener('click', e => e.stopPropagation());
   });
@@ -18275,8 +18279,8 @@ function initDayWrapup() {
         } else {
           localStorage.removeItem(key);
         }
-        // Update the cloud record so the dashboard shows the session RPE.
-        recordSessionToCloud(dayOf(key));
+        // After Done, update the cloud record so the dashboard shows the session RPE. Before Done, Done sends it.
+        if (filed(dayOf(key))) recordSessionToCloud(dayOf(key));
         paintRateFold(dayOf(key));   // and the "Your rating" row's line
         // Rated: the finish card's hint goes; after Done, a change offers "Send the update".
         const h = document.querySelector('#confirm-' + dayOf(key) + ' .finish-hint');
