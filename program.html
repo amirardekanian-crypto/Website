@@ -16414,6 +16414,24 @@ function switchDay(n) {
 //   - circuits + simple count as 1 unit if .checked
 // Returns { done, total, missing[] } where each missing entry describes an
 // unfinished exercise (with a short label like "2/4 sets" or "skipped").
+// The sets a card asks for today: the check-in's halving (data-rd-sets) and this week's note's setsDrop ("1 set fewer"),
+// never below one. The card still prints what Amir wrote (SCHEMA.md, weekNotes): only the count, Guided's walk and the
+// rest screen's "next set" know. Until 2026-10-21 nothing did, so a back-off week done as told filed Partial on Finish
+// early and Career paid session_finished_early (Love All B2).
+function setsAskedOf(card, written) {
+  let need = card.dataset.rdSets ? Math.min(parseInt(card.dataset.rdSets, 10) || written, written) : written;
+  const drop = weekSetsDrop(card);
+  if (drop && written > 1) need = Math.min(need, Math.max(1, written - drop));
+  return need;
+}
+// This week's setsDrop for a card of a programme day: a set-logged lift only (a circuit, a warm-up row and a Library
+// session's card keep theirs), 0 when the week has no note or the note no drop.
+function weekSetsDrop(card) {
+  if (!card || card.dataset.day === 'ws' || card.classList.contains('round-group')) return 0;
+  if (!(cardDetail(card) || card).querySelector('.rest-btn')) return 0;
+  const n = weekNoteNow(currentCycleData());
+  return n ? Math.max(0, Math.min(3, parseInt(n.setsDrop, 10) || 0)) : 0;
+}
 function getDayCompletion(day) {
   let total = dayTotals[day] || 0;
   const items = document.querySelectorAll(`[data-day="${day}"]`);
@@ -16449,7 +16467,7 @@ function getDayCompletion(day) {
         if (doneSets < totalSets && name) excused.push({ name, label: off });
         return;
       }
-      const need = item.dataset.rdSets ? Math.min(parseInt(item.dataset.rdSets, 10) || totalSets, totalSets) : totalSets;
+      const need = setsAskedOf(item, totalSets);
       if (need < totalSets) total -= totalSets - Math.max(need, doneSets);
       if (doneSets < need && name) {
         missing.push({
@@ -20207,7 +20225,7 @@ function restNextOfCard(card) {
     const openSet = c => {
       if (circuit(c) || !loggable(c)) return null;
       const total = parseInt(c.dataset.sets, 10) || 1;
-      const need = c.dataset.rdSets ? Math.min(parseInt(c.dataset.rdSets, 10) || total, total) : total;
+      const need = setsAskedOf(c, total);
       const i = loadSetLog(nm(c), total, day).findIndex((s, k) => k < need && !s.d);
       return i < 0 ? null : { no: i + 1, total: need };
     };
@@ -20745,7 +20763,7 @@ function buildStepSeq(day) {
     const exI = cards.indexOf(card);
     const circuit = card.classList.contains('round-group');
     const written = parseInt(circuit ? card.dataset.rounds : card.dataset.sets, 10) || 1;
-    const total = (!circuit && card.dataset.rdSets) ? Math.min(parseInt(card.dataset.rdSets, 10) || written, written) : written;
+    const total = circuit ? written : setsAskedOf(card, written);
     const name = card.querySelector('.item-name').textContent.trim();
     for (let setI = 0; setI < total; setI++) seq.push({ card, exI, exCount: cards.length, total, setI, name, circuit });
   });

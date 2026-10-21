@@ -371,7 +371,7 @@ closing week (the retest window), where the bar reads *Max RPE 7 except the rete
 is that week's RPE target, on every lift and every day of it, and only that week's (2026-10-12): every logged RPE is
 coloured against it in the app and judged against it on the dashboard, a lower day takes the lower of the two, and a
 test-flagged lift in the closing week keeps its own card on a normal day (`paintWeekTargets()`, `compareDay()`, TST-4). The card's printed RPE never
-changes. `setsDrop` is a decision the text tells the athlete, and nothing in the app applies it. `scripts/check_program.py` reads all three. A cycle without
+changes. Nor does `setsDrop`: the card prints the written sets, and only the day's count, Guided's walk and the rest screen's next set leave the dropped sets out (`setsAskedOf()`, 2026-10-21), so a session done as the note says is a full one, never Partial. `scripts/check_program.py` reads all three. A cycle without
 `weekNotes` (every programme written before 2026-09-26) shows nothing: the app never invents a
 back-off. `/program-design` decides which weeks get a note and the dose, `/program-engage` writes the text,
 `/program-assemble` writes the object on `cycles[currentCycleIndex]`.
