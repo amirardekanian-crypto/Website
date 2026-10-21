@@ -4585,7 +4585,7 @@
      the SHEETS block) on this screen's paper: nothing new to draw, so the guide and the manual can never drift apart in
      the way they look. The first section is open on arrival; the rest are headers until they are asked for. */
   #screen-system { background: var(--grey-bg); }
-  #screen-system #sys-body { padding: 0 var(--g) 40px; }
+  #screen-system #sys-body { padding: 0 var(--g) 110px; }   /* clears the tab bar, as #ceil-body (Love All L4) */
   #screen-system .sys-lead { margin: 18px 0 0; font: 400 var(--fs-body)/1.55 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
   #screen-system .help-list { margin: 18px 0 0; }
   /* The price list inside a section: the thing on the left, what it pays on the right, a hairline between. Space Mono on
@@ -4870,7 +4870,7 @@
   #screen-plan .cs-foot { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hair); }
   #screen-plan .cs-lw { flex: none; font: 600 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--grey); }
   #screen-plan .cs-foot .cs-bar { flex: 1; margin-top: 0; }
-  #screen-moments #mom-body, #screen-achievements #ach-body { padding: 4px 0 28px; }
+  #screen-moments #mom-body, #screen-achievements #ach-body { padding: 4px 0 110px; }   /* clears the tab bar (Love All L4) */
   #screen-achievements #ach-body > .ac-next:first-child { margin-top: 18px; }
   /* A month's heading on Your moments: four honours of one month ran as four near-identical cards on the tab. */
   #screen-moments .mom-month { display: flex; align-items: baseline; gap: 8px; margin: 22px var(--g) 6px;
@@ -4967,12 +4967,12 @@
 
   /* 6. The door rows: the About sheet's "Your history" row. White, rounded 12, a 1 px edge, a 22 px green line icon, a green Space
      Mono label over one line, a grey ›. One look with or without data (.quiet only changes the words). No dark fill, no dashes. */
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow { display: flex; align-items: center; gap: 14px; width: calc(100% - 2 * var(--g)); min-height: 64px; margin: 0 var(--g) 10px;
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow { display: flex; align-items: center; gap: 14px; width: calc(100% - 2 * var(--g)); min-height: 64px; margin: 0 var(--g) 10px;
     padding: 12px 14px 12px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-ic svg { width: 22px; height: 22px; }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-ic svg { width: 22px; height: 22px; }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 2px; }
   /* ── THE DOOR'S NAME (Number First, Amir 2026-10-19: "the mono door labels") ────────────────────────────────────────
      The label used to be 11 px Space Mono 700, tracked and in capitals, on all 51 doors: the name of the place you are
      going, set as the smallest and least readable thing in the row, and declared SIX times (this block, #screen-notes,
@@ -4991,19 +4991,19 @@
     font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; letter-spacing: normal; text-transform: none; color: var(--ink); text-wrap: balance; }
   :where(#home-overview, #screen-plan, #screen-habits, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-b:has(.hrow-vv) .hrow-l {
     font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-wrap: normal; }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-vv { white-space: nowrap; }   /* the value never breaks; the small line under it wraps whole */
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-v small { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-v.is-togo { color: var(--clay-ink); }   /* "2 to go" asks for something */
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-v.is-ok { color: var(--green-ink); }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-vv { white-space: nowrap; }   /* the value never breaks; the small line under it wraps whole */
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-v small { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-v.is-togo { color: var(--clay-ink); }   /* "2 to go" asks for something */
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-v.is-ok { color: var(--green-ink); }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); }
   /* the sparkline belongs to the number, so it sits on the number's line: cleared by the quiet name's own line height, never a fixed nudge (at 320 the metadata wraps to a third line) */
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-sp { flex: none; align-self: start; margin-top: calc(var(--fs-small) * 1.3); color: var(--green-ink); }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-sp .nc-spark { width: 60px; height: 24px; display: block; }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
-  :where(#home-overview, #screen-plan, #screen-habits) .hrow-sp + .hrow-a { margin-left: -4px; }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-sp { flex: none; align-self: start; margin-top: calc(var(--fs-small) * 1.3); color: var(--green-ink); }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-sp .nc-spark { width: 60px; height: 24px; display: block; }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+  :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow-sp + .hrow-a { margin-left: -4px; }
   @media (max-width: 359px) {   /* the narrowest phone: tighter gaps, and one more pixel of air because 320 stacks the name, the figure and its line */
-    :where(#home-overview, #screen-plan, #screen-habits) .hrow { gap: 10px; padding-right: 12px; }
+    :where(#home-overview, #screen-plan, #screen-habits, #screen-achievements, #screen-moments) .hrow { gap: 10px; padding-right: 12px; }
     :where(#home-overview, #screen-plan, #screen-habits, #screen-ceiling, #screen-notes, #hist-overlay, #ar-body, #day-view .complete-crew, #day-view .complete-share) .hrow-b { gap: 3px; }
   }
 
