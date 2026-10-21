@@ -465,7 +465,10 @@
 // leaves alone another day ticked today even when its clock was never started. A sign-in refresh that gets no answer is no signal,
 // not a refusal, so the saved plan is kept. The coach's dashboard always comes from the network, a habit reminder opens this app,
 // and a phone whose reminder subscription was made with an old key subscribes again by itself, its settings kept.
-const CACHE = 'aap-v218';
+// v219: program.html changed (2026-10-21, the Love All audit). The session rating and note stay on the phone until Done, so a
+// session is filed once and New best shows at Done. A week of one set fewer, done as told, is a full session. Reminders opens
+// without looping. A warm-up row ticks on its first tap, and one box names a warm-up row left unticked once every set is done. Achievements and Moments draw their door icons at their real size.
+const CACHE = 'aap-v219';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
