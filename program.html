@@ -10633,8 +10633,10 @@ function toggleCheckOnly(item, day) {
   if (navigator.vibrate) navigator.vibrate(15);
   const isStandardWithSets = item.dataset.sets && !item.classList.contains('round-group');
   // A first-timer's circle on a closed card opens it: ticking every set at once logs no weight and no RPE, so nothing to
-  // remember. After the first finished session the circle is the as-written shortcut it always was.
-  if (isStandardWithSets && !item.classList.contains('checked') && item.classList.contains('collapsed') && !window.IS_PREVIEW && !onbVeteran()) {
+  // remember. After the first finished session the circle is the as-written shortcut it always was. Only a card with a set
+  // log to open: every card carries data-sets, and a warm-up row (no .ex-log) used to open on "Log each set…" with no
+  // set to log, and tick nothing (Love All B3). It ticks now, as it does for everyone else.
+  if (isStandardWithSets && item.querySelector('.ex-log') && !item.classList.contains('checked') && item.classList.contains('collapsed') && !window.IS_PREVIEW && !onbVeteran()) {
     toggleExpand(item);
     aaToast('Log each set in the open card: the weight, the circle, then how hard it was.', { kicker: 'How to log' });
     return;
