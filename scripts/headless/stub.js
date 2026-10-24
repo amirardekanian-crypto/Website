@@ -25,6 +25,9 @@
 // and days that carry only day and extra: the stub sends exactly what the fixture gives, so a test can also send MORE than the server would), `game` and each achievement's `signed` / `signed_n` come from the `crewPages` entry (none by default, so a
 // page has no cycle, no game and nobody signed); my_game_set answers like CONTRACT 4 and crew_page(own) then carries what it saved (`myGame`; gameMissing, gameErr, gameFail, gameDelay).
 // Step 7: crew_reply keeps a mention token @[ck|name] for a member of `bell.crew` who is not you (the first five), turns any other into plain @name, counts what is SEEN against 140 (a token is "@name"), and the reply row carries `mentions`.
+// Bring a partner (step 9, stage97): `partner` is the referral object your page carries ({ code: null } before a code exists, or { code, percent, reward, friends, waiting, used }); without it a page has
+// no `referral` (a server without stage97: no card). my_partner_code({p_make}) answers like CONTRACT 8: {code:null} for none, p_make true makes ALEX24 (upper first name letters + two digits, 10 and 10),
+// refuses an athlete under 13 ('partner:under13'); partnerMissing = "no such function" · partnerErr = a message to refuse with · partnerDelay = ms to take.
 // Faces (step 2): crew_faces_get answers `faces` ({ '<ck>': { fv, b64 } }), crew_face_set / crew_face_clear change the caller's own (faceDelay, faceMax, faceMissing, faceErr).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
@@ -139,7 +142,7 @@
       };
       var merge = function (pg, over) { Object.keys(over || {}).forEach(function (k) { pg[k] = over[k]; }); return pg; };
       // `myGame` is what my_game_set last saved: your own page then carries it (the saved row, in the shape CONTRACT 4 gives crew_page().game)
-      if (!sub) { var own = merge(pageOf(PM.name || 'Alex R.', true, PM), pages.me); if (S.myGame !== undefined) own.game = S.myGame; return res({ data: JSON.parse(JSON.stringify(own)), error: null, status: 200 }); }
+      if (!sub) { var own = merge(pageOf(PM.name || 'Alex R.', true, PM), pages.me); if (S.myGame !== undefined) own.game = S.myGame; if (S.partner !== undefined && own.referral === undefined) own.referral = S.partner; return res({ data: JSON.parse(JSON.stringify(own)), error: null, status: 200 }); }
       if (PM.answer !== 'yes' || PM.under13 || PM.can_post === false) return bad('crew:not_yes');
       var who = (PB.crew || []).filter(function (x) { return x && x.ck === sub; })[0];
       if (!who) return bad('crew:gone');
@@ -170,6 +173,20 @@
       if (club) saved.club = club; if (wo) saved.working_on = wo; if (ig) saved.ig = ig;
       S.myGame = saved;
       return new Promise(function (ok) { setTimeout(function () { ok({ data: JSON.parse(JSON.stringify(saved)), error: null, status: 200 }); }, S.gameDelay || 0); });
+    }
+    // Players' Lounge (stage97, "Bring a partner"): see the header.
+    if (name === 'my_partner_code') {
+      if (S.partnerMissing) return res({ data: null, error: { message: 'Could not find the function public.my_partner_code(p_make) in the schema cache', code: 'PGRST202' }, status: 404 });
+      var qbad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+      if (S.partnerErr) return qbad(S.partnerErr);
+      var QM = (S.bell && S.bell.me) || {};
+      if (QM.under13) return qbad('partner:under13');
+      if (params && params.p_make === true && !(S.partner && S.partner.code)) {
+        var qn = String(QM.name || 'Alex R.').split(/\s+/)[0].replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 10) || 'ATHLETE';
+        S.partner = { code: qn + '24', percent: 10, reward: 10, friends: 0, waiting: 0, used: 0 };
+      }
+      var qout = JSON.parse(JSON.stringify(S.partner && S.partner.code ? S.partner : { code: null }));
+      return new Promise(function (ok) { setTimeout(function () { ok({ data: qout, error: null, status: 200 }); }, S.partnerDelay || 0); });
     }
     if (/^crew_/.test(name) && S.bell) {
       var B = S.bell, me = B.me = B.me || {}, keep = function () { try { var cb = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); cb.bell = B; localStorage.setItem('__stubcfg', JSON.stringify(cb)); } catch (e) {} };

@@ -67,8 +67,9 @@ athlete ids replaced by plain descriptions (the repo is public).
 | 51 | [🧮 The Scoreboard: Progress cut to one screen (2026-10-19)](docs/ref/program-app/51-the-scoreboard.md) | 9 KB |
 | 52 | [⭕ The Ring: Home's habit card, and the Career row's end (2026-10-20)](docs/ref/program-app/52-the-ring.md) | 5 KB |
 | 53 | [🪜 The ladders come back, and the app finally explains itself (2026-10-20)](docs/ref/program-app/53-the-ladders-and-the-manual.md) | 7 KB |
-| 54 | [🏟️ Players' Lounge (2026-10-24): the Player Page and the join question, step by step](docs/ref/program-app/54-players-lounge.md) | 5 KB |
+| 54 | [🏟️ Players' Lounge (2026-10-24): the Player Page, faces, the cheer, This cycle, Player facts and signatures (steps 0 to 6)](docs/ref/program-app/54-players-lounge.md) | 21 KB |
+| 55 | [🏟️ Players' Lounge, continued: @names, First Serve, Bring a partner, the cards and the Open wall (steps 7 to 11)](docs/ref/program-app/55-players-lounge-continued.md) | 14 KB |
 
 ---
 
-*54 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*
+*55 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*

@@ -5862,6 +5862,26 @@
   .pl-mo { font: 700 var(--fs-label)/1 'Space Mono', monospace; color: var(--grey); }
   .pl-sgr { grid-template-columns: 36px minmax(0, 1fr) 12px; gap: 12px; }
   .pl-sgr.plain { grid-template-columns: 36px minmax(0, 1fr); }
+
+  /* ══ PLAYERS' LOUNGE · STEP 9 (2026-10-24): Bring a partner ═══════════════════════════════════════════════════
+     9 · Bring a partner (frag-s9 A, a card on your own page): the code big in Space Mono on a dashed field, what you both get, Copy (outlined) and Send on
+         WhatsApp (the one primary button), and the line that says who has joined. The page's clay stays on the Cheer button alone. */
+  .pt-card { margin: 12px var(--g) 0; padding: 12px 14px 14px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  .pt-k { display: block; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  .pt-code { margin: 10px 0 8px; padding: 12px 6px; border: 1.5px dashed var(--field); border-radius: 10px; background: var(--tint); text-align: center; overflow-wrap: anywhere;
+    font: 700 var(--fs-head)/1.1 'Space Mono', monospace; letter-spacing: 3px; color: var(--ink); user-select: all; }
+  .pt-line { margin: 8px 0 12px; font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .pt-code + .pt-line { margin-top: 0; }
+  .pt-pair { display: grid; grid-template-columns: 1fr 1.7fr; gap: 8px; }
+  .pt-copy { min-height: 48px; padding: 0 10px; border: 1.5px solid var(--field); border-radius: 8px; background: transparent; color: var(--green-ink); cursor: pointer;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .pt-copy:focus-visible, .pt-wa:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .pt-wa, .pt-make { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 48px; padding: 0 10px; text-align: center; text-decoration: none; font-size: var(--fs-body); }
+  .pt-err { margin: 8px 0 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--clay-ink); }
+  .pt-err:empty { display: none; }
+  .pt-note { margin: 10px 0 0; padding-top: 8px; border-top: 1px solid var(--hair); font: 600 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--green-ink); }
+  .pt-sel { margin: 10px 0 0; padding: 8px 10px; border: 1px solid var(--hair); border-radius: 8px; background: var(--paper); font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--ink);
+    white-space: pre-line; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
   /* Tell the crew, on the finished card, under the WhatsApp row (paintCrewTell()) */
   :where(#day-view) .complete-crew, :where(#day-view) .complete-share { margin-top: 10px; }
   :where(#day-view) .complete-crew[hidden], :where(#day-view) .complete-share[hidden] { display: none; }
@@ -11256,6 +11276,9 @@ APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how ofte
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
   const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. On your own page tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p>`;
+  // Bring a partner is named only while the card is on the page (the server has partner codes, stage97)
+  const GUIDE_PARTNER = `<p><strong>Bring a partner</strong> is a card on your own page, under your numbers. Tap <strong>Get your code</strong> and it makes one for you. A friend who uses your code gets 10% off. You get 10% off your next cycle. <strong>Send on WhatsApp</strong> sends them your code and the link, and <strong>Copy</strong> copies the same words so you can send them anywhere. When a friend has joined, the card says so. A code earns no XP.</p>`;
+  const myPage = (() => { try { const c = crewPageGet('me'); return c && c.p; } catch (e) { return null; } })();
   const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with likes), last month\'s honours early in the month, and the season board.</li>';
   return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
     <div class="note-card app-card${openKey && card.key === openKey ? ' open' : ''}" onclick="toggleNote(this)">
@@ -11264,7 +11287,7 @@ function buildAppGuideCards(openKey) {
         <div class="note-card-title">${esc(card.title)}</div>
         <span class="note-chevron">▼</span>
       </div>
-      <div class="note-body">${card.body.replace('<!--crew-->', crewOn() ? crewLi : '').replace('<!--pages-->', crewPagesOn() ? GUIDE_PAGES : '')}</div>
+      <div class="note-body">${card.body.replace('<!--crew-->', crewOn() ? crewLi : '').replace('<!--pages-->', crewPagesOn() ? GUIDE_PAGES + (partnerOn(myPage) ? GUIDE_PARTNER : '') : '')}</div>
     </div>`).join('');
 }
 
@@ -14940,6 +14963,87 @@ function playerHonRow(h) {
     : h.honour === 'full_month' ? 'every week held' : 'his pick of the month';
   return `<div class="pl-row"><div><span class="t">${esc(PL_HON[h.honour] || h.honour)}</span><span class="q">${esc([M && yr ? M + ' ' + yr : M, what].filter(Boolean).join(' · '))}</span></div></div>`;
 }
+// ── Step 9 · Bring a partner (idea 69; Amir, 2026-10-24: "the idea 69 gives the memeber 10% discount to the new memeber, and 10% to themselves") ──
+// A card on YOUR page only, after the numbers: one button to get your code, then the code, what you both get, Copy and Send on WhatsApp. The server
+// (stage97) makes the code (my_partner_code) and sends it back on your page as `referral`; a server without stage97 sends no `referral`, so there is no card.
+// Never on anyone else's page, never for an athlete under 13, never in the demo or the coach's preview. Social things pay nothing (GAME-6): a code is a discount, not XP.
+var _partnerBusy = false, _partnerSel = false;
+function partnerOn(p) { return !!(p && p.referral && typeof p.referral === 'object' && !p.under13 && !window.IS_DEMO && !window.IS_PREVIEW); }
+function partnerPct(r, k) { const n = Math.round(Number(r && r[k])); return n > 0 && n <= 90 ? n : 10; }
+// What the friend is sent, in the athlete's language (pushLang(): the intake form's). The English is Amir's own line; the Farsi is a DRAFT for him to read
+// (every Farsi word the app speaks is his) and points at the Farsi form, which reads ?code= too. The code and the link sit on their own lines in Farsi so the
+// reading order of a right-to-left line cannot move them.
+function partnerText(r) {
+  const code = String((r && r.code) || '').toUpperCase().replace(/[^A-Z0-9]/g, ''), pct = partnerPct(r, 'percent');
+  if (pushLang() === 'fa') {
+    const fa = String(pct).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    return `با امیر اردکانی تمرین کن.\nبا کد من ${fa}٪ تخفیف می‌گیری:\n${code}\nhttps://amirardekani.com/form-fa.html?code=${encodeURIComponent(code)}`;
+  }
+  return `Train with Amir Ardekani. Use my code ${code} for ${pct}% off: https://amirardekani.com/form.html?code=${encodeURIComponent(code)}`;
+}
+function partnerWaUrl(r) { return 'https://wa.me/?text=' + encodeURIComponent(partnerText(r)); }
+// "1 friend joined · 10% off waiting for you": from the server's counts, and nothing until a friend has joined.
+function partnerNote(r) {
+  const n = Math.max(0, Math.round(Number(r.friends)) || 0), w = Math.max(0, Math.round(Number(r.waiting)) || 0), rew = partnerPct(r, 'reward');
+  if (!n) return '';
+  const left = w > 0 ? (w === 1 ? `${rew}% off waiting for you` : `${w} discounts of ${rew}% waiting for you`) : `your ${rew}% off is used`;
+  return `${n} friend${n === 1 ? '' : 's'} joined · ${left}`;
+}
+function playerPartnerHTML(p) {
+  if (!partnerOn(p)) return '';
+  const r = p.referral, code = String(r.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const line = `They get ${partnerPct(r, 'percent')}% off. You get ${partnerPct(r, 'reward')}% off your next cycle.`;
+  if (!code) {
+    return `<section class="pt-card" aria-label="Bring a partner"><span class="pt-k">Bring a partner</span><p class="pt-line">${esc(line)}</p>
+      <button type="button" class="cr-go pt-make" onclick="partnerMake(this)">Get your code</button><p class="pt-err" role="status"></p></section>`;
+  }
+  const note = partnerNote(r);
+  return `<section class="pt-card" aria-label="Bring a partner"><span class="pt-k">Bring a partner</span>
+    <div class="pt-code" dir="ltr">${esc(code)}</div>
+    <p class="pt-line">${esc(line)}</p>
+    <div class="pt-pair"><button type="button" class="pt-copy" onclick="partnerCopy(this)">Copy</button><a class="cr-go pt-wa" href="${esc(partnerWaUrl(r))}" target="_blank" rel="noopener">Send on WhatsApp</a></div>
+    ${_partnerSel ? `<p class="pt-sel" id="pt-sel" dir="auto">${esc(partnerText(r))}</p>` : ''}
+    ${note ? `<p class="pt-note" role="status">${esc(note)}</p>` : ''}</section>`;
+}
+// Get your code: my_partner_code({p_make: true}), then the card shows it. No signal keeps the button; a refusal says so in the card.
+async function partnerMake(btn) {
+  if (_partnerBusy || !btn) return;
+  const err = btn.parentElement && btn.parentElement.querySelector('.pt-err'), label = btn.textContent;
+  _partnerBusy = true; btn.disabled = true; btn.textContent = 'Getting your code…'; if (err) err.textContent = '';
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('my_partner_code', { p_make: true }), 15000); } catch (e) { r = null; }
+  _partnerBusy = false;
+  const back = words => { btn.disabled = false; btn.textContent = label; if (err) err.textContent = words; };
+  if (!r || _noAnswer(r)) { back('No signal. Tap again when you have signal.'); return; }
+  if (r.error || !r.data || !r.data.code) { back('That did not work. Try again.'); return; }
+  const c = crewPageGet('me');
+  if (c) { c.p.referral = Object.assign({}, r.data); crewPagesSave(); }
+  _playerForce = true; renderPlayerPage(); _playerForce = false;
+}
+window.partnerMake = partnerMake;
+// Copy: the same words Send on WhatsApp carries. The clipboard first, then the old way, then the words shown selected so a long press can copy them.
+function partnerCopy(btn) {
+  const c = crewPageGet('me'), r = c && c.p.referral;
+  if (!r || !r.code) return;
+  const t = partnerText(r);
+  const done = ok => {
+    if (ok) { _partnerSel = false; btn.textContent = 'Copied'; aaToast('Copied. Paste it to your friend.', { kicker: 'Bring a partner', ms: 3500 }); setTimeout(() => { if (btn.isConnected) btn.textContent = 'Copy'; }, 2500); return; }
+    _partnerSel = true; _playerForce = true; renderPlayerPage(); _playerForce = false;
+    const el = document.getElementById('pt-sel');
+    if (el) { try { const rg = document.createRange(); rg.selectNodeContents(el); const s = window.getSelection(); s.removeAllRanges(); s.addRange(rg); } catch (e) {} el.scrollIntoView({ block: 'center' }); }
+  };
+  const old = () => {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = t; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy'); ta.remove(); done(ok);
+    } catch (e) { done(false); }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => done(true), old);
+  else old();
+}
+window.partnerCopy = partnerCopy;
 // ── Step 4 · This cycle, Week Bars (Amir: "the workouts can be anything other than their cycles, they can do extra, it needs to show that as well") ──
 // One row per plan week: W1, a bar cut into the plan's own sessions (a filled piece is a session done), and the sessions BEYOND the plan as small
 // round dots after the bar with "+1" (a plan day done twice, a Library session, anything past the plan). A held week is one solid bar and says Held; the
@@ -15230,6 +15334,7 @@ function playerHTML(key, p, note) {
   let b = '';
   const tiles = playerTilesHTML(p, own, mk);
   if (tiles) b += `<h2 class="prog-sec">${own ? 'Your numbers' : esc(first) + "'s numbers"}</h2>${tiles}`;
+  if (own) b += playerPartnerHTML(p);      // Bring a partner (step 9): your page only, right after the numbers
   b += playerCycleHTML(key, p, own, mk);   // This cycle (step 4): the week bars, with the extra sessions as dots
   b += playerFactsHTML(key, p, own);       // Player facts (step 5)
   const ach = Array.isArray(p.achievements) ? p.achievements : [];

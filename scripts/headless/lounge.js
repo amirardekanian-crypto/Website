@@ -27,6 +27,8 @@
 // Step 8: First Serve (section 22): five steps in the one suggestion slot, the ring, the order and ticks, the slot's priority, the iPhone wait, blocked as done, what each tap does, THE PHONE'S BOX (a stand-in for
 // Notification.requestPermission: shut on load, on the line, on the sheet and on the toast, once inside the button's click), never a veteran, never in the demo or the preview, 14 days, steps that do not apply,
 // the guide, 320 px and dark. Section 23 takes its pictures.
+// Step 9: Bring a partner (section 24): a card on YOUR page after the numbers, Get your code, the code, Copy (clipboard, execCommand, the selected box), Send on WhatsApp (the code is in the link, English and the Farsi draft),
+// the friends line, no signal, a refusal, never anyone else's page, never under 13, the demo or the preview, a server without stage97, the guide, 320 px and dark. Section 25 takes its pictures.
 // `--only=14,15` runs just those sections (everything after a "// ── N." line is wrapped in on(N)).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
@@ -2005,6 +2007,173 @@ const on = n => !ONLY.length || ONLY.includes(n);
       await x.p.screenshot({ path: path.join(out, 'first-serve-sheet-' + (dark ? 'dark' : 'light') + '-390.png') });
       await x.ctx.close();
     }
+  }
+
+  // ── 24. Step 9 · Bring a partner (idea 69): a card on YOUR page, a code, "They get 10% off. You get 10% off your next cycle." ──────────────────────────────────────────────
+  // CONTRACT 8: crew_page() carries `referral` on your own page once the server has stage97 ({ code: null } before a code exists); my_partner_code({ p_make: true }) makes the code. No `referral`, no card.
+  const REF1 = (o = {}) => Object.assign({ code: 'ALEX24', percent: 10, reward: 10, friends: 0, waiting: 0, used: 0 }, o);
+  const WA_EN = 'Train with Amir Ardekani. Use my code ALEX24 for 10% off: https://amirardekani.com/form.html?code=ALEX24';
+  const ptOpen = async (o = {}) => {
+    const x = await open(browser, o);
+    await goCrew(x.p); await x.p.evaluate(() => openPlayer('me')); await x.p.waitForTimeout(700);
+    return x;
+  };
+  const ptCard = p => p.evaluate(() => {
+    const c = document.querySelector('#crewplayer-body .pt-card');
+    if (!c) return null;
+    const q = s => c.querySelector(s), t = e => e ? e.textContent.replace(/\s+/g, ' ').trim() : null;
+    return { k: t(q('.pt-k')), code: t(q('.pt-code')), line: t(q('.pt-line')), make: t(q('.pt-make')), copy: t(q('.pt-copy')),
+      wa: q('.pt-wa') ? { text: t(q('.pt-wa')), href: q('.pt-wa').getAttribute('href'), target: q('.pt-wa').target, rel: q('.pt-wa').rel } : null,
+      note: t(q('.pt-note')), err: t(q('.pt-err')), sel: t(q('#pt-sel')), makeDis: q('.pt-make') ? q('.pt-make').disabled : null, text: t(c) };
+  });
+  const waText = href => decodeURIComponent(String(href).replace(/^https:\/\/wa\.me\/\?text=/, ''));
+  if (on(24)) {
+    // no code yet: the line and one button, and nothing is made by looking
+    const a = await ptOpen({ stub: { partner: { code: null }, crewPages: { me: { cycle: wholeCycle(true) } } } });
+    let s = await ptCard(a.p);
+    C.check('your page with no code yet: a card "Bring a partner", what you both get, and ONE button, "Get your code"', !!s && s.k === 'Bring a partner' && s.line === 'They get 10% off. You get 10% off your next cycle.' && s.make === 'Get your code'
+      && s.code === null && s.copy === null && s.wa === null, JSON.stringify(s));
+    const ord = await a.p.evaluate(() => { const b = document.getElementById('crewplayer-body'), card = b.querySelector('.pt-card'), after = (x, y) => !!x && !!y && !!(x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING);
+      return { afterNumbers: after(b.querySelector('.pl-tiles'), card), beforeCycle: after(card, b.querySelector('.pl-cyc')), beforeFacts: after(card, b.querySelector('.pl-facts')), one: b.querySelectorAll('.pt-card').length }; });
+    C.check('…it sits right after "Your numbers", before This cycle and Player facts, once', ord.afterNumbers && ord.beforeCycle && ord.beforeFacts && ord.one === 1, JSON.stringify(ord));
+    C.check('…opening the page asks for no code (my_partner_code is not called until the button)', (await calls(a.p, 'my_partner_code')).length === 0);
+    await click(a.p, '#crewplayer-body .pt-make'); await a.p.waitForTimeout(500);
+    const mk = await calls(a.p, 'my_partner_code');
+    s = await ptCard(a.p);
+    C.check('"Get your code": my_partner_code({ p_make: true }) once, and the code is on the card in its own box', mk.length === 1 && mk[0].p_make === true && !!s && s.code === 'ALEX24', JSON.stringify([mk, s && s.code]));
+    C.check('…the button goes; Copy and Send on WhatsApp come; the line stays; with no friend yet there is no "joined" line', !!s && s.make === null && s.copy === 'Copy' && !!s.wa && s.wa.text === 'Send on WhatsApp' && s.line === 'They get 10% off. You get 10% off your next cycle.' && s.note === null, JSON.stringify(s));
+    C.check('…the WhatsApp link carries the code: wa.me, the English line with the code and the form link, opens outside the app', !!s && s.wa && /^https:\/\/wa\.me\/\?text=/.test(s.wa.href) && waText(s.wa.href) === WA_EN && s.wa.target === '_blank' && /noopener/.test(s.wa.rel), s && s.wa && waText(s.wa.href));
+    const kept = await a.p.evaluate(() => { const c = crewPageGet('me'); return c && c.p.referral && c.p.referral.code; });
+    C.check('…the code is kept with your page on the phone, and a second look shows it with no new call', kept === 'ALEX24', String(kept));
+    // Copy: the clipboard first
+    await a.p.evaluate(() => { window.__copied = []; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: t => { window.__copied.push(t); return Promise.resolve(); } } }); });
+    await click(a.p, '#crewplayer-body .pt-copy'); await a.p.waitForTimeout(300);
+    const cp = await a.p.evaluate(() => ({ copied: window.__copied, btn: document.querySelector('#crewplayer-body .pt-copy').textContent, sel: !!document.getElementById('pt-sel') }));
+    const tt = await toast(a.p);
+    C.check('Copy puts the same words on the clipboard (the code and the link), says Copied and shows no fallback box', cp.copied.length === 1 && cp.copied[0] === WA_EN && cp.btn === 'Copied' && !cp.sel, JSON.stringify(cp));
+    C.check('…and a toast says to paste it to your friend', !!tt && /Copied\. Paste it to your friend\./.test(tt.text || ''), JSON.stringify(tt));
+    // …no clipboard at all: the words are shown, selected, ready for a long press
+    await a.p.evaluate(() => { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: () => Promise.reject(new Error('no')) } }); document.execCommand = () => false; });
+    await click(a.p, '#crewplayer-body .pt-copy'); await a.p.waitForTimeout(500);
+    const fb = await a.p.evaluate(() => ({ box: (document.getElementById('pt-sel') || {}).textContent || '', selected: String(window.getSelection()), btn: document.querySelector('#crewplayer-body .pt-copy').textContent }));
+    C.check('Copy with no clipboard: the words appear in a box, selected so a long press copies them', fb.box === WA_EN && fb.selected.trim() === WA_EN && fb.btn === 'Copy', JSON.stringify(fb));
+    C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.p.screenshot({ path: path.join(out, 'partner-code-light-390.png') }).catch(() => {});
+    // leave the page and come back: the code is drawn from the copy at once
+    await a.p.evaluate(() => playerBack()); await a.p.waitForTimeout(300);
+    await a.p.evaluate(() => { openPlayer('me'); }); await a.p.waitForTimeout(150);
+    s = await ptCard(a.p);
+    C.check('coming back to your page: the code is there at once', !!s && s.code === 'ALEX24' && s.make === null, JSON.stringify(s));
+    await a.ctx.close();
+
+    // the friends line, from the server's counts
+    for (const [what, ref, want] of [
+      ['one friend, one discount waiting', REF1({ friends: 1, waiting: 1 }), '1 friend joined · 10% off waiting for you'],
+      ['three friends, two discounts waiting', REF1({ friends: 3, waiting: 2, used: 1 }), '3 friends joined · 2 discounts of 10% waiting for you'],
+      ['two friends, both discounts used', REF1({ friends: 2, waiting: 0, used: 2 }), '2 friends joined · your 10% off is used'],
+      ['nobody yet', REF1(), null]]) {
+      const x = await ptOpen({ stub: { partner: ref } });
+      const y = await ptCard(x.p);
+      C.check('the card with a code already made opens with it, no button, and ' + what + ': ' + (want ? '"' + want + '"' : 'no "joined" line'), !!y && y.code === 'ALEX24' && y.make === null && y.note === want, JSON.stringify(y && [y.code, y.note]));
+      await x.ctx.close();
+    }
+    // no signal on the tap: the button comes back and says so; then it works
+    const o = await ptOpen({ stub: { partner: { code: null } } });
+    await o.p.evaluate(() => { window.__STUB.mode = 'offline'; });
+    await click(o.p, '#crewplayer-body .pt-make'); await o.p.waitForTimeout(500);
+    s = await ptCard(o.p);
+    C.check('no signal on "Get your code": the button is back, enabled, with a plain line, and no code', !!s && s.make === 'Get your code' && s.makeDis === false && /^No signal\./.test(s.err || '') && s.code === null, JSON.stringify(s));
+    await o.p.evaluate(() => { window.__STUB.mode = 'online'; });
+    await click(o.p, '#crewplayer-body .pt-make'); await o.p.waitForTimeout(500);
+    s = await ptCard(o.p);
+    C.check('…and with signal the same button makes the code (the offline try made none)', !!s && s.code === 'ALEX24' && (await calls(o.p, 'my_partner_code')).length === 2, JSON.stringify(s && s.code));
+    await o.ctx.close();
+    // a refusal
+    const r = await ptOpen({ stub: { partner: { code: null }, partnerErr: 'partner:no_programme' } });
+    await click(r.p, '#crewplayer-body .pt-make'); await r.p.waitForTimeout(500);
+    s = await ptCard(r.p);
+    C.check('a refusal from the server: "That did not work. Try again.", the button back, no code', !!s && s.err === 'That did not work. Try again.' && s.make === 'Get your code' && s.makeDis === false && s.code === null, JSON.stringify(s));
+    await r.ctx.close();
+    // a double tap makes one call
+    const dd = await ptOpen({ stub: { partner: { code: null }, partnerDelay: 400 } });
+    await dd.p.evaluate(() => { const b = document.querySelector('#crewplayer-body .pt-make'); b.click(); b.click(); }); await dd.p.waitForTimeout(900);
+    C.check('two quick taps make one call', (await calls(dd.p, 'my_partner_code')).length === 1);
+    await dd.ctx.close();
+
+    // never on anyone else's page, even if a server sent the key
+    const el = await open(browser, { stub: { partner: REF1(), crewPages: { [CK.mina]: { referral: { code: 'MINA24', percent: 10, reward: 10, friends: 2, waiting: 1, used: 0 } } } } });
+    await goCrew(el.p); await shown(el.p, CK.mina);
+    C.check('never on anyone else\'s page: no card and no code, even when the server sends one for her', !(await el.p.$('#crewplayer-body .pt-card')) && !/MINA24/.test(await el.p.evaluate(() => document.getElementById('crewplayer-body').textContent)));
+    await el.ctx.close();
+    // under 13 and a member who said no
+    const u = await ptOpen({ b: { me: { under13: true, can_post: false } }, stub: { partner: REF1() } });
+    C.check('under 13: no card on their own page, even if the key arrives', !(await ptCard(u.p)));
+    await u.ctx.close();
+    const nm = await ptOpen({ b: { me: { answer: 'no', can_post: false } }, stub: { partner: { code: null } } });
+    s = await ptCard(nm.p);
+    C.check('someone who is not in the crew still has the card on their own page (a code is a discount, not the crew)', !!s && s.make === 'Get your code', JSON.stringify(s));
+    await nm.ctx.close();
+    // the demo and the coach's preview
+    const dm = await ptOpen({ stub: { partner: REF1() } });
+    const gate = await dm.p.evaluate(() => { const p = { referral: { code: 'ALEX24' } }, on0 = partnerOn(p); window.IS_PREVIEW = true; const pv = partnerOn(p); window.IS_PREVIEW = false; window.IS_DEMO = true; const de = partnerOn(p); window.IS_DEMO = false;
+      return { on0, pv, de, under: partnerOn({ referral: { code: 'X1' }, under13: true }), none: partnerOn({}), html: playerPartnerHTML({}) }; });
+    C.check('the card is for a real athlete: not in the coach\'s preview, not in the demo, not under 13, not without the key', gate.on0 && !gate.pv && !gate.de && !gate.under && !gate.none && gate.html === '', JSON.stringify(gate));
+    await dm.ctx.close();
+    // a server with the Lounge but not stage97: no `referral`, no card, nothing else changes
+    const n97 = await ptOpen({ stub: { partner: undefined } });
+    C.check('a server without partner codes (stage96 only): no card, and the rest of your page is as it was', !(await ptCard(n97.p)) && (await tiles(n97.p)).length >= 3 && !!(await n97.p.$('#crewplayer-body .pl-facts')));
+    C.check('…and no page errors', !n97.p.errs.length, n97.p.errs.join(' | '));
+    await n97.ctx.close();
+
+    // Farsi: the athlete's language is the intake form's (`athlete.lang`); the message points at the Farsi form. The words are a DRAFT for Amir to read.
+    const PF = H.fixture(); PF.athlete.lang = 'fa';
+    const fa = await ptOpen({ opts: { prog: PF }, stub: { partner: REF1() } });
+    s = await ptCard(fa.p);
+    const ft = s && s.wa ? waText(s.wa.href) : '';
+    C.check('an athlete whose language is Farsi: the message is the Farsi draft, with the code and the link to form-fa.html on their own lines', /form-fa\.html\?code=ALEX24/.test(ft) && /\nALEX24\n/.test(ft) && /[؀-ۿ]/.test(ft) && /۱۰٪/.test(ft) && !/Train with Amir/.test(ft), JSON.stringify(ft));
+    C.check('…the page itself stays English (COM-1), and Copy gives the same Farsi words', s && s.line === 'They get 10% off. You get 10% off your next cycle.' && await (async () => {
+      await fa.p.evaluate(() => { window.__copied = []; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: t => { window.__copied.push(t); return Promise.resolve(); } } }); });
+      await click(fa.p, '#crewplayer-body .pt-copy'); await fa.p.waitForTimeout(250);
+      return (await fa.p.evaluate(() => window.__copied[0])) === ft;
+    })());
+    await fa.ctx.close();
+
+    // the guide names it only while the card is on the page
+    const gx = await ptOpen({ stub: { partner: REF1() } });
+    const gtxt = await gx.p.evaluate(() => buildAppGuideCards());
+    const gpart = (gtxt.match(/<p><strong>Bring a partner<\/strong>[\s\S]*?<\/p>/) || [''])[0];
+    C.check('the guide has a paragraph Bring a partner while the card is on the page: Get your code, 10% each way, Send on WhatsApp, Copy, and that it earns no XP', /Get your code/.test(gpart) && /gets 10% off/.test(gpart) && /You get 10% off your next cycle/.test(gpart) && /Send on WhatsApp/.test(gpart) && /<strong>Copy<\/strong>/.test(gpart) && /earns no XP/.test(gpart), gpart.slice(0, 120));
+    C.check('…plain words: no em-dash, no semicolon', gpart && !/[—;]/.test(gpart.replace(/&[a-z]+;/g, '')), gpart.slice(0, 60));
+    await gx.ctx.close();
+    const gn = await ptOpen({ stub: { partner: undefined } });
+    C.check('…and it is not in the guide when the server has no partner codes', !/Bring a partner/.test(await gn.p.evaluate(() => buildAppGuideCards())));
+    await gn.ctx.close();
+
+    // 320 px and dark
+    const nr = await ptOpen({ opts: { w: 320, h: 640 }, stub: { partner: REF1({ friends: 1, waiting: 1 }) } });
+    const m = await nr.p.evaluate(() => { const r = n => document.querySelector(n).getBoundingClientRect(), c = r('.pt-card'); return { sw: document.documentElement.scrollWidth, iw: innerWidth, right: Math.round(c.right), wa: Math.round(r('.pt-wa').right), codeH: Math.round(r('.pt-code').height), waH: Math.round(r('.pt-wa').height), copyH: Math.round(r('.pt-copy').height) }; });
+    C.check('320 px: the card and both buttons fit, nothing scrolls sideways, the buttons are 44 px or more', m.sw <= m.iw && m.right <= m.iw && m.wa <= m.right && m.waH >= 44 && m.copyH >= 44, JSON.stringify(m));
+    await nr.ctx.close();
+    const dk = await ptOpen({ opts: { dark: true }, stub: { partner: REF1({ friends: 1, waiting: 1 }) } });
+    const dc = await dk.p.evaluate(() => { const c = document.querySelector('.pt-card'), cs = getComputedStyle(c), code = getComputedStyle(c.querySelector('.pt-code')); return { bg: cs.backgroundColor, ink: code.color, codeBg: code.backgroundColor }; });
+    C.check('dark mode: the card takes the dark row colour and the code is light on its field', dc.bg !== 'rgb(255, 255, 255)' && /^rgb\((2[0-9]{2}|1[5-9][0-9])/.test(dc.ink), JSON.stringify(dc));
+    await dk.p.screenshot({ path: path.join(out, 'partner-code-dark-390.png') }).catch(() => {});
+    await dk.ctx.close();
+  }
+
+  // ── 25. the pictures for step 9 (390 px, light): the card before a code and after ───────────────────────────────────────────────────────────────────────────────────────────
+  if (on(25)) {
+    const b = await ptOpen({ stub: { partner: { code: null } } });
+    await b.p.evaluate(() => document.querySelector('.pt-card').scrollIntoView({ block: 'center' })); await b.p.waitForTimeout(250);
+    await b.p.screenshot({ path: path.join(out, 'partner-card-before-light-390.png') });
+    await click(b.p, '#crewplayer-body .pt-make'); await b.p.waitForTimeout(500);
+    await b.p.evaluate(() => document.querySelector('.pt-card').scrollIntoView({ block: 'center' })); await b.p.waitForTimeout(250);
+    await b.p.screenshot({ path: path.join(out, 'partner-card-after-light-390.png') });
+    await b.ctx.close();
+    const c = await ptOpen({ stub: { partner: REF1({ friends: 1, waiting: 1 }) } });
+    await c.p.evaluate(() => document.querySelector('.pt-card').scrollIntoView({ block: 'center' })); await c.p.waitForTimeout(250);
+    await c.p.screenshot({ path: path.join(out, 'partner-card-friend-light-390.png') });
+    await c.ctx.close();
   }
 
 
