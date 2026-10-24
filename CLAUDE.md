@@ -80,6 +80,7 @@ section. A reference `INDEX.md` is one line per section — read the index, open
 | **Apply a database stage** | [`docs/rules/server-and-data.md`](docs/rules/server-and-data.md) + that stage's procedure from [`career/PROCEDURES.md`](career/PROCEDURES.md) (Career Mode) or the file's own header; then the snapshot rule in [`scripts/restore/README.md`](scripts/restore/README.md) |
 | **Anything Career Mode** | [`docs/rules/career.md`](docs/rules/career.md), then [`career/CAREER_MODE.md`](career/CAREER_MODE.md) for the rule GAME-n and [`career/PROCEDURES.md`](career/PROCEDURES.md) for the function |
 | **Reminders / push** | [`docs/rules/push.md`](docs/rules/push.md) |
+| **Change the Crew** (the Bell, Player Page, faces, cheers, partner codes) | [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) + sections 54 and 55 of [`PROGRAM-APP.md`](PROGRAM-APP.md) (the Players' Lounge) + the header of `supabase/stage96_players_lounge.sql`; then `node scripts/headless/lounge.js` and `crew.js` |
 | **Change a public page's design or copy** | [`docs/rules/site.md`](docs/rules/site.md) (the style guard is in it) + the page review in [`Content/site-audit/`](Content/site-audit/) if there is one |
 | **Write or change an article** | `/article` + [`docs/rules/seo.md`](docs/rules/seo.md) + [`.claude/SEO-SOP.md`](.claude/SEO-SOP.md) → *The SEO gate* + [`Content/CONTENT-PARITY.md`](Content/CONTENT-PARITY.md) |
 | **The Farsi course or testing app** | [`docs/rules/site.md`](docs/rules/site.md) + [`FARSI-PRODUCTS.md`](FARSI-PRODUCTS.md) |

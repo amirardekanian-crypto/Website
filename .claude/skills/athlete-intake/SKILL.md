@@ -52,6 +52,9 @@ Grouped into one round of questions, the genuine gaps to close:
   (+ any competition / season date)
 - **Athlete type**: general-fitness OR sport-performance (+ sport) — decides whether SFR or
   sport-transfer leads exercise selection in design
+- **Dominant hand, and for padel the side they play** (racket sports only; the form does not ask it) — design
+  uses it for the rotational and one-sided work and the serving shoulder. Once they are in the app they can
+  set it themselves under Your game (`public.athlete_profile`, read by /program-design as `ctx.game`).
 - **Baseline lifts** — the form asks them but they're *optional*; if blank, plan to gauge
   strength by watching them train (trust the bar over the résumé)
 - **Red-flag triage** on any reported pain — if the injury description reads sharp /

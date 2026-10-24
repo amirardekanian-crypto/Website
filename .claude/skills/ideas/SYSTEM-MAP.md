@@ -66,7 +66,17 @@ login, new signup, no session for 7+ days, silent on Proof, ready to upgrade (`r
 switches (habits, workout, crew, cycle, stage84-87); crew replies have no push. program.html has no welcome-back
 screen and nothing compares habits with readiness.
 
-**Crew, checked 2026-10-24 (round 6):** program.html's Crew tab (`renderCrew`) = the week band (initials, a door to *In the
+**Crew since the Players' Lounge went LIVE (2026-10-24, stage96 + stage97, sw v223; docs/ref/program-app/54 + 55):** every
+crew name opens a **Player Page** (`screen-crewplayer`, `openPlayer(ck)`, server `crew_page()`), and every person carries `ck`
+(crew_key) and `fv` (face version) in get_bell, the board, replies and the Open. Faces (`crew_faces`, not backed up), the Cheer
+to a person (`crew_cheers`, all-time `crew_cheer_tally` = cheers + likes received), band faces with a held ring and New Balls,
+Your game (`athlete_profile`, backed up, read by /program-design as `ctx.game`), the face stack on achievements
+(`crew_award_likes`), @names (`crew_mentions`) with aimed pushes (cheer, reply, mention), the cycle bars (others see this week
+only), First Serve on Home (push.md: three ask moments), partner codes (`affiliates.kind='athlete'`, `referral_credits`, 10% for
+the friend and 10% off one cycle per friend for the member), the stamp on photo posts, the Open Wall. The paragraph below is
+the state BEFORE the build, kept for its traps.
+
+**Crew, checked 2026-10-24 (round 6, before the build):** program.html's Crew tab (`renderCrew`) = the week band (initials, a door to *In the
 crew*), honours, the Monthly Open card, the Bell (posts with photos, folded session lines, moment lines, replies), *This season*.
 There is **no page per person**: a name leads nowhere, and *In the crew* lists names with a level only. Posts, photos and likes are
 deleted after 7 days (stage81's sweep, `line_day < current_date - 7`). Faces are initials (`crewInitials`); the only photo picker is

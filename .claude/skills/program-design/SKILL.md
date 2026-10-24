@@ -107,6 +107,13 @@ change before I build?"* before writing exercises.
      exactly what assemble's local copy and fingerprint need, so nothing is looked up twice.
      `ctx.row.notes` lists last cycle's card titles. `ctx.sessions.minutes_by_day` is the real
      average session length per day over the last six weeks (STEP 2's time check).
+   - `ctx.game` is **Your game**, the athlete's own answers in the app (2026-10-24, the Players' Lounge; null until
+     they fill it in): `sports`, `hand`, `backhand`, `side` (padel / pickleball / beach tennis), `plays_at`
+     (fun / club / competition), `club`, `training_for`, `working_on`. The **dominant hand** decides which side
+     the rotational and one-sided work favours or balances and which shoulder serves (overhead volume, shoulder
+     care); `side` tells which way a padel player turns and reaches most; `working_on` is the athlete's own goal
+     in one line, worth a sentence in the cycle message when it fits. It is their words, not a coaching fact: when
+     it disagrees with the intake or the log, the log wins and the gap is a question for Amir.
    - **No exercise catalogue comes with it** (2026-10-17; Amir: *"i want the program writer to write
      the best program possible, use new exercises if needed, and then check spine"*). Until then Q1
      carried the whole Spine, 39,000 characters ordered by SFR, and reading it before choosing anchored

@@ -45,7 +45,10 @@ select jsonb_build_object(
                   regexp_matches(l.body, '\n(## [^\n]+)', 'g') m where l.athlete_id = '<id>'),
   'cycle_names_in_use', (select jsonb_agg(distinct c->>'name') from public.programs p,
                          jsonb_array_elements(coalesce(p.data->'cycles', '[]'::jsonb)) c),
-  'qualities', (select jsonb_agg(id order by sort) from public.qualities where status = 'approved')
+  'qualities', (select jsonb_agg(id order by sort) from public.qualities where status = 'approved'),
+  -- Your game (stage96, 2026-10-24): what the athlete wrote about their sport in the app (sports, hand, backhand, side,
+  -- plays_at, club, training_for, working_on, ig). null until they fill it in.
+  'game', (select to_jsonb(g) - 'athlete_id' - 'updated_at' - 'ig' from public.athlete_profile g where g.athlete_id = '<id>')
 ) as ctx;
 
 -- ─── Q2 · the coaching log slice alone (what /program-edit Step 0 reads) ─────────────────────

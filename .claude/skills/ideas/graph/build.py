@@ -231,6 +231,17 @@ IDEAS = [
   coach="The cheapest win in the system, in the panel you already read.",
   mvp="The row and the line, nothing for the athlete to see.",
   adv="After a rain delay, a softer line."),
+ dict(n=70, name="New Balls", sub="A new crew member is marked NEW for a week, and their first cheers are their welcome", layer="Grown along the way", grown="65",
+  grown_url="https://claude.ai/artifact/X5L2WMkayoxx8eioc85SJV#s3",
+  stages=["Communication","Feedback"], needs=[], cost="None. The server already knows the day they said yes.",
+  chain=["Joins the crew","NEW under their face for 7 days","Joined this week. Say hello.","Cheers","Their page"],
+  what="For a member's first 7 days in the crew, their face in the week band says NEW and their page says \"Joined this week. Say hello.\" above the Cheer button. Grew out of round 6's #65 The Lineup (the faces in the band), in the Players' Lounge plan.",
+  problem="A join was one line on the Bell that scrolled away. Nobody knew who was new, so nobody said hello, and the first week in a room decides whether someone stays.",
+  how="crew_consent.first_yes_at within 7 days sets `new` beside the person in get_bell's crew list.",
+  athlete="Your first week, people cheer you before you have done anything to earn it.",
+  coach="Every join becomes the crew's first conversation with that person, with no time from you.",
+  mvp="The NEW mark and the line on the page.",
+  adv="A Courtside line on day 3 if nobody has cheered a new member yet."),
 ]
 
 STAGES = ["Assessment","Decision making","Exercise selection","Programming","Execution","Feedback",
@@ -254,6 +265,7 @@ STATUS = {
  16: ("Parked 24 Sep", None),
  13: ("Picked 24 Oct as #53, report first", "https://claude.ai/artifact/8VP8Q1B44uuYjrb88ayHvb#patterns"),
  12: ("Built 24 Sep as /cycle-report", "https://claude.ai/artifact/JY1eG1RNYHTLvYpFCwcHBx"),
+ 70: ("Built and live 24 Oct", "https://claude.ai/artifact/X5L2WMkayoxx8eioc85SJV"),
 }
 
 def chips(i):
