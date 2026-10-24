@@ -5275,7 +5275,7 @@
   .cyc-share-go:active { transform: scale(.98); }
 
   /* 3. The moment: the Welcome's cover and sheet, a burst of court lines from the cover's middle, the card itself small on the paper. */
-  .hl-moment { position: fixed; top: 0; bottom: 0; left: var(--app-gutter); right: var(--app-gutter); z-index: 200; display: flex; flex-direction: column; overflow-y: auto;
+  .hl-moment { position: fixed; top: 0; bottom: 0; left: var(--app-gutter); right: var(--app-gutter); z-index: 211; display: flex; flex-direction: column; overflow-y: auto;
     background: var(--paper); animation: fadeUp 0.35s ease both; }
   .hl-m-hero { position: relative; isolation: isolate; flex: none; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; min-height: clamp(220px, 34vh, 340px);
     padding: calc(env(safe-area-inset-top, 0px) + 64px) var(--g) 48px; background: var(--hero); color: var(--on-accent); }
@@ -12715,7 +12715,7 @@ function rwMomentFor(m) {
 // kind per open (D7). 'done' (the answer to a session just finished): the biggest full-screen reward that session earned, once the finished
 // card is on screen. 'open' (any other fresh answer): the first waiting one, unless a moment already opened in this run or a session is under
 // way. What does not open stays untold and unseen, so it comes at the next open (never lost; the server turns it into a line after 14 days).
-// A row is marked seen BEFORE it is shown, then told.
+// A row is marked seen, then told, once its moment is on screen and on top.
 function maybeRewardMoment(reason, day) {
   if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || !DATA || !catalogueOnT()) return;
   if (!(CAREER_T.at >= ((window.performance && performance.timeOrigin) || 0))) return;   // a cached answer is never a trigger
@@ -12734,8 +12734,12 @@ function maybeRewardMoment(reason, day) {
   if (!m) return;
   const open = () => {
     if (document.querySelector('.wel, .hl-moment, .finish-rate:focus-within')) return;
-    if (!rwSeenAdd([m.award_id].concat((m.also || []).map(a => a && a.award_id).filter(Boolean)))) return;   // marked seen BEFORE it shows; storage blocked: never every open
+    // It draws above any open sheet (z-index 211 over the sheet's 210). Marked seen and told only once it is on screen AND on top (B6): if something
+    // still covers it, or storage is blocked, it is taken down again untouched and waits for the next open.
     openMoment(Object.assign(rwMomentFor(m), { onClose: () => { /* the next one waits for the next trigger: no chain */ } }));
+    const el = document.querySelector('.hl-moment');
+    const hit = el && document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
+    if (!el || !hit || !el.contains(hit) || !rwSeenAdd([m.award_id].concat((m.also || []).map(a => a && a.award_id).filter(Boolean)))) { if (el) el.remove(); navSync(); return; }
     rwTold([m.award_id]);
   };
   if (reason === 'done') setTimeout(open, 700); else open();   // 'done': after the finished card has scrolled in
