@@ -14975,10 +14975,14 @@ function ncSpark(entries) {
     <polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="${last[0]}" cy="${last[1]}" r="3.2" fill="currentColor"/></svg>`;
 }
-// "Barbell Back Squat" → "Back Squat" for the short name on the Records row (Progress).
+// "Barbell Back Squat" → "Back Squat" for the short name on the Records row (Progress). A name that is long (over 22 letters) loses its LAST WORDS,
+// never half a word: "Romanian Deadlift" is whole, "Trap Bar Romanian Deadlift Hold" becomes "Trap Bar Romanian…" (Love All B, 2026-10-24).
 function shortLift(name) {
   const t = String(name || '').replace(/^(barbell|dumbbell|machine|cable|smith machine)\s+/i, '');
-  return t.length > 13 ? t.slice(0, 12).trim() + '…' : t;
+  if (t.length <= 22) return t;
+  const w = t.split(/\s+/);
+  while (w.length > 1 && w.join(' ').length > 20) w.pop();
+  return w.join(' ').slice(0, 20).trim() + '…';
 }
 
 // A tiny sparkline for a lift's estimates. Flat when there is only one point.

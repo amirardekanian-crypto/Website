@@ -38,9 +38,36 @@ async function a(browser) {
   }
 }
 
+// ═════════ b: shortLift ═════════
+async function b(browser) {
+  const day = n => ymd(new Date(Date.now() - n * DAY));
+  const rec = (lift, kg, n) => ({ lift, kg, w: String(kg - 10), r: '6', rpe: 7, d: day(n), t: Date.now() - n * DAY });
+  for (const [lift, whole] of [['Barbell Romanian Deadlift', 'Romanian Deadlift'], ['Dumbbell Single-Leg Romanian Deadlift Hold', null]]) {
+    for (const [w, h] of [[390, 844], [320, 640]]) {
+      const seed = { _1rm: [rec(lift, 100, 20), rec(lift, 110, 10), rec(lift, 120, 2)] };
+      const { ctx, p } = await H.openProgram(browser, { w, h, seed });
+      await p.evaluate("goTo('plan')"); await p.waitForTimeout(700);
+      const r = await p.evaluate(() => {
+        const q = s => [...document.querySelectorAll(s)].map(e => e.textContent.replace(/\s+/g, ' ').trim());
+        return { tr: q('.tr-n'), door: q('#ceiling-row-wrap .hrow-v small'), side: document.documentElement.scrollWidth - window.innerWidth };
+      });
+      await p.evaluate("goTo('ceiling')"); await p.waitForTimeout(600);
+      const cov = await p.evaluate(() => document.querySelector('.screen.active .ceil-board').innerText.replace(/\s+/g, ' '));
+      const seen = r.tr.concat(r.door.map(x => x.split(' · ')[0]));
+      const full = lift.replace(/^dumbbell\s+/i, '').replace(/^barbell\s+/i, '');
+      const okWord = x => x === full || (x.endsWith('…') && full.startsWith(x.slice(0, -1)) && (full[x.length - 1] === ' ' || full[x.length - 1] === undefined));
+      t.check(`b ${w}: "${lift}" is drawn on Progress (card and Records row)`, seen.length >= 1, JSON.stringify(r));
+      t.check(`b ${w}: ${whole ? 'a name that fits is whole (' + whole + ')' : 'a long name loses whole words, never half a word'}`, whole ? seen.every(x => x === whole) && cov.includes(whole.toUpperCase()) || cov.includes(whole) : seen.every(okWord), JSON.stringify([seen, cov]));
+      t.check(`b ${w}: no sideways scroll, no page errors`, r.side <= 0 && p.errs.length === 0, JSON.stringify([r.side, p.errs]));
+      await ctx.close();
+    }
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await a(browser);
+  await b(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
