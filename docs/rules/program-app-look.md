@@ -122,7 +122,8 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   likes on a reply. **A crew post is written once however slow the line**: the phone makes one key per draft and sends it with every attempt, and the
   server hands back the post it already wrote rather than writing a second.
   **Home's one crew invitation is a PICKED LINE, not a door row** (2026-10-20): it uses the Library suggestion's slot and grammar, the week's own
-  suggestion wins that slot when both want it, and it goes for good the first time Crew is opened (`<id>_crewinv`). Home still carries no door row of
+  suggestion wins that slot when both want it, **except that First Serve comes first during an athlete's first two weeks** (Amir, 2026-10-24: its one line
+  at a time sits in the same slot until the five steps are done), and it goes for good the first time Crew is opened (`<id>_crewinv`). Home still carries no door row of
   its own.
 - **Dark mode is the athlete's choice** (Amir, 2026-09-27: *"Let the client choose dark mode"*): both apps start
   light and switch only on the athlete's tap; neither follows the phone's setting.

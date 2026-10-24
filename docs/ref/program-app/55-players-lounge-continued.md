@@ -112,3 +112,19 @@ Amir kept the card he already has and picked a stamp for crew photos. Nothing in
 | `crewShareCard(id)` / `crewPostSpec(it)` / `crewPhotoData(id)` / `hlUsePhoto(url, w, h)` | Share on your photo, its card, the photo as a data URL, the card's photo ground. |
 
 **Tests.** `lounge.js` section 26: Share my card opens the player card (the same spec as Progress's, no other name), no button without a profile, in the preview or on someone else's page; the stamp on a full post, with some parts missing, on an old post, never on a plain photo post or on a server without stage96, inside the photo and in capitals, the viewer still opens; Share on your own session photo only, with the post's own card and the photo as its ground; what Tell the crew sends in each case (held, no clock, six hours, a long name, a day with a title, no stage96, no week closed); the guide; 320 px and dark mode. Section 27 takes the pictures. `stub.js`'s `crew_post` keeps from `p_session` what stage96 keeps.
+
+## Step 11 · The Open wall (idea 67, direction A "Tiles")
+
+**What.** The Monthly Open's board, on Crew, is two columns of tiles (`crewOpenTile()`): the place in small mono, the face (46 px, `crewFace(p, 'tile')`), the result as the big figure with its unit small beside it, and the name. Yours is outlined in mint and reads *You*. The first 8 are drawn; with more, **All 14 ›** opens the whole board as a list in a sheet (`openCrewOpenList()`, a wrapped sheet opener, so ‹ Back works over another sheet): place, face, name and result on every row, yours marked. Your own tile is carried in after the eight when you are further down (still marked with your true place, the rule the rows had). Every tile and every row opens that person's page (a button through `crewDoor()`, yours opens your page); an athlete under 13 gets the same tiles and no door.
+
+**What did not change.** The clay door to WhatsApp (*Send Amir your result* / *Send a better one*), the line *Your result: ... Beat it and send me the new one.*, *Share your result* and the empty board's *Nobody has put a result up yet. Be first.* are exactly as they were. The Open's share card still carries only your own result, your place and the size of the field: **a card never names another athlete**, and none of this goes into a share card. Nothing here pays XP (GAME-6).
+
+**Without stage96** the board is the rows it always was, five of them and yours, with *Show all 9* opening them in place (`crewOpenAll()` decides by `crewPagesOn()`). `crew.js` holds that path, unchanged.
+
+| function | job |
+|---|---|
+| `crewOpenHTML()` | the card; the tiles when `crewPagesOn()`, else the rows. |
+| `crewOpenTile(r, unit)` | one tile. |
+| `openCrewOpenList()` / `crewOpenGo(ck)` / `crewOpenAll()` | the list sheet, a row's tap (closes the sheet, opens the page), the button. |
+
+**Tests.** `lounge.js` section 28: the grid and its order, two across, the face, the place, the figure and the name in order, the mint outline, the picture on a tile whose person has a face, the door and the line under the tiles, a tile opening a page and ← coming back, your own tile, more than eight (you inside, you outside, exactly eight, nine, one entry), the list and its rows, a row opening a page, ‹ Back over another sheet, an empty board, not in the crew, under 13, a server without stage96, the share card untouched, 320 px with a long name and unit, dark mode, the guide. Section 29 takes the pictures.

@@ -31,6 +31,7 @@
 // the friends line, no signal, a refusal, never anyone else's page, never under 13, the demo or the preview, a server without stage97, the guide, 320 px and dark. Section 25 takes its pictures.
 // Step 10: the cards (section 26): Share my card opens the player card Progress has, the stamp on a session photo (the parts a post has, an old post, never on a plain photo), Share on your own session photo with that photo as
 // the card's ground, what Tell the crew sends (title, mins, held), the guide. Section 27 takes its pictures.
+// Step 11: the Open wall (section 28): tiles, your mint outline, the first 8 and All 14 ›, the list sheet, a tile opens the page, a server without stage96 keeps the rows, the card names nobody else. Section 29 takes its pictures.
 // `--only=14,15` runs just those sections (everything after a "// ── N." line is wrapped in on(N)).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
@@ -2374,6 +2375,167 @@ const on = n => !ONLY.length || ONLY.includes(n);
       }
       await x.ctx.close();
     }
+  }
+
+  // ── 28. Step 11 · the Open wall (idea 67): the board as two columns of tiles ────────────────────────────────────────────────────────────────────────────────────────────────
+  // frag-s11 A: a tile is the place, the face, the result big and the name; yours is outlined in mint; the first 8, then "All 14 ›" which opens the whole board as a list; every tile opens that person's page.
+  // The clay door to WhatsApp and the line under it stay as they were. With no stage96 the board is the rows it always was (crew.js holds those). A card never names another athlete: none of this goes on a share card.
+  const WALL_NAMES = ['Reza K.', 'Ehsan A.', 'Mina S.', 'Sara T.', 'Omid P.', 'Leila M.', 'Ali B.', 'Nima F.', 'Dara H.', 'Kian R.', 'Yasi G.', 'Pouya L.', 'Roya D.', 'Tara N.'];
+  const WALL_CK = { 'Reza K.': CK.reza, 'Mina S.': CK.mina, 'Sara T.': CK.sara, 'Omid P.': CK.omid, 'Leila M.': CK.leila, 'Ali B.': CK.ali1 };
+  const wallBoard = (n, meAt, o = {}) => Array.from({ length: n }, (_, i) => { const me = i + 1 === meAt, nm = me ? 'Alex R.' : WALL_NAMES[i % WALL_NAMES.length];
+    return { who: nm, value: 200 - i * 7, place: i + 1, me, ck: me ? CK.alex : (WALL_CK[nm] || ck(40 + i)), fv: (o.fv && o.fv[me ? CK.alex : (WALL_CK[nm] || '')]) || null }; });
+  const wallOpen = async (n, meAt, o = {}) => {
+    const b = bell(o.b || {});
+    const board_ = o.board || wallBoard(n, meAt, o), mine = board_.find(r => r.me);
+    b.open = { id: 'aaaaaaaa-0000-4000-8000-000000000084', title: 'Wall Sit', how: 'Back to the wall, knees at 90. Send me the clip.', unit: o.unit === undefined ? 'seconds' : o.unit, better: 'high', board: o.noBoard ? [] : board_,
+      mine: mine ? { value: mine.value, day: today } : (o.mine || null) };
+    const x = await open(browser, { bell: b, opts: o.opts, stub: o.stub });
+    if (o.faces) await putFaces(x.p, o.faces);
+    await goCrew(x.p); await x.p.waitForTimeout(o.faces ? 900 : 300);
+    return x;
+  };
+  const wallState = p => p.evaluate(() => {
+    const c = document.querySelector('#screen-crew .cr-open'), g = c && c.querySelector('.cr-ob'), t = [...document.querySelectorAll('#screen-crew .cr-tiles .cr-ob-r')];
+    const r = e => { const b = e.getBoundingClientRect(); return { left: Math.round(b.left), top: Math.round(b.top + scrollY), w: Math.round(b.width), h: Math.round(b.height) }; };
+    return { grid: !!g && g.classList.contains('cr-tiles'), cols: g ? getComputedStyle(g).gridTemplateColumns.split(' ').length : 0, rows: g ? [...g.querySelectorAll('.cr-ob-r')].length : 0,
+      tiles: t.map(e => ({ tag: e.tagName, me: e.classList.contains('me'), place: (e.querySelector('.p') || {}).textContent, name: (e.querySelector('.n') || {}).textContent, v: (e.querySelector('.v') || {}).textContent,
+        face: !!e.querySelector('.cr-tf'), order: [...e.children].map(k => k.className.split(' ')[0]).join(','), pos: r(e), pic: !!e.querySelector('.cr-tf > img.fc-img') })),
+      more: ((c && c.querySelector('.cr-o-more')) || {}).textContent || '', go: c ? (c.querySelector('.cr-o-go') || {}).textContent : '', goTop: c && c.querySelector('.cr-o-go') ? r(c.querySelector('.cr-o-go')).top : 0,
+      gridBottom: g ? r(g).top + r(g).h : 0, mine: ((c && c.querySelector('.cr-o-mine')) || {}).textContent || '', share: !!(c && c.querySelector('.cr-o-share')), none: !!(c && c.querySelector('.cr-o-none')),
+      href: c && c.querySelector('.cr-o-go') ? c.querySelector('.cr-o-go').getAttribute('href') : '', sw: document.documentElement.scrollWidth, iw: innerWidth };
+  });
+  const tapTile = (p, name) => p.evaluate(n => { const e = [...document.querySelectorAll('#screen-crew .cr-tiles .cr-ob-r')].find(x => x.querySelector('.n').textContent === n); if (!e) return false; e.click(); return true; }, name);
+  const listState = p => p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), eyebrow: (document.querySelector('#hist-overlay .readiness-eyebrow') || {}).textContent, title: (document.querySelector('#hist-overlay .readiness-title') || {}).textContent,
+    sub: (document.querySelector('#hist-overlay .readiness-sub') || {}).textContent, back: !!document.querySelector('#hist-overlay .sheet-back'),
+    rows: [...document.querySelectorAll('#hist-overlay .ol-r')].map(r => ({ tag: r.tagName, me: r.classList.contains('me'), p: r.querySelector('.p').textContent, t: r.querySelector('.t').textContent, v: r.querySelector('.v').textContent, face: !!r.querySelector('.cr-fl') })) }));
+  if (on(28)) {
+    // four entries, you second
+    const a = await wallOpen(4, 2, { faces: [[CK.reza, '#2A5C8A', 7]], fv: { [CK.reza]: 7 } });
+    const s = await wallState(a.p), t = s.tiles;
+    C.check('with stage96 the board is a grid of TILES, two columns, one tile for each entry, in the board\'s order', s.grid && s.cols === 2 && t.length === 4 && t.map(x => x.place).join() === '1,2,3,4' && t.map(x => x.name).join() === 'Reza K.,You,Mina S.,Sara T.', JSON.stringify([s.grid, s.cols, t.map(x => x.place + x.name)]));
+    C.check('…each tile is the place, the face, the result big and the name, in that order; the result carries its unit', t.every(x => x.order === 'p,cr-tf,v,n' && x.face) && t[0].v === '200 seconds' && t[1].v === '193 seconds', JSON.stringify([t[0].order, t[0].v, t[1].v]));
+    C.check('…two across: tiles 1 and 2 share a row, 3 is under 1, and tiles are the same width', t[0].pos.top === t[1].pos.top && t[1].pos.left > t[0].pos.left && t[2].pos.top > t[0].pos.top && t[2].pos.left === t[0].pos.left && Math.abs(t[0].pos.w - t[1].pos.w) <= 1, JSON.stringify(t.map(x => x.pos)));
+    C.check('…a tile is a door (a button) to that person\'s page', t.every(x => x.tag === 'BUTTON'));
+    C.check('…yours is the one outlined tile, and it reads You', t.filter(x => x.me).length === 1 && t[1].me && t[1].name === 'You');
+    const look = await a.p.evaluate(() => { const tiles = [...document.querySelectorAll('#screen-crew .cr-tiles .cr-ob-r')], probe = document.createElement('i'); probe.style.cssText = 'border:2px solid var(--mint);position:absolute'; document.body.appendChild(probe);
+      const mint = getComputedStyle(probe).borderTopColor; probe.remove(); const c = i => getComputedStyle(tiles[i]);
+      const v = getComputedStyle(tiles[0].querySelector('.v')), v2 = getComputedStyle(tiles[0].querySelector('.v b')), n = getComputedStyle(tiles[0].querySelector('.n')), f = tiles[0].querySelector('.cr-tf').getBoundingClientRect();
+      return { me: c(1).borderTopWidth + ' ' + (c(1).borderTopColor === mint), other: c(0).borderTopWidth, vSize: v.fontSize, vFont: v.fontFamily, vW: v2.fontWeight, nSize: n.fontSize, face: Math.round(f.width) + 'x' + Math.round(f.height) }; });
+    C.check('…the outline is 2 px of the mint, the others 1 px; the result is the 28 px display figure and the name the small line; the face is 46 px', look.me === '2px true' && look.other === '1px' && look.vSize === '28px' && /Barlow Condensed/.test(look.vFont) && look.vW === '900' && look.nSize === '13px' && look.face === '46x46', JSON.stringify(look));
+    C.check('…the face of a person with a picture is the picture (and the letters under it for the rest)', t[0].pic && !t[2].pic, JSON.stringify(t.map(x => x.pic)));
+    C.check('the clay door to WhatsApp, your result, the share door and the line are as before, under the tiles', s.go === 'Send a better one' && /wa\.me|whatsapp/.test(s.href) && /Wall%20Sit|Wall\+Sit|Wall Sit/.test(decodeURI(s.href)) && /Your result: 193 seconds/.test(s.mine) && s.share && s.goTop > s.gridBottom, JSON.stringify([s.go, s.mine, s.share, s.goTop, s.gridBottom]));
+    C.check('…eight or fewer: no "All" button', s.more === '');
+    // a tile opens a page; Back returns to Crew
+    await tapTile(a.p, 'Reza K.'); await a.p.waitForTimeout(700);
+    const pg = await a.p.evaluate(() => ({ screen: (document.querySelector('.screen.active') || {}).id, ck: _playerCk, name: (document.querySelector('#crewplayer-body .pl-name') || {}).textContent, tab: (document.querySelector('#global-tabs .nav-item.active') || {}).dataset.tab }));
+    C.check('a tile opens that person\'s page (Reza\'s), with Crew still lit', pg.screen === 'screen-crewplayer' && pg.ck === CK.reza && /Reza/.test(pg.name || '') && pg.tab === 'crew', JSON.stringify(pg));
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(400);
+    C.check('…← returns to Crew, where the wall is', (await screenNow(a.p)) === 'screen-crew' && (await wallState(a.p)).tiles.length === 4);
+    await tapTile(a.p, 'You'); await a.p.waitForTimeout(600);
+    C.check('your own tile opens your own page', await a.p.evaluate(() => _playerCk === 'me' && /Your numbers/.test(document.getElementById('crewplayer-body').textContent)));
+    C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+
+    // more than eight: the first eight, yours carried in under them when it is outside, and "All 14 ›"
+    const m = await wallOpen(14, 11);
+    const sm = await wallState(m.p);
+    C.check('fourteen entries, you eleventh: the first 8, your own tile carried in after them (still marked 11), and the button reads exactly "All 14 ›"', sm.tiles.length === 9 && sm.tiles.slice(0, 8).map(x => x.place).join() === '1,2,3,4,5,6,7,8' && sm.tiles[8].me && sm.tiles[8].place === '11' && sm.tiles[8].name === 'You' && sm.more === 'All 14 ›', JSON.stringify([sm.tiles.map(x => x.place), sm.more]));
+    await click(m.p, '#screen-crew .cr-o-more'); await m.p.waitForTimeout(500);
+    const l = await listState(m.p);
+    C.check('"All 14 ›" opens a sheet, The Open, with the challenge and "14 entries"', l.on && l.eyebrow === 'The Open' && l.title === 'Wall Sit' && l.sub === '14 entries', JSON.stringify([l.on, l.eyebrow, l.title, l.sub]));
+    C.check('…every entry is a row: place, face, name, result, in order; yours is marked and reads You', l.rows.length === 14 && l.rows.map(r => r.p).join() === '1,2,3,4,5,6,7,8,9,10,11,12,13,14' && l.rows[0].t === 'Reza K.' && l.rows[0].v === '200 seconds' && l.rows[0].face && l.rows[10].me && l.rows[10].t === 'You' && l.rows.filter(r => r.me).length === 1, JSON.stringify(l.rows.slice(0, 2).concat(l.rows[10])));
+    C.check('…every row is a door (a button), and the rows fit the sheet', l.rows.filter(r => r.tag === 'BUTTON').length === 14 && await m.p.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    await m.p.evaluate(() => { const r = [...document.querySelectorAll('#hist-overlay .ol-r')].find(x => x.querySelector('.t').textContent === 'Reza K.'); r.click(); }); await m.p.waitForTimeout(700);
+    const pr = await m.p.evaluate(() => ({ sheet: document.getElementById('hist-overlay').classList.contains('visible'), screen: (document.querySelector('.screen.active') || {}).id, ck: _playerCk }));
+    await m.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await m.p.waitForTimeout(400);
+    C.check('…a row opens that person\'s page and closes the sheet; ← returns to Crew', !pr.sheet && pr.screen === 'screen-crewplayer' && pr.ck === CK.reza && (await screenNow(m.p)) === 'screen-crew', JSON.stringify(pr));
+    await m.p.evaluate(() => { openAccount(); }); await m.p.waitForTimeout(300);
+    await m.p.evaluate(() => openCrewOpenList()); await m.p.waitForTimeout(300);
+    C.check('"All 14 ›" is a sheet opener like the others: opened over another sheet it has ‹ Back', (await listState(m.p)).back);
+    await m.p.evaluate(() => closeHistorySheet());
+    C.check('…no page errors', !m.p.errs.length, m.p.errs.join(' | '));
+    await m.ctx.close();
+    const m3 = await wallOpen(14, 3);
+    const s3 = await wallState(m3.p);
+    C.check('fourteen entries, you third: eight tiles, you among them once, and "All 14 ›"', s3.tiles.length === 8 && s3.tiles.filter(x => x.me).length === 1 && s3.tiles[2].me && s3.more === 'All 14 ›', JSON.stringify([s3.tiles.length, s3.more]));
+    await m3.ctx.close();
+    const m8 = await wallOpen(8, 5), m9 = await wallOpen(9, 5);
+    const s8 = await wallState(m8.p), s9 = await wallState(m9.p);
+    C.check('eight entries: eight tiles and no button; nine: eight tiles and "All 9 ›"', s8.tiles.length === 8 && s8.more === '' && s9.tiles.length === 8 && s9.more === 'All 9 ›', JSON.stringify([s8.tiles.length, s8.more, s9.tiles.length, s9.more]));
+    await m8.ctx.close(); await m9.ctx.close();
+    // one entry says "1 entry" in the list; an empty board is the old line, with no tiles
+    const m1 = await wallOpen(1, 1);
+    await m1.p.evaluate(() => openCrewOpenList()); await m1.p.waitForTimeout(300);
+    C.check('a one-entry list says "1 entry"', (await listState(m1.p)).sub === '1 entry');
+    await m1.ctx.close();
+    const m0 = await wallOpen(0, 0, { noBoard: true });
+    const s0 = await wallState(m0.p);
+    C.check('nobody on the board: "Nobody has put a result up yet. Be first." and no tiles, no button, the door asks for the first result', s0.none && s0.tiles.length === 0 && s0.more === '' && s0.go === 'Send Amir your result', JSON.stringify(s0));
+    await m0.ctx.close();
+    // not in the crew: the board is the members', your own result still shows; under 13: tiles are not doors
+    const nm = await wallOpen(5, 0, { b: { me: { answer: 'no', can_post: false } }, mine: { value: 80, day: today } });
+    const sn = await wallState(nm.p);
+    C.check('not in the crew: the members\' tiles, no tile of yours, and your own result under them', sn.tiles.length === 5 && !sn.tiles.some(x => x.me) && /Your result: 80 seconds/.test(sn.mine), JSON.stringify(sn.tiles.map(x => x.name)));
+    await nm.ctx.close();
+    const u = await wallOpen(6, 2, { b: { me: { under13: true, can_post: false } } });
+    const su = await wallState(u.p);
+    C.check('under 13 reads only: the same tiles, none of them a door', su.tiles.length === 6 && su.tiles.every(x => x.tag === 'DIV'), JSON.stringify(su.tiles.map(x => x.tag)));
+    await u.ctx.close();
+    // a server without stage96: the rows as they were, Show all in place
+    const old = await wallOpen(9, 8, { b: { noPages: true } });
+    const so = await old.p.evaluate(() => { const g = document.querySelector('#screen-crew .cr-ob'); return { tiles: g.classList.contains('cr-tiles'), rows: g.querySelectorAll('.cr-ob-r').length, more: document.querySelector('.cr-o-more').textContent, faces: g.querySelectorAll('.cr-tf').length }; });
+    C.check('a server without stage96: the same rows as ever (five and yours), no tiles, "Show all 9"', !so.tiles && so.rows === 6 && so.more === 'Show all 9' && so.faces === 0, JSON.stringify(so));
+    await old.p.evaluate(() => crewOpenAll()); await old.p.waitForTimeout(300);
+    C.check('…and Show all opens them in place, with no sheet', await old.p.evaluate(() => document.querySelectorAll('#screen-crew .cr-ob-r').length === 9 && !document.getElementById('hist-overlay').classList.contains('visible')));
+    await old.ctx.close();
+    // a card never names another athlete: your Open card is still your own result, your place and the size of the field
+    const cd = await wallOpen(14, 4);
+    const spec = await cd.p.evaluate(() => JSON.stringify(hlOpenSpec()));
+    C.check('the Open\'s share card is untouched: your result, your place and the size of the field, no other name', /"place":4/.test(spec) && /"field":14/.test(spec) && /"first":"Alex"/.test(spec) && !/Reza|Ehsan|Mina|Sara|Omid|Leila|Ali|Nima|Dara/.test(spec), spec);
+    await cd.ctx.close();
+    // 320 px: two columns still, a long name and a long unit stay inside their tile
+    const longB = wallBoard(5, 2).map((r, i) => i === 0 ? Object.assign({}, r, { who: 'Alexandra Konstantinopoulou-Papadakis' }) : r);
+    const nr = await wallOpen(5, 2, { opts: { w: 320, h: 640 }, board: longB, unit: 'minutes and seconds' });
+    const sr = await wallState(nr.p);
+    const ov = await nr.p.evaluate(() => [...document.querySelectorAll('#screen-crew .cr-tiles .cr-ob-r')].map(t => { const r = t.getBoundingClientRect(); return [...t.querySelectorAll('.p, .cr-tf, .v, .n')].every(k => { const q = k.getBoundingClientRect(); return q.left >= r.left - 1 && q.right <= r.right + 1; }); }));
+    C.check('320 px: still two columns, every tile\'s contents inside it (a long name is cut with an ellipsis, a long unit wraps), nothing scrolls sideways', sr.cols === 2 && ov.every(Boolean) && sr.sw <= sr.iw && sr.tiles[0].pos.w >= 120, JSON.stringify([sr.cols, ov, sr.sw, sr.iw, sr.tiles[0].pos]));
+    await nr.ctx.close();
+    const dk = await wallOpen(6, 2, { opts: { dark: true } });
+    const dl = await dk.p.evaluate(() => { const t = [...document.querySelectorAll('#screen-crew .cr-tiles .cr-ob-r')], probe = document.createElement('i'); probe.style.cssText = 'border:2px solid var(--mint);position:absolute'; document.body.appendChild(probe); const mint = getComputedStyle(probe).borderTopColor; probe.remove();
+      return { bg: getComputedStyle(t[0]).backgroundColor, ink: getComputedStyle(t[0].querySelector('.v')).color, me: getComputedStyle(t[1]).borderTopColor === mint }; });
+    C.check('dark mode: the tiles are dark with a light figure and yours keeps its mint outline', dl.bg !== 'rgb(255, 255, 255)' && /^rgb\((2[0-9]{2}|1[89][0-9]|2[0-9])/.test(dl.ink) && dl.me, JSON.stringify(dl));
+    await dk.ctx.close();
+    // the guide
+    const gx = await wallOpen(4, 2);
+    const gt = await gx.p.evaluate(() => buildAppGuideCards());
+    const gseg = (gt.match(/<p><strong>The Open<\/strong> on Crew is a wall of tiles[\s\S]*?<\/p>/) || [''])[0];
+    C.check('the guide says the wall in plain words: tiles, your green outline, a tap for the page, "All" past eight', /wall of tiles/.test(gseg) && /green outline/.test(gseg) && /Tap a tile/.test(gseg) && /<strong>All<\/strong>/.test(gseg) && !/[—;]/.test(gseg.replace(/&[a-z]+;/g, '')), gseg.slice(0, 80));
+    await gx.ctx.close();
+  }
+
+  // ── 29. the pictures for step 11 (390 px, light): the Open wall with faces, and the list behind "All 14 ›" ──────────────────────────────────────────────────────────────────────
+  if (on(29)) {
+    const people = [[CK.reza, '#7C6B8F', '#E8C4A0', '#26322C', 7], [CK.mina, '#9CB4C6', '#C98E6A', '#8C3D2B', 8], [CK.sara, '#6E8FA3', '#D8A682', '#7A4E3A', 9], [CK.omid, '#A9B79A', '#B07B58', '#3C5A7A', 10],
+      [CK.leila, '#C9A99A', '#E0B493', '#4F6B52', 11], [CK.alex, '#5E8C7A', '#E3B896', '#2E4A57', 12]];
+    const x = await wallOpen(14, 4);
+    await x.p.evaluate(rows => {
+      const faces = {};
+      rows.forEach(([k, bg, skin, shirt, fv]) => {
+        const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+        const gr = g.createLinearGradient(0, 0, 128, 128); gr.addColorStop(0, bg); gr.addColorStop(1, '#1F3A30'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+        g.fillStyle = shirt; g.beginPath(); g.ellipse(64, 132, 48, 40, 0, 0, Math.PI * 2); g.fill(); g.fillStyle = skin; g.fillRect(56, 70, 16, 18); g.beginPath(); g.ellipse(64, 52, 21, 25, 0, 0, Math.PI * 2); g.fill();
+        faces[k] = { fv, b64: c.toDataURL('image/jpeg', 0.85).split(',')[1] };
+      });
+      window.__STUB.faces = faces;
+      // the board rows carry the versions, so each tile asks for its face
+      BELL.open.board.forEach(r => { if (r.ck in faces) r.fv = faces[r.ck].fv; }); renderCrew();
+    }, people);
+    await x.p.waitForTimeout(1300);
+    await x.p.evaluate(() => { const c = document.querySelector('#screen-crew .cr-open'); c.scrollIntoView({ block: 'start' }); window.scrollBy(0, -16); }); await x.p.waitForTimeout(300);
+    await x.p.screenshot({ path: path.join(out, 'open-wall-light-390.png') });
+    await click(x.p, '#screen-crew .cr-o-more'); await x.p.waitForTimeout(600);
+    await x.p.screenshot({ path: path.join(out, 'open-wall-all-light-390.png') });
+    await x.ctx.close();
   }
 
 

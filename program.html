@@ -5863,11 +5863,12 @@
   .pl-sgr { grid-template-columns: 36px minmax(0, 1fr) 12px; gap: 12px; }
   .pl-sgr.plain { grid-template-columns: 36px minmax(0, 1fr); }
 
-  /* ══ PLAYERS' LOUNGE · STEPS 9 AND 10 (2026-10-24): Bring a partner and the cards ═══════════════════════════════════════════════════
+  /* ══ PLAYERS' LOUNGE · STEPS 9 TO 11 (2026-10-24): Bring a partner, the cards, the Open wall ═══════════════════════════════════════════════════
      9 · Bring a partner (frag-s9 A, a card on your own page): the code big in Space Mono on a dashed field, what you both get, Copy (outlined) and Send on
          WhatsApp (the one primary button), and the line that says who has joined. The page's clay stays on the Cheer button alone.
      10 · Share my card (the same outlined button as Copy), the stamp (frag-s10 A: one dark strip across the foot of a session photo, Space Mono capitals,
-         the AA mark at its right; the shade is the strip's own so it reads on any photo and in both themes) and Share, next to Delete on your own post. */
+         the AA mark at its right; the shade is the strip's own so it reads on any photo and in both themes) and Share, next to Delete on your own post.
+     11 · The Open wall (frag-s11 A): the board as two columns of tiles, the place, the face, the result big, the name; yours outlined in mint. */
   .pt-card { margin: 12px var(--g) 0; padding: 12px 14px 14px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
   .pt-k { display: block; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
   .pt-code { margin: 10px 0 8px; padding: 12px 6px; border: 1.5px dashed var(--field); border-radius: 10px; background: var(--tint); text-align: center; overflow-wrap: anywhere;
@@ -5895,6 +5896,22 @@
   .cr-sh { flex: none; min-height: 44px; padding: 0 6px; border: 0; background: none; color: var(--green-ink); font: 700 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
   .cr-tf { position: relative; display: grid; place-items: center; width: 46px; height: 46px; margin: 2px 0; border-radius: 50%; background: var(--tint); color: var(--green-ink);
     font: 900 var(--fs-lead)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: .5px; text-transform: uppercase; }
+  #screen-crew .cr-ob.cr-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 0; }
+  #screen-crew .cr-tiles .cr-ob-r { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: start; gap: 3px; width: 100%; min-width: 0; margin: 0; padding: 10px 8px;
+    border: 1px solid var(--hair); border-radius: 12px; background: var(--paper); text-align: center; }
+  #screen-crew .cr-tiles .cr-ob-r:last-child { border-bottom: 1px solid var(--hair); }
+  #screen-crew .cr-tiles .cr-ob-r.me { margin: 0; padding: 9px 7px; border: 2px solid var(--mint); background: var(--paper); }
+  #screen-crew .cr-tiles .cr-ob-r .p { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .6px; color: var(--grey); }
+  #screen-crew .cr-tiles .cr-ob-r .v { margin-top: 2px; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  #screen-crew .cr-tiles .cr-ob-r .v small { font: 600 var(--fs-small)/1 'Barlow', sans-serif; letter-spacing: 0; color: var(--grey); }
+  #screen-crew .cr-tiles .cr-ob-r .n { max-width: 100%; font: 600 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #screen-crew .cr-tiles .cr-ob-r.me .p, #screen-crew .cr-tiles .cr-ob-r.me .n { color: var(--green-ink); }
+  #screen-crew .cr-tiles button.cr-ob-r:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  #hist-overlay .ol-r { grid-template-columns: 22px 24px minmax(0, 1fr) auto; gap: 10px; min-height: 48px; padding: 6px 2px; text-align: left; }
+  #hist-overlay .ol-r .p { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; color: var(--grey); font-variant-numeric: tabular-nums; }
+  #hist-overlay .ol-r .v { font: 700 var(--fs-body)/1.2 'Space Mono', monospace; color: var(--ink); font-variant-numeric: tabular-nums; }
+  #hist-overlay .ol-r.me { width: calc(100% + 16px); margin: 0 -8px; padding-left: 10px; padding-right: 10px; border-radius: 8px; background: var(--tint); border-bottom-color: transparent; }
+  #hist-overlay .ol-r.me .t, #hist-overlay .ol-r.me .p, #hist-overlay .ol-r.me .v { color: var(--green-ink); }
   /* Tell the crew, on the finished card, under the WhatsApp row (paintCrewTell()) */
   :where(#day-view) .complete-crew, :where(#day-view) .complete-share { margin-top: 10px; }
   :where(#day-view) .complete-crew[hidden], :where(#day-view) .complete-share[hidden] { display: none; }
@@ -11288,7 +11305,7 @@ APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how ofte
     body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
-  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. On your own page tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p><p>A photo you post with <strong>Tell the crew</strong> wears a small stamp across its foot: the session, the minutes, <strong>WEEK HELD</strong> when that session held your week, and the day. You read the stamp before you post. On your own session photo, tap <strong>Share</strong> and you get the session card for Instagram with that photo behind it. Nobody else's photo has Share.</p><p><strong>Share my card</strong>, on your own page, opens the same card as <strong>Share your card</strong> on Progress.</p>`;
+  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. On your own page tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p><p>A photo you post with <strong>Tell the crew</strong> wears a small stamp across its foot: the session, the minutes, <strong>WEEK HELD</strong> when that session held your week, and the day. You read the stamp before you post. On your own session photo, tap <strong>Share</strong> and you get the session card for Instagram with that photo behind it. Nobody else's photo has Share.</p><p><strong>Share my card</strong>, on your own page, opens the same card as <strong>Share your card</strong> on Progress.</p><p><strong>The Open</strong> on Crew is a wall of tiles: the place, the face, the result and the name. Your tile has a green outline. Tap a tile to see that person's page. When more than 8 are on the board, tap <strong>All</strong> to see every one.</p>`;
   // Bring a partner is named only while the card is on the page (the server has partner codes, stage97)
   const GUIDE_PARTNER = `<p><strong>Bring a partner</strong> is a card on your own page, under your numbers. Tap <strong>Get your code</strong> and it makes one for you. A friend who uses your code gets 10% off. You get 10% off your next cycle. <strong>Send on WhatsApp</strong> sends them your code and the link, and <strong>Copy</strong> copies the same words so you can send them anywhere. When a friend has joined, the card says so. A code earns no XP.</p>`;
   const myPage = (() => { try { const c = crewPageGet('me'); return c && c.p; } catch (e) { return null; } })();
@@ -14057,6 +14074,7 @@ function crewFace(p, size, door) {
   if (size === 'row') return `<span class="p ini"${dat} aria-hidden="true">${ini}${pic}</span>`;
   if (size === 'line') return `<span class="cr-fl"${dat} aria-hidden="true">${ini}${pic}</span>`;
   if (size === 'xl') return `<span class="pl-face"${dat} aria-hidden="true">${ini}${pic}</span>`;
+  if (size === 'tile') return `<span class="cr-tf"${dat} aria-hidden="true">${ini}${pic}</span>`;   // the Open wall's tiles (46 px)
   return `<span class="cr-ini${p.amir ? ' am' : ''}"${dat} aria-hidden="true">${ini}${pic}</span>`;
 }
 function crewScreenNow() { const s = document.querySelector('.screen.active'); return s ? s.id.replace('screen-', '') : 'home'; }
@@ -14266,8 +14284,11 @@ function crewOpenHTML() {
   // the board, and would otherwise never see the result Amir confirmed for them
   const mine = board.find(r => r && r.me) || null;
   const myVal = mine ? mine.value : (o.mine && o.mine.value);
-  const shown = _openAll ? board : board.slice(0, 5);
+  // The Open Wall (Players' Lounge, step 11): with stage96 the board is a grid of tiles, the first eight and "All 14 ›". A server without it keeps the rows as they were.
+  const wall = crewPagesOn();
+  const shown = wall ? board.slice(0, 8) : _openAll ? board : board.slice(0, 5);
   const rows = shown.concat(mine && shown.indexOf(mine) < 0 ? [mine] : []).map(r => {
+    if (wall) return crewOpenTile(r, o.unit);
     const inner = `<span class="p">${Number(r.place) || ''}</span>`
       + `<span class="n">${esc(r.me ? 'You' : (r.who || 'Athlete'))}</span>`
       + `<span class="v">${esc(crewOpenNum(r.value) + unit)}</span>`, cls = 'cr-ob-r' + (r.me ? ' me' : '');
@@ -14278,15 +14299,45 @@ function crewOpenHTML() {
     <span class="k">The Open</span>
     <h3 id="cr-open-h">${esc(o.title)}</h3>
     ${o.how ? `<p class="how">${esc(o.how)}</p>` : ''}
-    ${board.length ? `<div class="cr-ob">${rows}</div>` : '<p class="cr-o-none">Nobody has put a result up yet. Be first.</p>'}
-    ${!_openAll && board.length > 5 ? `<button type="button" class="cr-o-more" onclick="crewOpenAll()">Show all ${board.length}</button>` : ''}
+    ${board.length ? `<div class="cr-ob${wall ? ' cr-tiles' : ''}">${rows}</div>` : '<p class="cr-o-none">Nobody has put a result up yet. Be first.</p>'}
+    ${wall ? (board.length > 8 ? `<button type="button" class="cr-o-more" onclick="crewOpenAll()">All ${board.length} ›</button>` : '')
+      : !_openAll && board.length > 5 ? `<button type="button" class="cr-o-more" onclick="crewOpenAll()">Show all ${board.length}</button>` : ''}
     ${myVal != null ? `<span class="cr-o-mine">Your result: ${esc(crewOpenNum(myVal) + unit)}. Beat it and send me the new one.</span>` : ''}
     ${myVal != null && !window.IS_PREVIEW ? '<button type="button" class="cr-o-share" onclick="shareOpen()">Share your result</button>' : ''}
     <a class="cr-o-go" href="${esc(coachWhatsAppUrl(msg))}" target="_blank" rel="noopener">${myVal != null ? 'Send a better one' : 'Send Amir your result'}</a>
   </section>`;
 }
-function crewOpenAll() { _openAll = true; renderCrew(); }
-window.crewOpenAll = crewOpenAll;
+// One tile of the wall: the place, the face, the result big, the name. Yours is outlined mint (.me). A tile opens that person's page (yours, yours): a door, or
+// a plain tile when the person has none (under 13, or a row with no key). The unit stays small beside the number.
+function crewOpenTile(r, unit) {
+  const pp = crewPersonOf(r), name = r.me ? 'You' : (r.who || 'Athlete'), cls = 'cr-ob-r' + (r.me ? ' me' : ''), place = Number(r.place) || '';
+  const inner = `<span class="p">${place}</span>${crewFace(pp, 'tile')}`
+    + `<span class="v"><b>${esc(crewOpenNum(r.value))}</b>${unit ? ' <small>' + esc(unit) + '</small>' : ''}</span>`
+    + `<span class="n">${esc(name)}</span>`;
+  return crewDoor(pp, cls, inner, `${name}, place ${place}, ${crewOpenNum(r.value)}${unit ? ' ' + unit : ''}`) || `<div class="${cls}">${inner}</div>`;
+}
+// "All 14 ›": the whole board as a list in a sheet, every row a door to that person's page. Without stage96 the rows simply open in place, as they always did.
+function openCrewOpenList() {
+  const ov = document.getElementById('hist-overlay'), o = BELL && BELL.open;
+  if (!ov || !o || !o.title) return;
+  const board = Array.isArray(o.board) ? o.board : [], unit = o.unit ? ' ' + o.unit : '';
+  const rows = board.map(r => {
+    const pp = crewPersonOf(r), name = r.me ? 'You' : (r.who || 'Athlete');
+    const inner = `<span class="p">${Number(r.place) || ''}</span>${crewFace(pp, 'line')}<span class="t" dir="auto">${esc(name)}</span><span class="v">${esc(crewOpenNum(r.value) + unit)}</span>`;
+    return crewCanDoor(pp) ? `<button type="button" class="cr-bt pl-row ol-r${r.me ? ' me' : ''}" onclick="crewOpenGo('${pp.me ? 'me' : esc(pp.ck)}')">${inner}</button>`
+      : `<div class="pl-row ol-r${r.me ? ' me' : ''}">${inner}</div>`;
+  }).join('');
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">The Open</div>
+    <h2 class="readiness-title">${esc(o.title)}</h2>
+    <p class="readiness-sub">${board.length} ${board.length === 1 ? 'entry' : 'entries'}</p>
+    <div class="pl-list">${rows}</div>`;
+  ov.classList.add('visible');
+  crewWireFaces(ov.querySelector('.readiness-modal'));
+}
+function crewOpenGo(ck) { closeHistorySheet(); openPlayer(ck); }
+function crewOpenAll() { if (crewPagesOn()) { openCrewOpenList(); return; } _openAll = true; renderCrew(); }
+window.crewOpenAll = crewOpenAll; window.openCrewOpenList = openCrewOpenList; window.crewOpenGo = crewOpenGo;
 function crewPostHTML(it) {
   const name = it.amir ? 'Amir' : it.me ? 'You' : (it.who || 'Athlete');
   const person = crewPersonOf(it);
@@ -23648,6 +23699,7 @@ function wrapSheetOpeners() {
   openCrewPost = sheetWrap(openCrewPost); window.openCrewPost = openCrewPost;   // Crew: the composer (stage81)
   openFirstServe = sheetWrap(openFirstServe); window.openFirstServe = openFirstServe;   // First Serve's five steps: opened from Home's ring; Your photo opened from a step comes ‹ Back to it
   openCrewReply = sheetWrap(openCrewReply); window.openCrewReply = openCrewReply;   // Crew: the reply sheet (stage92), so ‹ Back works when a page is behind it
+  openCrewOpenList = sheetWrap(openCrewOpenList); window.openCrewOpenList = openCrewOpenList;   // the Open wall's "All 14 ›": the whole board as a list
   openPlayerAchievements = sheetWrap(openPlayerAchievements); window.openPlayerAchievements = openPlayerAchievements;   // a Player Page's "All n"
   openPlayerWeek = sheetWrap(openPlayerWeek); window.openPlayerWeek = openPlayerWeek;   // a Player Page's week of sessions (This cycle)
   openPlayerSigners = sheetWrap(openPlayerSigners); window.openPlayerSigners = openPlayerSigners;   // "Cheered by": ‹ Back to "All n" when it was opened from there
