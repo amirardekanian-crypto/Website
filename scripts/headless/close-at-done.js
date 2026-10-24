@@ -39,6 +39,7 @@ const inDay = (day, nm) => `[...document.querySelectorAll('#day${day} .checklist
 
 // Logs the squat of `day` (80 kg, RPE 8 on each set, `sets` of them), through the card's own boxes.
 async function logSquat(p, day, sets) {
+  await p.evaluate(() => { window.restAfterTick = () => {}; });   // a tick rests by itself now (love-all-rest.js); this suite is not about the rest
   await p.evaluate(`(() => { const c = ${inDay(day, SQUAT)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = 'sq${day}'; })()`);
   await p.waitForTimeout(250);
   await p.fill(`#sq${day} .ex-set-row[data-set-idx="0"] .ex-set-weight`, '80');

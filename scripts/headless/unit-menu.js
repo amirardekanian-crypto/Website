@@ -25,7 +25,7 @@ function prog() {
 }
 const open = (browser, o = {}) => H.openProgram(browser, Object.assign({ w: 390, h: 844, prog: prog(), hist: [], seed: { _setlog_Barbell_Back_Squat: EMPTY() }, stub: { library: H.library() } }, o));
 async function openCard(p, name, id) {
-  await p.evaluate(`(() => { openDayView('1'); const c = ${H.card(name)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = ${JSON.stringify(id)}; try { hideAaToast(); } catch (e) {} c.scrollIntoView({ block: 'center' }); })()`);
+  await p.evaluate(`(() => { window.restAfterTick = () => {}; /* a tick rests by itself now (love-all-rest.js); this suite is not about the rest */ openDayView('1'); const c = ${H.card(name)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = ${JSON.stringify(id)}; try { hideAaToast(); } catch (e) {} c.scrollIntoView({ block: 'center' }); })()`);
   await p.waitForTimeout(350);
 }
 const menu = p => p.evaluate(() => { const m = document.querySelector('.unit-menu'); return m ? { opts: [...m.querySelectorAll('.unit-opt')].map(o => o.dataset.u + (o.getAttribute('aria-checked') === 'true' ? '*' : '')).join(' '), head: m.querySelector('.unit-menu-k').textContent } : null; });
@@ -141,7 +141,7 @@ const geo = (p, id) => p.evaluate(i => { const c = document.getElementById(i), h
     const offer = await toast(p);
     await p.click('#sq .ex-set-unit'); await p.waitForTimeout(150);
     const after = await toast(p);
-    C.check('the session clock offer (a note with a Start button) stays up when the unit menu opens', offer && offer.go === 'Start' && after && after.go === 'Start', JSON.stringify([offer, after]));
+    C.check('the session clock offer is put away by the tap on the unit button, and that tap still opens the menu (Love All round 5: a note never eats a tap)', offer && offer.go === 'Start' && !after && await p.evaluate(() => !!document.querySelector('#sq .ex-set-unit[aria-expanded="true"]')), JSON.stringify([offer, after]));
     await p.keyboard.press('Escape');
     await p.evaluate(() => aaToast('A plain note.', { kicker: 'Test' })); await p.waitForTimeout(100);
     await p.click('#sq .ex-set-unit'); await p.waitForTimeout(150);

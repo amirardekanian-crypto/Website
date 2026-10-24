@@ -19,7 +19,7 @@ const said = p => p.evaluate(() => { const e = document.getElementById('aaToast'
 
 async function b4(browser) {
   const { ctx, p } = await open(browser);
-  await p.evaluate(`(() => { openDayView('1'); const c = ${H.card(SQ)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = 'sq'; try { hideAaToast(); } catch (e) {} })()`);
+  await p.evaluate(`(() => { window.restAfterTick = () => {}; /* a tick rests by itself now (love-all-rest.js); this suite is not about the rest */ openDayView('1'); const c = ${H.card(SQ)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = 'sq'; try { hideAaToast(); } catch (e) {} })()`);
   await p.waitForTimeout(300);
   const row = '#sq .ex-set-row[data-set-idx="0"]';
   await p.fill(row + ' .ex-set-weight', '60');
@@ -50,7 +50,7 @@ async function b4(browser) {
 
 async function b15(browser) {
   const { ctx, p } = await open(browser);
-  await p.evaluate(`(() => { openDayView('1'); startTimerNow('1'); try { hideAaToast(); } catch (e) {} })()`);
+  await p.evaluate(`(() => { window.restAfterTick = () => {}; /* a tick rests by itself now (love-all-rest.js); this suite is not about the rest */ openDayView('1'); startTimerNow('1'); try { hideAaToast(); } catch (e) {} })()`);
   await p.waitForTimeout(400);
   await p.evaluate(`(() => { const c = ${H.card('Rowing')}; if (c.classList.contains('collapsed')) toggleExpand(c); })()`);
   const first = await p.evaluate(() => askAmirFor('1'));
@@ -72,7 +72,7 @@ async function b15(browser) {
 
 async function b16(browser) {
   const { ctx, p } = await open(browser);
-  await p.evaluate(`(() => { openDayView('1'); try { hideAaToast(); } catch (e) {} })()`);
+  await p.evaluate(`(() => { window.restAfterTick = () => {}; /* a tick rests by itself now (love-all-rest.js); this suite is not about the rest */ openDayView('1'); try { hideAaToast(); } catch (e) {} })()`);
   await p.waitForTimeout(300);
   await p.evaluate(`(() => { const c = ${H.card(SQ)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = 'sq'; })()`);
   await p.fill('#sq .ex-set-row[data-set-idx="0"] .ex-set-weight', '60');
