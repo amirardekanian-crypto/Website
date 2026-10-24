@@ -74,9 +74,39 @@ async function typing(browser) {
   await ctx.close();
 }
 
+// ═════════ B4: Before you start is one closed row ═════════
+async function before(browser) {
+  const LIB = H.library();
+  for (const FULL of ['strength/full-body-power', 'mobility/everyday-mobility']) {
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, stub: { library: LIB } });
+    p.setDefaultTimeout(8000);
+    await p.evaluate(() => goLibrary()); await p.waitForTimeout(900);
+    await p.evaluate(k => openWorkout(k), FULL); await p.waitForTimeout(800);
+    const m = () => p.evaluate(() => {
+      const b = document.getElementById('ws-before-btn'), body = document.getElementById('ws-before-body'), r = b.getBoundingClientRect();
+      const first = document.querySelector('#ws-body .checklist-item, #ws-body .hrow, #ws-body > *'), fr = first && first.getBoundingClientRect();
+      return { tag: b.tagName, exp: b.getAttribute('aria-expanded'), ctl: b.getAttribute('aria-controls'), h: Math.round(r.height), n: document.getElementById('ws-before-n').textContent,
+        bodyVis: !!body.getClientRects().length, firstTop: fr ? Math.round(fr.top) : null, vh: innerHeight, sw: document.documentElement.scrollWidth, w: innerWidth };
+    });
+    const c = await m();
+    t.check(`before ${FULL}: one closed row, a button with aria-expanded=false, 44 px or more, a count on the right`,
+      c.tag === 'BUTTON' && c.exp === 'false' && c.ctl === 'ws-before-body' && c.h >= 44 && /^\d+ things?$/.test(c.n) && !c.bodyVis, JSON.stringify(c));
+    t.check(`before ${FULL}: at 390 px the first exercise starts on the first screen`, c.firstTop !== null && c.firstTop < c.vh - 60, JSON.stringify([c.firstTop, c.vh]));
+    t.check(`before ${FULL}: nothing runs off the side`, c.sw <= c.w, JSON.stringify([c.sw, c.w]));
+    await p.focus('#ws-before-btn'); await p.keyboard.press('Enter'); await p.waitForTimeout(250);
+    const o = await m();
+    t.check(`before ${FULL}: the keyboard opens it to the full block`, o.exp === 'true' && o.bodyVis, JSON.stringify(o));
+    await p.keyboard.press('Space'); await p.waitForTimeout(250);
+    t.check(`before ${FULL}: and closes it again`, (await m()).exp === 'false');
+    t.check(`before ${FULL}: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await typing(browser);
+  await before(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
