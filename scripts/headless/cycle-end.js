@@ -1,5 +1,5 @@
 // When the cycle is over (PROG-02): the day after the current cycle's endDate, Home says Cycle complete,
-// shows the next cycle under Up next, asks "Ready for Cycle N?" (always, the last cycle included) and folds
+// shows the next cycle under Up next, asks "Ready for Cycle N?" (the last cycle asks "What comes next?" and names no cycle) and folds
 // the day cards under Repeat a session; Progress marks the cycle Done. Since 2026-10-12 the Cycle complete / Roadmap complete CARD (and its
 // wins) is on Progress, and Home says the cycle ended with one door row, Cycle N complete (.bt-done). Since 2026-10-13 Progress's cycles are one road
 // of rows (.road-row.is-done / is-now / is-next / is-locked), not a meter and pills, and Home's Up next is the same row. Serve the repo first
@@ -46,6 +46,7 @@ const state = p => p.evaluate(() => ({
   btSub: (document.querySelector('#home-week-wrap .bt-done .hrow-q') || {}).textContent || null,
   upnext: !!document.querySelector('.bt-next .road-row.is-next'),
   building: /building it/i.test(document.getElementById('screen-home').innerText),
+  home: document.getElementById('screen-home').innerText,
   door: (document.querySelector('.bt-wa b') || {}).textContent || null,
   folded: document.getElementById('day-cards-wrap').classList.contains('bt-folded'),
   rep: !!document.getElementById('bt-rep'),
@@ -114,12 +115,12 @@ const state = p => p.evaluate(() => ({
     await ctx.close();
   }
 
-  // The roadmap's last cycle: Roadmap complete and the same ask, Ready for Cycle 4?. Then dark, and a 320 px phone.
+  // The roadmap's last cycle: Roadmap complete and an ask that names no Cycle 4. Then dark, and a 320 px phone.
   for (const [w, dark, name] of [[390, false, 'cycle-end-last'], [390, true, 'cycle-end-last-dark'], [320, false, 'cycle-end-last-320']]) {
     const { ctx, p } = await H.openProgram(browser, { prog: prog(4, 2), hist: hist(4), w, dark });
     const s = await state(p);
-    t.check(`last cycle ${w}${dark ? ' dark' : ''}: Roadmap complete (Progress, and the row on Home), 3 cycles · 15 weeks, Ready for Cycle 4?`,
-      s.fin === 'Roadmap complete' && s.bt === 'Roadmap complete' && /3 cycles · 15 weeks/.test(s.sub) && !s.upnext && !s.building && s.door === 'Ready for Cycle 4?' && s.folded, JSON.stringify(s));
+    t.check(`last cycle ${w}${dark ? ' dark' : ''}: Roadmap complete (Progress, and the row on Home), 3 cycles · 15 weeks, no Cycle 4 named`,
+      s.fin === 'Roadmap complete' && s.bt === 'Roadmap complete' && /3 cycles · 15 weeks/.test(s.sub) && !s.upnext && !s.building && s.door === 'What comes next?' && s.folded && /last cycle of your plan/.test(s.home) && !/Cycle 4/.test(s.home), JSON.stringify(s));
     const g = await plan(p);
     t.check(`last cycle ${w}${dark ? ' dark' : ''}: the road is done all the way, no Now row and nothing up next`, g.states === 'done done done' && g.now === null, JSON.stringify(g));
     t.check(`last cycle ${w}${dark ? ' dark' : ''}: no sideways scroll, no page errors`, s.sideways <= 0 && p.errs.length === 0, p.errs.join(' | '));

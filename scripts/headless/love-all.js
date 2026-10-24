@@ -193,7 +193,7 @@ async function tickDrop(p) {
       const checks = c.querySelectorAll('.ex-set-check');
       if (checks.length) {
         const written = checks.length, k = written > 1 ? written - 1 : 1;   // 3 of 4, 2 of 3, 1 of 1
-        for (let j = 0; j < k; j++) checks[j].click();
+        for (let j = 0; j < k; j++) { checks[j]._now = true; checks[j].click(); checks[j]._now = false; }   // a hold would count; the test means "ticked"
       } else if (!c.classList.contains('checked')) toggleCheckOnly(c, '1');
       if (c.classList.contains('round-group')) c.querySelectorAll('.rpe-row').forEach(r => r.querySelector('.rpe-btn[data-rpe="7"]').click());
     }, i);

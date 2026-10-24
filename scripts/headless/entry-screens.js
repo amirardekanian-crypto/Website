@@ -271,7 +271,7 @@ const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); i
     t.check('Welcome: the sheet is the paper, its top corners the app\'s one sheet\'s radius', W.sheet.bg === tk['--paper'] && W.sheet.tl === W.sheet.modal && W.sheet.tr === W.sheet.modal, JSON.stringify(W.sheet));
     t.check('Welcome: the two lines are unchanged (ink and grey)', W.ps.length === 2 && /^Your plan is ready\. First up is .+\.$/.test(W.ps[0]) && W.ps[1] === 'Any questions, message me on WhatsApp. The button is in the Coach tab.' && W.pColors[0] === tk['--ink'] && W.pColors[1] === tk['--grey'] && W.pSizes[0] === '15px' && W.pSizes[1] === '13px', JSON.stringify([W.ps, W.pColors, W.pSizes]));
     t.check('Welcome: Amir\'s signature and photo sit under the two lines, as the week note signs, before the buttons', !!W.sign && W.sign.sig && W.sign.sigLabel === 'Amir' && W.sign.av && /assets\/img\/coach\.jpg$/.test(W.sign.avImg || '') && W.order === 'P > sub > wn-sign > wel-go > wel-skip', JSON.stringify([W.sign, W.order]));
-    t.check('Welcome: Open Day 1 is the one primary green button', W.go.text === 'OPEN DAY 1' && W.go.bg === tk['--btn'] && W.go.color === tk['--on-accent'] && W.go.h >= 48 && W.go.radius === '8px' && /Barlow Condensed/.test(W.go.font), JSON.stringify(W.go));
+    t.check('Welcome: Open Day 1 is the one primary green button', /^OPEN DAY \d+$/.test(W.go.text) && W.go.bg === tk['--btn'] && W.go.color === tk['--on-accent'] && W.go.h >= 48 && W.go.radius === '8px' && /Barlow Condensed/.test(W.go.font), JSON.stringify(W.go));
     t.check('Welcome: Look around first is quiet green-ink text, at least 44 px tall, no box', W.skip.text === 'Look around first' && W.skip.color === tk['--green-ink'] && W.skip.h >= 44 && W.skip.border === '0px' && W.skip.bg === 'rgba(0, 0, 0, 0)', JSON.stringify(W.skip));
     t.check('Welcome (390 x 844): both buttons are on screen', W.go.bottom <= W.vh && W.skip.bottom <= W.vh, JSON.stringify([W.go.bottom, W.skip.bottom, W.vh]));
     const ov = await sideways(p);
@@ -297,8 +297,8 @@ const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); i
     const { ctx, p } = await openFresh(browser, {});
     await p.evaluate(() => { const orig = window.openDayView; window.__opened = []; window.openDayView = function (id) { window.__opened.push(String(id)); return orig.apply(this, arguments); }; });
     await p.click('.wel-go'); await p.waitForTimeout(600);
-    const od = await p.evaluate(() => ({ wel: !!document.querySelector('.wel'), dayView: !document.getElementById('day-view').hidden, cards: document.querySelectorAll('#day-view .checklist-item').length, opened: window.__opened, first: String(DATA.workouts.days[0].id), home: document.querySelector('.screen.active').id }));
-    t.check('Welcome: Open Day 1 closes it and opens Day 1 (the first day of the plan)', !od.wel && od.dayView && od.cards > 0 && od.opened.length === 1 && od.opened[0] === od.first, JSON.stringify(od));
+    const od = await p.evaluate(() => ({ wel: !!document.querySelector('.wel'), dayView: !document.getElementById('day-view').hidden, cards: document.querySelectorAll('#day-view .checklist-item').length, opened: window.__opened, first: String(suggestedDayId() || DATA.workouts.days[0].id), home: document.querySelector('.screen.active').id }));
+    t.check('Welcome: Open Day 1 closes it and opens the Next up day (the first day when none is suggested)', !od.wel && od.dayView && od.cards > 0 && od.opened.length === 1 && od.opened[0] === od.first, JSON.stringify(od));
     t.check('Welcome: no page errors after Open Day 1', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
@@ -372,7 +372,7 @@ const isClay = c => { const m = String(c).match(/rgba?\((\d+), (\d+), (\d+)/); i
     t.check('Loading: the mark is icon-192.png, 52 px, the sign-in\'s 13 px radius, and it loaded', !!Lo.mark && /assets\/img\/icon-192\.png$/.test(Lo.mark.src) && Lo.mark.w === 52 && Lo.mark.h === 52 && Lo.mark.radius === '13px' && Lo.mark.loaded, JSON.stringify(Lo.mark));
     t.check('Loading: under the mark a 32 px ring: a --hair ring and a green arc', Lo.ring.w === 32 && Lo.ring.h === 32 && Lo.ring.border === '3px' && Lo.ring.ringColor === tk['--hair'] && Lo.ring.arc === tk['--green-ink'] && Lo.ring.radius === '50%' && !!Lo.mark && Lo.ring.y >= Lo.mark.b, JSON.stringify(Lo.ring));
     t.check('Loading: the ring turns (spin, 0.8 s)', Lo.ring.anim === 'spin' && Lo.ring.dur === '0.8s', JSON.stringify([Lo.ring.anim, Lo.ring.dur]));
-    t.check('Loading: under the ring the label reads "Loading your plan", Space Mono capitals in --grey', Lo.label.raw === 'Loading your plan' && Lo.label.text === 'LOADING YOUR PLAN' && /Space Mono/.test(Lo.label.font) && Lo.label.caps === 'uppercase' && Lo.label.color === tk['--grey'] && Lo.label.y >= Lo.ring.b && Lo.label.size === '11px', JSON.stringify(Lo.label));
+    t.check('Loading: under the ring the label reads "Loading your plan", Space Mono capitals in --grey', Lo.label.raw === 'Loading your plan' && Lo.label.text === 'LOADING YOUR PLAN' && /Space Mono/.test(Lo.label.font) && Lo.label.caps === 'uppercase' && Lo.label.color === tk['--grey'] && Lo.label.y >= Lo.ring.b && Lo.label.size === '12px', JSON.stringify(Lo.label));
     t.check('Loading: the mark, the ring and the label share one centre line', Lo.centre.every(c => Math.abs(c - Lo.centre[3]) <= 1), JSON.stringify(Lo.centre));
     // it fades out when the app is ready
     await p.evaluate(() => document.getElementById('loading').classList.add('hidden'));

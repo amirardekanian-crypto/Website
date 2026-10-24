@@ -477,14 +477,19 @@
 // Your numbers. Guided and the lower-day banner follow today's targets. LAST reads the server's history. Body weight shows one
 // change. Dates are day first. A note with a button stays until tapped, the weight check says Keep it or Fix it, and the
 // install card is a layer that never sits over a day.
-// v222: program.html changed (2026-10-24, the Players' Lounge: Amir: "i want all of this to be built first, when we are all done, then
+// v222: program.html changed (2026-10-24, Love All round 4). No light flash on a dark phone. How the app works leads the Coach
+// tab. The demo offers Day 1 first. The last cycle names no cycle after it, lift names are not cut mid-word, a card's Day is
+// the day's own number, Welcome opens the Next up day, the chip row shows its last chip. A timed hold counts in its circle,
+// a step count can be typed, dumbbell lifts say kg / hand, circuit movements have their i, Before you start is one row, and
+// no text is under 12 px.
+// v223: program.html changed (2026-10-24, the Players' Lounge: Amir: "i want all of this to be built first, when we are all done, then
 // we go live"). A person in the crew has a page now: their face (kept on the phone under crew-faces-v1, which this worker leaves alone),
 // four tiles, the cheers they have had, the cycle's weeks as bars, "Your game" (club, hand, sports), the names that signed an achievement
 // (Signed Ball), and on your own page a partner code. A Cheer button, @names in replies, First Serve on Home for a new athlete's first
 // two weeks, the stamp on a session photo with Share on your own photo, Share my card, and the Open wall as tiles. It needs stage96
 // (and stage97 for the partner code) on the server and falls back to the old rows without it. No new file to pre-cache: the page, the
 // board's photo of Amir (assets/img/coach.jpg, kept as first used) and the share painter are the files they already were.
-const CACHE = 'aap-v222';
+const CACHE = 'aap-v223';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

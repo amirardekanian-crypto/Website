@@ -39,7 +39,8 @@ async function walk(p) {
       const c = [...document.querySelectorAll('#day1 .checklist-item')].find(c => (c.querySelector('.item-name') || {}).textContent.trim() === s.name);
       if (c.classList.contains('collapsed')) toggleExpand(c);
       const k = c.querySelectorAll('.ex-set-check');
-      if (k.length) k[s.setI].click(); else if (!c.classList.contains('checked')) toggleCheckOnly(c, '1');
+      if (k.length) { k[s.setI]._now = true; k[s.setI].click(); k[s.setI]._now = false; }   // a hold would count down; the test means "ticked"
+      else if (!c.classList.contains('checked')) toggleCheckOnly(c, '1');
     }, s);
     await p.waitForTimeout(80);
   }

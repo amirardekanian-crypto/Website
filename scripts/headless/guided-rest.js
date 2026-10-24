@@ -438,7 +438,7 @@ const t = H.checker();
   {
     const { ctx, p } = await open(browser, { note: true });   // open() did the warm-up through its step
     const end = await p.evaluate(() => {
-      STEP.seq.forEach(it => { if (!it.group && !it.circuit && !stepDone(it)) { STEP.pos = STEP.seq.indexOf(it); renderStep(); currentStepRow().querySelector('.ex-set-check').click(); } });
+      STEP.seq.forEach(it => { if (!it.group && !it.circuit && !stepDone(it)) { STEP.pos = STEP.seq.indexOf(it); renderStep(); { const b = currentStepRow().querySelector('.ex-set-check'); b._now = true; b.click(); b._now = false; } } });
       if (document.getElementById('timerOverlay').classList.contains('visible')) closeTimer();
       STEP.pos = STEP.seq.length - 1; renderStep();
       const st = getDayCompletion('1');

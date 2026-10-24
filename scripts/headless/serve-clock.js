@@ -48,7 +48,8 @@ async function open(browser, { w = 390, h = 844, dark = false, ...pr } = {}) {
 }
 // The card's real Rest button, as a tap on it does (openTimer(event) gets the card and the circuit / retest stamps).
 const restOn = (p, name) => p.evaluate(`(() => { const c = ${H.card(name)}; c.querySelector('.rest-btn').click(); })()`);
-const tickSet = async (p, name, i) => { await p.evaluate(`(() => { const c = ${H.card(name)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.querySelectorAll('.ex-set-check')[${i}].click(); try { hideAaToast(); } catch (e) {} })()`); await wait(p, 150); };
+// _now: a hold's circle would start its count; the test means "ticked" (see 615ed373)
+const tickSet = async (p, name, i) => { await p.evaluate(`(() => { const c = ${H.card(name)}; if (c.classList.contains('collapsed')) toggleExpand(c); const k = c.querySelectorAll('.ex-set-check')[${i}]; k._now = true; k.click(); k._now = false; try { hideAaToast(); } catch (e) {} })()`); await wait(p, 150); };
 // Move the clock: this many seconds left on the running rest, then a tick or two.
 const setLeft = async (p, s) => { await p.evaluate(x => { timerEndsAt = Date.now() + x * 1000; }, s); await wait(p, 600); };
 const shelf = async (p, key) => {

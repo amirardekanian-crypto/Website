@@ -199,11 +199,11 @@
   :root {
     /* THE TYPE SCALE (DS-03, 2026-09-27). Seven sizes and the field size; every font size in this
        file is one of them. It replaced 46 sizes, 22 of them between 6 and 20 px, and nothing is
-       smaller than 11 px (A11Y-01). Clocks, timers, record numbers and the clamp() heroes are
+       smaller than 12 px (A11Y-01, raised from 11 on 2026-10-24: Love All B6). Clocks, timers, record numbers and the clamp() heroes are
        display pieces with their own sizes (32 px and up, or a line marked display: in a comment).
        scripts/check_type_scale.py blocks any other px size. A new rule picks the step by its job,
        not by the pixel it looks right at. The table: PROGRAM-APP.md, One type scale. */
-    --fs-label: 11px;    /* Space Mono labels, eyebrows, pills, the tab bar, meta lines */
+    --fs-label: 12px;    /* Space Mono labels, eyebrows, pills, the tab bar, meta lines */
     --fs-small: 13px;    /* a secondary line, a helper sentence, a small button */
     --fs-body: 15px;     /* notes, cues, sheet text, rows, buttons */
     --fs-field: 16px;    /* what the athlete types: under 16 px an iPhone zooms the page on a tap */
@@ -3151,7 +3151,7 @@
     :where(#day-view) .session-timer-actions { gap: 8px; }
     :where(#day-view) .session-timer.has-reset:not(.slim) .session-timer-btn { padding: 0 8px; font-size: var(--fs-body); }
     :where(#day-view) .session-timer-reset:not([hidden]) { padding: 0 10px; }
-    :where(#day-view) .session-timer-week, :where(#day-view) .session-timer-week .stw-k { letter-spacing: .4px; }
+    :where(#day-view) .session-timer-week, :where(#day-view) .session-timer-week .stw-k { letter-spacing: 0; }
     :where(#day-view) .session-timer-week .stw-k { margin-right: 8px; }
     :where(#day-view) .session-timer-week i { margin: 0 6px 0 0; }
     :where(#day-view) .session-timer.slim .session-timer-leave { padding: 0 8px 0 10px; gap: 5px; }
@@ -3547,6 +3547,7 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-set-unit { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; margin: -14px 0; padding: 0 6px; border: 0; border-radius: 6px;
     background: none; cursor: pointer; font: inherit; font-weight: 700; letter-spacing: inherit; text-transform: uppercase; color: var(--green-ink); white-space: nowrap;
     -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-unit.hand { letter-spacing: 0; padding: 0 2px; gap: 1px; max-width: 100%; white-space: normal; line-height: 1.15; }   /* "kg / hand" is longer than the boxes are wide: at 12 px it stacks as "kg /" over "hand", never into REPS */
   :where(#day-view, .step-scroll, #ws-body) .ex-set-unit::after { content: '\25BE'; font-weight: 400; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   /* 44 wide to hit as well as 44 high (Love All L5, 2026-10-24): an invisible box 3 px past each side, the drawn button unchanged. */
@@ -3617,6 +3618,11 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check::before { background: var(--mark); border-color: var(--mark); }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check::after { opacity: 1; transform: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-check:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 0; }
+  /* a hold counting (holdGate()): the circle's edge is a ring that empties, the seconds left sit in it; reduced motion keeps the number only */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-check.holding { font-size: var(--fs-small); font-weight: 700; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-check.holding::before { border: 0; background: conic-gradient(var(--green-ink) calc(var(--hold, 1) * 360deg), var(--hair) 0);
+    -webkit-mask: radial-gradient(circle, transparent 12.5px, #000 13px); mask: radial-gradient(circle, transparent 12.5px, #000 13px); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-check.holding.quiet::before { background: var(--green-ink); }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row .ex-set-check.kg-armed::before { border: 2px solid var(--clay); }   /* the weight asks first (kgLooksWrong()) */
   /* How hard?: a sand band that hangs off its set, a caret up at that set's RPE slot, big keys */
   :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe { grid-column: 1 / -1; display: none; position: relative; align-items: center; gap: 6px;
@@ -3663,6 +3669,11 @@
   :where(#day-view, .step-scroll, #ws-body) .round-row.prep.has-cues .round-row-main { cursor: pointer; }
   :where(#day-view, .step-scroll, #ws-body) .round-letter { grid-area: l; justify-self: center; width: auto; font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; color: var(--green-ink); }
   :where(#day-view, .step-scroll, #ws-body) .round-name { grid-area: n; align-self: end; letter-spacing: 0; font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  /* the ⓘ after a movement's name: 44 px to hit, a 22 px circle to see, margins that give back the height so the line does not grow */
+  :where(#day-view, .step-scroll, #ws-body) .round-about { position: relative; z-index: 0; display: inline-block; vertical-align: middle; width: 44px; height: 44px; margin: -13px -8px -13px -4px; padding: 0;
+    border: 0; background: none; cursor: pointer; font: 700 var(--fs-small)/44px 'Barlow', sans-serif; color: var(--grey); text-align: center; -webkit-tap-highlight-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .round-about::before { content: ''; position: absolute; z-index: -1; inset: 11px; border-radius: 50%; border: 1.5px solid var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .round-about:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   :where(#day-view, .step-scroll, #ws-body) .round-detail { grid-area: d; align-self: start; margin: 2px 0 0; letter-spacing: 0; font: 500 var(--fs-small)/1.3 'Barlow', sans-serif;
     color: var(--grey); font-variant-numeric: tabular-nums; }
   :where(#day-view, .step-scroll, #ws-body) .round-row-main > :not(.round-letter):not(.round-name):not(.round-detail) { grid-row: 1 / span 2; }
@@ -3693,8 +3704,8 @@
   :where(#day-view, .step-scroll, #ws-body) .round-wt { flex: 1 1 auto; min-width: 0; width: auto; height: auto; margin: 0; padding: 0 6px 0 4px; border: 0; border-radius: 0; background: none; outline: none;
     font: 500 var(--fs-field)/1 'Barlow', sans-serif; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
   :where(#day-view, .step-scroll, #ws-body) .round-wt::placeholder { color: var(--ph); opacity: 1; font-weight: 500; }
-  :where(#day-view, .step-scroll, #ws-body) .circ-unit { flex: none; min-width: 40px; margin: 0; padding: 0 8px; border: 0; border-left: 1px solid var(--hair); border-radius: 0; background: var(--sand); cursor: pointer;
-    -webkit-appearance: none; appearance: none; font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .3px; text-transform: uppercase; color: var(--green-ink); white-space: nowrap;
+  :where(#day-view, .step-scroll, #ws-body) .circ-unit { flex: none; min-width: 40px; margin: 0; padding: 0 5px; border: 0; border-left: 1px solid var(--hair); border-radius: 0; background: var(--sand); cursor: pointer;
+    -webkit-appearance: none; appearance: none; font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 0; text-transform: uppercase; color: var(--green-ink); white-space: nowrap;
     -webkit-tap-highlight-color: transparent; }
   :where(#day-view, .step-scroll, #ws-body) .circ-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   :where(#day-view, .step-scroll, #ws-body) .round-row:not(.prep) .round-cues-slot { display: block; }
@@ -4105,7 +4116,7 @@
     #stepOverlay .step-pill:not(:empty)::before { content: none; }
   }
   @media (max-width: 359px) {
-    #stepOverlay .step-week .session-timer-week, #stepOverlay .step-week .stw-k { letter-spacing: .4px; }
+    #stepOverlay .step-week .session-timer-week, #stepOverlay .step-week .stw-k { letter-spacing: 0; }
     #stepOverlay .step-week .stw-k { margin-right: 8px; }
     #stepOverlay .step-week .session-timer-week i { margin: 0 6px 0 0; }
   }
@@ -4297,7 +4308,7 @@
   .timer-next .tn-v { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
   @media (max-width: 359px) {
     .timer-log .tl-line { gap: 4px; }
-    .timer-log .session-timer-week, .timer-log .stw-k { letter-spacing: .4px; }
+    .timer-log .session-timer-week, .timer-log .stw-k { letter-spacing: 0; }
     .timer-log .stw-k { margin-right: 8px; }
     .timer-log .session-timer-week i { margin: 0 6px 0 0; }
   }
@@ -4414,6 +4425,8 @@
   .xl-search:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
   .xl-chips { display: flex; gap: 4px; margin: 0 calc(-1 * var(--g)); padding: 0 var(--g); overflow-x: auto; scrollbar-width: none; }
   .xl-chips::-webkit-scrollbar { display: none; }
+  /* Room after the last chip on every engine, and a soft fade on the edge it scrolls off (Love All B, 2026-10-24): pinned to the right edge while there is more, it rests in the empty end space once the last chip is whole. */
+  .xl-chips::after { content: ''; flex: none; position: sticky; right: 0; width: 28px; pointer-events: none; background: linear-gradient(to right, transparent, var(--paper)); }
   .xl-chip { position: relative; isolation: isolate; flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 0; background: none;
     color: var(--grey); cursor: pointer; white-space: nowrap; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
   .xl-chip::before { content: ''; position: absolute; z-index: -1; inset: 4px 0; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--box); }
@@ -4462,17 +4475,18 @@
   .lib-head .prog-eyebrow { text-wrap: balance; }   /* 320 px: "TRAIN IT, LEARN IT, / KNOW IT", not one word alone */
 
   /* Before you start: the lower-day banner's recipe (a white row on the paper, a 4 px clay stripe: clay because it is a "look here"). The
-     row is the fold: BEFORE YOU START in clay mono over "Safety checks: what to stop for", the app's ⌄ at the right (turned when open). It is
-     open the first time each session is opened on this phone and one folded row after that (renderBefore()); it folds by its own tap only,
-     never by Why this session's. Its paragraphs are at reading size. */
+     row is the fold: BEFORE YOU START in clay mono, a short count at the right ("4 things") and the app's ⌄ (turned when open). It is
+     CLOSED by default, every time (Love All B4, 2026-10-24: it was 687 px and pushed the first exercise off the first screen); it opens and
+     closes by its own tap only, never by Why this session's. Its paragraphs are at reading size. */
   .ws-before { margin: 0; background: var(--row); box-shadow: inset 4px 0 0 var(--clay-fill); border-bottom: 1px solid var(--hair); }
   .ws-before[hidden] { display: none; }
-  .ws-before-h { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; margin: 0; padding: 14px var(--g); border: 0; border-radius: 0; background: transparent;
+  .ws-before-h { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; margin: 0; padding: 8px var(--g); border: 0; border-radius: 0; background: transparent;
     color: var(--ink); text-align: left; cursor: pointer; }
   .ws-before-h:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   .wb-t { flex: 1; min-width: 0; display: grid; gap: 5px; }
   .wb-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--clay-ink); }
-  .wb-l { font: 500 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .wb-l { flex: none; font: 500 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--grey); white-space: nowrap; }
+  .wb-s { font: 500 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }   /* folded, the row still says what it holds: a red flag is never out of sight */
   .wb-c, .ws-fold-c { flex: none; width: 18px; height: 18px; background: var(--grey); transition: transform .2s ease;
     -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
   .ws-before-h[aria-expanded="true"] .wb-c, .ws-why-toggle[aria-expanded="true"] .ws-fold-c { transform: rotate(180deg); }
@@ -4765,8 +4779,11 @@
      34 px of ink inside a 44 px tap target (the padding is the target), and a held button stays pressed while it repeats. */
   #home-overview .hb-steps { flex: none; display: flex; align-items: center; gap: 2px; }
   /* The number between them, in the row's own figures: 44 px wide so 7.5 and 10,000 leave the buttons where they are. */
-  #home-overview .hb-now { flex: none; min-width: 48px; text-align: center; font: 700 var(--fs-field)/1 'Barlow', sans-serif;
-    font-variant-numeric: tabular-nums; color: var(--ink); }
+  #home-overview .hb-now { flex: none; min-width: 48px; height: 44px; padding: 0 2px; margin: 0; border: 0; border-radius: 10px; background: none;
+    text-align: center; font: 700 var(--fs-field)/1 'Barlow', sans-serif;
+    font-variant-numeric: tabular-nums; color: var(--ink); cursor: text; }
+  #home-overview .hb-now:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  #home-overview input.hb-type { width: 72px; min-width: 72px; box-sizing: border-box; border: 1.5px solid var(--fill); background: var(--paper); outline: none; font-size: var(--fs-field); }
   #home-overview .hb-now.is-done { color: var(--green-ink); }
   /* The narrowest phone: the pair keeps its 34 px targets and the row buys the space back from the gaps, so
      "Sleep 7.5+ hours" still gets one line. */
@@ -6123,6 +6140,12 @@
 </style>
 </head>
 <body>
+<script>
+/* The theme before the first paint (2026-10-24): the stored pick (1 dark, 0 or empty light), else the phone. The same rule as themePick/themeApply, which boot() keeps running. */
+(function () { var d = null; try { var v = localStorage.getItem('dark_mode'); d = v === null ? null : v === '1'; } catch (e) {}
+  if (d === null) { try { d = !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); } catch (e) { d = false; } }
+  if (d) { document.body.setAttribute('data-dark', ''); document.documentElement.style.colorScheme = 'dark'; } })();
+</script>
 
 <!-- ═══ DEMO BANNER (shown only when ?client=demo) ═══ -->
 <div class="demo-banner" id="demo-banner" hidden>
@@ -6436,8 +6459,8 @@
        workout, and a red flag must never be the thing a closed toggle hides. The row
        folds ONLY by its own tap: open the first time a session is opened (renderBefore()). -->
   <section class="ws-before" id="ws-before" aria-labelledby="ws-before-h" hidden>
-    <button type="button" class="ws-before-h" id="ws-before-btn" aria-expanded="true" aria-controls="ws-before-body" onclick="toggleBefore()">
-      <span class="wb-t"><span class="wb-k" id="ws-before-h">Before you start</span><span class="wb-l">Safety checks: what to stop for</span></span>
+    <button type="button" class="ws-before-h" id="ws-before-btn" aria-expanded="false" aria-controls="ws-before-body" onclick="toggleBefore()">
+      <span class="wb-t"><span class="wb-k" id="ws-before-h">Before you start</span><span class="wb-s">Safety checks: what to stop for</span></span><span class="wb-l" id="ws-before-n"></span>
       <span class="wb-c" aria-hidden="true"></span>
     </button>
     <div class="ws-before-b" id="ws-before-body"></div>
@@ -8805,6 +8828,9 @@ function maybeWelcome() {
   const plan = cyc && cyc.name
     ? 'Your plan is ready. First up is ' + esc(cyc.name) + (cyc.weeks ? ', ' + esc(cyc.weeks) : '') + '.'
     : 'Your plan is ready.';
+  // The button opens the Next up day and names it (suggestedDayId(); the first day when none is suggested: Love All B, 2026-10-24).
+  const wDays = (DATA.workouts && DATA.workouts.days) || [], wSid = suggestedDayId();
+  const wDay = wDays.find(d => wSid != null && String(d.id) === String(wSid)) || wDays[0] || null;
   const el = document.createElement('div');
   el.className = 'wel';
   el.innerHTML =
@@ -8821,7 +8847,7 @@ function maybeWelcome() {
       '<p>' + plan + '</p>' +
       '<p class="sub">Any questions, message me on WhatsApp. The button is in the Coach tab.</p>' +
       '<div class="wn-sign">' + WN_SIG + '<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>' +   // his two lines, signed as the week note is
-      '<button type="button" class="wel-go">Open Day 1</button>' +
+      '<button type="button" class="wel-go">Open Day ' + esc(String(wDay && wDay.id != null ? wDay.id : 1)) + '</button>' +
       '<button type="button" class="wel-skip">Look around first</button>' +
     '</div>';
   document.body.appendChild(el);
@@ -8829,9 +8855,8 @@ function maybeWelcome() {
   // To the training, not the plan (PLAN-01, Amir 2026-09-26): a new athlete's first tap lands on Day 1.
   el.querySelector('.wel-go').addEventListener('click', function () {
     el.remove();
-    const d0 = (DATA.workouts && DATA.workouts.days || [])[0];
     goTo('home');
-    if (d0) openDayView(String(d0.id));
+    if (wDay) openDayView(String(wDay.id));
     navSync();
   });
   const closeWelcome = function () { el.remove(); navSync(); };
@@ -9306,6 +9331,7 @@ function dayImageCategory(day) {
 function dayCardHTML(day, dayNum, total, opts) {
   opts = opts || {};
   const id = day.id != null ? day.id : dayNum;
+  dayNum = esc(String(id));   // "Day N" is the day's real id, never its place in the list (ids 1 and 3 say Day 1 and Day 3: Love All B, 2026-10-24)
   // Descriptive day name = title, else focusTag (e.g. "Squat & Glute Activation").
   const name = day.title || day.focusTag || ('Day ' + dayNum);
   const idStr = esc(String(id));
@@ -9797,7 +9823,9 @@ window.openCycleNote = openCycleNote;
 // roadmap has one, the one ask, Ready for Cycle N?, and one row that unfolds the cycle's day cards.
 function betweenCyclesHTML(o) {
   const n = o.cIdx + 1, nDays = ((DATA.workouts && DATA.workouts.days) || []).length;
-  const ask = `<div class="bt-wa">${waInlineHtml(coachWhatsAppUrl('About Cycle ' + (n + 1) + ': '), 'Ready for Cycle ' + (n + 1) + '?', 'Message Amir to start it.')}</div>`;
+  // The roadmap's last cycle has no Cycle N+1 to name (Love All B, 2026-10-24): the ask is about what comes after the plan.
+  const ask = `<div class="bt-wa">${o.next ? waInlineHtml(coachWhatsAppUrl('About Cycle ' + (n + 1) + ': '), 'Ready for Cycle ' + (n + 1) + '?', 'Message Amir to start it.')
+    : waInlineHtml(coachWhatsAppUrl('About what comes next: '), 'What comes next?', 'Message Amir any time.')}</div>`;
   // The Cycle complete card is on Progress now (paintCycleCard()), so Home still says the cycle ended: one door row, first.
   const fin = `<button type="button" class="hrow bt-done" onclick="goTo('plan')">
     <span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16 9.5"/></svg></span>
@@ -9806,13 +9834,13 @@ function betweenCyclesHTML(o) {
     ? `<div class="home-section-head"><div class="home-section-title">Up next</div></div>
       <div class="bt-next"><div class="road">${roadRowHTML(o.next, o.cIdx + 1, { state: 'next', idp: 'bt-road-body-', open: false })}</div></div>${ask}`
     : `<div class="home-section-head"><div class="home-section-title">What's next</div></div>
-      <div class="bt-sum">You've trained the whole plan.</div>${ask}`);
+      <div class="bt-sum">That was the last cycle of your plan. I'll be in touch about what comes next.</div>${ask}`);
   // One session to do until it starts (Line Call, 2026-10-13; Amir: "yes to all recommended"): the day trained least this cycle,
   // usually the last of the week, the one partial weeks drop. Every day the same: none is named.
   // In its own slot: the session history can arrive after Home is drawn, and paintWeek() then fills it again.
   const pick = `<div id="bt-pick-slot">${btPickHTML(o.cur)}</div>`;
   return h +`<div class="home-section-head"><div class="home-section-title">${o.next ? 'Between cycles' : 'Keep moving'}</div></div>
-    <div class="bt-sum">No new week until Cycle ${n + 1} starts. Want to keep moving? Any session from ${esc(o.cur.name || 'this cycle')} still works.</div>${pick}
+    <div class="bt-sum">${o.next ? 'No new week until Cycle ' + (n + 1) + ' starts.' : 'There is no new week to train.'} Want to keep moving? Any session from ${esc(o.cur.name || 'this cycle')} still works.</div>${pick}
     <button type="button" class="bt-rep" id="bt-rep" aria-expanded="false" aria-controls="day-cards-wrap" onclick="toggleBetweenDays()">
       <span class="bt-rep-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg></span>
       <span class="dc-nm">Repeat a session<small>Cycle ${n} · ${nDays} session${nDays === 1 ? '' : 's'}</small></span>
@@ -10789,11 +10817,13 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   const repsData = (rx.dose && rx.dose.kind === 'reps') ? rx.dose.value : '';
   // The dose as words, for a set row with no box to type in (a hold: "30 s / side").
   const doseData = rx.dose ? rx.dose.value + (rx.dose.side ? ' / side' : '') : '';
+  // A timed hold ("30 s / side") gets a circle that counts it (holdGate()): its seconds, or nothing for "30-45 s" or a carry.
+  const holdSec = (rx.dose && rx.dose.kind === 'time' && isStandard) ? (parseDurationToSec(rx.dose.value) || '') : '';
 
   // .ex-side holds the ⓘ (paintSpine()); .ex-doneline is the finished row's summary
   // (paintDoneLines()). The dot is an empty span inside .item-name, so the name's text
   // (which every lookup reads) is unchanged.
-  return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-dose="${esc(doseData)}" data-target="${esc(rx.rpe || '')}" data-exid="${esc(ex.exId || '')}">
+  return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-dose="${esc(doseData)}"${holdSec ? ` data-hold="${holdSec}"` : ''}${holdSec && rx.dose.side ? ' data-hold-side="1"' : ''} data-target="${esc(rx.rpe || '')}" data-exid="${esc(ex.exId || '')}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" role="button" tabindex="0" aria-label="Tick every set" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')" onkeydown="onCheckBoxKey(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
@@ -11289,8 +11319,8 @@ function renderNotes() {
 
   document.getElementById('notes-container').innerHTML =
     coachContactHtml() +
-    (rows ? `<div class="prog-sec">Notes from Amir</div><div class="cn-list">${rows}</div>` : '') +
-    door;
+    door +   // first, above the notes: it is where a new athlete starts, so it must not sit under seven notes (2026-10-24)
+    (rows ? `<div class="prog-sec">Notes from Amir</div><div class="cn-list">${rows}</div>` : '');
 }
 
 // "How the app works" — the general how-to content shown to every athlete in the
@@ -11795,7 +11825,7 @@ window.goLibrary = goLibrary;
 //
 // The keys are AA Proof's own, unchanged: <id>_hab_cfg and <id>_hab_log. Every athlete's history, every
 // board position and every XP row on the server reads them exactly as it did, so nothing migrates.
-let HAB_CFG = null, HAB_LOG = {}, HAB_UI = { day: null }, _habEdit = null, _habWaiting = false;
+let HAB_CFG = null, HAB_LOG = {}, HAB_UI = { day: null }, _habEdit = null, _habTyping = null, _habWaiting = false;
 const habKeyCfg = () => ATHLETE_ID + '_hab_cfg';
 const habKeyLog = () => ATHLETE_ID + '_hab_log';
 // Never in the coach's preview (a stray tap would land in that athlete's own log) and never before the
@@ -11953,6 +11983,34 @@ function habSaveNum(id) {
   if (isFinite(n)) habSetVal(id, n); else paintTodayCard();
 }
 window.habSaveNum = habSaveNum;
+// ── Tap the number to type it (Love All round 4, 2026-10-24): 12,000 steps was 24 taps on the +. The number is a button; a tap turns
+// it into a number box in the same place, and Enter or leaving the box saves it through habSetVal(), the one door the + and − use, so
+// the cap, the floor, the XP and the day's window are the same. Escape or an empty box leaves the number as it was.
+
+function habTypeOpen(id) {
+  if (!habOn()) return;
+  const h = window.AAHabits.byId(id);
+  if (!h || h.locked || h.kind !== 'count') return;
+  _habTyping = id;
+  paintTodayCard();
+  const el = document.getElementById('hab-type-' + id);
+  if (el) { el.focus(); el.select(); }
+}
+function habTypeSave(id) {
+  if (_habTyping !== id) return;                 // Escape or a save already closed it: the blur that follows is only the box going away
+  const el = document.getElementById('hab-type-' + id);
+  _habTyping = null;
+  const raw = el ? String(el.value).trim() : '';
+  const h = window.AAHabits.byId(id);
+  const txt = (h && Number(h.step || 1) % 1) ? raw.replace(',', '.') : raw.replace(/[,\s]/g, '');
+  const n = txt === '' ? NaN : Number(txt);
+  if (isFinite(n) && n >= 0) habSetVal(id, n); else paintTodayCard();
+}
+function habTypeKey(ev, id) {
+  if (ev.key === 'Enter') { ev.preventDefault(); habTypeSave(id); }
+  else if (ev.key === 'Escape') { ev.preventDefault(); _habTyping = null; paintTodayCard(); }
+}
+window.habTypeOpen = habTypeOpen; window.habTypeSave = habTypeSave; window.habTypeKey = habTypeKey;
 
 // ── The card ──────────────────────────────────────────────────────────────────────────────────────────
 // Everything on it is logged, or says whether today counts. Nothing else earns a place.
@@ -12097,7 +12155,9 @@ function habRowHtml(hb, k) {
   const plus = (hb.kind === 'count' && !hb.locked)
     ? `<span class="hb-steps">
       <button type="button" class="hb-step" data-h="${hb.id}" data-d="-1"${val <= 0 ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Take ${step} off ${esc(name)}">−</button>
-      <output class="hb-now${done ? ' is-done' : ''}" aria-label="${esc(name)}: ${H.fmtVal(hb, val)} of ${H.fmtVal(hb, hb.target)} ${esc(hb.unit || '')}">${H.fmtVal(hb, val)}</output>
+      ${_habTyping === hb.id
+        ? `<input class="hb-now hb-type" id="hab-type-${hb.id}" type="text" inputmode="${Number(hb.step || 1) % 1 ? 'decimal' : 'numeric'}" enterkeyhint="done" autocomplete="off" value="${H.fmtVal(hb, val).replace(/,/g, '')}" aria-label="${esc(name)}: type the ${esc(hb.unit || 'number')}" onkeydown="habTypeKey(event, '${hb.id}')" onblur="habTypeSave('${hb.id}')">`
+        : `<button type="button" class="hb-now${done ? ' is-done' : ''}" onclick="habTypeOpen('${hb.id}')" aria-label="${esc(name)}: ${H.fmtVal(hb, val)} of ${H.fmtVal(hb, hb.target)} ${esc(hb.unit || '')}. Tap to type a number.">${H.fmtVal(hb, val)}</button>`}
       <button type="button" class="hb-step" data-h="${hb.id}" data-d="1"${val >= cap ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Add ${step} to ${esc(name)}">+</button>
     </span>` : '';
   return `<div class="hb-wrap" data-h="${hb.id}">
@@ -16879,10 +16939,14 @@ function ncSpark(entries) {
     <polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="${last[0]}" cy="${last[1]}" r="3.2" fill="currentColor"/></svg>`;
 }
-// "Barbell Back Squat" → "Back Squat" for the short name on the Records row (Progress).
+// "Barbell Back Squat" → "Back Squat" for the short name on the Records row (Progress). A name that is long (over 22 letters) loses its LAST WORDS,
+// never half a word: "Romanian Deadlift" is whole, "Trap Bar Romanian Deadlift Hold" becomes "Trap Bar Romanian…" (Love All B, 2026-10-24).
 function shortLift(name) {
   const t = String(name || '').replace(/^(barbell|dumbbell|machine|cable|smith machine)\s+/i, '');
-  return t.length > 13 ? t.slice(0, 12).trim() + '…' : t;
+  if (t.length <= 22) return t;
+  const w = t.split(/\s+/);
+  while (w.length > 1 && w.join(' ').length > 20) w.pop();
+  return w.join(' ').slice(0, 20).trim() + '…';
 }
 
 // A tiny sparkline for a lift's estimates. Flat when there is only one point.
@@ -18192,19 +18256,9 @@ function renderWhy(wk) {
 // so a hand-written file with a plain list still shows. Absent or empty → the card stays hidden,
 // which is every session written before 2026-09-20.
 //
-// Open the FIRST time each session is opened on this phone, one folded row after that (Amir, 2026-10-13: "open the first
-// time each session is opened; afterwards one row titled Before you start that opens with a tap"). The phone keeps which
-// sessions it has shown, { "<workout id>": 1 } under WS_BEFORE_KEY: NOT athlete-prefixed and never synced, because it is
-// about this phone's reading, not the athlete's record. Where it cannot be read or written (a private window) the card is
-// simply open every time, the safe way round. The row folds by its OWN tap only: nothing else hides these rows.
-const WS_BEFORE_KEY = 'ws_before_seen';
-function _wsBeforeSeen() {
-  try { const o = JSON.parse(localStorage.getItem(WS_BEFORE_KEY) || '{}'); return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; }
-  catch (e) { return {}; }
-}
-function _wsBeforeMark(id) {
-  try { const o = _wsBeforeSeen(); if (o[id]) return; o[id] = 1; localStorage.setItem(WS_BEFORE_KEY, JSON.stringify(o)); } catch (e) { /* private window */ }
-}
+// CLOSED by default, every time (Love All B4, 2026-10-24, Amir: direction A of the audit; it had been open the first time each session
+// was opened, 687 px, and the first exercise began below the first screen). One row, "Before you start" and how many things it
+// holds, opens and closes with a tap. Nothing is remembered: the row is always one tap away and always starts closed.
 function _wsBeforeOpen(open) {
   const wrap = document.getElementById('ws-before');
   const body = document.getElementById('ws-before-body');
@@ -18223,9 +18277,9 @@ function renderBefore(wk) {
     ? `<p>${esc(r)}</p>`
     : `<p>${r.label ? `<b>${esc(r.label)}</b> ` : ''}${esc(r.text)}</p>`).join('');
   wrap.hidden = false;
-  const id = wk && wk.id ? String(wk.id) : '';
-  _wsBeforeOpen(!(id && _wsBeforeSeen()[id]));
-  if (id) _wsBeforeMark(id);
+  const n = document.getElementById('ws-before-n');
+  if (n) n.textContent = rows.length + (rows.length === 1 ? ' thing' : ' things');
+  _wsBeforeOpen(false);
 }
 function toggleBefore() {
   const btn = document.getElementById('ws-before-btn');
@@ -20842,6 +20896,57 @@ function repRangeText(card) {
   return /\d\s*[-–]\s*\d/.test(t) ? t.replace(/\s*[-–]\s*/, '–').replace(/[^\d–]/g, '') : '';
 }
 
+// ── THE CIRCLE COUNTS A HOLD (Love All round 4, 2026-10-24, direction A of "Round 4 choices") ──
+// A set whose dose is a time ("20 s / side", the plank: data-hold, in seconds) counts down inside its own circle: a ring that empties,
+// the seconds left as the number, a buzz at 0, and for "/ side" three seconds to change, "Other side", then the second side. At the end
+// the set ticks itself through the same click every tick takes. A second tap while it counts stops it and ticks nothing. A done set's
+// circle still unticks as ever, and Guided's big Done button ticks at once (it sets btn._now): the athlete said it is done.
+// Reduced motion: no ring moves, only the number. One hold at a time (holdGate.run).
+function holdGate(card, row, btn, idx, name, total, day) {
+  const sec = parseInt(card.dataset.hold, 10);
+  if (!sec || btn._now) return false;
+  if (btn._hold) { holdStop(btn); return true; }                  // a tap while it counts: stop, tick nothing
+  const pre = loadSetLog(name, total, day)[idx] || {};
+  if (pre.d) return false;                                        // already ticked: the circle unticks as it always did
+  if (holdGate.run) holdStop(holdGate.run);
+  const quiet = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const plan = card.dataset.holdSide === '1' ? [['hold', sec], ['switch', 3], ['hold', sec]] : [['hold', sec]];
+  let phase = 0, t0 = Date.now();
+  btn._hold = {};
+  holdGate.run = btn;
+  btn.classList.add('holding');
+  btn.classList.toggle('quiet', quiet);
+  btn.setAttribute('aria-label', `Set ${idx + 1} counting. Tap to stop`);
+  const draw = () => {
+    const [kind, len] = plan[phase], left = Math.max(0, len - (Date.now() - t0) / 1000);
+    btn.textContent = String(Math.ceil(left));
+    if (!quiet) btn.style.setProperty('--hold', kind === 'hold' ? (left / len).toFixed(3) : '0');
+    return left;
+  };
+  btn._hold.timer = setInterval(() => {
+    if (!btn.isConnected) { holdStop(btn); return; }
+    if (draw() > 0) return;
+    if (plan[phase][0] === 'hold' && navigator.vibrate) navigator.vibrate(220);
+    if (++phase >= plan.length) {
+      holdStop(btn);
+      btn._now = true; btn.click(); btn._now = false;             // the set ticks itself, by the very click a thumb makes
+      return;
+    }
+    if (plan[phase][0] === 'switch') aaToast('Other side.', { kicker: 'Hold', ms: 3000 }); else hideAaToast();
+    t0 = Date.now(); draw();
+  }, 100);
+  draw();
+  return true;
+}
+function holdStop(btn) {
+  if (!btn || !btn._hold) return;
+  clearInterval(btn._hold.timer); btn._hold = null;
+  if (holdGate.run === btn) holdGate.run = null;
+  btn.classList.remove('holding', 'quiet'); btn.style.removeProperty('--hold'); btn.textContent = '';
+  const row = btn.closest('.ex-set-row');
+  btn.setAttribute('aria-label', `Mark set ${row ? parseInt(row.dataset.setIdx, 10) + 1 : ''} done as written`);
+}
+
 function attachSetLog(card) {
   const name  = card.querySelector('.item-name').textContent.trim();
   const total = parseInt(card.dataset.sets, 10) || 1;
@@ -20907,7 +21012,9 @@ function attachSetLog(card) {
     const liveIdx = cur.findIndex(s => !s.d);
     const unit = cardUnit(card);
     const ub = wrap.querySelector('.ex-set-unit');
-    if (ub && ub.textContent !== unit) ub.textContent = unit;
+    const head = unitHead(card, unit);
+    if (ub && ub.textContent !== head) ub.textContent = head;
+    if (ub) ub.classList.toggle('hand', head !== unit);
     if (ub) ub.setAttribute('aria-label', `Weight in ${unit}. Tap to choose a unit`);
     wrap.dataset.unit = unit;
     rows.forEach((row, i) => {
@@ -21027,6 +21134,7 @@ function attachSetLog(card) {
     // an RPE is already there; unticking closes it. Nothing is erased either way.
     row.querySelector('.ex-set-check').addEventListener('click', ev => {
       ev.stopPropagation();
+      if (holdGate(card, row, ev.currentTarget, idx, name, total, day)) return;   // a timed hold: the circle counts it first
       // A weight far above this lift's numbers asks once before the tick keeps it (kgLooksWrong()): the first tap arms the
       // tick (a clay ring) and says so, a second within 4 s keeps it.
       const pre = loadSetLog(name, total, day)[idx] || {}, btn = ev.currentTarget;
@@ -21903,6 +22011,16 @@ function kgWanted(card) {
   if (!eq.length) return true;
   return eq.some(x => KG_LOADED.test(x) && !KG_NOT.test(x));
 }
+// "kg / hand" (Love All round 4, 2026-10-24): a dumbbell or kettlebell weight is the weight in EACH hand, so the column header says so
+// ("lb / hand" in pounds; a plate stack is never per hand). Dumbbell or kettlebell is read from the Spine entry's equipment (the same
+// field kgWanted() reads); only a card with no entry, or an entry with no equipment, falls back to the name (Dumbbell, DB, Kettlebell, KB).
+function perHand(card) {
+  const name = card.querySelector('.item-name').textContent.trim();
+  const entry = SPINE ? spineFor(name, card.dataset.exid) : null;
+  const eq = (entry && Array.isArray(entry.equipment)) ? entry.equipment : [];
+  return eq.length ? eq.some(x => /dumbbell|kettlebell/i.test(x)) : /\b(dumbbell|db|kettlebell|kb)s?\b/i.test(name);
+}
+function unitHead(card, unit) { return unit !== 'plates' && perHand(card) ? unit + ' / hand' : unit; }
 function paintKgCol(card) {
   const d = cardDetail(card);
   const wrap = d && d.querySelector('.ex-set-log');
@@ -22333,6 +22451,7 @@ function themeApply() {
   let dark = pick;
   if (dark === null) { try { dark = !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); } catch (e) { dark = false; } }
   if (dark !== document.body.hasAttribute('data-dark')) dark ? document.body.setAttribute('data-dark', '') : document.body.removeAttribute('data-dark');
+  document.documentElement.style.colorScheme = dark ? 'dark' : '';
   syncDarkToggle();
 }
 function themeBoot() {
@@ -23198,7 +23317,9 @@ function stepPrimary() {
   if (!stepDone(item)) {
     if (item.circuit) finishRound(item);
     else {
-      currentStepRow().querySelector('.ex-set-check').click();
+      const tick = currentStepRow().querySelector('.ex-set-check');
+      holdStop(tick);                                            // Done says it is done: a hold's circle is not waited for
+      tick._now = true; tick.click(); tick._now = false;
       if (!stepDone(item)) return;   // the weight asked first (kgLooksWrong()): the next tap of Done keeps it
     }
     stepAfterDone();
@@ -23263,7 +23384,7 @@ function paintTimerLog(row, item) {
     tl.innerHTML = `
       <div class="tl-head">Set ${item.setI + 1} of ${item.total} · how did it go?</div>
       ${kgOn ? `<div class="tl-line tl-kgline">
-        <button type="button" class="tl-lab tl-unit" aria-haspopup="menu" aria-expanded="false" aria-label="Weight in ${unit}. Tap to choose a unit">${unit === 'plates' ? 'Plates' : unit === 'lb' ? 'Lb' : 'Kg'}</button>
+        <button type="button" class="tl-lab tl-unit" aria-haspopup="menu" aria-expanded="false" aria-label="Weight in ${unit}. Tap to choose a unit">${(unit === 'plates' ? 'Plates' : unit === 'lb' ? 'Lb' : 'Kg') + (item.card && unit !== 'plates' && perHand(item.card) ? ' / hand' : '')}</button>
         <input class="tl-kg" type="text" inputmode="decimal" autocomplete="off" value="${esc(wIn.value)}" placeholder="${lw ? 'last ' + esc(lastText(lw, unit)) : unitWord(unit)}" aria-label="Weight on set ${item.setI + 1}">
         ${lw ? `<button type="button" class="tl-same">Same as last</button>` : ''}
       </div>` : ''}
@@ -23670,11 +23791,11 @@ function demoLoad(name, h) {
   return 20;
 }
 function demoHistory() {
-  const rows = [], day0 = new Date();
+  const rows = [], day0 = new Date(), nDays = ((DATA && DATA.workouts && DATA.workouts.days) || []).length;
   const hash = s => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
   ((DATA && DATA.workouts && DATA.workouts.days) || []).forEach((d, di) => {
     for (let k = 0; k < 4; k++) {
-      const dt = new Date(day0.getTime() - ((di + 2) + 7 * k) * 86400000);
+      const dt = new Date(day0.getTime() - ((nDays - di + 1) + 7 * k) * 86400000);   // the LAST day is the newest, so a first visit's Next up is Day 1
       const log = [];
       (d.blocks || []).forEach(b => (b.exercises || []).forEach((ex, xi) => {
         if (!ex || ex.type === 'circuit') return;
@@ -24118,9 +24239,10 @@ function spineCuesInto(slot, entry, render) {
   setSlot(slot, entry && hasCues(entry.cues) ? render(entry.cues) : slot.dataset.own);
 }
 function paintSpine() {
-  // Exercises inside a circuit: steps and cues (a circuit row has no ⓘ).
+  // Exercises inside a circuit: steps and cues, and the ⓘ of a movement with an approved entry (Love All round 4, 2026-10-24).
   document.querySelectorAll('.round-cues-slot').forEach(slot => {
     const entry = SPINE ? spineFor(slot.dataset.name, slot.dataset.exid) : null;
+    paintRoundAbout(slot.closest('.round-row'), slot, entry);
     spineCuesInto(slot, entry, renderRoundCues);
     const row = slot.closest('.round-row');
     if (!row) return;
@@ -24147,6 +24269,25 @@ function paintSpine() {
     if (entry) paintKgCol(card);
     paintAbout(card);
   });
+}
+// The ⓘ on a circuit's movement: the same small circle a single exercise has, after the movement's name, opening the same About sheet for its Spine
+// entry (the Library's, which carries the steps and the cues the row folds away). No entry, no ⓘ. 44 px to hit, drawn small; a tap on it
+// does nothing else (the row's own tap, a warm-up row's folding, the circuit's tick and fold never hear it).
+function paintRoundAbout(row, slot, entry) {
+  const nm = row && row.querySelector('.round-name');
+  if (!nm) return;
+  let b = nm.querySelector('.round-about');
+  if (!entry) { if (b) b.remove(); return; }
+  if (b) return;
+  b = document.createElement('button');
+  b.type = 'button'; b.className = 'round-about'; b.textContent = 'i';
+  b.setAttribute('aria-label', 'About ' + slot.dataset.name);
+  b.addEventListener('click', ev => {
+    ev.stopPropagation();
+    const e = SPINE ? spineFor(slot.dataset.name, slot.dataset.exid) : null;   // resolved at the tap: the Spine can arrive after the row was painted
+    if (e) openExerciseSheet(e.id, null);
+  });
+  nm.appendChild(b);
 }
 // The ⓘ sits at the right end of the row and of the open card's header (CARD-01, Amir 2026-09-27), so a long
 // name never pushes it onto a line of its own. It is there for an approved entry, a reason (solid clay), and,
