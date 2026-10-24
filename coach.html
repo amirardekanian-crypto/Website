@@ -674,6 +674,13 @@
   .ava.has-face, .det-ava.has-face, .pface.has-face { background: var(--line); overflow: hidden; }
   .ava img, .det-ava img, .pface img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .need .needgo .pface { margin: -4px 0; }                         /* centred on the row's first line, so the row grows no taller */
+  .cheer-w { padding: 8px 0; border-top: 1px solid var(--rule); }
+  .cw-top { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; }
+  .cw-top .nm, .cw-top .nm a { font-weight: 600; color: var(--ink); text-decoration: none; }
+  .cw-top .nm a:hover { color: var(--court); text-decoration: underline; }
+  .cw-top .when { font-size: 12px; color: var(--muted); }
+  .cw-top .btn { margin-left: auto; }
+  .cw-txt { margin-top: 2px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
   .court .cheer-sheet { padding-left: 16px; }
   .clap { font-family: 'Segoe UI Symbol', 'Noto Sans Symbols', 'Apple Symbols', sans-serif; font-variant-emoji: text; }
   .court .cheer-state { padding: 0 4px; }
@@ -6715,6 +6722,7 @@ async function renderProof() {
   const scope = _boardScope;
   if (S.bell && S.bell.on && S.bell.at && Date.now() - S.bell.at.getTime() > 60000) loadBell();   // a post can be minutes old: read the Bell again, behind the paint
   if (S.open && S.open.on && S.open.at && Date.now() - S.open.at.getTime() > 60000) loadOpen();   // and so can a result (another tab, the SQL editor): read the Open again
+  if (S.cheers && S.cheers.on && S.cheers.at && Date.now() - S.cheers.at.getTime() > 60000) loadCheers().then(paintCheers);   // and a cheer's word (the Lounge, K4)
   const held = DEMO ? (S.board[scope] || []) : S.board[scope];
   drawProof(held || undefined);                           // undefined = still to be read
   if (held) return;
@@ -6732,6 +6740,7 @@ function drawProof(rows) {
       <div class="colstack">
         <section class="panel" id="wallPanel">${wallPanelHtml()}</section>
         ${bellPanelsHtml()}
+        ${cheersPanelHtml()}
         ${openPanelHtml()}
         <section class="panel" id="boardPanel">${boardPanelHtml(rows)}</section>
       </div>
@@ -7196,7 +7205,10 @@ function paintLounge() {
   paintFaces();
   const v = route().view;
   if (v === 'today') paintCourt();
-  else if (v === 'proof' && S.bell && S.bell.on && $('bellPeople')) $('bellPeople').innerHTML = bellPeopleHtml();
+  else if (v === 'proof') {
+    if (S.bell && S.bell.on && $('bellPeople')) $('bellPeople').innerHTML = bellPeopleHtml();
+    paintCheers();
+  }
 }
 window.loadLounge = loadLounge;
 
@@ -7265,9 +7277,9 @@ const CHEER_ERRS = {   // the server's messages (raise exception 'crew:...') in 
 };
 async function loadCheers() {
   const res = await loungeRpc('coach_crew_cheers');
-  if (loungeMissing(res)) { S.cheers = { on: false, rows: [], err: '' }; LOAD_ERR.cheers = ''; return; }
-  if (res.error) { S.cheers = { on: true, rows: (S.cheers && S.cheers.rows) || [], err: res.error.message || 'no answer' }; LOAD_ERR.cheers = S.cheers.err; return; }
-  S.cheers = { on: true, rows: Array.isArray(res.data) ? res.data : [], err: '' }; LOAD_ERR.cheers = '';
+  if (loungeMissing(res)) { S.cheers = { on: false, rows: [], err: '', at: new Date() }; LOAD_ERR.cheers = ''; return; }
+  if (res.error) { S.cheers = { on: true, rows: (S.cheers && S.cheers.rows) || [], err: res.error.message || 'no answer', at: new Date() }; LOAD_ERR.cheers = S.cheers.err; return; }
+  S.cheers = { on: true, rows: Array.isArray(res.data) ? res.data : [], err: '', at: new Date() }; LOAD_ERR.cheers = '';
 }
 // Cheered today: the list says so (the server's day is UTC), or this page just did it.
 function cheeredToday(id) {
@@ -7327,6 +7339,52 @@ async function cheerSend(key) {
   loadCheers().then(() => { paintCourt(); });
 }
 Object.assign(window, { cheerOpen, cheerCancel, cheerType, cheerSend });
+
+// K4. Cheers with words, last 7 days: the crew's own words go on each other's pages, so Amir reads them here and clears one (coach_cheer_word_clear): the cheer
+// stays and still counts, only the words go. Two taps, like a removed post. Under Who said yes on Proof, there only while the server has coach_crew_cheers().
+// The list is read again when Proof is opened after a minute (a word can arrive any time), and by ↻ Reload.
+function cheersPanelHtml() {
+  return S.cheers && S.cheers.on ? `<section class="panel" id="cheersPanel">${cheersHtml()}</section>` : '';
+}
+function cheersHtml() {
+  const c = S.cheers, rows = (c.rows || []).filter(x => x && String(x.word || '').trim());
+  const head = `<div class="phead"><span class="t hd">Cheers with words</span><span class="r">last 7 days${c.err ? '' : ' · ' + rows.length} <button class="btn sm quiet" onclick="loadCheers().then(paintCheers)">↻ Reload</button></span></div>`;
+  if (c.err) return `${head}<p class="empty">The cheers did not load: ${esc(c.err)}. <button class="btn sm" onclick="loadCheers().then(paintCheers)">↻ Try again</button></p>`;
+  const name = (id, who) => id === COACH_NOTE_ID ? 'You' : esc(who || nameOf(id));
+  const row = x => `<div class="cheer-w" data-id="${esc(x.id)}">
+      <div class="cw-top"><b class="nm">${x.from_athlete === COACH_NOTE_ID ? 'You' : `<a href="#a/${encodeURIComponent(x.from_athlete)}">${esc(x.from_who || nameOf(x.from_athlete))}</a>`}</b> → <b class="nm">${name(x.to_athlete, x.to_who)}</b>
+        <span class="when">${esc(wallDayLabel(x.day))}</span><button class="btn sm danger" onclick="cheerWordClear(${jsq(x.id)})">Clear the word</button></div>
+      <div class="cw-txt" dir="auto">“${esc(x.word)}”</div>
+      ${dangerSlot('cheer:' + x.id)}
+    </div>`;
+  return `${head}${rows.length ? rows.map(row).join('') : '<p class="empty">No cheers with words this week.</p>'}`;
+}
+function paintCheers() {
+  if (!S.ready || route().view !== 'proof') return;
+  const on = !!(S.cheers && S.cheers.on), el = $('cheersPanel');
+  if (!!el !== on) { render(); return; }
+  if (el) el.innerHTML = cheersHtml();
+}
+function cheerWordClear(id) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  dangerAsk('cheer:' + id, { title: 'Clear this word?', goes: 'The word. Nobody sees it any more, on any phone.',
+    stays: 'The cheer itself: who cheered whom, the day, and the count. There is no undo.', button: 'Clear the word', busyText: 'Clearing…', run: () => cheerWordClearNow(id) });
+}
+async function cheerWordClearNow(id) {
+  const res = await loungeRpc('coach_cheer_word_clear', { p_id: Number(id) });
+  if (res.error) {
+    fail(res.error.code ? 'Could not clear the word: ' + res.error.message : `The answer never arrived (${res.error.message || 'no reply'}), so the page cannot tell whether the word went. The list is reloading: look before you try again.`);
+    if (!res.error.code) await loadCheers();
+    paintCheers();
+    return;
+  }
+  const x = ((S.cheers && S.cheers.rows) || []).find(y => String(y.id) === String(id));
+  if (x) x.word = null;
+  toast(res.data === false ? 'That word was already gone' : 'Word cleared');
+  paintCheers();
+  loadCheers().then(paintCheers);
+}
+Object.assign(window, { cheerWordClear, paintCheers, loadCheers });
 
 // Remove photo: two taps, like every delete on this page (the panel names what goes and what stays). The function is stage96's coach_crew_face_clear.
 function faceRemove(id) {

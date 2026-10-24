@@ -6986,6 +6986,69 @@ S['lounge-cheer'] = async (b) => {
   return r;
 };
 
+// K4. Cheers with words, last 7 days, on Proof: read them, clear a word with two taps.
+S['lounge-cheers-words'] = async (b) => {
+  const r = { id: 'lounge-cheers-words', title: 'K4: Proof lists the cheers with words from the last 7 days (newest first, as text), and Clear the word takes two taps (coach_cheer_word_clear); absent on a server without stage96', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { lounge: true } }, BELL_T));
+  await page.waitForSelector('#cheersPanel', { timeout: 5000 }).catch(() => {});
+  const panel = () => page.evaluate(() => { const p = document.getElementById('cheersPanel'); return p ? { head: p.querySelector('.phead').innerText.replace(/\s+/g, ' ').trim(), rows: [...p.querySelectorAll('.cheer-w')].map(e => ({ id: e.dataset.id, top: e.querySelector('.cw-top').innerText.replace(/\s+/g, ' ').trim(), text: e.querySelector('.cw-txt').textContent, markup: !!e.querySelector('.cw-txt b'), link: (e.querySelector('.cw-top a') || {}).getAttribute ? e.querySelector('.cw-top a').getAttribute('href') : null, btn: e.querySelector('.btn').textContent.trim() })), empty: (p.querySelector('.empty') || {}).textContent || '' } : null; });
+  let st = await panel();
+  check(r, 'the panel is there, under Who said yes and above the Open, and its head counts the two cheers that carry words', st && /^Cheers with words last 7 days · 2/.test(st.head) && await page.evaluate(() => { const ids = [...document.querySelectorAll('#bellPeople, #cheersPanel, #openPanel')].map(e => e.id); return ids.join() === 'bellPeople,cheersPanel,openPanel' || ids.join() === 'bellPeople,cheersPanel'; }), st && st.head);
+  check(r, 'newest first: Ben to Ava (yesterday), then Ava to Ben (2 days ago); the two cheers without words are not listed', st && JSON.stringify(st.rows.map(x => x.id)) === JSON.stringify(['1', '2']) && /^Ben E\. → Ava E\. Yesterday Clear the word$/.test(st.rows[0].top), st && st.rows.map(x => x.top));
+  check(r, 'the words are text: markup and quotes show as typed', st && st.rows[0].text === '“that sled push looked heavy”' && st.rows[1].text === '“<b>Nice</b> one "legend"”' && !st.rows[1].markup, st && st.rows.map(x => x.text));
+  check(r, 'the giver is a link to their file', st && st.rows[0].link === '#a/ben_test' && st.rows[1].link === '#a/ava_test', st && st.rows.map(x => x.link));
+  check(r, 'it read coach_crew_cheers once', (await L.calls(page)).filter(c => c.name === 'coach_crew_cheers').length === 1, '');
+  const n0 = await L.nCalls(page);
+  await page.locator('.cheer-w[data-id="1"] .btn', { hasText: 'Clear the word' }).click(); await L.settle(page, 250);
+  const ask = (await page.locator('#cheersPanel .dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the first tap opens a panel (what goes: the word, what stays: the cheer and the count) and sends nothing', /Clear this word\?/.test(ask) && /Goes:.*word/.test(ask) && /Stays:.*cheer.*count/.test(ask) && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_cheer_word_clear'), ask);
+  const looks = await lookOf(page, '#cheersPanel');
+  check(r, 'the look holds with the panel open: five font sizes, three radii, one button height, one primary button', !looks.length, looks.slice(0, 5));
+  await page.locator('#dangerNo').click(); await L.settle(page, 200);
+  check(r, 'Cancel sends nothing', !(await L.callsSince(page, n0)).some(c => c.name === 'coach_cheer_word_clear') && (await panel()).rows.length === 2, '');
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_cheer_word_clear', message: 'fixture: not the coach', times: 1 }));
+  await page.locator('.cheer-w[data-id="1"] .btn', { hasText: 'Clear the word' }).click(); await L.settle(page, 200);
+  await page.locator('#dangerGo').click(); await L.settle(page, 500);
+  check(r, 'a refusal is said in plain words and the word stays', /Could not clear the word: fixture: not the coach/.test(await L.failText(page)) && (await panel()).rows.length === 2, await L.failText(page));
+  await page.locator('.cheer-w[data-id="1"] .btn', { hasText: 'Clear the word' }).click(); await L.settle(page, 200);
+  const m0 = await L.nCalls(page);
+  await page.locator('#dangerGo').click(); await L.settle(page, 700);
+  const clr = (await L.callsSince(page, m0)).filter(c => c.name === 'coach_cheer_word_clear');
+  check(r, 'the second tap calls coach_cheer_word_clear once with the cheer\'s id, as a number', clr.length === 1 && JSON.stringify(clr[0].payload) === '{"p_id":1}', clr.map(c => c.payload));
+  st = await panel();
+  check(r, 'the row leaves, the head says 1, "Word cleared", and the list was read again', st.rows.length === 1 && st.rows[0].id === '2' && /· 1/.test(st.head) && /Word cleared/.test(await L.toastText(page)) && (await L.callsSince(page, m0)).some(c => c.name === 'coach_crew_cheers'), st);
+  const dbc = (await L.db(page)).lounge.cheers.find(c => c.id === 1);
+  check(r, 'on the server the cheer is still there with no word', dbc && dbc.word === null && dbc.from_athlete === 'ben_test', dbc);
+  // Amir's own cheer with a word is listed too, as "You"
+  await page.evaluate(() => { const l = window.__DB.lounge; l.cheers.push({ id: ++l.seq, from_athlete: '__coach__', from_who: 'Coach', to_athlete: 'ava_test', to_who: 'Ava E.', word: 'Proud of you', day: '2026-11-12' }); });
+  await page.locator('#cheersPanel .phead .btn', { hasText: 'Reload' }).click(); await L.settle(page, 400);
+  st = await panel();
+  check(r, 'a cheer with a word from Amir reads "You → Ava E." and comes first (today)', st.rows.length === 2 && /^You → Ava E\. Today Clear the word$/.test(st.rows[0].top) && st.rows[0].link === null, st.rows.map(x => x.top));
+  // clearing the last words: the empty line
+  for (const id of st.rows.map(x => x.id)) {
+    await page.locator(`.cheer-w[data-id="${id}"] .btn`, { hasText: 'Clear the word' }).click(); await L.settle(page, 150);
+    await page.locator('#dangerGo').click(); await L.settle(page, 500);
+  }
+  st = await panel();
+  check(r, 'with none left it says so in one line', st.rows.length === 0 && st.empty === 'No cheers with words this week.' && /· 0/.test(st.head), st);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  // a failed read is named by the banner and the panel says so, with Try again
+  const bad = await L.openCoach(b, Object.assign({ seed: { lounge: true, stub: { fail: [{ kind: 'rpc', name: 'coach_crew_cheers', message: 'fixture: cheers down', times: 1 }] } } }, BELL_T));
+  await bad.page.waitForSelector('#cheersPanel', { timeout: 5000 }).catch(() => {});
+  check(r, 'a failed read: the banner names "the crew\'s cheers", the panel says it did not load and offers Try again', /the crew's cheers: fixture: cheers down/.test(await bad.page.locator('#loadwarn').innerText()) && /The cheers did not load: fixture: cheers down/.test(await bad.page.locator('#cheersPanel').innerText()), await bad.page.locator('#cheersPanel').innerText());
+  await bad.page.locator('#cheersPanel .btn', { hasText: 'Try again' }).click(); await L.settle(bad.page, 500);
+  check(r, 'Try again lists them and the banner goes', (await bad.page.locator('#cheersPanel .cheer-w').count()) === 2 && !(await bad.page.locator('#loadwarn:not([hidden])').count()), '');
+  await bad.page.context().close();
+  // a server without stage96: no panel, no banner
+  const old = await L.openCoach(b, Object.assign({ seed: { crew: true } }, BELL_T));
+  await L.settle(old.page, 500);
+  check(r, 'without stage96 Proof has no cheers panel, no banner and no failure line', !(await old.page.locator('#cheersPanel').count()) && !(await old.page.locator('#loadwarn:not([hidden])').count()) && !(await L.failText(old.page)), '');
+  check(r, 'no page errors on the old server', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));
