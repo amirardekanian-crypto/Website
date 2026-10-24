@@ -674,6 +674,14 @@
   .ava.has-face, .det-ava.has-face, .pface.has-face { background: var(--line); overflow: hidden; }
   .ava img, .det-ava img, .pface img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .need .needgo .pface { margin: -4px 0; }                         /* centred on the row's first line, so the row grows no taller */
+  .pc-h { margin-top: 12px; font-size: 12px; color: var(--muted); }
+  .pc-credit, .pc-app { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 4px 0; font-size: 14px; min-width: 0; overflow-wrap: anywhere; }
+  .pc-used { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .pc-make { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
+  .pc-make .goal-in { flex: 0 1 260px; }
+  .intake-card .i-name a { color: inherit; text-decoration: none; }
+  .intake-card .i-name a:hover { text-decoration: underline; }
+  .in-partner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0; font-size: 14px; }
   .cheer-w { padding: 8px 0; border-top: 1px solid var(--rule); }
   .cw-top { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; }
   .cw-top .nm, .cw-top .nm a { font-weight: 600; color: var(--ink); text-decoration: none; }
@@ -1785,6 +1793,7 @@ const S = {
   cheers: null,    // { on, rows, err }: coach_crew_cheers(), the last 7 days; on is false while the server has none (loadCheers())
   cheerDone: {},   // athlete_id -> the server's UTC day Amir cheered them from this page (the list above can lag a write)
   partner: null,   // { on, rows, err }: coach_partner_codes() (stage97); on is false while the server has none (loadPartner())
+  partnerDone: {}, // intake id -> the athlete code this page credited it to (the server's list does not say which application a credit came from)
   // Bumped by every assemble(). The athlete file caches its own context so that
   // switching sub-tabs costs nothing; this is what tells it the cache is stale
   // after a refetch, instead of it quietly showing pre-write data for ever.
@@ -7196,7 +7205,7 @@ let _loungeSeq = 0;
 async function loadLounge() {
   if (DEMO) return;
   const seq = ++_loungeSeq;
-  await Promise.all([loadFaces(), loadCheers()]);
+  await Promise.all([loadFaces(), loadCheers(), loadPartner()]);
   if (seq === _loungeSeq) paintLounge();
 }
 // Draw what changed where it stands: the faces in place, then the screen that shows the rest.
@@ -7205,6 +7214,7 @@ function paintLounge() {
   paintFaces();
   const v = route().view;
   if (v === 'today') paintCourt();
+  else if (v === 'leads') paintPartner();
   else if (v === 'proof') {
     if (S.bell && S.bell.on && $('bellPeople')) $('bellPeople').innerHTML = bellPeopleHtml();
     paintCheers();
@@ -7385,6 +7395,146 @@ async function cheerWordClearNow(id) {
   loadCheers().then(paintCheers);
 }
 Object.assign(window, { cheerWordClear, paintCheers, loadCheers });
+
+// K6. The athletes' partner codes (stage97; Amir 2026-10-24: "the friend gets 10%, the member gets 10%"). An athlete makes a code in the app, or Amir makes one
+// here; the friend types it on the apply form and gets 10% off (check_discount() already answers it), and when that friend becomes a client Amir credits the
+// member: 10% off their next cycle, which he applies when they pay, then ticks Used. They sit under Leads → Referral codes in a group of their own (kind
+// 'athlete' in the affiliates table, which Live codes leaves out), read with coach_partner_codes(): the code, the athlete, the applications that typed it
+// (affUses(), the page's own count: APPLICATIONS, never payments), the credits (friend, earned on, Used) and "10% owed: N" while some are unused. Credit
+// Sara 10% is on the application that typed her code (Leads → Applications) and in the group. The server refuses a credit for the member's own application
+// (partner:self). Not in BACKUP_TABLES until go-live (referral_credits, with the snapshot and coach_erase_person()).
+async function loadPartner() {
+  const res = await loungeRpc('coach_partner_codes');
+  if (loungeMissing(res)) { S.partner = { on: false, rows: [], err: '' }; LOAD_ERR.partner = ''; return; }
+  if (res.error) { S.partner = { on: true, rows: (S.partner && S.partner.rows) || [], err: res.error.message || 'no answer' }; LOAD_ERR.partner = S.partner.err; return; }
+  S.partner = { on: true, rows: Array.isArray(res.data) ? res.data : [], err: '' }; LOAD_ERR.partner = '';
+}
+const PARTNER_DEAL = 'The friend gets 10% off. The member gets 10% off their next cycle. You apply it when they pay.';
+let _partnerMake = false, _partnerPick = '';
+const unusedCredits = r => (r.credits || []).filter(c => !c.used_on).length;
+const partnerReward = row => { const a = (S.affiliates || []).find(x => x.code === row.code); return Number(a && a.reward_percent) || 10; };
+const partnerName = row => (S.ath[row.athlete_id] && S.ath[row.athlete_id].name) || row.who || row.athlete_id;   // the dashboard's name for them, else the one the server sends
+// Live or retired: the affiliates row is the fresher word (Retire writes it and reads it back at once), the server's list the fallback.
+const partnerLive = row => { const a = (S.affiliates || []).find(x => x.code === row.code); return a ? !!a.active : !!row.active; };
+// The athlete code an application typed (the typed field, or the first word of what the form approved), live or retired; null when it typed none.
+function partnerCodeOf(i) {
+  if (!(S.partner && S.partner.on)) return null;
+  const p = i.payload || {}, typed = normCode(intakeVal(p['Discount Code'])), applied = normCode(intakeVal(p['Discount Applied']).trim().split(' ')[0]);
+  return (S.partner.rows || []).find(r => r.code === typed || r.code === applied) || null;
+}
+// Already credited for this application: the credit names the application (intake_id, when the server sends it), or this page just did it, or a credit
+// carries the same friend name (the server fills it from the application, and the contract's list has no intake_id).
+function partnerCredited(row, i) {
+  const cs = row.credits || [], nm = intakeName(i).trim().toLowerCase();
+  return cs.some(c => c.intake_id != null && String(c.intake_id) === String(i.id)) || S.partnerDone[i.id] === row.code
+    || cs.some(c => c.intake_id == null && c.friend_name && String(c.friend_name).trim().toLowerCase() === nm);
+}
+function partnerCard(row) {
+  const uses = affUses(row.code), owed = unusedCredits(row), name = partnerName(row), first = firstWord(name) || name, pct = partnerReward(row);
+  const pills = `<span class="ipill pct">${pct}% off</span>` +
+    (uses.length ? `<span class="ipill used" title="Applications that typed this code (archived ones left out). Not payments: credit the member only when the friend became a client.">${uses.length} application${uses.length === 1 ? '' : 's'}</span>` : '') +
+    (owed ? `<span class="ipill warn">${pct}% owed: ${owed}</span>` : '') + (partnerLive(row) ? '' : '<span class="ipill">retired</span>');
+  const credits = (row.credits || []).slice().sort((a, b) => String(b.earned_on).localeCompare(String(a.earned_on)));
+  const crHtml = credits.length ? `<div class="pc-h">Credits · ${credits.length}</div>` + credits.map(c => `<div class="pc-credit">
+        <label class="pc-used"><input type="checkbox" ${c.used_on ? 'checked' : ''} onchange="partnerUsed(${jsq(c.id)}, this.checked, this)" aria-label="${esc(c.friend_name || 'This credit')} is used"> Used</label>
+        <b>${esc(c.friend_name || 'A friend')}</b><span class="muted">earned ${esc(dayMonth(c.earned_on))}${c.used_on ? ' · used ' + esc(dayMonth(c.used_on)) : ''}</span></div>`).join('')
+    : '<div class="pc-h">No credits yet.</div>';
+  const appHtml = uses.length ? `<div class="pc-h">Applications that typed it · ${uses.length}</div>` + uses.map(i => `<div class="pc-app">
+        <span>${esc(intakeName(i))} <span class="muted">${esc(String(i.created_at || '').slice(0, 10))}</span></span>
+        ${partnerCredited(row, i) ? `<span class="ipill used">Credited</span>` : `<button class="btn sm" onclick="partnerCredit(${jsq(row.code)}, ${jsq(i.id)})">Credit ${esc(first)} ${pct}%</button>`}</div>`).join('') : '';
+  const acts = partnerLive(row) ? `<button class="btn sm danger aff-retire" data-code="${esc(row.code)}">Retire code</button>` : `<button class="btn sm aff-reactivate" data-code="${esc(row.code)}">Reactivate</button>`;
+  return `<details class="intake-card pcard${partnerLive(row) ? '' : ' archived'}" data-code="${esc(row.code)}"${_partnerOpen.has(row.code) ? ' open' : ''}>
+    <summary><span class="aff-code">${esc(row.code)}</span><span class="i-name"><a href="#a/${encodeURIComponent(row.athlete_id)}">${esc(name)}</a></span>${pills}</summary>
+    <div class="i-body">${crHtml}${appHtml}<div class="i-actions">${acts}</div></div>
+  </details>`;
+}
+const _partnerOpen = new Set();   // the codes whose card is open: kept across a redraw
+// The athletes without a code, who could have one made: coached, active, not ticked under 13 (an athlete the server refuses is refused there too).
+function partnerCandidates() {
+  const have = new Set((S.partner.rows || []).map(r => r.athlete_id)), u13 = new Set(((S.bell && S.bell.people) || []).filter(p => p.under13).map(p => p.athlete_id));
+  return Object.values(S.ath).filter(a => inTotals(a) && a.tier === 'coached' && a.status === 'active' && !have.has(a.id) && !u13.has(a.id)).sort((x, y) => String(x.name).localeCompare(String(y.name)));
+}
+function partnerGroupHtml() {
+  const p = S.partner;
+  if (!(p && p.on)) return '';
+  const rows = (p.rows || []).slice().sort((a, b) => (partnerLive(b) - partnerLive(a)) || (unusedCredits(b) - unusedCredits(a)) || String(partnerName(a)).localeCompare(String(partnerName(b))));
+  const owed = rows.reduce((n, r) => n + unusedCredits(r), 0), cand = partnerCandidates();
+  const make = _partnerMake
+    ? `<div class="pc-make"><select id="partnerPick" class="goal-in" aria-label="Which athlete" onchange="_partnerPick=this.value"><option value="">Choose an athlete…</option>${cand.map(a => `<option value="${esc(a.id)}"${a.id === _partnerPick ? ' selected' : ''}>${esc(a.name)}</option>`).join('')}</select>
+        <button class="btn sm primary" onclick="partnerMake()">Make the code</button><button class="btn sm quiet" onclick="partnerMakeCancel()">Cancel</button></div>`
+    : `<div class="pc-make"><button class="btn sm primary" onclick="partnerMakeOpen()"${cand.length ? '' : ' disabled title="Every coached athlete has a code"'}>Make a code</button></div>`;
+  return `<section class="panel gap-top" id="partnerPanel">
+    <div class="phead"><span class="t hd">Athletes' partner codes</span><span class="r">${rows.length} code${rows.length === 1 ? '' : 's'}${owed ? ` · <span class="t-clay">10% owed: ${owed}</span>` : ''}</span></div>
+    <p class="psub" data-hint="partner-deal">${esc(PARTNER_DEAL)}</p>
+    ${make}
+    ${p.err ? `<p class="empty">The athletes' codes did not load: ${esc(p.err)}. <button class="btn sm" onclick="loadPartner().then(paintPartner)">↻ Try again</button></p>`
+      : rows.map(partnerCard).join('') || '<p class="empty">No athlete has a code yet. An athlete makes theirs in the app, or you make one here.</p>'}
+    ${howFold('how-partner', ['The friend types the member\'s code on the apply form (English or Farsi, or from the member\'s link) and gets 10% off. Those are applications, not payments.',
+      'When that friend becomes a client and pays, press Credit on their application. The member then has 10% off their next cycle: you apply it when they pay, then tick Used.'])}
+  </section>`;
+}
+// What the Leads screen on show draws from the codes: the codes view, or the application on show.
+function paintPartner() {
+  if (!S.ready) return;
+  const r = route();
+  if (r.view === 'leads') { if (r.sub === 'codes') renderAffiliates(); else if (!r.sub && $('inView')) intakeRedraw(); }
+}
+// The line on an application that typed an athlete's code: who it is, and Credit Sara 10% (or that it is done).
+function partnerIntakeHtml(i) {
+  const row = partnerCodeOf(i);
+  if (!row) return '';
+  const name = partnerName(row), first = firstWord(name) || name, pct = partnerReward(row);
+  return `<div class="in-partner"><span>Typed <span class="aff-code">${esc(row.code)}</span>, ${esc(name)}'s partner code.</span>${partnerCredited(row, i)
+    ? `<span class="ipill used">Credited ${esc(first)} ${pct}%</span>` : `<button class="btn sm" onclick="partnerCredit(${jsq(row.code)}, ${jsq(i.id)})">Credit ${esc(first)} ${pct}%</button>`}</div>`;
+}
+async function partnerCredit(code, intakeId) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const row = ((S.partner && S.partner.rows) || []).find(r => r.code === code), first = row ? firstWord(partnerName(row)) : 'Them', pct = row ? partnerReward(row) : 10;
+  const res = await loungeRpc('coach_partner_credit_add', { p_code: code, p_intake: intakeId, p_note: null });
+  if (res.error) {
+    const m = String(res.error.message || '');
+    if (/partner:self/.test(m)) fail('That is their own code.');
+    else if (res.error.code === '23505' || /duplicate key/i.test(m)) { S.partnerDone[intakeId] = code; fail(`${first} is already credited for that application.`); await loadPartner(); }
+    else if (!res.error.code) { fail(`The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${first} was credited. The codes are reloading: look before you try again.`); await loadPartner(); }
+    else fail('Could not credit ' + first + ': ' + m);
+    paintPartner();
+    return;
+  }
+  S.partnerDone[intakeId] = code;
+  toast(`${first} is credited ${pct}%`);
+  await loadPartner();
+  paintPartner();
+}
+async function partnerUsed(id, on, box) {
+  if (DEMO) { toast('Demo mode — nothing saved'); if (box) box.checked = !on; return; }
+  if (box) box.disabled = true;
+  const res = await loungeRpc('coach_partner_credit_used', { p_id: id, p_used: !!on });
+  if (res.error) { fail('Could not save that: ' + res.error.message); paintPartner(); return; }
+  await loadPartner();
+  paintPartner();
+  toast(on ? 'Marked used' : 'Marked not used');
+}
+function partnerMakeOpen() { _partnerMake = true; _partnerPick = ''; paintPartner(); }
+function partnerMakeCancel() { _partnerMake = false; _partnerPick = ''; paintPartner(); }
+async function partnerMake() {
+  const id = $('partnerPick') ? $('partnerPick').value : _partnerPick;
+  if (!id) { toast('Pick an athlete first'); return; }
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const first = firstWord(nameOf(id));
+  const res = await loungeRpc('coach_partner_code_make', { p_athlete: id });
+  if (res.error) {
+    fail(res.error.code ? `Could not make a code for ${first}: ${res.error.message}` : `The answer never arrived (${res.error.message || 'no reply'}), so the page cannot tell whether ${first}'s code was made. The codes are reloading: look before you try again.`);
+    if (!res.error.code) { await loadPartner(); await refetch(['affiliates']); }
+    return;
+  }
+  _partnerMake = false; _partnerPick = '';
+  const code = res.data && res.data.code;
+  if (code) _partnerOpen.add(code);
+  toast(code ? `${code} is live for ${first}. The friend gets 10% off.` : `A code is made for ${first}`);
+  await loadPartner();
+  await refetch(['affiliates']);   // the code is a row of affiliates too (Retire works on it)
+}
+Object.assign(window, { loadPartner, paintPartner, partnerCredit, partnerUsed, partnerMakeOpen, partnerMakeCancel, partnerMake });
 
 // Remove photo: two taps, like every delete on this page (the panel names what goes and what stays). The function is stage96's coach_crew_face_clear.
 function faceRemove(id) {
@@ -8093,7 +8243,8 @@ async function affSetActive(code, active, btn) {
 // The referral codes view as one piece of HTML (Leads → Referral codes, round 2 of the UX pass, 2026-10-12), as intakeViewHtml() is for the applications:
 // put it anywhere, then wireAffiliates(the element with id affView). Nothing in here reads $('content').
 function affiliatesViewHtml() {
-  const all = (S.affiliates || []).slice().sort((a, b) =>
+  // An athlete's partner code (kind 'athlete', stage97) is not a coach's: it has its own group below (partnerGroupHtml()), so Live codes leaves it out.
+  const all = (S.affiliates || []).filter(a => a.kind !== 'athlete').sort((a, b) =>
     String(b.applied_on || '').localeCompare(String(a.applied_on || '')) || String(a.code).localeCompare(String(b.code)));
   const live = all.filter(a => a.active), retired = all.filter(a => !a.active);
   const orphans = live.filter(a => !a.coach_name && !a.coach_name_fa).length;
@@ -8108,6 +8259,7 @@ function affiliatesViewHtml() {
     : '<p class="empty">No live codes. When you accept a coach from partner-fa.html, add their code here.</p>';
   html += `<p class="psub" data-hint="aff-deal" style="margin:12px 0 0">The coach earns 10% of what the client pays.</p>
     ${howFold('how-aff', ['These are the codes both apply forms accept. Add or retire one and it takes effect straight away — no deploy.', 'The deal: the client gets the code\'s % off; the coach earns 10% of what the client actually pays — first payment and every renewal. Payout details stay in the application email (Gmail, subject:(Affiliate)).'])}</section>`;
+  html += partnerGroupHtml();   // the athletes' partner codes (stage97): nothing while the server has no coach_partner_codes()
   if (retired.length) {
     const openRetired = retired.some(a => a.code === _affEditing) ? ' open' : '';
     html += `<section class="panel gap-top"><details${openRetired}><summary class="arch-toggle">Retired · ${retired.length}</summary><div style="margin-top:12px">${retired.map(affCard).join('')}</div></details></section>`;
@@ -8122,6 +8274,7 @@ function wireAffiliates(root) {
   on('#affAdd', () => { _affEditing = '__new__'; renderAffiliates(); });
   on('.aff-edit', el => { _affEditing = el.dataset.code; renderAffiliates(); });
   on('.aff-cancel', () => { _affEditing = null; renderAffiliates(); });
+  root.querySelectorAll('details.pcard').forEach(d => d.addEventListener('toggle', () => { if (d.open) _partnerOpen.add(d.dataset.code); else _partnerOpen.delete(d.dataset.code); }));   // an athlete's code card stays open across a redraw
   on('.aff-save', el => affSave(el.closest('.aff-form'), el));
   on('.aff-retire', el => affSetActive(el.dataset.code, false, el));
   on('.aff-reactivate', el => affSetActive(el.dataset.code, true, el));
@@ -9724,6 +9877,7 @@ function intakeDetailHtml(i) {
       </div>
     </div>
     <div class="in-contact">${cbits.join('') || '<span class="muted">No contact given</span>'}</div>
+    ${partnerIntakeHtml(i)}
     <h3 class="in-h">Answers</h3>
     ${intakeAnswersHtml(i)}
     ${intakeCloseHtml(i)}`;

@@ -7049,6 +7049,121 @@ S['lounge-cheers-words'] = async (b) => {
   return r;
 };
 
+// K6. Leads → Referral codes: the athletes' partner codes in a group of their own, with credits, Used, "10% owed: N", Make a code, and Credit Sara 10% on an application.
+S['lounge-partner-codes'] = async (b) => {
+  const r = { id: 'lounge-partner-codes', title: 'K6: an athlete\'s partner code has its own group under Referral codes (code, athlete, applications, credits, Used, "10% owed: N", Make a code) and "Credit Ava 10%" on an application that typed it; partner:self is "That is their own code."', checks: [] };
+  const T = Object.assign({ seed: { lounge: true, partner: true, court: true }, hash: 'leads/codes' }, COURT_T);
+  const { page, log } = await L.openCoach(b, T);
+  await page.waitForSelector('#partnerPanel', { timeout: 5000 }).catch(() => {});
+  const view = () => page.evaluate(() => {
+    const txt = el => el ? el.innerText.replace(/\s+/g, ' ').trim() : '';
+    const g = document.getElementById('partnerPanel');
+    return { live: [...document.querySelectorAll('#affView > section:not(#partnerPanel) .intake-card .aff-code')].map(e => e.textContent), head: txt(g && g.querySelector('.phead')), deal: txt(g && g.querySelector('.psub')),
+      cards: g ? [...g.querySelectorAll('.pcard')].map(d => ({ code: d.dataset.code, open: d.open, summary: txt(d.querySelector('summary')),
+        credits: [...d.querySelectorAll('.pc-credit')].map(c => ({ text: txt(c), used: c.querySelector('input').checked })),
+        apps: [...d.querySelectorAll('.pc-app')].map(a => ({ text: txt(a), btn: (a.querySelector('.btn') || {}).textContent || '', credited: !!a.querySelector('.ipill.used') })), acts: [...d.querySelectorAll('.i-actions .btn')].map(x => x.textContent.trim()) })) : null,
+      make: g ? [...g.querySelectorAll('.pc-make .btn')].map(x => x.textContent.trim()) : null, pick: g && g.querySelector('#partnerPick') ? [...g.querySelectorAll('#partnerPick option')].map(o => o.textContent) : null };
+  });
+  let v = await view();
+  check(r, 'Live codes holds the coach\'s code only (FIXTURE10): the athletes\' codes are not mixed in', JSON.stringify(v.live) === JSON.stringify(['FIXTURE10']), v.live);
+  check(r, 'the group "Athletes\' partner codes" counts its two codes and what is owed ("10% owed: 1")', /^Athletes' partner codes 2 codes · 10% owed: 1$/.test(v.head), v.head);
+  check(r, 'the deal is one line at the top of the group, in Amir\'s words', v.deal === 'The friend gets 10% off. The member gets 10% off their next cycle. You apply it when they pay.', v.deal);
+  check(r, 'AVA42 comes first (it is owed something): the code, the athlete, "10% off", 4 applications that typed it and "10% owed: 1"; BEN43 has nothing yet', v.cards.length === 2 && v.cards[0].code === 'AVA42' && v.cards[0].summary === 'AVA42 Ava Example 10% off 4 applications 10% owed: 1' && v.cards[1].code === 'BEN43' && v.cards[1].summary === 'BEN43 Ben Example 10% off', v.cards.map(c => c.summary));
+  const reads = (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'coach_partner_codes');
+  check(r, 'coach_partner_codes is read once, behind the first paint', reads.length === 1, reads.length);
+  await page.locator('.pcard[data-code="AVA42"] summary').click(); await L.settle(page, 200);
+  v = await view();
+  const ava = v.cards[0];
+  check(r, 'her credits, newest first: Fixture Applicant Three (not used) and Friend Zero (used and ticked), each with the date it was earned', ava.credits.length === 2 && /^Used Fixture Applicant Three earned \d+ \w{3}$/.test(ava.credits[0].text) && !ava.credits[0].used && /^Used Friend Zero earned \d+ \w{3} · used \d+ \w{3}$/.test(ava.credits[1].text) && ava.credits[1].used, ava.credits);
+  check(r, 'the applications that typed it: Three is already credited, One and Two (typed as " ava 42 ") offer Credit Ava 10%, and so does Ava\'s own application (the server decides)', JSON.stringify(ava.apps.map(a => [a.text.replace(/\s*\d{4}-\d{2}-\d{2}.*$/, ''), a.credited, a.btn])) === JSON.stringify([['Fixture Applicant One', false, 'Credit Ava 10%'], ['Fixture Applicant Two', false, 'Credit Ava 10%'], ['Fixture Applicant Three', true, ''], ['Ava Example', false, 'Credit Ava 10%']]), ava.apps);
+  check(r, 'Retire code is there for a live code', JSON.stringify(ava.acts) === JSON.stringify(['Retire code']), ava.acts);
+  // Used
+  const uid = 'f0000000-0000-4000-8000-000000000002';
+  const n0 = await L.nCalls(page);
+  await page.locator('.pcard[data-code="AVA42"] .pc-credit', { hasText: 'Fixture Applicant Three' }).locator('input').check(); await L.settle(page, 500);
+  const used = (await L.callsSince(page, n0)).filter(c => c.name === 'coach_partner_credit_used');
+  v = await view();
+  check(r, 'ticking Used calls coach_partner_credit_used with the credit and true; "10% owed" is gone from the card and the head; the card stays open', used.length === 1 && JSON.stringify(used[0].payload) === JSON.stringify({ p_id: uid, p_used: true }) && v.cards[0].summary === 'AVA42 Ava Example 10% off 4 applications' && v.cards[0].open && v.head === 'Athletes\' partner codes 2 codes', { used: used.map(c => c.payload), s: v.cards[0].summary, head: v.head });
+  await page.locator('.pcard[data-code="AVA42"] .pc-credit', { hasText: 'Fixture Applicant Three' }).locator('input').uncheck(); await L.settle(page, 500);
+  v = await view();
+  check(r, 'unticking sends false and brings "10% owed: 1" back', /10% owed: 1$/.test(v.cards[0].summary) && (await L.callsSince(page, n0)).filter(c => c.name === 'coach_partner_credit_used').length === 2, v.cards[0].summary);
+  // Credit
+  const m0 = await L.nCalls(page);
+  await page.locator('.pcard[data-code="AVA42"] .pc-app', { hasText: 'Fixture Applicant One' }).locator('.btn').click(); await L.settle(page, 600);
+  const add = (await L.callsSince(page, m0)).filter(c => c.name === 'coach_partner_credit_add');
+  v = await view();
+  check(r, 'Credit Ava 10% calls coach_partner_credit_add once with the code and the application, and a null note', add.length === 1 && JSON.stringify(add[0].payload) === JSON.stringify({ p_code: 'AVA42', p_intake: '00000000-0000-4000-8000-0000000001a1', p_note: null }), add.map(c => c.payload));
+  check(r, 'the card now has three credits (the new one named for the friend), One reads Credited, and 2 are owed; "Ava is credited 10%"', v.cards[0].credits.length === 3 && v.cards[0].credits.some(c => /Fixture Applicant One/.test(c.text)) && v.cards[0].apps.find(a => /Applicant One/.test(a.text)).credited && /10% owed: 2$/.test(v.cards[0].summary) && /Ava is credited 10%/.test(await L.toastText(page)), { c: v.cards[0].credits.length, s: v.cards[0].summary });
+  // her own application: refused by the server
+  await page.locator('.pcard[data-code="AVA42"] .pc-app', { hasText: 'Ava Example' }).locator('.btn').click(); await L.settle(page, 500);
+  v = await view();
+  check(r, 'Ava\'s own application is refused (partner:self) in plain words, and nothing was credited', /^That is their own code\./.test(await L.failText(page)) && v.cards[0].credits.length === 3 && !v.cards[0].apps.find(a => a.text.startsWith('Ava Example')).credited, await L.failText(page));
+  // credited from somewhere else already: the server's unique answer
+  await page.evaluate(() => window.__DB.referral_credits.push({ id: 'f0000000-0000-4000-8000-000000000009', code: 'AVA42', athlete_id: 'ava_test', intake_id: '00000000-0000-4000-8000-0000000001a2', friend_name: 'Someone Else', percent: 10, earned_on: '2026-11-12', used_on: null, note: null }));
+  await page.locator('.pcard[data-code="AVA42"] .pc-app', { hasText: 'Fixture Applicant Two' }).locator('.btn').click(); await L.settle(page, 600);
+  v = await view();
+  check(r, 'an application already credited elsewhere: "Ava is already credited for that application." and it reads Credited from then on', /Ava is already credited for that application\./.test(await L.failText(page)) && v.cards[0].apps.find(a => /Applicant Two/.test(a.text)).credited, await L.failText(page));
+  // lookOf() allows Space Mono only in the counter of a composer; the code on a card is the one place the page sets numbers that line up in it (design-rules' MONO_OK says so), so those are let through.
+  const looks = (await lookOf(page, '#partnerPanel')).filter(x => !/^face .*\.aff-code/.test(x));
+  check(r, 'the look holds with a card open: five font sizes, three radii, one button height, one primary button in the panel', !looks.length, looks.slice(0, 6));
+  // Make a code
+  await page.locator('#partnerPanel .pc-make .btn', { hasText: 'Make a code' }).click(); await L.settle(page, 200);
+  v = await view();
+  check(r, 'Make a code opens a picker of the coached, active athletes with no code (Eli, Gia, Hal, Ivy, Jon): not Ava or Ben (they have one), Cara (free), Dan (Proof only), Kim (former) or the demo', JSON.stringify(v.pick) === JSON.stringify(['Choose an athlete…', 'Eli Example', 'Gia Example', 'Hal Example', 'Ivy Example', 'Jon Example']) && JSON.stringify(v.make) === JSON.stringify(['Make the code', 'Cancel']), v.pick);
+  const k0 = await L.nCalls(page);
+  await page.locator('#partnerPanel .pc-make .btn', { hasText: 'Make the code' }).click(); await L.settle(page, 200);
+  check(r, 'with nobody picked it says so and sends nothing', /Pick an athlete first/.test(await L.toastText(page)) && !(await L.callsSince(page, k0)).some(c => c.name === 'coach_partner_code_make'), '');
+  await page.locator('#partnerPick').selectOption('gia_court');
+  await page.locator('#partnerPanel .pc-make .btn', { hasText: 'Make the code' }).click(); await L.settle(page, 800);
+  const mk = (await L.callsSince(page, k0)).filter(c => c.name === 'coach_partner_code_make');
+  v = await view();
+  check(r, 'Make the code calls coach_partner_code_make with the athlete only; the new code is in the group (open) and the toast names it', mk.length === 1 && JSON.stringify(mk[0].payload) === JSON.stringify({ p_athlete: 'gia_court' }) && v.cards.length === 3 && /^GIA\d\d$/.test(v.cards.find(c => /Gia/.test(c.summary)).code) && v.cards.find(c => /Gia/.test(c.summary)).open && /^GIA\d\d is live for Gia\. The friend gets 10% off\./.test(await L.toastText(page)) && v.make.join() === 'Make a code', { toast: await L.toastText(page), cards: v.cards.map(c => c.summary) });
+  check(r, 'and it is not in Live codes (the coach\'s list), though the affiliates table now holds it as kind "athlete"', JSON.stringify(v.live) === JSON.stringify(['FIXTURE10']) && (await L.db(page)).affiliates.some(a => a.kind === 'athlete' && a.athlete_id === 'gia_court'), v.live);
+  // Retire
+  await page.locator('.pcard[data-code="BEN43"] summary').click(); await L.settle(page, 150);
+  await page.locator('.pcard[data-code="BEN43"] .aff-retire').click(); await L.settle(page, 800);
+  v = await view();
+  const ben = v.cards.find(c => c.code === 'BEN43');
+  check(r, 'Retire code works on an athlete\'s code: the card reads retired, offers Reactivate, and the code row is inactive', ben && /retired$/.test(ben.summary) && JSON.stringify(ben.acts) === JSON.stringify(['Reactivate']) && (await L.db(page)).affiliates.find(a => a.code === 'BEN43').active === false, ben);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // the application that typed her code (Leads → Applications)
+  const ap = await L.openCoach(b, Object.assign({}, T, { hash: 'leads' }));
+  await ap.page.waitForSelector('#inView .in-detail .in-partner', { timeout: 5000 }).catch(() => {});
+  const line = () => ap.page.evaluate(() => { const e = document.querySelector('#inView .in-detail .in-partner'); return e ? { text: e.innerText.replace(/\s+/g, ' ').trim(), btn: (e.querySelector('.btn') || {}).textContent || '' } : null; });
+  let ln = await line();
+  check(r, 'Applicant One (the newest) typed AVA42: the application says whose code it is and offers Credit Ava 10%', ln && ln.text === 'Typed AVA42, Ava Example\'s partner code. Credit Ava 10%' && ln.btn === 'Credit Ava 10%', ln);
+  const q0 = await L.nCalls(ap.page);
+  await ap.page.locator('#inView .in-partner .btn').click(); await L.settle(ap.page, 600);
+  ln = await line();
+  check(r, 'pressing it credits Ava once and the line turns to "Credited Ava 10%" on the same application', (await L.callsSince(ap.page, q0)).filter(c => c.name === 'coach_partner_credit_add').length === 1 && ln && ln.text === 'Typed AVA42, Ava Example\'s partner code. Credited Ava 10%' && !ln.btn && /In-detail|Fixture Applicant One/i.test(await ap.page.locator('#inView .in-title').innerText()), ln);
+  await ap.page.locator('#inView .in-row', { hasText: 'Fixture Applicant Three' }).click(); await L.settle(ap.page, 300);
+  ln = await line();
+  check(r, 'Applicant Three was credited before: it reads Credited, with no button', ln && /Credited Ava 10%$/.test(ln.text) && !ln.btn, ln);
+  await ap.page.locator('#inView .in-row', { hasText: 'Fixture Applicant Two' }).click(); await L.settle(ap.page, 300);
+  check(r, 'Applicant Two typed " ava 42 " (lower case, a space): the same code, so the same line', /^Typed AVA42/.test((await line() || {}).text || ''), await line());
+  check(r, 'no page errors on Applications', !ap.log.errors.length, ap.log.errors);
+  await ap.page.context().close();
+
+  // a server without stage97: Live codes exactly as before, no group, no banner
+  const old = await L.openCoach(b, Object.assign({}, T, { seed: { lounge: true, court: true } }));
+  await L.settle(old.page, 500);
+  check(r, 'without stage97 the codes view has no partner group, lists its coach code, and there is no banner or failure line', !(await old.page.locator('#partnerPanel').count()) && (await old.page.locator('#affView .intake-card .aff-code').allInnerTexts()).join() === 'FIXTURE10' && !(await old.page.locator('#loadwarn:not([hidden])').count()) && !(await L.failText(old.page)), '');
+  await L.go(old.page, 'leads');
+  check(r, 'and an application has no partner line', !(await old.page.locator('.in-partner').count()), '');
+  check(r, 'no page errors on the old server', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
+
+  // a failed read is named
+  const bad = await L.openCoach(b, Object.assign({}, T, { seed: { lounge: true, partner: true, court: true, stub: { fail: [{ kind: 'rpc', name: 'coach_partner_codes', message: 'fixture: codes down', times: 1 }] } } }));
+  await bad.page.waitForSelector('#partnerPanel', { timeout: 5000 }).catch(() => {});
+  check(r, 'a failed read: the banner names "the athletes\' partner codes", the group says it did not load and offers Try again, which lists them', /the athletes' partner codes: fixture: codes down/.test(await bad.page.locator('#loadwarn').innerText()) && /The athletes' codes did not load: fixture: codes down/.test(await bad.page.locator('#partnerPanel').innerText())
+    && await (async () => { await bad.page.locator('#partnerPanel .btn', { hasText: 'Try again' }).click(); await L.settle(bad.page, 500); return (await bad.page.locator('#partnerPanel .pcard').count()) === 2 && !(await bad.page.locator('#loadwarn:not([hidden])').count()); })(), await bad.page.locator('#partnerPanel').innerText());
+  await bad.page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));
