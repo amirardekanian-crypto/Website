@@ -7862,7 +7862,7 @@ setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS /
   if (!window.IS_DEMO && !window.IS_PREVIEW) setupCloudBackup(ATHLETE_ID, DATA, effectiveKey);
   if (!window.IS_DEMO && !window.IS_PREVIEW) _replayQueue();   // replay any sessions that failed to save last time
 
-  if (localStorage.getItem('dark_mode')) document.body.setAttribute('data-dark', '');
+  themeBoot();   // the stored pick, or the phone's own dark mode until a pick is made (B32)
 
   const _currentCycle = (DATA.cycles || [])[DATA.currentCycleIndex || 0];
   document.title = `${DATA.athlete.firstName} ${DATA.athlete.lastName}${_currentCycle ? ' — ' + _currentCycle.name : ''}`;
@@ -20219,13 +20219,30 @@ function selectRPE(btn, key, e) {
   }
 }
 
+// THEME (B32, 2026-10-24): until the athlete picks Light or Dark, the app follows the phone's dark mode, at boot and when the
+// phone flips it while the app is open. A pick is stored ('1' dark, '0' light; an old '' was a light pick) and wins from then on.
+// null means no pick yet. Colours are untouched: this only sets or clears body[data-dark].
+function themePick() {
+  try { const v = localStorage.getItem('dark_mode'); return v === null ? null : v === '1'; } catch (e) { return null; }
+}
+function themeApply() {
+  const pick = themePick();
+  let dark = pick;
+  if (dark === null) { try { dark = !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); } catch (e) { dark = false; } }
+  if (dark !== document.body.hasAttribute('data-dark')) dark ? document.body.setAttribute('data-dark', '') : document.body.removeAttribute('data-dark');
+  syncDarkToggle();
+}
+function themeBoot() {
+  themeApply();
+  if (themeBoot.on) return;
+  themeBoot.on = true;
+  try { const mq = matchMedia('(prefers-color-scheme: dark)'); (mq.addEventListener ? mq.addEventListener('change', themeApply) : mq.addListener(themeApply)); } catch (e) {}
+}
 function toggleDark(e) {
   if (e) e.stopPropagation();
   const on = document.body.hasAttribute('data-dark');
-  on ? document.body.removeAttribute('data-dark') : document.body.setAttribute('data-dark', '');
-  localStorage.setItem('dark_mode', on ? '' : '1');
-  syncDarkToggle();
-
+  try { localStorage.setItem('dark_mode', on ? '0' : '1'); } catch (err) {}
+  themeApply();
 }
 
 // The account button's face (the athlete's initials, NAV-02) and, when the account sheet
