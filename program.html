@@ -17279,7 +17279,7 @@ function readinessBannerHtml(day, r, dayData) {
       <button type="button" class="rd-btn" onclick="setAsWritten('${d}', false)">Use today's targets</button></div>`;
   }
   const lines = [];
-  if (low) lines.push('Every RPE is 1 lower today, never below 6. Same sets and reps.');
+  if (low) lines.push('Effort 1 lower today.');
   if (r.level === 'red' && dayData) {
     const c = redDayCore(dayData);
     const what = c.primary
