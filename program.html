@@ -10688,6 +10688,7 @@ function setFolded(card, open) {
 }
 function foldCard(card, open) {
   if (!card) return;
+  if (!open) stopInlineVideos(card);                                  // a folded card does not keep playing
   if (card._foldAnim) { clearTimeout(card._foldAnim); card._foldAnim = null; }   // a second tap lands on a settled card
   card.classList.remove('folding', 'closing');
   card.style.height = '';
@@ -10737,6 +10738,15 @@ function ytWatchUrl(url) {
   return ytIsShort(url) ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`;
 }
 
+// Stops every inline player inside root (B7): the iframe goes, the ▶ placeholder comes back, so the sound stops with the card, the sheet or the screen
+// that held it, as the pop-up player's does when it closes.
+function stopInlineVideos(root) {
+  (root || document).querySelectorAll('.ex-video.playing').forEach(w => {
+    w.querySelectorAll('iframe').forEach(f => { f.src = 'about:blank'; f.remove(); });
+    w.classList.remove('playing');
+  });
+}
+window.stopInlineVideos = stopInlineVideos;
 // Replace the video placeholder with a YouTube iframe (inline playback).
 function loadInlineVideo(btn) {
   const wrap = btn.closest('.ex-video');
@@ -10797,6 +10807,7 @@ function toggleRoundSteps(ev, row) {
   if (ev) ev.stopPropagation();
   if (!row) return;
   const open = row.classList.toggle('steps-open');
+  if (!open) stopInlineVideos(row);
   // An item with a video (E's s): the player goes at the top of its steps the first time they open, the card's
   // How to do it player (Open in YouTube under it). Built on demand, so a closed row holds no player.
   if (open && row.dataset.vid && !row.querySelector('.round-how-vid')) {
@@ -11098,6 +11109,7 @@ function coachContactHtml() {
 let _libScrollY = null;
 let _wsReturn = null;   // where a suggested Library session's ← goes (LIB-01): wsBack()
 function goTo(screen, historyId, keepContent) {
+  stopInlineVideos();
   if (screen !== 'workout') _wsReturn = null;
   const was = (document.querySelector('.screen.active') || {}).id || '';
   if (was === 'screen-workouts' && (screen === 'workout' || screen === 'article')) _libScrollY = window.scrollY;
@@ -21610,7 +21622,7 @@ function openHistorySheet(card) {
 }
 function closeHistorySheet() {
   const ov = document.getElementById('hist-overlay');
-  if (ov) ov.classList.remove('visible');
+  if (ov) { stopInlineVideos(ov); ov.classList.remove('visible'); }
 }
 window.openHistorySheet = openHistorySheet;
 window.closeHistorySheet = closeHistorySheet;
