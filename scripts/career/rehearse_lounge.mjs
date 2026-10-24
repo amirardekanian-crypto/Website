@@ -388,9 +388,13 @@ async function main() {
   ok(pB.game === null && pB.at, 'game is null until he fills it in; at is there');
   ok(pB.cycle && pB.cycle.n === 1 && pB.cycle.per_week === 3 && pB.cycle.weeks.length === 5 && pB.cycle.weeks[0].w === 1, 'cycle: n, from, to, per_week and five weeks', pB.cycle && [pB.cycle.n, pB.cycle.per_week, pB.cycle.weeks.length]);
   ok(pB.cycle.weeks[0].held === true && pB.cycle.weeks[1].held === true && pB.cycle.weeks[1].now === true && pB.cycle.weeks[0].now === false, 'his weeks 1 and 2 are held (facts), week 2 is "now"', pB.cycle.weeks.slice(0, 2));
-  ok(pB.cycle.weeks[0].done === 1 && pB.cycle.weeks[0].extra === 0 && pB.cycle.weeks[0].days.length === 1 && pB.cycle.weeks[0].days[0].title === 'Lower Power' && pB.cycle.weeks[0].days[0].extra === false && !('mins' in pB.cycle.weeks[0].days[0]),
-     'week 1: one plan day done, titled by its focusTag, no minutes for somebody else', pB.cycle.weeks[0]);
-  ok(pB.cycle.weeks[1].days[0].title === 'Upper Pull', 'and a day\'s title beats its focusTag (title "Upper Pull" over "Ignored")', pB.cycle.weeks[1].days);
+  ok(pB.cycle.weeks[0].done === 1 && pB.cycle.weeks[0].extra === 0 && pB.cycle.weeks[0].days.length === 1 && pB.cycle.weeks[0].days[0].extra === false && eq(Object.keys(pB.cycle.weeks[0].days[0]).sort(), ['day', 'extra']),
+     'week 1: one plan day done; for somebody else a day is only its date and whether it is extra: no title, no minutes', pB.cycle.weeks[0]);
+  ok(pB.cycle.weeks.every(w => w.days.every(d => !('title' in d) && !('mins' in d))) && !JSON.stringify(pB.cycle).includes('Lower Power') && !JSON.stringify(pB.cycle).includes('Upper Pull'),
+     'and no title or minutes appear anywhere in another person\'s cycle (a Library session or a rehab day name can hint at pain)', pB.cycle);
+  const pBenOwn = await page('zz_ben');
+  ok(pBenOwn.cycle.weeks[0].days[0].title === 'Lower Power' && pBenOwn.cycle.weeks[1].days[0].title === 'Upper Pull',
+     'on his own page the days keep their titles, and a day title beats its focusTag (Upper Pull over Ignored)', pBenOwn.cycle.weeks.slice(0, 2).map(w => w.days));
   ok(pB.cheers && pB.cheers.season === 0 && eq(pB.cheers.recent, []) && pB.cheers.mine_today === false, 'cheers: season 0, nothing recent, you have not cheered him today', pB.cheers);
   // your own page
   const pAvaOwn = await page('zz_ava');
@@ -404,7 +408,7 @@ async function main() {
   ok(w1o.done === 3 && w1o.extra === 2 && w1o.plan === 3 && w1o.held === true && w1o.days.length === 5, 'Ava\'s own week 1: three plan days done, two extra (plan day 1 again, the Library session), held', w1o);
   ok(eq(w1o.days.map(d => [d.title, d.extra, d.mins]), [['Lower Power', false, 61], ['Upper Pull', false, 45], ['Day 3', false, undefined], ['Lower Power', true, 50], ['Night Shift', true, 20]]),
      'with titles (Day 3 for a day with no name, the Library session by its name) and minutes where she logged them', w1o.days.map(d => [d.title, d.extra, d.mins]));
-  ok(w1s.done === 3 && w1s.extra === 1 && w1s.days.length === 4 && w1s.days.every(d => !('mins' in d)), 'Ben sees week 1 clipped to the day she joined (her session before it is not counted: the repeat of plan day 1 becomes the plan\'s) and no minutes', w1s);
+  ok(w1s.done === 3 && w1s.extra === 1 && w1s.days.length === 4 && w1s.days.every(d => !('mins' in d) && !('title' in d)) && !JSON.stringify(pAvaSeen.cycle).includes('Night Shift'),'Ben sees week 1 clipped to the day she joined (her session before it is not counted: the repeat of plan day 1 becomes the plan\'s) and no minutes', w1s);
   ok(pAvaSeen.cycle.weeks[1].done === 1 && pAvaSeen.cycle.weeks[1].held === false && pAvaSeen.cycle.weeks[1].now === true, 'week 2 (now): one plan day done, not held', pAvaSeen.cycle.weeks[1]);
   ok(!JSON.stringify(pAvaSeen.cycle).includes('rpe') && !JSON.stringify(pAvaOwn.cycle).includes('note'), 'no RPE and no note anywhere in the grid');
   const pGusSeen = await page('zz_ava', GUS);

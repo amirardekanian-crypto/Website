@@ -605,7 +605,7 @@ begin
 
   -- the current cycle, week by week. A plan day counts once in `done`; a plan day done again, a Library session and anything past the plan is
   -- `extra` ("they can do extra, it needs to show that as well"). Another person's weeks before the day they joined come back empty with
-  -- `before: true`, and their sessions before that day are not counted. Minutes only on your own page; never an RPE, a note or a check-in.
+  -- `before: true`, and their sessions before that day are not counted. The day's TITLE and the minutes only on your own page (a Library session or a rehab day's name can hint at pain, which is on the never list); never an RPE, a note or a check-in.
   if v_s_session then
     with w as (select * from public.career_weeks(v_subj) cw where cw.is_current),
     pdays as (select p.data -> 'workouts' -> 'days' as days from public.programs p where p.athlete_id = v_subj),
@@ -635,7 +635,8 @@ begin
         from fw),
     wk as (
       select w.week, count(*) filter (where fd.in_plan) as done, count(*) filter (where not fd.in_plan) as extra,
-             jsonb_agg(jsonb_build_object('day', fd.d, 'title', fd.title, 'extra', not fd.in_plan)
+             jsonb_agg(jsonb_build_object('day', fd.d, 'extra', not fd.in_plan)
+                       || case when v_own then jsonb_build_object('title', fd.title) else '{}'::jsonb end
                        || case when v_own and fd.mins is not null then jsonb_build_object('mins', fd.mins) else '{}'::jsonb end
                        order by fd.d, fd.ref) filter (where fd.week is not null) as days
         from w left join fd on fd.week = w.week group by w.week)
