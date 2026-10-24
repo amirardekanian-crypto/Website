@@ -674,6 +674,9 @@
   .ava.has-face, .det-ava.has-face, .pface.has-face { background: var(--line); overflow: hidden; }
   .ava img, .det-ava img, .pface img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .need .needgo .pface { margin: -4px 0; }                         /* centred on the row's first line, so the row grows no taller */
+  .need.nudge { padding: 8px 0 8px 20px; }                        /* the people under "Trains, not in the crew", set in under their head row */
+  .need.nudge a.n { color: var(--ink); text-decoration: none; }
+  .need.nudge a.n:hover { text-decoration: underline; }
   .court .cs-l1.withface { align-items: center; }
   .court .cs-l1.withface .dot { transform: none; }
   .bell-p .pface { align-self: center; }
@@ -3711,6 +3714,7 @@ function needPanelHtml() {
   if (stale) also.push(housekeeping('grey', `${stale} older note${stale === 1 ? '' : 's'}`,
     `Never marked read, arrived more than ${NEEDS_WINDOW_DAYS} days ago — history, not today's work`,
     `<button class="btn sm" onclick="clearNoteBacklog()">Clear</button>`));
+  nudgeRows(housekeeping).forEach(x => also.push(x));   // "Trains, not in the crew": the Players' Lounge (K1)
   return `
     <div class="phead"><span class="t hd">Needs you</span><span class="r">${people.length ? people.length + (people.length === 1 ? ' person' : ' people') : ''}</span></div>
     ${shown.map(row).join('') || '<p class="empty">Nobody is waiting on you. Clean bench. ✓</p>'}
@@ -6842,6 +6846,7 @@ async function loadBell() {
 // Draw what changed where it stands: the feed and the answers in place (the composer is never replaced, so typing keeps its focus), or the whole
 // Proof screen when the panels have just appeared or gone.
 function paintBell() {
+  paintNeed();   // Today's "Trains, not in the crew" reads the Bell's answers
   if (!S.ready || route().view !== 'proof') return;
   const on = !!(S.bell && S.bell.on), el = $('bellPanel');
   if (!el || !on) { if (!!el !== on) render(); return; }
@@ -7188,6 +7193,54 @@ function paintLounge() {
   if (route().view === 'proof' && S.bell && S.bell.on && $('bellPeople')) $('bellPeople').innerHTML = bellPeopleHtml();
 }
 window.loadLounge = loadLounge;
+
+// K1. "Trains, not in the crew: N" on Today, in Also waiting (it is a thing to do, not a reason: reasonsOf(), the people count and every badge stay as they were).
+// Who: a coached, active athlete who finished a session in the last 28 days and has no crew yes (not asked yet, or a no; an athlete ticked under 13 cannot join
+// and is left out). It reads what the page already holds: the Bell's answers (coach_crew(), S.bell.people) and the sessions (a.lastSession). Each name has the
+// line already written, WhatsApp and Copy. The English line is Amir's; the Farsi one is a DRAFT for him to read (COACH_DASHBOARD.md, Players' Lounge): the
+// athlete's own language is the programme's athlete.lang (SCHEMA.md), the notification language, and English when it is not 'fa'. While the server has
+// no crew (stage81) or the Bell did not load, nothing is said: the page cannot tell who is in.
+const NUDGE_DAYS = 28, NUDGE_CAP = 5;
+let _nudgeAll = false;
+const NUDGE_EN = n => `Hi ${n}. The crew is live in your app. The others cheer each other on there. Have a look in the Crew tab. You choose what they see.`;
+const NUDGE_FA = n => `سلام ${n}. Crew توی اپت راه افتاده. بقیه اونجا همدیگه رو تشویق می‌کنن. یه سر به تب Crew بزن. خودت انتخاب می‌کنی چی رو ببینن.`;   // FARSI DRAFT, Amir to read
+function nudgeLine(a) {
+  const first = firstWord(a.name) || a.name, fa = (((S.programs[a.id] || {}).athlete) || {}).lang === 'fa';
+  return fa ? NUDGE_FA(first) : NUDGE_EN(first);
+}
+function nudgeList() {
+  const b = S.bell;
+  if (!(b && b.on) || b.err) return [];
+  const by = {}; (b.people || []).forEach(p => { by[p.athlete_id] = p; });
+  const from = addDays(todayKey(), -NUDGE_DAYS);
+  return Object.values(S.ath).filter(a => inTotals(a) && a.tier === 'coached' && a.status === 'active' && a.lastSession && a.lastSession >= from
+      && !(by[a.id] && (by[a.id].answer === 'yes' || by[a.id].under13)))
+    .sort((x, y) => String(y.lastSession).localeCompare(String(x.lastSession)) || String(x.name).localeCompare(String(y.name)));
+}
+function nudgeRowHtml(a) {
+  const p = ((S.bell && S.bell.people) || []).find(x => x.athlete_id === a.id);
+  return `<div class="need nudge" data-id="${esc(a.id)}">
+      <span class="needgo static">${avaHtml('pface', a.id, a.name)}<span class="b"><span class="l1"><a class="n" href="#a/${encodeURIComponent(a.id)}">${esc(a.name)}</a> <span class="r1">last session ${esc(timeAgo(a.lastSession + 'T12:00:00'))}${p && p.answer === 'no' ? ', said no' : ''}</span></span></span></span>
+      <span class="nacts">${courtSendHtml(a.id, nudgeLine(a), () => '', 'WhatsApp ↗')}</span>
+    </div>`;
+}
+// The rows for Also waiting: the head row, then the people (five, or all on a tap).
+function nudgeRows(housekeeping) {
+  const list = nudgeList();
+  if (!list.length) return [];
+  const rows = [housekeeping('grey', `Trains, not in the crew: ${list.length}`, `Finished a session in the last ${NUDGE_DAYS} days. The line to send is ready for each.`, '')];
+  (_nudgeAll ? list : list.slice(0, NUDGE_CAP)).forEach(a => rows.push(nudgeRowHtml(a)));
+  if (list.length > NUDGE_CAP) rows.push(`<button class="showweek" onclick="_nudgeAll=!_nudgeAll;paintNeed()">${_nudgeAll ? 'Show fewer' : 'Show all ' + list.length}</button>`);
+  return rows;
+}
+// Draw Needs you again where it stands (the Bell arrives behind the first paint, and a tick under 13 changes who is listed).
+function paintNeed() {
+  if (!S.ready || route().view !== 'today') return;
+  const el = $('needPanel');
+  if (el) el.innerHTML = needPanelHtml();
+}
+window.paintNeed = paintNeed;
+
 // Remove photo: two taps, like every delete on this page (the panel names what goes and what stays). The function is stage96's coach_crew_face_clear.
 function faceRemove(id) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }

@@ -6824,6 +6824,78 @@ S['lounge-faces'] = async (b) => {
   return r;
 };
 
+// K1. "Trains, not in the crew: N" on Today: who finished a session in the last 28 days and has no crew yes, with the line ready and WhatsApp / Copy.
+S['lounge-nudge'] = async (b) => {
+  const r = { id: 'lounge-nudge', title: 'K1: Today says who trains and is not in the crew, with the drafted line (English, a Farsi draft for a Farsi athlete) and WhatsApp / Copy; never a reason', checks: [] };
+  const open = (seed, extra) => L.openCoach(b, Object.assign({ seed: Object.assign({ lounge: true, court: true }, seed || {}), hash: 'today' }, COURT_T, extra || {}));
+  const { page, log } = await open();
+  await noPopups(page);
+  const rows = () => page.evaluate(() => {
+    const head = [...document.querySelectorAll('#needPanel .also .need:not(.nudge)')].find(e => /Trains, not in the crew/.test(e.textContent));
+    return { head: head ? head.innerText.replace(/\s+/g, ' ').trim() : null,
+      people: [...document.querySelectorAll('#needPanel .need.nudge')].map(e => ({ id: e.dataset.id, name: e.querySelector('a.n').textContent, when: e.querySelector('.r1').textContent.trim(), face: !!e.querySelector('.pface'),
+        buttons: [...e.querySelectorAll('.nacts .btn')].map(x => x.textContent.trim()), wa: (e.querySelector('.nacts a.btn') || {}).href || '' })),
+      more: ((document.querySelector('#needPanel .also .showweek') || {}).textContent || '').trim() };
+  });
+  let st = await rows();
+  check(r, 'Also waiting has one row, "Trains, not in the crew: 4" (Gia, Hal, Ivy and Jon: a session three days ago, no yes). Ava and Ben said yes, Eli said no and has not trained, Kim is a former athlete, Cara is free', /^Trains, not in the crew: 4\b/.test(st.head || ''), st.head);
+  check(r, 'the four are listed by name, newest session first and then by name, each with when they last trained', JSON.stringify(st.people.map(p => p.name + '|' + p.when)) === JSON.stringify(['Gia Example|last session 3 days ago', 'Hal Example|last session 3 days ago', 'Ivy Example|last session 3 days ago', 'Jon Example|last session 3 days ago']), st.people);
+  check(r, 'each has WhatsApp ↗ and Copy, and the name opens the athlete', st.people.every(p => JSON.stringify(p.buttons) === JSON.stringify(['WhatsApp ↗', 'Copy'])) && await page.evaluate(() => [...document.querySelectorAll('#needPanel .need.nudge a.n')].every(a => /^#a\/[a-z_]+$/.test(a.getAttribute('href')))), st.people.map(p => p.buttons));
+  const text = p => { try { return new URL(p.wa).searchParams.get('text'); } catch (e) { return null; } };
+  const gia = st.people.find(p => p.id === 'gia_court'), jon = st.people.find(p => p.id === 'jon_court');
+  check(r, 'the English line is Amir\'s, with the first name: "Hi Gia. The crew is live in your app. The others cheer each other on there. Have a look in the Crew tab. You choose what they see."', text(gia) === 'Hi Gia. The crew is live in your app. The others cheer each other on there. Have a look in the Crew tab. You choose what they see.' && /^https:\/\/wa\.me\/10000000021\?text=/.test(gia.wa), gia);
+  check(r, 'Jon reads Farsi (athlete.lang = "fa"): his line is the Farsi draft, with his name, and it names the Crew tab', /^سلام Jon\./.test(text(jon) || '') && /تب Crew/.test(text(jon) || '') && !/The crew is live/.test(text(jon) || ''), text(jon));
+  await page.locator('#needPanel .need.nudge[data-id="hal_court"] button', { hasText: 'Copy' }).click(); await L.settle(page, 300);
+  check(r, 'Copy puts the same line on the clipboard and says so', (await page.evaluate(() => navigator.clipboard.readText())) === 'Hi Hal. The crew is live in your app. The others cheer each other on there. Have a look in the Crew tab. You choose what they see.' && /Copied/.test(await L.toastText(page)), await L.toastText(page));
+  check(r, 'it is not a reason: Needs you still counts 4 people and Also waiting keeps its other rows', /4 people/.test(await page.locator('#needPanel .phead .r').innerText()) && (await page.locator('#needPanel .also .need:not(.nudge)').count()) >= 5, await page.locator('#needPanel .phead .r').innerText());
+  const plain = await open({ lounge: false, crew: false });
+  const a = await needSnap(page), z = await needSnap(plain.page);
+  check(r, 'the reasons, the counters, the rail and its badges are exactly what a page without the Lounge shows', JSON.stringify([a.reasons, a.counters, a.rail, a.badges]) === JSON.stringify([z.reasons, z.counters, z.rail, z.badges]), [a.reasons, z.reasons]);
+  check(r, 'a page without the crew (no coach_crew) says nothing of it', !/Trains, not in the crew/.test(await plain.page.locator('#needPanel').innerText()), '');
+  await plain.page.context().close();
+  // someone joins, someone is ticked under 13: the list follows the Bell
+  await page.evaluate(() => { const p = window.__DB.crew_bell.people; p.push({ athlete_id: 'ivy_court', answer: 'yes', under13: false, answered_at: new Date().toISOString(), kinds_off: [] }, { athlete_id: 'gia_court', answer: null, under13: true, answered_at: null, kinds_off: [] }); return window.loadBell(); });
+  await L.settle(page, 500);
+  st = await rows();
+  check(r, 'Ivy says yes and Gia is ticked under 13: both leave, the head says 2 and the list is Hal and Jon', /^Trains, not in the crew: 2\b/.test(st.head || '') && JSON.stringify(st.people.map(p => p.id)) === JSON.stringify(['hal_court', 'jon_court']), st);
+  // the window is 28 days: 28 is in, 29 is out; paused is nobody's chase; a no that trained shows "said no"; more than five is a button
+  const t = await page.evaluate(() => {
+    const day = n => { const d = new Date(Date.now() - n * 86400000); return d.toISOString().slice(0, 10); };
+    const sh = window.__DB.session_history;
+    sh.filter(s => s.athlete_id === 'hal_court').forEach(s => { s.completed_on = day(28); });
+    sh.filter(s => s.athlete_id === 'jon_court').forEach(s => { s.completed_on = day(29); });
+    sh.push({ athlete_id: 'eli_new', athlete_name: 'Eli Example', day: 1, completed_on: day(5), status: 'Complete', session_rpe: 7, duration_min: 50, day_note: '', focus: '', summary: 'x', updated_at: day(5) + 'T18:00:00.000Z', coach_status: 'read', log: null });
+    window.__DB.athlete_status.push({ athlete_id: 'gia_court', status: 'paused', since: day(3), note: null, updated_at: new Date().toISOString() });
+    return true;
+  });
+  await page.evaluate(() => window.hardRefresh()); await L.settle(page, 900);
+  st = await rows();
+  check(r, 'a session 28 days ago counts and 29 does not (Hal in, Jon out); Eli, who said no, trained 5 days ago and is listed marked "said no"; nobody else', JSON.stringify(st.people.map(p => p.id)) === JSON.stringify(['eli_new', 'hal_court']) && /said no/.test(st.people[0].when) && !/said no/.test(st.people[1].when), st.people);
+  await page.evaluate(() => {
+    const p = window.__DB.programs[0], day = n => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+    ['q1', 'q2', 'q3', 'q4', 'q5'].forEach((k, i) => {
+      window.__DB.programs.push({ athlete_id: k + '_test', data: JSON.parse(JSON.stringify(Object.assign({}, p.data, { athlete: { id: k + '_test', firstName: 'Quin' + i, lastName: 'Extra', tier: 'coached' } }))), updated_at: new Date().toISOString(), updated_by: 'x' });
+      window.__DB.session_history.push({ athlete_id: k + '_test', athlete_name: 'Quin' + i + ' Extra', day: 1, completed_on: day(2 + i), status: 'Complete', session_rpe: 7, duration_min: 50, day_note: '', focus: '', summary: 'x', updated_at: day(2 + i) + 'T18:00:00.000Z', coach_status: 'read', log: null });
+    });
+  });
+  await page.evaluate(() => window.hardRefresh()); await L.settle(page, 900);
+  st = await rows();
+  check(r, 'seven people: five are listed and a button says "Show all 7", which lists them all and "Show fewer" goes back', st.people.length === 5 && st.more === 'Show all 7' && /^Trains, not in the crew: 7\b/.test(st.head), { n: st.people.length, more: st.more, head: st.head });
+  await page.locator('#needPanel .also .showweek').click(); await L.settle(page, 200);
+  const all = await rows();
+  check(r, 'all seven, then back to five', all.people.length === 7 && all.more === 'Show fewer' && await (async () => { await page.locator('#needPanel .also .showweek').click(); await L.settle(page, 200); return (await rows()).people.length === 5; })(), all.people.length);
+  const looks = await lookOf(page, '#needPanel');
+  check(r, 'the look holds: five font sizes, three radii, one button height', !looks.length, looks.slice(0, 5));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  // the Bell did not load: the page cannot tell who is in, so it says nothing
+  const down = await open({ stub: { fail: [{ kind: 'rpc', name: 'coach_crew', message: 'fixture: bell down', times: 1 }] } });
+  await L.settle(down.page, 500);
+  check(r, 'when the Bell fails to load there is no row at all (and the banner names the Bell)', !/Trains, not in the crew/.test(await down.page.locator('#needPanel').innerText()) && /the Bell/.test(await down.page.locator('#loadwarn').innerText()), '');
+  await down.page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));
