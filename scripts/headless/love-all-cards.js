@@ -134,6 +134,49 @@ async function spy(p) { await p.evaluate(() => { window.__buzz = []; navigator.v
     await ctx.close();
   }
 
+  // ── K2: "kg / hand" on dumbbell and kettlebell lifts only ──
+  const DB = 'Dumbbell Bulgarian Split Squat', KB = 'KB Swing', NOENT = 'Mystery Carry';
+  const head = (p, name) => p.evaluate(`(() => { const b = ${H.card(name)}.querySelector('.ex-set-unit'); const r = b.getBoundingClientRect(); const rep = ${H.card(name)}.querySelector('.ex-set-header > div:nth-child(3)').getBoundingClientRect();
+    const tr = document.createRange(); tr.selectNodeContents(b); const t1 = tr.getBoundingClientRect(); const rt = document.createRange(); rt.selectNodeContents(${H.card(name)}.querySelector('.ex-set-header > div:nth-child(3)')); const t2 = rt.getBoundingClientRect(); const sw = ${H.card(name)}.querySelector('.ex-set-header > div:nth-child(1)').getBoundingClientRect(); return { tx: Math.round(t1.right + 8), reps: Math.round(t2.left), setR: Math.round(sw.right), tl: Math.round(t1.left), text: b.textContent, hand: b.classList.contains('hand'), right: Math.round(r.right), repsLeft: Math.round(rep.left), left: Math.round(r.left), w: Math.round(r.width), h: Math.round(r.height), vw: innerWidth, label: b.getAttribute('aria-label') }; })()`);
+  for (const w of [390, 320]) {
+    const P = holdProg();
+    P.workouts.days[0].blocks[2].exercises.push({ name: KB, type: 'standard', rx: { sets: 2, reps: 10, rest: 60 } });
+    const { ctx, p } = await open(browser, { w, prog: P });
+    p.setDefaultTimeout(8000);
+    await openCard(p, SQ);
+    let h = await head(p, SQ);
+    t.check(`a barbell lift\'s header stays "kg" (${w} px)`, h.text === 'kg' && !h.hand, JSON.stringify(h));
+    await openCard(p, DB);
+    h = await head(p, DB);
+    t.check(`a dumbbell lift (Spine equipment: dumbbells) reads "kg / hand" (${w} px)`, h.text === 'kg / hand' && h.hand, JSON.stringify(h));
+    t.check(`…it does not run into the REPS header and stays on the screen (${w} px)`, h.tx <= h.reps + 1 && h.tl >= h.setR && h.left >= 0 && h.h >= 44, JSON.stringify(h));
+    await openCard(p, KB);
+    h = await head(p, KB);
+    t.check(`a card with no Spine entry falls back to the name: "KB Swing" reads "kg / hand" (${w} px)`, h.text === 'kg / hand', JSON.stringify(h));
+    await openCard(p, NOENT);
+    t.check('a card with no entry and no such word in its name stays plain', await p.evaluate(`(() => { const b = ${H.card(NOENT)}.querySelector('.ex-set-unit'); return b ? b.textContent : 'none'; })()`).then(x => x === 'kg' || x === 'none'));
+    if (w === 390) {
+      await openCard(p, DB);
+      await p.evaluate(`pickCardUnit(${H.card(DB)}, 'lb')`); await p.waitForTimeout(200);
+      t.check('in pounds it reads "lb / hand"', (await head(p, DB)).text === 'lb / hand');
+      await p.evaluate(`pickCardUnit(${H.card(DB)}, 'plates')`); await p.waitForTimeout(200);
+      t.check('in plates it reads "plates", never per hand', (await head(p, DB)).text === 'plates');
+      await p.evaluate(`pickCardUnit(${H.card(DB)}, 'kg')`); await p.waitForTimeout(200);
+      // Guided's weight box label
+      await p.evaluate(() => { openDayView('1'); openStepMode('1'); });
+      await p.waitForTimeout(350);
+      await p.evaluate(() => { if (STEP.seq[STEP.pos].group) stepPrimary(); });
+      await p.evaluate(n => { const i = STEP.seq.findIndex(x => x.name === n && x.setI === 0); STEP.pos = i; renderStep(); }, DB);
+      await p.waitForTimeout(300);
+      await p.click('#step-footer .step-primary-btn');
+      await p.waitForTimeout(500);
+      const gl = await p.evaluate(() => { const b = document.querySelector('#timerLog .tl-unit'); return b ? b.textContent : null; });
+      t.check('Guided\'s weight label says "Kg / hand" for a dumbbell lift', gl === 'Kg / hand', gl);
+    }
+    t.check(`no page errors (${w} px)`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });

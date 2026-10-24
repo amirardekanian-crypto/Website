@@ -3528,6 +3528,7 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-set-unit { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; margin: -14px 0; padding: 0 6px; border: 0; border-radius: 6px;
     background: none; cursor: pointer; font: inherit; font-weight: 700; letter-spacing: inherit; text-transform: uppercase; color: var(--green-ink); white-space: nowrap;
     -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-unit.hand { letter-spacing: 0; padding: 0 2px; gap: 1px; }   /* "kg / hand" is a word longer than the boxes are wide */
   :where(#day-view, .step-scroll, #ws-body) .ex-set-unit::after { content: '\25BE'; font-weight: 400; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   /* 44 wide to hit as well as 44 high (Love All L5, 2026-10-24): an invisible box 3 px past each side, the drawn button unchanged. */
@@ -18967,7 +18968,9 @@ function attachSetLog(card) {
     const liveIdx = cur.findIndex(s => !s.d);
     const unit = cardUnit(card);
     const ub = wrap.querySelector('.ex-set-unit');
-    if (ub && ub.textContent !== unit) ub.textContent = unit;
+    const head = unitHead(card, unit);
+    if (ub && ub.textContent !== head) ub.textContent = head;
+    if (ub) ub.classList.toggle('hand', head !== unit);
     if (ub) ub.setAttribute('aria-label', `Weight in ${unit}. Tap to choose a unit`);
     wrap.dataset.unit = unit;
     rows.forEach((row, i) => {
@@ -19964,6 +19967,16 @@ function kgWanted(card) {
   if (!eq.length) return true;
   return eq.some(x => KG_LOADED.test(x) && !KG_NOT.test(x));
 }
+// "kg / hand" (Love All round 4, 2026-10-24): a dumbbell or kettlebell weight is the weight in EACH hand, so the column header says so
+// ("lb / hand" in pounds; a plate stack is never per hand). Dumbbell or kettlebell is read from the Spine entry's equipment (the same
+// field kgWanted() reads); only a card with no entry, or an entry with no equipment, falls back to the name (Dumbbell, DB, Kettlebell, KB).
+function perHand(card) {
+  const name = card.querySelector('.item-name').textContent.trim();
+  const entry = SPINE ? spineFor(name, card.dataset.exid) : null;
+  const eq = (entry && Array.isArray(entry.equipment)) ? entry.equipment : [];
+  return eq.length ? eq.some(x => /dumbbell|kettlebell/i.test(x)) : /\b(dumbbell|db|kettlebell|kb)s?\b/i.test(name);
+}
+function unitHead(card, unit) { return unit !== 'plates' && perHand(card) ? unit + ' / hand' : unit; }
 function paintKgCol(card) {
   const d = cardDetail(card);
   const wrap = d && d.querySelector('.ex-set-log');
@@ -21325,7 +21338,7 @@ function paintTimerLog(row, item) {
     tl.innerHTML = `
       <div class="tl-head">Set ${item.setI + 1} of ${item.total} · how did it go?</div>
       ${kgOn ? `<div class="tl-line tl-kgline">
-        <button type="button" class="tl-lab tl-unit" aria-haspopup="menu" aria-expanded="false" aria-label="Weight in ${unit}. Tap to choose a unit">${unit === 'plates' ? 'Plates' : unit === 'lb' ? 'Lb' : 'Kg'}</button>
+        <button type="button" class="tl-lab tl-unit" aria-haspopup="menu" aria-expanded="false" aria-label="Weight in ${unit}. Tap to choose a unit">${(unit === 'plates' ? 'Plates' : unit === 'lb' ? 'Lb' : 'Kg') + (item.card && unit !== 'plates' && perHand(item.card) ? ' / hand' : '')}</button>
         <input class="tl-kg" type="text" inputmode="decimal" autocomplete="off" value="${esc(wIn.value)}" placeholder="${lw ? 'last ' + esc(lastText(lw, unit)) : unitWord(unit)}" aria-label="Weight on set ${item.setI + 1}">
         ${lw ? `<button type="button" class="tl-same">Same as last</button>` : ''}
       </div>` : ''}
