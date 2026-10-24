@@ -11183,7 +11183,7 @@ function goTo(screen, historyId, keepContent) {
   // Leaving Personal Records by any route other than its own back chevron drops the
   // saved return point, so a later visit can never teleport the athlete into a
   // day view they did not come from.
-  if (screen !== 'ceiling') _ceilReturn = null;
+  if (screen !== 'ceiling') { _ceilReturn = null; _ceilFrom = null; }
 
   // Personal Records — rebuilt on every visit so a max saved mid-session shows.
   // `keepContent` is set when renderCeilingLift() routes here itself; it has
@@ -14971,12 +14971,15 @@ function ceilingDue() {
 // that exercise rather than dumping them on Progress with their place lost.
 // Cleared by goTo() the moment they leave by any other route.
 let _ceilReturn = null;
+// The screen a lift's page was opened from when it was not the Records list (the trend card on Progress, Home): ← goes back there, not to the list (B23).
+let _ceilFrom = null;
 
 function ceilingBack() {
   if (_ceilAdd && _ceilAdd.lift) { openCeilingAdd(); return; }   // form -> picker
   if (_ceilAdd) { renderCeiling(); return; }                     // picker -> the list
+  if (_ceilReturn) { returnFromCeiling(); return; }              // opened from an exercise's History: back to that exercise
+  if (_ceilLift && _ceilFrom) { const f = _ceilFrom; _ceilFrom = null; goTo(f); return; }   // opened from a card elsewhere: back there
   if (_ceilLift) { renderCeiling(); return; }                    // one step: out of a lift
-  if (_ceilReturn) { returnFromCeiling(); return; }
   goTo('plan');   // Progress, where the row is (Amir, 2026-10-12)
 }
 window.ceilingBack = ceilingBack;
@@ -15034,6 +15037,7 @@ function ceilDoor(onclick) {
 // the number of lifts), retests first, then the way to add one by hand, then one row per lift.
 function renderCeiling() {
   _ceilLift = null;
+  _ceilFrom = null;
   _ceilAdd = null;
   ceilHeadPlain('One-rep maxes');
   document.getElementById('ceil-title').textContent = 'Personal Records';
@@ -15440,6 +15444,8 @@ function renderCeilingLift(lift) {
   // The lift's last entry was just deleted — there is no history left to show,
   // so fall back to the list rather than a screen about nothing.
   if (!l) { renderCeiling(); return; }
+  const wasId = (document.querySelector('.screen.active') || {}).id || '';
+  if (wasId !== 'screen-ceiling') _ceilFrom = wasId ? wasId.slice(7) : null;   // from somewhere else; from the list or the lift itself it keeps what it had
   goTo('ceiling', null, true);
   _ceilLift = lift;
   _ceilAdd = null;
