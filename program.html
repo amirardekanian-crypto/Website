@@ -21660,11 +21660,11 @@ function demoLoad(name, h) {
   return 20;
 }
 function demoHistory() {
-  const rows = [], day0 = new Date();
+  const rows = [], day0 = new Date(), nDays = ((DATA && DATA.workouts && DATA.workouts.days) || []).length;
   const hash = s => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
   ((DATA && DATA.workouts && DATA.workouts.days) || []).forEach((d, di) => {
     for (let k = 0; k < 4; k++) {
-      const dt = new Date(day0.getTime() - ((di + 2) + 7 * k) * 86400000);
+      const dt = new Date(day0.getTime() - ((nDays - di + 1) + 7 * k) * 86400000);   // the LAST day is the newest, so a first visit's Next up is Day 1
       const log = [];
       (d.blocks || []).forEach(b => (b.exercises || []).forEach((ex, xi) => {
         if (!ex || ex.type === 'circuit') return;
