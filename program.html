@@ -5770,9 +5770,10 @@
   #screen-crew .cr-burst i svg { width: 18px; height: 18px; display: block; }
   @keyframes crBurst { 0% { opacity: 0; transform: translate(0, 6px) scale(.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx, 0), -34px) scale(1.25); } }
   @media (prefers-reduced-motion: reduce) { #screen-crew .cr-burst { display: none; } }
-  /* PLAYERS' LOUNGE · THE CYCLE BARS (step 4, 2026-10-24). Week Bars, with the extra sessions as small round dots after the bar
-     (Amir: "the workouts can be anything other than their cycles, they can do extra, it needs to show that as well"). Colours are the
-     app's one set; sizes are the --fs-* tokens. A filled segment reads --mark (the made-tick green that holds in dark). */
+  /* PLAYERS' LOUNGE · THE CYCLE BARS AND PLAYER FACTS (steps 4 and 5, 2026-10-24). Week Bars, with the extra sessions as small round dots after the bar
+     (Amir: "the workouts can be anything other than their cycles, they can do extra, it needs to show that as well"); Player Facts for every racket sport and for people
+     who play none (Amir: "applicable to all racket sports, and general people as well"). Colours are the app's one set; sizes are the --fs-* tokens. A filled segment
+     reads --mark (the made-tick green that holds in dark), a chip that is on reads --btn as the account's switch does. */
   .pl-cx { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); white-space: nowrap; }
   .pl-cyc { margin: 0 var(--g); padding: 8px 12px 10px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
   .pl-cyc-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding-top: 2px; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
@@ -5793,6 +5794,30 @@
   .pl-tail { margin-top: 8px; }
   .pl-xt { padding: 3px 6px; border: 1px solid var(--mint); border-radius: 6px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
   #hist-overlay .pl-quiet { margin: 10px 0 0; }
+  /* Player facts: the tennis tour's card. Your own page edits each row in place. */
+  .pl-facts { margin: 12px var(--g) 0; padding: 10px 12px 2px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  .pl-fk { display: block; margin-bottom: 3px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  .pl-f { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 8px; align-items: center; width: 100%; min-height: 44px; padding: 6px 0; border-top: 1px solid var(--hair); text-align: left; color: var(--ink); }
+  .pl-f.e { grid-template-columns: 86px minmax(0, 1fr) 12px; }
+  .pl-fl { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); text-align: left; }
+  .pl-fv { min-width: 0; font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
+  .pl-fv.add { font-weight: 400; color: var(--grey); }
+  a.pl-fv { color: var(--green-ink); text-decoration: underline; text-underline-offset: 2px; }
+  .pl-fc { font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); text-align: center; transition: transform .15s; }
+  .pl-fc.dn { transform: rotate(90deg); }
+  .pl-f.open { margin: 0 -12px; padding: 6px 12px; background: var(--tint); align-items: start; }
+  .pl-f.open .pl-fl { align-self: start; padding-top: 9px; min-height: 36px; }
+  .pl-f.open .pl-fc { align-self: start; padding-top: 5px; min-height: 36px; }
+  .pl-fo { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+  .pl-chip { min-height: 36px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 999px; background: var(--row); color: var(--ink); cursor: pointer; font: 600 var(--fs-small)/1 'Barlow', sans-serif; }
+  .pl-chip[aria-pressed="true"] { border-color: transparent; background: var(--btn); color: #fff; }
+  .pl-chip:focus-visible, .pl-fb:focus-visible, .pl-wb:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .pl-fo .pl-gin { flex: 1 1 100%; min-width: 0; min-height: 44px; padding: 8px 10px; border: 1.5px solid var(--field); border-radius: 8px; background: var(--paper); color: var(--ink); font: 400 var(--fs-field)/1.3 'Barlow', sans-serif; }
+  .pl-fo .pl-gin:focus { outline: 2px solid var(--green-ink); outline-offset: 1px; }
+  .pl-gerr { flex: 1 1 100%; min-height: 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--clay-ink); }
+  .pl-gerr:empty { display: none; }
+  .pl-gsave { min-height: 40px; padding: 0 18px; border: 0; border-radius: 8px; background: var(--btn); color: #fff; cursor: pointer; font: 700 var(--fs-small)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .pl-fadd { grid-template-columns: minmax(0, 1fr) 12px; }
   /* Tell the crew, on the finished card, under the WhatsApp row (paintCrewTell()) */
   :where(#day-view) .complete-crew, :where(#day-view) .complete-share { margin-top: 10px; }
   :where(#day-view) .complete-crew[hidden], :where(#day-view) .complete-share[hidden] { display: none; }
@@ -11181,7 +11206,7 @@ APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how ofte
     body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
-  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p><p><strong>This cycle</strong> on a page shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. The crew sees only the dates.</p>`;
+  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p><p><strong>This cycle</strong> on a page shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. On your own page tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p>`;
   const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with likes), last month\'s honours early in the month, and the season board.</li>';
   return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
     <div class="note-card app-card${openKey && card.key === openKey ? ' open' : ''}" onclick="toggleNote(this)">
@@ -14516,7 +14541,7 @@ function playerBack() {
   if (y) window.scrollTo(0, y);
 }
 window.playerBack = playerBack;
-function openPlayerScreen() { _playerNote = ''; _playerHTML = ''; renderPlayerPage(); crewPageRefresh(_playerCk); }
+function openPlayerScreen() { _playerNote = ''; _playerHTML = ''; _gameOpen = null; _gameStart = false; _gameDraft = ''; _gameErr = ''; renderPlayerPage(); crewPageRefresh(_playerCk); }
 async function crewPageFetch(key) {
   let r = null;
   try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_page', key === 'me' ? {} : { p_subject: key }), 10000); } catch (e) { r = null; }
@@ -14538,6 +14563,8 @@ async function crewPageRefresh(key) {
   _pageAt[key] = Date.now();
   const here = onPlayer() && _playerCk === key, hint = key === 'me' ? '' : (crewNameOfCk(key) || _playerHint);
   if (res.p) {
+    // a save of Your game still on its way: the page the server answers is older than the card on the screen, so the card keeps what was just tapped
+    if (key === 'me' && (_gameBusy || _gamePend)) { const mine = crewPageGet('me'); if (mine) res.p.game = mine.p.game; }
     crewPagePut(key, res.p);
     if (here) { _playerNote = ''; renderPlayerPage(); }
     if (key === 'me') paintAskMini();
@@ -14620,8 +14647,14 @@ function setPlayerCover(url) {
   else img.hidden = false;
 }
 function plSince(iso) { const m = /^(\d{4})-(\d{2})/.exec(String(iso || '')); return m ? crewMonth(iso) + ' ' + m[1] : ''; }
-// What goes under the name besides the date: the sport line (step 5, nothing yet) and, on someone else's page, the New Balls line and the cheer (step 3).
-function playerSportLine() { return ''; }
+// What goes under the name besides the date: the sport line (step 5: the first sport and its side, "Padel · left side", from the athlete's own
+// Player facts and NEVER from the programme's sport badge, which can name an injury; nothing for someone who plays no sport) and, on someone
+// else's page, the New Balls line and the cheer (step 3).
+function playerSportLine(p) {
+  const g = p && p.game && typeof p.game === 'object' ? p.game : null, s = g && Array.isArray(g.sports) ? g.sports.filter(x => PL_SPORTS[x]) : [];
+  if (!s.length) return '';
+  return PL_SPORTS[s[0]] + (PL_SIDE_SPORTS.indexOf(s[0]) >= 0 && PL_SIDE[g.side] ? ' · ' + PL_SIDE[g.side] : '');
+}
 // "Only you" (Amir's main session, 2026-10-24): YOUR page is sent whole, comebacks and the blocks you switched off included, and every part the
 // crew cannot see wears a small quiet label. `kinds` is your own switches as the page sends them (a kind not named is on); a page that is not
 // the crew's yet (you have not joined) has no labels, because the whole page is yours. `mk.n` counts the labels, so the note above can say so.
@@ -14723,6 +14756,160 @@ function openPlayerWeek(key, i) {
 }
 window.openPlayerWeek = openPlayerWeek;
 
+// ── Step 5 · Player facts, for every racket sport and for people who play none (Amir: "your game should be in a way, that is applicable to all racket sports, and general people as well") ──
+// A small card, the way a tennis tour shows a player; only the rows that have a value. Your own page edits each row in place (the choices open as chips, or a
+// field). The rows depend on the answers: Backhand only for tennis, pickleball and beach tennis; Side only for padel, pickleball and beach tennis; Level only
+// once a sport is chosen. With no sport the card is Hand, Trains for, Club, Working on, Instagram. my_game_set(p) saves, and its reply replaces the card.
+// The sport line under a name comes from here (playerSportLine()), never from the programme's sport badge.
+const PL_SPORTS = { tennis: 'Tennis', padel: 'Padel', squash: 'Squash', badminton: 'Badminton', pickleball: 'Pickleball', table_tennis: 'Table tennis', beach_tennis: 'Beach tennis' };
+const PL_BH_SPORTS = ['tennis', 'pickleball', 'beach_tennis'], PL_SIDE_SPORTS = ['padel', 'pickleball', 'beach_tennis'];
+const PL_HAND = { right: 'Right-handed', left: 'Left-handed' }, PL_BH = { one: 'One hand', two: 'Two hands' };
+const PL_SIDE = { right: 'right side', left: 'left side', both: 'both sides' }, PL_LEVEL = { fun: 'For fun', club: 'Club', competition: 'Competition' };
+const PL_TRAIN = { competition: 'Competition', strength: 'Strength', fitness: 'Fitness', physique: 'Physique', running: 'Running', health: 'Health' };
+const PL_IG_RE = /^[A-Za-z0-9._]{1,30}$/;
+var _gameOpen = null, _gameStart = false, _gameDraft = '', _gameErr = '', _gameBusy = false, _gamePend = null, _gameOk = null, _playerLate = false, _playerForce = false;
+const plCap = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+// The answers as the server keeps them, with what no sport asks for dropped (a backhand with no tennis, a side with no padel, a level with no sport).
+function plGameClean(g) {
+  g = g && typeof g === 'object' ? g : {};
+  const uniq = (a, ok) => (Array.isArray(a) ? a : []).filter((x, i, all) => ok[x] && all.indexOf(x) === i);
+  const sports = uniq(g.sports, PL_SPORTS), bh = sports.some(s => PL_BH_SPORTS.indexOf(s) >= 0), sd = sports.some(s => PL_SIDE_SPORTS.indexOf(s) >= 0);
+  const ig = String(g.ig || '').replace(/^@+/, '').trim();
+  return { sports, hand: PL_HAND[g.hand] ? g.hand : null, backhand: bh && PL_BH[g.backhand] ? g.backhand : null, side: sd && PL_SIDE[g.side] ? g.side : null,
+    plays_at: sports.length && PL_LEVEL[g.plays_at] ? g.plays_at : null, club: String(g.club || '').trim().slice(0, 40) || null, training_for: uniq(g.training_for, PL_TRAIN),
+    working_on: String(g.working_on || '').trim().slice(0, 60) || null, ig: PL_IG_RE.test(ig) ? ig : null };
+}
+const plHasGame = g => !!g && (g.sports.length > 0 || g.training_for.length > 0 || !!(g.hand || g.backhand || g.side || g.plays_at || g.club || g.working_on || g.ig));
+// The rows. For someone else: only what has a value, the backhand folded into the hand ("Right-handed, two-handed backhand"). For you: every row the answers ask
+// for, an empty one saying Add.
+function plGameRows(g, own, under13) {
+  const o = [], bh = g.sports.some(s => PL_BH_SPORTS.indexOf(s) >= 0), sd = g.sports.some(s => PL_SIDE_SPORTS.indexOf(s) >= 0);
+  const add = (id, label, val, extra) => { if (own || val) o.push(Object.assign({ id, label, val: val || '' }, extra)); };
+  add('plays', 'Plays', g.sports.map(s => PL_SPORTS[s]).join(', ') || (own && plHasGame(g) ? 'None' : ''));
+  if (own) { add('hand', 'Hand', PL_HAND[g.hand]); if (bh) add('backhand', 'Backhand', PL_BH[g.backhand]); }
+  else {
+    const h = [PL_HAND[g.hand], bh && g.backhand ? (g.backhand === 'two' ? 'two-handed backhand' : 'one-handed backhand') : ''].filter(Boolean);
+    if (g.hand) add('hand', 'Hand', h.join(', ')); else if (bh && g.backhand) add('backhand', 'Backhand', g.backhand === 'two' ? 'Two-handed' : 'One-handed');
+  }
+  if (sd) add('side', 'Side', g.side ? plCap(PL_SIDE[g.side]) : '');
+  if (g.sports.length) add('level', 'Level', PL_LEVEL[g.plays_at]);
+  add('club', 'Club', g.club);
+  add('train', 'Trains for', g.training_for.map(t => PL_TRAIN[t]).join(', '));
+  add('work', 'Working on', g.working_on);
+  if (!under13) add('ig', 'Instagram', g.ig ? '@' + g.ig : '', { ig: g.ig });
+  return o;
+}
+const PL_FIELDS = { club: { f: 'club', max: 40, ph: 'Club or city' }, work: { f: 'working_on', max: 60, ph: 'What you are working on' }, ig: { f: 'ig', max: 31, ph: '@yourname' } };
+const PL_CHIPS = {
+  plays: () => Object.keys(PL_SPORTS).map(k => ['sports', k, PL_SPORTS[k]]).concat([['sports', 'none', 'None']]),
+  hand: () => Object.keys(PL_HAND).map(k => ['hand', k, PL_HAND[k]]), backhand: () => Object.keys(PL_BH).map(k => ['backhand', k, PL_BH[k]]),
+  side: () => [['side', 'right', 'Right'], ['side', 'left', 'Left'], ['side', 'both', 'Both']], level: () => Object.keys(PL_LEVEL).map(k => ['plays_at', k, PL_LEVEL[k]]),
+  train: () => Object.keys(PL_TRAIN).map(k => ['training_for', k, PL_TRAIN[k]]),
+};
+function plEditor(r, g) {
+  if (PL_FIELDS[r.id]) {
+    const f = PL_FIELDS[r.id];
+    return `<input class="pl-gin" id="pl-gin" type="text" maxlength="${f.max}" dir="auto" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="${esc(f.ph)}" value="${esc(_gameDraft)}"
+      aria-label="${esc(r.label)}" oninput="plGameType(this)" onblur="plGameBlur()" onkeydown="if(event.key==='Enter'){event.preventDefault();plGameSave('${r.id}')}">
+      <span class="pl-gerr" id="pl-gerr" role="alert">${esc(_gameErr)}</span><button type="button" class="cr-bt pl-gsave" onclick="plGameSave('${r.id}')">Save</button>`;
+  }
+  return PL_CHIPS[r.id]().map(([f, v, t]) => {
+    const on = v === 'none' ? !g.sports.length && plHasGame(g) : Array.isArray(g[f]) ? g[f].indexOf(v) >= 0 : g[f] === v;
+    return `<button type="button" class="cr-bt pl-chip" aria-pressed="${on}" onclick="plGamePick('${f}', '${v}')">${esc(t)}</button>`;
+  }).join('');
+}
+function playerFactsHTML(key, p, own) {
+  const g = plGameClean(p.game);
+  if (!own) {
+    const rows = plGameRows(g, false, false);
+    if (!rows.length) return '';
+    return `<section class="pl-facts" aria-label="Player facts"><span class="pl-fk">Player facts</span>${rows.map(r => `<div class="pl-f"><span class="pl-fl">${esc(r.label)}</span>${r.id === 'ig' && r.ig
+      ? `<a class="pl-fv" href="https://instagram.com/${esc(r.ig)}" target="_blank" rel="noopener noreferrer">${esc(r.val)}</a>` : `<span class="pl-fv" dir="auto">${esc(r.val)}</span>`}</div>`).join('')}</section>`;
+  }
+  if (!plHasGame(g) && !_gameStart) {
+    return `<section class="pl-facts" aria-label="Player facts"><span class="pl-fk">Player facts</span><button type="button" class="cr-bt pl-f pl-fadd" onclick="plGameStart()"><span class="pl-fv">Add your game</span><span class="pl-fc" aria-hidden="true">›</span></button></section>
+      <p class="pl-note">${p.member === false ? 'Any racket sport, or none.' : 'Any racket sport, or none. The crew sees what you add.'}</p>`;
+  }
+  const rows = plGameRows(g, true, !!p.under13);
+  if (_gameOpen && !rows.some(r => r.id === _gameOpen)) _gameOpen = null;
+  return `<section class="pl-facts" aria-label="Player facts"><span class="pl-fk">Player facts</span>${rows.map(r => _gameOpen === r.id
+    ? `<div class="pl-f e open"><button type="button" class="cr-bt pl-fl" aria-expanded="true" onclick="plGameOpen(null)">${esc(r.label)}</button><div class="pl-fo">${plEditor(r, g)}</div><button type="button" class="cr-bt pl-fc dn" aria-label="Close ${esc(r.label)}" onclick="plGameOpen(null)">›</button></div>`
+    : `<button type="button" class="cr-bt pl-f e pl-fb" aria-expanded="false" onclick="plGameOpen('${r.id}')"><span class="pl-fl">${esc(r.label)}</span><span class="pl-fv${r.val ? '' : ' add'}" dir="auto">${esc(r.val || 'Add')}</span><span class="pl-fc" aria-hidden="true">›</span></button>`).join('')}</section>
+    <p class="pl-note">${p.member === false ? '' : 'The crew sees these. '}A row you leave empty stays off your page.</p>`;
+}
+function plGameStart() { _gameStart = true; plGameOpen('plays'); }
+function plGameOpen(id) {
+  const c = crewPageGet('me');
+  _gameOpen = id && _gameOpen !== id ? id : null;
+  _gameErr = '';
+  const f = PL_FIELDS[_gameOpen], g = plGameClean(c && c.p.game);
+  _gameDraft = f ? (f.f === 'ig' ? (g.ig ? '@' + g.ig : '') : g[f.f] || '') : '';
+  _playerForce = true; renderPlayerPage(); _playerForce = false;
+  if (f) setTimeout(() => { const i = document.getElementById('pl-gin'); if (i) { try { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } catch (e) {} } }, 30);
+}
+function plGameType(el) { _gameDraft = el.value; if (_gameErr) { _gameErr = ''; const e = document.getElementById('pl-gerr'); if (e) e.textContent = ''; } }
+// The page is not redrawn under a field while it has the keyboard (nobody is moved off what they are typing); it catches up a moment after, so a tap on Save still lands.
+function plGameBlur() { setTimeout(() => { if (_playerLate) { _playerLate = false; renderPlayerPage(); } }, 300); }
+function plGamePick(field, val) {
+  const c = crewPageGet('me');
+  if (!c) return;
+  const g = plGameClean(c.p.game);
+  if (field === 'sports') g.sports = val === 'none' ? [] : g.sports.indexOf(val) >= 0 ? g.sports.filter(s => s !== val) : g.sports.concat(val);
+  else if (field === 'training_for') g.training_for = g.training_for.indexOf(val) >= 0 ? g.training_for.filter(s => s !== val) : g.training_for.concat(val);
+  else { g[field] = g[field] === val ? null : val; _gameOpen = null; }   // one answer: a second tap on it takes it back, and the row closes
+  plGameSet(g);
+}
+function plGameSave(id) {
+  const f = PL_FIELDS[id], inp = document.getElementById('pl-gin'), c = crewPageGet('me');
+  if (!f || !inp || !c) return;
+  let v = inp.value.trim();
+  if (f.f === 'ig') {
+    v = v.replace(/^@+/, '');
+    if (v && !PL_IG_RE.test(v)) {
+      _gameDraft = inp.value; _gameErr = 'Use letters, numbers, dots and underscores only, 30 at most.';
+      _playerForce = true; renderPlayerPage(); _playerForce = false;
+      setTimeout(() => { const i = document.getElementById('pl-gin'); if (i) i.focus(); }, 30);
+      return;
+    }
+  }
+  const g = plGameClean(c.p.game);
+  g[f.f] = v || null; _gameOpen = null; _gameDraft = ''; _gameErr = '';
+  try { inp.blur(); } catch (e) {}
+  plGameSet(g);
+}
+// Shown at once, then the server's answer replaces it; no signal or a refusal puts the last saved card back. One call at a time, and the latest wins.
+function plGameSet(g) {
+  const c = crewPageGet('me');
+  if (!c) return;
+  g = plGameClean(g);
+  if (!_gameBusy && !_gamePend) _gameOk = c.p.game ? JSON.parse(JSON.stringify(c.p.game)) : null;
+  c.p.game = g; crewPagesSave();
+  _gamePend = g;
+  _playerForce = true; renderPlayerPage(); _playerForce = false;
+  plGameFlush();
+}
+async function plGameFlush() {
+  if (_gameBusy) return;
+  _gameBusy = true;
+  try {
+    while (_gamePend) {
+      const sent = _gamePend; _gamePend = null;
+      let r = null;
+      try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('my_game_set', { p: sent }), 10000); } catch (e) { r = null; }
+      const c = crewPageGet('me');
+      if (r && !r.error && r.data && typeof r.data === 'object') {
+        _gameOk = r.data;
+        if (c && !_gamePend) { c.p.game = r.data; crewPagesSave(); if (onPlayer() && _playerCk === 'me') { _playerForce = true; renderPlayerPage(); _playerForce = false; } }
+      } else {
+        _gamePend = null;
+        if (c) { c.p.game = _gameOk; crewPagesSave(); if (onPlayer() && _playerCk === 'me') { _playerForce = true; renderPlayerPage(); _playerForce = false; } }
+        aaToast(_noAnswer(r) ? 'No signal. That did not save. Try again when you are back online.' : r && r.error && crewMissingErr(r) ? 'That is not ready yet.' : 'That did not save. Try again.');
+      }
+    }
+  } finally { _gameBusy = false; }
+}
+window.plGameStart = plGameStart; window.plGameOpen = plGameOpen; window.plGameType = plGameType; window.plGameBlur = plGameBlur; window.plGamePick = plGamePick; window.plGameSave = plGameSave;
+
 // This week: what the person posted on the Bell, still on this phone's copy of it. A row takes you to the post on Crew.
 function playerPosts(key, p) {
   return ((BELL && BELL.items) || []).filter(i => i && i.t === 'post' && !i.amir && (key === 'me' ? i.me : (!!p.ck && i.ck === p.ck)));
@@ -14761,6 +14948,7 @@ function playerHTML(key, p, note) {
   const tiles = playerTilesHTML(p, own, mk);
   if (tiles) b += `<h2 class="prog-sec">${own ? 'Your numbers' : esc(first) + "'s numbers"}</h2>${tiles}`;
   b += playerCycleHTML(key, p, own, mk);   // This cycle (step 4): the week bars, with the extra sessions as dots
+  b += playerFactsHTML(key, p, own);       // Player facts (step 5)
   const ach = Array.isArray(p.achievements) ? p.achievements : [];
   if (ach.length) {
     b += `<h2 class="prog-sec">Achievements${plMark(p, own, 'achievement', mk)}</h2><div class="pl-list">${ach.slice(0, 3).map(playerAchRow).join('')}`
@@ -14796,6 +14984,10 @@ function renderPlayerPage() {
   setPlayerCover(c ? playerCoverUrl(key, c.p) : key === 'me' ? playerCoverUrl('me') : '');
   const html = c ? playerHTML(key, c.p, _playerNote) : playerLoadingHTML(key);
   if (html === _playerHTML) return;   // nothing changed: a thumb is not rebuilt under
+  // Nobody is moved off what they are typing: a field of Player facts that has the keyboard is not redrawn under the thumb (plGameBlur() catches up).
+  const ae = document.activeElement;
+  if (!_playerForce && ae && ae.id === 'pl-gin' && body.contains(ae)) { _playerLate = true; return; }
+  _playerLate = false;
   _playerHTML = html;
   body.innerHTML = html;
   crewWireFaces(body);

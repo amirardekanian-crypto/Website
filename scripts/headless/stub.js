@@ -21,6 +21,8 @@
 // stage96 is TOLD by get_bell's top-level `lounge: 1` (the fixture sets it; without it the app draws Crew as it was). YOUR page (no p_subject) is whole: every block, the comebacks, and
 // `kinds` (your switches, a kind not named is on); someone else's has neither.
 // The cheer (step 3): crew_cheer answers like the server (cheerLog, cheerCap, cheerErr); crew_page reads cheerLog for mine_today.
+// Steps 4 to 6: a page's `cycle` (weeks, days; another person's days carry only day and extra), `game` and each achievement's `signed` / `signed_n` come from the `crewPages` entry (none by default, so a
+// page has no cycle, no game and nobody signed); my_game_set answers like CONTRACT 4 and crew_page(own) then carries what it saved (`myGame`; gameMissing, gameErr, gameFail, gameDelay).
 // Faces (step 2): crew_faces_get answers `faces` ({ '<ck>': { fv, b64 } }), crew_face_set / crew_face_clear change the caller's own (faceDelay, faceMax, faceMissing, faceErr).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
@@ -134,11 +136,38 @@
         return pg;
       };
       var merge = function (pg, over) { Object.keys(over || {}).forEach(function (k) { pg[k] = over[k]; }); return pg; };
-      if (!sub) return res({ data: JSON.parse(JSON.stringify(merge(pageOf(PM.name || 'Alex R.', true, PM), pages.me))), error: null, status: 200 });
+      // `myGame` is what my_game_set last saved: your own page then carries it (the saved row, in the shape CONTRACT 4 gives crew_page().game)
+      if (!sub) { var own = merge(pageOf(PM.name || 'Alex R.', true, PM), pages.me); if (S.myGame !== undefined) own.game = S.myGame; return res({ data: JSON.parse(JSON.stringify(own)), error: null, status: 200 }); }
       if (PM.answer !== 'yes' || PM.under13 || PM.can_post === false) return bad('crew:not_yes');
       var who = (PB.crew || []).filter(function (x) { return x && x.ck === sub; })[0];
       if (!who) return bad('crew:gone');
       return res({ data: JSON.parse(JSON.stringify(merge(pageOf(who.who, !!who.me, who), pages[sub]))), error: null, status: 200 });
+    }
+    // Players' Lounge (stage96, "Your game"): my_game_set(p) validates like CONTRACT 4 (unknown keys dropped, '' to null, the enums, club <= 40, working_on <= 60, ig by its pattern, an
+    // unknown sport refused) and answers the saved row in crew_page().game's shape (nulls absent); crew_page(own) then carries it (S.myGame). gameMissing = a server without the function ·
+    // gameErr = a message to refuse every save with · gameDelay = ms to take · gameFail = refuse the next N saves.
+    if (name === 'my_game_set') {
+      if (S.gameMissing) return res({ data: null, error: { message: 'Could not find the function public.my_game_set(p) in the schema cache', code: 'PGRST202' }, status: 404 });
+      var gp =(params && params.p) || {}, GK = ['sports', 'hand', 'backhand', 'side', 'plays_at', 'club', 'training_for', 'working_on', 'ig'];
+      var gbad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+      if (S.gameErr) return gbad(S.gameErr);
+      if (S.gameFail > 0) { S.gameFail--; return gbad('game:bad'); }
+      var SP = ['tennis', 'padel', 'squash', 'badminton', 'pickleball', 'table_tennis', 'beach_tennis'], TF = ['competition', 'strength', 'fitness', 'physique', 'running', 'health'];
+      var one = function (v, ok) { v = v === '' || v === undefined ? null : v; return v === null || ok.indexOf(v) >= 0 ? v : false; };
+      var got = {}, bd = false;
+      GK.forEach(function (k) { if (gp[k] !== undefined) got[k] = gp[k]; });
+      var sp = Array.isArray(got.sports) ? got.sports : [], tf = Array.isArray(got.training_for) ? got.training_for : [];
+      if (sp.some(function (x) { return SP.indexOf(x) < 0; }) || tf.some(function (x) { return TF.indexOf(x) < 0; })) bd = true;
+      var hand = one(got.hand, ['right', 'left']), bh = one(got.backhand, ['one', 'two']), sd = one(got.side, ['right', 'left', 'both']), pa = one(got.plays_at, ['fun', 'club', 'competition']);
+      if (hand === false || bh === false || sd === false || pa === false) bd = true;
+      var club = String(got.club || '').trim(), wo = String(got.working_on || '').trim(), ig = String(got.ig || '').trim();
+      if (club.length > 40 || wo.length > 60 || (ig && !/^[A-Za-z0-9._]{1,30}$/.test(ig))) bd = true;
+      if (bd) return gbad('game:bad');
+      var saved = { sports: sp, training_for: tf };
+      if (hand) saved.hand = hand; if (bh) saved.backhand = bh; if (sd) saved.side = sd; if (pa) saved.plays_at = pa;
+      if (club) saved.club = club; if (wo) saved.working_on = wo; if (ig) saved.ig = ig;
+      S.myGame = saved;
+      return new Promise(function (ok) { setTimeout(function () { ok({ data: JSON.parse(JSON.stringify(saved)), error: null, status: 200 }); }, S.gameDelay || 0); });
     }
     if (/^crew_/.test(name) && S.bell) {
       var B = S.bell, me = B.me = B.me || {}, keep = function () { try { var cb = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); cb.bell = B; localStorage.setItem('__stubcfg', JSON.stringify(cb)); } catch (e) {} };

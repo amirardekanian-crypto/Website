@@ -17,6 +17,8 @@
 //
 // Step 4: This cycle (Week Bars): a bar cut into the plan's sessions, held weeks solid, the sessions beyond the plan as dots with +N, now, weeks before joining, the week sheet (yours with
 // names and minutes, theirs with the date and Session or Extra only). Section 16.
+// Step 5: Player facts for every racket sport and for people who play none: the rows each sport asks for, chips and fields in place, my_game_set one call at a time, a refusal and no signal,
+// Instagram checked, the sport line, the programme's sport badge never on a page. Section 17.
 // `--only=14,15` runs just those sections (everything after a "// ── N." line is wrapped in on(N)).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
@@ -1208,6 +1210,141 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const t3 = await t.p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, bar: Math.round(document.querySelectorAll('#crewplayer-body .pl-wb')[2].querySelector('.pl-bar').getBoundingClientRect().width) }));
     C.check('320 px: the bars fit, nothing scrolls sideways, and the bar keeps room', t3.sw <= t3.iw && t3.bar >= 60, JSON.stringify(t3));
     await t.ctx.close();
+  }
+
+  // ── 17. Step 5 · Player facts, for every racket sport and for people who play none ────────────────────────────────────────────────────────────────────
+  const GAME_FULL = { sports: ['padel', 'tennis'], hand: 'right', backhand: 'two', side: 'left', plays_at: 'club', club: 'Enghelab, Tehran', training_for: ['strength', 'physique'], working_on: 'a faster first step', ig: 'sara.k' };
+  const factRows = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-facts .pl-f')].map(r => [(r.querySelector('.pl-fl') || {}).textContent, ((r.querySelector('.pl-fv') || r.querySelector('.pl-fo') || {}).textContent || '').trim()]));
+  const labels = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-facts .pl-f .pl-fl')].map(e => e.textContent.trim()));
+  const setGame = (p, g) => p.evaluate(game => { const c = crewPageGet('me'); c.p.game = game; crewPagesSave(); _gameOpen = null; _gameStart = false; _playerHTML = ''; renderPlayerPage(); }, g);
+  const gameCalls = p => calls(p, 'my_game_set');
+  const lastGame = async p => { const c = await gameCalls(p); return c.length ? c[c.length - 1].p : null; };
+  const chipOf = (p, text) => p.evaluate(t => { const b = [...document.querySelectorAll('#crewplayer-body .pl-fo .pl-chip')].find(x => x.textContent.trim() === t); if (!b) return false; b.click(); return true; }, text);
+  const rowTap = (p, label) => p.evaluate(l => { const b = [...document.querySelectorAll('#crewplayer-body .pl-facts button.pl-f, #crewplayer-body .pl-facts .pl-f > button.pl-fl')].find(x => (x.querySelector('.pl-fl') || x).textContent.trim() === l); if (!b) return false; b.click(); return true; }, label);
+  if (on(17)) {
+    const prog = H.fixture(); prog.sport = { badge: '\u{1FA79} Knee rehab' };
+    const a = await open(browser, { opts: { prog }, stub: { crewPages: { [CK.mina]: { game: GAME_FULL }, [CK.reza]: { game: { sports: [], training_for: ['strength', 'health'], club: 'Home gym' } }, [CK.sara]: { game: null } } } });
+    await goCrew(a.p); await shown(a.p, CK.mina);
+    const f = await a.p.evaluate(() => ({ sub: (document.querySelector('#crewplayer-body .pl-sub') || {}).textContent, ig: (() => { const x = document.querySelector('#crewplayer-body .pl-facts a.pl-fv'); return x ? [x.getAttribute('href'), x.getAttribute('target'), x.getAttribute('rel'), x.textContent] : null; })(),
+      editable: document.querySelectorAll('#crewplayer-body .pl-facts button').length, all: document.getElementById('crewplayer-body').textContent }));
+    const rows = await factRows(a.p);
+    C.check('someone else\'s Player facts: only rows with a value, in words (Plays, Hand with the backhand, Side, Level, Club, Trains for, Working on, Instagram)',
+      JSON.stringify(rows) === JSON.stringify([['Plays', 'Padel, Tennis'], ['Hand', 'Right-handed, two-handed backhand'], ['Side', 'Left side'], ['Level', 'Club'], ['Club', 'Enghelab, Tehran'], ['Trains for', 'Strength, Physique'], ['Working on', 'a faster first step'], ['Instagram', '@sara.k']]), JSON.stringify(rows));
+    C.check('…the sport line under the name is the first sport and its side ("Padel · left side")', f.sub === 'Padel · left side', f.sub);
+    C.check('…the Instagram name is a link out (a new tab, no opener) and nothing on the card is editable', !!f.ig && f.ig[0] === 'https://instagram.com/sara.k' && f.ig[1] === '_blank' && /noopener/.test(f.ig[2]) && f.ig[3] === '@sara.k' && f.editable === 0, JSON.stringify(f.ig));
+    C.check('the programme\'s sport badge never appears on a page ("Knee rehab", "Tennis Performance")', !/Knee rehab|Tennis Performance/.test(f.all) && /Knee rehab/.test(await a.p.evaluate(() => (DATA.sport || {}).badge || '')));
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(300);
+    await shown(a.p, CK.reza);
+    const r2 = await factRows(a.p), sub2 = await a.p.evaluate(() => !!document.querySelector('#crewplayer-body .pl-sub'));
+    C.check('someone who plays no sport: a card of what they have ("Club", "Trains for"), no Plays, no Hand, and no sport line', JSON.stringify(r2) === JSON.stringify([['Club', 'Home gym'], ['Trains for', 'Strength, Health']]) && !sub2, JSON.stringify(r2));
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(300);
+    await shown(a.p, CK.sara);
+    C.check('someone with no game at all: no card, and still no sport line from the programme\'s badge', !(await a.p.$('#crewplayer-body .pl-facts')) && !(await a.p.$('#crewplayer-body .pl-sub')) && !/Knee rehab|Tennis Performance/.test(await text(a.p, '#crewplayer-body')));
+    C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+  }
+  if (on(17)) {
+    // YOUR page: an empty card is one row; each row edits in place; only the rows the sports ask for
+    const a = await open(browser, {});
+    await goCrew(a.p); await a.p.evaluate(() => openPlayer('me')); await a.p.waitForTimeout(700);
+    const add = await a.p.evaluate(() => ({ t: (document.querySelector('#crewplayer-body .pl-fadd') || {}).textContent, n: document.querySelectorAll('#crewplayer-body .pl-facts .pl-f').length, note: (document.querySelector('#crewplayer-body .pl-facts + .pl-note') || {}).textContent }));
+    C.check('your empty card is one row, "Add your game"', /Add your game/.test(add.t || '') && add.n === 1 && /Any racket sport, or none/.test(add.note || ''), JSON.stringify(add));
+    await click(a.p, '#crewplayer-body .pl-fadd'); await a.p.waitForTimeout(300);
+    const l0 = await labels(a.p), chips0 = await a.p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-fo .pl-chip')].map(b => b.textContent + ':' + b.getAttribute('aria-pressed')));
+    C.check('…it opens on Plays, with every racket sport and None; with no sport it asks Hand, Trains for, Club, Working on, Instagram, and not Backhand, Side or Level',
+      JSON.stringify(l0) === JSON.stringify(['Plays', 'Hand', 'Club', 'Trains for', 'Working on', 'Instagram']) && chips0.length === 8 && chips0[7] === 'None:false' && chips0.join().indexOf('Table tennis') > 0 && chips0.join().indexOf('Beach tennis') > 0, JSON.stringify([l0, chips0]));
+    await chipOf(a.p, 'Tennis'); await a.p.waitForTimeout(500);
+    const l1 = await labels(a.p), g1 = await lastGame(a.p);
+    C.check('Tennis: Backhand and Level appear, Side does not; my_game_set was sent with the sport', JSON.stringify(l1) === JSON.stringify(['Plays', 'Hand', 'Backhand', 'Level', 'Club', 'Trains for', 'Working on', 'Instagram']) && !!g1 && JSON.stringify(g1.sports) === '["tennis"]', JSON.stringify([l1, g1]));
+    await chipOf(a.p, 'Padel'); await a.p.waitForTimeout(500);
+    const l2 = await labels(a.p), line2 = await text(a.p, '#crewplayer-body .pl-sub');
+    C.check('Padel as well: Side appears too, Plays stays open for more, and the sport line under your name is the first sport', JSON.stringify(l2) === JSON.stringify(['Plays', 'Hand', 'Backhand', 'Side', 'Level', 'Club', 'Trains for', 'Working on', 'Instagram']) && line2 === 'Tennis', JSON.stringify([l2, line2]));
+    await rowTap(a.p, 'Plays'); await a.p.waitForTimeout(250);
+    C.check('…the Plays row says what is chosen when it is closed', JSON.stringify((await factRows(a.p))[0]) === '["Plays","Tennis, Padel"]', JSON.stringify((await factRows(a.p))[0]));
+    // one answer: a chip saves at once and the row closes; a second tap on the same answer takes it back
+    await rowTap(a.p, 'Hand'); await a.p.waitForTimeout(250); await chipOf(a.p, 'Left-handed'); await a.p.waitForTimeout(500);
+    const g2 = await lastGame(a.p), h2 = (await factRows(a.p)).find(r => r[0] === 'Hand');
+    C.check('Hand: one tap saves it and closes the row (Left-handed)', !!g2 && g2.hand === 'left' && JSON.stringify(h2) === '["Hand","Left-handed"]' && !(await a.p.$('#crewplayer-body .pl-fo')), JSON.stringify([g2, h2]));
+    await rowTap(a.p, 'Backhand'); await a.p.waitForTimeout(250); await chipOf(a.p, 'Two hands'); await a.p.waitForTimeout(400);
+    await rowTap(a.p, 'Side'); await a.p.waitForTimeout(250); await chipOf(a.p, 'Right'); await a.p.waitForTimeout(400);
+    await rowTap(a.p, 'Level'); await a.p.waitForTimeout(250); await chipOf(a.p, 'Competition'); await a.p.waitForTimeout(400);
+    const g3 = await lastGame(a.p), s3 = await text(a.p, '#crewplayer-body .pl-sub');
+    C.check('Backhand, Side and Level the same way', !!g3 && g3.backhand === 'two' && g3.side === 'right' && g3.plays_at === 'competition' && g3.hand === 'left' && JSON.stringify(g3.sports) === '["tennis","padel"]', JSON.stringify(g3));
+    // dropping tennis takes the backhand with it; the sport line becomes Padel and its side
+    await rowTap(a.p, 'Plays'); await a.p.waitForTimeout(250); await chipOf(a.p, 'Tennis'); await a.p.waitForTimeout(500);
+    const l4 = await labels(a.p), g4 = await lastGame(a.p), s4 = await text(a.p, '#crewplayer-body .pl-sub');
+    C.check('Tennis taken off: no Backhand row, the backhand is cleared on the server, and the line reads "Padel · right side"', JSON.stringify(l4) === JSON.stringify(['Plays', 'Hand', 'Side', 'Level', 'Club', 'Trains for', 'Working on', 'Instagram']) && g4.backhand === null && s4 === 'Padel · right side', JSON.stringify([l4, g4.backhand, s4]));
+    // fields
+    await rowTap(a.p, 'Club'); await a.p.waitForTimeout(350);
+    const fld = await a.p.evaluate(() => { const i = document.getElementById('pl-gin'); return i ? { max: i.maxLength, size: parseFloat(getComputedStyle(i).fontSize), focus: document.activeElement === i } : null; });
+    C.check('a text row opens a field with its limit (Club 40), typed at 16 px so the phone does not zoom, and the keyboard on it', !!fld && fld.max === 40 && fld.size >= 16 && fld.focus, JSON.stringify(fld));
+    await a.p.fill('#pl-gin', 'Enghelab, Tehran'); await click(a.p, '#crewplayer-body .pl-gsave'); await a.p.waitForTimeout(500);
+    const g5 = await lastGame(a.p);
+    C.check('Save sends the club and closes the row', !!g5 && g5.club === 'Enghelab, Tehran' && JSON.stringify((await factRows(a.p)).find(r => r[0] === 'Club')) === '["Club","Enghelab, Tehran"]');
+    await rowTap(a.p, 'Instagram'); await a.p.waitForTimeout(350);
+    const n0 = (await gameCalls(a.p)).length;
+    await a.p.fill('#pl-gin', 'bad name!'); await click(a.p, '#crewplayer-body .pl-gsave'); await a.p.waitForTimeout(400);
+    const bad = await a.p.evaluate(() => ({ err: (document.getElementById('pl-gerr') || {}).textContent, val: (document.getElementById('pl-gin') || {}).value }));
+    C.check('an Instagram name that is not one is said in words, kept in the field, and never sent', /letters, numbers, dots and underscores/.test(bad.err || '') && bad.val === 'bad name!' && (await gameCalls(a.p)).length === n0, JSON.stringify(bad));
+    await a.p.fill('#pl-gin', '@sara.k'); await a.p.press('#pl-gin', 'Enter'); await a.p.waitForTimeout(500);
+    const g6 = await lastGame(a.p);
+    C.check('…@sara.k saves as "sara.k" (the Enter key too), and the card shows @sara.k', !!g6 && g6.ig === 'sara.k' && JSON.stringify((await factRows(a.p)).find(r => r[0] === 'Instagram')) === '["Instagram","@sara.k"]', JSON.stringify(g6 && g6.ig));
+    // Trains for: several
+    await rowTap(a.p, 'Trains for'); await a.p.waitForTimeout(250); await chipOf(a.p, 'Strength'); await a.p.waitForTimeout(300); await chipOf(a.p, 'Health'); await a.p.waitForTimeout(500);
+    const g7 = await lastGame(a.p);
+    C.check('Trains for takes several, and stays open while you choose', JSON.stringify(g7.training_for) === '["strength","health"]' && !!(await a.p.$('#crewplayer-body .pl-fo')));
+    C.check('…and the reply from the server is what the card then holds', await a.p.evaluate(() => JSON.stringify(crewPageGet('me').p.game) === JSON.stringify(window.__STUB.myGame)));
+    // a refusal puts the last saved card back; so does no signal
+    await a.p.evaluate(() => { window.__STUB.gameFail = 1; });
+    await rowTap(a.p, 'Level'); await a.p.waitForTimeout(250); await chipOf(a.p, 'For fun'); await a.p.waitForTimeout(700);
+    const tf = await toast(a.p), lv = (await factRows(a.p)).find(r => r[0] === 'Level');
+    C.check('a refusal: "That did not save. Try again." and the card goes back to what was saved (Competition)', !!tf && tf.text === 'That did not save. Try again.' && JSON.stringify(lv) === '["Level","Competition"]', JSON.stringify([tf, lv]));
+    await a.p.evaluate(() => { window.__STUB.mode = 'offline'; });
+    await rowTap(a.p, 'Level'); await a.p.waitForTimeout(250); await chipOf(a.p, 'For fun'); await a.p.waitForTimeout(700);
+    const to = await toast(a.p), lv2 = (await factRows(a.p)).find(r => r[0] === 'Level');
+    C.check('no signal: it says so and the card goes back', !!to && /^No signal/.test(to.text) && JSON.stringify(lv2) === '["Level","Competition"]', JSON.stringify([to, lv2]));
+    await a.p.evaluate(() => { window.__STUB.mode = 'online'; });
+    // the page is not redrawn under a field that has the keyboard
+    await rowTap(a.p, 'Working on'); await a.p.waitForTimeout(350);
+    await a.p.fill('#pl-gin', 'my first step');
+    await a.p.evaluate(() => { const c = crewPageGet('me'); c.p.numbers.sessions = 77; crewPagePut('me', c.p); renderPlayerPage(); });
+    const mid = await a.p.evaluate(() => ({ focus: document.activeElement && document.activeElement.id === 'pl-gin', val: (document.getElementById('pl-gin') || {}).value, tile: document.querySelector('#crewplayer-body .pl-tiles').innerText.replace(/\s+/g, ' ') }));
+    C.check('a redraw of the page waits while a field has the keyboard: the text and the cursor stay', mid.focus && mid.val === 'my first step' && !/77/.test(mid.tile), JSON.stringify(mid));
+    await a.p.evaluate(() => document.getElementById('pl-gin').blur()); await a.p.waitForTimeout(700);
+    const late = await a.p.evaluate(() => ({ tile: document.querySelector('#crewplayer-body .pl-tiles').innerText.replace(/\s+/g, ' '), val: (document.getElementById('pl-gin') || {}).value }));
+    C.check('…and the page catches up a moment after it lets go, with the typed text kept', /77/.test(late.tile) && late.val === 'my first step', JSON.stringify(late));
+    C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+  }
+  if (on(17)) {
+    // which rows each sport asks for, on your own page
+    const a = await open(browser, {});
+    await goCrew(a.p); await a.p.evaluate(() => openPlayer('me')); await a.p.waitForTimeout(700);
+    const rowsFor = async (sports, extra) => { await setGame(a.p, Object.assign({ sports }, extra || {})); await a.p.waitForTimeout(150); return labels(a.p); };
+    const L = x => x.join('|');
+    C.check('tennis asks Backhand and not Side', L(await rowsFor(['tennis'])) === 'Plays|Hand|Backhand|Level|Club|Trains for|Working on|Instagram');
+    C.check('padel asks Side and not Backhand', L(await rowsFor(['padel'])) === 'Plays|Hand|Side|Level|Club|Trains for|Working on|Instagram');
+    C.check('pickleball and beach tennis ask both', L(await rowsFor(['pickleball'])) === 'Plays|Hand|Backhand|Side|Level|Club|Trains for|Working on|Instagram' && L(await rowsFor(['beach_tennis'])) === 'Plays|Hand|Backhand|Side|Level|Club|Trains for|Working on|Instagram');
+    C.check('squash, badminton and table tennis ask neither (and Level)', L(await rowsFor(['squash'])) === 'Plays|Hand|Level|Club|Trains for|Working on|Instagram' && L(await rowsFor(['badminton', 'table_tennis'])) === 'Plays|Hand|Level|Club|Trains for|Working on|Instagram');
+    C.check('no sport asks neither Backhand, Side nor Level (even if the server still holds an old one)', L(await rowsFor([], { club: 'Home gym', backhand: 'two', side: 'left', plays_at: 'fun' })) === 'Plays|Hand|Club|Trains for|Working on|Instagram'
+      && JSON.stringify((await factRows(a.p))[0]) === '["Plays","None"]');
+    // someone else's page never shows an old backhand for a sport that has none
+    await a.p.evaluate(() => { _playerHTML = ''; });
+    // under 13: no Instagram row on your own page
+    await a.ctx.close();
+    const u = await open(browser, { b: { me: { under13: true, can_post: false } } });
+    await waitTab(u.p); await u.p.evaluate(() => openPlayer('me')); await u.p.waitForTimeout(700);
+    await u.p.evaluate(() => { const c = crewPageGet('me'); if (!c) return; c.p.under13 = true; c.p.game = { sports: ['tennis'], hand: 'right', training_for: [] }; crewPagesSave(); _gameOpen = null; _playerHTML = ''; renderPlayerPage(); });
+    const lu = await labels(u.p);
+    C.check('under 13: your own card has no Instagram row', lu.length > 0 && lu.indexOf('Instagram') < 0 && lu.indexOf('Hand') >= 0, lu.join('|'));
+    await u.ctx.close();
+    // the guide names the controls
+    const g = await open(browser, {});
+    await goCrew(g.p);
+    const gd = await g.p.evaluate(() => buildAppGuideCards());
+    C.check('the guide names This cycle, Held, the dots and Player facts, in plain words (no em-dash, no semicolon)', /<strong>This cycle<\/strong>/.test(gd) && /<strong>Held<\/strong>/.test(gd) && /small dot after the bar/.test(gd) && /<strong>Player facts<\/strong>/.test(gd)
+      && !/[—;]/.test((gd.match(/<strong>This cycle<\/strong>[\s\S]*?your Instagram name[^<]*<\/p>/) || [''])[0]));
+    await g.ctx.close();
   }
 
   await browser.close();

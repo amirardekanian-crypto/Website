@@ -127,5 +127,27 @@ what is counted (and held), so the bar is cut into exactly that; what a person d
 | `playerCycleHTML(key, p, own, mk)` | the heading, the card and every row; `plCycle` / `plWeekN` read the server's numbers safely (done never above plan). |
 | `openPlayerWeek(key, i)` | the week's sheet (a wrapped sheet opener: ‹ Back works); `plDay(iso)` writes *Tue 21 Oct* from a calendar day, never through `new Date(string)`. |
 
-**Tests.** `lounge.js` section 16: the segments, held, the dots and +N, now, the week sheets (yours with names and minutes, theirs with neither, even if the server sent them), weeks before
-joining, no cycle no block, 320 px.
+## Step 5 · Player facts, for every racket sport and for people who play none (idea 57, direction B)
+
+**What.** A small card, the way a tennis tour shows a player, on every page that has a `game`: **Plays** (the sports in the order chosen), **Hand** (*Right-handed, two-handed backhand*), **Side**
+(*Left side*), **Level** (*For fun*, *Club*, *Competition*), **Club**, **Trains for**, **Working on**, **Instagram** (a link out on someone else's page). Only rows with a value; someone who plays
+no sport has a card of what they have (a fitness client sees one row). **Your own page** edits each row in place: a tap opens the choices as chips (one answer: a tap saves and closes it, a second tap
+takes it back; several: Plays, Trains for) or a field (Club 40, Working on 60, Instagram, typed at 16 px). The rows follow the answers: **Backhand** only for tennis, pickleball and beach tennis; **Side**
+only for padel, pickleball and beach tennis; **Level** only once a sport is chosen; with no sport the card is Hand, Trains for, Club, Working on, Instagram (plus Plays, where you choose, with **None**).
+An empty card is one row, **Add your game**. A choice is shown at once and sent as `my_game_set({p})`; the reply replaces the card; a refusal or no signal puts the last saved card back. The page is not
+redrawn under a field that has the keyboard. Under 13 has no Instagram row. The sport line under a name is the first sport and its side (*Padel · left side*), from here and **never from the programme's
+sport badge** (which can name an injury).
+
+**Why.** Amir: *"your game should be in a way, that is applicable to all racket sports, and general people as well"*, so the sports are tennis, padel, squash, badminton, pickleball, table tennis, beach tennis
+or none. The crew sees what is on the card (there is no switch for it), which the card says under it.
+
+| function | job |
+|---|---|
+| `playerFactsHTML` / `plGameRows` / `plEditor` | the card, its rows and the chips or field of the open row. |
+| `plGameClean(g)` | the answers as the server keeps them, with what no sport asks for dropped. |
+| `plGamePick` / `plGameSave` / `plGameSet` / `plGameFlush` | one chip · one field (Instagram checked first) · shown at once · the one call at a time (latest wins, `_gameOk` is the card put back). |
+| `playerSportLine(p)` | the line under the name. |
+
+**Tests.** `lounge.js` sections 16 and 17: the segments, held, the dots and +N, now, the week sheets (yours with names and minutes, theirs with neither, even if the server sent them), weeks before
+joining, no cycle no block, 320 px; the rows for each sport, the chips, one call at a time, a refusal and no signal, Instagram checked, a field kept while a redraw waits, under 13, the
+programme's sport badge never on a page.
