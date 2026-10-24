@@ -5969,7 +5969,7 @@
      the Body Weight row on Progress (under "Your numbers"; it was on Home until 2026-10-12). -->
 <div id="screen-weight" class="screen">
   <div class="ceil-head">
-    <button class="nav-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
+    <button class="nav-back" onclick="subBack('weight')" aria-label="Back to Progress">←</button>
     <div class="ceil-kick">Your numbers</div>
     <h1 class="ceil-title">Body Weight</h1>
     <div class="ceil-board" id="wt-board" hidden></div>
@@ -5982,7 +5982,7 @@
      and the ways to add another. Opened from Progress's one habit door (renderHabitList()). -->
 <div id="screen-habits" class="screen">
   <div class="ceil-head">
-    <button class="nav-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
+    <button class="nav-back" onclick="subBack('habits')" aria-label="Back to Progress">←</button>
     <div class="ceil-kick">Your habits</div>
     <h1 class="ceil-title">Daily habits</h1>
   </div>
@@ -5997,7 +5997,7 @@
      under Your numbers; never in the demo or the coach's preview (no get_achievements answer, so no door and no page). -->
 <div id="screen-achievements" class="screen">
   <div class="ceil-head">
-    <button class="nav-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
+    <button class="nav-back" onclick="subBack('achievements')" aria-label="Back to Progress">←</button>
     <div class="ceil-kick">Your numbers</div>
     <h1 class="ceil-title">Achievements</h1>
   </div>
@@ -6021,7 +6021,7 @@
      Progress, reached from its door row. renderMoments(). -->
 <div id="screen-moments" class="screen">
   <div class="ceil-head">
-    <button class="nav-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
+    <button class="nav-back" onclick="subBack('moments')" aria-label="Back to Progress">←</button>
     <div class="ceil-kick">Your numbers</div>
     <h1 class="ceil-title">Your moments</h1>
   </div>
@@ -11111,11 +11111,21 @@ function coachContactHtml() {
 // returns there, not to the top of the shelves. Any other route to the Library forgets it.
 let _libScrollY = null;
 let _wsReturn = null;   // where a suggested Library session's ← goes (LIB-01): wsBack()
+// A page of Progress's "Your numbers" can also be opened from Home (New from Amir, the habit card's ›): its ← and the phone's Back return to the tab
+// that opened it, Progress otherwise. Set on the way in; a page reached from another page (the manual) keeps the tab it first came from.
+const SUB_FROM = {};
+function subBack(screen) { goTo(SUB_FROM[screen] === 'home' ? 'home' : 'plan'); }
+window.subBack = subBack;
 function goTo(screen, historyId, keepContent) {
   dropClockOffer();
   stopInlineVideos();
   if (screen !== 'workout') _wsReturn = null;
   const was = (document.querySelector('.screen.active') || {}).id || '';
+  if (screen in { weight: 1, habits: 1, achievements: 1, moments: 1 }) {
+    if (was === 'screen-home' || was === 'screen-plan') SUB_FROM[screen] = was.slice(7);
+    const bb = document.querySelector('#screen-' + screen + ' .nav-back');
+    if (bb) bb.setAttribute('aria-label', SUB_FROM[screen] === 'home' ? 'Back to Home' : 'Back to Progress');
+  }
   if (was === 'screen-workouts' && (screen === 'workout' || screen === 'article')) _libScrollY = window.scrollY;
   const libBack = screen === 'workouts' && (was === 'screen-workout' || was === 'screen-article') && _libScrollY != null;
   if (screen !== 'workout' && screen !== 'article') { if (!libBack) _libScrollY = null; }

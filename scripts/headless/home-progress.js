@@ -114,12 +114,13 @@ function noStrip(browser) {
     // The dates moved onto the This cycle cover (2026-10-13): the header keeps the eyebrow, the title and the sport badge, and the cover's mono line carries the dates.
     t.check('Progress header: the sport badge stays under the title, and the header has no dates line (the cover has them)', o.badge && o.dates === null && o.y.title < o.y.badge && /\d/.test(o.coverDates || ''), JSON.stringify([o.y, o.dates, o.coverDates]));
     const y = o.y;
-    t.check('Progress order: header, This cycle card, Your numbers (Records, Body weight), then the Game Plan and its road',
-      y.badge < y.card && y.card < y.numbers && y.numbers < y.ceil && y.ceil < y.weight && y.weight < y.plan && y.plan < y.road, JSON.stringify(y));
+    // Without the career "Your numbers" has nothing under it and is not drawn (Love All B20), so Records stand straight under the card.
+    t.check('Progress order: header, This cycle card, Records, Body weight, then the Game Plan and its road',
+      y.badge < y.card && y.card < y.ceil && y.ceil < y.weight && y.weight < y.plan && y.plan < y.road, JSON.stringify(y));
     // THE SCOREBOARD (2026-10-19): two titles on the whole tab. Without the career (the demo's way: no profile) there is no career
     // card and no Achievements or Your moments door either; Records and Body weight stand on their own under Your numbers.
-    t.check('Progress: its four section titles (Your numbers, Getting stronger, Your body, Game Plan), and no career card or career doors without the career',
-      o.sec.join('|') === 'Your numbers|Getting stronger|Your body|Game Plan' && !o.career, JSON.stringify([o.sec, o.career]));
+    t.check('Progress: its three section titles (Getting stronger, Your body, Game Plan), no empty Your numbers, and no career card or career doors without the career',
+      o.sec.join('|') === 'Getting stronger|Your body|Game Plan' && !o.career, JSON.stringify([o.sec, o.career]));
     t.check('Progress: the Game Plan title is 15 px capitals in green ink with a hairline to the edge',
       !!o.gp && o.gp.size === '15px' && o.gp.caps === 'uppercase' && o.gp.color === 'rgb(14, 74, 54)' && parseFloat(o.gp.spacing) > 0, JSON.stringify(o.gp));
     t.check('This cycle card on Progress: a plain card, no tap, no ›', !!o.card && o.card.tag === 'DIV' && !o.card.onclick && !o.card.arrow, JSON.stringify(o.card && [o.card.tag, o.card.onclick, o.card.arrow]));
@@ -676,7 +677,7 @@ function noStrip(browser) {
     await p.click('#weight-row-wrap .hrow');
     await p.waitForTimeout(400);
     const wk = await p.evaluate(() => ({ screen: document.querySelector('.screen.active').id, back: document.querySelector('#screen-weight .nav-back').getAttribute('aria-label'), onclick: document.querySelector('#screen-weight .nav-back').getAttribute('onclick') }));
-    t.check('the Body weight row opens Body Weight, whose ← says Back to Progress', wk.screen === 'screen-weight' && wk.back === 'Back to Progress' && wk.onclick === "goTo('plan')", JSON.stringify(wk));
+    t.check('the Body weight row opens Body Weight, whose ← says Back to Progress', wk.screen === 'screen-weight' && wk.back === 'Back to Progress' && wk.onclick === "subBack('weight')", JSON.stringify(wk));
     t.check('Body weight: the Progress tab stays lit', (await lit(p)) === 'plan', await lit(p));
     await p.click('#screen-weight .nav-back');
     await p.waitForTimeout(400);
@@ -772,7 +773,7 @@ function noStrip(browser) {
     await after.p.waitForTimeout(400);
     const on = await after.p.evaluate(() => ({ line: !!document.querySelector('#dayone-wrap .day1'), numbers: !document.getElementById('numbers-title').hidden,
       records: !!document.querySelector('#ceiling-row-wrap .hrow') }));
-    t.check('Day one is only day one: with a finished session the line goes and Your numbers is back', !on.line && on.numbers && on.records, JSON.stringify(on));
+    t.check('Day one is only day one: with a finished session the line goes and the Records row is back (no career here, so no Your numbers over an empty card, Love All B20)', !on.line && !on.numbers && on.records, JSON.stringify(on));
     await after.ctx.close();
   }
 
