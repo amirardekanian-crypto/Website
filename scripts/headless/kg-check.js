@@ -12,7 +12,7 @@ const SQ = 'Barbell Back Squat';
 const LW = [0, 1, 2, 3].map(() => ({ w: '', n: '', r: '', d: false, lw: '80' }));   // last time: 80 kg on every set
 
 async function openSquat(p) {
-  await p.evaluate(`(() => { openDayView('1'); const c = ${H.card(SQ)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = 'sq'; try { hideAaToast(); } catch (e) {} })()`);
+  await p.evaluate(`(() => { window.restAfterTick = () => {}; /* a tick rests by itself now (love-all-rest.js); this suite is about the weight, not the rest */ openDayView('1'); const c = ${H.card(SQ)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = 'sq'; try { hideAaToast(); } catch (e) {} })()`);
   await p.waitForTimeout(300);
 }
 const row = i => `#sq .ex-set-row[data-set-idx="${i}"]`;

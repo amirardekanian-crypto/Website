@@ -11404,7 +11404,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p><p>When I update the app, an orange note says <strong>A new version of the app is ready</strong>. Tap <strong>Reload</strong> and it loads in a second. You don't have to close it from your phone and open it again. <strong>Not now</strong> puts it away. Mid-session it waits until you've finished, so a reload never takes your sets with it.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. You get one match a session: first to 15. A bank shot off the glass counts 2. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. <strong>The Lob</strong> is a slow ball to breathe with: in as it rises, out as it falls. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong>: tick a set and the countdown starts by itself, when I wrote a rest for that exercise. Not after your last set of the day. The <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts it any time (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. You get one match a session: first to 15. A bank shot off the glass counts 2. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. <strong>The Lob</strong> is a slow ball to breathe with: in as it rises, out as it falls. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. During a session it's under <strong>⋯</strong> on the bar too, as <strong>Ask Amir</strong>, and it names the exercise you have open. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
 ];
@@ -21159,7 +21159,7 @@ function attachSetLog(card) {
       // Sync the exercise-level check: all sets done = exercise checked.
       syncExerciseCheck(card, cur);
       if (cur[idx].d) foldWhenDone(card, open);
-      if (cur[idx].d && !kgNudge(row, card, cur[idx])) offerClock(card.dataset.day);
+      if (cur[idx].d && !kgNudge(row, card, cur[idx])) { offerClock(card.dataset.day); restAfterTick(card); }
       if (navigator.vibrate) navigator.vibrate(12);
     });
   });
@@ -22657,11 +22657,30 @@ function openTimer(e) {
   openRest(secs, name, ctx);
 }
 
-// Every list-mode door (the card's Rest button, the offer after a tick) opens the rest
+// Every list-mode door (the card's Rest button, a tick in the list) opens the rest
 // already running: tapping Rest means the set is over (WK-02; it used to wait for Start).
 function openRest(secs, name, ctx) {
   showTimer(secs, name, null, ctx);
   startTimer();
+}
+
+// A tick in the list starts the card's rest by itself (Amir, 2026-10-24: "the same as Guided does, and X skips it"). It is the card's own Rest
+// button pressed for the athlete, so the time, the Next line and the games are exactly the button's. Only where a rest was WRITTEN (the
+// button names its time; an unwritten one says "Rest timer"), only in the day's list (a Library session has no day to walk), never in Guided
+// (it rests itself) or the coach's preview, never over a rest already counting, and never when nothing follows: restNextOfCard() is null
+// after the last set of the last exercise. A hold's own count ending ticks the set through the same click, so it rests then, once: its
+// first tap only starts the count and rests nothing. Un-ticking, "tick all" (setAllSetsDone()) and warm-up rows (no Rest button) never get here.
+// The old pill above the tab bar (offerRest(), WK-02) stays gone.
+function restAfterTick(card) {
+  try {
+    if (window.IS_PREVIEW || isLoading || (typeof STEP !== 'undefined' && STEP)) return;
+    const ov = document.getElementById('timerOverlay');
+    if (!ov || ov.classList.contains('visible')) return;
+    const btn = (cardDetail(card) || card).querySelector('.rest-btn');
+    if (!btn || !btn.querySelector('.rest-t') || !(parseInt(btn.getAttribute('data-rest'), 10) > 0)) return;
+    if (!restNextOfCard(card)) return;
+    openTimer({ target: btn, stopPropagation() {} });
+  } catch (e) { /* a rest that cannot open must never cost a tick */ }
 }
 
 // Guided Mode's rest: same overlay, same running start, but it calls onComplete when

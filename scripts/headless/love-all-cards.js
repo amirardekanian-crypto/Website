@@ -20,7 +20,7 @@ function holdProg() {
 }
 const open = (browser, o = {}) => H.openProgram(browser, Object.assign({ w: 390, h: 844, prog: holdProg(), hist: [], stub: { library: H.library() } }, o));
 async function openCard(p, name) {
-  await p.evaluate(`(() => { openDayView('1'); const c = ${H.card(name)}; if (c.classList.contains('collapsed')) toggleExpand(c); try { hideAaToast(); } catch (e) {} c.scrollIntoView({ block: 'center' }); })()`);
+  await p.evaluate(`(() => { window.restAfterTick = () => {}; /* a tick rests by itself now (love-all-rest.js); this suite is about the cards */ openDayView('1'); const c = ${H.card(name)}; if (c.classList.contains('collapsed')) toggleExpand(c); try { hideAaToast(); } catch (e) {} c.scrollIntoView({ block: 'center' }); })()`);
   await p.waitForTimeout(400);
 }
 const circle = (p, name, i = 0) => `${H.card(name)}.querySelectorAll('.ex-set-row')[${i}].querySelector('.ex-set-check')`;
