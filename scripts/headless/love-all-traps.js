@@ -64,10 +64,40 @@ async function b(browser) {
   }
 }
 
+// ═════════ c: Day N is the day's real id ═════════
+function idsProg() {
+  const P = H.fixture({ dated: false });
+  P.workouts.days[1].id = 3;
+  return P;
+}
+async function c(browser) {
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    const hist = [{ completed_on: ymd(new Date()), day: '1', readiness: 4, log: [] }];
+    const seed = { _autofiled: [{ on: ymd(new Date(Date.now() - DAY)), day: '3', done: 2, total: 6, at: Date.now() }] };
+    const { ctx, p } = await H.openProgram(browser, { w, h, prog: idsProg(), hist, seed });
+    await p.waitForTimeout(500);
+    const r = await p.evaluate(() => ({
+      hero: (document.querySelector('#day-cards-wrap .day-card-num') || {}).textContent || '',
+      go: (document.querySelector('#day-cards-wrap .dc-go') || {}).textContent || '',
+      rows: [...document.querySelectorAll('#day-cards-wrap .dc-row')].map(e => e.getAttribute('aria-label') + '|' + e.querySelector('.dc-num').textContent),
+      uf: (document.querySelector('.uf-t') || {}).textContent || '' }));
+    t.check(`c ${w}: Home's Next up card says Day 3 (its id, not its place)`, /Day 3$/.test(r.hero.trim()) && /Open Day 3/.test(r.go), JSON.stringify(r));
+    t.check(`c ${w}: the Not finished card and the cards agree on Day 3`, /Day 3 wasn't finished/.test(r.uf), JSON.stringify(r));
+    await p.evaluate("openDayView('3')"); await p.waitForTimeout(500);
+    const v = await p.evaluate(() => (document.querySelector('#day-view-card .day-card-num') || {}).textContent || '');
+    t.check(`c ${w}: the open day's own card says Day 3`, /Day 3/.test(v), v);
+    await p.evaluate("closeDayView()"); await p.waitForTimeout(300);
+    t.check(`c ${w}: the row for Day 1 says Day 1`, r.rows.some(x => /^Day 1,.*\|1$/.test(x)), JSON.stringify(r.rows));
+    t.check(`c ${w}: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await a(browser);
   await b(browser);
+  await c(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

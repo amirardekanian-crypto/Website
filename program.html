@@ -9006,6 +9006,7 @@ function dayImageCategory(day) {
 function dayCardHTML(day, dayNum, total, opts) {
   opts = opts || {};
   const id = day.id != null ? day.id : dayNum;
+  dayNum = esc(String(id));   // "Day N" is the day's real id, never its place in the list (ids 1 and 3 say Day 1 and Day 3: Love All B, 2026-10-24)
   // Descriptive day name = title, else focusTag (e.g. "Squat & Glute Activation").
   const name = day.title || day.focusTag || ('Day ' + dayNum);
   const idStr = esc(String(id));
