@@ -13052,6 +13052,7 @@ function paintCareerCard() {
   const on = (document.querySelector('.screen.active') || {}).id;
   if (on === 'screen-moments') renderMoments();
   if (on === 'screen-achievements') renderAchievements();
+  if (typeof paintDayOne === 'function') paintDayOne();   // keeps "Your numbers" in step with the card under it
 }
 function careerCardHTML() {
   if (!careerOnT() || !DATA) return '';
@@ -14823,6 +14824,9 @@ function paintDayOne() {
     const e = document.getElementById(id);
     if (e) e.hidden = on;
   });
+  // The heading goes whenever the card under it is empty too: Career off, the demo, the coach's preview, offline with no copy (Love All B20).
+  const nt = document.getElementById('numbers-title'), cc = document.getElementById('career-card-wrap');
+  if (nt && cc && !cc.innerHTML.trim()) nt.hidden = true;
 }
 window.paintDayOne = paintDayOne;
 window.paintNumbers = paintNumbers;
