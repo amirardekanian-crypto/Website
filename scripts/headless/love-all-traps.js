@@ -93,11 +93,27 @@ async function c(browser) {
   }
 }
 
+// ═════════ d: Welcome opens the Next up day ═════════
+async function d(browser) {
+  for (const [name, hist, want] of [['Day 1 done this week: Next up is Day 3', [{ completed_on: ymd(new Date()), day: '1', readiness: 4, log: [] }], '3'], ['nothing done yet: Day 1', [], '1']]) {
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: idsProg(), hist });
+    await p.evaluate(() => { localStorage.setItem('aa_fresh_signin', '1'); localStorage.removeItem(ATHLETE_ID + '_welcomed'); maybeWelcome(); });
+    const label = await p.evaluate(() => (document.querySelector('.wel .wel-go') || {}).textContent || '');
+    t.check(`d ${name}: the button says Open Day ${want}`, label === 'Open Day ' + want, label);
+    await p.click('.wel .wel-go'); await p.waitForTimeout(600);
+    const o = await p.evaluate(() => { const v = document.getElementById('day-view'); return { open: !!v && !v.hidden, card: (document.querySelector('#day-view-card .day-card-num') || {}).textContent || '', wel: !!document.querySelector('.wel') }; });
+    t.check(`d ${name}: the tap opens that day (${want}) and closes Welcome`, o.open && o.card === 'Day ' + want && !o.wel, JSON.stringify(o));
+    t.check(`d ${name}: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await a(browser);
   await b(browser);
   await c(browser);
+  await d(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

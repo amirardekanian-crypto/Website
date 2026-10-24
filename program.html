@@ -8505,6 +8505,9 @@ function maybeWelcome() {
   const plan = cyc && cyc.name
     ? 'Your plan is ready. First up is ' + esc(cyc.name) + (cyc.weeks ? ', ' + esc(cyc.weeks) : '') + '.'
     : 'Your plan is ready.';
+  // The button opens the Next up day and names it (suggestedDayId(); the first day when none is suggested: Love All B, 2026-10-24).
+  const wDays = (DATA.workouts && DATA.workouts.days) || [], wSid = suggestedDayId();
+  const wDay = wDays.find(d => wSid != null && String(d.id) === String(wSid)) || wDays[0] || null;
   const el = document.createElement('div');
   el.className = 'wel';
   el.innerHTML =
@@ -8521,7 +8524,7 @@ function maybeWelcome() {
       '<p>' + plan + '</p>' +
       '<p class="sub">Any questions, message me on WhatsApp. The button is in the Coach tab.</p>' +
       '<div class="wn-sign">' + WN_SIG + '<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>' +   // his two lines, signed as the week note is
-      '<button type="button" class="wel-go">Open Day 1</button>' +
+      '<button type="button" class="wel-go">Open Day ' + esc(String(wDay && wDay.id != null ? wDay.id : 1)) + '</button>' +
       '<button type="button" class="wel-skip">Look around first</button>' +
     '</div>';
   document.body.appendChild(el);
@@ -8529,9 +8532,8 @@ function maybeWelcome() {
   // To the training, not the plan (PLAN-01, Amir 2026-09-26): a new athlete's first tap lands on Day 1.
   el.querySelector('.wel-go').addEventListener('click', function () {
     el.remove();
-    const d0 = (DATA.workouts && DATA.workouts.days || [])[0];
     goTo('home');
-    if (d0) openDayView(String(d0.id));
+    if (wDay) openDayView(String(wDay.id));
     navSync();
   });
   const closeWelcome = function () { el.remove(); navSync(); };
