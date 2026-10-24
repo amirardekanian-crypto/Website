@@ -468,7 +468,11 @@
 // v219: program.html changed (2026-10-21, the Love All audit). The session rating and note stay on the phone until Done, so a
 // session is filed once and New best shows at Done. A week of one set fewer, done as told, is a full session. Reminders opens
 // without looping. A warm-up row ticks on its first tap, and one box names a warm-up row left unticked once every set is done. Achievements and Moments draw their door icons at their real size.
-const CACHE = 'aap-v219';
+// v220: program.html changed (2026-10-24, Love All round 2, the small bugs). A weight check waits for an answer. An award
+// shows above an open sheet. Videos stop when their card folds. Last night's session counts once after midnight. History,
+// Ask Amir, the clock offer, rest Reset, Back from Home's pages and from a lift, the Reminders bell, a typed crew reply,
+// the plurals, the finish card's set count, article headings, the demo link, the tempo button and the guide's facts.
+const CACHE = 'aap-v220';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
