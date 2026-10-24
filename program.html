@@ -16555,7 +16555,15 @@ function refreshConfirmCard(day, status) {
 
   card.querySelector('.confirm-text').textContent =
     isFull ? `All done with Day ${day}` : early ? `Finishing Day ${day} early` : 'In progress';
-  card.querySelector('.confirm-count').textContent = `${done} of ${total} sets`;
+  // The words count sets only (Love All B30): warm-up rows (.is-prep) are units in done/total, which decide Partial and pay, but are not sets.
+  let pd = 0, pt = 0;
+  document.querySelectorAll(`.is-prep[data-day="${day}"]`).forEach(c => {
+    const n = parseInt(c.dataset.sets, 10) || 0;
+    if (c.classList.contains('round-group') || !n) { pt += 1; pd += c.classList.contains('checked') ? 1 : 0; return; }
+    pt += n; pd += loadSetLog((c.querySelector('.item-name')?.textContent || '').trim(), n, day).filter(s => s.d).length;
+  });
+  const sd = Math.max(0, done - pd), st = Math.max(0, total - pt);
+  card.querySelector('.confirm-count').textContent = `${sd} of ${st} sets` + (!ready && st > 0 && sd >= st ? ', warm-up left' : '');
   card.querySelector('.confirm-bar i').style.width = (total ? Math.round(done / total * 100) : 0) + '%';
   const missEl = card.querySelector('.confirm-missing');
   const why = early ? earlyWhyOf(day) : '';
