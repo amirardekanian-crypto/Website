@@ -5770,6 +5770,29 @@
   #screen-crew .cr-burst i svg { width: 18px; height: 18px; display: block; }
   @keyframes crBurst { 0% { opacity: 0; transform: translate(0, 6px) scale(.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx, 0), -34px) scale(1.25); } }
   @media (prefers-reduced-motion: reduce) { #screen-crew .cr-burst { display: none; } }
+  /* PLAYERS' LOUNGE · THE CYCLE BARS (step 4, 2026-10-24). Week Bars, with the extra sessions as small round dots after the bar
+     (Amir: "the workouts can be anything other than their cycles, they can do extra, it needs to show that as well"). Colours are the
+     app's one set; sizes are the --fs-* tokens. A filled segment reads --mark (the made-tick green that holds in dark). */
+  .pl-cx { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); white-space: nowrap; }
+  .pl-cyc { margin: 0 var(--g); padding: 8px 12px 10px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  .pl-cyc-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding-top: 2px; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  .pl-wb { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; min-height: 36px; margin: 0; padding: 0; text-align: left; color: var(--ink); }
+  .pl-wb + .pl-wb { margin-top: 0; }
+  .pl-wn { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .6px; color: var(--green-ink); }
+  .pl-bw { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .pl-bar { display: flex; flex: 1 1 auto; min-width: 0; gap: 4px; height: 14px; }
+  .pl-bar i { flex: 1; min-width: 0; border-radius: 7px; background: var(--tint); border: 1px solid var(--hair); }
+  .pl-bar i.on { background: var(--mark); border-color: var(--mark); }
+  .pl-wb.before .pl-bar i { background: transparent; border-style: dashed; opacity: .55; }
+  .pl-xd { flex: none; width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--mint); background: var(--tint); }
+  .pl-xn { flex: none; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .4px; color: var(--green-ink); white-space: nowrap; }
+  .pl-rt { display: flex; justify-content: flex-end; align-items: center; gap: 5px; min-width: 62px; white-space: nowrap; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--grey); }
+  .pl-hd { color: var(--green-ink); }
+  .pl-now { padding: 3px 5px; border: 1px solid var(--mint); border-radius: 6px; letter-spacing: .8px; color: var(--green-ink); }
+  .pl-wm { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: var(--fs-small); font-family: 'Barlow', sans-serif; color: var(--grey); }
+  .pl-tail { margin-top: 8px; }
+  .pl-xt { padding: 3px 6px; border: 1px solid var(--mint); border-radius: 6px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
+  #hist-overlay .pl-quiet { margin: 10px 0 0; }
   /* Tell the crew, on the finished card, under the WhatsApp row (paintCrewTell()) */
   :where(#day-view) .complete-crew, :where(#day-view) .complete-share { margin-top: 10px; }
   :where(#day-view) .complete-crew[hidden], :where(#day-view) .complete-share[hidden] { display: none; }
@@ -11158,7 +11181,7 @@ APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how ofte
     body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
-  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p>`;
+  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p><p><strong>This cycle</strong> on a page shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. The crew sees only the dates.</p>`;
   const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with likes), last month\'s honours early in the month, and the season board.</li>';
   return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
     <div class="note-card app-card${openKey && card.key === openKey ? ' open' : ''}" onclick="toggleNote(this)">
@@ -14634,6 +14657,72 @@ function playerHonRow(h) {
     : h.honour === 'full_month' ? 'every week held' : 'his pick of the month';
   return `<div class="pl-row"><div><span class="t">${esc(PL_HON[h.honour] || h.honour)}</span><span class="q">${esc([M && yr ? M + ' ' + yr : M, what].filter(Boolean).join(' · '))}</span></div></div>`;
 }
+// ── Step 4 · This cycle, Week Bars (Amir: "the workouts can be anything other than their cycles, they can do extra, it needs to show that as well") ──
+// One row per plan week: W1, a bar cut into the plan's own sessions (a filled piece is a session done), and the sessions BEYOND the plan as small
+// round dots after the bar with "+1" (a plan day done twice, a Library session, anything past the plan). A held week is one solid bar and says Held; the
+// week it is now says "now"; the weeks before a person joined are drawn empty and grey. The count counts plan sessions only ("8 of 15") and the
+// extras sit beside it ("+2 extra"). There are no weekday letters on the bars (SES-17): a tap on a week opens its sessions, by date. Your own page lists
+// the session's name and minutes; someone else's lists only the date and Session or Extra (the server sends no name or minutes for them: a name can hint
+// at pain, and the app never draws them even if one came).
+const PL_DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], PL_MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// "Tue 21 Oct" from a calendar day: read as a day, never through new Date(string), so no time zone can move it.
+function plDay(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ''));
+  if (!m) return '';
+  return PL_DOW[new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).getUTCDay()] + ' ' + (+m[3]) + ' ' + (PL_MON[+m[2] - 1] || '');
+}
+function plCycle(p) { const c = p && p.cycle; return c && Array.isArray(c.weeks) && c.weeks.some(w => w && Number(w.plan) > 0) ? c : null; }
+function plWeekN(w) {
+  const plan = Math.max(0, Math.min(14, Math.round(Number(w && w.plan) || 0))), done = Math.max(0, Math.min(plan, Math.round(Number(w && w.done) || 0)));
+  return { plan, done, extra: Math.max(0, Math.round(Number(w && w.extra) || 0)) };
+}
+function playerCycleHTML(key, p, own, mk) {
+  const c = plCycle(p);
+  if (!c) return '';
+  const weeks = c.weeks.filter(Boolean), nowAt = weeks.findIndex(w => w.now);
+  let done = 0, plan = 0, extra = 0, tap = false;
+  const rows = weeks.map((w, i) => {
+    const n = plWeekN(w), before = !!w.before, held = !!w.held && !before, now = !!w.now, wn = Number(w.w) || i + 1;
+    if (!before) { done += n.done; plan += n.plan; extra += n.extra; }
+    const days = (Array.isArray(w.days) ? w.days : []).filter(d => d && d.day), canTap = !before && days.length > 0;
+    if (canTap) tap = true;
+    const segs = held ? '<i class="on"></i>' : Array.from({ length: Math.max(1, n.plan) }, (_, j) => `<i${j < n.done ? ' class="on"' : ''}></i>`).join('');
+    const dots = Array.from({ length: Math.min(n.extra, 5) }, () => '<span class="pl-xd"></span>').join('');
+    // "2 of 3" on the week it is now, and on YOUR past weeks that fell short; a past week of someone else's is the bar alone
+    const count = !before && !held && n.plan && (now || (own && (nowAt >= 0 ? i < nowAt : n.done > 0))) ? `<span class="pl-wm">${n.done} of ${n.plan}</span>` : '';
+    const rt = before ? '' : `${now ? '<span class="pl-now">now</span>' : ''}${held ? '<span class="pl-hd">Held</span>' : ''}${count}`;
+    const said = `Week ${wn}${now ? ', this week' : ''}${before ? ', before they joined' : held ? ', held' : `, ${n.done} of ${n.plan} sessions`}${n.extra ? `, ${n.extra} extra` : ''}${canTap ? '. Tap to see its sessions.' : ''}`;
+    const cls = `pl-wb${before ? ' before' : ''}${held ? ' held' : ''}${now ? ' now' : ''}`;
+    const inner = `<b class="pl-wn">W${wn}</b><span class="pl-bw"><span class="pl-bar" aria-hidden="true">${segs}</span>${dots}${n.extra ? `<span class="pl-xn">+${n.extra}</span>` : ''}</span><span class="pl-rt">${rt}</span>`;
+    return canTap ? `<button type="button" class="cr-bt ${cls}" onclick="openPlayerWeek('${esc(key)}', ${i})" aria-label="${esc(said)}">${inner}</button>`
+      : `<div class="${cls}" role="group" aria-label="${esc(said)}">${inner}</div>`;
+  });
+  const per = Number(c.per_week) > 0 ? `${Math.round(c.per_week)} a week · ` : '';
+  return `<h2 class="prog-sec">This cycle · ${done} of ${plan}${extra ? `<span class="pl-cx">+${extra} extra</span>` : ''}${plMark(p, own, 'session', mk)}</h2>
+    <div class="pl-cyc"><div class="pl-cyc-h"><span>${c.n ? 'Cycle ' + esc(String(c.n)) : ''}</span><span>${per}${weeks.length} ${weeks.length === 1 ? 'week' : 'weeks'}</span></div>${rows.join('')}</div>
+    ${tap ? '<p class="pl-note pl-tail">Tap a week for its sessions.</p>' : ''}`;
+}
+// A week's sessions, one row each, by date.
+function openPlayerWeek(key, i) {
+  const ov = document.getElementById('hist-overlay'), c = crewPageGet(key), cy = c && plCycle(c.p), w = cy && cy.weeks[i];
+  if (!ov || !w) return;
+  const own = key === 'me' || !!c.p.me, n = plWeekN(w);
+  const days = (Array.isArray(w.days) ? w.days : []).filter(d => d && d.day).sort((a, b) => String(a.day).localeCompare(String(b.day)));
+  if (!days.length) return;
+  const row = d => own
+    ? `<div class="pl-row"><div><span class="t" dir="auto">${esc(d.title || plDay(d.day))}</span><span class="q">${esc([d.title ? plDay(d.day) : '', Number(d.mins) > 0 ? Math.round(Number(d.mins)) + ' min' : ''].filter(Boolean).join(' · '))}</span></div>${d.extra ? '<span class="pl-xt">Extra</span>' : '<span></span>'}</div>`
+    : `<div class="pl-row"><div><span class="t">${esc(plDay(d.day))}</span><span class="q">${d.extra ? 'Extra' : 'Session'}</span></div><span></span></div>`;
+  const sub = [`${n.done} of ${n.plan} ${n.plan === 1 ? 'session' : 'sessions'}`, n.extra ? `${n.extra} extra` : '', w.held ? 'Held' : ''].filter(Boolean).join(' · ');
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">This cycle</div>
+    <h2 class="readiness-title">Week ${Number(w.w) || i + 1}</h2>
+    <p class="readiness-sub">${esc(sub)}</p>
+    <div class="pl-list">${days.map(row).join('')}</div>
+    ${own && c.p.member !== false && !c.p.under13 && !plKindOff(c.p, 'session') ? '<p class="pl-quiet">The crew sees these dates and nothing else. The names and the minutes stay with you.</p>' : ''}`;
+  ov.classList.add('visible');
+}
+window.openPlayerWeek = openPlayerWeek;
+
 // This week: what the person posted on the Bell, still on this phone's copy of it. A row takes you to the post on Crew.
 function playerPosts(key, p) {
   return ((BELL && BELL.items) || []).filter(i => i && i.t === 'post' && !i.amir && (key === 'me' ? i.me : (!!p.ck && i.ck === p.ck)));
@@ -14671,6 +14760,7 @@ function playerHTML(key, p, note) {
   let b = '';
   const tiles = playerTilesHTML(p, own, mk);
   if (tiles) b += `<h2 class="prog-sec">${own ? 'Your numbers' : esc(first) + "'s numbers"}</h2>${tiles}`;
+  b += playerCycleHTML(key, p, own, mk);   // This cycle (step 4): the week bars, with the extra sessions as dots
   const ach = Array.isArray(p.achievements) ? p.achievements : [];
   if (ach.length) {
     b += `<h2 class="prog-sec">Achievements${plMark(p, own, 'achievement', mk)}</h2><div class="pl-list">${ach.slice(0, 3).map(playerAchRow).join('')}`
@@ -22745,6 +22835,7 @@ function wrapSheetOpeners() {
   openCourt = sheetWrap(openCourt); window.openCourt = openCourt;   // Four Courts: a kind of achievements
   openCrewPost = sheetWrap(openCrewPost); window.openCrewPost = openCrewPost;   // Crew: the composer (stage81)
   openPlayerAchievements = sheetWrap(openPlayerAchievements); window.openPlayerAchievements = openPlayerAchievements;   // a Player Page's "All n"
+  openPlayerWeek = sheetWrap(openPlayerWeek); window.openPlayerWeek = openPlayerWeek;   // a Player Page's week of sessions (This cycle)
   openFacePhoto = sheetWrap(openFacePhoto); window.openFacePhoto = openFacePhoto;   // Your photo: opened from your page
   openCheer = sheetWrap(openCheer); window.openCheer = openCheer;   // Cheer Sara: opened from her page
   openCrewSettings = sheetWrap(openCrewSettings); window.openCrewSettings = openCrewSettings;   // Crew: the yes and the switches; ‹ Back to the account

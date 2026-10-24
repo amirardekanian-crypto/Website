@@ -109,3 +109,23 @@ join button. Under 13: no door on a face, no hint, no button.
 **Tests.** `lounge.js` section 14: the ring only on `held`, NEW only on `new`, forty pixels, one tap waits then opens, a double tap cheers once and never opens the page, no word,
 the burst, the toast, the hint's three visits and its end, the second cheer politely, the page's button and its words, the sheet (100, auto, count, the 7-day line), a word over 100,
 no signal, a person who left, New Balls, your own page, the daily limit, reduced motion, no 👏 character in anything drawn, the guide. Section 15 takes the pictures.
+
+## Step 4 · This cycle, Week Bars with the extra sessions (idea 58, direction B)
+
+**What.** On a page that carries a `cycle`, a block **This cycle · 8 of 15** with one row per plan week: `W1`, a bar cut into the plan's own sessions (a filled piece is a session done), and
+the sessions BEYOND the plan as small round dots after the bar, mint outline, one each, with **+1** (a plan day done twice, a Library session, anything past the plan). A held week is ONE
+solid bar and says **Held**; the week it is now says **now** and *2 of 3*; weeks before a person joined are empty and grey and are not in the count. The count is plan sessions only, and
+the extras sit beside it (*+2 extra*). No weekday letters anywhere on the bars (SES-17). A week that has sessions is a button: it opens that week by date. **Your own page** lists the
+session's name, the date and the minutes, and *Extra* on an extra; **someone else's** lists only *Mon 12 Oct* and *Session* or *Extra*: the server sends no name or minutes for them (a
+Library session's or a rehab day's name can hint at pain) and the app never draws one even if it came. On your own page the block follows your `session` switch and wears *Only you* when it is off.
+
+**Why.** Amir, on the cycle bars: *"i like week bars idea, but the workouts, can be anything other than their cycles, they can do extra, it needs to show that as well"*. A plan week is
+what is counted (and held), so the bar is cut into exactly that; what a person does beyond it is shown, never counted against them.
+
+| function | job |
+|---|---|
+| `playerCycleHTML(key, p, own, mk)` | the heading, the card and every row; `plCycle` / `plWeekN` read the server's numbers safely (done never above plan). |
+| `openPlayerWeek(key, i)` | the week's sheet (a wrapped sheet opener: ‹ Back works); `plDay(iso)` writes *Tue 21 Oct* from a calendar day, never through `new Date(string)`. |
+
+**Tests.** `lounge.js` section 16: the segments, held, the dots and +N, now, the week sheets (yours with names and minutes, theirs with neither, even if the server sent them), weeks before
+joining, no cycle no block, 320 px.

@@ -14,6 +14,10 @@
 // Step 3: The cheer (In the Band). The band's faces (40 px, a ring for a held week, NEW, a tap that waits, a double tap that cheers once and never opens the page, the burst
 // that reduced motion does not get, the hint's three visits), the page's button (the clap icon and "Cheer", never the emoji), the sheet, the word, the polite refusals, New Balls,
 // the cheers received. Section 14. Section 15 takes the pictures (into --out).
+//
+// Step 4: This cycle (Week Bars): a bar cut into the plan's sessions, held weeks solid, the sessions beyond the plan as dots with +N, now, weeks before joining, the week sheet (yours with
+// names and minutes, theirs with the date and Session or Extra only). Section 16.
+// `--only=14,15` runs just those sections (everything after a "// ── N." line is wrapped in on(N)).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
 const H = require('./lib');
@@ -1120,6 +1124,90 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('320 px: the band\'s seven faces fit inside the band, none under 30 px, and nothing scrolls sideways', nw.sw <= nw.iw && nw.w.every(x => x >= 29) && nw.right <= nw.iw - 16, JSON.stringify(nw));
     await n.p.screenshot({ path: path.join(out, 'crew-band-faces-light-320.png') });
     await n.ctx.close();
+  }
+
+  // ── 16. Step 4 · This cycle (Week Bars): a bar for every plan week, and the sessions beyond the plan as small dots ────────────────────────────────
+  // The server's cycle (CONTRACT 3): per week { w, plan, done, held, extra, now, before, days[] }. Another person's days carry only `day` and `extra`;
+  // your own carry the session's title and minutes as well. Made-up people and dates only.
+  const cDays = (rows, own) => rows.map(([day, extra, title, mins]) => (own ? { day, title, mins, extra } : { day, extra }));
+  const cycleOf = (own, o = {}) => ({ n: 3, from: '2026-10-05', to: '2026-11-08', per_week: 3, weeks: [
+    { w: 1, from: '2026-10-05', to: '2026-10-11', plan: 3, done: o.before1 ? 0 : 3, held: !o.before1, extra: 0, now: false, before: !!o.before1,
+      days: o.before1 ? [] : cDays([['2026-10-05', false, 'Lower · Power', 64], ['2026-10-07', false, 'Upper · Push', 55], ['2026-10-09', false, 'Full Body', 60]], own) },
+    { w: 2, from: '2026-10-12', to: '2026-10-18', plan: 3, done: 3, held: true, extra: 1, now: false,
+      days: cDays([['2026-10-12', false, 'Lower · Power', 62], ['2026-10-14', false, 'Upper · Push', 58], ['2026-10-16', false, 'Full Body', 61], ['2026-10-17', true, 'Easy Spin', 30]], own) },
+    { w: 3, from: '2026-10-19', to: '2026-10-25', plan: 3, done: 2, held: false, extra: 1, now: true,
+      days: cDays([['2026-10-19', false, 'Lower · Power', 64], ['2026-10-21', false, 'Upper · Push', 52], ['2026-10-22', true, 'Core Circuit', 20]], own) },
+    { w: 4, from: '2026-10-26', to: '2026-11-01', plan: 3, done: 0, held: false, extra: 0, now: false, days: [] },
+    { w: 5, from: '2026-11-02', to: '2026-11-08', plan: 3, done: 0, held: false, extra: 0, now: false, days: [] }] });
+  const cycleShot = p => p.evaluate(() => ({
+    head: (document.querySelector('#crewplayer-body .pl-cyc') ? document.querySelector('#crewplayer-body .pl-cyc').previousElementSibling : document.createElement('i')).textContent.replace(/\s+/g, ' ').trim(),
+    rows: [...document.querySelectorAll('#crewplayer-body .pl-wb')].map(r => ({ n: r.querySelector('.pl-wn').textContent, segs: r.querySelectorAll('.pl-bar i').length, on: r.querySelectorAll('.pl-bar i.on').length,
+      dots: r.querySelectorAll('.pl-xd').length, xn: (r.querySelector('.pl-xn') || {}).textContent || '', rt: [...r.querySelectorAll('.pl-rt > *')].map(e => e.textContent.trim()).join(' '), tag: r.tagName, cls: r.className })),
+    card: (document.querySelector('#crewplayer-body .pl-cyc') || { textContent: '' }).textContent.replace(/\s+/g, ' ').trim(),
+    note: !!document.querySelector('#crewplayer-body .pl-tail') }));
+  const nth = (p, sel, i) => p.evaluate(([s, k]) => { const e = document.querySelectorAll(s)[k]; if (!e) return false; e.click(); return true; }, [sel, i]);
+  const sheetRows = p => p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), eyebrow: (document.querySelector('#hist-overlay .readiness-eyebrow') || {}).textContent, title: (document.querySelector('#hist-overlay .readiness-title') || {}).textContent,
+    sub: (document.querySelector('#hist-overlay .readiness-sub') || {}).textContent, rows: [...document.querySelectorAll('#hist-overlay .pl-row')].map(r => r.innerText.replace(/\s+/g, ' ').trim()),
+    quiet: (document.querySelector('#hist-overlay .pl-quiet') || {}).textContent }));
+  if (on(16)) {
+    const a = await open(browser, { stub: { crewPages: { [CK.mina]: { cycle: cycleOf(false) } } } });
+    await goCrew(a.p); await shown(a.p, CK.mina);
+    const s = await cycleShot(a.p);
+    C.check('another person\'s page: "This cycle · 8 of 15" (plan sessions only) and "+2 extra" beside it', /^This cycle · 8 of 15/.test(s.head) && /\+2 extra$/.test(s.head), s.head);
+    C.check('…the plan\'s own sessions are the segments: a 3-day plan draws 3, filled for each one done', s.rows[2].segs === 3 && s.rows[2].on === 2 && s.rows[3].segs === 3 && s.rows[3].on === 0 && s.rows[4].segs === 3, JSON.stringify(s.rows));
+    C.check('…a held week is ONE continuous green bar, and says Held', s.rows[0].segs === 1 && s.rows[0].on === 1 && /^held$/i.test(s.rows[0].rt) && s.rows[1].segs === 1 && s.rows[1].on === 1 && /^held/i.test(s.rows[1].rt), JSON.stringify(s.rows.slice(0, 2)));
+    C.check('…an extra session is a small round dot after the bar, one each, with "+1" (also after a held bar)', s.rows[1].dots === 1 && s.rows[1].xn === '+1' && s.rows[2].dots === 1 && s.rows[2].xn === '+1' && s.rows[0].dots === 0 && s.rows[0].xn === '' && s.rows[3].dots === 0, JSON.stringify(s.rows.map(r => [r.n, r.dots, r.xn])));
+    C.check('…the current week says "now" and "2 of 3"; the others do not', /^now 2 of 3$/i.test(s.rows[2].rt) && s.rows.filter(r => /now/.test(r.rt)).length === 1 && s.rows[3].rt === '' && s.rows[4].rt === '', JSON.stringify(s.rows.map(r => r.rt)));
+    C.check('…no weekday letters or names anywhere on the bars (SES-17)', !/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/.test(s.card) && !(await a.p.$('#crewplayer-body .pl-cyc .pl-wd')), s.card);
+    C.check('…the card says which cycle and how long, and a week with sessions is a button (the empty ones are not)', /Cycle 3/.test(s.card) && /3 a week · 5 weeks/.test(s.card) && s.rows.map(r => r.tag).join() === 'BUTTON,BUTTON,BUTTON,DIV,DIV' && s.note, s.card);
+    // a tap on a week: the date, and Session or Extra, and nothing else
+    await nth(a.p, '#crewplayer-body .pl-wb', 1); await a.p.waitForTimeout(350);
+    const w2 = await sheetRows(a.p);
+    C.check('a tap on week 2 opens its sessions by date, with Session or Extra only', w2.on && w2.title === 'Week 2' && w2.eyebrow === 'This cycle' && /3 of 3 sessions · 1 extra · Held/.test(w2.sub) && w2.rows.length === 4
+      && w2.rows[0] === 'Mon 12 Oct Session' && w2.rows[2] === 'Fri 16 Oct Session' && w2.rows[3] === 'Sat 17 Oct Extra', JSON.stringify(w2));
+    C.check('…never a title, never minutes, and nothing about the crew\'s switches', !/Lower|Upper|Full Body|Easy Spin|min\b/.test(w2.rows.join(' ')) && !w2.quiet, JSON.stringify(w2.rows));
+    await a.p.evaluate(() => closeHistorySheet());
+    C.check('…a day the page has no sessions for is no button, so a tap on it does nothing', await a.p.evaluate(() => { document.querySelectorAll('#crewplayer-body .pl-wb')[3].click(); return !document.getElementById('hist-overlay').classList.contains('visible'); }));
+    C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+    // even if a title or minutes came for someone else's day, the page never draws them
+    const d = await open(browser, { stub: { crewPages: { [CK.mina]: { cycle: cycleOf(true) } } } });
+    await goCrew(d.p); await shown(d.p, CK.mina);
+    await nth(d.p, '#crewplayer-body .pl-wb', 1); await d.p.waitForTimeout(350);
+    const w2d = await sheetRows(d.p);
+    C.check('defence: a title and minutes sent for someone else are never drawn', w2d.rows.length === 4 && !/Lower|Upper|Full Body|Easy Spin|min\b/.test(w2d.rows.join(' ')) && w2d.rows[3] === 'Sat 17 Oct Extra', JSON.stringify(w2d.rows));
+    await d.ctx.close();
+    // your own page: the name, the date, the minutes, and Extra on an extra
+    const o = await open(browser, { stub: { crewPages: { me: { cycle: cycleOf(true) } } } });
+    await goCrew(o.p); await o.p.evaluate(() => openPlayer('me')); await o.p.waitForTimeout(700);
+    const so = await cycleShot(o.p);
+    C.check('your own page: the same bars, "now 2 of 3" on this week, and "2 of 3" is not said on weeks that are still to come', /^This cycle · 8 of 15/.test(so.head) && so.rows[2].segs === 3 && so.rows[2].on === 2 && so.rows[3].rt === '' && so.rows[4].rt === '', JSON.stringify(so.rows.map(r => r.rt)));
+    await nth(o.p, '#crewplayer-body .pl-wb', 2); await o.p.waitForTimeout(350);
+    const w3 = await sheetRows(o.p);
+    C.check('…your week lists the session\'s name, the date and the minutes, and "Extra" on an extra', w3.title === 'Week 3' && w3.rows.length === 3 && w3.rows[0] === 'Lower · Power Mon 19 Oct · 64 min' && w3.rows[2].toLowerCase() === 'core circuit thu 22 oct · 20 min extra', JSON.stringify(w3.rows));
+    C.check('…and says what the crew sees of it', /The crew sees these dates and nothing else/.test(w3.quiet || ''), w3.quiet);
+    await o.p.evaluate(() => closeHistorySheet());
+    // the session switch off: the block is still yours, wearing "Only you"
+    await o.p.evaluate(() => { const c = crewPageGet('me'); c.p.kinds = Object.assign({}, c.p.kinds, { session: false }); crewPagesSave(); _playerHTML = ''; renderPlayerPage(); });
+    C.check('your session switch off: the block stays and wears "Only you"', /Only you/.test((await cycleShot(o.p)).head) && !/Only you/.test((await cycleShot(o.p)).card), (await cycleShot(o.p)).head);
+    await o.ctx.close();
+    // a person who joined in week 2: week 1 is empty and grey and is not in the count
+    const j = await open(browser, { stub: { crewPages: { [CK.mina]: { cycle: cycleOf(false, { before1: true }) } } } });
+    await goCrew(j.p); await shown(j.p, CK.mina);
+    const sj = await cycleShot(j.p);
+    C.check('weeks before they joined are drawn empty and grey, say nothing, and are not in the count ("5 of 12")', /^This cycle · 5 of 12/.test(sj.head) && /before/.test(sj.rows[0].cls) && sj.rows[0].segs === 3 && sj.rows[0].on === 0 && sj.rows[0].rt === '' && sj.rows[0].tag === 'DIV', JSON.stringify([sj.head, sj.rows[0]]));
+    await j.ctx.close();
+    // no cycle (the switch is off, or a page with none): no block at all
+    const n = await open(browser, {});
+    await goCrew(n.p); await shown(n.p, CK.mina);
+    C.check('a page with no cycle (their switch is off) draws no This cycle block', !(await n.p.$('#crewplayer-body .pl-cyc')) && !(await secs(n.p)).some(x => /This cycle/.test(x)));
+    await n.ctx.close();
+    // 320 px, with an extra and the longest right column
+    const t = await open(browser, { opts: { w: 320, h: 640 }, stub: { crewPages: { [CK.mina]: { cycle: cycleOf(false) } } } });
+    await goCrew(t.p); await shown(t.p, CK.mina);
+    const t3 = await t.p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, bar: Math.round(document.querySelectorAll('#crewplayer-body .pl-wb')[2].querySelector('.pl-bar').getBoundingClientRect().width) }));
+    C.check('320 px: the bars fit, nothing scrolls sideways, and the bar keeps room', t3.sw <= t3.iw && t3.bar >= 60, JSON.stringify(t3));
+    await t.ctx.close();
   }
 
   await browser.close();
