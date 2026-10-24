@@ -690,7 +690,7 @@
   .cw-top .btn { margin-left: auto; }
   .cw-txt { margin-top: 2px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
   .court .cheer-sheet { padding-left: 16px; }
-  .clap { font-family: 'Segoe UI Symbol', 'Noto Sans Symbols', 'Apple Symbols', sans-serif; font-variant-emoji: text; }
+  .cheer-ico { width: 16px; height: 16px; vertical-align: -3px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .court .cheer-state { padding: 0 4px; }
   .need.nudge { padding: 8px 0 8px 20px; }                        /* the people under "Trains, not in the crew", set in under their head row */
   .need.nudge a.n { color: var(--ink); text-decoration: none; }
@@ -7223,8 +7223,8 @@ function paintLounge() {
 window.loadLounge = loadLounge;
 
 // K1. "Trains, not in the crew: N" on Today, in Also waiting (it is a thing to do, not a reason: reasonsOf(), the people count and every badge stay as they were).
-// Who: a coached, active athlete who finished a session in the last 28 days and has no crew yes (not asked yet, or a no; an athlete ticked under 13 cannot join
-// and is left out). It reads what the page already holds: the Bell's answers (coach_crew(), S.bell.people) and the sessions (a.lastSession). Each name has the
+// Who: a coached, active athlete who finished a session in the last 28 days and NEVER ANSWERED the crew question. Someone who answered no is left out (Amir,
+// 2026-10-24: their choice stands, and the app already shows them the way back), and so is an athlete ticked under 13 (they cannot join). It reads what the page already holds: the Bell's answers (coach_crew(), S.bell.people) and the sessions (a.lastSession). Each name has the
 // line already written, WhatsApp and Copy. The English line is Amir's; the Farsi one is a DRAFT for him to read (COACH_DASHBOARD.md, Players' Lounge): the
 // athlete's own language is the programme's athlete.lang (SCHEMA.md), the notification language, and English when it is not 'fa'. While the server has
 // no crew (stage81) or the Bell did not load, nothing is said: the page cannot tell who is in.
@@ -7242,13 +7242,12 @@ function nudgeList() {
   const by = {}; (b.people || []).forEach(p => { by[p.athlete_id] = p; });
   const from = addDays(todayKey(), -NUDGE_DAYS);
   return Object.values(S.ath).filter(a => inTotals(a) && a.tier === 'coached' && a.status === 'active' && a.lastSession && a.lastSession >= from
-      && !(by[a.id] && (by[a.id].answer === 'yes' || by[a.id].under13)))
+      && !(by[a.id] && (by[a.id].answer === 'yes' || by[a.id].answer === 'no' || by[a.id].under13)))
     .sort((x, y) => String(y.lastSession).localeCompare(String(x.lastSession)) || String(x.name).localeCompare(String(y.name)));
 }
 function nudgeRowHtml(a) {
-  const p = ((S.bell && S.bell.people) || []).find(x => x.athlete_id === a.id);
   return `<div class="need nudge" data-id="${esc(a.id)}">
-      <span class="needgo static">${avaHtml('pface', a.id, a.name)}<span class="b"><span class="l1"><a class="n" href="#a/${encodeURIComponent(a.id)}">${esc(a.name)}</a> <span class="r1">last session ${esc(timeAgo(a.lastSession + 'T12:00:00'))}${p && p.answer === 'no' ? ', said no' : ''}</span></span></span></span>
+      <span class="needgo static">${avaHtml('pface', a.id, a.name)}<span class="b"><span class="l1"><a class="n" href="#a/${encodeURIComponent(a.id)}">${esc(a.name)}</a> <span class="r1">last session ${esc(timeAgo(a.lastSession + 'T12:00:00'))}</span></span></span></span>
       <span class="nacts">${courtSendHtml(a.id, nudgeLine(a), () => '', 'WhatsApp ↗')}</span>
     </div>`;
 }
@@ -7269,7 +7268,7 @@ function paintNeed() {
 }
 window.paintNeed = paintNeed;
 
-// K3. Cheer. Courtside shows moments; each row gets "👏 Cheer": a small sheet under the row with an optional word (100 letters), then coach_cheer() (stage96:
+// K3. Cheer. Courtside shows moments; each row gets "Cheer" with a clap icon: a small sheet under the row with an optional word (100 letters), then coach_cheer() (stage96:
 // Amir as the giver, shown to the crew as "Coach", one cheer a day per person on the server's UTC day). Afterwards the row says "Cheered today". A cheer
 // pays nothing (GAME-6) and its word is the crew's to read for 7 days, so the sheet says so; Amir clears a word under Proof (K4). The control is there only
 // while the server has coach_crew_cheers() (stage96), and someone the Bell says is not in the crew gets the words "Not in the crew" instead of a button.
@@ -7305,11 +7304,13 @@ function cheerNotIn(id) {
 }
 function cheerCtlHtml(g) {
   if (!(S.cheers && S.cheers.on)) return '';
-  if (cheeredToday(g.id)) return '<span class="muted t-sm cheer-state">Cheered today</span>';
+  if (cheeredToday(g.id)) return `<span class="muted t-sm cheer-state">${CHEER_ICON} Cheered today</span>`;
   if (cheerNotIn(g.id)) return '<span class="muted t-sm cheer-state">Not in the crew</span>';
-  // 👏 asked for in the text style (U+FE0E): the picture-style one is yellow, and yellow is never in this app. It takes the button's own colour.
-  return `<button class="btn sm" onclick="cheerOpen(${jsq(g.key)})"><span class="clap" aria-hidden="true">👏&#xFE0E;</span> Cheer</button>`;
+  return `<button class="btn sm" onclick="cheerOpen(${jsq(g.key)})">${CHEER_ICON} Cheer</button>`;
 }
+// The clap: two hands meeting, three short lines of noise above them, drawn as a line icon (stroke in the text's own colour, no fill, round caps), like the
+// page's charts. It replaces the clapping-hands emoji, which is yellow on a phone whatever the page asks of it, and yellow is never in this app.
+const CHEER_ICON = '<svg class="cheer-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="9" width="4.4" height="12" rx="2.2" transform="rotate(38 7.2 15)"/><rect x="14.6" y="9" width="4.4" height="12" rx="2.2" transform="rotate(-38 16.8 15)"/><path d="M12 2v2.6M5.6 4.4l1.6 2M18.4 4.4l-1.6 2"/></svg>';
 function cheerSheetHtml(g) {
   if (!(S.cheers && S.cheers.on) || _cheerFor !== g.key || cheeredToday(g.id)) return '';
   const first = firstWord(nameOf(g.id)), busy = _cheerBusy ? ' disabled' : '';
@@ -7390,7 +7391,7 @@ async function cheerWordClearNow(id) {
   }
   const x = ((S.cheers && S.cheers.rows) || []).find(y => String(y.id) === String(id));
   if (x) x.word = null;
-  toast(res.data === false ? 'That word was already gone' : 'Word cleared');
+  toast(res.data && res.data.ok === false ? 'That word was already gone' : 'Word cleared');
   paintCheers();
   loadCheers().then(paintCheers);
 }
@@ -7409,6 +7410,11 @@ async function loadPartner() {
   if (res.error) { S.partner = { on: true, rows: (S.partner && S.partner.rows) || [], err: res.error.message || 'no answer' }; LOAD_ERR.partner = S.partner.err; return; }
   S.partner = { on: true, rows: Array.isArray(res.data) ? res.data : [], err: '' }; LOAD_ERR.partner = '';
 }
+const PARTNER_ERRS = {   // coach_partner_code_make()'s refusals in plain words; f is the first name
+  'partner:has_code': f => `${f} has a code already.`,
+  'partner:under13': f => `${f} is ticked under 13, so they get no code.`,
+  'partner:no_programme': f => `${f} has no programme on the server yet, so they get no code.`,
+};
 const PARTNER_DEAL = 'The friend gets 10% off. The member gets 10% off their next cycle. You apply it when they pay.';
 let _partnerMake = false, _partnerPick = '';
 const unusedCredits = r => (r.credits || []).filter(c => !c.used_on).length;
@@ -7422,8 +7428,8 @@ function partnerCodeOf(i) {
   const p = i.payload || {}, typed = normCode(intakeVal(p['Discount Code'])), applied = normCode(intakeVal(p['Discount Applied']).trim().split(' ')[0]);
   return (S.partner.rows || []).find(r => r.code === typed || r.code === applied) || null;
 }
-// Already credited for this application: the credit names the application (intake_id, when the server sends it), or this page just did it, or a credit
-// carries the same friend name (the server fills it from the application, and the contract's list has no intake_id).
+// Already credited for this application: a credit names the application (intake_id, which coach_partner_codes() sends), or this page just did it. A credit
+// that arrives with no intake_id (an older answer) is matched by the friend name instead, which the server fills from the application.
 function partnerCredited(row, i) {
   const cs = row.credits || [], nm = intakeName(i).trim().toLowerCase();
   return cs.some(c => c.intake_id != null && String(c.intake_id) === String(i.id)) || S.partnerDone[i.id] === row.code
@@ -7523,8 +7529,13 @@ async function partnerMake() {
   const first = firstWord(nameOf(id));
   const res = await loungeRpc('coach_partner_code_make', { p_athlete: id });
   if (res.error) {
-    fail(res.error.code ? `Could not make a code for ${first}: ${res.error.message}` : `The answer never arrived (${res.error.message || 'no reply'}), so the page cannot tell whether ${first}'s code was made. The codes are reloading: look before you try again.`);
-    if (!res.error.code) { await loadPartner(); await refetch(['affiliates']); }
+    const m = String(res.error.message || ''), k = Object.keys(PARTNER_ERRS).find(x => m.indexOf(x) >= 0);
+    if (!res.error.code) fail(`The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${first}'s code was made. The codes are reloading: look before you try again.`);
+    else fail(k ? PARTNER_ERRS[k](first) : `Could not make a code for ${first}: ${m}`);
+    // No code from the server, or a refusal that says the page's list is behind (they have one already, or the Bell's tick is newer): read again.
+    if (!res.error.code || k === 'partner:has_code') { await loadPartner(); await refetch(['affiliates']); }
+    else if (k === 'partner:under13') loadBell();
+    paintPartner();
     return;
   }
   _partnerMake = false; _partnerPick = '';

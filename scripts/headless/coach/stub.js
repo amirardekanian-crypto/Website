@@ -425,8 +425,8 @@
     });
   }
   function partnerCredits(code) {
-    return tbl('referral_credits').filter(function (c) { return c.code === code; }).map(function (c) {   // the contract's shape: no intake_id
-      return { id: c.id, friend_name: c.friend_name, earned_on: c.earned_on, used_on: c.used_on, percent: c.percent }; });
+    return tbl('referral_credits').filter(function (c) { return c.code === code; }).map(function (c) {   // the contract's shape, with intake_id (the main session's answer, 2026-10-24)
+      return { id: c.id, friend_name: c.friend_name, earned_on: c.earned_on, used_on: c.used_on, percent: c.percent, intake_id: c.intake_id }; });
   }
   function intakeFriend(i) { var p = i.payload || {}; return (i.name && String(i.name).trim()) || [p['First Name'], p['Last Name']].filter(Boolean).join(' ').trim() || null; }
   function errCode(msg, code) { var e = new Error(msg); e.code = code; return e; }
@@ -437,7 +437,7 @@
     },
     coach_crew_face_clear: function (p) {
       var L = lounge(); L.faces = L.faces.filter(function (f) { return f.athlete_id !== p.p_athlete; });
-      return { fv: null };
+      return { ok: true };
     },
     // crew_cheer() as Amir: the word first (100 after cleaning), then the person (a member, not under 13: otherwise gone), then once a day (the server's UTC day).
     coach_cheer: function (p) {
@@ -456,8 +456,8 @@
     },
     coach_cheer_word_clear: function (p) {
       var c = lounge().cheers.find(function (x) { return x.id === p.p_id; });
-      if (!c) return false;
-      c.word = null; return true;
+      if (c) c.word = null;
+      return { ok: true };
     },
     // ---- stage97: the athletes' partner codes (CONTRACT.md section 8) ----
     coach_partner_codes: function () {
@@ -466,19 +466,22 @@
           uses: partnerUses(a.code).length, credits: partnerCredits(a.code) };
       });
     },
-    // my_partner_code(true) for someone else: upper(first name letters only, max 10) + two digits, unique; one per athlete
+    // my_partner_code(true) for someone else: upper(first name letters only, max 10) + two digits, unique; one per athlete. Returns {code}; refuses
+    // partner:has_code, partner:under13 (the Bell's tick) and partner:no_programme.
     coach_partner_code_make: function (p) {
       var rows = tbl('affiliates'), have = rows.find(function (a) { return a.kind === 'athlete' && a.athlete_id === p.p_athlete; });
       var pr = tbl('programs').find(function (r) { return r.athlete_id === p.p_athlete; });
-      if (!pr) throw new Error('partner:who');
-      if (!have) {
+      if (!pr) throw new Error('partner:no_programme');
+      if (bell().people.some(function (x) { return x.athlete_id === p.p_athlete && x.under13; })) throw new Error('partner:under13');
+      if (have) throw new Error('partner:has_code');
+      {
         var a = pr.data.athlete || {}, first = String(a.firstName || p.p_athlete).replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 10) || 'ATHLETE', n = 41, code;
         do { code = first + String(++n % 100).padStart(2, '0'); } while (rows.some(function (x) { return x.code === code; }));
         have = { code: code, percent: 10, reward_percent: 10, kind: 'athlete', coach_name: [a.firstName, a.lastName].filter(Boolean).join(' ') || p.p_athlete, coach_name_fa: null, instagram: null, whatsapp: null, email: null,
           athlete_id: p.p_athlete, applied_on: utcDate(), active: true, retired_on: null, notes: null, created_at: nowIso() };
         rows.push(have);
       }
-      return { code: have.code, percent: 10, reward: 10, friends: 0, waiting: 0, used: 0 };
+      return { code: have.code };
     },
     // The member's own code on their own application is refused (partner:self); the same intake twice hits the unique (code, intake_id).
     coach_partner_credit_add: function (p) {
