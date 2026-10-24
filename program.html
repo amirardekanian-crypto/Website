@@ -5838,6 +5838,12 @@
 </style>
 </head>
 <body>
+<script>
+/* The theme before the first paint (2026-10-24): the stored pick (1 dark, 0 or empty light), else the phone. The same rule as themePick/themeApply, which boot() keeps running. */
+(function () { var d = null; try { var v = localStorage.getItem('dark_mode'); d = v === null ? null : v === '1'; } catch (e) {}
+  if (d === null) { try { d = !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); } catch (e) { d = false; } }
+  if (d) { document.body.setAttribute('data-dark', ''); document.documentElement.style.colorScheme = 'dark'; } })();
+</script>
 
 <!-- ═══ DEMO BANNER (shown only when ?client=demo) ═══ -->
 <div class="demo-banner" id="demo-banner" hidden>
@@ -20318,6 +20324,7 @@ function themeApply() {
   let dark = pick;
   if (dark === null) { try { dark = !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); } catch (e) { dark = false; } }
   if (dark !== document.body.hasAttribute('data-dark')) dark ? document.body.setAttribute('data-dark', '') : document.body.removeAttribute('data-dark');
+  document.documentElement.style.colorScheme = dark ? 'dark' : '';
   syncDarkToggle();
 }
 function themeBoot() {
