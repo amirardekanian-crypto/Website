@@ -2928,9 +2928,10 @@
   .aa-toast-x { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.5); }
   .aa-toast-go, .aa-toast-x:only-child { background: var(--tile-on-green); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 10px 22px -10px rgba(0,0,0,.6); }
   .aa-toast-go:focus-visible, .aa-toast-x:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-  /* aaToast(…, { pass: true }): the box lets a tap through to the boxes under it (the unit note sits over the set rows it is about); only its buttons catch one */
-  .aa-toast[data-pass] { pointer-events: none; }
-  .aa-toast[data-pass] button { pointer-events: auto; }
+  /* Every note box lets a tap through to what is under it (a box that waits for an answer must never sit over a set's RPE or kg button and
+     eat the tap); only its own buttons catch one. A tap outside it also puts it away (aaToast's pointerdown, below), and still lands. */
+  .aa-toast { pointer-events: none; }
+  .aa-toast button { pointer-events: auto; }
   /* aaToast(…, { tone: 'clay' }): the same box in the one accent, for the one note that asks the athlete to do something to the
      app itself ("A new version of the app is ready", 2026-10-19; Amir: "lets go with C but in ckay"). The primary button is the
      paper with --clay-deep on it, which is the strongest thing that can sit on clay. */
@@ -23015,6 +23016,13 @@ function aaToast(text, opts) {
   clearTimeout(_toastT); _toastT = null;
   if (opts.ms !== 0 && !opts.action) _toastT = setTimeout(hideAaToast, opts.ms || 6000);   // a note with a button waits for a tap, whatever ms a caller passed
 }
+// A tap anywhere outside the box puts it away and is NOT swallowed (nothing here stops it): the control under the finger still gets it. The
+// clay new-version box stays until it is answered. Capture phase, so it runs before the tapped control's own handler can raise a new box.
+document.addEventListener('pointerdown', e => {
+  const el = document.getElementById('aaToast');
+  if (!el || el.hidden || el.getAttribute('data-tone') === 'clay' || el.contains(e.target)) return;
+  hideAaToast();
+}, true);
 function hideAaToast() {
   clearTimeout(_toastT); _toastT = null; _toastRun = null; _toastOff = null;
   const el = document.getElementById('aaToast');
