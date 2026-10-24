@@ -5863,9 +5863,11 @@
   .pl-sgr { grid-template-columns: 36px minmax(0, 1fr) 12px; gap: 12px; }
   .pl-sgr.plain { grid-template-columns: 36px minmax(0, 1fr); }
 
-  /* ══ PLAYERS' LOUNGE · STEP 9 (2026-10-24): Bring a partner ═══════════════════════════════════════════════════
+  /* ══ PLAYERS' LOUNGE · STEPS 9 AND 10 (2026-10-24): Bring a partner and the cards ═══════════════════════════════════════════════════
      9 · Bring a partner (frag-s9 A, a card on your own page): the code big in Space Mono on a dashed field, what you both get, Copy (outlined) and Send on
-         WhatsApp (the one primary button), and the line that says who has joined. The page's clay stays on the Cheer button alone. */
+         WhatsApp (the one primary button), and the line that says who has joined. The page's clay stays on the Cheer button alone.
+     10 · Share my card (the same outlined button as Copy), the stamp (frag-s10 A: one dark strip across the foot of a session photo, Space Mono capitals,
+         the AA mark at its right; the shade is the strip's own so it reads on any photo and in both themes) and Share, next to Delete on your own post. */
   .pt-card { margin: 12px var(--g) 0; padding: 12px 14px 14px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
   .pt-k { display: block; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
   .pt-code { margin: 10px 0 8px; padding: 12px 6px; border: 1.5px dashed var(--field); border-radius: 10px; background: var(--tint); text-align: center; overflow-wrap: anywhere;
@@ -5875,13 +5877,24 @@
   .pt-pair { display: grid; grid-template-columns: 1fr 1.7fr; gap: 8px; }
   .pt-copy { min-height: 48px; padding: 0 10px; border: 1.5px solid var(--field); border-radius: 8px; background: transparent; color: var(--green-ink); cursor: pointer;
     font: 700 var(--fs-body)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
-  .pt-copy:focus-visible, .pt-wa:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .pt-copy:focus-visible, .pt-wa:focus-visible, .pl-share:focus-visible, .cr-sh:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   .pt-wa, .pt-make { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 48px; padding: 0 10px; text-align: center; text-decoration: none; font-size: var(--fs-body); }
   .pt-err { margin: 8px 0 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--clay-ink); }
   .pt-err:empty { display: none; }
   .pt-note { margin: 10px 0 0; padding-top: 8px; border-top: 1px solid var(--hair); font: 600 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--green-ink); }
   .pt-sel { margin: 10px 0 0; padding: 8px 10px; border: 1px solid var(--hair); border-radius: 8px; background: var(--paper); font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--ink);
     white-space: pre-line; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
+  .pl-share { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 48px; margin-top: 12px; border: 1.5px solid var(--field); border-radius: 8px; background: transparent;
+    color: var(--green-ink); cursor: pointer; font: 700 var(--fs-body)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .cr-stamp { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px;
+    background: rgba(0,0,0,.64); color: #fff; text-align: left; pointer-events: none; }
+  .cr-st-t { min-width: 0; font: 700 var(--fs-label)/1.35 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; overflow-wrap: anywhere; }
+  .cr-sp { white-space: nowrap; }
+  .cr-st-aa { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid #fff; border-radius: 6px; font: 900 var(--fs-body)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; }
+  .cr-stn { font: 700 var(--fs-label)/1.35 'Space Mono', monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--ink); }
+  .cr-sh { flex: none; min-height: 44px; padding: 0 6px; border: 0; background: none; color: var(--green-ink); font: 700 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
+  .cr-tf { position: relative; display: grid; place-items: center; width: 46px; height: 46px; margin: 2px 0; border-radius: 50%; background: var(--tint); color: var(--green-ink);
+    font: 900 var(--fs-lead)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: .5px; text-transform: uppercase; }
   /* Tell the crew, on the finished card, under the WhatsApp row (paintCrewTell()) */
   :where(#day-view) .complete-crew, :where(#day-view) .complete-share { margin-top: 10px; }
   :where(#day-view) .complete-crew[hidden], :where(#day-view) .complete-share[hidden] { display: none; }
@@ -11275,7 +11288,7 @@ APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how ofte
     body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
-  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. On your own page tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p>`;
+  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. On your own page tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p><p>A photo you post with <strong>Tell the crew</strong> wears a small stamp across its foot: the session, the minutes, <strong>WEEK HELD</strong> when that session held your week, and the day. You read the stamp before you post. On your own session photo, tap <strong>Share</strong> and you get the session card for Instagram with that photo behind it. Nobody else's photo has Share.</p><p><strong>Share my card</strong>, on your own page, opens the same card as <strong>Share your card</strong> on Progress.</p>`;
   // Bring a partner is named only while the card is on the page (the server has partner codes, stage97)
   const GUIDE_PARTNER = `<p><strong>Bring a partner</strong> is a card on your own page, under your numbers. Tap <strong>Get your code</strong> and it makes one for you. A friend who uses your code gets 10% off. You get 10% off your next cycle. <strong>Send on WhatsApp</strong> sends them your code and the link, and <strong>Copy</strong> copies the same words so you can send them anywhere. When a friend has joined, the card says so. A code earns no XP.</p>`;
   const myPage = (() => { try { const c = crewPageGet('me'); return c && c.p; } catch (e) { return null; } })();
@@ -13189,6 +13202,7 @@ function paintCareer() {
   paintHomeCareer();
   paintNote();
   paintCareerCard();
+  try { renderPlayerPage(); } catch (e) { /* Your page's "Share my card" waits for the career profile: it appears when the answer lands */ }
   document.querySelectorAll('.session-complete.visible[id^="complete-"]').forEach(c => {
     paintCareerEarn(c.id.slice(9));
     try {
@@ -14278,15 +14292,17 @@ function crewPostHTML(it) {
   const person = crewPersonOf(it);
   const sub = it.amir ? '<small>to the crew</small>' : (it.kind === 'session' ? `<small>${it.session && it.session.day ? 'Day ' + Number(it.session.day) + ' done' : 'A session done'}</small>` : '');
   const top = it.pinned ? `<span class="cr-pin${_crewFreshPin === it.id ? ' is-new' : ''}">Pinned</span>` : `<span class="cr-when">${esc(crewWhen(it.at))}</span>`;
-  const ph = it.photo ? `<button type="button" class="cr-ph" data-ph="${esc(it.id)}" onclick="openCrewPhoto('${esc(it.id)}')" aria-label="Open ${esc(it.amir ? "Amir's" : it.me ? 'your' : (it.who || 'their') + "'s")} photo"><img alt=""><span class="cr-ph-wait">Photo</span></button>` : '';
+  const ph = it.photo ? `<button type="button" class="cr-ph" data-ph="${esc(it.id)}" onclick="openCrewPhoto('${esc(it.id)}')" aria-label="Open ${esc(it.amir ? "Amir's" : it.me ? 'your' : (it.who || 'their') + "'s")} photo"><img alt=""><span class="cr-ph-wait">Photo</span>${crewStampHTML(it)}</button>` : '';
   // The post's own Delete now sits in the REACTION foot, beside what the post got (2026-10-20). It used to sit on the
   // names line, directly above the replies, where it read as the thread's heading — and on his own post with his own
   // reply there were two identical Deletes in the same column. Its armed words name what it takes with it.
   const del = it.me ? `<button type="button" class="cr-del" onclick="armedTap(this, 'Tap again to delete the post', () => crewDelete('${esc(it.id)}'))">Delete</button>` : '';
+  // Share (Players' Lounge, step 10): ONLY on your own session photo, never on anyone else's. It opens the session card for Instagram with this very photo as its ground.
+  const shr = it.me && it.kind === 'session' && it.photo && crewPagesOn() && !window.IS_PREVIEW ? `<button type="button" class="cr-sh" onclick="crewShareCard('${esc(it.id)}')">Share</button>` : '';
   return `<article class="cr-post${it.amir ? ' amir' : ''}" data-id="${esc(it.id)}">
     <div class="cr-who">${crewDoor(person, 'cr-pl', `${crewFace(person)}<span class="cr-nm">${esc(name)}${sub}</span>`) || `${crewFace(person)}<span class="cr-nm">${esc(name)}${sub}</span>`}${top}</div>
     ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}${ph}
-    <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span>${del}</div>
+    <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span>${shr}${del}</div>
     <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}" aria-live="polite">${esc(crewKudosWords(it.kudos))}</small></div>
     <div class="cr-reps" data-rep="${esc(it.id)}">${crewRepsHTML(it)}</div>
   </article>`;
@@ -15662,9 +15678,17 @@ async function crewQuickCheer(ck, el) {
   if (r.busy) return;
   if (r.ok) crewCheerSentToast(nm); else crewCheerFail(ck, r, nm);
 }
+// Step 10 · "Share my card" on YOUR page opens the player card you already have (Progress → Share your card): the same sheet and the same card, nothing new in it.
+// It is only there when the card can be made (Career Mode on, a level known), and never in the coach's preview, as on Progress.
+function playerShareHTML() {
+  let ok = false;
+  try { ok = !window.IS_PREVIEW && !!hlPlayerSpec(); } catch (e) { ok = false; }
+  return ok ? '<button type="button" class="pl-share" onclick="sharePlayerCard()">Share my card</button>' : '';
+}
 // On someone else's page: the New Balls line and the one clay control on it. After you have cheered today it is a quiet green line, not a button.
 function playerActionsHTML(key, p) {
-  if (key === 'me' || p.me || !crewCanLike() || p.member === false) return '';
+  if (key === 'me' || p.me) return playerShareHTML();
+  if (!crewCanLike() || p.member === false) return '';
   const fresh = p.new ? '<p class="pl-new"><span class="pl-newtag">New</span>Joined this week. Say hello.</p>' : '';
   return fresh + (crewCheeredToday(key)
     ? `<span class="pl-cheered" role="status">${CLAP_SVG}<span>Cheered today</span></span>`
@@ -15794,6 +15818,44 @@ function closeCrewPhoto() {
 }
 window.openCrewPhoto = openCrewPhoto;
 window.closeCrewPhoto = closeCrewPhoto;
+// ── Step 10 · Share, on your own session photo ──────────────────────────────────────────────────────────────────────────────────────────────────
+// The session card (kind 'session', the one "Share the session" makes) with THIS photo as its ground, so it goes to Instagram as one picture. The photo is the one
+// already on the phone (crewFetchPhoto(): the cache, or the copy that was just posted); it is read here and drawn on the phone, and nothing leaves until Share or
+// Save image. The card carries the athlete's own words only (name, session, minutes, date): a card never names another athlete.
+function crewPostSpec(it) {
+  const s = it && it.session && typeof it.session === 'object' ? it.session : {}, at = it && it.at ? new Date(it.at) : null;
+  const on = at && !isNaN(at) ? ymdLocal(at) : ymdLocal(new Date());
+  let cur = null;
+  try { cur = s.day != null ? hlSessionSpec(s.day) : null; } catch (e) { cur = null; }
+  const same = !!cur && cur.date === on;   // the day's own numbers belong to this post only when it is the same day
+  const title = crewStampTitle(s.title) || crewDayName(s.day) || (cur && crewStampTitle(cur.title)) || (Number(s.day) > 0 ? 'Day ' + Number(s.day) : '');
+  if (!title) return null;
+  const mins = Math.round(Number(s.mins) || 0);
+  return { kind: 'session', first: hlFirst(), title, cycle: hlCycleOf(on), mins: mins >= 1 && mins <= 300 ? mins : (same ? cur.mins : 0),
+    exercises: same ? cur.exercises : 0, sets: same ? cur.sets : 0, date: on };
+}
+// The cached photo as a data URL and its size, the form the share sheet's photo ground takes.
+async function crewPhotoData(id) {
+  const url = await crewFetchPhoto(id);
+  if (!url) return null;
+  try {
+    const blob = await (await fetch(url)).blob();
+    const data = await new Promise((ok, bad) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result)); fr.onerror = bad; fr.readAsDataURL(blob); });
+    const dim = await new Promise(ok => { const im = new Image(); im.onload = () => ok({ w: im.naturalWidth, h: im.naturalHeight }); im.onerror = () => ok(null); im.src = data; });
+    return dim && dim.w && dim.h ? { url: data, w: dim.w, h: dim.h } : null;
+  } catch (e) { return null; }
+}
+async function crewShareCard(id) {
+  const it = crewItem(id);
+  if (!it || !it.me || it.kind !== 'session' || !it.photo || !crewPagesOn() || window.IS_PREVIEW) return;
+  const spec = crewPostSpec(it);
+  if (!spec) return;
+  openShareSheet([spec], 0);   // the sheet opens at once; the photo arrives a moment later and the card is drawn again over it
+  const ph = await crewPhotoData(id);
+  if (!_HL.specs || _HL.specs[0] !== spec || !document.getElementById('hl-prev')) return;   // the sheet was closed or taken over meanwhile
+  if (ph) hlUsePhoto(ph.url, ph.w, ph.h); else hlMsg('That photo could not be opened. You can choose one below.');
+}
+window.crewShareCard = crewShareCard;
 
 // ── a Like: on at once here, then the server's answer (who gave it) replaces it; a refusal puts it back ──
 function paintKudos(key) {
@@ -16157,6 +16219,63 @@ function crewSessionDraft(dayId) {
   const n = crewSessionsN();
   return `Day ${dayId} done.` + (n ? ` ${n} sessions with Amir.` : '');
 }
+// ── Step 10 · the stamp (Players' Lounge, idea 63; frag-s10 A, "Photo Poster": the strip across the foot of a crew photo) ──────────────────────────────
+// A session photo on the Bell wears one strip of Space Mono capitals on a dark shade: the session's name, its minutes, WEEK HELD when this session held the week,
+// and the day it was posted, e.g. LOWER · POWER · 64 MIN · WEEK HELD · 24 OCT. Only the parts the post has: a post from before the stamp has {day, n} and reads
+// DAY 2 · 24 OCT. Tell the crew sends the parts beside day and n (CONTRACT 2) once the server speaks stage96, and the athlete reads them in the composer first.
+const STAMP_MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function crewStampTitle(t) {
+  const x = String(t || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (x.length <= 40) return x;
+  const cut = x.slice(0, 40), sp = cut.lastIndexOf(' ');
+  return (x.charAt(40) === ' ' || sp < 20 ? cut : cut.slice(0, sp)).trim();   // 40 characters at most, at the end of a word where it can
+}
+// The day's name as the app says it everywhere: its title, else its focus tag, else nothing (the stamp then reads DAY n).
+function crewDayName(day) {
+  const D = ((DATA && DATA.workouts && DATA.workouts.days) || []).find(x => x && String(x.id) === String(day));
+  return D ? crewStampTitle(D.title || D.focusTag || '') : '';
+}
+// Did THIS session close its training week? The phone worked that out at Done (careerEarn(): every plan day of the week done, and this one not a repeat) and kept it
+// on the day's record; the server confirms a week later, as it does for the finish card's "Your week held". No record (Career Mode off) says nothing.
+function crewSessionHeld(day) {
+  try { const r = JSON.parse(localStorage.getItem(ATHLETE_ID + '_earn_d' + day) || 'null'); return !!(r && Array.isArray(r.parts) && r.parts.some(x => x && x.k === 'week')); } catch (e) { return false; }
+}
+// What Tell the crew sends as p_session. {day, n} as ever; with stage96 also the day's title, the minutes it took (1 to 300) and whether it held the week.
+function crewSessionPayload(day) {
+  const o = { day: Number(day) || null, n: crewSessionsN() || null };
+  if (!crewPagesOn()) return o;
+  try {
+    const s = hlSessionSpec(day) || {}, title = crewDayName(day), mins = Math.round(Number(s.mins) || 0);
+    if (title) o.title = title;
+    if (mins >= 1 && mins <= 300) o.mins = mins;
+    o.held = crewSessionHeld(day);
+  } catch (e) { /* the stamp is extra: the post goes with {day, n} */ }
+  return o;
+}
+// The parts of a stamp, in order, only those the post has. `at` is when it was posted (the athlete's own day).
+function crewStampParts(session, at) {
+  const s = session && typeof session === 'object' ? session : {};
+  const title = crewStampTitle(s.title), day = Number(s.day) || 0, mins = Math.round(Number(s.mins) || 0);
+  const d = at ? new Date(at) : null, date = d && !isNaN(d) ? d.getDate() + ' ' + STAMP_MON[d.getMonth()] : '';
+  const head = title || (day > 0 ? 'Day ' + day : '');
+  if (!head && !(mins >= 1) && s.held !== true) return [];
+  return [head, mins >= 1 && mins <= 300 ? mins + ' min' : '', s.held === true ? 'Week held' : '', date].filter(Boolean);
+}
+// The composer says what the stamp will read before anything is sent, so what the crew sees of the session is never a surprise.
+function crewStampNoteHTML(day) {
+  if (!crewPagesOn()) return '';
+  let parts = [];
+  try { parts = crewStampParts(crewSessionPayload(day), new Date().toISOString()); } catch (e) { parts = []; }
+  return parts.length ? `<p class="cr-note">Your photo gets a stamp: <b class="cr-stn">${esc(parts.join(' · '))}</b></p>` : '';
+}
+// The strip itself, drawn inside the photo's button (the CSS sets it in capitals). Only on a session photo, and only while the server speaks stage96.
+function crewStampHTML(it) {
+  if (!it || it.kind !== 'session' || !it.photo || !crewPagesOn()) return '';
+  const parts = crewStampParts(it.session, it.at);
+  // each part after the name keeps itself on one line ("64 min" is never cut in two), so a long stamp wraps between its parts
+  const t = parts.map((x, i) => i ? `<span class="cr-sp">· ${esc(x)}</span>` : esc(x)).join(' ');
+  return parts.length ? `<span class="cr-stamp"><span class="cr-st-t">${t}</span><span class="cr-st-aa" aria-hidden="true">AA</span></span>` : '';
+}
 function blobToB64(blob) {
   return new Promise((ok, bad) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).replace(/^data:[^,]*,/, '')); fr.onerror = bad; fr.readAsDataURL(blob); });
 }
@@ -16217,6 +16336,7 @@ function openCrewPost(mode, dayId) {
     <label class="cr-add"${noPh ? ' hidden' : ''}>${CREW_CAM_SVG}<span>Add a photo</span><input type="file" accept="image/*"></label>
     ${noPh ? `<p class="cr-note">That is 3 photos today. More tomorrow.${ses ? ' A session goes to the crew with a photo, so this one waits.' : ''}</p>` : ''}
     ${ses ? '<p class="cr-note">A session goes to the crew with a photo.</p>' : ''}
+    ${ses ? crewStampNoteHTML(dayId) : ''}
     <p class="cr-note"><b>Made smaller before it's sent.</b> About 200 KB, and its location is taken off.</p>
     <p class="cr-note">Gone after 7 days. Amir can remove any post. Only photos you would show your coach.</p>
     <button type="button" class="cr-go"${noPost ? ' disabled' : ''}>${ses ? 'Post with the photo' : 'Post'}</button>
@@ -16278,7 +16398,7 @@ async function crewSend(go, ta, err) {
   // comes back as the one it is instead of being written a second time. A server without stage92 ignores the argument.
   if (!d.key) d.key = crewNewKey();
   const p = { p_body: ta.value, p_photo: d.photo ? d.photo.b64 : null, p_w: d.photo ? d.photo.w : null, p_h: d.photo ? d.photo.h : null, p_kind: d.mode,
-    p_session: d.mode === 'session' ? { day: Number(d.day) || null, n: crewSessionsN() || null } : null, p_key: d.key };
+    p_session: d.mode === 'session' ? crewSessionPayload(d.day) : null, p_key: d.key };
   let r = null;
   // 45 seconds with a photo, 25 without (2026-10-20). A 200 KB photo on Iran's connection can take longer than 25 s, and the
   // old timeout then said "No signal. Tap Post again" while the upload was still on its way: the server wrote it, the second
@@ -24766,6 +24886,13 @@ function hlPhotoUI() {
 }
 function hlPhotoOff() {
   _HL.photo = null; _HL.fit = { z: 1, dx: 0, dy: 0 }; _HL.pw = 0; _HL.ph = 0;
+  hlPhotoUI();
+  hlPaint();
+}
+// A picture the app already holds as the card's ground (a crew photo of the athlete's own, Players' Lounge step 10), already the size of a post's photo: drawn as it is.
+function hlUsePhoto(url, w, h) {
+  if (!url || !w || !h) return;
+  _HL.photo = url; _HL.pw = w; _HL.ph = h; _HL.fit = { z: 1, dx: 0, dy: 0 };
   hlPhotoUI();
   hlPaint();
 }

@@ -29,6 +29,8 @@
 // the guide, 320 px and dark. Section 23 takes its pictures.
 // Step 9: Bring a partner (section 24): a card on YOUR page after the numbers, Get your code, the code, Copy (clipboard, execCommand, the selected box), Send on WhatsApp (the code is in the link, English and the Farsi draft),
 // the friends line, no signal, a refusal, never anyone else's page, never under 13, the demo or the preview, a server without stage97, the guide, 320 px and dark. Section 25 takes its pictures.
+// Step 10: the cards (section 26): Share my card opens the player card Progress has, the stamp on a session photo (the parts a post has, an old post, never on a plain photo), Share on your own session photo with that photo as
+// the card's ground, what Tell the crew sends (title, mins, held), the guide. Section 27 takes its pictures.
 // `--only=14,15` runs just those sections (everything after a "// ── N." line is wrapped in on(N)).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
@@ -2174,6 +2176,204 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await c.p.evaluate(() => document.querySelector('.pt-card').scrollIntoView({ block: 'center' })); await c.p.waitForTimeout(250);
     await c.p.screenshot({ path: path.join(out, 'partner-card-friend-light-390.png') });
     await c.ctx.close();
+  }
+
+  // ── 26. Step 10 · the cards (ideas 63 and 66): Share my card, the stamp on a session photo, Share on your own session photo, and what Tell the crew sends ─────────────────
+  // "Keep the player card you already have, with their own photo as the ground": Share my card on YOUR page opens the card Progress already has (sharePlayerCard), nothing new in it.
+  // The stamp is one strip across the foot of a session photo on the Bell: LOWER · POWER · 64 MIN · WEEK HELD · 24 OCT, only the parts the post has (an old post: DAY 2 · 24 OCT).
+  // Tell the crew sends title, mins and held beside day and n (CONTRACT 2). Your own session photo gets Share: the session card, with that very photo behind it. Never on anyone else's.
+  const LVL = { base: 300, growth: 0.55, levels_per_rank: 5, prestige_after: 50, ranks: ['Rookie', 'Club'] };
+  const careerP = () => ({ athlete_id: H.ID, ready: true, switch: { xp: '2026-10-01', catalogue: null }, rules_version: 3, career: { xp: 3000, level: 6, habits: {}, facts: {}, facts_xp: 0 },
+    season: { name: 'Season 1', starts_on: '2026-10-01', points: 1234 }, week: { from: '2026-10-19', points: 900 }, since: '2026-06-06', kept: null,
+    numbers: { weeks_held: { now: 2, best: 4 }, sessions_with_amir: 24, personal_bests: 3, comebacks: 1, days_on_target: 40, perfect_days: 10 }, titles_owned: [],
+    rules: { version: 3, level: LVL, season: { title_points: 2000 }, prices: {} }, badges: [], achievements: [], missions: [], quest: null, moments: [] });
+  const careerStub = () => ({ profile: careerP(), tables: { career_rules: [{ version: 3, switch: { xp: '2026-10-01', catalogue: 'off' } }], career_facts: [] } });
+  const MON3 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const dmon = ms => { const d = new Date(ms); return d.getDate() + ' ' + MON3[d.getMonth()]; };
+  const PID = { a: 'bbbbbbbb-0000-4000-8000-0000000000a1', b: 'bbbbbbbb-0000-4000-8000-0000000000a2', c: 'bbbbbbbb-0000-4000-8000-0000000000a3', d: 'bbbbbbbb-0000-4000-8000-0000000000a4',
+    e: 'bbbbbbbb-0000-4000-8000-0000000000a5', f: 'bbbbbbbb-0000-4000-8000-0000000000a6', g: 'bbbbbbbb-0000-4000-8000-0000000000a7' };
+  const sessPost = (id, o = {}) => Object.assign({ t: 'post', id, who: 'Mina S.', me: false, amir: false, kind: 'session', body: '', photo: true, w: 1080, h: 1350, at: iso(now - 3600e3), pinned: false, left: 7,
+    kudos: { n: 0, mine: false, names: [] }, replies: [] }, o);
+  // a Bell with the posts under test and nothing else but Amir's pinned one; `lounge: false` = a server without stage96
+  const stampBell = (posts, o = {}) => { const b = bell(o.b || {}); b.items = [b.items[0]].concat(posts); return b; };
+  const T_A = now - 3600e3, T_D = now - 86400e3 * 2;
+  const POSTS = () => [
+    sessPost(PID.a, { who: 'Mina S.', ck: CK.mina, fv: null, session: { day: 2, n: 41, title: 'Lower · Power', mins: 64, held: true }, at: iso(T_A) }),
+    sessPost(PID.b, { who: 'Reza K.', ck: CK.reza, fv: null, session: { day: 3, n: 12, mins: 40 }, at: iso(T_A - 60e3) }),
+    sessPost(PID.c, { who: 'Ali B.', ck: CK.ali1, fv: null, session: { day: 4, n: 7, held: true }, at: iso(T_A - 120e3) }),
+    sessPost(PID.d, { who: 'Leila M.', ck: CK.leila, fv: null, session: { day: 2, n: 41 }, at: iso(T_D) }),
+    sessPost(PID.e, { who: 'Sara T.', ck: CK.sara, fv: null, kind: 'post', body: 'Look at this court.', session: null, at: iso(T_A - 180e3) }),
+    sessPost(PID.f, { who: 'Alex R.', me: true, ck: CK.alex, fv: null, session: { day: 1, n: 26, title: 'Acceleration & Squat Strength', mins: 64, held: true }, at: iso(T_A - 240e3) }),
+    sessPost(PID.g, { who: 'Alex R.', me: true, ck: CK.alex, fv: null, kind: 'post', body: 'Back at it.', session: null, at: iso(T_A - 300e3) })];
+  const crewShot = async (b, o = {}) => { const x = await open(browser, Object.assign({ bell: b }, o)); await goCrew(x.p); await x.p.waitForTimeout(500); return x; };
+  const stampOf = (p, id) => p.evaluate(i => {
+    const art = document.querySelector('#crew-body .cr-post[data-id="' + i + '"]');
+    if (!art) return null;
+    const s = art.querySelector('.cr-stamp'), ph = art.querySelector('.cr-ph'), base = { share: art.querySelector('.cr-sh') ? art.querySelector('.cr-sh').textContent : null, hasPhoto: !!ph };
+    if (!s) return Object.assign(base, { stamp: null });
+    const r = s.getBoundingClientRect(), b = ph.getBoundingClientRect(), t = s.querySelector('.cr-st-t'), cs = getComputedStyle(t);
+    return Object.assign(base, { stamp: t.textContent, shown: t.innerText, inside: r.left >= b.left - 1 && r.right <= b.right + 1 && Math.abs(r.bottom - b.bottom) <= 1 && r.height > 20, bg: getComputedStyle(s).backgroundColor,
+      tt: cs.textTransform, ff: cs.fontFamily, color: cs.color, aa: s.querySelector('.cr-st-aa').textContent, tag: ph.tagName, pe: getComputedStyle(s).pointerEvents });
+  }, id);
+  if (on(26)) {
+    // ── Share my card: the card you already have, from your own page
+    const sa = await ptOpen({ stub: Object.assign({ partner: undefined }, careerStub()) });
+    await sa.p.waitForFunction(() => !!document.querySelector('#crewplayer-body .pl-share'), null, { timeout: 8000 }).catch(() => {});
+    const shr = await sa.p.evaluate(() => { const b = document.querySelector('#crewplayer-body .pl-share'); return b ? { txt: b.textContent, h: Math.round(b.getBoundingClientRect().height), inId: !!b.closest('.pl-id') } : null; });
+    C.check('your own page has "Share my card" once Career Mode has your level (the same outlined button as Copy), up with your name', !!shr && shr.txt === 'Share my card' && shr.h >= 44 && shr.inId, JSON.stringify(shr));
+    await click(sa.p, '#crewplayer-body .pl-share'); await sa.p.waitForTimeout(800);
+    const sh = await sa.p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), title: (document.getElementById('hl-title') || {}).textContent, kind: _HL.specs[0] && _HL.specs[0].kind,
+      same: JSON.stringify(_HL.specs[0]) === JSON.stringify(hlPlayerSpec()), spec: JSON.stringify(_HL.specs[0]), titles: HL_TITLE.player, photo: !!_HL.photo }));
+    C.check('…it opens THE player card, the one Progress opens: the same sheet, the same spec, no photo until you choose one', sh.on && sh.kind === 'player' && sh.same && sh.title === sh.titles && !sh.photo, JSON.stringify([sh.on, sh.kind, sh.same, sh.title]));
+    C.check('…and the card names nobody but you (a card never names another athlete)', /"first":"Alex"/.test(sh.spec) && !/Mina|Reza|Ali|Leila|Sara|Omid|Amir/.test(sh.spec), sh.spec);
+    await sa.p.evaluate(() => closeHistorySheet());
+    C.check('…no page errors', !sa.p.errs.length, sa.p.errs.join(' | '));
+    await sa.ctx.close();
+    const sn = await ptOpen({ stub: { partner: undefined } });
+    C.check('with no career profile there is no card to share, so no button', !(await sn.p.$('#crewplayer-body .pl-share')));
+    const pv = await sn.p.evaluate(() => { window.IS_PREVIEW = true; const h = playerShareHTML(); window.IS_PREVIEW = false; return h; });
+    C.check('…and none in the coach\'s preview', pv === '');
+    await sn.ctx.close();
+    const so = await open(browser, { stub: careerStub() });
+    await goCrew(so.p); await shown(so.p, CK.mina);
+    await so.p.waitForTimeout(500);
+    C.check('someone else\'s page has no Share my card', !(await so.p.$('#crewplayer-body .pl-share')));
+    await so.ctx.close();
+
+    // ── the stamp on a session photo of the Bell
+    const sb = await crewShot(stampBell(POSTS()));
+    const A = await stampOf(sb.p, PID.a), Bp = await stampOf(sb.p, PID.b), Cp = await stampOf(sb.p, PID.c), Dp = await stampOf(sb.p, PID.d);
+    C.check('a session photo wears the stamp across its foot: the session, the minutes, WEEK HELD and the day it was posted', !!A && A.stamp === 'Lower · Power · 64 min · Week held · ' + dmon(T_A), JSON.stringify(A));
+    C.check('…one strip inside the photo, flush with its foot, in Space Mono capitals, white on a dark shade, with the AA mark, and it never takes a tap from the photo', !!A && A.inside && A.shown === A.stamp.toUpperCase() && A.tt === 'uppercase' && /Space Mono/.test(A.ff) && A.bg === 'rgba(0, 0, 0, 0.64)' && A.color === 'rgb(255, 255, 255)' && A.aa === 'AA' && A.pe === 'none', JSON.stringify(A));
+    C.check('…only the parts the post has: no title reads Day 3 · 40 min · date, a held week with nothing else reads Day 4 · Week held · date', !!Bp && Bp.stamp === 'Day 3 · 40 min · ' + dmon(T_A - 60e3) && !!Cp && Cp.stamp === 'Day 4 · Week held · ' + dmon(T_A - 120e3), JSON.stringify([Bp && Bp.stamp, Cp && Cp.stamp]));
+    C.check('…an old post (only day and n) reads "Day 2 · 22 Oct"-style: the day and the date, nothing invented', !!Dp && Dp.stamp === 'Day 2 · ' + dmon(T_D), JSON.stringify(Dp && Dp.stamp));
+    const Ep = await stampOf(sb.p, PID.e), Gp = await stampOf(sb.p, PID.g);
+    C.check('a plain photo post has no stamp, yours or anyone\'s', !!Ep && Ep.hasPhoto && Ep.stamp === null && !!Gp && Gp.hasPhoto && Gp.stamp === null, JSON.stringify([Ep, Gp]));
+    const Fp = await stampOf(sb.p, PID.f);
+    C.check('your own session photo has its stamp too', !!Fp && Fp.stamp === 'Acceleration & Squat Strength · 64 min · Week held · ' + dmon(T_A - 240e3), JSON.stringify(Fp && Fp.stamp));
+    await sb.p.evaluate(id => document.querySelector('#crew-body .cr-post[data-id="' + id + '"] .cr-ph').click(), PID.a); await sb.p.waitForTimeout(400);
+    C.check('a tap on the photo still opens it in the viewer (the stamp is only drawn on it)', await sb.p.evaluate(() => document.getElementById('crew-viewer').classList.contains('visible')));
+    await sb.p.evaluate(() => closeCrewPhoto());
+    // Share: only on your own session photo
+    const shares = await sb.p.evaluate(ids => Object.keys(ids).map(k => { const a = document.querySelector('#crew-body .cr-post[data-id="' + ids[k] + '"]'); const s = a && a.querySelector('.cr-sh'); return [k, s ? s.textContent : null]; }), PID);
+    C.check('Share is on YOUR session photo and on no other post: not on theirs, not on your plain photo post', JSON.stringify(shares) === JSON.stringify([['a', null], ['b', null], ['c', null], ['d', null], ['e', null], ['f', 'Share'], ['g', null]]), JSON.stringify(shares));
+    const side = await sb.p.evaluate(id => { const a = document.querySelector('#crew-body .cr-post[data-id="' + id + '"]'), s = a.querySelector('.cr-sh').getBoundingClientRect(), d = a.querySelector('.cr-del').getBoundingClientRect(); return { sLeft: s.left, dLeft: d.left, sH: Math.round(s.height), gap: Math.round(d.left - s.right) }; }, PID.f);
+    C.check('…Share sits at the left of the post\'s foot and Delete stays at the right, a thumb apart, 44 px tall', side.sLeft < side.dLeft && side.gap >= 40 && side.sH >= 44, JSON.stringify(side));
+    await sb.p.evaluate(id => document.querySelector('#crew-body .cr-post[data-id="' + id + '"] .cr-sh').click(), PID.f);
+    await sb.p.waitForFunction(() => hlPhotoState().on, null, { timeout: 8000 }).catch(() => {});
+    const card = await sb.p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), spec: _HL.specs[0], photo: String(_HL.photo || '').slice(0, 22), st: hlPhotoState(), live: !document.getElementById('hl-live').hidden,
+      title: (document.getElementById('hl-title') || {}).textContent, btn: (document.getElementById('hl-ph-btn') || {}).textContent }));
+    C.check('Share opens the session card with the post\'s own words: its name, its minutes and the day it was posted, and no other athlete\'s name', card.on && card.spec.kind === 'session' && card.spec.title === 'Acceleration & Squat Strength' && card.spec.mins === 64 && card.spec.date === (d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'))(new Date(T_A - 240e3))
+      && card.spec.first === 'Alex' && !/Mina|Reza|Ali|Leila|Sara|Omid/.test(JSON.stringify(card.spec)), JSON.stringify(card.spec));
+    C.check('…with THAT photo as its ground, read from the phone\'s copy: the photo is on, drawn live, and the button now offers another', card.st.on && card.photo.indexOf('data:image/jpeg') === 0 && card.st.pw > 0 && card.st.ph > 0 && card.live && card.btn === 'Choose another photo', JSON.stringify([card.photo, card.st, card.live, card.btn]));
+    await sb.p.evaluate(() => hlPhotoOff()); await sb.p.waitForTimeout(300);
+    C.check('…and Remove the photo still takes it off, as on every card', await sb.p.evaluate(() => !hlPhotoState().on));
+    await sb.p.evaluate(() => closeHistorySheet());
+    C.check('…no page errors', !sb.p.errs.length, sb.p.errs.join(' | '));
+    await sb.ctx.close();
+    // Share is yours alone even if someone calls it for another person's post, and not in the preview
+    const sg = await crewShot(stampBell(POSTS()));
+    await sg.p.evaluate(id => crewShareCard(id), PID.a); await sg.p.waitForTimeout(400);
+    C.check('crewShareCard() on someone else\'s post does nothing (no sheet, no card)', await sg.p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')));
+    await sg.p.evaluate(() => { window.IS_PREVIEW = true; }); await sg.p.evaluate(id => crewShareCard(id), PID.f); await sg.p.waitForTimeout(300);
+    C.check('…and none in the coach\'s preview', await sg.p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')));
+    await sg.ctx.close();
+    // a server without stage96: the Bell is as it was: no stamp, no Share
+    const ns = await crewShot(stampBell(POSTS(), { b: { noPages: true } }));
+    const n1 = await stampOf(ns.p, PID.a), n2 = await stampOf(ns.p, PID.f);
+    C.check('a server without stage96: no stamp on any photo and no Share, the Bell exactly as it was', !!n1 && n1.stamp === null && !!n2 && n2.stamp === null && n2.share === null, JSON.stringify([n1, n2]));
+    await ns.ctx.close();
+    // 320 px and dark: the strip fits and reads
+    const nr = await crewShot(stampBell(POSTS()), { opts: { w: 320, h: 640 } });
+    const m = await nr.p.evaluate(id => { const a = document.querySelector('#crew-body .cr-post[data-id="' + id + '"]'), s = a.querySelector('.cr-stamp').getBoundingClientRect(), p = a.querySelector('.cr-ph').getBoundingClientRect();
+      return { sw: document.documentElement.scrollWidth, iw: innerWidth, left: Math.round(s.left - p.left), right: Math.round(p.right - s.right), h: Math.round(s.height), ph: Math.round(p.height) }; }, PID.f);
+    C.check('320 px: the longest stamp wraps inside the photo (a strip under a quarter of its height), nothing scrolls sideways', m.sw <= m.iw && m.left === 0 && m.right === 0 && m.h * 4 < m.ph, JSON.stringify(m));
+    await nr.ctx.close();
+    const dk = await crewShot(stampBell(POSTS()), { opts: { dark: true } });
+    const dA = await stampOf(dk.p, PID.a);
+    C.check('dark mode: the strip is the same shade with white words (the photo\'s own, not the theme\'s)', !!dA && dA.bg === 'rgba(0, 0, 0, 0.64)' && dA.color === 'rgb(255, 255, 255)', JSON.stringify(dA));
+    await dk.ctx.close();
+
+    // ── Tell the crew sends the stamp's parts, and the composer shows them first
+    const progOf = fn => { const P = H.fixture(); fn(P); return P; };
+    const tellRun = async (o = {}) => {
+      const x = await open(browser, Object.assign({ seed: Object.assign({ _timer_1: { acc: 64 * 60000, running: false }, _earn_d1: { t: iso(now), xp: 870, parts: [{ k: 'session', xp: 400 }, { k: 'week', xp: 400, pending: true }], before: 0, saved: 0 } }, o.seed || {}) }, o.o || {}));
+      await goCrew(x.p);
+      await x.p.evaluate(() => openCrewPost('session', '1')); await x.p.waitForTimeout(300);
+      const note = await x.p.evaluate(() => { const n = document.querySelector('#hist-overlay .cr-stn'); return n ? n.textContent : null; });
+      await x.p.evaluate(async () => {
+        const c = document.createElement('canvas'); c.width = 900; c.height = 700; const g = c.getContext('2d'); g.fillStyle = '#345'; g.fillRect(0, 0, 900, 700); g.fillStyle = '#9ab'; g.fillRect(100, 300, 700, 40);
+        const blob = await new Promise(r => c.toBlob(r, 'image/png')), dt = new DataTransfer(); dt.items.add(new File([blob], 'gym.png', { type: 'image/png' }));
+        const inp = document.querySelector('#hist-overlay .cr-add input'); inp.files = dt.files; inp.dispatchEvent(new Event('change'));
+      });
+      await x.p.waitForFunction(() => !document.querySelector('#hist-overlay .cr-prev').hidden, null, { timeout: 8000 }).catch(() => {});
+      await x.p.evaluate(() => document.querySelector('#hist-overlay .cr-go').click()); await x.p.waitForTimeout(700);
+      x.note = note; x.post = (await calls(x.p, 'crew_post')).pop() || {};
+      return x;
+    };
+    const t1 = await tellRun();
+    const ses = t1.post.p_session || {};
+    C.check('Tell the crew with stage96 sends day, n, the day\'s name, the minutes it took and whether it held the week (CONTRACT 2)', ses.day === 1 && 'n' in ses && ses.title === 'Acceleration & Squat Strength' && ses.mins === 64 && ses.held === true
+      && Object.keys(ses).sort().join() === 'day,held,mins,n,title' && t1.post.p_kind === 'session', JSON.stringify(ses));
+    C.check('…the composer showed the stamp first, in the same words the post will wear', new RegExp('^Acceleration & Squat Strength · 64 min · Week held · ' + dmon(now) + '$').test(t1.note || ''), String(t1.note));
+    const landed = await t1.p.evaluate(() => { const i = BELL.items.find(x => x.me && x.kind === 'session'); return i && i.session; });
+    C.check('…and the post, once it is on the Bell, carries them (the stub keeps what stage96 keeps)', !!landed && landed.title === 'Acceleration & Squat Strength' && landed.mins === 64 && landed.held === true, JSON.stringify(landed));
+    await t1.ctx.close();
+    const t2 = await tellRun({ seed: { _earn_d1: null, _timer_1: null } });
+    const s2 = t2.post.p_session || {};
+    C.check('a session with no clock and no earn record: held is false and there are no minutes, never a guess', s2.held === false && !('mins' in s2) && s2.title === 'Acceleration & Squat Strength', JSON.stringify(s2));
+    C.check('…and the composer says only what it will say: the name and the date', new RegExp('^Acceleration & Squat Strength · ' + dmon(now) + '$').test(t2.note || ''), String(t2.note));
+    await t2.ctx.close();
+    const t3 = await tellRun({ seed: { _timer_1: { acc: 6 * 3600000, running: false } } });
+    C.check('a clock of six hours (a phone left running) is not sent as minutes', !('mins' in (t3.post.p_session || {})), JSON.stringify(t3.post.p_session));
+    await t3.ctx.close();
+    const t4 = await tellRun({ o: { opts: { prog: progOf(P => { P.workouts.days[0].focusTag = 'Acceleration and Squat Strength with a Rather Long Name'; }) } } });
+    const tt4 = (t4.post.p_session || {}).title || '';
+    C.check('a long day name is cut to 40 characters at the end of a word', tt4.length > 0 && tt4.length <= 40 && tt4 === 'Acceleration and Squat Strength with a', JSON.stringify(tt4));
+    await t4.ctx.close();
+    const t5 = await tellRun({ o: { opts: { prog: progOf(P => { P.workouts.days[0].title = 'Lower · Power'; }) } } });
+    C.check('a day with its own title is named by it before its focus tag', (t5.post.p_session || {}).title === 'Lower · Power', JSON.stringify(t5.post.p_session));
+    await t5.ctx.close();
+    const t6 = await tellRun({ o: { b: { noPages: true } } });
+    C.check('a server without stage96 is sent day and n only, exactly as before, and the composer shows no stamp line', Object.keys(t6.post.p_session || {}).sort().join() === 'day,n' && t6.note === null, JSON.stringify([t6.post.p_session, t6.note]));
+    await t6.ctx.close();
+    const t7 = await tellRun({ o: { stub: careerStub() }, seed: { _earn_d1: { t: iso(now), xp: 470, parts: [{ k: 'session', xp: 400 }], before: 0, saved: 0 } } });
+    C.check('a session that did not close its week says held: false (the earn record has no week part)', (t7.post.p_session || {}).held === false && (t7.post.p_session || {}).mins === 64, JSON.stringify(t7.post.p_session));
+    await t7.ctx.close();
+
+    // the guide names the stamp, Share and Share my card in plain words
+    const gx = await open(browser, { stub: careerStub() });
+    await goCrew(gx.p);
+    const gt = await gx.p.evaluate(() => buildAppGuideCards());
+    const gseg = (gt.match(/<p>A photo you post with <strong>Tell the crew<\/strong>[\s\S]*?<\/p>/) || [''])[0] + (gt.match(/<p><strong>Share my card<\/strong>[\s\S]*?<\/p>/) || [''])[0];
+    C.check('the guide says the stamp, Share on your own session photo, and Share my card, in plain words (no em-dash, no semicolon)', /wears a small stamp/.test(gseg) && /WEEK HELD/.test(gseg) && /tap <strong>Share<\/strong>/.test(gseg) && /Nobody else's photo has Share/.test(gseg) && /Share my card<\/strong>, on your own page/.test(gseg) && !/[—;]/.test(gseg.replace(/&[a-z]+;/g, '')), gseg.slice(0, 100));
+    await gx.ctx.close();
+  }
+
+  // ── 27. the pictures for step 10 (390 px): a stamped photo post, light and dark ──────────────────────────────────────────────────────────────────────────────────────────────
+  if (on(27)) {
+    for (const dark of [false, true]) {
+      const x = await open(browser, { bell: stampBell(POSTS()), opts: { dark } });
+      // a made-up photo for the stub to hand out: a dim gym, a bar across a rack
+      const b64 = await x.p.evaluate(() => {
+        const c = document.createElement('canvas'); c.width = 1080; c.height = 1350; const g = c.getContext('2d');
+        const sky = g.createLinearGradient(0, 0, 0, 1350); sky.addColorStop(0, '#7f9bb3'); sky.addColorStop(.55, '#4a6378'); sky.addColorStop(1, '#1c2b38'); g.fillStyle = sky; g.fillRect(0, 0, 1080, 1350);
+        g.fillStyle = 'rgba(0,0,0,.45)'; g.beginPath(); g.arc(540, 470, 120, 0, 7); g.fill(); g.beginPath(); g.ellipse(540, 760, 280, 210, 0, 0, 7); g.fill();
+        g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(60, 600, 960, 22); g.fillRect(60, 500, 56, 220); g.fillRect(964, 500, 56, 220);
+        return c.toDataURL('image/jpeg', .8).split(',')[1];
+      });
+      await x.p.evaluate(b => { window.__STUB.photoB64 = b; }, b64);
+      await goCrew(x.p); await x.p.waitForTimeout(900);
+      await x.p.evaluate(id => { const a = document.querySelector('#crew-body .cr-post[data-id="' + id + '"]'); a.scrollIntoView({ block: 'start' }); window.scrollBy(0, -70); }, PID.a);
+      await x.p.waitForTimeout(500);
+      await x.p.screenshot({ path: path.join(out, 'stamp-post-' + (dark ? 'dark' : 'light') + '-390.png') });
+      if (!dark) {
+        await x.p.evaluate(id => { const a = document.querySelector('#crew-body .cr-post[data-id="' + id + '"]'); a.scrollIntoView({ block: 'start' }); window.scrollBy(0, -70); }, PID.f);
+        await x.p.waitForTimeout(400);
+        await x.p.screenshot({ path: path.join(out, 'stamp-own-post-light-390.png') });
+      }
+      await x.ctx.close();
+    }
   }
 
 

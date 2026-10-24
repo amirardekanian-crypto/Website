@@ -28,6 +28,7 @@
 // Bring a partner (step 9, stage97): `partner` is the referral object your page carries ({ code: null } before a code exists, or { code, percent, reward, friends, waiting, used }); without it a page has
 // no `referral` (a server without stage97: no card). my_partner_code({p_make}) answers like CONTRACT 8: {code:null} for none, p_make true makes ALEX24 (upper first name letters + two digits, 10 and 10),
 // refuses an athlete under 13 ('partner:under13'); partnerMissing = "no such function" · partnerErr = a message to refuse with · partnerDelay = ms to take.
+// Step 10: crew_post keeps from p_session what the server keeps: day, n, and with stage96 (`bell.lounge`) title (<= 40, one line), mins (1..300) and held (a bool); anything else is dropped.
 // Faces (step 2): crew_faces_get answers `faces` ({ '<ck>': { fv, b64 } }), crew_face_set / crew_face_clear change the caller's own (faceDelay, faceMax, faceMissing, faceErr).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
@@ -102,7 +103,7 @@
     }
     // Crew and the Bell (stage81, scripts/headless/crew.js): get_bell answers the stub's `bell` (none set: no answer, so no Crew tab); bellMissing
     // answers as a server without stage81 (PGRST202, 404). crew_answer, crew_kinds, crew_post, crew_kudos and crew_delete_post change `bell` the way
-    // the server would and keep it in '__stubcfg' (the next page sees it); crew_photo answers a tiny JPEG; leaderboard_top answers `board`.
+    // the server would and keep it in '__stubcfg' (the next page sees it); crew_photo answers a tiny JPEG (or `photoB64`, a picture a test makes for a screenshot); leaderboard_top answers `board`.
     if (name === 'get_bell' || name === 'get_bell_if_new') {
       if (S.bellMissing) return res({ data: null, error: { message: 'Could not find the function public.' + name + '(p_athlete_id) in the schema cache', code: 'PGRST202' }, status: 404 });
       // stage83: the app asks get_bell_if_new with the hash it holds. ifNewMissing = a server without that stage, so the app
@@ -206,7 +207,19 @@
         var id = 'p' + Date.now().toString(16) + Math.floor(Math.random() * 1e6).toString(16);
         while (id.length < 36) id += '0';
         B.items = B.items || [];
-        B.items.splice(B.items.filter(function (i) { return i && i.pinned; }).length, 0, { t: 'post', id: id, who: me.name, me: true, amir: false, kind: p.p_kind || 'post', body: p.p_body || '', session: p.p_session || null,
+        var sess = null;
+        if (p.p_session && typeof p.p_session === 'object') {
+          var ps = p.p_session; sess = {};
+          if ('day' in ps) sess.day = ps.day;
+          if ('n' in ps) sess.n = ps.n;
+          if (B.lounge) {
+            var ttl = String(ps.title || '').replace(/\s+/g, ' ').trim().slice(0, 40), mn = Math.round(Number(ps.mins));
+            if (ttl) sess.title = ttl;
+            if (mn >= 1 && mn <= 300) sess.mins = mn;
+            if (typeof ps.held === 'boolean') sess.held = ps.held;
+          }
+        }
+        B.items.splice(B.items.filter(function (i) { return i && i.pinned; }).length, 0, { t: 'post', id: id, who: me.name, me: true, amir: false, kind: p.p_kind || 'post', body: p.p_body || '', session: sess,
           photo: !!p.p_photo, w: p.p_w, h: p.p_h, at: new Date().toISOString(), pinned: false, left: 7, kudos: { n: 0, mine: false, names: [] } });
         if (p.p_photo) me.photos_left = Math.max(0, (me.photos_left || 0) - 1);
         me.posts_left = Math.max(0, (me.posts_left || 0) - 1);
@@ -318,7 +331,7 @@
         return res({ data: { ok: true, season: 13 }, error: null, status: 200 });
       }
       if (name === 'crew_photo') return res({ data: { id: params && params.p_post, mime: 'image/jpeg', w: 4, h: 5,
-        b64: '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z' }, error: null, status: 200 });
+        b64: S.photoB64 || '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z' }, error: null, status: 200 });
     }
     // crew_board (stage91): the season board, crew members only, in its own shape (who/points, no display_name/xp). Answered
     // from `crewBoard` when a fixture sets one, else from `board` translated, so every older fixture keeps working. A fixture
