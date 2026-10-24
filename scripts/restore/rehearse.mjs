@@ -26,7 +26,8 @@ const ROOT = path.resolve(HERE, '..', '..');
 const SNAPSHOT = path.join(ROOT, 'supabase', 'schema_snapshot.sql');
 const SECRET_TABLES = ['assess_publish_keys', 'tps_publish_keys',
                        'push_config'];                   // and the reminders' VAPID private key and shared secret (stage84): see restore_backup.py
-const SHORT_LIVED = ['crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings',   // the Bell's 7-day tables (stage81), as in restore_backup.py: never in a backup, on purpose
+const SHORT_LIVED = ['crew_faces', 'crew_cheers', 'crew_award_likes', 'crew_mentions', 'crew_cheer_tally',   // the Players' Lounge (stage96)
+                     'crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings',   // the Bell's 7-day tables (stage81), as in restore_backup.py: never in a backup, on purpose
                      'crew_replies',                            // the replies (stage92): they die with their post at 7 days, so the same promise
                      'push_sent',                              // and what went out today (stage84): it rebuilds itself by not sending twice
                      'crew_push_q', 'crew_push_seen',
@@ -251,7 +252,7 @@ try {
   const chk2 = await check(B, dirB);
   ok(JSON.stringify(chk2) === JSON.stringify(chk), 'the second run leaves every count as it was');
   const nx = await nextIdsAfterMax(B);
-  ok(nx.n === 9 && nx.bad.length === 0, `all ${nx.n} id counters hand out an id past every restored one`, nx.bad.join('\n'));
+  ok(nx.n === 10 && nx.bad.length === 0, `all ${nx.n} id counters hand out an id past every restored one`, nx.bad.join('\n'));
 
   section('7. the logins come back in two steps; the rows that belong to a login follow');
   const made1 = await recreateLogins(B, reportB, new Set(['buyer_one', 'learner_one', 'ava_test']));

@@ -1517,7 +1517,7 @@ const TABLE_KEYS = {
   career_goals: ['athlete_id', 'month'], career_notes: ['athlete_id', 'day'],
 };
 function keysOf(table) {
-  return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys', 'athlete_status', 'career_scores']
+  return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys', 'athlete_status', 'career_scores', 'athlete_profile']
     .includes(table) ? ['athlete_id'] : ['id']);
 }
 // `apply` narrows the read ((q) => q.eq('athlete_id', id)); the paging and the key order stay the same.
@@ -2259,6 +2259,7 @@ const BACKUP_TABLES = [
   // day stage85 is applied, in the same commit as the new schema snapshot (test_restore_backup.py check 1h holds the two equal, and it reads the
   // quoted names out of this block, so do not write a table name in quotes in a comment). Applied 2026-10-19, so here they are:
   'crew_open', 'crew_open_results',
+  'athlete_profile', 'referral_credits',
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
   'library', 'library_categories', 'library_sessions',

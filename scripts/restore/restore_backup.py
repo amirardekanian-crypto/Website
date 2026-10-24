@@ -30,7 +30,8 @@ SECRET_TABLES = {'assess_publish_keys', 'tps_publish_keys',
                  # is already granted and only the key changes), and the permission is the thing that
                  # cannot be asked for twice. Filled in again by hand after a restore.
                  'push_config'}
-SHORT_LIVED = {'crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings',   # the Bell's 7-day tables (stage81): never in a backup, or a 12-week backup breaks the 7-day promise in privacy.html
+SHORT_LIVED = {'crew_faces', 'crew_cheers', 'crew_award_likes', 'crew_mentions', 'crew_cheer_tally',   # the Players' Lounge (stage96)
+               'crew_posts', 'crew_photos', 'crew_kudos', 'crew_rings',   # the Bell's 7-day tables (stage81): never in a backup, or a 12-week backup breaks the 7-day promise in privacy.html
                # The replies (stage92). They hang off a post and die with it at 7 days, so the same promise applies.
                'crew_replies',
                # What went out today (stage84). It rebuilds itself by simply not sending twice, and a

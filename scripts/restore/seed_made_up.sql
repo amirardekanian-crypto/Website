@@ -94,6 +94,13 @@ insert into public.crew_consent (athlete_id, answer, kinds, name, under13, crew_
   ('ava_test', 'yes', '{"best": false}', 'Ava T.', false, '11111111-2222-4333-8444-555555555555', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00', '2026-10-18 09:00:00+00'),
   ('gone_test', 'no', '{}', null, false, '22222222-3333-4444-8555-666666666666', '2026-10-18 10:00:00+00', '2026-10-18 09:30:00+00', null, '2026-10-18 10:00:00+00');
 
+-- The Players' Lounge (stage96) and Bring a Partner (stage97): the game and the credits are KEPT (coaching data, Amir's ledger); faces, cheers, signatures and
+-- mentions and cheer tallies are short-lived on purpose (SHORT_LIVED) and are not seeded.
+insert into public.athlete_profile (athlete_id, sports, hand, backhand, side, plays_at, club, training_for, working_on, ig, updated_at) values
+  ('ava_test', '{tennis,padel}', 'left', 'two', 'right', 'club', 'Test Club', '{competition,strength}', 'my second serve', 'ava.test', '2026-10-24 09:00:00+00'),
+  ('gone_test', '{}', null, null, null, null, null, '{health}', null, null, '2026-10-24 09:30:00+00');
+-- (the credits come after the partner codes they name: see the affiliates insert below)
+
 -- The Monthly Open (stage85): the other way round from the Bell's short-lived tables. A challenge and the results Amir confirmed are a RECORD,
 -- not a post: they are never swept, and a restore must bring them back, so both ARE backed up and both are seeded here.
 insert into public.crew_open (id, title, how, unit, better, opened_on, closed_at, created_at) values
@@ -221,6 +228,10 @@ insert into public.affiliates (code, percent, coach_name, coach_name_fa, instagr
   ('PARTNER10', 10, 'Partner Coach', 'مربی همکار', '@partner_test', '+44 7700 900002', 'partner@example.test', 'ava_test', '2026-08-01', true, null, E'a note with ''quotes'' and a back\\slash and $bk$'),
   ('GONE20', 20, 'Gone Partner', null, null, null, null, 'gone_test', '2026-08-02', false, '2026-09-30', null),
   ('SOLO5', 5, 'Solo', null, null, null, null, null, null, true, null, null);
+
+-- Bring a Partner (stage97): a credit names its partner code, so it is seeded after the codes.
+insert into public.referral_credits (id, code, athlete_id, intake_id, friend_name, percent, earned_on, used_on, note, created_at) values
+  ('40000000-0000-4000-8000-000000000001', 'PARTNER10', 'ava_test', '10000000-0000-4000-8000-000000000003', 'Friend Test', 10, '2026-10-24', null, 'first friend', '2026-10-24 10:00:00+00');
 
 -- ── the website chatbot's saved chats (stage67) ──
 insert into public.chat_conversations (id, site, page, visitor, started_at, last_at, turns, handoff, tokens_in, tokens_out, cost_usd) values
