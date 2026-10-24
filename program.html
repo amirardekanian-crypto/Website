@@ -597,6 +597,25 @@
   .lib-sugg-q b { font-weight: 600; }
   .lib-sugg-a { margin-left: auto; flex: none; color: var(--grey-text); font-size: var(--fs-title); }
   #home-sugg-wrap:not(:empty) { margin: 14px 24px 0; }
+  /* Step 8 · First Serve (2026-10-24): the ring and the one line share the suggestion's frame; the sheet lists all five */
+  .fs-slot { gap: 10px; padding: 8px 14px 8px 8px; cursor: default; }
+  .fs-slot .cr-bt { border: 0; background: none; color: inherit; text-align: left; font: inherit; cursor: pointer; }
+  .fs-ring { flex: none; display: grid; place-items: center; position: relative; width: 44px; height: 44px; border-radius: 50%; }
+  .fs-ring::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; background: conic-gradient(var(--mark) 0 var(--p, 0%), var(--prog-track) 0); }
+  .fs-ring::after { content: ''; position: absolute; inset: 10px; border-radius: 50%; background: var(--white); }
+  .fs-ring span { position: relative; z-index: 1; font: 700 var(--fs-label)/1 'Space Mono', monospace; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .fs-go { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0; }
+  #hist-overlay .fs-list { margin-top: 6px; }
+  #hist-overlay .fs-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 14px; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 0; border: 0; border-top: 1px solid var(--hair);
+    background: none; text-align: left; font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  #hist-overlay .fs-row:first-child { border-top: 0; }
+  #hist-overlay .fs-row.done { grid-template-columns: 24px minmax(0, 1fr); font-weight: 400; color: var(--grey); }
+  #hist-overlay .fs-row:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; border-radius: 6px; }
+  #hist-overlay .fs-t small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  #hist-overlay .fs-c { color: var(--grey); font-size: var(--fs-lead); }
+  #hist-overlay .fs-dot { position: relative; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--ring); box-sizing: border-box; }
+  #hist-overlay .fs-row.done .fs-dot { border-color: var(--fill); background: var(--fill); }
+  #hist-overlay .fs-row.done .fs-dot::after { content: ''; position: absolute; left: 5px; top: 1px; width: 5px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
   .complete-sugg-slot:not(:empty) { margin: 0 0 4px; }
   .session-complete .lib-sugg { background: var(--grey-bg); }
   /* "2 of 3 sessions done this week" (HOME-01), from paintWeek(). */
@@ -11190,6 +11209,8 @@ const CEILING_HELP = `
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
     body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then today's habits as one card: the five you tick, your <strong>level</strong> in the ring, and the weeks you have held in a row beside <strong>This Week</strong>.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers and your level), <strong>Getting stronger</strong> (your best lift, week by week), <strong>Your body</strong> (your records, your body weight and your habits) and <strong>What you've earned</strong> (your achievements and your moments) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit on your Today card when you track that habit. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+  { icon: 'compass', key: 'serve', title: 'First Serve: your first week', when: () => firstServeWanted(),
+    body: `<p>While you are new, a line called <strong>First Serve</strong> sits on Home, under the days. It has five steps: finish your first session, add the app to your Home Screen, turn on notifications, join the crew and add your photo. It shows you one at a time, like <strong>Next: add the app to your Home Screen</strong>. Tap the line and the app takes you there. Tap the small ring, like <strong>2/5</strong>, to see all five.</p><p>Turn on notifications asks your phone once, and only when you tap its button. You can say no. It goes when you have done them all, or two weeks after your first session.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now. The card shows my first line. Tap <strong>Why this cycle matters</strong> for the rest of the note and <strong>Expected outcomes</strong> for what we're aiming to hit.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -11234,7 +11255,7 @@ APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how ofte
     body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
-  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else&rsquo;s page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. On your own page tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p>`;
+  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. On your own page tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p>`;
   const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with likes), last month\'s honours early in the month, and the season board.</li>';
   return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
     <div class="note-card app-card${openKey && card.key === openKey ? ' open' : ''}" onclick="toggleNote(this)">
@@ -13578,7 +13599,7 @@ function achNudgeHTML(e) {
 // signal; <id>_crewseen is the newest post of Amir's opened on this phone (the tab's clay dot until then).
 var BELL = null;             // get_bell()'s answer: { athlete_id, me, items, honours, kinds, at } or null
 var CREW_BOARD = null;       // leaderboard_top()'s rows for the season board
-var _bellBusy = false, _bellAt = 0, _boardAt = 0, _crewMissing = false, _crewDraft = null, _crewFreshPin = null, _bellSig = '';
+var _bellTried = false, _bellBusy = false, _bellAt = 0, _boardAt = 0, _crewMissing = false, _crewDraft = null, _crewFreshPin = null, _bellSig = '';
 // How many "no such function" answers in a row (2026-10-20). The tab goes on the SECOND, never the first: PostgREST says it
 // for a few seconds after any stage is applied, and one of those used to empty the phone's copy mid-read.
 var _crewMiss2 = 0;
@@ -13838,7 +13859,7 @@ async function refreshBell() {
   // The screen is redrawn only when the feed changed, or when there is still nothing to show (so "No signal" and "Loading" stay
   // honest): a tick that finds the same crew must not rebuild the feed under a thumb, or disarm a Delete half-tapped.
   finally {
-    _bellBusy = false; setCrewTab(); paintCrewTell(); paintSessionShare(); paintWeekSugg();
+    _bellBusy = false; _bellTried = true; setCrewTab(); paintCrewTell(); paintSessionShare(); paintWeekSugg();
     try { syncDarkToggle(); } catch (e) { /* your face on the account button */ }
     if (changed || !BELL) { if (onCrew()) renderCrew(); if (onCrewPage()) renderCrewPage(); }
   }
@@ -15408,6 +15429,7 @@ async function crewOwnFace(fv, blob) {
   const me = crewMe(), ck = me.ck;
   me.fv = fv == null ? null : Number(fv);
   try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
+  paintWeekSugg();   // First Serve's last step ticks with a photo
   const mine = crewPageGet('me');
   if (mine) { mine.p.fv = me.fv; crewPagesSave(); }
   if (ck) {
@@ -15898,8 +15920,9 @@ async function pushTurnOn() {
   else if (r && r.state === 'needs-install') aaToast('Add the app to your Home Screen first');
   else aaToast('That did not work. Try again later.');
   openPushSettingsPage();
+  paintWeekSugg();   // First Serve's step ticks with the answer
 }
-// ── Asking for notifications at the two moments that earn it (Amir, 2026-10-20) ──
+// ── Asking for notifications at the moments that earn it (Amir, 2026-10-20; a third on 2026-10-24: First Serve's step, the athlete's own tap) ──
 // "can you make it in a way that the person who installs the app, ask for notifications to be turned
 // on?" and "if some one joins the crew, again it should ask for permission for their notification".
 // Both are moments of real intent: they have just chosen to keep the app, or just chosen to be seen by
@@ -15928,13 +15951,16 @@ async function pushTurnOnHere() {
   else if (r && r.state === 'blocked') aaToast('Your phone said no. You can undo that in its settings.');
   else if (r && r.state === 'needs-install') aaToast('Add the app to your Home Screen first.');
   else aaToast('That did not work. Account, then Reminders, when you want to try again.');
+  paintWeekSugg();   // First Serve's step ticks, or moves on, with the answer
 }
 window.pushTurnOnHere = pushTurnOnHere;
 
 // One ask, with its own line, left on screen until they answer it (ms: 0 — a six-second toast is no way
 // to put a one-chance decision to somebody).
-function pushAsk(why, line) {
-  if (!pushWorthAsking() || pushAsked(why)) return false;
+// `again` is for an ask the athlete made by tapping (First Serve's step): their own tap puts the line on screen every time, and the box still opens only
+// inside the button's click. The two automatic moments (the install, the join) pass nothing and are asked once per phone.
+function pushAsk(why, line, again) {
+  if (!pushWorthAsking() || (!again && pushAsked(why))) return false;
   pushAskMark(why);
   aaToast(line, { kicker: 'Your phone', action: 'Turn them on', dismiss: 'Not now', ms: 0,
                   run: () => pushTurnOnHere() });
@@ -17364,9 +17390,112 @@ function crewInvHTML() {
         <span class="lib-sugg-q"><b>The crew is open</b>: ${esc(say)}. ${n} ${n === 1 ? 'is' : 'are'} in.</span></span>
       <span class="lib-sugg-a" aria-hidden="true">›</span></button>`;
 }
+// ── Step 8 · First Serve, one line at a time (Amir: "go with your picks": 8, B One Line at a Time, and "can we add turn on notification for the app as well?") ──
+// A new athlete's first two weeks as five steps, in this order: finish your first session, add the app to your Home Screen, turn on notifications, join the
+// crew, add your photo. Home shows ONE line at a time, in the one suggestion slot, FIRST in its priority while the athlete is new (14 days from their first
+// finished session, or from the cycle's start while there is none) and until every step is done: a 32 px ring ("2/5", a tap opens all five) and "Next: add the app
+// to your Home Screen". Then the slot goes back to the crew's invitation and the Library's picks. A tap on the line does the step with what the app already has:
+// the install offer, the one ask with its button (pushAsk()), the crew's question, the photo sheet. The line never asks the phone anything: the phone's box opens only
+// inside the button of pushAsk()'s toast, which an athlete's own tap on THIS step puts on screen (push.md: the third moment, and the box is still never ours to open).
+// A step that cannot apply to this athlete is not in the list (no notifications on a browser that cannot take them, no crew or photo for an athlete under 13, on a
+// server with no crew, or who answered no), so the ring says "2/3" and the line never nags for what the phone or the athlete has settled. Step 3 counts as done when
+// the phone's answer is in and is not "off" (on, or blocked: a blocked phone is never nagged); on an iPhone that has not been put on the Home Screen it waits behind
+// step 2. Never shown in the demo or the coach's preview, and never to a veteran: someone in their second cycle or later, or whose first session is older than 14 days.
+const FS_DAYS = 14;
+// The first day a session was finished on this phone's copy of the history (a calendar day number), or null.
+function fsFirstDay() {
+  let best = null;
+  const take = v => { const n = cycleDayNo(v); if (isFinite(n) && (best === null || n < best)) best = n; };
+  try { const h = JSON.parse(localStorage.getItem(histKey()) || 'null'); if (Array.isArray(h)) h.forEach(r => { if (r && r.completed_on) take(String(r.completed_on).slice(0, 10)); }); } catch (e) {}
+  try { Object.keys(localStorage).forEach(k => { if (k.indexOf(ATHLETE_ID + '_completed_d') === 0 || k.indexOf(ATHLETE_ID + '_sent_d') === 0) take(completedDate(localStorage.getItem(k))); }); } catch (e) {}
+  return best;
+}
+// New, and not a veteran: inside the first 14 days.
+function fsNew() {
+  if (!DATA || (DATA.currentCycleIndex || 0) > 0) return false;   // a second cycle is not a first week
+  const first = fsFirstDay(), today = todayDayNo();
+  if (first !== null) return today - first < FS_DAYS;               // from the first finished session
+  if (onbVeteran()) return false;                                    // trained before and the phone cannot say when
+  const c0 = DATA.cycles && DATA.cycles[0], s = c0 && c0.startDate ? cycleDayNo(c0.startDate) : NaN;
+  return isNaN(s) || today - s < FS_DAYS;                            // no session yet: from the cycle's start
+}
+function fsSteps() {
+  const me = crewMe(), st = window.AAPush ? AAPush.state() : 'unsupported';
+  const steps = [
+    { id: 'session', label: 'Finish your first session', line: 'finish your first session', done: hasFinishedASession() },
+    { id: 'install', label: 'Add the app to your Home Screen', line: 'add the app to your Home Screen', done: _isStandalone() }];
+  if (pushReady()) {
+    const wait = st === 'needs-install';
+    steps.push({ id: 'push', label: 'Turn on notifications' + (wait ? ' (after step 2)' : ''), line: 'turn on notifications', done: st === 'on' || st === 'blocked', blocked: st === 'blocked', wait });
+  }
+  if (crewOn() && !me.under13 && me.answer !== 'no') {
+    steps.push({ id: 'join', label: 'Join the crew', line: 'join the crew', done: me.answer === 'yes' });
+    if (crewPagesOn()) steps.push({ id: 'photo', label: 'Add your photo', line: 'add your photo', done: me.fv != null });
+  }
+  return steps;
+}
+// The line waits for the crew to answer once (from the phone's copy, or from the server), so the steps do not change under it.
+function fsHeld() { return crewAllowed() && !BELL && !_crewMissing && !_bellTried; }
+function firstServeWanted() {
+  if (window.IS_PREVIEW || window.IS_DEMO || !ATHLETE_ID || !DATA || fsHeld()) return false;
+  return fsNew() && fsSteps().some(s => !s.done);
+}
+function firstServeHTML() {
+  const st = fsSteps(), done = st.filter(s => s.done).length, nx = st.find(s => !s.done);
+  if (!nx) return '';
+  return `<div class="lib-sugg fs-slot" data-sugg="serve">
+      <button type="button" class="cr-bt fs-ring" style="--p:${Math.round(done / st.length * 100)}%" onclick="openFirstServe()" aria-label="First Serve, ${done} of ${st.length} done. Tap to see every step."><span>${done}/${st.length}</span></button>
+      <button type="button" class="cr-bt fs-go" onclick="firstServeDo('${nx.id}')"><span class="lib-sugg-b"><span class="lib-sugg-k">First serve</span>
+        <span class="lib-sugg-q">Next: ${esc(nx.line)}</span></span><span class="lib-sugg-a" aria-hidden="true">›</span></button>
+    </div>`;
+}
+function firstServeSheetHTML() {
+  const st = fsSteps(), done = st.filter(s => s.done).length;
+  const row = s => s.done
+    ? `<div class="fs-row done"><span class="fs-dot" aria-hidden="true"></span><span class="fs-t">${esc(s.label)}${s.blocked ? '<small>Your phone said no. You can change that in its settings.</small>' : ''}</span><span class="sr-only">Done</span></div>`
+    : `<button type="button" class="cr-bt fs-row" onclick="firstServeDo('${s.id}')"><span class="fs-dot" aria-hidden="true"></span><span class="fs-t">${esc(s.label)}</span><span class="fs-c" aria-hidden="true">›</span></button>`;
+  return `<div class="readiness-eyebrow">Your first week</div>
+    <h2 class="readiness-title">First serve</h2>
+    <p class="readiness-sub">${done === st.length ? 'All ' + st.length + ' done' : done + ' of ' + st.length + ' done'}</p>
+    <div class="fs-list">${st.map(row).join('')}</div>
+    <p class="cr-note">Home shows you one at a time. It goes when you have done them all, or after your first two weeks.</p>`;
+}
+function openFirstServe() {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov || !firstServeWanted()) return;
+  ov.querySelector('.readiness-modal').innerHTML = firstServeSheetHTML();
+  ov.classList.add('visible');
+}
+window.openFirstServe = openFirstServe;
+// The sheet, when it is the page on screen, follows the steps as they tick.
+function firstServeSheetOpen() { const ov = document.getElementById('hist-overlay'); return !!(ov && ov.classList.contains('visible') && ov.querySelector('.fs-list')); }
+// A step, done with what the app already has. The sheet (if it is open) gives way, except for the photo, whose sheet comes ‹ Back to it.
+function firstServeDo(id) {
+  if (id === 'photo') { openFacePhoto(); return; }
+  if (firstServeSheetOpen()) closeHistorySheet();
+  if (id === 'session') { const d = suggestedDayId(); if (d) openDayView(d); return; }
+  if (id === 'install' || (id === 'push' && window.AAPush && AAPush.state() === 'needs-install')) {
+    try { localStorage.removeItem('a2hs_dismissed_v1'); } catch (e) {}   // asked for: always answer (as Account's Install the app does)
+    showInstallOffer();
+    return;
+  }
+  if (id === 'push') {
+    // The line, with its button, and nothing else: the phone's box opens inside that button's click (pushAsk -> pushTurnOnHere), never here.
+    if (!pushAsk('serve', 'Reminders for your training and your habits, and the crew when something happens.', true)) paintWeekSugg();
+    return;
+  }
+  if (id === 'join') goTo('crew');
+}
+window.firstServeDo = firstServeDo;
+// push.js is deferred: a Bell that answers before it has run draws the line without AAPush, and the notifications step is not in it. Once the page has loaded, draw it again.
+window.addEventListener('load', () => { Promise.resolve(paintWeekSugg()).catch(() => {}); });
 async function paintWeekSugg() {
   const wrap = document.getElementById('home-sugg-wrap');
   if (!wrap) return;
+  if (fsHeld() && !window.IS_PREVIEW && !window.IS_DEMO && fsNew()) crewFirstLook();   // a new athlete's phone has no copy of the crew: ask now, not in 2.5 seconds
+  if (firstServeSheetOpen()) { const m = document.querySelector('#hist-overlay .readiness-modal'); if (m) m.innerHTML = firstServeSheetHTML(); }   // the sheet follows the steps
+  // First Serve comes FIRST while the athlete is new (Amir, 2026-10-24); then the week's own suggestion, then the crew's invitation
+  if (firstServeWanted()) { wrap.innerHTML = firstServeHTML(); return; }
   if (!weekSuggWanted()) { wrap.innerHTML = crewInvWanted() ? crewInvHTML() : ''; return; }
   await ensureLibManifests();
   const w = weekSuggWanted() && libPickItem(LIB_PICKS.weekDone.id);
@@ -23292,6 +23421,7 @@ function wrapSheetOpeners() {
   openShareSheet = sheetWrap(openShareSheet); window.openShareSheet = openShareSheet;   // Highlight Reel's share sheet
   openCourt = sheetWrap(openCourt); window.openCourt = openCourt;   // Four Courts: a kind of achievements
   openCrewPost = sheetWrap(openCrewPost); window.openCrewPost = openCrewPost;   // Crew: the composer (stage81)
+  openFirstServe = sheetWrap(openFirstServe); window.openFirstServe = openFirstServe;   // First Serve's five steps: opened from Home's ring; Your photo opened from a step comes ‹ Back to it
   openCrewReply = sheetWrap(openCrewReply); window.openCrewReply = openCrewReply;   // Crew: the reply sheet (stage92), so ‹ Back works when a page is behind it
   openPlayerAchievements = sheetWrap(openPlayerAchievements); window.openPlayerAchievements = openPlayerAchievements;   // a Player Page's "All n"
   openPlayerWeek = sheetWrap(openPlayerWeek); window.openPlayerWeek = openPlayerWeek;   // a Player Page's week of sessions (This cycle)

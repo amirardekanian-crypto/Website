@@ -20,6 +20,13 @@
 // Step 5: Player facts for every racket sport and for people who play none: the rows each sport asks for, chips and fields in place, my_game_set one call at a time, a refusal and no signal,
 // Instagram checked, the sport line, the programme's sport badge never on a page. Section 17. Step 6: the face stack (2, 5 with +2, none), Cheered by, the one-time note on the first
 // like of an achievement's line. Section 18. Section 19 takes the pictures for steps 4 to 6.
+// Someone else's cycle (CONTRACT 9b, in section 16): their page is "This week" (one bar, the extras as dots, Held) and "8 sessions this cycle", never "of N" and never a week that is over, even if the
+// server were to send them; your own page keeps the whole cycle and "8 of 15".
+// Step 7: @names in replies (Name Chips): the row of names above the field, its filter and order, a tap, the token that is sent, five at most, 140 counted as seen, the sheet kept above the keyboard
+// (a fake visualViewport), a name as a button or as plain words, openCrewReply as a sheet opener. Section 20; section 21 takes its pictures.
+// Step 8: First Serve (section 22): five steps in the one suggestion slot, the ring, the order and ticks, the slot's priority, the iPhone wait, blocked as done, what each tap does, THE PHONE'S BOX (a stand-in for
+// Notification.requestPermission: shut on load, on the line, on the sheet and on the toast, once inside the button's click), never a veteran, never in the demo or the preview, 14 days, steps that do not apply,
+// the guide, 320 px and dark. Section 23 takes its pictures.
 // `--only=14,15` runs just those sections (everything after a "// ── N." line is wrapped in on(N)).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
@@ -1747,6 +1754,257 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await a.p.waitForTimeout(300);
     await a.p.screenshot({ path: path.join(out, 'reply-chips-keyboard-light-390.png') });
     await a.ctx.close();
+  }
+
+  // ── 22. Step 8 · First Serve, one line at a time: five steps in the one suggestion slot, with the notifications step ──────────────────────────────────────
+  // 1 finish your first session · 2 add the app to your Home Screen · 3 turn on notifications · 4 join the crew · 5 add your photo. Home's slot carries a ring ("2/5") and
+  // "Next: ..." for 14 days from the first finished session (the cycle's start while there is none) and until all are done, never to a veteran, never in the demo. A tap on the
+  // line does the step; a tap on the ring lists all five. THE PHONE'S BOX opens only inside the button of pushAsk()'s toast (push.md: the third moment is the athlete's own tap).
+  const DAYMS = 864e5, ymd = ms => new Date(ms).toISOString().slice(0, 10);
+  const newProg = (o = {}) => {
+    const P = H.fixture(); P.currentCycleIndex = o.idx || 0;
+    P.cycles.forEach((c, i) => { const s = now - (o.startAgo === undefined ? 3 : o.startAgo) * DAYMS + (i - P.currentCycleIndex) * 35 * DAYMS; c.startDate = ymd(s); c.endDate = ymd(s + 34 * DAYMS); });
+    return P;
+  };
+  const histAgo = n => [{ completed_on: ymd(now - n * DAYMS), day: '1', readiness: 4, log: [] }];
+  // a stand-in for the phone's box, in front of the page's own scripts: the permission starts at "default" (so AAPush.state() is "off"), a service worker is "ready", and every call
+  // of Notification.requestPermission() is written down, so the real chain (the toast's button -> pushTurnOnHere -> AAPush.enable) is what is measured
+  const BOX = "window.__BOX = []; window.__PERM = 'default';"
+    + " try { Notification.requestPermission = function () { window.__BOX.push('requestPermission'); return Promise.resolve(window.__PERM); }; Object.defineProperty(Notification, 'permission', { configurable: true, get: function () { return window.__PERM; } }); } catch (e) {}"
+    + " try { var sw = navigator.serviceWorker; sw.register = function () { return Promise.resolve({}); }; Object.defineProperty(sw, 'ready', { configurable: true, get: function () { return Promise.resolve({ pushManager: { getSubscription: function () { return Promise.resolve(null); }, subscribe: function () { return Promise.resolve({ toJSON: function () { return { endpoint: 'https://push.invalid/e', keys: { p256dh: 'a', auth: 'b' } }; } }); } } }); } }); } catch (e) {}";
+  const fsOpen = (o = {}) => open(browser, { b: o.b === undefined ? { me: { answer: null, can_post: false } } : o.b, stub: o.stub, bell: o.bell,
+    opts: Object.assign({ tz: 'UTC', prog: newProg(o.prog), hist: o.hist || [], init: BOX }, o.opts || {}) });
+  const fsSlot = p => p.evaluate(() => { const s = document.querySelector('#home-sugg-wrap .fs-slot'); return s ? { ring: s.querySelector('.fs-ring').textContent.trim(), p: s.querySelector('.fs-ring').style.getPropertyValue('--p'), kick: s.querySelector('.lib-sugg-k').textContent.trim(),
+    line: s.querySelector('.lib-sugg-q').textContent.trim(), other: !!document.querySelector('#home-sugg-wrap [data-sugg="crew"]') } : null; });
+  const fsRows = p => p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), eyebrow: (document.querySelector('#hist-overlay .readiness-eyebrow') || {}).textContent, title: (document.querySelector('#hist-overlay .readiness-title') || {}).textContent,
+    sub: (document.querySelector('#hist-overlay .readiness-sub') || {}).textContent, rows: [...document.querySelectorAll('#hist-overlay .fs-row')].map(r => ({ t: r.querySelector('.fs-t').childNodes[0].textContent.trim(), done: r.classList.contains('done'), tag: r.tagName, sub: (r.querySelector('small') || {}).textContent || '' })) }));
+  const fsSet = (p, s) => p.evaluate(s => {
+    if (s.standalone !== undefined) Object.defineProperty(navigator, 'standalone', { configurable: true, get: () => s.standalone });
+    if (s.push) window.AAPush = Object.assign({}, window.AAPush, { state: () => s.push });
+    if (s.answer !== undefined) { BELL.me.answer = s.answer; BELL.me.can_post = s.answer === 'yes'; }
+    if (s.fv !== undefined) BELL.me.fv = s.fv;
+    if (s.hist) localStorage.setItem(s.id + '_histcache', JSON.stringify(s.hist));
+    return paintWeekSugg();
+  }, Object.assign({ id: H.ID }, s));
+  const box = p => p.evaluate(() => window.__BOX.length);
+  const homeWait = async p => { await p.waitForTimeout(1500); };
+  if (on(22)) {
+    // ── the line, the ring and the order
+    const a = await fsOpen();
+    await homeWait(a.p);
+    let s = await fsSlot(a.p);
+    C.check('a new athlete, nothing done: the slot is First Serve: a 0/5 ring, "First serve", "Next: finish your first session"', !!s && s.ring === '0/5' && s.kick === 'First serve' && s.line === 'Next: finish your first session' && s.p === '0%', JSON.stringify(s));
+    C.check('…it has the slot to itself: the crew\'s invitation, which wants it too (a crew, never opened), waits', !s.other && await a.p.evaluate(() => crewInvWanted()));
+    await a.p.evaluate(() => { window.__w = weekSuggWanted; window.weekSuggWanted = () => true; return paintWeekSugg(); });
+    C.check('…and so does the week\'s own suggestion: First Serve is first in the slot\'s priority', !!(await fsSlot(a.p)));
+    await a.p.evaluate(() => { window.weekSuggWanted = window.__w; return paintWeekSugg(); });
+    C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-ring').click()); await a.p.waitForTimeout(350);
+    let r = await fsRows(a.p);
+    C.check('the ring opens a sheet "First serve" with all five, in this order, none done, each a button', r.on && r.title === 'First serve' && r.eyebrow === 'Your first week' && r.sub === '0 of 5 done' && r.rows.map(x => x.t).join('|') === 'Finish your first session|Add the app to your Home Screen|Turn on notifications|Join the crew|Add your photo' && r.rows.every(x => !x.done && x.tag === 'BUTTON'), JSON.stringify(r));
+    await a.p.evaluate(() => closeHistorySheet());
+    await a.ctx.close();
+
+    // ── what ticks each step, in order (the done-tests)
+    const t = await fsOpen();
+    await homeWait(t.p);
+    const seq = [['a session finished', { hist: histAgo(1) }, '1/5', 'Next: add the app to your Home Screen'], ['the app on the Home Screen', { standalone: true }, '2/5', 'Next: turn on notifications'],
+      ['notifications on', { push: 'on' }, '3/5', 'Next: join the crew'], ['the crew joined', { answer: 'yes' }, '4/5', 'Next: add your photo']];
+    for (const [what, st, ring, line] of seq) {
+      await fsSet(t.p, st); s = await fsSlot(t.p);
+      C.check(`${what}: the ring says ${ring} and the line "${line}"`, !!s && s.ring === ring && s.line === line, JSON.stringify(s));
+    }
+    await fsSet(t.p, { fv: 1700000000 });
+    C.check('all five done: First Serve is gone and the slot goes back to the crew\'s invitation', !(await fsSlot(t.p)) && await t.p.evaluate(() => !!document.querySelector('#home-sugg-wrap [data-sugg="crew"]')));
+    await fsSet(t.p, { push: 'blocked', fv: null, answer: null });
+    s = await fsSlot(t.p);
+    C.check('a phone that said no ("blocked") counts as done: never nagged, the line moves on to the crew (3/5 with the session and the Home Screen)', !!s && s.ring === '3/5' && s.line === 'Next: join the crew', JSON.stringify(s));
+    await t.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-ring').click()); await t.p.waitForTimeout(300);
+    r = await fsRows(t.p);
+    C.check('…in the sheet the step is ticked and says so quietly', r.rows[2].done && /said no/.test(r.rows[2].sub) && r.rows[2].tag === 'DIV', JSON.stringify(r.rows[2]));
+    await fsSet(t.p, { answer: 'yes', fv: 1700000000 });
+    r = await fsRows(t.p);
+    C.check('…and an open sheet follows the steps as they tick (the crew and the photo)', r.rows.every(x => x.done) && r.sub === 'All 5 done', JSON.stringify(r));
+    await t.ctx.close();
+
+    // ── the iPhone wait: not on the Home Screen, step 3 waits behind step 2
+    const ip = await fsOpen({ hist: histAgo(1), opts: { init: BOX } });
+    await homeWait(ip.p);
+    await fsSet(ip.p, { push: 'needs-install' });
+    await ip.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-ring').click()); await ip.p.waitForTimeout(300);
+    r = await fsRows(ip.p);
+    C.check('an iPhone that has not been put on the Home Screen: step 3 reads "Turn on notifications (after step 2)"', r.rows[2].t === 'Turn on notifications (after step 2)' && !r.rows[2].done, JSON.stringify(r.rows[2]));
+    await ip.p.evaluate(() => document.querySelectorAll('#hist-overlay .fs-row')[2].click()); await ip.p.waitForTimeout(500);
+    C.check('…a tap on it is the install offer (step 2), never the phone\'s box', await ip.p.evaluate(() => !!document.querySelector('.a2hs-toast')) && (await box(ip.p)) === 0 && !(await ip.p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))));
+    await ip.ctx.close();
+
+    // ── a tap on the line does the step
+    const d = await fsOpen({ hist: histAgo(1) });
+    await homeWait(d.p);
+    await d.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-go').click()); await d.p.waitForTimeout(500);
+    C.check('step 2, install: the line opens the install offer, even when it was dismissed before', await d.p.evaluate(() => !!document.querySelector('.a2hs-toast .a2hs-toast-body') && /Install app/.test(document.querySelector('.a2hs-toast').textContent)));
+    await d.p.evaluate(() => { document.querySelectorAll('.a2hs-toast').forEach(e => e.remove()); });
+    await fsSet(d.p, { standalone: true, push: 'on' });
+    await d.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-go').click()); await d.p.waitForTimeout(700);
+    C.check('step 4, join: the line opens Crew, and Crew asks its question', (await screenNow(d.p)) === 'screen-crew' && await d.p.evaluate(() => !!document.querySelector('#crew-body .cr-ask, #crew-body .cr-yes, #crew-body [onclick*="crewAnswer"]')));
+    await d.p.evaluate(() => goTo('home')); await d.p.waitForTimeout(400);
+    await fsSet(d.p, { answer: 'yes' });
+    await d.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-go').click()); await d.p.waitForTimeout(500);
+    C.check('step 5, photo: the line opens Your photo', await d.p.evaluate(() => /Your photo/.test((document.querySelector('#hist-overlay .readiness-title') || {}).textContent || '')));
+    await d.p.evaluate(() => closeHistorySheet());
+    await d.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-ring').click()); await d.p.waitForTimeout(300);
+    await d.p.evaluate(() => document.querySelectorAll('#hist-overlay .fs-row')[4].click()); await d.p.waitForTimeout(400);
+    C.check('…from the sheet, the same photo sheet, and ‹ Back returns to the five', await d.p.evaluate(() => !!document.querySelector('#hist-overlay .sheet-back') && /Your photo/.test(document.querySelector('#hist-overlay .readiness-title').textContent)));
+    await d.p.evaluate(() => sheetBack()); await d.p.waitForTimeout(300);
+    C.check('…Back shows the First Serve sheet again', await d.p.evaluate(() => !!document.querySelector('#hist-overlay .fs-list')));
+    await d.ctx.close();
+    const f = await fsOpen();
+    await homeWait(f.p);
+    await f.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-go').click()); await f.p.waitForTimeout(500);
+    C.check('step 1, the first session: the line opens the day Home suggests', await f.p.evaluate(() => { const dv = document.getElementById('day-view'); return !!dv && !dv.hidden && document.getElementById('home-overview').hidden; }));
+    await f.ctx.close();
+
+    // ── THE PHONE'S BOX: not on load, not on the line, not on the sheet, and only inside the button of the ask the athlete's own tap puts up
+    const q = await fsOpen({ hist: histAgo(1), opts: { init: BOX } });
+    await homeWait(q.p);
+    await fsSet(q.p, { standalone: true });
+    const b0 = await box(q.p), shown0 = await fsSlot(q.p);
+    C.check('the page loaded and First Serve\'s line is on Home: the phone\'s box was never opened', !!shown0 && shown0.line === 'Next: turn on notifications' && b0 === 0, String(b0));
+    await q.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-ring').click()); await q.p.waitForTimeout(300);
+    await q.p.evaluate(() => closeHistorySheet());
+    C.check('…and not on opening the ring\'s sheet either', (await box(q.p)) === 0);
+    await q.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-go').click()); await q.p.waitForTimeout(500);
+    let tt = await toast(q.p);
+    C.check('a tap on "Next: turn on notifications" puts up the ask: one line with a "Turn them on" button, and the box is still shut', !!tt && tt.action === 'Turn them on' && /Reminders/.test(tt.text) && (await box(q.p)) === 0, JSON.stringify(tt));
+    await q.p.waitForTimeout(6500);
+    C.check('…it waits for them (it does not fade), and the box is still shut', !!(await toast(q.p)) && (await box(q.p)) === 0);
+    await q.p.evaluate(() => document.querySelector('#aaToast .aa-toast-x').click()); await q.p.waitForTimeout(250);
+    await q.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-go').click()); await q.p.waitForTimeout(400);
+    C.check('"Not now", then the step again: the line comes back (their own tap, every time), the box still shut', !!(await toast(q.p)) && (await box(q.p)) === 0);
+    await q.p.evaluate(() => document.querySelector('#aaToast .aa-toast-go').click()); await q.p.waitForTimeout(700);
+    C.check('only the button\'s tap opens the box: exactly once, inside that click', (await box(q.p)) === 1 && await q.p.evaluate(() => window.__BOX[0] === 'requestPermission'), String(await box(q.p)));
+    C.check('…no page errors', !q.p.errs.length, q.p.errs.join(' | '));
+    await q.ctx.close();
+    // the ring's sheet is the same: its notifications row puts up the line and nothing else
+    const q2 = await fsOpen({ hist: histAgo(1), opts: { init: BOX } });
+    await homeWait(q2.p);
+    await q2.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-ring').click()); await q2.p.waitForTimeout(300);
+    await q2.p.evaluate(() => document.querySelectorAll('#hist-overlay .fs-row')[2].click()); await q2.p.waitForTimeout(500);
+    tt = await toast(q2.p);
+    C.check('the sheet\'s "Turn on notifications" row is the same ask: its button, the box shut until it is tapped', !!tt && tt.action === 'Turn them on' && (await box(q2.p)) === 0 && !(await q2.p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))), JSON.stringify(tt));
+    await q2.ctx.close();
+    // already answered: the step is not a button and the line asks nothing
+    for (const [state, want] of [['on', 'on'], ['blocked', 'blocked']]) {
+      const w = await fsOpen({ hist: histAgo(1), opts: { init: BOX } });
+      await homeWait(w.p);
+      await fsSet(w.p, { standalone: true, push: state });
+      const sw = await fsSlot(w.p);
+      C.check(`push ${want}: First Serve moves past the step, and nothing at all is asked`, !!sw && sw.line === 'Next: join the crew' && !(await toast(w.p)) && (await box(w.p)) === 0, JSON.stringify(sw));
+      await w.ctx.close();
+    }
+    const src = require('fs').readFileSync(path.join(__dirname, '..', '..', 'program.html'), 'utf8');
+    const fsSrc = src.slice(src.indexOf('const FS_DAYS'), src.indexOf('async function paintWeekSugg'));
+    C.check('First Serve\'s code never opens the phone\'s box itself: no requestPermission, no enable(), only pushAsk()', !/requestPermission|AAPush\.enable|pushTurnOnHere\(/.test(fsSrc) && /pushAsk\('serve'/.test(fsSrc), '');
+
+    // ── never to a veteran, never in the demo, and the 14 days
+    const never = [
+      ['a second cycle (currentCycleIndex 1) with a session two days ago', { prog: { idx: 1 }, hist: histAgo(2) }],
+      ['a first session 20 days ago', { hist: histAgo(20) }],
+      ['a first session 14 days ago', { hist: histAgo(14) }],
+      ['no session yet, and a cycle that started 20 days ago', { prog: { startAgo: 20 } }]];
+    for (const [name, o] of never) {
+      const v = await fsOpen(o);
+      await homeWait(v.p);
+      C.check(`never to a veteran or past the 14 days: ${name}`, !(await fsSlot(v.p)) && !(await v.p.evaluate(() => firstServeWanted())), JSON.stringify(await fsSlot(v.p)));
+      await v.ctx.close();
+    }
+    const vt = await open(browser, { opts: { init: BOX } });   // the default fixture is a second-cycle athlete with a session 2 days ago
+    await homeWait(vt.p);
+    C.check('…the everyday fixture (a veteran) has no First Serve, and the guide does not describe it', !(await fsSlot(vt.p)) && !/First Serve/.test(await vt.p.evaluate(() => buildAppGuideCards())));
+    await vt.ctx.close();
+    const within = [['a first session 13 days ago', { hist: histAgo(13) }], ['no session yet, and a cycle that started 13 days ago', { prog: { startAgo: 13 } }]];
+    for (const [name, o] of within) {
+      const v = await fsOpen(o);
+      await homeWait(v.p);
+      C.check(`still inside the 14 days: ${name}`, !!(await fsSlot(v.p)), '');
+      await v.ctx.close();
+    }
+    const dm = await fsOpen({ opts: { query: '?client=demo', init: BOX }, stub: { demo: newProg() } });
+    await dm.p.waitForTimeout(800);
+    C.check('the demo shows no First Serve, and the box is never opened', !(await dm.p.evaluate(() => !!document.querySelector('.fs-slot') || firstServeWanted())) && (await box(dm.p)) === 0);
+    await dm.ctx.close();
+    const pv = await fsOpen({ opts: { query: '?client=rel01_athlete&preview=1', init: BOX } });
+    await pv.p.waitForTimeout(800);
+    C.check('…nor the coach\'s preview', !(await pv.p.evaluate(() => !!document.querySelector('.fs-slot') || firstServeWanted())) && (await box(pv.p)) === 0);
+    await pv.ctx.close();
+
+    // ── steps that do not apply to this athlete are not in the list
+    const u13 = await fsOpen({ b: { me: { answer: null, can_post: false, under13: true } } });
+    await homeWait(u13.p);
+    s = await fsSlot(u13.p);
+    C.check('an athlete under 13 has no crew and no photo to do: 0/3, and the line says the session', !!s && s.ring === '0/3', JSON.stringify(s));
+    await u13.ctx.close();
+    const no = await fsOpen({ b: { me: { answer: 'no', can_post: false } } });
+    await homeWait(no.p);
+    s = await fsSlot(no.p);
+    C.check('someone who answered no to the crew is not asked again: 0/3, no join and no photo', !!s && s.ring === '0/3', JSON.stringify(s));
+    await no.ctx.close();
+    const np = await fsOpen({ b: { noPages: true, me: { answer: null, can_post: false } } });
+    await homeWait(np.p);
+    s = await fsSlot(np.p);
+    C.check('a server with a crew but no Lounge (no faces): no photo step, 0/4', !!s && s.ring === '0/4', JSON.stringify(s));
+    await np.ctx.close();
+    const nb = await fsOpen({ bell: null });
+    await nb.p.waitForTimeout(1800);
+    s = await fsSlot(nb.p);
+    C.check('no crew at all (the server never answers the Bell): only what can be done, 0/3', !!s && s.ring === '0/3', JSON.stringify(s));
+    await nb.ctx.close();
+    const un = await fsOpen();
+    await homeWait(un.p);
+    await fsSet(un.p, { push: 'unsupported' });
+    s = await fsSlot(un.p);
+    C.check('a browser that cannot take notifications has no notifications step: 0/4', !!s && s.ring === '0/4' && s.line === 'Next: finish your first session', JSON.stringify(s));
+    await un.ctx.close();
+    // the line waits for the crew to answer once, so the steps do not change under it
+    const sl = await fsOpen({ bell: null, stub: { stall: { get_bell: true, get_bell_if_new: true } } });
+    await sl.p.waitForTimeout(1500);
+    C.check('while the crew has not answered the line is not drawn yet (no 3/3 that turns into 5)', !(await fsSlot(sl.p)));
+    await sl.ctx.close();
+
+    // ── the guide names it while it is on Home
+    const gd = await fsOpen();
+    await homeWait(gd.p);
+    const guide = await gd.p.evaluate(() => buildAppGuideCards());
+    C.check('the guide has a card First Serve while the line is on Home: the five steps, "Next: …", the ring, and that the phone is asked only on its button, in plain words', /First Serve: your first week/.test(guide) && /<strong>First Serve<\/strong>/.test(guide) && /Next: add the app to your Home Screen/.test(guide) && /2\/5/.test(guide) && /only when you tap its button/.test(guide)
+      && !/[—;]/.test((guide.match(/<strong>First Serve<\/strong>[\s\S]*?<\/p><p>[\s\S]*?<\/p>/) || [''])[0]), '');
+    await gd.ctx.close();
+
+    // ── 320 px and dark: the ring and the line fit, and nothing scrolls sideways
+    const nr = await fsOpen({ opts: { w: 320, h: 640 } });
+    await homeWait(nr.p);
+    const m = await nr.p.evaluate(() => { const r = n => document.querySelector(n).getBoundingClientRect(); return { sw: document.documentElement.scrollWidth, iw: innerWidth, ring: Math.round(r('.fs-ring').width), go: Math.round(r('.fs-go').width), h: Math.round(r('.fs-slot').height), lineBottom: Math.round(r('.fs-go').bottom), slotBottom: Math.round(r('.fs-slot').bottom) }; });
+    C.check('320 px: the ring is 44 px, the line has room, nothing scrolls sideways and the line stays inside its frame', m.sw <= m.iw && m.ring === 44 && m.go >= 150 && m.lineBottom <= m.slotBottom, JSON.stringify(m));
+    await nr.ctx.close();
+    const dk = await fsOpen({ opts: { dark: true } });
+    await homeWait(dk.p);
+    const dc = await dk.p.evaluate(() => { const r = document.querySelector('.fs-ring'); return { ringBg: getComputedStyle(r, '::after').backgroundColor, card: getComputedStyle(document.querySelector('.fs-slot')).backgroundColor, ink: getComputedStyle(r.querySelector('span')).color }; });
+    C.check('dark mode: the ring\'s middle is the card\'s own colour and its number is light', dc.ringBg === dc.card && /^rgb\((2[0-9]{2}|1[89][0-9])/.test(dc.ink), JSON.stringify(dc));
+    await dk.ctx.close();
+  }
+
+  // ── 23. the pictures for step 8 (390 px): First Serve's line on Home, light and dark, and its sheet, light and dark ─────────────────────────────────────────
+  if (on(23)) {
+    for (const dark of [false, true]) {
+      const x = await fsOpen({ hist: histAgo(1), opts: { dark } });
+      await homeWait(x.p);
+      await fsSet(x.p, { standalone: true });
+      await x.p.evaluate(() => { const e = document.getElementById('home-sugg-wrap'); e.scrollIntoView({ block: 'center' }); });
+      await x.p.waitForTimeout(300);
+      await x.p.screenshot({ path: path.join(out, 'first-serve-line-' + (dark ? 'dark' : 'light') + '-390.png') });
+      await x.p.evaluate(() => document.querySelector('#home-sugg-wrap .fs-ring').click()); await x.p.waitForTimeout(500);
+      await x.p.screenshot({ path: path.join(out, 'first-serve-sheet-' + (dark ? 'dark' : 'light') + '-390.png') });
+      await x.ctx.close();
+    }
   }
 
 

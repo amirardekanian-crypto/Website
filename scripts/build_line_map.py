@@ -92,8 +92,8 @@ DECOR = re.compile(r'[═─=_\-—•*]{2,}')
 LETTERS = re.compile(r'[A-Za-z]{3}')
 
 REF_CEILING = 30 * 1024
-# The fallback sits 1 KB under the ceiling, not well under it: the terse form of every file
-# here is around 24 KB, so there is always a safe landing, and the richer form should be used
+# The fallback sits 1 KB under the ceiling, not well under it: the terse form of program.html's map
+# was 24 KB and is 29 KB at 1,100 functions (2026-10-24), so there is a safe landing for a while yet, and the richer form should be used
 # whenever it genuinely fits. A file that outgrows even the terse form is a hard error below.
 RICH_BUDGET = REF_CEILING - 1024
 PURPOSE_MAX = 78
@@ -248,9 +248,10 @@ def render(src, what, lines, funcs, blocks, screens, rich):
                 for k in range(0, len(run), 6):
                     body.append('- %s%s' % ('also: ' if k == 0 else '', ' · '.join(run[k:k + 6])))
         else:
+            # a comma, not the middle dot of the rich form: it is 2 bytes a name, and 1,100 names are what brought this file to the ceiling (2026-10-24)
             run = ['%s %d' % (name, ln) for name, ln, _, _ in rows]
             for k in range(0, len(run), 6):
-                body.append('- ' + ' · '.join(run[k:k + 6]))
+                body.append('- ' + ', '.join(run[k:k + 6]))
         body.append('')
 
     return '\n'.join(head + body).rstrip() + '\n'
