@@ -91,11 +91,41 @@ async function b13(browser) {
   await ctx.close();
 }
 
+// ═════════ B24: the install card is a layer, and never over a day ═════════
+async function b24(browser) {
+  const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), stub: { library: H.library() } });
+  await p.evaluate(() => { localStorage.removeItem('a2hs_dismissed_v1'); });
+  const card = () => p.evaluate(() => !!document.querySelector('.a2hs-toast'));
+  const depth = () => p.evaluate(() => history.length);
+  // A day is open (its finish card is in there): the ask waits.
+  await p.evaluate(() => openDayView('1')); await p.waitForTimeout(500);
+  await p.evaluate(() => maybeOfferInstall()); await p.waitForTimeout(600);
+  t.check('B24: with a day open (where the finish card is) the install card does not open', !(await card()));
+  // Home again: it comes by itself.
+  await p.evaluate(() => closeDayView()); await p.waitForTimeout(1600);
+  t.check('B24: closing the day: the install card comes on the way home', await card());
+  const url0 = await p.evaluate(() => location.href);
+  // The phone's Back closes it and the app stays.
+  await p.goBack(); await p.waitForTimeout(700);
+  const after = await p.evaluate(() => ({ card: !!document.querySelector('.a2hs-toast'), same: location.href, key: localStorage.getItem('a2hs_dismissed_v1'), loaded: document.getElementById('home-overview') && !document.getElementById('home-overview').hidden }));
+  t.check('B24: the phone\'s Back closes the install card and leaves the app where it was', !after.card && after.same === url0 && after.loaded, JSON.stringify(after));
+  t.check('B24: Back is not a "Not now": nothing is stored, so it is asked again later', after.key === null, String(after.key));
+  // The card's own Not now is unchanged: it dismisses for good and leaves no stale Back entry.
+  await p.evaluate(() => { showInstallOffer(); }); await p.waitForTimeout(500);
+  t.check('B24: shown again, the card is there', await card());
+  await p.click('.a2hs-toast [data-a2hs-dismiss]'); await p.waitForTimeout(700);
+  const d = await p.evaluate(() => ({ card: !!document.querySelector('.a2hs-toast'), key: localStorage.getItem('a2hs_dismissed_v1'), armed: BACKNAV.armed }));
+  t.check('B24: Not now still dismisses for good, and leaves no stale Back entry', !d.card && d.key === '1' && !d.armed, JSON.stringify(d));
+  t.check('B24: no page errors', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await b25(browser);
   await kgButtons(browser);
   await b13(browser);
+  await b24(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

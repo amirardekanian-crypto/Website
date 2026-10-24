@@ -9596,6 +9596,7 @@ function openDayView(dayId) {
 // Return from a day's workout back to the home overview.
 function closeDayView() {
   dropClockOffer();
+  if (window.maybeOfferInstall && maybeOfferInstall.waiting) setTimeout(maybeOfferInstall, 900);   // the install ask that waited for the day to close (B24)
   const ov = document.getElementById('home-overview');
   const dv = document.getElementById('day-view');
   if (dv) dv.hidden = true;
@@ -11238,6 +11239,7 @@ function topLayer() {
   const on = id => { const e = document.getElementById(id); return !!(e && e.classList.contains('visible')); };
   if (document.querySelector('.unit-menu')) return () => closeUnitMenu(true);   // the unit menu is the top of anything it opened over
   if (document.querySelector('.wel')) return () => { const w = document.querySelector('.wel'); if (w) w.remove(); };   // the Welcome sits over everything
+  if (document.querySelector('.a2hs-toast')) return closeInstallOffer;   // the install card (B24): Back closes it, and it stays unanswered
   if (document.querySelector('.hl-moment')) return closeMoment;   // a cycle's moment (Highlight Reel), the Welcome's recipe
   const vm = document.querySelector('.video-modal.is-open');
   if (vm) return () => window.VideoModal && window.VideoModal.close();
@@ -11261,6 +11263,13 @@ function topLayer() {
   const dv = document.getElementById('day-view');
   if (dv && !dv.hidden) return closeDayView;
   return null;
+}
+// Back on the install card: it slides away like Not now, but nothing is stored, so it is asked again on a later open.
+function closeInstallOffer() {
+  const el = document.querySelector('.a2hs-toast');
+  if (!el) return;
+  el.classList.remove('is-visible');
+  setTimeout(() => { el.remove(); navSync(); }, 300);
 }
 function navSync() {
   if (window.IS_PREVIEW) return;
@@ -11299,6 +11308,7 @@ function initBackNav() {
     if (e) mo.observe(e, { attributes: true, attributeFilter: ['class', 'hidden'] });
   });
   document.querySelectorAll('.screen').forEach(e => mo.observe(e, { attributes: true, attributeFilter: ['class'] }));
+  new MutationObserver(() => navSync()).observe(document.body, { childList: true });   // the install card is drawn into the body by shared.js
   navSync();
 }
 
@@ -19741,6 +19751,9 @@ function maybeOfferInstall() {
   const signin = document.getElementById('signin-screen');
   if (signin && signin.classList.contains('visible')) return;
   if (!hasFinishedASession()) return;
+  const dv = document.getElementById('day-view');
+  if (dv && !dv.hidden) { maybeOfferInstall.waiting = true; return; }   // a day is open: the finish card (Your rating, Reset session) is under it. Ask on the way home
+  maybeOfferInstall.waiting = false;
   showInstallOffer();
 }
 window.maybeOfferInstall = maybeOfferInstall;
