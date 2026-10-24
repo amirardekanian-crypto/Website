@@ -14513,12 +14513,11 @@ function openCrewReply(postId) {
   const go = m.querySelector('.cr-go'), err = m.querySelector('.cr-err');
   try { ta.value = String(localStorage.getItem(crewRepKeepKey(postId)) || '').slice(0, 140); } catch (e) {}
   const sync = () => { cnt.textContent = ta.value.length + ' / 140'; go.disabled = !ta.value.trim(); };
-  ta.addEventListener('input', () => {
-    sync();
-    try { if (ta.value) _lsRawSet(crewRepKeepKey(postId), ta.value); else localStorage.removeItem(crewRepKeepKey(postId)); } catch (e) {}
-  });
+  // What is in the field is kept as it changes: by typing, and by a name picked from the crew's row (which sets the field without an input event).
+  const keep = () => { try { if (ta.value) _lsRawSet(crewRepKeepKey(postId), ta.value); else localStorage.removeItem(crewRepKeepKey(postId)); } catch (e) {} };
+  ta.addEventListener('input', () => { sync(); keep(); });
   go.addEventListener('click', () => crewReplySend(postId, go, ta, err));
-  crewMnStart(ta, it, err, sync);   // typing @ opens the crew's names above the field (step 7)
+  crewMnStart(ta, it, err, () => { sync(); keep(); });   // typing @ opens the crew's names above the field (step 7)
   sync();
   ov.classList.add('visible');
 }

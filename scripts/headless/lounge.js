@@ -1709,6 +1709,17 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('…no page errors', !r.p.errs.length, r.p.errs.join(' | '));
     await r.ctx.close();
 
+    // main's unsent-reply draft (crew.js) and the row of names meet here: a name tapped in the row sets the field without a keystroke, and the draft must still hold it
+    const dr = await open(browser);
+    await goCrew(dr.p); await replyOpen(dr.p, P_MINA);
+    await typeIn(dr.p, 'Nice one @Sa'); await chipTap(dr.p, 0);
+    await dr.p.evaluate(() => closeHistorySheet()); await dr.p.waitForTimeout(300);
+    await replyOpen(dr.p, P_MINA);
+    const drv = await mnState(dr.p);
+    C.check('an unsent reply comes back with the name tapped in the row in it (the draft is kept by a tap as well as by a key)', !!drv && drv.value === 'Nice one @Sara T. ', JSON.stringify(drv));
+    C.check('…no page errors', !dr.p.errs.length, dr.p.errs.join(' | '));
+    await dr.ctx.close();
+
     // an athlete under 13 reads only: the words, no doors; and a server without stage96 has no row and sends the words as typed
     const u = await open(browser, { bell: withReplies(P_MINA, reps, { me: { under13: true, can_post: false } }) });
     await goCrew(u.p);
