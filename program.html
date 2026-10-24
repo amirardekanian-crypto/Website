@@ -14845,7 +14845,7 @@ function plGameOpen(id) {
   const f = PL_FIELDS[_gameOpen], g = plGameClean(c && c.p.game);
   _gameDraft = f ? (f.f === 'ig' ? (g.ig ? '@' + g.ig : '') : g[f.f] || '') : '';
   _playerForce = true; renderPlayerPage(); _playerForce = false;
-  if (f) setTimeout(() => { const i = document.getElementById('pl-gin'); if (i) { try { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } catch (e) {} } }, 30);
+  if (f) { const i = document.getElementById('pl-gin'); if (i) { try { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } catch (e) {} } }   // inside the tap: an iPhone raises the keyboard only for a focus made in the tap itself
 }
 function plGameType(el) { _gameDraft = el.value; if (_gameErr) { _gameErr = ''; const e = document.getElementById('pl-gerr'); if (e) e.textContent = ''; } }
 // The page is not redrawn under a field while it has the keyboard (nobody is moved off what they are typing); it catches up a moment after, so a tap on Save still lands.
@@ -14868,7 +14868,7 @@ function plGameSave(id) {
     if (v && !PL_IG_RE.test(v)) {
       _gameDraft = inp.value; _gameErr = 'Use letters, numbers, dots and underscores only, 30 at most.';
       _playerForce = true; renderPlayerPage(); _playerForce = false;
-      setTimeout(() => { const i = document.getElementById('pl-gin'); if (i) i.focus(); }, 30);
+      const i = document.getElementById('pl-gin'); if (i) i.focus();
       return;
     }
   }
