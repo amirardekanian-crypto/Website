@@ -5,6 +5,14 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-24 · Round 6 'Players' Lounge': build the rest, plan each step first.** He gave the one reward call I left open (*"the idea
+  69 gives the memeber 10% discount to the new memeber, and 10% to themselves"*), cut one (*"cut idea 61"*, Doubles; no reason given,
+  and the page had already said the evidence for it was weak), then: *"get ready to build the rest / first for each step, we want to
+  plan / give me some suggestions, directions of how we can do it, what you think is best, then we build / easier jobs should be done
+  by easier agents, use as many agents as you need"*. What it teaches: a round he likes becomes a build programme at once, and he
+  wants the plan per step (directions + my pick) before any code, with the mechanical work on cheaper agents. Page:
+  https://claude.ai/artifact/TQz3VhH61WvqPqXiG32K28
+
 - **2026-10-19 · Achievements: "go with your picks".** He asked for it: *"a good big section on achievements ... everything we think is good to be
   celebrated and will help them to move more"*. The page listed all 22 by the four kinds with real counts, 15 new ones (each with why it moves them
   more and how many would hold it today), quiet back-pay and three looks (Four Courts recommended); he took all of it. What it teaches: he wants a
