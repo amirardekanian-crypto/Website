@@ -78,7 +78,7 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
       h.role === 'Strength & conditioning coach' && h.roleCaps === 'uppercase' && /Space Mono/.test(h.roleFont) && h.roleSize === '11px' && h.roleColor === GREY, JSON.stringify([h.role, h.roleCaps, h.roleFont, h.roleSize, h.roleColor]));
     t.check('header: no photo or avatar in it (his photo is in the panel)', !h.headImg, String(h.headImg));
     t.check('the old Coach parts are gone (hero, avatar, coloured tiles, Tap to read, section labels, the old row)', h.old.length === 0, h.old.join());
-    t.check('order top to bottom: header, the panel, the number, Notes from Amir, the notes, then the one door row', h.order === 'coach-head coach-panel coach-num prog-sec cn-list hrow', h.order);
+    t.check('order top to bottom: header, the panel, the number, the one door row (How the app works), then Notes from Amir and the notes', h.order === 'coach-head coach-panel coach-num hrow prog-sec cn-list', h.order);
     t.check('no page errors (header)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
@@ -236,7 +236,7 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
         line: v.textContent.trim(), lineCls: v.className, lineFont: vc.fontFamily.split(',')[0].replace(/["']/g, ''), arrow: a.textContent.trim(), arrowF: [ac.fontSize, ac.color].join('|'), icon: ic && Math.round(ic.getBoundingClientRect().width) + 'x' + Math.round(ic.getBoundingClientRect().height), iconColor: ic && getComputedStyle(ic.parentElement).color,
         helpGlyph: !!ic && ic.innerHTML.indexOf('M9.09 9a3 3 0 0 1 5.83 1') > -1,
         sibling: (r.previousElementSibling || {}).className || '', h: Math.round(r.getBoundingClientRect().height), w: Math.round(r.getBoundingClientRect().width), left: Math.round(r.getBoundingClientRect().left), gutter: parseFloat(getComputedStyle(document.body).getPropertyValue('--g')),
-        secBefore: [...s.querySelectorAll('.prog-sec')].map(e => e.textContent.trim()) }; })()`);
+        secBefore: [...s.querySelectorAll('.prog-sec')].map(e => e.textContent.trim()), secAfterDoor: !!(r.compareDocumentPosition(s.querySelector('.prog-sec')) & Node.DOCUMENT_POSITION_FOLLOWING) }; })()`);
     t.check('door row: exactly one, a <button> that calls openHelp()', d.n === 1 && d.tag === 'BUTTON' && d.onclick === 'openHelp()', JSON.stringify([d.n, d.tag, d.onclick]));
     // Named after the sheet it opens, as the Account page's row to that same sheet already is (Amir, 2026-10-19). It was
     // "Using the app" over a LOUDER "How the app works" — the same thing twice — because the prose sat in the figure's slot.
@@ -248,7 +248,7 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
     // headline (Barlow 600, 16 px, ink, sentence case); Home's habits row carries one ("3 to go"), so its name is the quiet green label.
     t.check('door row: its name is the headline voice, and Home\'s habits row — which carries a figure — is the quiet green label instead',
       d.labelF === 'Barlow|16px|600|normal|rgb(26, 26, 26)|none' && homeRow.label === 'Barlow|13px|600|normal|rgb(14, 74, 54)|none' && d.labelF !== homeRow.label, JSON.stringify([d.labelF, homeRow.label]));
-    t.check('door row: a 22 px green line icon, the help glyph; on the gutter; no section label above it (the only title is Notes from Amir, which is above the notes)', d.icon === '22x22' && d.iconColor === GREEN && d.helpGlyph && d.left === d.gutter && d.sibling.indexOf('cn-list') > -1 && d.secBefore.join() === 'Notes from Amir', JSON.stringify([d.icon, d.iconColor, d.helpGlyph, d.left, d.gutter, d.sibling, d.secBefore]));
+    t.check('door row: a 22 px green line icon, the help glyph; on the gutter; no section label above it (the only title is Notes from Amir, which is BELOW the door now, above the notes)', d.icon === '22x22' && d.iconColor === GREEN && d.helpGlyph && d.left === d.gutter && d.sibling.indexOf('coach-num') > -1 && d.secBefore.join() === 'Notes from Amir' && d.secAfterDoor, JSON.stringify([d.icon, d.iconColor, d.helpGlyph, d.left, d.gutter, d.sibling, d.secBefore]));
     await tap(p, '#screen-notes .hrow');
     const sheet = await p.evaluate(() => { const ov = document.getElementById('hist-overlay'); return { shown: ov.classList.contains('visible'), title: (ov.querySelector('.readiness-title') || {}).textContent, cards: ov.querySelectorAll('.help-list .note-card').length, screen: document.querySelector('.screen.active').id }; });
     t.check('tapping it opens the help sheet (How the app works, with the guide cards), the Coach tab still behind it', sheet.shown && sheet.title === 'How the app works' && sheet.cards >= 10 && sheet.screen === 'screen-notes', JSON.stringify(sheet));

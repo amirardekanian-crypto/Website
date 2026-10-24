@@ -10989,8 +10989,8 @@ function renderNotes() {
 
   document.getElementById('notes-container').innerHTML =
     coachContactHtml() +
-    (rows ? `<div class="prog-sec">Notes from Amir</div><div class="cn-list">${rows}</div>` : '') +
-    door;
+    door +   // first, above the notes: it is where a new athlete starts, so it must not sit under seven notes (2026-10-24)
+    (rows ? `<div class="prog-sec">Notes from Amir</div><div class="cn-list">${rows}</div>` : '');
 }
 
 // "How the app works" — the general how-to content shown to every athlete in the

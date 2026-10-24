@@ -1,6 +1,7 @@
 // Love All round 2, the paint group (2026-10-24): node scripts/headless/love-all-paint.js
 //   AVATAR  no ochre tan (#C57D52, #E3966C) behind Amir's initials or anywhere else the app draws; white on clay clears 3:1.
 //   EARLY   the theme is on before the first paint: the loading screen itself draws dark on a dark phone, or with a stored 1; a stored 0 stays light.
+//   DOOR    "How the app works" is the first row on the Coach tab, above Amir's notes, and still opens the help sheet.
 // Serve the repo first (python -m http.server <port>; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js).
 'use strict';
 const fs = require('fs');
@@ -75,10 +76,28 @@ async function early(browser) {
   await ctx.close();
 }
 
+async function door(browser) {
+  const P = H.fixture(); P.notes = { greeting: 'For You', cards: [1, 2, 3].map(i => ({ icon: '🛌', title: 'Note ' + i, body: '<p>Body ' + i + '</p>' })) };
+  const { ctx, p } = await H.openProgram(browser, { prog: P });
+  await p.evaluate(() => { window.scrollTo(0, 0); goTo('notes'); }); await p.waitForTimeout(500);
+  const o = await p.evaluate(() => {
+    const s = document.getElementById('screen-notes'), d = s.querySelector('.hrow'), sec = s.querySelector('.prog-sec');
+    return { label: d.querySelector('.hrow-l').textContent.trim(), above: !!(d.compareDocumentPosition(sec) & Node.DOCUMENT_POSITION_FOLLOWING), top: Math.round(d.getBoundingClientRect().top), secTop: Math.round(sec.getBoundingClientRect().top),
+      rowsBelow: [...s.querySelectorAll('.cn-row')].every(r => d.compareDocumentPosition(r) & Node.DOCUMENT_POSITION_FOLLOWING), n: s.querySelectorAll('.hrow').length };
+  });
+  t.check('DOOR: "How the app works" is above "Notes from Amir" and every note, and there is still only one', o.label === 'How the app works' && o.above && o.rowsBelow && o.n === 1 && o.top < o.secTop, JSON.stringify(o));
+  await p.click('#screen-notes .hrow');
+  await p.waitForTimeout(300);
+  t.check('DOOR: a tap on it opens the help sheet', await p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible') && /How the app works/.test(document.getElementById('hist-overlay').textContent)));
+  t.check('DOOR: no page errors', !p.errs.length, p.errs.join(' | '));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await avatar(browser);
   await early(browser);
+  await door(browser);
   await browser.close();
   const failed = t.report();
   process.exit(failed ? 1 : 0);
