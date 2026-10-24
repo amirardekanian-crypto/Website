@@ -10,7 +10,7 @@ const H = require('./lib');
 // A local calendar day n days from today, as YYYY-MM-DD (noon, so a clock change cannot move it).
 const calDay = n => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-const short = iso => { const [, m, d] = iso.split('-').map(Number); return MON[m - 1] + ' ' + d; };
+const short = iso => { const [, m, d] = iso.split('-').map(Number); return d + ' ' + MON[m - 1]; };
 const sideways = p => p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
 const active = p => p.evaluate(() => document.querySelector('.screen.active').id);
 const norm = s => String(s || '').replace(/\s+/g, ' ').trim();
@@ -136,7 +136,7 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     const c = await p.evaluate(() => { const card = document.querySelector('#cycle-card-wrap .cyc-card'); const q = s => card.querySelector(s);
       return { top: q('.cyc-top').innerText.replace(/\s+/g, ' ').trim(), fin: q('.cyc-fin-h').textContent.trim(), tick: !!q('.cyc-fin-tick svg'), dot: getComputedStyle(q('.cyc-top'), '::before').display, dates: !!q('.cyc-dates'),
         title: q('.cyc-name').innerText.trim(), sub: q('.cyc-fin-s').innerText.replace(/\s+/g, ' ').trim(), cls: card.className }; });
-    t.check('past its end: the eyebrow reads CYCLE COMPLETE · 2 OF 5 (a tick for the dot), the title is still the name, and the line says Finished', c.top === 'CYCLE COMPLETE · 2 OF 5' && c.fin === 'Cycle complete' && c.tick && c.dot === 'none' && !c.dates && c.title === 'LOAD & BUILD' && /^FINISHED [A-Z]{3} \d{1,2} · 5 OF 5 WEEKS$/.test(c.sub), JSON.stringify(c));
+    t.check('past its end: the eyebrow reads CYCLE COMPLETE · 2 OF 5 (a tick for the dot), the title is still the name, and the line says Finished', c.top === 'CYCLE COMPLETE · 2 OF 5' && c.fin === 'Cycle complete' && c.tick && c.dot === 'none' && !c.dates && c.title === 'LOAD & BUILD' && /^FINISHED \d{1,2} [A-Z]{3} · 5 OF 5 WEEKS$/.test(c.sub), JSON.stringify(c));
     await ctx.close();
     const last = await H.openProgram(browser, { prog: prog({ endsIn: -4, idx: 4 }), w: 390, h: 844 });
     await toPlan(last.p);

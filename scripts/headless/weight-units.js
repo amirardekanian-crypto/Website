@@ -83,7 +83,7 @@ const pickUnit = async (p, u, btn = '#sq .ex-set-unit') => {
       sets: [{ w: '6 plates', n: 6, r: '7', d: true }, { w: '6 plates', n: 6, r: '7', d: true }] }] }];
     const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), hist, seed: { _setlog_Barbell_Back_Squat: EMPTY() }, stub: { library: H.library() } });
     await openSquat(p);
-    C.check('no weight today or last time, but the lift was last logged in plates: the card opens in plates', (await unit(p)) === 'plates' && (await boxes(p))[0].ph === 'plates', JSON.stringify([await unit(p), (await boxes(p))[0]]));
+    C.check('no weight on the phone, but the server history has the lift in plates: the card opens in plates and LAST shows the number ("6", Love All B14)', (await unit(p)) === 'plates' && (await boxes(p))[0].ph === '6', JSON.stringify([await unit(p), (await boxes(p))[0]]));
     await ctx.close();
   }
 
