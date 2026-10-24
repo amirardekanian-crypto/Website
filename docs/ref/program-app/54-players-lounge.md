@@ -17,10 +17,10 @@ flag only stage96's `get_bell()` sends). A new screen is a static `.screen` with
 *In the crew*, the board on the tab and its page, the honours names, the Open board's rows and the name in a Bell line. Amir ("Coach") opens the Coach tab.
 Your own name opens your own page; so does *Your page* under your initials and the same row in *Crew and the Bell*. The page (`screen-crewplayer`) is one
 scroll: the person's current cycle picture as the cover (YOUR page: `cycleArt()` of your own current cycle, so exactly your Progress; someone else's: the `art` family they send when it names one of the app's pictures, else `bedrock`; the app never reads a cycle name from the server) with ← on it, their
-face over the cover's foot with `LV n`, the name, *With Amir since June 2026*, **Sara's numbers** as tiles (weeks held, sessions with Amir, personal bests, and
-cheers this season, or comebacks on YOUR page only), the latest three achievements and *All n* (a sheet), the honours, and *This week*, their posts still on the
+face over the cover's foot with `LV n`, the name, *With Amir since June 2026*, **Sara's numbers** as tiles (weeks held, sessions with Amir, personal bests and
+cheers, the same four on every page; the cheers number is every cheer and like that person has had since joining, `cheers.total`, and YOUR page adds your comebacks as a thin row under the tiles, marked *Only you*), the latest three achievements and *All n* (a sheet), the honours, and *This week*, their posts still on the
 Bell, a row each that scrolls Crew to the post. Your own page is sent whole (every block, the comebacks, and `kinds`, your switches) and every part the crew cannot see wears a quiet *Only you*
-(the comebacks always, and any block you switched off); it adds *This is what the crew sees. Parts marked Only you stay with you.* and a door to *What
+(the comebacks row always, and any block you switched off); it adds *This is what the crew sees. Parts marked Only you stay with you.* and a door to *What
 the crew sees of you*. A block the person switched off is not sent to the crew, so it is not drawn on their page (GAME-9); a comeback is never drawn on
 anyone else's page, whatever the server sends. `best_lifts` is sent and never drawn. The join question shows your
 own page first, a face, your name and *26 sessions with Amir · 4 achievements*, then *This is what the crew sees. Never a weight, never your check-in.*; its buttons are as they
@@ -88,7 +88,7 @@ taps, a refusal), who may not (not in the crew, under 13), leaving, never synced
 understandable to any one ... a clapping icon"*), and **Cheered today** in quiet green once it is done. The clap is `CLAP_SVG`, the inline *hands-clapping* icon of Phosphor Icons (MIT, regular weight, 256 box, `currentColor`;
 the first drawing did not read as clapping hands, so Amir had it swapped 2026-10-24; in the sheet's title it is green ink, clay is only the page's button): the 👏 character is yellow on phones and the text variation selector is ignored on iOS, so it is in no string an athlete reads. On someone's page: the
 button (the page's one clay control), under *Joined this week. Say hello.* when they are new; the sheet **Cheer Sara** (a word, 100 characters, a live count, *The crew can see
-your word for 7 days.*, **Send**); and *Cheers this season · 12* with the last week's cheers (face, name or Coach, the word, the day). On Crew, the week band's faces are 40 px
+your word for 7 days.*, **Send**); and *Cheers this week* with the last 7 days' cheers (face, name or Coach, the word, the day; the number is the tile's, so the heading carries none). On Crew, the week band's faces are 40 px
 and each is a door: a mint ring round the ones who held this week, **NEW** under the ones who joined this week, one tap opens their page after 250 ms unless a second tap
 comes, and a double tap cheers at once with no word (a small burst of claps over the face unless the phone asks for less motion, and the toast *Cheer sent to Sara*). A one-line
 hint in the band (*Double-tap a face to cheer. Tap to see their page.*, `<id>_cheerhint`) shows on three visits and goes for good after the first double tap. A cheer pays
@@ -101,7 +101,7 @@ join button. Under 13: no door on a face, no hint, no button.
 | function | job |
 |---|---|
 | `crewBandTap(ev, ck)` | the one-or-two-tap rule on a band face (250 ms; your own face opens your page at once; the tap after a double is ignored). |
-| `crewQuickCheer` / `crewCheerSend` / `crewCheerDone` / `crewCheerFail` | the double tap, the call (`crew_cheer`, 15 s), what the copy of their page becomes (*Cheered today*, the season count, your cheer first), what a refusal says. |
+| `crewQuickCheer` / `crewCheerSend` / `crewCheerDone` / `crewCheerFail` | the double tap, the call (`crew_cheer`, 15 s), what the copy of their page becomes (*Cheered today*, one more on their cheers total, your cheer first), what a refusal says. |
 | `crewCheeredToday(key)` | did you cheer them today, by the server's UTC day (a copy made yesterday is no answer). |
 | `playerActionsHTML` / `playerCheersHTML` / `openCheer` | the button and New Balls line · the list · the sheet. |
 | `crewBurst(el)` / `crewCheerHint()` / `crewHintDone()` | the claps (none under `prefers-reduced-motion`) · the one-time line · its end. |

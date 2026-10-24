@@ -21,6 +21,7 @@
 // stage96 is TOLD by get_bell's top-level `lounge: 1` (the fixture sets it; without it the app draws Crew as it was). YOUR page (no p_subject) is whole: every block, the comebacks, and
 // `kinds` (your switches, a kind not named is on); someone else's has neither.
 // The cheer (step 3): crew_cheer answers like the server (cheerLog, cheerCap, cheerErr); crew_page reads cheerLog for mine_today.
+// Cheers on a page (CONTRACT 9b, "All-time cheers"): `cheers.total` is every cheer and like the person has received since joining (the tile, on every page, yours too); `season` is still sent, and the app does not draw it.
 // Steps 4 to 6: a page's `cycle` (YOUR page: every week of the cycle with days that carry title and mins, plus `done` / `extra`; SOMEONE ELSE'S, CONTRACT 9b: { n, per_week, done, extra, weeks: [this week only] }
 // and days that carry only day and extra: the stub sends exactly what the fixture gives, so a test can also send MORE than the server would), `game` and each achievement's `signed` / `signed_n` come from the `crewPages` entry (none by default, so a
 // page has no cycle, no game and nobody signed); my_game_set answers like CONTRACT 4 and crew_page(own) then carries what it saved (`myGame`; gameMissing, gameErr, gameFail, gameDelay).
@@ -132,13 +133,13 @@
         var first = String(who || '').split(' ')[0];
         var pg = { ck: c.ck || null, me: !!own, who: who, first: first, since: '2026-06-06', joined: '2026-10-19', member: !own || PM.answer === 'yes', under13: !!(own && PM.under13),
           lv: c.lv || null, fv: c.fv || null, art: 'iron', game: null,
-          numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9 }, cheers: { season: 12, recent: [] },
+          numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9 }, cheers: { total: 12, season: 4, recent: [] },
           achievements: [{ id: 'achievement:back_to_back', name: 'Back to Back', day: '2026-10-12', size: 'win', signed: [], signed_n: 0 },
             { id: 'achievement:the_notebook', name: 'The Notebook', day: '2026-10-03', size: 'win', signed: [], signed_n: 0 }],
           honours: [], best_lifts: [], cycle: null, at: new Date().toISOString() };
         // YOUR page is sent whole: every block, the comebacks, and `kinds` (your own switches, a kind not named is on). Someone else's has no comebacks and no `kinds`.
         if (own) { pg.numbers.comebacks = 2; pg.kinds = Object.assign({}, PM.kinds || {}); }
-        else { pg.cheers.mine_today = !!(S.cheerLog && c.ck && S.cheerLog[c.ck]); if (pg.cheers.mine_today) pg.cheers.season = 13; }   // a cheer you sent (crew_cheer) is on their page
+        else { pg.cheers.mine_today = !!(S.cheerLog && c.ck && S.cheerLog[c.ck]); if (pg.cheers.mine_today) { pg.cheers.total = 13; pg.cheers.season = 5; } }   // a cheer you sent (crew_cheer) is on their page
         return pg;
       };
       var merge = function (pg, over) { Object.keys(over || {}).forEach(function (k) { pg[k] = over[k]; }); return pg; };
@@ -328,7 +329,7 @@
         if (S.cheerLog[chsub]) return chbad('crew:cheer_today');
         if (Object.keys(S.cheerLog).length >= (S.cheerCap || 30)) return chbad('crew:cheers_today');
         S.cheerLog[chsub] = { word: chword || null };
-        return res({ data: { ok: true, season: 13 }, error: null, status: 200 });
+        return res({ data: { ok: true, season: 5 }, error: null, status: 200 });
       }
       if (name === 'crew_photo') return res({ data: { id: params && params.p_post, mime: 'image/jpeg', w: 4, h: 5,
         b64: S.photoB64 || '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z' }, error: null, status: 200 });

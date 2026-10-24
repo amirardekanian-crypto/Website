@@ -32,6 +32,7 @@
 // Step 10: the cards (section 26): Share my card opens the player card Progress has, the stamp on a session photo (the parts a post has, an old post, never on a plain photo), Share on your own session photo with that photo as
 // the card's ground, what Tell the crew sends (title, mins, held), the guide. Section 27 takes its pictures.
 // Step 11: the Open wall (section 28): tiles, your mint outline, the first 8 and All 14 ›, the list sheet, a tile opens the page, a server without stage96 keeps the rows, the card names nobody else. Section 29 takes its pictures.
+// All-time cheers (section 30, CONTRACT 9b): the four tiles are the same on every page (weeks held, sessions, bests, cheers = cheers.total), yours adds your comebacks as a thin Only you row under them; the list is "Cheers this week".
 // `--only=14,15` runs just those sections (everything after a "// ── N." line is wrapped in on(N)).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
@@ -246,15 +247,15 @@ const on = n => !ONLY.length || ONLY.includes(n);
   if (on(4)) {
     const ach = [['Back to Back', '2026-10-12'], ['The Notebook', '2026-10-03'], ['First Blood', '2026-09-28'], ['Straight Talk', '2026-09-20']].map(([name, day]) => ({ id: 'achievement:' + name, name, day, size: 'win', signed: [], signed_n: 0 }));
     const { ctx, p } = await open(browser, { stub: { crewPages: {
-      [CK.mina]: { numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9, comebacks: 3 }, cheers: { season: 12, recent: [], mine_today: false }, achievements: ach,
+      [CK.mina]: { numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9, comebacks: 3 }, cheers: { total: 12, season: 4, recent: [], mine_today: false }, achievements: ach,
         honours: [{ month: '2026-09-01', honour: 'sessions', value: { n: 14 } }] },
-      [CK.reza]: { numbers: { weeks: { now: 1, best: 1 } }, cheers: { season: 0, recent: [] }, achievements: null, honours: [] },
-      [CK.sara]: { numbers: { sessions: 3, bests: 1 }, cheers: { season: 2, recent: [] }, achievements: [], honours: [] },
+      [CK.reza]: { numbers: { weeks: { now: 1, best: 1 } }, cheers: { total: 0, recent: [] }, achievements: null, honours: [] },
+      [CK.sara]: { numbers: { sessions: 3, bests: 1 }, cheers: { total: 2, recent: [] }, achievements: [], honours: [] },
     } } });
     await goCrew(p);
     await shown(p, CK.mina);
     const t = await tiles(p);
-    C.check('others\' numbers: weeks held, sessions with Amir, personal bests, cheers this season', JSON.stringify(t) === JSON.stringify(['6 weeks held', '41 sessions with Amir', '9 personal bests', '12 cheers this season']), JSON.stringify(t));
+    C.check('others\' numbers: weeks held, sessions with Amir, personal bests and cheers (the all-time total, never the season\'s 4)', JSON.stringify(t) === JSON.stringify(['6 weeks held', '41 sessions with Amir', '9 personal bests', '12 cheers']), JSON.stringify(t));
     C.check('…titled with the first name, never a he or a she', (await secs(p))[0] === 'Mina\'s numbers', JSON.stringify(await secs(p)));
     C.check('NO comebacks on someone else\'s page, even if the server were to send them', !/comeback/i.test(await text(p, '#crewplayer-body')), t.join('|'));
     const a = await p.evaluate(() => ({ rows: [...document.querySelectorAll('#crewplayer-body .pl-list')][0].querySelectorAll('.pl-row').length,
@@ -271,7 +272,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(250);
     await shown(p, CK.reza);
     const t2 = await tiles(p), s2 = await secs(p);
-    C.check('a switch off: no sessions tile, no bests tile', JSON.stringify(t2) === JSON.stringify(['1 week held', '0 cheers this season']), JSON.stringify(t2));
+    C.check('a switch off: no sessions tile, no bests tile', JSON.stringify(t2) === JSON.stringify(['1 week held', '0 cheers']), JSON.stringify(t2));
     C.check('…no Achievements block (null), no Honours block (none)', s2.join() === 'Reza\'s numbers', s2.join());
     const w = await p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-tiles > div')].map(d => Math.round(d.getBoundingClientRect().width)));
     C.check('…two tiles are a tidy pair', w.length === 2 && Math.abs(w[0] - w[1]) <= 1, w.join());
@@ -302,7 +303,10 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await click(p, '#acct-page'); await p.waitForTimeout(600);
     C.check('…it opens your own page (the sheet closes)', (await screenNow(p)) === 'screen-crewplayer' && !(await p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))) && (await p.evaluate(() => _playerCk)) === 'me');
     const t = await tiles(p);
-    C.check('your numbers: weeks, sessions, bests and COMEBACKS', JSON.stringify(t) === JSON.stringify(['6 weeks held', '41 sessions with Amir', '9 personal bests', '2 comebacks ONLY YOU']), JSON.stringify(t));
+    C.check('your numbers: the same four tiles as everyone\'s (weeks, sessions, bests, cheers) and NO comebacks tile', JSON.stringify(t) === JSON.stringify(['6 weeks held', '41 sessions with Amir', '9 personal bests', '12 cheers']), JSON.stringify(t));
+    const cbr = await p.evaluate(() => { const r = document.querySelector('#crewplayer-body .pl-cb'), g = document.querySelector('#crewplayer-body .pl-tiles'); if (!r) return null; const a = r.getBoundingClientRect(), b = g.getBoundingClientRect();
+      return { text: r.innerText.replace(/\s+/g, ' ').trim(), under: Math.round(a.top - b.bottom), w: Math.round(a.width), gw: Math.round(b.width), h: Math.round(a.height), only: !!r.querySelector('.pl-only'), follows: !!(g.compareDocumentPosition(r) & Node.DOCUMENT_POSITION_FOLLOWING) }; });
+    C.check('…your comebacks are a fifth row under the tiles: thin, as wide as the tiles, marked Only you', !!cbr && /^2 comebacks ONLY YOU$/.test(cbr.text) && cbr.only && cbr.follows && cbr.under >= 0 && cbr.under <= 12 && cbr.w === cbr.gw && cbr.h <= 48, JSON.stringify(cbr));
     C.check('…titled Your numbers', (await secs(p))[0] === 'Your numbers');
     C.check('…and says it is what the crew sees, with a door to what the crew sees of you', /This is what the crew sees/.test(await text(p, '#crewplayer-body')) && /What the crew sees of you/.test(await text(p, '#crewplayer-body .pl-door')));
     C.check('…your own posts are This week', (await p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-wk')].map(r => r.textContent).join('|'))).includes('Day 2 done.'));
@@ -344,7 +348,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(250);
     await p.evaluate(() => { window.__STUB.mode = 'offline'; });
     await shown(p, CK.mina);
-    C.check('no signal: the copy on the phone is drawn, under a quiet "No signal" line', (await tiles(p)).join('|') === '4 weeks held|20 sessions with Amir|2 personal bests|12 cheers this season' && /No signal/.test(await text(p, '#crewplayer-body .pl-quiet') || ''), JSON.stringify(await tiles(p)));
+    C.check('no signal: the copy on the phone is drawn, under a quiet "No signal" line', (await tiles(p)).join('|') === '4 weeks held|20 sessions with Amir|2 personal bests|12 cheers' && /No signal/.test(await text(p, '#crewplayer-body .pl-quiet') || ''), JSON.stringify(await tiles(p)));
     await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(250);
     await shown(p, CK.reza);
     C.check('no signal and never opened: it says so, and shows the name it knows', /No signal/.test(await text(p, '#crewplayer-body .pl-quiet') || '') && (await plain(p, '#crewplayer-body .pl-name')) === 'Reza K.');
@@ -535,7 +539,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
   // ── 11. 320 px, dark mode, long names, and a look ──────────────────────────────────────────────────────────────────────────
   if (on(11)) {
     const long = 'Alexandra Papadopoulou-Richardson';
-    const { ctx, p } = await open(browser, { opts: { w: 320, h: 640, dark: true }, stub: { crewPages: { [CK.mina]: { who: long, first: 'Alexandra', numbers: { weeks: { now: 12, best: 12 }, sessions: 1234, bests: 88 }, cheers: { season: 240, recent: [] },
+    const { ctx, p } = await open(browser, { opts: { w: 320, h: 640, dark: true }, stub: { crewPages: { [CK.mina]: { who: long, first: 'Alexandra', numbers: { weeks: { now: 12, best: 12 }, sessions: 1234, bests: 88 }, cheers: { total: 240, recent: [] },
       achievements: [{ id: 'a:1', name: 'An achievement with a rather long name to wrap', day: '2026-10-12' }], honours: [{ month: '2026-09-01', honour: 'improved', value: { lift: 'Barbell Back Squat', pct: 27.1 } }] } } } });
     await goCrew(p);
     await shown(p, CK.mina);
@@ -550,7 +554,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
   }
   if (on(11)) {
     // the pictures: someone else's page, light; your own, dark, at 390 px
-    const pages = { [CK.mina]: { art: 'iron', numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9 }, cheers: { season: 12, recent: [] },
+    const pages = { [CK.mina]: { art: 'iron', numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9 }, cheers: { total: 12, recent: [] },
       achievements: [{ id: 'a:1', name: 'Back to Back', day: '2026-10-12' }, { id: 'a:2', name: 'The Notebook', day: '2026-10-03' }, { id: 'a:3', name: 'First Blood', day: '2026-09-28' }, { id: 'a:4', name: 'Straight Talk', day: '2026-09-20' }],
       honours: [{ month: '2026-09-01', honour: 'sessions', value: { n: 14 } }] }, me: { art: 'voltage', who: 'Alex R.', lv: 19 } };
     const a = await open(browser, { stub: { crewPages: pages } });
@@ -585,13 +589,13 @@ const on = n => !ONLY.length || ONLY.includes(n);
     // (2) "Only you": the comebacks always, and any block whose switch is off; never on someone else's page
     const ach = [{ id: 'a:1', name: 'Back to Back', day: '2026-10-12', signed: [], signed_n: 0 }, { id: 'a:2', name: 'The Notebook', day: '2026-10-03', signed: [], signed_n: 0 }];
     const hon = [{ month: '2026-09-01', honour: 'sessions', value: { n: 14 } }];
-    const lone = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-only')].map(e => ({ t: e.textContent.trim(), where: e.closest('.pl-tiles > div') ? 'tile:' + e.closest('.pl-tiles > div').innerText.replace(/\s+/g, ' ').trim() : e.closest('.prog-sec') ? 'sec:' + e.closest('.prog-sec').firstChild.textContent.trim() : e.closest('.pl-lv') ? 'lv' : '?' })));
+    const lone = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-only')].map(e => ({ t: e.textContent.trim(), where: e.closest('.pl-tiles > div') ? 'tile:' + e.closest('.pl-tiles > div').innerText.replace(/\s+/g, ' ').trim() : e.closest('.pl-cb') ? 'cb:' + e.closest('.pl-cb').innerText.replace(/\s+/g, ' ').trim() : e.closest('.prog-sec') ? 'sec:' + e.closest('.prog-sec').firstChild.textContent.trim() : e.closest('.pl-lv') ? 'lv' : '?' })));
     const { ctx, p } = await open(browser, { stub: { crewPages: { me: { kinds: { achievement: false, honour: true, level: true }, achievements: ach, honours: hon, lv: 19, best_lifts: [{ lift: 'Trap Bar Deadlift', day: '2026-10-08' }] },
       [CK.mina]: { kinds: { achievement: false }, achievements: ach, honours: hon, numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9, comebacks: 3 } } } } });
     await goCrew(p);
     await p.evaluate(() => openPlayer('me')); await p.waitForTimeout(600);
     let l = await lone(p);
-    C.check('your page: "Only you" on the comebacks tile and on Achievements (its switch is off), nowhere else', l.length === 2 && l.every(x => x.t === 'Only you') && /^tile:2 comebacks/.test(l[0].where) && l[1].where === 'sec:Achievements', JSON.stringify(l));
+    C.check('your page: "Only you" on the comebacks row and on Achievements (its switch is off), nowhere else', l.length === 2 && l.every(x => x.t === 'Only you') && /^cb:2 comebacks/.test(l[0].where) && l[1].where === 'sec:Achievements', JSON.stringify(l));
     C.check('…the label is small grey Space Mono, quiet', await p.evaluate(() => { const s = getComputedStyle(document.querySelector('#crewplayer-body .pl-only')); return /Space Mono/.test(s.fontFamily) && parseFloat(s.fontSize) <= 12 && s.color !== 'rgb(26, 26, 26)'; }));
     const note = await plain(p, '#crewplayer-body .pl-note');
     C.check('…the line stays "This is what the crew sees" and adds "Parts marked Only you stay with you."', note === 'This is what the crew sees. Parts marked Only you stay with you.', note);
@@ -968,7 +972,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     // the page: the button, the sheet, the word, the New Balls line, what was received
     const rec = [{ ck: CK.reza, who: 'Reza K.', fv: null, coach: false, word: 'that sled push looked heavy', day: today }, { ck: null, who: 'Coach', fv: null, coach: true, word: null, day: today },
       { ck: CK.sara, who: 'Sara T.', fv: null, coach: false, word: null, day: iso(now - 86400e3 * 2).slice(0, 10) }];
-    const a = await open(browser, { stub: { crewPages: { [CK.mina]: { cheers: { season: 12, recent: rec, mine_today: false } }, [CK.leila]: { new: true }, me: { cheers: { season: 3, recent: rec.slice(0, 2) } } } } });
+    const a = await open(browser, { stub: { crewPages: { [CK.mina]: { cheers: { total: 12, recent: rec, mine_today: false } }, [CK.leila]: { new: true }, me: { cheers: { total: 3, recent: rec.slice(0, 2) } } } } });
     await goCrew(a.p);
     await shown(a.p, CK.mina);
     const pg = await a.p.evaluate(() => { const b = document.querySelector('#crewplayer-body .pl-cheer'); const cs = b && getComputedStyle(b); return { text: b && b.textContent.trim(), svg: !!(b && b.querySelector('svg')), tag: b && b.tagName,
@@ -977,7 +981,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
       doors: [...document.querySelectorAll('#crewplayer-body button.pl-ch')].length }; });
     C.check('someone else\'s page: one clay button, the clap icon and the word "Cheer" (not "Well played")', pg.text === 'Cheer' && pg.svg && pg.tag === 'BUTTON' && pg.n === 1 && !/Well played/i.test(await text(a.p, '#crewplayer-body')) && /^rgb\(19\d, 8\d, 4\d\)$/.test(pg.bg), JSON.stringify([pg.text, pg.bg]));
     C.check('…no New Balls line for someone who has been here a while', !pg.newline);
-    C.check('…"Cheers this season · 12" and the last week\'s: the face, the name (Coach for Amir), the word, the day', pg.secs.includes('Cheers this season · 12') && pg.rows.length === 3 && /Reza K\./.test(pg.rows[0]) && /that sled push looked heavy/.test(pg.rows[0]) && /Today/.test(pg.rows[0]), JSON.stringify(pg.rows));
+    C.check('…"Cheers this week" and the last 7 days\': the face, the name (Coach for Amir), the word, the day', pg.secs.includes('Cheers this week') && !pg.secs.some(x => /season/i.test(x)) && pg.rows.length === 3 && /Reza K\./.test(pg.rows[0]) && /that sled push looked heavy/.test(pg.rows[0]) && /Today/.test(pg.rows[0]), JSON.stringify(pg.rows));
     C.check('…Coach\'s row says Coach with Amir\'s photo, a word-less row shows the day alone, and a name is a door', /Coach/.test(pg.rows[1]) && /Sara T\./.test(pg.rows[2]) && /\d|Today|Yesterday|[A-Z][a-z]+day/.test(pg.rows[2]) && pg.doors === 3, JSON.stringify(pg.rows));
     C.check('…no 👏 character on the page', await noEmoji(a.p));
     // the sheet
@@ -1000,7 +1004,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('Send: crew_cheer with her key and your word; the sheet closes; "Cheer sent to Mina"', !!sent && sent.p_subject === CK.mina && sent.p_word === 'nice work' && !(await a.p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))) && !!tt && tt.text === 'Cheer sent to Mina', JSON.stringify([sent, tt]));
     const after = await a.p.evaluate(() => ({ cheered: !!document.querySelector('#crewplayer-body .pl-cheered'), btn: !!document.querySelector('#crewplayer-body .pl-cheer'), tile: [...document.querySelectorAll('#crewplayer-body .pl-tiles > div')].map(d => d.innerText.replace(/\s+/g, ' ').trim()).pop(),
       first: (document.querySelector('#crewplayer-body .pl-ch') || {}).innerText }));
-    C.check('…the page now says "Cheered today", the season count moved, and your cheer is the first on her list', after.cheered && !after.btn && /^13 cheers this season/.test(after.tile) && /You/.test(after.first) && /nice work/.test(after.first), JSON.stringify(after));
+    C.check('…the page now says "Cheered today", her cheers total moved by one, and your cheer is the first on her list', after.cheered && !after.btn && /^13 cheers$/.test(after.tile) && /You/.test(after.first) && /nice work/.test(after.first), JSON.stringify(after));
     await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(300);
     // a word that is too long (the field stops it; a pasted one is the server's to refuse), and a line that never answers
     await shown(a.p, CK.reza);
@@ -1039,7 +1043,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(300);
     // your own page: nothing to cheer, but what you received is there
     await a.p.evaluate(() => openPlayer('me')); await a.p.waitForTimeout(600);
-    C.check('your own page: no Cheer button, and the cheers you got are listed (a number and the last week)', !(await a.p.$('#crewplayer-body .pl-cheer')) && (await secs(a.p)).includes('Cheers this season · 3') && (await a.p.$$('#crewplayer-body .pl-ch')).length === 2);
+    C.check('your own page: no Cheer button, and the cheers you got are listed (a number and the last week)', !(await a.p.$('#crewplayer-body .pl-cheer')) && (await secs(a.p)).includes('Cheers this week') && (await a.p.$$('#crewplayer-body .pl-ch')).length === 2);
     C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();
   }
@@ -1056,7 +1060,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await a.ctx.close();
     // a non-member who has a page cached cannot open the sheet
     const n = await open(browser, { b: { me: { answer: null, can_post: false } } });
-    await waitTab(n.p); await n.p.evaluate(ckk => { crewPagePut(ckk, { ck: ckk, who: 'Mina S.', first: 'Mina', numbers: {}, cheers: { season: 1, recent: [] } }); openCheer(ckk); }, CK.mina); await n.p.waitForTimeout(300);
+    await waitTab(n.p); await n.p.evaluate(ckk => { crewPagePut(ckk, { ck: ckk, who: 'Mina S.', first: 'Mina', numbers: {}, cheers: { total: 1, recent: [] } }); openCheer(ckk); }, CK.mina); await n.p.waitForTimeout(300);
     C.check('not in the crew: openCheer is the join offer, never a sheet', !!(await toast(n.p)) && /Join the crew to cheer/.test((await toast(n.p)).text) && !(await n.p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))));
     await n.ctx.close();
   }
@@ -1093,9 +1097,9 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const pages = { me: { who: 'Alex R.', lv: 19, art: 'voltage', kinds: { achievement: false, honour: true, level: true, week: true }, fv: 1101,
       achievements: [{ id: 'a:1', name: 'Back to Back', day: '2026-10-12', signed: [], signed_n: 0 }, { id: 'a:2', name: 'The Notebook', day: '2026-10-03', signed: [], signed_n: 0 }],
       honours: [{ month: '2026-09-01', honour: 'sessions', value: { n: 14 } }],
-      cheers: { season: 3, recent: [{ ck: CK.reza, who: 'Reza K.', fv: 1103, coach: false, word: 'that sled push looked heavy', day: today }, { ck: null, who: 'Coach', fv: null, coach: true, word: null, day: today }] } },
+      cheers: { total: 3, recent: [{ ck: CK.reza, who: 'Reza K.', fv: 1103, coach: false, word: 'that sled push looked heavy', day: today }, { ck: null, who: 'Coach', fv: null, coach: true, word: null, day: today }] } },
       [CK.mina]: { who: 'Mina S.', lv: 14, art: 'iron', fv: 1102, achievements: [{ id: 'a:1', name: 'Back to Back', day: '2026-10-12', signed: [], signed_n: 0 }, { id: 'a:2', name: 'The Notebook', day: '2026-10-03', signed: [], signed_n: 0 }],
-        cheers: { season: 12, recent: [{ ck: CK.reza, who: 'Reza K.', fv: 1103, coach: false, word: 'that sled push looked heavy', day: today }, { ck: null, who: 'Coach', fv: null, coach: true, word: null, day: today }, { ck: CK.sara, who: 'Sara T.', fv: 1106, coach: false, word: null, day: iso(now - 86400e3 * 2).slice(0, 10) }], mine_today: false } },
+        cheers: { total: 12, recent: [{ ck: CK.reza, who: 'Reza K.', fv: 1103, coach: false, word: 'that sled push looked heavy', day: today }, { ck: null, who: 'Coach', fv: null, coach: true, word: null, day: today }, { ck: CK.sara, who: 'Sara T.', fv: 1106, coach: false, word: null, day: iso(now - 86400e3 * 2).slice(0, 10) }], mine_today: false } },
       [CK.leila]: { who: 'Leila M.', new: true, fv: 1105 } };
     const a = await open(browser, { stub: { bell: b, crewBoard: brd, crewPages: pages } });
     await faceImgs(a.p);
@@ -1521,8 +1525,8 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const gameMina = { sports: ['padel', 'tennis'], hand: 'right', backhand: 'two', side: 'left', plays_at: 'club', club: 'Enghelab, Tehran', training_for: ['strength', 'physique'], working_on: 'a faster first step', ig: 'mina.s' };
     const pages = {
       me: { who: 'Alex R.', lv: 19, art: 'voltage', fv: 1101, kinds: { week: true, level: true }, cycle: cycleOf(true), achievements: ach, game: { sports: ['padel'], hand: 'right', side: 'left', club: 'Enghelab, Tehran', training_for: ['strength'], working_on: 'my second serve' },
-        cheers: { season: 3, recent: [] } },
-      [CK.mina]: { who: 'Mina S.', lv: 14, art: 'iron', fv: 1102, cycle: cycleOf(false), game: gameMina, achievements: ach, cheers: { season: 12, recent: [], mine_today: false } } };
+        cheers: { total: 3, recent: [] } },
+      [CK.mina]: { who: 'Mina S.', lv: 14, art: 'iron', fv: 1102, cycle: cycleOf(false), game: gameMina, achievements: ach, cheers: { total: 12, recent: [], mine_today: false } } };
     // YOUR page, dark: the bars with an extra, Your game, the face stack
     const d = await open(browser, { opts: { dark: true }, stub: { bell: bl, crewBoard: brd, crewPages: pages } });
     await faceImgs(d.p);
@@ -2536,6 +2540,99 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await click(x.p, '#screen-crew .cr-o-more'); await x.p.waitForTimeout(600);
     await x.p.screenshot({ path: path.join(out, 'open-wall-all-light-390.png') });
     await x.ctx.close();
+  }
+
+
+  // ── 30. All-time cheers (CONTRACT 9b, Amir 2026-10-24: "the number of cheers a person has got, should be shown on their acount") ───────────────────────────────────────────────
+  // `crew_page().cheers.total` = cheers and likes received since joining. The page's tiles are the same on EVERY page: weeks held, sessions with Amir, personal bests, cheers. Your own page adds your comebacks as a
+  // fifth, thin, full-width row under the tiles, marked Only you. An absent key is an absent tile (a switch off). The list below the tiles is the last 7 days and is headed "Cheers this week".
+  const cheerTiles = async (o = {}) => {
+    const x = await open(browser, Object.assign({ stub: { crewPages: o.pages || {} } }, o.o || {}));
+    await goCrew(x.p);
+    if (o.own) { await x.p.evaluate(() => openPlayer('me')); await x.p.waitForTimeout(600); } else await shown(x.p, o.ck || CK.mina);
+    x.t = await tiles(x.p); x.secs = await secs(x.p);
+    return x;
+  };
+  if (on(30)) {
+    const NUM = { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9 };
+    const a = await cheerTiles({ pages: { [CK.mina]: { numbers: NUM, cheers: { total: 31, season: 5, recent: [] } } } });
+    C.check('someone else\'s page: weeks held, sessions with Amir, personal bests, cheers (the total, 31, not the season\'s 5)', JSON.stringify(a.t) === JSON.stringify(['6 weeks held', '41 sessions with Amir', '9 personal bests', '31 cheers']), JSON.stringify(a.t));
+    C.check('…the tiles are one grid of four, two across, and the cheers tile has no switch to mark', await a.p.evaluate(() => document.querySelectorAll('#crewplayer-body .pl-tiles > div').length === 4 && getComputedStyle(document.querySelector('#crewplayer-body .pl-tiles')).gridTemplateColumns.split(' ').length === 2 && !document.querySelector('#crewplayer-body .pl-only')));
+    C.check('…and no word "season" anywhere on the page, no comebacks', !/season/i.test(await text(a.p, '#crewplayer-body')) && !/comeback/i.test(await text(a.p, '#crewplayer-body')));
+    await a.ctx.close();
+    const one = await cheerTiles({ pages: { [CK.mina]: { numbers: NUM, cheers: { total: 1, recent: [] } } } });
+    C.check('one cheer says "1 cheer"', one.t[3] === '1 cheer', JSON.stringify(one.t));
+    await one.ctx.close();
+    const none = await cheerTiles({ pages: { [CK.mina]: { numbers: NUM, cheers: { recent: [] } } } });
+    C.check('a page with no total (an older answer) has no cheers tile, never a guess', JSON.stringify(none.t) === JSON.stringify(['6 weeks held', '41 sessions with Amir', '9 personal bests']), JSON.stringify(none.t));
+    await none.ctx.close();
+    const off = await cheerTiles({ pages: { [CK.mina]: { numbers: { weeks: { now: 6, best: 8 } }, cheers: { total: 0, recent: [] } } } });
+    C.check('a switch off leaves the others: two tiles, "0 cheers" among them', JSON.stringify(off.t) === JSON.stringify(['6 weeks held', '0 cheers']), JSON.stringify(off.t));
+    await off.ctx.close();
+    const three = await cheerTiles({ pages: { [CK.mina]: { numbers: { sessions: 41, bests: 9 }, cheers: { total: 31, recent: [] } } } });
+    const wide = await three.p.evaluate(() => { const d = [...document.querySelectorAll('#crewplayer-body .pl-tiles > div')], g = document.querySelector('#crewplayer-body .pl-tiles').getBoundingClientRect(); return { n: d.length, lastW: Math.round(d[2].getBoundingClientRect().width), gw: Math.round(g.width) }; });
+    C.check('three tiles stay a tidy grid: the odd one takes the whole row', three.t.length === 3 && wide.lastW === wide.gw, JSON.stringify(wide));
+    await three.ctx.close();
+
+    // your own page: the same four tiles, the cheers you have had, and the comebacks as a row of their own
+    const own = await cheerTiles({ own: true, pages: { me: { numbers: Object.assign({ comebacks: 2 }, NUM), cheers: { total: 52, season: 9, recent: [] } } } });
+    const cb = await own.p.evaluate(() => { const r = document.querySelector('#crewplayer-body .pl-cb'), g = document.querySelector('#crewplayer-body .pl-tiles'), a = r.getBoundingClientRect(), b = g.getBoundingClientRect();
+      return { text: r.innerText.replace(/\s+/g, ' ').trim(), w: Math.round(a.width), gw: Math.round(b.width), h: Math.round(a.height), gap: Math.round(a.top - b.bottom), only: !!r.querySelector('.pl-only'), tag: r.tagName, inGrid: !!r.closest('.pl-tiles') }; });
+    C.check('your own page: the same four tiles, with the cheers you have had (52)', JSON.stringify(own.t) === JSON.stringify(['6 weeks held', '41 sessions with Amir', '9 personal bests', '52 cheers']), JSON.stringify(own.t));
+    C.check('…and your comebacks as a fifth row UNDER the tiles: "2 comebacks", Only you, as wide as the grid, thin, not a tile', cb.text === '2 comebacks ONLY YOU' && cb.only && !cb.inGrid && cb.w === cb.gw && cb.h <= 48 && cb.gap >= 4 && cb.gap <= 12, JSON.stringify(cb));
+    C.check('…the page\'s note counts it: "Parts marked Only you stay with you."', (await plain(own.p, '#crewplayer-body .pl-note')) === 'This is what the crew sees. Parts marked Only you stay with you.');
+    await own.p.screenshot({ path: path.join(out, 'own-numbers-light-390.png') }).catch(() => {});
+    await own.ctx.close();
+    const o1 = await cheerTiles({ own: true, pages: { me: { numbers: Object.assign({ comebacks: 1 }, NUM), cheers: { total: 1, recent: [] } } } });
+    C.check('one comeback says "1 comeback"; one cheer "1 cheer"', (await o1.p.evaluate(() => document.querySelector('#crewplayer-body .pl-cb .pl-l').textContent)) === 'comeback' && o1.t[3] === '1 cheer');
+    await o1.ctx.close();
+    const o0 = await cheerTiles({ own: true, pages: { me: { numbers: NUM, cheers: { total: 4, recent: [] } } } });
+    C.check('your own page with no comebacks key: no row (an absent key is absent)', !(await o0.p.$('#crewplayer-body .pl-cb')) && !(await o0.p.$('#crewplayer-body .pl-only')), JSON.stringify(o0.t));
+    await o0.ctx.close();
+    const nm = await cheerTiles({ own: true, o: { b: { me: { answer: 'no', can_post: false } } }, pages: { me: { numbers: Object.assign({ comebacks: 2 }, NUM), cheers: { total: 3, recent: [] } } } });
+    C.check('someone not in the crew: the whole page is theirs, so the comebacks row has no "Only you" to say', !!(await nm.p.$('#crewplayer-body .pl-cb')) && !(await nm.p.$('#crewplayer-body .pl-cb .pl-only')));
+    await nm.ctx.close();
+    // a switch off on your own page: its tile stays, marked Only you; the cheers tile has no switch, and the comebacks row always says Only you
+    const sw = await cheerTiles({ own: true, pages: { me: { kinds: { session: false }, numbers: Object.assign({ comebacks: 2 }, NUM), cheers: { total: 52, recent: [] } } } });
+    const lab = await sw.p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-only')].map(e => e.closest('.pl-cb') ? 'cb' : e.closest('.pl-tiles > div') ? e.closest('.pl-tiles > div').innerText.replace(/\s+/g, ' ').trim() : '?'));
+    C.check('your sessions switch off marks the sessions tile Only you; the cheers tile has no mark and the comebacks row always has one', lab.length === 2 && /^41 sessions with Amir ONLY YOU$/.test(lab[0]) && lab[1] === 'cb', JSON.stringify(lab));
+    await sw.ctx.close();
+    // someone else's page never shows comebacks, whatever the server sends
+    const sneak = await cheerTiles({ pages: { [CK.mina]: { numbers: Object.assign({ comebacks: 3 }, NUM), cheers: { total: 31, recent: [] } } } });
+    C.check('defence: comebacks sent for someone else are never drawn, as a tile or as a row', !(await sneak.p.$('#crewplayer-body .pl-cb')) && sneak.t.length === 4 && !/comeback/i.test(await text(sneak.p, '#crewplayer-body')), JSON.stringify(sneak.t));
+    await sneak.ctx.close();
+    // the list below: the last 7 days, "Cheers this week"
+    const rec = [{ ck: CK.reza, who: 'Reza K.', fv: null, coach: false, word: 'that sled push looked heavy', day: today }];
+    const ls = await cheerTiles({ pages: { [CK.mina]: { numbers: NUM, cheers: { total: 31, season: 5, recent: rec } } } });
+    C.check('the cheers list is headed "Cheers this week" (the last 7 days), with no number beside it', ls.secs.includes('Cheers this week') && !ls.secs.some(x => /Cheers this season|·/.test(x)) && (await ls.p.$$('#crewplayer-body .pl-ch')).length === 1, JSON.stringify(ls.secs));
+    await ls.ctx.close();
+    // a cheer you send is one more on their total, at once, and stays on the next draw
+    const ch = await open(browser, { stub: { crewPages: { [CK.mina]: { numbers: NUM, cheers: { total: 31, recent: [], mine_today: false } } } } });
+    await goCrew(ch.p); await shown(ch.p, CK.mina);
+    await click(ch.p, '#crewplayer-body .pl-cheer'); await ch.p.waitForTimeout(400);
+    await ch.p.evaluate(() => document.querySelector('#hist-overlay .ch-go').click()); await ch.p.waitForTimeout(700);
+    const after = await tiles(ch.p);
+    C.check('cheering her moves her total by one on the page at once: 31 becomes 32', after[3] === '32 cheers', JSON.stringify(after));
+    await ch.p.evaluate(() => { _playerHTML = ''; renderPlayerPage(); }); await ch.p.waitForTimeout(200);
+    C.check('…and it stays 32 when the page is drawn again from the copy', (await tiles(ch.p))[3] === '32 cheers');
+    await ch.ctx.close();
+    // 320 px: four tiles and the row fit
+    const nr = await cheerTiles({ own: true, o: { opts: { w: 320, h: 640 } }, pages: { me: { numbers: Object.assign({ comebacks: 12 }, { weeks: { now: 12, best: 12 }, sessions: 1234, bests: 88 }), cheers: { total: 4321, recent: [] } } } });
+    const fit = await nr.p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, out: [...document.querySelectorAll('#crewplayer-body .pl-tiles > div, #crewplayer-body .pl-cb')].filter(d => d.scrollWidth > d.clientWidth + 1).length }));
+    C.check('320 px: four tiles and the comebacks row fit, nothing scrolls sideways', fit.sw <= fit.iw && fit.out === 0, JSON.stringify(fit));
+    await nr.ctx.close();
+    // dark
+    const dk = await cheerTiles({ own: true, o: { opts: { dark: true } }, pages: { me: { numbers: Object.assign({ comebacks: 2 }, NUM), cheers: { total: 52, recent: [] } } } });
+    const dcl = await dk.p.evaluate(() => { const r = getComputedStyle(document.querySelector('#crewplayer-body .pl-cb')); return { bg: r.backgroundColor, ink: getComputedStyle(document.querySelector('#crewplayer-body .pl-cb b')).color }; });
+    C.check('dark mode: the comebacks row takes the dark row colour with a light figure', dcl.bg !== 'rgb(255, 255, 255)' && /^rgb\((2[0-9]{2}|1[89][0-9]|2[0-9])/.test(dcl.ink), JSON.stringify(dcl));
+    await dk.p.screenshot({ path: path.join(out, 'own-numbers-dark-390.png') }).catch(() => {});
+    await dk.ctx.close();
+    // the guide
+    const gx = await cheerTiles({ own: true, pages: { me: { numbers: NUM, cheers: { total: 52, recent: [] } } } });
+    const gt = await gx.p.evaluate(() => buildAppGuideCards());
+    const gseg = (gt.match(/The <strong>cheers<\/strong> number on a page[\s\S]*?<\/p>/) || [''])[0];
+    C.check('the guide says the cheers number counts cheers and likes since joining, and that comebacks are a thin line only you see, in plain words', /every cheer and every like/.test(gseg) && /<strong>comebacks<\/strong>/.test(gseg) && /Only you/.test(gseg) && !/[—;]/.test(gseg.replace(/&[a-z]+;/g, '')), gseg.slice(0, 80));
+    await gx.ctx.close();
   }
 
 
