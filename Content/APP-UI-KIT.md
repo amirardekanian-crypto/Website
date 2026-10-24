@@ -84,7 +84,7 @@ The green surfaces are gradients, all four re-tuned for dark:
 | `--clay-fill` | `#C2512C` | same | **the fill under white text**: a Because disc, an over-target tag, a banner stripe, an armed button (never `#C7552F` under white) |
 | `--clay-ink` | `#B5461F` (5.1:1) | `#E06B43` | **small clay text** |
 | `--clay-big` | `#C7552F` | `#E06B43` | clay text at 18.66 px bold or larger |
-| `--clay-on-green` | `#E06B43` | same | clay on a green surface (week limits, the tempo's hot digit, a cycle bar) |
+| `--clay-on-green` | `#F7A183` | same | clay on a green surface (week limits, the tempo's hot digit, a cycle bar) |
 | `--steel` | `#3E6A92` | `#8DB3D6` | RPE under target; a sore check-in's stripe |
 
 ### 2.4 Old names

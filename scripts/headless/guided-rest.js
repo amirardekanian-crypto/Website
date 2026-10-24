@@ -68,7 +68,7 @@ const t = H.checker();
     t.check('Guided bar: the slim bar\'s green, full width, at the top; the eyebrow is Space Mono with a mint dot', bar.bg === 'radial-gradient' && bar.w === bar.vw && bar.top === 0 && /Space Mono/.test(bar.ebFam) && bar.dot === '7px rgb(109, 190, 149)', JSON.stringify(bar));
     t.check('Guided bar: the body\'s own copy of the name is hidden (never in the day)', bar.bodyName === 'none'
       && (await p.evaluate(() => { const c = [...document.querySelectorAll('#day-view .checklist-item')].find(x => x.querySelector('.item-name').textContent.trim() === 'Box Jump'); return !!c && getComputedStyle(c.querySelector('.item-name')).display !== 'none'; })), JSON.stringify(bar));
-    t.check('Guided bar: the week\'s limits row sits under it, label grey-white and the number clay on the green', bar.week === 'This week Max RPE 7' && /rgba?\(0, 0, 0, 0\.18\)/.test(bar.weekBg) && bar.clay === 'rgb(224, 107, 67)', JSON.stringify([bar.week, bar.weekBg, bar.clay]));
+    t.check('Guided bar: the week\'s limits row sits under it, label grey-white and the number clay on the green', bar.week === 'This week Max RPE 7' && /rgba?\(0, 0, 0, 0\.18\)/.test(bar.weekBg) && bar.clay === 'rgb(247, 161, 131)', JSON.stringify([bar.week, bar.weekBg, bar.clay]));
 
     // the ⓘ: the card's own, opening the same About sheet over Guided; closing it leaves the same step
     const sc0 = await p.evaluate(() => { document.getElementById('step-scroll').scrollTop = 0; return { pos: STEP.pos, name: document.getElementById('step-name').textContent, st: document.getElementById('step-scroll').scrollTop }; });

@@ -238,7 +238,7 @@
     --paper: #FAF7F2; --sand: #F1ECE3; --row: #FFFFFF; --hair: #E4DDD1; --box: #D8D1C5;
     --ink: #1A1A1A; --grey: #5C5C5C; --ring: #8A8378; --num: #5C5C5C; --info: var(--ring);
     --fill: #0E4A36; --green-ink: #0E4A36; --mint: #6DBE95;
-    --clay: #C7552F; --clay-ink: #B5461F; --clay-big: #C7552F; --clay-fill: #C2512C; --clay-on-green: #E06B43; --steel: #3E6A92;
+    --clay: #C7552F; --clay-ink: #B5461F; --clay-big: #C7552F; --clay-fill: #C2512C; --clay-on-green: #F7A183; --steel: #3E6A92;   /* clay text on the green was #E06B43, 2.9 to 3.6:1 (Love All L6, 2026-10-24); this lighter clay is 4.5:1 or more on every green it sits on */
     /* The clay note box (2026-10-19, Amir's pick for "a new version is ready"): the green box's shape in the one accent. Declared
        on body ONLY, like --clay and --clay-fill: the box is its own surface, so white on it reads the same in either mode and the
        brand clay does not move. Every stop is 4.6:1 or better under white; --clay-deep is the ink on the white button (8:1). */
@@ -833,6 +833,7 @@
     font-size: var(--fs-small); white-space: nowrap;
   }
   .demo-banner-exit:hover { opacity: 1; }
+  body[data-dark] .demo-banner-cta { color: #0E4A36; }   /* Apply is a white button: the dark theme's mint text on it was 2.2:1 (Love All L6, 2026-10-24) */
   /* 44 px to hit (Love All L5, Amir 2026-10-24: "every control keeps its look, its tap area grows to 44 px"): an invisible box round each, drawn size unchanged.
      Exit takes only 4.5 px sideways, because Apply sits 10 px beside it and the two areas must not meet. */
   .demo-banner-exit, .demo-banner-cta { position: relative; }
@@ -1250,7 +1251,12 @@
   body[data-dark] .ex-set-row { border-top-color: #2a2a2a; }
   /* Sets that aren't the active one fade slightly so the eye lands on the
      current set first. The "active" set is the first one not yet marked done. */
-  .ex-set-row.dim { opacity: 0.55; }
+  .ex-set-row.dim { opacity: 1; }
+  /* ...but not by fading the whole row (Love All L6, 2026-10-24): 55% took the set number, the LAST caption and the empty boxes' words to 2.2 to 2.8:1.
+     The words keep their solid grey and what recedes is the box (paper, not white, and a hairline edge) and the tick. */
+  .ex-set-row.dim:not(.done) :is(.ex-set-weight, .ex-set-reps) { background: var(--paper); border-color: var(--hair); }
+  .ex-set-row.dim :is(.ex-set-check, .ex-set-rpetag) { opacity: .55; }
+  .ex-set-row.dim.done :is(.ex-set-weight, .ex-set-reps) { color: var(--grey); }
   .ex-set-num {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 900;
@@ -2214,7 +2220,8 @@
   .step-scroll .rpe-row.step-current { position: sticky; top: 0; bottom: 0; z-index: 3;
     background: #EDF1EE; box-shadow: 0 -6px 14px rgba(0,0,0,0.07), 0 6px 14px rgba(0,0,0,0.05); }
   .step-scroll .rpe-row.step-current { border-radius: 10px; }
-  .step-scroll .rpe-row.dim { opacity: 0.55; }
+  /* a round still to come recedes by its keys' edge, not by fading the row (Love All L6, 2026-10-24: 55% left its words at 2.4:1) */
+  .step-scroll .rpe-row.dim .rpe-btn { border-color: var(--hair); }
   body[data-dark] .step-scroll .ex-set-row.step-current,
   body[data-dark] .step-scroll .rpe-row.step-current { background: #173328; }
   .step-complete { text-align: center; padding: 48px 12px; }
@@ -3120,7 +3127,7 @@
      has three: Pause takes the first row on its own, Reset and Finish early share the second. */
   :where(#day-view) .session-timer.slim.open.has-finish .session-timer-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   :where(#day-view) .session-timer.slim.open.has-finish .session-timer-btn:not(.guided):nth-last-child(3) { grid-column: 1 / -1; }
-  :where(#day-view) .session-timer.slim.open .session-timer-more { background: rgba(255,255,255,.12); color: var(--mint); }
+  :where(#day-view) .session-timer.slim.open .session-timer-more { background: rgba(255,255,255,.12); color: #fff; }   /* was mint, 2.4 to 2.6:1 on the lighter tile (Love All L6, 2026-10-24) */
   @media (max-width: 359px) {
     :where(#day-view) .session-timer-actions { gap: 8px; }
     :where(#day-view) .session-timer.has-reset:not(.slim) .session-timer-btn { padding: 0 8px; font-size: var(--fs-body); }
@@ -3152,6 +3159,7 @@
   :where(#day-view) .onb-hint b { font-weight: 700; color: #fff; }
   :where(#day-view) .onb-hint-ok { flex: none; min-width: 44px; min-height: 44px; margin-top: -10px; padding: 0 10px; border: 0; background: none;
     cursor: pointer; color: var(--mint); font: 700 var(--fs-small)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  body[data-dark] :where(#day-view) .onb-hint-ok { color: #fff; }   /* mint on the dark theme's lighter green was 2.5:1 (Love All L6, 2026-10-24) */
 
   /* 5. Block titles, quiet: 15 px condensed capitals in green and a hairline to the edge, the block's rest at its end. A
      block whose only item has its name (.same-name, sameNameBlock()) hides its title; the header node stays. */
@@ -3431,6 +3439,7 @@
   :where(#day-view, .step-scroll, #ws-body) .note-row textarea { display: block; width: 100%; min-height: 88px; margin: 6px 0 2px; padding: 12px 14px; border: 1px solid var(--box);
     border-radius: 12px; background: var(--row); color: var(--ink); font: 400 var(--fs-field)/1.4 'Barlow', sans-serif; resize: vertical; }
   :where(#day-view, .step-scroll, #ws-body) .note-row textarea:focus { border-color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .note-row textarea::placeholder { color: var(--ph); opacity: 1; }   /* the browser's own grey was 3.9 to 4.3:1 (Love All L6, 2026-10-24) */
 
   /* 7e. The Coach's Note: Amir's voice with no box, the clay quote on the ring column, 3 lines then MORE (fitNotes()). */
   :where(#day-view, .step-scroll, #ws-body) .ex-coach-note { position: relative; margin: 0; padding: 16px 0 0 56px; border: 0; border-radius: 0; background: none;
@@ -3881,6 +3890,9 @@
   :where(#day-view) .cf-nudge { display: block; margin-top: 8px; font: 600 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--green-ink); }
   :where(#day-view) .ew-q { font-size: var(--fs-body); font-weight: 600; line-height: 1.3; color: var(--ink); }
   :where(#day-view) .ew-q span { margin-left: 6px; font-size: var(--fs-small); font-weight: 400; color: var(--grey); }
+  /* The question sits on the early card's green panel in both themes, and ink was 1.2:1 there in the light one (Love All L6, 2026-10-24): white and a pale mint. */
+  :where(#day-view) .session-confirm.early .ew-q { color: #fff; }
+  :where(#day-view) .session-confirm.early .ew-q span { color: #CFE0D8; }
   :where(#day-view) .ew-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   :where(#day-view) .ew-chip { min-height: 44px; padding: 0 16px; border: 1px solid var(--hair); border-radius: 999px; background: var(--row);
     color: var(--ink); font: inherit; font-size: var(--fs-body); font-weight: 600; cursor: pointer; }
@@ -4034,7 +4046,7 @@
   #stepOverlay .step-topbar-text { grid-area: eb; display: flex; align-items: center; column-gap: 8px; min-width: 0; min-height: 44px; }
   #stepOverlay .step-eyebrow, #stepOverlay .step-pill { font: 700 var(--fs-label)/1.35 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase;
     white-space: nowrap; }
-  #stepOverlay .step-eyebrow { display: flex; align-items: center; gap: 8px; color: var(--mint); }
+  #stepOverlay .step-eyebrow { display: flex; align-items: center; gap: 8px; color: #7CCBA4; }   /* the mint a shade lighter: 4.4:1 on the bar's green (Love All L6, 2026-10-24) */
   #stepOverlay .step-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
   #stepOverlay .step-pill { color: #fff; }
   #stepOverlay .step-pill:not(:empty)::before { content: '\00B7'; margin-right: 8px; color: rgba(255,255,255,.5); }
@@ -4295,6 +4307,7 @@
   .lib-tab-n { min-height: 13px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .5px; font-variant-numeric: tabular-nums; }
   .lib-tab[aria-selected="true"] { background: var(--btn); color: #fff; }
   .lib-tab[aria-selected="true"] .lib-tab-n { color: var(--mint); }
+  body[data-dark] .lib-tab[aria-selected="true"] .lib-tab-n { color: #fff; }   /* mint on the dark theme's lighter green was 2.5:1 (Love All L6, 2026-10-24) */
   .lib-pane { position: relative; }
   .lib-pane[hidden] { display: none; }
   #lib-playbook { padding-bottom: 110px; }
@@ -4556,7 +4569,7 @@
   #home-overview .today-mid::before { content: ''; position: absolute; width: 64px; height: 64px; border-radius: 50%; background: var(--row); }
   #home-overview .today-mid b, #home-overview .today-mid span { position: relative; }
   #home-overview .today-mid b { display: block; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
-  #home-overview .today-mid span { display: block; margin-top: 1px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .4px; text-transform: uppercase; color: var(--ring); }
+  #home-overview .today-mid span { display: block; margin-top: 1px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .4px; text-transform: uppercase; color: var(--grey); }   /* --ring is the line round it; as words it was 3.8:1 light, 2.7:1 dark (Love All L6, 2026-10-24) */
   #home-overview .today-b { flex: 1; min-width: 0; }
   #home-overview .today-k { display: block; margin-bottom: 3px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--clay-ink); }
   /* "N to go" asks for something, so it stays clay; On target and Perfect are the good news, green. */
@@ -4565,7 +4578,7 @@
   #home-overview .today-v.is-ok { color: var(--green-ink); }
   #home-overview .today-s { display: block; margin-top: 5px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   #home-overview .today-go { flex: none; width: 32px; height: 32px; margin: -4px -4px 0 0; border: 0; border-radius: 99px; background: none;
-    color: var(--ring); font: 400 var(--fs-title)/1 'Barlow', sans-serif; cursor: pointer; }
+    color: var(--grey); font: 400 var(--fs-title)/1 'Barlow', sans-serif; cursor: pointer; }
   #home-overview .today-go:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   /* 44 px to hit, round the 32 px button (Love All L5, 2026-10-24): an invisible box, the drawn size unchanged. */
   #home-overview .today-go { position: relative; }

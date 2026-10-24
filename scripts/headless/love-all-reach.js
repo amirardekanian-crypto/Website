@@ -217,6 +217,213 @@ async function l5(browser, record) {
   if (record) console.log('const DRAWN = ' + JSON.stringify(got, null, 1) + ';');
 }
 
+// ═════════ L6: contrast ═════════
+// WCAG 2.x contrast of every text element as the athlete sees it. The text colour is the element's computed colour (the placeholder's, for an empty
+// field) with every opacity up the tree applied; the background is read from the PIXELS of the page with the text itself made transparent, so a
+// gradient, a disc drawn by a pseudo-element or a dimmed row is judged on what is really behind the letters (the worst of up to 60 samples). Large
+// text (24 px, or bold 18.66 px) needs 3:1, the rest 4.5:1.
+// (and every transition and animation is jumped to its end, so a card half way to green is not measured)
+const STILL = '*, *::before, *::after { transition-duration: 0s !important; transition-delay: 0s !important; animation-duration: 0s !important; animation-delay: 0s !important; }';
+const HIDE_TEXT = '*, *::placeholder { -webkit-text-fill-color: transparent !important; text-shadow: none !important; } ::placeholder { color: transparent !important; opacity: 1 !important; }';
+const COLLECT = ({ rootSel }) => {
+  const root = document.querySelector(rootSel) || document.body, out = [], seen = new Set();
+  const shown = e => { const r = e.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; for (let x = e; x; x = x.parentElement) { const cs = getComputedStyle(x); if (cs.display === 'none' || cs.visibility === 'hidden') return false; } return true; };
+  const path = e => { const p = []; for (let x = e; x && x !== document.body && p.length < 4; x = x.parentElement) p.unshift(x.tagName.toLowerCase() + (x.id ? '#' + x.id : '') + (typeof x.className === 'string' && x.className.trim() ? '.' + x.className.trim().split(/\s+/).slice(0, 2).join('.') : '')); return p.join(' > '); };
+  const need = e => { const cs = getComputedStyle(e), px = parseFloat(cs.fontSize), bold = parseInt(cs.fontWeight, 10) >= 700; return (px >= 24 || (bold && px >= 18.66)) ? 3 : 4.5; };
+  const opac = e => { let o = 1; for (let x = e; x; x = x.parentElement) o *= parseFloat(getComputedStyle(x).opacity); return o; };
+  window.__els = [];
+  const add = (e, node, text, color, ph) => { window.__els.push({ e, node, ph }); out.push({ i: window.__els.length - 1, el: path(e) + (ph ? '::placeholder' : ''), text: text.trim().slice(0, 30), color, op: opac(e), need: need(e), size: getComputedStyle(e).fontSize,
+    off: !!(e.disabled || e.closest('button:disabled, fieldset:disabled')) }); };
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let n; (n = tw.nextNode());) {
+    const e = n.parentElement;
+    if (!e || seen.has(e) || !n.textContent.trim() || /^(SCRIPT|STYLE|NOSCRIPT|OPTION)$/.test(e.tagName) || !shown(e)) continue;
+    if (n.textContent.trim().length <= 2 && /\p{Extended_Pictographic}/u.test(n.textContent)) continue;   // an emoji icon (⏸ ▶ ⏱) is a picture, drawn in its own colours
+    seen.add(e);
+    add(e, n, n.textContent, getComputedStyle(e).color, false);
+  }
+  root.querySelectorAll('input, textarea').forEach(e => { if (!e.value && e.placeholder && shown(e)) add(e, null, e.placeholder, getComputedStyle(e, '::placeholder').color, true); });
+  return out;
+};
+// scroll item i to the middle of its scroller; its text box in viewport coordinates, or null when something else covers it
+const BOX = i => {
+  const { e, node, ph } = window.__els[i];
+  e.scrollIntoView({ block: 'center', inline: 'center' });
+  let r;
+  if (node) { const rg = document.createRange(); rg.selectNodeContents(node); const rs = [...rg.getClientRects()].filter(q => q.width > 0.5 && q.height > 0.5); if (!rs.length) return null; r = rs[0]; }
+  else { const q = e.getBoundingClientRect(); r = { left: q.left + 6, top: q.top + 4, width: Math.max(1, q.width - 12), height: Math.max(1, q.height - 8) }; }
+  const x = Math.max(0, Math.floor(r.left)), y = Math.max(0, Math.floor(r.top)), w = Math.min(innerWidth, Math.ceil(r.left + r.width)) - x, h = Math.min(innerHeight, Math.ceil(r.top + r.height)) - y;
+  if (w < 2 || h < 2) return null;
+  // something else on top of it (the tab bar, a toast) means the pixels are not its own; a layer inside the same few ancestors is its own card
+  const hit = document.elementFromPoint(x + w / 2, y + h / 2);
+  let near = false; for (let a = e, n = 0; a && n < 5; a = a.parentElement, n++) if (a.contains(hit)) { near = true; break; }
+  if (!hit || !near) return null;
+  return { x, y, width: w, height: h };
+};
+// items [{color, op}] and their screenshots (text hidden) as base64: the worst ratio each, and the colours it was between
+const ANALYSE = async ({ items, shots }) => {
+  const cv = document.createElement('canvas').getContext('2d');
+  const rgba = s => { const m = String(s).match(/rgba?\(\s*([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)(?:[ ,\/]+([\d.%]+))?\s*\)/); if (m) return [+m[1], +m[2], +m[3], m[4] === undefined ? 1 : (String(m[4]).endsWith('%') ? parseFloat(m[4]) / 100 : parseFloat(m[4]))];
+    cv.clearRect(0, 0, 1, 1); cv.fillStyle = '#000'; cv.fillStyle = s; cv.fillRect(0, 0, 1, 1); const d = cv.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255]; };
+  const lum = c => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+  const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const res = [];
+  for (let k = 0; k < items.length; k++) {
+    const img = new Image(); img.src = 'data:image/png;base64,' + shots[k]; await img.decode();
+    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+    const d = g.getImageData(0, 0, c.width, c.height).data, fg = rgba(items[k].color), a = fg[3] * items[k].op;
+    let worst = Infinity, wf = null, wb = null;
+    const nx = Math.min(c.width, 12), ny = Math.min(c.height, 5);
+    for (let iy = 0; iy < ny; iy++) for (let ix = 0; ix < nx; ix++) {
+      const px = Math.min(c.width - 1, Math.floor((ix + 0.5) * c.width / nx)), py = Math.min(c.height - 1, Math.floor((iy + 0.5) * c.height / ny)), o = (py * c.width + px) * 4;
+      const b = [d[o], d[o + 1], d[o + 2]], f = [0, 1, 2].map(j => a * fg[j] + (1 - a) * b[j]), r = ratio(f, b);
+      if (r < worst) { worst = r; wf = f.map(Math.round); wb = b; }
+    }
+    res.push({ ratio: Math.round(worst * 100) / 100, fg: wf, bg: wb });
+  }
+  return res;
+};
+const hex = c => c ? '#' + c.map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase() : '?';
+// every text element under `rootSel`, with its ratio
+async function measureAll(p, rootSel) {
+  await p.addStyleTag({ content: STILL });
+  await p.waitForTimeout(300);
+  const items = await p.evaluate(`(${COLLECT.toString()})(${JSON.stringify({ rootSel })})`);
+  await p.addStyleTag({ content: HIDE_TEXT });
+  const keep = [], shots = [];
+  for (const it of items) {
+    const box = await p.evaluate(`(${BOX.toString()})(${it.i})`);
+    if (!box) continue;
+    shots.push((await p.screenshot({ clip: box })).toString('base64'));
+    keep.push(it);
+  }
+  const res = shots.length ? await p.evaluate(`(${ANALYSE.toString()})(${JSON.stringify({ items: keep, shots })})`) : [];
+  return keep.map((it, k) => Object.assign({}, it, res[k], { fgHex: hex(res[k].fg), bgHex: hex(res[k].bg) }));
+}
+// A disabled control is exempt in WCAG (1.4.3), and a glyph that is exactly its background (ratio ~1) is one the page paints over on purpose (the number
+// inside a filled disc, the play triangle under its disc): both are counted, not failed.
+const failing = rows => rows.filter(r => r.ratio < r.need && !r.off && r.ratio >= 1.05);
+const exempt = rows => rows.filter(r => r.ratio < r.need && (r.off || r.ratio < 1.05));
+
+async function l6(browser) {
+  const left = new Map(), all = {};
+  const scenes = {
+    'a card, open': async (w, dark) => {
+      const o = await H.openProgram(browser, { w, h: 844, dark });
+      await o.p.evaluate(`(() => { openDayView('1'); const c = ${H.card('Barbell Back Squat')}; if (c.classList.contains('collapsed')) toggleExpand(c); c.scrollIntoView({ block: 'center' }); })()`);
+      await o.p.waitForTimeout(600);
+      return { ...o, root: '#day-view' };
+    },
+    Home: async (w, dark) => {
+      const o = await H.openProgram(browser, { w, h: 844, dark, seed: { _hab_cfg: HAB_CFG } });
+      await o.p.evaluate(() => goTo('home')); await o.p.waitForTimeout(800);
+      return { ...o, root: '#screen-home' };
+    },
+    Progress: async (w, dark) => {
+      const o = await H.openProgram(browser, { w, h: 844, dark, seed: { _hab_cfg: HAB_CFG } });
+      await o.p.evaluate(() => goTo('plan')); await o.p.waitForTimeout(800);
+      return { ...o, root: '#screen-plan' };
+    },
+    Guided: async (w, dark) => {
+      const o = await H.openProgram(browser, { w, h: 844, dark });
+      await o.p.evaluate(() => { openDayView('1'); openStepMode('1'); }); await o.p.waitForTimeout(350);
+      await o.p.evaluate(() => { if (STEP && STEP.seq[STEP.pos].group) stepPrimary(); }); await o.p.waitForTimeout(250);
+      await goStep(o.p, 'Barbell Back Squat'); await o.p.waitForTimeout(300);
+      return { ...o, root: '#stepOverlay' };
+    },
+    'the finish card': async (w, dark) => {
+      const o = await H.openProgram(browser, { w, h: 844, dark });
+      await o.p.evaluate(() => openDayView('1')); await o.p.waitForTimeout(300);
+      const n = await o.p.evaluate(() => document.querySelectorAll('#day1 .checklist-item').length);
+      for (let i = 0; i < n; i++) { await o.p.evaluate(i => { const c = document.querySelectorAll('#day1 .checklist-item')[i]; if (c.classList.contains('collapsed')) toggleExpand(c); if (!c.classList.contains('checked')) toggleCheckOnly(c, '1'); }, i); await o.p.waitForTimeout(80); }
+      await o.p.evaluate(() => { hideAaToast(); document.getElementById('confirm-1').scrollIntoView({ block: 'center' }); }); await o.p.waitForTimeout(500);
+      return { ...o, root: '#confirm-1' };
+    },
+    'a circuit round in Guided': async (w, dark) => { const o = await guidedRound(browser, w, dark); return { ...o, root: '#stepOverlay' }; },
+    'the demo banner': async (w, dark) => { const o = await demo(browser, w, dark); return { ...o, root: '#demo-banner' }; },
+    'the session bar': async (w, dark) => {
+      const o = await H.openProgram(browser, { w, h: 844, dark });
+      await o.p.evaluate(() => openDayView('1')); await o.p.waitForTimeout(300);
+      await o.p.evaluate(() => startTimerNow('1')); await o.p.waitForTimeout(600);
+      return { ...o, root: '#timer-1' };
+    },
+    'the session bar, ⋯ open': async (w, dark) => {
+      const o = await H.openProgram(browser, { w, h: 844, dark });
+      await o.p.evaluate(() => openDayView('1')); await o.p.waitForTimeout(300);
+      await o.p.evaluate(() => startTimerNow('1')); await o.p.waitForTimeout(500);
+      await o.p.evaluate(() => toggleBarMore('1')); await o.p.waitForTimeout(500);
+      return { ...o, root: '#timer-1' };
+    },
+    Library: async (w, dark) => {
+      const o = await H.openProgram(browser, { w, h: 844, dark, stub: { library: H.library() } });
+      await o.p.evaluate(() => goTo('workouts')); await o.p.waitForTimeout(900);
+      return { ...o, root: '#screen-workouts' };
+    },
+    'a notice (Got it)': async (w, dark) => {
+      const o = await H.openProgram(browser, { w, h: 844, dark });
+      await o.p.evaluate(() => aaToast('Check the weight. 80 kg looks like a lot more than last time.', { kicker: 'Check the weight', action: 'Keep it', dismiss: 'Got it', ms: 0 })); await o.p.waitForTimeout(500);
+      return { ...o, root: '#aaToast' };
+    },
+    'a first-session hint': async (w, dark) => {
+      const P = H.fixture();   // the demo is always someone new, so the hints show (onbVeteran())
+      const o = await H.openProgram(browser, { w, h: 844, dark, fresh: true, hist: [], prog: P, query: '?client=demo', stub: { demo: P } });
+      await o.p.evaluate(() => openDayView('1')); await o.p.waitForTimeout(300);
+      await o.p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; if (c.classList.contains('collapsed')) toggleExpand(c); })()`); await o.p.waitForTimeout(900);
+      return { ...o, root: '#day-view' };
+    },
+    'the early finish': async (w, dark) => {
+      const o = await H.openProgram(browser, { w, h: 844, dark });
+      await o.p.evaluate(() => {   // early-why.js's way in: three cards ticked, then the early step
+        openDayView('1');
+        [...document.querySelectorAll('#day1 .checklist-item')].slice(0, 3).forEach(c => { if (!c.classList.contains('checked')) toggleCheckOnly(c, '1'); });
+        try { hideAaToast(); } catch (e) {}
+        finishEarlyStep('1');
+        document.getElementById('confirm-1').scrollIntoView({ block: 'center' });
+      });
+      await o.p.waitForTimeout(600);
+      return { ...o, root: '#confirm-1' };
+    },
+  };
+  for (const [name, open] of Object.entries(scenes)) {
+    for (const dark of [false, true]) {
+      const o = await open(390, dark);
+      const rows = await measureAll(o.p, o.root);
+      if (process.env.ROWS && new RegExp(process.env.ROWS).test(name)) rows.forEach(r => console.log('ROW', name, dark ? 'dark' : 'light', r.ratio, r.fgHex, r.bgHex, r.size, JSON.stringify(r.text), r.el.slice(-60)));
+      const bad = failing(rows);
+      bad.forEach(r => left.set(`${name}${dark ? ' (dark)' : ''} | ${r.el} | "${r.text}"`, `${r.ratio}:1 needs ${r.need}, ${r.fgHex} on ${r.bgHex}, ${r.size}`));
+      t.check(`L6 sweep ${name}${dark ? ' dark' : ''}: ${rows.length} text elements measured (${exempt(rows).length} exempt)`, rows.length > 0, rows.length);
+      all[name + (dark ? '#dark' : '')] = rows;
+      await o.ctx.close();
+    }
+  }
+  // ── the audit's list: each of these must be there to measure, and must pass, in the light theme and the dark one ──
+  const must = (what, scene, pick, label) => {
+    for (const dark of [false, true]) {
+      const rows = (all[scene + (dark ? '#dark' : '')] || []).filter(pick);
+      const low = rows.filter(r => r.ratio < r.need);
+      t.check(`L6 ${what}${dark ? ' (dark)' : ''}: ${rows.length} measured, all at ${rows[0] ? rows[0].need : '4.5'}:1 or more`, rows.length > 0 && low.length === 0,
+        rows.length ? (low.length ? low.map(r => `${r.text} ${r.ratio}:1 ${r.fgHex} on ${r.bgHex}`).join(' | ') : 'worst ' + Math.min(...rows.map(r => r.ratio)) + ':1') : 'nothing found: ' + (label || ''));
+    }
+  };
+  const el = re => r => re.test(r.el);
+  must('the placeholders in the boxes of sets still to come', 'Guided', r => /ex-set-row\.dim/.test(r.el) && /::placeholder/.test(r.el));
+  must('a set still to come: its number and its LAST caption', 'Guided', r => /ex-set-row\.dim/.test(r.el) && /ex-set-num|lt-ghost/.test(r.el));
+  must('a circuit round still to come: its words and its keys', 'a circuit round in Guided', el(/rpe-row\.dim/));
+  must('the tempo digit on the green card head', 'a card, open', el(/t-hot/));
+  must('the clay tag on the early card\'s green', 'the early finish', el(/confirm-missing-tag/));
+  must('the session bar\'s ⋯ with its menu open', 'the session bar, ⋯ open', r => r.text === '⋯');
+  must('the session bar\'s ⋯', 'the session bar', r => r.text === '⋯');
+  must('the Library counts', 'Library', el(/lib-tab-n/));
+  must('"Got it" on the first-session hint', 'a first-session hint', r => r.text === 'Got it');
+  must('"Got it" on the notice', 'a notice (Got it)', r => r.text === 'Got it');
+  must('the ring\'s word and the › on Home\'s habit card', 'Home', r => /today-mid > span|today-go/.test(r.el));
+  must('Apply in the demo banner', 'the demo banner', r => r.text === 'Apply');
+  must('"What stopped you?" and Optional on the early finish', 'the early finish', r => /ew-q/.test(r.el));
+  must('the notes box\'s placeholder', 'Guided', el(/textarea::placeholder/));
+  must('Guided\'s eyebrow on its green bar', 'Guided', el(/step-eyebrow/));
+  return left;
+}
+
 // The chevron beside each exercise's name is not a control of its own: it is a pseudo-element on the name, and the whole row is the tap (onExerciseRowTap).
 // So its tap area is the row's, and a tap ON the chevron (and 20 px each side of it) opens the card.
 async function chevron(browser) {
@@ -241,8 +448,10 @@ async function chevron(browser) {
 if (require.main !== module) { module.exports = { SCENES }; return; }
 (async () => {
   const browser = await H.launch();
-  await l5(browser, process.argv.includes('--record'));
-  await chevron(browser);
+  const only = process.argv.includes('--l6');
+  if (!only) { await l5(browser, process.argv.includes('--record')); await chevron(browser); }
+  const left = await l6(browser);
+  console.log('Text under its contrast target that nothing in L6 asks to change (' + left.size + '):\n  ' + [...left].map(([k, v]) => k + ' => ' + v).join('\n  '));
   if (NOTES.size) console.log('Where a touch area stops short of 20 px because another control is close:\n  ' + [...NOTES].join('\n  '));
   await browser.close();
   process.exit(t.report() ? 1 : 0);

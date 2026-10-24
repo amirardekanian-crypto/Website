@@ -102,7 +102,7 @@ const view = p => p.evaluate(() => {
     // the cue's look: clay bar, Barlow, a size from the scale, white on the green
     const look = await p.evaluate(() => { const c = document.getElementById('timerGetCue'), cs = getComputedStyle(c);
       return { bw: cs.borderLeftWidth, bc: cs.borderLeftColor, ff: cs.fontFamily.slice(0, 6), fs: cs.fontSize, col: cs.color }; });
-    t.check('the cue has a 3 px clay bar and 15 px Barlow text', look.bw === '3px' && look.bc === 'rgb(224, 107, 67)' && /Barlow/.test(look.ff) && look.fs === '15px' && look.col === 'rgb(255, 255, 255)', JSON.stringify(look));
+    t.check('the cue has a 3 px clay bar and 15 px Barlow text', look.bw === '3px' && look.bc === 'rgb(247, 161, 131)' && /Barlow/.test(look.ff) && look.fs === '15px' && look.col === 'rgb(255, 255, 255)', JSON.stringify(look));
     // a tap on the door's old place, or a programmatic open, does nothing now
     await p.evaluate(() => openRestGame('rally'));
     await wait(p, 600);
@@ -544,7 +544,7 @@ const view = p => p.evaluate(() => {
       await p.screenshot({ path: path.join(out, 'serve-clock-list-' + label.replace(' ', '-') + '.png') });
       if (dark) {
         const c = await p.evaluate(() => { const cs = getComputedStyle(document.getElementById('timerGetCue')), nx = getComputedStyle(document.getElementById('timerGetNext')); return { col: cs.color, bar: cs.borderLeftColor, next: nx.color, bg: getComputedStyle(document.querySelector('.timer-band')).backgroundImage.slice(0, 20) }; });
-        t.check(label + ': white text on the green band, the clay bar', c.col === 'rgb(255, 255, 255)' && c.next === 'rgb(255, 255, 255)' && c.bar === 'rgb(224, 107, 67)', JSON.stringify(c));
+        t.check(label + ': white text on the green band, the clay bar', c.col === 'rgb(255, 255, 255)' && c.next === 'rgb(255, 255, 255)' && c.bar === 'rgb(247, 161, 131)', JSON.stringify(c));
       }
       await ctx.close();
     }
