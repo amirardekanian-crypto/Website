@@ -4475,9 +4475,9 @@
   .lib-head .prog-eyebrow { text-wrap: balance; }   /* 320 px: "TRAIN IT, LEARN IT, / KNOW IT", not one word alone */
 
   /* Before you start: the lower-day banner's recipe (a white row on the paper, a 4 px clay stripe: clay because it is a "look here"). The
-     row is the fold: BEFORE YOU START in clay mono, a short count at the right ("4 things") and the app's ⌄ (turned when open). It is
-     CLOSED by default, every time (Love All B4, 2026-10-24: it was 687 px and pushed the first exercise off the first screen); it opens and
-     closes by its own tap only, never by Why this session's. Its paragraphs are at reading size. */
+     row is the fold: BEFORE YOU START in clay mono over "Safety checks: what to stop for", a short count at the right ("4 things") and the app's
+     ⌄ (turned when open). It is open the first time each session is opened on this phone and one folded row after that (renderBefore(); Love All
+     B4 made the head one row, 2026-10-24); it folds by its own tap only, never by Why this session's. Its paragraphs are at reading size. */
   .ws-before { margin: 0; background: var(--row); box-shadow: inset 4px 0 0 var(--clay-fill); border-bottom: 1px solid var(--hair); }
   .ws-before[hidden] { display: none; }
   .ws-before-h { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; margin: 0; padding: 8px var(--g); border: 0; border-radius: 0; background: transparent;
@@ -6457,9 +6457,9 @@
        rules that keep it safe. Its OWN element, deliberately outside "Why this
        session" below: that block can be closed, the choice is remembered for every
        workout, and a red flag must never be the thing a closed toggle hides. The row
-       folds ONLY by its own tap: open the first time a session is opened (renderBefore()). -->
+       folds ONLY by its own tap: open the first time a session is opened on this phone (renderBefore()). -->
   <section class="ws-before" id="ws-before" aria-labelledby="ws-before-h" hidden>
-    <button type="button" class="ws-before-h" id="ws-before-btn" aria-expanded="false" aria-controls="ws-before-body" onclick="toggleBefore()">
+    <button type="button" class="ws-before-h" id="ws-before-btn" aria-expanded="true" aria-controls="ws-before-body" onclick="toggleBefore()">
       <span class="wb-t"><span class="wb-k" id="ws-before-h">Before you start</span><span class="wb-s">Safety checks: what to stop for</span></span><span class="wb-l" id="ws-before-n"></span>
       <span class="wb-c" aria-hidden="true"></span>
     </button>
@@ -18257,9 +18257,20 @@ function renderWhy(wk) {
 // so a hand-written file with a plain list still shows. Absent or empty → the card stays hidden,
 // which is every session written before 2026-09-20.
 //
-// CLOSED by default, every time (Love All B4, 2026-10-24, Amir: direction A of the audit; it had been open the first time each session
-// was opened, 687 px, and the first exercise began below the first screen). One row, "Before you start" and how many things it
-// holds, opens and closes with a tap. Nothing is remembered: the row is always one tap away and always starts closed.
+// Open the FIRST time each session is opened on this phone, one folded row after that (Amir, 2026-10-13: "open the first
+// time each session is opened; afterwards one row titled Before you start that opens with a tap"; he kept it on 2026-10-24 when
+// Love All B4 made the head one row with a count). The phone keeps which sessions it has shown, { "<workout id>": 1 } under
+// WS_BEFORE_KEY: NOT athlete-prefixed and never synced, because it is about this phone's reading, not the athlete's record. Where
+// it cannot be read or written (a private window) the card is simply open every time, the safe way round. The row folds by its OWN
+// tap only: nothing else hides these rows.
+const WS_BEFORE_KEY = 'ws_before_seen';
+function _wsBeforeSeen() {
+  try { const o = JSON.parse(localStorage.getItem(WS_BEFORE_KEY) || '{}'); return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; }
+  catch (e) { return {}; }
+}
+function _wsBeforeMark(id) {
+  try { const o = _wsBeforeSeen(); if (o[id]) return; o[id] = 1; localStorage.setItem(WS_BEFORE_KEY, JSON.stringify(o)); } catch (e) { /* private window */ }
+}
 function _wsBeforeOpen(open) {
   const wrap = document.getElementById('ws-before');
   const body = document.getElementById('ws-before-body');
@@ -18280,7 +18291,9 @@ function renderBefore(wk) {
   wrap.hidden = false;
   const n = document.getElementById('ws-before-n');
   if (n) n.textContent = rows.length + (rows.length === 1 ? ' thing' : ' things');
-  _wsBeforeOpen(false);
+  const id = wk && wk.id ? String(wk.id) : '';
+  _wsBeforeOpen(!(id && _wsBeforeSeen()[id]));
+  if (id) _wsBeforeMark(id);
 }
 function toggleBefore() {
   const btn = document.getElementById('ws-before-btn');

@@ -329,19 +329,16 @@ const OVERLAP = `(() => {
       const c = (e, ps) => getComputedStyle(e, ps), btn = document.getElementById('ws-before-btn'), body = document.getElementById('ws-before-body'), sec = document.getElementById('ws-before');
       const vis = e => !!e.getClientRects().length;
       return { sec: vis(sec), row: vis(btn), exp: btn.getAttribute('aria-expanded'), bodyVis: vis(body), paras: [...body.querySelectorAll('p')].map(x => x.textContent.replace(/\s+/g, ' ').trim()), parasVis: [...body.querySelectorAll('p')].filter(vis).length,
-        label: document.getElementById('ws-before-h').textContent, line: btn.querySelector('.wb-l').textContent, rowH: Math.round(btn.getBoundingClientRect().height),
+        label: document.getElementById('ws-before-h').textContent, line: btn.querySelector('.wb-l').textContent, safety: btn.querySelector('.wb-s').textContent, rowH: Math.round(btn.getBoundingClientRect().height),
         seen: localStorage.getItem('ws_before_seen'), twins: Object.keys(localStorage).filter(k => /ws_before_seen/.test(k) && k !== 'ws_before_seen'), inWhy: !!document.getElementById('ws-why').contains(sec) };
     });
     const want = wk.it.before.map(r => (typeof r === 'string' ? r : (r.label ? r.label + ' ' : '') + r.text).replace(/\s+/g, ' ').trim());
     await p.evaluate(k => openWorkout(k), FULL); await sleep(p, 700);
-    const f0 = await info();
-    t.check('Before you start is CLOSED by default, even the first time: one row, the heading, a short count on the right, the text hidden (Love All B4)',
-      f0.sec && f0.row && f0.exp === 'false' && !f0.bodyVis && f0.parasVis === 0 && f0.label === 'Before you start' && f0.line === want.length + (want.length === 1 ? ' thing' : ' things') && f0.rowH >= 44, JSON.stringify([f0.exp, f0.label, f0.line, f0.rowH]));
-    t.check('nothing is remembered about it (no ws_before_seen)', f0.seen === null && f0.twins.length === 0, JSON.stringify([f0.seen, f0.twins]));
-    await p.evaluate(() => document.getElementById('ws-before-btn').click()); await sleep(p, 200);
     const f1 = await info();
-    t.check('a tap opens it: all the rows\' text, intact',
-      f1.exp === 'true' && f1.bodyVis && f1.paras.length === want.length && f1.paras.every((x, i) => x === want[i]) && f1.parasVis === want.length, JSON.stringify([f1.exp, f1.paras.length]));
+    t.check('Before you start is OPEN the first time a session is opened: the row (heading, the safety line, a count on the right), and all the rows\' text, intact',
+      f1.sec && f1.row && f1.exp === 'true' && f1.bodyVis && f1.paras.length === want.length && f1.paras.every((x, i) => x === want[i]) && f1.parasVis === want.length && f1.label === 'Before you start'
+      && f1.safety === 'Safety checks: what to stop for' && f1.line === want.length + (want.length === 1 ? ' thing' : ' things') && f1.rowH >= 44, JSON.stringify([f1.exp, f1.paras.length, f1.label, f1.safety, f1.line, f1.rowH]));
+    t.check('the phone remembers it under ws_before_seen = {"<workout id>": 1}, a key that is not athlete-prefixed', JSON.parse(f1.seen)[wk.it.id] === 1 && f1.twins.length === 0, JSON.stringify([f1.seen, f1.twins]));
     t.check('the text is in its own section, never inside "Why this session"', !f1.inWhy);
     // Why this session closing must not touch it
     await p.evaluate(() => document.getElementById('ws-why-toggle').click()); await sleep(p, 200);
@@ -349,11 +346,11 @@ const OVERLAP = `(() => {
     const f1b = await info();
     t.check('closing "Why this session" (a fold row, remembered for every session) hides none of the Before-you-start text', why1.closed && why1.exp === 'false' && why1.key === '1' && !why1.body && f1b.bodyVis && f1b.parasVis === want.length, JSON.stringify([why1, f1b.parasVis]));
     await p.evaluate(() => document.getElementById('ws-why-toggle').click());
-    // opened again: closed again
+    // second open: folded
     await p.evaluate(() => goTo('workouts')); await sleep(p, 300);
     await p.evaluate(k => openWorkout(k), FULL); await sleep(p, 700);
     const f2 = await info();
-    t.check('opened again it is ONE CLOSED ROW again (aria-expanded=false), its text hidden, the row 44 px tall or more', f2.sec && f2.row && f2.exp === 'false' && !f2.bodyVis && f2.parasVis === 0 && f2.label === 'Before you start' && f2.rowH >= 44, JSON.stringify([f2.exp, f2.bodyVis, f2.rowH]));
+    t.check('the second time it is ONE FOLDED ROW titled Before you start (aria-expanded=false), its text hidden, the safety line and the count still on it, the row 44 px or more', f2.sec && f2.row && f2.exp === 'false' && !f2.bodyVis && f2.parasVis === 0 && f2.label === 'Before you start' && f2.safety === 'Safety checks: what to stop for' && f2.line === want.length + (want.length === 1 ? ' thing' : ' things') && f2.rowH >= 44, JSON.stringify([f2.exp, f2.bodyVis, f2.rowH]));
     await p.evaluate(() => document.getElementById('ws-before-btn').click()); await sleep(p, 200);
     const f3 = await info();
     t.check('a tap opens it in place with the same text', f3.exp === 'true' && f3.bodyVis && f3.paras.every((x, i) => x === want[i]) && f3.parasVis === want.length, JSON.stringify([f3.exp, f3.parasVis]));
@@ -363,10 +360,13 @@ const OVERLAP = `(() => {
     await p.evaluate(() => goTo('workouts')); await sleep(p, 200);
     await p.evaluate(k => openWorkout(k), OTHER); await sleep(p, 700);
     const o1 = await info();
-    t.check('every session starts closed, with its own count', o1.exp === 'false' && o1.parasVis === 0 && o1.line === oth.it.before.length + (oth.it.before.length === 1 ? ' thing' : ' things'), JSON.stringify([o1.exp, o1.parasVis, o1.line]));
+    t.check('it is per session: a session never opened before is open the first time, with its own count', o1.exp === 'true' && o1.parasVis === oth.it.before.length && o1.line === oth.it.before.length + (oth.it.before.length === 1 ? ' thing' : ' things'), JSON.stringify([o1.exp, o1.parasVis, o1.line]));
+    const seen = await p.evaluate(() => JSON.parse(localStorage.getItem('ws_before_seen')));
+    t.check('both sessions are in the memory', seen[wk.it.id] === 1 && seen[oth.it.id] === 1, JSON.stringify(seen));
+    // after a reload the memory is still there
     await reload(p); await goLib(p);
     await p.evaluate(k => openWorkout(k), FULL); await sleep(p, 700);
-    t.check('after a reload (a new run of the app) it is still closed', (await info()).exp === 'false');
+    t.check('after a reload (a new run of the app) the first session is still folded', (await info()).exp === 'false');
     // the cover
     const cv = await p.evaluate(() => {
       const c = (e, ps) => getComputedStyle(e, ps), hd = document.querySelector('#screen-workout .ws-header'), img = document.getElementById('ws-img'), back = document.querySelector('#screen-workout .nav-back'), gut = parseFloat(c(document.body).getPropertyValue('--g'));
@@ -391,7 +391,7 @@ const OVERLAP = `(() => {
     await ctx.close();
   }
 
-  // storage that cannot be read or written (a private window): the pane is Sessions, and Before you start is closed as ever
+  // storage that cannot be read or written (a private window): the card is simply open every time, the pane is Sessions
   {
     const { ctx, p } = await open(browser);
     await p.evaluate(() => {
@@ -407,7 +407,7 @@ const OVERLAP = `(() => {
     await p.evaluate(() => goTo('workouts')); await sleep(p, 200);
     await p.evaluate(k => openWorkout(k), FULL); await sleep(p, 600);
     const open2 = await p.evaluate(() => document.getElementById('ws-before-btn').getAttribute('aria-expanded'));
-    t.check('storage blocked: the switch still works and Before you start is closed as ever, with no error', w1.pane === 'playbook' && open2 === 'false' && p.errs.length === 0, JSON.stringify([w1, open2, p.errs]));
+    t.check('storage blocked: the switch still works and Before you start is open every time (the safe way round), with no error', w1.pane === 'playbook' && open2 === 'true' && p.errs.length === 0, JSON.stringify([w1, open2, p.errs]));
     await ctx.close();
   }
 
@@ -528,7 +528,6 @@ const OVERLAP = `(() => {
     await p.evaluate(() => setLibPane('exercises')); await sleep(p, 500);
     await checkScreen('Exercises', '#screen-workouts', '#lib-switch button, #lib-exercises button, #lib-exercises input', 3 + 1 + 2 + 5);
     await p.evaluate(k => { openWorkout(k); }, FULL); await sleep(p, 700);
-    await p.evaluate(() => document.getElementById('ws-before-btn').click()); await sleep(p, 200);
     await checkScreen('a Library session (Before you start open)', '#screen-workout', '#screen-workout .nav-back, #ws-before-btn, #ws-why-toggle', 3);
     await p.evaluate(() => { goTo('workouts'); }); await sleep(p, 200);
     await p.evaluate(k => { openWorkout(k); }, FULL); await sleep(p, 700);

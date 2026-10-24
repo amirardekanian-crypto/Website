@@ -74,7 +74,7 @@ async function typing(browser) {
   await ctx.close();
 }
 
-// ═════════ B4: Before you start is one closed row ═════════
+// ═════════ B4: Before you start is one row with a count (open the first time a session is viewed on this phone, folded after, Amir 2026-10-13) ═════════
 async function before(browser) {
   const LIB = H.library();
   for (const FULL of ['strength/full-body-power', 'mobility/everyday-mobility']) {
@@ -85,12 +85,17 @@ async function before(browser) {
     const m = () => p.evaluate(() => {
       const b = document.getElementById('ws-before-btn'), body = document.getElementById('ws-before-body'), r = b.getBoundingClientRect();
       const first = document.querySelector('#ws-body .checklist-item, #ws-body .hrow, #ws-body > *'), fr = first && first.getBoundingClientRect();
-      return { tag: b.tagName, exp: b.getAttribute('aria-expanded'), ctl: b.getAttribute('aria-controls'), h: Math.round(r.height), n: document.getElementById('ws-before-n').textContent,
+      return { tag: b.tagName, exp: b.getAttribute('aria-expanded'), ctl: b.getAttribute('aria-controls'), h: Math.round(r.height), n: document.getElementById('ws-before-n').textContent, safety: document.querySelector('#ws-before-btn .wb-s').textContent,
         bodyVis: !!body.getClientRects().length, firstTop: fr ? Math.round(fr.top) : null, vh: innerHeight, sw: document.documentElement.scrollWidth, w: innerWidth };
     });
+    const first = await m();
+    t.check(`before ${FULL}: the first time it is viewed it is open, one row with the count and the safety line, its text showing`,
+      first.tag === 'BUTTON' && first.exp === 'true' && first.ctl === 'ws-before-body' && first.h >= 44 && /^\d+ things?$/.test(first.n) && first.bodyVis && first.safety === 'Safety checks: what to stop for', JSON.stringify(first));
+    await p.evaluate(() => goTo('workouts')); await p.waitForTimeout(300);
+    await p.evaluate(k => openWorkout(k), FULL); await p.waitForTimeout(800);
     const c = await m();
-    t.check(`before ${FULL}: one closed row, a button with aria-expanded=false, 44 px or more, a count on the right`,
-      c.tag === 'BUTTON' && c.exp === 'false' && c.ctl === 'ws-before-body' && c.h >= 44 && /^\d+ things?$/.test(c.n) && !c.bodyVis, JSON.stringify(c));
+    t.check(`before ${FULL}: the next time it is one closed row, a button with aria-expanded=false, 44 px or more, a count on the right, the safety line still on it`,
+      c.tag === 'BUTTON' && c.exp === 'false' && c.ctl === 'ws-before-body' && c.h >= 44 && /^\d+ things?$/.test(c.n) && !c.bodyVis && c.safety === 'Safety checks: what to stop for', JSON.stringify(c));
     t.check(`before ${FULL}: at 390 px the first exercise starts on the first screen`, c.firstTop !== null && c.firstTop < c.vh - 60, JSON.stringify([c.firstTop, c.vh]));
     t.check(`before ${FULL}: nothing runs off the side`, c.sw <= c.w, JSON.stringify([c.sw, c.w]));
     await p.focus('#ws-before-btn'); await p.keyboard.press('Enter'); await p.waitForTimeout(250);

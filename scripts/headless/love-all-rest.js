@@ -147,8 +147,50 @@ async function restTests(browser) {
 
 // ═════════ BEFORE YOU START: open the first time a session is viewed on this phone, folded after ═════════
 async function before(browser) {
-  const lib = H.library ? H.library() : null;
-  t.check('before: (placeholder until item 2)', true, String(!!lib));
+  const LIB = H.library();
+  const FULL = 'strength/full-body-power', OTHER = 'mobility/everyday-mobility';
+  const view = (p, k) => p.evaluate(k => { goTo('workouts'); openWorkout(k); }, k).then(() => p.waitForTimeout(800));
+  const info = p => p.evaluate(() => {
+    const b = document.getElementById('ws-before-btn'), body = document.getElementById('ws-before-body');
+    return { exp: b.getAttribute('aria-expanded'), vis: !!body.getClientRects().length, n: document.getElementById('ws-before-n').textContent,
+      safety: b.querySelector('.wb-s').textContent, h: Math.round(b.getBoundingClientRect().height), seen: localStorage.getItem('ws_before_seen') };
+  });
+  {
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, stub: { library: LIB } });
+    p.setDefaultTimeout(8000);
+    await p.evaluate(() => goLibrary()); await p.waitForTimeout(900);
+    await view(p, FULL);
+    const a1 = await info(p);
+    t.check('before: the first time a session is viewed on this phone it is open (text showing), with the count and the safety line on the row',
+      a1.exp === 'true' && a1.vis && /^\d+ things?$/.test(a1.n) && a1.safety === 'Safety checks: what to stop for' && a1.h >= 44, JSON.stringify(a1));
+    t.check('before: the phone keeps it as ws_before_seen = {"<id>": 1}, no athlete prefix', Object.keys(JSON.parse(a1.seen)).length === 1 && Object.values(JSON.parse(a1.seen))[0] === 1
+      && await p.evaluate(() => Object.keys(localStorage).filter(k => /ws_before_seen/.test(k)).length === 1), a1.seen);
+    await view(p, FULL);
+    const a2 = await info(p);
+    t.check('before: viewed again it is one folded row, the count and the safety line still on it', a2.exp === 'false' && !a2.vis && a2.n === a1.n && a2.safety === a1.safety, JSON.stringify(a2));
+    await p.click('#ws-before-btn'); await p.waitForTimeout(200);
+    t.check('before: a tap opens it, and the next view folds it again', (await info(p)).exp === 'true' && (await view(p, FULL), (await info(p)).exp === 'false'));
+    await view(p, OTHER);
+    const o1 = await info(p);
+    t.check('before: another session is open its first time, and both are remembered', o1.exp === 'true' && o1.vis && Object.keys(JSON.parse(o1.seen)).length === 2, JSON.stringify(o1));
+    t.check('before: nothing synced (the key is on this phone only, not in the cloud queue)', await p.evaluate(() => !/ws_before_seen/.test(JSON.stringify(window.__STUB && window.__STUB.params || []))));
+    t.check('before: no page errors', p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+  {   // a private window: storage cannot be read or written, so it is open every time
+    const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, stub: { library: LIB } });
+    p.setDefaultTimeout(8000);
+    await p.evaluate(() => {
+      const og = Storage.prototype.getItem, os = localStorage.setItem;
+      localStorage.getItem = k => { if (k === 'ws_before_seen') throw new Error('blocked'); return og.call(localStorage, k); };
+      localStorage.setItem = (k, v) => { if (k === 'ws_before_seen') throw new Error('blocked'); return os.call(localStorage, k, v); };
+    });
+    await p.evaluate(() => goLibrary()); await p.waitForTimeout(900);
+    await view(p, FULL); await view(p, FULL);
+    t.check('before: with storage blocked it is open every time (the safe way round) and nothing throws',
+      await p.evaluate(() => document.getElementById('ws-before-btn').getAttribute('aria-expanded')) === 'true' && p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
 }
 
 (async () => {
