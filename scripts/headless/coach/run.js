@@ -6896,6 +6896,96 @@ S['lounge-nudge'] = async (b) => {
   return r;
 };
 
+// K3. Cheer a moment from Courtside: a sheet with an optional word, coach_cheer, "Cheered today", plain words for a refusal.
+S['lounge-cheer'] = async (b) => {
+  const r = { id: 'lounge-cheer', title: 'K3: each Courtside moment has 👏 Cheer (a small sheet, an optional word of 100 letters, coach_cheer); the row then says "Cheered today"; refusals in plain words; absent on a server without stage96', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { lounge: true, court: true }, hash: 'today' }, COURT_T));
+  await noPopups(page);
+  const rows = () => page.evaluate(() => [...document.querySelectorAll('#courtPanel .cs')].filter(e => e.querySelector('.cs-name')).map(e => ({ name: e.querySelector('.cs-name').textContent, acts: [...e.querySelectorAll('.cs-acts .btn')].map(x => x.textContent.trim().replace(/︎/g, '')),
+    state: (e.querySelector('.cheer-state') || {}).textContent || '', sheet: !!e.querySelector('#cheerSheet') })));
+  const row = async n => (await rows()).find(x => x.name === n);
+  const calls = async name => (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === name);
+  const btn = (name, label) => page.locator('#courtPanel .cs', { has: page.locator('.cs-name', { hasText: name }) }).locator('.cs-acts .btn', { hasText: label }).first();
+  check(r, 'coach_crew_cheers is read once, behind the first paint', (await calls('coach_crew_cheers')).length === 1, (await calls('coach_crew_cheers')).length);
+  check(r, 'Ava (in the crew): her row offers WhatsApp ↗, Copy, Saw it and then 👏 Cheer', JSON.stringify((await row('Ava Example')).acts) === JSON.stringify(['WhatsApp ↗', 'Copy', 'Saw it', '👏 Cheer']), (await row('Ava Example')).acts);
+  check(r, 'the clapping hands are the text-style glyph (U+FE0E), so they take the button\'s colour: the picture-style one is yellow and yellow is never in this app', await page.evaluate(() => { const c = document.querySelector('#courtPanel .clap'); return !!c && c.textContent.includes('︎') && /Symbol/.test(getComputedStyle(c).fontFamily) && getComputedStyle(c).color === getComputedStyle(c.parentElement).color; }), '');
+  check(r, 'Ben (Amir already cheered him today, the list says so): "Cheered today" and no button', (await row('Ben Example')).state === 'Cheered today' && !(await row('Ben Example')).acts.some(x => /Cheer$/.test(x)), await row('Ben Example'));
+  check(r, 'Gia, Jon and Hal have not joined the crew: "Not in the crew" and no button (the server would refuse)', ['Gia Example', 'Jon Example', 'Hal Example'].every(n => { return true; }) && (await Promise.all(['Gia Example', 'Jon Example', 'Hal Example'].map(row))).every(x => x.state === 'Not in the crew' && !x.acts.some(a => /Cheer$/.test(a))), await rows());
+  // the sheet
+  const n0 = await L.nCalls(page);
+  await btn('Ava Example', 'Cheer').click(); await L.settle(page, 250);
+  const sh = await page.evaluate(() => { const i = document.getElementById('cheerIn'); return i ? { max: i.maxLength, val: i.value, focus: document.activeElement === i, count: document.getElementById('cheerCount').textContent, text: document.getElementById('cheerSheet').innerText.replace(/\s+/g, ' ').trim(), buttons: [...document.querySelectorAll('#cheerSheet .btn')].map(x => x.textContent.trim()) } : null; });
+  check(r, 'the first tap opens a sheet under her row: a box for a word (100 letters, focused), a count, "Send the cheer" and Cancel; nothing was sent', sh && sh.max === 100 && sh.focus && sh.count === '0' && JSON.stringify(sh.buttons) === JSON.stringify(['Send the cheer', 'Cancel']) && /A word for Ava\? Optional\. It shows on their page for 7 days/.test(sh.text) && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_cheer'), sh);
+  await page.locator('#cheerIn').fill('Great week, <b>legs</b>');
+  check(r, 'the count follows what is typed', (await page.locator('#cheerCount').innerText()) === '23', await page.locator('#cheerCount').innerText());
+  const looksOpen = await lookOf(page, '#courtPanel');
+  check(r, 'the look holds with the sheet open: five font sizes, three radii, one button height, one primary button', !looksOpen.length, looksOpen.slice(0, 5));
+  await page.locator('#cheerSheet .btn', { hasText: 'Cancel' }).click(); await L.settle(page, 200);
+  check(r, 'Cancel closes it and sends nothing', !(await row('Ava Example')).sheet && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_cheer'), '');
+  await btn('Ava Example', 'Cheer').click(); await L.settle(page, 250);
+  check(r, 'opened again it is empty (the cancelled word is not kept)', (await page.locator('#cheerIn').inputValue()) === '', '');
+  await page.locator('#cheerIn').fill('Great week, <b>legs</b>');
+  const m0 = await L.nCalls(page);
+  await page.locator('#cheerSheet .btn', { hasText: 'Send the cheer' }).click(); await L.settle(page, 600);
+  const sent = (await L.callsSince(page, m0)).filter(c => c.name === 'coach_cheer');
+  check(r, 'Send calls coach_cheer once with exactly the athlete and the word as typed', sent.length === 1 && JSON.stringify(sent[0].payload) === JSON.stringify({ p_athlete: 'ava_test', p_word: 'Great week, <b>legs</b>' }), sent.map(c => c.payload));
+  check(r, 'the row says "Cheered today", the sheet is gone, and the page said "Cheered Ava"', (await row('Ava Example')).state === 'Cheered today' && !(await row('Ava Example')).sheet && /Cheered Ava/.test(await L.toastText(page)), await row('Ava Example'));
+  check(r, 'the list of cheers was read again after it', (await L.callsSince(page, m0)).filter(c => c.name === 'coach_crew_cheers').length === 1, '');
+  const dbc = (await L.db(page)).lounge.cheers.filter(c => c.to_athlete === 'ava_test' && c.from_athlete === '__coach__');
+  check(r, 'the server holds one cheer from the coach to Ava, with the word cleaned of < and >, dated today', dbc.length === 1 && dbc[0].word === 'Great week, blegs/b' && dbc[0].day === '2026-11-12', dbc);
+  check(r, 'a cheer pays nothing: no XP, award or fact call', !(await L.callsSince(page, m0)).some(c => /xp|award|fact|career/i.test(c.name) && c.kind === 'rpc'), (await L.callsSince(page, m0)).map(c => c.name));
+  // an empty word goes as null
+  await page.evaluate(() => { window.__DB.crew_bell.people.push({ athlete_id: 'hal_court', answer: 'yes', under13: false, answered_at: new Date().toISOString(), kinds_off: [] }); return window.loadBell(); }); await L.settle(page, 400);
+  check(r, 'Hal joins the crew: when the Bell is read again his row offers the button', (await row('Hal Example')).acts.includes('👏 Cheer'), await row('Hal Example'));
+  const h0 = await L.nCalls(page);
+  await btn('Hal Example', 'Cheer').click(); await L.settle(page, 200);
+  await page.locator('#cheerIn').fill('   ');
+  await page.locator('#cheerIn').press('Enter'); await L.settle(page, 500);
+  const hs = (await L.callsSince(page, h0)).filter(c => c.name === 'coach_cheer');
+  check(r, 'Enter sends it; a box with only spaces sends p_word null', hs.length === 1 && hs[0].payload.p_word === null && hs[0].payload.p_athlete === 'hal_court' && (await row('Hal Example')).state === 'Cheered today', hs.map(c => c.payload));
+  // too long: refused here, nothing sent
+  await page.evaluate(() => { window.__DB.crew_bell.people.push({ athlete_id: 'gia_court', answer: 'yes', under13: false, answered_at: new Date().toISOString(), kinds_off: [] }); return window.loadBell(); }); await L.settle(page, 400);
+  await btn('Gia Example', 'Cheer').click(); await L.settle(page, 200);
+  const g0 = await L.nCalls(page);
+  await page.evaluate(() => { document.getElementById('cheerIn').value = 'x'.repeat(101); });
+  await page.locator('#cheerSheet .btn', { hasText: 'Send the cheer' }).click(); await L.settle(page, 300);
+  check(r, 'a word over 100 letters is refused on the page in plain words and nothing is sent', /That word is over 100 letters\. Shorten it and send again\./.test(await L.failText(page)) && !(await L.callsSince(page, g0)).some(c => c.name === 'coach_cheer'), await L.failText(page));
+  // cheered from somewhere else today: the server says so
+  await page.evaluate(() => { const l = window.__DB.lounge; l.cheers.push({ id: ++l.seq, from_athlete: '__coach__', from_who: 'Coach', to_athlete: 'gia_court', to_who: 'Gia E.', word: null, day: '2026-11-12' }); document.getElementById('cheerIn').value = ''; });
+  await page.locator('#cheerSheet .btn', { hasText: 'Send the cheer' }).click(); await L.settle(page, 500);
+  check(r, 'a second cheer the same day (made on another screen) is refused: "You already cheered Gia today." and the row now says "Cheered today"', /You already cheered Gia today\./.test(await L.failText(page)) && (await row('Gia Example')).state === 'Cheered today' && !(await row('Gia Example')).sheet, await L.failText(page));
+  // not in the crew any more: the Bell is read again
+  await page.evaluate(() => { window.__DB.crew_bell.people.push({ athlete_id: 'jon_court', answer: 'yes', under13: false, answered_at: new Date().toISOString(), kinds_off: [] }); return window.loadBell(); }); await L.settle(page, 400);
+  await btn('Jon Example', 'Cheer').click(); await L.settle(page, 200);
+  await page.evaluate(() => { window.__DB.crew_bell.people = window.__DB.crew_bell.people.filter(p => p.athlete_id !== 'jon_court'); });
+  const j0 = await L.nCalls(page);
+  await page.locator('#cheerSheet .btn', { hasText: 'Send the cheer' }).click(); await L.settle(page, 700);
+  check(r, 'someone who left the crew since: "Jon is not in the crew, so there is nobody to cheer", the Bell is read again and the row says "Not in the crew"', /Jon is not in the crew, so there is nobody to cheer\./.test(await L.failText(page)) && (await L.callsSince(page, j0)).some(c => c.name === 'coach_crew') && (await row('Jon Example')).state === 'Not in the crew', await L.failText(page));
+  // the answer never arrived
+  await page.evaluate(() => { window.__DB.crew_bell.people.push({ athlete_id: 'ivy_court', answer: 'yes', under13: false, answered_at: new Date().toISOString(), kinds_off: [] }); return window.loadBell(); });
+  await page.locator('#courtPanel .showweek').click().catch(() => {}); await L.settle(page, 400);
+  await btn('Ivy Example', 'Cheer').click(); await L.settle(page, 200);
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_cheer', message: 'fixture: connection dropped', code: '', times: 1 }));
+  const v0 = await L.nCalls(page);
+  await page.locator('#cheerSheet .btn', { hasText: 'Send the cheer' }).click(); await L.settle(page, 600);
+  check(r, 'no answer at all: the page does not say it went or did not, it reads the list again and says to look', /The answer never arrived \(fixture: connection dropped\), so the page cannot tell whether the cheer went/.test(await L.failText(page)) && (await L.callsSince(page, v0)).some(c => c.name === 'coach_crew_cheers'), await L.failText(page));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  // a phone: the sheet fits
+  const ph = await L.openCoach(b, Object.assign({ seed: { lounge: true, court: true }, hash: 'today' }, COURT_T));
+  await ph.page.setViewportSize({ width: 360, height: 800 }); await L.settle(ph.page, 300);
+  await ph.page.locator('#courtPanel .cs', { has: ph.page.locator('.cs-name', { hasText: 'Ava Example' }) }).locator('.cs-acts .btn', { hasText: 'Cheer' }).click(); await L.settle(ph.page, 300);
+  check(r, 'at 360 px the sheet fits: no sideways scroll, the box and both buttons inside the panel', await ph.page.evaluate(() => { const p = document.getElementById('courtPanel').getBoundingClientRect(); return document.documentElement.scrollWidth <= innerWidth && [...document.querySelectorAll('#cheerSheet input, #cheerSheet .btn')].every(e => { const q = e.getBoundingClientRect(); return q.left >= p.left - 1 && q.right <= p.right + 1; }); }), '');
+  await ph.page.context().close();
+  // a server without stage96: no Cheer, no "Not in the crew", no words about it
+  const old = await L.openCoach(b, Object.assign({ seed: { crew: true, court: true }, hash: 'today' }, COURT_T));
+  await L.settle(old.page, 500);
+  check(r, 'without stage96 there is nothing about cheers on Courtside, no banner and no failure line', await old.page.evaluate(() => !/Cheer|Not in the crew|Cheered/.test(document.getElementById('courtPanel').innerText)) && !(await old.page.locator('#loadwarn:not([hidden])').count()) && !(await L.failText(old.page)), '');
+  check(r, 'no page errors on the old server', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));

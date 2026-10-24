@@ -452,7 +452,7 @@
     // the last 7 days (today and the six before), newest first
     coach_crew_cheers: function () {
       var L = lounge(), from = ymdBack(utcDate(), 6);
-      return clone(L.cheers.filter(function (c) { return c.day >= from; }).sort(function (a, b) { return b.id - a.id; }));
+      return clone(L.cheers.filter(function (c) { return c.day >= from; }).sort(function (a, b) { return (a.day < b.day ? 1 : a.day > b.day ? -1 : 0) || (b.id - a.id); }));
     },
     coach_cheer_word_clear: function (p) {
       var c = lounge().cheers.find(function (x) { return x.id === p.p_id; });

@@ -674,6 +674,9 @@
   .ava.has-face, .det-ava.has-face, .pface.has-face { background: var(--line); overflow: hidden; }
   .ava img, .det-ava img, .pface img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .need .needgo .pface { margin: -4px 0; }                         /* centred on the row's first line, so the row grows no taller */
+  .court .cheer-sheet { padding-left: 16px; }
+  .clap { font-family: 'Segoe UI Symbol', 'Noto Sans Symbols', 'Apple Symbols', sans-serif; font-variant-emoji: text; }
+  .court .cheer-state { padding: 0 4px; }
   .need.nudge { padding: 8px 0 8px 20px; }                        /* the people under "Trains, not in the crew", set in under their head row */
   .need.nudge a.n { color: var(--ink); text-decoration: none; }
   .need.nudge a.n:hover { text-decoration: underline; }
@@ -3425,7 +3428,7 @@ function courtGroups() {
   const rank = x => COURT_SIZE[x.size] || 0;
   return Object.values(by).map(list => {
     list.sort((a, b) => rank(b) - rank(a) || String(b.at).localeCompare(String(a.at)) || String(a.award_id).localeCompare(String(b.award_id)));
-    return { id: list[0].athlete_id, lead: list[0], rows: list, ids: list.map(x => x.award_id), at: list.reduce((m, x) => (String(x.at) > m ? String(x.at) : m), ''),
+    return { key: list[0].athlete_id + '|' + dkey(new Date(list[0].at)), id: list[0].athlete_id, lead: list[0], rows: list, ids: list.map(x => x.award_id), at: list.reduce((m, x) => (String(x.at) > m ? String(x.at) : m), ''),
              seen: list.every(x => x.saw_at), sent: list.some(x => x.sent_at) };
   }).sort((a, b) => rank(b.lead) - rank(a.lead) || b.at.localeCompare(a.at));
 }
@@ -3468,7 +3471,8 @@ function courtRowHtml(g) {
       <div class="cs-l1 withface"><span class="dot"></span>${avaHtml('pface', g.id, nameOf(g.id))}<span class="m"><a class="cs-name" href="#a/${encodeURIComponent(g.id)}">${esc(nameOf(g.id))}</a> ${esc(courtWords(g.lead))}</span><span class="cs-when">${esc(DOWS[new Date(g.at).getDay()])}</span></div>
       ${also.length ? `<div class="cs-sub">and ${esc(also.join(', '))}</div>` : ''}
       <div class="cs-msg" dir="auto">“${esc(msg)}”</div>
-      <div class="cs-acts">${courtSendHtml(g.id, msg, act)}<button class="btn sm" onclick="${act('saw')}">Saw it</button></div>
+      <div class="cs-acts">${courtSendHtml(g.id, msg, act)}<button class="btn sm" onclick="${act('saw')}">Saw it</button>${cheerCtlHtml(g)}</div>
+      ${cheerSheetHtml(g)}
     </div>`;
 }
 function courtSeenHtml(g) {
@@ -6846,7 +6850,7 @@ async function loadBell() {
 // Draw what changed where it stands: the feed and the answers in place (the composer is never replaced, so typing keeps its focus), or the whole
 // Proof screen when the panels have just appeared or gone.
 function paintBell() {
-  paintNeed();   // Today's "Trains, not in the crew" reads the Bell's answers
+  if (S.ready && route().view === 'today') { paintNeed(); paintCourt(); }   // Today's "Trains, not in the crew" and Courtside's Cheer read the Bell's answers
   if (!S.ready || route().view !== 'proof') return;
   const on = !!(S.bell && S.bell.on), el = $('bellPanel');
   if (!el || !on) { if (!!el !== on) render(); return; }
@@ -7183,14 +7187,16 @@ let _loungeSeq = 0;
 async function loadLounge() {
   if (DEMO) return;
   const seq = ++_loungeSeq;
-  await Promise.all([loadFaces()]);
+  await Promise.all([loadFaces(), loadCheers()]);
   if (seq === _loungeSeq) paintLounge();
 }
 // Draw what changed where it stands: the faces in place, then the screen that shows the rest.
 function paintLounge() {
   if (!S.ready) return;
   paintFaces();
-  if (route().view === 'proof' && S.bell && S.bell.on && $('bellPeople')) $('bellPeople').innerHTML = bellPeopleHtml();
+  const v = route().view;
+  if (v === 'today') paintCourt();
+  else if (v === 'proof' && S.bell && S.bell.on && $('bellPeople')) $('bellPeople').innerHTML = bellPeopleHtml();
 }
 window.loadLounge = loadLounge;
 
@@ -7240,6 +7246,87 @@ function paintNeed() {
   if (el) el.innerHTML = needPanelHtml();
 }
 window.paintNeed = paintNeed;
+
+// K3. Cheer. Courtside shows moments; each row gets "👏 Cheer": a small sheet under the row with an optional word (100 letters), then coach_cheer() (stage96:
+// Amir as the giver, shown to the crew as "Coach", one cheer a day per person on the server's UTC day). Afterwards the row says "Cheered today". A cheer
+// pays nothing (GAME-6) and its word is the crew's to read for 7 days, so the sheet says so; Amir clears a word under Proof (K4). The control is there only
+// while the server has coach_crew_cheers() (stage96), and someone the Bell says is not in the crew gets the words "Not in the crew" instead of a button.
+const CHEER_MAX = 100;
+let _cheerFor = null, _cheerWord = '', _cheerBusy = false;   // the Courtside group whose sheet is open, what is typed, a cheer on its way
+const utcDay = () => new Date().toISOString().slice(0, 10);
+const CHEER_ERRS = {   // the server's messages (raise exception 'crew:...') in plain words; f is the first name
+  'crew:cheer_today': f => `You already cheered ${f} today.`,
+  'crew:cheers_today': () => 'That is too many cheers for one day. Try again tomorrow.',
+  'crew:word_long': () => `That word is over ${CHEER_MAX} letters. Shorten it and send again.`,
+  'crew:under13': f => `${f} is ticked under 13, so they cannot be cheered.`,
+  'crew:gone': f => `${f} is not in the crew, so there is nobody to cheer. The Bell is reloading.`,
+  'crew:not_yes': f => `${f} is not in the crew, so there is nobody to cheer. The Bell is reloading.`,
+  'crew:own': () => 'You cannot cheer yourself.',
+};
+async function loadCheers() {
+  const res = await loungeRpc('coach_crew_cheers');
+  if (loungeMissing(res)) { S.cheers = { on: false, rows: [], err: '' }; LOAD_ERR.cheers = ''; return; }
+  if (res.error) { S.cheers = { on: true, rows: (S.cheers && S.cheers.rows) || [], err: res.error.message || 'no answer' }; LOAD_ERR.cheers = S.cheers.err; return; }
+  S.cheers = { on: true, rows: Array.isArray(res.data) ? res.data : [], err: '' }; LOAD_ERR.cheers = '';
+}
+// Cheered today: the list says so (the server's day is UTC), or this page just did it.
+function cheeredToday(id) {
+  const d = utcDay();
+  return S.cheerDone[id] === d || ((S.cheers && S.cheers.rows) || []).some(c => c.from_athlete === COACH_NOTE_ID && c.to_athlete === id && c.day === d);
+}
+// The Bell has been read and does not list this person as a yes (or lists them under 13): they cannot be cheered.
+function cheerNotIn(id) {
+  const b = S.bell;
+  if (!(b && b.on) || b.err) return false;
+  const p = (b.people || []).find(x => x.athlete_id === id);
+  return !(p && p.answer === 'yes' && !p.under13);
+}
+function cheerCtlHtml(g) {
+  if (!(S.cheers && S.cheers.on)) return '';
+  if (cheeredToday(g.id)) return '<span class="muted t-sm cheer-state">Cheered today</span>';
+  if (cheerNotIn(g.id)) return '<span class="muted t-sm cheer-state">Not in the crew</span>';
+  // 👏 asked for in the text style (U+FE0E): the picture-style one is yellow, and yellow is never in this app. It takes the button's own colour.
+  return `<button class="btn sm" onclick="cheerOpen(${jsq(g.key)})"><span class="clap" aria-hidden="true">👏&#xFE0E;</span> Cheer</button>`;
+}
+function cheerSheetHtml(g) {
+  if (!(S.cheers && S.cheers.on) || _cheerFor !== g.key || cheeredToday(g.id)) return '';
+  const first = firstWord(nameOf(g.id)), busy = _cheerBusy ? ' disabled' : '';
+  return `<div class="from-box cheer-sheet" id="cheerSheet">
+      <span class="t-sm muted">A word for ${esc(first)}? Optional. It shows on their page for 7 days. Some characters are removed. <span id="cheerCount">${_cheerWord.length}</span>/${CHEER_MAX}</span>
+      <div class="from-row"><input id="cheerIn" class="goal-in" maxlength="${CHEER_MAX}" dir="auto" value="${esc(_cheerWord)}" placeholder="That sled push looked heavy" aria-label="A word for ${esc(nameOf(g.id))}"
+          oninput="cheerType(this)" onkeydown="if(event.key==='Enter')cheerSend(${jsq(g.key)});if(event.key==='Escape')cheerCancel()">
+        <button class="btn sm primary" onclick="cheerSend(${jsq(g.key)})"${busy}>${_cheerBusy ? 'Sending…' : 'Send the cheer'}</button><button class="btn sm quiet" onclick="cheerCancel()"${busy}>Cancel</button></div>
+    </div>`;
+}
+function cheerOpen(key) { _cheerFor = key; _cheerWord = ''; paintCourt(); focusEnd('cheerIn'); }
+function cheerCancel() { if (_cheerBusy) return; _cheerFor = null; _cheerWord = ''; paintCourt(); }
+function cheerType(inp) { _cheerWord = inp.value; const c = $('cheerCount'); if (c) c.textContent = inp.value.length; }
+async function cheerSend(key) {
+  if (_cheerBusy) return;
+  const g = courtGroups().find(x => x.key === key);
+  if (!g) { _cheerFor = null; paintCourt(); return; }
+  const id = g.id, first = firstWord(nameOf(id)), word = String($('cheerIn') ? $('cheerIn').value : _cheerWord).trim();
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (word.length > CHEER_MAX) { fail(CHEER_ERRS['crew:word_long']()); return; }
+  _cheerBusy = true; _cheerWord = word; paintCourt();
+  const res = await loungeRpc('coach_cheer', { p_athlete: id, p_word: word || null });
+  _cheerBusy = false;
+  if (res.error) {
+    const m = String(res.error.message || ''), k = Object.keys(CHEER_ERRS).find(x => m.indexOf(x) >= 0);
+    // No database code means the answer never arrived: the cheer may have gone, so the list is read again before anyone is told.
+    if (!res.error.code) { fail(`The answer never arrived (${m || 'no reply'}), so the page cannot tell whether the cheer went. The list is reloading: look before you try again.`); await loadCheers(); }
+    else fail(k ? CHEER_ERRS[k](first) : 'Could not send the cheer: ' + m);
+    if (k === 'crew:cheer_today') { S.cheerDone[id] = utcDay(); _cheerFor = null; _cheerWord = ''; }
+    if (k === 'crew:gone' || k === 'crew:not_yes' || k === 'crew:under13') { _cheerFor = null; _cheerWord = ''; loadBell(); }
+    paintCourt();
+    return;
+  }
+  S.cheerDone[id] = utcDay(); _cheerFor = null; _cheerWord = '';
+  toast(`Cheered ${first}`);
+  paintCourt();
+  loadCheers().then(() => { paintCourt(); });
+}
+Object.assign(window, { cheerOpen, cheerCancel, cheerType, cheerSend });
 
 // Remove photo: two taps, like every delete on this page (the panel names what goes and what stays). The function is stage96's coach_crew_face_clear.
 function faceRemove(id) {
