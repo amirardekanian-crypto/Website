@@ -3598,6 +3598,11 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check::before { background: var(--mark); border-color: var(--mark); }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check::after { opacity: 1; transform: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-check:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 0; }
+  /* a hold counting (holdGate()): the circle's edge is a ring that empties, the seconds left sit in it; reduced motion keeps the number only */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-check.holding { font-size: var(--fs-small); font-weight: 700; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-check.holding::before { border: 0; background: conic-gradient(var(--green-ink) calc(var(--hold, 1) * 360deg), var(--hair) 0);
+    -webkit-mask: radial-gradient(circle, transparent 12.5px, #000 13px); mask: radial-gradient(circle, transparent 12.5px, #000 13px); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-check.holding.quiet::before { background: var(--green-ink); }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row .ex-set-check.kg-armed::before { border: 2px solid var(--clay); }   /* the weight asks first (kgLooksWrong()) */
   /* How hard?: a sand band that hangs off its set, a caret up at that set's RPE slot, big keys */
   :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe { grid-column: 1 / -1; display: none; position: relative; align-items: center; gap: 6px;
@@ -10496,11 +10501,13 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   const repsData = (rx.dose && rx.dose.kind === 'reps') ? rx.dose.value : '';
   // The dose as words, for a set row with no box to type in (a hold: "30 s / side").
   const doseData = rx.dose ? rx.dose.value + (rx.dose.side ? ' / side' : '') : '';
+  // A timed hold ("30 s / side") gets a circle that counts it (holdGate()): its seconds, or nothing for "30-45 s" or a carry.
+  const holdSec = (rx.dose && rx.dose.kind === 'time' && isStandard) ? (parseDurationToSec(rx.dose.value) || '') : '';
 
   // .ex-side holds the ⓘ (paintSpine()); .ex-doneline is the finished row's summary
   // (paintDoneLines()). The dot is an empty span inside .item-name, so the name's text
   // (which every lookup reads) is unchanged.
-  return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-dose="${esc(doseData)}" data-target="${esc(rx.rpe || '')}" data-exid="${esc(ex.exId || '')}">
+  return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-dose="${esc(doseData)}"${holdSec ? ` data-hold="${holdSec}"` : ''}${holdSec && rx.dose.side ? ' data-hold-side="1"' : ''} data-target="${esc(rx.rpe || '')}" data-exid="${esc(ex.exId || '')}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" role="button" tabindex="0" aria-label="Tick every set" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')" onkeydown="onCheckBoxKey(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
@@ -18844,6 +18851,57 @@ function repRangeText(card) {
   return /\d\s*[-–]\s*\d/.test(t) ? t.replace(/\s*[-–]\s*/, '–').replace(/[^\d–]/g, '') : '';
 }
 
+// ── THE CIRCLE COUNTS A HOLD (Love All round 4, 2026-10-24, direction A of "Round 4 choices") ──
+// A set whose dose is a time ("20 s / side", the plank: data-hold, in seconds) counts down inside its own circle: a ring that empties,
+// the seconds left as the number, a buzz at 0, and for "/ side" three seconds to change, "Other side", then the second side. At the end
+// the set ticks itself through the same click every tick takes. A second tap while it counts stops it and ticks nothing. A done set's
+// circle still unticks as ever, and Guided's big Done button ticks at once (it sets btn._now): the athlete said it is done.
+// Reduced motion: no ring moves, only the number. One hold at a time (holdGate.run).
+function holdGate(card, row, btn, idx, name, total, day) {
+  const sec = parseInt(card.dataset.hold, 10);
+  if (!sec || btn._now) return false;
+  if (btn._hold) { holdStop(btn); return true; }                  // a tap while it counts: stop, tick nothing
+  const pre = loadSetLog(name, total, day)[idx] || {};
+  if (pre.d) return false;                                        // already ticked: the circle unticks as it always did
+  if (holdGate.run) holdStop(holdGate.run);
+  const quiet = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const plan = card.dataset.holdSide === '1' ? [['hold', sec], ['switch', 3], ['hold', sec]] : [['hold', sec]];
+  let phase = 0, t0 = Date.now();
+  btn._hold = {};
+  holdGate.run = btn;
+  btn.classList.add('holding');
+  btn.classList.toggle('quiet', quiet);
+  btn.setAttribute('aria-label', `Set ${idx + 1} counting. Tap to stop`);
+  const draw = () => {
+    const [kind, len] = plan[phase], left = Math.max(0, len - (Date.now() - t0) / 1000);
+    btn.textContent = String(Math.ceil(left));
+    if (!quiet) btn.style.setProperty('--hold', kind === 'hold' ? (left / len).toFixed(3) : '0');
+    return left;
+  };
+  btn._hold.timer = setInterval(() => {
+    if (!btn.isConnected) { holdStop(btn); return; }
+    if (draw() > 0) return;
+    if (plan[phase][0] === 'hold' && navigator.vibrate) navigator.vibrate(220);
+    if (++phase >= plan.length) {
+      holdStop(btn);
+      btn._now = true; btn.click(); btn._now = false;             // the set ticks itself, by the very click a thumb makes
+      return;
+    }
+    if (plan[phase][0] === 'switch') aaToast('Other side.', { kicker: 'Hold', ms: 3000 }); else hideAaToast();
+    t0 = Date.now(); draw();
+  }, 100);
+  draw();
+  return true;
+}
+function holdStop(btn) {
+  if (!btn || !btn._hold) return;
+  clearInterval(btn._hold.timer); btn._hold = null;
+  if (holdGate.run === btn) holdGate.run = null;
+  btn.classList.remove('holding', 'quiet'); btn.style.removeProperty('--hold'); btn.textContent = '';
+  const row = btn.closest('.ex-set-row');
+  btn.setAttribute('aria-label', `Mark set ${row ? parseInt(row.dataset.setIdx, 10) + 1 : ''} done as written`);
+}
+
 function attachSetLog(card) {
   const name  = card.querySelector('.item-name').textContent.trim();
   const total = parseInt(card.dataset.sets, 10) || 1;
@@ -19029,6 +19087,7 @@ function attachSetLog(card) {
     // an RPE is already there; unticking closes it. Nothing is erased either way.
     row.querySelector('.ex-set-check').addEventListener('click', ev => {
       ev.stopPropagation();
+      if (holdGate(card, row, ev.currentTarget, idx, name, total, day)) return;   // a timed hold: the circle counts it first
       // A weight far above this lift's numbers asks once before the tick keeps it (kgLooksWrong()): the first tap arms the
       // tick (a clay ring) and says so, a second within 4 s keeps it.
       const pre = loadSetLog(name, total, day)[idx] || {}, btn = ev.currentTarget;
@@ -21199,7 +21258,9 @@ function stepPrimary() {
   if (!stepDone(item)) {
     if (item.circuit) finishRound(item);
     else {
-      currentStepRow().querySelector('.ex-set-check').click();
+      const tick = currentStepRow().querySelector('.ex-set-check');
+      holdStop(tick);                                            // Done says it is done: a hold's circle is not waited for
+      tick._now = true; tick.click(); tick._now = false;
       if (!stepDone(item)) return;   // the weight asked first (kgLooksWrong()): the next tap of Done keeps it
     }
     stepAfterDone();
