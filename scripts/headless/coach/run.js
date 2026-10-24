@@ -6638,6 +6638,46 @@ S['open-panel'] = async (b) => {
   return r;
 };
 
+// ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+// PLAYERS' LOUNGE (stage96 + stage97, built 2026-10-24, not live yet). Every answer below is in the shape of C:\Users\Amir\AA-Lounge\CONTRACT.md, with
+// made-up people. buildSeed({lounge: true}) turns the stage96 functions on in the stub, buildSeed({partner: true}) stage97's; without them the stub
+// answers "Could not find the function" like a server that has not had the stage, and the page must draw nothing and say nothing.
+// ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+// K7. form-fa.html reads ?code= into the discount box and runs the same check typing would, as form.html does.
+S['lounge-form-fa-code'] = async (b) => {
+  const r = { id: 'lounge-form-fa-code', title: 'K7: form-fa.html?code=SARA42 fills the discount box and runs check_discount; no code leaves the box empty and asks nothing', checks: [] };
+  const run = async (query, answer) => {
+    const ctx = await b.newContext({ viewport: { width: 420, height: 900 }, timezoneId: 'UTC' });
+    const page = await ctx.newPage();
+    const asked = [], errs = [];
+    page.on('pageerror', e => errs.push(String(e && e.message || e)));
+    await page.route('**/*', route => {
+      const u = route.request().url();
+      if (u.startsWith(L.BASE)) return route.continue();
+      if (/\/rest\/v1\/rpc\/check_discount/.test(u)) { asked.push(JSON.parse(route.request().postData() || '{}')); return route.fulfill({ status: 200, contentType: 'application/json', body: answer }); }
+      return route.fulfill({ status: 204, body: '' });
+    });
+    await page.goto(L.BASE + '/form-fa.html' + query);
+    await page.waitForTimeout(900);
+    const st = await page.evaluate(() => ({ value: document.getElementById('dcode').value, msg: document.getElementById('dmsg').textContent, applied: document.getElementById('dapplied').value, cls: document.getElementById('dmsg').className }));
+    await ctx.close();
+    return { asked, errs, st };
+  };
+  const a = await run('?code=SARA42', '10');
+  check(r, 'the box holds the code from the link', a.st.value === 'SARA42', a.st);
+  check(r, 'check_discount was asked once, with the code in capitals', a.asked.length === 1 && a.asked[0].p_code === 'SARA42', a.asked);
+  check(r, 'a live code is approved in Farsi and goes out in Discount Applied as the English form does ("SARA42 (10% off)")', /valid/.test(a.st.cls) && /تایید شد/.test(a.st.msg) && a.st.applied === 'SARA42 (10% off)', a.st);
+  const lower = await run('?code=%20sara42%20', '10');
+  check(r, 'spaces around the code are trimmed and a lower-case code is asked in capitals', lower.st.value === 'sara42' && lower.asked.length === 1 && lower.asked[0].p_code === 'SARA42', { v: lower.st.value, asked: lower.asked });
+  const bad = await run('?code=NOPE', 'null');
+  check(r, 'a code the server does not know says nothing until the box is left, and sends nothing as applied', bad.asked.length === 1 && bad.st.applied === '' && !/invalid/.test(bad.st.cls), bad.st);
+  const none = await run('', '10');
+  check(r, 'no ?code= leaves the box empty and asks nothing', none.st.value === '' && none.asked.length === 0, none);
+  check(r, 'no page errors', !a.errs.length && !lower.errs.length && !bad.errs.length && !none.errs.length, [a.errs, lower.errs, bad.errs, none.errs]);
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));
