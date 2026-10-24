@@ -604,8 +604,10 @@ begin
   end if;
 
   -- the current cycle, week by week. A plan day counts once in `done`; a plan day done again, a Library session and anything past the plan is
-  -- `extra` ("they can do extra, it needs to show that as well"). Another person's weeks before the day they joined come back empty with
-  -- `before: true`, and their sessions before that day are not counted. The day's TITLE and the minutes only on your own page (a Library session or a rehab day's name can hint at pain, which is on the never list); never an RPE, a note or a check-in.
+  -- `extra` ("they can do extra, it needs to show that as well"). ANOTHER person gets only the CURRENT week (`weeks` holds one entry, now: true) and the
+  -- cycle's `done` and `extra` totals; no past weeks and no plan total for the cycle, because a row of past weeks with gaps would show a broken week, which the Bell's
+  -- never list keeps for you alone. Their sessions before the day they joined are not counted anywhere. Your OWN page keeps every week of the cycle, the dates, the
+  -- titles and the minutes (a Library session or a rehab day's name can hint at pain, which is on the never list), and carries the same two totals; never an RPE, a note or a check-in.
   if v_s_session then
     with w as (select * from public.career_weeks(v_subj) cw where cw.is_current),
     pdays as (select p.data -> 'workouts' -> 'days' as days from public.programs p where p.athlete_id = v_subj),
@@ -641,8 +643,10 @@ begin
                        order by fd.d, fd.ref) filter (where fd.week is not null) as days
         from w left join fd on fd.week = w.week group by w.week)
     select jsonb_build_object(
-             'n', max(w.cycle_num), 'from', max(w.cstart), 'to', max(w.cend), 'per_week', max(cardinality(w.plan)),
-             'weeks', jsonb_agg(jsonb_build_object(
+             'n', max(w.cycle_num), 'per_week', max(cardinality(w.plan)),
+             'done', coalesce(sum(wk.done), 0)::int, 'extra', coalesce(sum(wk.extra), 0)::int)
+           || case when v_own then jsonb_build_object('from', max(w.cstart), 'to', max(w.cend)) else '{}'::jsonb end
+           || jsonb_build_object('weeks', coalesce(jsonb_agg(jsonb_build_object(
                          'w', w.week, 'from', w.wfrom, 'to', w.wto, 'plan', cardinality(w.plan),
                          'done', coalesce(wk.done, 0),
                          'held', exists (select 1 from public.career_facts h
@@ -651,8 +655,7 @@ begin
                          'extra', coalesce(wk.extra, 0),
                          'now', current_date between w.wfrom and w.wto,
                          'days', coalesce(wk.days, '[]'::jsonb))
-                       || case when not v_own and w.wto < v_joined then jsonb_build_object('before', true) else '{}'::jsonb end
-                       order by w.week))
+                       order by w.week) filter (where v_own or current_date between w.wfrom and w.wto), '[]'::jsonb))
       into v_cycle
       from w left join wk on wk.week = w.week
     having count(*) > 0;

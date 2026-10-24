@@ -386,15 +386,27 @@ async function main() {
   ok(pB.achievements.length === 1 && pB.achievements[0].id === 'achievement:back_to_back' && pB.achievements[0].name === 'Back to Back' && pB.achievements[0].size === 'win' && pB.achievements[0].signed_n === 0 && eq(pB.achievements[0].signed, []), 'achievements: id, name, day, size, signed (none yet)', pB.achievements);
   ok(pB.honours.length === 1 && pB.honours[0].honour === 'sessions' && eq(pB.honours[0].value, { n: 14 }) && pB.honours[0].month === m0, 'honours: the frozen month\'s sessions, "slot" left out, "near" never', pB.honours);
   ok(pB.game === null && pB.at, 'game is null until he fills it in; at is there');
-  ok(pB.cycle && pB.cycle.n === 1 && pB.cycle.per_week === 3 && pB.cycle.weeks.length === 5 && pB.cycle.weeks[0].w === 1, 'cycle: n, from, to, per_week and five weeks', pB.cycle && [pB.cycle.n, pB.cycle.per_week, pB.cycle.weeks.length]);
-  ok(pB.cycle.weeks[0].held === true && pB.cycle.weeks[1].held === true && pB.cycle.weeks[1].now === true && pB.cycle.weeks[0].now === false, 'his weeks 1 and 2 are held (facts), week 2 is "now"', pB.cycle.weeks.slice(0, 2));
-  ok(pB.cycle.weeks[0].done === 1 && pB.cycle.weeks[0].extra === 0 && pB.cycle.weeks[0].days.length === 1 && pB.cycle.weeks[0].days[0].extra === false && eq(Object.keys(pB.cycle.weeks[0].days[0]).sort(), ['day', 'extra']),
-     'week 1: one plan day done; for somebody else a day is only its date and whether it is extra: no title, no minutes', pB.cycle.weeks[0]);
-  ok(pB.cycle.weeks.every(w => w.days.every(d => !('title' in d) && !('mins' in d))) && !JSON.stringify(pB.cycle).includes('Lower Power') && !JSON.stringify(pB.cycle).includes('Upper Pull'),
-     'and no title or minutes appear anywhere in another person\'s cycle (a Library session or a rehab day name can hint at pain)', pB.cycle);
+  // ANOTHER person's cycle is the cycle's number, the plan per week, two totals and ONE week: this one. No past weeks (a row of past weeks with gaps would show a
+  // broken week, which the Bell's never list keeps for you alone), no dates of the cycle, no plan total for the cycle.
+  ok(pB.cycle && eq(Object.keys(pB.cycle).sort(), ['done', 'extra', 'n', 'per_week', 'weeks']) && pB.cycle.n === 1 && pB.cycle.per_week === 3,
+     'cycle for somebody else: only n, per_week, done, extra and weeks (no cycle dates, no plan total)', pB.cycle && Object.keys(pB.cycle));
+  ok(pB.cycle.weeks.length === 1 && pB.cycle.weeks[0].w === 2 && pB.cycle.weeks[0].now === true && !JSON.stringify(pB.cycle).includes('before'),
+     'and `weeks` holds exactly one week and it is the current one (week 2, now: true, no `before` row)', pB.cycle.weeks);
+  ok(eq(Object.keys(pB.cycle.weeks[0]).sort(), ['days', 'done', 'extra', 'from', 'held', 'now', 'plan', 'to', 'w']) && pB.cycle.weeks[0].plan === 3 && pB.cycle.weeks[0].held === true
+     && pB.cycle.weeks[0].done === 1 && pB.cycle.weeks[0].extra === 0,
+     'the week: w, from, to, plan, done, held, extra, now, days. Week 2 is held (his fact), one plan day done, no extra', pB.cycle.weeks[0]);
+  ok(pB.cycle.weeks[0].days.length === 1 && pB.cycle.weeks[0].days[0].extra === false && eq(Object.keys(pB.cycle.weeks[0].days[0]).sort(), ['day', 'extra']),
+     'for somebody else a day is only its date and whether it is extra: no title, no minutes', pB.cycle.weeks[0].days);
+  ok(pB.cycle.done === 2 && pB.cycle.extra === 0, 'the totals are of the whole cycle, not of the week shown: week 1\'s plan day and this week\'s make done 2', [pB.cycle.done, pB.cycle.extra]);
+  ok(!JSON.stringify(pB.cycle).includes('Lower Power') && !JSON.stringify(pB.cycle).includes('Upper Pull') && !JSON.stringify(pB.cycle).includes('"title"') && !JSON.stringify(pB.cycle).includes('"mins"')
+     && !JSON.stringify(pB.cycle).includes(await val(`(current_date - 9)::text`)),
+     'no title or minutes appear anywhere in another person\'s cycle (a Library session or a rehab day name can hint at pain), and week 1\'s session day appears nowhere', pB.cycle);
   const pBenOwn = await page('zz_ben');
   ok(pBenOwn.cycle.weeks[0].days[0].title === 'Lower Power' && pBenOwn.cycle.weeks[1].days[0].title === 'Upper Pull',
      'on his own page the days keep their titles, and a day title beats its focusTag (Upper Pull over Ignored)', pBenOwn.cycle.weeks.slice(0, 2).map(w => w.days));
+  ok(pBenOwn.cycle.weeks.length === 5 && pBenOwn.cycle.weeks[0].w === 1 && pBenOwn.cycle.weeks[0].held === true && pBenOwn.cycle.weeks[0].now === false && pBenOwn.cycle.weeks[1].now === true
+     && pBenOwn.cycle.weeks[1].held === true && 'from' in pBenOwn.cycle && 'to' in pBenOwn.cycle && pBenOwn.cycle.per_week === 3 && pBenOwn.cycle.done === 2 && pBenOwn.cycle.extra === 0,
+     'his own page keeps the whole cycle (five weeks, the cycle dates, weeks 1 and 2 held, week 2 "now") and gets the same two totals', pBenOwn.cycle);
   ok(pB.cheers && pB.cheers.season === 0 && eq(pB.cheers.recent, []) && pB.cheers.mine_today === false, 'cheers: season 0, nothing recent, you have not cheered him today', pB.cheers);
   // your own page
   const pAvaOwn = await page('zz_ava');
@@ -403,20 +415,37 @@ async function main() {
   const pAvaSeen = await page('zz_ben', AVA);
   ok(!('comebacks' in pAvaSeen.numbers), 'but Ben looking at Ava sees no comebacks (they stay on your own page)', pAvaSeen.numbers);
   ok(pAvaSeen.numbers.sessions === 5 && pAvaSeen.numbers.weeks.now === 1 && pAvaSeen.numbers.bests === 1, 'the numbers are the same for him: 5 sessions, 1 week held, 1 best', pAvaSeen.numbers);
-  // the cycle grid: own page (all sessions, minutes) vs. another (clipped to her joined day, no minutes)
-  const w1o = pAvaOwn.cycle.weeks[0], w1s = pAvaSeen.cycle.weeks[0];
+  // the cycle: own page (every week, all sessions, minutes) vs. another (this week only, clipped to her joined day, no minutes)
+  const w1o = pAvaOwn.cycle.weeks[0], w2s = pAvaSeen.cycle.weeks[0];
   ok(w1o.done === 3 && w1o.extra === 2 && w1o.plan === 3 && w1o.held === true && w1o.days.length === 5, 'Ava\'s own week 1: three plan days done, two extra (plan day 1 again, the Library session), held', w1o);
   ok(eq(w1o.days.map(d => [d.title, d.extra, d.mins]), [['Lower Power', false, 61], ['Upper Pull', false, 45], ['Day 3', false, undefined], ['Lower Power', true, 50], ['Night Shift', true, 20]]),
      'with titles (Day 3 for a day with no name, the Library session by its name) and minutes where she logged them', w1o.days.map(d => [d.title, d.extra, d.mins]));
-  ok(w1s.done === 3 && w1s.extra === 1 && w1s.days.length === 4 && w1s.days.every(d => !('mins' in d) && !('title' in d)) && !JSON.stringify(pAvaSeen.cycle).includes('Night Shift'),'Ben sees week 1 clipped to the day she joined (her session before it is not counted: the repeat of plan day 1 becomes the plan\'s) and no minutes', w1s);
-  ok(pAvaSeen.cycle.weeks[1].done === 1 && pAvaSeen.cycle.weeks[1].held === false && pAvaSeen.cycle.weeks[1].now === true, 'week 2 (now): one plan day done, not held', pAvaSeen.cycle.weeks[1]);
+  ok(pAvaSeen.cycle.weeks.length === 1 && w2s.w === 2 && w2s.now === true && w2s.done === 1 && w2s.extra === 0 && w2s.held === false && w2s.days.length === 1 && w2s.days.every(d => !('mins' in d) && !('title' in d)),
+     'Ben sees Ava\'s week 2 (now) and nothing else: one plan day done, not held, no minutes, no title', pAvaSeen.cycle.weeks);
+  ok(pAvaSeen.cycle.done === 4 && pAvaSeen.cycle.extra === 1 && !JSON.stringify(pAvaSeen.cycle).includes('Night Shift'),
+     'the totals count only since the day she joined: her session the day before is not counted, so the repeat of plan day 1 counts as the plan\'s (done 4, extra 1: the Library session)', [pAvaSeen.cycle.done, pAvaSeen.cycle.extra]);
+  ok(pAvaOwn.cycle.weeks.length === 5 && pAvaOwn.cycle.done === 4 && pAvaOwn.cycle.extra === 2 && pAvaOwn.cycle.weeks[1].done === 1 && pAvaOwn.cycle.weeks[1].extra === 0 && 'from' in pAvaOwn.cycle && 'to' in pAvaOwn.cycle,
+     'her own page is unchanged (five weeks, the dates, her day before joining counted: done 4, extra 2) and the totals are the sums of her weeks', [pAvaOwn.cycle.done, pAvaOwn.cycle.extra, pAvaOwn.cycle.weeks.length]);
   ok(!JSON.stringify(pAvaSeen.cycle).includes('rpe') && !JSON.stringify(pAvaOwn.cycle).includes('note'), 'no RPE and no note anywhere in the grid');
   const pGusSeen = await page('zz_ava', GUS);
-  ok(pGusSeen.new === true && pGusSeen.cycle.weeks[0].before === true && pGusSeen.cycle.weeks[0].done === 0 && pGusSeen.cycle.weeks[0].extra === 0 && eq(pGusSeen.cycle.weeks[0].days, []) && !('before' in pGusSeen.cycle.weeks[1]),
-     'Gus joined 2 days ago: new is true, week 1 comes back empty with before: true, this week does not', [pGusSeen.new, pGusSeen.cycle.weeks[0], pGusSeen.cycle.weeks[1].before]);
-  ok(pGusSeen.cycle.weeks[1].held === false && pGusSeen.cycle.weeks[1].done === 1, 'his held fact from before the yes does not make the week held; the session since does count', pGusSeen.cycle.weeks[1]);
+  ok(pGusSeen.new === true && pGusSeen.cycle.weeks.length === 1 && pGusSeen.cycle.weeks[0].w === 2 && !JSON.stringify(pGusSeen.cycle).includes('before'),
+     'Gus joined 2 days ago: new is true, and he shows this week only; no empty "before" week for the one that ended before he joined', [pGusSeen.new, pGusSeen.cycle.weeks]);
+  ok(pGusSeen.cycle.weeks[0].held === false && pGusSeen.cycle.weeks[0].done === 1 && pGusSeen.cycle.done === 1 && pGusSeen.cycle.extra === 0,
+     'his held fact and his session from before the yes count for nothing; the session since does count (this week done 1, held false, cycle done 1)', [pGusSeen.cycle.weeks[0], pGusSeen.cycle.done]);
   const pGusOwn = await page('zz_gus');
-  ok(pGusOwn.cycle.weeks[0].done === 1 && !('before' in pGusOwn.cycle.weeks[0]) && pGusOwn.cycle.weeks[1].held === true, 'his own page shows everything, from before he joined', pGusOwn.cycle.weeks.slice(0, 2));
+  ok(pGusOwn.cycle.weeks[0].done === 1 && !('before' in pGusOwn.cycle.weeks[0]) && pGusOwn.cycle.weeks[1].held === true && pGusOwn.cycle.done === 2 && pGusOwn.cycle.extra === 0,
+     'his own page shows everything, from before he joined (done 2 in the cycle)', pGusOwn.cycle.weeks.slice(0, 2));
+  // a person whose cycle has no week that is today (the cycle ended yesterday): others get no week, never a past one. Pat's programme is used, since changing a
+  // programme can void a made-up athlete's week facts through the career triggers
+  const patBefore = (await page('zz_ava', PAT)).cycle;
+  const pastCyc = await val(`select data -> 'cycles' -> 0 ->> 'endDate' from public.programs where athlete_id = 'zz_pat'`);
+  await q(`update public.programs set data = jsonb_set(data, '{cycles,0,endDate}', to_jsonb((current_date - 1)::text)) where athlete_id = 'zz_pat'`);
+  const patEnded = (await page('zz_ava', PAT)).cycle, patEndedOwn = (await page('zz_pat')).cycle;
+  ok(patBefore && patBefore.weeks.length === 1 && patBefore.weeks[0].now === true, 'the cycle of Pat covers today: one week, now', patBefore);
+  ok(!patEnded || (Array.isArray(patEnded.weeks) && patEnded.weeks.length === 0), 'a cycle with no week that is today: another person sees no week at all, never a past one', patEnded);
+  ok(!patEndedOwn || patEndedOwn.weeks.length >= 0, 'and his own page still answers', patEndedOwn && patEndedOwn.weeks.length);
+  await q(`update public.programs set data = jsonb_set(data, '{cycles,0,endDate}', to_jsonb($1::text)) where athlete_id = 'zz_pat'`, [pastCyc]);
+  ok(eq((await page('zz_ava', PAT)).cycle, patBefore), 'and with the programme put back the page is as it was', [(await page('zz_ava', PAT)).cycle, patBefore]);
   // the switches: Cal has every one off
   const pCal = await page('zz_ava', CAL);
   ok(pCal.who === 'Cal C.' && pCal.member === true && !('lv' in pCal) && !('since' in pCal) && !('cycle' in pCal) && !('achievements' in pCal) && !('honours' in pCal) && !('best_lifts' in pCal) && eq(pCal.numbers, {}),
