@@ -3132,7 +3132,7 @@
     :where(#day-view) .session-timer-actions { gap: 8px; }
     :where(#day-view) .session-timer.has-reset:not(.slim) .session-timer-btn { padding: 0 8px; font-size: var(--fs-body); }
     :where(#day-view) .session-timer-reset:not([hidden]) { padding: 0 10px; }
-    :where(#day-view) .session-timer-week, :where(#day-view) .session-timer-week .stw-k { letter-spacing: .4px; }
+    :where(#day-view) .session-timer-week, :where(#day-view) .session-timer-week .stw-k { letter-spacing: 0; }
     :where(#day-view) .session-timer-week .stw-k { margin-right: 8px; }
     :where(#day-view) .session-timer-week i { margin: 0 6px 0 0; }
     :where(#day-view) .session-timer.slim .session-timer-leave { padding: 0 8px 0 10px; gap: 5px; }
@@ -4097,7 +4097,7 @@
     #stepOverlay .step-pill:not(:empty)::before { content: none; }
   }
   @media (max-width: 359px) {
-    #stepOverlay .step-week .session-timer-week, #stepOverlay .step-week .stw-k { letter-spacing: .4px; }
+    #stepOverlay .step-week .session-timer-week, #stepOverlay .step-week .stw-k { letter-spacing: 0; }
     #stepOverlay .step-week .stw-k { margin-right: 8px; }
     #stepOverlay .step-week .session-timer-week i { margin: 0 6px 0 0; }
   }
@@ -4289,7 +4289,7 @@
   .timer-next .tn-v { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
   @media (max-width: 359px) {
     .timer-log .tl-line { gap: 4px; }
-    .timer-log .session-timer-week, .timer-log .stw-k { letter-spacing: .4px; }
+    .timer-log .session-timer-week, .timer-log .stw-k { letter-spacing: 0; }
     .timer-log .stw-k { margin-right: 8px; }
     .timer-log .session-timer-week i { margin: 0 6px 0 0; }
   }
