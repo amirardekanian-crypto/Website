@@ -108,12 +108,39 @@ async function d(browser) {
   }
 }
 
+// ═════════ e: Library > Exercises chip row ═════════
+async function e(browser) {
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    const spine = H.SPINE.map((x, i) => Object.assign({}, x, { pattern: ['squat', 'jump-land', 'single-leg', 'anti-rotation', 'anti-lateral-flexion'][i % 5] }));
+    const { ctx, p } = await H.openProgram(browser, { w, h, spine, stub: { library: H.library() } });
+    await p.evaluate(() => goLibrary()); await p.waitForTimeout(900);
+    await p.evaluate(() => setLibPane('exercises')); await p.waitForTimeout(500);
+    const m = async () => p.evaluate(() => {
+      const row = document.getElementById('xl-chips'), cs = [...row.querySelectorAll('.xl-chip')], last = cs[cs.length - 1];
+      const rr = row.getBoundingClientRect(), lr = last.getBoundingClientRect();
+      return { n: cs.length, last: last.textContent, lastRight: Math.round(lr.right), viewport: innerWidth, atEnd: row.scrollLeft + row.clientWidth >= row.scrollWidth - 1, rowRight: Math.round(rr.right),
+        sideways: document.documentElement.scrollWidth - innerWidth, firstLeft: Math.round(cs[0].getBoundingClientRect().left) };
+    });
+    const before = await m();
+    await p.evaluate(() => { const r = document.getElementById('xl-chips'); r.scrollLeft = r.scrollWidth; });
+    await p.waitForTimeout(300);
+    const end = await m();
+    const fade = await p.evaluate(() => { const c = getComputedStyle(document.getElementById('xl-chips'), '::after'); return { pos: c.position, w: parseFloat(c.width), bg: c.backgroundImage }; });
+    t.check(`e ${w}: the row scrolls (${end.n} chips) and at the end the last chip (${end.last}) is whole, inside the screen with room to spare`, end.atEnd && end.lastRight <= end.viewport - 8, JSON.stringify([before, end]));
+    t.check(`e ${w}: the last chip clears the edge by at least 24 px at the end of the row, and a soft fade is pinned to the edge while there is more`,
+      end.lastRight <= end.viewport - 24 && fade.pos === 'sticky' && fade.w === 28 && fade.bg.includes('gradient'), JSON.stringify([end, fade]));
+    t.check(`e ${w}: no sideways scroll of the page, no page errors`, end.sideways <= 0 && p.errs.length === 0, JSON.stringify([end.sideways, p.errs]));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await a(browser);
   await b(browser);
   await c(browser);
   await d(browser);
+  await e(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

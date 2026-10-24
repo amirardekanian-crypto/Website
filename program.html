@@ -4395,6 +4395,8 @@
   .xl-search:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
   .xl-chips { display: flex; gap: 4px; margin: 0 calc(-1 * var(--g)); padding: 0 var(--g); overflow-x: auto; scrollbar-width: none; }
   .xl-chips::-webkit-scrollbar { display: none; }
+  /* Room after the last chip on every engine, and a soft fade on the edge it scrolls off (Love All B, 2026-10-24): pinned to the right edge while there is more, it rests in the empty end space once the last chip is whole. */
+  .xl-chips::after { content: ''; flex: none; position: sticky; right: 0; width: 28px; pointer-events: none; background: linear-gradient(to right, transparent, var(--paper)); }
   .xl-chip { position: relative; isolation: isolate; flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 0; background: none;
     color: var(--grey); cursor: pointer; white-space: nowrap; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
   .xl-chip::before { content: ''; position: absolute; z-index: -1; inset: 4px 0; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--box); }
