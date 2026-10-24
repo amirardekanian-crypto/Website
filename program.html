@@ -20750,7 +20750,7 @@ async function restWake(on) {
 // can keep logging with it showing. Used for a first-timer's note on the closed number, the empty-weight nudge and the clock offer,
 // each with its label (opts.kicker, the mint-dot eyebrow): How to log, No weight, Session clock.
 // opts: kicker · action + run (the filled button) · dismiss + off (what the second button says, and what a REAL tap on it does:
-// the box going for any other reason is not an answer) · pass · tone ('clay') · ms (0 = it stays until it is answered).
+// the box going for any other reason is not an answer) · pass · tone ('clay') · ms (0 = it stays until it is answered; a note with an action always does, B25).
 let _toastT = null, _toastRun = null, _toastOff = null;
 function aaToast(text, opts) {
   const el = document.getElementById('aaToast');
@@ -20771,7 +20771,7 @@ function aaToast(text, opts) {
   x.addEventListener('click', () => { const f = _toastOff; hideAaToast(); if (f) f(); });
   el.hidden = false;
   clearTimeout(_toastT); _toastT = null;
-  if (opts.ms !== 0) _toastT = setTimeout(hideAaToast, opts.ms || 6000);
+  if (opts.ms !== 0 && !opts.action) _toastT = setTimeout(hideAaToast, opts.ms || 6000);   // a note with a button waits for a tap, whatever ms a caller passed
 }
 function hideAaToast() {
   clearTimeout(_toastT); _toastT = null; _toastRun = null; _toastOff = null;
