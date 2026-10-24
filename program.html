@@ -4759,8 +4759,11 @@
      34 px of ink inside a 44 px tap target (the padding is the target), and a held button stays pressed while it repeats. */
   #home-overview .hb-steps { flex: none; display: flex; align-items: center; gap: 2px; }
   /* The number between them, in the row's own figures: 44 px wide so 7.5 and 10,000 leave the buttons where they are. */
-  #home-overview .hb-now { flex: none; min-width: 48px; text-align: center; font: 700 var(--fs-field)/1 'Barlow', sans-serif;
-    font-variant-numeric: tabular-nums; color: var(--ink); }
+  #home-overview .hb-now { flex: none; min-width: 48px; height: 44px; padding: 0 2px; margin: 0; border: 0; border-radius: 10px; background: none;
+    text-align: center; font: 700 var(--fs-field)/1 'Barlow', sans-serif;
+    font-variant-numeric: tabular-nums; color: var(--ink); cursor: text; }
+  #home-overview .hb-now:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  #home-overview input.hb-type { width: 72px; min-width: 72px; box-sizing: border-box; border: 1.5px solid var(--fill); background: var(--paper); outline: none; font-size: var(--fs-field); }
   #home-overview .hb-now.is-done { color: var(--green-ink); }
   /* The narrowest phone: the pair keeps its 34 px targets and the row buys the space back from the gaps, so
      "Sleep 7.5+ hours" still gets one line. */
@@ -11506,7 +11509,7 @@ window.goLibrary = goLibrary;
 //
 // The keys are AA Proof's own, unchanged: <id>_hab_cfg and <id>_hab_log. Every athlete's history, every
 // board position and every XP row on the server reads them exactly as it did, so nothing migrates.
-let HAB_CFG = null, HAB_LOG = {}, HAB_UI = { day: null }, _habEdit = null, _habWaiting = false;
+let HAB_CFG = null, HAB_LOG = {}, HAB_UI = { day: null }, _habEdit = null, _habTyping = null, _habWaiting = false;
 const habKeyCfg = () => ATHLETE_ID + '_hab_cfg';
 const habKeyLog = () => ATHLETE_ID + '_hab_log';
 // Never in the coach's preview (a stray tap would land in that athlete's own log) and never before the
@@ -11664,6 +11667,34 @@ function habSaveNum(id) {
   if (isFinite(n)) habSetVal(id, n); else paintTodayCard();
 }
 window.habSaveNum = habSaveNum;
+// ── Tap the number to type it (Love All round 4, 2026-10-24): 12,000 steps was 24 taps on the +. The number is a button; a tap turns
+// it into a number box in the same place, and Enter or leaving the box saves it through habSetVal(), the one door the + and − use, so
+// the cap, the floor, the XP and the day's window are the same. Escape or an empty box leaves the number as it was.
+
+function habTypeOpen(id) {
+  if (!habOn()) return;
+  const h = window.AAHabits.byId(id);
+  if (!h || h.locked || h.kind !== 'count') return;
+  _habTyping = id;
+  paintTodayCard();
+  const el = document.getElementById('hab-type-' + id);
+  if (el) { el.focus(); el.select(); }
+}
+function habTypeSave(id) {
+  if (_habTyping !== id) return;                 // Escape or a save already closed it: the blur that follows is only the box going away
+  const el = document.getElementById('hab-type-' + id);
+  _habTyping = null;
+  const raw = el ? String(el.value).trim() : '';
+  const h = window.AAHabits.byId(id);
+  const txt = (h && Number(h.step || 1) % 1) ? raw.replace(',', '.') : raw.replace(/[,\s]/g, '');
+  const n = txt === '' ? NaN : Number(txt);
+  if (isFinite(n) && n >= 0) habSetVal(id, n); else paintTodayCard();
+}
+function habTypeKey(ev, id) {
+  if (ev.key === 'Enter') { ev.preventDefault(); habTypeSave(id); }
+  else if (ev.key === 'Escape') { ev.preventDefault(); _habTyping = null; paintTodayCard(); }
+}
+window.habTypeOpen = habTypeOpen; window.habTypeSave = habTypeSave; window.habTypeKey = habTypeKey;
 
 // ── The card ──────────────────────────────────────────────────────────────────────────────────────────
 // Everything on it is logged, or says whether today counts. Nothing else earns a place.
@@ -11808,7 +11839,9 @@ function habRowHtml(hb, k) {
   const plus = (hb.kind === 'count' && !hb.locked)
     ? `<span class="hb-steps">
       <button type="button" class="hb-step" data-h="${hb.id}" data-d="-1"${val <= 0 ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Take ${step} off ${esc(name)}">−</button>
-      <output class="hb-now${done ? ' is-done' : ''}" aria-label="${esc(name)}: ${H.fmtVal(hb, val)} of ${H.fmtVal(hb, hb.target)} ${esc(hb.unit || '')}">${H.fmtVal(hb, val)}</output>
+      ${_habTyping === hb.id
+        ? `<input class="hb-now hb-type" id="hab-type-${hb.id}" type="text" inputmode="${Number(hb.step || 1) % 1 ? 'decimal' : 'numeric'}" enterkeyhint="done" autocomplete="off" value="${H.fmtVal(hb, val).replace(/,/g, '')}" aria-label="${esc(name)}: type the ${esc(hb.unit || 'number')}" onkeydown="habTypeKey(event, '${hb.id}')" onblur="habTypeSave('${hb.id}')">`
+        : `<button type="button" class="hb-now${done ? ' is-done' : ''}" onclick="habTypeOpen('${hb.id}')" aria-label="${esc(name)}: ${H.fmtVal(hb, val)} of ${H.fmtVal(hb, hb.target)} ${esc(hb.unit || '')}. Tap to type a number.">${H.fmtVal(hb, val)}</button>`}
       <button type="button" class="hb-step" data-h="${hb.id}" data-d="1"${val >= cap ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Add ${step} to ${esc(name)}">+</button>
     </span>` : '';
   return `<div class="hb-wrap" data-h="${hb.id}">
