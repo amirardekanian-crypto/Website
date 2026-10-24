@@ -21544,7 +21544,7 @@ function openHistorySheet(card) {
   const planned = cardReps(card);
   const target = card.dataset.target || null;   // the rows: a past set against the card as written
   const today = rpeTargetOf(card) || null;       // the caption: today's target (this week's cap, a lower day)
-  const hist = historyFor(name).slice(0, 12);
+  const histAll = historyFor(name), hist = histAll.slice(0, 12);   // the list shows 12 rows, the count is every session (Love All B9)
   const ov = document.getElementById('hist-overlay');
   if (!ov) return;
 
@@ -21609,7 +21609,7 @@ function openHistorySheet(card) {
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">Your history</div>
     <h2 class="readiness-title">${esc(name)}</h2>
-    <p class="readiness-sub">${hist.length} time${hist.length === 1 ? '' : 's'} logged${target ? ` · target RPE ${target}${today && today !== target ? ` · ${today} today` : ''}` : ''}. What you did, never what to lift: your coach sets the load.</p>
+    <p class="readiness-sub">${histAll.length} time${histAll.length === 1 ? '' : 's'} logged${target ? ` · target RPE ${target}${today && today !== target ? ` · ${today} today` : ''}` : ''}. What you did, never what to lift: your coach sets the load.</p>
     ${chart}
     <div class="hs-list">${rows}</div>
     ${hasRecord ? `<div class="hs-actions"><button type="button" class="hrow hs-link" id="hs-rec">${hrowIc('records')}<span class="hrow-b"><span class="hrow-l">Open in Personal Records</span></span><span class="hrow-a" aria-hidden="true">›</span></button></div>` : ''}`;
