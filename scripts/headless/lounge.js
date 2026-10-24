@@ -1130,10 +1130,11 @@ const on = n => !ONLY.length || ONLY.includes(n);
   }
 
   // ── 16. Step 4 · This cycle (Week Bars): a bar for every plan week, and the sessions beyond the plan as small dots ────────────────────────────────
-  // The server's cycle (CONTRACT 3): per week { w, plan, done, held, extra, now, before, days[] }. Another person's days carry only `day` and `extra`;
-  // your own carry the session's title and minutes as well. Made-up people and dates only.
+  // YOUR page (CONTRACT 3 and 9b): the whole cycle, per week { w, plan, done, held, extra, now, before, days[] } (days carry the session's title and minutes), and `done` / `extra` for
+  // the cycle. SOMEONE ELSE'S: { n, per_week, done, extra, weeks: [this week only] }, each day only { day, extra }: no past week (a past week that was not held is a broken week, on the
+  // never list), no plan total ("8 of 15"), no title, no minutes. The app draws theirs as "This week": one bar and the line "8 sessions this cycle". Made-up people and dates only.
   const cDays = (rows, own) => rows.map(([day, extra, title, mins]) => (own ? { day, title, mins, extra } : { day, extra }));
-  const cycleOf = (own, o = {}) => ({ n: 3, from: '2026-10-05', to: '2026-11-08', per_week: 3, weeks: [
+  const wholeCycle = (own, o = {}) => ({ n: 3, from: '2026-10-05', to: '2026-11-08', per_week: 3, done: 8, extra: 2, weeks: [
     { w: 1, from: '2026-10-05', to: '2026-10-11', plan: 3, done: o.before1 ? 0 : 3, held: !o.before1, extra: 0, now: false, before: !!o.before1,
       days: o.before1 ? [] : cDays([['2026-10-05', false, 'Lower · Power', 64], ['2026-10-07', false, 'Upper · Push', 55], ['2026-10-09', false, 'Full Body', 60]], own) },
     { w: 2, from: '2026-10-12', to: '2026-10-18', plan: 3, done: 3, held: true, extra: 1, now: false,
@@ -1142,74 +1143,112 @@ const on = n => !ONLY.length || ONLY.includes(n);
       days: cDays([['2026-10-19', false, 'Lower · Power', 64], ['2026-10-21', false, 'Upper · Push', 52], ['2026-10-22', true, 'Core Circuit', 20]], own) },
     { w: 4, from: '2026-10-26', to: '2026-11-01', plan: 3, done: 0, held: false, extra: 0, now: false, days: [] },
     { w: 5, from: '2026-11-02', to: '2026-11-08', plan: 3, done: 0, held: false, extra: 0, now: false, days: [] }] });
+  // what the server sends about someone else: this week alone, and the cycle's two totals
+  const otherCycle = (o = {}) => ({ n: 3, per_week: 3, done: o.done === undefined ? 8 : o.done, extra: o.extra === undefined ? 2 : o.extra, weeks: [
+    Object.assign({ w: 3, from: '2026-10-19', to: '2026-10-25', plan: 3, done: 2, held: false, extra: 1, now: true,
+      days: cDays([['2026-10-19', false], ['2026-10-21', false], ['2026-10-22', true]], false) }, o.week || {})] });
+  const cycleOf = (own, o = {}) => (own ? wholeCycle(true, o) : otherCycle(o));
   const cycleShot = p => p.evaluate(() => ({
     head: (document.querySelector('#crewplayer-body .pl-cyc') ? document.querySelector('#crewplayer-body .pl-cyc').previousElementSibling : document.createElement('i')).textContent.replace(/\s+/g, ' ').trim(),
-    rows: [...document.querySelectorAll('#crewplayer-body .pl-wb')].map(r => ({ n: r.querySelector('.pl-wn').textContent, segs: r.querySelectorAll('.pl-bar i').length, on: r.querySelectorAll('.pl-bar i.on').length,
+    rows: [...document.querySelectorAll('#crewplayer-body .pl-wb')].map(r => ({ n: (r.querySelector('.pl-wn') || {}).textContent || '', segs: r.querySelectorAll('.pl-bar i').length, on: r.querySelectorAll('.pl-bar i.on').length,
       dots: r.querySelectorAll('.pl-xd').length, xn: (r.querySelector('.pl-xn') || {}).textContent || '', rt: [...r.querySelectorAll('.pl-rt > *')].map(e => e.textContent.trim()).join(' '), tag: r.tagName, cls: r.className })),
     card: (document.querySelector('#crewplayer-body .pl-cyc') || { textContent: '' }).textContent.replace(/\s+/g, ' ').trim(),
+    foot: ((document.querySelector('#crewplayer-body .pl-cyc-f') || {}).textContent || '').trim(),
     note: !!document.querySelector('#crewplayer-body .pl-tail') }));
   const nth = (p, sel, i) => p.evaluate(([s, k]) => { const e = document.querySelectorAll(s)[k]; if (!e) return false; e.click(); return true; }, [sel, i]);
   const sheetRows = p => p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), eyebrow: (document.querySelector('#hist-overlay .readiness-eyebrow') || {}).textContent, title: (document.querySelector('#hist-overlay .readiness-title') || {}).textContent,
     sub: (document.querySelector('#hist-overlay .readiness-sub') || {}).textContent, rows: [...document.querySelectorAll('#hist-overlay .pl-row')].map(r => r.innerText.replace(/\s+/g, ' ').trim()),
     quiet: (document.querySelector('#hist-overlay .pl-quiet') || {}).textContent }));
+  const pageCycle = async (cycle, who = CK.mina, extra = {}) => {
+    const x = await open(browser, Object.assign({ stub: { crewPages: { [who]: { cycle } } } }, extra));
+    await goCrew(x.p); if (who === 'me') { await x.p.evaluate(() => openPlayer('me')); await x.p.waitForTimeout(700); } else await shown(x.p, who);
+    x.s = await cycleShot(x.p);
+    return x;
+  };
   if (on(16)) {
-    const a = await open(browser, { stub: { crewPages: { [CK.mina]: { cycle: cycleOf(false) } } } });
-    await goCrew(a.p); await shown(a.p, CK.mina);
-    const s = await cycleShot(a.p);
-    C.check('another person\'s page: "This cycle · 8 of 15" (plan sessions only) and "+2 extra" beside it', /^This cycle · 8 of 15/.test(s.head) && /\+2 extra$/.test(s.head), s.head);
-    C.check('…the plan\'s own sessions are the segments: a 3-day plan draws 3, filled for each one done', s.rows[2].segs === 3 && s.rows[2].on === 2 && s.rows[3].segs === 3 && s.rows[3].on === 0 && s.rows[4].segs === 3, JSON.stringify(s.rows));
-    C.check('…a held week is ONE continuous green bar, and says Held', s.rows[0].segs === 1 && s.rows[0].on === 1 && /^held$/i.test(s.rows[0].rt) && s.rows[1].segs === 1 && s.rows[1].on === 1 && /^held/i.test(s.rows[1].rt), JSON.stringify(s.rows.slice(0, 2)));
-    C.check('…an extra session is a small round dot after the bar, one each, with "+1" (also after a held bar)', s.rows[1].dots === 1 && s.rows[1].xn === '+1' && s.rows[2].dots === 1 && s.rows[2].xn === '+1' && s.rows[0].dots === 0 && s.rows[0].xn === '' && s.rows[3].dots === 0, JSON.stringify(s.rows.map(r => [r.n, r.dots, r.xn])));
-    C.check('…the current week says "now" and "2 of 3"; the others do not', /^now 2 of 3$/i.test(s.rows[2].rt) && s.rows.filter(r => /now/.test(r.rt)).length === 1 && s.rows[3].rt === '' && s.rows[4].rt === '', JSON.stringify(s.rows.map(r => r.rt)));
-    C.check('…no weekday letters or names anywhere on the bars (SES-17)', !/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/.test(s.card) && !(await a.p.$('#crewplayer-body .pl-cyc .pl-wd')), s.card);
-    C.check('…the card says which cycle and how long, and a week with sessions is a button (the empty ones are not)', /Cycle 3/.test(s.card) && /3 a week · 5 weeks/.test(s.card) && s.rows.map(r => r.tag).join() === 'BUTTON,BUTTON,BUTTON,DIV,DIV' && s.note, s.card);
-    // a tap on a week: the date, and Session or Extra, and nothing else
-    await nth(a.p, '#crewplayer-body .pl-wb', 1); await a.p.waitForTimeout(350);
-    const w2 = await sheetRows(a.p);
-    C.check('a tap on week 2 opens its sessions by date, with Session or Extra only', w2.on && w2.title === 'Week 2' && w2.eyebrow === 'This cycle' && /3 of 3 sessions · 1 extra · Held/.test(w2.sub) && w2.rows.length === 4
-      && w2.rows[0] === 'Mon 12 Oct Session' && w2.rows[2] === 'Fri 16 Oct Session' && w2.rows[3] === 'Sat 17 Oct Extra', JSON.stringify(w2));
-    C.check('…never a title, never minutes, and nothing about the crew\'s switches', !/Lower|Upper|Full Body|Easy Spin|min\b/.test(w2.rows.join(' ')) && !w2.quiet, JSON.stringify(w2.rows));
-    await a.p.evaluate(() => closeHistorySheet());
-    C.check('…a day the page has no sessions for is no button, so a tap on it does nothing', await a.p.evaluate(() => { document.querySelectorAll('#crewplayer-body .pl-wb')[3].click(); return !document.getElementById('hist-overlay').classList.contains('visible'); }));
+    // ── someone else's page: THIS week as one bar, and one line for the cycle
+    const a = await pageCycle(cycleOf(false));
+    const s = a.s;
+    C.check('another person\'s page: the block is "This week" and the card holds ONE bar, with no week number', s.head === 'This week' && s.rows.length === 1 && s.rows[0].n === '', JSON.stringify([s.head, s.rows.length, s.rows[0] && s.rows[0].n]));
+    C.check('…the plan\'s own sessions are the pieces: 3 drawn, 2 filled', s.rows[0].segs === 3 && s.rows[0].on === 2 && s.rows[0].tag === 'BUTTON', JSON.stringify(s.rows[0]));
+    C.check('…an extra session is one small round dot after the bar with "+1"; nothing says "now", and a week not held says no "Held"', s.rows[0].dots === 1 && s.rows[0].xn === '+1' && s.rows[0].rt === '', JSON.stringify(s.rows[0]));
+    C.check('…the line under it: "8 sessions this cycle · 2 extra"', s.foot === '8 sessions this cycle · 2 extra', s.foot);
+    C.check('…never "of N" and never a week that is over: no "of", no W1 or W2, no "5 weeks", no total like 15', !/\bof\b/i.test(s.head + ' ' + s.card) && !/\bW\d\b|Week \d|weeks/.test(s.card) && !/\b15\b/.test(s.card), s.card);
+    C.check('…the card says which cycle and how many a week, and a hint says the bar can be tapped', /^Cycle 3\s*3 a week/.test(s.card) && s.note, s.card);
+    C.check('…no weekday letters or names on the bar (SES-17)', !/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/.test(s.card), s.card);
+    C.check('…their posts, when there are some, are headed "Posted this week", so the page has one "This week"', (await secs(a.p)).filter(x => x === 'This week').length === 1 && !(await secs(a.p)).includes('This cycle'), (await secs(a.p)).join('|'));
+    // a tap on the bar: the date, and Session or Extra, and nothing else (no "of N" either)
+    await nth(a.p, '#crewplayer-body .pl-wb', 0); await a.p.waitForTimeout(350);
+    const w3 = await sheetRows(a.p);
+    C.check('a tap on the bar opens this week\'s days by date, with Session or Extra only', w3.on && w3.title === 'Week 3' && w3.eyebrow === 'This cycle' && w3.sub === '2 sessions · 1 extra' && w3.rows.length === 3
+      && w3.rows[0] === 'Mon 19 Oct Session' && w3.rows[1] === 'Wed 21 Oct Session' && w3.rows[2] === 'Thu 22 Oct Extra', JSON.stringify(w3));
+    C.check('…never a title, never minutes, never "of N", and nothing about the crew\'s switches', !/Lower|Upper|Core|min\b|\bof\b/.test(w3.rows.join(' ') + ' ' + w3.sub) && !w3.quiet, JSON.stringify(w3.rows));
     C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();
-    // even if a title or minutes came for someone else's day, the page never draws them
-    const d = await open(browser, { stub: { crewPages: { [CK.mina]: { cycle: cycleOf(true) } } } });
-    await goCrew(d.p); await shown(d.p, CK.mina);
-    await nth(d.p, '#crewplayer-body .pl-wb', 1); await d.p.waitForTimeout(350);
-    const w2d = await sheetRows(d.p);
-    C.check('defence: a title and minutes sent for someone else are never drawn', w2d.rows.length === 4 && !/Lower|Upper|Full Body|Easy Spin|min\b/.test(w2d.rows.join(' ')) && w2d.rows[3] === 'Sat 17 Oct Extra', JSON.stringify(w2d.rows));
+    // a held week is one solid bar and says Held; the extras still show; with no extras at all there is no "· 2 extra" and no dot
+    const h = await pageCycle(cycleOf(false, { week: { done: 3, held: true, extra: 1 }, extra: 0 }));
+    C.check('a held week is ONE continuous green bar, says Held, keeps its dot, and a cycle with no extras says no "extra"', h.s.rows[0].segs === 1 && h.s.rows[0].on === 1 && h.s.rows[0].rt === 'Held' && h.s.rows[0].dots === 1 && h.s.foot === '8 sessions this cycle', JSON.stringify([h.s.rows[0], h.s.foot]));
+    await h.ctx.close();
+    const z = await pageCycle(cycleOf(false, { done: 1, extra: 0, week: { done: 1, extra: 0 } }));
+    C.check('one session is "1 session this cycle", and a week with no extras has no dot and no "+"', z.s.foot === '1 session this cycle' && z.s.rows[0].dots === 0 && z.s.rows[0].xn === '', JSON.stringify([z.s.foot, z.s.rows[0]]));
+    await z.ctx.close();
+    const nn = await pageCycle(cycleOf(false, { done: 0, extra: 0, week: { done: 0, extra: 0, days: [] } }));
+    C.check('a new member: "No sessions yet this cycle", the empty bar is not a button', nn.s.foot === 'No sessions yet this cycle' && nn.s.rows[0].on === 0 && nn.s.rows[0].segs === 3 && nn.s.rows[0].tag === 'DIV' && !nn.s.note, JSON.stringify([nn.s.foot, nn.s.rows[0], nn.s.note]));
+    await nn.ctx.close();
+    const mx = await pageCycle(cycleOf(false, { week: { extra: 7 }, extra: 7 }));
+    C.check('seven extras draw five dots and the true "+7"', mx.s.rows[0].dots === 5 && mx.s.rows[0].xn === '+7' && mx.s.foot === '8 sessions this cycle · 7 extra', JSON.stringify([mx.s.rows[0], mx.s.foot]));
+    await mx.ctx.close();
+    // DEFENCE: the server should never send a past week, an "of" total, a title or minutes for someone else, and if it did the page still draws none of it
+    const d = await pageCycle(wholeCycle(true));
+    C.check('defence: a whole cycle sent for someone else (past weeks, a title and minutes) draws only this week and "8 sessions this cycle · 2 extra", no "15", no "of"', d.s.head === 'This week' && d.s.rows.length === 1 && d.s.foot === '8 sessions this cycle · 2 extra'
+      && !/\bof\b/i.test(d.s.card) && !/15|W1|W2|Week 1|Week 2|5 weeks/.test(d.s.card), JSON.stringify(d.s));
+    await nth(d.p, '#crewplayer-body .pl-wb', 0); await d.p.waitForTimeout(350);
+    const wd = await sheetRows(d.p);
+    C.check('…and a title or minutes sent for someone else\'s day are never drawn in the week\'s sheet', wd.title === 'Week 3' && wd.rows.length === 3 && !/Lower|Upper|Core|min\b|\bof\b/.test(wd.rows.join(' ') + wd.sub) && wd.rows[2] === 'Thu 22 Oct Extra', JSON.stringify(wd));
     await d.ctx.close();
-    // your own page: the name, the date, the minutes, and Extra on an extra
-    const o = await open(browser, { stub: { crewPages: { me: { cycle: cycleOf(true) } } } });
-    await goCrew(o.p); await o.p.evaluate(() => openPlayer('me')); await o.p.waitForTimeout(700);
-    const so = await cycleShot(o.p);
-    C.check('your own page: the same bars, "now 2 of 3" on this week, and "2 of 3" is not said on weeks that are still to come', /^This cycle · 8 of 15/.test(so.head) && so.rows[2].segs === 3 && so.rows[2].on === 2 && so.rows[3].rt === '' && so.rows[4].rt === '', JSON.stringify(so.rows.map(r => r.rt)));
+    // …a past week with no `now` flag anywhere is not guessed at: no bar, but the server's own total
+    const nf = await pageCycle(Object.assign(wholeCycle(false), { weeks: wholeCycle(false).weeks.map(w => Object.assign({}, w, { now: false })) }));
+    C.check('defence: several weeks and none marked "now": no bar is guessed, the total line alone is drawn, headed "This cycle"', nf.s.rows.length === 0 && nf.s.head === 'This cycle' && nf.s.foot === '8 sessions this cycle · 2 extra', JSON.stringify(nf.s));
+    await nf.ctx.close();
+    // …no total sent: the bar alone, no line
+    const nt = await pageCycle(Object.assign(otherCycle(), { done: undefined, extra: undefined }));
+    C.check('no total from the server: the bar alone, and no invented line', nt.s.rows.length === 1 && nt.s.foot === '', JSON.stringify(nt.s));
+    await nt.ctx.close();
+    // …a week that is "before" they joined is never drawn as this week
+    const bj = await pageCycle(otherCycle({ week: { before: true, done: 0, extra: 0, days: [] } }));
+    C.check('defence: a week marked "before" is not drawn as this week (the total line stays)', bj.s.rows.length === 0 && bj.s.foot === '8 sessions this cycle · 2 extra', JSON.stringify(bj.s));
+    await bj.ctx.close();
+    // your own page: the whole cycle with "8 of 15", the name, the date, the minutes, and Extra on an extra
+    const o = await pageCycle(cycleOf(true), 'me');
+    const so = o.s;
+    C.check('your own page keeps the whole cycle: "This cycle · 8 of 15", five week rows with W1 to W5, "now 2 of 3" on this week and nothing on the weeks to come', /^This cycle · 8 of 15/.test(so.head) && /\+2 extra$/.test(so.head) && so.rows.length === 5
+      && so.rows.map(r => r.n).join() === 'W1,W2,W3,W4,W5' && so.rows[2].segs === 3 && so.rows[2].on === 2 && /^now 2 of 3$/i.test(so.rows[2].rt) && so.rows[3].rt === '' && so.rows[4].rt === '', JSON.stringify([so.head, so.rows.map(r => [r.n, r.rt])]));
+    C.check('…a held week is ONE solid bar and says Held; the dots and "+1" are after the bar (also after a held one)', so.rows[0].segs === 1 && so.rows[0].on === 1 && /^held$/i.test(so.rows[0].rt) && so.rows[1].dots === 1 && so.rows[1].xn === '+1' && so.rows[2].dots === 1 && so.rows[0].dots === 0, JSON.stringify(so.rows.map(r => [r.n, r.dots, r.xn, r.rt])));
+    C.check('…the card says which cycle and how long, and a week with sessions is a button (the empty ones are not)', /Cycle 3/.test(so.card) && /3 a week · 5 weeks/.test(so.card) && so.rows.map(r => r.tag).join() === 'BUTTON,BUTTON,BUTTON,DIV,DIV' && so.note, so.card);
     await nth(o.p, '#crewplayer-body .pl-wb', 2); await o.p.waitForTimeout(350);
-    const w3 = await sheetRows(o.p);
-    C.check('…your week lists the session\'s name, the date and the minutes, and "Extra" on an extra', w3.title === 'Week 3' && w3.rows.length === 3 && w3.rows[0] === 'Lower · Power Mon 19 Oct · 64 min' && w3.rows[2].toLowerCase() === 'core circuit thu 22 oct · 20 min extra', JSON.stringify(w3.rows));
-    C.check('…and says what the crew sees of it', /The crew sees these dates and nothing else/.test(w3.quiet || ''), w3.quiet);
+    const w3o = await sheetRows(o.p);
+    C.check('…your week lists the session\'s name, the date and the minutes, and "Extra" on an extra, and "of 3" in its subtitle', w3o.title === 'Week 3' && /^2 of 3 sessions · 1 extra/.test(w3o.sub) && w3o.rows.length === 3 && w3o.rows[0] === 'Lower · Power Mon 19 Oct · 64 min' && w3o.rows[2].toLowerCase() === 'core circuit thu 22 oct · 20 min extra', JSON.stringify(w3o));
+    C.check('…and says what the crew sees of it', /The crew sees these dates and nothing else/.test(w3o.quiet || ''), w3o.quiet);
     await o.p.evaluate(() => closeHistorySheet());
     // the session switch off: the block is still yours, wearing "Only you"
     await o.p.evaluate(() => { const c = crewPageGet('me'); c.p.kinds = Object.assign({}, c.p.kinds, { session: false }); crewPagesSave(); _playerHTML = ''; renderPlayerPage(); });
     C.check('your session switch off: the block stays and wears "Only you"', /Only you/.test((await cycleShot(o.p)).head) && !/Only you/.test((await cycleShot(o.p)).card), (await cycleShot(o.p)).head);
+    C.check('…no page errors on your page', !o.p.errs.length, o.p.errs.join(' | '));
     await o.ctx.close();
-    // a person who joined in week 2: week 1 is empty and grey and is not in the count
-    const j = await open(browser, { stub: { crewPages: { [CK.mina]: { cycle: cycleOf(false, { before1: true }) } } } });
-    await goCrew(j.p); await shown(j.p, CK.mina);
-    const sj = await cycleShot(j.p);
-    C.check('weeks before they joined are drawn empty and grey, say nothing, and are not in the count ("5 of 12")', /^This cycle · 5 of 12/.test(sj.head) && /before/.test(sj.rows[0].cls) && sj.rows[0].segs === 3 && sj.rows[0].on === 0 && sj.rows[0].rt === '' && sj.rows[0].tag === 'DIV', JSON.stringify([sj.head, sj.rows[0]]));
+    // your own page, joined in week 2: week 1 is empty and grey and is not in the count
+    const j = await pageCycle(cycleOf(true, { before1: true }), 'me');
+    C.check('weeks before you joined are drawn empty and grey, say nothing, and are not in the count ("5 of 12")', /^This cycle · 5 of 12/.test(j.s.head) && /before/.test(j.s.rows[0].cls) && j.s.rows[0].segs === 3 && j.s.rows[0].on === 0 && j.s.rows[0].rt === '' && j.s.rows[0].tag === 'DIV', JSON.stringify([j.s.head, j.s.rows[0]]));
     await j.ctx.close();
     // no cycle (the switch is off, or a page with none): no block at all
     const n = await open(browser, {});
     await goCrew(n.p); await shown(n.p, CK.mina);
-    C.check('a page with no cycle (their switch is off) draws no This cycle block', !(await n.p.$('#crewplayer-body .pl-cyc')) && !(await secs(n.p)).some(x => /This cycle/.test(x)));
+    C.check('a page with no cycle (their switch is off) draws no cycle block at all', !(await n.p.$('#crewplayer-body .pl-cyc')) && !(await secs(n.p)).some(x => /This cycle|^This week$/.test(x)));
     await n.ctx.close();
-    // 320 px, with an extra and the longest right column
-    const t = await open(browser, { opts: { w: 320, h: 640 }, stub: { crewPages: { [CK.mina]: { cycle: cycleOf(false) } } } });
+    // 320 px, with an extra and a held week
+    const t = await open(browser, { opts: { w: 320, h: 640 }, stub: { crewPages: { [CK.mina]: { cycle: otherCycle({ week: { held: true, done: 3 } }) } } } });
     await goCrew(t.p); await shown(t.p, CK.mina);
-    const t3 = await t.p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, bar: Math.round(document.querySelectorAll('#crewplayer-body .pl-wb')[2].querySelector('.pl-bar').getBoundingClientRect().width) }));
-    C.check('320 px: the bars fit, nothing scrolls sideways, and the bar keeps room', t3.sw <= t3.iw && t3.bar >= 60, JSON.stringify(t3));
+    const t3 = await t.p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, bar: Math.round(document.querySelector('#crewplayer-body .pl-wb .pl-bar').getBoundingClientRect().width) }));
+    C.check('320 px: the bar fits, nothing scrolls sideways, and the bar keeps room', t3.sw <= t3.iw && t3.bar >= 60, JSON.stringify(t3));
     await t.ctx.close();
   }
 
@@ -1490,10 +1529,10 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await a.p.evaluate(() => { document.getElementById('global-tabs').style.display = 'none'; });   // the fixed tab bar would sit across the middle of a full-page picture
     await a.p.screenshot({ path: path.join(out, 'player-other-game-light-390.png'), fullPage: true });
     const crop = (sel0, sel1, up) => a.p.evaluate(([s0, s1, u]) => { const t = document.querySelector(s0).getBoundingClientRect(), e = document.querySelector(s1).getBoundingClientRect(); return { x: 0, y: Math.max(0, Math.round(t.top + scrollY - u)), width: 390, height: Math.round(e.bottom - t.top + u + 14) }; }, [sel0, sel1, up]);
-    await a.p.screenshot({ path: path.join(out, 'cycle-bars-extra-light-390.png'), fullPage: true, clip: await crop('#crewplayer-body .pl-cyc', '#crewplayer-body .pl-cyc + .pl-tail', 50) });
+    await a.p.screenshot({ path: path.join(out, 'player-other-thisweek-light-390.png'), fullPage: true, clip: await crop('#crewplayer-body .pl-cyc', '#crewplayer-body .pl-cyc + .pl-tail', 50) });
     await a.p.screenshot({ path: path.join(out, 'face-stack-light-390.png'), fullPage: true, clip: await crop('#crewplayer-body .pl-ar', '#crewplayer-body .pl-list + .pl-tail', 52) });
     await a.p.evaluate(() => { document.getElementById('global-tabs').style.display = ''; window.scrollTo(0, 0); });
-    await nth(a.p, '#crewplayer-body .pl-wb', 2); await a.p.waitForTimeout(450);
+    await nth(a.p, '#crewplayer-body .pl-wb', 0); await a.p.waitForTimeout(450);
     await a.p.screenshot({ path: path.join(out, 'cycle-week-sheet-light-390.png') });
     await a.p.evaluate(() => closeHistorySheet()); await a.p.waitForTimeout(250);
     await nth(a.p, '#crewplayer-body .pl-list button.pl-ar', 0); await a.p.waitForTimeout(900);

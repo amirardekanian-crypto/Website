@@ -119,6 +119,13 @@ the extras sit beside it (*+2 extra*). No weekday letters anywhere on the bars (
 session's name, the date and the minutes, and *Extra* on an extra; **someone else's** lists only *Mon 12 Oct* and *Session* or *Extra*: the server sends no name or minutes for them (a
 Library session's or a rehab day's name can hint at pain) and the app never draws one even if it came. On your own page the block follows your `session` switch and wears *Only you* when it is off.
 
+**Someone else's cycle (CONTRACT 9b, 2026-10-24).** The server sends another person only `{ n, per_week, done, extra, weeks: [this week only] }`, days with a date and `extra` and nothing else: a past
+week that was not held is a broken week, and a broken week is on the Bell's never list. So on someone else's page the block is **This week**: one bar with no week number (the plan's pieces, the extras as
+dots with *+N*, **Held** when held), a tap on it lists the week's days by date, and one line under it, **8 sessions this cycle** (and *· 2 extra* when there are some, *No sessions yet this cycle* at zero).
+Never *of N* and never a week that is over, even if the server were to send one: the week drawn is the one marked `now` (or the only one sent), a week marked `before` is not drawn, several weeks with none
+marked `now` draw no bar at all, and the line is the server's own `done` (no `done`, no line). Their posts, on the same page, are headed **Posted this week** so the page has one *This week*. **Your own
+page keeps the whole cycle** and *8 of 15*. `playerThisWeekHTML(key, p)` / `plThisWeek(c)` are the two functions; `playerCycleHTML` hands someone else to them.
+
 **Why.** Amir, on the cycle bars: *"i like week bars idea, but the workouts, can be anything other than their cycles, they can do extra, it needs to show that as well"*. A plan week is
 what is counted (and held), so the bar is cut into exactly that; what a person does beyond it is shown, never counted against them.
 

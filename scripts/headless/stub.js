@@ -21,7 +21,8 @@
 // stage96 is TOLD by get_bell's top-level `lounge: 1` (the fixture sets it; without it the app draws Crew as it was). YOUR page (no p_subject) is whole: every block, the comebacks, and
 // `kinds` (your switches, a kind not named is on); someone else's has neither.
 // The cheer (step 3): crew_cheer answers like the server (cheerLog, cheerCap, cheerErr); crew_page reads cheerLog for mine_today.
-// Steps 4 to 6: a page's `cycle` (weeks, days; another person's days carry only day and extra), `game` and each achievement's `signed` / `signed_n` come from the `crewPages` entry (none by default, so a
+// Steps 4 to 6: a page's `cycle` (YOUR page: every week of the cycle with days that carry title and mins, plus `done` / `extra`; SOMEONE ELSE'S, CONTRACT 9b: { n, per_week, done, extra, weeks: [this week only] }
+// and days that carry only day and extra: the stub sends exactly what the fixture gives, so a test can also send MORE than the server would), `game` and each achievement's `signed` / `signed_n` come from the `crewPages` entry (none by default, so a
 // page has no cycle, no game and nobody signed); my_game_set answers like CONTRACT 4 and crew_page(own) then carries what it saved (`myGame`; gameMissing, gameErr, gameFail, gameDelay).
 // Faces (step 2): crew_faces_get answers `faces` ({ '<ck>': { fv, b64 } }), crew_face_set / crew_face_clear change the caller's own (faceDelay, faceMax, faceMissing, faceErr).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
