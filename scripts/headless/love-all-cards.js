@@ -177,6 +177,48 @@ async function spy(p) { await p.evaluate(() => { window.__buzz = []; navigator.v
     await ctx.close();
   }
 
+  // ── I3: the ⓘ on a circuit's movements ──
+  const PAIR = 'Jump & Plank Pair', PRIMER = 'Primer Pair';
+  for (const w of [390, 320]) {
+    const P = holdProg();
+    const day = P.workouts.days[0];
+    day.blocks.push({ title: 'Strength', exercises: [{ type: 'circuit', name: PAIR, rx: { rounds: 2, rpe: 8, rest: 60 },
+      items: [{ name: 'Box Jump', exId: 'box-jump', rx: { reps: 5 } }, { name: 'Mystery Move', rx: { reps: 8 } }, { name: 'Side Plank', exId: 'side-plank', rx: { time: '20 s', side: true } }] }] });
+    day.blocks[0].exercises.push({ type: 'circuit', name: PRIMER, warmup: true, rx: { rounds: 2 }, items: [{ name: 'Side Plank', exId: 'side-plank', rx: { time: '20 s' } }, { name: 'Mystery Warm', rx: { reps: 8 } }] });
+    const { ctx, p } = await open(browser, { w, prog: P, stub: { library: H.library() } });
+    p.setDefaultTimeout(8000);
+    for (const name of [PAIR, PRIMER]) {
+      await openCard(p, name);
+      const rows = await p.evaluate(`[...${H.card(name)}.querySelectorAll('.round-row')].map(r => { const b = r.querySelector('.round-about'); const q = b && b.getBoundingClientRect(); const n = r.querySelector('.round-name').getBoundingClientRect();
+        return { nm: r.querySelector('.round-name').firstChild.textContent, about: !!b, w: q ? Math.round(q.width) : 0, h: q ? Math.round(q.height) : 0, label: b ? b.getAttribute('aria-label') : '', rowH: Math.round(r.getBoundingClientRect().height), nameH: Math.round(n.height), inside: !!b && q.right <= innerWidth }; })`);
+      const ent = rows.filter(r => r.about), none = rows.filter(r => !r.about);
+      t.check(`${name}: every movement with a Spine entry has the ⓘ, named for it, and the ones without have none (${w} px)`,
+        ent.length >= 1 && none.length >= 1 && ent.every(r => /^About /.test(r.label)) && (name === PAIR ? ent.map(r => r.nm).join() === 'Box Jump,Side Plank' : ent.map(r => r.nm).join() === 'Side Plank'), JSON.stringify(rows));
+      t.check(`${name}: the ⓘ is 44 x 44 to hit, on the screen, and a line of name is not made taller by it (${w} px)`, ent.every(r => r.w === 44 && r.h === 44 && r.inside && r.nameH < 44), JSON.stringify(rows));
+    }
+    await openCard(p, PAIR);
+    const before = await p.evaluate(`(() => { const c = ${H.card(PAIR)}; return { collapsed: c.classList.contains('collapsed'), checked: c.classList.contains('checked'), wt: [...c.querySelectorAll('.round-wt')].map(i => i.value).join() }; })()`);
+    await p.evaluate(`${H.card(PAIR)}.querySelector('.round-about').scrollIntoView({ block: 'center' })`);
+    await p.waitForTimeout(150);
+    const h = await p.evaluateHandle(`${H.card(PAIR)}.querySelector('.round-about')`);
+    await h.asElement().click();
+    await p.waitForTimeout(500);
+    const after = await p.evaluate(`(() => { const c = ${H.card(PAIR)}, ov = document.getElementById('hist-overlay'); return { collapsed: c.classList.contains('collapsed'), checked: c.classList.contains('checked'), wt: [...c.querySelectorAll('.round-wt')].map(i => i.value).join(),
+      sheet: ov.classList.contains('visible'), name: (ov.querySelector('.ax-name') || {}).textContent }; })()`);
+    t.check(`a tap on a movement's ⓘ opens the About sheet for its entry (${w} px)`, after.sheet && after.name === 'Box Jump', JSON.stringify(after));
+    t.check(`…and ticks nothing, folds nothing, types no weight (${w} px)`, after.collapsed === before.collapsed && after.checked === before.checked && after.wt === before.wt && !after.checked, JSON.stringify([before, after]));
+    await p.evaluate(() => closeHistorySheet()); await p.waitForTimeout(300);
+    // a warm-up row: the ⓘ must not fold the row's cues
+    await openCard(p, PRIMER);
+    const open0 = await p.evaluate(`${H.card(PRIMER)}.querySelector('.round-row').classList.contains('cues-open')`);
+    const hp = await p.evaluateHandle(`${H.card(PRIMER)}.querySelector('.round-about')`);
+    await hp.asElement().scrollIntoViewIfNeeded(); await hp.asElement().click(); await p.waitForTimeout(400);
+    const open1 = await p.evaluate(`({ cues: ${H.card(PRIMER)}.querySelector('.round-row').classList.contains('cues-open'), sheet: document.getElementById('hist-overlay').classList.contains('visible') })`);
+    t.check(`a warm-up row's ⓘ opens the sheet and does not fold the row (${w} px)`, open1.sheet && open1.cues === open0, JSON.stringify([open0, open1]));
+    t.check(`no page errors (${w} px)`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });

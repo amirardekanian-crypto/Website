@@ -3650,6 +3650,11 @@
   :where(#day-view, .step-scroll, #ws-body) .round-row.prep.has-cues .round-row-main { cursor: pointer; }
   :where(#day-view, .step-scroll, #ws-body) .round-letter { grid-area: l; justify-self: center; width: auto; font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; color: var(--green-ink); }
   :where(#day-view, .step-scroll, #ws-body) .round-name { grid-area: n; align-self: end; letter-spacing: 0; font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  /* the ⓘ after a movement's name: 44 px to hit, a 22 px circle to see, margins that give back the height so the line does not grow */
+  :where(#day-view, .step-scroll, #ws-body) .round-about { position: relative; z-index: 0; display: inline-block; vertical-align: middle; width: 44px; height: 44px; margin: -13px -8px -13px -4px; padding: 0;
+    border: 0; background: none; cursor: pointer; font: 700 var(--fs-small)/44px 'Barlow', sans-serif; color: var(--grey); text-align: center; -webkit-tap-highlight-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .round-about::before { content: ''; position: absolute; z-index: -1; inset: 11px; border-radius: 50%; border: 1.5px solid var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .round-about:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   :where(#day-view, .step-scroll, #ws-body) .round-detail { grid-area: d; align-self: start; margin: 2px 0 0; letter-spacing: 0; font: 500 var(--fs-small)/1.3 'Barlow', sans-serif;
     color: var(--grey); font-variant-numeric: tabular-nums; }
   :where(#day-view, .step-scroll, #ws-body) .round-row-main > :not(.round-letter):not(.round-name):not(.round-detail) { grid-row: 1 / span 2; }
@@ -22185,9 +22190,10 @@ function spineCuesInto(slot, entry, render) {
   setSlot(slot, entry && hasCues(entry.cues) ? render(entry.cues) : slot.dataset.own);
 }
 function paintSpine() {
-  // Exercises inside a circuit: steps and cues (a circuit row has no ⓘ).
+  // Exercises inside a circuit: steps and cues, and the ⓘ of a movement with an approved entry (Love All round 4, 2026-10-24).
   document.querySelectorAll('.round-cues-slot').forEach(slot => {
     const entry = SPINE ? spineFor(slot.dataset.name, slot.dataset.exid) : null;
+    paintRoundAbout(slot.closest('.round-row'), slot, entry);
     spineCuesInto(slot, entry, renderRoundCues);
     const row = slot.closest('.round-row');
     if (!row) return;
@@ -22214,6 +22220,25 @@ function paintSpine() {
     if (entry) paintKgCol(card);
     paintAbout(card);
   });
+}
+// The ⓘ on a circuit's movement: the same small circle a single exercise has, after the movement's name, opening the same About sheet for its Spine
+// entry (the Library's, which carries the steps and the cues the row folds away). No entry, no ⓘ. 44 px to hit, drawn small; a tap on it
+// does nothing else (the row's own tap, a warm-up row's folding, the circuit's tick and fold never hear it).
+function paintRoundAbout(row, slot, entry) {
+  const nm = row && row.querySelector('.round-name');
+  if (!nm) return;
+  let b = nm.querySelector('.round-about');
+  if (!entry) { if (b) b.remove(); return; }
+  if (b) return;
+  b = document.createElement('button');
+  b.type = 'button'; b.className = 'round-about'; b.textContent = 'i';
+  b.setAttribute('aria-label', 'About ' + slot.dataset.name);
+  b.addEventListener('click', ev => {
+    ev.stopPropagation();
+    const e = SPINE ? spineFor(slot.dataset.name, slot.dataset.exid) : null;   // resolved at the tap: the Spine can arrive after the row was painted
+    if (e) openExerciseSheet(e.id, null);
+  });
+  nm.appendChild(b);
 }
 // The ⓘ sits at the right end of the row and of the open card's header (CARD-01, Amir 2026-09-27), so a long
 // name never pushes it onto a line of its own. It is there for an approved entry, a reason (solid clay), and,
