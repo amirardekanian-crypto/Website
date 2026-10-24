@@ -549,7 +549,7 @@
   /* Section heading = §NN + condensed title + a scoreboard divider rule */
   #ar-body .ar-h { display: flex; align-items: center; gap: 10px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); text-transform: uppercase; color: var(--ink); letter-spacing: 0.3px; margin: 26px 0 11px; }
   #ar-body .ar-h::before { content: ''; width: 22px; height: 2px; background: var(--green-ink); flex-shrink: 0; }
-  #ar-body .ar-h .ar-h-t { flex-shrink: 0; }
+  #ar-body .ar-h .ar-h-t { min-width: 0; overflow-wrap: anywhere; }   /* a long heading wraps; it used to hold its width and push the page sideways */
   /* List = tennis-ball bullets */
   #ar-body .ar-list { list-style: none; padding-left: 0; margin: 0 0 14px; }
   #ar-body .ar-list li { position: relative; padding-left: 28px; margin-bottom: 7px; font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.7; color: var(--ink); }
