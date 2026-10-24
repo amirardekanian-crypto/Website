@@ -16933,7 +16933,18 @@ function toggleBarMore(day) {
 // The questions that cannot wait (the machine is taken, this hurts) come mid-set, and the way to WhatsApp was ← Home, Coach,
 // Open WhatsApp, with a message that named nothing. Under ⋯ on the slim bar, one row opens WhatsApp with the day and the exercise
 // that is open: "About Day 1, Barbell Back Squat: ". The ⓘ sheet stays without a door (Amir's 2026-10-12 call).
+// The card in use: Guided's current step, else the card last touched (a tick, typing, opening it), else the first one left open.
+let _lastCard = null;
+document.addEventListener('pointerdown', e => { const c = e.target.closest && e.target.closest('.checklist-item'); if (c) _lastCard = c; }, true);
+document.addEventListener('input', e => { const c = e.target.closest && e.target.closest('.checklist-item'); if (c) _lastCard = c; }, true);
 function askAmirFor(day) {
+  const nm = c => { const n = c && c.querySelector('.item-name'); return n ? n.textContent.trim() : ''; };
+  if (typeof STEP !== 'undefined' && STEP && String(STEP.day) === String(day)) {
+    const it = STEP.seq[STEP.pos];
+    const n = it && nm(it.group ? it.cards && it.cards[0] : it.card);
+    if (n) return n;
+  }
+  if (_lastCard && _lastCard.isConnected && _lastCard.closest('#day' + day)) { const n = nm(_lastCard); if (n) return n; }
   const card = document.querySelector('#day' + day + ' .checklist-item:not(.collapsed) .item-name');
   return card ? card.textContent.trim() : '';
 }
