@@ -9347,16 +9347,16 @@ function cycleOver() {
   if (!wk || !wk.after) return null;
   return { cur, cIdx, count: DATA.cycles.length, next: DATA.cycles[cIdx + 1] || null };
 }
-// "OCT 6": the card's caption is upper case. Read as a local date, so it never slips a day.
+// "6 OCT": the card's caption is upper case, the day first like every other date in the app (B31). Read as a local date, so it never slips a day.
 function cycDate(iso) {
   const s = String(iso || '').slice(0, 10), d = new Date(s + 'T00:00:00');
-  return isNaN(d) ? '' : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate();
+  return isNaN(d) ? '' : d.getDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()];
 }
 // The This cycle card (PROG-01) is Progress's one green thing, a cover in the Centre Court look (Amir, 2026-10-13): the cycle's picture graded
 // into the green, "● THIS CYCLE · 2 OF 3" in Space Mono over the cycle's NAME in capitals, one mono line under it with the cycle's dates and,
 // in its last 14 days, the days left (the days-left banner and the header's dates line it replaced are gone), then the bars and the wins.
 // Past the end date it says so in the same place: "● CYCLE COMPLETE · 2 OF 3" ("● ROADMAP COMPLETE" on the last), the dates line becomes
-// "Finished Nov 2 · 5 of 5 weeks". The dates are calendar days (cycleDayNo(), cycDate()), never new Date('YYYY-MM-DD').
+// "Finished 2 Nov · 5 of 5 weeks". The dates are calendar days (cycleDayNo(), cycDate()), never new Date('YYYY-MM-DD').
 function paintCycleCard() {
   const wrap = document.getElementById('cycle-card-wrap');   // on Progress since 2026-10-12 (it was the top of Home)
   if (!wrap || !DATA) return;

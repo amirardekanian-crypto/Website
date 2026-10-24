@@ -3,6 +3,7 @@
 //   B14  the grey LAST under a set reads the server's history: a new phone with no set log still shows last time, in the measure last time used.
 //   B19  History's "low day" tag follows the level the day was trained at (the check-in's plan as filed), not the raw score.
 //   B21  the demo's Progress never says "Nothing here yet" (a real first-timer's still does).
+//   B31  Progress's cycle cover gives its dates day first ("13 Oct – 16 Nov"), and so does the finished line.
 // Serve the repo first (python -m http.server <port>; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js), then:
 //   node scripts/headless/love-all-data.js
 'use strict';
@@ -122,12 +123,30 @@ async function b21(browser) {
   await ctx.close();
 }
 
+// ═════════ B31: day first ═════════
+async function b31(browser) {
+  const P = H.fixture();
+  const cur = P.cycles[P.currentCycleIndex];
+  cur.startDate = '2026-10-13'; cur.endDate = '2026-11-16';
+  let { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, tz: 'UTC', prog: P });
+  await p.evaluate(() => goTo('plan'));
+  await p.waitForTimeout(500);
+  let d = await p.evaluate(() => { const e = document.querySelector('.cyc-dates'); return e ? e.textContent.trim() : null; });
+  t.check('B31: the cover reads 13 Oct – 16 Nov', d && /^13 Oct – 16 Nov/.test(d), d);
+  t.check('B31: the cover is not month first', d && !/Oct 13|Nov 16/.test(d), d);
+  const cap = await p.evaluate(() => { const e = document.querySelector('.cyc-dates'); return e ? getComputedStyle(e).textTransform : null; });
+  t.check('B31: the cover keeps its upper case', cap === 'uppercase', cap);
+  t.check('B31: no page errors', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await b10(browser);
   await b14(browser);
   await b19(browser);
   await b21(browser);
+  await b31(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
