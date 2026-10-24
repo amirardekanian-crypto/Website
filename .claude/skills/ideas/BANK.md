@@ -216,17 +216,45 @@ stamps `sent_at`); only Amir can pause (`athlete_status`); replies have no push;
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 48 | Owed a Word | coach.html logs every WhatsApp / Copy / Mark read tap and call; Needs you names "no word from you in N days" (from Ladder's coach tool) | — | pitched · **recommended first** |
-| 49 | Break Point | When sessions left ≥ days left in the plan week, Home's This Week line names the way out (REC-5, REC-6, Finish early counts); later one push before the week's last day (Duolingo's late save) | week state | pitched · top 3 |
-| 50 | Rain Delay | Athlete asks for a pause on the Coach tab (ill, injured, away); Amir confirms in Needs you; uses `athlete_status` (Gentler Streak) | week state | pitched · top 3 |
-| 51 | The Return | First open after 10+ days: one card in Amir's words, start with the next day, the session counts for Bounce Back; grows the Quiet Frame audit's open comeback line | week state | pitched |
-| 52 | Seen by Amir | "Seen by Amir" under the athlete's session note once `coach_status` is read; never "not seen" (Future's coach presence) | 48 | pitched |
-| 53 | Patterns, now with data | #13 revived: habit days vs the next check-in and session RPE, shown after 5 yes + 5 no, "goes with" not "causes"; coach-only first (WHOOP Journal) | — | pitched (revives #13) |
-| 54 | Reply Rings | A reply to your crew post rings you, like a cheer (`reply_you` in `crew_push_q`) (Strava) | — | pitched · small fix |
+| 48 | Owed a Word | coach.html logs every WhatsApp / Copy / Mark read tap and call; Needs you names "no word from you in N days" (from Ladder's coach tool) | — | **rejected** 2026-10-24 ("cut the rest") |
+| 49 | Break Point | When sessions left ≥ days left in the plan week, Home's This Week line names the way out (REC-5, REC-6, Finish early counts); later one push before the week's last day (Duolingo's late save) | week state | **rejected** 2026-10-24 ("cut the rest") |
+| 50 | Rain Delay | Athlete asks for a pause on the Coach tab (ill, injured, away); Amir confirms in Needs you; uses `athlete_status` (Gentler Streak) | week state | **picked** 2026-10-24 ("go deep on these 4") |
+| 51 | The Return | First open after 10+ days: one card in Amir's words, start with the next day, the session counts for Bounce Back; grows the Quiet Frame audit's open comeback line | week state | **picked** 2026-10-24 ("go deep on these 4") |
+| 52 | Seen by Amir | "Seen by Amir" under the athlete's session note once `coach_status` is read; never "not seen" (Future's coach presence) | 48 | **rejected** 2026-10-24 ("cut the rest") |
+| 53 | Patterns, now with data | #13 revived: habit days vs the next check-in and session RPE, shown after 5 yes + 5 no, "goes with" not "causes"; coach-only first (WHOOP Journal) | — | **picked** 2026-10-24 ("go deep on these 4") |
+| 54 | Reply Rings | A reply to your crew post rings you, like a cheer (`reply_you` in `crew_push_q`) (Strava) | — | **picked** 2026-10-24 ("go deep on these 4") |
 
 Cut in the same round: Duolingo leagues (round 3), Hevy's send-to-AI (COM-3, no chatbot), copying a friend's routine,
 Future's coach matching, an athlete-facing load path (ACWR stays coach-only), a "crew mate trained" push, Ladder's one
 plan per team, a self-serve streak freeze (Rain Delay instead).
+
+**Deep-dive, 2026-10-24, "Second Wind"** (Amir: *"go deep on these 4"*, and *"what does strava have in community that is a good
+idea for me to have? what does doulingo has in its gaming and achievement that is good for us to have?"*):
+https://claude.ai/artifact/8VP8Q1B44uuYjrb88ayHvb. Three looks for each of 50, 51, 53, 54 (A recommended every time), 20 calls.
+Found: `athlete_status` has 0 rows (nobody ever paused); ending a pause deletes the row, so `career_derive` would turn the paused
+weeks into broken weeks at the next scoring; `push_due` ignores the pause; a pause has no end date and hides the athlete from Needs
+you for good. 11 of 12 returns after 10+ days trained again within 7 days (median gap 14). The Quiet Frame audit's comeback line
+(14 days, words only, "needs your sentence") is #51. Patterns: no link between any habit and the next check-in (pooled about +0.1
+of 5; within people sleep and protein go the wrong way) or training in the next two days (protein 80% vs 68% pooled, 3 of 5 within
+people), so the advice is a quarterly report first and the panel when it finds something. #54 Reply Rings is already in the Lounge's
+stage96 (branch `lounge-sql`, trigger `crew_push_reply`, words "<name> replied to your post", Farsi a draft); only the in-app marker
+is left.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 50+ | Fair Count | Adherence, the cycle's 80% and the cycle report count only weeks not on a rain delay | 50 | pitched (grown, on The Coaching Graph) |
+| 51+ | First Ball Back | Courtside names a return the day the first session back is done, WhatsApp line ready | 51 | pitched (grown, on The Coaching Graph) |
+| 53+ | One Sleep Number | The check-in asks hours of sleep, ticks the sleep habit, turns hours into its 1-5 (REC-2; twins) | 53 | pitched (grown, on The Coaching Graph as 13+) |
+| 71 | Hitting Partner | "with" on Tell the crew: a crew mate you trained beside, one Bell line, sessions together on both pages (Strava group activities) | Lounge | pitched |
+| 72 | Year-End | A free recap per athlete as share cards: sessions, weeks held, longest run, bests, the crew's total; English in December, Farsi at Nowruz (Strava Year in Sport, Duolingo Year in Review) | — | pitched |
+| 73 | The Draw | Amir writes six Monthly Opens in one sitting; the next opens itself on the 1st (the Open has never been set) (Duolingo monthly challenge) | — | pitched |
+| 74 | Let | Once a year, anyone 30+ days away who finishes 3 sessions in 14 days gets their best run of held weeks back; marks never paid twice (Duolingo Streak Revival, June 2026) | 51 | pitched · test once |
+| 75 | Career High | Best run of held weeks and most sessions in a month on the Player Page (Duolingo personal records) | 55 | pitched |
+
+Cut on the page (so they are not re-pitched): Strava's messages, followers, clubs inside the crew, segments and Local Legends,
+Flyby, Athlete Intelligence, friend group challenges, club events; Duolingo's leagues, gems/shop/hearts/energy, XP boosts and
+Happy Hour, daily quests (missions parked), Legendary, Duolingo Score, nudging a friend, pushier notifications. Friend streaks and
+Friends Quests stay cut as #61 Doubles, noted as the cut to revisit if the crew passes 20 (Duolingo: +22% daily completion).
 
 ## Round 6 · 2026-10-24 · "Players' Lounge" (grow the Crew: profiles, more interaction)
 

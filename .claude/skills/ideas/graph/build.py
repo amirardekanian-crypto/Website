@@ -199,6 +199,38 @@ IDEAS = [
   coach="Your back-off rule, applied on every athlete's phone without a message from you.",
   mvp="Primary blocks only, half the sets rounded up (4 becomes 2, 3 becomes 2). Weight and intent unchanged.",
   adv="A per-cycle override for a cycle that ends on a test week or a tournament, and the Debrief (#12) reading whether the back-off happened."),
+ dict(n="13b", label="13+", name="One Sleep Number", sub="Ask sleep once, in hours, and let the check-in use it", layer="Grown along the way", grown="13",
+  stages=["Monitoring","Feedback"], needs=[13], cost="None. One question fewer for the athlete.",
+  chain=["Check-in: hours slept","Sleep habit ticked","Hours to 1-5","Today's targets (REC-2)","Patterns"],
+  what="The check-in asks hours of sleep instead of a 1 to 5 rating. The answer ticks the sleep habit and becomes the 1 to 5 that sets today's targets. Grew out of the Patterns deep-dive (#13, revived as round 5's #53).",
+  problem="Sleep is asked twice: a rating in the check-in, hours on the habit card. Short nights are rarely logged, so the 24 Oct check found no habit link it could trust: about 0.1 points out of 5, inside the noise.",
+  how="The check-in's sleep row becomes a stepper in half hours. A table you set turns hours into the score that REC-2 already uses.",
+  athlete="One question fewer, and their real sleep counted on the days that matter.",
+  coach="An honest sleep number on every training day, short nights included, which is the data Patterns needs.",
+  mvp="The stepper, the hours-to-score table, the habit ticked from it. The coach and athlete copies of the score change together (twins rule).",
+  adv="Patterns' sleep row reads it first. Rest-day sleep still comes from the habit card."),
+ dict(n="50b", label="50+", name="Fair Count", sub="Adherence counted over the weeks someone could train", layer="Grown along the way", grown="50",
+  grown_url="https://claude.ai/artifact/8VP8Q1B44uuYjrb88ayHvb#rain",
+  stages=["Monitoring","Review"], needs=[], cost="None. It reads the pause log.",
+  chain=["Pause log (Rain Delay)","Weeks that could be trained","Adherence","Cycle finished's 80%","/cycle-report"],
+  what="Adherence in coach.html, the cycle's 80% for Cycle finished and the cycle report count only the weeks an athlete was not on a rain delay. Grew out of round 5's #50 Rain Delay.",
+  problem="A fortnight of flu drags a cycle's adherence and makes Cycle finished impossible. The number then shows illness, not effort.",
+  how="Once pauses are kept with a start, an end and a reason, every count divides by the weeks that were open.",
+  athlete="A cycle with a fever in it can still be finished.",
+  coach="REC-3 in numbers: life load separated from training in every review.",
+  mvp="coach.html adherence and the cycle's 80%, from the new rulebook version on (D20).",
+  adv="/cycle-report names the paused weeks and why."),
+ dict(n="51b", label="51+", name="First Ball Back", sub="Courtside names a return the day the first session back is done", layer="Grown along the way", grown="51",
+  grown_url="https://claude.ai/artifact/8VP8Q1B44uuYjrb88ayHvb#return",
+  stages=["Communication","Feedback"], needs=[], cost="One message per return, about 2 a week.",
+  chain=["14+ days away","First session back","Courtside row","Your WhatsApp line"],
+  what="Courtside shows a return the day the first session after 14+ days is finished, with the WhatsApp line ready. Grew out of round 5's #51 The Return.",
+  problem="Courtside's Back on court waits for a held week. But 11 of 12 athletes who finish one session after a gap train again within a week, so the first session is the moment.",
+  how="A Courtside item from the session save: last session 14+ days before this one.",
+  athlete="You noticed, on the day it was hard.",
+  coach="The cheapest win in the system, in the panel you already read.",
+  mvp="The row and the line, nothing for the athlete to see.",
+  adv="After a rain delay, a softer line."),
 ]
 
 STAGES = ["Assessment","Decision making","Exercise selection","Programming","Execution","Feedback",
@@ -220,6 +252,7 @@ STATUS = {
  2: ("Built 24 Sep", "https://claude.ai/artifact/US2RW8TaHZbFk8voADq6fu"),
  "5b": ("Built 24 Sep", None), 14: ("Removed 24 Sep", None), 15: ("Built 24 Sep", None),
  16: ("Parked 24 Sep", None),
+ 13: ("Picked 24 Oct as #53, report first", "https://claude.ai/artifact/8VP8Q1B44uuYjrb88ayHvb#patterns"),
  12: ("Built 24 Sep as /cycle-report", "https://claude.ai/artifact/JY1eG1RNYHTLvYpFCwcHBx"),
 }
 
@@ -231,7 +264,7 @@ def chips(i):
         s += (f'<a class="chip {cls}" href="{st[1]}">{E(st[0])} · the brief ›</a>' if st[1]
               else f'<span class="chip {cls}">{E(st[0])}</span>')
     if i.get("grown"):
-        s += f'<a class="chip grown" href="#idea-{i["grown"]}">grew from #{i["grown"]}</a>'
+        s += f'<a class="chip grown" href="{i.get("grown_url") or "#idea-" + i["grown"]}">grew from #{i["grown"]}</a>'
     s += "".join(f'<span class="chip">{E(x)}</span>' for x in i["stages"])
     if i["needs"]:
         s += "".join(f'<a class="chip need" href="#idea-{n}">needs #{n}</a>' for n in i["needs"])
@@ -268,10 +301,10 @@ def card(i):
   </div>
 </article>'''
 
-by_stage = {s: [i["n"] for i in IDEAS if s in i["stages"]] for s in STAGES}
+by_stage = {s: [i for i in IDEAS if s in i["stages"]] for s in STAGES}
 stage_html = "".join(
   f'<li><span class="st">{E(s)}</span><span class="pins">' +
-  "".join(f'<a href="#idea-{n}">{"5+" if n == "5b" else n}</a>' for n in by_stage[s]) + '</span></li>' for s in STAGES)
+  "".join(f'<a href="#idea-{i["n"]}">{i.get("label") or i["n"]}</a>' for i in by_stage[s]) + '</span></li>' for s in STAGES)
 
 sections = ""
 for L in LAYERS:

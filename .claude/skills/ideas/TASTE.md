@@ -5,6 +5,14 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-24 · Round 5 'Borrowed Plays': four kept, three cut.** *"i like the idea 50 , 51, 53, 54 / cut the rest / go deep on these 4"*.
+  Kept Rain Delay (the athlete asks for a pause), The Return (the welcome back), Patterns (habits against check-ins) and Reply Rings
+  (a reply rings you). Cut Owed a Word (a contact clock on him), Break Point (the week-at-risk line and push) and Seen by Amir (a read
+  receipt). He gave no reason. What it seems to teach (inferred): he kept what is kind to the athlete or closes a loop for them, and cut
+  what keeps score on him (who he has not messaged, what he has not read) and what pushes an athlete to cram a week. Do not pitch a
+  coach-contact clock, read receipts or a "save your week" push again without asking. Same message, he asked what Strava's community
+  and Duolingo's game and achievements hold that is good for us.
+
 - **2026-10-24 · The Lounge build plan: "go with your picks", with five changes.** (1) *"i want the well played button to be changed
   to something more understandable to any one, has a like icon so every one understands what it is. or maybe keep it and just add a
   clapping icon to it or a thumbs up"*: a tennis idiom is not plain enough for everyone, so an icon carries the meaning (built as
