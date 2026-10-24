@@ -228,6 +228,45 @@ Cut in the same round: Duolingo leagues (round 3), Hevy's send-to-AI (COM-3, no 
 Future's coach matching, an athlete-facing load path (ACWR stays coach-only), a "crew mate trained" push, Ladder's one
 plan per team, a self-serve streak freeze (Rain Delay instead).
 
+## Round 6 · 2026-10-24 · "Players' Lounge" (grow the Crew: profiles, more interaction)
+
+Full write-up (8 fields per idea, both screenshot sets mapped piece by piece, a phone sketch of the profile, the rules, dependencies, the cuts, six calls):
+https://claude.ai/artifact/TQz3VhH61WvqPqXiG32K28
+
+Brief: Amir sent 15 screens of the Ladder app in two sets (profile, badges sheet, edit profile, settings; the RELOAD challenge grid,
+Get Started checklist, Share your Proof coin, Ladder Wall, faces on Home with double-tap cheer) and asked *"I want to grow the crew,
+into a bigger thing, adding profile, letting people interact more"*. Live numbers that day: 7 in the crew of the 19 who trained in 28
+days; 8 of 41 have ever answered the join question; 43 likes from 5 people and 4 replies from 2 since 19 Oct, all deleted after 7 days
+(stage81's sweep); 200 achievements held by 30 athletes and nobody can open another person's; the Monthly Open never set; 26 of 41
+programmes tennis/padel. Found: the sport badge can name an injury ("Build Muscle, Protect The Back"), so a page shows the plain sport;
+plan weeks are anchored to the cycle, so a Monday-to-Sunday month calendar can split a held week (58 became a cycle grid). The
+Affiliates tab already counts codes from the intake form and has an `athlete_id` column.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 55 | Player Page | Every name in Crew opens that person's page from existing data: cycle picture as cover, level ring, plain sport, with Amir since, the four numbers, achievements, honours, this week's posts; only what their switches allow | — | pitched · **recommended first** (with 62) |
+| 56 | Your Face | One photo per person, everywhere a name sits and in coach.html; reuses Highlight Reel's picker; ~20 KB on the server | — | pitched · top 3 |
+| 57 | Plays | ATP-style chips (hand, backhand, padel side, club or city, an optional Instagram handle) + one "Working on" line; "Trains for" for fitness clients; handedness feeds /program-design | 55 | pitched |
+| 58 | Cycle Grid | The cycle as W1-W5 rows, trained days filled, a held week a full row, "8 of 15" = the plan's own target (was "Season Calendar", a month view, changed after Ladder's RELOAD grid) | 55 | pitched |
+| 59 | Well Played | A cheer to a person (not a post) with an optional 100-character word, rings their phone, 7 days on their page, cheers-this-season count; Amir can send one as Coach; no private messages | 55 | pitched · top 3 |
+| 60 | Signed Ball | Names of who liked an achievement's Bell line kept on the achievement past the 7-day sweep | 55 | pitched |
+| 61 | Doubles | A monthly partner: both pages, "held the week together", "one to go"; STEP UP says expect little | 55 | pitched · later, at 12+ in the crew |
+| 62 | Your Page Is Ready | The join question and Home's one-time invitation show the athlete their own page first; coach.html lists who trains and is not in the crew | 55 | pitched · **ships with 55** |
+| 63 | Player Card | The page as an Instagram share card, optional invite code | 55, 56 | pitched · waits for the share-card design pass |
+| 64 | Call Out | @mentions in replies ring the person; one push change with #54 Reply Rings | 54 | pitched |
+| 65 | The Lineup | Bigger crew faces in the week band, a ring only for a held week (nobody shown behind), double-tap = Well Played, tap = page | 56, 59 | pitched (Crew top recommended; Home is Amir's call) |
+| 66 | Proof Stamp | A post's photo stamped from `crew_posts.session` (session name, minutes, week mark, date, AA mark); one image when shared out | — | pitched · share-card design pass |
+| 67 | The Open Wall | The Monthly Open as a wall of confirmed entries (face + result); photos kept for the Open's month need Amir's yes | an Open | pitched · after the first Open |
+| 68 | First Serve | A new athlete's first two weeks as a short list with a ring (first session, check-in, photo, join the crew, reminders last) in the invitation's Home slot | 56, 62 | pitched |
+| 69 | Bring a Partner | An athlete gets an affiliate code (affiliates row with `athlete_id`) shown on their page; friend's intake form counts it; the athlete's reward is Amir's call | — | pitched |
+
+Cut in the same round (listed so they are not re-pitched): private messages (SEND MESSAGE), calories and minutes rings, Favorites
+(Library sessions on top of a dosed plan), medal art / a level medal / greyed badges on others' pages, holiday "limited edition" badges
+(the Open is), followers, a photo grid on the page, Ask the crew, sport groups inside the crew, one-on-one challenges, "training now"
+live, "also in Sara's plan" on an exercise, cohorts by start month, match day on the page (the tennis-days rule: ask Amir), the
+spinning coin, a wall per workout, group chat (Chat, Teams), choosing a cover (a skin), Connected Apps / heart rate, widgets, an upgrade
+banner, a shop, birthday and email on the page. Parked: a "your plan" membership page (its own round).
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |

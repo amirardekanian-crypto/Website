@@ -66,6 +66,15 @@ login, new signup, no session for 7+ days, silent on Proof, ready to upgrade (`r
 switches (habits, workout, crew, cycle, stage84-87); crew replies have no push. program.html has no welcome-back
 screen and nothing compares habits with readiness.
 
+**Crew, checked 2026-10-24 (round 6):** program.html's Crew tab (`renderCrew`) = the week band (initials, a door to *In the
+crew*), honours, the Monthly Open card, the Bell (posts with photos, folded session lines, moment lines, replies), *This season*.
+There is **no page per person**: a name leads nowhere, and *In the crew* lists names with a level only. Posts, photos and likes are
+deleted after 7 days (stage81's sweep, `line_day < current_date - 7`). Faces are initials (`crewInitials`); the only photo picker is
+Highlight Reel's (`hlPhotoPick`, share cards). `CREW_KINDS` are the athlete's switches (session, level, week, mark, achievement, best,
+cycle, honour, open). The programme's `sport.badge` is free text that can name an injury. Plan weeks run from the cycle's start day,
+not Monday. coach.html's Affiliates tab (stage29) has an `athlete_id` column and counts codes from the intake form (`affUses`).
+Welcome is one overlay (`maybeWelcome`); there is no first-week list.
+
 **Gaps found:** Needs-you lists a run of low days (since 2026-09-26) but still does not fire on ACWR
 spikes, RPE drift, pain words or due retests; intake brief is pulled from Gmail though `hab_intake` has
 it; handoff-brief gates are not tracked; testing-app results never meet coached athletes.
