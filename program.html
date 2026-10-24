@@ -18849,7 +18849,7 @@ function attachSetLog(card) {
       const wIn = row.querySelector('.ex-set-weight');
       const shown = splitW(s.w).num;
       if (wIn !== document.activeElement && wIn.value !== shown) wIn.value = shown;
-      const lastW = (!s.d && s.lw) ? lastText(s.lw, unit) : '';
+      const lastW = (!s.d && lastWeightOf(name, i, s)) ? lastText(lastWeightOf(name, i, s), unit) : '';
       const ph = lastW || unitWord(unit);
       if (wIn.placeholder !== ph) wIn.placeholder = ph;
       wIn.setAttribute('aria-label', `Weight on set ${i + 1}${lastW ? ', last time ' + lastW : ''}`);
@@ -19848,6 +19848,18 @@ function cardUnit(card) {
     }
   }
   return 'kg';
+}
+// The weight to show under LAST for set i (B14, 2026-10-24): what the SERVER's history says the athlete lifted on that set last time,
+// the same source as the ⓘ's Last time and History, so a new phone shows it too. Fewer sets last time: its last weighed set. Nothing in the
+// history (or not loaded yet): the phone's own copy (carrySet's `lw`). Each weight keeps its own measure; lastText() names it, nothing is converted.
+function lastWeightOf(name, i, s) {
+  const h = HIST ? historyFor(name)[0] : null;
+  const sets = (h && h.entry && !h.entry.circuit && h.entry.sets) || [];
+  const has = x => x && x.w && weightOf(x.w).n != null;
+  if (has(sets[i])) return sets[i].w;
+  const lastWeighed = sets.slice().reverse().find(has);
+  if (i >= sets.length && lastWeighed) return lastWeighed.w;
+  return (s && s.lw) || '';
 }
 // Last time's weight as a box hint: the bare number in today's unit, the number and its own unit when they differ.
 function lastText(lw, unit) {
@@ -21146,7 +21158,7 @@ function paintTimerLog(row, item) {
   // the empty sets below exactly as the card does. Not for work with no kg box (paintKgCol()).
   const wIn = row.querySelector('.ex-set-weight');
   const kgOn = !!(wIn && !row.closest('.ex-set-log.no-kg'));
-  const lastKg = () => { const s = loadSetLog(item.name, item.total, item.card && item.card.dataset.day)[item.setI] || {}; return s.lw || ''; };
+  const lastKg = () => { const s = loadSetLog(item.name, item.total, item.card && item.card.dataset.day)[item.setI] || {}; return lastWeightOf(item.name, item.setI, s); };
   const planned = repsIn ? parseInt(repsIn.getAttribute('placeholder'), 10) || null : null;
   const isRange = !!(repsIn && /–/.test(repsIn.getAttribute('placeholder') || ''));
   const repsNow = () => parseInt(repsIn.value, 10) || (isRange ? null : planned);
