@@ -59,6 +59,13 @@ adherence, Personal records, planned-vs-done per day by exercise name, the day's
 editor) · Proof · Calls · File (versions, coaching log). The Chat sub-tab went on 2026-09-26: a session
 note is only marked read, and Amir answers on WhatsApp.
 
+**Checked 2026-10-24 (round 5):** Needs you reasons are note to read, not synced, low run, cycle ended / ending, no
+login, new signup, no session for 7+ days, silent on Proof, ready to upgrade (`reasonsOf`). The WhatsApp buttons open
+`wa.me` and log nothing; only Courtside stamps `sent_at`, so there is no record of Amir's last contact. Pausing
+(`athlete_status` paused / former, stage63) is coach-only; paused weeks are no week in the rulebook. Push has four
+switches (habits, workout, crew, cycle, stage84-87); crew replies have no push. program.html has no welcome-back
+screen and nothing compares habits with readiness.
+
 **Gaps found:** Needs-you lists a run of low days (since 2026-09-26) but still does not fire on ACWR
 spikes, RPE drift, pain words or due retests; intake brief is pulled from Gmail though `hab_intake` has
 it; handoff-brief gates are not tracked; testing-app results never meet coached athletes.

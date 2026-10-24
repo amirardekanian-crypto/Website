@@ -201,6 +201,33 @@ Page (six versions, every direction kept): https://claude.ai/artifact/AriVWJQskS
 | Tell the crew | One button on the finished card drafts the session's line for the Bell, a photo optional | **picked** 2026-10-19 (grown idea, The Bell page https://claude.ai/artifact/55fbdfUgJVxySL7EpihyWb; built with stage80) |
 | Beat Your October | When a test comes back in a later Open, each card shows the athlete's own last result beside the board | pitched 2026-10-19 (grown idea, Crew and Open page https://claude.ai/artifact/7fCYGFL6mboE3igFLUkE5E) |
 
+## Round 5 · 2026-10-24 · "Borrowed Plays" (patterns from other apps)
+
+Full write-up (8 fields per idea, what each app gave, dependencies, the cuts):
+https://claude.ai/artifact/LWN8Pn5Hdb7nszb6CxsRWA
+
+Brief: Amir asked which apps to learn from, then *"Run /ideas using the apps from this research (Future, Ladder, Whoop,
+Gentler Streak, Strava, Duolingo, Hevy) as the starting point"*. Live numbers that day: the 19 athletes active in 28 days
+did 1.49 sessions a week against 3.47 asked (46%); 19 of 33 athletes 10+ days past their last session, 15 returns after
+such a gap in 60 days by 10 athletes; every one of the 113 sessions since 24 Sep still `coach_status='new'`, 18 with a
+day note; 6 push subscribers; crew 8 posts by 5 athletes, 43 kudos, 4 replies; 298 `habit_done` facts by 17 athletes in
+14 days; 85% of sessions carry a check-in. Code facts: the WhatsApp buttons in coach.html log nothing (only Courtside
+stamps `sent_at`); only Amir can pause (`athlete_status`); replies have no push; no welcome-back screen.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 48 | Owed a Word | coach.html logs every WhatsApp / Copy / Mark read tap and call; Needs you names "no word from you in N days" (from Ladder's coach tool) | — | pitched · **recommended first** |
+| 49 | Break Point | When sessions left ≥ days left in the plan week, Home's This Week line names the way out (REC-5, REC-6, Finish early counts); later one push before the week's last day (Duolingo's late save) | week state | pitched · top 3 |
+| 50 | Rain Delay | Athlete asks for a pause on the Coach tab (ill, injured, away); Amir confirms in Needs you; uses `athlete_status` (Gentler Streak) | week state | pitched · top 3 |
+| 51 | The Return | First open after 10+ days: one card in Amir's words, start with the next day, the session counts for Bounce Back; grows the Quiet Frame audit's open comeback line | week state | pitched |
+| 52 | Seen by Amir | "Seen by Amir" under the athlete's session note once `coach_status` is read; never "not seen" (Future's coach presence) | 48 | pitched |
+| 53 | Patterns, now with data | #13 revived: habit days vs the next check-in and session RPE, shown after 5 yes + 5 no, "goes with" not "causes"; coach-only first (WHOOP Journal) | — | pitched (revives #13) |
+| 54 | Reply Rings | A reply to your crew post rings you, like a cheer (`reply_you` in `crew_push_q`) (Strava) | — | pitched · small fix |
+
+Cut in the same round: Duolingo leagues (round 3), Hevy's send-to-AI (COM-3, no chatbot), copying a friend's routine,
+Future's coach matching, an athlete-facing load path (ACWR stays coach-only), a "crew mate trained" push, Ladder's one
+plan per team, a self-serve streak freeze (Rain Delay instead).
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
