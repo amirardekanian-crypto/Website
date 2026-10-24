@@ -2086,8 +2086,8 @@ const on = n => !ONLY.length || ONLY.includes(n);
 
     // the friends line, from the server's counts
     for (const [what, ref, want] of [
-      ['one friend, one discount waiting', REF1({ friends: 1, waiting: 1 }), '1 friend joined · 10% off waiting for you'],
-      ['three friends, two discounts waiting', REF1({ friends: 3, waiting: 2, used: 1 }), '3 friends joined · 2 discounts of 10% waiting for you'],
+      ['one friend, one discount waiting', REF1({ friends: 1, waiting: 1 }), '1 friend joined · 10% off your next cycle is waiting for you.'],
+      ['three friends, two discounts waiting', REF1({ friends: 3, waiting: 2, used: 1 }), '3 friends joined · 10% off each of your next 2 cycles is waiting for you.'],
       ['two friends, both discounts used', REF1({ friends: 2, waiting: 0, used: 2 }), '2 friends joined · your 10% off is used'],
       ['nobody yet', REF1(), null]]) {
       const x = await ptOpen({ stub: { partner: ref } });

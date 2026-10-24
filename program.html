@@ -15225,11 +15225,12 @@ function partnerText(r) {
   return `Train with Amir Ardekani. Use my code ${code} for ${pct}% off: https://amirardekani.com/form.html?code=${encodeURIComponent(code)}`;
 }
 function partnerWaUrl(r) { return 'https://wa.me/?text=' + encodeURIComponent(partnerText(r)); }
-// "1 friend joined · 10% off waiting for you": from the server's counts, and nothing until a friend has joined.
+// "1 friend joined · 10% off your next cycle is waiting for you.": from the server's counts, and nothing until a friend has joined. Each friend is 10% off ONE cycle: two waiting are
+// 10% off each of your next two cycles, never 20% at once (Amir, 2026-10-24).
 function partnerNote(r) {
   const n = Math.max(0, Math.round(Number(r.friends)) || 0), w = Math.max(0, Math.round(Number(r.waiting)) || 0), rew = partnerPct(r, 'reward');
   if (!n) return '';
-  const left = w > 0 ? (w === 1 ? `${rew}% off waiting for you` : `${w} discounts of ${rew}% waiting for you`) : `your ${rew}% off is used`;
+  const left = w > 0 ? (w === 1 ? `${rew}% off your next cycle is waiting for you.` : `${rew}% off each of your next ${w} cycles is waiting for you.`) : `your ${rew}% off is used`;
   return `${n} friend${n === 1 ? '' : 's'} joined · ${left}`;
 }
 function playerPartnerHTML(p) {

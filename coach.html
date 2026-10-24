@@ -7399,9 +7399,9 @@ Object.assign(window, { cheerWordClear, paintCheers, loadCheers });
 
 // K6. The athletes' partner codes (stage97; Amir 2026-10-24: "the friend gets 10%, the member gets 10%"). An athlete makes a code in the app, or Amir makes one
 // here; the friend types it on the apply form and gets 10% off (check_discount() already answers it), and when that friend becomes a client Amir credits the
-// member: 10% off their next cycle, which he applies when they pay, then ticks Used. They sit under Leads → Referral codes in a group of their own (kind
+// member: 10% off one cycle for each friend, which he applies when they pay, then ticks Used. They sit under Leads → Referral codes in a group of their own (kind
 // 'athlete' in the affiliates table, which Live codes leaves out), read with coach_partner_codes(): the code, the athlete, the applications that typed it
-// (affUses(), the page's own count: APPLICATIONS, never payments), the credits (friend, earned on, Used) and "10% owed: N" while some are unused. Credit
+// (affUses(), the page's own count: APPLICATIONS, never payments), the credits (friend, earned on, Used) and "10% off owed for N cycles" while some are unused. Credit
 // Sara 10% is on the application that typed her code (Leads → Applications) and in the group. The server refuses a credit for the member's own application
 // (partner:self). Not in BACKUP_TABLES until go-live (referral_credits, with the snapshot and coach_erase_person()).
 async function loadPartner() {
@@ -7415,7 +7415,9 @@ const PARTNER_ERRS = {   // coach_partner_code_make()'s refusals in plain words;
   'partner:under13': f => `${f} is ticked under 13, so they get no code.`,
   'partner:no_programme': f => `${f} has no programme on the server yet, so they get no code.`,
 };
-const PARTNER_DEAL = 'The friend gets 10% off. The member gets 10% off their next cycle. You apply it when they pay.';
+const PARTNER_DEAL = 'The friend gets 10% off. The member gets 10% off one cycle for each friend: two friends, the next two cycles. You apply it when they pay.';
+// What is owed, in cycles: each unused credit is 10% off ONE cycle, never 20% at once (Amir, 2026-10-24).
+const owedWords = (pct, n) => `${pct}% off owed for ${n} cycle${n === 1 ? '' : 's'}`;
 let _partnerMake = false, _partnerPick = '';
 const unusedCredits = r => (r.credits || []).filter(c => !c.used_on).length;
 const partnerReward = row => { const a = (S.affiliates || []).find(x => x.code === row.code); return Number(a && a.reward_percent) || 10; };
@@ -7439,7 +7441,7 @@ function partnerCard(row) {
   const uses = affUses(row.code), owed = unusedCredits(row), name = partnerName(row), first = firstWord(name) || name, pct = partnerReward(row);
   const pills = `<span class="ipill pct">${pct}% off</span>` +
     (uses.length ? `<span class="ipill used" title="Applications that typed this code (archived ones left out). Not payments: credit the member only when the friend became a client.">${uses.length} application${uses.length === 1 ? '' : 's'}</span>` : '') +
-    (owed ? `<span class="ipill warn">${pct}% owed: ${owed}</span>` : '') + (partnerLive(row) ? '' : '<span class="ipill">retired</span>');
+    (owed ? `<span class="ipill warn">${owedWords(pct, owed)}</span>` : '') + (partnerLive(row) ? '' : '<span class="ipill">retired</span>');
   const credits = (row.credits || []).slice().sort((a, b) => String(b.earned_on).localeCompare(String(a.earned_on)));
   const crHtml = credits.length ? `<div class="pc-h">Credits · ${credits.length}</div>` + credits.map(c => `<div class="pc-credit">
         <label class="pc-used"><input type="checkbox" ${c.used_on ? 'checked' : ''} onchange="partnerUsed(${jsq(c.id)}, this.checked, this)" aria-label="${esc(c.friend_name || 'This credit')} is used"> Used</label>
@@ -7470,7 +7472,7 @@ function partnerGroupHtml() {
         <button class="btn sm primary" onclick="partnerMake()">Make the code</button><button class="btn sm quiet" onclick="partnerMakeCancel()">Cancel</button></div>`
     : `<div class="pc-make"><button class="btn sm primary" onclick="partnerMakeOpen()"${cand.length ? '' : ' disabled title="Every coached athlete has a code"'}>Make a code</button></div>`;
   return `<section class="panel gap-top" id="partnerPanel">
-    <div class="phead"><span class="t hd">Athletes' partner codes</span><span class="r">${rows.length} code${rows.length === 1 ? '' : 's'}${owed ? ` · <span class="t-clay">10% owed: ${owed}</span>` : ''}</span></div>
+    <div class="phead"><span class="t hd">Athletes' partner codes</span><span class="r">${rows.length} code${rows.length === 1 ? '' : 's'}${owed ? ` · <span class="t-clay">${owedWords(10, owed)}</span>` : ''}</span></div>
     <p class="psub" data-hint="partner-deal">${esc(PARTNER_DEAL)}</p>
     ${make}
     ${p.err ? `<p class="empty">The athletes' codes did not load: ${esc(p.err)}. <button class="btn sm" onclick="loadPartner().then(paintPartner)">↻ Try again</button></p>`

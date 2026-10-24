@@ -7053,9 +7053,9 @@ S['lounge-cheers-words'] = async (b) => {
   return r;
 };
 
-// K6. Leads → Referral codes: the athletes' partner codes in a group of their own, with credits, Used, "10% owed: N", Make a code, and Credit Sara 10% on an application.
+// K6. Leads → Referral codes: the athletes' partner codes in a group of their own, with credits, Used, "10% off owed for N cycles", Make a code, and Credit Sara 10% on an application.
 S['lounge-partner-codes'] = async (b) => {
-  const r = { id: 'lounge-partner-codes', title: 'K6: an athlete\'s partner code has its own group under Referral codes (code, athlete, applications, credits, Used, "10% owed: N", Make a code) and "Credit Ava 10%" on an application that typed it; partner:self is "That is their own code."', checks: [] };
+  const r = { id: 'lounge-partner-codes', title: 'K6: an athlete\'s partner code has its own group under Referral codes (code, athlete, applications, credits, Used, "10% off owed for N cycles", Make a code) and "Credit Ava 10%" on an application that typed it; partner:self is "That is their own code."', checks: [] };
   const T = Object.assign({ seed: { lounge: true, partner: true, court: true }, hash: 'leads/codes' }, COURT_T);
   const { page, log } = await L.openCoach(b, T);
   await page.waitForSelector('#partnerPanel', { timeout: 5000 }).catch(() => {});
@@ -7070,9 +7070,9 @@ S['lounge-partner-codes'] = async (b) => {
   });
   let v = await view();
   check(r, 'Live codes holds the coach\'s code only (FIXTURE10): the athletes\' codes are not mixed in', JSON.stringify(v.live) === JSON.stringify(['FIXTURE10']), v.live);
-  check(r, 'the group "Athletes\' partner codes" counts its two codes and what is owed ("10% owed: 1")', /^Athletes' partner codes 2 codes · 10% owed: 1$/.test(v.head), v.head);
-  check(r, 'the deal is one line at the top of the group, in Amir\'s words', v.deal === 'The friend gets 10% off. The member gets 10% off their next cycle. You apply it when they pay.', v.deal);
-  check(r, 'AVA42 comes first (it is owed something): the code, the athlete, "10% off", 4 applications that typed it and "10% owed: 1"; BEN43 has nothing yet', v.cards.length === 2 && v.cards[0].code === 'AVA42' && v.cards[0].summary === 'AVA42 Ava Example 10% off 4 applications 10% owed: 1' && v.cards[1].code === 'BEN43' && v.cards[1].summary === 'BEN43 Ben Example 10% off', v.cards.map(c => c.summary));
+  check(r, 'the group "Athletes\' partner codes" counts its two codes and what is owed ("10% off owed for 1 cycle")', /^Athletes' partner codes 2 codes · 10% off owed for 1 cycle$/.test(v.head), v.head);
+  check(r, 'the deal is one line at the top of the group, in Amir\'s words', v.deal === 'The friend gets 10% off. The member gets 10% off one cycle for each friend: two friends, the next two cycles. You apply it when they pay.', v.deal);
+  check(r, 'AVA42 comes first (it is owed something): the code, the athlete, "10% off", 4 applications that typed it and "10% off owed for 1 cycle"; BEN43 has nothing yet', v.cards.length === 2 && v.cards[0].code === 'AVA42' && v.cards[0].summary === 'AVA42 Ava Example 10% off 4 applications 10% off owed for 1 cycle' && v.cards[1].code === 'BEN43' && v.cards[1].summary === 'BEN43 Ben Example 10% off', v.cards.map(c => c.summary));
   const reads = (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'coach_partner_codes');
   check(r, 'coach_partner_codes is read once, behind the first paint', reads.length === 1, reads.length);
   await page.locator('.pcard[data-code="AVA42"] summary').click(); await L.settle(page, 200);
@@ -7087,17 +7087,17 @@ S['lounge-partner-codes'] = async (b) => {
   await page.locator('.pcard[data-code="AVA42"] .pc-credit', { hasText: 'Fixture Applicant Three' }).locator('input').check(); await L.settle(page, 500);
   const used = (await L.callsSince(page, n0)).filter(c => c.name === 'coach_partner_credit_used');
   v = await view();
-  check(r, 'ticking Used calls coach_partner_credit_used with the credit and true; "10% owed" is gone from the card and the head; the card stays open', used.length === 1 && JSON.stringify(used[0].payload) === JSON.stringify({ p_id: uid, p_used: true }) && v.cards[0].summary === 'AVA42 Ava Example 10% off 4 applications' && v.cards[0].open && v.head === 'Athletes\' partner codes 2 codes', { used: used.map(c => c.payload), s: v.cards[0].summary, head: v.head });
+  check(r, 'ticking Used calls coach_partner_credit_used with the credit and true; "10% off owed" is gone from the card and the head; the card stays open', used.length === 1 && JSON.stringify(used[0].payload) === JSON.stringify({ p_id: uid, p_used: true }) && v.cards[0].summary === 'AVA42 Ava Example 10% off 4 applications' && v.cards[0].open && v.head === 'Athletes\' partner codes 2 codes', { used: used.map(c => c.payload), s: v.cards[0].summary, head: v.head });
   await page.locator('.pcard[data-code="AVA42"] .pc-credit', { hasText: 'Fixture Applicant Three' }).locator('input').uncheck(); await L.settle(page, 500);
   v = await view();
-  check(r, 'unticking sends false and brings "10% owed: 1" back', /10% owed: 1$/.test(v.cards[0].summary) && (await L.callsSince(page, n0)).filter(c => c.name === 'coach_partner_credit_used').length === 2, v.cards[0].summary);
+  check(r, 'unticking sends false and brings "10% off owed for 1 cycle" back', /10% off owed for 1 cycle$/.test(v.cards[0].summary) && (await L.callsSince(page, n0)).filter(c => c.name === 'coach_partner_credit_used').length === 2, v.cards[0].summary);
   // Credit
   const m0 = await L.nCalls(page);
   await page.locator('.pcard[data-code="AVA42"] .pc-app', { hasText: 'Fixture Applicant One' }).locator('.btn').click(); await L.settle(page, 600);
   const add = (await L.callsSince(page, m0)).filter(c => c.name === 'coach_partner_credit_add');
   v = await view();
   check(r, 'Credit Ava 10% calls coach_partner_credit_add once with the code and the application, and a null note', add.length === 1 && JSON.stringify(add[0].payload) === JSON.stringify({ p_code: 'AVA42', p_intake: '00000000-0000-4000-8000-0000000001a1', p_note: null }), add.map(c => c.payload));
-  check(r, 'the card now has three credits (the new one named for the friend), One reads Credited, and 2 are owed; "Ava is credited 10%"', v.cards[0].credits.length === 3 && v.cards[0].credits.some(c => /Fixture Applicant One/.test(c.text)) && v.cards[0].apps.find(a => /Applicant One/.test(a.text)).credited && /10% owed: 2$/.test(v.cards[0].summary) && /Ava is credited 10%/.test(await L.toastText(page)), { c: v.cards[0].credits.length, s: v.cards[0].summary });
+  check(r, 'the card now has three credits (the new one named for the friend), One reads Credited, and 2 are owed; "Ava is credited 10%"', v.cards[0].credits.length === 3 && v.cards[0].credits.some(c => /Fixture Applicant One/.test(c.text)) && v.cards[0].apps.find(a => /Applicant One/.test(a.text)).credited && /10% off owed for 2 cycles$/.test(v.cards[0].summary) && /Ava is credited 10%/.test(await L.toastText(page)), { c: v.cards[0].credits.length, s: v.cards[0].summary });
   // her own application: refused by the server
   await page.locator('.pcard[data-code="AVA42"] .pc-app', { hasText: 'Ava Example' }).locator('.btn').click(); await L.settle(page, 500);
   v = await view();
