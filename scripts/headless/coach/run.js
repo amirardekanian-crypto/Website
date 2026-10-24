@@ -5979,7 +5979,7 @@ S['bell-panel'] = async (b) => {
   await page.waitForSelector('#bellPanel');
   const cs0 = await L.calls(page);
   check(r, 'the page asked coach_crew once, after the first paint, with nothing to say', rpcs(cs0, 'coach_crew').length === 1 && rpcs(cs0, 'coach_crew')[0].payload == null, rpcs(cs0, 'coach_crew').map(c => c.payload));
-  check(r, 'and made no other Bell call and no photo call (a photo is asked for only when "Show photo" is tapped)', cs0.filter(c => c.kind === 'rpc' && /^(coach_crew_|crew_photo)/.test(c.name)).length === 0, cs0.filter(c => c.kind === 'rpc' && /crew/.test(c.name)).map(c => c.name));
+  check(r, 'and made no other Bell call and no photo call (a photo is asked for only when "Show photo" is tapped; the reads of faces and cheers are the Lounge, not the Bell)', cs0.filter(c => c.kind === 'rpc' && /^(coach_crew_(?!face|cheers)|crew_photo)/.test(c.name)).length === 0, cs0.filter(c => c.kind === 'rpc' && /crew/.test(c.name)).map(c => c.name));
   check(r, 'The Bell and Who said yes sit under the wall and above the board, in the left column', await page.evaluate(() => { const q = id => document.getElementById(id); const f = (a, b) => !!(q(a).compareDocumentPosition(q(b)) & Node.DOCUMENT_POSITION_FOLLOWING); return f('wallPanel', 'bellPanel') && f('bellPanel', 'bellPeople') && f('bellPeople', 'boardPanel') && q('bellPanel').parentElement === q('wallPanel').parentElement; }), '');
   let st = await bellState(page);
   check(r, 'four posts, newest first: Amir 3h ago, Ava yesterday, the unseen one on Tuesday, Ben\'s session on Monday', JSON.stringify(st.posts.map(p => [p.name, p.when])) === JSON.stringify([['You (Amir)', '3h'], ['Ava E.', 'Yesterday'], ['Gone E.', 'Tue'], ['Ben E.', 'Mon']]), st.posts.map(p => [p.name, p.when]));
@@ -6294,7 +6294,7 @@ S['bell-missing'] = async (b) => {
   check(r, 'the page asked (coach_crew answered "could not find the function", PGRST202)', rpcs(cs, 'coach_crew').length === 1 && rpcs(cs, 'coach_crew')[0].result.error === 'missing', rpcs(cs, 'coach_crew').map(c => c.result));
   check(r, 'Proof has no Bell and no Who said yes, and the wall, the board and the quest lever are all there', (await page.locator('#bellPanel').count()) === 0 && (await page.locator('#bellPeople').count()) === 0 && (await page.locator('#wallPanel').count()) === 1 && (await page.locator('#boardPanel').count()) === 1 && (await page.locator('#questPanel').count()) === 1, '');
   check(r, 'no "Not everything loaded" banner, no line at the bottom', !(await page.evaluate(() => { const w = document.getElementById('loadwarn'); return !!w && !w.hidden; })) && !(await L.failText(page)), await L.failText(page));
-  check(r, 'the page knows it is off (S.bell.on false) and made no other Bell call', (await page.evaluate(() => S.bell && S.bell.on)) === false && !cs.some(c => c.kind === 'rpc' && /^(coach_crew_|crew_photo)/.test(c.name)), cs.filter(c => c.kind === 'rpc').map(c => c.name));
+  check(r, 'the page knows it is off (S.bell.on false) and made no other Bell call', (await page.evaluate(() => S.bell && S.bell.on)) === false && !cs.some(c => c.kind === 'rpc' && /^(coach_crew_(?!face|cheers)|crew_photo)/.test(c.name)), cs.filter(c => c.kind === 'rpc').map(c => c.name));
   await L.go(page, 'today'); await L.go(page, 'athletes'); await L.go(page, 'proof');
   check(r, 'the other tabs still open and Proof still has no Bell', (await page.locator('#bellPanel').count()) === 0 && (await page.locator('#boardPanel').count()) === 1, '');
   check(r, 'no page errors', !log.errors.length, log.errors);
@@ -6725,6 +6725,102 @@ S['lounge-game-line'] = async (b) => {
   await L.go(bad.page, 'a/ava_test/work'); await L.settle(bad.page, 500);
   check(r, 'a failed read says so on the line ("did not load" and why) and is read again the next time the file opens', /game profile did not load: fixture: permission denied/.test((await bad.page.locator('#detGame').innerText())) && await (async () => { await L.go(bad.page, 'a/ben_test/work'); await L.go(bad.page, 'a/ava_test/work'); await L.settle(bad.page, 500); return /right-handed/.test(await bad.page.locator('#detGame').innerText()); })(), await bad.page.locator('#detGame').innerText());
   await bad.page.context().close();
+  return r;
+};
+
+// K2. Faces: read once per load, drawn where an athlete is drawn, initials as the fallback; Remove photo with two taps.
+S['lounge-faces'] = async (b) => {
+  const r = { id: 'lounge-faces', title: 'K2: coach_crew_faces once per load; the face (28 px circle) in the roster, the file header, Needs you, Courtside and Who said yes; initials as the fallback; older server quiet; Remove photo takes two taps', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { lounge: true, court: true }, hash: 'today' }, COURT_T));
+  await page.waitForSelector('#needPanel [data-face="ava_test"] img', { timeout: 5000 }).catch(() => {});
+  const circle = sel => page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return null;
+    const q = el.getBoundingClientRect(), img = el.querySelector('img'), cs = getComputedStyle(el);
+    return { w: Math.round(q.width), h: Math.round(q.height), radius: parseFloat(cs.borderTopLeftRadius) >= 14 || cs.borderTopLeftRadius.endsWith('%'), img: !!img, loaded: !!img && img.complete && img.naturalWidth > 0,
+      src: img ? img.getAttribute('src').slice(0, 23) : '', text: el.textContent.trim(), clip: cs.overflow };
+  }, sel);
+  const facesCalls = async () => (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'coach_crew_faces');
+  check(r, 'coach_crew_faces was asked once, behind the first paint', (await facesCalls()).length === 1, (await facesCalls()).length);
+  // Today: Needs you and Courtside
+  const need = await circle('#needPanel .pface[data-face="ava_test"]');
+  check(r, 'Needs you: Ava\'s row has her face, a 28 px circle, decoded', need && need.img && need.loaded && need.w === 28 && need.h === 28 && need.radius && need.src === 'data:image/jpeg;base64,', need);
+  const ben = await circle('#needPanel .pface[data-face="ben_test"]');
+  check(r, 'Needs you: Ben has no face, so his initials are in the circle (BE)', !ben || (!ben.img && ben.text === 'BE'), ben);
+  const court = await circle('#courtPanel [data-face="ava_test"]');
+  check(r, 'Courtside: Ava\'s moment row has her face in a 28 px circle', court && court.img && court.loaded && court.w === 28 && court.h === 28 && court.radius, court);
+  const gia = await circle('#courtPanel [data-face="gia_court"]');
+  check(r, 'Courtside: Gia has no face (not in the crew): initials GE', gia && !gia.img && gia.text === 'GE' && gia.w === 28, gia);
+  // the roster
+  await L.go(page, 'athletes');
+  const ra = await circle('.ath .ava[data-face="ava_test"]');
+  check(r, 'Roster: Ava\'s circle is her face, 28 px, clipped to the circle', ra && ra.img && ra.loaded && ra.w === 28 && ra.h === 28 && ra.radius && ra.clip === 'hidden', ra);
+  const rb = await circle('.ath .ava[data-face="ben_test"]'), re = await circle('.ath .ava[data-face="eli_new"]');
+  check(r, 'Roster: Ben (no photo) shows BE and Eli (said no, so the server holds no face for him) shows EE', rb && !rb.img && rb.text === 'BE' && re && !re.img && re.text === 'EE', { rb, re });
+  check(r, 'Roster: the court-green disc is still there for someone without a photo (the look did not change)', await page.evaluate(() => getComputedStyle(document.querySelector('.ath .ava[data-face="ben_test"]')).backgroundColor === 'rgb(14, 74, 54)'), '');
+  // the file header
+  await L.go(page, 'a/ava_test/work');
+  const hd = await circle('.dethead .det-ava');
+  check(r, 'The file header: her face in the file\'s own circle (44 px)', hd && hd.img && hd.loaded && hd.w === 44 && hd.radius, hd);
+  await L.go(page, 'a/ben_test/work');
+  check(r, 'The file header: Ben keeps his initials', (await circle('.dethead .det-ava')).text === 'BE', '');
+  check(r, 'None of this asked for the faces again (read once per load)', (await facesCalls()).length === 1, (await facesCalls()).length);
+  // Proof: Who said yes, and Remove photo
+  await L.go(page, 'proof'); await L.settle(page, 500);
+  const ppl = await page.evaluate(() => [...document.querySelectorAll('#bellPeople .bell-p')].filter(el => ['ava_test', 'ben_test', 'eli_new'].includes(el.dataset.id)).map(el => ({ id: el.dataset.id, face: !!el.querySelector('.pface img'), btn: [...el.querySelectorAll('button')].map(x => x.textContent.trim()).filter(t => /photo/i.test(t)) })));
+  check(r, 'Who said yes: Ava has her face and a Remove photo button; Ben and Eli have neither the face nor the button', JSON.stringify(ppl) === JSON.stringify([{ id: 'ava_test', face: true, btn: ['Remove photo'] }, { id: 'ben_test', face: false, btn: [] }, { id: 'eli_new', face: false, btn: [] }]), ppl);
+  const n0 = await L.nCalls(page);
+  await page.locator('#bellPeople .bell-p[data-id="ava_test"] button', { hasText: 'Remove photo' }).click(); await L.settle(page, 250);
+  const ask = (await page.locator('#bellPeople .dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the first tap only opens a panel that says what goes and what stays; nothing was sent', /Remove Ava Example's photo\?/.test(ask) && /Goes:.*initials show in its place/.test(ask) && /Stays:.*answer.*posts.*login/.test(ask) && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_crew_face_clear'), ask);
+  await page.locator('#dangerNo').click(); await L.settle(page, 200);
+  check(r, 'Cancel closes it and sends nothing', !(await page.locator('.dangerask').count()) && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_crew_face_clear'), '');
+  // a refusal keeps the face and is said
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_crew_face_clear', message: 'fixture: not the coach', times: 1 }));
+  await page.locator('#bellPeople .bell-p[data-id="ava_test"] button', { hasText: 'Remove photo' }).click(); await L.settle(page, 200);
+  await page.locator('#dangerGo').click(); await L.settle(page, 500);
+  check(r, 'a refused removal is said in plain words and the face stays', /Could not remove the photo: fixture: not the coach/.test(await L.failText(page)) && (await circle('#bellPeople [data-face="ava_test"]')).img, await L.failText(page));
+  await page.locator('#failbar .fb-x, #failbar button[aria-label]').first().click({ timeout: 1000 }).catch(() => {});
+  // the real one
+  await page.locator('#bellPeople .bell-p[data-id="ava_test"] button', { hasText: 'Remove photo' }).click(); await L.settle(page, 200);
+  const m0 = await L.nCalls(page);
+  await page.locator('#dangerGo').click(); await L.settle(page, 600);
+  const clear = (await L.callsSince(page, m0)).filter(c => c.name === 'coach_crew_face_clear');
+  check(r, 'the second tap calls coach_crew_face_clear once with the athlete id', clear.length === 1 && clear[0].payload.p_athlete === 'ava_test' && Object.keys(clear[0].payload).length === 1, clear.map(c => c.payload));
+  check(r, 'her photo is gone at once: initials in Who said yes, no Remove photo button, and a line saying so', await page.evaluate(() => { const el = document.querySelector('#bellPeople .bell-p[data-id="ava_test"]'); return !el.querySelector('img') && !/Remove photo/.test(el.textContent) && el.querySelector('.pface').textContent.trim() === 'AE'; }) && /Ava's photo is removed/.test(await L.toastText(page)), await L.toastText(page));
+  await L.go(page, 'athletes');
+  check(r, 'and in the roster too', (await circle('.ath .ava[data-face="ava_test"]')).text === 'AE', '');
+  // a face the server sends that is not base64 is never drawn
+  await page.evaluate(() => { window.__DB.lounge.faces[0].b64 = 'AAAA" onerror="window.__pwned=1'; return window.loadLounge(); }); await L.settle(page, 500);
+  check(r, 'a face that is not plain base64 is left out (no markup reaches the page)', !(await page.evaluate(() => document.querySelectorAll('img[onerror]').length)) && !(await page.evaluate(() => window.__pwned)), '');
+  const looks = [];
+  for (const sel of ['#bellPeople']) { await L.go(page, 'proof'); await L.settle(page, 300); looks.push(...await lookOf(page, sel)); }
+  await L.go(page, 'today'); await L.settle(page, 300);
+  looks.push(...await lookOf(page, '#needPanel'), ...await lookOf(page, '#courtPanel'));
+  check(r, 'the look holds: five font sizes, three radii, one button height, one primary button (Needs you, Courtside, Who said yes)', !looks.length, looks.slice(0, 6));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // arriving late: the faces are read behind the first paint and filled into the circles that are already there
+  const late = await L.openCoach(b, Object.assign({ seed: { lounge: true, court: true, stub: { delay: { coach_crew_faces: 1200 } } }, hash: 'athletes' }, COURT_T));
+  await late.page.evaluate(() => { document.querySelectorAll('.ath').forEach(el => { el.__mine = 1; }); });
+  const first = await late.page.evaluate(() => document.querySelector('.ath .ava').textContent.trim());
+  check(r, 'before the faces arrive the roster shows initials', first.length === 2, first);
+  await late.page.waitForSelector('.ath .ava img', { timeout: 6000 }).catch(() => {});
+  check(r, 'when they arrive the circles are filled in place: the same rows, no redraw', await late.page.evaluate(() => [...document.querySelectorAll('.ath')].every(el => el.__mine === 1) && !!document.querySelector('.ath .ava img')), '');
+  await late.page.context().close();
+
+  // a failed read is named by the banner and leaves initials; a server without stage96 is quiet
+  const bad = await L.openCoach(b, Object.assign({ seed: { lounge: true, stub: { fail: [{ kind: 'rpc', name: 'coach_crew_faces', message: 'fixture: faces down', times: 1 }] } }, hash: 'athletes' }, COURT_T));
+  await L.settle(bad.page, 600);
+  check(r, 'a failed read is named in the banner ("the crew\'s photos: fixture: faces down") and the roster still shows initials', /Not everything loaded/.test(await bad.page.locator('#loadwarn').innerText()) && /the crew's photos: fixture: faces down/.test(await bad.page.locator('#loadwarn').innerText()) && !(await bad.page.locator('.ath .ava img').count()), await bad.page.locator('#loadwarn').innerText());
+  await bad.page.context().close();
+  const old = await L.openCoach(b, Object.assign({ hash: 'athletes' }, COURT_T));
+  await L.settle(old.page, 500);
+  const oc = (await L.calls(old.page)).filter(c => c.name === 'coach_crew_faces');
+  check(r, 'a server without coach_crew_faces: asked once, no banner, no failure line, initials only', oc.length === 1 && !(await old.page.locator('#loadwarn:not([hidden])').count()) && !(await L.failText(old.page)) && !(await old.page.locator('.ath .ava img').count()), '');
+  check(r, 'no page errors on the old server', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
   return r;
 };
 
