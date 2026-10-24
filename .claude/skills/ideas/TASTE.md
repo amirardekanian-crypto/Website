@@ -5,6 +5,16 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-24 · The Lounge build plan: "go with your picks", with five changes.** (1) *"i want the well played button to be changed
+  to something more understandable to any one, has a like icon so every one understands what it is. or maybe keep it and just add a
+  clapping icon to it or a thumbs up"*: a tennis idiom is not plain enough for everyone, so an icon carries the meaning (built as
+  "👏 Cheer"). (2) *"i like week bars idea, but the workouts, can be anything other than their cycles, they can do extra, it needs to
+  show that as well"*: extra sessions count as visible work. (3) *"your game should be in a way, that is applicable to all racket
+  sports, and general people as well"*: never design a profile field for tennis alone. (4) *"for signed ball, i like face stack a bit
+  more"*: once faces exist, he prefers the picture to the names line. (5) *"in the first serve, i like one line at a time, can we add
+  turn on notification for the app as well?"*: a third push-ask moment, by his word. And: *"i want all of this to be built first, when
+  we are all done, then we go live"*: one release at the end, not step by step. Page: https://claude.ai/artifact/X5L2WMkayoxx8eioc85SJV
+
 - **2026-10-24 · Round 6 'Players' Lounge': build the rest, plan each step first.** He gave the one reward call I left open (*"the idea
   69 gives the memeber 10% discount to the new memeber, and 10% to themselves"*), cut one (*"cut idea 61"*, Doubles; no reason given,
   and the page had already said the evidence for it was weak), then: *"get ready to build the rest / first for each step, we want to
