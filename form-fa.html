@@ -635,6 +635,12 @@
   }
   dcode.addEventListener('input',function(){clearTimeout(dTimer);dTimer=setTimeout(function(){dCheck=checkDiscount(false);},350);});
   dcode.addEventListener('blur',function(){clearTimeout(dTimer);dCheck=checkDiscount(true);});
+  // A shared link arrives as ?code=… (a friend's code from a member, a coach's code from their page): fill the box and run the same check
+  // typing would, exactly as form.html does. A code the form does not know says nothing until the field is left (checkDiscount(false)).
+  (function(){
+    var q=new URLSearchParams(location.search),code=(q.get('code')||'').trim();
+    if(code){dcode.value=code.slice(0,40);dcode.dispatchEvent(new Event('input',{bubbles:true}));}
+  })();
 
   // dynamic subject
   function subj(){var n=[document.getElementById('fn').value.trim(),document.getElementById('ln').value.trim()].filter(Boolean).join(' ');

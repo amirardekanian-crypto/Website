@@ -73,6 +73,13 @@
   // `window.__STUB.openNull = true` makes coach_open() answer nothing at all (a null, no error).
   var OPEN_RPCS = ['coach_open', 'coach_open_set', 'coach_open_close', 'coach_open_result', 'coach_open_remove'];
   function noStage84() { return !SEED.open || (ST.missingRpc || []).indexOf('coach_open') >= 0; }
+  // The Players' Lounge (CONTRACT.md, 2026-10-24). stage96's coach functions (faces, cheers) and its table athlete_profile answer only when the seed says
+  // `lounge: true` (buildSeed({lounge: true})); stage97's partner-code functions only with `partner: true`. Otherwise every one answers "Could not find
+  // the function" (PGRST202) and athlete_profile "Could not find the table" (PGRST205), like a server that has not had the stage. `missingRpc: [name]` takes one away.
+  var LOUNGE_RPCS = ['coach_crew_faces', 'coach_crew_face_clear', 'coach_cheer', 'coach_crew_cheers', 'coach_cheer_word_clear'];
+  var PARTNER_RPCS = ['coach_partner_codes', 'coach_partner_code_make', 'coach_partner_credit_add', 'coach_partner_credit_used'];
+  function noStage96() { return !SEED.lounge; }
+  function noStage97() { return !SEED.partner; }
   function persist() { if (ST.persist) { try { localStorage.setItem('__harness_db', JSON.stringify(DB)); } catch (e) {} } }
   function tbl(name) { return DB[name] || (DB[name] = []); }
   function nowIso() { return new Date().toISOString(); }
@@ -222,7 +229,7 @@
     var f = takeFail('from', table, op);
     if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'XX000' }, status: f.status || 400, count: null }; }
     // A table the server does not have (PostgREST's schema-cache answer): stage75's five while that stage is missing, or any in ST.missingTables.
-    if ((noStage75() && COURT_TABLES.indexOf(table) >= 0) || (ST.missingTables || []).indexOf(table) >= 0) {
+    if ((noStage75() && COURT_TABLES.indexOf(table) >= 0) || (noStage96() && table === 'athlete_profile') || (noStage97() && table === 'referral_credits') || (ST.missingTables || []).indexOf(table) >= 0) {
       call.result = { error: 'missing' };
       return { data: null, error: { message: "Could not find the table 'public." + table + "' in the schema cache", code: 'PGRST205' }, status: 404, count: null };
     }
@@ -401,7 +408,100 @@
       crew: crew.map(function (m) { return { athlete_id: m.athlete_id, who: m.name }; }).sort(function (a, b) { return a.who < b.who ? -1 : a.who > b.who ? 1 : 0; }),
       at: nowIso() };
   }
+  // The Players' Lounge's state (stage96): the faces as coach_crew_faces() returns them, the cheers as coach_crew_cheers() returns them (all of them, with the
+  // day; the read lists the last 7). Tests read and change it as window.__DB.lounge. A member is a crew_members() person: a yes, not under 13, not a former
+  // athlete, not the demo (the server takes a face, a cheer given or received and a mention away when someone leaves; the stub just does not list them).
+  function lounge() { return DB.lounge || (DB.lounge = { faces: [], cheers: [], seq: 100 }); }
+  function loungeMember(id) { return openCrew().some(function (m) { return m.athlete_id === id; }); }
+  function loungeName(id) { var m = openCrew().find(function (x) { return x.athlete_id === id; }); return m ? m.name : id; }
+  function ymdBack(day, n) { var p = day.split('-'), d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])); d.setUTCDate(d.getUTCDate() - n); return d.toISOString().slice(0, 10); }
+  var normCodeS = function (v) { return String(v == null ? '' : v).replace(/\s+/g, '').toUpperCase(); };
+  // The intakes that typed a code (stage97's `uses`): the "Discount Code" field or the first word of "Discount Applied", archived ones left out.
+  function partnerUses(code) {
+    return tbl('hab_intake').filter(function (i) {
+      if ((i.status || 'new') === 'archived') return false;
+      var p = i.payload || {};
+      return normCodeS(p['Discount Code']) === code || normCodeS(String(p['Discount Applied'] || '').split(' ')[0]) === code;
+    });
+  }
+  function partnerCredits(code) {
+    return tbl('referral_credits').filter(function (c) { return c.code === code; }).map(function (c) {   // the contract's shape, with intake_id (the main session's answer, 2026-10-24)
+      return { id: c.id, friend_name: c.friend_name, earned_on: c.earned_on, used_on: c.used_on, percent: c.percent, intake_id: c.intake_id }; });
+  }
+  function intakeFriend(i) { var p = i.payload || {}; return (i.name && String(i.name).trim()) || [p['First Name'], p['Last Name']].filter(Boolean).join(' ').trim() || null; }
+  function errCode(msg, code) { var e = new Error(msg); e.code = code; return e; }
   var RPC = {
+    // ---- stage96: faces and cheers (CONTRACT.md sections 3 and 6) ----
+    coach_crew_faces: function () {
+      return lounge().faces.filter(function (f) { return loungeMember(f.athlete_id); }).map(function (f) { return { athlete_id: f.athlete_id, fv: f.fv, b64: f.b64 }; });
+    },
+    coach_crew_face_clear: function (p) {
+      var L = lounge(); L.faces = L.faces.filter(function (f) { return f.athlete_id !== p.p_athlete; });
+      return { ok: true };
+    },
+    // crew_cheer() as Amir: the word first (100 after cleaning), then the person (a member, not under 13: otherwise gone), then once a day (the server's UTC day).
+    coach_cheer: function (p) {
+      var L = lounge(), word = p.p_word == null ? null : String(p.p_word).replace(/^\s+|\s+$/g, '').replace(/["<>\\]/g, '');
+      if (word !== null && word.length > 100) throw new Error('crew:word_long');
+      if (!loungeMember(p.p_athlete)) throw new Error('crew:gone');
+      var day = utcDate();
+      if (L.cheers.some(function (c) { return c.from_athlete === '__coach__' && c.to_athlete === p.p_athlete && c.day === day; })) throw new Error('crew:cheer_today');
+      L.cheers.push({ id: ++L.seq, from_athlete: '__coach__', from_who: 'Coach', to_athlete: p.p_athlete, to_who: loungeName(p.p_athlete), word: word || null, day: day });
+      return { ok: true, season: L.cheers.filter(function (c) { return c.to_athlete === p.p_athlete; }).length };
+    },
+    // the last 7 days (today and the six before), newest first
+    coach_crew_cheers: function () {
+      var L = lounge(), from = ymdBack(utcDate(), 6);
+      return clone(L.cheers.filter(function (c) { return c.day >= from; }).sort(function (a, b) { return (a.day < b.day ? 1 : a.day > b.day ? -1 : 0) || (b.id - a.id); }));
+    },
+    coach_cheer_word_clear: function (p) {
+      var c = lounge().cheers.find(function (x) { return x.id === p.p_id; });
+      if (c) c.word = null;
+      return { ok: true };
+    },
+    // ---- stage97: the athletes' partner codes (CONTRACT.md section 8) ----
+    coach_partner_codes: function () {
+      return tbl('affiliates').filter(function (a) { return a.kind === 'athlete'; }).map(function (a) {
+        return { code: a.code, athlete_id: a.athlete_id, who: loungeName(a.athlete_id) === a.athlete_id ? (a.coach_name || a.athlete_id) : loungeName(a.athlete_id), active: !!a.active,
+          uses: partnerUses(a.code).length, credits: partnerCredits(a.code) };
+      });
+    },
+    // my_partner_code(true) for someone else: upper(first name letters only, max 10) + two digits, unique; one per athlete. Returns {code}; refuses
+    // partner:has_code, partner:under13 (the Bell's tick) and partner:no_programme.
+    coach_partner_code_make: function (p) {
+      var rows = tbl('affiliates'), have = rows.find(function (a) { return a.kind === 'athlete' && a.athlete_id === p.p_athlete; });
+      var pr = tbl('programs').find(function (r) { return r.athlete_id === p.p_athlete; });
+      if (!pr) throw new Error('partner:no_programme');
+      if (bell().people.some(function (x) { return x.athlete_id === p.p_athlete && x.under13; })) throw new Error('partner:under13');
+      if (have) throw new Error('partner:has_code');
+      {
+        var a = pr.data.athlete || {}, first = String(a.firstName || p.p_athlete).replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 10) || 'ATHLETE', n = 41, code;
+        do { code = first + String(++n % 100).padStart(2, '0'); } while (rows.some(function (x) { return x.code === code; }));
+        have = { code: code, percent: 10, reward_percent: 10, kind: 'athlete', coach_name: [a.firstName, a.lastName].filter(Boolean).join(' ') || p.p_athlete, coach_name_fa: null, instagram: null, whatsapp: null, email: null,
+          athlete_id: p.p_athlete, applied_on: utcDate(), active: true, retired_on: null, notes: null, created_at: nowIso() };
+        rows.push(have);
+      }
+      return { code: have.code };
+    },
+    // The member's own code on their own application is refused (partner:self); the same intake twice hits the unique (code, intake_id).
+    coach_partner_credit_add: function (p) {
+      var a = tbl('affiliates').find(function (x) { return x.code === p.p_code && x.kind === 'athlete'; });
+      if (!a) throw new Error('partner:no_code');
+      var i = tbl('hab_intake').find(function (x) { return String(x.id) === String(p.p_intake); });
+      if (!i) throw new Error('partner:no_intake');
+      if (i.athlete_id && i.athlete_id === a.athlete_id) throw new Error('partner:self');
+      var cr = tbl('referral_credits');
+      if (cr.some(function (c) { return c.code === a.code && String(c.intake_id) === String(i.id); })) throw errCode('duplicate key value violates unique constraint "referral_credits_code_intake_id_key"', '23505');
+      var row = { id: 'f0000000-0000-4000-8000-' + String(++ST.seq).padStart(12, '0'), code: a.code, athlete_id: a.athlete_id, intake_id: i.id, friend_name: intakeFriend(i), percent: 10, earned_on: utcDate(), used_on: null, note: p.p_note || null, created_at: nowIso() };
+      cr.push(row);
+      return { id: row.id, friend_name: row.friend_name, earned_on: row.earned_on, used_on: null, percent: 10 };
+    },
+    coach_partner_credit_used: function (p) {
+      var c = tbl('referral_credits').find(function (x) { return x.id === p.p_id; });
+      if (!c) throw new Error('partner:no_credit');
+      c.used_on = p.p_used ? utcDate() : null;
+      return { id: c.id, friend_name: c.friend_name, earned_on: c.earned_on, used_on: c.used_on, percent: c.percent };
+    },
     // ---- stage81: the Bell (supabase/stage81_career_crew.sql) ----
     coach_crew: function () {
       var c = bellSweep();
@@ -921,7 +1021,7 @@
         await sleep(0);
         var f = takeFail('rpc', name);
         if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'P0001' }, status: 400 }; }
-        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0 || (noStage75() && COURT_RPCS.indexOf(name) >= 0) || (noStage81() && CREW_RPCS.indexOf(name) >= 0) || (noStage84() && OPEN_RPCS.indexOf(name) >= 0)) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
+        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0 || (noStage75() && COURT_RPCS.indexOf(name) >= 0) || (noStage81() && CREW_RPCS.indexOf(name) >= 0) || (noStage84() && OPEN_RPCS.indexOf(name) >= 0) || (noStage96() && LOUNGE_RPCS.indexOf(name) >= 0) || (noStage97() && PARTNER_RPCS.indexOf(name) >= 0)) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
         try { var d = RPC[name](params || {}); persist(); call.result = { ok: true }; return { data: clone(d), error: null, status: 200 }; }
         catch (e) { call.result = { error: e.message }; return { data: null, error: { message: e.message, code: e.code || 'P0001' }, status: 400 }; }
       })();

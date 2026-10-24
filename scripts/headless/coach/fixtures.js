@@ -182,6 +182,51 @@ function openSeed(db, today) {
   };
 }
 
+// ── The Players' Lounge (stage96 + stage97, CONTRACT.md), made up like everything here ───────────────────────────
+// buildSeed({ lounge: true }) turns the stub's stage96 functions on (faces, cheers, the table athlete_profile) and seeds them; it needs the Bell's answers
+// (the crew is the yes answers), so it turns stage81 on too. buildSeed({ partner: true }) turns stage97 on (the athletes' partner codes). window.__DB.lounge
+// holds the faces and the cheers; athlete_profile and referral_credits are tables. Nothing here is a real person or a real photo.
+// A one-pixel JPEG: what coach_crew_faces() returns in b64 (the server holds 64 to 512 px; the page only draws it small).
+const FACE_B64 = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
+function loungeSeed(db, today) {
+  db.lounge = {
+    seq: 100,
+    // Ava is in the crew and has a face. Eli said no: a no takes the face away, so the stub lists none for him even though a row is kept here.
+    faces: [{ athlete_id: 'ava_test', fv: 1729771234, b64: FACE_B64 }, { athlete_id: 'eli_new', fv: 1729771300, b64: FACE_B64 }],
+    cheers: [
+      { id: 1, from_athlete: 'ben_test', from_who: 'Ben E.', to_athlete: 'ava_test', to_who: 'Ava E.', word: 'that sled push looked heavy', day: daysAgo(today, 1) },
+      { id: 2, from_athlete: 'ava_test', from_who: 'Ava E.', to_athlete: 'ben_test', to_who: 'Ben E.', word: '<b>Nice</b> one "legend"', day: daysAgo(today, 2) },   // markup and a quote on purpose: shown as text
+      { id: 3, from_athlete: 'ben_test', from_who: 'Ben E.', to_athlete: 'ava_test', to_who: 'Ava E.', word: null, day: daysAgo(today, 3) },
+      { id: 4, from_athlete: '__coach__', from_who: 'Coach', to_athlete: 'ben_test', to_who: 'Ben E.', word: null, day: today },   // Amir already cheered Ben today
+    ],
+  };
+  // "Your game": the athlete_profile rows the coach reads. Ava has most of it, Ben only his hand, Eli a row with nothing in it, Cara none.
+  db.athlete_profile = [
+    { athlete_id: 'ava_test', sports: ['padel', 'tennis'], hand: 'right', backhand: 'two', side: 'left', plays_at: null, club: 'Aspire Padel', training_for: ['strength'], working_on: 'my second serve', ig: 'ava.plays', updated_at: iso(today, 4) },
+    { athlete_id: 'ben_test', sports: [], hand: 'left', backhand: null, side: null, plays_at: null, club: null, training_for: [], working_on: null, ig: null, updated_at: iso(today, 4) },
+    { athlete_id: 'eli_new', sports: [], hand: null, backhand: null, side: null, plays_at: null, club: null, training_for: [], working_on: null, ig: null, updated_at: iso(today, 4) },
+  ];
+  // Jon reads Farsi: the notification language the programme holds (SCHEMA.md: athlete.lang), so his WhatsApp draft is the Farsi one.
+  const jon = db.programs.find(p => p.athlete_id === 'jon_court');
+  if (jon) jon.data.athlete.lang = 'fa';
+}
+function partnerSeed(db, today) {
+  const row = (code, id, name) => ({ code, percent: 10, reward_percent: 10, kind: 'athlete', coach_name: name, coach_name_fa: null, instagram: null, whatsapp: null, email: null, athlete_id: id,
+    applied_on: daysAgo(today, 20), active: true, retired_on: null, notes: null, created_at: iso(today, 20) });
+  db.affiliates.push(row('AVA42', 'ava_test', 'Ava Example'), row('BEN43', 'ben_test', 'Ben Example'));
+  const typed = (id, code) => { const i = db.hab_intake.find(x => x.id === id); if (i) i.payload = Object.assign({}, i.payload || {}, { 'Discount Code': code }); };
+  typed('00000000-0000-4000-8000-0000000001a1', 'AVA42');         // Applicant One typed Ava's code: not credited yet
+  typed('00000000-0000-4000-8000-0000000001a2', ' ava 42 ');      // Applicant Two typed it in lower case with a space: the same code
+  typed('00000000-0000-4000-8000-0000000001a3', 'AVA42');         // Applicant Three typed it and was credited five days ago
+  // Ava's own application, linked to her: the server refuses to credit her for her own code (partner:self)
+  db.hab_intake.push({ id: '00000000-0000-4000-8000-0000000001a4', created_at: new Date(Date.now() - 2 * 86400e3).toISOString(), lang: 'en', name: 'Ava Example', email: 'ava@example.invalid', contact: '', programme: null,
+    payload: { 'First Name': 'Ava', 'Last Name': 'Example', 'Discount Code': 'AVA42' }, status: 'new', athlete_id: 'ava_test', linked_at: iso(today, 1) });
+  db.referral_credits = [
+    { id: 'f0000000-0000-4000-8000-000000000001', code: 'AVA42', athlete_id: 'ava_test', intake_id: '00000000-0000-4000-8000-0000000000e1', friend_name: 'Friend Zero', percent: 10, earned_on: daysAgo(today, 30), used_on: daysAgo(today, 20), note: null, created_at: iso(today, 30) },
+    { id: 'f0000000-0000-4000-8000-000000000002', code: 'AVA42', athlete_id: 'ava_test', intake_id: '00000000-0000-4000-8000-0000000001a3', friend_name: 'Fixture Applicant Three', percent: 10, earned_on: daysAgo(today, 5), used_on: null, note: null, created_at: iso(today, 5) },
+  ];
+}
+
 function buildSeed(opt) {
   opt = opt || {};
   const today = opt.today;                     // the page's local YYYY-MM-DD
@@ -319,8 +364,10 @@ function buildSeed(opt) {
     ],
   };
   if (opt.court) courtSeed(db, today, opt.courtAwards !== false);
-  if (opt.crew || opt.open) crewSeed(db);
+  if (opt.crew || opt.open || opt.lounge) crewSeed(db);
   if (opt.open) openSeed(db, today);
+  if (opt.lounge) loungeSeed(db, today);
+  if (opt.partner) partnerSeed(db, today);
   if (opt.bigHistory) {
     for (let i = 0; i < opt.bigHistory; i++) {
       db.session_history.push(session('bulk_' + (i % 40), 'Bulk ' + (i % 40), (i % 3) + 1, daysAgo(today, 30 + Math.floor(i / 40))));
@@ -332,8 +379,10 @@ function buildSeed(opt) {
     levels: { cara_free: 4, ava_test: 3, dan_proof: 1 },
     board: [{ pos: 1, display_name: 'Cara', title: null, xp: 900, level: 4, rank_label: 'STARTER', is_me: false, joined: true }],
     stub: opt.stub || {},
-    crew: !!(opt.crew || opt.open),   // stub.js: the stage81 functions (the Bell) answer only when this is on
+    crew: !!(opt.crew || opt.open || opt.lounge),   // stub.js: the stage81 functions (the Bell) answer only when this is on
     open: !!opt.open,                 // stub.js: the stage85 functions (the Monthly Open) answer only when this is on
+    lounge: !!opt.lounge,             // stub.js: stage96's coach functions (faces, cheers) and the table athlete_profile answer only when this is on
+    partner: !!opt.partner,           // stub.js: stage97's partner-code functions and the table referral_credits answer only when this is on
     // The month just gone's honours as the server would work them out (see stub.js: liveHonours). Made up; nothing is computed.
     honoursLive: opt.honoursLive !== undefined ? opt.honoursLive : opt.court ? {
       // A former athlete shares the top session count and the coach's own identity shares the top gain: the stub leaves both out, as

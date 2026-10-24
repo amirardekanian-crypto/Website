@@ -5979,7 +5979,7 @@ S['bell-panel'] = async (b) => {
   await page.waitForSelector('#bellPanel');
   const cs0 = await L.calls(page);
   check(r, 'the page asked coach_crew once, after the first paint, with nothing to say', rpcs(cs0, 'coach_crew').length === 1 && rpcs(cs0, 'coach_crew')[0].payload == null, rpcs(cs0, 'coach_crew').map(c => c.payload));
-  check(r, 'and made no other Bell call and no photo call (a photo is asked for only when "Show photo" is tapped)', cs0.filter(c => c.kind === 'rpc' && /^(coach_crew_|crew_photo)/.test(c.name)).length === 0, cs0.filter(c => c.kind === 'rpc' && /crew/.test(c.name)).map(c => c.name));
+  check(r, 'and made no other Bell call and no photo call (a photo is asked for only when "Show photo" is tapped; the reads of faces and cheers are the Lounge, not the Bell)', cs0.filter(c => c.kind === 'rpc' && /^(coach_crew_(?!face|cheers)|crew_photo)/.test(c.name)).length === 0, cs0.filter(c => c.kind === 'rpc' && /crew/.test(c.name)).map(c => c.name));
   check(r, 'The Bell and Who said yes sit under the wall and above the board, in the left column', await page.evaluate(() => { const q = id => document.getElementById(id); const f = (a, b) => !!(q(a).compareDocumentPosition(q(b)) & Node.DOCUMENT_POSITION_FOLLOWING); return f('wallPanel', 'bellPanel') && f('bellPanel', 'bellPeople') && f('bellPeople', 'boardPanel') && q('bellPanel').parentElement === q('wallPanel').parentElement; }), '');
   let st = await bellState(page);
   check(r, 'four posts, newest first: Amir 3h ago, Ava yesterday, the unseen one on Tuesday, Ben\'s session on Monday', JSON.stringify(st.posts.map(p => [p.name, p.when])) === JSON.stringify([['You (Amir)', '3h'], ['Ava E.', 'Yesterday'], ['Gone E.', 'Tue'], ['Ben E.', 'Mon']]), st.posts.map(p => [p.name, p.when]));
@@ -6294,7 +6294,7 @@ S['bell-missing'] = async (b) => {
   check(r, 'the page asked (coach_crew answered "could not find the function", PGRST202)', rpcs(cs, 'coach_crew').length === 1 && rpcs(cs, 'coach_crew')[0].result.error === 'missing', rpcs(cs, 'coach_crew').map(c => c.result));
   check(r, 'Proof has no Bell and no Who said yes, and the wall, the board and the quest lever are all there', (await page.locator('#bellPanel').count()) === 0 && (await page.locator('#bellPeople').count()) === 0 && (await page.locator('#wallPanel').count()) === 1 && (await page.locator('#boardPanel').count()) === 1 && (await page.locator('#questPanel').count()) === 1, '');
   check(r, 'no "Not everything loaded" banner, no line at the bottom', !(await page.evaluate(() => { const w = document.getElementById('loadwarn'); return !!w && !w.hidden; })) && !(await L.failText(page)), await L.failText(page));
-  check(r, 'the page knows it is off (S.bell.on false) and made no other Bell call', (await page.evaluate(() => S.bell && S.bell.on)) === false && !cs.some(c => c.kind === 'rpc' && /^(coach_crew_|crew_photo)/.test(c.name)), cs.filter(c => c.kind === 'rpc').map(c => c.name));
+  check(r, 'the page knows it is off (S.bell.on false) and made no other Bell call', (await page.evaluate(() => S.bell && S.bell.on)) === false && !cs.some(c => c.kind === 'rpc' && /^(coach_crew_(?!face|cheers)|crew_photo)/.test(c.name)), cs.filter(c => c.kind === 'rpc').map(c => c.name));
   await L.go(page, 'today'); await L.go(page, 'athletes'); await L.go(page, 'proof');
   check(r, 'the other tabs still open and Proof still has no Bell', (await page.locator('#bellPanel').count()) === 0 && (await page.locator('#boardPanel').count()) === 1, '');
   check(r, 'no page errors', !log.errors.length, log.errors);
@@ -6635,6 +6635,560 @@ S['open-panel'] = async (b) => {
     && /Nothing is open/.test(ys.now) && !ys.form && ys.past[0].name === 'Plank', { fail: await L.failText(y.page), now: ys.now, past: ys.past.map(p => p.name) });
   check(r, 'no page errors (closed elsewhere)', !y.log.errors.length, y.log.errors);
   await y.page.context().close();
+  return r;
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+// PLAYERS' LOUNGE (stage96 + stage97, built 2026-10-24, not live yet). Every answer below is in the shape of C:\Users\Amir\AA-Lounge\CONTRACT.md, with
+// made-up people. buildSeed({lounge: true}) turns the stage96 functions on in the stub, buildSeed({partner: true}) stage97's; without them the stub
+// answers "Could not find the function" like a server that has not had the stage, and the page must draw nothing and say nothing.
+// ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+// K7. form-fa.html reads ?code= into the discount box and runs the same check typing would, as form.html does.
+S['lounge-form-fa-code'] = async (b) => {
+  const r = { id: 'lounge-form-fa-code', title: 'K7: form-fa.html?code=SARA42 fills the discount box and runs check_discount; no code leaves the box empty and asks nothing', checks: [] };
+  const run = async (query, answer) => {
+    const ctx = await b.newContext({ viewport: { width: 420, height: 900 }, timezoneId: 'UTC' });
+    const page = await ctx.newPage();
+    const asked = [], errs = [];
+    page.on('pageerror', e => errs.push(String(e && e.message || e)));
+    await page.route('**/*', route => {
+      const u = route.request().url();
+      if (u.startsWith(L.BASE)) return route.continue();
+      if (/\/rest\/v1\/rpc\/check_discount/.test(u)) { asked.push(JSON.parse(route.request().postData() || '{}')); return route.fulfill({ status: 200, contentType: 'application/json', body: answer }); }
+      return route.fulfill({ status: 204, body: '' });
+    });
+    await page.goto(L.BASE + '/form-fa.html' + query);
+    await page.waitForTimeout(900);
+    const st = await page.evaluate(() => ({ value: document.getElementById('dcode').value, msg: document.getElementById('dmsg').textContent, applied: document.getElementById('dapplied').value, cls: document.getElementById('dmsg').className }));
+    await ctx.close();
+    return { asked, errs, st };
+  };
+  const a = await run('?code=SARA42', '10');
+  check(r, 'the box holds the code from the link', a.st.value === 'SARA42', a.st);
+  check(r, 'check_discount was asked once, with the code in capitals', a.asked.length === 1 && a.asked[0].p_code === 'SARA42', a.asked);
+  check(r, 'a live code is approved in Farsi and goes out in Discount Applied as the English form does ("SARA42 (10% off)")', /valid/.test(a.st.cls) && /تایید شد/.test(a.st.msg) && a.st.applied === 'SARA42 (10% off)', a.st);
+  const lower = await run('?code=%20sara42%20', '10');
+  check(r, 'spaces around the code are trimmed and a lower-case code is asked in capitals', lower.st.value === 'sara42' && lower.asked.length === 1 && lower.asked[0].p_code === 'SARA42', { v: lower.st.value, asked: lower.asked });
+  const bad = await run('?code=NOPE', 'null');
+  check(r, 'a code the server does not know says nothing until the box is left, and sends nothing as applied', bad.asked.length === 1 && bad.st.applied === '' && !/invalid/.test(bad.st.cls), bad.st);
+  const none = await run('', '10');
+  check(r, 'no ?code= leaves the box empty and asks nothing', none.st.value === '' && none.asked.length === 0, none);
+  check(r, 'no page errors', !a.errs.length && !lower.errs.length && !bad.errs.length && !none.errs.length, [a.errs, lower.errs, bad.errs, none.errs]);
+  return r;
+};
+
+// K5. Their game: one line under the name in the athlete's file, from athlete_profile, only what is set.
+S['lounge-game-line'] = async (b) => {
+  const r = { id: 'lounge-game-line', title: 'K5: the athlete file says their game in one line (only what is set); nothing for an empty row, no row, or a server without the table', checks: [] };
+  const { page, log } = await L.openCoach(b, { seed: { lounge: true }, hash: 'a/ava_test/work' });
+  const game = () => page.evaluate(() => { const el = document.getElementById('detGame'); return el ? { text: el.innerText.replace(/\s+/g, ' ').trim(), shown: el.offsetHeight > 0, html: el.innerHTML } : null; });
+  await page.waitForFunction(() => document.getElementById('detGame') && document.getElementById('detGame').textContent.trim(), null, { timeout: 5000 }).catch(() => {});
+  const ava = await game();
+  check(r, 'Ava: sports, hand, backhand, side, club, what she trains for, what she is working on and her Instagram, in one line under her name', ava && ava.text === 'Padel, Tennis · right-handed · two-handed backhand · left side · at Aspire Padel · trains for strength · working on: my second serve · @ava.plays', ava);
+  check(r, 'her Instagram is a link that opens her page in a new tab', await page.evaluate(() => { const a = document.querySelector('#detGame a'); return !!a && a.getAttribute('href') === 'https://instagram.com/ava.plays' && a.target === '_blank' && /noopener/.test(a.rel); }), ava && ava.html);
+  const reads = (await L.calls(page)).filter(c => c.kind === 'from' && c.name === 'athlete_profile');
+  check(r, 'one read of the table, for this athlete only', reads.length === 1 && reads[0].op === 'select' && reads[0].filters.length === 1 && reads[0].filters[0] === 'athlete_id.eq."ava_test"', reads.map(c => c.filters));
+  check(r, 'it sits between the tier line and the cycle line, and it is on the page without a banner or a failure line', await page.evaluate(() => { const g = document.getElementById('detGame'); return g.previousElementSibling.classList.contains('sub') && /det-cycle/.test(g.nextElementSibling.className); }) && !(await L.failText(page)) && !(await page.locator('#loadwarn:not([hidden])').count()), await L.failText(page));
+  // opening her again, from another tab of her file, reads nothing more
+  await L.go(page, 'a/ava_test/file');
+  check(r, 'going to her File and back does not read it again (kept for the page)', (await L.calls(page)).filter(c => c.kind === 'from' && c.name === 'athlete_profile').length === 1 && (await game()).text === ava.text, '');
+  // Ben has only his hand set; Eli has a row with nothing in it; Cara has no row
+  await L.go(page, 'a/ben_test/work'); await L.settle(page, 400);
+  const ben = await game();
+  check(r, 'Ben: only "left-handed"', ben && ben.text === 'left-handed' && ben.shown, ben);
+  await L.go(page, 'a/eli_new/work'); await L.settle(page, 400);
+  const eli = await game();
+  check(r, 'Eli (an empty row): nothing, and the line takes no room', eli && eli.text === '' && !eli.shown, eli);
+  await L.go(page, 'a/cara_free/proof'); await L.settle(page, 400);
+  const cara = await game();
+  check(r, 'Cara (no row): nothing, and the line takes no room', cara && cara.text === '' && !cara.shown, cara);
+  // text, never markup
+  await page.evaluate(() => { window.__DB.athlete_profile.push({ athlete_id: 'dan_proof', sports: ['table_tennis', 'pickleball'], hand: null, backhand: null, side: 'both', plays_at: 'competition', club: '<img src=x onerror=alert(1)>', training_for: ['fitness', 'running', 'health'], working_on: null, ig: null }); });
+  await L.go(page, 'a/dan_proof/proof'); await L.settle(page, 400);
+  const dan = await game();
+  check(r, 'a club typed with markup is shown as text; two sports in words; three goals read "a, b and c"; both sides; competes', dan && dan.text === 'Table tennis, Pickleball · plays both sides · competes · at <img src=x onerror=alert(1)> · trains for fitness, running and health' && !/<img/.test(dan.html.replace(/&lt;img/g, '')), dan);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // a server that has not had stage96: the table does not exist (PGRST205). Nothing is drawn, nothing is said, and it is asked once only.
+  const old = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  await L.go(old.page, 'a/ben_test/work'); await L.settle(old.page, 400);
+  const oc = (await L.calls(old.page)).filter(c => c.kind === 'from' && c.name === 'athlete_profile');
+  check(r, 'without stage96: the table is asked about once, the line is empty, and there is no banner and no failure line', oc.length === 1 && (await old.page.evaluate(() => document.getElementById('detGame').textContent)) === '' && !(await L.failText(old.page)) && !(await old.page.locator('#loadwarn:not([hidden])').count()), oc.length);
+  check(r, 'no page errors without stage96', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
+
+  // a real failure is said on the line, not drawn as an empty profile
+  const bad = await L.openCoach(b, { seed: { lounge: true }, hash: 'today' });
+  await bad.page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'athlete_profile', op: 'select', message: 'fixture: permission denied', times: 1 }));
+  await L.go(bad.page, 'a/ava_test/work'); await L.settle(bad.page, 500);
+  check(r, 'a failed read says so on the line ("did not load" and why) and is read again the next time the file opens', /game profile did not load: fixture: permission denied/.test((await bad.page.locator('#detGame').innerText())) && await (async () => { await L.go(bad.page, 'a/ben_test/work'); await L.go(bad.page, 'a/ava_test/work'); await L.settle(bad.page, 500); return /right-handed/.test(await bad.page.locator('#detGame').innerText()); })(), await bad.page.locator('#detGame').innerText());
+  await bad.page.context().close();
+  return r;
+};
+
+// K2. Faces: read once per load, drawn where an athlete is drawn, initials as the fallback; Remove photo with two taps.
+S['lounge-faces'] = async (b) => {
+  const r = { id: 'lounge-faces', title: 'K2: coach_crew_faces once per load; the face (28 px circle) in the roster, the file header, Needs you, Courtside and Who said yes; initials as the fallback; older server quiet; Remove photo takes two taps', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { lounge: true, court: true }, hash: 'today' }, COURT_T));
+  await page.waitForSelector('#needPanel [data-face="ava_test"] img', { timeout: 5000 }).catch(() => {});
+  const circle = sel => page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return null;
+    const q = el.getBoundingClientRect(), img = el.querySelector('img'), cs = getComputedStyle(el);
+    return { w: Math.round(q.width), h: Math.round(q.height), radius: parseFloat(cs.borderTopLeftRadius) >= 14 || cs.borderTopLeftRadius.endsWith('%'), img: !!img, loaded: !!img && img.complete && img.naturalWidth > 0,
+      src: img ? img.getAttribute('src').slice(0, 23) : '', text: el.textContent.trim(), clip: cs.overflow };
+  }, sel);
+  const facesCalls = async () => (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'coach_crew_faces');
+  check(r, 'coach_crew_faces was asked once, behind the first paint', (await facesCalls()).length === 1, (await facesCalls()).length);
+  // Today: Needs you and Courtside
+  const need = await circle('#needPanel .pface[data-face="ava_test"]');
+  check(r, 'Needs you: Ava\'s row has her face, a 28 px circle, decoded', need && need.img && need.loaded && need.w === 28 && need.h === 28 && need.radius && need.src === 'data:image/jpeg;base64,', need);
+  const ben = await circle('#needPanel .pface[data-face="ben_test"]');
+  check(r, 'Needs you: Ben has no face, so his initials are in the circle (BE)', !ben || (!ben.img && ben.text === 'BE'), ben);
+  const court = await circle('#courtPanel [data-face="ava_test"]');
+  check(r, 'Courtside: Ava\'s moment row has her face in a 28 px circle', court && court.img && court.loaded && court.w === 28 && court.h === 28 && court.radius, court);
+  const gia = await circle('#courtPanel [data-face="gia_court"]');
+  check(r, 'Courtside: Gia has no face (not in the crew): initials GE', gia && !gia.img && gia.text === 'GE' && gia.w === 28, gia);
+  // the roster
+  await L.go(page, 'athletes');
+  const ra = await circle('.ath .ava[data-face="ava_test"]');
+  check(r, 'Roster: Ava\'s circle is her face, 28 px, clipped to the circle', ra && ra.img && ra.loaded && ra.w === 28 && ra.h === 28 && ra.radius && ra.clip === 'hidden', ra);
+  const rb = await circle('.ath .ava[data-face="ben_test"]'), re = await circle('.ath .ava[data-face="eli_new"]');
+  check(r, 'Roster: Ben (no photo) shows BE and Eli (said no, so the server holds no face for him) shows EE', rb && !rb.img && rb.text === 'BE' && re && !re.img && re.text === 'EE', { rb, re });
+  check(r, 'Roster: the court-green disc is still there for someone without a photo (the look did not change)', await page.evaluate(() => getComputedStyle(document.querySelector('.ath .ava[data-face="ben_test"]')).backgroundColor === 'rgb(14, 74, 54)'), '');
+  // the file header
+  await L.go(page, 'a/ava_test/work');
+  const hd = await circle('.dethead .det-ava');
+  check(r, 'The file header: her face in the file\'s own circle (44 px)', hd && hd.img && hd.loaded && hd.w === 44 && hd.radius, hd);
+  await L.go(page, 'a/ben_test/work');
+  check(r, 'The file header: Ben keeps his initials', (await circle('.dethead .det-ava')).text === 'BE', '');
+  check(r, 'None of this asked for the faces again (read once per load)', (await facesCalls()).length === 1, (await facesCalls()).length);
+  // Proof: Who said yes, and Remove photo
+  await L.go(page, 'proof'); await L.settle(page, 500);
+  const ppl = await page.evaluate(() => [...document.querySelectorAll('#bellPeople .bell-p')].filter(el => ['ava_test', 'ben_test', 'eli_new'].includes(el.dataset.id)).map(el => ({ id: el.dataset.id, face: !!el.querySelector('.pface img'), btn: [...el.querySelectorAll('button')].map(x => x.textContent.trim()).filter(t => /photo/i.test(t)) })));
+  check(r, 'Who said yes: Ava has her face and a Remove photo button; Ben and Eli have neither the face nor the button', JSON.stringify(ppl) === JSON.stringify([{ id: 'ava_test', face: true, btn: ['Remove photo'] }, { id: 'ben_test', face: false, btn: [] }, { id: 'eli_new', face: false, btn: [] }]), ppl);
+  const n0 = await L.nCalls(page);
+  await page.locator('#bellPeople .bell-p[data-id="ava_test"] button', { hasText: 'Remove photo' }).click(); await L.settle(page, 250);
+  const ask = (await page.locator('#bellPeople .dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the first tap only opens a panel that says what goes and what stays; nothing was sent', /Remove Ava Example's photo\?/.test(ask) && /Goes:.*initials show in its place/.test(ask) && /Stays:.*answer.*posts.*login/.test(ask) && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_crew_face_clear'), ask);
+  await page.locator('#dangerNo').click(); await L.settle(page, 200);
+  check(r, 'Cancel closes it and sends nothing', !(await page.locator('.dangerask').count()) && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_crew_face_clear'), '');
+  // a refusal keeps the face and is said
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_crew_face_clear', message: 'fixture: not the coach', times: 1 }));
+  await page.locator('#bellPeople .bell-p[data-id="ava_test"] button', { hasText: 'Remove photo' }).click(); await L.settle(page, 200);
+  await page.locator('#dangerGo').click(); await L.settle(page, 500);
+  check(r, 'a refused removal is said in plain words and the face stays', /Could not remove the photo: fixture: not the coach/.test(await L.failText(page)) && (await circle('#bellPeople [data-face="ava_test"]')).img, await L.failText(page));
+  await page.locator('#failbar .fb-x, #failbar button[aria-label]').first().click({ timeout: 1000 }).catch(() => {});
+  // the real one
+  await page.locator('#bellPeople .bell-p[data-id="ava_test"] button', { hasText: 'Remove photo' }).click(); await L.settle(page, 200);
+  const m0 = await L.nCalls(page);
+  await page.locator('#dangerGo').click(); await L.settle(page, 600);
+  const clear = (await L.callsSince(page, m0)).filter(c => c.name === 'coach_crew_face_clear');
+  check(r, 'the second tap calls coach_crew_face_clear once with the athlete id', clear.length === 1 && clear[0].payload.p_athlete === 'ava_test' && Object.keys(clear[0].payload).length === 1, clear.map(c => c.payload));
+  check(r, 'her photo is gone at once: initials in Who said yes, no Remove photo button, and a line saying so', await page.evaluate(() => { const el = document.querySelector('#bellPeople .bell-p[data-id="ava_test"]'); return !el.querySelector('img') && !/Remove photo/.test(el.textContent) && el.querySelector('.pface').textContent.trim() === 'AE'; }) && /Ava's photo is removed/.test(await L.toastText(page)), await L.toastText(page));
+  await L.go(page, 'athletes');
+  check(r, 'and in the roster too', (await circle('.ath .ava[data-face="ava_test"]')).text === 'AE', '');
+  // a face the server sends that is not base64 is never drawn
+  await page.evaluate(() => { window.__DB.lounge.faces[0].b64 = 'AAAA" onerror="window.__pwned=1'; return window.loadLounge(); }); await L.settle(page, 500);
+  check(r, 'a face that is not plain base64 is left out (no markup reaches the page)', !(await page.evaluate(() => document.querySelectorAll('img[onerror]').length)) && !(await page.evaluate(() => window.__pwned)), '');
+  const looks = [];
+  for (const sel of ['#bellPeople']) { await L.go(page, 'proof'); await L.settle(page, 300); looks.push(...await lookOf(page, sel)); }
+  await L.go(page, 'today'); await L.settle(page, 300);
+  looks.push(...await lookOf(page, '#needPanel'), ...await lookOf(page, '#courtPanel'));
+  check(r, 'the look holds: five font sizes, three radii, one button height, one primary button (Needs you, Courtside, Who said yes)', !looks.length, looks.slice(0, 6));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // arriving late: the faces are read behind the first paint and filled into the circles that are already there
+  const late = await L.openCoach(b, Object.assign({ seed: { lounge: true, court: true, stub: { delay: { coach_crew_faces: 1200 } } }, hash: 'athletes' }, COURT_T));
+  await late.page.evaluate(() => { document.querySelectorAll('.ath').forEach(el => { el.__mine = 1; }); });
+  const first = await late.page.evaluate(() => document.querySelector('.ath .ava').textContent.trim());
+  check(r, 'before the faces arrive the roster shows initials', first.length === 2, first);
+  await late.page.waitForSelector('.ath .ava img', { timeout: 6000 }).catch(() => {});
+  check(r, 'when they arrive the circles are filled in place: the same rows, no redraw', await late.page.evaluate(() => [...document.querySelectorAll('.ath')].every(el => el.__mine === 1) && !!document.querySelector('.ath .ava img')), '');
+  await late.page.context().close();
+
+  // a failed read is named by the banner and leaves initials; a server without stage96 is quiet
+  const bad = await L.openCoach(b, Object.assign({ seed: { lounge: true, stub: { fail: [{ kind: 'rpc', name: 'coach_crew_faces', message: 'fixture: faces down', times: 1 }] } }, hash: 'athletes' }, COURT_T));
+  await L.settle(bad.page, 600);
+  check(r, 'a failed read is named in the banner ("the crew\'s photos: fixture: faces down") and the roster still shows initials', /Not everything loaded/.test(await bad.page.locator('#loadwarn').innerText()) && /the crew's photos: fixture: faces down/.test(await bad.page.locator('#loadwarn').innerText()) && !(await bad.page.locator('.ath .ava img').count()), await bad.page.locator('#loadwarn').innerText());
+  await bad.page.context().close();
+  const old = await L.openCoach(b, Object.assign({ hash: 'athletes' }, COURT_T));
+  await L.settle(old.page, 500);
+  const oc = (await L.calls(old.page)).filter(c => c.name === 'coach_crew_faces');
+  check(r, 'a server without coach_crew_faces: asked once, no banner, no failure line, initials only', oc.length === 1 && !(await old.page.locator('#loadwarn:not([hidden])').count()) && !(await L.failText(old.page)) && !(await old.page.locator('.ath .ava img').count()), '');
+  check(r, 'no page errors on the old server', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
+  return r;
+};
+
+// K1. "Trains, not in the crew: N" on Today: who finished a session in the last 28 days and has no crew yes, with the line ready and WhatsApp / Copy.
+S['lounge-nudge'] = async (b) => {
+  const r = { id: 'lounge-nudge', title: 'K1: Today says who trains and is not in the crew, with the drafted line (English, a Farsi draft for a Farsi athlete) and WhatsApp / Copy; never a reason', checks: [] };
+  const open = (seed, extra) => L.openCoach(b, Object.assign({ seed: Object.assign({ lounge: true, court: true }, seed || {}), hash: 'today' }, COURT_T, extra || {}));
+  const { page, log } = await open();
+  await noPopups(page);
+  const rows = () => page.evaluate(() => {
+    const head = [...document.querySelectorAll('#needPanel .also .need:not(.nudge)')].find(e => /Trains, not in the crew/.test(e.textContent));
+    return { head: head ? head.innerText.replace(/\s+/g, ' ').trim() : null,
+      people: [...document.querySelectorAll('#needPanel .need.nudge')].map(e => ({ id: e.dataset.id, name: e.querySelector('a.n').textContent, when: e.querySelector('.r1').textContent.trim(), face: !!e.querySelector('.pface'),
+        buttons: [...e.querySelectorAll('.nacts .btn')].map(x => x.textContent.trim()), wa: (e.querySelector('.nacts a.btn') || {}).href || '' })),
+      more: ((document.querySelector('#needPanel .also .showweek') || {}).textContent || '').trim() };
+  });
+  let st = await rows();
+  check(r, 'Also waiting has one row, "Trains, not in the crew: 4" (Gia, Hal, Ivy and Jon: a session three days ago, never answered). Ava and Ben said yes, Eli said no (and has not trained), Kim is a former athlete, Cara is free', /^Trains, not in the crew: 4\b/.test(st.head || ''), st.head);
+  check(r, 'the four are listed by name, newest session first and then by name, each with when they last trained', JSON.stringify(st.people.map(p => p.name + '|' + p.when)) === JSON.stringify(['Gia Example|last session 3 days ago', 'Hal Example|last session 3 days ago', 'Ivy Example|last session 3 days ago', 'Jon Example|last session 3 days ago']), st.people);
+  check(r, 'each has WhatsApp ↗ and Copy, and the name opens the athlete', st.people.every(p => JSON.stringify(p.buttons) === JSON.stringify(['WhatsApp ↗', 'Copy'])) && await page.evaluate(() => [...document.querySelectorAll('#needPanel .need.nudge a.n')].every(a => /^#a\/[a-z_]+$/.test(a.getAttribute('href')))), st.people.map(p => p.buttons));
+  const text = p => { try { return new URL(p.wa).searchParams.get('text'); } catch (e) { return null; } };
+  const gia = st.people.find(p => p.id === 'gia_court'), jon = st.people.find(p => p.id === 'jon_court');
+  check(r, 'the English line is Amir\'s, with the first name: "Hi Gia. The crew is live in your app. The others cheer each other on there. Have a look in the Crew tab. You choose what they see."', text(gia) === 'Hi Gia. The crew is live in your app. The others cheer each other on there. Have a look in the Crew tab. You choose what they see.' && /^https:\/\/wa\.me\/10000000021\?text=/.test(gia.wa), gia);
+  check(r, 'Jon reads Farsi (athlete.lang = "fa"): his line is the Farsi draft, with his name, and it names the Crew tab', /^سلام Jon\./.test(text(jon) || '') && /تب Crew/.test(text(jon) || '') && !/The crew is live/.test(text(jon) || ''), text(jon));
+  await page.locator('#needPanel .need.nudge[data-id="hal_court"] button', { hasText: 'Copy' }).click(); await L.settle(page, 300);
+  check(r, 'Copy puts the same line on the clipboard and says so', (await page.evaluate(() => navigator.clipboard.readText())) === 'Hi Hal. The crew is live in your app. The others cheer each other on there. Have a look in the Crew tab. You choose what they see.' && /Copied/.test(await L.toastText(page)), await L.toastText(page));
+  check(r, 'it is not a reason: Needs you still counts 4 people and Also waiting keeps its other rows', /4 people/.test(await page.locator('#needPanel .phead .r').innerText()) && (await page.locator('#needPanel .also .need:not(.nudge)').count()) >= 5, await page.locator('#needPanel .phead .r').innerText());
+  const plain = await open({ lounge: false, crew: false });
+  const a = await needSnap(page), z = await needSnap(plain.page);
+  check(r, 'the reasons, the counters, the rail and its badges are exactly what a page without the Lounge shows', JSON.stringify([a.reasons, a.counters, a.rail, a.badges]) === JSON.stringify([z.reasons, z.counters, z.rail, z.badges]), [a.reasons, z.reasons]);
+  check(r, 'a page without the crew (no coach_crew) says nothing of it', !/Trains, not in the crew/.test(await plain.page.locator('#needPanel').innerText()), '');
+  await plain.page.context().close();
+  // someone joins, someone is ticked under 13: the list follows the Bell
+  await page.evaluate(() => { const p = window.__DB.crew_bell.people; p.push({ athlete_id: 'ivy_court', answer: 'yes', under13: false, answered_at: new Date().toISOString(), kinds_off: [] }, { athlete_id: 'gia_court', answer: null, under13: true, answered_at: null, kinds_off: [] }); return window.loadBell(); });
+  await L.settle(page, 500);
+  st = await rows();
+  check(r, 'Ivy says yes and Gia is ticked under 13: both leave, the head says 2 and the list is Hal and Jon', /^Trains, not in the crew: 2\b/.test(st.head || '') && JSON.stringify(st.people.map(p => p.id)) === JSON.stringify(['hal_court', 'jon_court']), st);
+  // the window is 28 days: 28 is in, 29 is out; paused is nobody's chase; someone who answered no is left alone even when they train (their choice stands); more than five is a button
+  const t = await page.evaluate(() => {
+    const day = n => { const d = new Date(Date.now() - n * 86400000); return d.toISOString().slice(0, 10); };
+    const sh = window.__DB.session_history;
+    sh.filter(s => s.athlete_id === 'hal_court').forEach(s => { s.completed_on = day(28); });
+    sh.filter(s => s.athlete_id === 'jon_court').forEach(s => { s.completed_on = day(29); });
+    sh.push({ athlete_id: 'eli_new', athlete_name: 'Eli Example', day: 1, completed_on: day(5), status: 'Complete', session_rpe: 7, duration_min: 50, day_note: '', focus: '', summary: 'x', updated_at: day(5) + 'T18:00:00.000Z', coach_status: 'read', log: null });
+    window.__DB.athlete_status.push({ athlete_id: 'gia_court', status: 'paused', since: day(3), note: null, updated_at: new Date().toISOString() });
+    return true;
+  });
+  await page.evaluate(() => window.hardRefresh()); await L.settle(page, 900);
+  st = await rows();
+  check(r, 'a session 28 days ago counts and 29 does not (Hal in, Jon out); Gia is paused; nobody else', JSON.stringify(st.people.map(p => p.id)) === JSON.stringify(['hal_court']), st.people);
+  check(r, 'Eli answered no and trained 5 days ago: he is NOT listed (their choice stands, and the app already shows them the way back), and nothing says "said no" anywhere in the row', !st.people.some(p => p.id === 'eli_new') && !/said no/.test(JSON.stringify(st)) && !/Eli/.test(await page.locator('#needPanel .also').innerText()), st.people);
+  await page.evaluate(() => {
+    const p = window.__DB.programs[0], day = n => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+    ['q1', 'q2', 'q3', 'q4', 'q5', 'q6'].forEach((k, i) => {
+      window.__DB.programs.push({ athlete_id: k + '_test', data: JSON.parse(JSON.stringify(Object.assign({}, p.data, { athlete: { id: k + '_test', firstName: 'Quin' + i, lastName: 'Extra', tier: 'coached' } }))), updated_at: new Date().toISOString(), updated_by: 'x' });
+      window.__DB.session_history.push({ athlete_id: k + '_test', athlete_name: 'Quin' + i + ' Extra', day: 1, completed_on: day(2 + i), status: 'Complete', session_rpe: 7, duration_min: 50, day_note: '', focus: '', summary: 'x', updated_at: day(2 + i) + 'T18:00:00.000Z', coach_status: 'read', log: null });
+    });
+  });
+  await page.evaluate(() => window.hardRefresh()); await L.settle(page, 900);
+  st = await rows();
+  check(r, 'seven people: five are listed and a button says "Show all 7", which lists them all and "Show fewer" goes back', st.people.length === 5 && st.more === 'Show all 7' && /^Trains, not in the crew: 7\b/.test(st.head), { n: st.people.length, more: st.more, head: st.head });
+  await page.locator('#needPanel .also .showweek').click(); await L.settle(page, 200);
+  const all = await rows();
+  check(r, 'all seven, then back to five', all.people.length === 7 && all.more === 'Show fewer' && await (async () => { await page.locator('#needPanel .also .showweek').click(); await L.settle(page, 200); return (await rows()).people.length === 5; })(), all.people.length);
+  const looks = await lookOf(page, '#needPanel');
+  check(r, 'the look holds: five font sizes, three radii, one button height', !looks.length, looks.slice(0, 5));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  // the Bell did not load: the page cannot tell who is in, so it says nothing
+  const down = await open({ stub: { fail: [{ kind: 'rpc', name: 'coach_crew', message: 'fixture: bell down', times: 1 }] } });
+  await L.settle(down.page, 500);
+  check(r, 'when the Bell fails to load there is no row at all (and the banner names the Bell)', !/Trains, not in the crew/.test(await down.page.locator('#needPanel').innerText()) && /the Bell/.test(await down.page.locator('#loadwarn').innerText()), '');
+  await down.page.context().close();
+  return r;
+};
+
+// K3. Cheer a moment from Courtside: a sheet with an optional word, coach_cheer, "Cheered today", plain words for a refusal.
+S['lounge-cheer'] = async (b) => {
+  const r = { id: 'lounge-cheer', title: 'K3: each Courtside moment has Cheer with a filled Phosphor clap icon, never the emoji (a small sheet, an optional word of 100 letters, coach_cheer); the row then says "Cheered today"; refusals in plain words; absent on a server without stage96', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { lounge: true, court: true }, hash: 'today' }, COURT_T));
+  await noPopups(page);
+  const rows = () => page.evaluate(() => [...document.querySelectorAll('#courtPanel .cs')].filter(e => e.querySelector('.cs-name')).map(e => ({ name: e.querySelector('.cs-name').textContent, acts: [...e.querySelectorAll('.cs-acts .btn')].map(x => x.textContent.trim()),
+    state: ((e.querySelector('.cheer-state') || {}).textContent || '').trim(), icon: !!e.querySelector('.cs-acts .cheer-ico'), sheet: !!e.querySelector('#cheerSheet') })));
+  const row = async n => (await rows()).find(x => x.name === n);
+  const calls = async name => (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === name);
+  const btn = (name, label) => page.locator('#courtPanel .cs', { has: page.locator('.cs-name', { hasText: name }) }).locator('.cs-acts .btn', { hasText: label }).first();
+  check(r, 'coach_crew_cheers is read once, behind the first paint', (await calls('coach_crew_cheers')).length === 1, (await calls('coach_crew_cheers')).length);
+  check(r, 'Ava (in the crew): her row offers WhatsApp ↗, Copy, Saw it and then Cheer (with the clap icon)', JSON.stringify((await row('Ava Example')).acts) === JSON.stringify(['WhatsApp ↗', 'Copy', 'Saw it', 'Cheer']) && (await row('Ava Example')).icon, (await row('Ava Example')).acts);
+  check(r, 'the clap is the Phosphor hands-clapping icon filled in the button\'s own colour (fill currentColor, no stroke, 16 px) and no clapping-hands emoji is drawn anywhere in the panel: the emoji is yellow on a phone and yellow is never in this app', await page.evaluate(() => {
+    const i = document.querySelector('#courtPanel .cs-acts .btn .cheer-ico'), cs = i && getComputedStyle(i), b = i && getComputedStyle(i.closest('.btn'));
+    return !!i && i.tagName.toLowerCase() === 'svg' && cs.fill === b.color && cs.stroke === 'none' && Math.round(i.getBoundingClientRect().width) === 16 && !/[\u{1F44F}\u{FE0E}]/u.test(document.getElementById('courtPanel').innerHTML) && !/[\u{1F44F}\u{FE0E}]/u.test(document.body.innerHTML); }), '');
+  check(r, 'the icon is a drawing, not text: the button reads exactly "Cheer", and Cheered today keeps the icon too', (await row('Ava Example')).acts[3] === 'Cheer' && (await row('Ben Example')).icon, await row('Ben Example'));
+  check(r, 'Ben (Amir already cheered him today, the list says so): "Cheered today" and no button', (await row('Ben Example')).state === 'Cheered today' && !(await row('Ben Example')).acts.some(x => /Cheer$/.test(x)), await row('Ben Example'));
+  check(r, 'Gia, Jon and Hal have not joined the crew: "Not in the crew" and no button (the server would refuse)', ['Gia Example', 'Jon Example', 'Hal Example'].every(n => { return true; }) && (await Promise.all(['Gia Example', 'Jon Example', 'Hal Example'].map(row))).every(x => x.state === 'Not in the crew' && !x.acts.some(a => /Cheer$/.test(a))), await rows());
+  // the sheet
+  const n0 = await L.nCalls(page);
+  await btn('Ava Example', 'Cheer').click(); await L.settle(page, 250);
+  const sh = await page.evaluate(() => { const i = document.getElementById('cheerIn'); return i ? { max: i.maxLength, val: i.value, focus: document.activeElement === i, count: document.getElementById('cheerCount').textContent, text: document.getElementById('cheerSheet').innerText.replace(/\s+/g, ' ').trim(), buttons: [...document.querySelectorAll('#cheerSheet .btn')].map(x => x.textContent.trim()) } : null; });
+  check(r, 'the first tap opens a sheet under her row: a box for a word (100 letters, focused), a count, "Send the cheer" and Cancel; nothing was sent', sh && sh.max === 100 && sh.focus && sh.count === '0' && JSON.stringify(sh.buttons) === JSON.stringify(['Send the cheer', 'Cancel']) && /A word for Ava\? Optional\. It shows on their page for 7 days/.test(sh.text) && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_cheer'), sh);
+  await page.locator('#cheerIn').fill('Great week, <b>legs</b>');
+  check(r, 'the count follows what is typed', (await page.locator('#cheerCount').innerText()) === '23', await page.locator('#cheerCount').innerText());
+  const looksOpen = await lookOf(page, '#courtPanel');
+  check(r, 'the look holds with the sheet open: five font sizes, three radii, one button height, one primary button', !looksOpen.length, looksOpen.slice(0, 5));
+  await page.locator('#cheerSheet .btn', { hasText: 'Cancel' }).click(); await L.settle(page, 200);
+  check(r, 'Cancel closes it and sends nothing', !(await row('Ava Example')).sheet && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_cheer'), '');
+  await btn('Ava Example', 'Cheer').click(); await L.settle(page, 250);
+  check(r, 'opened again it is empty (the cancelled word is not kept)', (await page.locator('#cheerIn').inputValue()) === '', '');
+  await page.locator('#cheerIn').fill('Great week, <b>legs</b>');
+  const m0 = await L.nCalls(page);
+  await page.locator('#cheerSheet .btn', { hasText: 'Send the cheer' }).click(); await L.settle(page, 600);
+  const sent = (await L.callsSince(page, m0)).filter(c => c.name === 'coach_cheer');
+  check(r, 'Send calls coach_cheer once with exactly the athlete and the word as typed', sent.length === 1 && JSON.stringify(sent[0].payload) === JSON.stringify({ p_athlete: 'ava_test', p_word: 'Great week, <b>legs</b>' }), sent.map(c => c.payload));
+  check(r, 'the row says "Cheered today", the sheet is gone, and the page said "Cheered Ava"', (await row('Ava Example')).state === 'Cheered today' && !(await row('Ava Example')).sheet && /Cheered Ava/.test(await L.toastText(page)), await row('Ava Example'));
+  check(r, 'the list of cheers was read again after it', (await L.callsSince(page, m0)).filter(c => c.name === 'coach_crew_cheers').length === 1, '');
+  const dbc = (await L.db(page)).lounge.cheers.filter(c => c.to_athlete === 'ava_test' && c.from_athlete === '__coach__');
+  check(r, 'the server holds one cheer from the coach to Ava, with the word cleaned of < and >, dated today', dbc.length === 1 && dbc[0].word === 'Great week, blegs/b' && dbc[0].day === '2026-11-12', dbc);
+  check(r, 'a cheer pays nothing: no XP, award or fact call', !(await L.callsSince(page, m0)).some(c => /xp|award|fact|career/i.test(c.name) && c.kind === 'rpc'), (await L.callsSince(page, m0)).map(c => c.name));
+  // an empty word goes as null
+  await page.evaluate(() => { window.__DB.crew_bell.people.push({ athlete_id: 'hal_court', answer: 'yes', under13: false, answered_at: new Date().toISOString(), kinds_off: [] }); return window.loadBell(); }); await L.settle(page, 400);
+  check(r, 'Hal joins the crew: when the Bell is read again his row offers the button', (await row('Hal Example')).acts.includes('Cheer'), await row('Hal Example'));
+  const h0 = await L.nCalls(page);
+  await btn('Hal Example', 'Cheer').click(); await L.settle(page, 200);
+  await page.locator('#cheerIn').fill('   ');
+  await page.locator('#cheerIn').press('Enter'); await L.settle(page, 500);
+  const hs = (await L.callsSince(page, h0)).filter(c => c.name === 'coach_cheer');
+  check(r, 'Enter sends it; a box with only spaces sends p_word null', hs.length === 1 && hs[0].payload.p_word === null && hs[0].payload.p_athlete === 'hal_court' && (await row('Hal Example')).state === 'Cheered today', hs.map(c => c.payload));
+  // too long: refused here, nothing sent
+  await page.evaluate(() => { window.__DB.crew_bell.people.push({ athlete_id: 'gia_court', answer: 'yes', under13: false, answered_at: new Date().toISOString(), kinds_off: [] }); return window.loadBell(); }); await L.settle(page, 400);
+  await btn('Gia Example', 'Cheer').click(); await L.settle(page, 200);
+  const g0 = await L.nCalls(page);
+  await page.evaluate(() => { document.getElementById('cheerIn').value = 'x'.repeat(101); });
+  await page.locator('#cheerSheet .btn', { hasText: 'Send the cheer' }).click(); await L.settle(page, 300);
+  check(r, 'a word over 100 letters is refused on the page in plain words and nothing is sent', /That word is over 100 letters\. Shorten it and send again\./.test(await L.failText(page)) && !(await L.callsSince(page, g0)).some(c => c.name === 'coach_cheer'), await L.failText(page));
+  // cheered from somewhere else today: the server says so
+  await page.evaluate(() => { const l = window.__DB.lounge; l.cheers.push({ id: ++l.seq, from_athlete: '__coach__', from_who: 'Coach', to_athlete: 'gia_court', to_who: 'Gia E.', word: null, day: '2026-11-12' }); document.getElementById('cheerIn').value = ''; });
+  await page.locator('#cheerSheet .btn', { hasText: 'Send the cheer' }).click(); await L.settle(page, 500);
+  check(r, 'a second cheer the same day (made on another screen) is refused: "You already cheered Gia today." and the row now says "Cheered today"', /You already cheered Gia today\./.test(await L.failText(page)) && (await row('Gia Example')).state === 'Cheered today' && !(await row('Gia Example')).sheet, await L.failText(page));
+  // not in the crew any more: the Bell is read again
+  await page.evaluate(() => { window.__DB.crew_bell.people.push({ athlete_id: 'jon_court', answer: 'yes', under13: false, answered_at: new Date().toISOString(), kinds_off: [] }); return window.loadBell(); }); await L.settle(page, 400);
+  await btn('Jon Example', 'Cheer').click(); await L.settle(page, 200);
+  await page.evaluate(() => { window.__DB.crew_bell.people = window.__DB.crew_bell.people.filter(p => p.athlete_id !== 'jon_court'); });
+  const j0 = await L.nCalls(page);
+  await page.locator('#cheerSheet .btn', { hasText: 'Send the cheer' }).click(); await L.settle(page, 700);
+  check(r, 'someone who left the crew since: "Jon is not in the crew, so there is nobody to cheer", the Bell is read again and the row says "Not in the crew"', /Jon is not in the crew, so there is nobody to cheer\./.test(await L.failText(page)) && (await L.callsSince(page, j0)).some(c => c.name === 'coach_crew') && (await row('Jon Example')).state === 'Not in the crew', await L.failText(page));
+  // the answer never arrived
+  await page.evaluate(() => { window.__DB.crew_bell.people.push({ athlete_id: 'ivy_court', answer: 'yes', under13: false, answered_at: new Date().toISOString(), kinds_off: [] }); return window.loadBell(); });
+  await page.locator('#courtPanel .showweek').click().catch(() => {}); await L.settle(page, 400);
+  await btn('Ivy Example', 'Cheer').click(); await L.settle(page, 200);
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_cheer', message: 'fixture: connection dropped', code: '', times: 1 }));
+  const v0 = await L.nCalls(page);
+  await page.locator('#cheerSheet .btn', { hasText: 'Send the cheer' }).click(); await L.settle(page, 600);
+  check(r, 'no answer at all: the page does not say it went or did not, it reads the list again and says to look', /The answer never arrived \(fixture: connection dropped\), so the page cannot tell whether the cheer went/.test(await L.failText(page)) && (await L.callsSince(page, v0)).some(c => c.name === 'coach_crew_cheers'), await L.failText(page));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  // a phone: the sheet fits
+  const ph = await L.openCoach(b, Object.assign({ seed: { lounge: true, court: true }, hash: 'today' }, COURT_T));
+  await ph.page.setViewportSize({ width: 360, height: 800 }); await L.settle(ph.page, 300);
+  await ph.page.locator('#courtPanel .cs', { has: ph.page.locator('.cs-name', { hasText: 'Ava Example' }) }).locator('.cs-acts .btn', { hasText: 'Cheer' }).click(); await L.settle(ph.page, 300);
+  check(r, 'at 360 px the sheet fits: no sideways scroll, the box and both buttons inside the panel', await ph.page.evaluate(() => { const p = document.getElementById('courtPanel').getBoundingClientRect(); return document.documentElement.scrollWidth <= innerWidth && [...document.querySelectorAll('#cheerSheet input, #cheerSheet .btn')].every(e => { const q = e.getBoundingClientRect(); return q.left >= p.left - 1 && q.right <= p.right + 1; }); }), '');
+  await ph.page.context().close();
+  // a server without stage96: no Cheer, no "Not in the crew", no words about it
+  const old = await L.openCoach(b, Object.assign({ seed: { crew: true, court: true }, hash: 'today' }, COURT_T));
+  await L.settle(old.page, 500);
+  check(r, 'without stage96 there is nothing about cheers on Courtside, no banner and no failure line', await old.page.evaluate(() => !/Cheer|Not in the crew|Cheered/.test(document.getElementById('courtPanel').innerText)) && !(await old.page.locator('#loadwarn:not([hidden])').count()) && !(await L.failText(old.page)), '');
+  check(r, 'no page errors on the old server', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
+  return r;
+};
+
+// K4. Cheers with words, last 7 days, on Proof: read them, clear a word with two taps.
+S['lounge-cheers-words'] = async (b) => {
+  const r = { id: 'lounge-cheers-words', title: 'K4: Proof lists the cheers with words from the last 7 days (newest first, as text), and Clear the word takes two taps (coach_cheer_word_clear); absent on a server without stage96', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ seed: { lounge: true } }, BELL_T));
+  await page.waitForSelector('#cheersPanel', { timeout: 5000 }).catch(() => {});
+  const panel = () => page.evaluate(() => { const p = document.getElementById('cheersPanel'); return p ? { head: p.querySelector('.phead').innerText.replace(/\s+/g, ' ').trim(), rows: [...p.querySelectorAll('.cheer-w')].map(e => ({ id: e.dataset.id, top: e.querySelector('.cw-top').innerText.replace(/\s+/g, ' ').trim(), text: e.querySelector('.cw-txt').textContent, markup: !!e.querySelector('.cw-txt b'), link: (e.querySelector('.cw-top a') || {}).getAttribute ? e.querySelector('.cw-top a').getAttribute('href') : null, btn: e.querySelector('.btn').textContent.trim() })), empty: (p.querySelector('.empty') || {}).textContent || '' } : null; });
+  let st = await panel();
+  check(r, 'the panel is there, under Who said yes and above the Open, and its head counts the two cheers that carry words', st && /^Cheers with words last 7 days · 2/.test(st.head) && await page.evaluate(() => { const ids = [...document.querySelectorAll('#bellPeople, #cheersPanel, #openPanel')].map(e => e.id); return ids.join() === 'bellPeople,cheersPanel,openPanel' || ids.join() === 'bellPeople,cheersPanel'; }), st && st.head);
+  check(r, 'newest first: Ben to Ava (yesterday), then Ava to Ben (2 days ago); the two cheers without words are not listed', st && JSON.stringify(st.rows.map(x => x.id)) === JSON.stringify(['1', '2']) && /^Ben E\. → Ava E\. Yesterday Clear the word$/.test(st.rows[0].top), st && st.rows.map(x => x.top));
+  check(r, 'the words are text: markup and quotes show as typed', st && st.rows[0].text === '“that sled push looked heavy”' && st.rows[1].text === '“<b>Nice</b> one "legend"”' && !st.rows[1].markup, st && st.rows.map(x => x.text));
+  check(r, 'the giver is a link to their file', st && st.rows[0].link === '#a/ben_test' && st.rows[1].link === '#a/ava_test', st && st.rows.map(x => x.link));
+  check(r, 'it read coach_crew_cheers once', (await L.calls(page)).filter(c => c.name === 'coach_crew_cheers').length === 1, '');
+  const n0 = await L.nCalls(page);
+  await page.locator('.cheer-w[data-id="1"] .btn', { hasText: 'Clear the word' }).click(); await L.settle(page, 250);
+  const ask = (await page.locator('#cheersPanel .dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the first tap opens a panel (what goes: the word, what stays: the cheer and the count) and sends nothing', /Clear this word\?/.test(ask) && /Goes:.*word/.test(ask) && /Stays:.*cheer.*count/.test(ask) && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_cheer_word_clear'), ask);
+  const looks = await lookOf(page, '#cheersPanel');
+  check(r, 'the look holds with the panel open: five font sizes, three radii, one button height, one primary button', !looks.length, looks.slice(0, 5));
+  await page.locator('#dangerNo').click(); await L.settle(page, 200);
+  check(r, 'Cancel sends nothing', !(await L.callsSince(page, n0)).some(c => c.name === 'coach_cheer_word_clear') && (await panel()).rows.length === 2, '');
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_cheer_word_clear', message: 'fixture: not the coach', times: 1 }));
+  await page.locator('.cheer-w[data-id="1"] .btn', { hasText: 'Clear the word' }).click(); await L.settle(page, 200);
+  await page.locator('#dangerGo').click(); await L.settle(page, 500);
+  check(r, 'a refusal is said in plain words and the word stays', /Could not clear the word: fixture: not the coach/.test(await L.failText(page)) && (await panel()).rows.length === 2, await L.failText(page));
+  await page.locator('.cheer-w[data-id="1"] .btn', { hasText: 'Clear the word' }).click(); await L.settle(page, 200);
+  const m0 = await L.nCalls(page);
+  await page.locator('#dangerGo').click(); await L.settle(page, 700);
+  const clr = (await L.callsSince(page, m0)).filter(c => c.name === 'coach_cheer_word_clear');
+  check(r, 'the second tap calls coach_cheer_word_clear once with the cheer\'s id, as a number', clr.length === 1 && JSON.stringify(clr[0].payload) === '{"p_id":1}', clr.map(c => c.payload));
+  st = await panel();
+  check(r, 'the row leaves, the head says 1, "Word cleared", and the list was read again', st.rows.length === 1 && st.rows[0].id === '2' && /· 1/.test(st.head) && /Word cleared/.test(await L.toastText(page)) && (await L.callsSince(page, m0)).some(c => c.name === 'coach_crew_cheers'), st);
+  const dbc = (await L.db(page)).lounge.cheers.find(c => c.id === 1);
+  check(r, 'on the server the cheer is still there with no word', dbc && dbc.word === null && dbc.from_athlete === 'ben_test', dbc);
+  // Amir's own cheer with a word is listed too, as "You"
+  await page.evaluate(() => { const l = window.__DB.lounge; l.cheers.push({ id: ++l.seq, from_athlete: '__coach__', from_who: 'Coach', to_athlete: 'ava_test', to_who: 'Ava E.', word: 'Proud of you', day: '2026-11-12' }); });
+  await page.locator('#cheersPanel .phead .btn', { hasText: 'Reload' }).click(); await L.settle(page, 400);
+  st = await panel();
+  check(r, 'a cheer with a word from Amir reads "You → Ava E." and comes first (today)', st.rows.length === 2 && /^You → Ava E\. Today Clear the word$/.test(st.rows[0].top) && st.rows[0].link === null, st.rows.map(x => x.top));
+  // clearing the last words: the empty line
+  for (const id of st.rows.map(x => x.id)) {
+    await page.locator(`.cheer-w[data-id="${id}"] .btn`, { hasText: 'Clear the word' }).click(); await L.settle(page, 150);
+    await page.locator('#dangerGo').click(); await L.settle(page, 500);
+  }
+  st = await panel();
+  check(r, 'with none left it says so in one line', st.rows.length === 0 && st.empty === 'No cheers with words this week.' && /· 0/.test(st.head), st);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  // a failed read is named by the banner and the panel says so, with Try again
+  const bad = await L.openCoach(b, Object.assign({ seed: { lounge: true, stub: { fail: [{ kind: 'rpc', name: 'coach_crew_cheers', message: 'fixture: cheers down', times: 1 }] } } }, BELL_T));
+  await bad.page.waitForSelector('#cheersPanel', { timeout: 5000 }).catch(() => {});
+  check(r, 'a failed read: the banner names "the crew\'s cheers", the panel says it did not load and offers Try again', /the crew's cheers: fixture: cheers down/.test(await bad.page.locator('#loadwarn').innerText()) && /The cheers did not load: fixture: cheers down/.test(await bad.page.locator('#cheersPanel').innerText()), await bad.page.locator('#cheersPanel').innerText());
+  await bad.page.locator('#cheersPanel .btn', { hasText: 'Try again' }).click(); await L.settle(bad.page, 500);
+  check(r, 'Try again lists them and the banner goes', (await bad.page.locator('#cheersPanel .cheer-w').count()) === 2 && !(await bad.page.locator('#loadwarn:not([hidden])').count()), '');
+  await bad.page.context().close();
+  // a server without stage96: no panel, no banner
+  const old = await L.openCoach(b, Object.assign({ seed: { crew: true } }, BELL_T));
+  await L.settle(old.page, 500);
+  check(r, 'without stage96 Proof has no cheers panel, no banner and no failure line', !(await old.page.locator('#cheersPanel').count()) && !(await old.page.locator('#loadwarn:not([hidden])').count()) && !(await L.failText(old.page)), '');
+  check(r, 'no page errors on the old server', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
+  return r;
+};
+
+// K6. Leads → Referral codes: the athletes' partner codes in a group of their own, with credits, Used, "10% owed: N", Make a code, and Credit Sara 10% on an application.
+S['lounge-partner-codes'] = async (b) => {
+  const r = { id: 'lounge-partner-codes', title: 'K6: an athlete\'s partner code has its own group under Referral codes (code, athlete, applications, credits, Used, "10% owed: N", Make a code) and "Credit Ava 10%" on an application that typed it; partner:self is "That is their own code."', checks: [] };
+  const T = Object.assign({ seed: { lounge: true, partner: true, court: true }, hash: 'leads/codes' }, COURT_T);
+  const { page, log } = await L.openCoach(b, T);
+  await page.waitForSelector('#partnerPanel', { timeout: 5000 }).catch(() => {});
+  const view = () => page.evaluate(() => {
+    const txt = el => el ? el.innerText.replace(/\s+/g, ' ').trim() : '';
+    const g = document.getElementById('partnerPanel');
+    return { live: [...document.querySelectorAll('#affView > section:not(#partnerPanel) .intake-card .aff-code')].map(e => e.textContent), head: txt(g && g.querySelector('.phead')), deal: txt(g && g.querySelector('.psub')),
+      cards: g ? [...g.querySelectorAll('.pcard')].map(d => ({ code: d.dataset.code, open: d.open, summary: txt(d.querySelector('summary')),
+        credits: [...d.querySelectorAll('.pc-credit')].map(c => ({ text: txt(c), used: c.querySelector('input').checked })),
+        apps: [...d.querySelectorAll('.pc-app')].map(a => ({ text: txt(a), btn: (a.querySelector('.btn') || {}).textContent || '', credited: !!a.querySelector('.ipill.used') })), acts: [...d.querySelectorAll('.i-actions .btn')].map(x => x.textContent.trim()) })) : null,
+      make: g ? [...g.querySelectorAll('.pc-make .btn')].map(x => x.textContent.trim()) : null, pick: g && g.querySelector('#partnerPick') ? [...g.querySelectorAll('#partnerPick option')].map(o => o.textContent) : null };
+  });
+  let v = await view();
+  check(r, 'Live codes holds the coach\'s code only (FIXTURE10): the athletes\' codes are not mixed in', JSON.stringify(v.live) === JSON.stringify(['FIXTURE10']), v.live);
+  check(r, 'the group "Athletes\' partner codes" counts its two codes and what is owed ("10% owed: 1")', /^Athletes' partner codes 2 codes · 10% owed: 1$/.test(v.head), v.head);
+  check(r, 'the deal is one line at the top of the group, in Amir\'s words', v.deal === 'The friend gets 10% off. The member gets 10% off their next cycle. You apply it when they pay.', v.deal);
+  check(r, 'AVA42 comes first (it is owed something): the code, the athlete, "10% off", 4 applications that typed it and "10% owed: 1"; BEN43 has nothing yet', v.cards.length === 2 && v.cards[0].code === 'AVA42' && v.cards[0].summary === 'AVA42 Ava Example 10% off 4 applications 10% owed: 1' && v.cards[1].code === 'BEN43' && v.cards[1].summary === 'BEN43 Ben Example 10% off', v.cards.map(c => c.summary));
+  const reads = (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'coach_partner_codes');
+  check(r, 'coach_partner_codes is read once, behind the first paint', reads.length === 1, reads.length);
+  await page.locator('.pcard[data-code="AVA42"] summary').click(); await L.settle(page, 200);
+  v = await view();
+  const ava = v.cards[0];
+  check(r, 'her credits, newest first: Fixture Applicant Three (not used) and Friend Zero (used and ticked), each with the date it was earned', ava.credits.length === 2 && /^Used Fixture Applicant Three earned \d+ \w{3}$/.test(ava.credits[0].text) && !ava.credits[0].used && /^Used Friend Zero earned \d+ \w{3} · used \d+ \w{3}$/.test(ava.credits[1].text) && ava.credits[1].used, ava.credits);
+  check(r, 'the applications that typed it: Three is already credited, One and Two (typed as " ava 42 ") offer Credit Ava 10%, and so does Ava\'s own application (the server decides)', JSON.stringify(ava.apps.map(a => [a.text.replace(/\s*\d{4}-\d{2}-\d{2}.*$/, ''), a.credited, a.btn])) === JSON.stringify([['Fixture Applicant One', false, 'Credit Ava 10%'], ['Fixture Applicant Two', false, 'Credit Ava 10%'], ['Fixture Applicant Three', true, ''], ['Ava Example', false, 'Credit Ava 10%']]), ava.apps);
+  check(r, 'Retire code is there for a live code', JSON.stringify(ava.acts) === JSON.stringify(['Retire code']), ava.acts);
+  // Used
+  const uid = 'f0000000-0000-4000-8000-000000000002';
+  const n0 = await L.nCalls(page);
+  await page.locator('.pcard[data-code="AVA42"] .pc-credit', { hasText: 'Fixture Applicant Three' }).locator('input').check(); await L.settle(page, 500);
+  const used = (await L.callsSince(page, n0)).filter(c => c.name === 'coach_partner_credit_used');
+  v = await view();
+  check(r, 'ticking Used calls coach_partner_credit_used with the credit and true; "10% owed" is gone from the card and the head; the card stays open', used.length === 1 && JSON.stringify(used[0].payload) === JSON.stringify({ p_id: uid, p_used: true }) && v.cards[0].summary === 'AVA42 Ava Example 10% off 4 applications' && v.cards[0].open && v.head === 'Athletes\' partner codes 2 codes', { used: used.map(c => c.payload), s: v.cards[0].summary, head: v.head });
+  await page.locator('.pcard[data-code="AVA42"] .pc-credit', { hasText: 'Fixture Applicant Three' }).locator('input').uncheck(); await L.settle(page, 500);
+  v = await view();
+  check(r, 'unticking sends false and brings "10% owed: 1" back', /10% owed: 1$/.test(v.cards[0].summary) && (await L.callsSince(page, n0)).filter(c => c.name === 'coach_partner_credit_used').length === 2, v.cards[0].summary);
+  // Credit
+  const m0 = await L.nCalls(page);
+  await page.locator('.pcard[data-code="AVA42"] .pc-app', { hasText: 'Fixture Applicant One' }).locator('.btn').click(); await L.settle(page, 600);
+  const add = (await L.callsSince(page, m0)).filter(c => c.name === 'coach_partner_credit_add');
+  v = await view();
+  check(r, 'Credit Ava 10% calls coach_partner_credit_add once with the code and the application, and a null note', add.length === 1 && JSON.stringify(add[0].payload) === JSON.stringify({ p_code: 'AVA42', p_intake: '00000000-0000-4000-8000-0000000001a1', p_note: null }), add.map(c => c.payload));
+  check(r, 'the card now has three credits (the new one named for the friend), One reads Credited, and 2 are owed; "Ava is credited 10%"', v.cards[0].credits.length === 3 && v.cards[0].credits.some(c => /Fixture Applicant One/.test(c.text)) && v.cards[0].apps.find(a => /Applicant One/.test(a.text)).credited && /10% owed: 2$/.test(v.cards[0].summary) && /Ava is credited 10%/.test(await L.toastText(page)), { c: v.cards[0].credits.length, s: v.cards[0].summary });
+  // her own application: refused by the server
+  await page.locator('.pcard[data-code="AVA42"] .pc-app', { hasText: 'Ava Example' }).locator('.btn').click(); await L.settle(page, 500);
+  v = await view();
+  check(r, 'Ava\'s own application is refused (partner:self) in plain words, and nothing was credited', /^That is their own code\./.test(await L.failText(page)) && v.cards[0].credits.length === 3 && !v.cards[0].apps.find(a => a.text.startsWith('Ava Example')).credited, await L.failText(page));
+  // credited from somewhere else already: the server's unique answer
+  await page.evaluate(() => window.__DB.referral_credits.push({ id: 'f0000000-0000-4000-8000-000000000009', code: 'AVA42', athlete_id: 'ava_test', intake_id: '00000000-0000-4000-8000-0000000001a2', friend_name: 'Someone Else', percent: 10, earned_on: '2026-11-12', used_on: null, note: null }));
+  await page.locator('.pcard[data-code="AVA42"] .pc-app', { hasText: 'Fixture Applicant Two' }).locator('.btn').click(); await L.settle(page, 600);
+  v = await view();
+  check(r, 'an application already credited elsewhere: "Ava is already credited for that application." and it reads Credited from then on', /Ava is already credited for that application\./.test(await L.failText(page)) && v.cards[0].apps.find(a => /Applicant Two/.test(a.text)).credited, await L.failText(page));
+  // lookOf() allows Space Mono only in the counter of a composer; the code on a card is the one place the page sets numbers that line up in it (design-rules' MONO_OK says so), so those are let through.
+  const looks = (await lookOf(page, '#partnerPanel')).filter(x => !/^face .*\.aff-code/.test(x));
+  check(r, 'the look holds with a card open: five font sizes, three radii, one button height, one primary button in the panel', !looks.length, looks.slice(0, 6));
+  // Make a code
+  await page.locator('#partnerPanel .pc-make .btn', { hasText: 'Make a code' }).click(); await L.settle(page, 200);
+  v = await view();
+  check(r, 'Make a code opens a picker of the coached, active athletes with no code (Eli, Gia, Hal, Ivy, Jon): not Ava or Ben (they have one), Cara (free), Dan (Proof only), Kim (former) or the demo', JSON.stringify(v.pick) === JSON.stringify(['Choose an athlete…', 'Eli Example', 'Gia Example', 'Hal Example', 'Ivy Example', 'Jon Example']) && JSON.stringify(v.make) === JSON.stringify(['Make the code', 'Cancel']), v.pick);
+  const k0 = await L.nCalls(page);
+  await page.locator('#partnerPanel .pc-make .btn', { hasText: 'Make the code' }).click(); await L.settle(page, 200);
+  check(r, 'with nobody picked it says so and sends nothing', /Pick an athlete first/.test(await L.toastText(page)) && !(await L.callsSince(page, k0)).some(c => c.name === 'coach_partner_code_make'), '');
+  await page.locator('#partnerPick').selectOption('gia_court');
+  await page.locator('#partnerPanel .pc-make .btn', { hasText: 'Make the code' }).click(); await L.settle(page, 800);
+  const mk = (await L.callsSince(page, k0)).filter(c => c.name === 'coach_partner_code_make');
+  v = await view();
+  check(r, 'Make the code calls coach_partner_code_make with the athlete only; the new code is in the group (open) and the toast names it', mk.length === 1 && JSON.stringify(mk[0].payload) === JSON.stringify({ p_athlete: 'gia_court' }) && v.cards.length === 3 && /^GIA\d\d$/.test(v.cards.find(c => /Gia/.test(c.summary)).code) && v.cards.find(c => /Gia/.test(c.summary)).open && /^GIA\d\d is live for Gia\. The friend gets 10% off\./.test(await L.toastText(page)) && v.make.join() === 'Make a code', { toast: await L.toastText(page), cards: v.cards.map(c => c.summary) });
+  check(r, 'and it is not in Live codes (the coach\'s list), though the affiliates table now holds it as kind "athlete"', JSON.stringify(v.live) === JSON.stringify(['FIXTURE10']) && (await L.db(page)).affiliates.some(a => a.kind === 'athlete' && a.athlete_id === 'gia_court'), v.live);
+  // the server's refusals for Make a code, in plain words (the page's lists are behind the server in each case)
+  const tryMake = async id => {
+    const b0 = await L.nCalls(page);
+    if (!(await page.locator('#partnerPick').count())) { await page.locator('#partnerPanel .pc-make .btn', { hasText: 'Make a code' }).click(); await L.settle(page, 150); }
+    await page.locator('#partnerPick').selectOption(id);
+    await page.locator('#partnerPanel .pc-make .btn', { hasText: 'Make the code' }).click(); await L.settle(page, 800);
+    return { fail: await L.failText(page), calls: (await L.callsSince(page, b0)).map(c => c.name) };
+  };
+  await page.evaluate(() => window.__DB.affiliates.push({ code: 'ELI77', percent: 10, reward_percent: 10, kind: 'athlete', coach_name: 'Eli Example', athlete_id: 'eli_new', applied_on: '2026-11-12', active: true, retired_on: null, notes: null }));
+  let mkr = await tryMake('eli_new');
+  v = await view();
+  check(r, 'an athlete who got a code since the page read (partner:has_code): "Eli has a code already.", the codes are read again and ELI77 is in the group', /Eli has a code already\./.test(mkr.fail) && mkr.calls.includes('coach_partner_codes') && v.cards.some(c => c.code === 'ELI77'), { fail: mkr.fail, calls: mkr.calls });
+  await page.evaluate(() => { window.__DB.crew_bell.people.push({ athlete_id: 'hal_court', answer: null, under13: true, answered_at: null, kinds_off: [] }); });
+  mkr = await tryMake('hal_court');
+  check(r, 'ticked under 13 since the Bell was read (partner:under13): "Hal is ticked under 13, so they get no code." and the Bell is read again', /Hal is ticked under 13, so they get no code\./.test(mkr.fail) && mkr.calls.includes('coach_crew'), mkr);
+  await page.evaluate(() => { window.__DB.programs = window.__DB.programs.filter(p => p.athlete_id !== 'ivy_court'); });
+  mkr = await tryMake('ivy_court');
+  check(r, 'no programme on the server (partner:no_programme): "Ivy has no programme on the server yet, so they get no code."', /Ivy has no programme on the server yet, so they get no code\./.test(mkr.fail), mkr);
+  await page.locator('#partnerPanel .pc-make .btn', { hasText: 'Cancel' }).click(); await L.settle(page, 150);
+  // Retire
+  await page.locator('.pcard[data-code="BEN43"] summary').click(); await L.settle(page, 150);
+  await page.locator('.pcard[data-code="BEN43"] .aff-retire').click(); await L.settle(page, 800);
+  v = await view();
+  const ben = v.cards.find(c => c.code === 'BEN43');
+  check(r, 'Retire code works on an athlete\'s code: the card reads retired, offers Reactivate, and the code row is inactive', ben && /retired$/.test(ben.summary) && JSON.stringify(ben.acts) === JSON.stringify(['Reactivate']) && (await L.db(page)).affiliates.find(a => a.code === 'BEN43').active === false, ben);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // the application that typed her code (Leads → Applications)
+  const ap = await L.openCoach(b, Object.assign({}, T, { hash: 'leads' }));
+  await ap.page.waitForSelector('#inView .in-detail .in-partner', { timeout: 5000 }).catch(() => {});
+  const line = () => ap.page.evaluate(() => { const e = document.querySelector('#inView .in-detail .in-partner'); return e ? { text: e.innerText.replace(/\s+/g, ' ').trim(), btn: (e.querySelector('.btn') || {}).textContent || '' } : null; });
+  let ln = await line();
+  check(r, 'Applicant One (the newest) typed AVA42: the application says whose code it is and offers Credit Ava 10%', ln && ln.text === 'Typed AVA42, Ava Example\'s partner code. Credit Ava 10%' && ln.btn === 'Credit Ava 10%', ln);
+  const q0 = await L.nCalls(ap.page);
+  await ap.page.locator('#inView .in-partner .btn').click(); await L.settle(ap.page, 600);
+  ln = await line();
+  check(r, 'pressing it credits Ava once and the line turns to "Credited Ava 10%" on the same application', (await L.callsSince(ap.page, q0)).filter(c => c.name === 'coach_partner_credit_add').length === 1 && ln && ln.text === 'Typed AVA42, Ava Example\'s partner code. Credited Ava 10%' && !ln.btn && /In-detail|Fixture Applicant One/i.test(await ap.page.locator('#inView .in-title').innerText()), ln);
+  await ap.page.locator('#inView .in-row', { hasText: 'Fixture Applicant Three' }).click(); await L.settle(ap.page, 300);
+  ln = await line();
+  check(r, 'Applicant Three was credited before: it reads Credited, with no button', ln && /Credited Ava 10%$/.test(ln.text) && !ln.btn, ln);
+  await ap.page.locator('#inView .in-row', { hasText: 'Fixture Applicant Two' }).click(); await L.settle(ap.page, 300);
+  check(r, 'Applicant Two typed " ava 42 " (lower case, a space): the same code, so the same line', /^Typed AVA42/.test((await line() || {}).text || ''), await line());
+  // a credit the server sends with its intake_id marks THAT application, whatever the friend's name on the credit
+  await ap.page.evaluate(() => { window.__DB.referral_credits.push({ id: 'f0000000-0000-4000-8000-000000000008', code: 'AVA42', athlete_id: 'ava_test', intake_id: '00000000-0000-4000-8000-0000000001a2', friend_name: 'A Different Name', percent: 10, earned_on: '2026-11-12', used_on: null, note: null }); return window.loadPartner().then(window.paintPartner); });
+  await L.settle(ap.page, 400);
+  ln = await line();
+  check(r, 'Applicant Two is marked Credited from the credit\'s intake_id alone (the credit carries another name)', ln && /Credited Ava 10%$/.test(ln.text) && !ln.btn, ln);
+  check(r, 'no page errors on Applications', !ap.log.errors.length, ap.log.errors);
+  await ap.page.context().close();
+
+  // a server without stage97: Live codes exactly as before, no group, no banner
+  const old = await L.openCoach(b, Object.assign({}, T, { seed: { lounge: true, court: true } }));
+  await L.settle(old.page, 500);
+  check(r, 'without stage97 the codes view has no partner group, lists its coach code, and there is no banner or failure line', !(await old.page.locator('#partnerPanel').count()) && (await old.page.locator('#affView .intake-card .aff-code').allInnerTexts()).join() === 'FIXTURE10' && !(await old.page.locator('#loadwarn:not([hidden])').count()) && !(await L.failText(old.page)), '');
+  await L.go(old.page, 'leads');
+  check(r, 'and an application has no partner line', !(await old.page.locator('.in-partner').count()), '');
+  check(r, 'no page errors on the old server', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
+
+  // a failed read is named
+  const bad = await L.openCoach(b, Object.assign({}, T, { seed: { lounge: true, partner: true, court: true, stub: { fail: [{ kind: 'rpc', name: 'coach_partner_codes', message: 'fixture: codes down', times: 1 }] } } }));
+  await bad.page.waitForSelector('#partnerPanel', { timeout: 5000 }).catch(() => {});
+  check(r, 'a failed read: the banner names "the athletes\' partner codes", the group says it did not load and offers Try again, which lists them', /the athletes' partner codes: fixture: codes down/.test(await bad.page.locator('#loadwarn').innerText()) && /The athletes' codes did not load: fixture: codes down/.test(await bad.page.locator('#partnerPanel').innerText())
+    && await (async () => { await bad.page.locator('#partnerPanel .btn', { hasText: 'Try again' }).click(); await L.settle(bad.page, 500); return (await bad.page.locator('#partnerPanel .pcard').count()) === 2 && !(await bad.page.locator('#loadwarn:not([hidden])').count()); })(), await bad.page.locator('#partnerPanel').innerText());
+  await bad.page.context().close();
   return r;
 };
 

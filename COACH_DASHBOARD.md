@@ -38,3 +38,25 @@ like an empty list or a success.
 ---
 
 *9 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`COACH_DASHBOARD.md` → *Section*" is the row with that name.*
+
+---
+
+## Players' Lounge (2026-10-24)
+
+Built on the branch `lounge-coach`, **not live**: the server side is stage96 (faces, cheers, `athlete_profile`) and stage97 (the athletes' partner codes), and none of it is applied yet. The contract the page was built to is `C:\Users\Amir\AA-Lounge\CONTRACT.md`. One rule runs through all seven: **when the server has no such function or table, the page draws nothing and says nothing** (older server); any other failed read is named in the banner under the tabs ("the crew's photos", "the crew's cheers", "the athletes' partner codes"). Nothing here pays XP (GAME-6). `BACKUP_TABLES` is **not** changed on the branch: `athlete_profile` and `referral_credits` join it on go-live day, together with the snapshot and `coach_erase_person()` (the backup check compares the two).
+
+| | Where | What | Server |
+|---|---|---|---|
+| K1 | Today, Also waiting | **Trains, not in the crew: N**: a coached, active athlete who finished a session in the last 28 days and never answered the crew question. Someone who answered no is left alone (their choice stands, and the app already shows them the way back), and so is anyone ticked under 13. Each name has the drafted line, WhatsApp and Copy. Not a reason: `reasonsOf()`, the people count and the badges do not move. Nothing while the Bell is missing or failed. | reads `coach_crew()` answers and the sessions already held |
+| K2 | roster, file header, Needs you, Courtside, Who said yes | The athlete's **face** in the circle (28 px, 44 px in the file's header), initials as the fallback. Read once per load, kept in memory. **Remove photo** in Who said yes, two taps. | `coach_crew_faces()`, `coach_crew_face_clear(p_athlete)` |
+| K3 | Courtside | **Cheer** on each moment: a small sheet, an optional word (100 letters), then the row says "Cheered today". "Not in the crew" when the Bell says so. "You already cheered Sara today." for `crew:cheer_today`. The clap is the inline Phosphor hands-clapping icon (the athlete app's), filled in the text colour, never the emoji (yellow on a phone, and yellow is never in this app). | `coach_cheer(p_athlete, p_word)` |
+| K4 | Proof, under Who said yes | **Cheers with words, last 7 days**, newest first, the words as text, **Clear the word** in two taps (the cheer and the count stay). | `coach_crew_cheers()`, `coach_cheer_word_clear(p_id)` |
+| K5 | the athlete's file, under the name | One line from their `athlete_profile` row, only what is set: "Padel, Tennis · right-handed · two-handed backhand · left side · at Aspire Padel · trains for strength · working on: ... · @handle". Nothing for an empty row or a missing table. Read once per athlete. | `athlete_profile` (coach SELECT policy) |
+| K6 | Leads, Referral codes | **Athletes' partner codes**, a group of its own (kind `athlete` leaves Live codes): the deal in one line, the code, the athlete, the applications that typed it (`affUses()`, applications and never payments), the credits (each carries its `intake_id`, so an application reads Credited) with a **Used** tick, "10% owed: N", **Make a code** (a picker; `partner:has_code`, `partner:under13` and `partner:no_programme` are said in plain words), Retire. On an application that typed an athlete's code: **Credit Sara 10%**; `partner:self` is "That is their own code." | `coach_partner_codes()`, `coach_partner_code_make(p_athlete)`, `coach_partner_credit_add(p_code, p_intake, p_note)`, `coach_partner_credit_used(p_id, p_used)` |
+| K7 | `form-fa.html` | `?code=` fills the discount box and runs the same check, as `form.html` does. | `check_discount()` (unchanged) |
+
+**Farsi draft, Amir to read.** The line for a Farsi athlete (the programme's `athlete.lang` is `fa`, SCHEMA.md) is, with the first name in place of the dots:
+`سلام ... . Crew توی اپت راه افتاده. بقیه اونجا همدیگه رو تشویق می‌کنن. یه سر به تب Crew بزن. خودت انتخاب می‌کنی چی رو ببینن.`
+The English line is Amir's: "Hi Sara. The crew is live in your app. The others cheer each other on there. Have a look in the Crew tab. You choose what they see." Both live in coach.html as `NUDGE_EN` and `NUDGE_FA` (the Farsi one marked as a draft); change the words there.
+
+**Tests.** `scripts/headless/coach/run.js`: `lounge-form-fa-code`, `lounge-game-line`, `lounge-faces`, `lounge-nudge`, `lounge-cheer`, `lounge-cheers-words`, `lounge-partner-codes`. The stub answers the new functions only when the seed says so (`buildSeed({lounge: true})` for stage96, `{partner: true}` for stage97), in the CONTRACT's shapes, with made-up people; without them every one answers "Could not find the function", which is how every other scenario still runs against an older server.

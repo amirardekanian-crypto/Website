@@ -667,6 +667,38 @@
   .bell-p .off { font-size: 12px; color: var(--muted); }
   .bell-u13 { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
 
+  /* ── The Players' Lounge (stage96 + stage97, 2026-10-24): faces, cheers, the athletes' partner codes. No new size, radius or colour: the same five sizes, three
+     radii and one button height. A face fills its circle; initials stay for anyone without one. ── */
+  .pface { flex: none; width: 28px; height: 28px; border-radius: 999px; background: var(--court); color: #fff; display: inline-flex; align-items: center; justify-content: center;
+           font-size: 12px; font-weight: 600; line-height: 1; overflow: hidden; }
+  .ava.has-face, .det-ava.has-face, .pface.has-face { background: var(--line); overflow: hidden; }
+  .ava img, .det-ava img, .pface img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .need .needgo .pface { margin: -4px 0; }                         /* centred on the row's first line, so the row grows no taller */
+  .pc-h { margin-top: 12px; font-size: 12px; color: var(--muted); }
+  .pc-credit, .pc-app { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 4px 0; font-size: 14px; min-width: 0; overflow-wrap: anywhere; }
+  .pc-used { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .pc-make { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
+  .pc-make .goal-in { flex: 0 1 260px; }
+  .intake-card .i-name a { color: inherit; text-decoration: none; }
+  .intake-card .i-name a:hover { text-decoration: underline; }
+  .in-partner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0; font-size: 14px; }
+  .cheer-w { padding: 8px 0; border-top: 1px solid var(--rule); }
+  .cw-top { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; }
+  .cw-top .nm, .cw-top .nm a { font-weight: 600; color: var(--ink); text-decoration: none; }
+  .cw-top .nm a:hover { color: var(--court); text-decoration: underline; }
+  .cw-top .when { font-size: 12px; color: var(--muted); }
+  .cw-top .btn { margin-left: auto; }
+  .cw-txt { margin-top: 2px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+  .court .cheer-sheet { padding-left: 16px; }
+  .cheer-ico { width: 16px; height: 16px; vertical-align: -3px; fill: currentColor; stroke: none; }
+  .court .cheer-state { padding: 0 4px; }
+  .need.nudge { padding: 8px 0 8px 20px; }                        /* the people under "Trains, not in the crew", set in under their head row */
+  .need.nudge a.n { color: var(--ink); text-decoration: none; }
+  .need.nudge a.n:hover { text-decoration: underline; }
+  .court .cs-l1.withface { align-items: center; }
+  .court .cs-l1.withface .dot { transform: none; }
+  .bell-p .pface { align-self: center; }
+
   /* ── The Monthly Open (stage85): the one challenge Amir sets, the results he confirms, the board the crew sees (Proof, under Who said yes). ── */
   .open-title { font-size: 17px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
   .open-how { margin-top: 4px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-line; }
@@ -877,6 +909,9 @@
              display: flex; align-items: center; justify-content: center;
              font-weight: 600; font-size: 17px; }
   /* The cycle and what needs the coach sit under the name on every sub-tab; the actions sit on the right (below the name on a phone). */
+  .det-game { margin-top: 4px; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }   /* their game (stage96): one line, nothing at all when there is none */
+  .det-game:empty { display: none; }
+  .det-game a { color: inherit; text-underline-offset: 3px; }
   .det-cycle { margin-top: 8px; font-size: 14px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
   .det-cycle b { font-weight: 600; }
   .det-cycle .det-fo { color: var(--muted); }
@@ -1752,6 +1787,13 @@ const S = {
   honours: null,   // the month just gone: coach_honours()'s answer (frozen rows, or the live work and the Pick's shortlist)
   goals: {},       // athlete_id -> { 'YYYY-MM-01': career_goals row }
   amirNotes: {},   // athlete_id -> career_notes rows ("From Amir", one a day)
+  game: {},        // The Players' Lounge (stage96): athlete_id -> their athlete_profile row, or null when they have none (loadGame()); gameOff is true while the server has no such table
+  gameOff: false,
+  faces: {},       // athlete_id -> { fv, src }: the crew faces, read once per load by loadFaces(); empty while the server has no coach_crew_faces()
+  cheers: null,    // { on, rows, err }: coach_crew_cheers(), the last 7 days; on is false while the server has none (loadCheers())
+  cheerDone: {},   // athlete_id -> the server's UTC day Amir cheered them from this page (the list above can lag a write)
+  partner: null,   // { on, rows, err }: coach_partner_codes() (stage97); on is false while the server has none (loadPartner())
+  partnerDone: {}, // intake id -> the athlete code this page credited it to (the server's list does not say which application a credit came from)
   // Bumped by every assemble(). The athlete file caches its own context so that
   // switching sub-tabs costs nothing; this is what tells it the cache is stale
   // after a refetch, instead of it quietly showing pre-write data for ever.
@@ -1858,6 +1900,7 @@ const LOAD_ERR_LABEL = {
   assess: 'testing-app logins', course: 'course logins', buyerNotes: 'your notes about buyers', spine: 'the exercise library (Spine)',
   affiliates: 'affiliate codes', chats: 'website chats', status: 'paused and former marks', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
   court: 'Courtside, the goals and your lines', bell: 'the Bell (the crew\'s posts and answers)', bellReplies: 'the replies under the crew\'s posts', open: 'the Monthly Open',
+  faces: 'the crew\'s photos', cheers: 'the crew\'s cheers', partner: 'the athletes\' partner codes',
 };
 function paintLoadWarn() {
   const lw = $('loadwarn'), warn = loadWarnHtml();
@@ -3001,12 +3044,14 @@ async function hardRefresh() {
   loadLevels._done = false; resetBoard(); S.assess = null; S.course = null; S.spine = null;
   LOAD_ERR.assess = LOAD_ERR.course = LOAD_ERR.spine = '';
   S.callLogs = {};   // cached per athlete for the page's life: a failed read stuck as "No call logs yet"
+  S.game = {}; S.gameOff = false;   // their game lines (stage96) are read again when a file is opened
   try { await loadAll(); } catch (e) { $('content').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; return; }
   render();
   loadLevels().then(() => { if (S.ready) paintLevels(); });   // ↻ used to drop the levels and never fetch them again; they are filled in place (ROSTER-15)
   loadCourt();
   loadBell();
   loadOpen();
+  loadLounge();
 }
 let _lastViewKey = '', _scrollMem = {}, _viaHistory = false, _pendingScroll = null;
 // Back keeps your place (audit BROWSER-4, 2026-10-11). A new screen starts at the top, but going Back to one you left lands where you were on it:
@@ -3399,7 +3444,7 @@ function courtGroups() {
   const rank = x => COURT_SIZE[x.size] || 0;
   return Object.values(by).map(list => {
     list.sort((a, b) => rank(b) - rank(a) || String(b.at).localeCompare(String(a.at)) || String(a.award_id).localeCompare(String(b.award_id)));
-    return { id: list[0].athlete_id, lead: list[0], rows: list, ids: list.map(x => x.award_id), at: list.reduce((m, x) => (String(x.at) > m ? String(x.at) : m), ''),
+    return { key: list[0].athlete_id + '|' + dkey(new Date(list[0].at)), id: list[0].athlete_id, lead: list[0], rows: list, ids: list.map(x => x.award_id), at: list.reduce((m, x) => (String(x.at) > m ? String(x.at) : m), ''),
              seen: list.every(x => x.saw_at), sent: list.some(x => x.sent_at) };
   }).sort((a, b) => rank(b.lead) - rank(a.lead) || b.at.localeCompare(a.at));
 }
@@ -3439,10 +3484,11 @@ function courtRowHtml(g) {
   const msg = courtLine(g.lead), ids = jsq(g.ids.join(',')), also = g.rows.slice(1).map(courtWords);
   const act = what => `courtAct(${jsq(g.id)}, ${ids}, '${what}')`;
   return `<div class="cs">
-      <div class="cs-l1"><span class="dot"></span><span class="m"><a class="cs-name" href="#a/${encodeURIComponent(g.id)}">${esc(nameOf(g.id))}</a> ${esc(courtWords(g.lead))}</span><span class="cs-when">${esc(DOWS[new Date(g.at).getDay()])}</span></div>
+      <div class="cs-l1 withface"><span class="dot"></span>${avaHtml('pface', g.id, nameOf(g.id))}<span class="m"><a class="cs-name" href="#a/${encodeURIComponent(g.id)}">${esc(nameOf(g.id))}</a> ${esc(courtWords(g.lead))}</span><span class="cs-when">${esc(DOWS[new Date(g.at).getDay()])}</span></div>
       ${also.length ? `<div class="cs-sub">and ${esc(also.join(', '))}</div>` : ''}
       <div class="cs-msg" dir="auto">“${esc(msg)}”</div>
-      <div class="cs-acts">${courtSendHtml(g.id, msg, act)}<button class="btn sm" onclick="${act('saw')}">Saw it</button></div>
+      <div class="cs-acts">${courtSendHtml(g.id, msg, act)}<button class="btn sm" onclick="${act('saw')}">Saw it</button>${cheerCtlHtml(g)}</div>
+      ${cheerSheetHtml(g)}
     </div>`;
 }
 function courtSeenHtml(g) {
@@ -3658,7 +3704,7 @@ function needPanelHtml() {
       acts = `<button class="btn sm" onclick="${go}">${esc(NEED_ACT[top.key] || 'Open')}</button>`;
     }
     return `<div class="need${note ? ' needrow' : ''}">
-      <button class="needgo" onclick="${go}">${dot}${body}</button>
+      <button class="needgo" onclick="${go}">${dot}${avaHtml('pface', a.id, a.name)}${body}</button>
       <span class="nacts">${acts}</span>
     </div>`;
   };
@@ -3688,6 +3734,7 @@ function needPanelHtml() {
   if (stale) also.push(housekeeping('grey', `${stale} older note${stale === 1 ? '' : 's'}`,
     `Never marked read, arrived more than ${NEEDS_WINDOW_DAYS} days ago — history, not today's work`,
     `<button class="btn sm" onclick="clearNoteBacklog()">Clear</button>`));
+  nudgeRows(housekeeping).forEach(x => also.push(x));   // "Trains, not in the crew": the Players' Lounge (K1)
   return `
     <div class="phead"><span class="t hd">Needs you</span><span class="r">${people.length ? people.length + (people.length === 1 ? ' person' : ' people') : ''}</span></div>
     ${shown.map(row).join('') || '<p class="empty">Nobody is waiting on you. Clean bench. ✓</p>'}
@@ -4266,7 +4313,7 @@ function renderRoster() {
       .forEach(r => why.push(`<span${r.tone === 'warn' ? ' class="warn"' : ''}>${esc(r.text)}</span>`));
     if (acwrPill) why.push(`<span class="spike">load ${round1(m.acwr.ratio)} · ${esc(az.label.toLowerCase())}</span>`);
     return `<button class="ath${a.toReply ? ' flag' : ''}${a.tier === 'free' ? ' freeath' : ''}" onclick="location.hash=${jsq('a/' + encodeURIComponent(a.id))}">
-      <span class="ava">${esc(initials(a.name))}</span>
+      ${avaHtml('ava', a.id, a.name)}
       <span class="a-id"><span class="nm">${esc(a.name)}</span><span class="tier">${tierText(a)}</span>${statusChip(a)}</span>
       <span class="a-cycle">${rosterCycleHtml(a)}</span>
       <span class="a-last${a.finished && a.lastSession || a.tier === 'coached' ? '' : ' dash'}">${last}</span>
@@ -5761,10 +5808,11 @@ async function renderDetail(athleteId, sub) {
   $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a>
     <div class="dethead">
       <div class="det-id">
-        <span class="det-ava">${esc(initials(a.name))}</span>
+        ${avaHtml('det-ava', athleteId, a.name)}
         <div>
           <h2 class="hd">${esc(a.name)}</h2>
           <div class="sub">${tierChip(a)}${statusChip(a)}${lvSlot('hchip', athleteId)} <span>${esc(sub2.join(' · '))}</span></div>
+          <div class="det-game" id="detGame" data-id="${esc(athleteId)}">${gameLine(S.game[athleteId])}</div>
           ${cycleLineHtml(_D)}
           ${needsLineHtml(a)}
           ${goalLineHtml(a)}
@@ -5778,6 +5826,7 @@ async function renderDetail(athleteId, sub) {
       }).join('')}</div>
     <div id="tabbody"></div>`;
   renderDetailBody(keep);
+  loadGame(athleteId);     // their game line (stage96): drawn from the copy held, else read once and filled in place
   const st = document.querySelector('.subrail .stab.active');
   if (st && st.scrollIntoView) st.scrollIntoView({ inline: 'center', block: 'nearest' });
   if (_pendingFocus && _pendingFocus.id === athleteId) {
@@ -6682,6 +6731,7 @@ async function renderProof() {
   const scope = _boardScope;
   if (S.bell && S.bell.on && S.bell.at && Date.now() - S.bell.at.getTime() > 60000) loadBell();   // a post can be minutes old: read the Bell again, behind the paint
   if (S.open && S.open.on && S.open.at && Date.now() - S.open.at.getTime() > 60000) loadOpen();   // and so can a result (another tab, the SQL editor): read the Open again
+  if (S.cheers && S.cheers.on && S.cheers.at && Date.now() - S.cheers.at.getTime() > 60000) loadCheers().then(paintCheers);   // and a cheer's word (the Lounge, K4)
   const held = DEMO ? (S.board[scope] || []) : S.board[scope];
   drawProof(held || undefined);                           // undefined = still to be read
   if (held) return;
@@ -6699,6 +6749,7 @@ function drawProof(rows) {
       <div class="colstack">
         <section class="panel" id="wallPanel">${wallPanelHtml()}</section>
         ${bellPanelsHtml()}
+        ${cheersPanelHtml()}
         ${openPanelHtml()}
         <section class="panel" id="boardPanel">${boardPanelHtml(rows)}</section>
       </div>
@@ -6817,6 +6868,7 @@ async function loadBell() {
 // Draw what changed where it stands: the feed and the answers in place (the composer is never replaced, so typing keeps its focus), or the whole
 // Proof screen when the panels have just appeared or gone.
 function paintBell() {
+  if (S.ready && route().view === 'today') { paintNeed(); paintCourt(); }   // Today's "Trains, not in the crew" and Courtside's Cheer read the Bell's answers
   if (!S.ready || route().view !== 'proof') return;
   const on = !!(S.bell && S.bell.on), el = $('bellPanel');
   if (!el || !on) { if (!!el !== on) render(); return; }
@@ -7042,11 +7094,13 @@ function bellPeopleHtml() {
   const rowHtml = ({ a, p }) => {
     const k = rank({ p }), off = p && Array.isArray(p.kinds_off) ? p.kinds_off.map(x => BELL_KINDS[x] || x) : [];
     return `<div class="bell-p" data-id="${esc(a.id)}">
+        ${avaHtml('pface', a.id, a.name)}
         <a class="nm" href="#a/${encodeURIComponent(a.id)}">${esc(a.name)}</a>
         <span class="chip${k === 0 ? ' court' : ''}">${k === 0 ? 'Yes' : k === 2 ? 'No' : 'Not asked yet'}</span>
         ${off.length ? `<span class="off">${esc(off.join(', '))} off</span>` : ''}
+        ${S.faces[a.id] ? `<button class="btn sm danger" onclick="faceRemove(${jsq(a.id)})">Remove photo</button>` : ''}
         <label class="bell-u13"><input type="checkbox" ${p && p.under13 ? 'checked' : ''} aria-label="${esc(a.name)} is under 13" onchange="bellUnder13(${jsq(a.id)}, this.checked, this)"> Under 13</label>
-      </div>${dangerSlot('bell:u13:' + a.id)}`;
+      </div>${dangerSlot('bell:u13:' + a.id)}${dangerSlot('face:' + a.id)}`;
   };
   return `${head(rows.length ? `${n(0)} yes · ${n(2)} no · ${n(1)} not asked yet` : '')}
     <p class="psub" data-hint="bell-who">Under 13s read the Bell but never post or ring (GAME-9). Tick anyone under 13.</p>
@@ -7070,6 +7124,448 @@ async function bellSetUnder13(id, on) {
 window.loadBell = loadBell; window.bellPost = bellPost; window.bellPick = bellPick; window.bellDropPhoto = bellDropPhoto;
 window.bellShowPhoto = bellShowPhoto; window.bellHidePhoto = bellHidePhoto; window.bellRemove = bellRemove; window.bellUnder13 = bellUnder13;
 window.bellReplyRemove = bellReplyRemove;
+
+// ── The Players' Lounge (stage96 + stage97; Amir 2026-10-24: "build all of this first, then we go live") ─────────────────────────────────────────
+// What the crew got that the coach sees and runs from here: their game (one line in the athlete's file, K5), their faces (the circle that was only
+// initials, K2), the cheers (Amir cheers a moment, and moderates the words, K3 and K4), who trains and has not joined (K1), and the athletes' partner
+// codes (K6). Every call is a stage96 or stage97 function or table; the server has none of them until go-live, so each read treats "not there" as
+// "off" and the page draws nothing and says nothing, as Courtside and the Bell do. Any other failed read is named by the banner (LOAD_ERR). Nothing here
+// pays XP (GAME-6). Not in BACKUP_TABLES on purpose: that edit and the snapshot wait for go-live day (the check compares them with each other).
+const loungeMissing = res => !!res && !!res.error && (res.status === 404 || courtMissing(res.error));
+const loungeRpc = (name, params) => Promise.resolve(sb.rpc(name, params)).then(r => r, e => ({ data: null, error: { message: (e && e.message) || 'no answer' } }));
+
+// K5. Their game: one line under the name in the athlete's file, from their athlete_profile row (the coach reads the table: policy "coach reads athlete
+// profile"). Only what is set. Nothing when the row is empty or missing, or while the table does not exist yet.
+const GAME_SPORT = { tennis: 'Tennis', padel: 'Padel', squash: 'Squash', badminton: 'Badminton', pickleball: 'Pickleball', table_tennis: 'Table tennis', beach_tennis: 'Beach tennis' };
+const GAME_PLAYS = { fun: 'plays for fun', club: 'club player', competition: 'competes' };
+function gameLine(g) {
+  if (!g) return '';
+  const bits = [], list = v => (Array.isArray(v) ? v : []);
+  const sp = list(g.sports).map(s => GAME_SPORT[s] || unslug(s));
+  if (sp.length) bits.push(esc(sp.join(', ')));
+  if (g.hand === 'right' || g.hand === 'left') bits.push(g.hand + '-handed');
+  if (g.backhand === 'one' || g.backhand === 'two') bits.push(g.backhand + '-handed backhand');
+  if (g.side === 'right' || g.side === 'left') bits.push(g.side + ' side'); else if (g.side === 'both') bits.push('plays both sides');
+  if (GAME_PLAYS[g.plays_at]) bits.push(GAME_PLAYS[g.plays_at]);
+  if (g.club) bits.push(esc('at ' + g.club));
+  const tf = list(g.training_for).map(unslug);
+  if (tf.length) bits.push('trains for ' + esc(tf.length < 3 ? tf.join(' and ') : tf.slice(0, -1).join(', ') + ' and ' + tf[tf.length - 1]));
+  if (g.working_on) bits.push(esc('working on: ' + g.working_on));
+  if (g.ig) bits.push(`<a href="${esc(affIg(g.ig))}" target="_blank" rel="noopener">@${esc(String(g.ig).replace(/^@/, ''))}</a>`);
+  return bits.join(' · ');
+}
+// Read once per athlete and kept for the page's life (↻ Refresh reads again). A missing table is quiet; any other failure is said on the line itself.
+async function loadGame(id) {
+  if (DEMO || S.gameOff || !sb || Object.prototype.hasOwnProperty.call(S.game, id)) return;
+  const res = await sb.from('athlete_profile').select('*').eq('athlete_id', id).maybeSingle();
+  if (res.error) {
+    if (loungeMissing(res)) { S.gameOff = true; return; }
+    paintGame(id, `<span class="muted">Their game profile did not load: ${esc(res.error.message || 'no answer')}</span>`);
+    return;
+  }
+  S.game[id] = res.data || null;
+  paintGame(id);
+}
+function paintGame(id, html) {
+  const el = $('detGame');
+  if (el && el.dataset.id === id) el.innerHTML = html != null ? html : gameLine(S.game[id]);
+}
+
+// K2. Faces. coach_crew_faces() once per load answers every face the crew holds ({athlete_id, fv, b64}, members only: leaving takes the face away). They are
+// kept in memory (S.faces) and drawn as a circle wherever the dashboard draws an athlete: the roster, the file's header, Needs you, Courtside, Who said
+// yes. Initials stay for anyone without one. An older server has no such function: no faces, no warning. Any other failure is named by the banner
+// (LOAD_ERR.faces) and the faces already held stay. The circles carry data-face, so paintFaces() can fill them in place when the faces arrive after
+// the first paint (they are read behind it, like Courtside and the Bell).
+const FACE_B64 = /^[A-Za-z0-9+\/=]+$/;
+async function loadFaces() {
+  const res = await loungeRpc('coach_crew_faces');
+  if (loungeMissing(res)) { S.faces = {}; LOAD_ERR.faces = ''; return; }
+  if (res.error) { LOAD_ERR.faces = res.error.message || 'no answer'; return; }
+  const f = {};
+  (Array.isArray(res.data) ? res.data : []).forEach(x => {
+    const b64 = x && typeof x.b64 === 'string' ? x.b64.replace(/\s/g, '') : '';
+    if (x && x.athlete_id && b64 && FACE_B64.test(b64)) f[x.athlete_id] = { fv: x.fv == null ? null : Number(x.fv), src: 'data:image/jpeg;base64,' + b64 };
+  });
+  S.faces = f; LOAD_ERR.faces = '';
+}
+// The inside of a circle: the face, else the initials (initials() is the dashboard's: first letter of the first and the last word).
+const avaInner = (id, name) => { const f = S.faces[id]; return f ? `<img src="${esc(f.src)}" alt="">` : esc(initials(name)); };
+// A circle for an athlete. cls is its look (ava: the roster's, det-ava: the file's, pface: the small one in a row); a face is clipped to the circle.
+const avaHtml = (cls, id, name) => `<span class="${cls}${S.faces[id] ? ' has-face' : ''}" data-face="${esc(id)}" data-nm="${esc(name)}">${avaInner(id, name)}</span>`;
+function paintFaces() {
+  document.querySelectorAll('[data-face]').forEach(el => {
+    const f = S.faces[el.dataset.face], img = el.querySelector('img');
+    if (f ? (img && img.getAttribute('src') === f.src) : !img) return;   // already as it should be
+    el.classList.toggle('has-face', !!f);
+    el.innerHTML = avaInner(el.dataset.face, el.dataset.nm);
+  });
+}
+// Everything the Lounge reads, behind the first paint, once per load (↻ Refresh reads it again). Each read fails alone.
+let _loungeSeq = 0;
+async function loadLounge() {
+  if (DEMO) return;
+  const seq = ++_loungeSeq;
+  await Promise.all([loadFaces(), loadCheers(), loadPartner()]);
+  if (seq === _loungeSeq) paintLounge();
+}
+// Draw what changed where it stands: the faces in place, then the screen that shows the rest.
+function paintLounge() {
+  if (!S.ready) return;
+  paintFaces();
+  const v = route().view;
+  if (v === 'today') paintCourt();
+  else if (v === 'leads') paintPartner();
+  else if (v === 'proof') {
+    if (S.bell && S.bell.on && $('bellPeople')) $('bellPeople').innerHTML = bellPeopleHtml();
+    paintCheers();
+  }
+}
+window.loadLounge = loadLounge;
+
+// K1. "Trains, not in the crew: N" on Today, in Also waiting (it is a thing to do, not a reason: reasonsOf(), the people count and every badge stay as they were).
+// Who: a coached, active athlete who finished a session in the last 28 days and NEVER ANSWERED the crew question. Someone who answered no is left out (Amir,
+// 2026-10-24: their choice stands, and the app already shows them the way back), and so is an athlete ticked under 13 (they cannot join). It reads what the page already holds: the Bell's answers (coach_crew(), S.bell.people) and the sessions (a.lastSession). Each name has the
+// line already written, WhatsApp and Copy. The English line is Amir's; the Farsi one is a DRAFT for him to read (COACH_DASHBOARD.md, Players' Lounge): the
+// athlete's own language is the programme's athlete.lang (SCHEMA.md), the notification language, and English when it is not 'fa'. While the server has
+// no crew (stage81) or the Bell did not load, nothing is said: the page cannot tell who is in.
+const NUDGE_DAYS = 28, NUDGE_CAP = 5;
+let _nudgeAll = false;
+const NUDGE_EN = n => `Hi ${n}. The crew is live in your app. The others cheer each other on there. Have a look in the Crew tab. You choose what they see.`;
+const NUDGE_FA = n => `سلام ${n}. Crew توی اپت راه افتاده. بقیه اونجا همدیگه رو تشویق می‌کنن. یه سر به تب Crew بزن. خودت انتخاب می‌کنی چی رو ببینن.`;   // FARSI DRAFT, Amir to read
+function nudgeLine(a) {
+  const first = firstWord(a.name) || a.name, fa = (((S.programs[a.id] || {}).athlete) || {}).lang === 'fa';
+  return fa ? NUDGE_FA(first) : NUDGE_EN(first);
+}
+function nudgeList() {
+  const b = S.bell;
+  if (!(b && b.on) || b.err) return [];
+  const by = {}; (b.people || []).forEach(p => { by[p.athlete_id] = p; });
+  const from = addDays(todayKey(), -NUDGE_DAYS);
+  return Object.values(S.ath).filter(a => inTotals(a) && a.tier === 'coached' && a.status === 'active' && a.lastSession && a.lastSession >= from
+      && !(by[a.id] && (by[a.id].answer === 'yes' || by[a.id].answer === 'no' || by[a.id].under13)))
+    .sort((x, y) => String(y.lastSession).localeCompare(String(x.lastSession)) || String(x.name).localeCompare(String(y.name)));
+}
+function nudgeRowHtml(a) {
+  return `<div class="need nudge" data-id="${esc(a.id)}">
+      <span class="needgo static">${avaHtml('pface', a.id, a.name)}<span class="b"><span class="l1"><a class="n" href="#a/${encodeURIComponent(a.id)}">${esc(a.name)}</a> <span class="r1">last session ${esc(timeAgo(a.lastSession + 'T12:00:00'))}</span></span></span></span>
+      <span class="nacts">${courtSendHtml(a.id, nudgeLine(a), () => '', 'WhatsApp ↗')}</span>
+    </div>`;
+}
+// The rows for Also waiting: the head row, then the people (five, or all on a tap).
+function nudgeRows(housekeeping) {
+  const list = nudgeList();
+  if (!list.length) return [];
+  const rows = [housekeeping('grey', `Trains, not in the crew: ${list.length}`, `Finished a session in the last ${NUDGE_DAYS} days. The line to send is ready for each.`, '')];
+  (_nudgeAll ? list : list.slice(0, NUDGE_CAP)).forEach(a => rows.push(nudgeRowHtml(a)));
+  if (list.length > NUDGE_CAP) rows.push(`<button class="showweek" onclick="_nudgeAll=!_nudgeAll;paintNeed()">${_nudgeAll ? 'Show fewer' : 'Show all ' + list.length}</button>`);
+  return rows;
+}
+// Draw Needs you again where it stands (the Bell arrives behind the first paint, and a tick under 13 changes who is listed).
+function paintNeed() {
+  if (!S.ready || route().view !== 'today') return;
+  const el = $('needPanel');
+  if (el) el.innerHTML = needPanelHtml();
+}
+window.paintNeed = paintNeed;
+
+// K3. Cheer. Courtside shows moments; each row gets "Cheer" with a clap icon: a small sheet under the row with an optional word (100 letters), then coach_cheer() (stage96:
+// Amir as the giver, shown to the crew as "Coach", one cheer a day per person on the server's UTC day). Afterwards the row says "Cheered today". A cheer
+// pays nothing (GAME-6) and its word is the crew's to read for 7 days, so the sheet says so; Amir clears a word under Proof (K4). The control is there only
+// while the server has coach_crew_cheers() (stage96), and someone the Bell says is not in the crew gets the words "Not in the crew" instead of a button.
+const CHEER_MAX = 100;
+let _cheerFor = null, _cheerWord = '', _cheerBusy = false;   // the Courtside group whose sheet is open, what is typed, a cheer on its way
+const utcDay = () => new Date().toISOString().slice(0, 10);
+const CHEER_ERRS = {   // the server's messages (raise exception 'crew:...') in plain words; f is the first name
+  'crew:cheer_today': f => `You already cheered ${f} today.`,
+  'crew:cheers_today': () => 'That is too many cheers for one day. Try again tomorrow.',
+  'crew:word_long': () => `That word is over ${CHEER_MAX} letters. Shorten it and send again.`,
+  'crew:under13': f => `${f} is ticked under 13, so they cannot be cheered.`,
+  'crew:gone': f => `${f} is not in the crew, so there is nobody to cheer. The Bell is reloading.`,
+  'crew:not_yes': f => `${f} is not in the crew, so there is nobody to cheer. The Bell is reloading.`,
+  'crew:own': () => 'You cannot cheer yourself.',
+};
+async function loadCheers() {
+  const res = await loungeRpc('coach_crew_cheers');
+  if (loungeMissing(res)) { S.cheers = { on: false, rows: [], err: '', at: new Date() }; LOAD_ERR.cheers = ''; return; }
+  if (res.error) { S.cheers = { on: true, rows: (S.cheers && S.cheers.rows) || [], err: res.error.message || 'no answer', at: new Date() }; LOAD_ERR.cheers = S.cheers.err; return; }
+  S.cheers = { on: true, rows: Array.isArray(res.data) ? res.data : [], err: '', at: new Date() }; LOAD_ERR.cheers = '';
+}
+// Cheered today: the list says so (the server's day is UTC), or this page just did it.
+function cheeredToday(id) {
+  const d = utcDay();
+  return S.cheerDone[id] === d || ((S.cheers && S.cheers.rows) || []).some(c => c.from_athlete === COACH_NOTE_ID && c.to_athlete === id && c.day === d);
+}
+// The Bell has been read and does not list this person as a yes (or lists them under 13): they cannot be cheered.
+function cheerNotIn(id) {
+  const b = S.bell;
+  if (!(b && b.on) || b.err) return false;
+  const p = (b.people || []).find(x => x.athlete_id === id);
+  return !(p && p.answer === 'yes' && !p.under13);
+}
+function cheerCtlHtml(g) {
+  if (!(S.cheers && S.cheers.on)) return '';
+  if (cheeredToday(g.id)) return `<span class="muted t-sm cheer-state">${CHEER_ICON} Cheered today</span>`;
+  if (cheerNotIn(g.id)) return '<span class="muted t-sm cheer-state">Not in the crew</span>';
+  return `<button class="btn sm" onclick="cheerOpen(${jsq(g.key)})">${CHEER_ICON} Cheer</button>`;
+}
+// The clap: the Phosphor "hands-clapping" icon (regular), the same one the athlete app uses, filled in the text's own colour with no stroke, like the
+// page's other icons. It replaces the clapping-hands emoji, which is yellow on a phone whatever the page asks of it, and yellow is never in this app.
+const CHEER_ICON = '<svg class="cheer-ico" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M160.22,24V8a8,8,0,0,1,16,0V24a8,8,0,0,1-16,0ZM196.1,41a7.91,7.91,0,0,0,4.17,1.17,8,8,0,0,0,6.84-3.83l8-13.11a8,8,0,0,0-13.68-8.33l-8,13.1A8,8,0,0,0,196.1,41Zm47.51,12.59a8,8,0,0,0-10.08-5.16l-15.06,4.85a8,8,0,0,0,2.46,15.62,8.15,8.15,0,0,0,2.46-.39l15.05-4.85A8,8,0,0,0,243.61,53.55ZM217,97.58a80.22,80.22,0,0,1-10.22,94c-.34,1.73-.72,3.46-1.19,5.18A80.17,80.17,0,0,1,58.77,216L23.5,155a26,26,0,0,1,19.24-38.79l-3-5.2a26,26,0,0,1,19.2-38.78L58.24,71A26,26,0,0,1,95.47,36.53,26.06,26.06,0,0,1,140.3,37l12.26,21.2A26.07,26.07,0,0,1,195.81,61ZM109.07,55l0,0h0l25,43.17a26,26,0,0,1,17.33-10L126.42,45a10,10,0,1,0-17.35,10ZM72.12,63l6.46,11.17a26.05,26.05,0,0,1,17.32-10L89.45,53A10,10,0,1,0,72.12,63Zm111.54,81-20.22-35a10,10,0,0,0-17.74,9.25L158.3,140a8,8,0,0,1-13.87,8l-36.5-63A10,10,0,1,0,90.58,95l26.05,45a8,8,0,0,1-13.87,8L71,93h0l0,0a10,10,0,0,0-17.33,10l35.22,61A8,8,0,0,1,75,172L54.72,137a10,10,0,0,0-17.34,10l35.27,61a64.12,64.12,0,0,0,117.42-15.44A63.52,63.52,0,0,0,183.66,144Zm19.41-38.42L181.93,69A10,10,0,0,0,164.55,79l33,57.05A80.2,80.2,0,0,1,207,161.51,64.23,64.23,0,0,0,203.07,105.58Z"/></svg>';   // Phosphor Icons, MIT
+function cheerSheetHtml(g) {
+  if (!(S.cheers && S.cheers.on) || _cheerFor !== g.key || cheeredToday(g.id)) return '';
+  const first = firstWord(nameOf(g.id)), busy = _cheerBusy ? ' disabled' : '';
+  return `<div class="from-box cheer-sheet" id="cheerSheet">
+      <span class="t-sm muted">A word for ${esc(first)}? Optional. It shows on their page for 7 days. Some characters are removed. <span id="cheerCount">${_cheerWord.length}</span>/${CHEER_MAX}</span>
+      <div class="from-row"><input id="cheerIn" class="goal-in" maxlength="${CHEER_MAX}" dir="auto" value="${esc(_cheerWord)}" placeholder="That sled push looked heavy" aria-label="A word for ${esc(nameOf(g.id))}"
+          oninput="cheerType(this)" onkeydown="if(event.key==='Enter')cheerSend(${jsq(g.key)});if(event.key==='Escape')cheerCancel()">
+        <button class="btn sm primary" onclick="cheerSend(${jsq(g.key)})"${busy}>${_cheerBusy ? 'Sending…' : 'Send the cheer'}</button><button class="btn sm quiet" onclick="cheerCancel()"${busy}>Cancel</button></div>
+    </div>`;
+}
+function cheerOpen(key) { _cheerFor = key; _cheerWord = ''; paintCourt(); focusEnd('cheerIn'); }
+function cheerCancel() { if (_cheerBusy) return; _cheerFor = null; _cheerWord = ''; paintCourt(); }
+function cheerType(inp) { _cheerWord = inp.value; const c = $('cheerCount'); if (c) c.textContent = inp.value.length; }
+async function cheerSend(key) {
+  if (_cheerBusy) return;
+  const g = courtGroups().find(x => x.key === key);
+  if (!g) { _cheerFor = null; paintCourt(); return; }
+  const id = g.id, first = firstWord(nameOf(id)), word = String($('cheerIn') ? $('cheerIn').value : _cheerWord).trim();
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (word.length > CHEER_MAX) { fail(CHEER_ERRS['crew:word_long']()); return; }
+  _cheerBusy = true; _cheerWord = word; paintCourt();
+  const res = await loungeRpc('coach_cheer', { p_athlete: id, p_word: word || null });
+  _cheerBusy = false;
+  if (res.error) {
+    const m = String(res.error.message || ''), k = Object.keys(CHEER_ERRS).find(x => m.indexOf(x) >= 0);
+    // No database code means the answer never arrived: the cheer may have gone, so the list is read again before anyone is told.
+    if (!res.error.code) { fail(`The answer never arrived (${m || 'no reply'}), so the page cannot tell whether the cheer went. The list is reloading: look before you try again.`); await loadCheers(); }
+    else fail(k ? CHEER_ERRS[k](first) : 'Could not send the cheer: ' + m);
+    if (k === 'crew:cheer_today') { S.cheerDone[id] = utcDay(); _cheerFor = null; _cheerWord = ''; }
+    if (k === 'crew:gone' || k === 'crew:not_yes' || k === 'crew:under13') { _cheerFor = null; _cheerWord = ''; loadBell(); }
+    paintCourt();
+    return;
+  }
+  S.cheerDone[id] = utcDay(); _cheerFor = null; _cheerWord = '';
+  toast(`Cheered ${first}`);
+  paintCourt();
+  loadCheers().then(() => { paintCourt(); });
+}
+Object.assign(window, { cheerOpen, cheerCancel, cheerType, cheerSend });
+
+// K4. Cheers with words, last 7 days: the crew's own words go on each other's pages, so Amir reads them here and clears one (coach_cheer_word_clear): the cheer
+// stays and still counts, only the words go. Two taps, like a removed post. Under Who said yes on Proof, there only while the server has coach_crew_cheers().
+// The list is read again when Proof is opened after a minute (a word can arrive any time), and by ↻ Reload.
+function cheersPanelHtml() {
+  return S.cheers && S.cheers.on ? `<section class="panel" id="cheersPanel">${cheersHtml()}</section>` : '';
+}
+function cheersHtml() {
+  const c = S.cheers, rows = (c.rows || []).filter(x => x && String(x.word || '').trim());
+  const head = `<div class="phead"><span class="t hd">Cheers with words</span><span class="r">last 7 days${c.err ? '' : ' · ' + rows.length} <button class="btn sm quiet" onclick="loadCheers().then(paintCheers)">↻ Reload</button></span></div>`;
+  if (c.err) return `${head}<p class="empty">The cheers did not load: ${esc(c.err)}. <button class="btn sm" onclick="loadCheers().then(paintCheers)">↻ Try again</button></p>`;
+  const name = (id, who) => id === COACH_NOTE_ID ? 'You' : esc(who || nameOf(id));
+  const row = x => `<div class="cheer-w" data-id="${esc(x.id)}">
+      <div class="cw-top"><b class="nm">${x.from_athlete === COACH_NOTE_ID ? 'You' : `<a href="#a/${encodeURIComponent(x.from_athlete)}">${esc(x.from_who || nameOf(x.from_athlete))}</a>`}</b> → <b class="nm">${name(x.to_athlete, x.to_who)}</b>
+        <span class="when">${esc(wallDayLabel(x.day))}</span><button class="btn sm danger" onclick="cheerWordClear(${jsq(x.id)})">Clear the word</button></div>
+      <div class="cw-txt" dir="auto">“${esc(x.word)}”</div>
+      ${dangerSlot('cheer:' + x.id)}
+    </div>`;
+  return `${head}${rows.length ? rows.map(row).join('') : '<p class="empty">No cheers with words this week.</p>'}`;
+}
+function paintCheers() {
+  if (!S.ready || route().view !== 'proof') return;
+  const on = !!(S.cheers && S.cheers.on), el = $('cheersPanel');
+  if (!!el !== on) { render(); return; }
+  if (el) el.innerHTML = cheersHtml();
+}
+function cheerWordClear(id) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  dangerAsk('cheer:' + id, { title: 'Clear this word?', goes: 'The word. Nobody sees it any more, on any phone.',
+    stays: 'The cheer itself: who cheered whom, the day, and the count. There is no undo.', button: 'Clear the word', busyText: 'Clearing…', run: () => cheerWordClearNow(id) });
+}
+async function cheerWordClearNow(id) {
+  const res = await loungeRpc('coach_cheer_word_clear', { p_id: Number(id) });
+  if (res.error) {
+    fail(res.error.code ? 'Could not clear the word: ' + res.error.message : `The answer never arrived (${res.error.message || 'no reply'}), so the page cannot tell whether the word went. The list is reloading: look before you try again.`);
+    if (!res.error.code) await loadCheers();
+    paintCheers();
+    return;
+  }
+  const x = ((S.cheers && S.cheers.rows) || []).find(y => String(y.id) === String(id));
+  if (x) x.word = null;
+  toast(res.data && res.data.ok === false ? 'That word was already gone' : 'Word cleared');
+  paintCheers();
+  loadCheers().then(paintCheers);
+}
+Object.assign(window, { cheerWordClear, paintCheers, loadCheers });
+
+// K6. The athletes' partner codes (stage97; Amir 2026-10-24: "the friend gets 10%, the member gets 10%"). An athlete makes a code in the app, or Amir makes one
+// here; the friend types it on the apply form and gets 10% off (check_discount() already answers it), and when that friend becomes a client Amir credits the
+// member: 10% off their next cycle, which he applies when they pay, then ticks Used. They sit under Leads → Referral codes in a group of their own (kind
+// 'athlete' in the affiliates table, which Live codes leaves out), read with coach_partner_codes(): the code, the athlete, the applications that typed it
+// (affUses(), the page's own count: APPLICATIONS, never payments), the credits (friend, earned on, Used) and "10% owed: N" while some are unused. Credit
+// Sara 10% is on the application that typed her code (Leads → Applications) and in the group. The server refuses a credit for the member's own application
+// (partner:self). Not in BACKUP_TABLES until go-live (referral_credits, with the snapshot and coach_erase_person()).
+async function loadPartner() {
+  const res = await loungeRpc('coach_partner_codes');
+  if (loungeMissing(res)) { S.partner = { on: false, rows: [], err: '' }; LOAD_ERR.partner = ''; return; }
+  if (res.error) { S.partner = { on: true, rows: (S.partner && S.partner.rows) || [], err: res.error.message || 'no answer' }; LOAD_ERR.partner = S.partner.err; return; }
+  S.partner = { on: true, rows: Array.isArray(res.data) ? res.data : [], err: '' }; LOAD_ERR.partner = '';
+}
+const PARTNER_ERRS = {   // coach_partner_code_make()'s refusals in plain words; f is the first name
+  'partner:has_code': f => `${f} has a code already.`,
+  'partner:under13': f => `${f} is ticked under 13, so they get no code.`,
+  'partner:no_programme': f => `${f} has no programme on the server yet, so they get no code.`,
+};
+const PARTNER_DEAL = 'The friend gets 10% off. The member gets 10% off their next cycle. You apply it when they pay.';
+let _partnerMake = false, _partnerPick = '';
+const unusedCredits = r => (r.credits || []).filter(c => !c.used_on).length;
+const partnerReward = row => { const a = (S.affiliates || []).find(x => x.code === row.code); return Number(a && a.reward_percent) || 10; };
+const partnerName = row => (S.ath[row.athlete_id] && S.ath[row.athlete_id].name) || row.who || row.athlete_id;   // the dashboard's name for them, else the one the server sends
+// Live or retired: the affiliates row is the fresher word (Retire writes it and reads it back at once), the server's list the fallback.
+const partnerLive = row => { const a = (S.affiliates || []).find(x => x.code === row.code); return a ? !!a.active : !!row.active; };
+// The athlete code an application typed (the typed field, or the first word of what the form approved), live or retired; null when it typed none.
+function partnerCodeOf(i) {
+  if (!(S.partner && S.partner.on)) return null;
+  const p = i.payload || {}, typed = normCode(intakeVal(p['Discount Code'])), applied = normCode(intakeVal(p['Discount Applied']).trim().split(' ')[0]);
+  return (S.partner.rows || []).find(r => r.code === typed || r.code === applied) || null;
+}
+// Already credited for this application: a credit names the application (intake_id, which coach_partner_codes() sends), or this page just did it. A credit
+// that arrives with no intake_id (an older answer) is matched by the friend name instead, which the server fills from the application.
+function partnerCredited(row, i) {
+  const cs = row.credits || [], nm = intakeName(i).trim().toLowerCase();
+  return cs.some(c => c.intake_id != null && String(c.intake_id) === String(i.id)) || S.partnerDone[i.id] === row.code
+    || cs.some(c => c.intake_id == null && c.friend_name && String(c.friend_name).trim().toLowerCase() === nm);
+}
+function partnerCard(row) {
+  const uses = affUses(row.code), owed = unusedCredits(row), name = partnerName(row), first = firstWord(name) || name, pct = partnerReward(row);
+  const pills = `<span class="ipill pct">${pct}% off</span>` +
+    (uses.length ? `<span class="ipill used" title="Applications that typed this code (archived ones left out). Not payments: credit the member only when the friend became a client.">${uses.length} application${uses.length === 1 ? '' : 's'}</span>` : '') +
+    (owed ? `<span class="ipill warn">${pct}% owed: ${owed}</span>` : '') + (partnerLive(row) ? '' : '<span class="ipill">retired</span>');
+  const credits = (row.credits || []).slice().sort((a, b) => String(b.earned_on).localeCompare(String(a.earned_on)));
+  const crHtml = credits.length ? `<div class="pc-h">Credits · ${credits.length}</div>` + credits.map(c => `<div class="pc-credit">
+        <label class="pc-used"><input type="checkbox" ${c.used_on ? 'checked' : ''} onchange="partnerUsed(${jsq(c.id)}, this.checked, this)" aria-label="${esc(c.friend_name || 'This credit')} is used"> Used</label>
+        <b>${esc(c.friend_name || 'A friend')}</b><span class="muted">earned ${esc(dayMonth(c.earned_on))}${c.used_on ? ' · used ' + esc(dayMonth(c.used_on)) : ''}</span></div>`).join('')
+    : '<div class="pc-h">No credits yet.</div>';
+  const appHtml = uses.length ? `<div class="pc-h">Applications that typed it · ${uses.length}</div>` + uses.map(i => `<div class="pc-app">
+        <span>${esc(intakeName(i))} <span class="muted">${esc(String(i.created_at || '').slice(0, 10))}</span></span>
+        ${partnerCredited(row, i) ? `<span class="ipill used">Credited</span>` : `<button class="btn sm" onclick="partnerCredit(${jsq(row.code)}, ${jsq(i.id)})">Credit ${esc(first)} ${pct}%</button>`}</div>`).join('') : '';
+  const acts = partnerLive(row) ? `<button class="btn sm danger aff-retire" data-code="${esc(row.code)}">Retire code</button>` : `<button class="btn sm aff-reactivate" data-code="${esc(row.code)}">Reactivate</button>`;
+  return `<details class="intake-card pcard${partnerLive(row) ? '' : ' archived'}" data-code="${esc(row.code)}"${_partnerOpen.has(row.code) ? ' open' : ''}>
+    <summary><span class="aff-code">${esc(row.code)}</span><span class="i-name"><a href="#a/${encodeURIComponent(row.athlete_id)}">${esc(name)}</a></span>${pills}</summary>
+    <div class="i-body">${crHtml}${appHtml}<div class="i-actions">${acts}</div></div>
+  </details>`;
+}
+const _partnerOpen = new Set();   // the codes whose card is open: kept across a redraw
+// The athletes without a code, who could have one made: coached, active, not ticked under 13 (an athlete the server refuses is refused there too).
+function partnerCandidates() {
+  const have = new Set((S.partner.rows || []).map(r => r.athlete_id)), u13 = new Set(((S.bell && S.bell.people) || []).filter(p => p.under13).map(p => p.athlete_id));
+  return Object.values(S.ath).filter(a => inTotals(a) && a.tier === 'coached' && a.status === 'active' && !have.has(a.id) && !u13.has(a.id)).sort((x, y) => String(x.name).localeCompare(String(y.name)));
+}
+function partnerGroupHtml() {
+  const p = S.partner;
+  if (!(p && p.on)) return '';
+  const rows = (p.rows || []).slice().sort((a, b) => (partnerLive(b) - partnerLive(a)) || (unusedCredits(b) - unusedCredits(a)) || String(partnerName(a)).localeCompare(String(partnerName(b))));
+  const owed = rows.reduce((n, r) => n + unusedCredits(r), 0), cand = partnerCandidates();
+  const make = _partnerMake
+    ? `<div class="pc-make"><select id="partnerPick" class="goal-in" aria-label="Which athlete" onchange="_partnerPick=this.value"><option value="">Choose an athlete…</option>${cand.map(a => `<option value="${esc(a.id)}"${a.id === _partnerPick ? ' selected' : ''}>${esc(a.name)}</option>`).join('')}</select>
+        <button class="btn sm primary" onclick="partnerMake()">Make the code</button><button class="btn sm quiet" onclick="partnerMakeCancel()">Cancel</button></div>`
+    : `<div class="pc-make"><button class="btn sm primary" onclick="partnerMakeOpen()"${cand.length ? '' : ' disabled title="Every coached athlete has a code"'}>Make a code</button></div>`;
+  return `<section class="panel gap-top" id="partnerPanel">
+    <div class="phead"><span class="t hd">Athletes' partner codes</span><span class="r">${rows.length} code${rows.length === 1 ? '' : 's'}${owed ? ` · <span class="t-clay">10% owed: ${owed}</span>` : ''}</span></div>
+    <p class="psub" data-hint="partner-deal">${esc(PARTNER_DEAL)}</p>
+    ${make}
+    ${p.err ? `<p class="empty">The athletes' codes did not load: ${esc(p.err)}. <button class="btn sm" onclick="loadPartner().then(paintPartner)">↻ Try again</button></p>`
+      : rows.map(partnerCard).join('') || '<p class="empty">No athlete has a code yet. An athlete makes theirs in the app, or you make one here.</p>'}
+    ${howFold('how-partner', ['The friend types the member\'s code on the apply form (English or Farsi, or from the member\'s link) and gets 10% off. Those are applications, not payments.',
+      'When that friend becomes a client and pays, press Credit on their application. The member then has 10% off their next cycle: you apply it when they pay, then tick Used.'])}
+  </section>`;
+}
+// What the Leads screen on show draws from the codes: the codes view, or the application on show.
+function paintPartner() {
+  if (!S.ready) return;
+  const r = route();
+  if (r.view === 'leads') { if (r.sub === 'codes') renderAffiliates(); else if (!r.sub && $('inView')) intakeRedraw(); }
+}
+// The line on an application that typed an athlete's code: who it is, and Credit Sara 10% (or that it is done).
+function partnerIntakeHtml(i) {
+  const row = partnerCodeOf(i);
+  if (!row) return '';
+  const name = partnerName(row), first = firstWord(name) || name, pct = partnerReward(row);
+  return `<div class="in-partner"><span>Typed <span class="aff-code">${esc(row.code)}</span>, ${esc(name)}'s partner code.</span>${partnerCredited(row, i)
+    ? `<span class="ipill used">Credited ${esc(first)} ${pct}%</span>` : `<button class="btn sm" onclick="partnerCredit(${jsq(row.code)}, ${jsq(i.id)})">Credit ${esc(first)} ${pct}%</button>`}</div>`;
+}
+async function partnerCredit(code, intakeId) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const row = ((S.partner && S.partner.rows) || []).find(r => r.code === code), first = row ? firstWord(partnerName(row)) : 'Them', pct = row ? partnerReward(row) : 10;
+  const res = await loungeRpc('coach_partner_credit_add', { p_code: code, p_intake: intakeId, p_note: null });
+  if (res.error) {
+    const m = String(res.error.message || '');
+    if (/partner:self/.test(m)) fail('That is their own code.');
+    else if (res.error.code === '23505' || /duplicate key/i.test(m)) { S.partnerDone[intakeId] = code; fail(`${first} is already credited for that application.`); await loadPartner(); }
+    else if (!res.error.code) { fail(`The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${first} was credited. The codes are reloading: look before you try again.`); await loadPartner(); }
+    else fail('Could not credit ' + first + ': ' + m);
+    paintPartner();
+    return;
+  }
+  S.partnerDone[intakeId] = code;
+  toast(`${first} is credited ${pct}%`);
+  await loadPartner();
+  paintPartner();
+}
+async function partnerUsed(id, on, box) {
+  if (DEMO) { toast('Demo mode — nothing saved'); if (box) box.checked = !on; return; }
+  if (box) box.disabled = true;
+  const res = await loungeRpc('coach_partner_credit_used', { p_id: id, p_used: !!on });
+  if (res.error) { fail('Could not save that: ' + res.error.message); paintPartner(); return; }
+  await loadPartner();
+  paintPartner();
+  toast(on ? 'Marked used' : 'Marked not used');
+}
+function partnerMakeOpen() { _partnerMake = true; _partnerPick = ''; paintPartner(); }
+function partnerMakeCancel() { _partnerMake = false; _partnerPick = ''; paintPartner(); }
+async function partnerMake() {
+  const id = $('partnerPick') ? $('partnerPick').value : _partnerPick;
+  if (!id) { toast('Pick an athlete first'); return; }
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const first = firstWord(nameOf(id));
+  const res = await loungeRpc('coach_partner_code_make', { p_athlete: id });
+  if (res.error) {
+    const m = String(res.error.message || ''), k = Object.keys(PARTNER_ERRS).find(x => m.indexOf(x) >= 0);
+    if (!res.error.code) fail(`The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${first}'s code was made. The codes are reloading: look before you try again.`);
+    else fail(k ? PARTNER_ERRS[k](first) : `Could not make a code for ${first}: ${m}`);
+    // No code from the server, or a refusal that says the page's list is behind (they have one already, or the Bell's tick is newer): read again.
+    if (!res.error.code || k === 'partner:has_code') { await loadPartner(); await refetch(['affiliates']); }
+    else if (k === 'partner:under13') loadBell();
+    paintPartner();
+    return;
+  }
+  _partnerMake = false; _partnerPick = '';
+  const code = res.data && res.data.code;
+  if (code) _partnerOpen.add(code);
+  toast(code ? `${code} is live for ${first}. The friend gets 10% off.` : `A code is made for ${first}`);
+  await loadPartner();
+  await refetch(['affiliates']);   // the code is a row of affiliates too (Retire works on it)
+}
+Object.assign(window, { loadPartner, paintPartner, partnerCredit, partnerUsed, partnerMakeOpen, partnerMakeCancel, partnerMake });
+
+// Remove photo: two taps, like every delete on this page (the panel names what goes and what stays). The function is stage96's coach_crew_face_clear.
+function faceRemove(id) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  dangerAsk('face:' + id, { title: `Remove ${nameOf(id)}'s photo?`, goes: 'Their photo in the crew. Their initials show in its place, here and on every phone.',
+    stays: 'Their answer, their posts and their login. They can add a new photo.', button: 'Remove the photo', busyText: 'Removing…', run: () => faceRemoveNow(id) });
+}
+async function faceRemoveNow(id) {
+  const res = await loungeRpc('coach_crew_face_clear', { p_athlete: id });
+  if (res.error) {
+    // No database code means the answer never arrived: the photo may be gone, so the faces are read again before anyone is told.
+    fail(res.error.code ? 'Could not remove the photo: ' + res.error.message : `The answer never arrived (${res.error.message || 'no reply'}), so the page cannot tell whether the photo went. The faces are reloading: look before you try again.`);
+    if (!res.error.code) { await loadFaces(); paintLounge(); }
+    return;
+  }
+  delete S.faces[id];
+  paintLounge();
+  toast(`${firstWord(nameOf(id))}'s photo is removed`);
+}
+window.faceRemove = faceRemove;
 
 // ── The Monthly Open (stage85; Career Mode round 5, the last step of plan A; Amir 2026-10-19: "for crew and the open go with your picks") ──────────────────
 // One challenge at a time, any kind Amir designs (not only the six tennis tests). On the athletes' Crew tab it is a card under the feed, with a board ranked by
@@ -7758,7 +8254,8 @@ async function affSetActive(code, active, btn) {
 // The referral codes view as one piece of HTML (Leads → Referral codes, round 2 of the UX pass, 2026-10-12), as intakeViewHtml() is for the applications:
 // put it anywhere, then wireAffiliates(the element with id affView). Nothing in here reads $('content').
 function affiliatesViewHtml() {
-  const all = (S.affiliates || []).slice().sort((a, b) =>
+  // An athlete's partner code (kind 'athlete', stage97) is not a coach's: it has its own group below (partnerGroupHtml()), so Live codes leaves it out.
+  const all = (S.affiliates || []).filter(a => a.kind !== 'athlete').sort((a, b) =>
     String(b.applied_on || '').localeCompare(String(a.applied_on || '')) || String(a.code).localeCompare(String(b.code)));
   const live = all.filter(a => a.active), retired = all.filter(a => !a.active);
   const orphans = live.filter(a => !a.coach_name && !a.coach_name_fa).length;
@@ -7773,6 +8270,7 @@ function affiliatesViewHtml() {
     : '<p class="empty">No live codes. When you accept a coach from partner-fa.html, add their code here.</p>';
   html += `<p class="psub" data-hint="aff-deal" style="margin:12px 0 0">The coach earns 10% of what the client pays.</p>
     ${howFold('how-aff', ['These are the codes both apply forms accept. Add or retire one and it takes effect straight away — no deploy.', 'The deal: the client gets the code\'s % off; the coach earns 10% of what the client actually pays — first payment and every renewal. Payout details stay in the application email (Gmail, subject:(Affiliate)).'])}</section>`;
+  html += partnerGroupHtml();   // the athletes' partner codes (stage97): nothing while the server has no coach_partner_codes()
   if (retired.length) {
     const openRetired = retired.some(a => a.code === _affEditing) ? ' open' : '';
     html += `<section class="panel gap-top"><details${openRetired}><summary class="arch-toggle">Retired · ${retired.length}</summary><div style="margin-top:12px">${retired.map(affCard).join('')}</div></details></section>`;
@@ -7787,6 +8285,7 @@ function wireAffiliates(root) {
   on('#affAdd', () => { _affEditing = '__new__'; renderAffiliates(); });
   on('.aff-edit', el => { _affEditing = el.dataset.code; renderAffiliates(); });
   on('.aff-cancel', () => { _affEditing = null; renderAffiliates(); });
+  root.querySelectorAll('details.pcard').forEach(d => d.addEventListener('toggle', () => { if (d.open) _partnerOpen.add(d.dataset.code); else _partnerOpen.delete(d.dataset.code); }));   // an athlete's code card stays open across a redraw
   on('.aff-save', el => affSave(el.closest('.aff-form'), el));
   on('.aff-retire', el => affSetActive(el.dataset.code, false, el));
   on('.aff-reactivate', el => affSetActive(el.dataset.code, true, el));
@@ -9389,6 +9888,7 @@ function intakeDetailHtml(i) {
       </div>
     </div>
     <div class="in-contact">${cbits.join('') || '<span class="muted">No contact given</span>'}</div>
+    ${partnerIntakeHtml(i)}
     <h3 class="in-h">Answers</h3>
     ${intakeAnswersHtml(i)}
     ${intakeCloseHtml(i)}`;
@@ -10027,11 +10527,12 @@ async function boot() {
     $('content').innerHTML = `<p class="empty">Could not load the dashboard: ${esc(e.message)}</p>`; return;
   }
   render();
-  // Server-scored levels fill in behind the first paint; so do Courtside (stage75), the Bell (stage81) and the Monthly Open (stage85).
+  // Server-scored levels fill in behind the first paint; so do Courtside (stage75), the Bell (stage81), the Monthly Open (stage85) and the Lounge (stage96 and 97).
   loadLevels().then(() => { if (S.ready) paintLevels(); });
   loadCourt();
   loadBell();
   loadOpen();
+  loadLounge();
 }
 function showGate(err) { failDismissAll(); $('app').style.display = 'none'; $('gate').style.display = 'block'; $('gateErr').textContent = err || ''; }
 // supabase-js fires an auth event on load, on every hourly token refresh, when the tab comes
