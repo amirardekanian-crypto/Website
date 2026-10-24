@@ -89,13 +89,17 @@ const secs = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-bo
 const toast = p => p.evaluate(() => { const el = document.getElementById('aaToast'); return !el || el.hidden ? null : { text: (el.querySelector('.aa-toast-t') || {}).textContent, action: (el.querySelector('.aa-toast-go') || {}).textContent }; });
 const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); await p.waitForTimeout(500); };
 
+// --only=14,15 runs just those numbered sections (every block after a "// ── N." line is wrapped in on(N)); no flag runs everything.
+const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean).map(Number);
+const on = n => !ONLY.length || ONLY.includes(n);
+
 (async () => {
   const C = H.checker();
   const browser = await H.launch();
   const out = H.outDir();
 
   // ── 1. the shared helpers: who an item is ─────────────────────────────────────────────────────────────────────────────────
-  {
+  if (on(1)) {
     const { ctx, p } = await open(browser);
     await goCrew(p);
     const s = await p.evaluate(ids => ({
@@ -122,7 +126,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 2. a name opens the page; ← goes back to where you came from ─────────────────────────────────────────────────────────
-  {
+  if (on(2)) {
     const { ctx, p } = await open(browser, { stub: { crewPages: { [CK.mina]: { art: 'iron', since: '2026-06-06' } } } });
     await goCrew(p);
     const doors = await p.evaluate(() => ({ pl: document.querySelectorAll('#crew-body .cr-pl').length, nb: document.querySelectorAll('#crew-body .cr-nb').length,
@@ -158,7 +162,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 3. every door, and where its ← goes ───────────────────────────────────────────────────────────────────────────────────
-  {
+  if (on(3)) {
     const { ctx, p } = await open(browser);
     await goCrew(p);
     const doors = [
@@ -220,7 +224,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 4. what is on a page, and what is left off it ─────────────────────────────────────────────────────────────────────────
-  {
+  if (on(4)) {
     const ach = [['Back to Back', '2026-10-12'], ['The Notebook', '2026-10-03'], ['First Blood', '2026-09-28'], ['Straight Talk', '2026-09-20']].map(([name, day]) => ({ id: 'achievement:' + name, name, day, size: 'win', signed: [], signed_n: 0 }));
     const { ctx, p } = await open(browser, { stub: { crewPages: {
       [CK.mina]: { numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9, comebacks: 3 }, cheers: { season: 12, recent: [], mine_today: false }, achievements: ach,
@@ -271,7 +275,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 5. your own page ──────────────────────────────────────────────────────────────────────────────────────────────────────
-  {
+  if (on(5)) {
     const { ctx, p } = await open(browser, { stub: { crewPages: { me: { who: 'Alex R.' } } } });
     await goCrew(p);
     await p.evaluate(() => openAccount()); await p.waitForTimeout(250);
@@ -300,7 +304,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }
-  {
+  if (on(5)) {
     // not in the crew: your page is still there, and says so
     const { ctx, p } = await open(browser, { b: { me: { answer: null, can_post: false } }, stub: { crewPages: { me: { member: false } } } });
     await waitTab(p); await p.waitForTimeout(500);
@@ -312,7 +316,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 6. no signal, and a server that does not know the page ──────────────────────────────────────────────────────────────────
-  {
+  if (on(6)) {
     const { ctx, p } = await open(browser, { stub: { crewPages: { [CK.mina]: { numbers: { weeks: { now: 4, best: 4 }, sessions: 20, bests: 2 } } } } });
     await goCrew(p);
     await shown(p, CK.mina);
@@ -334,7 +338,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }
-  {
+  if (on(6)) {
     // a server with get_bell's keys but no crew_page: the doors go and Crew is as it was
     const { ctx, p } = await open(browser, { stub: { pageMissing: true } });
     await goCrew(p);
@@ -347,7 +351,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('…nor is there a Your page row', !(await p.$('#acct-page')));
     await ctx.close();
   }
-  {
+  if (on(6)) {
     // a server without stage96: get_bell has no ck, and Crew is exactly what it was
     const { ctx, p } = await open(browser, { b: { noPages: true } });
     await goCrew(p);
@@ -364,7 +368,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }
-  {
+  if (on(6)) {
     // the level comes with the person: two Ali B.s are two levels
     const { ctx, p } = await open(browser);
     await goCrew(p);
@@ -376,7 +380,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 7. what an error says ───────────────────────────────────────────────────────────────────────────────────────────────────
-  {
+  if (on(7)) {
     const { ctx, p } = await open(browser, { stub: { crewPages: {} } });
     await goCrew(p);
     await p.evaluate(() => { window.__STUB.pageErr = 'crew:gone'; });
@@ -390,7 +394,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('crew:not_yes → the join offer, and back', !!t2 && /Join the crew to see their page/.test(t2.text) && t2.action === 'Join the crew' && (await screenNow(p)) === 'screen-crew', JSON.stringify(t2));
     await ctx.close();
   }
-  {
+  if (on(7)) {
     // not in the crew: a tap on a name is the same offer, with no call to the server
     const { ctx, p } = await open(browser, { b: { me: { answer: null, can_post: false } } });
     await goCrew(p);
@@ -399,7 +403,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('not in the crew: a name offers the crew, not a dead tap', !!t && /Join the crew to see their page/.test(t.text) && (await screenNow(p)) === 'screen-crew' && (await calls(p, 'crew_page')).filter(x => x.p_subject).length === 0, JSON.stringify(t));
     await ctx.close();
   }
-  {
+  if (on(7)) {
     // an athlete Amir ticked under 13 reads only: no door on a name
     const { ctx, p } = await open(browser, { b: { me: { answer: 'yes', under13: true, can_post: false } } });
     await goCrew(p);
@@ -409,7 +413,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 8. the join question shows your page first (62), and "Your page is here" once ───────────────────────────────────────────
-  {
+  if (on(8)) {
     const { ctx, p } = await open(browser, { b: { me: { answer: null, can_post: false } }, stub: { crewPages: { me: { numbers: { weeks: { now: 6, best: 8 }, sessions: 26, bests: 9 },
       achievements: [{ id: 'a:1', name: 'One' }, { id: 'a:2', name: 'Two' }, { id: 'a:3', name: 'Three' }, { id: 'a:4', name: 'Four' }] } } } });
     await goCrew(p);
@@ -422,7 +426,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('…and no "Your page is here" card for someone who has not joined', !(await p.$('#crew-intro')));
     await ctx.close();
   }
-  {
+  if (on(8)) {
     // the first time a member who was already in opens Crew after pages exist: once
     const { ctx, p } = await open(browser);
     await waitTab(p); await p.evaluate(() => goTo('crew')); await p.waitForTimeout(600);
@@ -442,7 +446,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('…and the key is the athlete\'s own (it syncs, so a second phone does not say it again)', await p.evaluate(() => Object.keys(_snapshot()).some(k => /_pageintro$/.test(k))));
     await ctx.close();
   }
-  {
+  if (on(8)) {
     // someone who joins now is not told their page is here; under 13 and no stage96 never see it
     const { ctx, p } = await open(browser, { b: { me: { answer: null, can_post: false } } });
     await goCrew(p);
@@ -458,7 +462,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 9. the copy on the phone belongs to the phone ────────────────────────────────────────────────────────────────────────────
-  {
+  if (on(9)) {
     const { ctx, p } = await open(browser);
     await goCrew(p);
     // 35 pages already on the phone, the oldest first: a new one keeps the newest 30 and yours
@@ -475,14 +479,14 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('the pages never sync: not in the snapshot, not in a progress push', snap.length === 0 && pushes.length === 0, JSON.stringify([snap, pushes]));
     await ctx.close();
   }
-  {
+  if (on(9)) {
     const mine = { me: { at: 5, p: { me: true, who: 'Alex R.', numbers: {} } } };
     const { ctx, p } = await open(browser, { seed: { _crewpages: mine }, stub: { progress: { [H.ID + '_crewpages']: JSON.stringify({ zzzz: { at: 9, p: { who: 'Someone Else' } } }), [H.ID + '_snapAt']: new Date(Date.now() + 3600e3).toISOString() } } });
     await p.waitForTimeout(2500);
     C.check('a cloud copy of the pages is not pulled over the phone\'s own', (await p.evaluate(id => localStorage.getItem(id + '_crewpages'), H.ID)) === JSON.stringify(mine));
     await ctx.close();
   }
-  {
+  if (on(9)) {
     // a person who leaves the crew takes their page off the phone at the next refresh; leaving yourself takes them all
     const { ctx, p } = await open(browser);
     await goCrew(p);
@@ -500,7 +504,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 10. the guide names the controls ─────────────────────────────────────────────────────────────────────────────────────────
-  {
+  if (on(10)) {
     const { ctx, p } = await open(browser);
     await goCrew(p);
     const g = await p.evaluate(() => buildAppGuideCards());
@@ -510,7 +514,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 11. 320 px, dark mode, long names, and a look ──────────────────────────────────────────────────────────────────────────
-  {
+  if (on(11)) {
     const long = 'Alexandra Papadopoulou-Richardson';
     const { ctx, p } = await open(browser, { opts: { w: 320, h: 640, dark: true }, stub: { crewPages: { [CK.mina]: { who: long, first: 'Alexandra', numbers: { weeks: { now: 12, best: 12 }, sessions: 1234, bests: 88 }, cheers: { season: 240, recent: [] },
       achievements: [{ id: 'a:1', name: 'An achievement with a rather long name to wrap', day: '2026-10-12' }], honours: [{ month: '2026-09-01', honour: 'improved', value: { lift: 'Barbell Back Squat', pct: 27.1 } }] } } } });
@@ -525,7 +529,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('…no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }
-  {
+  if (on(11)) {
     // the pictures: someone else's page, light; your own, dark, at 390 px
     const pages = { [CK.mina]: { art: 'iron', numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9 }, cheers: { season: 12, recent: [] },
       achievements: [{ id: 'a:1', name: 'Back to Back', day: '2026-10-12' }, { id: 'a:2', name: 'The Notebook', day: '2026-10-03' }, { id: 'a:3', name: 'First Blood', day: '2026-09-28' }, { id: 'a:4', name: 'Straight Talk', day: '2026-09-20' }],
@@ -545,7 +549,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 12. Amir's four decisions on the page (main session, 2026-10-24) ────────────────────────────────────────────────────────
-  {
+  if (on(12)) {
     // (1) the flag is the test: keys without it are Crew as it was; the flag without a key of your own is the Lounge
     const a = await open(browser, { b: { noFlag: true } });
     await goCrew(a.p);
@@ -558,7 +562,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('the flag with no key of your own (no consent row yet): the Lounge is on', sb.on && sb.doors >= 3, JSON.stringify(sb));
     await b.ctx.close();
   }
-  {
+  if (on(12)) {
     // (2) "Only you": the comebacks always, and any block whose switch is off; never on someone else's page
     const ach = [{ id: 'a:1', name: 'Back to Back', day: '2026-10-12', signed: [], signed_n: 0 }, { id: 'a:2', name: 'The Notebook', day: '2026-10-03', signed: [], signed_n: 0 }];
     const hon = [{ month: '2026-09-01', honour: 'sessions', value: { n: 14 } }];
@@ -588,7 +592,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('…the app draws what the server sent: a switched-off block is left out by the server, never decided here', (await secs(p)).includes('Achievements'));
     await ctx.close();
   }
-  {
+  if (on(12)) {
     // nothing off and no comebacks: no label, and the second sentence is not there to point at nothing
     const { ctx, p } = await open(browser, { stub: { crewPages: { me: { kinds: {}, numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9 } } } } });
     await goCrew(p);
@@ -602,7 +606,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('not in the crew: no labels (the whole page is yours)', (await r.p.$$('#crewplayer-body .pl-only')).length === 0);
     await r.ctx.close();
   }
-  {
+  if (on(12)) {
     // (3) the cover: your own page is the picture on your Progress; another's is their art family, else bedrock; never a cycle name
     const { ctx, p } = await open(browser, { stub: { crewPages: { me: { art: 'voltage' }, [CK.mina]: { art: 'armour' }, [CK.reza]: { art: 'c3' }, [CK.sara]: { art: null }, [CK.omid]: { art: 'Load & Build' } } } });
     await goCrew(p);
@@ -641,7 +645,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     b.items.forEach(i => { if (i.t === 'line' && i.key && i.key.split(':')[0] in fvs) i.fv = fvs[i.key.split(':')[0]]; });
     return b;
   };
-  {
+  if (on(13)) {
     const fvs = { [CK.alex]: 1001, [CK.mina]: 1002, [CK.reza]: 1003, [CK.ali1]: 1004, [CK.leila]: 1005 };
     const brd = board().map(r => (r.ck in fvs ? { ...r, fv: fvs[r.ck] } : r));
     const a = await open(browser, { stub: { bell: withFaces(fvs), crewBoard: brd } });
@@ -686,7 +690,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();
   }
-  {
+  if (on(13)) {
     // twelve to a call, one call at a time, and only what is on or near the screen
     const many = []; const fvs = { [CK.alex]: 1 };
     for (let i = 0; i < 14; i++) { const k = 'f' + String(i).padStart(7, '0') + '-0000-4000-8000-000000000000'; many.push(k); fvs[k] = 10 + i; }
@@ -704,7 +708,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('…and every row ended up with its picture', await a.p.evaluate(() => [...document.querySelectorAll('#crewwho-body .p.ini[data-fc]')].every(e => !!e.querySelector('img.fc-img'))));
     await a.ctx.close();
   }
-  {
+  if (on(13)) {
     // only the faces on or near the screen are asked for: a person who appears only far down the board waits until it is scrolled to
     const fvs = { [CK.omid]: 77 };
     const b = withFaces(fvs);
@@ -721,7 +725,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('…scrolled to, it is', (await faceKeys(a.p)).flat().includes(CK.omid) && !!(await picOf(a.p, '#crew-board [data-fc="' + CK.omid + '"]')).img);
     await a.ctx.close();
   }
-  {
+  if (on(13)) {
     // no signal: the letters stay and nothing breaks; the same faces are asked for at the next draw
     const fvs = { [CK.mina]: 5 };
     const a = await open(browser, { stub: { bell: withFaces(fvs), mode: 'online' } });
@@ -736,14 +740,14 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('crew_faces_get missing on the server: the letters, and no page error', (await picOf(m.p, '.cr-post[data-id="bbbbbbbb-0000-4000-8000-000000000001"] .cr-ini')).text === 'MS' && !m.p.errs.length, m.p.errs.join('|'));
     await m.ctx.close();
   }
-  {
+  if (on(13)) {
     // without stage96 (no flag) a face is the letters on every surface and nothing is asked
     const a = await open(browser, { b: { noPages: true } });
     await goCrew(a.p); await a.p.waitForTimeout(500);
     C.check('without stage96: no face data on any face, Amir\'s post stays AA, nothing asked', await a.p.evaluate(() => !document.querySelector('[data-fc], img.fc-img') && /^AA$/.test(document.querySelector('.cr-post.amir .cr-ini').textContent.trim())) && (await faceKeys(a.p)).length === 0);
     await a.ctx.close();
   }
-  {
+  if (on(13)) {
     // your photo: choose, move, pinch, zoom, save; Remove; who may and who may not
     const mkPhoto = (p, w, h) => p.evaluate(async ([W, H]) => {
       const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
@@ -809,7 +813,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('under 13: no camera, and the picker does not open even if called', !u13.btn && !u13.sheet, JSON.stringify(u13));
     await u.ctx.close();
   }
-  {
+  if (on(13)) {
     // leaving takes every face off the phone
     const fvs = { [CK.mina]: 5, [CK.alex]: 6 };
     const a = await open(browser, { stub: { bell: withFaces(fvs) } });
@@ -823,7 +827,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('you leave: your own face is gone from the phone and the account button (the server took it too)', !((await cacheKeys(a.p)) || []).some(k => k.startsWith(CK.alex + '-')) && await a.p.evaluate(ck => !CREW_FACES.has(ck) && !document.querySelector('#global-account > img.fc-img') && crewMe().fv === null, CK.alex));
     await a.ctx.close();
   }
-  {
+  if (on(13)) {
     // the faces never sync
     const fvs = { [CK.mina]: 5 };
     const a = await open(browser, { stub: { bell: withFaces(fvs) } });
@@ -844,7 +848,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }, [ckk, n || 1]);
   const stubCalls = (p, n) => calls(p, n);
   const noEmoji = p => p.evaluate(() => ['#crewplayer-body', '#hist-overlay', '#aaToast', '#crew-body .cr-week'].map(s => (document.querySelector(s) || { innerHTML: '' }).innerHTML).join(' ').indexOf('\u{1F44F}') < 0);
-  {
+  if (on(14)) {
     // the band
     const a = await open(browser, {});
     await goCrew(a.p); await a.p.waitForTimeout(500);
@@ -902,7 +906,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();
   }
-  {
+  if (on(14)) {
     // the hint's life: three visits, then gone
     const a = await open(browser, {});
     await goCrew(a.p); await a.p.waitForTimeout(300);
@@ -931,7 +935,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('without stage96: the band is exactly the old one (26 px, one button, no hint, no NEW)', await o.p.evaluate(() => { const b = document.querySelector('#crew-body .cr-faces'); return b.tagName === 'BUTTON' && !document.querySelector('#crew-body .cr-fc, #crew-body .cr-hint, #crew-body .cr-new') && Math.round(document.querySelector('#crew-body .cr-face').getBoundingClientRect().width) === 26; }));
     await o.ctx.close();
   }
-  {
+  if (on(14)) {
     // reduced motion: the cheer goes, the toast says it, and nothing flies
     const a = await open(browser, { opts: { reduced: true } });
     await goCrew(a.p); await a.p.waitForTimeout(300);
@@ -941,7 +945,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('reduced motion: the cheer goes and the toast says it, with no burst at all', b === 0 && (await stubCalls(a.p, 'crew_cheer')).length === 1 && /Cheer sent to Reza/.test((await toast(a.p) || {}).text || ''), String(b));
     await a.ctx.close();
   }
-  {
+  if (on(14)) {
     // the page: the button, the sheet, the word, the New Balls line, what was received
     const rec = [{ ck: CK.reza, who: 'Reza K.', fv: null, coach: false, word: 'that sled push looked heavy', day: today }, { ck: null, who: 'Coach', fv: null, coach: true, word: null, day: today },
       { ck: CK.sara, who: 'Sara T.', fv: null, coach: false, word: null, day: iso(now - 86400e3 * 2).slice(0, 10) }];
@@ -963,6 +967,12 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
       max: ta.getAttribute('maxlength'), dir: ta.getAttribute('dir'), cnt: document.querySelector('#hist-overlay .cr-cnt').textContent, note: (document.querySelector('#hist-overlay .cr-note') || {}).textContent, go: document.querySelector('#hist-overlay .ch-go').textContent,
       icon: !!document.querySelector('#hist-overlay .readiness-title svg'), open: document.getElementById('hist-overlay').classList.contains('visible') }; });
     C.check('the sheet "Cheer Mina": a word field (100, auto direction), a live count, the 7-day line, Send, and the clap icon', sh.open && sh.title === 'Cheer Mina' && sh.max === '100' && sh.dir === 'auto' && sh.cnt === '0 / 100' && sh.note === 'The crew can see your word for 7 days.' && sh.go === 'Send' && sh.icon, JSON.stringify(sh));
+    const ink = await a.p.evaluate(() => {
+      const probe = v => { const e = document.createElement('i'); e.style.color = 'var(' + v + ')'; document.body.appendChild(e); const c = getComputedStyle(e).color; e.remove(); return c; };
+      const ic = document.querySelector('#hist-overlay .ch-ic'), pb = document.querySelector('#hist-overlay .readiness-title svg');
+      return { ic: getComputedStyle(ic).color, green: probe('--green-ink'), clay: probe('--clay-ink'), vb: pb.getAttribute('viewBox'), fill: pb.getAttribute('fill'), ext: /href|url\(|<image|<use/.test(pb.outerHTML) };
+    });
+    C.check('the sheet\'s clap icon is green ink (not clay), the Phosphor hands-clapping drawing (256 box, fill currentColor) and points at nothing outside the page', ink.ic === ink.green && ink.ic !== ink.clay && ink.vb === '0 0 256 256' && ink.fill === 'currentColor' && !ink.ext, JSON.stringify(ink));
     C.check('…no 👏 character in the sheet', await noEmoji(a.p));
     await a.p.fill('#hist-overlay .ch-txt', 'nice work'); await a.p.waitForTimeout(100);
     C.check('…the count follows what is typed', (await text(a.p, '#hist-overlay .cr-cnt')) === '9 / 100');
@@ -1014,7 +1024,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();
   }
-  {
+  if (on(14)) {
     // 30 a day, and yourself
     const a = await open(browser, { stub: { cheerCap: 1 } });
     await goCrew(a.p);
@@ -1031,7 +1041,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('not in the crew: openCheer is the join offer, never a sheet', !!(await toast(n.p)) && /Join the crew to cheer/.test((await toast(n.p)).text) && !(await n.p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))));
     await n.ctx.close();
   }
-  {
+  if (on(14)) {
     // the guide, and the 👏 character is in none of what was added
     const a = await open(browser, {});
     await goCrew(a.p);
@@ -1043,7 +1053,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
   }
 
   // ── 15. the pictures (390 px): the band with faces and a NEW, your page with a photo and the Only you marks, the cheer sheet, the photo sheet ──────────────
-  {
+  if (on(15)) {
     // made-up faces: a coloured ground, a head and a pair of shoulders (never a real person)
     const people = [[CK.alex, '#5E8C7A', '#E3B896', '#2E4A57', 1101], [CK.mina, '#9CB4C6', '#C98E6A', '#8C3D2B', 1102], [CK.reza, '#7C6B8F', '#E8C4A0', '#26322C', 1103],
       [CK.ali1, '#A9B79A', '#B07B58', '#3C5A7A', 1104], [CK.leila, '#C9A99A', '#E0B493', '#4F6B52', 1105], [CK.sara, '#6E8FA3', '#D8A682', '#7A4E3A', 1106]];

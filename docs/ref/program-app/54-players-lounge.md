@@ -85,8 +85,8 @@ taps, a refusal), who may not (not in the crew, under 13), leaving, never synced
 ## Step 3 · The cheer (ideas 59, 65, 70 "New Balls", direction A "In the Band")
 
 **What.** A cheer goes to one person, once a day each, with a word if you like. The button is the clap icon and **Cheer**, never "Well played" (Amir: *"something more
-understandable to any one ... a clapping icon"*), and **Cheered today** in quiet green once it is done. The clap is `CLAP_SVG`, an inline line icon (24 box, `currentColor`,
-1.6 stroke, round caps): the 👏 character is yellow on phones and the text variation selector is ignored on iOS, so it is in no string an athlete reads. On someone's page: the
+understandable to any one ... a clapping icon"*), and **Cheered today** in quiet green once it is done. The clap is `CLAP_SVG`, the inline *hands-clapping* icon of Phosphor Icons (MIT, regular weight, 256 box, `currentColor`;
+the first drawing did not read as clapping hands, so Amir had it swapped 2026-10-24; in the sheet's title it is green ink, clay is only the page's button): the 👏 character is yellow on phones and the text variation selector is ignored on iOS, so it is in no string an athlete reads. On someone's page: the
 button (the page's one clay control), under *Joined this week. Say hello.* when they are new; the sheet **Cheer Sara** (a word, 100 characters, a live count, *The crew can see
 your word for 7 days.*, **Send**); and *Cheers this season · 12* with the last week's cheers (face, name or Coach, the word, the day). On Crew, the week band's faces are 40 px
 and each is a door: a mint ring round the ones who held this week, **NEW** under the ones who joined this week, one tap opens their page after 250 ms unless a second tap

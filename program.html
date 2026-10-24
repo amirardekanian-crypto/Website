@@ -5735,7 +5735,7 @@
   #hist-overlay .fp-rm { background: transparent; color: var(--green-ink); border: 1.5px solid var(--field); }
   #hist-overlay .fp-rm[hidden] { display: none; }
 
-  /* PLAYERS' LOUNGE · THE CHEER (step 3, 2026-10-24). The clap is an icon in the app's line style (CLAP_SVG), never the emoji (it is yellow on a phone).
+  /* PLAYERS' LOUNGE · THE CHEER (step 3, 2026-10-24). The clap is an inline icon (CLAP_SVG, Phosphor hands-clapping), never the emoji (it is yellow on a phone).
      The page's button is its one clay control; once you have cheered today it is a quiet green line. The band's faces grow to 40 px: a mint ring for a held
      week, NEW under a new member, and a burst of claps on a double tap (none for anyone who asked for less motion). */
   .pl-cheer, .pl-cheered { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; margin-top: 12px; border-radius: 8px; }
@@ -5750,7 +5750,7 @@
   .pl-ch { grid-template-columns: 24px minmax(0, 1fr) auto; gap: 12px; text-align: left; }
   .pl-ch .cr-fl { align-self: start; margin-top: 2px; }
   .pl-ch .q { display: block; }
-  #hist-overlay .ch-ic { display: inline-flex; width: 26px; height: 26px; margin-right: 8px; vertical-align: -4px; color: var(--clay-ink); }
+  #hist-overlay .ch-ic { display: inline-flex; width: 26px; height: 26px; margin-right: 8px; vertical-align: -4px; color: var(--green-ink); }   /* the sheet's icon is green ink: clay is only on the page's Cheer button */
   #hist-overlay .ch-ic svg { width: 26px; height: 26px; display: block; }
   .aa-toast-ic { display: inline-block; width: 20px; height: 20px; margin-right: 8px; vertical-align: -4px; color: var(--mint); }
   .aa-toast-ic svg { width: 20px; height: 20px; display: block; }
@@ -13678,10 +13678,10 @@ const CREW_BELL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 // The day's attendance wears a tick, not the bell: it is the roll call, not a moment anyone earned.
 const CREW_TICK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>';
 const CREW_CAM_SVG ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>';
-// The clap (Amir's main session, 2026-10-24): two hands meeting with three short bursts, in the line style of the app's icons (24 box, currentColor, 1.6
-// stroke, round caps). The 👏 character is YELLOW on phones and the text variation selector is ignored on iOS, so it is never put in anything an athlete
-// reads: the page's button, the sheet, the toast and the double tap's burst all use this one icon, and the guide says "Cheer" in words.
-const CLAP_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 9.4 5.9 18.2c-.7 1.4-2.5 1.7-3.3.6-.6-.9-.3-1.7 0-2.3L6.9 8.7c.6-1.1 2.1-1.4 3-.5.7.7.9 1.1.7 1.2z"/><path d="M13.4 9.4l4.7 8.8c.7 1.4 2.5 1.7 3.3.6.6-.9.3-1.7 0-2.3L17.1 8.7c-.6-1.1-2.1-1.4-3-.5-.7.7-.9 1.1-.7 1.2z"/><path d="M12 2v2.6M5.4 3.6l1.5 2M18.6 3.6l-1.5 2"/></svg>';
+// The clap: the "hands-clapping" icon of Phosphor Icons, MIT licence, regular weight (256 box, fill currentColor, no external reference). Amir, 2026-10-24: the first
+// drawing was not recognisable as clapping hands at button size. The 👏 character is YELLOW on phones and the text variation selector is ignored on iOS, so it is never put in
+// anything an athlete reads: the page's button, the sheet, the toast and the double tap's burst all use this one icon, and the guide says "Cheer" in words.
+const CLAP_SVG = '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M160.22,24V8a8,8,0,0,1,16,0V24a8,8,0,0,1-16,0ZM196.1,41a7.91,7.91,0,0,0,4.17,1.17,8,8,0,0,0,6.84-3.83l8-13.11a8,8,0,0,0-13.68-8.33l-8,13.1A8,8,0,0,0,196.1,41Zm47.51,12.59a8,8,0,0,0-10.08-5.16l-15.06,4.85a8,8,0,0,0,2.46,15.62,8.15,8.15,0,0,0,2.46-.39l15.05-4.85A8,8,0,0,0,243.61,53.55ZM217,97.58a80.22,80.22,0,0,1-10.22,94c-.34,1.73-.72,3.46-1.19,5.18A80.17,80.17,0,0,1,58.77,216L23.5,155a26,26,0,0,1,19.24-38.79l-3-5.2a26,26,0,0,1,19.2-38.78L58.24,71A26,26,0,0,1,95.47,36.53,26.06,26.06,0,0,1,140.3,37l12.26,21.2A26.07,26.07,0,0,1,195.81,61ZM109.07,55l0,0h0l25,43.17a26,26,0,0,1,17.33-10L126.42,45a10,10,0,1,0-17.35,10ZM72.12,63l6.46,11.17a26.05,26.05,0,0,1,17.32-10L89.45,53A10,10,0,1,0,72.12,63Zm111.54,81-20.22-35a10,10,0,0,0-17.74,9.25L158.3,140a8,8,0,0,1-13.87,8l-36.5-63A10,10,0,1,0,90.58,95l26.05,45a8,8,0,0,1-13.87,8L71,93h0l0,0a10,10,0,0,0-17.33,10l35.22,61A8,8,0,0,1,75,172L54.72,137a10,10,0,0,0-17.34,10l35.27,61a64.12,64.12,0,0,0,117.42-15.44A63.52,63.52,0,0,0,183.66,144Zm19.41-38.42L181.93,69A10,10,0,0,0,164.55,79l33,57.05A80.2,80.2,0,0,1,207,161.51,64.23,64.23,0,0,0,203.07,105.58Z"/></svg>';   // Phosphor Icons, MIT
 function crewKey() { return ATHLETE_ID + '_crewcache'; }
 function crewSeenKey() { return ATHLETE_ID + '_crewseen'; }
 function crewAllowed() { return !window.IS_DEMO && !window.IS_PREVIEW && !!ATHLETE_ID; }
