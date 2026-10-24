@@ -9591,6 +9591,7 @@ function openDayView(dayId) {
 
 // Return from a day's workout back to the home overview.
 function closeDayView() {
+  dropClockOffer();
   const ov = document.getElementById('home-overview');
   const dv = document.getElementById('day-view');
   if (dv) dv.hidden = true;
@@ -11111,6 +11112,7 @@ function coachContactHtml() {
 let _libScrollY = null;
 let _wsReturn = null;   // where a suggested Library session's ← goes (LIB-01): wsBack()
 function goTo(screen, historyId, keepContent) {
+  dropClockOffer();
   stopInlineVideos();
   if (screen !== 'workout') _wsReturn = null;
   const was = (document.querySelector('.screen.active') || {}).id || '';
@@ -20739,8 +20741,15 @@ function offerClock(day) {
   const askKey = ATHLETE_ID + '_clockasked_d' + day, today = new Date().toDateString();
   if (localStorage.getItem(askKey) === today) return;
   localStorage.setItem(askKey, today);
-  aaToast("The session clock isn't running.", { kicker: 'Session clock', action: 'Start', ms: 20000, run: () => toggleSessionTimer(day) });
+  // Its Start only starts the clock of the day it was offered for, and only while that day is the one open. Leaving the day takes the box away.
+  offerClock.run = () => {
+    const act = document.querySelector('.day-content.active'), dv = document.getElementById('day-view');
+    if (act && act.id === 'day' + day && dv && !dv.hidden) toggleSessionTimer(day);
+  };
+  aaToast("The session clock isn't running.", { kicker: 'Session clock', action: 'Start', ms: 20000, run: offerClock.run });
 }
+// goTo() and closeDayView() call this, so it reads nothing declared below it until an offer exists (boot can reach goTo early).
+function dropClockOffer() { const r = offerClock.run; if (!r) return; offerClock.run = null; if (_toastRun === r) hideAaToast(); }
 
 function updateTimerDisplay() {
   const el = document.getElementById('timerDisplay');
