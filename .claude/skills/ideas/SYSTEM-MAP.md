@@ -73,7 +73,12 @@ deleted after 7 days (stage81's sweep, `line_day < current_date - 7`). Faces are
 Highlight Reel's (`hlPhotoPick`, share cards). `CREW_KINDS` are the athlete's switches (session, level, week, mark, achievement, best,
 cycle, honour, open). The programme's `sport.badge` is free text that can name an injury. Plan weeks run from the cycle's start day,
 not Monday. coach.html's Affiliates tab (stage29) has an `athlete_id` column and counts codes from the intake form (`affUses`).
-Welcome is one overlay (`maybeWelcome`); there is no first-week list.
+Welcome is one overlay (`maybeWelcome`); there is no first-week list. **No stable person id reaches the phone**: every crew
+list carries a display name only (`crew_key` exists on the server, only inside Bell-line keys). Crew push is a broadcast + a
+15-minute fold (`crew_push_fold`), 11 kinds, nothing aimed at one person except a lone like; replies ring nothing. **Share cards
+already include `player` ("Your card": level, weeks, sessions, bests, comebacks, lifts) and `session` (with the athlete's photo)**
+(assets/js/sharecard.js). The referral side has no payments data at all (`check_discount` is the only validator; form-fa.html
+ignores `?code=`).
 
 **Gaps found:** Needs-you lists a run of low days (since 2026-09-26) but still does not fire on ACWR
 spikes, RPE drift, pain words or due retests; intake brief is pulled from Gmail though `hab_intake` has

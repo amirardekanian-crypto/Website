@@ -260,6 +260,15 @@ Affiliates tab already counts codes from the intake form and has an `athlete_id`
 | 68 | First Serve | A new athlete's first two weeks as a short list with a ring (first session, check-in, photo, join the crew, reminders last) in the invitation's Home slot | 56, 62 | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
 | 69 | Bring a Partner | An athlete gets an affiliate code (affiliates row with `athlete_id`) shown on their page; friend's intake form counts it; the athlete's reward is Amir's call | — | **picked** 2026-10-24: the friend gets 10% and the member gets 10% (Amir), plan per step first |
 
+**Build plan, 2026-10-24** (Amir: *"get ready to build the rest / first for each step, we want to plan"*):
+https://claude.ai/artifact/X5L2WMkayoxx8eioc85SJV. Eleven steps, three directions each, picks A A A B B A A B A A A (step 0 = a
+`crew_key` on every crew name + the `crew_page()` reader + one shared counting function, before step 1). Sources, the server/client
+reports and the mockup fragments: `C:\Users\Amir\AA-Lounge\`. Corrections found while planning: **63 Player Card already exists**
+(`TPL.player` in sharecard.js, "Your card", since 19 Oct), so 63 is a door to it from the page; **66's session card with a photo
+exists** (`TPL.session`), so 66 is the stamp drawn on Bell photo posts; **comebacks are on the Bell's never list**, so another
+person's page shows three numbers + cheers. Grown idea: **70 New Balls** (a new member's face says NEW for 7 days, the page says "Joined
+this week. Say hello."), ships with step 3, pitched.
+
 Cut in the same round (listed so they are not re-pitched): private messages (SEND MESSAGE), calories and minutes rings, Favorites
 (Library sessions on top of a dosed plan), medal art / a level medal / greyed badges on others' pages, holiday "limited edition" badges
 (the Open is), followers, a photo grid on the page, Ask the crew, sport groups inside the crew, one-on-one challenges, "training now"
