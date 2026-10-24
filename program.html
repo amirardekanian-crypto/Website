@@ -22788,7 +22788,7 @@ function hlMomentSpec(x) {
 function hlTopLifts(n) {
   try {
     return ceilingLifts().filter(sr => sr.latest && Number(sr.latest.w) > 0 && Number(sr.latest.r) > 0)
-      .sort((a, b) => (Number(b.latest.kg) || 0) - (Number(a.latest.kg) || 0)).slice(0, n || 3)
+      .sort((a, b) => (recKgEq(b.latest) || -1) - (recKgEq(a.latest) || -1)).slice(0, n || 3)   // lb as kg for the sort only, plates behind every kg and lb lift (Love All B18)
       .map(sr => ({ name: sr.lift, w: Number(sr.latest.w), r: Number(sr.latest.r), u: uKey(sr.latest.u) }));
   } catch (e) { return []; }
 }
