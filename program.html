@@ -9561,6 +9561,8 @@ document.addEventListener('keydown', ev => {
 // Show a single day's workout (the day panels + program header) and hide the
 // overview. switchDay() activates the right panel + recomputes progress.
 function openDayView(dayId) {
+  // An install card already up on Home goes when a day opens (it never sits over the finish card) and is asked again on the way home (B24).
+  if (document.querySelector('.a2hs-toast')) { closeInstallOffer(); if (window.maybeOfferInstall) maybeOfferInstall.waiting = true; }
   const ov = document.getElementById('home-overview');
   const dv = document.getElementById('day-view');
   if (ov) ov.hidden = true;

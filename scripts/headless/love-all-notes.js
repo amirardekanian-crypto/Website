@@ -116,6 +116,13 @@ async function b24(browser) {
   await p.click('.a2hs-toast [data-a2hs-dismiss]'); await p.waitForTimeout(700);
   const d = await p.evaluate(() => ({ card: !!document.querySelector('.a2hs-toast'), key: localStorage.getItem('a2hs_dismissed_v1'), armed: BACKNAV.armed }));
   t.check('B24: Not now still dismisses for good, and leaves no stale Back entry', !d.card && d.key === '1' && !d.armed, JSON.stringify(d));
+  // A card already up on Home when a day opens: it goes (unanswered) and comes back on the way home.
+  await p.evaluate(() => { localStorage.removeItem('a2hs_dismissed_v1'); showInstallOffer(); }); await p.waitForTimeout(500);
+  await p.evaluate(() => openDayView('1')); await p.waitForTimeout(700);
+  const o = await p.evaluate(() => ({ card: !!document.querySelector('.a2hs-toast'), key: localStorage.getItem('a2hs_dismissed_v1') }));
+  t.check('B24: a card already showing goes when a day opens, and is not taken as an answer', !o.card && o.key === null, JSON.stringify(o));
+  await p.evaluate(() => closeDayView()); await p.waitForTimeout(1600);
+  t.check('B24: …and it comes back on the way home', await card());
   t.check('B24: no page errors', p.errs.length === 0, p.errs.join(' | '));
   await ctx.close();
 }
