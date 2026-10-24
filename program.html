@@ -9383,14 +9383,14 @@ function paintCycleCard() {
     const last = !p.over.next;
     const lens = cycles.map(c => (cycleWeekInfo(c) || {}).total);
     const weeks = lens.every(n => n) ? lens.reduce((a, n) => a + n, 0) : 0;   // the roadmap's weeks, when every cycle is dated
-    const what = last ? `${cycles.length} cycle${cycles.length === 1 ? '' : 's'}${weeks ? ' · ' + weeks + ' weeks' : ''}` : `${p.wk.total} of ${p.wk.total} weeks`;
+    const what = last ? `${cycles.length} cycle${cycles.length === 1 ? '' : 's'}${weeks ? ' · ' + weeks + ' week' + (weeks === 1 ? '' : 's') : ''}` : `${p.wk.total} of ${p.wk.total} week${p.wk.total === 1 ? '' : 's'}`;
     paintInto(wrap, `<div class="cyc-card">${photo}<div class="cyc-body">
       <span class="cyc-top is-fin"><span class="cyc-fin-h"><span class="cyc-fin-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${last ? 'Roadmap complete' : 'Cycle complete'}</span>${last ? '' : `<span class="cyc-of">· ${p.cIdx + 1} of ${p.count}</span>`}</span>
       ${name}
       <span class="cyc-fin-s">Finished ${cycDate(p.cur.endDate)} · ${what}</span>
       ${last ? `<span class="cyc-fin-meter">${cycles.map((c, i) => `<span>C${i + 1}</span>`).join('')}</span>`
              : `<span class="cyc-row"><span class="cyc-k">Week ${p.wk.total}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.total)}</span>`}
-      <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} sessions</small></span>${bar(p.planned, p.done)}</span>
+      <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} session${p.planned === 1 ? '' : 's'}</small></span>${bar(p.planned, p.done)}</span>
       ${wins}
       ${window.IS_PREVIEW || !p.done ? '' : `<button type="button" class="cyc-share-go" onclick="openShareCycle()">${last ? 'Share the whole road' : 'Share your cycle'}</button>`}
     </div></div>`);
@@ -9413,7 +9413,7 @@ function paintCycleCard() {
       ${name}
       ${dates ? `<span class="cyc-dates">${dates}</span>` : ''}
       <span class="cyc-row"><span class="cyc-k">Week ${p.wk.wk}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.wk)}</span>
-      <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} sessions</small></span>${bar(p.planned, p.done)}</span>
+      <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} session${p.planned === 1 ? '' : 's'}</small></span>${bar(p.planned, p.done)}</span>
       ${note}
       ${wins}
     </div></div>`);
@@ -9526,7 +9526,7 @@ function paintWeek() {
   // In a week with a note the count sits in the note's kicker (weekNoteHTML), in its short form.
   el.textContent = el.classList.contains('wn-count')
     ? (n >= ids.length ? `All ${ids.length} done` : `${n} of ${ids.length} done`)
-    : n >= ids.length ? `All ${ids.length} sessions done this week` : `${n} of ${ids.length} sessions done this week`;
+    : n >= ids.length ? (ids.length === 1 ? 'Session done this week' : `All ${ids.length} sessions done this week`) : `${n} of ${ids.length} session${ids.length === 1 ? '' : 's'} done this week`;
   el.classList.toggle('all', n >= ids.length);
   el.dataset.count = el.textContent;
   paintWeekRun();   // the weeks held in a row sit beside the count (2026-10-20: Home's Hold Serve row went with the Career row)
@@ -11697,7 +11697,7 @@ function habRowHtml(hb, k) {
   // is how the session's row stops reading "Not yet" at someone who has not trained yet today.
   const left = hb.kind === 'count' && !done ? Math.max(0, (Number(hb.target) || 0) - val) : 0;
   const sub = done ? 'Done'
-    : hb.kind === 'count' ? H.fmtVal(hb, left) + ' ' + String(hb.unit || '') + ' to go'
+    : hb.kind === 'count' ? H.fmtVal(hb, left) + ' ' + (Number(left) === 1 ? String(hb.unit || '').replace(/(ss)es$|s$/, '$1') : String(hb.unit || '')) + ' to go'
     : String(hb.goal || hb.source || '');
   const edit = _habEdit === hb.id ? `<div class="hb-edit">
       <label class="hb-field"><input id="hab-num-${hb.id}" type="number" inputmode="decimal" step="${hb.step || 1}" value="${H.fmtVal(hb, val > 0 ? val : hb.target)}" aria-label="${esc(name)}"><span>${esc(hb.unit || '')}</span></label>
@@ -12717,7 +12717,7 @@ function rwMomentFor(m) {
   if (mk) {
     const tier = Number(m.spec.tier || m.tier), n = mk.at[tier - 1], nx = mk.at[tier];
     const unit = { weeks_held: 'weeks', sessions_with_amir: 'sessions', personal_bests: 'bests', comebacks: 'comebacks' }[mk.key];
-    const words = { weeks_held: `Every session, ${n} weeks running. Keep it boring.`, sessions_with_amir: `${n} sessions in. This is how it adds up.`,
+    const words = { weeks_held: `Every session, ${n} weeks running. Keep it boring.`, sessions_with_amir: `${n} session${n === 1 ? '' : 's'} in. This is how it adds up.`,
       personal_bests: `${n} personal bests. You're getting stronger.`, comebacks: `${n} times you came back. That's the part that counts.` }[mk.key];
     return { eyebrow: 'A new mark', num: n, title: careerMarkWords(mk.key, n) + (mk.key === 'weeks_held' ? ' in a row' : ''), sub: '',
       next: nx ? 'Next mark · ' + nx + ' ' + unit : '', art, words, go: 'Share the card', specs: [sp] };
@@ -13145,7 +13145,7 @@ function momentsList() {
     if (!w) return;
     const n = Number(v.n), pct = Number(v.pct), wk = Number(v.weeks);
     // Amir's Pick had no line at all, so its card drew as a name over an empty body (2026-10-19, The Long Rally audit).
-    const s = h.honour === 'sessions' && n > 0 ? n + ' sessions with Amir that month.'
+    const s = h.honour === 'sessions' && n > 0 ? n + ' session' + (n === 1 ? '' : 's') + ' with Amir that month.'
       : h.honour === 'improved' && pct > 0 ? '+' + (Math.round(pct * 10) / 10) + '% on ' + (v.lift ? String(v.lift) : 'a main lift') + '.'
       : h.honour === 'full_month' ? (wk > 0 ? 'All ' + wk + ' training weeks held.' : 'Every training week held.')
       : h.honour === 'pick' ? 'Amir picked you that month.' : '';
@@ -14461,7 +14461,7 @@ function crewSessionsN() {
 }
 function crewSessionDraft(dayId) {
   const n = crewSessionsN();
-  return `Day ${dayId} done.` + (n ? ` ${n} sessions with Amir.` : '');
+  return `Day ${dayId} done.` + (n ? ` ${n} session${n === 1 ? '' : 's'} with Amir.` : '');
 }
 function blobToB64(blob) {
   return new Promise((ok, bad) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).replace(/^data:[^,]*,/, '')); fr.onerror = bad; fr.readAsDataURL(blob); });
@@ -23264,8 +23264,8 @@ function maybeHighlightMoment() {
     const last = !!cd.current && !cd.next;
     const sub = last
       ? `${(DATA.cycles || []).length} cycles${specs[0].weeks ? ' · ' + specs[0].weeks + ' weeks' : ''}`
-      : p ? `${p.done + ' of ' + p.planned + ' sessions · '}${p.wk.total + ' weeks'}`
-      : spec ? `${spec.done} of ${spec.planned} sessions${spec.weeks ? ' · ' + spec.weeks + ' weeks' : ''}` : '';
+      : p ? `${p.done + ' of ' + p.planned + ' session' + (p.planned === 1 ? '' : 's') + ' · '}${p.wk.total + ' week' + (p.wk.total === 1 ? '' : 's')}`
+      : spec ? `${spec.done} of ${spec.planned} session${spec.planned === 1 ? '' : 's'}${spec.weeks ? ' · ' + spec.weeks + ' week' + (spec.weeks === 1 ? '' : 's') : ''}` : '';
     openMoment({
       eyebrow: last ? 'Roadmap complete' : 'Cycle complete',
       title: last ? 'The distance' : (cd.cur.name || 'Cycle ' + n),
