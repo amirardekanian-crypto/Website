@@ -13840,8 +13840,8 @@ function crewRepsHTML(it) {
     : can ? `<button type="button" class="cr-rep-add" onclick="openCrewReply('${esc(it.id)}')">${reps.length ? 'Add a reply' : 'Reply'}</button>` : '';
   return rows + add;
 }
-// The sheet: 140 characters, and nothing else. It does not keep a draft — a reply is one line, and the post it belongs to
-// is on the screen behind it.
+// The sheet: 140 characters. What was typed and not sent comes back, per post, as a post's does (crewKeepKey()), and goes when the reply is sent.
+function crewRepKeepKey(postId) { return ATHLETE_ID + '_crewrep_' + postId; }
 function openCrewReply(postId) {
   const ov = document.getElementById('hist-overlay'), me = crewMe();
   if (!ov || !BELL || !me.can_post) return;
@@ -13859,8 +13859,12 @@ function openCrewReply(postId) {
     <p class="cr-err" role="status"></p>`;
   const m = ov.querySelector('.readiness-modal'), ta = m.querySelector('.cr-rtxt'), cnt = m.querySelector('.cr-cnt');
   const go = m.querySelector('.cr-go'), err = m.querySelector('.cr-err');
+  try { ta.value = String(localStorage.getItem(crewRepKeepKey(postId)) || '').slice(0, 140); } catch (e) {}
   const sync = () => { cnt.textContent = ta.value.length + ' / 140'; go.disabled = !ta.value.trim(); };
-  ta.addEventListener('input', sync);
+  ta.addEventListener('input', () => {
+    sync();
+    try { if (ta.value) _lsRawSet(crewRepKeepKey(postId), ta.value); else localStorage.removeItem(crewRepKeepKey(postId)); } catch (e) {}
+  });
   go.addEventListener('click', () => crewReplySend(postId, go, ta, err));
   sync();
   ov.classList.add('visible');
@@ -13875,6 +13879,7 @@ async function crewReplySend(postId, go, ta, err) {
   if (_noAnswer(r)) { err.textContent = 'No signal. Your reply is still here: tap Reply again when you have signal.'; go.disabled = false; return; }
   if (r.error || !r.data) { err.textContent = crewErrWords(r.error && r.error.message); go.disabled = false; return; }
   crewPutReplies(postId, r.data.replies);
+  try { localStorage.removeItem(crewRepKeepKey(postId)); } catch (e) {}
   closeHistorySheet();
 }
 async function crewReplyDelete(id) {
