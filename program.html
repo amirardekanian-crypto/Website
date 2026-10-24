@@ -19010,7 +19010,12 @@ function kgCheckTicked(name, w, card, skip) {
   if (!kgLooksWrong(name, w, card, skip)) return;
   // The box stays until answered, and the weight is kept only by a tap on Keep it, never because the box timed out or was replaced.
   aaToast(`${weightText(w)}? That's far above your numbers for this lift. If it's a typo, fix it in the weight box.`,
-    { kicker: 'Check the weight', ms: 0, action: 'Keep it', dismiss: 'Got it', run: () => kgKept(card, w) });
+    { kicker: 'Check the weight', ms: 0, action: 'Keep it', run: () => kgKept(card, w),
+      dismiss: 'Fix it', off: () => {   // Fix it: the cursor goes into that set's weight box, and nothing is kept
+        const box = [document.querySelector('.timer-log .tl-kg'), card.querySelector(`.ex-set-row[data-set-idx="${skip}"] .ex-set-weight`)]
+          .find(b => b && b.offsetParent);
+        if (box) { box.focus(); try { box.select(); } catch (e) {} }
+      } });
 }
 
 // Persian (۰-۹) and Arabic-Indic (٠-٩) digits to ASCII, and their decimal marks

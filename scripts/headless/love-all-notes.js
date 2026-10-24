@@ -46,9 +46,39 @@ async function b25(browser) {
   await ctx.close();
 }
 
+// ═════════ kg: the far-above-weight box says Keep it and Fix it ═════════
+const LW = [0, 1, 2, 3].map(() => ({ w: '', n: '', r: '', d: false, lw: '80' }));   // last time: 80 kg on every set
+async function kgButtons(browser) {
+  const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), seed: { _setlog_Barbell_Back_Squat: LW }, stub: { library: H.library() } });
+  await p.evaluate(`(() => { openDayView('1'); const c = ${H.card(SQUAT)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = 'sq'; try { hideAaToast(); } catch (e) {} })()`);
+  await p.waitForTimeout(300);
+  const row = i => `#sq .ex-set-row[data-set-idx="${i}"]`;
+  // Tick set 0 at 80, then type 600 into the ticked set: the box asks.
+  await p.fill(`${row(0)} .ex-set-weight`, '80');
+  await p.click(`${row(0)} .ex-set-check`); await p.waitForTimeout(250);
+  await p.evaluate(() => hideAaToast());   // the clock offer from the tick
+  await p.fill(`${row(0)} .ex-set-weight`, '600'); await p.keyboard.press('Tab'); await p.waitForTimeout(250);
+  t.check('kg: 600 typed into a ticked set: the box asks', /600 kg\? That's far above/.test(await toast(p)), await toast(p));
+  const names = await p.evaluate(() => [...document.querySelectorAll('#aaToast button')].map(b => b.textContent));
+  t.check('kg: the two buttons read Keep it and Fix it', names.join('|') === 'Keep it|Fix it', names.join('|'));
+  await p.evaluate(() => document.activeElement && document.activeElement.blur());
+  await p.click('#aaToast .aa-toast-x'); await p.waitForTimeout(250);
+  const f = await p.evaluate(() => { const a = document.activeElement; return { cls: a && a.className, idx: a && a.closest('.ex-set-row') && a.closest('.ex-set-row').dataset.setIdx, val: a && a.value, sel: a && a.selectionStart === 0 && a.selectionEnd === String(a.value).length }; });
+  t.check('kg: Fix it closes the box and the cursor is in that set\'s weight box, selected', (await toast(p)) === '' && /ex-set-weight/.test(f.cls || '') && f.idx === '0' && f.val === '600' && f.sel, JSON.stringify(f));
+  const kept = await p.evaluate(() => { const c = document.getElementById('sq'); return !!(c._kgOk && c._kgOk.size); });
+  t.check('kg: Fix it does not mark the weight kept', !kept);
+  // Keep it still keeps.
+  await p.fill(`${row(0)} .ex-set-weight`, '601'); await p.keyboard.press('Tab'); await p.waitForTimeout(250);   // typed, then off the box: that is when it asks
+  await p.click('#aaToast .aa-toast-go'); await p.waitForTimeout(250);
+  t.check('kg: Keep it marks the weight kept', await p.evaluate(() => { const c = document.getElementById('sq'); return !!(c._kgOk && c._kgOk.has('601')); }));
+  t.check('kg: no page errors', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await b25(browser);
+  await kgButtons(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
