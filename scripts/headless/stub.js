@@ -13,6 +13,11 @@
 // answers how many waiting moments it told and takes them out of the profile's `moments`, as the server's told_at does, and keeps the
 // profile in '__stubcfg' so the OTHER app opened next in the same browser sees it; off by default: the stub never tells), told (every
 // id mark_moments_told was given, as [app, award_id], in window.__STUB.told).
+// Players' Lounge (stage96, scripts/headless/lounge.js): crew_page answers the stub's `crewPages` ({ me: {...}, '<ck>': {...} }), each MERGED over a default page
+// made from that person's entry in `bell.crew` (the shape of CONTRACT.md section 3: numbers, cheers, achievements, ...; made-up people only); the viewer's own
+// page (no p_subject) is made from `bell.me`. Like the server it answers 'crew:not_yes' to a viewer who is not in the crew (or is under 13) and 'crew:gone' to a
+// ck that is not in `bell.crew`. pageMissing = a server without stage96 (PGRST202, 404); pageErr = an error message to answer with (e.g. 'crew:gone');
+// stall: { crew_page: true } never answers; a mode of 'offline' is no signal. get_bell, crew_board and a reply carry ck/fv/lv/held/new as the fixture gives them.
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
   var cfg = {};
@@ -95,7 +100,7 @@
       if (!S.bell) return res({ data: null, error: null, status: 200 });
       // the hash the server takes over the payload: it MUST change when the feed does, or a new post would never arrive
       var tag = (function (B) {
-        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji]), h = 0;
+        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji, B.crew, B.week, B.open]), h = 0;
         for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
         return S.bell.etag && !S.bellTagMoves ? S.bell.etag : 'tag' + h;
       })(S.bell);
@@ -103,6 +108,31 @@
       var out = JSON.parse(JSON.stringify(S.bell));
       out.etag = tag; out.at = new Date().toISOString();
       return res({ data: out, error: null, status: 200 });
+    }
+    // Players' Lounge (stage96): the Player Page. See the header for what it answers.
+    if (name === 'crew_page') {
+      if (S.pageMissing) return res({ data: null, error: { message: 'Could not find the function public.crew_page(p_subject) in the schema cache', code: 'PGRST202' }, status: 404 });
+      var PB = S.bell || {}, PM = PB.me || {}, sub = params && params.p_subject, pages = S.crewPages || {};
+      var bad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+      if (S.pageErr) return bad(S.pageErr);
+      var pageOf = function (who, own, c) {
+        c = c || {};
+        var first = String(who || '').split(' ')[0];
+        var pg = { ck: c.ck || null, me: !!own, who: who, first: first, since: '2026-06-06', joined: '2026-10-19', member: !own || PM.answer === 'yes', under13: !!(own && PM.under13),
+          lv: c.lv || null, fv: c.fv || null, art: 'iron', game: null,
+          numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9 }, cheers: { season: 12, recent: [] },
+          achievements: [{ id: 'achievement:back_to_back', name: 'Back to Back', day: '2026-10-12', size: 'win', signed: [], signed_n: 0 },
+            { id: 'achievement:the_notebook', name: 'The Notebook', day: '2026-10-03', size: 'win', signed: [], signed_n: 0 }],
+          honours: [], best_lifts: [], cycle: null, at: new Date().toISOString() };
+        if (own) pg.numbers.comebacks = 2; else pg.cheers.mine_today = false;
+        return pg;
+      };
+      var merge = function (pg, over) { Object.keys(over || {}).forEach(function (k) { pg[k] = over[k]; }); return pg; };
+      if (!sub) return res({ data: JSON.parse(JSON.stringify(merge(pageOf(PM.name || 'Alex R.', true, PM), pages.me))), error: null, status: 200 });
+      if (PM.answer !== 'yes' || PM.under13 || PM.can_post === false) return bad('crew:not_yes');
+      var who = (PB.crew || []).filter(function (x) { return x && x.ck === sub; })[0];
+      if (!who) return bad('crew:gone');
+      return res({ data: JSON.parse(JSON.stringify(merge(pageOf(who.who, !!who.me, who), pages[sub]))), error: null, status: 200 });
     }
     if (/^crew_/.test(name) && S.bell) {
       var B = S.bell, me = B.me = B.me || {}, keep = function () { try { var cb = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); cb.bell = B; localStorage.setItem('__stubcfg', JSON.stringify(cb)); } catch (e) {} };
@@ -153,7 +183,8 @@
           if (!body) return res({ data: null, error: { message: 'crew:empty' }, status: 400 });
           if (body.length > 140) return res({ data: null, error: { message: 'crew:reply_long' }, status: 400 });
           if (!Array.isArray(post.replies)) post.replies = [];
-          post.replies.push({ id: 'rep-' + (++S._repN || (S._repN = 1)), who: (B.me && B.me.name) || 'You', me: true, amir: false, body: body, at: new Date().toISOString() });
+          post.replies.push({ id: 'rep-' + (++S._repN || (S._repN = 1)), who: (B.me && B.me.name) || 'You', me: true, amir: false, body: body, at: new Date().toISOString(),
+            ck: B.me && B.me.ck ? B.me.ck : undefined, fv: B.me && 'fv' in B.me ? B.me.fv : undefined });
         } else {
           (B.items || []).forEach(function (i) {
             if (i && Array.isArray(i.replies) && i.replies.some(function (r) { return r.id === (params && params.p_id); })) {
@@ -176,7 +207,7 @@
     if (name === 'crew_board') {
       if (S.noCrewBoard) return res({ data: null, error: { message: 'Could not find the function public.crew_board', code: 'PGRST202' }, status: 404 });
       if (S.crewBoard) return res({ data: JSON.parse(JSON.stringify(S.crewBoard)), error: null, status: 200 });
-      if (S.board) return res({ data: S.board.map(function (r) { return { pos: r.pos, who: r.display_name, points: r.xp, level: r.level, is_me: r.is_me }; }), error: null, status: 200 });
+      if (S.board) return res({ data: S.board.map(function (r) { var o = { pos: r.pos, who: r.display_name, points: r.xp, level: r.level, is_me: r.is_me }; if (r.ck) { o.ck = r.ck; o.fv = r.fv === undefined ? null : r.fv; } return o; }), error: null, status: 200 });
       return res({ data: [], error: null, status: 200 });
     }
     if (name === 'leaderboard_top' && S.board) return res({ data: JSON.parse(JSON.stringify(S.board)), error: null, status: 200 });
