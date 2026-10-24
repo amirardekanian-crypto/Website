@@ -18,6 +18,8 @@
 // page (no p_subject) is made from `bell.me`. Like the server it answers 'crew:not_yes' to a viewer who is not in the crew (or is under 13) and 'crew:gone' to a
 // ck that is not in `bell.crew`. pageMissing = a server without stage96 (PGRST202, 404); pageErr = an error message to answer with (e.g. 'crew:gone');
 // stall: { crew_page: true } never answers; a mode of 'offline' is no signal. get_bell, crew_board and a reply carry ck/fv/lv/held/new as the fixture gives them.
+// stage96 is TOLD by get_bell's top-level `lounge: 1` (the fixture sets it; without it the app draws Crew as it was). YOUR page (no p_subject) is whole: every block, the comebacks, and
+// `kinds` (your switches, a kind not named is on); someone else's has neither.
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
   var cfg = {};
@@ -100,7 +102,7 @@
       if (!S.bell) return res({ data: null, error: null, status: 200 });
       // the hash the server takes over the payload: it MUST change when the feed does, or a new post would never arrive
       var tag = (function (B) {
-        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji, B.crew, B.week, B.open]), h = 0;
+        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji, B.crew, B.week, B.open, B.lounge]), h = 0;
         for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
         return S.bell.etag && !S.bellTagMoves ? S.bell.etag : 'tag' + h;
       })(S.bell);
@@ -124,7 +126,8 @@
           achievements: [{ id: 'achievement:back_to_back', name: 'Back to Back', day: '2026-10-12', size: 'win', signed: [], signed_n: 0 },
             { id: 'achievement:the_notebook', name: 'The Notebook', day: '2026-10-03', size: 'win', signed: [], signed_n: 0 }],
           honours: [], best_lifts: [], cycle: null, at: new Date().toISOString() };
-        if (own) pg.numbers.comebacks = 2; else pg.cheers.mine_today = false;
+        // YOUR page is sent whole: every block, the comebacks, and `kinds` (your own switches, a kind not named is on). Someone else's has no comebacks and no `kinds`.
+        if (own) { pg.numbers.comebacks = 2; pg.kinds = Object.assign({}, PM.kinds || {}); } else pg.cheers.mine_today = false;
         return pg;
       };
       var merge = function (pg, over) { Object.keys(over || {}).forEach(function (k) { pg[k] = over[k]; }); return pg; };

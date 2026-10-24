@@ -5678,6 +5678,10 @@
   .pl-tiles > div:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .pl-tiles b { display: block; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
   .pl-tiles small { display: block; margin-top: 3px; font: 400 var(--fs-small)/1.25 'Barlow', sans-serif; color: var(--grey); }
+  /* "Only you": the quiet label on every part of YOUR page the crew cannot see (the comebacks, and anything you switched off) */
+  .pl-only { display: block; margin-top: 4px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--grey); }
+  .prog-sec .pl-only { display: inline; margin: 0; white-space: nowrap; }
+  .pl-lv .pl-only { margin-top: 3px; font-weight: 400; }
   .pl-list { margin: 0 var(--g); }
   .pl-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 10px 2px; border-bottom: 1px solid var(--hair); color: var(--ink); }
   .pl-row:last-child { border-bottom: 0; }
@@ -13666,10 +13670,11 @@ function crewInitials(name) {
 // ── PLAYERS' LOUNGE: the helpers every step shares (step 0 and 1, 2026-10-24) ──────────────────────────────────────────────────────
 // Amir, 2026-10-24: "go with your picks". Every person drawn in Crew is a door to their Player Page. These few functions are the only place
 // that decides WHO an item is, HOW their face is drawn and WHETHER the name opens anything, so a later step changes one function, not twelve
-// draw sites. Nothing here draws before the server speaks stage96 (get_bell()'s `me` carries `ck` and `fv`), so a server without it keeps
+// draw sites. Nothing here draws before the server speaks stage96 (get_bell() carries a top-level `lounge: 1`, Amir's main session, 2026-10-24:
+// the flag is the test, never a guess from `me.ck`), so a server without it keeps
 // today's Crew exactly; and an athlete Amir ticked under 13 reads only and gets no door at all.
 var _pageMissing = false;   // crew_page() answered "no such function": this server has no stage96, so there are no doors on any name
-function crewPagesOn() { return crewOn() && !_pageMissing && !!BELL.me && ('ck' in BELL.me || 'fv' in BELL.me); }
+function crewPagesOn() { return crewOn() && !_pageMissing && !!BELL.lounge; }
 function crewDoorOn() { return crewPagesOn() && !crewMe().under13; }
 // WHO an item is: `{ ck, fv, who, me, amir }` for any item the crew screens draw (a post, a reply, a member of get_bell()'s crew list, a
 // board row, an honours row, an Open row, a Bell line). `ck` is the crew key the server hands out, the only handle on another person (a name
@@ -14343,10 +14348,20 @@ function crewIntroHTML() {
 function crewIntroGo(what) { if (what === 'page') openPlayer('me', 'crew'); else openCrewSettings(); }
 window.crewIntroGo = crewIntroGo;
 // ── drawing the page ──
-function setPlayerCover(art) {
+// The cover (Amir's main session, 2026-10-24). YOUR page wears the picture of your own current cycle, from cycleArt() on the programme on this
+// phone, so it is exactly the cover of your Progress card. Someone else's wears the family they send as `art` when it names one of the app's
+// pictures, and `bedrock` when it does not. The server never sends a cycle's name, so the app never guesses one for another person.
+function playerCoverUrl(key, p) {
+  if (key === 'me') {
+    const cycles = (DATA && DATA.cycles) || [], i = Number.isInteger(DATA && DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+    return cycleArtUrl(cycles[i] || {});
+  }
+  const a = String((p && p.art) || '').toLowerCase().trim();
+  return cycleArtUrl({ art: APP_ART.cycles[a] ? a : 'bedrock' });
+}
+function setPlayerCover(url) {
   const img = document.getElementById('pl-cover-img');
   if (!img) return;
-  const url = art ? cycleArtUrl({ art }) : '';
   if (!url) { img.hidden = true; img.removeAttribute('src'); return; }
   if (img.getAttribute('src') !== url) { img.hidden = false; img.onerror = () => { img.hidden = true; }; img.src = url; }
   else img.hidden = false;
@@ -14355,14 +14370,28 @@ function plSince(iso) { const m = /^(\d{4})-(\d{2})/.exec(String(iso || '')); re
 // What goes under the name besides the date (the sport line, step 5; the cheer button and the New Balls line, step 3): nothing yet.
 function playerSportLine() { return ''; }
 function playerActionsHTML() { return ''; }
-function playerTilesHTML(p, own) {
+// "Only you" (Amir's main session, 2026-10-24): YOUR page is sent whole, comebacks and the blocks you switched off included, and every part the
+// crew cannot see wears a small quiet label. `kinds` is your own switches as the page sends them (a kind not named is on); a page that is not
+// the crew's yet (you have not joined) has no labels, because the whole page is yours. `mk.n` counts the labels, so the note above can say so.
+const PL_ONLY = '<span class="pl-only">Only you</span>';
+function plKindOff(p, kind) {
+  const k = (p.kinds && typeof p.kinds === 'object') ? p.kinds : (crewMe().kinds || {});
+  return k[kind] === false;
+}
+function plMark(p, own, kind, mk) {
+  if (!own || p.member === false || p.under13) return '';
+  if (kind !== null && !plKindOff(p, kind)) return '';
+  if (mk) mk.n++;
+  return PL_ONLY;
+}
+function playerTilesHTML(p, own, mk) {
   const n = p.numbers || {}, t = [];
-  const one = (v, a, b) => `<b>${Number(v) || 0}</b><small>${Number(v) === 1 ? a : b}</small>`;
+  const one = (v, a, b, kind) => `<b>${Number(v) || 0}</b><small>${Number(v) === 1 ? a : b}</small>${kind === undefined ? '' : plMark(p, own, kind, mk)}`;
   const weeks = n.weeks && typeof n.weeks === 'object' ? n.weeks.now : n.weeks;
-  if (weeks != null) t.push(one(weeks, 'week held', 'weeks held'));
-  if (n.sessions != null) t.push(one(n.sessions, 'session with Amir', 'sessions with Amir'));
-  if (n.bests != null) t.push(one(n.bests, 'personal best', 'personal bests'));
-  if (own && n.comebacks != null) t.push(one(n.comebacks, 'comeback', 'comebacks'));   // yours only: the crew never sees a broken week
+  if (weeks != null) t.push(one(weeks, 'week held', 'weeks held', 'week'));
+  if (n.sessions != null) t.push(one(n.sessions, 'session with Amir', 'sessions with Amir', 'session'));
+  if (n.bests != null) t.push(one(n.bests, 'personal best', 'personal bests', 'best'));
+  if (own && n.comebacks != null) t.push(one(n.comebacks, 'comeback', 'comebacks', null));   // yours only, always: the crew never sees a broken week
   if (!own && p.cheers && p.cheers.season != null) t.push(one(p.cheers.season, 'cheer this season', 'cheers this season'));
   return t.length ? `<div class="pl-tiles">${t.map(x => `<div>${x}</div>`).join('')}</div>` : '';
 }
@@ -14398,28 +14427,31 @@ function crewShowPost(id) {
 window.crewShowPost = crewShowPost;
 function playerHTML(key, p, note) {
   const own = key === 'me' || !!p.me, first = plFirst(p), who = p.who || '';
-  const lv = Number(p.lv) > 0 ? `<span class="pl-lv">LV ${Number(p.lv)}</span>` : '';
+  const mk = { n: 0 };   // how many "Only you" labels the page wears
+  // `best_lifts` is sent and never drawn (Amir's main session, 2026-10-24): the lift names have no place on the page.
+  const lv = Number(p.lv) > 0 ? `<span class="pl-lv">LV ${Number(p.lv)}${plMark(p, own, 'level', mk)}</span>` : '';
   const since = plSince(p.since), sub = playerSportLine(p);
   let h = `<div class="pl-id"><span class="pl-facewrap">${crewFace({ ck: p.ck, fv: p.fv, who, me: own, amir: false }, 'xl')}${lv}</span>
     <h1 class="pl-name" dir="auto">${esc(who)}</h1>
     ${sub ? `<p class="pl-sub">${esc(sub)}</p>` : ''}${since ? `<p class="pl-meta">With Amir since ${esc(since)}</p>` : ''}${playerActionsHTML(key, p)}</div>`;
   if (note) h += `<p class="pl-quiet" role="status">${esc(note)}</p>`;
-  if (own) {
-    if (p.member === false && !p.under13) h += `<p class="pl-note">Only you see this page now. Join the crew and this is what they see.</p><button type="button" class="cr-go pl-join" onclick="playerJoin()">Join the crew</button>`;
-    else if (!p.under13) h += `<p class="pl-note">This is what the crew sees. Anything you switched off is left out.</p><button type="button" class="cr-bt pl-door" onclick="openCrewSettings()"><span>What the crew sees of you</span><span aria-hidden="true">›</span></button>`;
-  }
-  const tiles = playerTilesHTML(p, own);
-  if (tiles) h += `<h2 class="prog-sec">${own ? 'Your numbers' : esc(first) + "'s numbers"}</h2>${tiles}`;
+  let b = '';
+  const tiles = playerTilesHTML(p, own, mk);
+  if (tiles) b += `<h2 class="prog-sec">${own ? 'Your numbers' : esc(first) + "'s numbers"}</h2>${tiles}`;
   const ach = Array.isArray(p.achievements) ? p.achievements : [];
   if (ach.length) {
-    h += `<h2 class="prog-sec">Achievements</h2><div class="pl-list">${ach.slice(0, 3).map(playerAchRow).join('')}`
+    b += `<h2 class="prog-sec">Achievements${plMark(p, own, 'achievement', mk)}</h2><div class="pl-list">${ach.slice(0, 3).map(playerAchRow).join('')}`
       + (ach.length > 3 ? `<button type="button" class="cr-bt pl-row" onclick="openPlayerAchievements('${esc(key)}')"><span class="t">All ${ach.length}</span><span class="c" aria-hidden="true">›</span></button>` : '') + `</div>`;
   }
   const hon = Array.isArray(p.honours) ? p.honours : [];
-  if (hon.length) h += `<h2 class="prog-sec">Honours</h2><div class="pl-list">${hon.map(playerHonRow).join('')}</div>`;
+  if (hon.length) b += `<h2 class="prog-sec">Honours${plMark(p, own, 'honour', mk)}</h2><div class="pl-list">${hon.map(playerHonRow).join('')}</div>`;
   const posts = playerPosts(key, p);
-  if (posts.length) h += `<h2 class="prog-sec">This week</h2><div class="pl-list">${posts.map(playerPostRow).join('')}</div>`;
-  return h;
+  if (posts.length) b += `<h2 class="prog-sec">This week</h2><div class="pl-list">${posts.map(playerPostRow).join('')}</div>`;
+  if (own) {
+    if (p.member === false && !p.under13) h += `<p class="pl-note">Only you see this page now. Join the crew and this is what they see.</p><button type="button" class="cr-go pl-join" onclick="playerJoin()">Join the crew</button>`;
+    else if (!p.under13) h += `<p class="pl-note">This is what the crew sees.${mk.n ? ' Parts marked Only you stay with you.' : ''}</p><button type="button" class="cr-bt pl-door" onclick="openCrewSettings()"><span>What the crew sees of you</span><span aria-hidden="true">›</span></button>`;
+  }
+  return h + b;
 }
 // Join from your own page: yes, then the page is asked for again so it says it is the crew's too.
 async function playerJoin() {
@@ -14437,7 +14469,7 @@ function renderPlayerPage() {
   const body = document.getElementById('crewplayer-body');
   if (!body) return;
   const key = _playerCk, c = key ? crewPageGet(key) : null;
-  setPlayerCover(c ? c.p.art : null);
+  setPlayerCover(c ? playerCoverUrl(key, c.p) : key === 'me' ? playerCoverUrl('me') : '');
   const html = c ? playerHTML(key, c.p, _playerNote) : playerLoadingHTML(key);
   if (html === _playerHTML) return;   // nothing changed: a thumb is not rebuilt under
   _playerHTML = html;
@@ -14878,6 +14910,9 @@ async function crewSetKind(kind, on, input) {
   }
   if (BELL) BELL.me = r.data;
   try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
+  // Your own page wears "Only you" on whatever you have switched off: it follows the switch at once, without asking the server again.
+  const mine = crewPageGet('me');
+  if (mine) { mine.p.kinds = Object.assign({}, mine.p.kinds || {}, { [kind]: !!on }); crewPagesSave(); renderPlayerPage(); }
   if (onCrew()) renderCrew();
 }
 

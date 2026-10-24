@@ -7,8 +7,8 @@ first and goes live together (*"i want all of this to be built first, when we ar
 contract's, `CONTRACT.md` in the Lounge folder; this file is what the app does with them. The page is called the **Player Page** in code and docs,
 and athletes read **Your page**.
 
-Every step obeys the same ground rules. A server without stage96 draws Crew exactly as it was (the doors, the faces and the page all key off `ck`, which only
-stage96's `get_bell()` sends). A new screen is a static `.screen` with a visible `.nav-back` (NAV-01). Anything cached about OTHER people is a key that
+Every step obeys the same ground rules. A server without stage96 draws Crew exactly as it was (the doors, the faces and the page all key off `lounge`, the top-level
+flag only stage96's `get_bell()` sends). A new screen is a static `.screen` with a visible `.nav-back` (NAV-01). Anything cached about OTHER people is a key that
 `_snapshot()` and `syncFromCloud()` both skip. The in-app guide names every new control in the same commit. Social things pay nothing (GAME-6).
 
 ## Step 0 and 1 · The Player Page and the join question (ideas 55 and 62, direction A "Clubhouse")
@@ -16,11 +16,13 @@ stage96's `get_bell()` sends). A new screen is a static `.screen` with a visible
 **What.** Every person drawn in Crew is a door to their page: a post's face and name, a reply's face and name, the faces on the week band, the rows of
 *In the crew*, the board on the tab and its page, the honours names, the Open board's rows and the name in a Bell line. Amir ("Coach") opens the Coach tab.
 Your own name opens your own page; so does *Your page* under your initials and the same row in *Crew and the Bell*. The page (`screen-crewplayer`) is one
-scroll: the person's current cycle picture as the cover (the same file as that cycle's cover on Progress; the green when there is none) with ← on it, their
+scroll: the person's current cycle picture as the cover (YOUR page: `cycleArt()` of your own current cycle, so exactly your Progress; someone else's: the `art` family they send when it names one of the app's pictures, else `bedrock`; the app never reads a cycle name from the server) with ← on it, their
 face over the cover's foot with `LV n`, the name, *With Amir since June 2026*, **Sara's numbers** as tiles (weeks held, sessions with Amir, personal bests, and
 cheers this season, or comebacks on YOUR page only), the latest three achievements and *All n* (a sheet), the honours, and *This week*, their posts still on the
-Bell, a row each that scrolls Crew to the post. Your own page adds *This is what the crew sees* and a door to *What the crew sees of you*. A block the person
-switched off is not sent, so it is not drawn (GAME-9); a comeback is never drawn on anyone else's page, whatever the server sends. The join question shows your
+Bell, a row each that scrolls Crew to the post. Your own page is sent whole (every block, the comebacks, and `kinds`, your switches) and every part the crew cannot see wears a quiet *Only you*
+(the comebacks always, and any block you switched off); it adds *This is what the crew sees. Parts marked Only you stay with you.* and a door to *What
+the crew sees of you*. A block the person switched off is not sent to the crew, so it is not drawn on their page (GAME-9); a comeback is never drawn on
+anyone else's page, whatever the server sends. `best_lifts` is sent and never drawn. The join question shows your
 own page first, a face, your name and *26 sessions with Amir · 4 achievements*, then *This is what the crew sees. Never a weight, never your check-in.*; its buttons are as they
 were. A member who joined before pages existed sees *Your page is here* once.
 
@@ -35,10 +37,11 @@ a check-in, a comeback only to its owner.
 | `crewPersonOf(item)` | who an item is: `{ ck, fv, who, me, amir }` (+ `lv`, `held`, `isNew` when the item has them), for a post, a reply, a crew member, a board row (`is_me`), an honours row, an Open row, a Bell line (ck from its key). Amir has no ck. |
 | `crewFace(p, size, door)` | THE one place a face is drawn: `'post'` 36 px (default), `'band'`, `'row'`, `'xl'`. Initials until step 2, which puts the picture in this function only. |
 | `crewCanDoor(p)`, `crewGoCode(p)`, `crewDoor(p, cls, inner, label)`, `crewNameHTML(p, label)`, `crewListH(a)` | whether a person opens anything (a ck, you, or Amir), the `onclick` for it, a button around any markup, a name inside words, a list of such names. `null` means "draw what you always drew". |
-| `crewPagesOn()` / `crewDoorOn()` | the server speaks stage96 (`me` carries `ck`) · and the viewer is not under 13 (reads only, no doors). |
+| `crewPagesOn()` / `crewDoorOn()` | the server speaks stage96 (`get_bell()` carries `lounge: 1`, never a guess from `me.ck`) · and the viewer is not under 13 (reads only, no doors). |
 | `openPlayer(ck, from)` / `playerBack()` | open a page (`'me'`, a ck, or `'amir'`); ← goes back to `from` (default: the screen it was opened on) at the scroll it was left, or to the page before it. `_playerFrom`, `_playerScroll`, `_playerTrail` are reset in `goTo()` like `_wsReturn`. |
 | `crewPageGet / Put / Drop / Refresh / Ensure(key)` | the cache `<id>_crewpages` (30 people, newest kept, yours always; never synced; a person who leaves the crew takes their page off the phone, `crewPagesSweep()`) and `crew_page()` (10 s). |
 | `playerHTML(key, p, note)`, `renderPlayerPage()` | the page drawn from the copy at once, again when the server answers; slots for later steps: `playerSportLine()` (step 5), `playerActionsHTML()` (the cheer, step 3). |
+| `playerCoverUrl(key, p)` · `plMark(p, own, kind, mk)` | the cover's picture (above) · the *Only you* label for a block (kind `null` = always, the comebacks), counted so the note can say so. |
 | `crewLevelOf(c)` | the level from the person's own `lv`, so two *Ali B.*s are two levels; a server without stage96 sends none and it is the board's copy by name, as before. |
 
 **Errors.** `crew:gone` → *Sara is not in the crew any more.* and back; `crew:not_yes`, or a tap while you are not in the crew → *Join the crew to see their page.* with the

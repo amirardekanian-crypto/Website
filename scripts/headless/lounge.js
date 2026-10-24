@@ -16,7 +16,8 @@ const ck = n => 'a0000000-0000-4000-8000-0000000000' + String(n).padStart(2, '0'
 const CK = { alex: ck(1), mina: ck(2), reza: ck(3), ali1: ck(4), ali2: ck(5), leila: ck(6), sara: ck(7), omid: ck(8) };
 const AMIR = '11111111-2222-3333-4444-555555555555', P_MINA = 'bbbbbbbb-0000-4000-8000-000000000001', P_ALI = '66666666-7777-8888-9999-000000000000', P_OWN = 'cccccccc-0000-4000-8000-000000000001';
 
-// The Bell as stage96 sends it: ck and fv on every person, lv/held/new on the crew list. `o.noPages` = a server without stage96 (none of those keys).
+// The Bell as stage96 sends it: the top-level `lounge: 1` flag (the app's only test that the server has the Lounge), ck and fv on every person, lv/held/new
+// on the crew list. `o.noPages` = a server without stage96 (none of those keys, no flag) · `o.noFlag` = the keys but no flag (the app must draw Crew as it was).
 function bell(o = {}) {
   const me = Object.assign({ answer: 'yes', name: 'Alex R.', on_board: true, under13: false, can_post: true, photos_left: 3, posts_left: 10,
     kinds: { level: true, week: true, mark: true, achievement: true, best: true, cycle: true, honour: true, open: true } }, o.me || {});
@@ -32,7 +33,7 @@ function bell(o = {}) {
     Object.assign({ who: 'Sara T.', me: false, since: '2026-10-19' }, P(CK.sara), o.noPages ? {} : { lv: 12 }),
     Object.assign({ who: 'Omid P.', me: false, since: '2026-10-19' }, P(CK.omid), o.noPages ? {} : { lv: 5 }),
   ];
-  return {
+  return Object.assign(o.noPages || o.noFlag ? {} : { lounge: 1 }, {
     athlete_id: H.ID, at: iso(now), days: 7, kinds: ['level', 'week', 'mark', 'achievement', 'best', 'cycle', 'honour', 'open'], me,
     week: { members: 8, sessions: 14, held: 3 }, crew,
     honours: { month: '2026-09-01', rows: [Object.assign({ honour: 'sessions', who: 'Reza K.', me: false, value: { n: 14 } }, P(CK.reza)),
@@ -54,7 +55,7 @@ function bell(o = {}) {
       Object.assign({ t: 'post', id: P_OWN, who: 'Alex R.', me: true, amir: false, kind: 'post', body: 'Day 2 done.', photo: false, at: iso(now - 12000e3), pinned: false, left: 7,
         kudos: { n: 0, mine: false, names: [] }, replies: [] }, P(CK.alex)),
     ],
-  };
+  });
 }
 const board = (noPages) => [
   Object.assign({ pos: 1, who: 'Reza K.', points: 6240, level: 22, is_me: false }, noPages ? {} : { ck: CK.reza, fv: null }),
@@ -107,7 +108,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     C.check('…a board row (is_me, not me), an Open row', s.board.ck === CK.reza && s.boardMe.me && s.boardMe.ck === CK.alex && s.open.ck === CK.reza, JSON.stringify([s.board, s.boardMe, s.open]));
     C.check('…a name with no key is a person with no ck, and no door', s.nobody.ck === null && s.canDoor.join() === 'true,false,true', s.canDoor.join());
     C.check('crewFace: initials in a .cr-ini, AA for Amir, a button on the band when it is a door', /cr-ini/.test(s.face) && />MS</.test(s.face) && />AA</.test(s.faceAmir) && /<i class="cr-face me"/.test(s.faceBand), s.face + ' ' + s.faceBand);
-    C.check('the doors are on when get_bell carries stage96\'s ck', s.pagesOn && s.doorOn && s.fns.every(t => t === 'function'), s.fns.join());
+    C.check('the doors are on when get_bell carries stage96\'s flag (lounge: 1)', s.pagesOn && s.doorOn && s.fns.every(t => t === 'function'), s.fns.join());
     C.check('…no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }
@@ -270,7 +271,7 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     await click(p, '#acct-page'); await p.waitForTimeout(600);
     C.check('…it opens your own page (the sheet closes)', (await screenNow(p)) === 'screen-crewplayer' && !(await p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))) && (await p.evaluate(() => _playerCk)) === 'me');
     const t = await tiles(p);
-    C.check('your numbers: weeks, sessions, bests and COMEBACKS', JSON.stringify(t) === JSON.stringify(['6 weeks held', '41 sessions with Amir', '9 personal bests', '2 comebacks']), JSON.stringify(t));
+    C.check('your numbers: weeks, sessions, bests and COMEBACKS', JSON.stringify(t) === JSON.stringify(['6 weeks held', '41 sessions with Amir', '9 personal bests', '2 comebacks ONLY YOU']), JSON.stringify(t));
     C.check('…titled Your numbers', (await secs(p))[0] === 'Your numbers');
     C.check('…and says it is what the crew sees, with a door to what the crew sees of you', /This is what the crew sees/.test(await text(p, '#crewplayer-body')) && /What the crew sees of you/.test(await text(p, '#crewplayer-body .pl-door')));
     C.check('…your own posts are This week', (await p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-wk')].map(r => r.textContent).join('|'))).includes('Day 2 done.'));
@@ -533,6 +534,84 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     await goCrew(c.p); await c.p.waitForTimeout(500);
     await c.p.screenshot({ path: path.join(out, 'join-question-light-390.png') }).catch(() => {});
     await c.ctx.close();
+  }
+
+  // ── 12. Amir's four decisions on the page (main session, 2026-10-24) ────────────────────────────────────────────────────────
+  {
+    // (1) the flag is the test: keys without it are Crew as it was; the flag without a key of your own is the Lounge
+    const a = await open(browser, { b: { noFlag: true } });
+    await goCrew(a.p);
+    const sa = await a.p.evaluate(() => ({ on: crewPagesOn(), doors: document.querySelectorAll('#crew-body .cr-bt').length, band: document.querySelector('#crew-body .cr-faces').tagName }));
+    C.check('ck and fv without get_bell\'s "lounge" flag: no door, the band is the one button it was', !sa.on && sa.doors === 0 && sa.band === 'BUTTON', JSON.stringify(sa));
+    await a.ctx.close();
+    const b = await open(browser, { b: { me: { ck: null, fv: null } } });
+    await goCrew(b.p);
+    const sb = await b.p.evaluate(() => ({ on: crewPagesOn(), doors: document.querySelectorAll('#crew-body .cr-pl').length }));
+    C.check('the flag with no key of your own (no consent row yet): the Lounge is on', sb.on && sb.doors >= 3, JSON.stringify(sb));
+    await b.ctx.close();
+  }
+  {
+    // (2) "Only you": the comebacks always, and any block whose switch is off; never on someone else's page
+    const ach = [{ id: 'a:1', name: 'Back to Back', day: '2026-10-12', signed: [], signed_n: 0 }, { id: 'a:2', name: 'The Notebook', day: '2026-10-03', signed: [], signed_n: 0 }];
+    const hon = [{ month: '2026-09-01', honour: 'sessions', value: { n: 14 } }];
+    const lone = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-only')].map(e => ({ t: e.textContent.trim(), where: e.closest('.pl-tiles > div') ? 'tile:' + e.closest('.pl-tiles > div').innerText.replace(/\s+/g, ' ').trim() : e.closest('.prog-sec') ? 'sec:' + e.closest('.prog-sec').firstChild.textContent.trim() : e.closest('.pl-lv') ? 'lv' : '?' })));
+    const { ctx, p } = await open(browser, { stub: { crewPages: { me: { kinds: { achievement: false, honour: true, level: true }, achievements: ach, honours: hon, lv: 19, best_lifts: [{ lift: 'Trap Bar Deadlift', day: '2026-10-08' }] },
+      [CK.mina]: { kinds: { achievement: false }, achievements: ach, honours: hon, numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9, comebacks: 3 } } } } });
+    await goCrew(p);
+    await p.evaluate(() => openPlayer('me')); await p.waitForTimeout(600);
+    let l = await lone(p);
+    C.check('your page: "Only you" on the comebacks tile and on Achievements (its switch is off), nowhere else', l.length === 2 && l.every(x => x.t === 'Only you') && /^tile:2 comebacks/.test(l[0].where) && l[1].where === 'sec:Achievements', JSON.stringify(l));
+    C.check('…the label is small grey Space Mono, quiet', await p.evaluate(() => { const s = getComputedStyle(document.querySelector('#crewplayer-body .pl-only')); return /Space Mono/.test(s.fontFamily) && parseFloat(s.fontSize) <= 12 && s.color !== 'rgb(26, 26, 26)'; }));
+    const note = await plain(p, '#crewplayer-body .pl-note');
+    C.check('…the line stays "This is what the crew sees" and adds "Parts marked Only you stay with you."', note === 'This is what the crew sees. Parts marked Only you stay with you.', note);
+    C.check('…best_lifts are sent and never drawn', !/Trap Bar/.test(await text(p, '#crewplayer-body')));
+    // a switch turned off in the sheet marks its tile at once, and on again takes the mark away
+    await p.evaluate(() => crewSetKind('week', false)); await p.waitForTimeout(500);
+    l = await lone(p);
+    C.check('turning "A week held" off marks the weeks tile "Only you"', l.some(x => /^tile:6 weeks held/.test(x.where)) && l.length === 3, JSON.stringify(l));
+    await p.evaluate(() => crewSetKind('week', true)); await p.waitForTimeout(500);
+    C.check('…and on again takes it away', (await lone(p)).length === 2);
+    await p.evaluate(() => crewSetKind('level', false)); await p.waitForTimeout(500);
+    C.check('the level switch off marks the level chip', (await lone(p)).some(x => x.where === 'lv'));
+    await p.evaluate(() => crewSetKind('level', true)); await p.waitForTimeout(300);
+    await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(250);
+    await shown(p, CK.mina);
+    C.check('someone else\'s page never says "Only you", whatever the server sends', (await lone(p)).length === 0 && !/Only you/.test(await text(p, '#crewplayer-body')) && !/comeback/i.test(await text(p, '#crewplayer-body')));
+    C.check('…the app draws what the server sent: a switched-off block is left out by the server, never decided here', (await secs(p)).includes('Achievements'));
+    await ctx.close();
+  }
+  {
+    // nothing off and no comebacks: no label, and the second sentence is not there to point at nothing
+    const { ctx, p } = await open(browser, { stub: { crewPages: { me: { kinds: {}, numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9 } } } } });
+    await goCrew(p);
+    await p.evaluate(() => openPlayer('me')); await p.waitForTimeout(600);
+    C.check('nothing to mark: no "Only you", no second sentence', (await p.$$('#crewplayer-body .pl-only')).length === 0 && (await plain(p, '#crewplayer-body .pl-note')) === 'This is what the crew sees.');
+    await ctx.close();
+    // not in the crew: the whole page is yours, so there is nothing to label
+    const r = await open(browser, { b: { me: { answer: null, can_post: false } }, stub: { crewPages: { me: { member: false, kinds: { week: false } } } } });
+    await waitTab(r.p); await r.p.waitForTimeout(400);
+    await r.p.evaluate(() => openPlayer('me')); await r.p.waitForTimeout(600);
+    C.check('not in the crew: no labels (the whole page is yours)', (await r.p.$$('#crewplayer-body .pl-only')).length === 0);
+    await r.ctx.close();
+  }
+  {
+    // (3) the cover: your own page is the picture on your Progress; another's is their art family, else bedrock; never a cycle name
+    const { ctx, p } = await open(browser, { stub: { crewPages: { me: { art: 'voltage' }, [CK.mina]: { art: 'armour' }, [CK.reza]: { art: 'c3' }, [CK.sara]: { art: null }, [CK.omid]: { art: 'Load & Build' } } } });
+    await goCrew(p);
+    const src = () => p.evaluate(() => { const i = document.getElementById('pl-cover-img'); return i.hidden ? null : i.getAttribute('src'); });
+    const want = await p.evaluate(() => cycleArtUrl(DATA.cycles[DATA.currentCycleIndex]));
+    await p.evaluate(() => goTo('plan')); await p.waitForTimeout(500);
+    const prog = await p.evaluate(() => { const i = document.querySelector('#cycle-card-wrap .cyc-img'); return i ? i.getAttribute('src') : null; });
+    await p.evaluate(() => openPlayer('me')); await p.waitForTimeout(600);
+    C.check('your own page: the cover is exactly the picture on your Progress (cycleArt of your current cycle), not the page\'s art', (await src()) === want && prog === want && /iron-v1/.test(want), JSON.stringify([await src(), prog, want]));
+    await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(250);
+    for (const [who, ckk, family] of [['a named family', CK.mina, 'armour'], ['a word that is no family ("c3")', CK.reza, 'bedrock'], ['no art at all', CK.sara, 'bedrock'], ['a cycle name (never read as one)', CK.omid, 'bedrock']]) {
+      await shown(p, ckk);
+      const s = await src();
+      C.check('someone else\'s cover, ' + who + ': ' + family, !!s && s.indexOf('assets/art/cycles/' + family + '-v1.webp') >= 0, String(s));
+      await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(200);
+    }
+    await ctx.close();
   }
 
   await browser.close();
