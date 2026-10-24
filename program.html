@@ -5734,6 +5734,42 @@
   #hist-overlay .fp-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   #hist-overlay .fp-rm { background: transparent; color: var(--green-ink); border: 1.5px solid var(--field); }
   #hist-overlay .fp-rm[hidden] { display: none; }
+
+  /* PLAYERS' LOUNGE · THE CHEER (step 3, 2026-10-24). The clap is an icon in the app's line style (CLAP_SVG), never the emoji (it is yellow on a phone).
+     The page's button is its one clay control; once you have cheered today it is a quiet green line. The band's faces grow to 40 px: a mint ring for a held
+     week, NEW under a new member, and a burst of claps on a double tap (none for anyone who asked for less motion). */
+  .pl-cheer, .pl-cheered { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; margin-top: 12px; border-radius: 8px; }
+  .pl-cheer { border: 0; background: var(--clay-fill); color: #fff; cursor: pointer; font: 700 var(--fs-lead)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .pl-cheer:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .pl-cheer:active { filter: brightness(.94); }
+  .pl-cheered { border: 1px solid var(--hair); background: var(--tint); color: var(--green-ink); font: 700 var(--fs-body)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .pl-cheer svg, .pl-cheered svg { flex: none; width: 22px; height: 22px; display: block; }
+  .pl-new { margin: 12px 0 0; font: 600 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--green-ink); }
+  .pl-newtag { display: inline-block; margin-right: 8px; padding: 3px 6px; border-radius: 6px; background: var(--tint); font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; }
+  .pl-new + .pl-cheer { margin-top: 8px; }
+  .pl-ch { grid-template-columns: 24px minmax(0, 1fr) auto; gap: 12px; text-align: left; }
+  .pl-ch .cr-fl { align-self: start; margin-top: 2px; }
+  .pl-ch .q { display: block; }
+  #hist-overlay .ch-ic { display: inline-flex; width: 26px; height: 26px; margin-right: 8px; vertical-align: -4px; color: var(--clay-ink); }
+  #hist-overlay .ch-ic svg { width: 26px; height: 26px; display: block; }
+  .aa-toast-ic { display: inline-block; width: 20px; height: 20px; margin-right: 8px; vertical-align: -4px; color: var(--mint); }
+  .aa-toast-ic svg { width: 20px; height: 20px; display: block; }
+  #screen-crew .cr-faces.cr-fcs { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; min-height: 0; margin-top: 12px; padding: 4px 4px 0; cursor: default; }
+  #screen-crew .cr-fc { position: relative; display: flex; flex-direction: column; align-items: center; flex: 0 1 40px; min-width: 30px; }
+  #screen-crew .cr-fcs .cr-face { width: 100%; height: auto; aspect-ratio: 1; margin-right: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;
+    font: 700 var(--fs-small)/1 'Barlow', sans-serif; }
+  #screen-crew .cr-fcs .cr-face.held { box-shadow: 0 0 0 2px #0E4A36, 0 0 0 4px var(--mint); }   /* the gap is the band's own green (--hero is a gradient: it cannot sit in a shadow) */
+  #screen-crew .cr-fcs .cr-face.more { background: rgba(255,255,255,.14); }
+  #screen-crew .cr-fcs button.cr-bt.cr-face::after { inset: -4px -1px; }
+  #screen-crew .cr-new { margin-top: 7px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
+  #screen-crew .cr-bandfoot { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  #screen-crew .cr-hint { flex: 1; min-width: 0; margin: 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: rgba(255,255,255,.74); }
+  #screen-crew .cr-bandfoot .go { margin-left: auto; flex: none; min-height: 44px; padding-left: 10px; font: 600 var(--fs-small)/1 'Barlow', sans-serif; color: rgba(255,255,255,.74); white-space: nowrap; }
+  #screen-crew .cr-burst { position: absolute; left: 50%; top: 0; width: 0; height: 0; pointer-events: none; z-index: 5; }
+  #screen-crew .cr-burst i { position: absolute; left: -9px; top: -4px; width: 18px; height: 18px; color: var(--mint); opacity: 0; animation: crBurst .9s ease-out forwards; animation-delay: var(--d, 0ms); }
+  #screen-crew .cr-burst i svg { width: 18px; height: 18px; display: block; }
+  @keyframes crBurst { 0% { opacity: 0; transform: translate(0, 6px) scale(.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx, 0), -34px) scale(1.25); } }
+  @media (prefers-reduced-motion: reduce) { #screen-crew .cr-burst { display: none; } }
   /* Tell the crew, on the finished card, under the WhatsApp row (paintCrewTell()) */
   :where(#day-view) .complete-crew, :where(#day-view) .complete-share { margin-top: 10px; }
   :where(#day-view) .complete-crew[hidden], :where(#day-view) .complete-share[hidden] { display: none; }
@@ -11122,7 +11158,7 @@ APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how ofte
     body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
-  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p>`;
+  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP.</p>`;
   const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with likes), last month\'s honours early in the month, and the season board.</li>';
   return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
     <div class="note-card app-card${openKey && card.key === openKey ? ' open' : ''}" onclick="toggleNote(this)">
@@ -13642,6 +13678,10 @@ const CREW_BELL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 // The day's attendance wears a tick, not the bell: it is the roll call, not a moment anyone earned.
 const CREW_TICK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>';
 const CREW_CAM_SVG ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>';
+// The clap (Amir's main session, 2026-10-24): two hands meeting with three short bursts, in the line style of the app's icons (24 box, currentColor, 1.6
+// stroke, round caps). The 👏 character is YELLOW on phones and the text variation selector is ignored on iOS, so it is never put in anything an athlete
+// reads: the page's button, the sheet, the toast and the double tap's burst all use this one icon, and the guide says "Cheer" in words.
+const CLAP_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 9.4 5.9 18.2c-.7 1.4-2.5 1.7-3.3.6-.6-.9-.3-1.7 0-2.3L6.9 8.7c.6-1.1 2.1-1.4 3-.5.7.7.9 1.1.7 1.2z"/><path d="M13.4 9.4l4.7 8.8c.7 1.4 2.5 1.7 3.3.6.6-.9.3-1.7 0-2.3L17.1 8.7c-.6-1.1-2.1-1.4-3-.5-.7.7-.9 1.1-.7 1.2z"/><path d="M12 2v2.6M5.4 3.6l1.5 2M18.6 3.6l-1.5 2"/></svg>';
 function crewKey() { return ATHLETE_ID + '_crewcache'; }
 function crewSeenKey() { return ATHLETE_ID + '_crewseen'; }
 function crewAllowed() { return !window.IS_DEMO && !window.IS_PREVIEW && !!ATHLETE_ID; }
@@ -13760,6 +13800,7 @@ function setCrewTab() {
 function openCrew() {
   _crewOpenEm = {};   // a menu the ＋ opened lasts for this visit only (it used to last until the app was reloaded)
   _introVisit = false;   // and "Your page is here" is one visit's card (crewIntroHTML())
+  _hintSeen = false;   // and so is the band's hint: a visit is one sighting of it (crewCheerHint())
   // Amir's pinned post wears its clay pin on the visit that first shows it; from then on it is seen (the tab's dot goes at once).
   _crewFreshPin = crewAmirNew() ? crewAmirPost().id : null;
   crewMarkSeen();
@@ -13875,8 +13916,8 @@ function crewFace(p, size, door) {
   p = p || {};
   const ini = esc(p.amir ? 'AA' : crewInitials(p.who)), pic = crewFaceImg(p), dat = crewFaceData(p);
   if (size === 'band') {
-    const cls = 'cr-face' + (p.me ? ' me' : '');
-    return door ? `<button type="button" class="cr-bt ${cls}"${dat} onclick="event.stopPropagation(); ${crewGoCode(p)}" aria-label="${esc(crewDoorLabel(p))}">${ini}${pic}</button>`
+    const cls = 'cr-face' + (p.me ? ' me' : '') + (p.held ? ' held' : '');
+    return door ? `<button type="button" class="cr-bt ${cls}"${dat} onclick="crewBandTap(event, '${p.me || !p.ck ? 'me' : esc(p.ck)}')" aria-label="${esc(crewDoorLabel(p) + (p.held ? ', held the week' : '') + (p.isNew ? ', new in the crew' : ''))}">${ini}${pic}</button>`
       : `<i class="${cls}"${dat} aria-hidden="true">${ini}${pic}</i>`;
   }
   if (size === 'row') return `<span class="p ini"${dat} aria-hidden="true">${ini}${pic}</span>`;
@@ -14224,10 +14265,18 @@ function crewWeekHTML() {
   // With stage96 every face is a door to its owner's page, and the row's own door is the words "In the crew ›" (a button inside a button is not
   // allowed, so the row is a div and a tap on the empty part of it still opens In the crew). Without it: the one button it always was.
   const doors = crewDoorOn();
-  const faces = crew.slice(0, 6).map(c => { const p = crewPersonOf(c); return crewFace(p, 'band', doors && crewCanDoor(p)); }).join('')
-    + (crew.length > 6 ? `<i class="cr-face" aria-hidden="true">+${crew.length - 6}</i>` : '');
+  // Step 3, In the Band (Amir: "go with your picks", the clap button "something more understandable to any one"): the faces grow to 40 px, each a door to its
+  // page, a mint ring round the ones who held this week, NEW under the ones who joined this week. One tap opens the page after 250 ms unless a second tap
+  // comes (crewBandTap()), and a double tap cheers at once. "+N" and "In the crew ›" open the list.
+  const bandFace = c => {
+    const p = crewPersonOf(c), f = crewFace(p, 'band', doors && crewCanDoor(p));
+    return doors ? `<span class="cr-fc">${f}${p.isNew ? '<span class="cr-new">New</span>' : ''}</span>` : f;
+  };
+  const more = crew.length > 6 ? (doors ? `<span class="cr-fc"><button type="button" class="cr-bt cr-face more" onclick="goTo('crewwho')" aria-label="See who is in the crew">+${crew.length - 6}</button></span>` : `<i class="cr-face" aria-hidden="true">+${crew.length - 6}</i>`) : '';
+  const faces = crew.slice(0, 6).map(bandFace).join('') + more;
+  const hint = doors && crewCanLike() && crewCheerHint() ? '<span class="q cr-hint">Double-tap a face to cheer. Tap to see their page.</span>' : '';
   const door = !crew.length ? ''
-    : doors ? `<div class="cr-faces" onclick="goTo('crewwho')">${faces}<button type="button" class="cr-bt go" aria-label="See who is in the crew">In the crew ›</button></div>`
+    : doors ? `<div class="cr-faces cr-fcs">${faces}</div><div class="cr-bandfoot">${hint}<button type="button" class="cr-bt go" onclick="goTo('crewwho')" aria-label="See who is in the crew">In the crew ›</button></div>`
     : `<button type="button" class="cr-faces" onclick="goTo('crewwho')" aria-label="See who is in the crew">${faces}<span class="go">In the crew ›</span></button>`;
   return `<section class="cr-week" aria-label="The crew this week">
     <p class="k">Last 7 days · ${mem} in the crew</p>
@@ -14548,9 +14597,8 @@ function setPlayerCover(url) {
   else img.hidden = false;
 }
 function plSince(iso) { const m = /^(\d{4})-(\d{2})/.exec(String(iso || '')); return m ? crewMonth(iso) + ' ' + m[1] : ''; }
-// What goes under the name besides the date (the sport line, step 5; the cheer button and the New Balls line, step 3): nothing yet.
+// What goes under the name besides the date: the sport line (step 5, nothing yet) and, on someone else's page, the New Balls line and the cheer (step 3).
 function playerSportLine() { return ''; }
-function playerActionsHTML() { return ''; }
 // "Only you" (Amir's main session, 2026-10-24): YOUR page is sent whole, comebacks and the blocks you switched off included, and every part the
 // crew cannot see wears a small quiet label. `kinds` is your own switches as the page sends them (a kind not named is on); a page that is not
 // the crew's yet (you have not joined) has no labels, because the whole page is yours. `mk.n` counts the labels, so the note above can say so.
@@ -14630,6 +14678,7 @@ function playerHTML(key, p, note) {
   }
   const hon = Array.isArray(p.honours) ? p.honours : [];
   if (hon.length) b += `<h2 class="prog-sec">Honours${plMark(p, own, 'honour', mk)}</h2><div class="pl-list">${hon.map(playerHonRow).join('')}</div>`;
+  b += playerCheersHTML(p);
   const posts = playerPosts(key, p);
   if (posts.length) b += `<h2 class="prog-sec">This week</h2><div class="pl-list">${posts.map(playerPostRow).join('')}</div>`;
   if (own) {
@@ -14827,6 +14876,173 @@ async function crewOwnFace(fv, blob) {
   if (onCrew()) renderCrew();
   if (onCrewPage()) renderCrewPage();
 }
+
+// ── PLAYERS' LOUNGE · THE CHEER (step 3, 2026-10-24) ──────────────────────────────────────────────────────────────────────────────
+// Amir: "something more understandable to any one ... a clapping icon": the button reads [clap] Cheer, not "Well played". A cheer goes to ONE person, once
+// a day each, with a word if you like (100 characters, which the crew sees for 7 days), and it rings their phone with your name and never the word (push.md).
+// It pays nothing (GAME-6). Two doors: the person's page (the button and its sheet) and the week band (a double tap on a face, with no word).
+// "New Balls" (idea 70): someone who joined in the last 7 days wears NEW on the band and "Joined this week. Say hello." above the button.
+var _cheered = {}, _cheerBusy = {};   // ck → the server's (UTC) day you cheered them · ck → a cheer is on its way
+var _tapT = null, _tapCk = null, _tapQuiet = 0, _hintSeen = false;
+const utcDay = ms => new Date(ms == null ? Date.now() : ms).toISOString().slice(0, 10);
+// Did you cheer this person today? The server's day is UTC, so a copy of their page made yesterday is no answer.
+function crewCheeredToday(key) {
+  if (_cheered[key] === utcDay()) return true;
+  const c = crewPageGet(key);
+  return !!(c && c.p.cheers && c.p.cheers.mine_today && utcDay(c.at) === utcDay());
+}
+function crewFirstOf(ck) { const c = crewPageGet(ck); return (c && plFirst(c.p)) || String(crewNameOfCk(ck) || '').split(/\s+/)[0] || 'them'; }
+function crewCheerAsk() {
+  aaToast('Join the crew to cheer.', { kicker: 'Crew', action: 'Join the crew', dismiss: 'Not now', run: () => crewAnswer('yes') });
+}
+function crewCheerWords(err, nm) {
+  if (err === 'crew:cheer_today') return `You cheered ${nm} today. Come back tomorrow.`;
+  if (err === 'crew:gone') return `${nm} is not in the crew any more.`;
+  if (err === 'crew:missing') return 'Cheers are not ready yet.';
+  return crewErrWords(err).replace('That did not post. Try again.', 'That cheer did not go. Try again.');
+}
+// The server's answer is the truth: a cheer went, or it says why not. On the copy of their page it is one more cheer, yours, and "Cheered today".
+function crewCheerDone(ck, word, season) {
+  _cheered[ck] = utcDay();
+  const c = crewPageGet(ck);
+  if (!c) return;
+  const ch = c.p.cheers = c.p.cheers || {}, me = crewPersonOf({ me: true });
+  ch.mine_today = true;
+  if (season != null && isFinite(Number(season))) ch.season = Number(season);
+  ch.recent = [{ ck: me.ck, who: me.who, fv: me.fv, coach: false, word: word || null, day: utcDay() }].concat(Array.isArray(ch.recent) ? ch.recent : []).slice(0, 20);
+  c.at = Date.now(); crewPagesSave();
+  _playerHTML = '';
+  if (onPlayer()) renderPlayerPage();
+}
+async function crewCheerSend(ck, word) {
+  if (_cheerBusy[ck]) return { busy: true };
+  _cheerBusy[ck] = true;
+  let r = null;
+  try {
+    const sb = await _sbReady(), args = { p_subject: ck };
+    if (word) args.p_word = word;
+    r = sb && await _withTimeout(sb.rpc('crew_cheer', args), 15000);
+  } catch (e) { r = null; } finally { delete _cheerBusy[ck]; }
+  if (_noAnswer(r)) return { offline: true };
+  if (r.error || !r.data) {
+    if (crewMissingErr(r)) return { err: 'crew:missing' };
+    const m = /crew:[a-z_0-9]+/.exec(String(r.error && r.error.message || ''));
+    return { err: m ? m[0] : 'crew:other' };
+  }
+  crewCheerDone(ck, word, r.data.season);
+  return { ok: true, season: r.data.season };
+}
+// A refusal in words. A person who has left is gone from this phone too.
+function crewCheerFail(ck, r, nm) {
+  if (r.offline) { aaToast('No signal. Cheer again when you are back online.'); return; }
+  if (r.err === 'crew:gone') { crewPageDrop(ck); _bellAt = 0; refreshBell(); if (onPlayer() && _playerCk === ck) playerBack(); }
+  if (r.err === 'crew:cheer_today') { _cheered[ck] = utcDay(); _playerHTML = ''; if (onPlayer()) renderPlayerPage(); }
+  aaToast(crewCheerWords(r.err, nm));
+}
+function crewCheerSentToast(nm) { aaToast(`Cheer sent to ${nm}`, { kicker: 'Crew', icon: CLAP_SVG, ms: 3500 }); }
+// The band's hint is one line, three visits at most, and gone for good after the first double tap. It is the athlete's own key, so it syncs.
+function crewHintKey() { return ATHLETE_ID + '_cheerhint'; }
+function crewCheerHint() {
+  let v = null;
+  try { v = localStorage.getItem(crewHintKey()); } catch (e) { return false; }
+  if (v === 'done') return false;
+  if (_hintSeen) return true;
+  const n = Number(v) || 0;
+  if (n >= 3) return false;
+  _hintSeen = true;
+  try { _lsRawSet(crewHintKey(), String(n + 1)); } catch (e) {}
+  return true;
+}
+function crewHintDone() {
+  try { _lsRawSet(crewHintKey(), 'done'); } catch (e) {}
+  document.querySelectorAll('.cr-hint').forEach(e => e.remove());
+}
+// A small burst of claps over the face. Not for anyone who asked their phone for less motion: the toast says it then.
+function crewBurst(el) {
+  const fc = el && el.closest ? el.closest('.cr-fc') : null;
+  if (!fc || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  const b = document.createElement('span');
+  b.className = 'cr-burst'; b.setAttribute('aria-hidden', 'true');
+  b.innerHTML = [['-16px', '0ms'], ['0px', '90ms'], ['16px', '180ms']].map(([dx, d]) => `<i style="--dx:${dx};--d:${d}">${CLAP_SVG}</i>`).join('');
+  fc.appendChild(b);
+  setTimeout(() => b.remove(), 1100);
+}
+// One tap opens their page after 250 ms unless a second tap on the same face comes first. A double tap cheers at once and never also opens the page.
+// Your own face has nobody to cheer: it opens your page at once.
+function crewBandTap(ev, ck) {
+  if (ev) ev.stopPropagation();
+  const el = ev && ev.currentTarget, now = Date.now();
+  if (ck === 'me') { openPlayer('me'); return; }
+  if (now < _tapQuiet) return;   // the tap after a double tap is not a third act
+  if (_tapT && _tapCk === ck) { clearTimeout(_tapT); _tapT = null; _tapCk = null; _tapQuiet = now + 450; crewQuickCheer(ck, el); return; }
+  clearTimeout(_tapT); _tapCk = ck;
+  _tapT = setTimeout(() => { _tapT = null; _tapCk = null; openPlayer(ck); }, 250);
+}
+window.crewBandTap = crewBandTap;
+async function crewQuickCheer(ck, el) {
+  if (!crewCanLike()) { crewCheerAsk(); return; }
+  const nm = crewFirstOf(ck);
+  if (crewCheeredToday(ck)) { aaToast(`You cheered ${nm} today. Come back tomorrow.`, { kicker: 'Crew', icon: CLAP_SVG, ms: 3500 }); return; }
+  crewBurst(el);
+  crewHintDone();
+  const r = await crewCheerSend(ck, null);
+  if (r.busy) return;
+  if (r.ok) crewCheerSentToast(nm); else crewCheerFail(ck, r, nm);
+}
+// On someone else's page: the New Balls line and the one clay control on it. After you have cheered today it is a quiet green line, not a button.
+function playerActionsHTML(key, p) {
+  if (key === 'me' || p.me || !crewCanLike() || p.member === false) return '';
+  const fresh = p.new ? '<p class="pl-new"><span class="pl-newtag">New</span>Joined this week. Say hello.</p>' : '';
+  return fresh + (crewCheeredToday(key)
+    ? `<span class="pl-cheered" role="status">${CLAP_SVG}<span>Cheered today</span></span>`
+    : `<button type="button" class="pl-cheer" onclick="openCheer('${esc(key)}')">${CLAP_SVG}<span>Cheer</span></button>`);
+}
+// "Cheers this season · 12" and the last week's, newest first: the face, the name (Coach for Amir), the word, the day.
+function playerCheerRow(r) {
+  const mineCk = crewMe().ck, pp = r.coach ? { amir: true, who: 'Amir' } : { ck: r.ck || null, fv: r.fv == null ? null : r.fv, who: r.who || '', me: !!(mineCk && r.ck === mineCk) };
+  const q = [r.word ? `<span dir="auto">${esc(r.word)}</span>` : '', esc(crewDayWord(r.day))].filter(Boolean).join(' · ');
+  const inner = `${crewFace(pp, 'line')}<span><span class="t">${esc(r.coach ? 'Coach' : (pp.me ? 'You' : (r.who || 'Someone')))}</span><span class="q">${q}</span></span>${crewCanDoor(pp) ? '<span class="c" aria-hidden="true">›</span>' : ''}`;
+  return crewDoor(pp, 'pl-row pl-ch', inner) || `<div class="pl-row pl-ch">${inner}</div>`;
+}
+function playerCheersHTML(p) {
+  const ch = p.cheers || {}, rows = Array.isArray(ch.recent) ? ch.recent : [];
+  if (!rows.length) return '';
+  const n = ch.season != null ? Number(ch.season) || 0 : rows.length;
+  return `<h2 class="prog-sec">Cheers this season · ${n}</h2><div class="pl-list">${rows.map(playerCheerRow).join('')}</div>`;
+}
+// The sheet "Cheer Sara": a word if you like, 100 characters, and Send.
+function openCheer(key) {
+  const ov = document.getElementById('hist-overlay'), c = crewPageGet(key);
+  if (!ov || !BELL || !c || key === 'me') return;
+  if (!crewCanLike()) { crewCheerAsk(); return; }
+  if (crewCheeredToday(key)) return;
+  const nm = plFirst(c.p) || 'them';
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Crew</div>
+    <h2 class="readiness-title"><span class="ch-ic" aria-hidden="true">${CLAP_SVG}</span>Cheer ${esc(nm)}</h2>
+    <textarea class="cr-txt cr-rtxt ch-txt" dir="auto" maxlength="100" aria-label="A word for ${esc(nm)}, if you have one" placeholder="Add a word (optional)"></textarea>
+    <span class="cr-cnt" aria-live="polite"></span>
+    <p class="cr-note">The crew can see your word for 7 days.</p>
+    <button type="button" class="cr-go ch-go">Send</button>
+    <p class="cr-err" role="status"></p>`;
+  const m = ov.querySelector('.readiness-modal'), ta = m.querySelector('.ch-txt'), cnt = m.querySelector('.cr-cnt'), go = m.querySelector('.ch-go'), err = m.querySelector('.cr-err');
+  const sync = () => { cnt.textContent = ta.value.length + ' / 100'; };
+  ta.addEventListener('input', sync);
+  go.addEventListener('click', async () => {
+    const label = go.textContent;
+    go.disabled = true; go.textContent = 'Sending…'; err.textContent = '';
+    const r = await crewCheerSend(key, ta.value.trim());
+    go.textContent = label;
+    if (r.busy) { go.disabled = false; return; }
+    if (r.ok) { closeHistorySheet(); crewCheerSentToast(nm); return; }
+    if (r.offline) { err.textContent = 'No signal. Your cheer is still here. Tap Send again when you have signal.'; go.disabled = false; return; }
+    if (r.err === 'crew:gone' || r.err === 'crew:cheer_today') { closeHistorySheet(); crewCheerFail(key, r, nm); return; }
+    err.textContent = crewCheerWords(r.err, nm); go.disabled = false;
+  });
+  sync();
+  ov.classList.add('visible');   // no focus here: the word is optional, and a keyboard would cover Send
+}
+window.openCheer = openCheer;
 
 // ── the photos: asked one at a time when their card comes near the screen, two at once at most, kept for this visit ──
 const _crewPhP = new Map(), _crewPhQ = [];
@@ -15299,6 +15515,8 @@ function crewErrWords(msg) {
     'crew:session_photo': 'Add a photo to tell the crew.', 'crew:not_yes': 'Say yes to the Bell on Crew first.',
     'crew:reply_long': 'That is over 140 characters.', 'crew:replies_today': 'That is 30 replies today. More tomorrow.',
     'crew:replies_full': 'This post has all the replies it can hold.', 'crew:gone': 'That post has gone.', 'crew:under13': 'That is off for your account.',
+    'crew:cheer_today': 'You cheered them today. Come back tomorrow.', 'crew:word_long': 'That is over 100 characters.', 'crew:cheers_today': 'That is 30 cheers today. More tomorrow.',
+    'crew:own': 'You cannot cheer yourself.',
   })[m && m[0]] || 'That did not post. Try again.';
 }
 function openCrewPost(mode, dayId) {
@@ -21501,6 +21719,7 @@ function aaToast(text, opts) {
     (opts.action ? '<button type="button" class="aa-toast-go"></button>' : '') + '<button type="button" class="aa-toast-x"></button></div>';
   if (opts.kicker) el.querySelector('.aa-toast-k').textContent = opts.kicker;
   el.querySelector('.aa-toast-t').textContent = text;
+  if (opts.icon) el.querySelector('.aa-toast-t').insertAdjacentHTML('afterbegin', '<span class="aa-toast-ic" aria-hidden="true">' + opts.icon + '</span>');   // opts.icon is one of the app's own constants (CLAP_SVG)
   const go = el.querySelector('.aa-toast-go');
   if (go) { go.textContent = opts.action; go.addEventListener('click', () => { const r = _toastRun; _toastOff = null; hideAaToast(); if (r) r(); }); }
   const x = el.querySelector('.aa-toast-x');
@@ -22527,6 +22746,7 @@ function wrapSheetOpeners() {
   openCrewPost = sheetWrap(openCrewPost); window.openCrewPost = openCrewPost;   // Crew: the composer (stage81)
   openPlayerAchievements = sheetWrap(openPlayerAchievements); window.openPlayerAchievements = openPlayerAchievements;   // a Player Page's "All n"
   openFacePhoto = sheetWrap(openFacePhoto); window.openFacePhoto = openFacePhoto;   // Your photo: opened from your page
+  openCheer = sheetWrap(openCheer); window.openCheer = openCheer;   // Cheer Sara: opened from her page
   openCrewSettings = sheetWrap(openCrewSettings); window.openCrewSettings = openCrewSettings;   // Crew: the yes and the switches; ‹ Back to the account
   openPushSettings = sheetWrap(openPushSettings); window.openPushSettings = openPushSettings;   // Reminders: ‹ Back to the account, as its door says
   window.openHistorySheet = openHistorySheet; window.openExerciseSheet = openExerciseSheet;

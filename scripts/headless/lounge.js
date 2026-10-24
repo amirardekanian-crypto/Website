@@ -10,6 +10,10 @@
 // Step 2: Faces (Ring Faces). A photo wherever a name sits and the letters until there is one: asked 12 to a call, one call in flight, only what is on or near the
 // screen, kept in Cache Storage "crew-faces-v1", a new version replacing the old, gone with a person who leaves; Your photo (choose, move, pinch, zoom, Save, Remove);
 // who may and who may not. Section 13.
+//
+// Step 3: The cheer (In the Band). The band's faces (40 px, a ring for a held week, NEW, a tap that waits, a double tap that cheers once and never opens the page, the burst
+// that reduced motion does not get, the hint's three visits), the page's button (the clap icon and "Cheer", never the emoji), the sheet, the word, the polite refusals, New Balls,
+// the cheers received. Section 14. Section 15 takes the pictures (into --out).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
 const H = require('./lib');
@@ -122,10 +126,10 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     const { ctx, p } = await open(browser, { stub: { crewPages: { [CK.mina]: { art: 'iron', since: '2026-06-06' } } } });
     await goCrew(p);
     const doors = await p.evaluate(() => ({ pl: document.querySelectorAll('#crew-body .cr-pl').length, nb: document.querySelectorAll('#crew-body .cr-nb').length,
-      band: document.querySelectorAll('#crew-body .cr-faces button.cr-face').length, go: !!document.querySelector('#crew-body .cr-faces .go'),
+      band: document.querySelectorAll('#crew-body .cr-faces button.cr-face').length, go: !!document.querySelector('#crew-body .cr-week .cr-bandfoot .go'),
       boardBtn: document.querySelectorAll('#crew-board button.cr-br').length, openBtn: document.querySelectorAll('#crew-body button.cr-ob-r').length,
       bandIsDiv: document.querySelector('#crew-body .cr-faces').tagName }));
-    C.check('stage96: posts, replies, lines, honours, the band\'s faces, the board and the Open rows are all doors', doors.pl >= 4 && doors.nb >= 4 && doors.band === 6 && doors.go && doors.boardBtn === 3 && doors.openBtn === 2, JSON.stringify(doors));
+    C.check('stage96: posts, replies, lines, honours, the band\'s faces, the board and the Open rows are all doors', doors.pl >= 4 && doors.nb >= 4 && doors.band === 7 && doors.go && doors.boardBtn === 3 && doors.openBtn === 2, JSON.stringify(doors));
     C.check('…the band is a row of buttons, not a button full of them', doors.bandIsDiv === 'DIV');
     C.check('…every door has a name a screen reader can say (words, or an aria-label for a face)', await p.evaluate(() =>
       [...document.querySelectorAll('#crew-body .cr-bt')].every(b => ((b.getAttribute('aria-label') || '') + b.textContent).replace(/\s+/g, '').length > 1)));    await p.evaluate(() => window.scrollTo(0, 500));
@@ -162,13 +166,13 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
       ['a reply\'s face', '.cr-rep .cr-rf', CK.mina],
       ['a reply\'s name', '.cr-rep .cr-nb', CK.mina],
       ['a Bell line\'s name', '.cr-line .cr-nb', CK.mina],
-      ['a face on the week band', '.cr-faces button.cr-face:nth-child(3)', CK.reza],
+      ['a face on the week band', '.cr-fcs .cr-fc:nth-child(3) button.cr-face', CK.reza],
       ['an honours name', '.cr-hon b .cr-nb', CK.reza],
       ['an Open board row', 'button.cr-ob-r:not(.me)', CK.reza],
       ['a row of the season board on the tab', '#crew-board button.cr-br:not(.me)', CK.reza],
     ];
     for (const [what, sel, want] of doors) {
-      await click(p, sel); await p.waitForTimeout(350);
+      await click(p, sel); await p.waitForTimeout(/band/.test(what) ? 750 : 350);   // a band face waits 250 ms for a second tap
       const got = await p.evaluate(() => ({ ck: _playerCk, scr: (document.querySelector('.screen.active') || {}).id }));
       C.check('Crew: ' + what + ' opens that person\'s page', got.scr === 'screen-crewplayer' && got.ck === want, JSON.stringify(got));
       await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(250);
@@ -829,6 +833,283 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
     const snap = await a.p.evaluate(() => JSON.stringify(_snapshot()).length > 0 && !/crew-face|__crew-face/.test(JSON.stringify(_snapshot())) && Object.keys(localStorage).filter(k => /face/i.test(k)).length === 0);
     C.check('faces are in Cache Storage only: no localStorage key, nothing in the progress snapshot', snap);
     await a.ctx.close();
+  }
+
+  // ── 14. Step 3 · The cheer (In the Band): the band's faces, a double tap, the page's button, the sheet, New Balls ───────────────────────────────
+  const p_ck = p => p.evaluate(() => _playerCk);
+  const tapBand = (p, ckk, n) => p.evaluate(([k, times]) => {
+    const b = [...document.querySelectorAll('#crew-body .cr-fcs button.cr-face')].find(e => (e.getAttribute('onclick') || '').indexOf("'" + k + "'") > 0);
+    for (let i = 0; i < times; i++) b.click();
+    return !!b;
+  }, [ckk, n || 1]);
+  const stubCalls = (p, n) => calls(p, n);
+  const noEmoji = p => p.evaluate(() => ['#crewplayer-body', '#hist-overlay', '#aaToast', '#crew-body .cr-week'].map(s => (document.querySelector(s) || { innerHTML: '' }).innerHTML).join(' ').indexOf('\u{1F44F}') < 0);
+  {
+    // the band
+    const a = await open(browser, {});
+    await goCrew(a.p); await a.p.waitForTimeout(500);
+    const b = await a.p.evaluate(() => {
+      const faces = [...document.querySelectorAll('#crew-body .cr-fcs .cr-face')];
+      const ring = f => /rgb\(\d+, \d+, \d+\) 0px 0px 0px 4px/.test(getComputedStyle(f).boxShadow) || /0px 0px 0px 4px/.test(getComputedStyle(f).boxShadow);
+      return { n: faces.length, w: faces.map(f => Math.round(f.getBoundingClientRect().width)), held: faces.filter(f => f.classList.contains('held')).map(f => f.getAttribute('aria-label')),
+        ring: faces.filter(ring).length, news: [...document.querySelectorAll('#crew-body .cr-new')].map(e => e.closest('.cr-fc').querySelector('.cr-face').getAttribute('aria-label')),
+        hint: (document.querySelector('#crew-body .cr-hint') || {}).textContent, foot: !!document.querySelector('#crew-body .cr-bandfoot .go'), more: (document.querySelector('#crew-body .cr-face.more') || {}).textContent,
+        facesTag: document.querySelector('#crew-body .cr-faces').tagName };
+    });
+    C.check('the band: six faces and "+2", forty pixels each (a door apiece)', b.n === 7 && b.w.slice(0, 6).every(x => x >= 38 && x <= 40) && b.facesTag === 'DIV', JSON.stringify(b.w));
+    C.check('…a mint ring only on the two who held this week (you and Mina), nobody else', b.held.length === 2 && /^You|Alex|Your/.test(b.held[0]) && /Mina/.test(b.held[1]) && b.ring === 2, JSON.stringify([b.held, b.ring]));
+    C.check('…NEW only under Leila, who joined this week', b.news.length === 1 && /Leila/.test(b.news[0]) && /new in the crew/.test(b.news[0]), JSON.stringify(b.news));
+    C.check('…the one-time line, and "In the crew ›" still opens the list', b.hint === 'Double-tap a face to cheer. Tap to see their page.' && b.foot && b.more === '+2', JSON.stringify([b.hint, b.foot]));
+    C.check('…the hint counts this visit as its first sighting', await a.p.evaluate(id => localStorage.getItem(id + '_cheerhint') === '1', H.ID));
+    C.check('…the band\'s own words carry no 👏 character', await noEmoji(a.p));
+    // one tap: the page, after a beat
+    await tapBand(a.p, CK.mina, 1); await a.p.waitForTimeout(110);
+    const early = await screenNow(a.p);
+    await a.p.waitForTimeout(450);
+    C.check('one tap on a face waits (250 ms), then opens that page; it cheers nobody', early === 'screen-crew' && (await screenNow(a.p)) === 'screen-crewplayer' && (await p_ck(a.p)) === CK.mina && (await stubCalls(a.p, 'crew_cheer')).length === 0, early);
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(400);
+    // your own face: no wait, no cheer
+    await a.p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-fcs button.cr-face')].find(e => e.classList.contains('me')).click()); await a.p.waitForTimeout(90);
+    C.check('your own face opens your own page at once', (await screenNow(a.p)) === 'screen-crewplayer' && (await p_ck(a.p)) === 'me');
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(400);
+    // a double tap: a cheer, no word, a burst, a toast, never the page
+    await tapBand(a.p, CK.reza, 2);
+    await a.p.waitForTimeout(150);
+    const burst = await a.p.evaluate(() => ({ n: document.querySelectorAll('#crew-body .cr-burst i').length, svg: document.querySelectorAll('#crew-body .cr-burst i svg').length, text: (document.querySelector('#crew-body .cr-burst') || { textContent: '' }).textContent }));
+    await a.p.waitForTimeout(700);
+    const ch = await stubCalls(a.p, 'crew_cheer'), tt = await toast(a.p);
+    C.check('a double tap cheers ONCE, with no word, and never also opens the page', ch.length === 1 && ch[0].p_subject === CK.reza && ch[0].p_word === undefined && (await screenNow(a.p)) === 'screen-crew', JSON.stringify(ch));
+    C.check('…a small burst of clap icons over the face (drawn as icons, no emoji character)', burst.n === 3 && burst.svg === 3 && burst.text === '', JSON.stringify(burst));
+    C.check('…and the toast says "Cheer sent to Reza" with the clap icon', !!tt && tt.text === 'Cheer sent to Reza' && await a.p.evaluate(() => !!document.querySelector('#aaToast .aa-toast-ic svg')), JSON.stringify(tt));
+    C.check('…the hint is gone for good after the first double tap', (await a.p.evaluate(id => localStorage.getItem(id + '_cheerhint'), H.ID)) === 'done' && !(await a.p.$('#crew-body .cr-hint')));
+    // the same face again: told politely, no second call; and the server's own refusal
+    await a.p.waitForTimeout(500);
+    await tapBand(a.p, CK.reza, 2); await a.p.waitForTimeout(500);
+    const t2 = await toast(a.p);
+    C.check('the second cheer the same day is refused politely, and not even sent', (await stubCalls(a.p, 'crew_cheer')).length === 1 && !!t2 && t2.text === 'You cheered Reza today. Come back tomorrow.', JSON.stringify(t2));
+    await a.p.evaluate(() => { _cheered = {}; crewPagesClear(); }); await a.p.waitForTimeout(100);
+    await a.p.waitForTimeout(500);
+    await tapBand(a.p, CK.reza, 2); await a.p.waitForTimeout(700);
+    const t3 = await toast(a.p);
+    C.check('…the server\'s own "already today" says the same words', (await stubCalls(a.p, 'crew_cheer')).length === 2 && !!t3 && t3.text === 'You cheered Reza today. Come back tomorrow.', JSON.stringify(t3));
+    // the page now says so
+    await shown(a.p, CK.reza);
+    C.check('…and Reza\'s page says "Cheered today", quietly, with no button', await a.p.evaluate(() => { const s = document.querySelector('#crewplayer-body .pl-cheered'); return !!s && /Cheered today/.test(s.textContent) && !document.querySelector('#crewplayer-body .pl-cheer') && !!s.querySelector('svg') && s.tagName === 'SPAN'; }));
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(400);
+    // a triple tap is one cheer and no page
+    await tapBand(a.p, CK.mina, 3); await a.p.waitForTimeout(700);
+    C.check('a triple tap is still one cheer and no page', (await stubCalls(a.p, 'crew_cheer')).filter(x => x.p_subject === CK.mina).length === 1 && (await screenNow(a.p)) === 'screen-crew');
+    C.check('no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+  }
+  {
+    // the hint's life: three visits, then gone
+    const a = await open(browser, {});
+    await goCrew(a.p); await a.p.waitForTimeout(300);
+    const seen = [!!(await a.p.$('#crew-body .cr-hint'))];
+    for (let i = 0; i < 3; i++) { await a.p.evaluate(() => { goTo('home'); goTo('crew'); }); await a.p.waitForTimeout(300); seen.push(!!(await a.p.$('#crew-body .cr-hint'))); }
+    C.check('the hint shows on the first three visits to Crew and not on the fourth', seen.join() === 'true,true,true,false', seen.join());
+    await a.p.evaluate(() => { _bellAt = 0; return refreshBell(); }); await a.p.waitForTimeout(400);
+    C.check('…a redraw within a visit does not use one up', await a.p.evaluate(id => localStorage.getItem(id + '_cheerhint') === '3', H.ID));
+    C.check('…the key is the athlete\'s own, so a second phone does not say it again', await a.p.evaluate(() => Object.keys(_snapshot()).some(k => /_cheerhint$/.test(k))));
+    await a.ctx.close();
+    // not for the athlete who cannot cheer
+    const n = await open(browser, { b: { me: { answer: null, can_post: false } } });
+    await goCrew(n.p); await n.p.waitForTimeout(300);
+    C.check('not in the crew: no hint (nothing to teach)', !(await n.p.$('#crew-body .cr-hint')));
+    await tapBand(n.p, CK.reza, 2); await n.p.waitForTimeout(700);
+    const t = await toast(n.p);
+    C.check('…and a double tap is the join offer, with no call and no page', !!t && /Join the crew to cheer/.test(t.text) && t.action === 'Join the crew' && (await stubCalls(n.p, 'crew_cheer')).length === 0 && (await screenNow(n.p)) === 'screen-crew', JSON.stringify(t));
+    await n.ctx.close();
+    const u = await open(browser, { b: { me: { answer: 'yes', under13: true, can_post: false } } });
+    await goCrew(u.p); await u.p.waitForTimeout(300);
+    C.check('under 13: no ring of doors, no hint, no double tap', await u.p.evaluate(() => !document.querySelector('#crew-body .cr-fcs') && !document.querySelector('#crew-body .cr-hint') && !document.querySelector('#crew-body button.cr-face')));
+    await u.ctx.close();
+    // a server without stage96: the band is the one button it was
+    const o = await open(browser, { b: { noPages: true } });
+    await goCrew(o.p);
+    C.check('without stage96: the band is exactly the old one (26 px, one button, no hint, no NEW)', await o.p.evaluate(() => { const b = document.querySelector('#crew-body .cr-faces'); return b.tagName === 'BUTTON' && !document.querySelector('#crew-body .cr-fc, #crew-body .cr-hint, #crew-body .cr-new') && Math.round(document.querySelector('#crew-body .cr-face').getBoundingClientRect().width) === 26; }));
+    await o.ctx.close();
+  }
+  {
+    // reduced motion: the cheer goes, the toast says it, and nothing flies
+    const a = await open(browser, { opts: { reduced: true } });
+    await goCrew(a.p); await a.p.waitForTimeout(300);
+    await tapBand(a.p, CK.reza, 2); await a.p.waitForTimeout(120);
+    const b = await a.p.evaluate(() => document.querySelectorAll('.cr-burst').length);
+    await a.p.waitForTimeout(600);
+    C.check('reduced motion: the cheer goes and the toast says it, with no burst at all', b === 0 && (await stubCalls(a.p, 'crew_cheer')).length === 1 && /Cheer sent to Reza/.test((await toast(a.p) || {}).text || ''), String(b));
+    await a.ctx.close();
+  }
+  {
+    // the page: the button, the sheet, the word, the New Balls line, what was received
+    const rec = [{ ck: CK.reza, who: 'Reza K.', fv: null, coach: false, word: 'that sled push looked heavy', day: today }, { ck: null, who: 'Coach', fv: null, coach: true, word: null, day: today },
+      { ck: CK.sara, who: 'Sara T.', fv: null, coach: false, word: null, day: iso(now - 86400e3 * 2).slice(0, 10) }];
+    const a = await open(browser, { stub: { crewPages: { [CK.mina]: { cheers: { season: 12, recent: rec, mine_today: false } }, [CK.leila]: { new: true }, me: { cheers: { season: 3, recent: rec.slice(0, 2) } } } } });
+    await goCrew(a.p);
+    await shown(a.p, CK.mina);
+    const pg = await a.p.evaluate(() => { const b = document.querySelector('#crewplayer-body .pl-cheer'); const cs = b && getComputedStyle(b); return { text: b && b.textContent.trim(), svg: !!(b && b.querySelector('svg')), tag: b && b.tagName,
+      bg: cs && cs.backgroundColor, n: document.querySelectorAll('#crewplayer-body .pl-cheer').length, newline: !!document.querySelector('#crewplayer-body .pl-new'),
+      secs: [...document.querySelectorAll('#crewplayer-body .prog-sec')].map(d => d.textContent.trim()), rows: [...document.querySelectorAll('#crewplayer-body .pl-ch')].map(r => r.innerText.replace(/\s+/g, ' ').trim()),
+      doors: [...document.querySelectorAll('#crewplayer-body button.pl-ch')].length }; });
+    C.check('someone else\'s page: one clay button, the clap icon and the word "Cheer" (not "Well played")', pg.text === 'Cheer' && pg.svg && pg.tag === 'BUTTON' && pg.n === 1 && !/Well played/i.test(await text(a.p, '#crewplayer-body')) && /^rgb\(19\d, 8\d, 4\d\)$/.test(pg.bg), JSON.stringify([pg.text, pg.bg]));
+    C.check('…no New Balls line for someone who has been here a while', !pg.newline);
+    C.check('…"Cheers this season · 12" and the last week\'s: the face, the name (Coach for Amir), the word, the day', pg.secs.includes('Cheers this season · 12') && pg.rows.length === 3 && /Reza K\./.test(pg.rows[0]) && /that sled push looked heavy/.test(pg.rows[0]) && /Today/.test(pg.rows[0]), JSON.stringify(pg.rows));
+    C.check('…Coach\'s row says Coach with Amir\'s photo, a word-less row shows the day alone, and a name is a door', /Coach/.test(pg.rows[1]) && /Sara T\./.test(pg.rows[2]) && /\d|Today|Yesterday|[A-Z][a-z]+day/.test(pg.rows[2]) && pg.doors === 3, JSON.stringify(pg.rows));
+    C.check('…no 👏 character on the page', await noEmoji(a.p));
+    // the sheet
+    await click(a.p, '#crewplayer-body .pl-cheer'); await a.p.waitForTimeout(350);
+    const sh = await a.p.evaluate(() => { const ta = document.querySelector('#hist-overlay .ch-txt'); return { title: document.querySelector('#hist-overlay .readiness-title').textContent.trim(), eyebrow: document.querySelector('#hist-overlay .readiness-eyebrow').textContent,
+      max: ta.getAttribute('maxlength'), dir: ta.getAttribute('dir'), cnt: document.querySelector('#hist-overlay .cr-cnt').textContent, note: (document.querySelector('#hist-overlay .cr-note') || {}).textContent, go: document.querySelector('#hist-overlay .ch-go').textContent,
+      icon: !!document.querySelector('#hist-overlay .readiness-title svg'), open: document.getElementById('hist-overlay').classList.contains('visible') }; });
+    C.check('the sheet "Cheer Mina": a word field (100, auto direction), a live count, the 7-day line, Send, and the clap icon', sh.open && sh.title === 'Cheer Mina' && sh.max === '100' && sh.dir === 'auto' && sh.cnt === '0 / 100' && sh.note === 'The crew can see your word for 7 days.' && sh.go === 'Send' && sh.icon, JSON.stringify(sh));
+    C.check('…no 👏 character in the sheet', await noEmoji(a.p));
+    await a.p.fill('#hist-overlay .ch-txt', 'nice work'); await a.p.waitForTimeout(100);
+    C.check('…the count follows what is typed', (await text(a.p, '#hist-overlay .cr-cnt')) === '9 / 100');
+    await click(a.p, '#hist-overlay .ch-go'); await a.p.waitForTimeout(900);
+    const sent = (await stubCalls(a.p, 'crew_cheer'))[0], tt = await toast(a.p);
+    C.check('Send: crew_cheer with her key and your word; the sheet closes; "Cheer sent to Mina"', !!sent && sent.p_subject === CK.mina && sent.p_word === 'nice work' && !(await a.p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))) && !!tt && tt.text === 'Cheer sent to Mina', JSON.stringify([sent, tt]));
+    const after = await a.p.evaluate(() => ({ cheered: !!document.querySelector('#crewplayer-body .pl-cheered'), btn: !!document.querySelector('#crewplayer-body .pl-cheer'), tile: [...document.querySelectorAll('#crewplayer-body .pl-tiles > div')].map(d => d.innerText.replace(/\s+/g, ' ').trim()).pop(),
+      first: (document.querySelector('#crewplayer-body .pl-ch') || {}).innerText }));
+    C.check('…the page now says "Cheered today", the season count moved, and your cheer is the first on her list', after.cheered && !after.btn && /^13 cheers this season/.test(after.tile) && /You/.test(after.first) && /nice work/.test(after.first), JSON.stringify(after));
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(300);
+    // a word that is too long (the field stops it; a pasted one is the server's to refuse), and a line that never answers
+    await shown(a.p, CK.reza);
+    await click(a.p, '#crewplayer-body .pl-cheer'); await a.p.waitForTimeout(300);
+    await a.p.evaluate(() => { const ta = document.querySelector('#hist-overlay .ch-txt'); ta.removeAttribute('maxlength'); ta.value = 'x'.repeat(101); ta.dispatchEvent(new Event('input', { bubbles: true })); });
+    await click(a.p, '#hist-overlay .ch-go'); await a.p.waitForTimeout(600);
+    const long = await a.p.evaluate(() => ({ err: document.querySelector('#hist-overlay .cr-err').textContent, go: !document.querySelector('#hist-overlay .ch-go').disabled, open: document.getElementById('hist-overlay').classList.contains('visible') }));
+    C.check('a word over 100: "That is over 100 characters.", the sheet stays and Send is ready', long.err === 'That is over 100 characters.' && long.go && long.open, JSON.stringify(long));
+    await a.p.evaluate(() => { window.__STUB.mode = 'offline'; });
+    await a.p.evaluate(() => { document.querySelector('#hist-overlay .ch-txt').value = 'ok'; });
+    await click(a.p, '#hist-overlay .ch-go'); await a.p.waitForTimeout(600);
+    C.check('no signal: the word stays, and it says to tap Send again', await a.p.evaluate(() => /No signal/.test(document.querySelector('#hist-overlay .cr-err').textContent) && document.querySelector('#hist-overlay .ch-txt').value === 'ok'));
+    await a.p.evaluate(() => { window.__STUB.mode = 'online'; closeHistorySheet(); });
+    // the server says it was already done today (the page was a day old): the same polite words, and the page catches up
+    await a.p.evaluate(ckk => { window.__STUB.cheerLog = { [ckk]: { word: null } }; }, CK.sara);
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(300);
+    await shown(a.p, CK.sara);
+    await a.p.evaluate(ckk => { const c = crewPageGet(ckk); c.p.cheers.mine_today = false; crewPagesSave(); _cheered = {}; _playerHTML = ''; renderPlayerPage(); }, CK.sara);
+    await click(a.p, '#crewplayer-body .pl-cheer'); await a.p.waitForTimeout(300);
+    await click(a.p, '#hist-overlay .ch-go'); await a.p.waitForTimeout(700);
+    const tc = await toast(a.p);
+    C.check('"already cheered today" from the server: the sheet closes, the words are polite, the button is the quiet line', !!tc && tc.text === 'You cheered Sara today. Come back tomorrow.' && !(await a.p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))) && !!(await a.p.$('#crewplayer-body .pl-cheered')), JSON.stringify(tc));
+    // a person who has left
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(300);
+    await shown(a.p, CK.omid);
+    await a.p.evaluate(() => { window.__STUB.cheerErr = 'crew:gone'; });
+    await click(a.p, '#crewplayer-body .pl-cheer'); await a.p.waitForTimeout(300);
+    await click(a.p, '#hist-overlay .ch-go'); await a.p.waitForTimeout(800);
+    const tg = await toast(a.p);
+    C.check('a person who left: "Omid is not in the crew any more.", and back to Crew', !!tg && tg.text === 'Omid is not in the crew any more.' && (await screenNow(a.p)) === 'screen-crew', JSON.stringify(tg));
+    await a.p.evaluate(() => { window.__STUB.cheerErr = null; });
+    // New Balls: the line above the button, only for someone new
+    await shown(a.p, CK.leila);
+    const nb = await a.p.evaluate(() => { const l = document.querySelector('#crewplayer-body .pl-new'), b = document.querySelector('#crewplayer-body .pl-cheer'); return { text: l && l.innerText.replace(/\s+/g, ' ').trim(), above: !!(l && b && (l.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)) }; });
+    C.check('New Balls: "Joined this week. Say hello." sits above the button on a new member\'s page', !!nb.text && /Joined this week\. Say hello\./.test(nb.text) && nb.above, JSON.stringify(nb));
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(300);
+    // your own page: nothing to cheer, but what you received is there
+    await a.p.evaluate(() => openPlayer('me')); await a.p.waitForTimeout(600);
+    C.check('your own page: no Cheer button, and the cheers you got are listed (a number and the last week)', !(await a.p.$('#crewplayer-body .pl-cheer')) && (await secs(a.p)).includes('Cheers this season · 3') && (await a.p.$$('#crewplayer-body .pl-ch')).length === 2);
+    C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+  }
+  {
+    // 30 a day, and yourself
+    const a = await open(browser, { stub: { cheerCap: 1 } });
+    await goCrew(a.p);
+    await shown(a.p, CK.mina); await click(a.p, '#crewplayer-body .pl-cheer'); await a.p.waitForTimeout(250); await click(a.p, '#hist-overlay .ch-go'); await a.p.waitForTimeout(600);
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(250);
+    await shown(a.p, CK.reza); await click(a.p, '#crewplayer-body .pl-cheer'); await a.p.waitForTimeout(250); await click(a.p, '#hist-overlay .ch-go'); await a.p.waitForTimeout(600);
+    C.check('the daily limit is said in plain words and the sheet stays', await a.p.evaluate(() => document.querySelector('#hist-overlay .cr-err').textContent === 'That is 30 cheers today. More tomorrow.' && document.getElementById('hist-overlay').classList.contains('visible')));
+    const own = await a.p.evaluate(() => crewErrWords('crew:own'));
+    C.check('…and a cheer to yourself has its words', own === 'You cannot cheer yourself.', own);
+    await a.ctx.close();
+    // a non-member who has a page cached cannot open the sheet
+    const n = await open(browser, { b: { me: { answer: null, can_post: false } } });
+    await waitTab(n.p); await n.p.evaluate(ckk => { crewPagePut(ckk, { ck: ckk, who: 'Mina S.', first: 'Mina', numbers: {}, cheers: { season: 1, recent: [] } }); openCheer(ckk); }, CK.mina); await n.p.waitForTimeout(300);
+    C.check('not in the crew: openCheer is the join offer, never a sheet', !!(await toast(n.p)) && /Join the crew to cheer/.test((await toast(n.p)).text) && !(await n.p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))));
+    await n.ctx.close();
+  }
+  {
+    // the guide, and the 👏 character is in none of what was added
+    const a = await open(browser, {});
+    await goCrew(a.p);
+    const g = await a.p.evaluate(() => buildAppGuideCards());
+    const para = (g.match(/<p>To cheer someone[\s\S]*?<\/p>/) || [''])[0];
+    C.check('the guide names the controls in words: Cheer, Send, the double tap, the ring, NEW', /<strong>Cheer<\/strong>/.test(para) && /<strong>Send<\/strong>/.test(para) && /double-tap a face/.test(para) && /A ring round a face/.test(para) && /<strong>NEW<\/strong>/.test(para), para.slice(0, 120));
+    C.check('…in plain words: no em-dash, no semicolon, no 👏', !/[—;]/.test(para) && para.indexOf('\u{1F44F}') < 0);
+    await a.ctx.close();
+  }
+
+  // ── 15. the pictures (390 px): the band with faces and a NEW, your page with a photo and the Only you marks, the cheer sheet, the photo sheet ──────────────
+  {
+    // made-up faces: a coloured ground, a head and a pair of shoulders (never a real person)
+    const people = [[CK.alex, '#5E8C7A', '#E3B896', '#2E4A57', 1101], [CK.mina, '#9CB4C6', '#C98E6A', '#8C3D2B', 1102], [CK.reza, '#7C6B8F', '#E8C4A0', '#26322C', 1103],
+      [CK.ali1, '#A9B79A', '#B07B58', '#3C5A7A', 1104], [CK.leila, '#C9A99A', '#E0B493', '#4F6B52', 1105], [CK.sara, '#6E8FA3', '#D8A682', '#7A4E3A', 1106]];
+    const faceImgs = p => p.evaluate(rows => {
+      const out = {};
+      rows.forEach(([k, bg, skin, shirt, fv]) => {
+        const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
+        const g = x.createLinearGradient(0, 0, 128, 128); g.addColorStop(0, bg); g.addColorStop(1, '#1F3A30'); x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+        x.fillStyle = shirt; x.beginPath(); x.ellipse(64, 132, 48, 40, 0, 0, Math.PI * 2); x.fill();
+        x.fillStyle = skin; x.fillRect(56, 70, 16, 18); x.beginPath(); x.ellipse(64, 52, 21, 25, 0, 0, Math.PI * 2); x.fill();
+        out[k] = { fv, b64: c.toDataURL('image/jpeg', 0.85).split(',')[1] };
+      });
+      window.__STUB.faces = out;
+    }, people);
+    const fvs = Object.fromEntries(people.map(r => [r[0], r[4]]));
+    const b = withFaces(fvs);
+    const brd = board().map(r => (r.ck in fvs ? { ...r, fv: fvs[r.ck] } : r));
+    const pages = { me: { who: 'Alex R.', lv: 19, art: 'voltage', kinds: { achievement: false, honour: true, level: true, week: true }, fv: 1101,
+      achievements: [{ id: 'a:1', name: 'Back to Back', day: '2026-10-12', signed: [], signed_n: 0 }, { id: 'a:2', name: 'The Notebook', day: '2026-10-03', signed: [], signed_n: 0 }],
+      honours: [{ month: '2026-09-01', honour: 'sessions', value: { n: 14 } }],
+      cheers: { season: 3, recent: [{ ck: CK.reza, who: 'Reza K.', fv: 1103, coach: false, word: 'that sled push looked heavy', day: today }, { ck: null, who: 'Coach', fv: null, coach: true, word: null, day: today }] } },
+      [CK.mina]: { who: 'Mina S.', lv: 14, art: 'iron', fv: 1102, achievements: [{ id: 'a:1', name: 'Back to Back', day: '2026-10-12', signed: [], signed_n: 0 }, { id: 'a:2', name: 'The Notebook', day: '2026-10-03', signed: [], signed_n: 0 }],
+        cheers: { season: 12, recent: [{ ck: CK.reza, who: 'Reza K.', fv: 1103, coach: false, word: 'that sled push looked heavy', day: today }, { ck: null, who: 'Coach', fv: null, coach: true, word: null, day: today }, { ck: CK.sara, who: 'Sara T.', fv: 1106, coach: false, word: null, day: iso(now - 86400e3 * 2).slice(0, 10) }], mine_today: false } },
+      [CK.leila]: { who: 'Leila M.', new: true, fv: 1105 } };
+    const a = await open(browser, { stub: { bell: b, crewBoard: brd, crewPages: pages } });
+    await faceImgs(a.p);
+    await goCrew(a.p); await a.p.waitForTimeout(1500);
+    await a.p.evaluate(() => window.scrollTo(0, 0)); await a.p.waitForTimeout(200);
+    await a.p.screenshot({ path: path.join(out, 'crew-band-faces-light-390.png') });
+    await shown(a.p, CK.mina); await a.p.waitForTimeout(900);
+    await click(a.p, '#crewplayer-body .pl-cheer'); await a.p.waitForTimeout(500);
+    await a.p.fill('#hist-overlay .ch-txt', 'great week, Mina'); await a.p.waitForTimeout(200);
+    await a.p.screenshot({ path: path.join(out, 'cheer-sheet-light-390.png') });
+    await a.p.evaluate(() => closeHistorySheet()); await a.p.waitForTimeout(200);
+    await a.p.screenshot({ path: path.join(out, 'player-other-cheer-light-390.png'), fullPage: true });
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(300);
+    await a.p.evaluate(() => openPlayer('me')); await a.p.waitForTimeout(600);
+    await click(a.p, '#crewplayer-body .pl-fbtn'); await a.p.waitForTimeout(400);
+    const mk = (W, H) => a.p.evaluate(async ([w, h]) => {
+      const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d');
+      const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#7FA89A'); g.addColorStop(1, '#1F3A30'); x.fillStyle = g; x.fillRect(0, 0, w, h);
+      x.fillStyle = '#2E4A57'; x.beginPath(); x.ellipse(w / 2, h * 1.02, w * .36, h * .3, 0, 0, Math.PI * 2); x.fill();
+      x.fillStyle = '#E3B896'; x.fillRect(w * .46, h * .52, w * .08, h * .12); x.beginPath(); x.ellipse(w / 2, h * .42, w * .16, h * .2, 0, 0, Math.PI * 2); x.fill();
+      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.9)); const dt = new DataTransfer(); dt.items.add(new File([blob], 'me.jpg', { type: 'image/jpeg' }));
+      const input = document.getElementById('fp-file'); input.files = dt.files; input.dispatchEvent(new Event('change', { bubbles: true }));
+    }, [W, H]);
+    await mk(900, 1200); await a.p.waitForTimeout(500);
+    await a.p.screenshot({ path: path.join(out, 'photo-sheet-light-390.png') });
+    await a.ctx.close();
+    const d = await open(browser, { opts: { dark: true }, stub: { bell: b, crewBoard: brd, crewPages: pages } });
+    await faceImgs(d.p);
+    await goCrew(d.p); await d.p.waitForTimeout(900);
+    await d.p.evaluate(() => openPlayer('me')); await d.p.waitForTimeout(1200);
+    await d.p.screenshot({ path: path.join(out, 'player-own-photo-dark-390.png'), fullPage: true });
+    await d.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await d.p.waitForTimeout(400);
+    await d.p.evaluate(() => window.scrollTo(0, 0)); await d.p.waitForTimeout(200);
+    await d.p.screenshot({ path: path.join(out, 'crew-band-faces-dark-390.png') });
+    await d.ctx.close();
+    // 320 px: the band keeps its seven faces inside the screen
+    const n = await open(browser, { opts: { w: 320, h: 640 }, stub: { bell: b, crewBoard: brd, crewPages: pages } });
+    await faceImgs(n.p);
+    await goCrew(n.p); await n.p.waitForTimeout(1000);
+    const nw = await n.p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, w: [...document.querySelectorAll('#crew-body .cr-fcs .cr-face')].map(f => Math.round(f.getBoundingClientRect().width)), right: Math.max(...[...document.querySelectorAll('#crew-body .cr-fcs .cr-fc')].map(f => f.getBoundingClientRect().right)) }));
+    C.check('320 px: the band\'s seven faces fit inside the band, none under 30 px, and nothing scrolls sideways', nw.sw <= nw.iw && nw.w.every(x => x >= 29) && nw.right <= nw.iw - 16, JSON.stringify(nw));
+    await n.p.screenshot({ path: path.join(out, 'crew-band-faces-light-320.png') });
+    await n.ctx.close();
   }
 
   await browser.close();

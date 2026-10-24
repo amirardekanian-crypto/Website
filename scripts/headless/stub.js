@@ -20,6 +20,7 @@
 // stall: { crew_page: true } never answers; a mode of 'offline' is no signal. get_bell, crew_board and a reply carry ck/fv/lv/held/new as the fixture gives them.
 // stage96 is TOLD by get_bell's top-level `lounge: 1` (the fixture sets it; without it the app draws Crew as it was). YOUR page (no p_subject) is whole: every block, the comebacks, and
 // `kinds` (your switches, a kind not named is on); someone else's has neither.
+// The cheer (step 3): crew_cheer answers like the server (cheerLog, cheerCap, cheerErr); crew_page reads cheerLog for mine_today.
 // Faces (step 2): crew_faces_get answers `faces` ({ '<ck>': { fv, b64 } }), crew_face_set / crew_face_clear change the caller's own (faceDelay, faceMax, faceMissing, faceErr).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
@@ -129,7 +130,7 @@
           honours: [], best_lifts: [], cycle: null, at: new Date().toISOString() };
         // YOUR page is sent whole: every block, the comebacks, and `kinds` (your own switches, a kind not named is on). Someone else's has no comebacks and no `kinds`.
         if (own) { pg.numbers.comebacks = 2; pg.kinds = Object.assign({}, PM.kinds || {}); }
-        else pg.cheers.mine_today = false;
+        else { pg.cheers.mine_today = !!(S.cheerLog && c.ck && S.cheerLog[c.ck]); if (pg.cheers.mine_today) pg.cheers.season = 13; }   // a cheer you sent (crew_cheer) is on their page
         return pg;
       };
       var merge = function (pg, over) { Object.keys(over || {}).forEach(function (k) { pg[k] = over[k]; }); return pg; };
@@ -234,6 +235,24 @@
         me.fv = fnew; (B.crew || []).forEach(function (c) { if (c && c.me) c.fv = fnew; });
         S.faces = S.faces || {}; if (me.ck) S.faces[me.ck] = { fv: fnew, b64: fph };
         keep(); return res({ data: { fv: fnew }, error: null, status: 200 });
+      }
+      // The cheer (stage96): crew_cheer({ p_subject, p_word }) answers { ok: true, season }. Like the server: one per giver, subject and day (the second is 'crew:cheer_today'), a word over 100 is
+      // 'crew:word_long', yourself 'crew:own', a key that is not in the crew 'crew:gone', a non-member 'crew:not_yes', under 13 'crew:under13', 30 a day (`cheerCap`) 'crew:cheers_today'.
+      // `cheerLog` ({ '<ck>': { word } }) is what has been sent (set it to say "already cheered today"); crew_page reads it for mine_today and the season. cheerErr = a message to refuse every cheer with.
+      if (name === 'crew_cheer') {
+        var chbad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+        var chsub = params && params.p_subject, chword = params && params.p_word;
+        if (S.cheerErr) return chbad(S.cheerErr);
+        if (me.under13) return chbad('crew:under13');
+        if (me.answer !== 'yes' || me.can_post === false) return chbad('crew:not_yes');
+        if (chsub && chsub === me.ck) return chbad('crew:own');
+        if (!(B.crew || []).some(function (c) { return c && c.ck === chsub; })) return chbad('crew:gone');
+        if (chword && String(chword).length > 100) return chbad('crew:word_long');
+        S.cheerLog = S.cheerLog || {};
+        if (S.cheerLog[chsub]) return chbad('crew:cheer_today');
+        if (Object.keys(S.cheerLog).length >= (S.cheerCap || 30)) return chbad('crew:cheers_today');
+        S.cheerLog[chsub] = { word: chword || null };
+        return res({ data: { ok: true, season: 13 }, error: null, status: 200 });
       }
       if (name === 'crew_photo') return res({ data: { id: params && params.p_post, mime: 'image/jpeg', w: 4, h: 5,
         b64: '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z' }, error: null, status: 200 });

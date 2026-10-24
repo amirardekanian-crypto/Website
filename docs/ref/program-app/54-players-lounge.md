@@ -81,3 +81,31 @@ to 60,000 bytes (ladder 256 px .82 → 256 px .72 → 200 px .7 → 160 px .65),
 **Tests.** `lounge.js` section 13: a face on every surface and the letters where there is none, one batched call, the cache and its key, a new `fv` replacing the old,
 twelve to a call and one in flight, only what is near the screen, a slow line and a server without the function, Your photo (choose, move, pinch, zoom, Save's size, Remove's two
 taps, a refusal), who may not (not in the crew, under 13), leaving, never synced.
+
+## Step 3 · The cheer (ideas 59, 65, 70 "New Balls", direction A "In the Band")
+
+**What.** A cheer goes to one person, once a day each, with a word if you like. The button is the clap icon and **Cheer**, never "Well played" (Amir: *"something more
+understandable to any one ... a clapping icon"*), and **Cheered today** in quiet green once it is done. The clap is `CLAP_SVG`, an inline line icon (24 box, `currentColor`,
+1.6 stroke, round caps): the 👏 character is yellow on phones and the text variation selector is ignored on iOS, so it is in no string an athlete reads. On someone's page: the
+button (the page's one clay control), under *Joined this week. Say hello.* when they are new; the sheet **Cheer Sara** (a word, 100 characters, a live count, *The crew can see
+your word for 7 days.*, **Send**); and *Cheers this season · 12* with the last week's cheers (face, name or Coach, the word, the day). On Crew, the week band's faces are 40 px
+and each is a door: a mint ring round the ones who held this week, **NEW** under the ones who joined this week, one tap opens their page after 250 ms unless a second tap
+comes, and a double tap cheers at once with no word (a small burst of claps over the face unless the phone asks for less motion, and the toast *Cheer sent to Sara*). A one-line
+hint in the band (*Double-tap a face to cheer. Tap to see their page.*, `<id>_cheerhint`) shows on three visits and goes for good after the first double tap. A cheer pays
+nothing (GAME-6) and rings the other phone with your name, never the word (push.md).
+
+**Words.** `crew:cheer_today` *You cheered Sara today. Come back tomorrow.* · `crew:word_long` *That is over 100 characters.* · `crew:cheers_today` *That is 30 cheers today. More
+tomorrow.* · `crew:own` *You cannot cheer yourself.* · `crew:gone` *Sara is not in the crew any more.* (and the page goes). Not in the crew: *Join the crew to cheer.* with the
+join button. Under 13: no door on a face, no hint, no button.
+
+| function | job |
+|---|---|
+| `crewBandTap(ev, ck)` | the one-or-two-tap rule on a band face (250 ms; your own face opens your page at once; the tap after a double is ignored). |
+| `crewQuickCheer` / `crewCheerSend` / `crewCheerDone` / `crewCheerFail` | the double tap, the call (`crew_cheer`, 15 s), what the copy of their page becomes (*Cheered today*, the season count, your cheer first), what a refusal says. |
+| `crewCheeredToday(key)` | did you cheer them today, by the server's UTC day (a copy made yesterday is no answer). |
+| `playerActionsHTML` / `playerCheersHTML` / `openCheer` | the button and New Balls line · the list · the sheet. |
+| `crewBurst(el)` / `crewCheerHint()` / `crewHintDone()` | the claps (none under `prefers-reduced-motion`) · the one-time line · its end. |
+
+**Tests.** `lounge.js` section 14: the ring only on `held`, NEW only on `new`, forty pixels, one tap waits then opens, a double tap cheers once and never opens the page, no word,
+the burst, the toast, the hint's three visits and its end, the second cheer politely, the page's button and its words, the sheet (100, auto, count, the 7-day line), a word over 100,
+no signal, a person who left, New Balls, your own page, the daily limit, reduced motion, no 👏 character in anything drawn, the guide. Section 15 takes the pictures.
