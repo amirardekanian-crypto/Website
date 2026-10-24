@@ -6899,7 +6899,7 @@ S['lounge-nudge'] = async (b) => {
 
 // K3. Cheer a moment from Courtside: a sheet with an optional word, coach_cheer, "Cheered today", plain words for a refusal.
 S['lounge-cheer'] = async (b) => {
-  const r = { id: 'lounge-cheer', title: 'K3: each Courtside moment has Cheer with a line-icon clap, never the emoji (a small sheet, an optional word of 100 letters, coach_cheer); the row then says "Cheered today"; refusals in plain words; absent on a server without stage96', checks: [] };
+  const r = { id: 'lounge-cheer', title: 'K3: each Courtside moment has Cheer with a filled Phosphor clap icon, never the emoji (a small sheet, an optional word of 100 letters, coach_cheer); the row then says "Cheered today"; refusals in plain words; absent on a server without stage96', checks: [] };
   const { page, log } = await L.openCoach(b, Object.assign({ seed: { lounge: true, court: true }, hash: 'today' }, COURT_T));
   await noPopups(page);
   const rows = () => page.evaluate(() => [...document.querySelectorAll('#courtPanel .cs')].filter(e => e.querySelector('.cs-name')).map(e => ({ name: e.querySelector('.cs-name').textContent, acts: [...e.querySelectorAll('.cs-acts .btn')].map(x => x.textContent.trim()),
@@ -6909,9 +6909,9 @@ S['lounge-cheer'] = async (b) => {
   const btn = (name, label) => page.locator('#courtPanel .cs', { has: page.locator('.cs-name', { hasText: name }) }).locator('.cs-acts .btn', { hasText: label }).first();
   check(r, 'coach_crew_cheers is read once, behind the first paint', (await calls('coach_crew_cheers')).length === 1, (await calls('coach_crew_cheers')).length);
   check(r, 'Ava (in the crew): her row offers WhatsApp ↗, Copy, Saw it and then Cheer (with the clap icon)', JSON.stringify((await row('Ava Example')).acts) === JSON.stringify(['WhatsApp ↗', 'Copy', 'Saw it', 'Cheer']) && (await row('Ava Example')).icon, (await row('Ava Example')).acts);
-  check(r, 'the clap is a line icon in the button\'s own colour (stroke currentColor, no fill, round caps, 16 px) and no clapping-hands emoji is drawn anywhere in the panel: the emoji is yellow on a phone and yellow is never in this app', await page.evaluate(() => {
+  check(r, 'the clap is the Phosphor hands-clapping icon filled in the button\'s own colour (fill currentColor, no stroke, 16 px) and no clapping-hands emoji is drawn anywhere in the panel: the emoji is yellow on a phone and yellow is never in this app', await page.evaluate(() => {
     const i = document.querySelector('#courtPanel .cs-acts .btn .cheer-ico'), cs = i && getComputedStyle(i), b = i && getComputedStyle(i.closest('.btn'));
-    return !!i && i.tagName.toLowerCase() === 'svg' && cs.fill === 'none' && cs.stroke === b.color && cs.strokeLinecap === 'round' && Math.round(i.getBoundingClientRect().width) === 16 && !/[\u{1F44F}\u{FE0E}]/u.test(document.getElementById('courtPanel').innerHTML) && !/[\u{1F44F}\u{FE0E}]/u.test(document.body.innerHTML); }), '');
+    return !!i && i.tagName.toLowerCase() === 'svg' && cs.fill === b.color && cs.stroke === 'none' && Math.round(i.getBoundingClientRect().width) === 16 && !/[\u{1F44F}\u{FE0E}]/u.test(document.getElementById('courtPanel').innerHTML) && !/[\u{1F44F}\u{FE0E}]/u.test(document.body.innerHTML); }), '');
   check(r, 'the icon is a drawing, not text: the button reads exactly "Cheer", and Cheered today keeps the icon too', (await row('Ava Example')).acts[3] === 'Cheer' && (await row('Ben Example')).icon, await row('Ben Example'));
   check(r, 'Ben (Amir already cheered him today, the list says so): "Cheered today" and no button', (await row('Ben Example')).state === 'Cheered today' && !(await row('Ben Example')).acts.some(x => /Cheer$/.test(x)), await row('Ben Example'));
   check(r, 'Gia, Jon and Hal have not joined the crew: "Not in the crew" and no button (the server would refuse)', ['Gia Example', 'Jon Example', 'Hal Example'].every(n => { return true; }) && (await Promise.all(['Gia Example', 'Jon Example', 'Hal Example'].map(row))).every(x => x.state === 'Not in the crew' && !x.acts.some(a => /Cheer$/.test(a))), await rows());

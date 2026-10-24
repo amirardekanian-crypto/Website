@@ -690,7 +690,7 @@
   .cw-top .btn { margin-left: auto; }
   .cw-txt { margin-top: 2px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
   .court .cheer-sheet { padding-left: 16px; }
-  .cheer-ico { width: 16px; height: 16px; vertical-align: -3px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .cheer-ico { width: 16px; height: 16px; vertical-align: -3px; fill: currentColor; stroke: none; }
   .court .cheer-state { padding: 0 4px; }
   .need.nudge { padding: 8px 0 8px 20px; }                        /* the people under "Trains, not in the crew", set in under their head row */
   .need.nudge a.n { color: var(--ink); text-decoration: none; }
@@ -7308,9 +7308,9 @@ function cheerCtlHtml(g) {
   if (cheerNotIn(g.id)) return '<span class="muted t-sm cheer-state">Not in the crew</span>';
   return `<button class="btn sm" onclick="cheerOpen(${jsq(g.key)})">${CHEER_ICON} Cheer</button>`;
 }
-// The clap: two hands meeting, three short lines of noise above them, drawn as a line icon (stroke in the text's own colour, no fill, round caps), like the
-// page's charts. It replaces the clapping-hands emoji, which is yellow on a phone whatever the page asks of it, and yellow is never in this app.
-const CHEER_ICON = '<svg class="cheer-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="9" width="4.4" height="12" rx="2.2" transform="rotate(38 7.2 15)"/><rect x="14.6" y="9" width="4.4" height="12" rx="2.2" transform="rotate(-38 16.8 15)"/><path d="M12 2v2.6M5.6 4.4l1.6 2M18.4 4.4l-1.6 2"/></svg>';
+// The clap: the Phosphor "hands-clapping" icon (regular), the same one the athlete app uses, filled in the text's own colour with no stroke, like the
+// page's other icons. It replaces the clapping-hands emoji, which is yellow on a phone whatever the page asks of it, and yellow is never in this app.
+const CHEER_ICON = '<svg class="cheer-ico" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M160.22,24V8a8,8,0,0,1,16,0V24a8,8,0,0,1-16,0ZM196.1,41a7.91,7.91,0,0,0,4.17,1.17,8,8,0,0,0,6.84-3.83l8-13.11a8,8,0,0,0-13.68-8.33l-8,13.1A8,8,0,0,0,196.1,41Zm47.51,12.59a8,8,0,0,0-10.08-5.16l-15.06,4.85a8,8,0,0,0,2.46,15.62,8.15,8.15,0,0,0,2.46-.39l15.05-4.85A8,8,0,0,0,243.61,53.55ZM217,97.58a80.22,80.22,0,0,1-10.22,94c-.34,1.73-.72,3.46-1.19,5.18A80.17,80.17,0,0,1,58.77,216L23.5,155a26,26,0,0,1,19.24-38.79l-3-5.2a26,26,0,0,1,19.2-38.78L58.24,71A26,26,0,0,1,95.47,36.53,26.06,26.06,0,0,1,140.3,37l12.26,21.2A26.07,26.07,0,0,1,195.81,61ZM109.07,55l0,0h0l25,43.17a26,26,0,0,1,17.33-10L126.42,45a10,10,0,1,0-17.35,10ZM72.12,63l6.46,11.17a26.05,26.05,0,0,1,17.32-10L89.45,53A10,10,0,1,0,72.12,63Zm111.54,81-20.22-35a10,10,0,0,0-17.74,9.25L158.3,140a8,8,0,0,1-13.87,8l-36.5-63A10,10,0,1,0,90.58,95l26.05,45a8,8,0,0,1-13.87,8L71,93h0l0,0a10,10,0,0,0-17.33,10l35.22,61A8,8,0,0,1,75,172L54.72,137a10,10,0,0,0-17.34,10l35.27,61a64.12,64.12,0,0,0,117.42-15.44A63.52,63.52,0,0,0,183.66,144Zm19.41-38.42L181.93,69A10,10,0,0,0,164.55,79l33,57.05A80.2,80.2,0,0,1,207,161.51,64.23,64.23,0,0,0,203.07,105.58Z"/></svg>';   // Phosphor Icons, MIT
 function cheerSheetHtml(g) {
   if (!(S.cheers && S.cheers.on) || _cheerFor !== g.key || cheeredToday(g.id)) return '';
   const first = firstWord(nameOf(g.id)), busy = _cheerBusy ? ' disabled' : '';
