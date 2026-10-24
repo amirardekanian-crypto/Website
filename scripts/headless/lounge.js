@@ -1540,6 +1540,215 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await a.ctx.close();
   }
 
+  // ── 20. Step 7 · @names in replies (Name Chips): type @, tap a name, the token goes to the server, the name opens a page ─────────────────────────────────
+  // CONTRACT 5: the writer sees "@Name"; the server gets @[ck|Name] (at most 5; a ck that is not a member is plain "@name"); a row carries `mentions` for the members named, and a
+  // name in a reply is a button to that page only for those, else plain text. The row of names sits ABOVE the field and is kept above the phone's keyboard with visualViewport.
+  const MN = (name, cck) => '@[' + cck + '|' + name + ']';
+  const mnState = p => p.evaluate(() => { const b = document.getElementById('cr-mpick'), t = document.querySelector('#hist-overlay .cr-rtxt'); return b ? { hidden: b.hidden, chips: [...b.querySelectorAll('.cr-mchip')].map(c => c.lastElementChild.textContent.trim()), note: ((b.querySelector('.cr-mnote') || {}).textContent || '').trim(),
+    value: t.value, caret: t.selectionStart, focused: document.activeElement === t, cnt: (document.querySelector('#hist-overlay .cr-cnt') || {}).textContent, go: !document.querySelector('#hist-overlay .cr-go').disabled } : null; });
+  const replyOpen = async (p, id) => { await p.evaluate(i => openCrewReply(i), id); await p.waitForTimeout(250); };
+  const typeIn = async (p, s) => { await p.focus('#hist-overlay .cr-rtxt'); await p.keyboard.type(s); await p.waitForTimeout(120); };
+  const chipTap = async (p, i) => { await p.evaluate(k => document.querySelectorAll('#cr-mpick .cr-mchip')[k].click(), i); await p.waitForTimeout(120); };
+  const sentBodies = p => calls(p, 'crew_reply').then(a => a.map(x => x.p_body));
+  const sendReply = async p => { await p.evaluate(() => document.querySelector('#hist-overlay .cr-go').click()); await p.waitForTimeout(500); };
+  const withReplies = (post, reps, b) => { const x = bell(b || {}); x.items.find(i => i.id === post).replies = reps; return x; };
+  if (on(20)) {
+    const a = await open(browser);
+    await goCrew(a.p);
+    await replyOpen(a.p, P_MINA);
+    let s = await mnState(a.p);
+    C.check('the reply sheet has a row for names ABOVE the field, hidden until an @ is typed', !!s && s.hidden && s.chips.length === 0 && await a.p.evaluate(() => { const b = document.getElementById('cr-mpick'), t = document.querySelector('#hist-overlay .cr-rtxt'); return !!(b.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING); }), JSON.stringify(s));
+    await typeIn(a.p, 'Well played @');
+    s = await mnState(a.p);
+    C.check('typing @ opens the crew\'s names: you are left out, the people in this thread come first (Mina, whose post it is), then by name', !s.hidden && s.chips.join() === 'Mina S.,Ali B.,Ali B.,Leila M.,Omid P.,Reza K.,Sara T.', JSON.stringify(s));
+    await typeIn(a.p, 'S');
+    s = await mnState(a.p);
+    C.check('…what follows the @ filters it (by the start of the name or of a word in it): "@S"', s.chips.join() === 'Mina S.,Sara T.', s.chips.join());
+    await typeIn(a.p, 'a');
+    s = await mnState(a.p);
+    C.check('…"@Sa" leaves one', s.chips.join() === 'Sara T.' && !s.hidden, s.chips.join());
+    const face = await a.p.evaluate(() => { const c = document.querySelector('#cr-mpick .cr-mchip'); return { fl: !!c.querySelector('.cr-fl'), w: Math.round(c.querySelector('.cr-fl').getBoundingClientRect().width), h: Math.round(c.getBoundingClientRect().height), txt: c.querySelector('.cr-fl').textContent.trim() }; });
+    C.check('…each name wears its face (the initials until a picture) and is a 44 px target', face.fl && face.w === 24 && face.h >= 44 && face.txt === 'ST', JSON.stringify(face));
+    await chipTap(a.p, 0);
+    s = await mnState(a.p);
+    C.check('a tap puts "@Sara T. " where the @ was, closes the row, keeps the keyboard (the field is focused and the caret is after it) and counts what is seen', s.value === 'Well played @Sara T. ' && s.hidden && s.focused && s.caret === 21 && s.cnt === '21 / 140' && s.go, JSON.stringify(s));
+    await typeIn(a.p, 'you!');
+    await sendReply(a.p);
+    const b1 = await sentBodies(a.p);
+    C.check('what is SENT is the token: "@[ck|Sara T.]" in the writer\'s words', b1.length === 1 && b1[0] === 'Well played ' + MN('Sara T.', CK.sara) + ' you!', JSON.stringify(b1));
+    C.check('…the sheet closes and the name is a button to her page in the thread', await a.p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible') && [...document.querySelectorAll('.cr-post[data-id="' + 'bbbbbbbb-0000-4000-8000-000000000001' + '"] .cr-rep .cr-mn')].map(x => x.textContent).join() === '@Sara T.'));
+    await a.p.evaluate(() => document.querySelector('.cr-mn').click()); await a.p.waitForTimeout(500);
+    C.check('…and the button opens Sara\'s page', (await screenNow(a.p)) === 'screen-crewplayer' && (await plain(a.p, '#crewplayer-body .pl-name')) === 'Sara T.', await screenNow(a.p));
+    C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+
+    // two people with the same name: the tap decides, not the name; a name moves with the words around it; a name that is edited is just words
+    const d = await open(browser);
+    await goCrew(d.p); await replyOpen(d.p, P_MINA);
+    await typeIn(d.p, '@Al');
+    s = await mnState(d.p);
+    C.check('two members called "Ali B." are two chips', s.chips.join() === 'Ali B.,Ali B.', s.chips.join());
+    await chipTap(d.p, 1);
+    await d.p.evaluate(() => { const t = document.querySelector('#hist-overlay .cr-rtxt'); t.focus(); t.setSelectionRange(0, 0); });
+    await typeIn(d.p, '@Al');
+    s = await mnState(d.p);
+    C.check('…a name already put in the reply is not offered again (a typed @ before an @ is an insertion, not an edit of the name)', s.value === '@Al@Ali B. ' && s.chips.join() === 'Ali B.', JSON.stringify(s));
+    await chipTap(d.p, 0);
+    await d.p.keyboard.press('End');
+    await typeIn(d.p, 'Hi');
+    await sendReply(d.p);
+    const b2 = (await sentBodies(d.p))[0];
+    C.check('…each token keeps the ck of the one who was tapped, in the order they sit in the words', b2 === MN('Ali B.', CK.ali1) + ' ' + MN('Ali B.', CK.ali2) + ' Hi', b2);
+    await d.ctx.close();
+
+    const e = await open(browser);
+    await goCrew(e.p); await replyOpen(e.p, P_MINA);
+    await typeIn(e.p, '@Sa'); await chipTap(e.p, 0);
+    await e.p.keyboard.press('Home'); await e.p.keyboard.type('Hi '); await e.p.waitForTimeout(100);
+    await e.p.keyboard.press('End'); await e.p.keyboard.type('there'); await e.p.waitForTimeout(100);
+    await sendReply(e.p);
+    const b3 = (await sentBodies(e.p))[0];
+    C.check('text typed before a name and after it leaves it a name: "Hi @[ck|Sara T.] there"', b3 === 'Hi ' + MN('Sara T.', CK.sara) + ' there', b3);
+    await e.ctx.close();
+
+    const g = await open(browser);
+    await goCrew(g.p); await replyOpen(g.p, P_MINA);
+    await typeIn(g.p, '@Sa'); await chipTap(g.p, 0);
+    await g.p.keyboard.press('Backspace'); await g.p.keyboard.press('Backspace'); await g.p.waitForTimeout(100);
+    const sg = await mnState(g.p);
+    await sendReply(g.p);
+    const b4 = (await sentBodies(g.p))[0];
+    C.check('a name edited by hand (its last letter taken away) is only words: nothing is sent as a name', sg.value === '@Sara T' && b4 === '@Sara T', JSON.stringify([sg.value, b4]));
+    await g.ctx.close();
+
+    const h = await open(browser);
+    await goCrew(h.p); await replyOpen(h.p, P_MINA);
+    await typeIn(h.p, '@Sara T. you');
+    await sendReply(h.p);
+    const b5 = (await sentBodies(h.p))[0];
+    C.check('"@Sara T." typed by hand, never tapped, is words and goes as words', b5 === '@Sara T. you', b5);
+    await h.ctx.close();
+
+    // at most 5
+    const m = await open(browser);
+    await goCrew(m.p); await replyOpen(m.p, P_MINA);
+    for (let k = 0; k < 5; k++) { await typeIn(m.p, '@'); await chipTap(m.p, 0); }
+    await typeIn(m.p, '@');
+    s = await mnState(m.p);
+    C.check('a sixth name is not offered: the row says "You can name 5 people in a reply."', !s.hidden && s.chips.length === 0 && s.note === 'You can name 5 people in a reply.', JSON.stringify(s));
+    await sendReply(m.p);
+    const b6 = (await sentBodies(m.p))[0];
+    C.check('…and five tokens are sent', (b6.match(/@\[/g) || []).length === 5 && /@$/.test(b6), b6);
+    await m.ctx.close();
+
+    // the 140 is what is SEEN: a name that would not fit is not put in
+    const l = await open(browser);
+    await goCrew(l.p); await replyOpen(l.p, P_MINA);
+    await l.p.evaluate(() => { const t = document.querySelector('#hist-overlay .cr-rtxt'); t.value = 'x'.repeat(134) + ' @'; t.dispatchEvent(new Event('input')); t.focus(); t.setSelectionRange(t.value.length, t.value.length); });
+    await typeIn(l.p, 'S'); await chipTap(l.p, 0);
+    const sl = await mnState(l.p);
+    C.check('a name that would take the reply past 140 is not put in, and the sheet says so', sl.value.length <= 140 && !/Sara|Mina/.test(sl.value) && /over 140/.test(await text(l.p, '#hist-overlay .cr-err') || ''), JSON.stringify([sl.value.length, await text(l.p, '#hist-overlay .cr-err')]));
+    await l.ctx.close();
+
+    // above the keyboard: visualViewport shrinks, the sheet is fitted to what is left, and it lets go when the keyboard goes
+    const k = await open(browser);
+    await goCrew(k.p); await replyOpen(k.p, P_MINA);
+    await typeIn(k.p, '@S');
+    await k.p.evaluate(() => { const vv = window.visualViewport; Object.defineProperty(vv, 'height', { configurable: true, get: () => 420 }); vv.dispatchEvent(new Event('resize')); });
+    await k.p.waitForTimeout(150);
+    const kb = await k.p.evaluate(() => { const r = n => document.querySelector(n).getBoundingClientRect(), ov = document.getElementById('hist-overlay'); return { h: ov.style.height, top: ov.style.top, chips: Math.round(r('#cr-mpick').bottom), chipTop: Math.round(r('#cr-mpick').top), field: Math.round(r('#hist-overlay .cr-rtxt').bottom), modal: Math.round(r('#hist-overlay .readiness-modal').bottom), cnt: Math.round(r('#hist-overlay .cr-cnt').bottom), go: Math.round(r('#hist-overlay .cr-go').bottom), quote: getComputedStyle(document.querySelector('#hist-overlay .cr-quote')).display }; });
+    C.check('with the keyboard up (the visual viewport 420 tall) the sheet ends above it: the names, the field, the counter and Reply are all inside 420 px (the quote under the title gives way)', kb.h === '420px' && kb.top === '0px' && kb.modal <= 420 && kb.chips <= 420 && kb.field <= 420 && kb.cnt <= 420 && kb.go <= 420 && kb.chipTop >= 0 && kb.quote === 'none', JSON.stringify(kb));
+    await k.p.evaluate(() => { delete window.visualViewport.height; window.visualViewport.dispatchEvent(new Event('resize')); });
+    await k.p.waitForTimeout(150);
+    C.check('…and with the keyboard gone nothing is left set on the sheet', await k.p.evaluate(() => { const ov = document.getElementById('hist-overlay'); return !ov.style.height && !ov.style.top && !ov.style.bottom && !document.querySelector('#hist-overlay .readiness-modal').style.maxHeight && !document.querySelector('#hist-overlay .readiness-modal').classList.contains('cr-kb') && getComputedStyle(document.querySelector('#hist-overlay .cr-quote')).display !== 'none'; }));
+    await k.p.evaluate(() => { const vv = window.visualViewport; Object.defineProperty(vv, 'height', { configurable: true, get: () => 420 }); vv.dispatchEvent(new Event('resize')); });
+    await k.p.evaluate(() => closeHistorySheet()); await k.p.waitForTimeout(150);
+    C.check('…closing the sheet with the keyboard still "up" lets go too', await k.p.evaluate(() => { const ov = document.getElementById('hist-overlay'); return !ov.style.height && !ov.style.top; }));
+    await k.ctx.close();
+
+    // the opener is a sheet's opener: with a page behind it, ‹ Back is there
+    const w = await open(browser);
+    await goCrew(w.p);
+    await w.p.evaluate(() => openAccount()); await w.p.waitForTimeout(250);
+    await replyOpen(w.p, P_MINA);
+    C.check('openCrewReply is in wrapSheetOpeners(): over another page it has ‹ Back, and Back returns to that page', await w.p.evaluate(() => !!document.querySelector('#hist-overlay .sheet-back') && !!document.querySelector('#hist-overlay .cr-rtxt')));
+    await w.p.evaluate(() => sheetBack()); await w.p.waitForTimeout(250);
+    C.check('…Back shows the page behind', await w.p.evaluate(() => !document.querySelector('#hist-overlay .cr-rtxt') && document.getElementById('hist-overlay').classList.contains('visible')));
+    await w.ctx.close();
+
+    // how a name is drawn in a thread: a button for a member the row names, plain for anyone else, whatever the writer wrote
+    const reps = [
+      Object.assign({ id: 'rt1', who: 'Reza K.', me: false, amir: false, body: 'Good one ' + MN('Sara T.', CK.sara) + ' and ' + MN('Omid P.', CK.omid) + ', come on', at: iso(now - 300e3), mentions: [{ ck: CK.sara, who: 'Sara T.', fv: null }] }, { ck: CK.reza, fv: null }),
+      Object.assign({ id: 'rt2', who: 'Leila M.', me: false, amir: false, body: 'You ' + MN('Alex R.', CK.alex) + ' <b>x</b> @[nope|X]', at: iso(now - 200e3), mentions: [{ ck: CK.alex, who: 'Alex R.', fv: null }] }, { ck: CK.leila, fv: null })];
+    const r = await open(browser, { bell: withReplies(P_MINA, reps) });
+    await goCrew(r.p);
+    const th = await r.p.evaluate(id => [...document.querySelectorAll('.cr-post[data-id="' + id + '"] .cr-rep .cr-rb')].map(rb => ({ text: rb.textContent.replace(/\s+/g, ' ').trim(), btns: [...rb.querySelectorAll('button.cr-mn')].map(b => b.textContent), html: rb.innerHTML })), P_MINA);
+    C.check('a member named in a reply is a button "@Sara T."; someone who is not in the row\'s `mentions` is plain "@Omid P."; the token itself is never on the screen', th[0].btns.join() === '@Sara T.' && /Good one @Sara T\. and @Omid P\., come on/.test(th[0].text) && !/@\[/.test(th[0].text) && !/<button[^>]*>@Omid/.test(th[0].html), JSON.stringify(th[0]));
+    C.check('…you named yourself: a button to YOUR page; text that only looks like a tag or a broken token stays words, safely', th[1].btns.join() === '@Alex R.' && /@\[nope\|X\]/.test(th[1].text) && /&lt;b&gt;x&lt;\/b&gt;/.test(th[1].html) && !/<b>x<\/b>/.test(th[1].html), JSON.stringify(th[1]));
+    await r.p.evaluate(() => document.querySelector('.cr-rep .cr-mn').click()); await r.p.waitForTimeout(450);
+    const at1 = await screenNow(r.p), nm1 = await plain(r.p, '#crewplayer-body .pl-name');
+    await r.p.evaluate(() => playerBack()); await r.p.waitForTimeout(350);
+    await r.p.evaluate(() => document.querySelectorAll('.cr-rep .cr-mn')[1].click()); await r.p.waitForTimeout(450);
+    C.check('…the buttons open Sara\'s page and your own, and ← comes back to Crew', at1 === 'screen-crewplayer' && nm1 === 'Sara T.' && (await plain(r.p, '#crewplayer-body .pl-name')) === 'Alex R.', nm1);
+    C.check('…no page errors', !r.p.errs.length, r.p.errs.join(' | '));
+    await r.ctx.close();
+
+    // an athlete under 13 reads only: the words, no doors; and a server without stage96 has no row and sends the words as typed
+    const u = await open(browser, { bell: withReplies(P_MINA, reps, { me: { under13: true, can_post: false } }) });
+    await goCrew(u.p);
+    const tu = await u.p.evaluate(id => ({ btns: document.querySelectorAll('.cr-post[data-id="' + id + '"] .cr-rep .cr-mn').length, text: document.querySelector('.cr-post[data-id="' + id + '"] .cr-rep .cr-rb').textContent.replace(/\s+/g, ' ').trim() }), P_MINA);
+    C.check('under 13: a name in a reply is the words and no door', tu.btns === 0 && /Good one @Sara T\. and @Omid P\./.test(tu.text), JSON.stringify(tu));
+    await u.ctx.close();
+    const o = await open(browser, { b: { noPages: true } });
+    await goCrew(o.p); await replyOpen(o.p, P_MINA);
+    await typeIn(o.p, 'hello @Sa');
+    const so = await o.p.evaluate(() => ({ row: !!document.getElementById('cr-mpick'), val: document.querySelector('#hist-overlay .cr-rtxt').value }));
+    await sendReply(o.p);
+    C.check('a server without stage96: no row of names at all, and the reply goes as typed', !so.row && (await sentBodies(o.p))[0] === 'hello @Sa', JSON.stringify([so, await sentBodies(o.p)]));
+    await o.ctx.close();
+
+    // the guide says it; a reply of the stub's own: the server rewrites a token that is not a member to plain words
+    const gd = await open(browser);
+    await goCrew(gd.p);
+    const guide = await gd.p.evaluate(() => buildAppGuideCards());
+    C.check('the guide says how: type @ and tap a name, five at most, in plain words', /type <strong>@<\/strong> and tap their name/.test(guide) && /name 5 people/.test(guide) && !/[—;]/.test((guide.match(/<p>To name someone[\s\S]*?<\/p>/) || [''])[0]), '');
+    await gd.ctx.close();
+  }
+
+  // ── 21. the picture for step 7 (390 px, light): the names over a reply, with the keyboard up ──────────────────────────────────────────────────────────────
+  if (on(21)) {
+    const people = [[CK.alex, '#5E8C7A', '#E3B896', '#2E4A57', 1101], [CK.mina, '#9CB4C6', '#C98E6A', '#8C3D2B', 1102], [CK.reza, '#7C6B8F', '#E8C4A0', '#26322C', 1103],
+      [CK.ali1, '#A9B79A', '#B07B58', '#3C5A7A', 1104], [CK.leila, '#C9A99A', '#E0B493', '#4F6B52', 1105], [CK.sara, '#6E8FA3', '#D8A682', '#7A4E3A', 1106], [CK.omid, '#A9B79A', '#B07B58', '#3C5A7A', 1107]];
+    const faceImgs = p => p.evaluate(rows => {
+      const o = {};
+      rows.forEach(([k, bg, skin, shirt, fv]) => {
+        const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
+        const g = x.createLinearGradient(0, 0, 128, 128); g.addColorStop(0, bg); g.addColorStop(1, '#1F3A30'); x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+        x.fillStyle = shirt; x.beginPath(); x.ellipse(64, 132, 48, 40, 0, 0, Math.PI * 2); x.fill();
+        x.fillStyle = skin; x.fillRect(56, 70, 16, 18); x.beginPath(); x.ellipse(64, 52, 21, 25, 0, 0, Math.PI * 2); x.fill();
+        o[k] = { fv, b64: c.toDataURL('image/jpeg', 0.85).split(',')[1] };
+      });
+      window.__STUB.faces = o;
+    }, people);
+    const fvs = Object.fromEntries(people.map(r => [r[0], r[4]]));
+    const b = withFaces(fvs);
+    const post = b.items.find(i => i.id === P_MINA);
+    post.replies = [Object.assign({ id: 'pic1', who: 'Reza K.', me: false, amir: false, body: 'Same here. Ask ' + MN('Leila M.', CK.leila) + ' for the sled plan.', at: iso(now - 600e3), mentions: [{ ck: CK.leila, who: 'Leila M.', fv: 1105 }] }, { ck: CK.reza, fv: 1103 })];
+    const a = await open(browser, { stub: { bell: b, crewBoard: board().map(r => (r.ck in fvs ? { ...r, fv: fvs[r.ck] } : r)) } });
+    await faceImgs(a.p);
+    await goCrew(a.p); await a.p.waitForTimeout(1200);
+    await a.p.evaluate(id => { document.querySelector('.cr-post[data-id="' + id + '"]').scrollIntoView({ block: 'start' }); window.scrollBy(0, -12); }, P_MINA);
+    await a.p.screenshot({ path: path.join(out, 'reply-thread-names-light-390.png') });
+    await replyOpen(a.p, P_MINA);
+    await typeIn(a.p, 'Legs too, @S'); await a.p.waitForTimeout(700);
+    await a.p.screenshot({ path: path.join(out, 'reply-chips-light-390.png') });
+    // the same with the keyboard up: a visual viewport of 440 px (about what an iPhone leaves)
+    await a.p.evaluate(() => { const vv = window.visualViewport; Object.defineProperty(vv, 'height', { configurable: true, get: () => 440 }); vv.dispatchEvent(new Event('resize')); });
+    await a.p.waitForTimeout(300);
+    await a.p.screenshot({ path: path.join(out, 'reply-chips-keyboard-light-390.png') });
+    await a.ctx.close();
+  }
+
 
   await browser.close();
   process.exit(C.report() ? 1 : 0);

@@ -24,6 +24,7 @@
 // Steps 4 to 6: a page's `cycle` (YOUR page: every week of the cycle with days that carry title and mins, plus `done` / `extra`; SOMEONE ELSE'S, CONTRACT 9b: { n, per_week, done, extra, weeks: [this week only] }
 // and days that carry only day and extra: the stub sends exactly what the fixture gives, so a test can also send MORE than the server would), `game` and each achievement's `signed` / `signed_n` come from the `crewPages` entry (none by default, so a
 // page has no cycle, no game and nobody signed); my_game_set answers like CONTRACT 4 and crew_page(own) then carries what it saved (`myGame`; gameMissing, gameErr, gameFail, gameDelay).
+// Step 7: crew_reply keeps a mention token @[ck|name] for a member of `bell.crew` who is not you (the first five), turns any other into plain @name, counts what is SEEN against 140 (a token is "@name"), and the reply row carries `mentions`.
 // Faces (step 2): crew_faces_get answers `faces` ({ '<ck>': { fv, b64 } }), crew_face_set / crew_face_clear change the caller's own (faceDelay, faceMax, faceMissing, faceErr).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
@@ -220,10 +221,25 @@
           if (!post) return res({ data: null, error: { message: 'crew:gone' }, status: 400 });
           var body = String((params && params.p_body) || '').trim();
           if (!body) return res({ data: null, error: { message: 'crew:empty' }, status: 400 });
-          if (body.length > 140) return res({ data: null, error: { message: 'crew:reply_long' }, status: 400 });
+          // stage96 mentions (CONTRACT 5): a token @[ck|name] is kept when the ck is a member of the crew list and not the author, the first five only; anything else becomes plain
+          // "@name". What the 140 counts is what is SEEN (a token counts as "@name"), the body at most 700. The row carries `mentions` for the members named.
+          var mre = /@\[([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\|([^\]|\n]{1,40})\]/, mrest = body, mout = '', mseen = '', mcnt = 0, mm, ments = [], mtok = [];
+          while ((mm = mre.exec(mrest))) {
+            var mnm = mm[2].trim().slice(0, 24), mck = mm[1].toLowerCase();
+            var mem = mcnt < 5 && mnm ? (B.crew || []).filter(function (c) { return c && c.ck && String(c.ck).toLowerCase() === mck && !c.me; })[0] : null;
+            mout += mrest.slice(0, mm.index); mseen += mrest.slice(0, mm.index);
+            if (mem) { mout += '@[' + mck + '|' + mnm + ']'; mcnt++; mtok.push(mck); if (!ments.some(function (x) { return x.ck === mck; })) ments.push({ ck: mck, who: mem.who, fv: mem.fv != null ? mem.fv : null }); }
+            else mout += '@' + mnm;
+            mseen += '@' + mnm; mrest = mrest.slice(mm.index + mm[0].length);
+          }
+          body = mout + mrest; mseen += mrest;
+          S.lastBody = body;
+          if (mseen.length > 140 || body.length > 700) return res({ data: null, error: { message: 'crew:reply_long' }, status: 400 });
           if (!Array.isArray(post.replies)) post.replies = [];
-          post.replies.push({ id: 'rep-' + (++S._repN || (S._repN = 1)), who: (B.me && B.me.name) || 'You', me: true, amir: false, body: body, at: new Date().toISOString(),
-            ck: B.me && B.me.ck ? B.me.ck : undefined, fv: B.me && 'fv' in B.me ? B.me.fv : undefined });
+          var newRep = { id: 'rep-' + (++S._repN || (S._repN = 1)), who: (B.me && B.me.name) || 'You', me: true, amir: false, body: body, at: new Date().toISOString(),
+            ck: B.me && B.me.ck ? B.me.ck : undefined, fv: B.me && 'fv' in B.me ? B.me.fv : undefined };
+          if (ments.length) newRep.mentions = ments;
+          post.replies.push(newRep);
         } else {
           (B.items || []).forEach(function (i) {
             if (i && Array.isArray(i.replies) && i.replies.some(function (r) { return r.id === (params && params.p_id); })) {
