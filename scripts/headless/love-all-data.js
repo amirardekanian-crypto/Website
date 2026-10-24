@@ -1,6 +1,7 @@
 // Love All round 2 (2026-10-24), the data fixes of the 2026-10-20 audit, checked the way the athlete meets them.
 //   B10  Progress's Body weight row and the Body Weight screen say the SAME change, average to average, with no single date in it.
 //   B14  the grey LAST under a set reads the server's history: a new phone with no set log still shows last time, in the measure last time used.
+//   B19  History's "low day" tag follows the level the day was trained at (the check-in's plan as filed), not the raw score.
 // Serve the repo first (python -m http.server <port>; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js), then:
 //   node scripts/headless/love-all-data.js
 'use strict';
@@ -73,10 +74,39 @@ async function b14(browser) {
   await ctx.close();
 }
 
+// ═════════ B19: the tag follows the level trained ═════════
+async function b19(browser) {
+  const ses = (ago, readiness, ready) => ({ completed_on: H.past(ago), day: '1', readiness, ready, log: [
+    { ex: SQUAT, block: 'Strength', reps: 6, note: '', sets: [{ w: '70', n: 6, r: '7', d: true }, { w: '70', n: 6, r: '7', d: true }] }] });
+  const hist = [
+    ses(2, 4.5, { sleep: 2, energy: 2, stress: 2, overall: 2, soreness: 4, composite: 2.4, level: 'amber', drop: 1, asWritten: false }),   // trained lower, a high raw number: tagged
+    ses(4, 2, { sleep: 3, energy: 3, stress: 3, overall: 3, soreness: 1, composite: 2, level: 'green', sore: 'skip', drop: 0 }),             // a sore day at a normal level, a low raw number: no tag
+    ses(6, 2, { sleep: 2, energy: 2, stress: 2, overall: 2, soreness: 2, composite: 2, level: 'amber', drop: 1, asWritten: true }),          // the lower day was turned down: trained as written, no tag
+    ses(8, 3, { sleep: 1, energy: 1, stress: 1, overall: 1, soreness: 3, composite: 1, level: 'red', drop: 1, asWritten: false }),           // a short day: tagged
+    ses(10, 1.5, null),                                                                                                                   // an old check-in with no plan: no tag
+  ];
+  const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), hist });
+  await p.evaluate(() => openDayView('1'));
+  await p.waitForTimeout(400);
+  await p.evaluate(nm => { const c = [...document.querySelectorAll('#day-view .checklist-item')].find(c => c.querySelector('.item-name').textContent.trim() === nm); if (c.classList.contains('collapsed')) toggleExpand(c); openHistorySheet(c); }, SQUAT);
+  await p.waitForTimeout(500);
+  const rows = await p.evaluate(() => [...document.querySelectorAll('#hist-overlay .hs-row .hs-d')].map(e => e.textContent.trim()));
+  const tag = i => /low day/i.test(rows[i] || '');
+  t.check('B19: five rows in History', rows.length === 5, JSON.stringify(rows));
+  t.check('B19: a day trained lower shows the tag even with a high raw score', tag(0), rows[0]);
+  t.check('B19: a sore day at a normal level shows no tag even with a low raw score', !tag(1), rows[1]);
+  t.check('B19: a lower day trained as written shows no tag', !tag(2), rows[2]);
+  t.check('B19: a short day shows the tag', tag(3), rows[3]);
+  t.check('B19: an old check-in with no plan shows no tag', !tag(4), rows[4]);
+  t.check('B19: no page errors', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await b10(browser);
   await b14(browser);
+  await b19(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

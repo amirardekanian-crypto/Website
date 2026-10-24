@@ -21393,7 +21393,7 @@ function historyFor(name) {
       if (histNorm(nm) !== want) return;
       if (e.circuit ? !(e.items || []).some(it => it.w) && !e.gear
                     : !(e.sets || []).some(histSetLogged)) return;
-      out.push({ date: s.date, readiness: s.readiness, entry: e });
+      out.push({ date: s.date, readiness: s.readiness, ready: s.ready, entry: e });
     });
   });
   return out;
@@ -21689,7 +21689,9 @@ function openHistorySheet(card) {
                           : histSetsText(e.sets, e.reps || null);
     const rs = e.circuit ? '' : (e.sets || []).filter(histSetLogged).map(s => Number(s.r) || null).filter(Boolean)
       .map(r => rpeMark(r, target)).join(' ');
-    const low = h.readiness != null && h.readiness <= 2.5;
+    // The tag follows the level the day was TRAINED at (B19, 2026-10-24): the check-in's plan as filed with that session, lower or short and
+    // not trained as written. Not the raw score: a lower day shows it, a sore day on a normal level and a day trained as written do not.
+    const rd = h.ready, low = !!(rd && (rd.level === 'amber' || rd.level === 'red') && !rd.asWritten);
     return `<div class="hs-row"><span class="hs-d">${esc(dl.when)}${rs ? ' · RPE ' + rs : ''}${low ? ' · low day' : ''}</span>
       <span class="hs-v">${esc(txt)}</span>
       ${e.note ? `<span class="hs-n">“<bdi>${esc(e.note)}</bdi>”</span>` : ''}</div>`;
