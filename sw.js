@@ -472,7 +472,12 @@
 // shows above an open sheet. Videos stop when their card folds. Last night's session counts once after midnight. History,
 // Ask Amir, the clock offer, rest Reset, Back from Home's pages and from a lift, the Reminders bell, a typed crew reply,
 // the plurals, the finish card's set count, article headings, the demo link, the tempo button and the guide's facts.
-const CACHE = 'aap-v220';
+// v221: program.html changed (2026-10-24, Love All round 3, Amir's answers and direction A). Every small control has a 44 px
+// tap area and the faint greys pass 4.5:1. The app follows the phone's dark mode until a theme is picked. The ring on Home opens
+// Your numbers. Guided and the lower-day banner follow today's targets. LAST reads the server's history. Body weight shows one
+// change. Dates are day first. A note with a button stays until tapped, the weight check says Keep it or Fix it, and the
+// install card is a layer that never sits over a day.
+const CACHE = 'aap-v221';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
