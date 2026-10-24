@@ -5,6 +5,14 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-24 · The Lounge, the last answers before it went live.** *"like the images i showed you, the number of cheers a person
+  has got, should be shown on their acount. what do you think about this?"* and *"i like new balls idea, you can add it"* (it was
+  already in step 3); the cheers became ONE all-time number counting cheers and likes received (a like already reads "X cheered you"),
+  a tile on every page. On the partner reward: *"its 2 cycle for 10% each"* (two friends = 10% off each of the next two cycles, never
+  20% at once). Then *"After your tests come out. Go live"*. What it teaches: he reads the reference screens for the number they put
+  in front of people (a count of recognition), and he gives a conditional go-live in advance, so finish the checks and ship without
+  asking again.
+
 - **2026-10-24 · Round 5 'Borrowed Plays': four kept, three cut.** *"i like the idea 50 , 51, 53, 54 / cut the rest / go deep on these 4"*.
   Kept Rain Delay (the athlete asks for a pause), The Return (the welcome back), Patterns (habits against check-ins) and Reply Rings
   (a reply rings you). Cut Owed a Word (a contact clock on him), Break Point (the week-at-risk line and push) and Seen by Amir (a read
