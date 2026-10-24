@@ -429,7 +429,7 @@ const OVERLAP = `(() => {
       return { text: b.textContent, done: b.classList.contains('is-done'), color: c(b).color, bg: c(b).backgroundColor, note: document.getElementById('ws-done-note').textContent, calls, stored: !!localStorage.getItem('wkdone_full-body-power') };
     });
     t.check('pressing it writes the row once (log_library_session with the slug) and the done state is hollow with green text, "Done today ✓"',
-      d.calls.length === 1 && d.calls[0].p_slug === 'workouts/strength/full-body-power' && d.text === 'Done today ✓' && d.done && d.color === 'rgb(14, 74, 54)' && d.bg === 'rgba(0, 0, 0, 0)' && /^Done today\. Your Session habit is ticked\.$/.test(d.note) && d.stored, JSON.stringify(d));
+      d.calls.length === 1 && d.calls[0].p_slug === 'workouts/strength/full-body-power' && d.text === 'Done today ✓' && d.done && d.color === 'rgb(14, 74, 54)' && d.bg === 'rgba(0, 0, 0, 0)' && d.note === "Done. I'll see it." && d.stored, JSON.stringify(d));
     t.check('no page errors (Mark as done)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
@@ -451,12 +451,12 @@ const OVERLAP = `(() => {
     await p.evaluate(() => document.getElementById('ws-done-btn').click()); await sleep(p, 600);
     const mid = await p.evaluate(() => { const o = document.querySelector('#ws-track:not([hidden])'); return { note: document.getElementById('ws-done-note').textContent, offer: o && o.textContent, log: (HAB_LOG[AAHabits.TKEY()] || {}).mobility }; });
     t.check('after Done: it says the coach sees it, ticks nothing, and offers "Track Mobility from today"',
-      mid.note === 'Done today. Your coach can see you did it.' && mid.offer === 'Track Mobility from today' && !mid.log, JSON.stringify(mid));
+      mid.note === "Done. I'll see it." && mid.offer === 'Track Mobility from today' && !mid.log, JSON.stringify(mid));
     await p.evaluate(() => document.getElementById('ws-track').click()); await sleep(p, 500);
     const after = await p.evaluate(() => ({ on: !!(HAB_CFG.on || {}).mobility, stored: !!(JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_cfg')).on || {}).mobility, log: (HAB_LOG[AAHabits.TKEY()] || {}).mobility,
       note: document.getElementById('ws-done-note').textContent, offer: !!document.querySelector('#ws-track:not([hidden])'), toast: (document.querySelector('.aa-toast') || {}).textContent || '' }));
     t.check('one tap: Mobility is on from today, today is ticked, the offer goes and the note says the habit is ticked',
-      after.on && after.stored && after.log === 1 && !after.offer && after.note === 'Done today. Your Mobility habit is ticked.', JSON.stringify(after));
+      after.on && after.stored && after.log === 1 && !after.offer && after.note === "Done. I'll see it.", JSON.stringify(after));
     t.check('no page errors (the Library tick)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }

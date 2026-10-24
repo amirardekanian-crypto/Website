@@ -16382,9 +16382,7 @@ function renderLibraryDone() {
   // Promise a habit tick only when Done gives one (CNT-01, libTickLabel()): an add-on habit counts only once the athlete has
   // switched it on. Otherwise the Done still reaches the coach. The tick is on Today's card now: AA Proof is retired.
   if (done) {
-    note.textContent = label
-      ? 'Done today. Your ' + label + ' habit is ticked.'
-      : 'Done today. Your coach can see you did it.';
+    note.textContent = "Done. I'll see it.";   // the habit tick still happens in markLibraryDone(); this line is Amir's, in his voice (B13)
   } else {
     note.textContent = label
       ? 'Tap when you finish. It ticks your ' + label + ' habit.'

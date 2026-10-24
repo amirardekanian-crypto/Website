@@ -75,10 +75,27 @@ async function kgButtons(browser) {
   await ctx.close();
 }
 
+// ═════════ B13: Library's Mark as done, once done ═════════
+async function b13(browser) {
+  const LIB = H.library();
+  const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), stub: { library: LIB } });
+  p.setDefaultTimeout(8000);
+  await p.evaluate(() => goLibrary()); await p.waitForTimeout(900);
+  await p.evaluate(() => openWorkout('strength/full-body-power')); await p.waitForTimeout(700);
+  await p.click('#ws-done-btn'); await p.waitForTimeout(600);
+  const d = await p.evaluate(() => ({ btn: document.getElementById('ws-done-btn').textContent, note: document.getElementById('ws-done-note').textContent,
+    ticked: !!(HAB_LOG[AAHabits.TKEY()] || {}).strength }));
+  t.check('B13: Mark as done, once done: the line reads "Done. I\'ll see it."', d.note === "Done. I'll see it.", d.note);
+  t.check('B13: the habit still ticks and the button still says Done today', d.ticked && d.btn === 'Done today ✓', JSON.stringify(d));
+  t.check('B13: no page errors', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await b25(browser);
   await kgButtons(browser);
+  await b13(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
