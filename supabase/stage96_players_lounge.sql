@@ -1438,7 +1438,6 @@ begin
     'public.crew_extra(text,jsonb,timestamptz,timestamptz,text)', 'public.crew_season_start(text)', 'public.crew_cheer_count(text)',
     'public.crew_game_of(text)', 'public.crew_forget(text)', 'public.crew_t_forget_former()',
     'public.crew_push_t_cheer()', 'public.crew_push_t_reply()', 'public.crew_push_t_mention()'] loop
-    if f = 'public.crew_lv(text)' then f := 'public.crew_lv(text)'; end if;
     execute format('revoke all on function %s from public, anon, authenticated', f);
     execute format('grant execute on function %s to service_role', f);
   end loop;
