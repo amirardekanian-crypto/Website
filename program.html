@@ -14838,7 +14838,7 @@ function paintDayOne() {
   const on = !hasFinishedASession();
   const wrap = document.getElementById('dayone-wrap');
   if (wrap) {
-    const h = on ? '<p class="day1">Nothing here yet. Your numbers, your records and your moments fill in as you train.</p>' : '';
+    const h = on && !window.IS_DEMO ? '<p class="day1">Nothing here yet. Your numbers, your records and your moments fill in as you train.</p>' : '';
     if (wrap.innerHTML !== h) wrap.innerHTML = h;
   }
   ['numbers-title', 'career-card-wrap', 'ceiling-row-wrap', 'career-courts-wrap', 'career-moments-wrap'].forEach(id => {

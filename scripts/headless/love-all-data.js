@@ -2,6 +2,7 @@
 //   B10  Progress's Body weight row and the Body Weight screen say the SAME change, average to average, with no single date in it.
 //   B14  the grey LAST under a set reads the server's history: a new phone with no set log still shows last time, in the measure last time used.
 //   B19  History's "low day" tag follows the level the day was trained at (the check-in's plan as filed), not the raw score.
+//   B21  the demo's Progress never says "Nothing here yet" (a real first-timer's still does).
 // Serve the repo first (python -m http.server <port>; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js), then:
 //   node scripts/headless/love-all-data.js
 'use strict';
@@ -102,11 +103,31 @@ async function b19(browser) {
   await ctx.close();
 }
 
+// ═════════ B21: the demo's Progress ═════════
+async function b21(browser) {
+  const P = H.fixture();
+  let { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: P, hist: [], query: '?client=demo', stub: { demo: P, library: H.library() } });
+  await p.evaluate(() => goTo('plan'));
+  await p.waitForTimeout(500);
+  let m = await p.evaluate(() => ({ demo: !!window.IS_DEMO, none: !hasFinishedASession(), text: document.getElementById('dayone-wrap').innerText, shown: document.querySelector('.screen.active').id }));
+  t.check('B21: the demo is open on Progress with no finished session (the case that said it)', m.demo && m.none && m.shown === 'screen-plan', JSON.stringify(m));
+  t.check('B21: Progress in the demo has no "Nothing here yet" line', !/nothing here yet/i.test(m.text) && !/nothing here yet/i.test(await p.evaluate(() => document.querySelector('.screen.active').innerText)), JSON.stringify(m.text));
+  t.check('B21: no page errors (demo)', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+  ({ ctx, p } = await H.openProgram(browser, { w: 390, h: 844, prog: H.fixture(), hist: [] }));
+  await p.evaluate(() => goTo('plan'));
+  await p.waitForTimeout(500);
+  m = await p.evaluate(() => ({ none: !hasFinishedASession(), text: document.getElementById('dayone-wrap').innerText }));
+  t.check('B21: a real first-timer still gets the line', m.none && /nothing here yet/i.test(m.text), JSON.stringify(m));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await b10(browser);
   await b14(browser);
   await b19(browser);
+  await b21(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
