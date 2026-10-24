@@ -1,19 +1,19 @@
 -- The way back from stage96 (the Players' Lounge: a page per crew member, faces, cheers, signatures, mentions, "your game", the aimed pushes).
 -- On Amir's word only (CLAUDE.md: a change to the live project waits for his yes), after a backup (coach.html -> Tools -> Backup).
 --
--- WHAT IS LOST. The faces, the cheers, the signatures on achievements and the mentions exist nowhere else: they are not in any backup, on purpose
+-- WHAT IS LOST. The faces, the cheers, the cheer tally (how many cheers each person has got), the signatures on achievements and the mentions exist nowhere else: they are not in any backup, on purpose
 -- (SHORT_LIVED in scripts/restore/restore_backup.py). They go. Nothing else is lost: the game (athlete_profile, coaching data) is copied to
 -- backup.athlete_profile_<yyyymmdd> first. Drop that copy within the privacy notice's three months, like every other backup copy.
 --
 -- WHAT IT DOES, in this order (each step safe to run twice, and each only undoes what stage96 did):
 --   1. copies athlete_profile to the backup schema;
---   2. drops the four triggers (the three aimed pushes, the former-athlete door);
+--   2. drops the six triggers (the three aimed pushes, the former-athlete door, the two cheer-tally counters);
 --   3. deletes the queued cheer, reply and mention rows and puts the queue's kind check back to the eleven kinds it had;
---   4. takes the five tables and the three "to them" deletes out of coach_erase_person() (the same single-line anchors and chr(10) as the stage);
+--   4. takes the six tables and the three "to them" deletes out of coach_erase_person() (the same single-line anchors and chr(10) as the stage);
 --   5. takes ck, fv, lv, held and new back out of get_bell() (the same five one-line anchors);
 --   6. puts every other replaced function back to the live text stage96 started from (crew_board first dropped, because its columns changed);
---   7. drops the new functions, then the five tables.
--- Afterwards: take athlete_profile out of coach.html's BACKUP_TABLES and the four others out of restore_backup.py's SHORT_LIVED and
+--   7. drops the new functions, then the six tables.
+-- Afterwards: take athlete_profile out of coach.html's BACKUP_TABLES and the five others out of restore_backup.py's SHORT_LIVED and
 -- rehearse.mjs, and remake supabase/schema_snapshot.sql (scripts/restore/README.md), in one commit.
 -- If stage97 is on too, take IT off first (scripts/career/rollback_stage97.sql): its crew_referral() is read by crew_page().
 -- If stage86 and stage96 both come off, this goes FIRST (scripts/push/rollback_stage86.sql drops the queue this puts its check back on).
@@ -35,6 +35,8 @@ drop trigger if exists crew_push_cheer on public.crew_cheers;
 drop trigger if exists crew_push_reply on public.crew_replies;
 drop trigger if exists crew_push_mention on public.crew_mentions;
 drop trigger if exists crew_forget_former on public.athlete_status;
+drop trigger if exists crew_tally_cheer on public.crew_cheers;
+drop trigger if exists crew_tally_kudos on public.crew_kudos;
 
 -- 3. the queue: nothing of the new kinds can be left behind a check that does not know them
 delete from public.crew_push_q where kind in ('cheer', 'reply', 'mention');
@@ -46,7 +48,7 @@ alter table public.crew_push_q add constraint crew_push_q_kind_check
 do $rb96_erase$
 declare
   d text := pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure);
-  s_new constant text := '''athlete_profile'', ''crew_mentions'', ''crew_replies'', ''crew_award_likes'', ''crew_cheers'', ''crew_faces'', ''crew_kudos''';
+  s_new constant text := '''athlete_profile'', ''crew_mentions'', ''crew_replies'', ''crew_award_likes'', ''crew_cheers'', ''crew_faces'', ''crew_cheer_tally'', ''crew_kudos''';
   s_old constant text := '''crew_replies'', ''crew_kudos''';
   -- Exactly what stage96 inserted (without the comment line it was put before), built from chr(10) the same way, so neither can drift with the line
   -- endings of the file it is run from.
@@ -584,7 +586,7 @@ end $function$$old$;
   end if;
 end $rb96_fns$;
 
--- 7. the new functions, then the five tables
+-- 7. the new functions, then the six tables
 drop function if exists public.crew_page(uuid, text);
 drop function if exists public.crew_face_set(text, integer, integer);
 drop function if exists public.crew_face_clear();
@@ -601,6 +603,10 @@ drop function if exists public.crew_push_t_reply();
 drop function if exists public.crew_push_t_mention();
 drop function if exists public.crew_t_forget_former();
 drop function if exists public.crew_forget(text);
+drop function if exists public.crew_t_tally_cheer();
+drop function if exists public.crew_t_tally_kudos();
+drop function if exists public.crew_tally_up(text);
+drop function if exists public.crew_tally_down(text);
 drop function if exists public.crew_extra(text, jsonb, timestamptz, timestamptz, text);
 drop function if exists public.crew_held_now(text, date);
 drop function if exists public.crew_now_week(text);
@@ -610,6 +616,7 @@ drop function if exists public.crew_game_of(text);
 drop function if exists public.crew_lv(text);
 drop function if exists public.crew_face_v(text);
 
+drop table if exists public.crew_cheer_tally;
 drop table if exists public.crew_mentions;
 drop table if exists public.crew_award_likes;
 drop table if exists public.crew_cheers;

@@ -16,7 +16,7 @@
 -- leaving means gone; an athlete under 13 reads only; the phone only ever sees a crew_key (ck) for another person, never an id.
 --
 -- What this adds, and nothing else:
---   1. Five tables. Every write goes through a function; nobody writes a table directly (RLS on, no client grant), except that the coach READS
+--   1. Six tables. Every write goes through a function; nobody writes a table directly (RLS on, no client grant), except that the coach READS
 --      athlete_profile (a policy, so the weekly backup is complete).
 --        athlete_profile   "Your game": sports (seven racket sports, or none), hand, backhand, padel side, plays at, club, trains for, one working-on
 --                          line, an Instagram name. COACHING DATA: kept for good, in BACKUP_TABLES, the snapshot and coach_erase_person().
@@ -24,8 +24,11 @@
 --        crew_cheers       who cheered whom, once a day, with a word of up to 100 characters. The word lives 7 days; the row (the season's count) 400.
 --        crew_award_likes  who liked an achievement's Bell line, kept on the achievement past the 7-day sweep (Signed Ball).
 --        crew_mentions     who was @mentioned in which reply (the token is in the reply's body; this is what rings).
---      The last four are LEFT OUT of BACKUP_TABLES (scripts/restore/restore_backup.py SHORT_LIVED) and are in coach_erase_person()'s list, each
---      with an extra delete for the column that names ANOTHER person (to_athlete), which the erase function's athlete_id scan cannot see.
+--        crew_cheer_tally  how many cheers a person has RECEIVED since joining the crew, all time ("like the images i showed you, the number of
+--                          cheers a person has got, should be shown on their acount": Amir). It counts a person cheer (crew_cheers) AND a like
+--                          on their post or Bell line (crew_kudos), because the push already calls a like "X cheered you". One row, one number.
+--      The last five are LEFT OUT of BACKUP_TABLES (scripts/restore/restore_backup.py SHORT_LIVED) and are in coach_erase_person()'s list; the three
+--      that name ANOTHER person (cheers, signatures, mentions: to_athlete) get an extra delete for that column, which the athlete_id scan cannot see.
 --   2. get_bell() learns who is who: crew[] and the board gain ck, fv, lv, held, new; posts, lines, replies, honours and the Open board gain
 --      ck and/or fv. Everything is added beside what was there. The new fields are stable (they change only when a face, a level, a held week or a
 --      join does), so get_bell_if_new keeps answering in 78 bytes.
@@ -39,8 +42,13 @@
 --      row's words to every phone in the group, so a second row for the same person would be lost): an aimed event wins the tick over the folded
 --      broadcast, naming its sender; the broadcasts it was sent with are told as told (the Bell holds them for 7 days).
 --   6. Leaving means gone: crew_forget() takes a person's face, cheers (both ways), signatures (both ways) and mentions (both ways) off the server.
---      crew_answer('no'), coach_crew_under13(true) and a trigger on athlete_status ('former') all call it.
---   7. coach_erase_person() learns the five tables (patched in place, as stage81/86/92 did it).
+--      crew_answer('no'), coach_crew_under13(true) and a trigger on athlete_status ('former') all call it. The cheer tally is deleted with them.
+--   6b. The cheer tally: +1 for the person cheered (an INSERT into crew_cheers, Amir's included) and +1 for the author of a post or the owner of a line
+--      that gets a like (an INSERT into crew_kudos; never for your own, none for Amir's posts). Both are TRIGGERS, so no other door can forget them.
+--      An emoji swap on a like is an UPDATE and counts nothing more. It goes DOWN by one (never below 0) only when somebody takes a like back through
+--      crew_kudos(p_on false): the 7-day sweep and a deleted post (the cascade) leave it alone, because it is an all-time number. The last lines of
+--      this file backfill each current member's number from the likes that still exist. GAME-6 holds: it is a number on a page, it pays nothing.
+--   7. coach_erase_person() learns the six tables (patched in place, as stage81/86/92 did it).
 --   8. A bug found on the way (stage86): crew_push_due() raised "ON CONFLICT DO UPDATE command cannot affect row a second time" for any athlete
 --      with TWO subscribed phones, which would have stopped every crew notification (and the hourly reminders, push-send returns 500 first).
 --      Nobody has two phones yet (7 phones, 7 athletes). It is fixed here, in the one function this stage already had to touch the neighbours of.
@@ -182,11 +190,18 @@ create table if not exists public.crew_mentions (
 create index if not exists crew_mentions_to_idx on public.crew_mentions (to_athlete);
 create index if not exists crew_mentions_who_idx on public.crew_mentions (athlete_id);
 
+-- How many cheers a person has received since they joined, all time: a person cheer or a like on a post or a line. One row per member; gone when they leave.
+create table if not exists public.crew_cheer_tally (
+  athlete_id text        primary key,
+  n          integer     not null default 0 check (n >= 0),
+  updated_at timestamptz not null default now()
+);
+
 -- ── 2. Policies and grants: nothing is writable directly; the coach reads the profile so the backup is complete ──────────────────
 do $stage96_policies$
 declare t text;
 begin
-  foreach t in array array['athlete_profile', 'crew_faces', 'crew_cheers', 'crew_award_likes', 'crew_mentions'] loop
+  foreach t in array array['athlete_profile', 'crew_faces', 'crew_cheers', 'crew_award_likes', 'crew_mentions', 'crew_cheer_tally'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('revoke all on table public.%I from public, anon, authenticated', t);
     execute format('grant all on table public.%I to service_role', t);
@@ -288,7 +303,7 @@ language sql stable set search_path to 'public' as $function$
 $function$;
 
 -- Leaving means gone (CONTRACT section 0): a face, the cheers a person gave and got, the names on achievements they signed and the names signed on
--- theirs, the mentions they made and the ones of them. Their game (athlete_profile) STAYS: it is coaching data, only hidden.
+-- theirs, the mentions they made and the ones of them, and the number of cheers they had got. Their game (athlete_profile) STAYS: it is coaching data, only hidden.
 create or replace function public.crew_forget(p_athlete text) returns void
 language plpgsql security definer set search_path to 'public' as $function$
 begin
@@ -296,6 +311,7 @@ begin
   delete from public.crew_cheers where athlete_id = p_athlete or to_athlete = p_athlete;
   delete from public.crew_award_likes where athlete_id = p_athlete or to_athlete = p_athlete;
   delete from public.crew_mentions where athlete_id = p_athlete or to_athlete = p_athlete;
+  delete from public.crew_cheer_tally where athlete_id = p_athlete;
 end $function$;
 
 -- ── 4. The Bell and the board learn who is who ─────────────────────────────────────────────────────────────────────────────────
@@ -538,11 +554,12 @@ begin
     end if;
   end if;
 
-  -- cheers: members only. The season's count, the last 7 days (the word goes after 7), and whether YOU cheered them today (not on your own page).
+  -- cheers: members only. The season's count, the all-time total (cheers and likes got), the last 7 days (the word goes after 7), and whether YOU cheered them today (not on your own page).
   if v_member then
     v_giver := case when v_coach and v_view is null then public.coach_note_id() else v_id end;
     v_cheers := jsonb_build_object(
       'season', public.crew_cheer_count(v_subj),
+      'total', coalesce((select t.n from public.crew_cheer_tally t where t.athlete_id = v_subj), 0),   -- all time: cheers and likes received since joining
       'recent', coalesce((select jsonb_agg(x.j order by x.day desc, x.id desc) from (
                     select c2.id, c2.day,
                            jsonb_build_object('ck', gm.crew_key, 'who', case when c2.athlete_id = public.coach_note_id() then 'Coach' else gm.name end,
@@ -901,6 +918,58 @@ begin
      where c.day >= current_date - 7), '[]'::jsonb);
 end $function$;
 
+-- ── 8b. The cheer tally: how many cheers a person has received, all time ─────────────────────────────────────────────────────────────
+-- "The number of cheers a person has got, should be shown on their acount" (Amir). A person cheer (crew_cheers) is one; so is a like on their post or
+-- their Bell line (crew_kudos), because the push already calls a like "X cheered you". +1 happens in a TRIGGER on each INSERT, so no door can forget
+-- it: Amir's cheers count; Amir's own posts have no number; nobody counts for themselves. An emoji swap on a like is an UPDATE and counts nothing.
+-- It goes DOWN (never below 0) in one place only, crew_kudos(p_on false), when somebody takes their like back. The 7-day sweep and the cascade of a
+-- deleted post leave it alone: it is an all-time number. crew_forget() deletes the row when a person leaves; the backfill is the last step of this file.
+create or replace function public.crew_tally_up(p_athlete text) returns void
+language plpgsql security definer set search_path to 'public' as $function$
+begin
+  if p_athlete is null or p_athlete = public.coach_note_id() then return; end if;
+  insert into public.crew_cheer_tally as t (athlete_id, n) values (p_athlete, 1)
+  on conflict (athlete_id) do update set n = t.n + 1, updated_at = now();
+end $function$;
+
+create or replace function public.crew_tally_down(p_athlete text) returns void
+language plpgsql security definer set search_path to 'public' as $function$
+begin
+  update public.crew_cheer_tally set n = greatest(n - 1, 0), updated_at = now() where athlete_id = p_athlete;
+end $function$;
+
+-- A cheer was given (a member's, or Amir's as '__coach__'): +1 for the person cheered.
+create or replace function public.crew_t_tally_cheer() returns trigger
+language plpgsql security definer set search_path to 'public' as $function$
+begin
+  begin
+    if new.to_athlete is distinct from new.athlete_id then perform public.crew_tally_up(new.to_athlete); end if;
+  exception when others then
+    raise warning 'crew: a cheer for % was not counted: % (%)', new.to_athlete, sqlerrm, sqlstate;
+  end;
+  return null;
+end $function$;
+drop trigger if exists crew_tally_cheer on public.crew_cheers;
+create trigger crew_tally_cheer after insert on public.crew_cheers
+  for each row execute function public.crew_t_tally_cheer();
+
+-- A like was given: +1 for the author of the post, or the owner of the line. Only a real INSERT fires it (the emoji swap is an UPDATE).
+create or replace function public.crew_t_tally_kudos() returns trigger
+language plpgsql security definer set search_path to 'public' as $function$
+declare v_to text;
+begin
+  begin
+    v_to := case when new.post_id is not null then (select p.athlete_id from public.crew_posts p where p.id = new.post_id) else new.to_athlete end;
+    if v_to is not null and v_to <> new.athlete_id then perform public.crew_tally_up(v_to); end if;
+  exception when others then
+    raise warning 'crew: a like was not counted: % (%)', sqlerrm, sqlstate;
+  end;
+  return null;
+end $function$;
+drop trigger if exists crew_tally_kudos on public.crew_kudos;
+create trigger crew_tally_kudos after insert on public.crew_kudos
+  for each row execute function public.crew_t_tally_kudos();
+
 -- ── 9. Mentions, the signatures, the answers, the sweep, the post's stamp: the live functions, plus the lines marked stage96 ─────────
 -- crew_reply(): a mention token in the body (@[<ck>|<name>]) is checked: the ck must be a member and not the author, at most 5 to a reply. A token
 -- that fails any of these becomes plain "@<name>". What the 140-character limit counts is what is SEEN (a token counts as "@name"), so five chips
@@ -964,7 +1033,8 @@ begin
   return jsonb_build_object('post', p_post, 'replies', public.crew_reply_rows(p_post, v_me));
 end $function$;
 
--- crew_kudos(): a like on a Bell LINE also signs that day's live achievements of the person (Signed Ball); taking the like back unsigns them.
+-- crew_kudos(): a like on a Bell LINE also signs that day's live achievements of the person (Signed Ball); taking the like back unsigns them,
+-- and takes one off the person's cheer tally (a post's like too). Only taking a like back does: the sweep and a post's cascade do not.
 CREATE OR REPLACE FUNCTION public.crew_kudos(p_target text, p_on boolean DEFAULT true, p_emoji text DEFAULT NULL::text)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -990,6 +1060,7 @@ begin
       do update set emoji = excluded.emoji, created_at = now();
     else
       delete from public.crew_kudos k where k.athlete_id = v_me and k.post_id = v_post;
+      if found then perform public.crew_tally_down(v_author); end if;   -- stage96: taking a like back takes one off the cheer tally (the sweep and a deleted post do not)
     end if;
     return public.crew_kudos_of(v_post, null, null, v_me);
   end if;
@@ -1012,6 +1083,7 @@ begin
     on conflict do nothing;
   else
     delete from public.crew_kudos k where k.athlete_id = v_me and k.to_athlete = v_to and k.line_day = v_day;
+    if found then perform public.crew_tally_down(v_to); end if;   -- stage96: taking a like back takes one off the cheer tally (the sweep and a deleted post do not)
     delete from public.crew_award_likes l
      where l.athlete_id = v_me and l.to_athlete = v_to
        and l.award_id in (select a.award_id from public.career_awards a
@@ -1395,7 +1467,7 @@ begin
       cross join lateral public.crew_push_words(f.n, f.one_kind, f.one_who, f.one_mine, f.lang) w;
 end $function$;
 
--- ── 11. coach_erase_person() learns the five tables ──────────────────────────────────────────────────────────────────────────────
+-- ── 11. coach_erase_person() learns the six tables ───────────────────────────────────────────────────────────────────────────────
 -- Their athlete_id columns go into the loop's list (crew_mentions BEFORE crew_replies, so its rows are counted and not swallowed by the cascade),
 -- and one block after the loop deletes the rows that name the person in a column the loop cannot see: crew_cheers.to_athlete, crew_award_likes.to_athlete
 -- and crew_mentions.to_athlete. Single-line anchors and chr(10), as stage81 did, because the live body mixes CRLF and LF.
@@ -1403,7 +1475,7 @@ do $stage96_erase$
 declare
   d text := pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure);
   s_old constant text := '''crew_replies'', ''crew_kudos''';
-  s_new constant text := '''athlete_profile'', ''crew_mentions'', ''crew_replies'', ''crew_award_likes'', ''crew_cheers'', ''crew_faces'', ''crew_kudos''';
+  s_new constant text := '''athlete_profile'', ''crew_mentions'', ''crew_replies'', ''crew_award_likes'', ''crew_cheers'', ''crew_faces'', ''crew_cheer_tally'', ''crew_kudos''';
   a_old constant text := '      -- The rollback copies the pipeline keeps before a one-off change to live programmes sit in the "backup" schema';
   a_new constant text := concat_ws(chr(10),
     '      -- stage96: what others did TO this person (the loop above deleted what they did): cheers to them, names signed on their achievements, mentions of them.',
@@ -1441,6 +1513,7 @@ begin
     'public.crew_face_v(text)', 'public.crew_lv(text)', 'public.crew_now_week(text)', 'public.crew_held_now(text,date)',
     'public.crew_extra(text,jsonb,timestamptz,timestamptz,text)', 'public.crew_season_start(text)', 'public.crew_cheer_count(text)',
     'public.crew_game_of(text)', 'public.crew_forget(text)', 'public.crew_t_forget_former()',
+    'public.crew_tally_up(text)', 'public.crew_tally_down(text)', 'public.crew_t_tally_cheer()', 'public.crew_t_tally_kudos()',
     'public.crew_push_t_cheer()', 'public.crew_push_t_reply()', 'public.crew_push_t_mention()'] loop
     execute format('revoke all on function %s from public, anon, authenticated', f);
     execute format('grant execute on function %s to service_role', f);
@@ -1469,6 +1542,17 @@ begin
 end
 $stage96_grants$;
 
+-- ── 12b. The cheer tally starts from what exists: each current member's number is the likes they have received that are still there (the last 7 days
+-- of them) plus the cheers they have received (none yet). Never overwrites a row: a re-run adds a member who has none and changes nobody else. ──
+insert into public.crew_cheer_tally (athlete_id, n)
+select m.athlete_id,
+       ((select count(*) from public.crew_kudos k
+           left join public.crew_posts p on p.id = k.post_id
+          where coalesce(k.to_athlete, p.athlete_id) = m.athlete_id and k.athlete_id <> m.athlete_id)
+        + (select count(*) from public.crew_cheers c where c.to_athlete = m.athlete_id and c.athlete_id <> m.athlete_id))::integer
+  from public.crew_members() m
+on conflict (athlete_id) do nothing;
+
 -- ── 13. What it must look like afterwards ────────────────────────────────────────────────────────────────────────────────────────
 do $stage96_check$
 begin
@@ -1477,7 +1561,7 @@ begin
     raise exception 'stage96: a new function is missing';
   end if;
   if to_regclass('public.athlete_profile') is null or to_regclass('public.crew_faces') is null or to_regclass('public.crew_cheers') is null
-     or to_regclass('public.crew_award_likes') is null or to_regclass('public.crew_mentions') is null then
+     or to_regclass('public.crew_award_likes') is null or to_regclass('public.crew_mentions') is null or to_regclass('public.crew_cheer_tally') is null then
     raise exception 'stage96: a new table is missing';
   end if;
   if position('crew_face_v' in pg_get_functiondef('public.get_bell(text)'::regprocedure)) = 0 then
@@ -1487,8 +1571,8 @@ begin
      or position('''crew_faces''' in pg_get_functiondef('public.coach_erase_person(text,text,text,uuid[],boolean)'::regprocedure)) = 0 then
     raise exception 'stage96: coach_erase_person() does not know the new tables';
   end if;
-  if not exists (select 1 from pg_trigger t where t.tgname in ('crew_push_cheer', 'crew_push_reply', 'crew_push_mention', 'crew_forget_former') and not t.tgisinternal
-                 having count(*) = 4) then
+  if not exists (select 1 from pg_trigger t where t.tgname in ('crew_push_cheer', 'crew_push_reply', 'crew_push_mention', 'crew_forget_former', 'crew_tally_cheer', 'crew_tally_kudos')
+                                              and not t.tgisinternal having count(*) = 6) then
     raise exception 'stage96: a trigger is missing';
   end if;
   raise notice 'stage96: applied';
