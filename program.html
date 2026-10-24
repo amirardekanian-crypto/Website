@@ -18938,8 +18938,9 @@ function kgKept(card, w) {
 }
 function kgCheckTicked(name, w, card, skip) {
   if (!kgLooksWrong(name, w, card, skip)) return;
-  kgKept(card, w);
-  aaToast(`${weightText(w)}? That's far above your numbers for this lift. If it's a typo, fix it in the weight box.`, { kicker: 'Check the weight' });
+  // The box stays until answered, and the weight is kept only by a tap on Keep it, never because the box timed out or was replaced.
+  aaToast(`${weightText(w)}? That's far above your numbers for this lift. If it's a typo, fix it in the weight box.`,
+    { kicker: 'Check the weight', ms: 0, action: 'Keep it', dismiss: 'Got it', run: () => kgKept(card, w) });
 }
 
 // Persian (۰-۹) and Arabic-Indic (٠-٩) digits to ASCII, and their decimal marks
