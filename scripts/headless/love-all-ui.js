@@ -103,9 +103,56 @@ async function before(browser) {
   }
 }
 
+// ═════════ B6: nothing an athlete reads is under 12 px ═════════
+// The smallest visible text on a screen, and whether anything runs off the side or a tab label is cut.
+const smallest = p => p.evaluate(() => {
+  const bad = []; let min = 99;
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n; (n = walker.nextNode());) {
+    if (!n.nodeValue.trim()) continue;
+    const e = n.parentElement;
+    if (!e || /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE)$/.test(e.tagName) || e.closest('svg')) continue;
+    const cs = getComputedStyle(e);
+    if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) continue;
+    const rg = document.createRange(); rg.selectNodeContents(n);
+    const rr = [...rg.getClientRects()].find(r => r.width > 1 && r.height > 1 && r.bottom > 0 && r.right > 0 && r.left < innerWidth);
+    if (!rr) continue;
+    let hid = false;   // inside an element that is clipped away or sits in a closed layer
+    for (let a = e; a && a !== document.body; a = a.parentElement) { const c = getComputedStyle(a); if (c.display === 'none' || c.visibility === 'hidden') { hid = true; break; } }
+    if (hid) continue;
+    const px = parseFloat(cs.fontSize);
+    if (px < min) min = px;
+    if (px < 12) bad.push(px + ' ' + (e.className || e.tagName) + ' "' + n.nodeValue.trim().slice(0, 24) + '"');
+  }
+  const tabs = [...document.querySelectorAll('.nav-item .nav-label')].map(l => ({ t: l.textContent, cut: l.scrollWidth > l.clientWidth + 1, wraps: l.getClientRects().length > 1 || l.getBoundingClientRect().height > 20 }));
+  return { min, bad: bad.slice(0, 6), nBad: bad.length, over: document.documentElement.scrollWidth - innerWidth, tabs };
+});
+async function floor(browser) {
+  const LIB = H.library();
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    const { ctx, p } = await H.openProgram(browser, { w, h, prog: H.fixture(), stub: { library: LIB }, seed: { _hab_cfg: CFG_ON } });
+    p.setDefaultTimeout(8000);
+    await p.waitForTimeout(900);
+    const screens = [['Home', () => goTo('home')], ['Progress', () => goTo('plan')], ['Library', () => goLibrary()],
+      ['Library Playbook', () => setLibPane('playbook')], ['Library Exercises', () => setLibPane('exercises')], ['Coach', () => goTo('notes')],
+      ['a Library session', () => { goLibrary(); openWorkout('strength/full-body-power'); }],
+      ['the day view', () => { goTo('home'); openDayView('1'); }], ['Guided', () => { openStepMode('1'); }]];
+    for (const [name, fn] of screens) {
+      await p.evaluate(fn); await p.waitForTimeout(800);
+      const r = await smallest(p);
+      t.check(`floor ${w}: ${name}: no visible text under 12 px (smallest ${r.min}px)`, r.min >= 12 && r.nBad === 0, JSON.stringify(r.bad));
+      t.check(`floor ${w}: ${name}: nothing runs off the side`, r.over <= 0, r.over);
+      t.check(`floor ${w}: ${name}: every tab label whole, on one line`, r.tabs.length >= 4 && r.tabs.every(x => !x.cut && !x.wraps), JSON.stringify(r.tabs.filter(x => x.cut || x.wraps)));
+    }
+    t.check(`floor ${w}: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await typing(browser);
+  await floor(browser);
   await before(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);

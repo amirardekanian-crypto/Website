@@ -124,7 +124,7 @@ rule never says 800.
 
 | Token | px | For |
 |---|---|---|
-| `--fs-label` | 11 | Space Mono labels, eyebrows, pills, the tab bar, meta lines. **The floor** |
+| `--fs-label` | 12 | Space Mono labels, eyebrows, pills, the tab bar, meta lines. **The floor** |
 | `--fs-small` | 13 | a secondary line, a helper sentence, a small button |
 | `--fs-body` | 15 | notes, cues, rows, buttons |
 | `--fs-field` | 16 | what the athlete types |
