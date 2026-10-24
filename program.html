@@ -833,6 +833,11 @@
     font-size: var(--fs-small); white-space: nowrap;
   }
   .demo-banner-exit:hover { opacity: 1; }
+  /* 44 px to hit (Love All L5, Amir 2026-10-24: "every control keeps its look, its tap area grows to 44 px"): an invisible box round each, drawn size unchanged.
+     Exit takes only 4.5 px sideways, because Apply sits 10 px beside it and the two areas must not meet. */
+  .demo-banner-exit, .demo-banner-cta { position: relative; }
+  .demo-banner-exit::before { content: ''; position: absolute; inset: -14.5px -4.5px; }
+  .demo-banner-cta::before { content: ''; position: absolute; inset: -9.5px 0; }
   /* Push everything below the fixed banner (the slim session bar parks under it: CENTRE COURT). */
   body.is-demo { padding-top: 44px; }
   /* The fixed demo banner (44 px, z 120) sat on the top-right button (the account button since NAV-02) and on Guided's ✕ (POL-01). */
@@ -3516,6 +3521,9 @@
     -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-unit::after { content: '\25BE'; font-weight: 400; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* 44 wide to hit as well as 44 high (Love All L5, 2026-10-24): an invisible box 3 px past each side, the drawn button unchanged. */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-unit { position: relative; z-index: 1; }   /* above the first row, whose padding the button's lower 7 px lies on */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-unit::before { content: ''; position: absolute; inset: 0 -3px; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-log .ex-set-row { position: relative; align-items: center; min-height: 60px; padding-top: 6px; padding-bottom: 6px; border-top: 0;
     border-radius: 0; background: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row::before { content: ''; position: absolute; top: 0; left: calc(var(--c-set) + var(--c-gap)); right: calc(-1 * var(--g)); height: 1px; background: var(--hair); }
@@ -3756,6 +3764,16 @@
     :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row { flex-wrap: wrap; gap: 0 4px; }
     :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-label { flex: 0 0 100%; min-height: 44px; }
     :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-btn { flex: 1 1 0; }
+  }
+  /* Guided's circuit round keeps its RPE row in .ex-log, outside .checklist-item, so none of the above reached it: the five keys shared what the words left
+     (29 px at 320). Love All L5 (2026-10-24): the keys are 44 wide, drawn as before; one line holds them from 390 px up (gap 4), and below that the words take
+     their own line, as on the card. */
+  .step-scroll .ex-log .rpe-row { gap: 4px; }
+  .step-scroll .ex-log .rpe-row .rpe-btn { min-width: 44px; }
+  @media (max-width: 389px) {
+    .step-scroll .ex-log .rpe-row { flex-wrap: wrap; }
+    .step-scroll .ex-log .rpe-row .rpe-label { flex: 0 0 100%; min-height: 44px; }
+    .step-scroll .ex-log .rpe-row .rpe-btn { flex: 1 1 0; }
   }
 
   /* 7j. 320 px: the gutter is 16 (--g); the set table narrows its fixed columns so the kg and reps boxes hold "102.5", and
@@ -4216,6 +4234,9 @@
   .timer-log .tl-unit { width: auto; min-width: 36px; min-height: 44px; margin: 0; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; color: var(--green-ink);
     text-decoration: underline dotted; text-underline-offset: 4px; -webkit-appearance: none; appearance: none; }
   .timer-log .tl-unit:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* 44 wide to hit as well as 44 high (Love All L5, 2026-10-24): an invisible box 4 px past each side, the drawn button unchanged. */
+  .timer-log .tl-unit { position: relative; }
+  .timer-log .tl-unit::before { content: ''; position: absolute; inset: 0 -4px; }
   .timer-log .tl-kg { flex: 1; min-width: 0; height: 48px; padding: 0 8px; border: 1px solid var(--field); border-radius: 10px; background: var(--row); outline: none;
     -webkit-appearance: none; appearance: none; box-sizing: border-box; font: 500 var(--fs-field)/1 'Barlow', sans-serif; color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
   .timer-log .tl-kg::placeholder { color: var(--ph); opacity: 1; font-weight: 500; }
@@ -4546,6 +4567,9 @@
   #home-overview .today-go { flex: none; width: 32px; height: 32px; margin: -4px -4px 0 0; border: 0; border-radius: 99px; background: none;
     color: var(--ring); font: 400 var(--fs-title)/1 'Barlow', sans-serif; cursor: pointer; }
   #home-overview .today-go:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* 44 px to hit, round the 32 px button (Love All L5, 2026-10-24): an invisible box, the drawn size unchanged. */
+  #home-overview .today-go { position: relative; }
+  #home-overview .today-go::before { content: ''; position: absolute; inset: -6px; }
 
 
   /* ══ THE HABIT FIGURES AND THE WEEK (2026-10-19) ════════════════════════════════════════════════════════
@@ -4650,6 +4674,11 @@
   #home-overview .hb-day.is-on { border-color: var(--fill); background: var(--fill); color: #fff; }
   #home-overview .hb-day.is-on.is-ok i { background: #fff; }
   #home-overview .hb-day:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* 44 px high to hit, and as wide as the seven days allow (Love All L5, 2026-10-24): an invisible box, the drawn button unchanged. Sideways it takes
+     only 2.5 px, half the 5 px gap each, because seven buttons across 288 px cannot each own 44 and their areas must not overlap. */
+  #home-overview .hb-day { position: relative; }
+  #home-overview .hb-day::before { content: ''; position: absolute; inset: -4px -2.5px; }
+  #home-overview .hb-day:first-child::before { left: -8px; }   /* nothing beside the first one but the ring, 14 px away */
   #home-overview .hb-wrap + .hb-wrap { border-top: 1px solid var(--hair); }
   /* What the tick just paid (2026-10-20): it rises off the row and goes. */
   .hb-wrap { position: relative; }
@@ -4722,6 +4751,9 @@
   #home-overview .hb-step:disabled { color: var(--grey); opacity: .45; cursor: default; }
   #home-overview .hb-step:not(:disabled):active { border-color: var(--fill); background: var(--tint); }
   #home-overview .hb-step:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* 44 px to hit round the 34 px ring (Love All L5, 2026-10-24): an invisible box, the drawn size unchanged. */
+  #home-overview .hb-step { position: relative; }
+  #home-overview .hb-step::before { content: ''; position: absolute; inset: -5px; }
 
   /* The number row, under its habit, prefilled with the target: a full day is two taps, a real number three. */
   #home-overview .hb-edit { display: flex; align-items: center; gap: 8px; padding: 0 16px 12px; }
@@ -4842,7 +4874,9 @@
   :where(#screen-plan, #screen-moments, #screen-achievements) .mo-w { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
   :where(#screen-plan, #screen-moments, #screen-achievements) .mo-s { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
   :where(#screen-plan, #screen-moments, #screen-achievements) .mo-from { font: italic 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--clay-ink); quotes: "\201C" "\201D"; }   /* his words: the Coach's note's clay */
-  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-reply { padding: 4px 0; font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-decoration: underline; text-underline-offset: 3px; }
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-reply { padding: 4px 0; font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); text-decoration: underline; text-underline-offset: 3px; position: relative; }
+  /* 44 px to hit (Love All L5, 2026-10-24); the link is drawn as before */
+  :where(#screen-plan, #screen-moments, #screen-achievements) .mo-reply::before { content: ''; position: absolute; inset: -10px -4px; }
   /* Share, on every moment that can be drawn and on the month's goal once it is done (the share cards' pass, 2026-10-19). */
   :where(#screen-plan, #screen-moments, #screen-achievements) .mo-share { justify-self: start; margin-top: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 999px;
     background: var(--paper); color: var(--green-ink); cursor: pointer; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
@@ -5361,6 +5395,10 @@
   .hl-ph-z { display: flex; align-items: center; gap: 12px; }
   .hl-ph-z span { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
   .hl-ph-z input { flex: 1; min-width: 0; accent-color: var(--green-ink); }
+  /* The zoom slider is 44 px to touch (Love All L5, 2026-10-24): the control is 44 high with the same track and thumb centred in it, pulled back 14 px each way
+     so the row keeps its 16 px. The button above is a control too, so the row moves down 4 px to keep the two touch areas apart. */
+  .hl-ph-z { margin-top: 4px; }
+  .hl-ph-z input { position: relative; height: 44px; margin: -14px 0; }
   .hl-ph-tip { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
   .hl-wait { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 8px 12px; border-radius: 999px; background: rgba(6,36,26,.7);
     font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: #fff; white-space: nowrap; }
@@ -5609,6 +5647,10 @@
   #hist-overlay .cr-sw span { flex: 1; min-width: 0; }
   #hist-overlay .cr-sw small { display: block; margin-top: 2px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   #hist-overlay .cr-sw input { flex: none; width: 24px; height: 24px; accent-color: var(--fill); }
+  /* The whole row is the switch (a label), and it is 52 px high; Love All L5 (2026-10-24) added the 12 px past the box on the right, so a tap beside it
+     counts too. The box sits at the row's edge, with the sheet's padding beyond it, so this is an invisible extension and nothing else moves. */
+  #hist-overlay .cr-sw { position: relative; }
+  #hist-overlay .cr-sw::after { content: ''; position: absolute; top: 0; bottom: 0; right: -12px; width: 12px; }
   #hist-overlay .cr-sws { margin-top: 16px; }
   #hist-overlay .cr-sws[hidden] { display: none; }
   /* the photo, opened: full screen, dark, the whole photo, its words and likes */
