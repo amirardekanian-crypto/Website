@@ -474,6 +474,115 @@ const EARLY = '2026-11-12T06:00:00Z';     // 06:00 in the UK (asleep), 09:30 in 
             (select coalesce(sum(xp), 0)::int from public.career_awards where athlete_id like 'zz_%') as xp`);
   ok(sc.xp === 0, 'not one XP was paid by anything in this stage (GAME-6)', sc);
 
+  // ── 7b. The Players' Lounge (stage96): three AIMED kinds ──────────────────────────────────────────────────────────────────
+  // This script starts from a snapshot that is older than stage92 (it has to lack stage86), so stage96 cannot go on that database. A second one
+  // is built from the CURRENT snapshot (which already holds stage86 and the replies), stage96 goes on it, and the decision is asked the same way.
+  // Skipped, and said so, when scripts/career/rollback_stage96.sql or stage96 is not in this checkout.
+  section('7b. stage96: a cheer, a reply and a mention ring ONE person, by name');
+  const S96 = opt('--stage96') || path.join(ROOT, 'supabase', 'stage96_players_lounge.sql');      // --stage96 <file>: a modified copy, to see that a check bites
+  const fs = await import('node:fs');
+  if (!fs.existsSync(S96)) info('supabase/stage96_players_lounge.sql is not in this checkout: skipped');
+  else {
+    const d2 = await openDb();
+    const x1 = async (sql, p = []) => (await d2.query(sql, p)).rows[0];
+    const xa = async (sql, p = []) => (await d2.query(sql, p)).rows;
+    await runSql(d2, read(path.join(ROOT, 'scripts', 'restore', 'stand_in_supabase.sql')), 'stand-in (7b)');
+    await runSql(d2, snapshotWithout(/create table public\.crew_faces/i).sql, 'snapshot (7b)');
+    await d2.exec(`set timezone = 'UTC'`);
+    await runSql(d2, read(S96), 'stage96 (7b)');
+    //   l_a UK en · l_b Iran fa · l_c UK en · l_d UK en with TWO phones · l_g a member with no phone, who will leave
+    const P2 = ['l_a', 'l_b', 'l_c', 'l_d', 'l_g'];
+    for (const id of P2) {
+      await d2.query(`insert into public.programs (athlete_id, data) values ($1, $2::jsonb)`, [id, JSON.stringify({ athlete: { id, firstName: id.toUpperCase(), lastName: 'Test' } })]);
+      await d2.query(`insert into public.crew_consent (athlete_id, answer, name, answered_at, first_yes_at, yes_since) values ($1, 'yes', $1, '2026-11-01', '2026-11-01', '2026-11-01')`, [id]);
+    }
+    for (const [ep, id, off, lang] of [['https://push.example.test/l_a', 'l_a', 0, 'en'], ['https://push.example.test/l_b', 'l_b', 210, 'fa'], ['https://push.example.test/l_c', 'l_c', 0, 'en'],
+                                       ['https://push.example.test/l_d1', 'l_d', 0, 'en'], ['https://push.example.test/l_d2', 'l_d', 0, 'en']])
+      await d2.query(`insert into public.push_subs (endpoint, athlete_id, p256dh, auth, app, kinds, tz_offset, lang, created_at) values ($1, $2, 'k', 'a', 'training', '{}'::jsonb, $3, $4, '2026-11-01')`, [ep, id, off, lang]);
+    const wipe = async () => { await d2.exec(`delete from public.crew_push_q; delete from public.crew_push_seen; delete from public.crew_cheers`); };
+    const age = async (mins = 5) => d2.query(`update public.crew_push_q set created_at = $1::timestamptz - ($2 || ' minutes')::interval`, [T, mins]);
+    const due2 = async (now = T, mark = false) => xa(`select * from public.crew_push_due($1::timestamptz, $2)`, [now, mark]);
+    const ids2 = rows => [...new Set(rows.map(r => r.athlete_id))].sort().join(',');
+    const cheer2 = (from, to) => d2.query(`insert into public.crew_cheers (athlete_id, to_athlete, day) values ($1, $2, '2026-11-12')`, [from, to]);
+    const mkPost2 = async who => (await x1(`insert into public.crew_posts (athlete_id, body) values ($1, 'a post') returning id`, [who])).id;
+
+    // a lone cheer names its sender, and reaches that person and nobody else
+    await wipe(); await cheer2('l_a', 'l_b'); await age();
+    let r7 = await due2();
+    ok(r7.length === 1 && r7[0].athlete_id === 'l_b' && r7[0].kind === 'crew' && r7[0].tag === 'crew' && r7[0].ttl === 3600, 'a lone cheer is ONE notification, to the person cheered and to no other phone (kind and tag crew, one-hour TTL)', r7.map(r => [r.athlete_id, r.title]));
+    ok(/l_a/.test(r7[0].title) && /تشویق/.test(r7[0].title) && !/خبر/.test(r7[0].title) && /[؀-ۿ]/.test(r7[0].body), 'it names the sender, in that person\'s language (Farsi: the draft words)', r7[0]);
+    await wipe(); await cheer2('l_b', 'l_c'); await age();
+    r7 = await due2();
+    ok(r7.length === 1 && r7[0].athlete_id === 'l_c' && r7[0].title === 'l_b sent you a cheer' && r7[0].body === 'Have a look.', 'in English: "<name> sent you a cheer"', r7[0]);
+    ok(!/secret|word/.test(JSON.stringify(r7)), 'and never a word of what was said');
+    // a cheer arriving with five broadcast events still names the sender; the others are counted without it
+    await wipe();
+    for (let i = 0; i < 5; i++) await d2.query(`insert into public.crew_posts (athlete_id, body) values ('l_a', $1)`, ['broadcast ' + i]);
+    await cheer2('l_a', 'l_c'); await age();
+    r7 = await due2();
+    const forC = r7.filter(r => r.athlete_id === 'l_c'), forB = r7.filter(r => r.athlete_id === 'l_b'), forD = r7.filter(r => r.athlete_id === 'l_d');
+    ok(forC.length === 1 && forC[0].title === 'l_a sent you a cheer', 'a cheer arriving with five broadcast posts still names its sender (it is not "6 new things")', forC.map(r => r.title));
+    ok(forB.length === 1 && /۵/.test(forB[0].body) && !/تشویق/.test(forB[0].title), 'and the person who was not cheered is told five things, not six, and nothing about a cheer (۵ in Persian digits)', forB.map(r => [r.title, r.body]));
+    ok(forD.length === 2 && forD.every(r => /busy/.test(r.title) && /5 new things/.test(r.body)), 'likewise the person with two phones: the count is 5 on both', forD.map(r => [r.endpoint, r.title, r.body]));
+    ok(!r7.some(r => r.athlete_id === 'l_a'), 'and the sender is told nothing (never your own doing)');
+    // two aimed events at once: the newest names; nothing is counted
+    await wipe(); await cheer2('l_a', 'l_c'); await d2.query(`update public.crew_push_q set created_at = $1::timestamptz - interval '8 minutes'`, [T]);
+    await cheer2('l_b', 'l_c'); await d2.query(`update public.crew_push_q set created_at = $1::timestamptz - interval '2 minutes' where athlete_id = 'l_b'`, [T]);
+    r7 = (await due2()).filter(r => r.athlete_id === 'l_c');
+    ok(r7.length === 1 && r7[0].title === 'l_b sent you a cheer', 'two cheers in one tick: one notification, naming the newer sender (push-send sends one row\'s words per person)', r7.map(r => r.title));
+    // a reply rings the post's author, not Amir's posts, not yourself
+    await wipe();
+    const bPost = await mkPost2('l_b'); await wipe();
+    await d2.query(`insert into public.crew_replies (post_id, athlete_id, body) values ($1, 'l_a', 'good one')`, [bPost]); await age();
+    r7 = await due2();
+    ok(r7.length === 1 && r7[0].athlete_id === 'l_b' && /l_a/.test(r7[0].title) && /جواب/.test(r7[0].title), 'a reply rings the author of the post, by name, and nobody else', r7.map(r => [r.athlete_id, r.title]));
+    await wipe(); await d2.query(`insert into public.crew_replies (post_id, athlete_id, body) values ($1, 'l_b', 'my own')`, [bPost]);
+    ok((await xa(`select 1 from public.crew_push_q`)).length === 0, 'a reply to your own post queues nothing');
+    const amirP = await mkPost2('__coach__'); await wipe();
+    await d2.query(`insert into public.crew_replies (post_id, athlete_id, body) values ($1, 'l_a', 'hi coach')`, [amirP]);
+    ok((await xa(`select 1 from public.crew_push_q`)).length === 0, 'a reply to one of Amir\'s posts queues nothing (he has no phone in the crew)');
+    // a mention rings the person named, and that person alone
+    await wipe();
+    const cPost = await mkPost2('l_c'); await wipe();
+    const rep = (await x1(`insert into public.crew_replies (post_id, athlete_id, body) values ($1, 'l_a', 'hey') returning id`, [cPost])).id; await wipe();
+    await d2.query(`insert into public.crew_mentions (reply_id, athlete_id, to_athlete) values ($1, 'l_a', 'l_c')`, [rep]); await age();
+    r7 = await due2();
+    ok(r7.length === 1 && r7[0].athlete_id === 'l_c' && r7[0].title === 'l_a mentioned you', 'a mention rings the person named, by name, and nobody else', r7.map(r => [r.athlete_id, r.title]));
+    await wipe(); await d2.query(`insert into public.crew_mentions (reply_id, athlete_id, to_athlete) values ($1, 'l_a', 'l_b')`, [rep]); await age();
+    r7 = await due2();
+    ok(ids2(r7) === 'l_b' && /منشن/.test(r7[0].title), 'and in Farsi (the draft word)', r7[0]);
+    // the night, the watermark, and the news that is not sent twice
+    await wipe(); await cheer2('l_a', 'l_c'); await age();
+    ok((await due2(NIGHT)).length === 0, 'at half past eleven at night an aimed cheer waits too');
+    r7 = await due2(T, true);
+    ok(r7.length === 1, 'and goes at ten, when the person is up');
+    await x1(`select public.crew_push_done('l_c', true) as r`);
+    ok((await due2()).length === 0, 'once taken it is not sent twice');
+    // the doer left the crew: nothing of theirs rings
+    await wipe(); await cheer2('l_g', 'l_a'); await age();
+    await d2.query(`update public.crew_consent set answer = 'no' where athlete_id = 'l_g'`);
+    ok((await due2()).length === 0, 'a cheer from somebody who then left the crew rings nobody (a no takes their queued moments with it)');
+    await d2.query(`update public.crew_consent set answer = 'yes' where athlete_id = 'l_g'`);
+    // an aimed event the phone's owner switched all crew off for
+    await wipe(); await cheer2('l_a', 'l_c'); await age();
+    await d2.query(`update public.push_subs set kinds = '{"crew": false}'::jsonb where athlete_id = 'l_c'`);
+    ok((await due2()).length === 0, 'with the crew switch OFF in the Reminders panel, a cheer rings nobody');
+    await d2.query(`update public.push_subs set kinds = '{}'::jsonb where athlete_id = 'l_c'`);
+    // the stage86 bug: an athlete with TWO phones used to stop the whole decision
+    await wipe(); await d2.query(`insert into public.crew_posts (athlete_id, body) values ('l_a', 'for two phones')`); await age();
+    let twoOk = true; let rows2 = [];
+    try { rows2 = await due2(T, true); } catch (e) { twoOk = false; info('raised: ' + e.message); }
+    ok(twoOk && rows2.filter(r => r.athlete_id === 'l_d').length === 2, 'an athlete with two subscribed phones no longer stops the watermark insert (both phones are owed the news)', rows2.map(r => r.endpoint));
+    ok((await xa(`select 1 from public.crew_push_seen where athlete_id = 'l_d'`)).length === 1, 'and they have ONE watermark');
+    // the words, whatever the kind
+    const w7 = await x1(`select (select title from public.crew_push_words(1, 'cheer', 'X', false, 'en')) as c, (select title from public.crew_push_words(1, 'reply', 'X', false, 'en')) as r,
+                                (select title from public.crew_push_words(1, 'mention', 'X', false, 'en')) as m, (select title from public.crew_push_words(3, 'cheer', 'X', false, 'en')) as many`);
+    ok(w7.c === 'X sent you a cheer' && w7.r === 'X replied to your post' && w7.m === 'X mentioned you' && /busy/.test(w7.many), 'the three English lines, and a count of aimed events is still the count line', w7);
+    const kept = await x1(`select (select title from public.crew_push_words(1, 'kudos', 'X', true, 'fa')) as ku, (select title from public.crew_push_words(1, 'joined', 'X', false, 'fa')) as j`);
+    ok(/برات دست زد/.test(kept.ku) && /تیم/.test(kept.j), 'and Amir\'s words for the old kinds are untouched (برات دست زد, تیم)', kept);
+    await d2.close();
+  }
+
   section('8. The way back');
   await runSql(db, read(ROLLBACK), 'rollback');
   ok((await all(db, `select 1 from pg_class where relname in ('crew_push_q','crew_push_seen') and relnamespace='public'::regnamespace`)).length === 0,
