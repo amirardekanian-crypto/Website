@@ -275,7 +275,7 @@ async function trainingBase(browser, C) {
     const r = await row(p);
     C.check('on: Home has no Career row and no Hold Serve row — no door row at all', shown && r && r.rows.join() === '' && r.career === '' && r.hold === '', JSON.stringify(r && [r.rows, r.career, r.hold]));
     C.check('on: the level is the number inside the habit card\'s ring, and no rank name is said on the card', r && r.big === 'Level ' + L10.level && !RANKS.test(r.text), JSON.stringify(r));
-    C.check('on: the ring is the day, a segment per habit, and says so', r && r.segs === 5 && /^\d of 5 done today$/.test(r.aria || ''), JSON.stringify(r && [r.segs, r.on, r.aria]));
+    C.check('on: the ring is the day, a segment per habit, and its button says what it opens', r && r.segs === 5 && r.aria === 'Your level. Open your numbers', JSON.stringify(r && [r.segs, r.on, r.aria]));
     C.check('on: the weeks held in a row sit beside the week\'s own count, and what is left this week is not said twice',
       r && / · 3 weeks in a row$/.test(r.week || '') && !/more session/.test(r.week || ''), r && r.week);
     const order = await p.evaluate(() => {
@@ -290,10 +290,10 @@ async function trainingBase(browser, C) {
     C.check('on: one get_profile, after Hold Serve\'s read said the switch is on; then one get_my_moments and one get_awards (Your moments)',
       await calls(p, 'rpc:get_profile') === 1 && await calls(p, 'rpc:get_my_moments') === 1 && await calls(p, 'rpc:get_awards') === 1,
       JSON.stringify([await calls(p, 'rpc:get_profile'), await calls(p, 'rpc:get_my_moments'), await calls(p, 'rpc:get_awards')]));
-    // The ring is display only: Your numbers is one tap away in the tab bar, and the card's own › goes to the habits page.
-    // goCareer() stays for the deep link AA Proof's door card uses (?go=numbers).
+    // With the level in it the ring is a button to Your numbers (2026-10-24); the card's own › still goes to the habits page.
+    // goCareer() is also the deep link AA Proof's door card uses (?go=numbers).
     const ringTap = await p.evaluate(() => ({ button: document.querySelector('#home-overview .today-ring').tagName, go: (document.querySelector('.today-go') || {}).getAttribute('aria-label') }));
-    C.check('on: the ring is not a button, and the card\'s › opens the habits page', ringTap.button === 'DIV' && ringTap.go === 'Open your habits', JSON.stringify(ringTap));
+    C.check('on: the ring is a button, and the card\'s › opens the habits page', ringTap.button === 'BUTTON' && ringTap.go === 'Open your habits', JSON.stringify(ringTap));
     await p.evaluate(() => goCareer());
     await p.waitForTimeout(800);
     const tap = await p.evaluate(() => ({ screen: document.querySelector('.screen.active').id, url: location.pathname + location.search, top: Math.round(document.getElementById('numbers-title').getBoundingClientRect().top) }));
@@ -476,7 +476,7 @@ async function trainingLight(browser, C) {
       && / · 3 weeks in a row$/.test(r.week || ''), JSON.stringify(r));
     C.check('light, on: the nearest mark is not said on Home any more (Progress names it)', r && !/to 25 with Amir/.test(r.text + ' ' + r.week), JSON.stringify([r && r.text, r && r.week]));
     C.check('light, on: no rank, no badge name, no metal on the card', r && !RANKS.test(r.text) && !METALS.test(r.text) && !/Hold Serve|Century|Paper Trail|AA Proof|Locker/i.test(r.text), r && r.text);
-    C.check('light, on: the ring says the day in words for a screen reader', r && /^\d of 5 done today$/.test(r.aria || ''), r && r.aria);
+    C.check('light, on: the ring tells a screen reader it is the level and opens Your numbers', r && r.aria === 'Your level. Open your numbers', r && r.aria);
     await shot(p, 'light-home-row-390.png');
     C.check('light, on: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
@@ -1606,4 +1606,4 @@ async function main() {
   process.exitCode = C.report() ? 1 : 0;
 }
 if (require.main === module) main().catch(e => { console.error(e); process.exitCode = 1; });
-module.exports = { rwProfile, rwShelf, stubSet, rwLog, catRows, rwProof, mom, badgeSpec, RW_LADDER, RW_RULES, at, lvl, SWX, strip, toReady, tickAll, waitRow, T, myMomentsFx, proofXp, trainingBase, trainingLight, crossApp };
+module.exports = { RW_RULES, rwProfile, rwShelf, stubSet, rwLog, catRows, rwProof, mom, badgeSpec, RW_LADDER, RW_RULES, at, lvl, SWX, strip, toReady, tickAll, waitRow, T, myMomentsFx, proofXp, trainingBase, trainingLight, crossApp };

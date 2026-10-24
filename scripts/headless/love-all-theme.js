@@ -1,8 +1,10 @@
 // Love All round 2, the theme group (2026-10-24): node scripts/headless/love-all-theme.js
 //   B32   until the athlete picks Light or Dark the app follows the phone's dark mode (at boot and live); a pick is kept and wins.
+//   RING  on Home, the level in the habit card's ring is a button (44 px or more) that opens Your numbers; the day's count is not.
 // Serve the repo first (python -m http.server <port>; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js).
 'use strict';
 const H = require('./lib');
+const C = require('./career');
 const t = H.checker();
 
 const isDark = p => p.evaluate(() => document.body.hasAttribute('data-dark'));
@@ -60,9 +62,48 @@ async function theme(browser) {
   await d.ctx.close();
 }
 
+const HAB_ON = { onboarded: true, toured: true, installAsked: true, boardSwept: true, updatedAt: Date.now() };
+async function ring(browser) {
+  // Career on, the level in the ring.
+  const prof = C.rwProfile(10000);
+  const { ctx, p } = await H.openProgram(browser, { w: 390, h: 844, tz: 'UTC', hist: [], seed: { _hab_cfg: HAB_ON },
+    stub: { tables: { career_rules: C.RW_RULES, career_facts: [], career_catalogue: C.catRows() }, profile: prof, awards: C.rwShelf(prof) } });
+  await C.waitRow(p);
+  const r = await p.evaluate(() => {
+    const e = document.querySelector('#home-overview .today-ring'); if (!e) return null;
+    const b = e.getBoundingClientRect();
+    return { tag: e.tagName, aria: e.getAttribute('aria-label'), w: b.width, h: b.height, kick: e.querySelector('.today-mid span').textContent,
+             border: getComputedStyle(e).borderTopWidth, bgc: getComputedStyle(e).backgroundColor };
+  });
+  t.check('RING: with the level in it the ring is a button', r && r.tag === 'BUTTON' && r.kick === 'Level', JSON.stringify(r));
+  t.check('RING: its label says what it is and what it does', r && r.aria === 'Your level. Open your numbers', r && r.aria);
+  t.check('RING: the tap target is at least 44 px', r && r.w >= 44 && r.h >= 44, r && r.w + 'x' + r.h);
+  t.check('RING: it looks as before (no border, no fill, 84 px)', r && r.border === '0px' && r.bgc === 'rgba(0, 0, 0, 0)' && r.w === 84 && r.h === 84, JSON.stringify(r));
+  await p.focus('#home-overview .today-ring-go');
+  await p.keyboard.press('Enter');
+  await p.waitForTimeout(500);
+  const where = await p.evaluate(() => ({ plan: document.getElementById('screen-plan').classList.contains('active'),
+    top: Math.round(document.getElementById('numbers-title').getBoundingClientRect().top) }));
+  t.check('RING: Enter on it opens Progress at Your numbers', where.plan && where.top < 200, JSON.stringify(where));
+  await p.evaluate(() => goTo('home'));
+  await p.waitForTimeout(300);
+  await p.click('#home-overview .today-ring-go');
+  await p.waitForTimeout(500);
+  t.check('RING: a tap opens Progress at Your numbers', await p.evaluate(() => document.getElementById('screen-plan').classList.contains('active')));
+  t.check('RING: no page errors', !p.errs.length, p.errs.join(' | '));
+  await ctx.close();
+  // Career off: the day's count, not a button.
+  const o = await H.openProgram(browser, { w: 390, h: 844, tz: 'UTC', hist: [], seed: { _hab_cfg: HAB_ON } });
+  await o.p.waitForTimeout(500);
+  const k = await o.p.evaluate(() => { const e = document.querySelector('#home-overview .today-ring'); return e && { tag: e.tagName, role: e.getAttribute('role'), kick: e.querySelector('.today-mid span').textContent }; });
+  t.check('RING: showing the day\'s count, the ring stays a picture', k && k.tag === 'DIV' && k.role === 'img' && k.kick === 'Done', JSON.stringify(k));
+  await o.ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await theme(browser);
+  await ring(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

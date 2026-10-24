@@ -70,7 +70,7 @@ async function guide(browser) {
     return d.textContent.replace(/\s+/g, ' ');
   });
   const has = (s) => text.includes(s);
-  t.check('a. Career card: the level is the number in the ring on Home', has('Your level is the number in the ring on Home'));
+  t.check('a. Career card: the level is the number in the ring on Home, and tapping it opens Your numbers', has('Your level is the number in the ring on Home') && has('Tap the ring to open Your numbers.'));
   t.check('a. …the old "Career row" lines are gone', !/Home has a Career row|Tap the Career row/.test(text));
   t.check('b. Logging card: the arrow is next to the name, the i is on the right', has('The small arrow next to its name means it opens, and the i on the right is its info.') && !has('The small arrow on the right means it opens'));
   t.check('c. Records card: only a max put in with Log a max is labelled', has('A max you put in with Log a max is labelled') && !has('Every number is labelled'));
