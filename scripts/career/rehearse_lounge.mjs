@@ -42,9 +42,11 @@ const NEW_USER = ['crew_page(uuid,text)', 'crew_face_set(text,integer,integer)',
                   'coach_crew_face_clear(text)', 'my_game_set(jsonb)', 'crew_cheer(uuid,text)', 'coach_cheer(text,text)', 'coach_cheer_word_clear(bigint)', 'coach_crew_cheers()'];
 const NEW_HELPER = ['crew_face_v(text)', 'crew_lv(text)', 'crew_now_week(text)', 'crew_held_now(text,date)', 'crew_extra(text,jsonb,timestamptz,timestamptz,text)',
                     'crew_season_start(text)', 'crew_cheer_count(text)', 'crew_game_of(text)', 'crew_forget(text)', 'crew_t_forget_former()',
-                    'crew_push_t_cheer()', 'crew_push_t_reply()', 'crew_push_t_mention()'];
-const TABLES = ['athlete_profile', 'crew_faces', 'crew_cheers', 'crew_award_likes', 'crew_mentions'];
-const TRIGS = [['crew_push_cheer', 'crew_cheers'], ['crew_push_reply', 'crew_replies'], ['crew_push_mention', 'crew_mentions'], ['crew_forget_former', 'athlete_status']];
+                    'crew_push_t_cheer()', 'crew_push_t_reply()', 'crew_push_t_mention()',
+                    'crew_tally_up(text)', 'crew_tally_down(text)', 'crew_t_tally_cheer()', 'crew_t_tally_kudos()'];
+const TABLES = ['athlete_profile', 'crew_faces', 'crew_cheers', 'crew_award_likes', 'crew_mentions', 'crew_cheer_tally'];
+const TRIGS = [['crew_push_cheer', 'crew_cheers'], ['crew_push_reply', 'crew_replies'], ['crew_push_mention', 'crew_mentions'], ['crew_forget_former', 'athlete_status'],
+               ['crew_tally_cheer', 'crew_cheers'], ['crew_tally_kudos', 'crew_kudos']];
 
 async function main() {
   const t0 = Date.now();
@@ -632,6 +634,102 @@ async function main() {
   // the achievement switch hides the whole block, signatures with it
   ok(!('achievements' in await page('zz_ava', CAL)), 'and with the achievement switch off, none of it is shown (Cal)');
 
+  // ═══ 6b ═════════════════════════════════════════════════════════════════════════════════
+  section('6b. the cheer tally: every cheer and every like a person has got, all time');
+  const tl = id => val(`select coalesce((select n from public.crew_cheer_tally where athlete_id = $1), 0)::int`, [id]);
+  const tlSum = () => val(`select coalesce(sum(n), 0)::int from public.crew_cheer_tally`);
+  const mkPost = async (author, ageDays = 0) => (await q(`insert into public.crew_posts (athlete_id, body, created_at) values ($1, 'A post for the tally.', now() - make_interval(days => $2::int)) returning id`, [author, ageDays])).rows[0].id;
+  const likeEm = (id, target, em) => call(id, `select public.crew_kudos($1, true, $2)`, [target, em]);
+  await q(`delete from public.crew_kudos`);
+  await q(`delete from public.crew_cheers where to_athlete = 'zz_ava'`);
+  await q(`delete from public.crew_cheer_tally`);
+  const tallyLine = `${AVA}:${todayS}`;
+  const tp = await mkPost('zz_ava');
+  // a like on a post
+  await kudos('zz_ben', tp);
+  ok(await tl('zz_ava') === 1, 'a like on a post is +1 for the post\'s author');
+  await likeEm('zz_ben', tp, '🔥');
+  ok(await tl('zz_ava') === 1 && (await val(`select emoji from public.crew_kudos where athlete_id = 'zz_ben' and post_id = $1`, [tp])) === '🔥',
+     'the same like with another emoji is +0 (the swap is an UPDATE, and the emoji did change)');
+  await likeEm('zz_ben', tp, '💪'); await kudos('zz_ben', tp);
+  ok(await tl('zz_ava') === 1, 'and so is every further swap and tap');
+  await kudos('zz_ben', tp, false);
+  ok(await tl('zz_ava') === 0, 'taking the like back is -1');
+  await kudos('zz_ben', tp, false);
+  ok(await tl('zz_ava') === 0 && await cnt('crew_cheer_tally', 'n < 0') === 0, 'taking back a like that is not there changes nothing');
+  // a like on a Bell line
+  await kudos('zz_ben', tallyLine);
+  ok(await tl('zz_ava') === 1, 'a like on a Bell line is +1 for the line\'s owner');
+  await likeEm('zz_ben', tallyLine, '👏');
+  ok(await tl('zz_ava') === 1, 'the line like\'s emoji swap is +0');
+  await kudos('zz_pat', tallyLine);
+  ok(await tl('zz_ava') === 2, 'a second person\'s like is another +1');
+  await kudos('zz_pat', tallyLine, false);
+  await kudos('zz_ben', tallyLine, false);
+  ok(await tl('zz_ava') === 0, 'and taking both back is -2: the line like goes down too');
+  // never your own, none for Amir
+  await refuses('you cannot like your own post: crew:own', kudos('zz_ava', tp), /crew:own/);
+  await refuses('or your own line: crew:own', kudos('zz_ava', tallyLine), /crew:own/);
+  await refuses('or cheer yourself: crew:own', cheer('zz_ava', AVA), /crew:own/);
+  ok(await tl('zz_ava') === 0 && await tlSum() === 0, 'and none of that counted for anybody');
+  await q(`insert into public.crew_kudos (athlete_id, post_id) values ('zz_ava', $1)`, [tp]);
+  ok(await tl('zz_ava') === 0, 'even a like written straight into the table by the author counts for nobody (the trigger itself refuses to count yourself)');
+  await q(`delete from public.crew_kudos`);
+  const tAmir = await tlSum();
+  const tpAmir = await mkPost(await val('public.coach_note_id()'));
+  await kudos('zz_ben', tpAmir);
+  ok(await tlSum() === tAmir && await cnt('crew_cheer_tally', `athlete_id = public.coach_note_id()`) === 0, 'a like on Amir\'s post counts for nobody: he has no number');
+  await kudos('zz_ben', tpAmir, false);
+  ok(await tlSum() === tAmir, 'and taking it back moves nobody');
+  // the sweep and a post's cascade never take one off
+  await kudos('zz_ben', tallyLine);
+  await q(`update public.crew_kudos set line_day = current_date - 9`);
+  await q(`select public.crew_sweep()`);
+  ok(await cnt('crew_kudos') === 0 && await tl('zz_ava') === 1, 'the 7-day sweep deletes an old like and the number stays (it is an all-time number)');
+  await kudos('zz_ben', tallyLine, false);
+  ok(await tl('zz_ava') === 1, 'and taking back a like the sweep already deleted is +0');
+  await kudos('zz_cal', tp);
+  ok(await tl('zz_ava') === 2, 'Cal likes the post: +1');
+  await q(`delete from public.crew_posts where id = $1`, [tp]);
+  ok(await cnt('crew_kudos') === 0 && await tl('zz_ava') === 2, 'the post is deleted, its likes go with it (the cascade) and the number stays');
+  const tp2 = await mkPost('zz_ava');
+  await kudos('zz_ben', tp2);
+  ok(await tl('zz_ava') === 3, 'a like on another post: 3');
+  await q(`update public.crew_posts set created_at = now() - interval '8 days' where id = $1`, [tp2]);
+  await q(`select public.crew_sweep()`);
+  ok(await cnt('crew_posts', `id = '${tp2}'`) === 0 && await cnt('crew_kudos') === 0 && await tl('zz_ava') === 3, 'the sweep deletes a post past 7 days with its likes and the number stays');
+  // a cheer
+  await cheer('zz_ben', AVA, 'nice one');
+  ok(await tl('zz_ava') === 4, 'a cheer is +1 for the person cheered');
+  await refuses('a second cheer the same day is refused: crew:cheer_today', cheer('zz_ben', AVA), /crew:cheer_today/);
+  ok(await tl('zz_ava') === 4, 'and the refused one counted nothing');
+  await coachCall(`select public.coach_cheer('zz_ava')`);
+  ok(await tl('zz_ava') === 5, 'Amir\'s cheer counts too (+1)');
+  await q(`update public.crew_cheers set word = null where to_athlete = 'zz_ava'`);
+  await q(`delete from public.crew_cheers where to_athlete = 'zz_ava'`);
+  ok(await tl('zz_ava') === 5, 'and deleting cheer rows (the 400-day sweep) does not take any off');
+  // never below zero, never negative by hand
+  await kudos('zz_ben', tallyLine);
+  await q(`update public.crew_cheer_tally set n = 0 where athlete_id = 'zz_ava'`);
+  await kudos('zz_ben', tallyLine, false);
+  ok(await tl('zz_ava') === 0, 'a like taken back when the number is already 0 leaves it at 0, never -1');
+  await refuses('and the table itself refuses a negative number', q(`update public.crew_cheer_tally set n = -1 where athlete_id = 'zz_ava'`), /check|violat/i);
+  // what the page says
+  await q(`update public.crew_cheer_tally set n = 11 where athlete_id = 'zz_ava'`);
+  const pT = await page('zz_ben', AVA), pTo = await page('zz_ava');
+  ok(pT.cheers.total === 11 && pTo.cheers.total === 11 && Number.isInteger(pT.cheers.total), 'cheers.total on her page is the number, for another member and for her own page', [pT.cheers.total, pTo.cheers.total]);
+  ok('season' in pT.cheers && 'recent' in pT.cheers && 'mine_today' in pT.cheers && !('mine_today' in pTo.cheers), 'season, recent and mine_today are still there (mine_today not on the own page)', Object.keys(pT.cheers));
+  await q(`delete from public.crew_cheer_tally where athlete_id = 'zz_gus'`);
+  ok((await page('zz_ava', GUS)).cheers.total === 0, 'a member with no row says 0');
+  ok(typeof (await page('zz_ava', CAL)).cheers.total === 'number', 'Cal has every switch off and the number is still shown (cheers has no switch)');
+  await refuses('a person who has not said yes cannot read it: crew:not_yes', page('zz_fox', AVA), /crew:not_yes/);
+  ok(!('cheers' in await page('zz_fox')) && !JSON.stringify(await page('zz_fox')).includes('"total"'), 'and a person with no yes has no cheers block, so no number, on their own page');
+  const bAvaT = await bell('zz_ben');
+  ok(!JSON.stringify(bAvaT).includes('cheer_tally') && !JSON.stringify(bAvaT.crew.find(r => r.me === false) || {}).includes('"total"'), 'the Bell does not carry the number (the page does)');
+  // GAME-6: nothing but a number
+  ok(await cnt('career_facts', `kind in ('cheer','kudos','like')`) === 0, 'it wrote no fact (GAME-6)');
+  await q(`delete from public.crew_cheer_tally`); await q(`delete from public.crew_push_q`);
+
   // ═══ 7 ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
   section('7. mentions');
   const pm = (await post('zz_ava', 'Who is in for the weekend session?')).id;
@@ -724,32 +822,38 @@ async function main() {
     for (const [from, to] of [['zz_pat', 'zz_ava'], ['zz_ava', 'zz_pat'], ['zz_cal', 'zz_ava']])
       await q(`insert into public.crew_mentions (reply_id, athlete_id, to_athlete) values ($1, $2, $3)`, [await rawReply(from, anyPost), from, to]);
     await q(`insert into public.athlete_profile (athlete_id, sports, hand) values ('zz_pat', '{tennis}', 'left') on conflict do nothing`);
+    await q(`insert into public.crew_cheer_tally (athlete_id, n) values ('zz_pat', 5), ('zz_cal', 4) on conflict (athlete_id) do update set n = excluded.n`);
   };
   const tallyPat = async () => ({ face: await cnt('crew_faces', `athlete_id = 'zz_pat'`), cheers: await cnt('crew_cheers', `athlete_id = 'zz_pat' or to_athlete = 'zz_pat'`),
-    likes: await cnt('crew_award_likes', `athlete_id = 'zz_pat' or to_athlete = 'zz_pat'`), mentions: await cnt('crew_mentions', `athlete_id = 'zz_pat' or to_athlete = 'zz_pat'`), game: await cnt('athlete_profile', `athlete_id = 'zz_pat'`) });
+    likes: await cnt('crew_award_likes', `athlete_id = 'zz_pat' or to_athlete = 'zz_pat'`), mentions: await cnt('crew_mentions', `athlete_id = 'zz_pat' or to_athlete = 'zz_pat'`), game: await cnt('athlete_profile', `athlete_id = 'zz_pat'`),
+    tally: await cnt('crew_cheer_tally', `athlete_id = 'zz_pat'`) });
   await setup9();
   const t0pat = await tallyPat();
-  ok(t0pat.face === 1 && t0pat.cheers === 2 && t0pat.likes === 2 && t0pat.mentions === 2 && t0pat.game === 1, 'before: Pat has a face, two cheers (one each way), two signatures and two mentions (each way) and a game', t0pat);
+  ok(t0pat.face === 1 && t0pat.cheers === 2 && t0pat.likes === 2 && t0pat.mentions === 2 && t0pat.game === 1 && t0pat.tally === 1, 'before: Pat has a face, two cheers (one each way), two signatures and two mentions (each way), a game and a cheer tally', t0pat);
   await answer('zz_pat', 'no');
   const t1pat = await tallyPat();
-  ok(t1pat.face === 0 && t1pat.cheers === 0 && t1pat.likes === 0 && t1pat.mentions === 0, 'crew_answer("no") takes the face, the cheers they gave AND got, the signatures both ways and the mentions both ways', t1pat);
+  ok(t1pat.face === 0 && t1pat.cheers === 0 && t1pat.likes === 0 && t1pat.mentions === 0 && t1pat.tally === 0, 'crew_answer("no") takes the face, the cheers they gave AND got, the signatures both ways, the mentions both ways and the cheer tally', t1pat);
   ok(t1pat.game === 1, 'but their game (athlete_profile) stays: it is coaching data, only hidden');
-  ok(await cnt('crew_cheers', `athlete_id = 'zz_cal'`) === 1 && await cnt('crew_award_likes', `athlete_id = 'zz_cal'`) === 1 && await cnt('crew_mentions', `athlete_id = 'zz_cal'`) === 1 && await cnt('crew_faces', `athlete_id in ('zz_cal','zz_ava')`) === 2, 'and nobody else\'s moved');
+  ok(await cnt('crew_cheers', `athlete_id = 'zz_cal'`) === 1 && await cnt('crew_award_likes', `athlete_id = 'zz_cal'`) === 1 && await cnt('crew_mentions', `athlete_id = 'zz_cal'`) === 1 && await cnt('crew_faces', `athlete_id in ('zz_cal','zz_ava')`) === 2
+     && await val(`select n from public.crew_cheer_tally where athlete_id = 'zz_cal'`) === 4, 'and nobody else\'s moved (Cal\'s tally is still 4)');
   await refuses('their page is gone to everyone: crew:gone', page('zz_ava', PAT), /crew:gone/);
   await answer('zz_pat', 'yes');
   ok((await tallyPat()).cheers === 0 && (await page('zz_ava', PAT)).game.hand === 'left', 'saying yes again does not bring the old rows back; the game is where they left it');
+  ok((await tallyPat()).tally === 0 && (await page('zz_ava', PAT)).cheers.total === 0, 'and the cheer tally starts again from 0 (the page says total 0)');
   await setup9();
   await coachCall(`select public.coach_crew_under13('zz_pat', true)`);
   const t2pat = await tallyPat();
-  ok(t2pat.face === 0 && t2pat.cheers === 0 && t2pat.likes === 0 && t2pat.mentions === 0 && t2pat.game === 1, 'coach_crew_under13(true) does the same', t2pat);
+  ok(t2pat.face === 0 && t2pat.cheers === 0 && t2pat.likes === 0 && t2pat.mentions === 0 && t2pat.game === 1 && t2pat.tally === 0, 'coach_crew_under13(true) does the same, the cheer tally included', t2pat);
   await coachCall(`select public.coach_crew_under13('zz_pat', false)`);
   await setup9();
   await q(`delete from public.athlete_status where athlete_id = 'zz_old'`);
   await face('zz_ava', jpg(2500, 3));
   await q(`insert into public.crew_faces (athlete_id, w, h, bytes) values ('zz_old', 256, 256, $1)`, [jpg(2500, 8)]);
   await q(`insert into public.crew_cheers (athlete_id, to_athlete, day) values ('zz_old', 'zz_ava', current_date), ('zz_ava', 'zz_old', current_date)`);
+  await q(`insert into public.crew_cheer_tally (athlete_id, n) values ('zz_old', 3) on conflict (athlete_id) do update set n = 3`);
   await q(`insert into public.athlete_status (athlete_id, status, since) values ('zz_old', 'former', current_date)`);
-  ok(await cnt('crew_faces', `athlete_id = 'zz_old'`) === 0 && await cnt('crew_cheers', `athlete_id = 'zz_old' or to_athlete = 'zz_old'`) === 0, 'marking an athlete former (athlete_status) clears their face and cheers both ways: the trigger is the door', await cnt('crew_cheers', `athlete_id = 'zz_old' or to_athlete = 'zz_old'`));
+  ok(await cnt('crew_faces', `athlete_id = 'zz_old'`) === 0 && await cnt('crew_cheers', `athlete_id = 'zz_old' or to_athlete = 'zz_old'`) === 0 && await cnt('crew_cheer_tally', `athlete_id = 'zz_old'`) === 0,
+     'marking an athlete former (athlete_status) clears their face, cheers both ways and cheer tally: the trigger is the door', await cnt('crew_cheers', `athlete_id = 'zz_old' or to_athlete = 'zz_old'`));
   await q(`insert into public.crew_faces (athlete_id, w, h, bytes) values ('zz_ava', 256, 256, $1) on conflict (athlete_id) do nothing`, [jpg(2500, 3)]);
   await q(`insert into public.athlete_status (athlete_id, status, since) values ('zz_ava', 'paused', current_date)`);
   ok(await cnt('crew_faces', `athlete_id = 'zz_ava'`) === 1, 'an athlete_status row that is "paused", not "former", clears nothing');
@@ -812,18 +916,20 @@ async function main() {
   for (const [from, to] of [['zz_ben', 'zz_cal'], ['zz_cal', 'zz_ben'], ['zz_ava', 'zz_cal']])
     await q(`insert into public.crew_mentions (reply_id, athlete_id, to_athlete) values ($1, $2, $3)`, [await rawReply(from, anyPost2), from, to]);
   await game('zz_cal', { hand: 'right', sports: ['tennis'] });
-  const calMine = async () => ({ profile: await cnt('athlete_profile', `athlete_id = 'zz_cal'`), faces: await cnt('crew_faces', `athlete_id = 'zz_cal'`),
+  await q(`insert into public.crew_cheer_tally (athlete_id, n) values ('zz_cal', 6), ('zz_ben', 2) on conflict (athlete_id) do update set n = excluded.n`);
+  const calMine = async () => ({ profile: await cnt('athlete_profile', `athlete_id = 'zz_cal'`), faces: await cnt('crew_faces', `athlete_id = 'zz_cal'`), tally: await cnt('crew_cheer_tally', `athlete_id = 'zz_cal'`),
     cheers: await cnt('crew_cheers', `athlete_id = 'zz_cal' or to_athlete = 'zz_cal'`), likes: await cnt('crew_award_likes', `athlete_id = 'zz_cal' or to_athlete = 'zz_cal'`),
     mentions: await cnt('crew_mentions', `athlete_id = 'zz_cal' or to_athlete = 'zz_cal'`) });
   const m0c = await calMine();
-  ok(m0c.profile === 1 && m0c.faces === 1 && m0c.cheers === 3 && m0c.likes === 3 && m0c.mentions === 3, 'before: Cal has a game, a face, three cheers (given 1, got 2), three signatures and three mentions', m0c);
+  ok(m0c.profile === 1 && m0c.faces === 1 && m0c.cheers === 3 && m0c.likes === 3 && m0c.mentions === 3 && m0c.tally === 1, 'before: Cal has a game, a face, a cheer tally, three cheers (given 1, got 2), three signatures and three mentions', m0c);
   const dry = await asCoach(() => val(`select public.coach_erase_person('athlete', 'zz_cal', null, '{}'::uuid[], true)`));
-  ok(dry.counts.athlete_profile === 1 && dry.counts.crew_faces === 1 && dry.counts.crew_cheers === 1 && dry.counts['crew_cheers (to them)'] === 2 && dry.counts.crew_award_likes === 1 && dry.counts['crew_award_likes (to them)'] === 2
+  ok(dry.counts.athlete_profile === 1 && dry.counts.crew_faces === 1 && dry.counts.crew_cheer_tally === 1 && dry.counts.crew_cheers === 1 && dry.counts['crew_cheers (to them)'] === 2 && dry.counts.crew_award_likes === 1 && dry.counts['crew_award_likes (to them)'] === 2
      && dry.counts.crew_mentions === 1 && dry.counts['crew_mentions (to them)'] === 2, 'the dry run counts every table and every "to them" delete', dry.counts);
   ok(eq(await calMine(), m0c), 'and a dry run changes nothing');
   const real = await asCoach(() => val(`select public.coach_erase_person('athlete', 'zz_cal', 'zz_cal', '{}'::uuid[], false)`));
   ok(real.ok === true, 'the real run succeeds (its final check proves no public table with an athlete_id column was forgotten)', real.counts);
-  ok(eq(await calMine(), { profile: 0, faces: 0, cheers: 0, likes: 0, mentions: 0 }), 'afterwards nothing of Cal remains in any of the five tables, in either column');
+  ok(eq(await calMine(), { profile: 0, faces: 0, tally: 0, cheers: 0, likes: 0, mentions: 0 }), 'afterwards nothing of Cal remains in any of the six tables, in either column');
+  ok(await val(`select n from public.crew_cheer_tally where athlete_id = 'zz_ben'`) === 2, 'and the cheer tally of somebody else is untouched (Ben keeps 2)');
   ok(await cnt('crew_cheers', `athlete_id = 'zz_ben' or athlete_id = 'zz_ava'`) === 0 && await cnt('crew_cheers') === 0, 'and the cheers he gave and was given are gone from the others\' side too');
   // the check at the end of the erase function bites when a table is forgotten
   const eraseNow = await eraseDef(db);
@@ -915,8 +1021,34 @@ async function main() {
   await runSql(db, stage.split('\r\n').join('\n'), 'stage96 with LF lines');
   await runSql(db, read(ROLLBACK).split('\r\n').join('\n').split('\n').join('\r\n'), 'rollback with CRLF lines');
   ok(eraseBack.replace(/\r/g, '') === (await eraseDef(db)).replace(/\r/g, ''), 'after every mix, the erase function is exactly what the live project has');
+  // the tally is backfilled from the likes that exist when the stage goes on: what a person has received, never their own, nothing for Amir
+  const bfPost = (await q(`insert into public.crew_posts (athlete_id, body) values ('zz_ava', 'backfill post') returning id`)).rows[0].id;
+  const bfAmir = (await q(`insert into public.crew_posts (athlete_id, body) values (public.coach_note_id(), 'amir backfill') returning id`)).rows[0].id;
+  await q(`delete from public.crew_kudos`);
+  await q(`insert into public.crew_kudos (athlete_id, post_id) values ('zz_ben', $1), ('zz_cal', $1), ('zz_ava', $1), ('zz_pat', $2)`, [bfPost, bfAmir]);
+  await q(`insert into public.crew_kudos (athlete_id, to_athlete, line_day) values ('zz_ava', 'zz_ben', current_date), ('zz_gus', 'zz_ben', current_date), ('zz_pat', 'zz_cal', current_date)`);
   await runSql(db, stage, 'stage96 once more');
   ok(await val(`select to_regclass('public.crew_faces')::text`) !== null, 'and the stage goes on again after the way back');
+  const bf = Object.fromEntries((await q(`select athlete_id, n from public.crew_cheer_tally`)).rows.map(r => [r.athlete_id, r.n]));
+  ok(bf.zz_ava === 2 && bf.zz_ben === 2 && bf.zz_gus === 0 && bf.zz_pat === 0 && !('zz_cal' in bf),
+     'the backfill: Ava 2 (a post liked by Ben and Cal; her own like on it is not counted), Ben 2 (two line likes), the others 0, and Cal (erased in section 12, so not a member) has no row', bf);
+  const memberIds = (await q(`select athlete_id from public.crew_members() order by 1`)).rows.map(r => r.athlete_id);
+  ok(eq(Object.keys(bf).sort(), memberIds) && !('__coach__' in bf) && await cnt('crew_cheer_tally', `athlete_id = public.coach_note_id()`) === 0,
+     'one row for every current member and for nobody else (not Amir, not a no, not an under-13, not an erased athlete)', [Object.keys(bf).sort(), memberIds]);
+  await q(`update public.crew_cheer_tally set n = 99 where athlete_id = 'zz_gus'`); await q(`delete from public.crew_cheer_tally where athlete_id = 'zz_pat'`);
+  await runSql(db, stage, 'stage96 a re-run');
+  ok(await val(`select n from public.crew_cheer_tally where athlete_id = 'zz_gus'`) === 99 && await val(`select n from public.crew_cheer_tally where athlete_id = 'zz_pat'`) === 0,
+     'a re-run of the stage changes nobody\'s number (Gus keeps 99) and only gives a member who has no row one');
+  // the backfill's other half: cheers received, counted with the likes
+  const bfSql = stage.match(/insert into public\.crew_cheer_tally \(athlete_id, n\)\s+select m\.athlete_id[\s\S]*?on conflict \(athlete_id\) do nothing;/);
+  ok(bfSql !== null, 'the backfill statement is in the stage file');
+  await q(`insert into public.crew_cheers (athlete_id, to_athlete, day) values ('zz_ben', 'zz_ava', current_date), (public.coach_note_id(), 'zz_ava', current_date), ('zz_cal', 'zz_ava', current_date)`);
+  ok(await val(`select n from public.crew_cheer_tally where athlete_id = 'zz_ava'`) === 5, 'three more cheers arrive through the trigger: Ava is on 5');
+  await q(`delete from public.crew_cheer_tally`);
+  await q(bfSql[0]);
+  ok(await val(`select n from public.crew_cheer_tally where athlete_id = 'zz_ava'`) === 5 && await val(`select n from public.crew_cheer_tally where athlete_id = 'zz_ben'`) === 2,
+     'and the backfill alone arrives at the same 5: the likes that exist plus the cheers received (Amir\'s included)');
+  await q(`delete from public.crew_cheer_tally`); await q(`delete from public.crew_cheers`); await q(`delete from public.crew_kudos`); await q(`delete from public.crew_posts where id in ($1, $2)`, [bfPost, bfAmir]);
 
   console.log(`\n${passed} of ${passed + failed} checks passed  (${((Date.now() - t0) / 1000).toFixed(1)} s)`);
   if (failed) { console.log('\nFAILED:'); fails.forEach(f => console.log('  · ' + f)); }
