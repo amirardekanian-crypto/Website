@@ -477,7 +477,14 @@
 // Your numbers. Guided and the lower-day banner follow today's targets. LAST reads the server's history. Body weight shows one
 // change. Dates are day first. A note with a button stays until tapped, the weight check says Keep it or Fix it, and the
 // install card is a layer that never sits over a day.
-const CACHE = 'aap-v221';
+// v222: program.html changed (2026-10-24, the Players' Lounge: Amir: "i want all of this to be built first, when we are all done, then
+// we go live"). A person in the crew has a page now: their face (kept on the phone under crew-faces-v1, which this worker leaves alone),
+// four tiles, the cheers they have had, the cycle's weeks as bars, "Your game" (club, hand, sports), the names that signed an achievement
+// (Signed Ball), and on your own page a partner code. A Cheer button, @names in replies, First Serve on Home for a new athlete's first
+// two weeks, the stamp on a session photo with Share on your own photo, Share my card, and the Open wall as tiles. It needs stage96
+// (and stage97 for the partner code) on the server and falls back to the old rows without it. No new file to pre-cache: the page, the
+// board's photo of Amir (assets/img/coach.jpg, kept as first used) and the share painter are the files they already were.
+const CACHE = 'aap-v222';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -119,6 +119,7 @@ async function context(browser, opts) {
     return u.startsWith(BASE + '/') || (opts.fonts && /^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(u)) ? r.continue() : r.abort();
   });
   await ctx.addInitScript({ content: STUB });
+  if (opts.init) await ctx.addInitScript({ content: opts.init });   // a script that runs before the page's own (e.g. a stand-in for the phone's permission box)
   const p = await ctx.newPage();
   p.errs = [];
   p.on('pageerror', e => p.errs.push(String(e.message || e)));
@@ -128,7 +129,7 @@ async function context(browser, opts) {
 
 // program.html, signed in as the fixture athlete, past the loading screen. opts:
 //   tz ('America/Los_Angeles': the browser's time zone) · w, h, dark, touch · prog / spine / hist (instead of the fixtures) · stub (extra stub config, e.g.
-//   { mode: 'offline' }) · fonts: true lets Google Fonts load (no app asks for them since 2026-10-17) · query ('?client=demo') · seed: { '<key suffix>': value } stored under '<id><suffix>' (e.g.
+//   { mode: 'offline' }) · init: a script (a string) run before the page's own · fonts: true lets Google Fonts load (no app asks for them since 2026-10-17) · query ('?client=demo') · seed: { '<key suffix>': value } stored under '<id><suffix>' (e.g.
 //   { _setlog_Barbell_Back_Squat: [...] }) · fresh: true skips the welcome and install stand-downs.
 async function openProgram(browser, opts = {}) {
   const { ctx, p } = await context(browser, opts);

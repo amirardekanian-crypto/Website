@@ -13,6 +13,24 @@
 // answers how many waiting moments it told and takes them out of the profile's `moments`, as the server's told_at does, and keeps the
 // profile in '__stubcfg' so the OTHER app opened next in the same browser sees it; off by default: the stub never tells), told (every
 // id mark_moments_told was given, as [app, award_id], in window.__STUB.told).
+// Players' Lounge (stage96, scripts/headless/lounge.js): crew_page answers the stub's `crewPages` ({ me: {...}, '<ck>': {...} }), each MERGED over a default page
+// made from that person's entry in `bell.crew` (the shape of CONTRACT.md section 3: numbers, cheers, achievements, ...; made-up people only); the viewer's own
+// page (no p_subject) is made from `bell.me`. Like the server it answers 'crew:not_yes' to a viewer who is not in the crew (or is under 13) and 'crew:gone' to a
+// ck that is not in `bell.crew`. pageMissing = a server without stage96 (PGRST202, 404); pageErr = an error message to answer with (e.g. 'crew:gone');
+// stall: { crew_page: true } never answers; a mode of 'offline' is no signal. get_bell, crew_board and a reply carry ck/fv/lv/held/new as the fixture gives them.
+// stage96 is TOLD by get_bell's top-level `lounge: 1` (the fixture sets it; without it the app draws Crew as it was). YOUR page (no p_subject) is whole: every block, the comebacks, and
+// `kinds` (your switches, a kind not named is on); someone else's has neither.
+// The cheer (step 3): crew_cheer answers like the server (cheerLog, cheerCap, cheerErr); crew_page reads cheerLog for mine_today.
+// Cheers on a page (CONTRACT 9b, "All-time cheers"): `cheers.total` is every cheer and like the person has received since joining (the tile, on every page, yours too); `season` is still sent, and the app does not draw it.
+// Steps 4 to 6: a page's `cycle` (YOUR page: every week of the cycle with days that carry title and mins, plus `done` / `extra`; SOMEONE ELSE'S, CONTRACT 9b: { n, per_week, done, extra, weeks: [this week only] }
+// and days that carry only day and extra: the stub sends exactly what the fixture gives, so a test can also send MORE than the server would), `game` and each achievement's `signed` / `signed_n` come from the `crewPages` entry (none by default, so a
+// page has no cycle, no game and nobody signed); my_game_set answers like CONTRACT 4 and crew_page(own) then carries what it saved (`myGame`; gameMissing, gameErr, gameFail, gameDelay).
+// Step 7: crew_reply keeps a mention token @[ck|name] for a member of `bell.crew` who is not you (the first five), turns any other into plain @name, counts what is SEEN against 140 (a token is "@name"), and the reply row carries `mentions`.
+// Bring a partner (step 9, stage97): `partner` is the referral object your page carries ({ code: null } before a code exists, or { code, percent, reward, friends, waiting, used }); without it a page has
+// no `referral` (a server without stage97: no card). my_partner_code({p_make}) answers like CONTRACT 8: {code:null} for none, p_make true makes ALEX24 (upper first name letters + two digits, 10 and 10),
+// refuses an athlete under 13 ('partner:under13'); partnerMissing = "no such function" · partnerErr = a message to refuse with · partnerDelay = ms to take.
+// Step 10: crew_post keeps from p_session what the server keeps: day, n, and with stage96 (`bell.lounge`) title (<= 40, one line), mins (1..300) and held (a bool); anything else is dropped.
+// Faces (step 2): crew_faces_get answers `faces` ({ '<ck>': { fv, b64 } }), crew_face_set / crew_face_clear change the caller's own (faceDelay, faceMax, faceMissing, faceErr).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
   var cfg = {};
@@ -86,7 +104,7 @@
     }
     // Crew and the Bell (stage81, scripts/headless/crew.js): get_bell answers the stub's `bell` (none set: no answer, so no Crew tab); bellMissing
     // answers as a server without stage81 (PGRST202, 404). crew_answer, crew_kinds, crew_post, crew_kudos and crew_delete_post change `bell` the way
-    // the server would and keep it in '__stubcfg' (the next page sees it); crew_photo answers a tiny JPEG; leaderboard_top answers `board`.
+    // the server would and keep it in '__stubcfg' (the next page sees it); crew_photo answers a tiny JPEG (or `photoB64`, a picture a test makes for a screenshot); leaderboard_top answers `board`.
     if (name === 'get_bell' || name === 'get_bell_if_new') {
       if (S.bellMissing) return res({ data: null, error: { message: 'Could not find the function public.' + name + '(p_athlete_id) in the schema cache', code: 'PGRST202' }, status: 404 });
       // stage83: the app asks get_bell_if_new with the hash it holds. ifNewMissing = a server without that stage, so the app
@@ -95,7 +113,7 @@
       if (!S.bell) return res({ data: null, error: null, status: 200 });
       // the hash the server takes over the payload: it MUST change when the feed does, or a new post would never arrive
       var tag = (function (B) {
-        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji]), h = 0;
+        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji, B.crew, B.week, B.open, B.lounge]), h = 0;
         for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
         return S.bell.etag && !S.bellTagMoves ? S.bell.etag : 'tag' + h;
       })(S.bell);
@@ -104,12 +122,83 @@
       out.etag = tag; out.at = new Date().toISOString();
       return res({ data: out, error: null, status: 200 });
     }
+    // Players' Lounge (stage96): the Player Page. See the header for what it answers.
+    if (name === 'crew_page') {
+      if (S.pageMissing) return res({ data: null, error: { message: 'Could not find the function public.crew_page(p_subject) in the schema cache', code: 'PGRST202' }, status: 404 });
+      var PB = S.bell || {}, PM = PB.me || {}, sub = params && params.p_subject, pages = S.crewPages || {};
+      var bad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+      if (S.pageErr) return bad(S.pageErr);
+      var pageOf = function (who, own, c) {
+        c = c || {};
+        var first = String(who || '').split(' ')[0];
+        var pg = { ck: c.ck || null, me: !!own, who: who, first: first, since: '2026-06-06', joined: '2026-10-19', member: !own || PM.answer === 'yes', under13: !!(own && PM.under13),
+          lv: c.lv || null, fv: c.fv || null, art: 'iron', game: null,
+          numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9 }, cheers: { total: 12, season: 4, recent: [] },
+          achievements: [{ id: 'achievement:back_to_back', name: 'Back to Back', day: '2026-10-12', size: 'win', signed: [], signed_n: 0 },
+            { id: 'achievement:the_notebook', name: 'The Notebook', day: '2026-10-03', size: 'win', signed: [], signed_n: 0 }],
+          honours: [], best_lifts: [], cycle: null, at: new Date().toISOString() };
+        // YOUR page is sent whole: every block, the comebacks, and `kinds` (your own switches, a kind not named is on). Someone else's has no comebacks and no `kinds`.
+        if (own) { pg.numbers.comebacks = 2; pg.kinds = Object.assign({}, PM.kinds || {}); }
+        else { pg.cheers.mine_today = !!(S.cheerLog && c.ck && S.cheerLog[c.ck]); if (pg.cheers.mine_today) { pg.cheers.total = 13; pg.cheers.season = 5; } }   // a cheer you sent (crew_cheer) is on their page
+        return pg;
+      };
+      var merge = function (pg, over) { Object.keys(over || {}).forEach(function (k) { pg[k] = over[k]; }); return pg; };
+      // `myGame` is what my_game_set last saved: your own page then carries it (the saved row, in the shape CONTRACT 4 gives crew_page().game)
+      if (!sub) { var own = merge(pageOf(PM.name || 'Alex R.', true, PM), pages.me); if (S.myGame !== undefined) own.game = S.myGame; if (S.partner !== undefined && own.referral === undefined) own.referral = S.partner; return res({ data: JSON.parse(JSON.stringify(own)), error: null, status: 200 }); }
+      if (PM.answer !== 'yes' || PM.under13 || PM.can_post === false) return bad('crew:not_yes');
+      var who = (PB.crew || []).filter(function (x) { return x && x.ck === sub; })[0];
+      if (!who) return bad('crew:gone');
+      return res({ data: JSON.parse(JSON.stringify(merge(pageOf(who.who, !!who.me, who), pages[sub]))), error: null, status: 200 });
+    }
+    // Players' Lounge (stage96, "Your game"): my_game_set(p) validates like CONTRACT 4 (unknown keys dropped, '' to null, the enums, club <= 40, working_on <= 60, ig by its pattern, an
+    // unknown sport refused) and answers the saved row in crew_page().game's shape (nulls absent); crew_page(own) then carries it (S.myGame). gameMissing = a server without the function ·
+    // gameErr = a message to refuse every save with · gameDelay = ms to take · gameFail = refuse the next N saves.
+    if (name === 'my_game_set') {
+      if (S.gameMissing) return res({ data: null, error: { message: 'Could not find the function public.my_game_set(p) in the schema cache', code: 'PGRST202' }, status: 404 });
+      var gp =(params && params.p) || {}, GK = ['sports', 'hand', 'backhand', 'side', 'plays_at', 'club', 'training_for', 'working_on', 'ig'];
+      var gbad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+      if (S.gameErr) return gbad(S.gameErr);
+      if (S.gameFail > 0) { S.gameFail--; return gbad('game:bad'); }
+      var SP = ['tennis', 'padel', 'squash', 'badminton', 'pickleball', 'table_tennis', 'beach_tennis'], TF = ['competition', 'strength', 'fitness', 'physique', 'running', 'health'];
+      var one = function (v, ok) { v = v === '' || v === undefined ? null : v; return v === null || ok.indexOf(v) >= 0 ? v : false; };
+      var got = {}, bd = false;
+      GK.forEach(function (k) { if (gp[k] !== undefined) got[k] = gp[k]; });
+      var sp = Array.isArray(got.sports) ? got.sports : [], tf = Array.isArray(got.training_for) ? got.training_for : [];
+      if (sp.some(function (x) { return SP.indexOf(x) < 0; }) || tf.some(function (x) { return TF.indexOf(x) < 0; })) bd = true;
+      var hand = one(got.hand, ['right', 'left']), bh = one(got.backhand, ['one', 'two']), sd = one(got.side, ['right', 'left', 'both']), pa = one(got.plays_at, ['fun', 'club', 'competition']);
+      if (hand === false || bh === false || sd === false || pa === false) bd = true;
+      var club = String(got.club || '').trim(), wo = String(got.working_on || '').trim(), ig = String(got.ig || '').trim();
+      if (club.length > 40 || wo.length > 60 || (ig && !/^[A-Za-z0-9._]{1,30}$/.test(ig))) bd = true;
+      if (bd) return gbad('game:bad');
+      var saved = { sports: sp, training_for: tf };
+      if (hand) saved.hand = hand; if (bh) saved.backhand = bh; if (sd) saved.side = sd; if (pa) saved.plays_at = pa;
+      if (club) saved.club = club; if (wo) saved.working_on = wo; if (ig) saved.ig = ig;
+      S.myGame = saved;
+      return new Promise(function (ok) { setTimeout(function () { ok({ data: JSON.parse(JSON.stringify(saved)), error: null, status: 200 }); }, S.gameDelay || 0); });
+    }
+    // Players' Lounge (stage97, "Bring a partner"): see the header.
+    if (name === 'my_partner_code') {
+      if (S.partnerMissing) return res({ data: null, error: { message: 'Could not find the function public.my_partner_code(p_make) in the schema cache', code: 'PGRST202' }, status: 404 });
+      var qbad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+      if (S.partnerErr) return qbad(S.partnerErr);
+      var QM = (S.bell && S.bell.me) || {};
+      if (QM.under13) return qbad('partner:under13');
+      if (params && params.p_make === true && !(S.partner && S.partner.code)) {
+        var qn = String(QM.name || 'Alex R.').split(/\s+/)[0].replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 10) || 'ATHLETE';
+        S.partner = { code: qn + '24', percent: 10, reward: 10, friends: 0, waiting: 0, used: 0 };
+      }
+      var qout = JSON.parse(JSON.stringify(S.partner && S.partner.code ? S.partner : { code: null }));
+      return new Promise(function (ok) { setTimeout(function () { ok({ data: qout, error: null, status: 200 }); }, S.partnerDelay || 0); });
+    }
     if (/^crew_/.test(name) && S.bell) {
       var B = S.bell, me = B.me = B.me || {}, keep = function () { try { var cb = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); cb.bell = B; localStorage.setItem('__stubcfg', JSON.stringify(cb)); } catch (e) {} };
       if (name === 'crew_answer') {
         var a = params && params.p_answer;
         me.answer = a; me.can_post = a === 'yes' && !me.under13; me.name = me.name || (params && params.p_name) || 'Athlete';
-        if (a === 'no') B.items = (B.items || []).filter(function (i) { return !(i && i.me && i.t === 'post'); });
+        if (a === 'no') {   // leaving means gone: your posts, and your face (stage96)
+          B.items = (B.items || []).filter(function (i) { return !(i && i.me && i.t === 'post'); });
+          me.fv = null; if (S.faces && me.ck) delete S.faces[me.ck]; (B.crew || []).forEach(function (c) { if (c && c.me) c.fv = null; });
+        }
         keep(); return res({ data: JSON.parse(JSON.stringify(me)), error: null, status: 200 });
       }
       if (name === 'crew_kinds') { me.kinds = Object.assign({}, me.kinds || {}, (params && params.p_kinds) || {}); keep(); return res({ data: JSON.parse(JSON.stringify(me)), error: null, status: 200 }); }
@@ -119,7 +208,19 @@
         var id = 'p' + Date.now().toString(16) + Math.floor(Math.random() * 1e6).toString(16);
         while (id.length < 36) id += '0';
         B.items = B.items || [];
-        B.items.splice(B.items.filter(function (i) { return i && i.pinned; }).length, 0, { t: 'post', id: id, who: me.name, me: true, amir: false, kind: p.p_kind || 'post', body: p.p_body || '', session: p.p_session || null,
+        var sess = null;
+        if (p.p_session && typeof p.p_session === 'object') {
+          var ps = p.p_session; sess = {};
+          if ('day' in ps) sess.day = ps.day;
+          if ('n' in ps) sess.n = ps.n;
+          if (B.lounge) {
+            var ttl = String(ps.title || '').replace(/\s+/g, ' ').trim().slice(0, 40), mn = Math.round(Number(ps.mins));
+            if (ttl) sess.title = ttl;
+            if (mn >= 1 && mn <= 300) sess.mins = mn;
+            if (typeof ps.held === 'boolean') sess.held = ps.held;
+          }
+        }
+        B.items.splice(B.items.filter(function (i) { return i && i.pinned; }).length, 0, { t: 'post', id: id, who: me.name, me: true, amir: false, kind: p.p_kind || 'post', body: p.p_body || '', session: sess,
           photo: !!p.p_photo, w: p.p_w, h: p.p_h, at: new Date().toISOString(), pinned: false, left: 7, kudos: { n: 0, mine: false, names: [] } });
         if (p.p_photo) me.photos_left = Math.max(0, (me.photos_left || 0) - 1);
         me.posts_left = Math.max(0, (me.posts_left || 0) - 1);
@@ -151,9 +252,25 @@
           if (!post) return res({ data: null, error: { message: 'crew:gone' }, status: 400 });
           var body = String((params && params.p_body) || '').trim();
           if (!body) return res({ data: null, error: { message: 'crew:empty' }, status: 400 });
-          if (body.length > 140) return res({ data: null, error: { message: 'crew:reply_long' }, status: 400 });
+          // stage96 mentions (CONTRACT 5): a token @[ck|name] is kept when the ck is a member of the crew list and not the author, the first five only; anything else becomes plain
+          // "@name". What the 140 counts is what is SEEN (a token counts as "@name"), the body at most 700. The row carries `mentions` for the members named.
+          var mre = /@\[([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\|([^\]|\n]{1,40})\]/, mrest = body, mout = '', mseen = '', mcnt = 0, mm, ments = [], mtok = [];
+          while ((mm = mre.exec(mrest))) {
+            var mnm = mm[2].trim().slice(0, 24), mck = mm[1].toLowerCase();
+            var mem = mcnt < 5 && mnm ? (B.crew || []).filter(function (c) { return c && c.ck && String(c.ck).toLowerCase() === mck && !c.me; })[0] : null;
+            mout += mrest.slice(0, mm.index); mseen += mrest.slice(0, mm.index);
+            if (mem) { mout += '@[' + mck + '|' + mnm + ']'; mcnt++; mtok.push(mck); if (!ments.some(function (x) { return x.ck === mck; })) ments.push({ ck: mck, who: mem.who, fv: mem.fv != null ? mem.fv : null }); }
+            else mout += '@' + mnm;
+            mseen += '@' + mnm; mrest = mrest.slice(mm.index + mm[0].length);
+          }
+          body = mout + mrest; mseen += mrest;
+          S.lastBody = body;
+          if (mseen.length > 140 || body.length > 700) return res({ data: null, error: { message: 'crew:reply_long' }, status: 400 });
           if (!Array.isArray(post.replies)) post.replies = [];
-          post.replies.push({ id: 'rep-' + (++S._repN || (S._repN = 1)), who: (B.me && B.me.name) || 'You', me: true, amir: false, body: body, at: new Date().toISOString() });
+          var newRep = { id: 'rep-' + (++S._repN || (S._repN = 1)), who: (B.me && B.me.name) || 'You', me: true, amir: false, body: body, at: new Date().toISOString(),
+            ck: B.me && B.me.ck ? B.me.ck : undefined, fv: B.me && 'fv' in B.me ? B.me.fv : undefined };
+          if (ments.length) newRep.mentions = ments;
+          post.replies.push(newRep);
         } else {
           (B.items || []).forEach(function (i) {
             if (i && Array.isArray(i.replies) && i.replies.some(function (r) { return r.id === (params && params.p_id); })) {
@@ -167,8 +284,55 @@
         return res({ data: { post: post.id, replies: JSON.parse(JSON.stringify(post.replies || [])) }, error: null, status: 200 });
       }
       if (name === 'crew_delete_post') { var before = (B.items || []).length; B.items = (B.items || []).filter(function (i) { return !(i && i.id === (params && params.p_post)); }); keep(); return res({ data: B.items.length < before, error: null, status: 200 }); }
+      // Faces (stage96). crew_faces_get answers the stub's `faces` ({ '<ck>': { fv, b64 } }) for the keys asked, at most 12, only rows that exist, after `faceDelay` ms (so a second call
+      // in flight would show in `faceMax`); crew_face_set keeps the photo as the caller's face (a JPEG of 100..60,000 bytes, 64..512 square) and answers { fv }; crew_face_clear answers { fv: null }.
+      // faceMissing = "no such function"; faceErr = the message set and clear refuse with (e.g. 'crew:photo_bad').
+      if (name === 'crew_faces_get' || name === 'crew_face_set' || name === 'crew_face_clear') {
+        if (S.faceMissing) return res({ data: null, error: { message: 'Could not find the function public.' + name, code: 'PGRST202' }, status: 404 });
+        var fbad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+        if (name === 'crew_faces_get') {
+          var fkeys = (params && params.p_keys) || [];
+          if (fkeys.length > 12) return fbad('crew:too_many');
+          S.faceNow = (S.faceNow || 0) + 1; S.faceMax = Math.max(S.faceMax || 0, S.faceNow);
+          var frows = fkeys.filter(function (k) { return S.faces && S.faces[k]; }).map(function (k) { return { ck: k, fv: S.faces[k].fv, b64: S.faces[k].b64 }; });
+          return new Promise(function (ok) { setTimeout(function () { S.faceNow--; ok({ data: frows, error: null, status: 200 }); }, S.faceDelay || 0); });
+        }
+        if (S.faceErr) return fbad(S.faceErr);
+        if (me.under13) return fbad('crew:under13');
+        if (me.answer !== 'yes') return fbad('crew:not_yes');
+        if (name === 'crew_face_clear') {
+          me.fv = null; if (S.faces && me.ck) delete S.faces[me.ck];
+          (B.crew || []).forEach(function (c) { if (c && c.me) c.fv = null; });
+          keep(); return res({ data: { fv: null }, error: null, status: 200 });
+        }
+        var fph = String((params && params.p_photo) || ''), fw = params && params.p_w, fh = params && params.p_h;
+        if (fph.indexOf('/9j/') !== 0 || !(fw >= 64 && fw <= 512 && fh >= 64 && fh <= 512)) return fbad('crew:photo_bad');
+        if (Math.floor(fph.length * 3 / 4) > 60000) return fbad('crew:photo_big');
+        var fnew = Math.floor(Date.now() / 1000) + (S._faceN = (S._faceN || 0) + 1);
+        me.fv = fnew; (B.crew || []).forEach(function (c) { if (c && c.me) c.fv = fnew; });
+        S.faces = S.faces || {}; if (me.ck) S.faces[me.ck] = { fv: fnew, b64: fph };
+        keep(); return res({ data: { fv: fnew }, error: null, status: 200 });
+      }
+      // The cheer (stage96): crew_cheer({ p_subject, p_word }) answers { ok: true, season }. Like the server: one per giver, subject and day (the second is 'crew:cheer_today'), a word over 100 is
+      // 'crew:word_long', yourself 'crew:own', a key that is not in the crew 'crew:gone', a non-member 'crew:not_yes', under 13 'crew:under13', 30 a day (`cheerCap`) 'crew:cheers_today'.
+      // `cheerLog` ({ '<ck>': { word } }) is what has been sent (set it to say "already cheered today"); crew_page reads it for mine_today and the season. cheerErr = a message to refuse every cheer with.
+      if (name === 'crew_cheer') {
+        var chbad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+        var chsub = params && params.p_subject, chword = params && params.p_word;
+        if (S.cheerErr) return chbad(S.cheerErr);
+        if (me.under13) return chbad('crew:under13');
+        if (me.answer !== 'yes' || me.can_post === false) return chbad('crew:not_yes');
+        if (chsub && chsub === me.ck) return chbad('crew:own');
+        if (!(B.crew || []).some(function (c) { return c && c.ck === chsub; })) return chbad('crew:gone');
+        if (chword && String(chword).length > 100) return chbad('crew:word_long');
+        S.cheerLog = S.cheerLog || {};
+        if (S.cheerLog[chsub]) return chbad('crew:cheer_today');
+        if (Object.keys(S.cheerLog).length >= (S.cheerCap || 30)) return chbad('crew:cheers_today');
+        S.cheerLog[chsub] = { word: chword || null };
+        return res({ data: { ok: true, season: 5 }, error: null, status: 200 });
+      }
       if (name === 'crew_photo') return res({ data: { id: params && params.p_post, mime: 'image/jpeg', w: 4, h: 5,
-        b64: '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z' }, error: null, status: 200 });
+        b64: S.photoB64 || '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z' }, error: null, status: 200 });
     }
     // crew_board (stage91): the season board, crew members only, in its own shape (who/points, no display_name/xp). Answered
     // from `crewBoard` when a fixture sets one, else from `board` translated, so every older fixture keeps working. A fixture
@@ -176,7 +340,7 @@
     if (name === 'crew_board') {
       if (S.noCrewBoard) return res({ data: null, error: { message: 'Could not find the function public.crew_board', code: 'PGRST202' }, status: 404 });
       if (S.crewBoard) return res({ data: JSON.parse(JSON.stringify(S.crewBoard)), error: null, status: 200 });
-      if (S.board) return res({ data: S.board.map(function (r) { return { pos: r.pos, who: r.display_name, points: r.xp, level: r.level, is_me: r.is_me }; }), error: null, status: 200 });
+      if (S.board) return res({ data: S.board.map(function (r) { var o = { pos: r.pos, who: r.display_name, points: r.xp, level: r.level, is_me: r.is_me }; if (r.ck) { o.ck = r.ck; o.fv = r.fv === undefined ? null : r.fv; } return o; }), error: null, status: 200 });
       return res({ data: [], error: null, status: 200 });
     }
     if (name === 'leaderboard_top' && S.board) return res({ data: JSON.parse(JSON.stringify(S.board)), error: null, status: 200 });

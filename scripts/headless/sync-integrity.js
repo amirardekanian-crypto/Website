@@ -300,6 +300,32 @@ const hoursAgo = h => new Date(Date.now() - h * 3600e3).toISOString();
     await done(ctx, p);
   }
 
+  // 7b. The Player Pages (Players' Lounge, 2026-10-24) are a cache of other athletes' numbers: not progress either.
+  {
+    const mine = { 'a0000000-0000-4000-8000-000000000002': { at: 5, p: { who: 'Sam Example', numbers: {} } } };
+    const theirs = { 'a0000000-0000-4000-8000-000000000009': { at: 9, p: { who: 'Jo Placeholder', numbers: {} } } };
+    const { ctx, p } = await H.openProgram(browser, { seed: { _crewpages: mine }, stub: { progress: { [ID + '_crewpages']: JSON.stringify(theirs), [ID + '_snapAt']: new Date(Date.now() + 3600e3).toISOString() } } });
+    await pulled(p, 2500);
+    t.check('7b. a cloud copy of the pages is not pulled over the phone\'s own', (await stored(p, '_crewpages')) === JSON.stringify(mine), await stored(p, '_crewpages'));
+    await p.evaluate(() => _pushSnapshot(true));
+    await p.waitForTimeout(400);
+    const pp = await pushes(p);
+    t.check('7b. the pages are never in a progress push', pp.length > 0 && pp.every(x => !((ID + '_crewpages') in (x.p_data || {}))), pp.length + ' pushes');
+    await done(ctx, p);
+  }
+
+  // 7c. The one-time note that a like signs an achievement (Players' Lounge, step 6) is said once on THIS phone: never pulled onto another, never kept in the row.
+  {
+    const { ctx, p } = await H.openProgram(browser, { seed: { _signnote: '1' }, stub: { progress: { [ID + '_signnote']: '0', [ID + '_snapAt']: new Date(Date.now() + 3600e3).toISOString() } } });
+    await pulled(p, 2500);
+    t.check('7c. a cloud copy of the note is not pulled over the phone\'s own', (await stored(p, '_signnote')) === '1', await stored(p, '_signnote'));
+    await p.evaluate(() => _pushSnapshot(true));
+    await p.waitForTimeout(400);
+    const pp = await pushes(p);
+    t.check('7c. the note is never in a progress push', pp.length > 0 && pp.every(x => !((ID + '_signnote') in (x.p_data || {}))), pp.length + ' pushes');
+    await done(ctx, p);
+  }
+
   t.check('8. no page errors in any of it', errs.length === 0, errs.join(' | '));
   await browser.close();
   process.exit(t.report() ? 1 : 0);
