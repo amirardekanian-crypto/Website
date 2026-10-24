@@ -20848,7 +20848,9 @@ function buildStepSeq(day) {
   // The check-in's rules, as getDayCompletion() and restNextOfCard() keep them (2026-10-20): a card it struck out (rd-skip) is not
   // a step, and a halved exercise (data-rd-sets) asks only today's sets. Guided walked both, so on a sore day the athlete was
   // led through the jumps the check-in had just taken away, and the record said they were done.
-  const struck = c => c.classList.contains('rd-skip');
+  // An optional card (a red day) is left out the same way: it is not asked today, getDayCompletion() does not miss it, and the
+  // athlete can still log it from the list. One extra step to skip every time would be the bigger change.
+  const struck = c => c.classList.contains('rd-skip') || c.classList.contains('rd-optional');
   const cards = all.filter(c => logs(c) && !struck(c));
   // The block each card sits in, from the day's data: the cards are drawn one per exercise, in order (as paintWeekTargets() reads them).
   const dayData = ((DATA && DATA.workouts && DATA.workouts.days) || []).find(d => String(d.id) === String(day));
