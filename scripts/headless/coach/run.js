@@ -6678,6 +6678,56 @@ S['lounge-form-fa-code'] = async (b) => {
   return r;
 };
 
+// K5. Their game: one line under the name in the athlete's file, from athlete_profile, only what is set.
+S['lounge-game-line'] = async (b) => {
+  const r = { id: 'lounge-game-line', title: 'K5: the athlete file says their game in one line (only what is set); nothing for an empty row, no row, or a server without the table', checks: [] };
+  const { page, log } = await L.openCoach(b, { seed: { lounge: true }, hash: 'a/ava_test/work' });
+  const game = () => page.evaluate(() => { const el = document.getElementById('detGame'); return el ? { text: el.innerText.replace(/\s+/g, ' ').trim(), shown: el.offsetHeight > 0, html: el.innerHTML } : null; });
+  await page.waitForFunction(() => document.getElementById('detGame') && document.getElementById('detGame').textContent.trim(), null, { timeout: 5000 }).catch(() => {});
+  const ava = await game();
+  check(r, 'Ava: sports, hand, backhand, side, club, what she trains for, what she is working on and her Instagram, in one line under her name', ava && ava.text === 'Padel, Tennis · right-handed · two-handed backhand · left side · at Aspire Padel · trains for strength · working on: my second serve · @ava.plays', ava);
+  check(r, 'her Instagram is a link that opens her page in a new tab', await page.evaluate(() => { const a = document.querySelector('#detGame a'); return !!a && a.getAttribute('href') === 'https://instagram.com/ava.plays' && a.target === '_blank' && /noopener/.test(a.rel); }), ava && ava.html);
+  const reads = (await L.calls(page)).filter(c => c.kind === 'from' && c.name === 'athlete_profile');
+  check(r, 'one read of the table, for this athlete only', reads.length === 1 && reads[0].op === 'select' && reads[0].filters.length === 1 && reads[0].filters[0] === 'athlete_id.eq."ava_test"', reads.map(c => c.filters));
+  check(r, 'it sits between the tier line and the cycle line, and it is on the page without a banner or a failure line', await page.evaluate(() => { const g = document.getElementById('detGame'); return g.previousElementSibling.classList.contains('sub') && /det-cycle/.test(g.nextElementSibling.className); }) && !(await L.failText(page)) && !(await page.locator('#loadwarn:not([hidden])').count()), await L.failText(page));
+  // opening her again, from another tab of her file, reads nothing more
+  await L.go(page, 'a/ava_test/file');
+  check(r, 'going to her File and back does not read it again (kept for the page)', (await L.calls(page)).filter(c => c.kind === 'from' && c.name === 'athlete_profile').length === 1 && (await game()).text === ava.text, '');
+  // Ben has only his hand set; Eli has a row with nothing in it; Cara has no row
+  await L.go(page, 'a/ben_test/work'); await L.settle(page, 400);
+  const ben = await game();
+  check(r, 'Ben: only "left-handed"', ben && ben.text === 'left-handed' && ben.shown, ben);
+  await L.go(page, 'a/eli_new/work'); await L.settle(page, 400);
+  const eli = await game();
+  check(r, 'Eli (an empty row): nothing, and the line takes no room', eli && eli.text === '' && !eli.shown, eli);
+  await L.go(page, 'a/cara_free/proof'); await L.settle(page, 400);
+  const cara = await game();
+  check(r, 'Cara (no row): nothing, and the line takes no room', cara && cara.text === '' && !cara.shown, cara);
+  // text, never markup
+  await page.evaluate(() => { window.__DB.athlete_profile.push({ athlete_id: 'dan_proof', sports: ['table_tennis', 'pickleball'], hand: null, backhand: null, side: 'both', plays_at: 'competition', club: '<img src=x onerror=alert(1)>', training_for: ['fitness', 'running', 'health'], working_on: null, ig: null }); });
+  await L.go(page, 'a/dan_proof/proof'); await L.settle(page, 400);
+  const dan = await game();
+  check(r, 'a club typed with markup is shown as text; two sports in words; three goals read "a, b and c"; both sides; competes', dan && dan.text === 'Table tennis, Pickleball · plays both sides · competes · at <img src=x onerror=alert(1)> · trains for fitness, running and health' && !/<img/.test(dan.html.replace(/&lt;img/g, '')), dan);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // a server that has not had stage96: the table does not exist (PGRST205). Nothing is drawn, nothing is said, and it is asked once only.
+  const old = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  await L.go(old.page, 'a/ben_test/work'); await L.settle(old.page, 400);
+  const oc = (await L.calls(old.page)).filter(c => c.kind === 'from' && c.name === 'athlete_profile');
+  check(r, 'without stage96: the table is asked about once, the line is empty, and there is no banner and no failure line', oc.length === 1 && (await old.page.evaluate(() => document.getElementById('detGame').textContent)) === '' && !(await L.failText(old.page)) && !(await old.page.locator('#loadwarn:not([hidden])').count()), oc.length);
+  check(r, 'no page errors without stage96', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
+
+  // a real failure is said on the line, not drawn as an empty profile
+  const bad = await L.openCoach(b, { seed: { lounge: true }, hash: 'today' });
+  await bad.page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'athlete_profile', op: 'select', message: 'fixture: permission denied', times: 1 }));
+  await L.go(bad.page, 'a/ava_test/work'); await L.settle(bad.page, 500);
+  check(r, 'a failed read says so on the line ("did not load" and why) and is read again the next time the file opens', /game profile did not load: fixture: permission denied/.test((await bad.page.locator('#detGame').innerText())) && await (async () => { await L.go(bad.page, 'a/ben_test/work'); await L.go(bad.page, 'a/ava_test/work'); await L.settle(bad.page, 500); return /right-handed/.test(await bad.page.locator('#detGame').innerText()); })(), await bad.page.locator('#detGame').innerText());
+  await bad.page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));

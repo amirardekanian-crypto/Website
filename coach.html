@@ -877,6 +877,9 @@
              display: flex; align-items: center; justify-content: center;
              font-weight: 600; font-size: 17px; }
   /* The cycle and what needs the coach sit under the name on every sub-tab; the actions sit on the right (below the name on a phone). */
+  .det-game { margin-top: 4px; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }   /* their game (stage96): one line, nothing at all when there is none */
+  .det-game:empty { display: none; }
+  .det-game a { color: inherit; text-underline-offset: 3px; }
   .det-cycle { margin-top: 8px; font-size: 14px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
   .det-cycle b { font-weight: 600; }
   .det-cycle .det-fo { color: var(--muted); }
@@ -1752,6 +1755,12 @@ const S = {
   honours: null,   // the month just gone: coach_honours()'s answer (frozen rows, or the live work and the Pick's shortlist)
   goals: {},       // athlete_id -> { 'YYYY-MM-01': career_goals row }
   amirNotes: {},   // athlete_id -> career_notes rows ("From Amir", one a day)
+  game: {},        // The Players' Lounge (stage96): athlete_id -> their athlete_profile row, or null when they have none (loadGame()); gameOff is true while the server has no such table
+  gameOff: false,
+  faces: {},       // athlete_id -> { fv, src }: the crew faces, read once per load by loadFaces(); empty while the server has no coach_crew_faces()
+  cheers: null,    // { on, rows, err }: coach_crew_cheers(), the last 7 days; on is false while the server has none (loadCheers())
+  cheerDone: {},   // athlete_id -> the server's UTC day Amir cheered them from this page (the list above can lag a write)
+  partner: null,   // { on, rows, err }: coach_partner_codes() (stage97); on is false while the server has none (loadPartner())
   // Bumped by every assemble(). The athlete file caches its own context so that
   // switching sub-tabs costs nothing; this is what tells it the cache is stale
   // after a refetch, instead of it quietly showing pre-write data for ever.
@@ -3001,6 +3010,7 @@ async function hardRefresh() {
   loadLevels._done = false; resetBoard(); S.assess = null; S.course = null; S.spine = null;
   LOAD_ERR.assess = LOAD_ERR.course = LOAD_ERR.spine = '';
   S.callLogs = {};   // cached per athlete for the page's life: a failed read stuck as "No call logs yet"
+  S.game = {}; S.gameOff = false;   // their game lines (stage96) are read again when a file is opened
   try { await loadAll(); } catch (e) { $('content').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; return; }
   render();
   loadLevels().then(() => { if (S.ready) paintLevels(); });   // ↻ used to drop the levels and never fetch them again; they are filled in place (ROSTER-15)
@@ -5765,6 +5775,7 @@ async function renderDetail(athleteId, sub) {
         <div>
           <h2 class="hd">${esc(a.name)}</h2>
           <div class="sub">${tierChip(a)}${statusChip(a)}${lvSlot('hchip', athleteId)} <span>${esc(sub2.join(' · '))}</span></div>
+          <div class="det-game" id="detGame" data-id="${esc(athleteId)}">${gameLine(S.game[athleteId])}</div>
           ${cycleLineHtml(_D)}
           ${needsLineHtml(a)}
           ${goalLineHtml(a)}
@@ -5778,6 +5789,7 @@ async function renderDetail(athleteId, sub) {
       }).join('')}</div>
     <div id="tabbody"></div>`;
   renderDetailBody(keep);
+  loadGame(athleteId);     // their game line (stage96): drawn from the copy held, else read once and filled in place
   const st = document.querySelector('.subrail .stab.active');
   if (st && st.scrollIntoView) st.scrollIntoView({ inline: 'center', block: 'nearest' });
   if (_pendingFocus && _pendingFocus.id === athleteId) {
@@ -7070,6 +7082,52 @@ async function bellSetUnder13(id, on) {
 window.loadBell = loadBell; window.bellPost = bellPost; window.bellPick = bellPick; window.bellDropPhoto = bellDropPhoto;
 window.bellShowPhoto = bellShowPhoto; window.bellHidePhoto = bellHidePhoto; window.bellRemove = bellRemove; window.bellUnder13 = bellUnder13;
 window.bellReplyRemove = bellReplyRemove;
+
+// ── The Players' Lounge (stage96 + stage97; Amir 2026-10-24: "build all of this first, then we go live") ─────────────────────────────────────────
+// What the crew got that the coach sees and runs from here: their game (one line in the athlete's file, K5), their faces (the circle that was only
+// initials, K2), the cheers (Amir cheers a moment, and moderates the words, K3 and K4), who trains and has not joined (K1), and the athletes' partner
+// codes (K6). Every call is a stage96 or stage97 function or table; the server has none of them until go-live, so each read treats "not there" as
+// "off" and the page draws nothing and says nothing, as Courtside and the Bell do. Any other failed read is named by the banner (LOAD_ERR). Nothing here
+// pays XP (GAME-6). Not in BACKUP_TABLES on purpose: that edit and the snapshot wait for go-live day (the check compares them with each other).
+const loungeMissing = res => !!res && !!res.error && (res.status === 404 || courtMissing(res.error));
+const loungeRpc = (name, params) => Promise.resolve(sb.rpc(name, params)).then(r => r, e => ({ data: null, error: { message: (e && e.message) || 'no answer' } }));
+
+// K5. Their game: one line under the name in the athlete's file, from their athlete_profile row (the coach reads the table: policy "coach reads athlete
+// profile"). Only what is set. Nothing when the row is empty or missing, or while the table does not exist yet.
+const GAME_SPORT = { tennis: 'Tennis', padel: 'Padel', squash: 'Squash', badminton: 'Badminton', pickleball: 'Pickleball', table_tennis: 'Table tennis', beach_tennis: 'Beach tennis' };
+const GAME_PLAYS = { fun: 'plays for fun', club: 'club player', competition: 'competes' };
+function gameLine(g) {
+  if (!g) return '';
+  const bits = [], list = v => (Array.isArray(v) ? v : []);
+  const sp = list(g.sports).map(s => GAME_SPORT[s] || unslug(s));
+  if (sp.length) bits.push(esc(sp.join(', ')));
+  if (g.hand === 'right' || g.hand === 'left') bits.push(g.hand + '-handed');
+  if (g.backhand === 'one' || g.backhand === 'two') bits.push(g.backhand + '-handed backhand');
+  if (g.side === 'right' || g.side === 'left') bits.push(g.side + ' side'); else if (g.side === 'both') bits.push('plays both sides');
+  if (GAME_PLAYS[g.plays_at]) bits.push(GAME_PLAYS[g.plays_at]);
+  if (g.club) bits.push(esc('at ' + g.club));
+  const tf = list(g.training_for).map(unslug);
+  if (tf.length) bits.push('trains for ' + esc(tf.length < 3 ? tf.join(' and ') : tf.slice(0, -1).join(', ') + ' and ' + tf[tf.length - 1]));
+  if (g.working_on) bits.push(esc('working on: ' + g.working_on));
+  if (g.ig) bits.push(`<a href="${esc(affIg(g.ig))}" target="_blank" rel="noopener">@${esc(String(g.ig).replace(/^@/, ''))}</a>`);
+  return bits.join(' · ');
+}
+// Read once per athlete and kept for the page's life (↻ Refresh reads again). A missing table is quiet; any other failure is said on the line itself.
+async function loadGame(id) {
+  if (DEMO || S.gameOff || !sb || Object.prototype.hasOwnProperty.call(S.game, id)) return;
+  const res = await sb.from('athlete_profile').select('*').eq('athlete_id', id).maybeSingle();
+  if (res.error) {
+    if (loungeMissing(res)) { S.gameOff = true; return; }
+    paintGame(id, `<span class="muted">Their game profile did not load: ${esc(res.error.message || 'no answer')}</span>`);
+    return;
+  }
+  S.game[id] = res.data || null;
+  paintGame(id);
+}
+function paintGame(id, html) {
+  const el = $('detGame');
+  if (el && el.dataset.id === id) el.innerHTML = html != null ? html : gameLine(S.game[id]);
+}
 
 // ── The Monthly Open (stage85; Career Mode round 5, the last step of plan A; Amir 2026-10-19: "for crew and the open go with your picks") ──────────────────
 // One challenge at a time, any kind Amir designs (not only the six tennis tests). On the athletes' Crew tab it is a card under the feed, with a board ranked by
