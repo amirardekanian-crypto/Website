@@ -37,7 +37,7 @@ const seen = P => ({ _hl_seen: { ['cycle' + (P.currentCycleIndex + 1) + '|' + P.
       return { pick: pick ? pick.innerText.replace(/\s+/g, ' ').trim() : null, href: ask ? decodeURIComponent(ask.href) : '', h: pick ? Math.round(pick.getBoundingClientRect().height) : 0 };
     });
     C.check('between cycles: one row offers the day trained least (Day 2), in words a stranger reads', !!r.pick && /^Day 2 · Upper Body/i.test(r.pick) && /The one you did least this cycle\. A good one to repeat\./.test(r.pick) && r.h >= 44, JSON.stringify(r));
-    C.check('the WhatsApp ask says the cycle is finished, with its date, not "week 5"', /\(finished [^)]+ on [A-Z][a-z]{2} \d{1,2}\)\. About Cycle \d+:/.test(r.href) && !/week \d/.test(r.href), r.href.slice(0, 140));
+    C.check('the WhatsApp ask says the cycle is finished, with its date, not "week 5"', /\(finished [^)]+ on \d{1,2} [A-Z][a-z]{2}\)\. About Cycle \d+:/.test(r.href) && !/week \d/.test(r.href), r.href.slice(0, 140));
     await p.click('#screen-home .bt-pick'); await p.waitForTimeout(500);
     C.check('the row opens that day', await p.evaluate(() => { const v = document.getElementById('day-view'); return !!v && !v.hidden && !!document.querySelector('#day2.active, #day2.day-content.active'); }));
     C.check('no page errors (between cycles)', !p.errs.length, JSON.stringify(p.errs));

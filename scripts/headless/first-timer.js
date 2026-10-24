@@ -23,7 +23,7 @@ const t = H.checker();
   // mono line reads "SEP 29 – NOV 2" and, in the cycle's last 14 days, "· 9 DAYS LEFT". The fixture's cycle ends in 24 days, so a second one ends in 9, to run the days-left check.
   {
     const mon = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    const f = iso => { const [y, m, d] = iso.split('-').map(Number); return mon[m - 1] + ' ' + d; };
+    const f = iso => { const [y, m, d] = iso.split('-').map(Number); return d + ' ' + mon[m - 1]; };   // day first (Love All B31, 2026-10-24)
     const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     const endingIn = n => {   // the current cycle ends n local days from today, five weeks long
       const P = H.fixture(), c = P.cycles[P.currentCycleIndex], e = new Date(); e.setHours(12, 0, 0, 0); e.setDate(e.getDate() + n);
