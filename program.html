@@ -20518,7 +20518,7 @@ function pauseTimer() {
 }
 
 function resetTimer() {
-  pauseTimer(); timerRemaining = timerDuration;
+  pauseTimer(); timerDuration = timerRemaining = timerWritten || timerDuration;   // back to the card's own rest, whatever +15s did
   updateTimerDisplay(); updateRing(1);
   document.getElementById('timerDisplay').classList.remove('warning');
   serveClockReset();   // Serve Clock: Reset restarts the rest, so the door comes back (a rest written at the hand-back point or under is handed back at once)

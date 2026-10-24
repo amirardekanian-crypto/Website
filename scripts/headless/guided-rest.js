@@ -184,7 +184,7 @@ const t = H.checker();
     t.check('Guided rest: Pause is the running button, with its mark', band.ss === 'Pause/pause', band.ss);
     t.check('Guided rest: the log\'s head and the Next line', band.head === 'Set 1 of 3 · how did it go?' && band.next === 'Next: Box Jump · set 2 of 3', JSON.stringify([band.head, band.next]));
 
-    // +15s, Pause, Reset (the old behaviour)
+    // +15s, Pause, Reset (Reset goes back to the written rest)
     const tm = async () => p.evaluate(() => ({ disp: document.getElementById('timerDisplay').textContent, running: timerRunning, label: document.getElementById('startStopBtn').textContent, sym: document.getElementById('startStopBtn').dataset.sym, dur: timerDuration }));
     await p.click('.timer-controls .btn-add'); await p.waitForTimeout(150);
     const plus = await tm();
@@ -196,7 +196,7 @@ const t = H.checker();
     t.check('a paused rest does not count down', (await tm()).disp === paused.disp);
     await p.click('.timer-controls .btn-reset'); await p.waitForTimeout(150);
     const reset = await tm();
-    t.check('Reset puts the full duration back, paused', reset.disp === '1:45' && !reset.running && reset.label === 'Start', JSON.stringify(reset));
+    t.check('Reset puts the own rest back (1:30, whatever +15s did), paused (Love All B26)', reset.disp === '1:30' && reset.dur === 90 && !reset.running && reset.label === 'Start', JSON.stringify(reset));
     await p.click('#startStopBtn'); await p.waitForTimeout(150);
     const again = await tm();
     t.check('Start runs it again', again.running && again.label === 'Pause' && again.sym === 'pause', JSON.stringify(again));
