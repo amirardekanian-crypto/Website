@@ -3936,6 +3936,8 @@
   :where(#day-view) .send-session-status { min-height: 0; text-align: left; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--grey); }
   :where(#day-view) .send-session-status.success { color: var(--green-ink); }
   :where(#day-view) .send-session-status.pending { color: var(--clay-ink); }
+  /* the demo's "Apply to get yours" link: the app's own link look (as the sign-in help's), not the browser's blue */
+  .send-session-status a { color: var(--green-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
   :where(#day-view) .send-retry { min-height: 44px; }
   :where(#day-view) .send-session-btn { min-width: 0; min-height: 44px; padding: 0 18px; border: 0; border-radius: 8px; background: var(--btn); color: #fff;
     font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
