@@ -9102,7 +9102,8 @@ function weekDoneDays() {
   (HIST || []).forEach(s => {
     if (s.date >= win.from && s.date <= win.to && ids.indexOf(String(s.day)) >= 0) done.add(String(s.day));
   });
-  ids.forEach(id => { if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) done.add(id); });
+  // A finish stamp counts on the date it was stamped, as sessionDateFor() files it, never on today's (Love All B8).
+  ids.forEach(id => { if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) { const on = sessionDateFor(id); if (on >= win.from && on <= win.to) done.add(id); } });
   return done;
 }
 // ── AN UNFINISHED DAY IS FILED BY ITSELF (DATA-02; Amir, 2026-10-12: "i dont want any info or log to be lost") ──
@@ -9319,7 +9320,8 @@ function cycleProgress() {
   const ids = ((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id));
   const rows = (HIST || []).filter(x => x.date >= from && x.date <= to && ids.indexOf(String(x.day)) >= 0);
   const seen = new Set(rows.map(x => x.date + '|' + x.day));
-  if (!wk.after) ids.forEach(id => { if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) seen.add(today + '|' + id); });
+  // A finish stamp counts on the date it was stamped (sessionDateFor), the same key the server's row has, so it is one session (Love All B8).
+  if (!wk.after) ids.forEach(id => { if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) { const on = sessionDateFor(id); if (on >= from && on <= to) seen.add(on + '|' + id); } });
   return { cur, cIdx, count: cycles.length, wk, done: seen.size, planned: ids.length * wk.total, wins: cycleWins(rows), over: wk.after ? cycleOver() : null };
 }
 // ── WHEN THE CYCLE IS OVER (PROG-02, Amir 2026-10-10: "go with B") ──────────────
