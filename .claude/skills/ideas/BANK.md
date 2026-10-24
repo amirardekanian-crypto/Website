@@ -272,21 +272,21 @@ Affiliates tab already counts codes from the intake form and has an `athlete_id`
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 55 | Player Page | Every name in Crew opens that person's page from existing data: cycle picture as cover, level ring, plain sport, with Amir since, the four numbers, achievements, honours, this week's posts; only what their switches allow | — | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 56 | Your Face | One photo per person, everywhere a name sits and in coach.html; reuses Highlight Reel's picker; ~20 KB on the server | — | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 57 | Plays | ATP-style chips (hand, backhand, padel side, club or city, an optional Instagram handle) + one "Working on" line; "Trains for" for fitness clients; handedness feeds /program-design | 55 | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 58 | Cycle Grid | The cycle as W1-W5 rows, trained days filled, a held week a full row, "8 of 15" = the plan's own target (was "Season Calendar", a month view, changed after Ladder's RELOAD grid) | 55 | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 59 | Well Played | A cheer to a person (not a post) with an optional 100-character word, rings their phone, 7 days on their page, cheers-this-season count; Amir can send one as Coach; no private messages | 55 | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 60 | Signed Ball | Names of who liked an achievement's Bell line kept on the achievement past the 7-day sweep | 55 | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
+| 55 | Player Page | Every name in Crew opens that person's page from existing data: cycle picture as cover, level ring, plain sport, with Amir since, the four numbers, achievements, honours, this week's posts; only what their switches allow | — | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
+| 56 | Your Face | One photo per person, everywhere a name sits and in coach.html; reuses Highlight Reel's picker; ~20 KB on the server | — | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
+| 57 | Plays | ATP-style chips (hand, backhand, padel side, club or city, an optional Instagram handle) + one "Working on" line; "Trains for" for fitness clients; handedness feeds /program-design | 55 | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
+| 58 | Cycle Grid | The cycle as W1-W5 rows, trained days filled, a held week a full row, "8 of 15" = the plan's own target (was "Season Calendar", a month view, changed after Ladder's RELOAD grid) | 55 | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
+| 59 | Well Played | A cheer to a person (not a post) with an optional 100-character word, rings their phone, 7 days on their page, cheers-this-season count; Amir can send one as Coach; no private messages | 55 | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
+| 60 | Signed Ball | Names of who liked an achievement's Bell line kept on the achievement past the 7-day sweep | 55 | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
 | 61 | Doubles | A monthly partner: both pages, "held the week together", "one to go"; STEP UP says expect little | 55 | **rejected** 2026-10-24 by Amir ("cut idea 61") |
-| 62 | Your Page Is Ready | The join question and Home's one-time invitation show the athlete their own page first; coach.html lists who trains and is not in the crew | 55 | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 63 | Player Card | The page as an Instagram share card, optional invite code | 55, 56 | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 64 | Call Out | @mentions in replies ring the person; one push change with #54 Reply Rings | 54 | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 65 | The Lineup | Bigger crew faces in the week band, a ring only for a held week (nobody shown behind), double-tap = Well Played, tap = page | 56, 59 | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 66 | Proof Stamp | A post's photo stamped from `crew_posts.session` (session name, minutes, week mark, date, AA mark); one image when shared out | — | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 67 | The Open Wall | The Monthly Open as a wall of confirmed entries (face + result); photos kept for the Open's month need Amir's yes | an Open | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 68 | First Serve | A new athlete's first two weeks as a short list with a ring (first session, check-in, photo, join the crew, reminders last) in the invitation's Home slot | 56, 62 | **picked** 2026-10-24 ("get ready to build the rest"), plan per step first |
-| 69 | Bring a Partner | An athlete gets an affiliate code (affiliates row with `athlete_id`) shown on their page; friend's intake form counts it; the athlete's reward is Amir's call | — | **picked** 2026-10-24: the friend gets 10% and the member gets 10% (Amir), plan per step first |
+| 62 | Your Page Is Ready | The join question and Home's one-time invitation show the athlete their own page first; coach.html lists who trains and is not in the crew | 55 | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
+| 63 | Player Card | The page as an Instagram share card, optional invite code | 55, 56 | **built** 2026-10-24 and LIVE (stage96, sw.js v223): a door to the existing player card |
+| 64 | Call Out | @mentions in replies ring the person; one push change with #54 Reply Rings | 54 | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
+| 65 | The Lineup | Bigger crew faces in the week band, a ring only for a held week (nobody shown behind), double-tap = Well Played, tap = page | 56, 59 | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
+| 66 | Proof Stamp | A post's photo stamped from `crew_posts.session` (session name, minutes, week mark, date, AA mark); one image when shared out | — | **built** 2026-10-24 and LIVE (stage96, sw.js v223): the stamp on Bell photo posts; the session card existed |
+| 67 | The Open Wall | The Monthly Open as a wall of confirmed entries (face + result); photos kept for the Open's month need Amir's yes | an Open | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
+| 68 | First Serve | A new athlete's first two weeks as a short list with a ring (first session, check-in, photo, join the crew, reminders last) in the invitation's Home slot | 56, 62 | **built** 2026-10-24 and LIVE (stage96, sw.js v223) |
+| 69 | Bring a Partner | An athlete gets an affiliate code (affiliates row with `athlete_id`) shown on their page; friend's intake form counts it; the athlete's reward is Amir's call | — | **built** 2026-10-24 and LIVE (stage97, sw.js v223): friend 10%, member 10% off one cycle per friend (two friends = the next two cycles, Amir) |
 
 **Build plan, 2026-10-24** (Amir: *"get ready to build the rest / first for each step, we want to plan"*):
 https://claude.ai/artifact/X5L2WMkayoxx8eioc85SJV. Eleven steps, three directions each, picks A A A B B A A B A A A (step 0 = a
@@ -294,7 +294,7 @@ https://claude.ai/artifact/X5L2WMkayoxx8eioc85SJV. Eleven steps, three direction
 reports and the mockup fragments: `C:\Users\Amir\AA-Lounge\`. Corrections found while planning: **63 Player Card already exists**
 (`TPL.player` in sharecard.js, "Your card", since 19 Oct), so 63 is a door to it from the page; **66's session card with a photo
 exists** (`TPL.session`), so 66 is the stamp drawn on Bell photo posts; **comebacks are on the Bell's never list**, so another
-person's page shows three numbers + cheers. Grown idea: **70 New Balls** (a new member's face says NEW for 7 days, the page says "Joined
+person's page shows three numbers + cheers. Grown idea: **70 New Balls**, **built and LIVE 2026-10-24** with step 3 ("i like new balls idea, you can add it") (a new member's face says NEW for 7 days, the page says "Joined
 this week. Say hello."), ships with step 3, pitched.
 
 Cut in the same round (listed so they are not re-pitched): private messages (SEND MESSAGE), calories and minutes rings, Favorites
