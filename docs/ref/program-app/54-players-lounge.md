@@ -148,6 +148,22 @@ or none. The crew sees what is on the card (there is no switch for it), which th
 | `plGamePick` / `plGameSave` / `plGameSet` / `plGameFlush` | one chip · one field (Instagram checked first) · shown at once · the one call at a time (latest wins, `_gameOk` is the card put back). |
 | `playerSportLine(p)` | the line under the name. |
 
-**Tests.** `lounge.js` sections 16 and 17: the segments, held, the dots and +N, now, the week sheets (yours with names and minutes, theirs with neither, even if the server sent them), weeks before
-joining, no cycle no block, 320 px; the rows for each sport, the chips, one call at a time, a refusal and no signal, Instagram checked, a field kept while a redraw waits, under 13, the
-programme's sport badge never on a page.
+## Step 6 · Signatures as a Face Stack (idea 60, direction B)
+
+**What.** An achievement row shows up to three small faces (24 px, 6 px over each other) of the crew members whose like is on that moment, and **+N** for the rest, with the date on the right; a tap opens
+**Cheered by** with every name sent (each a door to that person; Amir is **Coach**; *and 3 more* when the server counted more than it sent). A row nobody signed has no stack and is not a button; *Tap an
+achievement to see every cheer.* sits under the list. The same rows are in the *All n* sheet, and a name list opened from there goes ‹ Back to it. The first time you like a Bell line that holds an
+achievement, after the server took it, one toast: *Your name stays on Sara's achievement while your like is on it.* (`<id>_signnote`, said once on this phone, never synced, nothing on a server without
+stage96). Four Courts' rows are NOT changed: they are the catalogue's rows (a caption and a date, no person), and your own signatures are on your own page.
+
+**Why.** Amir: *"for signed ball, i like face stack a bit more"*. Social actions pay nothing (GAME-6).
+
+| function | job |
+|---|---|
+| `playerAchRow(a, key)` / `plSigners` / `plSignPerson` | the row, its stack, who is on it. |
+| `openPlayerSigners(key, aid)` / `plSignerGo(ck)` | **Cheered by** · a name opens that page. |
+| `crewSignNote(it)` | the one-time note, called by `crewLike()` after a like the server took. |
+
+**Tests.** `lounge.js` sections 16 to 19: the segments, held, the dots and +N, now, the week sheets (yours with names and minutes, theirs with neither, even if the server sent them), weeks before joining, 320 px;
+the rows for each sport, the chips, one call at a time, a refusal and no signal, Instagram checked, a field kept while a redraw waits, under 13, the badge never on a page; the stacks (2, 5 with +2, none,
+the fourth with +5), the sheet, a door, the note once, never on a take-back, a failed like or a server without stage96; the pictures. `sync-integrity.js` 7c: the note is never synced.
