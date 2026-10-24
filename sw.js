@@ -477,7 +477,12 @@
 // Your numbers. Guided and the lower-day banner follow today's targets. LAST reads the server's history. Body weight shows one
 // change. Dates are day first. A note with a button stays until tapped, the weight check says Keep it or Fix it, and the
 // install card is a layer that never sits over a day.
-const CACHE = 'aap-v221';
+// v222: program.html changed (2026-10-24, Love All round 4). No light flash on a dark phone. How the app works leads the Coach
+// tab. The demo offers Day 1 first. The last cycle names no cycle after it, lift names are not cut mid-word, a card's Day is
+// the day's own number, Welcome opens the Next up day, the chip row shows its last chip. A timed hold counts in its circle,
+// a step count can be typed, dumbbell lifts say kg / hand, circuit movements have their i, Before you start is one row, and
+// no text is under 12 px.
+const CACHE = 'aap-v222';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
