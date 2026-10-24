@@ -6,6 +6,10 @@
 // first and with no signal it is all there is; the join question shows your own page first; "Your page is here" once, for members who were already
 // in; a server without stage96 keeps today's Crew exactly; under 13 gets no doors; 320 px and dark mode. Later steps of the Lounge add their checks
 // to THIS file, in their own numbered section. Made-up people only. The stub answers crew_page by name (stub.js).
+//
+// Step 2: Faces (Ring Faces). A photo wherever a name sits and the letters until there is one: asked 12 to a call, one call in flight, only what is on or near the
+// screen, kept in Cache Storage "crew-faces-v1", a new version replacing the old, gone with a person who leaves; Your photo (choose, move, pinch, zoom, Save, Remove);
+// who may and who may not. Section 13.
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
 const H = require('./lib');
@@ -612,6 +616,219 @@ const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); a
       await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(200);
     }
     await ctx.close();
+  }
+
+  // ── 13. Step 2 · Faces (Ring Faces): a photo wherever a name sits, the letters until there is one ─────────────────────────────────
+  const faceKeys = p => p.evaluate(() => (window.__STUB.params || []).filter(x => x[0] === 'crew_faces_get').map(x => x[1].p_keys));
+  const cacheKeys = p => p.evaluate(async () => { try { const c = await caches.open('crew-faces-v1'); return (await c.keys()).map(r => new URL(r.url).pathname.replace('/__crew-face/', '')).sort(); } catch (e) { return null; } });
+  // real little JPEGs, one colour each, handed to the stub the way crew_faces_get answers them
+  const putFaces = (p, list) => p.evaluate(rows => {
+    const out = {};
+    rows.forEach(([k, color, fv]) => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); x.fillStyle = color; x.fillRect(0, 0, 64, 64); out[k] = { fv, b64: c.toDataURL('image/jpeg', 0.8).split(',')[1] }; });
+    window.__STUB.faces = Object.assign(window.__STUB.faces || {}, out);
+  }, list);
+  const picOf = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); const im = e && e.querySelector(':scope > img.fc-img'); return e ? { img: !!im, src: im ? im.getAttribute('src') : null, text: e.textContent.trim(), loaded: !!im && im.complete && im.naturalWidth > 0 } : null; }, sel);
+  const withFaces = (fvs) => {
+    const b = bell();
+    b.crew.forEach(c => { if (c.ck in fvs) c.fv = fvs[c.ck]; });
+    if (CK.alex in fvs) b.me.fv = fvs[CK.alex];
+    b.items.forEach(i => { if (i.ck in fvs) i.fv = fvs[i.ck]; });
+    b.items[0].replies.forEach(r => { if (r.ck in fvs) r.fv = fvs[r.ck]; });
+    b.items.forEach(i => { if (i.t === 'line' && i.key && i.key.split(':')[0] in fvs) i.fv = fvs[i.key.split(':')[0]]; });
+    return b;
+  };
+  {
+    const fvs = { [CK.alex]: 1001, [CK.mina]: 1002, [CK.reza]: 1003, [CK.ali1]: 1004, [CK.leila]: 1005 };
+    const brd = board().map(r => (r.ck in fvs ? { ...r, fv: fvs[r.ck] } : r));
+    const a = await open(browser, { stub: { bell: withFaces(fvs), crewBoard: brd } });
+    await putFaces(a.p, [[CK.alex, '#C7552F', 1001], [CK.mina, '#2E7D5B', 1002], [CK.reza, '#2A5C8A', 1003], [CK.ali1, '#6B4A8C', 1004], [CK.leila, '#8A8A8A', 1005]]);
+    await goCrew(a.p); await a.p.waitForTimeout(1400);
+    const f = await a.p.evaluate(() => {
+      const has = s => { const e = document.querySelector(s); return !!(e && e.querySelector(':scope > img.fc-img')); };
+      return {
+        post: has('.cr-post[data-id="bbbbbbbb-0000-4000-8000-000000000001"] .cr-ini'), postAli: has('.cr-post[data-id="66666666-7777-8888-9999-000000000000"] .cr-ini'),
+        own: has('.cr-post[data-id="cccccccc-0000-4000-8000-000000000001"] .cr-ini'), composer: has('.cr-comp .cr-ini'),
+        reply: has('.cr-rep .cr-ini[data-fc]'), line: has('.cr-line .cr-fl'), band: document.querySelectorAll('.cr-faces .cr-face img.fc-img').length,
+        amirPost: (document.querySelector('.cr-post.amir .cr-ini img.fc-img') || {}).src || '', board: document.querySelectorAll('#crew-board .cr-fl img.fc-img').length,
+        account: !!document.querySelector('#global-account > img.fc-img'),
+        initials: [...document.querySelectorAll('.cr-faces .cr-face')].filter(e => !e.querySelector('img.fc-img')).map(e => e.textContent.trim()).join(','),
+      };
+    });
+    C.check('faces draw where a name sits: a post, your own post, the composer, a reply, a Bell line, the band', f.post && f.postAli && f.own && f.composer && f.reply && f.line && f.band === 5, JSON.stringify(f));
+    C.check('…the board rows (a face before the name) and the account button wear it too', f.board === 3 && f.account, JSON.stringify([f.board, f.account]));
+    C.check('…Amir\'s is his own photo, as on the week note', /assets\/img\/coach\.jpg$/.test(f.amirPost), f.amirPost);
+    C.check('…a person with no picture is the letters, as today (the second Ali B. and the +2 on the band)', /AB,\+2/.test(f.initials), f.initials);
+    C.check('…the pictures really opened (they are real JPEGs, not broken)', (await picOf(a.p, '.cr-post[data-id="bbbbbbbb-0000-4000-8000-000000000001"] .cr-ini')).loaded);
+    const k1 = await faceKeys(a.p);
+    C.check('ONE batched call asks for all five faces, each key once, yours included', k1.length === 1 && k1[0].length === 5 && new Set(k1[0]).size === 5 && k1[0].includes(CK.alex), JSON.stringify(k1));
+    const ck1 = await cacheKeys(a.p);
+    C.check('…they are kept in Cache Storage "crew-faces-v1" under <ck>-<fv>, not in the photos cache', ck1 && ck1.length === 5 && ck1.includes(CK.mina + '-1002') && !(await a.p.evaluate(async () => { const c = await caches.open('crew-photos-v1'); return (await c.keys()).some(r => /crew-face/.test(r.url)); })), JSON.stringify(ck1));
+    await a.p.evaluate(() => { goTo('home'); goTo('crew'); }); await a.p.waitForTimeout(700);
+    C.check('…a second visit asks for nothing', (await faceKeys(a.p)).length === 1);
+    // a new visit of the app: the faces come from the phone, not the line
+    await a.p.reload({ waitUntil: 'domcontentloaded' });
+    await a.p.waitForFunction(() => document.getElementById('loading') && document.getElementById('loading').classList.contains('hidden'), null, { timeout: 20000 });
+    await goCrew(a.p); await a.p.waitForTimeout(1200);
+    C.check('a new visit draws the faces from Cache Storage and asks the server for none', (await faceKeys(a.p)).length === 0 && (await picOf(a.p, '.cr-post[data-id="bbbbbbbb-0000-4000-8000-000000000001"] .cr-ini')).img);
+    C.check('…the account button wears your face on any tab', await (async () => { await a.p.evaluate(() => goTo('home')); await a.p.waitForTimeout(500); return a.p.evaluate(() => !!document.querySelector('#global-account > img.fc-img')); })());
+    // a new fv replaces the old cache key and the picture
+    await a.p.evaluate(() => goTo('crew'));
+    await putFaces(a.p, [[CK.mina, '#B07A2A', 2002]]);   // (a colour for the new one; never gold on screen: it is only a test picture)
+    await a.p.evaluate(ck => { const B = window.__STUB.bell; B.crew.find(c => c.ck === ck).fv = 2002; B.items.forEach(i => { if (i.ck === ck) i.fv = 2002; }); B.items[0].replies.forEach(r => { if (r.ck === ck) r.fv = 2002; }); _bellAt = 0; return refreshBell(); }, CK.mina);
+    await a.p.waitForTimeout(1500);
+    const ck2 = await cacheKeys(a.p), srcAfter = (await picOf(a.p, '.cr-post[data-id="bbbbbbbb-0000-4000-8000-000000000001"] .cr-ini')).src;
+    C.check('Mina changes her photo (a new fv): the old key leaves the cache and the new one is asked for once', ck2.includes(CK.mina + '-2002') && !ck2.includes(CK.mina + '-1002') && ck2.length === 5 && (await faceKeys(a.p)).length === 1 && (await faceKeys(a.p))[0].length === 1 && (await faceKeys(a.p))[0][0] === CK.mina, JSON.stringify([ck2, await faceKeys(a.p)]));
+    C.check('…and every face of hers on the screen shows the new picture', (await a.p.evaluate(ck => [...document.querySelectorAll('[data-fc="' + ck + '"]')].every(e => e.dataset.fv === '2002' && !!e.querySelector('img.fc-img')), CK.mina)) && !!srcAfter);
+    C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+  }
+  {
+    // twelve to a call, one call at a time, and only what is on or near the screen
+    const many = []; const fvs = { [CK.alex]: 1 };
+    for (let i = 0; i < 14; i++) { const k = 'f' + String(i).padStart(7, '0') + '-0000-4000-8000-000000000000'; many.push(k); fvs[k] = 10 + i; }
+    const b = bell();
+    many.forEach((k, i) => b.crew.push({ who: 'Member ' + String.fromCharCode(65 + i) + '.', me: false, since: '2026-10-19', ck: k, fv: 10 + i, lv: 3 }));
+    b.me.fv = 1; b.crew[0].fv = 1;
+    const a = await open(browser, { opts: { w: 390, h: 2600 }, stub: { bell: b, faceDelay: 150 } });
+    await putFaces(a.p, [[CK.alex, '#C7552F', 1]].concat(many.map((k, i) => [k, '#2E7D5B', 10 + i])));
+    await waitTab(a.p);
+    await a.p.evaluate(() => goTo('crewwho')); await a.p.waitForTimeout(2500);
+    const ks = await faceKeys(a.p), inflight = await a.p.evaluate(() => window.__STUB.faceMax);
+    const total = ks.reduce((s, x) => s + x.length, 0);
+    C.check('twenty-two faces on In the crew: calls of at most twelve, every key once', ks.length >= 2 && ks.every(x => x.length <= 12) && new Set(ks.flat()).size === total && total === 15, JSON.stringify(ks.map(x => x.length)));
+    C.check('…never two calls at once', inflight === 1, String(inflight));
+    C.check('…and every row ended up with its picture', await a.p.evaluate(() => [...document.querySelectorAll('#crewwho-body .p.ini[data-fc]')].every(e => !!e.querySelector('img.fc-img'))));
+    await a.ctx.close();
+  }
+  {
+    // only the faces on or near the screen are asked for: a person who appears only far down the board waits until it is scrolled to
+    const fvs = { [CK.omid]: 77 };
+    const b = withFaces(fvs);
+    const brd = [{ pos: 1, who: 'Reza K.', points: 6240, level: 22, is_me: false, ck: CK.reza, fv: null }, { pos: 2, who: 'Alex R.', points: 5910, level: 19, is_me: true, ck: CK.alex, fv: null },
+      { pos: 3, who: 'Mina S.', points: 5100, level: 14, is_me: false, ck: CK.mina, fv: null }, { pos: 4, who: 'Sara T.', points: 4000, level: 12, is_me: false, ck: CK.sara, fv: null },
+      { pos: 5, who: 'Omid P.', points: 100, level: 5, is_me: false, ck: CK.omid, fv: 77 }];
+    const a = await open(browser, { stub: { bell: b, crewBoard: brd } });
+    await putFaces(a.p, [[CK.omid, '#2A5C8A', 77]]);
+    await goCrew(a.p); await a.p.waitForTimeout(1000);
+    const far = await a.p.evaluate(ck => { const e = document.querySelector('#crew-board [data-fc="' + ck + '"]'); return e ? Math.round(e.getBoundingClientRect().top + scrollY) - innerHeight : null; }, CK.omid);
+    const early = (await faceKeys(a.p)).flat();
+    C.check('a face far below the screen is not asked for yet (the board\'s last row, ' + far + ' px past the fold)', far !== null && far > 300 && !early.includes(CK.omid), JSON.stringify([far, early.length]));
+    await a.p.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await a.p.waitForTimeout(1200);
+    C.check('…scrolled to, it is', (await faceKeys(a.p)).flat().includes(CK.omid) && !!(await picOf(a.p, '#crew-board [data-fc="' + CK.omid + '"]')).img);
+    await a.ctx.close();
+  }
+  {
+    // no signal: the letters stay and nothing breaks; the same faces are asked for at the next draw
+    const fvs = { [CK.mina]: 5 };
+    const a = await open(browser, { stub: { bell: withFaces(fvs), mode: 'online' } });
+    await putFaces(a.p, [[CK.mina, '#2E7D5B', 5]]);
+    await a.p.evaluate(() => { window.__STUB.stall = { crew_faces_get: true }; });
+    await goCrew(a.p); await a.p.waitForTimeout(500);
+    C.check('a face that has not come (the line is slow): the letters, exactly as today', (await picOf(a.p, '.cr-post[data-id="bbbbbbbb-0000-4000-8000-000000000001"] .cr-ini')).text === 'MS');
+    await a.ctx.close();
+    const m = await open(browser, { stub: { bell: withFaces(fvs), faceMissing: true } });
+    await putFaces(m.p, [[CK.mina, '#2E7D5B', 5]]);
+    await goCrew(m.p); await m.p.waitForTimeout(900);
+    C.check('crew_faces_get missing on the server: the letters, and no page error', (await picOf(m.p, '.cr-post[data-id="bbbbbbbb-0000-4000-8000-000000000001"] .cr-ini')).text === 'MS' && !m.p.errs.length, m.p.errs.join('|'));
+    await m.ctx.close();
+  }
+  {
+    // without stage96 (no flag) a face is the letters on every surface and nothing is asked
+    const a = await open(browser, { b: { noPages: true } });
+    await goCrew(a.p); await a.p.waitForTimeout(500);
+    C.check('without stage96: no face data on any face, Amir\'s post stays AA, nothing asked', await a.p.evaluate(() => !document.querySelector('[data-fc], img.fc-img') && /^AA$/.test(document.querySelector('.cr-post.amir .cr-ini').textContent.trim())) && (await faceKeys(a.p)).length === 0);
+    await a.ctx.close();
+  }
+  {
+    // your photo: choose, move, pinch, zoom, save; Remove; who may and who may not
+    const mkPhoto = (p, w, h) => p.evaluate(async ([W, H]) => {
+      const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+      const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#8FA6B2'); g.addColorStop(0.5, '#C98E6A'); g.addColorStop(1, '#2A2F2B'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+      x.fillStyle = 'rgba(255,255,255,0.4)'; for (let i = 0; i < 40; i++) x.fillRect((i * 211) % W, (i * 97) % H, W / 10, H / 40);
+      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.9));
+      const dt = new DataTransfer(); dt.items.add(new File([blob], 'me.jpg', { type: 'image/jpeg' }));
+      const input = document.getElementById('fp-file'); input.files = dt.files; input.dispatchEvent(new Event('change', { bubbles: true }));
+    }, [w, h]);
+    const a = await open(browser, { stub: { crewPages: { me: { who: 'Alex R.' } } } });
+    await goCrew(a.p);
+    await a.p.evaluate(() => openPlayer('me')); await a.p.waitForTimeout(600);
+    C.check('your page: the face is a button with a camera on it', await a.p.evaluate(() => { const b = document.querySelector('#crewplayer-body .pl-fbtn'); return !!b && !!b.querySelector('.pl-cam svg') && /Add your photo/.test(b.getAttribute('aria-label')); }));
+    await click(a.p, '#crewplayer-body .pl-fbtn'); await a.p.waitForTimeout(400);
+    const s0 = await a.p.evaluate(() => ({ title: (document.querySelector('#hist-overlay .readiness-title') || {}).textContent, save: document.getElementById('fp-save').disabled, rm: document.getElementById('fp-rm').hidden, cv: document.getElementById('fp-cv').hidden, z: document.getElementById('fp-z').hidden }));
+    C.check('the sheet "Your photo": Save waits for a picture, no Remove while there is none, the zoom is hidden', s0.title === 'Your photo' && s0.save && s0.rm && s0.cv && s0.z, JSON.stringify(s0));
+    await mkPhoto(a.p, 3000, 4000); await a.p.waitForTimeout(600);
+    const s1 = await a.p.evaluate(() => ({ save: document.getElementById('fp-save').disabled, cv: document.getElementById('fp-cv').hidden, w: document.getElementById('fp-cv').width, st: facePhotoState() }));
+    C.check('a 12 MP photo is chosen: a 256 px square under the mask, made smaller (1024 on its long side), Save ready', !s1.save && !s1.cv && s1.w === 256 && s1.st.on && s1.st.ih === 1024 && s1.st.iw === 768, JSON.stringify(s1));
+    const mv = await a.p.evaluate(async () => {
+      const fr = document.getElementById('fp-frame'), r = fr.getBoundingClientRect(), z = document.getElementById('fp-z');
+      z.value = '2'; z.dispatchEvent(new Event('input', { bubbles: true }));
+      const ev = (type, x, y, id) => fr.dispatchEvent(new PointerEvent(type, { pointerId: id, clientX: x, clientY: y, bubbles: true, cancelable: true }));
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      ev('pointerdown', cx, cy, 1); ev('pointermove', cx + 30, cy + 40, 1); const drag = facePhotoState().fit; ev('pointerup', cx + 30, cy + 40, 1);
+      ev('pointerdown', cx - 30, cy, 2); ev('pointerdown', cx + 30, cy, 3); ev('pointermove', cx - 90, cy, 2); ev('pointermove', cx + 90, cy, 3); const pinch = facePhotoState().fit;
+      ev('pointermove', cx - 4000, cy, 2); ev('pointermove', cx + 4000, cy, 3); const far = facePhotoState().fit.z;
+      ev('pointerup', cx - 4000, cy, 2); ev('pointerup', cx + 4000, cy, 3);
+      return { drag, pinch, far, slider: z.value };
+    });
+    C.check('one finger moves it, two zoom it, the slider follows, zoom stops at 4', mv.drag.dx > 0 && mv.drag.dy > 0 && mv.pinch.z > 2.5 && mv.far === 4 && Number(mv.slider) === 4, JSON.stringify(mv));
+    await click(a.p, '#fp-save'); await a.p.waitForTimeout(1200);
+    const set = (await calls(a.p, 'crew_face_set'))[0];
+    C.check('Save sends a JPEG, 256 square, at most 60,000 bytes (EXIF gone: it was drawn again)', !!set && set.p_w === 256 && set.p_h === 256 && /^\/9j\//.test(set.p_photo) && Math.floor(set.p_photo.length * 3 / 4) <= 60000, set ? [set.p_w, set.p_h, set.p_photo.length].join() : 'no call');
+    const after = await a.p.evaluate(() => ({ open: document.getElementById('hist-overlay').classList.contains('visible'), fv: crewMe().fv, acct: !!document.querySelector('#global-account > img.fc-img'), pg: !!document.querySelector('#crewplayer-body .pl-face > img.fc-img') }));
+    C.check('…the sheet closes, and the new picture is on your page and on the account button at once', !after.open && after.fv > 0 && after.acct && after.pg, JSON.stringify(after));
+    C.check('…and kept under your own ck-fv in the faces cache', (await cacheKeys(a.p)).some(k => k.startsWith(CK.alex + '-')));
+    // Remove takes two taps
+    await click(a.p, '#crewplayer-body .pl-fbtn'); await a.p.waitForTimeout(400);
+    C.check('with a photo the sheet offers Remove and the picture is the circle\'s own', await a.p.evaluate(() => !document.getElementById('fp-rm').hidden && !!document.querySelector('#fp-cur img.fc-img')));
+    await click(a.p, '#fp-rm'); await a.p.waitForTimeout(250);
+    C.check('Remove asks again before it acts (two taps)', (await calls(a.p, 'crew_face_clear')).length === 0);
+    await click(a.p, '#fp-rm'); await a.p.waitForTimeout(900);
+    const gone = await a.p.evaluate(() => ({ fv: crewMe().fv, acct: !!document.querySelector('#global-account > img.fc-img'), pg: !!document.querySelector('#crewplayer-body .pl-face > img.fc-img'), open: document.getElementById('hist-overlay').classList.contains('visible') }));
+    C.check('…the second tap clears it everywhere: the letters are back and the cache holds none of yours', (await calls(a.p, 'crew_face_clear')).length === 1 && gone.fv === null && !gone.acct && !gone.pg && !gone.open && !(await cacheKeys(a.p)).some(k => k.startsWith(CK.alex + '-')), JSON.stringify(gone));
+    // an error from the server is said in words, and Save comes back
+    await a.p.evaluate(() => { window.__STUB.faceErr = 'crew:photo_bad'; });
+    await click(a.p, '#crewplayer-body .pl-fbtn'); await a.p.waitForTimeout(300);
+    await mkPhoto(a.p, 800, 800); await a.p.waitForTimeout(400); await click(a.p, '#fp-save'); await a.p.waitForTimeout(700);
+    C.check('a refusal is said plainly and Save is ready to try again', await a.p.evaluate(() => /That photo did not work/.test(document.querySelector('#hist-overlay .cr-err').textContent) && !document.getElementById('fp-save').disabled));
+    C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+    // not in the crew: asked to join, never a picker; under 13: no button at all
+    const n = await open(browser, { b: { me: { answer: null, can_post: false } }, stub: { crewPages: { me: { member: false } } } });
+    await waitTab(n.p); await n.p.evaluate(() => openPlayer('me')); await n.p.waitForTimeout(600);
+    await click(n.p, '#crewplayer-body .pl-fbtn'); await n.p.waitForTimeout(300);
+    const t = await toast(n.p);
+    C.check('not in the crew: the face asks you to join and opens no picker', !!t && /Join the crew to add a photo/.test(t.text) && t.action === 'Join the crew' && !(await n.p.$('#fp-frame')), JSON.stringify(t));
+    await n.ctx.close();
+    const u = await open(browser, { b: { me: { answer: 'yes', under13: true, can_post: false } }, stub: { crewPages: { me: {} } } });
+    await waitTab(u.p); await u.p.evaluate(() => openPlayer('me')); await u.p.waitForTimeout(600);
+    const u13 = await u.p.evaluate(() => { openFacePhoto(); return { btn: !!document.querySelector('#crewplayer-body .pl-fbtn'), sheet: !!document.getElementById('fp-frame') }; });
+    C.check('under 13: no camera, and the picker does not open even if called', !u13.btn && !u13.sheet, JSON.stringify(u13));
+    await u.ctx.close();
+  }
+  {
+    // leaving takes every face off the phone
+    const fvs = { [CK.mina]: 5, [CK.alex]: 6 };
+    const a = await open(browser, { stub: { bell: withFaces(fvs) } });
+    await putFaces(a.p, [[CK.mina, '#2E7D5B', 5], [CK.alex, '#C7552F', 6]]);
+    await goCrew(a.p); await a.p.waitForTimeout(1200);
+    const had = (await cacheKeys(a.p)).length;
+    await a.p.evaluate(ckk => { window.__STUB.bell.crew = window.__STUB.bell.crew.filter(c => c.ck !== ckk); _bellAt = 0; return refreshBell(); }, CK.mina);
+    await a.p.waitForTimeout(900);
+    C.check('someone leaves the crew: their face leaves the phone (the cache and the picture), yours stays', had === 2 && JSON.stringify(await cacheKeys(a.p)) === JSON.stringify([CK.alex + '-6']) && await a.p.evaluate(ck => !CREW_FACES.has(ck), CK.mina));
+    await a.p.evaluate(() => crewAnswer('no')); await a.p.waitForTimeout(1200);
+    C.check('you leave: your own face is gone from the phone and the account button (the server took it too)', !((await cacheKeys(a.p)) || []).some(k => k.startsWith(CK.alex + '-')) && await a.p.evaluate(ck => !CREW_FACES.has(ck) && !document.querySelector('#global-account > img.fc-img') && crewMe().fv === null, CK.alex));
+    await a.ctx.close();
+  }
+  {
+    // the faces never sync
+    const fvs = { [CK.mina]: 5 };
+    const a = await open(browser, { stub: { bell: withFaces(fvs) } });
+    await putFaces(a.p, [[CK.mina, '#2E7D5B', 5]]);
+    await goCrew(a.p); await a.p.waitForTimeout(1000);
+    await a.p.evaluate(() => _pushSnapshot(true)); await a.p.waitForTimeout(300);
+    const snap = await a.p.evaluate(() => JSON.stringify(_snapshot()).length > 0 && !/crew-face|__crew-face/.test(JSON.stringify(_snapshot())) && Object.keys(localStorage).filter(k => /face/i.test(k)).length === 0);
+    C.check('faces are in Cache Storage only: no localStorage key, nothing in the progress snapshot', snap);
+    await a.ctx.close();
   }
 
   await browser.close();

@@ -5705,6 +5705,35 @@
   #screen-crew .cr-mini b { display: block; font: 600 var(--fs-body)/1.25 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
   #screen-crew .cr-mini small { display: block; margin-top: 1px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   #screen-crew .cr-mini small:empty { display: none; }
+
+  /* PLAYERS' LOUNGE · FACES (step 2, 2026-10-24). A face is the two letters with a picture laid over them; the picture is one absolute <img> (.fc-img), so
+     a face with no picture, or a picture that fails to open, is exactly today's look. The line face (24 px) sits where a Bell line's bell was and
+     in front of a board row's name. Amir's own is his photo (coach.jpg), as on the week note. */
+  .fc-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+  .cr-ini, .pl-face, #screen-crewwho .cr-br .p.ini, .cr-fl, #screen-crew .cr-faces .cr-face { position: relative; }
+  .cr-fl { flex: none; display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--tint); color: var(--green-ink);
+    font: 700 var(--fs-label)/1 'Barlow', sans-serif; }
+  #screen-crew .cr-line .cr-fl { align-self: flex-start; margin-top: 1px; }
+  :where(#screen-crew, #screen-crewboard) .cr-br .n.wf { display: flex; align-items: center; gap: 8px; }
+  :where(#screen-crew, #screen-crewboard) .cr-br .n.wf .nt { min-width: 0; overflow-wrap: anywhere; }
+  .pl-fbtn { position: relative; display: block; width: 88px; height: 88px; border-radius: 50%; }
+  .pl-cam { position: absolute; left: -2px; bottom: 0; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--btn); color: var(--on-accent);
+    box-shadow: 0 0 0 3px var(--paper); }
+  .pl-cam svg { width: 15px; height: 15px; display: block; }
+  /* the photo sheet: a square frame under a round mask; the picture is moved with a finger inside it */
+  #hist-overlay .fp-frame { position: relative; width: min(224px, 62vw); aspect-ratio: 1; margin: 16px auto 0; border: 2px dashed var(--field); border-radius: 50%; overflow: hidden;
+    background: var(--tint); touch-action: none; }
+  #hist-overlay .fp-frame canvas { display: block; width: 100%; height: 100%; }
+  #hist-overlay .fp-frame canvas[hidden] { display: none; }
+  #hist-overlay .fp-cur { position: absolute; inset: 0; display: grid; place-items: center; color: var(--green-ink);
+    font: 900 var(--fs-display)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; text-transform: uppercase; }
+  #hist-overlay .fp-cur[hidden] { display: none; }
+  #hist-overlay .fp-help { margin: 10px 0 0; text-align: center; font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--grey); }
+  #hist-overlay #fp-z { display: block; width: 100%; margin: 12px 0 0; accent-color: var(--green-ink); }
+  #hist-overlay #fp-z[hidden] { display: none; }
+  #hist-overlay .fp-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #hist-overlay .fp-rm { background: transparent; color: var(--green-ink); border: 1.5px solid var(--field); }
+  #hist-overlay .fp-rm[hidden] { display: none; }
   /* Tell the crew, on the finished card, under the WhatsApp row (paintCrewTell()) */
   :where(#day-view) .complete-crew, :where(#day-view) .complete-share { margin-top: 10px; }
   :where(#day-view) .complete-crew[hidden], :where(#day-view) .complete-share[hidden] { display: none; }
@@ -11093,7 +11122,7 @@ APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how ofte
     body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
-  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p>`;
+  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p>`;
   const crewLi = '<li><strong>Crew</strong> is the crew: the Bell (posts, photos and the moments that ring, with likes), last month\'s honours early in the month, and the season board.</li>';
   return APP_GUIDE.filter(card => !card.when || card.when()).map(card => `
     <div class="note-card app-card${openKey && card.key === openKey ? ' open' : ''}" onclick="toggleNote(this)">
@@ -13468,6 +13497,147 @@ async function crewSweepPhotos() {
     for (const req of keys) { if (!keep.has(new URL(req.url).pathname)) await c.delete(req); }
   } catch (e) { /* nothing to sweep */ }
 }
+// ── PLAYERS' LOUNGE · FACES (step 2, 2026-10-24) ─────────────────────────────────────────────────────────────────────────────
+// Amir, 2026-10-24: "go with your picks": direction A, Ring Faces. A photo in a circle wherever a name sits, and the two letters (today's look) until
+// there is one. crewFace() is the only place a face is DRAWN; this is where a picture COMES FROM. A face is about 15 KB, so it is never in get_bell()
+// (which sends only `fv`, its version stamp). It is asked for once per version, 12 at a time with ONE call in flight, only for the faces on or near the
+// screen, and kept on the phone in Cache Storage under a name of its own: `crew-faces-v1`, never `crew-photos-v1`, whose sweep empties everything that
+// is not a post photo. Other people's faces are never synced, and leaving the crew takes every face off the phone.
+const CREW_FACE_CACHE = 'crew-faces-v1';
+const CREW_FACES = new Map();                       // ck → { fv, url }: the newest picture this visit holds for that person (an object URL)
+const _faceWant = new Map(), _faceTried = {};       // ck → the version wanted · ck → the version already asked for this visit (a face that is not there is not asked twice)
+let _faceBusy = false, _faceIO = null, _faceT = null, _faceMissing = false;   // _faceMissing: this server has no crew_faces_get, so the letters stay and nothing is asked
+const crewFaceKey = (ck, fv) => '/__crew-face/' + encodeURIComponent(ck) + '-' + fv;
+async function crewFaceStore() { try { return window.caches ? await caches.open(CREW_FACE_CACHE) : null; } catch (e) { return null; } }
+async function crewFaceSaved(ck, fv) {
+  try { const c = await crewFaceStore(); if (!c) return null; const r = await c.match(crewFaceKey(ck, fv)); return r ? await r.blob() : null; } catch (e) { return null; }
+}
+// A newer version of a face replaces the older one in the cache: a person who changes their photo leaves nothing old on the phone.
+async function crewFaceKeep(ck, fv, blob) {
+  try {
+    const c = await crewFaceStore();
+    if (!c) return;
+    const mine = '/__crew-face/' + encodeURIComponent(ck) + '-', now = crewFaceKey(ck, fv);
+    for (const req of await c.keys()) { const path = new URL(req.url).pathname; if (path.indexOf(mine) === 0 && path !== now) await c.delete(req); }
+    await c.put(now, new Response(blob, { headers: { 'Content-Type': 'image/jpeg' } }));
+  } catch (e) { /* no room: it is asked for again */ }
+}
+async function crewFaceDrop(ck) {
+  const h = CREW_FACES.get(ck);
+  if (h) { try { URL.revokeObjectURL(h.url); } catch (e) {} CREW_FACES.delete(ck); }
+  delete _faceTried[ck];
+  try {
+    const c = await crewFaceStore();
+    if (!c) return;
+    const mine = '/__crew-face/' + encodeURIComponent(ck) + '-';
+    for (const req of await c.keys()) { if (new URL(req.url).pathname.indexOf(mine) === 0) await c.delete(req); }
+  } catch (e) {}
+}
+// Everyone the crew no longer lists takes their face off the phone with them ("leaving means gone"). You are always kept.
+async function crewFacesSweep() {
+  if (!BELL || !Array.isArray(BELL.crew) || !BELL.crew.length) return;
+  const keep = new Set(BELL.crew.map(c => c && c.ck).filter(Boolean));
+  if (crewMe().ck) keep.add(crewMe().ck);
+  for (const k of [...CREW_FACES.keys()]) if (!keep.has(k)) await crewFaceDrop(k);
+  try {
+    const c = await crewFaceStore();
+    if (!c) return;
+    for (const req of await c.keys()) {
+      const rest = new URL(req.url).pathname.replace('/__crew-face/', ''), ck = rest.slice(0, rest.lastIndexOf('-'));
+      if (!keep.has(decodeURIComponent(ck))) await c.delete(req);
+    }
+  } catch (e) {}
+}
+// You left the crew: no face of anyone is left on the phone, yours included (it is gone from the server too).
+function crewFacesClear() {
+  CREW_FACES.forEach(h => { try { URL.revokeObjectURL(h.url); } catch (e) {} });
+  CREW_FACES.clear(); _faceWant.clear();
+  Object.keys(_faceTried).forEach(k => delete _faceTried[k]);
+  try { if (window.caches) caches.delete(CREW_FACE_CACHE); } catch (e) {}
+  try { syncDarkToggle(); } catch (e) {}   // the account button goes back to your initials
+}
+function crewB64Blob(b64) {
+  try { const bin = atob(String(b64)), a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return new Blob([a], { type: 'image/jpeg' }); } catch (e) { return null; }
+}
+// What goes INSIDE a face: the picture over the two letters. The letters stay underneath, so a picture that has not come yet (or never will, or
+// fails to open) is today's look. Amir's is his own photo, as on the week note. Nothing is drawn before the server speaks stage96, so a server
+// without it keeps the letters on every face.
+function crewFaceImg(p) {
+  if (!crewPagesOn()) return '';
+  if (p.amir) return '<img class="fc-img" src="assets/img/coach.jpg" alt="" onerror="this.remove()">';
+  const h = p.ck && p.fv != null ? CREW_FACES.get(p.ck) : null;
+  return h ? `<img class="fc-img" alt="" decoding="async" src="${esc(h.url)}" onerror="this.remove()">` : '';
+}
+// A face that has a picture to fetch says whose and which version: crewWireFaces() reads this.
+function crewFaceData(p) { return crewPagesOn() && !p.amir && p.ck && p.fv != null ? ` data-fc="${esc(p.ck)}" data-fv="${Number(p.fv)}"` : ''; }
+// The picture arrived: every face of that person on the screen takes it, and the account button too when it is yours.
+function crewFaceShow(ck, fv, blob) {
+  const old = CREW_FACES.get(ck), url = URL.createObjectURL(blob);
+  CREW_FACES.set(ck, { fv: Number(fv), url });
+  document.querySelectorAll('[data-fc]').forEach(el => {
+    if (el.dataset.fc !== ck) return;
+    let im = el.querySelector(':scope > img.fc-img');
+    if (!im) { im = document.createElement('img'); im.className = 'fc-img'; im.alt = ''; im.decoding = 'async'; im.onerror = () => im.remove(); el.appendChild(im); }
+    im.src = url; el.dataset.fv = String(Number(fv));
+  });
+  if (old && old.url !== url) { try { URL.revokeObjectURL(old.url); } catch (e) {} }
+  if (crewMe().ck === ck) { try { syncDarkToggle(); } catch (e) {} }
+}
+const crewFaceNeeds = (ck, fv) => { const h = CREW_FACES.get(ck); return !(h && h.fv === Number(fv)); };
+// Ask for a face the screen is showing. Asks made in the same breath become one call (the timer), twelve to a call.
+function crewFaceAsk(ck, fv) {
+  fv = Number(fv);
+  if (_faceMissing || !ck || !isFinite(fv) || !crewFaceNeeds(ck, fv) || _faceTried[ck] === fv) return;
+  _faceWant.set(ck, fv);
+  clearTimeout(_faceT); _faceT = setTimeout(crewFacePump, 80);
+}
+async function crewFacePump() {
+  if (_faceBusy) { _faceT = setTimeout(crewFacePump, 400); return; }
+  _faceBusy = true;
+  try {
+    while (_faceWant.size) {
+      const batch = [..._faceWant.entries()].slice(0, 12);
+      batch.forEach(([k]) => _faceWant.delete(k));
+      const need = [];
+      for (const [k, v] of batch) {
+        _faceTried[k] = v;
+        const blob = await crewFaceSaved(k, v);   // already on the phone: nothing is downloaded
+        if (blob) crewFaceShow(k, v, blob); else need.push(k);
+      }
+      if (!need.length) continue;
+      let r = null;
+      try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_faces_get', { p_keys: need }), 15000); } catch (e) { r = null; }
+      if (r && r.error && crewMissingErr(r)) { _faceMissing = true; _faceWant.clear(); break; }
+      if (!r || _noAnswer(r) || r.error || !Array.isArray(r.data)) { need.forEach(k => { delete _faceTried[k]; }); break; }   // no signal: the letters stay, asked again at the next draw
+      for (const row of r.data) {
+        if (!row || !row.ck || !row.b64) continue;
+        const blob = crewB64Blob(row.b64);
+        if (!blob) continue;
+        await crewFaceKeep(row.ck, row.fv, blob);
+        _faceTried[row.ck] = Number(row.fv);
+        crewFaceShow(row.ck, row.fv, blob);
+      }
+    }
+  } finally { _faceBusy = false; }
+}
+// Only the faces on or near the screen are asked for (like the post photos): a crew of thirty does not cost thirty pictures at every open.
+function crewWireFaces(root) {
+  if (!root || !crewPagesOn()) return;
+  const els = [...root.querySelectorAll('[data-fc]')].filter(e => crewFaceNeeds(e.dataset.fc, e.dataset.fv));
+  if (!els.length) return;
+  if (!('IntersectionObserver' in window)) { els.forEach(e => crewFaceAsk(e.dataset.fc, e.dataset.fv)); return; }
+  if (!_faceIO) _faceIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { _faceIO.unobserve(e.target); crewFaceAsk(e.target.dataset.fc, e.target.dataset.fv); } }), { rootMargin: '300px 0px' });
+  els.forEach(e => _faceIO.observe(e));
+}
+// The account button wears your face too, over your initials (it is on every tab, so it asks for the picture itself).
+function crewAccountFace(btn) {
+  if (!btn || !crewPagesOn()) return;
+  const p = crewPersonOf({ me: true });
+  if (!p.ck || p.fv == null) return;
+  const h = CREW_FACES.get(p.ck);
+  if (h) btn.insertAdjacentHTML('beforeend', `<img class="fc-img" alt="" src="${esc(h.url)}" onerror="this.remove()">`);
+  if (!h || h.fv !== p.fv) crewFaceAsk(p.ck, p.fv);
+}
 const CREW_BELL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16zM10 20a2 2 0 0 0 4 0"/></svg>';
 // The day's attendance wears a tick, not the bell: it is the roll call, not a moment anyone earned.
 const CREW_TICK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>';
@@ -13497,6 +13667,7 @@ function loadCrewCache() {
   } catch (e) { /* no copy yet */ }
   loadCrewBoard();   // the board is kept beside the feed, so the bottom of Crew works with no signal
   setCrewTab(); paintCrewTell(); paintSessionShare();
+  try { syncDarkToggle(); } catch (e) { /* your face on the account button */ }
 }
 // "Not on the server": the function is missing (PostgREST's PGRST202, a 404). The tab goes, and the copy with it.
 function crewMissingErr(r) {
@@ -13543,6 +13714,7 @@ async function refreshBell() {
     try { _lsRawSet(crewKey(), sig); } catch (e) { /* storage full: shown this visit */ }
     crewSweepPhotos();   // a photo whose post has gone leaves the phone with it
     crewPagesSweep();    // and a page whose person has left the crew
+    crewFacesSweep();    // and their face
   } catch (e) { /* keep the copy */ }
   // paintWeekSugg() too (2026-10-20): Home is drawn at boot, before the Bell has answered, so the crew's one invitation
   // would never appear on the open that first learns there is a crew. It returns at once when the week's own suggestion
@@ -13551,6 +13723,7 @@ async function refreshBell() {
   // honest): a tick that finds the same crew must not rebuild the feed under a thumb, or disarm a Delete half-tapped.
   finally {
     _bellBusy = false; setCrewTab(); paintCrewTell(); paintSessionShare(); paintWeekSugg();
+    try { syncDarkToggle(); } catch (e) { /* your face on the account button */ }
     if (changed || !BELL) { if (onCrew()) renderCrew(); if (onCrewPage()) renderCrewPage(); }
   }
 }
@@ -13687,7 +13860,7 @@ function crewPersonOf(it) {
   if (!ck && typeof it.key === 'string' && it.key.indexOf(':') > 0) ck = it.key.split(':')[0];
   if (ck && !/^[0-9a-f-]{8,40}$/i.test(String(ck))) ck = null;
   let fv = it.fv != null ? Number(it.fv) : null, who = it.who || it.display_name || '';
-  if (me) { ck = ck || m.ck || null; if (fv == null && m.fv != null) fv = Number(m.fv); who = m.name || who; }
+  if (me) { ck = ck || m.ck || null; if (m.fv !== undefined) fv = m.fv == null ? null : Number(m.fv); who = m.name || who; }   // your face is always your latest (get_bell's `me`)
   if (amir) { ck = null; fv = null; who = 'Amir'; }
   const o = { ck, fv: fv != null && isFinite(fv) ? fv : null, who: String(who || ''), me, amir };
   if (it.lv != null) o.lv = Number(it.lv) || 0;
@@ -13695,19 +13868,21 @@ function crewPersonOf(it) {
   if (it.new) o.isNew = true;
   return o;
 }
-// The one drawing function for a face (`size`: 'post' 36 px, the default · 'band' 26 px · 'row' 30 px · 'xl' the page's). Step 1 draws
-// initials. Step 2 puts the picture in HERE and nowhere else. `door` (band only) makes the face itself the button.
+// The one drawing function for a face (`size`: 'post' 36 px, the default · 'band' · 'row' 30 px · 'line' 24 px · 'xl' the page's). The two letters
+// are always drawn; a picture, when there is one, lies over them (crewFaceImg(), step 2: the picture is HERE and nowhere else). `door` (band only)
+// makes the face itself the button.
 function crewFace(p, size, door) {
   p = p || {};
-  const ini = esc(p.amir ? 'AA' : crewInitials(p.who));
+  const ini = esc(p.amir ? 'AA' : crewInitials(p.who)), pic = crewFaceImg(p), dat = crewFaceData(p);
   if (size === 'band') {
     const cls = 'cr-face' + (p.me ? ' me' : '');
-    return door ? `<button type="button" class="cr-bt ${cls}" onclick="event.stopPropagation(); ${crewGoCode(p)}" aria-label="${esc(crewDoorLabel(p))}">${ini}</button>`
-      : `<i class="${cls}" aria-hidden="true">${ini}</i>`;
+    return door ? `<button type="button" class="cr-bt ${cls}"${dat} onclick="event.stopPropagation(); ${crewGoCode(p)}" aria-label="${esc(crewDoorLabel(p))}">${ini}${pic}</button>`
+      : `<i class="${cls}"${dat} aria-hidden="true">${ini}${pic}</i>`;
   }
-  if (size === 'row') return `<span class="p ini" aria-hidden="true">${ini}</span>`;
-  if (size === 'xl') return `<span class="pl-face" aria-hidden="true">${ini}</span>`;
-  return `<span class="cr-ini${p.amir ? ' am' : ''}" aria-hidden="true">${ini}</span>`;
+  if (size === 'row') return `<span class="p ini"${dat} aria-hidden="true">${ini}${pic}</span>`;
+  if (size === 'line') return `<span class="cr-fl"${dat} aria-hidden="true">${ini}${pic}</span>`;
+  if (size === 'xl') return `<span class="pl-face"${dat} aria-hidden="true">${ini}${pic}</span>`;
+  return `<span class="cr-ini${p.amir ? ' am' : ''}"${dat} aria-hidden="true">${ini}${pic}</span>`;
 }
 function crewScreenNow() { const s = document.querySelector('.screen.active'); return s ? s.id.replace('screen-', '') : 'home'; }
 // Is this person a door? A member with a ck, you, or Amir. Anyone else (a name the server sent no key for) stays plain text.
@@ -14031,7 +14206,7 @@ function crewPutReplies(postId, replies) {
   it.replies = replies;
   try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
   document.querySelectorAll('.cr-reps').forEach(box => {
-    if (box.dataset.rep === String(postId)) box.innerHTML = crewRepsHTML(it);
+    if (box.dataset.rep === String(postId)) { box.innerHTML = crewRepsHTML(it); crewWireFaces(box); }
   });
 }
 // ── The week first (direction B, Amir's pick, 2026-10-20) ────────────────────────────────────────────────────────────────
@@ -14086,9 +14261,11 @@ function crewDayWord(iso) {
 function crewLineHTML(it) {
   const parts = (it.parts || []).map(crewPartText).filter(Boolean);
   if (!parts.length) return '';
-  const txt = crewNameHTML(crewPersonOf(it), it.me ? 'You' : (it.who || 'Someone')) + ' ' + parts.map(esc).join(' · ');
+  const pp = crewPersonOf(it), txt = crewNameHTML(pp, it.me ? 'You' : (it.who || 'Someone')) + ' ' + parts.map(esc).join(' · ');
   const kw = crewKudosWords(it.kudos);
-  return `<div class="cr-line" data-key="${esc(it.key)}"><span class="cr-bell-ic">${CREW_BELL_SVG}</span>
+  // With stage96 a person's moment wears their face where the bell was; without it, the bell as always
+  const lead = crewPagesOn() && (pp.ck || pp.me) ? crewFace(pp, 'line') : `<span class="cr-bell-ic">${CREW_BELL_SVG}</span>`;
+  return `<div class="cr-line" data-key="${esc(it.key)}">${lead}
     <span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small>
       <span class="cr-react on-line" data-row="${esc(it.key)}">${crewReactRow(it.key, it.kudos, it.me, true)}</span></span></div>`;
 }
@@ -14102,8 +14279,9 @@ function crewBoardHTML(all) {
   }
   const rows = all ? CREW_BOARD : CREW_BOARD.slice(0, 5).concat(CREW_BOARD.slice(5).filter(r => r.is_me));
   return rows.map(r => {
-    const inner = `<span class="p">${Number(r.pos) || ''}</span><span class="n">${esc(r.is_me ? 'You' : r.who || '')}</span><span class="x">${Number(r.xp || 0).toLocaleString('en-GB')}</span>`;
-    const p = crewPersonOf(r), cls = 'cr-br' + (r.is_me ? ' me' : '');
+    const p = crewPersonOf(r), cls = 'cr-br' + (r.is_me ? ' me' : ''), nm = esc(r.is_me ? 'You' : r.who || '');
+    const n = crewPagesOn() && (p.ck || p.me) ? `<span class="n wf">${crewFace(p, 'line')}<span class="nt">${nm}</span></span>` : `<span class="n">${nm}</span>`;
+    const inner = `<span class="p">${Number(r.pos) || ''}</span>${n}<span class="x">${Number(r.xp || 0).toLocaleString('en-GB')}</span>`;
     return crewDoor(p, cls, inner) || `<div class="${cls}">${inner}</div>`;
   }).join('');
 }
@@ -14156,6 +14334,7 @@ function renderCrew() {
   }
   el.innerHTML = h;
   crewWirePhotos(el);
+  crewWireFaces(el);
   if (!me.answer && !me.under13 && crewPagesOn()) crewPageEnsure('me');   // the question's preview of your own page
 }
 window.renderCrew = renderCrew;
@@ -14170,6 +14349,7 @@ function renderCrewPage() {
   if (b && document.getElementById('screen-crewboard').classList.contains('active')) {
     b.innerHTML = `<div class="cr-brd" style="margin-top:22px">${crewBoardHTML(true)}</div>`
       + `<p class="cr-note">Points for this season only. Everything you train and every habit you tick adds to it. Nothing on Crew earns a point.</p>`;
+    crewWireFaces(b);
   }
   const w = document.getElementById('crewwho-body');
   if (w && document.getElementById('screen-crewwho').classList.contains('active')) {
@@ -14182,6 +14362,7 @@ function renderCrewPage() {
     w.innerHTML = rows
       ? `<div class="cr-brd" style="margin-top:22px">${rows}</div><p class="cr-note">Everyone here said yes to the Bell. They see your name and what you did. They never see a weight or your check-in. You can leave any time from <strong>What the crew sees of you</strong>.</p>`
       : '<p class="cr-quiet">The crew shows here once you have signal.</p>';
+    crewWireFaces(w);
   }
   renderPlayerPage();   // a Player Page that is open is redrawn from the same copy (its This week reads the Bell)
 }
@@ -14326,7 +14507,7 @@ function crewPageEnsure(key) {
 }
 function paintAskMini() {
   const el = document.getElementById('crew-ask-mini');
-  if (el && onCrew()) el.outerHTML = crewAskMiniHTML();
+  if (el && onCrew()) { el.outerHTML = crewAskMiniHTML(); crewWireFaces(document.getElementById('crew-ask-mini')); }
 }
 // ── the one-time card for a member who joined before pages existed ──
 function crewIntroKey() { return ATHLETE_ID + '_pageintro'; }
@@ -14431,7 +14612,11 @@ function playerHTML(key, p, note) {
   // `best_lifts` is sent and never drawn (Amir's main session, 2026-10-24): the lift names have no place on the page.
   const lv = Number(p.lv) > 0 ? `<span class="pl-lv">LV ${Number(p.lv)}${plMark(p, own, 'level', mk)}</span>` : '';
   const since = plSince(p.since), sub = playerSportLine(p);
-  let h = `<div class="pl-id"><span class="pl-facewrap">${crewFace({ ck: p.ck, fv: p.fv, who, me: own, amir: false }, 'xl')}${lv}</span>
+  // Your own face is the door to your photo (Ring Faces): a small camera on it says so. An athlete under 13 has no photo to add.
+  const faceH = crewFace({ ck: p.ck, fv: p.fv, who, me: own, amir: false }, 'xl');
+  const face = own && !p.under13
+    ? `<button type="button" class="cr-bt pl-fbtn" onclick="openFacePhoto()" aria-label="${crewPersonOf({ me: true }).fv != null ? 'Change your photo' : 'Add your photo'}">${faceH}<span class="pl-cam" aria-hidden="true">${CREW_CAM_SVG}</span></button>` : faceH;
+  let h = `<div class="pl-id"><span class="pl-facewrap">${face}${lv}</span>
     <h1 class="pl-name" dir="auto">${esc(who)}</h1>
     ${sub ? `<p class="pl-sub">${esc(sub)}</p>` : ''}${since ? `<p class="pl-meta">With Amir since ${esc(since)}</p>` : ''}${playerActionsHTML(key, p)}</div>`;
   if (note) h += `<p class="pl-quiet" role="status">${esc(note)}</p>`;
@@ -14474,6 +14659,7 @@ function renderPlayerPage() {
   if (html === _playerHTML) return;   // nothing changed: a thumb is not rebuilt under
   _playerHTML = html;
   body.innerHTML = html;
+  crewWireFaces(body);
 }
 window.renderPlayerPage = renderPlayerPage;
 // "All 7": every achievement, in the sheet (the page shows the latest three).
@@ -14490,6 +14676,157 @@ function openPlayerAchievements(key) {
   ov.classList.add('visible');
 }
 window.openPlayerAchievements = openPlayerAchievements;
+
+// ── Your photo: choose, move, zoom, save (Amir, 2026-10-24: Ring Faces) ──────────────────────────────────────────────────────────
+// A square 256 px picture under a circular mask: one finger moves it, two pinch it, the slider zooms it (the {z, dx, dy} fit of the share cards).
+// It is drawn onto a canvas and encoded again, so its EXIF (the location with it) is gone, and it is held to 60 KB, the server's ceiling. Only a
+// crew member (not under 13) can add one: anyone else is asked to join first.
+var _FP = null;
+const FP_SIDE = 256, FP_MAX = 60000, FP_LADDER = [[256, 0.82], [256, 0.72], [200, 0.7], [160, 0.65]];
+function fpSlack(z) {
+  const s = Math.max(FP_SIDE / _FP.iw, FP_SIDE / _FP.ih) * z;
+  return { x: Math.max(0, _FP.iw * s - FP_SIDE) / 2, y: Math.max(0, _FP.ih * s - FP_SIDE) / 2 };
+}
+function fpPaint(ctx, S) {
+  const f = _FP.fit, k = S / FP_SIDE, s = Math.max(S / _FP.iw, S / _FP.ih) * f.z, dw = _FP.iw * s, dh = _FP.ih * s, sl = fpSlack(f.z);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, S, S);
+  ctx.drawImage(_FP.src, (S - dw) / 2 + f.dx * sl.x * k, (S - dh) / 2 + f.dy * sl.y * k, dw, dh);
+}
+function fpDraw() { const cv = document.getElementById('fp-cv'); if (_FP && _FP.src && cv) fpPaint(cv.getContext('2d'), FP_SIDE); }
+// The photo, read once and made smaller (12 megapixels would make every finger move slow), the way the phone holds it up.
+async function fpPick(file) {
+  let im = null, w0 = 0, h0 = 0;
+  try { im = await createImageBitmap(file, { imageOrientation: 'from-image' }); w0 = im.width; h0 = im.height; }
+  catch (e) {
+    const u = URL.createObjectURL(file);
+    im = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = bad; i.src = u; });
+    w0 = im.naturalWidth; h0 = im.naturalHeight; URL.revokeObjectURL(u);
+  }
+  if (!w0 || !h0) throw new Error('crew:photo_bad');
+  const k = Math.min(1, 1024 / Math.max(w0, h0)), c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(w0 * k)); c.height = Math.max(1, Math.round(h0 * k));
+  c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+  if (im.close) { try { im.close(); } catch (e) {} }
+  _FP.src = c; _FP.iw = c.width; _FP.ih = c.height; _FP.fit = { z: 1, dx: 0, dy: 0 };
+}
+// The first try that fits 60 KB wins.
+async function fpBlob() {
+  for (const [side, q] of FP_LADDER) {
+    const c = document.createElement('canvas'); c.width = c.height = side;
+    fpPaint(c.getContext('2d'), side);
+    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', q));
+    if (blob && blob.size <= FP_MAX) return { blob, side };
+  }
+  throw new Error('crew:photo_big');
+}
+function openFacePhoto() {
+  const ov = document.getElementById('hist-overlay'), me = crewMe();
+  if (!ov || !BELL || !crewAllowed() || me.under13) return;
+  if (!crewCanLike()) { aaToast('Join the crew to add a photo.', { kicker: 'Crew', action: 'Join the crew', dismiss: 'Not now', run: () => crewAnswer('yes') }); return; }
+  const self = crewPersonOf({ me: true }), had = self.fv != null;
+  _FP = { src: null, iw: 0, ih: 0, fit: { z: 1, dx: 0, dy: 0 } };
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Crew</div>
+    <h2 class="readiness-title">Your photo</h2>
+    <div class="fp-frame" id="fp-frame">
+      <span class="fp-cur" id="fp-cur" data-fc="${esc(self.ck || '')}" data-fv="${had ? Number(self.fv) : ''}">${esc(crewInitials(self.who))}${crewFaceImg(self)}</span>
+      <canvas id="fp-cv" width="${FP_SIDE}" height="${FP_SIDE}" hidden></canvas>
+    </div>
+    <p class="fp-help" id="fp-help">${had ? 'This is your photo now.' : 'Pick a photo of you.'}</p>
+    <input type="range" id="fp-z" min="1" max="4" step="0.01" value="1" aria-label="Zoom" hidden>
+    <label class="cr-add">${CREW_CAM_SVG}<span>${had ? 'Choose another photo' : 'Choose a photo'}</span><input type="file" accept="image/*" id="fp-file"></label>
+    <div class="fp-btns"><button type="button" class="cr-go" id="fp-save" disabled>Save</button><button type="button" class="cr-go fp-rm" id="fp-rm"${had ? '' : ' hidden'}>Remove</button></div>
+    <p class="cr-note">The crew sees it in a circle, wherever your name is. Your phone makes it small and takes its location off.</p>
+    <p class="cr-err" role="status"></p>`;
+  const m = ov.querySelector('.readiness-modal'), frame = m.querySelector('#fp-frame'), cv = m.querySelector('#fp-cv'), cur = m.querySelector('#fp-cur');
+  const file = m.querySelector('#fp-file'), save = m.querySelector('#fp-save'), rm = m.querySelector('#fp-rm'), zin = m.querySelector('#fp-z');
+  const err = m.querySelector('.cr-err'), help = m.querySelector('#fp-help');
+  if (self.ck && had && crewFaceNeeds(self.ck, self.fv)) crewFaceAsk(self.ck, self.fv);
+  file.addEventListener('change', async () => {
+    const f = file.files && file.files[0];
+    file.value = '';
+    if (!f) return;
+    err.textContent = ''; help.textContent = 'Making it small…';
+    try { await fpPick(f); }
+    catch (e) { err.textContent = crewErrWords('crew:photo_bad'); help.textContent = had ? 'This is your photo now.' : 'Pick a photo of you.'; return; }
+    cur.hidden = true; cv.hidden = false; zin.hidden = false; zin.value = '1'; save.disabled = false;
+    help.textContent = 'Drag to move. Pinch to zoom.';
+    fpDraw();
+  });
+  zin.addEventListener('input', () => { if (!_FP.src) return; _FP.fit = Object.assign({}, _FP.fit, { z: Number(zin.value) || 1 }); fpDraw(); });
+  const pts = new Map();
+  let base = null;
+  const grab = () => {
+    const a = [...pts.values()];
+    if (!a.length) return null;
+    return { cx: a.reduce((s, q) => s + q.clientX, 0) / a.length, cy: a.reduce((s, q) => s + q.clientY, 0) / a.length,
+      d: a.length > 1 ? Math.hypot(a[0].clientX - a[1].clientX, a[0].clientY - a[1].clientY) : 0, fit: Object.assign({}, _FP.fit) };
+  };
+  frame.addEventListener('pointerdown', e => { if (!_FP.src) return; try { frame.setPointerCapture(e.pointerId); } catch (x) {} pts.set(e.pointerId, e); base = grab(); });
+  frame.addEventListener('pointermove', e => {
+    if (!_FP.src || !pts.has(e.pointerId) || !base) return;
+    pts.set(e.pointerId, e); e.preventDefault();
+    const a = [...pts.values()], cx = a.reduce((s, q) => s + q.clientX, 0) / a.length, cy = a.reduce((s, q) => s + q.clientY, 0) / a.length;
+    const d = a.length > 1 ? Math.hypot(a[0].clientX - a[1].clientX, a[0].clientY - a[1].clientY) : 0;
+    const z = base.d > 8 && d > 8 ? Math.max(1, Math.min(4, base.fit.z * d / base.d)) : base.fit.z;
+    const box = frame.getBoundingClientRect(), k = box.width > 0 ? box.width / FP_SIDE : 1, sl = fpSlack(z);
+    const dx = sl.x > 0 ? base.fit.dx + ((cx - base.cx) / k) / sl.x : 0, dy = sl.y > 0 ? base.fit.dy + ((cy - base.cy) / k) / sl.y : 0;
+    _FP.fit = { z, dx: Math.max(-1, Math.min(1, dx)), dy: Math.max(-1, Math.min(1, dy)) };
+    zin.value = String(z); fpDraw();
+  });
+  const drop = e => { pts.delete(e.pointerId); base = pts.size ? grab() : null; };
+  frame.addEventListener('pointerup', drop);
+  frame.addEventListener('pointercancel', drop);
+  save.addEventListener('click', () => fpSave(save, err));
+  rm.addEventListener('click', () => armedTap(rm, 'Tap again to remove', () => fpRemove(rm, err)));
+  ov.classList.add('visible');
+}
+window.openFacePhoto = openFacePhoto;
+// Where the picker has the picture, read only: how the headless test watches a finger drag and pinch it.
+window.facePhotoState = () => ({ on: !!(_FP && _FP.src), fit: _FP ? Object.assign({}, _FP.fit) : null, iw: _FP && _FP.iw, ih: _FP && _FP.ih });
+async function fpSave(btn, err) {
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Saving…'; err.textContent = '';
+  let ph = null;
+  try { ph = await fpBlob(); } catch (e) { err.textContent = crewErrWords('crew:photo_big'); btn.disabled = false; btn.textContent = label; return; }
+  const b64 = await blobToB64(ph.blob);
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_face_set', { p_photo: b64, p_w: ph.side, p_h: ph.side }), 20000); } catch (e) { r = null; }
+  btn.textContent = label;
+  if (_noAnswer(r)) { err.textContent = 'No signal. Your photo is still here. Tap Save again when you have signal.'; btn.disabled = false; return; }
+  if (r.error || !r.data || r.data.fv == null) { err.textContent = crewErrWords(r.error && r.error.message); btn.disabled = false; return; }
+  await crewOwnFace(r.data.fv, ph.blob);
+  closeHistorySheet();
+  aaToast('Your photo is saved.', { kicker: 'Crew' });
+}
+async function fpRemove(btn, err) {
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_face_clear'), 15000); } catch (e) { r = null; }
+  if (_noAnswer(r)) { err.textContent = 'No signal. Try again when you have signal.'; return; }
+  if (r.error) { err.textContent = crewErrWords(r.error && r.error.message); return; }
+  await crewOwnFace(null, null);
+  closeHistorySheet();
+  aaToast('Your photo is off.', { kicker: 'Crew' });
+}
+// Your face changed (saved or removed): the phone's copy follows at once, everywhere a face of yours is drawn.
+async function crewOwnFace(fv, blob) {
+  const me = crewMe(), ck = me.ck;
+  me.fv = fv == null ? null : Number(fv);
+  try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
+  const mine = crewPageGet('me');
+  if (mine) { mine.p.fv = me.fv; crewPagesSave(); }
+  if (ck) {
+    if (blob) { await crewFaceKeep(ck, me.fv, blob); _faceTried[ck] = me.fv; crewFaceShow(ck, me.fv, blob); }
+    else {
+      await crewFaceDrop(ck);
+      document.querySelectorAll('[data-fc]').forEach(el => { if (el.dataset.fc === ck) { el.querySelectorAll(':scope > img.fc-img').forEach(i => i.remove()); el.removeAttribute('data-fc'); } });
+    }
+  }
+  try { syncDarkToggle(); } catch (e) {}
+  _playerHTML = '';
+  if (onCrew()) renderCrew();
+  if (onCrewPage()) renderCrewPage();
+}
 
 // ── the photos: asked one at a time when their card comes near the screen, two at once at most, kept for this visit ──
 const _crewPhP = new Map(), _crewPhQ = [];
@@ -14559,6 +14896,7 @@ function openCrewPhoto(id) {
     ${it.me ? '' : `<div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span></div>`}
     <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}">${esc(crewKudosWords(it.kudos))}</small></div>`;
   v.classList.add('visible');
+  crewWireFaces(v);
   crewFetchPhoto(id).then(url => { const im = v.querySelector('.cr-vimg img'); if (url && im) im.src = url; });
 }
 function closeCrewPhoto() {
@@ -14660,7 +14998,7 @@ async function crewAnswer(ans, btn) {
   if (btn) { btn.disabled = false; btn.textContent = was; }
   if (!r || r.error || !r.data) { aaToast(_noAnswer(r) ? 'No signal. Answer again when you are back online.' : 'That did not save. Try again.'); return false; }
   if (BELL) BELL.me = r.data;
-  if (ans === 'no') crewPagesClear();   // leaving means gone: no page of another person stays on this phone
+  if (ans === 'no') { crewPagesClear(); crewFacesClear(); }   // leaving means gone: no page and no face of another person stays on this phone
   else { crewPageDrop('me'); try { _lsRawSet(crewIntroKey(), '1'); } catch (e) {} }   // and someone who has just joined is not told "your page is here"
   renderCrew();
   // Joining is the second moment worth asking for a phone (Amir, 2026-10-20): they have just chosen to
@@ -14960,7 +15298,7 @@ function crewErrWords(msg) {
     'crew:photo_big': 'That photo did not work. Try another one.', 'crew:photo_bad': 'That photo did not work. Try another one.',
     'crew:session_photo': 'Add a photo to tell the crew.', 'crew:not_yes': 'Say yes to the Bell on Crew first.',
     'crew:reply_long': 'That is over 140 characters.', 'crew:replies_today': 'That is 30 replies today. More tomorrow.',
-    'crew:replies_full': 'This post has all the replies it can hold.', 'crew:gone': 'That post has gone.',
+    'crew:replies_full': 'This post has all the replies it can hold.', 'crew:gone': 'That post has gone.', 'crew:under13': 'That is off for your account.',
   })[m && m[0]] || 'That did not post. Try again.';
 }
 function openCrewPost(mode, dayId) {
@@ -20666,6 +21004,7 @@ function syncDarkToggle() {
     const a = (DATA && DATA.athlete) || {};
     const ini = ((a.firstName || '').trim().charAt(0) + (a.lastName || '').trim().charAt(0)).toUpperCase();
     btn.textContent = ini || (ATHLETE_ID || 'A').charAt(0).toUpperCase();
+    crewAccountFace(btn);   // your face over your initials, once the crew has one
   }
   const dark = document.body.hasAttribute('data-dark');
   document.querySelectorAll('#hist-overlay .acct-seg button').forEach(b =>
@@ -22187,6 +22526,7 @@ function wrapSheetOpeners() {
   openCourt = sheetWrap(openCourt); window.openCourt = openCourt;   // Four Courts: a kind of achievements
   openCrewPost = sheetWrap(openCrewPost); window.openCrewPost = openCrewPost;   // Crew: the composer (stage81)
   openPlayerAchievements = sheetWrap(openPlayerAchievements); window.openPlayerAchievements = openPlayerAchievements;   // a Player Page's "All n"
+  openFacePhoto = sheetWrap(openFacePhoto); window.openFacePhoto = openFacePhoto;   // Your photo: opened from your page
   openCrewSettings = sheetWrap(openCrewSettings); window.openCrewSettings = openCrewSettings;   // Crew: the yes and the switches; ‹ Back to the account
   openPushSettings = sheetWrap(openPushSettings); window.openPushSettings = openPushSettings;   // Reminders: ‹ Back to the account, as its door says
   window.openHistorySheet = openHistorySheet; window.openExerciseSheet = openExerciseSheet;

@@ -20,6 +20,7 @@
 // stall: { crew_page: true } never answers; a mode of 'offline' is no signal. get_bell, crew_board and a reply carry ck/fv/lv/held/new as the fixture gives them.
 // stage96 is TOLD by get_bell's top-level `lounge: 1` (the fixture sets it; without it the app draws Crew as it was). YOUR page (no p_subject) is whole: every block, the comebacks, and
 // `kinds` (your switches, a kind not named is on); someone else's has neither.
+// Faces (step 2): crew_faces_get answers `faces` ({ '<ck>': { fv, b64 } }), crew_face_set / crew_face_clear change the caller's own (faceDelay, faceMax, faceMissing, faceErr).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
   var cfg = {};
@@ -127,7 +128,8 @@
             { id: 'achievement:the_notebook', name: 'The Notebook', day: '2026-10-03', size: 'win', signed: [], signed_n: 0 }],
           honours: [], best_lifts: [], cycle: null, at: new Date().toISOString() };
         // YOUR page is sent whole: every block, the comebacks, and `kinds` (your own switches, a kind not named is on). Someone else's has no comebacks and no `kinds`.
-        if (own) { pg.numbers.comebacks = 2; pg.kinds = Object.assign({}, PM.kinds || {}); } else pg.cheers.mine_today = false;
+        if (own) { pg.numbers.comebacks = 2; pg.kinds = Object.assign({}, PM.kinds || {}); }
+        else pg.cheers.mine_today = false;
         return pg;
       };
       var merge = function (pg, over) { Object.keys(over || {}).forEach(function (k) { pg[k] = over[k]; }); return pg; };
@@ -142,7 +144,10 @@
       if (name === 'crew_answer') {
         var a = params && params.p_answer;
         me.answer = a; me.can_post = a === 'yes' && !me.under13; me.name = me.name || (params && params.p_name) || 'Athlete';
-        if (a === 'no') B.items = (B.items || []).filter(function (i) { return !(i && i.me && i.t === 'post'); });
+        if (a === 'no') {   // leaving means gone: your posts, and your face (stage96)
+          B.items = (B.items || []).filter(function (i) { return !(i && i.me && i.t === 'post'); });
+          me.fv = null; if (S.faces && me.ck) delete S.faces[me.ck]; (B.crew || []).forEach(function (c) { if (c && c.me) c.fv = null; });
+        }
         keep(); return res({ data: JSON.parse(JSON.stringify(me)), error: null, status: 200 });
       }
       if (name === 'crew_kinds') { me.kinds = Object.assign({}, me.kinds || {}, (params && params.p_kinds) || {}); keep(); return res({ data: JSON.parse(JSON.stringify(me)), error: null, status: 200 }); }
@@ -201,6 +206,35 @@
         return res({ data: { post: post.id, replies: JSON.parse(JSON.stringify(post.replies || [])) }, error: null, status: 200 });
       }
       if (name === 'crew_delete_post') { var before = (B.items || []).length; B.items = (B.items || []).filter(function (i) { return !(i && i.id === (params && params.p_post)); }); keep(); return res({ data: B.items.length < before, error: null, status: 200 }); }
+      // Faces (stage96). crew_faces_get answers the stub's `faces` ({ '<ck>': { fv, b64 } }) for the keys asked, at most 12, only rows that exist, after `faceDelay` ms (so a second call
+      // in flight would show in `faceMax`); crew_face_set keeps the photo as the caller's face (a JPEG of 100..60,000 bytes, 64..512 square) and answers { fv }; crew_face_clear answers { fv: null }.
+      // faceMissing = "no such function"; faceErr = the message set and clear refuse with (e.g. 'crew:photo_bad').
+      if (name === 'crew_faces_get' || name === 'crew_face_set' || name === 'crew_face_clear') {
+        if (S.faceMissing) return res({ data: null, error: { message: 'Could not find the function public.' + name, code: 'PGRST202' }, status: 404 });
+        var fbad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+        if (name === 'crew_faces_get') {
+          var fkeys = (params && params.p_keys) || [];
+          if (fkeys.length > 12) return fbad('crew:too_many');
+          S.faceNow = (S.faceNow || 0) + 1; S.faceMax = Math.max(S.faceMax || 0, S.faceNow);
+          var frows = fkeys.filter(function (k) { return S.faces && S.faces[k]; }).map(function (k) { return { ck: k, fv: S.faces[k].fv, b64: S.faces[k].b64 }; });
+          return new Promise(function (ok) { setTimeout(function () { S.faceNow--; ok({ data: frows, error: null, status: 200 }); }, S.faceDelay || 0); });
+        }
+        if (S.faceErr) return fbad(S.faceErr);
+        if (me.under13) return fbad('crew:under13');
+        if (me.answer !== 'yes') return fbad('crew:not_yes');
+        if (name === 'crew_face_clear') {
+          me.fv = null; if (S.faces && me.ck) delete S.faces[me.ck];
+          (B.crew || []).forEach(function (c) { if (c && c.me) c.fv = null; });
+          keep(); return res({ data: { fv: null }, error: null, status: 200 });
+        }
+        var fph = String((params && params.p_photo) || ''), fw = params && params.p_w, fh = params && params.p_h;
+        if (fph.indexOf('/9j/') !== 0 || !(fw >= 64 && fw <= 512 && fh >= 64 && fh <= 512)) return fbad('crew:photo_bad');
+        if (Math.floor(fph.length * 3 / 4) > 60000) return fbad('crew:photo_big');
+        var fnew = Math.floor(Date.now() / 1000) + (S._faceN = (S._faceN || 0) + 1);
+        me.fv = fnew; (B.crew || []).forEach(function (c) { if (c && c.me) c.fv = fnew; });
+        S.faces = S.faces || {}; if (me.ck) S.faces[me.ck] = { fv: fnew, b64: fph };
+        keep(); return res({ data: { fv: fnew }, error: null, status: 200 });
+      }
       if (name === 'crew_photo') return res({ data: { id: params && params.p_post, mime: 'image/jpeg', w: 4, h: 5,
         b64: '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z' }, error: null, status: 200 });
     }

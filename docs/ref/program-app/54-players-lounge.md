@@ -51,3 +51,33 @@ join button (never a dead tap); no signal → the copy under *No signal*; "no su
 page shows and what a switch off removes, no comebacks on anyone else's page, your own page from three doors, offline, a server without stage96 or without `crew_page`,
 the level by person, the errors, under 13, the join preview, the one-time card, the cache (30, never synced, gone on leaving), the guide, 320 px and dark mode.
 `stub.js` answers `crew_page` by name (`crewPages`, `pageMissing`, `pageErr`) and carries `ck`/`fv` on the board and a reply.
+
+## Step 2 · Faces (idea 56, direction A "Ring Faces")
+
+**What.** A photo in a circle wherever a name sits, and the two letters (today's look) until there is one: a post, a reply, a Bell moment (the face takes the bell's place), the
+week band, the rows of *In the crew*, the board on the tab and its page, the composer, the join question's preview, the photo viewer, your page, and the account button
+over your initials. Amir's face is his own photo (`coach.jpg`, as on the week note). Your face is the door to **Your photo** on your page (a small camera on it): choose a
+photo, drag it, pinch or use the slider, **Save**, or **Remove** (two taps). Only a crew member who is not under 13 can add one; anyone else is asked to join first.
+
+**Why.** Amir picked A, 2026-10-24 (*"go with your picks"*): the circle everyone knows, and the one shape a held-week ring can wrap (step 3). A face is about 15 KB and
+*"iran's internet is very slow"*, so it never rides in `get_bell()`.
+
+**How.** `get_bell()` and the lists send only `fv`, the face's version. `crewFace()` always draws the letters and lays a picture over them (`.fc-img`), so a face that has
+not come, or fails to open, is today's look. A face on the screen says `data-fc` (the person) and `data-fv` (the version); `crewWireFaces(root)` watches them like the post
+photos (an `IntersectionObserver`, 300 px of margin), so only faces on or near the screen are asked for. Asks made in the same breath are one `crew_faces_get(p_keys)` call, at
+most 12 keys, with ONE call in flight. The answer is kept in Cache Storage `crew-faces-v1` under `/__crew-face/<ck>-<fv>`, never `crew-photos-v1` (whose sweep empties
+everything that is not a post photo), and a newer version deletes the older key. Nothing is in `localStorage`, nothing syncs. A person who leaves the crew takes their face off
+the phone at the next Bell refresh (`crewFacesSweep()`), and leaving yourself clears them all (`crewFacesClear()`). Your photo is a 256 px square under a circular mask, held
+to 60,000 bytes (ladder 256 px .82 → 256 px .72 → 200 px .7 → 160 px .65), drawn again on a canvas so its EXIF is gone, sent as `crew_face_set(p_photo, p_w, p_h)`.
+
+| function | job |
+|---|---|
+| `crewFaceImg(p)` / `crewFaceData(p)` | the picture inside a face · its `data-fc` / `data-fv`. Both are empty until the server speaks stage96. |
+| `crewFaceAsk` / `crewFacePump` / `crewWireFaces(root)` | the queue: 12 to a call, one call in flight, only what is on or near the screen. |
+| `crewFaceShow(ck, fv, blob)` | a picture arrived: every face of that person on the screen takes it (and the account button when it is yours). |
+| `crewFaceKeep` / `crewFaceSaved` / `crewFaceDrop` / `crewFacesSweep` / `crewFacesClear` | Cache Storage: keep (the older version goes), read, drop one person, sweep the departed, clear all. |
+| `openFacePhoto()` and `fp*` | Your photo: `fpPick` (decode, 1024 px), `fpPaint`/`fpDraw`, `fpBlob` (the ladder), `fpSave`, `fpRemove`, `crewOwnFace(fv, blob)` (your face changed everywhere). |
+
+**Tests.** `lounge.js` section 13: a face on every surface and the letters where there is none, one batched call, the cache and its key, a new `fv` replacing the old,
+twelve to a call and one in flight, only what is near the screen, a slow line and a server without the function, Your photo (choose, move, pinch, zoom, Save's size, Remove's two
+taps, a refusal), who may not (not in the crew, under 13), leaving, never synced.
