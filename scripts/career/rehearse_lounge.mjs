@@ -15,8 +15,11 @@
 //   5. cheers     6. signatures (Signed Ball)     7. mentions and replies     8. the push queue: what each new source queues
 //   9. leaving means gone (a no, under 13, a former athlete)     10. the game     11. the post's proof stamp     12. the erasure
 //   13. crew_now_week is career_weeks     14. nothing moved in the scorer     15. the way back     16. line endings
+//   1b. stage98 (2026-10-25, "The number of cheers is wrong."): a like is not a cheer. It goes on right after stage96, so every section below runs on
+//       what the live project has now (stage96 + stage98); 6b is the cheers number under the new rule; 15 takes stage98 off first; 17 is stage98 over a
+//       tally that counted likes (the recount, the copy, the way back with cheers sent in between).
 // A check that fails because stage96 is wrong is a finding: it is reported, not fixed here.
-// `--stage <file>` and `--rollback <file>` rehearse a modified copy, to see that a check bites.
+// `--stage <file>`, `--rollback <file>`, `--stage98 <file>` and `--rollback98 <file>` rehearse a modified copy, to see that a check bites.
 import path from 'node:path';
 import { openDb, runSql, read } from '../restore/lib.mjs';
 import { ROOT, snapshotWithout, eraseDef } from './rehearse_lib.mjs';
@@ -34,6 +37,8 @@ const eq = (a, b) => JSON.stringify(canon(a)) === JSON.stringify(canon(b));
 const jpg = (n, seed = 1) => { const b = Buffer.alloc(n); for (let i = 0; i < n; i++) b[i] = (i * 31 + seed) & 255; b[0] = 0xff; b[1] = 0xd8; b[2] = 0xff; b[3] = 0xe0; return b; };
 const STAGE = opt('--stage') || path.join(ROOT, 'supabase', 'stage96_players_lounge.sql');
 const ROLLBACK = opt('--rollback') || path.join(ROOT, 'scripts', 'career', 'rollback_stage96.sql');
+const STAGE98 = opt('--stage98') || path.join(ROOT, 'supabase', 'stage98_cheers_count.sql');
+const ROLLBACK98 = opt('--rollback98') || path.join(ROOT, 'scripts', 'career', 'rollback_stage98.sql');
 
 // what stage96 replaces whole, patches, or adds
 const REPLACED = ['crew_me', 'crew_reply_rows', 'crew_open_now', 'crew_board', 'crew_kudos', 'crew_reply', 'crew_answer', 'coach_crew_under13', 'crew_sweep',
@@ -253,6 +258,49 @@ async function main() {
   ok(erase1.split("'crew_kudos (to them)'").length === 2, "stage81's own kudos block is still there, once");
   for (const t of FP) ok((await hashOf(t)) === H0[t], `${t} is unchanged by the apply`);
   ok(!(await val(`select to_regclass('cron.job')::text`)), 'no cron job was touched (pg_cron is absent here and the stage schedules nothing)');
+
+  // ═══ 1b ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  section('1b. stage98 goes on, twice: a like is not a cheer, so the cheers number counts cheers only');
+  const stage98 = read(STAGE98);
+  const kudosDef96 = await val(`select pg_get_functiondef('public.crew_kudos(text,boolean,text)'::regprocedure)`);
+  const KUDOS_MD5_96 = await defMd5('crew_kudos');
+  const likeTrg = () => cnt('pg_trigger', `tgname = 'crew_tally_kudos' and not tgisinternal`);
+  const cheerTrg = () => cnt('pg_trigger t join pg_class c on c.oid = t.tgrelid', `t.tgname = 'crew_tally_cheer' and c.relname = 'crew_cheers' and not t.tgisinternal`);
+  const copy98 = () => val(`select to_regclass('backup.lounge98_cheer_tally_20261025')::text`);
+  const bcnt = t => val(`select count(*)::int from backup.${t}`);
+  ok(await likeTrg() === 1 && await cheerTrg() === 1, 'before it: both counters are on (a like and a cheer each count, as stage96 made them)');
+  // a crew_kudos changed since the file was written: refused by name, nothing moves
+  await q(kudosDef96.replace("raise exception 'crew:emoji'", "raise exception 'crew:emoji '"));
+  ok((await defMd5('crew_kudos')) !== KUDOS_MD5_96, 'this rehearsal\'s own tampering took hold');
+  await refuses('a crew_kudos() changed since stage98 was written is refused by name', runSql(db, stage98, 'stage98 against a changed crew_kudos'), /crew_kudos\(\) is not the text this file was written against/);
+  ok(await likeTrg() === 1 && !(await copy98()), 'and nothing moved: the like counter is still on, no copy of the numbers was made');
+  await q(kudosDef96);
+  ok((await defMd5('crew_kudos')) === KUDOS_MD5_96, 'the changed function is put back');
+  // the cheer counter missing: refused, the other half of the guard
+  await q(`drop trigger crew_tally_cheer on public.crew_cheers`);
+  await refuses('without the cheer counter stage98 is refused (nothing would count a cheer)', runSql(db, stage98, 'stage98 without crew_tally_cheer'), /crew_tally_cheer is missing/);
+  ok(await likeTrg() === 1 && !(await copy98()), 'and nothing moved');
+  await q(`create trigger crew_tally_cheer after insert on public.crew_cheers for each row execute function public.crew_t_tally_cheer()`);
+  ok(await cheerTrg() === 1, 'the cheer counter is put back (this rehearsal\'s own tampering)');
+  await runSql(db, stage98, 'stage98');
+  const KUDOS_MD5_98 = await defMd5('crew_kudos');
+  await runSql(db, stage98, 'stage98 again');
+  ok(true, 'stage98 applied, and applied again without an error');
+  ok(KUDOS_MD5_98 !== KUDOS_MD5_96 && (await defMd5('crew_kudos')) === KUDOS_MD5_98, 'crew_kudos() is different from stage96\'s and the second run does not change it');
+  const kudosDef98 = await val(`select pg_get_functiondef('public.crew_kudos(text,boolean,text)'::regprocedure)`);
+  const bare = s => s.replace(/\r/g, '').split('\n').filter(l => !/crew_tally_down|stage98/.test(l));
+  ok(!kudosDef98.includes('crew_tally_down') && kudosDef98.includes('stage98'), 'crew_kudos() no longer takes anything off the tally, and says why');
+  ok(eq(bare(kudosDef98), bare(kudosDef96)) && bare(kudosDef96).length === kudosDef96.replace(/\r/g, '').split('\n').length - 2, 'and nothing else of it changed: without the two tally lines and the new comment the two texts are line for line the same');
+  ok(await likeTrg() === 0, 'the trigger crew_tally_kudos is gone');
+  ok(await cheerTrg() === 1, 'the trigger crew_tally_cheer is still on crew_cheers');
+  for (const sig of ['crew_t_tally_kudos()', 'crew_tally_down(text)']) ok(!(await val(`select to_regprocedure('public.${sig}')::text`)), `${sig.split('(')[0]}() is dropped`);
+  for (const sig of ['crew_tally_up(text)', 'crew_t_tally_cheer()']) { const g = await fnRow(sig); ok(!g.anon && !g.auth && g.svc, `${sig.split('(')[0]}() is still the service role's alone`, g); }
+  { const g = await fnRow('crew_kudos(text,boolean,text)'); ok(!g.anon && g.auth && g.svc, 'crew_kudos() keeps its door: signed in and the service role', g); }
+  ok(await copy98() === 'backup.lounge98_cheer_tally_20261025', 'the old numbers were copied to backup.lounge98_cheer_tally_20261025 first');
+  ok(await bcnt('lounge98_cheer_tally_20261025') === await cnt('crew_cheer_tally') && eq((await q(`select column_name from information_schema.columns where table_schema = 'backup' and table_name = 'lounge98_cheer_tally_20261025' order by ordinal_position`)).rows.map(r => r.column_name), ['athlete_id', 'n', 'updated_at', 'n_after']),
+     'and the copy holds a row for every number, with n_after (what the stage set)');
+  await refuses('stage96 run again over stage98 is refused (it would count likes again)', runSql(db, stage, 'stage96 after stage98'), /stage98 is on this project/);
+  ok(await likeTrg() === 0 && (await defMd5('crew_kudos')) === KUDOS_MD5_98, 'and nothing moved: the like counter did not come back');
 
   // ═══ 2 ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
   section('2. get_bell: who is who');
@@ -635,84 +683,92 @@ async function main() {
   ok(!('achievements' in await page('zz_ava', CAL)), 'and with the achievement switch off, none of it is shown (Cal)');
 
   // ═══ 6b ═════════════════════════════════════════════════════════════════════════════════
-  section('6b. the cheer tally: every cheer and every like a person has got, all time');
+  section('6b. the cheers number: the cheers a person has been sent, and nothing else (stage98: a like is not a cheer)');
   const tl = id => val(`select coalesce((select n from public.crew_cheer_tally where athlete_id = $1), 0)::int`, [id]);
   const tlSum = () => val(`select coalesce(sum(n), 0)::int from public.crew_cheer_tally`);
   const mkPost = async (author, ageDays = 0) => (await q(`insert into public.crew_posts (athlete_id, body, created_at) values ($1, 'A post for the tally.', now() - make_interval(days => $2::int)) returning id`, [author, ageDays])).rows[0].id;
   const likeEm = (id, target, em) => call(id, `select public.crew_kudos($1, true, $2)`, [target, em]);
+  const received = id => val(`select count(*)::int from public.crew_cheers where to_athlete = $1 and athlete_id <> to_athlete`, [id]);
   await q(`delete from public.crew_kudos`);
   await q(`delete from public.crew_cheers where to_athlete = 'zz_ava'`);
   await q(`delete from public.crew_cheer_tally`);
   const tallyLine = `${AVA}:${todayS}`;
   const tp = await mkPost('zz_ava');
-  // a like on a post
+  // Ava starts on 3, as if three cheers had come. Nothing a like does may move it: not up, and (it used to) not down.
+  await q(`insert into public.crew_cheer_tally (athlete_id, n) values ('zz_ava', 3)`);
+  const still3 = what => tl('zz_ava').then(async n => ok(n === 3 && await tlSum() === 3 && await cnt('crew_cheer_tally') === 1, what));
   await kudos('zz_ben', tp);
-  ok(await tl('zz_ava') === 1, 'a like on a post is +1 for the post\'s author');
+  await still3('a like on a post is +0 for the post\'s author');
   await likeEm('zz_ben', tp, '🔥');
-  ok(await tl('zz_ava') === 1 && (await val(`select emoji from public.crew_kudos where athlete_id = 'zz_ben' and post_id = $1`, [tp])) === '🔥',
-     'the same like with another emoji is +0 (the swap is an UPDATE, and the emoji did change)');
+  ok((await val(`select emoji from public.crew_kudos where athlete_id = 'zz_ben' and post_id = $1`, [tp])) === '🔥', 'the same like with another emoji took hold (an UPDATE of the like)');
+  await still3('and the swap is +0');
   await likeEm('zz_ben', tp, '💪'); await kudos('zz_ben', tp);
-  ok(await tl('zz_ava') === 1, 'and so is every further swap and tap');
+  await still3('so is every further swap and tap');
   await kudos('zz_ben', tp, false);
-  ok(await tl('zz_ava') === 0, 'taking the like back is -1');
+  await still3('taking the like back is +0 (before stage98 it took one off)');
   await kudos('zz_ben', tp, false);
-  ok(await tl('zz_ava') === 0 && await cnt('crew_cheer_tally', 'n < 0') === 0, 'taking back a like that is not there changes nothing');
-  // a like on a Bell line
+  await still3('taking back a like that is not there changes nothing');
   await kudos('zz_ben', tallyLine);
-  ok(await tl('zz_ava') === 1, 'a like on a Bell line is +1 for the line\'s owner');
+  await still3('a like on a Bell line is +0 for the line\'s owner');
   await likeEm('zz_ben', tallyLine, '👏');
-  ok(await tl('zz_ava') === 1, 'the line like\'s emoji swap is +0');
   await kudos('zz_pat', tallyLine);
-  ok(await tl('zz_ava') === 2, 'a second person\'s like is another +1');
+  await still3('the line like\'s swap and a second person\'s like are +0');
   await kudos('zz_pat', tallyLine, false);
   await kudos('zz_ben', tallyLine, false);
-  ok(await tl('zz_ava') === 0, 'and taking both back is -2: the line like goes down too');
+  await still3('and taking both back is +0');
   // never your own, none for Amir
   await refuses('you cannot like your own post: crew:own', kudos('zz_ava', tp), /crew:own/);
   await refuses('or your own line: crew:own', kudos('zz_ava', tallyLine), /crew:own/);
   await refuses('or cheer yourself: crew:own', cheer('zz_ava', AVA), /crew:own/);
-  ok(await tl('zz_ava') === 0 && await tlSum() === 0, 'and none of that counted for anybody');
+  await still3('and none of that counted');
   await q(`insert into public.crew_kudos (athlete_id, post_id) values ('zz_ava', $1)`, [tp]);
-  ok(await tl('zz_ava') === 0, 'even a like written straight into the table by the author counts for nobody (the trigger itself refuses to count yourself)');
+  await still3('a like written straight into the table, by the author or by anyone, moves nothing either');
   await q(`delete from public.crew_kudos`);
-  const tAmir = await tlSum();
   const tpAmir = await mkPost(await val('public.coach_note_id()'));
   await kudos('zz_ben', tpAmir);
-  ok(await tlSum() === tAmir && await cnt('crew_cheer_tally', `athlete_id = public.coach_note_id()`) === 0, 'a like on Amir\'s post counts for nobody: he has no number');
+  ok(await tlSum() === 3 && await cnt('crew_cheer_tally', `athlete_id = public.coach_note_id()`) === 0, 'a like on Amir\'s post counts for nobody: he has no number');
   await kudos('zz_ben', tpAmir, false);
-  ok(await tlSum() === tAmir, 'and taking it back moves nobody');
-  // the sweep and a post's cascade never take one off
+  ok(await tlSum() === 3, 'and taking it back moves nobody');
+  // a like makes no row for a member who has none
+  await q(`delete from public.crew_cheer_tally`);
+  await kudos('zz_ben', tallyLine);
+  await kudos('zz_ben', tp);
+  ok(await cnt('crew_cheer_tally') === 0, 'a like makes no row at all for a member who has none (she still says 0)');
+  await kudos('zz_ben', tallyLine, false); await kudos('zz_ben', tp, false);
+  // the sweep and a post's cascade never move it
+  await q(`insert into public.crew_cheer_tally (athlete_id, n) values ('zz_ava', 3)`);
   await kudos('zz_ben', tallyLine);
   await q(`update public.crew_kudos set line_day = current_date - 9`);
   await q(`select public.crew_sweep()`);
-  ok(await cnt('crew_kudos') === 0 && await tl('zz_ava') === 1, 'the 7-day sweep deletes an old like and the number stays (it is an all-time number)');
-  await kudos('zz_ben', tallyLine, false);
-  ok(await tl('zz_ava') === 1, 'and taking back a like the sweep already deleted is +0');
+  ok(await cnt('crew_kudos') === 0 && await tl('zz_ava') === 3, 'the 7-day sweep deletes an old like and the number stays');
   await kudos('zz_cal', tp);
-  ok(await tl('zz_ava') === 2, 'Cal likes the post: +1');
   await q(`delete from public.crew_posts where id = $1`, [tp]);
-  ok(await cnt('crew_kudos') === 0 && await tl('zz_ava') === 2, 'the post is deleted, its likes go with it (the cascade) and the number stays');
+  ok(await cnt('crew_kudos') === 0 && await tl('zz_ava') === 3, 'a deleted post takes its likes with it (the cascade) and the number stays');
   const tp2 = await mkPost('zz_ava');
   await kudos('zz_ben', tp2);
-  ok(await tl('zz_ava') === 3, 'a like on another post: 3');
   await q(`update public.crew_posts set created_at = now() - interval '8 days' where id = $1`, [tp2]);
   await q(`select public.crew_sweep()`);
   ok(await cnt('crew_posts', `id = '${tp2}'`) === 0 && await cnt('crew_kudos') === 0 && await tl('zz_ava') === 3, 'the sweep deletes a post past 7 days with its likes and the number stays');
   // a cheer
+  await q(`delete from public.crew_cheer_tally`);
   await cheer('zz_ben', AVA, 'nice one');
-  ok(await tl('zz_ava') === 4, 'a cheer is +1 for the person cheered');
+  ok(await tl('zz_ava') === 1 && await cnt('crew_cheer_tally') === 1, 'a cheer is +1 for the person cheered (and makes her row)');
   await refuses('a second cheer the same day is refused: crew:cheer_today', cheer('zz_ben', AVA), /crew:cheer_today/);
-  ok(await tl('zz_ava') === 4, 'and the refused one counted nothing');
+  ok(await tl('zz_ava') === 1, 'and the refused one counted nothing');
   await coachCall(`select public.coach_cheer('zz_ava')`);
-  ok(await tl('zz_ava') === 5, 'Amir\'s cheer counts too (+1)');
+  ok(await tl('zz_ava') === 2, 'Amir\'s cheer counts too (+1)');
+  ok(await tl('zz_ava') === await received('zz_ava'), 'the number is the count of the cheers she has been sent');
+  await kudos('zz_pat', tallyLine);
+  ok(await tl('zz_ava') === 2, 'and a like on top of them is still +0');
+  await kudos('zz_pat', tallyLine, false);
+  ok(await tl('zz_ava') === 2, 'taking it back is still +0');
   await q(`update public.crew_cheers set word = null where to_athlete = 'zz_ava'`);
   await q(`delete from public.crew_cheers where to_athlete = 'zz_ava'`);
-  ok(await tl('zz_ava') === 5, 'and deleting cheer rows (the 400-day sweep) does not take any off');
-  // never below zero, never negative by hand
-  await kudos('zz_ben', tallyLine);
+  ok(await tl('zz_ava') === 2, 'deleting cheer rows (the 400-day sweep) does not take any off: it is an all-time number');
+  // never negative by hand
   await q(`update public.crew_cheer_tally set n = 0 where athlete_id = 'zz_ava'`);
-  await kudos('zz_ben', tallyLine, false);
-  ok(await tl('zz_ava') === 0, 'a like taken back when the number is already 0 leaves it at 0, never -1');
+  await kudos('zz_ben', tallyLine); await kudos('zz_ben', tallyLine, false);
+  ok(await tl('zz_ava') === 0, 'a like given and taken back when the number is 0 leaves it at 0, never -1');
   await refuses('and the table itself refuses a negative number', q(`update public.crew_cheer_tally set n = -1 where athlete_id = 'zz_ava'`), /check|violat/i);
   // what the page says
   await q(`update public.crew_cheer_tally set n = 11 where athlete_id = 'zz_ava'`);
@@ -985,7 +1041,17 @@ async function main() {
   ok(await val(`select count(*)::int from pg_trigger t join pg_class c on c.oid = t.tgrelid where c.relname in ('career_facts','career_awards','career_scores','career_recognition') and not t.tgisinternal and t.tgname ~ 'lounge|cheer|mention|face'`) === 0, 'and the stage put no trigger on a Career Mode table');
 
   // ═══ 15 ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-  section('15. the way back');
+  section('15. the way back (stage98 first, then stage96)');
+  // stage98 comes off first (the order the way back is documented in): the like counter, crew_kudos() as stage96 left it, the copy spent
+  await runSql(db, read(ROLLBACK98), 'rollback98');
+  ok(true, 'the way back from stage98 runs');
+  ok((await defMd5('crew_kudos')) === KUDOS_MD5_96, 'crew_kudos() is back to stage96\'s text, character for character');
+  ok(await likeTrg() === 1 && await cheerTrg() === 1, 'the trigger crew_tally_kudos is back on crew_kudos, and crew_tally_cheer is still on crew_cheers');
+  for (const sig of ['crew_t_tally_kudos()', 'crew_tally_down(text)']) { const g = await fnRow(sig); ok(g.svc && !g.anon && !g.auth, `${sig.split('(')[0]}() is back, the service role's alone`, g); }
+  { const g = await fnRow('crew_kudos(text,boolean,text)'); ok(!g.anon && g.auth && g.svc, 'and crew_kudos() keeps its door', g); }
+  ok(!(await copy98()) && await val(`select to_regclass('backup.lounge98_cheer_tally_20261025_restored')::text`) !== null, 'the copy of the old numbers is spent: renamed ..._restored');
+  await runSql(db, read(ROLLBACK98), 'rollback98 again');
+  ok((await defMd5('crew_kudos')) === KUDOS_MD5_96 && await likeTrg() === 1, 'the way back from stage98 runs twice with no error and changes nothing the second time');
   const KINDS_BEFORE_ROLLBACK = await cnt('crew_push_q');
   await q(`insert into public.athlete_profile (athlete_id, hand) values ('zz_keep', 'left') on conflict do nothing`);
   await runSql(db, read(ROLLBACK), 'rollback');
@@ -1049,6 +1115,66 @@ async function main() {
   ok(await val(`select n from public.crew_cheer_tally where athlete_id = 'zz_ava'`) === 5 && await val(`select n from public.crew_cheer_tally where athlete_id = 'zz_ben'`) === 2,
      'and the backfill alone arrives at the same 5: the likes that exist plus the cheers received (Amir\'s included)');
   await q(`delete from public.crew_cheer_tally`); await q(`delete from public.crew_cheers`); await q(`delete from public.crew_kudos`); await q(`delete from public.crew_posts where id in ($1, $2)`, [bfPost, bfAmir]);
+
+
+  // ═══ 17 ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  section('17. stage98 over a tally that counted likes: the recount, the copy, the way back with cheers sent in between');
+  // The database is stage96 alone again (section 16). Make the live situation: likes and cheers, both counted, as stage96 counted them.
+  const ck17 = {}; for (const id of ['zz_ava', 'zz_ben', 'zz_gus', 'zz_pat']) ck17[id] = await ckOf(id);
+  await q(`delete from public.crew_cheer_tally`); await q(`delete from public.crew_cheers`); await q(`delete from public.crew_kudos`);
+  const pAva17 = await mkPost('zz_ava'), pPat17 = await mkPost('zz_pat'), pGus17 = await mkPost('zz_gus');
+  const line = id => `${ck17[id]}:${todayS}`;
+  await kudos('zz_ben', pAva17); await kudos('zz_pat', pAva17); await kudos('zz_gus', line('zz_ava'));   // Ava: 3 likes
+  await cheer('zz_ben', ck17.zz_ava); await coachCall(`select public.coach_cheer('zz_ava')`);             // Ava: 2 cheers
+  await kudos('zz_ava', line('zz_ben')); await kudos('zz_gus', line('zz_ben')); await cheer('zz_pat', ck17.zz_ben);   // Ben: 2 likes, 1 cheer
+  await kudos('zz_ben', pPat17);                                                                           // Pat: 1 like, no cheer
+  const rows17 = async () => Object.fromEntries((await q(`select athlete_id, n from public.crew_cheer_tally order by 1`)).rows.map(r => [r.athlete_id, r.n]));
+  const T96 = { zz_ava: 5, zz_ben: 3, zz_pat: 1 };
+  ok(eq(await rows17(), T96), 'under stage96 the numbers count both: Ava 3 likes + 2 cheers = 5, Ben 2 + 1 = 3, Pat 1 + 0 = 1, and Gus (nothing sent to him) has no row', await rows17());
+  const KUDOS_MD5_17 = await defMd5('crew_kudos');
+  const allCounted = async () => (await q(`select t.athlete_id from public.crew_cheer_tally t where t.n <> (select count(*) from public.crew_cheers c where c.to_athlete = t.athlete_id and c.athlete_id <> t.athlete_id)`)).rows.length === 0;
+  await runSql(db, stage98, 'stage98 over likes');
+  ok(eq(await rows17(), { zz_ava: 2, zz_ben: 1, zz_pat: 0 }), 'stage98 counts again: Ava 2, Ben 1, Pat 0. Pat keeps a row (on 0), Gus still has none', await rows17());
+  ok(await allCounted(), 'every number equals the cheers that person has been sent');
+  ok(eq((await q(`select athlete_id, n, n_after from backup.lounge98_cheer_tally_20261025 order by 1`)).rows, [{ athlete_id: 'zz_ava', n: 5, n_after: 2 }, { athlete_id: 'zz_ben', n: 3, n_after: 1 }, { athlete_id: 'zz_pat', n: 1, n_after: 0 }]),
+     'the copy holds the old numbers (5, 3, 1) and what the stage set (2, 1, 0)');
+  await runSql(db, stage98, 'stage98 over likes again');
+  ok(eq(await rows17(), { zz_ava: 2, zz_ben: 1, zz_pat: 0 }) && await val(`select n from backup.lounge98_cheer_tally_20261025 where athlete_id = 'zz_ava'`) === 5,
+     'a re-run changes no number and keeps the first copy (the old 5 is not copied over by the new 2)');
+  const upd = await val(`select (select updated_at from public.crew_cheer_tally where athlete_id = 'zz_ava')::text`);
+  await runSql(db, stage98, 'stage98 over likes a third time');
+  ok(await val(`select (select updated_at from public.crew_cheer_tally where athlete_id = 'zz_ava')::text`) === upd, 'and a number that is already right is not touched (its updated_at stays)');
+  // the way back at once restores the old numbers exactly
+  await runSql(db, read(ROLLBACK98), 'rollback98 at once');
+  ok(eq(await rows17(), T96), 'the way back, with nothing sent in between, puts the old numbers back exactly (5, 3, 1)', await rows17());
+  ok((await defMd5('crew_kudos')) === KUDOS_MD5_17 && await likeTrg() === 1, 'and crew_kudos() and the like counter with them');
+  await kudos('zz_ben', pAva17, false);
+  ok(await tl('zz_ava') === 4, 'a like taken back is -1 again: the old rule is back (Ava 4)');
+  await kudos('zz_ben', pAva17);
+  ok(await tl('zz_ava') === 5, 'and given again it is +1 (Ava 5)');
+  // the stage again, and this time cheers go in between
+  await runSql(db, stage98, 'stage98 again after its way back');
+  ok(eq(await rows17(), { zz_ava: 2, zz_ben: 1, zz_pat: 0 }) && await val(`select n from backup.lounge98_cheer_tally_20261025 where athlete_id = 'zz_ava'`) === 5, 'it goes on again after its way back, with a fresh copy (Ava was 5, is 2)');
+  await kudos('zz_ben', pAva17, false); await kudos('zz_ben', pAva17);              // a like taken back and given again while it is on: nothing
+  await kudos('zz_ben', pGus17);                                                    // a like on Gus's post: nothing, and no row for him
+  ok(eq(await rows17(), { zz_ava: 2, zz_ben: 1, zz_pat: 0 }), 'likes given and taken back while it is on move nothing');
+  await cheer('zz_pat', ck17.zz_ava); await cheer('zz_gus', ck17.zz_pat); await cheer('zz_ben', ck17.zz_gus);
+  ok(eq(await rows17(), { zz_ava: 3, zz_ben: 1, zz_pat: 1, zz_gus: 1 }) && await allCounted(), 'three cheers go in between: Ava 3, Pat 1, and Gus gets his first row (1)', await rows17());
+  await runSql(db, read(ROLLBACK98), 'rollback98 after cheers');
+  ok(eq(await rows17(), { zz_ava: 6, zz_ben: 3, zz_pat: 2, zz_gus: 1 }),
+     'the way back keeps the cheers sent since: the old number + the new cheers (Ava 5 + 1, Ben 3 + 0, Pat 1 + 1); Gus, who has no copy, keeps his 1', await rows17());
+  // and the stage a last time, which is how the live project ends
+  await runSql(db, stage98, 'stage98 the last time');
+  ok(eq(await rows17(), { zz_ava: 3, zz_ben: 1, zz_pat: 1, zz_gus: 1 }) && await allCounted() && await likeTrg() === 0 && await cheerTrg() === 1, 'and again it is the cheers received: 3, 1, 1, 1, the like counter off, the cheer counter on', await rows17());
+  ok(await bcnt('lounge98_cheer_tally_20261025_restored') === 3, 'the spent copy of the last way back is kept (3 rows) until it is dropped by hand');
+  await db.exec('drop table backup.lounge98_cheer_tally_20261025_restored');
+  await refuses('with neither the copy nor a spent one the way back refuses and changes nothing', (async () => {
+    await db.exec('alter table backup.lounge98_cheer_tally_20261025 rename to zz_gone');
+    try { await runSql(db, read(ROLLBACK98), 'rollback98 without a copy'); }
+    finally { await db.exec('rollback').catch(() => {}); await db.exec('alter table backup.zz_gone rename to lounge98_cheer_tally_20261025'); }
+  })(), /backup\.lounge98_cheer_tally_20261025 is missing/);
+  ok(await likeTrg() === 0 && eq(await rows17(), { zz_ava: 3, zz_ben: 1, zz_pat: 1, zz_gus: 1 }), 'nothing moved: the stage is still on, the numbers are as they were');
+  await q(`delete from public.crew_cheer_tally`); await q(`delete from public.crew_cheers`); await q(`delete from public.crew_kudos`); await q(`delete from public.crew_posts where id in ($1, $2, $3)`, [pAva17, pPat17, pGus17]);
 
   console.log(`\n${passed} of ${passed + failed} checks passed  (${((Date.now() - t0) / 1000).toFixed(1)} s)`);
   if (failed) { console.log('\nFAILED:'); fails.forEach(f => console.log('  · ' + f)); }

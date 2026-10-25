@@ -69,7 +69,7 @@ screen and nothing compares habits with readiness.
 **Crew since the Players' Lounge went LIVE (2026-10-24, stage96 + stage97, sw v223; docs/ref/program-app/54 + 55):** every
 crew name opens a **Player Page** (`screen-crewplayer`, `openPlayer(ck)`, server `crew_page()`), and every person carries `ck`
 (crew_key) and `fv` (face version) in get_bell, the board, replies and the Open. Faces (`crew_faces`, not backed up), the Cheer
-to a person (`crew_cheers`, all-time `crew_cheer_tally` = cheers + likes received), band faces with a held ring and New Balls,
+to a person (`crew_cheers`, all-time `crew_cheer_tally` = cheers received; a like is not a cheer, stage98), band faces with a held ring and New Balls,
 Your game (`athlete_profile`, backed up, read by /program-design as `ctx.game`), the face stack on achievements
 (`crew_award_likes`), @names (`crew_mentions`) with aimed pushes (cheer, reply, mention), the cycle bars (others see this week
 only), First Serve on Home (push.md: three ask moments), partner codes (`affiliates.kind='athlete'`, `referral_credits`, 10% for

@@ -43,7 +43,8 @@
 --      broadcast, naming its sender; the broadcasts it was sent with are told as told (the Bell holds them for 7 days).
 --   6. Leaving means gone: crew_forget() takes a person's face, cheers (both ways), signatures (both ways) and mentions (both ways) off the server.
 --      crew_answer('no'), coach_crew_under13(true) and a trigger on athlete_status ('former') all call it. The cheer tally is deleted with them.
---   6b. The cheer tally: +1 for the person cheered (an INSERT into crew_cheers, Amir's included) and +1 for the author of a post or the owner of a line
+--   6b. (CHANGED BY stage98, 2026-10-25: Amir, "The number of cheers is wrong." A like no longer counts; the number is the cheers received. Read supabase/stage98_cheers_count.sql.)
+--      The cheer tally: +1 for the person cheered (an INSERT into crew_cheers, Amir's included) and +1 for the author of a post or the owner of a line
 --      that gets a like (an INSERT into crew_kudos; never for your own, none for Amir's posts). Both are TRIGGERS, so no other door can forget them.
 --      An emoji swap on a like is an UPDATE and counts nothing more. It goes DOWN by one (never below 0) only when somebody takes a like back through
 --      crew_kudos(p_on false): the 7-day sweep and a deleted post (the cascade) leave it alone, because it is an all-time number. The last lines of
@@ -67,12 +68,18 @@
 -- Rehearsed on PGlite: scripts/career/rehearse_lounge.mjs (the schema snapshot, made-up athletes, the stage twice, every function, the way back),
 -- scripts/push/rehearse_crew_push.mjs (the aimed cheer, reply and mention, and the two-phone fix), and once on the live database inside a DO block
 -- that ends in `raise exception`, so nothing stayed. The way back: scripts/career/rollback_stage96.sql (puts every function back to the text this
--- file started from, drops the tables, takes the patches out). Safe to re-run this file.
+-- file started from, drops the tables, takes the patches out). Safe to re-run this file, but NOT after stage98 (it refuses then, see section 0).
 
 -- ── 0. The guard: what this reads must be there, and what it overwrites must be what it was written against ──────────────────────
 do $stage96_guard$
 declare r record; d text;
 begin
+  -- stage98 (2026-10-25) took the likes out of the cheer tally. This file would put them back (the trigger crew_tally_kudos, the two decrement lines in
+  -- crew_kudos()), so once stage98 is on it must not run again. stage98 leaves its name in crew_kudos().
+  if to_regprocedure('public.crew_kudos(text,boolean,text)') is not null
+     and position('stage98' in pg_get_functiondef('public.crew_kudos(text,boolean,text)'::regprocedure)) > 0 then
+    raise exception 'stage96: stage98 is on this project (a like is no longer a cheer in the cheers number) and this file would count likes again. Do not run stage96 again. Nothing was changed.';
+  end if;
   if to_regprocedure('public.get_bell(text)') is null or to_regprocedure('public.crew_members()') is null
      or to_regprocedure('public.crew_reply_rows(uuid,text)') is null or to_regclass('public.crew_replies') is null then
     raise exception 'stage96: Crew, the Bell and the replies are missing (stages 81 to 92 first). Nothing was changed.';
@@ -918,6 +925,8 @@ begin
      where c.day >= current_date - 7), '[]'::jsonb);
 end $function$;
 
+-- ⚠️ stage98 (2026-10-25) took the likes out of this number: the trigger crew_tally_kudos, crew_t_tally_kudos(), crew_tally_down() and the decrement in crew_kudos() below are GONE from the live
+-- project, and this section's backfill (12b) is no longer how a number starts. What this section says about likes is the history of stage96, not the rule.
 -- ── 8b. The cheer tally: how many cheers a person has received, all time ─────────────────────────────────────────────────────────────
 -- "The number of cheers a person has got, should be shown on their acount" (Amir). A person cheer (crew_cheers) is one; so is a like on their post or
 -- their Bell line (crew_kudos), because the push already calls a like "X cheered you". +1 happens in a TRIGGER on each INSERT, so no door can forget
