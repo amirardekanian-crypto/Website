@@ -2557,7 +2557,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
 
 
   // ── 30. All-time cheers (CONTRACT 9b, Amir 2026-10-24: "the number of cheers a person has got, should be shown on their acount") ───────────────────────────────────────────────
-  // `crew_page().cheers.total` = cheers and likes received since joining. The page's tiles are the same on EVERY page: weeks held, sessions with Amir, personal bests, cheers. Your own page adds your comebacks as a
+  // `crew_page().cheers.total` = the Cheers people sent that person with the clap button since joining (stage98, 2026-10-25: never likes). The page's tiles are the same on EVERY page: weeks held, sessions with Amir, personal bests, cheers. Your own page adds your comebacks as a
   // fifth, thin, full-width row under the tiles, marked Only you. An absent key is an absent tile (a switch off). The list below the tiles is the last 7 days and is headed "Cheers this week".
   const cheerTiles = async (o = {}) => {
     const x = await open(browser, Object.assign({ stub: { crewPages: o.pages || {} } }, o.o || {}));
@@ -2644,7 +2644,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const gx = await cheerTiles({ own: true, pages: { me: { numbers: NUM, cheers: { total: 52, recent: [] } } } });
     const gt = await gx.p.evaluate(() => buildAppGuideCards());
     const gseg = (gt.match(/The <strong>cheers<\/strong> number on a page[\s\S]*?<\/p>/) || [''])[0];
-    C.check('the guide says the cheers number counts cheers and likes since joining, and that comebacks are a thin line only you see, in plain words', /every cheer and every like/.test(gseg) && /<strong>comebacks<\/strong>/.test(gseg) && /Only you/.test(gseg) && !/[—;]/.test(gseg.replace(/&[a-z]+;/g, '')), gseg.slice(0, 80));
+    C.check('the guide says the cheers number counts only the cheers sent with the Cheer button (no likes), and that comebacks are a thin line only you see, in plain words', /counts only the cheers people sent that person with the <strong>Cheer<\/strong> button/.test(gseg) && /Likes are not in it\./.test(gseg) && !/every like/.test(gseg) && /<strong>comebacks<\/strong>/.test(gseg) && /Only you/.test(gseg) && !/[—;]/.test(gseg.replace(/&[a-z]+;/g, '')), gseg.slice(0, 80));
     await gx.ctx.close();
   }
 
@@ -2711,6 +2711,28 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('no page errors', !d.p.errs.length, d.p.errs.join(' | '));
     await d.ctx.close();
   }
+  if (on(31)) {
+    // (2) THE CHEERS NUMBER: stage98 counts only Cheers sent with the clap button, so nothing an athlete reads says likes count
+    const g = await open(browser, { stub: { crewPages: { me: { cheers: { total: 3, recent: [] } }, [CK.mina]: { cheers: { total: 7, recent: [] } } } } });
+    await goCrew(g.p); await shown(g.p, CK.mina);
+    C.check('the tile still says "cheers", with the page\'s own number', (await tiles(g.p))[3] === '7 cheers', JSON.stringify(await tiles(g.p)));
+    await g.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await g.p.waitForTimeout(250);
+    // a like on her post never moves her total: the phone adds nothing for a like
+    await g.p.evaluate(id => crewLike({ dataset: { kd: id } }), P_MINA); await g.p.waitForTimeout(400);
+    await shown(g.p, CK.mina);
+    C.check('a like on her post leaves her cheers number alone (7)', (await tiles(g.p))[3] === '7 cheers', JSON.stringify(await tiles(g.p)));
+    const gt = await g.p.evaluate(() => buildAppGuideCards());
+    const gseg = (gt.match(/The <strong>cheers<\/strong> number on a page[\s\S]*?<\/p>/) || [''])[0];
+    C.check('the guide says the number counts only the cheers people sent with the Cheer button, and that likes are not in it', /only the cheers/.test(gseg) && /<strong>Cheer<\/strong> button/.test(gseg) && /likes/i.test(gseg) && /not in it|do not count|are not counted/.test(gseg) && !/every cheer and every like/.test(gt), gseg);
+    C.check('…and nothing else in the guide says likes make up the cheers', !/cheers? (and|or) (every )?likes?|likes? (and|or) (every )?cheers?/i.test(gt.replace(gseg, '')));
+    await g.ctx.close();
+    const en = fsx.readFileSync(path.join(ROOT, 'privacy.html'), 'utf8'), fa = fsx.readFileSync(path.join(ROOT, 'privacy-fa.html'), 'utf8');
+    C.check('privacy.html: the page\'s number counts only the cheers sent with the Cheer button, and likes are said not to be in it', /with the Cheer button since you joined the crew/.test(en) && /It counts only the cheers people sent you with the Cheer button\. Likes on your posts and moments are not in it\./.test(en) && !/cheers and likes you have received/.test(en) && !/It counts cheers and likes/.test(en));
+    C.check('privacy.html: the notice carries today\'s date', /Last updated · 25 October 2026/.test(en));
+    C.check('privacy-fa.html: both changed items say it, and each is marked as a draft for Amir to read', !/تشویق‌ها و لایک‌های پست‌ها/.test(fa) && !/تشویق‌ها و لایک‌هایی/.test(fa)
+      && (fa.match(/<!-- FA DRAFT 2026-10-25: Amir to read -->\r?\n\s*<li><b>(صفحه‌ی تو|تشویق)<\/b>/g) || []).length === 2 && (fa.match(/Cheer<\/bdi> برات فرستادن/g) || []).length === 2);
+  }
+
   // ── 32. the pictures (390 px) for 2026-10-25: the new cover (light and dark) and the account sheet's Profile group (light) ──────────────────────────────
   if (on(32)) {
     const people = [[CK.alex, '#5E8C7A', '#E3B896', '#2E4A57', 1101]];
