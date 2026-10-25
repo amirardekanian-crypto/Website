@@ -153,11 +153,51 @@ async function lowerDay(browser) {
   await ctx.close();
 }
 
+// ═════════ tempo ═════════
+// The fixture's day 1: the squat is 3-1-1, day 2's press 3-0-1. Added here: an explosive box jump (X-0-X-0), a split squat that
+// lowers for 0, and a pallof press at 2-0-2-0.
+function withTempos() {
+  const P = H.fixture();
+  const b = P.workouts.days[0].blocks;
+  b[1].exercises.find(e => e.name === 'Box Jump').rx.tempo = 'X-0-X-0';
+  b[1].exercises.find(e => e.name === 'Dumbbell Bulgarian Split Squat').rx.tempo = '0-0-1';
+  b[2].exercises.find(e => e.name === 'Half Kneeling Pallof Press').rx.tempo = '2-0-2-0';
+  return P;
+}
+async function tempo(browser) {
+  const { ctx, p } = await H.openProgram(browser, { prog: withTempos() });
+  await p.evaluate("openDayView('1')");
+  await p.waitForTimeout(400);
+  const L = nm => cardOf(p, nm);
+  const sq = await L('Barbell Back Squat'), pal = await L('Half Kneeling Pallof Press'), box = await L('Box Jump'), split = await L('Dumbbell Bulgarian Split Squat');
+  t.check('tempo: 3-1-1 says "Down 3 s · pause 1 s" and not the numbers', /Down 3 s · pause 1 s/.test(sq) && !/3-1-1/.test(sq), sq);
+  t.check('tempo: 2-0-2-0 says "Down 2 s", no pause', /Down 2 s/.test(pal) && !/pause/.test(pal) && !/2-0-2-0/.test(pal), pal);
+  t.check('tempo: X-0-X-0 (an explosive lift) leaves the tempo out of the line', box !== null && !/Down|tempo|X-0/i.test(box), box);
+  t.check('tempo: 0-0-1 (a 0 for the lowering) leaves the tempo out of the line', split !== null && !/Down|tempo|0-0-1/i.test(split), split);
+  await p.evaluate("openDayView('2')");
+  await p.waitForTimeout(400);
+  const press = await L('Incline Dumbbell Press');
+  t.check('tempo: 3-0-1 on day 2\'s press says "Down 3 s" only', /Down 3 s/.test(press) && !/pause/.test(press) && !/3-0-1/.test(press), press);
+  // the help button stays: a tap on the open squat's tempo opens the help card with the whole tempo in it
+  await p.evaluate("openDayView('1')");
+  await p.waitForTimeout(300);
+  await openCard(p, 'Barbell Back Squat');
+  await p.waitForTimeout(500);
+  await p.click('#day-view .checklist-item:not(.collapsed) .nl-tempo .nl-help');
+  await p.waitForTimeout(350);
+  const help = await p.evaluate(() => { const o = document.getElementById('hist-overlay'); const open = o.querySelector('.note-card.open'); return { shown: o.classList.contains('visible'), txt: open ? open.innerText.replace(/\s+/g, ' ') : '' }; });
+  t.check('tempo: the tempo help button still opens the help card, with the whole tempo (3-1-1) and "Down 3 s"', help.shown && /3-1-1/.test(help.txt) && /Down 3 s/.test(help.txt), help.txt.slice(0, 260));
+  t.check('tempo: no page errors', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+}
+
+
 (async () => {
   const browser = await H.launch();
   await rpe(browser);
   await tagWidth(browser);
   await lowerDay(browser);
+  await tempo(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

@@ -329,6 +329,7 @@ async function l6(browser) {
       await o.p.evaluate(() => { openDayView('1'); openStepMode('1'); }); await o.p.waitForTimeout(350);
       await o.p.evaluate(() => { if (STEP && STEP.seq[STEP.pos].group) stepPrimary(); }); await o.p.waitForTimeout(250);
       await goStep(o.p, 'Barbell Back Squat'); await o.p.waitForTimeout(300);
+      await o.p.evaluate(() => document.querySelectorAll('#stepOverlay details.note-row').forEach(d => { d.open = true; }));   // the Note is open, so its box is drawn (closed, Chrome still gives it a size and it sat under the footer)
       return { ...o, root: '#stepOverlay' };
     },
     'the finish card': async (w, dark) => {
