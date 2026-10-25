@@ -331,6 +331,16 @@ that's the calendar the athlete actually lives by.
 
 Hand off to **/program-assemble Part B**, which places the words, runs the full check and publishes.
 
+## Plain words (Amir, 2026-10-25)
+
+Amir approved these for everything an athlete reads in a new cycle. They change the words only, never the programming.
+
+- Write "easy week", never "Deload".
+- No lines in the style of "Earn the adaptation". Say it plainly: "Do the work. Your body changes."
+- Keep each cycle's name, and give it one plain line that says what the cycle is for.
+- Write "effort", never "RPE", in anything the athlete reads. (Field names and keys in the JSON stay as they are.)
+- Live programmes are not edited for this (PRC-1). It applies to the words of the next cycle you write.
+
 ## Don'ts
 - Don't alter exercises, sets, reps, tempo, or RPE.
 - Don't regenerate the roadmap.
