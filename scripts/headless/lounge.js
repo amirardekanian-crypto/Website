@@ -1517,7 +1517,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
       me: { who: 'Alex R.', lv: 19, art: 'voltage', fv: 1101, kinds: { week: true, level: true }, cycle: cycleOf(true), achievements: ach, game: { sports: ['padel'], hand: 'right', side: 'left', club: 'Enghelab, Tehran', training_for: ['strength'], working_on: 'my second serve' },
         cheers: { total: 3, recent: [] } },
       [CK.mina]: { who: 'Mina S.', lv: 14, art: 'iron', fv: 1102, cycle: cycleOf(false), game: gameMina, achievements: ach, cheers: { total: 12, recent: [], mine_today: false } } };
-    // YOUR page, dark: the bars with an extra, Your game, the face stack
+    // YOUR page, dark: the bars with an extra, Your game, the trophies
     const d = await open(browser, { opts: { dark: true }, stub: { bell: bl, crewBoard: brd, crewPages: pages } });
     await faceImgs(d.p);
     await goCrew(d.p); await d.p.waitForTimeout(700);
@@ -1536,13 +1536,13 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await a.p.screenshot({ path: path.join(out, 'player-other-game-light-390.png'), fullPage: true });
     const crop = (sel0, sel1, up) => a.p.evaluate(([s0, s1, u]) => { const t = document.querySelector(s0).getBoundingClientRect(), e = document.querySelector(s1).getBoundingClientRect(); return { x: 0, y: Math.max(0, Math.round(t.top + scrollY - u)), width: 390, height: Math.round(e.bottom - t.top + u + 14) }; }, [sel0, sel1, up]);
     await a.p.screenshot({ path: path.join(out, 'player-other-thisweek-light-390.png'), fullPage: true, clip: await crop('#crewplayer-body .pl-cyc', '#crewplayer-body .pl-cyc + .pl-tail', 50) });
-    await a.p.screenshot({ path: path.join(out, 'face-stack-light-390.png'), fullPage: true, clip: await crop('#crewplayer-body .cab-trh', '#crewplayer-body .cab-pl + .pl-tail', 52) });
+    await a.p.screenshot({ path: path.join(out, 'trophies-light-390.png'), fullPage: true, clip: await crop('#crewplayer-body .cab-trh', '#crewplayer-body .cab-trh + .cab-pl', 52) });   // no face stack since 2026-10-25
     await a.p.evaluate(() => { document.getElementById('global-tabs').style.display = ''; window.scrollTo(0, 0); });
     await nth(a.p, '#crewplayer-body .pl-wb', 0); await a.p.waitForTimeout(450);
     await a.p.screenshot({ path: path.join(out, 'cycle-week-sheet-light-390.png') });
     await a.p.evaluate(() => closeHistorySheet()); await a.p.waitForTimeout(250);
     await nth(a.p, '#crewplayer-body .cab-grid button.cab-cell', 0); await a.p.waitForTimeout(900);
-    await a.p.screenshot({ path: path.join(out, 'face-stack-sheet-light-390.png') });
+    await a.p.screenshot({ path: path.join(out, 'trophy-sheet-light-390.png') });   // a trophy opens what it is
     await a.ctx.close();
   }
 
