@@ -1,7 +1,7 @@
 // Players' Lounge, the athlete app (2026-10-24): node scripts/headless/lounge.js [--out <dir for screenshots>]
 //
 // Step 0 and 1: the Player Page. A page for every person in the crew, opened from any name, face or row on Crew (a post, a reply, the week band,
-// In the crew, the board on the tab and its page, the honours, the Open, a Bell line), from your initials → Your page and from Crew and the Bell;
+// In the crew, the board on the tab and its page, the honours, the Open, a Bell line), from your initials → Your page and from What the crew sees;
 // its ← goes back to where it was opened from; what a person switched off is not on it; a comeback is yours alone; the copy on the phone is drawn
 // first and with no signal it is all there is; the join question shows your own page first; "Your page is here" once, for members who were already
 // in; a server without stage96 keeps today's Crew exactly; under 13 gets no doors; 320 px and dark mode. Later steps of the Lounge add their checks
@@ -34,7 +34,7 @@
 // Step 11: the Open wall (section 28): tiles, your mint outline, the first 8 and All 14 ›, the list sheet, a tile opens the page, a server without stage96 keeps the rows, the card names nobody else. Section 29 takes its pictures.
 // All-time cheers (section 30, CONTRACT 9b): the four tiles are the same on every page (weeks held, sessions, bests, cheers = cheers.total), yours adds your comebacks as a thin Only you row under them; the list is "Cheers this week".
 // 2026-10-25, Amir from his iPhone (section 31; section 32 takes its pictures): the cover is a banner (about 200 px at 390 wide, never over 28% of the screen, the picture at full strength under a light shade, the
-// face still over its foot), the cheers number counts only Cheers sent with the clap button (stage98: no likes), and the account sheet opens with a Profile group (Your photo, Your game, Your page, What the crew sees of you).
+// face still over its foot), the cheers number counts only Cheers sent with the clap button (stage98: no likes), and the account sheet opens with a Profile group (Your photo, Your game, Your page, What the crew sees).
 // `--only=14,15` runs just those sections (everything after a "// ── N." line is wrapped in on(N)).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
@@ -152,10 +152,12 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const { ctx, p } = await open(browser, { stub: { crewPages: { [CK.mina]: { art: 'iron', since: '2026-06-06' } } } });
     await goCrew(p);
     const doors = await p.evaluate(() => ({ pl: document.querySelectorAll('#crew-body .cr-pl').length, nb: document.querySelectorAll('#crew-body .cr-nb').length,
-      band: document.querySelectorAll('#crew-body .cr-faces button.cr-face').length, go: !!document.querySelector('#crew-body .cr-week .cr-bandfoot .go'),
+      band: document.querySelectorAll('#crew-body .cr-faces button.cr-face').length, go: !!document.querySelector('#crew-body .cr-week .cr-bandtop .go'),
+      hon: document.querySelectorAll('#crew-body .cr-hon button.cr-ht').length, lineFace: document.querySelectorAll('#crew-body .cr-line > button.cr-fd').length, chev: document.querySelectorAll('#crew-board button.cr-br .c').length,
       boardBtn: document.querySelectorAll('#crew-board button.cr-br').length, openBtn: document.querySelectorAll('#crew-body button.cr-ob-r').length,
       bandIsDiv: document.querySelector('#crew-body .cr-faces').tagName }));
-    C.check('stage96: posts, replies, lines, honours, the band\'s faces, the board and the Open rows are all doors', doors.pl >= 4 && doors.nb >= 4 && doors.band === 7 && doors.go && doors.boardBtn === 3 && doors.openBtn === 2, JSON.stringify(doors));
+    C.check('stage96: posts, replies, lines (name AND face), honours (a one-person tile is the whole door), the band\'s faces, the board (with its ›) and the Open rows are all doors', doors.pl >= 4 && doors.nb >= 3 && doors.band === 7 && doors.go && doors.boardBtn === 3 && doors.openBtn === 2
+      && doors.hon === 2 && doors.lineFace === 1 && doors.chev === 3, JSON.stringify(doors));
     C.check('…the band is a row of buttons, not a button full of them', doors.bandIsDiv === 'DIV');
     C.check('…every door has a name a screen reader can say (words, or an aria-label for a face)', await p.evaluate(() =>
       [...document.querySelectorAll('#crew-body .cr-bt')].every(b => ((b.getAttribute('aria-label') || '') + b.textContent).replace(/\s+/g, '').length > 1)));    await p.evaluate(() => window.scrollTo(0, 500));
@@ -193,7 +195,8 @@ const on = n => !ONLY.length || ONLY.includes(n);
       ['a reply\'s name', '.cr-rep .cr-nb', CK.mina],
       ['a Bell line\'s name', '.cr-line .cr-nb', CK.mina],
       ['a face on the week band', '.cr-fcs .cr-fc:nth-child(3) button.cr-face', CK.reza],
-      ['an honours name', '.cr-hon b .cr-nb', CK.reza],
+      ['an honours tile with one person (the whole tile)', '.cr-hon button.cr-ht', CK.reza],
+      ['a Bell line\'s face', '.cr-line > button.cr-fd', CK.mina],
       ['an Open board row', 'button.cr-ob-r:not(.me)', CK.reza],
       ['a row of the season board on the tab', '#crew-board button.cr-br:not(.me)', CK.reza],
     ];
@@ -301,7 +304,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const { ctx, p } = await open(browser, { stub: { crewPages: { me: { who: 'Alex R.' } } } });
     await goCrew(p);
     await p.evaluate(() => openAccount()); await p.waitForTimeout(250);
-    C.check('your initials: a "Your page" row, before Crew and the Bell', await p.evaluate(() => { const r = [...document.querySelectorAll('#hist-overlay .acct-list .hrow .hrow-v')].map(x => x.textContent.trim()); return r.indexOf('Your page') >= 0 && r.indexOf('Your page') < r.indexOf('Crew and the Bell'); }));
+    C.check('your initials: a "Your page" row, in the Profile group right before What the crew sees (and no Crew and the Bell row anywhere)', await p.evaluate(() => { const r = [...document.querySelectorAll('#hist-overlay .acct-list .hrow .hrow-v')].map(x => x.textContent.trim()); return r.indexOf('Your page') >= 0 && r.indexOf('Your page') + 1 === r.indexOf('What the crew sees') && r.indexOf('Crew and the Bell') < 0; }));
     await click(p, '#acct-page'); await p.waitForTimeout(600);
     C.check('…it opens your own page (the sheet closes)', (await screenNow(p)) === 'screen-crewplayer' && !(await p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))) && (await p.evaluate(() => _playerCk)) === 'me');
     const t = await tiles(p);
@@ -310,10 +313,10 @@ const on = n => !ONLY.length || ONLY.includes(n);
       return { text: r.innerText.replace(/\s+/g, ' ').trim(), under: Math.round(a.top - b.bottom), w: Math.round(a.width), gw: Math.round(b.width), h: Math.round(a.height), only: !!r.querySelector('.pl-only'), follows: !!(g.compareDocumentPosition(r) & Node.DOCUMENT_POSITION_FOLLOWING) }; });
     C.check('…your comebacks are a fifth row under the tiles: thin, as wide as the tiles, marked Only you', !!cbr && /^2 comebacks ONLY YOU$/.test(cbr.text) && cbr.only && cbr.follows && cbr.under >= 0 && cbr.under <= 12 && cbr.w === cbr.gw && cbr.h <= 48, JSON.stringify(cbr));
     C.check('…titled Your numbers', (await secs(p))[0] === 'Your numbers');
-    C.check('…and says it is what the crew sees, with a door to what the crew sees of you', /This is what the crew sees/.test(await text(p, '#crewplayer-body')) && /What the crew sees of you/.test(await text(p, '#crewplayer-body .pl-door')));
+    C.check('…and says it is what the crew sees, with a door to What the crew sees', /This is what the crew sees/.test(await text(p, '#crewplayer-body')) && (await text(p, '#crewplayer-body .pl-door')).replace(/\s*›$/, '') === 'What the crew sees');
     C.check('…your own posts are This week', (await p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-wk')].map(r => r.textContent).join('|'))).includes('Day 2 done.'));
     await click(p, '#crewplayer-body .pl-door'); await p.waitForTimeout(350);
-    C.check('…the door opens Crew and the Bell', await p.evaluate(() => /Crew and the Bell/.test((document.querySelector('#hist-overlay .readiness-title') || {}).textContent || '')));
+    C.check('…the door opens What the crew sees', await p.evaluate(() => (document.querySelector('#hist-overlay .readiness-title') || {}).textContent === 'What the crew sees'));
     C.check('…whose own "Your page" row opens your page again', !!(await p.$('#cs-page')));
     await p.evaluate(() => closeHistorySheet()); await p.waitForTimeout(200);
     await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(300);
@@ -325,7 +328,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('…and from Home, back to Home', (await screenNow(p)) === 'screen-home');
     await p.evaluate(() => { goTo('crew'); openCrewSettings(); }); await p.waitForTimeout(300);
     await click(p, '#cs-page'); await p.waitForTimeout(500);
-    C.check('Crew and the Bell has the same row, and it opens your page', (await p.evaluate(() => _playerCk)) === 'me' && (await screenNow(p)) === 'screen-crewplayer');
+    C.check('What the crew sees has the same row, and it opens your page', (await p.evaluate(() => _playerCk)) === 'me' && (await screenNow(p)) === 'screen-crewplayer');
     C.check('no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }
@@ -385,7 +388,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('without stage96: no door anywhere, the band is the one button it was, and a tap on a key does nothing', !s.pagesOn && s.doors === 0 && s.band === 'BUTTON' && s.tapName === 'screen-crew', JSON.stringify(s));
     C.check('…crew_page is never asked', (await calls(p, 'crew_page')).length === 0);
     await p.evaluate(() => openAccount()); await p.waitForTimeout(250);
-    C.check('…no Your page row in the account, and none in Crew and the Bell', !(await p.$('#acct-page')) && await p.evaluate(() => { closeHistorySheet(); openCrewSettings(); return !document.getElementById('cs-page'); }));
+    C.check('…no Your page row in the account, and none in What the crew sees', !(await p.$('#acct-page')) && await p.evaluate(() => { closeHistorySheet(); openCrewSettings(); return !document.getElementById('cs-page'); }));
     await p.evaluate(() => { closeHistorySheet(); goTo('crewwho'); }); await p.waitForTimeout(300);
     C.check('…In the crew still reads each level from the board by name', /LV 19/.test(await text(p, '#crewwho-body')));
     const g = await p.evaluate(() => buildAppGuideCards());
@@ -456,7 +459,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const { ctx, p } = await open(browser);
     await waitTab(p); await p.evaluate(() => goTo('crew')); await p.waitForTimeout(600);
     const c = await p.evaluate(() => ({ t: (document.getElementById('crew-intro') || {}).textContent || '', first: document.querySelector('#crew-body').firstElementChild.id, btns: [...document.querySelectorAll('#crew-intro button')].map(b => b.textContent.trim()).join('|') }));
-    C.check('the first visit: "Your page is here. This is what the crew sees." with two buttons', /Your page is here/.test(c.t) && /This is what the crew sees/.test(c.t) && c.btns === 'See your page|What the crew sees of you' && c.first === 'crew-intro', JSON.stringify(c));
+    C.check('the first visit: "Your page is here. This is what the crew sees." with two buttons', /Your page is here/.test(c.t) && /This is what the crew sees/.test(c.t) && c.btns === 'See your page|What the crew sees' && c.first === 'crew-intro', JSON.stringify(c));
     C.check('…the key is set the moment it is shown', await p.evaluate(id => localStorage.getItem(id + '_pageintro') === '1', H.ID));
     await p.evaluate(() => { goTo('home'); goTo('crew'); }); await p.waitForTimeout(500);
     C.check('…and the next visit it is gone', !(await p.$('#crew-intro')));
@@ -467,7 +470,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await p.waitForTimeout(300);
     await p.evaluate(() => { localStorage.removeItem(ATHLETE_ID + '_pageintro'); goTo('home'); goTo('crew'); }); await p.waitForTimeout(400);
     await click(p, '#crew-intro .cr-no'); await p.waitForTimeout(300);
-    C.check('What the crew sees of you opens the switches', await p.evaluate(() => /Crew and the Bell/.test((document.querySelector('#hist-overlay .readiness-title') || {}).textContent || '')));
+    C.check('What the crew sees opens the switches', await p.evaluate(() => (document.querySelector('#hist-overlay .readiness-title') || {}).textContent === 'What the crew sees'));
     C.check('…and the key is the athlete\'s own (it syncs, so a second phone does not say it again)', await p.evaluate(() => Object.keys(_snapshot()).some(k => /_pageintro$/.test(k))));
     await ctx.close();
   }
@@ -882,7 +885,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
       const ring = f => /rgb\(\d+, \d+, \d+\) 0px 0px 0px 4px/.test(getComputedStyle(f).boxShadow) || /0px 0px 0px 4px/.test(getComputedStyle(f).boxShadow);
       return { n: faces.length, w: faces.map(f => Math.round(f.getBoundingClientRect().width)), held: faces.filter(f => f.classList.contains('held')).map(f => f.getAttribute('aria-label')),
         ring: faces.filter(ring).length, news: [...document.querySelectorAll('#crew-body .cr-new')].map(e => e.closest('.cr-fc').querySelector('.cr-face').getAttribute('aria-label')),
-        hint: (document.querySelector('#crew-body .cr-hint') || {}).textContent, foot: !!document.querySelector('#crew-body .cr-bandfoot .go'), more: (document.querySelector('#crew-body .cr-face.more') || {}).textContent,
+        hint: (document.querySelector('#crew-body .cr-hint') || {}).textContent, foot: !!document.querySelector('#crew-body .cr-week .cr-bandtop .go') && !!document.querySelector('#crew-body .cr-bandfoot .cr-hint'), more: (document.querySelector('#crew-body .cr-face.more') || {}).textContent,
         facesTag: document.querySelector('#crew-body .cr-faces').tagName };
     });
     C.check('the band: six faces and "+2", forty pixels each (a door apiece)', b.n === 7 && b.w.slice(0, 6).every(x => x >= 38 && x <= 40) && b.facesTag === 'DIV', JSON.stringify(b.w));
@@ -1929,6 +1932,61 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const fsSrc = src.slice(src.indexOf('const FS_DAYS'), src.indexOf('async function paintWeekSugg'));
     C.check('First Serve\'s code never opens the phone\'s box itself: no requestPermission, no enable(), only pushAsk()', !/requestPermission|AAPush\.enable|pushTurnOnHere\(/.test(fsSrc) && /pushAsk\('serve'/.test(fsSrc), '');
 
+    // ── THE FOURTH MOMENT (round 7, 2026-10-25, push.md: Amir "82 good"): the line under Cheers this week on YOUR OWN page. The same ask and the same button as First Serve's step:
+    //    the box is shut on load, on the page, on the line, and opens once, inside the button's click. Nothing when the phone is on, blocked or waits for the Home Screen; nothing on
+    //    someone else's page, in the demo or in the coach's preview.
+    const chPages = { me: { who: 'Alex R.', cheers: { total: 2, recent: [{ ck: CK.mina, fv: null, who: 'Mina S.', word: 'Nice one', day: today }] } }, [CK.mina]: { who: 'Mina S.', cheers: { total: 4, recent: [{ ck: CK.reza, fv: null, who: 'Reza K.', word: 'Yes', day: today }] } } };
+    const cq = await fsOpen({ hist: histAgo(1), b: { me: { answer: 'yes', can_post: true } }, stub: { crewPages: chPages }, opts: { init: BOX } });
+    await homeWait(cq.p);
+    const cb0 = await box(cq.p);
+    await cq.p.evaluate(() => openPlayer('me')); await cq.p.waitForTimeout(700);
+    const crow = () => cq.p.evaluate(() => { const r = document.querySelector('#crewplayer-body .pl-push'); const l = r && r.parentElement; return r ? { t: r.textContent.replace(/\s+/g, ' ').trim(), tag: r.tagName, last: l.lastElementChild === r, list: l.classList.contains('pl-list'), head: (l.previousElementSibling || {}).textContent, h: Math.round(r.getBoundingClientRect().height) } : null; });
+    let cr = await crow();
+    C.check('your own page, the phone able to take notifications and not on: one plain row under Cheers this week, "Turn on notifications so the next cheer reaches you" (after the cheers, a button, 44 px or more)',
+      !!cr && /^Turn on notifications so the next cheer reaches you/.test(cr.t) && cr.tag === 'BUTTON' && cr.last && cr.list && cr.head === 'Cheers this week' && cr.h >= 44, JSON.stringify(cr));
+    C.check('…the page loaded and was opened, and the phone\'s box was never opened', cb0 === 0 && (await box(cq.p)) === 0 && !(await toast(cq.p)), String(await box(cq.p)));
+    await cq.p.evaluate(() => document.querySelector('#crewplayer-body .pl-push').click()); await cq.p.waitForTimeout(500);
+    tt = await toast(cq.p);
+    C.check('a tap on the row puts up the one line with a "Turn them on" button, and the box is still shut', !!tt && tt.action === 'Turn them on' && /next cheer reaches you/.test(tt.text) && (await box(cq.p)) === 0, JSON.stringify(tt));
+    await cq.p.waitForTimeout(6500);
+    C.check('…it waits for them (it does not fade), and the box is still shut', !!(await toast(cq.p)) && (await box(cq.p)) === 0);
+    await cq.p.evaluate(() => document.querySelector('#aaToast .aa-toast-x').click()); await cq.p.waitForTimeout(250);
+    await cq.p.evaluate(() => document.querySelector('#crewplayer-body .pl-push').click()); await cq.p.waitForTimeout(400);
+    C.check('"Not now", then the row again: the line comes back (their own tap, every time), the box still shut', !!(await toast(cq.p)) && (await box(cq.p)) === 0);
+    await cq.p.evaluate(() => document.querySelector('#aaToast .aa-toast-go').click()); await cq.p.waitForTimeout(700);
+    C.check('only the button\'s tap opens the box: exactly once, inside that click', (await box(cq.p)) === 1 && await cq.p.evaluate(() => window.__BOX[0] === 'requestPermission'), String(await box(cq.p)));
+    C.check('…no page errors', !cq.p.errs.length, cq.p.errs.join(' | '));
+    await cq.ctx.close();
+    // the page with no cheers yet still carries the row (that is when it is worth most), under its heading
+    const c0 = await fsOpen({ b: { me: { answer: 'yes', can_post: true } }, stub: { crewPages: { me: { who: 'Alex R.', cheers: { total: 0, recent: [] } } } }, opts: { init: BOX } });
+    await homeWait(c0.p);
+    await c0.p.evaluate(() => openPlayer('me')); await c0.p.waitForTimeout(700);
+    C.check('with no cheers yet the row is still there, under the heading', await c0.p.evaluate(() => { const r = document.querySelector('#crewplayer-body .pl-push'); return !!r && /Cheers this week/.test((r.parentElement.previousElementSibling || {}).textContent || ''); }));
+    await c0.ctx.close();
+    // the states where asking is wrong, and the pages where the row does not belong
+    for (const [state, what] of [['on', 'notifications on'], ['blocked', 'blocked'], ['needs-install', 'an iPhone that needs the Home Screen'], ['unsupported', 'a browser that cannot take them']]) {
+      const w = await fsOpen({ b: { me: { answer: 'yes', can_post: true } }, stub: { crewPages: chPages }, opts: { init: BOX } });
+      await homeWait(w.p);
+      await w.p.evaluate(s => { window.AAPush = Object.assign({}, window.AAPush, { state: () => s }); openPlayer('me'); }, state); await w.p.waitForTimeout(700);
+      C.check(`${what}: no row on your page, nothing asked, the box shut`, !(await w.p.$('#crewplayer-body .pl-push')) && !(await toast(w.p)) && (await box(w.p)) === 0 && /Cheers this week/.test(await plain(w.p, '#crewplayer-body')), '');
+      await w.ctx.close();
+    }
+    const el = await fsOpen({ b: { me: { answer: 'yes', can_post: true } }, stub: { crewPages: chPages }, opts: { init: BOX } });
+    await homeWait(el.p);
+    await el.p.evaluate(() => openPlayer('me')); await el.p.waitForTimeout(500);
+    await el.p.evaluate(k => openPlayer(k), CK.mina); await el.p.waitForTimeout(700);
+    C.check('someone else\'s page: Cheers this week and no row', !(await el.p.$('#crewplayer-body .pl-push')) && /Cheers this week/.test(await plain(el.p, '#crewplayer-body')) && (await el.p.evaluate(() => _playerCk)) === CK.mina);
+    await el.ctx.close();
+    const dm4 = await fsOpen({ opts: { query: '?client=demo', init: BOX }, stub: { demo: newProg() } });
+    await dm4.p.waitForTimeout(800);
+    const pv4 = await fsOpen({ opts: { query: '?client=rel01_athlete&preview=1', init: BOX } });
+    await pv4.p.waitForTimeout(800);
+    C.check('the demo and the coach\'s preview: the row is never drawn and the box is never opened', (await dm4.p.evaluate(() => playerCheersAskHTML() === '')) && (await pv4.p.evaluate(() => playerCheersAskHTML() === '')) && (await box(dm4.p)) === 0 && (await box(pv4.p)) === 0);
+    await dm4.ctx.close(); await pv4.ctx.close();
+    const srcC = require('fs').readFileSync(path.join(__dirname, '..', '..', 'program.html'), 'utf8');
+    const cheersSrc = srcC.slice(srcC.indexOf('function playerCheersAskHTML'), srcC.indexOf('function openCheer'));
+    C.check('the cheers line\'s code never opens the phone\'s box itself: no requestPermission, no enable(), only pushAsk(\'cheers\')', !/requestPermission|AAPush\.enable|pushTurnOnHere\(/.test(cheersSrc) && /pushAsk\('cheers'/.test(cheersSrc), '');
+
     // ── never to a veteran, never in the demo, and the 14 days
     const never = [
       ['a second cycle (currentCycleIndex 1) with a session two days ago', { prog: { idx: 1 }, hist: histAgo(2) }],
@@ -2754,10 +2812,10 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const prof = await profRows(m.p), all = await acctRows(m.p);
     const top = await m.p.evaluate(() => { const ov = document.getElementById('hist-overlay'), g = ov.querySelector('.acct-grp'), first = ov.querySelector('.hrow'), th = ov.querySelector('.acct-theme');
       return { grp: g ? g.textContent.trim() : null, first: first ? first.id : null, grpBeforeRows: !!(g && first && (g.compareDocumentPosition(first) & Node.DOCUMENT_POSITION_FOLLOWING)), beforeTheme: !!(g && th && (g.compareDocumentPosition(th) & Node.DOCUMENT_POSITION_FOLLOWING)) }; });
-    C.check('the account sheet opens with a Profile group at the TOP: Your photo, Your game, Your page, What the crew sees of you', JSON.stringify(prof) === JSON.stringify(['Your photo', 'Your game', 'Your page', 'What the crew sees of you']) && top.grp === 'Profile' && top.first === 'acct-photo' && top.beforeTheme, JSON.stringify([prof, top]));
+    C.check('the account sheet opens with a Profile group at the TOP: Your photo, Your game, Your page, What the crew sees', JSON.stringify(prof) === JSON.stringify(['Your photo', 'Your game', 'Your page', 'What the crew sees']) && top.grp === 'Profile' && top.first === 'acct-photo' && top.beforeTheme, JSON.stringify([prof, top]));
     C.check('…each in the sheet\'s own door-row style (.hrow, 64 px or more, a ›), so nothing new is drawn', await m.p.evaluate(() => [...document.querySelectorAll('#hist-overlay .acct-prof .hrow')].every(b => b.classList.contains('hrow') && b.getBoundingClientRect().height >= 63.5 && !!b.querySelector('.hrow-a'))));
     C.check('…and "Your page" is in it once: the old row further down is gone, not copied', all.filter(x => x === 'Your page').length === 1 && all.indexOf('Your page') === 2 && (await m.p.$$('#hist-overlay #acct-page')).length === 1, JSON.stringify(all));
-    C.check('…Crew and the Bell, How the app works and Privacy keep their rows', ['Crew and the Bell', 'How the app works', 'Privacy'].every(x => all.indexOf(x) > 3), JSON.stringify(all));
+    C.check('…How the app works and Privacy keep their rows, and the separate "Crew and the Bell" row is GONE: What the crew sees is the one door (round 7, "78")', ['How the app works', 'Privacy'].every(x => all.indexOf(x) > 3) && all.indexOf('Crew and the Bell') < 0 && all.filter(x => /crew sees/i.test(x)).length === 1, JSON.stringify(all));
     const face = await m.p.evaluate(() => { const e = document.querySelector('#acct-photo .cr-fl'); return e ? { t: e.textContent.trim(), fc: e.getAttribute('data-fc'), w: Math.round(e.getBoundingClientRect().width) } : null; });
     C.check('Your photo row shows your face (your initials until you add one), 28 px or more', !!face && face.t === 'AR' && face.w >= 28, JSON.stringify(face));
     // the photo sheet, and ‹ Back to the account
@@ -2803,12 +2861,12 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await m.p.keyboard.type('Enghelab'); await click(m.p, '#hist-overlay .pl-gsave'); await m.p.waitForTimeout(500);
     C.check('…saved, and the page behind has it when the sheet is closed', ((await lastGame(m.p)) || {}).club === 'Enghelab' && (await (async () => { await m.p.evaluate(() => closeHistorySheet()); await m.p.waitForTimeout(250); return (await factRows(m.p)).some(r => r[0] === 'Club' && r[1] === 'Enghelab'); })()));
     C.check('…and closing the sheet with a row open leaves none open on the page', !(await m.p.$('#crewplayer-body .pl-fo')) && !(await m.p.$('#crewplayer-body #pl-gin')));
-    // Your page and What the crew sees of you
+    // Your page and What the crew sees
     await m.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await m.p.waitForTimeout(300);
     await openAcct(m.p); await click(m.p, '#acct-page'); await m.p.waitForTimeout(600);
     C.check('Your page opens your own page (the sheet closes)', (await screenNow(m.p)) === 'screen-crewplayer' && !(await sheetUp(m.p)) && (await m.p.evaluate(() => _playerCk)) === 'me');
     await openAcct(m.p); await click(m.p, '#acct-sees'); await m.p.waitForTimeout(400);
-    C.check('What the crew sees of you opens Crew and the Bell, with ‹ Back to the account', (await sheetTitle(m.p)) === 'Crew and the Bell' && !!(await m.p.$('#hist-overlay .cr-sw')) && (await sheetBackBtn(m.p)));
+    C.check('What the crew sees opens the switches, titled What the crew sees, with ‹ Back to the account', (await sheetTitle(m.p)) === 'What the crew sees' && !!(await m.p.$('#hist-overlay .cr-sw')) && (await sheetBackBtn(m.p)));
     await tapSheetBack(m.p);
     C.check('…‹ Back lands on the account sheet', (await sheetEye(m.p)) === 'Your account' && !!(await m.p.$('#acct-sees')));
     // Back (the phone's) closes the top sheet one layer at a time
@@ -2822,7 +2880,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const n = await open(browser, { b: { me: { answer: null, can_post: false } }, stub: { crewPages: { me: { member: false } } } });
     await waitTab(n.p); await n.p.waitForTimeout(600);
     await openAcct(n.p);
-    C.check('not in the crew: "Join the crew to add a photo" in the place of Your photo; Your game, Your page and What the crew sees of you are still there', JSON.stringify(await profRows(n.p)) === JSON.stringify(['Join the crew to add a photo', 'Your game', 'Your page', 'What the crew sees of you']), JSON.stringify(await profRows(n.p)));
+    C.check('not in the crew: "Join the crew to add a photo" in the place of Your photo; Your game, Your page and What the crew sees are still there', JSON.stringify(await profRows(n.p)) === JSON.stringify(['Join the crew to add a photo', 'Your game', 'Your page', 'What the crew sees']), JSON.stringify(await profRows(n.p)));
     await click(n.p, '#acct-photo'); await n.p.waitForTimeout(600);
     C.check('…it leads to the crew\'s question (Crew, "Join the crew?"), and the sheet is closed', (await screenNow(n.p)) === 'screen-crew' && !(await sheetUp(n.p)) && !!(await n.p.$('#crew-ask')) && /Join the crew\?/.test(await plain(n.p, '#crew-ask') || ''), await screenNow(n.p));
     await openAcct(n.p); await click(n.p, '#acct-game'); await n.p.waitForTimeout(500);
@@ -2843,7 +2901,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await waitTab(o.p); await o.p.waitForTimeout(600);
     await openAcct(o.p);
     const oldRows = await acctRows(o.p);
-    C.check('a server without stage96: no Profile group, and the rows the account always had', !(await o.p.$('#hist-overlay .acct-grp')) && !(await o.p.$('#acct-photo')) && !(await o.p.$('#acct-game')) && !(await o.p.$('#acct-page')) && oldRows.includes('Crew and the Bell') && oldRows.includes('How the app works'), JSON.stringify(oldRows));
+    C.check('a server without stage96: no Profile group, and the rows the account always had, with the one crew row named What the crew sees', !(await o.p.$('#hist-overlay .acct-grp')) && !(await o.p.$('#acct-photo')) && !(await o.p.$('#acct-game')) && !(await o.p.$('#acct-page')) && oldRows.includes('What the crew sees') && !oldRows.includes('Crew and the Bell') && oldRows.includes('How the app works'), JSON.stringify(oldRows));
     await o.ctx.close();
     // in the demo there is no crew: no group
     // the sheet at 320 px, in dark mode: nothing runs off the side
@@ -2911,6 +2969,120 @@ const on = n => !ONLY.length || ONLY.includes(n);
       }
       await a.ctx.close();
     }
+  }
+
+  // ── 33. round 7 · P1 (2026-10-25): 76 the band smaller · 80 looks like what it does · 78 one door, one name · the hit areas ──────────────────────────────────────
+  if (on(33)) {
+    // 80: honours (one person = the whole tile is the door, two = each name its own door), the pin, a moment line's face, the board's ›
+    const hb = bell({});
+    hb.honours.rows.push(Object.assign({ honour: 'sessions', who: 'Mina S.', me: false, value: { n: 14 } }, { ck: CK.mina, fv: null }));
+    const a = await open(browser, { bell: hb, stub: { crewBoard: board().concat([{ pos: 4, who: 'Zed Q.', points: 100, level: 3, is_me: false }]) } });
+    await goCrew(a.p); await a.p.waitForTimeout(500);
+    const tl = await a.p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-hon > *')].map(t => { const c = getComputedStyle(t); return { tag: t.tagName, k: t.querySelector('.k').textContent, nb: t.querySelectorAll('.cr-nb').length, label: t.getAttribute('aria-label'), bg: c.backgroundColor, br: c.borderTopLeftRadius, bw: c.borderTopWidth, pad: c.paddingLeft, w: Math.round(t.getBoundingClientRect().width) }; }));
+    C.check('honours: a tile with ONE person is a whole door (a button), a tile with two keeps each name as its own door (a div with two names)',
+      tl.length === 2 && tl[0].k === 'Most sessions' && tl[0].tag === 'DIV' && tl[0].nb === 2 && tl[1].k === 'Most improved' && tl[1].tag === 'BUTTON' && tl[1].nb === 0 && /^Most improved, Leila M\., Back Squat \+27\.1%\. Opens their page$/.test(tl[1].label), JSON.stringify(tl));
+    C.check('…and the door tile keeps the tile\'s look: same fill, corner, border, padding and width', tl[0].bg === tl[1].bg && tl[0].br === tl[1].br && tl[0].bw === tl[1].bw && tl[0].pad === tl[1].pad && Math.abs(tl[0].w - tl[1].w) <= 1, JSON.stringify(tl));
+    await click(a.p, '#crew-body .cr-hon button.cr-ht'); await a.p.waitForTimeout(500);
+    C.check('…and a tap anywhere on it opens that person\'s page (Leila\'s)', (await screenNow(a.p)) === 'screen-crewplayer' && (await a.p.evaluate(() => _playerCk)) === CK.leila);
+    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(300);
+    const pin = await a.p.evaluate(() => { const e = document.querySelector('.cr-post.amir .cr-pin'); if (!e) return null; const c = getComputedStyle(e); return { tag: e.tagName, bg: c.backgroundColor, bw: c.borderTopWidth, bc: c.borderTopColor, color: c.color, onclick: e.getAttribute('onclick') }; });
+    C.check('the "Pinned" label is a green outline (1 px, no fill), not a control, and not clay', !!pin && pin.tag === 'SPAN' && pin.bg === 'rgba(0, 0, 0, 0)' && pin.bw === '1px' && pin.bc === pin.color && pin.color !== 'rgb(199, 85, 47)' && !pin.onclick, JSON.stringify(pin));
+    const lf = await a.p.evaluate(() => { const b = document.querySelector('#crew-body .cr-line > button.cr-fd'); if (!b) return null; b.scrollIntoView({ block: 'center' }); const r = b.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, hit = (x, y) => { const e = document.elementFromPoint(x, y), t = e && e.closest('button'); return !!t && t.getAttribute('onclick') === b.getAttribute('onclick'); };   // the face's own target, or the name's beside it: the same door
+      return { label: b.getAttribute('aria-label'), face: Math.round(b.querySelector('.cr-fl').getBoundingClientRect().width), hits: [hit(cx - 21, cy), hit(cx + 21, cy), hit(cx, cy - 21), hit(cx, cy + 21)], name: !!b.parentElement.querySelector('.cr-nb') }; });
+    C.check('a moment line\'s face is a door like its name ("Mina S., their page"), 24 px drawn and a 44 px target', !!lf && lf.label === 'Mina S., their page' && lf.face === 24 && lf.hits.every(Boolean) && lf.name, JSON.stringify(lf));
+    const chev = await a.p.evaluate(() => ({ tab: [...document.querySelectorAll('#crew-board .cr-br')].map(r => [r.tagName, !!r.querySelector('.c'), (r.querySelector('.c') || {}).textContent || '']), cols: getComputedStyle(document.querySelector('#crew-board button.cr-br')).gridTemplateColumns.split(' ').length, rowH: Math.round(document.querySelector('#crew-board button.cr-br').getBoundingClientRect().height) }));
+    C.check('the season board: a row that is a door wears the small ›, a plain row (no key) has none', chev.tab.length === 4 && chev.tab.filter(r => r[0] === 'BUTTON' && r[1] && r[2] === '›').length === 3 && chev.tab[3][0] === 'DIV' && !chev.tab[3][1] && chev.cols === 4 && chev.rowH <= 56, JSON.stringify(chev));
+    await a.p.evaluate(() => goTo('crewboard')); await a.p.waitForTimeout(400);
+    C.check('…and the whole-board page the same', await a.p.evaluate(() => [...document.querySelectorAll('#crewboard-body .cr-br')].every(r => r.tagName === 'BUTTON' ? !!r.querySelector('.c') : !r.querySelector('.c')) && document.querySelectorAll('#crewboard-body button.cr-br .c').length === 3));
+    await a.p.evaluate(() => goTo('crew')); await a.p.waitForTimeout(300);
+    // the hit areas
+    const hit = await a.p.evaluate(() => {
+      const sz = n => { const e = document.querySelector(n); if (!e) return null; const b = e.getBoundingClientRect(); return { w: Math.round(b.width * 10) / 10, h: Math.round(b.height * 10) / 10 }; };
+      const faces = [...document.querySelectorAll('#crew-body .cr-fcs button.cr-face')].map(f => { const r = f.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, h = (x, y) => { const e = document.elementFromPoint(x, y); return !!e && e.closest('button.cr-face') === f; };
+        return { drawn: Math.round(r.width), l: h(cx - 21.5, cy), r: h(cx + 21.5, cy) }; });
+      return { reply: sz('#crew-body .cr-rep-add'), del: sz('#crew-body .cr-post .cr-foot .cr-del'), faces };
+    });
+    C.check('"Reply" is at least 44 x 44, and "Delete" on your own post is at least 44 x 44', !!hit.reply && !!hit.del && hit.reply.w >= 44 && hit.reply.h >= 44 && hit.del.w >= 44 && hit.del.h >= 44, JSON.stringify([hit.reply, hit.del]));
+    C.check('the band\'s faces: drawn at 40 px, with a hit area at least 44 px wide (a tap 21.5 px either side of the centre still lands on the face)', hit.faces.length === 7 && hit.faces.slice(0, 6).every(f => f.drawn >= 38 && f.drawn <= 40) && hit.faces.every(f => f.l && f.r), JSON.stringify(hit.faces));
+    C.check('no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+
+    // 76: the band smaller, "In the crew ›" beside the numbers
+    const band = async (o, w) => {
+      const x = await open(browser, o);
+      await x.p.setViewportSize({ width: w, height: 800 });
+      await goCrew(x.p); await x.p.waitForTimeout(500);
+      const m = await x.p.evaluate(() => {
+        const w0 = document.querySelector('#crew-body .cr-week'), top = w0.querySelector('.cr-bandtop'), b = top.querySelector('b'), go = top.querySelector('.go');
+        const rng = document.createRange(); rng.selectNodeContents(b);
+        const lines = [...rng.getClientRects()], tr = rng.getBoundingClientRect(), g = go ? go.getBoundingClientRect() : null, W = w0.getBoundingClientRect(), last = lines[lines.length - 1];
+        const gt = go ? (() => { const r2 = document.createRange(); r2.selectNodeContents(go); return r2.getBoundingClientRect(); })() : null;
+        const hit = go ? (() => { const cx = g.left + g.width / 2, cy = g.top + g.height / 2, h = (px, py) => { const e = document.elementFromPoint(px, py); return !!e && e.closest('.go') === go; }; return [h(cx, cy - 21), h(cx, cy + 21)]; })() : null;
+        const gr = document.querySelector('#crew-body .cr-faces').getBoundingClientRect();
+        return { text: w0.querySelector('.k').textContent, big: b.innerText.replace(/\s+/g, ' ').trim(), btn: go ? go.textContent : null, bandW: Math.round(W.width), bandH: Math.round(W.height), sw: document.documentElement.scrollWidth, iw: innerWidth,
+          overlap: go ? tr.right > g.left - 4 && lines.some(l => l.bottom > g.top && l.top < g.bottom) : null, inside: go ? g.right <= W.right - 12 && g.left >= W.left : null, oneLine: go ? Math.round(gt.height) <= 20 : null,
+          level: go ? Math.abs((gt.top + gt.height / 2) - (last.top + last.height / 2)) : null, hit, foot: !!w0.querySelector('.cr-bandfoot'), hint: !!w0.querySelector('.cr-hint'), aboveFaces: go ? g.bottom <= gr.top + 2 : null, goTop: go ? Math.round(g.top - W.top) : null };
+      });
+      await x.ctx.close();
+      return m;
+    };
+    const crowd = n => Array.from({ length: n }, (_, i) => Object.assign({ who: 'Member ' + (i + 1) + ' X.', me: i === 0, since: '2026-10-19', lv: 5 + i }, i < 3 ? {} : {}, { ck: ck(40 + i), fv: null }));
+    const big = bell({}); big.week = { members: 19, sessions: 123, held: 45 }; big.crew = crowd(19);
+    const empty = bell({}); empty.week = { members: 8, sessions: 0, held: 0 };
+    for (const w of [390, 320]) {
+      const m = await band({ bell: big }, w);
+      C.check(`${w} px, a crew of 19 and "123 sessions": every word as it was ("Last 7 days · 19 in the crew", "123 sessions", "45 weeks held"), the button "In the crew ›" on the right of the two lines, level with the second, on one line`,
+        m.text === 'Last 7 days · 19 in the crew' && /^123 sessions 45 weeks held$/i.test(m.big) && m.btn === 'In the crew ›' && !m.overlap && m.inside && m.oneLine && m.level <= 9 && m.sw <= m.iw, JSON.stringify(m));
+      C.check(`${w} px: the button is a 44 px target`, m.hit && m.hit.every(Boolean), JSON.stringify(m.hit));
+      const e = await band({ bell: empty }, w);
+      C.check(`${w} px, nobody has trained yet: the words give way to the button (they may wrap), nothing overlaps or scrolls sideways`, /^Nobody has trained yet/i.test(e.big) && e.btn === 'In the crew ›' && !e.overlap && e.inside && e.oneLine && e.sw <= e.iw, JSON.stringify(e));
+    }
+    const std = await band({}, 390);
+    C.check('390 px, the usual band: the first look carries the one-time hint in a foot line under the faces, and the button is no longer there', std.hint && std.foot && std.btn === 'In the crew ›' && std.aboveFaces, JSON.stringify(std));
+    // with no hint there is no foot at all, and the band is shorter than with one
+    const nh = await open(browser, { seed: { _cheerhint: 'done' } });
+    await goCrew(nh.p); await nh.p.waitForTimeout(500);
+    const nhm = await nh.p.evaluate(() => { const w0 = document.querySelector('#crew-body .cr-week'); return { foot: !!w0.querySelector('.cr-bandfoot'), hint: !!w0.querySelector('.cr-hint'), h: Math.round(w0.getBoundingClientRect().height), btn: !!w0.querySelector('.cr-bandtop .go') }; });
+    C.check('after the hint\'s three visits there is NO foot line, the band is shorter than the one with the hint, and "In the crew ›" is still there', !nhm.foot && !nhm.hint && nhm.btn && nhm.h < std.bandH, JSON.stringify([nhm, std.bandH]));
+    // a double tap that ends the hint takes the foot with it
+    await nh.ctx.close();
+    const dt = await open(browser, {});
+    await goCrew(dt.p); await dt.p.waitForTimeout(400);
+    await tapBand(dt.p, CK.reza, 2); await dt.p.waitForTimeout(900);
+    C.check('…and the first double tap, which ends the hint, takes its foot line away too (no empty strip left under the faces)', await dt.p.evaluate(() => !document.querySelector('#crew-body .cr-hint') && !document.querySelector('#crew-body .cr-bandfoot')));
+    await dt.ctx.close();
+    // the fallback without pages is still the one button
+    const np = await open(browser, { b: { noPages: true } });
+    await goCrew(np.p);
+    C.check('without stage96 the band keeps working: one button holding the faces and "In the crew ›", and it opens the list', await np.p.evaluate(() => { const b = document.querySelector('#crew-body .cr-faces'); return b.tagName === 'BUTTON' && /In the crew ›/.test(b.textContent) && !document.querySelector('#crew-body .cr-bandtop .go'); }) && await np.p.evaluate(() => { document.querySelector('#crew-body .cr-faces').click(); return true; }) && (await np.p.waitForTimeout(300), (await screenNow(np.p)) === 'screen-crewwho'));
+    await np.ctx.close();
+
+    // 78: one door, one name
+    const b78 = await open(browser, { stub: { crewPages: { me: { who: 'Alex R.' } } } });
+    await goCrew(b78.p); await b78.p.waitForTimeout(500);
+    C.check('the tab has no foot row to What the crew sees, and no "Crew and the Bell" or "of you" anywhere on it', await b78.p.evaluate(() => ![...document.querySelectorAll('#crew-body .cr-me-row')].some(x => /crew sees/i.test(x.textContent)) && !/Crew and the Bell|sees of you|just below/.test(document.getElementById('crew-body').innerText)));
+    C.check('the Bell heading is "The Bell" and carries no "Last 7 days" (the band already says it)', await b78.p.evaluate(() => { const h = [...document.querySelectorAll('#crew-body .prog-sec')].find(x => /^The Bell/i.test(x.textContent.trim())); return !!h && !/Last 7 days/i.test(h.textContent); }));
+    await b78.p.evaluate(() => openAccount()); await b78.p.waitForTimeout(300);
+    const acct = await acctRows(b78.p);
+    C.check('the account sheet: exactly one crew-settings row, "What the crew sees", in the Profile group, and no "Crew and the Bell"', acct.filter(x => /crew/i.test(x)).join('|') === 'What the crew sees' && !!(await b78.p.$('#hist-overlay .acct-prof #acct-sees')) && !(await b78.p.$('#acct-crew')), JSON.stringify(acct));
+    await click(b78.p, '#acct-sees'); await b78.p.waitForTimeout(350);
+    C.check('…it opens "What the crew sees", its switch heading reads "What the crew sees about you. Turn any of them off."', (await sheetTitle(b78.p)) === 'What the crew sees' && (await plain(b78.p, '#hist-overlay .cr-sws .cr-note')) === 'What the crew sees about you. Turn any of them off.');
+    await b78.p.evaluate(() => closeHistorySheet());
+    await b78.p.evaluate(() => { localStorage.removeItem(ATHLETE_ID + '_pageintro'); goTo('home'); goTo('crew'); }); await b78.p.waitForTimeout(400);
+    C.check('the one-time "Your page is here" card\'s second button says "What the crew sees"', (await plain(b78.p, '#crew-intro .cr-no')) === 'What the crew sees');
+    await b78.p.evaluate(() => goTo('crewwho')); await b78.p.waitForTimeout(400);
+    C.check('the In the crew page\'s note says "from What the crew sees."', /You can leave any time from What the crew sees\./.test(await plain(b78.p, '#crewwho-body .cr-note')));
+    await b78.ctx.close();
+    const jn = await open(browser, { b: { me: { answer: null, can_post: false } }, stub: { crewPages: { me: { member: false } } } });
+    await goCrew(jn.p); await jn.p.waitForTimeout(500);
+    C.check('the join card\'s small print: "You can leave any time from your initials, under What the crew sees."', (await plain(jn.p, '#crew-ask .sm:last-of-type') || '').indexOf('You can leave any time from your initials, under What the crew sees.') === 0 || await jn.p.evaluate(() => [...document.querySelectorAll('#crew-ask .sm')].some(x => x.textContent === 'You can leave any time from your initials, under What the crew sees.')));
+    await jn.ctx.close();
+    const no78 = await open(browser, { b: { me: { answer: 'no', can_post: false } } });
+    await goCrew(no78.p); await no78.p.waitForTimeout(500);
+    C.check('someone who said no: the line, then a green "Join the crew" button (the join card\'s), and its tap is crewAnswer("yes")', await no78.p.evaluate(() => { const q = [...document.querySelectorAll('#crew-body .cr-quiet')].find(x => /You keep your moments/.test(x.textContent)), b = q && q.nextElementSibling; return !!b && b.textContent === 'Join the crew' && /crewAnswer\('yes'/.test(b.getAttribute('onclick')) && q.textContent === 'You keep your moments to yourself, so the crew does not see you here.'; }));
+    await click(no78.p, '#crew-body .cr-join'); await no78.p.waitForTimeout(700);
+    C.check('…and it joins (crew_answer yes) and the composer comes', (await calls(no78.p, 'crew_answer')).some(x => x.p_answer === 'yes') && !!(await no78.p.$('.cr-comp')));
+    await no78.ctx.close();
   }
 
   await browser.close();

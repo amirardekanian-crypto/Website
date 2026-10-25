@@ -104,6 +104,8 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       ask: !!document.querySelector('#crew-ask'), askBtns: [...document.querySelectorAll('#crew-ask button')].map(b => b.textContent.trim()).join('|'),
       askH: (document.querySelector('#crew-ask h2') || {}).textContent || '',
       comp: !!document.querySelector('.cr-comp'), pin: (document.querySelector('.cr-post.amir .cr-pin') || {}).className || '',
+      pinCss: (() => { const e = document.querySelector('.cr-post.amir .cr-pin'); if (!e) return null; const c = getComputedStyle(e);
+        return { tag: e.tagName, bg: c.backgroundColor, bw: c.borderTopWidth, bs: c.borderTopStyle, bc: c.borderTopColor, color: c.color, cursor: c.cursor }; })(),
       first: (document.querySelector('#crew-body .cr-post, #crew-body .cr-line') || {}).className || '',
       line: ((document.querySelector('.cr-line .cr-lw') || {}).firstChild || {}).textContent || '',
       hon: [...document.querySelectorAll('.cr-hon > div')].map(d => [...d.children].map(c => c.textContent.trim()).join(' ')).join('|'),
@@ -114,7 +116,9 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…Amir\'s post counts as seen on this phone', (await p.evaluate(id => localStorage.getItem(id + '_crewseen'), H.ID)) === AMIR);
     C.check('…the question, once: Join the crew / Keep it to me, and no composer before the answer', s.ask && s.askBtns === 'Join the crew|Keep it to me' && !s.comp, s.askBtns);
     C.check('…it asks "Join the crew?", never "Ring the bell"', /Join the crew\?/.test(s.askH) && !/Ring (it|the bell)/i.test(s.text), s.askH);
-    C.check('…Amir\'s post pinned first, its pin clay on the visit that first shows it', /cr-post amir/.test(s.first) && /cr-pin is-new/.test(s.pin), s.first + ' / ' + s.pin);
+    C.check('…Amir\'s post pinned first, and its pin is a LABEL: a green outline with no fill, never clay, even on the visit that first shows it (round 7, 2026-10-25)',
+      /cr-post amir/.test(s.first) && /cr-pin is-new/.test(s.pin) && !!s.pinCss && s.pinCss.tag === 'SPAN' && s.pinCss.bw === '1px' && s.pinCss.bs === 'solid' && s.pinCss.bg === 'rgba(0, 0, 0, 0)'
+      && s.pinCss.bc === s.pinCss.color && s.pinCss.color !== 'rgb(199, 85, 47)' && s.pinCss.cursor !== 'pointer', s.first + ' / ' + s.pin + ' / ' + JSON.stringify(s.pinCss));
     C.check('…the Bell line in words: level, the lift (never a weight), the run', s.line === 'Mina S. reached level 14 · set a new best on Barbell Back Squat · held a week, 5 in a row', s.line);
     C.check('…no weight, no kg anywhere on Crew', !/\bkg\b|\d+\s*kg/i.test(s.text));
     C.check('…last month\'s honours: names and what they did', /Most sessions Reza K\. 14 plan sessions/.test(s.hon) && /Most improved Leila M\. Back Squat \+27\.1%/.test(s.hon), s.hon);
@@ -193,12 +197,19 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await p.evaluate(() => closeHistorySheet());
     // the account sheet's door, and the guide
     await p.evaluate(() => openAccount()); await p.waitForTimeout(200);
-    C.check('the account sheet has Crew and the Bell', !!(await p.$('#acct-crew')));
+    // ONE row, named What the crew sees (round 7, 2026-10-25, "78"): this bell has no Lounge, so the row sits in the main list; with the Lounge it is the Profile group's (lounge.js).
+    const rows78 = await p.evaluate(() => [...document.querySelectorAll('#hist-overlay .hrow .hrow-v')].map(x => x.textContent.trim()));
+    C.check('the account sheet has ONE crew row, "What the crew sees", and nothing is called Crew and the Bell', !!(await p.$('#acct-crew')) && rows78.filter(x => /crew/i.test(x)).join('|') === 'What the crew sees' && !/Crew and the Bell/.test(rows78.join('|')), JSON.stringify(rows78));
     await p.evaluate(() => document.getElementById('acct-crew').click()); await p.waitForTimeout(200);
-    C.check('…it opens the settings with ‹ Back to the account', await p.evaluate(() => /Crew and the Bell/.test(document.querySelector('#hist-overlay .readiness-title').textContent) && !!document.querySelector('#hist-overlay .sheet-back')));
+    C.check('…it opens the settings, titled What the crew sees, with ‹ Back to the account', await p.evaluate(() => document.querySelector('#hist-overlay .readiness-title').textContent === 'What the crew sees' && !!document.querySelector('#hist-overlay .sheet-back')));
+    C.check('…its switches say "What the crew sees about you. Turn any of them off." (it is what the crew sees, never what rings the phone)', await p.evaluate(() => {
+      const n = document.querySelector('#hist-overlay .cr-sws .cr-note'); return !!n && n.textContent === 'What the crew sees about you. Turn any of them off.' && !/Crew and the Bell|What rings/.test(document.querySelector('#hist-overlay').textContent);
+    }));
     await p.evaluate(() => closeHistorySheet());
     const g = await p.evaluate(() => buildAppGuideCards());
-    C.check('the guide: a Crew card naming its controls, and Crew among the tabs', /Crew and the Bell/.test(g) && /<strong>Crew<\/strong> is the crew/.test(g) && /Share something with the crew/.test(g) && /Tell the crew/.test(g) && /<strong>Join the crew<\/strong>/.test(g));
+    C.check('the guide: a Crew card naming its controls, and Crew among the tabs', /<strong>Crew<\/strong> is the crew/.test(g) && /Share something with the crew/.test(g) && /Tell the crew/.test(g) && /<strong>Join the crew<\/strong>/.test(g));
+    C.check('…and it names the real controls: What the crew sees (not Crew and the Bell, not "of you"), In the crew › beside the numbers, and no word of a foot row', /tap your initials, then <strong>What the crew sees<\/strong>/.test(g) && !/Crew and the Bell/.test(g) && !/sees of you/.test(g)
+      && /<strong>In the crew ›<\/strong> beside the numbers/.test(g) && !/just below/.test(g));
     C.check('…and it says Like, not Kudos, and never Ring it', /<strong>Like<\/strong>/.test(g) && !/kudos/i.test(g) && !/Ring it/.test(g));
     // never synced
     const synced = await p.evaluate(() => Object.keys(_snapshot()).filter(k => /crewcache|crewseen/.test(k)));
@@ -236,12 +247,23 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
     const row = await p.evaluate(() => {
       const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
-      return { kinds: [...r.children].map(b => b.className), chips: [...r.querySelectorAll('.cr-em i')].map(i => i.textContent).join(''),
+      return { kinds: [...r.children].map(b => b.className), chips: [...r.querySelectorAll('.cr-em[data-em]')].map(b => b.dataset.em).join(''),
+               icons: [...r.querySelectorAll('.cr-em i svg')].length, noChar: !/[\u{1F525}\u{1F4AA}\u{1F44F}\u{1F60D}]/u.test(r.textContent),
+               labels: [...r.querySelectorAll('.cr-em[data-em]')].map(b => b.getAttribute('aria-label')).join('|'),
+               iconPx: [...r.querySelectorAll('.cr-em i svg')].map(s => Math.round(s.getBoundingClientRect().width) + 'x' + Math.round(s.getBoundingClientRect().height)).join(','),
                like: r.querySelector('.cr-kd').textContent.trim(), wide: r.scrollWidth <= r.clientWidth + 1 };
     });
-    C.check('the Like and the four emoji are all out, in order', row.chips === '🔥💪👏😍' && row.kinds[0] === 'cr-kd' && row.kinds.length === 5, JSON.stringify(row));
+    C.check('the Like and the four reactions are all out, in order', row.chips === '🔥💪👏😍' && row.kinds[0] === 'cr-kd' && row.kinds.length === 5, JSON.stringify(row));
+    // 79 A, Line Icons (round 7, 2026-10-25): the server still sends and stores the characters; the app DRAWS each as a line icon and SAYS it as a word
+    C.check('…each is a line icon of about 20 px, and none of the phone\'s own emoji is on the row', row.icons === 4 && row.noChar && row.iconPx === '20x20,20x20,20x20,20x20', JSON.stringify([row.icons, row.noChar, row.iconPx]));
+    C.check('…and every label says the WORD: Send Fire, Send Strong, Send Well done, Send Love it', row.labels === 'Send Fire|Send Strong|Send Well done|Send Love it', row.labels);
+    C.check('…the 👏 is confetti, never the clapping hands the Cheer owns', await p.evaluate(() => {
+      const clap = (document.createRange().createContextualFragment(CLAP_SVG).querySelector('path') || {}).getAttribute('d');
+      const svgs = [...document.querySelectorAll('#crew-body .cr-post .cr-em[data-em] svg path')].map(x => x.getAttribute('d'));
+      return svgs.length >= 4 && !svgs.includes(clap) && new Set(svgs).size >= 4;
+    }));
     C.check('…and the row does not scroll sideways at 390 px', row.wide, JSON.stringify(row));
-    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => /🔥/.test(b.textContent)).click());
+    await p.evaluate(() => [...[...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelectorAll('.cr-em')].find(b => b.dataset.em === '🔥').click());
     await p.waitForTimeout(400);
     // what is on the 6 am post's row, as the athlete sees it: the buttons in order ('like', each emoji, '+'), which are pressed, and the pressed one's count
     const rowOf = () => p.evaluate(() => {
@@ -257,6 +279,14 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     // Amir, 2026-10-20, on the live app: "if under another post i have chose to send a fire emote or like, why is all my other
     // emotes opened? just show the fire and a + so i can change".
     C.check('…and the others go: just the 🔥 and a ＋ to change it', after.btns === '🔥,+', JSON.stringify(after));
+    C.check('…the chosen chip keeps its green ring and tint, its icon takes the green, and its label says "Fire sent. Tap to take it back"', await p.evaluate(() => {
+      const r = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react');
+      const pick = r.querySelector('.cr-em[aria-pressed="true"]'), plus = r.querySelector('.cr-plus');
+      if (!pick || !plus) return false;
+      const c = getComputedStyle(pick), g = getComputedStyle(plus).color;
+      return c.borderTopWidth === '2px' && c.color === g && getComputedStyle(pick.querySelector('svg')).color === g && c.backgroundColor !== 'rgba(0, 0, 0, 0)'
+        && pick.getAttribute('aria-label').indexOf('Fire sent. Tap to take it back') === 0;
+    }));
     C.check('…not even the Like stays, though the post has Likes', await p.evaluate(() =>
       !([...document.querySelectorAll('#crew-body .cr-post')].find(x => /6 am session/.test(x.textContent)).querySelector('.cr-react .cr-kd'))));
     // the ＋ opens the whole menu, his pick marked
@@ -296,6 +326,13 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await clickOn('💪'); await p.waitForTimeout(500);
     const back = await rowOf();
     C.check('…taking it back brings the whole menu back', back.btns === 'like,🔥,💪,👏,😍' && back.pressed === '' && (await calls(p, 'crew_kudos')).some(x => x.p_on === false), JSON.stringify(back));
+    // 79: in the dark photo viewer the icons are white, like the words beside them
+    await p.evaluate(id => openCrewPhoto(id), PHOTO); await p.waitForTimeout(300);
+    C.check('…and in the photo viewer the four icons are white like the text, on the dark ground', await p.evaluate(() => {
+      const chips = [...document.querySelectorAll('#crew-viewer .cr-em[data-em]')];
+      return chips.length === 4 && chips.every(b => { const s = b.querySelector('svg'); return !!s && getComputedStyle(s).color === 'rgb(255, 255, 255)' && getComputedStyle(b).color === 'rgb(255, 255, 255)'; });
+    }));
+    await p.evaluate(() => closeCrewPhoto());
     // a moment line keeps the Like ALONE, with the four behind a ＋ (2026-10-20): five chips under a one-line moment made the
     // row of buttons taller than the news. A post still carries all five out, Amir's pick of 2026-10-19.
     C.check('a moment line: the Like and a ＋, not five chips', await p.evaluate(() => {
@@ -359,7 +396,9 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     await ctx.close();
   }
   {
-    const { ctx, p } = await open(browser, { me: { answer: 'yes', under13: true, can_post: false }, bell: Object.assign(bell({ answer: 'yes', under13: true, can_post: false }), { emoji: ['🔥', '💪', '👏', '😍'] }) });
+    const b13 = Object.assign(bell({ answer: 'yes', under13: true, can_post: false }), { emoji: ['🔥', '💪', '👏', '😍'] });
+    b13.items[2].kudos = { n: 3, like: 1, mine: false, emoji: null, names: ['Mina S.', 'Sara T.'], by: { '🔥': 2 } };
+    const { ctx, p } = await open(browser, { me: { answer: 'yes', under13: true, can_post: false }, bell: b13 });
     await waitTab(p);
     await p.evaluate(() => goTo('crew')); await p.waitForTimeout(400);
     // A RECEIPT, never a dead button (2026-10-20): an account with reactions off sees what people gave and nothing to press.
@@ -369,6 +408,9 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…and nothing on it is in the tab order or says "0 people"', await p.evaluate(() =>
       !document.querySelector('#crew-body .cr-react [disabled]')
       && !/0 people/.test(document.querySelector('#crew-body').innerHTML)));
+    // the receipt's reactions are icons too, and say the word to a screen reader (round 7, 2026-10-25, "79 A")
+    const rc = await p.evaluate(() => { const s = document.querySelector('#crew-body .cr-react .cr-em.is-tally'); return s ? { role: s.getAttribute('role'), label: s.getAttribute('aria-label'), svg: !!s.querySelector('svg'), noChar: !/[\u{1F525}\u{1F4AA}\u{1F44F}\u{1F60D}]/u.test(s.textContent), text: s.textContent.trim() } : null; });
+    C.check('…and the receipt draws the 🔥 as its icon with the label "Fire, 2", no emoji character', !!rc && rc.role === 'img' && rc.label === 'Fire, 2' && rc.svg && rc.noChar && rc.text === '2', JSON.stringify(rc));
     await ctx.close();
   }
 
@@ -603,6 +645,30 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       await stub(s);
       C.check(`push ${s}: nothing is asked`, (await p.evaluate(() => pushAsk('zz3', 'x'))) === false && !(await toast()));
     }
+
+    // The FOURTH moment (round 7, 2026-10-25, Amir "82 good"): the line under Cheers this week on YOUR OWN page. It is a row, not an ask: it draws only while the phone can take
+    // notifications and they are not on, on your own page only, and its tap is pushAsk('cheers') with its button. The phone's box opens inside that button's click and nowhere else.
+    const row = (own) => p.evaluate(o => { const h = playerCheersHTML({ cheers: { recent: [] } }, o); return h; }, own);
+    for (const s of ['on', 'blocked', 'needs-install', 'unsupported']) {
+      await stub(s);
+      C.check(`cheers line, push ${s}: nothing is drawn`, (await row(true)) === '');
+    }
+    await stub('off');
+    const mine = await row(true), theirs = await row(false);
+    C.check('cheers line, push off: one plain row on YOUR page, "Turn on notifications so the next cheer reaches you"', /Turn on notifications so the next cheer reaches you/.test(mine) && /playerCheersAsk\(\)/.test(mine) && /<h2 class="prog-sec">Cheers this week<\/h2>/.test(mine), mine.slice(0, 140));
+    C.check('…and nothing on someone else\'s page', theirs === '');
+    C.check('…drawing it asks nothing: no toast, the box shut', !(await toast()) && (await p.evaluate(() => window.__ASKS)).length === 0);
+    await p.evaluate(() => playerCheersAsk());
+    t = await toast();
+    C.check('…its tap puts up the one line with a Turn them on button (reason "cheers"), and still nothing reaches the phone', !!t && t.action === 'Turn them on' && /next cheer reaches you/.test(t.text) && (await p.evaluate(() => window.__ASKS)).length === 0, JSON.stringify(t));
+    C.check('…as often as they tap it (their own tap, like First Serve\'s step)', await p.evaluate(() => { document.getElementById('aaToast').hidden = true; playerCheersAsk(); return !document.getElementById('aaToast').hidden; }));
+    await p.evaluate(() => document.querySelector('#aaToast .aa-toast-go').click());
+    await p.waitForTimeout(300);
+    C.check('…only the button\'s click calls enable(), once, so the box opens inside their own gesture', (await p.evaluate(() => window.__ASKS)).join() === 'enable');
+    const srcP = require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'program.html'), 'utf8');
+    const cheersSrc = srcP.slice(srcP.indexOf('function playerCheersAskHTML'), srcP.indexOf('function openCheer'));
+    C.check('…and the cheers line\'s code never opens the box itself: no requestPermission, no enable(), only pushAsk(\'cheers\')', !/requestPermission|AAPush\.enable|pushTurnOnHere\(/.test(cheersSrc) && /pushAsk\('cheers'/.test(cheersSrc));
+    await stub('off');
 
     // Joining the crew IS the second moment, and the ask replaces the join toast rather than stacking
     // a second one behind it.
@@ -994,6 +1060,65 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('a yes the server will not accept (a former athlete): the row offers to join, never a tap that fails', await p.evaluate(() =>
       [...document.querySelectorAll('#crew-body .cr-post .cr-react button')].every(x => /crewLikeAsk/.test(x.getAttribute('onclick') || ''))));
     await ctx.close();
+  }
+
+  // ── round 7 · P1 (2026-10-25): 78 One door, one name · 82 (a) Tell the crew for someone who has not answered · the hit areas ───────────────────────────────
+  {
+    // a member: the tab's foot row "What the crew sees of you ›" is gone, the composer says Crew / Share with the crew, the session mode is as it was
+    const b = bell({ answer: 'yes', can_post: true });
+    b.items[2].replies = [];
+    b.items.push({ t: 'post', id: 'own-9', who: 'You', me: true, amir: false, kind: 'post', body: 'Day 3 done.', photo: false, at: iso(now - 5000e3), pinned: false, left: 7, kudos: { n: 0, mine: false, names: [] }, replies: [] });
+    const { ctx, p } = await open(browser, { bell: b });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(500);
+    C.check('a member: the tab has no foot row to What the crew sees (the one door is in the initials)', await p.evaluate(() => ![...document.querySelectorAll('#crew-body button')].some(x => /crew sees/i.test(x.textContent))));
+    C.check('…and no word of "just below" or of Crew and the Bell anywhere on the tab', await p.evaluate(() => !/just below|Crew and the Bell|sees of you/.test(document.getElementById('crew-body').innerText)));
+    await p.evaluate(() => openCrewPost()); await p.waitForTimeout(250);
+    C.check('the composer: eyebrow "Crew", title "Share with the crew"', await p.evaluate(() => document.querySelector('#hist-overlay .readiness-eyebrow').textContent === 'Crew' && document.querySelector('#hist-overlay .readiness-title').textContent === 'Share with the crew'));
+    await p.evaluate(() => { closeHistorySheet(); openCrewPost('session', '2'); }); await p.waitForTimeout(250);
+    C.check('…and the session mode is unchanged: "Tell the crew" / "Day 2 done"', await p.evaluate(() => document.querySelector('#hist-overlay .readiness-eyebrow').textContent === 'Tell the crew' && document.querySelector('#hist-overlay .readiness-title').textContent === 'Day 2 done'));
+    await p.evaluate(() => closeHistorySheet());
+    // the hit areas: "Reply" and "Delete" on your own post are at least 44 x 44 by padding (the font is the same)
+    const hit = await p.evaluate(() => {
+      const r = n => { const e = document.querySelector(n); if (!e) return null; const b = e.getBoundingClientRect(); return { w: Math.round(b.width), h: Math.round(b.height), fs: getComputedStyle(e).fontSize }; };
+      return { reply: r('#crew-body .cr-rep-add'), del: r('#crew-body .cr-post .cr-foot .cr-del') };
+    });
+    C.check('"Reply" is at least 44 x 44 and "Delete" on your own post is at least 44 x 44 (padding, not a bigger font)', !!hit.reply && !!hit.del && hit.reply.w >= 44 && hit.reply.h >= 44 && hit.del.w >= 44 && hit.del.h >= 44 && hit.reply.fs === hit.del.fs, JSON.stringify(hit));
+    C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+  {
+    // someone who said no: the line, and the join card's button right there (it calls the same crewAnswer('yes'))
+    const { ctx, p } = await open(browser, { me: { answer: 'no', can_post: false } });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(500);
+    const no = await p.evaluate(() => { const q = [...document.querySelectorAll('#crew-body .cr-quiet')].find(x => /You keep your moments/.test(x.textContent)), btn = q && q.nextElementSibling; return { q: q ? q.textContent : null, btn: btn ? btn.textContent : null, cls: btn ? btn.className : '', h: btn ? Math.round(btn.getBoundingClientRect().height) : 0, bg: btn ? getComputedStyle(btn).backgroundColor : '' }; });
+    C.check('said no: "You keep your moments to yourself, so the crew does not see you here." and a "Join the crew" button right after it, no "just below"', no.q === 'You keep your moments to yourself, so the crew does not see you here.' && no.btn === 'Join the crew' && /cr-go/.test(no.cls) && no.h >= 44, JSON.stringify(no));
+    await p.evaluate(() => document.querySelector('#crew-body .cr-join').click()); await p.waitForTimeout(500);
+    C.check('…and its tap is crewAnswer("yes"): crew_answer("yes") and the composer comes', (await calls(p, 'crew_answer')).some(x => x.p_answer === 'yes') && await p.evaluate(() => !!document.querySelector('.cr-comp')));
+    await ctx.close();
+  }
+  {
+    // not answered yet: the join card's small print, and the finished card's Tell the crew row that goes to Crew (never a one-tap join)
+    const { ctx, p } = await open(browser, { me: { answer: null, can_post: false } });
+    await waitTab(p);
+    await p.evaluate(() => goTo('crew')); await p.waitForTimeout(500);
+    C.check('the join card\'s small print: "You can leave any time from your initials, under What the crew sees."', await p.evaluate(() => [...document.querySelectorAll('#crew-ask .sm')].some(x => x.textContent === 'You can leave any time from your initials, under What the crew sees.')));
+    await p.evaluate(() => goTo('home')); await p.waitForTimeout(300);
+    const rows = await p.evaluate(() => [...document.querySelectorAll('.complete-crew[data-day]')].map(e => ({ hidden: e.hidden, l: (e.querySelector('.hrow-l') || {}).textContent, q: (e.querySelector('.hrow-q') || {}).textContent })));
+    C.check('not answered: every finished card shows "Tell the crew" with "Join the crew first. You see what they would see."', rows.length > 0 && rows.every(r => !r.hidden && r.l === 'Tell the crew' && r.q === 'Join the crew first. You see what they would see.'), JSON.stringify(rows));
+    await p.evaluate(() => { window.scrollTo(0, 400); document.querySelector('.complete-crew[data-day] button').click(); }); await p.waitForTimeout(600);
+    C.check('…its tap goes to the Crew tab at the top, where the join card is, and joins nobody', await p.evaluate(() => !!document.querySelector('#screen-crew.active') && !!document.querySelector('#crew-ask') && window.scrollY < 40) && !(await calls(p, 'crew_answer')).length);
+    C.check('…and never opens the composer', await p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')));
+    await ctx.close();
+    for (const [who, me, want] of [['said no', { answer: 'no', can_post: false }, 'hidden'], ['a member', { answer: 'yes', can_post: true }, 'today']]) {
+      const o = await open(browser, { me });
+      await waitTab(o.p);
+      await o.p.evaluate(() => goTo('crew')); await o.p.waitForTimeout(400);
+      const r = await o.p.evaluate(() => [...document.querySelectorAll('.complete-crew[data-day]')].map(e => ({ hidden: e.hidden, q: (e.querySelector('.hrow-q') || {}).textContent || '' })));
+      C.check(`${who}: the finished card's Tell the crew row is ${want === 'hidden' ? 'not shown' : 'today\'s: "A photo from today, on the Bell for 7 days."'}`, r.length > 0 && r.every(x => want === 'hidden' ? x.hidden : (!x.hidden && x.q === 'A photo from today, on the Bell for 7 days.')), JSON.stringify(r));
+      await o.ctx.close();
+    }
   }
 
   await browser.close();
