@@ -496,7 +496,11 @@
 // 200 px at 390 wide, with the cycle's picture clear under a light shade. The cheers number counts only the Cheers people sent
 // with the clap button, and the guide says so. Your initials open an account sheet that starts with Profile: Your photo, Your
 // game, Your page and What the crew sees of you.
-const CACHE = 'aap-v225';
+// v226: program.html and assets/js/sharecard.js changed (2026-10-25, Plain Words, Amir: "Go with your picks. Change RPE to
+// effort everywhere."). Every word an athlete reads says effort, not RPE. The card line says Down 3 s, Rest 2 min, Last time
+// 7 reps · 8/10, Twice · rest 30 s between, each side. Stop here, Start this day again, 9 exercises, One set at a time,
+// For everyone, Articles from me, Cycle 2 of 5, Your best lifts, Adding it up, and a plain line under the game names.
+const CACHE = 'aap-v226';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
