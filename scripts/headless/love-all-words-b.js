@@ -16,6 +16,7 @@ const t = H.checker();
 // The fixture's Spine with qualities, so the day card has quality chips to lead (made-up lists, never a real athlete's).
 const QOF = { 'barbell-back-squat': ['strength', 'muscle', 'armour'], 'box-jump': ['power', 'spring'], 'dumbbell-bulgarian-split-squat': ['strength'] };
 const SPINE = H.SPINE.map(e => Object.assign({}, e, QOF[e.id] ? { qualities: QOF[e.id] } : { qualities: ['strength'] }))
+  .concat([{ id: 'cable-lateral-raise', name: 'Cable Lateral Raise', aliases: [], equipment: ['cable'], pattern: 'isolation', impact: 'none', cues: { good: [], bad: [] }, purpose: 'Side delts.' }])
   .concat(['Incline Dumbbell Press', 'Single-Arm Dumbbell Row'].map(n => ({ id: n.toLowerCase().replace(/ /g, '-'), name: n, aliases: [], qualities: ['muscle', 'strength'] })));
 const QUALS = ['armour', 'brakes', 'engine', 'movement', 'muscle', 'power', 'rotation', 'speed', 'spring', 'strength']
   .map((id, i) => ({ id, name: id[0].toUpperCase() + id.slice(1), line: 'What ' + id + ' means.', tennis: '', sort: i }));
@@ -74,10 +75,30 @@ async function qualities(browser) {
   }
 }
 
+async function isolation(browser) {
+  for (const w of [390, 320]) {
+    const { ctx, p } = await open(browser, { w });
+    await p.evaluate(() => openExerciseSheet('cable-lateral-raise', null, true));
+    await p.waitForTimeout(400);
+    const e = await p.evaluate(() => { const x = document.querySelector('#hist-overlay .ax-eyebrow'); return x ? x.textContent.trim() : null; });
+    t.check(`isolation: the About sheet says "One muscle at a time" (${w} px)`, e === 'One muscle at a time', String(e));
+    t.check('isolation: …and not "Isolation"', !/isolation/i.test(await p.evaluate(() => document.querySelector('#hist-overlay .readiness-modal').innerText)));
+    await fits(p, '#hist-overlay .ax-eyebrow', w, 'isolation: eyebrow');
+    await noScroll(p, w, 'isolation: sheet');
+    await p.evaluate(() => { document.getElementById('hist-overlay').classList.remove('visible'); goLibrary(); setLibPane('exercises'); });
+    await p.waitForTimeout(500);
+    const chip = await p.evaluate(() => [...document.querySelectorAll('#xl-chips .xl-chip')].map(c => c.textContent.trim()).find(x => /muscle at a time/i.test(x)) || null);
+    t.check(`isolation: Library, Exercises has the same words on its filter (${w} px)`, chip === 'One muscle at a time', String(chip));
+    t.check(`isolation: no page errors (${w})`, !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await blocks(browser);
   await qualities(browser);
+  await isolation(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
