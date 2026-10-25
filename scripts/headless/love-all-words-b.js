@@ -94,11 +94,50 @@ async function isolation(browser) {
   }
 }
 
+async function guided(browser) {
+  for (const w of [390, 320]) {
+    const { ctx, p } = await open(browser, { w });
+    await p.evaluate(() => openDayView('1'));
+    await p.waitForTimeout(500);
+    const g = () => p.evaluate(() => {
+      const b = document.querySelector('#day1 .session-timer-btn.guided') || document.querySelector('.session-timer-btn.guided');
+      if (!b || !b.offsetParent) return null;
+      const r = b.getBoundingClientRect(), s = b.querySelector('.stb-sub'), sr = s.getBoundingClientRect();
+      return { name: b.querySelector('.stb-gl').textContent.replace(/\s+/g, ' ').trim(), line: s.textContent.trim(), sub: Math.round(sr.height),
+        inside: sr.left >= r.left - 0.5 && sr.right <= r.right + 0.5 && sr.bottom <= r.bottom + 0.5 && sr.top >= r.top - 0.5, bh: Math.round(r.height), br: Math.round(r.right) };
+    });
+    let r = await g();
+    t.check(`guided: before Start the button is still "Guided" with "One set at a time" under it (${w} px)`, r && /^Guided/.test(r.name) && r.line === 'One set at a time', JSON.stringify(r));
+    t.check('guided: …the line is one line, grey, and inside the button', r && r.sub <= 16 && r.inside && r.br <= w, JSON.stringify(r));
+    await noScroll(p, w, 'guided: before Start');
+    await p.evaluate(() => startTimerNow('1'));
+    await p.waitForTimeout(500);
+    await p.evaluate(() => { const m = document.querySelector('#day1 .session-timer-more, .session-timer.slim .session-timer-more'); if (m) m.click(); });
+    await p.waitForTimeout(500);
+    r = await g();
+    t.check(`guided: with ⋯ open the button keeps the line, inside the screen (${w} px)`, r && r.line === 'One set at a time' && r.sub <= 16 && r.inside && r.br <= w, JSON.stringify(r));
+    await noScroll(p, w, 'guided: ⋯ open');
+    await p.evaluate(() => { window.restAfterTick = () => {}; const c = document.querySelector('#day-view .ex-set-row .ex-set-check'); if (c) c.click(); });
+    await p.waitForTimeout(400);
+    await p.evaluate(() => { const m = document.querySelector('.session-timer.slim .session-timer-more'); if (m && m.getAttribute('aria-expanded') !== 'true') m.click(); });
+    await p.waitForTimeout(400);
+    r = await g();
+    const fin = await p.evaluate(() => !!document.querySelector('.session-timer.has-finish'));
+    t.check(`guided: …and once a set is ticked (the fourth button shows, a 2 x 2 grid) too (${w} px)`, fin && r && r.line === 'One set at a time' && r.sub <= 16 && r.inside && r.br <= w, fin + ' ' + JSON.stringify(r));
+    await p.click('.session-timer-btn.guided');
+    await p.waitForTimeout(600);
+    t.check('guided: a tap on it opens Guided', await p.evaluate(() => !!STEP && STEP.day === '1'), '');
+    t.check(`guided: no page errors (${w})`, !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await blocks(browser);
   await qualities(browser);
   await isolation(browser);
+  await guided(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

@@ -3072,6 +3072,11 @@
     font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; transition: transform 0.1s; }
   :where(#day-view) .session-timer .session-timer-btn:active { transform: scale(0.97); }
   :where(#day-view) .session-timer .session-timer-btn.guided { flex: 1 1 0; background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.5); }
+  /* Guided carries a small grey line under its name (Plain Words, Amir 2026-10-25): what it does, in the button itself. */
+  :where(#day-view) .session-timer .session-timer-btn.guided { flex-direction: column; gap: 4px; }
+  :where(#day-view) .session-timer .stb-gl { display: inline-flex; align-items: center; gap: 8px; }
+  :where(#day-view) .session-timer .stb-sub { display: block; max-width: 100%; font: 500 var(--fs-label)/1.15 'Barlow', sans-serif; letter-spacing: 0; text-transform: none;
+    color: rgba(255,255,255,.7); white-space: normal; text-align: center; }
   :where(#day-view) .session-timer-reset[hidden] { display: none; }
   :where(#day-view) .session-timer-reset:not([hidden]) { flex: none; display: inline-flex; align-items: center; justify-content: center; min-height: 52px;
     padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; white-space: nowrap; color: #fff; background: transparent;
@@ -3159,6 +3164,9 @@
     :where(#day-view) .session-timer-actions { gap: 8px; }
     :where(#day-view) .session-timer.has-reset:not(.slim) .session-timer-btn { padding: 0 8px; font-size: var(--fs-body); }
     :where(#day-view) .session-timer-reset:not([hidden]) { padding: 0 10px; }
+    /* three buttons on one row leave Guided too little room for its grey line: it takes the row under Pause and Reset instead */
+    :where(#day-view) .session-timer.slim.open:not(.has-finish) .session-timer-actions { flex-wrap: wrap; }
+    :where(#day-view) .session-timer.slim.open:not(.has-finish) .session-timer-btn.guided { order: 1; flex: 1 1 100%; }
     :where(#day-view) .session-timer-week, :where(#day-view) .session-timer-week .stw-k { letter-spacing: -.4px; }
     :where(#day-view) .session-timer-week .stw-k { margin-right: 6px; }   /* "Back-off week · Max effort 7 · 1 set fewer" stays one line at 320 px */
     :where(#day-view) .session-timer-week i { margin: 0 4px 0 0; }
@@ -10179,7 +10187,7 @@ function renderHome() {
       </div>
       <div class="session-timer-actions">
         <button type="button" class="session-timer-btn" onclick="toggleSessionTimer('${day.id}')">Start ▶</button>
-        ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')">Guided<span class="stb-g" aria-hidden="true"> ▶</span></button>` : ''}
+        ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')"><span class="stb-gl">Guided<span class="stb-g" aria-hidden="true"> ▶</span></span><small class="stb-sub">One set at a time</small></button>` : ''}
         <button type="button" class="session-timer-reset" hidden onclick="armedTap(this, 'Reset?', () => resetDay('${day.id}'))">Reset</button>
         <button type="button" class="session-timer-finish" hidden onclick="armedTap(this, 'Finish early?', () => finishEarlyFromBar('${day.id}'))">Finish early</button>
       </div>
