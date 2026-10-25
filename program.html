@@ -2781,9 +2781,9 @@
   .readiness-sub.sheet-mono { font: 400 var(--fs-label)/1.5 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
 
   /* Green section titles (Progress's .prog-sec): condensed capitals in green with a hairline to the edge. */
-  .readiness-q-text, .sp-lbl, .wp-head { display: flex; align-items: center; gap: 12px; margin: 26px 0 8px; font: 700 var(--fs-body)/1.2 'Barlow Condensed', sans-serif; letter-spacing: .08em;
+  .readiness-q-text, .sp-lbl, .wp-head, .acct-grp { display: flex; align-items: center; gap: 12px; margin: 26px 0 8px; font: 700 var(--fs-body)/1.2 'Barlow Condensed', sans-serif; letter-spacing: .08em;
     text-transform: uppercase; color: var(--green-ink); }
-  .readiness-q-text::after, .sp-lbl::after { content: ''; flex: 1; min-width: 0; height: 1px; background: var(--hair); }
+  .readiness-q-text::after, .sp-lbl::after, .acct-grp::after { content: ''; flex: 1; min-width: 0; height: 1px; background: var(--hair); }
 
   /* Door rows (Home's and Progress's .hrow recipe): white, rounded 12, a 1 px edge, a 22 px green line icon, the label in Space Mono over the
      value, a grey ›. Account's three doors and History's way to Personal Records. */
@@ -2800,6 +2800,11 @@
   /* 4. Account (openAccount()): Theme as two buttons (the day's Start and Guided pair: the chosen one filled green, the other outlined), the
      three doors, and Sign out as quiet clay text at the end (two taps, unchanged; armed, it fills). The waiting note above it is grey. */
   .acct-list { display: grid; gap: 10px; margin-top: 22px; }
+  /* PROFILE, the account sheet's first group (2026-10-25, Amir: "we should be able to change profile settings in the settings when we click on our image on top right side"): a green
+     section title, then four of the sheet's own door rows. Your photo's row wears your face in the icon's place (28 px in the 22 px slot, so every row's words start in one column). */
+  .acct-grp + .acct-list { margin-top: 0; }
+  #hist-overlay .hrow-ic.is-face { width: 28px; height: 28px; margin: 0 -3px; }
+  #hist-overlay .hrow-ic.is-face .cr-fl { width: 28px; height: 28px; }
   .acct-theme { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); margin-bottom: 4px; }
   .acct-lbl { font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); }
   .acct-seg { display: grid; grid-template-columns: repeat(2, minmax(76px, 1fr)); gap: 4px; min-width: 176px; padding: 4px; border: 1px solid var(--hair); border-radius: 14px; background: var(--sand); }
@@ -5940,6 +5945,9 @@
   .pl-gerr:empty { display: none; }
   .pl-gsave { min-height: 40px; padding: 0 18px; border: 0; border-radius: 8px; background: var(--btn); color: #fff; cursor: pointer; font: 700 var(--fs-small)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
   .pl-fadd { grid-template-columns: minmax(0, 1fr) 12px; }
+  /* Your game in a sheet (the account's Profile group): the page's own card, in the sheet's width, so the gutter the page keeps is not kept again */
+  #hist-overlay #yg-body .pl-facts { margin: 16px 0 0; }
+  #hist-overlay #yg-body .pl-note { margin: 12px 0 0; }
   /* The face stack on an achievement: up to three small faces overlapping by 6 px, then +N for the rest */
   .pl-ar { grid-template-columns: minmax(0, 1fr) auto 12px; gap: 8px; }
   .pl-ar .pl-dt { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); white-space: nowrap; }
@@ -8587,6 +8595,8 @@ function acctIc(kind) {
     crew: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16zM10 20a2 2 0 0 0 4 0"/>',
     bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16zM10 20a2 2 0 0 0 4 0"/>',   // Reminders (the row had no drawing)
     person: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5a7 7 0 0 1 14 0"/>',
+    game: '<circle cx="12" cy="12" r="9"/><path d="M4.2 7.5c4.5 1.5 4.5 7.5 0 9M19.8 7.5c-4.5 1.5-4.5 7.5 0 9"/>',   // Your game: a ball
+    sees: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',   // What the crew sees of you: an eye
   }[kind] || '';
   return `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${draw}</svg></span>`;
 }
@@ -8609,6 +8619,20 @@ function openAccount(e) {
     : window.IS_PREVIEW ? 'Coach preview: you are looking at this athlete\'s app as your coach sign-in.'
     : 'Signed in on this phone.';
   const door = (id, ic, words) => `<button type="button" class="hrow" id="${id}">${acctIc(ic)}<span class="hrow-b"><span class="hrow-v">${words}</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+  // PROFILE (Players' Lounge, 2026-10-25; Amir: "we should be able to change profile settings in the settings when we click on our image on top right side of the app as well. Its part of
+  // the settings"): the first group of this sheet, only while the server has the Lounge. Your photo wears your face and opens the photo sheet (not in the crew: "Join the crew to add a
+  // photo", which goes to the crew's own question; under 13: no row), Your game is your page's own card in a sheet, Your page is the row that used to sit lower down (it is here once), and
+  // What the crew sees of you is Crew and the Bell's switches (an athlete under 13 has nothing the crew sees, as on the page, so no door). Each sheet comes ‹ Back to this one.
+  const pages = crewPagesOn(), u13 = !!crewMe().under13, self = pages ? crewPersonOf({ me: true }) : null;
+  const faceDoor = (id, words) => `<button type="button" class="hrow" id="${id}"><span class="hrow-ic is-face" aria-hidden="true">${crewFace(Object.assign({}, self, { who: self.who || name }), 'line')}</span><span class="hrow-b"><span class="hrow-v">${words}</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+  const profile = !pages ? '' : `
+    <h3 class="acct-grp">Profile</h3>
+    <div class="acct-list acct-prof">
+      ${u13 ? '' : faceDoor('acct-photo', crewCanLike() ? 'Your photo' : 'Join the crew to add a photo')}
+      ${door('acct-game', 'game', 'Your game')}
+      ${door('acct-page', 'person', 'Your page')}
+      ${u13 ? '' : door('acct-sees', 'sees', 'What the crew sees of you')}
+    </div>`;
   const install = (!_isStandalone() && window.A2HS) ? door('acct-install', 'install', 'Install the app') : '';
   const out = (window.IS_DEMO || window.IS_PREVIEW) ? '' : `
     <div class="acct-out">
@@ -8619,7 +8643,7 @@ function openAccount(e) {
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">Your account</div>
     <h2 class="readiness-title">${esc(name)}</h2>
-    <p class="readiness-sub sheet-mono">${sub}</p>
+    <p class="readiness-sub sheet-mono">${sub}</p>${profile}
     <div class="acct-list">
       <div class="acct-theme"><span class="acct-lbl">Theme</span>
         <span class="acct-seg" role="group" aria-label="Theme">
@@ -8628,7 +8652,6 @@ function openAccount(e) {
         </span></div>
       ${install}
       ${pushReady() ? door('acct-push', 'bell', 'Reminders') : ''}
-      ${crewPagesOn() ? door('acct-page', 'person', 'Your page') : ''}
       ${crewOn() ? door('acct-crew', 'crew', 'Crew and the Bell') : ''}
       ${door('acct-help', 'help', 'How the app works')}
       <a class="hrow" href="/privacy.html" target="_blank" rel="noopener">${acctIc('privacy')}<span class="hrow-b"><span class="hrow-v">Privacy</span></span><span class="hrow-a" aria-hidden="true">›</span></a>
@@ -8652,7 +8675,14 @@ function openAccount(e) {
   if (crw) crw.addEventListener('click', () => openCrewSettings());   // ‹ Back returns here
   const so = document.getElementById('acct-signout');
   if (so) so.addEventListener('click', () => armedTap(so, 'Tap again to sign out', () => signOutSafely(so)));
+  const aph = document.getElementById('acct-photo');
+  if (aph) aph.addEventListener('click', () => { if (crewCanLike()) openFacePhoto(); else { closeHistorySheet(); goTo('crew'); } });   // the photo sheet comes ‹ Back here; not in the crew: the crew's own question
+  const agm = document.getElementById('acct-game');
+  if (agm) agm.addEventListener('click', () => openYourGame());   // ‹ Back returns here
+  const ase = document.getElementById('acct-sees');
+  if (ase) ase.addEventListener('click', () => openCrewSettings());   // ‹ Back returns here
   ov.classList.add('visible');
+  if (pages) crewWireFaces(ov.querySelector('.readiness-modal'));   // your face on the Your photo row asks for its picture like every other face
 }
 window.openAccount = openAccount;
 // The guide in the one sheet (COACH-02, 2026-09-27). It sat at the bottom of the Coach tab, under
@@ -11376,7 +11406,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then today's habits as one card: the five you tick, your <strong>level</strong> in the ring, and the weeks you have held in a row beside <strong>This Week</strong>.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers and your level), <strong>Getting stronger</strong> (your best lift, each time you set a new best), <strong>Your body</strong> (your records, your body weight and your habits) and <strong>What you've earned</strong> (your achievements and your moments) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit on your Today card when you track that habit. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then today's habits as one card: the five you tick, your <strong>level</strong> in the ring, and the weeks you have held in a row beside <strong>This Week</strong>.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers and your level), <strong>Getting stronger</strong> (your best lift, each time you set a new best), <strong>Your body</strong> (your records, your body weight and your habits) and <strong>What you've earned</strong> (your achievements and your moments) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit on your Today card when you track that habit. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: <!--profile-->the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'compass', key: 'serve', title: 'First Serve: your first week', when: () => firstServeWanted(),
     body: `<p>While you are new, a line called <strong>First Serve</strong> sits on Home, under the days. It has five steps: finish your first session, add the app to your Home Screen, turn on notifications, join the crew and add your photo. It shows you one at a time, like <strong>Next: add the app to your Home Screen</strong>. Tap the line and the app takes you there. Tap the small ring, like <strong>2/5</strong>, to see all five.</p><p>Turn on notifications asks your phone once, and only when you tap its button. You can say no. It goes when you have done them all, or two weeks after your first session.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
@@ -11423,7 +11453,7 @@ APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how ofte
     body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
-  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is under your initials, and it is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP. The <strong>cheers</strong> number on a page counts only the cheers people sent that person with the <strong>Cheer</strong> button since they joined the crew. Likes are not in it. Your own page also shows your <strong>comebacks</strong> in a thin line under your numbers, marked Only you.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. On your own page tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p><p>A photo you post with <strong>Tell the crew</strong> wears a small stamp across its foot: the session, the minutes, <strong>WEEK HELD</strong> when that session held your week, and the day. You read the stamp before you post. On your own session photo, tap <strong>Share</strong> and you get the session card for Instagram with that photo behind it. Nobody else's photo has Share.</p><p><strong>Share my card</strong>, on your own page, opens the same card as <strong>Share your card</strong> on Progress.</p><p><strong>The Open</strong> on Crew is a wall of tiles: the place, the face, the result and the name. Your tile has a green outline. Tap a tile to see that person's page. When more than 8 are on the board, tap <strong>All</strong> to see every one.</p>`;
+  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is in the <strong>Profile</strong> group when you tap your initials, with <strong>Your photo</strong>, <strong>Your game</strong> and <strong>What the crew sees of you</strong>. Your page is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, tap your initials, then <strong>Your photo</strong>. Or open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP. The <strong>cheers</strong> number on a page counts only the cheers people sent that person with the <strong>Cheer</strong> button since they joined the crew. Likes are not in it. Your own page also shows your <strong>comebacks</strong> in a thin line under your numbers, marked Only you.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. Tap your initials, then <strong>Your game</strong>, or open your own page, and tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p><p>A photo you post with <strong>Tell the crew</strong> wears a small stamp across its foot: the session, the minutes, <strong>WEEK HELD</strong> when that session held your week, and the day. You read the stamp before you post. On your own session photo, tap <strong>Share</strong> and you get the session card for Instagram with that photo behind it. Nobody else's photo has Share.</p><p><strong>Share my card</strong>, on your own page, opens the same card as <strong>Share your card</strong> on Progress.</p><p><strong>The Open</strong> on Crew is a wall of tiles: the place, the face, the result and the name. Your tile has a green outline. Tap a tile to see that person's page. When more than 8 are on the board, tap <strong>All</strong> to see every one.</p>`;
   // Bring a partner is named only while the card is on the page (the server has partner codes, stage97)
   const GUIDE_PARTNER = `<p><strong>Bring a partner</strong> is a card on your own page, under your numbers. Tap <strong>Get your code</strong> and it makes one for you. A friend who uses your code gets 10% off. You get 10% off your next cycle. <strong>Send on WhatsApp</strong> sends them your code and the link, and <strong>Copy</strong> copies the same words so you can send them anywhere. When a friend has joined, the card says so. A code earns no XP.</p>`;
   const myPage = (() => { try { const c = crewPageGet('me'); return c && c.p; } catch (e) { return null; } })();
@@ -11435,7 +11465,7 @@ function buildAppGuideCards(openKey) {
         <div class="note-card-title">${esc(card.title)}</div>
         <span class="note-chevron">▼</span>
       </div>
-      <div class="note-body">${card.body.replace('<!--crew-->', crewOn() ? crewLi : '').replace('<!--pages-->', crewPagesOn() ? GUIDE_PAGES + (partnerOn(myPage) ? GUIDE_PARTNER : '') : '')}</div>
+      <div class="note-body">${card.body.replace('<!--crew-->', crewOn() ? crewLi : '').replace('<!--pages-->', crewPagesOn() ? GUIDE_PAGES + (partnerOn(myPage) ? GUIDE_PARTNER : '') : '').replace('<!--profile-->', crewPagesOn() ? 'your <strong>Profile</strong> (' + (crewMe().under13 ? '<strong>Your game</strong> and <strong>Your page</strong>' : '<strong>Your photo</strong>, <strong>Your game</strong>, <strong>Your page</strong> and <strong>What the crew sees of you</strong>') + '), ' : '')}</div>
     </div>`).join('');
 }
 
@@ -15036,11 +15066,12 @@ async function crewPageRefresh(key) {
     if (key === 'me' && (_gameBusy || _gamePend)) { const mine = crewPageGet('me'); if (mine) res.p.game = mine.p.game; }
     crewPagePut(key, res.p);
     if (here) { _playerNote = ''; renderPlayerPage(); }
-    if (key === 'me') paintAskMini();
+    if (key === 'me') { paintAskMini(); _ygNote = ''; ygDraw(); }
     return;
   }
   if (res.offline) {
     if (here) { _playerNote = crewPageGet(key) ? 'No signal. This is the last copy on your phone.' : 'No signal. This page shows when you are back online.'; renderPlayerPage(); }
+    if (key === 'me' && !crewPageGet(key)) { _ygNote = 'No signal. Your game shows when you are back online.'; ygDraw(); }
     return;
   }
   if (res.missing) {   // a server without stage96: no doors anywhere, and Crew as it was
@@ -15457,21 +15488,23 @@ function plEditor(r, g) {
     return `<button type="button" class="cr-bt pl-chip" aria-pressed="${on}" onclick="plGamePick('${f}', '${v}')">${esc(t)}</button>`;
   }).join('');
 }
-function playerFactsHTML(key, p, own) {
+function playerFactsHTML(key, p, own, inSheet) {
   const g = plGameClean(p.game);
+  const shut = !inSheet && ygOn();   // Your game's sheet is open over this page: the editor is in the sheet alone, never twice
   if (!own) {
     const rows = plGameRows(g, false, false);
     if (!rows.length) return '';
     return `<section class="pl-facts" aria-label="Player facts"><span class="pl-fk">Player facts</span>${rows.map(r => `<div class="pl-f"><span class="pl-fl">${esc(r.label)}</span>${r.id === 'ig' && r.ig
       ? `<a class="pl-fv" href="https://instagram.com/${esc(r.ig)}" target="_blank" rel="noopener noreferrer">${esc(r.val)}</a>` : `<span class="pl-fv" dir="auto">${esc(r.val)}</span>`}</div>`).join('')}</section>`;
   }
-  if (!plHasGame(g) && !_gameStart) {
+  if (!plHasGame(g) && !(_gameStart && !shut)) {
     return `<section class="pl-facts" aria-label="Player facts"><span class="pl-fk">Player facts</span><button type="button" class="cr-bt pl-f pl-fadd" onclick="plGameStart()"><span class="pl-fv">Add your game</span><span class="pl-fc" aria-hidden="true">›</span></button></section>
       <p class="pl-note">${p.member === false ? 'Any racket sport, or none.' : 'Any racket sport, or none. The crew sees what you add.'}</p>`;
   }
   const rows = plGameRows(g, true, !!p.under13);
-  if (_gameOpen && !rows.some(r => r.id === _gameOpen)) _gameOpen = null;
-  return `<section class="pl-facts" aria-label="Player facts"><span class="pl-fk">Player facts</span>${rows.map(r => _gameOpen === r.id
+  let open = shut ? null : _gameOpen;
+  if (open && !rows.some(r => r.id === open)) { open = null; if (!shut) _gameOpen = null; }
+  return `<section class="pl-facts" aria-label="Player facts"><span class="pl-fk">Player facts</span>${rows.map(r => open === r.id
     ? `<div class="pl-f e open"><button type="button" class="cr-bt pl-fl" aria-expanded="true" onclick="plGameOpen(null)">${esc(r.label)}</button><div class="pl-fo">${plEditor(r, g)}</div><button type="button" class="cr-bt pl-fc dn" aria-label="Close ${esc(r.label)}" onclick="plGameOpen(null)">›</button></div>`
     : `<button type="button" class="cr-bt pl-f e pl-fb" aria-expanded="false" onclick="plGameOpen('${r.id}')"><span class="pl-fl">${esc(r.label)}</span><span class="pl-fv${r.val ? '' : ' add'}" dir="auto">${esc(r.val || 'Add')}</span><span class="pl-fc" aria-hidden="true">›</span></button>`).join('')}</section>
     <p class="pl-note">${p.member === false ? '' : 'The crew sees these. '}A row you leave empty stays off your page.</p>`;
@@ -15483,12 +15516,12 @@ function plGameOpen(id) {
   _gameErr = '';
   const f = PL_FIELDS[_gameOpen], g = plGameClean(c && c.p.game);
   _gameDraft = f ? (f.f === 'ig' ? (g.ig ? '@' + g.ig : '') : g[f.f] || '') : '';
-  _playerForce = true; renderPlayerPage(); _playerForce = false;
+  plGameRedraw();
   if (f) { const i = document.getElementById('pl-gin'); if (i) { try { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } catch (e) {} } }   // inside the tap: an iPhone raises the keyboard only for a focus made in the tap itself
 }
 function plGameType(el) { _gameDraft = el.value; if (_gameErr) { _gameErr = ''; const e = document.getElementById('pl-gerr'); if (e) e.textContent = ''; } }
 // The page is not redrawn under a field while it has the keyboard (nobody is moved off what they are typing); it catches up a moment after, so a tap on Save still lands.
-function plGameBlur() { setTimeout(() => { if (_playerLate) { _playerLate = false; renderPlayerPage(); } }, 300); }
+function plGameBlur() { setTimeout(() => { if (_playerLate) { _playerLate = false; renderPlayerPage(); ygDraw(); } }, 300); }
 function plGamePick(field, val) {
   const c = crewPageGet('me');
   if (!c) return;
@@ -15506,7 +15539,7 @@ function plGameSave(id) {
     v = v.replace(/^@+/, '');
     if (v && !PL_IG_RE.test(v)) {
       _gameDraft = inp.value; _gameErr = 'Use letters, numbers, dots and underscores only, 30 at most.';
-      _playerForce = true; renderPlayerPage(); _playerForce = false;
+      plGameRedraw();
       const i = document.getElementById('pl-gin'); if (i) i.focus();
       return;
     }
@@ -15524,7 +15557,7 @@ function plGameSet(g) {
   if (!_gameBusy && !_gamePend) _gameOk = c.p.game ? JSON.parse(JSON.stringify(c.p.game)) : null;
   c.p.game = g; crewPagesSave();
   _gamePend = g;
-  _playerForce = true; renderPlayerPage(); _playerForce = false;
+  plGameRedraw();
   plGameFlush();
 }
 async function plGameFlush() {
@@ -15538,16 +15571,65 @@ async function plGameFlush() {
       const c = crewPageGet('me');
       if (r && !r.error && r.data && typeof r.data === 'object') {
         _gameOk = r.data;
-        if (c && !_gamePend) { c.p.game = r.data; crewPagesSave(); if (onPlayer() && _playerCk === 'me') { _playerForce = true; renderPlayerPage(); _playerForce = false; } }
+        if (c && !_gamePend) { c.p.game = r.data; crewPagesSave(); if ((onPlayer() && _playerCk === 'me') || ygOn()) plGameRedraw(); }
       } else {
         _gamePend = null;
-        if (c) { c.p.game = _gameOk; crewPagesSave(); if (onPlayer() && _playerCk === 'me') { _playerForce = true; renderPlayerPage(); _playerForce = false; } }
+        if (c) { c.p.game = _gameOk; crewPagesSave(); if ((onPlayer() && _playerCk === 'me') || ygOn()) plGameRedraw(); }
         aaToast(_noAnswer(r) ? 'No signal. That did not save. Try again when you are back online.' : r && r.error && crewMissingErr(r) ? 'That is not ready yet.' : 'That did not save. Try again.');
       }
     }
   } finally { _gameBusy = false; }
 }
 window.plGameStart = plGameStart; window.plGameOpen = plGameOpen; window.plGameType = plGameType; window.plGameBlur = plGameBlur; window.plGamePick = plGamePick; window.plGameSave = plGameSave;
+// ── Your game, in a sheet (2026-10-25; Amir: "we should be able to change profile settings in the settings when we click on our image on top right side of the app as well") ──
+// The account sheet's Profile group opens it. It is the SAME card and the SAME editor as your own page (playerFactsHTML(), asked for the sheet), saved by the SAME functions
+// (plGameOpen / plGamePick / plGameSave / plGameSet / plGameFlush: one my_game_set at a time, a refusal puts the last card back), so no field logic is written twice. The only new thing
+// is where the card is DRAWN: plGameRedraw() draws it on your page when that is the screen and in this sheet when it is open. While the sheet is open the page behind draws its card
+// closed, so there is one #pl-gin and one open row, the sheet's. `_ygOpen`: the sheet was opened. `ygOn()`: it is on the screen right now.
+var _ygOpen = false, _ygHTML = '', _ygNote = '';
+function ygOn() {
+  const b = document.getElementById('yg-body'), ov = document.getElementById('hist-overlay');
+  return !!(_ygOpen && b && ov && ov.contains(b) && ov.classList.contains('visible'));
+}
+function ygHTML() {
+  const c = crewPageGet('me');
+  if (!c) return `<p class="readiness-sub" role="status">${esc(_ygNote || (navigator.onLine === false ? 'No signal. Your game shows when you are back online.' : 'Loading…'))}</p>`;
+  return playerFactsHTML('me', c.p, true, true);
+}
+// Drawn again only when it changed, and never under a field that has the keyboard (plGameBlur() catches up), exactly as renderPlayerPage() does it.
+function ygDraw() {
+  if (!ygOn()) return;
+  const body = document.getElementById('yg-body'), html = ygHTML();
+  if (html === _ygHTML) return;
+  const ae = document.activeElement;
+  if (!_playerForce && ae && ae.id === 'pl-gin' && body.contains(ae)) { _playerLate = true; return; }
+  _playerLate = false; _ygHTML = html; body.innerHTML = html;
+}
+function plGameRedraw() {
+  _playerForce = true;
+  try { renderPlayerPage(); ygDraw(); } finally { _playerForce = false; }
+}
+function openYourGame() {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov || !BELL || !crewPagesOn()) return;
+  _gameOpen = null; _gameStart = false; _gameDraft = ''; _gameErr = ''; _playerLate = false; _ygOpen = true; _ygHTML = ''; _ygNote = '';
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Profile</div>
+    <h2 class="readiness-title">Your game</h2>
+    <div id="yg-body"></div>`;
+  ov.classList.add('visible');
+  ygDraw();
+  if (onPlayer() && _playerCk === 'me') { _playerHTML = ''; renderPlayerPage(); }   // the page behind lays its card down: the editor is the sheet's alone
+  crewPageEnsure('me');   // no copy, or an old one: ask the server, and the sheet fills in when it answers
+}
+// The sheet is done (closed, or ‹ Back to the account): nothing is left open on your page.
+function ygEnd() {
+  if (!_ygOpen) return;
+  _ygOpen = false; _ygHTML = ''; _ygNote = '';
+  _gameOpen = null; _gameStart = false; _gameDraft = ''; _gameErr = ''; _playerLate = false;
+  if (onPlayer() && _playerCk === 'me') { _playerHTML = ''; renderPlayerPage(); }
+}
+window.openYourGame = openYourGame;
 
 // This week: what the person posted on the Bell, still on this phone's copy of it. A row takes you to the post on Crew.
 function playerPosts(key, p) {
@@ -24017,6 +24099,7 @@ function sheetWrap(fn) {
   };
 }
 function sheetBack() {
+  ygEnd();
   const prev = _SHEET.stack.pop();
   if (!prev) { closeHistorySheet(); return; }
   _SHEET.restoring = true;
@@ -24064,14 +24147,15 @@ function wrapSheetOpeners() {
   openPlayerAchievements = sheetWrap(openPlayerAchievements); window.openPlayerAchievements = openPlayerAchievements;   // a Player Page's "All n"
   openPlayerWeek = sheetWrap(openPlayerWeek); window.openPlayerWeek = openPlayerWeek;   // a Player Page's week of sessions (This cycle)
   openPlayerSigners = sheetWrap(openPlayerSigners); window.openPlayerSigners = openPlayerSigners;   // "Cheered by": ‹ Back to "All n" when it was opened from there
-  openFacePhoto = sheetWrap(openFacePhoto); window.openFacePhoto = openFacePhoto;   // Your photo: opened from your page
+  openFacePhoto = sheetWrap(openFacePhoto); window.openFacePhoto = openFacePhoto;   // Your photo: opened from your page, or from the account's Profile group (‹ Back to it)
+  openYourGame = sheetWrap(openYourGame); window.openYourGame = openYourGame;   // Your game: the account's Profile group; ‹ Back to the account
   openCheer = sheetWrap(openCheer); window.openCheer = openCheer;   // Cheer Sara: opened from her page
   openCrewSettings = sheetWrap(openCrewSettings); window.openCrewSettings = openCrewSettings;   // Crew: the yes and the switches; ‹ Back to the account
   openPushSettings = sheetWrap(openPushSettings); window.openPushSettings = openPushSettings;   // Reminders: ‹ Back to the account, as its door says
   window.openHistorySheet = openHistorySheet; window.openExerciseSheet = openExerciseSheet;
   window.openWhyPlan = openWhyPlan; window.openQualitySheet = openQualitySheet;
   const close0 = closeHistorySheet;
-  closeHistorySheet = function () { _SHEET.stack = []; _SHEET.cur = null; try { crewMnEnd(); } catch (e) {} return close0.apply(this, arguments); };
+  closeHistorySheet = function () { _SHEET.stack = []; _SHEET.cur = null; try { crewMnEnd(); } catch (e) {} try { ygEnd(); } catch (e) {} return close0.apply(this, arguments); };
   window.closeHistorySheet = closeHistorySheet;
   // A page that redraws itself later (History fills in after its fetch) keeps its Back.
   const m = document.querySelector('#hist-overlay .readiness-modal');

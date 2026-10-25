@@ -533,7 +533,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const { ctx, p } = await open(browser);
     await goCrew(p);
     const g = await p.evaluate(() => buildAppGuideCards());
-    C.check('the guide: Your page under your initials, names and faces that open pages, and the join question', /<strong>Your page<\/strong> is under your initials/.test(g) && /Tap a name, a face or a row/.test(g) && /your own page is shown first/.test(g));
+    C.check('the guide: Your page in the Profile group of your initials, names and faces that open pages, and the join question', /<strong>Your page<\/strong> is in the <strong>Profile<\/strong> group when you tap your initials/.test(g) && /Tap a name, a face or a row/.test(g) && /your own page is shown first/.test(g));
     C.check('…in plain words: no em-dash, no semicolon in what was added', !/[—;]/.test((g.match(/<p>Tap a name[\s\S]*?<\/p>/) || [''])[0]));
     await ctx.close();
   }
@@ -2733,6 +2733,152 @@ const on = n => !ONLY.length || ONLY.includes(n);
       && (fa.match(/<!-- FA DRAFT 2026-10-25: Amir to read -->\r?\n\s*<li><b>(صفحه‌ی تو|تشویق)<\/b>/g) || []).length === 2 && (fa.match(/Cheer<\/bdi> برات فرستادن/g) || []).length === 2);
   }
 
+  // (3) PROFILE in the account sheet: the face button at the top right opens a group of four rows, at the TOP, in the sheet's own row style
+  const acctRows = p => p.evaluate(() => [...document.querySelectorAll('#hist-overlay .acct-list .hrow .hrow-v')].map(x => x.textContent.trim()));
+  const profRows = p => p.evaluate(() => [...document.querySelectorAll('#hist-overlay .acct-prof .hrow .hrow-v')].map(x => x.textContent.trim()));
+  const sheetTitle = p => p.evaluate(() => (document.querySelector('#hist-overlay .readiness-title') || {}).textContent || '');
+  const sheetEye = p => p.evaluate(() => (document.querySelector('#hist-overlay .readiness-eyebrow') || {}).textContent || '');
+  const sheetUp = p => p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'));
+  const sheetBackBtn = p => p.evaluate(() => !!document.querySelector('#hist-overlay .sheet-back'));
+  const tapSheetBack = async p => { await p.evaluate(() => { const b = document.querySelector('#hist-overlay .sheet-back'); if (b) b.click(); }); await p.waitForTimeout(300); };
+  const openAcct = async p => { await p.evaluate(() => openAccount()); await p.waitForTimeout(350); };
+  const sheetFacts = p => p.evaluate(() => [...document.querySelectorAll('#hist-overlay .pl-facts .pl-f')].map(r => [(r.querySelector('.pl-fl') || {}).textContent, ((r.querySelector('.pl-fv') || r.querySelector('.pl-fo') || {}).textContent || '').trim()]));
+  const sheetLabels = p => p.evaluate(() => [...document.querySelectorAll('#hist-overlay .pl-facts .pl-f .pl-fl')].map(e => e.textContent.trim()));
+  const sheetChip = (p, t) => p.evaluate(t => { const b = [...document.querySelectorAll('#hist-overlay .pl-fo .pl-chip')].find(x => x.textContent.trim() === t); if (!b) return false; b.click(); return true; }, t);
+  const sheetRow = (p, l) => p.evaluate(l => { const b = [...document.querySelectorAll('#hist-overlay .pl-facts button.pl-f, #hist-overlay .pl-facts .pl-f > button.pl-fl')].find(x => (x.querySelector('.pl-fl') || x).textContent.trim() === l); if (!b) return false; b.click(); return true; }, l);
+  if (on(31)) {
+    const m = await open(browser, { stub: { crewPages: { me: { who: 'Alex R.' } } } });
+    await waitTab(m.p); await m.p.waitForTimeout(600);
+    await openAcct(m.p);
+    const prof = await profRows(m.p), all = await acctRows(m.p);
+    const top = await m.p.evaluate(() => { const ov = document.getElementById('hist-overlay'), g = ov.querySelector('.acct-grp'), first = ov.querySelector('.hrow'), th = ov.querySelector('.acct-theme');
+      return { grp: g ? g.textContent.trim() : null, first: first ? first.id : null, grpBeforeRows: !!(g && first && (g.compareDocumentPosition(first) & Node.DOCUMENT_POSITION_FOLLOWING)), beforeTheme: !!(g && th && (g.compareDocumentPosition(th) & Node.DOCUMENT_POSITION_FOLLOWING)) }; });
+    C.check('the account sheet opens with a Profile group at the TOP: Your photo, Your game, Your page, What the crew sees of you', JSON.stringify(prof) === JSON.stringify(['Your photo', 'Your game', 'Your page', 'What the crew sees of you']) && top.grp === 'Profile' && top.first === 'acct-photo' && top.beforeTheme, JSON.stringify([prof, top]));
+    C.check('…each in the sheet\'s own door-row style (.hrow, 64 px or more, a ›), so nothing new is drawn', await m.p.evaluate(() => [...document.querySelectorAll('#hist-overlay .acct-prof .hrow')].every(b => b.classList.contains('hrow') && b.getBoundingClientRect().height >= 63.5 && !!b.querySelector('.hrow-a'))));
+    C.check('…and "Your page" is in it once: the old row further down is gone, not copied', all.filter(x => x === 'Your page').length === 1 && all.indexOf('Your page') === 2 && (await m.p.$$('#hist-overlay #acct-page')).length === 1, JSON.stringify(all));
+    C.check('…Crew and the Bell, How the app works and Privacy keep their rows', ['Crew and the Bell', 'How the app works', 'Privacy'].every(x => all.indexOf(x) > 3), JSON.stringify(all));
+    const face = await m.p.evaluate(() => { const e = document.querySelector('#acct-photo .cr-fl'); return e ? { t: e.textContent.trim(), fc: e.getAttribute('data-fc'), w: Math.round(e.getBoundingClientRect().width) } : null; });
+    C.check('Your photo row shows your face (your initials until you add one), 28 px or more', !!face && face.t === 'AR' && face.w >= 28, JSON.stringify(face));
+    // the photo sheet, and ‹ Back to the account
+    await click(m.p, '#acct-photo'); await m.p.waitForTimeout(400);
+    C.check('Your photo opens the photo sheet (choose, drag, Save), with ‹ Back', (await sheetTitle(m.p)) === 'Your photo' && !!(await m.p.$('#hist-overlay #fp-file')) && (await sheetBackBtn(m.p)));
+    await tapSheetBack(m.p);
+    C.check('…‹ Back is the account sheet again, Profile on top', (await sheetEye(m.p)) === 'Your account' && !!(await m.p.$('#acct-photo')));
+    // Your game: the same card and editor as your page, in a sheet
+    await click(m.p, '#acct-game'); await m.p.waitForTimeout(500);
+    C.check('Your game opens a sheet of its own, with ‹ Back, and an empty game is one row: "Add your game"', (await sheetTitle(m.p)) === 'Your game' && (await sheetBackBtn(m.p)) && /Add your game/.test(await text(m.p, '#hist-overlay .pl-fadd') || '') && (await m.p.$$('#hist-overlay .pl-facts .pl-f')).length === 1);
+    await click(m.p, '#hist-overlay .pl-fadd'); await m.p.waitForTimeout(300);
+    const l0 = await sheetLabels(m.p), chips0 = await m.p.evaluate(() => [...document.querySelectorAll('#hist-overlay .pl-fo .pl-chip')].map(b => b.textContent));
+    C.check('…it opens on Plays with every racket sport and None, the rows the page has (Hand, Club, Trains for, Working on, Instagram)', JSON.stringify(l0) === JSON.stringify(['Plays', 'Hand', 'Club', 'Trains for', 'Working on', 'Instagram']) && chips0.length === 8 && chips0[7] === 'None', JSON.stringify([l0, chips0]));
+    await sheetChip(m.p, 'Tennis'); await m.p.waitForTimeout(500);
+    const g1 = await lastGame(m.p), l1 = await sheetLabels(m.p);
+    C.check('Tennis saves with the page\'s own call (my_game_set), and the sheet shows Backhand and Level at once', !!g1 && JSON.stringify(g1.sports) === '["tennis"]' && l1.indexOf('Backhand') > 0 && l1.indexOf('Level') > 0, JSON.stringify([g1, l1]));
+    await sheetRow(m.p, 'Plays'); await m.p.waitForTimeout(250);
+    await sheetRow(m.p, 'Hand'); await m.p.waitForTimeout(250); await sheetChip(m.p, 'Left-handed'); await m.p.waitForTimeout(500);
+    const g2 = await lastGame(m.p), r2 = (await sheetFacts(m.p)).find(r => r[0] === 'Hand');
+    C.check('Hand: one tap saves it and closes the row', !!g2 && g2.hand === 'left' && JSON.stringify(r2) === '["Hand","Left-handed"]' && !(await m.p.$('#hist-overlay .pl-fo')), JSON.stringify([g2, r2]));
+    // a field, typed in the sheet: the Instagram name is checked and saved like on the page
+    await sheetRow(m.p, 'Instagram'); await m.p.waitForTimeout(300);
+    const foc = await m.p.evaluate(() => ({ id: (document.activeElement || {}).id, inSheet: !!(document.activeElement && document.activeElement.closest('#hist-overlay')), n: document.querySelectorAll('#pl-gin').length }));
+    C.check('the field has the keyboard, inside the sheet, and there is only one of it', foc.id === 'pl-gin' && foc.inSheet && foc.n === 1, JSON.stringify(foc));
+    await m.p.keyboard.type('sara k'); await click(m.p, '#hist-overlay .pl-gsave'); await m.p.waitForTimeout(350);
+    C.check('…a name with a space is refused in words, nothing is sent for it', /letters, numbers, dots and underscores/.test(await text(m.p, '#hist-overlay #pl-gerr') || '') && !((await lastGame(m.p)) || {}).ig);
+    await m.p.evaluate(() => { const i = document.getElementById('pl-gin'); i.value = ''; plGameType(i); });
+    await m.p.keyboard.type('@sara.k'); await click(m.p, '#hist-overlay .pl-gsave'); await m.p.waitForTimeout(600);
+    const g3 = await lastGame(m.p), ig = (await sheetFacts(m.p)).find(r => r[0] === 'Instagram');
+    C.check('…and "@sara.k" saves through the same my_game_set, shown as @sara.k', !!g3 && g3.ig === 'sara.k' && g3.hand === 'left' && JSON.stringify(ig) === '["Instagram","@sara.k"]', JSON.stringify([g3, ig]));
+    C.check('…one call for each save that was allowed (Tennis, Left-handed, @sara.k), none for the refused name', (await gameCalls(m.p)).length === 3, String((await gameCalls(m.p)).length));
+    await tapSheetBack(m.p);
+    C.check('‹ Back from Your game is the account sheet', (await sheetEye(m.p)) === 'Your account');
+    await m.p.evaluate(() => closeHistorySheet()); await m.p.waitForTimeout(200);
+    await m.p.evaluate(() => openPlayer('me')); await m.p.waitForTimeout(700);
+    const pg = await factRows(m.p);
+    C.check('your own page shows the very same card (what the sheet saved), with no row left open', pg.some(r => r[0] === 'Plays' && /Tennis/.test(r[1])) && pg.some(r => r[0] === 'Instagram' && r[1] === '@sara.k') && pg.some(r => r[0] === 'Hand' && r[1] === 'Left-handed') && !(await m.p.$('#crewplayer-body .pl-fo')), JSON.stringify(pg));
+    // from your own page: the account's button is on the page too. The editor lives in the sheet only, and the page behind never draws a second field
+    await openAcct(m.p); await click(m.p, '#acct-game'); await m.p.waitForTimeout(400);
+    await sheetRow(m.p, 'Club'); await m.p.waitForTimeout(300);
+    const two = await m.p.evaluate(() => ({ n: document.querySelectorAll('#pl-gin').length, inPage: !!document.querySelector('#crewplayer-body #pl-gin'), act: (document.activeElement || {}).id, sheet: !!document.querySelector('#hist-overlay #pl-gin') }));
+    C.check('with your page under the sheet, the Club field is in the sheet alone (the page draws no second one)', two.n === 1 && !two.inPage && two.sheet && two.act === 'pl-gin', JSON.stringify(two));
+    await m.p.keyboard.type('Enghelab'); await click(m.p, '#hist-overlay .pl-gsave'); await m.p.waitForTimeout(500);
+    C.check('…saved, and the page behind has it when the sheet is closed', ((await lastGame(m.p)) || {}).club === 'Enghelab' && (await (async () => { await m.p.evaluate(() => closeHistorySheet()); await m.p.waitForTimeout(250); return (await factRows(m.p)).some(r => r[0] === 'Club' && r[1] === 'Enghelab'); })()));
+    C.check('…and closing the sheet with a row open leaves none open on the page', !(await m.p.$('#crewplayer-body .pl-fo')) && !(await m.p.$('#crewplayer-body #pl-gin')));
+    // Your page and What the crew sees of you
+    await m.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await m.p.waitForTimeout(300);
+    await openAcct(m.p); await click(m.p, '#acct-page'); await m.p.waitForTimeout(600);
+    C.check('Your page opens your own page (the sheet closes)', (await screenNow(m.p)) === 'screen-crewplayer' && !(await sheetUp(m.p)) && (await m.p.evaluate(() => _playerCk)) === 'me');
+    await openAcct(m.p); await click(m.p, '#acct-sees'); await m.p.waitForTimeout(400);
+    C.check('What the crew sees of you opens Crew and the Bell, with ‹ Back to the account', (await sheetTitle(m.p)) === 'Crew and the Bell' && !!(await m.p.$('#hist-overlay .cr-sw')) && (await sheetBackBtn(m.p)));
+    await tapSheetBack(m.p);
+    C.check('…‹ Back lands on the account sheet', (await sheetEye(m.p)) === 'Your account' && !!(await m.p.$('#acct-sees')));
+    // Back (the phone's) closes the top sheet one layer at a time
+    await click(m.p, '#acct-game'); await m.p.waitForTimeout(400);
+    C.check('the phone\'s Back (topLayer) is ‹ Back while Your game sits over the account, and closes the sheet from the account', await m.p.evaluate(() => { const a = topLayer() === sheetBack; sheetBack(); const b = topLayer() === closeHistorySheet; return a && b; }));
+    C.check('no page errors', !m.p.errs.length, m.p.errs.join(' | '));
+    await m.ctx.close();
+  }
+  if (on(31)) {
+    // someone who has not joined: the photo row says so and leads to the crew's question; the rest is theirs all the same
+    const n = await open(browser, { b: { me: { answer: null, can_post: false } }, stub: { crewPages: { me: { member: false } } } });
+    await waitTab(n.p); await n.p.waitForTimeout(600);
+    await openAcct(n.p);
+    C.check('not in the crew: "Join the crew to add a photo" in the place of Your photo; Your game, Your page and What the crew sees of you are still there', JSON.stringify(await profRows(n.p)) === JSON.stringify(['Join the crew to add a photo', 'Your game', 'Your page', 'What the crew sees of you']), JSON.stringify(await profRows(n.p)));
+    await click(n.p, '#acct-photo'); await n.p.waitForTimeout(600);
+    C.check('…it leads to the crew\'s question (Crew, "Join the crew?"), and the sheet is closed', (await screenNow(n.p)) === 'screen-crew' && !(await sheetUp(n.p)) && !!(await n.p.$('#crew-ask')) && /Join the crew\?/.test(await plain(n.p, '#crew-ask') || ''), await screenNow(n.p));
+    await openAcct(n.p); await click(n.p, '#acct-game'); await n.p.waitForTimeout(500);
+    C.check('…and Your game still works for them (the page\'s own call)', (await sheetTitle(n.p)) === 'Your game' && /Add your game/.test(await text(n.p, '#hist-overlay .pl-fadd') || ''));
+    await click(n.p, '#hist-overlay .pl-fadd'); await n.p.waitForTimeout(250); await sheetChip(n.p, 'Padel'); await n.p.waitForTimeout(500);
+    C.check('…padel is saved', JSON.stringify(((await lastGame(n.p)) || {}).sports) === '["padel"]');
+    await n.ctx.close();
+    // under 13: no photo row at all, no door into what the crew sees (nothing reaches them), the game and the page stay
+    const u = await open(browser, { b: { me: { under13: true, can_post: false } }, stub: { crewPages: { me: { under13: true, member: false } } } });
+    await waitTab(u.p); await u.p.waitForTimeout(600);
+    await openAcct(u.p);
+    C.check('under 13: no Your photo row; Your game and Your page stay', JSON.stringify(await profRows(u.p)) === JSON.stringify(['Your game', 'Your page']), JSON.stringify(await profRows(u.p)));
+    await click(u.p, '#acct-game'); await u.p.waitForTimeout(500);
+    C.check('…and their Your game has no Instagram row', (await sheetTitle(u.p)) === 'Your game' && !(await sheetLabels(u.p)).includes('Instagram') && !!(await u.p.$('#hist-overlay .pl-facts')));
+    await u.ctx.close();
+    // a server without stage96: no Profile group, no photo, no page: the account sheet is what it was
+    const o = await open(browser, { b: { noPages: true } });
+    await waitTab(o.p); await o.p.waitForTimeout(600);
+    await openAcct(o.p);
+    const oldRows = await acctRows(o.p);
+    C.check('a server without stage96: no Profile group, and the rows the account always had', !(await o.p.$('#hist-overlay .acct-grp')) && !(await o.p.$('#acct-photo')) && !(await o.p.$('#acct-game')) && !(await o.p.$('#acct-page')) && oldRows.includes('Crew and the Bell') && oldRows.includes('How the app works'), JSON.stringify(oldRows));
+    await o.ctx.close();
+    // in the demo there is no crew: no group
+    // the sheet at 320 px, in dark mode: nothing runs off the side
+    const s = await open(browser, { opts: { w: 320, h: 640, dark: true }, stub: { crewPages: { me: { who: 'Alex R.' } } } });
+    await waitTab(s.p); await s.p.waitForTimeout(600);
+    await openAcct(s.p);
+    const fit = await s.p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, bad: [...document.querySelectorAll('#hist-overlay .acct-prof .hrow')].filter(b => b.scrollWidth > b.clientWidth + 1).length, rows: document.querySelectorAll('#hist-overlay .acct-prof .hrow').length,
+      bg: getComputedStyle(document.querySelector('#hist-overlay .acct-prof .hrow')).backgroundColor }));
+    C.check('320 px in dark mode: four rows, none cut, nothing scrolls sideways, the row colour is the dark one', fit.sw <= fit.iw && fit.bad === 0 && fit.rows === 4 && fit.bg !== 'rgb(255, 255, 255)', JSON.stringify(fit));
+    await click(s.p, '#acct-game'); await s.p.waitForTimeout(400); await click(s.p, '#hist-overlay .pl-fadd'); await s.p.waitForTimeout(300);
+    const fit2 = await s.p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, chips: [...document.querySelectorAll('#hist-overlay .pl-chip')].filter(b => { const r = b.getBoundingClientRect(), q = document.querySelector('#hist-overlay .readiness-modal').getBoundingClientRect(); return r.right > q.right + 1; }).length }));
+    C.check('…and Your game\'s chips stay inside the sheet', fit2.sw <= fit2.iw && fit2.chips === 0, JSON.stringify(fit2));
+    C.check('no page errors', !s.p.errs.length, s.p.errs.join(' | '));
+    await s.ctx.close();
+  }
+  if (on(31)) {
+    // no copy of your page on the phone: Your game says why, and fills in when the page lands
+    const w = await open(browser, {});
+    await waitTab(w.p); await w.p.waitForTimeout(600);
+    await w.p.evaluate(() => { crewPagesClear(); window.__STUB.mode = 'offline'; });
+    await openAcct(w.p); await click(w.p, '#acct-game'); await w.p.waitForTimeout(500);
+    C.check('no copy and no signal: Your game says so in words, not a blank sheet', (await sheetTitle(w.p)) === 'Your game' && /No signal/.test(await text(w.p, '#hist-overlay .readiness-modal') || '') && !(await w.p.$('#hist-overlay .pl-fadd')));
+    await w.p.evaluate(() => { window.__STUB.mode = 'online'; crewPageRefresh('me'); }); await w.p.waitForTimeout(900);
+    C.check('…and when the page lands the sheet fills in by itself: "Add your game"', !!(await w.p.$('#hist-overlay .pl-fadd')));
+    C.check('no page errors', !w.p.errs.length, w.p.errs.join(' | '));
+    await w.ctx.close();
+    // a save the server refuses puts the last card back in the sheet and says why
+    const r = await open(browser, { stub: { crewPages: { me: { game: { sports: ['tennis'], hand: 'right' } } }, gameErr: 'crew:not_yes' } });
+    await waitTab(r.p); await r.p.waitForTimeout(600);
+    await openAcct(r.p); await click(r.p, '#acct-game'); await r.p.waitForTimeout(500);
+    await sheetRow(r.p, 'Hand'); await r.p.waitForTimeout(250); await sheetChip(r.p, 'Left-handed'); await r.p.waitForTimeout(700);
+    const back = (await sheetFacts(r.p)).find(x => x[0] === 'Hand'), tt = await toast(r.p);
+    C.check('a refused save: the sheet goes back to Right-handed and a toast says it did not save', JSON.stringify(back) === '["Hand","Right-handed"]' && !!tt && /did not save|not ready/i.test(tt.text), JSON.stringify([back, tt]));
+    await r.ctx.close();
+  }
+
   // ── 32. the pictures (390 px) for 2026-10-25: the new cover (light and dark) and the account sheet's Profile group (light) ──────────────────────────────
   if (on(32)) {
     const people = [[CK.alex, '#5E8C7A', '#E3B896', '#2E4A57', 1101]];
@@ -2754,6 +2900,14 @@ const on = n => !ONLY.length || ONLY.includes(n);
       await faceImgs(a.p); await goCrew(a.p); await a.p.waitForTimeout(900);
       await a.p.evaluate(() => openPlayer('me')); await a.p.waitForTimeout(1200);
       await a.p.screenshot({ path: path.join(out, 'cover-' + (dark ? 'dark' : 'light') + '-390.png'), clip: { x: 0, y: 0, width: 390, height: 520 } });
+      if (!dark) {
+        await a.p.evaluate(() => openAccount()); await a.p.waitForTimeout(900);
+        const pf = await a.p.evaluate(() => { const e = document.querySelector('#acct-photo .cr-fl'), i = e && e.querySelector(':scope > img.fc-img'); return e ? { fc: e.getAttribute('data-fc'), fv: e.getAttribute('data-fv'), img: !!i, loaded: !!i && i.complete && i.naturalWidth > 0 } : null; });
+        C.check('with a photo, the Your photo row wears it (the face is asked for like every other, once the sheet is open)', !!pf && pf.fc === CK.alex && pf.fv === '1101' && pf.img && pf.loaded, JSON.stringify(pf));
+        await a.p.screenshot({ path: path.join(out, 'account-profile-light-390.png') });
+        await click(a.p, '#acct-game'); await a.p.waitForTimeout(500); await sheetRow(a.p, 'Hand'); await a.p.waitForTimeout(400);
+        await a.p.screenshot({ path: path.join(out, 'account-yourgame-light-390.png') });
+      }
       await a.ctx.close();
     }
   }
