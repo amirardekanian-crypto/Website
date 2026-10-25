@@ -348,6 +348,7 @@ back) with traps; nine calls. Grown idea, also on The Coaching Graph:
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
 | 91 | The Answer Book | Every Mailbag answer kept after its week on the Bell, on a Library shelf "Asked by the crew" (question, answer, the rule behind it in plain words); the Inbox row opens it; with his yes it feeds /chat-facts; kept out of the Playbook (parity rules untouched) | 88 | picked 2026-10-25 ("go with your picks"), built with step 3 (on The Coaching Graph) |
+| 92 | The Pick card | Amir's own ask (25 Oct): Amir's Pick gets a card on Crew for 14 days from the pick (her picture and name, his reason in his words, one clay Cheer button), replacing the pick's plain Bell line; the reason (140 characters, "Why her? The crew reads this") is written in Courtside and kept on her page's Honours row for good; a pick outside the crew sees it on their own page only. First use: Elmira, October (pickable from 1 Nov). 3 directions: A The Pick Card = pick, B In the Band, C Her Page Leads | — | pitched 2026-10-25 (plan page, calls 10-13) |
 
 **Build, 2026-10-25:** Amir, *"go with your picks"*. Brief for the build session: `C:\Users\Amir\AA-Lounge\HOME-CROWD-BUILD-BRIEF.md`
 (step 1 the tab, live when it passes; steps 2-4 the Inbox, the weekly crew, talk back, live together). Statuses become `built` with

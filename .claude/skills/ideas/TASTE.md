@@ -5,6 +5,14 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-25 · Amir's Pick needs a card and a reason.** *"add wall sit as the monthly open. / my pick of the month should have a card or
+  something that is nice, every one can see for a while. design it, and there should be a reason for it why she is my pick"*, then,
+  correcting me: *"elmira is my october pick for her consistency to never miss a session in 3 cycles. not september"*. What it teaches:
+  (1) recognition must be SEEN, for days, with his reason in his words: a one-line Bell entry is not an honour to him; (2) he thinks
+  of the pick as the month that is ending, so before writing any honour, confirm the month (I wrote his first "September" literally,
+  it rang 7 phones, and I had to remove it); (3) check a public claim against the logs before it goes on a card the crew reads, and
+  offer him a line that is exactly true ("never missed a session in 3 cycles" was 38 sessions in 11 weeks, one week off).
+
 - **2026-10-25 · The Home Crowd plan: "go with your picks and if you found anything along the way, let me know".** He took all nine
   calls (76 B beside the numbers, the Inbox only, 85 A, 87 C on the Toss card, 88 A on the Coach tab, coach.html A Proof becomes Crew,
   the samples my way, 91 with step 3, step 1 live first and the build in a new chat). What it teaches: once the looks are drawn he
