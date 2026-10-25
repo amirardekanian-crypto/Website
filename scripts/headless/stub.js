@@ -113,7 +113,7 @@
       if (!S.bell) return res({ data: null, error: null, status: 200 });
       // the hash the server takes over the payload: it MUST change when the feed does, or a new post would never arrive
       var tag = (function (B) {
-        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji, B.crew, B.week, B.open, B.lounge]), h = 0;
+        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji, B.crew, B.week, B.open, B.lounge, B.pick]), h = 0;
         for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
         return S.bell.etag && !S.bellTagMoves ? S.bell.etag : 'tag' + h;
       })(S.bell);

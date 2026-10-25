@@ -1121,6 +1121,252 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     }
   }
 
+  // ── round 7 · P3a (2026-10-25): idea 92 the Pick card (stage100's `pick`) and idea 77 Land on It ───────────────────────────────────────────────────
+  {
+    const CKM = 'aaaaaaaa-0000-4000-8000-0000000000aa', CKP = 'cccccccc-0000-4000-8000-000000000001', CKR = 'dddddddd-0000-4000-8000-000000000002';
+    const WHY = '38 sessions in 11 weeks, every day of her plan in order. That is what I want.';   // two lines at 390 px
+    const pickOf = o => Object.assign({ month: '2026-10-01', who: 'Mina S.', ck: CKP, fv: null, me: false, why: WHY, at: iso(now - 3600e3), until: iso(now + 6 * 86400e3) }, o || {});
+    const bellP = (meO, pk, o) => {
+      const b = bell(Object.assign({ answer: 'yes', can_post: true, ck: CKM, fv: null }, meO || {}));
+      b.lounge = 1; b.week = { sessions: 17, held: 4, members: 9 };
+      b.crew = [{ ck: CKP, who: 'Mina S.', fv: null, held: true }, { ck: CKR, who: 'Reza K.', fv: null }];
+      b.pick = pk === undefined ? pickOf() : pk;
+      return Object.assign(b, o || {});
+    };
+    const openCrewTab = async (b, extra) => {
+      const o = await open(browser, Object.assign({ bell: b }, extra || {}));
+      await waitTab(o.p);
+      await o.p.evaluate(() => goTo('crew')); await o.p.waitForTimeout(700);
+      return o;
+    };
+    const filler = n => Array.from({ length: n }, (_, i) => ({ t: 'post', id: 'fill-' + i, who: 'Ali B.', me: false, amir: false, kind: 'post', body: 'Filler post ' + i + '. ' + 'Long words to take some room. '.repeat(4),
+      photo: false, at: iso(now - (4 + i) * 3600e3), pinned: false, left: 7, kudos: { n: 0, mine: false, names: [] }, replies: [] }));
+    const view = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return { top: Math.round(r.top), bottom: Math.round(r.bottom), vh: innerHeight, y: Math.round(scrollY), lit: e.classList.contains('cr-lit'), anim: getComputedStyle(e).animationName }; }, sel);
+    const inView = v => !!v && v.top >= 0 && v.bottom <= v.vh;
+
+    // 92 · a member sees the card: after the band, before the honours and the Bell, with the reason, the Cheer and the page link
+    {
+      const { ctx, p } = await openCrewTab(bellP());
+      const d = await p.evaluate(() => {
+        const q = s => document.querySelector('#crew-body ' + s), after = (x, y) => !!x && !!y && !!(x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING);
+        const pk = q('.cr-pick'), bellH = [...document.querySelectorAll('#crew-body .prog-sec')].find(h => /^The Bell/.test(h.textContent)), ch = q('.cr-pick .pl-cheer'), lk = q('.cr-pick .cr-pk-pg');
+        const rc = e => { const r = e.getBoundingClientRect(); return { cy: r.top + r.height / 2, h: r.height, w: r.width }; };
+        return pk && {
+          order: after(q('.cr-week'), pk) && after(pk, q('.cr-hon')) && after(pk, bellH), count: document.querySelectorAll('#crew-body .cr-pick').length,
+          h: Math.round(pk.getBoundingClientRect().height), topH: Math.round(q('.cr-pk-top').getBoundingClientRect().height), label: pk.getAttribute('aria-label'),
+          eyebrow: q('.cr-pk-id .e').innerText, name: q('.cr-pk-id b').innerText, nameFs: getComputedStyle(q('.cr-pk-id b')).fontSize,
+          why: q('.cr-pk-why').textContent, whyFs: getComputedStyle(q('.cr-pk-why')).fontSize, qm: getComputedStyle(q('.cr-pk-why .qm')).color,
+          face: (() => { const f = q('.cr-fk'), r = f.getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height), ring: getComputedStyle(f).boxShadow }; })(),
+          by: q('.cr-pk-by').innerText.replace(/\s+/g, ' ').trim(),
+          ch: ch && { t: ch.textContent.trim(), bg: getComputedStyle(ch).backgroundColor, on: ch.getAttribute('onclick'), svg: !!ch.querySelector('svg'), cy: rc(ch).cy },
+          lk: lk && { t: lk.textContent.replace(/\s+/g, ' ').trim(), on: lk.getAttribute('onclick'), cy: rc(lk).cy, h: rc(lk).h },
+        };
+      });
+      C.check('the Pick card: ONE card, under the band, above the honours and the Bell heading', !!d && d.order && d.count === 1, JSON.stringify(d && [d.order, d.count]));
+      C.check('…about 170 to 200 px tall at 390 px with a two-line reason, its green top about 64 px', !!d && d.h >= 170 && d.h <= 200 && d.topH >= 60 && d.topH <= 68, JSON.stringify(d && [d.h, d.topH]));
+      C.check('…the section says "Amir\'s Pick for October: Mina S."', !!d && d.label === 'Amir\'s Pick for October: Mina S.', d && d.label);
+      C.check('…the mint eyebrow AMIR\'S PICK · OCTOBER and the name in white display type (22 px, uppercase)', !!d && d.eyebrow === 'AMIR\'S PICK · OCTOBER' && d.name === 'MINA S.' && d.nameFs === '22px', JSON.stringify(d && [d.eyebrow, d.name, d.nameFs]));
+      C.check('…her face is 44 px with a mint ring', !!d && d.face.w === 44 && d.face.h === 44 && /109, 190, 149/.test(d.face.ring), JSON.stringify(d && d.face));
+      C.check('…the reason in ink at 15 px between green quote marks, signed Amir', !!d && d.why === '“' + WHY + '”' && d.whyFs === '15px' && d.qm === 'rgb(14, 74, 54)' && d.by === 'AA Amir', JSON.stringify(d && [d.why, d.whyFs, d.qm, d.by]));
+      C.check('…ONE row: a clay [clap] Cheer Mina (openCheer) and a green "Mina\'s page ›" (openPlayer), 44 px tall',
+        !!d && !!d.ch && !!d.lk && d.ch.t === 'Cheer Mina' && d.ch.svg && d.ch.bg === 'rgb(194, 81, 44)' && d.ch.on === `openCheer('${CKP}')` && /^Mina's page ›$/.test(d.lk.t) && d.lk.on === `openPlayer('${CKP}')`
+        && Math.abs(d.ch.cy - d.lk.cy) < 6 && d.lk.h >= 44, JSON.stringify(d && [d.ch, d.lk]));
+      // the Cheer opens the Player Page's own sheet with no copy of her page on this phone, sends crew_cheer, and the card says it is done
+      const had = await p.evaluate(ck => !!crewPageGet(ck), CKP);
+      await p.evaluate(() => document.querySelector('#crew-body .cr-pick .pl-cheer').click()); await p.waitForTimeout(350);
+      const sh = await p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), title: (document.querySelector('#hist-overlay .readiness-title') || {}).textContent }));
+      C.check('Cheer on the card opens "Cheer Mina" (the sheet the page\'s button opens), with no page of hers fetched first', !had && sh.on && sh.title === 'Cheer Mina', JSON.stringify([had, sh]));
+      await p.evaluate(() => document.querySelector('#hist-overlay .ch-go').click()); await p.waitForTimeout(600);
+      const af = await p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), btn: !!document.querySelector('#crew-body .cr-pick .pl-cheer'), done: (document.querySelector('#crew-body .cr-pick .pl-cheered') || {}).textContent, n: document.querySelectorAll('#crew-body .cr-pick').length }));
+      C.check('…Send calls crew_cheer for her, the sheet closes and the card\'s button turns to "Cheered today"', (await calls(p, 'crew_cheer')).length === 1 && (await calls(p, 'crew_cheer'))[0].p_subject === CKP && !af.on && !af.btn && af.done === 'Cheered today' && af.n === 1, JSON.stringify(af));
+      await p.evaluate(() => document.querySelector('#crew-body .cr-pick .cr-pk-pg').click()); await p.waitForTimeout(500);
+      C.check('"Mina\'s page ›" opens her page', await p.evaluate(ck => !!document.querySelector('#screen-crewplayer.active') && _playerCk === ck, CKP));
+      C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+      await ctx.close();
+    }
+    // 92 · the card as the pick sees it: no Cheer, "Your page ›", the eyebrow still says AMIR'S PICK
+    {
+      const { ctx, p } = await openCrewTab(bellP({ name: 'Alex R.' }, pickOf({ who: 'Alex R.', ck: CKM, me: true })));
+      const d = await p.evaluate(() => { const pk = document.querySelector('#crew-body .cr-pick'); return pk && { ch: !!pk.querySelector('.pl-cheer, .pl-cheered'), lk: (pk.querySelector('.cr-pk-pg') || {}).textContent, on: (pk.querySelector('.cr-pk-pg') || {}).getAttribute('onclick'), eb: pk.querySelector('.cr-pk-id .e').innerText, nm: pk.querySelector('.cr-pk-id b').innerText, why: !!pk.querySelector('.cr-pk-why .qm') }; });
+      C.check('you are the pick: no Cheer, the link reads "Your page ›", the eyebrow still says AMIR\'S PICK · OCTOBER', !!d && !d.ch && /^Your page\s*›$/.test(d.lk.trim()) && d.on === "openPlayer('me')" && d.eb === 'AMIR\'S PICK · OCTOBER' && d.nm === 'ALEX R.' && d.why, JSON.stringify(d));
+      await p.evaluate(() => document.querySelector('#crew-body .cr-pick .cr-pk-pg').click()); await p.waitForTimeout(400);
+      C.check('…and "Your page ›" opens your own page', await p.evaluate(() => !!document.querySelector('#screen-crewplayer.active') && _playerCk === 'me'));
+      await ctx.close();
+    }
+    // 92 · the guide says it once, in Amir's voice, and only while the app has the Crew tab
+    {
+      const { ctx, p } = await openCrewTab(bellP());
+      const g = await p.evaluate(() => buildAppGuideCards().replace(/<[^>]+>/g, ''));
+      C.check('the guide says it: "When I pick someone for the month, a card at the top of Crew shows who and why, for a week. Tap Cheer to tell them well done."',
+        g.split('When I pick someone for the month, a card at the top of Crew shows who and why, for a week. Tap Cheer to tell them well done.').length === 2);
+      await ctx.close();
+    }
+    // 92 · nothing to draw: a pick past its `until`, `pick: null`, and a server with no `pick` key at all
+    {
+      const noKey = bellP({}, null); delete noKey.pick;
+      for (const [what, b] of [['past its until (the phone\'s copy is old)', bellP({}, pickOf({ until: iso(now - 1000) }))], ['pick: null', bellP({}, null)], ['no pick key (a server without stage100)', noKey]]) {
+        const { ctx, p } = await openCrewTab(b);
+        C.check('the Pick card is not drawn: ' + what, await p.evaluate(() => !document.querySelector('#crew-body .cr-pick') && !!document.querySelector('#crew-body .cr-week')));
+        await ctx.close();
+      }
+    }
+    // 92 · no reason: the line says it, no quote marks, nothing else changes
+    {
+      for (const why of [null, '   ']) {
+        const { ctx, p } = await openCrewTab(bellP({}, pickOf({ why })));
+        const d = await p.evaluate(() => { const pk = document.querySelector('#crew-body .cr-pick'); return pk && { w: (pk.querySelector('.cr-pk-why') || {}).textContent, qm: pk.querySelectorAll('.qm').length, ch: !!pk.querySelector('.pl-cheer'), lk: !!pk.querySelector('.cr-pk-pg'), by: !!pk.querySelector('.cr-pk-by') }; });
+        C.check(`no reason (${JSON.stringify(why)}): "Amir's pick for October", no quote marks, the Cheer and the link and the signature stay`, !!d && d.w === 'Amir\'s pick for October' && d.qm === 0 && d.ch && d.lk && d.by, JSON.stringify(d));
+        await ctx.close();
+      }
+    }
+    // 92 · a viewer who cannot cheer: a non-member is offered the join (as a Like does), under 13 has no Cheer and no link
+    {
+      const { ctx, p } = await openCrewTab(bellP({ answer: null, can_post: false }));
+      C.check('not in the crew: the Cheer is there', await p.evaluate(() => !!document.querySelector('#crew-body .cr-pick .pl-cheer')));
+      await p.evaluate(() => document.querySelector('#crew-body .cr-pick .pl-cheer').click()); await p.waitForTimeout(350);
+      const t = await p.evaluate(() => { const e = document.getElementById('aaToast'); return { on: !e.hidden, txt: e.innerText.replace(/\s+/g, ' ').trim(), sheet: document.getElementById('hist-overlay').classList.contains('visible') }; });
+      C.check('…its tap offers to join ("Join the crew to cheer"), never a sheet and never a crew_cheer', t.on && /Join the crew to cheer/.test(t.txt) && /Join the crew/.test(t.txt) && !t.sheet && !(await calls(p, 'crew_cheer')).length, JSON.stringify(t));
+      await ctx.close();
+      const u = await openCrewTab(bellP({ under13: true, can_post: false, answer: 'yes' }));
+      const d = await u.p.evaluate(() => { const pk = document.querySelector('#crew-body .cr-pick'); return pk && { ch: !!pk.querySelector('.pl-cheer, .pl-cheered'), lk: !!pk.querySelector('.cr-pk-pg'), why: pk.querySelector('.cr-pk-why').textContent }; });
+      C.check('under 13: the card is drawn and read, with no Cheer and no page link', !!d && !d.ch && !d.lk && d.why.indexOf(WHY) > 0, JSON.stringify(d));
+      await u.ctx.close();
+      // a pick whose person is not in the crew list this phone holds is still named on the sheet (the pick carries the name)
+      const g = await openCrewTab(bellP({}, undefined, { crew: [] }));
+      await g.p.evaluate(() => document.querySelector('#crew-body .cr-pick .pl-cheer').click()); await g.p.waitForTimeout(350);
+      C.check('a pick not in the crew list: the sheet still says "Cheer Mina"', await g.p.evaluate(() => (document.querySelector('#hist-overlay .readiness-title') || {}).textContent === 'Cheer Mina'));
+      await g.ctx.close();
+    }
+    // 92 · dark mode through the tokens only
+    {
+      const { ctx, p } = await openCrewTab(bellP(), { opts: { dark: true } });
+      const d = await p.evaluate(() => { const pk = document.querySelector('#crew-body .cr-pick'); return pk && { bg: getComputedStyle(pk).backgroundColor, why: getComputedStyle(pk.querySelector('.cr-pk-why')).color, qm: getComputedStyle(pk.querySelector('.qm')).color, top: getComputedStyle(pk.querySelector('.cr-pk-top')).backgroundImage.slice(0, 15), by: getComputedStyle(pk.querySelector('.cr-pk-by')).color }; });
+      C.check('dark mode: the row ground, the ink and the green quotes come from the tokens; the top is the hero gradient', !!d && d.bg === 'rgb(36, 36, 36)' && d.why === 'rgb(237, 237, 237)' && d.qm === 'rgb(109, 190, 149)' && /radial-gradient/.test(d.top) && d.by === 'rgb(154, 154, 154)', JSON.stringify(d));
+      await ctx.close();
+    }
+    // 92 · her page: the reason under the honour row (14 px asked, the type scale's 15 px given), "Amir" small; a row with no reason is as it was
+    {
+      const pages = { [CKP]: { honours: [{ month: '2026-10-01', honour: 'pick', value: { why: WHY } }, { month: '2026-09-01', honour: 'sessions', value: { n: 14 } }, { month: '2026-08-01', honour: 'pick', value: {} }] } };
+      const { ctx, p } = await openCrewTab(bellP(), { stub: { crewPages: pages } });
+      await p.evaluate(ck => openPlayer(ck), CKP); await p.waitForTimeout(900);
+      const d = await p.evaluate(() => {
+        const rows = [...document.querySelectorAll('#crewplayer-body .pl-row')].filter(r => /Amir's Pick|Most sessions/.test(r.textContent));
+        return rows.map(r => ({ t: (r.querySelector('.t') || {}).textContent, q: (r.querySelector('.q') || {}).textContent, why: (r.querySelector('.pl-why') || {}).textContent || null, fs: r.querySelector('.pl-why') ? getComputedStyle(r.querySelector('.pl-why')).fontSize : null,
+          by: (r.querySelector('.pl-by') || {}).textContent || null, qm: r.querySelector('.qm') ? getComputedStyle(r.querySelector('.qm')).color : null }));
+      });
+      const w = d.find(r => r.why) || {};
+      C.check('her page: the pick row shows Amir\'s reason in quotes under its line, then "Amir"', d.length === 3 && w.t === 'Amir\'s Pick' && /October 2026/.test(w.q) && w.why === '“' + WHY + '”' && w.by === 'Amir' && w.qm === 'rgb(14, 74, 54)' && w.fs === '15px', JSON.stringify(d));
+      C.check('...a pick with no reason and another honour are as they were (no quote, no name)', d.length === 3 && d.filter(r => r.why).length === 1 && d.filter(r => !r.why).every(r => r.by === null && r.qm === null) && d.some(r => /14 plan sessions/.test(r.q)), JSON.stringify(d));
+      await ctx.close();
+    }
+    // 77 · after Post the new post comes into view and lights for about 2 seconds
+    for (const reduced of [false, true]) {
+      const b = bellP({}, null); b.items = filler(14);
+      const { ctx, p } = await openCrewTab(b, { opts: { reduced } });
+      await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await p.waitForTimeout(400);
+      const y0 = await p.evaluate(() => Math.round(scrollY));
+      await p.evaluate(() => openCrewPost()); await p.waitForTimeout(300);
+      await p.fill('#hist-overlay .cr-txt', 'Landing test post.');
+      await p.evaluate(() => document.querySelector('#hist-overlay .cr-go').click());
+      await p.waitForFunction(() => document.querySelector('#crew-body .cr-post.cr-lit'), null, { timeout: 5000 }).catch(() => {});
+      await p.waitForTimeout(1000);
+      const id = await p.evaluate(() => { const e = [...document.querySelectorAll('#crew-body .cr-post')].find(x => /Landing test post/.test(x.textContent)); return e ? e.dataset.id : null; });
+      const v = id ? await view(p, `#crew-body .cr-post[data-id="${id}"]`) : null;
+      C.check(`after Post${reduced ? ' (reduced motion)' : ''}: the new post is scrolled into view (from ${y0} px down) and lit`, y0 > 800 && !!id && inView(v) && v.lit, JSON.stringify([y0, id, v]));
+      if (reduced) C.check('…reduced motion: the tint stays without the fade (no animation)', !!v && v.anim === 'none', v && v.anim); else C.check('…the tint fades (an animation)', !!v && v.anim === 'crLit', v && v.anim);
+      await p.waitForTimeout(2600);
+      C.check('…and the light is off again after about 2 seconds', id && !(await view(p, `#crew-body .cr-post[data-id="${id}"]`)).lit);
+      C.check('no page errors', !p.errs.length, p.errs.join(' | '));
+      await ctx.close();
+    }
+    // 77 · arriving from a crew notification (#crew) lands on what is new for me since my last visit; a normal tap on the Crew tab never moves anyone
+    {
+      const rep = (id, who, ck, ms, o) => Object.assign({ id, who, me: false, amir: false, body: 'Strong week.', at: iso(now - ms), ck, fv: null }, o || {});
+      const mk = (replies, extra) => {
+        const b = bellP({}, null);
+        b.items = filler(10).concat([{ t: 'post', id: 'own-1', who: 'Alex R.', me: true, amir: false, kind: 'post', body: 'Day 4 done.', photo: false, at: iso(now - 6 * 3600e3), pinned: false, left: 7, kudos: { n: 0, mine: false, names: [] }, replies }]);
+        return Object.assign(b, extra || {});
+      };
+      const arrive = async (b, since, stub, query) => {
+        const o = await open(browser, { bell: b, seed: since ? { _crewseen_at: String(since) } : {}, stub: stub || {}, opts: { query: query === undefined ? '#crew' : query } });
+        await o.p.waitForFunction(() => document.querySelector('#screen-crew.active, #screen-crewplayer.active'), null, { timeout: 12000 }).catch(() => {});
+        return o;
+      };
+      const calm = async p => { await p.waitForTimeout(1800); };
+      // a newer reply on my post: the NEWEST one is scrolled to and lit (the old one, from before my last visit, is not)
+      {
+        const o = await arrive(mk([rep('rep-old', 'Reza K.', CKR, 5 * 3600e3), rep('rep-a', 'Mina S.', CKP, 20 * 60e3), rep('rep-b', 'Reza K.', CKR, 5 * 60e3), rep('rep-me', 'Alex R.', CKM, 1 * 60e3, { me: true })]), now - 3 * 3600e3);
+        await o.p.waitForFunction(() => document.querySelector('.cr-rep.cr-lit'), null, { timeout: 6000 }).catch(() => {});
+        await o.p.waitForTimeout(1000);
+        const v = await view(o.p, '.cr-rep[data-rid="rep-b"]'), lit = await o.p.evaluate(() => [...document.querySelectorAll('.cr-lit')].map(e => e.dataset.rid));
+        C.check('#crew with a newer reply on my post: Crew opens and the newest reply is scrolled into view and lit (not the older ones, not my own)', !!v && inView(v) && v.y > 600 && lit.length === 1 && lit[0] === 'rep-b', JSON.stringify([v, lit]));
+        C.check('…the time of this visit is written on the phone and is never synced', Number(await o.p.evaluate(id => localStorage.getItem(id + '_crewseen_at'), H.ID)) > now - 5000 && await o.p.evaluate(() => !Object.keys(_snapshot()).some(k => /crewseen_at/.test(k))));
+        await calm(o.p);
+        C.check('…the light goes off after about 2 seconds', await o.p.evaluate(() => !document.querySelector('.cr-lit')));
+        C.check('no page errors', !o.p.errs.length, o.p.errs.join(' | '));
+        await o.ctx.close();
+      }
+      // a reply that names me with @, on someone else's post
+      {
+        const b = mk([]);
+        b.items[3].replies = [rep('rep-at', 'Mina S.', CKP, 10 * 60e3, { body: '@[' + CKM + '|Alex R.] look at this', mentions: [{ ck: CKM, who: 'Alex R.', fv: null }] })];
+        const o = await arrive(b, now - 3 * 3600e3);
+        await o.p.waitForFunction(() => document.querySelector('.cr-rep.cr-lit'), null, { timeout: 6000 }).catch(() => {});
+        await o.p.waitForTimeout(1000);
+        const v = await view(o.p, '.cr-rep[data-rid="rep-at"]');
+        C.check('#crew with a reply that names me with @ on someone else\'s post: that reply is scrolled to and lit', !!v && inView(v) && v.lit, JSON.stringify(v));
+        await o.ctx.close();
+      }
+      // nothing newer than my last visit: the top of Crew, as today
+      {
+        const o = await arrive(mk([rep('rep-old', 'Reza K.', CKR, 5 * 3600e3)]), now - 3 * 3600e3);
+        await calm(o.p);
+        const s = await o.p.evaluate(() => ({ crew: !!document.querySelector('#screen-crew.active'), y: Math.round(scrollY), lit: !!document.querySelector('.cr-lit') }));
+        C.check('#crew with nothing newer than my last visit: the top of Crew, nothing lit', s.crew && s.y < 40 && !s.lit, JSON.stringify(s));
+        await o.ctx.close();
+      }
+      // a phone with no time of a last visit counts the last day: a reply from 20 minutes ago lands, one from three days ago does not
+      {
+        const o = await arrive(mk([rep('rep-3d', 'Reza K.', CKR, 3 * 86400e3)]), 0);
+        await calm(o.p);
+        const s = await o.p.evaluate(() => ({ crew: !!document.querySelector('#screen-crew.active'), y: Math.round(scrollY), lit: !!document.querySelector('.cr-lit') }));
+        C.check('#crew on a phone with no last-visit time: a reply from three days ago does not move me', s.crew && s.y < 40 && !s.lit, JSON.stringify(s));
+        await o.ctx.close();
+        const o2 = await arrive(mk([rep('rep-new', 'Mina S.', CKP, 20 * 60e3)]), 0);
+        await o2.p.waitForFunction(() => document.querySelector('.cr-rep.cr-lit'), null, { timeout: 6000 }).catch(() => {});
+        await o2.p.waitForTimeout(1000);
+        const v = await view(o2.p, '.cr-rep[data-rid="rep-new"]');
+        C.check('…and one from 20 minutes ago lands', !!v && inView(v) && v.lit, JSON.stringify(v));
+        await o2.ctx.close();
+      }
+      // a normal tap on the Crew tab, with the same newer reply waiting: nobody is moved
+      {
+        const o = await arrive(mk([rep('rep-a', 'Mina S.', CKP, 20 * 60e3)]), now - 3 * 3600e3, {}, '');
+        await o.p.evaluate(() => goTo('crew')); await calm(o.p);
+        const s = await o.p.evaluate(() => ({ crew: !!document.querySelector('#screen-crew.active'), y: Math.round(scrollY), lit: !!document.querySelector('.cr-lit') }));
+        C.check('a normal tap on the Crew tab with a newer reply waiting: the top of Crew, nothing lit (only a notification lands)', s.crew && s.y < 40 && !s.lit, JSON.stringify(s));
+        await o.ctx.close();
+      }
+      // no reply, but a cheer on my page dated on or after the day of my last visit: my page opens at Cheers this week
+      {
+        const today = iso(now).slice(0, 10), yday = iso(now - 86400e3).slice(0, 10);
+        const pg = day => ({ me: { cheers: { total: 1, season: 1, recent: [{ ck: CKP, who: 'Mina S.', fv: null, coach: false, word: null, day }] } } });
+        const o = await arrive(mk([]), now - 2 * 3600e3, { crewPages: pg(today) });
+        await o.p.waitForTimeout(2000);
+        const s = await o.p.evaluate(() => { const h = [...document.querySelectorAll('#crewplayer-body h2.prog-sec')].find(x => /^Cheers this week/.test(x.textContent)); const r = h && h.getBoundingClientRect(); return { page: !!document.querySelector('#screen-crewplayer.active') && _playerCk === 'me', top: r ? Math.round(r.top) : null, y: Math.round(scrollY) }; });
+        C.check('#crew with a cheer from someone else on my page since my last visit: my page opens and is scrolled so Cheers this week is in view (it sits below the fold at the top)', s.page && s.top !== null && s.y > 300 && s.top >= 0 && s.top < 700, JSON.stringify(s));
+        await o.p.evaluate(() => playerBack()); await o.p.waitForTimeout(400);
+        C.check('…and ← goes back to Crew', await o.p.evaluate(() => !!document.querySelector('#screen-crew.active')));
+        await o.ctx.close();
+        const o2 = await arrive(mk([]), now - 60e3, { crewPages: pg(yday) });
+        await o2.p.waitForTimeout(2000);
+        const s2 = await o2.p.evaluate(() => ({ crew: !!document.querySelector('#screen-crew.active'), y: Math.round(scrollY) }));
+        C.check('…a cheer from a day before my last visit does not move me: the top of Crew', s2.crew && s2.y < 40, JSON.stringify(s2));
+        await o2.ctx.close();
+      }
+    }
+  }
+
   await browser.close();
   process.exit(C.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });
