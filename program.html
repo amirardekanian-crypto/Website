@@ -4412,6 +4412,7 @@
      clay is "look here", and nothing in a list asks to be looked at. */
   .pb-cover { position: relative; isolation: isolate; display: block; width: calc(100% - 2 * var(--g)); margin: 20px var(--g) 0; padding: 0; overflow: hidden;
     border: 0; border-radius: 16px; background: var(--hero); color: #fff; text-align: left; font: inherit; cursor: pointer; }
+  .pb-lead { margin: 16px var(--g) -6px; font: 500 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey-text); }   /* what the Playbook is (Plain Words, Amir 2026-10-25) */
   .pb-cover:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   .pb-img { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; background: transparent;
     mix-blend-mode: luminosity; opacity: .66; pointer-events: none;
@@ -18151,7 +18152,7 @@ async function renderPlaybook() {
     const rows = c.articles.map(a => `<button type="button" class="pb-row" data-file="${esc(a.file || '')}" onclick="openArticle(this.dataset.file)"><span class="sr-b"><span class="sr-name">${esc(a.title || '')}</span><span class="sr-meta">${mins(a.readMins)}</span></span><span class="sr-go" aria-hidden="true">›</span></button>`).join('');
     return `<div class="lib-sec"><span class="lib-sec-t">${esc(c.title || '')}</span><span class="lib-sec-n">${n} ${n === 1 ? 'read' : 'reads'}</span></div><div class="pb-list">${rows}</div>`;
   }).join('');
-  host.innerHTML = cover + sections;
+  host.innerHTML = '<p class="pb-lead">Articles from me</p>' + cover + sections;
   _playbookRendered = true;
 }
 

@@ -248,6 +248,26 @@ async function alwayson(browser) {
   }
 }
 
+async function playbook(browser) {
+  for (const w of [390, 320]) {
+    const { ctx, p } = await open(browser, { w });
+    await p.evaluate(() => goLibrary());
+    await p.waitForTimeout(500);
+    await p.click('#lib-tab-playbook');   // the athlete taps the switch
+    await p.waitForTimeout(900);
+    const r = await p.evaluate(() => {
+      const tab = document.querySelector('#lib-tab-playbook .lib-tab-w'), l = document.querySelector('#lib-playbook .pb-lead'), c = document.querySelector('#lib-playbook .pb-cover');
+      return { tab: tab && tab.textContent.trim(), line: l && l.textContent.trim(), above: !!(l && c && l.getBoundingClientRect().bottom <= c.getBoundingClientRect().top + 1), grey: l && getComputedStyle(l).color };
+    });
+    t.check(`playbook: the switch still says "Playbook" (${w} px)`, r.tab === 'Playbook', JSON.stringify(r));
+    t.check('playbook: …and the pane opens with "Articles from me"', r.line === 'Articles from me' && r.above, JSON.stringify(r));
+    await fits(p, '#lib-playbook .pb-lead', w, 'playbook: the line');
+    await noScroll(p, w, 'playbook: the pane');
+    t.check(`playbook: no page errors (${w})`, !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await blocks(browser);
@@ -258,6 +278,7 @@ async function alwayson(browser) {
   await reset(browser);
   await offswitch(browser);
   await alwayson(browser);
+  await playbook(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
