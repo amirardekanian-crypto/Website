@@ -18,29 +18,29 @@
 
 | block | line |
 |---|---|
-| THE LOOK (2026-10-12, round 3 of the coach UX pass: the global consisten | 67 |
-| Controls: ONE look each (round 3). Buttons come in four tiers at one hei | 114 |
-| The bar (2026-10-12, round 2 of the coach UX pass: nine tabs became seve | 157 |
-| The tabs: seven places, sentence case, the active one underlined (the at | 188 |
-| A phone's bottom bar (2026-10-12, round 3 of the coach UX pass; Amir wor | 225 |
+| THE LOOK (2026-10-12, round 3 of the coach UX pass: the global c | 67 |
+| Controls: ONE look each (round 3). Buttons come in four tiers at | 114 |
+| The bar (2026-10-12, round 2 of the coach UX pass: nine tabs bec | 157 |
+| The tabs: seven places, sentence case, the active one underlined | 188 |
+| A phone's bottom bar (2026-10-12, round 3 of the coach UX pass;  | 225 |
 | Login gate | 284 |
-| Today's strip: the date, the season and the four counters on one line wh | 299 |
+| Today's strip: the date, the season and the four counters on one | 299 |
 | Panels | 328 |
-| Exercises (round 2 of the coach UX pass, 2026-10-12): three sub-tabs (th | 351 |
-| Leads: the referral-code cards (.intake-card and .i , named for the Inta | 418 |
+| Exercises (round 2 of the coach UX pass, 2026-10-12): three sub- | 351 |
+| Leads: the referral-code cards (.intake-card and .i , named for  | 418 |
 | Affiliates (referral-code roster — public.affiliates, stage29) | 520 |
-| Needs you (2026-10-12, round 1 of the coach UX pass): ONE white panel, r | 526 |
+| Needs you (2026-10-12, round 1 of the coach UX pass): ONE white  | 526 |
 | The wall | 561 |
-| The Bell (stage81): the crew's feed, posted to and moderated here (Proof | 639 |
-| The Players' Lounge (stage96 + stage97, 2026-10-24): faces, cheers, the  | 670 |
-| The Monthly Open (stage85): the one challenge Amir sets, the results he  | 702 |
+| The Bell (stage81): the crew's feed, posted to and moderated her | 639 |
+| The Players' Lounge (stage96 + stage97, 2026-10-24): faces, chee | 670 |
+| The Monthly Open (stage85): the one challenge Amir sets, the res | 702 |
 | Quest panel | 736 |
 | Pulse (7-day presence) | 753 |
-| Chips: the one shape is in the controls block near the top. Only the lev | 770 |
-| ⚙ Tools (2026-10-12, round 2 of the coach UX pass): the button is in the | 773 |
+| Chips: the one shape is in the controls block near the top. Only | 770 |
+| ⚙ Tools (2026-10-12, round 2 of the coach UX pass): the button i | 773 |
 | Roster | 795 |
 | Detail | 846 |
-| Athlete → File: four groups, one white panel each; label / value / actio | 855 |
+| Athlete → File: four groups, one white panel each; label / value | 855 |
 | Athlete file: identity + sub-tabs | 904 |
 | Metric strip (the three numbers, charts behind one tap) | 939 |
 | A day of work: prescribed and done on one line | 952 |

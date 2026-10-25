@@ -56,7 +56,7 @@
   const FACE = { disp: '"Barlow Condensed"', mono: '"Space Mono"', body: 'Barlow' };
   const ASSET = {
     coach: '/assets/img/coach.jpg', logo: '/assets/img/icon-192.png', court: '/court-sessions.jpg',
-    vazir: '/assets/fonts/Vazirmatn-Variable.woff2', fonts: '/assets/css/app-fonts.css',
+    vazir: '/assets/fonts/Vazirmatn-Variable.woff2', fonts: '/assets/css/app-fonts.css', emblemFont: '/assets/fonts/BarlowCondensed-800.woff2',
   };
   // Amir's signature: program.html's WN_SIG, the same two paths (viewBox 0 0 130 46, skewX(-12) translate(8 0)).
   const SIG = {
@@ -419,6 +419,36 @@
       im.src = url;
     });
     return _imgs[url];
+  }
+
+  // The emblem an achievement's card carries (the Emblem Cabinet, 2026-10-25): assets/js/emblems.js (window.AAEmblem, loaded by the app) draws it as an <svg> string
+  // that leans on gradients kept in the page (#aae-defs) and on the app's own Barlow Condensed 800. For the canvas it is made whole: the gradients go inside the
+  // file and the font goes in as a data URL (a picture made from an <svg> cannot reach the page's fonts or its gradients). Both come from this site's own files, which
+  // the service worker keeps, so it works with no signal. Nothing here means no emblem: the card keeps its seal.
+  let _emFont = null;
+  function emblemFont() {
+    if (!_emFont) _emFont = fetch(ASSET.emblemFont).then(r => r.ok ? r.arrayBuffer() : null).then(buf => {
+      if (!buf) { _emFont = null; return ''; }   // not kept: it is asked for again the next time
+      const a = new Uint8Array(buf);
+      let s = '';
+      for (let i = 0; i < a.length; i += 0x8000) s += String.fromCharCode.apply(null, a.subarray(i, i + 0x8000));
+      return btoa(s);
+    }).catch(() => { _emFont = null; return ''; });
+    return _emFont;
+  }
+  // e: { k: 'ach', id } · { k: 'mark', id, tier } · { k: 'level', n } → a data URL of a whole <svg>, or null.
+  async function emblemUrl(e) {
+    const E = root.AAEmblem;
+    if (!E || !e || typeof document === 'undefined') return null;
+    try {
+      const svg = e.k === 'mark' ? E.mark(e.id, e.tier, { won: true }) : e.k === 'level' ? E.level(e.n, { won: true }) : E.ach(e.id, { won: true });
+      const d = document.getElementById('aae-defs') && document.getElementById('aae-defs').querySelector('defs');
+      if (!svg || !d) return null;
+      const b64 = await emblemFont();
+      const face = b64 ? '<style>@font-face{font-family:"Barlow Condensed";font-weight:800;src:url(data:font/woff2;base64,' + b64 + ') format("woff2")}</style>' : '';
+      const whole = svg.replace(/^<svg /, '<svg width="480" height="480" ').replace(/^(<svg[^>]*>)/, '$1' + face + d.outerHTML);
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(whole);
+    } catch (err) { return null; }
   }
 
   // ── 5. Drawing parts ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -1371,6 +1401,8 @@
     p.eye(rwEye(t.achievementEye, t.meaning[d.meaning]));
     p.add({ name: 'seal', gap: 0, h: k => 232 * k, draw: (y, k) => {
       const R = 116 * k, cx = startL(p, 2 * R) + R, cy = y + R;
+      // the cabinet's own emblem for this achievement, when the app handed one over (spec.emblem) and it could be drawn: the seal is its fallback
+      if (p.imgs.emblem) { x.drawImage(p.imgs.emblem, startL(p, 2 * R), y, 2 * R, 2 * R); return; }
       x.save();
       x.strokeStyle = C.clayLine; x.lineWidth = 6 * k; x.lineCap = 'round';
       x.beginPath();
@@ -1514,6 +1546,7 @@
     if (!tpl) throw new Error('sharecard: no card called ' + (spec && spec.kind));
     await fonts(lang);
     const want = Object.assign({ coach: ASSET.coach, logo: ASSET.logo, court: ASSET.court }, artList(spec));
+    if (spec.emblem && opts.layer !== 'bg') { const eu = await emblemUrl(spec.emblem); if (eu) want.emblem = eu; }
     if (opts.photo) want.shot = opts.photo;
     const keys = Object.keys(want), got = await Promise.all(keys.map(k => img(want[k])));
     const imgs = {}; keys.forEach((k, i) => { imgs[k] = got[i]; });

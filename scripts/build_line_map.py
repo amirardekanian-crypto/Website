@@ -165,7 +165,7 @@ def parse(text):
             name = DECOR.sub(' ', name)
             name = re.sub(r'\s+', ' ', name).strip()
             if name and LETTERS.search(name):
-                blocks.append((name[:72], i))
+                blocks.append((name[:64], i))
             continue
 
         s = SCREEN.match(line)
