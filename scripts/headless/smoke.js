@@ -82,7 +82,7 @@ const H = require('./lib');
     await ctx.close();
   }
 
-  // ── A per-side move with no kg box (Centre Court r2, E's p): its reps boxes read "4 / side", and that text is the
+  // ── A per-side move with no kg box (Centre Court r2, E's p): its reps boxes read "4 each side", and that text is the
   // placeholder only. A tick records 4 reps (from the plan, never the text), and Guided's rest screen reads 4. ──
   {
     const prog = H.fixture();
@@ -97,7 +97,7 @@ const H = require('./lib');
     const ps = await p.evaluate(`(() => { const c = ${H.card(nm)}; if (c.classList.contains('collapsed')) toggleExpand(c);
       const log = c.querySelector('.ex-set-log');
       return { noKg: log.classList.contains('no-kg'), ph: [...c.querySelectorAll('.ex-set-reps')].map(i => i.getAttribute('placeholder')) }; })()`);
-    t.check('per side, no kg box: every reps box reads "4 / side"', ps.noKg && ps.ph.length === 3 && ps.ph.every(x => x === '4 / side'), JSON.stringify(ps));
+    t.check('per side, no kg box: every reps box reads "4 each side"', ps.noKg && ps.ph.length === 3 && ps.ph.every(x => x === '4 each side'), JSON.stringify(ps));
     const tick = await p.evaluate(`(() => { const c = ${H.card(nm)}; c.querySelector('.ex-set-row .ex-set-check').click();
       const s = loadSetLog(${JSON.stringify(nm)}, 3)[0];
       const e = ((buildSessionData('1') || {}).log || []).find(x => x.ex === ${JSON.stringify(nm)});
@@ -111,7 +111,7 @@ const H = require('./lib');
       const log = document.getElementById('timerLog'), v = log && log.querySelector('.tl-val');
       const s = loadSetLog(${JSON.stringify(nm)}, 3)[1];
       return { found: true, shown: !!(log && !log.hidden), val: v && v.textContent.trim(), kg: !!(log && log.querySelector('.tl-kg')), d: s.d, n: s.n }; })()`);
-    t.check('per side: Guided\'s rest screen reads 4 reps (parseInt of "4 / side") and no kg', rest.found && rest.shown && rest.val === '4' && !rest.kg && rest.d === true && rest.n === '',
+    t.check('per side: Guided\'s rest screen reads 4 reps (parseInt of "4 each side") and no kg', rest.found && rest.shown && rest.val === '4' && !rest.kg && rest.d === true && rest.n === '',
       JSON.stringify(rest));
     const minus = await p.evaluate(() => { const b = document.querySelector('#timerLog .tl-step[data-d="-1"]'); if (b) b.click();
       return { val: (document.querySelector('#timerLog .tl-val') || {}).textContent }; });

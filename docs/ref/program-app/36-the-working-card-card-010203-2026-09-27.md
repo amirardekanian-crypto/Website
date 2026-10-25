@@ -15,6 +15,8 @@ Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8r
 - **What orange means, said once** (Plain Words, 2026-10-25): the first time an effort above the target, or more reps than asked,
   shows orange for an athlete, `orangeNote()` says *Orange means above my target. That's fine. I see it.* (a note that fades; the
   key `<id>_orange_told` keeps it from coming back).
+  The first time a one-sided card is opened, `sideNote()` says *Log one side.* (`<id>_side_told`). A one-sided dose reads *20 s each side* or
+  *6 each side* (`doseText()`).
 - **The Coach's Note is a clay dot after the name** (`NOTE_DOT`, an empty span inside `.item-name`, so the
   name's text is unchanged); open, the note is cut to three lines with **More** (its chevron drawn by CSS since
   Centre Court; `fitNotes()` measures it when the card opens: `toggleExpand()`, Guided's `renderStep()`).
@@ -69,7 +71,7 @@ when the Spine entry's `equipment` is loaded (`KG_LOADED`: barbell, dumbbell, ke
 machine that is not cardio, landmine, sled, medicine ball…), and kept when that is unknown (no approved
 entry, no equipment) or when the athlete has **ever logged a weight** on it (this session or history),
 so a weighted plank keeps its box. Hidden (`.ex-set-log.no-kg`), never removed, so Guided and the
-carry-down never meet a missing node. A row with no box at all says its dose, `30 s / side`
+carry-down never meet a missing node. A row with no box at all says its dose, `30 s each side`
 (`.ex-set-dose`, from `data-dose`). **No box for the seconds a hold lasted** (Amir, 2026-09-27: *"Leave
 the tick"*): the tick means the time as written, and a shorter hold goes in the Note. (It would have
 needed a new field in the log line, which only writes `×n` for a reps dose.)

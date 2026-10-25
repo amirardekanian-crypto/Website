@@ -111,7 +111,7 @@ dashboard do not change.
     glyph in `.rest-ic`; the time is `.rest-t`). One row, not sticky. Both keep their nodes: `.ex-log` and the open
     card's body are `display: contents` / a grid, and the Note and `.ex-rest-bottom` share its last row; an open Note's box
     runs full width under them. A warm-up ends the same way with an outlined Rest.
-  - **Circuits**: a warm-up stays on paper with plain letters, *5 / side* doses (`itemDose()` writes the card's
+  - **Circuits**: a warm-up stays on paper with plain letters, *5 each side* doses (`itemDose()` writes the card's
     spacing), a ▶ disc only with a video and the chevron for its steps and cues. A working circuit has the green head, its
     *Last time* line right under it (round 2, E's **t**: `renderCircuit()` gives a working circuit's body an `.lt-slot` as its
     first child, so `paintLastTime()` places the strip there, not before the rounds' RPE rows), its items as letter · name
@@ -173,8 +173,8 @@ dashboard do not change.
   (*4 × 6*, *2:30*) or the pill mid-set leaves it open (`onExerciseRowTap()`); a closed row still opens from anywhere.
   The tick-all target (`.check-box`, under the numeral) is `role="button"`, `tabindex="0"` with an `aria-label`, and Enter
   or Space ticks it like a tap (`onCheckBoxKey()`; a Library session wires its own listener, as it does for the tap).
-- **A per-side move with no kg box says so in its reps box** (round 2, E's **p**): *4 / side*. `paintKgCol()` writes the
-  placeholder (`cardReps()` or the range, plus *" / side"* when the box is hidden and `data-dose` ends in */ side*; with a kg
+- **A per-side move with no kg box says so in its reps box** (round 2, E's **p**): *4 each side*. `paintKgCol()` writes the
+  placeholder (`cardReps()` or the range, plus *" each side"* when the box is hidden and `data-dose` ends in *each side*; with a kg
   box the column is too narrow, so it stays *4*). It is the placeholder only: a tick records the plan's reps
   (`setReps(s, plannedReps(ex))` in `buildSessionData()`, never this text), Guided's rest screen reads the number with
   `parseInt()` (`paintTimerLog()`, which also drops the words when it shows a range). `smoke.js` ticks such a set and checks
@@ -182,7 +182,7 @@ dashboard do not change.
 - **Amir's answers on round 1's open calls** (2026-10-12, *"1 keep, 2 mint, 3 clay, 4 yes build them"*): (1) with ⋯ open,
   **Pause** stays on the second row beside Guided and Reset; (2) the cover's *● DAY 1* is mint, the words with the dot
   (`#day-view-card .cm-name`); (3) the fault cue's bar stays clay and is on the *Clay means look here* list; (4) E's p, s
-  and t are built (above; u was already: `itemDose()` writes *5 / side*).
+  and t are built (above; u was already: `itemDose()` writes *5 each side*).
 - **The old card CSS that Centre Court fully overrode is gone** (round 2): 118 pre-Centre-Court rules on the card shell, the
   set log, the Note row, the circuits and their `body[data-dark]` copies. Each was switched off in the browser, one at a time
   and then all together, in five day, Guided and Library states at 320, 390 and 600 px, light and dark, with transitions

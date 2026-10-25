@@ -322,6 +322,43 @@ async function rounds(browser) {
 }
 
 
+// ═════════ side ═════════
+async function side(browser) {
+  const P = H.fixture();
+  const b = P.workouts.days[0].blocks;
+  b[2].exercises.find(e => e.name === 'Side Plank').rx.time = '20s';
+  b.push({ title: 'Conditioning', exercises: [{ type: 'circuit', name: 'Engine', rx: { rounds: 2, rest: 30 }, items: [
+    { name: 'Walking Lunge', rx: { reps: 6, side: true } }, { name: 'Old Carry', detail: '×6 each' }, { name: 'Swing', rx: { reps: 12 } }] }] });
+  const { ctx, p } = await H.openProgram(browser, { prog: P });
+  await p.evaluate("openDayView('1')");
+  await p.waitForTimeout(400);
+  const L = nm => cardOf(p, nm);
+  const split = await L('Dumbbell Bulgarian Split Squat'), pal = await L('Half Kneeling Pallof Press'), plank = await L('Side Plank');
+  t.check('side: a one-sided lift says "3 × 8 each side"', /3 × 8 each side/.test(split) && !/\/ side/.test(split), split);
+  t.check('side: a one-sided press says "10 each side"', /10 each side/.test(pal) && !/\/ side/.test(pal), pal);
+  t.check('side: "20s" and a side says "20 s each side"', /3 × 20 s each side/.test(plank) && !/20s/.test(plank), plank);
+  const rows = await p.evaluate(() => [...document.querySelectorAll('#day-view .round-detail')].map(e => e.textContent.trim()));
+  t.check('side: a circuit item says "6 each side", and an old "×6 each" does too', rows.includes('6 each side') && rows.filter(r => r === '6 each side').length === 2, JSON.stringify(rows));
+  const anySlash = await p.evaluate(() => { const bad = []; document.querySelectorAll('#day-view *').forEach(e => { if (e.children.length === 0 && /\/ side/.test(e.textContent)) bad.push(e.textContent.trim()); }); document.querySelectorAll('#day-view [placeholder],#day-view [data-dose]').forEach(e => { if (/\/ side/.test((e.getAttribute('placeholder') || '') + (e.dataset.dose || ''))) bad.push('attr'); }); return bad; });
+  t.check('side: "/ side" is nowhere in the day', !anySlash.length, JSON.stringify(anySlash));
+  // the fading note: the first one-sided card opened says it, the second does not, a card with two sides never does
+  const toast = () => p.evaluate(() => { const e = document.getElementById('aaToast'); return e && !e.hidden ? e.innerText.replace(/\s+/g, ' ').trim() : ''; });
+  await p.evaluate(() => hideAaToast());
+  await openCard(p, 'Barbell Back Squat');
+  await p.waitForTimeout(400);
+  t.check('side: opening a two-sided lift says nothing', !/Log one side/.test(await toast()), await toast());
+  await openCard(p, 'Dumbbell Bulgarian Split Squat');
+  await p.waitForTimeout(400);
+  t.check('side: the first one-sided card opened says "Log one side."', /Log one side\./.test(await toast()), await toast());
+  t.check('side: and the key is the athlete\'s', await p.evaluate(id => !!localStorage.getItem(id + '_side_told'), H.ID), '');
+  await p.evaluate(() => hideAaToast());
+  await openCard(p, 'Half Kneeling Pallof Press');
+  await p.waitForTimeout(400);
+  t.check('side: the second one-sided card says nothing', !/Log one side/.test(await toast()), await toast());
+  t.check('side: no page errors', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await rpe(browser);
@@ -332,6 +369,7 @@ async function rounds(browser) {
   await last(browser);
   await orange(browser);
   await rounds(browser);
+  await side(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

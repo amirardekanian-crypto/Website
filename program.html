@@ -10616,9 +10616,17 @@ function tempoPlain(tempo) {
   const s = n => (n >= 2 ? `<span class="t-hot">${n}</span>` : String(n)) + ' s';
   return 'Down ' + s(parts[0]) + (parts[1] > 0 ? ' · pause ' + s(parts[1]) : '');
 }
+// A dose as the athlete reads it (Plain Words, Amir 2026-10-25): "20 s each side", "6 each side". A free-text detail from an older programme
+// ("×6 each") says the same.
+function doseText(d) {
+  if (!d) return '';
+  const v = String(d.value);
+  return d.side ? v.replace(/^(\d+(?:\s*[-–]\s*\d+)?)\s*(?:s|sec|secs|seconds?)$/i, '$1 s') + ' each side' : v;
+}
+function sideWords(s) { return String(s || '').replace(/^×\s*(\d+)\s+each$/i, '$1 each side'); }
 function renderNumLine(rx, rest) {
   const bits = [];
-  const dose = rx.dose ? rx.dose.value + (rx.dose.side ? ' / side' : '') : '';
+  const dose = doseText(rx.dose);
   // The open card's scoreboard puts a caption under each value (Centre Court, 2026-10-12): the dose's is .nl-cap (an
   // .nl-lab, so numLineText() leaves it out), RPE's word is .nl-k. The text of the line is unchanged.
   const cap = rx.dose ? String(rx.dose.label || DOSE_LABEL[rx.dose.kind] || '').toLowerCase() : '';
@@ -10871,14 +10879,14 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // carry sends nothing.
   const repsData = (rx.dose && rx.dose.kind === 'reps') ? rx.dose.value : '';
   // The dose as words, for a set row with no box to type in (a hold: "30 s / side").
-  const doseData = rx.dose ? rx.dose.value + (rx.dose.side ? ' / side' : '') : '';
+  const doseData = doseText(rx.dose);
   // A timed hold ("30 s / side") gets a circle that counts it (holdGate()): its seconds, or nothing for "30-45 s" or a carry.
   const holdSec = (rx.dose && rx.dose.kind === 'time' && isStandard) ? (parseDurationToSec(rx.dose.value) || '') : '';
 
   // .ex-side holds the ⓘ (paintSpine()); .ex-doneline is the finished row's summary
   // (paintDoneLines()). The dot is an empty span inside .item-name, so the name's text
   // (which every lookup reads) is unchanged.
-  return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-dose="${esc(doseData)}"${holdSec ? ` data-hold="${holdSec}"` : ''}${holdSec && rx.dose.side ? ' data-hold-side="1"' : ''} data-target="${esc(rx.rpe || '')}" data-exid="${esc(ex.exId || '')}">
+  return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-dose="${esc(doseData)}"${rx.dose && rx.dose.side ? ' data-side="1"' : ''}${holdSec ? ` data-hold="${holdSec}"` : ''}${holdSec && rx.dose.side ? ' data-hold-side="1"' : ''} data-target="${esc(rx.rpe || '')}" data-exid="${esc(ex.exId || '')}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" role="button" tabindex="0" aria-label="Tick every set" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')" onkeydown="onCheckBoxKey(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
@@ -10935,8 +10943,8 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // free-text `detail` when it does not, so an unconverted circuit is unchanged.
   const itemDose = item => {
     const r = rxOf(item);
-    if (!r.dose) return item.detail || '';
-    const bits = [r.dose.value + (r.dose.side ? ' / side' : '')];   // "5 / side", as on a card's line
+    if (!r.dose) return sideWords(item.detail);
+    const bits = [doseText(r.dose)];   // "5 each side", as on a card's line
     if (r.rpe) bits.push('Effort ' + r.rpe + '/10');
     return bits.join(' · ');
   };
@@ -11018,7 +11026,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   const roundsN = /^×\d+ Rounds$/.test(roundsLabel) ? parseInt(roundsLabel.slice(1), 10) : 0;
   const roundsSay = n => n === 1 ? 'Once' : n === 2 ? 'Twice' : n + ' times';
   if (roundsLabel)    nlBits.push(`<span class="nl-dose"><b>${esc(roundsN ? roundsSay(roundsN) : roundsLabel)}</b></span>`);
-  if (_rxC.dose)      nlBits.push(`<span>${esc(_rxC.dose.value + (_rxC.dose.side ? ' / side' : ''))}</span>`);
+  if (_rxC.dose)      nlBits.push(`<span>${esc(doseText(_rxC.dose))}</span>`);
   if (_rxC.rpe)       nlBits.push(`<span class="nl-rpe"><span class="nl-k">Effort </span>${esc(_rxC.rpe)}/10</span>`);
   // The rest that paces the rounds: "Twice · rest 30 s between". Alone, or with one round, it is just "Rest 30 s".
   if (_rxC.rest)      nlBits.push(roundsN > 1
@@ -11169,8 +11177,19 @@ function foldCard(card, open) {
   }, FOLD_MS + 40);
 }
 // The tap on a row: open what is closed, close what is open.
+// The first time a one-sided card is opened on this phone, one fading note says how to log it (Plain Words, Amir 2026-10-25).
+function sideNote() {
+  try {
+    const k = ATHLETE_ID + '_side_told';
+    if (localStorage.getItem(k)) return;
+    localStorage.setItem(k, '1');
+  } catch (e) { return; }
+  aaToast('Log one side.');
+}
 function toggleExpand(item) {
-  foldCard(item, item.classList.contains('collapsed'));
+  const opening = item.classList.contains('collapsed');
+  foldCard(item, opening);
+  if (opening && item.dataset.side) sideNote();
   if (item.dataset.day) paintHints(item.dataset.day);
 }
 
@@ -22160,7 +22179,7 @@ function paintKgCol(card) {
   // parseInt() (paintTimerLog()). With a kg box the column is too narrow for the words, so it stays "4".
   const base = cardReps(card) || repRangeText(card);
   if (!base) return;
-  const ph = base + (noKg && / \/ side$/.test(card.dataset.dose || '') ? ' / side' : '');
+  const ph = base + (noKg && / each side$/.test(card.dataset.dose || '') ? ' each side' : '');
   wrap.querySelectorAll('.ex-set-reps').forEach(i => { if (i.getAttribute('placeholder') !== ph) i.setAttribute('placeholder', ph); });
 }
 
@@ -23554,7 +23573,7 @@ function paintTimerLog(row, item) {
       ${repsIn ? `<div class="tl-line">
         <span class="tl-lab">Reps</span>
         <button type="button" class="tl-step" data-d="-1" aria-label="One rep fewer">−</button>
-        <span class="tl-val${off ? ' off' : ''}">${n != null ? n : esc((repsIn.getAttribute('placeholder') || '').replace(/ \/ side$/, ''))}</span>
+        <span class="tl-val${off ? ' off' : ''}">${n != null ? n : esc((repsIn.getAttribute('placeholder') || '').replace(/ each side$/, ''))}</span>
         <button type="button" class="tl-step" data-d="1" aria-label="One rep more">+</button>
       </div>` : ''}
       <div class="tl-line tl-rpe">
