@@ -5,6 +5,12 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-25 · The Pick card picked, smaller and shorter; the Open's look rejected live.** *"lets go with your pick, but make the card a
+  bit smaller, and it should only stay for a week. / the open is live, but i hate the look, for now, take the wallsit off / and start
+  building your plan"*. What it teaches: (1) he trims my size and duration again (as with 76): pitch recognition smaller and shorter
+  than feels generous; (2) he judges a look on the live app, and the Open card from round 6 (#67, the Open Wall) failed that test:
+  no Open goes live again until its card has three new directions and his pick; (3) "start building" means now, in this chat.
+
 - **2026-10-25 · Amir's Pick needs a card and a reason.** *"add wall sit as the monthly open. / my pick of the month should have a card or
   something that is nice, every one can see for a while. design it, and there should be a reason for it why she is my pick"*, then,
   correcting me: *"elmira is my october pick for her consistency to never miss a session in 3 cycles. not september"*. What it teaches:
