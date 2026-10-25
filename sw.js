@@ -509,7 +509,15 @@
 // v229: program.html changed (2026-10-25, Amir: "every achievement that any one gets in crew should be clickable ... we dont need the medal of it on the
 // crew screen", and "we dont need to see who cheered for their trophy"). A Crew line carries no emblem; the achievement in it opens what it is. A trophy on
 // someone's page shows no faces of who cheered, and a tap opens what it is.
-const CACHE = 'aap-v229';
+// v230: program.html changed (2026-10-25, Amir: "in the middle of a session i can do another session which doesnt make sense"). One session at a
+// time: Home Resumes the one day under way and another unfinished day waits; a shared lift no longer makes a day look started. A tick no longer
+// opens the rest by itself ("go back i dont like it").
+// v231: program.html and coach.html changed (2026-10-25, Home Crowd, round 7 step 1; Amir: "79 A", "77 is good", "82 good", and on the Pick card
+// "make the card a bit smaller, and it should only stay for a week"). Crew's reactions are line icons in the app's colours, never yellow; "In the
+// crew" sits beside the numbers; the settings are one sheet, What the crew sees; Pinned is a label and a face on a line opens its page; a member
+// without notifications is offered them under their cheers, a non-member's finished card offers the crew; Amir's Pick is a card for a week with his
+// reason; a crew notification opens the reply or cheer it was about. coach.html: the reason box and Someone else in Courtside's honours.
+const CACHE = 'aap-v231';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -9625,7 +9625,7 @@ function dayCardHTML(day, dayNum, total, opts) {
 function suggestedDayId() {
   const ids = (DATA.workouts && DATA.workouts.days || []).map((d, i) => String(d.id != null ? d.id : i + 1));
   const done = weekDoneDays();
-  let i = ids.findIndex(id => dayInProgress(id));
+  let i = ids.indexOf(activeDayId());
   if (i < 0 && !cycleOver()) {
     const last = ids.indexOf(lastTrainedDayId(ids));
     for (let k = 0; k < ids.length && i < 0; k++) {
@@ -9672,7 +9672,19 @@ function dayInProgress(id) {
   // Done earlier this week and not touched today → Done, not in progress.
   const t = loadTimer(id);
   if (t && !t.finished && t.sessionStart && new Date(t.sessionStart).toDateString() === new Date().toDateString()) return true;
-  try { return getDayCompletion(id).done > 0; } catch (e) { return false; }
+  // Ticks count only on a day ticked today ITSELF (markTouched()). The set log is kept per exercise name, so a lift Day 2 shares
+  // with Day 1 used to make Day 1 "In progress · 1 of 18 sets" while the athlete was on Day 2 (Amir, 2026-10-25).
+  try { return touchedToday(String(id), new Date().toDateString()) && getDayCompletion(id).done > 0; } catch (e) { return false; }
+}
+// The ONE day under way (Amir, 2026-10-25: "in the middle of a session i can do another session which doesnt make sense"). Home's
+// card Resumes it and openDayView() sends every other unfinished day back to it. Two at once (left from before this rule): the one
+// whose clock runs, else the one whose clock moved last.
+function activeDayId() {
+  const ids = ((DATA && DATA.workouts && DATA.workouts.days) || []).map((d, i) => String(d.id != null ? d.id : i + 1));
+  const live = ids.filter(id => dayInProgress(id));
+  if (live.length < 2) return live[0] || null;
+  const at = id => { const t = loadTimer(id); return !t ? 0 : t.running ? Infinity : (t.resumeAt || (t.sessionStart ? new Date(t.sessionStart).getTime() : 0) || 0); };
+  return live.reduce((a, b) => at(b) > at(a) ? b : a);
 }
 // ── THIS WEEK, FROM HISTORY (HOME-01, 2026-09-26) ──────────────────────────
 // Home's week used to know only TODAY: a Done pill lasted until midnight (the
@@ -10167,6 +10179,16 @@ document.addEventListener('keydown', ev => {
 // Show a single day's workout (the day panels + program header) and hide the
 // overview. switchDay() activates the right panel + recomputes progress.
 function openDayView(dayId) {
+  // One session at a time: another unfinished day waits until the one under way is finished or stopped (activeDayId()).
+  // A finished day still opens, to look at.
+  const act = typeof DATA !== 'undefined' && DATA ? activeDayId() : null;
+  if (act && act !== String(dayId) && !completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + dayId))) {
+    const days = (DATA.workouts && DATA.workouts.days) || [];
+    const n = days.findIndex(d => String(d.id) === act) + 1;
+    aaToast(`You're in the middle of Day ${n}. Finish it first. To end it early, tap ⋯ on its bar, then Stop here.`,
+      { kicker: 'One session at a time', action: `Back to Day ${n}`, run: () => openDayView(act) });
+    return;
+  }
   // An install card already up on Home goes when a day opens (it never sits over the finish card) and is asked again on the way home (B24).
   if (document.querySelector('.a2hs-toast')) { closeInstallOffer(); if (window.maybeOfferInstall) maybeOfferInstall.waiting = true; }
   const ov = document.getElementById('home-overview');
@@ -11644,7 +11666,7 @@ const APP_GUIDE = [
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Stop here</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Adding it up</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Stop here</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>One session at a time. While a day is under way, Home shows it with <strong>Resume</strong>, and the other days wait until you finish it or stop it.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Adding it up</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
   { icon: 'activity', key: 'career', title: 'Career: your level',
     body: `<p>Your level is the number in the ring on Home's habit card. Tap the ring to open Your numbers. The weeks you've held in a row sit beside <strong>This Week</strong>. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>adding it up</strong> until my side has it.</p><p>Your four numbers are in <strong>Your numbers</strong> on Progress: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers. It says how many you have and which one you're closest to. Open it and you see your cabinet. Every achievement is an emblem. In colour, you have won it. In grey, you have not, and it says what is left. <strong>Latest</strong> comes first, and <strong>New</strong> sits on what you have not seen yet. A small dot on <strong>Progress</strong> says there is something new in there. The chips under <strong>All achievements</strong> show only what you have won, or what is left, or one kind: consistency, commitment, progress or resilience. Tap an emblem to see what it asks for and how far along you are. Every ten levels you win a new level medal. When a session leaves you one step short of an achievement, its card tells you.</p><p>When I set you a job for the month, it sits right under this cycle's card, with a ring beside it. It is something to do, not a target for your training — I tick it off when you have done it. The <strong>Your moments</strong> row opens the lot, month by month: your marks, your achievements, the notes I write you and the month's honours. <strong>Amir saw this</strong> under one means I've seen it. A new note from me shows on Home until you open it. To answer it, tap <strong>Reply on WhatsApp</strong>.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks in a row you trained',
@@ -11656,7 +11678,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p><p>When I update the app, an orange note says <strong>A new version of the app is ready</strong>. Tap <strong>Reload</strong> and it loads in a second. You don't have to close it from your phone and open it again. <strong>Not now</strong> puts it away. Mid-session it waits until you've finished, so a reload never takes your sets with it.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong>: tick a set and the countdown starts by itself, when I wrote a rest for that exercise. Not after your last set of the day. The <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts it any time (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. You get one match a session: first to 15. A bank shot off the glass counts 2. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. <strong>The Lob</strong> is a slow ball to breathe with: in as it rises, out as it falls. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. You get one match a session: first to 15. A bank shot off the glass counts 2. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. <strong>The Lob</strong> is a slow ball to breathe with: in as it rises, out as it falls. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. During a session it's under <strong>⋯</strong> on the bar too, as <strong>Ask Amir</strong>, and it names the exercise you have open. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
 ];
@@ -22003,7 +22025,7 @@ function attachSetLog(card) {
       // Sync the exercise-level check: all sets done = exercise checked.
       syncExerciseCheck(card, cur);
       if (cur[idx].d) foldWhenDone(card, open);
-      if (cur[idx].d && !kgNudge(row, card, cur[idx])) { offerClock(card.dataset.day); restAfterTick(card); }
+      if (cur[idx].d && !kgNudge(row, card, cur[idx])) offerClock(card.dataset.day);
       if (navigator.vibrate) navigator.vibrate(12);
     });
   });
@@ -23501,30 +23523,11 @@ function openTimer(e) {
   openRest(secs, name, ctx);
 }
 
-// Every list-mode door (the card's Rest button, a tick in the list) opens the rest
+// Every list-mode door (the card's Rest button, the offer after a tick) opens the rest
 // already running: tapping Rest means the set is over (WK-02; it used to wait for Start).
 function openRest(secs, name, ctx) {
   showTimer(secs, name, null, ctx);
   startTimer();
-}
-
-// A tick in the list starts the card's rest by itself (Amir, 2026-10-24: "the same as Guided does, and X skips it"). It is the card's own Rest
-// button pressed for the athlete, so the time, the Next line and the games are exactly the button's. Only where a rest was WRITTEN (the
-// button names its time; an unwritten one says "Rest timer"), only in the day's list (a Library session has no day to walk), never in Guided
-// (it rests itself) or the coach's preview, never over a rest already counting, and never when nothing follows: restNextOfCard() is null
-// after the last set of the last exercise. A hold's own count ending ticks the set through the same click, so it rests then, once: its
-// first tap only starts the count and rests nothing. Un-ticking, "tick all" (setAllSetsDone()) and warm-up rows (no Rest button) never get here.
-// The old pill above the tab bar (offerRest(), WK-02) stays gone.
-function restAfterTick(card) {
-  try {
-    if (window.IS_PREVIEW || isLoading || (typeof STEP !== 'undefined' && STEP)) return;
-    const ov = document.getElementById('timerOverlay');
-    if (!ov || ov.classList.contains('visible')) return;
-    const btn = (cardDetail(card) || card).querySelector('.rest-btn');
-    if (!btn || !btn.querySelector('.rest-t') || !(parseInt(btn.getAttribute('data-rest'), 10) > 0)) return;
-    if (!restNextOfCard(card)) return;
-    openTimer({ target: btn, stopPropagation() {} });
-  } catch (e) { /* a rest that cannot open must never cost a tick */ }
 }
 
 // Guided Mode's rest: same overlay, same running start, but it calls onComplete when

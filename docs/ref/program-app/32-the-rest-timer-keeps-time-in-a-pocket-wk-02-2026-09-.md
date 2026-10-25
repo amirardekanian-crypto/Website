@@ -13,13 +13,10 @@ Centre Court look*, above). The timing below is unchanged.
   **Sound on/off** on the overlay is `rest_sound` (`'0'` = off) on this phone only.
 - **The screen stays awake** while a rest runs (`restWake()`, the Screen Wake Lock API), released on pause
   and close and asked for again on return.
-- **The rest offer is gone, the rest starts by itself** (Amir, 2026-10-11: "remove the rest pill, I don't like it"). Ticking a set no
-  longer brings up a **Rest 2:00** button above the tab bar (`offerRest()`, WK-02, 2026-09-27); that pill stays gone. Since 2026-10-24
-  a tick in the day's list opens the rest itself (`restAfterTick()`, Amir: "the same as Guided does, and X skips it"): it presses the
-  card's own **Rest ⏱** button, so the time is the button's and **✕** closes it. Only where a rest was written (the button names its
-  time), only when something follows (`restNextOfCard()` is null after the last set of the day), never in Guided, the coach's
-  preview, a Library session, over a rest already counting, on an un-tick, on "tick all" or on a warm-up row. A timed hold rests when
-  its own count ends and ticks the set, once. The guide's *Built-in tools* card says so.
+- **The rest offer is gone** (Amir, 2026-10-11: "remove the rest pill, I don't like it"). Ticking a set no longer brings up a
+  **Rest 2:00** button above the tab bar (`offerRest()`, WK-02, 2026-09-27; it never started by itself). Nothing replaced it: the
+  card's own **Rest ⏱** button (44 px) opens the Rest Timer, and Guided rests itself after every set. The guide's *Built-in tools* card says so. For one day (2026-10-24) a tick opened the
+  rest itself (`restAfterTick()`); Amir took it out on 2026-10-25 ("go back i dont like it"). `scripts/headless/love-all-rest.js` checks a tick opens nothing.
 - The overlay's dark palette came with A11Y-01 (#245). It is solid since 2026-09-27 (POL-01): at 97% the day's
   cards showed through behind the clock.
 
