@@ -5,6 +5,11 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-25 · Round 7 'Home Crowd': he asked for one place.** Straight after the page, before any pick: *"how about like a
+  notification center? or an inbox? how people can find things quicker or in one place?"*. It grew 83 For You (a Crew-only strip)
+  into #90 The Pigeonhole, one Inbox for the whole app. What it teaches: he thinks in "one place" across the app, not per tab, and
+  a Crew-only answer to a finding problem was too small for him. When an idea gathers things, ask whether it should span the app.
+
 - **2026-10-25 · The Lounge on his own phone: three corrections.** *"the background on the top of the page is too small, cant see
   anything"* (a cover must SHOW its picture: 200 px, light shade, not a dark strip), *"The number of cheers is wrong"* (this supersedes
   my reading of 2026-10-24: a cheer is the person-to-person Cheer, as in the reference app, never a like; counting likes in made
