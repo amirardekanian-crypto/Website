@@ -1781,6 +1781,8 @@
     -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
   }
   .dq-chip.main { background: #fff; color: #0E4A36; border-color: #fff; }
+  /* "Today builds:" (Plain Words, Amir 2026-10-25): the grey small line that names what the chips are, on its own row above them */
+  .dq-lead { flex: 0 0 100%; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.7); }
   .dq-chip:focus-visible { outline: 2px solid #E06B43; outline-offset: 2px; }
 
   /* ── Because (2026-09-24) — see whyOfCard() / whyBlock() / openWhyPlan() ──
@@ -24851,7 +24853,7 @@ function paintDayQualities() {
   document.querySelectorAll('.dq-row[data-dq]').forEach(row => {
     const day = days.find(d => String(d.id) === row.dataset.dq);
     const mix = qualityMix(day);
-    row.innerHTML = mix.map((q, i) =>
+    row.innerHTML = (mix.length ? '<span class="dq-lead">Today builds:</span>' : '') + mix.map((q, i) =>
       `<button type="button" class="dq-chip${i === 0 ? ' main' : ''}" data-q="${esc(q)}">${esc(QUALS_BY_ID[q].name)}</button>`).join('');
     row.querySelectorAll('.dq-chip').forEach(b => b.addEventListener('click', ev => {
       ev.stopPropagation();   // the card itself opens the day
