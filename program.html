@@ -12632,7 +12632,7 @@ function renderHabitList() {
       ? (hb.locked ? `<small>Session pays it</small>` : `<small>+${habXpFull(hb)} XP a day</small>`) : '';
     if (state === 'core') {
       return `<div class="hl-row is-core"><span class="hl-nm">${esc(name)}<small>${esc(hb.goal || '')}</small></span>
-        <span class="hl-tag">Always on${price}</span></div>`;
+        <span class="hl-tag">For everyone${price}</span></div>`;
     }
     const arming = _habArm === hb.id;
     return `<div class="hl-row"><span class="hl-nm">${esc(name)}<small>${arming

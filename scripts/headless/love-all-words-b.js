@@ -230,6 +230,24 @@ async function offswitch(browser) {
   }
 }
 
+async function alwayson(browser) {
+  const CFG = { onboarded: true, toured: true, installAsked: true, boardSwept: true, updatedAt: Date.now() };
+  for (const w of [390, 320]) {
+    const { ctx, p } = await open(browser, { w, seed: { _hab_cfg: CFG } });
+    await p.evaluate(() => goTo('plan'));
+    await p.waitForTimeout(300);
+    await p.click('#habits-block-wrap .hrow');   // the door into the list, as the athlete taps it
+    await p.waitForTimeout(400);
+    const tags = await p.evaluate(() => [...document.querySelectorAll('#screen-habits .hl-row.is-core .hl-tag')].map(e => e.firstChild.textContent.trim()));
+    t.check(`alwayson: each of the five says "For everyone" (${w} px)`, tags.length === 5 && tags.every(x => x === 'For everyone'), JSON.stringify(tags));
+    t.check('alwayson: …and "Always on" is nowhere on the list', !/always on/i.test(await p.evaluate(() => document.getElementById('screen-habits').innerText)), '');
+    await fits(p, '#screen-habits .hl-row.is-core .hl-tag', w, 'alwayson: the tags');
+    await noScroll(p, w, 'alwayson: the list');
+    t.check(`alwayson: no page errors (${w})`, !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await blocks(browser);
@@ -239,6 +257,7 @@ async function offswitch(browser) {
   await finish(browser);
   await reset(browser);
   await offswitch(browser);
+  await alwayson(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
