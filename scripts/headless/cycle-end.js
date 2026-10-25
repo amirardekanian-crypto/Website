@@ -78,7 +78,7 @@ const state = p => p.evaluate(() => ({
   {
     const { ctx, p } = await H.openProgram(browser, { prog: prog(4), hist: hist(4) });
     let s = await state(p);
-    t.check('4 days past: Progress says Cycle complete, with the full 5 weeks', s.fin === 'Cycle complete' && /5 of 5 weeks/.test(s.sub), JSON.stringify(s));
+    t.check('4 days past: Progress says Cycle complete and Finished once (the 5 weeks are on the Week row, not counted twice)', s.fin === 'Cycle complete' && /^Finished \d{1,2} [A-Za-z]{3}$/i.test(s.sub), JSON.stringify(s));
     t.check('4 days past: Home has the one door row, Cycle 2 complete, and no card', s.bt === 'Cycle 2 complete' && /^Finished \d{1,2} [A-Z][a-z]{2} · see it on Progress$/.test(s.btSub || '') && !s.cardOnHome, JSON.stringify(s));
     const door = await p.evaluate(() => { document.querySelector('#home-week-wrap .bt-done').click(); return document.querySelector('.screen.active').id; });
     t.check('4 days past: the door row opens Progress', door === 'screen-plan', door);

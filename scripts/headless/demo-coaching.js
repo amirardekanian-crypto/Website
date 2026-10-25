@@ -20,7 +20,7 @@ function undated() { const P = H.fixture({ dated: false }); P.cycles.forEach(c =
     C.check('the demo opens in week 2 of its current cycle', !!wk && wk.wk === 2 && !wk.after, JSON.stringify(wk));
     await p.evaluate(() => goTo('plan')); await p.waitForTimeout(400);
     const card = await p.evaluate(() => { const c = document.querySelector('#cycle-card-wrap .cyc-card'); return c ? c.innerText.replace(/\s+/g, ' ').trim().slice(0, 90) : null; });
-    C.check('Progress shows the This cycle card, week 2', !!card && /This cycle/i.test(card) && /Week 2/i.test(card), String(card));
+    C.check('Progress shows the cycle card (Cycle 2 of 3), week 2', !!card && /Cycle 2 of 3/i.test(card) && /Week 2/i.test(card), String(card));
     const saved = await p.evaluate(() => localStorage.getItem('plancache'));
     C.check('the dates live in memory only: no plan saved on the phone', saved === null, String(saved).slice(0, 40));
     await p.evaluate(() => { goTo('home'); openAccount(); }); await p.waitForTimeout(300);
