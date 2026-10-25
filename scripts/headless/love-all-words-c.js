@@ -4,6 +4,7 @@
 //   holdserve  Hold Serve keeps its name and wears "Weeks in a row you trained" (the weeks-held number, the help card's title).
 //   comebacks  Comebacks keeps its number and wears "Times you came back after a break".
 //   counting   the finished card says "Adding it up" (the XP line and the reward band) while the server adds the session up.
+//   bell       The Bell keeps its name and wears "What's new" (the small grey line on its heading on Crew).
 //   counts     the cover says "Cycle 2 of 3", under it "Week 2 of 5", the road says "5 weeks": one count per number.
 // Serve the repo first (python -m http.server <port> --bind 127.0.0.1; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js), then:
 //   node scripts/headless/love-all-words-c.js
@@ -159,6 +160,33 @@ async function counting(browser) {
   }
 }
 
+async function bell(browser) {
+  const now = Date.now(), iso = ms => new Date(ms).toISOString();
+  const AMIR = '11111111-2222-3333-4444-555555555555';
+  const b = {
+    athlete_id: ID, at: iso(now), days: 7, kinds: ['level', 'week', 'mark', 'achievement', 'best', 'cycle', 'honour', 'open'],
+    me: { answer: 'yes', name: 'Alex R.', on_board: true, under13: false, can_post: true, photos_left: 3, posts_left: 10,
+      kinds: { level: true, week: true, mark: true, achievement: true, best: true, cycle: true, honour: true, open: true } },
+    honours: { month: '2026-09-01', rows: [] },
+    items: [{ t: 'post', id: AMIR, who: 'Amir', me: false, amir: true, kind: 'post', body: '11 of you held your week. Keep it boring.', photo: false, at: iso(now - 3600e3), pinned: true, left: 7, kudos: { n: 2, mine: false, names: ['Mina S.'] } }] };
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    const { ctx, p } = await H.openProgram(browser, { w, h, stub: { board: [{ pos: 1, display_name: 'Alex R.', xp: 5910, level: 19, is_me: true, joined: true }], bell: b } });
+    await p.waitForFunction(() => !!document.querySelector('#global-tabs .nav-item[data-tab="crew"]'), null, { timeout: 8000 });
+    await p.evaluate("goTo('crew')");
+    await p.waitForTimeout(800);
+    const hd = await p.evaluate(() => {
+      const h2 = [...document.querySelectorAll('#crew-body .prog-sec')].find(x => /^The Bell/i.test(x.textContent.trim()));
+      if (!h2) return null;
+      const n = h2.querySelector('.prog-sec-n'), c = getComputedStyle(n);
+      return { text: h2.innerText.replace(/\s+/g, ' ').trim(), line: n.textContent, color: c.color, over: h2.scrollWidth - h2.clientWidth, side: document.documentElement.scrollWidth - innerWidth };
+    });
+    t.check(`bell ${w}px: the heading is "The Bell" with the line "What's new"`, !!hd && /^The Bell\s+What's new$/i.test(hd.text) && hd.line === "What's new", JSON.stringify(hd));
+    t.check(`bell ${w}px: the line is the heading's own small grey line and nothing overflows`, !!hd && hd.over <= 0 && hd.side <= 0 && hd.color !== 'rgb(199, 85, 47)', JSON.stringify(hd));
+    t.check(`bell ${w}px: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await counts(browser);
@@ -167,6 +195,7 @@ async function counting(browser) {
   await holdserve(browser);
   await comebacks(browser);
   await counting(browser);
+  await bell(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

@@ -14959,7 +14959,7 @@ function renderCrew() {
   h += crewWeekHTML();          // the week first (direction B): never an empty room
   h += crewHonoursHTML();
   h += crewOpenHTML();
-  h += `<h2 class="prog-sec">The Bell<span class="prog-sec-n">Last 7 days</span></h2>`;
+  h += `<h2 class="prog-sec">The Bell<span class="prog-sec-n">What's new</span></h2>`;   // its plain line (Plain Words, 2026-10-25); the week it covers is said in the band above
   if (me.can_post) h += `<button type="button" class="cr-comp" onclick="openCrewPost()">${crewFace(crewPersonOf({ me: true }))}<span class="t">Share something with the crew</span><span class="cr-cam">${CREW_CAM_SVG}</span></button>`;
   else if (me.under13) h += '<p class="cr-quiet">You can read the crew here. Posting is off for your account.</p>';
   // A no is not a door closing (Amir, 2026-10-20: *"if ghazal wants to come back, let her have a way"*). The way back was
