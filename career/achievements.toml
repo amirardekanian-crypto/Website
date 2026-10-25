@@ -9,6 +9,12 @@
 #   patterns_in_cycle (groups) · cycle_proving (bests, retests) · run_regained (away_weeks) · total (at: the at-th fact read,
 #   counted as a badge counts it, a capped kind only as paid) · best_run (at: weeks held in a row, reads week_held) ·
 #   month_held (weeks: a calendar month whose training weeks were all held, at least that many, once the month is over)
+#   on_dates (windows = [{ from = "MM-DD", to = "MM-DD" }]: a finished session whose own date falls in a window, inclusive, every year) ·
+#   slam_year (of = [ids of on_dates entries]: a session in each of their windows in one calendar year) ·
+#   clock (finish_before = "HH:MM" or finish_from = "HH:MM": a finished session whose local finish time, the phone's `fin`, is before / from it)
+# `total` may read a list of facts (reads = [a, b]): they are counted together, as a badge of kind total counts them (Century's two).
+# D21 (stage99): `paid_from` (a day) on an entry new in its version: a win done before that day is won at 0 XP. `added_in` (a rulebook version)
+# says which version brought the entry. `repeats` (a fact) makes get_achievements() say how many times it came ("Won 11 times"); it pays nothing.
 
 
 # ── Consistency ───────────────────────────────────────────────────────────────────────────────────────────────────
@@ -24,6 +30,7 @@ size = "highlight"
 caption = "Your first held week. Every session, on your days."
 free = false
 origin = "new"
+repeats = "week_held"
 
 [achievement.clean_sheet]
 name = "First Treble"
@@ -319,6 +326,7 @@ size = "milestone"
 caption = "Retest beaten. You came back stronger."
 free = false
 origin = "new"
+repeats = "retest_beaten"
 
 
 # ── Resilience ────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -373,6 +381,7 @@ size = "highlight"
 caption = "A week went wrong. The next one did not."
 free = false
 origin = "new"
+repeats = "bounce_back"
 
 
 # ── Carried over from AA Proof (origin = "proof") ────────────────────────────────────────────────────────────────
@@ -611,6 +620,7 @@ size = "win"
 caption = "Everything on the list, done."
 free = true
 origin = "new"
+repeats = "perfect_day"
 
 [achievement.ten_complete_days]
 name = "CLEAN SWEEP II"
@@ -1019,3 +1029,517 @@ size = "milestone"
 caption = "Three weeks after coming back."
 free = true
 origin = "new"
+
+
+# ── Version 11: the Emblem Cabinet (Amir, 2026-10-25: "go with your picks") ───────────────────────────────────────
+# 33 new achievements, each with an emblem in assets/js/emblems.js (the ids are the app's emblem map's). D21: an achievement carries
+# `paid_from`, the day it was seeded; a win done BEFORE that day is won at 0 XP (still on the shelf, dated the day it was done), a win on
+# or after it pays `xp`. `added_in` is the rulebook version that brought the entry: the checker asks `paid_from` of every entry added in
+# the version it checks. The windows are month-days, inclusive, every year (test on_dates); calendar_slam names the four windows by id
+# (`of`); Early Bird and Night Owl read the phone's local finish time (test clock). Left out on purpose: 5x/6x/7x in a week, rewards for
+# hard or long sessions (GAME-5), total minutes.
+
+# ── Sessions with Amir ──
+
+[achievement.sessions_3]
+name = "3 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 3
+rule = "3 sessions with Amir."
+xp = 60
+size = "win"
+caption = "Three sessions in. You have started."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.sessions_5]
+name = "5 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 5
+rule = "5 sessions with Amir."
+xp = 80
+size = "win"
+caption = "Five sessions. It is a habit now."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.sessions_7]
+name = "7 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 7
+rule = "7 sessions with Amir."
+xp = 100
+size = "win"
+caption = "Seven sessions. Keep stacking them."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.sessions_10]
+name = "10 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 10
+rule = "10 sessions with Amir."
+xp = 150
+size = "highlight"
+caption = "Ten sessions. Double figures."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.sessions_15]
+name = "15 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 15
+rule = "15 sessions with Amir."
+xp = 200
+size = "highlight"
+caption = "Fifteen sessions on the board."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.sessions_20]
+name = "20 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 20
+rule = "20 sessions with Amir."
+xp = 250
+size = "highlight"
+caption = "Twenty sessions. This is real work."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.sessions_30]
+name = "30 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 30
+rule = "30 sessions with Amir."
+xp = 350
+size = "highlight"
+caption = "Thirty sessions. You keep coming back."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.sessions_40]
+name = "40 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 40
+rule = "40 sessions with Amir."
+xp = 450
+size = "milestone"
+caption = "Forty sessions. Most people stop long before this."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.sessions_75]
+name = "75 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 75
+rule = "75 sessions with Amir."
+xp = 1000
+size = "milestone"
+caption = "Seventy-five sessions. Three quarters of the way to a hundred."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.sessions_300]
+name = "300 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 300
+rule = "300 sessions with Amir."
+xp = 4000
+size = "milestone"
+caption = "Three hundred sessions. That is years of work."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.sessions_400]
+name = "400 Sessions"
+meaning = "commitment"
+reads = ["session_finished", "session_finished_early"]
+test = "total"
+at = 400
+rule = "400 sessions with Amir."
+xp = 5000
+size = "legend"
+caption = "Four hundred sessions. Very few get here."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+# ── Weeks and months held in a row ──
+
+[achievement.weeks_3]
+name = "3 Weeks in a Row"
+meaning = "consistency"
+reads = "week_held"
+test = "best_run"
+at = 3
+rule = "Three training weeks held in a row."
+xp = 175
+size = "highlight"
+caption = "Three weeks in a row. Every session, on your days."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.weeks_5]
+name = "5 Weeks in a Row"
+meaning = "consistency"
+reads = "week_held"
+test = "best_run"
+at = 5
+rule = "Five training weeks held in a row."
+xp = 250
+size = "highlight"
+caption = "Five weeks in a row, held."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.weeks_6]
+name = "6 Weeks in a Row"
+meaning = "consistency"
+reads = "week_held"
+test = "best_run"
+at = 6
+rule = "Six training weeks held in a row."
+xp = 300
+size = "milestone"
+caption = "Six weeks in a row. Nothing missed."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.weeks_7]
+name = "7 Weeks in a Row"
+meaning = "consistency"
+reads = "week_held"
+test = "best_run"
+at = 7
+rule = "Seven training weeks held in a row."
+xp = 350
+size = "milestone"
+caption = "Seven weeks in a row. Almost two months without a gap."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.months_4]
+name = "4 Months in a Row"
+meaning = "consistency"
+reads = "week_held"
+test = "best_run"
+at = 16
+rule = "16 training weeks held in a row."
+xp = 800
+size = "milestone"
+caption = "Four months without a broken week."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.months_5]
+name = "5 Months in a Row"
+meaning = "consistency"
+reads = "week_held"
+test = "best_run"
+at = 20
+rule = "20 training weeks held in a row."
+xp = 1000
+size = "milestone"
+caption = "Five months without a broken week."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.months_7]
+name = "7 Months in a Row"
+meaning = "consistency"
+reads = "week_held"
+test = "best_run"
+at = 28
+rule = "28 training weeks held in a row."
+xp = 1400
+size = "milestone"
+caption = "Seven months in a row. That is a different athlete."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.months_9]
+name = "9 Months in a Row"
+meaning = "consistency"
+reads = "week_held"
+test = "best_run"
+at = 36
+rule = "36 training weeks held in a row."
+xp = 1800
+size = "legend"
+caption = "Nine months in a row, held. Hardly anyone does this."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+# ── Personal bests ──
+
+[achievement.bests_3]
+name = "3 Personal Bests"
+meaning = "progress"
+reads = "personal_best"
+test = "total"
+at = 3
+rule = "3 personal bests."
+xp = 150
+size = "win"
+caption = "Three personal bests. You are getting better."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.bests_15]
+name = "15 Personal Bests"
+meaning = "progress"
+reads = "personal_best"
+test = "total"
+at = 15
+rule = "15 personal bests."
+xp = 600
+size = "milestone"
+caption = "Fifteen personal bests."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.bests_75]
+name = "75 Personal Bests"
+meaning = "progress"
+reads = "personal_best"
+test = "total"
+at = 75
+rule = "75 personal bests."
+xp = 2200
+size = "legend"
+caption = "Seventy-five personal bests. Stronger, again and again."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+# ── Time with Amir ──
+
+[achievement.month_one]
+name = "Month One"
+meaning = "commitment"
+reads = "month_with_amir"
+test = "total"
+at = 1
+rule = "A whole month since your first session."
+xp = 100
+size = "win"
+caption = "One month with Amir. The first one is the hardest."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.year_two]
+name = "Year Two"
+meaning = "commitment"
+reads = "month_with_amir"
+test = "total"
+at = 24
+rule = "Twenty-four whole months since your first session."
+xp = 2000
+size = "legend"
+caption = "Two years with Amir. Two years of work."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+# ── The calendar and the clock ──
+
+[achievement.down_under]
+name = "Down Under"
+meaning = "commitment"
+reads = "session_finished"
+test = "on_dates"
+windows = [{ from = "01-12", to = "02-01" }]
+rule = "A session during the Australian Open fortnight."
+xp = 150
+size = "highlight"
+caption = "You trained while Melbourne played."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.red_clay]
+name = "Red Clay"
+meaning = "commitment"
+reads = "session_finished"
+test = "on_dates"
+windows = [{ from = "05-18", to = "06-08" }]
+rule = "A session during the clay Slam in Paris."
+xp = 150
+size = "highlight"
+caption = "You trained while Paris played on clay."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.the_lawns]
+name = "The Lawns"
+meaning = "commitment"
+reads = "session_finished"
+test = "on_dates"
+windows = [{ from = "06-22", to = "07-13" }]
+rule = "A session during the grass Slam in London."
+xp = 150
+size = "highlight"
+caption = "You trained while London played on grass."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.big_apple]
+name = "Big Apple"
+meaning = "commitment"
+reads = "session_finished"
+test = "on_dates"
+windows = [{ from = "08-24", to = "09-14" }]
+rule = "A session during the US Open fortnight."
+xp = 150
+size = "highlight"
+caption = "You trained while New York played."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.calendar_slam]
+name = "Calendar Slam"
+meaning = "commitment"
+reads = "session_finished"
+test = "slam_year"
+of = ["down_under", "red_clay", "the_lawns", "big_apple"]
+rule = "A session in all four Slam fortnights of one year."
+xp = 1000
+size = "legend"
+caption = "All four Slams in one year. You trained through every one."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.nowruz]
+name = "Nowruz"
+meaning = "commitment"
+reads = "session_finished"
+test = "on_dates"
+windows = [{ from = "03-20", to = "04-02" }]
+rule = "A session in the Nowruz holidays."
+xp = 150
+size = "highlight"
+caption = "New year, same work. Happy Nowruz."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.yalda]
+name = "Yalda"
+meaning = "commitment"
+reads = "session_finished"
+test = "on_dates"
+windows = [{ from = "12-20", to = "12-21" }]
+rule = "A session on Yalda night."
+xp = 150
+size = "highlight"
+caption = "The longest night of the year, and you trained."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.early_bird]
+name = "Early Bird"
+meaning = "commitment"
+reads = "session_finished"
+test = "clock"
+finish_before = "07:00"
+rule = "A session finished before 7 in the morning."
+xp = 100
+size = "win"
+caption = "Done before most people wake up."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"
+
+[achievement.night_owl]
+name = "Night Owl"
+meaning = "commitment"
+reads = "session_finished"
+test = "clock"
+finish_from = "21:00"
+rule = "A session finished after 9 at night."
+xp = 100
+size = "win"
+caption = "The day was long. You trained anyway."
+free = false
+origin = "new"
+added_in = 11
+paid_from = "2026-10-25"

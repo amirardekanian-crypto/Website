@@ -16,8 +16,8 @@
 # a tier or what earns an achievement raises `version` and sets `starts_on = "YYYY-MM-DD"`, the day it is seeded: facts before that day
 # keep their prices, awards keep the XP they were minted with. The seed refuses a change to [habits], [level], [season], [week], [share] or
 # to how a fact is worked out (career/README.md; PROCEDURES.md → Stage 76).
-version = 10
-starts_on = "2026-10-20"   # AA Proof's habit ladders, as achievements: 20 of them, and the ten of version 9 renamed into their families (version 10). Version 9, the same day: ten plain habit achievements. Version 8, the same day: the day pays: a day that counts 40, a perfect day 60 in all (version 7, the same day, had 50 and 150) (Amir: "50 for a day that counts, 100 more for a perfect day"). Version 6 (the same day) gave the seven achievements that paid nothing their XP; version 5 (2026-10-19) the new achievements, stage79; version 4 (2026-10-19) the cut, stage78. D20: forward only, every time.
+version = 11
+starts_on = "2026-10-25"   # A PLACEHOLDER until go-live: set it to the day the seed runs, and every `paid_from` in achievements.toml with it (D21). Version 11, the Emblem Cabinet: 33 achievements that pay only for wins from that day on. Version 10 (2026-10-20): AA Proof's habit ladders, as achievements: 20 of them, and the ten of version 9 renamed into their families (version 10). Version 9, the same day: ten plain habit achievements. Version 8, the same day: the day pays: a day that counts 40, a perfect day 60 in all (version 7, the same day, had 50 and 150) (Amir: "50 for a day that counts, 100 more for a perfect day"). Version 6 (the same day) gave the seven achievements that paid nothing their XP; version 5 (2026-10-19) the new achievements, stage79; version 4 (2026-10-19) the cut, stage78. D20: forward only, every time.
 meanings = ["consistency", "commitment", "progress", "resilience"]
 
 [switch]
