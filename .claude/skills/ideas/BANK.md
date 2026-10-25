@@ -304,6 +304,44 @@ live, "also in Sara's plan" on an exercise, cohorts by start month, match day on
 spinning coin, a wall per workout, group chat (Chat, Teams), choosing a cover (a skin), Connected Apps / heart rate, widgets, an upgrade
 banner, a shop, birthday and email on the page. Parked: a "your plan" membership page (its own round).
 
+## Round 7 · 2026-10-25 · "Home Crowd" (the Crew tab as a community page: friendlier, more fun)
+
+Full write-up (two parts, 8 fields per idea, today's tab measured with screenshots, three directions for each look question,
+dependencies, the cuts, seven calls): https://claude.ai/artifact/VQ7VRR7CvqQ4raUVSvh5gD
+
+Brief: Amir, *"analyse the crew tab, as a community or a social page, what do you think we can do to improve? make it more user
+friendly, make it more fun?"*. Live numbers that day (`C:\Users\Amir\AA-Lounge\usage-report.md`, 6 days of Crew, 12 hours of the
+Lounge): 10 members; 3 of them 93% of all 85 acts, Amir's own athlete account 48%; 54 of 57 likes from 3 people; 6 of 10 posts no
+reply, 1 reply ever between two members who are not Amir; 73% of the feed automatic; 0 posts in the coach's pinned lane; 1 of 6 posts
+since 21 Oct with a photo; 3 of 10 members with no phone; 7 of 18 recently active athletes never answered the join question; Amir
+cheered 8 on 24 Oct and 1 cheered back. Measured tab (`crew-review/measures.md`, fixture of nine): 5,808 px today (7.4 screens), 6,022
+from the 1st to the 14th (honours are sent only then); 39 of 98 controls are reaction chips; every crew push lands on the top of Crew;
+the settings sheet has 5 doors and 2 names. 36 ideas from the lenses, 14 kept. Honest call on the page: build the fixes, then 83 and
+84; the rest waits for the 8 Nov numbers.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 76 | Words First | The tab's order: a slim band, the composer, then the feed; honours as the Bell's first card (1st-14th) then on the winner's page; the board as one row "This season · you are 4th ›" (3 directions: A Feed First = pick, B Two Rooms, C Strip of Doors) | — | pitched 2026-10-25 |
+| 77 | Land on It | A crew push opens the thing: a reply/mention its post, a cheer your page's cheers; after Post the tab scrolls to your post | — | pitched 2026-10-25 |
+| 78 | One Door, One Name | The settings sheet as "What the crew sees", two doors (account sheet Profile, your page); "What rings for you" → "The crew sees it when you…"; the composer titled "Share with the crew"; the said-no line gets its own Join button | — | pitched 2026-10-25 |
+| 79 | Reactions in Our Colours | The four stored emoji drawn as Phosphor line icons (Fire, barbell = Strong, confetti = Well done, heart = Love it; never the clap, which is the Cheer's); server unchanged (3 directions: A Line Icons = pick, B Green Glyphs, C One Like, Four Behind). Fixes a broken "no yellow" rule | — | pitched 2026-10-25 · recommended first |
+| 80 | Looks Like What It Does | Tap cues: the clay Pinned pill goes green, whole honours tiles and moment-line faces and folded-line names become doors, board rows get a chevron, Reply/Delete/band faces to 44 × 44 | — | pitched 2026-10-25 |
+| 81 | Reply Right There | A box-like "Reply to Leila" line under every post, typing in place (3 directions: A A Reply Line = pick, B Half Sheet, C Reply Chip) | — | pitched 2026-10-25 · after 8 Nov |
+| 82 | Ask Where They Finish | (a) a non-member's finished card offers the join question; (b) a member with no phone sees "Turn on notifications so the next cheer reaches you" under Cheers this week (a fourth ask moment: needs Amir's word, push.md) | — | pitched 2026-10-25 |
+| 83 | For You | A strip at the top of Crew only when something happened to you; its list has Cheer back / Reply / Say hello; MVP "Cheer back" on your page's cheers; advanced Worth a Cheer (3 directions: A The Strip = pick, B The Bell Icon, C Cards in the Feed) | 77 | pitched 2026-10-25 · top 3 |
+| 84 | Match Report | Monday's Bell card: last week's sessions, held, bests, joins, faces of who held, one line from Amir drafted in Courtside (about 1 min a week, optional); honours ride in on the 1st (3 directions: A Green Card = pick, B Amir's Post, C The Band Turns Over) | — | pitched 2026-10-25 · top 3 |
+| 85 | The Toss | Amir's this-or-that question of the week, one tap, faces under each side, 7 days; a bank of 40 drafted, 12 ticked a quarter; two new tables (backup + erase same day) (3 directions: A Two Halves = pick, B A Line in the Feed, C Inside Match Report). Not "Ask the crew" (members never ask) | — | pitched 2026-10-25 · after 8 Nov |
+| 86 | Hello, Crew | A never-posted member's composer opens with a hello built from their page; "Say hello" on NEW faces and join lines = the cheer sheet with "Welcome to the crew" ready; never a second toast after joining | — | pitched 2026-10-25 · after 8 Nov |
+| 87 | Theme Week | One photo theme a week in the composer and the Bell heading, from The Toss's bank; no gallery | 85 | pitched 2026-10-25 · after 8 Nov |
+| 88 | Mailbag | Athletes ask privately on the Coach tab, Amir answers one a week as his pinned post (about 10 min a week) | — | pitched 2026-10-25 · suggested park |
+| 89 | Walk-Out Song | An optional "Trains to" song in Player facts | — | pitched 2026-10-25 · suggested park (1 of 10 has filled Your game) |
+
+Cut in the same round (listed on the page so they are not re-pitched): ready-made reply chips (COM-3), GIFs and stickers, voice
+cheers, who viewed your page (a read receipt), online now / typing, a crew total to reach (crew missions parked), Crew Day (one
+Library session for all), post of the week by likes, most cheered this month, reactions on replies, member polls (Ask the crew),
+a ring for every like, keeping your best post, a stories rail, a posting streak, crew badges, a crew chat, close friends /
+following, search in the crew, a live Q&A, a day recap video, choosing your own cover.
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |

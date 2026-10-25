@@ -76,6 +76,19 @@ only), First Serve on Home (push.md: three ask moments), partner codes (`affilia
 the friend and 10% off one cycle per friend for the member), the stamp on photo posts, the Open Wall. The paragraph below is
 the state BEFORE the build, kept for its traps.
 
+**Crew, walked through 2026-10-25 (round 7; `C:\Users\Amir\AA-Lounge\crew-review\measures.md`):** the tab is 5,808 px at 390 px
+(7.4 screens) with a nine-person fixture; photo posts are 604-691 px each. **Honours are sent only from the 1st to the 14th**
+(`get_bell`, `day <= 14`), and are ALSO a Bell line kind (`honour`) and a row on the winner's page. **Every crew push opens the top of
+Crew**: `sw.js` forwards only `#crew`, `initCrewDeepLink()` calls `goTo('crew')`, so a reply or a cheer is never landed on (a cheer is not
+on the tab at all, it is on the page). The settings sheet `openCrewSettings()` opens from 5 doors under 2 names ("What the crew sees of
+you" ×4, "Crew and the Bell" in the same account sheet); its switches are headed "What rings for you" but are CREW_KINDS (what the crew
+sees), not pushes. The reactions are native emoji from `crew_emoji_list()` (🔥 💪 👏 😍) drawn by `crewEmoji()`/`crewReactRow()`, and 💪 👏 😍
+render yellow on phones; 39 of the tab's 98 controls are reaction chips. The clay "Pinned" pill is not a control. Moment-line faces and the
+folded session line's names are not doors; board rows are doors with no chevron. Non-members see no Tell the crew on the finished card
+(`paintCrewTell()` hides it). The coach's pinned lane (`__coach__`, composer in coach.html's Crew panel) had 0 posts in the crew's first
+six days. Usage that day (`usage-report.md`): 10 members, 3 of them 93% of all acts, Amir's own athlete account 48%; 6 of 10 posts no
+reply; 73% of the feed automatic; 3 of 10 members with no phone subscribed.
+
 **Crew, checked 2026-10-24 (round 6, before the build):** program.html's Crew tab (`renderCrew`) = the week band (initials, a door to *In the
 crew*), honours, the Monthly Open card, the Bell (posts with photos, folded session lines, moment lines, replies), *This season*.
 There is **no page per person**: a name leads nowhere, and *In the crew* lists names with a level only. Posts, photos and likes are
