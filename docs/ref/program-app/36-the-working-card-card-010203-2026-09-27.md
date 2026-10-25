@@ -75,7 +75,8 @@ the tick"*): the tick means the time as written, and a shorter hold goes in the 
 needed a new field in the log line, which only writes `×n` for a reps dose.)
 
 Guided copies the line of numbers and the pills under its name (`renderStep()`), because they live in the
-header now. Circuits got the same header (line of numbers, note dot) and lost their Rounds/Rest grid.
+header now. Circuits got the same header (line of numbers, note dot) and lost their Rounds/Rest grid. A circuit's line says its
+rounds in words, *Twice · rest 30 s between* (3 rounds: *3 times · rest 30 s between*; no rest: *Twice*).
 
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*

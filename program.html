@@ -11014,13 +11014,16 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // The same line of numbers as a single exercise (CARD-02): rounds, the dose, RPE and
   // the rest that paces the round. The Coach's Note is the clay dot after the name.
   const nlBits = [];
-  // "×2 Rounds": the number is the scoreboard's value and "Rounds" its caption (Centre Court); the text is unchanged.
-  if (roundsLabel)    nlBits.push(/^×\d+ Rounds$/.test(roundsLabel)
-    ? `<span class="nl-dose"><b>${esc(roundsLabel.replace(/ Rounds$/, ''))}</b><span class="nl-k"> Rounds</span></span>`
-    : `<span class="nl-dose"><b>${esc(roundsLabel)}</b></span>`);
+  // "×2 Rounds" is "Twice", "×3 Rounds" is "3 times" (Plain Words, Amir 2026-10-25); a label that is not a plain count keeps its own words.
+  const roundsN = /^×\d+ Rounds$/.test(roundsLabel) ? parseInt(roundsLabel.slice(1), 10) : 0;
+  const roundsSay = n => n === 1 ? 'Once' : n === 2 ? 'Twice' : n + ' times';
+  if (roundsLabel)    nlBits.push(`<span class="nl-dose"><b>${esc(roundsN ? roundsSay(roundsN) : roundsLabel)}</b></span>`);
   if (_rxC.dose)      nlBits.push(`<span>${esc(_rxC.dose.value + (_rxC.dose.side ? ' / side' : ''))}</span>`);
   if (_rxC.rpe)       nlBits.push(`<span class="nl-rpe"><span class="nl-k">Effort </span>${esc(_rxC.rpe)}/10</span>`);
-  if (_rxC.rest)      nlBits.push(`<span class="nl-rest"><span class="nl-k">Rest </span>${esc(formatRestLabel(_rxC.rest))}</span>`);
+  // The rest that paces the rounds: "Twice · rest 30 s between". Alone, or with one round, it is just "Rest 30 s".
+  if (_rxC.rest)      nlBits.push(roundsN > 1
+    ? `<span class="nl-rest"><span class="nl-k">rest </span>${esc(formatRestLabel(_rxC.rest))} between</span>`
+    : `<span class="nl-rest"><span class="nl-k">Rest </span>${esc(formatRestLabel(_rxC.rest))}</span>`);
   const numLine = nlBits.length ? `<div class="ex-numline">${nlBits.join('')}</div>` : '';
 
   const numBadge = num ? `<div class="ex-num">${String(num).padStart(2, '0')}</div>` : '';   // "09", as on a card

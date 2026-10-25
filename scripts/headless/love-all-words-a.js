@@ -296,6 +296,32 @@ async function orange(browser) {
   o = await run('fewer reps than asked (4 on a 6) says nothing', async p => { await p.fill(set0 + ' .ex-set-reps', '4'); }, false); await o.ctx.close();
 }
 
+// ═════════ rounds ═════════
+async function rounds(browser) {
+  const P = H.fixture();
+  const kb = [{ name: 'Kettlebell Swing', rx: { reps: 12 } }];
+  P.workouts.days[0].blocks.push({ title: 'Conditioning', exercises: [
+    { type: 'circuit', name: 'Engine Two', rx: { rounds: 2, rest: 30 }, items: kb },
+    { type: 'circuit', name: 'Engine Three', rx: { rounds: 3, rest: 30 }, items: kb },
+    { type: 'circuit', name: 'Engine Bare', rx: { rounds: 2 }, items: kb },
+    { type: 'circuit', name: 'Engine Old', rounds: '×3 Rounds', restSec: 45, items: kb },
+  ] });
+  const { ctx, p } = await H.openProgram(browser, { prog: P });
+  await p.evaluate("openDayView('1')");
+  await p.waitForTimeout(400);
+  const L = nm => cardOf(p, nm);
+  const two = await L('Engine Two'), three = await L('Engine Three'), bare = await L('Engine Bare'), old = await L('Engine Old');
+  t.check('rounds: 2 rounds with a 30 s rest says "Twice · rest 30 s between"', two === 'Twice · rest 30 s between' || /^Twice\s*rest 30 s between$/.test(two || ''), two);
+  t.check('rounds: 3 rounds says "3 times · rest 30 s between"', /^3 times\s*(·\s*)?rest 30 s between$/.test(three || ''), three);
+  t.check('rounds: no rest says just "Twice"', /^Twice$/.test(bare || ''), bare);
+  t.check('rounds: an older "×3 Rounds" card says it the same way', /^3 times\s*(·\s*)?rest 45 s between$/.test(old || ''), old);
+  const word = await p.evaluate(() => [...document.querySelectorAll('#day-view .ex-numline')].some(n => /Rounds/.test(n.innerText)));
+  t.check('rounds: "Rounds" is nowhere on a card line any more', !word, '');
+  t.check('rounds: no page errors', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+}
+
+
 (async () => {
   const browser = await H.launch();
   await rpe(browser);
@@ -305,6 +331,7 @@ async function orange(browser) {
   await rest(browser);
   await last(browser);
   await orange(browser);
+  await rounds(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
