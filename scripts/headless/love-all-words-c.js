@@ -1,5 +1,6 @@
 // Plain Words, Group C (Amir, 2026-10-25: "Go with your picks"): the words of Progress, the records page, the unit menu, Career and Crew.
 //   onerm      the records page never says "One-rep max" and explains its number in one plain line.
+//   plates     the unit menu's third row says what it counts: "Plates: how many plates on the stack".
 //   counts     the cover says "Cycle 2 of 3", under it "Week 2 of 5", the road says "5 weeks": one count per number.
 // Serve the repo first (python -m http.server <port> --bind 127.0.0.1; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js), then:
 //   node scripts/headless/love-all-words-c.js
@@ -66,10 +67,34 @@ async function onerm(browser) {
   }
 }
 
+// ═════════ plates ═════════
+async function plates(browser) {
+  const EMPTY = () => [0, 1, 2, 3].map(() => ({ w: '', n: '', r: '', d: false }));
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    const { ctx, p } = await H.openProgram(browser, { w, h, prog: H.fixture(), hist: [], seed: { _setlog_Barbell_Back_Squat: EMPTY() }, stub: { library: H.library() } });
+    await p.evaluate(`(() => { window.restAfterTick = () => {}; openDayView('1'); const c = ${H.card('Barbell Back Squat')}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = 'sq'; try { hideAaToast(); } catch (e) {} c.scrollIntoView({ block: 'center' }); })()`);
+    await p.waitForTimeout(350);
+    await p.click('#sq .ex-set-unit');
+    await p.waitForTimeout(200);
+    const m = await p.evaluate(() => {
+      const el = document.querySelector('.unit-menu'), r = el.getBoundingClientRect();
+      const row = el.querySelector('.unit-opt[data-u="plates"]');
+      return { text: row.innerText.replace(/\s+/g, ' ').trim(), name: row.querySelector('.unit-opt-n').textContent, hint: row.querySelector('.unit-opt-h').textContent,
+        inScreen: r.left >= 0 && r.right <= innerWidth, rowOver: [...el.querySelectorAll('.unit-opt')].map(o => o.scrollWidth - o.clientWidth), h: Math.round(row.getBoundingClientRect().height),
+        all: el.innerText };
+    });
+    t.check(`plates ${w}px: the third row reads Plates, then "how many plates on the stack"`, m.name === 'Plates' && m.hint === 'how many plates on the stack' && !/count the stack/.test(m.all), JSON.stringify(m));
+    t.check(`plates ${w}px: the menu stays on the screen and no row overflows`, m.inScreen && m.rowOver.every(x => x <= 0), JSON.stringify([m.inScreen, m.rowOver, m.h]));
+    t.check(`plates ${w}px: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await counts(browser);
   await onerm(browser);
+  await plates(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
