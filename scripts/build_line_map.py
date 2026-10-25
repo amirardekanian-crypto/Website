@@ -171,7 +171,7 @@ def parse(text):
             name = DECOR.sub(' ', name)
             name = re.sub(r'\s+', ' ', name).strip()
             if name and LETTERS.search(name):
-                blocks.append((name[:64], i))
+                blocks.append((name[:56], i))   # 56 since 2026-10-25 (the map sat at its ceiling); the real fix is splitting the map by area
             continue
 
         s = SCREEN.match(line)

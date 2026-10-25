@@ -72,7 +72,7 @@ async function guide(browser) {
   const has = (s) => text.includes(s);
   t.check('a. Career card: the level is the number in the ring on Home, and tapping it opens Your numbers', has('Your level is the number in the ring on Home') && has('Tap the ring to open Your numbers.'));
   t.check('a. …the old "Career row" lines are gone', !/Home has a Career row|Tap the Career row/.test(text));
-  t.check('b. Logging card: the arrow is next to the name, the i is on the right', has('The small arrow next to its name means it opens, and the i on the right is its info.') && !has('The small arrow on the right means it opens'));
+  t.check('b. Logging card: the arrow is next to the name, the i follows it', has('The small arrow next to its name means it opens, and the i after it is its info.') && !has('The small arrow on the right means it opens'));
   t.check('c. Records card: only a max put in with Log a max is labelled', has('A max you put in with Log a max is labelled') && !has('Every number is labelled'));
   t.check('d. Library: Done ticks the habit on the Today card, no AA Proof', has('ticks the matching habit on your Today card') && !/AA Proof/.test(text) && !/✓ the AA Proof/.test(text));
   t.check('e. Getting stronger: each new best, not weeks', has('(your best lift, each time you set a new best)') && !has('week by week'));

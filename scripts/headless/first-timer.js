@@ -141,11 +141,12 @@ const t = H.checker();
       await p.waitForTimeout(1000);
     }
     await p.waitForTimeout(1000);
-    // The card's top and its Done on screen (2026-10-13): the ready card can now carry "No RPE on N lifts", so the WhatsApp row
+    // The card's top and its Done on screen (2026-10-13). With a Still to log list (2026-10-25: nothing here was weighed or rated) the card is
+    // taller than the phone, and Done is what must show. The WhatsApp row
     // under Done may sit below the fold on a short phone; Done is what the card is for.
     const r = await p.evaluate(() => { const c = document.getElementById('confirm-1'), b = c.getBoundingClientRect(), d = c.querySelector('.confirm-btn').getBoundingClientRect();
-      return { vis: c.classList.contains('visible'), top: Math.round(b.top), done: Math.round(d.bottom), h: innerHeight }; });
-    t.check('finish card is on screen after the last card closes, its Done visible (' + label + ')', r.vis && r.top >= 0 && r.done <= r.h + 4, JSON.stringify(r));
+      return { vis: c.classList.contains('visible'), top: Math.round(b.top), done: Math.round(d.bottom), h: innerHeight, miss: c.querySelectorAll('.cf-miss-row').length }; });
+    t.check('finish card is on screen after the last card closes, its Done visible (' + label + ')', r.vis && (r.top >= 0 || r.miss) && r.done <= r.h + 4, JSON.stringify(r));
     t.check('no page errors (' + label + ')', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }

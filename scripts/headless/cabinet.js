@@ -112,14 +112,14 @@ async function openMe(browser, o = {}) {
     seed: Object.assign({ _hab_cfg: { onboarded: true, toured: true, installAsked: true, boardSwept: true, updatedAt: Date.now() } }, o.seed || {}) }, o.opts || {}));
 }
 const goCab = async p => { await p.evaluate(() => goTo('achievements')); await p.waitForFunction(() => !!document.querySelector('#ach-body .cab-grid'), null, { timeout: 8000 }).catch(() => {}); await p.waitForTimeout(250); };
-const waitDoor = p => p.waitForFunction(() => { const d = document.querySelector('#career-courts-wrap .hrow'); return !!d; }, null, { timeout: 10000 }).catch(() => {});
+const waitDoor = p => p.waitForFunction(() => { const d = document.querySelector('#career-card-wrap .cs-card .cs-ach'); return !!d; }, null, { timeout: 10000 }).catch(() => {});
 
 module.exports = { achFx, shelfRows, profileFx, openMe, goCab, waitDoor, V11, ME, WON, NEW_WON, dayWord, xpForLevel };
 
 // ── what the checks read ──
 const T = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); return e ? e.textContent.replace(/\s+/g, ' ').trim() : null; }, sel);
 const seenKeys = p => p.evaluate(id => JSON.parse(localStorage.getItem(id + '_cabseen') || 'null'), H.ID);
-const doorOf = p => p.evaluate(() => { const b = document.querySelector('#career-courts-wrap .hrow'); return b ? { v: b.querySelector('.hrow-vv').textContent.trim(), nw: ((b.querySelector('.hrow-new') || {}).textContent || '').trim(), s: b.querySelector('.hrow-v small').textContent.trim() } : null; });
+const doorOf = p => p.evaluate(() => { const b = document.querySelector('#career-card-wrap .cs-card .cs-ach'); return b ? { v: b.querySelector('.cs-ach-t small').firstChild.textContent.replace(/\s*·\s*$/, '').trim(), nw: ((b.querySelector('.cs-ach-new') || {}).textContent || '').trim(), s: b.querySelector('.cs-ach-t b').textContent.trim(), stk: b.querySelectorAll('.cs-ach-stk svg').length } : null; });   // the Achievements row at the foot of Your numbers (2026-10-25: the door on Progress is gone)
 const goProgress = async p => { await p.evaluate(() => goTo('plan')); await p.waitForTimeout(500); };
 const dotOn = p => p.evaluate(() => !!document.querySelector('#global-tabs .nav-item[data-tab="plan"] .nav-dot'));
 const sheetOpen = p => p.evaluate(() => { const o = document.getElementById('hist-overlay'); return !!o && o.classList.contains('visible'); });
@@ -205,8 +205,12 @@ async function today(browser, C) {
     await waitDoor(p);
     const d = await doorOf(p);
     C.check('seen: three won emblems this phone has not shown: the door says "34 of 94" and "3 new" in clay', !!d && d.v === '34 of 94' && d.nw === '3 new', JSON.stringify(d));
-    const clay = await p.evaluate(() => getComputedStyle(document.querySelector('#career-courts-wrap .hrow-new')).color);
-    C.check('seen: the "3 new" is clay text', /194, 81, 44/.test(clay), clay);
+    const clay = await p.evaluate(() => getComputedStyle(document.querySelector('#career-card-wrap .cs-ach-new')).color);
+    C.check('seen: the "3 new" is clay text', /194, 81, 44/.test(clay), clay);
+    C.check('seen: the Achievements row at the foot of Your numbers: the word Achievements, three newest emblems drawn, no big share button, no door on Progress',
+      d.s === 'Achievements' && d.stk === 3 && await p.evaluate(() => !document.querySelector('.cs-card .cs-share') && document.querySelectorAll('#career-courts-wrap .hrow, #career-moments-wrap .hrow').length === 0)
+      , JSON.stringify(d));
+    await goProgress(p);
     C.check('seen: the Progress tab carries a dot, and no number', await dotOn(p) && (await p.evaluate(() => document.querySelector('#global-tabs .nav-item[data-tab="plan"] .nav-dot').textContent === '')));
     await goCab(p);
     const n = await p.evaluate(() => ({ cards: [...document.querySelectorAll('#ach-body .cab-card')].map(c => c.querySelector('.cab-cn').textContent + (c.querySelector('.cab-new') ? ' NEW' : '')), dots: [...document.querySelectorAll('#ach-body .cab-cell .cab-dot')].map(d => d.closest('.cab-cell').dataset.k).sort() }));
@@ -223,12 +227,35 @@ async function today(browser, C) {
     C.check('seen: the list is this phone\'s own: never in the synced snapshot', await p.evaluate(id => !Object.keys(_snapshot()).some(k => /cabseen|lvseen/.test(k)) && !!localStorage.getItem(id + '_cabseen'), H.ID));
     await ctx.close();
   }
+  // a tap on the Achievements row opens the cabinet (2026-10-25: the row replaced the door on Progress)
+  {
+    const { ctx, p } = await openMe(browser, {});
+    await waitDoor(p);
+    const scr = await p.evaluate(() => { document.querySelector('#career-card-wrap .cs-ach').click(); return new Promise(r => setTimeout(() => r((document.querySelector('.screen.active') || {}).id), 500)); });
+    C.check('today: a tap on the Achievements row opens the cabinet', scr === 'screen-achievements', scr);
+    await ctx.close();
+  }
+  // Home's habits page, "From your habits": opens the cabinet on its Habits shelf (filter All, scrolled to the Habits section), 2026-10-25
+  {
+    const { ctx, p } = await openMe(browser, { seed: { aa_cab_filter: 'won' } });
+    await waitDoor(p);
+    await p.evaluate(() => goTo('habits'));
+    await p.waitForTimeout(500);
+    const has = await p.evaluate(() => !![...document.querySelectorAll('#screen-habits .hrow')].find(x => /From your habits/.test(x.textContent)));
+    await p.evaluate(() => { localStorage.setItem('aa_cab_filter', 'won'); const b = [...document.querySelectorAll('#screen-habits .hrow')].find(x => /From your habits/.test(x.textContent)); if (b) b.click(); });
+    await p.waitForTimeout(700);
+    const sh = await p.evaluate(() => { const sec = [...document.querySelectorAll('#ach-body .cab-sec')].find(x => ((x.querySelector('.cab-t') || {}).textContent || '').trim() === 'Habits'); const r = sec && sec.getBoundingClientRect();
+      return { screen: (document.querySelector('.screen.active') || {}).id, pressed: [...document.querySelectorAll('#ach-body .cab-chip[aria-pressed="true"]')].map(b => b.textContent).join(), sec: !!sec, top: r ? Math.round(r.top) : null, vh: innerHeight }; });
+    C.check('habits: "From your habits" opens the cabinet on the Habits shelf: filter set to All, scrolled to the Habits section',
+      has && sh.screen === 'screen-achievements' && sh.pressed === 'All' && sh.sec && sh.top >= -2 && sh.top < sh.vh * 0.5, JSON.stringify([has, sh]));
+    await ctx.close();
+  }
   // no answer: no door, no page, nothing else changes
   {
     const { ctx, p } = await openMe(browser, { noAch: true });
     await p.waitForTimeout(1500);
     await goProgress(p);
-    const o = await p.evaluate(() => ({ door: !!document.querySelector('#career-courts-wrap .hrow'), card: !!document.querySelector('.cs-card'), medal: !!document.querySelector('.cs-card .cs-lm svg') }));
+    const o = await p.evaluate(() => ({ door: !!document.querySelector('.cs-ach'), card: !!document.querySelector('.cs-card'), medal: !!document.querySelector('.cs-card .cs-lm svg') }));
     C.check('today: no get_achievements answer: no Achievements door, Your numbers as before (with the level medal beside Level 24)', !o.door && o.card && o.medal, JSON.stringify(o));
     C.check('today: no answer: no page errors', !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();

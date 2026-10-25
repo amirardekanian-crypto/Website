@@ -23,6 +23,8 @@
   (letter, name, dose, kg) ran 34–42 px wide of a 320 px phone and cut the kg box off the card. A warm-up's
   rows have no box and stay one line.
   Guided still leaves warm-ups out (WK-01). Working circuits keep their cues open, as before.
+- Since 2026-10-25 a warm-up row and a warm-up circuit have a circle on the right, and every circuit one per round
+  (*One circle, everywhere*, section 36).
 
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*

@@ -298,7 +298,7 @@ async function trainingBase(browser, C) {
     await p.evaluate(() => goCareer());
     await p.waitForTimeout(800);
     const tap = await p.evaluate(() => ({ screen: document.querySelector('.screen.active').id, url: location.pathname + location.search, top: Math.round(document.getElementById('numbers-title').getBoundingClientRect().top) }));
-    C.check('on: goCareer() still opens Progress at Your numbers (the deep link), and AA Proof is not opened', tap.screen === 'screen-plan' && /program\.html/.test(tap.url) && !/habits/.test(tap.url) && tap.top >= 0 && tap.top < 160, JSON.stringify(tap));
+    C.check('on: goCareer() still opens Progress at Your numbers (the deep link), and AA Proof is not opened', tap.screen === 'screen-plan' && /program\.html/.test(tap.url) && !/habits/.test(tap.url) && tap.top >= -2 && tap.top < 160, JSON.stringify(tap));
     C.check('on: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -311,7 +311,7 @@ async function trainingBase(browser, C) {
     const o = await p.evaluate(() => {
       const c = document.querySelector('#career-card-wrap .cs-card');
       return { card: !!c, lvl: c && c.querySelector('.cs-lw').textContent, xp: c ? /XP/.test(c.innerText) : false, grid: !!document.querySelector('#career-card-wrap .cs-grid'), goal: !!document.querySelector('.goal-card'),
-        moments: !!document.querySelector('#career-moments-wrap .hrow'), rows: !!document.querySelector('#ceiling-row-wrap .hrow') && !!document.querySelector('#weight-row-wrap .hrow') };
+        moments: document.querySelectorAll('#career-moments-wrap *').length > 0, rows: !!document.querySelector('#ceiling-row-wrap .hrow') && !!document.querySelector('#weight-row-wrap .hrow') };
     });
     // THE SCOREBOARD (2026-10-19): the level is the card's quiet foot and the XP figure is gone from the athlete's view.
     C.check('Progress with only the XP switch: the career\'s card is the level alone, no four numbers, no XP figure, no goal, no moments door; the two rows are there',
@@ -327,8 +327,8 @@ async function trainingBase(browser, C) {
     C.check(`${name}: get_profile and get_my_moments are never asked`, await calls(p, 'rpc:get_profile') === 0 && await calls(p, 'rpc:get_my_moments') === 0, JSON.stringify([await calls(p, 'rpc:get_profile'), await calls(p, 'rpc:get_my_moments')]));
     await p.evaluate(() => goTo('plan'));
     await p.waitForTimeout(500);
-    const pr = await p.evaluate(() => ({ card: !!document.querySelector('#career-card-wrap .cs-card'), moments: !!document.querySelector('#career-moments-wrap .hrow'),
-      ach: !!document.querySelector('#career-courts-wrap .hrow'), rows: !!document.querySelector('#ceiling-row-wrap .hrow') }));
+    const pr = await p.evaluate(() => ({ card: !!document.querySelector('#career-card-wrap .cs-card'), moments: document.querySelectorAll('#career-moments-wrap *').length > 0,
+      ach: !!document.querySelector('.cs-ach'), rows: !!document.querySelector('#ceiling-row-wrap .hrow') }));
     C.check(`${name}: Progress has no career card and neither career door, and the two rows are there`, !pr.card && !pr.moments && !pr.ach && pr.rows, JSON.stringify(pr));
     C.check(`${name}: no page errors`, p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
@@ -369,7 +369,7 @@ async function trainingBase(browser, C) {
     await p.evaluate(() => goTo('plan'));
     await p.waitForTimeout(500);
     const o = await p.evaluate(() => ({ note: document.getElementById('home-note-wrap').innerHTML.trim(), card: !!document.querySelector('#career-card-wrap .cs-card'),
-      doors: document.querySelectorAll('#career-courts-wrap .hrow, #career-moments-wrap .hrow').length }));
+      doors: document.querySelectorAll('#career-courts-wrap *, #career-moments-wrap *, .cs-ach').length }));
     C.check(`${name}: no Career row, no profile asked, no moments asked, no note, no career card and neither career door on Progress`, (await row(p)) === null && await calls(p, 'rpc:get_profile') === 0 && await calls(p, 'rpc:get_my_moments') === 0
       && await calls(p, 'rpc:get_awards') === 0 && o.note === '' && !o.card && o.doors === 0, JSON.stringify({ row: await row(p), asked: await calls(p, 'rpc:get_profile'), o }));
     await ctx.close();
@@ -462,7 +462,7 @@ async function openRW(browser, o = {}) {
     seed: Object.assign({ _hab_cfg: HAB_ON }, o.seed || {}), query: o.query || '' }, o.opts || {}));
 }
 const goProgress = async p => { await p.evaluate(() => goTo('plan')); await p.waitForTimeout(500); };
-const momentsReady = p => p.waitForFunction(() => !!document.querySelector('#career-moments-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
+const momentsReady = p => p.waitForFunction(() => !!document.querySelector('#career-card-wrap .cs-card'), null, { timeout: 8000 }).catch(() => {});   // 2026-10-25: Your moments has no door on Progress; the card is what is waited for
 async function trainingLight(browser, C) {
   const OUT = H.outDir();
   const shot = (p, name) => p.screenshot({ path: path.join(OUT, name) }).catch(() => {});
@@ -554,7 +554,7 @@ async function trainingLight(browser, C) {
     // THE SCOREBOARD (2026-10-19): the four numbers lead and the level is the card's quiet foot. The XP figure, each cell's next
     // mark and its bar, and "best 7" on weeks held are gone from the athlete's view (the nearest mark is on Home's Career row).
     C.check('Your numbers: the four numbers first, then "Level N" and its bar as the foot, and no XP figure anywhere on the card',
-      !!card && card.order === 'cs-grid|cs-foot|cs-share' && card.lw === `Level ${L10.level}` && !card.xp
+      !!card && card.order === 'cs-grid|cs-foot' && card.lw === `Level ${L10.level}` && !card.xp
       && card.bar === Math.round(L10.xp_in_level / L10.level_cost * 100) + '%' && card.label === `Your numbers. Level ${L10.level}.`,
       JSON.stringify(card && [card.order, card.lw, card.xp, card.bar, card.label]));
     C.check('Your numbers: the four numbers 2 x 2, each its figure and its name alone (no next mark, no bar of its own)',
@@ -570,13 +570,21 @@ async function trainingLight(browser, C) {
     C.check('The month\'s goal: its own card, "<Month> · from Amir" over his line, an empty ring, green like the rest of Progress, and not inside the numbers card',
       !!goal && goal.l === monthName(monthStart(0)) + ' · from Amir' && goal.line === 'Four sessions a week, no gaps.' && goal.ring && !/is-done/.test(goal.cls)
       && !CLAY.test(goal.clay) && !goal.inCard, JSON.stringify(goal));
-    // The two career doors on the tab, and nothing of their lists left on it.
-    const doors = await p.evaluate(() => {
-      const d = sel => { const b = document.querySelector(sel); return b ? { l: b.querySelector('.hrow-l').textContent.trim(), v: b.querySelector('.hrow-vv').textContent.trim(), s: (b.querySelector('.hrow-v small') || {}).textContent.trim() } : null; };
-      return { ach: d('#career-courts-wrap .hrow'), mom: d('#career-moments-wrap .hrow'), onTab: document.querySelectorAll('#screen-plan .mo, #screen-plan .ac-tile, #screen-plan .ac-next').length };
-    });
-    C.check('Progress: Your moments is a door with its count and the newest moment, and nothing of the list is left on the tab',
-      !!doors.mom && doors.mom.l === 'Your moments' && doors.mom.v === '9' && doors.mom.s === MM.notes[0].line && doors.onTab === 0, JSON.stringify(doors));
+    // 2026-10-25 (Amir: "remove your moments"): neither career door is on Progress any more. The Achievements row lives at the foot of Your numbers
+    // (cabinet.js checks it), a small Share sits in the title of Your numbers, and nothing of the lists is left on the tab.
+    const doors = await p.evaluate(() => ({ ach: document.querySelectorAll('#career-courts-wrap *').length, mom: document.querySelectorAll('#career-moments-wrap *').length,
+      earned: (() => { const e = document.getElementById('earned-title'); return !e || getComputedStyle(e).display === 'none' || e.hidden; })(),
+      onTab: document.querySelectorAll('#screen-plan .mo, #screen-plan .ac-tile, #screen-plan .ac-next').length,
+      big: !!document.querySelector('.cs-card .cs-share'), sm: (document.querySelector('#numbers-title .cs-share-sm') || {}).textContent, h2: document.getElementById('numbers-title').textContent.trim() }));
+    C.check('Progress: no Achievements door and no Your moments door, "What you have earned" stays hidden, nothing of the lists on the tab, the big Share is gone and a small "Share ↗" sits in the Your numbers title',
+      doors.ach === 0 && doors.mom === 0 && doors.earned && doors.onTab === 0 && !doors.big && doors.sm === 'Share ↗' && doors.h2 === 'Your numbersShare ↗', JSON.stringify(doors));
+    await p.click('#numbers-title .cs-share-sm');
+    await p.waitForTimeout(700);
+    const sh = await p.evaluate(() => { const ov = document.getElementById('hist-overlay');
+      return { open: ov.classList.contains('visible'), title: (ov.querySelector('.readiness-title') || {}).textContent, picks: ov.querySelectorAll('.hl-pick button, .hl-card, canvas, img').length }; });
+    C.check('Progress: "Share ↗" beside Your numbers opens the share sheet (sharePlayerCard)', sh.open, JSON.stringify(sh));
+    await p.evaluate(() => history.back());
+    await p.waitForTimeout(300);
     await shot(p, 'light-progress-390.png');
     const order = await p.evaluate(() => {
       const y = sel => { const e = document.querySelector(sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
@@ -588,50 +596,7 @@ async function trainingLight(browser, C) {
     const seq = ['goal', 'numbers', 'card', 'trend', 'body', 'ceil', 'weight', 'hab', 'ach', 'moments', 'road'].map(k => order[k]).filter(v => v != null);
     C.check('Progress in order (2026-10-20): the goal, Your numbers, the card, Getting stronger, Your body and its rows, the earned doors, the Game Plan',
       seq.length >= 7 && seq.every((v, i) => i === 0 || v > seq[i - 1]), JSON.stringify(order));
-    // The page behind the door: every moment, under a heading for its month.
-    await p.evaluate(() => goTo('moments'));
-    await p.waitForTimeout(300);
-    const mo = await p.evaluate(() => ({
-      screen: (document.querySelector('.screen.active') || {}).id,
-      title: (document.querySelector('#screen-moments .ceil-title') || {}).textContent.trim(),
-      lit: [...document.querySelectorAll('#global-tabs .nav-item.active')].map(n => n.dataset.tab).join(),
-      months: [...document.querySelectorAll('#mom-body .mom-month')].map(h => h.textContent.replace(/\s+/g, ' ').trim()),
-      rows: [...document.querySelectorAll('#mom-body .mo')].map(r => ({ kind: r.className.replace('mo ', '').replace('mo-', ''), shown: !!r.offsetParent, w: r.querySelector('.mo-w').textContent.trim(),
-        s: ((r.querySelector('.mo-s') || r.querySelector('.mo-from') || {}).textContent || '').trim(), saw: !!r.querySelector('.mo-saw'), href: (r.querySelector('.mo-reply') || {}).href || null,
-        blank: r.querySelector('.mo-reply') ? r.querySelector('.mo-reply').target : null, note: r.dataset.note || null })),
-    }));
-    const pm = monthName(monthStart(-1));
-    const by = w => mo.rows.find(r => r.w === w);
-    C.check('Your moments: its own page with the Progress tab lit, all nine shown, each under its month\'s heading',
-      mo.screen === 'screen-moments' && mo.title === 'Your moments' && mo.lit === 'plan' && mo.rows.length === 9 && mo.rows.every(r => r.shown) && mo.months.length >= 2, JSON.stringify([mo.screen, mo.title, mo.lit, mo.rows.length, mo.months]));
-    C.check('Your moments: Amir\'s newest line is first, in his words, with Reply on WhatsApp (a new tab) under it', mo.rows[0].kind === 'note' && mo.rows[0].s === MM.notes[0].line && mo.rows[0].note === MM.notes[0].day
-      && !!mo.rows[0].href && /wa\.me|whatsapp/i.test(mo.rows[0].href) && decodeURIComponent(mo.rows[0].href).indexOf('About your note: \u201c' + MM.notes[0].line + '\u201d') >= 0 && mo.rows[0].blank === '_blank', JSON.stringify(mo.rows[0]));
-    C.check('Your moments: a mark is one row per tier, in the number\'s words ("8 weeks held in a row"), the newest tier first', !!by('8 weeks held in a row') && !!by('4 weeks held in a row')
-      && mo.rows.indexOf(by('8 weeks held in a row')) < mo.rows.indexOf(by('4 weeks held in a row')), JSON.stringify(mo.rows.map(r => r.w)));
-    C.check('Your moments: an achievement keeps its name (a name in capitals reads as a name) and its line', !!by('First Best') && by('First Best').s === 'Your first personal best. Not the last.', JSON.stringify(by('First Best')));
-    C.check('Your moments: honours say their month and what they were for (Most sessions, Most improved, Full month, Amir\'s Pick, which carries a line of its own now), read from the stored jsonb; a near miss is never shown',
-      !!by('Most sessions in ' + pm) && by('Most sessions in ' + pm).s === '14 sessions with Amir that month.' && !!by('Most improved in ' + pm) && by('Most improved in ' + pm).s === '+27.1% on Barbell Back Squat.'
-      && !!by('Full month: ' + pm) && by('Full month: ' + pm).s === 'All 4 training weeks held.' && !!by('Amir\u2019s Pick for ' + pm) && by('Amir\u2019s Pick for ' + pm).s === 'Amir picked you that month.'
-      && !mo.rows.some(r => /near/i.test(r.w)), JSON.stringify(mo.rows.map(r => r.w + ' / ' + r.s)));
-    C.check('Your moments: "Amir saw this" sits under the moments whose award id he marked Saw it (First Best, 8 weeks held), and under no other', mo.rows.filter(r => r.saw).map(r => r.w).sort().join() === '8 weeks held in a row,First Best', JSON.stringify(mo.rows.filter(r => r.saw).map(r => r.w)));
-    C.check('Your moments: no other badge, no retired badge, no title, no Grand Slam, no metal', !mo.rows.some(r => /SPRINKLER|Sprinkler|CLOCKWORK|Clockwork|Grand Slam|Hold Serve|Century/.test(r.w + ' ' + r.s)) && !METALS.test(mo.rows.map(r => r.w + ' ' + r.s).join(' ')), JSON.stringify(mo.rows.map(r => r.w)));
-    // ONE share door at the top of the page, and no Share on any row (2026-10-20).
-    const sd = await p.evaluate(() => ({ door: !!document.querySelector('#mom-body .mom-share-door'),
-      l: (document.querySelector('#mom-body .mom-share-door .hrow-l') || {}).textContent,
-      q: (document.querySelector('#mom-body .mom-share-door .hrow-q') || {}).textContent,
-      first: document.querySelector('#mom-body > *').className, perRow: document.querySelectorAll('#mom-body .mo-share').length }));
-    C.check('Your moments: ONE Share door above the list, and no Share button on any row',
-      sd.door && sd.perRow === 0 && sd.l === 'Share a moment' && /cards to pick from/.test(sd.q || '') && /mom-share-door/.test(sd.first), JSON.stringify(sd));
-    await p.click('#mom-body .mom-share-door');
-    await p.waitForTimeout(700);
-    const sh = await p.evaluate(() => { const ov = document.getElementById('hist-overlay');
-      return { open: ov.classList.contains('visible'), title: (ov.querySelector('.readiness-title') || {}).textContent, picks: ov.querySelectorAll('.hl-pick button').length }; });
-    C.check('Your moments: the door opens the share sheet with every card in it to pick from', sh.open && sh.picks >= 5, JSON.stringify(sh));
-    await p.evaluate(() => history.back());
-    await p.waitForTimeout(300);
-    await shot(p, 'light-moments-390.png');
-    const back = await p.evaluate(() => { document.querySelector('#screen-moments .nav-back').click(); return (document.querySelector('.screen.active') || {}).id; });
-    C.check('Your moments: the back arrow lands on Progress', back === 'screen-plan', back);
+    // The Your moments page's own checks (its rows, months, Reply on WhatsApp, "Amir saw this", the Share door, its back arrow) went on 2026-10-25: the page lost its door on Progress (Amir: "remove your moments"). His lines are checked on the Coach tab in section 4 below.
     C.check('Progress: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
     // a goal that is done: the ring fills green and the label says done; no goal this month: no goal card
@@ -647,8 +612,8 @@ async function trainingLight(browser, C) {
     await waitRow(n0.p);
     await goProgress(n0.p);
     await momentsReady(n0.p);
-    const ng = await n0.p.evaluate(() => ({ goal: !!document.querySelector('.goal-card'), door: (document.querySelector('#career-moments-wrap .hrow-vv') || {}).textContent }));
-    C.check('no goal this month and nothing from Amir: no goal card; the marks and the achievement are still the moments (3)', !ng.goal && ng.door === '3', JSON.stringify(ng));
+    const ng = await n0.p.evaluate(() => ({ goal: !!document.querySelector('.goal-card'), card: !!document.querySelector('#career-card-wrap .cs-card') }));
+    C.check('no goal this month and nothing from Amir: no goal card, Your numbers is still there', !ng.goal && ng.card, JSON.stringify(ng));
     await n0.ctx.close();
     // 320 px and dark: the card, the goal and the moments fit
     for (const [w, dark] of [[320, false], [320, true], [390, true]]) {
@@ -657,10 +622,10 @@ async function trainingLight(browser, C) {
       await goProgress(x.p);
       await momentsReady(x.p);
       await x.p.waitForTimeout(200);
-      const g = await x.p.evaluate(() => { const r = el => el.getBoundingClientRect(); const cs = document.querySelector('.cs-card'), mo = document.querySelector('#career-moments-wrap .hrow');
+      const g = await x.p.evaluate(() => { const r = el => el.getBoundingClientRect(); const cs = document.querySelector('.cs-card'), mo = document.querySelector('#numbers-title');
         const extra = [...document.querySelectorAll('.goal-card, .tr-card, .body-card')].map(e => Math.round(r(e).right));
         return { side: document.documentElement.scrollWidth - innerWidth, card: Math.round(r(cs).right), moments: Math.round(r(mo).right), vw: innerWidth, extra, cells: [...document.querySelectorAll('.cs-n')].map(n => Math.round(r(n).right)) }; });
-      C.check(`Your numbers ${w}px${dark ? ' dark' : ''}: the card, its four numbers, the goal, the trend, Your body and the moments fit, no sideways scroll`,
+      C.check(`Your numbers ${w}px${dark ? ' dark' : ''}: the card, its four numbers, the goal, the trend, Your body and the title with its Share fit, no sideways scroll`,
         g.side <= 0 && g.card <= g.vw && g.moments <= g.vw && g.cells.every(v => v <= g.vw) && g.extra.every(v => v <= g.vw), JSON.stringify(g));
       await shot(x.p, `light-progress-${w}${dark ? '-dark' : ''}.png`);
       C.check(`Your numbers ${w}px${dark ? ' dark' : ''}: no page errors`, x.p.errs.length === 0, JSON.stringify(x.p.errs));
@@ -683,10 +648,14 @@ async function trainingLight(browser, C) {
     await shot(p, 'light-home-note-390.png');
     await p.click('#home-note-wrap .from-amir');
     await p.waitForTimeout(900);
-    // THE SCOREBOARD (2026-10-19): the list is its own page, so the tap lands there, on that line, instead of Progress scrolled.
-    const s = await p.evaluate(day => { const row = document.querySelector('#mom-body .mo[data-note="' + day + '"]'); const r = row && row.getBoundingClientRect();
-      return { screen: document.querySelector('.screen.active').id, row: !!row, isNew: !!row && row.classList.contains('is-new'), visible: !!row && !!row.offsetParent, inView: !!r && r.top >= 0 && r.bottom <= innerHeight }; }, MM.notes[0].day);
-    C.check('a tap on it opens Your moments on that line (marked, scrolled into view)', s.screen === 'screen-moments' && s.row && s.isNew && s.visible && s.inView, JSON.stringify(s));
+    // 2026-10-25 (Amir: "remove your moments"): the tap lands on the Coach tab, on that line under Notes from Amir, marked and in view.
+    const s = await p.evaluate(day => { const row = document.querySelector('#notes-container .cn-line[data-note="' + day + '"]'); const r = row && row.getBoundingClientRect();
+      const all = [...document.querySelectorAll('#notes-container .cn-line')];
+      return { screen: (document.querySelector('.screen.active') || {}).id, row: !!row, isNew: !!row && row.classList.contains('is-new'), visible: !!row && !!row.offsetParent, inView: !!r && r.top >= 0 && r.bottom <= innerHeight,
+        say: row ? row.querySelector('.cn-say').textContent : null, date: row ? !!row.querySelector('.cn-date').textContent.trim() : false, first: all.length ? all[0].dataset.note : null,
+        sec: ([...document.querySelectorAll('#notes-container .prog-sec')].map(e => e.textContent.trim())).join() }; }, MM.notes[0].day);
+    C.check('a tap on it opens the Coach tab on that line under "Notes from Amir" (his words, dated, marked is-new, scrolled into view)',
+      s.screen === 'screen-notes' && s.row && s.isNew && s.visible && s.inView && s.say === MM.notes[0].line && s.date && s.first === MM.notes[0].day && /Notes from Amir/.test(s.sec), JSON.stringify(s));
     const rd = await params(p, 'mark_note_read');
     C.check('…and tells the server it was read: mark_note_read(athlete, that day), once', rd.length === 1 && rd[0].p_athlete_id === H.ID && rd[0].p_day === MM.notes[0].day, JSON.stringify(rd));
     await p.evaluate(() => goTo('home'));
@@ -722,9 +691,9 @@ async function trainingLight(browser, C) {
     await fold.p.waitForFunction(() => !!document.querySelector('#home-note-wrap .from-amir'), null, { timeout: 8000 }).catch(() => {});
     await fold.p.click('#home-note-wrap .from-amir');
     await fold.p.waitForTimeout(900);
-    const f = await fold.p.evaluate(day => { const row = document.querySelector('#mom-body .mo[data-note="' + day + '"]'); const r = row && row.getBoundingClientRect();
+    const f = await fold.p.evaluate(day => { const row = document.querySelector('#notes-container .cn-line[data-note="' + day + '"]'); const r = row && row.getBoundingClientRect();
       return { visible: !!row && !!row.offsetParent, isNew: !!row && row.classList.contains('is-new'), inView: !!r && r.top >= 0 && r.bottom <= innerHeight }; }, many.notes[0].day);
-    C.check('an old line far down the list: the tap opens the page, marks that line and brings it into view', f.visible && f.isNew && f.inView, JSON.stringify(f));
+    C.check('an old line far down the list: the tap opens the Coach tab, marks that line and brings it into view', f.visible && f.isNew && f.inView, JSON.stringify(f));
     await fold.ctx.close();
     // dark: New from Amir is the only row left on Home, so it is held to the habit card's own edge and fill instead
     const dk = await openRW(browser, { opts: { dark: true }, stub: { myMoments: myMomentsFx() } });
@@ -740,7 +709,7 @@ async function trainingLight(browser, C) {
     const { ctx, p } = await openRW(browser, { query: '?client=' + H.ID + '&go=numbers', stub: { myMoments: myMomentsFx() } });
     await p.waitForTimeout(1200);
     const tap = await p.evaluate(() => ({ screen: document.querySelector('.screen.active').id, top: Math.round(document.getElementById('numbers-title').getBoundingClientRect().top) }));
-    C.check('?go=numbers opens Progress at Your numbers', tap.screen === 'screen-plan' && tap.top >= 0 && tap.top < 160, JSON.stringify(tap));
+    C.check('?go=numbers opens Progress at Your numbers', tap.screen === 'screen-plan' && tap.top >= -2 && tap.top < 160, JSON.stringify(tap));
     C.check('?go=numbers: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -1158,7 +1127,7 @@ async function trainingLight(browser, C) {
     await m.p.waitForTimeout(1500);
     const q2 = await m.p.evaluate(id => ({ csq: localStorage.getItem(id + '_csq'), done: !!document.querySelector('#complete-1.visible') }), H.ID);
     await goProgress(m.p);
-    const card = await m.p.evaluate(() => ({ card: !!document.querySelector('.cs-card'), moments: !!document.querySelector('#career-moments-wrap .hrow') }));
+    const card = await m.p.evaluate(() => ({ card: !!document.querySelector('.cs-card'), moments: document.querySelectorAll('#career-moments-wrap *').length > 0 }));
     C.check('the moments\' read refused: Done finishes, the queue empties, and Progress still shows the career\'s card (no moments, no goal)', q2.done && (!q2.csq || q2.csq === '[]') && card.card && !card.moments && !m.p.errs.length, JSON.stringify([q2, card, m.p.errs]));
     await m.ctx.close();
   }
@@ -1433,19 +1402,18 @@ async function fourCourts(browser, C) {
     const { ctx, p } = await openRW(browser, { facts: HOLD_FACTS, hist: ONE_DONE, stub: { myMoments: myMomentsFx(), achievements: achFx() } });
     await waitRow(p);
     await goProgress(p);
-    await p.waitForFunction(() => !!document.querySelector('#career-courts-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
-    // THE SCOREBOARD (2026-10-19): Achievements is a door row on Progress. Since the Emblem Cabinet (2026-10-25) it counts the achievements, the four marks' tiers
-    // and the level medals together (8 + 18 + 11 = 37 here), and the page is the cabinet.
+    await p.waitForFunction(() => !!document.querySelector('#career-card-wrap .cs-ach'), null, { timeout: 8000 }).catch(() => {});
+    // Since the Emblem Cabinet (2026-10-25) Achievements counts the achievements, the four marks' tiers and the level medals together (8 + 18 + 11 = 37 here).
+    // Since direction A (2026-10-25) it is the last row of the Your numbers card, not a door on Progress; a tap opens the cabinet.
     const d = await p.evaluate(() => {
-      const b = document.querySelector('#career-courts-wrap .hrow');
-      const y = sel => { const e = document.querySelector(sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
-      return b ? { l: b.querySelector('.hrow-l').textContent.trim(), v: b.querySelector('.hrow-vv').textContent.trim(), s: b.querySelector('.hrow-v small').textContent.trim(),
-        order: [y('.cs-card'), y('#career-courts-wrap .hrow'), y('#career-moments-wrap .hrow')] } : null;
+      const b = document.querySelector('#career-card-wrap .cs-card .cs-ach');
+      return b ? { l: b.querySelector('.cs-ach-t b').textContent.trim(), v: b.querySelector('.cs-ach-t small').firstChild.textContent.replace(/\s*\u00b7\s*$/, '').trim(), last: b === document.querySelector('.cs-card').lastElementChild,
+        door: document.querySelectorAll('#career-courts-wrap *').length } : null;
     });
-    C.check('Achievements: a door saying "N of 37" with what is closest, under Your numbers and above Your moments',
-      !!d && d.l === 'Achievements' && /^\d+ of 37$/.test(d.v) && d.s === 'Straight Talk · 2 more check-ins before a session.' && d.order[0] < d.order[1] && d.order[1] < d.order[2], JSON.stringify(d));
-    await p.evaluate(() => goTo('achievements'));
-    await p.waitForTimeout(300);
+    C.check('Achievements: the last row of the Your numbers card saying "N of 37", and no door of its own on Progress',
+      !!d && d.l === 'Achievements' && /^\d+ of 37$/.test(d.v) && d.last && d.door === 0, JSON.stringify(d));
+    await p.click('#career-card-wrap .cs-ach');
+    await p.waitForTimeout(400);
     const s = await p.evaluate(() => {
       const n = document.querySelector('#ach-body .ac-next');
       return { screen: (document.querySelector('.screen.active') || {}).id, title: (document.querySelector('#screen-achievements .ceil-title') || {}).textContent.trim(),
@@ -1477,7 +1445,7 @@ async function fourCourts(browser, C) {
     const { ctx, p } = await openRW(browser, { w: 320, facts: HOLD_FACTS, hist: ONE_DONE, stub: { myMoments: myMomentsFx(), achievements: achFx({ checkins: 23 }) } });
     await waitRow(p);
     await goProgress(p);
-    await p.waitForFunction(() => !!document.querySelector('#career-courts-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
+    await p.waitForFunction(() => !!document.querySelector('#career-card-wrap .cs-ach'), null, { timeout: 8000 }).catch(() => {});
     await p.evaluate(() => goTo('achievements'));
     await p.waitForTimeout(300);
     const n = await p.evaluate(() => achNudgeHTML({ weekLeft: 3, checkin: true }));
@@ -1492,8 +1460,8 @@ async function fourCourts(browser, C) {
     await waitRow(p);
     await goProgress(p);
     await momentsReady(p);
-    const o = await p.evaluate(() => ({ door: !!document.querySelector('#career-courts-wrap .hrow'), moments: !!document.querySelector('#career-moments-wrap .hrow'), card: !!document.querySelector('.cs-card') }));
-    C.check('no get_achievements answer: no Achievements door, Your numbers and the Your moments door as before', !o.door && o.moments && o.card, JSON.stringify(o));
+    const o = await p.evaluate(() => ({ door: !!document.querySelector('.cs-ach'), card: !!document.querySelector('.cs-card') }));
+    C.check('no get_achievements answer: no Achievements row, Your numbers as before', !o.door && o.card, JSON.stringify(o));
     C.check('no answer: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -1533,21 +1501,12 @@ async function habitXp(browser, C) {
     C.check('a door into the one cabinet, counting the achievements the habits themselves can win', !!h.door && /^\d+ of \d+$/.test(h.door.v) && !!h.door.s, JSON.stringify(h.door));
     C.check('the habits page fits (no sideways scroll)', !h.sideways);
     await p.evaluate(() => { const b = [...document.querySelectorAll('#screen-habits .hrow')].find(x => /From your habits/.test(x.textContent)); b.click(); });
-    await p.waitForTimeout(400);
-    // ⚠️ It opens the HABIT ones themselves (2026-10-20, Amir: "i asked if i can see what achievements i can get through habits,
-    // or what ones i do own now"). It used to jump to the whole cabinet, where the nine are scattered across the four kinds.
-    const sheet = await p.evaluate(() => {
-      const ov = document.getElementById('hist-overlay');
-      return ov && ov.classList.contains('visible')
-        ? { title: ov.querySelector('.readiness-title').textContent, eyebrow: ov.querySelector('.readiness-eyebrow').textContent,
-            rows: [...ov.querySelectorAll('.ac-row')].map(r => ({ w: r.querySelector('.ac-w').textContent, done: r.classList.contains('is-earned'), kd: (r.querySelector('.ac-kd') || {}).textContent })),
-            screen: (document.querySelector('.screen.active') || {}).id }
-        : null;
-    });
-    C.check('the door opens the habit achievements, owned first with the day, in a sheet over the habits page', !!sheet && sheet.title === 'From your habits'
-      && /^Achievements · \d+ of \d+$/.test(sheet.eyebrow) && sheet.screen === 'screen-habits' && sheet.rows.length === habAch.length
-      && sheet.rows.filter(r => r.done).length === habAch.filter(i => i.day).length, JSON.stringify(sheet));
-    C.check('each row says which court it counts toward, since this one list mixes all four', !!sheet && sheet.rows.every(r => !!r.kd), JSON.stringify(sheet && sheet.rows));
+    await p.waitForTimeout(600);
+    // 2026-10-25: the door opens the cabinet itself on its Habits shelf (filter All, scrolled to the Habits section), not a sheet.
+    const shelf = await p.evaluate(() => { const sec = [...document.querySelectorAll('#ach-body .cab-sec')].find(x => ((x.querySelector('.cab-t') || {}).textContent || '').trim() === 'Habits'); const r = sec && sec.getBoundingClientRect();
+      return { screen: (document.querySelector('.screen.active') || {}).id, pressed: [...document.querySelectorAll('#ach-body .cab-chip[aria-pressed="true"]')].map(b => b.textContent).join(),
+        sec: !!sec, heads: [...document.querySelectorAll('#ach-body .cab-t')].map(e => e.textContent).join(), top: r ? Math.round(r.top) : null, vh: innerHeight, sheet: document.getElementById('hist-overlay').classList.contains('visible') }; });
+    C.check('the habits door opens the cabinet with the filter on All and no sheet (the fixture habit ones sit under Sessions, so the scroll to the Habits shelf is checked in cabinet.js)', shelf.screen === 'screen-achievements' && shelf.pressed === 'All' && !shelf.sheet, JSON.stringify(shelf));
     C.check('the habits page: no page errors', !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();
   }

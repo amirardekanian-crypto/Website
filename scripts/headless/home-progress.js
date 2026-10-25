@@ -159,7 +159,7 @@ function noStrip(browser) {
     // (no career_facts in this fixture, so there is no run to sit beside the count: hold-serve.js owns that check)
     t.check('Home with the career: the week\'s count says only the week when there is no run', /sessions? done this week$/.test((home.week || '').trim()), home.week);
     await p.evaluate(() => goTo('plan'));
-    await p.waitForFunction(() => !!document.querySelector('#career-moments-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
+    await p.waitForFunction(() => !!document.querySelector('#career-card-wrap .cs-card'), null, { timeout: 8000 }).catch(() => {});   // 2026-10-25: Progress has no Your moments door; the card is the wait
     await p.waitForTimeout(400);
     const o = await p.evaluate(() => {
       const y = sel => { const e = document.querySelector('#screen-plan ' + sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
@@ -171,14 +171,14 @@ function noStrip(browser) {
         goal: (document.querySelector('.goal-card') || {}).innerText };
     });
     // 2 marks (4 and 8 weeks held), the achievement, Amir's line and two honours
-    t.check('Progress with the career: five section titles, each naming a different subject (2026-10-20)',
-      o.sec.join('|') === "Your numbers|Getting stronger|Your body|What you've earned|Game Plan", o.sec.join('|'));
+    t.check('Progress with the career: four section titles, each naming a different subject (2026-10-25: "What you have earned" stays hidden, and the small Share sits in the Your numbers title)',
+      o.sec.join('|') === "Your numbersShare ↗|Getting stronger|Your body|Game Plan", o.sec.join('|'));
     // This athlete has no habit config and no get_achievements answer, so those two doors are not drawn: the order is what is there.
-    t.check('Progress with the career: the doors in order under the card, the training\'s own first (Personal records, Body weight, Daily habits, then Your moments)',
-      o.doors.join('|') === 'Personal records|Body weight|Daily habits|Your moments', o.doors.join('|'));
+    t.check('Progress with the career: the doors in order under the card, the training\'s own first (Personal records, Body weight, Daily habits) and no Achievements or Your moments door on Progress (2026-10-25)',
+      o.doors.join('|') === 'Personal records|Body weight|Daily habits' && o.y.ach === null && o.y.moments === null, o.doors.join('|'));
     const y = o.y;
     t.check('Progress with the career, in order: This cycle, the month\'s goal, Your numbers, the card, the doors, the Game Plan',
-      y.card < y.goal && y.goal < y.numbers && y.numbers < y.career && y.career < y.ceil && y.ceil < y.weight && y.weight < y.moments && y.moments < y.plan, JSON.stringify(y));
+      y.card < y.goal && y.goal < y.numbers && y.numbers < y.career && y.career < y.ceil && y.ceil < y.weight && y.weight < y.plan, JSON.stringify(y));
     t.check('…the goal is Amir\'s line for this month', /· from Amir/i.test(o.goal || '') && /Four sessions a week, no gaps\./.test(o.goal || ''), o.goal);
     t.check('no page errors (Progress with the career)', p.errs.length === 0, p.errs.join(' | '));
     await shot(p, 'progress-career');
