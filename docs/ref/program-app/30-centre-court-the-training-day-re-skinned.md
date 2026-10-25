@@ -104,7 +104,7 @@ dashboard do not change.
   - **The set table**: white boxes edged `--field`, the set numbers grey and the live set the one green number (a
     disc), LAST inside an empty kg box, a done set 700 with no box, the RPE tag in its own column 40+ px clear of the
     tick, **How hard?** a sand band that hangs off its set with 48 px keys, and the ghost line in that row's RPE slot,
-    *LAST 5 @ 9* (`paintLastTime()` writes `last 5 @ <b>9</b>`: the weight is in the box already). Columns are tokens on
+    *Last time 5 reps · 9/10* on two lines (`paintLastTime()`; a set with no reps number says its weight, *Last time 60 kg*). Columns are tokens on
     `.ex-set-log` (`--c-set`, `--c-tag`, `--c-tick`, `--c-gap`), narrower under 360 so the boxes hold *102.5*.
   - **The foot row** (A's P50): **Note** on the left (a 32 px outlined circle with its chevron, then *NOTE*) and **Rest ⏱
     2:30** on the right, the primary button with its time, the stopwatch drawn in mint (the button's text keeps the ⏱

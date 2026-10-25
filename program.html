@@ -3646,9 +3646,10 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn.selected { background: var(--fill); border-color: transparent; color: #fff; box-shadow: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn.selected.over { background: var(--clay-fill); border-color: transparent; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn.selected.under { background: var(--steel); border-color: transparent; }
-  /* last time, only on a set that ran over: "LAST 5 @ 9" in the RPE slot, in the LAST caption's grammar, until the set is ticked */
+  /* last time, only on a set that ran over: "Last time 5 reps · 9/10" in the effort slot, on two lines, until the set is ticked */
   :where(#day-view, .step-scroll, #ws-body) .lt-ghost { grid-column: -3 / -2; grid-row: 1; align-self: center; justify-self: start; margin: 0; padding-left: 4px; white-space: nowrap;
-    pointer-events: none; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+    pointer-events: none; font: 600 var(--fs-label)/1.2 'Barlow', sans-serif; letter-spacing: 0; text-transform: none; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .lt-ghost span { display: block; }
   :where(#day-view, .step-scroll, #ws-body) .lt-ghost b { font-weight: 700; color: var(--clay-ink); }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .lt-ghost { display: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row.rd-extra { opacity: .45; }
@@ -11441,7 +11442,7 @@ const APP_GUIDE = [
   { icon: 'compass', title: 'What each day builds',
     body: `<p>The <strong>Next up</strong> card on Home, and the top of each day, show up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Your history on every exercise',
-    body: `<p>Every exercise remembers what you did. An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. A set that ran <strong>over</strong> its target last time also shows a faint "last" line under today's row.</p><p>For the whole story, tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>: every time you've done it, your reps, your efforts and your notes, and how your best set has moved.</p><p>A superset or circuit still shows <strong>Last time</strong> when you open it, because its boxes don't show last time's weights.</p><p>It shows what you did, never what to lift. Train to today's effort target, and I'll put a weight in the Coach's Note when I want one.</p>` },
+    body: `<p>Every exercise remembers what you did. An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. A set that ran <strong>over</strong> its target last time also shows a faint <em>Last time</em> line beside today's row.</p><p>For the whole story, tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>: every time you've done it, your reps, your efforts and your notes, and how your best set has moved.</p><p>A superset or circuit still shows <strong>Last time</strong> when you open it, because its boxes don't show last time's weights.</p><p>It shows what you did, never what to lift. Train to today's effort target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'Personal Records: the most you could lift once',
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
@@ -23906,8 +23907,10 @@ function paintLastTime(card) {
       const g = document.createElement('div');
       g.className = 'lt-ghost';
       const w = histWt(s.w), n = (s.n != null && s.n !== '') ? s.n : (e.reps || null);
-      // "last 5 @ 9": the weight is in the kg box already (Centre Court, 2026-10-12). w stays for a bodyweight set.
-      g.innerHTML = `last${n ? ' ' + esc(String(n)) : (w ? ' ' + esc(w) : '')} @ <b>${esc(String(s.r))}</b>`;
+      // "Last time 5 reps · 9/10" (Plain Words, Amir 2026-10-25), on two lines in the slot: the words, then what it was. A set with no reps
+      // number says its weight ("Last time 60 kg"), the one case where the kg box is not enough on its own.
+      const what = n ? esc(String(n)) + (Number(n) === 1 ? ' rep' : ' reps') : (w ? esc(weightText(s.w)) : '');
+      g.innerHTML = `<span class="lt-g1">Last time</span> <span class="lt-g2">${what ? what + ' · ' : ''}<b>${esc(String(s.r))}/10</b></span>`;
       row.appendChild(g);
     });
   }

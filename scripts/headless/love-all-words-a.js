@@ -216,6 +216,42 @@ async function rest(browser) {
   await ctx.close();
 }
 
+// ═════════ last ═════════
+// The fixture's history has the squat at 6 · 7 · 7 · 8 (6 reps, 6, 6, 5) against a target of 7: set 4 ran over, so it carries the ghost.
+async function last(browser) {
+  for (const w of [320, 360, 390]) {
+    const { ctx, p } = await H.openProgram(browser, { w, h: 844 });
+    await p.evaluate("openDayView('1')");
+    await p.waitForTimeout(400);
+    await openCard(p, 'Barbell Back Squat');
+    await p.waitForTimeout(700);
+    const g = await p.evaluate(() => {
+      const c = [...document.querySelectorAll('#day-view .checklist-item')].find(c => c.querySelector('.item-name').textContent.trim() === 'Barbell Back Squat');
+      const rows = [...c.querySelectorAll('.ex-set-row')];
+      const ghost = rows.map(r => r.querySelector('.lt-ghost'));
+      const r3 = rows[3], gh = ghost[3];
+      if (!gh) return { ghosts: ghost.map(x => x ? x.innerText.replace(/\s+/g, ' ').trim() : null) };
+      const a = gh.getBoundingClientRect(), tick = r3.querySelector('.ex-set-check').getBoundingClientRect(), reps = r3.querySelector('.ex-set-reps').getBoundingClientRect(), row = r3.getBoundingClientRect();
+      return { ghosts: ghost.map(x => x ? x.innerText.replace(/\s+/g, ' ').trim() : null), l: Math.round(a.left), r: Math.round(a.right), tickL: Math.round(tick.left), repsR: Math.round(reps.right), top: Math.round(a.top - row.top), bot: Math.round(row.bottom - a.bottom), sw: document.documentElement.scrollWidth };
+    });
+    if (w === 390) t.check('last: the over set says "Last time 5 reps · 8/10" and only that set has one', JSON.stringify(g.ghosts) === JSON.stringify([null, null, null, 'Last time 5 reps · 8/10']), JSON.stringify(g.ghosts));
+    t.check(`last: at ${w} px the line sits inside its row, clear of the reps box and the tick, no sideways scroll`, g.l >= g.repsR - 1 && g.r <= g.tickL + 1 && g.top >= -1 && g.bot >= -1 && g.sw <= w, JSON.stringify(g));
+    await ctx.close();
+  }
+  // a set with no reps number says its weight
+  const hist = [{ completed_on: H.past(2), day: '1', readiness: 4, log: [{ ex: 'Barbell Back Squat', block: 'Strength', reps: '', note: '', sets: [{ w: '60', n: '', r: '9', d: true }, { w: '60', n: '', r: '7', d: true }, { w: '60', n: '', r: '7', d: true }, { w: '60', n: '', r: '7', d: true }] }] }];
+  const { ctx, p } = await H.openProgram(browser, { hist });
+  await p.evaluate("openDayView('1')");
+  await p.waitForTimeout(400);
+  await openCard(p, 'Barbell Back Squat');
+  await p.waitForTimeout(700);
+  const wt = await p.evaluate(() => { const c = [...document.querySelectorAll('#day-view .checklist-item')].find(c => c.querySelector('.item-name').textContent.trim() === 'Barbell Back Squat'); const g = c.querySelector('.lt-ghost'); return g ? g.innerText.replace(/\s+/g, ' ').trim() : null; });
+  t.check('last: a set with only a weight says "Last time 60 kg" (and its effort)', /^Last time 60 kg/.test(wt || ''), wt);
+  t.check('last: the old "LAST 5 @ 9" form is gone', !/@/.test(wt || ''), wt);
+  await ctx.close();
+}
+
+
 (async () => {
   const browser = await H.launch();
   await rpe(browser);
@@ -223,6 +259,7 @@ async function rest(browser) {
   await lowerDay(browser);
   await tempo(browser);
   await rest(browser);
+  await last(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
