@@ -34,8 +34,8 @@ off in their app settings"*. Two reminders, both opt-out once the phone allows t
   **nothing at all when the answer is already in** — on, blocked, or waiting for the Home Screen.
   Joining the crew makes the join toast ITSELF the ask rather than stacking a second one behind it:
   two toasts in a row is how a person learns to swipe them away.
-  Guard: `scripts/headless/crew.js` (16 checks, including that nothing reaches the phone until the
-  button is tapped, and the cheers line's) and `scripts/headless/lounge.js` section 22 (First Serve and
+  Guard: `scripts/headless/crew.js` (its checks that nothing reaches the phone until the
+  button is tapped, the cheers line's among them) and `scripts/headless/lounge.js` section 22 (First Serve and
   the cheers line: the box is shut on load,
   on the line, on the sheet and on the toast, and opens once, inside the button's click).
 - **The phone's box cannot be skipped by anyone.** Apple and Google both require the athlete's own tap.

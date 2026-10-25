@@ -70,7 +70,8 @@ athlete ids replaced by plain descriptions (the repo is public).
 | 54 | [🏟️ Players' Lounge (2026-10-24): the Player Page, faces, the cheer, This cycle, Player facts and signatures (steps 0 to 6)](docs/ref/program-app/54-players-lounge.md) | 21 KB |
 | 55 | [🏟️ Players' Lounge, continued: @names, First Serve, Bring a partner, the cards and the Open wall (steps 7 to 11), and the 2026-10-25 fixes](docs/ref/program-app/55-players-lounge-continued.md) | 23 KB |
 | 56 | [🏅 The cabinet: Achievements as emblems, a medal every ten levels, Trophies on a Player Page (the Emblem Cabinet, 2026-10-25)](docs/ref/program-app/56-the-cabinet.md) | 10 KB |
+| 57 | [🏠 Home Crowd (round 7 step 1, 2026-10-25): line icons for the reactions, a smaller band, one name for the settings, tap cues, asking where they finish, Amir's Pick as a card, Land on It](docs/ref/program-app/57-home-crowd.md) | 14 KB |
 
 ---
 
-*56 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*
+*57 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*

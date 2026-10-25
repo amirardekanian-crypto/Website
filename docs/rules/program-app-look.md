@@ -98,7 +98,7 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   posts, photos and kudos live 7 days and are left out of `BACKUP_TABLES` on purpose (`SHORT_LIVED` in `restore_backup.py`), a photo is a JPEG made on the
   phone (1080 px, about 200 KB: Amir, 2026-10-19, *"irans internet is very slow"*) and stored as a row (never Storage: a Storage file cannot be deleted from SQL), Tell the crew posts a session only with a photo,
   and an athlete Amir ticks under 13 reads only. A new crew table goes into `coach_erase_person()` and the snapshot the same day.
-  **Kudos is a Like** (Amir, 2026-10-19), with **🔥 💪 👏 😍** beside it (stage82, live 2026-10-19) (`crew_emoji_list()`; the app draws them only
+  **Kudos is a Like** (Amir, 2026-10-19), with four reactions beside it, drawn as line icons **Fire, Strong, Well done, Love it** (Amir, 2026-10-25: the stored values are still **🔥 💪 👏 😍**, and never the clap, which is the Cheer's) (stage82, live 2026-10-19) (`crew_emoji_list()`; the app draws them only
   while `get_bell()` hands over the list, so it degrades to the Like alone). One reaction per person.
   **THE REACTION ROW IS A ROW YOU CAN USE, OR NO ROW** (2026-10-20, Amir from his live phone: *"why do i have those under my posts then?"*,
   *"If i chose like under a post, why are there more emotes to choose?"*, *"When i choose emote, why others are still there?"*, and then, again:
@@ -109,6 +109,7 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   out on a post and the Like with whatever has been used and the rest behind a **＋** on a moment line. Nothing on this row is ever a disabled
   button, the keyboard stays on the chip it pressed, and what the app lets an athlete tap is the server's own gate (`can_post`), so a former
   athlete is never offered a reaction that will be refused.
+  **Amir's Pick is a card on Crew for 7 days** from the pick (stage100, 2026-10-25), with his reason in his words, drawn only for a crew member; the one clay thing on it is Cheer (`PROGRAM-APP.md` → *Home Crowd*).
   **The week comes first, and nothing on Crew is ranked by two ladders** (stage91, 2026-10-20, direction B of the audit *The Empty Room*): the top of
   the tab is the crew's own week (sessions and weeks held over the Bell's same 7 days) and it is never empty; **a finished session rings as ONE line a
   day for the whole crew**, naming only members whose switch is on, on by default and **with no notification** (Amir: *"unless if 20 ppl train, we wil

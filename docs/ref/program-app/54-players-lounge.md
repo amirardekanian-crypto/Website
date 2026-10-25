@@ -15,7 +15,7 @@ flag only stage96's `get_bell()` sends). A new screen is a static `.screen` with
 
 **What.** Every person drawn in Crew is a door to their page: a post's face and name, a reply's face and name, the faces on the week band, the rows of
 *In the crew*, the board on the tab and its page, the honours names, the Open board's rows and the name in a Bell line. Amir ("Coach") opens the Coach tab.
-Your own name opens your own page; so does *Your page* under your initials and the same row in *Crew and the Bell*. The page (`screen-crewplayer`) is one
+Your own name opens your own page; so does *Your page* under your initials and the same row in *What the crew sees* (named *Crew and the Bell* until 2026-10-25). The page (`screen-crewplayer`) is one
 scroll: the person's current cycle picture as the cover (YOUR page: `cycleArt()` of your own current cycle, so exactly your Progress; someone else's: the `art` family they send when it names one of the app's pictures, else `bedrock`; the app never reads a cycle name from the server) with ← on it, their
 face over the cover's foot with `LV n`, the name, *With Amir since June 2026*, **Sara's numbers** as tiles (weeks held, sessions with Amir, personal bests and
 cheers, the same four on every page; the cheers number is every cheer that person has been sent since joining (a like is not a cheer, stage98, 2026-10-25), `cheers.total`, and YOUR page adds your comebacks as a thin row under the tiles, marked *Only you*), the latest three achievements and *All n* (a sheet), the honours, and *This week*, their posts still on the

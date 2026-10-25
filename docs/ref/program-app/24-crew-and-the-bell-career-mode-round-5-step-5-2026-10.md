@@ -9,13 +9,13 @@ decides what rings and who can be seen, and never sends this app another athlete
   before stage81 is live, in the demo and in the coach's preview there is no Crew, and the static markup (and every older test) still has four
   tabs. A server that says the function is missing (PGRST202, 404: `crewMissingErr()`) takes the tab and the copy away. Its icon is the bell;
   a **clay dot** sits on it while Amir's pinned post has not been opened on this phone (`<id>_crewseen`), the one clay thing Crew shows (DS-01),
-  with the post's *Pinned* chip in clay on the visit that first shows it (`_crewFreshPin`).
+  with the post's *Pinned* chip on the visit that first shows it (`_crewFreshPin`; a green outline since 2026-10-25, it was clay: `PROGRAM-APP.md` → *Home Crowd*).
 - **THE WEEK FIRST** (stage91, 2026-10-20; direction B of the audit *The Empty Room*, https://claude.ai/artifact/6VAMqcv12S9Y7rNCLEwmdM, Amir's
   pick). The tab was well built and almost empty: 6 in the crew, 4 posts ever, ONE moment rang in eight weeks, and six of the Bell's ten items were
   *joined the crew*, a line each person gets once — so on 26 October the whole feed would have swept to *"Quiet so far this week"*. What was missing
   was the thing an athlete actually does every week. Now:
   - **A green band at the top** (`crewWeekHTML()`, `.cr-week` on `--hero`): *Last 7 days · N in the crew*, then the crew's sessions and weeks held
-    over the same 7 days the Bell covers, then a strip of initials (`.cr-faces`) that opens **In the crew**. It is the one block that is never
+    over the same 7 days the Bell covers, then a strip of initials (`.cr-faces`) that opens **In the crew** (since 2026-10-25 the **In the crew ›** button sits beside the two lines, not under the faces: `PROGRAM-APP.md` → *Home Crowd*). It is the one block that is never
     empty, because somebody always trained; with no sessions it says *Nobody has trained yet · Finish one and the crew sees it*. Both counts come
     from `get_bell()`'s `week` and respect each member's own switches, so a count can only move on the same event that moves the feed — which is why
     it is in the payload at all and the board is not (stage83's `{same:true}` would otherwise break every time anybody ticked a habit).
@@ -32,11 +32,11 @@ decides what rings and who can be seen, and never sends this app another athlete
     and a ← back to Crew (`renderCrewPage()`), both built from the copy on the phone, so both open with no signal.
 - **The screen** (`renderCrew()`, `#crew-body`): the eyebrow *Train together* and the title; **the question, once** (`crewAskHTML()`: *Ring the
   bell for the crew?*, **Ring it** / **Keep it to me** → `crew_answer()` with the board name, `crewDefaultName()`); **last month's honours** from the
-  1st to the 14th (four tiles, crew members only); **The Bell** · *Last 7 days*: the composer row (*Share something with the crew*, only with a yes
+  1st to the 14th (four tiles, crew members only); **The Bell** · *What's new*: the composer row (*Share something with the crew*, only with a yes
   and not under 13), then the feed in the server's order (Amir's post of the last 24 hours pinned first): a **post** is a card (`crewPostHTML()`:
   initials, name, when, the words, the photo at 4:5 cropped to fill, Likes with names, *Delete* on your own through `armedTap()`), a **moment** a
   slim green line with the bell (`crewLineHTML()`: *Mina reached level 14 · set a new best on Barbell Back Squat · held a week, 5 in a row*,
-  `crewPartText()`; a best names the lift, never a weight); then *What the crew sees of you ›* and the **board** (`crew_board()`, stage91: the CREW
+  `crewPartText()`; a best names the lift, never a weight); then the **board** (`crew_board()`, stage91: the CREW
   only, plain numbers, *You* tinted, no medals).
   **The board shows the crew and nothing else** (2026-10-20): it was `leaderboard_top()`, which is the whole board, so it listed 23 names — six who
   had never been asked the crew question, and Ghazal, who chose *Keep it to me*, by name and level — under a screen that promises nothing of yours
@@ -45,8 +45,8 @@ decides what rings and who can be seen, and never sends this app another athlete
   sorts is this season's, so on 20 October it read *1. Ehsan A. LV 14 — 3,153* above *4. Elmira A. LV 29 — 1,114*. One ladder on one block. The rows
   are kept on the phone under `<id>_crewboard`, so the bottom of Crew is no longer the one piece that needs signal.
   **A no is not a door closing** (Amir, 2026-10-20: *"if ghazal wants to come back, let her have a way"*): the line for an athlete who kept it to
-  themselves now ends *"You can join whenever you like, just below"*, and the row under it is the settings page with the Yes/No toggle that was
-  always there and never said so.
+  themselves now ends *"You keep your moments to yourself, so the crew does not see you here."*, with a green **Join the crew** button under it (2026-10-25; the old
+  *just below* pointed at a foot row that is gone: `PROGRAM-APP.md` → *Home Crowd*).
 - **A Like** (`crewLike()`): on at once here, the server's answer (who gave it) replaces it, a refusal puts it back. *You, Sara and 2 others*
   (`crewKudosWords()`). Not on your own. **A non-member's Like is not dead** (Amir, 2026-10-19: *"if some one want to like a photo and
   they are not allowed to do, they should be notified to join first"*): it calls `crewLikeAsk()`, a toast that says to join with one
@@ -61,11 +61,11 @@ decides what rings and who can be seen, and never sends this app another athlete
   each while every promise said 200 KB — on a slow connection each one is paid for by every athlete who opens Crew. The server's limits come back as words (`crewErrWords()`): 3 photos and 10 posts a day. No signal: the post stays in the sheet to send
   again (nothing is queued).
 - **Tell the crew** (`paintCrewTell()`): a door row under the WhatsApp row of every finished card (`.complete-crew[data-day]` inside `.complete-wa`,
-  so the card's grid rows did not move), shown while the athlete can post. It opens the composer as a session: *Day 2 done. 47 sessions with
+  so the card's grid rows did not move), shown while the athlete can post (since 2026-10-25 also to one who has not answered the crew question, and its tap then goes to Crew: `PROGRAM-APP.md` → *Home Crowd*). It opens the composer as a session: *Day 2 done. 47 sessions with
   Amir.* drafted (`crewSessionDraft()`, the count from `careerMarkCells()`), and **Post waits for a photo**: a finished session reaches the Bell
   only with one (Amir's rule).
 - **The Like and four emoji, all five out** (Amir, 2026-10-19, direction A of https://claude.ai/artifact/KkF7qE5yomcLdxKYF1mjo8: *"lets go
-  with all five out style"*, and *"instead of racket go with hearty eyes"*): `crewReactRow()` draws the Like then **🔥 💪 👏 😍**, each its own
+  with all five out style"*, and *"instead of racket go with hearty eyes"*): `crewReactRow()` draws the Like then **🔥 💪 👏 😍** (stored as those characters, drawn since 2026-10-25 as line icons Fire, Strong, Well done and Love it: `PROGRAM-APP.md` → *Home Crowd*), each its own
   chip with its count. One per person (`crewLike(btn, em)`): tapping another **swaps** yours, tapping yours takes it back, so the total never
   moves twice for one athlete. The row is drawn **only while the server hands over the list** (`BELL.emoji`, stage82): without it the Like
   stands alone, exactly as stage81 left it, so the app shipped before the stage was applied. The whole row repaints after a tap
@@ -83,7 +83,7 @@ decides what rings and who can be seen, and never sends this app another athlete
 - **The words** (Amir, 2026-10-19): the button is **Like**, never Kudos; the question is **Join the crew?** with *Join the crew* and
   *Keep it to me*; the account sheet says **In the crew**. The server's function is still `crew_kudos()` and the payload is still `kudos`:
   nobody reads those.
-- **The yes and the switches** (`openCrewSettings()`, from your initials → **Crew and the Bell**, and from *What the crew sees of you*): Yes / No,
+- **The yes and the switches** (`openCrewSettings()`, from your initials → **What the crew sees**, named *Crew and the Bell* until 2026-10-25): Yes / No,
   a switch per kind (`crew_kinds()`: a new level, a week held, a mark, an achievement, a personal best, a cycle finished, the month's honours, the
   Monthly Open), and what a no does. An athlete Amir ticked **under 13** reads only: no question, no composer, no Like, no Tell the crew.
 - **Five things that were broken, fixed 2026-10-20** (the audit's bug list; the three above it — the board's membership, its LV chip, and a no with
@@ -149,7 +149,7 @@ decides what rings and who can be seen, and never sends this app another athlete
   deletes every `aap-*` cache on a version bump. `crewSweepPhotos()` runs after each fresh feed and drops everything the feed no longer names,
   so a photo leaves the phone when its post leaves the server at 7 days. Photos are still only asked for when their card comes within 400 px
   of the screen, so a long feed nobody scrolls costs one small read.
-- **The guide** (CNT-01): the card *Crew and the Bell* and Crew's line in *Getting around* show only while the tab does (`when: () => crewOn()`, the
+- **The guide** (CNT-01): the card *Crew* (it was *Crew and the Bell* until 2026-10-25) and Crew's line in *Getting around* show only while the tab does (`when: () => crewOn()`, the
   `<!--crew-->` mark in Getting around).
 - **Tests**: `scripts/headless/crew.js` (**140 checks** since 2026-10-20 — section 16 is the band, the attendance line folded to one a day, the day
   headings, the board behind its door and kept on the phone, both pages and their ←, a server without stage91 falling back to `leaderboard_top`, the
