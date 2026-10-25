@@ -210,6 +210,28 @@ function loungeSeed(db, today) {
   const jon = db.programs.find(p => p.athlete_id === 'jon_court');
   if (jon) jon.data.athlete.lang = 'fa';
 }
+// ── The weekly crew (stage102), made up like everything here ─────────────────────────────────────────────────────
+// buildSeed({ weekly: true }) turns the stub's stage102 coach functions on (coach_crew_weekly and its four writes) and seeds them: window.__DB.crew_weekly is
+// the object coach_crew_weekly() answers. The Bell's clock is Thursday 2026-11-12, so this week is Monday 2026-11-09. Two open questions and one answered.
+function weeklySeed(db, today) {
+  const p = today.split('-'), d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])); d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  const mon = n => { const x = new Date(d.getTime()); x.setUTCDate(x.getUTCDate() + 7 * n); return x.toISOString().slice(0, 10); };
+  const wk = (n, q, a, b, theme, va, vb, closed) => ({ week: mon(n), q, a, b, theme, closed: !!closed, va: va || 0, vb: vb || 0 });
+  db.crew_weekly = {
+    week: mon(0), members: 5, answered_month: 1,
+    weeks: [wk(0, 'When do you train best?', 'Morning', 'Evening', 'Your shoes after a session', 3, 2),
+            wk(1, 'Which day do you like more?', 'Lower body', 'Upper body', 'A session at sunrise or sunset'),
+            wk(2, 'Rest day or easy ride?', 'Rest', 'Ride', null), wk(4, 'Team or solo?', 'Team', 'Solo', null)],
+    questions: [
+      { id: 11, athlete_id: 'ava_test', body: 'How long should I rest between sets?', ok_name: true, at: iso(today, 1), answer: null, answered_at: null },
+      { id: 12, athlete_id: 'ben_test', body: 'Is it ok to train when I am sore?', ok_name: false, at: iso(today, 2), answer: null, answered_at: null },
+      { id: 13, athlete_id: 'eli_new', body: 'What do I eat before a match?', ok_name: true, at: iso(today, 6), answer: 'Something simple you have tried before.', answered_at: iso(today, 3) },
+    ],
+  };
+  // Amir's post that answered a question: session.ask holds who asked and what (the Bell shows "ELI ASKED" above his answer)
+  if (db.crew_bell) db.crew_bell.posts.push({ id: 'b0000000-0000-4000-8000-0000000000e1', athlete_id: '__coach__', amir: true, who: 'Amir', seen: true, kind: 'post', body: 'Something simple you have tried before.',
+    photo: false, ago_min: 4000, kudos: 0, session: { ask: { q: 'What do I eat before a match?', by: 'Eli' } } });
+}
 function partnerSeed(db, today) {
   const row = (code, id, name) => ({ code, percent: 10, reward_percent: 10, kind: 'athlete', coach_name: name, coach_name_fa: null, instagram: null, whatsapp: null, email: null, athlete_id: id,
     applied_on: daysAgo(today, 20), active: true, retired_on: null, notes: null, created_at: iso(today, 20) });
@@ -368,6 +390,7 @@ function buildSeed(opt) {
   if (opt.open) openSeed(db, today);
   if (opt.lounge) loungeSeed(db, today);
   if (opt.partner) partnerSeed(db, today);
+  if (opt.weekly) weeklySeed(db, today);
   if (opt.bigHistory) {
     for (let i = 0; i < opt.bigHistory; i++) {
       db.session_history.push(session('bulk_' + (i % 40), 'Bulk ' + (i % 40), (i % 3) + 1, daysAgo(today, 30 + Math.floor(i / 40))));
@@ -382,6 +405,7 @@ function buildSeed(opt) {
     crew: !!(opt.crew || opt.open || opt.lounge),   // stub.js: the stage81 functions (the Bell) answer only when this is on
     open: !!opt.open,                 // stub.js: the stage85 functions (the Monthly Open) answer only when this is on
     lounge: !!opt.lounge,             // stub.js: stage96's coach functions (faces, cheers) and the table athlete_profile answer only when this is on
+    weekly: !!opt.weekly,             // stub.js: stage102's coach functions (the Toss, the bank, the Mailbag) answer only when this is on
     partner: !!opt.partner,           // stub.js: stage97's partner-code functions and the table referral_credits answer only when this is on
     // The month just gone's honours as the server would work them out (see stub.js: liveHonours). Made up; nothing is computed.
     honoursLive: opt.honoursLive !== undefined ? opt.honoursLive : opt.court ? {

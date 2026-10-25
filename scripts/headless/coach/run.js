@@ -587,7 +587,8 @@ async function takeBackup(page, tag) {
 }
 S['backup-basic'] = async (b) => {
   const r = { id: 'backup-basic', title: 'Athletes → ⤓ Backup: every table, every row', checks: [] };
-  const { page, log } = await L.openCoach(b, {});
+  // A server with every stage: athlete_profile (stage96) and referral_credits (stage97) are in BACKUP_TABLES, and a stub without them is an INCOMPLETE backup.
+  const { page, log } = await L.openCoach(b, { seed: { lounge: true, partner: true } });
   const live = await L.db(page);
   const { file, name } = await takeBackup(page, 'basic');
   const listed = await page.evaluate(() => BACKUP_TABLES.slice());
@@ -608,7 +609,7 @@ S['backup-basic'] = async (b) => {
 // reads the name, and it must not silence the weekly reminder.
 S['backup-incomplete'] = async (b) => {
   const r = { id: 'backup-incomplete', title: 'A backup that could not read a table is named INCOMPLETE and does not count as the weekly one', checks: [] };
-  const { page, log } = await L.openCoach(b, {});
+  const { page, log } = await L.openCoach(b, { seed: { lounge: true, partner: true } });   // every stage, as backup-basic
   const stamp = await page.evaluate(() => new Date().toISOString().slice(0, 10));
   await page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'hab_intake', op: 'select', message: 'fixture: cannot read hab_intake', times: 1 }));
   const bad = await takeBackup(page, 'incomplete');
@@ -839,7 +840,7 @@ S['athlete-delete-fails'] = async (b) => {
 S['danger-panels'] = async (b) => {
   const r = { id: 'danger-panels', title: 'The five long confirm()s are panels under their buttons, the long alert()s are notice() lines with Copy, and the demo draws neither', checks: [] };
   const FX = require('./fixtures');
-  const { page, log, today } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ben_test/file', seed: { lounge: true, partner: true } });   // every stage, so its backup is complete
   const asked = () => page.evaluate(() => (typeof _danger !== 'undefined' && _danger) ? _danger.key : null);
   const ptxt = async () => (await page.locator('.dangerask').innerText()).replace(/\s+/g, ' ');
   const clip = () => page.evaluate(() => navigator.clipboard.readText());
@@ -3052,7 +3053,7 @@ S['proof-home'] = async (b) => {
   });
   const colsOk = !geo.missing && geo.wall.l === geo.board.l && geo.wall.t < geo.board.t
     && ['pulse', 'season'].every(k => geo[k].l === geo.quest.l) && geo.quest.l > geo.wall.l + geo.wall.w - 1
-    && geo.quest.t < geo.pulse.t && geo.pulse.t < geo.season.t && Math.abs(geo.wall.t - geo.quest.t) < 3;
+    && geo.quest.t < geo.pulse.t && geo.pulse.t < geo.season.t && geo.wall.t >= geo.quest.t - 3;   // the wall is at the top of the left column, or under the Crew desk (This week, This month) when the server has them
   check(r, 'two columns: The wall then The board on the left; Quest week, Proof pulse and Season (last) on the right, level at the top (no Titles minted: titles left with the cut, stage78)', colsOk, geo);
   check(r, 'the left column is the wider one (about 1.3 to 1)', !geo.missing && geo.wall.w / geo.quest.w > 1.2 && geo.wall.w / geo.quest.w < 1.4, geo.missing || [geo.wall.w, geo.quest.w]);
   const wallTxt = await txt('#wallPanel');
@@ -3282,7 +3283,7 @@ S['nav-seven'] = async (b) => {
 
   // 1. the seven places and their two badges
   const tabs = await tabsOf();
-  check(r, 'seven tabs, in this order, with these addresses: Today, Athletes, Exercises, Proof, Leads, Library, Buyers', JSON.stringify(tabs.map(t => t.label)) === JSON.stringify(['Today', 'Athletes', 'Exercises', 'Proof', 'Leads', 'Library', 'Buyers']) && JSON.stringify(tabs.map(t => t.href)) === JSON.stringify(['#today', '#athletes', '#exercises', '#proof', '#leads', '#links', '#buyers']), tabs);
+  check(r, 'seven tabs, in this order, with these addresses: Today, Athletes, Exercises, Crew (the old Proof, address #proof), Leads, Library, Buyers', JSON.stringify(tabs.map(t => t.label)) === JSON.stringify(['Today', 'Athletes', 'Exercises', 'Crew', 'Leads', 'Library', 'Buyers']) && JSON.stringify(tabs.map(t => t.href)) === JSON.stringify(['#today', '#athletes', '#exercises', '#proof', '#leads', '#links', '#buyers']), tabs);
   const exp = await page.evaluate(() => ({ waiting: Object.values(S.ath).reduce((n, a) => n + a.toReply, 0), apps: newApplications() }));
   check(r, 'two badges: Athletes (notes to read) and Leads (new applications), and none on the others', exp.apps === 2 && exp.waiting > 0 && tabs.filter(t => t.n).map(t => t.label + ':' + t.n).join() === `Athletes:${exp.waiting},Leads:${exp.apps}`, { exp, tabs: tabs.filter(t => t.n) });
   check(r, 'Today is the one marked (aria-current), and the page title says Today\'s own: the Coach\'s Box alone', tabs.filter(t => t.on).map(t => t.label).join() === 'Today' && (await page.title()) === "The Coach's Box" && (await page.locator('#rail a.tab[aria-current="page"]').count()) === 1, await page.title());
@@ -3510,7 +3511,7 @@ S['phone-bottom-bar'] = async (b) => {
     let n0 = await hlen();
     await openMore();
     g = await geo(page);
-    check(r, `at ${w} px More opens a sheet above the bar with four places: Proof, Leads (with its badge), Library, Buyers; the scrim is up and More says it is expanded`, g.sheetShown && g.scrimShown && g.expanded === 'true' && JSON.stringify(g.rows.map(x => x.label)) === JSON.stringify(['Proof', 'Leads', 'Library', 'Buyers']) && g.rows.map(x => x.href).join() === '#proof,#leads,#links,#buyers' && g.rows.map(x => x.n).join('|') === `|${exp.apps}||`, g.rows);
+    check(r, `at ${w} px More opens a sheet above the bar with four places: Crew, Leads (with its badge), Library, Buyers; the scrim is up and More says it is expanded`, g.sheetShown && g.scrimShown && g.expanded === 'true' && JSON.stringify(g.rows.map(x => x.label)) === JSON.stringify(['Crew', 'Leads', 'Library', 'Buyers']) && g.rows.map(x => x.href).join() === '#proof,#leads,#links,#buyers' && g.rows.map(x => x.n).join('|') === `|${exp.apps}||`, g.rows);
     check(r, `at ${w} px the sheet sits right above the bar, inside the window and under the top bar, and the page does not scroll sideways`, g.sheetBottom <= g.barTop + 0.5 && g.barTop - g.sheetBottom <= 2 && g.sheetTop >= g.topBarBottom && g.sheetLeft >= 0 && g.sheetRight <= g.winW && g.over <= 0, g);
     check(r, `at ${w} px opening it is one history step`, (await hlen()) === n0 + 1, { before: n0, after: await hlen() });
     await page.keyboard.press('Escape'); await L.settle(page, 450);
@@ -3533,7 +3534,7 @@ S['phone-bottom-bar'] = async (b) => {
     await L.go(page, 'proof'); await page.evaluate(() => window.scrollTo({ top: 500, behavior: 'instant' })); await L.settle(page, 300);
     await L.go(page, 'today'); await L.settle(page, 300);
     await openMore();
-    await page.locator('#moreSheet .ms-row', { hasText: 'Proof' }).click(); await L.settle(page, 800);
+    await page.locator('#moreSheet .ms-row', { hasText: 'Crew' }).click(); await L.settle(page, 800);
     const yTop = await page.evaluate(() => Math.round(scrollY));
     check(r, `at ${w} px a place picked from the sheet starts at the top, even one left scrolled down (the place Back would have kept)`, (await hash()) === '#proof' && yTop === 0, { hash: await hash(), yTop });
     await page.evaluate(() => { document.body.style.minHeight = ''; });
@@ -6137,7 +6138,7 @@ S['bell-panel'] = async (b) => {
   await page.waitForSelector('#bellPanel');
   const cs0 = await L.calls(page);
   check(r, 'the page asked coach_crew once, after the first paint, with nothing to say', rpcs(cs0, 'coach_crew').length === 1 && rpcs(cs0, 'coach_crew')[0].payload == null, rpcs(cs0, 'coach_crew').map(c => c.payload));
-  check(r, 'and made no other Bell call and no photo call (a photo is asked for only when "Show photo" is tapped; the reads of faces and cheers are the Lounge, not the Bell)', cs0.filter(c => c.kind === 'rpc' && /^(coach_crew_(?!face|cheers)|crew_photo)/.test(c.name)).length === 0, cs0.filter(c => c.kind === 'rpc' && /crew/.test(c.name)).map(c => c.name));
+  check(r, 'and made no other Bell call and no photo call (a photo is asked for only when "Show photo" is tapped; the reads of faces and cheers are the Lounge, not the Bell)', cs0.filter(c => c.kind === 'rpc' && /^(coach_crew_(?!face|cheers|week)|crew_photo)/.test(c.name)).length === 0, cs0.filter(c => c.kind === 'rpc' && /crew/.test(c.name)).map(c => c.name));
   check(r, 'The Bell and Who said yes sit under the wall and above the board, in the left column', await page.evaluate(() => { const q = id => document.getElementById(id); const f = (a, b) => !!(q(a).compareDocumentPosition(q(b)) & Node.DOCUMENT_POSITION_FOLLOWING); return f('wallPanel', 'bellPanel') && f('bellPanel', 'bellPeople') && f('bellPeople', 'boardPanel') && q('bellPanel').parentElement === q('wallPanel').parentElement; }), '');
   let st = await bellState(page);
   check(r, 'four posts, newest first: Amir 3h ago, Ava yesterday, the unseen one on Tuesday, Ben\'s session on Monday', JSON.stringify(st.posts.map(p => [p.name, p.when])) === JSON.stringify([['You (Amir)', '3h'], ['Ava E.', 'Yesterday'], ['Gone E.', 'Tue'], ['Ben E.', 'Mon']]), st.posts.map(p => [p.name, p.when]));
@@ -6452,7 +6453,7 @@ S['bell-missing'] = async (b) => {
   check(r, 'the page asked (coach_crew answered "could not find the function", PGRST202)', rpcs(cs, 'coach_crew').length === 1 && rpcs(cs, 'coach_crew')[0].result.error === 'missing', rpcs(cs, 'coach_crew').map(c => c.result));
   check(r, 'Proof has no Bell and no Who said yes, and the wall, the board and the quest lever are all there', (await page.locator('#bellPanel').count()) === 0 && (await page.locator('#bellPeople').count()) === 0 && (await page.locator('#wallPanel').count()) === 1 && (await page.locator('#boardPanel').count()) === 1 && (await page.locator('#questPanel').count()) === 1, '');
   check(r, 'no "Not everything loaded" banner, no line at the bottom', !(await page.evaluate(() => { const w = document.getElementById('loadwarn'); return !!w && !w.hidden; })) && !(await L.failText(page)), await L.failText(page));
-  check(r, 'the page knows it is off (S.bell.on false) and made no other Bell call', (await page.evaluate(() => S.bell && S.bell.on)) === false && !cs.some(c => c.kind === 'rpc' && /^(coach_crew_(?!face|cheers)|crew_photo)/.test(c.name)), cs.filter(c => c.kind === 'rpc').map(c => c.name));
+  check(r, 'the page knows it is off (S.bell.on false) and made no other Bell call', (await page.evaluate(() => S.bell && S.bell.on)) === false && !cs.some(c => c.kind === 'rpc' && /^(coach_crew_(?!face|cheers|week)|crew_photo)/.test(c.name)), cs.filter(c => c.kind === 'rpc').map(c => c.name));
   await L.go(page, 'today'); await L.go(page, 'athletes'); await L.go(page, 'proof');
   check(r, 'the other tabs still open and Proof still has no Bell', (await page.locator('#bellPanel').count()) === 0 && (await page.locator('#boardPanel').count()) === 1, '');
   check(r, 'no page errors', !log.errors.length, log.errors);
@@ -6548,8 +6549,8 @@ S['open-panel'] = async (b) => {
   await page.waitForSelector('#openPanel');
   const cs0 = await L.calls(page);
   check(r, 'the page asked coach_open once, after the first paint, with nothing to say, and made no other Open call', calls0(cs0).length === 1 && calls0(cs0)[0].name === 'coach_open' && calls0(cs0)[0].payload == null, calls0(cs0).map(c => c.name));
-  check(r, 'The Monthly Open sits under The Bell and Who said yes and above the board, in the left column', await page.evaluate(() => { const q = id => document.getElementById(id); const f = (a, c) => !!(q(a).compareDocumentPosition(q(c)) & Node.DOCUMENT_POSITION_FOLLOWING);
-    return f('wallPanel', 'bellPanel') && f('bellPanel', 'bellPeople') && f('bellPeople', 'openPanel') && f('openPanel', 'boardPanel') && q('openPanel').parentElement === q('wallPanel').parentElement; }), '');
+  check(r, 'The Monthly Open sits inside the "This month" panel (Crew desk, step 3), which is first in the left column: above the wall, The Bell, Who said yes and the board', await page.evaluate(() => { const q = id => document.getElementById(id); const f = (a, c) => !!(q(a).compareDocumentPosition(q(c)) & Node.DOCUMENT_POSITION_FOLLOWING);
+    return !!q('openPanel').closest('#crewMonthPanel') && f('openPanel', 'wallPanel') && f('wallPanel', 'bellPanel') && f('bellPanel', 'bellPeople') && f('bellPeople', 'boardPanel') && q('crewMonthPanel').parentElement === q('wallPanel').parentElement && document.querySelectorAll('#openPanel').length === 1; }), '');
   let st = await openRead(page);
   check(r, 'the head says when it was read and offers to read again', /^The Monthly Open As of 10:00\./.test(st.head) && /Reload/.test(st.head), st.head);
   check(r, 'nothing is open: the empty state says so and offers to start one (the panel\'s one primary button)', /Nothing is open\. Start a challenge and it appears on Crew, under the feed\./.test(st.now) && JSON.stringify(st.acts) === JSON.stringify(['Start a challenge']) && JSON.stringify(st.primaries) === JSON.stringify(['Start a challenge']), { now: st.now, acts: st.acts, primaries: st.primaries });
@@ -7346,6 +7347,159 @@ S['lounge-partner-codes'] = async (b) => {
   await bad.page.waitForSelector('#partnerPanel', { timeout: 5000 }).catch(() => {});
   check(r, 'a failed read: the banner names "the athletes\' partner codes", the group says it did not load and offers Try again, which lists them', /the athletes' partner codes: fixture: codes down/.test(await bad.page.locator('#loadwarn').innerText()) && /The athletes' codes did not load: fixture: codes down/.test(await bad.page.locator('#partnerPanel').innerText())
     && await (async () => { await bad.page.locator('#partnerPanel .btn', { hasText: 'Try again' }).click(); await L.settle(bad.page, 500); return (await bad.page.locator('#partnerPanel .pcard').count()) === 2 && !(await bad.page.locator('#loadwarn:not([hidden])').count()); })(), await bad.page.locator('#partnerPanel').innerText());
+  await bad.page.context().close();
+  return r;
+};
+
+// ── The Crew desk (stage102; Home Crowd step 3): the Proof tab is Crew, its first panel is This week, its second is This month ──────────────────────
+S['crew-desk'] = async (b) => {
+  const r = { id: 'crew-desk', title: 'The Crew desk: the tab is Crew with a clay count of open questions, #proof (and #crew) land on it, This week runs the Toss, next week, the bank and the Mailbag through the five stage102 functions with confirms, This month draws the honours with the same honoursHtml() as Courtside, and a post that answers a question shows who asked', checks: [] };
+  const T = Object.assign({ seed: { weekly: true, court: true, open: true }, hash: 'proof' }, COURT_T);
+  const { page, log } = await L.openCoach(b, T);
+  await noPopups(page);
+  let decline = false;   // the harness accepts every confirm(); this scenario answers "no" when it says so
+  page.removeAllListeners('dialog');
+  page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await (decline ? d.dismiss() : d.accept()).catch(() => {}); });
+  await L.settle(page, 700);
+  const calls = async name => rpcs(await L.calls(page), name);
+  const lastCall = async name => (await calls(name)).slice(-1)[0];
+  const txt = sel => page.locator(sel).first().innerText().then(t => t.replace(/\s+/g, ' ').trim());
+  const tabs = () => page.evaluate(() => [...document.querySelectorAll('#rail a.tab')].map(a => ({ label: a.firstChild.textContent.trim(), href: a.getAttribute('href'), n: (a.querySelector('.n') || {}).textContent || '', clay: !!a.querySelector('.n') && getComputedStyle(a.querySelector('.n')).backgroundColor })));
+
+  // the tab
+  let t = (await tabs()).find(x => x.href === '#proof');
+  check(r, 'the tab is labelled Crew, keeps the address #proof, and shows a clay count of 2 (the open questions); no other tab changed', t && t.label === 'Crew' && t.n === '2' && /176, 74, 39/.test(t.clay) && (await tabs()).map(x => x.label).join() === 'Today,Athletes,Exercises,Crew,Leads,Library,Buyers', await tabs());
+  check(r, 'the weekly desk was read once, after the first paint, with nothing to say', (await calls('coach_crew_weekly')).length === 1 && (await calls('coach_crew_weekly'))[0].payload == null, (await calls('coach_crew_weekly')).length);
+
+  // old links: #proof, #crew
+  await L.go(page, 'today'); await L.settle(page, 300);
+  await page.evaluate(() => { location.hash = '#proof'; }); await L.settle(page, 400);
+  check(r, 'an old #proof link lands on the Crew tab with the desk on it', (await page.locator('#crewWeekPanel').count()) === 1 && (await page.locator('#rail a.tab.active').innerText()).startsWith('Crew'), await page.evaluate(() => location.hash));
+  await page.evaluate(() => { location.hash = '#today'; }); await L.settle(page, 300);
+  await page.evaluate(() => { location.hash = '#crew'; }); await L.settle(page, 400);
+  check(r, '#crew is an alias for it (the address is rewritten to #proof)', (await page.locator('#crewWeekPanel').count()) === 1 && (await page.evaluate(() => location.hash)) === '#proof', await page.evaluate(() => location.hash));
+  await page.evaluate(() => { location.hash = '#today'; }); await L.settle(page, 300);
+  const link = page.locator('#proofToday a.ptlink');
+  if (await link.count()) { await link.first().click(); await L.settle(page, 400); }
+  check(r, 'and the link on Today ("Earlier lines on Proof") still opens it', (await page.locator('#crewWeekPanel').count()) === 1, await page.evaluate(() => location.hash));
+
+  // the order: This week first, then This month, then the wall
+  const order = await page.evaluate(() => [...document.querySelectorAll('#content .colstack')[0].children].map(e => e.id));
+  check(r, 'the left column opens with This week, then This month, then the wall, the Bell, Who said yes, Cheers and the board; the Open is inside This month, once', order.slice(0, 3).join() === 'crewWeekPanel,crewMonthPanel,wallPanel' && (await page.locator('#openPanel').count()) === 1 && (await page.locator('#crewMonthPanel #openPanel').count()) === 1 && order.indexOf('bellPanel') > 2, order);
+
+  // This week: the Toss
+  let w = await txt('#crewWeekPanel');
+  check(r, 'The Toss: "5 of 5 voted", the question, both sides with their counts, Close early', /The Toss · this week/i.test(w) && /5 of 5 voted/.test(w) && /When do you train best\?/.test(w) && /Morning 3/.test(w) && /Evening 2/.test(w) && (await page.locator('#crewWeekPanel .btn', { hasText: 'Close early' }).count()) === 1, w.slice(0, 300));
+  check(r, 'the two bars are 60% and 40% wide', JSON.stringify(await page.$$eval('#crewWeekPanel .cw-bar i', els => els.map(e => e.style.width))) === '["60%","40%"]', await page.$$eval('#crewWeekPanel .cw-bar i', els => els.map(e => e.style.width)));
+  check(r, "next week and the bank: its question, \"2 more in the bank\" (the weeks after it that have one); the photo theme and the post count (the Bell's crew posts this week)", /Which day do you like more\?/.test(w) && /2 more in the bank/.test(w) && /This week's photo/i.test(w) && /Your shoes after a session/.test(w) && /\d+ posts? so far/.test(w), w.slice(200, 700));
+  check(r, 'the Mailbag: "2 waiting", "Answered this month: 1", Ava with "first name OK", Ben with "no name", each with Answer and Drop; the answered one is folded', /Mailbag · 2 waiting/i.test(w) && /Answered this month: 1/.test(w) && (await page.locator('.cw-q:not(.done)').count()) === 2
+    && /Ava Example.*first name OK.*How long should I rest between sets\?/.test(await txt('.cw-q:not(.done) >> nth=0')) && /Ben Example.*no name.*Is it ok to train when I am sore\?/.test(await txt('.cw-q:not(.done) >> nth=1'))
+    && (await page.locator('.cw-q:not(.done) .btn', { hasText: /^(Answer|Drop)$/ }).count()) === 4 && (await page.locator('.cw-done:not([open])').count()) === 1, w.slice(500, 1000));
+  await page.evaluate(() => { document.querySelector('.cw-done').open = true; });
+  check(r, 'the answered one, once opened, shows the answer', /What do I eat before a match\?.*You: Something simple you have tried before\./.test(await txt('.cw-done')), await txt('.cw-done'));
+
+  // Close early: a confirm, then coach_crew_week_close with this Monday
+  log.dialogs.length = 0;
+  await page.locator('#crewWeekPanel .btn', { hasText: 'Close early' }).click(); await L.settle(page, 400);
+  let c = await lastCall('coach_crew_week_close');
+  check(r, 'Close early asks first, then calls coach_crew_week_close with this Monday (2026-11-09), and the panel says Closed with no button', log.dialogs.some(d => d.type === 'confirm' && /Close this week's Toss/.test(d.message)) && c && JSON.stringify(c.payload) === JSON.stringify({ p_week: '2026-11-09' }) && /Closed/.test(await txt('#crewWeekPanel')) && (await page.locator('#crewWeekPanel .btn', { hasText: 'Close early' }).count()) === 0, { dialogs: log.dialogs, c: c && c.payload });
+  // a "no" on the confirm sends nothing
+  await page.evaluate(() => window.__DB.crew_weekly.weeks[0].closed = false); await page.evaluate(() => window.loadCrewWeekly()); await L.settle(page, 300);
+  const n0 = (await calls('coach_crew_week_close')).length;
+  decline = true;
+  await page.locator('#crewWeekPanel .btn', { hasText: 'Close early' }).click(); await L.settle(page, 300);
+  check(r, 'a "no" on that confirm sends nothing', (await calls('coach_crew_week_close')).length === n0 && (await page.locator('#crewWeekPanel .btn', { hasText: 'Close early' }).count()) === 1, '');
+  decline = false;
+
+  // Change next week: the editor, counters, all-or-none, then coach_crew_week_set
+  await page.locator('#crewWeekPanel .btn', { hasText: 'Change' }).first().click(); await L.settle(page, 200);
+  check(r, 'Change opens the editor under next week with the current words and counters (question /80, sides /30, theme /60)', (await page.inputValue('#cwE-q')) === 'Which day do you like more?' && (await page.inputValue('#cwE-a')) === 'Lower body' && /27\/80/.test(await txt('#cwEdit [data-cnt=q]')) && /10\/30/.test(await txt('#cwEdit [data-cnt=a]')) && /30\/60/.test(await txt('#cwEdit [data-cnt=theme]')), await txt('#cwEdit'));
+  check(r, 'the boxes stop at their limits (80, 30, 30, 60)', JSON.stringify(await page.$$eval('#cwEdit input', els => els.map(e => e.maxLength))) === '[80,30,30,60]', '');
+  await page.fill('#cwE-q', 'x'.repeat(10)); await page.fill('#cwE-a', '');
+  await page.locator('#cwEdit .btn.primary').click(); await L.settle(page, 200);
+  check(r, 'a question without both sides is not sent and the editor says why', /Fill the question and both sides/.test(await txt('#cwEdit')) && (await calls('coach_crew_week_set')).length === 0, await txt('#cwEdit'));
+  await page.fill('#cwE-q', 'Early or late?'); await page.fill('#cwE-a', 'Early'); await page.fill('#cwE-b', 'Late'); await page.fill('#cwE-theme', '');
+  log.dialogs.length = 0;
+  check(r, 'the counter follows the typing', /14\/80/.test(await txt('#cwEdit [data-cnt=q]')), await txt('#cwEdit [data-cnt=q]'));
+  await page.locator('#cwEdit .btn.primary').click(); await L.settle(page, 400);
+  c = await lastCall('coach_crew_week_set');
+  check(r, 'Save calls coach_crew_week_set for next Monday (2026-11-16) with the three words and an empty theme (which clears it); no vote warning, as it has no votes', c && JSON.stringify(c.payload) === JSON.stringify({ p_week: '2026-11-16', p_q: 'Early or late?', p_a: 'Early', p_b: 'Late', p_theme: '' }) && !log.dialogs.some(d => /vote/.test(d.message)), c && c.payload);
+  check(r, 'the panel shows the new question and the editor is gone', /Early or late\?/.test(await txt('#crewWeekPanel')) && !(await page.locator('#cwEdit').count()), '');
+
+  // a changed question on a week with votes warns first
+  await page.evaluate(() => { window.__DB.crew_weekly.weeks[0].q = 'When do you train best?'; });
+  await page.evaluate(() => { window.crewEditOpen('2026-11-09'); }); await L.settle(page, 150);
+  await page.fill('#cwE-q', 'Early bird or night owl?');
+  log.dialogs.length = 0;
+  await page.locator('#cwEdit .btn.primary').click(); await L.settle(page, 400);
+  check(r, 'changing the question of this week (5 votes) warns that the votes are deleted, then saves', log.dialogs.some(d => d.type === 'confirm' && /already has 5 votes/.test(d.message) && /deletes them/.test(d.message)) && (await lastCall('coach_crew_week_set')).payload.p_week === '2026-11-09' && /0 of 5 voted/.test(await txt('#crewWeekPanel')), log.dialogs);
+
+  // Skip a week
+  log.dialogs.length = 0;
+  await page.locator('#crewWeekPanel .btn', { hasText: 'Skip a week' }).click(); await L.settle(page, 400);
+  c = await lastCall('coach_crew_week_set');
+  check(r, 'Skip a week asks, then clears next week: question, sides and theme', log.dialogs.some(d => d.type === 'confirm' && /Skip the week of 16 Nov/.test(d.message)) && JSON.stringify(c.payload) === JSON.stringify({ p_week: '2026-11-16', p_q: null, p_a: null, p_b: null, p_theme: '' }) && /Nothing set for next week/.test(await txt('#crewWeekPanel')), c.payload);
+
+  // the bank
+  await page.locator('#crewWeekPanel .btn', { hasText: 'Open the bank' }).click(); await L.settle(page, 200);
+  const rows = await page.$$eval('.cw-bank-row', els => els.map(e => e.innerText.replace(/\s+/g, ' ').trim()));
+  check(r, 'Open the bank lists the weeks ahead (19 after next week), the ones with a question showing it', rows.length === 19 && /23 Nov Rest day or easy ride\? Change Skip/.test(rows[0]) && /7 Dec Team or solo\? Change Skip/.test(rows[2]) && /30 Nov Empty Write/.test(rows[1]), rows.slice(0, 3));
+  await page.locator('.cw-bank-row', { hasText: '30 Nov' }).locator('.btn', { hasText: 'Write' }).click(); await L.settle(page, 150);
+  await page.fill('#cwE-q', 'Sprint or jump?'); await page.fill('#cwE-a', 'Sprint'); await page.fill('#cwE-b', 'Jump'); await page.fill('#cwE-theme', 'Your warm-up');
+  await page.locator('#cwEdit .btn.primary').click(); await L.settle(page, 400);
+  c = await lastCall('coach_crew_week_set');
+  check(r, 'a bank row is edited the same way: Write on 30 Nov saves week 2026-11-30 with its theme, and the bank count is 3 more', JSON.stringify(c.payload) === JSON.stringify({ p_week: '2026-11-30', p_q: 'Sprint or jump?', p_a: 'Sprint', p_b: 'Jump', p_theme: 'Your warm-up' }) && /Sprint or jump\?/.test(await txt('.cw-bank')), c.payload);
+
+  // the Mailbag: Answer
+  const mine = page.locator('.cw-q:not(.done)', { hasText: 'How long should I rest' });
+  await mine.locator('.btn', { hasText: 'Answer' }).click(); await L.settle(page, 150);
+  check(r, 'Answer opens a box (280 letters, with a counter) and "Post to the crew"', (await page.locator('#cwAns').getAttribute('maxlength')) === '280' && /0\/280/.test(await txt('#cwAnsCnt')) && (await page.locator('.cw-ans .btn', { hasText: 'Post to the crew' }).count()) === 1, '');
+  await page.fill('#cwAns', 'Two to three minutes for the heavy ones.');
+  check(r, 'the counter follows the typing', /40\/280/.test(await txt('#cwAnsCnt')), await txt('#cwAnsCnt'));
+  log.dialogs.length = 0;
+  await page.locator('.cw-ans .btn', { hasText: 'Post to the crew' }).click(); await L.settle(page, 500);
+  c = await lastCall('coach_question_answer');
+  check(r, 'Post to the crew asks "This goes on the Bell as your pinned post, with the question.", then calls coach_question_answer with that question id and the text', log.dialogs.some(d => d.type === 'confirm' && d.message === 'This goes on the Bell as your pinned post, with the question.') && c && JSON.stringify(c.payload) === JSON.stringify({ p_id: 11, p_answer: 'Two to three minutes for the heavy ones.' }), { d: log.dialogs, p: c && c.payload });
+  check(r, 'the question leaves the waiting list (1 waiting, the tab count is 1, "Answered this month: 2") and the Bell is read again', /Mailbag · 1 waiting/i.test(await txt('#crewWeekPanel')) && /Answered this month: 2/.test(await txt('#crewWeekPanel')) && (await tabs()).find(x => x.href === '#proof').n === '1' && (await calls('coach_crew')).length >= 2, (await tabs()).find(x => x.href === '#proof'));
+  // Drop
+  log.dialogs.length = 0;
+  await page.locator('.cw-q:not(.done) .btn', { hasText: 'Drop' }).click(); await L.settle(page, 400);
+  c = await lastCall('coach_question_drop');
+  check(r, 'Drop asks (the asker is not told), then calls coach_question_drop with that id; no waiting question, no badge on the tab', log.dialogs.some(d => d.type === 'confirm' && /asker is not told/.test(d.message)) && c && JSON.stringify(c.payload) === JSON.stringify({ p_id: 12 }) && /Mailbag · 0 waiting/i.test(await txt('#crewWeekPanel')) && (await tabs()).find(x => x.href === '#proof').n === '', c && c.payload);
+
+  // a failed write is said in plain words and changes nothing
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_crew_week_close', message: 'fixture: not the coach', times: 1 }));
+  await page.evaluate(() => { window.__DB.crew_weekly.weeks[0].closed = false; return window.loadCrewWeekly(); }); await L.settle(page, 300);
+  await page.locator('#crewWeekPanel .btn', { hasText: 'Close early' }).click(); await L.settle(page, 400);
+  check(r, 'a refused write says so on the failure bar and the Toss stays open', /Could not save: fixture: not the coach/.test(await L.failText(page)) && (await page.locator('#crewWeekPanel .btn', { hasText: 'Close early' }).count()) === 1, await L.failText(page));
+
+  // This month: the honours are honoursHtml(), the one Courtside calls
+  const same = await page.evaluate(() => ({ crew: document.getElementById('crewHon').innerHTML, fn: (() => { const d = document.createElement('div'); d.innerHTML = window.honoursHtml(true); return d.innerHTML; })() }));
+  check(r, 'This month holds the honours, drawn by honoursHtml(true) exactly (same markup, same buttons)', same.crew.length > 200 && same.crew === same.fn && /Most sessions/.test(same.crew), same.crew.slice(0, 200));
+  const cs = await (async () => { const q = await L.openCoach(b, Object.assign({ seed: { weekly: true, court: true }, hash: 'today' }, COURT_T)); await L.settle(q.page, 700); const h = await q.page.evaluate(() => { const d = document.getElementById('courtHon'); return d ? d.innerHTML.replace(/^<summary>.*?<\/summary>/, '') : ''; }); await q.page.context().close(); return h; })();
+  check(r, 'and Courtside draws the same rows (its fold wraps the same markup)', cs.length > 200 && cs.replace(/^<div class="eyebrow cs-eb">.*?<\/div>/, '') === same.crew.replace(/^<div class="eyebrow cs-eb">.*?<\/div>/, ''), cs.slice(0, 160));
+  await page.locator('#crewHon .btn', { hasText: /^Pick Ava$/ }).first().click().catch(() => {});
+
+  // the Bell: an answer post shows who asked, and the question
+  const bell = await txt('#bellFeed');
+  check(r, 'the Bell shows an Amir post that answers a question with "ELI ASKED" and the quoted question above his answer; one with no name would read "SOMEONE ASKED"', /ELI ASKED\s+What do I eat before a match\?\s+Something simple you have tried before\./.test(bell.replace(/ELI ASKED/, 'ELI ASKED ')) || /ELI ASKED What do I eat before a match\? Something simple/.test(bell), bell.slice(0, 400));
+  check(r, 'the post just answered (first name OK) reads "FIRST ASKED"', /FIRST ASKED How long should I rest between sets\?/.test(bell) || /FIRST ASKED/.test(bell), bell.slice(0, 400));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.screenshot({ path: path.join(L.OUT, 'crew-desk.png') }).catch(() => {});
+  r.evidence = { order };
+  await page.context().close();
+
+  // a server before stage102: no panel, no badge, the page as it was (the label is still Crew)
+  const old = await L.openCoach(b, Object.assign({ seed: { court: true, open: true }, hash: 'proof' }, COURT_T));
+  await L.settle(old.page, 600);
+  check(r, 'without stage102 the Crew tab has no This week panel, no count, no failure line, and still shows the wall', !(await old.page.locator('#crewWeekPanel').count()) && (await old.page.locator('#wallPanel').count()) === 1 && !(await old.page.locator('#rail a.tab .n').filter({ hasText: /./ }).evaluateAll(es => es.filter(e => e.parentElement.getAttribute('href') === '#proof').length)) && !(await L.failText(old.page)) && !(await old.page.locator('#loadwarn:not([hidden])').count()), '');
+  check(r, 'no page errors on the old server', !old.log.errors.length, old.log.errors);
+  await old.page.context().close();
+  // a failed read is named, and Try again reads it
+  const bad = await L.openCoach(b, Object.assign({ seed: { weekly: true, court: true, stub: { fail: [{ kind: 'rpc', name: 'coach_crew_weekly', message: 'fixture: desk down', times: 1 }] } }, hash: 'proof' }, COURT_T));
+  await L.settle(bad.page, 600);
+  check(r, 'a failed read: the banner names it, the panel says it did not load and offers Try again, which shows the desk', /the crew's week and Mailbag: fixture: desk down/.test(await bad.page.locator('#loadwarn').innerText()) && /did not load: fixture: desk down/.test(await bad.page.locator('#crewWeekPanel').innerText())
+    && await (async () => { await bad.page.locator('#crewWeekPanel .btn', { hasText: 'Try again' }).first().click(); await L.settle(bad.page, 500); return /Mailbag · 2 waiting/i.test(await bad.page.locator('#crewWeekPanel').innerText()) && !(await bad.page.locator('#loadwarn:not([hidden])').count()); })(), await bad.page.locator('#crewWeekPanel').innerText());
   await bad.page.context().close();
   return r;
 };
