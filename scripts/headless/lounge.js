@@ -3029,8 +3029,10 @@ const on = n => !ONLY.length || ONLY.includes(n);
     // with no hint there is no foot at all, and the band is shorter than with one
     const nh = await open(browser, { seed: { _cheerhint: 'done' } });
     await goCrew(nh.p); await nh.p.waitForTimeout(500);
-    const nhm = await nh.p.evaluate(() => { const w0 = document.querySelector('#crew-body .cr-week'); return { foot: !!w0.querySelector('.cr-bandfoot'), hint: !!w0.querySelector('.cr-hint'), h: Math.round(w0.getBoundingClientRect().height), btn: !!w0.querySelector('.cr-bandtop .go') }; });
-    C.check('after the hint\'s three visits there is NO foot line, the band is shorter than the one with the hint, and "In the crew ›" is still there', !nhm.foot && !nhm.hint && nhm.btn && nhm.h < std.bandH, JSON.stringify([nhm, std.bandH]));
+    const nhm = await nh.p.evaluate(() => { const w0 = document.querySelector('#crew-body .cr-week'); return { foot: !!w0.querySelector('.cr-bandfoot'), hint: !!w0.querySelector('.cr-hint'), h: Math.round(w0.getBoundingClientRect().height), btn: !!w0.querySelector('.cr-bandtop .go'),
+      onlyHello: [...w0.querySelectorAll('.cr-bandfoot > *')].every(c => c.classList.contains('cr-hi') || c.classList.contains('cr-sayhi')) }; });
+    // (Home Crowd step 4b, 2026-10-25: this crew has a face that joined this week, so after the hint a foot line stays for Say hello, and for nothing else)
+    C.check('after the hint\'s three visits the foot line holds no hint: only Say hello for the new face (Leila), and "In the crew ›" is still there', nhm.foot && nhm.onlyHello && !nhm.hint && nhm.btn, JSON.stringify([nhm, std.bandH]));
     // a double tap that ends the hint takes the foot with it
     await nh.ctx.close();
     const dt = await open(browser, {});

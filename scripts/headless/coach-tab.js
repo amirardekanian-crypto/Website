@@ -78,7 +78,7 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
       h.role === 'Strength & conditioning coach' && h.roleCaps === 'uppercase' && /Space Mono/.test(h.roleFont) && h.roleSize === '12px' && h.roleColor === GREY, JSON.stringify([h.role, h.roleCaps, h.roleFont, h.roleSize, h.roleColor]));
     t.check('header: no photo or avatar in it (his photo is in the panel)', !h.headImg, String(h.headImg));
     t.check('the old Coach parts are gone (hero, avatar, coloured tiles, Tap to read, section labels, the old row)', h.old.length === 0, h.old.join());
-    t.check('order top to bottom: header, the panel, the number, the one door row (How the app works), then Notes from Amir and the notes', h.order === 'coach-head coach-panel coach-num hrow prog-sec cn-list', h.order);
+    t.check('order top to bottom: header, the panel, the number, the Ask for the crew row (Home Crowd step 3) and the one help door row (How the app works), then Notes from Amir and the notes', h.order === 'coach-head coach-panel coach-num hrow hrow prog-sec cn-list', h.order);
     t.check('no page errors (header)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
@@ -203,10 +203,10 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
     const { ctx, p } = await H.openProgram(browser, { prog: prog(notes) });
     await goCoach(p);
     const o = await p.evaluate(() => { const s = document.getElementById('screen-notes');
-      return { sec: s.querySelectorAll('.prog-sec').length, rows: s.querySelectorAll('.cn-row, .cn-list, .cn-item').length, panel: s.querySelectorAll('.coach-panel').length, num: s.querySelectorAll('.coach-num').length, door: s.querySelectorAll('.hrow').length,
+      return { sec: s.querySelectorAll('.prog-sec').length, rows: s.querySelectorAll('.cn-row, .cn-list, .cn-item').length, panel: s.querySelectorAll('.coach-panel').length, num: s.querySelectorAll('.coach-num').length, door: s.querySelectorAll('.hrow:not(#coach-ask)').length,
         text: /notes from amir|personal notes/i.test(s.innerText), order: [...s.querySelectorAll('.coach-head, .coach-panel, .coach-num, .hrow')].map(e => e.className.split(' ')[0]).join(' '),
         gap: (() => { const n = s.querySelector('.coach-num').getBoundingClientRect(), d = s.querySelector('.hrow').getBoundingClientRect(); return Math.round(d.top - n.bottom); })() }; });
-    t.check(`${name}: no "Notes from Amir" section and no fold rows; the panel, the number and the door row are still there, in order`, o.sec === 0 && o.rows === 0 && !o.text && o.panel === 1 && o.num === 1 && o.door === 1 && o.order === 'coach-head coach-panel coach-num hrow' && o.gap >= 12, JSON.stringify(o));
+    t.check(`${name}: no "Notes from Amir" section and no fold rows; the panel, the number and the door row are still there, in order`, o.sec === 0 && o.rows === 0 && !o.text && o.panel === 1 && o.num === 1 && o.door === 1 && o.order === 'coach-head coach-panel coach-num hrow hrow' && o.gap >= 12, JSON.stringify(o));
     t.check(`${name}: no page errors`, p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
@@ -230,9 +230,9 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
       const alone = [...document.querySelectorAll('#screen-plan .hrow')].find(e => !e.closest('.body-card') && e.offsetHeight > 0), card = document.querySelector('#screen-plan .body-card'), cc = getComputedStyle(card);
       return { row: f(alone), alone: alone.className + ' ' + alone.getAttribute('onclick'), card: [cc.backgroundColor, cc.borderTopWidth, cc.borderTopStyle, cc.borderTopColor, cc.borderTopLeftRadius].join('|'), label: [lc.fontFamily.split(',')[0].replace(/["']/g, ''), lc.fontSize, lc.fontWeight, lc.letterSpacing, lc.color, lc.textTransform].join('|'), arrow: [ac.fontSize, ac.color].join('|') }; })()`);
     await goCoach(p);
-    const d = await p.evaluate(`(() => { const f = ${look.toString()}; const s = document.getElementById('screen-notes'), r = s.querySelector('.hrow'), l = r.querySelector('.hrow-l'), v = r.querySelector('.hrow-v, .hrow-q'), a = r.querySelector('.hrow-a'), ic = r.querySelector('.hrow-ic svg');
+    const d = await p.evaluate(`(() => { const f = ${look.toString()}; const s = document.getElementById('screen-notes'), r = s.querySelector('.hrow:not(#coach-ask)'), l = r.querySelector('.hrow-l'), v = r.querySelector('.hrow-v, .hrow-q'), a = r.querySelector('.hrow-a'), ic = r.querySelector('.hrow-ic svg');
       const lc = getComputedStyle(l), ac = getComputedStyle(a), vc = getComputedStyle(v);
-      return { n: s.querySelectorAll('.hrow').length, tag: r.tagName, onclick: r.getAttribute('onclick'), row: f(r), label: l.textContent.trim(), labelF: [lc.fontFamily.split(',')[0].replace(/["']/g, ''), lc.fontSize, lc.fontWeight, lc.letterSpacing, lc.color, lc.textTransform].join('|'),
+      return { n: s.querySelectorAll('.hrow:not(#coach-ask)').length, tag: r.tagName, onclick: r.getAttribute('onclick'), row: f(r), label: l.textContent.trim(), labelF: [lc.fontFamily.split(',')[0].replace(/["']/g, ''), lc.fontSize, lc.fontWeight, lc.letterSpacing, lc.color, lc.textTransform].join('|'),
         line: v.textContent.trim(), lineCls: v.className, lineFont: vc.fontFamily.split(',')[0].replace(/["']/g, ''), arrow: a.textContent.trim(), arrowF: [ac.fontSize, ac.color].join('|'), icon: ic && Math.round(ic.getBoundingClientRect().width) + 'x' + Math.round(ic.getBoundingClientRect().height), iconColor: ic && getComputedStyle(ic.parentElement).color,
         helpGlyph: !!ic && ic.innerHTML.indexOf('M9.09 9a3 3 0 0 1 5.83 1') > -1,
         sibling: (r.previousElementSibling || {}).className || '', h: Math.round(r.getBoundingClientRect().height), w: Math.round(r.getBoundingClientRect().width), left: Math.round(r.getBoundingClientRect().left), gutter: parseFloat(getComputedStyle(document.body).getPropertyValue('--g')),
@@ -248,8 +248,8 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
     // headline (Barlow 600, 16 px, ink, sentence case); Home's habits row carries one ("3 to go"), so its name is the quiet green label.
     t.check('door row: its name is the headline voice, and Home\'s habits row — which carries a figure — is the quiet green label instead',
       d.labelF === 'Barlow|16px|600|normal|rgb(26, 26, 26)|none' && homeRow.label === 'Barlow|13px|600|normal|rgb(14, 74, 54)|none' && d.labelF !== homeRow.label, JSON.stringify([d.labelF, homeRow.label]));
-    t.check('door row: a 22 px green line icon, the help glyph; on the gutter; no section label above it (the only title is Notes from Amir, which is BELOW the door now, above the notes)', d.icon === '22x22' && d.iconColor === GREEN && d.helpGlyph && d.left === d.gutter && d.sibling.indexOf('coach-num') > -1 && d.secBefore.join() === 'Notes from Amir' && d.secAfterDoor, JSON.stringify([d.icon, d.iconColor, d.helpGlyph, d.left, d.gutter, d.sibling, d.secBefore]));
-    await tap(p, '#screen-notes .hrow');
+    t.check('door row: a 22 px green line icon, the help glyph; on the gutter; no section label above it (the only title is Notes from Amir, which is BELOW the door now, above the notes)', d.icon === '22x22' && d.iconColor === GREEN && d.helpGlyph && d.left === d.gutter && d.sibling.indexOf('hrow') > -1 && d.secBefore.join() === 'Notes from Amir' && d.secAfterDoor, JSON.stringify([d.icon, d.iconColor, d.helpGlyph, d.left, d.gutter, d.sibling, d.secBefore]));
+    await tap(p, '#screen-notes .hrow:not(#coach-ask)');
     const sheet = await p.evaluate(() => { const ov = document.getElementById('hist-overlay'); return { shown: ov.classList.contains('visible'), title: (ov.querySelector('.readiness-title') || {}).textContent, cards: ov.querySelectorAll('.help-list .note-card').length, screen: document.querySelector('.screen.active').id }; });
     t.check('tapping it opens the help sheet (How the app works, with the guide cards), the Coach tab still behind it', sheet.shown && sheet.title === 'How the app works' && sheet.cards >= 10 && sheet.screen === 'screen-notes', JSON.stringify(sheet));
     // the guide's cards still fold one at a time (toggleNote, untouched)
@@ -275,14 +275,14 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
       const title = s.querySelector('.coach-panel-title'), tr = title.getBoundingClientRect();
       return { gut, left: Math.round(pr.left), right: Math.round(innerWidth - pr.right), h: Math.round(pr.height), inside, controls, titleLines: Math.round(tr.height / parseFloat(getComputedStyle(title).lineHeight)), titleSize: getComputedStyle(title).fontSize,
         headLeft: Math.round(s.querySelector('.prog-eyebrow').getBoundingClientRect().left), numLeft: Math.round(s.querySelector('.coach-num').getBoundingClientRect().left), secPad: Math.round(parseFloat(getComputedStyle(s.querySelector('.prog-sec')).paddingLeft)),
-        listLeft: Math.round(s.querySelector('.cn-list').getBoundingClientRect().left), doorLeft: Math.round(s.querySelector('.hrow').getBoundingClientRect().left), rowRight: Math.round(innerWidth - s.querySelector('.cn-list').getBoundingClientRect().right), scroll: document.documentElement.scrollWidth - innerWidth,
-        bodyBg: getComputedStyle(document.body).backgroundColor, rowBg: getComputedStyle(s.querySelector('.hrow')).backgroundColor };
+        listLeft: Math.round(s.querySelector('.cn-list').getBoundingClientRect().left), doorLeft: Math.round(s.querySelector('.hrow:not(#coach-ask)').getBoundingClientRect().left), rowRight: Math.round(innerWidth - s.querySelector('.cn-list').getBoundingClientRect().right), scroll: document.documentElement.scrollWidth - innerWidth,
+        bodyBg: getComputedStyle(document.body).backgroundColor, rowBg: getComputedStyle(s.querySelector('.hrow:not(#coach-ask)')).backgroundColor };
     });
     t.check(`${tag}: no sideways scroll on the Coach tab, closed and with a note open`, g.scroll <= 0 && await (async () => { await tap(p, '#cn-h-0'); const a = await sideways(p); await tap(p, '#cn-h-0'); return a <= 0; })(), JSON.stringify([g.scroll, await sideways(p)]));
     t.check(`${tag}: the panel sits on the gutter (${g.gut} px each side) and the header, the number, the section title, the notes and the door row start on it too`,
       g.left === g.gut && g.right === g.gut && Math.abs(g.headLeft - g.gut) <= 1 && g.numLeft === g.gut && g.secPad === g.gut && g.listLeft === g.gut && g.doorLeft === g.gut && g.rowRight === g.gut, JSON.stringify([g.gut, g.left, g.right, g.headLeft, g.numLeft, g.secPad, g.listLeft, g.doorLeft, g.rowRight]));
     t.check(`${tag}: everything in the panel is whole (no part cut off or pushed past the panel's edge; the title is at most 3 lines)`, g.inside.every(i => i.sw <= 0 && i.l >= 0 && i.r >= 0) && g.titleLines <= 3, JSON.stringify([g.inside, g.titleLines, g.titleSize]));
-    t.check(`${tag}: every control is 44 px or more each way (the panel link, its button, the fold rows, the door row)`, g.controls.length === 5 && g.controls.every(c => c.w >= 44 && c.h >= 44), JSON.stringify(g.controls));
+    t.check(`${tag}: every control is 44 px or more each way (the panel link, its button, the fold rows, the two door rows: Ask for the crew and How the app works)`, g.controls.length === 6 && g.controls.every(c => c.w >= 44 && c.h >= 44), JSON.stringify(g.controls));
     await p.evaluate(() => window.scrollTo(0, 0));   // the initials button scrolls away with its screen: measure it at the top
     const o = await p.evaluate(OVERLAP);
     t.check(`${tag}: the initials button overlaps no text at the top of the Coach tab`, !o.hidden && o.hits.length === 0, JSON.stringify(o));
