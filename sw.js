@@ -501,7 +501,12 @@
 // 7 reps · 8/10, Twice · rest 30 s between, each side. Stop here, Start this day again, 9 exercises, One set at a time,
 // For everyone, Articles from me, Cycle 2 of 5, Your best lifts, Adding it up, and a plain line under the game names.
 // v227: assets/js/sharecard.js changed (2026-10-25). The Farsi share card says effort as شدت, never RPE.
-const CACHE = 'aap-v227';
+// v228: program.html, sharecard.js and the new emblems.js changed (2026-10-25, Amir: direction A of the Emblem Cabinet, "go with your picks"). Achievements
+// is a cabinet now: every achievement and mark tier is an emblem drawn in code, grouped in sections with Latest on top, a filter and a sheet for each
+// one, and a medal for every ten levels. A clay dot sits on Progress while something won has not been seen. Someone else's page shows Trophies.
+// An achievement's share card and its moment carry the emblem, and a finished session says the time it was finished (for Early Bird and Night Owl).
+// emblems.js is new in the shell, and the Barlow Condensed 800 face its numbers use.
+const CACHE = 'aap-v228';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -529,6 +534,10 @@ const SHELL = [
   '/assets/js/push.js?v=1',
   // The habit engine (v195): the training app owns the habits now, so this is shell, not an extra.
   '/assets/js/habits-core.js?v=1',
+  // The emblem cabinet's art (v226): the achievements, the marks and the level medals, drawn in code. By the exact URL the page asks for.
+  '/assets/js/emblems.js?v=1',
+  // The face the emblems' numbers are drawn in (the training day's title uses the 900 one above).
+  '/assets/fonts/BarlowCondensed-800.woff2',
   // Off the Glass, the rest game (v162): loaded on the first tap on Play. Cache-first by this plain URL: a change needs a CACHE bump.
   '/assets/js/rally.js',
   // Split Step, the second rest game (v165): loaded on the first tap on its row in the shelf. Cache-first by this plain URL: a change needs a CACHE bump.

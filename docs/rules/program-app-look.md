@@ -125,6 +125,12 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   suggestion wins that slot when both want it, **except that First Serve comes first during an athlete's first two weeks** (Amir, 2026-10-24: its one line
   at a time sits in the same slot until the five steps are done), and it goes for good the first time Crew is opened (`<id>_crewinv`). Home still carries no door row of
   its own.
+- **Achievements is a cabinet of emblems** (Amir, 2026-10-25, direction A of the Emblem Cabinet: *"go with your picks"*; `PROGRAM-APP.md` → *The cabinet*). Every achievement and every tier of the four
+  marks is an emblem drawn in code (`assets/js/emblems.js`, never redrawn in program.html: a drawing that looks wrong is reported). **Won is colour, not won is a flat ghost** (`--ghost`, `--ghost-dk`, in the
+  one colour set), and the five steps are Ink, Grass, Clay, Night and Champion: **never a metal, never yellow or gold**. The four kinds are the filter, not tiles. **What has been seen is this phone's own list**
+  (`<id>_cabseen`, `<id>_lvseen`, `aa_cab_filter`, never synced). Progress says *N of M* and *3 new* on its row and carries one clay dot on its tab, and **no number on the tab**. **Only every tenth level
+  opens the full screen with its medal** (`maybeLevelMoment()`); the levels between stay on the finished card. **Someone else's page shows Trophies: only what they have WON, no ghosts**, and only while their own
+  switches (`plMark()` / `plKindOff()`) say so. Anything new from the server (`done_on`, `xp_won`, `times`, the 33 new ids) is optional: the page works before and after stage99.
 - **Dark mode is the athlete's choice** (Amir, 2026-09-27: *"Let the client choose dark mode"*): both apps start
   light and switch only on the athlete's tap; neither follows the phone's setting.
 - **Clay means "look here"** (DS-01, Amir 2026-09-27; `PROGRAM-APP.md` → *Clay means look here*): the Coach's note,

@@ -192,6 +192,10 @@
 <!-- The habit engine (2026-10-19): the roster, the log, the verdict, the day streak and the backfill window, generated
      from habits.html by scripts/build_habits_core.js while AA Proof is being retired into this app. -->
 <script defer src="/assets/js/habits-core.js?v=1"></script>
+<!-- The emblem cabinet's art (2026-10-25, Amir: direction A of the Emblem Cabinet): every achievement, mark tier and level medal is drawn in
+     code (window.AAEmblem), no pictures. `defer`, like the habit engine, so boot() can get here first: every caller asks for it only when it
+     draws (cabEmblem()) and the page repaints itself once it has loaded (emblemsReady()). -->
+<script defer src="/assets/js/emblems.js?v=1" onload="window.emblemsReady && emblemsReady()"></script>
 <!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
      on `defer` it shares one ordered execution queue with the SDK above. -->
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
@@ -237,6 +241,8 @@
     --g: 20px;
     --paper: #FAF7F2; --sand: #F1ECE3; --row: #FFFFFF; --hair: #E4DDD1; --box: #D8D1C5;
     --ink: #1A1A1A; --grey: #5C5C5C; --ring: #8A8378; --num: #5C5C5C; --info: var(--ring);
+    /* the emblem cabinet's ghost: what is not won yet is the flat shape of its emblem in these two (assets/js/emblems.js draws it) */
+    --ghost: #E6E0D6; --ghost-dk: #D2C9BB;
     --fill: #0E4A36; --green-ink: #0E4A36; --mint: #6DBE95;
     --clay: #C7552F; --clay-ink: #B5461F; --clay-big: #C7552F; --clay-fill: #C2512C; --clay-on-green: #F7A183; --steel: #3E6A92;   /* clay text on the green was #E06B43, 2.9 to 3.6:1 (Love All L6, 2026-10-24); this lighter clay is 4.5:1 or more on every green it sits on */
     /* The clay note box (2026-10-19, Amir's pick for "a new version is ready"): the green box's shape in the one accent. Declared
@@ -274,6 +280,7 @@
   body[data-dark] {
     --paper: #181818; --sand: #202020; --row: #242424; --hair: #2C2C2C; --box: #4A4A4A;
     --ink: #EDEDED; --grey: #9A9A9A; --ring: #666666; --num: #9A9A9A;
+    --ghost: #2C2C2C; --ghost-dk: #222222;
     --green-ink: #6DBE95; --clay-ink: #E06B43; --clay-big: #E06B43; --steel: #8DB3D6;   /* --clay stays the brand fill; only clay TEXT moves */
     --tint: rgba(109,190,149,.13); --prog-track: rgba(109,190,149,.16); --ph: #8F8F8F;
     --field: #5A5A5A; --mark: #1B7254;   /* #0E4A36 sinks on #181818 (1.73:1); #1B7254 is 3.03:1 */
@@ -2419,7 +2426,7 @@
      compact ones in a card or the session bar smaller, where their widths were measured (WK-02, WK-03).
      A new primary action joins this list; a secondary one is outlined (Guided, Reset). */
   .signin-go, .wel-go, .error-btn, .readiness-begin, .session-timer-btn:not(.guided), .step-primary-btn,
-  .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .wt-save, .rest-btn, .ex-1rm-save, .hl-share, .hl-m-go, .cr-go {
+  .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .wt-save, .rest-btn, .ex-1rm-save, .hl-share, .hl-m-go, .cr-go, .cab-go {
     background: var(--btn); color: var(--on-accent); border: 0; border-radius: 8px; min-height: 44px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
     cursor: pointer;
@@ -4956,20 +4963,12 @@
     text-transform: uppercase; color: var(--green-ink); }
   :where(#screen-plan, #screen-moments, #screen-achievements) .mo-more { display: block; margin: 2px var(--g) 0; padding: 12px 0; border: 0; background: none; font: 600 var(--fs-body)/1 'Barlow', sans-serif; color: var(--green-ink); cursor: pointer; }
   /* Progress → Achievements, Four Courts (Career Mode round 5; Amir's pick A on the page Achievements, 2026-10-19): the Next up card (the one the
-     athlete is closest to, its line and bar; a tap opens its kind), then the four kinds as four tiles 2 × 2 (how many earned of how many, and the
-     newest); a tile opens its kind in the sheet (openCourt()). Green and grey only: it asks for nothing (DS-01). From get_achievements() (stage80). */
+     athlete is closest to, its line and bar; a tap opens its emblem since the cabinet, 2026-10-25). The four kind tiles that sat under it are gone: the kinds are
+     the cabinet's filter now (THE CABINET, below). Green and grey only: it asks for nothing (DS-01). From get_achievements() (stage80). */
   :where(#screen-plan, #screen-moments, #screen-achievements) .ac-next { display: block; width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 10px; padding: 14px 16px 16px; border: 1px solid var(--hair);
     border-radius: 12px; background: var(--row); text-align: left; font: inherit; color: inherit; cursor: pointer; }
   :where(#screen-plan, #screen-moments, #screen-achievements) .ac-nm { display: block; margin-top: 4px; font: 900 var(--fs-head)/1.1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); }
   :where(#screen-plan, #screen-moments, #screen-achievements) .ac-s { display: block; margin-top: 4px; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
-  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 var(--g) 10px; }
-  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-tile { min-width: 0; display: grid; gap: 2px; justify-items: start; padding: 12px; border: 1px solid var(--hair); border-radius: 12px;
-    background: var(--row); text-align: left; font: inherit; color: inherit; cursor: pointer; }
-  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-k { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
-  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-n { margin-top: 4px; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
-  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-n small { margin-left: 4px; font: 600 var(--fs-small)/1 'Barlow', sans-serif; color: var(--grey); }
-  :where(#screen-plan, #screen-moments, #screen-achievements) .ac-new { max-width: 100%; margin-top: 4px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* THE SCOREBOARD (2026-10-19, the audit The Long Rally; Amir: "we want to go with scoreboard"): the level as the card's quiet
      foot (it led the card, with an XP figure beside it), and the two pages the doors open — Achievements and Your moments, whose
      blocks are the same ones they wore on the tab (the rules above are scoped to all three screens). */
@@ -5005,6 +5004,111 @@
   #hist-overlay .ac-sub { font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
   #hist-overlay .ac-bar { display: block; height: 3px; margin-top: 6px; border-radius: 3px; background: var(--hair); overflow: hidden; }
   #hist-overlay .ac-bar i { display: block; height: 100%; border-radius: 3px; background: var(--fill); }
+  /* ══ THE CABINET (2026-10-25; Amir picked direction A of the Emblem Cabinet and said "go with your picks"; the board of 2026-10-25) ═══════════════════════════════════════════════════════════════════════════════════════════
+     Achievements stopped being four tiles and a list. Every achievement and every tier of the four marks is an EMBLEM, drawn in code
+     (assets/js/emblems.js, window.AAEmblem: one shape per family, one colour per step, a flat ghost for what is not won yet), and the
+     page is a cabinet: Latest (the won ones not seen yet, big, with New; the three newest when nothing is new), then All achievements
+     with a filter, then a medal for every ten levels and a section per family, each a grid of three. A tap opens the emblem in the
+     shared sheet (openEmblem()). The four kinds are the filter now. Clay is only the dot on what is unseen (DS-01: it asks you to look).
+     Colours are the app's one set (--ghost and --ghost-dk joined it, for the ghosts); none is declared here. renderAchievements(),
+     cabHTML(), openEmblem(), cabItems(). Font sizes are the --fs-* tokens. */
+  #screen-achievements .cab-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 28px var(--g) 10px; }
+  #screen-achievements .cab-h:first-child { margin-top: 18px; }
+  #screen-achievements .cab-t { margin: 0; font: 900 var(--fs-title)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: .3px; text-transform: uppercase; color: var(--ink); }
+  #screen-achievements .cab-n { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; color: var(--grey); white-space: nowrap; }
+  #screen-achievements .cab-k { margin: 10px var(--g) 2px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  #screen-achievements .cab-sec { padding-top: 4px; border-top: 1px solid var(--hair); margin-top: 6px; }
+  #screen-achievements .cab-sec .cab-h { margin-top: 18px; }
+  #screen-achievements .cab-none { margin: 20px var(--g); font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--grey); }
+  /* Latest: big cards on the step's own ground, side by side */
+  .cab-latest { display: flex; gap: 10px; margin: 0; padding: 2px var(--g) 8px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; scroll-padding: 0 var(--g); }
+  .cab-latest::-webkit-scrollbar { display: none; }
+  .cab-card { position: relative; flex: none; display: grid; place-items: center; width: 168px; height: 196px; padding: 10px; border: 0; border-radius: 16px; overflow: hidden; cursor: pointer;
+    scroll-snap-align: start; text-align: left; font: inherit; color: inherit; }
+  .cab-card:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .cab-card .cab-em { width: 112px; height: 112px; margin-top: -8px; }
+  .cab-card .cab-new { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 6px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; }
+  .cab-card .cab-cn { position: absolute; left: 12px; right: 12px; bottom: 12px; font: 600 var(--fs-small)/1.2 'Barlow', sans-serif; }
+  /* the filter: chips in one row that scrolls sideways; 44 px to hit, drawn at 36 */
+  .cab-filter { display: flex; gap: 6px; margin: 0; padding: 0 var(--g) 10px; overflow-x: auto; scrollbar-width: none; }
+  .cab-filter::-webkit-scrollbar { display: none; }
+  .cab-chip { position: relative; flex: none; min-height: 36px; padding: 0 14px; border: 1px solid var(--box); border-radius: 999px; background: none; color: var(--grey); cursor: pointer; font: 600 var(--fs-small)/1 'Barlow', sans-serif; }
+  .cab-chip::before { content: ''; position: absolute; inset: -4px -2px; }
+  .cab-chip[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+  .cab-chip:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* a grid of three: the emblem, its short name, one grey line, a clay dot while it is unseen */
+  .cab-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 2px; margin: 0 calc(var(--g) - 6px); }
+  .cab-cell { position: relative; min-width: 0; display: grid; justify-items: center; align-content: start; gap: 2px; padding: 6px 2px 10px; border: 0; border-radius: 12px; background: none; color: var(--ink);
+    cursor: pointer; font: inherit; text-align: center; }
+  div.cab-cell { cursor: default; }
+  .cab-cell:active { background: var(--sand); }
+  div.cab-cell:active { background: none; }
+  .cab-cell:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  .cab-em { display: block; width: 80px; height: 80px; }
+  .cab-em svg { display: block; width: 100%; height: 100%; }
+  .cab-l { max-width: 100%; min-height: 2.4em; font: 600 var(--fs-small)/1.2 'Barlow', sans-serif; text-wrap: balance; overflow-wrap: anywhere; }
+  .cab-s { font: 400 var(--fs-label)/1.2 'Barlow', sans-serif; color: var(--grey); }
+  .cab-dot { position: absolute; top: 8px; left: calc(50% + 28px); width: 10px; height: 10px; border-radius: 50%; background: var(--clay); box-shadow: 0 0 0 2px var(--paper); }
+  /* the sheet: the emblem large, what it is, what it asks, and what is left or what you did */
+  .cab-sh { display: grid; justify-items: center; gap: 10px; padding: 8px 0 4px; text-align: center; }
+  .cab-sh-em { width: 210px; height: 210px; }
+  .cab-sh-em svg { display: block; width: 100%; height: 100%; }
+  .cab-sh-kind { margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--grey); }
+  .cab-sh .readiness-title { margin: 0; text-align: center; }
+  .cab-sh .readiness-title.is-ghost { color: var(--grey); }
+  .cab-sh-p { max-width: 30ch; margin: 0; font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .cab-bar { width: 200px; height: 6px; border-radius: 3px; background: var(--hair); overflow: hidden; }
+  .cab-bar i { display: block; height: 100%; border-radius: 3px; background: var(--fill); }
+  .cab-meta { margin: 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  .cab-times { margin: 0; font: 700 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--green-ink); }
+  .cab-go { display: block; width: 100%; max-width: 280px; min-height: 52px; margin-top: 8px; padding: 0 16px; font-size: var(--fs-lead); }   /* look: the one primary button */
+  .cab-tell { display: block; width: 100%; max-width: 280px; min-height: 48px; border: 1.5px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--green-ink); cursor: pointer;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .cab-tell:disabled { cursor: default; }
+  .cab-tell.is-sent { border-color: var(--mark); background: var(--tint); }
+  .cab-go:focus-visible, .cab-tell:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* Progress: the door's "3 new" and the tab's dot */
+  /* "3 new" is clay (Amir, 2026-10-25), and Progress remaps --clay-ink to green (PROGRESS ONLY: single accent), so it reads the two clays that stay: the fill's 4.7:1 on the
+     card in light, and the big-text clay in dark (4.7:1 on the dark card). */
+  .hrow-new { font: 700 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--clay-fill); white-space: nowrap; }
+  body[data-dark] .hrow-new { color: var(--clay-big); }
+  /* the medal beside "Level 24" in Your numbers, on the finished card and on a Player Page */
+  #screen-plan .cs-foot .cs-lm { flex: none; width: 44px; height: 44px; margin: -8px 0; }
+  #screen-plan .cs-foot .cs-lm svg { display: block; width: 100%; height: 100%; }
+  .earn-lm { display: block; flex: none; width: 32px; height: 32px; }
+  .earn-lm svg { display: block; width: 100%; height: 100%; }
+  /* the moment: the emblem is the hero, over the rays */
+  .hl-m-hero.has-em { flex: 1 0 auto; justify-content: center; padding-top: calc(env(safe-area-inset-top, 0px) + 56px); padding-bottom: 56px; text-align: center; }
+  .hl-m-hero.has-em + .hl-m-sheet { flex: none; }
+  .hl-m-em .hl-m-burst { top: 50%; z-index: 0; }
+  .hl-m-hero.has-em .hl-m-eyebrow { justify-content: center; }
+  .hl-m-hero.has-em .hl-m-title { margin-left: auto; margin-right: auto; }
+  .hl-m-hero.has-em .hl-m-sub { max-width: 30ch; margin-left: auto; margin-right: auto; font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; letter-spacing: 0; text-transform: none; }
+  .hl-m-hero.has-em .hl-m-next { text-align: center; }
+  #day-view .complete-earn .earn-lv { display: flex; align-items: center; gap: 8px; }
+  .hl-m-em { position: relative; z-index: 2; width: 196px; height: 196px; margin: 0 auto 22px; animation: cabPop .9s cubic-bezier(.2,1.6,.4,1) both; }
+  .hl-m-em svg { position: relative; z-index: 1; display: block; width: 100%; height: 100%; filter: drop-shadow(0 18px 24px rgba(0,0,0,.35)); }
+  @keyframes cabPop { 0% { transform: scale(.3) rotate(-14deg); opacity: 0; } 60% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .hl-m-em { animation: none; } }
+  /* a Player Page: the level medal on the face, then Trophies */
+  .pl-lvm { position: absolute; right: -18px; bottom: -14px; width: 54px; height: 54px; }
+  .pl-lvm svg { display: block; width: 100%; height: 100%; filter: drop-shadow(0 2px 4px rgba(0,0,0,.25)); }
+  .pl-lvl .pl-only { display: inline; margin: 0 0 0 6px; }
+  .cab-trh { display: flex; align-items: center; }
+  .cab-trh .prog-sec { flex: 1; min-width: 0; }
+  .cab-trh .prog-sec::after { display: none; }
+  .cab-all { flex: none; min-height: 44px; margin-right: calc(var(--g) - 10px); padding: 0 10px; border: 0; background: none; color: var(--green-ink); cursor: pointer; font: 600 var(--fs-body)/1 'Barlow', sans-serif; }
+  .cab-all:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  .cab-pl { padding: 0 calc(var(--g) - 6px); }
+  .cab-pl .cab-grid { margin: 0; }
+  .cab-pl-k { margin: 12px var(--g) 2px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  .cab-cell .pl-sg { margin-top: 3px; justify-content: center; }
+  .cab-cell .pl-stk { padding-right: 6px; }
+  #hist-overlay .cab-pl { padding: 0; }
+  #hist-overlay .cab-pl-k { margin: 14px 0 2px; }
+  /* a Bell line about an achievement carries its emblem at the end of the line */
+  .cr-emblem { flex: none; width: 40px; height: 40px; }
+  .cr-emblem svg { display: block; width: 100%; height: 100%; }
   .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
   /* 4. Next up (.dc-hero): the suggested day as ONE card, the training day's cover on Home. The photo graded into the green
@@ -5509,7 +5613,7 @@
      photo post is a card with its photo at 4:5, a moment a slim green line, likes with names, Amir's post pinned for a day, the composer
      at the top. Green and grey; clay only where Crew asks to be looked at: the tab's dot and the pin of a post of Amir's not opened yet
      (DS-01). Colours are the app's one set. renderCrew(), crewPostHTML(), crewLineHTML(), openCrewPost(), openCrewPhoto(). */
-  .nav-item[data-tab="crew"] .nav-dot { position: absolute; top: 7px; left: calc(50% + 7px); width: 8px; height: 8px; border-radius: 50%; background: var(--clay);
+  .nav-item .nav-dot { position: absolute; top: 7px; left: calc(50% + 7px); width: 8px; height: 8px; border-radius: 50%; background: var(--clay);
     box-shadow: 0 0 0 2px var(--row); }
   .crew-head { margin: 14px var(--g) 6px; }
   /* A person is a DOOR now (Players' Lounge step 1, 2026-10-24): a name, a face or a row opens their page. .cr-bt is the bare button every door
@@ -6387,14 +6491,16 @@
   <div id="hab-list-body"></div>
 </div>
 
-<!-- ═══ ACHIEVEMENTS ═══ Four Courts, on its own page since THE SCOREBOARD (2026-10-19): Next up, then the four kinds as
-     tiles, each opening its kind in the shared sheet (openCourt()). A sub-screen of Progress, reached from its door row
-     under Your numbers; never in the demo or the coach's preview (no get_achievements answer, so no door and no page). -->
+<!-- ═══ ACHIEVEMENTS ═══ the cabinet (2026-10-25, the Emblem Cabinet; Four Courts before it): "N won · M to win" under the title, Next up,
+     Latest, then All achievements with a filter, the level medals and a section per family, each emblem opening its own sheet
+     (openEmblem()). A sub-screen of Progress, reached from its door row under Your numbers; never in the demo or the coach's
+     preview (no get_achievements answer, so no door and no page). renderAchievements(). -->
 <div id="screen-achievements" class="screen">
   <div class="ceil-head">
     <button class="nav-back" onclick="subBack('achievements')" aria-label="Back to Progress">←</button>
     <div class="ceil-kick">Your numbers</div>
     <h1 class="ceil-title">Achievements</h1>
+    <p class="ceil-line" id="ach-line" hidden></p>
   </div>
   <div id="ach-body"></div>
 </div>
@@ -7094,6 +7200,8 @@ function _snapshot() {
     if (k === prefix + 'crewpages') continue;
     // The one-time note that your like signs an achievement (Players' Lounge, step 6): said once on THIS phone, never pulled onto another or kept in the row.
     if (k === prefix + 'signnote') continue;
+    // The cabinet's list of what this phone has shown (the emblems seen, 2026-10-25): this phone's, so another phone starts its own. Never progress.
+    if (k === prefix + 'cabseen' || k === prefix + 'lvseen') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -11485,7 +11593,7 @@ const APP_GUIDE = [
   { icon: 'check-circle', title: 'Finishing a session',
     body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Stop here</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Adding it up</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
   { icon: 'activity', key: 'career', title: 'Career: your level',
-    body: `<p>Your level is the number in the ring on Home's habit card. Tap the ring to open Your numbers. The weeks you've held in a row sit beside <strong>This Week</strong>. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>adding it up</strong> until my side has it.</p><p>Your four numbers are in <strong>Your numbers</strong> on Progress: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers; it says how many you have and which one you're closest to. Open it for the four groups — consistency, commitment, progress and resilience — and tap a group to see every achievement in it and what earns it. When a session leaves you one step short of one, its card tells you.</p><p>When I set you a job for the month, it sits right under this cycle's card, with a ring beside it. It is something to do, not a target for your training — I tick it off when you have done it. The <strong>Your moments</strong> row opens the lot, month by month: your marks, your achievements, the notes I write you and the month's honours. <strong>Amir saw this</strong> under one means I've seen it. A new note from me shows on Home until you open it. To answer it, tap <strong>Reply on WhatsApp</strong>.</p>` },
+    body: `<p>Your level is the number in the ring on Home's habit card. Tap the ring to open Your numbers. The weeks you've held in a row sit beside <strong>This Week</strong>. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>adding it up</strong> until my side has it.</p><p>Your four numbers are in <strong>Your numbers</strong> on Progress: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers. It says how many you have and which one you're closest to. Open it and you see your cabinet. Every achievement is an emblem. In colour, you have won it. In grey, you have not, and it says what is left. <strong>Latest</strong> comes first, and <strong>New</strong> sits on what you have not seen yet. A small dot on <strong>Progress</strong> says there is something new in there. The chips under <strong>All achievements</strong> show only what you have won, or what is left, or one kind: consistency, commitment, progress or resilience. Tap an emblem to see what it asks for and how far along you are. Every ten levels you win a new level medal. When a session leaves you one step short of an achievement, its card tells you.</p><p>When I set you a job for the month, it sits right under this cycle's card, with a ring beside it. It is something to do, not a target for your training — I tick it off when you have done it. The <strong>Your moments</strong> row opens the lot, month by month: your marks, your achievements, the notes I write you and the month's honours. <strong>Amir saw this</strong> under one means I've seen it. A new note from me shows on Home until you open it. To answer it, tap <strong>Reply on WhatsApp</strong>.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks in a row you trained',
     body: `<p>A week is <strong>held</strong> when you finish every session in it. Stopping a session early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count beside <strong>This Week</strong> on Home goes up — the count next to it says what is left this week. Miss a week and it starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
@@ -11507,7 +11615,7 @@ APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how ofte
     body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, effort, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
-  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is in the <strong>Profile</strong> group when you tap your initials, with <strong>Your photo</strong>, <strong>Your game</strong> and <strong>What the crew sees of you</strong>. Your page is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, tap your initials, then <strong>Your photo</strong>. Or open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP. The <strong>cheers</strong> number on a page counts only the cheers people sent that person with the <strong>Cheer</strong> button since they joined the crew. Likes are not in it. Your own page also shows your <strong>comebacks</strong> in a thin line under your numbers, marked Only you.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. Tap your initials, then <strong>Your game</strong>, or open your own page, and tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p><p>A photo you post with <strong>Tell the crew</strong> wears a small stamp across its foot: the session, the minutes, <strong>WEEK HELD</strong> when that session held your week, and the day. You read the stamp before you post. On your own session photo, tap <strong>Share</strong> and you get the session card for Instagram with that photo behind it. Nobody else's photo has Share.</p><p><strong>Share my card</strong>, on your own page, opens the same card as <strong>Share your card</strong> on Progress.</p><p><strong>The Open</strong> on Crew is a wall of tiles: the place, the face, the result and the name. Your tile has a green outline. Tap a tile to see that person's page. When more than 8 are on the board, tap <strong>All</strong> to see every one.</p>`;
+  const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their trophies and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is in the <strong>Profile</strong> group when you tap your initials, with <strong>Your photo</strong>, <strong>Your game</strong> and <strong>What the crew sees of you</strong>. Your page is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, tap your initials, then <strong>Your photo</strong>. Or open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP. The <strong>cheers</strong> number on a page counts only the cheers people sent that person with the <strong>Cheer</strong> button since they joined the crew. Likes are not in it. Your own page also shows your <strong>comebacks</strong> in a thin line under your numbers, marked Only you.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. Tap your initials, then <strong>Your game</strong>, or open your own page, and tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows under that trophy on the page. Tap the trophy to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p><p>A photo you post with <strong>Tell the crew</strong> wears a small stamp across its foot: the session, the minutes, <strong>WEEK HELD</strong> when that session held your week, and the day. You read the stamp before you post. On your own session photo, tap <strong>Share</strong> and you get the session card for Instagram with that photo behind it. Nobody else's photo has Share.</p><p><strong>Share my card</strong>, on your own page, opens the same card as <strong>Share your card</strong> on Progress.</p><p><strong>The Open</strong> on Crew is a wall of tiles: the place, the face, the result and the name. Your tile has a green outline. Tap a tile to see that person's page. When more than 8 are on the board, tap <strong>All</strong> to see every one.</p>`;
   // Bring a partner is named only while the card is on the page (the server has partner codes, stage97)
   const GUIDE_PARTNER = `<p><strong>Bring a partner</strong> is a card on your own page, under your numbers. Tap <strong>Get your code</strong> and it makes one for you. A friend who uses your code gets 10% off. You get 10% off your next cycle. <strong>Send on WhatsApp</strong> sends them your code and the link, and <strong>Copy</strong> copies the same words so you can send them anywhere. When a friend has joined, the card says so. A code earns no XP.</p>`;
   const myPage = (() => { try { const c = crewPageGet('me'); return c && c.p; } catch (e) { return null; } })();
@@ -11670,6 +11778,8 @@ function goTo(screen, historyId, keepContent) {
   // The tab is settled on every move (2026-10-20). It is kept while the athlete is ON Crew even after the server stops
   // answering — nobody is moved off a screen mid-read — so leaving is the moment that decision gets taken again.
   try { setCrewTab(); } catch (e) {}
+  if (screen !== 'achievements') { _cabOpen = false; _cabNew = null; }   // the cabinet's New marks are one visit's (cabHTML())
+  try { paintCabDot(); } catch (e) {}   // the Progress tab's clay dot while something won is unseen in the cabinet
   if (screen === 'plan') {
     paintNumbers();
     paintHabitsBlock();
@@ -12521,11 +12631,14 @@ function renderSystemGuide() {
   // 6. the achievements
   h += sysCard('Achievements', 'technique',
     `<p>An achievement is won once and kept.${items.length ? ` There are ${items.length} of them, and you have ${got}.` : ''}</p>`
-    + `<p>They come in four kinds:</p><ul>` + achKinds().map(K => `<li><strong>${esc(K.t)}</strong>. ${esc(K.s)}</li>`).join('') + `</ul>`
+    + `<p>Each one is an emblem in your cabinet, on the Achievements page. It is in colour when you have won it and grey when you have not.</p>`
+    + `<p>They come in four kinds. Each kind is a chip on that page, so you can look at one kind alone:</p><ul>` + achKinds().map(K => `<li><strong>${esc(K.t)}</strong>. ${esc(K.s)}</li>`).join('') + `</ul>`
+    + `<p>Every ten levels you win a new level medal, and it comes up full screen.</p>`
     + `<p>Some come in threes, like <strong>Human Sprinkler I, II and III</strong>. One name, three bars, and each one pays more than the one below it. Whichever habit you favour, there is always a next one.</p>`
     + `<p>Every row says what it asks for, then how far along you are.</p>`
     + `<p>When you win one it comes up full screen. <strong>Share</strong> makes a card for it. <strong>Tell the crew</strong> puts one line on the Bell, and only if you tap it.</p>`
-    + `<p>An achievement keeps the XP it was worth on the day you won it. If I change a price later, what you already have does not move.</p>`);
+    + `<p>An achievement keeps the XP it was worth on the day you won it. If I change a price later, what you already have does not move.</p>`
+    + (items.some(i => i.day && i.xp_won === 0) ? `<p>A few of yours show no XP. I added them after you had already won them, so they are yours, but they paid nothing. From now on a win pays.</p>` : ''));
 
   // 7. the four numbers
   const marks = (() => { try { return careerMarks(); } catch (e) { return null; } })();
@@ -13247,6 +13360,8 @@ function collectRewardBands(day) {
 // The moment for one waiting row (round 5, the Scorecard's moment): a mark opens with its number, what it counts and the next mark; an
 // achievement with its name and its line. No metal, no title, no Grand Slam (L2). The card to share is rwLightSpec()'s.
 // Since 2026-10-20 an achievement's moment also carries `crew`: the one line the athlete can put on the Bell with a tap.
+// The catalogue id of a waiting row: its `item`, else the part of its award id after "achievement:".
+function rwItemOf(m) { return String((m && m.item) || String((m && m.award_id) || '').split(':')[1] || ''); }
 function rwMomentFor(m) {
   const sp = rwLightSpec(m) || {};
   const cur = DATA && (DATA.cycles || [])[Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0];
@@ -13258,13 +13373,14 @@ function rwMomentFor(m) {
     const words = { weeks_held: `Every session, ${n} weeks running. Keep it boring.`, sessions_with_amir: `${n} session${n === 1 ? '' : 's'} in. This is how it adds up.`,
       personal_bests: `${n} personal bests. You're getting stronger.`, comebacks: `${n} times you came back. That's the part that counts.` }[mk.key];
     return { eyebrow: 'A new mark', num: n, title: careerMarkWords(mk.key, n) + (mk.key === 'weeks_held' ? ' in a row' : ''), sub: '',
-      next: nx ? 'Next mark · ' + nx + ' ' + unit : '', art, words, go: 'Share the card', specs: [sp] };
+      next: nx ? 'Next mark · ' + nx + ' ' + unit : '', art, words, go: 'Share the card', specs: [sp], emblem: { k: 'mark', id: m.item, tier: tier - 1 } };
   }
   return {
     eyebrow: rwMeaningWord(sp.meaning) || 'Career',
     title: sp.name || '',
     sub: sp.caption || '',
     art,
+    emblem: { k: 'ach', id: rwItemOf(m) },   // the emblem is the hero over the rays (the Emblem Cabinet, 2026-10-25)
     // What Amir says under the card, by what the achievement cost: a small one never claims it took weeks.
     words: m.size === 'legend' ? 'This one is rare. Well done.'
       : m.size === 'milestone' ? 'That took weeks. It stays yours.'
@@ -13309,9 +13425,55 @@ function maybeRewardMoment(reason, day) {
   };
   if (reason === 'done') setTimeout(open, 700); else open();   // 'done': after the finished card has scrolled in
 }
+// ── A NEW LEVEL MEDAL (Amir, 2026-10-25: "only every tenth level opens the full screen, with the new medal"; the ones between stay on the finished card) ──
+// A medal changes every ten levels (10, 20, 30 …). The first time this phone reads a fresh answer it only notes the medal it is on (<id>_lvseen = { "20": 1 },
+// this phone's own list and never synced, so a second phone shows a medal once as well), so nobody is shown a medal they have worn for months; after that, a
+// fresh answer that is on a new decade opens the moment with the new medal. Never over the Welcome or another moment, never mid-session, one per open (D7): the
+// reward's own moment, when there is one, waits for the next open as it always has. Share it is the existing level card, Tell the crew is one plain line.
+// lvSeen() reads the list ({ "20": ms } or null); lvSeen([20, 30]) adds those decades and says whether the phone kept them.
+function lvSeen(decs) {
+  let o = null;
+  try { o = JSON.parse(localStorage.getItem(ATHLETE_ID + '_lvseen') || 'null'); } catch (e) { o = null; }
+  if (!o || typeof o !== 'object' || Array.isArray(o)) o = null;
+  if (!decs) return o;
+  o = o || {};
+  decs.forEach(d => { o[d] = Date.now(); });
+  try { _lsRawSet(ATHLETE_ID + '_lvseen', JSON.stringify(o)); return true; } catch (e) { return false; }
+}
+function maybeLevelMoment() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || !DATA || !careerOnT()) return false;
+  if (!(CAREER_T.at >= ((window.performance && performance.timeOrigin) || 0))) return false;   // a cached answer is never a trigger
+  const E = cabE(), L = cabLevel();
+  if (!E || !L) return false;
+  const dec = Math.floor(L / 10) * 10, seen = lvSeen();
+  if (!seen) { lvSeen([dec]); return false; }   // the first look on this phone: today's medal is not news
+  if (dec < 10 || seen[dec]) return false;
+  let doneDay = null;
+  document.querySelectorAll('.session-complete.visible[id^="complete-"]').forEach(c => {
+    const d = c.id.slice(9), raw = rwEarnRaw(d);
+    if (raw && raw.saved && CAREER_T.at > raw.saved) doneDay = d;
+  });
+  if (document.querySelector('.wel, .hl-moment, .finish-rate:focus-within')) return false;
+  if (doneDay == null && (_rwOpened || document.body.classList.contains('session-on'))) return false;
+  const st = E.LEVEL_STEPS.find(x => x.from === dec);
+  if (!st) return false;
+  const ids = []; for (let d = 10; d <= dec; d += 10) ids.push(d);
+  const open = () => {
+    if (document.querySelector('.wel, .hl-moment, .finish-rate:focus-within')) return;
+    openMoment({ eyebrow: 'Level up · a new medal', emblem: { k: 'level', n: L }, title: 'Level ' + L, art: '', go: 'Share it', crew: 'Just reached level ' + L + '.',
+      sub: `${st.name}, from ${dec} to ${dec + 9}.` + (dec >= 100 ? '' : ` The next medal comes at ${dec + 10}.`),
+      specs: [{ kind: 'level', first: hlFirst(), level: L, date: ymdLocal(new Date()) }] });
+    const el = document.querySelector('.hl-moment');
+    const hit = el && document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
+    if (!el || !hit || !el.contains(hit) || !lvSeen(ids)) { if (el) el.remove(); navSync(); }   // not on top, or no room to remember it: taken down, it waits for the next open
+  };
+  if (doneDay != null) setTimeout(open, 700); else open();   // after the finished card has scrolled in
+  return true;
+}
 // A fresh answer: the finish card's bands were drawn by paintCareer(); now decide the moment. The first answer after a session reached the
 // server is the session's own ('done'); any other is an open.
 function rewardAfterAnswer() {
+  try { if (maybeLevelMoment()) return; } catch (e) { console.warn('[career] level moment not decided:', e); }   // a new medal comes first: it is rarer, and one moment opens per open (D7)
   if (!catalogueOnT()) return;
   let doneDay = null;
   document.querySelectorAll('.session-complete.visible[id^="complete-"]').forEach(c => {
@@ -13384,7 +13546,7 @@ function paintCareerEarn(day) {
       const was = fresh && raw.before > 0 ? careerLevelOf(raw.before, p.rules).level : L.level;
       const up = fresh && L.level > was && !window.IS_PREVIEW;
       h = `<span class="earn-xp">+${gained.toLocaleString('en-US')} XP</span>`
-        + `<span class="earn-lv">Level ${L.level} · ${fresh ? `${L.to_next.toLocaleString('en-US')} to ${L.level + 1}` : 'adding it up'}</span>`
+        + `<span class="earn-lv">${cabMedal(L.level, 'earn-lm')}<span>Level ${L.level} · ${fresh ? `${L.to_next.toLocaleString('en-US')} to ${L.level + 1}` : 'adding it up'}</span></span>`
         + (up ? `<button type="button" class="earn-share" onclick="shareLevel(${L.level})">Share level ${L.level}</button>` : '');
     }
   } catch (err) { h = ''; }
@@ -13603,6 +13765,7 @@ function paintCareerCard() {
   if (on === 'screen-moments') renderMoments();
   if (on === 'screen-achievements') renderAchievements();
   if (typeof paintDayOne === 'function') paintDayOne();   // keeps "Your numbers" in step with the card under it
+  try { paintCabDot(); } catch (e) { /* the next move settles it */ }
 }
 function careerCardHTML() {
   if (!careerOnT() || !DATA) return '';
@@ -13622,7 +13785,7 @@ function careerCardHTML() {
   const cell = x => `<div class="cs-n"><b>${fmt(x.value)}</b><span class="cs-nm">${esc(careerMarkWords(x.key, x.value))}</span>${CS_LINE[x.key] ? `<span class="cs-ln">${CS_LINE[x.key]}</span>` : ''}</div>`;
   let h = `<div class="cs-card" role="group" aria-label="${esc('Your numbers. Level ' + L.level + '.').replace(/"/g, '&quot;')}">
     ${cells.length ? `<div class="cs-grid">${cells.map(cell).join('')}</div>` : ''}
-    <div class="cs-foot"><span class="cs-lw">Level ${L.level}</span><span class="cs-bar" aria-hidden="true"><i style="width:${pct}%"></i></span></div>
+    <div class="cs-foot">${cabMedal(L.level, 'cs-lm')}<span class="cs-lw">Level ${L.level}</span><span class="cs-bar" aria-hidden="true"><i style="width:${pct}%"></i></span></div>
     ${window.IS_PREVIEW ? '' : '<button type="button" class="cs-share" onclick="sharePlayerCard()">Share your card</button>'}</div>`;
   return h;
 }
@@ -13671,7 +13834,7 @@ function momentsList() {
   });
   ((aw && aw.achievements) || []).forEach(a => {
     if (!a || !a.id || !a.day) return;
-    out.push({ day: a.day, sort: a.day, kind: 'achievement', w: momName(a.name || a.id), s: a.caption || '',
+    out.push({ day: a.day, sort: a.day, kind: 'achievement', w: momName(a.name || a.id), s: a.caption || '', aid: String(a.id),
       meaning: achMeaningOf(a.id), award_id: awardId('achievement', a.id) });
   });
   ((my && my.notes) || []).forEach(n => {
@@ -13762,7 +13925,7 @@ function momentsHTML() {
   });
   return out + (month ? '</div>' : '');
 }
-// ── Progress → Achievements: Four Courts (Career Mode round 5; Amir's pick A, 2026-10-19) ─────────────────────────────────────────────────────
+// ── Progress → Achievements: the data, and Next up (Four Courts, Career Mode round 5, 2026-10-19; the page itself is the cabinet below, 2026-10-25) ─────────────────────────────────────────────────────
 // get_achievements() (stage80) is every achievement the athlete can see: earned ones with their day, the rest with have and need from the
 // server's own measures, and `next`, the one to lead with. It comes with get_my_moments() and get_awards() (refreshMoments()) and is kept in the
 // same copy; without an answer (offline with no copy, the server without stage80, the demo, the coach's preview) the section is not drawn.
@@ -13816,48 +13979,354 @@ function achSub(it) {
 }
 function achPct(it) { const n = Math.max(1, Number(it.need) || 1); return Math.max(0, Math.min(100, Math.round((Number(it.have) || 0) / n * 100))); }
 var _acHtml = '';
-// Progress's door to Achievements (THE SCOREBOARD, 2026-10-19): earned of all as the figure, and what is closest as the quiet
-// line, so the one forward-looking thing stays in sight. The four kinds are the page behind it (renderAchievements()).
+// ── THE CABINET (2026-10-25; Amir picked direction A of the Emblem Cabinet: "go with your picks"; the look is the block THE CABINET in the sheet) ──
+// Achievements is a cabinet of EMBLEMS. assets/js/emblems.js (window.AAEmblem) draws them, one per achievement and one per tier of the four marks,
+// and a medal for every ten levels; this part decides WHAT is on the shelf and what each one says. Items are achItems() (get_achievements(), stage80)
+// plus every tier of the four marks (careerMarks(), its day from get_awards()), merged and sorted by the emblem map's `order` into AAEmblem.SECTIONS.
+// An id the emblem map does not know goes into Trophies with the plain fallback drawing, so a new catalogue line never leaves a hole. Everything the
+// server adds (done_on, xp_won, times, the 33 new ids) is optional: without it the page is what the server sends today.
+// The functions are functions and the state is `var`, never a top-level const: Home's first paint can reach the painters before the script has got this far.
+var _cabFilter = null, _cabNew = null, _cabOpen = false;
+function cabE() { return window.AAEmblem || null; }
+// The emblem script is `defer`: a repaint once it has arrived, for what was drawn before it (the career card's medal).
+function emblemsReady() { try { paintCareerCard(); } catch (e) { /* the next answer paints it */ } }
+var CAB_MEANING = { held_weeks: 'consistency', century: 'commitment', bests: 'progress', comebacks: 'resilience' };
+var CAB_FILTERS = ['all', 'won', 'todo', 'consistency', 'commitment', 'progress', 'resilience'];
+function cabFilter() {
+  if (_cabFilter) return _cabFilter;
+  let f = 'all';
+  try { f = localStorage.getItem('aa_cab_filter') || 'all'; } catch (e) { f = 'all'; }   // not <id>_: this phone's own choice, never synced
+  return (_cabFilter = CAB_FILTERS.indexOf(f) >= 0 ? f : 'all');
+}
+function cabSetFilter(f) {
+  if (CAB_FILTERS.indexOf(f) < 0) return;
+  _cabFilter = f;
+  try { _lsRawSet('aa_cab_filter', f); } catch (e) { /* private window: it just forgets */ }
+  const bar = document.querySelector('#ach-body .cab-filter'), top = bar ? bar.getBoundingClientRect().top : null;
+  renderAchievements();
+  const nb = document.querySelector('#ach-body .cab-filter');
+  if (top != null && nb) window.scrollBy(0, nb.getBoundingClientRect().top - top);   // the chips stay under the thumb
+}
+window.cabSetFilter = cabSetFilter;
+// "3 Aug" (this year) or "3 Aug 2025".
+function cabDay(d) {
+  const m = /^(\d{4})/.exec(String(d || '')), a = achDay(d);
+  return a && m && Number(m[1]) !== new Date().getFullYear() ? a + ' ' + m[1] : a;
+}
+function cabNum(x) { return Math.round(x * 100) / 100 >= 1000 ? Math.round(x).toLocaleString('en-US') : String(Math.round(x * 10) / 10); }
+// The short name on the grid ("25 sessions", "4 weeks in a row", else the catalogue's own name) from the emblem map's family and number.
+function cabShort(info, name) {
+  const n = info && Number(info.n);
+  if (info && n > 0) {
+    if (info.fam === 'sessions') return n === 1 ? '1 session' : n + ' sessions';
+    if (info.fam === 'weeks') return n === 1 ? '1 week held' : n + ' weeks in a row';
+    if (info.fam === 'months') return n === 12 ? 'A year in a row' : n + ' months in a row';
+    if (info.fam === 'bests') return n === 1 ? 'First best' : n + ' personal bests';
+    if (info.fam === 'comebacks') return n + ' comebacks';
+  }
+  return name;
+}
+// The whole shelf: [{ key, kind: 'ach' | 'mark', id, won, day, tier, sec, order, meaning, name, short, info, it?, markId?, tierIdx?, have, need, times, xp, v11 }].
+function cabItems() {
+  const E = cabE(), ach = achItems();
+  if (!E || !ach.length) return [];   // no achievements answer, no cabinet (offline with no copy, the demo, the coach's preview)
+  const out = [];
+  ach.forEach(it => {
+    const id = String(it.id), info = E.info(id), won = !!it.day;
+    out.push({ key: id, kind: 'ach', id, it, info, won, day: won ? String(it.done_on || it.day) : '', tier: info ? info.tier : 0, sec: info ? info.sec : 'trophies',
+      order: info ? info.order : 1e6, v11: !!(info && info.v11), meaning: it.meaning || '', name: momName(it.name || id), short: cabShort(info, momName(it.name || id)),
+      have: Number(it.have) || 0, need: Number(it.need) || 0, times: Number(it.times) > 1 ? Number(it.times) : 0, xp: Number(it.xp) || 0,
+      xpWon: it.xp_won != null ? Number(it.xp_won) : null });
+  });
+  const marks = careerMarks(), shelf = (MOM_T && MOM_T.aw && Array.isArray(MOM_T.aw.badges)) ? MOM_T.aw.badges : null;
+  let cells = [];
+  try { cells = catalogueOnT() ? careerMarkCells(CAREER_T.p) : []; } catch (e) { cells = []; }
+  Object.keys(marks).forEach(id => {
+    const mk = marks[id], b = shelf && shelf.find(x => x && x.id === id), days = b && Array.isArray(b.days) ? b.days : [];
+    const cell = cells.find(x => x.id === id), have = cell ? cell.value : 0;
+    mk.at.forEach((n, i) => {
+      const mi = E.markInfo(id, i);
+      if (!mi) return;
+      const day = days[i] ? String(days[i]) : '';
+      const won = !!day || (!shelf && !!cell && have >= n);   // the shelf's day when it answered, else the number
+      const name = n + ' ' + careerMarkWords(mk.key, n) + (mk.key === 'weeks_held' ? ' in a row' : '');
+      out.push({ key: 'mark:' + id + ':' + i, kind: 'mark', id, markId: id, tierIdx: i, n, info: mi, won, day, tier: mi.tier, sec: mi.sec, order: mi.order, v11: false,
+        meaning: CAB_MEANING[id] || '', name, short: cabShort(mi, name), have, need: n, times: 0, xp: 0, xpWon: null, unit: { held_weeks: 'weeks', century: 'sessions', bests: 'bests', comebacks: 'comebacks' }[id] });
+    });
+  });
+  return out;
+}
+// The decade medals: 1, 10, 20 … 100, with where this athlete is. The level is the profile's (no profile, no medals).
+function cabLevel() {
+  try {
+    if (!careerOnT() || !CAREER_T.p.career || typeof CAREER_T.p.career.level !== 'number') return 0;
+    return careerLevelOf(CAREER_T.p.career.xp, CAREER_T.p.rules).level || 0;
+  } catch (e) { return 0; }
+}
+// The level's own medal, wrapped (Your numbers, the finished card): '' until the emblem script has loaded, so nothing is ever drawn half.
+function cabMedal(L, cls) {
+  const E = cabE();
+  return E && Number(L) > 0 ? `<span class="${cls}" aria-hidden="true">${E.level(Number(L))}</span>` : '';
+}
+// One emblem as a moment shows it: { k: 'ach', id } · { k: 'mark', id, tier } · { k: 'level', n }, always in colour.
+function cabEmblemSvg(e) {
+  const E = cabE();
+  if (!E || !e) return '';
+  return e.k === 'level' ? E.level(e.n, { won: true }) : e.k === 'mark' ? E.mark(e.id, e.tier, { won: true }) : E.ach(e.id, { won: true });
+}
+function cabMedals() {
+  const E = cabE(), L = cabLevel();
+  if (!E || !L) return [];
+  const st = E.LEVEL_STEPS;
+  return st.map((s, i) => {
+    const nx = st[i + 1], reached = L >= s.from, cur = reached && (!nx || L < nx.from);
+    return { key: 'level:' + s.from, kind: 'level', from: s.from, name: s.name, range: s.range, reached, cur, won: reached,
+      label: s.from === 1 ? 'Levels 1 to 9' : i === st.length - 1 ? 'Level 100 and up' : 'Levels ' + s.from + ' to ' + (s.from + 9),
+      sub: cur ? 'Now' : reached ? 'Done' : 'From ' + s.from };
+  });
+}
+// How many are won and how many there are (the page's line and the door's figure): achievements, mark tiers and level medals together.
+function cabCounts(items) {
+  items = items || cabItems();
+  const md = cabMedals(), won = items.filter(c => c.won).length + md.filter(m => m.reached).length;
+  return { won, all: items.length + md.length };
+}
+// ── what has been seen. <id>_cabseen = { key: 1 } on THIS phone, never synced (_snapshot() leaves it out): opening the cabinet marks what is on it. ──
+// The first time a phone reads it there is no key, and everything already won then is not new (the cabinet did not exist when it was won), except the
+// 33 of rulebook 11, which the server may back-fill as won the day it lands: those are exactly what the athlete has not seen.
+function cabSeenGet() {
+  try { const o = JSON.parse(localStorage.getItem(ATHLETE_ID + '_cabseen') || 'null'); return o && typeof o === 'object' && !Array.isArray(o) ? o : null; } catch (e) { return null; }
+}
+// The won ones this phone has not shown yet. With `mark` they are marked seen as well (what opening the cabinet does, after it has drawn them).
+function cabUnseen(items, mark) {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return [];
+  const won = (items || cabItems()).filter(c => c.won);
+  if (!won.length) return [];
+  let seen = cabSeenGet(), put = false;
+  if (!seen) {
+    if (!(MOM_T && MOM_T.aw)) return [];   // the marks' days have not come yet: a baseline taken now would call every mark new later
+    seen = {};
+    won.forEach(c => { if (!c.v11) seen[c.key] = 1; });
+    put = true;
+  }
+  const un = won.filter(c => !seen[c.key]);
+  if (mark && un.length) { un.forEach(c => { seen[c.key] = 1; }); put = true; }
+  if (put) { try { _lsRawSet(ATHLETE_ID + '_cabseen', JSON.stringify(seen)); } catch (e) { /* storage full: it is told again at the next visit */ } }
+  return un;
+}
+// The clay dot on the Progress tab while anything won is unseen in the cabinet. No number on the tab (Amir, 2026-10-25).
+function paintCabDot() {
+  const b = document.querySelector('#global-tabs .nav-item[data-tab="plan"]');
+  if (!b) return;
+  let n = 0;
+  try { const on = (document.querySelector('.screen.active') || {}).id; n = on === 'screen-achievements' ? 0 : cabUnseen().length; } catch (e) { n = 0; }
+  const dot = b.querySelector('.nav-dot');
+  if (n && !dot) b.insertAdjacentHTML('beforeend', '<span class="nav-dot" aria-hidden="true"></span>');
+  else if (!n && dot) dot.remove();
+  if (n) b.setAttribute('aria-label', 'Progress, ' + n + ' new in your achievements'); else b.removeAttribute('aria-label');
+}
+// Progress's door to Achievements: "50 of 127", "3 new" in clay while some are unseen, and what is closest as the quiet line.
 function courtsDoorHTML() {
-  const items = achItems();
+  const items = cabItems();
   if (!items.length) return '';
-  const earned = items.filter(i => i.day);
-  const nx = MOM_T.ach.next && !MOM_T.ach.next.day ? items.find(i => i.id === MOM_T.ach.next.id) : null;
+  const c = cabCounts(items), fresh = cabUnseen(items).length;
+  const nx = MOM_T.ach.next && !MOM_T.ach.next.day ? achItems().find(i => i.id === MOM_T.ach.next.id) : null;
   const sub = nx ? momName(nx.name) + ' · ' + achLine(nx) : 'Every one of them, earned.';
-  return `<button type="button" class="hrow" onclick="goTo('achievements')" aria-label="${esc('Achievements: ' + earned.length + ' of ' + items.length + '. ' + sub).replace(/"/g, '&quot;')}">
+  return `<button type="button" class="hrow" onclick="goTo('achievements')" aria-label="${esc('Achievements: ' + c.won + ' of ' + c.all + (fresh ? ', ' + fresh + ' new' : '') + '. ' + sub).replace(/"/g, '&quot;')}">
     ${hrowIc('ach')}<span class="hrow-b"><span class="hrow-l">Achievements</span>
-      <span class="hrow-v"><span class="hrow-vv">${earned.length} of ${items.length}</span><small>${esc(sub)}</small></span></span>
+      <span class="hrow-v"><span class="hrow-vv">${c.won} of ${c.all}</span>${fresh ? `<span class="hrow-new">${fresh} new</span>` : ''}<small>${esc(sub)}</small></span></span>
     <span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
-// The page: Next up, then the four kinds (#screen-achievements). It was a section of the tab until 2026-10-19.
+// The page: the cabinet (#screen-achievements). It was Next up and four tiles until 2026-10-25.
 function renderAchievements() {
   const body = document.getElementById('ach-body');
   if (!body) return;
-  let h = '';
-  try { h = courtsHTML(); } catch (e) { h = ''; }
-  // The manual's door is OUTSIDE courtsHTML(), which returns nothing at all until the first achievement answer lands: a
-  // page with no cabinet yet is exactly when an athlete wants to be told how the cabinet works.
+  let h = '', items = [];
+  try { items = cabItems(); h = cabHTML(items); } catch (e) { h = ''; items = []; }
+  // The manual's door is OUTSIDE the cabinet, which draws nothing at all until the first achievement answer lands: a page with no
+  // cabinet yet is exactly when an athlete wants to be told how the cabinet works.
   body.innerHTML = h + sysDoorHtml('achievements');
+  const line = document.getElementById('ach-line');
+  if (line) {
+    let t = '';
+    try { if (items.length) { const c = cabCounts(items); t = c.won + ' won · ' + (c.all - c.won) + ' to win'; } } catch (e) { t = ''; }
+    line.textContent = t; line.hidden = !t;
+  }
+  try { cabUnseen(items, true); paintCabDot(); } catch (e) { /* the dot catches up at the next move */ }
 }
 window.renderAchievements = renderAchievements;
-function courtsHTML() {
-  const items = achItems();
-  if (!items.length) return '';
-  const nx = MOM_T.ach.next && !MOM_T.ach.next.day ? items.find(i => i.id === MOM_T.ach.next.id) : null;
+// The cell on a grid: a button when it opens something (`key`), else a plain box (someone else's shelf).
+function cabCell(c, o) {
+  o = o || {};
+  const E = cabE();
+  const svg = c.kind === 'level' ? E.level(c.cur ? (o.lv || cabLevel()) : c.from, { won: c.reached })
+    : c.kind === 'mark' ? E.mark(c.markId, c.tierIdx, { won: c.won }) : E.ach(c.id, { won: c.won });
+  const hl = c.times ? c.times + ' times' : c.day ? cabDay(c.day) : '';
+  let sub = c.kind === 'level' ? c.sub : c.won ? hl : (c.it && c.it.test === 'best_value' && c.have > 0 ? Math.round(c.have) + '% of ' + Math.round(c.need) + '%' : c.need > 1 && c.have > 0 ? cabNum(c.have) + ' of ' + cabNum(c.need) : 'Not yet');
+  if (o.sub != null) sub = o.sub;
+  const lab = (c.kind === 'level' ? c.label : c.short) + '. ' + (c.won || c.reached ? (c.kind === 'level' ? sub : 'Won' + (c.day ? ' ' + cabDay(c.day) : '') + (c.times ? ', ' + c.times + ' times' : '')) : 'Not won yet. ' + sub) + (o.fresh ? '. New' : '');
+  const inner = `<span class="cab-em">${svg}</span><span class="cab-l">${esc(c.kind === 'level' ? c.label : c.short)}</span>${sub ? `<span class="cab-s">${esc(sub)}</span>` : ''}${o.fresh ? '<i class="cab-dot" aria-hidden="true"></i>' : ''}${o.extra || ''}`;
+  if (o.plain) return `<div class="cab-cell">${inner}</div>`;
+  if (o.signers) return `<button type="button" class="cab-cell" data-aid="${esc(c.key)}" onclick="openPlayerSigners('${esc(o.signers)}', this.dataset.aid)" aria-label="${esc(o.signLab || lab).replace(/"/g, '&quot;')}">${inner}</button>`;
+  return `<button type="button" class="cab-cell" data-k="${esc(c.key)}" onclick="openEmblem(this.dataset.k)" aria-label="${esc(lab).replace(/"/g, '&quot;')}">${inner}</button>`;
+}
+function cabCard(c) {
+  const E = cabE(), g = E.ground(c.tier);
+  const chip = g.text === '#FFFFFF' ? 'background:#fff;color:#1A1A1A' : 'background:#1A1A1A;color:#fff';
+  const isNew = _cabNew && _cabNew.has(c.key);
+  return `<button type="button" class="cab-card" data-k="${esc(c.key)}" onclick="openEmblem(this.dataset.k)" style="background:${g.css};color:${g.text}" aria-label="${esc(c.name + (isNew ? '. New' : '') + '. Won ' + cabDay(c.day)).replace(/"/g, '&quot;')}">`
+    + (isNew ? `<span class="cab-new" style="${chip}">New</span>` : '')
+    + `<span class="cab-em">${c.kind === 'mark' ? E.mark(c.markId, c.tierIdx, { won: true }) : E.ach(c.id, { won: true })}</span><span class="cab-cn">${esc(c.name)}</span></button>`;
+}
+function cabHTML(items) {
+  const E = cabE();
+  if (!E || !items.length) return '';
+  // what is new on this visit: the unseen ones when the page opens, and any that arrive while it stays open
+  const un = cabUnseen(items);
+  if (!_cabOpen || !_cabNew) { _cabNew = new Set(); _cabOpen = true; }
+  un.forEach(c => _cabNew.add(c.key));
+  const day = c => String(c.day || '');
+  const wonList = items.filter(c => c.won).sort((a, b) => day(b).localeCompare(day(a)) || a.order - b.order);
+  const fresh = wonList.filter(c => _cabNew.has(c.key));
+  const latest = fresh.length ? fresh.slice(0, 10) : wonList.slice(0, 3);
+  const f = cabFilter(), md = cabMedals();
+  const nx = MOM_T.ach.next && !MOM_T.ach.next.day ? achItems().find(i => i.id === MOM_T.ach.next.id) : null;
   let h = '';
   if (nx) {
-    h += `<button type="button" class="ac-next" onclick="openCourt('${esc(nx.meaning)}', '${esc(nx.id)}')" aria-label="${esc('Next up: ' + momName(nx.name) + '. ' + achLine(nx)).replace(/"/g, '&quot;')}">
+    h += `<button type="button" class="ac-next" data-k="${esc(nx.id)}" onclick="openEmblem(this.dataset.k)" aria-label="${esc('Next up: ' + momName(nx.name) + '. ' + achLine(nx)).replace(/"/g, '&quot;')}">
       <span class="cs-l">Next up</span><span class="ac-nm">${esc(momName(nx.name))}</span><span class="ac-s">${esc(achLine(nx))}</span>`
       + (Number(nx.need) > 1 ? `<span class="cs-bar sm" aria-hidden="true"><i style="width:${achPct(nx)}%"></i></span>` : '') + `</button>`;
   }
-  h += `<div class="ac-grid">` + achKinds().map(K => {
-    const of = items.filter(i => i.meaning === K.k), got = of.filter(i => i.day).sort((a, b) => String(b.day).localeCompare(String(a.day)));
-    const newest = got[0] ? momName(got[0].name) + ' · ' + achDay(got[0].day) : 'None yet';
-    return `<button type="button" class="ac-tile" onclick="openCourt('${K.k}')" aria-label="${esc(K.t + ': ' + got.length + ' of ' + of.length + '. ' + newest).replace(/"/g, '&quot;')}">
-      <span class="ac-k">${K.t}</span><span class="ac-n">${got.length}<small>of ${of.length}</small></span><span class="ac-new">${esc(newest)}</span></button>`;
-  }).join('') + `</div>`;
+  if (latest.length) h += `<div class="cab-h"><h2 class="cab-t">Latest</h2></div><div class="cab-latest">${latest.map(cabCard).join('')}</div>`;
+  const chips = [['all', 'All'], ['won', 'Won'], ['todo', 'To win'], ['consistency', 'Consistency'], ['commitment', 'Commitment'], ['progress', 'Progress'], ['resilience', 'Resilience']];
+  h += `<div class="cab-h"><h2 class="cab-t">All achievements</h2></div><div class="cab-filter" role="group" aria-label="Show">`
+    + chips.map(([k, t]) => `<button type="button" class="cab-chip" aria-pressed="${k === f}" onclick="cabSetFilter('${k}')">${t}</button>`).join('') + `</div>`;
+  const keep = c => f === 'all' || (f === 'won' ? c.won : f === 'todo' ? !c.won : c.meaning === f);
+  const isNewOf = c => !!(_cabNew && _cabNew.has(c.key));
+  let any = false;
+  // the level medals lead: only where a kind is not the filter (a medal is no kind)
+  const isKind = ['consistency', 'commitment', 'progress', 'resilience'].indexOf(f) >= 0;
+  const mds = isKind ? [] : md.filter(m => f === 'all' || (f === 'won' ? m.reached : !m.reached));
+  if (mds.length) {
+    any = true;
+    h += `<div class="cab-sec"><div class="cab-h"><h2 class="cab-t">Level ${cabLevel()}</h2><span class="cab-n">${md.filter(m => m.reached).length} of ${md.length} medals</span></div>`
+      + `<div class="cab-grid">${mds.map(m => cabCell(m)).join('')}</div></div>`;
+  }
+  const grid = list => `<div class="cab-grid">${list.map(c => cabCell(c, { fresh: isNewOf(c) })).join('')}</div>`;
+  const secs = E.SECTIONS, done = {};
+  secs.forEach(s => {
+    if (done[s.k]) return;
+    const group = s.group ? secs.filter(x => x.group === s.group) : [s];
+    group.forEach(g => { done[g.k] = 1; });
+    const all = items.filter(c => group.some(g => g.k === c.sec)), shown = all.filter(keep);
+    if (!shown.length) return;
+    any = true;
+    const sort = l => l.slice().sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+    let inner = '';
+    if (s.group) inner = group.map(g => { const l = sort(shown.filter(c => c.sec === g.k)); return l.length ? `<p class="cab-k">${esc(g.t)}</p>${grid(l)}` : ''; }).join('');
+    else if (s.k === 'habits') {
+      // one ladder per row, then the habits' one-offs
+      const lad = {}, ones = [];
+      sort(shown).forEach(c => { const k = c.info && c.info.ladder; if (k) (lad[k] = lad[k] || []).push(c); else ones.push(c); });
+      inner = Object.keys(lad).map(k => grid(lad[k])).join('') + (ones.length ? grid(ones) : '');
+    } else inner = grid(sort(shown));
+    const title = s.group === 'streaks' ? 'Streaks' : s.t;
+    h += `<div class="cab-sec"><div class="cab-h"><h2 class="cab-t">${esc(title)}</h2><span class="cab-n">${shown.filter(c => c.won).length} of ${shown.length}</span></div>${inner}</div>`;
+  });
+  if (!any) h += `<p class="cab-none">${f === 'won' ? 'Nothing won yet. Your first one is close.' : 'Nothing here.'}</p>`;
   return h;
 }
+// The cabinet's own sheet for one emblem, in the shared sheet (so Back and ✕ close it as they close every sheet): the emblem large, what kind it is and
+// its step, its name, the rule as one sentence; not won: how far along and what it pays when you win it, and a way to the next session when that is
+// what it asks for; won: the day, what it paid, how many times, and Share it and Tell the crew.
+function cabRule(c) {
+  if (c.kind === 'ach') return String((c.it && (c.it.rule || c.it.caption)) || '');
+  const n = c.n;
+  return { held_weeks: `Hold ${n} weeks in a row.`, century: `Finish ${n} sessions with Amir.`, bests: `Set ${n} personal bests.`, comebacks: `Make ${n} comebacks that stuck.` }[c.markId] || '';
+}
+function cabProg(c) {
+  if (!(c.need > 1) || !(c.have > 0)) return null;   // nothing done yet: the rule says what it asks, and a bar at nought says nothing
+  const h = c.have, n = c.need, pct = Math.max(0, Math.min(100, Math.round(h / n * 100)));
+  if (c.kind === 'ach' && c.it.test === 'best_value') return { pct, text: `Your best lift is up ${Math.round(h)}%. ${Math.round(n)}% gets it.` };
+  if (c.kind === 'ach' && c.it.test === 'goals') return { pct, text: `${cabNum(h)} of ${cabNum(n)} done` };
+  if (c.kind === 'ach' && c.it.test === 'runs_together') return { pct, text: `${cabNum(h)} of ${cabNum(n)} days with all four` };
+  // what the number counts, in a word
+  const r = c.kind === 'mark' ? [] : [].concat(c.it.reads || []).map(String), t = c.kind === 'mark' ? '' : c.it.test;
+  const u = c.kind === 'mark' ? c.unit : (t === 'best_run' || t === 'month_held') ? 'weeks' : r.indexOf('month_with_amir') >= 0 ? 'months' : r.indexOf('personal_best') >= 0 ? 'bests'
+    : (r.indexOf('session_finished') >= 0 || r.indexOf('session_finished_early') >= 0) ? 'sessions' : '';
+  return { pct, text: `${cabNum(h)} of ${cabNum(n)}${u ? ' ' + u : ''}` };
+}
+function cabSpec(c) {
+  if (c.kind === 'mark') return careerMarkSpec(c.markId, c.tierIdx + 1, c.day);
+  return { kind: 'achievement', name: c.name, caption: (c.it && c.it.caption) || '', meaning: c.meaning || '', date: c.day, first: hlFirst(), emblem: { k: 'ach', id: c.id } };
+}
+function openEmblem(key) {
+  const ov = document.getElementById('hist-overlay'), E = cabE();
+  if (!ov || !E) return;
+  const k = String(key || '');
+  if (k.indexOf('level:') === 0) { openLevelMedal(Number(k.slice(6))); return; }
+  const c = cabItems().find(x => x.key === k);
+  if (!c) return;
+  // it has been looked at: its dot goes at once (the seen list took it when the page drew)
+  document.querySelectorAll('#ach-body [data-k]').forEach(b => { if (b.dataset.k === k) { const d = b.querySelector('.cab-dot'); if (d) d.remove(); } });
+  if (_cabNew) _cabNew.delete(k);
+  const kind = [rwMeaningWord(c.meaning), E.stepName(c.tier)].filter(Boolean).join(' · ');
+  const rule = cabRule(c);
+  let tail = '';
+  if (c.won) {
+    const paid = c.kind === 'ach' ? (c.xpWon != null ? c.xpWon : c.xp) : 0;   // what it was minted with; the catalogue's price when the server does not say
+    tail += `<p class="cab-meta">Won ${esc(cabDay(c.day))}${paid > 0 ? ' · +' + paid.toLocaleString('en-US') + ' XP' : ''}</p>`;
+    if (c.times) tail += `<p class="cab-times">Won ${c.times} times</p>`;
+    if (!window.IS_PREVIEW && !window.IS_DEMO && c.day) tail += `<button type="button" class="cab-go" onclick="cabGo('share', this.dataset.k)" data-k="${esc(c.key)}">Share it</button>`;
+    // the one line for the Bell, in the athlete's own words, sent only on the tap
+    const line = c.kind === 'mark' ? 'Just reached ' + c.name + '.' : 'Just won ' + c.name + '.' + (c.it && c.it.caption ? ' ' + String(c.it.caption).replace(/\.$/, '') + '.' : '');
+    if (crewCanTell()) tail += `<button type="button" class="cab-tell" data-line="${esc(line)}" onclick="crewTellMoment(this)">Tell the crew</button>`;
+  } else {
+    const pg = cabProg(c);
+    if (pg) tail += `<div class="cab-bar" aria-hidden="true"><i style="width:${pg.pct}%"></i></div><p class="cab-meta">${esc(pg.text)}</p>`;
+    if (c.kind === 'ach' && c.xp > 0) tail += `<p class="cab-meta">+${c.xp.toLocaleString('en-US')} XP when you win it</p>`;
+    // "Open Next up: Day 3": only for sessions, weeks and months, and only while a plan day is next
+    let sid = '';
+    try { if (['sessions', 'weeks', 'months'].indexOf(c.sec) >= 0 && !cycleOver()) sid = suggestedDayId() || ''; } catch (e) { sid = ''; }
+    if (sid) tail += `<button type="button" class="cab-go" onclick="cabGo('day', '${esc(sid)}')">Open Next up: Day ${esc(sid)}</button>`;
+  }
+  ov.querySelector('.readiness-modal').innerHTML = `<div class="cab-sh">
+    <div class="cab-sh-em" role="img" aria-label="${esc(c.name + (c.won ? '' : ', not won yet')).replace(/"/g, '&quot;')}">${c.kind === 'mark' ? E.mark(c.markId, c.tierIdx, { won: c.won }) : E.ach(c.id, { won: c.won })}</div>
+    ${kind ? `<p class="cab-sh-kind">${esc(kind)}</p>` : ''}
+    <h2 class="readiness-title${c.won ? '' : ' is-ghost'}">${esc(c.name)}</h2>
+    ${rule ? `<p class="cab-sh-p">${esc(rule)}</p>` : ''}${tail}</div>`;
+  ov.classList.add('visible');
+}
+window.openEmblem = openEmblem;
+// The sheet's two buttons: Share it (the emblem's own card, in the share sheet, ‹ Back to this one) and Open Next up (the day).
+function cabGo(what, arg) {
+  if (what === 'day') { closeHistorySheet(); goTo('home'); openDayView(String(arg)); return; }
+  const c = cabItems().find(x => x.key === String(arg)), sp = c && cabSpec(c);
+  if (sp) openShareSheet([sp], 0);
+}
+window.cabGo = cabGo;
+// A level medal, in the same sheet.
+function openLevelMedal(from) {
+  const ov = document.getElementById('hist-overlay'), E = cabE(), m = cabMedals().find(x => x.from === from);
+  if (!ov || !E || !m) return;
+  const L = cabLevel(), shown = m.cur ? L : m.from, last = m.from >= 100;
+  const say = m.cur ? `${m.name}. Your medal now.${last ? '' : ' The next one comes at level ' + (m.from + 10) + '.'}`
+    : m.reached ? `${m.name}. You passed it on the way up.` : `${m.name}. Yours when you reach level ${m.from}.`;
+  let bar = '';
+  if (m.cur) {
+    try {
+      const lv = careerLevelOf(CAREER_T.p.career.xp, CAREER_T.p.rules), pct = lv.level_cost > 0 ? Math.max(0, Math.min(100, Math.round(lv.xp_in_level / lv.level_cost * 100))) : 0;
+      bar = `<div class="cab-bar" aria-hidden="true"><i style="width:${pct}%"></i></div><p class="cab-meta">${Math.max(0, Math.round(lv.to_next)).toLocaleString('en-US')} XP to level ${lv.level + 1}</p>`;
+    } catch (e) { bar = ''; }
+  }
+  ov.querySelector('.readiness-modal').innerHTML = `<div class="cab-sh">
+    <div class="cab-sh-em" role="img" aria-label="${esc('Level ' + shown + (m.reached ? '' : ', not reached yet')).replace(/"/g, '&quot;')}">${E.level(shown, { won: m.reached })}</div>
+    <p class="cab-sh-kind">Level medal · ${esc(m.from === 1 ? '1 to 9' : last ? '100 and up' : m.from + ' to ' + (m.from + 9))}</p>
+    <h2 class="readiness-title${m.reached ? '' : ' is-ghost'}">Level ${shown}</h2>
+    <p class="cab-sh-p">${esc(say)}</p>${bar}</div>`;
+  ov.classList.add('visible');
+}
+window.openLevelMedal = openLevelMedal;
 // A kind, opened in the sheet: earned ones newest first with their caption and day, then the rest, furthest along first, with what earns
 // them; the kind's nearest wears Next. `focus` scrolls to one (Next up's tap).
 function openCourt(kind, focus) {
@@ -14919,7 +15388,19 @@ function crewLineHTML(it) {
   const lead = crewPagesOn() && (pp.ck || pp.me) ? crewFace(pp, 'line') : `<span class="cr-bell-ic">${CREW_BELL_SVG}</span>`;
   return `<div class="cr-line" data-key="${esc(it.key)}">${lead}
     <span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small>
-      <span class="cr-react on-line" data-row="${esc(it.key)}">${crewReactRow(it.key, it.kudos, it.me, true)}</span></span></div>`;
+      <span class="cr-react on-line" data-row="${esc(it.key)}">${crewReactRow(it.key, it.kudos, it.me, true)}</span></span>${crewLineEmblem(it)}</div>`;
+}
+// A line about an achievement or a mark carries its emblem, small, at the end of the line (the Emblem Cabinet, 2026-10-25). The part names the catalogue id
+// (`id`, or `name` in an old answer); a mark names its badge and the number reached. Nothing without the emblem script, or for a line that is about neither.
+function crewLineEmblem(it) {
+  const E = cabE();
+  if (!E) return '';
+  const parts = it.parts || [];
+  const a = parts.find(x => x && x.k === 'achievement' && (x.id || x.name));
+  if (a) return `<span class="cr-emblem" aria-hidden="true">${E.ach(String(a.id || a.name), { won: true })}</span>`;
+  const m = parts.find(x => x && x.k === 'mark' && x.item && x.at);
+  const i = m ? (careerMarks()[m.item] || { at: [] }).at.indexOf(Number(m.at)) : -1;
+  return i >= 0 ? `<span class="cr-emblem" aria-hidden="true">${E.mark(m.item, i, { won: true })}</span>` : '';
 }
 // ONE ladder on one block (2026-10-20). It used to read "1. Ehsan A. LV 14 — 3,153" above "4. Elmira A. LV 29 — 1,114": the
 // level is lifetime and the number that sorts is this SEASON's, and the season was two days old, so a level-29 athlete sat
@@ -15251,14 +15732,33 @@ function plSigners(a) {
 function plSignPerson(s) {
   return s.ck ? crewPersonOf({ ck: s.ck, fv: s.fv, who: s.who, me: !!crewMe().ck && s.ck === crewMe().ck }) : { ck: null, fv: null, who: 'Coach', me: false, amir: true };
 }
-function playerAchRow(a, key) {
-  const nm = esc(momName(a.name || a.id || 'An achievement')), day = a.day ? esc(achDay(a.day)) : '', { sg, n } = plSigners(a);
-  if (!n) return `<div class="pl-row pl-ar"><div><span class="t">${nm}</span></div><span class="pl-dt">${day}</span><span aria-hidden="true"></span></div>`;
+// ── TROPHIES (the Emblem Cabinet, 2026-10-25): someone else's page shows only what they have WON (no ghosts), newest first, each emblem with the faces that
+// cheered it under it. The page's own switches decide whether any of it shows, exactly as before (plMark() / plKindOff() for `achievement` and `level`).
+// `a.id` is the award id ("achievement:big_apple"); the emblem map is keyed by the catalogue id.
+function plTrophies(p) {
+  const E = cabE();
+  return (Array.isArray(p.achievements) ? p.achievements : []).filter(a => a && (a.id || a.name)).map(a => {
+    const id = String(a.id || '').replace(/^achievement:/, ''), info = E ? E.info(id) : null, name = momName(a.name || id);
+    return { key: String(a.id || id), kind: 'ach', id, won: true, day: String(a.day || ''), tier: info ? info.tier : 0, sec: info ? info.sec : 'trophies',
+      order: info ? info.order : 1e6, info, name, short: cabShort(info, name), a };
+  }).sort((x, y) => y.day.localeCompare(x.day) || x.order - y.order);
+}
+// One trophy: the emblem, its short name, its day, and the face stack when someone cheered it (a button then: "Cheered by").
+function plTrophyCell(t, key) {
+  const { sg, n } = plSigners(t.a);
+  if (!n) return cabCell(t, { plain: true });
   const shown = sg.slice(0, 3), more = Math.max(0, n - shown.length);
-  const faces = shown.map(s => crewFace(plSignPerson(s), 'line')).join('');
-  return `<button type="button" class="cr-bt pl-row pl-ar" data-aid="${esc(a.id || '')}" onclick="openPlayerSigners('${esc(key || _playerCk)}', this.dataset.aid)" aria-label="${nm}. Cheered by ${n} ${n === 1 ? 'person' : 'people'}. Tap to see who.">`
-    + `<span><span class="t">${nm}</span><span class="pl-sg"><span class="pl-stk" aria-hidden="true">${faces}</span>${more ? `<span class="pl-mo" aria-hidden="true">+${more}</span>` : ''}</span></span>`
-    + `<span class="pl-dt">${day}</span><span class="c" aria-hidden="true">›</span></button>`;
+  const faces = shown.map(x => crewFace(plSignPerson(x), 'line')).join('');
+  return cabCell(t, { signers: key, signLab: `${t.name}. Cheered by ${n} ${n === 1 ? 'person' : 'people'}. Tap to see who.`,
+    extra: `<span class="pl-sg" aria-hidden="true"><span class="pl-stk">${faces}</span>${more ? `<span class="pl-mo">+${more}</span>` : ''}</span>` });
+}
+// A person's level medals (the decades they have reached, their own level on the one they are on).
+function plMedals(lv) {
+  const E = cabE();
+  if (!E || !(lv > 0)) return [];
+  const st = E.LEVEL_STEPS;
+  return st.map((s, i) => ({ s, cur: lv >= s.from && (!st[i + 1] || lv < st[i + 1].from) })).filter(x => lv >= x.s.from).map(x => ({ key: 'level:' + x.s.from, kind: 'level', from: x.s.from,
+    reached: true, won: true, cur: x.cur, label: x.s.from === 1 ? 'Levels 1 to 9' : x.s.from >= 100 ? 'Level 100 and up' : 'Levels ' + x.s.from + ' to ' + (x.s.from + 9), sub: '' }));
 }
 // "Cheered by": every name that is on this achievement. Each is a door to that person's page when doors are on.
 function openPlayerSigners(key, aid) {
@@ -15711,7 +16211,10 @@ function playerHTML(key, p, note) {
   const own = key === 'me' || !!p.me, first = plFirst(p), who = p.who || '';
   const mk = { n: 0 };   // how many "Only you" labels the page wears
   // `best_lifts` is sent and never drawn (Amir's main session, 2026-10-24): the lift names have no place on the page.
-  const lv = Number(p.lv) > 0 ? `<span class="pl-lv">LV ${Number(p.lv)}${plMark(p, own, 'level', mk)}</span>` : '';
+  // Their level medal on the corner of their face (the Emblem Cabinet), where the LV chip was; the chip stays until the emblem script has loaded. A level you
+  // switched off for the crew still shows on YOUR page, and a line under the dates says Only you.
+  const lvN = Number(p.lv) > 0 ? Number(p.lv) : 0, lvMark = lvN ? plMark(p, own, 'level', mk) : '';
+  const lv = lvN ? (cabE() ? `<span class="pl-lvm" role="img" aria-label="Level ${lvN}">${cabE().level(lvN)}</span>` : `<span class="pl-lv">LV ${lvN}</span>`) : '';
   const since = plSince(p.since), sub = playerSportLine(p);
   // Your own face is the door to your photo (Ring Faces): a small camera on it says so. An athlete under 13 has no photo to add.
   const faceH = crewFace({ ck: p.ck, fv: p.fv, who, me: own, amir: false }, 'xl');
@@ -15719,7 +16222,7 @@ function playerHTML(key, p, note) {
     ? `<button type="button" class="cr-bt pl-fbtn" onclick="openFacePhoto()" aria-label="${crewPersonOf({ me: true }).fv != null ? 'Change your photo' : 'Add your photo'}">${faceH}<span class="pl-cam" aria-hidden="true">${CREW_CAM_SVG}</span></button>` : faceH;
   let h = `<div class="pl-id"><span class="pl-facewrap">${face}${lv}</span>
     <h1 class="pl-name" dir="auto">${esc(who)}</h1>
-    ${sub ? `<p class="pl-sub">${esc(sub)}</p>` : ''}${since ? `<p class="pl-meta">With Amir since ${esc(since)}</p>` : ''}${playerActionsHTML(key, p)}</div>`;
+    ${sub ? `<p class="pl-sub">${esc(sub)}</p>` : ''}${since ? `<p class="pl-meta">With Amir since ${esc(since)}</p>` : ''}${lvMark ? `<p class="pl-meta pl-lvl">Level medal${lvMark}</p>` : ''}${playerActionsHTML(key, p)}</div>`;
   if (note) h += `<p class="pl-quiet" role="status">${esc(note)}</p>`;
   let b = '';
   const tiles = playerTilesHTML(p, own, mk);
@@ -15727,11 +16230,13 @@ function playerHTML(key, p, note) {
   if (own) b += playerPartnerHTML(p);      // Bring a partner (step 9): your page only, right after the numbers
   b += playerCycleHTML(key, p, own, mk);   // This cycle (step 4): the week bars, with the extra sessions as dots
   b += playerFactsHTML(key, p, own);       // Player facts (step 5)
-  const ach = Array.isArray(p.achievements) ? p.achievements : [];
-  if (ach.length) {
-    b += `<h2 class="prog-sec">Achievements${plMark(p, own, 'achievement', mk)}</h2><div class="pl-list">${ach.slice(0, 3).map(a => playerAchRow(a, key)).join('')}`
-      + (ach.length > 3 ? `<button type="button" class="cr-bt pl-row" onclick="openPlayerAchievements('${esc(key)}')"><span class="t">All ${ach.length}</span><span class="c" aria-hidden="true">›</span></button>` : '') + `</div>`
-      + (ach.some(a => plSigners(a).n) ? '<p class="pl-note pl-tail">Tap an achievement to see every cheer.</p>' : '');
+  const tro = plTrophies(p), medals = plMedals(lvN);
+  if (tro.length) {
+    const all = tro.length > 3 || lvN >= 10;
+    b += `<div class="cab-trh"><h2 class="prog-sec">Trophies · ${tro.length + medals.length}${plMark(p, own, 'achievement', mk)}</h2>`
+      + (all ? `<button type="button" class="cab-all" onclick="openPlayerAchievements('${esc(key)}')" aria-label="All ${tro.length + medals.length} trophies">All ›</button>` : '') + `</div>`
+      + `<div class="cab-pl"><div class="cab-grid">${tro.slice(0, 3).map(t => plTrophyCell(t, key)).join('')}</div></div>`
+      + (tro.some(t => plSigners(t.a).n) ? '<p class="pl-note pl-tail">Tap a trophy to see every cheer.</p>' : '');
   }
   const hon = Array.isArray(p.honours) ? p.honours : [];
   if (hon.length) b += `<h2 class="prog-sec">Honours${plMark(p, own, 'honour', mk)}</h2><div class="pl-list">${hon.map(playerHonRow).join('')}</div>`;
@@ -15774,15 +16279,26 @@ function renderPlayerPage() {
 window.renderPlayerPage = renderPlayerPage;
 // "All 7": every achievement, in the sheet (the page shows the latest three).
 function openPlayerAchievements(key) {
-  const ov = document.getElementById('hist-overlay'), c = crewPageGet(key || _playerCk);
-  if (!ov || !c) return;
-  const p = c.p, own = (key || _playerCk) === 'me' || !!p.me, list = Array.isArray(p.achievements) ? p.achievements : [];
-  if (!list.length) return;
+  const ov = document.getElementById('hist-overlay'), c = crewPageGet(key || _playerCk), E = cabE();
+  if (!ov || !c || !E) return;
+  const k = key || _playerCk, p = c.p, own = k === 'me' || !!p.me, tro = plTrophies(p), medals = plMedals(Number(p.lv) > 0 ? Number(p.lv) : 0);
+  if (!tro.length) return;
+  const grid = l => `<div class="cab-grid">${l.join('')}</div>`;
+  let h = '';
+  if (medals.length) h += `<p class="cab-pl-k">Level medals</p>` + grid(medals.map(m => cabCell(m, { plain: true, lv: Number(p.lv), sub: m.cur ? 'Now' : 'Done' })));
+  const done = {};
+  E.SECTIONS.forEach(s => {
+    if (done[s.k]) return;
+    const group = s.group ? E.SECTIONS.filter(x => x.group === s.group) : [s];
+    group.forEach(g => { done[g.k] = 1; });
+    const mine = tro.filter(t => group.some(g => g.k === t.sec)).sort((x, y) => x.order - y.order || x.name.localeCompare(y.name));
+    if (mine.length) h += `<p class="cab-pl-k">${esc(s.group === 'streaks' ? 'Streaks' : s.t)} · ${mine.length}</p>` + grid(mine.map(t => plTrophyCell(t, k)));
+  });
   ov.querySelector('.readiness-modal').innerHTML = `
-    <div class="readiness-eyebrow">Achievements</div>
-    <h2 class="readiness-title">${own ? 'Your achievements' : esc(plFirst(p)) + "'s achievements"}</h2>
-    <p class="readiness-sub">${list.length} so far.</p>
-    <div class="pl-list">${list.map(a => playerAchRow(a, key || _playerCk)).join('')}</div>`;
+    <div class="readiness-eyebrow">Trophies</div>
+    <h2 class="readiness-title">${own ? 'Your trophies' : esc(plFirst(p)) + "'s trophies"}</h2>
+    <p class="readiness-sub">${tro.length + medals.length} won so far.</p>
+    <div class="cab-pl">${h}</div>`;
   ov.classList.add('visible');
   crewWireFaces(ov.querySelector('.readiness-modal'));
 }
@@ -16878,7 +17394,7 @@ function rwLight(m) {
 // A waiting reward's share spec in the light version: a mark's tier becomes careerMarkSpec(), an achievement stays as the server wrote it.
 function rwLightSpec(m) {
   if (m.spec.kind === 'badge') return careerMarkSpec(m.item, Number(m.spec.tier || m.tier), m.spec.date || m.day);
-  return Object.assign({}, m.spec, { name: momName(m.spec.name) });
+  return Object.assign({}, m.spec, { name: momName(m.spec.name), emblem: { k: 'ach', id: rwItemOf(m) } });
 }
 // The last profile this phone had, painted at once on open.
 function loadCareerCache() {
@@ -19194,8 +19710,21 @@ function finishTimer(day) {
   }
   t.finished = true;
   t.sessionEnd = Date.now();
+  t.fin = finOf(null, t.sessionEnd);   // the clock time it was finished, kept so a later save (a rating, a note, a replay) says the same time (finOf())
   saveTimer(day, t);
   renderTimer(day);
+}
+// The local clock time, 24 h, "07:42": what Early Bird and Night Owl read (stage99), sent as p_session.fin. finOf(null, ms) is that of a moment;
+// finOf(day) is the moment a day's session was FINISHED (Done), or '' when it is not known: the session clock stamps it at Done (finishTimer(), `fin`, and
+// `sessionEnd` for a clock from before it), so a later save of the same session reads the same value and never "now". A session filed unfinished
+// (fileUnfinished(): Done was never pressed) or finished with no clock running has none, and is left out of the record rather than guessed.
+function finOf(day, ms) {
+  try {
+    if (ms != null) { const d = new Date(ms); return isNaN(d) ? '' : String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+    const t = loadTimer(day);
+    if (!t || !t.finished) return '';
+    return /^\d{2}:\d{2}$/.test(String(t.fin || '')) ? t.fin : (t.sessionEnd ? finOf(null, t.sessionEnd) : '');
+  } catch (e) { return ''; }
 }
 function renderTimer(day) {
   const el = document.getElementById('timer-' + day);
@@ -20889,6 +21418,13 @@ async function recordSessionToCloud(day) {
       log:          D.log
     }
   };
+  // When it was finished (Early Bird, Night Owl): the clock's own stamp, else what an earlier version of this same session in the queue said. Left out when
+  // unknown. A save is never refused or lost because of it: an old server ignores a key it does not know, and anything that goes wrong here is no `fin`.
+  try {
+    const q = _csqLoad().find(e => _csqSess(e) === Number(day) + '|' + completedOn);
+    const fin = finOf(day) || (q && q.p_session && /^\d{2}:\d{2}$/.test(String(q.p_session.fin || '')) ? q.p_session.fin : '');
+    if (fin) base.p_session.fin = fin;
+  } catch (e) { /* no fin: the record goes as it always did */ }
   _noteFinished(day, completedOn);
   const entry = _enqueueSession(base);       // on the phone first: nothing below can lose it
   const sb = _sb();
@@ -24209,7 +24745,9 @@ function wrapSheetOpeners() {
   openAccount = sheetWrap(openAccount); openHelp = sheetWrap(openHelp);   // Help from the account: ‹ Back
   window.openAccount = openAccount; window.openHelp = openHelp;
   openShareSheet = sheetWrap(openShareSheet); window.openShareSheet = openShareSheet;   // Highlight Reel's share sheet
-  openCourt = sheetWrap(openCourt); window.openCourt = openCourt;   // Four Courts: a kind of achievements
+  openCourt = sheetWrap(openCourt); window.openCourt = openCourt;   // the habits' achievements (From your habits)
+  openEmblem = sheetWrap(openEmblem); window.openEmblem = openEmblem;   // the cabinet: one emblem, and ‹ Back to it from Share it
+  openLevelMedal = sheetWrap(openLevelMedal); window.openLevelMedal = openLevelMedal;
   openCrewPost = sheetWrap(openCrewPost); window.openCrewPost = openCrewPost;   // Crew: the composer (stage81)
   openFirstServe = sheetWrap(openFirstServe); window.openFirstServe = openFirstServe;   // First Serve's five steps: opened from Home's ring; Your photo opened from a step comes ‹ Back to it
   openCrewReply = sheetWrap(openCrewReply); window.openCrewReply = openCrewReply;   // Crew: the reply sheet (stage92), so ‹ Back works when a page is behind it
@@ -25292,7 +25830,7 @@ function hlMomentSpec(x) {
   if (!x) return null;
   const first = hlFirst();
   if (x.kind === 'mark' && x.markKey && x.markN > 0) return { kind: 'mark', key: x.markKey, n: x.markN, next: x.markNext || 0, date: x.day, first };
-  if (x.kind === 'achievement') return { kind: 'achievement', name: x.w, caption: x.s || '', meaning: x.meaning || '', date: x.day, first };
+  if (x.kind === 'achievement') return { kind: 'achievement', name: x.w, caption: x.s || '', meaning: x.meaning || '', date: x.day, first, emblem: x.aid ? { k: 'ach', id: x.aid } : undefined };
   if (x.kind === 'honour' && x.hKind) return Object.assign({ kind: 'honour', honour: x.hKind, monthIso: x.day, date: x.sort, first }, x.hv || {});
   return null;
 }
@@ -25784,24 +26322,28 @@ function openMoment(o) {
   el._onClose = typeof o.onClose === 'function' ? o.onClose : null;
   el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'hl-m-title');
   const rays = Array.from({ length: 14 }, (_, i) => `<i style="rotate:${Math.round(i * 360 / 14)}deg;animation-delay:${(i % 3) * 60}ms"></i>`).join('');
+  // An achievement, a mark's tier or a new level medal shows its EMBLEM as the hero, over the rays (the Emblem Cabinet, 2026-10-25); the number a mark
+  // used to show big is in the emblem, and the card is one tap away under Share it, so there is no small copy of it on the page.
+  const em = cabEmblemSvg(o.emblem);
   el.innerHTML = `
-    <div class="hl-m-hero">
+    <div class="hl-m-hero${em ? ' has-em' : ''}">
       ${o.art ? `<img class="hl-m-img" src="${esc(o.art)}" alt="" aria-hidden="true" onload="this.classList.add('in')" onerror="this.remove()">` : ''}
       <div class="hl-m-scrim"></div>
-      <div class="hl-m-burst" aria-hidden="true">${rays}</div>
+      ${em ? '' : `<div class="hl-m-burst" aria-hidden="true">${rays}</div>`}
       <button type="button" class="hl-m-x" aria-label="Close">✕</button>
       <div class="hl-m-copy">
+        ${em ? `<div class="hl-m-em" role="img" aria-label="${esc(o.title || 'Emblem').replace(/"/g, '&quot;')}"><div class="hl-m-burst" aria-hidden="true">${rays}</div>${em}</div>` : ''}
         <div class="hl-m-eyebrow">${esc(o.eyebrow || '')}</div>
-        ${o.num != null ? `<div class="hl-m-num" aria-hidden="true">${esc(String(o.num))}</div>` : ''}
+        ${o.num != null && !em ? `<div class="hl-m-num" aria-hidden="true">${esc(String(o.num))}</div>` : ''}
         <h2 class="hl-m-title" id="hl-m-title">${o.num != null ? `<span class="sr-only">${esc(String(o.num))} </span>` : ''}${esc(o.title || '')}</h2>
         ${o.sub ? `<div class="hl-m-sub">${esc(o.sub)}</div>` : ''}
         ${o.next ? `<div class="hl-m-next">${esc(o.next)}</div>` : ''}
       </div>
     </div>
     <div class="hl-m-sheet">
-      <div class="hl-m-card"><img alt="" width="1080" height="1920"></div>
-      <p>${esc(o.words || '')}</p>
-      <div class="wn-sign">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>
+      ${em ? '' : '<div class="hl-m-card"><img alt="" width="1080" height="1920"></div>'}
+      ${o.words ? `<p>${esc(o.words)}</p>
+      <div class="wn-sign">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>` : ''}
       <button type="button" class="hl-m-go">${esc(o.go || 'Share it')}</button>
       ${o.crew ? `<button type="button" class="hl-m-crew" data-line="${esc(o.crew)}"${crewCanTell() ? '' : ' hidden'}>Tell the crew</button>` : ''}
       <button type="button" class="hl-m-skip">Not now</button>
@@ -25822,6 +26364,7 @@ function openMoment(o) {
   if (navigator.vibrate && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) navigator.vibrate([16, 80, 16]);
   // The card itself, small, as it will be shared (a Story, in the athlete's last choices).
   const im = el.querySelector('.hl-m-card img'), op = Object.assign(hlOpts(), { size: 'story' });
+  if (!im) return;
   hlLib().then(SC => SC.toBlob(o.specs[0], op).then(b => {
     if (!document.body.contains(el)) return;
     im.src = URL.createObjectURL(b);

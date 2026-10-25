@@ -45,8 +45,7 @@ The system and rules GAME-1 to GAME-14: [`../../career/CAREER_MODE.md`](../../ca
   **The new achievements are LIVE (2026-10-19)**: `supabase/stage79_career_achievements.sql` with rulebook version 5 (`PROCEDURES.md` → *Stage 79*): 13 new
   achievements (35 in all; Smooth Operator and Showed Up Anyway left out, GAME-5), three tests the server decides (`total`, `best_run`, `month_held`; checker
   rule 18), back-paid quietly (51 awards, 7,050 XP, nobody down). `career_rewards_batch()` reads `backup.career_catalogue_before` only while it exists.
-  A Library achievement mints at the app's next `get_profile()` (the Library trigger evaluates nothing). **Four Courts** (Achievements on Progress, a kind in the sheet,
-  the finish-card nudge) is LIVE in program.html (`PROGRAM-APP.md` → *Achievements, Four Courts*); its read `get_achievements()` is stage80, applied 2026-10-19.
+  A Library achievement mints at the app's next `get_profile()` (the Library trigger evaluates nothing). **Four Courts** (Achievements on Progress, the finish-card nudge) is LIVE in program.html; its page is the emblem cabinet since 2026-10-25 (`PROGRAM-APP.md` → *The cabinet*); its read `get_achievements()` is stage80, applied 2026-10-19.
   **Step 4, the cut, is LIVE (2026-10-19)**: `supabase/stage78_career_cut.sql` with rulebook version 4 (`PROCEDURES.md` → *Stage 78*). Only the four marks
   remain as badges, every achievement stays, no title, Grand Slam, skin or rank name is on the server (ranks stay only in `rulebook.toml` `[level]`, which
   D20 locks); each paying badge award that left is an `award_kept` fact with its XP on its day (`"proof": true` for AA Proof's, which `career_compare()` reads).
