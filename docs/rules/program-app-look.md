@@ -20,9 +20,10 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   the card suggests a weight mid-set. Records → "+ Log a max" (`paintCeilingForm()`) is the one hand-entry door.
 - **The working card** (Fresh Eyes, Amir 2026-09-27; `PROGRAM-APP.md` → *The working card*): a closed card shows
   **no history** (*"no history on the exercise card when not opened"*); its numbers are one line and a pill that says
-  something stays a pill (the green `intent` pill, the check-in's pills); the ⓘ has the right column to itself, centred,
+  something stays a pill (the green `intent` pill, the check-in's pills); the ⓘ follows the name, after its chevron,
   clay for a Because, a clay dot after the name is a Coach's Note, and the exercise's number is the tick (Centre Court,
-  Amir 2026-10-12: the day's look is ONE CSS block, `PROGRAM-APP.md` → *Centre Court*).
+  Amir 2026-10-12: the day's look is ONE CSS block, `PROGRAM-APP.md` → *Centre Court*). **One circle, everywhere** (Amir,
+  2026-10-25): warm-ups and circuit rounds carry a set's circle too (`PROGRAM-APP.md` → *The working card*).
   **The chevron that opens a card follows the NAME, and an open card is the same row turned green** (Amir, 2026-10-19:
   *"everytime i want to click, i click on the i button instead"* and *"i feel like everything moves"*; the directions he
   picked are *Name carries it* and *Stay put*). Nothing in the head moves or changes size when a card opens — the

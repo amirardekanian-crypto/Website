@@ -411,7 +411,7 @@ async function l6(browser) {
   must('a set still to come: its number and its LAST caption', 'Guided', r => /ex-set-row\.dim/.test(r.el) && /ex-set-num|lt-ghost/.test(r.el));
   must('a circuit round still to come: its words and its keys', 'a circuit round in Guided', el(/rpe-row\.dim/));
   must('the tempo digit on the green card head', 'a card, open', el(/t-hot/));
-  must('the clay tag on the early card\'s green', 'the early finish', el(/confirm-missing-tag/));
+  must('the clay lines of Still to log on the early finish', 'the early finish', el(/cf-miss-what/));
   must('the session bar\'s ⋯ with its menu open', 'the session bar, ⋯ open', r => r.text === '⋯');
   must('the session bar\'s ⋯', 'the session bar', r => r.text === '⋯');
   must('the Library counts', 'Library', el(/lib-tab-n/));

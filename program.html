@@ -3393,19 +3393,39 @@
   /* the ⓘ: a plain one is a 22 px grey ring with a 13 px i, a Because the 28 px clay disc; both 44 px to hit */
   :where(#day-view, .step-scroll, #ws-body) .ex-side { grid-column: 3; grid-row: 1; display: flex; justify-content: center; align-self: center; padding: 0; }
   :where(#day-view, .step-scroll, #ws-body) .ex-side:empty { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about { position: relative; z-index: 0; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  :where(#day-view, .step-scroll, #ws-body) :is(.ex-side, .item-name-row) .ex-about { position: relative; z-index: 0; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
     border: 0; border-radius: 50%; background: none; font: 700 var(--fs-small)/1 'Barlow', sans-serif; color: var(--head-mute); opacity: 1;
     transition: color .22s linear; }
-  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about::after { content: none; }
-  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about::before { content: ''; position: absolute; z-index: -1; inset: 11px; border-radius: 50%; border: 1.5px solid var(--head-ring);
+  :where(#day-view, .step-scroll, #ws-body) :is(.ex-side, .item-name-row) .ex-about::after { content: none; }
+  :where(#day-view, .step-scroll, #ws-body) :is(.ex-side, .item-name-row) .ex-about::before { content: ''; position: absolute; z-index: -1; inset: 11px; border-radius: 50%; border: 1.5px solid var(--head-ring);
     transition: border-color .22s linear, box-shadow .22s linear; }
   :where(#day-view, .step-scroll, #ws-body) .ex-about.has-why { background: none; border-color: transparent; color: #fff; font-size: var(--fs-body); }
   /* a Because is the clay disc: on the green it needs an edge of its own, on the paper none (--head-halo) */
-  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about.has-why::before { inset: 8px; background: var(--clay-fill); border-color: var(--clay-fill);
+  :where(#day-view, .step-scroll, #ws-body) :is(.ex-side, .item-name-row) .ex-about.has-why::before { inset: 8px; background: var(--clay-fill); border-color: var(--clay-fill);
     box-shadow: 0 0 0 1.5px var(--head-halo); }
   :where(#day-view, .step-scroll, #ws-body) .ex-about:hover, :where(#day-view, .step-scroll, #ws-body) .ex-about:focus-visible { border-color: transparent; }
   :where(#day-view, .step-scroll, #ws-body) .ex-about:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed > .ex-detail, :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed > .note-row { display: none; }
+  /* ONE CIRCLE, EVERYWHERE (Amir, 2026-10-25, direction A): a warm-up row's circle in the right column (.row-tick, its number still
+     ticks it too) and one per round of a circuit (.round-tick). A set's circle exactly: 32 px drawn, 44 to hit, green with a white tick. */
+  :where(#day-view, .step-scroll, #ws-body) :is(.row-tick, .round-tick) { position: relative; flex: none; width: 44px; height: 44px; margin: 0; padding: 0; border: 0;
+    border-radius: 50%; background: transparent; cursor: pointer; }
+  :where(#day-view, .step-scroll, #ws-body) :is(.row-tick, .round-tick)::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; border: 1.5px solid var(--ring); }
+  :where(#day-view, .step-scroll, #ws-body) :is(.row-tick, .round-tick)::after { content: ''; position: absolute; inset: 0; opacity: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l3.8 3.8L18 8'/%3E%3C/svg%3E") center / 18px no-repeat; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .row-tick::before, :where(#day-view, .step-scroll, #ws-body) .rt-row.on .round-tick::before { background: var(--mark); border-color: var(--mark); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .row-tick::after, :where(#day-view, .step-scroll, #ws-body) .rt-row.on .round-tick::after { opacity: 1; }
+  :where(#day-view, .step-scroll, #ws-body) :is(.row-tick, .round-tick):focus-visible { outline: 2px solid var(--green-ink); outline-offset: 0; }
+  /* THE ⓘ FOLLOWS THE NAME (Amir, 2026-10-25: "move the i close to the movement so the hit box doesnt collide"): the right column is a
+     warm-up row's circle now. The name takes only its own width, so the ⓘ sits after its chevron; 44 px to hit, the row's height untouched. */
+  :where(#day-view, .step-scroll, #ws-body) .item-name-row .item-name { flex: 0 1 auto; }
+  :where(#day-view, .step-scroll, #ws-body) .item-name-row .ex-about { flex: none; align-self: center; margin: -12px -10px -12px 6px; }
+  /* a circuit's rounds: one row each, its name left and its circle right (the Log under them keeps each round's How hard?) */
+  :where(#day-view, .step-scroll, #ws-body) .rt-list { grid-column: 1 / -1; margin: 2px 0 10px; }
+  :where(#day-view, .step-scroll, #ws-body) .rt-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; border-top: 1px solid var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .rt-row:first-child { border-top: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .rt-nm { font: 600 var(--fs-body)/1.2 'Barlow', sans-serif; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .rt-row.on .rt-nm { color: var(--grey); }
 
   /* 7b. The DONE row: a receipt on the paper. The solid green numeral, the name grey 15 px, what was done 13 px grey on one line. */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-main { min-height: 54px; padding-top: 5px; padding-bottom: 5px; }
@@ -3925,6 +3945,17 @@
   /* "No RPE on 4 lifts. Add them ›" on the ready card (noRpeCards()): a plain link line, clay because it asks (2026-10-13). */
   :where(#day-view) .confirm-norpe { padding: 12px var(--g) 0; }
   :where(#day-view) .confirm-norpe:empty, :where(#day-view) .session-confirm:not(.ready) .confirm-norpe { display: none; }
+  /* Still to log (Amir, 2026-10-25; missingToLog()): on the paper, one row per exercise, its name and what is missing in clay
+     (it asks for something), the grey chevron; a tap opens the card at it. A row goes as soon as it is logged. */
+  :where(#day-view) .cf-miss-k { padding: 6px 0 8px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px;
+    text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .cf-miss-row { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%;
+    min-height: 52px; margin: 0; padding: 10px 28px 10px 0; border: 0; border-top: 1px solid var(--hair); background: none; color: var(--ink);
+    font: inherit; text-align: left; cursor: pointer; }
+  :where(#day-view) .cf-miss-row::after { content: ''; position: absolute; right: 4px; top: 50%; width: 12px; height: 12px; margin-top: -6px;
+    background: var(--grey); -webkit-mask: var(--chev) center / 12px no-repeat; mask: var(--chev) center / 12px no-repeat; }
+  :where(#day-view) .cf-miss-nm { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  :where(#day-view) .cf-miss-what { font: 500 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--clay-ink); }
   :where(#day-view) .cf-norpe { display: block; min-height: 44px; margin-top: 0; padding: 0; border: 0; background: none; color: var(--clay-ink);
     font: inherit; font-size: var(--fs-body); font-weight: 600; text-align: left; cursor: pointer; }
   /* What the session earns (Career Mode phase 2, paintConfirmEarn()): the XP in Barlow Condensed, what makes it up in grey, what only the
@@ -11080,7 +11111,8 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // A timed hold ("30 s / side") gets a circle that counts it (holdGate()): its seconds, or nothing for "30-45 s" or a carry.
   const holdSec = (rx.dose && rx.dose.kind === 'time' && isStandard) ? (parseDurationToSec(rx.dose.value) || '') : '';
 
-  // .ex-side holds the ⓘ (paintSpine()); .ex-doneline is the finished row's summary
+  // .ex-side holds a warm-up row's circle (One circle, everywhere: Amir, 2026-10-25, direction A); the ⓘ follows the name
+  // (paintAbout()). .ex-doneline is the finished row's summary
   // (paintDoneLines()). The dot is an empty span inside .item-name, so the name's text
   // (which every lookup reads) is unchanged.
   return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-dose="${esc(doseData)}"${rx.dose && rx.dose.side ? ' data-side="1"' : ''}${holdSec ? ` data-hold="${holdSec}"` : ''}${holdSec && rx.dose.side ? ' data-hold-side="1"' : ''} data-target="${esc(rx.rpe || '')}" data-exid="${esc(ex.exId || '')}">
@@ -11093,7 +11125,7 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
         ${setupHtml}
         ${summary}
       </div>
-      <div class="ex-side"></div>
+      <div class="ex-side">${isStandard ? '' : `<button type="button" class="row-tick" aria-label="Tick ${esc(ex.name)}" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></button>`}</div>
     </div>
     <div class="ex-detail">
       ${noteHtml}
@@ -11254,13 +11286,17 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
         <div class="item-name-row">${numBadge}<div class="item-name">${itemNameHTML(ex.name, ex.note)}</div></div>
         <div class="ex-doneline"></div>
         ${numLine}
-      </div>
+      </div>${isPrep ? `
+      <div class="ex-side"><button type="button" class="row-tick" aria-label="Tick ${esc(ex.name)}" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></button></div>` : ''}
     </div>
     <div class="ex-detail">${isPrep ? '' : `
       <div class="lt-slot"></div>`}
       ${renderCoachNote(ex.note)}
       <div class="ex-section-label">Rounds</div>
       <div class="round-list">${roundsHtml}</div>
+      <div class="ex-section-label">${roundCount > 1 ? 'Tick each round' : 'Tick it when done'}</div>
+      <div class="rt-list">${Array.from({ length: roundCount }, (_, r) =>
+        `<div class="rt-row" data-round="${r}"><span class="rt-nm">${roundCount > 1 ? 'Round ' + (r + 1) : 'Done'}</span><button type="button" class="round-tick" data-round="${r}" aria-pressed="false" aria-label="${roundCount > 1 ? 'Tick round ' + (r + 1) : 'Tick it'}" onclick="tickRound(event, this)"></button></div>`).join('')}</div>
       ${showLog ? `<div class="ex-section-label">Log</div>
       <div class="ex-log"></div>` : ''}
       ${restBottom}
@@ -11312,6 +11348,7 @@ function toggleCheckOnly(item, day) {
     if (willBeChecked) foldWhenDone(item, null);
   } else {
     item.classList.toggle('checked');
+    if (item.classList.contains('round-group')) setRoundsAll(item, item.classList.contains('checked'));
     const rpeRows = item.querySelectorAll('.rpe-row');
     rpeRows.forEach(r => r.classList.toggle('visible', item.classList.contains('checked')));
     // Simple items (no RPE): auto-collapse on check, expand on uncheck.
@@ -11653,7 +11690,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every effort 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · Effort 7/10 · Down 3 s · Rest 2 min 30 s</strong> (sets × reps, the effort target, how long the lowering takes, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow next to its name means it opens, and the <strong>i</strong> on the right is its info.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small <strong>kg</strong> at the top of the weight boxes, or inside each box on a superset, is the unit. Some machines show pounds, and some show no weight at all. Tap it and pick <strong>kg</strong>, <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time. Picked the wrong one? Tap <strong>Undo</strong> in the note that shows.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · Effort 7/10 · Down 3 s · Rest 2 min 30 s</strong> (sets × reps, the effort target, how long the lowering takes, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow next to its name means it opens, and the <strong>i</strong> after it is its info.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small <strong>kg</strong> at the top of the weight boxes, or inside each box on a superset, is the unit. Some machines show pounds, and some show no weight at all. Tap it and pick <strong>kg</strong>, <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time. Picked the wrong one? Tap <strong>Undo</strong> in the note that shows.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and <strong>tap the circle</strong> on the right when it's done. A superset or circuit has <strong>a circle for each round</strong> under its movements: tick each round as you finish it. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your effort. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. It starts with your warm-up: tick each part as you do it, or tap <strong>Done ✓</strong> for all of it. <strong>Skip</strong> moves on, and I see it was skipped. In a week where my note sets a limit, it sits under the top bar and under the effort buttons while you rest, like <strong>Max effort 7</strong>.</p><p>At the end, <strong>Finish session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ: what an exercise is for',
@@ -11666,7 +11703,7 @@ const APP_GUIDE = [
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Stop here</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>One session at a time. While a day is under way, Home shows it with <strong>Resume</strong>, and the other days wait until you finish it or stop it.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Adding it up</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Stop here</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>If something isn't logged, the card says what, under <strong>Still to log</strong>: a set not ticked, a set with no weight or no effort, a round not ticked. Tap a line to go straight to it. It goes from the list as soon as you log it.</p><p>One session at a time. While a day is under way, Home shows it with <strong>Resume</strong>, and the other days wait until you finish it or stop it.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Adding it up</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
   { icon: 'activity', key: 'career', title: 'Career: your level',
     body: `<p>Your level is the number in the ring on Home's habit card. Tap the ring to open Your numbers. The weeks you've held in a row sit beside <strong>This Week</strong>. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>adding it up</strong> until my side has it.</p><p>Your four numbers are in <strong>Your numbers</strong> on Progress: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers. It says how many you have and which one you're closest to. Open it and you see your cabinet. Every achievement is an emblem. In colour, you have won it. In grey, you have not, and it says what is left. <strong>Latest</strong> comes first, and <strong>New</strong> sits on what you have not seen yet. A small dot on <strong>Progress</strong> says there is something new in there. The chips under <strong>All achievements</strong> show only what you have won, or what is left, or one kind: consistency, commitment, progress or resilience. Tap an emblem to see what it asks for and how far along you are. Every ten levels you win a new level medal. When a session leaves you one step short of an achievement, its card tells you.</p><p>When I set you a job for the month, it sits right under this cycle's card, with a ring beside it. It is something to do, not a target for your training — I tick it off when you have done it. The <strong>Your moments</strong> row opens the lot, month by month: your marks, your achievements, the notes I write you and the month's honours. <strong>Amir saw this</strong> under one means I've seen it. A new note from me shows on Home until you open it. To answer it, tap <strong>Reply on WhatsApp</strong>.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks in a row you trained',
@@ -19551,19 +19588,21 @@ function refreshConfirmCard(day, status) {
   card.querySelector('.confirm-bar i').style.width = (total ? Math.round(done / total * 100) : 0) + '%';
   const missEl = card.querySelector('.confirm-missing');
   const why = early ? earlyWhyOf(day) : '';
-  missEl.innerHTML = early
-    ? `<div class="confirm-missing-label">Not done</div><ul>${missing.map(m =>
-        `<li><span class="confirm-missing-name">${esc(m.name)}</span><span class="confirm-missing-tag">${esc(m.label)}</span></li>`).join('')}</ul>`
-      + earlyWhyHtml(day, why)
-    : '';
+  // What is not done is said once, on the paper under the green: Still to log (missingToLog()). The green keeps the why.
+  missEl.innerHTML = early ? earlyWhyHtml(day, why) : '';
   card.classList.toggle('why-pain', why === 'pain');
-  // Ready with lifts that carry no RPE (Line Call, 2026-10-13; Second Serve D3): the fastest path (the ring on each closed card)
-  // logs a whole day with no weight and no RPE, and the card said All done. One line says so and opens the first; logging is unchanged.
+  // STILL TO LOG (Amir, 2026-10-25: "it doesnt say what is missing, if its an rpe, if its a weight or a set, it should tell them what
+  // is missing, and when its ticked, it should be removed"). It replaced "No effort on 4 lifts" (2026-10-13) and the early card's
+  // Not done list. Once the card asks for the rating (every set ticked, or Stop here taken), one row per exercise names what is
+  // missing: sets not ticked, a ticked set with no weight or no effort, a round not ticked or not rated, a warm-up not ticked.
+  // A tap opens the card at it. Every save repaints it (missRefresh()), so a line goes as soon as it is logged.
   const nrEl = card.querySelector('.confirm-norpe');
   if (nrEl) {
-    const nr = isFull ? noRpeCards(day) : [];
-    const h = nr.length ? `<button type="button" class="cf-norpe" onclick="openNoRpe('${esc(String(day))}')">No effort on ${nr.length} lift${nr.length === 1 ? '' : 's'}. Add ${nr.length === 1 ? 'it' : 'them'} <span aria-hidden="true">›</span></button>` : '';
-    if (nrEl.innerHTML !== h) nrEl.innerHTML = h;
+    const ms = ready ? missingToLog(day) : [], d = esc(String(day));
+    const h = ms.length ? `<div class="cf-miss"><div class="cf-miss-k">Still to log</div>${ms.map((m, k) =>
+      `<button type="button" class="cf-miss-row" onclick="goMissing('${d}', ${k})"><span class="cf-miss-nm">${esc(m.name)}</span>${
+        m.lines.map(l => `<span class="cf-miss-what">${esc(l)}</span>`).join('')}</button>`).join('')}</div>` : '';
+    if (nrEl.dataset.h !== h) { nrEl.innerHTML = h; nrEl.dataset.h = h; }
   }
   const btn = card.querySelector('.confirm-btn');
   if (btn.dataset.armed !== '1') btn.textContent = ready ? 'Done · send to coach ✓' : 'Stop here';
@@ -19572,6 +19611,65 @@ function refreshConfirmCard(day, status) {
   if (!ready) { const h = card.querySelector('.finish-hint'); if (h) h.textContent = ''; }
   paintConfirmEarn(day, ready);   // Career Mode: what the session earns, once it can be finished
   paintFinishBtn(day, status);   // the bar's Finish early (under ⋯) goes when the card is ready or early
+}
+
+// What is still to log on a day (refreshConfirmCard()'s Still to log), in the day's order: [{ card, name, lines, set }], `set` the
+// first set to open at. Optional (a red day) and skipped (sore) work is never missing. Plain words: "Sets 3 and 4 not ticked",
+// "No weight on set 2", "No effort on sets 1 and 2", "Round 2 not ticked", "No effort on round 1", "Not ticked".
+function nthList(word, idx) {
+  const n = idx.map(i => i + 1);
+  return (n.length > 1 ? word + 's ' + n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1] : word + ' ' + n[0]);
+}
+function missingToLog(day) {
+  const out = [], cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  document.querySelectorAll(`.checklist-item[data-day="${day}"]`).forEach(card => {
+    if (card.classList.contains('rd-optional') || card.classList.contains('rd-skip')) return;
+    const nameEl = card.querySelector('.item-name');
+    if (!nameEl) return;
+    const name = nameEl.textContent.trim(), lines = [];
+    let set = null;
+    if (card.classList.contains('round-group')) {
+      const t = roundTicks(card), n = t.length;
+      const notT = t.map((x, i) => x ? -1 : i).filter(i => i >= 0);
+      if (notT.length) lines.push(n === 1 ? 'Not ticked' : cap(nthList('round', notT)) + ' not ticked');
+      if (card.dataset.logRpe !== '0') {
+        const noR = t.map((x, i) => x && !rpeOn(day, circuitRpeKey(name, i + 1)) ? i : -1).filter(i => i >= 0);
+        if (noR.length) lines.push('No effort on ' + (n === 1 ? 'it' : nthList('round', noR)));
+      }
+    } else if (!card.querySelector('.ex-log')) {
+      if (!card.classList.contains('checked')) lines.push('Not ticked');
+    } else {
+      const total = parseInt(card.dataset.sets, 10) || 1;
+      const log = loadSetLog(name, total, day), need = setsAskedOf(card, total);
+      const pick = f => log.map((s, i) => f(s, i) ? i : -1).filter(i => i >= 0);
+      const notT = pick((s, i) => i < need && !s.d);
+      const noW = kgWanted(card) ? pick(s => s.d && !String(s.w || '').trim()) : [];
+      const noR = card.dataset.target ? pick(s => s.d && !s.r) : [];
+      if (notT.length) lines.push(cap(nthList('set', notT)) + ' not ticked');
+      if (noW.length) lines.push('No weight on ' + nthList('set', noW));
+      if (noR.length) lines.push('No effort on ' + nthList('set', noR));
+      const first = notT.concat(noW, noR);
+      set = first.length ? Math.min.apply(null, first) : null;
+    }
+    if (lines.length) out.push({ card, name, lines, set });
+  });
+  return out;
+}
+// A row of Still to log: the card opens at the set that needs it (its How hard? strip open, as openNoRpe() did).
+function goMissing(day, k) {
+  const m = missingToLog(day)[k];
+  if (!m) return;
+  const c = m.card;
+  if (c.classList.contains('collapsed')) toggleExpand(c);
+  if (m.set != null && c._paintSets) c._paintSets(m.set);
+  c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+window.goMissing = goMissing;
+// A set, a weight or a rating saved: the list follows, but only while the card is asking for the rating.
+function missRefresh(day) {
+  if (isLoading || day == null || day === '') return;
+  const c = document.getElementById('confirm-' + day);
+  if (c && c.classList.contains('visible') && c.classList.contains('ready')) refreshConfirmCard(day);
 }
 
 // The day's cards with an RPE written and a ticked set with none (refreshConfirmCard()'s "No RPE on 4 lifts").
@@ -21134,11 +21232,11 @@ function closeSessionAtDone(day) {
     if (ex.type === 'circuit') {
       const rounds = parseRoundCount(rxOf(ex).rounds || ex.rounds);
       for (let r = 1; r <= rounds; r++) { const key = circuitRpeKey(ex.name, r); dl.rpe[key] = localStorage.getItem(key) || ''; }
-    } else {
-      let log = [];
-      try { log = JSON.parse(localStorage.getItem(setLogKey(ex.name))) || []; } catch (e) {}
-      dl.sets[ex.name] = Array.isArray(log) ? log : [];
     }
+    // a lift's sets, and a circuit's round ticks (roundTicks())
+    let log = [];
+    try { log = JSON.parse(localStorage.getItem(setLogKey(ex.name))) || []; } catch (e) {}
+    dl.sets[ex.name] = Array.isArray(log) ? log : [];
   });
   saveDoneLog(day, dl);
   if (!loadDoneLog(day)) return;   // the copy did not keep (storage full): the per-name keys stay as they are, as before
@@ -21659,6 +21757,7 @@ function setRpeOn(day, key, v) {
     dl.rpe[key] = v || ''; saveDoneLog(day, dl); resaveFinished(day); return;
   }
   if (v) localStorage.setItem(key, v); else localStorage.removeItem(key);
+  missRefresh(day);
 }
 function loadSetLog(exName, totalSets, day) {
   let log = [];
@@ -21727,6 +21826,7 @@ function saveSetLogValue(exName, log, day) {
     dl.sets[exName] = log; saveDoneLog(day, dl); resaveFinished(day); return;
   }
   localStorage.setItem(setLogKey(exName), JSON.stringify(log));
+  missRefresh(day);
 }
 // A set or a round rating changed on a FINISHED day's card (a typo fixed in the weight box after Done, as kgCheckTicked()
 // asks) re-saves the record the coach has, as a rating or note changed later does (initDayWrapup()), once the athlete stops
@@ -23124,6 +23224,65 @@ function parseRoundCount(roundsStr) {
   return n > 0 ? n : 1;
 }
 
+// ── ONE CIRCLE, EVERYWHERE (Amir, 2026-10-25, direction A of "Warm-up tick", round 2: "go with A") ──
+// Athletes tick circles, so a warm-up row (no circle, its number was the tick) and a circuit (no circle at all) were left
+// unticked. A warm-up row now has a set's circle on the right (.row-tick, the same toggle as its number), and a circuit one
+// circle per round (.round-tick, above the Log's How hard? rows, which Guided walks). A round's tick is kept in the circuit's own
+// set log under its name (setLogKey(), which circuits never used), so it goes wherever a set's tick goes: the finished day's
+// copy (closeSessionAtDone()), the carry at Done and at midnight (carryExerciseKeys()), a Reset, the cloud. The day still
+// counts a circuit as ONE unit, done when every round is ticked (.checked, saveState()); its number still ticks every round.
+// A circuit ticked whole before rounds had ticks of their own reads as every round ticked.
+function roundTicks(card) {
+  const name = card.querySelector('.item-name').textContent.trim();
+  const n = parseInt(card.dataset.rounds, 10) || 1;
+  const t = loadSetLog(name, n, card.dataset.day).map(s => !!s.d);
+  return card.classList.contains('checked') && !t.some(Boolean) ? t.map(() => true) : t;
+}
+function saveRoundTicks(card, t) {
+  const name = card.querySelector('.item-name').textContent.trim();
+  saveSetLogValue(name, t.map(d => ({ w: '', n: '', r: '', d: !!d })), card.dataset.day);
+}
+function paintRoundTicks(card) {
+  const t = roundTicks(card);
+  const d = cardDetail(card) || card;   // Guided carries the open card's body away
+  d.querySelectorAll('.rt-row').forEach((row, i) => {
+    row.classList.toggle('on', !!t[i]);
+    const b = row.querySelector('.round-tick');
+    if (b) b.setAttribute('aria-pressed', String(!!t[i]));
+  });
+}
+function setRoundsAll(card, on) {
+  saveRoundTicks(card, Array.from({ length: parseInt(card.dataset.rounds, 10) || 1 }, () => !!on));
+  paintRoundTicks(card);
+}
+// One round ticked or not. Returns true when every round is now ticked.
+function setRoundDone(card, i, on) {
+  const day = card.dataset.day, t = roundTicks(card);
+  if (!!t[i] === !!on) return t.every(Boolean);
+  t[i] = !!on;
+  saveRoundTicks(card, t);
+  const all = t.every(Boolean);
+  card.classList.toggle('checked', all);
+  paintRoundTicks(card);
+  saveState(); markTouched(day); updateProgress(day);
+  return all;
+}
+function tickRound(ev, btn) {
+  ev.stopPropagation();
+  const card = btn.closest('.checklist-item') || (STEP && STEP.homeCard);
+  if (!card) return;
+  const i = parseInt(btn.dataset.round, 10) || 0, on = !roundTicks(card)[i];
+  const all = setRoundDone(card, i, on);
+  if (navigator.vibrate) navigator.vibrate(12);
+  if (!on) return;
+  offerClock(card.dataset.day);
+  if (all) {
+    nudgeUnticked(card.dataset.day);
+    if (!(cardDetail(card) || card).querySelector('.rpe-row') && !STEP) { foldCard(card, false); setTimeout(() => nudgeFinishCard(card.dataset.day), 700); }
+  }
+}
+window.tickRound = tickRound;
+
 // Per-round RPE storage key for a circuit. Round 1 keeps the legacy
 // (no-suffix) key so previously-saved single ratings are preserved.
 function circuitRpeKey(name, round) {
@@ -23178,6 +23337,7 @@ function attachCircuitLog(card) {
       slot.appendChild(div);
     }
   }
+  paintRoundTicks(card);
 }
 
 // Which unit a circuit's weight boxes are in: the pick made this visit, else the unit already in its stored weights, else the unit it was
@@ -24016,6 +24176,7 @@ function stepDone(it) {
 }
 function finishRound(it) {
   (STEP.doneRounds = STEP.doneRounds || new Set()).add(it.name + '#' + it.setI);
+  setRoundDone(it.card, it.setI, true);   // the round's own circle, as in the list
   // The last round ticks the circuit, the one unit the day counts it as.
   if (it.setI === it.total - 1 && !it.card.classList.contains('checked')) toggleCheckOnly(it.card, it.card.dataset.day);
 }
@@ -25193,7 +25354,9 @@ function paintAbout(card) {
   const entry = SPINE ? spineFor(name, card.dataset.exid) : null;
   const why = whyOfCard(card);
   const hist = !!(HIST && historyFor(name).length);
-  const row = card.querySelector('.ex-side') || card.querySelector('.item-name-row');
+  // After the NAME since 2026-10-25 (Amir: "move the i close to the movement so the hit box doesnt collide"): the right column holds
+  // a warm-up row's circle now (One circle, everywhere).
+  const row = card.querySelector('.item-name-row');
   const btn = card.querySelector('.ex-about');
   if ((entry || why || hist) && row && !btn) {
     const b = document.createElement('button');

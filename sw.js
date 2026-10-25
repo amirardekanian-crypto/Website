@@ -517,7 +517,10 @@
 // crew" sits beside the numbers; the settings are one sheet, What the crew sees; Pinned is a label and a face on a line opens its page; a member
 // without notifications is offered them under their cheers, a non-member's finished card offers the crew; Amir's Pick is a card for a week with his
 // reason; a crew notification opens the reply or cheer it was about. coach.html: the reason box and Someone else in Courtside's honours.
-const CACHE = 'aap-v231';
+// v233: program.html changed (2026-10-25, Amir: "go with A" on the warm-up tick board, and "it should tell them what is missing"). A warm-up
+// row and a warm-up circuit have a set's circle on the right, a circuit one circle per round, the ⓘ follows the name, and the finish card lists
+// what is still to log (sets, weights, efforts, rounds), each line gone once it is logged. (v232 is the Your numbers card's, in its own commit.)
+const CACHE = 'aap-v233';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

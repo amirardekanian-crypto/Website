@@ -313,7 +313,7 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     a = await p.evaluate(() => {
       const c = document.getElementById('confirm-1'), bar = document.getElementById('timer-1'), br = bar.getBoundingClientRect(), cr = c.getBoundingClientRect(), tx = c.querySelector('.confirm-text').getBoundingClientRect();
       return { early: c.dataset.early, ready: c.classList.contains('ready'), cls: c.className, open: bar.classList.contains('open'), exp: bar.querySelector('.session-timer-more').getAttribute('aria-expanded'),
-        btnHidden: bar.querySelector('.session-timer-finish').hidden, text: c.querySelector('.confirm-text').textContent, missing: c.querySelectorAll('.confirm-missing li').length,
+        btnHidden: bar.querySelector('.session-timer-finish').hidden, text: c.querySelector('.confirm-text').textContent, missing: c.querySelectorAll('.cf-miss-row').length,
         cardTop: Math.round(cr.top), barBottom: Math.round(br.bottom), titleTop: Math.round(tx.top), vh: innerHeight, done: localStorage.getItem(ATHLETE_ID + '_completed_d1') };
     });
     t.check('the second tap: the finish card is early (rating, what is not done, Done), nothing is finished yet', a.early === '1' && a.ready && /early/.test(a.cls) && /Stopping Day 1 here/.test(a.text) && a.missing > 0 && !a.done, JSON.stringify(a));

@@ -44,7 +44,7 @@ const H = require('./lib');
       document.querySelectorAll('#day-view .day-content.active .checklist-item.collapsed').forEach(c => {
         const n = c.querySelector('.ex-num'), cb = c.querySelector('.check-box');
         const nr = n.getBoundingClientRect(), br = cb.getBoundingClientRect();
-        const ns = getComputedStyle(n), ab = c.querySelector('.ex-side .ex-about');
+        const ns = getComputedStyle(n), ab = c.querySelector('.item-name-row .ex-about');
         const tail = c.querySelector('.item-name .nm-tail');
         const taf = tail ? getComputedStyle(tail, '::after') : null;
         const chev = !!(taf && taf.content !== 'none' && taf.content !== 'normal');

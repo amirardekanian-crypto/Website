@@ -45,6 +45,13 @@ went wrong" and kept nothing, and every extra tap sent another email. Now:
   still goes), and so is the Rest offer. Done hides the Rest offer too.
 - `confirmSession()` stays for older callers: it finishes when the card is ready, and otherwise asks to finish
   early, as the button does.
+- **Still to log** (Amir, 2026-10-25: *"it doesnt say what is missing, if its an rpe, if its a weight or a set, it should tell them
+  what is missing, and when its ticked, it should be removed"*). Once the card asks for the rating (every set ticked, or Stop here
+  taken), `.confirm-norpe` lists one row per exercise with what is missing (`missingToLog()`): *Sets 3 and 4 not ticked*, *No weight
+  on set 2* (only where the kg box is wanted, `kgWanted()`), *No effort on sets 1 and 2* (only where an effort is written), *Round 2
+  not ticked*, *No effort on round 1*, *Not ticked*. Optional and skipped-today work is never listed. A tap opens the card at the
+  first set that needs it (`goMissing()`). Every set, weight or rating saved repaints it (`missRefresh()`), so a row goes the moment
+  it is logged. It replaced *No effort on 4 lifts* and the early card's *Not done* list; the green keeps only *What stopped you?*.
 
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*

@@ -80,5 +80,15 @@ Guided copies the line of numbers and the pills under its name (`renderStep()`),
 header now. Circuits got the same header (line of numbers, note dot) and lost their Rounds/Rest grid. A circuit's line says its
 rounds in words, *Twice · rest 30 s between* (3 rounds: *3 times · rest 30 s between*; no rest: *Twice*).
 
+**One circle, everywhere** (Amir, 2026-10-25, direction A of the *Warm-up tick* board, round 2: *"some people are used to ticking
+the circle for the movement to be done, so they are missing the warm-up and they are missing the circuit styles"*). A warm-up row
+and a warm-up circuit carry a set's circle in the right column (`.row-tick`, the same toggle as the number, which still ticks);
+a circuit has one circle per round under its movements (`.round-tick` in `.rt-list`, *Tick each round*), each round's *How hard?*
+under its circle once ticked. A round's tick is kept in the circuit's own set log (`setLogKey(name)`, `roundTicks()`), so the
+finished day's copy, the carry, a Reset and the cloud treat it as a set's; the day still counts a circuit as one unit, done when
+every round is ticked. Guided ticks the round it finishes (`finishRound()`). **The ⓘ follows the name** (Amir, same day: *"move
+the i close to the movement so the hit box doesnt collide"*): `paintAbout()` puts it in `.item-name-row`, after the chevron, and
+the right column is the circle's. `scripts/headless/one-circle.js`.
+
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*

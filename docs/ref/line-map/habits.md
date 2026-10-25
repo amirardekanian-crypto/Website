@@ -46,22 +46,22 @@
 | The long game — the reward track | 1196 |
 | MEADOW skin | 1232 |
 | THE PASS | 1547 |
-| Share picker the card is previewed by the same painter that expo | 1710 |
-| Celebration extras confetti, coins and the crest/medal stage. | 1736 |
+| Share picker the card is previewed by the same painter t | 1710 |
+| Celebration extras confetti, coins and the crest/medal s | 1736 |
 | MEADOW · panels | 1909 |
 | 1. The hero card, and the week under it | 1923 |
-| NO LABEL UNDER 11 PX (A11Y-01, AA Proof's half, 2026-09-27) | 2027 |
-| THE ROW AND THE LOG SHEET (2026-10-12, the UX audit's batch A) | 2056 |
-| TODAY'S CARD AND PROGRESS'S WEEK (2026-10-12, the UX audit's bat | 2082 |
+| NO LABEL UNDER 11 PX (A11Y-01, AA Proof's half, 2026-09- | 2027 |
+| THE ROW AND THE LOG SHEET (2026-10-12, the UX audit's ba | 2056 |
+| TODAY'S CARD AND PROGRESS'S WEEK (2026-10-12, the UX aud | 2082 |
 | A HABIT'S PAGE (2026-10-12, the UX audit) | 2149 |
 | 2. Settings as grouped cards | 2157 |
 | 3. Roll call: the dark composer, one card per voice | 2209 |
 | 4. The board as a standings panel | 2259 |
-| 5. Counted habits get a segmented meter, not a straight bar | 2290 |
+| 5. Counted habits get a segmented meter, not a straight  | 2290 |
 | Sign in | 2296 |
-| CREW, LOCKER AND SETTINGS (2026-10-12, the UX audit's batch D; l | 2335 |
-| THE MANUAL FOLDS, THE TOUR'S BUTTONS (2026-10-12, the UX audit's | 2358 |
-| Embedded on the training app's Home (Fork 1B, 2026-09-26; one ro | 2369 |
+| CREW, LOCKER AND SETTINGS (2026-10-12, the UX audit's ba | 2335 |
+| THE MANUAL FOLDS, THE TOUR'S BUTTONS (2026-10-12, the UX | 2358 |
+| Embedded on the training app's Home (Fork 1B, 2026-09-26 | 2369 |
 
 ## The functions, by area
 
