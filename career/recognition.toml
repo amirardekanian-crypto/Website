@@ -233,7 +233,7 @@ fa = ""
 
 [message.amirs_pick]
 used_for = "Amir's Pick"
-en = "You're my pick this month. Can I put you in my story?"
+en = "You're my pick for {month}. Can I put you in my story?"
 fa = ""
 
 [message.badge_tier]

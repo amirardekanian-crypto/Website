@@ -686,6 +686,16 @@
       vm.pick = 'picked'; vm.pick_at = nowIso();
       return honoursOf(m0, p.p_not_clients);
     },
+    // stage100 (2026-10-25, round 7, idea #92): the reason on a month's pick, kept in the pick row's value.why. 140 characters at most; empty clears it;
+    // refused with a plain message when the month has no pick. Answers coach_honours()'s shape. `missingRpc: ['coach_honours_why']` is a server before stage100.
+    coach_honours_why: function (p) {
+      var m0 = monthStart(p.p_month), why = String(p.p_why == null ? '' : p.p_why).replace(/^\s+|\s+$/g, '');
+      if (why.length > 140) throw new Error('The reason is ' + why.length + ' characters. Keep it to 140.');
+      var rows = tbl('career_honours').filter(function (h) { return h.month === m0 && h.honour === 'pick'; });
+      if (!rows.length) throw new Error('There is no pick for ' + monthLabel(m0) + ' yet. Pick first, then write why.');
+      rows.forEach(function (h) { h.value = h.value || {}; if (why === '') delete h.value.why; else h.value.why = why; });
+      return honoursOf(m0, p.p_not_clients);
+    },
     // Write, rewrite or clear (an empty line) an athlete's goal for a month. A goal already ticked done is not cleared. Returns the row, or null.
     coach_set_goal: function (p) {
       var m0 = monthStart(p.p_month), line = tidy(p.p_line), goals = tbl('career_goals'), cur = monthStart(utcDate());

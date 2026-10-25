@@ -5712,13 +5712,13 @@ S['honours-first-week'] = async (b) => {
   check(r, 'the second tap calls coach_honours_pick with the month and the id', pk.length === 1 && pk[0].payload.p_month === '2026-10-01' && pk[0].payload.p_athlete_id === 'hal_court', pk.map(c => c.payload));
   const st2 = await page.locator('#courtPanel').evaluate(el => el.innerText.replace(/\s+/g, ' '));
   db = await L.db(page);
-  check(r, 'the pick is decided: the row shows Hal with the story question and "Ask about the story ↗", the buttons are gone, and a toast says so', /Amir's Pick · Hal Example/.test(st2) && /You're my pick this month\. Can I put you in my story\?/.test(st2) && /Ask about the story ↗/.test(st2) && (await page.locator('#courtPanel .cs-pick').count()) === 0 && /Hal is your October pick/.test(await L.toastText(page)), st2.slice(0, 500));
+  check(r, 'the pick is decided: the row shows Hal with the story question (it names the month) and "Ask about the story ↗", the buttons are gone, and a toast says so', /Amir's Pick · Hal Example/.test(st2) && /You're my pick for October\. Can I put you in my story\?/.test(st2) && /Ask about the story ↗/.test(st2) && (await page.locator('#courtPanel .cs-pick').count()) === 0 && /Hal is your October pick/.test(await L.toastText(page)), st2.slice(0, 500));
   check(r, 'the database holds the pick (month pick "picked", a pick row for Hal with his shortlist slot)', db.career_honour_months[0].pick === 'picked' && db.career_honours.some(h => h.honour === 'pick' && h.athlete_id === 'hal_court' && h.value.slot === 'gain'), db.career_honours.filter(h => h.honour === 'pick'));
   n0 = await L.nCalls(page);
   const storyHref = await page.locator('#courtPanel a.btn', { hasText: 'Ask about the story' }).getAttribute('href');
   await page.locator('#courtPanel a.btn', { hasText: 'Ask about the story' }).click(); await L.settle(page, 500);
   const ss = rpcs(await L.callsSince(page, n0), 'coach_honours_sent');
-  check(r, 'Ask about the story ↗ opens WhatsApp with the question in text= and marks the pick row sent', ss.length === 1 && ss[0].payload.p_honour === 'pick' && ss[0].payload.p_athlete_id === 'hal_court' && new URL(storyHref).searchParams.get('text') === "You're my pick this month. Can I put you in my story?" && /sent ✓/.test(await page.locator('#courtPanel .cs', { hasText: "Amir's Pick" }).first().innerText()), { storyHref, calls: ss.map(c => c.payload) });
+  check(r, 'Ask about the story ↗ opens WhatsApp with the question in text= and marks the pick row sent', ss.length === 1 && ss[0].payload.p_honour === 'pick' && ss[0].payload.p_athlete_id === 'hal_court' && new URL(storyHref).searchParams.get('text') === "You're my pick for October. Can I put you in my story?" && /sent ✓/.test(await page.locator('#courtPanel .cs', { hasText: "Amir's Pick" }).first().innerText()), { storyHref, calls: ss.map(c => c.payload) });
   await page.evaluate(() => honourPick(null, '2026-10-01', 'jon_court')); await L.settle(page, 500);
   check(r, 'a second pick is refused by the server ("already decided") and said in the bar', /Your pick was not saved: Your October 2026 pick is already decided/.test(await L.failText(page)), await L.failText(page));
   // "Nobody this month": a fresh page, two taps, null
@@ -5801,6 +5801,164 @@ S['honours-folded'] = async (b) => {
     return f8 === 1 && fold8 && f7 === 0 && open7;
   })(), '');
   check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Amir's Pick: the reason the crew reads, and any client can be picked (stage100, 2026-10-25, round 7, idea #92) ──────────────────────────────
+// Under the picked row: "Why <first name>? The crew reads this.", a box (140 characters, a live count), Save -> coach_honours_why(), and one muted line on
+// how long the Pick card stays on Crew (7 days from the pick). Under the shortlist: "Someone else:" and a list of every client who counts. The stub
+// answers coach_honours_why() as stage100's SQL does (stub.js); `missingRpc: ['coach_honours_why']` is a server before stage100.
+S['honours-pick-reason'] = async (b) => {
+  const r = { id: 'honours-pick-reason', title: 'Amir\'s Pick has a reason box: the saved reason is prefilled, Save calls coach_honours_why with the typed text, a repaint keeps what is typed, an empty box removes the reason, and the line says how long it is on Crew', checks: [] };
+  const o = await L.openCoach(b, { seed: { court: true }, fixedTime: '2026-11-12T10:00:00Z' });   // the 12th: the month is frozen on load and the honours are folded
+  const page = o.page, log = o.log;
+  await page.waitForSelector('#courtPanel'); await noPopups(page);
+  const box = () => page.evaluate(() => {
+    const m = document.querySelector('#courtHon .mic');
+    if (!m) return null;
+    const ta = m.querySelector('textarea'), note = [...m.children].filter(e => e.classList.contains('muted')).map(e => e.textContent.trim());
+    return { label: m.querySelector('.eyebrow').textContent.trim(), value: ta.value, max: ta.maxLength, count: m.querySelector('.count').textContent, face: getComputedStyle(m.querySelector('.count')).fontFamily.split(',')[0].replace(/["']/g, '').trim(),
+      save: m.querySelector('button.primary') ? m.querySelector('button.primary').textContent.trim() : null, note: note.join(' | ') };
+  });
+  const openFold = () => page.evaluate(() => { const h = document.getElementById('courtHon'); if (h) h.open = true; });
+  check(r, 'before any pick there is no reason box', (await page.evaluate(() => document.querySelectorAll('#courtPanel .mic').length)) === 0, '');
+  check(r, 'the line Amir asks about the story names the month (COURT_LINES.amirs_pick)', (await page.evaluate(() => COURT_LINES.amirs_pick)) === "You're my pick for {month}. Can I put you in my story?", await page.evaluate(() => COURT_LINES.amirs_pick));
+  await page.evaluate(() => honourPick(null, '2026-10-01', 'hal_court')); await L.settle(page, 600);
+  await openFold();
+  const st = await page.locator('#courtHon').evaluate(el => el.innerText.replace(/\s+/g, ' '));
+  check(r, 'the picked row says "Amir\'s Pick · Hal Example", the question names October, and nothing else about "this month"', /Amir's Pick · Hal Example/.test(st) && /“You're my pick for October\. Can I put you in my story\?”/.test(st) && !/my pick this month/.test(st), st.slice(0, 600));
+  let bx = await box();
+  check(r, 'under the row: the label "Why Hal? The crew reads this.", an empty box (140 at most), a count "0 / 140" in Space Mono, and a primary Save', !!bx && bx.label === 'Why Hal? The crew reads this.' && bx.value === '' && bx.max === 140 && bx.count === '0 / 140' && bx.face === 'Space Mono' && bx.save === 'Save', bx);
+  check(r, 'the muted line says how long the Pick card stays: the pick was made on 12 Nov, so "On Crew until 19 Nov"', !!bx && bx.note === 'On Crew until 19 Nov', bx && bx.note);
+  check(r, 'the box sits after the row\'s buttons (label, then the box, then the line), inside the picked row', await page.evaluate(() => { const row = document.querySelector('#courtHon .cs .mic') && document.querySelector('#courtHon .mic').closest('.cs'); return !!row && /Amir's Pick/.test(row.querySelector('.cs-l1').textContent) && row.querySelector('.cs-acts').compareDocumentPosition(row.querySelector('.mic')) & Node.DOCUMENT_POSITION_FOLLOWING; }), '');
+  // typing: the count is live, and a repaint (a background refresh) does not wipe it
+  const TYPED = 'Never missed a session in October, and she asked for more.';
+  await page.locator('#whyIn').fill(TYPED);
+  bx = await box();
+  check(r, 'typing updates the count as you go ("N / 140")', bx.count === TYPED.length + ' / 140', bx.count);
+  await page.locator('#whyIn').focus();
+  await page.evaluate(() => paintCourt()); await L.settle(page, 200);
+  check(r, 'a repaint of the panel keeps the typed text, the open fold and the cursor in the box', (await box()).value === TYPED && (await page.evaluate(() => document.getElementById('courtHon').open && document.activeElement && document.activeElement.id === 'whyIn')), await box());
+  await page.evaluate(() => loadCourt()); await L.settle(page, 800);
+  check(r, 'a background refresh (↻, loadCourt) keeps it too', (await box()).value === TYPED && (await box()).count === TYPED.length + ' / 140', await box());
+  // Save
+  let n0 = await L.nCalls(page);
+  await page.locator('#courtHon .mic button.primary').click(); await L.settle(page, 700);
+  let w = rpcs(await L.callsSince(page, n0), 'coach_honours_why');
+  check(r, 'Save calls coach_honours_why with the month, the typed text and the same p_not_clients as every honours call', w.length === 1 && w[0].payload.p_month === '2026-10-01' && w[0].payload.p_why === TYPED && Array.isArray(w[0].payload.p_not_clients) && w[0].payload.p_not_clients.includes('amir_ardekani') && w[0].payload.p_not_clients.includes('demo'), w.map(c => c.payload));
+  check(r, 'a toast says it is saved and where the crew reads it', /Saved\. The crew reads it on the Pick card\./.test(await L.toastText(page)), await L.toastText(page));
+  let db = await L.db(page);
+  const pickRow = () => db.career_honours.find(h => h.honour === 'pick');
+  check(r, 'the database holds the reason in the pick row\'s value and keeps what was there (the shortlist slot)', !!pickRow() && pickRow().value.why === TYPED && pickRow().value.slot === 'gain', pickRow());
+  bx = await box();
+  check(r, 'the box shows the saved reason after the save (S.honours is the answer), and there is no draft left', bx.value === TYPED && (await page.evaluate(() => _whyDraft)) === null && !(await L.failText(page)), { bx, fail: await L.failText(page) });
+  await page.locator('#courtHon .mic').scrollIntoViewIfNeeded();
+  await page.locator('#courtPanel').screenshot({ path: path.join(L.OUT, 'honours-picked-with-reason.png') });
+  await page.screenshot({ path: path.join(L.OUT, 'honours-picked-with-reason-page.png') });
+  // a reload: the reason is prefilled from the server
+  await page.reload();
+  await page.waitForFunction(() => document.querySelector('#rail a.tab') && !document.querySelector('#content .loading'), null, { timeout: 15000 });
+  await page.waitForSelector('#courtPanel'); await L.settle(page, 500); await openFold();
+  check(r, 'after a reload the box is prefilled with the saved reason and the count matches', (await box()).value === TYPED && (await box()).count === TYPED.length + ' / 140', await box());
+  // a line break becomes a space
+  n0 = await L.nCalls(page);
+  await page.locator('#whyIn').fill('Line one\nline two');
+  await page.locator('#courtHon .mic button.primary').click(); await L.settle(page, 600);
+  w = rpcs(await L.callsSince(page, n0), 'coach_honours_why');
+  check(r, 'a pasted line break goes to the server as a space (one line on the card)', w.length === 1 && w[0].payload.p_why === 'Line one line two', w.map(c => c.payload));
+  // too long (a pasted value can get past maxlength): the server's words are said in the bar
+  n0 = await L.nCalls(page);
+  await page.evaluate(() => { document.getElementById('whyIn').value = 'x'.repeat(141); });
+  await page.locator('#courtHon .mic button.primary').click(); await L.settle(page, 600);
+  check(r, 'a reason over 140 is refused by the server and the bar says so in its words', /Your reason was not saved: The reason is 141 characters\. Keep it to 140\./.test(await L.failText(page)), await L.failText(page));
+  check(r, 'the refused text is still in the box (nothing was lost) and Save works again', (await box()).value.length === 141 && !(await page.locator('#courtHon .mic button.primary').isDisabled()), '');
+  // an empty box takes the reason off
+  n0 = await L.nCalls(page);
+  await page.locator('#whyIn').fill('');
+  await page.locator('#courtHon .mic button.primary').click(); await L.settle(page, 600);
+  w = rpcs(await L.callsSince(page, n0), 'coach_honours_why');
+  db = await L.db(page);
+  check(r, 'Save on an empty box sends an empty reason, a toast says "Reason removed.", and the pick row loses only the reason', w.length === 1 && w[0].payload.p_why === '' && /Reason removed\./.test(await L.toastText(page)) && !('why' in pickRow().value) && pickRow().value.slot === 'gain' && (await box()).value === '', { w: w.map(c => c.payload), row: pickRow() });
+  // the line when the card is gone
+  await page.evaluate(() => { S.honours.pick_at = '2026-11-01T10:00:00.000Z'; paintCourt(); });
+  check(r, 'once the 7 days are over the line says "No longer on Crew. Hal\'s page keeps it."', (await box()).note === "No longer on Crew. Hal's page keeps it.", (await box()).note);
+  // the look
+  check(r, 'the box keeps the look (sizes, corners, 32 px buttons, one primary, Space Mono only in the count) and Today does not scroll sideways at 390 px', (await lookOf(page, '#courtPanel')).length === 0 && await (async () => { await page.setViewportSize({ width: 390, height: 844 }); await L.go(page, 'today'); await openFold(); const x = await sideways(page); const bad = await lookOf(page, '#courtPanel'); await page.setViewportSize({ width: 1280, height: 900 }); return x.over <= 0 && x.panel <= 0 && bad.length === 0; })(), (await lookOf(page, '#courtPanel')).slice(0, 4));
+  // a server before stage100: no box, and a Save that finds no function hides it and says why
+  const old = await L.openCoach(b, { seed: { court: true, stub: { missingRpc: ['coach_honours_why'] } }, fixedTime: '2026-11-12T10:00:00Z' });
+  await old.page.waitForSelector('#courtPanel');
+  await old.page.evaluate(() => honourPick(null, '2026-10-01', 'hal_court')); await L.settle(old.page, 600);
+  await old.page.evaluate(() => { document.getElementById('courtHon').open = true; });
+  n0 = await L.nCalls(old.page);
+  await old.page.locator('#whyIn').fill('Anything'); await old.page.locator('#courtHon .mic button.primary').click(); await L.settle(old.page, 600);
+  const ot = await old.page.locator('#courtHon').evaluate(el => el.innerText.replace(/\s+/g, ' '));
+  check(r, 'on a server without coach_honours_why the first Save hides the box, says the server is older, and the pick row is still there', (await old.page.locator('#courtHon .mic').count()) === 0 && /newer server \(stage100\)/.test(await L.failText(old.page)) && /Amir's Pick · Hal Example/.test(ot) && /Ask about the story/.test(ot), { fail: await L.failText(old.page), ot: ot.slice(0, 300) });
+  check(r, 'no page errors', !log.errors.length && !old.log.errors.length, log.errors.concat(old.log.errors));
+  await old.ctx.close();
+  await page.context().close();
+  return r;
+};
+
+S['honours-someone-else'] = async (b) => {
+  const r = { id: 'honours-someone-else', title: 'Amir\'s Pick: "Someone else" offers every client who counts but the shortlist (never the demo, Amir\'s own id or a former athlete) and picks through the same two taps', checks: [] };
+  // open: true gives the demo, the coach's own identity and the former athlete a programme each, so that the list has to leave them out
+  const o = await L.openCoach(b, { seed: { court: true, open: true }, fixedTime: '2026-11-02T10:00:00Z' });
+  const page = o.page, log = o.log;
+  await page.waitForSelector('#courtPanel'); await noPopups(page);
+  check(r, 'the demo, the coach\'s own login and the former athlete each have a programme here (so the list is really leaving them out)', await page.evaluate(() => ['demo', 'amir_ardekani', 'kim_former'].every(id => !!S.programs[id] && !!S.ath[id])), '');
+  const row = () => page.evaluate(() => {
+    const e = document.querySelector('#courtPanel .cs-else');
+    if (!e) return null;
+    const sel = e.querySelector('select'), acts = [...e.parentElement.children];
+    return { label: e.querySelector('.m').textContent.trim(), options: [...sel.options].map(x => x.textContent.trim()), ids: [...sel.options].map(x => x.value), btn: e.querySelector('button').textContent.trim(),
+      before: acts.indexOf(e) > acts.findIndex(x => x.classList.contains('cs-pick')) && acts.indexOf(e) < acts.findIndex(x => x.classList.contains('cs-acts')), selected: sel.value };
+  });
+  let rw = await row();
+  check(r, 'under the shortlist, before "Nobody this month": "Someone else:", a list and a Pick button', !!rw && rw.label === 'Someone else:' && rw.btn === 'Pick' && rw.before, rw);
+  check(r, 'the list is every client who counts, sorted by name, minus the shortlist (Ava, Hal, Jon): Ben, Cara, Eli, Gia, Ivy', !!rw && JSON.stringify(rw.options.slice(1)) === JSON.stringify(['Ben Example', 'Cara', 'Eli Example', 'Gia Example', 'Ivy Example']), rw && rw.options);
+  check(r, 'it never lists the demo, the coach\'s own id or a former athlete (nor anyone on the shortlist)', !!rw && !rw.ids.some(id => ['demo', 'amir_ardekani', 'kim_former', 'ava_test', 'hal_court', 'jon_court'].includes(id)), rw && rw.ids);
+  // Pick with nothing chosen must never be "nobody"
+  let n0 = await L.nCalls(page);
+  await page.locator('#courtPanel .cs-else button').click(); await L.settle(page, 300);
+  check(r, 'Pick with no name chosen asks for a name and sends nothing (an empty id would mean "nobody")', /Choose a name first/.test(await L.toastText(page)) && rpcs(await L.callsSince(page, n0), 'coach_honours_pick').length === 0, await L.toastText(page));
+  // the chosen name survives a repaint
+  await page.locator('#elseSel').selectOption('ben_test');
+  await page.evaluate(() => paintCourt()); await L.settle(page, 200);
+  check(r, 'the chosen name is kept across a repaint', (await row()).selected === 'ben_test', await row());
+  // two taps, through the existing honourPick
+  await page.locator('#elseSel').selectOption('ivy_court');
+  n0 = await L.nCalls(page);
+  await page.locator('#courtPanel .cs-else button').click(); await L.settle(page, 300);
+  check(r, 'the first tap arms it: "Tap again: Ivy is your pick" and nothing is sent', /Tap again: Ivy is your pick/.test((await row()).btn) && rpcs(await L.callsSince(page, n0), 'coach_honours_pick').length === 0, (await row()).btn);
+  await page.screenshot({ path: path.join(L.OUT, 'honours-choosing.png') });
+  await page.locator('#courtPanel .cs').filter({ has: page.locator('.cs-else') }).screenshot({ path: path.join(L.OUT, 'honours-choosing-row.png') });
+  await page.locator('#elseSel').selectOption('gia_court'); await L.settle(page, 100);
+  await page.locator('#courtPanel .cs-else button').click(); await L.settle(page, 300);
+  check(r, 'changing the name after the first tap starts again (the button arms for Gia, not Ivy), still nothing sent', /Tap again: Gia is your pick/.test((await row()).btn) && rpcs(await L.callsSince(page, n0), 'coach_honours_pick').length === 0, (await row()).btn);
+  await page.locator('#courtPanel .cs-else button').click(); await L.settle(page, 700);
+  const pk = rpcs(await L.callsSince(page, n0), 'coach_honours_pick');
+  check(r, 'the second tap calls coach_honours_pick with the month and the chosen id', pk.length === 1 && pk[0].payload.p_month === '2026-10-01' && pk[0].payload.p_athlete_id === 'gia_court', pk.map(c => c.payload));
+  const db = await L.db(page);
+  const pickRow = db.career_honours.find(h => h.honour === 'pick');
+  check(r, 'the database holds Gia\'s pick (she is no one\'s shortlist slot), a toast says so, and Someone else is gone', db.career_honour_months[0].pick === 'picked' && !!pickRow && pickRow.athlete_id === 'gia_court' && !pickRow.value.slot && /Gia is your October pick/.test(await L.toastText(page)) && (await page.locator('#courtPanel .cs-else').count()) === 0 && (await page.locator('#courtPanel .cs-pick').count()) === 0, { pickRow, toast: await L.toastText(page) });
+  const px = await page.locator('#courtPanel').evaluate(el => el.innerText.replace(/\s+/g, ' '));
+  check(r, 'the picked row is Gia\'s, with the October question and her reason box ("Why Gia?")', /Amir's Pick · Gia Example/.test(px) && /You're my pick for October\./.test(px) && /why gia\? the crew reads this\./i.test(px), px.slice(0, 500));
+  await page.locator('#courtPanel .mic').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: path.join(L.OUT, 'honours-picked-someone-else.png') });
+  // an empty shortlist: everyone is offered, so Amir can still pick
+  const e = await L.openCoach(b, { seed: { court: true, open: true, honoursLive: { sessions: { n: 1, who: ['gia_court'] }, improved: { pct: null, who: [] }, full_month: { who: [], near: [] }, shortlist: [] } }, fixedTime: '2026-11-02T10:00:00Z' });
+  await e.page.waitForSelector('#courtPanel');
+  const ew = await e.page.evaluate(() => [...document.querySelectorAll('#elseSel option')].slice(1).map(x => x.textContent.trim()));
+  check(r, 'with an empty shortlist the list holds every client who counts (Ava, Ben, Cara, Eli, Gia, Hal, Ivy, Jon)', JSON.stringify(ew) === JSON.stringify(['Ava Example', 'Ben Example', 'Cara', 'Eli Example', 'Gia Example', 'Hal Example', 'Ivy Example', 'Jon Example']), ew);
+  // a month that is already decided as nobody has no list
+  const nb = await L.openCoach(b, { seed: { court: true, open: true }, fixedTime: '2026-11-02T10:00:00Z' });
+  await nb.page.waitForSelector('#courtPanel');
+  await nb.page.evaluate(() => honourPick(null, '2026-10-01', '')); await L.settle(nb.page, 600);
+  check(r, 'once the month is decided as nobody there is no Someone else and no box', (await nb.page.locator('#courtPanel .cs-else').count()) === 0 && (await nb.page.locator('#courtPanel .mic').count()) === 0, '');
+  check(r, 'the list keeps the look (sizes, corners, 32 px buttons) at 1280 px and does not scroll Today sideways at 390 px', (await lookOf(page, '#courtPanel')).length === 0 && await (async () => { const f = await L.openCoach(b, { seed: { court: true, open: true }, fixedTime: '2026-11-02T10:00:00Z' }); await f.page.waitForSelector('#courtPanel'); const bad1 = await lookOf(f.page, '#courtPanel'); await f.page.setViewportSize({ width: 390, height: 844 }); await L.go(f.page, 'today'); const x = await sideways(f.page); const bad2 = await lookOf(f.page, '#courtPanel'); await f.ctx.close(); return bad1.length === 0 && bad2.length === 0 && x.over <= 0 && x.panel <= 0; })(), (await lookOf(page, '#courtPanel')).slice(0, 4));
+  check(r, 'no page errors', !log.errors.length && !e.log.errors.length && !nb.log.errors.length, log.errors.concat(e.log.errors, nb.log.errors));
+  await e.ctx.close(); await nb.ctx.close();
   await page.context().close();
   return r;
 };

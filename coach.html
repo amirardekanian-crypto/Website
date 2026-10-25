@@ -620,8 +620,14 @@
   .court .cs-msg { font-style: italic; }
   .court .cs-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 4px 0 0 16px; }
   .court .cs-acts a.btn { text-decoration: none; }
-  .court .cs-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding-left: 16px; font-size: 14px; }
+  .court .cs-pick, .court .cs-else { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding-left: 16px; font-size: 14px; }
   .court .cs-pick .m { flex: 1 1 10em; min-width: 0; overflow-wrap: anywhere; }
+  /* "Someone else:" under the shortlist, and the reason box under the picked row (2026-10-25, round 7, idea #92). The reason box is the composer (.mic) at the width of a row. */
+  .court .cs-else .m { flex: none; }
+  .court .cs-else .goal-in { flex: 1 1 10em; }
+  .court .cs .mic { margin: 8px 0 0 16px; }
+  .court .cs .mic .row { margin-top: 8px; }
+  @media (max-width: 899px) and (pointer: coarse) { .mic textarea { font-size: 16px; } }
   .court .cs-eb { margin-top: 4px; }
   .court .cs-fold { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
   .court .cs-fold > summary { font-size: 14px; font-weight: 600; cursor: pointer; }
@@ -3375,7 +3381,7 @@ const COURT_LINES = {
   honour_sessions: 'Most sessions in {month}: {n}. Nobody trained more. Thank you.',
   honour_improved: "Most improved in {month}. {lift} up {pct}% at the same effort. That's real strength.",
   honour_full_month: 'Every plan session in {month}. Full Month. Respect.',
-  amirs_pick: "You're my pick this month. Can I put you in my story?",
+  amirs_pick: "You're my pick for {month}. Can I put you in my story?",
 };
 const COURT_SIZE = { highlight: 2, milestone: 3, legend: 4 };
 const COURT_MARK_LINE = { held_weeks: 'week_held', century: 'century', bests: 'bests', comebacks: 'comebacks' };
@@ -3383,6 +3389,10 @@ const COURT_CAP = 5;
 // Who is never a client, as inTotals() says: the server cannot name your own login in a public stage file (pre-commit guard 6), so the page passes it.
 const COURT_NOT_CLIENTS = SYSTEM_IDS.concat([AMIR_ATHLETE_ID]);
 let _courtAll = false, _goalEdit = null, _goalDraft = '', _fromEdit = null, _fromDraft = '';
+// 2026-10-25, round 7, idea #92: what is typed in the pick's reason box and the name chosen under "Someone else", kept across a repaint (a background
+// refresh redraws the panel; it must never wipe what Amir typed). _whyMissing: the server has no coach_honours_why() (stage100 not applied): no box.
+let _whyDraft = null, _whyMissing = false, _elseId = '';
+const WHY_MAX = 140;
 // The server has no stage75 yet: the function or the table is not there. Anything else is a real error and is said.
 const courtMissing = e => !!e && (['PGRST202', 'PGRST205', '42P01', '42883'].includes(e.code) || /Could not find the (function|table)|does not exist/i.test(e.message || ''));
 // This week on the coach's clock: Monday 00:00 to the next Monday.
@@ -3429,8 +3439,13 @@ function paintCourt() {
   const r = route(), on = !!(S.court && S.court.on);
   if (r.view === 'today') {
     const el = $('courtPanel');
-    if (el && on) el.innerHTML = courtsideHtml();
-    else if (!!el !== on) render();
+    if (el && on) {
+      // The honours fold and the cursor in the reason box survive the redraw (a background refresh must not close what Amir is writing in).
+      const fold = $('courtHon'), wasOpen = !!(fold && fold.open), f = document.activeElement, keep = f && f.id === 'whyIn' ? [f.selectionStart, f.selectionEnd] : null;
+      el.innerHTML = courtsideHtml();
+      if (wasOpen && $('courtHon')) $('courtHon').open = true;
+      if (keep && $('whyIn')) { $('whyIn').focus(); try { $('whyIn').setSelectionRange(keep[0], keep[1]); } catch (e) { /* a field with no selection */ } }
+    } else if (!!el !== on) render();
   } else if (r.view === 'detail' && on) render();
 }
 
@@ -3533,36 +3548,57 @@ function honoursData() {
   const L = h.live || {}, rows = h.frozen ? (h.rows || []) : [];
   const pick = (honour, live) => (h.frozen ? rows.filter(r => r.honour === honour).map(r => Object.assign({}, r.value || {}, { id: r.athlete_id, sent: r.sent_at })) : live).filter(x => courtClient(x.id));
   return {
-    month: h.month, frozen: !!h.frozen, pick: h.pick || null, pickOpen: !!h.pick_open,
+    month: h.month, frozen: !!h.frozen, pick: h.pick || null, pickOpen: !!h.pick_open, pickAt: h.pick_at || null,
     sessions: pick('sessions', ((L.sessions && L.sessions.who) || []).map(id => ({ id, n: L.sessions.n }))),
     improved: pick('improved', ((L.improved && L.improved.who) || []).map(x => ({ id: x.athlete_id, lift: x.lift, pct: x.pct }))),
     full: pick('full_month', ((L.full_month && L.full_month.who) || []).map(x => ({ id: x.athlete_id, weeks: x.weeks }))),
     near: pick('near', ((L.full_month && L.full_month.near) || []).map(x => ({ id: x.athlete_id, held: x.held, weeks: x.weeks }))),
-    picked: rows.filter(r => r.honour === 'pick').map(r => ({ id: r.athlete_id, sent: r.sent_at })),
+    picked: rows.filter(r => r.honour === 'pick').map(r => ({ id: r.athlete_id, sent: r.sent_at, why: (r.value || {}).why || '' })),
     shortlist: (h.shortlist || []).map(x => Object.assign({}, x, { id: x.athlete_id })).filter(x => courtClient(x.id)),
   };
 }
-function honRow(k, words, msg, acts) {
+function honRow(k, words, msg, acts, extra) {
   return `<div class="cs"><div class="cs-l1"><span class="dot"></span><span class="m"><b>${esc(k)}</b> · ${esc(words)}</span></div>
-      ${msg ? `<div class="cs-msg" dir="auto">“${esc(msg)}”</div>` : ''}${acts ? `<div class="cs-acts">${acts}</div>` : ''}</div>`;
+      ${msg ? `<div class="cs-msg" dir="auto">“${esc(msg)}”</div>` : ''}${acts ? `<div class="cs-acts">${acts}</div>` : ''}${extra || ''}</div>`;
+}
+// Under the picked row: why Amir picked them, in his words (140 characters). The athletes' Crew tab shows the pick as a card for 7 days from the moment of
+// the pick, with this reason; their Player Page keeps it. Written by coach_honours_why() (stage100), which keeps it in the pick row's value.why.
+function pickWhyHtml(d, x) {
+  if (_whyMissing) return '';
+  const first = firstWord(nameOf(x.id)) || nameOf(x.id), text = _whyDraft && _whyDraft.month === d.month ? _whyDraft.text : x.why;
+  let line = '';
+  if (d.pickAt) {
+    const until = new Date(new Date(d.pickAt).getTime() + 7 * 864e5);
+    line = until.getTime() > Date.now() ? `On Crew until ${dayMonth(dkey(until))}` : `No longer on Crew. ${first}'s page keeps it.`;
+  }
+  return `<div class="mic">
+      <div class="cap"><span class="eyebrow">Why ${esc(first)}? The crew reads this.</span></div>
+      <textarea id="whyIn" dir="auto" maxlength="${WHY_MAX}" aria-label="Why ${esc(first)} is your pick" placeholder="One line, in your words" oninput="whyType(this, ${jsq(d.month)})">${esc(text)}</textarea>
+      <div class="row"><button class="btn primary sm" onclick="honourWhy(this, ${jsq(d.month)})">Save</button><span class="count" id="whyCount">${text.length} / ${WHY_MAX}</span></div>
+      ${line ? `<div class="muted t-sm">${esc(line)}</div>` : ''}
+    </div>`;
 }
 function honoursHtml(expanded) {
   // Just after midnight on the 1st your clock can be ahead of the server's (UTC): the month has not ended there yet, so there is nothing to show.
   if (S.honours && S.honours.err) return /has not ended yet/.test(S.honours.err) ? '' : `<p class="empty">Last month's honours did not load: ${esc(S.honours.err)}</p>`;
   const d = honoursData();
   if (!d) return '';
-  const mn = monthName(d.month), out = [];
+  const mn = monthName(d.month), out = [], pickMsg = fillLine(COURT_LINES.amirs_pick, { month: mn });
   const send = (honour, x, msg, label) => courtSendHtml(x.id, msg, () => `honourSent(${jsq(d.month)}, '${honour}', ${jsq(x.id)})`, label) + (x.sent ? '<span class="muted t-sm">sent ✓</span>' : '');
   d.sessions.forEach(x => { const msg = fillLine(COURT_LINES.honour_sessions, { month: mn, n: x.n }); out.push(honRow('Most sessions', `${nameOf(x.id)}, ${x.n} plan session${x.n === 1 ? '' : 's'}`, msg, send('sessions', x, msg))); });
   d.improved.forEach(x => { const msg = fillLine(COURT_LINES.honour_improved, { month: mn, lift: x.lift, pct: x.pct }); out.push(honRow('Most improved', `${nameOf(x.id)}, ${x.lift} +${x.pct}% at the same effort`, msg, send('improved', x, msg))); });
   if (d.full.length) d.full.forEach(x => { const msg = fillLine(COURT_LINES.honour_full_month, { month: mn }); out.push(honRow('Full Month', `${nameOf(x.id)}, every plan session (${x.weeks} weeks)`, msg, send('full_month', x, msg))); });
   else out.push(honRow('Full Month', 'Nobody this month.' + (d.near.length ? ` ${listNames(d.near.map(x => x.id))} ${d.near.length === 1 ? 'was' : 'were'} one week short.` : '')));
-  if (d.pick === 'picked') d.picked.forEach(x => out.push(honRow("Amir's Pick", nameOf(x.id), COURT_LINES.amirs_pick, send('pick', x, COURT_LINES.amirs_pick, 'Ask about the story ↗'))));
+  if (d.pick === 'picked') d.picked.forEach(x => out.push(honRow("Amir's Pick", nameOf(x.id), pickMsg, send('pick', x, pickMsg, 'Ask about the story ↗'), pickWhyHtml(d, x))));
   else if (d.pick === 'nobody') out.push(honRow("Amir's Pick", 'Nobody this month.'));
   else if (d.pickOpen) {
     const why = x => x.slot === 'weeks_held' ? `most weeks held: ${x.n}` : x.slot === 'gain' ? `biggest gain: ${x.lift} +${x.pct}%` : x.gone ? `back after ${x.gone} days away` : `${x.n} comebacks`;
+    // Someone else: any client who counts (the page's own tests, and a programme), not on the shortlist. The server accepts any client (career_is_client()).
+    const others = Object.values(S.ath).filter(a => courtClient(a.id) && S.programs[a.id] && !d.shortlist.some(x => x.id === a.id)).sort((p, q) => nameOf(p.id).localeCompare(nameOf(q.id)));
+    const elseRow = others.length ? `<div class="cs-else"><span class="m muted">Someone else:</span><select id="elseSel" class="goal-in" aria-label="Pick someone who is not on the list" onchange="_elseId=this.value"><option value="">Choose a name</option>${others.map(a => `<option value="${esc(a.id)}"${a.id === _elseId ? ' selected' : ''}>${esc(nameOf(a.id))}</option>`).join('')}</select><button class="btn sm" onclick="honourElse(this, ${jsq(d.month)})">Pick</button></div>` : '';
     out.push(`<div class="cs"><div class="cs-l1"><span class="dot"></span><span class="m"><b>Amir's Pick</b> · choose one, or nobody</span></div>
       ${d.shortlist.map(x => `<div class="cs-pick"><span class="m">${esc(nameOf(x.id))} <span class="muted">· ${esc(why(x))}</span></span><button class="btn sm" onclick="honourPick(this, ${jsq(d.month)}, ${jsq(x.id)})">Pick ${esc(firstWord(nameOf(x.id)))}</button></div>`).join('')}
+      ${elseRow}
       <div class="cs-acts"><button class="btn sm quiet" onclick="honourPick(this, ${jsq(d.month)}, '')">Nobody this month</button></div></div>`);
   }
   return expanded ? `<div class="eyebrow cs-eb">${esc(mn)} honours</div>${out.join('')}`
@@ -3597,8 +3633,39 @@ async function honourPick(btn, month, id) {
   toast(id ? `${firstWord(nameOf(id))} is your ${monthName(month)} pick` : `No pick for ${monthName(month)}`);
   paintCourt();
 }
+// "Someone else": the name chosen in the list goes to the same two-tap honourPick(). An empty choice must never reach it (an empty id there means "nobody").
+function honourElse(btn, month) {
+  const sel = $('elseSel'), id = sel ? sel.value : '';
+  if (!id) { toast('Choose a name first'); return; }
+  _elseId = id;
+  if (btn.dataset.armed && btn.dataset.who !== id) { delete btn.dataset.armed; btn.textContent = 'Pick'; }   // the name changed after the first tap: start again
+  btn.dataset.who = id;
+  return honourPick(btn, month, id);
+}
+// The reason box: typing keeps a draft and the count; Save writes it (an empty box takes the reason off).
+function whyType(ta, month) {
+  _whyDraft = { month, text: ta.value };
+  const c = $('whyCount'); if (c) c.textContent = `${ta.value.length} / ${WHY_MAX}`;
+}
+async function honourWhy(btn, month) {
+  const ta = $('whyIn'), text = String(ta ? ta.value : _whyDraft ? _whyDraft.text : '').replace(/\s+/g, ' ').trim();   // one line: a line break becomes a space
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (btn) btn.disabled = true;
+  const r = await sb.rpc('coach_honours_why', { p_month: month, p_why: text, p_not_clients: COURT_NOT_CLIENTS });
+  if (btn && btn.isConnected) btn.disabled = false;
+  if (r.error) {
+    if (courtMissing(r.error)) { _whyMissing = true; paintCourt(); fail('The reason box needs the newer server (stage100). It is hidden until that is applied.'); return; }
+    fail('Your reason was not saved: ' + r.error.message); return;
+  }
+  S.honours = r.data; _whyDraft = null;
+  toast(text ? 'Saved. The crew reads it on the Pick card.' : 'Reason removed.');
+  paintCourt();
+}
 window.honourSent = honourSent;
 window.honourPick = honourPick;
+window.honourElse = honourElse;
+window.whyType = whyType;
+window.honourWhy = honourWhy;
 
 // The monthly goal (one line, one tick) and "From Amir" (one line a day), under the athlete's name. Clients with a programme only.
 function goalLineHtml(a) {
