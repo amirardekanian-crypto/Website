@@ -33,6 +33,8 @@
 // the card's ground, what Tell the crew sends (title, mins, held), the guide. Section 27 takes its pictures.
 // Step 11: the Open wall (section 28): tiles, your mint outline, the first 8 and All 14 ›, the list sheet, a tile opens the page, a server without stage96 keeps the rows, the card names nobody else. Section 29 takes its pictures.
 // All-time cheers (section 30, CONTRACT 9b): the four tiles are the same on every page (weeks held, sessions, bests, cheers = cheers.total), yours adds your comebacks as a thin Only you row under them; the list is "Cheers this week".
+// 2026-10-25, Amir from his iPhone (section 31; section 32 takes its pictures): the cover is a banner (about 200 px at 390 wide, never over 28% of the screen, the picture at full strength under a light shade, the
+// face still over its foot), the cheers number counts only Cheers sent with the clap button (stage98: no likes), and the account sheet opens with a Profile group (Your photo, Your game, Your page, What the crew sees of you).
 // `--only=14,15` runs just those sections (everything after a "// ── N." line is wrapped in on(N)).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
@@ -2646,6 +2648,93 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await gx.ctx.close();
   }
 
+  // ── 31. 2026-10-25 · Amir on his iPhone: the cover is a banner, the cheers number counts cheers, and Profile lives in the account sheet ──────────────
+  // Amir: "the background on the top of the page is too small, cant see anything" · "the number of cheers is wrong" (stage98: cheers.total counts only the Cheers sent
+  // with the clap button, never likes) · "we should be able to change profile settings in the settings when we click on our image on top right side of the app".
+  const fsx = require('fs'), ROOT = path.join(__dirname, '..', '..');
+  // the cover: its box, its picture, its shade, and what the phone actually draws there
+  const coverNow = p => p.evaluate(() => {
+    const c = document.getElementById('pl-cover'), i = document.getElementById('pl-cover-img'), f = document.querySelector('#crewplayer-body .pl-face');
+    const r = c.getBoundingClientRect(), ir = i.getBoundingClientRect(), fr = f ? f.getBoundingClientRect() : null, s = getComputedStyle(i), sc = getComputedStyle(c.querySelector('.cyc-scrim'));
+    const alphas = [...sc.backgroundImage.matchAll(/rgba?\(([^)]*)\)/g)].map(m => { const q = m[1].split(',').map(Number); return q.length === 4 ? q[3] : 1; });
+    return { h: Math.round(r.height), w: Math.round(r.width), vh: innerHeight, vw: innerWidth, imgW: Math.round(ir.width), imgH: Math.round(ir.height), hidden: i.hidden, loaded: i.complete && i.naturalWidth > 0,
+      opacity: +s.opacity, blend: s.mixBlendMode, mask: s.webkitMaskImage || s.maskImage, fit: s.objectFit, alphas, overlap: fr ? Math.round(r.bottom - fr.top) : null, sw: document.documentElement.scrollWidth };
+  });
+  // how much of the picture's own light and detail the banner keeps: the mean and the spread of the luminance over the middle of the cover (clear of the buttons and the face), drawn and
+  // then compared with the same picture laid on a canvas as it is (cover-fitted), unshaded
+  const coverSee = async (p) => {
+    const box = await p.evaluate(() => { const r = document.getElementById('pl-cover').getBoundingClientRect(); return { x: Math.round(r.left) + 64, y: Math.round(r.top), width: Math.round(r.width) - 128, height: Math.round(r.height) - 56 }; });
+    const png = (await p.screenshot({ clip: box })).toString('base64');
+    return p.evaluate(async ([b64, box]) => {
+      const stat = (cv) => { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let s = 0, s2 = 0, n = 0; for (let k = 0; k < d.length; k += 4) { const y = .2126 * d[k] + .7152 * d[k + 1] + .0722 * d[k + 2]; s += y; s2 += y * y; n++; } const m = s / n; return { mean: +m.toFixed(1), sd: +Math.sqrt(Math.max(0, s2 / n - m * m)).toFixed(1) }; };
+      const im = new Image(); im.src = 'data:image/png;base64,' + b64; await im.decode();
+      const a = document.createElement('canvas'); a.width = im.width; a.height = im.height; a.getContext('2d').drawImage(im, 0, 0);
+      const cover = document.getElementById('pl-cover'), cr = cover.getBoundingClientRect(), img = document.getElementById('pl-cover-img');
+      const s = Math.max(cr.width / img.naturalWidth, cr.height / img.naturalHeight), dw = img.naturalWidth * s, dh = img.naturalHeight * s;
+      const pos = getComputedStyle(img).objectPosition.split(' ').map(v => parseFloat(v) / 100);
+      const ox = (cr.width - dw) * (pos[0] || .5), oy = (cr.height - dh) * (pos[1] || .5);
+      const b = document.createElement('canvas'); b.width = box.width; b.height = box.height;
+      b.getContext('2d').drawImage(img, ox - 64, oy, dw, dh);
+      return { shown: stat(a), natural: stat(b) };
+    }, [png, box]);
+  };
+  if (on(31)) {
+    // (1) THE COVER: about 200 px at 390 wide, never over 28% of the screen, the picture itself with a light shade, the face still over its foot
+    const a = await open(browser, { stub: { crewPages: { me: { art: 'voltage' }, [CK.mina]: { art: 'armour' } } } });
+    await goCrew(a.p);
+    for (const [who, key] of [['your own page', 'me'], ['someone else\'s page', CK.mina]]) {
+      await a.p.evaluate(k => openPlayer(k), key); await a.p.waitForTimeout(800);
+      const c = await coverNow(a.p);
+      C.check('cover, ' + who + ' at 390 px: a banner about 200 px tall, under 28% of the screen', c.w === 390 && c.h >= 190 && c.h <= 210 && c.h <= c.vh * 0.28 + 0.5, JSON.stringify(c));
+      C.check('…the picture fills it (cropped to cover), loaded, at full strength: no luminosity blend, no fade-in mask, no dimming', !c.hidden && c.loaded && c.fit === 'cover' && c.imgW === c.w && c.imgH === c.h && c.opacity >= 0.99 && c.blend === 'normal' && (c.mask === 'none' || !c.mask), JSON.stringify(c));
+      C.check('…only a light shade: no stop of the scrim is darker than half', c.alphas.length >= 2 && Math.max(...c.alphas) <= 0.5, JSON.stringify(c.alphas));
+      C.check('…the profile face still overlaps the foot of the cover by about half its height', c.overlap >= 36 && c.overlap <= 52, String(c.overlap));
+      const see = await coverSee(a.p);
+      C.check('…and the picture can be seen: the banner keeps at least 85% of the picture\'s own light and detail', see.shown.mean >= see.natural.mean * 0.85 && see.shown.sd >= see.natural.sd * 0.85 && see.shown.sd >= 8, JSON.stringify(see));
+      await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(250);
+    }
+    C.check('no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+    // 320 x 640, and a short screen: it scales and never passes 28% of the height
+    for (const [w, h, lo] of [[320, 640, 150], [390, 500, 104], [430, 932, 190]]) {
+      const s = await open(browser, { opts: { w, h }, stub: { crewPages: { me: { art: 'voltage' } } } });
+      await goCrew(s.p); await s.p.evaluate(() => openPlayer('me')); await s.p.waitForTimeout(700);
+      const c = await coverNow(s.p);
+      C.check('cover at ' + w + ' x ' + h + ': ' + c.h + ' px, in range, under 28% of the height, nothing scrolls sideways', c.h >= lo && c.h <= 200 && (c.h <= c.vh * 0.28 + 0.5 || c.h === 104) && c.sw <= c.vw, JSON.stringify(c));
+      await s.ctx.close();
+    }
+    // dark mode: the same banner, the picture as strong
+    const d = await open(browser, { opts: { dark: true }, stub: { crewPages: { me: { art: 'iron' } } } });
+    await goCrew(d.p); await d.p.evaluate(() => openPlayer('me')); await d.p.waitForTimeout(800);
+    const dc = await coverNow(d.p), dsee = await coverSee(d.p);
+    C.check('cover in dark mode: the same height and the picture just as clear', dc.h >= 190 && dc.h <= 210 && dc.opacity >= 0.99 && dc.blend === 'normal' && dsee.shown.sd >= dsee.natural.sd * 0.85 && dsee.shown.mean >= dsee.natural.mean * 0.85, JSON.stringify([dc, dsee]));
+    C.check('no page errors', !d.p.errs.length, d.p.errs.join(' | '));
+    await d.ctx.close();
+  }
+  // ── 32. the pictures (390 px) for 2026-10-25: the new cover (light and dark) and the account sheet's Profile group (light) ──────────────────────────────
+  if (on(32)) {
+    const people = [[CK.alex, '#5E8C7A', '#E3B896', '#2E4A57', 1101]];
+    const faceImgs = p => p.evaluate(rows => {
+      const out = {};
+      rows.forEach(([k, bg, skin, shirt, fv]) => {
+        const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
+        const g = x.createLinearGradient(0, 0, 128, 128); g.addColorStop(0, bg); g.addColorStop(1, '#1F3A30'); x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+        x.fillStyle = shirt; x.beginPath(); x.ellipse(64, 132, 48, 40, 0, 0, Math.PI * 2); x.fill();
+        x.fillStyle = skin; x.fillRect(56, 70, 16, 18); x.beginPath(); x.ellipse(64, 52, 21, 25, 0, 0, Math.PI * 2); x.fill();
+        out[k] = { fv, b64: c.toDataURL('image/jpeg', 0.85).split(',')[1] };
+      });
+      window.__STUB.faces = out;
+    }, people);
+    const fvs = { [CK.alex]: 1101 };
+    const pages = { me: { who: 'Alex R.', lv: 19, fv: 1101, cheers: { total: 3, recent: [] }, game: { sports: ['tennis'], hand: 'right', backhand: 'two', plays_at: 'club', club: 'Enghelab' } } };
+    for (const dark of [false, true]) {
+      const a = await open(browser, { opts: { dark }, stub: { bell: withFaces(fvs), crewBoard: board(), crewPages: pages } });
+      await faceImgs(a.p); await goCrew(a.p); await a.p.waitForTimeout(900);
+      await a.p.evaluate(() => openPlayer('me')); await a.p.waitForTimeout(1200);
+      await a.p.screenshot({ path: path.join(out, 'cover-' + (dark ? 'dark' : 'light') + '-390.png'), clip: { x: 0, y: 0, width: 390, height: 520 } });
+      await a.ctx.close();
+    }
+  }
 
   await browser.close();
   process.exit(C.report() ? 1 : 0);

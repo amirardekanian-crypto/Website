@@ -5752,9 +5752,15 @@
      what they posted this week. Colours are the app's one set; none is declared here. Font sizes are the --fs-* tokens. #screen-crewplayer is in
      the id lists of .nav-back and .prog-sec above. renderPlayerPage(), playerHTML(), crewFace(). */
   #screen-crewplayer { padding-bottom: 110px; }
-  .pl-cover { position: relative; isolation: isolate; flex: none; height: 112px; overflow: hidden; background: var(--hero); }
-  .pl-cover .cyc-img { object-position: 84% 58%; }
+  /* THE COVER IS A BANNER (2026-10-25, Amir from his iPhone: "the background on the top of the page is too small, cant see anything"). It was 112 px with Progress's
+     grade on the picture: the luminosity blend at .66 and a mask that hides the left 40% are for a picture under WORDS, and here there are none, so the picture sat as a dark
+     green smear. Now it is 200 px at 390 wide (51.3% of the width, so 164 at 320), never over 28% of the screen and never under 104 px, and the picture is the cycle's own
+     (yours: exactly Progress's), cropped to cover at full strength with a small lift, because the pictures are dark by nature. Only a light shade: the top, where ← and your
+     account face sit, and a little at the foot, where the profile face overlaps. */
+  .pl-cover { position: relative; isolation: isolate; flex: none; height: min(200px, 51.3vw, 28vh); min-height: 104px; overflow: hidden; background: var(--hero); }
+  .pl-cover .cyc-img { object-position: 50% 58%; mix-blend-mode: normal; opacity: 1; -webkit-mask-image: none; mask-image: none; filter: brightness(1.4) contrast(1.06); }
   .pl-cover .cyc-img[hidden] { display: none; }
+  .pl-cover .cyc-scrim { background: linear-gradient(180deg, rgba(6,36,26,.38) 0%, rgba(6,36,26,0) 36%, rgba(6,36,26,0) 70%, rgba(6,36,26,.26) 100%); }
   .pl-id { position: relative; z-index: 3; padding: 0 var(--g); }
   .pl-facewrap { position: relative; display: block; width: 88px; height: 88px; margin-top: -44px; }
   .pl-face { display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 4px var(--paper);
