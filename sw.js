@@ -492,7 +492,11 @@
 // v224: program.html changed (2026-10-25, Amir's answers to round 4). Ticking a set in the list starts its rest by itself and the
 // cross skips it. Before you start is open the first time a session is seen, one row after that. A note box never takes a tap
 // meant for the control under it: only its own buttons are live, and a tap outside it closes it.
-const CACHE = 'aap-v224';
+// v225: program.html changed (2026-10-25, Amir from his iPhone, three fixes to the Player Page). The cover is a real banner,
+// 200 px at 390 wide, with the cycle's picture clear under a light shade. The cheers number counts only the Cheers people sent
+// with the clap button, and the guide says so. Your initials open an account sheet that starts with Profile: Your photo, Your
+// game, Your page and What the crew sees of you.
+const CACHE = 'aap-v225';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
