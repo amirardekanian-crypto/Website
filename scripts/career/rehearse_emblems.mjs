@@ -4,7 +4,8 @@
 //   npm install @electric-sql/pglite --prefix "$TEMP/pglite"          (once, outside the repo)
 //   PGLITE="$TEMP/pglite/node_modules/@electric-sql/pglite" node scripts/career/rehearse_emblems.mjs
 //
-// The live structure (supabase/schema_snapshot.sql, which holds stages 66 to 98 and not 99), the rulebook and catalogue as they are live (career/*.toml
+// The structure BEFORE stage99 (stage99 is live since 2026-10-25, so the snapshot now holds it and this starts from the newest committed
+// snapshot that does not: stages 66 to 98), the rulebook and catalogue as they were then (career/*.toml
 // at the commit this work started from, c6e429f7 = rulebook version 10, or --rev), made-up athletes whose sessions go in through the real triggers and
 // the real save_session(); then:
 //   1. stage99 twice, under version 10: nothing moves; `fin` is kept by the FIRST save only, dropped when it is not a time, and a save never fails

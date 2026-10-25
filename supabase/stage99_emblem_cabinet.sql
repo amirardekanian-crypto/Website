@@ -2,9 +2,11 @@
 -- (Career Mode, rulebook version 11; Amir, 2026-10-25: "go with your picks", then "remember if anyone has done the achievements before, it should be
 -- unlocked, their trophies should be already won, but no xp should be given to them. only from now on, the achievements will give xp")
 --
--- WRITTEN, REHEARSED (scripts/career/rehearse_emblems.mjs, PGlite) AND NOT APPLIED. An agent never applies a stage to the live project: Amir says
--- "go live", and career/PROCEDURES.md → Stage 99 → "To apply" is the order (a before-copy, this file, the seed of rulebook version 11 with its
--- starts_on and every paid_from set to the SEED DAY, one silent career_rewards_batch() pass, the checks, the snapshot).
+-- REHEARSED (scripts/career/rehearse_emblems.mjs, PGlite) AND APPLIED to the live project 2026-10-25 (~12:15 UTC) on Amir's explicit words, by the main
+-- session, as the migration stage99_emblem_cabinet (guarded by the md5 of the file as it was then, 643b10e016dc814fb62f9d6556350845; this header was
+-- reworded afterwards, so today's file has another md5, the code is the same). Then the seed of rulebook version 11 (starts_on and every paid_from the seed
+-- day, 2026-10-25), then one silent career_rewards_batch() pass. Result in career/PROCEDURES.md → Stage 99. The order is "To apply" there (a before-copy,
+-- this file, the seed with starts_on and every paid_from set to the SEED DAY, one silent pass, the checks, the snapshot).
 --
 -- What it does, in the order it does it:
 --   1. session_history.fin — the local clock time ("HH:MM", 24 h) at which the phone FINISHED the session. The phone sends it as p_session.fin;

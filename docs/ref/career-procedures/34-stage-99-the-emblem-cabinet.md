@@ -1,9 +1,9 @@
-## Stage 99: the Emblem Cabinet, server side (2026-10-25, WRITTEN AND REHEARSED, NOT APPLIED)
+## Stage 99: the Emblem Cabinet, server side (2026-10-25, APPLIED)
 
 Amir picked direction A of the Emblem Cabinet board and said *"go with your picks"*, then: *"remember if anyone has done the achievements before, it should be
 unlocked, their trophies should be already won, but no xp should be given to them. only from now on, the achievements will give xp"* (D21,
 `CAREER_MODE.md` → *The decisions* → D21). This is the server half: `supabase/stage99_emblem_cabinet.sql` and rulebook version 11 (33 new achievements). The
-contract with the app is `C:\Users\Amir\AA-Career\emblems\CONTRACT.md`. **Nothing here is on the live project.** Amir says "go live"; *To apply* is the order.
+contract with the app is `C:\Users\Amir\AA-Career\emblems\CONTRACT.md`. **It is on the live project since 2026-10-25** (*As applied*, below); *To apply* was the order.
 
 - **D21, one guarded change in `career_mint()`** (marked `/* stage99: D21 */`). An achievement whose catalogue body carries `paid_from` is minted with
   **xp = 0 when the day the work was done is before it**: `v_earned < career_day(p_body ->> 'paid_from')`, where `v_earned` is the unclamped day stage95 keeps
@@ -43,7 +43,21 @@ contract with the app is `C:\Users\Amir\AA-Career\emblems\CONTRACT.md`. **Nothin
 - **The way back:** `scripts/career/rollback_stage99.sql` (made from the stage's own table of lines, read backwards), on Amir's word only. Awards already minted keep what they
   were minted with. ⚠️ Its last statement drops `session_history.fin` (the time of day of the sessions saved since is lost); delete that statement to keep it.
 
-### To apply (Amir's "go live"; never an agent)
+### As applied (2026-10-25, ~12:15 UTC, by the main session on Amir's explicit words)
+
+- Migration `stage99_emblem_cabinet`, guarded by the file's md5 as it was then, `643b10e016dc814fb62f9d6556350845` (the header comment of the file was reworded afterwards, so
+  the file in the repo has another md5; the code is the same). Then the seed of rulebook version 11 (`starts_on` and every `paid_from` = 2026-10-25, sha256 `ebc05027b759…`),
+  then 9 silent `career_rewards_batch()` passes over 39 athletes, 0 errors.
+- Read back: 40 athletes. **Career XP 375,899 to 377,199 (+1,300), and all of it three OLD achievements that came due that week by the calendar** (Half Year twice and Season
+  Ticket: +500, +500, +300; they have no `paid_from`, so they pay as they always did). No level moved, nobody went down. The 33 new achievements: **189 awards to 33 athletes,
+  all at 0 XP, 0 paid, 0 recognition rows** (no moment, no Bell). Awards 216 to 408. `career_compare()` ok. `get_achievements()` answers with `done_on` and `xp_won = 0`.
+- Who got what (awards): 3 Sessions 30, Month One 27, 5 Sessions 26, 7 Sessions 20, 10 Sessions 17, Big Apple 16, 15 Sessions 12, 20 Sessions 10, The Lawns 9, Red Clay 6,
+  30 Sessions 6, 40 Sessions 4, 3 Weeks in a Row 3, 3 Personal Bests 2, 5 Weeks in a Row 1. Nothing else yet (Early Bird and Night Owl cannot be back-filled: no session had a finish time).
+- Safety copies, drop on 2026-11-08: `backup.emb99_scores_before`, `backup.emb99_awards_before`, `backup.emb99_catalogue_before`, `backup.emb99_scores_fresh`, `backup.emb99_scores_fresh2`.
+- `supabase/schema_snapshot.sql` remade the same day from the live catalogue (74 tables, 305 functions; `session_history.fin`, the three helpers and the seven patched bodies are in it);
+  `scripts/restore/rehearse.mjs` 49 of 49. The live bodies carry the file's own line comments, so the snapshot now shows them.
+
+### To apply (the order that was followed; Amir's "go live", never an agent)
 
 1. `python scripts/check_career.py` and `node scripts/career/rehearse_emblems.mjs` (header) both clean on the commit that goes live.
 2. A before-copy: `backup.emb99_scores_before` (every `career_scores` row) and `backup.emb99_awards_before` (every `career_awards` row). Drop both 14 days later.
@@ -56,7 +70,7 @@ contract with the app is `C:\Users\Amir\AA-Career\emblems\CONTRACT.md`. **Nothin
 6. `select public.career_rewards_batch(o, 5, 'silent')` from offset 0 until it answers `n = 0` (what the seed's `next` says). It is quiet: no moment, no Bell.
 7. Read back: every athlete's career XP, level, season and week against the before-copy; `career_compare()` ok; `select count(*), sum(xp) from career_awards where rules_version = 11`
    (xp 0 unless seed-day wins); no `career_recognition` row for the 33 ids; the seven bodies equal the file (md5); `get_achievements()` answers with `done_on` and `xp_won`.
-8. Remake `supabase/schema_snapshot.sql` (`scripts/restore/README.md` → *Keeping the snapshot current*) in the same commit; tell the app track the stage is live.
+8. Remake `supabase/schema_snapshot.sql` (`scripts/restore/README.md` → *Keeping the snapshot current*) in the same commit; tell the app track the stage is live. (Done 2026-10-25.)
 
 ---
 *One section of the reference. The index is [`career/PROCEDURES.md`](../../../career/PROCEDURES.md); the rules are in [`docs/rules/`](../../../docs/README.md).*
