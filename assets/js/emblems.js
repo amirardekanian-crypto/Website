@@ -382,7 +382,39 @@
     return o + `<g transform="translate(1 1.3)" style="opacity:.6">${draw(D.d)}</g><g transform="translate(-.7 -.8)" style="opacity:.9">${draw(D.h)}</g>${draw(U(D.rel))}`;
   }
 
+  // ── the month's honours: legendary, one of a kind (Amir, 2026-10-25: "any honour should be like a legendary trophy which is very unique";
+  //    direction A of https://claude.ai/artifact/9JYRa93PVAYZSH4pRw2rhs, The Grand Cup): Champion's cup, a crown of three clay stars, a clay laurel,
+  //    the honour's own sign on the cup and its month on a clay banner. kind: sessions · improved · full_month · pick; month "2026-10".
+  const HON_SIGN = {
+    sessions: c => [0, 1, 2, 3].map(i => `<rect x="44" y="${66 - i * 8}" width="32" height="6" rx="3" ${S(c)}/>`).join('') + `<rect x="58" y="26" width="4" height="46" rx="2" ${S(c)}/>`,
+    improved: c => `<path d="M38 72 L52 56 L60 64 L80 40" ${S('none', c, 5, RJ)}/><path d="M68 38 H82 V52" ${S('none', c, 5, RJ)}/>`,
+    full_month: (c, bg) => `<rect x="38" y="32" width="44" height="40" rx="5" ${S(c)}/><path d="M38 42 H82" ${S('none', bg, 2)}/>` + Array.from({ length: 12 }, (_, i) => `<path d="M${44 + (i % 4) * 10} ${49 + Math.floor(i / 4) * 8} l2 2 4-4" ${S('none', bg, 1.6, RJ)}/>`).join(''),
+    pick: c => `<text x="60" y="66" text-anchor="middle" style="${FONT};fill:${c};font-size:30px;letter-spacing:1px">AA</text>` + hstar(60, 33, 7, c),
+  };
+  function hstar(x, y, r, col) { return `<path d="${Array.from({ length: 10 }, (_, i) => { const rr = i % 2 ? r * .45 : r, a = (-90 + i * 36) * Math.PI / 180; return (i ? 'L' : 'M') + (x + rr * Math.cos(a)).toFixed(1) + ' ' + (y + rr * Math.sin(a)).toFixed(1); }).join('')}Z" ${S(col)}/>`; }
+  const MON3 = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  function honourInner(kind, month, won) {
+    const m = /^(\d{4})-(\d{2})/.exec(String(month || '')), label = m ? MON3[Number(m[2]) - 1] + ' ' + m[1] : '';
+    const sign = HON_SIGN[kind] || HON_SIGN.pick;
+    let laurel = '';
+    for (const side of [-1, 1]) for (let i = 0; i < 8; i++) {
+      const a = 90 + side * (20 + i * 130 / 7), x = 60 + 49 * Math.cos(a * Math.PI / 180), y = 54 + 49 * Math.sin(a * Math.PI / 180);
+      laurel += `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="2.5" ry="5.6" transform="rotate(${(a + 90 + side * 24).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})" ${S(won ? CLAY : GHOST, won ? '#7E2F15' : null, .5)}/>`;
+    }
+    const fr = won ? U('A4-fr') : GHOST, obj = won ? U('A4-obj') : GHOST, nu = won ? U('A4-nu') : GPAPER, cl = won ? CLAY : GHOST;
+    return laurel
+      + `<path d="M34 26 H22 V36 C22 48 30 55 40 57 M86 26 H98 V36 C98 48 90 55 80 57" ${S('none', fr, 5, RJ)}/>`
+      + `<path d="M30 16 H90 V44 C90 66 77 80 60 82 C43 80 30 66 30 44 Z" ${S(obj, fr, 4.5, 'stroke-linejoin:round')}/>`
+      + `<g transform="translate(60 49) scale(.78) translate(-60 -52)">${sign(nu, won ? '#0B3D2C' : GHOST)}</g>`
+      + `<rect x="53" y="82" width="14" height="8" ${S(fr)}/>`
+      + `<path d="M24 90 H96 L90 100 L96 110 H24 L30 100 Z" ${S(cl, won ? '#7E2F15' : null, .8)}/>`
+      + (label ? `<text x="60" y="104.5" text-anchor="middle" style="${FONT};fill:${won ? '#fff' : GPAPER};font-size:12px;letter-spacing:1.5px">${label}</text>` : '')
+      + hstar(42, 8, 4.5, cl) + hstar(60, 5, 6, cl) + hstar(78, 8, 4.5, cl);
+  }
+
   window.AAEmblem = {
+    /** A month's honour, legendary (kind: sessions · improved · full_month · pick; month "YYYY-MM"). opts: { won } (default true) */
+    honour(kind, month, opts) { const o = opts || {}; return svgWrap(honourInner(kind, month, o.won !== false), o.label); },
     /** An achievement by its catalogue id. opts: { won: bool, label: string } */
     ach(id, opts) { const o = opts || {}, c = CAT[id] || FALLBACK; return drawSpec(c, !!o.won, o.label); },
     /** One tier of a mark (badges.toml id: century, held_weeks, bests, comebacks; tierIndex from 0). */

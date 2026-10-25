@@ -149,3 +149,7 @@ whose instructions had just been taken away.
 
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*
+
+## Your numbers, one card (2026-10-25)
+
+Amir: *"if you look at the progress tab, we have achievements and your moments, which is basically the same thing, remove your moments, and bring achievements higher in your number / make the share your card much smaller"*; he picked A of three (https://claude.ai/artifact/XQoYoaLQasw3hRLHeyZNoG): *"wow A is gorgeous"*. `careerCardHTML()` ends with `csAchRowHTML()` (the three newest won emblems, *N of M*, *N new* in clay, a tap opens the cabinet); the big *Share your card* button became `.cs-share-sm` *Share ↗* inside `#numbers-title`; `paintCareerCard()` draws neither door and *What you've earned* stays hidden. Your moments keeps its screen in the code but has no door: Amir's short lines (`MOM_T.my.notes`) are rows on the Coach tab under Notes from Amir (`renderNotes()`, `.cn-line`), and Home's *New from Amir* opens them there (`openNote()`). *From your habits* opens the cabinet on its Habits shelf (`openCabShelf('Habits')`). Open: the month's honours have no shareable home until Amir says whether they become trophies in the cabinet.

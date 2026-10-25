@@ -195,7 +195,7 @@
 <!-- The emblem cabinet's art (2026-10-25, Amir: direction A of the Emblem Cabinet): every achievement, mark tier and level medal is drawn in
      code (window.AAEmblem), no pictures. `defer`, like the habit engine, so boot() can get here first: every caller asks for it only when it
      draws (cabEmblem()) and the page repaints itself once it has loaded (emblemsReady()). -->
-<script defer src="/assets/js/emblems.js?v=1" onload="window.emblemsReady && emblemsReady()"></script>
+<script defer src="/assets/js/emblems.js?v=2" onload="window.emblemsReady && emblemsReady()"></script>
 <!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
      on `defer` it shares one ordered execution queue with the SDK above. -->
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
@@ -2495,6 +2495,10 @@
   .cn-ic svg { width: 22px; height: 22px; }
   .cn-main { flex: 1; min-width: 0; display: block; }
   .cn-title { display: block; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); text-wrap: balance; }
+  /* one of his short lines (Courtside's "From Amir"): the whole line, nothing to unfold (2026-10-25, moved here from Your moments) */
+  .cn-flat { cursor: default; }
+  .cn-say { display: block; font: 500 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ink); }
+  .cn-line.is-new .cn-flat { background: var(--tint); border-radius: 10px; }
   .cn-date { display: block; margin-top: 4px; font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; color: var(--grey); }
   .cn-chev { flex: none; width: 18px; height: 18px; background: var(--grey); transition: transform .2s ease;
     -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
@@ -4988,6 +4992,22 @@
   :where(#screen-plan, #screen-moments, #screen-achievements) .mo-share { justify-self: start; margin-top: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 999px;
     background: var(--paper); color: var(--green-ink); cursor: pointer; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
   :where(#screen-plan, #screen-moments, #screen-achievements) .mo-share:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* Your numbers, one card (direction A, 2026-10-25): Achievements is its last row; Share your card is a small link at the title's end */
+  #numbers-title::after { order: 1; }
+  #numbers-title .cs-share-sm { order: 2; min-height: 44px; margin: -12px calc(var(--g) - 8px) -12px 0; padding: 0 8px; border: 0; background: none; color: var(--green-ink); cursor: pointer;
+    font: 600 var(--fs-small)/1 'Barlow', sans-serif; letter-spacing: 0; text-transform: none; }
+  #numbers-title .cs-share-sm:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; border-radius: 8px; }
+  .cs-ach { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 12px; padding: 12px 0 0; border: 0; border-top: 1px solid var(--hair); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+  .cs-ach-stk { display: flex; flex: none; }
+  .cs-ach-stk svg { width: 34px; height: 34px; margin-left: -8px; }
+  .cs-ach-stk svg:first-child { margin-left: 0; }
+  .cs-ach-t { flex: 1; min-width: 0; display: grid; line-height: 1.25; }
+  .cs-ach-t b { font: 600 var(--fs-body)/1.2 'Barlow', sans-serif; color: var(--ink); }
+  .cs-ach-t small { font: 500 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  .cs-ach-new { font-weight: 700; color: var(--clay-fill); }
+  body[data-dark] .cs-ach-new { color: var(--clay-big); }
+  .cs-ach-a { color: var(--grey); font-size: var(--fs-lead); }
+  .cs-ach:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 4px; border-radius: 8px; }
   :where(#screen-plan, #screen-moments, #screen-achievements) .cs-share { width: 100%; min-height: 44px; margin-top: 14px; border: 0; border-radius: 12px; background: var(--btn); color: #fff; cursor: pointer;
     font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
   :where(#screen-plan, #screen-moments, #screen-achievements) .mo-saw { margin-top: 3px; padding: 4px 8px; border-radius: 999px; background: var(--tint); font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px;
@@ -11628,10 +11648,18 @@ function renderNotes() {
       <span class="hrow-a" aria-hidden="true">›</span>
     </button>`;
 
+  // ── His short lines from coach.html (Courtside's "From Amir", stage75), newest first, above the programme's notes. They lived in Your moments
+  //    until 2026-10-25 (Amir: "remove your moments"): his words belong with his words. Each is the whole line, nothing to unfold.
+  const lines = ((typeof MOM_T !== 'undefined' && MOM_T && MOM_T.my && Array.isArray(MOM_T.my.notes)) ? MOM_T.my.notes : [])
+    .filter(n => n && n.line && /^\d{4}-\d{2}-\d{2}/.test(String(n.day))).slice().sort((a, b) => String(b.day).localeCompare(String(a.day)))
+    .map(n => `<div class="cn-item cn-line" data-note="${esc(String(n.day).slice(0, 10))}"><div class="cn-row cn-flat">
+        <span class="cn-ic" aria-hidden="true">${window.ICON('note', 1.6)}</span>
+        <span class="cn-main"><span class="cn-say" dir="auto">${esc(n.line)}</span><span class="cn-date">${esc(achDay(n.day))}</span></span></div></div>`).join('');
+
   document.getElementById('notes-container').innerHTML =
     coachContactHtml() +
     door +   // first, above the notes: it is where a new athlete starts, so it must not sit under seven notes (2026-10-24)
-    (rows ? `<div class="prog-sec">Notes from Amir</div><div class="cn-list">${rows}</div>` : '');
+    (rows || lines ? `<div class="prog-sec">Notes from Amir</div><div class="cn-list">${lines}${rows}</div>` : '');
 }
 
 // "How the app works" — the general how-to content shown to every athlete in the
@@ -11680,7 +11708,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then today's habits as one card: the five you tick, your <strong>level</strong> in the ring, and the weeks you have held in a row beside <strong>This Week</strong>.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers and your level), <strong>Getting stronger</strong> (your best lift, each time you set a new best), <strong>Your body</strong> (your records, your body weight and your habits) and <strong>What you've earned</strong> (your achievements and your moments) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit on your Today card when you track that habit. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: <!--profile-->the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then today's habits as one card: the five you tick, your <strong>level</strong> in the ring, and the weeks you have held in a row beside <strong>This Week</strong>.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers, your level and your achievements), <strong>Getting stronger</strong> (your best lift, each time you set a new best), <strong>Your body</strong> (your records, your body weight and your habits) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit on your Today card when you track that habit. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: <!--profile-->the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'compass', key: 'serve', title: 'First Serve: your first week', when: () => firstServeWanted(),
     body: `<p>While you are new, a line called <strong>First Serve</strong> sits on Home, under the days. It has five steps: finish your first session, add the app to your Home Screen, turn on notifications, join the crew and add your photo. It shows you one at a time, like <strong>Next: add the app to your Home Screen</strong>. Tap the line and the app takes you there. Tap the small ring, like <strong>2/5</strong>, to see all five.</p><p>Turn on notifications asks your phone once, and only when you tap its button. You can say no. It goes when you have done them all, or two weeks after your first session.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
@@ -11705,11 +11733,11 @@ const APP_GUIDE = [
   { icon: 'check-circle', title: 'Finishing a session',
     body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Stop here</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>If something isn't logged, the card says what, under <strong>Still to log</strong>: a set not ticked, a set with no weight or no effort, a round not ticked. Tap a line to go straight to it. It goes from the list as soon as you log it.</p><p>One session at a time. While a day is under way, Home shows it with <strong>Resume</strong>, and the other days wait until you finish it or stop it.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Adding it up</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
   { icon: 'activity', key: 'career', title: 'Career: your level',
-    body: `<p>Your level is the number in the ring on Home's habit card. Tap the ring to open Your numbers. The weeks you've held in a row sit beside <strong>This Week</strong>. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>adding it up</strong> until my side has it.</p><p>Your four numbers are in <strong>Your numbers</strong> on Progress: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers. It says how many you have and which one you're closest to. Open it and you see your cabinet. Every achievement is an emblem. In colour, you have won it. In grey, you have not, and it says what is left. <strong>Latest</strong> comes first, and <strong>New</strong> sits on what you have not seen yet. A small dot on <strong>Progress</strong> says there is something new in there. The chips under <strong>All achievements</strong> show only what you have won, or what is left, or one kind: consistency, commitment, progress or resilience. Tap an emblem to see what it asks for and how far along you are. Every ten levels you win a new level medal. When a session leaves you one step short of an achievement, its card tells you.</p><p>When I set you a job for the month, it sits right under this cycle's card, with a ring beside it. It is something to do, not a target for your training — I tick it off when you have done it. The <strong>Your moments</strong> row opens the lot, month by month: your marks, your achievements, the notes I write you and the month's honours. <strong>Amir saw this</strong> under one means I've seen it. A new note from me shows on Home until you open it. To answer it, tap <strong>Reply on WhatsApp</strong>.</p>` },
+    body: `<p>Your level is the number in the ring on Home's habit card. Tap the ring to open Your numbers. The weeks you've held in a row sit beside <strong>This Week</strong>. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>adding it up</strong> until my side has it.</p><p>Your four numbers are in <strong>Your numbers</strong> on Progress: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers. It says how many you have and which one you're closest to. Open it and you see your cabinet. Every achievement is an emblem. In colour, you have won it. In grey, you have not, and it says what is left. <strong>Latest</strong> comes first, and <strong>New</strong> sits on what you have not seen yet. A small dot on <strong>Progress</strong> says there is something new in there. The chips under <strong>All achievements</strong> show only what you have won, or what is left, or one kind: consistency, commitment, progress or resilience. Tap an emblem to see what it asks for and how far along you are. Every ten levels you win a new level medal. When a session leaves you one step short of an achievement, its card tells you.</p><p>When I set you a job for the month, it sits right under this cycle's card, with a ring beside it. It is something to do, not a target for your training — I tick it off when you have done it. <strong>Achievements</strong> is the last row of <strong>Your numbers</strong>, with your three newest. Tap it to open your cabinet. The short notes I send you are on the <strong>Coach</strong> tab, under <strong>Notes from Amir</strong>. A new one shows on Home until you open it.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks in a row you trained',
     body: `<p>A week is <strong>held</strong> when you finish every session in it. Stopping a session early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count beside <strong>This Week</strong> on Home goes up — the count next to it says what is left this week. Miss a week and it starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
-    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p><strong>Use your own photo</strong> puts a picture from your phone behind the card. Drag it to move it and pinch to zoom, or use the <strong>Zoom</strong> slider. <strong>Remove the photo</strong> puts the card back as it was. The picture stays on your phone: only the finished card goes anywhere, and only when you tap Share or Save image.</p><p>Everything in <strong>Your moments</strong>, behind its row on Progress, has its own <strong>Share</strong> — every mark, every achievement and every honour, however long ago you earned it. <strong>Share your card</strong>, under your numbers, makes a card of where you are right now: your level, your four numbers and your best lifts. The month's goal gets one once it's done, a new level gets one on the finished session, your result in <strong>The Open</strong> gets one on Crew, and <strong>Share the session</strong> on the finished card makes one of the session itself.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
+    body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p><strong>Use your own photo</strong> puts a picture from your phone behind the card. Drag it to move it and pinch to zoom, or use the <strong>Zoom</strong> slider. <strong>Remove the photo</strong> puts the card back as it was. The picture stays on your phone: only the finished card goes anywhere, and only when you tap Share or Save image.</p><p>Every achievement and mark in your cabinet has its own <strong>Share it</strong>, however long ago you won it. <strong>Share ↗</strong>, beside <strong>Your numbers</strong>, makes a card of where you are right now: your level, your four numbers and your best lifts. The month's goal gets one once it's done, a new level gets one on the finished session, your result in <strong>The Open</strong> gets one on Crew, and <strong>Share the session</strong> on the finished card makes one of the session itself.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Once a week</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
@@ -12640,11 +12668,22 @@ function habAchDoorHtml() {
   // ⚠️ It opens the HABIT ones (2026-10-20, Amir: "i asked if i can see what achievements i can get through habits, or what
   // ones i do own now"). It used to jump to the whole cabinet, where the nine are scattered across the four kinds and nothing
   // says which came from the habits — the door counted them and then lost them.
-  return `<button type="button" class="hrow" onclick="openCourt('habits')" aria-label="${esc('From your habits: ' + got.length + ' of ' + list.length + '. ' + sub).replace(/"/g, '&quot;')}">
+  // Since 2026-10-25 it opens the cabinet on its Habits shelf (the emblems), not the old list: the same habit ones, drawn as everything else is.
+  return `<button type="button" class="hrow" onclick="openCabShelf('Habits')" aria-label="${esc('From your habits: ' + got.length + ' of ' + list.length + '. ' + sub).replace(/"/g, '&quot;')}">
     ${hrowIc('ach')}<span class="hrow-b"><span class="hrow-l">From your habits</span>
       <span class="hrow-v"><span class="hrow-vv">${got.length} of ${list.length}</span><small>${esc(sub)}</small></span></span>
     <span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
+// The cabinet, opened on one shelf (its section title, e.g. "Habits"): All is chosen so the whole shelf shows, and the page scrolls to it.
+function openCabShelf(title) {
+  try { if (cabFilter() !== 'all') cabSetFilter('all'); } catch (e) { /* the page draws with what it has */ }
+  goTo('achievements');
+  setTimeout(() => {
+    const sec = [...document.querySelectorAll('#ach-body .cab-sec')].find(s => ((s.querySelector('.cab-t') || {}).textContent || '').trim() === title);
+    if (sec) sec.scrollIntoView({ block: 'start' });
+  }, 60);
+}
+window.openCabShelf = openCabShelf;
 // ── THE MANUAL ────────────────────────────────────────────────────────────────────────────────────────────────────
 // "What all this means" (2026-10-20, Amir: "we used to have a what all this means, and explanation of how habit system
 // works, and how the xp works, what the prizes are", then "it shouldnt be specific to achievements from habits only,
@@ -12765,9 +12804,9 @@ function renderSystemGuide() {
   }
 
   // 8. moments and sharing
-  h += sysCard('Your moments, and sharing them', 'book',
-    `<p>Everything you have won is in <strong>Your moments</strong> on Progress, newest first and grouped by month. Your marks, your achievements, the notes I write you and the month's honours.</p>`
-    + `<p>Each one has its own <strong>Share</strong>, however long ago you earned it. The card is drawn on your phone, and nothing leaves it until you tap Share or Save image.</p>`);
+  h += sysCard('Your trophies, and sharing them', 'book',
+    `<p>Everything you have won is in your cabinet: tap <strong>Achievements</strong>, the last row of <strong>Your numbers</strong> on Progress. My short notes to you are on the <strong>Coach</strong> tab.</p>`
+    + `<p>Each trophy has its own <strong>Share it</strong>, however long ago you won it. The card is drawn on your phone, and nothing leaves it until you tap Share or Save image.</p>`);
 
   // 9. the crew, only while the app has the tab
   if ((() => { try { return crewOn(); } catch (e) { return false; } })()) {
@@ -13833,9 +13872,11 @@ function paintNote() {
 function openNote(day) {
   _noteReadQ[day] = 1;
   paintNote();
-  goTo('moments');
+  // Since 2026-10-25 his lines live on the Coach tab, under Notes from Amir (Your moments is gone from Progress).
+  try { renderNotes(); } catch (e) { /* the tab draws it when it opens */ }
+  goTo('notes');   // the Coach tab is #screen-notes
   setTimeout(() => {
-    const row = document.querySelector('#mom-body .mo[data-note="' + day + '"]');
+    const row = document.querySelector('#notes-container .cn-line[data-note="' + String(day).slice(0, 10) + '"]');
     if (row) { row.scrollIntoView({ block: 'center' }); row.classList.add('is-new'); }
   }, 0);
   markNoteRead(day);
@@ -13862,8 +13903,15 @@ function paintCareerCard() {
   if (!cw || !mw) return;
   let c = '', m = '', a = '', g = '';
   try { c = careerCardHTML(); } catch (e) { c = ''; }
-  try { a = c ? courtsDoorHTML() : ''; } catch (e) { a = ''; }
-  try { m = c ? momentsDoorHTML() : ''; } catch (e) { m = ''; }
+  // Direction A of "Your numbers, one card" (Amir, 2026-10-25: "wow A is gorgeous"): Achievements is the card's last row, so neither door is drawn
+  // here any more, and Your moments has no door at all ("remove your moments"); his lines live on the Coach tab, the trophies in the cabinet.
+  a = ''; m = '';
+  const nt = document.getElementById('numbers-title');
+  if (nt) {
+    const sh = c && !window.IS_PREVIEW ? '<button type="button" class="cs-share-sm" onclick="sharePlayerCard()" aria-label="Share your card">Share ↗</button>' : '';
+    const want = 'Your numbers' + sh;
+    if (nt.innerHTML !== want) nt.innerHTML = want;
+  }
   try { g = goalCardHTML(); } catch (e) { g = ''; }   // his job for the month, under the cover (2026-10-20)
   const gw = document.getElementById('goal-wrap');
   if (gw && g !== _goHtml) { gw.innerHTML = g; _goHtml = g; }
@@ -13878,6 +13926,7 @@ function paintCareerCard() {
   if (on === 'screen-achievements') renderAchievements();
   if (typeof paintDayOne === 'function') paintDayOne();   // keeps "Your numbers" in step with the card under it
   try { paintCabDot(); } catch (e) { /* the next move settles it */ }
+  try { if (DATA) renderNotes(); } catch (e) { /* his lines wait for the Coach tab's next draw */ }
 }
 function careerCardHTML() {
   if (!careerOnT() || !DATA) return '';
@@ -13898,8 +13947,20 @@ function careerCardHTML() {
   let h = `<div class="cs-card" role="group" aria-label="${esc('Your numbers. Level ' + L.level + '.').replace(/"/g, '&quot;')}">
     ${cells.length ? `<div class="cs-grid">${cells.map(cell).join('')}</div>` : ''}
     <div class="cs-foot">${cabMedal(L.level, 'cs-lm')}<span class="cs-lw">Level ${L.level}</span><span class="cs-bar" aria-hidden="true"><i style="width:${pct}%"></i></span></div>
-    ${window.IS_PREVIEW ? '' : '<button type="button" class="cs-share" onclick="sharePlayerCard()">Share your card</button>'}</div>`;
+    ${csAchRowHTML()}</div>`;
   return h;
+}
+// The card's last row (direction A, 2026-10-25): the three newest emblems won, "50 of 127", "3 new" in clay while some are unseen; a tap opens the cabinet.
+function csAchRowHTML() {
+  let items = [];
+  try { items = cabItems(); } catch (e) { items = []; }
+  if (!items.length) return '';
+  const E = cabE(), c = cabCounts(items), fresh = cabUnseen(items).length;
+  const newest = items.filter(x => x.won && x.day).sort((x, y) => String(y.day).localeCompare(String(x.day)) || y.tier - x.tier).slice(0, 3);
+  const stk = newest.map(x => x.kind === 'mark' ? E.mark(x.markId, x.tierIdx, { won: true }) : E.ach(x.id, { won: true })).join('');
+  return `<button type="button" class="cs-ach" onclick="goTo('achievements')" aria-label="${esc('Achievements: ' + c.won + ' of ' + c.all + (fresh ? ', ' + fresh + ' new' : '')).replace(/"/g, '&quot;')}">
+    ${stk ? `<span class="cs-ach-stk" aria-hidden="true">${stk}</span>` : ''}<span class="cs-ach-t"><b>Achievements</b><small>${c.won} of ${c.all}${fresh ? ` · <span class="cs-ach-new">${fresh} new</span>` : ''}</small></span>
+    <span class="cs-ach-a" aria-hidden="true">›</span></button>`;
 }
 // The month's goal, on its own card under the cover (2026-10-20, Amir: "i built something to give one person or the whole squad
 // a goal they have to do. not their cycle outcome"). It sat in the middle of the card above, between the four numbers and the
@@ -26071,7 +26132,7 @@ function paintWinBand(day, quiet) {
     return `<button type="button" class="${cls}" data-bk="${attr(key)}" onclick="openShareFromBand('${d}', ${share.indexOf(s)})" aria-label="${attr(what + ': ' + nm + '. Share it')}">
       <span class="hl-band-t"><small>${esc(what)}</small><b>${esc(nm)}</b></span>
       <span class="hl-band-go" aria-hidden="true">Share</span></button>`;
-  }).join('') + (items.length > 3 ? `<small class="hl-band-more">+${items.length - 3} more in Your moments, on Progress</small>` : '');
+  }).join('') + (items.length > 3 ? `<small class="hl-band-more">+${items.length - 3} more in your Achievements, on Progress</small>` : '');
   if (!on || slot.innerHTML !== html) slot.innerHTML = html;
   if ((on ? fresh : !quiet) && navigator.vibrate) navigator.vibrate([12, 60, 12]);
 }
