@@ -215,6 +215,21 @@ async function reset(browser) {
   }
 }
 
+async function offswitch(browser) {
+  for (const w of [390, 320]) {
+    const { ctx, p } = await open(browser, { w });
+    await p.waitForTimeout(500);
+    const s = await p.evaluate(() => ({ head: (document.querySelector('.today-start .today-k') || {}).textContent, note: (document.querySelector('.today-start .hs-note') || {}).textContent }));
+    t.check(`offswitch: the first habits screen says "These five are for everyone." (${w} px)`, /^These five are for everyone\./.test(s.note || ''), JSON.stringify(s));
+    t.check('offswitch: …and the old "no off switch" is gone', !/off switch/i.test(s.note || ''), JSON.stringify(s));
+    t.check('hours: …the screen still opens with "The other 23 hours" (no change)', s.head === 'The other 23 hours', JSON.stringify(s));
+    await fits(p, '.today-start .hs-note', w, 'offswitch: the note');
+    await noScroll(p, w, 'offswitch: Home');
+    t.check(`offswitch: no page errors (${w})`, !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await blocks(browser);
@@ -223,6 +238,7 @@ async function reset(browser) {
   await guided(browser);
   await finish(browser);
   await reset(browser);
+  await offswitch(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
