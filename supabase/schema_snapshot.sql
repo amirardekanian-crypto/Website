@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 74 tables, 305 functions, 10 sequences.
+-- 74 tables, 306 functions, 10 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -5083,6 +5083,32 @@ begin
   return v_n;
 end $function$;
 
+CREATE OR REPLACE FUNCTION public.coach_honours_why(p_month date, p_why text, p_not_clients text[] DEFAULT '{}'::text[])
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+-- stage100: Amir's reason for his pick of the month, in his words, read by the crew on the Pick card and kept on the athlete's page.
+-- Empty clears it. 140 characters at most (the card is small: Amir, 2026-10-25, "make the card a bit smaller").
+declare
+  m0 date := date_trunc('month', p_month)::date;
+  v_why text := nullif(btrim(coalesce(p_why, '')), '');
+  v_n int;
+begin
+  if not public.is_coach() then raise exception 'coach only'; end if;
+  if v_why is not null and char_length(v_why) > 140 then
+    raise exception 'The reason is % characters. Keep it to 140.', char_length(v_why);
+  end if;
+  update public.career_honours
+     set value = case when v_why is null then coalesce(value, '{}'::jsonb) - 'why'
+                      else coalesce(value, '{}'::jsonb) || jsonb_build_object('why', v_why) end
+   where month = m0 and honour = 'pick';
+  get diagnostics v_n = row_count;
+  if v_n = 0 then raise exception 'There is no pick for % yet. Pick first, then write why.', to_char(m0, 'FMMonth YYYY'); end if;
+  return public.coach_honours(m0, p_not_clients);
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.coach_login_use()
  RETURNS TABLE(app text, key text, signed_in_since boolean)
  LANGUAGE plpgsql
@@ -7534,6 +7560,7 @@ declare
   v_from timestamptz := now() - interval '7 days';
   v_items jsonb; v_hon jsonb := null; v_m0 date := (date_trunc('month', current_date) - interval '1 month')::date;
   v_week jsonb; v_crew jsonb;
+  v_pick jsonb := null;   -- stage100: Amir's Pick, the card on Crew for 7 days
 begin
   if v_id is null and not (v_coach or v_report) then
     raise exception 'not signed in';
@@ -7590,7 +7617,7 @@ begin
     union all
     select h.athlete_id, h.created_at, 'honour', jsonb_build_object('k', 'honour', 'honour', h.honour, 'month', h.month)
       from public.career_honours h
-     where h.athlete_id in (select athlete_id from mem) and h.honour <> 'near' and h.created_at >= v_from
+     where h.athlete_id in (select athlete_id from mem) and h.honour not in ('near', 'pick') and h.created_at >= v_from   -- stage100: a pick is its card, not a line
     union all
     select m.athlete_id, m.first_yes_at, 'joined', jsonb_build_object('k', 'joined')
       from mem m where m.first_yes_at >= v_from
@@ -7695,7 +7722,19 @@ begin
      where h.month = v_m0 and h.honour <> 'near' and coalesce((m.kinds ->> 'honour')::boolean, true);
   end if;
 
-  return jsonb_build_object('athlete_id', v_id, 'me', public.crew_me(v_id), 'items', v_items, 'honours', v_hon, 'kinds', to_jsonb(public.crew_kind_list()),
+  -- stage100: Amir's Pick is a card on Crew for 7 days from the moment he picks (Amir, 2026-10-25: "make the card a bit smaller, and it should
+  -- only stay for a week"), with his reason (`why`, written in Courtside). Only a crew member whose honours switch is on: anybody else's pick
+  -- is on their own page alone. The newest pick wins if two months were picked inside one week.
+  select jsonb_build_object('month', h.month, 'who', m.name, 'ck', m.crew_key, 'fv', public.crew_face_v(m.athlete_id),
+                            'me', h.athlete_id is not distinct from v_id, 'why', nullif(btrim(coalesce(h.value ->> 'why', '')), ''),
+                            'at', h.created_at, 'until', h.created_at + interval '7 days')
+    into v_pick
+    from public.career_honours h join public.crew_members() m on m.athlete_id = h.athlete_id
+   where h.honour = 'pick' and h.created_at >= now() - interval '7 days' and coalesce((m.kinds ->> 'honour')::boolean, true)
+   order by h.created_at desc
+   limit 1;
+
+  return jsonb_build_object('athlete_id', v_id, 'me', public.crew_me(v_id), 'items', v_items, 'honours', v_hon, 'pick', v_pick, 'kinds', to_jsonb(public.crew_kind_list()),
                             'days', 7, 'emoji', to_jsonb(public.crew_emoji_list()), 'open', public.crew_open_now(v_id),
                             'week', v_week, 'crew', v_crew, 'lounge', 1, 'at', now());
 end $function$;
@@ -11287,6 +11326,8 @@ revoke all on function public.coach_honours_pick(p_month date, p_athlete_id text
 grant execute on function public.coach_honours_pick(p_month date, p_athlete_id text, p_not_clients text[]) to authenticated, service_role;
 revoke all on function public.coach_honours_sent(p_month date, p_honour text, p_athlete_id text) from public, anon, authenticated, service_role;
 grant execute on function public.coach_honours_sent(p_month date, p_honour text, p_athlete_id text) to authenticated, service_role;
+revoke all on function public.coach_honours_why(p_month date, p_why text, p_not_clients text[]) from public, anon, authenticated, service_role;
+grant execute on function public.coach_honours_why(p_month date, p_why text, p_not_clients text[]) to authenticated, service_role;
 revoke all on function public.coach_login_use() from public, anon, authenticated, service_role;
 grant execute on function public.coach_login_use() to authenticated, service_role;
 revoke all on function public.coach_note_id() from public, anon, authenticated, service_role;
