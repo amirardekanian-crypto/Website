@@ -161,13 +161,13 @@ function expectOk(s, want) {
       sideways: document.documentElement.scrollWidth - window.innerWidth };
   }, running);
   for (const [tag, dayIn, notes, want, w, running] of [
-    ['week 1 cap, before Start', MID(1), { '1': WEEK1 }, 'This week | Max RPE 7', 390, false],
-    ['week 1 cap, running (slim bar)', MID(1), { '1': WEEK1 }, 'This week | Max RPE 7', 390, true],
-    ['back-off, running at 320 px: one line, the clock whole', MID(5), { last: BACKOFF }, 'Back-off week | Max RPE 7 | 1 set fewer', 320, true],
-    ['back-off, before Start at 320 px', MID(5), { last: BACKOFF }, 'Back-off week | Max RPE 7 | 1 set fewer', 320, false],
-    ['a drop with no cap shows the drop and its floor (CHP-4)', MID(3), { '3': { title: 'Lighter week', rpeDrop: 1, text: 'Lighter week.' } }, 'Lighter week | RPE 1 lower, not below 6', 390, false],
-    ['the back-off written as "5" (no title) is the Back-off week', MID(5), { '5': BACKOFF }, 'Back-off week | Max RPE 7 | 1 set fewer', 390, false],
-    ['a cap hides the drop (dayRpe() order)', MID(3), { '3': { title: 'Lighter week', rpeCap: 7, rpeDrop: 1, text: 'Lighter week.' } }, 'Lighter week | Max RPE 7', 390, false],
+    ['week 1 cap, before Start', MID(1), { '1': WEEK1 }, 'This week | Max effort 7', 390, false],
+    ['week 1 cap, running (slim bar)', MID(1), { '1': WEEK1 }, 'This week | Max effort 7', 390, true],
+    ['back-off, running at 320 px: one line, the clock whole', MID(5), { last: BACKOFF }, 'Back-off week | Max effort 7 | 1 set fewer', 320, true],
+    ['back-off, before Start at 320 px', MID(5), { last: BACKOFF }, 'Back-off week | Max effort 7 | 1 set fewer', 320, false],
+    ['a drop with no cap shows the drop and its floor (CHP-4)', MID(3), { '3': { title: 'Lighter week', rpeDrop: 1, text: 'Lighter week.' } }, 'Lighter week | Effort 1 lower, not below 6', 390, false],
+    ['the back-off written as "5" (no title) is the Back-off week', MID(5), { '5': BACKOFF }, 'Back-off week | Max effort 7 | 1 set fewer', 390, false],
+    ['a cap hides the drop (dayRpe() order)', MID(3), { '3': { title: 'Lighter week', rpeCap: 7, rpeDrop: 1, text: 'Lighter week.' } }, 'Lighter week | Max effort 7', 390, false],
     ['a note with no numbers: no row', MID(3), { '3': { title: 'Test week', text: 'Day 1 opens with the jump test.' } }, null, 390, false],
     ['a week with no note: no row', MID(2), { '1': WEEK1 }, null, 390, true],
   ]) {
@@ -183,12 +183,12 @@ function expectOk(s, want) {
     const P = prog(MID(5), { '5': BACKOFF }); P.workouts.days[0].blocks[1].exercises.find(x => x.name === 'Barbell Back Squat').test = '5RM';
     const { ctx, p } = await H.openProgram(browser, { prog: P });
     const b = await bar(p, false);
-    t.check('session bar: a retest day in the back-off week says "except the retest"', b.week === 'Back-off week | Max RPE 7 except the retest | 1 set fewer', JSON.stringify(b));
+    t.check('session bar: a retest day in the back-off week says "except the retest"', b.week === 'Back-off week | Max effort 7 except the retest | 1 set fewer', JSON.stringify(b));
     await ctx.close();
     const Q = prog(MID(1), { '1': WEEK1 }); Q.workouts.days[0].blocks[1].exercises.find(x => x.name === 'Barbell Back Squat').test = '5RM';
     const o = await H.openProgram(browser, { prog: Q });
     const c = await bar(o.p, false);
-    t.check('session bar: the same flag in week 1 (no retest due) adds nothing', c.week === 'This week | Max RPE 7', JSON.stringify(c));
+    t.check('session bar: the same flag in week 1 (no retest due) adds nothing', c.week === 'This week | Max effort 7', JSON.stringify(c));
     await o.ctx.close();
   }
   {   // Finished without the clock ever starting: the row goes with Done all the same.
@@ -251,8 +251,8 @@ function expectOk(s, want) {
       sideways: document.documentElement.scrollWidth - window.innerWidth };
   });
   for (const [tag, dayIn, notes, want, w] of [
-    ['back-off week: the row under the top bar and on the rest screen', MID(5), { '5': BACKOFF }, 'Back-off week Max RPE 7 ·1 set fewer', 390],
-    ['week 1 cap at 320 px', MID(1), { '1': WEEK1 }, 'This week Max RPE 7', 320],
+    ['back-off week: the row under the top bar and on the rest screen', MID(5), { '5': BACKOFF }, 'Back-off week Max effort 7 ·1 set fewer', 390],
+    ['week 1 cap at 320 px', MID(1), { '1': WEEK1 }, 'This week Max effort 7', 320],
     ['a week with no note: no row in Guided', MID(2), { '1': WEEK1 }, null, 390],
   ]) {
     const { ctx, p } = await H.openProgram(browser, { prog: prog(dayIn, notes), w });
@@ -295,7 +295,7 @@ function expectOk(s, want) {
       const row = log && !log.hidden ? log.querySelector('.session-timer-week') : null;
       return { circuit: true, head: (log.querySelector('.tl-head') || {}).textContent || '', row: row ? row.textContent.replace(/\s+/g, ' ').trim() : null };
     });
-    t.check('Guided: a circuit round\'s rest screen carries the row', r.circuit && /Round 1/.test(r.head) && r.row === 'Back-off week Max RPE 7 ·1 set fewer'
+    t.check('Guided: a circuit round\'s rest screen carries the row', r.circuit && /Round 1/.test(r.head) && r.row === 'Back-off week Max effort 7 ·1 set fewer'
       && p.errs.length === 0, JSON.stringify(r) + (p.errs.length ? ' ERR ' + p.errs.join(' | ') : ''));
     await ctx.close();
   }
@@ -312,20 +312,20 @@ function expectOk(s, want) {
   });
   for (const [tag, dayIn, notes, w, check] of [
     ['week 1: "Alex," opens it, RPE 7 is clay, the count is in the kicker, signed with no byline', MID(1), { '1': WEEK1 }, 390,
-      l => l.hi === 'Alex,' && l.kick === 'This week' && same(l.clay, ['RPE 7']) && l.head === 'Keep every set at RPE 7 or under this week.'
+      l => l.hi === 'Alex,' && l.kick === 'This week' && same(l.clay, ['effort 7']) && l.head === 'Keep every set at effort 7 or under this week.'
         && l.countIsSum && /^(\d+ of 2|All 2) done$/.test(l.count) && l.dose === null && l.sig && l.photo === 'assets/img/coach.jpg' && !l.byline],
     ['back-off: its name in the kicker, both numbers clay in the headline, nothing left for the dose line', MID(5), { last: BACKOFF }, 390,
-      l => l.kick === 'Back-off week' && same(l.clay, ['One set fewer', 'RPE 7']) && l.dose === null],
+      l => l.kick === 'Back-off week' && same(l.clay, ['One set fewer', 'effort 7']) && l.dose === null],
     ['numbers the words do not say go on the dose line, a cap hides the drop', MID(5), { '5': { text: 'Easy week. Lift light and leave early.', title: 'Lighter week', rpeCap: 7, setsDrop: 2, rpeDrop: 1 } }, 390,
-      l => same(l.clay, []) && l.dose === 'Max RPE 7·2 sets fewer'],
+      l => same(l.clay, []) && l.dose === 'Max effort 7·2 sets fewer'],
     ['a first sentence over 100 characters: the week\'s name is the headline', MID(5), { last: { text: 'One set fewer on every exercise and nothing above RPE 7, except the test sets on bench and leg press and hip thrust today. Done.', rpeCap: 7, setsDrop: 1 } }, 390,
       l => l.head === 'Back-off week' && l.kick === 'This week'],
     ['"every RPE at 6" (the older wording) is clay too, so the cap is not said twice', MID(5), { last: { setsDrop: 1, rpeCap: 6, text: 'One set fewer on every exercise and every RPE at 6. You get stronger in the easy week too.' } }, 390,
-      l => same(l.clay, ['One set fewer', 'RPE at 6']) && l.dose === null],
+      l => same(l.clay, ['One set fewer', 'effort at 6']) && l.dose === null],
     ['an RPE drop: "one point lower" is clay, and "One less round" never claims it', MID(3), { '3': { title: 'Lighter week', rpeDrop: 1, text: 'One less round on every circuit, and every RPE one point lower. Rest well.' } }, 390,
       l => same(l.clay, ['one point lower']) && l.dose === null],
     ['a drop the words do not name goes on the dose line', MID(3), { '3': { title: 'Lighter week', rpeDrop: 1, setsDrop: 1, text: 'One less set on every exercise. Rest well.' } }, 390,
-      l => same(l.clay, []) && l.dose === '1 set fewer·RPE 1 lower, not below 6'],
+      l => same(l.clay, []) && l.dose === '1 set fewer·Effort 1 lower, not below 6'],
     ['at 320 px nothing goes sideways', MID(5), { last: BACKOFF }, 320, l => l.sideways <= 0],
   ]) {
     const { ctx, p } = await H.openProgram(browser, { prog: prog(dayIn, notes), w });
@@ -338,7 +338,7 @@ function expectOk(s, want) {
     const P = prog(MID(1), { '1': WEEK1 }); P.athlete.firstName = '';
     const { ctx, p } = await H.openProgram(browser, { prog: P });
     const l = await look(p);
-    t.check('no first name: no greeting, the note still shows', l.hi === null && l.head === 'Keep every set at RPE 7 or under this week.' && p.errs.length === 0, JSON.stringify(l));
+    t.check('no first name: no greeting, the note still shows', l.hi === null && l.head === 'Keep every set at effort 7 or under this week.' && p.errs.length === 0, JSON.stringify(l));
     await ctx.close();
   }
   {   // A week with no note keeps the This Week heading and its long count.
@@ -379,7 +379,7 @@ function expectOk(s, want) {
   const CAP7 = { '1': { text: 'Keep every set at RPE 7 or under this week.', rpeCap: 7 } };
   for (const [tag, dayIn, notes, check, want] of [
     ['cap week, no check-in: 7 on target, 8 and 9 over, the card still says RPE 9, no pill', MID(1), CAP7, null,
-      q => q.week === '7' && !q.today && !q.pill && /RPE 9/.test(q.numline) && same(q.tags, ['on', 'over', 'over'])],
+      q => q.week === '7' && !q.today && !q.pill && /Effort 9/.test(q.numline) && same(q.tags, ['on', 'over', 'over'])],
     ['week 2 (no note): back to the card, 7 and 8 under, 9 on target', MID(2), CAP7, null,
       q => !q.week && same(q.tags, ['under', 'under', 'on'])],
     ['cap week, Train as written: the cap still colours, no pill', MID(1), CAP7, { drop: 1, asWritten: true },
@@ -411,7 +411,7 @@ function expectOk(s, want) {
     const { ctx, p } = await H.openProgram(browser, { prog: P, seed });
     const q = await squat(p, { drop: 1, asWritten: false });
     const barTxt = await p.evaluate(() => (document.querySelector('#day-view .day-content.active .session-timer-week') || {}).textContent || '');
-    t.check('lower day in the back-off week: the retest is capped and the bar says no exception', q.today === '7' && !/except/.test(barTxt) && /Max RPE 7/.test(barTxt), JSON.stringify(q) + ' | ' + barTxt);
+    t.check('lower day in the back-off week: the retest is capped and the bar says no exception', q.today === '7' && !/except/.test(barTxt) && /Max effort 7/.test(barTxt), JSON.stringify(q) + ' | ' + barTxt);
     await ctx.close();
   }
   {   // An app left open across a week boundary: opening the day re-reads the week.
@@ -437,7 +437,7 @@ function expectOk(s, want) {
       const sub = document.querySelector('#hist-overlay .readiness-sub');
       return sub ? sub.textContent : '';
     }, H.card('Barbell Back Squat'));
-    t.check("History: the caption names the card's target its rows use, then today's (target RPE 9 · 7 today)", /target RPE 9 · 7 today\./.test(cap), cap);
+    t.check("History: the caption names the card's target its rows use, then today's (target effort 9 · 7 today)", /target effort 9 · 7 today\./.test(cap), cap);
     await ctx.close();
   }
 

@@ -68,7 +68,7 @@ const t = H.checker();
     t.check('Guided bar: the slim bar\'s green, full width, at the top; the eyebrow is Space Mono with a mint dot', bar.bg === 'radial-gradient' && bar.w === bar.vw && bar.top === 0 && /Space Mono/.test(bar.ebFam) && bar.dot === '7px rgb(109, 190, 149)', JSON.stringify(bar));
     t.check('Guided bar: the body\'s own copy of the name is hidden (never in the day)', bar.bodyName === 'none'
       && (await p.evaluate(() => { const c = [...document.querySelectorAll('#day-view .checklist-item')].find(x => x.querySelector('.item-name').textContent.trim() === 'Box Jump'); return !!c && getComputedStyle(c.querySelector('.item-name')).display !== 'none'; })), JSON.stringify(bar));
-    t.check('Guided bar: the week\'s limits row sits under it, label grey-white and the number clay on the green', bar.week === 'This week Max RPE 7' && /rgba?\(0, 0, 0, 0\.18\)/.test(bar.weekBg) && bar.clay === 'rgb(247, 161, 131)', JSON.stringify([bar.week, bar.weekBg, bar.clay]));
+    t.check('Guided bar: the week\'s limits row sits under it, label grey-white and the number clay on the green', bar.week === 'This week Max effort 7' && /rgba?\(0, 0, 0, 0\.18\)/.test(bar.weekBg) && bar.clay === 'rgb(247, 161, 131)', JSON.stringify([bar.week, bar.weekBg, bar.clay]));
 
     // the ⓘ: the card's own, opening the same About sheet over Guided; closing it leaves the same step
     const sc0 = await p.evaluate(() => { document.getElementById('step-scroll').scrollTop = 0; return { pos: STEP.pos, name: document.getElementById('step-name').textContent, st: document.getElementById('step-scroll').scrollTop }; });
@@ -219,7 +219,7 @@ const t = H.checker();
     await doneRest(p);
     const lg = await p.evaluate(() => { const k = document.querySelector('#timerLog .tl-kg'); return { kg: !!k, ph: k && k.placeholder, same: !!document.querySelector('#timerLog .tl-same:not([hidden])'), val: (document.querySelector('#timerLog .tl-val') || {}).textContent,
       lab: [...document.querySelectorAll('#timerLog .tl-lab')].map(x => x.textContent), keys: document.querySelectorAll('#timerLog .tl-rpe-btn').length, kgBox: k ? getComputedStyle(k).borderTopColor + ' ' + getComputedStyle(k).backgroundColor : '' }; });
-    t.check('the squat\'s rest: Kg (last 70 offered), Reps (6) and RPE 6-10, boxes white edged --field', lg.kg && lg.ph === 'last 70' && lg.same && lg.val === '6' && lg.lab.join('|') === 'Kg|Reps|RPE' && lg.keys === 5 && lg.kgBox === 'rgb(168, 159, 146) rgb(255, 255, 255)', JSON.stringify(lg));
+    t.check('the squat\'s rest: Kg (last 70 offered), Reps (6) and RPE 6-10, boxes white edged --field', lg.kg && lg.ph === 'last 70' && lg.same && lg.val === '6' && lg.lab.join('|') === 'Kg|Reps|Effort' && lg.keys === 5 && lg.kgBox === 'rgb(168, 159, 146) rgb(255, 255, 255)', JSON.stringify(lg));
     await p.fill('#timerLog .tl-kg', '72.5');
     await p.click('#timerLog .tl-step[data-d="1"]');
     await p.click('#timerLog .tl-rpe-btn[data-rpe="8"]');
@@ -240,7 +240,7 @@ const t = H.checker();
     t.check('RPE over the cap is clay, as today', over.text === '9' && / over/.test(over.cls) && over.bg === 'rgb(194, 81, 44)' && over.fg === 'rgb(255, 255, 255)', JSON.stringify(over));
     t.check('RPE on target is the selected green (--mark)', on.text === '7' && !/ over| under/.test(on.cls) && on.bg === 'rgb(14, 74, 54)', JSON.stringify(on));
     t.check('RPE under the cap is steel blue, as today', under.text === '6' && / under/.test(under.cls) && under.bg === 'rgb(62, 106, 146)', JSON.stringify(under));
-    t.check('the limits line is under the RPE keys, as before', await p.evaluate(() => { const r = document.querySelector('#timerLog .session-timer-week'), k = document.querySelector('#timerLog .tl-rpe'); return !!r && r.textContent.replace(/\s+/g, ' ').trim() === 'This week Max RPE 7' && r.getBoundingClientRect().top > k.getBoundingClientRect().bottom; }));
+    t.check('the limits line is under the RPE keys, as before', await p.evaluate(() => { const r = document.querySelector('#timerLog .session-timer-week'), k = document.querySelector('#timerLog .tl-rpe'); return !!r && r.textContent.replace(/\s+/g, ' ').trim() === 'This week Max effort 7' && r.getBoundingClientRect().top > k.getBoundingClientRect().bottom; }));
     t.check('no page errors in the rest checks', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }

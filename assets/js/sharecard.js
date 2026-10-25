@@ -113,7 +113,7 @@
       pctHarder: p => `heavier and harder: about ${p} stronger`, pctFewer: p => `heavier for fewer reps: about ${p} stronger`,
       pctLess: p => `more reps with less: about ${p} stronger`, pctBw: p => `about ${p} stronger`,
     },
-    rpe: r => `RPE ${r}`,
+    rpe: r => `Effort ${r}`,
     // Retest
     retestHead: [['Re'], ['test', 1]],
     beaten: 'Beaten',

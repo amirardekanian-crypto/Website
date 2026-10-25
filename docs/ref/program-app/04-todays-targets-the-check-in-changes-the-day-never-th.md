@@ -16,7 +16,7 @@ off in their notes.
   (`parseCheckinPlan()`); `scripts/check_twins.js` fails a commit that rewords one side only.
 - **`paintToday(day)` paints it; nothing is written but the check-in.** A banner under the timer
   says what changed and offers **Train as written** (`setAsWritten()`, kept as `asWritten` and sent
-  with the session). On a lower day every card with an RPE shows `RPE 8 → 7 today` (one clay pill: `rdTarget()`
+  with the session). On a lower day every card with an RPE shows `Effort 8 → 7 today` (one clay pill: `rdTarget()`
   takes the RPE out of the line of numbers); `data-target-today` makes the set-log and Guided
   colours compare against today's number. The pill still means a lower day only: a week note's limit
   colours the sets with no pill (`paintWeekTargets()`, below).

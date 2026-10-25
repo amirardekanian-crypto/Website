@@ -10,7 +10,7 @@ tints, the running bar, labels, and so it marked nothing. Now:
   the finished card's quote mark (Amir's voice, as on the Coach's note), the 3 px stripe beside his first sentence on Progress's Now card (Doors, 2026-10-19: the same voice,
   in place of a quote mark that drew as two slabs), what is not done when finishing early (only the tags),
   the numbers in a week note's headline (Front Page, 2026-10-12: *RPE 7*, *One set fewer*), and the same numbers on
-  the session bar's limits row (*Max RPE 7 · 1 set fewer*; only the numbers, light clay `#E06B43` on the green bar
+  the session bar's limits row (*Max effort 7 · 1 set fewer*; only the numbers, light clay `#E06B43` on the green bar
   since Centre Court, the words white and the label a paler white),
   the one number on a dark Home card (*Week 2*, the habits row's *2 to go*), and the fault cue's bar in How to do it (the one fault, written
   fault-then-fix, CUE-7: Amir, 2026-10-12, Centre Court round 2: *"3 clay"*; it was red `#E74C3C`). The Library's clay Playbook door went with the doors page, and the article reader's heading bar, drop cap and bullets turned green (2026-10-13).

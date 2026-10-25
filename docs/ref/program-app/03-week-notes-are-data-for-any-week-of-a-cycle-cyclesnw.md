@@ -21,12 +21,12 @@ note a week has, and calls an untitled one on the final week the *Back-off week*
   the note's limit is the target every logged RPE is coloured against, on every day of that week (Amir, 2026-10-12:
   *"colour against the cap in those weeks"*; `paintWeekTargets()`, *Today's targets* below). **So the session bar carries
   the numbers** (Amir, 2026-10-12: *"add the cap reminder to the session bar"*): `weekLimitsHTML()` draws one row at the
-  foot of the sticky bar, *This week · Max RPE 7*, *Back-off week · Max RPE 7 · 1 set fewer*, *Lighter week · RPE 1
+  foot of the sticky bar, *This week · Max effort 7*, *Back-off week · Max effort 7 · 1 set fewer*, *Lighter week · RPE 1
   lower, not below 6* (an `rpeDrop` only without a cap, as `rpeTargetOn()` reads them, and with its floor, CHP-4), before
   Start and all through the slim bar, gone after Done (the timer's `finished` or the day's completion, `.day-done`).
   Never the note's words, and nothing when the note has no numbers. **On a day with a test-flagged lift in the
   closing week** (`exTestSpec()`, `inRetestWindow()`: the window, whether or not that retest is due; not on a lower
-  check-in day, when the retest waits and is capped like every lift) the RPE line reads *Max RPE 7 except the
+  check-in day, when the retest waits and is capped like every lift) the RPE line reads *Max effort 7 except the
   retest* (TST-4: two lines never give opposite instructions for the same set). The label is the note's title, else
   *Back-off week* for the cycle's final week (`weekNoteLast()`: the legacy `last` or a numeric key on the last week;
   Home's kicker uses the same test), else *This week*. `renderTimer()` redraws the row from the cycle as it is now,

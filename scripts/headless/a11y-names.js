@@ -32,7 +32,7 @@ const H = require('./lib');
   C.check('Guided\'s tempo link: a tap 10 px above its box still hits it (a 44 px target)', !!tempo && tempo.above, JSON.stringify(tempo));
   await p.click('#step-footer .step-primary-btn'); await p.waitForTimeout(500);
   const rest = await p.evaluate(() => [...document.querySelectorAll('#timerLog .tl-rpe-btn')].map(b => b.getAttribute('aria-label')));
-  C.check('the rest screen\'s RPE keys are named "RPE N"', rest.length === 5 && rest[1] === 'RPE 7', JSON.stringify(rest));
+  C.check('the rest screen\'s effort keys are named "Effort N"', rest.length === 5 && rest[1] === 'Effort 7', JSON.stringify(rest));
   C.check('no page errors', !p.errs.length, JSON.stringify(p.errs));
   await ctx.close(); await browser.close();
   process.exit(C.report() ? 1 : 0);

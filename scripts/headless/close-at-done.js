@@ -115,7 +115,7 @@ const state = (p, day) => p.evaluate(([day, SQ, E, O]) => {
     }));
     C.check('Day 1 reopened: every card done, the finished card shown', !d1view.unchecked.length && d1view.finished, JSON.stringify(d1view));
     const line = await p.evaluate(`doneLineText(${inDay(1, SQUAT)})`);
-    C.check('Day 1\'s squat line still names its RPEs', /RPE 8 8 8 8/.test(line), line);
+    C.check('Day 1\'s squat line still names its efforts', /Effort 8 8 8 8/.test(line), line);
 
     // A rating changed after Done re-saves the session: with Day 1's own sets, not the carried ones.
     await p.evaluate(() => { try { setRateFold('1', true); paintRateFold('1'); } catch (e) {} });

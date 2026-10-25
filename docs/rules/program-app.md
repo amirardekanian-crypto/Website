@@ -44,11 +44,11 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   **It shows on Home only, as the This Week section itself** (Front Page, Amir 2026-10-12; never at the top of a session): the
   athlete's first name, the text's first sentence as the headline with its numbers in clay, then Amir's signature and photo. So
   the pipeline writes the rule as the first sentence, under 100 characters, with no greeting, name or sign-off (COM-16).
-  **In a session its numbers sit on the session bar** (`weekLimitsHTML()`, Amir 2026-10-12): a thin last row, *Max RPE 7 · 1 set
+  **In a session its numbers sit on the session bar** (`weekLimitsHTML()`, Amir 2026-10-12): a thin last row, *Max effort 7 · 1 set
   fewer*, never the words, never on the clock's line, and the same row in Guided (under its top bar and on the rest screen); on a day with a test-flagged lift in the closing week it says *except the retest* (TST-4; not on a lower day). An untitled note
   on the cycle's final week is the *Back-off week* (`weekNoteLast()`).
   **Every RPE logged that week is coloured against them, every day** (Amir 2026-10-12: *"colour against the cap in those weeks"*;
-  `rpeTargetOn()`, `paintWeekTargets()`), check-in or not, trained as written or not. The card keeps its printed RPE, *RPE 8 → 7 today*
+  `rpeTargetOn()`, `paintWeekTargets()`), check-in or not, trained as written or not. The card keeps its printed RPE, *Effort 8 → 7 today*
   still means a lower day only, and that retest keeps its own card on a normal day. **A number in a week note covers every lift**: a limit on only
   some lifts is words with no `rpeCap` / `rpeDrop` (PRC-15; `check_program.py` warns).
 - **The Spine**: only approved entries reach a phone, and **a card that names its entry (`exId`) shows that entry or nothing** (a draft's card has

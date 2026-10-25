@@ -983,7 +983,7 @@
   .session-timer-week i { font-style: normal; color: var(--grey-text); margin-right: 8px; }
   .stw-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--grey-text); }
   .session-timer.finished .session-timer-week, .session-timer.day-done .session-timer-week { display: none; }
-  @media (max-width: 359px) {   /* so "Back-off week · Max RPE 7 · 1 set fewer" stays one line at 320 px */
+  @media (max-width: 359px) {   /* so "Back-off week · Max effort 7 · 1 set fewer" stays one line at 320 px */
     .session-timer-week { gap: 2px 6px; }
     .session-timer-week i { margin-right: 6px; }
     .stw-k { letter-spacing: 0; }
@@ -3157,9 +3157,9 @@
     :where(#day-view) .session-timer-actions { gap: 8px; }
     :where(#day-view) .session-timer.has-reset:not(.slim) .session-timer-btn { padding: 0 8px; font-size: var(--fs-body); }
     :where(#day-view) .session-timer-reset:not([hidden]) { padding: 0 10px; }
-    :where(#day-view) .session-timer-week, :where(#day-view) .session-timer-week .stw-k { letter-spacing: 0; }
-    :where(#day-view) .session-timer-week .stw-k { margin-right: 8px; }
-    :where(#day-view) .session-timer-week i { margin: 0 6px 0 0; }
+    :where(#day-view) .session-timer-week, :where(#day-view) .session-timer-week .stw-k { letter-spacing: -.4px; }
+    :where(#day-view) .session-timer-week .stw-k { margin-right: 6px; }   /* "Back-off week · Max effort 7 · 1 set fewer" stays one line at 320 px */
+    :where(#day-view) .session-timer-week i { margin: 0 4px 0 0; }
     :where(#day-view) .session-timer.slim .session-timer-leave { padding: 0 8px 0 10px; gap: 5px; }
     :where(#day-view) .session-timer.slim .session-timer-btn { padding: 0 10px; gap: 6px; }
     :where(#day-view) .session-timer.slim.long .session-timer-time { font-size: var(--fs-lead); }   /* "1:05:12", so every word stays */
@@ -8915,7 +8915,7 @@ const ONB_TEXT = {
   set: row => (row.querySelector('.ex-set-wbox') && row.querySelector('.ex-set-wbox').offsetParent
       ? 'Weight in, set done: tap the <b>circle</b>.' : 'Set done? Tap the <b>circle</b>.')
     + ' One tap means done as written.' + (row.querySelector('.ex-set-reps') ? ' Different reps? Type them first.' : ''),
-  rpe: () => 'How hard was that set? <b>10</b>: not one more rep. <b>8</b>: two left. I read every RPE when I write your next cycle.'
+  rpe: () => 'How hard was that set? <b>10</b>: not one more rep. <b>8</b>: two left. I read every effort when I write your next cycle.'
 };
 function onbKey() { return ATHLETE_ID + '_onb'; }
 function onbState() {
@@ -9243,13 +9243,17 @@ function weekNoteLast(cycle, n) {
 const WN_SIG = '<svg class="wn-sig" viewBox="0 0 130 46" role="img" aria-label="Amir"><g transform="skewX(-12) translate(8 0)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'
   + '<path stroke-width="2.2" d="M5 40 C11 28 17 14 24 4 C25 15 27 28 30 38 C31 41 28 37 22 31 C17 27 11 26 9 28 C16 25 30 25 38 28 C40 29 41 33 41 38 C42 32 45 27 48 28 C51 29 51 34 51 38 C52 32 55 27 58 28 C61 29 61 34 62 38 C63 34 65 31 67 30 C67 33 67 36 69 38 C70 35 71 32 72 29 C72 32 72 35 73 38 C74 33 77 29 81 29 C84 29 85 31 87 32 C97 37 112 31 124 21"/>'
   + '<path stroke-width="2.7" d="M66.5 22.5 l1.6 -1.2"/></g></svg>';
+// Programme text an athlete reads may still say RPE (a week note, a coach's note, a pill): the app says effort (Plain Words, Amir 2026-10-25).
+function effortWord(str) {
+  return String(str == null ? '' : str).replace(/\bRPE\b/g, (m, off, all) => /^\s*$|[.!?]\s*$/.test(all.slice(0, off)) ? 'Effort' : 'effort');
+}
 function weekNoteHTML(cycle) {
   const n = weekNoteNow(cycle);
   if (!n) return '';
   const attr = s => esc(String(s)).replace(/"/g, '&quot;');
   const NB = String.fromCharCode(160);   // a non-breaking space; esc() writes it as &nbsp;
   const tie = s => String(s)
-    .replace(/\b(RPE)\s+(\d+(?:\.\d+)?)/gi, '$1' + NB + '$2')
+    .replace(/\b(RPE|effort)\s+(\d+(?:\.\d+)?)/gi, '$1' + NB + '$2')
     .replace(/(\d+(?:\.\d+)?)\s+(to|or)\s+(\d+(?:\.\d+)?)/gi, '$1' + NB + '$2' + NB + '$3')
     .replace(/\b(one|two|three|four|five|\d+)\s+(sets?|reps?)(\s+(?:fewer|less))?\b/gi, (m, a, b, c) => a + NB + b + (c ? NB + c.trim() : ''))
     .replace(/\b(week|day)\s+(\d+)\b/gi, '$1' + NB + '$2');
@@ -9257,7 +9261,7 @@ function weekNoteHTML(cycle) {
   const last = weekNoteLast(cycle, n);
   const name = n.title || (last ? 'Back-off week' : 'Week ' + n.wk);
   const named = !!n.title || last;
-  const text = String(n.text).trim();
+  const text = effortWord(n.text).trim();
   // The first sentence: up to . ! or ? followed by a space and a capital, a digit or an opening quote.
   const m = text.match(/^(.+?[.!?])\s+(?=[A-Z0-9"'(“])/);
   const first = m ? m[1] : text, rest = m ? text.slice(m[0].length) : '';
@@ -9266,12 +9270,12 @@ function weekNoteHTML(cycle) {
   const marked = { cap: false, sets: false, drop: false };
   const cap = String(n.rpeCap).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const mark = h => {   // h is already escaped, so a tied space reads &nbsp; here
-    // "RPE 7", and the older "every RPE at 6".
-    if (capOn) h = h.replace(new RegExp('RPE(?:\\s|&nbsp;)?(?:at(?:\\s|&nbsp;))?' + cap + '(?![\\d.]*\\d)', 'i'), s => { marked.cap = true; return '<em>' + s + '</em>'; });
+    // "effort 7" (the week note's "RPE 7" is worded as effort first, effortWord()), and the older "every effort at 6".
+    if (capOn) h = h.replace(new RegExp('(?:RPE|effort)(?:\\s|&nbsp;)?(?:at(?:\\s|&nbsp;))?' + cap + '(?![\\d.]*\\d)', 'i'), s => { marked.cap = true; return '<em>' + s + '</em>'; });
     if (setsOn) h = h.replace(/\b(one|two|three|four|five|\d+)(?:\s|&nbsp;)(sets?)(?:\s|&nbsp;)(fewer|less)\b/i,
       (s, a) => (WORD[a.toLowerCase()] || Number(a)) === Number(n.setsDrop) ? (marked.sets = true, '<em>' + s + '</em>') : s);
-    // "one point lower", "1 RPE lower": the RPE or point word is required, so "one less set" never claims the drop.
-    if (dropOn) h = h.replace(/\b(one|two|three|\d+(?:\.\d+)?)(?:\s|&nbsp;)(?:RPE|points?)(?:\s|&nbsp;)(lower|less|down)\b/i,
+    // "one point lower", "1 effort lower": the effort or point word is required, so "one less set" never claims the drop.
+    if (dropOn) h = h.replace(/\b(one|two|three|\d+(?:\.\d+)?)(?:\s|&nbsp;)(?:RPE|effort|points?)(?:\s|&nbsp;)(lower|less|down)\b/i,
       (s, a) => (WORD[a.toLowerCase()] || Number(a)) === Number(n.rpeDrop) ? (marked.drop = true, '<em>' + s + '</em>') : s);
     return h;
   };
@@ -9281,9 +9285,9 @@ function weekNoteHTML(cycle) {
       ? `<h3 class="wn-head">${esc(name)}</h3><p class="wn-stand" data-t>${esc(tie(text))}</p>`
       : `<p class="wn-lead" data-t>${esc(tie(text))}</p>`;
   const dose = [];
-  if (capOn && !marked.cap) dose.push('Max RPE ' + n.rpeCap);
+  if (capOn && !marked.cap) dose.push('Max effort ' + n.rpeCap);
   if (setsOn && !marked.sets) dose.push(n.setsDrop + (Number(n.setsDrop) === 1 ? ' set fewer' : ' sets fewer'));
-  if (dropOn && !marked.drop) dose.push('RPE ' + n.rpeDrop + ' lower, not below 6');   // CHP-4; 6 is RPE_FLOOR, see weekLimitsHTML()
+  if (dropOn && !marked.drop) dose.push('Effort ' + n.rpeDrop + ' lower, not below 6');   // CHP-4; 6 is RPE_FLOOR, see weekLimitsHTML()
   const who = (DATA && DATA.athlete && DATA.athlete.firstName) || '';
   return `<section class="wn week-note week-note-${n.key}" data-shape="${shape}" data-label="${attr(name)}" aria-label="${attr(name)}">
     <div class="wn-kick"><span class="wn-name">${esc(shape === 'sentence' && named ? name : 'This week')}</span><span class="wn-count" id="home-week-sum"></span></div>
@@ -9313,9 +9317,9 @@ function weekLimitsHTML(cycle, day) {
     ? (day.blocks || []).reduce((k, b) => k + (b.exercises || []).filter(ex => exTestSpec(ex)).length, 0) : 0;
   const but = tests ? (tests === 1 ? ' except the retest' : ' except retests') : '';
   const bits = [];
-  if (capOn) bits.push('Max RPE ' + n.rpeCap + but);
+  if (capOn) bits.push('Max effort ' + n.rpeCap + but);
   // 6 is RPE_FLOOR, written out: that const is declared far below boot(), and Home can be drawn before it is reached.
-  if (dropOn) bits.push('RPE ' + n.rpeDrop + ' lower, not below 6' + but);
+  if (dropOn) bits.push('Effort ' + n.rpeDrop + ' lower, not below 6' + but);
   if (setsOn) bits.push(n.setsDrop + (Number(n.setsDrop) === 1 ? ' set fewer' : ' sets fewer'));
   if (!bits.length) return '';
   const name = n.title || (weekNoteLast(cycle, n) ? 'Back-off week' : 'This week');
@@ -9678,7 +9682,7 @@ function winText(a, b) {
   const rpeKnown = a.r != null && b.r != null;
   const dr = rpeKnown ? b.r - a.r : 0;
   if (a.n == null || b.n == null) {                       // a hold: the dose is fixed, the effort tells
-    return (rpeKnown && dr < 0) ? { txt: `felt easier: RPE ${a.r} → ${b.r}`, gain: -dr * 0.03, shape: 'holdEasier', share: false } : null;
+    return (rpeKnown && dr < 0) ? { txt: `felt easier: effort ${a.r} → ${b.r}`, gain: -dr * 0.03, shape: 'holdEasier', share: false } : null;
   }
   const gain = (a.idx && b.idx) ? b.idx / a.idx - 1 : 0;
   if (gain < 0.02) return null;
@@ -9692,14 +9696,14 @@ function winText(a, b) {
   const same = rpeKnown && dr === 0;
   let txt, shape, share = true;
   if (!loaded) {
-    if (dn > 0 && dr <= 0)               { txt = `${reps(dn)}${same ? ', same RPE' : ''}`; shape = 'bwReps'; }
-    else if (dn === 0 && dr < 0)         { txt = `${b.n} reps felt easier: RPE ${a.r} → ${b.r}`; shape = 'bwEasier'; share = false; }
+    if (dn > 0 && dr <= 0)               { txt = `${reps(dn)}${same ? ', same effort' : ''}`; shape = 'bwReps'; }
+    else if (dn === 0 && dr < 0)         { txt = `${b.n} reps felt easier: effort ${a.r} → ${b.r}`; shape = 'bwEasier'; share = false; }
     else                                 { txt = `about ${pct}% stronger`; shape = 'pctBw'; share = dn > 0; }
-  } else if (dw > 0 && dn === 0 && dr === 0) { txt = `+${kg(dw)} ${wd(dw)}, same reps${rpeKnown ? ', same RPE' : ''}`; shape = 'kg'; }
+  } else if (dw > 0 && dn === 0 && dr === 0) { txt = `+${kg(dw)} ${wd(dw)}, same reps${rpeKnown ? ', same effort' : ''}`; shape = 'kg'; }
   else if (dw > 0 && dn === 0 && dr < 0)     { txt = `+${kg(dw)} ${wd(dw)}, and it felt easier`; shape = 'kgEasier'; }
   else if (dw > 0 && dn > 0 && dr <= 0)      { txt = `+${kg(dw)} ${wd(dw)} and ${reps(dn)}`; shape = 'kgReps'; }
-  else if (dw === 0 && dn > 0 && dr <= 0)    { txt = `${reps(dn)} at ${kg(val(b))} ${wd(val(b))}${same ? ', same RPE' : ''}`; shape = 'reps'; }
-  else if (dw === 0 && dn === 0 && dr < 0)   { txt = `${kg(val(b))} ${wd(val(b))} × ${b.n} felt easier: RPE ${a.r} → ${b.r}`; shape = 'easier'; share = false; }
+  else if (dw === 0 && dn > 0 && dr <= 0)    { txt = `${reps(dn)} at ${kg(val(b))} ${wd(val(b))}${same ? ', same effort' : ''}`; shape = 'reps'; }
+  else if (dw === 0 && dn === 0 && dr < 0)   { txt = `${kg(val(b))} ${wd(val(b))} × ${b.n} felt easier: effort ${a.r} → ${b.r}`; shape = 'easier'; share = false; }
   else if (dw > 0 && dr > 0)                 { txt = `heavier and harder: about ${pct}% stronger`; shape = 'pctHarder'; }
   else if (dw > 0 && dn < 0)                 { txt = `heavier for fewer reps: about ${pct}% stronger`; shape = 'pctFewer'; }
   else if (dw < 0 && dn > 0)                 { txt = `more reps with less: about ${pct}% stronger`; shape = 'pctLess'; }
@@ -10227,7 +10231,7 @@ function renderHome() {
       <div class="confirm-earn" aria-live="polite"></div>
       <div class="finish-rate">
         <div class="complete-rpe">
-          <div class="complete-rpe-label">How hard was this session?</div>
+          <div class="complete-rpe-label">Session effort</div>
           <div class="complete-rpe-hint">1 = very easy · 10 = maximum effort</div>
           <div class="complete-rpe-buttons" data-key="${sRpeKey}">
             ${[1,2,3,4,5,6,7,8,9,10].map(n =>
@@ -10607,7 +10611,7 @@ function renderNumLine(rx, rest) {
   if (rx.sets && dose) bits.push(`<span class="nl-dose"><b>${esc(rx.sets)} × ${esc(dose)}</b>${cap ? `<span class="nl-lab nl-cap">sets×${esc(cap)}</span>` : ''}</span>`);
   else if (rx.sets)    bits.push(`<span class="nl-dose"><b>${esc(rx.sets)} sets</b></span>`);
   else if (dose)       bits.push(`<span class="nl-dose"><b>${esc(dose)}</b>${cap ? `<span class="nl-lab nl-cap">${esc(cap)}</span>` : ''}</span>`);
-  if (rx.rpe) bits.push(`<span class="nl-rpe"><span class="nl-k">RPE </span>${esc(rx.rpe)}</span>`);
+  if (rx.rpe) bits.push(`<span class="nl-rpe"><span class="nl-k">Effort </span>${esc(rx.rpe)}/10</span>`);
   const tempo = tempoDisplay(rx.tempo);
   // "tempo" shows in an open card only, and is the way to what the numbers mean (COACH-02).
   if (tempo) bits.push(`<span class="nl-tempo"><button type="button" class="nl-lab nl-help" onclick="event.stopPropagation(); openHelp('tempo')" aria-label="Tempo: what the numbers mean">tempo </button>${tempo.html}</span>`);
@@ -10633,9 +10637,9 @@ function numLineText(nl) {
 function renderExSummary(rx) {
   // No capitals on a pill that holds a duration ("3s eccentric", "30s on / 30s off"): in capitals "3S" read like a code (2026-10-13).
   const pillCls = t => /\d\s*[sm]\b/i.test(String(t || '')) ? ' nocaps' : '';
-  const mods = (rx.intent ? [`<span class="ex-summary-pill modifier${pillCls(rx.intent)}">${esc(rx.intent)}</span>`] : [])
+  const mods = (rx.intent ? [`<span class="ex-summary-pill modifier${pillCls(rx.intent)}">${esc(effortWord(rx.intent))}</span>`] : [])
     .concat((rx.extras || []).map(e =>
-      `<span class="ex-summary-pill modifier${e.style === 'yellow' ? ' priority' : ''}${pillCls(e.label)}">${esc(e.label)}</span>`));
+      `<span class="ex-summary-pill modifier${e.style === 'yellow' ? ' priority' : ''}${pillCls(e.label)}">${esc(effortWord(e.label))}</span>`));
   return mods.length ? `<div class="ex-summary">${mods.join('')}</div>` : '';
 }
 
@@ -10647,7 +10651,7 @@ function renderExSummary(rx) {
 // Program-wide guidance belongs in the Coach tab, not here.
 function renderCoachNote(note) {
   if (!note) return '';
-  return `<div class="ex-coach-note"><div class="ex-note-text"><span class="ex-coach-note-label">Coach's note.</span> ${esc(note)}</div>`
+  return `<div class="ex-coach-note"><div class="ex-note-text"><span class="ex-coach-note-label">Coach's note.</span> ${esc(effortWord(note))}</div>`
     + `<button type="button" class="ex-note-more" onclick="toggleNoteMore(this, event)">More</button></div>`;
 }
 const NOTE_DOT = `<span class="ex-note-dot" role="img" aria-label="Has a coach's note"></span>`;
@@ -10919,7 +10923,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
     const r = rxOf(item);
     if (!r.dose) return item.detail || '';
     const bits = [r.dose.value + (r.dose.side ? ' / side' : '')];   // "5 / side", as on a card's line
-    if (r.rpe) bits.push('RPE ' + r.rpe);
+    if (r.rpe) bits.push('Effort ' + r.rpe + '/10');
     return bits.join(' · ');
   };
 
@@ -11001,7 +11005,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
     ? `<span class="nl-dose"><b>${esc(roundsLabel.replace(/ Rounds$/, ''))}</b><span class="nl-k"> Rounds</span></span>`
     : `<span class="nl-dose"><b>${esc(roundsLabel)}</b></span>`);
   if (_rxC.dose)      nlBits.push(`<span>${esc(_rxC.dose.value + (_rxC.dose.side ? ' / side' : ''))}</span>`);
-  if (_rxC.rpe)       nlBits.push(`<span class="nl-rpe"><span class="nl-k">RPE </span>${esc(_rxC.rpe)}</span>`);
+  if (_rxC.rpe)       nlBits.push(`<span class="nl-rpe"><span class="nl-k">Effort </span>${esc(_rxC.rpe)}/10</span>`);
   if (_rxC.rest)      nlBits.push(`<span class="nl-rest"><span class="nl-lab">rest </span>${esc(formatRestLabel(_rxC.rest))}</span>`);
   const numLine = nlBits.length ? `<div class="ex-numline">${nlBits.join('')}</div>` : '';
 
@@ -11338,10 +11342,10 @@ function renderNotes() {
     <div class="cn-item">
       <button type="button" class="cn-row" id="cn-h-${i}" aria-expanded="false" aria-controls="cn-b-${i}" onclick="toggleCoachNote(this)">
         <span class="cn-ic" aria-hidden="true">${window.ICON(window.resolveIconKey(card.icon), 1.6)}</span>
-        <span class="cn-main"><span class="cn-title">${esc(card.title)}</span>${card.date ? `<span class="cn-date">${esc(card.date)}</span>` : ''}</span>
+        <span class="cn-main"><span class="cn-title">${esc(effortWord(card.title))}</span>${card.date ? `<span class="cn-date">${esc(card.date)}</span>` : ''}</span>
         <span class="cn-chev" aria-hidden="true"></span>
       </button>
-      <div class="cn-body" id="cn-b-${i}" role="region" aria-labelledby="cn-h-${i}" hidden>${card.body || ''}</div>
+      <div class="cn-body" id="cn-b-${i}" role="region" aria-labelledby="cn-h-${i}" hidden>${effortWord(card.body || '')}</div>
     </div>`).join('');
 
   // ── How the app works: the guide (APP_GUIDE) opens in the one sheet (COACH-02); the Coach tab keeps ONE door row for it
@@ -11375,7 +11379,7 @@ const CEILING_HELP = `
   It is the normal way to measure how strong you are.</p>
   <p><strong>You never have to test it.</strong> Testing a real one rep max takes a long warm-up,
   leaves you wrecked, and carries a risk. So the app works it out instead, from sets you already
-  do in your programme. Log the weight you used and your RPE, and finish the session: every time
+  do in your programme. Log the weight you used and your effort, and finish the session: every time
   you beat your best, the new number appears by itself.</p>
   <p><strong>You can also put one in yourself.</strong> Tap <strong>Log a max</strong> on this
   screen, pick a lift (or search for one) and enter what you lifted. Useful when you have just
@@ -11385,11 +11389,11 @@ const CEILING_HELP = `
   Every few weeks, at the end of a block, this screen will ask you to retest one of them: warm
   up in steps, then one hard set of five where the last rep is a real grind. That is not extra
   work for its own sake — it is what tells us both whether the block did what it was meant to.</p>
-  <p><strong>Why your RPE matters here.</strong> RPE 8 means you stopped with about 2 reps left in
-  you. So a set of 5 at RPE 8 was really a set of 7 in you. The app adds those reps back before it
-  works anything out. That is why an honest RPE gives a much better number than the weight on its own.</p>
+  <p><strong>Why your effort matters here.</strong> Effort 8 means you stopped with about 2 reps left in
+  you. So a set of 5 at effort 8 was really a set of 7 in you. The app adds those reps back before it
+  works anything out. That is why an honest effort gives a much better number than the weight on its own.</p>
   <p><strong>How to get a number you can trust.</strong> Go heavy and stop close to your limit.
-  A hard set of 3 at RPE 9 gives a far better number than an easy set of 10 at RPE 7. The reason is
+  A hard set of 3 at effort 9 gives a far better number than an easy set of 10 at effort 7. The reason is
   simple. When you have one or two reps left you can feel it. When you have five left you are guessing.</p>
   <p>A max you put in with <strong>Log a max</strong> is labelled so you know how much to trust it:</p>
   <ul>
@@ -11401,7 +11405,7 @@ const CEILING_HELP = `
   <p><strong>Keep saving them.</strong> One number on its own can be a few kilos out either way.
   Save a few over a few weeks and you see the real line, which is whether you are getting stronger
   and how fast. That line is worth far more than any single number, and it is what I look at.</p>
-  <p><strong>It is not a weight to lift.</strong> Your programme is still set by RPE. Never work out
+  <p><strong>It is not a weight to lift.</strong> Your programme is still set by effort. Never work out
   a percentage of this number and load that on the bar.</p>`;
 
 const APP_GUIDE = [
@@ -11410,21 +11414,21 @@ const APP_GUIDE = [
   { icon: 'compass', key: 'serve', title: 'First Serve: your first week', when: () => firstServeWanted(),
     body: `<p>While you are new, a line called <strong>First Serve</strong> sits on Home, under the days. It has five steps: finish your first session, add the app to your Home Screen, turn on notifications, join the crew and add your photo. It shows you one at a time, like <strong>Next: add the app to your Home Screen</strong>. Tap the line and the app takes you there. Tap the small ring, like <strong>2/5</strong>, to see all five.</p><p>Turn on notifications asks your phone once, and only when you tap its button. You can say no. It goes when you have done them all, or two weeks after your first session.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
-    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now. The card shows my first line. Tap <strong>Why this cycle matters</strong> for the rest of the note and <strong>Expected outcomes</strong> for what we're aiming to hit.</p>` },
-  { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
-    body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 3 or 4 numbers like <strong>3-1-1</strong> or <strong>3-1-1-0</strong>: down, pause, up, and sometimes a pause at the top. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
+    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong>: blocks of about 5 weeks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks. That's by design, not a glitch. When a week works differently, like a week for finding your weights, a test week or a lighter back-off week, my note for that week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong>: each cycle has a few training days (Day 1, Day 2, Day 3…), each with its own focus.</li><li><strong>Blocks</strong>: the parts of a day, like warm-up, strength and power, in order.</li><li><strong>Exercises</strong>: each carries its sets, reps, tempo and target effort, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now. The card shows my first line. Tap <strong>Why this cycle matters</strong> for the rest of the note and <strong>Expected outcomes</strong> for what we're aiming to hit.</p>` },
+  { icon: 'activity', key: 'rpe', title: 'Effort & Tempo',
+    body: `<p><strong>Effort.</strong> How hard it was, out of 10. 10 means no reps left. 8 means two left. 7 means about three left.</p><p><strong>Tempo</strong> = the speed of each rep, written as 3 or 4 numbers like <strong>3-1-1</strong> or <strong>3-1-1-0</strong>: down, pause, up, and sometimes a pause at the top. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
-    body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
+    body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every effort 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow next to its name means it opens, and the <strong>i</strong> on the right is its info.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small <strong>kg</strong> at the top of the weight boxes, or inside each box on a superset, is the unit. Some machines show pounds, and some show no weight at all. Tap it and pick <strong>kg</strong>, <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time. Picked the wrong one? Tap <strong>Undo</strong> in the note that shows.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · Effort 7/10 · 3-1-1 · 2:30</strong> (sets × reps, the effort target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow next to its name means it opens, and the <strong>i</strong> on the right is its info.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small <strong>kg</strong> at the top of the weight boxes, or inside each box on a superset, is the unit. Some machines show pounds, and some show no weight at all. Tap it and pick <strong>kg</strong>, <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time. Picked the wrong one? Tap <strong>Undo</strong> in the note that shows.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
-    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. It starts with your warm-up: tick each part as you do it, or tap <strong>Done ✓</strong> for all of it. <strong>Skip</strong> moves on, and I see it was skipped. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
+    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your effort. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. It starts with your warm-up: tick each part as you do it, or tap <strong>Done ✓</strong> for all of it. <strong>Skip</strong> moves on, and I see it was skipped. In a week where my note sets a limit, it sits under the top bar and under the effort buttons while you rest, like <strong>Max effort 7</strong>.</p><p>At the end, <strong>Finish session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ: what an exercise is for',
     body: `<p>The small <strong>i</strong> at the right end of every exercise answers what you'd ask me about it. <strong>What does it do?</strong> and the qualities it builds (tap one to read what it means). <strong>How does it help on court?</strong> <strong>Where will I feel it?</strong> shows your body front and back with the working muscles in green, and a line under it names them, the main ones first.</p><p>Then three short lists. Under <strong>Too hard?</strong> are the <strong>Regressions</strong>, easier versions of the same movement. Under <strong>Too easy?</strong> are the <strong>Progressions</strong>, harder versions. Under <strong>Other kit?</strong> are the <strong>Alternatives</strong>, the same movement on other equipment. Tap a name to read about it. A name marked <em>Not in the app yet</em> has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why am I doing this?</strong>, signed by me. When your plan has reasons like that, they're on one page too: tap <strong>Why your plan looks like this</strong> on <strong>Progress</strong>, under your current cycle in the Game Plan.</p><p><strong>Your history</strong> at the bottom says how many times you've done it and what you did last time. Tap it for your last 12 sessions.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with <strong>How do I do it?</strong> (the video when there is one, the steps and the cues), and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
     body: `<p>The <strong>Next up</strong> card on Home, and the top of each day, show up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Your history on every exercise',
-    body: `<p>Every exercise remembers what you did. An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. A set that ran <strong>over</strong> its target last time also shows a faint "last" line under today's row.</p><p>For the whole story, tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>: every time you've done it, your reps, your RPEs and your notes, and how your best set has moved.</p><p>A superset or circuit still shows <strong>Last time</strong> when you open it, because its boxes don't show last time's weights.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
+    body: `<p>Every exercise remembers what you did. An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. A set that ran <strong>over</strong> its target last time also shows a faint "last" line under today's row.</p><p>For the whole story, tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>: every time you've done it, your reps, your efforts and your notes, and how your best set has moved.</p><p>A superset or circuit still shows <strong>Last time</strong> when you open it, because its boxes don't show last time's weights.</p><p>It shows what you did, never what to lift. Train to today's effort target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'Personal Records: the most you could lift once',
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
@@ -11450,7 +11454,7 @@ const APP_GUIDE = [
 // names a control the athlete cannot see (CNT-01).
 APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how often'), 0,
   { icon: 'compass', key: 'crew', title: 'Crew and the Bell', when: () => crewOn(),
-    body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, RPE, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
+    body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week, and the row of initials opens <strong>In the crew</strong>, everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, effort, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><!--pages--><p>To leave the crew, or turn off what rings for you, open <strong>your initials → Crew and the Bell</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
   const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their achievements and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is in the <strong>Profile</strong> group when you tap your initials, with <strong>Your photo</strong>, <strong>Your game</strong> and <strong>What the crew sees of you</strong>. Your page is what the crew sees of you. The same row is in <strong>Crew and the Bell</strong>. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, tap your initials, then <strong>Your photo</strong>. Or open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP. The <strong>cheers</strong> number on a page counts only the cheers people sent that person with the <strong>Cheer</strong> button since they joined the crew. Likes are not in it. Your own page also shows your <strong>comebacks</strong> in a thin line under your numbers, marked Only you.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. Tap your initials, then <strong>Your game</strong>, or open your own page, and tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>When someone likes the moment of an achievement on the Bell, their face shows on that achievement on the page. Tap the achievement to see everyone who cheered it. A name stays there as long as the like does.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p><p>A photo you post with <strong>Tell the crew</strong> wears a small stamp across its foot: the session, the minutes, <strong>WEEK HELD</strong> when that session held your week, and the day. You read the stamp before you post. On your own session photo, tap <strong>Share</strong> and you get the session card for Instagram with that photo behind it. Nobody else's photo has Share.</p><p><strong>Share my card</strong>, on your own page, opens the same card as <strong>Share your card</strong> on Progress.</p><p><strong>The Open</strong> on Crew is a wall of tiles: the place, the face, the result and the name. Your tile has a green outline. Tap a tile to see that person's page. When more than 8 are on the board, tap <strong>All</strong> to see every one.</p>`;
@@ -12494,7 +12498,7 @@ function renderSystemGuide() {
   if ((() => { try { return crewOn(); } catch (e) { return false; } })()) {
     h += sysCard('The crew', 'mindset',
       `<p>Nothing on <strong>Crew</strong> earns XP. It is the one part of the app that is not scoring you.</p>`
-      + `<p>The Bell rings for the crew when you finish a session, reach a level, hold a week, hit a mark or win an achievement. Weights, RPE, your check-in, pain, body weight and habits never go there.</p>`
+      + `<p>The Bell rings for the crew when you finish a session, reach a level, hold a week, hit a mark or win an achievement. Weights, effort, your check-in, pain, body weight and habits never go there.</p>`
       + `<p><strong>The Open</strong> is one challenge for the whole crew. I set it, I say what counts, and I put your result on the board.</p>`);
   }
 
@@ -17208,7 +17212,7 @@ function renderCeiling() {
         <ol class="ceil-steps">
           <li>Open any exercise in today's session.</li>
           <li>Type in the weight you used.</li>
-          <li>Tick the set, then tap your RPE for it, which is how hard it felt out of 10.</li>
+          <li>Tick the set, then tap your effort for it, which is how hard it felt out of 10.</li>
           <li>Finish the session. Your best set lands here by itself, and so does every new best after it.</li>
         </ol>
         ${canAdd ? `<p class="ceil-after-steps">Or put one in from here. It's useful when you have
@@ -17434,9 +17438,9 @@ function openCeilingForm(i, asTest) {
         <div class="ex-1rm-field"><input id="cf-rp" type="text" inputmode="numeric" aria-label="Reps" value="${esc(String(reps))}"><span>reps</span></div>
       </div>
       <input id="cf-rpe" type="hidden" value="">
-      <div class="rpe-row cf-rpe" role="group" aria-label="How hard it felt, RPE">
-        <button type="button" class="rpe-label" onclick="openHelp('rpe')" aria-label="How hard? What RPE means">How hard?</button>
-        ${[6, 7, 8, 9, 10].map(n => `<button type="button" class="rpe-btn" data-rpe="${n}" aria-label="RPE ${n}" aria-pressed="false">${n}</button>`).join('')}
+      <div class="rpe-row cf-rpe" role="group" aria-label="How hard it felt, effort">
+        <button type="button" class="rpe-label" onclick="openHelp('rpe')" aria-label="How hard? What effort means">How hard?</button>
+        ${[6, 7, 8, 9, 10].map(n => `<button type="button" class="rpe-btn" data-rpe="${n}" aria-label="Effort ${n}" aria-pressed="false">${n}</button>`).join('')}
       </div>
       <div class="cf-board">
         <div class="ex-1rm-out" id="cf-out"></div>
@@ -17497,7 +17501,7 @@ function paintCeilingForm() {
         + `Past ${ONE_RM_MAX_EFFECTIVE} the maths is a guess, not an estimate. `
         + `Try a heavier set of 5 or fewer.`;
     } else {
-      from.innerHTML = 'Put in a weight, the reps and your RPE.';
+      from.innerHTML = 'Put in a weight, the reps and your effort.';
     }
     return;
   }
@@ -17636,7 +17640,7 @@ function renderCeilingLift(lift) {
   // A row that set a record (it beat every entry before it) can be shared as a New best card, any time (Highlight Reel).
   const rows = l.entries.slice().reverse().map((e, i) => `
     <div class="ceil-row">
-      <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} ${uWord(e.u, e.w)} × ${e.r} @ RPE ${e.rpe}${
+      <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} ${uWord(e.u, e.w)} × ${e.r} @ effort ${e.rpe}${
         e.test ? ' · tested' : e.auto ? ' · from your sets' : ''}</span>
       <b>${e.kg} ${uWord(e.u, e.kg)}</b>
       ${!window.IS_PREVIEW && hlBestSpec(lift, e.d, e.u) ? `<button type="button" class="ceil-row-share" onclick="openShareRecord(${i})" aria-label="Share this record">Share</button>` : ''}
@@ -18821,7 +18825,7 @@ function refreshConfirmCard(day, status) {
   const nrEl = card.querySelector('.confirm-norpe');
   if (nrEl) {
     const nr = isFull ? noRpeCards(day) : [];
-    const h = nr.length ? `<button type="button" class="cf-norpe" onclick="openNoRpe('${esc(String(day))}')">No RPE on ${nr.length} lift${nr.length === 1 ? '' : 's'}. Add ${nr.length === 1 ? 'it' : 'them'} <span aria-hidden="true">›</span></button>` : '';
+    const h = nr.length ? `<button type="button" class="cf-norpe" onclick="openNoRpe('${esc(String(day))}')">No effort on ${nr.length} lift${nr.length === 1 ? '' : 's'}. Add ${nr.length === 1 ? 'it' : 'them'} <span aria-hidden="true">›</span></button>` : '';
     if (nrEl.innerHTML !== h) nrEl.innerHTML = h;
   }
   const btn = card.querySelector('.confirm-btn');
@@ -18946,7 +18950,7 @@ function doneLineText(card) {
   const rs = done.map(s => s.r).filter(Boolean);
   // A move with no weight reads "4 · 4 · 4 · 4", not "× 4 · 4 …" (Centre Court): the History sheet keeps its own form.
   const sets = (histSetsText(done, cardReps(card)) || done.length + ' sets').replace(/^× /, '');
-  return sets + (rs.length ? ' · RPE ' + rs.join(' ') : '');
+  return sets + (rs.length ? ' · Effort ' + rs.join(' ') : '');
 }
 
 // After the last set's RPE the card folds to its done row and the next unfinished one
@@ -19453,7 +19457,7 @@ function rpeTargetOn(written, drop, note) {
   if (a === lo && b === hi) return '';
   return a === b ? String(a) : a + '–' + b;
 }
-// A LOWER day's target, or '' on any other day: what draws "RPE 8 → 7 today" (rdTarget()). The pill still means a
+// A LOWER day's target, or '' on any other day: what draws "Effort 8 → 7 today" (rdTarget()). The pill still means a
 // lower check-in day only; the week note alone moves the colours (rpeTargetOn()), never the card.
 function dayRpe(written, drop, note) {
   return drop ? rpeTargetOn(written, drop, note) : '';
@@ -19558,7 +19562,7 @@ function rdTarget(card, ex, drop, note) {
   const t = written ? dayRpe(written, drop, note) : '';
   if (t) {
     if (ex.type !== 'circuit') card.dataset.targetToday = t;
-    // The RPE leaves the line of numbers and comes back as a pill, "RPE 7 → 6 today",
+    // The effort leaves the line of numbers and comes back as a pill, "Effort 7 → 6 today",
     // so it is still said once (CARD-02). Both are undone by paintToday()'s first lines.
     const span = card.querySelector('.ex-numline .nl-rpe');
     if (span) {
@@ -19573,7 +19577,7 @@ function rdTarget(card, ex, drop, note) {
       }
       const p = document.createElement('span');
       p.className = 'ex-summary-pill rd-pill rd-made';
-      p.textContent = `RPE ${written} → ${t} today`;
+      p.textContent = `Effort ${written} → ${t} today`;
       sum.insertBefore(p, sum.firstChild);
     }
   }
@@ -19584,7 +19588,7 @@ function rdTarget(card, ex, drop, note) {
       const det = it && rows[k] && rows[k].querySelector('.round-detail');
       if (!det) return;
       rdKeep(det);
-      det.textContent = det.textContent.replace('RPE ' + ir, `RPE ${ir} → ${it} today`);
+      det.textContent = det.textContent.replace('Effort ' + ir + '/10', `Effort ${ir} → ${it} today`);
     });
   }
 }
@@ -21079,7 +21083,7 @@ function attachSetLog(card) {
   let html = `<div class="ex-set-header"><div>SET</div><div><button type="button" class="ex-set-unit" aria-haspopup="menu" aria-expanded="false" aria-label="Weight unit. Tap to choose">kg</button></div>${repsCol ? '<div>REPS</div>' : ''}<div></div><div></div></div>`;
   log.forEach((s, i) => {
     const rpeBtns = [6,7,8,9,10].map(n =>
-      `<button class="rpe-btn${String(s.r) === String(n) ? ' selected' : ''}" data-rpe="${n}" type="button" aria-label="RPE ${n}">${n}</button>`
+      `<button class="rpe-btn${String(s.r) === String(n) ? ' selected' : ''}" data-rpe="${n}" type="button" aria-label="Effort ${n}">${n}</button>`
     ).join('');
     // A hold or a carry has no reps box: the row says its dose ("30 s / side") where the
     // box would be, shown only when there is no kg box either (paintKgCol()).
@@ -21092,7 +21096,7 @@ function attachSetLog(card) {
       ${repsBox}
       <button class="ex-set-rpetag" type="button" aria-label="Rate set ${i+1}"></button>
       <button class="ex-set-check" type="button" aria-label="Mark set ${i+1} done as written"></button>
-      <div class="ex-set-rpe"><button type="button" class="ex-set-rpe-q" onclick="event.stopPropagation(); openHelp('rpe')" aria-label="How hard? What RPE means">How hard?</button>${rpeBtns}</div>
+      <div class="ex-set-rpe"><button type="button" class="ex-set-rpe-q" onclick="event.stopPropagation(); openHelp('rpe')" aria-label="How hard? What effort means">How hard?</button>${rpeBtns}</div>
     </div>`;
   });
   wrap.innerHTML = html;
@@ -21146,7 +21150,7 @@ function attachSetLog(card) {
       wIn.setAttribute('aria-label', `Weight on set ${i + 1}${lastW ? ', last time ' + lastW : ''}`);
       row.querySelector('.ex-set-wbox').classList.toggle('show-last', !!lastW && !s.w);
       const tag = row.querySelector('.ex-set-rpetag');
-      tag.textContent = (s.d && s.r) ? 'RPE ' + s.r : (s.d ? 'RPE' : '');
+      tag.textContent = (s.d && s.r) ? 'Effort ' + s.r : (s.d ? 'Effort' : '');
       tag.classList.toggle('empty', !s.r);
       // Off target: clay when harder than prescribed, steel blue when easier. Against TODAY's target
       // (rpeTargetOf()): a lower day's, or this week's note's on every day of its week (Amir, 2026-10-12:
@@ -21154,7 +21158,7 @@ function attachSetLog(card) {
       const vs = s.r ? rpeVs(s.r, rpeTargetOf(card)) : '';
       tag.classList.toggle('over', vs === 'over');
       tag.classList.toggle('under', vs === 'under');
-      tag.setAttribute('aria-label', s.r ? `RPE ${s.r}${vs ? (vs === 'over' ? ', above' : ', below') + ' target' : ''}. Tap to change` : `Rate set ${i + 1}`);
+      tag.setAttribute('aria-label', s.r ? `Effort ${s.r}${vs ? (vs === 'over' ? ', above' : ', below') + ' target' : ''}. Tap to change` : `Rate set ${i + 1}`);
       row.querySelectorAll('.rpe-btn').forEach(b => {
         const on = String(s.r) === b.dataset.rpe;
         b.classList.toggle('selected', on);
@@ -22407,9 +22411,9 @@ function attachCircuitLog(card) {
       const div    = document.createElement('div');
       div.className = 'rpe-row';
       const label = rounds > 1 ? `R${round} · How hard?` : 'How hard?';
-      div.innerHTML = `<button type="button" class="rpe-label" onclick="event.stopPropagation(); openHelp('rpe')" aria-label="${rounds > 1 ? 'Round ' + round + ': how hard' : 'How hard'}? What RPE means">${label}</button>` +
+      div.innerHTML = `<button type="button" class="rpe-label" onclick="event.stopPropagation(); openHelp('rpe')" aria-label="${rounds > 1 ? 'Round ' + round + ': how hard' : 'How hard'}? What effort means">${label}</button>` +
         [6,7,8,9,10].map(n =>
-          `<button type="button" class="rpe-btn${saved === String(n) ? ' selected' : ''}" data-rpe="${n}" aria-label="RPE ${n}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
+          `<button type="button" class="rpe-btn${saved === String(n) ? ' selected' : ''}" data-rpe="${n}" aria-label="Effort ${n}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
         ).join('');
       div.addEventListener('click', e => e.stopPropagation());
       slot.appendChild(div);
@@ -23525,9 +23529,9 @@ function paintTimerLog(row, item) {
         <button type="button" class="tl-step" data-d="1" aria-label="One rep more">+</button>
       </div>` : ''}
       <div class="tl-line tl-rpe">
-        <span class="tl-lab">RPE</span>
+        <span class="tl-lab">Effort</span>
         ${[6,7,8,9,10].map(v => { const on = selRpe() === String(v), vs = on ? rpeVs(v, rpeTargetOf(item.card)) : '';
-          return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}" aria-label="RPE ${v}">${v}</button>`; }).join('')}
+          return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}" aria-label="Effort ${v}">${v}</button>`; }).join('')}
       </div>${lim}`;
     const kgBox = tl.querySelector('.tl-kg');
     const unitBtn = tl.querySelector('.tl-unit');
@@ -23583,7 +23587,7 @@ function paintRoundLog(row, item) {
     tl.innerHTML = `
       <div class="tl-head">Round ${item.setI + 1} of ${item.total} · how hard?</div>
       <div class="tl-line tl-rpe">
-        <span class="tl-lab">RPE</span>
+        <span class="tl-lab">Effort</span>
         ${[6,7,8,9,10].map(v => `<button type="button" class="tl-rpe-btn${sel && sel.textContent.trim() === String(v) ? ' selected' : ''}" data-rpe="${v}">${v}</button>`).join('')}
       </div>${lim}`;
     tl.querySelectorAll('.tl-rpe-btn').forEach(b => b.addEventListener('click', () => {
@@ -24033,7 +24037,7 @@ function openHistorySheet(card) {
     // The tag follows the level the day was TRAINED at (B19, 2026-10-24): the check-in's plan as filed with that session, lower or short and
     // not trained as written. Not the raw score: a lower day shows it, a sore day on a normal level and a day trained as written do not.
     const rd = h.ready, low = !!(rd && (rd.level === 'amber' || rd.level === 'red') && !rd.asWritten);
-    return `<div class="hs-row"><span class="hs-d">${esc(dl.when)}${rs ? ' · RPE ' + rs : ''}${low ? ' · low day' : ''}</span>
+    return `<div class="hs-row"><span class="hs-d">${esc(dl.when)}${rs ? ' · Effort ' + rs : ''}${low ? ' · low day' : ''}</span>
       <span class="hs-v">${esc(txt)}</span>
       ${e.note ? `<span class="hs-n">“<bdi>${esc(e.note)}</bdi>”</span>` : ''}</div>`;
   }).join('');
@@ -24042,7 +24046,7 @@ function openHistorySheet(card) {
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">Your history</div>
     <h2 class="readiness-title">${esc(name)}</h2>
-    <p class="readiness-sub">${histAll.length} time${histAll.length === 1 ? '' : 's'} logged${target ? ` · target RPE ${target}${today && today !== target ? ` · ${today} today` : ''}` : ''}. What you did, never what to lift: your coach sets the load.</p>
+    <p class="readiness-sub">${histAll.length} time${histAll.length === 1 ? '' : 's'} logged${target ? ` · target effort ${target}${today && today !== target ? ` · ${today} today` : ''}` : ''}. What you did, never what to lift: your coach sets the load.</p>
     ${chart}
     <div class="hs-list">${rows}</div>
     ${hasRecord ? `<div class="hs-actions"><button type="button" class="hrow hs-link" id="hs-rec">${hrowIc('records')}<span class="hrow-b"><span class="hrow-l">Open in Personal Records</span></span><span class="hrow-a" aria-hidden="true">›</span></button></div>` : ''}`;

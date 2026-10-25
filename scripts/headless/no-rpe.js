@@ -15,7 +15,7 @@ const H = require('./lib');
   await p.waitForTimeout(300);
   const a = await p.evaluate(() => { const b = document.querySelector('#confirm-1 .cf-norpe'); return { ready: document.getElementById('confirm-1').classList.contains('ready'), text: b ? b.textContent.replace(/\s+/g, ' ').trim() : null,
     n: noRpeCards('1').length, h: b ? Math.round(b.getBoundingClientRect().height) : 0 }; });
-  C.check('every set ticked by the ring: the ready card says "No RPE on N lifts. Add them ›", 44 px', a.ready && a.n >= 2 && a.text === `No RPE on ${a.n} lifts. Add them ›` && a.h >= 44, JSON.stringify(a));
+  C.check('every set ticked by the ring: the ready card says "No effort on N lifts. Add them ›", 44 px', a.ready && a.n >= 2 && a.text === `No effort on ${a.n} lifts. Add them ›` && a.h >= 44, JSON.stringify(a));
   await p.click('#confirm-1 .cf-norpe'); await p.waitForTimeout(600);
   const b = await p.evaluate(() => { const c = noRpeCards('1')[0]; return { open: !!c && !c.classList.contains('collapsed'), strip: !!(c && c.querySelector('.ex-set-row.rpe-open')) }; });
   C.check('tapping it opens the first such lift with its How hard? strip open', b.open && b.strip, JSON.stringify(b));

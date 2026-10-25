@@ -160,7 +160,7 @@ dashboard do not change.
 - **The lower-day banner** (section 10): a white row under the bar, full width, with a 4 px stripe in the colour that asks
   (clay for a lower or short day, steel blue for a sore one, none while training as written), its label in that colour,
   the sentence in ink and **Train as written** as the one text link (green condensed capitals and the chevron). Its words
-  are unchanged. The cards' pills (*RPE 7 → 6 today*, *2 of 4 sets today*) are section 7's clay pills.
+  are unchanged. The cards' pills (*Effort 7 → 6 today*, *2 of 4 sets today*) are section 7's clay pills.
 - **Library sessions** (`#ws-body`) get every card rule above through the same `renderExercise()`; a block title's
   hairline runs to the screen's edge like the rows'. Their own top and Done (`#ws-finish`) are unchanged.
 - **Dark mode** is the same page: the tokens flip (paper `#181818`, rows `#242424`, green text mint, clay text `#E06B43`),

@@ -3,13 +3,13 @@
 Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8rz). Opened, the card was
 1,306 px and the first set sat 953 px down; now about 700 px with the first set about 400 px down.
 **Closed** (`renderExercise()`):
-- **One line of numbers** (`renderNumLine()`, `.ex-numline`): `4 × 6 · RPE 7 · 3-1-1 · 2:30`, only what was
+- **One line of numbers** (`renderNumLine()`, `.ex-numline`): `4 × 6 · Effort 7/10 · 3-1-1 · 2:30`, only what was
   prescribed, the exercise's own rest only. It replaced the stats grid AND the grey number pills. The words
   *tempo* and *rest* (`.nl-lab`) show once the card is open. `numLineText()` reads it as text. Where it cannot
   fit (a narrow phone, an open card) a part starts the next line rather than running off the card (DS-03).
 - **A pill that says something stays a pill** (Amir: *"we need to find a way for them"*): the green `intent`
   pill and a legacy card's chips (`renderExSummary()`), and the check-in's pills. On a lower day `rdTarget()`
-  takes `RPE 7` out of the line and adds the clay **RPE 7 → 6 today** pill, so the number is said once;
+  takes `Effort 7/10` out of the line and adds the clay **Effort 7 → 6 today** pill, so the number is said once;
   `paintToday()`'s undo puts it back.
 - **The Coach's Note is a clay dot after the name** (`NOTE_DOT`, an empty span inside `.item-name`, so the
   name's text is unchanged); open, the note is cut to three lines with **More** (its chevron drawn by CSS since

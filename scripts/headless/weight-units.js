@@ -137,11 +137,11 @@ const pickUnit = async (p, u, btn = '#sq .ex-set-unit') => {
         meas: [setsMeasure([{ w: '', d: true }, { w: '45 lb', d: true }]), setsMeasure([{ w: '60', d: true }, { w: '45 lb', d: true }]), setsMeasure([])],
       };
     });
-    C.check('a win in pounds is worded in pounds (numbers as typed) and can be shared (the card says pounds)', m.lbWin && m.lbWin.txt === '+10 lb, same reps, same RPE' && m.lbWin.share === true, JSON.stringify(m.lbWin));
-    C.check('a win in kg is worded as ever and can be shared', m.kgWin && /^\+5 kg, same reps, same RPE$/.test(m.kgWin.txt) && m.kgWin.share === true, JSON.stringify(m.kgWin));
+    C.check('a win in pounds is worded in pounds (numbers as typed) and can be shared (the card says pounds)', m.lbWin && m.lbWin.txt === '+10 lb, same reps, same effort' && m.lbWin.share === true, JSON.stringify(m.lbWin));
+    C.check('a win in kg is worded as ever and can be shared', m.kgWin && /^\+5 kg, same reps, same effort$/.test(m.kgWin.txt) && m.kgWin.share === true, JSON.stringify(m.kgWin));
     C.check('kg against pounds is no win: two measures are never compared', m.mixWin === null, JSON.stringify(m.mixWin));
     C.check('plates are a measure of their own: 5 → 6 plates at the same reps is "+1 plate", more reps at the same plates is a reps win, no change is none',
-      m.plWin && m.plWin.txt === '+1 plate, same reps, same RPE' && m.plReps && /^\+2 reps at 5 plates/.test(m.plReps.txt) && m.plSame === null, JSON.stringify([m.plWin, m.plReps, m.plSame]));
+      m.plWin && m.plWin.txt === '+1 plate, same reps, same effort' && m.plReps && /^\+2 reps at 5 plates/.test(m.plReps.txt) && m.plSame === null, JSON.stringify([m.plWin, m.plReps, m.plSame]));
     C.check('a best set is estimated in its own measure, rounded to its own step (kg 2.5, lb 5, plates 0.5), and says which',
       m.lb && m.lb.est === 280 && m.lb.w === 225 && m.lb.u === 'lb' && m.kg && m.kg.est === 122.5 && m.kg.u === '' && m.pl && m.pl.est === 7.5 && m.pl.w === 6 && m.pl.u === 'plates' && m.none === null, JSON.stringify([m.lb, m.kg, m.pl, m.none]));
     C.check('a session\'s exercise is one measure: the first weighted set decides, a set typed in another is left out',
