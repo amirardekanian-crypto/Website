@@ -446,9 +446,9 @@ const t = H.checker();
       const msg = document.querySelector('.step-complete').innerText.replace(/\s+/g, ' ');
       stepFinish();
       const c = document.getElementById('confirm-1');
-      return { done: st.done, total: st.total, msg, ready: c.classList.contains('ready'), early: /finish early/i.test(c.innerText) };
+      return { done: st.done, total: st.total, msg, ready: c.classList.contains('ready'), early: /stop here/i.test(c.innerText) };
     });
-    t.check('every set and the warm-up done in Guided: the end says "Everything logged." and the finish card is ready (All done), not Finish early',
+    t.check('every set and the warm-up done in Guided: the end says "Everything logged." and the finish card is ready (All done), not Stop here',
       end.done === end.total && /Everything logged\./.test(end.msg) && end.ready && !end.early, JSON.stringify(end));
     t.check('no page errors in the whole-session run', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();

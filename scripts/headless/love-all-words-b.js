@@ -132,12 +132,65 @@ async function guided(browser) {
   }
 }
 
+// A part-done day: the clock running, one set ticked, the rest left. The day the athlete stops on.
+async function partDone(p) {
+  await p.evaluate(() => openDayView('1'));
+  await p.waitForTimeout(500);
+  await p.evaluate(() => { window.restAfterTick = () => {}; startTimerNow('1'); });
+  await p.waitForTimeout(300);
+  await p.evaluate(() => { document.querySelector('#day-view .ex-set-row .ex-set-check').click(); });
+  await p.waitForTimeout(400);
+}
+const body = p => p.evaluate(() => document.getElementById('day-view').innerText + ' ' + [...document.querySelectorAll('#day-view [aria-label]')].map(e => e.getAttribute('aria-label')).join(' '));
+
+async function finish(browser) {
+  for (const w of [390, 320]) {
+    const { ctx, p } = await open(browser, { w });
+    await partDone(p);
+    const card = await p.evaluate(() => document.querySelector('#confirm-1 .confirm-btn').textContent.trim());
+    t.check(`finish: the finish card's button says "Stop here" while sets are left (${w} px)`, card === 'Stop here', card);
+    t.check('finish: …and nowhere on the day does it say "Finish early"', !/finish early/i.test(await body(p)), '');
+    await p.click('#timer-1 .session-timer-more');
+    await p.waitForTimeout(250);
+    const b = await p.evaluate(() => { const e = document.querySelector('#timer-1 .session-timer-finish'); const r = e.getBoundingClientRect(); return { txt: e.textContent.trim(), l: Math.round(r.left), r: Math.round(r.right), fits: e.scrollWidth <= e.clientWidth + 1 }; });
+    t.check(`finish: under ⋯ the button says "Stop here" and fits (${w} px)`, b.txt === 'Stop here' && b.fits && b.l >= 0 && b.r <= w, JSON.stringify(b));
+    const lab = await p.getAttribute('#timer-1 .session-timer-more', 'aria-label');
+    t.check('finish: ⋯ names it in its label', /Stop here/.test(lab) && !/Finish early/.test(lab), lab);
+    await p.click('#timer-1 .session-timer-finish');
+    await p.waitForTimeout(200);
+    const armed = await p.evaluate(() => document.querySelector('#timer-1 .session-timer-finish').textContent.trim());
+    t.check('finish: the first tap asks "Stop here?"', armed === 'Stop here?', armed);
+    await noScroll(p, w, 'finish: armed');
+    await p.click('#timer-1 .session-timer-finish');
+    await p.waitForTimeout(900);
+    const head = await p.evaluate(() => document.querySelector('#confirm-1 .confirm-text').textContent.trim());
+    t.check('finish: the second tap lands on the card headed "Stopping Day 1 here"', head === 'Stopping Day 1 here', head);
+    t.check('finish: …and the card is early, so the session would file as a part-done one', await p.evaluate(() => document.getElementById('confirm-1').dataset.early === '1'));
+    await noScroll(p, w, 'finish: early card');
+    t.check(`finish: no page errors (${w})`, !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+  const { ctx, p } = await open(browser, { w: 390 });   // the card's own button, two taps
+  await partDone(p);
+  await p.click('#confirm-1 .confirm-btn');
+  await p.waitForTimeout(200);
+  const a = await p.evaluate(() => document.querySelector('#confirm-1 .confirm-btn').textContent.trim());
+  t.check('finish: the card\'s first tap says "Tap again to stop here"', a === 'Tap again to stop here', a);
+  await p.click('#confirm-1 .confirm-btn');
+  await p.waitForTimeout(700);
+  const head = await p.evaluate(() => document.querySelector('#confirm-1 .confirm-text').textContent.trim());
+  t.check('finish: …and the second lands on "Stopping Day 1 here"', head === 'Stopping Day 1 here', head);
+  t.check('finish: the how-the-app-works guide says Stop here, not Finish early', await p.evaluate(() => { const g = JSON.stringify(APP_GUIDE); return !/Finish early/.test(g) && /Stop here/.test(g); }), '');
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await blocks(browser);
   await qualities(browser);
   await isolation(browser);
   await guided(browser);
+  await finish(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

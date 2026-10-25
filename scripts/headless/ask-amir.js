@@ -3,7 +3,7 @@
 //
 // Mid-session the way to WhatsApp was ← Home, Coach, Open WhatsApp, with a message that named nothing. Under ⋯ on the slim bar one
 // row now opens WhatsApp with the day and the exercise that is open ("About Day 1, Barbell Back Squat: "), labelled with it. It is
-// hidden until ⋯ opens, never cuts the clock, keeps the 2 x 2 grid of Pause/Guided/Reset/Finish early, and fits 320 to 390 px.
+// hidden until ⋯ opens, never cuts the clock, keeps the 2 x 2 grid of Pause/Guided/Reset/Stop here, and fits 320 to 390 px.
 // Serve the repo first (python -m http.server 8775 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
 const H = require('./lib');

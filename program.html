@@ -10189,10 +10189,10 @@ function renderHome() {
         <button type="button" class="session-timer-btn" onclick="toggleSessionTimer('${day.id}')">Start ▶</button>
         ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')"><span class="stb-gl">Guided<span class="stb-g" aria-hidden="true"> ▶</span></span><small class="stb-sub">One set at a time</small></button>` : ''}
         <button type="button" class="session-timer-reset" hidden onclick="armedTap(this, 'Reset?', () => resetDay('${day.id}'))">Reset</button>
-        <button type="button" class="session-timer-finish" hidden onclick="armedTap(this, 'Finish early?', () => finishEarlyFromBar('${day.id}'))">Finish early</button>
+        <button type="button" class="session-timer-finish" hidden onclick="armedTap(this, 'Stop here?', () => finishEarlyFromBar('${day.id}'))">Stop here</button>
       </div>
       <a class="session-timer-ask" href="#" target="_blank" rel="noopener" onclick="this.href=askAmirUrl('${day.id}')">${WA_ICON}<span class="sta-txt">Ask Amir</span></a>
-      <button type="button" class="session-timer-more" aria-expanded="false" aria-label="More: Pause, ${hasStandard ? 'Guided, ' : ''}Reset, Finish early and Ask Amir" onclick="toggleBarMore('${day.id}')">⋯</button>
+      <button type="button" class="session-timer-more" aria-expanded="false" aria-label="More: Pause, ${hasStandard ? 'Guided, ' : ''}Reset, Stop here and Ask Amir" onclick="toggleBarMore('${day.id}')">⋯</button>
       <div class="stb-prog" role="progressbar" aria-label="Sets done in this session" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
       ${limits}
     </div>`;
@@ -10256,7 +10256,7 @@ function renderHome() {
       </div>
       <div class="finish-hint" aria-live="polite"></div>
       <div class="confirm-foot">
-        <button type="button" class="confirm-btn" onclick="finishTap('${day.id}', this)">Finish early</button>
+        <button type="button" class="confirm-btn" onclick="finishTap('${day.id}', this)">Stop here</button>
         <button type="button" class="confirm-back" hidden onclick="keepGoing('${day.id}')">Keep going</button>
       </div>
       <div class="finish-wa">${sessionWa}</div>
@@ -11478,11 +11478,11 @@ const APP_GUIDE = [
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Counting</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Stop here</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Counting</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
   { icon: 'activity', key: 'career', title: 'Career: your level',
     body: `<p>Your level is the number in the ring on Home's habit card. Tap the ring to open Your numbers. The weeks you've held in a row sit beside <strong>This Week</strong>. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>counting</strong> until my side has it.</p><p>Your four numbers are in <strong>Your numbers</strong> on Progress: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers; it says how many you have and which one you're closest to. Open it for the four groups — consistency, commitment, progress and resilience — and tap a group to see every achievement in it and what earns it. When a session leaves you one step short of one, its card tells you.</p><p>When I set you a job for the month, it sits right under this cycle's card, with a ring beside it. It is something to do, not a target for your training — I tick it off when you have done it. The <strong>Your moments</strong> row opens the lot, month by month: your marks, your achievements, the notes I write you and the month's honours. <strong>Amir saw this</strong> under one means I've seen it. A new note from me shows on Home until you open it. To answer it, tap <strong>Reply on WhatsApp</strong>.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks held in a row',
-    body: `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count beside <strong>This Week</strong> on Home goes up — the count next to it says what is left this week. Miss a week and it starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
+    body: `<p>A week is <strong>held</strong> when you finish every session in it. Stopping a session early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count beside <strong>This Week</strong> on Home goes up — the count next to it says what is left this week. Miss a week and it starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
     body: `<p>A win can become a card for your Instagram Story or a post, signed by me. You'll find <strong>Share</strong> where the win shows: on the finish card after a <strong>New best</strong> or a <strong>Retest beaten</strong>, under your wins on <strong>Progress</strong> (<strong>Share a win ›</strong>), on the cycle card once a cycle is complete (<strong>Share your cycle</strong>), and on a lift's page in <strong>Personal Records</strong>.</p><p>Pick <strong>Story</strong> or <strong>Post</strong>, and <strong>English</strong> or <strong>فارسی</strong>. Turn off <strong>Show the weights</strong> and the card shows only what you gained. Turn off <strong>Show my name</strong> and it leaves your name out. <strong>Share</strong> opens your phone's share sheet, and <strong>Save image</strong> keeps it for later. <strong>Copy caption</strong> copies a line to post with it.</p><p><strong>Use your own photo</strong> puts a picture from your phone behind the card. Drag it to move it and pinch to zoom, or use the <strong>Zoom</strong> slider. <strong>Remove the photo</strong> puts the card back as it was. The picture stays on your phone: only the finished card goes anywhere, and only when you tap Share or Save image.</p><p>Everything in <strong>Your moments</strong>, behind its row on Progress, has its own <strong>Share</strong> — every mark, every achievement and every honour, however long ago you earned it. <strong>Share your card</strong>, under your numbers, makes a card of where you are right now: your level, your four numbers and your best lifts. The month's goal gets one once it's done, a new level gets one on the finished session, your result in <strong>The Open</strong> gets one on Crew, and <strong>Share the session</strong> on the finished card makes one of the session itself.</p><p>The card is drawn on your phone. Nothing leaves it until you tap Share or Save image, and I never post anything for you. Mention <strong>@amirardekanian</strong> in your Story and I can share it too.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
@@ -12504,7 +12504,7 @@ function renderSystemGuide() {
                ['Every set logged, on top', pr.full_log], ['The readiness check, on top', pr.checkin_done],
                ['A retest', pr.retest_done], ['A session from the Library', pr.library_session],
                ['A week held', pr.week_held], ['Holding a week after a broken one', pr.bounce_back]])
-    + `<p>A week is <strong>held</strong> when you finish every session in it. Finishing early still counts. Library sessions do not.</p>`
+    + `<p>A week is <strong>held</strong> when you finish every session in it. Stopping a session early still counts. Library sessions do not.</p>`
     + `<p>The weeks between cycles never count against you.</p>`);
 
   // 5. the level
@@ -18846,7 +18846,7 @@ function refreshConfirmCard(day, status) {
   card.dataset.total = total;
 
   card.querySelector('.confirm-text').textContent =
-    isFull ? `All done with Day ${day}` : early ? `Finishing Day ${day} early` : 'In progress';
+    isFull ? `All done with Day ${day}` : early ? `Stopping Day ${day} here` : 'In progress';
   // The words count sets only (Love All B30): warm-up rows (.is-prep) are units in done/total, which decide Partial and pay, but are not sets.
   let pd = 0, pt = 0;
   document.querySelectorAll(`.is-prep[data-day="${day}"]`).forEach(c => {
@@ -18874,7 +18874,7 @@ function refreshConfirmCard(day, status) {
     if (nrEl.innerHTML !== h) nrEl.innerHTML = h;
   }
   const btn = card.querySelector('.confirm-btn');
-  if (btn.dataset.armed !== '1') btn.textContent = ready ? 'Done · send to coach ✓' : 'Finish early';
+  if (btn.dataset.armed !== '1') btn.textContent = ready ? 'Done · send to coach ✓' : 'Stop here';
   const back = card.querySelector('.confirm-back');
   if (back) back.hidden = !early;
   if (!ready) { const h = card.querySelector('.finish-hint'); if (h) h.textContent = ''; }
@@ -18933,7 +18933,7 @@ function finishTap(day, btn) {
   const card = document.getElementById('confirm-' + day);
   if (!card) return;
   if (card.classList.contains('ready')) { finishDay(day); return; }
-  armedTap(btn, 'Tap again to finish early', () => {
+  armedTap(btn, 'Tap again to stop here', () => {
     finishEarlyStep(day);
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });

@@ -5,7 +5,7 @@
 //      (.complete-wa), outside the fold. Both build the link at tap time, so the note typed in the box comes along.
 //   2. After Done the rating and the note fold behind one "Your rating" row (.rate-fold): closed every time the finished card is
 //      shown, a line that says what is saved, Send the update and the send status OUTSIDE the fold, a reset brings the panel back.
-//   3. Finish early joins Pause, Guided and Reset under ⋯ on the slim bar (.session-timer-finish): two taps (armedTap), the same
+//   3. Stop here joins Pause, Guided and Reset under ⋯ on the slim bar (.session-timer-finish): two taps (armedTap), the same
 //      early step as the finish card's own button (finishEarlyStep), ⋯ folds, the card lands under the bar. With four buttons the
 //      open row is a 2 x 2 grid, so a label that changes when it is armed never moves a neighbour between the two taps.
 // Fit: every word whole, every button 44 px to hit, no sideways scroll, at 320, 360, 375 and 390 px, light and dark, with and
@@ -28,7 +28,7 @@ function limitsProg() {
   P.cycles[1].weekNotes = { last: { text: 'One set fewer on every exercise and nothing above RPE 7.', rpeCap: 7, setsDrop: 1 } };
   return P;
 }
-// A day with no standard exercise has no Guided button: the open row then holds Pause, Reset and Finish early.
+// A day with no standard exercise has no Guided button: the open row then holds Pause, Reset and Stop here.
 function noGuidedProg() {
   const P = H.fixture();
   P.workouts.days[0].blocks = [{ icon: '🚣', title: 'Warm-Up', exercises: [
@@ -258,7 +258,7 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
       inConfirm: !!document.querySelector('#confirm-1 .finish-rate'), inSlot: !!document.querySelector('#complete-1 .complete-rate-slot .finish-rate'), doneStamp: localStorage.getItem(ATHLETE_ID + '_completed_d1'),
       completeShown: document.getElementById('complete-1').classList.contains('visible') }));
     t.check('Reset: the panel is back in the finish card, the fold is cleared, the day is not finished', r.inConfirm && !r.inSlot && !r.open && r.exp === 'false' && !r.doneStamp && !r.completeShown, JSON.stringify(r));
-    t.check('Reset: the Finish early under ⋯ is gone with the ticks (nothing is logged)', await p.evaluate(() => document.querySelector('#timer-1 .session-timer-finish').hidden));
+    t.check('Reset: the Stop here under ⋯ is gone with the ticks (nothing is logged)', await p.evaluate(() => document.querySelector('#timer-1 .session-timer-finish').hidden));
     await clock(p); await tickAll(p);
     await p.evaluate(() => document.getElementById('confirm-1').scrollIntoView({ block: 'center' })); await p.waitForTimeout(300);
     const k = await R(p, '#confirm-1 .finish-rate .complete-rpe-btn');
@@ -277,14 +277,14 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     await ctx.close();
   }
 
-  // ═══ 3. Finish early under ⋯ ═══════════════════════════════════════════════════════════════════════════════════════════
+  // ═══ 3. Stop here under ⋯ ═══════════════════════════════════════════════════════════════════════════════════════════
   {
     const { ctx, p } = await openDay(browser);
     const hidden = async () => (await p.evaluate(() => document.querySelector('#timer-1 .session-timer-finish').hidden));
-    t.check('before Start: Finish early is hidden', await hidden());
+    t.check('before Start: Stop here is hidden', await hidden());
     await tickOne(p);   // a set logged with the clock never started: the bar is not slim, so the button has no place on it
     const nb = await p.evaluate(() => { const b = document.querySelector('#timer-1 .session-timer-finish'); return { hidden: b.hidden, shown: b.getBoundingClientRect().height > 0, slim: document.getElementById('timer-1').classList.contains('slim') }; });
-    t.check('a set logged but the clock never started: the bar is not slim, Finish early is not drawn', !nb.slim && !nb.shown, JSON.stringify(nb));
+    t.check('a set logged but the clock never started: the bar is not slim, Stop here is not drawn', !nb.slim && !nb.shown, JSON.stringify(nb));
     await ctx.close();
   }
   {
@@ -293,18 +293,18 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     await clock(p);
     t.check('the clock running and nothing logged yet: hidden (the finish card is not on the page either)', await hidden());
     await tickOne(p);
-    t.check('mid-session (a set done, not all): Finish early is for the bar', !(await hidden()));
+    t.check('mid-session (a set done, not all): Stop here is for the bar', !(await hidden()));
     const closed = await R(p, '#timer-1 .session-timer-finish');
     t.check('…but it is only drawn on the open row (⋯ closed: not drawn)', !closed.shown, JSON.stringify(closed));
-    t.check('⋯ names what is under it', (await p.getAttribute('#timer-1 .session-timer-more', 'aria-label')) === 'More: Pause, Guided, Reset, Finish early and Ask Amir');   // Ask Amir under ⋯ since 2026-10-13
+    t.check('⋯ names what is under it', (await p.getAttribute('#timer-1 .session-timer-more', 'aria-label')) === 'More: Pause, Guided, Reset, Stop here and Ask Amir');   // Ask Amir under ⋯ since 2026-10-13
     await p.click('#timer-1 .session-timer-more'); await p.waitForTimeout(200);
     const f = await fit(p);
-    t.check('⋯ open: Pause, Guided, Reset and Finish early in a 2 x 2 grid, each 44 px to hit, nothing cut', f.count === 4 && f.actionRows === 2 && fitOk(f), JSON.stringify(f.rows.map(x => [x.n, x.text, x.h, Math.round(x.l), Math.round(x.t)])));
+    t.check('⋯ open: Pause, Guided, Reset and Stop here in a 2 x 2 grid, each 44 px to hit, nothing cut', f.count === 4 && f.actionRows === 2 && fitOk(f), JSON.stringify(f.rows.map(x => [x.n, x.text, x.h, Math.round(x.l), Math.round(x.t)])));
     // one tap arms and does nothing else
     await p.click('#timer-1 .session-timer-finish'); await p.waitForTimeout(150);
     let a = await p.evaluate(() => { const b = document.querySelector('#timer-1 .session-timer-finish'), c = document.getElementById('confirm-1'); return { txt: b.textContent, armed: b.classList.contains('armed'), early: c.dataset.early || '', partial: c.classList.contains('partial'),
       open: document.getElementById('timer-1').classList.contains('open'), done: localStorage.getItem(ATHLETE_ID + '_completed_d1') }; });
-    t.check('one tap arms it ("Finish early?") and does nothing else: ⋯ stays open, the card is not early, nothing finished', a.txt === 'Finish early?' && a.armed && !a.early && a.partial && a.open && !a.done, JSON.stringify(a));
+    t.check('one tap arms it ("Stop here?") and does nothing else: ⋯ stays open, the card is not early, nothing finished', a.txt === 'Stop here?' && a.armed && !a.early && a.partial && a.open && !a.done, JSON.stringify(a));
     const fa = await fit(p);
     t.check('armed: still a whole 2 x 2 grid, nothing cut, nothing moved to another row', fa.count === 4 && fa.actionRows === 2 && fitOk(fa) && JSON.stringify(fa.rows.map(x => [x.n, Math.round(x.l), Math.round(x.t)])) === JSON.stringify(f.rows.map(x => [x.n, Math.round(x.l), Math.round(x.t)])), JSON.stringify(fa.rows.map(x => [x.n, x.text, Math.round(x.l), Math.round(x.t)])));
     await p.screenshot({ path: require('path').join(shots, 'bar-more-armed-375.png') });
@@ -316,7 +316,7 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
         btnHidden: bar.querySelector('.session-timer-finish').hidden, text: c.querySelector('.confirm-text').textContent, missing: c.querySelectorAll('.confirm-missing li').length,
         cardTop: Math.round(cr.top), barBottom: Math.round(br.bottom), titleTop: Math.round(tx.top), vh: innerHeight, done: localStorage.getItem(ATHLETE_ID + '_completed_d1') };
     });
-    t.check('the second tap: the finish card is early (rating, what is not done, Done), nothing is finished yet', a.early === '1' && a.ready && /early/.test(a.cls) && /Finishing Day 1 early/.test(a.text) && a.missing > 0 && !a.done, JSON.stringify(a));
+    t.check('the second tap: the finish card is early (rating, what is not done, Done), nothing is finished yet', a.early === '1' && a.ready && /early/.test(a.cls) && /Stopping Day 1 here/.test(a.text) && a.missing > 0 && !a.done, JSON.stringify(a));
     t.check('…⋯ folds and the button goes', !a.open && a.exp === 'false' && a.btnHidden, JSON.stringify(a));
     t.check('…and the card is on screen right under the slim bar, its green band whole', a.cardTop >= a.barBottom - 1 && a.cardTop < a.vh - 100 && a.titleTop >= a.barBottom && a.titleTop < a.vh, JSON.stringify(a));
     await p.screenshot({ path: require('path').join(shots, 'bar-early-landed-375.png') });
@@ -324,8 +324,8 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     await done(p, 'early finish');
     const e = await p.evaluate(() => ({ done: !!localStorage.getItem(ATHLETE_ID + '_completed_d1'), partial: (buildSessionData('1') || {}).isPartial, btnHidden: document.querySelector('#timer-1 .session-timer-finish').hidden,
       fin: document.getElementById('timer-1').classList.contains('finished') }));
-    t.check('Done after the bar\'s Finish early finishes the day as a partial session; the bar is finished and has no Finish early', e.done && e.partial === true && e.btnHidden && e.fin, JSON.stringify(e));
-    t.check('no page errors (Finish early under ⋯)', p.errs.length === 0, p.errs.join(' | '));
+    t.check('Done after the bar\'s Stop here finishes the day as a partial session; the bar is finished and has no Stop here', e.done && e.partial === true && e.btnHidden && e.fin, JSON.stringify(e));
+    t.check('no page errors (Stop here under ⋯)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
   {   // The armed label goes by itself, and Keep going brings the bar's button back
@@ -333,37 +333,37 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     await clock(p); await tickOne(p);
     await p.click('#timer-1 .session-timer-more'); await p.click('#timer-1 .session-timer-finish'); await p.waitForTimeout(4400);
     const a = await p.evaluate(() => { const b = document.querySelector('#timer-1 .session-timer-finish'); return { txt: b.textContent, armed: b.classList.contains('armed') }; });
-    t.check('an armed Finish early disarms by itself after 4 s', a.txt === 'Finish early' && !a.armed, JSON.stringify(a));
+    t.check('an armed Stop here disarms by itself after 4 s', a.txt === 'Stop here' && !a.armed, JSON.stringify(a));
     await p.evaluate(() => finishEarlyFromBar('1')); await p.waitForTimeout(300);
     t.check('after the early step the bar\'s button is gone', await p.evaluate(() => document.querySelector('#timer-1 .session-timer-finish').hidden));
     await p.evaluate(() => keepGoing('1')); await p.waitForTimeout(200);
-    t.check('Keep going: the bar\'s Finish early is back', !(await p.evaluate(() => document.querySelector('#timer-1 .session-timer-finish').hidden)));
+    t.check('Keep going: the bar\'s Stop here is back', !(await p.evaluate(() => document.querySelector('#timer-1 .session-timer-finish').hidden)));
     await ctx.close();
   }
-  {   // The finish card's OWN Finish early still works (two taps), and shares the early step
+  {   // The finish card's OWN Stop here still works (two taps), and shares the early step
     const { ctx, p } = await openDay(browser);
     await clock(p); await tickOne(p);
     await p.evaluate(() => document.getElementById('confirm-1').scrollIntoView({ block: 'center' })); await p.waitForTimeout(300);
     await p.click('#confirm-1 .confirm-btn'); await p.waitForTimeout(150);
     let a = await p.evaluate(() => { const b = document.querySelector('#confirm-1 .confirm-btn'); return { txt: b.textContent, early: document.getElementById('confirm-1').dataset.early || '' }; });
-    t.check('the card\'s Finish early: one tap arms ("Tap again to finish early")', a.txt === 'Tap again to finish early' && !a.early, JSON.stringify(a));
+    t.check('the card\'s Stop here: one tap arms ("Tap again to stop here")', a.txt === 'Tap again to stop here' && !a.early, JSON.stringify(a));
     await p.click('#confirm-1 .confirm-btn'); await p.waitForTimeout(700);
     a = await p.evaluate(() => ({ early: document.getElementById('confirm-1').dataset.early, cls: document.getElementById('confirm-1').className, btn: document.querySelector('#confirm-1 .confirm-btn').textContent,
       barBtnHidden: document.querySelector('#timer-1 .session-timer-finish').hidden, shared: typeof finishEarlyStep === 'function' && finishTap.toString().includes('finishEarlyStep') && finishEarlyFromBar.toString().includes('finishEarlyStep') }));
     t.check('…the second tap makes the card early, with Done; the bar\'s button goes; both buttons call finishEarlyStep', a.early === '1' && /ready/.test(a.cls) && /early/.test(a.cls) && /Done/.test(a.btn) && a.barBtnHidden && a.shared, JSON.stringify(a));
     await ctx.close();
   }
-  {   // Every set done: the card asks for Done, so the bar has no Finish early; the coach preview never has it
+  {   // Every set done: the card asks for Done, so the bar has no Stop here; the coach preview never has it
     const { ctx, p } = await openDay(browser);
     await clock(p); await tickOne(p);
     await tickAll(p);
-    t.check('every set done: Finish early is hidden (the card asks for the rating and Done)', await p.evaluate(() => document.querySelector('#timer-1 .session-timer-finish').hidden));
+    t.check('every set done: Stop here is hidden (the card asks for the rating and Done)', await p.evaluate(() => document.querySelector('#timer-1 .session-timer-finish').hidden));
     t.check('…and the label stays accurate for the three that are left (Pause, Guided, Reset are still there)', (await p.evaluate(() => document.querySelectorAll('#timer-1 .session-timer-actions > button:not([hidden])').length)) === 3);
     await ctx.close();
     const o = await openDay(browser);
     await clock(o.p); await tickOne(o.p);
     const pv = await o.p.evaluate(() => { window.IS_PREVIEW = true; paintResetBtn('1'); const b = document.querySelector('#timer-1 .session-timer-finish'); return { hidden: b.hidden, reset: document.querySelector('#timer-1 .session-timer-reset').hidden }; });
-    t.check('the coach preview never shows Finish early (as Reset)', pv.hidden && pv.reset, JSON.stringify(pv));
+    t.check('the coach preview never shows Stop here (as Reset)', pv.hidden && pv.reset, JSON.stringify(pv));
     await o.ctx.close();
   }
   {   // A day with no Guided: three buttons, Pause on the first row on its own
@@ -371,10 +371,10 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     await clock(p);
     await p.evaluate(() => { const c = document.querySelector('#day1 .checklist-item'); if (c.classList.contains('collapsed')) toggleExpand(c); toggleCheckOnly(c, '1'); hideAaToast(); });
     await p.waitForTimeout(300);
-    t.check('no Guided on the day: the label does not name it', (await p.getAttribute('#timer-1 .session-timer-more', 'aria-label')) === 'More: Pause, Reset, Finish early and Ask Amir');
+    t.check('no Guided on the day: the label does not name it', (await p.getAttribute('#timer-1 .session-timer-more', 'aria-label')) === 'More: Pause, Reset, Stop here and Ask Amir');
     await p.click('#timer-1 .session-timer-more'); await p.waitForTimeout(200);
     const f = await fit(p);
-    t.check('no Guided: Pause on its own row, Reset and Finish early under it, all whole', f.count === 3 && f.actionRows === 2 && fitOk(f), JSON.stringify(f.rows.map(x => [x.n, x.text, x.h, Math.round(x.l), Math.round(x.t)])));
+    t.check('no Guided: Pause on its own row, Reset and Stop here under it, all whole', f.count === 3 && f.actionRows === 2 && fitOk(f), JSON.stringify(f.rows.map(x => [x.n, x.text, x.h, Math.round(x.l), Math.round(x.t)])));
     await ctx.close();
   }
 
@@ -390,7 +390,7 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     const same = JSON.stringify(idle.rows.map(x => [x.n, Math.round(x.l), Math.round(x.t)])) === JSON.stringify(armed.rows.map(x => [x.n, Math.round(x.l), Math.round(x.t)]));
     const gap = await p.evaluate(() => { const b = document.getElementById('timer-1'); return Math.round(b.querySelector('.session-timer-actions').getBoundingClientRect().top - b.querySelector('.session-timer-more').getBoundingClientRect().bottom); });
     const tag = `${w} px, ${dark ? 'dark' : 'light'}, ${lim ? 'with' : 'no'} limits row`;
-    t.check(`fit ${tag}: ⋯ open, clock ${idle.clock}, four buttons, Finish early? and Reset? armed`,
+    t.check(`fit ${tag}: ⋯ open, clock ${idle.clock}, four buttons, Stop here? and Reset? armed`,
       idle.count === 4 && fitOk(idle) && fitOk(armed) && armed.count === 4 && same && idle.actionRows === 2 && gap >= 4 && (!lim || idle.week) && p.errs.length === 0,
       JSON.stringify({ idle: fitOk(idle) ? 'ok' : idle, armed: fitOk(armed) ? 'ok' : armed, same, gap, week: idle.week, err: p.errs.join(' | ') }));
     if (!dark && !lim && (w === 320 || w === 375)) await p.screenshot({ path: require('path').join(shots, `bar-fit-${w}.png`) });
@@ -406,12 +406,12 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     t.check(`fit ${w} px, no Guided, both armed: three buttons whole`, f.count === 3 && fitOk(f), JSON.stringify(f.rows.map(x => [x.n, x.text, x.h, Math.round(x.l), Math.round(x.t)])));
     await ctx.close();
   }
-  for (const w of WIDTHS) for (const dark of [false, true]) {   // the three-button row (Finish early gone) is as it was: Pause, Guided, Reset whole
+  for (const w of WIDTHS) for (const dark of [false, true]) {   // the three-button row (Stop here gone) is as it was: Pause, Guided, Reset whole
     const { ctx, p } = await openDay(browser, { w, h: 700, dark });
     await clock(p, 3725000); await tickAll(p);
     await p.click('#timer-1 .session-timer-more'); await p.click('#timer-1 .session-timer-reset'); await p.waitForTimeout(150);
     const f = await fit(p);
-    t.check(`fit ${w} px, ${dark ? 'dark' : 'light'}: every set done, three buttons on one row, Reset? armed`, f.count === 3 && f.actionRows === 1 && fitOk(f), JSON.stringify(f.rows.map(x => [x.n, x.text, x.h, Math.round(x.l), Math.round(x.t)])));
+    t.check(`fit ${w} px, ${dark ? 'dark' : 'light'}: every set done, three buttons (Guided under Pause and Reset below 360 px, so its grey line fits), Reset? armed`, f.count === 3 && f.actionRows === (w < 360 ? 2 : 1) && fitOk(f), JSON.stringify(f.rows.map(x => [x.n, x.text, x.h, Math.round(x.l), Math.round(x.t)])));
     await ctx.close();
   }
 
@@ -466,13 +466,13 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     t.check('no page errors (Guided flow)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
-  {   // Guided with sets left over: its Finish Session lands on the card in progress, and the bar then offers Finish early under ⋯
+  {   // Guided with sets left over: its Finish Session lands on the card in progress, and the bar then offers Stop here under ⋯
     const { ctx, p } = await openDay(browser);
     await clock(p); await tickOne(p);
     await p.evaluate(() => { openGuided('1'); }); await p.waitForTimeout(400);
     await p.evaluate(() => { stepFinish(); }); await p.waitForTimeout(900);
     const r = await p.evaluate(() => ({ closed: !STEP, partial: document.getElementById('confirm-1').classList.contains('partial'), btnHidden: document.querySelector('#timer-1 .session-timer-finish').hidden }));
-    t.check('Guided closed with sets left: the card is in progress and the bar offers Finish early', r.closed && r.partial && !r.btnHidden, JSON.stringify(r));
+    t.check('Guided closed with sets left: the card is in progress and the bar offers Stop here', r.closed && r.partial && !r.btnHidden, JSON.stringify(r));
     await ctx.close();
   }
 
