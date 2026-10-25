@@ -1,6 +1,7 @@
 // Plain Words, Group C (Amir, 2026-10-25: "Go with your picks"): the words of Progress, the records page, the unit menu, Career and Crew.
 //   onerm      the records page never says "One-rep max" and explains its number in one plain line.
 //   plates     the unit menu's third row says what it counts: "Plates: how many plates on the stack".
+//   holdserve  Hold Serve keeps its name and wears "Weeks in a row you trained" (the weeks-held number, the help card's title).
 //   counts     the cover says "Cycle 2 of 3", under it "Week 2 of 5", the road says "5 weeks": one count per number.
 // Serve the repo first (python -m http.server <port> --bind 127.0.0.1; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js), then:
 //   node scripts/headless/love-all-words-c.js
@@ -90,11 +91,40 @@ async function plates(browser) {
   }
 }
 
+// ═════════ Career: the numbers on Progress ═════════
+async function openCareer(browser, w, h) {
+  const prof = C.rwProfile(10000);
+  const stub = { tables: { career_rules: C.RW_RULES, career_facts: [], career_catalog: [], career_catalogue: C.catRows() },
+    profile: prof, awards: C.rwShelf(prof), myMoments: C.myMomentsFx() };
+  return H.openProgram(browser, { w, h, tz: 'UTC', prog: H.fixture(), hist: [], stub, seed: { _hab_cfg: { onboarded: true, toured: true, installAsked: true, boardSwept: true, updatedAt: Date.now() } } });
+}
+const cells = p => p.evaluate(() => [...document.querySelectorAll('#career-card-wrap .cs-n')].map(n => ({ nm: n.querySelector('.cs-nm').innerText.replace(/\s+/g, ' ').trim(), ln: (n.querySelector('.cs-ln') || {}).innerText || null,
+  over: n.scrollWidth - n.clientWidth, bot: n.getBoundingClientRect().bottom - n.parentElement.getBoundingClientRect().bottom })));
+async function holdserve(browser) {
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    const { ctx, p } = await openCareer(browser, w, h);
+    await p.waitForTimeout(1200);
+    await p.evaluate("goTo('plan')");
+    await p.waitForTimeout(700);
+    const cs = await cells(p);
+    const wh = cs.find(c => /weeks? held/i.test(c.nm));
+    t.check(`holdserve ${w}px: the weeks-held number wears "Weeks in a row you trained"`, !!wh && wh.ln === 'Weeks in a row you trained', JSON.stringify(cs));
+    t.check(`holdserve ${w}px: the other numbers keep to their words (no line on sessions or bests)`, cs.filter(c => /sessions? with Amir|personal bests?/i.test(c.nm)).every(c => !/in a row/.test(c.ln || '')), JSON.stringify(cs));
+    t.check(`holdserve ${w}px: nothing overflows (the tile, the page)`, cs.every(c => c.over <= 0) && (await p.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0, JSON.stringify(cs));
+    const ttl = await p.evaluate(() => {
+      return buildAppGuideCards('hold').replace(/<[^>]+>/g, '|').replace(/\s+/g, ' '); });
+    t.check(`holdserve ${w}px: the help card is "Hold Serve: weeks in a row you trained"`, /Hold Serve: weeks in a row you trained/.test(ttl), ttl.slice(0, 200));
+    t.check(`holdserve ${w}px: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await counts(browser);
   await onerm(browser);
   await plates(browser);
+  await holdserve(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
