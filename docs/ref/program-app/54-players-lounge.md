@@ -155,9 +155,13 @@ or none. The crew sees what is on the card (there is no switch for it), which th
 | `plGamePick` / `plGameSave` / `plGameSet` / `plGameFlush` | one chip · one field (Instagram checked first) · shown at once · the one call at a time (latest wins, `_gameOk` is the card put back). |
 | `playerSportLine(p)` | the line under the name. |
 
-## Step 6 · Signatures as a Face Stack (idea 60, direction B)
+## Step 6 · Signatures as a Face Stack (idea 60, direction B) — RETIRED 2026-10-25
 
-**What.** An achievement row shows up to three small faces (24 px, 6 px over each other) of the crew members whose like is on that moment, and **+N** for the rest, with the date on the right; a tap opens
+**Retired.** Amir, 2026-10-25: *"when you click on someones profile, and you see their trophies, we dont need to see who cheered for their trophy"*. A trophy
+shows no faces and no *Cheered by*, a like says nothing of a name, and a tap on a trophy opens what it is (`openPlayerTrophy()`, `PROGRAM-APP.md` → *The
+cabinet*). The server still sends `signed` / `signed_n` on a page; nothing draws them. What follows is how it was.
+
+**What (as it was).** An achievement row shows up to three small faces (24 px, 6 px over each other) of the crew members whose like is on that moment, and **+N** for the rest, with the date on the right; a tap opens
 **Cheered by** with every name sent (each a door to that person; Amir is **Coach**; *and 3 more* when the server counted more than it sent). A row nobody signed has no stack and is not a button; *Tap an
 achievement to see every cheer.* sits under the list. The same rows are in the *All n* sheet, and a name list opened from there goes ‹ Back to it. The first time you like a Bell line that holds an
 achievement, after the server took it, one toast: *Your name stays on Sara's achievement while your like is on it.* (`<id>_signnote`, said once on this phone, never synced, nothing on a server without
@@ -167,9 +171,7 @@ stage96). Four Courts' rows are NOT changed (and since 2026-10-25 a page's Achie
 
 | function | job |
 |---|---|
-| `playerAchRow(a, key)` / `plSigners` / `plSignPerson` | the row, its stack, who is on it. |
-| `openPlayerSigners(key, aid)` / `plSignerGo(ck)` | **Cheered by** · a name opens that page. |
-| `crewSignNote(it)` | the one-time note, called by `crewLike()` after a like the server took. |
+| `plTrophyCell(t, key)` / `openPlayerTrophy(key, aid)` | a trophy, and what it is (since 2026-10-25; `plSigners`, `plSignPerson`, `openPlayerSigners`, `plSignerGo` and `crewSignNote` are gone). |
 
 **Tests.** `lounge.js` sections 16 to 19: the segments, held, the dots and +N, now, the week sheets (yours with names and minutes, theirs with neither, even if the server sent them), weeks before joining, 320 px;
 the rows for each sport, the chips, one call at a time, a refusal and no signal, Instagram checked, a field kept while a redraw waits, under 13, the badge never on a page; the stacks (2, 5 with +2, none,

@@ -416,15 +416,20 @@ async function player(browser, C, OUT) {
     all: (document.querySelector('#crewplayer-body .cab-all') || {}).textContent, ghosts: document.querySelectorAll('#crewplayer-body .cab-cell svg').length && [...document.querySelectorAll('#crewplayer-body .cab-cell svg')].filter(s => s.innerHTML.indexOf('var(--ghost') >= 0).length, side: document.documentElement.scrollWidth - innerWidth }));
   C.check('player: their level medal is on the corner of their face (the LV chip is gone)', g.medal && !g.chip && g.medalLab === 'Level 27', JSON.stringify([g.medal, g.chip, g.medalLab]));
   C.check('player: "Trophies · 15" (12 won and the 3 level medals they have reached), and All ›', g.secs.indexOf('Trophies · 15') >= 0 && g.all === 'All ›', JSON.stringify(g.secs));
-  C.check('player: their three newest, newest first: Night Owl, 75 Sessions, Flawless; each with the faces that cheered, then +N for the rest, a button only where someone cheered',
-    JSON.stringify(g.cells.map(c => c.l)) === JSON.stringify(['Night Owl', '75 sessions', 'Flawless']) && g.cells.every(c => c.btn && c.faces === 3) && g.cells[0].more === '+6' && g.cells[1].more === '+0' || (g.cells[1] && g.cells[1].faces === 1), JSON.stringify(g.cells));
+  // Amir, 2026-10-25: "we dont need to see who cheered for their trophy": no faces, no +N, every trophy a button to what it is
+  C.check('player: their three newest, newest first: Night Owl, 75 Sessions, Flawless; no faces of who cheered, each a button',
+    JSON.stringify(g.cells.map(c => c.l)) === JSON.stringify(['Night Owl', '75 sessions', 'Flawless']) && g.cells.every(c => c.btn && c.faces === 0 && !c.more), JSON.stringify(g.cells));
+  C.check('player: nothing on the page says who cheered a trophy', !(await p.evaluate(() => /every cheer|Cheered by/.test(document.getElementById('crewplayer-body').textContent))));
   C.check('player: only what they have won: every emblem is in colour, none is a ghost', g.ghosts === 0 && g.side <= 0, JSON.stringify([g.ghosts, g.side]));
   await p.screenshot({ path: path.join(OUT, 'player-top-390.png') }).catch(() => {});
   await p.evaluate(() => { const e = document.querySelector('#crewplayer-body .cab-trh'); window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 90); }); await p.waitForTimeout(250);
   await p.screenshot({ path: path.join(OUT, 'player-trophies-390.png') }).catch(() => {});
-  // a face stack opens "Cheered by"
+  // a trophy opens what it is: its emblem, its name, what it asks for, and who won it when (no Share, no Tell the crew: those are the winner's)
   await tap(p, '#crewplayer-body .cab-cell');
-  C.check('player: a trophy with cheers opens "Cheered by" with every name', (await sheetOpen(p)) && (await T(p, '#hist-overlay .readiness-title')) === 'Cheered by' && (await T(p, '#hist-overlay .readiness-eyebrow')) === 'Night Owl', await T(p, '#hist-overlay .readiness-title'));
+  const ts = await p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'); return { t: (m.querySelector('.readiness-title') || {}).textContent, em: !!m.querySelector('.cab-sh-em svg'),
+    rule: (m.querySelector('.cab-sh-p') || {}).textContent || '', meta: (m.querySelector('.cab-meta') || {}).textContent || '', btns: m.querySelectorAll('.cab-go, .cab-tell').length }; });
+  C.check('player: a trophy opens what it is: Night Owl, its emblem, its rule, "Won by Sam" and the day, and no Share or Tell the crew',
+    (await sheetOpen(p)) && ts.t === 'Night Owl' && ts.em && /after 9 at night/.test(ts.rule) && /^Won by Sam · \d+ [A-Z][a-z]{2}$/.test(ts.meta) && ts.btns === 0, JSON.stringify(ts));
   await p.evaluate(() => history.back()); await p.waitForTimeout(300);
   // All ›: the whole shelf, won only, grouped by the same sections, the level medals first
   await tap(p, '#crewplayer-body .cab-all');
@@ -457,13 +462,20 @@ async function player(browser, C, OUT) {
     C.check(`player: 320px${dark ? ' dark' : ''}: Trophies fit, no sideways scroll`, f.side <= 0 && f.right <= 320, JSON.stringify(f));
     await x.ctx.close();
   }
-  // the Bell: a line about an achievement or a mark carries its emblem
+  // the Bell (Amir, 2026-10-25: "every achievement that any one gets in crew should be clickable ... we dont need the medal of it on the crew screen"):
+  // no emblem on a line; the achievement or the mark in it is a button that opens what it is
   const bl = await mk();
   await bl.p.waitForFunction(() => !!document.querySelector('#global-tabs .nav-item[data-tab="crew"]'), null, { timeout: 8000 }).catch(() => {});
   await bl.p.evaluate(() => goTo('crew')); await bl.p.waitForTimeout(800);
-  const b = await bl.p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-line')].map(l => ({ t: l.querySelector('.cr-lw').textContent.replace(/\s+/g, ' ').trim().slice(0, 40), em: !!l.querySelector('.cr-emblem svg'), w: l.querySelector('.cr-emblem') ? Math.round(l.querySelector('.cr-emblem').getBoundingClientRect().width) : 0 })));
-  C.check('crew: a line about an achievement and one about a mark carry an emblem of about 40 px; a level line does not', b.length === 3 && b[0].em && b[1].em && !b[2].em && b[0].w === 40, JSON.stringify(b));
+  const b = await bl.p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-line')].map(l => ({ t: l.querySelector('.cr-lw').textContent.replace(/\s+/g, ' ').trim().slice(0, 40), svg: !!l.querySelector('svg.aae'), link: (l.querySelector('.cr-ach') || {}).textContent || '' })));
+  C.check('crew: no emblem on any line; the achievement and the mark are buttons, a level line has none', b.length === 3 && b.every(x => !x.svg) && !!b[0].link && !!b[1].link && !b[2].link, JSON.stringify(b));
   await bl.p.screenshot({ path: path.join(OUT, 'crew-line-390.png') }).catch(() => {});
+  for (const [i, want] of [[0, 'an achievement'], [1, 'a mark']]) {
+    await bl.p.evaluate(n => document.querySelectorAll('#crew-body .cr-line')[n].querySelector('.cr-ach').click(), i); await bl.p.waitForTimeout(300);
+    const s = await bl.p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'); return { open: document.getElementById('hist-overlay').classList.contains('visible'), em: !!m.querySelector('.cab-sh-em svg'), t: (m.querySelector('.readiness-title') || {}).textContent || '', meta: (m.querySelector('.cab-meta') || {}).textContent || '' }; });
+    C.check(`crew: tapping ${want} on a line opens what it is, with its emblem, name and who won it`, s.open && s.em && !!s.t && (/^Won by /.test(s.meta) || /^Won /.test(s.meta)), JSON.stringify(s));
+    await bl.p.evaluate(() => history.back()); await bl.p.waitForTimeout(300);
+  }
   // the emblem's sheet offers Tell the crew (one plain line, sent on the tap) while the athlete can post
   await bl.p.evaluate(() => goTo('achievements'));
   await bl.p.waitForFunction(() => !!document.querySelector('#ach-body .cab-grid'), null, { timeout: 8000 }).catch(() => {});
