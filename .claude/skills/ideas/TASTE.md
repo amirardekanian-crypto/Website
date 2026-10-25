@@ -5,6 +5,18 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-25 · Round 7 'Home Crowd': his picks.** *"if you want to do 76, you can make it smaller by moving in the crew next to the
+  other texts, but dont change other texts"*, *"77 is good / 78 is good / 79 A / 80 is good / 81 A / 82 good / 90A"*, *"cut 84"*,
+  *"85 amazing, add to coach html. make sure i have month honour as well"*, *"86 is good / add 87 as well. give me 3 diretions for
+  where it can go / add 88 like 85, put it in coach html. for these add some samples so i can see and may do / cut 89"*, and *"is 83
+  different than 90? can we have both?"*. What it teaches: (1) he trims a layout pitch to its smallest move himself and protects the
+  words already on screen, so pitch the smallest change to a screen first and never rewrite its texts unasked; (2) on community he
+  moves faster than my "wait for the numbers" advice when an idea delights him (85, 86, 87 were marked "after 8 Nov" and he took
+  them now); (3) anything he runs himself goes into coach.html, and he wants SAMPLES to judge it by (the same instinct as judging
+  an idea by its output on a real athlete, 2026-09-24); (4) when a pitch drops something, he checks what it carried (cutting 84
+  must not lose the month's honours); (5) he gave no reason for cutting 84 Match Report or 89 Walk-Out Song. "82 good" is his yes
+  to a fourth notification ask (push.md's three moments become four).
+
 - **2026-10-25 · Round 7 'Home Crowd': he asked for one place.** Straight after the page, before any pick: *"how about like a
   notification center? or an inbox? how people can find things quicker or in one place?"*. It grew 83 For You (a Crew-only strip)
   into #90 The Pigeonhole, one Inbox for the whole app. What it teaches: he thinks in "one place" across the app, not per tab, and

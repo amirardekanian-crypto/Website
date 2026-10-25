@@ -242,6 +242,17 @@ IDEAS = [
   coach="Every join becomes the crew's first conversation with that person, with no time from you.",
   mvp="The NEW mark and the line on the page.",
   adv="A Courtside line on day 3 if nobody has cheered a new member yet."),
+ dict(n=91, name="The Answer Book", sub="Every Mailbag answer kept in the Library, under Asked by the crew", layer="Grown along the way", grown="88",
+  grown_url="https://claude.ai/artifact/Ap56d6pvqEfExFYsFN7P1T",
+  stages=["Education","Communication"], needs=[], cost="None extra. The answer is already written for the Mailbag.",
+  chain=["A crew question","Amir's answer, pinned","Library: Asked by the crew","Chatbot facts, with his yes"],
+  what="Each Mailbag answer, after its day pinned and its week on the Bell, is kept on its own Library shelf: the question, Amir's answer, and the plan rule behind it in plain words. Grew out of round 7's #88 Mailbag, in the Home Crowd plan.",
+  problem="A Mailbag answer lives a day pinned and 7 days on the Bell, then it is gone, and the next athlete with the same question asks again.",
+  how="The coach's answer function also writes the pair to a Library shelf. The Inbox row \"Amir answered your question\" opens it. Kept out of the Playbook, so the blog and Playbook parity rules are not touched.",
+  athlete="The crew's questions become a growing answer book in their own coach's words.",
+  coach="Each answer is written once and keeps working, and with your yes it teaches the website chatbot too (/chat-facts).",
+  mvp="The shelf, filled by the answer post.",
+  adv="Search across it."),
 ]
 
 STAGES = ["Assessment","Decision making","Exercise selection","Programming","Execution","Feedback",
