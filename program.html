@@ -21226,6 +21226,7 @@ function attachSetLog(card) {
       const digits = normDigits(e.target.value).replace(/\D/g, '').slice(0, 3);
       if (digits !== e.target.value) e.target.value = digits;
       edit(s => { s.n = (digits && parseInt(digits, 10) !== planned) ? digits : ''; });
+      if (planned && digits && parseInt(digits, 10) > planned) orangeNote();   // more reps than asked shows orange: said once
     });
     // Typing the prescribed number back in means "as prescribed": show it that way.
     if (repsIn) repsIn.addEventListener('blur', e => {
@@ -21243,6 +21244,7 @@ function attachSetLog(card) {
         paintHints(card.dataset.day);
         if (!was) foldWhenDone(card, open);
         if (navigator.vibrate) navigator.vibrate(8);
+        if (!was && rpeVs(b.dataset.rpe, rpeTargetOf(card)) === 'over') orangeNote();   // an effort above the target shows orange: said once
       });
     });
     // The RPE tag on a done row reopens (or closes) its strip.
@@ -23130,6 +23132,16 @@ document.addEventListener('pointerdown', e => {
   if (!el || el.hidden || el.getAttribute('data-tone') === 'clay' || el.contains(e.target)) return;
   hideAaToast();
 }, true);
+// The first time an effort or a rep count shows orange for this athlete, one plain note says what orange means (Plain Words, Amir 2026-10-25).
+// No button but Got it, so it fades. Told once per athlete on this phone: the key carries the athlete's id.
+function orangeNote() {
+  try {
+    const k = ATHLETE_ID + '_orange_told';
+    if (localStorage.getItem(k)) return;
+    localStorage.setItem(k, '1');
+  } catch (e) { return; }
+  aaToast("Orange means above my target. That's fine. I see it.");
+}
 function hideAaToast() {
   clearTimeout(_toastT); _toastT = null; _toastRun = null; _toastOff = null;
   const el = document.getElementById('aaToast');

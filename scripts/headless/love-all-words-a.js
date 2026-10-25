@@ -119,6 +119,7 @@ async function rpe(browser) {
 async function tagWidth(browser) {
   for (const w of [320, 360, 390]) {
     const { ctx, p } = await H.openProgram(browser, { w, h: 800 });
+    await p.evaluate(() => document.fonts.ready);   // the tag's width is measured in the real face, not the fallback
     await p.evaluate("openDayView('1')");
     await p.waitForTimeout(300);
     await openCard(p, 'Barbell Back Squat');
@@ -127,6 +128,7 @@ async function tagWidth(browser) {
     await p.waitForTimeout(250);
     await p.click('#day-view .checklist-item:not(.collapsed) .ex-set-row[data-set-idx="0"] .rpe-btn[data-rpe="10"]');
     await p.waitForTimeout(350);
+    await p.evaluate(() => document.fonts.ready);
     const m = await p.evaluate(() => {
       const row = document.querySelector('#day-view .checklist-item:not(.collapsed) .ex-set-row[data-set-idx="0"]');
       const g = row.querySelector('.ex-set-rpetag').getBoundingClientRect(), tick = row.querySelector('.ex-set-check').getBoundingClientRect(), reps = row.querySelector('.ex-set-reps').getBoundingClientRect();
@@ -252,6 +254,48 @@ async function last(browser) {
 }
 
 
+// ═════════ orange ═════════
+async function orange(browser) {
+  const toast = p => p.evaluate(() => { const e = document.getElementById('aaToast'); return e && !e.hidden ? e.innerText.replace(/\s+/g, ' ').trim() : ''; });
+  const NOTE = "Orange means above my target. That's fine. I see it.";
+  const run = async (what, act, want) => {
+    const { ctx, p } = await H.openProgram(browser, {});
+    await p.evaluate("openDayView('1')");
+    await p.waitForTimeout(400);
+    await openCard(p, 'Barbell Back Squat');
+    await p.waitForTimeout(600);
+    await p.evaluate(() => hideAaToast());
+    await act(p);
+    await p.waitForTimeout(350);
+    const first = await toast(p);
+    const key = await p.evaluate(() => Object.keys(localStorage).filter(k => /orange_told$/.test(k)));
+    t.check(`orange: ${what}`, want ? first.includes(NOTE) && key.length === 1 && key[0] === H.ID + '_orange_told' : !first.includes(NOTE) && key.length === 0, first + ' | ' + key.join());
+    return { ctx, p };
+  };
+  const set0 = '#day-view .checklist-item:not(.collapsed) .ex-set-row[data-set-idx="0"]';
+  const tickThen = n => async p => { await p.click(set0 + ' .ex-set-check'); await p.waitForTimeout(250); await p.click(set0 + ` .rpe-btn[data-rpe="${n}"]`); };
+  // an effort above the target (7) shows orange: the note, once
+  let o = await run('the first effort above the target (9 on a 7) says what orange means, and the key is the athlete\'s', tickThen(9), true);
+  await o.p.evaluate(() => hideAaToast());
+  await o.p.click(set0 + ' .ex-set-rpetag');            // reopen the strip
+  await o.p.waitForTimeout(250);
+  await o.p.click(set0 + ' .rpe-btn[data-rpe="10"]');   // another orange one
+  await o.p.waitForTimeout(350);
+  t.check('orange: the second orange effort says nothing', !(await toast(o.p)).includes(NOTE), await toast(o.p));
+  t.check('orange: no page errors', o.p.errs.length === 0, o.p.errs.join(' | '));
+  await o.ctx.close();
+  o = await run('an effort on the target (7) says nothing', tickThen(7), false); await o.ctx.close();
+  o = await run('an effort under the target (6) says nothing', tickThen(6), false); await o.ctx.close();
+  // more reps than asked (8 on a 6) shows orange too
+  o = await run('more reps than asked (8 on a 6) says it', async p => { await p.fill(set0 + ' .ex-set-reps', '8'); }, true);
+  await o.p.evaluate(() => hideAaToast());
+  await o.p.fill(set0 + ' .ex-set-reps', '9');
+  await o.p.waitForTimeout(300);
+  t.check('orange: and once only', !(await toast(o.p)).includes(NOTE), await toast(o.p));
+  await o.ctx.close();
+  o = await run('fewer reps than asked (4 on a 6) says nothing', async p => { await p.fill(set0 + ' .ex-set-reps', '4'); }, false); await o.ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await rpe(browser);
@@ -260,6 +304,7 @@ async function last(browser) {
   await tempo(browser);
   await rest(browser);
   await last(browser);
+  await orange(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

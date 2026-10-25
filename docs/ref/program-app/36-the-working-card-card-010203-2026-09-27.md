@@ -12,6 +12,9 @@ Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8r
   pill and a legacy card's chips (`renderExSummary()`), and the check-in's pills. On a lower day `rdTarget()`
   takes `Effort 7/10` out of the line and adds the clay **Effort 7 → 6 today** pill, so the number is said once;
   `paintToday()`'s undo puts it back.
+- **What orange means, said once** (Plain Words, 2026-10-25): the first time an effort above the target, or more reps than asked,
+  shows orange for an athlete, `orangeNote()` says *Orange means above my target. That's fine. I see it.* (a note that fades; the
+  key `<id>_orange_told` keeps it from coming back).
 - **The Coach's Note is a clay dot after the name** (`NOTE_DOT`, an empty span inside `.item-name`, so the
   name's text is unchanged); open, the note is cut to three lines with **More** (its chevron drawn by CSS since
   Centre Court; `fitNotes()` measures it when the card opens: `toggleExpand()`, Guided's `renderStep()`).
