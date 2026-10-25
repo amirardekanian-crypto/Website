@@ -39,12 +39,16 @@ ERRORS (exit 1)
       paid from its own value (xp_from = "value": the level kept at the XP switch) has meaning "carried" and
       career_only = true, so a stored number never reaches a season's points; "carried" is for such a fact only
   17  best_run badges (phase 3): run is plan_weeks (counts week_held), days (counts habit_done, with a habit) or iso_weeks
-  18  achievements (phase 3): test is one of fourteen, with exactly that test's own keys (goals, habits, run, at, groups, bests,
-      retests, away_weeks, weeks, proof_measure + proof_need); total (at) reads a rulebook fact, best_run (at) and month_held (weeks)
-      read week_held (stage79)
+  18  achievements (phase 3): test is one of seventeen, with exactly that test's own keys (goals, habits, run, at, groups, bests,
+      retests, away_weeks, weeks, proof_measure + proof_need); total (at) reads a rulebook fact (stage99: or a list of them),
+      best_run (at) and month_held (weeks) read week_held (stage79); on_dates (windows of month-days, none overlapping),
+      slam_year (of: two or more on_dates entries whose windows do not overlap) and clock (exactly one of finish_before,
+      finish_from, as "HH:MM") read session_finished (stage99)
   19  a title's size only on the Grand Slam (meaning "all"), one of the sizes; recognition.toml [moments] has its keys
   21  tiers are APPEND-ONLY once career/tiers.lock.json exists: an entry in the lock keeps its first tiers' metals and is never
       removed (a tier's place in the list is its award's id)
+  22  D21 (stage99): paid_from is a real day; added_in is a version that exists; an achievement added in the version being checked
+      says paid_from, and not before the rulebook's starts_on; repeats is a rulebook fact
 WARNINGS (exit 0)
    6  a title with origin "new" that nothing awards (unless it is a template, or its meaning is "all": the engine
       mints the Grand Slam)
@@ -93,13 +97,18 @@ DOORS = ["coach", "cycle", "athlete"]
 ORIGINS = ["new", "proof"]
 RUNS = ["plan_weeks", "days", "iso_weeks"]    # rule 17: what a best_run badge's "run" is
 ACHIEVEMENT_TESTS = ["first", "proof", "goals", "cycle_all_held", "cycle_by_the_book", "cycle_with_broken", "runs_together",
-                      "best_value", "patterns_in_cycle", "cycle_proving", "run_regained", "total", "best_run", "month_held"]
+                      "best_value", "patterns_in_cycle", "cycle_proving", "run_regained", "total", "best_run", "month_held",
+                      "on_dates", "slam_year", "clock"]
 # Rule 18: the keys each test carries, and no others (a stray one is an error).
 TEST_PARAMS = {"first": set(), "proof": {"proof_measure", "proof_need"}, "goals": {"goals"}, "cycle_all_held": set(),
                "cycle_by_the_book": set(), "cycle_with_broken": set(), "runs_together": {"habits", "run"},
                "best_value": {"at"}, "patterns_in_cycle": {"groups"}, "cycle_proving": {"bests", "retests"},
-               "run_regained": {"away_weeks"}, "total": {"at"}, "best_run": {"at"}, "month_held": {"weeks"}}
-PARAM_KEYS = set().union(*TEST_PARAMS.values())
+               "run_regained": {"away_weeks"}, "total": {"at"}, "best_run": {"at"}, "month_held": {"weeks"},
+               "on_dates": {"windows"}, "slam_year": {"of"}, "clock": set()}
+# stage99: a test that takes ONE of several keys (clock: finish_before or finish_from, exactly one)
+TEST_ONE_OF = {"clock": {"finish_before", "finish_from"}}
+FACT_TESTS = ["on_dates", "slam_year", "clock"]   # stage99: these three read the finished-session fact (reads = "session_finished")
+PARAM_KEYS = set().union(*TEST_PARAMS.values(), *TEST_ONE_OF.values())
 GOAL_KINDS = ["daysHit:<habit>", "total:<habit>", "qualify", "perfect", "comebacksStuck", "comebackRun"]
 MOMENT_KEYS = ["per_open", "keep_days", "max", "full_screen"]
 NO_TWIN_OK = {"habit_custom", "comebacks"}   # rule 20: a starts_at entry with no Proof twin to retire (comebacks: its twin, hard_to_kill, left with the cut, stage78)
@@ -143,7 +152,8 @@ KNOWN_KEYS = {
     "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},
     "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code",
                     "retire_at", "starts_at", "superseded_by", "test", "goals", "habits", "run", "at", "groups", "bests",
-                    "retests", "away_weeks", "weeks", "proof_measure", "proof_need", "patterns", "qualities", "exclude"},
+                    "retests", "away_weeks", "weeks", "proof_measure", "proof_need", "patterns", "qualities", "exclude",
+                    "windows", "of", "finish_before", "finish_from", "added_in", "paid_from", "repeats"},   # stage99
     "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id", "retire_at", "superseded_by", "size"},
     "skin": {"name", "from", "origin", "proof_id"},
     "mission": {"name", "slot", "meaning", "asks", "counts", "habit", "measure", "target", "picked_when", "free",
@@ -206,6 +216,8 @@ class World:
         habits = rb.get("habits") if rb is not None else None
         weights = habits.get("weights") if isinstance(habits, dict) else None
         self.weights = list(weights) if isinstance(weights, dict) else None
+        self.version = rb.get("version") if rb is not None else None          # stage99: rule 22 asks paid_from of what this version added
+        self.starts_on = rb.get("starts_on") if rb is not None else None
         self.titles = ids_of(tl, "title") if tl is not None else None
         self.badge_ids = ids_of(data["badges"], "badge") if data["badges"] is not None else None
         self.title_entries = {}
@@ -782,8 +794,126 @@ def check_goals(c, goals, w):
                 gc.warn(f"unknown key {key!r} (a typo? it is ignored)")
 
 
+def month_day(v):
+    """(month, day) of "MM-DD" when it is a real day of a leap year (so 02-29 stands), else None. A window is month-days, every year."""
+    m = re.fullmatch(r"(\d{2})-(\d{2})", v) if isinstance(v, str) else None
+    if not m:
+        return None
+    try:
+        datetime.date(2024, int(m.group(1)), int(m.group(2)))
+    except ValueError:
+        return None
+    return (int(m.group(1)), int(m.group(2)))
+
+
+def clock_time(v):
+    """(hour, minute) of "HH:MM" on a 24-hour clock, else None."""
+    m = re.fullmatch(r"([01]\d|2[0-3]):([0-5]\d)", v) if isinstance(v, str) else None
+    return (int(m.group(1)), int(m.group(2))) if m else None
+
+
+def window_list(windows):
+    """[(from, to), ...] of month-days from a `windows` value, or None when it is not a valid list (check_windows says why)."""
+    if not (isinstance(windows, list) and windows):
+        return None
+    out = []
+    for win in windows:
+        if not (isinstance(win, dict) and set(win) == {"from", "to"}):
+            return None
+        a, b = month_day(win["from"]), month_day(win["to"])
+        if a is None or b is None or a > b:
+            return None
+        out.append((a, b))
+    return out
+
+
+def check_windows(c, windows):
+    """Rule 18, test on_dates: windows = [{ from = "MM-DD", to = "MM-DD" }, ...], inclusive, every year, none running over New Year, none
+    overlapping another (a session in two windows would count twice)."""
+    if not (isinstance(windows, list) and windows):
+        c.error('test "on_dates" needs windows = a non-empty list of { from = "MM-DD", to = "MM-DD" } tables (rule 18)')
+        return
+    for i, win in enumerate(windows, 1):
+        wc = c.sub(f"window {i}: ")
+        if not (isinstance(win, dict) and set(win) == {"from", "to"}):
+            wc.error('must be a table with exactly from and to, such as { from = "01-12", to = "02-01" }')
+            continue
+        a, b = month_day(win["from"]), month_day(win["to"])
+        for key, v in (("from", a), ("to", b)):
+            if v is None:
+                wc.error(f'{key} must be a real day written "MM-DD", found {win[key]!r}')
+        if a is not None and b is not None and a > b:
+            wc.error(f"from {win['from']} is after to {win['to']}: a window cannot run over New Year (split it in two entries)")
+    ok = window_list(windows)
+    if ok:
+        ordered = sorted(ok)
+        for (a1, b1), (a2, b2) in zip(ordered, ordered[1:]):
+            if a2 <= b1:
+                c.error("two windows of one entry overlap")
+                break
+
+
+def check_slam_of(c, of, w):
+    """Rule 18, test slam_year: `of` names at least two on_dates achievements (each once); their windows together must not overlap, so
+    a session counts for one window only."""
+    ents = getattr(w, "ach_entries", {}) or {}
+    if not (isinstance(of, list) and len(of) >= 2 and all(is_text(x) for x in of)):
+        c.error('test "slam_year" needs of = a list of two or more ids of on_dates achievements (rule 18)')
+        return
+    if len(set(of)) != len(of):
+        c.error("of names one achievement twice (rule 18)")
+    wins = []
+    for ident in dict.fromkeys(of):
+        e = ents.get(ident)
+        if e is None:
+            c.error(f'of names {ident!r}, which is not an achievement in achievements.toml (rule 18)')
+        elif e.get("test") != "on_dates":
+            c.error(f'of names {ident!r}, which is not an on_dates achievement (rule 18)')
+        else:
+            wins.extend(window_list(e.get("windows")) or [])
+    ordered = sorted(wins)
+    for (a1, b1), (a2, b2) in zip(ordered, ordered[1:]):
+        if a2 <= b1:
+            c.error("the windows of the achievements in of overlap: a session in both would count for two (rule 18)")
+            break
+
+
+def real_day(v):
+    """A "YYYY-MM-DD" that is a real day, as a date; else None."""
+    if not (isinstance(v, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", v)):
+        return None
+    try:
+        return datetime.date.fromisoformat(v)
+    except ValueError:
+        return None
+
+
+def check_d21(c, a, w):
+    """Rule 22 (D21, stage99). `paid_from` is the day an achievement started paying: a win done before it is won at 0 XP. `added_in` is the
+    rulebook version that brought the entry. An entry added in the version being checked MUST say paid_from, and not before the version's
+    starts_on (the seed would otherwise pay the back-fill). `repeats` is a rulebook fact whose count get_achievements() shows (\"Won 11 times\")."""
+    version = w.version if is_int(w.version) else None
+    if "added_in" in a:
+        n = get_number(c, a, "added_in", ge=1, integer=True)
+        if n is not None and version is not None and n > version:
+            c.error(f"added_in = {n} is a version that does not exist yet (the rulebook is at version {version}) (rule 22)")
+    if "paid_from" in a and real_day(a["paid_from"]) is None:
+        c.error(f'paid_from must be a real day, "YYYY-MM-DD" (the day this achievement started to pay), found {a["paid_from"]!r} (rule 22)')
+    if "repeats" in a:
+        if not is_text(a["repeats"]):
+            c.error(f"repeats must be a fact id, found {a['repeats']!r} (rule 22)")
+        elif w.facts is not None and a["repeats"] not in w.facts:
+            c.error(f"repeats {a['repeats']!r} is not a fact in rulebook.toml (rule 22)")
+    if is_int(a.get("added_in")) and version is not None and a["added_in"] == version:
+        pf, so = real_day(a.get("paid_from")), real_day(w.starts_on)
+        if "paid_from" not in a:
+            c.error("paid_from is missing: an achievement added in this version pays only for wins from the day it is seeded (D21, rule 22)")
+        elif pf is not None and so is not None and pf < so:
+            c.error(f"paid_from {a['paid_from']} is before the rulebook's starts_on {w.starts_on}: the seed's back-fill would pay it (D21, rule 22)")
+
+
 def check_test(c, a, w):
-    """Rule 18. Every achievement says how the server decides it: test is one of fourteen, and it carries exactly that test's
+    """Rule 18. Every achievement says how the server decides it: test is one of seventeen, and it carries exactly that test's
     keys (the params of another test, or a missing one, is an error)."""
     test = a.get("test")
     if test not in ACHIEVEMENT_TESTS:
@@ -791,23 +921,29 @@ def check_test(c, a, w):
                 else f"test is missing: one of {', '.join(ACHIEVEMENT_TESTS)} (rule 18)")
         return
     want = TEST_PARAMS[test]
+    one_of = TEST_ONE_OF.get(test, set())
     for key in sorted(want - set(a)):
         c.error(f'test "{test}" needs {key} (rule 18)')
-    for key in sorted((PARAM_KEYS & set(a)) - want):
+    for key in sorted((PARAM_KEYS & set(a)) - want - one_of):
         c.error(f'{key} belongs to another test, not to test "{test}" (rule 18)')
+    if one_of and len(one_of & set(a)) != 1:   # stage99: clock takes exactly one of its two times
+        c.error(f'test "{test}" needs exactly one of {", ".join(sorted(one_of))} (rule 18)')
     reads = a.get("reads")
-    if test == "first" and (reads == "proof" or (w.facts is not None and reads not in w.facts)):
+    if test == "first" and (reads == "proof" or (w.facts is not None and not (isinstance(reads, str) and reads in w.facts))):
         c.error('test "first" reads a fact from rulebook.toml (reads is the fact whose first one counts) (rule 18)')
     if test == "proof" and reads != "proof":
         c.error('test "proof" needs reads = "proof" (rule 18)')
     if test == "best_value" and reads != "lift_gain":
         c.error('test "best_value" reads the fact lift_gain (rule 18)')
     # stage79: total counts a fact as a badge of kind total counts it (career_measures()' count:<kind>); best_run and month_held walk
-    # the training weeks, so they read week_held and nothing else.
-    if test == "total" and (reads == "proof" or (w.facts is not None and reads not in w.facts)):
+    # the training weeks, so they read week_held and nothing else. stage99: total may read a LIST of facts (counted together, as
+    # Century counts a finished and an early session); check_achievements() has checked the list itself.
+    if test == "total" and not isinstance(reads, list) and (reads == "proof" or (w.facts is not None and not (isinstance(reads, str) and reads in w.facts))):
         c.error('test "total" reads a fact from rulebook.toml (reads is the fact it counts) (rule 18)')
     if test in ("best_run", "month_held") and reads != "week_held":
         c.error(f'test "{test}" reads the fact week_held (rule 18)')
+    if test in FACT_TESTS and reads != "session_finished":   # stage99: a finished session (the early kind counts with it)
+        c.error(f'test "{test}" reads the fact session_finished (the early finish counts with it) (rule 18)')
     if test == "goals":
         if "goals" in a:
             check_goals(c, a["goals"], w)
@@ -841,23 +977,50 @@ def check_test(c, a, w):
     elif test == "run_regained":
         if "away_weeks" in a:
             get_number(c, a, "away_weeks", ge=1, integer=True)
-    elif test in ("total", "best_run"):
+    elif test == "total":
+        if "at" in a:
+            get_number(c, a, "at", ge=1, integer=True)   # stage99: at 1 is allowed (Month One, the contract's wording); "first" is the plain way
+    elif test == "best_run":
         if "at" in a:
             get_number(c, a, "at", ge=2, integer=True)   # at 1 is test "first"
     elif test == "month_held":
         if "weeks" in a:
             get_number(c, a, "weeks", ge=1, integer=True)
+    elif test == "on_dates":
+        if "windows" in a:
+            check_windows(c, a["windows"])
+    elif test == "slam_year":
+        if "of" in a:
+            check_slam_of(c, a["of"], w)
+    elif test == "clock":
+        for key in sorted(one_of & set(a)):
+            if clock_time(a[key]) is None:
+                c.error(f'{key} must be a time of day, "HH:MM" on a 24-hour clock, found {a[key]!r} (rule 18)')
+            elif key == "finish_before" and a[key] == "00:00":
+                c.error('finish_before = "00:00" leaves no time before it (rule 18)')
 
 
 def check_achievements(data, w, rep):
     f = "achievements.toml"
     achievements = entries(data, "achievement", f, rep)
+    w.ach_entries = achievements   # stage99: slam_year names other entries by id
     for aid, a in achievements.items():
         c = Ctx(rep, f, f"achievement.{aid}")
         get_text(c, a, "name")
         get_choice(c, a, "meaning", MEANINGS)
         if "reads" not in a:
             c.error("reads is missing (a fact id, or \"proof\")")
+        elif a.get("test") == "total" and isinstance(a["reads"], list):
+            # stage99: a list of facts counted together (Century's finished and early session): at least two, each a rulebook fact, each once
+            rl = a["reads"]
+            if len(rl) < 2 or not all(is_text(x) for x in rl):
+                c.error(f"reads must be a fact id, or a list of two or more fact ids, found {rl!r}")
+            else:
+                if len(set(rl)) != len(rl):
+                    c.error("reads names a fact twice")
+                for x in rl:
+                    if x == "proof" or (w.facts is not None and x not in w.facts):
+                        c.error(f"reads {x!r} is not a fact in rulebook.toml")
         elif not is_text(a["reads"]):
             c.error(f"reads must be a fact id or \"proof\", found {a['reads']!r}")
         elif a["reads"] == "proof":
@@ -874,6 +1037,7 @@ def check_achievements(data, w, rep):
         check_title_ref(c, a, w)
         check_patterns(c, a, a.get("test") == "best_value" and a.get("reads") == "lift_gain")
         check_test(c, a, w)
+        check_d21(c, a, w)
         check_gates(c, a, aid, [(set(achievements), "an achievement in achievements.toml"),
                                 (w.badge_ids, "a badge in badges.toml")])
         warn_unknown(c, a, "achievement")

@@ -156,6 +156,11 @@ VALID_TESTS = {
     "total": achievement('test = "total"\nat = 5', reads="library_session", name="zz_total"),
     "best_run": achievement('test = "best_run"\nat = 2', reads="week_held", name="zz_backtoback"),
     "month_held": achievement('test = "month_held"\nweeks = 4', reads="week_held", name="zz_month"),
+    # stage99 (the Emblem Cabinet): the calendar, the Slam year (it names two real on_dates entries) and the clock
+    "on_dates": achievement('test = "on_dates"\nwindows = [{ from = "01-12", to = "02-01" }, { from = "05-18", to = "06-08" }]',
+                            reads="session_finished", name="zz_dates"),
+    "slam_year": achievement('test = "slam_year"\nof = ["down_under", "red_clay"]', reads="session_finished", name="zz_slam"),
+    "clock": achievement('test = "clock"\nfinish_before = "07:00"', reads="session_finished", name="zz_clock"),
 }
 
 
@@ -945,16 +950,17 @@ class CareerCheckerTests(unittest.TestCase):
         self.assertFails("[badge.zz_good]", 'run is for kind "best_run" only', "rule 17")
 
     # ── rule 18: an achievement's test and exactly its keys ───────────────────────────────────────────────────────
-    def test_rule_18_all_fourteen_tests_pass(self):
-        self.assertEqual(len(VALID_TESTS), 14)
+    def test_rule_18_all_seventeen_tests_pass(self):
+        self.assertEqual(len(VALID_TESTS), 17)
         for block in VALID_TESTS.values():
             self.append("achievements.toml", block)
         self.assertPasses("OK: 0 errors")
 
     def test_rule_18_every_real_achievement_has_a_test(self):
-        # 65 since rulebook version 10 (2026-10-20): AA Proof's habit ladders, 20 of them, on top of version 9's ten.
+        # 65 since rulebook version 10 (2026-10-20): AA Proof's habit ladders, 20 of them, on top of version 9's ten. 98 since version 11
+        # (2026-10-25): the Emblem Cabinet's 33.
         text = (self.dir / "achievements.toml").read_text(encoding="utf-8")
-        self.assertEqual(len(re.findall(r"(?m)^test = ", text)), 65)
+        self.assertEqual(len(re.findall(r"(?m)^test = ", text)), 98)
         self.assertEqual(text.count('test = "goals"'), 5)
         self.assertEqual(text.count('test = "proof"'), 33)
 
@@ -968,7 +974,7 @@ class CareerCheckerTests(unittest.TestCase):
     def test_rule_18_a_missing_param_fails_for_every_test_that_has_one(self):
         needs = {"proof": "proof_need", "goals": "goals", "runs_together": "run", "best_value": "at",
                  "patterns_in_cycle": "groups", "cycle_proving": "bests", "run_regained": "away_weeks",
-                 "total": "at", "best_run": "at", "month_held": "weeks"}
+                 "total": "at", "best_run": "at", "month_held": "weeks", "on_dates": "windows", "slam_year": "of"}
         for test, key in needs.items():
             with self.subTest(test=test):
                 self.setUp()
@@ -1002,12 +1008,125 @@ class CareerCheckerTests(unittest.TestCase):
                 self.append("achievements.toml", achievement(f'test = "{test}"\n{line}', reads="personal_best", name="zz_weeks"))
                 self.assertFails("[achievement.zz_weeks]", f'test "{test}" reads the fact week_held', "rule 18")
 
-    def test_rule_18_total_and_best_run_start_at_two(self):
-        for test, reads in (("total", "library_session"), ("best_run", "week_held")):
-            with self.subTest(test=test):
+    def test_rule_18_best_run_starts_at_two_and_total_at_one(self):
+        # stage99: total at 1 stands (Month One); best_run at 1 is test "first"
+        self.append("achievements.toml", achievement('test = "best_run"\nat = 1', reads="week_held", name="zz_one"))
+        self.assertFails("[achievement.zz_one]", "at")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "total"\nat = 1', reads="library_session", name="zz_one"))
+        self.assertPasses("OK: 0 errors")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "total"\nat = 0', reads="library_session", name="zz_none"))
+        self.assertFails("[achievement.zz_none]", "at")
+
+    def test_rule_18_total_may_read_a_list_of_facts(self):
+        # stage99: the new session rungs count a finished and an early session together, as Century does
+        block = achievement('test = "total"\nat = 5', name="zz_both").replace(
+            'reads = "personal_best"', 'reads = ["session_finished", "session_finished_early"]')
+        self.append("achievements.toml", block)
+        self.assertPasses("OK: 0 errors")
+        bad = {"a list of one": 'reads = ["session_finished"]', "a fact twice": 'reads = ["session_finished", "session_finished"]',
+               "a fact that is not there": 'reads = ["session_finished", "no_such_fact"]', "proof in a list": 'reads = ["session_finished", "proof"]',
+               "numbers": "reads = [1, 2]"}
+        for label, line in bad.items():
+            with self.subTest(reads=label):
                 self.setUp()
-                self.append("achievements.toml", achievement(f'test = "{test}"\nat = 1', reads=reads, name="zz_one"))
-                self.assertFails("[achievement.zz_one]", "at")
+                self.append("achievements.toml", block.replace('reads = ["session_finished", "session_finished_early"]', line))
+                self.assertFails("[achievement.zz_both]", "reads")
+        for test, extra in (("first", ""), ("best_run", "\nat = 2")):
+            with self.subTest(test=test):   # a list is for total only, and must not crash the checker
+                self.setUp()
+                self.append("achievements.toml", achievement(f'test = "{test}"{extra}', name="zz_list").replace(
+                    'reads = "personal_best"', 'reads = ["session_finished", "session_finished_early"]'))
+                self.assertFails("[achievement.zz_list]", "reads")
+
+    def test_rule_18_on_dates_windows_are_checked(self):
+        bad = {"an empty list": "windows = []", "a day that is not there": 'windows = [{ from = "02-30", to = "03-02" }]',
+               "not a day at all": 'windows = [{ from = "feb", to = "03-02" }]',
+               "a window over New Year": 'windows = [{ from = "12-28", to = "01-03" }]',
+               "a key missing": 'windows = [{ from = "01-12" }]', "a stray key": 'windows = [{ from = "01-12", to = "02-01", note = "x" }]',
+               "two that overlap": 'windows = [{ from = "01-12", to = "02-01" }, { from = "01-31", to = "02-05" }]',
+               "a string": 'windows = "01-12 to 02-01"'}
+        for label, line in bad.items():
+            with self.subTest(windows=label):
+                self.setUp()
+                self.append("achievements.toml", achievement(f'test = "on_dates"\n{line}', reads="session_finished", name="zz_dates"))
+                self.assertFails("[achievement.zz_dates]", "window")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "on_dates"\nwindows = [{ from = "02-29", to = "03-01" }]',
+                                                     reads="session_finished", name="zz_leap"))
+        self.assertPasses("OK: 0 errors")           # 02-29 is a real day of some year
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "on_dates"\nwindows = [{ from = "01-12", to = "02-01" }]',
+                                                     reads="week_held", name="zz_wrongfact"))
+        self.assertFails("[achievement.zz_wrongfact]", 'test "on_dates" reads the fact session_finished')
+
+    def test_rule_18_slam_year_names_on_dates_entries_that_do_not_overlap(self):
+        bad = {"an id that is not there": 'of = ["down_under", "no_such_one"]', "an entry that is not on_dates": 'of = ["down_under", "held"]',
+               "one only": 'of = ["down_under"]', "one twice": 'of = ["down_under", "down_under"]',
+               "windows that overlap": 'of = ["the_lawns", "red_clay", "zz_overlap"]', "not a list": 'of = "down_under"'}
+        self.append("achievements.toml", achievement('test = "on_dates"\nwindows = [{ from = "06-01", to = "06-30" }]',
+                                                     reads="session_finished", name="zz_overlap"))
+        for label, line in bad.items():
+            with self.subTest(of=label):
+                self.setUp()
+                self.append("achievements.toml", achievement('test = "on_dates"\nwindows = [{ from = "06-01", to = "06-30" }]',
+                                                             reads="session_finished", name="zz_overlap"))
+                self.append("achievements.toml", achievement(f'test = "slam_year"\n{line}', reads="session_finished", name="zz_slam"))
+                self.assertFails("[achievement.zz_slam]", "of")
+
+    def test_rule_18_clock_takes_exactly_one_good_time(self):
+        bad = {"neither": "", "both": '\nfinish_before = "07:00"\nfinish_from = "21:00"', "not a time": '\nfinish_from = "9pm"',
+               "no minutes": '\nfinish_from = "21"', "hour 24": '\nfinish_from = "24:00"', "minute 60": '\nfinish_from = "21:60"',
+               "a number": "\nfinish_from = 21", "before midnight": '\nfinish_before = "00:00"'}
+        for label, extra in bad.items():
+            with self.subTest(clock=label):
+                self.setUp()
+                self.append("achievements.toml", achievement(f'test = "clock"{extra}', reads="session_finished", name="zz_clock"))
+                self.assertFails("[achievement.zz_clock]")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "clock"\nfinish_from = "21:00"', reads="session_finished", name="zz_night"))
+        self.assertPasses("OK: 0 errors")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "first"\nfinish_from = "21:00"', name="zz_stray"))
+        self.assertFails("[achievement.zz_stray]", 'finish_from belongs to another test, not to test "first"')
+
+    def test_rule_22_d21_an_achievement_new_in_this_version_says_paid_from(self):
+        version = int(re.search(r"(?m)^version = (\d+)", (self.dir / "rulebook.toml").read_text(encoding="utf-8")).group(1))
+        so = re.search(r'(?m)^starts_on = "(\d{4}-\d{2}-\d{2})"', (self.dir / "rulebook.toml").read_text(encoding="utf-8")).group(1)
+        new = achievement('test = "first"', name="zz_new", extra=f"added_in = {version}")
+        self.append("achievements.toml", new)
+        self.assertFails("[achievement.zz_new]", "paid_from is missing")
+        self.setUp()
+        self.append("achievements.toml", new + f'paid_from = "{so}"\n')
+        self.assertPasses("OK: 0 errors")
+        self.setUp()
+        self.append("achievements.toml", new + 'paid_from = "2000-01-01"\n')
+        self.assertFails("[achievement.zz_new]", "is before the rulebook's starts_on")
+        self.setUp()
+        self.append("achievements.toml", new + 'paid_from = "2026-02-30"\n')
+        self.assertFails("[achievement.zz_new]", "paid_from must be a real day")
+        self.setUp()   # an older entry needs nothing, and may carry the day
+        self.append("achievements.toml", achievement('test = "first"', name="zz_old", extra=f"added_in = {version - 1}"))
+        self.assertPasses("OK: 0 errors")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "first"', name="zz_future", extra=f"added_in = {version + 1}"))
+        self.assertFails("[achievement.zz_future]", "a version that does not exist yet")
+
+    def test_rule_22_repeats_is_a_rulebook_fact(self):
+        self.append("achievements.toml", achievement('test = "first"', name="zz_rep", extra='repeats = "week_held"'))
+        self.assertPasses("OK: 0 errors")
+        self.setUp()
+        self.append("achievements.toml", achievement('test = "first"', name="zz_rep", extra='repeats = "no_such_fact"'))
+        self.assertFails("[achievement.zz_rep]", "is not a fact in rulebook.toml")
+
+    def test_rule_22_the_real_emblem_cabinet_entries_carry_paid_from(self):
+        text = (self.dir / "achievements.toml").read_text(encoding="utf-8")
+        self.assertEqual(text.count("added_in = 11"), 33)
+        self.assertEqual(len(re.findall(r'(?m)^paid_from = "\d{4}-\d{2}-\d{2}"', text)), 33)
+        for aid, fact in (("held", "week_held"), ("rebound", "bounce_back"), ("rematch_won", "retest_beaten"), ("complete_day", "perfect_day")):
+            block = text.split(f"[achievement.{aid}]")[1].split("[achievement.")[0]
+            self.assertIn(f'repeats = "{fact}"', block)
 
     def test_rule_18_goals_are_checked(self):
         bad = {"an empty list": "goals = []", "an unknown kind": 'goals = [{ kind = "steps", need = 5 }]',
