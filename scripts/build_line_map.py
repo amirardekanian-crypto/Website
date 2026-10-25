@@ -15,10 +15,16 @@ nothing. A map is worth having only if it is never wrong, so every line of it is
 from the source file and the whole thing is regenerated rather than edited. Pre-commit
 guard 26 fails a commit whose map is stale.
 
-Each map stays under the 30 KB ceiling that scripts/check_docs.py puts on a reference
+Each map file stays under the 30 KB ceiling that scripts/check_docs.py puts on a reference
 section. When the rich form (a purpose beside each function, taken from the comment above
-it) would cross that, the file falls back to the terse form — name and line only, several
-to a row. That choice is a function of the input, so the output stays deterministic.
+it) would cross that, the map is SPLIT BY AREA ("split, don't swell", docs/README.md): the
+first file (program-app.md) keeps the screens, the style blocks and the first areas, with a
+line at its top naming the continuation files (program-app-2.md, -3 ...) that hold the
+rest. Every file is rich if it fits. Only a single area too big for one file falls back to
+the terse form (name and line only, several to a row). Every choice is a function of the
+input, so the output stays deterministic. The first file keeps its old name, so every link
+to it still works. Pre-commit guard 26 runs --check, which compares every file this would
+write and fails on a stale or missing one, or a leftover continuation file nothing writes.
 
 Usage:
   python scripts/build_line_map.py            # write the maps
@@ -92,9 +98,9 @@ DECOR = re.compile(r'[═─=_\-—•*]{2,}')
 LETTERS = re.compile(r'[A-Za-z]{3}')
 
 REF_CEILING = 30 * 1024
-# The fallback sits 1 KB under the ceiling, not well under it: the terse form of program.html's map
-# was 24 KB and is 29 KB at 1,100 functions (2026-10-24), so there is a safe landing for a while yet, and the richer form should be used
-# whenever it genuinely fits. A file that outgrows even the terse form is a hard error below.
+# A file is rich up to 1 KB under the ceiling. Past that the map is split by area into a second
+# file (and a third ...), each rich if it fits (2026-10-25: program.html's map was 30,700 bytes
+# terse). A file over the ceiling, even after splitting, is a hard error below.
 RICH_BUDGET = REF_CEILING - 1024
 PURPOSE_MAX = 78
 
@@ -186,8 +192,22 @@ def grouped(funcs):
     return out
 
 
-def render(src, what, lines, funcs, blocks, screens, rich):
+def part_name(out_name, k):
+    """program-app.md, program-app-2.md, program-app-3.md ..."""
+    if k == 1:
+        return out_name
+    stem, ext = os.path.splitext(out_name)
+    return '%s-%d%s' % (stem, k, ext)
+
+
+def render(src, what, lines, funcs, blocks, screens, rich, groups=None, part=1, names=None):
     up = '../../..'
+    if groups is None:
+        groups = grouped(funcs)
+    names = names or [None]
+    nparts = len(names)
+    first = part == 1
+    here = [f for _, rows in groups for f in rows]
     n = len(lines)
     head = [
         '# Line map — `%s`' % src,
@@ -200,39 +220,47 @@ def render(src, what, lines, funcs, blocks, screens, rich):
         % (src, up, src, what, '{:,}'.format(n), 'one file', len(funcs)),
     ]
     tail = []
-    if blocks:
+    if blocks and first:
         tail.append('**%d named style blocks**' % len(blocks))
-    if screens:
+    if screens and first:
         tail.append('**%d top-level screens**' % len(screens))
     if tail:
         head[-1] += ', ' + ' and '.join(tail)
     head[-1] += '. Jump by line number; a nested function is not listed, only the top level.'
+    if nparts > 1:
+        head[-1] = head[-1].replace('one file', 'one file, so its map is in %d parts' % nparts)
+        others = ['[`%s`](%s)' % (names[k], names[k]) for k in range(nparts) if k != part - 1]
+        head.append('')
+        head.append('> **Part %d of %d.** The other part%s: %s. Each area is in exactly one part, in the order of the areas below.'
+                    % (part, nparts, 's' if len(others) > 1 else '', ', '.join(others)))
+        head.append('> This part holds %s%s. Its own count: %d functions.'
+                    % ('the screens, the style blocks and ' if first else '', ', '.join(t for t, _ in groups), len(here)))
     if not rich:
         head += [
             '',
             '> Names and line numbers only. With each function\'s own comment beside it this file would be '
             '%d KB, over the %d KB a reference section may be ([`docs/README.md`](%s/docs/README.md)) — '
             'so open the function to see what it does.'
-            % (len(render(src, what, lines, funcs, blocks, screens, True).encode('utf-8')) // 1024,
+            % (len(render(src, what, lines, funcs, blocks, screens, True, groups, part, names).encode('utf-8')) // 1024,
                REF_CEILING // 1024, up),
         ]
     head.append('')
 
     body = []
-    if screens:
+    if screens and first:
         body += ['## The screens, in page order', '', '| `id` | class | line |', '|---|---|---|']
         for sid, cls, ln in screens:
             body.append('| `%s` | %s | %d |' % (sid, ('`%s`' % cls if cls else '—'), ln))
         body.append('')
 
-    if blocks:
+    if blocks and first:
         body += ['## The named style blocks', '', '| block | line |', '|---|---|']
         for name, ln in blocks:
             body.append('| %s | %d |' % (name, ln))
         body.append('')
 
     body += ['## The functions, by area', '']
-    for title, rows in grouped(funcs):
+    for title, rows in groups:
         body.append('### %s' % title)
         body.append('')
         if rich:
@@ -258,16 +286,45 @@ def render(src, what, lines, funcs, blocks, screens, rich):
 
 
 def build_one(src, out_name, what):
+    """one source file -> a list of (file name, page, mode); more than one when the rich form does not fit"""
     path = os.path.join(REPO, src)
     with open(path, encoding='utf-8', errors='replace') as fh:
         text = fh.read()
     lines, funcs, blocks, screens = parse(text)
+    allgroups = grouped(funcs)
+
+    def size(page):
+        return len(page.encode('utf-8'))
+
+    # the whole map in one file, if the rich form fits
     page = render(src, what, lines, funcs, blocks, screens, rich=True)
-    mode = 'rich'
-    if len(page.encode('utf-8')) > RICH_BUDGET:
-        page = render(src, what, lines, funcs, blocks, screens, rich=False)
-        mode = 'terse'
-    return out_name, page, len(funcs), len(blocks), len(screens), mode
+    if size(page) <= RICH_BUDGET:
+        return [(out_name, page, 'rich')], len(funcs), len(blocks), len(screens)
+
+    # otherwise pack whole areas, in order, into as few parts as the rich form allows. The part
+    # count changes the header, so it is searched for: the smallest N where the greedy pack closes.
+    for nparts in range(2, 9):
+        names = [part_name(out_name, k) for k in range(1, nparts + 1)]
+        parts, rest, ok = [], list(allgroups), True
+        for k in range(1, nparts + 1):
+            take = []
+            while rest:
+                trial = take + [rest[0]]
+                if size(render(src, what, lines, funcs, blocks, screens, True, trial, k, names)) > RICH_BUDGET:
+                    break
+                take = trial
+                rest = rest[1:]
+            if not take:
+                ok = False
+                break
+            parts.append(take)
+        if ok and not rest:
+            return ([(names[k], render(src, what, lines, funcs, blocks, screens, True, parts[k], k + 1, names), 'rich')
+                     for k in range(nparts)], len(funcs), len(blocks), len(screens))
+
+    # one single area is too big for a rich file: that is the only case left for the terse form
+    page = render(src, what, lines, funcs, blocks, screens, rich=False)
+    return [(out_name, page, 'terse')], len(funcs), len(blocks), len(screens)
 
 
 def main():
@@ -276,34 +333,45 @@ def main():
     if not check:
         os.makedirs(out_dir, exist_ok=True)
 
-    stale, built = [], []
+    stale, built, wanted = [], [], set()
     for src, out_name, what in SOURCES:
-        out_name, page, nf, nb, ns, mode = build_one(src, out_name, what)
-        target = os.path.join(out_dir, out_name)
-        size = len(page.encode('utf-8'))
-        if size > REF_CEILING:
-            print('  %s would be %d KB, over the %d KB reference ceiling'
-                  % (out_name, size // 1024, REF_CEILING // 1024))
-            return 1
-        if check:
-            have = ''
-            if os.path.exists(target):
-                with open(target, encoding='utf-8') as fh:
-                    have = fh.read()
-            if have.replace('\r\n', '\n') != page:
-                stale.append(out_name)
-        else:
-            with open(target, 'w', encoding='utf-8', newline='\n') as fh:
-                fh.write(page)
-        built.append('  %-22s %4d functions, %3d style blocks, %3d screens  %5d bytes  %s'
-                     % (out_name, nf, nb, ns, size, mode))
+        files, nf, nb, ns = build_one(src, out_name, what)
+        for name, page, mode in files:
+            wanted.add(name)
+            target = os.path.join(out_dir, name)
+            size = len(page.encode('utf-8'))
+            if size > REF_CEILING:
+                print('  %s would be %d KB, over the %d KB reference ceiling'
+                      % (name, size // 1024, REF_CEILING // 1024))
+                return 1
+            if check:
+                have = ''
+                if os.path.exists(target):
+                    with open(target, encoding='utf-8') as fh:
+                        have = fh.read()
+                if have.replace('\r\n', '\n') != page:
+                    stale.append(name)
+            else:
+                with open(target, 'w', encoding='utf-8', newline='\n') as fh:
+                    fh.write(page)
+            built.append('  %-22s %5d bytes  %s  (%s: %d functions, %d style blocks, %d screens)'
+                         % (name, size, mode, src, nf, nb, ns))
+
+    # a continuation file the generator no longer writes (the map shrank) must not linger
+    if os.path.isdir(out_dir):
+        for name in sorted(os.listdir(out_dir)):
+            if name.endswith('.md') and name not in wanted:
+                if check:
+                    stale.append(name + ' (leftover)')
+                else:
+                    os.remove(os.path.join(out_dir, name))
 
     if check:
         if stale:
             print('line map STALE: ' + ', '.join(stale))
             print('Run: python scripts/build_line_map.py')
             return 1
-        print('line map OK: %d maps match their source files.' % len(SOURCES))
+        print('line map OK: %d files match their source files.' % len(wanted))
         return 0
 
     print('line map written to %s/' % OUT_DIR.replace('\\', '/'))

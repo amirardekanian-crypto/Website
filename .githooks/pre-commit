@@ -563,7 +563,7 @@ fi
 # docs/ref/line-map/ names every top-level function with its line number, grouped by area, and that is worth having only
 # while the numbers are right: any edit to those files moves them. scripts/build_line_map.py is derived from the source
 # and regenerates deterministically, so --check can say whether what is committed is what it would write now. The map is
-# reference, never rules: it points at code and restates nothing.
+# reference, never rules: it points at code and restates nothing. Since 2026-10-25 a map over the ceiling is split into program-app-2.md, -3 ... and --check covers every part.
 if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|habits\.html|coach\.html|sw\.js|scripts/build_line_map\.py|docs/ref/line-map/.+\.md)$'; then
   echo "pre-commit: an app file or the line map changed -- checking the map still matches..."
   if ! lm_out=$("$PY" -X utf8 scripts/build_line_map.py --check 2>&1); then
