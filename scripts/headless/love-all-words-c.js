@@ -2,6 +2,7 @@
 //   onerm      the records page never says "One-rep max" and explains its number in one plain line.
 //   plates     the unit menu's third row says what it counts: "Plates: how many plates on the stack".
 //   holdserve  Hold Serve keeps its name and wears "Weeks in a row you trained" (the weeks-held number, the help card's title).
+//   comebacks  Comebacks keeps its number and wears "Times you came back after a break".
 //   counts     the cover says "Cycle 2 of 3", under it "Week 2 of 5", the road says "5 weeks": one count per number.
 // Serve the repo first (python -m http.server <port> --bind 127.0.0.1; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js), then:
 //   node scripts/headless/love-all-words-c.js
@@ -119,12 +120,30 @@ async function holdserve(browser) {
   }
 }
 
+async function comebacks(browser) {
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    const { ctx, p } = await openCareer(browser, w, h);
+    await p.waitForTimeout(1200);
+    await p.evaluate("goTo('plan')");
+    await p.waitForTimeout(700);
+    const cs = await cells(p);
+    const cb = cs.find(c => /comebacks?/i.test(c.nm));
+    t.check(`comebacks ${w}px: the comebacks number wears "Times you came back after a break"`, !!cb && cb.ln === 'Times you came back after a break', JSON.stringify(cs));
+    t.check(`comebacks ${w}px: it is the same small grey line as the weeks-held one, and the tile and page do not overflow`, cs.filter(c => c.ln).length === 2 && cs.every(c => c.over <= 0) && (await p.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0, JSON.stringify(cs));
+    const st = await p.evaluate(() => [...document.querySelectorAll('#career-card-wrap .cs-ln')].map(e => { const c = getComputedStyle(e); return [c.fontSize, c.color, c.fontFamily.split(',')[0]]; }));
+    t.check(`comebacks ${w}px: both lines share one look (small, grey, Barlow)`, st.length === 2 && st[0].join() === st[1].join() && /Barlow/.test(st[0][2]), JSON.stringify(st));
+    t.check(`comebacks ${w}px: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await counts(browser);
   await onerm(browser);
   await plates(browser);
   await holdserve(browser);
+  await comebacks(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

@@ -13618,7 +13618,7 @@ function careerCardHTML() {
   // is on Home's Career row and on the finish card, where there is room to say what it means), and "best 7" on weeks held (a
   // mark above the best run read as an error). Nothing on the server changed: the numbers and the level are exactly as they were.
   // A number that has a name of its own wears one plain line under its words (Plain Words, 2026-10-25).
-  const CS_LINE = { weeks_held: 'Weeks in a row you trained' };
+  const CS_LINE = { weeks_held: 'Weeks in a row you trained', comebacks: 'Times you came back after a break' };
   const cell = x => `<div class="cs-n"><b>${fmt(x.value)}</b><span class="cs-nm">${esc(careerMarkWords(x.key, x.value))}</span>${CS_LINE[x.key] ? `<span class="cs-ln">${CS_LINE[x.key]}</span>` : ''}</div>`;
   let h = `<div class="cs-card" role="group" aria-label="${esc('Your numbers. Level ' + L.level + '.').replace(/"/g, '&quot;')}">
     ${cells.length ? `<div class="cs-grid">${cells.map(cell).join('')}</div>` : ''}
