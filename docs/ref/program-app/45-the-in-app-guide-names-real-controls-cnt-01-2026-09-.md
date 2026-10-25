@@ -8,7 +8,7 @@ appears "when every exercise is checked off", and "tap the timer icon". What is 
   taps), or *All done with Day N* (`refreshConfirmCard()`).
 - The session RPE (1–10), an optional note, and **Done · send to coach ✓**, which finishes and sends (WK-04,
   above). **Reset** sits in the session bar once a day has started.
-- The rest timer opens by itself when a set is ticked in the list, if the exercise has a written rest and something follows (2026-10-24), or from the **Rest ⏱** button under the sets (WK-02, above). The Rest pill above the tab bar is gone (2026-10-11).
+- The rest timer opens from the **Rest** offer after a tick, or the **Rest ⏱** button under an exercise's sets (WK-02, above).
 - **How to do it** (2026-10-11) holds the steps, the cues and the video when there is one, and its ▶ means a video. Five
   texts said otherwise and changed with it: *How your program is structured* (each exercise "carries a demo video and
   coaching cues"), *Logging your sets* (How to do it was "the video and the cues"; the warm-up line, and a line for a

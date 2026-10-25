@@ -509,7 +509,10 @@
 // v229: program.html changed (2026-10-25, Amir: "every achievement that any one gets in crew should be clickable ... we dont need the medal of it on the
 // crew screen", and "we dont need to see who cheered for their trophy"). A Crew line carries no emblem; the achievement in it opens what it is. A trophy on
 // someone's page shows no faces of who cheered, and a tap opens what it is.
-const CACHE = 'aap-v229';
+// v230: program.html changed (2026-10-25, Amir: "in the middle of a session i can do another session which doesnt make sense"). One session at a
+// time: Home Resumes the one day under way and another unfinished day waits; a shared lift no longer makes a day look started. A tick no longer
+// opens the rest by itself ("go back i dont like it").
+const CACHE = 'aap-v230';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

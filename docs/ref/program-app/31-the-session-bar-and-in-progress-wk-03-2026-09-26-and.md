@@ -10,6 +10,14 @@ started today and not finished (`dayInProgress()`) shows *In progress* on its ba
 it (`.dc-live`); a day done this week is a small `.dc-row` (HOME-02). `paintWeek()` redraws them whenever
 the day view closes (`paintDayCardPills()` is no longer called).
 
+**One session at a time** (Amir, 2026-10-25: "in the middle of a session i can do another session which doesnt make sense"). The set
+log is kept per exercise name, so ticks alone used to make every day that shares a lift look started: Home Resumed Day 1
+("1 of 18 sets") while the athlete was on Day 2. Now ticks make a day under way only when that day was ticked today itself
+(`_touched_d<N>`, `markTouched()`); a clock started today still counts. `activeDayId()` is the one day under way (two at once,
+left from before: the one whose clock runs, else the one whose clock moved last); Home's card Resumes it and
+`openDayView()` does not open any other unfinished day: a box (*One session at a time*) says which day is under way, how to
+end it early (⋯ then Stop here) and offers **Back to Day N**. A finished day still opens. `scripts/headless/one-session.js`.
+
 **From Start until Done it is the slim bar** (Amir, 2026-09-27, option C of the mockup at
 https://claude.ai/artifact/CiUjm5sF3cz4YhGzJCR1WY). `renderTimer()` sets `.slim` when the day's clock has
 started, is not finished and is inside the 6 h grace. Since Centre Court (A's P9) it is a green strip, 56 px, sticky

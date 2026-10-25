@@ -25,7 +25,7 @@ function prog() {
 }
 const open = (browser, o = {}) => H.openProgram(browser, Object.assign({ w: 390, h: 844, prog: prog(), hist: [], seed: { _setlog_Barbell_Back_Squat: EMPTY() }, stub: { library: H.library() } }, o));
 async function openCard(p, name, id) {
-  await p.evaluate(`(() => { window.restAfterTick = () => {}; /* a tick rests by itself now (love-all-rest.js); this suite is not about the rest */ openDayView('1'); const c = ${H.card(name)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = ${JSON.stringify(id)}; try { hideAaToast(); } catch (e) {} c.scrollIntoView({ block: 'center' }); })()`);
+  await p.evaluate(`(() => { openDayView('1'); const c = ${H.card(name)}; if (c.classList.contains('collapsed')) toggleExpand(c); c.id = ${JSON.stringify(id)}; try { hideAaToast(); } catch (e) {} c.scrollIntoView({ block: 'center' }); })()`);
   await p.waitForTimeout(350);
 }
 const menu = p => p.evaluate(() => { const m = document.querySelector('.unit-menu'); return m ? { opts: [...m.querySelectorAll('.unit-opt')].map(o => o.dataset.u + (o.getAttribute('aria-checked') === 'true' ? '*' : '')).join(' '), head: m.querySelector('.unit-menu-k').textContent } : null; });
