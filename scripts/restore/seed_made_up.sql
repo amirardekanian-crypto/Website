@@ -110,6 +110,18 @@ insert into public.crew_open_results (open_id, athlete_id, value, day, created_a
   ('33333333-4444-4555-8666-777777777777', 'ava_test', 95, '2026-10-18', '2026-10-18 12:00:00+00', '2026-10-18 12:00:00+00'),
   ('44444444-5555-4666-8777-888888888888', 'gone_test', 7.5, '2026-09-20', '2026-09-20 12:00:00+00', '2026-09-20 12:00:00+00');
 
+-- The weekly Toss and the Mailbag (stage102): records too (Amir's bank of weeks, the votes, the questions and his answers), so all three are
+-- backed up and seeded. The erased athlete has a vote and a question, so the erasure must take both.
+insert into public.crew_weeks (week_start, toss_q, toss_a, toss_b, theme, closed_at, created_at, updated_at) values
+  ('2026-10-26', 'Before a big day?', 'Pasta', 'Rice', 'Where you train', null, '2026-10-25 08:00:00+00', '2026-10-25 08:00:00+00'),
+  ('2026-11-02', null, null, null, E'What''s in your bag', null, '2026-10-25 08:00:00+00', '2026-10-25 08:00:00+00');
+insert into public.crew_toss_votes (week_start, athlete_id, side, created_at) values
+  ('2026-10-26', 'ava_test', 'a', '2026-10-26 09:00:00+00'),
+  ('2026-10-26', 'gone_test', 'b', '2026-10-26 09:30:00+00');
+insert into public.crew_questions (id, athlete_id, body, ok_name, created_at, answer, answered_at, answer_post) values
+  (1, 'ava_test', 'Can I do the gym on the same day as tennis?', true, '2026-10-26 10:00:00+00', 'Yes. Gym after tennis.', '2026-10-27 08:00:00+00', null),
+  (2, 'gone_test', 'My legs are sore. Should I skip?', false, '2026-10-26 11:00:00+00', null, null, null);
+
 -- The phones that asked for a reminder (stage84). This one IS backed up, because a restore without it
 -- would cost every athlete the single notification permission their browser gives, and that cannot be
 -- asked for twice. push_sent (what went out today) and push_config (the VAPID private key and the
