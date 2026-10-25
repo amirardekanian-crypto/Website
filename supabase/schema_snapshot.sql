@@ -4456,7 +4456,7 @@ begin
                 'who', case when p.athlete_id = public.coach_note_id() then 'Amir'
                             else coalesce((select m.name from public.crew_members() m where m.athlete_id = p.athlete_id), public.crew_default_name(p.athlete_id), p.athlete_id) end,
                 'seen', p.athlete_id = public.coach_note_id() or exists (select 1 from public.crew_members() m where m.athlete_id = p.athlete_id),
-                'kind', p.kind, 'body', p.body, 'photo', p.has_photo, 'at', p.created_at,
+                'kind', p.kind, 'body', p.body, 'photo', p.has_photo, 'at', p.created_at, 'ask', p.session -> 'ask',   -- stage103: a Mailbag answer's question
                 'kudos', (select count(*) from public.crew_kudos k where k.post_id = p.id)) order by p.created_at desc), '[]'::jsonb)
                 from public.crew_posts p),
     'people', (select coalesce(jsonb_agg(jsonb_build_object(
