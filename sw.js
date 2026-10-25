@@ -489,7 +489,10 @@
 // two weeks, the stamp on a session photo with Share on your own photo, Share my card, and the Open wall as tiles. It needs stage96
 // (and stage97 for the partner code) on the server and falls back to the old rows without it. No new file to pre-cache: the page, the
 // board's photo of Amir (assets/img/coach.jpg, kept as first used) and the share painter are the files they already were.
-const CACHE = 'aap-v223';
+// v224: program.html changed (2026-10-25, Amir's answers to round 4). Ticking a set in the list starts its rest by itself and the
+// cross skips it. Before you start is open the first time a session is seen, one row after that. A note box never takes a tap
+// meant for the control under it: only its own buttons are live, and a tap outside it closes it.
+const CACHE = 'aap-v224';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
