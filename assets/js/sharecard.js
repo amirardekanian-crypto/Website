@@ -240,7 +240,7 @@
       pctHarder: p => `سنگین‌تر و سخت‌تر: حدود ${p} قوی‌تر`, pctFewer: p => `سنگین‌تر با تکرار کمتر: حدود ${p} قوی‌تر`,
       pctLess: p => `تکرار بیشتر با وزنهٔ کمتر: حدود ${p} قوی‌تر`, pctBw: p => `حدود ${p} قوی‌تر`,
     },
-    rpe: r => `RPE ${r}`,
+    rpe: r => `شدت ${r}`,   // effort, in Amir's Farsi word (2026-10-25: "sheddat"), never RPE
     retestHead: [['تست '], ['دوباره', 1]],
     beaten: 'شکسته شد',
     retestOneCycle: g => [[g, 1], [' بیشتر، توی یک دوره.']],

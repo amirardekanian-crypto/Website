@@ -370,6 +370,9 @@ async function side(browser) {
   await orange(browser);
   await rounds(browser);
   await side(browser);
+  // The Farsi share card says effort as شدت (Amir, 2026-10-25), never RPE: read the served file the card is drawn from.
+  { const src = require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'assets', 'js', 'sharecard.js'), 'utf8');
+    t.check('rpe: the Farsi share card says شدت, and no card string prints RPE', /rpe: r => `شدت \$\{r\}`/.test(src) && !/rpe: r => `RPE/.test(src)); }
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
