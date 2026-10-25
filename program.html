@@ -9378,13 +9378,12 @@ function dayCardHTML(day, dayNum, total, opts) {
   const name = day.title || day.focusTag || ('Day ' + dayNum);
   const idStr = esc(String(id));
 
-  // Subtitle = "N blocks · M movements". Each exercise entry counts as one
-  // movement, so a circuit (one entry holding several items) counts as 1.
+  // Subtitle = "M exercises" (Plain Words, Amir 2026-10-25: no blocks). Each exercise entry counts as one,
+  // so a circuit (one entry holding several items) counts as 1.
   const blocks = Array.isArray(day.blocks) ? day.blocks : [];
-  const blockCount = blocks.length;
   const moveCount = blocks.reduce((n, b) => n + ((b.exercises || []).length), 0);
   const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
-  const sub = `${plural(blockCount, 'block')} · ${plural(moveCount, 'movement')}`;
+  const sub = plural(moveCount, 'exercise');
   const attr = s => esc(s).replace(/"/g, '&quot;');   // these go inside attributes (esc() escapes quotes itself since 2026-10-20)
 
   // The rest of the week (HOME-02, Amir 2026-09-26: "If the days are done, make the day card into that small one"; the
