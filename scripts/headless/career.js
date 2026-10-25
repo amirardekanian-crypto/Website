@@ -403,7 +403,7 @@ async function trainingBase(browser, C) {
       finishTap('1', document.querySelector('#confirm-1 .confirm-btn'));
       const e = document.getElementById('earn-1'); return e ? e.innerText.replace(/\s+/g, ' ').trim() : null;
     });
-    C.check('finished card: "+450 XP", counting until the server has the session', counting === `+450 XP LEVEL ${lvl(10450).level} · COUNTING`, counting);
+    C.check('finished card: "+450 XP", adding it up until the server has the session', counting === `+450 XP LEVEL ${lvl(10450).level} · ADDING IT UP`, counting);
     await p.waitForTimeout(1500);                   // the save lands, then the profile is asked again
     const L2 = lvl(10470), done = await T(p, '#earn-1');
     C.check('finished card: the server\'s number once it has the session', done === `+470 XP LEVEL ${L2.level} · ${fmt(L2.to_next)} TO ${L2.level + 1}`, done);
@@ -793,8 +793,8 @@ async function trainingLight(browser, C) {
       finishTap('1', document.querySelector('#confirm-1 .confirm-btn'));
       return [...document.querySelectorAll('#hlwin-1 .hl-band')].map(b => ({ t: b.innerText.replace(/\s+/g, ' ').trim(), tag: b.tagName, share: !!b.querySelector('.hl-band-go') }));
     });
-    C.check('Done: ONE "Counting" band at once, for the mark the finish card showed (25 sessions with Amir), no Share until the server has it', counting.length === 1 && counting[0].tag === 'DIV' && !counting[0].share
-      && /^A NEW MARK · COUNTING 25 SESSIONS WITH AMIR$/i.test(counting[0].t), JSON.stringify(counting));
+    C.check('Done: ONE "Adding it up" band at once, for the mark the finish card showed (25 sessions with Amir), no Share until the server has it', counting.length === 1 && counting[0].tag === 'DIV' && !counting[0].share
+      && /^A NEW MARK · ADDING IT UP 25 SESSIONS WITH AMIR$/i.test(counting[0].t), JSON.stringify(counting));
     C.check('Done: nothing is told or marked seen from the phone\'s guess', (await params(p, 'mark_moments_told')).every(a => !a.p_award_ids.includes('badge:century:1')));
     await p.waitForTimeout(1800);
     const rec = await p.evaluate(id => JSON.parse(localStorage.getItem(id + '_earn_d1')), H.ID);

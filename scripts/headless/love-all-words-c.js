@@ -3,6 +3,7 @@
 //   plates     the unit menu's third row says what it counts: "Plates: how many plates on the stack".
 //   holdserve  Hold Serve keeps its name and wears "Weeks in a row you trained" (the weeks-held number, the help card's title).
 //   comebacks  Comebacks keeps its number and wears "Times you came back after a break".
+//   counting   the finished card says "Adding it up" (the XP line and the reward band) while the server adds the session up.
 //   counts     the cover says "Cycle 2 of 3", under it "Week 2 of 5", the road says "5 weeks": one count per number.
 // Serve the repo first (python -m http.server <port> --bind 127.0.0.1; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js), then:
 //   node scripts/headless/love-all-words-c.js
@@ -137,6 +138,27 @@ async function comebacks(browser) {
   }
 }
 
+async function counting(browser) {
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    const { ctx, p } = await openCareer(browser, w, h);
+    await p.waitForTimeout(1200);
+    await C.toReady(p);
+    await p.evaluate(() => document.querySelector('#confirm-1 .complete-rpe-btn[data-rpe="7"]').click());
+    await p.waitForTimeout(200);
+    const earn = await p.evaluate(() => {      // the finished card as Done paints it, before the server has answered
+      finishTap('1', document.querySelector('#confirm-1 .confirm-btn'));
+      const e = document.getElementById('earn-1');
+      return e ? { text: e.innerText.replace(/\s+/g, ' ').trim(), over: e.scrollWidth - e.clientWidth } : null;
+    });
+    t.check(`counting ${w}px: the finished card says "Adding it up" while the server counts, not "Counting"`, !!earn && /ADDING IT UP$/i.test(earn.text) && !/counting/i.test(earn.text), JSON.stringify(earn));
+    t.check(`counting ${w}px: the line fits`, !!earn && earn.over <= 0, JSON.stringify(earn));
+    const guide = await p.evaluate(() => buildAppGuideCards().replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '));
+    t.check(`counting ${w}px: the help card says "adding it up", never "counting", for what the server has not confirmed`, /says adding it up until my side has it/.test(guide) && !/says counting/i.test(guide), guide.indexOf('adding it up') + ' ' + JSON.stringify(guide.slice(guide.indexOf('It says') , guide.indexOf('It says') + 80)));
+    t.check(`counting ${w}px: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await counts(browser);
@@ -144,6 +166,7 @@ async function comebacks(browser) {
   await plates(browser);
   await holdserve(browser);
   await comebacks(browser);
+  await counting(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
