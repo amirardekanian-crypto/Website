@@ -33,6 +33,8 @@
 // the card's ground, what Tell the crew sends (title, mins, held), the guide. Section 27 takes its pictures.
 // Step 11: the Open wall (section 28): tiles, your mint outline, the first 8 and All 14 ›, the list sheet, a tile opens the page, a server without stage96 keeps the rows, the card names nobody else. Section 29 takes its pictures.
 // All-time cheers (section 30, CONTRACT 9b): the four tiles are the same on every page (weeks held, sessions, bests, cheers = cheers.total), yours adds your comebacks as a thin Only you row under them; the list is "Cheers this week".
+// 2026-10-25, Amir from his iPhone (section 31; section 32 takes its pictures): the cover is a banner (about 200 px at 390 wide, never over 28% of the screen, the picture at full strength under a light shade, the
+// face still over its foot), the cheers number counts only Cheers sent with the clap button (stage98: no likes), and the account sheet opens with a Profile group (Your photo, Your game, Your page, What the crew sees of you).
 // `--only=14,15` runs just those sections (everything after a "// ── N." line is wrapped in on(N)).
 // Serve the repo first (python -m http.server 8792 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
@@ -531,7 +533,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const { ctx, p } = await open(browser);
     await goCrew(p);
     const g = await p.evaluate(() => buildAppGuideCards());
-    C.check('the guide: Your page under your initials, names and faces that open pages, and the join question', /<strong>Your page<\/strong> is under your initials/.test(g) && /Tap a name, a face or a row/.test(g) && /your own page is shown first/.test(g));
+    C.check('the guide: Your page in the Profile group of your initials, names and faces that open pages, and the join question', /<strong>Your page<\/strong> is in the <strong>Profile<\/strong> group when you tap your initials/.test(g) && /Tap a name, a face or a row/.test(g) && /your own page is shown first/.test(g));
     C.check('…in plain words: no em-dash, no semicolon in what was added', !/[—;]/.test((g.match(/<p>Tap a name[\s\S]*?<\/p>/) || [''])[0]));
     await ctx.close();
   }
@@ -2555,7 +2557,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
 
 
   // ── 30. All-time cheers (CONTRACT 9b, Amir 2026-10-24: "the number of cheers a person has got, should be shown on their acount") ───────────────────────────────────────────────
-  // `crew_page().cheers.total` = cheers and likes received since joining. The page's tiles are the same on EVERY page: weeks held, sessions with Amir, personal bests, cheers. Your own page adds your comebacks as a
+  // `crew_page().cheers.total` = the Cheers people sent that person with the clap button since joining (stage98, 2026-10-25: never likes). The page's tiles are the same on EVERY page: weeks held, sessions with Amir, personal bests, cheers. Your own page adds your comebacks as a
   // fifth, thin, full-width row under the tiles, marked Only you. An absent key is an absent tile (a switch off). The list below the tiles is the last 7 days and is headed "Cheers this week".
   const cheerTiles = async (o = {}) => {
     const x = await open(browser, Object.assign({ stub: { crewPages: o.pages || {} } }, o.o || {}));
@@ -2642,10 +2644,273 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const gx = await cheerTiles({ own: true, pages: { me: { numbers: NUM, cheers: { total: 52, recent: [] } } } });
     const gt = await gx.p.evaluate(() => buildAppGuideCards());
     const gseg = (gt.match(/The <strong>cheers<\/strong> number on a page[\s\S]*?<\/p>/) || [''])[0];
-    C.check('the guide says the cheers number counts cheers and likes since joining, and that comebacks are a thin line only you see, in plain words', /every cheer and every like/.test(gseg) && /<strong>comebacks<\/strong>/.test(gseg) && /Only you/.test(gseg) && !/[—;]/.test(gseg.replace(/&[a-z]+;/g, '')), gseg.slice(0, 80));
+    C.check('the guide says the cheers number counts only the cheers sent with the Cheer button (no likes), and that comebacks are a thin line only you see, in plain words', /counts only the cheers people sent that person with the <strong>Cheer<\/strong> button/.test(gseg) && /Likes are not in it\./.test(gseg) && !/every like/.test(gseg) && /<strong>comebacks<\/strong>/.test(gseg) && /Only you/.test(gseg) && !/[—;]/.test(gseg.replace(/&[a-z]+;/g, '')), gseg.slice(0, 80));
     await gx.ctx.close();
   }
 
+  // ── 31. 2026-10-25 · Amir on his iPhone: the cover is a banner, the cheers number counts cheers, and Profile lives in the account sheet ──────────────
+  // Amir: "the background on the top of the page is too small, cant see anything" · "the number of cheers is wrong" (stage98: cheers.total counts only the Cheers sent
+  // with the clap button, never likes) · "we should be able to change profile settings in the settings when we click on our image on top right side of the app".
+  const fsx = require('fs'), ROOT = path.join(__dirname, '..', '..');
+  // the cover: its box, its picture, its shade, and what the phone actually draws there
+  const coverNow = p => p.evaluate(() => {
+    const c = document.getElementById('pl-cover'), i = document.getElementById('pl-cover-img'), f = document.querySelector('#crewplayer-body .pl-face');
+    const r = c.getBoundingClientRect(), ir = i.getBoundingClientRect(), fr = f ? f.getBoundingClientRect() : null, s = getComputedStyle(i), sc = getComputedStyle(c.querySelector('.cyc-scrim'));
+    const alphas = [...sc.backgroundImage.matchAll(/rgba?\(([^)]*)\)/g)].map(m => { const q = m[1].split(',').map(Number); return q.length === 4 ? q[3] : 1; });
+    return { h: Math.round(r.height), w: Math.round(r.width), vh: innerHeight, vw: innerWidth, imgW: Math.round(ir.width), imgH: Math.round(ir.height), hidden: i.hidden, loaded: i.complete && i.naturalWidth > 0,
+      opacity: +s.opacity, blend: s.mixBlendMode, mask: s.webkitMaskImage || s.maskImage, fit: s.objectFit, alphas, overlap: fr ? Math.round(r.bottom - fr.top) : null, sw: document.documentElement.scrollWidth };
+  });
+  // how much of the picture's own light and detail the banner keeps: the mean and the spread of the luminance over the middle of the cover (clear of the buttons and the face), drawn and
+  // then compared with the same picture laid on a canvas as it is (cover-fitted), unshaded
+  const coverSee = async (p) => {
+    const box = await p.evaluate(() => { const r = document.getElementById('pl-cover').getBoundingClientRect(); return { x: Math.round(r.left) + 64, y: Math.round(r.top), width: Math.round(r.width) - 128, height: Math.round(r.height) - 56 }; });
+    const png = (await p.screenshot({ clip: box })).toString('base64');
+    return p.evaluate(async ([b64, box]) => {
+      const stat = (cv) => { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let s = 0, s2 = 0, n = 0; for (let k = 0; k < d.length; k += 4) { const y = .2126 * d[k] + .7152 * d[k + 1] + .0722 * d[k + 2]; s += y; s2 += y * y; n++; } const m = s / n; return { mean: +m.toFixed(1), sd: +Math.sqrt(Math.max(0, s2 / n - m * m)).toFixed(1) }; };
+      const im = new Image(); im.src = 'data:image/png;base64,' + b64; await im.decode();
+      const a = document.createElement('canvas'); a.width = im.width; a.height = im.height; a.getContext('2d').drawImage(im, 0, 0);
+      const cover = document.getElementById('pl-cover'), cr = cover.getBoundingClientRect(), img = document.getElementById('pl-cover-img');
+      const s = Math.max(cr.width / img.naturalWidth, cr.height / img.naturalHeight), dw = img.naturalWidth * s, dh = img.naturalHeight * s;
+      const pos = getComputedStyle(img).objectPosition.split(' ').map(v => parseFloat(v) / 100);
+      const ox = (cr.width - dw) * (pos[0] || .5), oy = (cr.height - dh) * (pos[1] || .5);
+      const b = document.createElement('canvas'); b.width = box.width; b.height = box.height;
+      b.getContext('2d').drawImage(img, ox - 64, oy, dw, dh);
+      return { shown: stat(a), natural: stat(b) };
+    }, [png, box]);
+  };
+  if (on(31)) {
+    // (1) THE COVER: about 200 px at 390 wide, never over 28% of the screen, the picture itself with a light shade, the face still over its foot
+    const a = await open(browser, { stub: { crewPages: { me: { art: 'voltage' }, [CK.mina]: { art: 'armour' } } } });
+    await goCrew(a.p);
+    for (const [who, key] of [['your own page', 'me'], ['someone else\'s page', CK.mina]]) {
+      await a.p.evaluate(k => openPlayer(k), key); await a.p.waitForTimeout(800);
+      const c = await coverNow(a.p);
+      C.check('cover, ' + who + ' at 390 px: a banner about 200 px tall, under 28% of the screen', c.w === 390 && c.h >= 190 && c.h <= 210 && c.h <= c.vh * 0.28 + 0.5, JSON.stringify(c));
+      C.check('…the picture fills it (cropped to cover), loaded, at full strength: no luminosity blend, no fade-in mask, no dimming', !c.hidden && c.loaded && c.fit === 'cover' && c.imgW === c.w && c.imgH === c.h && c.opacity >= 0.99 && c.blend === 'normal' && (c.mask === 'none' || !c.mask), JSON.stringify(c));
+      C.check('…only a light shade: no stop of the scrim is darker than half', c.alphas.length >= 2 && Math.max(...c.alphas) <= 0.5, JSON.stringify(c.alphas));
+      C.check('…the profile face still overlaps the foot of the cover by about half its height', c.overlap >= 36 && c.overlap <= 52, String(c.overlap));
+      const see = await coverSee(a.p);
+      C.check('…and the picture can be seen: the banner keeps at least 85% of the picture\'s own light and detail', see.shown.mean >= see.natural.mean * 0.85 && see.shown.sd >= see.natural.sd * 0.85 && see.shown.sd >= 8, JSON.stringify(see));
+      await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(250);
+    }
+    C.check('no page errors', !a.p.errs.length, a.p.errs.join(' | '));
+    await a.ctx.close();
+    // 320 x 640, and a short screen: it scales and never passes 28% of the height
+    for (const [w, h, lo] of [[320, 640, 150], [390, 500, 104], [430, 932, 190]]) {
+      const s = await open(browser, { opts: { w, h }, stub: { crewPages: { me: { art: 'voltage' } } } });
+      await goCrew(s.p); await s.p.evaluate(() => openPlayer('me')); await s.p.waitForTimeout(700);
+      const c = await coverNow(s.p);
+      C.check('cover at ' + w + ' x ' + h + ': ' + c.h + ' px, in range, under 28% of the height, nothing scrolls sideways', c.h >= lo && c.h <= 200 && (c.h <= c.vh * 0.28 + 0.5 || c.h === 104) && c.sw <= c.vw, JSON.stringify(c));
+      await s.ctx.close();
+    }
+    // dark mode: the same banner, the picture as strong
+    const d = await open(browser, { opts: { dark: true }, stub: { crewPages: { me: { art: 'iron' } } } });
+    await goCrew(d.p); await d.p.evaluate(() => openPlayer('me')); await d.p.waitForTimeout(800);
+    const dc = await coverNow(d.p), dsee = await coverSee(d.p);
+    C.check('cover in dark mode: the same height and the picture just as clear', dc.h >= 190 && dc.h <= 210 && dc.opacity >= 0.99 && dc.blend === 'normal' && dsee.shown.sd >= dsee.natural.sd * 0.85 && dsee.shown.mean >= dsee.natural.mean * 0.85, JSON.stringify([dc, dsee]));
+    C.check('no page errors', !d.p.errs.length, d.p.errs.join(' | '));
+    await d.ctx.close();
+  }
+  if (on(31)) {
+    // (2) THE CHEERS NUMBER: stage98 counts only Cheers sent with the clap button, so nothing an athlete reads says likes count
+    const g = await open(browser, { stub: { crewPages: { me: { cheers: { total: 3, recent: [] } }, [CK.mina]: { cheers: { total: 7, recent: [] } } } } });
+    await goCrew(g.p); await shown(g.p, CK.mina);
+    C.check('the tile still says "cheers", with the page\'s own number', (await tiles(g.p))[3] === '7 cheers', JSON.stringify(await tiles(g.p)));
+    await g.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await g.p.waitForTimeout(250);
+    // a like on her post never moves her total: the phone adds nothing for a like
+    await g.p.evaluate(id => crewLike({ dataset: { kd: id } }), P_MINA); await g.p.waitForTimeout(400);
+    await shown(g.p, CK.mina);
+    C.check('a like on her post leaves her cheers number alone (7)', (await tiles(g.p))[3] === '7 cheers', JSON.stringify(await tiles(g.p)));
+    const gt = await g.p.evaluate(() => buildAppGuideCards());
+    const gseg = (gt.match(/The <strong>cheers<\/strong> number on a page[\s\S]*?<\/p>/) || [''])[0];
+    C.check('the guide says the number counts only the cheers people sent with the Cheer button, and that likes are not in it', /only the cheers/.test(gseg) && /<strong>Cheer<\/strong> button/.test(gseg) && /likes/i.test(gseg) && /not in it|do not count|are not counted/.test(gseg) && !/every cheer and every like/.test(gt), gseg);
+    C.check('…and nothing else in the guide says likes make up the cheers', !/cheers? (and|or) (every )?likes?|likes? (and|or) (every )?cheers?/i.test(gt.replace(gseg, '')));
+    await g.ctx.close();
+    const en = fsx.readFileSync(path.join(ROOT, 'privacy.html'), 'utf8'), fa = fsx.readFileSync(path.join(ROOT, 'privacy-fa.html'), 'utf8');
+    C.check('privacy.html: the page\'s number counts only the cheers sent with the Cheer button, and likes are said not to be in it', /with the Cheer button since you joined the crew/.test(en) && /It counts only the cheers people sent you with the Cheer button\. Likes on your posts and moments are not in it\./.test(en) && !/cheers and likes you have received/.test(en) && !/It counts cheers and likes/.test(en));
+    C.check('privacy.html: the notice carries today\'s date', /Last updated · 25 October 2026/.test(en));
+    C.check('privacy-fa.html: both changed items say it, and each is marked as a draft for Amir to read', !/تشویق‌ها و لایک‌های پست‌ها/.test(fa) && !/تشویق‌ها و لایک‌هایی/.test(fa)
+      && (fa.match(/<!-- FA DRAFT 2026-10-25: Amir to read -->\r?\n\s*<li><b>(صفحه‌ی تو|تشویق)<\/b>/g) || []).length === 2 && (fa.match(/Cheer<\/bdi> برات فرستادن/g) || []).length === 2);
+  }
+
+  // (3) PROFILE in the account sheet: the face button at the top right opens a group of four rows, at the TOP, in the sheet's own row style
+  const acctRows = p => p.evaluate(() => [...document.querySelectorAll('#hist-overlay .acct-list .hrow .hrow-v')].map(x => x.textContent.trim()));
+  const profRows = p => p.evaluate(() => [...document.querySelectorAll('#hist-overlay .acct-prof .hrow .hrow-v')].map(x => x.textContent.trim()));
+  const sheetTitle = p => p.evaluate(() => (document.querySelector('#hist-overlay .readiness-title') || {}).textContent || '');
+  const sheetEye = p => p.evaluate(() => (document.querySelector('#hist-overlay .readiness-eyebrow') || {}).textContent || '');
+  const sheetUp = p => p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'));
+  const sheetBackBtn = p => p.evaluate(() => !!document.querySelector('#hist-overlay .sheet-back'));
+  const tapSheetBack = async p => { await p.evaluate(() => { const b = document.querySelector('#hist-overlay .sheet-back'); if (b) b.click(); }); await p.waitForTimeout(300); };
+  const openAcct = async p => { await p.evaluate(() => openAccount()); await p.waitForTimeout(350); };
+  const sheetFacts = p => p.evaluate(() => [...document.querySelectorAll('#hist-overlay .pl-facts .pl-f')].map(r => [(r.querySelector('.pl-fl') || {}).textContent, ((r.querySelector('.pl-fv') || r.querySelector('.pl-fo') || {}).textContent || '').trim()]));
+  const sheetLabels = p => p.evaluate(() => [...document.querySelectorAll('#hist-overlay .pl-facts .pl-f .pl-fl')].map(e => e.textContent.trim()));
+  const sheetChip = (p, t) => p.evaluate(t => { const b = [...document.querySelectorAll('#hist-overlay .pl-fo .pl-chip')].find(x => x.textContent.trim() === t); if (!b) return false; b.click(); return true; }, t);
+  const sheetRow = (p, l) => p.evaluate(l => { const b = [...document.querySelectorAll('#hist-overlay .pl-facts button.pl-f, #hist-overlay .pl-facts .pl-f > button.pl-fl')].find(x => (x.querySelector('.pl-fl') || x).textContent.trim() === l); if (!b) return false; b.click(); return true; }, l);
+  if (on(31)) {
+    const m = await open(browser, { stub: { crewPages: { me: { who: 'Alex R.' } } } });
+    await waitTab(m.p); await m.p.waitForTimeout(600);
+    await openAcct(m.p);
+    const prof = await profRows(m.p), all = await acctRows(m.p);
+    const top = await m.p.evaluate(() => { const ov = document.getElementById('hist-overlay'), g = ov.querySelector('.acct-grp'), first = ov.querySelector('.hrow'), th = ov.querySelector('.acct-theme');
+      return { grp: g ? g.textContent.trim() : null, first: first ? first.id : null, grpBeforeRows: !!(g && first && (g.compareDocumentPosition(first) & Node.DOCUMENT_POSITION_FOLLOWING)), beforeTheme: !!(g && th && (g.compareDocumentPosition(th) & Node.DOCUMENT_POSITION_FOLLOWING)) }; });
+    C.check('the account sheet opens with a Profile group at the TOP: Your photo, Your game, Your page, What the crew sees of you', JSON.stringify(prof) === JSON.stringify(['Your photo', 'Your game', 'Your page', 'What the crew sees of you']) && top.grp === 'Profile' && top.first === 'acct-photo' && top.beforeTheme, JSON.stringify([prof, top]));
+    C.check('…each in the sheet\'s own door-row style (.hrow, 64 px or more, a ›), so nothing new is drawn', await m.p.evaluate(() => [...document.querySelectorAll('#hist-overlay .acct-prof .hrow')].every(b => b.classList.contains('hrow') && b.getBoundingClientRect().height >= 63.5 && !!b.querySelector('.hrow-a'))));
+    C.check('…and "Your page" is in it once: the old row further down is gone, not copied', all.filter(x => x === 'Your page').length === 1 && all.indexOf('Your page') === 2 && (await m.p.$$('#hist-overlay #acct-page')).length === 1, JSON.stringify(all));
+    C.check('…Crew and the Bell, How the app works and Privacy keep their rows', ['Crew and the Bell', 'How the app works', 'Privacy'].every(x => all.indexOf(x) > 3), JSON.stringify(all));
+    const face = await m.p.evaluate(() => { const e = document.querySelector('#acct-photo .cr-fl'); return e ? { t: e.textContent.trim(), fc: e.getAttribute('data-fc'), w: Math.round(e.getBoundingClientRect().width) } : null; });
+    C.check('Your photo row shows your face (your initials until you add one), 28 px or more', !!face && face.t === 'AR' && face.w >= 28, JSON.stringify(face));
+    // the photo sheet, and ‹ Back to the account
+    await click(m.p, '#acct-photo'); await m.p.waitForTimeout(400);
+    C.check('Your photo opens the photo sheet (choose, drag, Save), with ‹ Back', (await sheetTitle(m.p)) === 'Your photo' && !!(await m.p.$('#hist-overlay #fp-file')) && (await sheetBackBtn(m.p)));
+    await tapSheetBack(m.p);
+    C.check('…‹ Back is the account sheet again, Profile on top', (await sheetEye(m.p)) === 'Your account' && !!(await m.p.$('#acct-photo')));
+    // Your game: the same card and editor as your page, in a sheet
+    await click(m.p, '#acct-game'); await m.p.waitForTimeout(500);
+    C.check('Your game opens a sheet of its own, with ‹ Back, and an empty game is one row: "Add your game"', (await sheetTitle(m.p)) === 'Your game' && (await sheetBackBtn(m.p)) && /Add your game/.test(await text(m.p, '#hist-overlay .pl-fadd') || '') && (await m.p.$$('#hist-overlay .pl-facts .pl-f')).length === 1);
+    await click(m.p, '#hist-overlay .pl-fadd'); await m.p.waitForTimeout(300);
+    const l0 = await sheetLabels(m.p), chips0 = await m.p.evaluate(() => [...document.querySelectorAll('#hist-overlay .pl-fo .pl-chip')].map(b => b.textContent));
+    C.check('…it opens on Plays with every racket sport and None, the rows the page has (Hand, Club, Trains for, Working on, Instagram)', JSON.stringify(l0) === JSON.stringify(['Plays', 'Hand', 'Club', 'Trains for', 'Working on', 'Instagram']) && chips0.length === 8 && chips0[7] === 'None', JSON.stringify([l0, chips0]));
+    await sheetChip(m.p, 'Tennis'); await m.p.waitForTimeout(500);
+    const g1 = await lastGame(m.p), l1 = await sheetLabels(m.p);
+    C.check('Tennis saves with the page\'s own call (my_game_set), and the sheet shows Backhand and Level at once', !!g1 && JSON.stringify(g1.sports) === '["tennis"]' && l1.indexOf('Backhand') > 0 && l1.indexOf('Level') > 0, JSON.stringify([g1, l1]));
+    await sheetRow(m.p, 'Plays'); await m.p.waitForTimeout(250);
+    await sheetRow(m.p, 'Hand'); await m.p.waitForTimeout(250); await sheetChip(m.p, 'Left-handed'); await m.p.waitForTimeout(500);
+    const g2 = await lastGame(m.p), r2 = (await sheetFacts(m.p)).find(r => r[0] === 'Hand');
+    C.check('Hand: one tap saves it and closes the row', !!g2 && g2.hand === 'left' && JSON.stringify(r2) === '["Hand","Left-handed"]' && !(await m.p.$('#hist-overlay .pl-fo')), JSON.stringify([g2, r2]));
+    // a field, typed in the sheet: the Instagram name is checked and saved like on the page
+    await sheetRow(m.p, 'Instagram'); await m.p.waitForTimeout(300);
+    const foc = await m.p.evaluate(() => ({ id: (document.activeElement || {}).id, inSheet: !!(document.activeElement && document.activeElement.closest('#hist-overlay')), n: document.querySelectorAll('#pl-gin').length }));
+    C.check('the field has the keyboard, inside the sheet, and there is only one of it', foc.id === 'pl-gin' && foc.inSheet && foc.n === 1, JSON.stringify(foc));
+    await m.p.keyboard.type('sara k'); await click(m.p, '#hist-overlay .pl-gsave'); await m.p.waitForTimeout(350);
+    C.check('…a name with a space is refused in words, nothing is sent for it', /letters, numbers, dots and underscores/.test(await text(m.p, '#hist-overlay #pl-gerr') || '') && !((await lastGame(m.p)) || {}).ig);
+    await m.p.evaluate(() => { const i = document.getElementById('pl-gin'); i.value = ''; plGameType(i); });
+    await m.p.keyboard.type('@sara.k'); await click(m.p, '#hist-overlay .pl-gsave'); await m.p.waitForTimeout(600);
+    const g3 = await lastGame(m.p), ig = (await sheetFacts(m.p)).find(r => r[0] === 'Instagram');
+    C.check('…and "@sara.k" saves through the same my_game_set, shown as @sara.k', !!g3 && g3.ig === 'sara.k' && g3.hand === 'left' && JSON.stringify(ig) === '["Instagram","@sara.k"]', JSON.stringify([g3, ig]));
+    C.check('…one call for each save that was allowed (Tennis, Left-handed, @sara.k), none for the refused name', (await gameCalls(m.p)).length === 3, String((await gameCalls(m.p)).length));
+    await tapSheetBack(m.p);
+    C.check('‹ Back from Your game is the account sheet', (await sheetEye(m.p)) === 'Your account');
+    await m.p.evaluate(() => closeHistorySheet()); await m.p.waitForTimeout(200);
+    await m.p.evaluate(() => openPlayer('me')); await m.p.waitForTimeout(700);
+    const pg = await factRows(m.p);
+    C.check('your own page shows the very same card (what the sheet saved), with no row left open', pg.some(r => r[0] === 'Plays' && /Tennis/.test(r[1])) && pg.some(r => r[0] === 'Instagram' && r[1] === '@sara.k') && pg.some(r => r[0] === 'Hand' && r[1] === 'Left-handed') && !(await m.p.$('#crewplayer-body .pl-fo')), JSON.stringify(pg));
+    // from your own page: the account's button is on the page too. The editor lives in the sheet only, and the page behind never draws a second field
+    await openAcct(m.p); await click(m.p, '#acct-game'); await m.p.waitForTimeout(400);
+    await sheetRow(m.p, 'Club'); await m.p.waitForTimeout(300);
+    const two = await m.p.evaluate(() => ({ n: document.querySelectorAll('#pl-gin').length, inPage: !!document.querySelector('#crewplayer-body #pl-gin'), act: (document.activeElement || {}).id, sheet: !!document.querySelector('#hist-overlay #pl-gin') }));
+    C.check('with your page under the sheet, the Club field is in the sheet alone (the page draws no second one)', two.n === 1 && !two.inPage && two.sheet && two.act === 'pl-gin', JSON.stringify(two));
+    await m.p.keyboard.type('Enghelab'); await click(m.p, '#hist-overlay .pl-gsave'); await m.p.waitForTimeout(500);
+    C.check('…saved, and the page behind has it when the sheet is closed', ((await lastGame(m.p)) || {}).club === 'Enghelab' && (await (async () => { await m.p.evaluate(() => closeHistorySheet()); await m.p.waitForTimeout(250); return (await factRows(m.p)).some(r => r[0] === 'Club' && r[1] === 'Enghelab'); })()));
+    C.check('…and closing the sheet with a row open leaves none open on the page', !(await m.p.$('#crewplayer-body .pl-fo')) && !(await m.p.$('#crewplayer-body #pl-gin')));
+    // Your page and What the crew sees of you
+    await m.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await m.p.waitForTimeout(300);
+    await openAcct(m.p); await click(m.p, '#acct-page'); await m.p.waitForTimeout(600);
+    C.check('Your page opens your own page (the sheet closes)', (await screenNow(m.p)) === 'screen-crewplayer' && !(await sheetUp(m.p)) && (await m.p.evaluate(() => _playerCk)) === 'me');
+    await openAcct(m.p); await click(m.p, '#acct-sees'); await m.p.waitForTimeout(400);
+    C.check('What the crew sees of you opens Crew and the Bell, with ‹ Back to the account', (await sheetTitle(m.p)) === 'Crew and the Bell' && !!(await m.p.$('#hist-overlay .cr-sw')) && (await sheetBackBtn(m.p)));
+    await tapSheetBack(m.p);
+    C.check('…‹ Back lands on the account sheet', (await sheetEye(m.p)) === 'Your account' && !!(await m.p.$('#acct-sees')));
+    // Back (the phone's) closes the top sheet one layer at a time
+    await click(m.p, '#acct-game'); await m.p.waitForTimeout(400);
+    C.check('the phone\'s Back (topLayer) is ‹ Back while Your game sits over the account, and closes the sheet from the account', await m.p.evaluate(() => { const a = topLayer() === sheetBack; sheetBack(); const b = topLayer() === closeHistorySheet; return a && b; }));
+    C.check('no page errors', !m.p.errs.length, m.p.errs.join(' | '));
+    await m.ctx.close();
+  }
+  if (on(31)) {
+    // someone who has not joined: the photo row says so and leads to the crew's question; the rest is theirs all the same
+    const n = await open(browser, { b: { me: { answer: null, can_post: false } }, stub: { crewPages: { me: { member: false } } } });
+    await waitTab(n.p); await n.p.waitForTimeout(600);
+    await openAcct(n.p);
+    C.check('not in the crew: "Join the crew to add a photo" in the place of Your photo; Your game, Your page and What the crew sees of you are still there', JSON.stringify(await profRows(n.p)) === JSON.stringify(['Join the crew to add a photo', 'Your game', 'Your page', 'What the crew sees of you']), JSON.stringify(await profRows(n.p)));
+    await click(n.p, '#acct-photo'); await n.p.waitForTimeout(600);
+    C.check('…it leads to the crew\'s question (Crew, "Join the crew?"), and the sheet is closed', (await screenNow(n.p)) === 'screen-crew' && !(await sheetUp(n.p)) && !!(await n.p.$('#crew-ask')) && /Join the crew\?/.test(await plain(n.p, '#crew-ask') || ''), await screenNow(n.p));
+    await openAcct(n.p); await click(n.p, '#acct-game'); await n.p.waitForTimeout(500);
+    C.check('…and Your game still works for them (the page\'s own call)', (await sheetTitle(n.p)) === 'Your game' && /Add your game/.test(await text(n.p, '#hist-overlay .pl-fadd') || ''));
+    await click(n.p, '#hist-overlay .pl-fadd'); await n.p.waitForTimeout(250); await sheetChip(n.p, 'Padel'); await n.p.waitForTimeout(500);
+    C.check('…padel is saved', JSON.stringify(((await lastGame(n.p)) || {}).sports) === '["padel"]');
+    await n.ctx.close();
+    // under 13: no photo row at all, no door into what the crew sees (nothing reaches them), the game and the page stay
+    const u = await open(browser, { b: { me: { under13: true, can_post: false } }, stub: { crewPages: { me: { under13: true, member: false } } } });
+    await waitTab(u.p); await u.p.waitForTimeout(600);
+    await openAcct(u.p);
+    C.check('under 13: no Your photo row; Your game and Your page stay', JSON.stringify(await profRows(u.p)) === JSON.stringify(['Your game', 'Your page']), JSON.stringify(await profRows(u.p)));
+    await click(u.p, '#acct-game'); await u.p.waitForTimeout(500);
+    C.check('…and their Your game has no Instagram row', (await sheetTitle(u.p)) === 'Your game' && !(await sheetLabels(u.p)).includes('Instagram') && !!(await u.p.$('#hist-overlay .pl-facts')));
+    await u.ctx.close();
+    // a server without stage96: no Profile group, no photo, no page: the account sheet is what it was
+    const o = await open(browser, { b: { noPages: true } });
+    await waitTab(o.p); await o.p.waitForTimeout(600);
+    await openAcct(o.p);
+    const oldRows = await acctRows(o.p);
+    C.check('a server without stage96: no Profile group, and the rows the account always had', !(await o.p.$('#hist-overlay .acct-grp')) && !(await o.p.$('#acct-photo')) && !(await o.p.$('#acct-game')) && !(await o.p.$('#acct-page')) && oldRows.includes('Crew and the Bell') && oldRows.includes('How the app works'), JSON.stringify(oldRows));
+    await o.ctx.close();
+    // in the demo there is no crew: no group
+    // the sheet at 320 px, in dark mode: nothing runs off the side
+    const s = await open(browser, { opts: { w: 320, h: 640, dark: true }, stub: { crewPages: { me: { who: 'Alex R.' } } } });
+    await waitTab(s.p); await s.p.waitForTimeout(600);
+    await openAcct(s.p);
+    const fit = await s.p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, bad: [...document.querySelectorAll('#hist-overlay .acct-prof .hrow')].filter(b => b.scrollWidth > b.clientWidth + 1).length, rows: document.querySelectorAll('#hist-overlay .acct-prof .hrow').length,
+      bg: getComputedStyle(document.querySelector('#hist-overlay .acct-prof .hrow')).backgroundColor }));
+    C.check('320 px in dark mode: four rows, none cut, nothing scrolls sideways, the row colour is the dark one', fit.sw <= fit.iw && fit.bad === 0 && fit.rows === 4 && fit.bg !== 'rgb(255, 255, 255)', JSON.stringify(fit));
+    await click(s.p, '#acct-game'); await s.p.waitForTimeout(400); await click(s.p, '#hist-overlay .pl-fadd'); await s.p.waitForTimeout(300);
+    const fit2 = await s.p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, chips: [...document.querySelectorAll('#hist-overlay .pl-chip')].filter(b => { const r = b.getBoundingClientRect(), q = document.querySelector('#hist-overlay .readiness-modal').getBoundingClientRect(); return r.right > q.right + 1; }).length }));
+    C.check('…and Your game\'s chips stay inside the sheet', fit2.sw <= fit2.iw && fit2.chips === 0, JSON.stringify(fit2));
+    C.check('no page errors', !s.p.errs.length, s.p.errs.join(' | '));
+    await s.ctx.close();
+  }
+  if (on(31)) {
+    // no copy of your page on the phone: Your game says why, and fills in when the page lands
+    const w = await open(browser, {});
+    await waitTab(w.p); await w.p.waitForTimeout(600);
+    await w.p.evaluate(() => { crewPagesClear(); window.__STUB.mode = 'offline'; });
+    await openAcct(w.p); await click(w.p, '#acct-game'); await w.p.waitForTimeout(500);
+    C.check('no copy and no signal: Your game says so in words, not a blank sheet', (await sheetTitle(w.p)) === 'Your game' && /No signal/.test(await text(w.p, '#hist-overlay .readiness-modal') || '') && !(await w.p.$('#hist-overlay .pl-fadd')));
+    await w.p.evaluate(() => { window.__STUB.mode = 'online'; crewPageRefresh('me'); }); await w.p.waitForTimeout(900);
+    C.check('…and when the page lands the sheet fills in by itself: "Add your game"', !!(await w.p.$('#hist-overlay .pl-fadd')));
+    C.check('no page errors', !w.p.errs.length, w.p.errs.join(' | '));
+    await w.ctx.close();
+    // a save the server refuses puts the last card back in the sheet and says why
+    const r = await open(browser, { stub: { crewPages: { me: { game: { sports: ['tennis'], hand: 'right' } } }, gameErr: 'crew:not_yes' } });
+    await waitTab(r.p); await r.p.waitForTimeout(600);
+    await openAcct(r.p); await click(r.p, '#acct-game'); await r.p.waitForTimeout(500);
+    await sheetRow(r.p, 'Hand'); await r.p.waitForTimeout(250); await sheetChip(r.p, 'Left-handed'); await r.p.waitForTimeout(700);
+    const back = (await sheetFacts(r.p)).find(x => x[0] === 'Hand'), tt = await toast(r.p);
+    C.check('a refused save: the sheet goes back to Right-handed and a toast says it did not save', JSON.stringify(back) === '["Hand","Right-handed"]' && !!tt && /did not save|not ready/i.test(tt.text), JSON.stringify([back, tt]));
+    await r.ctx.close();
+  }
+
+  // ── 32. the pictures (390 px) for 2026-10-25: the new cover (light and dark) and the account sheet's Profile group (light) ──────────────────────────────
+  if (on(32)) {
+    const people = [[CK.alex, '#5E8C7A', '#E3B896', '#2E4A57', 1101]];
+    const faceImgs = p => p.evaluate(rows => {
+      const out = {};
+      rows.forEach(([k, bg, skin, shirt, fv]) => {
+        const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
+        const g = x.createLinearGradient(0, 0, 128, 128); g.addColorStop(0, bg); g.addColorStop(1, '#1F3A30'); x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+        x.fillStyle = shirt; x.beginPath(); x.ellipse(64, 132, 48, 40, 0, 0, Math.PI * 2); x.fill();
+        x.fillStyle = skin; x.fillRect(56, 70, 16, 18); x.beginPath(); x.ellipse(64, 52, 21, 25, 0, 0, Math.PI * 2); x.fill();
+        out[k] = { fv, b64: c.toDataURL('image/jpeg', 0.85).split(',')[1] };
+      });
+      window.__STUB.faces = out;
+    }, people);
+    const fvs = { [CK.alex]: 1101 };
+    const pages = { me: { who: 'Alex R.', lv: 19, fv: 1101, cheers: { total: 3, recent: [] }, game: { sports: ['tennis'], hand: 'right', backhand: 'two', plays_at: 'club', club: 'Enghelab' } } };
+    for (const dark of [false, true]) {
+      const a = await open(browser, { opts: { dark }, stub: { bell: withFaces(fvs), crewBoard: board(), crewPages: pages } });
+      await faceImgs(a.p); await goCrew(a.p); await a.p.waitForTimeout(900);
+      await a.p.evaluate(() => openPlayer('me')); await a.p.waitForTimeout(1200);
+      await a.p.screenshot({ path: path.join(out, 'cover-' + (dark ? 'dark' : 'light') + '-390.png'), clip: { x: 0, y: 0, width: 390, height: 520 } });
+      if (!dark) {
+        await a.p.evaluate(() => openAccount()); await a.p.waitForTimeout(900);
+        const pf = await a.p.evaluate(() => { const e = document.querySelector('#acct-photo .cr-fl'), i = e && e.querySelector(':scope > img.fc-img'); return e ? { fc: e.getAttribute('data-fc'), fv: e.getAttribute('data-fv'), img: !!i, loaded: !!i && i.complete && i.naturalWidth > 0 } : null; });
+        C.check('with a photo, the Your photo row wears it (the face is asked for like every other, once the sheet is open)', !!pf && pf.fc === CK.alex && pf.fv === '1101' && pf.img && pf.loaded, JSON.stringify(pf));
+        await a.p.screenshot({ path: path.join(out, 'account-profile-light-390.png') });
+        await click(a.p, '#acct-game'); await a.p.waitForTimeout(500); await sheetRow(a.p, 'Hand'); await a.p.waitForTimeout(400);
+        await a.p.screenshot({ path: path.join(out, 'account-yourgame-light-390.png') });
+      }
+      await a.ctx.close();
+    }
+  }
 
   await browser.close();
   process.exit(C.report() ? 1 : 0);

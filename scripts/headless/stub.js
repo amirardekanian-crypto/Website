@@ -21,7 +21,7 @@
 // stage96 is TOLD by get_bell's top-level `lounge: 1` (the fixture sets it; without it the app draws Crew as it was). YOUR page (no p_subject) is whole: every block, the comebacks, and
 // `kinds` (your switches, a kind not named is on); someone else's has neither.
 // The cheer (step 3): crew_cheer answers like the server (cheerLog, cheerCap, cheerErr); crew_page reads cheerLog for mine_today.
-// Cheers on a page (CONTRACT 9b, "All-time cheers"): `cheers.total` is every cheer and like the person has received since joining (the tile, on every page, yours too); `season` is still sent, and the app does not draw it.
+// Cheers on a page (CONTRACT 9b, "All-time cheers"): `cheers.total` is every Cheer sent to the person with the clap button since joining, and since stage98 NEVER a like (the tile, on every page, yours too); `season` is still sent, and the app does not draw it.
 // Steps 4 to 6: a page's `cycle` (YOUR page: every week of the cycle with days that carry title and mins, plus `done` / `extra`; SOMEONE ELSE'S, CONTRACT 9b: { n, per_week, done, extra, weeks: [this week only] }
 // and days that carry only day and extra: the stub sends exactly what the fixture gives, so a test can also send MORE than the server would), `game` and each achievement's `signed` / `signed_n` come from the `crewPages` entry (none by default, so a
 // page has no cycle, no game and nobody signed); my_game_set answers like CONTRACT 4 and crew_page(own) then carries what it saved (`myGame`; gameMissing, gameErr, gameFail, gameDelay).
