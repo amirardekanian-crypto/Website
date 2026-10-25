@@ -6350,7 +6350,7 @@
        there are numbers to put on it (paintCover()). The lift's name is the title on a lift's page. -->
   <div class="ceil-head">
     <button class="nav-back" onclick="ceilingBack()" aria-label="Back">←</button>
-    <div class="ceil-kick">One-rep maxes</div>
+    <div class="ceil-kick">Your best lifts</div>
     <h1 class="ceil-title" id="ceil-title">Personal Records</h1>
     <div class="ceil-board" id="ceil-board" hidden></div>
     <p class="ceil-line" id="ceil-line" hidden></p>
@@ -11424,9 +11424,9 @@ function renderNotes() {
 // itself. Two copies of the same prose would drift the first time either is edited.
 // (The guide opens in the one sheet since COACH-02: openHelp().)
 const CEILING_HELP = `
-  <p><strong>What it is.</strong> Your one rep max is the heaviest you could lift one single time.
+  <p><strong>What it is.</strong> The most you could lift one single time, worked out from your sets.
   It is the normal way to measure how strong you are.</p>
-  <p><strong>You never have to test it.</strong> Testing a real one rep max takes a long warm-up,
+  <p><strong>You never have to test it.</strong> Testing a true max takes a long warm-up,
   leaves you wrecked, and carries a risk. So the app works it out instead, from sets you already
   do in your programme. Log the weight you used and your effort, and finish the session: every time
   you beat your best, the new number appears by itself.</p>
@@ -17237,15 +17237,15 @@ function renderCeiling() {
   _ceilLift = null;
   _ceilFrom = null;
   _ceilAdd = null;
-  ceilHeadPlain('One-rep maxes');
+  ceilHeadPlain('Your best lifts');
   document.getElementById('ceil-title').textContent = 'Personal Records';
   const lifts = ceilingLifts();
   const body  = document.getElementById('ceil-body');
 
   // Always-on plain-English line under the cover: this is the first screen
   // someone who has never heard of a one-rep max will land on.
-  const intro = `<p class="ceil-intro">The most you could lift for one rep, on each exercise.
-    Worked out from your normal sets, so you never have to test it.</p>`;
+  const intro = `<p class="ceil-intro">The most you could lift once, worked out from your sets.
+    You never have to test it.</p>`;
 
   // Always offered since 2026-10-20: the picker holds this cycle, the lifts already on the record and
   // a search over the rest, so it can no longer open an empty list. (It used to need a liftable
@@ -24066,7 +24066,7 @@ function openHistorySheet(card) {
     return { date: h.date, est: estOk ? best.est : null, top };
   }).filter(Boolean);
   const estPts = pts.filter(p => p.est != null);
-  const series = estPts.length >= 2 ? { label: `Best set · estimated 1RM, ${lu}`, vals: estPts.map(p => p.est) }
+  const series = estPts.length >= 2 ? { label: `Best set · most you could lift once, ${lu}`, vals: estPts.map(p => p.est) }
                : (pts.filter(p => p.top != null).length >= 2
                  ? { label: lu === 'plates' ? 'Top stack, plates' : `Top weight, ${lu}`, vals: pts.filter(p => p.top != null).map(p => p.top) } : null);
 

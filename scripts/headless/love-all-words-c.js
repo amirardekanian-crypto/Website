@@ -1,4 +1,5 @@
 // Plain Words, Group C (Amir, 2026-10-25: "Go with your picks"): the words of Progress, the records page, the unit menu, Career and Crew.
+//   onerm      the records page never says "One-rep max" and explains its number in one plain line.
 //   counts     the cover says "Cycle 2 of 3", under it "Week 2 of 5", the road says "5 weeks": one count per number.
 // Serve the repo first (python -m http.server <port> --bind 127.0.0.1; BASE=http://127.0.0.1:<port>; PLAYWRIGHT and CHROMIUM, see lib.js), then:
 //   node scripts/headless/love-all-words-c.js
@@ -40,9 +41,35 @@ async function counts(browser) {
   await ctx.close();
 }
 
+// ═════════ onerm ═════════
+const DAY = 86400000, day = n => new Date(Date.now() - n * DAY).toISOString().slice(0, 10);
+const LIFTS = [
+  { lift: 'Barbell Back Squat', kg: 98, w: '80', r: '6', rpe: 7, d: day(10), t: Date.now() - 10 * DAY },
+  { lift: 'Barbell Back Squat', kg: 104, w: '85', r: '6', rpe: 7, d: day(2), t: Date.now() - 2 * DAY }];
+async function onerm(browser) {
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    const { ctx, p } = await H.openProgram(browser, { w, h, tz: 'UTC', seed: { _1rm: LIFTS } });
+    await p.evaluate("goTo('ceiling')");
+    await p.waitForTimeout(500);
+    const kick = await txt(p, '#screen-ceiling .ceil-kick');
+    const intro = await txt(p, '#ceil-body .ceil-intro');
+    const all = await txt(p, '#screen-ceiling');
+    t.check(`onerm ${w}px: the eyebrow is "Your best lifts", the title stays "Personal Records"`, /^your best lifts$/i.test(kick || '') && /^personal records$/i.test(await txt(p, '#ceil-title')), kick);
+    t.check(`onerm ${w}px: the line "The most you could lift once, worked out from your sets." is where the page explains its number`, /^The most you could lift once, worked out from your sets\./.test(intro || ''), intro);
+    t.check(`onerm ${w}px: no "one-rep max" and no "1RM" anywhere on the records page`, !/one[- ]rep max|1\s?RM/i.test(all || ''), (all || '').slice(0, 200));
+    t.check(`onerm ${w}px: the line does not overflow`, (await overflow(p, '#ceil-body .ceil-intro')) <= 0 && (await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)) <= 0, '');
+    // the help card that explains the number (its "How this works" panel) says it plainly too
+    const help = await p.evaluate(() => (typeof CEILING_HELP === 'string' ? CEILING_HELP : '').replace(/<[^>]+>/g, ' '));
+    t.check(`onerm ${w}px: the help prose never says one rep max`, help.length > 100 && !/one[- ]rep max/i.test(help), help.slice(0, 120));
+    t.check(`onerm ${w}px: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await counts(browser);
+  await onerm(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

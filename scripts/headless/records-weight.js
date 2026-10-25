@@ -84,7 +84,7 @@ const COVER = `(() => {
     const { ctx, p } = await H.openProgram(browser, { seed: NUM });
     await p.evaluate("goTo('ceiling')"); await p.waitForTimeout(450);
     const c = await p.evaluate(COVER);
-    t.check('Records cover: the eyebrow "One-rep maxes", the title "Personal Records"', c.kick === 'One-rep maxes' && c.title === 'Personal Records', JSON.stringify([c.kick, c.title]));
+    t.check('Records cover: the eyebrow "Your best lifts", the title "Personal Records"', c.kick === 'Your best lifts' && c.title === 'Personal Records', JSON.stringify([c.kick, c.title]));
     t.check('Records cover: the scoreboard is the best lift (104 · KG BACK SQUAT), the ratio (1.30× · YOUR OWN BODY WEIGHT) and the number of lifts (2 · LIFTS)',
       JSON.stringify(c.cells) === JSON.stringify([['104', 'KG BACK SQUAT'], ['1.30×', 'YOUR OWN BODY WEIGHT'], ['2', 'LIFTS']]), JSON.stringify(c.cells));
     t.check('Records cover: the three tracks are equal', Math.max(...c.widths) - Math.min(...c.widths) <= 1, JSON.stringify(c.widths));
@@ -185,7 +185,7 @@ const COVER = `(() => {
       head: document.querySelector('#ceil-body .ceil-empty strong').textContent, order: [...document.querySelectorAll('#ceil-body > *')].map(e => e.className.split(' ').slice(0, 2).join('.')),
       after: document.querySelector('#ceil-body .ceil-after-steps').textContent.replace(/\s+/g, ' ').trim(), help: { open: document.querySelector('.ceil-help').open, n: document.querySelectorAll('.ceil-help').length },
       door: !!document.querySelector('#ceil-body .hrow.ceil-door') }));
-    t.check('Records empty: the cover has no scoreboard and no line', e.cover.board && e.cover.line && e.cover.kick === 'One-rep maxes', JSON.stringify(e.cover));
+    t.check('Records empty: the cover has no scoreboard and no line', e.cover.board && e.cover.line && e.cover.kick === 'Your best lifts', JSON.stringify(e.cover));
     t.check('Records empty: the four steps are a numbered list on the paper (01 to 04, Space Mono, green), with the same words',
       e.steps.length === 4 && e.steps.every(s => s[1] === 'counter(ceilstep, decimal-leading-zero)') && e.steps.every(s => s[2] === GREEN && /Space Mon/.test(s[3])) && /Open any exercise in today's session\./.test(e.steps[0][0]) && /Finish the session\. Your best set lands here by itself/.test(e.steps[3][0]) && e.head === 'Nothing here yet.', JSON.stringify(e));
     t.check('Records empty: then the one sentence about putting one in, then the + Log a max door, then How this works (closed)',
