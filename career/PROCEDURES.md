@@ -72,7 +72,8 @@ files: a procedure never hard-codes a number (GAME-10).
 | 31 | [Stage 91: the week first on Crew, as built (2026-10-20)](../docs/ref/career-procedures/31-stage-91-the-week-first-on-crew.md) | 6 KB |
 | 32 | [Stage 92: the crew's replies, as built (2026-10-20)](../docs/ref/career-procedures/32-stage-92-the-crew-s-replies.md) | 5 KB |
 | 33 | [Stage 95: a season counts what was done in it, as built (2026-10-20)](../docs/ref/career-procedures/33-stage-95-a-season-counts-what-was-done-in-it.md) | 4 KB |
+| 34 | [Stage 99: the Emblem Cabinet, server side (2026-10-25, written and rehearsed, not applied)](../docs/ref/career-procedures/34-stage-99-the-emblem-cabinet.md) | 7 KB |
 
 ---
 
-*33 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*
+*34 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*
