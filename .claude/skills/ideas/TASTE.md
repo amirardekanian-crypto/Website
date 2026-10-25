@@ -5,6 +5,14 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-25 · The Lounge on his own phone: three corrections.** *"the background on the top of the page is too small, cant see
+  anything"* (a cover must SHOW its picture: 200 px, light shade, not a dark strip), *"The number of cheers is wrong"* (this supersedes
+  my reading of 2026-10-24: a cheer is the person-to-person Cheer, as in the reference app, never a like; counting likes in made
+  Elaheh 15 against her 2 real Cheers), and *"we should be able to change profile settings in the settings when we click on our
+  image on top right side of the app as well. Its part of the settings"* (profile editing belongs in the account sheet too, not only
+  on the page). What it teaches: when he points at a reference app's number, copy its MEANING exactly, do not widen it; and every
+  editable thing about the athlete also lives in Settings.
+
 - **2026-10-24 · The Lounge, the last answers before it went live.** *"like the images i showed you, the number of cheers a person
   has got, should be shown on their acount. what do you think about this?"* and *"i like new balls idea, you can add it"* (it was
   already in step 3); the cheers became ONE all-time number counting cheers and likes received (a like already reads "X cheered you"),
