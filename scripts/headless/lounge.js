@@ -18,8 +18,8 @@
 // Step 4: This cycle (Week Bars): a bar cut into the plan's sessions, held weeks solid, the sessions beyond the plan as dots with +N, now, weeks before joining, the week sheet (yours with
 // names and minutes, theirs with the date and Session or Extra only). Section 16.
 // Step 5: Player facts for every racket sport and for people who play none: the rows each sport asks for, chips and fields in place, my_game_set one call at a time, a refusal and no signal,
-// Instagram checked, the sport line, the programme's sport badge never on a page. Section 17. Step 6: the face stack (2, 5 with +2, none), Cheered by, the one-time note on the first
-// like of an achievement's line. Section 18. Section 19 takes the pictures for steps 4 to 6.
+// Instagram checked, the sport line, the programme's sport badge never on a page. Section 17. Step 6 was the face stack and Cheered by; since 2026-10-25 (Amir:
+// "we dont need to see who cheered for their trophy") a trophy shows no cheers, a tap opens what it is, and a like says nothing of a name. Section 18. Section 19 takes the pictures for steps 4 to 6.
 // Someone else's cycle (CONTRACT 9b, in section 16): their page is "This week" (one bar, the extras as dots, Held) and "8 sessions this cycle", never "of N" and never a week that is over, even if the
 // server were to send them; your own page keeps the whole cycle and "8 of 15".
 // Step 7: @names in replies (Name Chips): the row of names above the field, its filter and order, a tap, the token that is sent, five at most, 140 counted as seen, the sheet kept above the keyboard
@@ -1405,57 +1405,46 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await g.ctx.close();
   }
 
-  // ── 18. Step 6 · Signatures as a Face Stack, and the one-time note on the first like ──────────────────────────────────────────────────────────────────
+  // ── 18. Trophies show no one's cheers (Amir, 2026-10-25: "we dont need to see who cheered for their trophy"); a tap opens what the trophy is ──────────
   const SG = (ck, who) => ({ ck, who, fv: null });
   const ACH6 = [
     { id: 'achievement:back_to_back', name: 'Back to Back', day: '2026-10-12', size: 'win', signed: [SG(CK.reza, 'Reza K.'), SG(CK.leila, 'Leila M.')], signed_n: 2 },
     { id: 'achievement:the_notebook', name: 'The Notebook', day: '2026-10-03', size: 'win', signed: [SG(CK.reza, 'Reza K.'), SG(CK.leila, 'Leila M.'), SG(CK.sara, 'Sara T.'), SG(CK.omid, 'Omid P.'), SG(null, 'Coach')], signed_n: 5 },
     { id: 'achievement:first_blood', name: 'First Blood', day: '2026-09-28', size: 'win', signed: [], signed_n: 0 },
     { id: 'achievement:straight_talk', name: 'Straight Talk', day: '2026-09-20', size: 'win', signed: [SG(CK.reza, 'Reza K.'), SG(CK.leila, 'Leila M.'), SG(CK.sara, 'Sara T.'), SG(CK.omid, 'Omid P.'), SG(CK.ali1, 'Ali B.')], signed_n: 8 }];
-  const achRows = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .cab-grid .cab-cell')].map(r => ({ t: r.querySelector('.cab-l').textContent, tag: r.tagName, faces: r.querySelectorAll('.pl-stk .cr-fl').length, more: (r.querySelector('.pl-mo') || {}).textContent || '',
-    dt: r.querySelector('.cab-s').textContent, ini: [...r.querySelectorAll('.pl-stk .cr-fl')].map(f => f.textContent.trim()).join(',') })));
+  const achRows = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .cab-grid .cab-cell')].map(r => ({ t: r.querySelector('.cab-l').textContent, tag: r.tagName, faces: r.querySelectorAll('.pl-stk, .cr-fl').length, more: (r.querySelector('.pl-mo') || {}).textContent || '',
+    dt: r.querySelector('.cab-s').textContent })));
+  const detail = p => p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'); return { on: document.getElementById('hist-overlay').classList.contains('visible'), title: (m.querySelector('.readiness-title') || {}).textContent || '',
+    em: !!m.querySelector('.cab-sh-em svg'), meta: (m.querySelector('.cab-meta') || {}).textContent || '', names: m.querySelectorAll('.pl-sgr').length, cheered: /Cheered by/.test(m.textContent) }; });
   if (on(18)) {
     const a = await open(browser, { stub: { crewPages: { [CK.mina]: { achievements: ACH6 } } } });
     await goCrew(a.p); await shown(a.p, CK.mina);
     const r = await achRows(a.p);
-    C.check('the face stack: two signed shows two faces and no number; five shows three faces and "+2"; nobody shows no stack and is no button',
-      r.length === 3 && r[0].faces === 2 && r[0].more === '' && r[0].tag === 'BUTTON' && r[1].faces === 3 && r[1].more === '+2' && r[1].tag === 'BUTTON' && r[2].faces === 0 && r[2].more === '' && r[2].tag === 'DIV', JSON.stringify(r));
-    C.check('…the faces are those who signed, in the order sent (initials until their photo is here), and the date is on the right', r[0].ini === 'RK,LM' && r[1].ini === 'RK,LM,ST' && r[0].dt === '12 Oct' && r[2].dt === '28 Sep', JSON.stringify(r.map(x => [x.ini, x.dt])));
-    C.check('…and one line says "Tap a trophy to see every cheer."', await a.p.evaluate(() => /Tap a trophy to see every cheer\./.test(document.getElementById('crewplayer-body').textContent)));
-    const ov = await a.p.evaluate(() => { const e = document.querySelectorAll('#crewplayer-body .pl-stk .cr-fl')[2], s = document.querySelectorAll('#crewplayer-body .pl-stk .cr-fl')[3]; return { w: Math.round(e.getBoundingClientRect().width), gap: Math.round(document.querySelectorAll('#crewplayer-body .pl-stk .cr-fl')[1].getBoundingClientRect().left - document.querySelectorAll('#crewplayer-body .pl-stk .cr-fl')[0].getBoundingClientRect().left), s: !!s }; });
-    C.check('…each face is 24 px and the next sits 6 px over it (18 px apart)', ov.w === 24 && ov.gap === 18, JSON.stringify(ov));
-    // the sheet
+    C.check('trophies show no faces and no number of who cheered, even the ones with cheers; every trophy is a button',
+      r.length === 3 && r.every(x => x.faces === 0 && x.more === '' && x.tag === 'BUTTON'), JSON.stringify(r));
+    C.check('…the date is still under each one', r[0].dt === '12 Oct' && r[2].dt === '28 Sep', JSON.stringify(r.map(x => x.dt)));
+    C.check('…and nothing on the page speaks of cheers on a trophy', await a.p.evaluate(() => !/every cheer|Cheered by/.test(document.getElementById('crewplayer-body').textContent)));
     await nth(a.p, '#crewplayer-body .cab-grid button.cab-cell', 1); await a.p.waitForTimeout(350);
-    const sh = await sheetRows(a.p);
-    C.check('a tap on the stack opens "Cheered by" with every name', sh.on && sh.title === 'Cheered by' && sh.eyebrow === 'The Notebook' && /3 Oct/.test(sh.sub) && sh.rows.length === 5
-      && sh.rows[0].indexOf('Reza K.') >= 0 && sh.rows[3].indexOf('Omid P.') >= 0 && /Coach/.test(sh.rows[4]) && !sh.quiet, JSON.stringify(sh));
-    C.check('…Amir shows as Coach with his photo, and the names are doors', await a.p.evaluate(() => { const rows = [...document.querySelectorAll('#hist-overlay .pl-sgr')]; return rows.length === 5 && rows.every(x => x.tagName === 'BUTTON') && !!rows[4].querySelector('.cr-ini.am'); }));
-    await nth(a.p, '#hist-overlay .pl-sgr', 0); await a.p.waitForTimeout(600);
-    C.check('a name in it opens that person\'s page (the sheet closes), and ← comes back to this page', (await screenNow(a.p)) === 'screen-crewplayer' && /Reza K\./.test(await plain(a.p, '#crewplayer-body .pl-name')) && !(await a.p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible'))), await plain(a.p, '#crewplayer-body .pl-name'));
-    await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(500);
-    C.check('…back on Mina\'s page', /Mina S\./.test(await plain(a.p, '#crewplayer-body .pl-name')));
-    // "All 4": the stacks are in the sheet too, and a signer list opens from it with ‹ Back to the list
+    const d1 = await detail(a.p);
+    C.check('a tap on a trophy opens what it is: The Notebook, its emblem, "Won by Mina · 3 Oct", and no list of who cheered', d1.on && d1.title === 'The Notebook' && d1.em && d1.meta === 'Won by Mina · 3 Oct' && !d1.names && !d1.cheered, JSON.stringify(d1));
+    await a.p.evaluate(() => history.back()); await a.p.waitForTimeout(350);
+    // "All 4": no faces there either, and a trophy opened from it has ‹ Back to the list
     await click(a.p, '#crewplayer-body .cab-all'); await a.p.waitForTimeout(350);
     const SHELF = '#hist-overlay .cab-pl > div.cab-grid:not(:first-of-type) .cab-cell';   // the sections after the level medals
-    const all = await a.p.evaluate(sel => ({ rows: [...document.querySelectorAll(sel)].map(r => [r.querySelectorAll('.pl-stk .cr-fl').length, (r.querySelector('.pl-mo') || {}).textContent || '']), title: document.querySelector('#hist-overlay .readiness-title').textContent }), SHELF);
-    C.check('"All ›" has the stacks too (Straight Talk: five faces sent, eight signed, so three faces and "+5"; First Blood, none)', all.rows.length === 4 && all.rows[3][0] === 3 && all.rows[3][1] === '+5' && all.rows[0][0] === 0, JSON.stringify(all));
+    const all = await a.p.evaluate(sel => [...document.querySelectorAll(sel)].map(r => r.querySelectorAll('.pl-stk, .cr-fl').length), SHELF);
+    C.check('"All ›" shows every trophy with no faces', all.length === 4 && all.every(n => n === 0), JSON.stringify(all));
     await nth(a.p, SHELF, 3); await a.p.waitForTimeout(350);
-    const s8 = await sheetRows(a.p);
-    C.check('…the fourth lists the five it was sent and says "and 3 more"', s8.title === 'Cheered by' && s8.rows.length === 5 && s8.quiet === 'and 3 more', JSON.stringify(s8));
+    const d2 = await detail(a.p);
+    C.check('…a trophy in it opens what it is (Straight Talk)', d2.title === 'Straight Talk' && d2.meta === 'Won by Mina · 20 Sep' && !d2.cheered, JSON.stringify(d2));
     C.check('…and ‹ Back goes to the list', await a.p.evaluate(() => { const b = document.querySelector('#hist-overlay .sheet-back'); if (!b) return false; b.click(); return /trophies/.test(document.querySelector('#hist-overlay .readiness-title').textContent); }));
     C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();
-    // your own page draws the stack too; under 13 sees no doors but still the names
+    // your own page: no faces either
     const o = await open(browser, { stub: { crewPages: { me: { achievements: ACH6 } } } });
     await goCrew(o.p); await o.p.evaluate(() => openPlayer('me')); await o.p.waitForTimeout(700);
     const ro = await achRows(o.p);
-    C.check('your own page shows the stack on your achievements', ro.length === 3 && ro[1].faces === 3 && ro[1].more === '+2', JSON.stringify(ro.map(x => [x.faces, x.more])));
+    C.check('your own page shows your trophies with no faces of who cheered', ro.length === 3 && ro.every(x => x.faces === 0 && !x.more), JSON.stringify(ro.map(x => [x.faces, x.more])));
     await o.ctx.close();
-    const u = await open(browser, { b: { me: { under13: true, can_post: false } }, stub: { crewPages: { me: { under13: true, achievements: ACH6 } } } });
-    await waitTab(u.p); await u.p.evaluate(() => openPlayer('me')); await u.p.waitForTimeout(700);
-    await nth(u.p, '#crewplayer-body .cab-grid button.cab-cell', 1); await u.p.waitForTimeout(350);
-    C.check('under 13: the names are shown and none of them is a door', await u.p.evaluate(() => { const r = [...document.querySelectorAll('#hist-overlay .pl-sgr')]; return r.length === 5 && r.every(x => x.tagName === 'DIV'); }));
-    await u.ctx.close();
   }
   if (on(18)) {
     // the one-time note: the first like on a Bell line that holds an achievement
@@ -1477,16 +1466,14 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('a like that did not reach the crew says nothing of a name (and uses up nothing)', ok2 && !!tf && !/Your name stays/.test(tf.text) && (await a.p.evaluate(id => localStorage.getItem(id + '_signnote'), H.ID)) === null, JSON.stringify(tf));
     await a.p.evaluate(() => { window.__STUB.mode = 'online'; const t = document.getElementById('aaToast'); if (t) t.hidden = true; });
     await a.p.waitForTimeout(300);
+    // Amir, 2026-10-25: "we dont need to see who cheered for their trophy": a like no longer puts a name on a trophy, so nothing says it does
     const ok3 = await likeLine(a.p, minaKey), t3 = await toast(a.p);
-    C.check('the first like on an achievement\'s line: "Your name stays on Mina\'s achievement while your like is on it."', ok3 && !!t3 && t3.text === 'Your name stays on Mina\'s achievement while your like is on it.', JSON.stringify(t3));
-    C.check('…it is said once: the key is set, and it is on this phone only (never in the snapshot that is saved to the cloud)', (await a.p.evaluate(id => localStorage.getItem(id + '_signnote'), H.ID)) === '1' && await a.p.evaluate(() => !Object.keys(_snapshot()).some(k => /signnote/.test(k))));
-    await a.p.evaluate(() => { const t = document.getElementById('aaToast'); if (t) t.hidden = true; });
+    C.check('a like on an achievement\'s line says nothing of a name (no trophy shows who cheered it)', ok3 && !t3 && (await a.p.evaluate(id => localStorage.getItem(id + '_signnote'), H.ID)) === null, JSON.stringify(t3));
     const ok4 = await likeLine(a.p, rezaKey), t4 = await toast(a.p);
-    C.check('…a second like on another achievement line says nothing', ok4 && !t4, JSON.stringify(t4));
-    C.check('…no 👏 character in the note, no em-dash, no semicolon', !/[—;]/.test((t3 || {}).text || '') && ((t3 || {}).text || '').indexOf('\u{1F44F}') < 0);
+    C.check('…nor does a second like on another achievement line', ok4 && !t4, JSON.stringify(t4));
     const gd6 = await a.p.evaluate(() => buildAppGuideCards());
-    C.check('the guide says in plain words that a face on an achievement is someone who liked it, and that a tap shows everyone', /When someone likes the moment of an achievement on the Bell, their face shows under that trophy/.test(gd6) && /Tap the trophy to see everyone who cheered it/.test(gd6)
-      && !/[—;]/.test((gd6.match(/<p>When someone likes the moment of an achievement[\s\S]*?<\/p>/) || [''])[0]));
+    C.check('the guide says a tap on a trophy or on an achievement on Crew shows what it is, and no longer speaks of faces on a trophy', /Tap a trophy on someone's page, or the name of an achievement on Crew, to see what it is and what it asks for\./.test(gd6)
+      && !/their face shows under that trophy|everyone who cheered it/.test(gd6));
     C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();
     // taking a like back, and a server without stage96, say nothing either

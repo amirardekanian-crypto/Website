@@ -506,7 +506,10 @@
 // one, and a medal for every ten levels. A clay dot sits on Progress while something won has not been seen. Someone else's page shows Trophies.
 // An achievement's share card and its moment carry the emblem, and a finished session says the time it was finished (for Early Bird and Night Owl).
 // emblems.js is new in the shell, and the Barlow Condensed 800 face its numbers use.
-const CACHE = 'aap-v228';
+// v229: program.html changed (2026-10-25, Amir: "every achievement that any one gets in crew should be clickable ... we dont need the medal of it on the
+// crew screen", and "we dont need to see who cheered for their trophy"). A Crew line carries no emblem; the achievement in it opens what it is. A trophy on
+// someone's page shows no faces of who cheered, and a tap opens what it is.
+const CACHE = 'aap-v229';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

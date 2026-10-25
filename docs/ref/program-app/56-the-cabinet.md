@@ -43,13 +43,17 @@ is reported, not fixed in place).
 - **The big moment** for an achievement or a mark tier (`openMoment()` with `emblem`): the emblem is the hero over the rays (the rays come out of the emblem's own
   middle), so a mark no longer shows its big number (it is in the emblem) and no small copy of the card sits on the page (it is one tap away, under Share it).
 - **Someone else's page** (`playerHTML()`): their level medal on the corner of their face (the LV chip stays only until the emblem script has loaded), and
-  **Trophies · N** instead of Achievements: their three newest emblems, newest first, with the faces that cheered each under it (the existing signers: a button
-  that opens *Cheered by* only where someone cheered), then **All ›** (`openPlayerAchievements()`): their whole shelf, **won only, no ghosts**, level medals
+  **Trophies · N** instead of Achievements: their three newest emblems, newest first, then **All ›** (`openPlayerAchievements()`): their whole shelf, **won only, no ghosts**, level medals
   first, then the same sections. **Their own switches decide whether any of it shows, exactly as before** (`plMark()` / `plKindOff()` for `achievement` and
   `level`): on your own page a switched-off level or achievements still show, each marked **Only you** (the level's label is a line under the dates).
   `a.id` is the award id (*achievement:big_apple*); the emblem map is keyed without the prefix.
-- **Crew line and share card.** A Bell line about an achievement or a mark carries its emblem at the end of the line, 40 px (`crewLineEmblem()`, `.cr-emblem`;
-  `.cr-em` is the reaction chip). `assets/js/sharecard.js` draws the emblem on the **achievement** card where the seal was (`spec.emblem`, `emblemUrl()`): the
+  **No cheers on a trophy** (Amir, 2026-10-25: *"when you click on someones profile, and you see their trophies, we dont need to see who cheered for their
+  trophy"*): no face stack, no *Cheered by*, no one-time note on a like. Every trophy is a button to **what it is** (`openPlayerTrophy()`): the emblem, its kind
+  and step, its rule and *Won by Sam · 22 Oct*, with no Share and no Tell the crew (those are the winner's own). Your own trophy opens your own cabinet's sheet.
+- **Crew line and share card.** **A Bell line carries no emblem** (Amir, 2026-10-25: *"every achievement that any one gets in crew should be clickable. when
+  they click, it shows the details of that achievement, we dont need the medal of it on the crew screen"*): the achievement or the mark in the line is a button
+  (`.cr-ach`, `openCrewAch()`) that opens the same sheet as a trophy (`achDetailOf()`, `achDetailSheet()`): *Won by Mina · 3 Oct*; yours opens your own cabinet's
+  sheet. `assets/js/sharecard.js` draws the emblem on the **achievement** card where the seal was (`spec.emblem`, `emblemUrl()`): the
   emblem is made whole (its gradients inside the file, Barlow Condensed 800 as a data URL, because a picture made from an `<svg>` cannot reach the page's fonts or
   gradients), drawn into the canvas, and with no emblem script, or anything failing, the seal stays. It works with no signal: both come from this site's own
   files, which the service worker keeps (`emblems.js?v=1` and `BarlowCondensed-800.woff2` are in `SHELL`).
