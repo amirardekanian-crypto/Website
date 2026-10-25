@@ -105,7 +105,8 @@ const waitRow = (p, ms) => p.waitForFunction(() => { const s = document.querySel
 const calls = (p, name) => p.evaluate(n => (window.__STUB.calls || []).filter(c => c === n).length, name);
 const params = (p, name) => p.evaluate(n => (window.__STUB.params || []).filter(c => c[0] === n).map(c => c[1]), name);
 // What a node says, line by line as the eye reads it (innerText keeps the breaks between its lines), spaces collapsed.
-const T = (p, sel) => p.evaluate(sel => { const e = document.querySelector(sel); return e ? e.innerText.replace(/ /g, ' ').replace(/\s+/g, ' ').trim() : null; }, sel);
+// (a drawing's own letters, such as the level medal's, are not what the page says: the pictures are hidden while it is read)
+const T = (p, sel) => p.evaluate(sel => { const e = document.querySelector(sel); if (!e) return null; const sv = [...e.querySelectorAll('svg')]; sv.forEach(x => { x.style.display = 'none'; }); const t = e.innerText.replace(/ /g, ' ').replace(/\s+/g, ' ').trim(); sv.forEach(x => { x.style.display = ''; }); return t; }, sel);
 async function tickAll(p) {   // every card in Day 1 (day-finish.js's way), ticked with no RPE
   const n = await p.evaluate(() => document.querySelectorAll('#day1 .checklist-item').length);
   for (let i = 0; i < n; i++) {
@@ -401,7 +402,9 @@ async function trainingBase(browser, C) {
     await p.evaluate(xp => { window.__STUB.profile = xp; }, profile(10470));
     const counting = await p.evaluate(() => {      // the finished card as Done paints it, before any answer (synchronously)
       finishTap('1', document.querySelector('#confirm-1 .confirm-btn'));
-      const e = document.getElementById('earn-1'); return e ? e.innerText.replace(/\s+/g, ' ').trim() : null;
+      const e = document.getElementById('earn-1'); if (!e) return null;
+      const sv = [...e.querySelectorAll('svg')]; sv.forEach(x => { x.style.display = 'none'; });   // the level medal's own letters are not the card's words
+      const t = e.innerText.replace(/\s+/g, ' ').trim(); sv.forEach(x => { x.style.display = ''; }); return t;
     });
     C.check('finished card: "+450 XP", counting until the server has the session', counting === `+450 XP LEVEL ${lvl(10450).level} · COUNTING`, counting);
     await p.waitForTimeout(1500);                   // the save lands, then the profile is asked again
@@ -998,9 +1001,9 @@ async function trainingLight(browser, C) {
     ({ ctx, p } = await openRW(browser, { profile: rwProfile(10000, { moments: [m1, m2], owned: { 'badge:held_weeks:3': at(0), 'badge:held_weeks:4': at(0) } }) }));
     await p.waitForSelector('.hl-moment', { timeout: 6000 }).catch(() => {});
     const mo = await p.evaluate(() => { const m = document.querySelector('.hl-moment'); const q = s => { const e = m.querySelector(s); return e ? e.textContent.replace(/\s+/g, ' ').trim() : null; };
-      return m ? { eb: q('.hl-m-eyebrow'), num: q('.hl-m-num'), t: q('.hl-m-title'), sub: q('.hl-m-sub'), next: q('.hl-m-next'), w: q('.hl-m-sheet p'), go: q('.hl-m-go'), n: document.querySelectorAll('.hl-moment').length } : null; });
-    C.check('a fresh answer opens ONE moment, the biggest: "A new mark", 24 at display size, "weeks held in a row", the next mark, Amir\'s line, Share the card; no metal, no badge name',
-      !!mo && mo.eb === 'A new mark' && mo.num === '24' && mo.t === '24 weeks held in a row' && mo.sub === null && mo.next === 'Next mark · 52 weeks' && mo.w === 'Every session, 24 weeks running. Keep it boring.' && mo.go === 'Share the card' && mo.n === 1
+      return m ? { eb: q('.hl-m-eyebrow'), num: q('.hl-m-num'), em: !!m.querySelector('.hl-m-em svg'), t: q('.hl-m-title'), sub: q('.hl-m-sub'), next: q('.hl-m-next'), w: q('.hl-m-sheet p'), go: q('.hl-m-go'), n: document.querySelectorAll('.hl-moment').length } : null; });
+    C.check('a fresh answer opens ONE moment, the biggest: "A new mark", its emblem as the hero (the 24 is in it, no big number), "weeks held in a row", the next mark, Amir\'s line, Share the card; no metal, no badge name',
+      !!mo && mo.eb === 'A new mark' && mo.num === null && mo.em && mo.t === '24 weeks held in a row' && mo.sub === null && mo.next === 'Next mark · 52 weeks' && mo.w === 'Every session, 24 weeks running. Keep it boring.' && mo.go === 'Share the card' && mo.n === 1
       && !METALS.test(JSON.stringify(mo)) && !/Hold Serve/.test(JSON.stringify(mo)), JSON.stringify(mo));
     await p.waitForTimeout(1800);
     await shot(p, 'light-moment.png');
@@ -1074,8 +1077,8 @@ async function trainingLight(browser, C) {
       const x = await openRW(browser, { w: 320, opts: { dark }, profile: rwProfile(10000, { moments: [m1], owned: { 'badge:held_weeks:3': at(0) } }) });
       await x.p.waitForSelector('.hl-moment', { timeout: 6000 }).catch(() => {});
       const g = await x.p.evaluate(() => { const el = document.querySelector('.hl-moment'); if (!el) return null; const b = [...el.querySelectorAll('.hl-m-go, .hl-m-skip')].map(e => Math.round(e.getBoundingClientRect().height));
-        return { side: document.documentElement.scrollWidth - innerWidth, buttons: b, title: el.querySelector('.hl-m-title').getBoundingClientRect().right <= innerWidth, num: el.querySelector('.hl-m-num').getBoundingClientRect().right <= innerWidth }; });
-      C.check(`320px${dark ? ' dark' : ''}: the mark's moment fits (the number at display size too), no sideways scroll, its buttons are 44 px or more`, !!g && g.side <= 0 && g.buttons.every(h => h >= 44) && g.title && g.num, JSON.stringify(g));
+        return { side: document.documentElement.scrollWidth - innerWidth, buttons: b, title: el.querySelector('.hl-m-title').getBoundingClientRect().right <= innerWidth, num: el.querySelector('.hl-m-em').getBoundingClientRect().right <= innerWidth }; });
+      C.check(`320px${dark ? ' dark' : ''}: the mark's moment fits (its emblem too), no sideways scroll, its buttons are 44 px or more`, !!g && g.side <= 0 && g.buttons.every(h => h >= 44) && g.title && g.num, JSON.stringify(g));
       await shot(x.p, `light-moment-320${dark ? '-dark' : ''}.png`);
       await x.ctx.close();
     }
@@ -1128,9 +1131,9 @@ async function trainingLight(browser, C) {
     const before = await p.evaluate(() => { finishTap('1', document.querySelector('#confirm-1 .confirm-btn')); return !!document.querySelector('.hl-moment'); });
     C.check('after Done: no moment at the tap itself', !before);
     await p.waitForSelector('.hl-moment', { timeout: 6000 }).catch(() => {});
-    const st = await p.evaluate(() => ({ mom: !!document.querySelector('.hl-moment'), card: !!document.querySelector('#complete-1.visible'), eb: (document.querySelector('.hl-moment .hl-m-eyebrow') || {}).textContent, num: (document.querySelector('.hl-moment .hl-m-num') || {}).textContent,
+    const st = await p.evaluate(() => ({ mom: !!document.querySelector('.hl-moment'), card: !!document.querySelector('#complete-1.visible'), eb: (document.querySelector('.hl-moment .hl-m-eyebrow') || {}).textContent, num: (document.querySelector('.hl-moment .hl-m-num') || {}).textContent, em: !!document.querySelector('.hl-moment .hl-m-em svg'),
       t: (document.querySelector('.hl-moment .hl-m-title') || {}).textContent, bands: document.querySelectorAll('#hlwin-1 .hl-band').length }));
-    C.check('after Done: the mark\'s moment (100 sessions with Amir) opens once the finished card is there, and is not also a band', st.mom && st.card && st.eb === 'A new mark' && st.num === '100' && st.t === '100 sessions with Amir' && st.bands === 0, JSON.stringify(st));
+    C.check('after Done: the mark\'s moment (100 sessions with Amir) opens once the finished card is there, and is not also a band', st.mom && st.card && st.eb === 'A new mark' && st.num === undefined && st.em && st.t === '100 sessions with Amir' && st.bands === 0, JSON.stringify(st));
     C.check('after Done: no page errors', !p.errs.length, JSON.stringify(p.errs));
     await ctx.close();
   }
@@ -1406,7 +1409,8 @@ async function crossApp(browser, C) {
 
 
 // ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-// FOUR COURTS: Achievements on Progress (get_achievements(), stage80), a kind opened in the sheet, the finish card's nudge
+// ACHIEVEMENTS on Progress (get_achievements(), stage80): the door, Next up, the finish card's nudge. The page behind the door was four tiles and a kind's
+// list (Four Courts) until 2026-10-25; it is the emblem cabinet now, and scripts/headless/cabinet.js checks that.
 // ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 // get_achievements() as stage80 answers it: earned ones with their day, the rest with have and need, `next` the one to lead with.
 function achFx(o = {}) {
@@ -1424,74 +1428,51 @@ function achFx(o = {}) {
 }
 async function fourCourts(browser, C) {
   const OUT = H.outDir();
-  const CLAY = /199, 85, 47|181, 70, 31|224, 107, 67/;
-  // 1. the section: the title with its count, Next up, the four tiles
+  // 1. the door on Progress: how many, what is closest; the page behind it is the cabinet
   {
     const { ctx, p } = await openRW(browser, { facts: HOLD_FACTS, hist: ONE_DONE, stub: { myMoments: myMomentsFx(), achievements: achFx() } });
     await waitRow(p);
     await goProgress(p);
     await p.waitForFunction(() => !!document.querySelector('#career-courts-wrap .hrow'), null, { timeout: 8000 }).catch(() => {});
-    // THE SCOREBOARD (2026-10-19): Achievements is a door row on Progress and the four kinds are the page behind it.
+    // THE SCOREBOARD (2026-10-19): Achievements is a door row on Progress. Since the Emblem Cabinet (2026-10-25) it counts the achievements, the four marks' tiers
+    // and the level medals together (8 + 18 + 11 = 37 here), and the page is the cabinet.
     const d = await p.evaluate(() => {
       const b = document.querySelector('#career-courts-wrap .hrow');
       const y = sel => { const e = document.querySelector(sel); return e ? Math.round(e.getBoundingClientRect().top + scrollY) : null; };
       return b ? { l: b.querySelector('.hrow-l').textContent.trim(), v: b.querySelector('.hrow-vv').textContent.trim(), s: b.querySelector('.hrow-v small').textContent.trim(),
         order: [y('.cs-card'), y('#career-courts-wrap .hrow'), y('#career-moments-wrap .hrow')] } : null;
     });
-    C.check('Achievements: a door saying "3 of 8" with what is closest, under Your numbers and above Your moments',
-      !!d && d.l === 'Achievements' && d.v === '3 of 8' && d.s === 'Straight Talk · 2 more check-ins before a session.' && d.order[0] < d.order[1] && d.order[1] < d.order[2], JSON.stringify(d));
+    C.check('Achievements: a door saying "N of 37" with what is closest, under Your numbers and above Your moments',
+      !!d && d.l === 'Achievements' && /^\d+ of 37$/.test(d.v) && d.s === 'Straight Talk · 2 more check-ins before a session.' && d.order[0] < d.order[1] && d.order[1] < d.order[2], JSON.stringify(d));
     await p.evaluate(() => goTo('achievements'));
     await p.waitForTimeout(300);
     const s = await p.evaluate(() => {
       const n = document.querySelector('#ach-body .ac-next');
       return { screen: (document.querySelector('.screen.active') || {}).id, title: (document.querySelector('#screen-achievements .ceil-title') || {}).textContent.trim(),
         lit: [...document.querySelectorAll('#global-tabs .nav-item.active')].map(x => x.dataset.tab).join(),
-        next: n && { l: n.querySelector('.cs-l').textContent, nm: n.querySelector('.ac-nm').textContent, s: n.querySelector('.ac-s').textContent, bar: (n.querySelector('.cs-bar i') || {}).style && n.querySelector('.cs-bar i').style.width },
-        tiles: [...document.querySelectorAll('#ach-body .ac-tile')].map(b => ({ k: b.querySelector('.ac-k').textContent, n: b.querySelector('.ac-n').textContent.replace(/\s+/g, ' ').trim(), nw: b.querySelector('.ac-new').textContent })),
-        clay: [...document.querySelectorAll('#ach-body, #ach-body *')].map(e => getComputedStyle(e).color + ' ' + getComputedStyle(e).backgroundColor).join('|') };
+        next: n && { l: n.querySelector('.cs-l').textContent, nm: n.querySelector('.ac-nm').textContent, s: n.querySelector('.ac-s').textContent, bar: (n.querySelector('.cs-bar i') || {}).style && n.querySelector('.cs-bar i').style.width } };
     });
     C.check('Achievements: its own page, titled Achievements, with the Progress tab lit', s.screen === 'screen-achievements' && s.title === 'Achievements' && s.lit === 'plan', JSON.stringify([s.screen, s.title, s.lit]));
-    C.check('Four Courts: Next up names the closest one with its line and bar (Straight Talk, 2 more check-ins, 92%)',
+    C.check('Next up names the closest one with its line and bar (Straight Talk, 2 more check-ins, 92%)',
       !!s && !!s.next && s.next.l === 'Next up' && s.next.nm === 'Straight Talk' && s.next.s === '2 more check-ins before a session.' && s.next.bar === '92%', JSON.stringify(s && s.next));
-    C.check('Four Courts: four tiles in order, each with earned of all and the newest (a capitals name reads as a name)', !!s && JSON.stringify(s.tiles) === JSON.stringify([
-      { k: 'Consistency', n: '1of 3', nw: 'Held · ' + Number(at(-20).slice(8)) + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(at(-20).slice(5, 7)) - 1] },
-      { k: 'Commitment', n: '1of 3', nw: 'First Blood · ' + Number(at(-40).slice(8)) + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(at(-40).slice(5, 7)) - 1] },
-      { k: 'Progress', n: '0of 1', nw: 'None yet' },
-      { k: 'Resilience', n: '1of 1', nw: 'Bounce Back · ' + Number(at(-6).slice(8)) + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(at(-6).slice(5, 7)) - 1] }]), JSON.stringify(s && s.tiles));
-    C.check('Four Courts: no clay anywhere in the section (it asks for nothing, DS-01)', !!s && !CLAY.test(s.clay), s && s.clay.slice(0, 300));
-    await p.screenshot({ path: path.join(OUT, 'four-courts-390.png'), fullPage: true }).catch(() => {});
-    // 2. a tile opens its kind: earned first with the day, then the rest furthest along first, Next on the nearest, a bar once started
-    await p.click('#ach-body .ac-tile:nth-child(1)');
-    await p.waitForTimeout(300);
-    const k = await p.evaluate(() => {
-      const ov = document.getElementById('hist-overlay');
-      return ov && ov.classList.contains('visible') ? { title: ov.querySelector('.readiness-title').textContent, eyebrow: ov.querySelector('.readiness-eyebrow').textContent,
-        rows: [...ov.querySelectorAll('.ac-row')].map(r => ({ id: r.dataset.ach, earned: r.classList.contains('is-earned'), w: r.querySelector('.ac-w').textContent, sub: r.querySelector('.ac-sub').textContent, bar: !!r.querySelector('.ac-bar') })) } : null;
-    });
-    C.check('a tile opens its kind in the sheet: "Consistency", Achievements · 1 of 3', !!k && k.title === 'Consistency' && k.eyebrow === 'Achievements · 1 of 3', JSON.stringify(k && [k.title, k.eyebrow]));
-    C.check('the kind: Held first (earned, its caption and day), then Back to Back (Next, its line and bar), then Full Month (what earns it, no bar: this month is spoilt)',
-      !!k && k.rows.map(r => r.id).join() === 'held,back_to_back,full_month' && k.rows[0].earned && /Your first held week/.test(k.rows[0].sub)
-      && k.rows[1].w === 'Back to BackNext' && k.rows[1].sub === 'Two training weeks held in a row, the first time. · 1 of 2' && k.rows[1].bar
-      && !k.rows[2].earned && !k.rows[2].bar && /calendar month/.test(k.rows[2].sub), JSON.stringify(k && k.rows));
-    await p.screenshot({ path: path.join(OUT, 'four-courts-kind-390.png') }).catch(() => {});
-    await p.evaluate(() => history.back());
-    await p.waitForTimeout(300);
-    C.check('Back closes the kind', await p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')));
-    // 3. Next up's tap opens its kind
+    // 2. Next up's tap opens that emblem's sheet
     await p.click('#ach-body .ac-next');
     await p.waitForTimeout(300);
-    C.check('Next up opens its kind (Commitment)', await p.evaluate(() => { const ov = document.getElementById('hist-overlay'); return ov.classList.contains('visible') && ov.querySelector('.readiness-title').textContent === 'Commitment'; }));
-    // 4. the nudge: one step short of a held week, of a check-in total; nothing otherwise
+    C.check('Next up opens its emblem in the sheet (Straight Talk, not won, 23 of 25)', await p.evaluate(() => { const ov = document.getElementById('hist-overlay'); return ov.classList.contains('visible') && ov.querySelector('.readiness-title').textContent === 'Straight Talk' && /23 of 25/.test(ov.textContent); }));
+    await p.evaluate(() => history.back());
+    await p.waitForTimeout(300);
+    C.check('Back closes it', await p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')));
+    // 3. the nudge: one step short of a held week, of a check-in total; nothing otherwise
     const nud = await p.evaluate(() => ({
       week: achNudgeHTML({ weekLeft: 1, checkin: true }), week0: achNudgeHTML({ weekLeft: 0, checkin: false }), two: achNudgeHTML({ weekLeft: 2, checkin: false }) }));
     C.check('the nudge: one more session this week gives Back to Back', /One more session this week and you get Back to Back\./.test(nud.week), nud.week);
     C.check('the nudge: none when the session holds the week itself or two are left (Straight Talk at 23 of 25 with no check-in today is two away)', nud.week0 === '' && nud.two === '', JSON.stringify(nud));
     const ab = await p.evaluate(() => { document.querySelector('#screen-achievements .nav-back').click(); return (document.querySelector('.screen.active') || {}).id; });
     C.check('Achievements: the back arrow lands on Progress', ab === 'screen-plan', ab);
-    C.check('Four Courts: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
+    C.check('Achievements: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
-  // 5. the check-in nudge, and 320 px
+  // 4. the check-in nudge, and 320 px
   {
     const { ctx, p } = await openRW(browser, { w: 320, facts: HOLD_FACTS, hist: ONE_DONE, stub: { myMoments: myMomentsFx(), achievements: achFx({ checkins: 23 }) } });
     await waitRow(p);
@@ -1501,11 +1482,11 @@ async function fourCourts(browser, C) {
     await p.waitForTimeout(300);
     const n = await p.evaluate(() => achNudgeHTML({ weekLeft: 3, checkin: true }));
     C.check('the nudge: today\'s check-in makes 24 of 25, so the next one gives Straight Talk', /Answer the check-in before your next session and you get Straight Talk\./.test(n), n);
-    const fit = await p.evaluate(() => { const r = [...document.querySelectorAll('#ach-body .ac-next, #ach-body .ac-tile')].map(e => e.getBoundingClientRect().right); return { right: Math.max(...r), vw: innerWidth, sideways: document.documentElement.scrollWidth > innerWidth + 1 }; });
-    C.check('320 px: Next up and the tiles fit, no sideways scroll', fit.right <= fit.vw && !fit.sideways, JSON.stringify(fit));
+    const fit = await p.evaluate(() => { const r = [...document.querySelectorAll('#ach-body .ac-next, #ach-body .cab-cell')].map(e => e.getBoundingClientRect().right); return { right: Math.max(...r), vw: innerWidth, sideways: document.documentElement.scrollWidth > innerWidth + 1 }; });
+    C.check('320 px: Next up and the emblems fit, no sideways scroll', fit.right <= fit.vw && !fit.sideways, JSON.stringify(fit));
     await ctx.close();
   }
-  // 6. no answer (the server without stage80): no section, nothing else changes
+  // 5. no answer (the server without stage80): no section, nothing else changes
   {
     const { ctx, p } = await openRW(browser, { facts: HOLD_FACTS, hist: ONE_DONE, stub: { myMoments: myMomentsFx() } });
     await waitRow(p);

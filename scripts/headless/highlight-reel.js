@@ -376,8 +376,8 @@ const liveReady = p => p.waitForFunction(() => {
     const { ctx, p } = await open(browser, { prog: prog(-4), hist: hist(-4), stub });
     await p.waitForSelector('.hl-moment', { timeout: 8000 }).catch(() => {});
     const mo = await p.evaluate(() => { const el = document.querySelector('.hl-moment'); const q = s => (el.querySelector(s) || {}).textContent || null;
-      return el ? { eyebrow: q('.hl-m-eyebrow'), num: q('.hl-m-num'), title: q('.hl-m-title').replace(/\s+/g, ' ').trim(), next: q('.hl-m-next'), go: q('.hl-m-go') } : null; });
-    t.check('a mark\'s moment: "A new mark", the number, what it counts, the next mark, Share the card', !!mo && mo.eyebrow === 'A new mark' && mo.num === '12' && /weeks held in a row$/.test(mo.title) && mo.next === 'Next mark · 24 weeks' && mo.go === 'Share the card', JSON.stringify(mo));
+      return el ? { eyebrow: q('.hl-m-eyebrow'), num: q('.hl-m-num'), em: !!el.querySelector('.hl-m-em svg'), title: q('.hl-m-title').replace(/\s+/g, ' ').trim(), next: q('.hl-m-next'), go: q('.hl-m-go') } : null; });
+    t.check('a mark\'s moment: "A new mark", its emblem (the number is in it, since the Emblem Cabinet), what it counts, the next mark, Share the card', !!mo && mo.eyebrow === 'A new mark' && mo.num === null && mo.em && /weeks held in a row$/.test(mo.title) && mo.next === 'Next mark · 24 weeks' && mo.go === 'Share the card', JSON.stringify(mo));
     await p.click('.hl-moment .hl-m-go'); await ready(p);
     const s = await sheet(p);
     t.check('its button closes the moment and opens "Share your mark" with the mark\'s card on it (no metal)', await p.evaluate(() => !document.querySelector('.hl-moment')) && s.title === 'Share your mark' && /12 weeks held/.test(s.alt) && !/emerald/i.test(s.alt) && s.w === 1080 && s.h === 1920, JSON.stringify([s.title, s.alt, s.w, s.h]));

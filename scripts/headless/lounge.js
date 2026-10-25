@@ -166,7 +166,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('a post\'s name opens that person\'s page, and the Crew tab stays lit', (await screenNow(p)) === 'screen-crewplayer' && (await litTab(p)) === 'crew');
     const a = await calls(p, 'crew_page');
     C.check('…asked with the person\'s crew key (never a name)', a.length === 1 && a[0].p_subject === CK.mina, JSON.stringify(a));
-    C.check('…the name, the level, the date', (await plain(p, '#crewplayer-body .pl-name')) === 'Mina S.' && (await plain(p, '#crewplayer-body .pl-lv')) === 'LV 14' && /With Amir since June 2026/.test(await plain(p, '#crewplayer-body .pl-meta')));
+    C.check('…the name, the level, the date', (await plain(p, '#crewplayer-body .pl-name')) === 'Mina S.' && (await p.evaluate(() => (document.querySelector('#crewplayer-body .pl-lvm') || { getAttribute: () => '' }).getAttribute('aria-label'))) === 'Level 14' && /With Amir since June 2026/.test(await plain(p, '#crewplayer-body .pl-meta')));
     C.check('…the cover is the current cycle\'s picture', await p.evaluate(() => { const i = document.getElementById('pl-cover-img'); return !i.hidden && /assets\/art\/cycles\/iron-v1\.webp/.test(i.getAttribute('src')); }));
     C.check('…and a visible ← back', await p.evaluate(() => { const b = document.querySelector('#screen-crewplayer .nav-back'); const r = b.getBoundingClientRect(); return r.width > 30 && r.height > 30 && getComputedStyle(b).visibility !== 'hidden'; }));
     await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click());
@@ -260,13 +260,13 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('others\' numbers: weeks held, sessions with Amir, personal bests and cheers (the all-time total, never the season\'s 4)', JSON.stringify(t) === JSON.stringify(['6 weeks held', '41 sessions with Amir', '9 personal bests', '12 cheers']), JSON.stringify(t));
     C.check('…titled with the first name, never a he or a she', (await secs(p))[0] === 'Mina\'s numbers', JSON.stringify(await secs(p)));
     C.check('NO comebacks on someone else\'s page, even if the server were to send them', !/comeback/i.test(await text(p, '#crewplayer-body')), t.join('|'));
-    const a = await p.evaluate(() => ({ rows: [...document.querySelectorAll('#crewplayer-body .pl-list')][0].querySelectorAll('.pl-row').length,
-      all: (document.querySelector('#crewplayer-body .pl-list button.pl-row') || {}).textContent || '' }));
-    C.check('achievements: the latest three, and "All 4" for the rest', a.rows === 4 && /All 4/.test(a.all), JSON.stringify(a));
-    await click(p, '#crewplayer-body .pl-list button.pl-row'); await p.waitForTimeout(350);
+    const a = await p.evaluate(() => ({ cells: document.querySelectorAll('#crewplayer-body .cab-cell').length, head: (document.querySelector('#crewplayer-body .cab-trh .prog-sec') || {}).textContent,
+      all: (document.querySelector('#crewplayer-body .cab-all') || {}).textContent || '' }));
+    C.check('trophies: the newest three, "Trophies · 6" (4 won and the 2 level medals she has reached), and "All ›" for the rest', a.cells === 3 && a.head === 'Trophies · 6' && a.all === 'All ›', JSON.stringify(a));
+    await click(p, '#crewplayer-body .cab-all'); await p.waitForTimeout(350);
     const sheet = await p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), title: (document.querySelector('#hist-overlay .readiness-title') || {}).textContent,
-      rows: [...document.querySelectorAll('#hist-overlay .pl-row .t')].map(x => x.textContent).join('|') }));
-    C.check('…All 4 opens a sheet with every one, named for the person', sheet.on && sheet.title === 'Mina\'s achievements' && sheet.rows === 'Back to Back|The Notebook|First Blood|Straight Talk', JSON.stringify(sheet));
+      rows: [...document.querySelectorAll('#hist-overlay .cab-cell .cab-l')].map(x => x.textContent).join('|') }));
+    C.check('…All › opens a sheet with every one, the level medals first, named for the person', sheet.on && sheet.title === 'Mina\'s trophies' && sheet.rows === 'Levels 1 to 9|Levels 10 to 19|Back to Back|First Blood|Straight Talk|The Notebook', JSON.stringify(sheet));
     await p.evaluate(() => closeHistorySheet()); await p.waitForTimeout(200);
     C.check('honours: shown when there are any, with the month', (await secs(p)).includes('Honours') && /Most sessions/.test(await text(p, '#crewplayer-body')) && /September 2026/.test(await text(p, '#crewplayer-body')));
     C.check('…and the block names what the crew may see: no weight, no kg', !/\bkg\b/i.test(await text(p, '#crewplayer-body')));
@@ -275,7 +275,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await shown(p, CK.reza);
     const t2 = await tiles(p), s2 = await secs(p);
     C.check('a switch off: no sessions tile, no bests tile', JSON.stringify(t2) === JSON.stringify(['1 week held', '0 cheers']), JSON.stringify(t2));
-    C.check('…no Achievements block (null), no Honours block (none)', s2.join() === 'Reza\'s numbers', s2.join());
+    C.check('…no Trophies block (null), no Honours block (none)', s2.join() === 'Reza\'s numbers', s2.join());
     const w = await p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-tiles > div')].map(d => Math.round(d.getBoundingClientRect().width)));
     C.check('…two tiles are a tidy pair', w.length === 2 && Math.abs(w[0] - w[1]) <= 1, w.join());
     await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(250);
@@ -283,7 +283,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const t3 = await tiles(p);
     const w3 = await p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-tiles > div')].map(d => Math.round(d.getBoundingClientRect().width)));
     C.check('three tiles: the third takes the whole row', t3.length === 3 && w3[2] > w3[0] * 1.9, w3.join() + ' ' + t3.join('|'));
-    C.check('…an empty list of achievements draws no block', !(await secs(p)).includes('Achievements'));
+    C.check('…an empty list of achievements draws no block', !(await secs(p)).some(x => /^Trophies/.test(x)));
     // this week: the person's posts still on the Bell, a row each, and a tap goes to the post
     await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(250);
     await shown(p, CK.mina);
@@ -591,13 +591,13 @@ const on = n => !ONLY.length || ONLY.includes(n);
     // (2) "Only you": the comebacks always, and any block whose switch is off; never on someone else's page
     const ach = [{ id: 'a:1', name: 'Back to Back', day: '2026-10-12', signed: [], signed_n: 0 }, { id: 'a:2', name: 'The Notebook', day: '2026-10-03', signed: [], signed_n: 0 }];
     const hon = [{ month: '2026-09-01', honour: 'sessions', value: { n: 14 } }];
-    const lone = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-only')].map(e => ({ t: e.textContent.trim(), where: e.closest('.pl-tiles > div') ? 'tile:' + e.closest('.pl-tiles > div').innerText.replace(/\s+/g, ' ').trim() : e.closest('.pl-cb') ? 'cb:' + e.closest('.pl-cb').innerText.replace(/\s+/g, ' ').trim() : e.closest('.prog-sec') ? 'sec:' + e.closest('.prog-sec').firstChild.textContent.trim() : e.closest('.pl-lv') ? 'lv' : '?' })));
+    const lone = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-only')].map(e => ({ t: e.textContent.trim(), where: e.closest('.pl-tiles > div') ? 'tile:' + e.closest('.pl-tiles > div').innerText.replace(/\s+/g, ' ').trim() : e.closest('.pl-cb') ? 'cb:' + e.closest('.pl-cb').innerText.replace(/\s+/g, ' ').trim() : e.closest('.prog-sec') ? 'sec:' + e.closest('.prog-sec').firstChild.textContent.trim() : (e.closest('.pl-lv') || e.closest('.pl-lvl')) ? 'lv' : '?' })));
     const { ctx, p } = await open(browser, { stub: { crewPages: { me: { kinds: { achievement: false, honour: true, level: true }, achievements: ach, honours: hon, lv: 19, best_lifts: [{ lift: 'Trap Bar Deadlift', day: '2026-10-08' }] },
       [CK.mina]: { kinds: { achievement: false }, achievements: ach, honours: hon, numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9, comebacks: 3 } } } } });
     await goCrew(p);
     await p.evaluate(() => openPlayer('me')); await p.waitForTimeout(600);
     let l = await lone(p);
-    C.check('your page: "Only you" on the comebacks row and on Achievements (its switch is off), nowhere else', l.length === 2 && l.every(x => x.t === 'Only you') && /^cb:2 comebacks/.test(l[0].where) && l[1].where === 'sec:Achievements', JSON.stringify(l));
+    C.check('your page: "Only you" on the comebacks row and on Trophies (its switch is off), nowhere else', l.length === 2 && l.every(x => x.t === 'Only you') && /^cb:2 comebacks/.test(l[0].where) && /^sec:Trophies · \d+$/.test(l[1].where), JSON.stringify(l));
     C.check('…the label is small grey Space Mono, quiet', await p.evaluate(() => { const s = getComputedStyle(document.querySelector('#crewplayer-body .pl-only')); return /Space Mono/.test(s.fontFamily) && parseFloat(s.fontSize) <= 12 && s.color !== 'rgb(26, 26, 26)'; }));
     const note = await plain(p, '#crewplayer-body .pl-note');
     C.check('…the line stays "This is what the crew sees" and adds "Parts marked Only you stay with you."', note === 'This is what the crew sees. Parts marked Only you stay with you.', note);
@@ -609,12 +609,12 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await p.evaluate(() => crewSetKind('week', true)); await p.waitForTimeout(500);
     C.check('…and on again takes it away', (await lone(p)).length === 2);
     await p.evaluate(() => crewSetKind('level', false)); await p.waitForTimeout(500);
-    C.check('the level switch off marks the level chip', (await lone(p)).some(x => x.where === 'lv'));
+    C.check('the level switch off marks the level medal', (await lone(p)).some(x => x.where === 'lv'));
     await p.evaluate(() => crewSetKind('level', true)); await p.waitForTimeout(300);
     await p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await p.waitForTimeout(250);
     await shown(p, CK.mina);
     C.check('someone else\'s page never says "Only you", whatever the server sends', (await lone(p)).length === 0 && !/Only you/.test(await text(p, '#crewplayer-body')) && !/comeback/i.test(await text(p, '#crewplayer-body')));
-    C.check('…the app draws what the server sent: a switched-off block is left out by the server, never decided here', (await secs(p)).includes('Achievements'));
+    C.check('…the app draws what the server sent: a switched-off block is left out by the server, never decided here', (await secs(p)).some(x => /^Trophies/.test(x)));
     await ctx.close();
   }
   if (on(12)) {
@@ -1412,8 +1412,8 @@ const on = n => !ONLY.length || ONLY.includes(n);
     { id: 'achievement:the_notebook', name: 'The Notebook', day: '2026-10-03', size: 'win', signed: [SG(CK.reza, 'Reza K.'), SG(CK.leila, 'Leila M.'), SG(CK.sara, 'Sara T.'), SG(CK.omid, 'Omid P.'), SG(null, 'Coach')], signed_n: 5 },
     { id: 'achievement:first_blood', name: 'First Blood', day: '2026-09-28', size: 'win', signed: [], signed_n: 0 },
     { id: 'achievement:straight_talk', name: 'Straight Talk', day: '2026-09-20', size: 'win', signed: [SG(CK.reza, 'Reza K.'), SG(CK.leila, 'Leila M.'), SG(CK.sara, 'Sara T.'), SG(CK.omid, 'Omid P.'), SG(CK.ali1, 'Ali B.')], signed_n: 8 }];
-  const achRows = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .pl-list .pl-ar')].map(r => ({ t: r.querySelector('.t').textContent, tag: r.tagName, faces: r.querySelectorAll('.pl-stk .cr-fl').length, more: (r.querySelector('.pl-mo') || {}).textContent || '',
-    dt: r.querySelector('.pl-dt').textContent, ini: [...r.querySelectorAll('.pl-stk .cr-fl')].map(f => f.textContent.trim()).join(',') })));
+  const achRows = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .cab-grid .cab-cell')].map(r => ({ t: r.querySelector('.cab-l').textContent, tag: r.tagName, faces: r.querySelectorAll('.pl-stk .cr-fl').length, more: (r.querySelector('.pl-mo') || {}).textContent || '',
+    dt: r.querySelector('.cab-s').textContent, ini: [...r.querySelectorAll('.pl-stk .cr-fl')].map(f => f.textContent.trim()).join(',') })));
   if (on(18)) {
     const a = await open(browser, { stub: { crewPages: { [CK.mina]: { achievements: ACH6 } } } });
     await goCrew(a.p); await shown(a.p, CK.mina);
@@ -1421,11 +1421,11 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('the face stack: two signed shows two faces and no number; five shows three faces and "+2"; nobody shows no stack and is no button',
       r.length === 3 && r[0].faces === 2 && r[0].more === '' && r[0].tag === 'BUTTON' && r[1].faces === 3 && r[1].more === '+2' && r[1].tag === 'BUTTON' && r[2].faces === 0 && r[2].more === '' && r[2].tag === 'DIV', JSON.stringify(r));
     C.check('…the faces are those who signed, in the order sent (initials until their photo is here), and the date is on the right', r[0].ini === 'RK,LM' && r[1].ini === 'RK,LM,ST' && r[0].dt === '12 Oct' && r[2].dt === '28 Sep', JSON.stringify(r.map(x => [x.ini, x.dt])));
-    C.check('…and one line says "Tap an achievement to see every cheer."', await a.p.evaluate(() => /Tap an achievement to see every cheer\./.test(document.getElementById('crewplayer-body').textContent)));
+    C.check('…and one line says "Tap a trophy to see every cheer."', await a.p.evaluate(() => /Tap a trophy to see every cheer\./.test(document.getElementById('crewplayer-body').textContent)));
     const ov = await a.p.evaluate(() => { const e = document.querySelectorAll('#crewplayer-body .pl-stk .cr-fl')[2], s = document.querySelectorAll('#crewplayer-body .pl-stk .cr-fl')[3]; return { w: Math.round(e.getBoundingClientRect().width), gap: Math.round(document.querySelectorAll('#crewplayer-body .pl-stk .cr-fl')[1].getBoundingClientRect().left - document.querySelectorAll('#crewplayer-body .pl-stk .cr-fl')[0].getBoundingClientRect().left), s: !!s }; });
     C.check('…each face is 24 px and the next sits 6 px over it (18 px apart)', ov.w === 24 && ov.gap === 18, JSON.stringify(ov));
     // the sheet
-    await nth(a.p, '#crewplayer-body .pl-list button.pl-ar', 1); await a.p.waitForTimeout(350);
+    await nth(a.p, '#crewplayer-body .cab-grid button.cab-cell', 1); await a.p.waitForTimeout(350);
     const sh = await sheetRows(a.p);
     C.check('a tap on the stack opens "Cheered by" with every name', sh.on && sh.title === 'Cheered by' && sh.eyebrow === 'The Notebook' && /3 Oct/.test(sh.sub) && sh.rows.length === 5
       && sh.rows[0].indexOf('Reza K.') >= 0 && sh.rows[3].indexOf('Omid P.') >= 0 && /Coach/.test(sh.rows[4]) && !sh.quiet, JSON.stringify(sh));
@@ -1435,13 +1435,14 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await a.p.evaluate(() => document.querySelector('#screen-crewplayer .nav-back').click()); await a.p.waitForTimeout(500);
     C.check('…back on Mina\'s page', /Mina S\./.test(await plain(a.p, '#crewplayer-body .pl-name')));
     // "All 4": the stacks are in the sheet too, and a signer list opens from it with ‹ Back to the list
-    await click(a.p, '#crewplayer-body .pl-list button.pl-row:not(.pl-ar)'); await a.p.waitForTimeout(350);
-    const all = await a.p.evaluate(() => ({ rows: [...document.querySelectorAll('#hist-overlay .pl-ar')].map(r => [r.querySelectorAll('.pl-stk .cr-fl').length, (r.querySelector('.pl-mo') || {}).textContent || '']), title: document.querySelector('#hist-overlay .readiness-title').textContent }));
-    C.check('"All 4" has the stacks too (the fourth: five faces sent, eight signed, so three faces and "+5")', all.rows.length === 4 && all.rows[3][0] === 3 && all.rows[3][1] === '+5' && all.rows[2][0] === 0, JSON.stringify(all));
-    await nth(a.p, '#hist-overlay .pl-ar', 3); await a.p.waitForTimeout(350);
+    await click(a.p, '#crewplayer-body .cab-all'); await a.p.waitForTimeout(350);
+    const SHELF = '#hist-overlay .cab-pl > div.cab-grid:not(:first-of-type) .cab-cell';   // the sections after the level medals
+    const all = await a.p.evaluate(sel => ({ rows: [...document.querySelectorAll(sel)].map(r => [r.querySelectorAll('.pl-stk .cr-fl').length, (r.querySelector('.pl-mo') || {}).textContent || '']), title: document.querySelector('#hist-overlay .readiness-title').textContent }), SHELF);
+    C.check('"All ›" has the stacks too (Straight Talk: five faces sent, eight signed, so three faces and "+5"; First Blood, none)', all.rows.length === 4 && all.rows[3][0] === 3 && all.rows[3][1] === '+5' && all.rows[0][0] === 0, JSON.stringify(all));
+    await nth(a.p, SHELF, 3); await a.p.waitForTimeout(350);
     const s8 = await sheetRows(a.p);
     C.check('…the fourth lists the five it was sent and says "and 3 more"', s8.title === 'Cheered by' && s8.rows.length === 5 && s8.quiet === 'and 3 more', JSON.stringify(s8));
-    C.check('…and ‹ Back goes to the list', await a.p.evaluate(() => { const b = document.querySelector('#hist-overlay .sheet-back'); if (!b) return false; b.click(); return /achievements/.test(document.querySelector('#hist-overlay .readiness-title').textContent); }));
+    C.check('…and ‹ Back goes to the list', await a.p.evaluate(() => { const b = document.querySelector('#hist-overlay .sheet-back'); if (!b) return false; b.click(); return /trophies/.test(document.querySelector('#hist-overlay .readiness-title').textContent); }));
     C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();
     // your own page draws the stack too; under 13 sees no doors but still the names
@@ -1452,7 +1453,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await o.ctx.close();
     const u = await open(browser, { b: { me: { under13: true, can_post: false } }, stub: { crewPages: { me: { under13: true, achievements: ACH6 } } } });
     await waitTab(u.p); await u.p.evaluate(() => openPlayer('me')); await u.p.waitForTimeout(700);
-    await nth(u.p, '#crewplayer-body .pl-list button.pl-ar', 1); await u.p.waitForTimeout(350);
+    await nth(u.p, '#crewplayer-body .cab-grid button.cab-cell', 1); await u.p.waitForTimeout(350);
     C.check('under 13: the names are shown and none of them is a door', await u.p.evaluate(() => { const r = [...document.querySelectorAll('#hist-overlay .pl-sgr')]; return r.length === 5 && r.every(x => x.tagName === 'DIV'); }));
     await u.ctx.close();
   }
@@ -1484,7 +1485,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('…a second like on another achievement line says nothing', ok4 && !t4, JSON.stringify(t4));
     C.check('…no 👏 character in the note, no em-dash, no semicolon', !/[—;]/.test((t3 || {}).text || '') && ((t3 || {}).text || '').indexOf('\u{1F44F}') < 0);
     const gd6 = await a.p.evaluate(() => buildAppGuideCards());
-    C.check('the guide says in plain words that a face on an achievement is someone who liked it, and that a tap shows everyone', /When someone likes the moment of an achievement on the Bell, their face shows on that achievement/.test(gd6) && /Tap the achievement to see everyone who cheered it/.test(gd6)
+    C.check('the guide says in plain words that a face on an achievement is someone who liked it, and that a tap shows everyone', /When someone likes the moment of an achievement on the Bell, their face shows under that trophy/.test(gd6) && /Tap the trophy to see everyone who cheered it/.test(gd6)
       && !/[—;]/.test((gd6.match(/<p>When someone likes the moment of an achievement[\s\S]*?<\/p>/) || [''])[0]));
     C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();
@@ -1548,12 +1549,12 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await a.p.screenshot({ path: path.join(out, 'player-other-game-light-390.png'), fullPage: true });
     const crop = (sel0, sel1, up) => a.p.evaluate(([s0, s1, u]) => { const t = document.querySelector(s0).getBoundingClientRect(), e = document.querySelector(s1).getBoundingClientRect(); return { x: 0, y: Math.max(0, Math.round(t.top + scrollY - u)), width: 390, height: Math.round(e.bottom - t.top + u + 14) }; }, [sel0, sel1, up]);
     await a.p.screenshot({ path: path.join(out, 'player-other-thisweek-light-390.png'), fullPage: true, clip: await crop('#crewplayer-body .pl-cyc', '#crewplayer-body .pl-cyc + .pl-tail', 50) });
-    await a.p.screenshot({ path: path.join(out, 'face-stack-light-390.png'), fullPage: true, clip: await crop('#crewplayer-body .pl-ar', '#crewplayer-body .pl-list + .pl-tail', 52) });
+    await a.p.screenshot({ path: path.join(out, 'face-stack-light-390.png'), fullPage: true, clip: await crop('#crewplayer-body .cab-trh', '#crewplayer-body .cab-pl + .pl-tail', 52) });
     await a.p.evaluate(() => { document.getElementById('global-tabs').style.display = ''; window.scrollTo(0, 0); });
     await nth(a.p, '#crewplayer-body .pl-wb', 0); await a.p.waitForTimeout(450);
     await a.p.screenshot({ path: path.join(out, 'cycle-week-sheet-light-390.png') });
     await a.p.evaluate(() => closeHistorySheet()); await a.p.waitForTimeout(250);
-    await nth(a.p, '#crewplayer-body .pl-list button.pl-ar', 0); await a.p.waitForTimeout(900);
+    await nth(a.p, '#crewplayer-body .cab-grid button.cab-cell', 0); await a.p.waitForTimeout(900);
     await a.p.screenshot({ path: path.join(out, 'face-stack-sheet-light-390.png') });
     await a.ctx.close();
   }
@@ -2617,7 +2618,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     // the list below: the last 7 days, "Cheers this week"
     const rec = [{ ck: CK.reza, who: 'Reza K.', fv: null, coach: false, word: 'that sled push looked heavy', day: today }];
     const ls = await cheerTiles({ pages: { [CK.mina]: { numbers: NUM, cheers: { total: 31, season: 5, recent: rec } } } });
-    C.check('the cheers list is headed "Cheers this week" (the last 7 days), with no number beside it', ls.secs.includes('Cheers this week') && !ls.secs.some(x => /Cheers this season|·/.test(x)) && (await ls.p.$$('#crewplayer-body .pl-ch')).length === 1, JSON.stringify(ls.secs));
+    C.check('the cheers list is headed "Cheers this week" (the last 7 days), with no number beside it', ls.secs.includes('Cheers this week') && !ls.secs.some(x => /^Cheers/.test(x) && /Cheers this season|·/.test(x)) && (await ls.p.$$('#crewplayer-body .pl-ch')).length === 1, JSON.stringify(ls.secs));
     await ls.ctx.close();
     // a cheer you send is one more on their total, at once, and stays on the next draw
     const ch = await open(browser, { stub: { crewPages: { [CK.mina]: { numbers: NUM, cheers: { total: 31, recent: [], mine_today: false } } } } });
