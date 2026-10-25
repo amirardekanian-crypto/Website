@@ -5,6 +5,11 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-10-25 · The Home Crowd plan: "go with your picks and if you found anything along the way, let me know".** He took all nine
+  calls (76 B beside the numbers, the Inbox only, 85 A, 87 C on the Toss card, 88 A on the Coach tab, coach.html A Proof becomes Crew,
+  the samples my way, 91 with step 3, step 1 live first and the build in a new chat). What it teaches: once the looks are drawn he
+  delegates the details, and he wants what I noticed on the way told to him plainly, unasked next time: end a plan with the findings.
+
 - **2026-10-25 · Round 7 'Home Crowd': his picks.** *"if you want to do 76, you can make it smaller by moving in the crew next to the
   other texts, but dont change other texts"*, *"77 is good / 78 is good / 79 A / 80 is good / 81 A / 82 good / 90A"*, *"cut 84"*,
   *"85 amazing, add to coach html. make sure i have month honour as well"*, *"86 is good / add 87 as well. give me 3 diretions for

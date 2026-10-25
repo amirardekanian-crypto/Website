@@ -277,6 +277,7 @@ STATUS = {
  13: ("Picked 24 Oct as #53, report first", "https://claude.ai/artifact/8VP8Q1B44uuYjrb88ayHvb#patterns"),
  12: ("Built 24 Sep as /cycle-report", "https://claude.ai/artifact/JY1eG1RNYHTLvYpFCwcHBx"),
  70: ("Built and live 24 Oct", "https://claude.ai/artifact/X5L2WMkayoxx8eioc85SJV"),
+ 91: ("Picked 25 Oct, builds with the weekly crew", "https://claude.ai/artifact/Ap56d6pvqEfExFYsFN7P1T"),
 }
 
 def chips(i):
