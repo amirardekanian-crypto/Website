@@ -5805,6 +5805,152 @@ S['honours-folded'] = async (b) => {
   return r;
 };
 
+// ── The month's honours wait for Amir (stage101, 2026-10-25) ───────────────────────────────────────────────────────────────────
+// The reminder card at the top of Courtside: from the month's LAST day until all four honours are confirmed (it stays into the next month). The stub
+// answers coach_honour_confirm() & co as stage101's SQL does, only when the seed says `honoursConfirm: true` (a server before stage101 sends no `confirmed`:
+// no card, the honours as they always were).
+const HC = { court: true, honoursConfirm: true, honoursLive: {
+  sessions: { n: 14, who: ['gia_court', 'kim_former'] },
+  improved: { pct: 27.1, who: [{ athlete_id: 'hal_court', lift: 'Barbell Back Squat', pct: 27.1 }] },
+  full_month: { who: [{ athlete_id: 'ivy_court', weeks: 4 }], near: [{ athlete_id: 'jon_court', held: 3, weeks: 4 }] },
+  shortlist: [{ slot: 'weeks_held', athlete_id: 'ava_test', n: 4 }, { slot: 'gain', athlete_id: 'hal_court', lift: 'Barbell Back Squat', pct: 27.1 }] } };
+const remind = page => page.evaluate(() => {
+  const c = document.getElementById('honRemind');
+  if (!c) return null;
+  const txt = el => el.innerText.replace(/\s+/g, ' ').trim();
+  return { title: txt(c.querySelector('.hrem-t')), line: txt(c.querySelector('.hrem-l')), rows: [...c.querySelectorAll('.cs')].map(txt), text: txt(c), first: c === document.querySelector('#courtPanel > *') };
+});
+S['honours-reminder-days'] = async (b) => {
+  const r = { id: 'honours-reminder-days', title: 'The honours reminder shows from the last day of the month, stays into the next until all four are confirmed, says "so far" until the month has ended, goes overdue after the 7th, and a server before stage101 has none', checks: [] };
+  // the 31st: this month, so far, nothing frozen
+  const a = await L.openCoach(b, { seed: HC, fixedTime: '2026-10-31T10:00:00Z' });
+  await a.page.waitForSelector('#courtPanel');
+  let cs = await L.calls(a.page), c = await remind(a.page);
+  check(r, 'on the last day (31 October) the page asks about October itself and freezes nothing', rpcs(cs, 'coach_honours').length === 1 && rpcs(cs, 'coach_honours')[0].payload.p_month === '2026-10-01' && rpcs(cs, 'coach_honours_freeze').length === 0, rpcs(cs, 'coach_honours').map(x => x.payload));
+  check(r, 'the card is the first thing in Courtside, titled "October\'s honours are waiting"', !!c && c.first && c.title === "October's honours are waiting", c);
+  check(r, 'it says when and what: "Pick them by 7 November. Nothing reaches anyone until you confirm."', !!c && c.line.startsWith('Pick them by 7 November. Nothing reaches anyone until you confirm.'), c && c.line);
+  check(r, 'and, because the month is not over, that these are the numbers so far', !!c && /not over yet.*so far/.test(c.line) && /suggested so far: Gia Example, 14 plan sessions/.test(c.text), c && c.text.slice(0, 300));
+  check(r, 'one row per honour, in order: Most sessions, Most improved, Full Month, Amir\'s Pick', !!c && c.rows.length === 4 && /^Most sessions/.test(c.rows[0]) && /^Most improved/.test(c.rows[1]) && /^Full Month/.test(c.rows[2]) && /^Amir's Pick/.test(c.rows[3]), c && c.rows);
+  check(r, 'a former athlete who ties on sessions is not suggested', !!c && !/Kim/.test(c.text), '');
+  check(r, 'a suggestion is not an honour: the honours area holds no WhatsApp line for it', !(await a.page.locator('#courtPanel').innerText()).includes('Most sessions in October'), '');
+  check(r, 'no page errors', !a.log.errors.length, a.log.errors);
+  await a.ctx.close();
+  // the 30th: the card is about September, the month just gone; once its four are confirmed there is nothing to remind
+  const e = await L.openCoach(b, { seed: HC, fixedTime: '2026-10-30T10:00:00Z' });
+  await e.page.waitForSelector('#courtPanel');
+  const e0 = await remind(e.page);
+  check(r, 'on the 30th the card is about September (the month just gone), and overdue', !!e0 && e0.title === "September's honours are waiting" && /^Overdue: pick them now\./.test(e0.line), e0 && e0.line);
+  await e.page.evaluate(async () => { window.__DB.career_honour_months = [{ month: '2026-09-01', frozen_at: new Date().toISOString(), pick: 'nobody', pick_at: new Date().toISOString(), confirmed: { sessions: 'x', improved: 'x', full_month: 'x' } }]; await loadCourt(); });
+  check(r, 'once all four of September are confirmed (the pick decided too) the card is gone', (await remind(e.page)) === null, '');
+  await e.ctx.close();
+  // the 2nd of November: still there, for October, not overdue yet, no "so far"
+  const n2 = await L.openCoach(b, { seed: HC, fixedTime: '2026-11-02T10:00:00Z' });
+  await n2.page.waitForSelector('#courtPanel');
+  const c2 = await remind(n2.page);
+  check(r, 'on 2 November it is still there for October, with no "so far" and not overdue', !!c2 && c2.title === "October's honours are waiting" && c2.line === 'Pick them by 7 November. Nothing reaches anyone until you confirm.' && /suggested: Gia Example/.test(c2.text) && !/so far/.test(c2.text), c2 && c2.line);
+  await n2.ctx.close();
+  // the 8th: overdue; the quiet freeze saves suggestions and the card stays
+  const n8 = await L.openCoach(b, { seed: HC, fixedTime: '2026-11-08T10:00:00Z' });
+  await n8.page.waitForSelector('#courtPanel');
+  const c8 = await remind(n8.page), d8 = await L.db(n8.page), f8 = rpcs(await L.calls(n8.page), 'coach_honours_freeze');
+  check(r, 'on the 8th it says "Overdue: pick them now."', !!c8 && c8.line === 'Overdue: pick them now. Nothing reaches anyone until you confirm.', c8 && c8.line);
+  check(r, 'the quiet freeze on the 8th still runs and saves the suggestions unconfirmed (nothing is published)', f8.length === 1 && d8.career_honours.filter(h => h.honour !== 'near').length === 3 && d8.career_honours.every(h => !h.confirmed_at) && !Object.keys(d8.career_honour_months[0].confirmed).length, d8.career_honours);
+  check(r, 'the card still suggests from the numbers', !!c8 && /suggested: Gia Example/.test(c8.text), '');
+  check(r, 'and the honours area still holds no line for a suggestion', !(await n8.page.locator('#courtPanel').innerText()).includes('Most sessions in October'), '');
+  await n8.ctx.close();
+  // a server before stage101
+  const old = await L.openCoach(b, { seed: { court: true }, fixedTime: '2026-11-02T10:00:00Z' });
+  await old.page.waitForSelector('#courtPanel');
+  check(r, 'a server before stage101 sends no `confirmed`: no card, the honours as they always were (a WhatsApp line for Gia)', (await remind(old.page)) === null && (await old.page.locator('#courtPanel').innerText()).includes('Most sessions in October'), '');
+  await old.ctx.close();
+  return r;
+};
+
+S['honours-reminder-confirm'] = async (b) => {
+  const r = { id: 'honours-reminder-confirm', title: 'The reminder card: Confirm calls coach_honour_confirm with the suggested winners and the row turns quiet; Change takes two taps; Full Month names can be removed and added; the Pick is chosen in the card; an honour is an honour only once confirmed', checks: [] };
+  const o = await L.openCoach(b, { seed: HC, fixedTime: '2026-11-02T10:00:00Z' });
+  const page = o.page, log = o.log;
+  await page.waitForSelector('#honRemind'); await noPopups(page);
+  const row = name => page.locator('#honRemind .cs', { hasText: name }).first();
+  let n0 = (await L.calls(page)).length;
+  // Confirm: one tap
+  await row('Most sessions').getByRole('button', { name: 'Confirm', exact: true }).click(); await L.settle(page, 500);
+  let cs = await L.callsSince(page, n0), cf = rpcs(cs, 'coach_honour_confirm');
+  check(r, 'Confirm on Most sessions calls coach_honour_confirm once, with the month, the honour and the suggested winner (a client)', cf.length === 1 && cf[0].payload.p_month === '2026-10-01' && cf[0].payload.p_honour === 'sessions' && JSON.stringify(cf[0].payload.p_athlete_ids) === '["gia_court"]' && Array.isArray(cf[0].payload.p_not_clients) && cf[0].payload.p_not_clients.includes('amir_ardekani'), cf.map(x => x.payload));
+  check(r, 'and nothing else is written (no sent mark, no pick, no freeze call from the page)', rpcs(cs, 'coach_honours_freeze').length === 0 && rpcs(cs, 'coach_honours_sent').length === 0 && rpcs(cs, 'coach_honours_pick').length === 0, cs.filter(c => c.kind === 'rpc').map(c => c.name));
+  let db = await L.db(page), cm = await remind(page);
+  check(r, 'the database holds the winner confirmed and the month\'s confirmation', db.career_honours.some(h => h.honour === 'sessions' && h.athlete_id === 'gia_court' && h.confirmed_at) && !!db.career_honour_months[0].confirmed.sessions, db.career_honours);
+  check(r, 'the row is now a quiet "Confirmed" line with no buttons', /^Most sessions · Confirmed Gia Example, 14 plan sessions$/.test(cm.rows[0]) && (await row('Most sessions').locator('button').count()) === 0, cm.rows[0]);
+  check(r, 'the confirmed honour now has its WhatsApp line in the honours area (Amir tells Gia himself, as before)', (await page.locator('#courtPanel').innerText()).includes('Most sessions in October: 14.'), '');
+  check(r, 'Most improved is still only a suggestion, with no line', !(await page.locator('#courtPanel').innerText()).includes('Most improved in October.'), '');
+  // Change: choose another athlete, two taps
+  n0 = (await L.calls(page)).length;
+  await page.locator('#chg_improved').selectOption('jon_court');
+  await row('Most improved').getByRole('button', { name: 'Change', exact: true }).click(); await L.settle(page, 200);
+  check(r, 'the first tap on Change only arms it ("Tap again: Jon gets it") and writes nothing', /Tap again: Jon gets it/.test(await row('Most improved').innerText()) && rpcs(await L.callsSince(page, n0), 'coach_honour_confirm').length === 0, await row('Most improved').innerText());
+  await row('Most improved').locator('button', { hasText: 'Tap again' }).click(); await L.settle(page, 500);
+  cf = rpcs(await L.callsSince(page, n0), 'coach_honour_confirm');
+  check(r, 'the second tap confirms Jon alone', cf.length === 1 && cf[0].payload.p_honour === 'improved' && JSON.stringify(cf[0].payload.p_athlete_ids) === '["jon_court"]', cf.map(x => x.payload));
+  db = await L.db(page);
+  check(r, 'Hal, who was suggested, has no Most improved row; Jon has it, confirmed', db.career_honours.filter(h => h.honour === 'improved').length === 1 && db.career_honours.some(h => h.honour === 'improved' && h.athlete_id === 'jon_court' && h.confirmed_at), db.career_honours.filter(h => h.honour === 'improved'));
+  // Full Month: the suggestion is Ivy; take her off, add Hal and Ava, confirm
+  const fm = () => row('Full Month').innerText().then(t => t.replace(/\s+/g, ' '));
+  check(r, 'Full Month lists who earned it as names, with a way to take one off and a list to add one', /Ivy Example/.test(await fm()) && (await row('Full Month').locator('.hr-chip').count()) === 1 && (await page.locator('#fullAdd').count()) === 1, await fm());
+  await row('Full Month').locator('.hr-chip button').click(); await L.settle(page, 100);
+  check(r, 'taking Ivy off leaves nobody, and the button then says "Nobody this month"', /nobody has earned it yet/.test(await fm()) && (await row('Full Month').getByRole('button', { name: 'Nobody this month' }).count()) === 1, await fm());
+  await page.locator('#fullAdd').selectOption('hal_court'); await row('Full Month').getByRole('button', { name: 'Add', exact: true }).click(); await L.settle(page, 100);
+  await page.locator('#fullAdd').selectOption('ava_test'); await row('Full Month').getByRole('button', { name: 'Add', exact: true }).click(); await L.settle(page, 100);
+  check(r, 'two names are added (a draft, nothing is saved yet)', (await row('Full Month').locator('.hr-chip').allInnerTexts()).map(t => t.replace(/\s*×\s*$/, '').trim()).join('|') === 'Hal Example|Ava Example', await fm());
+  n0 = (await L.calls(page)).length;
+  await row('Full Month').getByRole('button', { name: 'Confirm', exact: true }).click(); await L.settle(page, 500);
+  cf = rpcs(await L.callsSince(page, n0), 'coach_honour_confirm');
+  check(r, 'Confirm sends the edited list', cf.length === 1 && cf[0].payload.p_honour === 'full_month' && JSON.stringify(cf[0].payload.p_athlete_ids) === '["hal_court","ava_test"]', cf.map(x => x.payload));
+  check(r, 'three of four are confirmed, the card is still up, with the Pick to choose in it', !!(await remind(page)) && (await page.locator('#honRemind .cs-pick').count()) === 2 && (await page.locator('#courtPanel #elseSel').count()) === 1, '');
+  check(r, 'the Pick is in the card only: the honours area does not draw a second one', (await page.locator('#courtPanel .cs-pick').count()) === 2, await page.locator('#courtPanel .cs-pick').count());
+  // the Pick: two taps, and the card goes (all four are confirmed)
+  const pickBtn = page.locator('#honRemind .cs-pick', { hasText: 'Hal' }).locator('button');
+  await pickBtn.click(); await pickBtn.click(); await L.settle(page, 600);
+  check(r, 'the second tap on Pick Hal calls coach_honours_pick, and with all four confirmed the card is gone', rpcs(await L.callsSince(page, n0), 'coach_honours_pick').length === 1 && (await remind(page)) === null, '');
+  const st = await page.locator('#courtPanel').innerText();
+  check(r, 'the picked row, with its reason box, is in the honours area now', /Amir's Pick/.test(st) && (await page.locator('#courtPanel #whyIn').count()) === 1, st.slice(0, 200));
+  db = await L.db(page);
+  check(r, 'the pick row is confirmed as it is written (picking is the confirmation)', db.career_honours.some(h => h.honour === 'pick' && h.confirmed_at), db.career_honours.filter(h => h.honour === 'pick'));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await o.ctx.close();
+  return r;
+};
+
+S['honours-reminder-refusals'] = async (b) => {
+  const r = { id: 'honours-reminder-refusals', title: 'The reminder card: a refusal is said and the honour stays a suggestion; a double tap changes nothing; the card keeps the look and does not scroll sideways', checks: [] };
+  const o = await L.openCoach(b, { seed: HC, fixedTime: '2026-11-02T10:00:00Z' });
+  const page = o.page, log = o.log;
+  await page.waitForSelector('#honRemind');
+  await page.evaluate(() => { window.__STUB.noFigure = ['hal_court']; });
+  await page.locator('#honRemind .cs', { hasText: 'Most improved' }).getByRole('button', { name: 'Confirm', exact: true }).click(); await L.settle(page, 400);
+  check(r, 'an athlete the server cannot honour is refused in words, and the row is still a suggestion with its buttons', /cannot be honoured/.test(await L.failText(page)) && (await page.locator('#honRemind .cs', { hasText: 'Most improved' }).getByRole('button', { name: 'Confirm', exact: true }).count()) === 1, await L.failText(page));
+  const db = await L.db(page);
+  check(r, 'nothing was confirmed in the database', !db.career_honours.some(h => h.confirmed_at) && !Object.keys(db.career_honour_months[0].confirmed).length, db.career_honours);
+  const n0 = (await L.calls(page)).length;
+  await page.locator('#honRemind .cs', { hasText: 'Most sessions' }).getByRole('button', { name: 'Change', exact: true }).click(); await L.settle(page, 200);
+  check(r, 'Change with no name chosen sends nothing and says so', rpcs(await L.callsSince(page, n0), 'coach_honour_confirm').length === 0 && /Choose a name first/.test(await L.toastText(page)), await L.toastText(page));
+  await page.evaluate(() => { window.__STUB.noFigure = []; });
+  await page.locator('#honRemind .cs', { hasText: 'Most sessions' }).getByRole('button', { name: 'Confirm', exact: true }).click(); await L.settle(page, 400);
+  await page.evaluate(() => honourConfirm(null, '2026-10-01', 'sessions', ['gia_court'])); await L.settle(page, 300);
+  const dbb = await L.db(page);
+  check(r, 'a second Confirm with the same winners is accepted and changes nothing', !/already confirmed/.test(await L.failText(page)) && dbb.career_honours.filter(h => h.honour === 'sessions').length === 1, await L.failText(page));
+  await page.evaluate(() => honourConfirm(null, '2026-10-01', 'sessions', ['hal_court'])); await L.settle(page, 300);
+  check(r, 'a different list on a confirmed honour is refused: already confirmed', /already confirmed/.test(await L.failText(page)), await L.failText(page));
+  check(r, 'the card keeps the look (sizes, corners, 32 px buttons)', (await lookOf(page, '#honRemind')).length === 0, (await lookOf(page, '#honRemind')).slice(0, 4));
+  await page.setViewportSize({ width: 390, height: 844 }); await L.go(page, 'today');
+  const sw = await sideways(page);
+  check(r, 'Today does not scroll sideways at 390 px with the card up', sw.over <= 0 && sw.panel <= 0, sw);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.screenshot({ path: path.join(L.OUT, 'honours-reminder.png') });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await o.ctx.close();
+  return r;
+};
+
 // ── Amir's Pick: the reason the crew reads, and any client can be picked (stage100, 2026-10-25, round 7, idea #92) ──────────────────────────────
 // Under the picked row: "Why <first name>? The crew reads this.", a box (140 characters, a live count), Save -> coach_honours_why(), and one muted line on
 // how long the Pick card stays on Crew (7 days from the pick). Under the shortlist: "Someone else:" and a list of every client who counts. The stub

@@ -58,6 +58,9 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
 - **The weekly call log is retired** (Amir, 2026-10-11): no Calls tab, no new call logs, no Copy cycle prompt; old logs are read and
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
+- **A month's honours are suggestions until Amir confirms them** (stage101, 2026-10-25): the reminder card at the top of Courtside, from the month's last day until all four
+  are confirmed, is the only place a suggestion is drawn. The honours area (WhatsApp lines) shows an honour only once `S.honours.confirmed` has it; a server with no `confirmed`
+  is the old behaviour, no card. The page's quiet freeze never publishes. `COACH_DASHBOARD.md` → *The month's honours wait for Amir*.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
   (133 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **The UX pass (2026-10-12; Amir's answers in memory `coach-redesign-2026-10-12`)**, round 1 shipped: Today puts Needs you first and wide,

@@ -629,6 +629,12 @@
   .court .cs .mic .row { margin-top: 8px; }
   @media (max-width: 899px) and (pointer: coarse) { .mic textarea { font-size: 16px; } }
   .court .cs-eb { margin-top: 4px; }
+  /* The reminder: the month's honours wait for Amir (stage101). Same rows as the honours, in a bordered box at the top of Courtside. */
+  .court .hrem { border: 1px solid var(--line); border-radius: 12px; padding: 12px 12px 4px; margin-bottom: 16px; }
+  .court .hrem-t { font-size: 17px; font-weight: 600; line-height: 1.3; }
+  .court .hrem-l { margin-top: 4px; font-size: 14px; line-height: 1.4; color: var(--muted); }
+  .court .hrem .cs:first-of-type { border-top: 0; }
+  .court .hr-chip { display: inline-flex; align-items: center; gap: 2px; padding: 0 2px 0 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; }
   .court .cs-fold { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
   .court .cs-fold > summary { font-size: 14px; font-weight: 600; cursor: pointer; }
   /* The monthly goal and "From Amir" under the athlete's name (stage75) */
@@ -3403,6 +3409,8 @@ function courtWeek() {
 }
 const monthOf = iso => String(iso).slice(0, 7) + '-01';
 function lastMonthKey() { const t = todayKey(); return dkey(new Date(+t.slice(0, 4), +t.slice(5, 7) - 2, 1)); }
+// Stage101: the month the honours are about. The month just gone, except on a month's LAST day, when the reminder starts and it is this month ("so far").
+function honoursMonthKey() { const t = todayKey(); return new Date(+t.slice(0, 4), +t.slice(5, 7) - 1, +t.slice(8) + 1).getDate() === 1 ? monthOf(t) : lastMonthKey(); }
 function monthName(iso) { return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+String(iso).slice(5, 7) - 1] || ''; }
 const firstWord = s => String(s || '').trim().split(/\s+/)[0] || '';
 const listNames = ids => { const n = ids.map(nameOf); return n.length < 3 ? n.join(' and ') : n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1]; };
@@ -3412,7 +3420,7 @@ const courtClient = id => inTotals(S.ath[id] || { id });
 // is frozen once, quietly (a late session no longer moves a winner).
 async function loadCourt() {
   if (DEMO) { paintCourt(); return; }
-  const w = courtWeek(), m = lastMonthKey();
+  const w = courtWeek(), m = honoursMonthKey();
   const [cs, hon, goals, notes] = await Promise.all([
     sb.rpc('get_courtside', { p_from: w.from, p_to: w.to, p_not_clients: COURT_NOT_CLIENTS }),
     sb.rpc('coach_honours', { p_month: m, p_not_clients: COURT_NOT_CLIENTS }),
@@ -3427,7 +3435,7 @@ async function loadCourt() {
   S.goals = {}; ((goals && !goals.error && goals.data) || []).forEach(g => { (S.goals[g.athlete_id] = S.goals[g.athlete_id] || {})[g.month] = g; });
   S.amirNotes = {}; ((notes && !notes.error && notes.data) || []).forEach(n => { (S.amirNotes[n.athlete_id] = S.amirNotes[n.athlete_id] || []).push(n); });
   LOAD_ERR.court = cs.error ? cs.error.message : goals && goals.error ? goals.error.message : notes && notes.error ? notes.error.message : '';
-  if (S.honours && !S.honours.err && !S.honours.frozen && Number(todayKey().slice(8)) >= 8) {
+  if (S.honours && !S.honours.err && !S.honours.frozen && Number(todayKey().slice(8)) >= 8 && m < monthOf(todayKey())) {   // from the 8th, quietly: with stage101 this saves SUGGESTIONS, nothing reaches an athlete
     const r = await sb.rpc('coach_honours_freeze', { p_month: m, p_not_clients: COURT_NOT_CLIENTS });
     if (!r.error && r.data) S.honours = r.data;
   }
@@ -3443,7 +3451,8 @@ function paintCourt() {
       // The honours fold and the cursor in the reason box survive the redraw (a background refresh must not close what Amir is writing in).
       const fold = $('courtHon'), wasOpen = !!(fold && fold.open), f = document.activeElement, keep = f && f.id === 'whyIn' ? [f.selectionStart, f.selectionEnd] : null;
       el.innerHTML = courtsideHtml();
-      if (wasOpen && $('courtHon')) $('courtHon').open = true;
+      if ((wasOpen || _honOpen) && $('courtHon')) $('courtHon').open = true;
+      _honOpen = false;
       if (keep && $('whyIn')) { $('whyIn').focus(); try { $('whyIn').setSelectionRange(keep[0], keep[1]); } catch (e) { /* a field with no selection */ } }
     } else if (!!el !== on) render();
   } else if (r.view === 'detail' && on) render();
@@ -3516,6 +3525,7 @@ function courtsideHtml() {
   const shown = _courtAll ? open : open.slice(0, COURT_CAP);
   const firstWeek = Number(todayKey().slice(8)) <= 7, hon = honoursHtml(firstWeek);
   return `
+    ${honRemindOn() ? honRemindHtml() : ''}
     <div class="phead"><span class="t hd">Courtside</span><span class="r">this week${open.length > COURT_CAP ? ` · ${COURT_CAP} of ${open.length}` : ''}</span></div>
     ${firstWeek ? hon : ''}
     ${firstWeek && hon ? '<div class="eyebrow cs-eb">This week</div>' : ''}
@@ -3542,17 +3552,28 @@ async function courtAct(id, idsCsv, what) {
 window.courtAct = courtAct;
 
 // The month just gone: frozen rows once frozen, else the live work. Winners are clients only.
+// Stage101: a row counts as the athletes' only when Amir confirmed its honour; the unconfirmed ones are SUGGESTIONS (conf false), drawn in the reminder card.
+// A server before stage101 sends no `confirmed`: every row is already live for the athletes, and the page behaves as it always did (legacy).
+const HON3 = ['sessions', 'improved', 'full_month'];
+const honLegacy = h => !h || h.confirmed === undefined;
 function honoursData() {
   const h = S.honours;
   if (!h || h.err || !h.month) return null;
-  const L = h.live || {}, rows = h.frozen ? (h.rows || []) : [];
-  const pick = (honour, live) => (h.frozen ? rows.filter(r => r.honour === honour).map(r => Object.assign({}, r.value || {}, { id: r.athlete_id, sent: r.sent_at })) : live).filter(x => courtClient(x.id));
+  const L = h.live || {}, rows = h.frozen ? (h.rows || []) : [], legacy = honLegacy(h), conf = k => legacy || !!(h.confirmed && h.confirmed[k]);
+  const val = r => Object.assign({}, r.value || {}, { id: r.athlete_id, sent: r.sent_at });
+  const mine = (honour, live) => (legacy ? (h.frozen ? rows.filter(r => r.honour === honour).map(val) : live) : conf(honour) ? rows.filter(r => r.honour === honour && r.confirmed_at).map(val) : []).filter(x => courtClient(x.id));
+  const liveS = { sessions: ((L.sessions && L.sessions.who) || []).map(id => ({ id, n: L.sessions.n })),
+    improved: ((L.improved && L.improved.who) || []).map(x => ({ id: x.athlete_id, lift: x.lift, pct: x.pct })),
+    full_month: ((L.full_month && L.full_month.who) || []).map(x => ({ id: x.athlete_id, weeks: x.weeks })) };
+  const sugg = k => (h.live ? liveS[k] : rows.filter(r => r.honour === k && !r.confirmed_at).map(val)).filter(x => courtClient(x.id));
   return {
-    month: h.month, frozen: !!h.frozen, pick: h.pick || null, pickOpen: !!h.pick_open, pickAt: h.pick_at || null,
-    sessions: pick('sessions', ((L.sessions && L.sessions.who) || []).map(id => ({ id, n: L.sessions.n }))),
-    improved: pick('improved', ((L.improved && L.improved.who) || []).map(x => ({ id: x.athlete_id, lift: x.lift, pct: x.pct }))),
-    full: pick('full_month', ((L.full_month && L.full_month.who) || []).map(x => ({ id: x.athlete_id, weeks: x.weeks }))),
-    near: pick('near', ((L.full_month && L.full_month.near) || []).map(x => ({ id: x.athlete_id, held: x.held, weeks: x.weeks }))),
+    month: h.month, frozen: !!h.frozen, pick: h.pick || null, pickOpen: !!h.pick_open, pickAt: h.pick_at || null, legacy, ended: h.ended !== false,
+    conf: { sessions: conf('sessions'), improved: conf('improved'), full_month: conf('full_month') },
+    sugg: { sessions: sugg('sessions'), improved: sugg('improved'), full_month: sugg('full_month') },
+    sessions: mine('sessions', liveS.sessions),
+    improved: mine('improved', liveS.improved),
+    full: mine('full_month', liveS.full_month),
+    near: (h.frozen && !h.live ? rows.filter(r => r.honour === 'near').map(val) : ((L.full_month && L.full_month.near) || []).map(x => ({ id: x.athlete_id, held: x.held, weeks: x.weeks }))).filter(x => courtClient(x.id)),
     picked: rows.filter(r => r.honour === 'pick').map(r => ({ id: r.athlete_id, sent: r.sent_at, why: (r.value || {}).why || '' })),
     shortlist: (h.shortlist || []).map(x => Object.assign({}, x, { id: x.athlete_id })).filter(x => courtClient(x.id)),
   };
@@ -3578,6 +3599,17 @@ function pickWhyHtml(d, x) {
       ${line ? `<div class="muted t-sm">${esc(line)}</div>` : ''}
     </div>`;
 }
+// The Pick still to choose: the shortlist, "Someone else", "Nobody this month". Drawn in the reminder card while it is up, else in the honours.
+function pickFlowHtml(d) {
+    const why = x => x.slot === 'weeks_held' ? `most weeks held: ${x.n}` : x.slot === 'gain' ? `biggest gain: ${x.lift} +${x.pct}%` : x.gone ? `back after ${x.gone} days away` : `${x.n} comebacks`;
+    // Someone else: any client who counts (the page's own tests, and a programme), not on the shortlist. The server accepts any client (career_is_client()).
+    const others = Object.values(S.ath).filter(a => courtClient(a.id) && S.programs[a.id] && !d.shortlist.some(x => x.id === a.id)).sort((p, q) => nameOf(p.id).localeCompare(nameOf(q.id)));
+    const elseRow = others.length ? `<div class="cs-else"><span class="m muted">Someone else:</span><select id="elseSel" class="goal-in" aria-label="Pick someone who is not on the list" onchange="_elseId=this.value"><option value="">Choose a name</option>${others.map(a => `<option value="${esc(a.id)}"${a.id === _elseId ? ' selected' : ''}>${esc(nameOf(a.id))}</option>`).join('')}</select><button class="btn sm" onclick="honourElse(this, ${jsq(d.month)})">Pick</button></div>` : '';
+    return `<div class="cs"><div class="cs-l1"><span class="dot"></span><span class="m"><b>Amir's Pick</b> · choose one, or nobody</span></div>
+      ${d.shortlist.map(x => `<div class="cs-pick"><span class="m">${esc(nameOf(x.id))} <span class="muted">· ${esc(why(x))}</span></span><button class="btn sm" onclick="honourPick(this, ${jsq(d.month)}, ${jsq(x.id)})">Pick ${esc(firstWord(nameOf(x.id)))}</button></div>`).join('')}
+      ${elseRow}
+      <div class="cs-acts"><button class="btn sm quiet" onclick="honourPick(this, ${jsq(d.month)}, '')">Nobody this month</button></div></div>`;
+}
 function honoursHtml(expanded) {
   // Just after midnight on the 1st your clock can be ahead of the server's (UTC): the month has not ended there yet, so there is nothing to show.
   if (S.honours && S.honours.err) return /has not ended yet/.test(S.honours.err) ? '' : `<p class="empty">Last month's honours did not load: ${esc(S.honours.err)}</p>`;
@@ -3585,25 +3617,113 @@ function honoursHtml(expanded) {
   if (!d) return '';
   const mn = monthName(d.month), out = [], pickMsg = fillLine(COURT_LINES.amirs_pick, { month: mn });
   const send = (honour, x, msg, label) => courtSendHtml(x.id, msg, () => `honourSent(${jsq(d.month)}, '${honour}', ${jsq(x.id)})`, label) + (x.sent ? '<span class="muted t-sm">sent ✓</span>' : '');
+  const card = honRemindOn();   // stage101: the reminder card holds what is not confirmed yet, and the Pick while it is up
   d.sessions.forEach(x => { const msg = fillLine(COURT_LINES.honour_sessions, { month: mn, n: x.n }); out.push(honRow('Most sessions', `${nameOf(x.id)}, ${x.n} plan session${x.n === 1 ? '' : 's'}`, msg, send('sessions', x, msg))); });
   d.improved.forEach(x => { const msg = fillLine(COURT_LINES.honour_improved, { month: mn, lift: x.lift, pct: x.pct }); out.push(honRow('Most improved', `${nameOf(x.id)}, ${x.lift} +${x.pct}% at the same effort`, msg, send('improved', x, msg))); });
-  if (d.full.length) d.full.forEach(x => { const msg = fillLine(COURT_LINES.honour_full_month, { month: mn }); out.push(honRow('Full Month', `${nameOf(x.id)}, every plan session (${x.weeks} weeks)`, msg, send('full_month', x, msg))); });
+  if (!d.conf.full_month) { /* a suggestion: the reminder card */ }
+  else if (d.full.length) d.full.forEach(x => { const msg = fillLine(COURT_LINES.honour_full_month, { month: mn }); out.push(honRow('Full Month', `${nameOf(x.id)}, every plan session (${x.weeks} weeks)`, msg, send('full_month', x, msg))); });
   else out.push(honRow('Full Month', 'Nobody this month.' + (d.near.length ? ` ${listNames(d.near.map(x => x.id))} ${d.near.length === 1 ? 'was' : 'were'} one week short.` : '')));
-  if (d.pick === 'picked') d.picked.forEach(x => out.push(honRow("Amir's Pick", nameOf(x.id), pickMsg, send('pick', x, pickMsg, 'Ask about the story ↗'), pickWhyHtml(d, x))));
+  if (card) { /* the reminder card holds the Pick */ }
+  else if (d.pick === 'picked') d.picked.forEach(x => out.push(honRow("Amir's Pick", nameOf(x.id), pickMsg, send('pick', x, pickMsg, 'Ask about the story ↗'), pickWhyHtml(d, x))));
   else if (d.pick === 'nobody') out.push(honRow("Amir's Pick", 'Nobody this month.'));
-  else if (d.pickOpen) {
-    const why = x => x.slot === 'weeks_held' ? `most weeks held: ${x.n}` : x.slot === 'gain' ? `biggest gain: ${x.lift} +${x.pct}%` : x.gone ? `back after ${x.gone} days away` : `${x.n} comebacks`;
-    // Someone else: any client who counts (the page's own tests, and a programme), not on the shortlist. The server accepts any client (career_is_client()).
-    const others = Object.values(S.ath).filter(a => courtClient(a.id) && S.programs[a.id] && !d.shortlist.some(x => x.id === a.id)).sort((p, q) => nameOf(p.id).localeCompare(nameOf(q.id)));
-    const elseRow = others.length ? `<div class="cs-else"><span class="m muted">Someone else:</span><select id="elseSel" class="goal-in" aria-label="Pick someone who is not on the list" onchange="_elseId=this.value"><option value="">Choose a name</option>${others.map(a => `<option value="${esc(a.id)}"${a.id === _elseId ? ' selected' : ''}>${esc(nameOf(a.id))}</option>`).join('')}</select><button class="btn sm" onclick="honourElse(this, ${jsq(d.month)})">Pick</button></div>` : '';
-    out.push(`<div class="cs"><div class="cs-l1"><span class="dot"></span><span class="m"><b>Amir's Pick</b> · choose one, or nobody</span></div>
-      ${d.shortlist.map(x => `<div class="cs-pick"><span class="m">${esc(nameOf(x.id))} <span class="muted">· ${esc(why(x))}</span></span><button class="btn sm" onclick="honourPick(this, ${jsq(d.month)}, ${jsq(x.id)})">Pick ${esc(firstWord(nameOf(x.id)))}</button></div>`).join('')}
-      ${elseRow}
-      <div class="cs-acts"><button class="btn sm quiet" onclick="honourPick(this, ${jsq(d.month)}, '')">Nobody this month</button></div></div>`);
-  }
+  else if (d.pickOpen) out.push(pickFlowHtml(d));
+  if (!out.length) return '';
   return expanded ? `<div class="eyebrow cs-eb">${esc(mn)} honours</div>${out.join('')}`
                   : `<details class="cs-fold" id="courtHon"><summary>${esc(mn)} honours</summary>${out.join('')}</details>`;
 }
+// ── The month's honours wait for Amir (stage101; Amir 2026-10-25, board https://claude.ai/artifact/9JYRa93PVAYZSH4pRw2rhs, "The reminder in coach.html") ──
+// From the LAST day of the month until all four honours of that month are confirmed (it stays into the next month): one row per honour. The app
+// suggests the winner of Most sessions and Most improved and the athletes who earned Full Month, from the numbers; Amir confirms with one tap, or
+// changes it (another athlete). His Pick is the existing pick flow. Nothing reaches an athlete, the Bell or a phone until he confirms that honour.
+// A server before stage101 sends no `confirmed`: no card, and the honours behave as they always did.
+let _chg = {}, _fullDraft = null, _honOpen = false;   // _honOpen: the honours fold opens on the next repaint (after the Pick, whose reason box moves there when the card goes)
+function honRemindOn() {
+  const h = S.honours;
+  if (!h || h.err || !h.month || honLegacy(h) || !h.pick_open) return false;
+  return !(HON3.every(k => h.confirmed && h.confirmed[k]) && h.pick);
+}
+const honPeople = () => Object.values(S.ath).filter(a => courtClient(a.id) && S.programs[a.id]).sort((p, q) => nameOf(p.id).localeCompare(nameOf(q.id)));
+const honNext = month => dkey(new Date(+month.slice(0, 4), +month.slice(5, 7), 1));   // the 1st of the month after
+function honFigure(k, x) {
+  return k === 'sessions' ? `${nameOf(x.id)}, ${x.n} plan session${x.n === 1 ? '' : 's'}` : k === 'improved' ? `${nameOf(x.id)}, ${x.lift} +${x.pct}% at the same effort` : `${nameOf(x.id)}, ${x.weeks} week${x.weeks === 1 ? '' : 's'}`;
+}
+function honRemindHtml() {
+  const d = honoursData();
+  if (!d) return '';
+  const mn = monthName(d.month), next = honNext(d.month), by = next.slice(0, 8) + '07', over = todayKey() > by, sofar = d.ended ? '' : ' so far';
+  const quiet = (label, text, extra) => `<div class="cs"><div class="cs-l1"><span class="dot dim"></span><span class="m"><b>${esc(label)}</b> · <span class="muted">Confirmed</span> ${esc(text)}</span></div>${extra || ''}</div>`;
+  const people = honPeople();
+  const changeRow = k => `<div class="cs-else"><span class="m muted">Change to:</span><select id="chg_${k}" class="goal-in" aria-label="Choose another athlete for ${esc(k.replace('_', ' '))}" onchange="_chg.${k}=this.value"><option value="">Choose a name</option>${people.map(a => `<option value="${esc(a.id)}"${_chg[k] === a.id ? ' selected' : ''}>${esc(nameOf(a.id))}</option>`).join('')}</select><button class="btn sm" onclick="honourChange(this, ${jsq(d.month)}, '${k}')">Change</button></div>`;
+  const rows = [];
+  const one = (k, label, list, none) => {
+    if (d.conf[k]) { rows.push(quiet(label, list.length ? list.map(x => honFigure(k, x)).join(', ') : 'nobody')); return; }
+    const sg = d.sugg[k];
+    rows.push(`<div class="cs"><div class="cs-l1"><span class="dot"></span><span class="m"><b>${esc(label)}</b> · ${sg.length ? `suggested${sofar}: ${esc(sg.map(x => honFigure(k, x)).join(' and '))}` : esc(none)}</span></div>
+      <div class="cs-acts"><button class="btn sm" onclick="honourConfirm(this, ${jsq(d.month)}, '${k}')">${sg.length ? 'Confirm' : 'Nobody this month'}</button></div>${changeRow(k)}</div>`);
+  };
+  one('sessions', 'Most sessions', d.sessions, 'nobody has a plan session yet');
+  one('improved', 'Most improved', d.improved, 'no main-lift win yet');
+  if (d.conf.full_month) rows.push(quiet('Full Month', d.full.length ? d.full.map(x => nameOf(x.id)).join(', ') : 'nobody'));
+  else {
+    const ids = _fullDraft && _fullDraft.month === d.month ? _fullDraft.ids : d.sugg.full_month.map(x => x.id);
+    const add = people.filter(a => !ids.includes(a.id));
+    rows.push(`<div class="cs"><div class="cs-l1"><span class="dot"></span><span class="m"><b>Full Month</b> · ${ids.length ? `earned it${sofar}:` : 'nobody has earned it yet'}</span></div>
+      ${ids.length ? `<div class="cs-acts">${ids.map(id => `<span class="hr-chip">${esc(nameOf(id))}<button class="btn sm quiet" aria-label="Take ${esc(nameOf(id))} off Full Month" onclick="honourFull('del', ${jsq(id)})">×</button></span>`).join('')}</div>` : ''}
+      <div class="cs-acts"><button class="btn sm" onclick="honourConfirm(this, ${jsq(d.month)}, 'full_month')">${ids.length ? 'Confirm' : 'Nobody this month'}</button></div>
+      ${add.length ? `<div class="cs-else"><span class="m muted">Add a name:</span><select id="fullAdd" class="goal-in" aria-label="Add an athlete to Full Month"><option value="">Choose a name</option>${add.map(a => `<option value="${esc(a.id)}">${esc(nameOf(a.id))}</option>`).join('')}</select><button class="btn sm" onclick="honourFull('add')">Add</button></div>` : ''}</div>`);
+  }
+  if (d.pick === 'picked') d.picked.forEach(x => rows.push(quiet('Your Pick', nameOf(x.id), pickWhyHtml(d, x))));
+  else if (d.pick === 'nobody') rows.push(quiet('Your Pick', 'nobody'));
+  else rows.push(pickFlowHtml(d));
+  return `<div class="hrem" id="honRemind">
+      <div class="hrem-t">${esc(mn)}'s honours are waiting</div>
+      <div class="hrem-l">${over ? 'Overdue: pick them now.' : `Pick them by 7 ${esc(monthName(next))}.`} Nothing reaches anyone until you confirm.${d.ended ? '' : ' The month is not over yet, so these are the numbers so far.'}</div>
+      ${rows.join('')}
+    </div>`;
+}
+// Confirm: the winners the card shows (the suggestion, or Full Month's edited list) go to coach_honour_confirm(), which works their figures out again.
+async function honourConfirm(btn, month, honour, idsOverride) {
+  const d = honoursData();
+  if (!d) return;
+  const ids = idsOverride || (honour === 'full_month' && _fullDraft && _fullDraft.month === month ? _fullDraft.ids : d.sugg[honour].map(x => x.id));
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (btn) btn.disabled = true;
+  const r = await sb.rpc('coach_honour_confirm', { p_month: month, p_honour: honour, p_athlete_ids: ids, p_not_clients: COURT_NOT_CLIENTS });
+  if (btn && btn.isConnected) btn.disabled = false;
+  if (r.error) {
+    if (courtMissing(r.error)) { fail('Confirming honours needs the newer server (stage101).'); return; }
+    fail('Not confirmed: ' + r.error.message); return;
+  }
+  S.honours = r.data; _fullDraft = null; _chg[honour] = '';
+  toast(`${{ sessions: 'Most sessions', improved: 'Most improved', full_month: 'Full Month' }[honour]} confirmed. ${ids.length ? 'They can see it now.' : 'Nobody this month.'}`);
+  paintCourt();
+}
+// Change: another athlete takes the honour. Two taps, because a confirmed honour stays confirmed (the first says what the second does).
+function honourChange(btn, month, honour) {
+  const sel = $('chg_' + honour), id = sel ? sel.value : '';
+  if (!id) { toast('Choose a name first'); return; }
+  _chg[honour] = id;
+  if (btn.dataset.armed && btn.dataset.who !== id) { delete btn.dataset.armed; btn.textContent = 'Change'; }
+  btn.dataset.who = id;
+  if (!btn.dataset.armed) {
+    btn.dataset.armed = '1'; btn.textContent = `Tap again: ${firstWord(nameOf(id))} gets it`;
+    setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = 'Change'; } }, 4000);
+    return;
+  }
+  return honourConfirm(btn, month, honour, [id]);
+}
+// Full Month's list: take a name off, put one on. Kept in a draft until Confirm.
+function honourFull(what, id) {
+  const d = honoursData(); if (!d) return;
+  const month = d.month, ids = (_fullDraft && _fullDraft.month === month ? _fullDraft.ids : d.sugg.full_month.map(x => x.id)).slice();
+  if (what === 'del') { const i = ids.indexOf(id); if (i >= 0) ids.splice(i, 1); }
+  else { const sel = $('fullAdd'), v = sel ? sel.value : ''; if (!v) { toast('Choose a name first'); return; } if (!ids.includes(v)) ids.push(v); }
+  _fullDraft = { month, ids };
+  paintCourt();
+}
+window.honourConfirm = honourConfirm;
+window.honourChange = honourChange;
+window.honourFull = honourFull;
 // Sending (or copying) an honour fixes the month's winners first (frozen once), then marks that one sent.
 async function honourSent(month, honour, id) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
@@ -3629,7 +3749,7 @@ async function honourPick(btn, month, id) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const r = await sb.rpc('coach_honours_pick', { p_month: month, p_athlete_id: id || null, p_not_clients: COURT_NOT_CLIENTS });
   if (r.error) { fail('Your pick was not saved: ' + r.error.message); return; }
-  S.honours = r.data;
+  S.honours = r.data; _honOpen = true;
   toast(id ? `${firstWord(nameOf(id))} is your ${monthName(month)} pick` : `No pick for ${monthName(month)}`);
   paintCourt();
 }
