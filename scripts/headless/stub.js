@@ -113,7 +113,7 @@
       if (!S.bell) return res({ data: null, error: null, status: 200 });
       // the hash the server takes over the payload: it MUST change when the feed does, or a new post would never arrive
       var tag = (function (B) {
-        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji, B.crew, B.week, B.open, B.lounge, B.pick]), h = 0;
+        var t = JSON.stringify([B.items, B.me, B.honours, B.emoji, B.crew, B.week, B.open, B.lounge, B.pick, B.weekly]), h = 0;
         for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
         return S.bell.etag && !S.bellTagMoves ? S.bell.etag : 'tag' + h;
       })(S.bell);
@@ -189,6 +189,44 @@
       }
       var qout = JSON.parse(JSON.stringify(S.partner && S.partner.code ? S.partner : { code: null }));
       return new Promise(function (ok) { setTimeout(function () { ok({ data: qout, error: null, status: 200 }); }, S.partnerDelay || 0); });
+    }
+    // Home Crowd steps 2 to 4 (scripts/headless/inbox.js). get_inbox answers the stub's inbox ({ rows: [...] }, newest first) the way stage101 does: { since, rows, new, at }, new being the rows
+    // newer than p_since (inboxMissing = no such function). crew_ask keeps what was asked in askLog and refuses like stage102: an empty one (crew:empty), over 200 (crew:too_long), a fourth in a day
+    // (crew:enough; askCap changes the three). crew_vote moves the caller's vote on bell.weekly (a non-member crew:join, another side than a or b crew:side, a closed week crew:closed) and answers the new
+    // weekly object. get_answer_book answers answerBook ([{ q, a, at, by }]), bookMissing = no such function.
+    if (name === 'get_inbox') {
+      if (S.inboxMissing) return res({ data: null, error: { message: 'Could not find the function public.get_inbox(p_since) in the schema cache', code: 'PGRST202' }, status: 404 });
+      var ib = JSON.parse(JSON.stringify((S.inbox && S.inbox.rows) || [])), since = params && params.p_since ? Date.parse(params.p_since) : Date.now() - 7 * 86400000;
+      return res({ data: { since: params && params.p_since || null, rows: ib, new: ib.filter(function (r) { return Date.parse(r.at) > since; }).length, at: new Date().toISOString() }, error: null, status: 200 });
+    }
+    if (name === 'get_answer_book') {
+      if (S.bookMissing) return res({ data: null, error: { message: 'Could not find the function public.get_answer_book() in the schema cache', code: 'PGRST202' }, status: 404 });
+      return res({ data: JSON.parse(JSON.stringify(S.answerBook || [])), error: null, status: 200 });
+    }
+    if (name === 'crew_ask') {
+      var askBad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+      var askBody = String((params && params.p_body) || '').trim();
+      if (S.askErr) return askBad(S.askErr);
+      if (!askBody) return askBad('crew:empty');
+      if (askBody.length > 200) return askBad('crew:too_long');
+      S.askLog = S.askLog || [];
+      if (S.askLog.length >= (S.askCap || 3)) return askBad('crew:enough');
+      S.askLog.push({ body: askBody, ok_name: !!(params && params.p_ok_name) });
+      return res({ data: { ok: true, id: 'ask-' + S.askLog.length }, error: null, status: 200 });
+    }
+    if (name === 'crew_vote' && S.bell) {
+      var VB = S.bell, vme = VB.me || {}, vw = VB.weekly, vbad = function (m) { return res({ data: null, error: { message: m, code: 'P0001' }, status: 400 }); };
+      var vside = params && params.p_side;
+      if (!vw || !vw.q) return vbad('crew:closed');
+      if (vme.answer !== 'yes' || vme.can_post === false) return vbad('crew:join');
+      if (vside !== 'a' && vside !== 'b') return vbad('crew:side');
+      if (vw.open === false) return vbad('crew:closed');
+      var vv = vw.votes = vw.votes || { a: 0, b: 0, fa: [], fb: [] };
+      if (vw.mine === 'a' || vw.mine === 'b') { vv[vw.mine] = Math.max(0, (vv[vw.mine] || 0) - 1); vv['f' + vw.mine] = (vv['f' + vw.mine] || []).filter(function (f) { return !f.me; }); }
+      vv[vside] = (vv[vside] || 0) + 1; vv['f' + vside] = [{ ck: vme.ck || null, fv: vme.fv == null ? null : vme.fv, who: vme.name || 'You', me: true }].concat(vv['f' + vside] || []);
+      vw.mine = vside;
+      try { var vcb = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); vcb.bell = VB; localStorage.setItem('__stubcfg', JSON.stringify(vcb)); } catch (e) {}
+      return res({ data: JSON.parse(JSON.stringify(vw)), error: null, status: 200 });
     }
     if (/^crew_/.test(name) && S.bell) {
       var B = S.bell, me = B.me = B.me || {}, keep = function () { try { var cb = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); cb.bell = B; localStorage.setItem('__stubcfg', JSON.stringify(cb)); } catch (e) {} };

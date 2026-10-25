@@ -718,7 +718,10 @@ self.addEventListener('push', event => {
   // and a crew one (stage86) on the Bell itself rather than on Home — program.html reads the #crew
   // hash on the way in and then clears it, so a reload does not jump back there.
   // Habits open the training app: they live on its Today card now, and AA Proof (habits.html) is being retired (2026-10-20).
-  const url = d.url || (kind === 'crew' ? '/program.html#crew' : '/program.html');
+  // A crew notification that FOLDS several events (crew_push_words(), n > 1: "The crew has been busy" / "تو تیم خبر هست") opens the Inbox (Home Crowd step 2d, idea 90); one that names a single
+  // event keeps landing on the Crew tab (step 1, idea 77). program.html reads the #inbox hash the same way it reads #crew.
+  const folded = kind === 'crew' && (d.title === 'The crew has been busy' || d.title === 'تو تیم خبر هست');
+  const url = d.url || (kind === 'crew' ? (folded ? '/program.html#inbox' : '/program.html#crew') : '/program.html');
   event.waitUntil(
     self.registration.showNotification(title, {
       body: d.body || '',
