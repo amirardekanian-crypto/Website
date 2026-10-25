@@ -9117,7 +9117,9 @@ function roadRowHTML(c, i, o) {
   // The Now row says NOW once (2026-10-19, The Long Rally audit): the green pill is the state, so the mono line keeps only the
   // weeks. The pill is NOT aria-hidden any more — it is the row's only state word now, and the button's name must still carry it.
   const word = state === 'now' ? '' : roadWord(state);
-  const line = (c.weeks ? esc(c.weeks) : '') + (c.weeks && word ? ' · ' : '') + (word ? `<b>${word}</b>` : '');
+  // One count per number (Plain Words, 2026-10-25): the cover says "Cycle 2 of 5" and "Week 2 of 5", so the road says how long the cycle is, "5 weeks".
+  const wkTxt = (() => { const m = /(\d+)\s*[–—-]\s*(\d+)/.exec(String(c.weeks || '')); const k = m ? Number(m[2]) - Number(m[1]) + 1 : 0; return k > 0 ? k + (k === 1 ? ' week' : ' weeks') : (c.weeks || ''); })();
+  const line = (wkTxt ? esc(wkTxt) : '') + (wkTxt && word ? ' · ' : '') + (word ? `<b>${word}</b>` : '');
   const inner = `<span class="road-num" aria-hidden="true">${n}</span>`
     + `<span class="road-tx"><span class="road-nm">${esc(name)}</span><span class="road-ln">${line}</span></span>`
     + `<span class="road-st">${state === 'now' ? '<span class="road-tag">Now</span>' : ''}${state === 'locked' ? `<span class="road-lock" aria-hidden="true">${roadIc('lock')}</span>` : ''}`
@@ -9826,11 +9828,11 @@ function paintCycleCard() {
     const last = !p.over.next;
     const lens = cycles.map(c => (cycleWeekInfo(c) || {}).total);
     const weeks = lens.every(n => n) ? lens.reduce((a, n) => a + n, 0) : 0;   // the roadmap's weeks, when every cycle is dated
-    const what = last ? `${cycles.length} cycle${cycles.length === 1 ? '' : 's'}${weeks ? ' · ' + weeks + ' week' + (weeks === 1 ? '' : 's') : ''}` : `${p.wk.total} of ${p.wk.total} week${p.wk.total === 1 ? '' : 's'}`;
+    const what = last ? ` · ${cycles.length} cycle${cycles.length === 1 ? '' : 's'}${weeks ? ' · ' + weeks + ' week' + (weeks === 1 ? '' : 's') : ''}` : '';   // a finished cycle's weeks are on the Week row under it (one count per number)
     paintInto(wrap, `<div class="cyc-card">${photo}<div class="cyc-body">
       <span class="cyc-top is-fin"><span class="cyc-fin-h"><span class="cyc-fin-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${last ? 'Roadmap complete' : 'Cycle complete'}</span>${last ? '' : `<span class="cyc-of">· ${p.cIdx + 1} of ${p.count}</span>`}</span>
       ${name}
-      <span class="cyc-fin-s">Finished ${cycDate(p.cur.endDate)} · ${what}</span>
+      <span class="cyc-fin-s">Finished ${cycDate(p.cur.endDate)}${what}</span>
       ${last ? `<span class="cyc-fin-meter">${cycles.map((c, i) => `<span>C${i + 1}</span>`).join('')}</span>`
              : `<span class="cyc-row"><span class="cyc-k">Week ${p.wk.total}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.total)}</span>`}
       <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} session${p.planned === 1 ? '' : 's'}</small></span>${bar(p.planned, p.done)}</span>
@@ -9852,7 +9854,7 @@ function paintCycleCard() {
   const note = lead ? `<button type="button" class="cyc-note" onclick="openCycleNote()" aria-label="${esc('From Amir: ' + lead + ' Read the whole note.').replace(/"/g, '&quot;')}">
       <q class="cyc-note-q">${esc(lead)}</q><span class="cyc-note-go">Read it<i aria-hidden="true">›</i></span></button>` : '';
   paintInto(wrap, `<div class="cyc-card">${photo}<div class="cyc-body">
-      <span class="cyc-top">This cycle · ${p.cIdx + 1} of ${p.count}</span>
+      <span class="cyc-top">Cycle ${p.cIdx + 1} of ${p.count}</span>
       ${name}
       ${dates ? `<span class="cyc-dates">${dates}</span>` : ''}
       <span class="cyc-row"><span class="cyc-k">Week ${p.wk.wk}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.wk)}</span>

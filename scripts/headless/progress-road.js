@@ -79,7 +79,7 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     });
     t.check('the cover: a plain div card on Progress, no tap, 16 px corners, on the 20 px gutter', !!c && c.tag === 'DIV' && !c.onclick && !c.role && c.radius === '16px' && c.left === 20 && c.width === 350, JSON.stringify(c && [c.tag, c.onclick, c.radius, c.left, c.width]));
     t.check('the cover: it is the one green thing on Progress (the hero gradient), and nothing else has one', !!c && /radial-gradient/.test(c.bg) && c.greens.join() === 'cyc-card', JSON.stringify(c && [c.bg, c.greens]));
-    t.check('the cover: the eyebrow reads THIS CYCLE · 2 OF 5, with a mint dot', !!c && c.eyebrow === 'THIS CYCLE · 2 OF 5' && c.dot === 'rgb(109, 190, 149)' && c.dotContent === '""', JSON.stringify(c && [c.eyebrow, c.dot]));
+    t.check('the cover: the eyebrow reads CYCLE 2 OF 5, with a mint dot', !!c && c.eyebrow === 'CYCLE 2 OF 5' && c.dot === 'rgb(109, 190, 149)' && c.dotContent === '""', JSON.stringify(c && [c.eyebrow, c.dot]));
     t.check('the cover: the cycle\'s name is the title, in capitals, 28 to 36 px, 900', !!c && c.title === 'LOAD & BUILD' && c.titleTag === 'H2' && c.titleSize >= 28 && c.titleSize <= 36 && c.titleWeight === '900', JSON.stringify(c && [c.title, c.titleTag, c.titleSize, c.titleWeight]));
     t.check('the cover: one mono line of the cycle\'s dates (the fixture\'s own days), no days left with 20 to go',
       !!c && c.dates === short(P.cycles[1].startDate) + ' – ' + short(P.cycles[1].endDate) && !/left/i.test(c.dates), JSON.stringify(c && c.dates) + ' want ' + short(P.cycles[1].startDate) + ' – ' + short(P.cycles[1].endDate));
@@ -136,7 +136,7 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     const c = await p.evaluate(() => { const card = document.querySelector('#cycle-card-wrap .cyc-card'); const q = s => card.querySelector(s);
       return { top: q('.cyc-top').innerText.replace(/\s+/g, ' ').trim(), fin: q('.cyc-fin-h').textContent.trim(), tick: !!q('.cyc-fin-tick svg'), dot: getComputedStyle(q('.cyc-top'), '::before').display, dates: !!q('.cyc-dates'),
         title: q('.cyc-name').innerText.trim(), sub: q('.cyc-fin-s').innerText.replace(/\s+/g, ' ').trim(), cls: card.className }; });
-    t.check('past its end: the eyebrow reads CYCLE COMPLETE · 2 OF 5 (a tick for the dot), the title is still the name, and the line says Finished', c.top === 'CYCLE COMPLETE · 2 OF 5' && c.fin === 'Cycle complete' && c.tick && c.dot === 'none' && !c.dates && c.title === 'LOAD & BUILD' && /^FINISHED \d{1,2} [A-Z]{3} · 5 OF 5 WEEKS$/.test(c.sub), JSON.stringify(c));
+    t.check('past its end: the eyebrow reads CYCLE COMPLETE · 2 OF 5 (a tick for the dot), the title is still the name, and the line says Finished', c.top === 'CYCLE COMPLETE · 2 OF 5' && c.fin === 'Cycle complete' && c.tick && c.dot === 'none' && !c.dates && c.title === 'LOAD & BUILD' && /^FINISHED \d{1,2} [A-Z]{3}$/.test(c.sub), JSON.stringify(c));
     await ctx.close();
     const last = await H.openProgram(browser, { prog: prog({ endsIn: -4, idx: 4 }), w: 390, h: 844 });
     await toPlan(last.p);
@@ -149,10 +149,10 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
   const states = {};
   for (const [tag, ends, want, lines] of [
     // The Now row's mono line is the weeks ALONE since 2026-10-19 (The Long Rally audit): the green Now pill is the state, and the row said it twice.
-    ['during (ends in 20 days)', 20, 'done now next locked locked', ['WEEKS 1–5 · DONE', 'WEEKS 6–10', 'WEEKS 11–15 · UP NEXT', 'WEEKS 16–20 · LOCKED', 'WEEKS 21–25 · LOCKED']],
+    ['during (ends in 20 days)', 20, 'done now next locked locked', ['5 WEEKS · DONE', '5 WEEKS', '5 WEEKS · UP NEXT', '5 WEEKS · LOCKED', '5 WEEKS · LOCKED']],
     ['before (starts tomorrow)', 34 + 1, 'done now next locked locked', null],
     ['on its last day', 0, 'done now next locked locked', null],
-    ['after (ended yesterday)', -1, 'done done next locked locked', ['WEEKS 1–5 · DONE', 'WEEKS 6–10 · DONE', 'WEEKS 11–15 · UP NEXT', 'WEEKS 16–20 · LOCKED', 'WEEKS 21–25 · LOCKED']],
+    ['after (ended yesterday)', -1, 'done done next locked locked', ['5 WEEKS · DONE', '5 WEEKS · DONE', '5 WEEKS · UP NEXT', '5 WEEKS · LOCKED', '5 WEEKS · LOCKED']],
     ['after (ended 40 days ago)', -40, 'done done next locked locked', null],
   ]) {
     const { ctx, p } = await H.openProgram(browser, { prog: prog({ endsIn: ends }), w: 390, h: 844 });
@@ -477,7 +477,7 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
         old: !!(n && n.querySelector('.current-message, .cm-banner, .cm-toggle, .cm-pill')), left: n && Math.round(n.querySelector('.road').getBoundingClientRect().left), width: n && Math.round(n.querySelector('.road').getBoundingClientRect().width),
         collide: document.querySelectorAll('#road-body-3').length, bodyId: !!document.getElementById('bt-road-body-3'), head: [...document.querySelectorAll('#home-week-wrap .home-section-title')].map(x => x.textContent.trim()).join('|'),
         door: (document.querySelector('.bt-wa b') || {}).textContent, done: (document.querySelector('.bt-done .hrow-l') || {}).textContent, rep: !!document.getElementById('bt-rep') }; });
-    t.check('Home between cycles: Up next is the road\'s row for cycle 3 (numeral, name, WEEKS 11–15 · UP NEXT), closed', h.row && h.n === '3' && h.num === '3' && h.name === 'Power Translation' && h.line === 'WEEKS 11–15 · UP NEXT' && h.exp === 'false' && h.ctl === 'bt-road-body-3' && h.bodyId, JSON.stringify(h));
+    t.check('Home between cycles: Up next is the road\'s row for cycle 3 (numeral, name, 5 WEEKS · UP NEXT), closed', h.row && h.n === '3' && h.num === '3' && h.name === 'Power Translation' && h.line === '5 WEEKS · UP NEXT' && h.exp === 'false' && h.ctl === 'bt-road-body-3' && h.bodyId, JSON.stringify(h));
     t.check('Home between cycles: no photo card is left (no banner, pill or Read more), the row is on the 20 px gutter, and Progress\'s ids are not repeated', !h.old && h.left === 20 && h.width === 350 && h.collide === 1, JSON.stringify([h.old, h.left, h.width, h.collide]));
     t.check('Home between cycles: the rest is as it was (Cycle 2 complete door row, Ready for Cycle 3?, Repeat a session)', h.done === 'Cycle 2 complete' && h.door === 'Ready for Cycle 3?' && h.rep && /Up next/.test(h.head), JSON.stringify([h.done, h.door, h.rep, h.head]));
     await p.click('.bt-next .road-head'); await p.waitForTimeout(450);
