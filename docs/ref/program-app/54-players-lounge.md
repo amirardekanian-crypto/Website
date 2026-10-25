@@ -161,7 +161,7 @@ or none. The crew sees what is on the card (there is no switch for it), which th
 **Cheered by** with every name sent (each a door to that person; Amir is **Coach**; *and 3 more* when the server counted more than it sent). A row nobody signed has no stack and is not a button; *Tap an
 achievement to see every cheer.* sits under the list. The same rows are in the *All n* sheet, and a name list opened from there goes ‹ Back to it. The first time you like a Bell line that holds an
 achievement, after the server took it, one toast: *Your name stays on Sara's achievement while your like is on it.* (`<id>_signnote`, said once on this phone, never synced, nothing on a server without
-stage96). Four Courts' rows are NOT changed: they are the catalogue's rows (a caption and a date, no person), and your own signatures are on your own page.
+stage96). Four Courts' rows are NOT changed (and since 2026-10-25 a page's Achievements block is **Trophies**, the emblems, with the same signers: `PROGRAM-APP.md` → *The cabinet*): they are the catalogue's rows (a caption and a date, no person), and your own signatures are on your own page.
 
 **Why.** Amir: *"for signed ball, i like face stack a bit more"*. Social actions pay nothing (GAME-6).
 

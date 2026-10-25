@@ -53,7 +53,7 @@ changed: the server, the XP and the levels are exactly as before.
   its badge, title and level cards stay drawable but nothing opens them. The Farsi card shows the mark's name in English until the pass.
 - **Tests:** `scripts/headless/career.js` (both apps), `scripts/headless/hold-serve.js`, `node scripts/check_twins.js` (`careerMoves()` is
   unchanged), `python scripts/check_career.py` (rule 23), `scripts/headless/signin.js`.
-- **Achievements, Four Courts** (Amir's pick A on the page *Achievements*, https://claude.ai/artifact/WPHuuK2Y2z4jfEQUPVdqNt; 2026-10-19), in
+- **Achievements, Four Courts** (**replaced on 2026-10-25 by the cabinet: `PROGRAM-APP.md` → *The cabinet*. The kind tiles and the kind sheet are gone; Next up, the door, the data and the nudge stay. The rest of this bullet is the page as built on 2026-10-19.** Amir's pick A on the page *Achievements*, https://claude.ai/artifact/WPHuuK2Y2z4jfEQUPVdqNt; 2026-10-19), in
   `#career-courts-wrap` between Your numbers and Your moments (`courtsHTML()`, painted by `paintCareerCard()`): the title **Achievements**
   with *earned of all*; **Next up**, one card (the server's `next`: the furthest along, else the easiest first step, never a resilience one),
   its name, the line of what is left (`achLine()`: *Hold this week too. 1 week to go.*, *2 more check-ins before a session.*, *1 more month with
@@ -75,7 +75,7 @@ changed: the server, the XP and the levels are exactly as before.
   **never writes a result**: Amir confirms every one from the clip, so there is no form here at all. It comes inside `get_bell()` as `open`
   (so Crew still costs one call, and stage83's etag covers it); null or missing, and no card is drawn. Checked by `scripts/headless/crew.js`
   (the card, the order, your own row, the door, an empty board, a long one, no stage, 320 px and dark).
-- **Four Courts' tests:** `scripts/headless/career.js` → `fourCourts()` (14 checks: the section, its order, Next up, the tiles, no clay, a
+- **Four Courts' tests** (rewritten 2026-10-25: `fourCourts()` keeps the door, Next up, the nudge and the no-answer case; the page is `scripts/headless/cabinet.js`): `scripts/headless/career.js` → `fourCourts()` (14 checks: the section, its order, Next up, the tiles, no clay, a
   kind opened, Back, Next up's tap, both nudges and none, 320 px, no answer); the stub answers `get_achievements` from its `achievements`.
 
 ---
