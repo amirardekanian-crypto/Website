@@ -4021,6 +4021,7 @@
   :where(#day-view) .reset-session-btn { min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 8px; background: transparent; color: var(--ink);
     box-shadow: inset 0 0 0 1.5px var(--box); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; }
   :where(#day-view) .reset-session-btn.armed { background: var(--clay-fill); color: #fff; box-shadow: none; }
+  :where(#day-view) .reset-session-btn { max-width: 100%; line-height: 1.2; padding-top: 8px; padding-bottom: 8px; }   /* the armed words are a sentence: they wrap inside the button */
   /* AA Proof's row opens the other app: an open-out glyph (its ✓ is transparent), so the only ✓ on the card is the send status */
   :where(#day-view) .session-complete .complete-habit-mark { flex: none; width: 20px; height: 20px; border-radius: 0; overflow: hidden; color: transparent;
     font: 400 var(--fs-label)/1 'Barlow', sans-serif; background: var(--green-ink);
@@ -10290,7 +10291,7 @@ function renderHome() {
       <div class="complete-rate-slot" id="rate-slot-${day.id}"></div>
       <div class="complete-actions">
         <button class="send-session-btn" hidden onclick="sendReport('${day.id}')">Send the update to your coach</button>
-        <button class="reset-session-btn" onclick="armedTap(this, 'Tap again to reset', () => resetDay('${day.id}'))">Reset session</button>
+        <button class="reset-session-btn" onclick="armedTap(this, 'This clears today\\'s sets. Tap again to clear.', () => resetDay('${day.id}'))">Start this day again</button>
       </div>
     </div>`;
     html += `</div>`;

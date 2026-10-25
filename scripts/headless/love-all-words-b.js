@@ -184,6 +184,37 @@ async function finish(browser) {
   await ctx.close();
 }
 
+async function reset(browser) {
+  for (const w of [390, 320]) {
+    const { ctx, p } = await open(browser, { w });
+    await partDone(p);
+    await p.click('#confirm-1 .confirm-btn'); await p.waitForTimeout(150);
+    await p.click('#confirm-1 .confirm-btn'); await p.waitForTimeout(700);   // Stop here, twice: the card with the rating and the reset button
+    const rb = p.locator('#confirm-1 .complete-rpe-btn').nth(6);
+    if (!(await rb.isVisible())) await p.click('#confirm-1 .rate-fold').catch(() => {});
+    await rb.click(); await p.waitForTimeout(200);
+    await p.click('#confirm-1 .confirm-btn'); await p.waitForTimeout(900);   // Done: the finished card, with the reset button
+    const b = '#complete-1 .reset-session-btn';
+    await p.locator(b).scrollIntoViewIfNeeded().catch(() => {});
+    const w0 = await p.evaluate(s => { const e = document.querySelector(s); return e && e.offsetParent ? e.textContent.trim() : null; }, b);
+    t.check(`reset: the card's button says "Start this day again" (${w} px)`, w0 === 'Start this day again', String(w0));
+    t.check('reset: …and "Reset session" is nowhere on the day', !/reset session/i.test(await body(p)), '');
+    const ticked = () => p.evaluate(() => document.querySelectorAll('#day-view .ex-set-row.done, #day-view .ex-set-row .ex-set-check.on, #day-view .ex-set-row .ex-set-check[aria-pressed="true"]').length);
+    const before = await ticked();
+    await p.click(b); await p.waitForTimeout(200);
+    const armed = await p.evaluate(s => { const e = document.querySelector(s); const r = e.getBoundingClientRect(); return { txt: e.textContent.trim(), l: Math.round(r.left), r: Math.round(r.right), h: Math.round(r.height), fits: e.scrollWidth <= e.clientWidth + 1 }; }, b);
+    t.check(`reset: the first tap says what it clears (${w} px)`, armed.txt === "This clears today's sets. Tap again to clear.", JSON.stringify(armed));
+    t.check('reset: …the words sit inside the button and the screen, wrapped not cut', armed.fits && armed.l >= 0 && armed.r <= w && armed.h < 90, JSON.stringify(armed));
+    await noScroll(p, w, 'reset: armed');
+    t.check('reset: …and the first tap cleared nothing', (await ticked()) === before, before + ' vs ' + await ticked());
+    await p.click(b); await p.waitForTimeout(900);
+    const left = await p.evaluate(() => { try { return getDayCompletion('1').done; } catch (e) { return -1; } });
+    t.check(`reset: the second tap clears the day's sets (${w} px)`, before > 0 && left === 0, 'before ' + before + ' after ' + left);
+    t.check(`reset: no page errors (${w})`, !p.errs.length, p.errs.join(' | '));
+    await ctx.close();
+  }
+}
+
 (async () => {
   const browser = await H.launch();
   await blocks(browser);
@@ -191,6 +222,7 @@ async function finish(browser) {
   await isolation(browser);
   await guided(browser);
   await finish(browser);
+  await reset(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
