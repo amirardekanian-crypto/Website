@@ -3,10 +3,10 @@
 Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8rz). Opened, the card was
 1,306 px and the first set sat 953 px down; now about 700 px with the first set about 400 px down.
 **Closed** (`renderExercise()`):
-- **One line of numbers** (`renderNumLine()`, `.ex-numline`): `4 × 6 · Effort 7/10 · Down 3 s · 2:30`, only what was
+- **One line of numbers** (`renderNumLine()`, `.ex-numline`): `4 × 6 · Effort 7/10 · Down 3 s · Rest 2 min 30 s`, only what was
   prescribed, the exercise's own rest only. The tempo is how long the lowering takes (`tempoPlain()`: *Down 3 s*,
   *Down 3 s · pause 1 s*; an X or 0 for the lowering leaves it out), and the whole tempo lives in its help sheet. It replaced the stats grid AND the grey number pills. The words
-  *tempo* and *rest* (`.nl-lab`) show once the card is open. `numLineText()` reads it as text. Where it cannot
+  *tempo* (`.nl-lab`) shows once the card is open; the rest says its own word, *Rest 2 min*. `numLineText()` reads it as text. Where it cannot
   fit (a narrow phone, an open card) a part starts the next line rather than running off the card (DS-03).
 - **A pill that says something stays a pill** (Amir: *"we need to find a way for them"*): the green `intent`
   pill and a legacy card's chips (`renderExSummary()`), and the check-in's pills. On a lower day `rdTarget()`

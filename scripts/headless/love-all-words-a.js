@@ -192,12 +192,37 @@ async function tempo(browser) {
 }
 
 
+// ═════════ rest ═════════
+async function rest(browser) {
+  const P = H.fixture();
+  const b = P.workouts.days[0].blocks;
+  b[2].exercises.find(e => e.name === 'Half Kneeling Pallof Press').rx.rest = 120;
+  b[2].exercises.find(e => e.name === 'Side Plank').rx.rest = 30;
+  const { ctx, p } = await H.openProgram(browser, { prog: P });
+  await p.evaluate("openDayView('1')");
+  await p.waitForTimeout(400);
+  const lines = { sq: await cardOf(p, 'Barbell Back Squat'), box: await cardOf(p, 'Box Jump'), pal: await cardOf(p, 'Half Kneeling Pallof Press'), plank: await cardOf(p, 'Side Plank') };
+  t.check('rest: 150 s says "Rest 2 min 30 s"', /Rest 2 min 30 s/.test(lines.sq) && !/2:30/.test(lines.sq), lines.sq);
+  t.check('rest: 90 s says "Rest 90 s"', /Rest 90 s$/.test(lines.box) && !/1:30/.test(lines.box), lines.box);
+  t.check('rest: 120 s says "Rest 2 min"', /Rest 2 min$/.test(lines.pal) && !/2m\b/.test(lines.pal), lines.pal);
+  t.check('rest: 30 s says "Rest 30 s"', /Rest 30 s$/.test(lines.plank) && !/30s/.test(lines.plank), lines.plank);
+  await openCard(p, 'Box Jump');
+  await p.waitForTimeout(450);
+  const btn = await p.evaluate(() => { const c = [...document.querySelectorAll('#day-view .checklist-item')].find(c => c.querySelector('.item-name').textContent.trim() === 'Box Jump'); const b = c.querySelector('.rest-btn'); return b ? b.innerText.replace(/\s+/g, ' ').trim() : null; });
+  t.check('rest: the Rest button says "Rest 90 s" too', /^Rest\s*(⏱\s*)?90 s$/i.test(btn || ''), btn);
+  const f = await p.evaluate(() => [0, 30, 60, 90, 119, 120, 150, 180, 300].map(formatRestLabel).join('|'));
+  t.check('rest: formatRestLabel reads 0, 30, 60, 90, 119, 120, 150, 180, 300 s plainly', f === '|30 s|1 min|90 s|119 s|2 min|2 min 30 s|3 min|5 min', f);
+  t.check('rest: no page errors', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await H.launch();
   await rpe(browser);
   await tagWidth(browser);
   await lowerDay(browser);
   await tempo(browser);
+  await rest(browser);
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
