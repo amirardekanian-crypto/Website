@@ -52,9 +52,13 @@ week offers Green Light); a flagged pain is never asked about again.
 
 ## coach.html
 
-Tabs: Today (counters, wall, Needs-you, quests, Proof pulse) · Intake (`hab_intake`) · Athletes
-(roster, publish, backup, logins) · Exercises (the Spine editor, the ten qualities, the Quality check) ·
-Proof · Links · Affiliates · Testing app · Course. Athlete file: The work (ACWR, readiness vs baseline,
+Seven places since 2026-10-12 (docs/rules/coach-dashboard.md): Today (strip, Needs you, Courtside, Proof today) ·
+Athletes · Exercises (Entries, Qualities, Coverage) · Proof (the crew's home) · Leads (Applications from `hab_intake`,
+Free signups, Referral codes, Chats) · Library · Buyers (Course, Testing app); the tools sit behind ⚙ Tools.
+**AI, checked 2026-10-26 (round 8):** the only Claude call in the system is the public chatbot, `site-chat` (Haiku 5.5,
+verify_jwt off, $5 monthly cap); the `ANTHROPIC_API_KEY` secret is set. coach.html has no AI call. privacy.html 2.9 covers
+Claude for writing programmes from the application and training record, 2.11 the chatbot. `cycle_reports` (one row,
+2026-06-28, a `model` column) is an old AI-report table nothing reads. Athlete file: The work (ACWR, readiness vs baseline,
 adherence, Personal records, planned-vs-done per day by exercise name, the day's targets, inline
 editor) · Proof · Calls · File (versions, coaching log). The Chat sub-tab went on 2026-09-26: a session
 note is only marked read, and Amir answers on WhatsApp.

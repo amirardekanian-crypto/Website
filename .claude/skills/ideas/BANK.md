@@ -361,6 +361,34 @@ Library session for all), post of the week by likes, most cheered this month, re
 a ring for every like, keeping your best post, a stories rail, a posting streak, crew badges, a crew chat, close friends /
 following, search in the crew, a live Q&A, a day recap video, choosing your own cover.
 
+## Round 8 · 2026-10-26 · "Ball Kid" (a coach-only Claude assistant in coach.html)
+
+Full write-up (8 fields per idea, the three rules, Claude Code vs Ball Kid, costs, traps, findings, cuts, five calls):
+https://claude.ai/artifact/6ucJvjwJTePGSoyyJeqhCr
+
+Brief: Amir, *"have a little bit of look at my app and coach.html / see if i can use ai bot, to help me. i have claude api which i can use.
+maybe like an assistant, give me reports, do things for me that help my clients"*. Live numbers that day: 41 programmes, 18 trained in 28
+days, 119 sessions in 28 days (35 in 7); 37 day notes in 60 days, 14 naming a body part or pain; 13 notes unread in 14 days; 50 coaching
+applications in 60 days (47 Farsi), median 7 days to "handled" in Leads, 5 linked to an athlete; 8 cycles end in the next 14 days, 11 ended
+in the last 14; the ANTHROPIC_API_KEY secret is already set (site-chat, 1 conversation, $0.0008). The frame: it drafts and Amir sends
+(COM-3), it reads and never writes a programme (PRC-1), the key stays in one coach-only Edge Function with a cap. Programmes and cycle
+reports stay in Claude Code; Ball Kid feeds them. Cost estimate ~$15 a month for all seven on Opus 5.5.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 94 | Ball Kid | One coach-only Edge Function (`coach-assist`, verify_jwt on, `is_coach()`), named jobs, monthly cap, a content-free cost log, a COM-3 voice check in code; ⚙ Tools shows the month's spend | — | pitched |
+| 95 | Order of Play | Monday's one-page report on Today (beside Needs you): last week, who needs a word and why, unanswered notes, warning signs, cycles ending, wins, three jobs; MVP a button that sends what the page already worked out (`reasonsOf()`, Courtside, cycle dates), advanced 7:00 Monday + email | 94 | pitched · recommended first |
+| 96 | Line Call | Every session/exercise note called on arrival (Body, Question, Life, Good news, Nothing to do), two-line summary, reply draft in their language; Body notes first in Needs you; never diagnoses. Advanced: The Swap (Spine Alternatives into the draft, one tap into the ✎ editor) | 94 | pitched |
+| 97 | Scouting Report | Each application in Leads briefed in English (goal, injuries flagged, fit, three questions) + a first WhatsApp reply in their language, prices only from CHATBOT-FACTS.md; a column on `hab_intake`; advanced: /athlete-intake reads it instead of Gmail | 94 | pitched |
+| 98 | The Notebook | Paste a WhatsApp chat into the athlete file; kept as dated lines (Body, Life, Asks, Your promises) for /cycle-report, /program-design, Line Call and Order of Play; new coach-only table (backup + erase same day) | 94 | pitched |
+| 99 | Hawk-Eye | Ask your data in plain words (answers with links and sources) + "Brief me" on each athlete file; MVP Brief me only, advanced tool use over fixed read-only coach functions, never SQL | 94 | pitched |
+| 100 | Ready Position | "✎ Draft" beside every WhatsApp button (Courtside, Needs you, logins, nudge, Mailbag, Pick reason): a personal line from the athlete's week in Amir's voice; nothing sent, nothing logged | 94 | pitched |
+
+Cut on the page (so they are not re-pitched): an athlete-facing chatbot in program.html, AI writing or editing programmes in coach.html,
+anything sent automatically, a cycle report inside coach.html (a second copy of /cycle-report), AI-written crew posts (84), a record of who
+Amir messaged (48), voice notes to text, Instagram content from client data. Found: `cycle_reports` holds one row from 2026-06-28 with a
+`model` column (an old AI-report try, never shown).
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
