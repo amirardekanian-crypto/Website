@@ -158,7 +158,8 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…and off again', await p.evaluate(() => document.querySelector('.cr-line .cr-kd').getAttribute('aria-pressed') === 'false') && (await calls(p, 'crew_kudos')).some(x => x.p_target === KEY && x.p_on === false));
     // the composer: a message with a photo, made smaller here
     await p.evaluate(() => document.querySelector('.cr-comp').click()); await p.waitForTimeout(300);
-    C.check('the composer opens in the sheet; Post waits for words or a photo', await p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible') && !!document.querySelector('#hist-overlay .cr-txt') && document.querySelector('#hist-overlay .cr-go').disabled));
+    // (Home Crowd step 4b, 2026-10-25: a member who has never posted opens it to a hello draft; clearing it is what leaves Post waiting for words)
+    C.check('the composer opens in the sheet; Post waits for words or a photo', await p.evaluate(() => { const t = document.querySelector('#hist-overlay .cr-txt'); if (t) { t.value = ''; t.dispatchEvent(new Event('input')); } return document.getElementById('hist-overlay').classList.contains('visible') && !!t && document.querySelector('#hist-overlay .cr-go').disabled; }));
     await p.evaluate(async () => {
       const c = document.createElement('canvas'); c.width = 3000; c.height = 2250;
       const x = c.getContext('2d'); for (let i = 0; i < 400; i++) { x.fillStyle = `hsl(${i * 7},60%,${30 + i % 40}%)`; x.fillRect((i * 97) % 3000, (i * 53) % 2250, 300, 200); }
@@ -833,7 +834,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       onLine: !!document.querySelector('#crew-body .cr-line .cr-rep-add'),
     }));
     C.check('a reply shows under its post, the name in front of it', s.shown[0] === 'Mina S. What does Kudos mean?', JSON.stringify(s.shown));
-    C.check('…a post with none says Reply, one with some says Add a reply', s.adds.includes('Reply') && s.adds.includes('Add a reply'), s.adds.join(' | '));
+    C.check('…every post says the slim line Reply…, whether it has replies or none (Home Crowd step 4a)', s.adds.length >= 2 && s.adds.every(a => a === 'Reply…'), s.adds.join(' | '));
     C.check('…and a moment line has no Reply: a moment is not a post', !s.onLine);
     // writing one
     await p.evaluate(() => document.querySelector('#crew-body .cr-post .cr-rep-add').click());
@@ -1083,7 +1084,8 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       const r = n => { const e = document.querySelector(n); if (!e) return null; const b = e.getBoundingClientRect(); return { w: Math.round(b.width), h: Math.round(b.height), fs: getComputedStyle(e).fontSize }; };
       return { reply: r('#crew-body .cr-rep-add'), del: r('#crew-body .cr-post .cr-foot .cr-del') };
     });
-    C.check('"Reply" is at least 44 x 44 and "Delete" on your own post is at least 44 x 44 (padding, not a bigger font)', !!hit.reply && !!hit.del && hit.reply.w >= 44 && hit.reply.h >= 44 && hit.del.w >= 44 && hit.del.h >= 44 && hit.reply.fs === hit.del.fs, JSON.stringify(hit));
+    // (Home Crowd step 4a: Reply is the slim input-look line now, set in the body size on purpose; Delete is still padding on a small word)
+    C.check('"Reply…" is at least 44 x 44 and "Delete" on your own post is at least 44 x 44 (padding, not a bigger font)', !!hit.reply && !!hit.del && hit.reply.w >= 44 && hit.reply.h >= 44 && hit.del.w >= 44 && hit.del.h >= 44, JSON.stringify(hit));
     C.check('no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }

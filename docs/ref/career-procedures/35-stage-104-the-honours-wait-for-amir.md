@@ -1,10 +1,10 @@
-## Stage 101: the month's honours wait for Amir (2026-10-25, NOT APPLIED)
+## Stage 104: the month's honours wait for Amir (2026-10-25, NOT APPLIED)
 
 Amir, on the honours: *"im gonna choose other honours at the end of the month, there should be reminder in coach.html for me tho. to pick most sessions most
 improved an full month or my pick"*, then *"go with your picks"* on the board ("The reminder in coach.html", https://claude.ai/artifact/9JYRa93PVAYZSH4pRw2rhs):
 (a) the app **suggests** the winner of Most sessions and Most improved, and the athletes who earned Full Month, from the numbers, and Amir **confirms** each with
 one tap or **changes** it; his Pick he chooses with his reason (stage100); (b) Full Month goes to **every** athlete who earned it; (c) **nothing reaches an athlete
-until he confirms that honour.** Files: `supabase/stage101_honours_confirmed.sql`, `scripts/career/rollback_stage101.sql`, `scripts/career/rehearse_honours_confirmed.mjs`,
+until he confirms that honour.** Files: `supabase/stage104_honours_confirmed.sql`, `scripts/career/rollback_stage104.sql`, `scripts/career/rehearse_honours_confirmed.mjs`,
 and the page (coach.html → Today → Courtside, `COACH_DASHBOARD.md` → *The month's honours wait for Amir*). No XP moves (GAME-6), no table is added.
 
 **How an honour worked before.** `career_honours_live(month)` works the month out from the facts (stage75). The page freezes the month on the 8th (and
@@ -35,7 +35,7 @@ late-synced session before the tap still counts. A confirmed list is not edited 
 **To apply.** Dry-run first, inside a transaction that ends in `raise exception`, and read what it would do: `select month, honour, count(*) from career_honours
 group by 1, 2` is all back-filled confirmed afterwards, so the check is that every row has `confirmed_at` and `career_honour_months.confirmed` has three keys.
 Then apply the file, run `node scripts/headless/coach/run.js honours` and make the snapshot again (`scripts/restore/README.md`). The way back is
-`scripts/career/rollback_stage101.sql` (it makes every row visible to the athletes again, suggestions included: delete the unconfirmed ones first if that is not wanted).
+`scripts/career/rollback_stage104.sql` (it makes every row visible to the athletes again, suggestions included: delete the unconfirmed ones first if that is not wanted).
 
 **Rehearsal.** `PGLITE=<folder>/node_modules/@electric-sql/pglite node scripts/career/rehearse_honours_confirmed.mjs`: 55 checks. The structure before the
 stage, a month frozen the old way (stays visible after, every reader), the freeze saving suggestions nobody sees and nothing queued, Confirm, Change, Full Month

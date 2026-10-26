@@ -62,8 +62,8 @@
   var COURT_TABLES = ['courtside_marks', 'career_honour_months', 'career_honours', 'career_goals', 'career_notes'];
   var COURT_RPCS = ['get_courtside', 'coach_courtside_mark', 'coach_honours', 'coach_honours_freeze', 'coach_honours_sent', 'coach_honours_pick',
     'coach_set_goal', 'coach_goal_done', 'coach_from_amir'];
-  // stage101 (the month's honours wait for Amir): the stub answers as the stage does only when the seed says `honoursConfirm: true`, so every other scenario runs
-  // against a server before stage101 (no `confirmed`, every row live for the athletes) as before. `missingRpc: ['coach_honour_confirm']` takes it away again.
+  // stage104 (the month's honours wait for Amir): the stub answers as the stage does only when the seed says `honoursConfirm: true`, so every other scenario runs
+  // against a server before stage104 (no `confirmed`, every row live for the athletes) as before. `missingRpc: ['coach_honour_confirm']` takes it away again.
   function s101() { return !!SEED.honoursConfirm && (ST.missingRpc || []).indexOf('coach_honour_confirm') < 0; }
   function noStage75() { return (ST.missingRpc || []).indexOf('get_courtside') >= 0; }
   // stage81's functions (the Bell). The stub answers them only when the seed says `crew: true` (buildSeed({crew: true})), so every other scenario runs
@@ -81,6 +81,9 @@
   // the function" (PGRST202) and athlete_profile "Could not find the table" (PGRST205), like a server that has not had the stage. `missingRpc: [name]` takes one away.
   var LOUNGE_RPCS = ['coach_crew_faces', 'coach_crew_face_clear', 'coach_cheer', 'coach_crew_cheers', 'coach_cheer_word_clear'];
   var PARTNER_RPCS = ['coach_partner_codes', 'coach_partner_code_make', 'coach_partner_credit_add', 'coach_partner_credit_used'];
+  // stage102's coach functions (the weekly crew) answer only with `weekly: true` in the seed (buildSeed({weekly: true})).
+  var WEEKLY_RPCS = ['coach_crew_weekly', 'coach_crew_week_set', 'coach_crew_week_close', 'coach_question_answer', 'coach_question_drop'];
+  function noStage102() { return !SEED.weekly; }
   function noStage96() { return !SEED.lounge; }
   function noStage97() { return !SEED.partner; }
   function persist() { if (ST.persist) { try { localStorage.setItem('__harness_db', JSON.stringify(DB)); } catch (e) {} } }
@@ -423,6 +426,9 @@
   // The Players' Lounge's state (stage96): the faces as coach_crew_faces() returns them, the cheers as coach_crew_cheers() returns them (all of them, with the
   // day; the read lists the last 7). Tests read and change it as window.__DB.lounge. A member is a crew_members() person: a yes, not under 13, not a former
   // athlete, not the demo (the server takes a face, a cheer given or received and a mention away when someone leaves; the stub just does not list them).
+  // stage102's state: the object coach_crew_weekly() answers, kept in window.__DB.crew_weekly (tests read and change it).
+  function weekly() { return DB.crew_weekly || (DB.crew_weekly = { week: utcDate(), weeks: [], members: 0, questions: [], answered_month: 0 }); }
+  function weeklyOut() { return clone(weekly()); }
   function lounge() { return DB.lounge || (DB.lounge = { faces: [], cheers: [], seq: 100 }); }
   function loungeMember(id) { return openCrew().some(function (m) { return m.athlete_id === id; }); }
   function loungeName(id) { var m = openCrew().find(function (x) { return x.athlete_id === id; }); return m ? m.name : id; }
@@ -443,6 +449,43 @@
   function intakeFriend(i) { var p = i.payload || {}; return (i.name && String(i.name).trim()) || [p['First Name'], p['Last Name']].filter(Boolean).join(' ').trim() || null; }
   function errCode(msg, code) { var e = new Error(msg); e.code = code; return e; }
   var RPC = {
+    // ---- stage102: the weekly crew (the Toss, the bank, the Mailbag). Every write answers coach_crew_weekly() again, as the SQL does. ----
+    coach_crew_weekly: function () { return weeklyOut(); },
+    coach_crew_week_set: function (p) {
+      var W = weekly(), tr = function (v) { return v == null ? null : String(v).replace(/^\s+|\s+$/g, '') || null; };
+      var a = tr(p.p_q), s1 = tr(p.p_a), s2 = tr(p.p_b), theme = tr(p.p_theme);
+      if ((a || s1 || s2) && !(a && s1 && s2)) throw new Error('Give the question and both sides, or none of them.');
+      if ((a && a.length > 80) || (s1 && s1.length > 30) || (s2 && s2.length > 30) || (theme && theme.length > 60)) throw new Error('Too long.');
+      var row = W.weeks.find(function (w) { return w.week === p.p_week; });
+      if (!row) { row = { week: p.p_week, q: null, a: null, b: null, theme: null, closed: false, va: 0, vb: 0 }; W.weeks.push(row); }
+      if (row.q !== a) { row.va = 0; row.vb = 0; row.closed = false; }
+      row.q = a; row.a = s1; row.b = s2; row.theme = theme;
+      if (!row.q && !row.theme) W.weeks = W.weeks.filter(function (w) { return w !== row; });
+      W.weeks.sort(function (x, y) { return x.week < y.week ? -1 : 1; });
+      return weeklyOut();
+    },
+    coach_crew_week_close: function (p) {
+      var row = weekly().weeks.find(function (w) { return w.week === p.p_week; });
+      if (!row || !row.q) throw new Error('There is no question that week.');
+      row.closed = true; return weeklyOut();
+    },
+    coach_question_answer: function (p) {
+      var q = weekly().questions.find(function (x) { return String(x.id) === String(p.p_id); }), ans = String(p.p_answer == null ? '' : p.p_answer).replace(/^\s+|\s+$/g, '');
+      if (!q) throw new Error('That question is gone.');
+      if (q.answered_at) throw new Error('That question is already answered.');
+      if (!ans) throw new Error('Write the answer first.');
+      if (ans.length > 280) throw new Error('The answer is ' + ans.length + ' characters. Keep it to 280.');
+      q.answer = ans; q.answered_at = nowIso(); weekly().answered_month++;
+      if (DB.crew_bell) DB.crew_bell.posts.push({ id: '00000000-0000-4000-8000-' + String(++ST.seq).padStart(12, '0'), athlete_id: '__coach__', amir: true, who: 'Amir', seen: true, kind: 'post', body: ans, photo: false, ago_min: 0, kudos: 0, seq: ST.seq,
+        session: { ask: { q: q.body, by: q.ok_name ? 'First' : null } } });
+      return weeklyOut();
+    },
+    coach_question_drop: function (p) {
+      var W = weekly(), n = W.questions.length;
+      W.questions = W.questions.filter(function (x) { return String(x.id) !== String(p.p_id) || x.answered_at; });
+      if (W.questions.length === n) throw new Error('That question is gone.');
+      return weeklyOut();
+    },
     // ---- stage96: faces and cheers (CONTRACT.md sections 3 and 6) ----
     coach_crew_faces: function () {
       return lounge().faces.filter(function (f) { return loungeMember(f.athlete_id); }).map(function (f) { return { athlete_id: f.athlete_id, fv: f.fv, b64: f.b64 }; });
@@ -698,7 +741,7 @@
       vm.pick = 'picked'; vm.pick_at = nowIso();
       return honoursOf(m0, p.p_not_clients);
     },
-    // stage101: confirm or change one of sessions / improved / full_month (see supabase/stage101_honours_confirmed.sql). The chosen athletes replace that honour's
+    // stage104: confirm or change one of sessions / improved / full_month (see supabase/stage104_honours_confirmed.sql). The chosen athletes replace that honour's
     // rows, each confirmed now; an honour already confirmed takes the same winners again (a double tap) and refuses a different list. The figure is the fixture's
     // (honoursLive) for the athlete, else a made-up one; an athlete in __STUB.noFigure has none and cannot be honoured.
     coach_honour_confirm: function (p) {
@@ -1081,7 +1124,7 @@
         await sleep(0);
         var f = takeFail('rpc', name);
         if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'P0001' }, status: 400 }; }
-        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0 || (noStage75() && COURT_RPCS.indexOf(name) >= 0) || (noStage81() && CREW_RPCS.indexOf(name) >= 0) || (noStage84() && OPEN_RPCS.indexOf(name) >= 0) || (noStage96() && LOUNGE_RPCS.indexOf(name) >= 0) || (noStage97() && PARTNER_RPCS.indexOf(name) >= 0)) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
+        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0 || (noStage75() && COURT_RPCS.indexOf(name) >= 0) || (noStage81() && CREW_RPCS.indexOf(name) >= 0) || (noStage84() && OPEN_RPCS.indexOf(name) >= 0) || (noStage96() && LOUNGE_RPCS.indexOf(name) >= 0) || (noStage102() && WEEKLY_RPCS.indexOf(name) >= 0) || (noStage97() && PARTNER_RPCS.indexOf(name) >= 0)) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
         try { var d = RPC[name](params || {}); persist(); call.result = { ok: true }; return { data: clone(d), error: null, status: 200 }; }
         catch (e) { call.result = { error: e.message }; return { data: null, error: { message: e.message, code: e.code || 'P0001' }, status: 400 }; }
       })();

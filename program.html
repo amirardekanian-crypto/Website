@@ -5750,6 +5750,102 @@
   .cr-rep.cr-lit { border-radius: 8px; }
   @keyframes crLit { 0%, 30% { box-shadow: inset 0 0 0 100vmax var(--tint); } 100% { box-shadow: inset 0 0 0 100vmax transparent; } }
   @media (prefers-reduced-motion: reduce) { .cr-lit { animation: none; } }
+  /* ══ HOME CROWD, STEPS 2 TO 4 (round 7, 2026-10-25): the Inbox, the weekly crew, talking back ══════════════════════════════════════════
+     1 the tray beside the initials · 2 the Inbox screen and its rows · 3 the Toss card and the photo theme row · 4 the Mailbag sheet, the question
+     above an answer on the Bell, the Answer Book · 5 the slim Reply line and Say hello. Every colour is a token of THE APP'S ONE COLOUR SET and every size
+     a --fs- token, so dark mode needs no rules of its own. Clay is the one accent and only on what asks for something (DS-01). */
+  /* 1. The tray: a paper circle left of the initials (40 px, a 44 px target). Its count is a clay badge, drawn only when something is new. It goes
+     with the account button (the day view hides both) and is off for the demo and the coach's preview. */
+  .global-inbox { position: absolute; top: 14px; right: calc(var(--app-gutter) + 62px); z-index: 65; display: flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; padding: 0; border-radius: 50%; border: 1px solid var(--hair); background: var(--row); color: var(--ink); cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12); transition: transform 0.08s; }
+  .global-inbox::after { content: ''; position: absolute; inset: -2px; }
+  .global-inbox:active { transform: scale(0.9); }
+  .global-inbox:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .global-inbox svg { width: 20px; height: 20px; }
+  .global-inbox .gi-n { position: absolute; top: -6px; right: -6px; z-index: 1; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--clay-fill); color: var(--on-accent);
+    box-shadow: 0 0 0 2px var(--paper); font: 700 var(--fs-label)/20px 'Space Mono', monospace; text-align: center; font-variant-numeric: tabular-nums; }
+  .global-inbox .gi-n[hidden] { display: none; }
+  .global-inbox.is-off, .global-account.is-hidden + .global-inbox, body:has(#screen-inbox.active) .global-inbox { display: none; }
+  body.is-demo .global-inbox { top: 58px; }
+  /* 2. The Inbox: the green head Crew's pages wear, a day heading, then rows on the paper. A row is a door (the main button) and, at most, one small action beside it. */
+  #screen-inbox { padding-bottom: 110px; }
+  #screen-inbox .ceil-head { position: relative; padding: 74px var(--g) 22px; background: var(--hero); color: #fff; }
+  #screen-inbox .nav-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+    color: #fff; background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); font: 500 var(--fs-title)/1 'Barlow', sans-serif; }
+  #screen-inbox .nav-back:active { transform: scale(0.92); }
+  #screen-inbox .nav-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .ib-day { margin: 22px var(--g) 4px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  .ib-row { display: flex; align-items: center; gap: 4px; margin: 0 var(--g); border-bottom: 1px solid var(--hair); }
+  .ib-row:last-child { border-bottom: 0; }
+  .ib-go { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 0; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; }
+  .ib-go:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; border-radius: 6px; }
+  .ib-go:active { background: var(--tint); }
+  .ib-tx { flex: 1; min-width: 0; display: grid; gap: 3px; }
+  .ib-t { display: block; font: 400 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; text-wrap: pretty; }
+  .ib-t b { font-weight: 700; }
+  .ib-q { display: block; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); overflow-wrap: anywhere; }
+  .ib-time { flex: none; align-self: flex-start; margin-top: 3px; font: 400 var(--fs-label)/1 'Space Mono', monospace; color: var(--grey); font-variant-numeric: tabular-nums; }
+  .ib-row.is-new .ib-time::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--clay); vertical-align: 1px; }
+  .ib-act { flex: none; min-height: 44px; padding: 0 14px; border: 0; border-radius: 22px; background: var(--clay-fill); color: var(--on-accent); cursor: pointer;
+    font: 700 var(--fs-small)/1 'Barlow', sans-serif; white-space: nowrap; }
+  .ib-act:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .ib-act.is-quiet { background: none; box-shadow: inset 0 0 0 1.5px var(--field); color: var(--green-ink); }
+  .ib-done { flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; font: 600 var(--fs-small)/1 'Barlow', sans-serif; color: var(--green-ink); white-space: nowrap; }
+  .ib-empty { margin: 26px var(--g); font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--grey); }
+  /* 3. The Toss card, "Two Halves" (idea 85 A): the question big, two halves side by side, each with a label, up to four faces stacked and a count. The half you chose is outlined and tinted in clay. */
+  #screen-crew .cr-toss { margin: 0 var(--g) 14px; padding: 14px 14px 10px; border: 1px solid var(--hair); border-radius: 14px; background: var(--row); }
+  #screen-crew .cr-toss .k { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  #screen-crew .cr-toss .k::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--green-ink); }
+  #screen-crew .cr-toss .q { margin: 8px 0 12px; font: 900 var(--fs-head)/1.05 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--ink); text-wrap: balance; overflow-wrap: anywhere; }
+  #screen-crew .cr-halves { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #screen-crew .cr-half { display: grid; align-content: space-between; gap: 10px; min-width: 0; min-height: 96px; padding: 12px; border: 1.5px solid var(--hair); border-radius: 12px; background: var(--paper);
+    color: var(--ink); text-align: left; font: inherit; }
+  #screen-crew button.cr-half { cursor: pointer; }
+  #screen-crew button.cr-half:active { transform: scale(0.98); }
+  #screen-crew button.cr-half:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  #screen-crew .cr-half .l { display: block; font: 700 var(--fs-lead)/1.15 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; text-wrap: balance; }
+  #screen-crew .cr-half .f { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 28px; }
+  #screen-crew .cr-half .stk { display: flex; gap: 3px; min-width: 0; }
+  #screen-crew .cr-half .n { flex: none; font: 700 var(--fs-title)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  #screen-crew .cr-half.is-mine { border-color: var(--clay); background: var(--ice-dim); box-shadow: inset 0 0 0 1px var(--clay); }
+  #screen-crew .cr-half.is-win { border-color: var(--green-ink); background: var(--tint); }
+  #screen-crew .cr-toss .ft { margin: 10px 0 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  #screen-crew .cr-theme { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--hair); }
+  #screen-crew .cr-toss > .cr-theme:first-of-type { margin-top: 8px; }
+  #screen-crew .cr-theme p { flex: 1; min-width: 0; margin: 0; font: 400 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
+  #screen-crew .cr-theme p b { font-weight: 700; }
+  #screen-crew .cr-theme .ib-act { min-width: 44px; }
+  #hist-overlay .cr-prompt { margin: 10px 0 0; font: 700 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--green-ink); overflow-wrap: anywhere; }
+  /* 4. The Mailbag sheet, the question above Amir's answer on the Bell, the Answer Book. The quote's rule is the app's green hairline colour, not a new one. */
+  #hist-overlay .ca-ok { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 8px; font: 400 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); cursor: pointer; }
+  #hist-overlay .ca-ok input { flex: none; width: 22px; height: 22px; accent-color: var(--fill); }
+  #screen-crew .cr-askq, #hist-overlay .ab-i .cr-askq { margin: 10px 0 0; padding: 2px 0 2px 12px; border-left: 3px solid var(--mint); }
+  .cr-askq .e { display: block; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  .cr-askq p { margin: 3px 0 0; font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; overflow-wrap: anywhere; }
+  .cr-post .cr-askq + .cr-body { margin-top: 10px; }
+  #hist-overlay .ab-list { margin-top: 6px; }
+  #hist-overlay .ab-i { padding: 14px 0; border-top: 1px solid var(--hair); }
+  #hist-overlay .ab-i:first-child { border-top: 0; }
+  #hist-overlay .ab-q { margin: 0; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; text-wrap: balance; }
+  #hist-overlay .ab-a { margin: 8px 0 0; font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--ink); white-space: pre-line; overflow-wrap: anywhere; text-wrap: pretty; }
+  #hist-overlay .ab-m { margin: 8px 0 0; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--grey); }
+  #hist-overlay .ab-i.cr-lit { border-radius: 8px; }
+  #lib-asked[hidden] { display: none; }
+  /* 5. The slim Reply line under a post's action row (81 A): an input's look, 44 px tall, that opens the reply sheet at half height. And Say hello. */
+  #screen-crew .cr-rep-add.cr-rep-line { display: flex; align-items: center; justify-self: stretch; width: 100%; min-height: 44px; padding: 0 14px; border: 1px solid var(--hair); border-radius: 22px; background: var(--paper);
+    color: var(--grey); font: 400 var(--fs-body)/1 'Barlow', sans-serif; text-align: left; }
+  #screen-crew .cr-rep-add.cr-rep-line:active { background: var(--tint); }
+  .readiness-modal.cr-half { max-height: 58vh; max-height: 58dvh; }
+  #screen-crew .cr-sayhi { flex: none; min-height: 44px; margin-top: 6px; padding: 0 14px; border: 0; border-radius: 22px; background: none; box-shadow: inset 0 0 0 1.5px var(--field); color: var(--green-ink); cursor: pointer;
+    font: 700 var(--fs-small)/1 'Barlow', sans-serif; }
+  #screen-crew .cr-bandfoot .cr-sayhi { margin-top: 0; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.5); color: #fff; }
+  #screen-crew .cr-bandfoot .cr-hi { flex: 1; min-width: 0; margin: 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: rgba(255,255,255,.74); }
+  #screen-crew .cr-line .cr-sayhi { margin-top: 8px; }
+  /* Cheer back on your own page's cheer rows (83): the row, then a small clay button, in one hairline */
+  .pl-chw { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--hair); }
+  .pl-chw:last-child { border-bottom: 0; }
+  .pl-chw .pl-row { flex: 1; min-width: 0; border-bottom: 0; }
   #screen-crew .cr-post, #screen-crew .cr-rep, #crewplayer-body .prog-sec { scroll-margin-top: 72px; }
   /* the faces: a door, so it is a real 44 px target even though the circles are 26 px */
   #screen-crew .cr-faces { display: flex; align-items: center; width: 100%; min-height: 44px; margin-top: 10px; padding: 0; border: 0; background: none; cursor: pointer; }
@@ -6654,6 +6750,9 @@
     <div class="w-scroll" id="wl-scroll-train"></div>
   </div>
 
+  <!-- The Answer Book's door (Home Crowd step 3, idea 91): shown over the Playbook only while Amir has answered at least one question (paintAskedDoor()). -->
+  <div id="lib-asked" hidden></div>
+
   <!-- Playbook: the latest read as the cover, then each category's reads as paper rows (filled by renderPlaybook) -->
   <div id="lib-playbook" class="lib-pane" role="tabpanel" aria-labelledby="lib-tab-playbook" hidden></div>
 
@@ -6856,6 +6955,17 @@
 <!-- A photo on the Bell, opened (openCrewPhoto()): the whole photo on dark, who and when, the words, the Like. ✕ closes; so does Back (topLayer()). -->
 <div class="cr-viewer" id="crew-viewer" role="dialog" aria-modal="true" aria-label="A photo from the crew"></div>
 
+<!-- The Inbox (Home Crowd step 2, 2026-10-25; idea 90 A): what other people did to you in the last 7 days, and three things the phone knows by itself, in plain sentences by day. Every row is a door
+     (inboxGo()). Opened by the tray beside the initials (openInbox()), by a folded crew notification (#inbox) or goTo('inbox'); its ← goes back to where it was opened from (inboxBack()). -->
+<div id="screen-inbox" class="screen">
+  <div class="ceil-head">
+    <button class="nav-back" onclick="inboxBack()" aria-label="Back">←</button>
+    <div class="ceil-kick">Last 7 days</div>
+    <h1 class="ceil-title">Inbox</h1>
+  </div>
+  <div id="inbox-body"></div>
+</div>
+
 <!-- ═══ NOTES ═══ -->
 <div id="screen-notes" class="screen">
   <!-- The Coach header, in Progress's look (the Centre Court block COACH IN THE CENTRE COURT LOOK): a green-dot eyebrow, the 44 px title, one
@@ -6900,6 +7010,8 @@
      inside the day view, which carries its own .day-view-dark button. -->
 <button class="global-account is-hidden" id="global-account"
   onclick="openAccount(event)" aria-label="Your account: theme, install, help, privacy, sign out" title="Account"></button>
+<!-- The Inbox tray (Home Crowd step 2, idea 90 A): beside the initials, hidden with them. Its clay count is what is newer than the last time the Inbox was opened (paintInboxTray()). -->
+<button class="global-inbox is-off" id="global-inbox" type="button" onclick="openInbox()" aria-label="Inbox" title="Inbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13l2.4-7a1.6 1.6 0 0 1 1.5-1h10.2a1.6 1.6 0 0 1 1.5 1L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 13h5.2l1.2 2.4h5.2l1.2-2.4H21"/></svg><span class="gi-n" hidden></span></button>
 
 <!-- ═══ TIMER ═══ -->
 <!-- The rest timer is a focus screen (Centre Court, 2026-10-13): a green band with the sound icon top left, ✕ top right, the
@@ -8529,6 +8641,7 @@ setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS /
   loadCrewCache();   // Crew (stage81): the tab from the phone's copy; nothing is asked for unless Crew is opened (crewFirstLook())
   refreshHold();
   setTimeout(crewFirstLook, 2500);
+  inboxBoot();   // the tray's count from the phone's own list at once, the server's Inbox behind it (Home Crowd step 2)
   setTimeout(pushRefreshQuiet, 4000);   // reminders made under an old key subscribe again, quietly (AAPush.refresh())
   // The Spine: cues and the ⓘ from the phone's copy now, then from the server.
   paintSpine();
@@ -11658,6 +11771,7 @@ function renderNotes() {
 
   document.getElementById('notes-container').innerHTML =
     coachContactHtml() +
+    crewAskRowHTML() +   // Ask for the crew (Home Crowd step 3, idea 88 A): under the WhatsApp panel
     door +   // first, above the notes: it is where a new athlete starts, so it must not sit under seven notes (2026-10-24)
     (rows || lines ? `<div class="prog-sec">Notes from Amir</div><div class="cn-list">${lines}${rows}</div>` : '');
 }
@@ -11708,7 +11822,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then today's habits as one card: the five you tick, your <strong>level</strong> in the ring, and the weeks you have held in a row beside <strong>This Week</strong>.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers, your level and your achievements), <strong>Getting stronger</strong> (your best lift, each time you set a new best), <strong>Your body</strong> (your records, your body weight and your habits) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit on your Today card when you track that habit. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: <!--profile-->the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then a line from me when I've written you one, then today's habits as one card: the five you tick, your <strong>level</strong> in the ring, and the weeks you have held in a row beside <strong>This Week</strong>.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done, your wins and a line from me), then the job I set you for the month, then <strong>Your numbers</strong> (your four numbers, your level and your achievements), <strong>Getting stronger</strong> (your best lift, each time you set a new best), <strong>Your body</strong> (your records, your body weight and your habits) — every row there opens its own page — then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your programme. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the habit it ticks. <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit on your Today card when you track that habit. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><!--crew--><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p>The <strong>tray</strong> beside your initials is your <strong>Inbox</strong>. It lists what happened to you in the last 7 days, like a cheer, a reply or a like, and the notes and cycles I send you. A number on it means something is new. Tap a line to go there.</p><p><strong>Your initials</strong>, top right, open your account: <!--profile-->the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'compass', key: 'serve', title: 'First Serve: your first week', when: () => firstServeWanted(),
     body: `<p>While you are new, a line called <strong>First Serve</strong> sits on Home, under the days. It has five steps: finish your first session, add the app to your Home Screen, turn on notifications, join the crew and add your photo. It shows you one at a time, like <strong>Next: add the app to your Home Screen</strong>. Tap the line and the app takes you there. Tap the small ring, like <strong>2/5</strong>, to see all five.</p><p>Turn on notifications asks your phone once, and only when you tap its button. You can say no. It goes when you have done them all, or two weeks after your first session.</p>` },
   { icon: 'cycle', title: 'How your programme is structured',
@@ -11752,7 +11866,7 @@ const APP_GUIDE = [
 // names a control the athlete cannot see (CNT-01).
 APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how often'), 0,
   { icon: 'compass', key: 'crew', title: 'Crew', when: () => crewOn(),   // was "Crew and the Bell"; nothing in the app carries that name any more (round 7, 2026-10-25, "78")
-    body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week. The row of initials, and <strong>In the crew ›</strong> beside the numbers, open everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. If you keep it to yourself, a <strong>Join the crew</strong> button waits under the title of the Bell for when you change your mind. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, effort, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it. If you have not joined yet, it takes you to Crew first, where you can see what the crew would see.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four: Fire, Strong, Well done and Love it. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><p>When I pick someone for the month, a card at the top of Crew shows who and why, for a week. Tap <strong>Cheer</strong> to tell them well done.</p><!--pages--><p>To leave the crew, or turn off any of what the crew sees about you, tap your initials, then <strong>What the crew sees</strong>.</p>` });
+    body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week. The row of initials, and <strong>In the crew ›</strong> beside the numbers, open everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. If you keep it to yourself, a <strong>Join the crew</strong> button waits under the title of the Bell for when you change your mind. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, effort, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it. If you have not joined yet, it takes you to Crew first, where you can see what the crew would see.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four: Fire, Strong, Well done and Love it. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><p>When I pick someone for the month, a card at the top of Crew shows who and why, for a week. Tap <strong>Cheer</strong> to tell them well done.</p><p>Each week I ask the crew one question, under the green band. Tap a half to vote, tap the other half to change it. When I set a photo theme for the week, <strong>Post one</strong> opens the box with it ready. Got a question for me? Open the Coach tab and tap <strong>Ask for the crew</strong>. I answer one a week, and the answer shows on Crew with your question above it. <strong>Asked by the crew</strong>, in the Library under Playbook, keeps every answer. <strong>Reply…</strong> under a post opens the box for a reply. Nobody is named or counted who has not joined.</p><!--pages--><p>To leave the crew, or turn off any of what the crew sees about you, tap your initials, then <strong>What the crew sees</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
   const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their trophies and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is in the <strong>Profile</strong> group when you tap your initials, with <strong>Your photo</strong>, <strong>Your game</strong> and <strong>What the crew sees</strong>. Your page is what the crew sees. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, tap your initials, then <strong>Your photo</strong>. Or open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP. The <strong>cheers</strong> number on a page counts only the cheers people sent that person with the <strong>Cheer</strong> button since they joined the crew. Likes are not in it. When your phone can take notifications and they are off, a line under <strong>Cheers this week</strong> on your own page turns them on, so the next cheer reaches you. Your own page also shows your <strong>comebacks</strong> in a thin line under your numbers, marked Only you.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. Tap your initials, then <strong>Your game</strong>, or open your own page, and tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>Tap a trophy on someone's page, or the name of an achievement on Crew, to see what it is and what it asks for.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p><p>A photo you post with <strong>Tell the crew</strong> wears a small stamp across its foot: the session, the minutes, <strong>WEEK HELD</strong> when that session held your week, and the day. You read the stamp before you post. On your own session photo, tap <strong>Share</strong> and you get the session card for Instagram with that photo behind it. Nobody else's photo has Share.</p><p><strong>Share my card</strong>, on your own page, opens the same card as <strong>Share your card</strong> on Progress.</p><p><strong>The Open</strong> on Crew is a wall of tiles: the place, the face, the result and the name. Your tile has a green outline. Tap a tile to see that person's page. When more than 8 are on the board, tap <strong>All</strong> to see every one.</p>`;
@@ -11915,6 +12029,7 @@ function goTo(screen, historyId, keepContent) {
   // Crew's own two pages: built from the copy on this phone, so they open with no signal (2026-10-20).
   if (screen === 'crewboard' || screen === 'crewwho') { renderCrewPage(); if (Date.now() - _boardAt > 55000) refreshCrewBoard(); if (Date.now() - _bellAt > 20000) refreshBell(); }
   if (screen === 'crewplayer') openPlayerScreen();   // a Player Page: the copy on this phone at once, then crew_page() (Players' Lounge)
+  if (screen === 'inbox') openInboxScreen();   // the Inbox (Home Crowd step 2): the rows on this phone at once, the server's behind them
   // The tab is settled on every move (2026-10-20). It is kept while the athlete is ON Crew even after the server stops
   // answering — nobody is moved off a screen mid-read — so leaving is the moment that decision gets taken again.
   try { setCrewTab(); } catch (e) {}
@@ -11945,7 +12060,8 @@ function goTo(screen, historyId, keepContent) {
   // Progress (Amir, 2026-10-12), so that tab stays lit while you are inside them.
   // Every screen lights the tab it belongs to (POL-01: Workout, Article and Archive lit none).
   const litTab = ({ ceiling: 'plan', weight: 'plan', workout: 'workouts', article: 'workouts', archive: 'plan',
-                    habits: 'plan', moments: 'plan', achievements: 'plan', system: 'plan', crewboard: 'crew', crewwho: 'crew', crewplayer: 'crew' })[screen] || screen;
+                    habits: 'plan', moments: 'plan', achievements: 'plan', system: 'plan', crewboard: 'crew', crewwho: 'crew', crewplayer: 'crew',
+                    inbox: ({ ceiling: 'plan', weight: 'plan', habits: 'plan', moments: 'plan', achievements: 'plan', system: 'plan', crewboard: 'crew', crewwho: 'crew' })[_inboxFrom] || _inboxFrom })[screen] || screen;
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
     n.classList.toggle('active', n.dataset.tab === litTab);
     if (n.dataset.tab === litTab) n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');   // a screen reader says which tab is open
@@ -12139,6 +12255,7 @@ function libPaneStored() {
 function renderLibrary() {
   setLibPane(_libPane || libPaneStored(), { keep: true });
   loadLibCounts();
+  bookLoadCache(); paintAskedDoor(); loadAnswerBook();   // Asked by the crew (Home Crowd step 3, idea 91): from the phone's copy, then the server's
 }
 
 // Bottom-nav "Library" tap → the last pane used on this phone, at the top.
@@ -14831,6 +14948,7 @@ async function refreshBell() {
   // honest): a tick that finds the same crew must not rebuild the feed under a thumb, or disarm a Delete half-tapped.
   finally {
     _bellBusy = false; _bellTried = true; setCrewTab(); paintCrewTell(); paintSessionShare(); paintWeekSugg();
+    try { inboxBoot(); } catch (e) { /* the tray is a nicety: never the Bell's failure */ }   // the Inbox is asked when the Bell is (Home Crowd step 2), at most every 20 seconds
     try { syncDarkToggle(); } catch (e) { /* your face on the account button */ }
     if (changed || !BELL) { if (onCrew()) renderCrew(); if (onCrewPage()) renderCrewPage(); }
   }
@@ -15283,7 +15401,7 @@ function crewPostHTML(it) {
   const shr = it.me && it.kind === 'session' && it.photo && crewPagesOn() && !window.IS_PREVIEW ? `<button type="button" class="cr-sh" onclick="crewShareCard('${esc(it.id)}')">Share</button>` : '';
   return `<article class="cr-post${it.amir ? ' amir' : ''}" data-id="${esc(it.id)}">
     <div class="cr-who">${crewDoor(person, 'cr-pl', `${crewFace(person)}<span class="cr-nm">${esc(name)}${sub}</span>`) || `${crewFace(person)}<span class="cr-nm">${esc(name)}${sub}</span>`}${top}</div>
-    ${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}${ph}
+    ${crewAskQHTML(it)}${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}${ph}
     <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span>${shr}${del}</div>
     <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}" aria-live="polite">${esc(crewKudosWords(it.kudos))}</small></div>
     <div class="cr-reps" data-rep="${esc(it.id)}">${crewRepsHTML(it)}</div>
@@ -15308,10 +15426,11 @@ function crewRepsHTML(it) {
       + `<span class="cr-rb" dir="auto"><b>${crewNameHTML(pp, who)}</b> ${crewMentionsHTML(r)}</span>${x}</div>`;
   }).join('');
   const can = !!me.can_post, ask = !me.under13 && !can;
-  const add = me.under13 ? ''
-    : ask ? `<button type="button" class="cr-rep-add" onclick="crewLikeAsk()">Join the crew to reply</button>`
-    : can ? `<button type="button" class="cr-rep-add" onclick="openCrewReply('${esc(it.id)}')">${reps.length ? 'Add a reply' : 'Reply'}</button>` : '';
-  return rows + add;
+  // 81 A (Home Crowd step 4a): a member gets ONE slim line, an input's look, right under the post's action row; a tap opens the reply sheet at half height with the keyboard up. Someone who has not
+  // joined keeps the plain offer to join after the replies (Amir's rule of 2019-10-19: never a dead tap); under 13 reads only.
+  const line = can ? `<button type="button" class="cr-rep-add cr-rep-line" onclick="openCrewReply('${esc(it.id)}')" aria-label="Reply to ${esc(it.amir ? 'Amir' : it.me ? 'your post' : (it.who || 'this post'))}">Reply…</button>` : '';
+  const join = ask ? `<button type="button" class="cr-rep-add" onclick="crewLikeAsk()">Join the crew to reply</button>` : '';
+  return line + rows + join;
 }
 // The sheet: 140 characters. What was typed and not sent comes back, per post, as a post's does (crewKeepKey()), and goes when the reply is sent.
 function crewRepKeepKey(postId) { return ATHLETE_ID + '_crewrep_' + postId; }
@@ -15341,7 +15460,9 @@ function openCrewReply(postId) {
   go.addEventListener('click', () => crewReplySend(postId, go, ta, err));
   crewMnStart(ta, it, err, () => { sync(); keep(); });   // typing @ opens the crew's names above the field (step 7)
   sync();
+  m.classList.add('cr-half');   // half height, the keyboard up (Home Crowd step 4a); closeHistorySheet() takes the class off
   ov.classList.add('visible');
+  try { ta.focus({ preventScroll: true }); } catch (e) { ta.focus(); }
 }
 window.openCrewReply = openCrewReply;
 async function crewReplySend(postId, go, ta, err) {
@@ -15547,11 +15668,14 @@ function crewWeekHTML() {
   const more = crew.length > 6 ? (doors ? `<span class="cr-fc"><button type="button" class="cr-bt cr-face more" onclick="goTo('crewwho')" aria-label="See who is in the crew">+${crew.length - 6}</button></span>` : `<i class="cr-face" aria-hidden="true">+${crew.length - 6}</i>`) : '';
   const faces = crew.slice(0, 6).map(bandFace).join('') + more;
   const hint = doors && crewCanLike() && crewCheerHint() ? '<span class="q cr-hint">Double-tap a face to cheer. Tap to see their page.</span>' : '';
+  // Say hello (86, Home Crowd step 4b): under the band, for the newest face that joined this week, while the one-time cheer hint is not using the line
+  const newbie = doors && !hint && crewMe().can_post ? crew.find(c => c && c.new && !c.me && c.ck) : null;
+  const hi = newbie ? `<span class="cr-hi">${esc(String(newbie.who || 'Someone').split(/\s+/)[0])} joined this week.</span><button type="button" class="cr-sayhi" onclick="crewSayHello('${esc(newbie.ck)}')" aria-label="Say hello to ${esc(String(newbie.who || 'them').split(/\s+/)[0])}">Say hello</button>` : '';
   // The band smaller (round 7, 2026-10-25, "76 B", Beside the Numbers): "In the crew ›" sits to the right of the two big lines, level with the second, and the foot line is only there
   // while the one-time cheer hint is, so a band with no hint is about 50 px shorter. Every word is as it was. The fallback with no pages (no `doors`) is still the one button it always was.
   const goBtn = crew.length && doors ? `<button type="button" class="cr-bt go" onclick="goTo('crewwho')" aria-label="See who is in the crew">In the crew ›</button>` : '';
   const door = !crew.length ? ''
-    : doors ? `<div class="cr-faces cr-fcs">${faces}</div>${hint ? `<div class="cr-bandfoot">${hint}</div>` : ''}`
+    : doors ? `<div class="cr-faces cr-fcs">${faces}</div>${hint || hi ? `<div class="cr-bandfoot">${hint}${hi}</div>` : ''}`
     : `<button type="button" class="cr-faces" onclick="goTo('crewwho')" aria-label="See who is in the crew">${faces}<span class="go">In the crew ›</span></button>`;
   return `<section class="cr-week" aria-label="The crew this week">
     <p class="k">Last 7 days · ${mem} in the crew</p>
@@ -15625,12 +15749,15 @@ function crewLineHTML(it) {
   if (!parts.length) return '';
   const pp = crewPersonOf(it), txt = crewNameHTML(pp, it.me ? 'You' : (it.who || 'Someone')) + ' ' + parts.join(' · ');
   const kw = crewKudosWords(it.kudos);
+  // Say hello (86, Home Crowd step 4b): a join line gets the button, for a member, on someone else's line
+  const hello = !it.me && pp.ck && crewMe().can_post && (it.parts || []).some(p => p && p.k === 'joined')
+    ? `<button type="button" class="cr-sayhi" onclick="crewSayHello('${esc(pp.ck)}')" aria-label="Say hello to ${esc(String(it.who || 'them').split(/\s+/)[0])}">Say hello</button>` : '';
   // With stage96 a person's moment wears their face where the bell was; without it, the bell as always
   // (round 7, 2026-10-25, "80": the face is a door to the page like the name beside it; it was the one part of the line that looked tappable and was not)
   const lead = crewPagesOn() && (pp.ck || pp.me) ? crewFace(pp, 'line', true) : `<span class="cr-bell-ic">${CREW_BELL_SVG}</span>`;
   return `<div class="cr-line" data-key="${esc(it.key)}">${lead}
     <span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small>
-      <span class="cr-react on-line" data-row="${esc(it.key)}">${crewReactRow(it.key, it.kudos, it.me, true)}</span></span></div>`;
+      <span class="cr-react on-line" data-row="${esc(it.key)}">${crewReactRow(it.key, it.kudos, it.me, true)}</span>${hello}</span></div>`;
 }
 // An achievement or a mark someone won, opened from Crew or from their trophies: the emblem, its kind and step, what it asks for, and who won it when.
 // No Share and no Tell the crew: those are the winner's own, in their cabinet. The part names the catalogue id (`id`, or `name` in an old answer); a mark
@@ -15709,6 +15836,7 @@ function renderCrew() {
   if (!me.answer && !me.under13) h += crewAskHTML();
   h += crewIntroHTML();         // "Your page is here", once, for a member who joined before pages existed (Players' Lounge)
   h += crewWeekHTML();          // the week first (direction B): never an empty room
+  h += crewTossHTML();          // this week's question and photo theme (Home Crowd step 3, idea 85 A): under the band, the Pick card after it
   h += crewPickHTML();          // Amir's Pick, for a week (idea 92, round 7, 2026-10-25): under the band, above the honours
   h += crewHonoursHTML();
   h += crewOpenHTML();
@@ -15818,7 +15946,8 @@ function crewPagesSweep() {
 // What this phone calls a person it holds only a key for: from the crew list, the board, the posts and replies.
 function crewNameOfCk(ck) {
   const hit = (BELL && BELL.crew || []).find(c => c && c.ck === ck) || (CREW_BOARD || []).find(r => r && r.ck === ck)
-    || (BELL && BELL.items || []).find(i => i && i.ck === ck) || (BELL && BELL.pick && BELL.pick.ck === ck ? BELL.pick : null);   // the Pick card names its person too (idea 92, 2026-10-25)
+    || (BELL && BELL.items || []).find(i => i && i.ck === ck) || (BELL && BELL.pick && BELL.pick.ck === ck ? BELL.pick : null)
+    || (INBOX && INBOX.rows || []).find(i => i && i.ck === ck);   // and an Inbox row (Home Crowd step 2: a join or a cheer from someone this phone has no page for)   // the Pick card names its person too (idea 92, 2026-10-25)
   return hit && hit.who ? String(hit.who) : '';
 }
 function plFirst(p) { return String(p.first || '').trim() || String(p.who || '').trim().split(/\s+/)[0] || ''; }
@@ -16719,8 +16848,9 @@ function crewCheerWords(err, nm) {
 function crewCheerDone(ck, word, season) {
   _cheered[ck] = utcDay();
   crewPickHTML(true);   // the Pick card's button says "Cheered today" (idea 92)
+  if (onInbox()) renderInbox();   // an Inbox row's Cheer back turns to "Cheered" (Home Crowd step 2)
   const c = crewPageGet(ck);
-  if (!c) return;
+  if (!c) { _playerHTML = ''; if (onPlayer()) renderPlayerPage(); return; }   // their page was never fetched here: your own page's cheer rows still need to see "cheered today"
   const ch = c.p.cheers = c.p.cheers || {}, me = crewPersonOf({ me: true });
   ch.mine_today = true;
   if (season != null && isFinite(Number(season))) ch.season = Number(season);
@@ -16752,7 +16882,7 @@ async function crewCheerSend(ck, word) {
 function crewCheerFail(ck, r, nm) {
   if (r.offline) { aaToast('No signal. Cheer again when you are back online.'); return; }
   if (r.err === 'crew:gone') { crewPageDrop(ck); _bellAt = 0; refreshBell(); if (onPlayer() && _playerCk === ck) playerBack(); }
-  if (r.err === 'crew:cheer_today') { _cheered[ck] = utcDay(); _playerHTML = ''; if (onPlayer()) renderPlayerPage(); crewPickHTML(true); }
+  if (r.err === 'crew:cheer_today') { _cheered[ck] = utcDay(); _playerHTML = ''; if (onPlayer()) renderPlayerPage(); crewPickHTML(true); if (onInbox()) renderInbox(); }
   aaToast(crewCheerWords(r.err, nm));
 }
 function crewCheerSentToast(nm) { aaToast(`Cheer sent to ${nm}`, { kicker: 'Crew', icon: CLAP_SVG, ms: 3500 }); }
@@ -16824,11 +16954,14 @@ function playerActionsHTML(key, p) {
 }
 // "Cheers this week": the last 7 days' cheers, newest first: the face, the name (Coach for Amir), the word, the day. The number is the tile's (`cheers.total`, every cheer
 // sent with the clap button since joining, no likes); a season count beside it would say the same thing twice, so the heading carries none.
-function playerCheerRow(r) {
+function playerCheerRow(r, own) {
   const mineCk = crewMe().ck, pp = r.coach ? { amir: true, who: 'Amir' } : { ck: r.ck || null, fv: r.fv == null ? null : r.fv, who: r.who || '', me: !!(mineCk && r.ck === mineCk) };
   const q = [r.word ? `<span dir="auto">${esc(r.word)}</span>` : '', esc(crewDayWord(r.day))].filter(Boolean).join(' · ');
   const inner = `${crewFace(pp, 'line')}<span><span class="t">${esc(r.coach ? 'Coach' : (pp.me ? 'You' : (r.who || 'Someone')))}</span><span class="q">${q}</span></span>${crewCanDoor(pp) ? '<span class="c" aria-hidden="true">›</span>' : ''}`;
-  return crewDoor(pp, 'pl-row pl-ch', inner) || `<div class="pl-row pl-ch">${inner}</div>`;
+  const row = crewDoor(pp, 'pl-row pl-ch', inner) || `<div class="pl-row pl-ch">${inner}</div>`;
+  // Cheer back (83, Home Crowd step 2e): on YOUR page only, a cheer from a crew member can be answered once a day, the server's own rule; gone when you already cheered them today.
+  const back = !!own && !r.coach && !!r.ck && !pp.me && crewCanLike() && !crewCheeredToday(r.ck) && !inboxCheeredBack(r.ck);
+  return back ? `<div class="pl-chw">${row}<button type="button" class="ib-act" onclick="crewCheerBack('${esc(r.ck)}', this)" aria-label="Cheer ${esc(String(r.who || 'them').split(/\s+/)[0])} back">Cheer back</button></div>` : row;
 }
 // 82 (b) (round 7, 2026-10-25, Amir "82 good"): on YOUR OWN page only, under Cheers this week, one plain row when this phone can take notifications and they are not on yet, because a cheer
 // is exactly the thing that arrives while the app is shut. pushWorthAsking() is the whole test (the athlete is real, not the demo, not the coach's preview, and the phone's state is 'off':
@@ -16844,7 +16977,7 @@ window.playerCheersAsk = playerCheersAsk;
 function playerCheersHTML(p, own) {
   const ch = p.cheers || {}, rows = Array.isArray(ch.recent) ? ch.recent : [], ask = own ? playerCheersAskHTML() : '';
   if (!rows.length && !ask) return '';
-  return `<h2 class="prog-sec">Cheers this week</h2><div class="pl-list">${rows.map(playerCheerRow).join('')}${ask}</div>`;
+  return `<h2 class="prog-sec">Cheers this week</h2><div class="pl-list">${rows.map(r => playerCheerRow(r, own)).join('')}${ask}</div>`;
 }
 // The sheet "Cheer Sara": a word if you like, 100 characters, and Send.
 function openCheer(key) {
@@ -17461,7 +17594,8 @@ function crewErrWords(msg) {
     'crew:own': 'You cannot cheer yourself.',
   })[m && m[0]] || 'That did not post. Try again.';
 }
-function openCrewPost(mode, dayId) {
+function openCrewPost(mode, dayId, opts) {
+  opts = opts || {};   // { prompt: "Show us: Your gym" } the week's photo theme (87 C) · { draft } a line to start from (Say hello, 86)
   const ov = document.getElementById('hist-overlay'), me = crewMe();
   if (!ov || !BELL || !me.can_post) return;
   const ses = mode === 'session', noPh = (Number(me.photos_left) || 0) <= 0, noPost = (Number(me.posts_left) || 0) <= 0;
@@ -17470,11 +17604,16 @@ function openCrewPost(mode, dayId) {
   // it. A session's own draft is written fresh by crewSessionDraft(), so only a plain post is kept.
   let kept = '';
   if (!ses) { try { kept = String(localStorage.getItem(crewKeepKey()) || ''); } catch (e) { kept = ''; } }
-  const draft = ses ? crewSessionDraft(dayId) : kept;
+  let draft = ses ? crewSessionDraft(dayId) : kept;
+  // Hello, crew (86): someone who has never posted opens the composer to a short hello built from their own page, once. It is kept like anything typed and not sent, so editing it or clearing it sticks.
+  let hello = '';
+  if (!ses && opts.draft) draft = String(opts.draft);
+  else if (!ses && !opts.prompt && !kept && crewHelloWanted()) { hello = crewHelloDraft(); if (hello) { draft = hello; try { _lsRawSet(crewHelloKey(), '1'); _lsRawSet(crewKeepKey(), hello); } catch (e) {} } }
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">${ses ? 'Tell the crew' : 'Crew'}</div>
     <h2 class="readiness-title">${ses ? 'Day ' + esc(String(dayId)) + ' done' : 'Share with the crew'}</h2>
-    <textarea class="cr-txt" dir="auto" maxlength="280" aria-label="Your message to the crew" placeholder="${ses ? 'A line about the session' : 'What happened in training?'}">${esc(draft)}</textarea>
+    ${opts.prompt && !ses ? `<p class="cr-prompt" dir="auto">${esc(opts.prompt)}</p>` : ''}
+    <textarea class="cr-txt" dir="auto" maxlength="280" aria-label="Your message to the crew" placeholder="${ses ? 'A line about the session' : opts.prompt ? esc(opts.prompt) : 'What happened in training?'}">${esc(draft)}</textarea>
     <span class="cr-cnt" aria-live="polite"></span>
     <div class="cr-prev" hidden><img alt="Your photo"><button type="button" class="cr-rm" aria-label="Take the photo off">×</button></div>
     <label class="cr-add"${noPh ? ' hidden' : ''}>${CREW_CAM_SVG}<span>Add a photo</span><input type="file" accept="image/*"></label>
@@ -17520,6 +17659,11 @@ function openCrewPost(mode, dayId) {
   go.addEventListener('click', () => crewSend(go, ta, err));
   sync();
   ov.classList.add('visible');
+  // the page the hello is built from may not be on the phone yet: when it lands and the words are still the ones offered, the sport line joins them
+  if (hello && crewPagesOn() && !crewPageGet('me')) crewPageRefresh('me').then(() => {
+    const d1 = crewHelloDraft();
+    if (document.body.contains(ta) && ta.value === hello && d1 && d1 !== hello) { ta.value = d1; try { _lsRawSet(crewKeepKey(), d1); } catch (e) {} sync(); }
+  });
 }
 // How many posts on the Bell are this athlete's own: the way to tell whether a post that timed out actually landed.
 function crewMinePosts() { return ((BELL && BELL.items) || []).filter(i => i && i.t === 'post' && i.me).length; }
@@ -17571,6 +17715,7 @@ async function crewSend(go, ta, err) {
   if (d.photo && d.photo.url && r.data.id) CREW_PHOTOS.set(r.data.id, d.photo.url);   // your own photo shows at once, no download
   _crewDraft = null;
   crewForgetKept();
+  try { _lsRawSet(crewPostedKey(), '1'); } catch (e) {}   // a first post: no hello draft any more (Home Crowd step 4b)
   closeHistorySheet();
   aaToast(onCrew() ? 'Posted to the crew.' : 'Posted. See it on Crew.');
   _bellAt = 0;
@@ -18535,6 +18680,7 @@ function showLibPane(which) {
     const tab = document.getElementById('lib-tab-' + p);
     if (tab) { tab.setAttribute('aria-selected', String(p === which)); tab.tabIndex = (p === which) ? 0 : -1; }
   });
+  paintAskedDoor();   // the Answer Book's door sits over the Playbook only
 }
 
 // The switch's three tabs (and renderLibrary(), with keep: true). A tap remembers the pane on this phone and starts it
@@ -25035,7 +25181,7 @@ function openHistorySheet(card) {
 }
 function closeHistorySheet() {
   const ov = document.getElementById('hist-overlay');
-  if (ov) { stopInlineVideos(ov); ov.classList.remove('visible'); }
+  if (ov) { stopInlineVideos(ov); ov.classList.remove('visible'); const m = ov.querySelector('.readiness-modal'); if (m) m.classList.remove('cr-half'); }
 }
 window.openHistorySheet = openHistorySheet;
 window.closeHistorySheet = closeHistorySheet;
@@ -26825,7 +26971,254 @@ async function crewLandAimed(since) {
   if (!here()) return;
   const c = crewPageGet('me'), rows = c && c.p.cheers && Array.isArray(c.p.cheers.recent) ? c.p.cheers.recent : [], day = utcDay(from);
   if (!rows.some(r => r && !(r.ck && String(r.ck).toLowerCase() === mine) && String(r.day || '') >= day)) return;   // 3. nothing: the top of Crew, as today
-  openPlayer('me', 'crew');
+  crewShowMyCheers('crew');   // my page, at Cheers this week, the newest row lit (shared with the Inbox's cheer rows)
+}
+
+// ══ HOME CROWD, STEPS 2 TO 4 (round 7, 2026-10-25) ══════════════════════════════════════════════════════════════════════════════════
+// Amir: "go with your picks" on the round 7 plan (BANK.md, Round 7). The server is stage101 (get_inbox) and stage102 (the weekly question, the Mailbag, the Answer Book).
+// Step 2 · THE INBOX (idea 90 A, with 83's Cheer back): a tray beside the initials, a count of what is newer than the last time it was opened, one screen of plain sentences by day.
+// Step 3 · THE WEEKLY CREW: the Toss card (85 A, Two Halves), the photo theme (87 C), the Mailbag (88 A) and the Answer Book (91).
+// Step 4 · TALK BACK: a slim Reply line under every post (81 A) and a hello draft for someone who has never posted (86). Nothing here pays XP (GAME-6), and an athlete Amir
+// ticked under 13 (GAME-9) reads the crew, is never named, cannot vote and can ask Amir privately.
+
+// ── Step 2 · the Inbox ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// get_inbox(p_since) answers { since, rows, new, at }: what other people did TO this athlete in the last 7 days, newest first. The phone also adds three rows it works
+// out for itself (a new week note, a new notes card, a new cycle) by comparing what is on the programme with what this phone saw last (aa.inbox.known, this phone's own,
+// never synced). The last time the Inbox was opened is aa.inbox.seen ({ <athlete id>: ISO }): the badge counts the rows newer than it, and opening the Inbox moves it.
+var INBOX = null, _inboxBusy = false, _inboxAt = 0, _inboxMissing = false, _inboxFrom = 'home', _inboxList = [], _inboxPrev = 0;
+const INBOX_SEEN = 'aa.inbox.seen', INBOX_KNOWN = 'aa.inbox.known';
+function inboxStore(k) { try { const o = JSON.parse(localStorage.getItem(k) || 'null'); return o && typeof o === 'object' && !Array.isArray(o) ? o : {}; } catch (e) { return {}; } }
+function inboxSeen() { return Date.parse(inboxStore(INBOX_SEEN)[ATHLETE_ID]) || 0; }
+function inboxSeenSet(iso) { const o = inboxStore(INBOX_SEEN); o[ATHLETE_ID] = iso; try { _lsRawSet(INBOX_SEEN, JSON.stringify(o)); } catch (e) { /* storage full: the badge just stays */ } }
+function onInbox() { const s = document.getElementById('screen-inbox'); return !!(s && s.classList.contains('active')); }
+function inboxHash(s) { let h = 0; s = String(s || ''); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return String(h); }
+// The three rows the phone knows by itself. The first time on a phone only records what is there (a new phone is not "a new cycle"). After that, a different week note, a notes
+// card that was not there, or a higher cycle makes one row, dated when this phone first saw it, and it stays for 7 days.
+function inboxScan() {
+  if (!crewAllowed() || !DATA || !ATHLETE_ID) return;
+  const all = inboxStore(INBOX_KNOWN), idx = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0, cyc = (DATA.cycles || [])[idx] || null;
+  let wnote = null;
+  try { wnote = cyc ? weekNoteNow(cyc) : null; } catch (e) { wnote = null; }
+  const wn = wnote ? idx + '|' + wnote.wk + '|' + inboxHash(wnote.text) : '';
+  const cards = ((DATA.notes && DATA.notes.cards) || []).map(c => String((c && c.title) || '') + '|' + String((c && c.date) || ''));
+  const rec = all[ATHLETE_ID];
+  const now = new Date().toISOString();
+  if (!rec || typeof rec !== 'object') {
+    all[ATHLETE_ID] = { wn, nc: cards, cy: idx, rows: [] };
+  } else {
+    const rows = (Array.isArray(rec.rows) ? rec.rows : []).filter(r => r && Date.now() - Date.parse(r.at) < 7 * 86400000);
+    const put = row => { const i = rows.findIndex(r => r.k === row.k); if (i >= 0) rows.splice(i, 1); rows.unshift(row); };
+    if (wn && wn !== rec.wn) put({ k: 'wn', at: now });
+    const known = Array.isArray(rec.nc) ? rec.nc : [], fresh = cards.findIndex(c => known.indexOf(c) < 0);
+    if (fresh >= 0) put({ k: 'nc', at: now, i: fresh, title: ((DATA.notes.cards[fresh] || {}).title) || '' });
+    if (Number.isInteger(rec.cy) && idx > rec.cy) put({ k: 'cy', at: now, name: (cyc && cyc.name) || '' });
+    all[ATHLETE_ID] = { wn, nc: cards, cy: idx, rows };
+  }
+  try { _lsRawSet(INBOX_KNOWN, JSON.stringify(all)); } catch (e) { /* storage full: nothing is lost, the next open compares again */ }
+}
+// The server's own word on an Inbox cheer row: back is false once I have cheered that person today (the page of theirs may never have been fetched on this phone). Only an Inbox fetched today counts.
+function inboxCheeredBack(ck) {
+  return !!(INBOX && INBOX.rows && utcDay(Date.parse(INBOX.at) || 0) === utcDay() && INBOX.rows.some(r => r && r.k === 'cheer' && !r.amir && r.ck === ck && r.back === false));
+}
+function inboxRows() {
+  const rec = inboxStore(INBOX_KNOWN)[ATHLETE_ID], local = rec && Array.isArray(rec.rows) ? rec.rows : [];
+  const server = INBOX && Array.isArray(INBOX.rows) ? INBOX.rows : [];
+  return server.concat(local).filter(r => r && Date.parse(r.at) && Date.now() - Date.parse(r.at) < 7 * 86400000).sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
+}
+function inboxCount() { const s = inboxSeen(); return inboxRows().filter(r => Date.parse(r.at) > s).length; }
+function paintInboxTray() {
+  const b = document.getElementById('global-inbox');
+  if (!b) return;
+  const on = crewAllowed(), n = on ? inboxCount() : 0, el = b.querySelector('.gi-n');
+  b.classList.toggle('is-off', !on);
+  if (el) { el.hidden = !n; el.textContent = n > 9 ? '9+' : String(n); }
+  b.setAttribute('aria-label', n ? `Inbox, ${n} new` : 'Inbox');
+}
+async function refreshInbox() {
+  if (!crewAllowed() || _inboxBusy || _inboxMissing) return;
+  _inboxBusy = true;
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    const seen = inboxSeen();
+    const r = await _withTimeout(sb.rpc('get_inbox', { p_since: seen ? new Date(seen).toISOString() : null }), 10000);
+    if (_noAnswer(r)) return;   // no signal: the rows on the phone stand
+    if (r.error) { if (crewMissingErr(r)) _inboxMissing = true; return; }
+    if (!r.data || !Array.isArray(r.data.rows)) return;
+    INBOX = { rows: r.data.rows, at: r.data.at || new Date().toISOString() };
+    _inboxAt = Date.now();
+  } catch (e) { /* the copy stands */ }
+  finally { _inboxBusy = false; inboxScan(); paintInboxTray(); if (onInbox()) renderInbox(); }
+}
+// Asked when the app opens and when the Bell refreshes (refreshBell()), never on a fast poll of its own: at most once every 20 seconds.
+function inboxBoot() {
+  if (!crewAllowed()) { paintInboxTray(); return; }
+  inboxScan(); paintInboxTray();
+  if (Date.now() - _inboxAt > 20000) refreshInbox();
+}
+function openInbox() {
+  if (!crewAllowed()) return;
+  const here = crewScreenNow();
+  _inboxFrom = here === 'inbox' ? _inboxFrom : (here === 'crewplayer' ? 'crew' : here);
+  goTo('inbox');
+}
+window.openInbox = openInbox;
+function inboxBack() {
+  const ok = ['home', 'plan', 'workouts', 'notes', 'crew', 'habits', 'weight', 'moments', 'achievements', 'system', 'ceiling', 'crewboard', 'crewwho'];
+  goTo(ok.indexOf(_inboxFrom) >= 0 ? _inboxFrom : 'home');
+}
+window.inboxBack = inboxBack;
+// Called by goTo('inbox'): the rows on the phone at once, the server's behind them. The seen time moves to now; the rows that were newer than the old one keep a clay dot for this visit.
+function openInboxScreen() {
+  _inboxPrev = inboxSeen();
+  inboxScan();
+  renderInbox();
+  if (Date.now() - _inboxAt > 5000) refreshInbox();
+}
+function inboxMark() {
+  const rows = inboxRows(), last = rows.length ? Date.parse(rows[0].at) : 0;
+  const at = Math.max(INBOX && INBOX.at ? Date.parse(INBOX.at) || 0 : 0, last, 0);
+  inboxSeenSet(new Date(at || Date.now()).toISOString());
+  paintInboxTray();
+}
+function inboxDayHead(at) {
+  const d = new Date(at), word = crewDayWord(ymdLocal(d)), t = new Date(); t.setHours(0, 0, 0, 0);
+  const diff = Math.round((t - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
+  return diff >= 7 ? d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : word;
+}
+function inboxClock(at) { return new Date(at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
+// "Mina", "Mina and Reza", "Mina, Reza and 3 others": the server sends up to two names and the count.
+function inboxNames(names, n) {
+  const a = (Array.isArray(names) ? names : []).filter(Boolean).map(String), total = Math.max(Number(n) || a.length, a.length, 1);
+  const shown = a.slice(0, 2);
+  if (!shown.length) shown.push('Someone');
+  const rest = total - shown.length;
+  const bold = shown.map(x => `<b>${esc(x)}</b>`);
+  if (rest > 0) return bold.join(', ') + ' and ' + rest + (rest === 1 ? ' other' : ' others');
+  return crewListH(bold);
+}
+function inboxPlain(s) { return String(s || '').replace(crewMnRe(), (m, ck, name) => '@' + name); }
+// One row as { who (a person for the face), t (the sentence, markup), q (a quiet second line), act (markup) }. The sentence says what happened in plain words.
+function inboxSpec(r, i) {
+  const amir = !!r.amir || r.who === 'Amir';
+  const person = { ck: r.ck || null, fv: r.fv != null ? r.fv : null, who: r.who || '', amir };
+  const nm = amir ? '<b>Amir</b>' : `<b>${esc(r.who || 'Someone')}</b>`;
+  let t = '', q = '', act = '', face = person;
+  switch (r.k) {
+    case 'cheer': {
+      const w = String(r.word || '').trim();
+      t = `${nm} cheered you${w ? ': ' + esc(w) : ''}${/[.!?]$/.test(w) ? '' : '.'}`;
+      if (!amir && r.ck && crewCanLike()) {
+        act = crewCheeredToday(r.ck) ? '<span class="ib-done" role="status">Cheered</span>'
+          : r.back ? `<button type="button" class="ib-act" onclick="crewCheerBack('${esc(r.ck)}', this)" aria-label="Cheer ${esc(String(r.who || 'them').split(/\s+/)[0])} back">Cheer back</button>` : '';
+      }
+      break;
+    }
+    case 'reply': t = `${nm} replied: <span dir="auto">${esc(inboxPlain(r.body))}</span>`; break;
+    case 'mention': t = `${nm} named you in a reply`; q = inboxPlain(r.body); break;
+    case 'like': {
+      const f = Array.isArray(r.faces) && r.faces[0] ? r.faces[0] : null;
+      face = f ? { ck: f.ck || null, fv: f.fv != null ? f.fv : null, who: f.who || '' } : { who: (r.who && r.who[0]) || '' };
+      t = `${inboxNames(r.who, r.n)} liked your ${r.post ? 'post' : 'moment'}`;
+      q = r.post ? String(r.body || '') : '';
+      break;
+    }
+    case 'award_like': {
+      face = { who: (r.who && r.who[0]) || '' };
+      const kind = String(r.award || '').split(':')[0], id = String(r.award || '').split(':').slice(1).join(':');
+      t = `${inboxNames(r.who, r.n)} liked your ${kind === 'mark' ? 'mark' : 'achievement'} <b>${esc(momName(r.name || id || 'it'))}</b>`;
+      break;
+    }
+    case 'join':
+      t = `${nm} joined the crew`;
+      if (r.ck && crewMe().can_post) act = `<button type="button" class="ib-act is-quiet" onclick="crewSayHello('${esc(r.ck)}')" aria-label="Say hello to ${esc(String(r.who || 'them').split(/\s+/)[0])}">Say hello</button>`;
+      break;
+    case 'answer': t = '<b>Amir</b> answered your question'; q = String(r.q || ''); face = { amir: true, who: 'Amir' }; break;
+    case 'wn': t = '<b>Amir</b> wrote your week note'; face = { amir: true, who: 'Amir' }; break;
+    case 'nc': t = 'A new note from <b>Amir</b>'; q = String(r.title || ''); face = { amir: true, who: 'Amir' }; break;
+    case 'cy': t = `Your new cycle is here${r.name ? ': <b>' + esc(r.name) + '</b>' : ''}`; face = { amir: true, who: 'Amir' }; break;
+    default: return null;
+  }
+  const p = crewPersonOf(face);
+  return { t, q, act, face: crewFace(p) };
+}
+function renderInbox() {
+  const el = document.getElementById('inbox-body');
+  if (!el) return;
+  const rows = inboxRows();
+  _inboxList = rows;
+  if (!rows.length) {
+    el.innerHTML = `<p class="ib-empty">${!INBOX && _inboxBusy ? 'Loading…' : !INBOX && navigator.onLine === false ? 'No signal. The Inbox shows here when you are back online.' : 'Nothing new this week.'}</p>`;
+    if (onInbox()) inboxMark();
+    return;
+  }
+  let h = '', day = '';
+  rows.forEach((r, i) => {
+    const s = inboxSpec(r, i);
+    if (!s) return;
+    const d = inboxDayHead(r.at);
+    if (d !== day) { day = d; h += `${h ? '</div>' : ''}<h2 class="ib-day">${esc(d)}</h2><div class="ib-list">`; }
+    const fresh = Date.parse(r.at) > _inboxPrev;
+    h += `<div class="ib-row${fresh ? ' is-new' : ''}" data-k="${esc(r.k)}"><button type="button" class="ib-go" onclick="inboxGo(${i})">${s.face}`
+      + `<span class="ib-tx"><span class="ib-t">${s.t}</span>${s.q ? `<span class="ib-q" dir="auto">${esc(s.q)}</span>` : ''}</span><span class="ib-time">${esc(inboxClock(r.at))}</span></button>${s.act}</div>`;
+  });
+  el.innerHTML = h + (h ? '</div>' : '');
+  crewWireFaces(el);
+  if (onInbox()) inboxMark();
+}
+// A row is a door to the thing it was about (the targets step 1 made: crewLight(), the page's Cheers this week, a person's page).
+// The first visit to Crew in a run also asks for the season board, and when that comes back it repaints the tab and the tint with it: light again once, if so.
+var _inboxLit = {};
+function inboxLight(sel) {
+  crewLight(sel, 'new');
+  [450, 1100].forEach(ms => setTimeout(() => { const e = document.querySelector(sel); if (e && onCrew() && !e.classList.contains('cr-lit') && !_inboxLit[sel]) { _inboxLit[sel] = 1; crewLight(sel, 'stay'); } }, ms));
+  setTimeout(() => { delete _inboxLit[sel]; }, 2500);
+}
+function inboxGo(i) {
+  const r = _inboxList[i];
+  if (!r) return;
+  const mine = String(crewMe().ck || '');
+  switch (r.k) {
+    case 'cheer': crewShowMyCheers('inbox'); break;
+    case 'reply': case 'mention': {
+      goTo('crew');
+      if (r.reply) inboxLight(`#crew-body .cr-rep[data-rid="${CSS.escape(String(r.reply))}"]`);
+      else if (r.post) inboxLight(`#crew-body .cr-post[data-id="${CSS.escape(String(r.post))}"]`);
+      break;
+    }
+    case 'like': {
+      goTo('crew');
+      if (r.post) inboxLight(`#crew-body .cr-post[data-id="${CSS.escape(String(r.post))}"]`);
+      else if (r.day && mine) inboxLight(`#crew-body .cr-line[data-key="${CSS.escape(mine + ':' + String(r.day))}"]`);
+      break;
+    }
+    case 'award_like': {
+      const kind = String(r.award || '').split(':')[0], id = String(r.award || '').split(':').slice(1).join(':');
+      let done = false;
+      try { if (kind === 'achievement' && cabE() && cabItems().some(c => c.key === id)) { openEmblem(id); done = true; } } catch (e) { done = false; }
+      if (!done) goTo('achievements');
+      break;
+    }
+    case 'join': if (r.ck && crewPagesOn()) openPlayer(r.ck, 'inbox'); else goTo('crew'); break;
+    case 'answer': openAnswerBook(r.q); break;
+    case 'wn': {
+      goTo('home');
+      setTimeout(() => { const w = document.querySelector('#home-overview .week-note, .week-note'); if (w) { try { w.scrollIntoView({ block: 'center' }); } catch (e) { w.scrollIntoView(); } crewLight('.week-note', 'stay'); } }, 60);
+      break;
+    }
+    case 'nc': {
+      goTo('notes');
+      setTimeout(() => { const b = document.getElementById('cn-h-' + Number(r.i)); if (b) { if (b.getAttribute('aria-expanded') !== 'true') b.click(); try { b.scrollIntoView({ block: 'center' }); } catch (e) { b.scrollIntoView(); } } }, 60);
+      break;
+    }
+    case 'cy': goTo('home'); break;
+  }
+}
+window.inboxGo = inboxGo;
+// Your own cheers (Cheers this week on your page), newest first, with the newest row lit. The one place both Land on It (step 1) and the Inbox's cheer rows use.
+function crewShowMyCheers(from) {
+  if (!crewPagesOn()) { goTo('crew'); return; }
+  openPlayer('me', from || 'crew');
   let n = 0;
   const find = () => {
     const h = [...document.querySelectorAll('#crewplayer-body h2.prog-sec')].find(x => /^Cheers this week/.test(x.textContent));
@@ -26834,6 +27227,265 @@ async function crewLandAimed(since) {
     crewLight('#crewplayer-body .pl-ch', 'stay');   // the newest cheer's row
   };
   setTimeout(find, 120);
+}
+// Cheer back (83): the same call and the same once-a-day rule as the Cheer button. The Inbox row and your own page's cheer row both use it; they turn to "Cheered" or go,
+// because crewCheerDone() repaints both.
+async function crewCheerBack(ck, btn) {
+  if (!ck) return;
+  if (!crewCanLike()) { crewCheerAsk(); return; }
+  if (crewCheeredToday(ck)) return;
+  const nm = crewFirstOf(ck);
+  if (btn) btn.disabled = true;
+  const r = await crewCheerSend(ck, null);
+  if (r.busy) return;
+  if (r.ok) crewCheerSentToast(nm); else { crewCheerFail(ck, r, nm); if (btn) btn.disabled = false; }
+}
+window.crewCheerBack = crewCheerBack;
+// Say hello: the composer with a welcome. Composer mentions are not a thing (only a reply can name someone), so it is a plain line with their first name.
+function crewSayHello(ck) {
+  const me = crewMe();
+  if (me.under13 || !crewOn()) return;
+  if (!me.can_post) { crewLikeAsk(); return; }
+  openCrewPost('post', null, { draft: `Welcome to the crew, ${crewFirstOf(ck)}.` });
+}
+window.crewSayHello = crewSayHello;
+// A folded crew notification ("The crew has been busy") opens the Inbox, a single one keeps step 1's landing. sw.js sends #inbox for the first.
+function goToInboxSoon() {
+  let left = 20;
+  const tick = () => {
+    if (typeof crewAllowed !== 'function' || typeof goTo !== 'function' || !document.getElementById('inbox-body')) { if (--left > 0) setTimeout(tick, 300); return; }
+    if (!crewAllowed()) return;
+    if (document.body.classList.contains('session-on')
+        || document.querySelector('#stepOverlay.visible, #timerOverlay.visible, #readiness-overlay.visible')) return;
+    _inboxAt = 0;   // something is new: ask now, whatever the 20 s rule says
+    openInbox();
+  };
+  tick();
+}
+
+// ── Step 3 · the weekly crew ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+// get_bell() carries `weekly` (stage102): null, or { week, q, a, b, theme, open, closes, mine, votes: { a, b, fa: [faces], fb } }. q may be null with only a theme set.
+function crewWeekly() { const w = BELL && BELL.weekly; return w && typeof w === 'object' && (w.q || w.theme) ? w : null; }
+function crewClosesWord(w) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String((w && w.closes) || ''));
+  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString('en-GB', { weekday: 'long' }) : 'Sunday';
+}
+// The Toss card, "Two Halves" (85 A): the question big, two halves side by side (the side's words, up to four faces stacked, the count), the half you chose outlined in clay.
+// Closed with a question: the result, nothing to tap, "Closed". A non-member can see the counts and is asked to join when they tap. Under 13: counts only, no tap, no faces.
+// The photo theme row (87 C) sits at the foot, or alone when the week has only a theme.
+function crewTossHTML() {
+  const w = crewWeekly();
+  if (!w) return '';
+  const me = crewMe(), kid = !!me.under13, open = w.open !== false;
+  let h = '';
+  if (w.q) {
+    const v = w.votes && typeof w.votes === 'object' ? w.votes : {}, na = Number(v.a) || 0, nb = Number(v.b) || 0;
+    const half = s => {
+      const label = String(w[s] || ''), n = s === 'a' ? na : nb, mine = w.mine === s, win = !open && n > (s === 'a' ? nb : na);
+      const faces = kid ? '' : (Array.isArray(v['f' + s]) ? v['f' + s] : []).slice(0, 4).map(f => crewFace(crewPersonOf({ ck: f.ck, fv: f.fv, who: f.who, me: !!f.me }), 'line')).join('');
+      const inner = `<span class="l" dir="auto">${esc(label)}</span><span class="f"><span class="stk">${faces}</span><span class="n">${n}</span></span>`;
+      const cls = 'cr-half' + (mine ? ' is-mine' : '') + (win ? ' is-win' : '');
+      const say = `${label}. ${n} ${n === 1 ? 'vote' : 'votes'}`;
+      if (!open || kid) return `<div class="${cls}" role="group" aria-label="${esc(say)}${mine ? '. Your vote' : ''}">${inner}</div>`;
+      return `<button type="button" class="${cls}" data-side="${s}" aria-pressed="${mine}" aria-label="${esc(say + (mine ? '. Your vote' : '. Tap to vote'))}" onclick="crewVote('${s}')">${inner}</button>`;
+    };
+    h += `<p class="k">This week</p><h3 class="q" dir="auto">${esc(w.q)}</h3><div class="cr-halves">${half('a')}${half('b')}</div>`
+      + `<p class="ft">${open ? `Amir's question. Closes ${esc(crewClosesWord(w))}.` : 'Closed'}</p>`;
+  } else h += '<p class="k">This week</p>';
+  if (w.theme && open) {
+    const can = !!me.can_post, ask = !kid && !can;
+    h += `<div class="cr-theme"><p>This week's photo: <b dir="auto">${esc(w.theme)}</b></p>`
+      + (can ? '<button type="button" class="ib-act" onclick="crewPostOne()">Post one</button>'
+        : ask ? '<button type="button" class="ib-act is-quiet" onclick="crewAnswer(\'yes\', this)">Join the crew</button>' : '') + '</div>';
+  }
+  return `<section class="cr-toss" aria-label="This week in the crew">${h}</section>`;
+}
+function crewTossPaint() {
+  const el = document.querySelector('#crew-body .cr-toss');
+  if (!el) { if (onCrew() && crewWeekly()) renderCrew(); return; }
+  const html = crewTossHTML();
+  if (!html) { el.remove(); return; }
+  el.outerHTML = html;
+  crewWireFaces(document.getElementById('crew-body'));
+}
+var _voteBusy = false;
+async function crewVote(side) {
+  const w = BELL && BELL.weekly;
+  if (!w || w.open === false || (side !== 'a' && side !== 'b')) return;
+  const me = crewMe();
+  if (me.under13) return;
+  if (!crewCanLike()) { aaToast('Join the crew to vote.', { kicker: 'Crew', action: 'Join the crew', dismiss: 'Not now', run: () => crewAnswer('yes') }); return; }
+  if (w.mine === side || _voteBusy) return;
+  _voteBusy = true;
+  const before = JSON.stringify(w);
+  // optimistic: the count and the face move at once, the server's answer is the truth
+  const v = w.votes = w.votes && typeof w.votes === 'object' ? w.votes : { a: 0, b: 0, fa: [], fb: [] }, prev = w.mine, mp = crewPersonOf({ me: true});
+  const mf = { ck: mp.ck, fv: mp.fv, who: mp.who, me: true };
+  if (prev === 'a' || prev === 'b') { v[prev] = Math.max(0, (Number(v[prev]) || 0) - 1); v['f' + prev] = (v['f' + prev] || []).filter(f => !f.me); }
+  v[side] = (Number(v[side]) || 0) + 1; v['f' + side] = [mf].concat((v['f' + side] || []).filter(f => !f.me));
+  w.mine = side;
+  crewTossPaint();
+  const back = () => { try { BELL.weekly = JSON.parse(before); } catch (e) {} crewTossPaint(); };
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_vote', { p_side: side }), 12000); } catch (e) { r = null; }
+  _voteBusy = false;
+  if (_noAnswer(r)) { back(); aaToast('No signal. Your vote did not go. Try again when you are back online.'); return; }
+  if (r.error || !r.data) {
+    back();
+    const m = (/crew:[a-z_]+/.exec(String(r.error && r.error.message || '')) || [''])[0];
+    if (m === 'crew:closed') { aaToast('Voting has closed for this week.'); _bellAt = 0; refreshBell(); }
+    else if (m === 'crew:join') aaToast('Join the crew to vote.', { kicker: 'Crew', action: 'Join the crew', dismiss: 'Not now', run: () => crewAnswer('yes') });
+    else aaToast('That vote did not go. Try again.');
+    return;
+  }
+  if (r.data && typeof r.data === 'object' && (r.data.q !== undefined || r.data.votes)) BELL.weekly = r.data;
+  try { _lsRawSet(crewKey(), JSON.stringify(BELL)); } catch (e) {}
+  crewTossPaint();
+}
+window.crewVote = crewVote;
+// Post one (87 C): the composer with the theme as its prompt.
+function crewPostOne() {
+  const w = crewWeekly();
+  if (!w || !w.theme) return;
+  openCrewPost('post', null, { prompt: 'Show us: ' + String(w.theme) });
+}
+window.crewPostOne = crewPostOne;
+
+// ── The Mailbag (88 A): a row on the Coach tab opens one sheet with one box ──
+function crewAskRowHTML() {
+  if (!crewAllowed()) return '';
+  return `<button type="button" class="hrow" id="coach-ask" onclick="openCrewAsk()">
+      <span class="hrow-ic" aria-hidden="true">${window.ICON('help', 1.6)}</span>
+      <span class="hrow-b"><span class="hrow-l">Ask for the crew</span><span class="hrow-q">Amir answers one question a week</span></span>
+      <span class="hrow-a" aria-hidden="true">›</span>
+    </button>`;
+}
+function crewAskErr(msg, offline) {
+  if (offline) return 'No signal. Your question is still here. Tap Send again when you have signal.';
+  const m = (/crew:[a-z_]+/.exec(String(msg || '')) || [''])[0];
+  return ({ 'crew:enough': "That's three today. Ask again tomorrow.", 'crew:too_long': 'Keep it to 200 characters.', 'crew:empty': 'Write your question first.' })[m] || 'That did not send. Try again.';
+}
+function openCrewAsk() {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov || !crewAllowed()) return;
+  const kid = !!crewMe().under13;
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Mailbag</div>
+    <h2 class="readiness-title">Ask Amir</h2>
+    <textarea class="cr-txt cr-rtxt" dir="auto" maxlength="200" aria-label="Your question" placeholder="What do you want to know about your training?"></textarea>
+    <span class="cr-cnt" aria-live="polite">0 / 200</span>
+    ${kid ? '' : '<label class="ca-ok"><input type="checkbox" class="ca-name"><span>You can use my first name</span></label>'}
+    <p class="cr-note">Amir answers one question a week for the crew. He reads every one.</p>
+    <button type="button" class="cr-go" disabled>Send</button>
+    <p class="cr-err" role="status"></p>`;
+  const m = ov.querySelector('.readiness-modal'), ta = m.querySelector('.cr-rtxt'), cnt = m.querySelector('.cr-cnt'), go = m.querySelector('.cr-go'), err = m.querySelector('.cr-err'), ck = m.querySelector('.ca-name');
+  const sync = () => { cnt.textContent = ta.value.length + ' / 200'; go.disabled = !ta.value.trim(); };
+  ta.addEventListener('input', sync);
+  go.addEventListener('click', async () => {
+    const label = go.textContent;
+    go.disabled = true; go.textContent = 'Sending…'; err.textContent = '';
+    let r = null;
+    try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('crew_ask', { p_body: ta.value.trim(), p_ok_name: kid ? false : !!(ck && ck.checked) }), 15000); } catch (e) { r = null; }
+    go.textContent = label;
+    if (_noAnswer(r)) { err.textContent = crewAskErr('', true); go.disabled = false; return; }
+    if (r.error || !r.data) { err.textContent = crewAskErr(r.error && r.error.message); go.disabled = !ta.value.trim(); return; }
+    closeHistorySheet();
+    aaToast('Sent. Amir reads every one.');
+  });
+  sync();
+  ov.classList.add('visible');
+}
+window.openCrewAsk = openCrewAsk;
+
+// ── The Answer Book (91): every question Amir answered, newest first. A door in the Library's Playbook, and where an Inbox "answered your question" row lands. ──
+var BOOK = null, _bookBusy = false, _bookAt = 0;
+function bookKey() { return 'aa.book'; }
+function bookLoadCache() {
+  if (BOOK) return;
+  try { const o = JSON.parse(localStorage.getItem(bookKey()) || 'null'); if (o && Array.isArray(o[ATHLETE_ID])) BOOK = o[ATHLETE_ID]; } catch (e) { /* no copy yet */ }
+}
+async function loadAnswerBook(force) {
+  if (!crewAllowed() || _bookBusy) return BOOK;
+  if (!force && BOOK && Date.now() - _bookAt < 300000) return BOOK;
+  _bookBusy = true;
+  try {
+    const sb = await _sbReady();
+    const r = sb && await _withTimeout(sb.rpc('get_answer_book'), 10000);
+    if (r && !r.error && Array.isArray(r.data)) {
+      BOOK = r.data; _bookAt = Date.now();
+      try { const o = {}; o[ATHLETE_ID] = BOOK; _lsRawSet(bookKey(), JSON.stringify(o)); } catch (e) {}
+    }
+  } catch (e) { /* the copy stands */ }
+  finally { _bookBusy = false; }
+  paintAskedDoor();
+  return BOOK;
+}
+function paintAskedDoor() {
+  const el = document.getElementById('lib-asked');
+  if (!el) return;
+  const n = BOOK ? BOOK.length : 0;
+  if (!n) { el.innerHTML = ''; el.hidden = true; return; }
+  el.hidden = _libPane !== 'playbook';
+  el.innerHTML = `<div class="lib-sec"><span class="lib-sec-t">From the crew</span><span class="lib-sec-n">${n} ${n === 1 ? 'answer' : 'answers'}</span></div>`
+    + `<div class="pb-list"><button type="button" class="pb-row" id="lib-asked-go" onclick="openAnswerBook()"><span class="sr-b"><span class="sr-name">Asked by the crew</span><span class="sr-meta">Questions I answered</span></span><span class="sr-go" aria-hidden="true">›</span></button></div>`;
+}
+function bookDate(at) { const t = Date.parse(at); return t ? new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : ''; }
+function bookItemsHTML() {
+  return (BOOK || []).map((b, i) => {
+    const by = b.by ? `Asked by ${esc(String(b.by).split(/\s+/)[0])}` : '', d = bookDate(b.at), meta = [by, esc(d)].filter(Boolean).join(' · ');
+    return `<article class="ab-i" data-i="${i}"><p class="ab-q" dir="auto">${esc(b.q)}</p><p class="ab-a" dir="auto">${esc(b.a)}</p>${meta ? `<p class="ab-m">${meta}</p>` : ''}</article>`;
+  }).join('');
+}
+// `q` (optional): the question to land on, as the Inbox row carries it (its first 120 characters).
+function openAnswerBook(q) {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov || !crewAllowed()) return;
+  bookLoadCache();
+  const draw = () => {
+    const m = ov.querySelector('.readiness-modal');
+    if (!m || !m.querySelector('.ab-list, .ab-wait')) return;
+    const has = BOOK && BOOK.length;
+    m.querySelector('.ab-list, .ab-wait').outerHTML = has ? `<div class="ab-list">${bookItemsHTML()}</div>` : `<div class="ab-list"><p class="cr-note">${_bookBusy ? 'Loading…' : 'Nothing answered yet.'}</p></div>`;
+    if (has && q) {
+      const want = String(q).slice(0, 120), idx = BOOK.findIndex(b => String(b.q || '').slice(0, 120) === want);
+      const it = idx >= 0 ? m.querySelector(`.ab-i[data-i="${idx}"]`) : null;
+      if (it) { try { it.scrollIntoView({ block: 'start' }); } catch (e) { it.scrollIntoView(); } it.classList.remove('cr-lit'); void it.offsetWidth; it.classList.add('cr-lit'); setTimeout(() => it.classList.remove('cr-lit'), 2100); }
+    }
+  };
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Mailbag</div>
+    <h2 class="readiness-title">Asked by the crew</h2>
+    <div class="ab-wait"></div>`;
+  draw();
+  ov.classList.add('visible');
+  draw();
+  loadAnswerBook(true).then(() => { if (ov.classList.contains('visible')) draw(); });
+}
+window.openAnswerBook = openAnswerBook;
+
+// ── Step 4 · talk back ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// 86 Hello, crew: a member who has never posted opens the composer with a draft built from their own page. Only what the app knows goes in. They can edit it or clear it, and it
+// is offered once: the draft is kept like anything else typed and not sent (crewKeepKey()), and `<id>_crewhello` says it was shown. `<id>_crewposted` is set on a first post.
+function crewHelloKey() { return ATHLETE_ID + '_crewhello'; }
+function crewPostedKey() { return ATHLETE_ID + '_crewposted'; }
+function crewHelloWanted() {
+  try { return !localStorage.getItem(crewHelloKey()) && !localStorage.getItem(crewPostedKey()) && crewMinePosts() === 0; } catch (e) { return false; }
+}
+function crewHelloDraft() {
+  const c = crewPageGet('me'), p = c && c.p, a = (DATA && DATA.athlete) || {};
+  const first = (p && plFirst(p)) || String(a.firstName || '').trim() || String(crewMe().name || '').trim().split(/\s+/)[0] || '';
+  if (!first) return '';
+  const sport = p ? String(playerSportLine(p)).split(' · ')[0].toLowerCase() : '';
+  const days = ((DATA && DATA.workouts && DATA.workouts.days) || []).length;
+  return `Hi crew, I'm ${first}.` + (sport ? ` I play ${sport}.` : '') + (days > 0 && days < 8 ? ` Training ${days} ${days === 1 ? 'day' : 'days'} a week.` : '');
+}
+// The question above Amir's answer (88 A, 91): a post of Amir's whose session holds { ask: { q, by } } draws the quoted question first, then his answer as the post's body.
+// `by` is the asker's first name, or null when they did not say it could be used.
+function crewAskQHTML(it) {
+  const a = it && it.session && typeof it.session === 'object' ? it.session.ask : null;
+  if (!a || !a.q) return '';
+  const by = a.by ? String(a.by).trim().split(/\s+/)[0] : '';
+  return `<blockquote class="cr-askq"><span class="e">${by ? esc(by) + ' asked' : 'Someone asked'}</span><p dir="auto">${esc(a.q)}</p></blockquote>`;
 }
 
 // ── A notification that lands on a screen (stage86) ──
@@ -26866,9 +27518,14 @@ function initCrewDeepLink() {
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     goToCrewSoon();
   }
+  if (location.hash === '#inbox') {   // a folded crew notification ("The crew has been busy") opens the Inbox (Home Crowd step 2d)
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    goToInboxSoon();
+  }
   if (navigator.serviceWorker) {
     navigator.serviceWorker.addEventListener('message', e => {
       if (e.data && e.data.aa === 'go' && e.data.screen === 'crew') goToCrewSoon();
+      if (e.data && e.data.aa === 'go' && e.data.screen === 'inbox') goToInboxSoon();
     });
   }
 }

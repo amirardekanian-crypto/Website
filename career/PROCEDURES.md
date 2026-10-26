@@ -73,7 +73,7 @@ files: a procedure never hard-codes a number (GAME-10).
 | 32 | [Stage 92: the crew's replies, as built (2026-10-20)](../docs/ref/career-procedures/32-stage-92-the-crew-s-replies.md) | 5 KB |
 | 33 | [Stage 95: a season counts what was done in it, as built (2026-10-20)](../docs/ref/career-procedures/33-stage-95-a-season-counts-what-was-done-in-it.md) | 4 KB |
 | 34 | [Stage 99: the Emblem Cabinet, server side (2026-10-25, applied)](../docs/ref/career-procedures/34-stage-99-the-emblem-cabinet.md) | 7 KB |
-| 35 | [Stage 101: the month's honours wait for Amir (2026-10-25, not applied)](../docs/ref/career-procedures/35-stage-101-the-honours-wait-for-amir.md) | 4 KB |
+| 35 | [Stage 104: the month's honours wait for Amir (2026-10-25, not applied)](../docs/ref/career-procedures/35-stage-104-the-honours-wait-for-amir.md) | 4 KB |
 
 ---
 

@@ -1,12 +1,12 @@
-// Rehearses supabase/stage101_honours_confirmed.sql (the month's honours reach an athlete only when Amir confirms them) on PGlite. Nothing live,
+// Rehearses supabase/stage104_honours_confirmed.sql (the month's honours reach an athlete only when Amir confirms them) on PGlite. Nothing live,
 // no real athlete: every id here is made up.
 //
 //   npm install @electric-sql/pglite --prefix "$TEMP/pglite"          (once, outside the repo)
 //   PGLITE="$TEMP/pglite/node_modules/@electric-sql/pglite" node scripts/career/rehearse_honours_confirmed.mjs
 //
-// The structure BEFORE stage101 (supabase/schema_snapshot.sql: it holds stage100, not stage101), a month already frozen the old way (its rows are live
+// The structure BEFORE stage104 (supabase/schema_snapshot.sql: it holds stage100, not stage104), a month already frozen the old way (its rows are live
 // for the athletes), then:
-//   1. stage101 twice: the old month's rows are back-filled as confirmed and every athlete-facing reader still shows them (get_my_moments, crew_page,
+//   1. stage104 twice: the old month's rows are back-filled as confirmed and every athlete-facing reader still shows them (get_my_moments, crew_page,
 //      get_bell's honour line, the month's band and the Pick card); a second run changes nothing and does not confirm a suggestion;
 //   2. the freeze on the 8th writes SUGGESTIONS: coach_honours() shows them, no athlete reader does, nothing is queued for a push;
 //   3. Confirm: the honour becomes visible to the winner and the crew, the Bell line is dated by the confirmation, one push is queued per winner,
@@ -15,7 +15,7 @@
 //      Full Month takes a list; an athlete with no figure, the demo and a former athlete are refused;
 //   5. the Pick: confirmed by the picking, still works with its reason (coach_honours_why), the Pick card still shows;
 //   6. who can call what, and the last day of the month (career_honours_open);
-//   7. the way back (scripts/career/rollback_stage101.sql) puts every patched function back EXACTLY, then stage101 again.
+//   7. the way back (scripts/career/rollback_stage104.sql) puts every patched function back EXACTLY, then stage104 again.
 // The numbers behind a suggestion (career_honours_live, career_honour_figure) are stood in for by a small table: how they are worked out is
 // stage75's and is rehearsed in rehearse_courtside.mjs. This file proves who SEES what and when.
 import path from 'node:path';
@@ -55,7 +55,7 @@ async function main() {
   const M2 = dm(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 2, 1)));     // the month before: frozen the old way
   const M0 = dm(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)));
 
-  section('0. the live structure (stage100, not stage101), made-up athletes, one month frozen the old way');
+  section('0. the live structure (stage100, not stage104), made-up athletes, one month frozen the old way');
   await runSql(db, read(path.join(ROOT, 'scripts', 'restore', 'stand_in_supabase.sql')), 'stand-in');
   await runSql(db, read(path.join(ROOT, 'supabase', 'schema_snapshot.sql')), 'snapshot');
   await db.exec(`set timezone = 'UTC'`);
@@ -103,10 +103,10 @@ async function main() {
   ok((mA0 || []).some(h => h.honour === 'sessions') && (bHon0.rows || []).length >= 3 && (pD0 || []).some(h => h.honour === 'pick'),
      'before the stage the old month shows to its winners, in the Bell band and on the Player Page', { mA0, bHon0, pD0 });
 
-  section('1. stage101 goes on, twice; the old month stays visible');
-  const stage = read(path.join(ROOT, 'supabase', 'stage101_honours_confirmed.sql'));
-  await runSql(db, stage, 'stage101'); await runSql(db, stage, 'stage101 again');
-  ok(true, 'stage101 applied, and applied again without an error');
+  section('1. stage104 goes on, twice; the old month stays visible');
+  const stage = read(path.join(ROOT, 'supabase', 'stage104_honours_confirmed.sql'));
+  await runSql(db, stage, 'stage104'); await runSql(db, stage, 'stage104 again');
+  ok(true, 'stage104 applied, and applied again without an error');
   await mkProbe();
   const after = await defs();
   ok(PATCHED.every(f => after[f] !== before[f]), 'all six functions were patched', PATCHED.filter(f => after[f] === before[f]));
@@ -116,7 +116,7 @@ async function main() {
   ok(['sessions', 'improved', 'full_month'].every(h => cm[h]), 'the old month holds all three confirmations', cm);
   const mA1 = await momentsOf('zz_a');
   ok(eq(mA1, mA0) && eq(await bellHon('zz_b'), bHon0) && eq(await pageHon('zz_b', 'zz_d'), pD0), 'get_my_moments, the Bell band and the Player Page show exactly what they showed');
-  const defs2 = await defs(); await runSql(db, stage, 'stage101 third');
+  const defs2 = await defs(); await runSql(db, stage, 'stage104 third');
   ok(eq(defs2, await defs()), 'a re-run leaves every patched function as it was');
   info('(the old rows were written before the stage, with the old trigger: ' + (await queued()) + ' queued then)');
 
@@ -218,13 +218,13 @@ async function main() {
   ok(lastDay.month === M0 && lastDay.ended === false && lastDay.live, "on the month's last day coach_honours() answers for the month itself, not ended, with the live work", lastDay);
 
   section('7. the way back');
-  await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage101.sql')), 'rollback_stage101');
+  await runSql(db, read(path.join(ROOT, 'scripts', 'career', 'rollback_stage104.sql')), 'rollback_stage104');
   const back = await defs();
   ok(PATCHED.every(f => back[f] === before[f]), 'every patched function is back EXACTLY as it was before the stage', PATCHED.filter(f => back[f] !== before[f]));
   ok(!(await val(`select column_name from information_schema.columns where table_name = 'career_honours' and column_name = 'confirmed_at'`)) && !(await val(`select to_regprocedure('public.coach_honour_confirm(date,text,text[],text[])')::text`)), 'confirmed_at, confirmed and the new functions are gone');
   ok((await val(`select count(*)::int from pg_trigger where tgname in ('crew_push_honour', 'crew_push_honour_ok') and tgrelid = 'public.career_honours'::regclass`)) === 1, 'the push trigger is the stage86 one again');
-  await runSql(db, stage, 'stage101 after the rollback');
-  ok(true, 'stage101 applies again after the rollback');
+  await runSql(db, stage, 'stage104 after the rollback');
+  ok(true, 'stage104 applies again after the rollback');
   const cm2 = await val(`select count(*)::int from public.career_honours where confirmed_at is not null`);
   ok(cm2 === (await val(`select count(*)::int from public.career_honours`)), 'everything is visible again (the way back is a full undo; the back-fill treats the rows as confirmed)');
 

@@ -1,4 +1,6 @@
--- stage101_honours_confirmed.sql — the month's honours reach an athlete only when Amir confirms them (2026-10-25)
+-- stage104_honours_confirmed.sql — the month's honours reach an athlete only when Amir confirms them (2026-10-25)
+-- NUMBER: written as stage101 and applied to the live project on 2026-10-26 as migration `stage101_honours_confirmed`; renumbered 104 in the
+-- repo because stage101_inbox.sql had taken 101. The markers it writes into functions and its messages still say stage101, as applied.
 --
 -- Amir: "im gonna choose other honours at the end of the month, there should be reminder in coach.html for me tho. to pick most sessions most
 -- improved an full month or my pick", then "go with your picks": (a) the app SUGGESTS the winner of Most sessions and Most improved and the
@@ -25,7 +27,7 @@
 -- Nothing here changes how an honour is worked out, any XP (GAME-6), a fact, an award, or a table's backup or erase list: no new table, and both
 -- columns are on tables already in BACKUP_TABLES, the snapshot and coach_erase_person().
 -- Guarded textual patches, like stages 76/79/94/99: each line is found exactly once or the stage refuses and changes nothing. Safe to re-run.
--- The way back: scripts/career/rollback_stage101.sql. Rehearsed on PGlite: scripts/career/rehearse_honours_confirmed.mjs.
+-- The way back: scripts/career/rollback_stage104.sql. Rehearsed on PGlite: scripts/career/rehearse_honours_confirmed.mjs.
 
 -- ── 0. The guard ───────────────────────────────────────────────────────────
 do $stage101_guard$

@@ -49,12 +49,12 @@ are one file each — 20,809 lines, 12,831 and 9,613 — so [`ref/line-map/`](re
 names every top-level function with its line number, grouped by the area of the app it belongs
 to, with the named style blocks and the screens. It is **generated** by
 [`../scripts/build_line_map.py`](../scripts/build_line_map.py) from the files themselves and
-never hand-edited; pre-commit guard 26 fails a commit whose map is stale. It is reference of the
+never hand-edited; pre-commit guard 26 fails a commit whose map is stale, missing a part, or left with a part nothing writes. A map that would pass 30 KB is split by area, never squeezed (split, don't swell). It is reference of the
 purest kind: it points at code and restates no rule.
 
 | Map | For |
 |---|---|
-| [`ref/line-map/program-app.md`](ref/line-map/program-app.md) | `program.html` |
+| [`ref/line-map/program-app.md`](ref/line-map/program-app.md) and [`program-app-2.md`](ref/line-map/program-app-2.md) | `program.html`, split by area (the first names the second at its top; a third appears by itself when needed) |
 | [`ref/line-map/habits.md`](ref/line-map/habits.md) | `habits.html` |
 | [`ref/line-map/coach-dashboard.md`](ref/line-map/coach-dashboard.md) | `coach.html` |
 | [`ref/line-map/service-worker.md`](ref/line-map/service-worker.md) | `sw.js` |

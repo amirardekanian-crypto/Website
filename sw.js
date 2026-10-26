@@ -523,7 +523,11 @@
 // v234: program.html changed (2026-10-25, Amir: direction A of "Your numbers, one card", "wow A is gorgeous"). Achievements is the last row of Your
 // numbers (its three newest emblems, N of M, N new), Share your card is a small "Share ↗" beside the title, Your moments has no door (his short lines
 // are on the Coach tab under Notes from Amir, the trophies in the cabinet), and From your habits opens the cabinet on its Habits shelf. Also emblems.js ?v=2 (AAEmblem.honour, the honour trophies, not yet shown).
-const CACHE = 'aap-v234';
+// v235: program.html and coach.html changed (2026-10-25, Home Crowd steps 2-4; Amir: "90A", "85 amazing", "add 87 as well", "add 88 like 85",
+// "go live with all the build"). A tray beside the initials opens the Inbox (stage101), with Cheer back and Say hello; a folded crew notification
+// opens it. Crew gets the weekly Toss card with the week's photo (stage102); the Coach tab gets Ask for the crew; an answer shows its question on the
+// Bell; the Library gets Asked by the crew; every post has a reply line; a member who never posted gets a hello draft. coach.html: Proof is Crew.
+const CACHE = 'aap-v235';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -724,7 +728,10 @@ self.addEventListener('push', event => {
   // and a crew one (stage86) on the Bell itself rather than on Home — program.html reads the #crew
   // hash on the way in and then clears it, so a reload does not jump back there.
   // Habits open the training app: they live on its Today card now, and AA Proof (habits.html) is being retired (2026-10-20).
-  const url = d.url || (kind === 'crew' ? '/program.html#crew' : '/program.html');
+  // A crew notification that FOLDS several events (crew_push_words(), n > 1: "The crew has been busy" / "تو تیم خبر هست") opens the Inbox (Home Crowd step 2d, idea 90); one that names a single
+  // event keeps landing on the Crew tab (step 1, idea 77). program.html reads the #inbox hash the same way it reads #crew.
+  const folded = kind === 'crew' && (d.title === 'The crew has been busy' || d.title === 'تو تیم خبر هست');
+  const url = d.url || (kind === 'crew' ? (folded ? '/program.html#inbox' : '/program.html#crew') : '/program.html');
   event.waitUntil(
     self.registration.showNotification(title, {
       body: d.body || '',

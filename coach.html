@@ -629,7 +629,7 @@
   .court .cs .mic .row { margin-top: 8px; }
   @media (max-width: 899px) and (pointer: coarse) { .mic textarea { font-size: 16px; } }
   .court .cs-eb { margin-top: 4px; }
-  /* The reminder: the month's honours wait for Amir (stage101). Same rows as the honours, in a bordered box at the top of Courtside. */
+  /* The reminder: the month's honours wait for Amir (stage104). Same rows as the honours, in a bordered box at the top of Courtside. */
   .court .hrem { border: 1px solid var(--line); border-radius: 12px; padding: 12px 12px 4px; margin-bottom: 16px; }
   .court .hrem-t { font-size: 17px; font-weight: 600; line-height: 1.3; }
   .court .hrem-l { margin-top: 4px; font-size: 14px; line-height: 1.4; color: var(--muted); }
@@ -726,6 +726,34 @@
   .open-f .segs { align-self: flex-start; }
   .open-in { width: 100%; height: 32px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; font-size: 14px; }
   textarea.open-in { height: auto; min-height: 64px; padding: 8px 12px; line-height: 1.45; resize: vertical; }
+  /* ── The Crew desk (stage102): This week (the Toss, next week, the photo, the Mailbag) and This month, first on the Crew tab. ── */
+  .cw-sec { padding: 16px 0; border-top: 1px solid var(--rule); }
+  .cw-sec:first-of-type { border-top: 0; padding-top: 4px; }
+  .cw-sec .eyebrow { margin-bottom: 8px; }
+  .cw-sides { display: grid; gap: 8px; margin-top: 12px; }
+  .cw-sl { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+  .cw-n { font-variant-numeric: tabular-nums; }
+  .cw-bar { height: 8px; margin-top: 4px; border-radius: 999px; background: var(--rule); overflow: hidden; }
+  .cw-bar i { display: block; height: 100%; border-radius: 999px; background: var(--clay-fill); }
+  .cw-bankn { margin-top: 8px; }
+  .cw-bank { margin-top: 12px; border-top: 1px solid var(--rule); }
+  .cw-bank-row { padding: 8px 0; border-bottom: 1px solid var(--rule); }
+  .cw-bank-top { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; }
+  .cw-bank-top .when { font-size: 12px; color: var(--muted); min-width: 52px; }
+  .cw-bank-q { flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; }
+  .cw-bank-acts { display: flex; gap: 8px; margin-left: auto; }
+  .cw-cnt { font-variant-numeric: tabular-nums; font-weight: 400; color: var(--muted-soft); }
+  .cw-err { margin: 8px 0 0; font-size: 14px; color: var(--clay-ink); }
+  .cw-q { padding: 12px 0; border-top: 1px solid var(--rule); }
+  .cw-q .bell-top .when { margin-left: auto; }
+  .cw-qt { white-space: pre-line; }
+  .cw-at { margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--rule); }
+  .cw-ans textarea.open-in { min-height: 88px; }
+  .cw-done { margin-top: 12px; }
+  .cw-asked { margin: 4px 0 8px; padding-left: 12px; border-left: 2px solid var(--rule); }
+  .cw-asked .eyebrow { margin-bottom: 4px; }
+  .cw-askq { font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+  .cw-open { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rule); }
   .open-in:focus { border-color: var(--court); }
   .open-hint { margin-top: 8px; }
   .open-eb { margin: 16px 0 4px; }
@@ -1527,6 +1555,7 @@ const TABLE_KEYS = {
   // No id column in these three (stage81, 84, 85): paged by ['id'] they could not be read, and every backup was INCOMPLETE (2026-10-20).
   crew_consent: ['athlete_id'], push_subs: ['endpoint'], crew_open_results: ['open_id', 'athlete_id'],
   career_goals: ['athlete_id', 'month'], career_notes: ['athlete_id', 'day'],
+  crew_weeks: ['week_start'], crew_toss_votes: ['week_start', 'athlete_id'],   // stage102: no id column
 };
 function keysOf(table) {
   return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys', 'athlete_status', 'career_scores', 'athlete_profile']
@@ -1803,6 +1832,7 @@ const S = {
   gameOff: false,
   faces: {},       // athlete_id -> { fv, src }: the crew faces, read once per load by loadFaces(); empty while the server has no coach_crew_faces()
   cheers: null,    // { on, rows, err }: coach_crew_cheers(), the last 7 days; on is false while the server has none (loadCheers())
+  crewWeekly: null, // { on, data, err, at }: coach_crew_weekly() (stage102), the Toss, the bank and the Mailbag; on is false while the server has none (loadCrewWeekly())
   cheerDone: {},   // athlete_id -> the server's UTC day Amir cheered them from this page (the list above can lag a write)
   partner: null,   // { on, rows, err }: coach_partner_codes() (stage97); on is false while the server has none (loadPartner())
   partnerDone: {}, // intake id -> the athlete code this page credited it to (the server's list does not say which application a credit came from)
@@ -1912,7 +1942,7 @@ const LOAD_ERR_LABEL = {
   assess: 'testing-app logins', course: 'course logins', buyerNotes: 'your notes about buyers', spine: 'the exercise library (Spine)',
   affiliates: 'affiliate codes', chats: 'website chats', status: 'paused and former marks', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
   court: 'Courtside, the goals and your lines', bell: 'the Bell (the crew\'s posts and answers)', bellReplies: 'the replies under the crew\'s posts', open: 'the Monthly Open',
-  faces: 'the crew\'s photos', cheers: 'the crew\'s cheers', partner: 'the athletes\' partner codes',
+  crewWeekly: 'the crew\'s week and Mailbag', faces: 'the crew\'s photos', cheers: 'the crew\'s cheers', partner: 'the athletes\' partner codes',
 };
 function paintLoadWarn() {
   const lw = $('loadwarn'), warn = loadWarnHtml();
@@ -2271,6 +2301,9 @@ const BACKUP_TABLES = [
   // day stage85 is applied, in the same commit as the new schema snapshot (test_restore_backup.py check 1h holds the two equal, and it reads the
   // quoted names out of this block, so do not write a table name in quotes in a comment). Applied 2026-10-19, so here they are:
   'crew_open', 'crew_open_results',
+  // The weekly Toss, its votes and the Mailbag (stage102) are records too: the bank is Amir's own words for months ahead, and an answered
+  // question is the Answer Book. None of them is swept after 7 days.
+  'crew_weeks', 'crew_toss_votes', 'crew_questions',
   'athlete_profile', 'referral_credits',
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
@@ -2971,7 +3004,7 @@ const TABS = [
   { id: 'today', label: 'Today' },
   { id: 'athletes', label: 'Athletes' },
   { id: 'exercises', label: 'Exercises' },
-  { id: 'proof', label: 'Proof' },
+  { id: 'proof', label: 'Crew' },
   { id: 'leads', label: 'Leads' },
   { id: 'links', label: 'Library' },
   { id: 'buyers', label: 'Buyers' },
@@ -2996,7 +3029,7 @@ const LEAD_SUBS = ['signups', 'codes', 'chats'];
 const BUYER_SUBS = ['testing'];
 // The addresses of the nine-tab dashboard (until 2026-10-12): bookmarks, old links and the harness still use them. They land in the new place and the
 // address bar is rewritten in place (fixLegacyHash), so there is no extra history entry.
-const LEGACY_ADDR = { intake: 'leads', affiliates: 'leads/codes', assess: 'buyers/testing', course: 'buyers' };
+const LEGACY_ADDR = { crew: 'proof', intake: 'leads', affiliates: 'leads/codes', assess: 'buyers/testing', course: 'buyers' };
 function fixLegacyHash() {
   const h = (location.hash || '').slice(1);
   if (!Object.prototype.hasOwnProperty.call(LEGACY_ADDR, h)) return;
@@ -3029,6 +3062,7 @@ function renderRail() {
   const newIntake = newApplications();
   const tabHtml = t => {
     const badge = (t.id === 'athletes' && waiting > 0) ? `<span class="n" title="${waiting} note${waiting === 1 ? '' : 's'} to read">${waiting}</span>`
+                : (t.id === 'proof' && mailbagOpen() > 0) ? `<span class="n" title="${mailbagOpen()} question${mailbagOpen() === 1 ? '' : 's'} waiting in the Mailbag">${mailbagOpen()}</span>`
                 : (t.id === 'leads' && newIntake > 0) ? `<span class="n" title="${newIntake} new application${newIntake === 1 ? '' : 's'}">${newIntake}</span>` : '';
     return `<a class="tab${active === t.id ? ' active' : ''}" href="#${t.id}"${active === t.id ? ' aria-current="page"' : ''}>${t.label}${badge}</a>`;
   };
@@ -3065,6 +3099,7 @@ async function hardRefresh() {
   loadBell();
   loadOpen();
   loadLounge();
+  loadCrewWeekly();
 }
 let _lastViewKey = '', _scrollMem = {}, _viaHistory = false, _pendingScroll = null;
 // Back keeps your place (audit BROWSER-4, 2026-10-11). A new screen starts at the top, but going Back to one you left lands where you were on it:
@@ -3122,7 +3157,7 @@ window.addEventListener('hashchange', ev => {
 // Every other way out (a pick, a tap on the scrim, Esc, More again, a tap on the bar) goes back over that entry first and a pick navigates after it, so
 // no dead step is left in the history. With the sheet closed nothing here touches the history. Opening it closes ⚙ Tools and the reverse.
 const BAR_IDS = ['today', 'athletes', 'exercises'];
-const MORE_NOTE = { proof: 'Wall, board, quests', leads: 'Applications, signups, codes', links: 'Workouts and articles', buyers: 'Course and Testing app logins' };
+const MORE_NOTE = { proof: 'The week, the Mailbag, the wall', leads: 'Applications, signups, codes', links: 'Workouts and articles', buyers: 'Course and Testing app logins' };
 let _moreOpen = false, _moreGuard = false, _moreWait = null, _barHtml = '', _sheetHtml = '', _shownHash = '';
 const isPhoneBar = () => window.matchMedia('(max-width: 599px)').matches;
 function paintBotBar(active, waiting, newIntake) {
@@ -3135,7 +3170,7 @@ function paintBotBar(active, waiting, newIntake) {
   const on = id => active === id ? ' active' : '', cur = id => active === id ? ' aria-current="page"' : '';
   const bhtml = forBar.map(t => `<a class="bb-item${on(t.id)}" href="#${t.id}"${cur(t.id)} onclick="return navTap(event)"><span class="bb-l">${t.label}${t.id === 'athletes' ? notes : ''}</span></a>`).join('')
     + `<button type="button" id="moreBtn" class="bb-item${forMore.some(t => t.id === active) ? ' active' : ''}" aria-haspopup="true" aria-expanded="false" aria-controls="moreSheet" onclick="toggleMore(event)"><span class="bb-l">More${apps}</span></button>`;
-  const shtml = forMore.map(t => `<a class="ms-row${on(t.id)}" href="#${t.id}"${cur(t.id)} onclick="return navTap(event)"><span class="ms-text"><span class="ms-name">${t.label}</span>${MORE_NOTE[t.id] ? `<span class="ms-note">${MORE_NOTE[t.id]}</span>` : ''}</span>${t.id === 'leads' ? apps : ''}</a>`).join('');
+  const shtml = forMore.map(t => `<a class="ms-row${on(t.id)}" href="#${t.id}"${cur(t.id)} onclick="return navTap(event)"><span class="ms-text"><span class="ms-name">${t.label}</span>${MORE_NOTE[t.id] ? `<span class="ms-note">${MORE_NOTE[t.id]}</span>` : ''}</span>${t.id === 'leads' ? apps : t.id === 'proof' ? badge(mailbagOpen(), `${mailbagOpen()} question${mailbagOpen() === 1 ? '' : 's'} waiting in the Mailbag`) : ''}</a>`).join('');
   // Rewritten only when it changed, so a redraw does not take the focus away.
   const hadFocus = document.activeElement && document.activeElement.id === 'moreBtn';
   if (bhtml !== _barHtml) { bar.innerHTML = bhtml; _barHtml = bhtml; if (hadFocus && $('moreBtn')) $('moreBtn').focus(); }
@@ -3409,7 +3444,7 @@ function courtWeek() {
 }
 const monthOf = iso => String(iso).slice(0, 7) + '-01';
 function lastMonthKey() { const t = todayKey(); return dkey(new Date(+t.slice(0, 4), +t.slice(5, 7) - 2, 1)); }
-// Stage101: the month the honours are about. The month just gone, except on a month's LAST day, when the reminder starts and it is this month ("so far").
+// Stage104: the month the honours are about. The month just gone, except on a month's LAST day, when the reminder starts and it is this month ("so far").
 function honoursMonthKey() { const t = todayKey(); return new Date(+t.slice(0, 4), +t.slice(5, 7) - 1, +t.slice(8) + 1).getDate() === 1 ? monthOf(t) : lastMonthKey(); }
 function monthName(iso) { return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+String(iso).slice(5, 7) - 1] || ''; }
 const firstWord = s => String(s || '').trim().split(/\s+/)[0] || '';
@@ -3435,7 +3470,7 @@ async function loadCourt() {
   S.goals = {}; ((goals && !goals.error && goals.data) || []).forEach(g => { (S.goals[g.athlete_id] = S.goals[g.athlete_id] || {})[g.month] = g; });
   S.amirNotes = {}; ((notes && !notes.error && notes.data) || []).forEach(n => { (S.amirNotes[n.athlete_id] = S.amirNotes[n.athlete_id] || []).push(n); });
   LOAD_ERR.court = cs.error ? cs.error.message : goals && goals.error ? goals.error.message : notes && notes.error ? notes.error.message : '';
-  if (S.honours && !S.honours.err && !S.honours.frozen && Number(todayKey().slice(8)) >= 8 && m < monthOf(todayKey())) {   // from the 8th, quietly: with stage101 this saves SUGGESTIONS, nothing reaches an athlete
+  if (S.honours && !S.honours.err && !S.honours.frozen && Number(todayKey().slice(8)) >= 8 && m < monthOf(todayKey())) {   // from the 8th, quietly: with stage104 this saves SUGGESTIONS, nothing reaches an athlete
     const r = await sb.rpc('coach_honours_freeze', { p_month: m, p_not_clients: COURT_NOT_CLIENTS });
     if (!r.error && r.data) S.honours = r.data;
   }
@@ -3456,6 +3491,7 @@ function paintCourt() {
       if (keep && $('whyIn')) { $('whyIn').focus(); try { $('whyIn').setSelectionRange(keep[0], keep[1]); } catch (e) { /* a field with no selection */ } }
     } else if (!!el !== on) render();
   } else if (r.view === 'detail' && on) render();
+  else if (r.view === 'proof') paintCrewMonth();   // the honours on Crew (This month) are the same function Courtside calls
 }
 
 // The week's rows, one group per athlete per day (the coach's day), the biggest moment leading, then the newest. Clients only (the server
@@ -3552,8 +3588,8 @@ async function courtAct(id, idsCsv, what) {
 window.courtAct = courtAct;
 
 // The month just gone: frozen rows once frozen, else the live work. Winners are clients only.
-// Stage101: a row counts as the athletes' only when Amir confirmed its honour; the unconfirmed ones are SUGGESTIONS (conf false), drawn in the reminder card.
-// A server before stage101 sends no `confirmed`: every row is already live for the athletes, and the page behaves as it always did (legacy).
+// Stage104: a row counts as the athletes' only when Amir confirmed its honour; the unconfirmed ones are SUGGESTIONS (conf false), drawn in the reminder card.
+// A server before stage104 sends no `confirmed`: every row is already live for the athletes, and the page behaves as it always did (legacy).
 const HON3 = ['sessions', 'improved', 'full_month'];
 const honLegacy = h => !h || h.confirmed === undefined;
 function honoursData() {
@@ -3617,7 +3653,7 @@ function honoursHtml(expanded) {
   if (!d) return '';
   const mn = monthName(d.month), out = [], pickMsg = fillLine(COURT_LINES.amirs_pick, { month: mn });
   const send = (honour, x, msg, label) => courtSendHtml(x.id, msg, () => `honourSent(${jsq(d.month)}, '${honour}', ${jsq(x.id)})`, label) + (x.sent ? '<span class="muted t-sm">sent ✓</span>' : '');
-  const card = honRemindOn();   // stage101: the reminder card holds what is not confirmed yet, and the Pick while it is up
+  const card = honRemindOn();   // stage104: the reminder card holds what is not confirmed yet, and the Pick while it is up
   d.sessions.forEach(x => { const msg = fillLine(COURT_LINES.honour_sessions, { month: mn, n: x.n }); out.push(honRow('Most sessions', `${nameOf(x.id)}, ${x.n} plan session${x.n === 1 ? '' : 's'}`, msg, send('sessions', x, msg))); });
   d.improved.forEach(x => { const msg = fillLine(COURT_LINES.honour_improved, { month: mn, lift: x.lift, pct: x.pct }); out.push(honRow('Most improved', `${nameOf(x.id)}, ${x.lift} +${x.pct}% at the same effort`, msg, send('improved', x, msg))); });
   if (!d.conf.full_month) { /* a suggestion: the reminder card */ }
@@ -3631,11 +3667,11 @@ function honoursHtml(expanded) {
   return expanded ? `<div class="eyebrow cs-eb">${esc(mn)} honours</div>${out.join('')}`
                   : `<details class="cs-fold" id="courtHon"><summary>${esc(mn)} honours</summary>${out.join('')}</details>`;
 }
-// ── The month's honours wait for Amir (stage101; Amir 2026-10-25, board https://claude.ai/artifact/9JYRa93PVAYZSH4pRw2rhs, "The reminder in coach.html") ──
+// ── The month's honours wait for Amir (stage104; Amir 2026-10-25, board https://claude.ai/artifact/9JYRa93PVAYZSH4pRw2rhs, "The reminder in coach.html") ──
 // From the LAST day of the month until all four honours of that month are confirmed (it stays into the next month): one row per honour. The app
 // suggests the winner of Most sessions and Most improved and the athletes who earned Full Month, from the numbers; Amir confirms with one tap, or
 // changes it (another athlete). His Pick is the existing pick flow. Nothing reaches an athlete, the Bell or a phone until he confirms that honour.
-// A server before stage101 sends no `confirmed`: no card, and the honours behave as they always did.
+// A server before stage104 sends no `confirmed`: no card, and the honours behave as they always did.
 let _chg = {}, _fullDraft = null, _honOpen = false;   // _honOpen: the honours fold opens on the next repaint (after the Pick, whose reason box moves there when the card goes)
 function honRemindOn() {
   const h = S.honours;
@@ -3691,7 +3727,7 @@ async function honourConfirm(btn, month, honour, idsOverride) {
   const r = await sb.rpc('coach_honour_confirm', { p_month: month, p_honour: honour, p_athlete_ids: ids, p_not_clients: COURT_NOT_CLIENTS });
   if (btn && btn.isConnected) btn.disabled = false;
   if (r.error) {
-    if (courtMissing(r.error)) { fail('Confirming honours needs the newer server (stage101).'); return; }
+    if (courtMissing(r.error)) { fail('Confirming honours needs the newer server (stage104).'); return; }
     fail('Not confirmed: ' + r.error.message); return;
   }
   S.honours = r.data; _fullDraft = null; _chg[honour] = '';
@@ -6935,10 +6971,11 @@ function drawProof(rows) {
   $('content').innerHTML = `
     <div class="cols" style="margin-top:0">
       <div class="colstack">
+        ${crewWeekPanelHtml()}
+        ${crewMonthPanelHtml()}
         <section class="panel" id="wallPanel">${wallPanelHtml()}</section>
         ${bellPanelsHtml()}
         ${cheersPanelHtml()}
-        ${openPanelHtml()}
         <section class="panel" id="boardPanel">${boardPanelHtml(rows)}</section>
       </div>
       <div class="colstack">
@@ -7202,7 +7239,7 @@ function bellPostHtml(p) {
   const name = p.amir ? 'You (Amir)' : (p.who || nameOf(p.athlete_id));
   return `<div class="bell-post${p.seen === false ? ' unseen' : ''}">
       <div class="bell-top"><b class="nm">${esc(name)}</b>${real && real !== name ? `<span class="muted">${esc(real)}</span>` : ''}${p.kind === 'session' ? '<span class="chip">Session</span>' : ''}<span class="when" title="${esc(new Date(p.at).toLocaleString())}">${esc(bellWhen(p.at))}</span></div>
-      ${p.body ? `<div class="txt" dir="auto">${esc(p.body)}</div>` : ''}
+      ${askedHtml(p)}${p.body ? `<div class="txt" dir="auto">${esc(p.body)}</div>` : ''}
       ${p.photo ? `<div class="bell-ph" id="bellPh-${esc(p.id)}">${bellPhotoHtml(p.id)}</div>` : ''}
       <div class="bell-acts">
         <span class="muted t-sm">${Number(p.kudos) || 0} likes</span>
@@ -7584,6 +7621,255 @@ async function cheerWordClearNow(id) {
   loadCheers().then(paintCheers);
 }
 Object.assign(window, { cheerWordClear, paintCheers, loadCheers });
+
+// ── The Crew desk (stage102; Home Crowd step 3: ideas 85, 87 and 88, desk direction A "Proof becomes Crew") ───────────────────────────────────
+// The Proof tab is the Crew tab (AA Proof is retiring). Its address stays #proof (every old link lands here; #crew is rewritten to it by LEGACY_ADDR).
+// Its first panel, This week, is run from coach_crew_weekly() and its four writes, all coach-only: the Toss (this week's two-sided question and its votes,
+// Close early), next week (Change, Skip a week, the bank of weeks ahead), this week's photo theme, and the Mailbag (Answer posts Amir's pinned crew post with
+// the question quoted; Drop takes a question off without telling the asker). Every write answers with the whole object again, so the panel is drawn from the
+// answer. The second panel, This month, is the month's honours drawn by honoursHtml(), the function Courtside calls (never a copy), and the Monthly Open.
+// A server before stage102 has none of the five functions: no panel, no badge. The tab's clay count is the number of open questions.
+const CREW_Q_MAX = 80, CREW_SIDE_MAX = 30, CREW_THEME_MAX = 60, CREW_ANS_MAX = 280;
+let _crewSeq = 0, _crewEdit = null, _crewAns = null, _crewBusy = false, _crewBank = false;   // the read in flight; the week being written (its draft); the question being answered; a write on its way; the bank open
+const crewData = () => (S.crewWeekly && S.crewWeekly.on && S.crewWeekly.data) || null;
+const mailbagAll = () => (crewData() || {}).questions || [];
+function mailbagOpen() { return mailbagAll().filter(q => !q.answered_at).length; }
+const crewDay = w => String((w && w.week) || w || '').slice(0, 10);
+const crewAddDays = (key, n) => { const t = pDate(key); t.setDate(t.getDate() + n); return dkey(t); };
+const crewWeekRow = key => ((crewData() || {}).weeks || []).find(w => crewDay(w) === key) || null;
+async function loadCrewWeekly() {
+  if (DEMO) return;
+  const seq = ++_crewSeq;
+  const res = await loungeRpc('coach_crew_weekly');
+  if (seq !== _crewSeq) return;
+  if (loungeMissing(res)) { S.crewWeekly = { on: false, data: null, err: '', at: new Date() }; LOAD_ERR.crewWeekly = ''; }
+  else if (res.error) { S.crewWeekly = { on: true, data: (S.crewWeekly && S.crewWeekly.data) || null, err: res.error.message || 'no answer', at: new Date() }; LOAD_ERR.crewWeekly = S.crewWeekly.err; }
+  else { S.crewWeekly = { on: true, data: res.data || {}, err: '', at: new Date() }; LOAD_ERR.crewWeekly = ''; }
+  paintCrewWeekly();
+}
+// Draw what changed where it stands. A box being typed in is never redrawn under the typing hand (the next write or Reload draws it).
+function paintCrewWeekly(force) {
+  if (!S.ready) return;
+  renderRail();
+  if (route().view !== 'proof') return;
+  const on = !!(S.crewWeekly && S.crewWeekly.on), el = $('crewWeekPanel');
+  if (!!el !== on) { render(); return; }
+  if (!el) return;
+  const f = document.activeElement;
+  if (!force && f && el.contains(f) && /^(INPUT|TEXTAREA)$/.test(f.tagName)) return;
+  el.innerHTML = crewWeekHtml();
+}
+function crewWeekPanelHtml() {
+  return S.crewWeekly && S.crewWeekly.on ? `<section class="panel" id="crewWeekPanel">${crewWeekHtml()}</section>` : '';
+}
+function crewWeekHtml() {
+  const c = S.crewWeekly, d = c.data, at = c.at;
+  const head = `<div class="phead"><span class="t hd">This week</span><span class="r">${at ? `As of ${pad2(at.getHours())}:${pad2(at.getMinutes())}. ` : ''}<button class="btn sm quiet" onclick="loadCrewWeekly()">↻ Reload</button></span></div>`;
+  if (!d) return `${head}<p class="empty">The crew's week did not load: ${esc(c.err || 'no answer')}. <button class="btn sm" onclick="loadCrewWeekly()">↻ Try again</button></p>`;
+  const wk = crewDay(d.week), nx = crewAddDays(wk, 7);
+  return `${head}${c.err ? `<p class="muted t-sm">The last read failed (${esc(c.err)}), so this may be old. <button class="btn sm" onclick="loadCrewWeekly()">↻ Try again</button></p>` : ''}
+    ${crewTossHtml(d, wk)}${crewNextHtml(d, nx)}${crewThemeHtml(d, wk)}${crewMailbagHtml(d)}`;
+}
+// The Toss, this week: how many voted, the question, the two sides as two bars, Close early.
+function crewTossHtml(d, wk) {
+  const w = crewWeekRow(wk), has = !!(w && w.q);
+  const body = has ? (() => {
+    const va = Number(w.va) || 0, vb = Number(w.vb) || 0, tot = va + vb, pc = n => tot ? Math.round(n * 100 / tot) : 0;
+    const side = (label, n) => `<div class="cw-side"><div class="cw-sl"><span dir="auto">${esc(label)}</span><b class="cw-n">${n}</b></div><div class="cw-bar"><i style="width:${pc(n)}%"></i></div></div>`;
+    return `<div class="muted t-sm">${tot} of ${Number(d.members) || 0} voted</div>
+      <div class="open-title" dir="auto">${esc(w.q)}</div>
+      <div class="cw-sides">${side(w.a, va)}${side(w.b, vb)}</div>
+      <div class="open-acts">${w.closed ? '<span class="chip">Closed</span>' : `<button class="btn sm" onclick="crewClose()">Close early</button>`}</div>`;
+  })() : `<p class="empty">No question this week</p><div class="open-acts"><button class="btn sm" onclick="crewEditOpen(${jsq(wk)})">Write one</button></div>`;
+  return `<div class="cw-sec"><div class="eyebrow">The Toss · this week</div>${body}${crewEditHtml(wk)}</div>`;
+}
+// Next week: its question, what is left in the bank, Change, Skip a week, Open the bank.
+function crewNextHtml(d, nx) {
+  const w = crewWeekRow(nx), has = !!(w && w.q);
+  const more = ((d.weeks || []).filter(x => crewDay(x) > nx && x.q) || []).length;
+  const body = has
+    ? `<div class="open-title" dir="auto">${esc(w.q)}</div><div class="muted t-sm" dir="auto">${esc(w.a)} or ${esc(w.b)}</div>`
+    : '<p class="empty">Nothing set for next week</p>';
+  const acts = has
+    ? `<button class="btn sm" onclick="crewEditOpen(${jsq(nx)})">Change</button><button class="btn sm" onclick="crewSkip(${jsq(nx)})">Skip a week</button>`
+    : `<button class="btn sm" onclick="crewEditOpen(${jsq(nx)})">Write one</button>`;
+  return `<div class="cw-sec"><div class="eyebrow">Next week · ${esc(dayMonth(nx))}</div>${body}
+    <div class="muted t-sm cw-bankn">${more} more in the bank</div>
+    <div class="open-acts">${acts}<button class="btn sm quiet" onclick="crewBankToggle()">${_crewBank ? 'Close the bank' : 'Open the bank'}</button></div>
+    ${crewEditHtml(nx)}${_crewBank ? crewBankHtml(d, nx) : ''}</div>`;
+}
+// Every week ahead (the server keeps 20), each editable the same way.
+function crewBankHtml(d, nx) {
+  const rows = [];
+  for (let i = 1; i < 20; i++) {
+    const k = crewAddDays(nx, 7 * i), w = crewWeekRow(k), has = !!(w && w.q);
+    rows.push(`<div class="cw-bank-row">
+        <div class="cw-bank-top"><span class="when">${esc(dayMonth(k))}</span><span class="cw-bank-q" dir="auto">${has ? esc(w.q) : '<span class="muted">Empty</span>'}</span>
+          <span class="cw-bank-acts"><button class="btn sm quiet" onclick="crewEditOpen(${jsq(k)})">${has ? 'Change' : 'Write'}</button>${has ? `<button class="btn sm quiet" onclick="crewSkip(${jsq(k)})">Skip</button>` : ''}</span></div>
+        ${w && w.theme && !has ? `<div class="muted t-sm" dir="auto">Photo: ${esc(w.theme)}</div>` : ''}
+        ${crewEditHtml(k)}</div>`);
+  }
+  return `<div class="cw-bank">${rows.join('')}</div>`;
+}
+// This week's photo: the theme, and how many posts the crew has made this week when the Bell is loaded.
+function crewThemeHtml(d, wk) {
+  const w = crewWeekRow(wk), b = S.bell;
+  let line = '';
+  if (b && b.on && !b.err) {
+    const from = pDate(wk).getTime(), n = (b.posts || []).filter(p => !p.amir && new Date(p.at).getTime() >= from).length;
+    line = `<div class="muted t-sm">${n} post${n === 1 ? '' : 's'} so far</div>`;
+  }
+  return `<div class="cw-sec"><div class="eyebrow">This week's photo</div>
+    ${w && w.theme ? `<div class="open-title" dir="auto">${esc(w.theme)}</div>` : '<p class="empty">No photo theme this week</p>'}${line}</div>`;
+}
+// The editor under whichever row asked for it: question ≤80, two sides ≤30, theme ≤60, each with a counter. All three of question and sides, or none.
+function crewEditHtml(week) {
+  const e = _crewEdit;
+  if (!e || e.week !== week) return '';
+  const f = (k, label, max, ph) => `<label class="open-f"><span>${label} <span class="cw-cnt" data-cnt="${k}">${(e[k] || '').length}/${max}</span></span><input class="open-in" id="cwE-${k}" maxlength="${max}" dir="auto" value="${esc(e[k] || '')}" placeholder="${esc(ph)}" oninput="crewEditType('${k}', this, ${max})"${_crewBusy ? ' disabled' : ''}></label>`;
+  return `<div class="open-box cw-edit" id="cwEdit">
+      <div class="cap eyebrow">Week of ${esc(dayMonth(week))}</div>
+      <div class="open-form">
+        ${f('q', 'Question', CREW_Q_MAX, 'When do you train best?')}
+        <div class="open-grid two">${f('a', 'Side A', CREW_SIDE_MAX, 'Morning')}${f('b', 'Side B', CREW_SIDE_MAX, 'Evening')}</div>
+        ${f('theme', "Photo theme (empty clears it)", CREW_THEME_MAX, 'Your shoes after a session')}
+      </div>
+      ${e.err ? `<p class="cw-err">${esc(e.err)}</p>` : ''}
+      <div class="open-acts"><button class="btn sm primary" onclick="crewEditSave()"${_crewBusy ? ' disabled' : ''}>${_crewBusy ? 'Saving…' : 'Save'}</button><button class="btn sm quiet" onclick="crewEditCancel()"${_crewBusy ? ' disabled' : ''}>Cancel</button></div>
+    </div>`;
+}
+function crewEditOpen(week) {
+  if (_crewBusy) return;
+  const w = crewWeekRow(week) || {};
+  _crewEdit = { week, q: w.q || '', a: w.a || '', b: w.b || '', theme: w.theme || '', err: '' };
+  paintCrewWeekly(true);
+  const q = $('cwE-q'); if (q) { q.focus({ preventScroll: true }); if (q.scrollIntoView) q.scrollIntoView({ block: 'nearest' }); }
+}
+function crewEditCancel() { if (_crewBusy) return; _crewEdit = null; paintCrewWeekly(true); }
+function crewEditType(k, inp, max) {
+  if (!_crewEdit) return;
+  _crewEdit[k] = inp.value;
+  const c = document.querySelector('#cwEdit [data-cnt="' + k + '"]'); if (c) c.textContent = inp.value.length + '/' + max;
+}
+async function crewEditSave() {
+  const e = _crewEdit;
+  if (!e || _crewBusy) return;
+  const q = String(e.q || '').trim(), a = String(e.a || '').trim(), b = String(e.b || '').trim(), theme = String(e.theme || '').trim();
+  const filled = [q, a, b].filter(Boolean).length;
+  if (filled !== 0 && filled !== 3) { e.err = 'Fill the question and both sides, or leave all three empty.'; paintCrewWeekly(true); return; }
+  if (q.length > CREW_Q_MAX || a.length > CREW_SIDE_MAX || b.length > CREW_SIDE_MAX || theme.length > CREW_THEME_MAX) { e.err = 'One of the boxes is over its limit.'; paintCrewWeekly(true); return; }
+  const w = crewWeekRow(e.week), votes = w ? (Number(w.va) || 0) + (Number(w.vb) || 0) : 0;
+  if (w && w.q && votes > 0 && q !== w.q && !confirm(`This week's question already has ${votes} vote${votes === 1 ? '' : 's'}.\n\nA changed question deletes them. Save anyway?`)) return;
+  e.err = '';
+  const ok = await crewCall('coach_crew_week_set', { p_week: e.week, p_q: q || null, p_a: a || null, p_b: b || null, p_theme: theme }, 'Saved');
+  if (ok) _crewEdit = null;
+  paintCrewWeekly(true);
+}
+async function crewSkip(week) {
+  if (_crewBusy) return;
+  const w = crewWeekRow(week);
+  if (!confirm(`Skip the week of ${dayMonth(week)}?${w && w.q ? `\n\n"${w.q}" and the photo theme are cleared.` : ''}`)) return;
+  if (_crewEdit && _crewEdit.week === week) _crewEdit = null;
+  await crewCall('coach_crew_week_set', { p_week: week, p_q: null, p_a: null, p_b: null, p_theme: '' }, 'Week skipped');
+  paintCrewWeekly(true);
+}
+async function crewClose() {
+  const d = crewData();
+  if (!d || _crewBusy) return;
+  if (!confirm("Close this week's Toss now?\n\nThe crew sees the result and can no longer vote.")) return;
+  await crewCall('coach_crew_week_close', { p_week: crewDay(d.week) }, 'Toss closed');
+  paintCrewWeekly(true);
+}
+function crewBankToggle() { _crewBank = !_crewBank; paintCrewWeekly(true); }
+// One write: the answer is the whole object again, which the panel is drawn from. No database code means the answer never arrived (so it is read again).
+async function crewCall(name, params, done) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return false; }
+  if (_crewBusy) return false;
+  _crewBusy = true;
+  try {
+    const res = await loungeRpc(name, params);
+    if (res.error || !res.data || !Array.isArray(res.data.weeks)) {
+      const m = res.error ? String(res.error.message || '') : '';
+      if (res.error && res.error.code) fail('Could not save: ' + m);
+      else { fail(`The answer never arrived${m ? ' (' + m + ')' : ''}, so the page cannot tell whether it went through. The week is reloading: look at it before you try again.`); await loadCrewWeekly(); }
+      return false;
+    }
+    _crewSeq++;
+    S.crewWeekly = { on: true, data: res.data, err: '', at: new Date() }; LOAD_ERR.crewWeekly = '';
+    if (done) toast(done);
+    return true;
+  } finally { _crewBusy = false; }
+}
+// ── The Mailbag ──
+function crewMailbagHtml(d) {
+  const all = d.questions || [], open = all.filter(q => !q.answered_at), done = all.filter(q => q.answered_at);
+  const who = q => (S.ath[q.athlete_id] && S.ath[q.athlete_id].name) || nameOf(q.athlete_id);
+  const row = q => {
+    const mine = _crewAns && String(_crewAns.id) === String(q.id);
+    return `<div class="cw-q" data-id="${esc(q.id)}">
+      <div class="bell-top"><b class="nm">${esc(who(q))}</b><span class="chip">${q.ok_name ? 'first name OK' : 'no name'}</span><span class="when" title="${esc(new Date(q.at).toLocaleString())}">${esc(bellWhen(q.at))}</span></div>
+      <div class="txt cw-qt" dir="auto">${esc(q.body)}</div>
+      ${mine ? `<div class="from-box cw-ans"><textarea class="open-in" id="cwAns" maxlength="${CREW_ANS_MAX}" dir="auto" aria-label="Your answer" placeholder="Your answer" oninput="crewAnsType(this)"${_crewBusy ? ' disabled' : ''}>${esc(_crewAns.text)}</textarea>
+          <div class="from-row"><span class="cw-cnt" id="cwAnsCnt">${_crewAns.text.length}/${CREW_ANS_MAX}</span>
+            <button class="btn sm primary" onclick="crewAnswerSend(${jsq(q.id)})"${_crewBusy ? ' disabled' : ''}>${_crewBusy ? 'Posting…' : 'Post to the crew'}</button><button class="btn sm quiet" onclick="crewAnsCancel()"${_crewBusy ? ' disabled' : ''}>Cancel</button></div></div>`
+        : `<div class="open-acts"><button class="btn sm" onclick="crewAnsOpen(${jsq(q.id)})">Answer</button><button class="btn sm quiet" onclick="crewDrop(${jsq(q.id)})">Drop</button></div>`}
+    </div>`;
+  };
+  const dn = q => `<div class="cw-q done"><div class="bell-top"><b class="nm">${esc(who(q))}</b><span class="chip">${q.ok_name ? 'first name OK' : 'no name'}</span><span class="when">${esc(bellWhen(q.answered_at))}</span></div>
+      <div class="txt cw-qt" dir="auto">${esc(q.body)}</div><div class="txt cw-at" dir="auto"><b>You:</b> ${esc(q.answer || '')}</div></div>`;
+  return `<div class="cw-sec"><div class="eyebrow">Mailbag · ${open.length} waiting</div>
+    <div class="muted t-sm">Answered this month: ${Number(d.answered_month) || 0}</div>
+    ${open.length ? open.map(row).join('') : '<p class="empty">Nothing waiting.</p>'}
+    ${done.length ? `<details class="cw-done"><summary>Answered · ${done.length}</summary>${done.map(dn).join('')}</details>` : ''}</div>`;
+}
+function crewAnsOpen(id) {
+  if (_crewBusy) return;
+  _crewAns = { id, text: '' };
+  paintCrewWeekly(true);
+  const t = $('cwAns'); if (t) t.focus({ preventScroll: true });
+}
+function crewAnsCancel() { if (_crewBusy) return; _crewAns = null; paintCrewWeekly(true); }
+function crewAnsType(ta) { if (!_crewAns) return; _crewAns.text = ta.value; const c = $('cwAnsCnt'); if (c) c.textContent = ta.value.length + '/' + CREW_ANS_MAX; }
+async function crewAnswerSend(id) {
+  const a = _crewAns;
+  if (!a || _crewBusy || String(a.id) !== String(id)) return;
+  const text = String(a.text || '').trim();
+  if (!text) { fail('Write the answer first.'); return; }
+  if (text.length > CREW_ANS_MAX) { fail(`The answer is ${text.length} characters. Keep it to ${CREW_ANS_MAX}.`); return; }
+  if (!confirm('This goes on the Bell as your pinned post, with the question.')) return;
+  const ok = await crewCall('coach_question_answer', { p_id: Number(id), p_answer: text }, 'Posted to the crew');
+  if (ok) { _crewAns = null; loadBell(); }
+  paintCrewWeekly(true);
+}
+async function crewDrop(id) {
+  if (_crewBusy) return;
+  if (!confirm('Drop this question?\n\nIt leaves the Mailbag. The asker is not told.')) return;
+  if (_crewAns && String(_crewAns.id) === String(id)) _crewAns = null;
+  await crewCall('coach_question_drop', { p_id: Number(id) }, 'Question dropped');
+  paintCrewWeekly(true);
+}
+// A post that answers a question shows who asked and the question above the answer: the athlete app's words exactly ("MINA ASKED" / "SOMEONE ASKED").
+// The post carries it in session.ask {q, by}.
+function askedHtml(p) {
+  const ask = p && ((p.session && p.session.ask) || p.ask);
+  if (!ask || !ask.q) return '';
+  return `<div class="cw-asked"><div class="eyebrow">${esc(ask.by ? String(ask.by).toUpperCase() : 'SOMEONE')} ASKED</div><div class="cw-askq" dir="auto">${esc(ask.q)}</div></div>`;
+}
+// ── This month: the honours (honoursHtml, the one Courtside uses) and the Monthly Open ──
+function crewMonthPanelHtml() {
+  const hon = honoursHtml(true), open = openPanelHtml();
+  if (!hon && !open) return '';
+  return `<section class="panel" id="crewMonthPanel"><div class="phead"><span class="t hd">This month</span></div>
+      <div id="crewHon">${hon}</div>${open ? `<div class="cw-open">${open.replace('<section class="panel" id="openPanel">', '<div id="openPanel">').replace(/<\/section>\s*$/, '</div>')}</div>` : ''}</section>`;
+}
+function paintCrewMonth() {
+  const el = $('crewHon');
+  if (!el) return;
+  const f = document.activeElement, keep = f && f.id === 'whyIn' ? [f.selectionStart, f.selectionEnd] : null;
+  el.innerHTML = honoursHtml(true);
+  if (keep && $('whyIn')) { $('whyIn').focus(); try { $('whyIn').setSelectionRange(keep[0], keep[1]); } catch (e) { /* a field with no selection */ } }
+}
+Object.assign(window, { loadCrewWeekly, crewEditOpen, crewEditCancel, crewEditType, crewEditSave, crewSkip, crewClose, crewBankToggle, crewAnsOpen, crewAnsCancel, crewAnsType, crewAnswerSend, crewDrop, mailbagOpen, honoursHtml });
 
 // K6. The athletes' partner codes (stage97; Amir 2026-10-24: "the friend gets 10%, the member gets 10%"). An athlete makes a code in the app, or Amir makes one
 // here; the friend types it on the apply form and gets 10% off (check_discount() already answers it), and when that friend becomes a client Amir credits the
@@ -10723,6 +11009,7 @@ async function boot() {
   loadBell();
   loadOpen();
   loadLounge();
+  loadCrewWeekly();
 }
 function showGate(err) { failDismissAll(); $('app').style.display = 'none'; $('gate').style.display = 'block'; $('gateErr').textContent = err || ''; }
 // supabase-js fires an auth event on load, on every hourly token refresh, when the tab comes
