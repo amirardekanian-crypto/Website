@@ -527,7 +527,9 @@
 // "go live with all the build"). A tray beside the initials opens the Inbox (stage101), with Cheer back and Say hello; a folded crew notification
 // opens it. Crew gets the weekly Toss card with the week's photo (stage102); the Coach tab gets Ask for the crew; an answer shows its question on the
 // Bell; the Library gets Asked by the crew; every post has a reply line; a member who never posted gets a hello draft. coach.html: Proof is Crew.
-const CACHE = 'aap-v235';
+// v236: program.html changed (2026-10-26, Amir: honours are legendary trophies, "A, go with your picks"). The cabinet opens on an Honours shelf: one
+// Grand Cup per honour Amir confirmed (stage104), the month on its banner, and a sheet with the month, what was done and Share it.
+const CACHE = 'aap-v236';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

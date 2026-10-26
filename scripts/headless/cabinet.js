@@ -148,7 +148,7 @@ async function today(browser, C) {
     const pg = await p.evaluate(() => ({
       title: document.querySelector('#screen-achievements .ceil-title').textContent.trim(), line: document.getElementById('ach-line').textContent.trim(),
       heads: [...document.querySelectorAll('#ach-body .cab-t')].map(e => e.textContent.trim()), tiles: document.querySelectorAll('#ach-body .cab-cell').length,
-      next: (document.querySelector('#ach-body .ac-next .ac-nm') || {}).textContent, latest: [...document.querySelectorAll('#ach-body .cab-card')].map(c => ({ n: c.querySelector('.cab-cn').textContent, nw: !!c.querySelector('.cab-new') })),
+      next: (document.querySelector('#ach-body .ac-next .ac-nm') || {}).textContent, latest: [...document.querySelectorAll('#ach-body .cab-card:not(.cab-hon)')].map(c => ({ n: c.querySelector('.cab-cn').textContent, nw: !!c.querySelector('.cab-new') })),
       dots: document.querySelectorAll('#ach-body .cab-dot').length, lit: (document.querySelector('#global-tabs .nav-item.active') || {}).dataset.tab,
       v11: !!document.querySelector('#ach-body .cab-cell[data-k="sessions_3"]'), chips: [...document.querySelectorAll('#ach-body .cab-chip')].map(b => b.textContent + (b.getAttribute('aria-pressed') === 'true' ? '*' : '')).join('|'),
       won: document.querySelector('#ach-body .cab-cell[data-k="first_blood"] svg').innerHTML.indexOf('var(--ghost') < 0, ghost: document.querySelector('#ach-body .cab-cell[data-k="the_distance"] svg').innerHTML.indexOf('var(--ghost') >= 0,
@@ -156,7 +156,7 @@ async function today(browser, C) {
     C.check('today: the page is the cabinet: title Achievements, "34 won · 60 to win" under it, the Progress tab lit', pg.title === 'Achievements' && pg.line === '34 won · 60 to win' && pg.lit === 'plan', JSON.stringify([pg.title, pg.line, pg.lit]));
     C.check('today: Next up, Latest, All achievements with the chips, the level, then a section per family (Streaks holds weeks and months), in the emblem map\'s order',
       pg.next === 'Straight Talk' || !!pg.next, pg.next);
-    C.check('today: the order of the page', pg.heads.join() === 'Latest,All achievements,Level 24,Sessions,Streaks,Getting stronger,Comebacks,Habits,With Amir,Trophies', pg.heads.join());
+    C.check('today: the order of the page', pg.heads.join() === 'Honours,Latest,All achievements,Level 24,Sessions,Streaks,Getting stronger,Comebacks,Habits,With Amir,Trophies', pg.heads.join());
     C.check('today: every emblem is a button (83 items and 11 medals) and none of the 33 new ids is there', pg.tiles === 94 && !pg.v11, JSON.stringify([pg.tiles, pg.v11]));
     C.check('today: nothing is new, so Latest is the three most recent, with no New tag and no clay dot anywhere', pg.latest.length === 3 && pg.latest.every(c => !c.nw) && pg.dots === 0, JSON.stringify([pg.latest, pg.dots]));
     C.check('today: the chips: All is on, then Won, To win and the four kinds', pg.chips === 'All*|Won|To win|Consistency|Commitment|Progress|Resilience', pg.chips);
@@ -206,14 +206,14 @@ async function today(browser, C) {
     const d = await doorOf(p);
     C.check('seen: three won emblems this phone has not shown: the door says "34 of 94" and "3 new" in clay', !!d && d.v === '34 of 94' && d.nw === '3 new', JSON.stringify(d));
     const clay = await p.evaluate(() => getComputedStyle(document.querySelector('#career-card-wrap .cs-ach-new')).color);
-    C.check('seen: the "3 new" is clay text', /194, 81, 44/.test(clay), clay);
+    C.check('seen: the "3 new" is clay text', /194, 81, 44/.test(clay), clay);
     C.check('seen: the Achievements row at the foot of Your numbers: the word Achievements, three newest emblems drawn, no big share button, no door on Progress',
       d.s === 'Achievements' && d.stk === 3 && await p.evaluate(() => !document.querySelector('.cs-card .cs-share') && document.querySelectorAll('#career-courts-wrap .hrow, #career-moments-wrap .hrow').length === 0)
       , JSON.stringify(d));
     await goProgress(p);
     C.check('seen: the Progress tab carries a dot, and no number', await dotOn(p) && (await p.evaluate(() => document.querySelector('#global-tabs .nav-item[data-tab="plan"] .nav-dot').textContent === '')));
     await goCab(p);
-    const n = await p.evaluate(() => ({ cards: [...document.querySelectorAll('#ach-body .cab-card')].map(c => c.querySelector('.cab-cn').textContent + (c.querySelector('.cab-new') ? ' NEW' : '')), dots: [...document.querySelectorAll('#ach-body .cab-cell .cab-dot')].map(d => d.closest('.cab-cell').dataset.k).sort() }));
+    const n = await p.evaluate(() => ({ cards: [...document.querySelectorAll('#ach-body .cab-card:not(.cab-hon)')].map(c => c.querySelector('.cab-cn').textContent + (c.querySelector('.cab-new') ? ' NEW' : '')), dots: [...document.querySelectorAll('#ach-body .cab-cell .cab-dot')].map(d => d.closest('.cab-cell').dataset.k).sort() }));
     C.check('seen: Latest shows the three with New, newest first, and each carries a clay dot in its section', n.cards.length === 3 && n.cards.every(c => / NEW$/.test(c)) && n.dots.join() === 'mark:century:1,moving_up,rematch_won', JSON.stringify(n));
     C.check('seen: opening the cabinet marks everything on it as seen: the key holds all 34 won and the dot is gone', Object.keys(await seenKeys(p)).length === 31 && !(await dotOn(p)), JSON.stringify(Object.keys(await seenKeys(p)).length));
     await tap(p, '#ach-body .cab-cell[data-k="moving_up"]');
@@ -275,7 +275,7 @@ async function staged(browser, C) {
   await goCab(p);
   const g = await p.evaluate(() => ({ line: document.getElementById('ach-line').textContent, cells: document.querySelectorAll('#ach-body .cab-cell').length,
     all33: ['sessions_3', 'sessions_400', 'weeks_7', 'months_9', 'bests_75', 'month_one', 'year_two', 'down_under', 'calendar_slam', 'nowruz', 'yalda', 'early_bird', 'night_owl'].every(k => !!document.querySelector('#ach-body .cab-cell[data-k="' + k + '"]')),
-    latest: [...document.querySelectorAll('#ach-body .cab-card')].length, news: document.querySelectorAll('#ach-body .cab-card .cab-new').length,
+    latest: [...document.querySelectorAll('#ach-body .cab-card:not(.cab-hon)')].length, news: document.querySelectorAll('#ach-body .cab-card .cab-new').length,
     secs: [...document.querySelectorAll('#ach-body .cab-sec')].map(s => s.querySelector('.cab-t').textContent + ' ' + s.querySelector('.cab-n').textContent.replace(/\s+/g, ' ')) }));
   C.check('stage: the page counts them: "50 won · 77 to win", 127 emblems', g.line === '50 won · 77 to win' && g.cells === 127 && g.all33, JSON.stringify([g.line, g.cells, g.all33]));
   C.check('stage: Latest holds the new ones (at most ten), each with New', g.latest === 10 && g.news === 10, JSON.stringify([g.latest, g.news]));
@@ -655,6 +655,28 @@ async function narrow(browser, C) {
   }
 }
 
+// The month's honours (stage104, Amir 2026-10-25 "A, go with your picks"): a shelf of legendary trophies above Latest, from the honours Amir
+// confirmed (the fixture's four and a "near", which is never shown), a sheet with the month and Share it, the share sheet behind it.
+async function honours(browser, C, OUT) {
+  const { ctx, p } = await openMe(browser, {});
+  await goCab(p);
+  const r = await p.evaluate(() => ({ cards: [...document.querySelectorAll('#ach-body .cab-hon')].map(c => c.querySelector('.cab-cn').firstChild.textContent + '/' + c.querySelector('.cab-cn small').textContent),
+    svg: [...document.querySelectorAll('#ach-body .cab-hon svg')].length, first: (document.querySelector('#ach-body .cab-t') || {}).textContent }));
+  C.check('honours: the shelf leads the cabinet with four trophies (no "near"), each named with its month', r.first === 'Honours' && r.cards.length === 4 && r.svg === 4
+    && r.cards.map(c => c.split('/')[0]).sort().join() === 'Amir’s Pick,Full Month,Most improved,Most sessions' && r.cards.every(c => / \d{4}$/.test(c.split('/')[1])), JSON.stringify(r));
+  await p.screenshot({ path: path.join(OUT, 'cabinet-honours.png') });
+  await tap(p, '#ach-body .cab-hon[data-k$=":improved"]');
+  const s = await p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'); const q = x => { const e = m.querySelector(x); return e ? e.textContent.trim() : null; };
+    return { open: document.getElementById('hist-overlay').classList.contains('visible'), kind: q('.cab-sh-kind'), t: q('.readiness-title'), p: q('.cab-sh-p'), btn: q('.cab-go'), hon: !!m.querySelector('.cab-sh-em.is-hon svg') }; });
+  await p.screenshot({ path: path.join(OUT, 'cabinet-honour-sheet.png') });
+  C.check('honours: its sheet says Honour and the month, the name, what was done, and Share it', s.open && /^Honour · \w+ \d{4}$/.test(s.kind) && s.t === 'Most improved' && s.p === '+27.1% on Barbell Back Squat.' && s.btn === 'Share it' && s.hon, JSON.stringify(s));
+  await tap(p, '#hist-overlay .cab-go');
+  C.check('honours: Share it opens the honour card in the share sheet', await p.evaluate(() => !!document.querySelector('#hist-overlay.visible .hl-prev')));
+  await p.evaluate(() => cabSetFilter('todo')); await p.waitForTimeout(250);
+  C.check('honours: the To win filter has no honours shelf', !(await p.$('#ach-body .cab-hon')));
+  C.check('honours: no page errors', !p.errs.length, JSON.stringify(p.errs));
+  await ctx.close();
+}
 async function main() {
   const C = H.checker(), OUT = H.outDir(), browser = await H.launch();
   try {
@@ -665,6 +687,7 @@ async function main() {
     await shareCard(browser, C, OUT);
     await finish(browser, C);
     await narrow(browser, C);
+    await honours(browser, C, OUT);
     await pictures(browser, C, OUT);
   } finally { await browser.close(); }
   process.exitCode = C.report() ? 1 : 0;

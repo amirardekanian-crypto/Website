@@ -5080,6 +5080,10 @@
   .cab-card .cab-em { width: 112px; height: 112px; margin-top: -8px; }
   .cab-card .cab-new { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 6px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; }
   .cab-card .cab-cn { position: absolute; left: 12px; right: 12px; bottom: 12px; font: 600 var(--fs-small)/1.2 'Barlow', sans-serif; }
+  /* the month's honours (Amir 2026-10-25, Grand Cup): one legendary trophy each, on the night ground, above Latest; the month is on the trophy's banner */
+  .cab-hon { background: #0B3D2C; color: #fff; }
+  .cab-hon .cab-cn small { display: block; margin-top: 2px; font-weight: 500; opacity: .72; }
+  .cab-sh-em.is-hon { background: #0B3D2C; border-radius: 20px; }
   /* the filter: chips in one row that scrolls sideways; 44 px to hit, drawn at 36 */
   .cab-filter { display: flex; gap: 6px; margin: 0; padding: 0 var(--g) 10px; overflow-x: auto; scrollbar-width: none; }
   .cab-filter::-webkit-scrollbar { display: none; }
@@ -14460,6 +14464,36 @@ function cabCell(c, o) {
   if (o.trophy) return `<button type="button" class="cab-cell" data-aid="${esc(c.key)}" onclick="openPlayerTrophy('${esc(o.trophy)}', this.dataset.aid)" aria-label="${esc(lab).replace(/"/g, '&quot;')}">${inner}</button>`;
   return `<button type="button" class="cab-cell" data-k="${esc(c.key)}" onclick="openEmblem(this.dataset.k)" aria-label="${esc(lab).replace(/"/g, '&quot;')}">${inner}</button>`;
 }
+// The month's honours, as trophies: the ones Amir confirmed (stage104), newest first. The same rows the moments list reads (get_my_moments).
+const CAB_HON_NAME = { sessions: 'Most sessions', improved: 'Most improved', full_month: 'Full Month', pick: 'Amir\u2019s Pick' };
+function cabHonours() {
+  let l = [];
+  try { l = momentsList().filter(x => x.kind === 'honour' && CAB_HON_NAME[x.hKind]); } catch (e) { l = []; }
+  return l.map(x => ({ key: 'hon:' + String(x.day).slice(0, 7) + ':' + x.hKind, x, month: String(x.day).slice(0, 7), name: CAB_HON_NAME[x.hKind], mon: momMonth(x.day, true) + ' ' + String(x.day).slice(0, 4) }));
+}
+function cabHonCard(h) {
+  const E = cabE();
+  return `<button type="button" class="cab-card cab-hon" data-k="${esc(h.key)}" onclick="openHonour(this.dataset.k)" aria-label="${esc(h.name + ', ' + h.mon).replace(/"/g, '&quot;')}">`
+    + `<span class="cab-em">${E.honour(h.x.hKind, h.month)}</span><span class="cab-cn">${esc(h.name)}<small>${esc(h.mon)}</small></span></button>`;
+}
+function openHonour(key) {
+  const ov = document.getElementById('hist-overlay'), E = cabE(), h = cabHonours().find(x => x.key === String(key || ''));
+  if (!ov || !E || !h) return;
+  const sp = hlMomentSpec(h.x);
+  ov.querySelector('.readiness-modal').innerHTML = `<div class="cab-sh">
+    <div class="cab-sh-em is-hon" role="img" aria-label="${esc(h.name + ', ' + h.mon).replace(/"/g, '&quot;')}">${E.honour(h.x.hKind, h.month)}</div>
+    <p class="cab-sh-kind">Honour · ${esc(h.mon)}</p>
+    <h2 class="readiness-title">${esc(h.name)}</h2>
+    ${h.x.s ? `<p class="cab-sh-p">${esc(h.x.s)}</p>` : ''}
+    ${sp && !window.IS_PREVIEW && !window.IS_DEMO ? `<button type="button" class="cab-go" data-k="${esc(h.key)}" onclick="cabHonShare(this.dataset.k)">Share it</button>` : ''}</div>`;
+  ov.classList.add('visible');
+}
+window.openHonour = openHonour;
+function cabHonShare(key) {
+  const h = cabHonours().find(x => x.key === String(key || '')), sp = h && hlMomentSpec(h.x);
+  if (sp) openShareSheet([sp], 0);
+}
+window.cabHonShare = cabHonShare;
 function cabCard(c) {
   const E = cabE(), g = E.ground(c.tier);
   const chip = g.text === '#FFFFFF' ? 'background:#fff;color:#1A1A1A' : 'background:#1A1A1A;color:#fff';
@@ -14487,6 +14521,8 @@ function cabHTML(items) {
       <span class="cs-l">Next up</span><span class="ac-nm">${esc(momName(nx.name))}</span><span class="ac-s">${esc(achLine(nx))}</span>`
       + (Number(nx.need) > 1 ? `<span class="cs-bar sm" aria-hidden="true"><i style="width:${achPct(nx)}%"></i></span>` : '') + `</button>`;
   }
+  const hon = (f === 'all' || f === 'won') ? cabHonours() : [];
+  if (hon.length) h += `<div class="cab-h"><h2 class="cab-t">Honours</h2><span class="cab-n">${hon.length}</span></div><div class="cab-latest">${hon.map(cabHonCard).join('')}</div>`;
   if (latest.length) h += `<div class="cab-h"><h2 class="cab-t">Latest</h2></div><div class="cab-latest">${latest.map(cabCard).join('')}</div>`;
   const chips = [['all', 'All'], ['won', 'Won'], ['todo', 'To win'], ['consistency', 'Consistency'], ['commitment', 'Commitment'], ['progress', 'Progress'], ['resilience', 'Resilience']];
   h += `<div class="cab-h"><h2 class="cab-t">All achievements</h2></div><div class="cab-filter" role="group" aria-label="Show">`
