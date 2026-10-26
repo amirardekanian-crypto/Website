@@ -383,6 +383,7 @@ function buildSeed(opt) {
     open: !!opt.open,                 // stub.js: the stage85 functions (the Monthly Open) answer only when this is on
     lounge: !!opt.lounge,             // stub.js: stage96's coach functions (faces, cheers) and the table athlete_profile answer only when this is on
     partner: !!opt.partner,           // stub.js: stage97's partner-code functions and the table referral_credits answer only when this is on
+    honoursConfirm: !!opt.honoursConfirm,   // stub.js: stage101 (the month's honours wait for Amir's confirmation): coach_honour_confirm(), `confirmed`, confirmed_at
     // The month just gone's honours as the server would work them out (see stub.js: liveHonours). Made up; nothing is computed.
     honoursLive: opt.honoursLive !== undefined ? opt.honoursLive : opt.court ? {
       // A former athlete shares the top session count and the coach's own identity shares the top gain: the stub leaves both out, as

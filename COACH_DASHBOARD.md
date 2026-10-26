@@ -41,6 +41,21 @@ like an empty list or a success.
 
 ---
 
+## The month's honours wait for Amir (2026-10-25)
+
+Built with stage101 (`career/PROCEDURES.md` → *Stage 101*; **not applied yet**, and the page does nothing new until it is). Amir: *"im gonna choose other honours at the end of the month, there should be reminder in coach.html for me tho. to pick most sessions most improved an full month or my pick"*; board: https://claude.ai/artifact/9JYRa93PVAYZSH4pRw2rhs.
+
+**The reminder card** is the first thing in Courtside on Today (`honRemindHtml()`). It shows from the **last day of the month** and stays, into the next month, until all four honours of that month are confirmed. On the last day the month is not over, so it says "so far". Title: *October's honours are waiting*. Line: *Pick them by 7 November. Nothing reaches anyone until you confirm.* After the 7th: *Overdue: pick them now.* It goes when the month's pick window closes (the end of the month after) too.
+
+| Row | What it shows | Buttons |
+|---|---|---|
+| Most sessions | `suggested: Ana, 12 plan sessions` (a tie lists everyone) | **Confirm**, and **Change to:** a list of every client with a programme, then **Change** (two taps: the first says who gets it) |
+| Most improved | `suggested: Bo, Barbell Back Squat +18.2% at the same effort` | the same |
+| Full Month | the names who earned it, each with × to take off, and **Add a name** | **Confirm** (the list as it stands; an empty list says *Nobody this month*) |
+| Amir's Pick | the existing flow: the shortlist, *Someone else*, *Nobody this month* (two taps); once picked, the reason box | his pick is his confirmation |
+
+A confirmed row becomes one quiet line, *Confirmed* and the winner. The WhatsApp lines (the honours area) appear for an honour only once it is confirmed. Confirm and Change call `coach_honour_confirm(p_month, p_honour, p_athlete_ids, p_not_clients)`, which works the figure out again; a refusal (no figure, already confirmed with another list) is said and the row stays a suggestion. **The page freezes the month quietly from the 8th as before, and that now saves suggestions only.** Demo mode and a server before stage101 have no card. Harness: `honours-reminder-days`, `-confirm` and `-refusals`; the stub answers stage101 only when the seed says `honoursConfirm: true`.
+
 ## Players' Lounge (2026-10-24)
 
 Built on the branch `lounge-coach`, **not live**: the server side is stage96 (faces, cheers, `athlete_profile`) and stage97 (the athletes' partner codes), and none of it is applied yet. The contract the page was built to is `C:\Users\Amir\AA-Lounge\CONTRACT.md`. One rule runs through all seven: **when the server has no such function or table, the page draws nothing and says nothing** (older server); any other failed read is named in the banner under the tabs ("the crew's photos", "the crew's cheers", "the athletes' partner codes"). Nothing here pays XP (GAME-6). `BACKUP_TABLES` is **not** changed on the branch: `athlete_profile` and `referral_credits` join it on go-live day, together with the snapshot and `coach_erase_person()` (the backup check compares the two).
