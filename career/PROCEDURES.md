@@ -74,7 +74,8 @@ files: a procedure never hard-codes a number (GAME-10).
 | 33 | [Stage 95: a season counts what was done in it, as built (2026-10-20)](../docs/ref/career-procedures/33-stage-95-a-season-counts-what-was-done-in-it.md) | 4 KB |
 | 34 | [Stage 99: the Emblem Cabinet, server side (2026-10-25, applied)](../docs/ref/career-procedures/34-stage-99-the-emblem-cabinet.md) | 7 KB |
 | 35 | [Stage 104: the month's honours wait for Amir (2026-10-25, not applied)](../docs/ref/career-procedures/35-stage-104-the-honours-wait-for-amir.md) | 4 KB |
+| 36 | [Stage 105: marks on the Player Page, the comebacks number (2026-10-26, applied)](../docs/ref/career-procedures/36-stage-105-marks-on-the-player-page-and-the-comebacks-number.md) | 4 KB |
 
 ---
 
-*35 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*
+*36 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*

@@ -3684,7 +3684,7 @@ begin
                                                                           and c.body ->> 'kind' = 'best_run' and c.body ? 'habit'
                                                                         group by a.item) z), 0))
                             else jsonb_build_object('key', 'personal_bests', 'value', count(*) filter (where cf.kind = 'personal_best')) end,
-           'resilience', jsonb_build_object('key', 'comebacks', 'value', count(*) filter (where cf.kind in ('comeback', 'training_return'))))
+           'resilience', jsonb_build_object('key', 'comebacks', 'value', count(*) filter (where cf.kind in ('comeback_stuck', 'training_return'))   /* stage105: what HARD TO KILL counts */))
     into v_four
     from public.career_facts cf where cf.athlete_id = p_athlete and cf.void_at is null;
 
@@ -6468,7 +6468,7 @@ begin
       select a.award_id, a.day,
              jsonb_build_object(
                'id', a.award_id,
-               'name', coalesce((select ct.body ->> 'name' from public.career_catalogue ct where ct.kind = 'achievement' and ct.id = a.item), a.item),
+               'name', coalesce((select ct.body ->> 'name' from public.career_catalogue ct where ct.kind = a.kind and ct.id = a.item), a.item),
                'day', a.day, 'size', a.size,
                'signed', coalesce((select jsonb_agg(z.j order by z.ts desc) from (
                                      select l.created_at as ts,
@@ -6484,8 +6484,8 @@ begin
                              where l.to_athlete = v_subj and l.award_id = a.award_id
                                and (sm.athlete_id is not null or l.athlete_id = public.coach_note_id()))) as j
         from public.career_awards a
-       where a.athlete_id = v_subj and a.kind = 'achievement'
-       order by a.day desc, a.award_id limit 40) x;
+       where a.athlete_id = v_subj and (a.kind = 'achievement' or (a.kind = 'badge' and a.item in ('held_weeks', 'century', 'bests', 'comebacks')))   /* stage105: a mark's step is a trophy too */
+       order by a.day desc, a.award_id limit 60) x;
   end if;
 
   -- the month's honours, once frozen (never "one week short")

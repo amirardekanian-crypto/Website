@@ -46,7 +46,7 @@ is reported, not fixed in place).
   **Trophies · N** instead of Achievements: their three newest emblems, newest first, then **All ›** (`openPlayerAchievements()`): their whole shelf, **won only, no ghosts**, level medals
   first, then the same sections. **Their own switches decide whether any of it shows, exactly as before** (`plMark()` / `plKindOff()` for `achievement` and
   `level`): on your own page a switched-off level or achievements still show, each marked **Only you** (the level's label is a line under the dates).
-  `a.id` is the award id (*achievement:big_apple*); the emblem map is keyed without the prefix.
+  `a.id` is the award id (*achievement:big_apple*); the emblem map is keyed without the prefix. **A mark's step is a trophy there too** (stage105, 2026-10-26: *"all of them should be the same, and should be shown"*): `crew_page()` sends it as `badge:century:2` (the badge, then the step 1 to 5), `plTrophies()` draws it with `E.mark()` and sorts it into the same section, and it opens as a mark's step (`achDetailOf({ k: 'mark' })`).
   **No cheers on a trophy** (Amir, 2026-10-25: *"when you click on someones profile, and you see their trophies, we dont need to see who cheered for their
   trophy"*): no face stack, no *Cheered by*, no one-time note on a like. Every trophy is a button to **what it is** (`openPlayerTrophy()`): the emblem, its kind
   and step, its rule and *Won by Sam · 22 Oct*, with no Share and no Tell the crew (those are the winner's own). Your own trophy opens your own cabinet's sheet.

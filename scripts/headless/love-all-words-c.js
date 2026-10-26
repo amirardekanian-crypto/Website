@@ -2,7 +2,7 @@
 //   onerm      the records page never says "One-rep max" and explains its number in one plain line.
 //   plates     the unit menu's third row says what it counts: "Plates: how many plates on the stack".
 //   holdserve  Hold Serve keeps its name and wears "Weeks in a row you trained" (the weeks-held number, the help card's title).
-//   comebacks  Comebacks keeps its number and wears "Times you came back after a break".
+//   comebacks  Comebacks keeps its number and wears "Comebacks that held for a week".
 //   counting   the finished card says "Adding it up" (the XP line and the reward band) while the server adds the session up.
 //   bell       The Bell keeps its name and wears "What's new" (the small grey line on its heading on Crew).
 //   counts     the cover says "Cycle 2 of 3", under it "Week 2 of 5", the road says "5 weeks": one count per number.
@@ -130,7 +130,7 @@ async function comebacks(browser) {
     await p.waitForTimeout(700);
     const cs = await cells(p);
     const cb = cs.find(c => /comebacks?/i.test(c.nm));
-    t.check(`comebacks ${w}px: the comebacks number wears "Times you came back after a break"`, !!cb && cb.ln === 'Times you came back after a break', JSON.stringify(cs));
+    t.check(`comebacks ${w}px: the comebacks number wears "Comebacks that held for a week"`, !!cb && cb.ln === 'Comebacks that held for a week', JSON.stringify(cs));
     t.check(`comebacks ${w}px: it is the same small grey line as the weeks-held one, and the tile and page do not overflow`, cs.filter(c => c.ln).length === 2 && cs.every(c => c.over <= 0) && (await p.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0, JSON.stringify(cs));
     const st = await p.evaluate(() => [...document.querySelectorAll('#career-card-wrap .cs-ln')].map(e => { const c = getComputedStyle(e); return [c.fontSize, c.color, c.fontFamily.split(',')[0]]; }));
     t.check(`comebacks ${w}px: both lines share one look (small, grey, Barlow)`, st.length === 2 && st[0].join() === st[1].join() && /Barlow/.test(st[0][2]), JSON.stringify(st));

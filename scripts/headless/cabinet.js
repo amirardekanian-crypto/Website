@@ -431,7 +431,9 @@ function samPage() {
   return { lv: 27, numbers: { weeks: { now: 15, best: 15 }, sessions: 88, bests: 19 }, cheers: { total: 42, season: 4, recent: [] },
     achievements: [A('night_owl', 'Night Owl', at(-3), [s(2, 'Mina S.'), s(3, 'Reza K.'), s(6, 'Leila M.')], 9), A('sessions_75', '75 Sessions', at(-9), [s(2, 'Mina S.')], 3), A('flawless', 'Flawless', at(-15), [s(3, 'Reza K.'), s(2, 'Mina S.'), s(8, 'Omid P.')], 12),
       A('the_lawns', 'The Lawns', at(-20)), A('red_clay', 'Red Clay', at(-30)), A('nowruz', 'Nowruz', at(-60)), A('by_the_book', 'By the Book', at(-70)), A('first_cycle', 'First Cycle', at(-90)), A('rematch_won', 'Rematch Won', at(-100)),
-      A('held', 'Held', at(-120)), A('weeks_5', '5 Weeks in a Row', at(-110)), A('months_4', '4 Months in a Row', at(-40))] };
+      A('held', 'Held', at(-120)), A('weeks_5', '5 Weeks in a Row', at(-110)), A('months_4', '4 Months in a Row', at(-40)),
+      // stage105: a mark's step is a trophy on a Player Page too (the id is the award id: badge, then the step 1 to 5)
+      { id: 'badge:century:2', name: 'Century', day: at(-5), size: 'milestone', signed: [], signed_n: 0 }, { id: 'badge:century:1', name: 'Century', day: at(-80), size: 'highlight', signed: [], signed_n: 0 }] };
 }
 async function player(browser, C, OUT) {
   const mk = o => openMe(browser, Object.assign({ stage: true, stub: { bell: bellFx(), crewPages: { [ck(7)]: samPage() } } }, o || {}));
@@ -442,10 +444,10 @@ async function player(browser, C, OUT) {
     secs: [...document.querySelectorAll('#crewplayer-body .prog-sec')].map(e => e.textContent.replace(/\s+/g, ' ').trim()), cells: [...document.querySelectorAll('#crewplayer-body .cab-cell')].map(c => ({ l: c.querySelector('.cab-l').textContent, s: (c.querySelector('.cab-s') || {}).textContent, btn: c.tagName === 'BUTTON', faces: c.querySelectorAll('.pl-stk > *').length, more: (c.querySelector('.pl-mo') || {}).textContent })),
     all: (document.querySelector('#crewplayer-body .cab-all') || {}).textContent, ghosts: document.querySelectorAll('#crewplayer-body .cab-cell svg').length && [...document.querySelectorAll('#crewplayer-body .cab-cell svg')].filter(s => s.innerHTML.indexOf('var(--ghost') >= 0).length, side: document.documentElement.scrollWidth - innerWidth }));
   C.check('player: their level medal is on the corner of their face (the LV chip is gone)', g.medal && !g.chip && g.medalLab === 'Level 27', JSON.stringify([g.medal, g.chip, g.medalLab]));
-  C.check('player: "Trophies · 15" (12 won and the 3 level medals they have reached), and All ›', g.secs.indexOf('Trophies · 15') >= 0 && g.all === 'All ›', JSON.stringify(g.secs));
+  C.check('player: "Trophies · 17" (14 won, two of them a mark step, and the 3 level medals they have reached), and All ›', g.secs.indexOf('Trophies · 17') >= 0 && g.all === 'All ›', JSON.stringify(g.secs));
   // Amir, 2026-10-25: "we dont need to see who cheered for their trophy": no faces, no +N, every trophy a button to what it is
-  C.check('player: their three newest, newest first: Night Owl, 75 Sessions, Flawless; no faces of who cheered, each a button',
-    JSON.stringify(g.cells.map(c => c.l)) === JSON.stringify(['Night Owl', '75 sessions', 'Flawless']) && g.cells.every(c => c.btn && c.faces === 0 && !c.more), JSON.stringify(g.cells));
+  C.check('player: their three newest, newest first: Night Owl, the 50 sessions step of Century, 75 Sessions; no faces of who cheered, each a button',
+    JSON.stringify(g.cells.map(c => c.l)) === JSON.stringify(['Night Owl', '50 sessions', '75 sessions']) && g.cells.every(c => c.btn && c.faces === 0 && !c.more), JSON.stringify(g.cells));
   C.check('player: nothing on the page says who cheered a trophy', !(await p.evaluate(() => /every cheer|Cheered by/.test(document.getElementById('crewplayer-body').textContent))));
   C.check('player: only what they have won: every emblem is in colour, none is a ghost', g.ghosts === 0 && g.side <= 0, JSON.stringify([g.ghosts, g.side]));
   await p.screenshot({ path: path.join(OUT, 'player-top-390.png') }).catch(() => {});
@@ -458,12 +460,18 @@ async function player(browser, C, OUT) {
   C.check('player: a trophy opens what it is: Night Owl, its emblem, its rule, "Won by Sam" and the day, and no Share or Tell the crew',
     (await sheetOpen(p)) && ts.t === 'Night Owl' && ts.em && /after 9 at night/.test(ts.rule) && /^Won by Sam · \d+ [A-Z][a-z]{2}$/.test(ts.meta) && ts.btns === 0, JSON.stringify(ts));
   await p.evaluate(() => history.back()); await p.waitForTimeout(300);
+  // stage105: the 50 sessions step opens as what it is, a mark's step, the way an achievement does
+  await p.evaluate(() => document.querySelector('#crewplayer-body .cab-cell[data-aid="badge:century:2"]').click()); await p.waitForTimeout(300);
+  const ms = await p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'); return { t: (m.querySelector('.readiness-title') || {}).textContent, em: !!m.querySelector('.cab-sh-em svg'),
+    kind: (m.querySelector('.cab-sh-kind') || {}).textContent || '', rule: (m.querySelector('.cab-sh-p') || {}).textContent || '', meta: (m.querySelector('.cab-meta') || {}).textContent || '', btns: m.querySelectorAll('.cab-go, .cab-tell').length }; });
+  C.check('player: the 50 sessions step opens: its emblem, "Commitment", "Finish 50 sessions with Amir.", "Won by Sam", and no Share or Tell the crew',
+    (await sheetOpen(p)) && ms.t === '50 sessions with Amir' && ms.em && /^Commitment/.test(ms.kind) && ms.rule === 'Finish 50 sessions with Amir.' && /^Won by Sam · \d+ [A-Z][a-z]{2}$/.test(ms.meta) && ms.btns === 0, JSON.stringify(ms));
   // All ›: the whole shelf, won only, grouped by the same sections, the level medals first
   await tap(p, '#crewplayer-body .cab-all');
   const a = await p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'); return { t: m.querySelector('.readiness-title').textContent, sub: m.querySelector('.readiness-sub').textContent, keys: [...m.querySelectorAll('.cab-pl-k')].map(e => e.textContent.trim()),
     cells: m.querySelectorAll('.cab-cell').length, ghosts: [...m.querySelectorAll('.cab-cell svg')].filter(s => s.innerHTML.indexOf('var(--ghost') >= 0).length, medals: [...m.querySelectorAll('.cab-pl-k')][0] && [...m.querySelectorAll('.cab-grid')][0].querySelectorAll('.cab-cell').length }; });
-  C.check('player: All › is their whole shelf: "Sam\'s trophies", 15 won, the level medals first (1, 10, 20), then Sessions, Streaks, Habits… won only, no ghosts',
-    a.t === 'Sam\'s trophies' && a.sub === '15 won so far.' && a.keys[0] === 'Level medals' && a.medals === 3 && a.cells === 15 && a.ghosts === 0 && a.keys.length >= 5, JSON.stringify(a));
+  C.check('player: All › is their whole shelf: "Sam\'s trophies", 17 won, the level medals first (1, 10, 20), then Sessions, Streaks, Habits… won only, no ghosts',
+    a.t === 'Sam\'s trophies' && a.sub === '17 won so far.' && a.keys[0] === 'Level medals' && a.medals === 3 && a.cells === 17 && a.ghosts === 0 && a.keys.length >= 5, JSON.stringify(a));
   await p.screenshot({ path: path.join(OUT, 'player-all-390.png') }).catch(() => {});
   await p.evaluate(() => history.back()); await p.waitForTimeout(300);
   // their own switches decide: achievements off, level off

@@ -14063,7 +14063,7 @@ function careerCardHTML() {
   // is on Home's Career row and on the finish card, where there is room to say what it means), and "best 7" on weeks held (a
   // mark above the best run read as an error). Nothing on the server changed: the numbers and the level are exactly as they were.
   // A number that has a name of its own wears one plain line under its words (Plain Words, 2026-10-25).
-  const CS_LINE = { weeks_held: 'Weeks in a row you trained', comebacks: 'Times you came back after a break' };
+  const CS_LINE = { weeks_held: 'Weeks in a row you trained', comebacks: 'Comebacks that held for a week' };
   const cell = x => `<div class="cs-n"><b>${fmt(x.value)}</b><span class="cs-nm">${esc(careerMarkWords(x.key, x.value))}</span>${CS_LINE[x.key] ? `<span class="cs-ln">${CS_LINE[x.key]}</span>` : ''}</div>`;
   let h = `<div class="cs-card" role="group" aria-label="${esc('Your numbers. Level ' + L.level + '.').replace(/"/g, '&quot;')}">
     ${cells.length ? `<div class="cs-grid">${cells.map(cell).join('')}</div>` : ''}
@@ -16165,12 +16165,21 @@ function playerTilesHTML(p, own, mk) {
 // switches decide whether any of it shows, exactly as before (plMark() / plKindOff() for `achievement` and `level`).
 // `a.id` is the award id ("achievement:big_apple"); the emblem map is keyed by the catalogue id.
 function plTrophies(p) {
-  const E = cabE();
+  const E = cabE(), marks = careerMarks();
   return (Array.isArray(p.achievements) ? p.achievements : []).filter(a => a && (a.id || a.name)).map(a => {
+    // A mark's step (stage105: "badge:century:2", the badge and the step 1 to 5) is a trophy like any other, drawn and opened the way the cabinet does.
+    const bm = /^badge:([a-z_]+):(\d+)$/.exec(String(a.id || ''));
+    if (bm) {
+      const mk = marks[bm[1]], i = Number(bm[2]) - 1, mi = E && mk && i >= 0 ? E.markInfo(bm[1], i) : null;
+      if (!mi) return null;
+      const n = mk.at[i], name = n + ' ' + careerMarkWords(mk.key, n) + (mk.key === 'weeks_held' ? ' in a row' : '');
+      return { key: String(a.id), kind: 'mark', id: bm[1], markId: bm[1], tierIdx: i, n, won: true, day: String(a.day || ''), tier: mi.tier, sec: mi.sec, order: mi.order,
+        info: mi, name, short: cabShort(mi, name), a };
+    }
     const id = String(a.id || '').replace(/^achievement:/, ''), info = E ? E.info(id) : null, name = momName(a.name || id);
     return { key: String(a.id || id), kind: 'ach', id, won: true, day: String(a.day || ''), tier: info ? info.tier : 0, sec: info ? info.sec : 'trophies',
       order: info ? info.order : 1e6, info, name, short: cabShort(info, name), a };
-  }).sort((x, y) => y.day.localeCompare(x.day) || x.order - y.order);
+  }).filter(Boolean).sort((x, y) => y.day.localeCompare(x.day) || x.order - y.order);
 }
 // One trophy: the emblem, its short name, its day; a tap opens what it is.
 function plTrophyCell(t, key) { return cabCell(t, { trophy: key }); }
@@ -16185,7 +16194,7 @@ function plMedals(lv) {
 // A trophy on a Player Page: what it is, and when they won it (the same sheet as an achievement opened from Crew). Your own opens your own cabinet's sheet.
 function openPlayerTrophy(key, aid) {
   const c = crewPageGet(key || _playerCk), t = c ? plTrophies(c.p).find(x => x.key === String(aid)) : null;
-  const d = t && achDetailOf({ k: 'achievement', id: t.id, name: t.name });
+  const d = t && achDetailOf(t.kind === 'mark' ? { k: 'mark', item: t.markId, at: t.n } : { k: 'achievement', id: t.id, name: t.name });
   if (!d) return;
   const own = (key || _playerCk) === 'me' || !!c.p.me;
   if (own && cabItems().some(x => x.key === d.ownKey)) { openEmblem(d.ownKey); return; }
