@@ -12,8 +12,8 @@
 -- nothing; leaving again arms a fresh one with a fresh token.
 --
 -- WHAT IT SAYS. "Your session is still open" / "Done training? Tap to finish it." The tap opens the day on its finish card
--- (sw.js: tag finish → /program.html#finish). No exercise, number or effort: the lock-screen rule. The Farsi is a DRAFT until Amir
--- reads it. TTL one hour (still worth having late), Urgency normal, tag finish (a second one replaces the first). More than 15
+-- (sw.js: tag finish → /program.html#finish). No exercise, number or effort: the lock-screen rule. The Farsi was approved by Amir
+-- on 2026-11-02. TTL one hour (still worth having late), Urgency normal, tag finish (a second one replaces the first). More than 15
 -- minutes late it is not sent. kinds->>'finish' = 'false' is honoured; there is no switch in the panel for it yet.
 --
 -- NO NEW TABLE: two more columns on push_subs, which is backed up and erased already.

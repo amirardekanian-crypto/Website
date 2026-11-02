@@ -20,7 +20,7 @@ example"*; his pick: any rest, only when the athlete is out of the app. The full
   disarmed rest sends none. `push-rest-sweep` keeps that job's run log to two days.
 - **TTL 30 s, Urgency high, tag `rest`, no quiet hours** (the athlete is training by their own tap). The words carry no
   exercise, weight or effort. `kinds.rest = false` is honoured; there is no switch in the panel for it yet.
-- **⚠️ The Farsi is a DRAFT until Amir reads it on a lock screen**: *۱۰ ثانیه تا آخر استراحت* / *برای ست بعدی آماده شو.*
+- **The Farsi, approved by Amir on 2026-11-02** (*"There farsi words are ok"*): *۱۰ ثانیه تا آخر استراحت* / *برای ست بعدی آماده شو.*
 - **Proven live** (2026-11-02) with a made-up phone: armed for +40 s, the job woke the sender at the minute and the row
   was taken 0.11 s after it was due. **Not yet proven on a real phone**: that a hiding iPhone page gets its keepalive
   request out is the one thing no test here can show.
@@ -38,7 +38,7 @@ is the header of `supabase/stage108_finish_push.sql`.
   since stage108). The every-minute job and push-send serve both through `push_alert_due()` / `push_alert_take()`.
 - **TTL one hour, Urgency normal, tag `finish`, more than 15 minutes late is never sent.** The tap opens the day under way at
   its finish card (`sw.js`: `#finish`, `goFinishSoon()`), where *Stop here* is when sets are left.
-- **⚠️ The Farsi is a DRAFT until Amir reads it**: *جلسه‌ت هنوز بازه* / *تمرینت تموم شد؟ بزن و تمومش کن.*
+- **The Farsi, approved by Amir on 2026-11-02**: *جلسه‌ت هنوز بازه* / *تمرینت تموم شد؟ بزن و تمومش کن.*
 - **Offline, on Android, the app sets both alerts itself too** (`localAlert()`, Amir: *"Imagine someone is training without
   internet"*): a hidden page's timers keep running there for a few minutes. An iPhone freezes the page, so there it is the
   server or nothing, and a frozen timer waking on the way back in checks the page is still hidden. Both carry one tag, and

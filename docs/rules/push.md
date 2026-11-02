@@ -225,7 +225,7 @@ finish on the session"* (*"remind them 10 min"*). How they were built, what was 
 - **The phone's request is a keepalive text/plain POST carrying the athlete's token** (no preflight); push-send arms the row
   AS the athlete, so nobody can arm another phone. **The deploy must say `verify_jwt: false`** like every push-send deploy.
 - **The words exist twice** — `push_alert_take()` and `localAlert.WORDS` in program.html (Android's offline copy). Change
-  both. **⚠️ Both Farsi lines are DRAFTS until Amir reads them on a lock screen.**
+  both. **Both Farsi lines are Amir's** (2026-11-02: *"There farsi words are ok"*): change them only on his word.
 - **No quiet hours**: both follow the athlete's own training. `kinds.rest` / `kinds.finish = false` are honoured; there is no
   switch in the panel for either yet.
 - Guards: `scripts/push/rehearse_rest_push.mjs` (49), `scripts/push/rehearse_finish_push.mjs` (40),

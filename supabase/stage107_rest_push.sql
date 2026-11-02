@@ -25,7 +25,7 @@
 -- most an alert from the past, which push_rest_take() refuses (more than 30 s late is not sent).
 --
 -- WHAT IT SAYS. "10 seconds left" / "Get set for your next set." No exercise, no weight, no number of the athlete's: the lock-screen
--- rule (docs/rules/push.md). The Farsi is a DRAFT until Amir reads it on a lock screen, as every Farsi notification word was.
+-- rule (docs/rules/push.md). The Farsi was approved by Amir on 2026-11-02 ("There farsi words are ok").
 -- TTL 30 s and Urgency high: an alert that arrives after the rest is noise, so the push service drops it rather than deliver late.
 -- The tag is 'rest', so a second alert replaces the first. No quiet hours: the athlete is training at that moment, by their own tap.
 -- A kind switched off (kinds->>'rest' = 'false') is never armed; there is no switch for it in the panel yet, and a kind nobody
