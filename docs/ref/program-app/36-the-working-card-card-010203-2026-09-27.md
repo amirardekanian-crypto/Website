@@ -84,6 +84,12 @@ after side 1: the circle becomes a play mark (`.waiting`) and the note box says 
 note's button or the circle starts side 2's 3-2-1, and nothing starts it by itself. At the end the set ticks itself and **no rest opens**
 (Amir, 2026-11-02: *"Tick set only"*). A tap while it counts stops it and ticks nothing; Guided's Done still ticks at once.
 `scripts/headless/love-all-cards.js` H1.
+**The hold screen** (the same day, Amir, from his phone: *"The times was a very small circle and that 3 second wasnt enough"*): the tap
+also opens `#holdOverlay`, the rest timer's green band with a 280 px ring and the seconds at 132 px (220 / 104 on a short phone), the
+side over it (*Get ready · side 1*, *Side 1 of 2*, *Side 1 done*) and the set under it. After side 1 it waits on a 72 px **Start side 2**
+beside **Stop** (the note box is no longer used for it); ✕, Stop and the phone's Back (`topLayer()`) stop it and tick nothing; it closes
+when the set ticks. The screen is kept awake while it runs (`holdWake()`). Guided's Done while a hold counts stops the hold first, which
+until then went on and unticked the set at its own 0.
 
 Guided copies the line of numbers and the pills under its name (`renderStep()`), because they live in the
 header now. Circuits got the same header (line of numbers, note dot) and lost their Rounds/Rest grid. A circuit's line says its

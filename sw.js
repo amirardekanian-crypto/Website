@@ -535,7 +535,9 @@
 // v238: program.html changed (2026-11-02, Amir: "for each side, i dont want the clock to start again immediately" and "add a minimise funtion to
 // rest timer"). A hold's circle gives 3-2-1 before each side and waits for Start side 2 after side 1; the rest timer minimises to a bar.
 // v239: program.html changed (2026-11-02, stage107): leaving the app mid-rest arms the phone's "10 seconds left" from the server; back in the app takes it back.
-const CACHE = 'aap-v239';
+// v240: program.html changed (2026-11-02, Amir: "The times was a very small circle and that 3 second wasnt enough"). A timed set opens the
+// hold screen: a big ring and the seconds readable from the floor, Start side 2 as a big button, ✕ / Stop / Back to stop it.
+const CACHE = 'aap-v240';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

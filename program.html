@@ -4256,6 +4256,19 @@
   .rest-mini .rm-name { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 500 var(--fs-small)/1.2 'Barlow', sans-serif; color: rgba(255,255,255,.75); }
   .rest-mini .rm-open { flex: none; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; }
   .rest-mini .rm-open::after { content: ''; display: inline-block; width: 7px; height: 7px; margin-left: 8px; border: solid currentColor; border-width: 2px 2px 0 0; transform: translateY(1px) rotate(-45deg); }
+  /* The hold screen (holdGate()): the rest timer's band, a bigger ring and clock, the side it is on over the ring, the set under it. Over the
+     rest timer and Guided (z 101), under the note box and the sheets. */
+  .hold-overlay { z-index: 101; }
+  .hold-overlay .timer-ring { width: 280px; height: 280px; margin: 8px 0 0; }
+  .hold-overlay .timer-display { font-size: 132px; letter-spacing: -3px; }   /* display: a hold's seconds, read from the floor */
+  .hold-overlay .timer-display.ready { color: var(--mint); }
+  .hold-phase { margin: auto 0 0; min-height: 1.2em; font: 900 var(--fs-head)/1.1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #fff; text-align: center; }
+  .hold-phase.go { color: var(--mint); }
+  .hold-set { margin: 14px 0 0; font: 500 var(--fs-body)/1.3 'Barlow', sans-serif; color: rgba(255,255,255,.75); text-align: center; }
+  .hold-controls .timer-ctrl-btn[hidden] { display: none; }
+  .hold-controls .timer-ctrl-btn.btn-reset { flex: 1 1 0; }
+  .hold-overlay.waiting .hold-controls .btn-start { min-height: 72px; font-size: var(--fs-title); }
+  @media (max-height: 620px) { .hold-overlay .timer-ring { width: 220px; height: 220px; } .hold-overlay .timer-display { font-size: 104px; } }   /* display: a short phone */
   .timer-sound:focus-visible, .timer-x:focus-visible, .timer-min:focus-visible, .timer-overlay .timer-ctrl-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .timer-sound svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .timer-sound .tsnd-off { display: none; }
@@ -7096,6 +7109,32 @@
     <div class="timer-next" id="timerNext" hidden></div>
     <!-- Guided Mode only: one thing to think about for that next set, from the hand-back on (paintGetSet(), Serve Clock). -->
     <p class="timer-cue" id="timerCue" aria-live="polite" hidden></p>
+  </div>
+</div>
+
+<!-- The hold screen (Amir, 2026-11-02, on the set's circle counting a plank: "The times was a very small circle and that 3 second wasnt
+     enough"). A timed set's circle opens it: the rest timer's green, a big ring and the seconds in it, readable from the floor. holdGate()
+     drives it and the circle together; ✕ and Stop stop the hold and tick nothing; after side 1 it waits on Start side 2. -->
+<div class="timer-overlay hold-overlay" id="holdOverlay" role="dialog" aria-modal="true" aria-label="Hold timer">
+  <div class="timer-band">
+    <div class="timer-top">
+      <span></span>
+      <div class="timer-eyebrow"><span class="timer-label">Hold</span> <span class="timer-exercise-name" id="holdName"></span></div>
+      <div class="timer-tr"><button type="button" class="timer-x" id="holdXBtn" onclick="holdStopAll()" aria-label="Stop the hold. Nothing is ticked">✕</button></div>
+    </div>
+    <div class="hold-phase" id="holdPhase" aria-live="assertive"></div>
+    <div class="timer-ring">
+      <svg viewBox="0 0 220 220">
+        <circle class="ring-bg" cx="110" cy="110" r="100"/>
+        <circle class="ring-progress" id="holdRing" cx="110" cy="110" r="100" stroke-dasharray="628" stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-inner"><div class="timer-display" id="holdDisplay"></div></div>
+    </div>
+    <div class="hold-set" id="holdSet"></div>
+    <div class="timer-controls hold-controls">
+      <button type="button" class="timer-ctrl-btn btn-start" id="holdGoBtn" data-sym="play" onclick="holdGoNow()" hidden>Start side 2</button>
+      <button type="button" class="timer-ctrl-btn btn-reset" id="holdStopBtn" onclick="holdStopAll()">Stop</button>
+    </div>
   </div>
 </div>
 
@@ -11872,7 +11911,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every effort 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · Effort 7/10 · Down 3 s · Rest 2 min 30 s</strong> (sets × reps, the effort target, how long the lowering takes, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow next to its name means it opens, and the <strong>i</strong> after it is its info.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". On a hold, like a plank, the circle times it for you: tap it, get set during 3-2-1, then it counts down and ticks the set at 0. Tap it again to stop. On a hold done each side, it waits after the first side: get set on the other side and tap <strong>Start side 2</strong>. Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small <strong>kg</strong> at the top of the weight boxes, or inside each box on a superset, is the unit. Some machines show pounds, and some show no weight at all. Tap it and pick <strong>kg</strong>, <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time. Picked the wrong one? Tap <strong>Undo</strong> in the note that shows.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and <strong>tap the circle</strong> on the right when it's done. A superset or circuit has <strong>a circle for each round</strong> under its movements: tick each round as you finish it. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · Effort 7/10 · Down 3 s · Rest 2 min 30 s</strong> (sets × reps, the effort target, how long the lowering takes, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow next to its name means it opens, and the <strong>i</strong> after it is its info.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". On a hold, like a plank, the circle times it for you: tap it and the hold timer fills the screen, big enough to read from the floor. Get set during 3-2-1, then it counts down and ticks the set at 0. <strong>Stop</strong> or <strong>✕</strong> stops it. On a hold done each side, it waits after the first side: get set on the other side and tap <strong>Start side 2</strong>. Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small <strong>kg</strong> at the top of the weight boxes, or inside each box on a superset, is the unit. Some machines show pounds, and some show no weight at all. Tap it and pick <strong>kg</strong>, <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time. Picked the wrong one? Tap <strong>Undo</strong> in the note that shows.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and <strong>tap the circle</strong> on the right when it's done. A superset or circuit has <strong>a circle for each round</strong> under its movements: tick each round as you finish it. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your effort. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. It starts with your warm-up: tick each part as you do it, or tap <strong>Done ✓</strong> for all of it. <strong>Skip</strong> moves on, and I see it was skipped. In a week where my note sets a limit, it sits under the top bar and under the effort buttons while you rest, like <strong>Max effort 7</strong>.</p><p>At the end, <strong>Finish session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ: what an exercise is for',
@@ -12146,6 +12185,7 @@ function topLayer() {
   if (on('rallyOverlay')) return closeRally;   // the rest games sit over the rest timer
   if (on('splitOverlay')) return closeSplitStep;
   if (on('setsOverlay')) return closeBetweenSets;
+  if (on('holdOverlay')) return holdStopAll;   // a hold counting: Back stops it and ticks nothing
   if (on('timerOverlay')) return closeTimer;
   if (on('readiness-overlay')) return cancelReadiness;
   if (on('hist-overlay')) return _SHEET.stack.length ? sheetBack : closeHistorySheet;   // a page back first (SHEET-01)
@@ -12202,7 +12242,7 @@ function initBackNav() {
   // Every way a layer opens or closes goes through one of these nodes' class or hidden
   // attribute, so watching them catches all of them without touching each function.
   const mo = new MutationObserver(() => navSync());
-  ['rallyOverlay', 'splitOverlay', 'setsOverlay', 'timerOverlay', 'readiness-overlay', 'hist-overlay', 'stepOverlay', 'day-view', 'crew-viewer'].forEach(id => {
+  ['rallyOverlay', 'splitOverlay', 'setsOverlay', 'holdOverlay', 'timerOverlay', 'readiness-overlay', 'hist-overlay', 'stepOverlay', 'day-view', 'crew-viewer'].forEach(id => {
     const e = document.getElementById(id);
     if (e) mo.observe(e, { attributes: true, attributeFilter: ['class', 'hidden'] });
   });
@@ -22149,21 +22189,25 @@ function repRangeText(card) {
   return /\d\s*[-–]\s*\d/.test(t) ? t.replace(/\s*[-–]\s*/, '–').replace(/[^\d–]/g, '') : '';
 }
 
-// ── THE CIRCLE COUNTS A HOLD (Love All round 4, 2026-10-24, direction A of "Round 4 choices"; Amir changed it 2026-11-02) ──
-// A set whose dose is a time ("20 s / side", the plank: data-hold, in seconds) counts down inside its own circle: a ring that empties,
-// the seconds left as the number, then a beep and a buzz at 0. Every side starts with 3-2-1 (a short beep each), so the athlete has time
-// to get down into position (Amir, 2026-11-02: "Yes, 3 seconds"). A "/ side" hold does NOT start the second side by itself any more
-// (Amir, 2026-11-02: "i dont want the clock to start again immediately, i want it to add a button for them to hit themselves"): after
-// side 1 the circle turns into a play button and a note says so with a Start side 2 button. Either one starts side 2's 3-2-1. At the end
-// the set ticks itself through the same click every tick takes, and nothing else: the rest is still the athlete's own tap (Amir,
-// 2026-11-02: "Tick set only"). A tap while it counts stops it and ticks nothing; so does the note's Stop. A done set's circle still
-// unticks as ever, and Guided's big Done button ticks at once (it sets btn._now): the athlete said it is done.
-// Reduced motion: no ring moves, only the number. One hold at a time (holdGate.run). The beeps are the rest timer's (restSoundOn()).
+// ── THE CIRCLE COUNTS A HOLD (Love All round 4, 2026-10-24, direction A of "Round 4 choices"; Amir changed it twice on 2026-11-02) ──
+// A set whose dose is a time ("20 s / side", the plank: data-hold, in seconds) is timed by the app. A tap on its circle opens THE HOLD
+// SCREEN (#holdOverlay; Amir, 2026-11-02, on the circle counting a side plank: "The times was a very small circle and that 3 second wasnt
+// enough"): the rest timer's green, a big ring and the seconds in 132 px, the side over it and the set under it, readable from the floor.
+// The circle counts with it, as before. Every side starts with 3-2-1 (a short beep each, Amir: "Yes, 3 seconds"), then the seconds,
+// then two tones and a buzz at 0. A "/ side" hold does NOT start the second side by itself (Amir: "i dont want the clock to start again
+// immediately, i want it to add a button for them to hit themselves"): after side 1 the screen says Side 1 done and waits on a big Start
+// side 2 button. At the end the screen closes and the set ticks itself through the same click every tick takes, and nothing else: the rest
+// is still the athlete's own tap (Amir: "Tick set only"). ✕, Stop and the phone's Back stop it and tick nothing. A done set's circle still
+// unticks as ever, and Guided's big Done button ticks at once (it sets btn._now): the athlete said it is done. The screen stays awake while
+// it counts (holdWake()). Reduced motion: no ring moves, only the numbers. One hold at a time (holdGate.run).
 const HOLD_READY = 3;
+let _holdLock = null;
 function holdGate(card, row, btn, idx, name, total, day) {
   const sec = parseInt(card.dataset.hold, 10);
+  if (btn._now && btn._hold) holdStop(btn);                       // Guided's Done while it counts: the athlete said it is done, so the hold
+                                                                  // stops first, or its own tick at 0 would untick the set again
   if (!sec || btn._now) return false;
-  if (btn._hold) {                                                // a tap while it runs
+  if (btn._hold) {                                                // a tap while it runs (the screen is shut only if something closed it)
     if (btn._hold.waiting) btn._hold.go();                        // waiting for side 2: this tap starts it
     else holdStop(btn);                                           // counting: stop, tick nothing
     return true;
@@ -22175,24 +22219,38 @@ function holdGate(card, row, btn, idx, name, total, day) {
   const quiet = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   const sides = card.dataset.holdSide === '1';
   const plan = sides
-    ? [['ready', HOLD_READY], ['hold', sec, 1], ['wait'], ['ready', HOLD_READY], ['hold', sec, 2]]
-    : [['ready', HOLD_READY], ['hold', sec, 0]];
+    ? [['ready', HOLD_READY, 1], ['hold', sec, 1], ['wait'], ['ready', HOLD_READY, 2], ['hold', sec, 2]]
+    : [['ready', HOLD_READY, 0], ['hold', sec, 0]];
   let phase = 0, t0 = Date.now(), lastN = null;
   const H = btn._hold = { waiting: false };
   holdGate.run = btn;
   btn.classList.add('holding');
   btn.classList.toggle('quiet', quiet);
+  // the screen
+  const ov = document.getElementById('holdOverlay'), disp = document.getElementById('holdDisplay'), ring = document.getElementById('holdRing');
+  const ph = document.getElementById('holdPhase'), go = document.getElementById('holdGoBtn'), stop = document.getElementById('holdStopBtn');
+  document.getElementById('holdName').textContent = name;
+  document.getElementById('holdSet').textContent = `Set ${idx + 1} of ${total} · ${card.dataset.dose || sec + ' s'}`;
+  ov.classList.add('visible');
+  holdWake(true);
+  const C = 628;   // the ring's length (r 100)
   const label = () => {
     const [kind, , side] = plan[phase];
     btn.setAttribute('aria-label', kind === 'wait' ? `Set ${idx + 1}: side 1 done. Tap to start side 2`
       : kind === 'ready' ? `Set ${idx + 1}: get ready. Tap to stop` : `Set ${idx + 1}${side ? ', side ' + side : ''} counting. Tap to stop`);
+    const sideOf = n => sides ? `Side ${n} of 2` : 'Hold';
+    ph.textContent = kind === 'wait' ? 'Side 1 done' : kind === 'ready' ? 'Get ready' + (sides ? ' · side ' + side : '') : sideOf(side);
+    ph.classList.toggle('go', kind === 'hold');
   };
   const draw = () => {
     const [kind, len] = plan[phase];
     if (kind === 'wait') return 1;
     const left = Math.max(0, len - (Date.now() - t0) / 1000), n = Math.ceil(left);
     btn.textContent = String(n);
-    if (!quiet) btn.style.setProperty('--hold', kind === 'hold' ? (left / len).toFixed(3) : '0');
+    if (disp.textContent !== String(n)) disp.textContent = String(n);
+    const frac = kind === 'hold' ? left / len : 0;
+    if (!quiet) btn.style.setProperty('--hold', frac.toFixed(3));
+    ring.style.strokeDashoffset = String(quiet ? 0 : C * (1 - frac));
     if (kind === 'ready' && n !== lastN && n > 0) holdBeep(660, 0.08);   // 3, 2, 1
     lastN = n;
     return left;
@@ -22203,15 +22261,20 @@ function holdGate(card, row, btn, idx, name, total, day) {
     H.waiting = kind === 'wait';
     btn.classList.toggle('waiting', H.waiting);
     btn.classList.toggle('readying', kind === 'ready');
+    ov.classList.toggle('waiting', H.waiting);
+    disp.classList.toggle('ready', kind === 'ready');
+    go.hidden = !H.waiting;
+    stop.setAttribute('aria-label', 'Stop the hold. Nothing is ticked');
     label();
     if (kind === 'hold') holdBeep(990, 0.12);                     // go
     if (H.waiting) {
       btn.textContent = ''; btn.style.removeProperty('--hold');
-      aaToast('Side 1 done. Get set on the other side, then tap Start.', { kicker: 'Other side', action: 'Start side 2', dismiss: 'Stop', run: H.go, off: () => holdStop(btn) });
-    } else if (_toastRun === H.go) hideAaToast();
+      disp.textContent = String(sec); ring.style.strokeDashoffset = '0';   // the next side's seconds, in a full ring, waiting
+      try { go.focus({ preventScroll: true }); } catch (e) {}
+    }
     draw();
   };
-  H.go = () => { if (btn._hold !== H || !H.waiting) return; phase++; enter(); };
+  H.go = () => { if (btn._hold !== H || !H.waiting) return; restAudioPrime(); phase++; enter(); };
   H.timer = setInterval(() => {
     if (!btn.isConnected) { holdStop(btn); return; }
     if (H.waiting || draw() > 0) return;
@@ -22230,11 +22293,30 @@ function holdStop(btn) {
   if (!btn || !btn._hold) return;
   const H = btn._hold;
   clearInterval(H.timer); btn._hold = null;
-  if (H.go && _toastRun === H.go) hideAaToast();                  // the "Start side 2" note goes with it
   if (holdGate.run === btn) holdGate.run = null;
   btn.classList.remove('holding', 'quiet', 'waiting', 'readying'); btn.style.removeProperty('--hold'); btn.textContent = '';
+  const ov = document.getElementById('holdOverlay');
+  if (ov) ov.classList.remove('visible', 'waiting');
+  holdWake(false);
   const row = btn.closest('.ex-set-row');
   btn.setAttribute('aria-label', `Mark set ${row ? parseInt(row.dataset.setIdx, 10) + 1 : ''} done as written`);
+}
+// The hold screen's own buttons: ✕ / Stop / Back stop the hold that is running; Start side 2 starts the waiting side.
+function holdStopAll() {
+  if (holdGate.run) holdStop(holdGate.run);
+  else { const ov = document.getElementById('holdOverlay'); if (ov) ov.classList.remove('visible', 'waiting'); holdWake(false); }
+}
+function holdGoNow() { const b = holdGate.run; if (b && b._hold && b._hold.waiting) b._hold.go(); }
+// The screen stays on while a hold runs: a 45 s plank outlasts most phones' screen lock.
+async function holdWake(on) {
+  try {
+    if (!on) { const l = _holdLock; _holdLock = null; if (l) await l.release(); return; }
+    if (_holdLock || !('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
+    const l = await navigator.wakeLock.request('screen');
+    if (!holdGate.run) { l.release(); return; }
+    _holdLock = l;
+    l.addEventListener('release', () => { if (_holdLock === l) _holdLock = null; });
+  } catch (e) { _holdLock = null; }
 }
 
 function attachSetLog(card) {
