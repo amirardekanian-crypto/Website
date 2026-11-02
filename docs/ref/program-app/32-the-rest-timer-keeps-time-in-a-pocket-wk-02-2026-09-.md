@@ -25,6 +25,9 @@ Centre Court look*, above). The timing below is unchanged.
   again (`restoreTimer()`); a paused rest says *Paused*; at zero the bar says *Go* and goes with the rest; a new rest always opens whole; ✕
   ends it as ever. A game on the rest is closed by Minimise. **Guided's rest has no Minimise** (`.timer-overlay.guided`): its rest screen is
   where the set is logged and its end moves the steps on. The phone's Back treats a minimised rest as a closed one. `scripts/headless/rest-mini.js`.
+- **10 seconds left, on the phone** (stage107, 2026-11-02): leaving the app mid-rest arms a server push 10 s before the end
+  (`restPushPrep()` at every start, `restPushArm()` on hidden, `restPushDisarm()` on visible); `docs/rules/push.md` → *The rest on a
+  phone*. `scripts/headless/rest-push.js`.
 - The overlay's dark palette came with A11Y-01 (#245). It is solid since 2026-09-27 (POL-01): at 97% the day's
   cards showed through behind the clock.
 

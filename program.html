@@ -11897,7 +11897,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app: full screen, no browser bar.</p><p>When I update the app, an orange note says <strong>A new version of the app is ready</strong>. Tap <strong>Reload</strong> and it loads in a second. You don't have to close it from your phone and open it again. <strong>Not now</strong> puts it away. Mid-session it waits until you've finished, so a reload never takes your sets with it.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. The <strong>down arrow</strong> beside it minimises it: the rest keeps running in a small bar at the bottom of the screen, so you can look at the rest of your session. Tap the bar to open the timer again. Guided keeps the whole timer. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. You get one match a session: first to 15. A bank shot off the glass counts 2. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. <strong>The Lob</strong> is a slow ball to breathe with: in as it rises, out as it falls. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it. The <strong>down arrow</strong> beside it minimises it: the rest keeps running in a small bar at the bottom of the screen, so you can look at the rest of your session. Tap the bar to open the timer again. Guided keeps the whole timer. If your notifications are on and you leave the app during a rest, your phone tells you when 10 seconds are left. Want something to do while you wait? Tap <strong>Play while you rest</strong> at the bottom and pick a game. <strong>Split Step</strong> is four quick drills: tap when I hit, pick the side, call it in or out, and time the ball onto your racket. <strong>Off the Glass</strong> is air hockey against me: drag your racket in your half and get the ball through my gap. You get one match a session: first to 15. A bank shot off the glass counts 2. <strong>Between Sets</strong> is tennis against me: a short set that saves after every point, so it lasts your whole workout. <strong>The Lob</strong> is a slow ball to breathe with: in as it rises, out as it falls. All of them stop with about 25 seconds left, and the timer shows your next set and one thing to think about. A short rest has no games, and neither does a circuit round or a retest.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. During a session it's under <strong>⋯</strong> on the bar too, as <strong>Ask Amir</strong>, and it names the exercise you have open. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
 ];
@@ -24148,6 +24148,7 @@ function startTimer() {
   paintRestMini();
   restAudioPrime();   // inside the tap that started it, so the sound at zero is allowed to play
   restWake(true);
+  restPushPrep();     // ready for the page being hidden mid-rest (the phone's "10 seconds left")
   clearInterval(timerInterval);
   timerInterval = setInterval(timerTick, 250);
 }
@@ -24305,8 +24306,49 @@ function toggleRestGames() {
 // A hidden page gets no ticks and loses its wake lock; coming back catches the clock up
 // (ending the rest if it ran out) and asks for the lock again.
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && timerRunning) { restWake(true); timerTick(); }
+  if (document.visibilityState === 'hidden') { if (timerRunning) restPushArm(); return; }
+  restPushDisarm();   // back in the app: the phone's "10 seconds left" is not owed any more
+  if (timerRunning) { restWake(true); timerTick(); }
 });
+
+// ── The rest on a phone: "10 seconds left" when the athlete has left the app (stage107; Amir, 2026-11-02: "add a notification 10sec
+// before the rest finishes if they had minimised the app and was on instagram for example"; his pick: any rest, only when they are
+// out of the app) ──
+// A frozen page cannot ring, so the server does: the moment the page is hidden with a rest running, ONE plain request tells
+// push-send?only=rest when this rest ends, and the server sends the alert 10 s before it (supabase/stage107_rest_push.sql). Back in
+// the app, push_rest_disarm() takes it back, so nothing rings while the athlete is looking at the app. Only a phone whose
+// notifications are on (AAPush.state() 'on' and a subscription), never the demo or the coach's preview.
+// What the request needs is got READY at the start of every rest, in the open page (restPushPrep()), because the hiding page has no
+// time to wait for anything: it sends a keepalive fetch with a text/plain body (a simple request, no CORS preflight) and is gone.
+let _restPush = null;   // { endpoint, token, exp, armed }
+async function restPushPrep() {
+  try {
+    if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || !window.AAPush || AAPush.state() !== 'on' || !navigator.serviceWorker) { _restPush = null; return; }
+    const reg = await navigator.serviceWorker.ready;
+    const sub = reg && reg.pushManager ? await reg.pushManager.getSubscription() : null;
+    const sb = sub ? await _sbReady() : null;
+    const session = sb ? (await sb.auth.getSession()).data.session : null;
+    if (!sub || !session) { _restPush = null; return; }
+    const was = _restPush && _restPush.armed;
+    _restPush = { endpoint: sub.endpoint, token: session.access_token, exp: (session.expires_at || 0) * 1000, armed: !!was };
+  } catch (e) { _restPush = null; }
+}
+function restPushArm() {
+  const P = _restPush;
+  if (!P || !timerRunning || (P.exp && P.exp < Date.now() + 60000)) return;   // a token about to expire would be refused
+  if (timerEndsAt - Date.now() < 13000) return;                                // 12 s or less: the alert is already late
+  P.armed = true;
+  try {
+    fetch(SB_URL + '/functions/v1/push-send?only=rest', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ endpoint: P.endpoint, end: new Date(timerEndsAt).toISOString(), token: P.token }) }).catch(() => {});
+  } catch (e) {}
+}
+async function restPushDisarm() {
+  const P = _restPush;
+  if (!P || !P.armed) return;
+  P.armed = false;
+  try { const sb = await _sbReady(); if (sb) await sb.rpc('push_rest_disarm', { p_endpoint: P.endpoint }); } catch (e) {}
+}
 
 // ── Rest: sound, buzz, screen awake ──
 // The sound is two short tones made with Web Audio, so nothing is downloaded. The audio
