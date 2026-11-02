@@ -2929,6 +2929,14 @@
   .po-txt, .uf-s { margin: 0; font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
   .uf-t { font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
   .uf-a { display: block; margin: 0; }
+  /* The rescue (rescueRate()): the finish card's effort question, on the banner. Ten 44 px keys, five to a row. */
+  .uf-q { margin: 6px 0 0; font: 700 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  .uf-hint { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  .uf-rate { justify-self: stretch; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 4px 0 4px; }
+  .uf-rate-btn { min-height: 44px; border: 0; border-radius: 10px; background: var(--row); box-shadow: inset 0 0 0 1px var(--box); color: var(--ink);
+    font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; cursor: pointer; }
+  .uf-rate-btn:active { transform: scale(0.96); }
+  .uf-rate-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   .po-btn, .uf-card .uf-send { display: inline-flex; align-items: center; gap: 6px; flex: none; min-height: 44px; margin: 0; padding: 0 12px 0 0; border: 0; border-radius: 0; background: none; cursor: pointer;
     white-space: nowrap; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
   .po-btn::after { content: ''; flex: none; width: 12px; height: 12px; background: var(--green-ink); -webkit-mask: var(--chev) center / 12px no-repeat; mask: var(--chev) center / 12px no-repeat; }
@@ -7480,6 +7488,8 @@ function _snapshot() {
     if (k && k.indexOf(prefix + 'hlwin_d') === 0) continue;
     // Hold Serve's copy of the server's held weeks (Career Mode): a cache of the server's facts, never progress.
     if (k === prefix + 'holdcache') continue;
+    // When a day was last touched (markTouched(), 2026-11-02): this phone's clock for its own reminder and rescue, never progress.
+    if (k && k.indexOf(prefix + 'lastact_d') === 0) continue;
     // The career's profile (Career Mode phase 2): a cache of get_profile(); and what a finished day earned, this phone's view of it.
     if (k === prefix + 'careercache' || (k && k.indexOf(prefix + 'earn_d') === 0)) continue;
     // Your moments (Career Mode round 5): a cache of get_my_moments() and get_awards(), never progress.
@@ -10004,9 +10014,26 @@ function closeUnfinished(id) {
   const on = localStorage.getItem(ATHLETE_ID + '_touched_d' + id);
   localStorage.setItem(ATHLETE_ID + '_completed_d' + id, on + '|' + progToken());
   // A clock still running has no end anybody knows: Done was never pressed, so the time since is the night, not the
-  // session (a 19:00 start filed at 06:30 said "Duration: 690 min"). The record goes with no duration (2026-10-20).
+  // session (a 19:00 start filed at 06:30 said "Duration: 690 min"). The record went with no duration (2026-10-20).
+  // Since 2026-11-02 (the rescue; Amir: "Make the rescue as well") the session ends at its LAST TICK, the last time the day was
+  // touched (markTouched(): <id>_lastact_d<N>), when that is on the session's own day and after its clock started: the clock is
+  // stopped there. Anything else still files with no duration, as before.
   const t = loadTimer(id);
-  if (t && t.running && !t.finished) saveTimer(id, Object.assign(t, { running: false, resumeAt: null, acc: 0 }));
+  if (t && t.running && !t.finished) {
+    const end = unfinishedEnd(id, t);
+    const acc = end ? (t.acc || 0) + Math.max(0, end - (Number(t.resumeAt) || end)) : 0;
+    saveTimer(id, Object.assign(t, { running: false, resumeAt: null, acc }));
+  }
+}
+// The last tick of an unfinished day, as a time, or 0 when it cannot be trusted: it must be on the day the day was touched, after
+// the clock started, and less than 12 hours after it (no real session is longer; buildSessionData() drops 720+ minutes anyway).
+function unfinishedEnd(id, t) {
+  const last = Number(localStorage.getItem(ATHLETE_ID + '_lastact_d' + id)) || 0;
+  const on = localStorage.getItem(ATHLETE_ID + '_touched_d' + id);
+  const start = t && t.sessionStart ? new Date(t.sessionStart).getTime() : 0;
+  if (!last || !start || isNaN(start) || last <= start || last - start > 12 * 3600000) return 0;
+  if (!on || new Date(last).toDateString() !== on) return 0;
+  return last;
 }
 // From boot, once the days are drawn (getDayCompletion() counts the drawn sets). Files each
 // unfinished day into the session queue, notes what it filed for Home, and answers true when
@@ -10018,9 +10045,18 @@ function fileUnfinished() {
   const filed = [];
   unfinishedDays().forEach(id => {
     const st = getDayCompletion(id);
+    const t0 = loadTimer(id), end = t0 && t0.running && !t0.finished ? unfinishedEnd(id, t0) : 0;
     closeUnfinished(id);
     recordSessionToCloud(id);              // queued before its first await (see there)
-    filed.push({ day: id, on: sessionDateFor(id), done: st.done, total: st.total, at: Date.now() });
+    // The rescue (2026-11-02): what Home needs to ask the session's effort afterwards. The session as it was saved (the queue's own
+    // copy, `p`), when it started and ended (the last tick), its minutes, and whether it was rated. The note is this phone's alone.
+    const on = sessionDateFor(id);
+    let q = null;
+    try { q = _csqLoad().find(e => _csqSess(e) === Number(id) + '|' + on) || null; } catch (e) {}
+    const ps = q && q.p_session ? q.p_session : {};
+    filed.push({ day: id, on, done: st.done, total: st.total, at: Date.now(),
+      from: t0 && t0.sessionStart ? new Date(t0.sessionStart).getTime() : 0, to: end, min: Number(ps.duration_min) || 0,
+      rated: !!ps.session_rpe, p: q ? Object.assign({}, q, { _q: undefined }) : null });
   });
   (DATA.workouts && DATA.workouts.days || []).forEach(d => {
     const id = String(d.id);
@@ -10053,15 +10089,52 @@ function paintUnfinished() {
   const on = new Date(n.on + 'T12:00:00');
   const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][on.getDay()];
   const more = notes.length - 1;
+  // The rescue (Amir, 2026-11-02: "Make the rescue as well"): when the saved session has no effort yet, the card asks for it, and
+  // says the time it ran when the last tick gave it an end. One tap re-saves the session with it (rescueRate()), so the day's load
+  // reaches Amir. An older version of the note (no `p`) only says what was saved, as before.
+  const hm = ms => new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const ran = n.from && n.to && n.min ? ` You trained from ${hm(n.from)} to your last set at ${hm(n.to)}, ${Number(n.min)} min.` : '';
+  const ask = n.p && !n.rated;
+  const rate = ask ? `<div class="uf-q">How hard was that session?</div>
+      <div class="uf-hint">1 = very easy · 10 = maximum effort</div>
+      <div class="uf-rate">${[1,2,3,4,5,6,7,8,9,10].map(v => `<button type="button" class="uf-rate-btn" onclick="rescueRate(${v})" aria-label="Session effort ${v} of 10">${v}</button>`).join('')}</div>` : '';
+  const said = n.rpe ? ` Effort ${Number(n.rpe)} saved. Thanks.` : '';
   wrap.innerHTML = `<div class="uf-card">
       <div class="uf-k">Saved for you</div>
       <div class="uf-t">${esc(dayName)}'s Day ${esc(n.day)} wasn't finished</div>
-      <div class="uf-s">I still got it, as you left it: ${Number(n.done) || 0} of ${Number(n.total) || 0} sets.${more > 0 ? ` And ${more} more like it.` : ''} Next time tap Done at the end.</div>
+      <div class="uf-s">I still got it, as you left it: ${Number(n.done) || 0} of ${Number(n.total) || 0} sets.${ran}${more > 0 ? ` And ${more} more like it.` : ''}${said} Next time tap Done at the end.</div>
+      ${rate}
       <div class="uf-a">
-        <button type="button" class="uf-send" onclick="dismissFiled()">OK</button>
+        <button type="button" class="uf-send" onclick="dismissFiled()">${ask ? 'Skip' : 'OK'}</button>
       </div>
     </div>`;
 }
+// The rescue's tap: the saved session again, with the effort (and its load when the minutes are known), through the same queue as
+// every save (nothing is ever lost on the way: the queue keeps it until the server has it). save_session overwrites the same day
+// and date. The note remembers the answer so the card says thanks.
+function rescueRate(v) {
+  let notes = [];
+  try { notes = JSON.parse(localStorage.getItem(ATHLETE_ID + '_autofiled') || '[]') || []; } catch (e) {}
+  const n = notes[notes.length - 1];
+  if (!n || !n.p || n.rated || window.IS_DEMO || window.IS_PREVIEW) return;
+  v = Math.max(1, Math.min(10, parseInt(v, 10) || 0));
+  if (!v) return;
+  const base = JSON.parse(JSON.stringify(n.p));
+  delete base._q;
+  const ps = base.p_session = base.p_session || {};
+  ps.session_rpe = String(v);
+  const min = Number(ps.duration_min) || 0;
+  let sum = String(ps.summary || '').replace(/Session RPE: [^\n]*/, `Session RPE: ${v}/10`);
+  if (min && !/Session Load:/.test(sum)) sum = sum.replace(/(Duration: \d+ min\n)/, `$1Session Load: ${Math.round(v * min)} AU (sRPE ${v} × ${min} min)\n`);
+  ps.summary = sum;
+  n.rated = true; n.rpe = v;
+  try { _lsRawSet(ATHLETE_ID + '_autofiled', JSON.stringify(notes)); } catch (e) {}
+  const entry = _enqueueSession(base);   // on the phone first
+  paintUnfinished();
+  const sb = _sb();
+  if (sb && entry) _sendSession(sb, entry).then(okd => { if (okd) { _dequeueSession(entry); refreshHoldSoon(); } });
+}
+window.rescueRate = rescueRate;
 function dismissFiled() {
   try { _lsRawRemove(ATHLETE_ID + '_autofiled'); } catch (e) {}
   paintUnfinished();
@@ -11580,6 +11653,9 @@ function toggleCheckOnly(item, day) {
 function markTouched(day) {
   if (isLoading || day == null) return;
   localStorage.setItem(ATHLETE_ID + '_touched_d' + day, new Date().toDateString());
+  // When the day was last touched (stage108's reminder, the rescue's end time). This phone's own, never synced: _lsRawSet().
+  try { _lsRawSet(ATHLETE_ID + '_lastact_d' + day, String(Date.now())); } catch (e) {}
+  if (!markTouched.prep || Date.now() - markTouched.prep > 300000) { markTouched.prep = Date.now(); restPushPrep(); }
 }
 
 // ── OPENING AND CLOSING A CARD: THE ROW STAYS PUT (Amir, 2026-10-19) ──────────────────────────────────────────────
@@ -11924,7 +12000,7 @@ const APP_GUIDE = [
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Stop here</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>If something isn't logged, the card says what, under <strong>Still to log</strong>: a set not ticked, a set with no weight or no effort, a round not ticked. Tap a line to go straight to it. It goes from the list as soon as you log it.</p><p>One session at a time. While a day is under way, Home shows it with <strong>Resume</strong>, and the other days wait until you finish it or stop it.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Adding it up</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Stop here</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>If something isn't logged, the card says what, under <strong>Still to log</strong>: a set not ticked, a set with no weight or no effort, a round not ticked. Tap a line to go straight to it. It goes from the list as soon as you log it.</p><p>One session at a time. While a day is under way, Home shows it with <strong>Resume</strong>, and the other days wait until you finish it or stop it.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Adding it up</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly. Forget to tap Done? If your notifications are on, your phone reminds you 10 minutes after your last set. Tap it and you land on this card. And the next time you open the app, it asks how hard that session was, so I still get it.</p>` },
   { icon: 'activity', key: 'career', title: 'Career: your level',
     body: `<p>Your level is the number in the ring on Home's habit card. Tap the ring to open Your numbers. The weeks you've held in a row sit beside <strong>This Week</strong>. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>adding it up</strong> until my side has it.</p><p>Your four numbers are in <strong>Your numbers</strong> on Progress: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers. It says how many you have and which one you're closest to. Open it and you see your cabinet. Every achievement is an emblem. In colour, you have won it. In grey, you have not, and it says what is left. <strong>Latest</strong> comes first, and <strong>New</strong> sits on what you have not seen yet. A small dot on <strong>Progress</strong> says there is something new in there. The chips under <strong>All achievements</strong> show only what you have won, or what is left, or one kind: consistency, commitment, progress or resilience. Tap an emblem to see what it asks for and how far along you are. Every ten levels you win a new level medal. When a session leaves you one step short of an achievement, its card tells you.</p><p>When I set you a job for the month, it sits right under this cycle's card, with a ring beside it. It is something to do, not a target for your training — I tick it off when you have done it. <strong>Achievements</strong> is the last row of <strong>Your numbers</strong>, with your three newest. Tap it to open your cabinet. The short notes I send you are on the <strong>Coach</strong> tab, under <strong>Notes from Amir</strong>. A new one shows on Home until you open it.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks in a row you trained',
@@ -24388,8 +24464,9 @@ function toggleRestGames() {
 // A hidden page gets no ticks and loses its wake lock; coming back catches the clock up
 // (ending the rest if it ran out) and asks for the lock again.
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') { if (timerRunning) restPushArm(); return; }
-  restPushDisarm();   // back in the app: the phone's "10 seconds left" is not owed any more
+  if (document.visibilityState === 'hidden') { if (timerRunning) restPushArm(); finishPushArm(); return; }
+  localAlertsOff();   // back in the app: nothing this phone set for itself is owed
+  restPushDisarm();   // …and nothing the server holds for it (both kinds)
   if (timerRunning) { restWake(true); timerTick(); }
 });
 
@@ -24400,36 +24477,117 @@ document.addEventListener('visibilitychange', () => {
 // push-send?only=rest when this rest ends, and the server sends the alert 10 s before it (supabase/stage107_rest_push.sql). Back in
 // the app, push_rest_disarm() takes it back, so nothing rings while the athlete is looking at the app. Only a phone whose
 // notifications are on (AAPush.state() 'on' and a subscription), never the demo or the coach's preview.
-// What the request needs is got READY at the start of every rest, in the open page (restPushPrep()), because the hiding page has no
-// time to wait for anything: it sends a keepalive fetch with a text/plain body (a simple request, no CORS preflight) and is gone.
-let _restPush = null;   // { endpoint, token, exp, armed }
+// What the request needs is got READY in the open page (restPushPrep(): at every rest start and, at most every 5 minutes, on a tick),
+// because the hiding page has no time to wait for anything: it sends a keepalive fetch with a text/plain body (a simple request, no
+// CORS preflight) and is gone. The state is restPushPrep.s, a property and not a `let`, so nothing that runs during boot can meet it
+// in its dead zone.
+//
+// ── "Your session is still open" (stage108; Amir, 2026-11-02: "Some people forget to hit finish on the session" and "Lets remind
+// them 10 min instead of 30 min") ──
+// The same road, a second kind: the page hidden with a session open (activeDayId(), not finished) arms a reminder 10 minutes after
+// the day's last tick (<id>_lastact_d<N>, markTouched()), or a minute from now when that is already past. Coming back takes it back.
+//
+// ── Offline, on Android (Amir, 2026-11-02: "Imagine someone is training without internet") ──
+// Chrome on Android keeps a hidden page's timers running for a few minutes, so the app ALSO sets each alert for itself
+// (localAlert()): no internet needed. An iPhone freezes the page at once, so there it is the server's alert or nothing, and the timer
+// that wakes on the way back in checks it is still hidden and says nothing. Both alerts carry the same tag, so the phone shows one;
+// sw.js lets a push that lands after this phone's own alert replace it quietly instead of buzzing twice.
+const FINISH_NUDGE_MS = 10 * 60000;
 async function restPushPrep() {
   try {
-    if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || !window.AAPush || AAPush.state() !== 'on' || !navigator.serviceWorker) { _restPush = null; return; }
+    if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || !window.AAPush || AAPush.state() !== 'on' || !navigator.serviceWorker) { restPushPrep.s = null; return; }
     const reg = await navigator.serviceWorker.ready;
     const sub = reg && reg.pushManager ? await reg.pushManager.getSubscription() : null;
     const sb = sub ? await _sbReady() : null;
     const session = sb ? (await sb.auth.getSession()).data.session : null;
-    if (!sub || !session) { _restPush = null; return; }
-    const was = _restPush && _restPush.armed;
-    _restPush = { endpoint: sub.endpoint, token: session.access_token, exp: (session.expires_at || 0) * 1000, armed: !!was };
-  } catch (e) { _restPush = null; }
+    if (!sub || !session) { restPushPrep.s = null; return; }
+    const was = restPushPrep.s && restPushPrep.s.armed;
+    restPushPrep.s = { endpoint: sub.endpoint, token: session.access_token, exp: (session.expires_at || 0) * 1000, armed: !!was };
+  } catch (e) { restPushPrep.s = null; }
 }
-function restPushArm() {
-  const P = _restPush;
-  if (!P || !timerRunning || (P.exp && P.exp < Date.now() + 60000)) return;   // a token about to expire would be refused
-  if (timerEndsAt - Date.now() < 13000) return;                                // 12 s or less: the alert is already late
+// One keepalive request for one kind. False when there is nothing to send it with.
+function alertPushSend(body) {
+  const P = restPushPrep.s;
+  if (!P || (P.exp && P.exp < Date.now() + 60000)) return false;   // a token about to expire would be refused
   P.armed = true;
   try {
     fetch(SB_URL + '/functions/v1/push-send?only=rest', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ endpoint: P.endpoint, end: new Date(timerEndsAt).toISOString(), token: P.token }) }).catch(() => {});
+      body: JSON.stringify(Object.assign({ endpoint: P.endpoint, token: P.token }, body)) }).catch(() => {});
   } catch (e) {}
+  return true;
+}
+function restPushArm() {
+  if (!timerRunning) return;
+  if (timerEndsAt - Date.now() < 13000) return;                                // 12 s or less: the alert is already late
+  localAlert('rest', timerEndsAt - 10000);
+  alertPushSend({ end: new Date(timerEndsAt).toISOString() });
+}
+function finishPushArm() {
+  try {
+    if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || typeof DATA === 'undefined' || !DATA) return;
+    const day = activeDayId();
+    if (!day) return;
+    const t = loadTimer(day);
+    if (t && t.finished) return;
+    const last = Number(localStorage.getItem(ATHLETE_ID + '_lastact_d' + day)) || 0;
+    const from = last || (t && t.sessionStart ? new Date(t.sessionStart).getTime() : 0);
+    if (!from) return;
+    const at = Math.max(from + FINISH_NUDGE_MS, Date.now() + 60000);
+    localAlert('finish', at);
+    alertPushSend({ kind: 'finish', at: new Date(at).toISOString() });
+  } catch (e) { /* no reminder: the rescue on the next open still catches it */ }
 }
 async function restPushDisarm() {
-  const P = _restPush;
+  const P = restPushPrep.s;
   if (!P || !P.armed) return;
   P.armed = false;
   try { const sb = await _sbReady(); if (sb) await sb.rpc('push_rest_disarm', { p_endpoint: P.endpoint }); } catch (e) {}
+}
+// This phone's own alert, for when there is no internet (Android). The words are the server's, in the athlete's notification
+// language: ⚠️ the same words live in push_alert_take() (supabase/stage108_finish_push.sql); change both.
+function localAlert(kind, at) {
+  const T = localAlert.t || (localAlert.t = {});
+  clearTimeout(T[kind]); T[kind] = null;
+  try { if (!('Notification' in window) || Notification.permission !== 'granted' || !navigator.serviceWorker) return; } catch (e) { return; }
+  if (window.IS_DEMO || window.IS_PREVIEW) return;
+  const ms = at - Date.now();
+  if (!(ms >= 0 && ms < 6 * 3600000)) return;
+  T[kind] = setTimeout(async () => {
+    T[kind] = null;
+    if (document.visibilityState !== 'hidden') return;   // an iPhone's frozen timer waking on the way back in says nothing
+    try {
+      const fa = !!(DATA && DATA.athlete && DATA.athlete.lang === 'fa');
+      const w = localAlert.WORDS[kind][fa ? 1 : 0];
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification(w[0], { body: w[1], tag: kind, renotify: true, icon: '/assets/img/icon-192.png', badge: '/assets/img/icon-192.png',
+        data: { url: kind === 'finish' ? '/program.html#finish' : '/program.html', kind, local: Date.now() } });
+    } catch (e) {}
+  }, ms);
+}
+localAlert.WORDS = {
+  rest:   [['10 seconds left', 'Get set for your next set.'], ['۱۰ ثانیه تا آخر استراحت', 'برای ست بعدی آماده شو.']],
+  finish: [['Your session is still open', 'Done training? Tap to finish it.'], ['جلسه‌ت هنوز بازه', 'تمرینت تموم شد؟ بزن و تمومش کن.']]
+};
+function localAlertsOff() { const T = localAlert.t || {}; Object.keys(T).forEach(k => { clearTimeout(T[k]); T[k] = null; }); }
+
+// A tap on "Your session is still open" (sw.js: #finish, or its message to an open app): the day under way, at its finish card, or
+// with ⋯ open on the session bar so Finish early is right there when sets are left. Nothing opens over Guided, a rest or the check-in.
+function goFinishSoon() {
+  let left = 20;
+  const tick = () => {
+    if (typeof DATA === 'undefined' || !DATA || isLoading || !document.getElementById('day-view')) { if (--left > 0) setTimeout(tick, 300); return; }
+    const day = activeDayId();
+    if (!day) return;
+    if (document.querySelector('#stepOverlay.visible, #timerOverlay.visible, #holdOverlay.visible, #readiness-overlay.visible')) return;
+    const act = document.querySelector('.day-content.active'), dv = document.getElementById('day-view');
+    if (!(act && act.id === 'day' + day && dv && !dv.hidden)) openDayView(day);
+    setTimeout(() => {
+      const conf = document.getElementById('confirm-' + day), bar = document.getElementById('timer-' + day);
+      if (conf && conf.classList.contains('visible')) scrollFinishCard(conf);
+      else if (bar && !bar.classList.contains('open')) toggleBarMore(day);
+    }, 450);
+  };
+  tick();
 }
 
 // ── Rest: sound, buzz, screen awake ──
@@ -27841,8 +27999,13 @@ function initCrewDeepLink() {
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     goToInboxSoon();
   }
+  if (location.hash === '#finish') {   // "Your session is still open" (stage108): the day under way, at its finish
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    goFinishSoon();
+  }
   if (navigator.serviceWorker) {
     navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data && e.data.aa === 'go' && e.data.screen === 'finish') goFinishSoon();
       if (e.data && e.data.aa === 'go' && e.data.screen === 'crew') goToCrewSoon();
       if (e.data && e.data.aa === 'go' && e.data.screen === 'inbox') goToInboxSoon();
     });

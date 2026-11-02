@@ -32,6 +32,10 @@
 //                              (EdgeRuntime.waitUntil): every alert waits 75 s at most, far inside the 150 s wall clock.
 //                              push_rest_take() is the one door to sending, so two callers that saw the same rest send it once,
 //                              and a rest the athlete came back to (push_rest_disarm()) sends nothing.
+//                              stage108 (2026-11-02): the same road carries a second kind, { kind: 'finish', endpoint, at, token }
+//                              from the phone: "Your session is still open", 10 minutes after the last set of a session left
+//                              open (push_finish_arm()). The job's list and the one door to sending are push_alert_due() and
+//                              push_alert_take(), which answer for both kinds with each kind's words, tag, TTL and urgency.
 //
 // THE FOUR KINDS, and where each one is decided: habits and workout in push_due() (stage84, hourly,
 // at the athlete's own hour), crew in crew_push_due() (stage86, every 15 minutes), cycle in
@@ -73,20 +77,20 @@ const CORS = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 
-// The rest alert (stage107). Waits until the alert is due, takes it (only while its token is live), sends it.
+// The rest alert (stage107) and the "still open" reminder (stage108). Waits until it is due, takes it (only while its token is live),
+// sends it with its own kind's tag, TTL and urgency (push_alert_take() decides them: the rest 30 s and high, the reminder an hour).
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void } | undefined;
 const REST_WINDOW = 75;   // seconds; the every-minute job's window is 70, so every alert is in some run's
-interface RestDue { endpoint: string; rest_at: string; rest_token: string }
+interface AlertDue { endpoint: string; kind: string; due_at: string; token: string }
 // deno-lint-ignore no-explicit-any
-async function restSend(db: any, vapid: { subject: string; publicKey: string; privateKey: string }, d: RestDue) {
-  const wait = Math.min(REST_WINDOW * 1000, Math.max(0, Date.parse(d.rest_at) - Date.now()));
+async function restSend(db: any, vapid: { subject: string; publicKey: string; privateKey: string }, d: AlertDue) {
+  const wait = Math.min(REST_WINDOW * 1000, Math.max(0, Date.parse(d.due_at) - Date.now()));
   if (wait > 0) await new Promise(r => setTimeout(r, wait));
-  const { data, error } = await db.rpc('push_rest_take', { p_endpoint: d.endpoint, p_token: d.rest_token });
+  const { data, error } = await db.rpc('push_alert_take', { p_endpoint: d.endpoint, p_kind: d.kind, p_token: d.token });
   if (error || !data || !data.length) return 'not owed';
   const t = data[0];
-  const payload = JSON.stringify({ title: t.title, body: t.body, tag: 'rest', sent: Date.now() });
-  // TTL 30 s and high urgency: an alert that would arrive after the rest is dropped by the push service, not delivered late.
-  const r = await sendPush({ endpoint: t.endpoint, p256dh: t.p256dh, auth: t.auth }, payload, vapid, { ttl: 30, urgency: 'high' });
+  const payload = JSON.stringify({ title: t.title, body: t.body, tag: t.tag, sent: Date.now() });
+  const r = await sendPush({ endpoint: t.endpoint, p256dh: t.p256dh, auth: t.auth }, payload, vapid, { ttl: t.ttl, urgency: t.urgency });
   if (r.gone) await db.rpc('push_drop', { p_endpoint: t.endpoint });
   return r.ok ? 'sent' : 'failed ' + r.status;
 }
@@ -137,27 +141,30 @@ Deno.serve(async (req) => {
     if (!publicKey || !privateKey) return json({ error: 'the VAPID keys are not set' }, 500);
     const vapid = { subject, publicKey, privateKey };
     if (same) {
-      const { data, error } = await db.rpc('push_rest_due', { p_within: REST_WINDOW });
-      if (error) return json({ error: 'push_rest_due: ' + error.message }, 500);
-      const due = (data ?? []) as RestDue[];
+      const { data, error } = await db.rpc('push_alert_due', { p_within: REST_WINDOW });
+      if (error) return json({ error: 'push_alert_due: ' + error.message }, 500);
+      const due = (data ?? []) as AlertDue[];
       inBackground(Promise.all(due.map(d => restSend(db, vapid, d))));
       return json({ rest: due.length });
     }
     // The body is text/plain JSON with the athlete's token in it, NOT an Authorization header: the phone sends it as the page is
     // being hidden (fetch keepalive), and a custom header would need a CORS preflight first, which a page going to sleep may
     // never finish. A plain-text POST is a simple request and goes in one trip.
-    let body: { endpoint?: string; end?: string; token?: string } = {};
+    let body: { kind?: string; endpoint?: string; end?: string; at?: string; token?: string } = {};
     try { body = JSON.parse(await req.text()); } catch { /* no body: nothing to arm */ }
     const jwt = body.token || (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '');
-    if (!jwt || !body.endpoint || !body.end) return json({ error: 'no' }, 401);
+    const kind = body.kind === 'finish' ? 'finish' : 'rest';
+    if (!jwt || !body.endpoint || !(kind === 'finish' ? body.at : body.end)) return json({ error: 'no' }, 401);
     const asAthlete = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
       auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${jwt}` } },
     });
-    const { data, error } = await asAthlete.rpc('push_rest_arm', { p_endpoint: body.endpoint, p_end: body.end });
-    if (error) return json({ error: 'push_rest_arm: ' + error.message }, 400);
+    const { data, error } = kind === 'finish'
+      ? await asAthlete.rpc('push_finish_arm', { p_endpoint: body.endpoint, p_at: body.at })
+      : await asAthlete.rpc('push_rest_arm', { p_endpoint: body.endpoint, p_end: body.end });
+    if (error) return json({ error: 'arm: ' + error.message }, 400);
     if (!data) return json({ armed: false });
-    const d = { endpoint: body.endpoint, rest_at: data.at, rest_token: data.token } as RestDue;
-    if (Date.parse(d.rest_at) - Date.now() <= REST_WINDOW * 1000) inBackground(restSend(db, vapid, d));
+    const d = { endpoint: body.endpoint, kind, due_at: data.at, token: data.token } as AlertDue;
+    if (Date.parse(d.due_at) - Date.now() <= REST_WINDOW * 1000) inBackground(restSend(db, vapid, d));
     return json({ armed: true });   // a longer rest is the every-minute job's
   }
 

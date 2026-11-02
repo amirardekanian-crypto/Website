@@ -55,3 +55,19 @@ went wrong" and kept nothing, and every extra tap sent another email. Now:
 
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*
+
+## The rescue: a forgotten Done (2026-11-02)
+
+Amir: *"Some people forget to hit finish on the session"*, then *"Make the rescue as well"*. A day left unfinished is still filed
+by itself at the next open (`fileUnfinished()`, DATA-02), but now with what Amir needs from it:
+
+- **Its real time.** `closeUnfinished()` stops a running clock at the day's **last tick** (`unfinishedEnd()`: `<id>_lastact_d<N>`,
+  on the day it was touched, after the clock started, under 12 hours) instead of throwing the time away. With no such tick it files
+  with no duration, as before.
+- **Its effort, asked on Home.** The *Saved for you* banner (`paintUnfinished()`) says when it ran (*from 18:10 to your last set at
+  19:02, 52 min*) and asks **How hard was that session?** with the finish card's ten keys. One tap (`rescueRate()`) sends the saved
+  session again (the queue's own copy, kept in `<id>_autofiled`) with the session RPE and its load in the summary, through the same
+  queue, so nothing is lost on the way; `save_session` overwrites the same day and date. **Skip** puts the banner away.
+- **A reminder first**, when the phone allows it: *Your session is still open*, 10 minutes after the last tick (stage108,
+  `docs/rules/push.md`). The guide's finishing card says both.
+- `scripts/headless/finish-nudge.js` (R1, R2).

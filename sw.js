@@ -537,7 +537,11 @@
 // v239: program.html changed (2026-11-02, stage107): leaving the app mid-rest arms the phone's "10 seconds left" from the server; back in the app takes it back.
 // v240: program.html changed (2026-11-02, Amir: "The times was a very small circle and that 3 second wasnt enough"). A timed set opens the
 // hold screen: a big ring and the seconds readable from the floor, Start side 2 as a big button, ✕ / Stop / Back to stop it.
-const CACHE = 'aap-v240';
+// v241: program.html and sw.js changed (2026-11-02, Amir: "Some people forget to hit finish", "Lets remind them 10 min", "Make the rescue
+// as well", "Imagine someone is training without internet"). "Your session is still open" 10 minutes after the last set (stage108), its tap
+// opens the finish card (#finish); Android sets the rest alert and the reminder itself too, and a push after it replaces it quietly; the
+// next open asks a forgotten session's effort and files its real time.
+const CACHE = 'aap-v241';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -741,19 +745,32 @@ self.addEventListener('push', event => {
   // A crew notification that FOLDS several events (crew_push_words(), n > 1: "The crew has been busy" / "تو تیم خبر هست") opens the Inbox (Home Crowd step 2d, idea 90); one that names a single
   // event keeps landing on the Crew tab (step 1, idea 77). program.html reads the #inbox hash the same way it reads #crew.
   const folded = kind === 'crew' && (d.title === 'The crew has been busy' || d.title === 'تو تیم خبر هست');
-  const url = d.url || (kind === 'crew' ? (folded ? '/program.html#inbox' : '/program.html#crew') : '/program.html');
-  event.waitUntil(
-    self.registration.showNotification(title, {
-      body: d.body || '',
-      icon: '/assets/img/icon-192.png',
-      badge: '/assets/img/icon-192.png',
-      // One tag per kind: a second habit reminder REPLACES the first on the lock screen instead of
-      // stacking, so nobody wakes up to four of them.
-      tag: kind,
-      renotify: true,
-      data: { url, kind, sent: d.sent || null }
-    }).catch(() => self.registration.showNotification(title, { body: d.body || '', tag: kind }))
-  );
+  // "Your session is still open" (stage108) opens the day under way at its finish card (program.html reads #finish, goFinishSoon()).
+  const url = d.url || (kind === 'crew' ? (folded ? '/program.html#inbox' : '/program.html#crew') : kind === 'finish' ? '/program.html#finish' : '/program.html');
+  event.waitUntil((async () => {
+    // The rest alert and the "still open" reminder are also set by the app itself on Android, for a gym with no internet
+    // (localAlert()). When this phone already showed its own a moment ago, the push replaces it QUIETLY (renotify false): one
+    // buzz, not two. A push must always show something, so it is never simply dropped.
+    let quiet = false;
+    if (kind === 'rest' || kind === 'finish') {
+      try {
+        const mine = await self.registration.getNotifications({ tag: kind });
+        quiet = mine.some(n => n.data && n.data.local && Date.now() - n.data.local < 5 * 60000);
+      } catch (e) {}
+    }
+    try {
+      await self.registration.showNotification(title, {
+        body: d.body || '',
+        icon: '/assets/img/icon-192.png',
+        badge: '/assets/img/icon-192.png',
+        // One tag per kind: a second habit reminder REPLACES the first on the lock screen instead of
+        // stacking, so nobody wakes up to four of them.
+        tag: kind,
+        renotify: !quiet,
+        data: { url, kind, sent: d.sent || null }
+      });
+    } catch (e) { await self.registration.showNotification(title, { body: d.body || '', tag: kind }); }
+  })());
 });
 
 self.addEventListener('notificationclick', event => {

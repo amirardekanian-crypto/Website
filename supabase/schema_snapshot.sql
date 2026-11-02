@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 77 tables, 324 functions, 11 sequences.
+-- 77 tables, 327 functions, 11 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -716,7 +716,9 @@ create table public.push_subs (
   last_ok_at timestamp with time zone,
   fails smallint default 0 not null,
   rest_at timestamp with time zone,
-  rest_token uuid
+  rest_token uuid,
+  finish_at timestamp with time zone,
+  finish_token uuid
 );
 
 create table public.qualities (
@@ -9829,6 +9831,49 @@ begin
   return v_n;
 end; $function$;
 
+CREATE OR REPLACE FUNCTION public.push_alert_due(p_within integer DEFAULT 70)
+ RETURNS TABLE(endpoint text, kind text, due_at timestamp with time zone, token uuid)
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  with w as (select now() + make_interval(secs => least(greatest(coalesce(p_within, 70), 0), 120)) as till)
+  select s.endpoint, 'rest', s.rest_at, s.rest_token from public.push_subs s, w
+   where s.rest_at is not null and s.rest_at <= w.till and s.rest_at > now() - interval '30 seconds'
+  union all
+  select s.endpoint, 'finish', s.finish_at, s.finish_token from public.push_subs s, w
+   where s.finish_at is not null and s.finish_at <= w.till and s.finish_at > now() - interval '15 minutes'
+  order by 3
+  limit 400;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.push_alert_take(p_endpoint text, p_kind text, p_token uuid)
+ RETURNS TABLE(endpoint text, p256dh text, auth text, athlete_id text, lang text, title text, body text, tag text, ttl integer, urgency text)
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  if p_token is null then return; end if;
+  if p_kind = 'rest' then
+    return query
+    update public.push_subs s set rest_at = null, rest_token = null, last_sent_at = now()
+     where s.endpoint = p_endpoint and s.rest_token = p_token and s.rest_at is not null and s.rest_at > now() - interval '30 seconds'
+    returning s.endpoint, s.p256dh, s.auth, s.athlete_id, s.lang,
+              case when s.lang = 'fa' then '۱۰ ثانیه تا آخر استراحت' else '10 seconds left' end,
+              case when s.lang = 'fa' then 'برای ست بعدی آماده شو.' else 'Get set for your next set.' end,
+              'rest'::text, 30, 'high'::text;
+  elsif p_kind = 'finish' then
+    return query
+    update public.push_subs s set finish_at = null, finish_token = null, last_sent_at = now()
+     where s.endpoint = p_endpoint and s.finish_token = p_token and s.finish_at is not null and s.finish_at > now() - interval '15 minutes'
+    returning s.endpoint, s.p256dh, s.auth, s.athlete_id, s.lang,
+              case when s.lang = 'fa' then 'جلسه‌ت هنوز بازه' else 'Your session is still open' end,
+              case when s.lang = 'fa' then 'تمرینت تموم شد؟ بزن و تمومش کن.' else 'Done training? Tap to finish it.' end,
+              'finish'::text, 3600, 'normal'::text;
+  end if;
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.push_done(p_athlete_id text, p_kind text, p_day date, p_ok boolean DEFAULT true)
  RETURNS void
  LANGUAGE plpgsql
@@ -9908,6 +9953,29 @@ AS $function$
     from picked p
     cross join lateral public.push_lines(p.kind, p.lang) l
 $function$;
+
+CREATE OR REPLACE FUNCTION public.push_finish_arm(p_endpoint text, p_at timestamp with time zone)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_id text := public.current_athlete_id(); v_tok uuid := gen_random_uuid(); n int;
+begin
+  if v_id is null or p_endpoint is null then return null; end if;
+  if p_at is null or p_at < now() + interval '30 seconds' or p_at > now() + interval '6 hours' then
+    update public.push_subs set finish_at = null, finish_token = null where endpoint = p_endpoint and athlete_id = v_id;
+    return null;
+  end if;
+  update public.push_subs
+     set finish_at = p_at, finish_token = v_tok
+   where endpoint = p_endpoint and athlete_id = v_id
+     and coalesce(kinds ->> 'finish', 'true') <> 'false'
+     and fails < 5;
+  get diagnostics n = row_count;
+  if n = 0 then return null; end if;
+  return jsonb_build_object('at', p_at, 'token', v_tok);
+end $function$;
 
 CREATE OR REPLACE FUNCTION public.push_fire()
  RETURNS jsonb
@@ -10074,8 +10142,8 @@ AS $function$
 declare v_id text := public.current_athlete_id();
 begin
   if v_id is null or p_endpoint is null then return; end if;
-  update public.push_subs set rest_at = null, rest_token = null
-   where endpoint = p_endpoint and athlete_id = v_id and rest_at is not null;
+  update public.push_subs set rest_at = null, rest_token = null, finish_at = null, finish_token = null
+   where endpoint = p_endpoint and athlete_id = v_id and (rest_at is not null or finish_at is not null);
 end $function$;
 
 CREATE OR REPLACE FUNCTION public.push_rest_due(p_within integer DEFAULT 70)
@@ -10102,7 +10170,8 @@ AS $function$
 declare c record; req bigint;
 begin
   if not exists (select 1 from public.push_subs
-                  where rest_at is not null and rest_at <= now() + interval '70 seconds' and rest_at > now() - interval '30 seconds') then
+                  where (rest_at is not null and rest_at <= now() + interval '70 seconds' and rest_at > now() - interval '30 seconds')
+                     or (finish_at is not null and finish_at <= now() + interval '70 seconds' and finish_at > now() - interval '15 minutes')) then
     return jsonb_build_object('ok', true, 'due', 0);
   end if;
   select * into c from public.push_config where id;
@@ -12172,12 +12241,18 @@ revoke all on function public.publish_cycle(p_athlete_id text, p_workouts jsonb,
 grant execute on function public.publish_cycle(p_athlete_id text, p_workouts jsonb, p_notes jsonb, p_new_cycle boolean, p_cycle_patch jsonb, p_cycles jsonb, p_sport jsonb, p_log_section text, p_log_profile text, p_log_ledger text, p_log_new text) to service_role;
 revoke all on function public.purge_old_notes() from public, anon, authenticated, service_role;
 grant execute on function public.purge_old_notes() to service_role;
+revoke all on function public.push_alert_due(p_within integer) from public, anon, authenticated, service_role;
+grant execute on function public.push_alert_due(p_within integer) to service_role;
+revoke all on function public.push_alert_take(p_endpoint text, p_kind text, p_token uuid) from public, anon, authenticated, service_role;
+grant execute on function public.push_alert_take(p_endpoint text, p_kind text, p_token uuid) to service_role;
 revoke all on function public.push_done(p_athlete_id text, p_kind text, p_day date, p_ok boolean) from public, anon, authenticated, service_role;
 grant execute on function public.push_done(p_athlete_id text, p_kind text, p_day date, p_ok boolean) to service_role;
 revoke all on function public.push_drop(p_endpoint text) from public, anon, authenticated, service_role;
 grant execute on function public.push_drop(p_endpoint text) to service_role;
 revoke all on function public.push_due(p_now timestamp with time zone) from public, anon, authenticated, service_role;
 grant execute on function public.push_due(p_now timestamp with time zone) to service_role;
+revoke all on function public.push_finish_arm(p_endpoint text, p_at timestamp with time zone) from public, anon, authenticated, service_role;
+grant execute on function public.push_finish_arm(p_endpoint text, p_at timestamp with time zone) to authenticated, service_role;
 revoke all on function public.push_fire() from public, anon, authenticated, service_role;
 grant execute on function public.push_fire() to service_role;
 revoke all on function public.push_forget(p_endpoint text) from public, anon, authenticated, service_role;

@@ -13,6 +13,7 @@ was decided and why.
 | [`CLIENT-APP-MAP.md`](CLIENT-APP-MAP.md) | the athlete app as a first-time client sees it, screen by screen, with findings for Amir. |
 | [`SET-LOGGING-DESIGN.md`](SET-LOGGING-DESIGN.md) | how set logging was designed. |
 | [`COACHING-PRINCIPLES-HISTORY.md`](COACHING-PRINCIPLES-HISTORY.md) | the dates, Amir's words and each rule's origin behind the rule index (2026-09-27). No stage reads it. |
+| [`PUSH-REST-AND-FINISH.md`](PUSH-REST-AND-FINISH.md) | the rest alert (stage107) and the "still open" reminder (stage108), 2026-11-02: how they work, the live proofs, the stage number clash, the made-up phone still in `push_subs`. |
 
 ## Records left where they are
 

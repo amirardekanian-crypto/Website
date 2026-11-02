@@ -210,27 +210,24 @@ moved 65 → 66.
 **The first notification of this kind goes out the first time Amir publishes a cycle** for an athlete
 whose phone was already subscribed — never for the cycle they are on now.
 
-## The rest on a phone (stage107, LIVE 2026-11-02)
 
-Amir: *"add a notification 10sec before the rest finishes if they had minimised the app and was on instagram for
-example"*; his pick: any rest, only when the athlete is out of the app. The full account is the header of
-`supabase/stage107_rest_push.sql` (applied as the migration `stage106_rest_push`: another session had applied a
-`stage106_spare_session` that never reached main).
+## The rest alert and the "still open" reminder (stage107 and stage108, LIVE 2026-11-02)
 
-- **A frozen page cannot ring, so the server does.** When the page is hidden with a rest running, the app sends ONE
-  keepalive request with a text/plain body (no preflight) to `push-send?only=rest`; push-send arms THAT phone's
-  `push_subs` row as the athlete (`push_rest_arm()`: their sign-in is the check, never anyone else's phone). Back in the
-  app, `push_rest_disarm()` takes it back, so nothing rings while the athlete is looking at the app.
-- **No new table.** `rest_at` and `rest_token` sit on `push_subs`, which is already backed up and erased.
-- **Whoever is closest sends it, once.** push-send waits in the background (`EdgeRuntime.waitUntil`, 75 s at most) when
-  the alert is near; the every-minute job `push-rest` wakes it only when a phone is due within 70 s; `push_rest_take()`
-  clears the row and hands back the keys in one statement while the token matches, so two senders send one alert and a
-  disarmed rest sends none. `push-rest-sweep` keeps that job's run log to two days.
-- **TTL 30 s, Urgency high, tag `rest`, no quiet hours** (the athlete is training by their own tap). The words carry no
-  exercise, weight or effort. `kinds.rest = false` is honoured; there is no switch in the panel for it yet.
-- **⚠️ The Farsi is a DRAFT until Amir reads it on a lock screen**: *۱۰ ثانیه تا آخر استراحت* / *برای ست بعدی آماده شو.*
-- **Proven live** (2026-11-02) with a made-up phone: armed for +40 s, the job woke the sender at the minute and the row
-  was taken 0.11 s after it was due. **Not yet proven on a real phone**: that a hiding iPhone page gets its keepalive
-  request out is the one thing no test here can show.
-- Guards: `scripts/push/rehearse_rest_push.mjs` (49, PGlite), `scripts/headless/rest-push.js` (11). The way back is
-  `scripts/push/rollback_stage107.sql`, on Amir's word only.
+Amir: *"add a notification 10sec before the rest finishes if they had minimised the app"* and *"Some people forget to hit
+finish on the session"* (*"remind them 10 min"*). How they were built, what was proven and the open items:
+[`docs/record/PUSH-REST-AND-FINISH.md`](../record/PUSH-REST-AND-FINISH.md).
+
+- **Armed only while the athlete is out of the app, and taken back the moment they return** (`restPushArm()`,
+  `finishPushArm()` on hidden; `push_rest_disarm()` on visible clears both kinds). Nothing rings while they look at the app.
+- **No new table**: `rest_at` / `rest_token` and `finish_at` / `finish_token` on `push_subs`, which is backed up and erased.
+- **`push_alert_take()` is the one door to sending**, while the token matches and it is not late (rest 30 s, finish 15 min):
+  two senders send one notification.
+- **The phone's request is a keepalive text/plain POST carrying the athlete's token** (no preflight); push-send arms the row
+  AS the athlete, so nobody can arm another phone. **The deploy must say `verify_jwt: false`** like every push-send deploy.
+- **The words exist twice** — `push_alert_take()` and `localAlert.WORDS` in program.html (Android's offline copy). Change
+  both. **⚠️ Both Farsi lines are DRAFTS until Amir reads them on a lock screen.**
+- **No quiet hours**: both follow the athlete's own training. `kinds.rest` / `kinds.finish = false` are honoured; there is no
+  switch in the panel for either yet.
+- Guards: `scripts/push/rehearse_rest_push.mjs` (49), `scripts/push/rehearse_finish_push.mjs` (40),
+  `scripts/headless/rest-push.js` (11), `scripts/headless/finish-nudge.js` (20). Ways back: `rollback_stage108.sql` FIRST,
+  then `rollback_stage107.sql`, on Amir's word only.
