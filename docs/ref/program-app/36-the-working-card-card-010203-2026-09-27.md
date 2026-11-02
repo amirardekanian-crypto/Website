@@ -76,6 +76,15 @@ carry-down never meet a missing node. A row with no box at all says its dose, `3
 the tick"*): the tick means the time as written, and a shorter hold goes in the Note. (It would have
 needed a new field in the log line, which only writes `×n` for a reps dose.)
 
+**The circle counts a hold** (Love All round 4, 2026-10-24; changed 2026-11-02, Amir: *"for each side, i dont want the clock to start
+again immediately, i want it to add a button for them to hit themselves to start the other side"*; `holdGate()`). A set whose dose is a time
+(`data-hold`) is timed by its own circle: a tap gives **3-2-1** (a short beep each, the ring empty), then the seconds count down in a ring
+that empties, then two tones and a buzz at 0 (the rest timer's sound and its switch, `holdBeep()` / `restBeep()`). A **"/ side"** hold stops
+after side 1: the circle becomes a play mark (`.waiting`) and the note box says *Side 1 done* with **Start side 2** and **Stop**; either the
+note's button or the circle starts side 2's 3-2-1, and nothing starts it by itself. At the end the set ticks itself and **no rest opens**
+(Amir, 2026-11-02: *"Tick set only"*). A tap while it counts stops it and ticks nothing; Guided's Done still ticks at once.
+`scripts/headless/love-all-cards.js` H1.
+
 Guided copies the line of numbers and the pills under its name (`renderStep()`), because they live in the
 header now. Circuits got the same header (line of numbers, note dot) and lost their Rounds/Rest grid. A circuit's line says its
 rounds in words, *Twice · rest 30 s between* (3 rounds: *3 times · rest 30 s between*; no rest: *Twice*).

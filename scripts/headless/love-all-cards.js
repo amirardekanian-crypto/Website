@@ -1,6 +1,7 @@
 // Love All round 4 (2026-10-24, "Round 4 choices", all direction A): the three card changes, checked the way the athlete meets them.
-//   H1  a timed hold's circle counts: tap it and the seconds run down inside it, a tap again stops it and ticks nothing, at 0 it buzzes and
-//       the set ticks itself; a "/ side" hold gives "Other side" and counts the second side; Guided's circle does the same, Guided's Done
+//   H1  a timed hold's circle counts: tap it and 3-2-1 comes first (2026-11-02), then the seconds run down inside it, a tap again stops it
+//       and ticks nothing, at 0 it buzzes and the set ticks itself; a "/ side" hold WAITS after side 1 (the circle is a play button and a
+//       note offers Start side 2) and starts side 2 only on a tap, from the note or the circle; Guided's circle does the same, Guided's Done
 //       ticks at once; reduced motion keeps the number and draws no moving ring; a rep set's circle is untouched.
 //   K2  "kg / hand" over the weight column of a dumbbell or kettlebell lift only (lb / hand in pounds, never for plates).
 //   I3  each movement of a circuit has the ⓘ for its Spine entry, 44 px to hit, and a tap on it ticks and folds nothing.
@@ -43,7 +44,10 @@ async function spy(p) { await p.evaluate(() => { window.__buzz = []; navigator.v
     await clickCircle(p, FRONT);
     await p.waitForTimeout(300);
     let s = await state(p, FRONT);
-    t.check('a tap on a hold\'s circle starts the count: the seconds are in it and the set is not ticked', s.holding && /^[12]$/.test(s.text) && !s.done && /counting/.test(s.label), JSON.stringify(s));
+    t.check('a tap on a hold\'s circle starts with 3-2-1: 3 is in it, the ring is empty, the set is not ticked', s.holding && s.text === '3' && !s.done && /get ready/.test(s.label) && s.hold === '0', JSON.stringify(s));
+    await p.waitForTimeout(3200);
+    s = await state(p, FRONT);
+    t.check('…then the hold counts: the seconds are in it and the set is not ticked', s.holding && /^[12]$/.test(s.text) && !s.done && /counting/.test(s.label), JSON.stringify(s));
     t.check('the ring empties as it counts (its fraction is below 1)', s.hold !== '' && parseFloat(s.hold) < 1 && parseFloat(s.hold) > 0, JSON.stringify(s));
     await clickCircle(p, FRONT);
     await p.waitForTimeout(2600);
@@ -51,7 +55,7 @@ async function spy(p) { await p.evaluate(() => { window.__buzz = []; navigator.v
     t.check('a tap while it counts stops it: no tick, the circle is back to a plain circle', !s.holding && s.text === '' && !s.done && /Mark set 1 done/.test(s.label), JSON.stringify(s));
     t.check('…and stopping it buzzed nothing', (await buzzes(p)).length === 0);
     await clickCircle(p, FRONT);
-    await p.waitForTimeout(2700);
+    await p.waitForTimeout(5700);
     s = await state(p, FRONT);
     t.check('left alone, the hold ends by itself and the set ticks', !s.holding && s.done, JSON.stringify(s));
     t.check('…with a buzz at 0', (await buzzes(p)).length >= 1, JSON.stringify(await buzzes(p)));
@@ -64,18 +68,46 @@ async function spy(p) { await p.evaluate(() => { window.__buzz = []; navigator.v
 
     // a "/ side" hold
     await openCard(p, PLANK); await spy(p);
+    const toastText = () => p.evaluate(() => { const e = document.getElementById('aaToast'); return e && !e.hidden ? e.textContent : null; });
+    const waiting = (i = 0) => p.evaluate(`${circle(p, PLANK, i)}.classList.contains('waiting')`);
     await clickCircle(p, PLANK);
-    await p.waitForTimeout(2600);
-    const toast = await p.evaluate(() => { const e = document.getElementById('aaToast'); return e && !e.hidden ? e.textContent : null; });
+    await p.waitForTimeout(5600);
+    let toast = await toastText();
     s = await state(p, PLANK);
-    t.check('a "/ side" hold goes on to the other side: "Other side" is said, still counting, not ticked', s.holding && !s.done && /Other side/.test(toast || ''), JSON.stringify([s, toast]));
-    await p.waitForTimeout(3000);
+    t.check('a "/ side" hold stops after side 1 and waits: "Other side" and Start side 2 are offered, not ticked', s.holding && !s.done && await waiting() && /Other side/.test(toast || '') && /Start side 2/.test(toast || '') && /start side 2/.test(s.label), JSON.stringify([s, toast]));
+    await p.waitForTimeout(2500);
     s = await state(p, PLANK);
-    t.check('…and counts the second side', s.holding && !s.done && parseFloat(s.hold || '0') > 0, JSON.stringify(s));
+    t.check('…and side 2 does NOT start by itself', s.holding && !s.done && await waiting() && s.text === '', JSON.stringify(s));
+    await p.evaluate(() => document.querySelector('#aaToast .aa-toast-go').click());
+    await p.waitForTimeout(300);
+    s = await state(p, PLANK);
+    t.check('the note\'s Start side 2 starts side 2 with 3-2-1, and the note goes', s.holding && s.text === '3' && !await waiting() && !(await toastText()), JSON.stringify(s));
+    await p.waitForTimeout(3300);
+    s = await state(p, PLANK);
+    t.check('…and counts the second side', s.holding && !s.done && parseFloat(s.hold || '0') > 0 && /side 2/.test(s.label), JSON.stringify(s));
     await p.waitForTimeout(2300);
     s = await state(p, PLANK);
     const b2 = await buzzes(p);
     t.check('…then ticks the set, after a buzz at the end of each side', !s.holding && s.done && b2.filter(x => x === 220).length === 2, JSON.stringify([s, b2]));
+    t.check('…and the tick opens no rest (the rest is the athlete\'s own tap)', !(await p.evaluate(() => document.getElementById('timerOverlay').classList.contains('visible'))));
+    // set 2: the circle itself starts side 2, and the note's Stop stops the lot
+    await clickCircle(p, PLANK, 1);
+    await p.waitForTimeout(5600);
+    t.check('set 2 waits after side 1 too', await waiting(1));
+    await clickCircle(p, PLANK, 1);
+    await p.waitForTimeout(300);
+    s = await state(p, PLANK, 1);
+    t.check('a tap on the waiting circle starts side 2 (3 in it)', s.holding && s.text === '3' && !s.done, JSON.stringify(s));
+    await clickCircle(p, PLANK, 1);
+    await p.waitForTimeout(200);
+    s = await state(p, PLANK, 1);
+    t.check('a tap during side 2\'s 3-2-1 stops it: nothing ticked', !s.holding && !s.done, JSON.stringify(s));
+    await clickCircle(p, PLANK, 1);
+    await p.waitForTimeout(5600);
+    await p.evaluate(() => document.querySelector('#aaToast .aa-toast-x').click());
+    await p.waitForTimeout(200);
+    s = await state(p, PLANK, 1);
+    t.check('the note\'s Stop stops a waiting hold: nothing ticked, a plain circle', !s.holding && !s.done && !await waiting(1) && s.text === '', JSON.stringify(s));
 
     // a rep set is untouched
     await openCard(p, SQ);
@@ -93,7 +125,7 @@ async function spy(p) { await p.evaluate(() => { window.__buzz = []; navigator.v
     await p.emulateMedia({ reducedMotion: 'reduce' });
     await openCard(p, FRONT);
     await clickCircle(p, FRONT);
-    await p.waitForTimeout(400);
+    await p.waitForTimeout(3400);
     const s = await state(p, FRONT);
     const q = await p.evaluate(`${circle(p, FRONT)}.classList.contains('quiet')`);
     t.check('reduced motion: the number counts and the ring is not driven (no --hold)', s.holding && /^[12]$/.test(s.text) && s.hold === '' && q, JSON.stringify(s));
@@ -119,8 +151,8 @@ async function spy(p) { await p.evaluate(() => { window.__buzz = []; navigator.v
     await p.evaluate(() => { document.querySelector('#step-scroll .ex-set-row.step-current .ex-set-check').click(); });
     await p.waitForTimeout(300);
     s = await g();
-    t.check('Guided: a tap on the circle counts it (the number in it), not ticked', s.holding && /^[12]$/.test(s.text) && !s.done, JSON.stringify(s));
-    await p.waitForTimeout(2500);
+    t.check('Guided: a tap on the circle counts it (3-2-1 in it first), not ticked', s.holding && s.text === '3' && !s.done, JSON.stringify(s));
+    await p.waitForTimeout(5500);
     s = await g();
     t.check('Guided: at 0 the set ticks', !s.holding && s.done, JSON.stringify(s));
     await p.evaluate(n => { const i = STEP.seq.findIndex(x => x.name === n && x.setI === 1); STEP.pos = i; renderStep(); }, FRONT);

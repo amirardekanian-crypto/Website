@@ -532,7 +532,9 @@
 // v237: program.html changed (2026-10-26, Amir: "all of them should be the same, and should be shown, fix the other thing as well"). A mark's step (50 sessions,
 // 4 weeks in a row, 5 personal bests) is a trophy on someone else's Player Page like on their own cabinet (stage105), and the comebacks number counts the
 // comebacks that held a week, what HARD TO KILL counts, with its line saying so.
-const CACHE = 'aap-v237';
+// v238: program.html changed (2026-11-02, Amir: "for each side, i dont want the clock to start again immediately" and "add a minimise funtion to
+// rest timer"). A hold's circle gives 3-2-1 before each side and waits for Start side 2 after side 1; the rest timer minimises to a bar.
+const CACHE = 'aap-v238';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

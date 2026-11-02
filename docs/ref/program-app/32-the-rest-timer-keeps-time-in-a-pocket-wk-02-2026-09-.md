@@ -17,6 +17,14 @@ Centre Court look*, above). The timing below is unchanged.
   **Rest 2:00** button above the tab bar (`offerRest()`, WK-02, 2026-09-27; it never started by itself). Nothing replaced it: the
   card's own **Rest ⏱** button (44 px) opens the Rest Timer, and Guided rests itself after every set. The guide's *Built-in tools* card says so. For one day (2026-10-24) a tick opened the
   rest itself (`restAfterTick()`); Amir took it out on 2026-10-25 ("go back i dont like it"). `scripts/headless/love-all-rest.js` checks a tick opens nothing.
+- **Minimise** (Amir, 2026-11-02: *"add a minimise funtion to rest timer, so the athlete can minimise the rest, and check other training
+  without losing rest time"*; his pick, a small bar at the bottom). A down arrow beside ✕ (`#timerMinBtn`, `minimiseTimer()`) takes the
+  overlay away and leaves `#restMini`, one green bar: *● REST 2:28 · the exercise · OPEN*, above the tab bar when it shows and at the foot
+  mid-session (`placeRestMini()`, every 400 ms while it shows), z 95: over Guided and the tab bar, under the timer and the sheets. The clock is
+  the same (`timerEndsAt` is never touched), so the beep at zero, Serve Clock and the phone's notification keep time. A tap opens the timer
+  again (`restoreTimer()`); a paused rest says *Paused*; at zero the bar says *Go* and goes with the rest; a new rest always opens whole; ✕
+  ends it as ever. A game on the rest is closed by Minimise. **Guided's rest has no Minimise** (`.timer-overlay.guided`): its rest screen is
+  where the set is logged and its end moves the steps on. The phone's Back treats a minimised rest as a closed one. `scripts/headless/rest-mini.js`.
 - The overlay's dark palette came with A11Y-01 (#245). It is solid since 2026-09-27 (POL-01): at 97% the day's
   cards showed through behind the clock.
 
