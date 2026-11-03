@@ -7,7 +7,8 @@
 Amir: *"add a notification 10sec before the rest finishes if they had minimised the app and was on instagram for
 example"*; his pick: any rest, only when the athlete is out of the app. The full account is the header of
 `supabase/stage107_rest_push.sql` (applied as the migration `stage106_rest_push`: another session had applied a
-`stage106_spare_session` that never reached main).
+`stage106_spare_session` that never reached main; it is on main since 2026-11-03 as `supabase/stage106_spare_session.sql`, taken
+from the live migration history).
 
 - **A frozen page cannot ring, so the server does.** When the page is hidden with a rest running, the app sends ONE
   keepalive request with a text/plain body (no preflight) to `push-send?only=rest`; push-send arms THAT phone's

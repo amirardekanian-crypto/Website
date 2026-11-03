@@ -16,8 +16,8 @@
 # a tier or what earns an achievement raises `version` and sets `starts_on = "YYYY-MM-DD"`, the day it is seeded: facts before that day
 # keep their prices, awards keep the XP they were minted with. The seed refuses a change to [habits], [level], [season], [week], [share] or
 # to how a fact is worked out (career/README.md; PROCEDURES.md → Stage 76).
-version = 11
-starts_on = "2026-10-25"   # A PLACEHOLDER until go-live: set it to the day the seed runs, and every `paid_from` in achievements.toml with it (D21). Version 11, the Emblem Cabinet: 33 achievements that pay only for wins from that day on. Version 10 (2026-10-20): AA Proof's habit ladders, as achievements: 20 of them, and the ten of version 9 renamed into their families (version 10). Version 9, the same day: ten plain habit achievements. Version 8, the same day: the day pays: a day that counts 40, a perfect day 60 in all (version 7, the same day, had 50 and 150) (Amir: "50 for a day that counts, 100 more for a perfect day"). Version 6 (the same day) gave the seven achievements that paid nothing their XP; version 5 (2026-10-19) the new achievements, stage79; version 4 (2026-10-19) the cut, stage78. D20: forward only, every time.
+version = 12
+starts_on = "2026-10-26"   # Version 12 (2026-10-26, seeded live that day, brought to the repo 2026-11-03): the spare, a plan day done twice in a training week pays twice (limit 2 on session_finished and session_finished_early); its server half is supabase/stage106_spare_session.sql. On a new version, set it to the day the seed runs, and every new `paid_from` in achievements.toml with it (D21). Version 11 (2026-10-25), the Emblem Cabinet: 33 achievements that pay only for wins from that day on. Version 10 (2026-10-20): AA Proof's habit ladders, as achievements: 20 of them, and the ten of version 9 renamed into their families (version 10). Version 9, the same day: ten plain habit achievements. Version 8, the same day: the day pays: a day that counts 40, a perfect day 60 in all (version 7, the same day, had 50 and 150) (Amir: "50 for a day that counts, 100 more for a perfect day"). Version 6 (the same day) gave the seven achievements that paid nothing their XP; version 5 (2026-10-19) the new achievements, stage79; version 4 (2026-10-19) the cut, stage78. D20: forward only, every time.
 meanings = ["consistency", "commitment", "progress", "resilience"]
 
 [switch]
@@ -128,8 +128,8 @@ xp = 400
 source = "training"
 pays_for = "act"
 when = "A session from the plan is finished with Done."
-cap = "One per plan day per training week. A day repeated in the same week pays once."
-limit = 1                 # the cap as a number: at most this many paid sessions per plan day per training week
+cap = "One per plan day per training week, and one spare: a plan day done a second time in the same week pays again, a third time pays nothing (version 12)."
+limit = 2                 # the cap as a number: at most this many paid sessions per plan day per training week (1 until version 12, 2026-10-26: the spare)
 limit_per = "plan_day_week"
 
 [fact.session_finished_early]
@@ -139,7 +139,7 @@ source = "training"
 pays_for = "act"
 when = "A session from the plan is finished with Finish early."
 cap = "As session_finished. It still counts toward a held week."
-limit = 1                 # shared with session_finished: one paid session per plan day per training week
+limit = 2                 # shared with session_finished: two paid sessions per plan day per training week since version 12 (the spare)
 limit_per = "plan_day_week"
 
 [fact.full_log]
