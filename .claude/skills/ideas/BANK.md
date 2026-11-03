@@ -476,6 +476,16 @@ upgrade door). Row ۱۴ grew a day for the SMS choice and queue. During the buil
 «انتخاب شد» on the page: the player picks reminders by notification or SMS, and one `sms_outbox` from day one. Decisions ۸ to ۱۷
 still carry my pick, open to his no. Same link, version 5.
 
+**The build, from 2026-11-03.** Lob lives in its own private repo (`GitHub\lob`, local only so far). Step ۲ (local part: the
+guards) and step ۳ (schema, row rules, the ledger rules, `player_state()` = `link_view()`, 262 PGlite checks) are done; the paid
+items (Supabase, domain, GitHub Pro) wait on his yes. Ideas from the finished steps, one line each, none built:
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 105 | Cover the Gap | Selling a package to a player with counted sessions no package covers: the sheet asks whether this package covers them too and starts it early enough. Why: those sessions otherwise stay unpaid and out of sight (the numbers already count them as `unpackaged`). About half a day, in step ۹ | step ۹ | pitched |
+| 106 | Makeup Running Out | A line in the coach's jobs for today when a player's makeup expires within 3 days. Why: an expired makeup is a lost session the player paid for; the expiry is already worked out. Only matters for a coach who sets an expiry. About half a day, in step ۱۰ | step ۱۰ | pitched |
+| 107 | Only What Changed | An `updated_at` on every table that changes, so the phone pulls only what changed since its last sync. Why: the app opens faster on slow mobile data and after an outage. About half to one day, best before step ۶ builds the offline queue | step ۶ | pitched |
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
