@@ -455,6 +455,23 @@ can answer are left: does WhatsApp reach Mehraneh's players without a VPN, and w
 Iran) have an Iranian national ID, mobile and bank card for the SMS panel; how many minutes per athlete per cycle the upgrade costs
 him. Same link, version 3.
 
+**Version 4, the same day (status: nothing built).** His answers: *"Whatsapp needs vpn but everyone has vpn / Some prefer sms for
+reminders / Keep the sms panel idea i need to ask my fanily in iran / When building , make sure the easier jobs to eb done with
+cheaper agents / At the same time if you come up with new ideas of doing something or improvements, suggest then"*. So question 1 is
+answered: the pre-filled WhatsApp stays, for news that can wait (a VPN can drop in several cities at once, so must-arrive news never
+goes by WhatsApp alone). Question 2 waits on his family in Iran, and the panel stays in the plan (decision 3). Question 3 (his
+minutes per athlete per cycle) is still open. Two new decisions, my pick on each: **۱۸ «یادآوری با چی»**, the player picks
+reminders by notification or by SMS on their own page, the coach can set it for someone who never opens the page, the player's
+choice wins, must-arrive news still goes every way; **۱۹ «صف پیامک از روز اول»**, every SMS goes into one `sms_outbox`; until the
+panel exists it opens in the coach's evening check (no extra ring) as one `sms:` tap per person, and the day the panel is ready
+the same queue sends itself. The pilot also counts how many SMS the panel would have sent and what it would have cost before he
+pays for one. Also pitched: ask the family everything in one call (ID, mobile and bank card for the panel and whether they agree
+to it being in their name; half an hour on two phones for build steps ۱ب and ۱۷; the bank card for tomans only after the lawyer).
+The build table has a new column «کی می‌سازه»: about 29 of 66 days cheap agents alone (Sonnet, Haiku for the very simple), 27 both
+(the expensive model designs and reviews once), about 10 the expensive model alone (money rules, receipts, legal text, the
+upgrade door). Row ۱۴ grew a day for the SMS choice and queue. During the build every finished step may end with a one-line idea
+(what, why, how many days), never added mid-step and never built without his yes. Same link, version 4.
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |

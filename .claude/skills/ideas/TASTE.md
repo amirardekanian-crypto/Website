@@ -5,6 +5,13 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-03 · WhatsApp needs a VPN "but everyone has vpn"; some want SMS; cheap agents and ideas during the build.**
+  *"Whatsapp needs vpn but everyone has vpn / Some prefer sms for reminders / Keep the sms panel idea i need to ask my fanily in
+  iran / When building , make sure the easier jobs to eb done with cheaper agents / At the same time if you come up with new ideas
+  of doing something or improvements, suggest then"*. What it teaches: (1) in Iran, reach is what people actually have switched on
+  (everyone runs a VPN), not what is filtered, so do not rank a channel down for being filtered; (2) let the player choose the
+  channel for routine news, and keep must-arrive news on every route; (3) a build plan for him says which steps go to cheaper
+  agents; (4) he wants ideas and improvements pitched as they come up during a build, one line each, never built without his yes.
 - **2026-11-03 · "Go with your picks", then: like my own app, on the phone, ringing for both sides.** *"go with your picks / like
   my own app, i want it to be able to be saved on the phone / and i want to have notifications for both the customer and the coach
   about many things"*. When the research marked push in Iran "unproven without a VPN": *"notifications can go through if they have
