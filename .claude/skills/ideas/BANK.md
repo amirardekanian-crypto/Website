@@ -418,7 +418,20 @@ app, sold with his websites), republished at the same link. It is a new product,
 Cut on the page (so they are not re-pitched): a session calendar, free slots and working hours (no scheduling around tennis; UTS and
 the academy book at the club), per-head class pricing (CHATBOT-FACTS.md is the one price source), expenses, phone-number signup and a
 trial, sending WhatsApp automatically (paid Business API, his voice out), showing the athlete "paid through" (the one-ask rule), Jalali
-dates in coach.html.
+dates in coach.html. Those cuts are for **coach.html only**: the new product below has a calendar, free slots and Jalali dates.
+
+**The blueprint, 2026-11-03 (status: pitched, nothing built).** His answers first: a Farsi blueprint only; first users are tennis and
+padel coaches (Mehraneh, the Etminan academy, coaches like them); the door is an upgrade for their athletes into his training app; its
+own brand, "by AA Performance" small; a free pilot for 3 to 5 coaches, then monthly; websites kept separate for now; messages are a
+pre-filled WhatsApp plus SMS through an Iranian panel; athletes get a private link page in v1, no login. Three directions were drawn
+and scored (A «سرِ زمین» On Court 25/30, B «شمارش معکوس» Countdown 21, C «اون‌ورِ تور» Other Side of the Net 21). **Pick: A**, the app
+opens on the coach's day with one tap «اومد» per session, and the sessions write the money ledger, the jobs list and the athlete page.
+Grafted from B: the package dot meter, the jobs-list order, the rain button, the «پرداخت کردم» claim the coach confirms. From C: every
+coach action says what the athlete page will show, a first run that ends on a sample athlete page, the upgrade card's manners.
+**Working name «لاب» (Lob)**; the others on the page are والی، کوک، هم‌زمین (none checked on Cafe Bazaar, Myket, domains or trademark).
+Seven decisions wait on him in section ۱۳ (name, where the pilot lives, who pays the SMS panel, the upgrade tier, default class rules,
+money on the athlete page, the pilot's shape and price), plus six questions only he can answer. Page:
+https://claude.ai/artifact/KQjJiAfREV7T5HbL5jG4mb (version 2, Farsi).
 
 ## Grown out of deep-dives
 
