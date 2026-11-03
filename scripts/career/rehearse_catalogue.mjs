@@ -1964,7 +1964,7 @@ async function buildCases(db, c) {
   const E = [{ early: false, fullLog: true, checkin: true, weekCloses: false, cycleCloses: false }, { early: false, fullLog: false, checkin: true, weekCloses: false, cycleCloses: false },
              { early: true, fullLog: false, checkin: false, weekCloses: false, cycleCloses: false }, { early: false, fullLog: true, checkin: true, weekCloses: true, cycleCloses: false },
              { early: false, fullLog: true, checkin: true, weekCloses: true, cycleCloses: true }, { early: false, fullLog: false, checkin: false, weekCloses: true, cycleCloses: false, byBook: true },
-             // D19 (2026-10-18; the cap GAME-4 puts on XP): a plan day done again in its training week is not a paid session; it moves no count over the session kinds
+             // a plan day done again in its training week: D19 (2026-10-18) moved no count over the session kinds; since stage106 (2026-10-26) every session counts
              { early: false, fullLog: true, checkin: true, weekCloses: false, cycleCloses: false, repeat: true },
              { early: true, fullLog: false, checkin: false, weekCloses: false, cycleCloses: false, repeat: true },
              { early: false, fullLog: true, checkin: true, weekCloses: true, cycleCloses: false, repeat: true }];
@@ -1993,8 +1993,8 @@ function movesRef(e, ladder) {
     if (!en || !(Number(en.next) > 0)) return;
     let inc = 0, pending = false;
     if (en.phone === 'session') {
-      if (has(en, 'session_finished') && !e.early && !e.repeat) inc++;           // a repeated plan day is not a paid session (D19); the full log and the check-in still count
-      if (has(en, 'session_finished_early') && e.early && !e.repeat) inc++;
+      if (has(en, 'session_finished') && !e.early) inc++;           // every finished session counts, a repeated plan day too (stage106; D19 until 2026-10-26)
+      if (has(en, 'session_finished_early') && e.early) inc++;
       if (has(en, 'full_log') && e.fullLog) inc++;
       if (has(en, 'checkin_done') && e.checkin) inc++;
     } else if (en.phone === 'week') {

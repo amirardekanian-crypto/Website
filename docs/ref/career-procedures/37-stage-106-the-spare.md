@@ -29,4 +29,11 @@ Ignoring whitespace, they are identical.
 **Check (2026-11-03, PGlite, nothing live).** Starting from the two functions as the 2026-10-26 snapshot has them: the stage file turns them into the live text
 of the 2026-11-02 snapshot, a second run changes nothing, the rollback puts both back exactly, and a second rollback changes nothing (9 of 9).
 `python scripts/check_career.py` is clean at version 12.
+**The phone, brought in step 2026-11-03** (sw `aap-v243`). Until then program.html still worked out a session's XP with one paid session per plan day per week and
+moved neither Century nor Sessions with Amir for a repeat, so a second session of a plan day showed less than the server paid. Now `careerEarn()` pays the session while
+the plan day was done fewer than `CAREER_SESSION_LIMIT` (2) times this week and holds the week with a spare (`careerWeekOf()`, `CAREER_SPARE_FROM`), `careerMoves()` moves
+the session counts for every session, and `careerRecPaid()` / `careerPaidAtDone()` add 1 for every finish. `scripts/check_twins.js` holds the two constants to
+`career/rulebook.toml` and `career_derive()`; `reward_cases.json`'s six repeat moves were worked out again from `movesRef()` in `rehearse_catalogue.mjs`, which says the same.
+The phone reads an earlier session of the plan day as a full finish (the history it has does not say early), so after an early finish the card can say less than the server
+pays; the server's answer puts it right. `scripts/headless/career.js` checks the second, the third and the spare on the finish card.
 **The way back:** `scripts/career/rollback_stage106.sql`, on Amir's word only. It does not undo version 12's limit 2; that would be a new rulebook version (D20).

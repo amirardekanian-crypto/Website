@@ -16,7 +16,7 @@
 //        four marks only ("25 of 25 sessions with Amir · a new mark", "4 of 8 weeks held · when the week counts"), never a badge name, a metal or "+N more in AA Proof" · the finished
 //        card's bands and the full-screen moments are achievements and the four marks' tiers only ("A new mark"; a mark has its own share card), every other badge, a
 //        title and the Grand Slam are neither, and are never marked seen or told · Counting bands at Done, confirmed (or taken away) by the answer · Sessions with Amir counts a
-//        paid session finished here that no answer has counted yet (GAME-4) · ?go=numbers lands on Your numbers · the session queue never waits on any of it.
+//        session finished here that no answer has counted yet (every session, since stage106) · the cap and the spare on the finish card · ?go=numbers lands on Your numbers · the session queue never waits on any of it.
 // AA PROOF has no career screens (CAREER_LIGHT; scripts/headless/proof-light.js tests what is gone and what stays). What this file keeps for it is the XP that still moves: the
 //        career's level and its curve on Today's ring, a tick moves the career XP at once, the WORKOUT habit pays 0 a day, a phone-decided award's XP at once and withdrawn when the
 //        server lacks it, a dirty push and then the catalogue newly on does not move the XP, the cached profile offline, the embed and the coach's preview ask and write nothing.
@@ -416,14 +416,27 @@ async function trainingBase(browser, C) {
     C.check('finish: no page errors', p.errs.length === 0, JSON.stringify(p.errs));
     await ctx.close();
   }
-  // 7. a repeat this week pays its session once; the session that completes the week holds it (the server confirms), after a broken week
+  // 7. the cap and the spare (stage106, rulebook version 12): a plan day pays its session twice a week and the second time covers it next week, a third time pays only
+  // its full log; the session that completes the week holds it (the server confirms), after a broken week, and a spare from last week counts as a day done
   {
     const hist = [{ completed_on: at(-1), day: '1', readiness: 4, log: [] }];
     let { ctx, p } = await openP(browser, { hist });
     await waitRow(p);
     await toReady(p);
     let earn = await T(p, '#confirm-1 .confirm-earn');
-    C.check('repeat: the session itself pays once a week, the full log still pays', /^THIS SESSION EARNS \+50 XP Every set logged 50 Day 1 is done this week already/.test(earn || ''), earn);
+    C.check('repeat: the second time in a week the session pays again and covers the day next week', earn === 'THIS SESSION EARNS +450 XP Session 400 · Every set logged 50 Day 1 again this week, so the session pays once more. If you miss Day 1 next week, this one covers it.', earn);
+    await ctx.close();
+    ({ ctx, p } = await openP(browser, { hist: [{ completed_on: at(-1), day: '1', readiness: 4, log: [] }, { completed_on: at(-2), day: '1', readiness: 4, log: [] }] }));
+    await waitRow(p);
+    await toReady(p);
+    earn = await T(p, '#confirm-1 .confirm-earn');
+    C.check('repeat: the third time the session itself pays nothing more, the full log still pays', earn === 'THIS SESSION EARNS +50 XP Every set logged 50 Day 1 is done twice this week already, so the session itself pays nothing more.', earn);
+    await ctx.close();
+    ({ ctx, p } = await openP(browser, { prog: prog({ days: 2 }), hist: [{ completed_on: at(-8), day: '2', readiness: 4, log: [] }, { completed_on: at(-6), day: '2', readiness: 4, log: [] }] }));
+    await waitRow(p);
+    await toReady(p);
+    earn = await T(p, '#confirm-1 .confirm-earn');
+    C.check('the spare: Day 2 twice last week covers it, so Day 1 holds the week', earn === 'THIS SESSION EARNS +450 XP Session 400 · Every set logged 50 Your week held +400 when it counts', earn);
     await ctx.close();
     const P2 = prog({ days: 2 });
     const facts = [W('H', 1, 4, -20), W('B', 1, 5, -13)];
@@ -882,7 +895,7 @@ async function trainingLight(browser, C) {
       await p.waitForTimeout(400);
     };
     const STALL = { stall: { save_session: true } };
-    // 1. Day 1 was trained yesterday: finishing it again this week adds nothing; Day 2 is a new plan day and adds 1
+    // 1. Day 1 was trained yesterday: finishing it again this week adds 1 (every session counts since stage106), and so does Day 2
     {
       const { ctx, p } = await openRW(browser, { hist: [{ completed_on: at(-1), day: '1', readiness: 4, log: [] }], stub: STALL });
       await waitRow(p);
@@ -890,17 +903,17 @@ async function trainingLight(browser, C) {
       C.check('Sessions with Amir: the profile\'s number before anything is finished (24)', s0.n === 24, JSON.stringify(s0));
       await finishDay(p, '1');
       const s1 = await sessionsOf(p), r1 = await earnOf(p, '1');
-      C.check('Sessions with Amir: Day 1 finished again in its week, not yet saved, leaves the cell as it was (24)', s1.n === 24 && s1.text === s0.text && r1 && !r1.saved, JSON.stringify({ s1, r1: r1 && { saved: r1.saved, repeat: r1.repeat } }));
-      C.check('Sessions with Amir: the repeat is on the record (repeat true, paid 0) and its parts have no session', r1 && r1.repeat === true && r1.paid === 0 && !(r1.parts || []).some(x => x.k === 'session' || x.k === 'early'), JSON.stringify(r1 && { repeat: r1.repeat, paid: r1.paid, parts: r1.parts }));
+      C.check('Sessions with Amir: Day 1 finished again in its week, not yet saved, adds 1 (25)', s1.n === 25 && r1 && !r1.saved, JSON.stringify({ s1, r1: r1 && { saved: r1.saved, repeat: r1.repeat } }));
+      C.check('Sessions with Amir: the repeat is on the record (repeat true, paid 1) and, the second time this week, its session pays', r1 && r1.repeat === true && r1.paid === 1 && (r1.parts || []).some(x => x.k === 'session'), JSON.stringify(r1 && { repeat: r1.repeat, paid: r1.paid, parts: r1.parts }));
       await finishDay(p, '2');
       const s2 = await sessionsOf(p), r2 = await earnOf(p, '2');
-      C.check('Sessions with Amir: Day 2, a new plan day, not yet saved, adds 1 (25)', s2.n === 25 && !r2.saved, JSON.stringify({ s2, r2: r2 && { saved: r2.saved, repeat: r2.repeat } }));
+      C.check('Sessions with Amir: Day 2, a new plan day, not yet saved, adds 1 more (26)', s2.n === 26 && !r2.saved, JSON.stringify({ s2, r2: r2 && { saved: r2.saved, repeat: r2.repeat } }));
       C.check('Sessions with Amir: the new day\'s record says repeat false, paid 1, and carries its session part', r2 && r2.repeat === false && r2.paid === 1 && r2.parts.some(x => x.k === 'session'), JSON.stringify(r2 && { repeat: r2.repeat, paid: r2.paid, parts: r2.parts }));
       C.check('Sessions with Amir: the session was never saved here (the stall), no page errors', (await p.evaluate(() => (window.__STUB.params || []).filter(x => x[0] === 'save_session').length)) >= 1 && !p.errs.length, JSON.stringify(p.errs));
       await ctx.close();
     }
     // 1b. a Day 1 session is waiting for an answer (finished on this phone, the history already lists Day 1 this week): finishing Day 1 AGAIN before an answer has counted that
-    // session must not take its +1 away. The key of the record is the plan day, so the repeat's record replaces the waiting one and carries it in `paid`.
+    // session must not take its +1 away. The key of the record is the plan day, so the repeat's record replaces the waiting one and carries it in `paid` (1 + 1).
     {
       const waiting = { t: new Date().toISOString(), xp: 450, parts: [{ k: 'session', xp: 400 }, { k: 'log', xp: 50 }], before: 10000, saved: 0, repeat: false, paid: 1 };
       const { ctx, p } = await openRW(browser, { hist: [{ completed_on: at(-1), day: '1', readiness: 4, log: [] }], stub: STALL, seed: { _earn_d1: waiting } });
@@ -909,11 +922,11 @@ async function trainingLight(browser, C) {
       C.check('Sessions with Amir: a Day 1 session waiting for an answer shows as +1 (25)', s0.n === 25, JSON.stringify(s0));
       await finishDay(p, '1');
       const s1 = await sessionsOf(p), r1 = await earnOf(p, '1');
-      C.check('Sessions with Amir: Day 1 finished again before an answer counted the first leaves the cell at 25, and the repeat\'s record carries the waiting session (repeat true, paid 1)',
-        s1.n === 25 && s1.text === s0.text && r1 && r1.repeat === true && r1.paid === 1 && !r1.saved, JSON.stringify({ s1, r1: r1 && { saved: r1.saved, repeat: r1.repeat, paid: r1.paid } }));
+      C.check('Sessions with Amir: Day 1 finished again before an answer counted the first adds 1 (26), and the repeat\'s record carries the waiting session (repeat true, paid 2)',
+        s1.n === 26 && r1 && r1.repeat === true && r1.paid === 2 && !r1.saved, JSON.stringify({ s1, r1: r1 && { saved: r1.saved, repeat: r1.repeat, paid: r1.paid } }));
       await finishDay(p, '2');
       const s2 = await sessionsOf(p), r2 = await earnOf(p, '2');
-      C.check('Sessions with Amir: Day 2, a new plan day, then adds 1 more (26)', s2.n === 26 && r2 && r2.paid === 1, JSON.stringify({ s2, paid: r2 && r2.paid }));
+      C.check('Sessions with Amir: Day 2, a new plan day, then adds 1 more (27)', s2.n === 27 && r2 && r2.paid === 1, JSON.stringify({ s2, paid: r2 && r2.paid }));
       C.check('Sessions with Amir: no page errors in the repeat-over-a-waiting-session run', !p.errs.length, JSON.stringify(p.errs));
       await ctx.close();
     }
@@ -926,7 +939,7 @@ async function trainingLight(browser, C) {
       C.check('Sessions with Amir: Day 1 finished with nothing done this week adds 1 (25), the record says repeat false', s.n === 25 && r && r.repeat === false, JSON.stringify({ s, repeat: r && r.repeat }));
       await ctx.close();
     }
-    // 3. records written before the flag existed (the app as of the last release), waiting on the phone: read from their parts
+    // 3. records written before the paid count existed, waiting on the phone: each is one finish (every session counts since stage106), whatever its parts
     {
       const rec = parts => ({ t: new Date().toISOString(), xp: parts.reduce((a, x) => a + x.xp, 0), parts, before: 10000, saved: 0 });
       const { ctx, p } = await openRW(browser, { seed: {
@@ -934,12 +947,12 @@ async function trainingLight(browser, C) {
         _earn_d2: rec([{ k: 'session', xp: 400 }, { k: 'log', xp: 50 }]) } });                  // a paid session
       await waitRow(p);
       const s = await sessionsOf(p);
-      C.check('Sessions with Amir: an older waiting record with no session part adds nothing, one with a session part adds 1 (25)', s.n === 25, JSON.stringify(s));
+      C.check('Sessions with Amir: two older waiting records add 1 each, with or without a session part (26)', s.n === 26, JSON.stringify(s));
       await ctx.close();
       const q = await openRW(browser, { seed: { _earn_d1: rec([{ k: 'log', xp: 50 }]), _earn_d2: rec([{ k: 'checkin', xp: 20 }]) } });
       await waitRow(q.p);
       const s2 = await sessionsOf(q.p);
-      C.check('Sessions with Amir: two older repeats waiting leave the cell as the profile has it (24)', s2.n === 24, JSON.stringify(s2));
+      C.check('Sessions with Amir: two older repeats waiting add 1 each (26)', s2.n === 26, JSON.stringify(s2));
       await q.ctx.close();
     }
   }

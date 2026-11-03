@@ -49,8 +49,11 @@
                                  Career Mode phase 3 (the catalogue switch), section 10: held to scripts/career/reward_cases.json (the server's answers,
                                  scripts/career/rehearse_catalogue.mjs) AND, for what those cases never cross, to a measure grown by hand, one a day, for every
                                  entry the phone decides and every tier. In index mode the toml, its seed script, the checker, the snapshot and coach.html come from the index too.
-                                 careerRecPaid, careerRecPending, careerPaidAtDone (Home's Sessions with Amir): a plan day done again in its week adds nothing, as career_facts_paid()
-                                 pays it nothing (GAME-4, D19), and keeps the +1 of a session of the same day still waiting for an answer.
+                                 careerRecPaid, careerRecPending, careerPaidAtDone (Home's Sessions with Amir): every finish adds 1, a plan day done again in its week included, as
+                                 career_measures() counts every session since stage106, and keeps the +1 of a session of the same day still waiting for an answer.
+     CAREER_SESSION_LIMIT, CAREER_SPARE_FROM, careerEarn (the cap and the spare)
+                                 / career/rulebook.toml [fact.session_finished] and [fact.session_finished_early] limit, career_derive() in supabase/schema_snapshot.sql
+                                 A plan day pays its session twice a training week (rulebook version 12), and one done twice covers it the next week (stage106).
      weightOf, setsMeasure, histBestSet, cycleBestSet, winText, cycleWins, estimateOneRM
                                  / career_w(), career_entry_sets(), career_win_gain(), career_derive() in SQL (supabase/stage72_weight_measures.sql)
                                  Career Mode's lift maths in a lift's OWN measure (kg, lb or plates, never compared), section 11: held to the cases written in this
@@ -938,17 +941,17 @@ run('Career Mode phase 3: the finish card\'s lines (program.html careerMoves / t
   expect('careerMoves, pinned: the last session of a cycle moves Closer (and a week closing alongside it)', 'cycleCloses', brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, cycleCloses: true }), { finisher: LAD.finisher })), ['finisher 1 1 true true']);
   expect('careerMoves, pinned: a session finished early moves its own ladder and not the finished one', 'early', brief(A_AW.careerMoves(Object.assign({}, none, { early: true }), { century: LAD.century, early_only: LAD.early_only })).sort(), ['century 25 25 true false', 'early_only 5 5 true false']);
   expect('careerMoves, pinned: a session finished in full moves the finished ladders only', 'not early', brief(A_AW.careerMoves(none, { century: LAD.century, early_only: LAD.early_only })), ['century 25 25 true false']);
-  // GAME-4 (D19, Claude's pick, waiting for Amir's word): a plan day done again in the same training week is not a paid session, so it moves no count over session_finished /
-  // session_finished_early (Century, Early Bird); the full log and the check-in still count (they are paid per session, uncapped).
+  // stage106 (2026-10-26): career_measures() counts EVERY finished session for a count over session_finished / session_finished_early (Century, Early Bird), a plan day done
+  // again in its training week included, so `repeat` stops nothing (D19 held until then). The full log and the check-in count as ever.
   const FULLS = { full_log_only: { name: 'Full Book', have: 9, next: 10, phone: 'session', counts: ['full_log'] }, checkin_only: { name: 'Check-in Habit', have: 3, next: 5, phone: 'session', counts: ['checkin_done'] } };
-  expect('careerMoves, pinned: a plan day repeated in its week moves no session count (Century stays at 24)', 'repeat', [
+  expect('careerMoves, pinned: a plan day repeated in its week moves the session counts like any session (Century 25 of 25)', 'repeat', [
     brief(A_AW.careerMoves(Object.assign({}, none, { repeat: true }), { century: LAD.century })),
-    brief(A_AW.careerMoves(Object.assign({}, none, { repeat: true, early: true }), { century: LAD.century, early_only: LAD.early_only })),
+    brief(A_AW.careerMoves(Object.assign({}, none, { repeat: true, early: true }), { century: LAD.century, early_only: LAD.early_only })).sort(),
     brief(A_AW.careerMoves(Object.assign({}, none, { repeat: false }), { century: LAD.century }))],
-    [[], [], ['century 25 25 true false']]);
-  expect('careerMoves, pinned: a repeated plan day still moves the full log and the check-in', 'repeat + fullLog + checkin',
+    [['century 25 25 true false'], ['century 25 25 true false', 'early_only 5 5 true false'], ['century 25 25 true false']]);
+  expect('careerMoves, pinned: a repeated plan day moves Century, the full log and the check-in', 'repeat + fullLog + checkin',
     brief(A_AW.careerMoves(Object.assign({}, none, { repeat: true, fullLog: true, checkin: true }), { century: LAD.century, full_log_only: FULLS.full_log_only, checkin_only: FULLS.checkin_only })).sort(),
-    ['checkin_only 4 5 false false', 'full_log_only 10 10 true false']);
+    ['century 25 25 true false', 'checkin_only 4 5 false false', 'full_log_only 10 10 true false']);
   expect('careerMoves, pinned: Love Hold needs a session logged in full and checked in, or the byBook the caller knows', 'byBook', [
     brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, fullLog: true, checkin: true }), { love_hold: LAD.love_hold })),
     brief(A_AW.careerMoves(Object.assign({}, none, { weekCloses: true, fullLog: true, checkin: true, byBook: false }), { love_hold: LAD.love_hold })),
@@ -958,84 +961,95 @@ run('Career Mode phase 3: the finish card\'s lines (program.html careerMoves / t
   expect('careerMoves: no ladder', null, A_AW.careerMoves({ early: false, fullLog: true, checkin: true }, null), { lines: [], more: 0 });
   expect('careerMoves: no session facts', null, A_AW.careerMoves(null, (RW.moves[0] || {}).ladder || {}), { lines: [], more: 0 });
 });
-// Sessions with Amir (numbers.four.commitment) counts what career_facts_paid() pays, one session per plan day per training week (GAME-4), like Century. Home adds +1 for a session
-// finished on the phone that no answer has counted yet (careerPendingSessions()), and a plan day done again in its week must add nothing, or Home says 25 while Century says 24.
-// careerRecPaid() reads the waiting record: the `paid` count careerEarnAtDone() writes (careerPaidAtDone(): this finish's own session, none for a repeat, plus what the record it
-// replaces still had waiting, so a repeat finished before an answer has counted the first session of that plan day cannot take its +1 away), else the `repeat` flag, else (an older
-// record) its parts. The second half runs careerEarn() itself on made-up weeks and holds the readings to what it decided, so the count, the flag and the old-record rule cannot drift
-// from the repeat they stand for. careerPendingSessions() runs here on a fake localStorage (LS), the answer last asked at 1000 (CAREER_T.at), the catalogue switch ON (a var, so a
-// case can turn it off).
+// Sessions with Amir (numbers.four.commitment) is Century's count, and since stage106 (2026-10-26) that counts EVERY finished session, a plan day done again in its training
+// week included (until then D19 counted only the sessions career_facts_paid() pays, and a repeat added nothing here). Home adds +1 for a session finished on the phone that no
+// answer has counted yet (careerPendingSessions()). careerRecPaid() reads the waiting record: the `paid` count careerEarnAtDone() writes (careerPaidAtDone(): this finish's 1
+// plus what the record it replaces still had waiting, so a second finish of a plan day before an answer has counted the first cannot take its +1 away), else 1.
+// careerEarn() is held to the cap and the spare: CAREER_SESSION_LIMIT is the `limit` of session_finished and session_finished_early in career/rulebook.toml (career_facts_paid()
+// pays that many per plan day per training week), CAREER_SPARE_FROM the first week career_derive() lets a spare hold (supabase/schema_snapshot.sql), and both need a plan day
+// done twice the week before. careerPendingSessions() runs here on a fake localStorage (LS), the answer last asked at 1000 (CAREER_T.at), the catalogue switch ON (a var, so a
+// case can turn it off); WK is what cycleWeekInfo() answers (a var: null is outside a cycle's weeks).
+const A_LIMITS = (() => {
+  const m = /\nvar CAREER_SESSION_LIMIT = (\d+), CAREER_SPARE_FROM = '(\d{4}-\d{2}-\d{2})';/.exec(A_SRC);
+  if (!m) bail("program.html: could not find var CAREER_SESSION_LIMIT = <n>, CAREER_SPARE_FROM = '<day>'; Update scripts/check_twins.js.");
+  return { limit: Number(m[1]), from: m[2] };
+})();
 const A_PAID = sandbox(`
-  const CAREER_T = { at: 1000, p: { rules: { prices: { session_finished: 400, session_finished_early: 200, full_log: 50, checkin_done: 20 } } } };
+  const CAREER_T = { at: 1000, p: { rules: { prices: { session_finished: 400, session_finished_early: 200, full_log: 50, checkin_done: 20, week_held: 400 } } } };
   const DATA = { workouts: { days: [{ id: '1' }, { id: '2' }] }, cycles: [{}], currentCycleIndex: 0 };
   const HOLD = null, ATHLETE_ID = 'a';
-  var ON = true;
+  var ON = true, WK = null, CAREER_SESSION_LIMIT = ${A_LIMITS.limit};
   const LS = {};
   const localStorage = { get length() { return Object.keys(LS).length; }, key(i) { return Object.keys(LS)[i]; }, getItem(k) { return k in LS ? LS[k] : null; } };
   function careerOnT() { return true; }
   function catalogueOnT() { return ON; }
-  function cycleWeekInfo() { return null; }`,
+  function cycleWeekInfo() { return WK; }`,
   fromA('careerEarn', 'careerTruthy', 'careerFullLog', 'careerCheckin', 'careerEarly', 'careerRecPaid', 'careerRecPending', 'careerPaidAtDone', 'careerPendingSessions'),
   ['careerEarn', 'careerRecPaid', 'careerRecPending', 'careerPaidAtDone', 'careerPendingSessions', 'LS']);
-run('Career Mode phase 3: a plan day done again in its week adds nothing to Sessions with Amir (program.html careerRecPaid / careerEarn / career_facts_paid)', () => {
-  const S = k => ({ k }), rp = r => A_PAID.careerRecPaid(r);
-  // the flag decides, and a record without it is read from its parts (no part of a paid session means a repeat)
-  expect('careerRecPaid, pinned: nothing, or not a record, adds nothing', null, [rp(null), rp(undefined), rp('x'), rp(7)], [0, 0, 0, 0]);
-  expect('careerRecPaid, pinned: the repeat flag decides, over the parts', null, [rp({ repeat: true }), rp({ repeat: false }), rp({ repeat: true, parts: [S('session')] }), rp({ repeat: false, parts: [] })], [0, 1, 0, 1]);
-  expect('careerRecPaid, pinned: an older record with a session part, or an early one, is a paid session', null,
-    [rp({ parts: [S('session'), S('log'), S('checkin')] }), rp({ parts: [S('early')] }), rp({ parts: [S('log'), S('session')] })], [1, 1, 1]);
-  expect('careerRecPaid, pinned: an older record with no session part (a full log and a check-in only, or nothing) is a repeat', null,
-    [rp({ parts: [S('log'), S('checkin')] }), rp({ parts: [S('log')] }), rp({ parts: [S('checkin')] }), rp({ parts: [] }), rp({ parts: [null] })], [0, 0, 0, 0, 0]);
-  expect('careerRecPaid, pinned: a record with neither flag nor parts counts, as it did before', null, [rp({}), rp({ parts: 'x' }), rp({ t: '2026-10-18T10:00:00Z', xp: 0 })], [1, 1, 1]);
-  expect('careerRecPaid, pinned: the paid count decides, over the flag and the parts (a repeat that keeps a session waiting adds 1)', null,
-    [rp({ paid: 1, repeat: true }), rp({ paid: 0, repeat: false }), rp({ paid: 2, repeat: false }), rp({ paid: 1, repeat: true, parts: [S('log')] }), rp({ paid: 0, parts: [S('session')] })], [1, 0, 2, 1, 0]);
-  expect('careerRecPaid, pinned: a paid count that is not a usable number is ignored, a fraction is rounded down, below 0 is 0', null,
-    [rp({ paid: 'x', repeat: true }), rp({ paid: NaN, repeat: false }), rp({ paid: Infinity, repeat: true }), rp({ paid: 1.9, repeat: true }), rp({ paid: -3, repeat: false })], [0, 1, 0, 1, 0]);
-  // careerEarn() on made-up weeks: whatever it calls a repeat, both readings of the record it leaves agree with it
-  const full = { statusLabel: 'Complete', log: [{ ex: 'Squat', sets: [{ w: '60', n: 5, r: '7', d: true }] }], readiness: { composite: 4 } };
-  const bare = { statusLabel: 'Complete', log: [], readiness: null };
-  const early = { statusLabel: 'Partial (2 of 5 exercises)', log: [], readiness: null };
-  [['day 1, nothing done this week', '1', full, [], 1], ['day 1, day 1 done this week (a repeat, still logged in full and checked in)', '1', full, ['1'], 0],
-   ['day 1, only day 2 done this week', '1', full, ['2'], 1], ['day 2, day 1 done this week', '2', bare, ['1'], 1], ['day 2 again, both done this week', '2', bare, ['1', '2'], 0],
-   ['day 1 finished early, nothing done', '1', early, [], 1], ['day 1 finished early, a repeat', '1', early, ['1'], 0]].forEach(([name, day, D, done, paid]) => {
-    const e = A_PAID.careerEarn(day, D, new Set(done));
-    const rec = { t: '2026-10-18T10:00:00.000Z', xp: e.xp, parts: e.parts, before: 0, saved: 0 };
-    expect('careerEarn calls it a repeat only when the day was done: ' + name, { day, done }, e.repeat, paid === 0);
-    expect('the older record (no flag) of ' + name + ' adds ' + paid, rec.parts.map(p => p.k), rp(rec), paid);
-    expect('the record careerEarnAtDone writes (with the flag) of ' + name + ' adds ' + paid, { repeat: e.repeat }, rp(Object.assign({}, rec, { repeat: e.repeat })), paid);
-    expect('the record careerEarnAtDone writes (with the paid count, nothing waiting for the day) of ' + name + ' adds ' + paid, { repeat: e.repeat },
-      rp(Object.assign({}, rec, { repeat: e.repeat, paid: A_PAID.careerPaidAtDone(e.repeat, null, Date.now()) })), paid);
+run('Career Mode: the cap and the spare (program.html CAREER_SESSION_LIMIT, CAREER_SPARE_FROM, careerWeekOf, careerEarn / career/rulebook.toml, career_derive() in the snapshot)', () => {
+  const rb = read('career/rulebook.toml');
+  ['session_finished', 'session_finished_early'].forEach(k => {
+    const sec = new RegExp('\\n\\[fact\\.' + k + '\\]\\n([\\s\\S]*?)(?=\\n\\[|$)').exec(rb);
+    const lim = sec && /(?:^|\n)limit = (\d+)/.exec(sec[1]);
+    expect(`CAREER_SESSION_LIMIT is the limit of [fact.${k}] in career/rulebook.toml`, k, A_LIMITS.limit, lim ? Number(lim[1]) : null);
   });
-  // careerPendingSessions() itself: the waiting records of the last 3 days that no answer has counted, each as many as careerRecPaid() says, and nothing while the catalogue is off
+  const snap = read('supabase/schema_snapshot.sql');
+  const from = /or \(wk\.wfrom >= date '(\d{4}-\d{2}-\d{2})'\s+\/\* stage106: the spare/.exec(snap);
+  expect('CAREER_SPARE_FROM is the first week career_derive() lets a spare hold (supabase/schema_snapshot.sql)', 'stage106', A_LIMITS.from, from ? from[1] : null);
+  const twiceS = /s\.pday = pd\) >= (\d+)\)\) from unnest\(wk\.plan\) pd\) as held/.exec(snap), twiceA = /\(prev\[id\] \|\| 0\) >= (\d+)\) spare\.add\(id\)/.exec(A_SRC);
+  expect('a spare is a plan day done this many times the week before, in careerWeekOf() as in career_derive()', 'stage106', twiceA ? Number(twiceA[1]) : null, twiceS ? Number(twiceS[1]) : null);
+  const full = { statusLabel: 'Complete', log: [{ ex: 'Squat', sets: [{ w: '60', n: 5, r: '7', d: true }] }], readiness: null };
+  const early = { statusLabel: 'Partial (2 of 5 exercises)', log: [], readiness: null };
+  const ks = e => e.parts.map(p => p.k + ' ' + p.xp);
+  const E = (day, D, done, n, spare, wk) => { A_PAID.ctx.WK = wk === undefined ? { wk: 2, total: 5, before: false, after: false } : wk; return A_PAID.careerEarn(day, D, new Set(done), { n, spare: new Set(spare) }); };
+  // the cap: the session itself pays the first CAREER_SESSION_LIMIT times a plan day is done in its week, the full log always
+  const caps = [0, 1, 2, 3].map(n => E('1', full, n ? ['1'] : [], n, []));
+  expect('careerEarn, pinned: Day 1 the first, second, third and fourth time in a week (the session pays twice, the full log every time)', null,
+    caps.map(e => [ks(e), e.repeat, e.capped]),
+    [[['session 400', 'log 50'], false, false], [['session 400', 'log 50'], true, false], [['log 50'], true, true], [['log 50'], true, true]]);
+  expect('careerEarn, pinned: a session finished early the second time pays its own price', null, ks(E('1', early, ['1'], 1, [])), ['early 200']);
+  expect('careerEarn, pinned: the second time says it covers the plan day next week, only when next week is in the same cycle', null,
+    [E('1', full, ['1'], 1, []).spareNext, E('1', full, ['1'], 1, [], { wk: 5, total: 5, before: false, after: false }).spareNext, E('1', full, [], 0, []).spareNext, E('1', full, ['1'], 2, []).spareNext, E('1', full, ['1'], 1, [], null).spareNext],
+    [true, false, false, false, false]);
+  // the spare: a plan day covered by last week's second session counts as done this week
+  const week = e => e.parts.some(p => p.k === 'week');
+  expect('careerEarn, pinned: the week holds when the last plan day is done, or when the other one is covered by a spare', null,
+    [week(E('1', full, ['2'], 0, [])), week(E('1', full, [], 0, ['2'])), week(E('1', full, [], 0, [])), E('1', full, [], 0, ['2']).weekLeft, E('1', full, [], 0, []).weekLeft],
+    [true, true, false, 0, 1]);
+  expect('careerEarn, pinned: a week a spare already held is not held again (Day 1 covered, Day 2 done, then Day 1 trained)', null,
+    [week(E('1', full, ['2'], 0, ['1'])), week(E('1', full, ['1', '2'], 1, []))], [false, false]);
+  expect('careerEarn, pinned: outside a cycle\'s weeks nothing holds and nothing is left', null,
+    [week(E('1', full, ['2'], 0, [], null)), E('1', full, ['2'], 0, [], null).weekLeft], [false, null]);
+  A_PAID.ctx.WK = null;
+  expect('careerEarn, pinned: without careerWeekOf() a day `done` has is one earlier finish (it still pays)', null, (() => { const e = A_PAID.careerEarn('1', full, new Set(['1'])); return [ks(e), e.repeat, e.capped, e.again]; })(), [['session 400', 'log 50'], true, false, 1]);
+});
+run('Career Mode: every finished session adds 1 to Sessions with Amir (program.html careerRecPaid / careerPaidAtDone / careerPendingSessions, career_measures() since stage106)', () => {
+  const S = k => ({ k }), rp = r => A_PAID.careerRecPaid(r);
+  expect('careerRecPaid, pinned: nothing, or not a record, adds nothing', null, [rp(null), rp(undefined), rp('x'), rp(7)], [0, 0, 0, 0]);
+  expect('careerRecPaid, pinned: a record without a paid count is one finish, a repeat and an older record with no session part included', null,
+    [rp({ repeat: true }), rp({ repeat: false }), rp({}), rp({ parts: [S('log'), S('checkin')] }), rp({ parts: [S('session')] }), rp({ t: '2026-10-18T10:00:00Z', xp: 0 })], [1, 1, 1, 1, 1, 1]);
+  expect('careerRecPaid, pinned: the paid count decides (a finish that keeps one waiting adds 2; a 0 written by the app before stage106 stays 0)', null,
+    [rp({ paid: 1, repeat: true }), rp({ paid: 0, repeat: true }), rp({ paid: 2, repeat: false }), rp({ paid: 0, parts: [S('session')] })], [1, 0, 2, 0]);
+  expect('careerRecPaid, pinned: a paid count that is not a usable number is ignored, a fraction is rounded down, below 0 is 0', null,
+    [rp({ paid: 'x', repeat: true }), rp({ paid: NaN }), rp({ paid: Infinity }), rp({ paid: 1.9 }), rp({ paid: -3 })], [1, 1, 1, 1, 0]);
   const LS = A_PAID.LS, ago = h => new Date(Date.now() - h * 3600000).toISOString();
   const waiting = recs => { Object.keys(LS).forEach(k => delete LS[k]); recs.forEach((r, i) => { LS['a_earn_d' + (i + 1)] = JSON.stringify(r); }); LS.a_careercache = '{}'; return A_PAID.careerPendingSessions(); };
-  const paidDay = (o) => Object.assign({ t: ago(2), xp: 450, parts: [{ k: 'session' }, { k: 'log' }], before: 0, saved: 0, repeat: false }, o);
-  const repeatDay = (o) => Object.assign({ t: ago(2), xp: 50, parts: [{ k: 'log' }], before: 0, saved: 0, repeat: true }, o);
-  expect('careerPendingSessions, pinned: one new plan day adds 1', null, waiting([paidDay()]), 1);
-  expect('careerPendingSessions, pinned: a plan day done again in its week adds nothing (Home stays at the profile number)', null, waiting([repeatDay()]), 0);
-  expect('careerPendingSessions, pinned: a new day and a repeat of another add 1, two new days add 2', null, [waiting([paidDay(), repeatDay()]), waiting([paidDay(), paidDay()])], [1, 2]);
-  expect('careerPendingSessions, pinned: an older record with no flag is read from its parts', null,
-    [waiting([paidDay({ repeat: undefined })]), waiting([repeatDay({ repeat: undefined })]), waiting([{ t: ago(1), saved: 0 }])], [1, 0, 1]);
+  const paidDay = (o) => Object.assign({ t: ago(2), xp: 450, parts: [{ k: 'session' }, { k: 'log' }], before: 0, saved: 0, repeat: false, paid: 1 }, o);
+  const repeatDay = (o) => Object.assign({ t: ago(2), xp: 450, parts: [{ k: 'session' }, { k: 'log' }], before: 0, saved: 0, repeat: true, paid: 1 }, o);
+  expect('careerPendingSessions, pinned: a new plan day adds 1, and so does a plan day done again in its week', null, [waiting([paidDay()]), waiting([repeatDay()]), waiting([paidDay(), repeatDay()])], [1, 1, 2]);
+  expect('careerPendingSessions, pinned: a record with no paid count adds 1', null, [waiting([paidDay({ paid: undefined })]), waiting([{ t: ago(1), saved: 0 }])], [1, 1]);
   expect('careerPendingSessions, pinned: a session an answer asked after it was saved has counted adds nothing, one saved after the last answer still adds 1', null,
     [waiting([paidDay({ saved: 500 })]), waiting([paidDay({ saved: 2000 })])], [0, 1]);
   expect('careerPendingSessions, pinned: a record older than 3 days adds nothing', null, waiting([paidDay({ t: ago(80) })]), 0);
   expect('careerPendingSessions, pinned: nothing while the catalogue switch is off', null, (A_PAID.ctx.ON = false, waiting([paidDay()])), 0);
   A_PAID.ctx.ON = true;
-  // a repeat that took over the record of a session still waiting for an answer carries that session: its paid count says 1, and Home keeps the +1
-  expect('careerPendingSessions, pinned: a repeat that carries the waiting session of its plan day adds that 1, a paid count of 2 adds 2, 0 adds nothing', null,
-    [waiting([repeatDay({ paid: 1 })]), waiting([paidDay({ paid: 2 })]), waiting([paidDay({ paid: 0 })]), waiting([repeatDay({ paid: 1 }), paidDay()])], [1, 2, 0, 2]);
-  expect('careerPendingSessions, pinned: a carried session an answer has counted adds nothing, and neither does one older than 3 days', null,
-    [waiting([repeatDay({ paid: 1, saved: 500 })]), waiting([repeatDay({ paid: 1, t: ago(80) })]), waiting([repeatDay({ paid: 1, saved: 2000 })])], [0, 0, 1]);
-  // careerPaidAtDone(): the paid count a finish writes. This finish's own session (none for a repeat) plus what the record for the same plan day, still waiting, stood for.
+  expect('careerPendingSessions, pinned: a record carrying a waiting session adds both', null, [waiting([repeatDay({ paid: 2 })]), waiting([repeatDay({ paid: 2 }), paidDay()])], [2, 3]);
   const pd = A_PAID.careerPaidAtDone, nowMs = Date.now();
-  expect('careerPaidAtDone, pinned: nothing waiting for the plan day: a new day is 1, a repeat 0', null, [pd(false, null, nowMs), pd(true, null, nowMs), pd(true, undefined, nowMs), pd(false, 'x', nowMs)], [1, 0, 0, 1]);
-  expect('careerPaidAtDone, pinned: a repeat keeps the session still waiting in the record it replaces, a new finish adds to it', null,
-    [pd(true, paidDay(), nowMs), pd(false, paidDay(), nowMs), pd(true, repeatDay({ paid: 1 }), nowMs), pd(true, paidDay({ paid: 2 }), nowMs)], [1, 2, 1, 2]);
-  expect('careerPaidAtDone, pinned: a waiting repeat that carried nothing carries nothing on', null, [pd(true, repeatDay(), nowMs), pd(true, repeatDay({ paid: 0 }), nowMs), pd(false, repeatDay(), nowMs)], [0, 0, 1]);
+  expect('careerPaidAtDone, pinned: nothing waiting for the plan day: 1', null, [pd(null, nowMs), pd(undefined, nowMs), pd('x', nowMs)], [1, 1, 1]);
+  expect('careerPaidAtDone, pinned: a finish keeps what the record it replaces still had waiting', null,
+    [pd(paidDay(), nowMs), pd(repeatDay({ paid: 2 }), nowMs), pd(paidDay({ paid: undefined }), nowMs), pd(repeatDay({ paid: 0 }), nowMs)], [2, 3, 2, 1]);
   expect('careerPaidAtDone, pinned: a session an answer has counted, or one older than 3 days, is not carried; one saved after the last answer still is', null,
-    [pd(true, paidDay({ saved: 500 }), nowMs), pd(true, paidDay({ t: ago(80) }), nowMs), pd(true, paidDay({ saved: 2000 }), nowMs)], [0, 0, 1]);
-  expect('careerPaidAtDone, pinned: an older waiting record (no count, no flag) is read from its parts', null,
-    [pd(true, paidDay({ repeat: undefined }), nowMs), pd(true, repeatDay({ repeat: undefined }), nowMs), pd(true, { t: ago(1), saved: 0 }, nowMs)], [1, 0, 1]);
+    [pd(paidDay({ saved: 500 }), nowMs), pd(paidDay({ t: ago(80) }), nowMs), pd(paidDay({ saved: 2000 }), nowMs)], [1, 1, 2]);
 });
 run('Career Mode phase 3: the five events\' goals (habits.html EVENTS / career/achievements.toml)', () => {
   const H_EV = sandbox(null, [constSrc(H_SRC, 'EVENTS', 'habits.html')], ['EVENTS']);

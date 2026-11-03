@@ -28,11 +28,17 @@ level is the career's (every session, every habit, never reset by a season) and 
   says *Ready for today*, because the level is the Career row's.
 - **The finish card's line, before Done** (`.confirm-earn` in `#confirm-<day>`, `paintConfirmEarn()`): once the session can be
   finished, *This session earns* **+450 XP**, with what makes it up in grey underneath: *Session 400 · Every set logged 50*, and
-  *Check-in 20* when it was answered. A day already done this week says *Day 1 is done this week already, so the session itself pays
-  once* (the full log and the check-in still pay). A session that completes the week adds *Your week held +400 · Back after a broken
-  week +100 when it counts*. The server judges a week (`career_derive()`), so the phone marks those two as pending and keeps them out
+  *Check-in 20* when it was answered. Since stage106 and rulebook version 12 (2026-10-26) a plan day
+  pays its session twice in a training week: the second time says *Day 1 again this week, so the session pays once more. If you miss Day 1
+  next week, this one covers it.* (the second half only when next week is in the same cycle), and the third says *Day 1 is done twice this
+  week already, so the session itself pays nothing more.* (the full log and the check-in still pay). `careerWeekOf()` counts the earlier
+  finishes from the history and this phone's finish stamp; the phone reads each as a full finish, and the server pays the higher two.
+  **The spare:** a plan day done twice in the training week before, in the same cycle, counts as done for the held week (`career_derive()`,
+  weeks from 2026-10-18; `CAREER_SPARE_FROM`), and a week a spare already held is not held again. A session that completes the week adds
+  *Your week held +400 · Back after a broken week +100 when it counts*. The server judges a week (`career_derive()`), so the phone marks those two as pending and keeps them out
   of the sum. `careerEarn()` prices from the profile's `rules.prices`, so a re-seeded rulebook changes it with no release, and it uses
-  the cap of `career_facts_paid()` (one paid session per plan day per training week). A session finished early reads *Session,
+  the cap of `career_facts_paid()` (`CAREER_SESSION_LIMIT`, 2 paid sessions per plan day per training week, held to `career/rulebook.toml` by
+  `scripts/check_twins.js`). A session finished early reads *Session,
   finished early* at the early price. The box is empty, and hidden, outside Career Mode and until the card is ready.
 - **The finished card's line, after Done** (`#earn-<day>`, `.complete-earn`, at the left of Amir's signature on the green): **+470 XP**
   over **Level 11 · 840 to 12**. At Done, `careerEarnAtDone()` keeps what the session earned and the career XP of that moment in

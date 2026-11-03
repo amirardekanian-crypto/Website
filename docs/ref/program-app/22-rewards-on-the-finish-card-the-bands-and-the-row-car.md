@@ -62,12 +62,11 @@ card, the row and the finished card are byte for byte what they were; `scripts/h
   or the coach's preview.
 - **Home's Career row** (`careerRowHTML()`): the level line is untouched. Two more small lines under it, each on its own line:
   `.career-four` from `numbers.four` only (*7 weeks held · 41 sessions · 12 bests · 2 comebacks*, a zero cell left out, nothing when
-  all four are zero, singular at 1; **Sessions with Amir shows +1 from this phone** for a *paid* session finished here that no answer has
-  counted yet, never lower than the profile's: **a plan day done again in its training week adds nothing** (GAME-4; D19, Claude's pick, waiting for Amir's
-  word: the server counts one session per plan day per week, as Century does; if he says no, `careerMoves()`'s `repeat` rule and `careerRecPaid()` go back with stage73's),
-  which `careerRecPaid()` reads from the `paid` count `careerEarnAtDone()` writes on the record (this finish's own session, none for a repeat, plus what the record it
-  replaces still had waiting, `careerPaidAtDone()`, so a repeat never takes away a session of the same plan day that no answer has counted yet), else from its `repeat`
-  flag, else, for a record written before them, from its parts, a record with no `session` / `early` part being a repeat) and `.career-next` (`near[0]` as *Paper Trail 9 of 10* when it is within two or at 80%).
+  all four are zero, singular at 1; **Sessions with Amir shows +1 from this phone** for every session finished here that no answer has
+  counted yet, never lower than the profile's: **a plan day done again in its training week adds 1 too** since stage106 (2026-10-26), when the server's
+  number, Century's count, began counting every session (under D19 it counted one per plan day per week, and a repeat added nothing; `careerMoves()` moved Century
+  the same way), which `careerRecPaid()` reads from the `paid` count `careerEarnAtDone()` writes on the record (this finish's 1 plus what the record it
+  replaces still had waiting, `careerPaidAtDone()`, so a second finish never takes away a session of the same plan day that no answer has counted yet), else 1) and `.career-next` (`near[0]` as *Paper Trail 9 of 10* when it is within two or at 80%).
   The tap opens AA Proof's **Progress** (`&go=progress`) instead of the Locker; the `aria-label` names the numbers. Checked at 320 and
   390 px, light and dark: the four wrap to two rows at most, the goal is one row, the rank line is never cut.
 - **The guide:** `APP_GUIDE` *Getting around*, *Finishing a session*, `key: 'career'` and `key: 'share'` each gained a sentence phrased

@@ -30,7 +30,7 @@ training app one score and one level. Amir's three decisions, 2026-10-17 (*"go w
   (finished early 200), a full log (every set logged) 50, the check-in answered 20, a week held 400, a bounce-back after a broken week 100, a
   return after two or more weeks away 50, a Library session 100 (two a week), a personal best 150, an effort win 200 (three a
   cycle), a retest done 50, a retest beaten 300, a cycle finished 1,000 and the roadmap finished 3,000. One paid session per plan
-  day per training week: a day done twice in a week pays its session once. Proof's own comeback stays 50, paid by the habit half.
+  day per training week: a day done twice in a week pays its session once (twice since rulebook version 12, 2026-10-26, a third time once more nothing). Proof's own comeback stays 50, paid by the habit half.
 - **The WORKOUT habit pays 0 a day toward the overall XP** (id `strength`, the locked one). The session pays instead, so a session
   is never paid twice. The habit stays on the day's list. Its weight (100) still counts in the day gate (the day streak, days on
   target), in its own consistency tiers and in HEAVY METAL and THE MACHINIST until the catalogue switch. Its own ladder (its level

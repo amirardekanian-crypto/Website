@@ -85,7 +85,7 @@ Share it opens the Rank card, eyebrow *MY RECORD*.
 - **Today:** under the level bar, **four numbers**, one per kind of win (`hero4()`): coached *Weeks held* (with its best) ·
   *Sessions with Amir* · *Personal bests* · *Comebacks*; free *Day streak* · *Perfect days* · *Habit steps* · *Comebacks* (D4),
   the free athlete's first three this phone's own, so they move at the tap. *Sessions with Amir* is the server's `numbers.four.commitment.value` and nothing is added to it here: from stage73
-  (built, not yet applied; D19, Claude's pick, waiting for Amir's word) it is the paid sessions Century counts, a plan day done again in its training week counting once (GAME-4). A tap opens Progress at that kind of win. Two by two
+  (built, not yet applied; D19, Claude's pick, waiting for Amir's word) it is the paid sessions Century counts, a plan day done again in its training week counting once (GAME-4); since stage106 (2026-10-26) it is every finished session. A tap opens Progress at that kind of win. Two by two
   under 360 px.
 - **Progress:** the statgrid is unchanged (D15; *Milestones* now counts the awards held over every live tier and milestone). The
   milestone block is the catalogue's, in four groups (*Consistency*, *Commitment*, *Progress*, *Resilience*), with the same folds,

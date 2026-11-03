@@ -3864,6 +3864,14 @@
    "expect": {
     "lines": [
      {
+      "id": "century",
+      "name": "Century",
+      "have": 11,
+      "next": 25,
+      "crossed": false,
+      "pending": false
+     },
+     {
       "id": "full_log",
       "name": "Paper Trail",
       "have": 11,
@@ -4135,7 +4143,16 @@
     "repeat": true
    },
    "expect": {
-    "lines": [],
+    "lines": [
+     {
+      "id": "century",
+      "name": "Century",
+      "have": 11,
+      "next": 25,
+      "crossed": false,
+      "pending": false
+     }
+    ],
     "more": 0
    }
   },
@@ -4409,15 +4426,15 @@
       "pending": true
      },
      {
-      "id": "full_log",
-      "name": "Paper Trail",
+      "id": "century",
+      "name": "Century",
       "have": 11,
       "next": 25,
       "crossed": false,
       "pending": false
      }
     ],
-    "more": 2
+    "more": 3
    }
   },
   {
@@ -6436,6 +6453,14 @@
    "expect": {
     "lines": [
      {
+      "id": "century",
+      "name": "Century",
+      "have": 25,
+      "next": 25,
+      "crossed": true,
+      "pending": false
+     },
+     {
       "id": "full_log",
       "name": "Paper Trail",
       "have": 25,
@@ -6722,7 +6747,16 @@
     "repeat": true
    },
    "expect": {
-    "lines": [],
+    "lines": [
+     {
+      "id": "century",
+      "name": "Century",
+      "have": 25,
+      "next": 25,
+      "crossed": true,
+      "pending": false
+     }
+    ],
     "more": 0
    }
   },
@@ -6995,6 +7029,14 @@
    "expect": {
     "lines": [
      {
+      "id": "century",
+      "name": "Century",
+      "have": 25,
+      "next": 25,
+      "crossed": true,
+      "pending": false
+     },
+     {
       "id": "full_log",
       "name": "Paper Trail",
       "have": 25,
@@ -7009,17 +7051,9 @@
       "next": 25,
       "crossed": true,
       "pending": false
-     },
-     {
-      "id": "love_hold",
-      "name": "Love Hold",
-      "have": 12,
-      "next": 12,
-      "crossed": true,
-      "pending": true
      }
     ],
-    "more": 2
+    "more": 3
    }
   }
  ],

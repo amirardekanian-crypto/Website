@@ -39,7 +39,7 @@ keys never synced, and 320 px. In AA Proof: the one reveal (once per athlete, no
 the XP at once, WORKOUT at 0, the manual's wording, `?go=pass` opening the Locker, and the embedded strip never asking for the profile. Serve the
 repo first (see `lib.js`). `PROGRAM-APP.md` → *Career on Home, and what a session earns*, `HABITS.md` → *Career Mode (phase 2, the XP switch)*.
 Phase 3 (2026-10-18) extends it to 289 checks, with the catalogue switch OFF and ON: with it off both apps are byte for byte phase 2's; with it on, the
-four numbers and the nearest goal on Home's Career row (its Sessions with Amir adds +1 for a paid session finished on the phone and none for a plan day done again in its week: `careerRecPaid()`), the finish card's `moves` lines, the reward bands on the finished card and the reward moment in
+four numbers and the nearest goal on Home's Career row (its Sessions with Amir adds +1 for every session finished on the phone, a plan day done again in its week included since stage106: `careerRecPaid()`; the finish card's cap and spare), the finish card's `moves` lines, the reward bands on the finished card and the reward moment in
 the training app, and in AA Proof the catalogue reveal (which waits for the catalogue copy or the shelf, never counting four zeros), the shelf and its phone cache
 (`<id>_hab_shelf`, the stub's `get_awards`), the four numbers on Today's card, the Grand Slam row, award moments and wins lines.
 `sharecard.js`, `highlight-reel.js` and `proof-cards.js` also draw the badge, achievement and title cards (the Proof look for Proof's).

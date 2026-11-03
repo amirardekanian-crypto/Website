@@ -15,7 +15,7 @@ breaks a copy of the files on purpose, 131 ways, and requires the guard to fail 
 differences (the week-note input, drafts, the leftover-session window, the retest flag) are in the script's header.
 Career Mode's phone copies are sections 8 to 11 (2026-10-17/18; 65,472 checks in all, section 11 being a lift in its own measure, the weight units' stage72): the weeks held in a row, phase 2's curve and the day's XP, and phase 3's award id, the
 phone's scoring (`habits.html awardMeasures()` / `phoneAwardsFrom()`, held to the server's `reward_cases.json` and to a measure grown by hand for every entry and every tier),
-the finish card's lines (a plan day done again in its week moves no session count) and Home's pending session, and the five events' goals against `career/*.toml` (read through `career_seed.py --json`; in index mode the toml, the seed script, the checker, the
+the finish card's lines (every session moves the session counts since stage106) and Home's pending session, the cap and the spare (`CAREER_SESSION_LIMIT` to `career/rulebook.toml`, `CAREER_SPARE_FROM` to `career_derive()`), and the five events' goals against `career/*.toml` (read through `career_seed.py --json`; in index mode the toml, the seed script, the checker, the
 snapshot and `coach.html` come from the index, like `habits.html`). Already guarded elsewhere: `rxOf()` (`check_rx.js`), the set-log grammar (`check_setlog.js`), the word lists
 (`check_parity.py`), the XP rules (`check_xp_rules.py`).
 

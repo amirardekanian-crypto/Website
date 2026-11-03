@@ -26,7 +26,7 @@
   the schema snapshot (the coach.html lines, the restore script and the snapshot are in the phase 3 commit, rollout step 2); **no trigger evaluates on a DELETE** (an erasure must not mint);
   `career_evaluate()` stays inside its budget (on the longest log a Proof save costs 42 to 58 ms more, the spread being the PC's load, and a session save about 2 ms more under stage70 alone and 51 ms more with stage73 on top, because the capped counts of Century and Same Effort call `career_facts_paid()`; rehearsed on 2026-10-18, against a budget of 300); a badge's tiers are
   **append-only** (the award id is the tier's place in the list: `career/tiers.lock.json`, rule 21 of the checker, `career_seed.py --write-lock`).
-- **The phones' copies of phase 3's rules** (the award id, the phone's scoring of the phone-decidable entries, the finish card's moves, Home's pending session (`careerRecPaid()`: a plan day done again in its week adds none, GAME-4), the five events'
+- **The phones' copies of phase 3's rules** (the award id, the phone's scoring of the phone-decidable entries, the finish card's moves, Home's pending session (`careerRecPaid()`: every finish adds 1 since stage106; a plan day done again in its week added none under D19), the five events'
   goals) are held to the server's own answers in `scripts/career/reward_cases.json` by `scripts/check_twins.js` §10, and the answers to the server by
   `scripts/career/rehearse_catalogue.mjs` (`--write-cases` after a deliberate change, on both sides).
 - **The profile is two reads, and the two must agree** (phase 3 fix round, 2026-10-18). `get_profile()` is the core: `owned` (a **list** of award ids, sorted byte
