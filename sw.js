@@ -541,7 +541,9 @@
 // as well", "Imagine someone is training without internet"). "Your session is still open" 10 minutes after the last set (stage108), its tap
 // opens the finish card (#finish); Android sets the rest alert and the reminder itself too, and a push after it replaces it quietly; the
 // next open asks a forgotten session's effort and files its real time.
-const CACHE = 'aap-v241';
+// v242: program.html changed (2026-11-03, Amir: "Why does it say 17of16 sets for ehsan training"). The phone keeps a day's ticks over its
+// exercise cards only, so reopening the app mid-session no longer moves a circuit's tick onto the session clock; the count never runs past the total.
+const CACHE = 'aap-v242';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

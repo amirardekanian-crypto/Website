@@ -19911,7 +19911,8 @@ function weekSetsDrop(card) {
 }
 function getDayCompletion(day) {
   let total = dayTotals[day] || 0;
-  const items = document.querySelectorAll(`[data-day="${day}"]`);
+  // The exercise cards only: the session clock and Home's clock carry data-day too, and a stray .checked on one counted (restoreState()).
+  const items = document.querySelectorAll(`.checklist-item[data-day="${day}"]`);
   let done = 0;
   const missing = [];
   // Today's targets (paintToday()): work the day did not ask for is never "missing".
@@ -21763,10 +21764,15 @@ function migrateCarriedWeights() {
   try { localStorage.setItem(flag, '1'); } catch (e) {}
 }
 
+// The ticks are kept by position, over the day's exercise cards ONLY (.checklist-item). Until 2026-11-03 they were kept over
+// every [data-day] element, and that list also holds the session clock, the finish card's Crew and Share slots and, while the
+// day is under way, Home's clock (.dc-clock), which comes first. A save made before Home had its clock and an open after it
+// moved every tick one place on: the session clock took the first warm-up's tick and counted as a unit, so the day could never
+// be full and Ehsan's Day 1 read "17 of 16 sets, warm-up left" with every set done (Amir, 2026-11-02). `v: 2` marks the new list.
 function saveState() {
-  const state = {};
+  const state = { v: 2 };
   Object.keys(dayTotals).forEach(day => {
-    state[day] = Array.from(document.querySelectorAll(`[data-day="${day}"]`))
+    state[day] = Array.from(document.querySelectorAll(`.checklist-item[data-day="${day}"]`))
       .map(i => i.classList.contains('checked'));
   });
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -21780,8 +21786,11 @@ function loadState() {
 function restoreState() {
   const state = loadState();
   Object.keys(dayTotals).forEach(day => {
-    const items = Array.from(document.querySelectorAll(`[data-day="${day}"]`));
-    (state[day] || []).forEach((checked, idx) => {
+    const items = Array.from(document.querySelectorAll(`.checklist-item[data-day="${day}"]`));
+    let saved = state[day] || [];
+    // A list saved by the old code: [Home's clock?] [the session clock] [the cards] [Crew] [Share]. Its cards are the n before the last two.
+    if (state.v !== 2 && saved.length >= items.length + 3) saved = saved.slice(saved.length - 2 - items.length, saved.length - 2);
+    saved.forEach((checked, idx) => {
       if (checked && items[idx]) {
         items[idx].classList.add('checked');
         items[idx].querySelectorAll('.rpe-row').forEach(r => r.classList.add('visible'));
