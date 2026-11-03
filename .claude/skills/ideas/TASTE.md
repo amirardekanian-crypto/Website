@@ -5,6 +5,14 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-03 · "Go with your picks", then: like my own app, on the phone, ringing for both sides.** *"go with your picks / like
+  my own app, i want it to be able to be saved on the phone / and i want to have notifications for both the customer and the coach
+  about many things"*. When the research marked push in Iran "unproven without a VPN": *"notifications can go through if they have
+  access to internet without the need of vpn / just get the info about this from my own app"*. What it teaches: (1) "go with your
+  picks" settles every open decision at once, so mark them taken and do not ask again; (2) a product he puts his name near must
+  feel like his own training app: installable, and it rings, for the coach and for the customer; (3) for how his own system works
+  for Iranian users, read his app's data first (here `push_subs`, `push_sent`) and take his word. Web research about Iran is the
+  fallback, never a reason to call his own experience unproven.
 - **2026-11-03 · A competitor teardown was for a NEW product, not for his apps.** He asked for Nazm's code, took a teardown, and when
   it came back as four coach.html ideas: *"my aim was not to change my own coach.html, i liked how this idea works, and i wanted to
   create apps like that for coaches that i work with as a way to introduce my own app and because i create some websites, this will

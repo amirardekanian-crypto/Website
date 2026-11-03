@@ -433,6 +433,28 @@ Seven decisions wait on him in section ۱۳ (name, where the pilot lives, who pa
 money on the athlete page, the pilot's shape and price), plus six questions only he can answer. Page:
 https://claude.ai/artifact/KQjJiAfREV7T5HbL5jG4mb (version 2, Farsi).
 
+**Version 3, the same day (status: picks taken, nothing built).** He answered *"go with your picks / like my own app, i want it to be
+able to be saved on the phone / and i want to have notifications for both the customer and the coach about many things"*. So the
+seven decisions are marked «انتخاب شد» on the page: the name «لاب»; a new Supabase Pro project and GitHub Pages from a private repo,
+with a sanctions lawyer before the first paid coach; one shared SMS panel that he pays for in the pilot; upgrade tier A (the Etminan
+shape); default class rules A; money on the athlete page A; Mehraneh as coach 1, 3 free months, a founder price locked for 12 months.
+That reverses "the page never asks for notifications": web push is in v1. New section ۹ «نصب روی گوشی و اعلان‌ها»: both apps install
+to the Home Screen, and the athlete page moves to its own origin `p.<brand-domain>`, so a "Don't allow" on one never costs the other.
+Three directions for the moment the app asks (A «سرِ وقتش» Right on Cue 30/35, B «روز اول» Day One 25, C «کنارِ خودش» Right Beside
+It 24). **Pick A**: nothing on a first visit, and the first ask comes under the row the person just used (the coach's first «اومد» of
+a day, the player's first visit with news), our line and button before the phone's box. Grafts: install before login for an iPhone
+coach, the first Home Screen open as an ask moment, a test push with a receipt and a reach word per player («اعلان» / «پیامک» /
+«هیچی»), the «پرداخت کردم» then «خبرت کنیم؟» moment, an install code that carries what the player asked for, no ask while offline.
+The notification list: P0 to P18 for players, K0 to K9 for parents of children, C0 to C8 for the coach, A1 to A10 for Amir as the
+seller. The lock screen shows a name and a kind only. Channel order: push first (free), SMS only for must-arrive news with no
+receipt, a pre-filled WhatsApp last. **Push in Iran, his word:** *"notifications can go through if they have access to internet
+without the need of vpn / just get the info about this from my own app"*. His app backs it: 7 athletes in Iran have push on (5
+iPhone, 2 Android), 55 reminders since 2026-10-20, 0 failures. Only a national cut or a phone without Google services stops it. The
+build grew from 45 to 50 days to about 60 to 70. Decisions ۸ to ۱۷ carry my pick («انتخاب من، اگه نه بگو»). Three questions only he
+can answer are left: does WhatsApp reach Mehraneh's players without a VPN, and which app do they answer on; does he (or a partner in
+Iran) have an Iranian national ID, mobile and bank card for the SMS panel; how many minutes per athlete per cycle the upgrade costs
+him. Same link, version 3.
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
