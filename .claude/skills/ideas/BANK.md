@@ -472,6 +472,10 @@ The build table has a new column «کی می‌سازه»: about 29 of 66 days c
 upgrade door). Row ۱۴ grew a day for the SMS choice and queue. During the build every finished step may end with a one-line idea
 (what, why, how many days), never added mid-step and never built without his yes. Same link, version 4.
 
+**Version 5, the same day.** Asked "go with my picks for decisions 18 and 19?", he said *"Yes"*. Both are marked
+«انتخاب شد» on the page: the player picks reminders by notification or SMS, and one `sms_outbox` from day one. Decisions ۸ to ۱۷
+still carry my pick, open to his no. Same link, version 5.
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
