@@ -46,6 +46,6 @@ is the header of `supabase/stage108_finish_push.sql`.
   **⚠️ The words exist twice**: `push_alert_take()` and `localAlert.WORDS` in program.html. Change both.
 - **The rescue catches what the reminder does not**, with or without internet (`docs/ref/program-app/38-one-finish-rate-then-done-wk-04-2026-09-27.md` → *The rescue*).
 - **Proven live** (2026-11-02) with a made-up phone: armed for +40 s, taken at its time. The made-up row
-  (`zz_rest_rehearsal`) is still in `push_subs` until Amir allows the delete.
+  (`zz_rest_rehearsal`) was deleted on 2026-11-03 on Amir's word (*"Delete it"*).
 - Guards: `scripts/push/rehearse_finish_push.mjs` (40, PGlite), `scripts/headless/finish-nudge.js` (20). The way back is
   `scripts/push/rollback_stage108.sql`, on Amir's word only; it puts stage107's two functions back as they were.
