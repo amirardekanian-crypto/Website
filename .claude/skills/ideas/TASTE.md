@@ -5,6 +5,15 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-03 · A competitor teardown was for a NEW product, not for his apps.** He asked for Nazm's code, took a teardown, and when
+  it came back as four coach.html ideas: *"my aim was not to change my own coach.html, i liked how this idea works, and i wanted to
+  create apps like that for coaches that i work with as a way to introduce my own app and because i create some websites, this will
+  help as an addition"*, then *"create the file in farsi, and imagine we want to copy the app and create an app like that in farsi,
+  with our own design"*. What it teaches: (1) when he points at someone else's product, ask first whether he wants it for his own
+  apps or as a product of his own; (2) he builds side products for the coaches he works with (websites first, now apps), and each
+  should be a door to his training app; (3) a plan meant for that world is written in Farsi; (4) "copy the app" means its features
+  under his own name, look and words, never their code, text or screens.
+
 - **2026-10-25 · The Pick card picked, smaller and shorter; the Open's look rejected live.** *"lets go with your pick, but make the card a
   bit smaller, and it should only stay for a week. / the open is live, but i hate the look, for now, take the wallsit off / and start
   building your plan"*. What it teaches: (1) he trims my size and duration again (as with 76): pitch recognition smaller and shorter

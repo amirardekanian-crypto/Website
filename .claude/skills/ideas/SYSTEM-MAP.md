@@ -107,6 +107,11 @@ already include `player` ("Your card": level, weeks, sessions, bests, comebacks,
 (assets/js/sharecard.js). The referral side has no payments data at all (`check_discount` is the only validator; form-fa.html
 ignores `?code=`).
 
+**Money, checked 2026-11-03 (round 9):** no payment is stored anywhere: no table or column for who paid, how much, in which
+currency or for how many cycles (EN plans by PayPal in USD for 1/3/6 cycles; Iran one cycle at a time, card-to-card in toman).
+The `cycle` and `renew` reasons (`reasonsOf()`, `CYCLE_RENEW_DAYS` 14) read `endDate` only. `referral_credits` had 0 rows. Needs-you
+WhatsApp buttons (`NEED_WA_KEYS`: signup, silent, upgrade) open an empty chat; only Courtside and the login message pre-fill `?text=`.
+
 **Gaps found:** Needs-you lists a run of low days (since 2026-09-26) but still does not fire on ACWR
 spikes, RPE drift, pain words or due retests; intake brief is pulled from Gmail though `hab_intake` has
 it; handoff-brief gates are not tracked; testing-app results never meet coached athletes.

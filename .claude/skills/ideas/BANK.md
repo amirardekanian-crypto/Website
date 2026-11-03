@@ -389,6 +389,37 @@ anything sent automatically, a cycle report inside coach.html (a second copy of 
 Amir messaged (48), voice notes to text, Instagram content from client data. Found: `cycle_reports` holds one row from 2026-06-28 with a
 `model` column (an old AI-report try, never shown).
 
+## Round 9 · 2026-11-03 · "Nazm teardown" (a competitor's coach admin app against coach.html)
+
+Full write-up (what Nazm is, feature by feature, 8 fields per idea, ranking, traps, four calls):
+https://claude.ai/artifact/KQjJiAfREV7T5HbL5jG4mb
+
+Brief: Amir asked for the code of Nazm (nazmapp.com, نظم), a paid Farsi PWA for coaches and tutors (students, Jalali session calendar,
+free slots, working hours, per-head class pricing, payments and balances, expenses, four WhatsApp reminder templates with {name}
+{class} {amount} {trainerName} {card}; Next.js on Liara; no athlete app). The code is not public; he took a teardown instead. Live
+numbers that day: 39 programmes not paused, 36 with a dated cycle, 17 cycles ended since 20 Oct or ending by 3 Dec, 16 on Cycle 2 or
+later, 0 `referral_credits` rows ever. Finding: **no payment data exists anywhere** (no table, no column); the renew reasons read
+`endDate` only, so a prepaid Set or Match plan is flagged like a renewal. All four ideas are coach-only (the athlete's end-of-cycle ask
+stays one line, Amir 2026-10-10).
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 101 | Box Office | A payments card on the athlete file (date, amount, $ or toman, PayPal or card-to-card, cycles covered, discount used) → "paid through Cycle N" on the file and roster; new coach-only `coach_payments` (backup + erase same day); a missed row falls back to today's reasons | — | **parked** 2026-11-03: not his aim (he wants a product for other coaches, coach.html unchanged) |
+| 102 | Paid Through | `reasonsOf()` splits the cycle reasons by the paid-through cycle: "Last paid cycle ends in N days: renewal" vs "Cycle N is paid: build it"; renew fires only when nothing covers the next cycle | 101 | **parked** 2026-11-03 (as 101) |
+| 103 | Stock Shots | Amir's message lines written once in Farsi and English with fill-ins ({name} {cycle} {next} {days} {amount} {card}), pre-filled behind every Needs-you WhatsApp button (the `?text=` pattern Courtside and logins use); stored coach-only, never in the repo; logs nothing | — | **parked** 2026-11-03 (as 101) |
+| 104 | Gate Receipts | ⚙ Tools: taken this month in $ and toman (never summed), owed now, credits to use, the last 20 payments; advanced renewal rate by cycle number | 101 | **parked** 2026-11-03 (as 101) |
+
+**The real brief, the same day:** *"my aim was not to change my own coach.html, i liked how this idea works, and i wanted to create
+apps like that for coaches that i work with as a way to introduce my own app and because i create some websites, this will help as
+an addition"*, then *"create the file in farsi, and imagine we want to copy the app and create an app like that in farsi, with our own
+design"*. So round 9 became a Farsi product blueprint for a new app of his own (Nazm's features, his design, a door to his training
+app, sold with his websites), republished at the same link. It is a new product, not one of the apps in SYSTEM-MAP.md.
+
+Cut on the page (so they are not re-pitched): a session calendar, free slots and working hours (no scheduling around tennis; UTS and
+the academy book at the club), per-head class pricing (CHATBOT-FACTS.md is the one price source), expenses, phone-number signup and a
+trial, sending WhatsApp automatically (paid Business API, his voice out), showing the athlete "paid through" (the one-ask rule), Jalali
+dates in coach.html.
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
