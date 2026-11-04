@@ -478,13 +478,19 @@ still carry my pick, open to his no. Same link, version 5.
 
 **The build, from 2026-11-03.** Lob lives in its own private repo (`GitHub\lob`, local only so far). Step ۲ (local part: the
 guards) and step ۳ (schema, row rules, the ledger rules, `player_state()` = `link_view()`, 262 PGlite checks) are done; the paid
-items (Supabase, domain, GitHub Pro) wait on his yes. Ideas from the finished steps, one line each, none built:
+items (Supabase, domain, GitHub Pro) wait on his yes; 2026-11-04 he said "Not yet" to all three, then "Yes, start ۳ب". Step ۳ب
+(the push machine: phones, the queue, folding, quiet hours, the sender, cron; 477 database checks) is done. Its one design change
+from the Website's crew queue: the mark is on each queued row, not one watermark per person, because a send for one person could
+otherwise step over a held row (a 23:00 night-time cancellation would have swallowed a row waiting for 08:00). Ideas from the
+finished steps, one line each, none built:
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
 | 105 | Cover the Gap | Selling a package to a player with counted sessions no package covers: the sheet asks whether this package covers them too and starts it early enough. Why: those sessions otherwise stay unpaid and out of sight (the numbers already count them as `unpackaged`). About half a day, in step ۹ | step ۹ | pitched |
 | 106 | Makeup Running Out | A line in the coach's jobs for today when a player's makeup expires within 3 days. Why: an expired makeup is a lost session the player paid for; the expiry is already worked out. Only matters for a coach who sets an expiry. About half a day, in step ۱۰ | step ۱۰ | pitched |
 | 107 | Only What Changed | An `updated_at` on every table that changes, so the phone pulls only what changed since its last sync. Why: the app opens faster on slow mobile data and after an outage. About half to one day, best before step ۶ builds the offline queue | step ۶ | pitched |
+| 108 | Held Till Eight | When the coach does something after 21:50 that a player would be told about, one quiet line under it says it reaches them at 08:00, with an `sms:` tap if it cannot wait. Why: the coach otherwise thinks a late cancellation went out tonight; the queue already knows it is held. About half a day, in step ۱۴ | step ۱۴ | pitched |
+| 109 | What Goes Next | A page only Amir sees listing what the sender would send in the next hour (the dry run it already has: `push-send?dry=1`), by coach and kind, names only. Why: during the pilot he can check the machine without holding a phone, and catch a wrong rule before a coach does. About half a day, with step ۴ب | step ۴ب | pitched |
 
 ## Grown out of deep-dives
 
