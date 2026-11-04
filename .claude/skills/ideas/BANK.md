@@ -481,8 +481,10 @@ guards) and step ۳ (schema, row rules, the ledger rules, `player_state()` = `li
 items (Supabase, domain, GitHub Pro) wait on his yes; 2026-11-04 he said "Not yet" to all three, then "Yes, start ۳ب". Step ۳ب
 (the push machine: phones, the queue, folding, quiet hours, the sender, cron; 477 database checks) is done. Its one design change
 from the Website's crew queue: the mark is on each queued row, not one watermark per person, because a send for one person could
-otherwise step over a held row (a 23:00 night-time cancellation would have swallowed a row waiting for 08:00). Ideas from the
-finished steps, one line each, none built:
+otherwise step over a held row (a 23:00 night-time cancellation would have swallowed a row waiting for 08:00). He then said "Yes,
+start ۳ج": step ۳ج (the catalogue as drafts, delivery receipts, the rungs to SMS and the coach's own SIM, caps, mourning days and
+the money window, the coach's class policy; 654 database checks) is done, lob d7703dc. Ideas from the finished steps, one line
+each, none built:
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
@@ -491,6 +493,8 @@ finished steps, one line each, none built:
 | 107 | Only What Changed | An `updated_at` on every table that changes, so the phone pulls only what changed since its last sync. Why: the app opens faster on slow mobile data and after an outage. About half to one day, best before step ۶ builds the offline queue | step ۶ | pitched |
 | 108 | Held Till Eight | When the coach does something after 21:50 that a player would be told about, one quiet line under it says it reaches them at 08:00, with an `sms:` tap if it cannot wait. Why: the coach otherwise thinks a late cancellation went out tonight; the queue already knows it is held. About half a day, in step ۱۴ | step ۱۴ | pitched |
 | 109 | What Goes Next | A page only Amir sees listing what the sender would send in the next hour (the dry run it already has: `push-send?dry=1`), by coach and kind, names only. Why: during the pilot he can check the machine without holding a phone, and catch a wrong rule before a coach does. About half a day, with step ۴ب | step ۴ب | pitched |
+| 110 | The Year's Calendar | Ship the official holidays and mourning days for 1405 and 1406 in `holidays` now, checked against the official calendar, instead of an empty table Amir fills by hand. Why: the money window and the mourning-day rule read that table, and with it empty money news could go out on Ashura. About half a day | — | pitched |
+| 111 | Lock-Screen Proof Sheet | One page that shows every draft notification and SMS line (about 60) as it would sit on an iPhone and an Android lock screen, with Persian digits and sample names, grouped by who gets it. Why: step ۱۶ asks Amir to read every Farsi line, and one page beats hunting through SQL; a wrong word is fixed before any coach sees it. About half a day, before step ۱۶ | — | pitched |
 
 ## Grown out of deep-dives
 
