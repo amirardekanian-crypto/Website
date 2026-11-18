@@ -7650,6 +7650,44 @@ S['crew-desk'] = async (b) => {
   return r;
 };
 
+// ── An optional day (2026-11-18, stage109): never planned, its sessions a bonus, never a miss ──────────────────────────────────────────────
+S['optional-day'] = async (b) => {
+  const r = { id: 'optional-day', title: 'A day marked "optional": true is out of Planned = N/week; its sessions show as a bonus', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  // Day 3 optional. In the last 28 days: Days 1 and 2 twice each (4 plan sessions) and the optional Day 3 twice.
+  const sess = [[27, 1], [20, 2], [13, 1], [6, 2], [5, 3], [2, 3]];
+  await page.evaluate(sess => {
+    window.__DB.programs.find(p => p.athlete_id === 'ava_test').data.workouts.days[2].optional = true;
+    const arr = window.__DB.session_history;
+    for (let i = arr.length - 1; i >= 0; i--) if (arr[i].athlete_id === 'ava_test') arr.splice(i, 1);
+    const day = n => new Date(Date.now() - n * 86400e3).toISOString().slice(0, 10);
+    sess.forEach(([ago, d]) => arr.push({ athlete_id: 'ava_test', athlete_name: 'Ava Example', day: d, completed_on: day(ago), status: 'Complete', session_rpe: 6, duration_min: 40,
+      readiness: null, day_note: '', focus: '', summary: 'Day ' + d + ' — fixture', coach_status: 'read', log: null, updated_at: new Date().toISOString() }));
+    return hardRefresh();
+  }, sess);
+  await L.settle(page, 900);
+  await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work');
+  await page.locator('#chartsBtn').click(); await L.settle(page, 250);
+  const ad = await page.evaluate(() => {
+    const c = [...document.querySelectorAll('#chartbox .chart-card')].find(x => x.querySelector('h4').textContent === 'Adherence');
+    return c ? { big: (c.querySelector('.chart-big') || {}).textContent || '', sub: c.querySelector('.chart-sub').textContent, legend: c.querySelector('.chart-legend').textContent } : null;
+  });
+  check(r, 'Adherence counts the plan days only: 4 of 8 planned (2 a week over 4 weeks), 50 %', !!ad && /^4 of 8 planned sessions completed/.test(ad.sub) && /^50%/.test(ad.big), ad);
+  check(r, 'the two optional sessions show as a bonus, never as "more than planned"', !!ad && /\+2 optional, a bonus/.test(ad.sub) && !/more than planned/.test(ad.sub), ad && ad.sub);
+  check(r, 'the legend says Planned = 2/week and names the optional day', !!ad && /Planned = 2\/week \(their program, plus 1 optional day that never counts as a miss\)/.test(ad.legend), ad && ad.legend);
+  const card = (await page.locator('#wday-3 .wday-title').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the Day 3 card wears "optional · a bonus" (it was trained)', /optional · a bonus/.test(card), card);
+  const other = (await page.locator('#wday-1 .wday-title').innerText()).replace(/\s+/g, ' ');
+  check(r, 'a plan day wears no optional pill', !/optional/.test(other), other);
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 300);
+  const fileTxt = (await page.locator('main, body').first().innerText()).replace(/\s+/g, ' ');
+  check(r, 'the File says Days a week: 2 + 1 optional', /Days a week 2 \+ 1 optional/.test(fileTxt), (fileTxt.match(/Days a week.{0,30}/) || [''])[0]);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));

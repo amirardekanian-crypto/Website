@@ -992,6 +992,26 @@ expect('VOL-11 --new unchanged: the new-athlete message and the first-week note'
        and has(out, 'FAIL', 'needs a week 1 note'), out)
 expect('VOL-11 --new unchanged: a flag in a first cycle is still TST-5', has(run(flag(d, 0, 1, 0, '8RM'), ctx=CTX), 'FAIL', 'retest flag in a first cycle'))
 
+# ── an optional day (2026-11-18): shown and logged, never one of the week's plan days, so never in a weekly number ──
+def with_extra_day(optional):
+    d = copy.deepcopy(BASE)
+    day = {"id": 3, "title": "Zone 2", "blocks": [{"title": "Primary", "exercises": [
+        {"type": "standard", "name": "Barbell Back Squat", "exId": "barbell-back-squat", "rx": {"sets": 8, "reps": 6, "rpe": 7, "tempo": "3-0-1-0", "rest": 150}}]}]}
+    if optional is not None: day["optional"] = optional
+    d['workouts']['days'].append(day)
+    return d
+out = run(with_extra_day(None), '--floor', ctx=CTX)
+expect('a third plan day with 8 squat sets lifts quads over the floor', not has(out, 'FAIL', 'quads') , out)
+out = run(with_extra_day(True), '--floor', ctx=CTX)
+expect('the same day marked optional counts toward no floor: quads stays at 4', has(out, 'FAIL', 'quads 4 sets/week: under the floor'), out)
+expect('an optional day is named in an INFO line', has(out, 'INFO', 'optional: Day 3'), out)
+expect('an optional day passes the structure checks', not has(out, 'FAIL', 'Day 3: optional'), out)
+expect('optional must be true or absent', has(run(with_extra_day("yes"), ctx=CTX), 'FAIL', 'Day 3: optional is'))
+d = copy.deepcopy(BASE)
+for x in d['workouts']['days']: x['optional'] = True
+expect('every day optional fails: no week could ever be held', has(run(d, ctx=CTX), 'FAIL', 'every day is optional'))
+expect('no optional day: no optional line', not has(run(BASE, ctx=CTX), 'INFO', 'optional: Day'))
+
 print(f"{sum(1 for _, ok in results if ok)}/{len(results)} passed" + ('' if HAVE_NODE else ' (node not found: the node-backed checks were skipped)'))
 for n, ok in results:
     if not ok: print('  failed:', n)

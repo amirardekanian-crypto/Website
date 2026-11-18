@@ -984,7 +984,7 @@ const A_PAID = sandbox(`
   function careerOnT() { return true; }
   function catalogueOnT() { return ON; }
   function cycleWeekInfo() { return WK; }`,
-  fromA('careerEarn', 'careerTruthy', 'careerFullLog', 'careerCheckin', 'careerEarly', 'careerRecPaid', 'careerRecPending', 'careerPaidAtDone', 'careerPendingSessions'),
+  fromA('careerEarn', 'dayIsOptional', 'planDayIds', 'dayIdIsOptional', 'careerTruthy', 'careerFullLog', 'careerCheckin', 'careerEarly', 'careerRecPaid', 'careerRecPending', 'careerPaidAtDone', 'careerPendingSessions'),
   ['careerEarn', 'careerRecPaid', 'careerRecPending', 'careerPaidAtDone', 'careerPendingSessions', 'LS']);
 run('Career Mode: the cap and the spare (program.html CAREER_SESSION_LIMIT, CAREER_SPARE_FROM, careerWeekOf, careerEarn / career/rulebook.toml, career_derive() in the snapshot)', () => {
   const rb = read('career/rulebook.toml');
@@ -1209,6 +1209,32 @@ const D_UNIT = sandbox(null, [lineSrc(D_SRC, 'const REC_UNIT_C =', 'coach.html')
 run('the unit word (unitWord, recUnitC)', () => {
   [undefined, null, '', 'kg', 'lb', 'plates', 'kgs', 'LB', 'plate', '<b>x</b>'].forEach(u => [0, 1, 2, 2.5, undefined].forEach(n =>
     same('unitWord vs recUnitC', [u, n], A_UNIT.unitWord(u, n), D_UNIT.recUnitC(u, n))));
+});
+
+/* ── which days are the week's plan (an optional day is never one; stage109, 2026-11-18) ─────────────────────── */
+// program.html planDayIds() holds the week, counts it and closes it on these; coach.html planDaysC() is Planned = N/week; the server's
+// career_weeks() leaves the same days out of `plan`. Only the JSON value true makes a day optional.
+const A_PLAN = sandbox('var DATA = null;', fromA('dayIsOptional', 'planDayIds', 'dayIdIsOptional'), ['planDayIds', 'dayIdIsOptional']);
+const D_PLAN = sandbox(null, fromD('dayIsOptionalC', 'planDaysC', 'optionalDayIdsC'), ['planDaysC', 'optionalDayIdsC']);
+run('the week\'s plan days (planDayIds, planDaysC / career_weeks() since stage109)', () => {
+  const progs = [null, {}, { workouts: {} }, { workouts: { days: [] } },
+    { workouts: { days: [{ id: 1 }, { id: 2 }, { id: 3 }] } },
+    { workouts: { days: [{ id: 1 }, { id: 2 }, { id: 3, optional: true }] } },
+    { workouts: { days: [{ id: 1, optional: false }, { id: 2, optional: 'true' }, { id: 3, optional: 1 }, { id: 4, optional: true }] } },
+    { workouts: { days: [{ id: 1, optional: true }, { id: 2, optional: true }] } },
+    { workouts: { days: [{ id: 2 }, { id: 5, optional: true }, { id: 7 }] } }];
+  progs.forEach(p => {
+    A_PLAN.ctx.DATA = p;
+    same('planDayIds vs planDaysC', p, A_PLAN.planDayIds(), D_PLAN.planDaysC(p).map(d => String(d.id)));
+    const days = (p && p.workouts && p.workouts.days) || [];
+    same('dayIdIsOptional vs optionalDayIdsC', p, days.filter(d => A_PLAN.dayIdIsOptional(d.id)).map(d => String(d.id)), D_PLAN.optionalDayIdsC(p));
+  });
+  A_PLAN.ctx.DATA = { workouts: { days: [{ id: 1 }, { id: 2 }, { id: 3, optional: true }] } };
+  expect('Day 3 marked optional is out of the plan', null, A_PLAN.planDayIds(), ['1', '2']);
+  const snap = read('supabase/schema_snapshot.sql');
+  const cw = snap.slice(snap.indexOf('FUNCTION public.career_weeks(p_athlete text)'), snap.indexOf('$function$;', snap.indexOf('FUNCTION public.career_weeks(p_athlete text)')));
+  expect('the snapshot\'s career_weeks() leaves an optional day out of the plan (stage109), in all four places it reads the days', null,
+    (cw.match(/is distinct from 'true'::jsonb/g) || []).length, 4);
 });
 
 /* ── report ───────────────────────────────────────────────────────────────── */

@@ -133,7 +133,7 @@
   /* A pill that says something: one shape (999, 12, 600) in four tones, neutral (an outline), green, clay and plum. .chip, .ipill, .fl, .zpill, .tag and .hidetag are all it. */
   .chip, .ipill, .fl, .zpill, .tag, .hidetag { display: inline-block; padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted);
                                                 font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 0; text-transform: none; white-space: nowrap; }
-  .chip.court, .ipill.en, .ipill.pct, .fl.good, .tag.done { background: var(--court-100); border-color: transparent; color: var(--court); }
+  .chip.court, .ipill.en, .ipill.pct, .fl.good, .tag.done, .zpill.green { background: var(--court-100); border-color: transparent; color: var(--court); }
   .chip.clay, .ipill.fa, .ipill.warn, .fl.warn, .zpill.reply, .tag.warn, .hidetag { background: var(--clay-100); border-color: transparent; color: var(--clay-ink); }
   .tag.partial, .ipill.gap { background: var(--ochre-100); border-color: transparent; color: var(--ochre); }
   .fl.under { background: var(--rpe-under-100); border-color: transparent; color: var(--rpe-under); }
@@ -2805,7 +2805,8 @@ function assemble() {
     const stRow = (S.status || {})[a.id];      // stage63: only a paused or former athlete has a row
     a.status = stRow && (stRow.status === 'paused' || stRow.status === 'former') ? stRow.status : 'active';
     a.statusSince = stRow ? stRow.since : null; a.statusNote = stRow ? (stRow.note || '') : '';
-    a.perWeek = (p && p.workouts && p.workouts.days && p.workouts.days.length) || 0;
+    a.perWeek = planDaysC(p).length;          // the plan days: an optional day is a bonus, never planned (stage109)
+    a.optDays = optionalDayIdsC(p);
     a.onBoard = !!S.optin[a.id];
     a.lastSession = a.sessions.length ? a.sessions.map(s => s.completed_on).sort().slice(-1)[0] : null;
     // Needs both halves, so it runs here rather than in either pass above.
@@ -4221,7 +4222,14 @@ function weeklyLoad(daily, weeks, ref) {
   });
   return buckets;
 }
-function adherence(sessions, daysPerWeek, weeks, ref) {
+// ── AN OPTIONAL DAY (2026-11-18; SCHEMA.md → workouts.days[n], "optional": true) ──
+// Shown and logged like any day, never one of the week's plan days: it is not in "Planned = N/week", and a session on it is a bonus,
+// never a miss and never counted toward the plan. TWIN of program.html planDayIds() and the server's career_weeks() (stage109).
+function dayIsOptionalC(d) { return !!(d && d.optional === true); }
+function planDaysC(p) { return ((p && p.workouts && p.workouts.days) || []).filter(d => !dayIsOptionalC(d)); }
+function optionalDayIdsC(p) { return ((p && p.workouts && p.workouts.days) || []).filter(dayIsOptionalC).map(d => String(d.id)); }
+// `optIds`: the optional days' ids (optionalDayIdsC()); their sessions are counted as `bonus`, outside done and expected.
+function adherence(sessions, daysPerWeek, weeks, ref, optIds) {
   weeks = weeks || 4;
   if (!daysPerWeek) return null;
   let earliest = null;
@@ -4235,15 +4243,18 @@ function adherence(sessions, daysPerWeek, weeks, ref) {
   const effDays = Math.max(1, Math.min(weeks * 7, daysActive));
   const effWeeks = Math.max(1, Math.round(effDays / 7));
   const start = new Date(refMid); start.setDate(start.getDate() - (effDays - 1));
-  let done = 0;
+  let done = 0, bonus = 0;
+  const opt = new Set((optIds || []).map(String));
   sessions.forEach(s => { if (!s.completed_on) return; const d = pDate(s.completed_on);
-    if (d >= start && d <= refMid) done += isPartialStatus(s.status) ? 0.5 : 1; });
+    if (d < start || d > refMid) return;
+    const n = isPartialStatus(s.status) ? 0.5 : 1;
+    if (opt.has(String(s.day))) bonus += n; else done += n; });
   const expected = Math.max(1, Math.round(daysPerWeek * effDays / 7));
   const raw = Math.round((done / expected) * 100);
   return { done, expected, pct: Math.min(100, raw), extra: Math.max(0, done - expected), days: effDays,
-           weeks: effWeeks, perWeek: daysPerWeek };
+           weeks: effWeeks, perWeek: daysPerWeek, bonus, optional: opt.size };
 }
-function athleteMetrics(sessions, daysPerWeek) {
+function athleteMetrics(sessions, daysPerWeek, optIds) {
   const daily = dailyLoad(sessions);
   const rser  = readinessSeries(sessions);
   const latestRd = sessions
@@ -4257,7 +4268,7 @@ function athleteMetrics(sessions, daysPerWeek) {
   if (cover.total > cover.withLoad) { acwr.enough = false; acwr.partial = true; }
   return { daily, acwr, cover, rser, readiness: readinessStats(rser),
            latestPlan: latestRd && latestRd.rd.level ? latestRd.rd : null,
-           adherence: adherence(sessions, daysPerWeek) };
+           adherence: adherence(sessions, daysPerWeek, undefined, undefined, optIds) };
 }
 
 // --- tiny inline-SVG charts (ported) ----------------------------------------
@@ -4358,9 +4369,9 @@ function renderCharts(m) {
   const adhCard = `<div class="chart-card">
     ${adh && adh.pct != null
       ? `${head('Adherence', `<div class="chart-big ${adhColor}">${adh.pct}%<span class="cb-unit">last ${adh.days < 28 ? adh.days + ' days' : '4 wks'}</span></div>`)}
-         <div class="chart-sub">${adhDone} of ${adh.expected} planned sessions completed${adh.extra ? ` (${adh.extra % 1 ? adh.extra.toFixed(1) : adh.extra} more than planned)` : ''}</div>
+         <div class="chart-sub">${adhDone} of ${adh.expected} planned sessions completed${adh.extra ? ` (${adh.extra % 1 ? adh.extra.toFixed(1) : adh.extra} more than planned)` : ''}${adh.bonus ? ` · <span class="tone-green">+${adh.bonus % 1 ? adh.bonus.toFixed(1) : adh.bonus} optional, a bonus</span>` : ''}</div>
          <div class="chart-bar"><div class="bar"><div class="bar-fill ${adhColor}" style="width:${Math.min(adh.pct, 100)}%"></div></div><div class="cp-x"><span>0%</span><span>100%</span></div></div>
-         <div class="chart-legend">Planned = ${adh.perWeek}/week (their program), over the last ${adh.days} day${adh.days === 1 ? '' : 's'}${adhFrom.length === 2 ? ` (${adhFrom[0]} to ${adhFrom[1]})` : ''}</div>`
+         <div class="chart-legend">Planned = ${adh.perWeek}/week (their program${adh.optional ? `, plus ${adh.optional} optional day${adh.optional === 1 ? ' that never counts' : 's that never count'} as a miss` : ''}), over the last ${adh.days} day${adh.days === 1 ? '' : 's'}${adhFrom.length === 2 ? ` (${adhFrom[0]} to ${adhFrom[1]})` : ''}</div>`
       : `${head('Adherence')}<p class="empty">Needs a program file and at least one finished session.</p>`}
   </div>`;
   return `<div class="charts">${loadCard}${readyCard}${adhCard}</div>`;
@@ -4512,7 +4523,7 @@ function renderRoster() {
   // The column heads (a PC only: CSS hides them on a phone, where a row is two lines).
   const head = '<div class="rhead" aria-hidden="true"><span class="h-ath">Athlete</span><span>Cycle</span><span>Last session</span><span>Proof</span><span>Why</span></div>';
   const rowHtml = (a) => {
-    const m = athleteMetrics(a.sessions, a.tier === 'coached' ? a.perWeek : 0);
+    const m = athleteMetrics(a.sessions, a.tier === 'coached' ? a.perWeek : 0, a.optDays);
     const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
     // Only a load spike earns a word, in plum. "Low load" looked the same as "climbing", and an
     // idle athlete's "ACWR 0" repeated the no-session reason.
@@ -5636,7 +5647,8 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
 
   // Status line — only facts the session actually carries.
   let status, statusTone;
-  if (!s) { status = sessions.length ? 'never finished' : 'not logged yet'; statusTone = 'idle'; }
+  const optional = dayIsOptionalC(pd);   // stage109: done, it is a bonus; not done, it is no miss
+  if (!s) { status = optional && !sessions.length ? 'optional, not done' : sessions.length ? 'never finished' : 'not logged yet'; statusTone = 'idle'; }
   else if (isPartialStatus(s.status)) { status = partialLabel(s.status); statusTone = 'warn'; }
   else { status = 'Complete'; statusTone = 'ok'; }
   const thisCycle = !!(_D && _D.a && _D.a.cycle && _D.a.cycle.start);   // a dated cycle: the cards hold only its sessions (workTabHtml)
@@ -5695,7 +5707,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
     <button class="wday-top" aria-expanded="${open}" onclick="toggleWorkDay(${dayNum})">
       <span class="wday-n">${esc(dayNum)}</span>
       <span class="wday-main">
-        <span class="wday-title">${esc(focus || 'Day ' + dayNum)}${needsReply ? ' <span class="zpill reply">note to read</span>' : ''}</span>
+        <span class="wday-title">${esc(focus || 'Day ' + dayNum)}${optional ? ` <span class="zpill${s ? ' green' : ''}">${s ? 'optional · a bonus' : 'optional'}</span>` : ''}${needsReply ? ' <span class="zpill reply">note to read</span>' : ''}</span>
         <span class="wday-meta">${esc(meta.join(' · ')) || (thisCycle ? 'nothing logged on this day this cycle yet' : 'nothing logged against this day yet')}</span>
       </span>
       <span class="wday-right">${scoreline}<span class="tag ${statusTone === 'ok' ? 'done' : statusTone === 'warn' ? 'partial' : ''}">${esc(status)}</span></span>
@@ -6002,7 +6014,7 @@ async function renderDetail(athleteId, sub) {
       callLogs,
       lib,
       logsErr: full.ok ? '' : full.error,
-      metrics: athleteMetrics(history, programDays.length),
+      metrics: athleteMetrics(history, planDaysC(program).length, optionalDayIdsC(program)),
       stamp: S.stamp,
     };
     // A rebuild of the SAME athlete (after a save or a refresh) keeps the days the coach had
@@ -6355,7 +6367,8 @@ function fileTabHtml(D) {
   const facts = [
     ['Athlete id', esc(athleteId)],
     ['Tier', esc(a.tier)],
-    ['Days a week', programDays.length || '—'],
+    ['Days a week', (() => { const n = planDaysC(program).length, o = programDays.length - n;   // stage109: an optional day is not a plan day
+      return (n || (o ? 0 : '—')) + (o ? ` + ${o} optional` : ''); })()],
     ['Cycle', cycles[ci] ? esc(cycles[ci].name || '') + (cycles[ci].weeks ? ' · ' + esc(cycles[ci].weeks) : '') : '—'],
     ['Roadmap', cycles.length ? esc(ci + 1) + ' of ' + esc(cycles.length) : '—'],
   ];

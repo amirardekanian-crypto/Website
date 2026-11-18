@@ -545,7 +545,9 @@
 // exercise cards only, so reopening the app mid-session no longer moves a circuit's tick onto the session clock; the count never runs past the total.
 // v243: program.html changed (2026-11-03, the spare, stage106 with rulebook version 12): a plan day's second session in a week pays again on the finish card and
 // covers the day next week; a third pays only its log; every session moves Century and Sessions with Amir, as the server counts them since 2026-10-26.
-const CACHE = 'aap-v243';
+// v244: program.html changed (2026-11-18, an optional day, stage109): a day with "optional": true says Optional on Home and its cover, is never Next up,
+// and the week is counted, held and closed on the plan days alone, so skipping it is never a miss.
+const CACHE = 'aap-v244';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

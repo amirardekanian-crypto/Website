@@ -9814,6 +9814,8 @@ function dayCardHTML(day, dayNum, total, opts) {
   const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
   const sub = plural(moveCount, 'exercise');
   const attr = s => esc(s).replace(/"/g, '&quot;');   // these go inside attributes (esc() escapes quotes itself since 2026-10-20)
+  // An optional day says so wherever the day is named (2026-11-18, stage109): do it or skip it, the week is held either way.
+  const opt = dayIsOptional(day);
 
   // The rest of the week (HOME-02, Amir 2026-09-26: "If the days are done, make the day card into that small one"; the
   // Centre Court look, 2026-10-12): a row on the paper, the day's number as an outlined numeral, a green Done once it is
@@ -9821,9 +9823,9 @@ function dayCardHTML(day, dayNum, total, opts) {
   // never data-dc: only the Next up card carries data-dc (markSuggestedDay() and the tests look for it there).
   if (!opts.static && !opts.hero) {
     const done = weekDoneDays().has(String(id));
-    return `<div class="dc-row${done ? ' is-done' : ''}" data-dl="${idStr}" role="button" tabindex="0" onclick="openDayView('${idStr}')" aria-label="Day ${dayNum}, ${attr(name)}${done ? ', done this week' : ''}">`
+    return `<div class="dc-row${done ? ' is-done' : ''}${opt ? ' is-optional' : ''}" data-dl="${idStr}" role="button" tabindex="0" onclick="openDayView('${idStr}')" aria-label="Day ${dayNum}, ${attr(name)}${opt ? ', optional' : ''}${done ? ', done this week' : ''}">`
       + `<span class="dc-num" aria-hidden="true">${dayNum}</span>`
-      + `<span class="dc-nm">${esc(name)}<small>${done ? 'Done this week' : esc(sub)}</small></span>`
+      + `<span class="dc-nm">${esc(name)}<small>${done ? 'Done this week' : (opt ? 'Optional · ' : '') + esc(sub)}</small></span>`
       + (done ? `<span class="dc-st">Done</span>` : `<span class="dc-ar" aria-hidden="true">›</span>`) + `</div>`;
   }
 
@@ -9840,7 +9842,7 @@ function dayCardHTML(day, dayNum, total, opts) {
     return `<div class="current-message day-ov-card is-clickable dc-hero${live ? ' is-live' : ''}" role="button" tabindex="0" onclick="openDayView('${idStr}')" data-dc="${idStr}">`
       + `<div class="cm-banner"><img class="cm-banner-img" alt="" src="${catImg}" onerror="dayImgError(this)"><div class="cm-banner-scrim"></div>`
       + `<div class="cm-banner-caption">`
-      + `<div class="cm-name day-card-num">${live ? 'In progress' : 'Next up'} · Day ${dayNum}</div>`
+      + `<div class="cm-name day-card-num">${live ? 'In progress' : 'Next up'} · Day ${dayNum}${opt ? ' · Optional' : ''}</div>`
       + `<div class="day-card-name">${esc(name)}</div>`
       + `<div class="cm-weeks">${esc(sub)}</div>`
       // The Quality Map: what this day builds. Filled by paintDayQualities() once the Spine and the approved
@@ -9858,7 +9860,7 @@ function dayCardHTML(day, dayNum, total, opts) {
        `src="${catImg}" onerror="dayImgError(this)">`;
   h += `<div class="cm-banner-scrim"></div>`;
   h += `<div class="cm-banner-caption">`;
-  h += `<div class="cm-name day-card-num">Day ${dayNum}</div>`;
+  h += `<div class="cm-name day-card-num">Day ${dayNum}${opt ? ' · Optional' : ''}</div>`;
   h += `<div class="day-card-name">${esc(name)}</div>`;
   h += `<div class="cm-weeks">${esc(sub)}</div>`;
   // The Quality Map: what this day builds. Filled by paintDayQualities() once the
@@ -9876,10 +9878,14 @@ function dayCardHTML(day, dayNum, total, opts) {
 // day done this week: null. markSuggestedDay() and homeDaysHTML() both ask it, so the card that is marked and the card that is
 // big can never be two different days. This Week still counts the calendar week (weekDoneDays()).
 function suggestedDayId() {
-  const ids = (DATA.workouts && DATA.workouts.days || []).map((d, i) => String(d.id != null ? d.id : i + 1));
+  const all = DATA.workouts && DATA.workouts.days || [];
+  const active = all.map((d, i) => String(d.id != null ? d.id : i + 1)).indexOf(activeDayId());
+  if (active >= 0) return String(all[active].id != null ? all[active].id : active + 1);   // a session under way, an optional one too
+  // Only the plan days rotate: an optional day is never Next up, and once the plan days are done the week is done (stage109).
+  const ids = all.map((d, i) => dayIsOptional(d) ? null : String(d.id != null ? d.id : i + 1)).filter(x => x !== null);
   const done = weekDoneDays();
-  let i = ids.indexOf(activeDayId());
-  if (i < 0 && !cycleOver()) {
+  let i = -1;
+  if (!cycleOver()) {
     const last = ids.indexOf(lastTrainedDayId(ids));
     for (let k = 0; k < ids.length && i < 0; k++) {
       const j = (last + 1 + k) % ids.length;   // last = -1 (none yet): from the first day
@@ -9967,6 +9973,19 @@ function weekWindow() {
   }
   const end = new Date(start); end.setDate(end.getDate() + 6);
   return { from: ymdLocal(start), to: ymdLocal(end) };
+}
+// ── AN OPTIONAL DAY (2026-11-18; SCHEMA.md → workouts.days[n], "optional": true) ──
+// Amir wanted an easy zone 2 day an athlete may do or skip. An optional day is shown, opened and logged like any other, and its session
+// counts as a session (XP, the record, the report), but it is never one of the week's plan days: the week is held, counted ("2 of 3 done"),
+// suggested and closed on the plan days alone, and a missed optional day is never a miss. Only the JSON value true counts.
+// TWIN: the server's plan is career_weeks() (supabase/stage109_optional_day.sql), coach.html's is planDaysC(); change all three together.
+function dayIsOptional(d) { return !!(d && d.optional === true); }
+// The ids of this cycle's PLAN days, in day order: every day of workouts.days but the optional ones.
+function planDayIds() {
+  return ((DATA && DATA.workouts && DATA.workouts.days) || []).filter(d => !dayIsOptional(d)).map(d => String(d.id));
+}
+function dayIdIsOptional(id) {
+  return ((DATA && DATA.workouts && DATA.workouts.days) || []).some(d => String(d.id) === String(id) && dayIsOptional(d));
 }
 function weekDoneDays() {
   const ids = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
@@ -10253,7 +10272,7 @@ function cycleProgress() {
   // one repeated since.
   const from = String(cur.startDate).slice(0, 10), today = ymdLocal(new Date());
   const to = wk.after ? String(cur.endDate).slice(0, 10) : today;
-  const ids = ((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id));
+  const ids = planDayIds();   // the plan days, as the server's cycle_finished counts them: an optional day is on neither side of done ÷ planned
   const rows = (HIST || []).filter(x => x.date >= from && x.date <= to && ids.indexOf(String(x.day)) >= 0);
   const seen = new Set(rows.map(x => x.date + '|' + x.day));
   // A finish stamp counts on the date it was stamped (sessionDateFor), the same key the server's row has, so it is one session (Love All B8).
@@ -10401,7 +10420,7 @@ function btPickHTML(cur) {
 // The day of this cycle trained least (betweenCyclesHTML()): sessions in the session history between its start and end dates, by
 // day; fewest wins, a tie goes to the later day. null when every day was trained as often (or nothing is known).
 function leastTrainedDay(cur) {
-  const days = (DATA.workouts && DATA.workouts.days) || [];
+  const days = ((DATA.workouts && DATA.workouts.days) || []).filter(d => !dayIsOptional(d));   // an optional day is not "the one you did least"
   if (!days.length || !cur) return null;
   const from = String(cur.startDate || '').slice(0, 10), to = String(cur.endDate || '').slice(0, 10);
   const n = {};
@@ -10457,7 +10476,7 @@ function paintWeek() {
   }
   const el = document.getElementById('home-week-sum');
   if (!el) return;
-  const ids = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
+  const ids = planDayIds();   // the plan days only: an optional day done is a bonus, one not done is no miss
   if (!ids.length) { el.textContent = ''; return; }
   const n = ids.filter(id => weekDoneDays().has(id)).length;
   // In a week with a note the count sits in the note's kicker (weekNoteHTML), in its short form.
@@ -13377,7 +13396,7 @@ function holdState() {
     const n = w.after ? cci + 2 : cci + 1;   // the app's own "Cycle N" (betweenCyclesHTML(): its place in the roadmap)
     return { now, best, carry: (w.after && !cycles[cci + 1]) ? '' : 'Cycle ' + n };
   }
-  const ids = ((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id));
+  const ids = planDayIds();   // the plan days: an optional day never holds or breaks a week (stage109)
   if (!ids.length) return null;
   const doneSet = weekDoneDays();
   const done = ids.filter(id => doneSet.has(id)).length;
@@ -13542,13 +13561,13 @@ function careerEarn(day, D, done, wk) {
   if (!capped) parts.push(early ? { k: 'early', xp: n(pr.session_finished_early) } : { k: 'session', xp: n(pr.session_finished) });
   if (careerFullLog(D.log, early)) parts.push({ k: 'log', xp: n(pr.full_log) });
   if (careerCheckin(D.readiness)) parts.push({ k: 'checkin', xp: n(pr.checkin_done) });
-  const ids = ((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id));
+  const ids = planDayIds(), optional = dayIdIsOptional(day);   // an optional session pays as a session but never closes a week (stage109)
   const cur = (DATA.cycles || [])[Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0], w = cycleWeekInfo(cur);
   const inWeek = !!(w && !w.before && !w.after && ids.length), covered = id => done.has(id) || spare.has(id);
   // the week closes with THIS session: every plan day is done or covered now, and was not before (a week a spare already held is not held twice)
-  const weekCloses = !!(inWeek && !repeat && !ids.every(covered) && ids.every(id => id === String(day) || covered(id)));
-  // the second time this week: it will cover this plan day next week, when next week is in the same cycle
-  const spareNext = !!(inWeek && again === 1 && w.wk < w.total);
+  const weekCloses = !!(inWeek && !optional && !repeat && !ids.every(covered) && ids.every(id => id === String(day) || covered(id)));
+  // the second time this week: it will cover this plan day next week, when next week is in the same cycle (an optional day covers nothing)
+  const spareNext = !!(inWeek && !optional && again === 1 && w.wk < w.total);
   if (weekCloses) {
     parts.push({ k: 'week', xp: n(pr.week_held), pending: true });
     const last = HOLD && holdCount(HOLD.facts).last;
@@ -13662,7 +13681,7 @@ function careerLadderNow() {
 // of this training week it can read (the server decides: Love Hold stays pending).
 function careerWeekByBook(fullLog, checkin) {
   if (!fullLog || !checkin) return false;
-  const win = weekWindow(), ids = ((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id));
+  const win = weekWindow(), ids = planDayIds();   // the plan days' sessions, as the server's by_book reads them
   return !(HIST || []).some(s => s.date >= win.from && s.date <= win.to && ids.indexOf(String(s.day)) >= 0
     && !(careerFullLog(s.entries, false) && careerCheckin(s.ready)));
 }
@@ -19133,7 +19152,7 @@ async function paintSoreSugg(day) {
 // The local day this week's last session was done (each day's first time this week), or null while it is not
 // done. The same sources as weekDoneDays(), so the row shows exactly when This Week says "All N sessions done".
 function weekDoneOn() {
-  const ids = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
+  const ids = planDayIds();   // the plan days: the week is done without its optional day
   if (!ids.length) return null;
   const win = weekWindow(), first = {};
   (HIST || []).forEach(s => {

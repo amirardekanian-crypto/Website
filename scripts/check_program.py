@@ -179,6 +179,29 @@ def exercises(data):
                 for it in ex.get('items') or []:
                     yield d, b, ex, it
 
+# ── an optional day (2026-11-18; SCHEMA.md → workouts.days[n], "optional": true) ──
+# Amir wanted an easy zone 2 day an athlete may do or skip. It is shown and logged like any day, but it is never one of the week's plan
+# days: the app and the server (career_weeks(), stage109) hold the week on the plan days alone. So the weekly numbers here leave it out too:
+# no set on it counts toward a muscle's floor (VOL-4), the week's day loads (VOL-2) or the week's contacts, because the athlete may skip it.
+def optional_day(d): return isinstance(d, dict) and d.get('optional') is True
+
+def plan_exercises(data):
+    """exercises(), but only on the plan days: an optional day's work never counts toward the week."""
+    for d, b, ex, it in exercises(data):
+        if not optional_day(d): yield d, b, ex, it
+
+def check_optional(data):
+    days = [d for d in (data.get('workouts') or {}).get('days') or [] if isinstance(d, dict)]
+    for d in days:
+        if 'optional' in d and not isinstance(d['optional'], bool):
+            fail(f"Day {d.get('id')}: optional is {d['optional']!r}: write true (an optional day) or leave the key out (SCHEMA.md → workouts.days[n])")
+    opt = [d for d in days if optional_day(d)]
+    if not opt: return
+    if len(opt) == len(days):
+        fail("every day is optional: a programme needs at least one plan day, or no week can ever be held (SCHEMA.md → workouts.days[n])")
+    info(f"optional: Day {', Day '.join(str(d.get('id')) for d in opt)} (shown and logged, never needed for a held week; "
+         "left out of the weekly volume, load and contacts)")
+
 def text_fields(data):
     """Every athlete-facing string, labelled."""
     for c in data.get('cycles') or []:
@@ -1092,7 +1115,7 @@ def contact_counts(data, spine):
     Sets (an item: its circuit's rounds) × reps, ×2 when side, each day once. The week as written: week 1's and the
     back-off's limits are not taken off. A dose in time or distance has no count, so it is named instead."""
     tot, unc = {'contacts': {}, 'throws': {}}, []
-    for d, b, ex, it in exercises(data):
+    for d, b, ex, it in plan_exercises(data):   # the plan days: an optional day may be skipped (check_optional())
         if not it and ex.get('type') == 'circuit': continue
         o, day = it or ex, str(d.get('id'))
         e = spine.get(o.get('exId') or '') or {}
@@ -1130,7 +1153,7 @@ def compute_volume(data, spine):
     """The per-exercise rows, the weekly total per muscle, each day's sets per muscle (and direct sets,
     weight 1 only), each day's working sets and cost-weighted load, and the entries missing a count."""
     v = {'rows': [], 'total': {}, 'day': {}, 'direct': {}, 'load': {}, 'sets': {}, 'nocredit': set(), 'nocost': set()}
-    for d, b, ex, it in exercises(data):
+    for d, b, ex, it in plan_exercises(data):   # an optional day counts toward no weekly number (check_optional())
         if not it and ex.get('type') == 'circuit': continue
         o, day = it or ex, str(d.get('id'))
         e = spine.get(o.get('exId') or '')
@@ -1908,7 +1931,7 @@ def main():
         args.taper = next((t for t in spec_lines(args, 'taper') if t and t != '-'), '')
     if not args.week and spec_lines(args, 'week'):
         args.week = spec_lines(args, 'week')[0]  # the spec's example week (2026-09-26)
-    check_structure(data, args, ctx['spine'], ctx.get('names')); check_pill_layers(data, ctx)
+    check_structure(data, args, ctx['spine'], ctx.get('names')); check_pill_layers(data, ctx); check_optional(data)
     check_names(data, ctx); check_tests(data, args); check_blocks(data); check_prep_rest(data, args)
     # --stage build runs straight after design, BEFORE engage writes a word (2026-09-26): a FAIL
     # there changes the programme while no note, Because or message has been written around it.
