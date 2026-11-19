@@ -7,6 +7,15 @@ description: Build a ready-to-post Instagram carousel (1080×1350, Farsi by defa
 
 Turn Amir's raw script/topic into a finished, self-contained carousel HTML file with per-slide PNG download buttons, plus an Instagram caption. Content is **Farsi by default** (Amir, 2026-09-21: all new social content is Farsi again, because the business sells in Iran; the 2026-07-02 English directive is retired, see `.claude/skills/ad/BRAND.md` §6). English only when he asks; the goal of content is to **justify the premium price and retain clients** (show depth) — never cheap lead-gen.
 
+## THE LAYOUT RULE (Amir, 2026-11-19: *"don't stick to the layouts, change the layouts of the pages based on whatever you need, get creative, this is a rule"*)
+
+Every slide's layout is designed for what that slide has to say. The kit's templates are a toolbox, never a menu: a
+comparison can be a split screen, four areas can be the four boxes of a court, a set of goals can be a control meter,
+a research result can be a bar chart, a checklist can be a notebook page. Fixed: the brand chrome (palette, frame,
+grain, header, ghost page-number, ball, fonts, the Farsi rules, the CTA outro). Free: everything inside the frame.
+Before building, ask of each slide "what picture makes this obvious at a glance?", and if the answer is a stock
+template with text poured in, design a better one. First deck built this way: `Content/build_match_review_v2.py`.
+
 ## Step 0 — Required reading (EVERY run, before designing anything)
 
 1. **`Content/PRODUCT.md`** — what the business and app are: the offer, the cycle system, the app's four tabs, readiness/ACWR/auto-regulation, the coach dashboard, pricing, and the **"Content angles that work"** list.
