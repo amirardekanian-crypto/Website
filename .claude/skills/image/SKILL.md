@@ -14,7 +14,7 @@ What is in this folder, and when you reach for it:
 | File | Use |
 |---|---|
 | `LEDGER.md` | **Step 0.** What every existing picture shows (searchable), where the newer ones came from, their Higgsfield job ids, and the exact prompts that won |
-| `bench/` | Eleven ship-ready alternates nobody used. Free to reuse |
+| `bench/` | Ten ship-ready alternates nobody used (`alt-spider-drill` shipped as `ball-row` on 2026-11-19). Free to reuse |
 | `tools/shelf.py` | **Step 0.** Contact sheets of everything shipped; `find <word>`; `bench`; `--audit` (course app: missing / orphaned / duplicate pictures) |
 | `tools/crop.py` | **Step 4.** What a 2.9:1 card really shows of a 16:9 picture, at several positions |
 | `tools/gate.py` | **Step 4.** Brightness of the text zone, measured through the destination's own scrim |

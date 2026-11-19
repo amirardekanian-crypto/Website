@@ -501,7 +501,8 @@
       'hydration-heat': { f: 'steam', pos: '50% 60%' },
       'why-strength': { f: 'iron-pair', pos: '50% 55%' },
       'training-on-period': { f: 'warm-seat', pos: '50% 35%' },
-      'training-with-injury': { f: 'long-way-back', pos: '50% 55%' }
+      'training-with-injury': { f: 'long-way-back', pos: '50% 55%' },
+      'match-reflection': { f: 'ball-row', pos: '50% 50%' }                // the bench alt-spider-drill, 2026-11-19
     },
     test: {                                                                // by test id
       'broad-jump': { f: 'the-coin', pos: '50% 45%' },

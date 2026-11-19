@@ -113,7 +113,6 @@ Made by the program.html session on 2026-09-20 for the same twelve course slots 
 | `alt-missed-sessions` | a rolled mat and an orange band in a dark corner |
 | `alt-pain-red-flags` | a white tape roll, scissors and orange bands on a dark bench (the palette-pure alternative to the blue ice bag) |
 | `alt-speed-braking` | a worn shoe on a green-grey court with a curved slide mark |
-| `alt-spider-drill` | tennis balls in a row on clay (wrong geometry for the spider drill; fine as a generic clay-court picture) |
 | `alt-sprint-20m` | one orange cone on a dark court, a second far away |
 | `alt-yo-yo-ir1` | a dark hall floor with orange tape lines |
 

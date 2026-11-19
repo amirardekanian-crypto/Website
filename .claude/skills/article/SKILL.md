@@ -1,6 +1,6 @@
 ---
 name: article
-description: "Turn Amir's raw article text into a finished article in the app's Read library AND a public web page in Farsi and English. Use when Amir pastes article copy and asks to publish it, says \"write a blog about…\" / \"add this to the app\", or revises an existing article. Handles everything: block mapping, the English JSON, the Farsi translation (with his approval), the website pages + sitemap, commit + push."
+description: "Turn Amir's raw article text into a finished article in the app's Read library AND a public web page in Farsi and English. Use when Amir pastes article copy and asks to publish it, says \"write a blog about…\" / \"add this to the app\", or revises an existing article. Handles everything: block mapping, the English JSON, the Farsi translation (with his approval), the website pages + sitemap, commit + push, then publishes it to the app (public.library) itself."
 ---
 
 # Article publisher — AA Performance Read library + the website
@@ -251,11 +251,27 @@ git push
 
 The pre-commit hook re-runs the check. Ship it live the way `CLAUDE.md` → *How Amir works* says.
 
-## Step 9 — Publish it in the app
+## Step 9 — Publish it in the app (automatic: you do it, Amir, 2026-11-19)
 
-The app reads the Library from the database, not from the file. Amir (or you, with his OK) opens
-**coach.html → Library → + Publish article** and picks `<slug>.json` — the English file. (If the
-`.fa.json` is picked by mistake, coach.html refuses it: no `id`.)
+Amir: *"publish on my app and it should be automatic from now"*. The app reads the Library from the
+database, not from the file, so straight after the push in Step 8 **you** publish the English file.
+No need to ask first: the website push already carried his OK on the Farsi.
+
+```
+python scripts/publish_article_sql.py articles/<category-id>/<slug>.json > <scratchpad>/publish.sql
+```
+
+Run that file's text with the Supabase MCP tool `execute_sql` (project `bvipfipbdcyqnbczjmaq`). It does
+what coach.html's **+ Publish article** does: it refuses a `.fa.json`, upserts `public.library` on
+`articles/<shelf>/<slug>`, stops if the same id is on another shelf, and keeps an article Amir hid hidden.
+It ends by reading the row back: `published` must be `true`. Re-run it after every revision of a published
+article, so the app never lags the website. coach.html's button still works as the manual fallback.
+
+**The TPS course too** (Amir, 2026-11-19: *"add to tps as well"*). Step 0.6's parity check names the course
+lesson. If there is none, write it (Farsi in the course's formal register plus its `course_en` twin, the rules in
+`Content/CONTENT-PARITY.md` → *How to publish each surface*, drafts in `Content/parity-drafts/<lesson-id>/`), add its
+cover to `ART.lesson` in `tennis/app/app.js` (reuse a bench picture before generating one) and run
+`python scripts/stamp_tps_app.py`. Done this way the first time for `match-reflection`.
 
 Then tell Amir:
 - The app link: `program.html?article=<slug>` (shareable, works without login)
