@@ -67,6 +67,7 @@ lesson changes are in `Content/parity-drafts/<slug>/lesson-changes.md`. The Fars
 | Robustness | `robustness` (learn-3) | `robust-body` |
 | RPE and choosing a weight | `rpe-weights` (learn-3) | `rpe-explained` (the app keeps its own `APP_GUIDE`) |
 | Training alongside tennis and tournaments | `tennis-tournaments` (learn-4) | `training-around-matches` |
+| Match reflection and goal setting (2026-11-19) | **none yet** (a candidate lesson) | `turn-match-experiences-into-training-goals` (Mental shelf) |
 | How to read the card · parents' guide · ready for level 3 | n/a | n/a (stay in the course) |
 
 The 17 course lessons became athlete-voiced articles under a new **Training** shelf (`articles/training/`), plus
@@ -153,5 +154,9 @@ Amir said "fix everything with your own recommendation", so these were decided b
    `hydration-heat`, the injury red-flag list. A dietitian for the plain portions and timing windows (see `learn-5` `_notes`).
 3. **Search Console**: Request indexing for the new article URLs, and real search-box phrases to replace the "guess" rows
    in SEO-SOP section 10.
-4. **English twin paragraphs** over 3 sentences in a few lessons this port did not rewrite (pre-existing); lint and trim
+4. **Match reflection lesson** (2026-11-19): the blog article `turn-match-experiences-into-training-goals` has no TPS lesson.
+   Science checked: Williamson et al. 2024 (online 2022, 27 studies; process goals d = 1.36, performance 0.44, outcome 0.09),
+   Bird et al. 2024, Kingston & Hardy 1997, Laird & Waters 2008 (coaches recalled 59% of key events; no study of players'
+   own recall, so that line is advice), Zimmerman 2000. Decide whether the course gets a lesson.
+5. **English twin paragraphs** over 3 sentences in a few lessons this port did not rewrite (pre-existing); lint and trim
    when one of those lessons is next edited.

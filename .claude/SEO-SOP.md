@@ -263,3 +263,4 @@ suggestions when he sends screenshots, or after 3–4 weeks of Search Console da
 | `robust-body` | مقاوم‌سازی بدن برای تنیس (پیشگیری از آسیب) | guess. Title is the question «پیشگیری از آسیب چقدر جواب می‌ده؟» because the evidence is mixed | 2026-10-02 |
 | `rpe-explained` | RPE چیه و وزنه رو چطور انتخاب کنیم | guess | 2026-10-02 |
 | `training-around-matches` | بدنسازی در هفته‌ی مسابقه تنیس | guess | 2026-10-02 |
+| `turn-match-experiences-into-training-goals` | تحلیل مسابقه تنیس (also «هدف گذاری در ورزش» in a heading) | guess. Farsi text is Amir's own (2026-11-19); description is 173 characters, over the 120–160 target | 2026-11-19 |

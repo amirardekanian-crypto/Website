@@ -163,7 +163,15 @@
       "title": "Mental",
       "icon": "mindset",
       "banner": "assets/art/library/read-mental-v1.webp",
-      "articles": []
+      "articles": [
+        {
+          "id": "turn-match-experiences-into-training-goals",
+          "title": "Learn From Every Match",
+          "category": "Mental",
+          "readMins": 6,
+          "file": "articles/mental/turn-match-experiences-into-training-goals.json"
+        }
+      ]
     },
     {
       "id": "nutrition",
