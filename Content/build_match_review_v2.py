@@ -139,7 +139,7 @@ slides.append(('court4 light', '', f"""
   </div>
   <div class="court-foot">هر خطایی مشکلِ تکنیک نیست: شاید دیر رسیدی، یا ضربه‌ی اشتباه رو انتخاب کردی.</div>""", None))
 
-# 5 · METERS: three goal types, by how much is in your control
+# 5 · METERS: three goal types for the same backhand (Amir, 2026-11-19), by how much is in your control
 def meter(kind, quote, pct, ctrl, star=False):
     return (f'<div class="g-row{" star" if star else ""}"><div class="g-kind">{kind}</div><div class="g-quote">{quote}</div>'
             f'<div class="g-meter"><div class="g-track"><div class="g-fill" style="width:{pct}%"></div></div><div class="g-ctrl">{ctrl}</div></div></div>')
@@ -153,9 +153,9 @@ slides.append(('meters', '', f"""
     <div class="sub">مشکلت رو پیدا کردی؟ حالا براش هدف بذار. ولی کدوم نوع؟</div>
   </div>
   <div class="g-rows">
-    {meter('نتیجه‌ای: چی می‌خوای ببری؟', '«می‌خوام این تورنمنت رو ببرم.»', 18, 'کنترلِ تو: کم. به حریف هم بستگی داره')}
+    {meter('نتیجه‌ای: چی می‌خوای ببری؟', '«می‌خوام با بک‌هندم امتیاز ببرم.»', 18, 'کنترلِ تو: کم. به حریف هم بستگی داره')}
     {meter('عملکردی: چه عددی بهتر بشه؟', '«خطای کمتر توی بک‌هندِ بلند.»', 58, 'کنترلِ تو: بیشتر. توی بازیِ خودته')}
-    {meter('فرایندی: موقعِ ضربه چی کار کنی؟', '«تعادل و فاصله‌ی درست از توپ.»', 100, 'کنترلِ تو: کامل. تمرینِ هر روزت همینه', True)}
+    {meter('فرایندی: برای یه ضربه‌ی بک‌هند چی کار کنم؟', '«تعادلم رو نگه دارم و از توپ فاصله‌ی درست بگیرم.»', 100, 'کنترلِ تو: کامل. تمرینِ هر روزت همینه', True)}
   </div>""", 'court'))
 
 # 6 · CHART: the research, as bars
