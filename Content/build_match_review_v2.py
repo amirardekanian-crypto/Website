@@ -69,16 +69,11 @@ IG = """تحلیل مسابقه تنیس: از هر بازی یه هدفِ تم�
 
 slides = []
 
-# 1 · COVER: a scoreboard, struck out
+# 1 · COVER (the scoreboard was removed on Amir's word, 2026-11-19)
 slides.append(('cover2', '', f"""
-  {ghost(1, -20, 860, 520)}
+  {ghost(1, 560, 70, 560)}
   {ball(985, 1245, 70, -18)}
   {HEADER}
-  <div class="board">
-    <div class="board-row"><div class="b-name">تو</div><div class="b-sets"><span>{fa(6)}</span><span>{fa(3)}</span><span>{fa(4)}</span></div></div>
-    <div class="board-row"><div class="b-name">حریف</div><div class="b-sets"><span>{fa(4)}</span><span>{fa(6)}</span><span class="w">{fa(6)}</span></div></div>
-    <div class="board-strike"></div>
-  </div>
   <div class="body-wrap">
     <div class="stamp-tag">تحلیل مسابقه تنیس</div>
     <h1>مسابقه‌ت رو بردی یا باختی؟ سؤالِ <span class="hl">اشتباهیه.</span></h1>
