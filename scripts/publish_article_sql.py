@@ -48,6 +48,17 @@ def main(path):
     if p.parent.name != shelf:
         sys.exit(f'{p}: the file sits in articles/{p.parent.name}/ but its category is the {shelf} shelf')
     slug = f'articles/{shelf}/{aid}'
+    # The app in Farsi (2026-11-20, Amir: "the libraries and playbook should be available in farsi and everything should
+    # be written in both languages"): the article's Farsi, its sibling .fa.json (the website's Farsi page, which Amir
+    # approved), rides along as data.fa, a full copy with the Farsi title and blocks. The app shows it on a Farsi phone.
+    # A republish without it would wipe the Farsi from the app, so a missing or mismatched .fa.json stops here.
+    fa_path = p.with_name(p.stem + '.fa.json')
+    if not fa_path.exists():
+        sys.exit(f'{p}: no {fa_path.name} beside it. Every article goes to the app in both languages (write the Farsi first)')
+    fa = json.loads(fa_path.read_text(encoding='utf-8'))
+    if len(fa.get('blocks') or []) != len(d.get('blocks') or []) or not fa.get('title'):
+        sys.exit(f'{fa_path}: its blocks do not line up with the English ({len(fa.get("blocks") or [])} vs {len(d.get("blocks") or [])}); bring it up to date first')
+    d = dict(d, fa=dict(d, title=fa['title'], blocks=fa['blocks']))
     body = json.dumps(d, ensure_ascii=False)
     tag = '$art$'
     if tag in body:

@@ -142,5 +142,151 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "steady-run",
+    "intro": [
+      "این پایه‌ایه که بین امتیازها پاهات رو برمی‌گردونه. حدود بیست و پنج ثانیه وقت داری و بدنت اون‌ها رو با اکسیژن ریکاوری می‌کنه. موتوری که این جلسه می‌سازه همینه. فقط کفش و یه کم جاده‌ی صاف لازم داره، پس تقریباً توی هر هفته‌ای جا می‌شه.",
+      "بیست و هشت دقیقه با یه سرعت بدو. باید بتونی کل مسیر یه جمله‌ی کامل بلند بگی. اگه نمی‌تونی، آروم‌تر بدو. سخت‌تر از این دیگه این جلسه نیست، پس شتاب ناگهانی و پایان تند نداریم. دویدن ترمز رو روی پاهات میندازه و روزهای زمین به اندازه‌ی کافی بهت می‌دن. توی یه هفته‌ی سنگین زمین، Engine Builder رو با دوچرخه انجام بده."
+    ],
+    "title": "Open Road",
+    "before": [
+      {
+        "text": "اگه ساق، پا، مچ یا زانوت الان درد داره، به‌جاش دوچرخه بزن یا راه برو و بذار دکتر ببینه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، یا مفصلی که خالی می‌کنه.",
+        "label": "وایسا و معاینه شو"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی، حتماً بذار دکتر ببینه. بهت گفتن با ورزش سخت مواظب باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "note": "تند، اما نه خیلی.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "ankle-dorsiflexion-rocks",
+            "name": "Ankle Dorsiflexion Rocks",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "hamstring-scoop",
+            "name": "Hamstring Scoop",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45s"
+            },
+            "exId": "half-kneeling-hip-flexor-with-overhead-reach",
+            "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 12,
+              "side": true
+            },
+            "exId": "single-leg-calf-raise",
+            "name": "Single-Leg Calf Raise",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "note": "با دو آروم شروع کن و تا سرعت دویدنت بالا ببر.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🫀",
+        "title": "Aerobic Base",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 6,
+              "time": "28 minutes"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "note": "جمله‌ی کامل. اگه از قبل نمی‌دویدی، به‌جاش کل مسیر دو دقیقه بدو و یه دقیقه راه برو.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Cool-Down",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45s"
+            },
+            "exId": "standing-calf-stretch",
+            "name": "Standing Calf Stretch",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "conditioning",
+    "countsAs": "strength",
+    "duration": "45 min",
+    "focusTag": "دوی طولانی و آروم",
+    "equipment": "Bodyweight"
+  }
 }

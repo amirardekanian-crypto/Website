@@ -158,5 +158,167 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "shoulder-endurance",
+    "intro": [
+      "سبک و طولانیه، چون هدفش استقامته، و هیچ چیزی توش شونه‌ای رو که همین الان آخر دامنه‌شه نمی‌کشه. Racket Arm که اون هم توی لیست مراقبته، یه رول و کشش کوتاهه. به شونه بار نمی‌ده، ولی این یکی می‌ده.",
+      "بعد از ضربه زدن یا توی روزی که نمی‌زنی انجامش بده، و ساعت‌های قبل از سرویس یا بازی نزدیکش نشو، چون شونه‌ی خسته مکانیک بالای سر رو بدتر می‌کنه. تنها استثنا بلوک Take the Edge Off ـه. قبل از بازی به‌جای چهار تا، دو نگه‌داشتن با شدت ۶ بزن. یه کش لازم داری، یه جای محکم برای بستنش، مثل گره‌ی کش که توی در گیر کنی، و یه چیز خیلی سبک برای توی دست. اول کش رو از نظر بریدگی چک کن. اگه بعد از حدود شش هفته بهتر نشد، برو پیش فیزیوتراپ؛ اگه بدتر می‌شه یا زودتر از قبل شروع می‌شه، زودتر برو."
+    ],
+    "title": "Shoulder Brake",
+    "before": [
+      {
+        "text": "شونه‌ی دردناکی که دکتر یا فیزیوتراپ دیده و گفته می‌تونی تمرین کنی. اگه چیزی درد نمی‌کنه و فقط بالای سر سفتی، این جلسه‌ی تو نیست. Open The Cage توی لیست موبیلیتی برای همینه.",
+        "label": "برای کیه"
+      },
+      {
+        "text": "اگه شونه‌ت از جا دررفته یا حس می‌کنی سر می‌خوره، موقع سرویس یهو صدای تق اومد و نتونستی دستت رو بلند کنی، درد شب بیدارت می‌کنه، درد بعد از زمین خوردن شروع شد، یا گز‌گز یا بی‌حسی توی بازو یا از گردن داری. درد قفسه‌ی سینه، یا تنگی نفس همراه با درد شونه، یعنی همون روز برو پیش دکتر.",
+        "label": "بایست و بذار معاینه بشه"
+      },
+      {
+        "text": "یه کم درد کشیدن اوکیه. درد تیز نه، و دردی که توی یه ست بیشتر می‌شه یا صبح بعد بدتره هم نه. اگه بیشتر می‌شه، اون حرکت رو قطع کن. اگه تیزه، جلسه رو قطع کن. اگه یه حالت بازو جلو یا بالای شونه رو نیشگون می‌گیره، همونجا اون حرکت رو قطع کن.",
+        "label": "وقتی تمرین می‌کنی"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🚶",
+        "title": "Warm It Through",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "arm-circles",
+            "name": "Arm Circles",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 15
+            },
+            "exId": "band-pull-apart",
+            "name": "Band Pull-Apart",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Free the Upper Back",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "quadruped-thoracic-rotation",
+            "name": "Quadruped Thoracic Rotation",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "open-book",
+            "name": "Open Book",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "scapular-wall-slide",
+            "name": "Scapular Wall Slide",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🛡️",
+        "title": "Take the Edge Off",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "rest": 30,
+              "sets": 4,
+              "time": "45s",
+              "tempo": "Iso"
+            },
+            "exId": "band-external-rotation",
+            "name": "Band External Rotation",
+            "note": "سمت دردناک رو کار کن، و توی روز عود کردن فقط همین بلوک رو با شدت ۶ بزن و جلسه رو تموم‌شده ثبت نکن.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💪",
+        "rest": 45,
+        "title": "Load It",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 12,
+              "sets": 3,
+              "tempo": "3-0-1-0"
+            },
+            "exId": "side-lying-dumbbell-external-rotation",
+            "name": "Side-Lying Dumbbell External Rotation",
+            "note": "سمت دردناک رو کار کن، و اگه شونه‌ت صبح بعد بدتر از قبل از شروع بود، دفعه‌ی بعد از هر حرکت این بلوک یه ست کم کن، و اگه بعدش هم بدتر بود، بذار معاینه‌ش کنن.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 6,
+              "reps": 10,
+              "sets": 3,
+              "tempo": "1-0-1-2"
+            },
+            "exId": "prone-y-raise",
+            "name": "Prone Y Raise",
+            "note": "اگه Y نیشگون می‌گیره، دست‌هات رو توی یه V باز بذار.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 12,
+              "sets": 3
+            },
+            "exId": "seated-band-row",
+            "name": "Seated Band Row",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "care",
+    "countsAs": "mobility",
+    "duration": "30 min",
+    "focusTag": "درد شونه",
+    "equipment": "Bands"
+  }
 }

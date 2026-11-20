@@ -264,7 +264,10 @@ python scripts/publish_article_sql.py articles/<category-id>/<slug>.json > <scra
 Run that file's text with the Supabase MCP tool `execute_sql` (project `bvipfipbdcyqnbczjmaq`). It does
 what coach.html's **+ Publish article** does: it refuses a `.fa.json`, upserts `public.library` on
 `articles/<shelf>/<slug>`, stops if the same id is on another shelf, and keeps an article Amir hid hidden.
-It ends by reading the row back: `published` must be `true`. Re-run it after every revision of a published
+It ends by reading the row back: `published` must be `true`. **It carries the Farsi too** (2026-11-20, Amir: *"the libraries
+and playbook should be available in farsi and everything should be written in both languages"*): the sibling `.fa.json`'s
+title and blocks go in as `data.fa`, which the athlete app shows on a Farsi phone, and the script stops if the `.fa.json`
+is missing or its blocks no longer line up with the English. So write and approve the Farsi before publishing. Re-run it after every revision of a published
 article, so the app never lags the website. coach.html's button still works as the manual fallback.
 
 **The TPS course too** (Amir, 2026-11-19: *"add to tps as well"*). Step 0.6's parity check names the course

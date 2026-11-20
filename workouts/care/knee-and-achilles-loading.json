@@ -149,5 +149,158 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "knee-and-achilles-loading",
+    "intro": [
+      "بار گذاشتن آهسته و کنترل‌شده روی پا برای زانو، آشیل یا مچ دردناک مناسبه، برای همین یه جلسه هر سه رو پوشش می‌ده. اگه فقط یکیشون درد می‌کنه، باز هم جلسه جور درمیاد. کار تعادل اگه قبلاً اون مچ رو پیچونده باشی از همه مهم‌تره.",
+      "بین جلسه‌ها حداقل ۴۸ ساعت فاصله بذار. روز بعد از کار ترمز یا تغییر جهت توی زمین، یا روز قبل مسابقه، یا وقتی پات هنوز از یه چیز دیگه داغونه، انجامش نده. هرجا درد می‌کنه، عمق یا ارتفاع پله‌ای رو پیدا کن که توش آروم می‌مونه و همونجا کار کن، چون حالتی که درد داره حالت اشتباهه. یه دیوار یا نرده و یه پله‌ی کوتاه لازم داری. هیچ‌چیزی اینجا نمی‌پره. Wall Sit قبل از بازی تنهایی هم اوکیه، به‌صورت دو نگه‌داشتن با شدت ۶ به‌جای چهار تا. اگه بعد از حدود شش هفته بهتر نشد، برو پیش فیزیوتراپ؛ اگه بدتر می‌شه یا زودتر از قبل شروع می‌شه، زودتر برو."
+    ],
+    "title": "Quiet Knee",
+    "before": [
+      {
+        "text": "زانو، آشیل یا مچ دردناکی که دکتر یا فیزیوتراپ دیده و گفته می‌تونی تمرین کنی.",
+        "label": "برای کیه"
+      },
+      {
+        "text": "یه تق یا صدای ترکیدن و قدرت هل دادنت رو از دست دادی، زانو خالی می‌کنه، قفل می‌شه یا مدام ورم می‌کنه، نمی‌تونی کل وزنت رو رویش بندازی، بعد از یه پیچ یا فرود سریع ورم کرد، یا یه ساقت ورم کرده، گرمه یا با لمس درد داره و موقع بازی کشیدگی نداشتی. اون آخری همون روز دکتر می‌خواد.",
+        "label": "بایست و بذار معاینه بشه"
+      },
+      {
+        "text": "یه کم درد کشیدن اوکیه. درد تیز نه، و دردی که توی یه ست بیشتر می‌شه یا صبح بعد بدتره هم نه. اگه بیشتر می‌شه، اون حرکت رو قطع کن. اگه تیزه، جلسه رو قطع کن. توی روز عود کردن، فقط بلوک Wall Sit رو با شدت ۶ بزن و جلسه رو تموم‌شده ثبت نکن.",
+        "label": "وقتی تمرین می‌کنی"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🚶",
+        "title": "Get Moving",
+        "exercises": [
+          {
+            "rx": {
+              "time": "4 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "ankle-dorsiflexion-rocks",
+            "name": "Ankle Dorsiflexion Rocks",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 15
+            },
+            "exId": "tibialis-raise",
+            "name": "Tibialis Raise",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 12
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 20,
+              "sets": 2,
+              "side": true,
+              "time": "30s"
+            },
+            "exId": "single-leg-balance",
+            "name": "Single-Leg Balance",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🛡️",
+        "title": "Take the Edge Off",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "rest": 25,
+              "sets": 4,
+              "time": "45s",
+              "tempo": "Iso"
+            },
+            "exId": "wall-sit",
+            "name": "Wall Sit",
+            "note": "بذار درد عمق رو تعیین کنه، و اگه توی عمقی که آروم می‌مونه از ۷ آسون‌تر بود، باز هم کل زمان رو نگهش دار.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💪",
+        "rest": 45,
+        "title": "Load It",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 8,
+              "sets": 3,
+              "side": true,
+              "tempo": "3-0-1-0"
+            },
+            "exId": "lateral-step-down",
+            "name": "Lateral Step-Down",
+            "note": "اگه زانو، آشیل یا مچت صبح بعد بدتر از قبل از شروع بود، دفعه‌ی بعد از هر حرکت این بلوک یه ست کم کن، و اگه بعدش هم بدتر بود، بذار معاینه‌ش کنن.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 12,
+              "sets": 3,
+              "side": true,
+              "tempo": "3-0-1-0"
+            },
+            "exId": "single-leg-calf-raise",
+            "name": "Single-Leg Calf Raise",
+            "note": "وقتی نسخه‌ی وزن بدن از ۷ آسون‌تر شد، یه چیز سنگین توی دست دیگه‌ت بگیر و قبل از اینکه تکرار اضافه کنی، وزنه اضافه کن.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 15,
+              "rest": 30,
+              "sets": 2,
+              "side": true,
+              "tempo": "1-0-1-2"
+            },
+            "exId": "side-lying-hip-abduction",
+            "name": "Side-Lying Hip Abduction",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "care",
+    "countsAs": "strength",
+    "duration": "32 min",
+    "focusTag": "زانو، آشیل و مچ پا",
+    "equipment": "Bodyweight"
+  }
 }

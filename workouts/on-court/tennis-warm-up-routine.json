@@ -164,5 +164,173 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "tennis-warm-up-routine",
+    "title": "Tennis Warm-Up Routine",
+    "before": [
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا تلق ناگهانی. باهاش بازی نکن.",
+        "label": "وایستا و بذار چکش کنن"
+      },
+      {
+        "text": "حدود بیست متر زمین صاف و ضدلغزش، و بالای سرت چیزی نباشه برای پرش‌ها.",
+        "label": "فضا رو چک کن"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Raise",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 min"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": "3 Lengths"
+            },
+            "exId": "lateral-shuffle",
+            "name": "Lateral Shuffle",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": "1 Length"
+            },
+            "exId": "high-knees",
+            "name": "High Knees",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": "1 Length"
+            },
+            "exId": "butt-kicks",
+            "name": "Butt Kicks",
+            "type": "simple"
+          }
+        ]
+      },
+      {
+        "icon": "🎾",
+        "title": "Activate & Mobilise",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "bodyweight-squat",
+            "name": "Squat",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "hip-airplane",
+            "name": "Hip Airplane",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "standing-hip-circle",
+            "name": "Standing Hip Circle",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "reverse-lunge-with-knee-drive",
+            "name": "Reverse Lunge with Knee Drive",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "arm-circles",
+            "name": "Arm Circles",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "cross-body-arm-swing",
+            "name": "Cross-Body Arm Swing",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "half-kneeling-thoracic-rotation",
+            "name": "Half-Kneeling Thoracic Rotation",
+            "type": "simple"
+          }
+        ]
+      },
+      {
+        "icon": "⚡",
+        "rest": 30,
+        "title": "Potentiate",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10,
+              "rest": 20,
+              "sets": 2
+            },
+            "exId": "pogo-jump",
+            "name": "Pogo Jump",
+            "type": "standard",
+            "intent": "fast turnover",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 3,
+              "sets": 2
+            },
+            "exId": "countermovement-jump",
+            "name": "Countermovement Jump",
+            "type": "standard",
+            "intent": "max intent",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "sets": 3,
+              "distance": "10 m"
+            },
+            "exId": "split-stance-start",
+            "name": "Split-Stance Start",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "on-court",
+    "countsAs": "none",
+    "duration": "15 min",
+    "focusTag": "گرم کردن و آماده‌سازی",
+    "equipment": "Bodyweight"
+  }
 }

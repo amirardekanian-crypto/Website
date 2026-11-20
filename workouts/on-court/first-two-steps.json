@@ -167,5 +167,176 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "first-two-steps",
+    "intro": [
+      "به‌موقع رسیدن به توپ از دو قدم اول شروع می‌شه و می‌تونی تمرینشون بدی. هر استارتی که اینجا می‌زنی خودت انتخاب می‌کنی، پس با تمام قدرت برو و بعد از هر کدوم کامل استراحت کن. شونزده استارته، در کل حدود نود و دو متر دویدن. اگه این اواخر پرش کار نکردی، اول Landing Gear رو انجام بده، چون هر اسپلیت‌استپ اینجا یه فرود هست.",
+      "یه زمین یا حدود بیست و پنج متر زمین صاف و ضدلغزش و کفش زمین لازم داری. هر فاصله رو با چسب یا خط علامت بزن، نه با مخروط یا کیسه‌ای که ممکنه پات بره روش. تا انتهای هر استارت بدو و ده متر بعدش آروم شو. با پاهای تازه اوایل روز انجامش بده، هیچ‌وقت آخر تمرین. اگه استارت‌هات از قبلی‌ها کندتر شد، همون‌جا جلسه رو تموم کن."
+    ],
+    "title": "Off the Mark",
+    "before": [
+      {
+        "text": "مچ پا، زانو، ساق، همسترینگ، کشاله‌ی ران یا آشیل دردناک، یا آسیب توی ماه گذشته؟ اول بذار دکتر ببینه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای ناگهانی.",
+        "label": "وایسا و معاینه شو"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی، حتماً بذار دکتر ببینه. بهت گفتن با ورزش سخت مواظب باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "تا حالا رباط زانوت پاره شده یا از آسیب مچ پا برمی‌گردی؟ از کسی که درمانت کرده بپرس استارت و تغییر جهت اشکال نداره یا نه.",
+        "label": "آسیب قبلی"
+      },
+      {
+        "text": "۴۸ ساعت فاصله از یه جلسه‌ی سخت دیگه، و نه روز قبل از مسابقه.",
+        "label": "دور بمون"
+      },
+      {
+        "text": "به‌جای چهار ست از هر استارت، دو ست انجام بده.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "lateral-lunge",
+            "name": "Lateral Lunge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 3,
+              "side": true
+            },
+            "exId": "worlds-greatest-stretch",
+            "name": "World's Greatest Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 45,
+              "sets": 2,
+              "distance": "15 m"
+            },
+            "exId": "a-skip",
+            "name": "A-Skip",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 60,
+              "sets": 3,
+              "distance": "20 m"
+            },
+            "exId": "build-up-run",
+            "name": "Build-Up Run",
+            "type": "standard",
+            "intent": "build 60-80-90",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🎾",
+        "rest": 75,
+        "title": "First Step",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 60,
+              "sets": 4,
+              "distance": "6 m"
+            },
+            "exId": "split-step-to-sprint",
+            "name": "Split-Step to Sprint",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "sets": 4,
+              "distance": "6 m"
+            },
+            "exId": "crossover-start",
+            "name": "Crossover Start",
+            "note": "طرف‌ها رو عوض کن.",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "sets": 4,
+              "distance": "6 m"
+            },
+            "exId": "drop-step-and-drive",
+            "name": "Drop-Step and Drive",
+            "note": "طرف‌ها رو عوض کن.",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "👟",
+        "title": "Close the Net",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 60,
+              "sets": 4,
+              "distance": "5 m"
+            },
+            "exId": "diagonal-closing-step",
+            "name": "Diagonal Closing Step",
+            "note": "طرف‌ها رو عوض کن.",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "on-court",
+    "countsAs": "strength",
+    "duration": "34 min",
+    "focusTag": "استارت در چهار جهت",
+    "equipment": "Court"
+  }
 }

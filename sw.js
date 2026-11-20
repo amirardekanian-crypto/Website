@@ -558,7 +558,10 @@
 // v249: program.html and /assets/js/i18n-fa.js changed (i18n-fa ?v=4) (2026-11-20, the moment cards, Amir: "go with your picks"). Every Bell moment
 // is a card: its emblem, one big fact with a clay change, the heart; a new best shows its gain as a percent (stage112), never a weight.
 // v250: program.html and /assets/js/i18n-fa.js changed (i18n-fa ?v=5) (2026-11-20): Farsi for the join text that now says a new best shows its weight.
-const CACHE = 'aap-v250';
+// v251: program.html, i18n-fa.js (?v=6), rally.js and between-sets.js changed (2026-11-20, Amir: "the libraries and playbook should be
+// available in farsi and everything should be written in both languages"). A Library item's Farsi copy (data.fa) on a Farsi phone; the
+// Career Mode names, Library shelves, pills and block titles in Farsi; the rest games' words, canvas included, through the translator.
+const CACHE = 'aap-v251';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -599,7 +602,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=2',
-  '/assets/js/i18n-fa.js?v=5',
+  '/assets/js/i18n-fa.js?v=6',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

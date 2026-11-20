@@ -1,0 +1,480 @@
+{
+  "area": "games: rally.js (Off the Glass + The Lob), splitstep.js (Split Step), between-sets.js (Between Sets), including their canvas words",
+  "exact": {
+    "AMIR": "امیر",
+    "YOU": "تو",
+    "Point!": "امتیاز!",
+    "Amir scores": "امیر امتیاز گرفت",
+    "Off the glass +2": "از شیشه +۲",
+    "Amir off the glass +2": "امیر از شیشه +۲",
+    "Last point.": "آخرین امتیاز.",
+    "Drag in your half. Hit it through Amir's gap.": "تو نیمهٔ خودت بکش. از شکاف امیر ردش کن.",
+    "Full time": "تمام شد",
+    "Back to the timer": "برگشت به تایمر",
+    "Rest paused": "استراحت متوقف شد",
+    "Time. Next set.": "وقت تمومه. ست بعدی.",
+    "Back to work.": "برگرد سر کار.",
+    "Rest over. Back to work.": "استراحت تموم شد. برگرد سر کار.",
+    "Off the Glass: drag in the bottom half to move your racket": "Off the Glass: تو نیمهٔ پایین بکش تا راکتت حرکت کنه",
+    "Back to the rest timer": "برگشت به تایمر استراحت",
+    "Breathe in": "نفس بکش تو",
+    "Breathe out": "نفس بده بیرون",
+    "Breathe in as the ball rises. Breathe out as it falls.": "وقتی توپ بالا می‌ره نفس بکش تو. وقتی میاد پایین بده بیرون.",
+    "First Step": "اولین قدم",
+    "Fore or Back": "فورهند یا بک‌هند",
+    "In or Out": "تو یا بیرون",
+    "Sweet Spot": "نقطهٔ طلایی",
+    "Tap the moment Amir hits the ball.": "لحظه‌ای که امیر به توپ می‌زنه بزن.",
+    "Tap the side the ball goes to.": "سمتی که توپ می‌ره بزن.",
+    "Tap if it lands in. Leave it if it is out. On the line is in.": "اگه تو زمین می‌افته بزن. اگه بیرونه ولش کن. روی خط یعنی تو.",
+    "Tap as the ball reaches your racket. It slows after the bounce, by a different amount each time.": "وقتی توپ به راکتت می‌رسه بزن. بعد از برخورد با زمین کند می‌شه، هر بار یه مقدار متفاوت.",
+    "Wait for the hit": "منتظر ضربه باش",
+    "Left half or right half": "نیمهٔ چپ یا نیمهٔ راست",
+    "Tap if in. Leave it if out.": "تو بود بزن. بیرون بود ولش کن.",
+    "Tap at your racket": "کنار راکتت بزن",
+    "tap anywhere the moment Amir hits the ball": "لحظه‌ای که امیر به توپ می‌زنه هرجا بزن",
+    "tap the left or right half, the side the ball goes to": "نیمهٔ چپ یا راست رو بزن، همون سمتی که توپ می‌ره",
+    "tap if the ball lands in, do nothing if it is out": "اگه توپ تو زمین می‌افته بزن، بیرونه هیچی نزن",
+    "tap as the ball reaches your racket": "وقتی توپ به راکتت می‌رسه بزن",
+    "Drill": "تمرین",
+    "Each ball": "هر توپ",
+    "Not enough rest left for a round. Get set.": "استراحت واسه یه دور کافی نیست. آماده شو.",
+    "Best on this phone": "بهترینت روی این گوشی",
+    "A best needs every ball right and no foot faults.": "رکورد وقتی ثبت می‌شه که همهٔ توپ‌ها درست باشن و خطای پا نداشته باشی.",
+    "Too few hits to score this round.": "ضربه‌ها واسه امتیاز دادن به این دور کم بود.",
+    "New best on this phone.": "رکورد جدید روی این گوشی.",
+    "Taller is closer": "بلندتر یعنی دقیق‌تر",
+    "Taller is faster": "بلندتر یعنی سریع‌تر",
+    "Leave": "ولش کردی",
+    "Slow": "کند",
+    "Wrong": "اشتباه",
+    "Out": "بیرون",
+    "Early": "زود",
+    "Late": "دیر",
+    "Miss": "خطا",
+    "Foot fault": "خطای پا",
+    "Wait for the hit.": "منتظر ضربه باش.",
+    "Good leave.": "ولش کردی، خوبه.",
+    "Sweet spot.": "نقطهٔ طلایی.",
+    "On the line is in.": "روی خط یعنی تو.",
+    "You played it. It was out.": "زدی. بیرون بود.",
+    "It touched the line. On the line is in.": "به خط خورد. روی خط یعنی تو.",
+    "It was in. You left it.": "تو بود. ولش کردی.",
+    "Too slow": "خیلی کند",
+    "Wrong side": "سمت اشتباه",
+    "Too early": "خیلی زود",
+    "Too late": "خیلی دیر",
+    "Missed it": "نرسیدی",
+    "ms early": "میلی‌ثانیه زود",
+    "ms late": "میلی‌ثانیه دیر",
+    "That round stopped because you left the app.": "این دور تموم شد چون از اپ رفتی بیرون.",
+    "That round stopped when the screen turned.": "این دور تموم شد چون صفحه چرخید.",
+    "MARK CHECK": "بررسی جای توپ",
+    "LINE CHECK": "بررسی خط",
+    "IN": "تو",
+    "OUT": "بیرون",
+    "Toss again": "دوباره بنداز",
+    "NET CORD": "خورد به تور",
+    "NEW BEST": "رکورد جدید",
+    "MISSED": "نرسیدی",
+    "FAULT": "خطا",
+    "DOUBLE FAULT": "خطای دوم",
+    "ACE": "آس",
+    "WINNER": "برنده",
+    "NET": "تور",
+    "PERFECT": "عالی",
+    "GOOD": "خوب",
+    "EARLY": "زود",
+    "Between Sets, a tennis game": "Between Sets، یه بازی تنیس",
+    "Sound on. Tap to mute": "صدا روشنه. برای بی‌صدا شدن بزن",
+    "Sound off. Tap to turn on": "صدا خاموشه. برای روشن شدن بزن",
+    "Rally": "رالی",
+    "Best": "بهترین",
+    "Rally drill": "تمرین رالی",
+    "Deciding point": "امتیاز تعیین‌کننده",
+    "Tiebreak": "تای‌برک",
+    "2nd serve": "سرو دوم",
+    "Deciding point · 2nd serve": "امتیاز تعیین‌کننده · سرو دوم",
+    "Tiebreak · 2nd serve": "تای‌برک · سرو دوم",
+    "Serve": "سرو",
+    "Shot": "ضربه",
+    "You win the set": "ست رو بردی",
+    "Amir wins the set": "امیر ست رو برد",
+    "Amir's game": "گیم امیر",
+    "Tiebreak. First to 5.": "تای‌برک. اولی که به ۵ برسه.",
+    "Move the mouse to run": "برای دویدن ماوس رو حرکت بده",
+    "Drag anywhere to run": "برای دویدن هرجا بکش",
+    "Click to start the rally": "برای شروع رالی کلیک کن",
+    "Tap to start the rally": "برای شروع رالی بزن",
+    "Second serve. Tap to toss": "سرو دوم. برای پرتاب بزن",
+    "Tap to toss": "برای پرتاب بزن",
+    "Tap again at the top": "اوج که رسید دوباره بزن",
+    "Click as the ring closes": "وقتی حلقه بسته می‌شه کلیک کن",
+    "Tap as the ring closes": "وقتی حلقه بسته می‌شه بزن",
+    "That's the one.": "همینه.",
+    "Clean. Again.": "تمیز بود. دوباره.",
+    "Early prep. Big ball.": "آماده شدن زود. توپ بزرگ.",
+    "Feet first, then the ball. Yes.": "اول پا، بعد توپ. آفرین.",
+    "Get there early.": "زود برس.",
+    "Move first, then hit.": "اول حرکت کن، بعد بزن.",
+    "Split step, then go.": "اسپلیت‌استپ، بعد برو.",
+    "Small steps. Be set.": "قدم‌های کوچیک. آماده باش.",
+    "Big serve.": "سرو محکم.",
+    "Nothing I could do there.": "کاری نمی‌تونستم بکنم.",
+    "Breathe. Same toss.": "نفس بکش. همون پرتاب.",
+    "Slow it down. Same toss.": "آروم‌تر. همون پرتاب.",
+    "Good legs. Keep that.": "پاهات خوبن. همینو نگه دار.",
+    "Long point. Nice work.": "امتیاز بلند. دمت گرم.",
+    "Your game. Keep going.": "گیم تو. ادامه بده.",
+    "Good game.": "گیم خوبی بود.",
+    "My game. Stay with me.": "گیم من. باهام بمون.",
+    "One game. Plenty left.": "یه گیم. هنوز کلی مونده.",
+    "You beat me. Good work.": "بردی. دمت گرم.",
+    "Great set. Now lift.": "ست عالی بود. حالا برو تمرین.",
+    "Close. Run it back next rest.": "نزدیک بود. استراحت بعدی دوباره.",
+    "Good fight. Back to work.": "خوب جنگیدی. برگرد سر کار.",
+    "Ten. Nice rhythm.": "ده تا. ریتم خوبیه.",
+    "Twenty. Locked in.": "بیست تا. حسابی تمرکز داری.",
+    "Thirty. That is focus.": "سی تا. این یعنی تمرکز.",
+    "Fifty. I am impressed.": "پنجاه تا. حسابی تحت تأثیر قرار گرفتم.",
+    "10 seconds. Finish the point.": "۱۰ ثانیه. امتیاز رو تموم کن.",
+    "Tennis for your rest": "تنیس واسه وقت استراحتت",
+    "Play a few points while you rest. Your match saves after every point, so one set lasts about one workout.": "وقت استراحت چند تا امتیاز بازی کن. مسابقه بعد از هر امتیاز ذخیره می‌شه، پس یه ست تقریباً یه تمرین طول می‌کشه.",
+    "Continue": "ادامه",
+    "New match": "مسابقهٔ جدید",
+    "First to 4 games": "اولی که به ۴ گیم برسه",
+    "Play Amir": "بازی با امیر",
+    "Keep the ball in play": "توپ رو تو بازی نگه دار",
+    "Off": "خاموش",
+    "60 s": "۶۰ ثانیه",
+    "90 s": "۹۰ ثانیه",
+    "2 min": "۲ دقیقه",
+    "Easy": "آسون",
+    "Medium": "متوسط",
+    "Hard": "سخت",
+    "Clay": "خاکی",
+    "Grass": "چمن",
+    "Run": "بدو",
+    "Hit": "بزن",
+    "Drag anywhere. Your player follows your thumb.": "هرجا بکش. بازیکنت دنبال انگشتت می‌آد.",
+    "Move the mouse, or use the arrow keys.": "ماوس رو حرکت بده، یا از کلیدهای جهت‌دار استفاده کن.",
+    "Automatic when you reach the ball. Get there early for a better shot. Tap as the ring closes for a power shot.": "وقتی به توپ برسی خودکار می‌زنه. زودتر برسی ضربه بهتری می‌زنی. برای ضربهٔ قوی، وقتی حلقه بسته می‌شه بزن.",
+    "Automatic when you reach the ball. Get there early for a better shot. Click as the ring closes for a power shot.": "وقتی به توپ برسی خودکار می‌زنه. زودتر برسی ضربه بهتری می‌زنی. برای ضربهٔ قوی، وقتی حلقه بسته می‌شه کلیک کن.",
+    "Tap to toss. Then again at the top.": "برای پرتاب بزن. بعد اوج که رسید دوباره بزن.",
+    "Click to toss. Then again at the top.": "برای پرتاب کلیک کن. بعد اوج که رسید دوباره کلیک کن.",
+    "Take your time": "راحت باش",
+    "Menu": "منو",
+    "Rest over": "استراحت تموم شد",
+    "Time to lift": "وقت تمرینه",
+    "Your best rally is saved.": "بهترین رالیت ذخیره شد.",
+    "Score saved after every point. Pick it up on your next rest.": "نتیجه بعد از هر امتیاز ذخیره می‌شه. استراحت بعدی ادامه بده.",
+    "Pick the game up on your next rest.": "استراحت بعدی بازی رو ادامه بده.",
+    "Start the next rest": "شروع استراحت بعدی",
+    "Demo of the app's rest timer": "نمونهٔ تایمر استراحت اپ",
+    "Keep playing": "بازی رو ادامه بده",
+    "Timer off": "تایمر خاموش",
+    "Your tennis": "تنیس تو",
+    "Your movement": "حرکت تو",
+    "Points won": "امتیازهای برده",
+    "Winners": "ضربهٔ برنده",
+    "Errors": "خطاها",
+    "Aces": "آس",
+    "Double faults": "خطای دوم",
+    "Longest rally": "بلندترین رالی",
+    "Fastest serve": "سریع‌ترین سرو",
+    "First serves in": "سرو اول داخل",
+    "Distance run": "مسافت دویده",
+    "Sprints": "اسپرینت‌ها",
+    "Changes of direction": "تغییر جهت",
+    "Set early": "آماده شدن زود",
+    "Power shots": "ضربه‌های قوی",
+    "Play again": "دوباره بازی کن",
+    "Go again": "دوباره برو",
+    "Locked in. Now go lift.": "حسابی تمرکز داشتی. حالا برو تمرین.",
+    "Good rhythm. Beat it on your next rest.": "ریتم خوبیه. استراحت بعدی ازش رد شو.",
+    "Warm-up done. Go again on your next rest.": "گرم کردن تموم شد. استراحت بعدی دوباره."
+  },
+  "patterns": [
+    [
+      "RALLY (\\d+)",
+      "رالی {n1}"
+    ],
+    [
+      "Play resumes · You (\\d+), Amir (\\d+)",
+      "بازی ادامه داره · تو {n1}، امیر {n2}"
+    ],
+    [
+      "First to (\\d+)\\. The match waits for your next rest\\.",
+      "اولی که به {n1} برسه. مسابقه تا استراحت بعدیت صبر می‌کنه."
+    ],
+    [
+      "You (\\d+), Amir (\\d+)\\. Back to work\\.",
+      "تو {n1}، امیر {n2}. برگرد سر کار."
+    ],
+    [
+      "You win (\\d+)–(\\d+)\\. Longest rally: (\\d+) hits?\\. Off the glass: (\\d+)\\.",
+      "تو بردی {n1}–{n2}. بلندترین رالی: {n3} ضربه. از شیشه: {n4}."
+    ],
+    [
+      "You win (\\d+)–(\\d+)\\. Longest rally: (\\d+) hits?\\.",
+      "تو بردی {n1}–{n2}. بلندترین رالی: {n3} ضربه."
+    ],
+    [
+      "Amir wins (\\d+)–(\\d+)\\. Longest rally: (\\d+) hits?\\. Off the glass: (\\d+)\\.",
+      "امیر برد {n1}–{n2}. بلندترین رالی: {n3} ضربه. از شیشه: {n4}."
+    ],
+    [
+      "Amir wins (\\d+)–(\\d+)\\. Longest rally: (\\d+) hits?\\.",
+      "امیر برد {n1}–{n2}. بلندترین رالی: {n3} ضربه."
+    ],
+    [
+      "Split Step, (.+): (.+)",
+      "Split Step، {t1}: {t2}"
+    ],
+    [
+      "Split Step · (\\d+) of 4",
+      "Split Step · {n1} از ۴"
+    ],
+    [
+      "(.+) · round done",
+      "{t1} · دور تموم شد"
+    ],
+    [
+      "Last (\\d+)",
+      "{n1} تای آخر"
+    ],
+    [
+      "(\\d+) ms",
+      "{n1} میلی‌ثانیه"
+    ],
+    [
+      "(\\d+) ms off",
+      "{n1} میلی‌ثانیه فاصله"
+    ],
+    [
+      "Middle time of (\\d+) balls",
+      "زمان میانهٔ {n1} توپ"
+    ],
+    [
+      "Middle time of (\\d+) balls · (\\d+) foot faults?",
+      "زمان میانهٔ {n1} توپ · {n2} خطای پا"
+    ],
+    [
+      "(\\d+) of (\\d+) right",
+      "{n1} از {n2} درست"
+    ],
+    [
+      "(\\d+) of (\\d+) right · (\\d+) foot faults?",
+      "{n1} از {n2} درست · {n3} خطای پا"
+    ],
+    [
+      "(\\d+) of (\\d+) calls right",
+      "{n1} از {n2} قضاوت درست"
+    ],
+    [
+      "(\\d+) of (\\d+) calls right · (\\d+) foot faults?",
+      "{n1} از {n2} قضاوت درست · {n3} خطای پا"
+    ],
+    [
+      "(\\d+) of (\\d+) hit",
+      "{n1} از {n2} ضربه"
+    ],
+    [
+      "(\\d+) of (\\d+) hit · (\\d+) foot faults?",
+      "{n1} از {n2} ضربه · {n3} خطای پا"
+    ],
+    [
+      "(\\d+) of (\\d+) hit · on time on average",
+      "{n1} از {n2} ضربه · به‌طور میانگین سر وقت"
+    ],
+    [
+      "(\\d+) of (\\d+) hit · on time on average · (\\d+) foot faults?",
+      "{n1} از {n2} ضربه · به‌طور میانگین سر وقت · {n3} خطای پا"
+    ],
+    [
+      "(\\d+) of (\\d+) hit · (\\d+) ms early on average",
+      "{n1} از {n2} ضربه · به‌طور میانگین {n3} میلی‌ثانیه زود"
+    ],
+    [
+      "(\\d+) of (\\d+) hit · (\\d+) ms early on average · (\\d+) foot faults?",
+      "{n1} از {n2} ضربه · به‌طور میانگین {n3} میلی‌ثانیه زود · {n4} خطای پا"
+    ],
+    [
+      "(\\d+) of (\\d+) hit · (\\d+) ms late on average",
+      "{n1} از {n2} ضربه · به‌طور میانگین {n3} میلی‌ثانیه دیر"
+    ],
+    [
+      "(\\d+) of (\\d+) hit · (\\d+) ms late on average · (\\d+) foot faults?",
+      "{n1} از {n2} ضربه · به‌طور میانگین {n3} میلی‌ثانیه دیر · {n4} خطای پا"
+    ],
+    [
+      "Best on this phone (\\d+) ms off\\.",
+      "بهترینت روی این گوشی {n1} میلی‌ثانیه فاصله."
+    ],
+    [
+      "Best on this phone (\\d+) ms off\\. Your usual is (\\d+) ms off\\.",
+      "بهترینت روی این گوشی {n1} میلی‌ثانیه فاصله. معمولیت {n2} میلی‌ثانیه فاصله."
+    ],
+    [
+      "A best needs every ball right and no foot faults\\. Yours is (\\d+) ms off\\.",
+      "رکورد وقتی ثبت می‌شه که همهٔ توپ‌ها درست باشن و خطای پا نداشته باشی. رکوردت {n1} میلی‌ثانیه فاصله."
+    ],
+    [
+      "Your last (\\d+) clean rounds, oldest to newest: (.+) ms off\\. Lower is closer\\. Taller bars are better\\.",
+      "{n1} دور تمیز آخرت، از قدیمی به جدید: $2 میلی‌ثانیه فاصله. کمتر یعنی دقیق‌تر. ستون‌های بلندتر بهترن."
+    ],
+    [
+      "Your last (\\d+) clean rounds, oldest to newest: (.+) ms off\\. Lower is faster\\. Taller bars are better\\.",
+      "{n1} دور تمیز آخرت، از قدیمی به جدید: $2 میلی‌ثانیه فاصله. کمتر یعنی سریع‌تر. ستون‌های بلندتر بهترن."
+    ],
+    [
+      "Best on this phone (\\d+) ms\\.",
+      "بهترینت روی این گوشی {n1} میلی‌ثانیه."
+    ],
+    [
+      "Best on this phone (\\d+) ms\\. Your usual is (\\d+) ms\\.",
+      "بهترینت روی این گوشی {n1} میلی‌ثانیه. معمولیت {n2} میلی‌ثانیه."
+    ],
+    [
+      "A best needs every ball right and no foot faults\\. Yours is (\\d+) ms\\.",
+      "رکورد وقتی ثبت می‌شه که همهٔ توپ‌ها درست باشن و خطای پا نداشته باشی. رکوردت {n1} میلی‌ثانیه."
+    ],
+    [
+      "Your last (\\d+) clean rounds, oldest to newest: (.+) ms\\. Lower is closer\\. Taller bars are better\\.",
+      "{n1} دور تمیز آخرت، از قدیمی به جدید: $2 میلی‌ثانیه. کمتر یعنی دقیق‌تر. ستون‌های بلندتر بهترن."
+    ],
+    [
+      "Your last (\\d+) clean rounds, oldest to newest: (.+) ms\\. Lower is faster\\. Taller bars are better\\.",
+      "{n1} دور تمیز آخرت، از قدیمی به جدید: $2 میلی‌ثانیه. کمتر یعنی سریع‌تر. ستون‌های بلندتر بهترن."
+    ],
+    [
+      "Ball (\\d+): good leave",
+      "توپ {n1}: ولش کردی، خوبه"
+    ],
+    [
+      "Ball (\\d+): on time, hit",
+      "توپ {n1}: سر وقت، زدی"
+    ],
+    [
+      "Ball (\\d+): (\\d+) ms early, hit",
+      "توپ {n1}: {n2} میلی‌ثانیه زود، زدی"
+    ],
+    [
+      "Ball (\\d+): (\\d+) ms late, hit",
+      "توپ {n1}: {n2} میلی‌ثانیه دیر، زدی"
+    ],
+    [
+      "Ball (\\d+): (\\d+) ms, right",
+      "توپ {n1}: {n2} میلی‌ثانیه، درست"
+    ],
+    [
+      "Ball (\\d+): too slow",
+      "توپ {n1}: خیلی کند"
+    ],
+    [
+      "Ball (\\d+): wrong side",
+      "توپ {n1}: سمت اشتباه"
+    ],
+    [
+      "Ball (\\d+): you played it, it was out",
+      "توپ {n1}: زدی، بیرون بود"
+    ],
+    [
+      "Ball (\\d+): you left it, it was in",
+      "توپ {n1}: ولش کردی، تو بود"
+    ],
+    [
+      "Ball (\\d+): too early",
+      "توپ {n1}: خیلی زود"
+    ],
+    [
+      "Ball (\\d+): too late",
+      "توپ {n1}: خیلی دیر"
+    ],
+    [
+      "Ball (\\d+): missed",
+      "توپ {n1}: نرسیدی"
+    ],
+    [
+      "Best (\\d+)",
+      "بهترین {n1}"
+    ],
+    [
+      "Rally (\\d+)\\. Best (\\d+)\\.",
+      "رالی {n1}. بهترین {n2}."
+    ],
+    [
+      "You (\\d+)–(\\d+) Amir · (.+)",
+      "تو {n1}–{n2} امیر · {t3}"
+    ],
+    [
+      "(.+) (\\d+)–(\\d+) Amir in games\\. Saved after every point\\.",
+      "$1 {n2}–{n3} امیر در گیم‌ها. بعد از هر امتیاز ذخیره می‌شه."
+    ],
+    [
+      "Your sets against Amir: (.+)",
+      "ست‌های تو مقابل امیر: $1"
+    ],
+    [
+      "Games (\\d+)–(\\d+)",
+      "گیم {n1}–{n2}"
+    ],
+    [
+      "(\\d+) all",
+      "{n1} مساوی"
+    ],
+    [
+      "(\\d+) km/h",
+      "{n1} کیلومتر بر ساعت"
+    ],
+    [
+      "Fast4 set · (.+) · (.+)",
+      "ست Fast4 · {t1} · {t2}"
+    ],
+    [
+      "Tiebreak (\\d+)–(\\d+)",
+      "تای‌برک {n1}–{n2}"
+    ],
+    [
+      "(\\d+) shots",
+      "{n1} ضربه"
+    ],
+    [
+      "(\\d+) m",
+      "{n1} متر"
+    ],
+    [
+      "(\\d+)% of shots",
+      "{n1}٪ ضربه‌ها"
+    ],
+    [
+      "Shots in a row\\. Your best is (\\d+)\\.",
+      "ضربهٔ پشت‌سرهم. بهترینت {n1} بوده."
+    ],
+    [
+      "You were set early on (\\d+)% of your shots\\. Get there first, then hit\\.",
+      "تو {n1}٪ ضربه‌هات زود آماده بودی. اول برس، بعد بزن."
+    ],
+    [
+      "Set early on (\\d+)% of your shots\\. Push that to 80 and the winners come\\.",
+      "تو {n1}٪ ضربه‌هات زود آماده بودی. برسونش به ۸۰ تا ضربه‌های برنده بیان."
+    ],
+    [
+      "Set early on (\\d+)% of your shots\\. That is how points are won\\.",
+      "تو {n1}٪ ضربه‌هات زود آماده بودی. امتیاز اینجوری برده می‌شه."
+    ]
+  ],
+  "split": [
+    {
+      "line": 2975,
+      "text": "Your sets against Amir: Easy 1–0, Medium 0–1",
+      "note": "between-sets.js showMenu: the level labels inside $1 stay English"
+    },
+    {
+      "line": 553,
+      "text": "splitstep.js say(): \"<drill> round done. 123 ms. ...\"",
+      "note": "screen-reader live region, built from many parts; left in English"
+    }
+  ],
+  "readback": []
+}

@@ -125,5 +125,134 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "front-rack-rescue",
+    "title": "Front-Rack Rescue",
+    "before": [
+      {
+        "text": "گز‌گز یا بی‌حسی توی انگشت‌ها، درد تیز توی مچ، آرنج یا شونه، یا درد بعد از زمین خوردن یا پیچ خوردن.",
+        "label": "بایست و بذار معاینه بشه"
+      },
+      {
+        "text": "کمر، جلو یا کنار گردن، پشت زانو، داخل آرنج، زیر بغل یا درست توی چین کشاله. هیچ جایی که ورم کرده، داغه، کبود شده یا تازه آسیب دیده.",
+        "label": "هیچ‌وقت رول نکن"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🌀",
+        "title": "Soften the Tissue",
+        "exercises": [
+          {
+            "rx": {
+              "side": true,
+              "time": "60s"
+            },
+            "exId": "lat-roll",
+            "name": "Lat Roll",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "sets": 2
+            },
+            "exId": "foam-roller-thoracic-extension",
+            "name": "Foam Roller Thoracic Extension",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Stretch & Open",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10,
+              "sets": 2
+            },
+            "exId": "wrist-rocks",
+            "name": "Wrist Rocks",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "quadruped-thoracic-rotation",
+            "name": "Quadruped Thoracic Rotation",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "40s"
+            },
+            "exId": "banded-lat-stretch",
+            "name": "Banded Lat Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "40s"
+            },
+            "exId": "overhead-triceps-stretch",
+            "name": "Overhead Triceps Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "sets": 2,
+              "time": "30s"
+            },
+            "exId": "kneeling-thoracic-extension",
+            "name": "Kneeling Thoracic Extension",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🔥",
+        "title": "Own the Rack",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10,
+              "sets": 2
+            },
+            "exId": "front-rack-elbow-punches",
+            "name": "Front-Rack Elbow Punches",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "sets": 2
+            },
+            "exId": "front-rack-hold",
+            "name": "Front Rack Hold",
+            "type": "simple",
+            "intent": "Max hold",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "mobility",
+    "countsAs": "mobility",
+    "duration": "15 min",
+    "focusTag": "آماده‌سازی فرانت‌رک کلین و جرک",
+    "equipment": "Foam Roller"
+  }
 }

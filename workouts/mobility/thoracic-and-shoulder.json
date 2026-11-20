@@ -124,5 +124,133 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "thoracic-and-shoulder",
+    "intro": [
+      "سرویس یعنی چرخش بالای کمر و رفتن شونه بالای سر، و هر دو هرچی بیشتر بازی کنی سفت‌تر می‌شن. بازیکن‌های پدل سرویس رو از پایین می‌زنن، ولی باندخا همون شونه‌ی بالای سر رو با نصف سرعت و خیلی بیشتر زیر بار می‌ذاره.",
+      "توی روز استراحت یا بعد از یه ضربه‌زدن کوتاه انجامش بده. یه دمبل لازم داری که بتونی با دنده‌های پایین بالای سرت نگهش داری و یه چیز محکم که روش به پشت بخوابی، مثل نیمکت یا دسته‌ی یه مبل سنگین. اگه ترجیح بدی، دوچرخه‌ی آروم کار پیاده‌روی رو می‌کنه."
+    ],
+    "title": "Open The Cage",
+    "before": [
+      {
+        "text": "شونه‌ی خشک، نه شونه‌ای که درد داره. اگه شونه‌ت به‌جای خشکی درد داره و یکی قبلاً دیدتش، Shoulder Brake توی لیست Care همونیه که براش ساخته شده.",
+        "label": "برای کیه"
+      },
+      {
+        "text": "اگه شونه از جا در رفته یا حس می‌کنی سر می‌خوره، موقع سرویس یا اسمش صدای شکستن حس کردی و بعدش نتونستی دستت رو بلند کنی، درد شب‌ها از خواب بیدارت می‌کنه، دستت مرده، سوزن‌سوزن شدن یا بی‌حسی توی دست داری یا از گردن میاد، یا درد هر بار که بازی می‌کنی زودتر شروع می‌شه.",
+        "label": "وایسا و حتماً بذار دکتر ببینه"
+      },
+      {
+        "text": "بین دفعه‌ها یه روز فاصله بذار، و ساعت‌های قبل از بازی انجامش نده، چون دست رو خسته می‌کنه.",
+        "label": "زمان‌بندی"
+      },
+      {
+        "text": "از نگه داشتن و پرس دو ست با RPE ۶ بزن و ببین دو روز بعد شونه چه حالی داره.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Raise",
+        "exercises": [
+          {
+            "rx": {
+              "time": "5 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "arm-circles",
+            "name": "Arm Circles",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Free the Ribs",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "quadruped-thoracic-rotation",
+            "name": "Quadruped Thoracic Rotation",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "bench-thoracic-extension",
+            "name": "Bench Thoracic Extension",
+            "note": "از نیمکت یا دسته‌ی یه مبل سنگین استفاده کن، نه صندلی، چون صندلی ممکنه از پشتت سر بخوره.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "open-book",
+            "name": "Open Book",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💪",
+        "rest": 45,
+        "title": "Own Overhead",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "sets": 3,
+              "side": true,
+              "time": "25s",
+              "tempo": "Iso"
+            },
+            "exId": "half-kneeling-single-arm-dumbbell-overhead-hold",
+            "name": "Half-Kneeling Single-Arm Dumbbell Overhead Hold",
+            "note": "از دمبلی سبک‌تر از دمبل پرس استفاده کن.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 8,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "half-kneeling-single-arm-dumbbell-press",
+            "name": "Half-Kneeling Single-Arm Dumbbell Press",
+            "note": "اگه دستت بدون قوس انداختن کمر کامل بالا نمی‌ره، پرس رو همون‌جا که قوس شروع می‌شه تموم کن.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "mobility",
+    "countsAs": "mobility",
+    "duration": "20 min",
+    "focusTag": "بالای کمر و شونه‌ی بالای سر",
+    "equipment": "Dumbbells"
+  }
 }

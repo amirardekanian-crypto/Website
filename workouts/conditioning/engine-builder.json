@@ -111,5 +111,120 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "engine-builder",
+    "intro": [
+      "راحت‌ترینشونه، و همونیه که آدم‌ها با سخت کردنش خرابش می‌کنن. بیست و دو دقیقه با سرعتی که بتونی حرف بزنی.",
+      "این پایه‌ایه که بین امتیازها و بین جلسه‌ها ریکاوری‌ت رو ممکن می‌کنه. سخت‌تر رفتن بهتر کارش نمی‌کنه، فقط تبدیلش می‌کنه به جلسه‌ی دیگه‌ای که جای دیگه‌ای هم انجامش می‌دی."
+    ],
+    "title": "Engine Builder",
+    "before": [
+      {
+        "text": "زانو، باسن یا مچ پایی که موقع رکاب زدن درد می‌گیره؟ اول بذار دکتر ببینه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، یا مفصلی که خالی می‌کنه.",
+        "label": "وایسا و معاینه شو"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی، حتماً بذار دکتر ببینه. بهت گفتن با ورزش سخت مواظب باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "5 minutes"
+            },
+            "exId": "stationary-bike",
+            "name": "Stationary Bike",
+            "note": "اگه ترجیح می‌دی، راه رفتن روی تردمیل شیب‌دار همین کار رو می‌کنه.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "note": "جلو و عقب، بعد چپ و راست.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 4,
+              "side": true
+            },
+            "exId": "worlds-greatest-stretch",
+            "name": "World's Greatest Stretch",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🫀",
+        "title": "Aerobic Base",
+        "exercises": [
+          {
+            "rx": {
+              "time": "22 minutes"
+            },
+            "exId": "stationary-bike",
+            "name": "Stationary Bike",
+            "note": "سرعت حرف زدن. اگه نمی‌تونی حرف بزنی، داری زیادی تند می‌ری.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Cool-Down",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "stationary-bike",
+            "name": "Stationary Bike",
+            "note": "اگه ترجیح می‌دی، راه رفتن روی تردمیل شیب‌دار همین کار رو می‌کنه.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "cues": {
+              "bad": [
+                "نفس‌های زورکی و بزرگ"
+              ],
+              "good": [
+                "با بینی ۴ ثانیه نفس بگیر، ۶ ثانیه بده بیرون",
+                "با هر بازدم شونه‌ها رو بنداز پایین"
+              ]
+            },
+            "name": "Nasal Breathing",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "conditioning",
+    "countsAs": "strength",
+    "duration": "35 min",
+    "focusTag": "پایه‌ی هوازی",
+    "equipment": "Bike"
+  }
 }

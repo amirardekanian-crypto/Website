@@ -207,5 +207,216 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "landing-and-springs",
+    "intro": [
+      "نمی‌شه با پایی که فرود رو تحمل نمی‌کنه ایستاد، تغییر جهت داد یا هل داد، پس جلسه از همین‌جا شروع می‌شه. نیرو رو می‌گیری، بعد پس می‌دی. اگه اخیراً پرش کار نکردی، قبل از Off the Mark و Hard Stop از اینجا شروع کن. در کل حدود نود تماس با زمینه. کفش ورزشی یا کفش زمین و یه خط برای پریدن از روش لازم داری، مثل خط زمین یا یه نوار چسب. زمین یا تشک لاستیکی از کاشی یا بتن مهربون‌تره.",
+      "اگه فرود صدادار یا شل شد، همون‌جا جلسه رو تموم کن. توی هفته‌ی تورنمنت این رو ردش کن و به‌جاش Green Light رو از لیست Mobility انجام بده."
+    ],
+    "title": "Landing Gear",
+    "before": [
+      {
+        "text": "مچ پا، زانو، ساق، همسترینگ، کشاله‌ی ران یا آشیل دردناک، یا آسیب توی ماه گذشته؟ اول بذار دکتر ببینه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای ناگهانی.",
+        "label": "وایسا و معاینه شو"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی، حتماً بذار دکتر ببینه. بهت گفتن با ورزش سخت مواظب باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "خیلی بیشتر از معمول درد داری یا ادرارت تیره شده؟ همون روز معاینه شو.",
+        "label": "یکی دو روز بعد"
+      },
+      {
+        "text": "از آسیب مچ پا برمی‌گردی؟ از کسی که درمانت کرده بپرس فرود و پرش اشکال نداره یا نه. اگه تا حالا رباط زانوت پاره شده، Lateral Bound رو ردش کن.",
+        "label": "آسیب قبلی"
+      },
+      {
+        "text": "چهار متر زمین خالی و ضدلغزش و هیچ چیزی بالای سرت که بخوره بهش، مثل پنکه یا تیر کوتاه سقف. جای بالای سر نداری؟ Countermovement Jump رو ردش کن. چهار متر جای خالی نداری؟ Lateral Bound رو ردش کن. با تکرار بیشتر جبرانش نکن.",
+        "label": "فضا رو چک کن"
+      },
+      {
+        "text": "۴۸ ساعت فاصله از یه جلسه‌ی سخت دیگه، و نه روز قبل از مسابقه.",
+        "label": "دور بمون"
+      },
+      {
+        "text": "حدود نصف بلوک‌های Rebound و Springs رو با استراحت کامل انجام بده. باز هم حساب می‌شه.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "ankle-dorsiflexion-rocks",
+            "name": "Ankle Dorsiflexion Rocks",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "lateral-lunge",
+            "name": "Lateral Lunge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 3,
+              "side": true
+            },
+            "exId": "worlds-greatest-stretch",
+            "name": "World's Greatest Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "single-leg-calf-raise",
+            "name": "Single-Leg Calf Raise",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🪂",
+        "rest": 45,
+        "title": "Land It",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 5,
+              "sets": 3
+            },
+            "exId": "snap-down",
+            "name": "Snap Down",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 3,
+              "sets": 2,
+              "side": true
+            },
+            "exId": "single-leg-snap-down",
+            "name": "Single-Leg Snap Down",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "⚡",
+        "title": "Rebound",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 3,
+              "rest": 60,
+              "sets": 3
+            },
+            "exId": "countermovement-jump",
+            "name": "Countermovement Jump",
+            "type": "standard",
+            "intent": "max intent",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 1,
+              "rest": 75,
+              "sets": 6
+            },
+            "exId": "lateral-bound",
+            "name": "Lateral Bound",
+            "note": "فرود رو محکم بگیر، طرف‌ها رو عوض کن.",
+            "type": "standard",
+            "intent": "max intent",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "⚡",
+        "rest": 45,
+        "title": "Springs",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10,
+              "sets": 3
+            },
+            "exId": "pogo-jump",
+            "name": "Pogo Jump",
+            "type": "standard",
+            "intent": "fast turnover",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "sets": 2
+            },
+            "exId": "lateral-line-hop",
+            "name": "Lateral Line Hop",
+            "type": "standard",
+            "intent": "fast turnover",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "on-court",
+    "countsAs": "strength",
+    "duration": "30 min",
+    "focusTag": "فرود و پایه‌ی پرش",
+    "equipment": "Bodyweight"
+  }
 }

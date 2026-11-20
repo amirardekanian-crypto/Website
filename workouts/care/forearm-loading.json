@@ -146,5 +146,155 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "forearm-loading",
+    "intro": [
+      "چیزی که توی چند هفته به آرنج دردناک کمک می‌کنه بار گذاشتنه، برای همین این جلسه آروم و سبکه. Racket Arm که اون هم توی لیست مراقبته، یه رول و کشش کوتاهه. به بازو بار نمی‌ده، ولی این یکی می‌ده.",
+      "بلوک Take the Edge Off هر روزی اوکیه، و قبل از بازی به‌صورت دو نگه‌داشتن با شدت ۶. بلوک Load It رو بعد از ضربه زدن یا توی روزی که نمی‌زنی انجام بده، با حداقل ۴۸ ساعت فاصله. یه لبه‌ی نیمکت یا میز لازم داری که ساعدت رو روش بذاری، و یه وزنه‌ی سبک برای توی دست، مثل دمبل یک یا دو کیلویی یا یه بطری پر آب. اگه یه ست آسون‌تر از ۷ بود، اول پایین آوردن رو آهسته‌تر کن، و فقط وقتی سنگین‌تر برو که آرنجت صبح بعد آروم بوده. تا وقتی آروم نشده، حمل و گرفتن سنگین رو از روزت بذار بیرون. اگه بعد از حدود شش هفته بهتر نشد، برو پیش فیزیوتراپ؛ اگه بدتر می‌شه یا زودتر از قبل شروع می‌شه، زودتر برو."
+    ],
+    "title": "Forearm Forge",
+    "before": [
+      {
+        "text": "آرنج یا مچ دردناکی که دکتر یا فیزیوتراپ دیده و گفته می‌تونی تمرین کنی. برای درد بیرون یا داخل آرنج ساخته شده. اگه درد توی خود مفصل مچ باشه، وزنه رو توی محدوده‌ای نگه دار که آروم می‌مونه.",
+        "label": "برای کیه"
+      },
+      {
+        "text": "گز‌گز یا بی‌حسی توی انگشت‌ها، گریپی که یهو می‌ره یا چیزها از دستت می‌افتن، درد بعد از زمین خوردن یا پیچ خوردن، ورم، آرنجی که قفل می‌شه یا صاف نمی‌شه، یا دردی که شب بیدارت می‌کنه.",
+        "label": "بایست و بذار معاینه بشه"
+      },
+      {
+        "text": "یه کم درد کشیدن اوکیه. درد تیز نه، و دردی که توی یه ست بیشتر می‌شه یا صبح بعد بدتره هم نه. اگه بیشتر می‌شه، اون حرکت رو قطع کن. اگه تیزه، جلسه رو قطع کن.",
+        "label": "وقتی تمرین می‌کنی"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🚶",
+        "title": "Warm the Arm",
+        "exercises": [
+          {
+            "rx": {
+              "time": "4 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "arm-circles",
+            "name": "Arm Circles",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "wrist-circles",
+            "name": "Wrist Circles",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 15
+            },
+            "exId": "wrist-flexion-extension",
+            "name": "Wrist Flexion-Extension",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "60s"
+            },
+            "exId": "forearm-self-massage",
+            "name": "Forearm Self-Massage",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🛡️",
+        "title": "Take the Edge Off",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "rest": 30,
+              "sets": 4,
+              "time": "45s",
+              "tempo": "Iso"
+            },
+            "exId": "dumbbell-wrist-extension",
+            "name": "Dumbbell Wrist Extension",
+            "note": "سمت دردناک رو کار کن، و توی روز عود کردن فقط همین بلوک رو با شدت ۶ بزن و جلسه رو تموم‌شده ثبت نکن.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💪",
+        "title": "Load It",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 12,
+              "rest": 40,
+              "sets": 3,
+              "tempo": "4-0-1-0"
+            },
+            "exId": "single-arm-eccentric-wrist-extension",
+            "name": "Single-Arm Eccentric Wrist Extension",
+            "note": "سمت دردناک رو کار کن، و اگه آرنجت صبح بعد بدتر از قبل از شروع بود، دفعه‌ی بعد از هر حرکت این بلوک یه ست کم کن، و اگه بعدش هم بدتر بود، بذار معاینه‌ش کنن.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 12,
+              "rest": 30,
+              "sets": 2,
+              "tempo": "3-0-1-0"
+            },
+            "exId": "dumbbell-wrist-flexion",
+            "name": "Dumbbell Wrist Flexion",
+            "note": "سمت دردناک.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 10,
+              "rest": 20,
+              "sets": 2
+            },
+            "exId": "dumbbell-forearm-rotation",
+            "name": "Dumbbell Forearm Rotation",
+            "note": "سمت دردناک.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "care",
+    "countsAs": "mobility",
+    "duration": "25 min",
+    "focusTag": "درد آرنج و مچ",
+    "equipment": "Dumbbells"
+  }
 }

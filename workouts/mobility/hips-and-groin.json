@@ -101,5 +101,110 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "hips-and-groin",
+    "intro": [
+      "لگن و کشاله، که تنیس و پدل بیشتر از هر جای دیگه‌ای بهش فشار میارن. هر توپ دور، هر فورهند با پای باز و هر لانج به سمت تور یعنی عضله نزدیک‌کننده تو حالت کشیده زیر بار.",
+      "این جلسه همون دامنه حرکتی رو تمرین می‌ده، به‌جای اینکه امیدوار باشی وقتی توپ رسید داشته باشیش. Cossack squat وسط جلسه نزدیک‌ترین چیز تو باشگاه به یه توپ دفاعی دوره، و همون حالتیه که اگه اونجا قوی نباشی کشاله تو همونجا پاره می‌شه."
+    ],
+    "title": "Low and Wide",
+    "before": [
+      {
+        "text": "کشاله‌ای که سفته، نه کشاله‌ای که کشیده شده.",
+        "label": "برای کیه"
+      },
+      {
+        "text": "اگه تو چند ماه گذشته کشاله‌ت کشیده شده، موقع هل دادن می‌گیره، تو استخوان شرمگاهی یا پایین شکمت درد داری، یا تو کشاله یه برآمدگی حس می‌کنی. همین‌طور اگه تو حالت‌های عمیق جلوی لگن یه نیشگون تیز می‌گیری که تکرار می‌شه.",
+        "label": "وایستا و بذار معاینه‌ش کنن"
+      },
+      {
+        "text": "خسته بودن یا یه کم درد داشتن اشکالی نداره. اگه تیزه، تو یه نقطه‌ست، یا صبح اول وقت بدتره، یعنی عقب بکش و بذار معاینه‌ش کنن.",
+        "label": "وقتی تمرین می‌کنی"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🦵",
+        "title": "Groin",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "frog-stretch",
+            "name": "Frog Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "adductor-rock-back",
+            "name": "Adductor Rock Back",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🎾",
+        "title": "Wide Stance",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "cossack-squat",
+            "name": "Cossack Squat",
+            "note": "فقط تا جایی پایین برو که بدون لرزش برگردی بالا.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "lateral-lunge",
+            "name": "Lateral Lunge",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Front of the Hip",
+        "exercises": [
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "half-kneeling-hip-flexor-with-overhead-reach",
+            "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "time": "90 sec"
+            },
+            "exId": "deep-squat-hold",
+            "name": "Deep Squat Hold",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "mobility",
+    "countsAs": "mobility",
+    "duration": "15 min",
+    "focusTag": "لگن و کشاله",
+    "equipment": "Bodyweight"
+  }
 }

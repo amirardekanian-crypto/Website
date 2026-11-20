@@ -161,5 +161,170 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "bodyweight-strength",
+    "intro": [
+      "کل بدن فقط با زمین. ساخته شده برای اتاق هتل، پارک، یا هفته‌ای که باشگاه نیست.",
+      "پاها جلو می‌افتن، پرس سبک می‌مونه، و یه ست prone raise هست تا تعادل همه پرس‌هایی رو که شونه‌ت تو زمین می‌زنه برقرار کنه."
+    ],
+    "title": "Ground Work",
+    "before": [
+      {
+        "text": "زانو، مچ پا، لگن، شونه یا مچ دستت درد داره، یا تو یه ماه گذشته آسیب دیدی؟ اول بذار معاینه‌ش کنن.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا تلق ناگهانی.",
+        "label": "وایستا و بذار چکش کنن"
+      },
+      {
+        "text": "درد قفسه سینه، سرگیجه، ضربان قلبی که تند می‌زنه یا جا می‌اندازه، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی بذار معاینه‌ش کنن. بهت گفتن مراقب ورزش سنگین باش؟ اول با دکترت چک کن.",
+        "label": "همین الان وایستا"
+      },
+      {
+        "text": "از هر حرکت دو ست بزن و ببین دو روز بعد چه حسی داری.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "exId": "march-in-place",
+            "name": "March in Place",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 12,
+              "sets": 2
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "sets": 2
+            },
+            "exId": "bodyweight-squat",
+            "name": "Squat",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "arm-circles",
+            "name": "Arm Circles",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 5
+            },
+            "exId": "inchworm",
+            "name": "Inchworm",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🎯",
+        "title": "Primary",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10,
+              "rest": 90,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "split-squat",
+            "name": "Split Squat",
+            "note": "اگه سخت‌ترش رو می‌خوای، موقع پایین اومدن سه ثانیه وقت بذار.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "rest": 75,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "single-leg-glute-bridge",
+            "name": "Single-Leg Glute Bridge",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💪",
+        "rest": 60,
+        "title": "Accessory",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 8,
+              "sets": 3
+            },
+            "exId": "push-up",
+            "name": "Push-Up",
+            "note": "اگه نمی‌تونی هر هشت تا رو تو یه خط نگه داری، دست‌ها رو روی پله یا دیوار بذار.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "8 each shape",
+              "sets": 3
+            },
+            "exId": "prone-y-t-raise",
+            "name": "Prone Y-T Raise",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧱",
+        "title": "Core",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 8,
+              "rest": 45,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "dead-bug",
+            "name": "Dead Bug",
+            "note": "دامنه رسیدن رو کوتاه کن، نه اینکه بذاری کمر بلند بشه.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "strength",
+    "countsAs": "strength",
+    "duration": "30 min",
+    "focusTag": "قدرت کل بدن، بدون وسیله",
+    "equipment": "Bodyweight"
+  }
 }

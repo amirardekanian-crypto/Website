@@ -162,5 +162,171 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "bodyweight-intervals",
+    "intro": [
+      "کاندیشنینگ فقط با یه زمین، به همون شکلی که یه رالی ساخته می‌شه: کوتاه و سخت، بعد استراحت، بعد دوباره.",
+      "چهار راند چهار حرکتی با نود ثانیه استراحت بینشون. استراحت بخشی از جلسه‌ست، کوتاهش کنی چیز دیگه‌ای رو تمرین می‌دی."
+    ],
+    "title": "Floor Engine",
+    "before": [
+      {
+        "text": "مچ پا، زانو، ساق، همسترینگ، کشاله‌ی ران یا آشیل دردناک، یا آسیب توی ماه گذشته؟ اول بذار دکتر ببینه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای ناگهانی.",
+        "label": "وایسا و معاینه شو"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی، حتماً بذار دکتر ببینه. بهت گفتن با ورزش سخت مواظب باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "خیلی بیشتر از معمول درد داری یا ادرارت تیره شده؟ همون روز معاینه شو.",
+        "label": "یکی دو روز بعد"
+      },
+      {
+        "text": "یه زمین خالی و ضدلغزش و هیچ چیزی بالای سرت که بخوره بهش، مثل پنکه یا تیر کوتاه سقف. جای بالای سر نداری؟ Squat Jump رو به‌شکل یه Squat تند انجام بده.",
+        "label": "فضا رو چک کن"
+      },
+      {
+        "text": "مچ دستت توی Mountain Climber درد می‌گیره؟ به‌جاش سر جا قدم بزن.",
+        "label": "موقع تمرین"
+      },
+      {
+        "text": "۴۸ ساعت فاصله از مسابقه و وزنه‌ی سنگین پایین‌تنه.",
+        "label": "دور بمون"
+      },
+      {
+        "text": "دو راند بزن و همون‌جا تموم کن. باز هم حساب می‌شه.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "exId": "march-in-place",
+            "name": "March in Place",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "bodyweight-squat",
+            "name": "Squat",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "reverse-lunge",
+            "name": "Reverse Lunge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6
+            },
+            "exId": "inchworm",
+            "name": "Inchworm",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🫀",
+        "title": "Conditioning",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 90,
+              "rounds": 4
+            },
+            "name": "Repeat-Effort Circuit",
+            "type": "circuit",
+            "items": [
+              {
+                "rx": {
+                  "time": "20 seconds"
+                },
+                "exId": "squat-jump",
+                "name": "Squat Jump"
+              },
+              {
+                "rx": {
+                  "time": "20 seconds"
+                },
+                "exId": "mountain-climber",
+                "name": "Mountain Climber"
+              },
+              {
+                "exId": "reverse-lunge",
+                "name": "Reverse Lunge",
+                "detail": "۲۰ ثانیه، یکی در میون"
+              },
+              {
+                "rx": {
+                  "time": "20 seconds"
+                },
+                "exId": "fast-feet",
+                "name": "Fast Feet"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Cool-Down",
+        "exercises": [
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "cues": {
+              "bad": [
+                "نفس‌های زورکی و بزرگ"
+              ],
+              "good": [
+                "با بینی ۴ ثانیه نفس بگیر، ۶ ثانیه بده بیرون",
+                "با هر بازدم شونه‌ها بیفتن پایین"
+              ]
+            },
+            "name": "Nasal Breathing",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "conditioning",
+    "countsAs": "strength",
+    "duration": "20 min",
+    "focusTag": "کاندیشنینگ با تلاش تکراری",
+    "equipment": "Bodyweight"
+  }
 }

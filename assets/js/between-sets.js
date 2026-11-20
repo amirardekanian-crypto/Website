@@ -1,3 +1,5 @@
+// The app in Farsi (2026-11-20): words drawn on the canvas go through the app's translator (assets/js/i18n.js); English as written.
+var _aaT = function (s) { return (window.AAI18N && window.AAI18N.t) ? window.AAI18N.t(s) : s; };
 // Between Sets: a tennis game for the rest between gym sets (2026-10-18; Amir: a game for his tennis and padel players to
 // play while the rest timer runs). You against Amir, a Fast4 set (first to 4 games, a deciding point at deuce, a tiebreak to 5 at
 // 3-3). The match is saved after every point, so one set lasts about one workout and a rest picks it up where the last one stopped.
@@ -2277,9 +2279,9 @@
       const ty = p[1] - k * q.rise;
       x.globalAlpha = a;
       x.lineWidth = 4; x.strokeStyle = q.clay ? 'rgba(199,85,47,.95)' : 'rgba(6,30,22,.75)';
-      x.strokeText(q.text, p[0], ty);
+      x.strokeText(_aaT(q.text), p[0], ty);
       x.fillStyle = '#FBF8F2';
-      x.fillText(q.text, p[0], ty);
+      x.fillText(_aaT(q.text), p[0], ty);
       x.globalAlpha = 1;
     }
   };
@@ -2323,9 +2325,9 @@
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = '700 13px ' + FD;
     x.fillStyle = 'rgba(244,239,230,.9)';
-    x.fillText(sf.mark ? 'MARK CHECK' : 'LINE CHECK', cx, cy - R - 12);
+    x.fillText(_aaT(sf.mark ? 'MARK CHECK' : 'LINE CHECK'), cx, cy - R - 12);
     if (age > 0.75) {
-      const v = mc.inn ? 'IN' : 'OUT';
+      const v = _aaT(mc.inn ? 'IN' : 'OUT');
       x.font = 'italic 700 30px ' + FD;
       x.lineWidth = 5; x.strokeStyle = mc.inn ? 'rgba(14,74,54,.95)' : 'rgba(199,85,47,.95)';
       x.strokeText(v, cx, cy + R + 22);

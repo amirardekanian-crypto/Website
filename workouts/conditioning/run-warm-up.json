@@ -174,5 +174,183 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "run-warm-up",
+    "intro": [
+      "پونزده دقیقه که از سرد بودن می‌رسونتت به آماده‌ی دویدن. بالا بردن دما، موبیلایز، فعال‌سازی، بعد آماده‌سازی.",
+      "یه دور پیش می‌ره و راندها تکرار نمی‌شن، و هر تکه یه قدم نزدیک‌تره به سرعت دویدن. به ترتیب انجامشون بده، و بلوک آخر رو ردش نکن؛ همونه که اولین مایل رو واقعاً آسون می‌کنه."
+    ],
+    "title": "Rolling Start",
+    "before": [
+      {
+        "text": "اگه همین الان ساق، پا، مچ یا زانوت درد می‌کنه، به‌جاش راه برو و بذار معاینه بشه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای تق ناگهانی.",
+        "label": "بایست و بذار چک بشه"
+      },
+      {
+        "text": "حدود بیست متر زمین صاف و ضدلغزش که چیزی روش نباشه.",
+        "label": "جا رو چک کن"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از تمرین بعدی بذار معاینه بشه. بهت گفتن مراقب ورزش سنگین باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Raise",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 min"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Mobilize",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "walking-lunge-with-overhead-reach",
+            "name": "Walking Lunge with Overhead Reach",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "lateral-lunge",
+            "name": "Lateral Lunge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "hamstring-scoop",
+            "name": "Hamstring Scoop",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "note": "جلو به عقب.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "note": "پهلو به پهلو.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "⚡",
+        "title": "Activate",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 45,
+              "rounds": 2
+            },
+            "name": "Ankle & Hamstring Primer",
+            "type": "circuit",
+            "items": [
+              {
+                "rx": {
+                  "reps": 10,
+                  "side": true
+                },
+                "exId": "single-leg-calf-raise",
+                "name": "Single-Leg Calf Raise"
+              },
+              {
+                "rx": {
+                  "reps": 6,
+                  "side": true
+                },
+                "exId": "single-leg-romanian-deadlift",
+                "name": "Single-Leg Romanian Deadlift"
+              },
+              {
+                "rx": {
+                  "reps": 20
+                },
+                "exId": "pogo-jump",
+                "name": "Pogo Jump"
+              },
+              {
+                "rx": {
+                  "distance": "20m"
+                },
+                "exId": "a-skip",
+                "name": "A-Skip"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "icon": "👟",
+        "title": "Prime",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 45,
+              "sets": 3,
+              "time": "15 s"
+            },
+            "exId": "build-up-run",
+            "name": "Build-Up Run",
+            "note": "این پل بین گرم بودن و دویدنه؛ ردش نکن.",
+            "type": "standard",
+            "intent": "fast but relaxed",
+            "videoUrl": null
+          },
+          {
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "note": "زون ۲.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "conditioning",
+    "countsAs": "none",
+    "duration": "15 min",
+    "focusTag": "گرم کردن برای دویدن زون ۲",
+    "equipment": "Bodyweight"
+  }
 }

@@ -182,5 +182,191 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "bodyweight-band-strength",
+    "intro": [
+      "پا و باسن با کش و یه صندلی. باشگاه لازم نیست، و اگه پایین آوردن رو آهسته کنی حسابی می‌گیره.",
+      "همه‌جا ست‌های ساده، هیچ‌چیز سوپرست نیست. دو حرکت تک‌پا خود جلسه‌ان، برای همین استراحت کامل و تمرکز کامل می‌گیرن."
+    ],
+    "title": "Banded Lower Burner",
+    "before": [
+      {
+        "text": "مچ پا، زانو، لگن، همسترینگ، کشاله یا آشیل دردناک، یا آسیبی توی ماه گذشته؟ اول بذار معاینه بشه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای تق ناگهانی.",
+        "label": "بایست و بذار چک بشه"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از تمرین بعدی بذار معاینه بشه. بهت گفتن مراقب ورزش سنگین باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "خیلی بیشتر از معمول درد داری، یا ادرارت تیره شده؟ همون روز بذار چک بشه.",
+        "label": "یکی دو روز بعد"
+      },
+      {
+        "text": "اول کش رو از نظر بریدگی و پارگی چک کن. کشی که پاره بشه می‌تونه بخوره توی صورتت.",
+        "label": "وسیله رو چک کن"
+      },
+      {
+        "text": "۴۸ ساعت از جلسه‌ی سخت پای دیگه فاصله بگیر، و روز قبل مسابقه نه.",
+        "label": "فاصله بگیر"
+      },
+      {
+        "text": "دو ست اسپلیت اسکوات و ددلیفت تک‌پا بزن و ببین دو روز بعد چه حسی داری.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "march-in-place",
+            "name": "March in Place",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 15,
+              "sets": 2
+            },
+            "exId": "banded-glute-bridge",
+            "name": "Banded Glute Bridge",
+            "note": "مینی‌باند بالای زانو.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "10 Steps",
+              "side": true
+            },
+            "exId": "banded-lateral-walk",
+            "name": "Banded Lateral Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "tempo": "3-0-1-0"
+            },
+            "exId": "bodyweight-squat",
+            "name": "Squat",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 4,
+              "side": true
+            },
+            "exId": "worlds-greatest-stretch",
+            "name": "World's Greatest Stretch",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🎯",
+        "rest": 90,
+        "title": "Primary",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": "7-8",
+              "reps": 8,
+              "sets": 3,
+              "side": true,
+              "tempo": "3-0-1-0"
+            },
+            "exId": "bulgarian-split-squat",
+            "name": "Bulgarian Split Squat",
+            "note": "ست‌های ساده با استراحت کامل: یه پا رو تموم کن، استراحت کن، بعد پای دیگه.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 8,
+              "sets": 3,
+              "side": true,
+              "tempo": "3-0-1-0"
+            },
+            "exId": "single-leg-romanian-deadlift",
+            "name": "Single-Leg Romanian Deadlift",
+            "note": "اگه محدودکننده تعادله نه همسترینگ، نوک انگشت‌ها رو روی دیوار بذار.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💪",
+        "title": "Accessory",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 10,
+              "rest": 75,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "reverse-lunge",
+            "name": "Reverse Lunge",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 12,
+              "rest": 60,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "banded-single-leg-glute-bridge",
+            "name": "Banded Single-Leg Glute Bridge",
+            "note": "باند بالای زانو.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧱",
+        "title": "Core",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 45,
+              "sets": 3,
+              "side": true,
+              "time": "30 sec"
+            },
+            "exId": "side-plank",
+            "name": "Side Plank",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "strength",
+    "countsAs": "strength",
+    "duration": "40 min",
+    "focusTag": "پا و باسن، حداقل وسیله",
+    "equipment": "Bands"
+  }
 }

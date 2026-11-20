@@ -1191,6 +1191,14 @@ Separate from athlete programmes (`data/*.json`), the **Library tab → Train** 
 shared library of extra, on-demand sessions available to **every** user. These
 live in their own `workouts/` folder so they never mix with athlete data.
 
+**`fa` — the item in Farsi** (2026-11-20, Amir: *"the libraries and playbook should be available in farsi and everything
+should be written in both languages"*). Every Library item, workout and article, carries its Farsi as `fa`: a FULL copy of
+the item in which only the words an athlete reads differ (a workout's `intro`, `before`, `focusTag`, exercise `note`, circuit
+item `note` / `detail`, `why.text`; an article's `title` and its blocks' words). Ids, titles of workouts, block titles,
+exercise names, `exId` and `rx` stay exactly the English. program.html shows `fa` on a Farsi phone (`_loadLibManifests()`).
+Checked by `scripts/i18n/check_library_fa.js` (pre-commit guard 30 for workout files); an article's comes from its
+`.fa.json` when `scripts/publish_article_sql.py` publishes it.
+
 ### Folder layout
 
 ```

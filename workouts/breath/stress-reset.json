@@ -96,5 +96,105 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "stress-reset",
+    "intro": [
+      "برای روزهایی که بدنت خوبه ولی سرت نه. کار، سفر، امتحان، یه هفته بد.",
+      "اول یه کم حرکت تا حواست یه جا بره، بعد پنج دقیقه Box breathing، بعدش دو دقیقه بازدم‌های بلند که واقعاً آرومت کنن."
+    ],
+    "title": "Switch Off",
+    "before": [
+      {
+        "text": "سرگیجه گرفتی یا دست و صورتت سوزن‌سوزن می‌شه؟ شمردن رو ول کن و عادی نفس بکش. هیچ‌وقت تو آب یا موقع رانندگی نفستو حبس نکن.",
+        "label": "سبکی سر"
+      },
+      {
+        "text": "اگه بیشتر روزها بی‌حال یا مضطربی، یا هفته‌هاست درست نخوابیدی، با دکترت حرف بزن.",
+        "label": "بیشتر از یه هفته بد"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🧘",
+        "title": "Loosen",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "cat-cow",
+            "name": "Cat-Cow",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "thread-the-needle",
+            "name": "Thread the Needle",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "open-book",
+            "name": "Open Book",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💨",
+        "title": "Breathe",
+        "exercises": [
+          {
+            "rx": {
+              "time": "5 minutes"
+            },
+            "cues": {
+              "bad": [
+                "با تلویزیون روشن انجامش بدی"
+              ],
+              "good": [
+                "صاف بشین یا دراز بکش؛ چهار تا دم، چهار تا نگه‌دار، چهار تا بازدم، چهار تا نگه‌دار",
+                "اگه می‌تونی، همه‌ش از بینی نفس بکش"
+              ]
+            },
+            "name": "Box Breathing",
+            "note": "۴ تا دم، ۴ تا نگه‌دار، ۴ تا بازدم، ۴ تا نگه‌دار. اگه ذهنت پرت شد، بفهم و برگرد سر شمارش؛ خود تمرین همینه، نه شکست تو تمرین.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🌙",
+        "title": "Settle",
+        "exercises": [
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "exId": "childs-pose",
+            "name": "Child's Pose",
+            "note": "۴ تا دم، ۸ تا بازدم. Box breathing آرومت می‌کنه؛ بازدم بلنده که پایینت میاره.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "breath",
+    "countsAs": "breathe",
+    "duration": "12 min",
+    "focusTag": "بعد از یه روز سخت",
+    "equipment": "Bodyweight"
+  }
 }

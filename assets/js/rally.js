@@ -1,3 +1,5 @@
+// The app in Farsi (2026-11-20): words drawn on the canvas go through the app's translator (assets/js/i18n.js); English as written.
+var _aaT = function (s) { return (window.AAI18N && window.AAI18N.t) ? window.AAI18N.t(s) : s; };
 // Off the Glass: a one-thumb game for the rest between sets (2026-10-17; Amir: "a game like this for my app, to use during
 // rest time", after Matt Cannon's air hockey pen). Air hockey on a padel court seen from above: the ball comes off the glass,
 // your racket is the bottom one, Amir's is the top one, and a point is the ball through the gap in the other end's wall.
@@ -567,10 +569,10 @@
     g.fillText(String(S.score.you), W / 2, mid() + (B() - mid()) * 0.5);
     g.font = `700 11px 'Space Mono', monospace`; g.fillStyle = 'rgba(255,255,255,.45)';
     g.textAlign = 'left';
-    g.fillText('AMIR', L() + 10, mid() - 14);
-    g.fillText('YOU', L() + 10, mid() + 14);
+    g.fillText(_aaT('AMIR'), L() + 10, mid() - 14);
+    g.fillText(_aaT('YOU'), L() + 10, mid() + 14);
     g.textAlign = 'right';
-    if (S.rally > 1) g.fillText(`RALLY ${S.rally}`, R() - 10, mid() + 14);
+    if (S.rally > 1) g.fillText(_aaT(`RALLY ${S.rally}`), R() - 10, mid() + 14);
     // the glass, with a gap at each end
     const g1 = W / 2 - S.gw / 2, g2 = W / 2 + S.gw / 2;
     g.strokeStyle = C.glass; g.lineWidth = 4; g.lineCap = 'round';
@@ -623,7 +625,7 @@
     if (S.banner && !(S.m && S.m.over)) {   // not behind the Full time box: the last point's banner would show round its edges
       const t = S.banner.t, d = S.banner.dur || 1.1, a = t < 0.15 ? t / 0.15 : t > d - 0.3 ? Math.max(0, 1 - (t - (d - 0.3)) / 0.3) : 1;
       g.globalAlpha = a; g.fillStyle = S.banner.c; g.textAlign = 'center';
-      const word = S.banner.text.toUpperCase(), fam = `'Barlow Condensed', 'AA Barlow Condensed', 'Arial Narrow', sans-serif`;
+      const word = _aaT(S.banner.text).toUpperCase(), fam = `'Barlow Condensed', 'AA Barlow Condensed', 'Arial Narrow', sans-serif`;
       g.font = `900 ${Math.round(W * 0.13)}px ${fam}`;
       // a long banner ("Amir off the glass +2", "Play resumes · You 6, Amir 4") shrinks to fit the court's width, never under 22 px
       const wide = g.measureText(word).width, room = W - 28;
@@ -634,7 +636,7 @@
     // the first serve's hint
     if (S.hint) {
       g.fillStyle = 'rgba(255,255,255,.8)'; g.textAlign = 'center';
-      const lines = ['Drag in your half. Hit it through Amir\'s gap.', `First to ${WIN_AT}. The match waits for your next rest.`];
+      const lines = ['Drag in your half. Hit it through Amir\'s gap.', `First to ${WIN_AT}. The match waits for your next rest.`].map(_aaT);
       g.font = `600 15px 'Barlow', sans-serif`;
       const wide = Math.max(g.measureText(lines[0]).width, g.measureText(lines[1]).width), room = W - 24;
       if (wide > room) g.font = `600 ${Math.max(12, Math.floor(15 * room / wide))}px 'Barlow', sans-serif`;   // a narrow phone: smaller, never under 12 px

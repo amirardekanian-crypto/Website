@@ -184,5 +184,193 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "first-step-speed",
+    "intro": [
+      "بیست و پنج دقیقه روی دو قدم اول. ده دقیقه‌ش گرم کردنه و الکی نیست، چون با باسن سرد نمی‌شه اسپرینت زد.",
+      "بین هر تلاش استراحت کامل. این یه جلسه‌ی سرعته، پس کیفیت همه‌ی ماجراست. همین که استراحت رو کم کنی، می‌شه کاندیشنینگ و دیگه سرعت رو تمرین نمی‌ده."
+    ],
+    "title": "First-Step Speed",
+    "before": [
+      {
+        "text": "مچ پا، زانو، ساق، همسترینگ، کشاله‌ی ران یا آشیل دردناک، یا آسیب توی ماه گذشته؟ اول بذار دکتر ببینه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای ناگهانی.",
+        "label": "وایسا و معاینه شو"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی، حتماً بذار دکتر ببینه. بهت گفتن با ورزش سخت مواظب باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "تا حالا همسترینگت پاره شده یا از آسیب زانو یا مچ پا برمی‌گردی؟ از کسی که درمانت کرده بپرس اسپرینت اشکال نداره یا نه.",
+        "label": "آسیب قبلی"
+      },
+      {
+        "text": "حدود بیست و پنج متر زمین صاف و ضدلغزش و کفش زمین. هر فاصله رو با چسب یا خط علامت بزن، نه با مخروط یا کیسه‌ای که ممکنه پات بره روش.",
+        "label": "فضا رو چک کن"
+      },
+      {
+        "text": "۴۸ ساعت فاصله از یه جلسه‌ی سخت دیگه، و نه روز قبل از مسابقه.",
+        "label": "دور بمون"
+      },
+      {
+        "text": "به‌جای شش، سه اسپرینت اسپلیت‌استپ بزن و به‌جای چهار، دو فالینگ استارت.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "note": "جلو و عقب، بعد چپ و راست.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "lateral-lunge",
+            "name": "Lateral Lunge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 4,
+              "side": true
+            },
+            "exId": "worlds-greatest-stretch",
+            "name": "World's Greatest Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "sets": 2,
+              "distance": "15 m"
+            },
+            "exId": "a-skip",
+            "name": "A-Skip",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "sets": 2
+            },
+            "exId": "pogo-jump",
+            "name": "Pogo Jump",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "20 m, 60% → 80% → 90%",
+              "sets": 3
+            },
+            "exId": "build-up-run",
+            "name": "Build-Up Run",
+            "note": "این پل بین گرم شدن و اسپرینته، ردش نکن.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "⚡",
+        "title": "Acceleration",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 60,
+              "sets": 6,
+              "distance": "5 m"
+            },
+            "exId": "split-step-to-sprint",
+            "name": "Split-Step to Sprint",
+            "note": "بین هر کدوم استراحت کامل، این جلسه‌ی سرعته، نه کاندیشنینگ.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 75,
+              "sets": 4,
+              "distance": "10 m"
+            },
+            "exId": "falling-start",
+            "name": "Falling Start",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "👟",
+        "title": "Footwork",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 60,
+              "rounds": 3
+            },
+            "name": "Baseline Footwork",
+            "type": "circuit",
+            "items": [
+              {
+                "exId": "split-step-to-sprint",
+                "name": "Split-Step to Sprint",
+                "note": "یه هل محکم، بعد ثابت.",
+                "detail": "۶ تکرار، یکی در میون"
+              },
+              {
+                "rx": {
+                  "reps": 4,
+                  "side": true
+                },
+                "exId": "lateral-shuffle",
+                "name": "Lateral Shuffle"
+              },
+              {
+                "rx": {
+                  "reps": 4
+                },
+                "exId": "backward-to-forward-transition",
+                "name": "Backward-to-Forward Transition"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "category": "on-court",
+    "countsAs": "strength",
+    "duration": "25 min",
+    "focusTag": "شتاب و قدم اول",
+    "equipment": "Court"
+  }
 }

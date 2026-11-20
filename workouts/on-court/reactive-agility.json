@@ -141,5 +141,150 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "reactive-agility",
+    "intro": [
+      "چابکی‌ای که نمی‌شه از قبل تمرینش کرد. هر تمرین اینجا مجبورت می‌کنه به یه چیزی واکنش نشون بدی، نه اینکه یه الگوی از قبل بلد رو بدوی.",
+      "همه‌ش تنهایی جواب می‌ده، با دیوار یا توپی که خودت ول می‌کنی. پرتاب‌ها رو عوض کن که نتونی پرش توپ رو حدس بزنی؛ لحظه‌ای که قابل پیش‌بینی بشه، تمرین فوت‌ورک می‌شه، نه واکنش."
+    ],
+    "title": "Split Second",
+    "before": [
+      {
+        "text": "مچ پا، زانو، ساق، همسترینگ، کشاله یا آشیل درد داره، یا تو یه ماه گذشته آسیب دیدی؟ اول بذار معاینه‌ش کنن.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا تلق ناگهانی.",
+        "label": "وایستا و بذار چکش کنن"
+      },
+      {
+        "text": "درد قفسه سینه، سرگیجه، ضربان قلبی که تند می‌زنه یا جا می‌اندازه، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی بذار معاینه‌ش کنن. بهت گفتن مراقب ورزش سنگین باش؟ اول با دکترت چک کن.",
+        "label": "همین الان وایستا"
+      },
+      {
+        "text": "دیواری که اجازه داری بهش توپ بزنی، کف تمیز و ضدلغزش دور و برت، و هیچ توپ دیگه‌ای روی زمین نباشه. پا گذاشتن روی یه توپ ول، راه آسونیه برای پیچ خوردن مچ پا.",
+        "label": "فضا رو چک کن"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "4 Lengths"
+            },
+            "exId": "lateral-shuffle",
+            "name": "Lateral Shuffle",
+            "note": "از خط سرویس تا خط سرویس.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "2 Lengths",
+              "side": true
+            },
+            "exId": "carioca",
+            "name": "Carioca",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "sets": 3
+            },
+            "exId": "split-step-bounce",
+            "name": "Split-Step Bounce",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "⚡",
+        "title": "Reaction",
+        "exercises": [
+          {
+            "rx": {
+              "reps": "5 Balls",
+              "rest": 60,
+              "sets": 6
+            },
+            "exId": "wall-feed-reaction",
+            "name": "Wall Feed Reaction",
+            "note": "شدت پرتاب رو عوض کن که نتونی پرش توپ رو حدس بزنی.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 3,
+              "rest": 45,
+              "sets": 4,
+              "side": true
+            },
+            "exId": "self-drop-drop-step",
+            "name": "Self-Drop Drop-Step",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "👟",
+        "title": "Quickness",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 60,
+              "rounds": 3
+            },
+            "name": "Line Drill",
+            "type": "circuit",
+            "items": [
+              {
+                "rx": {
+                  "time": "15 seconds"
+                },
+                "exId": "lateral-line-hop",
+                "name": "Lateral Line Hop"
+              },
+              {
+                "rx": {
+                  "time": "15 seconds"
+                },
+                "exId": "front-back-line-hop",
+                "name": "Front-Back Line Hop"
+              },
+              {
+                "rx": {
+                  "time": "20 seconds"
+                },
+                "exId": "shadow-change-of-direction",
+                "name": "Shadow Change of Direction"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "category": "on-court",
+    "countsAs": "strength",
+    "duration": "20 min",
+    "focusTag": "واکنش و چابکی",
+    "equipment": "Court"
+  }
 }

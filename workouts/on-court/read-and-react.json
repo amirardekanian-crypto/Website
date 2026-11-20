@@ -152,5 +152,161 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "read-and-react",
+    "intro": [
+      "توی زمین تو انتخاب نمی‌کنی کِی حرکت کنی. توپ برات انتخاب می‌کنه. هر تمرین اینجا با واکنش به توپی تموم می‌شه که کامل نمی‌تونی پیش‌بینیش کنی. از چهارتاشون سبک‌ترینه برای پاهات، سی و چهار واکنش، بیشترشون توی ست‌های چهارتایی پرتاب.",
+      "یه دیوار لازم داری که اجازه داشته باشی بهش توپ بزنی، و یه توپ. دیوار نداری، امروز این یکی رو ردش کن. برای بلوک آخر حدود شش متر از دیوار شروع کن. اول روز با پاهای تازه انجامش بده، قبل از ضربه زدن یا کاندیشنینگ، چون پای خسته باعث می‌شه دیر بخونی. ۴۸ ساعت از دویدن یا پرش سخت فاصله بگیر. روز قبل مسابقه اوکیه، ولی اون روز بلوک Back Away رو ردش کن. روز مسابقه نه. اگه دیر واکنش نشون می‌دی یا بیشتر خطا می‌کنی، جلسه رو همونجا تموم کن."
+    ],
+    "title": "Eyes First",
+    "before": [
+      {
+        "text": "مچ پا، زانو، ساق، همسترینگ، کشاله یا آشیل دردناک، یا آسیبی توی ماه گذشته؟ اول بذار معاینه بشه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای تق ناگهانی.",
+        "label": "بایست و بذار چک بشه"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از تمرین بعدی بذار معاینه بشه. بهت گفتن مراقب ورزش سنگین باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "حدود هشت متر زمین خالی پشت سرت که بتونی عقب بری، و چیزی که باهاش پات گیر کنه نباشه. توپ‌های دیگه رو توی کیف یا جیبت نگه دار، چون پا گذاشتن روی توپ ول، راه راحتیه برای پیچ خوردن مچ.",
+        "label": "جا رو چک کن"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "lateral-lunge",
+            "name": "Lateral Lunge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "4 Lengths"
+            },
+            "exId": "lateral-shuffle",
+            "name": "Lateral Shuffle",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "2 Lengths",
+              "side": true
+            },
+            "exId": "carioca",
+            "name": "Carioca",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6
+            },
+            "exId": "split-step-bounce",
+            "name": "Split-Step Bounce",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 45,
+              "sets": 3,
+              "distance": "20 m"
+            },
+            "exId": "build-up-run",
+            "name": "Build-Up Run",
+            "type": "standard",
+            "intent": "build 60-80-90",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "⚡",
+        "title": "Read It",
+        "exercises": [
+          {
+            "rx": {
+              "reps": "4 Throws",
+              "rest": 60,
+              "sets": 6
+            },
+            "exId": "wall-feed-reaction",
+            "name": "Wall Feed Reaction",
+            "note": "هر ست فاصله‌ت رو عوض کن.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 1,
+              "rest": 45,
+              "sets": 6
+            },
+            "exId": "self-drop-chase",
+            "name": "Self-Drop Chase",
+            "note": "یکی در میان طرف‌ها رو عوض کن.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "👟",
+        "title": "Back Away",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 1,
+              "rest": 75,
+              "sets": 4
+            },
+            "exId": "backpedal-and-turn",
+            "name": "Backpedal and Turn",
+            "note": "یکی در میان طرف‌ها رو عوض کن. دوتای اول رو با نصف سرعت بزن تا حسش دستت بیاد، بعد بالا ببر.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "on-court",
+    "countsAs": "strength",
+    "duration": "31 min",
+    "focusTag": "خوندن توپ از روی دیوار",
+    "equipment": "Court"
+  }
 }

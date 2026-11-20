@@ -179,5 +179,188 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "repeat-effort",
+    "intro": [
+      "یه نقطه حدود شش ثانیه طول می‌کشه. بعدش حدود بیست‌وپنج ثانیه تا نقطه‌ی بعدی وقت داری، و هر دو گیم یه بار، یه استراحت نود ثانیه‌ای داری. این جلسه همین شکل رو فشرده می‌کنه: شش سرعت، یه استراحت بلند، شش تای دیگه. تلاش بیست‌وچهارم همونیه که مهمه. هر گیم کارت خودش رو داره.",
+      "ده متر رفت و ده متر برگشت، با سریع‌ترین سرعتی که می‌تونی کنترل کنی، با یه چرخش سخت اون سر. بیست‌وپنج ثانیه بین سرعت‌ها و نود ثانیه بین گیم‌ها، پس نود رو با ساعت بگیر. اون بیست‌وپنج ثانیه خود جلسه‌ست، پس درازش نکن. بیست متر زمین صاف و خشک با گریپ واقعی لازم داری، با چند متر فضای خالی دو طرف، و یه چسب یا خط که سر دور رو نشون بده. کفش زمین یا کتونی با گریپ بپوش، و چمن خیس و کف صیقلی رو ردش کن. نقطه‌های پدل طولانی‌تره، پس بازیکن‌های پدل وقتی نسخه‌ی معمولی کنترل‌شده شد، رفت و برگشت رو دو بار می‌دوئن، حدود دوازده ثانیه."
+    ],
+    "title": "Deuce Point",
+    "before": [
+      {
+        "text": "مچ پا، زانو، ساق، همسترینگ، کشاله یا آشیل دردناک، یا آسیبی توی ماه گذشته؟ اول بذار معاینه بشه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای تق ناگهانی.",
+        "label": "بایست و بذار چک بشه"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از تمرین بعدی بذار معاینه بشه. بهت گفتن مراقب ورزش سنگین باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "خیلی بیشتر از معمول درد داری، یا ادرارت تیره شده؟ همون روز بذار چک بشه.",
+        "label": "یکی دو روز بعد"
+      },
+      {
+        "text": "۴۸ ساعت از مسابقه، از وزنه‌ی سنگین پایین‌تنه، از Hard Stop و Cut & Recover توی لیست On-Court، و از هر جلسه‌ی دویدن سخت دیگه، چه قبلش چه بعدش. توی هفته‌ی تورنمنت ردش کن.",
+        "label": "فاصله بگیر"
+      },
+      {
+        "text": "گیم اول رو با حدود سه‌چهارم سرعت بدو و بعد از دو گیم بایست.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "lateral-lunge",
+            "name": "Lateral Lunge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 4,
+              "side": true
+            },
+            "exId": "worlds-greatest-stretch",
+            "name": "World's Greatest Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 30,
+              "sets": 3,
+              "distance": "20 m"
+            },
+            "exId": "a-skip",
+            "name": "A-Skip",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 45,
+              "sets": 4,
+              "distance": "20 m"
+            },
+            "exId": "build-up-run",
+            "name": "Build-Up Run",
+            "note": "از آروم تا سریع. دوتای آخر رو به‌صورت ده متر رفت، یه چرخش با حدود سه‌چهارم سرعت و ده متر برگشت بدو.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🫀",
+        "rest": 25,
+        "title": "Games & Changeovers",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 9,
+              "sets": 6,
+              "distance": "20 m"
+            },
+            "exId": "shuttle-sprint",
+            "name": "Shuttle Sprint",
+            "note": "گیم ۱ از ۴: اگه چرخش‌هات شل شد، پات لیز خورد، چیزی تیر کشید یا سرعتت حسابی افت کرد، بعد از این گیم بایست و برو سراغ سرد کردن.",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 9,
+              "sets": 6,
+              "distance": "20 m"
+            },
+            "exId": "shuttle-sprint",
+            "name": "Shuttle Sprint",
+            "note": "گیم ۲ از ۴: اول نود ثانیه راه برو و نفس بکش، و اگه گیم قبل شل شد، تیر کشید یا حسابی کند شد، به‌جاش برو سراغ سرد کردن.",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 9,
+              "sets": 6,
+              "distance": "20 m"
+            },
+            "exId": "shuttle-sprint",
+            "name": "Shuttle Sprint",
+            "note": "گیم ۳ از ۴: اول نود ثانیه راه برو و نفس بکش، و اگه گیم قبل شل شد، تیر کشید یا حسابی کند شد، به‌جاش برو سراغ سرد کردن.",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 9,
+              "sets": 6,
+              "distance": "20 m"
+            },
+            "exId": "shuttle-sprint",
+            "name": "Shuttle Sprint",
+            "note": "گیم ۴ از ۴: اول نود ثانیه راه برو و نفس بکش، و اگه گیم قبل شل شد، تیر کشید یا حسابی کند شد، به‌جاش برو سراغ سرد کردن.",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Cool-Down",
+        "exercises": [
+          {
+            "rx": {
+              "time": "4 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "conditioning",
+    "countsAs": "strength",
+    "duration": "30 min",
+    "focusTag": "کاندیشنینگ بین نقطه‌ها",
+    "equipment": "Court"
+  }
 }

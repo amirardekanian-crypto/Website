@@ -198,5 +198,207 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "braking-and-cuts",
+    "intro": [
+      "چیزی رو که نمی‌تونی نگه داری، نمی‌تونی ببُری، و نگه داشتن خیلی بیشتر از رفتن هزینه داره. این جلسه روی پاهات سخته، و پهلو ترمز می‌کنه، که همون راه نگه داشتنه وقتی به بیرون کشیده می‌شی. بیست توقفه، هفده‌تاش با تمام سرعت، هرکدوم با استراحت خودش، و هیچ دویدن قبلش از ده متر بیشتر نیست. اگه هنوز نزدی، اول Landing Gear رو بزن، چون ترمز یه فرود ـه که باید نگهش داری.",
+      "یه زمین یا حدود بیست‌وپنج متر زمین صاف با گریپ واقعی لازم داری، و کفش زمین. سطح لغزنده جاییه که مچ پا می‌ره. هر فاصله رو با چسب یا خط علامت بزن، نه با مخروط یا کیسه‌ای که بشه رویش پا گذاشت. چند روز درد ران و باسن عادیه. اول روز تمرین با پاهای تازه انجامش بده. اگه یه توقف درازتر، پهن‌تر یا شل‌تر شد، یا پاهات کند و سنگین شدن، جلسه رو همونجا تموم کن."
+    ],
+    "title": "Hard Stop",
+    "before": [
+      {
+        "text": "مچ پا، زانو، ساق، همسترینگ، کشاله یا آشیل دردناک، یا آسیبی توی ماه گذشته؟ اول بذار معاینه بشه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای تق ناگهانی.",
+        "label": "بایست و بذار چک بشه"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از تمرین بعدی بذار معاینه بشه. بهت گفتن مراقب ورزش سنگین باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "خیلی بیشتر از معمول درد داری، یا ادرارت تیره شده؟ همون روز بذار چک بشه.",
+        "label": "یکی دو روز بعد"
+      },
+      {
+        "text": "تا حالا رباط زانوت پاره شده، یا از آسیب مچ پا برمی‌گردی؟ از کسی که درمانت کرده بپرس توقف‌ها و کات‌های سخت اوکیه یا نه.",
+        "label": "آسیب قبلی"
+      },
+      {
+        "text": "صبر کن تا درد از بین بره، و هیچ‌وقت کمتر از ۴۸ ساعت، قبل از یه جلسه‌ی دویدن سخت دیگه یا وزنه‌ی سنگین پا. دو روز از مسابقه فاصله بگیر، چه قبلش چه بعدش.",
+        "label": "فاصله بگیر"
+      },
+      {
+        "text": "توی دو بلوک آخر نصف تکرارها رو بزن و استراحت کامل رو بگیر.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "ankle-dorsiflexion-rocks",
+            "name": "Ankle Dorsiflexion Rocks",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "lateral-lunge",
+            "name": "Lateral Lunge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 3,
+              "side": true
+            },
+            "exId": "worlds-greatest-stretch",
+            "name": "World's Greatest Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "4 Lengths"
+            },
+            "exId": "lateral-shuffle",
+            "name": "Lateral Shuffle",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 60,
+              "sets": 3,
+              "distance": "20 m"
+            },
+            "exId": "build-up-run",
+            "name": "Build-Up Run",
+            "type": "standard",
+            "intent": "build 60-80-90",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 5,
+              "rest": 45,
+              "sets": 1
+            },
+            "exId": "snap-down",
+            "name": "Snap Down",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🛑",
+        "title": "Build the Brake",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 45,
+              "sets": 3,
+              "distance": "10 m"
+            },
+            "exId": "jog-in-two-step-stop",
+            "name": "Jog-In Two-Step Stop",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 75,
+              "sets": 3,
+              "distance": "10 m"
+            },
+            "exId": "sprint-to-two-step-stop",
+            "name": "Sprint to Two-Step Stop",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "👟",
+        "title": "Outside Foot",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 1,
+              "rest": 75,
+              "sets": 6
+            },
+            "exId": "lateral-run-to-outside-leg-stop",
+            "name": "Lateral Run to Outside-Leg Stop",
+            "note": "یکی در میان طرف‌ها رو عوض کن. دوتای اول رو با حدود سه‌چهارم سرعت بزن، بعد با تمام قدرت برو.",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🎾",
+        "title": "Plant and Go",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 1,
+              "rest": 75,
+              "sets": 4
+            },
+            "exId": "turn-and-go",
+            "name": "Turn and Go",
+            "note": "چرخش ۱۸۰ درجه، یکی در میان طرف‌ها.",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 1,
+              "rest": 60,
+              "sets": 4
+            },
+            "exId": "45-degree-cut",
+            "name": "45° Cut",
+            "note": "کات ۴۵ درجه، یکی در میان طرف‌ها.",
+            "type": "standard",
+            "intent": "max speed",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "on-court",
+    "countsAs": "strength",
+    "duration": "39 min",
+    "focusTag": "ترمز و چرخش با پای ثابت",
+    "equipment": "Court"
+  }
 }

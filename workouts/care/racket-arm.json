@@ -108,5 +108,117 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "racket-arm",
+    "intro": [
+      "دوازده دقیقه کار روی بازویی که ورزش رو بازی می‌کنه: ساعد، آرنج و شونه.",
+      "از ساعد شروع می‌کنیم، نه آرنج، چون تنیس البو واقعاً از اونجا شروع می‌شه: عضله‌هایی که راکت رو می‌گیرن و تو هر ضربه مچ رو ترمز می‌کنن. آرنج فقط جاییه که اینا بهش وصلن و اونجا درد می‌گیرن."
+    ],
+    "title": "Racket Arm",
+    "before": [
+      {
+        "text": "سوزن‌سوزن شدن یا بی‌حسی تا انگشت‌ها، گریپی که یهو از دست می‌ره، درد بعد از زمین خوردن یا پیچ خوردن، ورم، آرنجی که قفل می‌کنه یا صاف نمی‌شه، یا دردی که شب از خواب بیدارت می‌کنه.",
+        "label": "وایستا و بذار معاینه‌ش کنن"
+      },
+      {
+        "text": "کمرت، جلو یا کنار گردنت، پشت زانوت، داخل آرنجت، زیر بغلت یا درست تو چین کشاله. هر جایی که ورم کرده، داغه، کبوده یا تازه آسیب دیده هم نه.",
+        "label": "هیچ‌وقت فوم رول نکن"
+      },
+      {
+        "text": "اگه وسط بازی یه جاییت گرفت و هنوز درد داره، بهش دست نزن و بذار معاینه‌ش کنن. اگه درد تیزه یا سوزن‌سوزن می‌شی، قطع کن.",
+        "label": "به اون نقطه دست نزن"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🌀",
+        "title": "Forearm & Elbow",
+        "exercises": [
+          {
+            "rx": {
+              "side": true,
+              "time": "60 sec"
+            },
+            "exId": "forearm-roll",
+            "name": "Forearm Roll",
+            "note": "هم رو، هم زیر ساعد.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "30 sec"
+            },
+            "exId": "wrist-extensor-stretch",
+            "name": "Wrist Extensor Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "30 sec"
+            },
+            "exId": "wrist-flexor-stretch",
+            "name": "Wrist Flexor Stretch",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Shoulder & Lat",
+        "exercises": [
+          {
+            "rx": {
+              "side": true,
+              "time": "60 sec"
+            },
+            "exId": "lat-roll",
+            "name": "Lat Roll",
+            "note": "دست سرویستت بدتره، پس وقت بیشتری بهش بده.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "time": "60 sec"
+            },
+            "exId": "upper-back-roll",
+            "name": "Upper Back Roll",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "cross-body-shoulder-stretch",
+            "name": "Cross-Body Shoulder Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "doorway-pec-stretch",
+            "name": "Doorway Pec Stretch",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "care",
+    "countsAs": "mobility",
+    "duration": "12 min",
+    "focusTag": "ساعد، آرنج و شونه",
+    "equipment": "Foam Roller"
+  }
 }

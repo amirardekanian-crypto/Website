@@ -140,5 +140,149 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "trunk-and-rotation",
+    "intro": [
+      "بیست دقیقه کار روی میان‌تنه‌ت. اول چرخش وقتی تازه‌ای، بعد کار سفت‌کردن که نمی‌ذاره لگن و دنده‌ها تقلب کنن.",
+      "تو همه‌ش آروم بهتر از تنده. داری به تنه یاد می‌دی ثابت بمونه تا بقیه دورش بچرخن، که فورهند دقیقاً همینو ازت می‌خواد."
+    ],
+    "title": "Torque",
+    "before": [
+      {
+        "text": "اگه مشکل از کمرته، اول بذار معاینه‌ش کنن. جلسه کمر با وزن بدن تو لیست Care هست، بعد از اینکه یکی اجازه‌ت داد.",
+        "label": "کمر"
+      },
+      {
+        "text": "درد تو پا پایین می‌ره، بی‌حسی، ضعف تو پا یا کف پا، یا بی‌حسی بین پاها. اگه کنترل مثانه یا روده‌ت عوض شد، همون روز معاینه شو.",
+        "label": "وایستا و بذار چکش کنن"
+      },
+      {
+        "text": "اون حرکت رو ردش کن.",
+        "label": "درد تیز تو یه حرکت"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "exId": "march-in-place",
+            "name": "March in Place",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8
+            },
+            "exId": "cat-cow",
+            "name": "Cat-Cow",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "open-book",
+            "name": "Open Book",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 12
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "note": "چرخش قدرتش رو از لگن می‌گیره، پس اول اونا رو بیدار کن.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "⚡",
+        "rest": 45,
+        "title": "Rotation",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 8,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "half-kneeling-thoracic-rotation",
+            "name": "Half-Kneeling Thoracic Rotation",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "standing-chop",
+            "name": "Standing Chop",
+            "note": "با توپ و دیوار، به‌جاش پرتاب کن؛ همون حرکت، با قصد بیشتر.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧱",
+        "rest": 45,
+        "title": "Core",
+        "exercises": [
+          {
+            "rx": {
+              "reps": "10 Taps",
+              "sets": 3,
+              "side": true
+            },
+            "exId": "plank-with-shoulder-taps",
+            "name": "Plank with Shoulder Taps",
+            "note": "ضربه‌های آروم‌تر سخت‌ترن.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "sets": 3,
+              "side": true,
+              "time": "30 sec"
+            },
+            "exId": "side-plank",
+            "name": "Side Plank",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "bird-dog",
+            "name": "Bird Dog",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "strength",
+    "countsAs": "strength",
+    "duration": "20 min",
+    "focusTag": "کنترل تنه و چرخش",
+    "equipment": "Bodyweight"
+  }
 }

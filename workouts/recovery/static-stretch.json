@@ -118,5 +118,127 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "static-stretch",
+    "intro": [
+      "کشش ثابت بدون هیچ وسیله‌ای، برای روزهایی که رولر نداری یا نمی‌خوایش.",
+      "این‌ها بعد از تمرین یا توی روز استراحت جا دارن، نه توی ده دقیقه‌ی قبل از بازی. یه کششی که به‌اندازه‌ی کافی نگه داشته بشه، تا حدود یه ساعت بعد کمی از شدت انقباض عضله کم می‌کنه، که دقیقاً چیزیه که امشب می‌خوای و دقیقاً چیزیه که قبل از مسابقه نمی‌خوای."
+    ],
+    "title": "Long Holds",
+    "before": [
+      {
+        "text": "درد تیز، سوزن‌سوزن شدن یا هر چیزی که تا پا یا دست میاد پایین، کشش نیست، پس همون حرکت رو ول کن.",
+        "label": "وایسا و حتماً بذار دکتر ببینه"
+      },
+      {
+        "text": "اگه کشاله‌ی ران یا همسترینگت هنوز از بازی درد داره، کشش‌های همسترینگ و پروانه رو بذار کنار.",
+        "label": "بذار کنار"
+      },
+      {
+        "text": "اگه یکی از ساق‌هات ورم کرده، گرمه یا لمسش دردناکه و موقع بازی هم کشیده نشده، همون روز دکتر ببین.",
+        "label": "ساق ورم‌کرده"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🦵",
+        "title": "Lower Body",
+        "exercises": [
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "supine-hamstring-stretch",
+            "name": "Supine Hamstring Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "supine-figure-4-stretch",
+            "name": "Supine Figure-4 Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "time": "60 sec"
+            },
+            "exId": "butterfly-stretch",
+            "name": "Butterfly Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "couch-stretch",
+            "name": "Couch Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "standing-calf-stretch",
+            "name": "Standing Calf Stretch",
+            "note": "زانوی صاف، بعد خم.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💪",
+        "title": "Upper Body",
+        "exercises": [
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "doorway-pec-stretch",
+            "name": "Doorway Pec Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "childs-pose",
+            "name": "Child's Pose",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "cross-body-shoulder-stretch",
+            "name": "Cross-Body Shoulder Stretch",
+            "note": "پشت شونه‌ی سرویس همونیه که هیچ‌کس نمی‌کشه، آروم برو.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "recovery",
+    "countsAs": "mobility",
+    "duration": "15 min",
+    "focusTag": "کشش ثابت، بدون وسیله",
+    "equipment": "Bodyweight"
+  }
 }

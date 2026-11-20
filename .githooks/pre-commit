@@ -627,4 +627,18 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(assets/js/i18n-
   fi
 fi
 
+# -- 30. every Library session is written in both languages (added 2026-11-20) ---------------------------------------------
+# Why (Amir, 2026-11-20: "the libraries and playbook should be available in farsi and everything should be written in both
+# languages"): a workout file carries its Farsi as `fa`, a full copy in which only the words differ (scripts/i18n/check_library_fa.js).
+# coach.html's + Publish workout uploads the file as it is, so a file without `fa`, or one whose Farsi copy drifted from the English
+# (a changed rx, a renamed exercise), would put that into the app. Articles carry theirs from the .fa.json (publish_article_sql.py).
+lib_fa=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^workouts/[^/]+/[^/]+[.]json$' || true)
+if [ -n "$lib_fa" ]; then
+  if ! lf_out=$(node scripts/i18n/check_library_fa.js --files $lib_fa 2>&1); then
+    echo "$lf_out"
+    echo "pre-commit: BLOCKED -- a Library session's Farsi copy is missing or does not match its English (details above)."
+    failed=1
+  fi
+fi
+
 exit $failed

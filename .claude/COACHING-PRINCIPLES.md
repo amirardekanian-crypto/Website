@@ -944,7 +944,9 @@ same ID. Read a rule's story and its history before changing it.
   Farsi in Amir's spoken voice (COM-3, informal تو, Persian digits in sentences) or English. Never both. Exercise
   names, day names and the prescription stay as they are, and a week note's numbers are the same numbers. Read
   `athlete.lang` from the server at the run (the athlete may have changed it); the pipeline never writes it. It starts
-  with each athlete's next cycle: nothing already written is translated (PRC-1). `check_program.py` warns on a text
+  with each athlete's next cycle: nothing already written is translated (PRC-1), with one exception Amir made on
+  2026-11-20 (*"everything should be available in farsi for the athletes with a current cycle"*): the current cycle of
+  every Farsi athlete was translated once, in its own programme run, words only. `check_program.py` warns on a text
   whose script does not match.
 - `COM-2` **The WhatsApp handoff message is PIPELINE OUTPUT, and it is written in the ATHLETE'S OWN
   LANGUAGE — not English, and not on request.** Every finished programme ships with ONE message (two until

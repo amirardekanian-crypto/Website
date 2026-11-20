@@ -138,5 +138,147 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "evening-release",
+    "intro": [
+      "همه چهارسر رو رول می‌کنن. این یکی جاهایی می‌ره که تنیس واقعاً بهشون فشار می‌ده. کف پات. ساق عمیقی که به ترمز کمک می‌کنه. داخل ران از توپ‌های باز و بیرون ران از هل دادن. پشت ران از این‌همه توقف. بعد کمر بالا و سینه از سرویس و اسمش، و سه دقیقه نفس آهسته برای تموم کردن. یه فوم رولر و یه توپ لازم داری، و توپ تنیس هم کافیه.",
+      "آهسته بودن کل تکنیکه. وقتی یه نقطه‌ی دردناک پیدا کردی، همونجا وایسا و سه تا نفس بکش. جلو عقب نکش. فشار محکم هدف باشه. رول کردن کمک می‌کنه یه مدت حالت بهتر باشه و راحت‌تر حرکت کنی، و واقعاً همینه. چیزی رو از عضله‌هات بیرون نمی‌ده و چیزی رو خرد نمی‌کنه. پس انجامش بده چون روز تموم شده و می‌خوای حس آدم بودن داشته باشی."
+    ],
+    "title": "Night Shift",
+    "before": [
+      {
+        "text": "کمر، جلو یا کنار گردن، پشت زانو، داخل آرنج، زیر بغل یا درست توی چین کشاله. هیچ جایی که ورم کرده، داغه، کبود شده یا تازه آسیب دیده.",
+        "label": "هیچ‌وقت رول نکن"
+      },
+      {
+        "text": "اگه موقع بازی یه جایی گرفت و هنوز دردناکه، دستش نزن و بذار معاینه بشه. اگه تیزه، یا گز‌گز داری، دست بکش.",
+        "label": "اون نقطه رو تنها بذار"
+      },
+      {
+        "text": "اگه یه ساقت ورم کرده، گرمه یا با لمس درد داره و موقع بازی کشیدگی نداشتی، رولش نکن و همون روز برو پیش دکتر.",
+        "label": "ساق ورم کرده"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🌀",
+        "title": "Feet and Lower Legs",
+        "exercises": [
+          {
+            "rx": {
+              "side": true,
+              "time": "60s"
+            },
+            "exId": "foot-roll",
+            "name": "Foot Roll",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "60s"
+            },
+            "exId": "soleus-roll",
+            "name": "Soleus Roll",
+            "note": "اگه ساقت هنوز از بازی درد می‌کنه، این یکی رو ردش کن.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🌀",
+        "title": "Where the Wide Balls Land",
+        "exercises": [
+          {
+            "rx": {
+              "side": true,
+              "time": "90s"
+            },
+            "exId": "adductor-roll",
+            "name": "Adductor Roll",
+            "note": "اگه کشاله هنوز از بازی درد می‌کنه، این یکی رو ردش کن.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "60s"
+            },
+            "exId": "lateral-thigh-roll",
+            "name": "Lateral Thigh Roll",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "60s"
+            },
+            "exId": "hamstring-roll",
+            "name": "Hamstring Roll",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🌀",
+        "title": "The Serve Side",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "foam-roller-thoracic-extension",
+            "name": "Foam Roller Thoracic Extension",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "60s"
+            },
+            "exId": "pec-roll",
+            "name": "Pec Roll",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🌙",
+        "title": "Finish Here",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "cues": {
+              "bad": [
+                "زور زدن برای نفس‌های بزرگ و عمیق"
+              ],
+              "good": [
+                "به پشت دراز بکش، یه دستت رو روی شکمت بذار و بذار هر بازدم آروم شکمت رو خالی کنه",
+                "حس کن اون دست بالا و پایین می‌ره، در حالی که سینه‌ت ساکنه"
+              ]
+            },
+            "name": "Extended Exhale Breathing",
+            "note": "۴ تا دم، ۸ تا بازدم. اگه سرگیجه یا گز‌گز گرفتی، برگرد به نفس معمولی.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "recovery",
+    "countsAs": "mobility",
+    "duration": "20 min",
+    "focusTag": "روز سخت، کار با رولر",
+    "equipment": "Foam Roller"
+  }
 }

@@ -116,5 +116,125 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "threshold-intervals",
+    "intro": [
+      "چیزی که یه ست طولانی رو تعیین می‌کنه اینه که چقدر می‌تونی لبه‌ی سخت بمونی. این جلسه اون لبه رو روی دوچرخه تمرین می‌ده، پس هیچ ضربه‌ای به مفصل نمی‌خوره. برای هفته‌ای که پاهات حسابی زمین رو تحمل کردن خوبه.",
+      "پنج تلاش چهار دقیقه‌ای، سخت ولی کنترل‌شده. می‌تونی یه جمله‌ی کوتاه بگی ولی نه یه جمله‌ی بلند. فقط تک‌کلمه می‌تونی بگی؟ یه کم آروم‌تر. آزاد داری حرف می‌زنی؟ توی بعدی مقاومت اضافه کن. بین هر کدوم دو دقیقه آروم پدال بزن و پدال زدن رو ادامه بده، چون کوتاه کردن استراحت یه جلسه‌ی دیگه می‌سازه. دستگاه روئینگ یا شیب تند تردمیل هم همین کار رو می‌کنه. دستگاه نداری؟ چهار دقیقه از یه تپه‌ی شیب‌دار برو بالا و دو دقیقه آروم بیا پایین."
+    ],
+    "title": "Hold the Line",
+    "before": [
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از تمرین بعدی بذار معاینه بشه. بهت گفتن مراقب ورزش سنگین باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "۴۸ ساعت از مسابقه فاصله بگیر.",
+        "label": "فاصله بگیر"
+      },
+      {
+        "text": "بعد از سه تلاش بایست.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "5 minutes"
+            },
+            "exId": "stationary-bike",
+            "name": "Stationary Bike",
+            "note": "سرعت آروم.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45s"
+            },
+            "exId": "half-kneeling-hip-flexor-with-overhead-reach",
+            "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "ankle-dorsiflexion-rocks",
+            "name": "Ankle Dorsiflexion Rocks",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 12
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 30,
+              "sets": 3,
+              "time": "30s"
+            },
+            "exId": "stationary-bike",
+            "name": "Stationary Bike",
+            "note": "هر بار مقاومت رو بیشتر کن.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🫀",
+        "title": "Threshold",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": "7-8",
+              "rest": 120,
+              "sets": 5,
+              "time": "4 min"
+            },
+            "exId": "stationary-bike",
+            "name": "Stationary Bike",
+            "note": "اگه نمی‌تونی توی کل یه تلاش با همون مقاومت همون ریتم رو نگه داری، همون آخرین تلاشت بود.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Cool-Down",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "stationary-bike",
+            "name": "Stationary Bike",
+            "note": "سرعت آروم، بذار نفست جا بیاد.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "conditioning",
+    "countsAs": "strength",
+    "duration": "42 min",
+    "focusTag": "آستانه · بدون ضربه",
+    "equipment": "Bike"
+  }
 }

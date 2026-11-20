@@ -101,5 +101,110 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "day-after",
+    "intro": [
+      "این برای صبح بعد از تمرینه، وقتی پاهات سنگین و خشکن. حرکت کردن اصل کاره. با ده دقیقه راه رفتن یا دوچرخه‌ی آروم شروع کن. بعد مچ پا، همسترینگ و باسن رو باز کن، و با یه اسکوات آروم و یه هینج آروم تموم کن تا بدنت یادش بیاد حالت عادی چه شکلیه. برای دو سه دقیقه‌ی آخر یه دسته‌جارو لازم داری، و برای اسکوات می‌تونی راکت رو جلوت نگه داری.",
+      "این جلسه باعث می‌شه امروز بدنت بهتر حرکت کنه. ریکاوری واقعی رو خواب و غذا انجام می‌دن. جلسه‌های موبیلیتی برای هر روزی هستن. این یکی برای روز بعده، وقتی سنگینی، و پیاده‌روی خودِ جلسه‌ست. اگه بیشتر صبح‌ها این‌قدر سنگینی، یه چیزی توی هفته‌ت درست نیست. معمولاً دلیلش کار سخت زیاد، خواب کم یا غذای کمه. اگه خوب نشد، برو معاینه شو."
+    ],
+    "title": "The Morning After",
+    "before": [
+      {
+        "text": "سنگینی و خشکی توی هر دو پا عادیه، و توی ورزش راکتی این‌که یه طرف بیشتر از طرف دیگه درد بگیره هم رایجه.",
+        "label": "عادی"
+      },
+      {
+        "text": "اگه درد تیزه، توی یه نقطه‌ست که می‌تونی با انگشت نشونش بدی، با ورم یا کبودی همراهه، یا وقتی روش وزن میندازی درد می‌گیره. همین‌طور اگه بعد از سه روز هنوز داره بدتر می‌شه.",
+        "label": "وایسا و حتماً بذار دکتر ببینه"
+      },
+      {
+        "text": "ادرار قهوه‌ای تیره، یا عضله‌ای اون‌قدر ورم کرده و سفته که نمی‌تونی مفصل رو خم کنی.",
+        "label": "همون روز دکتر ببین"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🚶",
+        "title": "Get Moving",
+        "exercises": [
+          {
+            "rx": {
+              "time": "10 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "note": "آروم، در حد حرف زدن.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🦵",
+        "title": "Open What Took the Hits",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "ankle-dorsiflexion-rocks",
+            "name": "Ankle Dorsiflexion Rocks",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "hamstring-scoop",
+            "name": "Hamstring Scoop",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Move Normal Again",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "bodyweight-squat",
+            "name": "Squat",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "dowel-hip-hinge",
+            "name": "Dowel Hip Hinge",
+            "note": "اگه دسته‌جارو نداری، دست‌هات رو بذار روی کمرت و به‌جاش باسن رو عقب بده.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "recovery",
+    "countsAs": "mobility",
+    "duration": "17 min",
+    "focusTag": "روز بعد، حرکت کن",
+    "equipment": "Bodyweight"
+  }
 }

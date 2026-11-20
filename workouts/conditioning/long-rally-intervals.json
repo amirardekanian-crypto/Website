@@ -174,5 +174,183 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "long-rally-intervals",
+    "intro": [
+      "بعضی رالی‌ها تموم نمی‌شن، و وقتی امتیاز بعدی شروع می‌شه پاهات پره. این همون حسه، عمدی. شش تلاش چهل ثانیه‌ای با هشتاد ثانیه استراحت بینشون، که استراحت کافی نیست، و ایده همینه. سخت بزن، شدت ۹. هر چهل ثانیه شامل skater step-out، اسپلیت اسکات و بیر کرال هست، و هیچ‌چیز پرش نداره.",
+      "یه نوار خالی چهار متر در دو متر لازم داری، کفی که سر نخوری، کفش، و یه تایمر که بوق بزنه. موکت چسبیده اشکالی نداره، فرش شل نه. رالی‌های پدل طولانی‌ترن، پس بازیکن‌های پدل پنجاه ثانیه می‌زنن: بیست، بیست و ده. مچ دستت درد می‌کنه؟ به‌جای کرال، سرجات قدم‌رو برو."
+    ],
+    "title": "Deep Water",
+    "before": [
+      {
+        "text": "مچ پا، زانو، ساق، همسترینگ، کشاله یا آشیل درد داره، یا تو یه ماه گذشته آسیب دیدی؟ اول بذار معاینه‌ش کنن.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا تلق ناگهانی.",
+        "label": "وایستا و بذار چکش کنن"
+      },
+      {
+        "text": "درد قفسه سینه، سرگیجه، ضربان قلبی که تند می‌زنه یا جا می‌اندازه، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی بذار معاینه‌ش کنن. بهت گفتن مراقب ورزش سنگین باش؟ اول با دکترت چک کن.",
+        "label": "همین الان وایستا"
+      },
+      {
+        "text": "خیلی بیشتر از معمول درد داری، یا ادرارت تیره شده؟ همون روز چک کن.",
+        "label": "یکی دو روز بعد"
+      },
+      {
+        "text": "۴۸ ساعت با مسابقه و وزنه‌برداری سنگین پایین‌تنه فاصله بنداز. تو هفته تورنمنت انجامش نده.",
+        "label": "فاصله بنداز"
+      },
+      {
+        "text": "چهار راند بزن و همونجا تموم کن. بازم حساب می‌شه. اگه زانوهات به داخل رفتن یا قدم‌هات شل شد، همون راند آخرت بود.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "jog-on-the-spot",
+            "name": "Jog on the Spot",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45s"
+            },
+            "exId": "half-kneeling-hip-flexor-with-overhead-reach",
+            "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": 4,
+              "side": true
+            },
+            "exId": "worlds-greatest-stretch",
+            "name": "World's Greatest Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 12
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "lateral-lunge",
+            "name": "Lateral Lunge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "skater-step-out",
+            "name": "Skater Step-Out",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🫀",
+        "title": "Long-Rally Intervals",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 80,
+              "rounds": 6
+            },
+            "name": "Long-Rally Intervals",
+            "type": "circuit",
+            "items": [
+              {
+                "exId": "skater-step-out",
+                "name": "Skater Step-Out",
+                "detail": "۱۵ ثانیه، یکی در میون"
+              },
+              {
+                "exId": "split-squat",
+                "name": "Split Squat",
+                "detail": "۱۵ ثانیه، هر راند پا عوض کن"
+              },
+              {
+                "exId": "bear-crawl",
+                "name": "Bear Crawl",
+                "detail": "۱۰ ثانیه، کرال به جلو و برگشت با قدم"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Cool-Down",
+        "exercises": [
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "cues": {
+              "bad": [
+                "عجله کردن تو بازدم برای رسیدن به نفس بعدی"
+              ],
+              "good": [
+                "یه دستت رو روی شکمت بذار، چهار تا از بینی دم بگیر و هشت تا از دهن بازدم کن",
+                "فقط حرکت دستی که روی شکمته رو حس کن"
+              ]
+            },
+            "name": "Extended Exhale Breathing",
+            "note": "۴ تا دم، ۸ تا بازدم.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "conditioning",
+    "countsAs": "strength",
+    "duration": "25 min",
+    "focusTag": "تحمل رالی بلند · بدون وسیله",
+    "equipment": "Bodyweight"
+  }
 }

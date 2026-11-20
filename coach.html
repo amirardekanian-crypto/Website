@@ -2507,13 +2507,18 @@ function pickLibraryFile(kind) {
       // An item you hid stays hidden when its file is published again: the confirm says so, and publishing it is the Show button's job.
       const before = (S.lib || []).find(l => l.slug === slug);
       fileOf[slug] = { name: f.name, was: !before ? 'new' : before.published === false ? 'hidden' : 'live' };
+      // Its Farsi (2026-11-20, the app in Farsi: every Library item is written in both languages, its Farsi a full copy in `fa`).
+      // A file without one never wipes the live item's: it is kept, and the confirm says so (bring the Farsi up to date if the
+      // English changed: /workout and /article write it, scripts/i18n/check_library_fa.js checks it).
+      if (!d.fa && before && before.data && before.data.fa) { d.fa = before.data.fa; fileOf[slug].keptFa = true; }
       rows.push({ slug, kind, category_id: shelf.id, data: d, published: before && before.published === false ? false : true });
     }
 
     const NL = String.fromCharCode(10);
     if (bad.length && !rows.length) { fail('Nothing published:' + NL + NL + bad.join(NL)); return; }
     const WAS = { 'new': 'new', live: 'replaces the live one', hidden: 'replaces a hidden one, which STAYS hidden (show it from its row when you want it live)' };
-    const preview = rows.map(r => '· ' + (r.data.title || r.slug) + ' — ' + WAS[fileOf[r.slug].was]).join(NL);
+    const preview = rows.map(r => '· ' + (r.data.title || r.slug) + ' — ' + WAS[fileOf[r.slug].was]
+      + (fileOf[r.slug].keptFa ? ' (no Farsi in the file: the live Farsi copy is kept)' : !r.data.fa ? ' (NO Farsi: Farsi phones show English)' : '')).join(NL);
     const skipped = bad.length ? NL + NL + 'Skipped:' + NL + bad.join(NL) : '';
     if (!confirm('Publish ' + rows.length + ' ' + kind + '(s)?' + NL + NL + preview + skipped)) return;
 

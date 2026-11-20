@@ -195,5 +195,204 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "push-pull-pump",
+    "intro": [
+      "یه جلسه بالاتنه برای بازویی که ورزش راکتی بازی می‌کنه. کشش‌محور، چون کشیدن نیمه‌ایه که ورزشت هیچ‌وقت تمرینش نمی‌ده.",
+      "عمداً دو ست پرس سینه، و آخرش یه ست سبک کار مچ. شونه‌ت که همه هفته داره پرس می‌کنه، و آرنج معمولاً همون جاییه که ساعد آخرش ازش شکایت می‌کنه."
+    ],
+    "title": "Serve Armour",
+    "before": [
+      {
+        "text": "شونه، آرنج، مچ یا گردنت درد داره، یا تو یه ماه گذشته آسیب دیدی؟ اول بذار معاینه‌ش کنن.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی یا سوزن‌سوزن شدن تو دست، ورم، شونه‌ای که سر می‌خوره یا درمیاد، یا یهو صدای تلق.",
+        "label": "وایستا و بذار چکش کنن"
+      },
+      {
+        "text": "درد قفسه سینه، سرگیجه، ضربان قلبی که تند می‌زنه یا جا می‌اندازه، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی بذار معاینه‌ش کنن. بهت گفتن مراقب ورزش سنگین باش؟ اول با دکترت چک کن.",
+        "label": "همین الان وایستا"
+      },
+      {
+        "text": "اگه پرس بالای سر جلو یا بالای شونه‌ت رو نیشگون می‌گیره، همونجا پرس رو قطع کن و امروز ردش کن.",
+        "label": "وقتی تمرین می‌کنی"
+      },
+      {
+        "text": "خیلی بیشتر از معمول درد داری، یا ادرارت تیره شده؟ همون روز چک کن.",
+        "label": "یکی دو روز بعد"
+      },
+      {
+        "text": "به‌جای ست‌های کامل، از هر حرکت دو ست بزن و ببین دو روز بعد چه حسی داری.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "4 minutes"
+            },
+            "exId": "rowing",
+            "name": "Rowing",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "arm-circles",
+            "name": "Arm Circles",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "open-book",
+            "name": "Open Book",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "8 Reps / shape"
+            },
+            "exId": "prone-y-t-raise",
+            "name": "Prone Y-T Raise",
+            "note": "با وزن بدن.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "10 Reps, very light",
+              "sets": 1
+            },
+            "cues": {
+              "bad": [
+                "مستقیم رفتن سراغ وزنه اصلی"
+              ],
+              "good": [
+                "یه ست سبک از اولین حرکت اصلی",
+                "مسیر حرکت رو جا بنداز و شونه رو حس کن"
+              ]
+            },
+            "name": "Light Dumbbell Rehearsal",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🎯",
+        "rest": 90,
+        "title": "Primary",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": "7-8",
+              "reps": 10,
+              "sets": 4,
+              "side": true
+            },
+            "exId": "single-arm-dumbbell-row",
+            "name": "Single-Arm Dumbbell Row",
+            "note": "عمداً کشیدن تو این جلسه جلوتره.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 8,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "half-kneeling-single-arm-dumbbell-press",
+            "name": "Half-Kneeling Single-Arm Dumbbell Press",
+            "note": "زانو زدن جلوی قوس برداشتن کمرت برای تموم کردن تکرار رو می‌گیره.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💪",
+        "title": "Accessory",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 10,
+              "rest": 75,
+              "sets": 2
+            },
+            "exId": "dumbbell-bench-press",
+            "name": "Dumbbell Bench Press",
+            "note": "فقط دو ست، و این عمدیه.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 12,
+              "rest": 60,
+              "sets": 3
+            },
+            "exId": "bent-over-dumbbell-reverse-fly",
+            "name": "Bent-Over Dumbbell Reverse Fly",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 15,
+              "rest": 45,
+              "sets": 2,
+              "side": true
+            },
+            "exId": "dumbbell-wrist-extension",
+            "name": "Dumbbell Wrist Extension",
+            "note": "این همون حرکتیه که تنیس البو رو ازت دور نگه می‌داره.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧱",
+        "title": "Core",
+        "exercises": [
+          {
+            "rx": {
+              "rest": 60,
+              "sets": 3,
+              "side": true,
+              "distance": "20 m"
+            },
+            "exId": "suitcase-carry",
+            "name": "Suitcase Carry",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "strength",
+    "countsAs": "strength",
+    "duration": "40 min",
+    "focusTag": "بالاتنه برای ورزشکارای راکتی",
+    "equipment": "Dumbbells"
+  }
 }

@@ -113,5 +113,122 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "reset-roll",
+    "intro": [
+      "پانزده دقیقه با فوم رولر، بعد از تمرین یا شبِ یه روز سخت.",
+      "آروم بودن کل ماجراست. روی نقطه‌های دردناک وایسا و همون‌جا نفس بکش، به‌جای اینکه عقب و جلو اره‌اش کنی."
+    ],
+    "title": "Reset & Roll",
+    "before": [
+      {
+        "text": "کمرت، پس بالاتر از انتهای قفسه‌ی سینه بمون. همین‌طور جلو یا کنار گردن، پشت زانو، داخل آرنج، زیر بغل یا مستقیم روی چین کشاله‌ی ران. هر جایی که ورم کرده، داغه، کبوده یا تازه آسیب دیده هم نه.",
+        "label": "هیچ‌وقت رول نکن"
+      },
+      {
+        "text": "اگه موقع بازی یه جایی گرفت و هنوز درد داره، دستش نزن و بذار دکتر ببینه. اگه تیزه یا سوزن‌سوزن شدی، عقب بکش.",
+        "label": "اون نقطه رو ول کن"
+      },
+      {
+        "text": "اگه یکی از ساق‌هات ورم کرده، گرمه یا لمسش دردناکه و موقع بازی هم کشیده نشده، رولش نکن و همون روز دکتر ببین.",
+        "label": "ساق ورم‌کرده"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🌀",
+        "title": "Release",
+        "exercises": [
+          {
+            "rx": {
+              "side": true,
+              "time": "60 sec"
+            },
+            "exId": "calf-roll",
+            "name": "Calf Roll",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "60 sec"
+            },
+            "exId": "quad-roll",
+            "name": "Quad Roll",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "60 sec"
+            },
+            "exId": "glute-roll",
+            "name": "Glute Roll",
+            "note": "این همونیه که بیشتر بازیکن‌ها ردش می‌کنن و بیشتر از همه بهش احتیاج دارن.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "time": "60 sec"
+            },
+            "exId": "upper-back-roll",
+            "name": "Upper Back Roll",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "lat-roll",
+            "name": "Lat Roll",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Down-Regulate",
+        "exercises": [
+          {
+            "rx": {
+              "time": "60 sec"
+            },
+            "exId": "childs-pose",
+            "name": "Child's Pose",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "cues": {
+              "bad": [
+                "اگه برای نگه داشتن شمارش زور می‌زنی، کوتاه‌ترش کن به سه"
+              ],
+              "good": [
+                "۴ ثانیه نفس بگیر، ۴ ثانیه نگه دار، ۴ ثانیه بده بیرون، ۴ ثانیه نگه دار",
+                "دراز بکش، یه دست روی شکم، فقط همون دست تکون بخوره"
+              ]
+            },
+            "name": "Box Breathing",
+            "note": "این بخشیه که واقعاً خاموشت می‌کنه، پس کوتاهش نکن.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "recovery",
+    "countsAs": "mobility",
+    "duration": "15 min",
+    "focusTag": "رها کردن و آروم شدن",
+    "equipment": "Foam Roller"
+  }
 }

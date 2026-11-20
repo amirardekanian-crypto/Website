@@ -110,5 +110,119 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "everyday-mobility",
+    "intro": [
+      "هشت دقیقه، هر روز که خواستی. دامنه حرکتی‌ای که الان داری رو نگه می‌داره و اونقدر کوتاهه که واقعاً انجامش می‌دی. هیچ‌چیزش نگه داشته نمی‌شه، پس تو یه ساعت قبل بازی اشکالی نداره. ولی برای یه ضربه‌زنی یا جلسه سرعت گرمت نمی‌کنه، و لیست On-Court جلسه‌ش رو داره.",
+      "اینو نسخه کوتاه روزانه حساب کن، بدون نگه‌داشتن. Daily Mobility Flow تو این لیست همونیه که پانزده دقیقه‌ست و نگه‌داشتن‌های طولانی داره، پس وقتی وقت داری و یه ساعت قبل بازی نیست اونو بزن. بقیه جلسه‌های موبیلیتی همونایی‌ان که یه چیزی رو عوض می‌کنن. صبح بعد از یه مسابقه سخت سفت و سنگینی؟ جلسه روز بعد تو لیست ریکاوری برای همین ساخته شده."
+    ],
+    "title": "Green Light",
+    "before": [
+      {
+        "text": "اگه مشکل از کمرته، اول بذار معاینه‌ش کنن. جلسه کمر با وزن بدن تو لیست Care هست، بعد از اینکه یکی اجازه‌ت داد.",
+        "label": "کمر"
+      },
+      {
+        "text": "درد تو پا پایین می‌ره، بی‌حسی، ضعف تو پا یا کف پا، یا بی‌حسی بین پاها. اگه کنترل مثانه یا روده‌ت عوض شد، همون روز معاینه شو.",
+        "label": "وایستا و بذار چکش کنن"
+      },
+      {
+        "text": "اون حرکت رو ردش کن.",
+        "label": "درد تیز تو یه حرکت"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🧘",
+        "title": "Turn",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "quadruped-thoracic-rotation",
+            "name": "Quadruped Thoracic Rotation",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "alternating-overhead-reach",
+            "name": "Alternating Overhead Reach",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🦵",
+        "title": "Hips",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 12
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "reverse-lunge",
+            "name": "Reverse Lunge",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🦶",
+        "title": "Ground",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 6
+            },
+            "exId": "inchworm",
+            "name": "Inchworm",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8
+            },
+            "exId": "squat-to-stand",
+            "name": "Squat to Stand",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "mobility",
+    "countsAs": "mobility",
+    "duration": "8 min",
+    "focusTag": "فلو روزانه کل بدن",
+    "equipment": "Bodyweight"
+  }
 }

@@ -203,5 +203,212 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "full-body-power",
+    "intro": [
+      "یه جلسه‌ی کامل باشگاه حول بک اسکوات، با پرش‌ها قبل از اون وقتی هنوز تازه‌ای. اون‌قدر سنگین که به درد بخوره، نه اون‌قدر که بقیه‌ی هفته‌ت رو خراب کنه.",
+      "پرس عمداً نیست و کشیدن هست. شونه‌ت از قبل کل هفته توی زمین پرس می‌کنه، پس حجم می‌ره روی پا و کمر."
+    ],
+    "title": "Full-Body Power",
+    "before": [
+      {
+        "text": "زانو، مچ پا، باسن یا کمر دردناک، یا آسیب توی ماه گذشته؟ اول بذار دکتر ببینه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه یا تا پا میاد پایین، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای ناگهانی.",
+        "label": "وایسا و معاینه شو"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از اینکه دوباره تمرین کنی، حتماً بذار دکتر ببینه. بهت گفتن با ورزش سخت مواظب باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "خیلی بیشتر از معمول درد داری یا ادرارت تیره شده؟ همون روز معاینه شو.",
+        "label": "یکی دو روز بعد"
+      },
+      {
+        "text": "از آسیب زانو یا مچ پا برمی‌گردی؟ از کسی که درمانت کرده بپرس پرش و اسکوات سنگین اشکال نداره یا نه.",
+        "label": "آسیب قبلی"
+      },
+      {
+        "text": "پین‌ها یا بازوهای ایمنی توی رک رو درست زیر پایین‌ترین نقطه‌ی اسکوات بذار. رک نداری؟ به‌جاش Goblet Squat بزن. برای پرش‌ها هیچ چیزی بالای سرت نباشه، مثل پنکه یا تیر کوتاه سقف.",
+        "label": "ستاپ رو چک کن"
+      },
+      {
+        "text": "۴۸ ساعت فاصله از یه جلسه‌ی سنگین پا یا دوی سخت دیگه، و نه روز قبل از مسابقه.",
+        "label": "دور بمون"
+      },
+      {
+        "text": "به‌جای ست‌های کامل، از هر حرکت دو ست بزن و ببین دو روز بعد چه حالی داری.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "5 minutes"
+            },
+            "exId": "stationary-bike",
+            "name": "Stationary Bike",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 12,
+              "sets": 2
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 5,
+              "side": true
+            },
+            "exId": "worlds-greatest-stretch",
+            "name": "World's Greatest Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": "8 Reps, light",
+              "sets": 2
+            },
+            "exId": "goblet-squat",
+            "name": "Goblet Squat",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "cues": {
+              "bad": [
+                "پریدن از میله‌ی خالی به ست اصلی"
+              ],
+              "good": [
+                "میله‌ی خالی، بعد دو سه ست با وزن بالارونده تا وزن کاری",
+                "با بالا رفتن وزن، تکرار رو کم کن"
+              ]
+            },
+            "name": "Empty Bar Warm-Up Sets",
+            "note": "اسکوات: میله × 8، بعد بالا برو. این‌ها ست کاری حساب نمی‌شن و شدت (RPE) ندارن.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "⚡",
+        "title": "Power",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 3,
+              "rest": 60,
+              "sets": 4
+            },
+            "exId": "countermovement-jump",
+            "name": "Countermovement Jump",
+            "note": "قدرت اول جلسه میاد، وقتی هنوز تازه‌ای.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🎯",
+        "title": "Primary",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": "7-8",
+              "reps": 5,
+              "rest": 180,
+              "sets": 4
+            },
+            "exId": "barbell-back-squat",
+            "name": "Barbell Back Squat",
+            "note": "دو سه تکرار توی مخزن بذار، امروز روز تست نیست.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 8,
+              "rest": 150,
+              "sets": 3
+            },
+            "exId": "barbell-romanian-deadlift",
+            "name": "Barbell Romanian Deadlift",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💪",
+        "title": "Accessory",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 8,
+              "rest": 90,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "dumbbell-split-squat",
+            "name": "Dumbbell Split Squat",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 10,
+              "rest": 75,
+              "sets": 3
+            },
+            "exId": "chest-supported-dumbbell-row",
+            "name": "Chest-Supported Dumbbell Row",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧱",
+        "title": "Core",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10,
+              "rest": 45,
+              "sets": 3,
+              "side": true
+            },
+            "exId": "half-kneeling-pallof-press",
+            "name": "Half-Kneeling Pallof Press",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "strength",
+    "countsAs": "strength",
+    "duration": "50 min",
+    "focusTag": "قدرت و توان پایین‌تنه",
+    "equipment": "Barbell"
+  }
 }

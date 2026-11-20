@@ -32,6 +32,12 @@ written from: [`scripts/i18n/BRIEF.md`](../../scripts/i18n/BRIEF.md).
 - **The switch is for every athlete** since 2026-11-20 (`REVEALED = true` in `i18n.js`; Amir: *"Yes, show it"*). A phone
   with no choice of its own opens in the programme's `athlete.lang` (read from the saved plan in the `<head>`, or adopted
   at the first open, `AAI18N.adopt()`). `?fa=0` clears one phone's choice.
+- **The Library and the Playbook are in both languages** (Amir, 2026-11-20: *"the libraries and playbook should be
+  available in farsi and everything should be written in both languages"*). Each item carries its Farsi as `fa`, a full
+  copy where only the words differ (SCHEMA.md → *Library tab*); the app shows it on a Farsi phone. `/workout` writes it in
+  the file (guard 30), `/article` publishes it from the `.fa.json`, and coach.html's Publish keeps a live item's Farsi when
+  a file has none. The current cycle of every Farsi athlete with a cycle running on 2026-11-20 was translated once,
+  words only (COM-1's one exception).
 - **The exercise texts come from the Spine's Farsi columns** (`get_exercises_fa()`, stage65): steps, cues, purpose and
   On court, where the entry has them (`spineFaOverlay()`); the rest stays English. `spinecache_fa` is a cache, never synced.
 - **Words are generated**: change a part in `scripts/i18n/fa/`, run `node scripts/build_i18n_fa.js`, bump `?v=` on the

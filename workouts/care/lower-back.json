@@ -173,5 +173,182 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "lower-back",
+    "intro": [
+      "هفته‌ای دو یا سه بار، کنار تمرین‌های معمولیت. اول راه می‌ریم، بعد باسن و بالای کمر رو باز می‌کنیم، بعد برِیس رو می‌سازیم که میانه‌ی بدن ثابت بمونه، و آخر هم فشار رو برمی‌داریم. اینجا هیچ حرکتی کمرت رو کش نمی‌ده و رول نمی‌کنه، چون کمر دردناک دقیقاً همینو نمی‌خواد."
+    ],
+    "title": "Steady Spine",
+    "before": [
+      {
+        "text": "کمردرد معمولی که دکتر یا فیزیوتراپ دیده و گفته می‌تونی باهاش تمرین کنی.",
+        "label": "برای کیه"
+      },
+      {
+        "text": "درد که تا پا میاد پایین، بی‌حسی، ضعف توی پا یا مچ پا، یا بی‌حسی بین پاها. همین‌طور اگه کمردردت بعد از زمین خوردن یا ضربه شروع شده، یا شب‌ها از خواب بیدارت می‌کنه. اگه کنترل مثانه یا روده‌ت عوض شد، همون روز باید دکتر ببینی.",
+        "label": "وایسا و حتماً بذار دکتر ببینه"
+      },
+      {
+        "text": "یه کم درد کشیدنی اشکالی نداره. درد تیز نه، دردی که وسط ست بیشتر می‌شه یا صبح بعد بدتره هم نه. اگه بیشتر شد، همون حرکت رو ول کن. اگه تیز بود، کل جلسه رو تموم کن.",
+        "label": "موقع تمرین"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🚶",
+        "title": "Wake It Up",
+        "exercises": [
+          {
+            "rx": {
+              "time": "4 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "note": "دردِ کشیدنی که می‌تونی با نفس کشیدن تحملش کنی اشکالی نداره، ولی اگه تیز شد، همون حرکت رو ول کن و به من بگو.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "sets": 2
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "note": "باسن رو همین‌جا بیدار کن تا بقیه‌ی جلسه کمرت کمتر جای اون کار کنه.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🧘",
+        "title": "Mobility Where It Is Needed",
+        "exercises": [
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "half-kneeling-hip-flexor-with-overhead-reach",
+            "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+            "note": "باسن و بالای کمر رو باز می‌کنیم تا کمرت دیگه کار اون‌ها رو انجام نده.",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "90-90-hip-switch",
+            "name": "90/90 Hip Switch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "open-book",
+            "name": "Open Book",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "side": true,
+              "time": "45 sec"
+            },
+            "exId": "supine-figure-4-stretch",
+            "name": "Supine Figure-4 Stretch",
+            "type": "simple"
+          }
+        ]
+      },
+      {
+        "icon": "🧱",
+        "rest": 30,
+        "title": "Build the Brace",
+        "exercises": [
+          {
+            "rx": {
+              "reps": "6 / 4 / 2",
+              "sets": 3,
+              "tempo": "1-0-1-10"
+            },
+            "exId": "modified-curl-up",
+            "name": "Modified Curl-Up",
+            "note": "این یکی رو تا یه ساعت بعد از بیدار شدن انجام نده، چون دیسک‌ها اون موقع بیشترین ورم رو دارن.",
+            "type": "standard"
+          },
+          {
+            "rx": {
+              "reps": "6 / 4 / 2",
+              "sets": 3,
+              "side": true,
+              "tempo": "1-0-1-10"
+            },
+            "exId": "side-plank",
+            "name": "Side Plank",
+            "note": "از روی زانو شروع کن و فقط وقتی نسخه‌ی زانو برای هر دو طرف راحت شد برو سراغ روی پا.",
+            "type": "standard",
+            "videoUrl": "https://www.youtube.com/watch?v=I_drRVYlHbc"
+          },
+          {
+            "rx": {
+              "reps": "6 / 4 / 2",
+              "sets": 3,
+              "side": true,
+              "tempo": "1-0-1-10"
+            },
+            "exId": "bird-dog",
+            "name": "Bird Dog",
+            "note": "شش تکرار، بعد چهار، بعد دو، که با خسته شدنت راحت‌تر بشه و هیچ‌وقت تا آخرین تکرار نری.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🌙",
+        "title": "Release",
+        "exercises": [
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "exId": "supine-rest-calves-elevated",
+            "name": "Supine Rest with Calves Elevated",
+            "note": "عمداً اینجا رول و کشش کمر نداریم، چون کمر دردناک فشار کم می‌خواد، نه فشار بیشتر.",
+            "type": "simple"
+          },
+          {
+            "rx": {
+              "time": "2 minutes"
+            },
+            "cues": {
+              "bad": [
+                "نفس‌های زورکی و بزرگ"
+              ],
+              "good": [
+                "با بینی ۴ ثانیه نفس بگیر، ۸ ثانیه بده بیرون",
+                "فقط دستی که روی شکمته باید تکون بخوره"
+              ]
+            },
+            "name": "Extended Exhale Breathing",
+            "note": "۴ ثانیه نفس بگیر، ۸ ثانیه بده بیرون.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "care",
+    "countsAs": "strength",
+    "duration": "30 min",
+    "focusTag": "کمردرد",
+    "equipment": "Bodyweight"
+  }
 }

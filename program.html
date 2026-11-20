@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=2" data-fa="/assets/js/i18n-fa.js?v=5"></script>
+<script src="/assets/js/i18n.js?v=2" data-fa="/assets/js/i18n-fa.js?v=6"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -19418,7 +19418,11 @@ async function _loadLibManifests() {
         const shape = (cats, itemKey) => ({
           categories: (cats || []).map(c => ({
             id: c.id, title: c.title, banner: c.banner, icon: c.icon,
-            [itemKey]: (c.items || []).map(it => {
+            [itemKey]: (c.items || []).map(it0 => {
+              // The Library in Farsi (2026-11-20, Amir: "the libraries and playbook should be available in farsi and everything should be
+              // written in both languages"): an item carries its Farsi as a FULL copy in `fa` (only the words differ: ids, titles, names,
+              // block titles and rx are the same, scripts/i18n/check_library_fa.js), shown when the phone is in Farsi. No copy: English.
+              const it = (window.AAI18N && AAI18N.fa && it0 && it0.fa && typeof it0.fa === 'object') ? it0.fa : it0;
               const key = it.slug || (it.id ? c.id + '/' + it.id : '');
               if (key) _libItems[key] = it;
               return Object.assign({}, it, { file: key });

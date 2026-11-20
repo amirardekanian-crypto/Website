@@ -92,5 +92,101 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "between-matches",
+    "intro": [
+      "امروز یه مسابقه دیگه داری، پس این با بقیه جلسه‌های کتابخونه فرق داره. تنها کارش اینه که تو انتظار سفت و سرد نشی. تو بیست تا سی دقیقه آخر فاصله انجامش بده، بعد مستقیم برو سراغ گرم کردن معمول تو زمین. جای اون گرم کردن رو نمی‌گیره.",
+      "فاصله قبلش مهم‌تره. قبل از اینکه بشینی چند دقیقه راه برو، بعد زود غذا بخور و آب بخور و از آفتاب دور بمون. اگه وقتی این شروع می‌شه هنوز چیزی نخوردی یا ننوشیدی، اول اونو انجام بده و بعد راه برو. اینجا کشش طولانی نیست، چون نگه‌داشتن طولانی یه مدت از نیروت کم می‌کنه و تو به‌زودی اون نیرو رو لازم داری. اگه پاهات اون بیرون گرفتگی کردن، آروم راه برو و مایعات بخور."
+    ],
+    "title": "Turnaround",
+    "before": [
+      {
+        "text": "اگه یه جاییت تیز گرفت و هنوز درد داره، بازی رو ادامه نده و بذار معاینه‌ش کنن.",
+        "label": "گرفتگی تیز"
+      },
+      {
+        "text": "اگه سرگیجه داری، حالت بده، گیجی، یا عرق کردنت قطع شده، این گرماست، نه سفتی. برو تو سایه، خودتو خنک کن، به یکی بگو و مسابقه بعدی رو بازی نکن.",
+        "label": "گرما"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🚶",
+        "title": "Keep Moving",
+        "exercises": [
+          {
+            "rx": {
+              "time": "5 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "note": "راحت، در حدی که بتونی حرف بزنی.",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "👟",
+        "title": "Stay Loose",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "standing-hip-circle",
+            "name": "Standing Hip Circle",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "cross-body-arm-swing",
+            "name": "Cross-Body Arm Swing",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "ankle-dorsiflexion-rocks",
+            "name": "Ankle Dorsiflexion Rocks",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "split-step-bounce",
+            "name": "Split-Step Bounce",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "recovery",
+    "countsAs": "mobility",
+    "duration": "10 min",
+    "focusTag": "بین مسابقه‌ها، همون روز",
+    "equipment": "Bodyweight"
+  }
 }

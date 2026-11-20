@@ -172,5 +172,181 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "change-of-direction",
+    "intro": [
+      "First-Step Speed شروع کردن رو تمرین می‌ده. این یکی توقف کردن رو، که نصفیه که واقعاً تعیین می‌کنه به توپ بعدی می‌رسی یا نه.",
+      "تا مومنتوم ضربه‌ی قبلی رو نکُشی، نمی‌تونی دوباره شتاب بگیری. ترمز اول میاد، وقتی تازه‌ای، بعد چرخش‌هایی که ازش استفاده می‌کنن."
+    ],
+    "title": "Cut & Recover",
+    "before": [
+      {
+        "text": "مچ پا، زانو، ساق، همسترینگ، کشاله یا آشیل دردناک، یا آسیبی توی ماه گذشته؟ اول بذار معاینه بشه.",
+        "label": "امروز نه"
+      },
+      {
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای تق ناگهانی.",
+        "label": "بایست و بذار چک بشه"
+      },
+      {
+        "text": "درد قفسه‌ی سینه، سرگیجه، ضربان تند یا نامنظم، یا نفس کشیدنی که درست حس نمی‌شه. قبل از تمرین بعدی بذار معاینه بشه. بهت گفتن مراقب ورزش سنگین باشی؟ اول با دکترت چک کن.",
+        "label": "همین الان بایست"
+      },
+      {
+        "text": "خیلی بیشتر از معمول درد داری، یا ادرارت تیره شده؟ همون روز بذار چک بشه.",
+        "label": "یکی دو روز بعد"
+      },
+      {
+        "text": "تا حالا رباط زانوت پاره شده، یا از آسیب مچ پا برمی‌گردی؟ از کسی که درمانت کرده بپرس توقف‌ها و کات‌ها اوکیه یا نه.",
+        "label": "آسیب قبلی"
+      },
+      {
+        "text": "حدود بیست‌وپنج متر زمین صاف و ضدلغزش، و کفش زمین. هر فاصله رو با چسب یا خط علامت بزن، نه با مخروط یا کیسه‌ای که بشه رویش پا گذاشت.",
+        "label": "جا رو چک کن"
+      },
+      {
+        "text": "۴۸ ساعت از جلسه‌ی سخت دیگه فاصله بگیر، و روز قبل مسابقه نه.",
+        "label": "فاصله بگیر"
+      },
+      {
+        "text": "توی دو بلوک آخر نصف ست‌ها رو بزن و استراحت کامل رو بگیر.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Activation & Prep",
+        "exercises": [
+          {
+            "rx": {
+              "time": "3 minutes"
+            },
+            "exId": "easy-run",
+            "name": "Easy Run",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "leg-swings",
+            "name": "Leg Swings",
+            "note": "جلو و عقب، بعد پهلو به پهلو.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 6,
+              "side": true
+            },
+            "exId": "lateral-lunge",
+            "name": "Lateral Lunge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 4,
+              "side": true
+            },
+            "exId": "worlds-greatest-stretch",
+            "name": "World's Greatest Stretch",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "sets": 2,
+              "distance": "15 m"
+            },
+            "exId": "a-skip",
+            "name": "A-Skip",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "sets": 2
+            },
+            "exId": "pogo-jump",
+            "name": "Pogo Jump",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "⚡",
+        "title": "Deceleration",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 5,
+              "rest": 45,
+              "sets": 3
+            },
+            "exId": "snap-down",
+            "name": "Snap Down",
+            "note": "آروم فرود بیا؛ باید تقریباً هیچ صدایی نشنوی.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rest": 60,
+              "sets": 5,
+              "distance": "10 m"
+            },
+            "exId": "sprint-to-two-step-stop",
+            "name": "Sprint to Two-Step Stop",
+            "note": "اول مال خودت کن توقف رو، بعد سریع‌ترش کن.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "👟",
+        "title": "Change of Direction",
+        "exercises": [
+          {
+            "rx": {
+              "reps": 3,
+              "rest": 60,
+              "sets": 6,
+              "side": true
+            },
+            "exId": "shuffle-to-sprint",
+            "name": "Shuffle to Sprint",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 3,
+              "rest": 75,
+              "sets": 6,
+              "side": true
+            },
+            "exId": "turn-and-go",
+            "name": "Turn and Go",
+            "note": "یه ست کامل از همون پا بچرخ، بعد عوض کن.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "on-court",
+    "countsAs": "strength",
+    "duration": "25 min",
+    "focusTag": "ترمز و تغییر جهت",
+    "equipment": "Court"
+  }
 }

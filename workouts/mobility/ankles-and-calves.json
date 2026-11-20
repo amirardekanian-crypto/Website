@@ -140,5 +140,149 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "ankles-and-calves",
+    "intro": [
+      "با مچ پا و ساق ترمز می‌کنی. وقتی مچ پا نمی‌ذاره زانوت به جلو بره، ممکنه به‌جای نشستن توی قدم آخر، بالا بکشی و هل دادن از گوشه‌ی زمین کندتر بشه. پس اول مچ پا رو باز می‌کنیم، بعد ساق رو می‌سازیم که اون دامنه رو نگه داره.",
+      "بعد از تمرین یا توی یه روز جدا انجامش بده. یه پله یا پله‌ی پایین راه‌پله و یه دیوار برای گرفتن لازم داری. بدون پله هم می‌شه، فقط کشش پایین رو از دست می‌دی. دوچرخه‌ی آروم کار پیاده‌روی رو می‌کنه."
+    ],
+    "title": "Brake Pads",
+    "before": [
+      {
+        "text": "مچ پای خشک، نه آسیب‌دیده. اگه زانو، آشیل یا مچ پات به‌جای خشکی درد داره، اول باید یکی معاینه‌ت کنه و بعد جلسه‌ی زانو، آشیل و مچ پا توی لیست Care همونیه که براش ساخته شده.",
+        "label": "برای کیه"
+      },
+      {
+        "text": "اگه اخیراً پیچ خورده، ورم داره، خالی می‌کنه، توی حالت عمیق زانوت درد می‌گیره، پشت مچ پا یا ساق صدای شکستن یا کشیدگی حس کردی، یه نقطه‌ی تیز توی ساق یا آشیل داری، یا خود تاندون دردناکه و صبح بعد بدتره.",
+        "label": "وایسا و حتماً بذار دکتر ببینه"
+      },
+      {
+        "text": "اگه یکی از ساق‌هات ورم کرده، گرمه یا لمسش دردناکه و موقع بازی هم کشیده نشده، همون روز دکتر ببین.",
+        "label": "ساق ورم‌کرده"
+      },
+      {
+        "text": "ساق‌هات رو یکی دو روز خسته می‌کنه. دو روز از مسابقه و از کار ترمزی توی زمین فاصله بگیر.",
+        "label": "دور بمون"
+      },
+      {
+        "text": "از هر حرکت باردار دو ست بزن و ببین دو روز بعد چه حالی داری.",
+        "label": "بار اول"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🔥",
+        "title": "Warm the Ground",
+        "exercises": [
+          {
+            "rx": {
+              "time": "5 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "ankle-dorsiflexion-rocks",
+            "name": "Ankle Dorsiflexion Rocks",
+            "note": "اگه دیوار نداری که روبه‌روش وایسی، چارچوب در هم کار می‌کنه.",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 15
+            },
+            "exId": "tibialis-raise",
+            "name": "Tibialis Raise",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "distance": "20m"
+            },
+            "exId": "toe-walk",
+            "name": "Toe Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10,
+              "side": true
+            },
+            "exId": "downward-dog-heel-drive",
+            "name": "Downward Dog Heel Drive",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🦵",
+        "title": "Load the Range",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "rest": 45,
+              "sets": 3,
+              "side": true,
+              "time": "20s",
+              "tempo": "Iso"
+            },
+            "exId": "split-squat",
+            "name": "Split Squat",
+            "note": "این یه نگه داشتنِ طولانیه، نه تکرار، و اگه جلوی مچ پا به‌جای کشش، فشار می‌آره، زانو رو کمی عقب ببر.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🦶",
+        "rest": 45,
+        "title": "Calves",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 20,
+              "sets": 3,
+              "tempo": "3-0-1-0"
+            },
+            "exId": "double-leg-calf-raise",
+            "name": "Double-Leg Calf Raise",
+            "note": "اون‌قدر پایین برو که پاشنه‌هات درست زیر پله باشه، و اگه ست آخر راحت بود، یه کوله‌پشتی با چندتا کتاب توش ببند.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 15,
+              "sets": 2,
+              "tempo": "2-0-1-0"
+            },
+            "exId": "bent-knee-calf-raise",
+            "name": "Bent-Knee Calf Raise",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "mobility",
+    "countsAs": "mobility",
+    "duration": "25 min",
+    "focusTag": "مچ پا و ساق",
+    "equipment": "Bodyweight"
+  }
 }

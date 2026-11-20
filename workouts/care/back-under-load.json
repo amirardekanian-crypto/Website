@@ -145,5 +145,154 @@
         }
       ]
     }
-  ]
+  ],
+  "fa": {
+    "id": "back-under-load",
+    "intro": [
+      "کمرت ثابت و محکم می‌مونه، تو هم لگنت قوی هل می‌ده و یه دستت بار می‌کشه. هیچ‌چیز ستون فقراتت رو زیر بار خم یا چرخ نمی‌ده.",
+      "بین جلسه‌ها ۴۸ ساعت فاصله بنداز و روز قبل از مسابقه هم نه. بلوک Take the Edge Off تنهایی قبل از بازی اشکالی نداره. به‌جای چهار تا، دو تا نگه‌داشتن با شدت ۶ بزن. دمبل رو روی میز یا کانتر تقریباً هم‌ارتفاع لگن بذار، از همونجا بردار و همونجا برگردون، هیچ‌وقت از روی زمین نه. آخر کری با جابه‌جا کردن پاها بچرخ، نه با پیچوندن کمر. جا نداری پانزده متر راه بری؟ سی ثانیه کری رو سرجات نگه دار. یه نیمکت یا مبل سفت کنار دیوار و یه دسته جارو هم لازم داری. اگه بعد از حدود شش هفته بهتر نشد برو پیش فیزیوتراپ، یا زودتر اگه داره بدتر می‌شه یا زودتر از قبل شروع می‌شه."
+    ],
+    "title": "Iron Back",
+    "before": [
+      {
+        "text": "کمری که خوابیده خوبه ولی موقع سرویس، موقع خم شدن پایین برای ولی، یا دو ساعت بعد از شروع مسابقه درد می‌گیره، و دکتر یا فیزیوتراپ قبلاً دیده و اجازه تمرین داده. اگه بیشتر وقت‌ها کمرت درد می‌کنه، یا قبلاً هیچ کاری براش نکردی، چند هفته با Steady Spine شروع کن.",
+        "label": "برای کیه"
+      },
+      {
+        "text": "دردی که تو پا پایین می‌ره، بی‌حسی، ضعف تو پا یا کف پا، یا بی‌حسی بین پاها. همین‌طور اگه کمردردت بعد از زمین خوردن یا ضربه شروع شده، یا شب از خواب بیدارت می‌کنه. اگه کنترل مثانه یا روده‌ت عوض شد، همون روز معاینه شو.",
+        "label": "وایستا و بذار معاینه‌ش کنن"
+      },
+      {
+        "text": "یه کم درد کشیدن عیبی نداره. درد تیز نه، و دردی که وسط ست بیشتر می‌شه یا صبح بعدش بدتره هم نه. اگه داره بیشتر می‌شه، اون حرکت رو قطع کن. اگه تیزه، جلسه رو تموم کن.",
+        "label": "وقتی تمرین می‌کنی"
+      }
+    ],
+    "blocks": [
+      {
+        "icon": "🚶",
+        "title": "Get the Hips Going",
+        "exercises": [
+          {
+            "rx": {
+              "time": "5 minutes"
+            },
+            "exId": "walk",
+            "name": "Walk",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 10
+            },
+            "exId": "dowel-hip-hinge",
+            "name": "Dowel Hip Hinge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 12
+            },
+            "exId": "glute-bridge",
+            "name": "Glute Bridge",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "quadruped-thoracic-rotation",
+            "name": "Quadruped Thoracic Rotation",
+            "type": "simple",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "reps": 8,
+              "side": true
+            },
+            "exId": "dead-bug",
+            "name": "Dead Bug",
+            "type": "simple",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "🛡️",
+        "title": "Take the Edge Off",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "rest": 30,
+              "sets": 4,
+              "side": true,
+              "time": "25s",
+              "tempo": "Iso"
+            },
+            "exId": "suitcase-carry",
+            "name": "Suitcase Carry",
+            "note": "تو روزی که کمرت عود کرده، فقط همین بلوک رو با شدت ۶ بزن و جلسه رو تموم‌شده ثبت نکن.",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      },
+      {
+        "icon": "💪",
+        "rest": 45,
+        "title": "Load It",
+        "exercises": [
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 8,
+              "sets": 2,
+              "side": true,
+              "tempo": "3-0-1-0"
+            },
+            "exId": "dumbbell-split-squat",
+            "name": "Dumbbell Split Squat",
+            "note": "اگه صبح بعد کمرت بدتر از قبل از شروع بود، دفعه بعد از هر حرکت این بلوک یه ست کم کن، و اگه بازم بدتر بود، بذار معاینه‌ش کنن.",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "reps": 10,
+              "sets": 3,
+              "side": true,
+              "tempo": "1-0-1-2"
+            },
+            "exId": "single-leg-dumbbell-hip-thrust",
+            "name": "Single-Leg Dumbbell Hip Thrust",
+            "type": "standard",
+            "videoUrl": null
+          },
+          {
+            "rx": {
+              "rpe": 7,
+              "sets": 3,
+              "side": true,
+              "distance": "30 m"
+            },
+            "exId": "suitcase-carry",
+            "name": "Suitcase Carry",
+            "type": "standard",
+            "videoUrl": null
+          }
+        ]
+      }
+    ],
+    "category": "care",
+    "countsAs": "strength",
+    "duration": "32 min",
+    "focusTag": "کمر زیر بار",
+    "equipment": "Dumbbells"
+  }
 }

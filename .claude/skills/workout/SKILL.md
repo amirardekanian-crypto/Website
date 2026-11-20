@@ -280,6 +280,19 @@ Library card writes no `cues`), carries its `exId` and is named EXACTLY as its e
 2026-10-09; `python scripts/check_library_spine.py --online`, pre-commit
 guard 14: a card with no `exId` blocks the commit, 2026-10-09), every note one sentence, `intro` present and about 100–150 words, `before` present with no warning also repeated in the intro.
 
+### ⚠️ Every session is written in BOTH languages: its Farsi goes in `fa`
+
+Amir, 2026-11-20: *"the libraries and playbook should be available in farsi and everything should be written in both
+languages"*. The athlete app shows a Library session in the phone's language. So the file carries, as its LAST key,
+`"fa"`: a FULL copy of the session in which only the words an athlete reads are Farsi: `intro[]`, `before[].label` and
+`before[].text`, `focusTag`, every exercise `note`, a circuit item's `note` and `detail`, `why.text`. Everything else is
+byte for byte the English: `id`, `title` (the app logs it), `category`, `countsAs`, `duration`, `equipment`, block
+`title` and `icon` (the app's logic reads block titles; the screen translates them), exercise `name`, `exId`, `type`, all
+of `rx`, `intent`. The Farsi is Amir's spoken voice (COM-3, informal تو), the safety lines in `before` exact. The rules and
+the glossary: `scripts/i18n/LIBRARY-BRIEF.md`. Check it with
+`node scripts/i18n/check_library_fa.js --files workouts/<shelf>/<id>.json` (pre-commit guard 30 runs it on every staged
+workout file and fails a file with no `fa`). A change to the English is a change to the Farsi copy in the same run.
+
 ### ⚠️ `countsAs` is required — decide it, don't omit it
 
 An athlete can press **Mark as done** at the foot of a library workout, and this
